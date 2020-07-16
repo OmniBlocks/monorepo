@@ -234,17 +234,54 @@ class PenSkin extends Skin {
      * Create 2D geometry for drawing lines to a framebuffer.
      */
     _createLineGeometry () {
+        this.a_lineColor = new Float32Array(65520);
+        this.a_lineColorIndex = 0;
+        this.a_lineThickness = new Float32Array(16380);
+        this.a_lineThicknessIndex = 0;
+        this.a_lineLength = new Float32Array(16380);
+        this.a_lineLengthIndex = 0;
+        this.a_penPoints = new Float32Array(65520);
+        this.a_penPointsIndex = 0;
+        this.a_position = new Float32Array(32760);
+        for (var i = 0; i < this.a_position.length; i += 12) {
+            this.a_position[i + 0] = 1;
+            this.a_position[i + 1] = 0;
+            this.a_position[i + 2] = 0;
+            this.a_position[i + 3] = 0;
+            this.a_position[i + 4] = 1;
+            this.a_position[i + 5] = 1;
+            this.a_position[i + 6] = 1;
+            this.a_position[i + 7] = 1;
+            this.a_position[i + 8] = 0;
+            this.a_position[i + 9] = 0;
+            this.a_position[i + 10] = 0;
+            this.a_position[i + 11] = 1;
+        }
+
         const quads = {
             a_position: {
                 numComponents: 2,
-                data: [
-                    1, 0,
-                    0, 0,
-                    1, 1,
-                    1, 1,
-                    0, 0,
-                    0, 1
-                ]
+                data: this.a_position
+            },
+            a_lineColor: {
+                numComponents: 4,
+                drawType: this._renderer.gl.STREAM_DRAW,
+                data: this.a_lineColor
+            },
+            a_lineThickness: {
+                numComponents: 1,
+                drawType: this._renderer.gl.STREAM_DRAW,
+                data: this.a_lineThickness
+            },
+            a_lineLength: {
+                numComponents: 1,
+                drawType: this._renderer.gl.STREAM_DRAW,
+                data: this.a_lineLength
+            },
+            a_penPoints: {
+                numComponents: 4,
+                drawType: this._renderer.gl.STREAM_DRAW,
+                data: this.a_penPoints
             }
         };
 
@@ -261,13 +298,16 @@ class PenSkin extends Skin {
         const currentShader = this._lineShader;
         const projection = twgl.m4.ortho(0, bounds.width, 0, bounds.height, -1, 1, __projectionMatrix);
 
+        this.a_lineColorIndex = 0;
+        this.a_lineThicknessIndex = 0;
+        this.a_lineLengthIndex = 0;
+        this.a_penPointsIndex = 0;
+
         twgl.bindFramebufferInfo(gl, this._framebuffer);
 
         gl.viewport(0, 0, bounds.width, bounds.height);
 
         gl.useProgram(currentShader.program);
-
-        twgl.setBuffersAndAttributes(gl, currentShader, this._lineBufferInfo);
 
         const uniforms = {
             u_skin: this._texture,
@@ -281,6 +321,10 @@ class PenSkin extends Skin {
      * Return to a base state from _lineOnBufferDrawRegionId.
      */
     _exitDrawLineOnBuffer () {
+        if (this.a_lineColorIndex) {
+            this._flushLines();
+        }
+
         const gl = this._renderer.gl;
 
         twgl.bindFramebufferInfo(gl, null);
@@ -297,10 +341,6 @@ class PenSkin extends Skin {
      * @param {number} y1 - the Y coordinate of the end of the line.
      */
     _drawLineOnBuffer (penAttributes, x0, y0, x1, y1) {
-        const gl = this._renderer.gl;
-
-        const currentShader = this._lineShader;
-
         this._renderer.enterDrawRegion(this._lineOnBufferDrawRegionId);
 
         // Premultiply pen color by pen transparency
@@ -319,17 +359,62 @@ class PenSkin extends Skin {
         const lineDiffY = y1 - y0;
         const lineLength = Math.sqrt((lineDiffX * lineDiffX) + (lineDiffY * lineDiffY));
 
+        const lineThickness = penAttributes.diameter || DefaultPenAttributes.diameter;
+
+        if (this.a_lineColorIndex + 24 >= this.a_lineColor.length) {
+            this._flushLines();
+        }
+
+        for (var i = 0; i < 6; i++) {
+            this.a_lineColor[this.a_lineColorIndex] = __premultipliedColor[0];
+            this.a_lineColorIndex++;
+            this.a_lineColor[this.a_lineColorIndex] = __premultipliedColor[1];
+            this.a_lineColorIndex++;
+            this.a_lineColor[this.a_lineColorIndex] = __premultipliedColor[2];
+            this.a_lineColorIndex++;
+            this.a_lineColor[this.a_lineColorIndex] = __premultipliedColor[3];
+            this.a_lineColorIndex++;
+
+            this.a_lineThickness[this.a_lineThicknessIndex] = lineThickness;
+            this.a_lineThicknessIndex++;
+
+            this.a_lineLength[this.a_lineLengthIndex] = lineLength;
+            this.a_lineLengthIndex++;
+
+            this.a_penPoints[this.a_penPointsIndex] = x0;
+            this.a_penPointsIndex++;
+            this.a_penPoints[this.a_penPointsIndex] = -y0;
+            this.a_penPointsIndex++;
+            this.a_penPoints[this.a_penPointsIndex] = x1;
+            this.a_penPointsIndex++;
+            this.a_penPoints[this.a_penPointsIndex] = -y1;
+            this.a_penPointsIndex++;
+        }
+    }
+
+    _flushLines() {
+        const gl = this._renderer.gl;
+
+        const currentShader = this._lineShader;
+
+        twgl.setAttribInfoBufferFromArray(gl, this._lineBufferInfo.attribs.a_lineColor, this.a_lineColor);
+        twgl.setAttribInfoBufferFromArray(gl, this._lineBufferInfo.attribs.a_penPoints, this.a_penPoints);
+        twgl.setAttribInfoBufferFromArray(gl, this._lineBufferInfo.attribs.a_lineThickness, this.a_lineThickness);
+        twgl.setAttribInfoBufferFromArray(gl, this._lineBufferInfo.attribs.a_lineLength, this.a_lineLength);
+        twgl.setBuffersAndAttributes(gl, currentShader, this._lineBufferInfo);
+
         const uniforms = {
-            u_lineColor: __premultipliedColor,
-            u_lineThickness: penAttributes.diameter || DefaultPenAttributes.diameter,
-            u_lineLength: lineLength,
-            u_penPoints: [x0, -y0, x1, -y1],
             u_stageSize: this.size
         };
 
         twgl.setUniforms(currentShader, uniforms);
 
-        twgl.drawBufferInfo(gl, this._lineBufferInfo, gl.TRIANGLES);
+        twgl.drawBufferInfo(gl, this._lineBufferInfo, gl.TRIANGLES, this.a_lineLengthIndex);
+
+        this.a_lineColorIndex = 0;
+        this.a_lineLengthIndex = 0;
+        this.a_lineThicknessIndex = 0;
+        this.a_penPointsIndex = 0;
 
         this._silhouetteDirty = true;
     }

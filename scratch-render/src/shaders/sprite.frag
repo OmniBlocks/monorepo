@@ -34,10 +34,9 @@ uniform float u_ghost;
 #endif // ENABLE_ghost
 
 #ifdef DRAW_MODE_line
-uniform vec4 u_lineColor;
-uniform float u_lineThickness;
-uniform float u_lineLength;
-uniform vec4 u_penPoints;
+varying vec4 v_lineColor;
+varying float v_lineThickness;
+varying float v_lineLength;
 #endif // DRAW_MODE_line
 
 #ifdef DRAW_MODE_background
@@ -230,7 +229,7 @@ void main()
 	// "along-the-lineness". This increases parallel to the line.
 	// It goes from negative before the start point, to 0.5 through the start to the end, then ramps up again
 	// past the end point.
-	float d = ((v_texCoord.x - clamp(v_texCoord.x, 0.0, u_lineLength)) * 0.5) + 0.5;
+	float d = ((v_texCoord.x - clamp(v_texCoord.x, 0.0, v_lineLength)) * 0.5) + 0.5;
 
 	// Distance from (0.5, 0.5) to (d, the perpendicular coordinate). When we're in the middle of the line,
 	// d will be 0.5, so the distance will be 0 at points close to the line and will grow at points further from it.
@@ -238,10 +237,10 @@ void main()
 	// See https://www.youtube.com/watch?v=PMltMdi1Wzg for a rough outline of the technique used to round the lines.
 	float line = distance(vec2(0.5), vec2(d, v_texCoord.y)) * 2.0;
 	// Expand out the line by its thickness.
-	line -= ((u_lineThickness - 1.0) * 0.5);
+	line -= ((v_lineThickness - 1.0) * 0.5);
 	// Because "distance to the center of the line" decreases the closer we get to the line, but we want more opacity
 	// the closer we are to the line, invert it.
-	gl_FragColor = u_lineColor * clamp(1.0 - line, 0.0, 1.0);
+	gl_FragColor = v_lineColor * clamp(1.0 - line, 0.0, 1.0);
 	#endif // DRAW_MODE_line
 
 	#ifdef DRAW_MODE_background

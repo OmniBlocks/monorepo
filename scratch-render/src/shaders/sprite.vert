@@ -2,9 +2,15 @@ precision mediump float;
 
 #ifdef DRAW_MODE_line
 uniform vec2 u_stageSize;
-uniform float u_lineThickness;
-uniform float u_lineLength;
-uniform vec4 u_penPoints;
+attribute float a_lineThickness;
+attribute float a_lineLength;
+attribute vec4 a_penPoints;
+attribute vec4 a_lineColor;
+
+varying vec4 v_lineColor;
+varying float v_lineThickness;
+varying float v_lineLength;
+varying vec4 v_penPoints;
 
 // Add this to divisors to prevent division by 0, which results in NaNs propagating through calculations.
 // Smaller values can cause problems on some mobile devices.
@@ -30,36 +36,41 @@ void main() {
 	// Expand line bounds by sqrt(2) / 2 each side-- this ensures that all antialiased pixels
 	// fall within the quad, even at a 45-degree diagonal
 	vec2 position = a_position;
-	float expandedRadius = (u_lineThickness * 0.5) + 1.4142135623730951;
+	float expandedRadius = (a_lineThickness * 0.5) + 1.4142135623730951;
 
 	// The X coordinate increases along the length of the line. It's 0 at the center of the origin point
 	// and is in pixel-space (so at n pixels along the line, its value is n).
-	v_texCoord.x = mix(0.0, u_lineLength + (expandedRadius * 2.0), a_position.x) - expandedRadius;
+	v_texCoord.x = mix(0.0, a_lineLength + (expandedRadius * 2.0), a_position.x) - expandedRadius;
 	// The Y coordinate is perpendicular to the line. It's also in pixel-space.
 	v_texCoord.y = ((a_position.y - 0.5) * expandedRadius) + 0.5;
 
-	position.x *= u_lineLength + (2.0 * expandedRadius);
+	position.x *= a_lineLength + (2.0 * expandedRadius);
 	position.y *= 2.0 * expandedRadius;
 
 	// Center around first pen point
 	position -= expandedRadius;
 
 	// Rotate quad to line angle
-	vec2 pointDiff = u_penPoints.zw - u_penPoints.xy;
+	vec2 pointDiff = a_penPoints.zw - a_penPoints.xy;
 	// Ensure line has a nonzero length so it's rendered properly
 	// As long as either component is nonzero, the line length will be nonzero
 	// If the line is zero-length, give it a bit of horizontal length
 	pointDiff.x = (abs(pointDiff.x) < epsilon && abs(pointDiff.y) < epsilon) ? epsilon : pointDiff.x;
 	// The `normalized` vector holds rotational values equivalent to sine/cosine
 	// We're applying the standard rotation matrix formula to the position to rotate the quad to the line angle
-	vec2 normalized = pointDiff / max(u_lineLength, epsilon);
+	vec2 normalized = pointDiff / max(a_lineLength, epsilon);
 	position = mat2(normalized.x, normalized.y, -normalized.y, normalized.x) * position;
 	// Translate quad
-	position += u_penPoints.xy;
+	position += a_penPoints.xy;
 
 	// Apply view transform
 	position *= 2.0 / u_stageSize;
 	gl_Position = vec4(position, 0, 1);
+
+	v_lineColor = a_lineColor;
+	v_lineThickness = a_lineThickness;
+	v_lineLength = a_lineLength;
+	v_penPoints = a_penPoints;
 	#elif defined(DRAW_MODE_background)
 	gl_Position = vec4(a_position * 2.0, 0, 1);
 	#else

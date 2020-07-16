@@ -236,12 +236,11 @@ class PenSkin extends Skin {
     _createLineGeometry () {
         this.a_lineColor = new Float32Array(65520);
         this.a_lineColorIndex = 0;
-        this.a_lineThickness = new Float32Array(16380);
-        this.a_lineThicknessIndex = 0;
-        this.a_lineLength = new Float32Array(16380);
-        this.a_lineLengthIndex = 0;
+        this.a_lineThicknessAndLength = new Float32Array(32760);
+        this.a_lineThicknessAndLengthIndex = 0;
         this.a_penPoints = new Float32Array(65520);
         this.a_penPointsIndex = 0;
+
         this.a_position = new Float32Array(32760);
         for (var i = 0; i < this.a_position.length; i += 12) {
             this.a_position[i + 0] = 1;
@@ -268,15 +267,10 @@ class PenSkin extends Skin {
                 drawType: this._renderer.gl.STREAM_DRAW,
                 data: this.a_lineColor
             },
-            a_lineThickness: {
-                numComponents: 1,
+            a_lineThicknessAndLength: {
+                numComponents: 2,
                 drawType: this._renderer.gl.STREAM_DRAW,
-                data: this.a_lineThickness
-            },
-            a_lineLength: {
-                numComponents: 1,
-                drawType: this._renderer.gl.STREAM_DRAW,
-                data: this.a_lineLength
+                data: this.a_lineThicknessAndLength
             },
             a_penPoints: {
                 numComponents: 4,
@@ -299,8 +293,7 @@ class PenSkin extends Skin {
         const projection = twgl.m4.ortho(0, bounds.width, 0, bounds.height, -1, 1, __projectionMatrix);
 
         this.a_lineColorIndex = 0;
-        this.a_lineThicknessIndex = 0;
-        this.a_lineLengthIndex = 0;
+        this.a_lineThicknessAndLengthIndex = 0;
         this.a_penPointsIndex = 0;
 
         twgl.bindFramebufferInfo(gl, this._framebuffer);
@@ -311,7 +304,9 @@ class PenSkin extends Skin {
 
         const uniforms = {
             u_skin: this._texture,
-            u_projectionMatrix: projection
+            u_projectionMatrix: projection,
+            // we assume that size won't change between now and when this region is exited
+            u_stageSize: this.size
         };
 
         twgl.setUniforms(currentShader, uniforms);
@@ -343,6 +338,10 @@ class PenSkin extends Skin {
     _drawLineOnBuffer (penAttributes, x0, y0, x1, y1) {
         this._renderer.enterDrawRegion(this._lineOnBufferDrawRegionId);
 
+        if (this.a_lineColorIndex + 24 > this.a_lineColor.length) {
+            this._flushLines();
+        }
+
         // Premultiply pen color by pen transparency
         const penColor = penAttributes.color4f || DefaultPenAttributes.color4f;
         __premultipliedColor[0] = penColor[0] * penColor[3];
@@ -361,10 +360,6 @@ class PenSkin extends Skin {
 
         const lineThickness = penAttributes.diameter || DefaultPenAttributes.diameter;
 
-        if (this.a_lineColorIndex + 24 >= this.a_lineColor.length) {
-            this._flushLines();
-        }
-
         for (var i = 0; i < 6; i++) {
             this.a_lineColor[this.a_lineColorIndex] = __premultipliedColor[0];
             this.a_lineColorIndex++;
@@ -375,11 +370,11 @@ class PenSkin extends Skin {
             this.a_lineColor[this.a_lineColorIndex] = __premultipliedColor[3];
             this.a_lineColorIndex++;
 
-            this.a_lineThickness[this.a_lineThicknessIndex] = lineThickness;
-            this.a_lineThicknessIndex++;
+            this.a_lineThicknessAndLength[this.a_lineThicknessAndLengthIndex] = lineThickness;
+            this.a_lineThicknessAndLengthIndex++;
 
-            this.a_lineLength[this.a_lineLengthIndex] = lineLength;
-            this.a_lineLengthIndex++;
+            this.a_lineThicknessAndLength[this.a_lineThicknessAndLengthIndex] = lineLength;
+            this.a_lineThicknessAndLengthIndex++;
 
             this.a_penPoints[this.a_penPointsIndex] = x0;
             this.a_penPointsIndex++;
@@ -397,23 +392,22 @@ class PenSkin extends Skin {
 
         const currentShader = this._lineShader;
 
-        twgl.setAttribInfoBufferFromArray(gl, this._lineBufferInfo.attribs.a_lineColor, this.a_lineColor);
-        twgl.setAttribInfoBufferFromArray(gl, this._lineBufferInfo.attribs.a_penPoints, this.a_penPoints);
-        twgl.setAttribInfoBufferFromArray(gl, this._lineBufferInfo.attribs.a_lineThickness, this.a_lineThickness);
-        twgl.setAttribInfoBufferFromArray(gl, this._lineBufferInfo.attribs.a_lineLength, this.a_lineLength);
+        // If only a small amount of data needs to be uploaded, we only upload part of the data. Otherwise we'll just upload everything.
+        if (this.a_lineColorIndex < 1000) {
+            twgl.setAttribInfoBufferFromArray(gl, this._lineBufferInfo.attribs.a_lineColor, new Float32Array(this.a_lineColor.buffer, 0, this.a_lineColorIndex), 0);
+            twgl.setAttribInfoBufferFromArray(gl, this._lineBufferInfo.attribs.a_penPoints, new Float32Array(this.a_penPoints.buffer, 0, this.a_penPointsIndex), 0);
+            twgl.setAttribInfoBufferFromArray(gl, this._lineBufferInfo.attribs.a_lineThicknessAndLength, new Float32Array(this.a_lineThicknessAndLength.buffer, 0, this.a_lineThicknessAndLengthIndex), 0);
+        } else {
+            twgl.setAttribInfoBufferFromArray(gl, this._lineBufferInfo.attribs.a_lineColor, this.a_lineColor);
+            twgl.setAttribInfoBufferFromArray(gl, this._lineBufferInfo.attribs.a_penPoints, this.a_penPoints);
+            twgl.setAttribInfoBufferFromArray(gl, this._lineBufferInfo.attribs.a_lineThicknessAndLength, this.a_lineThicknessAndLength);
+        }
         twgl.setBuffersAndAttributes(gl, currentShader, this._lineBufferInfo);
 
-        const uniforms = {
-            u_stageSize: this.size
-        };
-
-        twgl.setUniforms(currentShader, uniforms);
-
-        twgl.drawBufferInfo(gl, this._lineBufferInfo, gl.TRIANGLES, this.a_lineLengthIndex);
+        twgl.drawBufferInfo(gl, this._lineBufferInfo, gl.TRIANGLES, this.a_lineThicknessAndLengthIndex / 2);
 
         this.a_lineColorIndex = 0;
-        this.a_lineLengthIndex = 0;
-        this.a_lineThicknessIndex = 0;
+        this.a_lineThicknessAndLengthIndex = 0;
         this.a_penPointsIndex = 0;
 
         this._silhouetteDirty = true;

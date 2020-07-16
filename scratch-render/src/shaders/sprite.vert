@@ -2,8 +2,7 @@ precision mediump float;
 
 #ifdef DRAW_MODE_line
 uniform vec2 u_stageSize;
-attribute float a_lineThickness;
-attribute float a_lineLength;
+attribute vec2 a_lineThicknessAndLength;
 attribute vec4 a_penPoints;
 attribute vec4 a_lineColor;
 
@@ -36,15 +35,15 @@ void main() {
 	// Expand line bounds by sqrt(2) / 2 each side-- this ensures that all antialiased pixels
 	// fall within the quad, even at a 45-degree diagonal
 	vec2 position = a_position;
-	float expandedRadius = (a_lineThickness * 0.5) + 1.4142135623730951;
+	float expandedRadius = (a_lineThicknessAndLength.x * 0.5) + 1.4142135623730951;
 
 	// The X coordinate increases along the length of the line. It's 0 at the center of the origin point
 	// and is in pixel-space (so at n pixels along the line, its value is n).
-	v_texCoord.x = mix(0.0, a_lineLength + (expandedRadius * 2.0), a_position.x) - expandedRadius;
+	v_texCoord.x = mix(0.0, a_lineThicknessAndLength.y + (expandedRadius * 2.0), a_position.x) - expandedRadius;
 	// The Y coordinate is perpendicular to the line. It's also in pixel-space.
 	v_texCoord.y = ((a_position.y - 0.5) * expandedRadius) + 0.5;
 
-	position.x *= a_lineLength + (2.0 * expandedRadius);
+	position.x *= a_lineThicknessAndLength.y + (2.0 * expandedRadius);
 	position.y *= 2.0 * expandedRadius;
 
 	// Center around first pen point
@@ -58,7 +57,7 @@ void main() {
 	pointDiff.x = (abs(pointDiff.x) < epsilon && abs(pointDiff.y) < epsilon) ? epsilon : pointDiff.x;
 	// The `normalized` vector holds rotational values equivalent to sine/cosine
 	// We're applying the standard rotation matrix formula to the position to rotate the quad to the line angle
-	vec2 normalized = pointDiff / max(a_lineLength, epsilon);
+	vec2 normalized = pointDiff / max(a_lineThicknessAndLength.y, epsilon);
 	position = mat2(normalized.x, normalized.y, -normalized.y, normalized.x) * position;
 	// Translate quad
 	position += a_penPoints.xy;
@@ -68,8 +67,8 @@ void main() {
 	gl_Position = vec4(position, 0, 1);
 
 	v_lineColor = a_lineColor;
-	v_lineThickness = a_lineThickness;
-	v_lineLength = a_lineLength;
+	v_lineThickness = a_lineThicknessAndLength.x;
+	v_lineLength = a_lineThicknessAndLength.y;
 	v_penPoints = a_penPoints;
 	#elif defined(DRAW_MODE_background)
 	gl_Position = vec4(a_position * 2.0, 0, 1);

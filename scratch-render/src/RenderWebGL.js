@@ -44,6 +44,12 @@ const MAX_TOUCH_SIZE = [3, 3];
 const MASK_TOUCHING_COLOR_TOLERANCE = 2;
 
 /**
+ * Maximum number of pixels in either dimension of "extracted drawable" data
+ * @type {int}
+ */
+const MAX_EXTRACTED_DRAWABLE_DIMENSION = 2048;
+
+/**
  * Determines if the mask color is "close enough" (only test the 6 top bits for
  * each color).  These bit masks are what scratch 2 used to use, so we do the same.
  * @param {Uint8Array} a A color3b or color4b value.
@@ -182,22 +188,8 @@ class RenderWebGL extends EventEmitter {
         /** @type {function} */
         this._exitRegion = null;
 
-        /** @type {object} */
-        this._backgroundDrawRegionId = {
-            enter: () => this._enterDrawBackground(),
-            exit: () => this._exitDrawBackground()
-        };
-
         /** @type {Array.<snapshotCallback>} */
         this._snapshotCallbacks = [];
-
-        /** @type {Array<number>} */
-        // Don't set this directly-- use setBackgroundColor so it stays in sync with _backgroundColor3b
-        this._backgroundColor4f = [0, 0, 0, 1];
-
-        /** @type {Uint8ClampedArray} */
-        // Don't set this directly-- use setBackgroundColor so it stays in sync with _backgroundColor4f
-        this._backgroundColor3b = new Uint8ClampedArray(3);
 
         this._createGeometry();
 
@@ -258,14 +250,7 @@ class RenderWebGL extends EventEmitter {
      * @param {number} blue The blue component for the background.
      */
     setBackgroundColor (red, green, blue) {
-        this._backgroundColor4f[0] = red;
-        this._backgroundColor4f[1] = green;
-        this._backgroundColor4f[2] = blue;
-
-        this._backgroundColor3b[0] = red * 255;
-        this._backgroundColor3b[1] = green * 255;
-        this._backgroundColor3b[2] = blue * 255;
-
+        this._backgroundColor = [red, green, blue, 1];
     }
 
     /**
@@ -644,7 +629,7 @@ class RenderWebGL extends EventEmitter {
 
         twgl.bindFramebufferInfo(gl, null);
         gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-        gl.clearColor.apply(gl, this._backgroundColor4f);
+        gl.clearColor.apply(gl, this._backgroundColor);
         gl.clear(gl.COLOR_BUFFER_BIT);
 
         this._drawThese(this._drawList, ShaderManager.DRAW_MODE.default, this._projection);
@@ -760,19 +745,11 @@ class RenderWebGL extends EventEmitter {
      */
     isTouchingColor (drawableID, color3b, mask3b) {
         const candidates = this._candidatesTouching(drawableID, this._visibleDrawList);
-
-        let bounds;
-        if (colorMatches(color3b, this._backgroundColor3b, 0)) {
-            // If the color we're checking for is the background color, don't confine the check to
-            // candidate drawables' bounds--since the background spans the entire stage, we must check
-            // everything that lies inside the drawable.
-            bounds = this._touchingBounds(drawableID);
-        } else if (candidates.length === 0) {
-            // If not checking for the background color, we can return early if there are no candidate drawables.
+        if (candidates.length === 0) {
             return false;
-        } else {
-            bounds = this._candidatesBounds(candidates);
         }
+
+        const bounds = this._candidatesBounds(candidates);
 
         const maxPixelsForCPU = this._getMaxPixelsForCPU();
 
@@ -834,19 +811,6 @@ class RenderWebGL extends EventEmitter {
         }
     }
 
-    _enterDrawBackground () {
-        const gl = this.gl;
-        const currentShader = this._shaderManager.getShader(ShaderManager.DRAW_MODE.background, 0);
-        gl.disable(gl.BLEND);
-        gl.useProgram(currentShader.program);
-        twgl.setBuffersAndAttributes(gl, currentShader, this._bufferInfo);
-    }
-
-    _exitDrawBackground () {
-        const gl = this.gl;
-        gl.enable(gl.BLEND);
-    }
-
     _isTouchingColorGpuStart (drawableID, candidateIDs, bounds, color3b, mask3b) {
         this._doExitDrawRegion();
 
@@ -858,8 +822,15 @@ class RenderWebGL extends EventEmitter {
         gl.viewport(0, 0, bounds.width, bounds.height);
         const projection = twgl.m4.ortho(bounds.left, bounds.right, bounds.top, bounds.bottom, -1, 1);
 
-        // Clear the query buffer to fully transparent. This will be the color of pixels that fail the stencil test.
-        gl.clearColor(0, 0, 0, 0);
+        let fillBackgroundColor = this._backgroundColor;
+
+        // When using masking such that the background fill color will showing through, ensure we don't
+        // fill using the same color that we are trying to detect!
+        if (color3b[0] > 196 && color3b[1] > 196 && color3b[2] > 196) {
+            fillBackgroundColor = [0, 0, 0, 255];
+        }
+
+        gl.clearColor.apply(gl, fillBackgroundColor);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
 
         let extraUniforms;
@@ -871,9 +842,6 @@ class RenderWebGL extends EventEmitter {
         }
 
         try {
-            // Using the stencil buffer, mask out the drawing to either the drawable's alpha channel
-            // or pixels of the drawable which match the mask color, depending on whether a mask color is given.
-            // Masked-out pixels will not be checked.
             gl.enable(gl.STENCIL_TEST);
             gl.stencilFunc(gl.ALWAYS, 1, 1);
             gl.stencilOp(gl.KEEP, gl.KEEP, gl.REPLACE);
@@ -894,25 +862,12 @@ class RenderWebGL extends EventEmitter {
             gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP);
             gl.colorMask(true, true, true, true);
 
-            // Draw the background as a quad. Drawing a background with gl.clear will not mask to the stenciled area.
-            this.enterDrawRegion(this._backgroundDrawRegionId);
-
-            const uniforms = {
-                u_backgroundColor: this._backgroundColor4f
-            };
-
-            const currentShader = this._shaderManager.getShader(ShaderManager.DRAW_MODE.background, 0);
-            twgl.setUniforms(currentShader, uniforms);
-            twgl.drawBufferInfo(gl, this._bufferInfo, gl.TRIANGLES);
-
-            // Draw the candidate drawables on top of the background.
             this._drawThese(candidateIDs, ShaderManager.DRAW_MODE.default, projection,
                 {idFilterFunc: testID => testID !== drawableID}
             );
         } finally {
             gl.colorMask(true, true, true, true);
             gl.disable(gl.STENCIL_TEST);
-            this._doExitDrawRegion();
         }
     }
 
@@ -931,8 +886,7 @@ class RenderWebGL extends EventEmitter {
         }
 
         for (let pixelBase = 0; pixelBase < pixels.length; pixelBase += 4) {
-            // Transparent pixels are masked (either by the drawable's alpha channel or color mask).
-            if (pixels[pixelBase + 3] !== 0 && colorMatches(color3b, pixels, pixelBase)) {
+            if (colorMatches(color3b, pixels, pixelBase)) {
                 return true;
             }
         }
@@ -1121,7 +1075,7 @@ class RenderWebGL extends EventEmitter {
     }
 
     /**
-     * @typedef DrawableExtraction
+     * @typedef DrawableExtractionOld
      * @property {Uint8Array} data Raw pixel data for the drawable
      * @property {int} width Drawable bounding box width
      * @property {int} height Drawable bounding box height
@@ -1136,7 +1090,8 @@ class RenderWebGL extends EventEmitter {
      * @param {int} drawableID The ID of the drawable to get pixel data for
      * @param {int} x The client x coordinate of the picking location.
      * @param {int} y The client y coordinate of the picking location.
-     * @return {?DrawableExtraction} Data about the picked drawable
+     * @return {?DrawableExtractionOld} Data about the picked drawable
+     * @deprecated Use {@link extractDrawableScreenSpace} instead.
      */
     extractDrawable (drawableID, x, y) {
         this._doExitDrawRegion();
@@ -1228,6 +1183,112 @@ class RenderWebGL extends EventEmitter {
     }
 
     /**
+     * @typedef DrawableExtraction
+     * @property {ImageData} data Raw pixel data for the drawable
+     * @property {number} x The x coordinate of the drawable's bounding box's top-left corner, in 'CSS pixels'
+     * @property {number} y The y coordinate of the drawable's bounding box's top-left corner, in 'CSS pixels'
+     * @property {number} width The drawable's bounding box width, in 'CSS pixels'
+     * @property {number} height The drawable's bounding box height, in 'CSS pixels'
+     */
+
+    /**
+     * Return a drawable's pixel data and bounds in screen space.
+     * @param {int} drawableID The ID of the drawable to get pixel data for
+     * @return {DrawableExtraction} Data about the picked drawable
+     */
+    extractDrawableScreenSpace (drawableID) {
+        const drawable = this._allDrawables[drawableID];
+        if (!drawable) throw new Error(`Could not extract drawable with ID ${drawableID}; it does not exist`);
+
+        this._doExitDrawRegion();
+
+        const nativeCenterX = this._nativeSize[0] * 0.5;
+        const nativeCenterY = this._nativeSize[1] * 0.5;
+
+        const scratchBounds = drawable.getFastBounds();
+
+        const canvas = this.canvas;
+        // Ratio of the screen-space scale of the stage's canvas to the "native size" of the stage
+        const scaleFactor = canvas.width / this._nativeSize[0];
+
+        // Bounds of the extracted drawable, in "canvas pixel space"
+        // (origin is 0, 0, destination is the canvas width, height).
+        const canvasSpaceBounds = new Rectangle();
+        canvasSpaceBounds.initFromBounds(
+            (scratchBounds.left + nativeCenterX) * scaleFactor,
+            (scratchBounds.right + nativeCenterX) * scaleFactor,
+            // in "canvas space", +y is down, but Rectangle methods assume bottom < top, so swap them
+            (nativeCenterY - scratchBounds.top) * scaleFactor,
+            (nativeCenterY - scratchBounds.bottom) * scaleFactor
+        );
+        canvasSpaceBounds.snapToInt();
+
+        // undo the transformation to transform the bounds, snapped to "canvas-pixel space", back to "Scratch space"
+        // We have to transform -> snap -> invert transform so that the "Scratch-space" bounds are snapped in
+        // "canvas-pixel space".
+        scratchBounds.initFromBounds(
+            (canvasSpaceBounds.left / scaleFactor) - nativeCenterX,
+            (canvasSpaceBounds.right / scaleFactor) - nativeCenterX,
+            nativeCenterY - (canvasSpaceBounds.top / scaleFactor),
+            nativeCenterY - (canvasSpaceBounds.bottom / scaleFactor)
+        );
+
+        const gl = this._gl;
+
+        // Set a reasonable max limit width and height for the bufferInfo bounds
+        const maxTextureSize = gl.getParameter(gl.MAX_TEXTURE_SIZE);
+        const clampedWidth = Math.min(MAX_EXTRACTED_DRAWABLE_DIMENSION, canvasSpaceBounds.width, maxTextureSize);
+        const clampedHeight = Math.min(MAX_EXTRACTED_DRAWABLE_DIMENSION, canvasSpaceBounds.height, maxTextureSize);
+
+        // Make a new bufferInfo since this._queryBufferInfo is limited to 480x360
+        const bufferInfo = twgl.createFramebufferInfo(gl, [{format: gl.RGBA}], clampedWidth, clampedHeight);
+
+        try {
+            twgl.bindFramebufferInfo(gl, bufferInfo);
+
+            // Limit size of viewport to the bounds around the target Drawable,
+            // and create the projection matrix for the draw.
+            gl.viewport(0, 0, clampedWidth, clampedHeight);
+            const projection = twgl.m4.ortho(
+                scratchBounds.left,
+                scratchBounds.right,
+                scratchBounds.top,
+                scratchBounds.bottom,
+                -1, 1
+            );
+
+            gl.clearColor(0, 0, 0, 0);
+            gl.clear(gl.COLOR_BUFFER_BIT);
+            // Don't apply the ghost effect. TODO: is this an intentional design decision?
+            this._drawThese([drawableID], ShaderManager.DRAW_MODE.straightAlpha, projection,
+                {effectMask: ~ShaderManager.EFFECT_INFO.ghost.mask});
+
+            const data = new Uint8Array(Math.floor(clampedWidth * clampedHeight * 4));
+            gl.readPixels(0, 0, clampedWidth, clampedHeight, gl.RGBA, gl.UNSIGNED_BYTE, data);
+            // readPixels can only read into a Uint8Array, but ImageData has to take a Uint8ClampedArray.
+            // We can share the same underlying buffer between them to avoid having to copy any data.
+            const imageData = new ImageData(new Uint8ClampedArray(data.buffer), clampedWidth, clampedHeight);
+
+            // On high-DPI devices, the canvas' width (in canvas pixels) will be larger than its width in CSS pixels.
+            // We want to return the CSS-space bounds,
+            // so take into account the ratio between the canvas' pixel dimensions and its layout dimensions.
+            // This is usually the same as 1 / window.devicePixelRatio, but if e.g. you zoom your browser window without
+            // the canvas resizing, then it'll differ.
+            const ratio = canvas.getBoundingClientRect().width / canvas.width;
+
+            return {
+                imageData,
+                x: canvasSpaceBounds.left * ratio,
+                y: canvasSpaceBounds.bottom * ratio,
+                width: canvasSpaceBounds.width * ratio,
+                height: canvasSpaceBounds.height * ratio
+            };
+        } finally {
+            gl.deleteFramebuffer(bufferInfo.framebuffer);
+        }
+    }
+
+    /**
      * @typedef ColorExtraction
      * @property {Uint8Array} data Raw pixel data for the drawable
      * @property {int} width Drawable bounding box width
@@ -1260,7 +1321,7 @@ class RenderWebGL extends EventEmitter {
         gl.viewport(0, 0, bounds.width, bounds.height);
         const projection = twgl.m4.ortho(bounds.left, bounds.right, bounds.top, bounds.bottom, -1, 1);
 
-        gl.clearColor.apply(gl, this._backgroundColor4f);
+        gl.clearColor.apply(gl, this._backgroundColor);
         gl.clear(gl.COLOR_BUFFER_BIT);
         this._drawThese(this._drawList, ShaderManager.DRAW_MODE.default, projection);
 
@@ -1348,13 +1409,6 @@ class RenderWebGL extends EventEmitter {
                     // Update the CPU position data
                     drawable.updateCPURenderAttributes();
                     const candidateBounds = drawable.getFastBounds();
-
-                    // Push bounds out to integers. If a drawable extends out into half a pixel, that half-pixel still
-                    // needs to be tested. Plus, in some areas we construct another rectangle from the union of these,
-                    // and iterate over its pixels (width * height). Turns out that doesn't work so well when the
-                    // width/height aren't integers.
-                    candidateBounds.snapToInt();
-
                     if (bounds.intersects(candidateBounds)) {
                         result.push({
                             id,

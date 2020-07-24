@@ -16,7 +16,7 @@ varying vec4 v_penPoints;
 const float epsilon = 1e-3;
 #endif
 
-#if !(defined(DRAW_MODE_line) || defined(DRAW_MODE_background))
+#ifndef DRAW_MODE_line
 uniform mat4 u_projectionMatrix;
 uniform mat4 u_modelMatrix;
 attribute vec2 a_texCoord;
@@ -46,23 +46,26 @@ void main() {
 	position.x *= a_lineThicknessAndLength.y + (2.0 * expandedRadius);
 	position.y *= 2.0 * expandedRadius;
 
-	// Center around first pen point
+	// 1. Center around first pen point
 	position -= expandedRadius;
 
-	// Rotate quad to line angle
-	vec2 pointDiff = a_penPoints.zw - a_penPoints.xy;
+	// 2. Rotate quad to line angle
+	vec2 pointDiff = a_penPoints.zw;
 	// Ensure line has a nonzero length so it's rendered properly
 	// As long as either component is nonzero, the line length will be nonzero
 	// If the line is zero-length, give it a bit of horizontal length
 	pointDiff.x = (abs(pointDiff.x) < epsilon && abs(pointDiff.y) < epsilon) ? epsilon : pointDiff.x;
 	// The `normalized` vector holds rotational values equivalent to sine/cosine
 	// We're applying the standard rotation matrix formula to the position to rotate the quad to the line angle
+	// pointDiff can hold large values so we must divide by u_lineLength instead of calling GLSL's normalize function:
+	// https://asawicki.info/news_1596_watch_out_for_reduced_precision_normalizelength_in_opengl_es
 	vec2 normalized = pointDiff / max(a_lineThicknessAndLength.y, epsilon);
 	position = mat2(normalized.x, normalized.y, -normalized.y, normalized.x) * position;
-	// Translate quad
+
+	// 3. Translate quad
 	position += a_penPoints.xy;
 
-	// Apply view transform
+	// 4. Apply view transform
 	position *= 2.0 / u_stageSize;
 	gl_Position = vec4(position, 0, 1);
 
@@ -70,8 +73,6 @@ void main() {
 	v_lineThickness = a_lineThicknessAndLength.x;
 	v_lineLength = a_lineThicknessAndLength.y;
 	v_penPoints = a_penPoints;
-	#elif defined(DRAW_MODE_background)
-	gl_Position = vec4(a_position * 2.0, 0, 1);
 	#else
 	gl_Position = u_projectionMatrix * u_modelMatrix * vec4(a_position, 0, 1);
 	v_texCoord = a_texCoord;

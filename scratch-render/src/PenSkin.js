@@ -380,9 +380,9 @@ class PenSkin extends Skin {
             this.a_penPointsIndex++;
             this.a_penPoints[this.a_penPointsIndex] = -y0;
             this.a_penPointsIndex++;
-            this.a_penPoints[this.a_penPointsIndex] = x1;
+            this.a_penPoints[this.a_penPointsIndex] = lineDiffX;
             this.a_penPointsIndex++;
-            this.a_penPoints[this.a_penPointsIndex] = -y1;
+            this.a_penPoints[this.a_penPointsIndex] = -lineDiffY;
             this.a_penPointsIndex++;
         }
     }

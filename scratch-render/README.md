@@ -1,3 +1,17 @@
+scratch-render modified for use in [TurboWarp](https://turbowarp.github.io/)
+
+Changes to upstream:
+
+ - faster pen rendering (by buffering)
+
+## Setup
+
+See https://github.com/TurboWarp/scratch-gui/wiki/Getting-Started to setup the complete TurboWarp environment.
+
+If you just want to play with the render then it's the same process as upstream scratch-render.
+
+<!--
+
 ## scratch-render
 #### WebGL-based rendering engine for Scratch 3.0
 
@@ -67,3 +81,5 @@ npm test
 
 ## Donate
 We provide [Scratch](https://scratch.mit.edu) free of charge, and want to keep it that way! Please consider making a [donation](https://secure.donationpay.org/scratchfoundation/) to support our continued engineering, design, community, and resource development efforts. Donations of any size are appreciated. Thank you!
+
+-->

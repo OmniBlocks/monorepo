@@ -2,7 +2,8 @@ scratch-render modified for use in [TurboWarp](https://turbowarp.github.io/)
 
 Changes to upstream:
 
- - faster pen rendering (by buffering)
+ - faster pen line rendering (by buffering)
+ - option to enable "High Quality Pen"
 
 ## Setup
 

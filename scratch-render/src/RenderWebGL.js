@@ -214,7 +214,7 @@ class RenderWebGL extends EventEmitter {
     // tw: implement high quality pen option
     setUseHighQualityPen (enabled) {
         this.useHighQualityPen = enabled;
-        this.emit(RenderConstants.Events.useHighQualityPenChanged, enabled);
+        this.emit(RenderConstants.Events.UseHighQualityPenChanged, enabled);
         this._updatePenQuality();
     }
     _updatePenQuality () {

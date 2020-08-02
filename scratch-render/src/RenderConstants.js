@@ -25,7 +25,7 @@ module.exports = {
         /**
          * Event for when the high quality pen option is changed
          */
-        useHighQualityPenChanged: 'useHighQualityPenChanged',
+        UseHighQualityPenChanged: 'UseHighQualityPenChanged',
 
         /**
          * NativeSizeChanged event

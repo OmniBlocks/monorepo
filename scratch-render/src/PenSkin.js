@@ -122,6 +122,12 @@ class PenSkin extends Skin {
             exit: () => this._exitDrawToBuffer()
         };
 
+        // tw: renderQuality attribute
+        this.renderQuality = 1;
+
+        // tw: keep track of pen size
+        this._nativeSize = renderer.getNativeSize();
+
         /** @type {twgl.BufferInfo} */
         this._lineBufferInfo = null;
 
@@ -305,8 +311,9 @@ class PenSkin extends Skin {
         const uniforms = {
             u_skin: this._texture,
             u_projectionMatrix: projection,
-            // we assume that size won't change between now and when this region is exited
-            u_stageSize: this.size
+            // tw: we assume that size won't change between now and when lines are flushed
+            // tw: must use native size instead of real size for proper scaling
+            u_stageSize: this._nativeSize
         };
 
         twgl.setUniforms(currentShader, uniforms);
@@ -360,7 +367,7 @@ class PenSkin extends Skin {
 
         const lineThickness = penAttributes.diameter || DefaultPenAttributes.diameter;
 
-        for (var i = 0; i < 6; i++) {
+        for (let i = 0; i < 6; i++) {
             this.a_lineColor[this.a_lineColorIndex] = __premultipliedColor[0];
             this.a_lineColorIndex++;
             this.a_lineColor[this.a_lineColorIndex] = __premultipliedColor[1];
@@ -393,6 +400,7 @@ class PenSkin extends Skin {
         const currentShader = this._lineShader;
 
         // If only a small amount of data needs to be uploaded, we only upload part of the data. Otherwise we'll just upload everything.
+        // todo: need to see if this helps and fine tune this number
         if (this.a_lineColorIndex < 1000) {
             twgl.setAttribInfoBufferFromArray(gl, this._lineBufferInfo.attribs.a_lineColor, new Float32Array(this.a_lineColor.buffer, 0, this.a_lineColorIndex), 0);
             twgl.setAttribInfoBufferFromArray(gl, this._lineBufferInfo.attribs.a_penPoints, new Float32Array(this.a_penPoints.buffer, 0, this.a_penPointsIndex), 0);
@@ -402,6 +410,7 @@ class PenSkin extends Skin {
             twgl.setAttribInfoBufferFromArray(gl, this._lineBufferInfo.attribs.a_penPoints, this.a_penPoints);
             twgl.setAttribInfoBufferFromArray(gl, this._lineBufferInfo.attribs.a_lineThicknessAndLength, this.a_lineThicknessAndLength);
         }
+        // todo: if we skip twgl and do all this buffer stuff ourselves, we can skip some unneeded gl calls
         twgl.setBuffersAndAttributes(gl, currentShader, this._lineBufferInfo);
 
         twgl.drawBufferInfo(gl, this._lineBufferInfo, gl.TRIANGLES, this.a_lineThicknessAndLengthIndex / 2);
@@ -548,6 +557,8 @@ class PenSkin extends Skin {
      * @param {object} event - The change event.
      */
     onNativeSizeChanged (event) {
+        // tw: keep track of native size
+        this._nativeSize = event.newSize;
         this._setCanvasSize(event.newSize);
     }
 
@@ -598,7 +609,10 @@ class PenSkin extends Skin {
                 attachment: this._exportTexture
             }
         ];
-        if (this._framebuffer) {
+        // tw: this is a temporary dirty hack to avoid some weird issue with resizing the framebuffers
+        if (this._framebuffer) gl.deleteFramebuffer(this._framebuffer.framebuffer);
+        if (this._silhouetteBuffer) gl.deleteFramebuffer(this._silhouetteBuffer.framebuffer);
+        if (this._framebuffer && false) {
             twgl.resizeFramebufferInfo(gl, this._framebuffer, attachments, width, height);
             twgl.resizeFramebufferInfo(gl, this._silhouetteBuffer, [{format: gl.RGBA}], width, height);
         } else {
@@ -613,6 +627,12 @@ class PenSkin extends Skin {
         this._silhouetteImageData = this._canvas.getContext('2d').createImageData(width, height);
 
         this._silhouetteDirty = true;
+    }
+
+    setRenderQuality (quality) {
+        const nativeSize = this._renderer.getNativeSize();
+        this.renderQuality = quality;
+        this._setCanvasSize([Math.round(nativeSize[0] * quality), Math.round(nativeSize[1] * quality)]);
     }
 
     /**

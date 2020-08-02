@@ -191,6 +191,9 @@ class RenderWebGL extends EventEmitter {
         /** @type {Array.<snapshotCallback>} */
         this._snapshotCallbacks = [];
 
+        // tw: track id of pen skin
+        this._penSkinId = null;
+
         this._createGeometry();
 
         this.on(RenderConstants.Events.NativeSizeChanged, this.onNativeSizeChanged);
@@ -238,6 +241,11 @@ class RenderWebGL extends EventEmitter {
             canvas.height = newHeight;
             // Resizing the canvas causes it to be cleared, so redraw it.
             this.draw();
+
+            // tw: notify pen skin of resize
+            if (this._penSkinId !== null) {
+                this._allSkins[this._penSkinId].setRenderQuality(newWidth / this._nativeSize[0]);
+            }
         }
 
     }
@@ -347,6 +355,8 @@ class RenderWebGL extends EventEmitter {
         const skinId = this._nextSkinId++;
         const newSkin = new PenSkin(skinId, this);
         this._allSkins[skinId] = newSkin;
+        // tw: track id of pen skin
+        this._penSkinId = skinId;
         return skinId;
     }
 
@@ -1643,10 +1653,11 @@ class RenderWebGL extends EventEmitter {
 
         // Limit size of viewport to the bounds around the stamp Drawable and create the projection matrix for the draw.
         gl.viewport(
-            (this._nativeSize[0] * 0.5) + bounds.left,
-            (this._nativeSize[1] * 0.5) - bounds.top,
-            bounds.width,
-            bounds.height
+            // tw: account for renderQuality
+            ((this._nativeSize[0] * 0.5) + bounds.left) * skin.renderQuality,
+            ((this._nativeSize[1] * 0.5) - bounds.top) * skin.renderQuality,
+            bounds.width * skin.renderQuality,
+            bounds.height * skin.renderQuality
         );
         const projection = twgl.m4.ortho(bounds.left, bounds.right, bounds.top, bounds.bottom, -1, 1);
 

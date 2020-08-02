@@ -630,6 +630,9 @@ class PenSkin extends Skin {
     }
 
     setRenderQuality (quality) {
+        if (this.renderQuality === quality) {
+            return;
+        }
         const nativeSize = this._renderer.getNativeSize();
         this.renderQuality = quality;
         this._setCanvasSize([Math.round(nativeSize[0] * quality), Math.round(nativeSize[1] * quality)]);

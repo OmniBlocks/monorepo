@@ -194,6 +194,9 @@ class RenderWebGL extends EventEmitter {
         // tw: track id of pen skin
         this._penSkinId = null;
 
+        // tw: add high quality pen option
+        this.useHighQualityPen = false;
+
         this._createGeometry();
 
         this.on(RenderConstants.Events.NativeSizeChanged, this.onNativeSizeChanged);
@@ -206,6 +209,25 @@ class RenderWebGL extends EventEmitter {
         /** @todo disable when no partial transparency? */
         gl.enable(gl.BLEND);
         gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+    }
+
+    // tw: implement high quality pen option
+    setUseHighQualityPen (enabled) {
+        this.useHighQualityPen = enabled;
+        this.emit(RenderConstants.Events.useHighQualityPenChanged, enabled);
+        this._updatePenQuality();
+    }
+    _updatePenQuality () {
+        if (this._penSkinId !== null) {
+            const skin = this._allSkins[this._penSkinId];
+            if (skin) {
+                if (this.useHighQualityPen) {
+                    skin.setRenderQuality(this.canvas.width / this._nativeSize[0]);
+                } else {
+                    skin.setRenderQuality(1);
+                }
+            }
+        }
     }
 
     /**
@@ -242,10 +264,7 @@ class RenderWebGL extends EventEmitter {
             // Resizing the canvas causes it to be cleared, so redraw it.
             this.draw();
 
-            // tw: notify pen skin of resize
-            if (this._penSkinId !== null) {
-                this._allSkins[this._penSkinId].setRenderQuality(newWidth / this._nativeSize[0]);
-            }
+            this._updatePenQuality();
         }
 
     }

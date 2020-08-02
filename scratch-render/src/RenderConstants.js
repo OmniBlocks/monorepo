@@ -23,6 +23,11 @@ module.exports = {
      */
     Events: {
         /**
+         * Event for when the high quality pen option is changed
+         */
+        useHighQualityPenChanged: 'useHighQualityPenChanged',
+
+        /**
          * NativeSizeChanged event
          *
          * @event RenderWebGL#event:NativeSizeChanged

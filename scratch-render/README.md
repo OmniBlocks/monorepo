@@ -1,4 +1,4 @@
-scratch-render modified for use in [TurboWarp](https://turbowarp.github.io/)
+scratch-render modified for use in [TurboWarp](https://turbowarp.org/)
 
 Changes to upstream:
 

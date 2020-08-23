@@ -376,6 +376,8 @@ class RenderWebGL extends EventEmitter {
         this._allSkins[skinId] = newSkin;
         // tw: track id of pen skin
         this._penSkinId = skinId;
+        // tw: high quality pen may have been enabled before the pen skin was created
+        this._updatePenQuality();
         return skinId;
     }
 

@@ -628,9 +628,12 @@ class PenSkin extends Skin {
         gl.clearColor(0, 0, 0, 0);
         gl.clear(gl.COLOR_BUFFER_BIT);
 
-        // Draw the old image
         if (oldExportTexture) {
+            // Draw the old image
             this._drawToBuffer(oldExportTexture);
+            // Delete old textures
+            this._renderer._gl.deleteTexture(oldExportTexture);
+            this._renderer._gl.deleteTexture(oldTexture);
         }
 
         this._silhouettePixels = new Uint8Array(Math.floor(width * height * 4));

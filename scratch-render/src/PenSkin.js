@@ -168,7 +168,8 @@ class PenSkin extends Skin {
      * @return {Array<number>} the "native" size, in texels, of this skin. [width, height]
      */
     get size () {
-        return [this._canvas.width, this._canvas.height];
+        // tw: the "native" size of the pen layer is always equal to the native size of the renderer
+        return this._nativeSize;
     }
 
     /**
@@ -577,8 +578,9 @@ class PenSkin extends Skin {
 
         this._canvas.width = width;
         this._canvas.height = height;
-        this._rotationCenter[0] = width / 2;
-        this._rotationCenter[1] = height / 2;
+
+        this._rotationCenter[0] = this.size[0] / 2;
+        this._rotationCenter[1] = this.size[1] / 2;
 
         this._texture = twgl.createTexture(
             gl,

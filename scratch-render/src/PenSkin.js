@@ -582,6 +582,9 @@ class PenSkin extends Skin {
         this._rotationCenter[0] = this.size[0] / 2;
         this._rotationCenter[1] = this.size[1] / 2;
 
+        const oldTexture = this._texture;
+        const oldExportTexture = this._exportTexture;
+
         this._texture = twgl.createTexture(
             gl,
             {
@@ -624,6 +627,11 @@ class PenSkin extends Skin {
 
         gl.clearColor(0, 0, 0, 0);
         gl.clear(gl.COLOR_BUFFER_BIT);
+
+        // Draw the old image
+        if (oldExportTexture) {
+            this._drawToBuffer(oldExportTexture);
+        }
 
         this._silhouettePixels = new Uint8Array(Math.floor(width * height * 4));
         this._silhouetteImageData = this._canvas.getContext('2d').createImageData(width, height);

@@ -200,6 +200,8 @@ class PenSkin extends Skin {
         const ctx = this._canvas.getContext('2d');
         ctx.clearRect(0, 0, this._canvas.width, this._canvas.height);
 
+        this._resetAttributeIndexes();
+
         this._silhouetteDirty = true;
     }
 
@@ -242,11 +244,9 @@ class PenSkin extends Skin {
      */
     _createLineGeometry () {
         this.a_lineColor = new Float32Array(65520);
-        this.a_lineColorIndex = 0;
         this.a_lineThicknessAndLength = new Float32Array(32760);
-        this.a_lineThicknessAndLengthIndex = 0;
         this.a_penPoints = new Float32Array(65520);
-        this.a_penPointsIndex = 0;
+        this._resetAttributeIndexes();
 
         this.a_position = new Float32Array(32760);
         for (var i = 0; i < this.a_position.length; i += 12) {
@@ -395,7 +395,13 @@ class PenSkin extends Skin {
         }
     }
 
-    _flushLines() {
+    _resetAttributeIndexes () {
+        this.a_lineColorIndex = 0;
+        this.a_lineThicknessAndLengthIndex = 0;
+        this.a_penPointsIndex = 0;
+    }
+
+    _flushLines () {
         const gl = this._renderer.gl;
 
         const currentShader = this._lineShader;
@@ -416,9 +422,7 @@ class PenSkin extends Skin {
 
         twgl.drawBufferInfo(gl, this._lineBufferInfo, gl.TRIANGLES, this.a_lineThicknessAndLengthIndex / 2);
 
-        this.a_lineColorIndex = 0;
-        this.a_lineThicknessAndLengthIndex = 0;
-        this.a_penPointsIndex = 0;
+        this._resetAttributeIndexes();
 
         this._silhouetteDirty = true;
     }

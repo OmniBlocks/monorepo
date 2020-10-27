@@ -249,7 +249,7 @@ class PenSkin extends Skin {
         this._resetAttributeIndexes();
 
         this.a_position = new Float32Array(32760);
-        for (var i = 0; i < this.a_position.length; i += 12) {
+        for (let i = 0; i < this.a_position.length; i += 12) {
             this.a_position[i + 0] = 1;
             this.a_position[i + 1] = 0;
             this.a_position[i + 2] = 0;
@@ -406,16 +406,43 @@ class PenSkin extends Skin {
 
         const currentShader = this._lineShader;
 
-        // If only a small amount of data needs to be uploaded, we only upload part of the data. Otherwise we'll just upload everything.
+        // If only a small amount of data needs to be uploaded, only upload part of the data.
         // todo: need to see if this helps and fine tune this number
         if (this.a_lineColorIndex < 1000) {
-            twgl.setAttribInfoBufferFromArray(gl, this._lineBufferInfo.attribs.a_lineColor, new Float32Array(this.a_lineColor.buffer, 0, this.a_lineColorIndex), 0);
-            twgl.setAttribInfoBufferFromArray(gl, this._lineBufferInfo.attribs.a_penPoints, new Float32Array(this.a_penPoints.buffer, 0, this.a_penPointsIndex), 0);
-            twgl.setAttribInfoBufferFromArray(gl, this._lineBufferInfo.attribs.a_lineThicknessAndLength, new Float32Array(this.a_lineThicknessAndLength.buffer, 0, this.a_lineThicknessAndLengthIndex), 0);
+            twgl.setAttribInfoBufferFromArray(
+                gl,
+                this._lineBufferInfo.attribs.a_lineColor,
+                new Float32Array(this.a_lineColor.buffer, 0, this.a_lineColorIndex),
+                0
+            );
+            twgl.setAttribInfoBufferFromArray(
+                gl,
+                this._lineBufferInfo.attribs.a_penPoints,
+                new Float32Array(this.a_penPoints.buffer, 0, this.a_penPointsIndex),
+                0
+            );
+            twgl.setAttribInfoBufferFromArray(
+                gl,
+                this._lineBufferInfo.attribs.a_lineThicknessAndLength,
+                new Float32Array(this.a_lineThicknessAndLength.buffer, 0, this.a_lineThicknessAndLengthIndex),
+                0
+            );
         } else {
-            twgl.setAttribInfoBufferFromArray(gl, this._lineBufferInfo.attribs.a_lineColor, this.a_lineColor);
-            twgl.setAttribInfoBufferFromArray(gl, this._lineBufferInfo.attribs.a_penPoints, this.a_penPoints);
-            twgl.setAttribInfoBufferFromArray(gl, this._lineBufferInfo.attribs.a_lineThicknessAndLength, this.a_lineThicknessAndLength);
+            twgl.setAttribInfoBufferFromArray(
+                gl,
+                this._lineBufferInfo.attribs.a_lineColor,
+                this.a_lineColor
+            );
+            twgl.setAttribInfoBufferFromArray(
+                gl,
+                this._lineBufferInfo.attribs.a_penPoints,
+                this.a_penPoints
+            );
+            twgl.setAttribInfoBufferFromArray(
+                gl,
+                this._lineBufferInfo.attribs.a_lineThicknessAndLength,
+                this.a_lineThicknessAndLength
+            );
         }
         // todo: if we skip twgl and do all this buffer stuff ourselves, we can skip some unneeded gl calls
         twgl.setBuffersAndAttributes(gl, currentShader, this._lineBufferInfo);
@@ -618,16 +645,12 @@ class PenSkin extends Skin {
                 attachment: this._exportTexture
             }
         ];
-        // tw: this is a temporary dirty hack to avoid some weird issue with resizing the framebuffers
+        // tw: for some reason trying to resize the framebuffers causes pen rendering to completely break,
+        // so we just recreate the buffers every time
         if (this._framebuffer) gl.deleteFramebuffer(this._framebuffer.framebuffer);
         if (this._silhouetteBuffer) gl.deleteFramebuffer(this._silhouetteBuffer.framebuffer);
-        if (this._framebuffer && false) {
-            twgl.resizeFramebufferInfo(gl, this._framebuffer, attachments, width, height);
-            twgl.resizeFramebufferInfo(gl, this._silhouetteBuffer, [{format: gl.RGBA}], width, height);
-        } else {
-            this._framebuffer = twgl.createFramebufferInfo(gl, attachments, width, height);
-            this._silhouetteBuffer = twgl.createFramebufferInfo(gl, [{format: gl.RGBA}], width, height);
-        }
+        this._framebuffer = twgl.createFramebufferInfo(gl, attachments, width, height);
+        this._silhouetteBuffer = twgl.createFramebufferInfo(gl, [{format: gl.RGBA}], width, height);
 
         gl.clearColor(0, 0, 0, 0);
         gl.clear(gl.COLOR_BUFFER_BIT);

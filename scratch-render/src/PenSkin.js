@@ -154,7 +154,13 @@ class PenSkin extends Skin {
      * @return {Array<number>} the "native" size, in texels, of this skin. [width, height]
      */
     get size () {
-        return this._size;
+        // tw: use native size for Drawable positioning logic
+        return this._nativeSize;
+    }
+    
+    get rotationCenter () {
+        // tw: use native size for Drawable positioning logic
+        return [this._nativeSize[0] / 2, this._nativeSize[1] / 2];
     }
 
     useNearest (scale) {
@@ -275,7 +281,7 @@ class PenSkin extends Skin {
     _enterDrawTexture () {
         const gl = this._renderer.gl;
         this._enterUsePenBuffer();
-        gl.viewport(0, 0, this.size[0], this.size[1]);
+        gl.viewport(0, 0, this._size[0], this._size[1]);
         gl.useProgram(this._drawTextureShader.program);
         twgl.setBuffersAndAttributes(gl, this._drawTextureShader, this._renderer._bufferInfo);
     }
@@ -287,7 +293,7 @@ class PenSkin extends Skin {
         const gl = this._renderer.gl;
 
         const projection = twgl.m4.ortho(
-            this.size[0] / 2, this.size[0] / -2, this.size[1] / -2, this.size[1] / 2, -1, 1,
+            this._size[0] / 2, this._size[0] / -2, this._size[1] / -2, this._size[1] / 2, -1, 1,
             twgl.m4.identity()
         );
 
@@ -295,16 +301,10 @@ class PenSkin extends Skin {
             u_skin: texture,
             u_projectionMatrix: projection,
             u_modelMatrix: twgl.m4.multiply(
-                twgl.m4.translation(twgl.v3.create(
-                    // -this.size[0] / 2 - (this.size[0] / 2),
-                    // -this.size[1] / 2 + (this.size[1] / 2),
-                    0,
-                    0,
-                    0
-                ), twgl.m4.identity()),
+                twgl.m4.translation(twgl.v3.create(0, 0, 0), twgl.m4.identity()),
                 twgl.m4.scaling(twgl.v3.create(
-                    this.size[0],
-                    this.size[1],
+                    this._size[0],
+                    this._size[1],
                     0
                 ), twgl.m4.identity()),
                 twgl.m4.identity()

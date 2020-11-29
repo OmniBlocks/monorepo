@@ -472,6 +472,11 @@ class PenSkin extends Skin {
     _setCanvasSize (canvasSize) {
         const [width, height] = canvasSize;
 
+        // tw: do not resize if new size === old size
+        if (this._size && this._size[0] === width && this._size[1] === height) {
+            return;
+        }
+
         this._size = canvasSize;
         this._rotationCenter[0] = width / 2;
         this._rotationCenter[1] = height / 2;

@@ -348,6 +348,12 @@ class PenSkin extends Skin {
         __premultipliedColor[2] = penColor[2] * penColor[3];
         __premultipliedColor[3] = penColor[3];
 
+        // tw: apply renderQuality
+        x0 *= this.renderQuality;
+        y0 *= this.renderQuality;
+        x1 *= this.renderQuality;
+        y1 *= this.renderQuality;
+
         // Fun fact: Doing this calculation in the shader has the potential to overflow the floating-point range.
         // 'mediump' precision is only required to have a range up to 2^14 (16384), so any lines longer than 2^7 (128)
         // can overflow that, because you're squaring the operands, and they could end up as "infinity".
@@ -359,10 +365,6 @@ class PenSkin extends Skin {
 
         // tw: apply renderQuality
         const lineThickness = (penAttributes.diameter || DefaultPenAttributes.diameter) * this.renderQuality;
-        x0 *= this.renderQuality;
-        y0 *= this.renderQuality;
-        x1 *= this.renderQuality;
-        y1 *= this.renderQuality;
         // tw: write pen draws to buffers where they will be flushed later
         for (let i = 0; i < 6; i++) {
             this.a_lineColor[this.a_lineColorIndex] = __premultipliedColor[0];

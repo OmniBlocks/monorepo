@@ -298,8 +298,13 @@ class PenSkin extends Skin {
         const lineDiffY = y1 - y0;
         const lineLength = Math.sqrt((lineDiffX * lineDiffX) + (lineDiffY * lineDiffY));
 
+        // tw: apply renderQuality
+        const lineThickness = (penAttributes.diameter || DefaultPenAttributes.diameter) * this.renderQuality;
+        x0 *= this.renderQuality;
+        y0 *= this.renderQuality;
+        x1 *= this.renderQuality;
+        y1 *= this.renderQuality;
         // tw: write pen draws to buffers where they will be flushed later
-        const lineThickness = penAttributes.diameter || DefaultPenAttributes.diameter;
         for (let i = 0; i < 6; i++) {
             this.a_lineColor[this.a_lineColorIndex] = __premultipliedColor[0];
             this.a_lineColorIndex++;

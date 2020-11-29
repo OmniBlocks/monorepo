@@ -127,6 +127,7 @@ class PenSkin extends Skin {
         /** @type {twgl.ProgramInfo} */
         this._lineShader = this._renderer._shaderManager.getShader(ShaderManager.DRAW_MODE.line, NO_EFFECTS);
 
+        // tw: draw region used to preserve texture when resizing
         this._drawTextureShader = this._renderer._shaderManager.getShader(ShaderManager.DRAW_MODE.default, NO_EFFECTS);
         /** @type {object} */
         this._drawTextureRegionId = {
@@ -279,8 +280,8 @@ class PenSkin extends Skin {
 
     // tw: draw region used to preserve texture when resizing
     _enterDrawTexture () {
-        const gl = this._renderer.gl;
         this._enterUsePenBuffer();
+        const gl = this._renderer.gl;
         gl.viewport(0, 0, this._size[0], this._size[1]);
         gl.useProgram(this._drawTextureShader.program);
         twgl.setBuffersAndAttributes(gl, this._drawTextureShader, this._renderer._bufferInfo);
@@ -291,27 +292,33 @@ class PenSkin extends Skin {
     _drawPenTexture (texture) {
         this._renderer.enterDrawRegion(this._drawTextureRegionId);
         const gl = this._renderer.gl;
-
-        const projection = twgl.m4.ortho(
-            this._size[0] / 2, this._size[0] / -2, this._size[1] / -2, this._size[1] / 2, -1, 1,
-            twgl.m4.identity()
-        );
+        const width = this._size[0];
+        const height = this._size[1];
 
         const uniforms = {
             u_skin: texture,
-            u_projectionMatrix: projection,
-            u_modelMatrix: twgl.m4.multiply(
-                twgl.m4.translation(twgl.v3.create(0, 0, 0), twgl.m4.identity()),
-                twgl.m4.scaling(twgl.v3.create(
-                    this._size[0],
-                    this._size[1],
-                    0
-                ), twgl.m4.identity()),
+            u_projectionMatrix: twgl.m4.ortho(
+                width / 2,
+                width / -2,
+                height / -2,
+                height / 2,
+                -1,
+                1,
                 twgl.m4.identity()
-            )
+            ),
+            u_modelMatrix: twgl.m4.scaling(twgl.v3.create(
+                width,
+                height,
+                0
+            ), twgl.m4.identity())
         };
 
-        // twgl.setTextureParameters(gl, texture, {minMag: gl.LINEAR});
+        twgl.setTextureParameters(gl, texture, {
+            // Minify using linear to look less pixelated
+            min: gl.LINEAR,
+            // Magnify using nearest because that's what Scratch normally does
+            mag: gl.NEAREST
+        });
         twgl.setUniforms(this._drawTextureShader, uniforms);
         twgl.drawBufferInfo(gl, this._renderer._bufferInfo, gl.TRIANGLES);
     }

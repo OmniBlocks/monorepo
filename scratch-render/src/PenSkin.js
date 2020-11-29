@@ -431,7 +431,9 @@ class PenSkin extends Skin {
         ];
 
         if (this._framebuffer) {
-            twgl.resizeFramebufferInfo(gl, this._framebuffer, attachments, width, height);
+            // tw: resize framebuffer info doesn't work here, so always make a new framebuffer
+            // twgl.resizeFramebufferInfo(gl, this._framebuffer, attachments, width, height);
+            this._framebuffer = twgl.createFramebufferInfo(gl, attachments, width, height);
         } else {
             this._framebuffer = twgl.createFramebufferInfo(gl, attachments, width, height);
         }

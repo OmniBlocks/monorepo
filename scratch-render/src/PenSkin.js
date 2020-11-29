@@ -127,6 +127,13 @@ class PenSkin extends Skin {
         /** @type {twgl.ProgramInfo} */
         this._lineShader = this._renderer._shaderManager.getShader(ShaderManager.DRAW_MODE.line, NO_EFFECTS);
 
+        this._drawTextureShader = this._renderer._shaderManager.getShader(ShaderManager.DRAW_MODE.default, NO_EFFECTS);
+        /** @type {object} */
+        this._drawTextureRegionId = {
+            enter: () => this._enterDrawTexture(),
+            exit: () => this._exitDrawTexture()
+        };
+
         this.onNativeSizeChanged = this.onNativeSizeChanged.bind(this);
         this._renderer.on(RenderConstants.Events.NativeSizeChanged, this.onNativeSizeChanged);
 
@@ -262,6 +269,51 @@ class PenSkin extends Skin {
      */
     _exitUsePenBuffer () {
         twgl.bindFramebufferInfo(this._renderer.gl, null);
+    }
+
+    // tw: draw region used to preserve texture when resizing
+    _enterDrawTexture () {
+        const gl = this._renderer.gl;
+        this._enterUsePenBuffer();
+        gl.viewport(0, 0, this.size[0], this.size[1]);
+        gl.useProgram(this._drawTextureShader.program);
+        twgl.setBuffersAndAttributes(gl, this._drawTextureShader, this._renderer._bufferInfo);
+    }
+    _exitDrawTexture () {
+        this._exitUsePenBuffer();
+    }
+    _drawPenTexture (texture) {
+        this._renderer.enterDrawRegion(this._drawTextureRegionId);
+        const gl = this._renderer.gl;
+
+        const projection = twgl.m4.ortho(
+            this.size[0] / 2, this.size[0] / -2, this.size[1] / -2, this.size[1] / 2, -1, 1,
+            twgl.m4.identity()
+        );
+
+        const uniforms = {
+            u_skin: texture,
+            u_projectionMatrix: projection,
+            u_modelMatrix: twgl.m4.multiply(
+                twgl.m4.translation(twgl.v3.create(
+                    // -this.size[0] / 2 - (this.size[0] / 2),
+                    // -this.size[1] / 2 + (this.size[1] / 2),
+                    0,
+                    0,
+                    0
+                ), twgl.m4.identity()),
+                twgl.m4.scaling(twgl.v3.create(
+                    this.size[0],
+                    this.size[1],
+                    0
+                ), twgl.m4.identity()),
+                twgl.m4.identity()
+            )
+        };
+
+        // twgl.setTextureParameters(gl, texture, {minMag: gl.LINEAR});
+        twgl.setUniforms(this._drawTextureShader, uniforms);
+        twgl.drawBufferInfo(gl, this._renderer._bufferInfo, gl.TRIANGLES);
     }
 
     /**
@@ -417,6 +469,9 @@ class PenSkin extends Skin {
 
         const gl = this._renderer.gl;
 
+        // tw: store current texture to redraw it later
+        const oldTexture = this._texture;
+
         this._texture = twgl.createTexture(
             gl,
             {
@@ -445,6 +500,11 @@ class PenSkin extends Skin {
 
         gl.clearColor(0, 0, 0, 0);
         gl.clear(gl.COLOR_BUFFER_BIT);
+
+        // tw: preserve old texture when resizing
+        if (oldTexture) {
+            this._drawPenTexture(oldTexture);
+        }
 
         this._silhouettePixels = new Uint8Array(Math.floor(width * height * 4));
         this._silhouetteImageData = new ImageData(width, height);

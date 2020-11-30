@@ -159,11 +159,6 @@ class PenSkin extends Skin {
         return this._nativeSize;
     }
     
-    get rotationCenter () {
-        // tw: use native size for Drawable positioning logic
-        return [this._nativeSize[0] / 2, this._nativeSize[1] / 2];
-    }
-
     useNearest (scale) {
         // Use nearest-neighbor interpolation when scaling up the pen skin-- this matches Scratch 2.0.
         // When scaling it down, use linear interpolation to avoid giving pen lines a "dashed" appearance.
@@ -478,8 +473,9 @@ class PenSkin extends Skin {
         }
 
         this._size = canvasSize;
-        this._rotationCenter[0] = width / 2;
-        this._rotationCenter[1] = height / 2;
+        // tw: use native size for Drawable positioning logic
+        this._rotationCenter[0] = this._nativeSize[0] / 2;
+        this._rotationCenter[1] = this._nativeSize[1] / 2;
 
         const gl = this._renderer.gl;
 

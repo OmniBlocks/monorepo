@@ -1730,12 +1730,11 @@ class RenderWebGL extends EventEmitter {
             return;
         }
 
-        this._doExitDrawRegion();
-
+        // tw: use a region for pen stamping to avoid unnecessary framebuffer binds
         const skin = /** @type {PenSkin} */ this._allSkins[penSkinID];
 
         const gl = this._gl;
-        twgl.bindFramebufferInfo(gl, skin._framebuffer);
+        this.enterDrawRegion(skin._usePenBufferDrawRegionId);
 
         // Limit size of viewport to the bounds around the stamp Drawable and create the projection matrix for the draw.
         gl.viewport(

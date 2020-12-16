@@ -1910,10 +1910,8 @@ class RenderWebGL extends EventEmitter {
 
             // Manually perform region check. Do not create functions inside a
             // loop.
-            if (this._regionId !== newShader) {
-                this._doExitDrawRegion();
-                this._regionId = newShader;
-
+            // tw: don't clobber region
+            if (currentShader !== newShader) {
                 currentShader = newShader;
                 gl.useProgram(currentShader.program);
                 twgl.setBuffersAndAttributes(gl, currentShader, this._bufferInfo);
@@ -1943,7 +1941,7 @@ class RenderWebGL extends EventEmitter {
             twgl.drawBufferInfo(gl, this._bufferInfo, gl.TRIANGLES);
         }
 
-        this._regionId = null;
+        // tw: don't clobber region
     }
 
     /**

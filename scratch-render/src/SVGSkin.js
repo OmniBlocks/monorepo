@@ -107,6 +107,9 @@ class SVGSkin extends Skin {
         const context = canvas.getContext('2d');
         const textureData = context.getImageData(0, 0, canvas.width, canvas.height);
 
+        canvas.width = 0;
+        canvas.height = 0;
+
         const textureOptions = {
             auto: false,
             wrap: this._renderer.gl.CLAMP_TO_EDGE,

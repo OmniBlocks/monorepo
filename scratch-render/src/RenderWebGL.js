@@ -208,8 +208,8 @@ class RenderWebGL extends EventEmitter {
         // tw: track id of pen skin
         this._penSkinId = null;
 
-        // tw: add high quality pen option
-        this.useHighQualityPen = false;
+        // tw: add high quality render option
+        this.useHighQualityRender = false;
 
         this._createGeometry();
 
@@ -226,16 +226,16 @@ class RenderWebGL extends EventEmitter {
     }
 
     // tw: implement high quality pen option
-    setUseHighQualityPen (enabled) {
-        this.useHighQualityPen = enabled;
-        this.emit(RenderConstants.Events.UseHighQualityPenChanged, enabled);
-        this._updatePenQuality();
+    setUseHighQualityRender (enabled) {
+        this.useHighQualityRender = enabled;
+        this.emit(RenderConstants.Events.UseHighQualityRenderChanged, enabled);
+        this._updateRenderQuality();
     }
-    _updatePenQuality () {
+    _updateRenderQuality () {
         if (this._penSkinId !== null) {
             const skin = this._allSkins[this._penSkinId];
             if (skin) {
-                if (this.useHighQualityPen) {
+                if (this.useHighQualityRender) {
                     skin.setRenderQuality(this.canvas.width / this._nativeSize[0]);
                 } else {
                     skin.setRenderQuality(1);
@@ -278,7 +278,7 @@ class RenderWebGL extends EventEmitter {
             // Resizing the canvas causes it to be cleared, so redraw it.
             this.draw();
 
-            this._updatePenQuality();
+            this._updateRenderQuality();
         }
 
     }
@@ -398,7 +398,7 @@ class RenderWebGL extends EventEmitter {
         // tw: track id of pen skin
         this._penSkinId = skinId;
         // tw: high quality pen may have been enabled before the pen skin was created
-        this._updatePenQuality();
+        this._updateRenderQuality();
         return skinId;
     }
 

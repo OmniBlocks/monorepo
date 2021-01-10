@@ -23,9 +23,9 @@ module.exports = {
      */
     Events: {
         /**
-         * Event for when the high quality pen option is changed
+         * Event for when the high quality render option is changed
          */
-        UseHighQualityPenChanged: 'UseHighQualityPenChanged',
+        UseHighQualityRenderChanged: 'UseHighQualityRenderChanged',
 
         /**
          * NativeSizeChanged event

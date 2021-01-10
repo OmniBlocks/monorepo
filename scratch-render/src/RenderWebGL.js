@@ -242,6 +242,9 @@ class RenderWebGL extends EventEmitter {
                 }
             }
         }
+        for (const drawable of this._allDrawables) {
+            drawable.setHighQuality(this.useHighQualityRender);
+        }
     }
 
     /**
@@ -511,6 +514,8 @@ class RenderWebGL extends EventEmitter {
         const drawable = new Drawable(drawableID);
         this._allDrawables[drawableID] = drawable;
         this._addToDrawList(drawableID, group);
+        // tw: implement high quality render
+        drawable.setHighQuality(this.useHighQualityRender);
 
         drawable.skin = null;
 

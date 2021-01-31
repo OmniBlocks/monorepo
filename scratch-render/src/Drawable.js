@@ -126,6 +126,13 @@ class Drawable {
         this._skinWasAltered = this._skinWasAltered.bind(this);
 
         this.isTouching = this._isTouchingNever;
+
+        // tw: implement high quality render
+        this._highQuality = false;
+    }
+
+    setHighQuality (highQuality) {
+        this._highQuality = highQuality;
     }
 
     /**
@@ -207,8 +214,14 @@ class Drawable {
     updatePosition (position) {
         if (this._position[0] !== position[0] ||
             this._position[1] !== position[1]) {
-            this._position[0] = Math.round(position[0]);
-            this._position[1] = Math.round(position[1]);
+            // tw: implement high quality render
+            if (this._highQuality) {
+                this._position[0] = position[0];
+                this._position[1] = position[1];
+            } else {
+                this._position[0] = Math.round(position[0]);
+                this._position[1] = Math.round(position[1]);
+            }
             this.setTransformDirty();
         }
     }

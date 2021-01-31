@@ -3,7 +3,7 @@ import {CROSSHAIR_SIZE, getBackgroundGuideLayer, getDragCrosshairLayer, getRaste
 import {getAllRootItems, getSelectedRootItems} from './selection';
 import {getHitBounds} from './bitmap';
 import log from '../log/log';
-import twStageSize from './tw-stage-size';
+import twStageSize from '../lib/tw-stage-size';
 
 // Vectors are imported and exported at SVG_ART_BOARD size.
 // Once they are imported however, both SVGs and bitmaps are on

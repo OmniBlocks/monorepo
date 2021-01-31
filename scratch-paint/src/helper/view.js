@@ -3,14 +3,15 @@ import {CROSSHAIR_SIZE, getBackgroundGuideLayer, getDragCrosshairLayer, getRaste
 import {getAllRootItems, getSelectedRootItems} from './selection';
 import {getHitBounds} from './bitmap';
 import log from '../log/log';
+import twStageSize from './tw-stage-size';
 
 // Vectors are imported and exported at SVG_ART_BOARD size.
 // Once they are imported however, both SVGs and bitmaps are on
 // canvases of ART_BOARD size.
 // (This is for backwards compatibility, to handle both assets
 // designed for 480 x 360, and bitmap resolution 2 bitmaps)
-const SVG_ART_BOARD_WIDTH = 480;
-const SVG_ART_BOARD_HEIGHT = 360;
+const SVG_ART_BOARD_WIDTH = twStageSize.width;
+const SVG_ART_BOARD_HEIGHT = twStageSize.height;
 const ART_BOARD_WIDTH = SVG_ART_BOARD_WIDTH * 2;
 const ART_BOARD_HEIGHT = SVG_ART_BOARD_HEIGHT * 2;
 const CENTER = new paper.Point(ART_BOARD_WIDTH / 2, ART_BOARD_HEIGHT / 2);

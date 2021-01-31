@@ -243,7 +243,9 @@ class RenderWebGL extends EventEmitter {
             }
         }
         for (const drawable of this._allDrawables) {
-            drawable.setHighQuality(this.useHighQualityRender);
+            if (drawable) {
+                drawable.setHighQuality(this.useHighQualityRender);
+            }
         }
     }
 

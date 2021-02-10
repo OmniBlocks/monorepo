@@ -38,7 +38,8 @@ export const enum EnvelopeType {
 	swell,
 	tremolo,
 	tremolo2,
-	decay,
+    decay,
+    wibble,
 }
 
 export const enum InstrumentType {
@@ -156,28 +157,27 @@ export class Config {
 	public static readonly scales: DictionaryArray<Scale> = toNameMap([
 
 		//   C     Db      D     Eb      E      F     F#      G     Ab      A     Bb      B      C
-		{ name: "Free", realName: "chromatic", flags: [true, true, true, true, true, true, true, true, true, true, true, true] }, // Free
-		{ name: "Major", realName: "ionian", flags: [true, false, true, false, true, true, false, true, false, true, false, true] }, // Major
-		{ name: "Minor", realName: "aeolian", flags: [true, false, true, true, false, true, false, true, true, false, true, false] }, // Minor
-		{ name: "Mixolydian", realName: "mixolydian", flags: [true, false, true, false, true, true, false, true, false, true, true, false] }, // Mixolydian
-		{ name: "Lydian", realName: "lydian", flags: [true, false, true, false, true, false, true, true, false, true, false, true] }, // Lydian
-		{ name: "Dorian", realName: "dorian", flags: [true, false, true, true, false, true, false, true, false, true, true, false] }, // Dorian
-		{ name: "Phrygian", realName: "phrygian", flags: [true, true, false, true, false, true, false, true, true, false, true, false] }, // Phrygian
-		{ name: "Locrian", realName: "locrian", flags: [true, true, false, true, false, true, true, false, true, false, true, false] }, // Locrian
-		{ name: "Lydian Dominant", realName: "lydian dominant", flags: [true, false, true, false, true, false, true, true, false, true, true, false] }, // Lydian Dominant
-		{ name: "Phrygian Dominant", realName: "phrygian dominant", flags: [true, true, false, false, true, true, false, true, true, false, true, false] }, // Phrygian Dominant
-		{ name: "Harmonic Major", realName: "harmonic major", flags: [true, false, true, false, true, true, false, true, true, false, false, true] }, // Harmonic Major
-		{ name: "Harmonic Minor", realName: "harmonic minor", flags: [true, false, true, true, false, true, false, true, true, false, false, true] }, // Harmonic Minor
-		{ name: "Melodic Minor", realName: "melodic minor", flags: [true, false, true, true, false, true, false, true, false, true, false, true] }, // Melodic Minor
-		{ name: "Blues", realName: "blues", flags: [true, false, false, true, false, true, true, true, false, false, true, false] }, // Blues
-		{ name: "Altered", realName: "altered", flags: [true, true, false, true, true, false, true, false, true, false, true, false] }, // Altered
-		{ name: "Major Pentatonic", realName: "major pentatonic", flags: [true, false, true, false, true, false, false, true, false, true, false, false] }, // Major Pentatonic
-		{ name: "Minor Pentatonic", realName: "minor pentatonic", flags: [true, false, false, true, false, true, false, true, false, false, true, false] }, // Minor Pentatonic
-		{ name: "Whole Tone", realName: "whole tone", flags: [true, false, true, false, true, false, true, false, true, false, true, false] }, // Whole Tone
-		{ name: "Octatonic", realName: "octatonic", flags: [true, false, true, true, false, true, true, false, true, true, false, true] }, // Octatonic
-		{ name: "Hexatonic", realName: "hexatonic", flags: [true, false, false, true, true, false, false, true, true, false, false, true] }, // Hexatonic
-
-
+		{ name: "Free", realName: "chromatic", flags:                       [true, true, true, true, true, true, true, true, true, true, true, true] }, // Free
+		{ name: "Major", realName: "ionian", flags:                         [true, false, true, false, true, true, false, true, false, true, false, true] }, // Major
+		{ name: "Minor", realName: "aeolian", flags:                        [true, false, true, true, false, true, false, true, true, false, true, false] }, // Minor
+		{ name: "Mixolydian", realName: "mixolydian", flags:                [true, false, true, false, true, true, false, true, false, true, true, false] }, // Mixolydian
+		{ name: "Lydian", realName: "lydian", flags:                        [true, false, true, false, true, false, true, true, false, true, false, true] }, // Lydian
+		{ name: "Dorian", realName: "dorian", flags:                        [true, false, true, true, false, true, false, true, false, true, true, false] }, // Dorian
+		{ name: "Phrygian", realName: "phrygian", flags:                    [true, true, false, true, false, true, false, true, true, false, true, false] }, // Phrygian
+		{ name: "Locrian", realName: "locrian", flags:                      [true, true, false, true, false, true, true, false, true, false, true, false] }, // Locrian
+		{ name: "Lydian Dominant", realName: "lydian dominant", flags:      [true, false, true, false, true, false, true, true, false, true, true, false] }, // Lydian Dominant
+		{ name: "Phrygian Dominant", realName: "phrygian dominant", flags:  [true, true, false, false, true, true, false, true, true, false, true, false] }, // Phrygian Dominant
+		{ name: "Harmonic Major", realName: "harmonic major", flags:        [true, false, true, false, true, true, false, true, true, false, false, true] }, // Harmonic Major
+		{ name: "Harmonic Minor", realName: "harmonic minor", flags:        [true, false, true, true, false, true, false, true, true, false, false, true] }, // Harmonic Minor
+		{ name: "Melodic Minor", realName: "melodic minor", flags:          [true, false, true, true, false, true, false, true, false, true, false, true] }, // Melodic Minor
+		{ name: "Blues", realName: "blues", flags:                          [true, false, false, true, false, true, true, true, false, false, true, false] }, // Blues
+		{ name: "Altered", realName: "altered", flags:                      [true, true, false, true, true, false, true, false, true, false, true, false] }, // Altered
+		{ name: "Major Pentatonic", realName: "major pentatonic", flags:    [true, false, true, false, true, false, false, true, false, true, false, false] }, // Major Pentatonic
+		{ name: "Minor Pentatonic", realName: "minor pentatonic", flags:    [true, false, false, true, false, true, false, true, false, false, true, false] }, // Minor Pentatonic
+		{ name: "Whole Tone", realName: "whole tone", flags:                [true, false, true, false, true, false, true, false, true, false, true, false] }, // Whole Tone
+		{ name: "Octatonic", realName: "octatonic", flags:                  [true, false, true, true, false, true, true, false, true, true, false, true] }, // Octatonic
+        { name: "Hexatonic", realName: "hexatonic", flags:                  [true, false, false, true, true, false, false, true, true, false, false, true] }, // Hexatonic
+        { name: "Custom", realName: "custom", flags:                        [true, false, true, true, false, false, false, true, true, false, true, true] }, // Custom? considering allowing this one to be be completely configurable
 	]);
 	public static readonly keys: DictionaryArray<Key> = toNameMap([
 		{ name: "C", isWhiteKey: true, basePitch: 12 }, // C0 has index 12 on the MIDI scale. C7 is 96, and C9 is 120. C10 is barely in the audible range.
@@ -197,7 +197,7 @@ export class Config {
 	public static readonly tempoMin: number = 30;
 	public static readonly tempoMax: number = 320;
 	public static readonly reverbRange: number = 32;
-	public static readonly beatsPerBarMin: number = 3;
+	public static readonly beatsPerBarMin: number = 2;
 	public static readonly beatsPerBarMax: number = 16;
 	public static readonly barCountMin: number = 1;
 	public static readonly barCountMax: number = 256;
@@ -251,7 +251,8 @@ export class Config {
 		{ name: "shine", volume: 1.0, basePitch: 69, pitchFilterMult: 1024.0, isSoft: false, samples: null },
 		{ name: "deep", volume: 1.5, basePitch: 120, pitchFilterMult: 1024.0, isSoft: true, samples: null },
 		{ name: "cutter", volume: 0.005, basePitch: 96, pitchFilterMult: 1024.0, isSoft: false, samples: null },
-		{ name: "metallic", volume: 1.0, basePitch: 96, pitchFilterMult: 1024.0, isSoft: false, samples: null },
+        { name: "metallic", volume: 1.0, basePitch: 96, pitchFilterMult: 1024.0, isSoft: false, samples: null },
+        { name: "uhhh??", volume: 1.0, basePitch: 96, pitchFilterMult: 1024.0, isSoft: false, samples: null },
 	]);
 	public static readonly filterCutoffMaxHz: number = 8000; // This is carefully calculated to correspond to no change when filtering at 48000 samples per second.
 	public static readonly filterCutoffMinHz: number = 1;
@@ -267,7 +268,8 @@ export class Config {
 		{ name: "cross fade", isSeamless: false, attackSeconds: 0.04, releases: true, releaseTicks: 6, slides: false, slideTicks: 3 },
 		{ name: "hard fade", isSeamless: false, attackSeconds: 0.0, releases: true, releaseTicks: 48, slides: false, slideTicks: 3 },
 		{ name: "medium fade", isSeamless: false, attackSeconds: 0.0125, releases: true, releaseTicks: 72, slides: false, slideTicks: 3 },
-		{ name: "soft fade", isSeamless: false, attackSeconds: 0.06, releases: true, releaseTicks: 96, slides: false, slideTicks: 6 },
+        { name: "soft fade", isSeamless: false, attackSeconds: 0.06, releases: true, releaseTicks: 96, slides: false, slideTicks: 6 },
+        { name: "sliding fade", isSeamless: false, attackSeconds: 0.08, releases: true, releaseTicks: 96, slides: true, slideTicks: 6 },
 	]);
 	public static readonly vibratos: DictionaryArray<Vibrato> = toNameMap([
 		{ name: "none", amplitude: 0.0, type: 0, delayParts: 0 },
@@ -292,7 +294,8 @@ export class Config {
 		{ name: "fifth", spread: 3.5, offset: 3.5, volume: 0.9, sign: 1.0 },
 		{ name: "octave", spread: 6.0, offset: 6.0, volume: 0.8, sign: 1.0 },
 		{ name: "bowed", spread: 0.02, offset: 0.0, volume: 1.0, sign: -1.0 },
-		{ name: "piano", spread: 0.01, offset: 0.0, volume: 1.0, sign: 0.7 },
+        { name: "piano", spread: 0.01, offset: 0.0, volume: 1.0, sign: 0.7 },
+        { name: "warbled", spread: 0.25, offset: 0.05, volume: 0.9, sign: -0.8 },
 	]);
 	public static readonly effectsNames: ReadonlyArray<string> = ["none", "reverb", "chorus", "chorus & reverb"];
 	public static readonly volumeRange: number = 50;
@@ -311,7 +314,7 @@ export class Config {
 		{ name: "arpeggio", harmonizes: false, customInterval: false, arpeggiates: true, isCustomInterval: false, strumParts: 0 },
 		{ name: "custom interval", harmonizes: true, customInterval: true, arpeggiates: true, isCustomInterval: true, strumParts: 0 },
 	]);
-	public static readonly maxChordSize: number = 4;
+	public static readonly maxChordSize: number = 12;
 	public static readonly operatorCount: number = 4;
 	public static readonly algorithms: DictionaryArray<Algorithm> = toNameMap([
 		{ name: "1←(2 3 4)", carrierCount: 1, associatedCarrier: [1, 1, 1, 1], modulatedBy: [[2, 3, 4], [], [], []] },
@@ -324,9 +327,9 @@ export class Config {
 		{ name: "1 2←3←4", carrierCount: 2, associatedCarrier: [1, 2, 2, 2], modulatedBy: [[], [3], [4], []] },
 		{ name: "(1 2)←3←4", carrierCount: 2, associatedCarrier: [1, 2, 2, 2], modulatedBy: [[3], [3], [4], []] },
 		{ name: "(1 2)←(3 4)", carrierCount: 2, associatedCarrier: [1, 2, 2, 2], modulatedBy: [[3, 4], [3, 4], [], []] },
-		{ name: "1 2 3←4", carrierCount: 3, associatedCarrier: [1, 2, 3, 3], modulatedBy: [[], [], [4], []] },
+        { name: "1 2 3←4", carrierCount: 3, associatedCarrier: [1, 2, 3, 3], modulatedBy: [[], [], [4], []] }, 
 		{ name: "(1 2 3)←4", carrierCount: 3, associatedCarrier: [1, 2, 3, 3], modulatedBy: [[4], [4], [4], []] },
-		{ name: "1 2 3 4", carrierCount: 4, associatedCarrier: [1, 2, 3, 4], modulatedBy: [[], [], [], []] },
+        { name: "1 2 3 4", carrierCount: 4, associatedCarrier: [1, 2, 3, 4], modulatedBy: [[], [], [], []] },
 	]);
 	public static readonly operatorCarrierInterval: ReadonlyArray<number> = [0.0, 0.04, -0.073, 0.091];
 	public static readonly operatorAmplitudeMax: number = 15;
@@ -345,7 +348,10 @@ export class Config {
 		{ name: "11×", mult: 11.0, hzOffset: 0.0, amplitudeSign: 1.0 },
 		{ name: "13×", mult: 13.0, hzOffset: 0.0, amplitudeSign: 1.0 },
 		{ name: "16×", mult: 16.0, hzOffset: 0.0, amplitudeSign: 1.0 },
-		{ name: "20×", mult: 20.0, hzOffset: 0.0, amplitudeSign: 1.0 },
+        { name: "20×", mult: 20.0, hzOffset: 0.0, amplitudeSign: 1.0 },
+        { name: "0.5×", mult: 0.5, hzOffset: 0.0, amplitudeSign: 1.0 },
+        { name: "0.25×", mult: 0.25, hzOffset: 0.0, amplitudeSign: 1.0 },
+        { name: "3.5×", mult: 3.5, hzOffset: -0.05, amplitudeSign: 1.0 },
 	]);
 	public static readonly envelopes: DictionaryArray<Envelope> = toNameMap([
 		{ name: "custom", type: EnvelopeType.custom, speed: 0.0 },
@@ -368,7 +374,10 @@ export class Config {
 		{ name: "tremolo6", type: EnvelopeType.tremolo2, speed: 1.0 },
 		{ name: "decay 1", type: EnvelopeType.decay, speed: 10.0 },
 		{ name: "decay 2", type: EnvelopeType.decay, speed: 7.0 },
-		{ name: "decay 3", type: EnvelopeType.decay, speed: 4.0 },
+        { name: "decay 3", type: EnvelopeType.decay, speed: 4.0 },
+        { name: "wibble 1", type: EnvelopeType.wibble, speed: 24.0 },
+        { name: "wibble 2", type: EnvelopeType.wibble, speed: 12.0 },
+        { name: "wibble 3", type: EnvelopeType.wibble, speed: 4.0 },
 	]);
 	public static readonly feedbacks: DictionaryArray<Feedback> = toNameMap([
 		{ name: "1⟲", indices: [[1], [], [], []] },
@@ -388,7 +397,10 @@ export class Config {
 		{ name: "3→4", indices: [[], [], [], [3]] },
 		{ name: "1→3 2→4", indices: [[], [], [1], [2]] },
 		{ name: "1→4 2→3", indices: [[], [], [2], [1]] },
-		{ name: "1→2→3→4", indices: [[], [1], [2], [3]] },
+        { name: "1→2→3→4", indices: [[], [1], [2], [3]] },
+        { name: "1↔2 3↔4", indices: [[2], [1], [4], [3]] },
+        { name: "1↔4 2↔3", indices: [[4], [3], [2], [1]] },
+        { name: "2→1→4→3→2", indices: [[2], [3], [4], [1]] },
 	]);
 	public static readonly chipNoiseLength: number = 1 << 15; // 32768
 	public static readonly spectrumBasePitch: number = 24;
@@ -562,7 +574,18 @@ export function getDrumWave(index: number, inverseRealFourierTransform: Function
 					newBuffer -= 10 << 2;
 				}
 				drumBuffer = newBuffer;
-			}
+            }
+        } else if (index == 9) {
+            // New Drum noise? New Drum Noise!
+            let drumBuffer: number = 1;
+            for (let i: number = 0; i < Config.chipNoiseLength; i++) {
+                wave[i] = (drumBuffer & 1) * 2.0 - 1.1;
+                let newBuffer: number = drumBuffer >> 1;
+                if (((drumBuffer + newBuffer) & 1) == 1) {
+                    newBuffer += 16 ^ 2 << 2;
+                }
+                drumBuffer = newBuffer;
+            }
 		} else {
 			throw new Error("Unrecognized drum index: " + index);
 		}

@@ -4897,7 +4897,14 @@ export class Synth {
 				const attack: number = 0.25 / Math.sqrt(speed);
 				return time < attack ? time / attack : 1.0 / (1.0 + (time - attack) * speed);
 			case EnvelopeType.decay:
-				return Math.pow(2, -envelope.speed * time);
+                return Math.pow(2, -envelope.speed * time);
+            case EnvelopeType.wibble:
+                let temp = time * Math.sqrt(envelope.speed);
+                temp = Math.abs(Math.sin(temp));
+                temp = temp > 0.0 ? temp : 0.001;
+                temp = 1.0 / (1.0 + time * temp);
+                console.log(temp)
+                return temp; 
 			default: throw new Error("Unrecognized operator envelope type.");
 		}
 	}

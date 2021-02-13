@@ -105,6 +105,9 @@ $border-radius: 0.25rem;
     height: 1.25rem;
     vertical-align: middle;
 }
+[theme="dark"] .button-group-button-icon {
+    filter: brightness(1.7);
+}
 
 .mod-mode-tools {
     margin-left: calc(2 * $grid-unit);

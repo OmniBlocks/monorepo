@@ -31,6 +31,9 @@
     color: #575E75;
     margin: 8px;
 }
+[theme="dark"] .row-header {
+    color: #ccc;
+}
 
 [dir="ltr"] .label-readout {
     margin-left: 10px;
@@ -47,6 +50,9 @@
 .divider {
     border-top: 1px solid #ddd;
     margin: 8px;
+}
+[theme="dark"] .divider {
+    border-color: #333;
 }
 
 .swap-button {

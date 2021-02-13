@@ -38,15 +38,25 @@ Edited to add input-range-small
     white-space: nowrap;
     min-width: 0;
 }
+[theme="dark"] .input-form {
+    background: rgb(30, 30, 30);
+    border-color: rgb(46, 46, 46);
+}
 
 .input-form:focus {
     border-color: $motion-primary;
     box-shadow: 0 0 0 $grid-unit $motion-transparent;
 }
+[theme="dark"] .input-form:hover {
+    border-color: #333;
+}
 
 .input-small {
     width: 3rem;
     text-align: center;
+}
+[theme="dark"] .input-form:focus {
+    border-color: #333;
 }
 
 .input-small-range {

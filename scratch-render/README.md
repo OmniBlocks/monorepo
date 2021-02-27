@@ -3,13 +3,19 @@ scratch-render modified for use in [TurboWarp](https://turbowarp.org/)
 Changes to upstream:
 
  - faster pen line rendering (by buffering)
- - option to enable "High Quality Pen"
+ - "High Quality Render"/"High Quality Pen" mode
 
 ## Setup
 
 See https://github.com/TurboWarp/scratch-gui/wiki/Getting-Started to setup the complete TurboWarp environment.
 
 If you just want to play with the render then it's the same process as upstream scratch-render.
+
+## API
+
+Compatible with upstream scratch-render.
+
+Renderer.setUseHighQualityRender(boolean) toggles high quality rendering. A UseHighQualityRenderChanged event is emitted on the renderer when this is called.
 
 <!--
 

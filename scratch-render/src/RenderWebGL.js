@@ -1126,6 +1126,7 @@ class RenderWebGL extends EventEmitter {
                 const drawableBounds = drawable.getFastBounds();
                 const inRange = bounds.intersects(drawableBounds);
                 if (!inRange) return false;
+                if (drawable.skin instanceof PenSkin) return false;
 
                 drawable.updateCPURenderAttributes();
                 return true;

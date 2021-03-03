@@ -46,4 +46,4 @@ const getDimensions = () => {
     };
 };
 
-export default getDimensions();
+module.exports = getDimensions();

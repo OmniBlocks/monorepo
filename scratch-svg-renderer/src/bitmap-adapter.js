@@ -1,5 +1,4 @@
 const base64js = require('base64-js');
-const twStageSize = requrie('./tw-stage-size');
 
 /**
  * Adapts Scratch 2.0 bitmaps for use in scratch 3.0
@@ -12,6 +11,13 @@ class BitmapAdapter {
     constructor (makeImage, makeCanvas) {
         this._makeImage = makeImage ? makeImage : () => new Image();
         this._makeCanvas = makeCanvas ? makeCanvas : () => document.createElement('canvas');
+        this.stageWidth = 480;
+        this.stageHeight = 360;
+    }
+
+    setStageSize (width, height) {
+        this.stageWidth = width;
+        this.stageHeight = height;
     }
 
     /**
@@ -68,8 +74,8 @@ class BitmapAdapter {
      * @return {object} Array of new width, new height
      */
     getResizedWidthHeight (oldWidth, oldHeight) {
-        const STAGE_WIDTH = twStageSize.width;
-        const STAGE_HEIGHT = twStageSize.height;
+        const STAGE_WIDTH = this.stageWidth;
+        const STAGE_HEIGHT = this.stageHeight;
         const STAGE_RATIO = STAGE_WIDTH / STAGE_HEIGHT;
 
         // If both dimensions are smaller than or equal to corresponding stage dimension,

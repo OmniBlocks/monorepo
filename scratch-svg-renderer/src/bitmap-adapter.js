@@ -1,4 +1,5 @@
 const base64js = require('base64-js');
+const twStageSize = requrie('./tw-stage-size');
 
 /**
  * Adapts Scratch 2.0 bitmaps for use in scratch 3.0
@@ -67,8 +68,8 @@ class BitmapAdapter {
      * @return {object} Array of new width, new height
      */
     getResizedWidthHeight (oldWidth, oldHeight) {
-        const STAGE_WIDTH = 480;
-        const STAGE_HEIGHT = 360;
+        const STAGE_WIDTH = twStageSize.width;
+        const STAGE_HEIGHT = twStageSize.height;
         const STAGE_RATIO = STAGE_WIDTH / STAGE_HEIGHT;
 
         // If both dimensions are smaller than or equal to corresponding stage dimension,

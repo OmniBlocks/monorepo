@@ -15,7 +15,7 @@ import {MIXED} from '../helper/style-path';
 import Modes from '../lib/modes';
 
 const colorStringToHsv = hexString => {
-    const hsv = parseColor(hexString).hsv;
+    const hsv = parseColor(hexString).hsva;
     // Hue comes out in [0, 360], limit to [0, 100]
     hsv[0] = hsv[0] / 3.6;
     // Black is parsed as {0, 0, 0}, but turn saturation up to 100
@@ -26,9 +26,11 @@ const colorStringToHsv = hexString => {
     return hsv;
 };
 
-const hsvToHex = (h, s, v) =>
+const makeAlphaComponent = alpha => Math.round(alpha * 255).toString(16).padStart(2, '0');
+
+const hsvToHex = (h, s, v, a) =>
     // Scale hue back up to [0, 360] from [0, 100]
-    parseColor(`hsv(${3.6 * h}, ${s}, ${v})`).hex
+    parseColor(`hsv(${3.6 * h}, ${s}, ${v})`).hex + makeAlphaComponent(a)
 ;
 
 // Important! This component ignores new color props except when isEyeDropping
@@ -46,6 +48,7 @@ class ColorPicker extends React.Component {
             'handleHueChange',
             'handleSaturationChange',
             'handleBrightnessChange',
+            'handleAlphaChange',
             'handleTransparent',
             'handleActivateEyeDropper'
         ]);
@@ -55,7 +58,8 @@ class ColorPicker extends React.Component {
         this.state = {
             hue: hsv[0],
             saturation: hsv[1],
-            brightness: hsv[2]
+            brightness: hsv[2],
+            alpha: hsv[3]
         };
     }
     componentWillReceiveProps (newProps) {
@@ -67,7 +71,8 @@ class ColorPicker extends React.Component {
             this.setState({
                 hue: hsv[0],
                 saturation: hsv[1],
-                brightness: hsv[2]
+                brightness: hsv[2],
+                alpha: hsv[3]
             });
         }
     }
@@ -75,7 +80,7 @@ class ColorPicker extends React.Component {
         const isTransparent = color === null;
         const isMixed = color === MIXED;
         return isTransparent || isMixed ?
-            [50, 100, 100] : colorStringToHsv(color);
+            [50, 100, 100, isTransparent ? 0 : 1] : colorStringToHsv(color);
     }
     handleHueChange (hue) {
         this.setState({hue: hue}, () => {
@@ -96,8 +101,18 @@ class ColorPicker extends React.Component {
         this.props.onChangeColor(hsvToHex(
             this.state.hue,
             this.state.saturation,
-            this.state.brightness
+            this.state.brightness,
+            this.state.alpha
         ));
+    }
+    handleAlphaChange (alpha) {
+        this.setState({alpha: alpha / 100}, () => {
+            if (this.state.alpha === 0) {
+                this.handleTransparent();
+            } else {
+                this.handleColorChange();
+            }
+        });
     }
     handleTransparent () {
         this.props.onChangeColor(null);
@@ -133,6 +148,9 @@ class ColorPicker extends React.Component {
                 mode={this.props.mode}
                 rtl={this.props.rtl}
                 saturation={this.state.saturation}
+                allowTransparency={this.props.allowTransparency}
+                alpha={this.state.alpha * 100}
+                onAlphaChange={this.handleAlphaChange}
                 shouldShowGradientTools={this.props.shouldShowGradientTools}
                 onActivateEyeDropper={this.handleActivateEyeDropper}
                 onBrightnessChange={this.handleBrightnessChange}
@@ -152,6 +170,7 @@ class ColorPicker extends React.Component {
 }
 
 ColorPicker.propTypes = {
+    alllowTransparency: PropTypes.bool,
     color: PropTypes.string,
     color2: PropTypes.string,
     colorIndex: PropTypes.number.isRequired,

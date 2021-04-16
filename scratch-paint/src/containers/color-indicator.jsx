@@ -146,6 +146,7 @@ const makeColorIndicator = (label, isStroke) => {
     }
 
     ColorIndicator.propTypes = {
+        allowTransparency: PropTypes.bool,
         colorIndex: PropTypes.number.isRequired,
         disabled: PropTypes.bool.isRequired,
         color: PropTypes.string,

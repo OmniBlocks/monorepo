@@ -88,10 +88,12 @@ const PaintEditorComponent = props => (
                             <FillColorIndicatorComponent
                                 className={styles.modMarginAfter}
                                 onUpdateImage={props.onUpdateImage}
+                                allowTransparency
                             />
                             {/* stroke */}
                             <StrokeColorIndicatorComponent
                                 onUpdateImage={props.onUpdateImage}
+                                allowTransparency
                             />
                             {/* stroke width */}
                             <StrokeWidthIndicatorComponent

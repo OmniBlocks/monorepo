@@ -15,7 +15,15 @@ import {MIXED} from '../helper/style-path';
 import Modes from '../lib/modes';
 
 const colorStringToHsv = hexString => {
-    const hsv = parseColor(hexString).hsva;
+    let hsv;
+    if (hexString.startsWith('#') && hexString.length === 9) {
+        // parseColor does not properly parse alpha of hex colors
+        hsv = parseColor(hexString).hsva;
+        const alpha = parseInt(hexString.substr(hexString.length - 2), 16) / 255;
+        hsv[3] = alpha;
+    } else {
+        hsv = parseColor(hexString).hsva;
+    }
     // Hue comes out in [0, 360], limit to [0, 100]
     hsv[0] = hsv[0] / 3.6;
     // Black is parsed as {0, 0, 0}, but turn saturation up to 100

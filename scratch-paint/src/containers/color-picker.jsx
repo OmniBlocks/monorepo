@@ -116,7 +116,7 @@ class ColorPicker extends React.Component {
             this.state.hue,
             this.state.saturation,
             this.state.brightness,
-            this.state.alpha
+            this.props.allowTransparency ? this.state.alpha : 1
         ));
     }
     handleAlphaChange (alpha) {

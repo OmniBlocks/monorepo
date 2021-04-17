@@ -20,6 +20,7 @@ import fillSolidIcon from './icons/fill-solid-enabled.svg';
 import fillVertGradientIcon from './icons/fill-vert-gradient-enabled.svg';
 import swapIcon from './icons/swap.svg';
 import Modes from '../../lib/modes';
+import alphaBackground from './alpha.png';
 
 const hsvToHex = (h, s, v) =>
     // Scale hue back up to [0, 360] from [0, 100]
@@ -67,7 +68,11 @@ class ColorPickerComponent extends React.Component {
         stops[0] += ` 0 ${halfHandleWidth}px`;
         stops[stops.length - 1] += ` ${CONTAINER_WIDTH - halfHandleWidth}px 100%`;
 
-        return `linear-gradient(to left, ${stops.join(',')})`;
+        let css = `linear-gradient(to left, ${stops.join(',')})`;
+        if (channel === 'alpha') {
+            css = `${css}, url("${alphaBackground}")`;
+        }
+        return css;
     }
     render () {
         return (

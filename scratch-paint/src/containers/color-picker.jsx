@@ -28,10 +28,13 @@ const colorStringToHsv = hexString => {
 
 const makeAlphaComponent = alpha => Math.round(alpha * 255).toString(16).padStart(2, '0');
 
-const hsvToHex = (h, s, v, a) =>
-    // Scale hue back up to [0, 360] from [0, 100]
-    parseColor(`hsv(${3.6 * h}, ${s}, ${v})`).hex + makeAlphaComponent(a)
-;
+const hsvToHex = (h, s, v, a) => {
+    let color = parseColor(`hsv(${3.6 * h}, ${s}, ${v})`).hex;
+    if (a < 1) {
+        color += makeAlphaComponent(a);
+    }
+    return color;
+};
 
 // Important! This component ignores new color props except when isEyeDropping
 // This is to make the HSV <=> RGB conversion stable. The sliders manage their

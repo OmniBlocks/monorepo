@@ -135,22 +135,18 @@ class ColorPicker extends React.Component {
         } else {
             color = e.target.value;
         }
-        if (!color.startsWith('#')) {
-            color = `#${color}`;
+        color = normalizeColorToHex(color);
+        if (!color) {
+            return;
         }
-        let hsv;
-        try {
-            hsv = colorStringToHsv(color);
-        } catch (e) { /* ignore */ }
-        if (hsv) {
-            this.setState({
-                hue: hsv[0],
-                saturation: hsv[1],
-                brightness: hsv[2],
-                alpha: hsv[3]
-            });
-            this.props.onChangeColor(color);
-        }
+        const hsv = colorStringToHsv(color);
+        this.setState({
+            hue: hsv[0],
+            saturation: hsv[1],
+            brightness: hsv[2],
+            alpha: hsv[3]
+        });
+        this.props.onChangeColor(color);
     }
     handleTransparent () {
         this.props.onChangeColor(null);

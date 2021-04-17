@@ -21,6 +21,10 @@ import fillVertGradientIcon from './icons/fill-vert-gradient-enabled.svg';
 import swapIcon from './icons/swap.svg';
 import Modes from '../../lib/modes';
 import alphaBackground from './alpha.png';
+import BufferedInputHOC from '../forms/buffered-input-hoc.jsx';
+import Input from '../forms/input.jsx';
+
+const BufferedInput = BufferedInputHOC(Input);
 
 const hsvToHex = (h, s, v) =>
     // Scale hue back up to [0, 360] from [0, 100]
@@ -285,6 +289,21 @@ class ColorPickerComponent extends React.Component {
                         </div>
                     </div>
                 )}
+                <div className={styles.pickerRow}>
+                    <Input
+                        type="color"
+                        className={styles.pickerColor}
+                        // HTML color input does not understand transparency
+                        value={this.props.hexColor ? this.props.hexColor.substr(0, 7) : '#000000'}
+                        onChange={this.props.onHexColorChange}
+                    />
+                    <BufferedInput
+                        type="text"
+                        className={styles.pickerText}
+                        value={this.props.hexColor || '#00000000'}
+                        onSubmit={this.props.onHexColorChange}
+                    />
+                </div>
                 <div className={styles.swatchRow}>
                     <div className={styles.swatches}>
                         {this.props.mode === Modes.BIT_LINE ||
@@ -335,6 +354,8 @@ ColorPickerComponent.propTypes = {
     allowTransparency: PropTypes.bool,
     alpha: PropTypes.number.isRequired,
     onAlphaChange: PropTypes.func.isRequired,
+    hexColor: PropTypes.string,
+    onHexColorChange: PropTypes.func,
     brightness: PropTypes.number.isRequired,
     color: PropTypes.string,
     color2: PropTypes.string,

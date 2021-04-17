@@ -122,3 +122,31 @@
 [dir="rtl"] .gradient-swatches-row {
     flex-direction: row-reverse;
 }
+
+.picker-row {
+    display: flex;
+    margin: 8px;
+    margin-top: 12px;
+    width: 150px;
+    align-items: center;
+}
+.picker-row .picker-color {
+    border: none;
+    border-radius: 0;
+    padding: 0 0.2rem;
+    width: 3rem;
+    box-sizing: border-box;
+    cursor: pointer;
+}
+.picker-row .picker-text {
+    box-sizing: border-box;
+    width: 100%;
+}
+[dir="ltr"] .picker-row .picker-text {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+[dir="rtl"] .picker-row .picker-text {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}

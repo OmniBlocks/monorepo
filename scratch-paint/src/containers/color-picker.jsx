@@ -44,6 +44,8 @@ const hsvToHex = (h, s, v, a) => {
     return color;
 };
 
+const normalizeColorToHex = color => parseColor(color).hex;
+
 // Important! This component ignores new color props except when isEyeDropping
 // This is to make the HSV <=> RGB conversion stable. The sliders manage their
 // own changes until unmounted or color changes with props.isEyeDropping = true.
@@ -60,6 +62,7 @@ class ColorPicker extends React.Component {
             'handleSaturationChange',
             'handleBrightnessChange',
             'handleAlphaChange',
+            'handleHexColorChange',
             'handleTransparent',
             'handleActivateEyeDropper'
         ]);
@@ -125,6 +128,30 @@ class ColorPicker extends React.Component {
             }
         });
     }
+    handleHexColorChange (e) {
+        let color;
+        if (typeof e === 'string') {
+            color = e;
+        } else {
+            color = e.target.value;
+        }
+        if (!color.startsWith('#')) {
+            color = `#${color}`;
+        }
+        let hsv;
+        try {
+            hsv = colorStringToHsv(color);
+        } catch (e) { /* ignore */ }
+        if (hsv) {
+            this.setState({
+                hue: hsv[0],
+                saturation: hsv[1],
+                brightness: hsv[2],
+                alpha: hsv[3]
+            });
+            this.props.onChangeColor(color);
+        }
+    }
     handleTransparent () {
         this.props.onChangeColor(null);
     }
@@ -162,6 +189,8 @@ class ColorPicker extends React.Component {
                 allowTransparency={this.props.allowTransparency}
                 alpha={this.state.alpha * 100}
                 onAlphaChange={this.handleAlphaChange}
+                hexColor={normalizeColorToHex(this.props.colorIndex === 0 ? this.props.color : this.props.color2)}
+                onHexColorChange={this.handleHexColorChange}
                 shouldShowGradientTools={this.props.shouldShowGradientTools}
                 onActivateEyeDropper={this.handleActivateEyeDropper}
                 onBrightnessChange={this.handleBrightnessChange}

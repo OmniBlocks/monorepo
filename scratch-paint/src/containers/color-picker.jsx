@@ -112,6 +112,10 @@ class ColorPicker extends React.Component {
         });
     }
     handleColorChange () {
+        if (this.state.alpha === 0) {
+            this.handleTransparent();
+            return;
+        }
         this.props.onChangeColor(hsvToHex(
             this.state.hue,
             this.state.saturation,
@@ -121,11 +125,7 @@ class ColorPicker extends React.Component {
     }
     handleAlphaChange (alpha) {
         this.setState({alpha: alpha / 100}, () => {
-            if (this.state.alpha === 0) {
-                this.handleTransparent();
-            } else {
-                this.handleColorChange();
-            }
+            this.handleColorChange();
         });
     }
     handleHexColorChange (e) {

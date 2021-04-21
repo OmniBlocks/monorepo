@@ -100,3 +100,12 @@ test('largeImageWidthConstraint', t => {
     t.equals(960 / 2000 * 1000, size.height);
     t.end();
 });
+
+test('custom stage size', t => {
+    const bitmapAdapter = new BitmapAdapter();
+    bitmapAdapter.setStageSize(640, 360);
+    const size = bitmapAdapter.getResizedWidthHeight(2000, 50);
+    t.equals(1280, size.width);
+    t.equals(1280 / 2000 * 50, size.height);
+    t.end();
+});

@@ -264,7 +264,7 @@ Blockly.HorizontalFlyout.prototype.scrollTo = function(pos) {
   var viewWidth = metrics.viewWidth;
   this.scrollTarget = Math.min(this.scrollTarget, contentWidth - viewWidth);
 
-  this.stepScrollAnimation();
+  this.startScrollAnimation();
 };
 
 /**

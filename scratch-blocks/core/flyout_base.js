@@ -655,24 +655,35 @@ Blockly.Flyout.prototype.selectCategoryByScrollPosition = function(pos) {
   }
 };
 
+Blockly.Flyout.prototype.startScrollAnimation = function() {
+  this.scrollTime = -1;
+  this.scrollStart = this.horizontalLayout_ ? -this.workspace_.scrollX : -this.workspace_.scrollY;
+  requestAnimationFrame(this.stepScrollAnimation.bind(this));
+};
+
 /**
  * Step the scrolling animation by scrolling a fraction of the way to
  * a scroll target, and request the next frame if necessary.
+ * @param {number} time Time in milliseconds
  * @package
  */
-Blockly.Flyout.prototype.stepScrollAnimation = function() {
+Blockly.Flyout.prototype.stepScrollAnimation = function(time) {
   if (!this.scrollTarget) {
     return;
   }
-  var scrollPos = this.horizontalLayout_ ?
-    -this.workspace_.scrollX : -this.workspace_.scrollY;
+  if (this.scrollTime === -1) {
+    this.scrollTime = time;
+  }
+  var animationTime = (time - this.scrollTime) / 60 + 1;
+  var totalDistance = this.scrollTarget - this.scrollStart;
+  var scrollPos = this.scrollTarget - totalDistance * Math.pow(this.scrollAnimationFraction, animationTime);
   var diff = this.scrollTarget - scrollPos;
   if (Math.abs(diff) < 1) {
     this.scrollbar_.set(this.scrollTarget);
     this.scrollTarget = null;
     return;
   }
-  this.scrollbar_.set(scrollPos + diff * this.scrollAnimationFraction);
+  this.scrollbar_.set(scrollPos);
 
   // Polyfilled by goog.dom.animationFrame.polyfill
   requestAnimationFrame(this.stepScrollAnimation.bind(this));

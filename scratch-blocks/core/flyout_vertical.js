@@ -413,7 +413,7 @@ Blockly.VerticalFlyout.prototype.scrollTo = function(pos) {
   var viewHeight = metrics.viewHeight;
   this.scrollTarget = Math.min(this.scrollTarget, contentHeight - viewHeight);
 
-  this.stepScrollAnimation();
+  this.startScrollAnimation();
 };
 
 /**

@@ -293,13 +293,16 @@ Blockly.IntersectionObserver.prototype._parseRootMargin = function(opt_rootMargi
   return margins;
 };
 
-/**
- * Scans each observation target for intersection changes and adds them
- * to the internal entries queue. If new entries are found, it
- * schedules the callback to be invoked.
- * @private
- */
 Blockly.IntersectionObserver.prototype.checkForIntersections = function() {
+  if (this.intersectionCheckQueued) {
+    return;
+  }
+  this.intersectionCheckQueued = true;
+  (window.queueMicrotask || window.setTimeout)(this.actuallyCheckForIntersections.bind(this));
+};
+
+Blockly.IntersectionObserver.prototype.actuallyCheckForIntersections = function() {
+  this.intersectionCheckQueued = false;
   var rootIsInDom = this._rootIsInDom();
   var rootRect = rootIsInDom ? this._getRootRect() : getEmptyRect();
 

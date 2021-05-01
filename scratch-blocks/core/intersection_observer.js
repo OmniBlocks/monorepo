@@ -2,6 +2,17 @@
 
 goog.provide('Blockly.IntersectionObserver');
 
+function queueMicrotask(callback) {
+  // Prefer native when possible.
+  // Otherwise, use a polyfill based on Promise
+  if (window.queueMicrotask) {
+    window.queueMicrotask(callback);
+  } else {
+    // eslint-disable-next-line no-undef
+    Promise.resolve().then(callback);
+  }
+}
+
 Blockly.IntersectionObserver = function(workspace) {
   this.workspace = workspace;
   this.observing = [];
@@ -34,7 +45,7 @@ Blockly.IntersectionObserver.prototype.queueIntersectionCheck = function() {
     return;
   }
   this.intersectionCheckQueued = true;
-  (window.queueMicrotask || window.setTimeout)(this.checkForIntersections);
+  queueMicrotask(this.checkForIntersections);
 };
 
 Blockly.IntersectionObserver.prototype.checkForIntersections = function() {

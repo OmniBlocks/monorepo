@@ -24,8 +24,9 @@ Blockly.IntersectionObserver.prototype.unobserve = function(block) {
   }
 };
 
-Blockly.IntersectionObserver.prototype.disconnect = function() {
+Blockly.IntersectionObserver.prototype.dispose = function() {
   this.observing = [];
+  this.workspace = null;
 };
 
 Blockly.IntersectionObserver.prototype.queueIntersectionCheck = function() {
@@ -38,6 +39,10 @@ Blockly.IntersectionObserver.prototype.queueIntersectionCheck = function() {
 
 Blockly.IntersectionObserver.prototype.checkForIntersections = function() {
   this.intersectionCheckQueued = false;
+
+  if (!this.workspace) {
+    return;
+  }
 
   var workspace = this.workspace;
   var workspaceScale = workspace.scale;

@@ -558,7 +558,7 @@ Blockly.WorkspaceSvg.prototype.dispose = function() {
     this.resizeHandlerWrapper_ = null;
   }
   if (this.intersectionObserver) {
-    this.intersectionObserver.disconnect();
+    this.intersectionObserver.dispose();
   }
 };
 

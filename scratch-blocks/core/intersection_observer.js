@@ -50,7 +50,8 @@ Blockly.IntersectionObserver.prototype.checkForIntersections = function() {
   var workspaceWidth = workspace.getParentSvg().width.baseVal.value;
   var canvasPos = Blockly.utils.getRelativeXY(workspace.getCanvas());
 
-  this.observing.forEach(function(block) {
+  for (var i = 0; i < this.observing.length; i++) {
+    var block = this.observing[i];
     var blockPos = block.getRelativeToSurfaceXY();
     blockPos.x *= workspaceScale;
     blockPos.y *= workspaceScale;
@@ -72,5 +73,5 @@ Blockly.IntersectionObserver.prototype.checkForIntersections = function() {
     }
 
     block.setIntersects(visible);
-  }, this);
+  }
 };

@@ -48,7 +48,11 @@ Blockly.IntersectionObserver.prototype.checkForIntersections = function() {
   var workspaceScale = workspace.scale;
   var workspaceHeight = workspace.getParentSvg().height.baseVal.value;
   var workspaceWidth = workspace.getParentSvg().width.baseVal.value;
-  var canvasPos = Blockly.utils.getRelativeXY(workspace.getCanvas());
+  if (workspace.isDragSurfaceActive_) {
+    var canvasPos = Blockly.utils.getRelativeXY(workspace.workspaceDragSurface_.SVG_);
+  } else {
+    var canvasPos = Blockly.utils.getRelativeXY(workspace.getCanvas());
+  }
 
   for (var i = 0; i < this.observing.length; i++) {
     var block = this.observing[i];

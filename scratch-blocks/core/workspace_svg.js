@@ -473,14 +473,7 @@ Blockly.WorkspaceSvg.prototype.createDom = function(opt_backgroundClass) {
     }
   }
 
-  this.intersectionObserver = new Blockly.IntersectionObserver(function(intersections) {
-    for (var i = 0; i < intersections.length; i++) {
-      var intersection = intersections[i];
-      intersection.target.block.setIntersects(intersection.intersectionRatio > 0);
-    }
-  }, {
-    root: this.getParentSvg()
-  });
+  this.intersectionObserver = new Blockly.IntersectionObserver(this);
 
   // Determine if there needs to be a category tree, or a simple list of
   // blocks.  This cannot be changed later, since the UI is very different.
@@ -714,7 +707,7 @@ Blockly.WorkspaceSvg.prototype.resize = function() {
     this.scrollbar.resize();
   }
   this.updateScreenCalculations_();
-  this.intersectionObserver.checkForIntersections();
+  this.intersectionObserver.queueIntersectionCheck();
 };
 
 /**
@@ -786,7 +779,7 @@ Blockly.WorkspaceSvg.prototype.translate = function(x, y) {
   if (this.blockDragSurface_) {
     this.blockDragSurface_.translateAndScaleGroup(x, y, this.scale);
   }
-  this.intersectionObserver.checkForIntersections();
+  this.intersectionObserver.queueIntersectionCheck();
 };
 
 /**
@@ -1820,7 +1813,7 @@ Blockly.WorkspaceSvg.prototype.setScale = function(newScale) {
     // No toolbox, resize flyout.
     this.flyout_.reflow();
   }
-  this.intersectionObserver.checkForIntersections();
+  this.intersectionObserver.queueIntersectionCheck();
 };
 
 /**

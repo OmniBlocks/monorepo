@@ -686,14 +686,7 @@ Blockly.BlockSvg.prototype.render = function(opt_bubble) {
   }
   Blockly.Field.stopCache();
 
-  // TODO: remove this
-  if (this.workspace.intersectionObserver) {
-    if (this.getParent()) {
-      this.workspace.intersectionObserver.unobserve(this.getSvgRoot());
-    } else {
-      this.workspace.intersectionObserver.observe(this.getSvgRoot());
-    }
-  }
+  this.updateIntersectionObserver();
 };
 
 /**

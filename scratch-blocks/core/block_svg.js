@@ -280,7 +280,6 @@ Blockly.BlockSvg.prototype.getIcons = function() {
 };
 
 Blockly.BlockSvg.prototype.visible_ = true;
-Blockly.BlockSvg.prototype.placeholder = null;
 
 Blockly.BlockSvg.prototype.setIntersects = function(visible) {
   if (visible === this.visible_) {
@@ -293,23 +292,18 @@ Blockly.BlockSvg.prototype.setIntersects = function(visible) {
   }
   if (visible) {
     root.style.display = '';
-    if (this.placeholder) {
-      this.workspace.intersectionObserver.unobserve(this.placeholder);
-      goog.dom.removeNode(this.placeholder);
-      this.placeholder = null;
-    }
   } else {
     root.style.display = 'none';
-    var widthAndHeight = this.getHeightWidth();
-    this.placeholder = Blockly.utils.createSvgElement('rect', {
-      fill: this.getColour(),
-      width: widthAndHeight.width,
-      height: widthAndHeight.height,
-      transform: root.getAttribute('transform')
-    }, null);
-    this.placeholder.block = this;
-    root.parentNode.insertBefore(this.placeholder, root);
-    this.workspace.intersectionObserver.observe(this.placeholder);
+  }
+};
+
+Blockly.BlockSvg.prototype.updateIntersectionObserver = function() {
+  if (this.workspace.intersectionObserver) {
+    if (this.getParent()) {
+      this.workspace.intersectionObserver.unobserve(this);
+    } else {
+      this.workspace.intersectionObserver.observe(this);
+    }
   }
 };
 
@@ -334,8 +328,7 @@ Blockly.BlockSvg.prototype.setParent = function(newParent) {
     return;
   }
 
-  // TODO
-  this.setIntersects(true);
+  this.updateIntersectionObserver();
 
   var oldXY = this.getRelativeToSurfaceXY();
   if (newParent) {
@@ -428,9 +421,6 @@ Blockly.BlockSvg.prototype.moveBy = function(dx, dy) {
 Blockly.BlockSvg.prototype.translate = function(x, y) {
   this.getSvgRoot().setAttribute('transform',
       'translate(' + x + ',' + y + ')');
-  if (this.placeholder) {
-    this.placeholder.setAttribute('transform', this.getSvgRoot().getAttribute('transform'));
-  }
 };
 
 /**
@@ -896,15 +886,9 @@ Blockly.BlockSvg.prototype.dispose = function(healStack, animate) {
   Blockly.BlockSvg.superClass_.dispose.call(this, healStack);
 
   if (blockWorkspace.intersectionObserver) {
-    blockWorkspace.intersectionObserver.unobserve(this.getSvgRoot());
-    if (this.placeholder) {
-      blockWorkspace.intersectionObserver.unobserve(this.placeholder);
-    }
+    blockWorkspace.intersectionObserver.unobserve(this);
   }
   goog.dom.removeNode(this.svgGroup_);
-  if (this.placeholder) {
-    goog.dom.removeNode(this.placeholder);
-  }
   blockWorkspace.resizeContents();
   // Sever JavaScript to DOM connections.
   this.svgGroup_ = null;

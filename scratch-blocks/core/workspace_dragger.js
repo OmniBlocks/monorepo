@@ -81,6 +81,7 @@ Blockly.WorkspaceDragger.prototype.startDrag = function() {
   if (Blockly.selected) {
     Blockly.selected.unselect();
   }
+  this.workspace_.setupDragSurface();
 };
 
 /**
@@ -92,6 +93,7 @@ Blockly.WorkspaceDragger.prototype.startDrag = function() {
 Blockly.WorkspaceDragger.prototype.endDrag = function(currentDragDeltaXY) {
   // Make sure everything is up to date.
   this.drag(currentDragDeltaXY);
+  this.workspace_.resetDragSurface();
 };
 
 /**

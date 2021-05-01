@@ -473,7 +473,10 @@ Blockly.WorkspaceSvg.prototype.createDom = function(opt_backgroundClass) {
     }
   }
 
-  this.intersectionObserver = new Blockly.IntersectionObserver(this);
+  // Doesn't work in RTL right now
+  if (!this.RTL) {
+    this.intersectionObserver = new Blockly.IntersectionObserver(this);
+  }
 
   // Determine if there needs to be a category tree, or a simple list of
   // blocks.  This cannot be changed later, since the UI is very different.
@@ -683,6 +686,12 @@ Blockly.WorkspaceSvg.prototype.resizeContents = function() {
   this.updateInverseScreenCTM();
 };
 
+Blockly.WorkspaceSvg.prototype.queueIntersectionCheck = function() {
+  if (this.intersectionObserver) {
+    this.intersectionObserver.queueIntersectionCheck();
+  }
+};
+
 /**
  * Resize and reposition all of the workspace chrome (toolbox,
  * trash, scrollbars etc.)
@@ -707,7 +716,7 @@ Blockly.WorkspaceSvg.prototype.resize = function() {
     this.scrollbar.resize();
   }
   this.updateScreenCalculations_();
-  this.intersectionObserver.queueIntersectionCheck();
+  this.queueIntersectionCheck();
 };
 
 /**
@@ -779,7 +788,7 @@ Blockly.WorkspaceSvg.prototype.translate = function(x, y) {
   if (this.blockDragSurface_) {
     this.blockDragSurface_.translateAndScaleGroup(x, y, this.scale);
   }
-  this.intersectionObserver.queueIntersectionCheck();
+  this.queueIntersectionCheck();
 };
 
 /**
@@ -1813,7 +1822,7 @@ Blockly.WorkspaceSvg.prototype.setScale = function(newScale) {
     // No toolbox, resize flyout.
     this.flyout_.reflow();
   }
-  this.intersectionObserver.queueIntersectionCheck();
+  this.queueIntersectionCheck();
 };
 
 /**

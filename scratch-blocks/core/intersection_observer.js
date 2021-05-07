@@ -40,6 +40,7 @@ Blockly.IntersectionObserver.prototype.queueIntersectionCheck = function() {
   if (window.queueMicrotask) {
     window.queueMicrotask(this.checkForIntersections);
   } else {
+    // eslint-disable-next-line no-undef
     Promise.resolve().then(this.checkForIntersections);
   }
 };

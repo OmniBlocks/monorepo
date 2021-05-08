@@ -207,7 +207,9 @@ Blockly.WorkspaceCommentSvg.prototype.createEditor_ = function() {
   }, true, true);
   // Don't zoom with mousewheel.
   Blockly.bindEventWithChecks_(textarea, 'wheel', this, function(e) {
-    e.stopPropagation();
+    if (!e.ctrlKey) {
+      e.stopPropagation();
+    }
   });
   Blockly.bindEventWithChecks_(textarea, 'change', this, function(_e) {
     if (this.text_ != textarea.value) {

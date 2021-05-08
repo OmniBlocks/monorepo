@@ -679,7 +679,7 @@ Blockly.Css.CONTENT = [
   '}',
 
   '.scratchCommentTextarea {',
-    'background-color: #fef49c;',
+    'background-color: transparent;',
     'border: 0;',
     'outline: 0;',
     'padding: 0;',

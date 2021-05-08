@@ -236,7 +236,7 @@ Blockly.ScratchBlockComment.prototype.createEditor_ = function() {
       this.textareaFocus_, true, true); // noCapture and do not prevent default
   // Don't zoom with mousewheel.
   Blockly.bindEventWithChecks_(textarea, 'wheel', this, function(e) {
-    if (!e.ctrlKey) {
+    if (!e.ctrlKey && textarea.clientHeight !== textarea.scrollHeight) {
       e.stopPropagation();
     }
   });

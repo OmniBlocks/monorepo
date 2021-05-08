@@ -662,17 +662,9 @@ Blockly.Css.CONTENT = [
     'fill: #fef49c;',
   '}',
 
-  '.scratchCommentTarget {',
-    'fill: transparent;',
-  '}',
-
   '.scratchWorkspaceCommentBorder {',
     'stroke: #bcA903;',
     'stroke-width: 1px;',
-  '}',
-
-  '.scratchCommentTargetFocused {',
-    'fill: none;',
   '}',
 
   '.scratchCommentTopBar {',
@@ -692,7 +684,6 @@ Blockly.Css.CONTENT = [
     'outline: 0;',
     'padding: 0;',
     'resize: none;',
-    'overflow: hidden;',
   '}',
 
   '.scratchCommentTextarea::placeholder {',

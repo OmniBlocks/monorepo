@@ -123,16 +123,6 @@ Blockly.WorkspaceCommentSvg.prototype.render = function() {
 
   this.createCommentTopBar_();
 
-  this.svgRectTarget_ = Blockly.utils.createSvgElement('rect',
-      {
-        'class': 'blocklyDraggable scratchCommentTarget',
-        'x': 0,
-        'y': Blockly.WorkspaceCommentSvg.TOP_BAR_HEIGHT,
-        'rx': 4 * Blockly.WorkspaceCommentSvg.BORDER_WIDTH,
-        'ry': 4 * Blockly.WorkspaceCommentSvg.BORDER_WIDTH
-      });
-  this.svgGroup_.appendChild(this.svgRectTarget_);
-
   // Add the resize icon
   this.addResizeDom_();
 
@@ -592,8 +582,6 @@ Blockly.WorkspaceCommentSvg.prototype.setSize = function(width, height) {
   }
   this.svgRect_.setAttribute('width', width);
   this.svgRect_.setAttribute('height', height);
-  this.svgRectTarget_.setAttribute('width', width);
-  this.svgRectTarget_.setAttribute('height', height - Blockly.WorkspaceCommentSvg.TOP_BAR_HEIGHT);
   this.svgHandleTarget_.setAttribute('width', width);
   this.svgHandleTarget_.setAttribute('height', Blockly.WorkspaceCommentSvg.TOP_BAR_HEIGHT);
   if (this.RTL) {
@@ -607,7 +595,6 @@ Blockly.WorkspaceCommentSvg.prototype.setSize = function(width, height) {
     this.svgHandleTarget_.setAttribute('transform', 'translate(' + -width + ', 1)');
     this.minimizeArrow_.setAttribute('transform', 'translate(' + -width + ', 1)');
     this.deleteIcon_.setAttribute('tranform', 'translate(' + -width + ', 1)');
-    this.svgRectTarget_.setAttribute('transform', 'translate(' + -width + ', 1)');
     this.topBarLabel_.setAttribute('transform', 'translate(' + -width + ', 1)');
   } else {
     this.deleteIcon_.setAttribute('x', width -
@@ -682,7 +669,6 @@ Blockly.WorkspaceCommentSvg.prototype.disposeInternal_ = function() {
   this.textarea_ = null;
   this.foreignObject_ = null;
   this.svgRect_ = null;
-  this.svgRectTarget_ = null;
   this.svgHandleTarget_ = null;
 };
 
@@ -697,8 +683,6 @@ Blockly.WorkspaceCommentSvg.prototype.setFocus = function() {
   // Defer CSS changes.
   setTimeout(function() {
     comment.addFocus();
-    Blockly.utils.addClass(
-        comment.svgRectTarget_, 'scratchCommentTargetFocused');
     Blockly.utils.addClass(
         comment.svgHandleTarget_, 'scratchCommentHandleTargetFocused');
   }, 0);
@@ -716,8 +700,6 @@ Blockly.WorkspaceCommentSvg.prototype.blurFocus = function() {
   setTimeout(function() {
     if (comment.svgGroup_) { // Could have been deleted in the meantime
       comment.removeFocus();
-      Blockly.utils.removeClass(
-          comment.svgRectTarget_, 'scratchCommentTargetFocused');
       Blockly.utils.removeClass(
           comment.svgHandleTarget_, 'scratchCommentHandleTargetFocused');
     }

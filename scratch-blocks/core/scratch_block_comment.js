@@ -263,7 +263,6 @@ Blockly.ScratchBlockComment.prototype.createEditor_ = function() {
  * @private
  */
 Blockly.ScratchBlockComment.prototype.textareaFocus_ = function(e) {
-  Blockly.ScratchBlockComment.superClass_.textareaFocus_.call(this, e);
   // Stop event from propagating to the workspace to make sure preventDefault _is not called_.
   e.stopPropagation();
 };

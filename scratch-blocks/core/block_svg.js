@@ -279,18 +279,18 @@ Blockly.BlockSvg.prototype.getIcons = function() {
   return icons;
 };
 
-Blockly.BlockSvg.prototype.visible_ = true;
+Blockly.BlockSvg.prototype.intersects_ = true;
 
-Blockly.BlockSvg.prototype.setIntersects = function(visible) {
-  if (visible === this.visible_) {
+Blockly.BlockSvg.prototype.setIntersects = function(intersects) {
+  if (intersects === this.intersects_) {
     return;
   }
-  this.visible_ = visible;
+  this.intersects_ = intersects;
   var root = this.getSvgRoot();
   if (!root) {
     return;
   }
-  if (visible) {
+  if (intersects) {
     root.style.display = '';
   } else {
     root.style.display = 'none';
@@ -301,7 +301,7 @@ Blockly.BlockSvg.prototype.updateIntersectionObserver = function() {
   if (this.workspace.intersectionObserver) {
     if (this.getParent()) {
       this.workspace.intersectionObserver.unobserve(this);
-      if (!this.visible_) {
+      if (!this.intersects_) {
         this.setIntersects(true);
       }
     } else {

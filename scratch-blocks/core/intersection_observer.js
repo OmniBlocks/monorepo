@@ -5,6 +5,7 @@ goog.provide('Blockly.IntersectionObserver');
 Blockly.IntersectionObserver = function(workspace) {
   this.workspace = workspace;
   this.observing = [];
+  this.intersectionCheckQueued = false;
   this.checkForIntersections = this.checkForIntersections.bind(this);
 };
 

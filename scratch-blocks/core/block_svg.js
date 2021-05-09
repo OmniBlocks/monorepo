@@ -301,6 +301,9 @@ Blockly.BlockSvg.prototype.updateIntersectionObserver = function() {
   if (this.workspace.intersectionObserver) {
     if (this.getParent()) {
       this.workspace.intersectionObserver.unobserve(this);
+      if (!this.visible_) {
+        this.setIntersects(true);
+      }
     } else {
       this.workspace.intersectionObserver.observe(this);
     }

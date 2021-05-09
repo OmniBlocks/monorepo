@@ -52,9 +52,6 @@ Blockly.IntersectionObserver.prototype.checkForIntersections = function() {
     return;
   }
 
-  // Allow blocks to go slightly offscreen so that effects such as glow do not get cut off.
-  var PADDING = 10;
-
   var workspace = this.workspace;
   var workspaceScale = workspace.scale;
   var workspaceHeight = workspace.getParentSvg().height.baseVal.value;
@@ -65,6 +62,9 @@ Blockly.IntersectionObserver.prototype.checkForIntersections = function() {
     var canvasPos = Blockly.utils.getRelativeXY(workspace.getCanvas());
   }
 
+  // Allow blocks to go slightly offscreen so that effects such as glow do not get cut off.
+  var margin = 12 * workspaceScale;
+
   for (var i = 0; i < this.observing.length; i++) {
     var block = this.observing[i];
     var blockPos = block.getRelativeToSurfaceXY();
@@ -72,17 +72,17 @@ Blockly.IntersectionObserver.prototype.checkForIntersections = function() {
     blockPos.y *= workspaceScale;
 
     var visible = true;
-    if (canvasPos.y + blockPos.y - PADDING > workspaceHeight) {
+    if (canvasPos.y + blockPos.y - margin > workspaceHeight) {
       visible = false;
-    } else if (canvasPos.x + blockPos.x - PADDING > workspaceWidth) {
+    } else if (canvasPos.x + blockPos.x - margin > workspaceWidth) {
       visible = false;
     } else {
       var blockSize = block.getHeightWidth();
       blockSize.width *= workspaceScale;
       blockSize.height *= workspaceScale;
-      if (canvasPos.x + blockPos.x + blockSize.width + PADDING < 0) {
+      if (canvasPos.x + blockPos.x + blockSize.width + margin < 0) {
         visible = false;
-      } else if (canvasPos.y + blockPos.y + blockSize.height + PADDING < 0) {
+      } else if (canvasPos.y + blockPos.y + blockSize.height + margin < 0) {
         visible = false;
       }
     }

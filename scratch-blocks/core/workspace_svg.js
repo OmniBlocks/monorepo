@@ -1276,6 +1276,7 @@ Blockly.WorkspaceSvg.prototype.isInsideBlocksArea = function(e) {
  */
 Blockly.WorkspaceSvg.prototype.onMouseDown_ = function(e) {
   if (this.disableMouseDown) {
+    this.disableMouseDown = false;
     return;
   }
   var gesture = this.getGesture(e);

@@ -104,8 +104,6 @@ Blockly.WorkspaceSvg = function(options, opt_blockDragSurface, opt_wsDragSurface
    */
   this.audioManager_ = new Blockly.WorkspaceAudio(options.parentWorkspace);
 
-  this.disableMouseDown = false;
-
   /**
    * This workspace's grid object or null.
    * @type {Blockly.Grid}
@@ -1275,10 +1273,6 @@ Blockly.WorkspaceSvg.prototype.isInsideBlocksArea = function(e) {
  * @private
  */
 Blockly.WorkspaceSvg.prototype.onMouseDown_ = function(e) {
-  if (this.disableMouseDown) {
-    this.disableMouseDown = false;
-    return;
-  }
   var gesture = this.getGesture(e);
   if (gesture) {
     gesture.handleWsStart(e, this);

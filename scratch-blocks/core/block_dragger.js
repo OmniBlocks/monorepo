@@ -223,11 +223,6 @@ Blockly.BlockDragger.prototype.dragBlock = function(e, currentDragDeltaXY) {
  * @package
  */
 Blockly.BlockDragger.prototype.endBlockDrag = function(e, currentDragDeltaXY) {
-  var workspace = this.workspace_;
-  workspace.disableMouseDown = true;
-  setTimeout(function() {
-    workspace.disableMouseDown = false;
-  });
   // Make sure internal state is fresh.
   this.dragBlock(e, currentDragDeltaXY);
   this.dragIconData_ = [];

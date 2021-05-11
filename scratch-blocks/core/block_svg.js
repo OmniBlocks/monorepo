@@ -675,6 +675,9 @@ Blockly.BlockSvg.prototype.createTabList_ = function() {
  * @private
  */
 Blockly.BlockSvg.prototype.onMouseDown_ = function(e) {
+  if (this.workspace && this.workspace.isDragging()) {
+    return;
+  }
   var gesture = this.workspace && this.workspace.getGesture(e);
   if (gesture) {
     gesture.handleBlockStart(e, this);

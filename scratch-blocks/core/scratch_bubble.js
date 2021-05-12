@@ -534,10 +534,13 @@ Blockly.ScratchBubble.prototype.registerContextMenuCallback = function(callback)
  * @package
  */
 Blockly.ScratchBubble.prototype.setAnchorLocation = function(xy) {
+  var event = new Blockly.Events.CommentMove(this.comment);
   this.anchorXY_ = xy;
   if (this.rendered_) {
     this.positionBubble_();
   }
+  event.recordNew();
+  Blockly.Events.fire(event);
 };
 
 /**

@@ -97,8 +97,12 @@ class RenderWebGL extends EventEmitter {
      */
     static isSupported (optCanvas) {
         try {
-            // Create the context the same way that the constructor will: attributes may make the difference.
-            return !!RenderWebGL._getContext(optCanvas || document.createElement('canvas'));
+            optCanvas = optCanvas || document.createElement('canvas');
+            const options = {alpha: false, stencil: true, antialias: false};
+            return !!(
+                optCanvas.getContext('webgl', options) ||
+                optCanvas.getContext('experimental-webgl', options)
+            );
         } catch (e) {
             return false;
         }

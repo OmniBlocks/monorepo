@@ -1,8 +1,16 @@
 const twgl = require('twgl.js');
 
-const TextWrapper = require('./util/text-wrapper');
 const CanvasMeasurementProvider = require('./util/canvas-measurement-provider');
 const Skin = require('./Skin');
+
+let _TextWrapper;
+const getTextWrapper = () => {
+    if (!_TextWrapper) {
+        // eslint-disable-next-line global-require
+        _TextWrapper = require('./util/text-wrapper');
+    }
+    return _TextWrapper;
+};
 
 const BubbleStyle = {
     MAX_LINE_WIDTH: 170, // Maximum width, in Scratch pixels, of a single line of text
@@ -67,7 +75,7 @@ class TextBubbleSkin extends Skin {
         this._textureDirty = true;
 
         this.measurementProvider = new CanvasMeasurementProvider(this._canvas.getContext('2d'));
-        this.textWrapper = new TextWrapper(this.measurementProvider);
+        this.textWrapper = new (getTextWrapper())(this.measurementProvider);
 
         this._restyleCanvas();
     }

@@ -473,10 +473,7 @@ Blockly.WorkspaceSvg.prototype.createDom = function(opt_backgroundClass) {
     }
   }
 
-  // Doesn't work in RTL right now
-  if (!this.RTL) {
-    this.intersectionObserver = new Blockly.IntersectionObserver(this);
-  }
+  this.intersectionObserver = new Blockly.IntersectionObserver(this);
 
   // Determine if there needs to be a category tree, or a simple list of
   // blocks.  This cannot be changed later, since the UI is very different.

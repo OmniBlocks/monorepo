@@ -95,26 +95,32 @@ class ColorPicker extends React.Component {
         return isTransparent || isMixed ?
             [50, 100, 100, isTransparent ? 0 : 1] : colorStringToHsv(color);
     }
+    ensureNonZeroAlpha () {
+        if (this.state.alpha === 0) {
+            this.setState({
+                alpha: 1
+            });
+        }
+    }
     handleHueChange (hue) {
+        this.ensureNonZeroAlpha();
         this.setState({hue: hue}, () => {
             this.handleColorChange();
         });
     }
     handleSaturationChange (saturation) {
+        this.ensureNonZeroAlpha();
         this.setState({saturation: saturation}, () => {
             this.handleColorChange();
         });
     }
     handleBrightnessChange (brightness) {
+        this.ensureNonZeroAlpha();
         this.setState({brightness: brightness}, () => {
             this.handleColorChange();
         });
     }
     handleColorChange () {
-        if (this.state.alpha === 0) {
-            this.handleTransparent();
-            return;
-        }
         this.props.onChangeColor(hsvToHex(
             this.state.hue,
             this.state.saturation,
@@ -124,7 +130,11 @@ class ColorPicker extends React.Component {
     }
     handleAlphaChange (alpha) {
         this.setState({alpha: alpha / 100}, () => {
-            this.handleColorChange();
+            if (this.state.alpha === 0) {
+                this.handleTransparent();
+            } else {
+                this.handleColorChange();
+            }
         });
     }
     handleHexColorChange (e) {

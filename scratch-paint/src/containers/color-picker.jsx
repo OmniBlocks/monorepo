@@ -13,6 +13,7 @@ import GradientTypes from '../lib/gradient-types';
 import ColorPickerComponent from '../components/color-picker/color-picker.jsx';
 import {MIXED} from '../helper/style-path';
 import Modes from '../lib/modes';
+import {normalizeToHex8} from '../lib/tw-color-utils';
 
 const colorStringToHsv = hexString => {
     let hsv;
@@ -43,8 +44,6 @@ const hsvToHex = (h, s, v, a) => {
     }
     return color;
 };
-
-const normalizeColorToHex = color => parseColor(color).hex;
 
 // Important! This component ignores new color props except when isEyeDropping
 // This is to make the HSV <=> RGB conversion stable. The sliders manage their
@@ -135,7 +134,7 @@ class ColorPicker extends React.Component {
         } else {
             color = e.target.value;
         }
-        color = normalizeColorToHex(color);
+        color = normalizeToHex8(color);
         if (!color) {
             return;
         }
@@ -185,7 +184,7 @@ class ColorPicker extends React.Component {
                 allowTransparency={this.props.allowTransparency}
                 alpha={this.state.alpha * 100}
                 onAlphaChange={this.handleAlphaChange}
-                hexColor={normalizeColorToHex(this.props.colorIndex === 0 ? this.props.color : this.props.color2)}
+                hexColor={normalizeToHex8(this.props.colorIndex === 0 ? this.props.color : this.props.color2)}
                 onHexColorChange={this.handleHexColorChange}
                 shouldShowGradientTools={this.props.shouldShowGradientTools}
                 onActivateEyeDropper={this.handleActivateEyeDropper}

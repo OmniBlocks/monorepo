@@ -23,6 +23,7 @@ import Modes from '../../lib/modes';
 import alphaBackground from './alpha.png';
 import BufferedInputHOC from '../forms/buffered-input-hoc.jsx';
 import Input from '../forms/input.jsx';
+import {makeAlphaComponent} from '../../lib/tw-color-utils';
 
 const BufferedInput = BufferedInputHOC(Input);
 
@@ -54,10 +55,11 @@ class ColorPickerComponent extends React.Component {
             case 'brightness':
                 stops.push(hsvToHex(this.props.hue, this.props.saturation, n));
                 break;
-            case 'alpha':
-                const alphaComponent = Math.round(n / 100 * 255).toString(16).padStart(2, '0');
-                stops.push(`${hsvToHex(this.props.hue, this.props.saturation, this.props.brightness)}${alphaComponent}`);
+            case 'alpha': {
+                const alpha = makeAlphaComponent(n / 100);
+                stops.push(`${hsvToHex(this.props.hue, this.props.saturation, this.props.brightness)}${alpha}`);
                 break;
+            }
             default:
                 throw new Error(`Unknown channel for color sliders: ${channel}`);
             }

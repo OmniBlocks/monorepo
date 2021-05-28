@@ -15,6 +15,7 @@ import {applyColorToSelection,
     generateSecondaryColor,
     swapColorsInSelection,
     MIXED} from '../helper/style-path';
+import {removeAlpha} from '../lib/tw-color-utils';
 
 const makeColorIndicator = (label, isStroke) => {
     class ColorIndicator extends React.Component {
@@ -30,12 +31,32 @@ const makeColorIndicator = (label, isStroke) => {
             // Flag to track whether an svg-update-worthy change has been made
             this._hasChanged = false;
         }
+        componentDidMount () {
+            if (!this.props.allowTransparency) {
+                this.removeTransparency();
+            }
+        }
         componentWillReceiveProps (newProps) {
             const {colorModalVisible, onUpdateImage} = this.props;
             if (colorModalVisible && !newProps.colorModalVisible) {
                 // Submit the new SVG, which also stores a single undo/redo action.
                 if (this._hasChanged) onUpdateImage();
                 this._hasChanged = false;
+            }
+        }
+        componentDidUpdate (prevProps) {
+            if (!this.props.allowTransparency && prevProps.allowTransparency) {
+                this.removeTransparency();
+            }
+        }
+        removeTransparency () {
+            const colorWithoutAlpha = removeAlpha(this.props.color);
+            if (colorWithoutAlpha && this.props.color !== colorWithoutAlpha) {
+                this.props.onChangeColor(colorWithoutAlpha, 0);
+            }
+            const colorWithoutAlpha2 = removeAlpha(this.props.color2);
+            if (colorWithoutAlpha2 && this.props.color2 !== colorWithoutAlpha2) {
+                this.props.onChangeColor(colorWithoutAlpha2, 1);
             }
         }
         handleChangeColor (newColor) {

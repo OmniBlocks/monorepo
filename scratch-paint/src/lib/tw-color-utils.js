@@ -18,8 +18,14 @@ const normalizeToHex8 = color => {
     return colorToHex8(parsed);
 };
 
+const removeAlpha = color => {
+    const parsed = parseColor(color);
+    return parsed.hex.substr(0, 7);
+};
+
 export {
     makeAlphaComponent,
     colorToHex8,
-    normalizeToHex8
+    normalizeToHex8,
+    removeAlpha
 };

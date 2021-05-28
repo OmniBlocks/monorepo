@@ -27,6 +27,8 @@ import Modes, {BitmapModes, VectorModes} from '../lib/modes';
 import Formats, {isBitmap, isVector} from '../lib/format';
 import bindAll from 'lodash.bindall';
 
+window.paper = paper;
+
 /**
  * The top-level paint editor component. See README for more details on usage.
  *

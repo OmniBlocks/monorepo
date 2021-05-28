@@ -2,6 +2,14 @@ import parseColor from 'parse-color';
 
 const TRANSPARENT_BLACK = '#00000000';
 
+const safeParseColor = color => {
+    const result = parseColor(color);
+    if (!result.rgba) {
+        return parseColor(TRANSPARENT_BLACK);
+    }
+    return result;
+};
+
 const makeAlphaComponent = alpha => Math.round(alpha * 255)
     .toString(16)
     .padStart(2, '0');
@@ -16,15 +24,12 @@ const colorToHex8 = color => {
 };
 
 const normalizeToHex8 = color => {
-    if (!color) {
-        color = TRANSPARENT_BLACK;
-    }
-    const parsed = parseColor(color);
+    const parsed = safeParseColor(color);
     return colorToHex8(parsed);
 };
 
 const removeAlpha = color => {
-    const parsed = parseColor(color);
+    const parsed = safeParseColor(color);
     return parsed.hex.substr(0, 7);
 };
 

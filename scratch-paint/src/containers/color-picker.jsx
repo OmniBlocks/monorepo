@@ -206,7 +206,7 @@ class ColorPicker extends React.Component {
 }
 
 ColorPicker.propTypes = {
-    alllowTransparency: PropTypes.bool,
+    allowTransparency: PropTypes.bool,
     color: PropTypes.string,
     color2: PropTypes.string,
     colorIndex: PropTypes.number.isRequired,

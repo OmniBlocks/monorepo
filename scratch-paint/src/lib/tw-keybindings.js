@@ -1,8 +1,8 @@
 import Modes from './modes';
 
 const VECTOR_KEYBINDINGS = {
-    v: Modes.SELECT,
-    h: Modes.RESHAPE,
+    s: Modes.SELECT,
+    a: Modes.RESHAPE,
     b: Modes.BRUSH,
     e: Modes.ERASER,
     f: Modes.FILL,
@@ -20,7 +20,7 @@ const BITMAP_KEYBINDINGS = {
     t: Modes.BIT_TEXT,
     f: Modes.BIT_FILL,
     e: Modes.BIT_ERASER,
-    v: Modes.BIT_SELECT
+    s: Modes.BIT_SELECT
 };
 
 export {

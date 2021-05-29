@@ -138,7 +138,7 @@ class ScrollableCanvas extends React.Component {
         );
         if (event.metaKey || event.ctrlKey) {
             // Zoom keeping mouse location fixed
-            zoomOnFixedPoint(-deltaY / 1000, fixedPoint);
+            zoomOnFixedPoint(-deltaY / 500, fixedPoint);
             this.props.updateViewBounds(paper.view.matrix);
             this.props.redrawSelectionBox(); // Selection handles need to be resized after zoom
         } else if (event.shiftKey && event.deltaX === 0) {

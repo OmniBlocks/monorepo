@@ -247,7 +247,12 @@ class PaintEditor extends React.Component {
         if (this.props.onKeyPress) {
             this.props.onKeyPress(event);
         }
-        if (document.activeElement !== document.body || event.ctrlKey || event.altKey || event.metaKey) {
+        if (
+            (document.activeElement !== document.body && document.activeElement.style.display !== 'none') ||
+            event.ctrlKey ||
+            event.altKey ||
+            event.metaKey
+        ) {
             return;
         }
         const key = event.key;

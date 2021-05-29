@@ -19,6 +19,9 @@ class ScrollableCanvas extends React.Component {
     constructor (props) {
         super(props);
         bindAll(this, [
+            'handleMouseDown',
+            'handleDragMove',
+            'handleDragEnd',
             'handleHorizontalScrollbarMouseDown',
             'handleHorizontalScrollbarMouseMove',
             'handleHorizontalScrollbarMouseUp',
@@ -31,14 +34,44 @@ class ScrollableCanvas extends React.Component {
     componentDidMount () {
         if (this.props.canvas) {
             this.props.canvas.addEventListener('wheel', this.handleWheel);
+            this.props.canvas.addEventListener('mousedown', this.handleMouseDown);
         }
     }
     componentWillReceiveProps (nextProps) {
         if (nextProps.canvas) {
             if (this.props.canvas) {
                 this.props.canvas.removeEventListener('wheel', this.handleWheel);
+                this.props.canvas.removeEventListener('mousedown', this.handleMouseDown);
             }
             nextProps.canvas.addEventListener('wheel', this.handleWheel);
+            nextProps.canvas.addEventListener('mousedown', this.handleMouseDown);
+        }
+    }
+    handleMouseDown (event) {
+        if (event.button === 1) {
+            event.preventDefault();
+            this.initialCursor = this.props.canvas.style.cursor;
+            this.props.canvas.style.cursor = 'move';
+            window.addEventListener('mousemove', this.handleDragMove);
+            window.addEventListener('mouseup', this.handleDragEnd);
+        }
+    }
+    handleDragMove (event) {
+        event.preventDefault();
+        const dx = event.movementX / paper.view.zoom;
+        const dy = event.movementY / paper.view.zoom;
+        pan(-dx, -dy);
+        this.props.updateViewBounds(paper.view.matrix);
+        if (this.props.canvas) {
+            this.props.canvas.style.cursor = 'move';
+        }
+    }
+    handleDragEnd (event) {
+        event.preventDefault();
+        window.removeEventListener('mousemove', this.handleDragMove);
+        window.removeEventListener('mouseup', this.handleDragEnd);
+        if (this.props.canvas) {
+            this.props.canvas.style.cursor = this.initialCursor;
         }
     }
     handleHorizontalScrollbarMouseDown (event) {

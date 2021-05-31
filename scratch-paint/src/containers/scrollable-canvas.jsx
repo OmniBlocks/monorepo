@@ -50,6 +50,11 @@ class ScrollableCanvas extends React.Component {
     handleMouseDown (event) {
         if (event.button === 1) {
             event.preventDefault();
+            const {x, y} = getEventXY(event);
+            this.initialMouseX = x;
+            this.initialMouseY = y;
+            this.initialScreenX = paper.view.matrix.tx;
+            this.initialScreenY = paper.view.matrix.ty;
             this.initialCursor = this.props.canvas.style.cursor;
             this.props.canvas.style.cursor = 'move';
             window.addEventListener('mousemove', this.handleDragMove);
@@ -58,9 +63,10 @@ class ScrollableCanvas extends React.Component {
     }
     handleDragMove (event) {
         event.preventDefault();
-        const dx = event.movementX / paper.view.zoom;
-        const dy = event.movementY / paper.view.zoom;
-        pan(-dx, -dy);
+        const {x, y} = getEventXY(event);
+        paper.view.matrix.ty = this.initialScreenY - (this.initialMouseY - y);
+        paper.view.matrix.tx = this.initialScreenX - (this.initialMouseX - x);
+        clampViewBounds();
         this.props.updateViewBounds(paper.view.matrix);
         if (this.props.canvas) {
             this.props.canvas.style.cursor = 'move';

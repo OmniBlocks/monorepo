@@ -37,7 +37,6 @@ Blockly.IntersectionObserver.prototype.queueIntersectionCheck = function() {
   this.intersectionCheckQueued = true;
   // Check for intersections on the next microtick
   // Prefer to use the native method when available, otherwise fallback to a Promise-based polyfill
-  // Otherwise, use a polyfill based on Promise
   if (window.queueMicrotask) {
     window.queueMicrotask(this.checkForIntersections);
   } else {

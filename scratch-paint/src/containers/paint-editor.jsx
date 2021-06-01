@@ -241,19 +241,6 @@ class PaintEditor extends React.Component {
     setTextArea (element) {
         this.setState({textArea: element});
     }
-    onKeyPress (event) {
-        if (this.props.onKeyPress) {
-            this.props.onKeyPress(event);
-        }
-        if (
-            (document.activeElement !== document.body && document.activeElement.style.display !== 'none') ||
-            event.ctrlKey ||
-            event.altKey ||
-            event.metaKey
-        ) {
-            return;
-        }
-    }
     onMouseDown (event) {
         if (event.target === paper.view.element &&
                 document.activeElement instanceof HTMLInputElement) {

@@ -26,7 +26,6 @@ import EyeDropperTool from '../helper/tools/eye-dropper';
 import Modes, {BitmapModes, VectorModes} from '../lib/modes';
 import Formats, {isBitmap, isVector} from '../lib/format';
 import bindAll from 'lodash.bindall';
-import {VECTOR_KEYBINDINGS, BITMAP_KEYBINDINGS} from '../lib/tw-keybindings';
 
 window.paper = paper;
 
@@ -79,7 +78,6 @@ class PaintEditor extends React.Component {
         super(props);
         bindAll(this, [
             'switchModeForFormat',
-            'onKeyPress',
             'onMouseDown',
             'onMouseUp',
             'setCanvas',
@@ -98,7 +96,7 @@ class PaintEditor extends React.Component {
         this.props.setLayout(this.props.rtl ? 'rtl' : 'ltr');
     }
     componentDidMount () {
-        document.addEventListener('keydown', this.onKeyPress);
+        document.addEventListener('keydown', this.props.onKeyPress);
 
         // document listeners used to detect if a mouse is down outside of the
         // canvas, and should therefore stop the eye dropper
@@ -135,7 +133,7 @@ class PaintEditor extends React.Component {
         }
     }
     componentWillUnmount () {
-        document.removeEventListener('keydown', this.onKeyPress);
+        document.removeEventListener('keydown', this.props.onKeyPress);
         this.stopEyeDroppingLoop();
         document.removeEventListener('mousedown', this.onMouseDown);
         document.removeEventListener('touchstart', this.onMouseDown);
@@ -254,18 +252,6 @@ class PaintEditor extends React.Component {
             event.metaKey
         ) {
             return;
-        }
-        const key = event.key;
-        if (isVector(this.props.format)) {
-            if (key in VECTOR_KEYBINDINGS) {
-                this.props.changeMode(VECTOR_KEYBINDINGS[key]);
-                event.preventDefault();
-            }
-        } else if (isBitmap(this.props.format)) {
-            if (key in BITMAP_KEYBINDINGS) {
-                this.props.changeMode(BITMAP_KEYBINDINGS[key]);
-                event.preventDefault();
-            }
         }
     }
     onMouseDown (event) {

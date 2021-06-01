@@ -13,8 +13,31 @@ import {groupSelection, shouldShowGroup, ungroupSelection, shouldShowUngroup} fr
 import {clearSelectedItems, setSelectedItems} from '../reducers/selected-items';
 import {changeMode} from '../reducers/modes';
 
-import Formats, {isBitmap} from '../lib/format';
+import Formats, {isBitmap, isVector} from '../lib/format';
 import Modes from '../lib/modes';
+
+const VECTOR_KEYBINDINGS = {
+    s: Modes.SELECT,
+    a: Modes.RESHAPE,
+    b: Modes.BRUSH,
+    e: Modes.ERASER,
+    f: Modes.FILL,
+    t: Modes.TEXT,
+    l: Modes.LINE,
+    c: Modes.OVAL,
+    r: Modes.RECT
+};
+
+const BITMAP_KEYBINDINGS = {
+    b: Modes.BIT_BRUSH,
+    l: Modes.BIT_LINE,
+    c: Modes.BIT_OVAL,
+    r: Modes.BIT_RECT,
+    t: Modes.BIT_TEXT,
+    f: Modes.BIT_FILL,
+    e: Modes.BIT_ERASER,
+    s: Modes.BIT_SELECT
+};
 
 const KeyboardShortcutsHOC = function (WrappedComponent) {
     class KeyboardShortcutsWrapper extends React.Component {
@@ -75,6 +98,18 @@ const KeyboardShortcutsHOC = function (WrappedComponent) {
                     this.changeToASelectMode();
                     event.preventDefault();
                     this.selectAll();
+                }
+            } else if (!event.ctrlKey && !event.metaKey && !event.altKey) {
+                if (isVector(this.props.format)) {
+                    if (event.key in VECTOR_KEYBINDINGS) {
+                        this.props.changeMode(VECTOR_KEYBINDINGS[event.key]);
+                        event.preventDefault();
+                    }
+                } else if (isBitmap(this.props.format)) {
+                    if (event.key in BITMAP_KEYBINDINGS) {
+                        this.props.changeMode(BITMAP_KEYBINDINGS[event.key]);
+                        event.preventDefault();
+                    }
                 }
             }
         }

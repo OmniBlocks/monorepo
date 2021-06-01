@@ -35,7 +35,15 @@ Blockly.IntersectionObserver.prototype.queueIntersectionCheck = function() {
     return;
   }
   this.intersectionCheckQueued = true;
-  requestAnimationFrame(this.checkForIntersections);
+  // Check for intersections on the next microtick
+  // Prefer to use the native method when available, otherwise fallback to a Promise-based polyfill
+  // Otherwise, use a polyfill based on Promise
+  if (window.queueMicrotask) {
+    window.queueMicrotask(this.checkForIntersections);
+  } else {
+    // eslint-disable-next-line no-undef
+    Promise.resolve().then(this.checkForIntersections);
+  }
 };
 
 Blockly.IntersectionObserver.prototype.checkForIntersections = function() {

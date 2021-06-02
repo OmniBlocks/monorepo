@@ -69,7 +69,7 @@ Blockly.IntersectionObserver.prototype.checkForIntersections = function() {
   for (var i = 0; i < this.observing.length; i++) {
     var block = this.observing[i];
     var blockPos = block.getRelativeToSurfaceXY();
-    var blockSize;
+    var blockSize = null;
     if (RTL) {
       blockSize = block.getHeightWidth();
       blockPos.x -= blockSize.width;

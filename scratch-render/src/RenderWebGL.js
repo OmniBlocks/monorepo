@@ -1486,6 +1486,18 @@ class RenderWebGL extends EventEmitter {
         return bounds;
     }
 
+    _unsnappedTouchingBounds (drawableID) {
+        // _touchingBounds with the snapToint call removed.
+        const drawable = this._allDrawables[drawableID];
+        if (!drawable.skin || !drawable.skin.getTexture([100, 100])) return null;
+        const bounds = drawable.getFastBounds();
+        bounds.clamp(this._xLeft, this._xRight, this._yBottom, this._yTop);
+        if (bounds.width === 0 || bounds.height === 0) {
+            return null;
+        }
+        return bounds;
+    }
+
     /**
      * Filter a list of candidates for a touching query into only those that
      * could possibly intersect the given bounds.
@@ -1737,7 +1749,8 @@ class RenderWebGL extends EventEmitter {
             return;
         }
 
-        const bounds = this._touchingBounds(stampID);
+        // tw: snapping occurs later
+        const bounds = this._unsnappedTouchingBounds(stampID);
         if (!bounds) {
             return;
         }
@@ -1750,13 +1763,21 @@ class RenderWebGL extends EventEmitter {
         twgl.bindFramebufferInfo(gl, skin._framebuffer);
 
         // Limit size of viewport to the bounds around the stamp Drawable and create the projection matrix for the draw.
-        gl.viewport(
-            // tw: account for renderQuality
-            ((this._nativeSize[0] * 0.5) + bounds.left) * skin.renderQuality,
-            ((this._nativeSize[1] * 0.5) - bounds.top) * skin.renderQuality,
-            bounds.width * skin.renderQuality,
-            bounds.height * skin.renderQuality
-        );
+        // tw: scale for high quality render
+        if (!this.useHighQualityRender) {
+            bounds.snapToInt();
+        }
+        let x = (this._nativeSize[0] * 0.5) + bounds.left;
+        let y = (this._nativeSize[1] * 0.5) - bounds.top;
+        let width = bounds.width;
+        let height = bounds.height;
+        if (this.useHighQualityRender) {
+            x = Math.floor(x * skin.renderQuality);
+            y = Math.floor(y * skin.renderQuality);
+            width = Math.ceil(width * skin.renderQuality);
+            height = Math.ceil(height * skin.renderQuality);
+        }
+        gl.viewport(x, y, width, height);
         const projection = twgl.m4.ortho(bounds.left, bounds.right, bounds.top, bounds.bottom, -1, 1);
 
         // Draw the stamped sprite onto the PenSkin's framebuffer.

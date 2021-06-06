@@ -309,10 +309,8 @@ class PenSkin extends Skin {
         };
 
         twgl.setTextureParameters(gl, texture, {
-            // Minify using linear to look less pixelated
-            min: gl.LINEAR,
-            // Magnify using nearest because that's what Scratch normally does
-            mag: gl.NEAREST
+            // Always use NEAREST because this most closely matches Scratch behavior
+            minMag: gl.NEAREST
         });
         twgl.setUniforms(this._drawTextureShader, uniforms);
         twgl.drawBufferInfo(gl, this._renderer._bufferInfo, gl.TRIANGLES);

@@ -40,6 +40,8 @@ export const enum EnvelopeType {
 	tremolo2,
     decay,
     wibble,
+    hard,
+    linear,
 }
 
 export const enum InstrumentType {
@@ -239,8 +241,7 @@ export class Config {
 		{ name: "organ", volume: 0.2, samples: centerAndNormalizeWave([11.0, 10.0, 12.0, 11.0, 14.0, 7.0, 5.0, 5.0, 12.0, 10.0, 10.0, 9.0, 12.0, 6.0, 4.0, 5.0, 13.0, 12.0, 12.0, 10.0, 12.0, 5.0, 2.0, 2.0, 8.0, 6.0, 6.0, 5.0, 8.0, 3.0, 2.0, 1.0]) },
 		{ name: "pan flute", volume: 0.35, samples: centerAndNormalizeWave([1.0, 4.0, 7.0, 6.0, 7.0, 9.0, 7.0, 7.0, 11.0, 12.0, 13.0, 15.0, 13.0, 11.0, 11.0, 12.0, 13.0, 10.0, 7.0, 5.0, 3.0, 6.0, 10.0, 7.0, 3.0, 3.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0]) },
         { name: "glitch", volume: 0.5, samples: centerWave([1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0, -1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0, -1.0, -1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0, -1.0, -1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0, -1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0, -1.0]) },
-        { name: "generated sine", volume: 0.5, samples: generatedWave([1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]) },
-	]);
+    ]); 
 	// Noise waves have too many samples to write by hand, they're generated on-demand by getDrumWave instead.
 	public static readonly chipNoises: DictionaryArray<ChipNoise> = toNameMap([
 		{ name: "retro", volume: 0.25, basePitch: 69, pitchFilterMult: 1024.0, isSoft: false, samples: null },
@@ -314,7 +315,6 @@ export class Config {
 		{ name: "strum", harmonizes: true, customInterval: false, arpeggiates: false, isCustomInterval: false, strumParts: 1 },
         { name: "arpeggio", harmonizes: false, customInterval: false, arpeggiates: true, isCustomInterval: false, strumParts: 0 },
         { name: "custom interval", harmonizes: true, customInterval: true, arpeggiates: true, isCustomInterval: true, strumParts: 0 },
-        { name: "arpstrum", harmonizes: true, customInterval: false, arpeggiates: true, isCustomInterval: false, strumParts: 1 },
 	]);
 	public static readonly maxChordSize: number = 12;
 	public static readonly operatorCount: number = 4;
@@ -381,6 +381,10 @@ export class Config {
         { name: "wibble 1", type: EnvelopeType.wibble, speed: 24.0 },
         { name: "wibble 2", type: EnvelopeType.wibble, speed: 12.0 },
         { name: "wibble 3", type: EnvelopeType.wibble, speed: 4.0 },
+        { name: "linear 1", type: EnvelopeType.linear, speed: 12.0 },
+        { name: "linear 2", type: EnvelopeType.linear, speed: 4.0 },
+        { name: "linear 3", type: EnvelopeType.linear, speed: 1.0 },
+        { name: "hard", type: EnvelopeType.hard, speed: 6.0 },
 	]);
 	public static readonly feedbacks: DictionaryArray<Feedback> = toNameMap([
 		{ name: "1⟲", indices: [[1], [], [], []] },
@@ -434,6 +438,9 @@ export class Config {
 	public static readonly sineWaveLength: number = 1 << 8; // 256
 	public static readonly sineWaveMask: number = Config.sineWaveLength - 1;
 	public static readonly sineWave: Float64Array = generateSineWave();
+    public static readonly triWave: Float64Array = generateTriWave();
+    public static readonly squareWave: Float64Array = generateSquareWave();
+    public static readonly sawWave: Float64Array = generateSawWave()
 
 	// Height of the small editor column for inserting/deleting rows, in pixels.
 	public static readonly barEditorHeight: number = 10;
@@ -483,29 +490,6 @@ function centerAndNormalizeWave(wave: Array<number>): Float64Array {
 	return new Float64Array(wave);
 }
 
-function generatedWave(wave: Array<number>): Float64Array {
-    let sum: number = 0.0;
-    let magn: number = 0.0;
-    for (let i: number = 0; i < wave.length; i++) {
-        wave[i] = Math.sin(i);
-        sum += wave[i];
-        magn += Math.abs(wave[i]);
-    }
-    const average: number = sum / wave.length;
-    const magnAvg: number = magn / wave.length;
-
-    // Perform the integral on the wave. The chipSynth will perform the derivative to get the original wave back but with antialiasing.
-    let cumulative: number = 0;
-    let wavePrev: number = 0;
-    for (let i: number = 0; i < wave.length; i++) {
-        cumulative += wavePrev;
-        wavePrev = (wave[i] - average) / (magnAvg);
-        wave[i] = cumulative;
-    }
-    // The first sample should be zero, and we'll duplicate it at the end for easier interpolation.
-    wave.push(0);
-    return new Float64Array(wave);
-}
 
 // The function arguments will be defined in FFT.ts, but I want
 // SynthConfig.ts to be at the top of the compiled JS so I won't directly
@@ -608,7 +592,7 @@ export function getDrumWave(index: number, inverseRealFourierTransform: Function
                 wave[i] = (drumBuffer & 1) * 2.0 - 1.1;
                 let newBuffer: number = drumBuffer >> 1;
                 if (((drumBuffer + newBuffer) & 1) == 1) {
-                    newBuffer += 16 ^ 3 << 2;
+                    newBuffer += 16 ^ 4 << 2;
                 }
                 drumBuffer = newBuffer;
             }
@@ -662,6 +646,31 @@ function generateSineWave(): Float64Array {
 		wave[i] = Math.sin(i * Math.PI * 2.0 / Config.sineWaveLength);
 	}
 	return wave;
+}
+
+function generateTriWave(): Float64Array {
+    const wave: Float64Array = new Float64Array(Config.sineWaveLength + 1);
+    for (let i: number = 0; i < Config.sineWaveLength + 1; i++) {
+        wave[i] = Math.asin(Math.sin(i * Math.PI * 2.0 / Config.sineWaveLength))/(Math.PI/2);
+    }
+    return wave;
+}
+
+function generateSquareWave(): Float64Array {
+    const wave: Float64Array = new Float64Array(Config.sineWaveLength + 1);
+    for (let i: number = 0; i < Config.sineWaveLength + 1; i++) {
+        wave[i] = Math.sin(i * Math.PI * 2.0 / Config.sineWaveLength);
+        wave[i] = wave[i]>0?1.0:-1.0;
+    }
+    return wave;
+}
+
+function generateSawWave(): Float64Array {
+    const wave: Float64Array = new Float64Array(Config.sineWaveLength + 1);
+    for (let i: number = 0; i < Config.sineWaveLength + 1; i++) {
+        wave[i] = ((i - (Config.sineWaveLength * 0.75) + Config.sineWaveLength) * 2.0 / Config.sineWaveLength) % 2 - 1;
+    }
+    return wave;
 }
 
 export function getArpeggioPitchIndex(pitchCount: number, useFastTwoNoteArp: boolean, arpeggio: number): number {

@@ -4878,7 +4878,7 @@ export class Synth {
 		synthesizer(this, synthBuffer, stereoBufferIndex, stereoBufferLength, runLength * 2, tone, tone.instrument);
 	}
 
-	private static computeEnvelope(envelope: Envelope, time: number, beats: number, customVolume: number): number {
+    private static computeEnvelope(envelope: Envelope, time: number, beats: number, customVolume: number): number {
 		switch (envelope.type) {
 			case EnvelopeType.custom: return customVolume;
 			case EnvelopeType.steady: return 1.0;
@@ -4899,12 +4899,16 @@ export class Synth {
 			case EnvelopeType.decay:
                 return Math.pow(2, -envelope.speed * time);
             case EnvelopeType.wibble:
-                let temp = time * Math.sqrt(envelope.speed);
-                temp = Math.abs(Math.sin(temp));
-                temp = temp > 0.0 ? temp : 0.001;
-                temp = 1.0 / (1.0 + time * temp);
-                console.log(temp)
-                return temp; 
+                let temp = 0.5 - Math.cos(beats * envelope.speed) * 0.5;
+                temp = 1.0 / (1.0 + time * (envelope.speed - (temp / (1.5 / envelope.speed))));
+                temp = temp > 0.0 ? temp : 0.0;
+                return temp;
+            case EnvelopeType.hard:
+                return time < 8 / envelope.speed ? 1.0 : 0.0;
+            case EnvelopeType.linear:
+                let lin = (1.0 - (time / (16 / envelope.speed)));
+                lin = lin > 0.0 ? lin : 0.0;
+                return lin;
 			default: throw new Error("Unrecognized operator envelope type.");
 		}
 	}
@@ -6015,7 +6019,7 @@ export class Synth {
 	}
 
 	private static fmSourceTemplate: string[] = (`
-const sineWave = beepbox.Config.sineWave;
+const sineWave = beepbox.Config.sawWave;
 
 let phaseDeltaScale = +tone.phaseDeltaScale;
 // I'm adding 1000 to the phase to ensure that it's never negative even when modulated by other waves because negative numbers don't work with the modulus operator very well.

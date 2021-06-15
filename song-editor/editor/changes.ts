@@ -170,6 +170,7 @@ export class ChangeMoveAndOverflowNotes extends ChangeGroup {
 		for (let channelIndex: number = 0; channelIndex < doc.song.getChannelCount(); channelIndex++) {
 			const oldChannel: Channel = doc.song.channels[channelIndex];
 			const newChannel: Channel = new Channel();
+
 			if (channelIndex < doc.song.pitchChannelCount) {
 				pitchChannels.push(newChannel);
 			} else if (channelIndex < doc.song.pitchChannelCount + doc.song.noiseChannelCount) {
@@ -181,6 +182,8 @@ export class ChangeMoveAndOverflowNotes extends ChangeGroup {
 
 			newChannel.muted = oldChannel.muted;
 			newChannel.octave = oldChannel.octave;
+			newChannel.name = oldChannel.name;
+	
 			for (const instrument of oldChannel.instruments) {
 				newChannel.instruments.push(instrument);
 			}
@@ -1189,6 +1192,34 @@ export class ChangeFastTwoNoteArp extends Change {
 	}
 }
 
+export class ChangeTieNoteTransition extends Change {
+	constructor(doc: SongDocument, newValue: boolean) {
+		super();
+		const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+		const oldValue = instrument.tieNoteTransition;
+
+		doc.notifier.changed();
+		if (oldValue != newValue) {
+			instrument.tieNoteTransition = newValue;
+			this._didSomething();
+		}
+	}
+}
+
+export class ChangeClicklessTransition extends Change {
+	constructor(doc: SongDocument, newValue: boolean) {
+		super();
+		const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+		const oldValue = instrument.clicklessTransition;
+
+		doc.notifier.changed();
+		if (oldValue != newValue) {
+			instrument.clicklessTransition = newValue;
+			this._didSomething();
+		}
+	}
+}
+
 export class ChangeSpectrum extends Change {
 	constructor(doc: SongDocument, instrument: Instrument, spectrumWave: SpectrumWave) {
 		super();
@@ -2083,7 +2114,7 @@ export class ChangeBeatsPerBar extends ChangeGroup {
 						const sequence: ChangeSequence = new ChangeSequence();
 						for (let i: number = 0; i < doc.song.getChannelCount(); i++) {
 							for (let j: number = 0; j < doc.song.channels[i].patterns.length; j++) {
-								sequence.append(new ChangeNoteTruncate(doc, doc.song.channels[i].patterns[j], newValue * Config.partsPerBeat, doc.song.beatsPerBar * Config.partsPerBeat));
+								sequence.append(new ChangeNoteTruncate(doc, doc.song.channels[i].patterns[j], newValue * Config.partsPerBeat, doc.song.beatsPerBar * Config.partsPerBeat, null, true));
 							}
 						}
 					}

@@ -84,6 +84,10 @@ export interface ChipWave extends BeepBoxOption {
 	readonly samples: Float64Array;
 }
 
+export interface OperatorWave extends BeepBoxOption {
+    samples: Float64Array;
+}
+
 export interface ChipNoise extends BeepBoxOption {
 	readonly volume: number;
 	readonly basePitch: number;
@@ -441,6 +445,12 @@ export class Config {
     public static readonly triWave: Float64Array = generateTriWave();
     public static readonly squareWave: Float64Array = generateSquareWave();
     public static readonly sawWave: Float64Array = generateSawWave()
+    public static readonly operatorWaves: DictionaryArray<OperatorWave> = toNameMap([
+        { name: "sine", samples: generateSineWave() },
+        { name: "triangle", samples: generateTriWave() },
+        { name: "sawtooth", samples: generateSawWave() },
+        { name: "square", samples: generateSquareWave() },
+    ]);
 
 	// Height of the small editor column for inserting/deleting rows, in pixels.
 	public static readonly barEditorHeight: number = 10;
@@ -592,7 +602,7 @@ export function getDrumWave(index: number, inverseRealFourierTransform: Function
                 wave[i] = (drumBuffer & 1) * 2.0 - 1.1;
                 let newBuffer: number = drumBuffer >> 1;
                 if (((drumBuffer + newBuffer) & 1) == 1) {
-                    newBuffer += 16 ^ 4 << 2;
+                    newBuffer += 8 ^ 2 << 16;
                 }
                 drumBuffer = newBuffer;
             }

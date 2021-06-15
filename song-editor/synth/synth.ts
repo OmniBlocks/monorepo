@@ -136,6 +136,7 @@ const enum SongTagCode {
     limiterSettings = CharCode.O,
     operatorAmplitudes = CharCode.P,
     operatorFrequencies = CharCode.Q,
+    operatorWaves = CharCode.R,
 
     spectrum = CharCode.S,
     startInstrument = CharCode.T,
@@ -378,6 +379,7 @@ export class Operator {
     public frequency: number = 0;
     public amplitude: number = 0;
     public envelope: number = 0;
+    public waveform: number = 0;
 
     constructor(index: number) {
         this.reset(index);
@@ -387,12 +389,14 @@ export class Operator {
         this.frequency = 0;
         this.amplitude = (index <= 1) ? Config.operatorAmplitudeMax : 0;
         this.envelope = (index == 0) ? 0 : 1;
+        this.waveform = 0;
     }
 
     public copy(other: Operator): void {
         this.frequency = other.frequency;
         this.amplitude = other.amplitude;
         this.envelope = other.envelope;
+        this.waveform = other.waveform;
     }
 }
 
@@ -886,6 +890,7 @@ export class Instrument {
                     "frequency": Config.operatorFrequencies[operator.frequency].name,
                     "amplitude": operator.amplitude,
                     "envelope": Config.envelopes[operator.envelope].name,
+                    "waveform": Config.operatorWaves[operator.waveform].name,
                 });
             }
             if (this.vibrato != 5) {
@@ -1173,6 +1178,11 @@ export class Instrument {
                     operator.amplitude = clamp(0, Config.operatorAmplitudeMax + 1, operatorObject["amplitude"] | 0);
                 } else {
                     operator.amplitude = 0;
+                }
+                if (operatorObject["waveform"] != undefined) {
+                    operator.waveform = Config.operatorWaves.findIndex(wave => wave.name == operatorObject["waveform"]);
+                } else {
+                    operator.waveform = 0;
                 }
                 operator.envelope = legacyEnvelopeNames[operatorObject["envelope"]] != undefined ? legacyEnvelopeNames[operatorObject["envelope"]] : Config.envelopes.findIndex(envelope => envelope.name == operatorObject["envelope"]);
                 if (operator.envelope == -1) operator.envelope = 0;
@@ -1843,6 +1853,10 @@ export class Song {
                     buffer.push(SongTagCode.operatorEnvelopes);
                     for (let o: number = 0; o < Config.operatorCount; o++) {
                         buffer.push(base64IntToCharCode[instrument.operators[o].envelope]);
+                    }
+                    buffer.push(SongTagCode.operatorWaves);
+                    for (let o: number = 0; o < Config.operatorCount; o++) {
+                        buffer.push(base64IntToCharCode[instrument.operators[o].waveform]);
                     }
                 } else if (instrument.type == InstrumentType.customChipWave) {
                     buffer.push(SongTagCode.wave, base64IntToCharCode[instrument.chipWave]);
@@ -2738,6 +2752,11 @@ export class Song {
             case SongTagCode.operatorEnvelopes: {
                 for (let o: number = 0; o < Config.operatorCount; o++) {
                     this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].operators[o].envelope = clamp(0, Config.envelopes.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                }
+            } break;
+            case SongTagCode.operatorWaves: {
+                for (let o: number = 0; o < Config.operatorCount; o++) {
+                    this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].operators[o].waveform = clamp(0, Config.operatorWaves.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                 }
             } break;
             case SongTagCode.spectrum: {

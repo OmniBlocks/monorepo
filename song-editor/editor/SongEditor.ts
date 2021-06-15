@@ -6,7 +6,7 @@ import { Config, InstrumentType } from "../synth/SynthConfig";
 import { BarScrollBar } from "./BarScrollBar";
 import { BeatsPerBarPrompt } from "./BeatsPerBarPrompt";
 import { Change, ChangeGroup } from "./Change";
-import { ChangeAlgorithm, ChangeChannelBar, ChangeChipWave, ChangeChannelOrder, ChangeChord, ChangeCustomWave, ChangeDetectKey, ChangeDetune, ChangeDrumsetEnvelope, ChangeEffects, ChangeFeedbackAmplitude, ChangeFeedbackEnvelope, ChangeFeedbackType, ChangeFilterCutoff, ChangeFilterEnvelope, ChangeFilterResonance, ChangeInterval, ChangeKey, ChangeNoiseWave, ChangeOperatorAmplitude, ChangeOperatorEnvelope, ChangeOperatorFrequency, ChangePan, ChangePasteInstrument, ChangePatternNumbers, ChangePatternsPerChannel, ChangePreset, ChangePulseEnvelope, ChangePulseWidth, ChangeRandomGeneratedInstrument, ChangeReverb, ChangeRhythm, ChangeScale, ChangeSong, ChangeSongTitle, ChangeTempo, ChangeTransition, ChangeVibrato, ChangeVibratoType, ChangeVolume, ChangeVibratoDepth, ChangeVibratoSpeed, ChangeVibratoDelay, ChangePanDelay, ChangeArpeggioSpeed, pickRandomPresetValue, ChangeFastTwoNoteArp, ChangeClicklessTransition, ChangeTieNoteTransition, ChangePatternSelection } from "./changes";
+import { ChangeAlgorithm, ChangeChannelBar, ChangeChipWave, ChangeChannelOrder, ChangeChord, ChangeCustomWave, ChangeDetectKey, ChangeDetune, ChangeDrumsetEnvelope, ChangeEffects, ChangeFeedbackAmplitude, ChangeFeedbackEnvelope, ChangeFeedbackType, ChangeFilterCutoff, ChangeFilterEnvelope, ChangeFilterResonance, ChangeInterval, ChangeKey, ChangeNoiseWave, ChangeOperatorAmplitude, ChangeOperatorEnvelope, ChangeOperatorFrequency, ChangePan, ChangePasteInstrument, ChangePatternNumbers, ChangePatternsPerChannel, ChangePreset, ChangePulseEnvelope, ChangePulseWidth, ChangeRandomGeneratedInstrument, ChangeReverb, ChangeRhythm, ChangeScale, ChangeSong, ChangeSongTitle, ChangeTempo, ChangeTransition, ChangeVibrato, ChangeVibratoType, ChangeVolume, ChangeVibratoDepth, ChangeVibratoSpeed, ChangeVibratoDelay, ChangePanDelay, ChangeArpeggioSpeed, pickRandomPresetValue, ChangeFastTwoNoteArp, ChangeClicklessTransition, ChangeTieNoteTransition, ChangePatternSelection, ChangeOperatorWaveform } from "./changes";
 import { ChannelSettingsPrompt } from "./ChannelSettingsPrompt";
 import { ColorConfig } from "./ColorConfig";
 import { CustomChipPrompt } from "./CustomChipPrompt";
@@ -682,7 +682,11 @@ export class SongEditor {
 	private readonly _operatorRows: HTMLDivElement[] = []
 	private readonly _operatorAmplitudeSliders: Slider[] = []
 	private readonly _operatorEnvelopeSelects: HTMLSelectElement[] = []
-	private readonly _operatorFrequencySelects: HTMLSelectElement[] = []
+    private readonly _operatorFrequencySelects: HTMLSelectElement[] = []
+    private readonly _operatorDropdowns: HTMLButtonElement[] = []
+    private readonly _operatorWaveformSelects: HTMLSelectElement[] = []
+    private readonly _operatorDropdownRows: HTMLElement[] = []
+    private readonly _operatorDropdownGroups: HTMLDivElement[] = []
 	private readonly _drumsetSpectrumEditors: SpectrumEditor[] = [];
 	private readonly _drumsetEnvelopeSelects: HTMLSelectElement[] = [];
 	private _showModSliders: boolean[] = [];
@@ -696,7 +700,8 @@ export class SongEditor {
 	private _openPanDropdown: boolean = false;
 	private _openVibratoDropdown: boolean = false;
 	private _openChordDropdown: boolean = false;
-	private _openTransitionDropdown: boolean = false;
+    private _openTransitionDropdown: boolean = false;
+    private _openOperatorDropdowns: boolean[] = [];
 
 	private outVolumeHistoricTimer: number = 0;
 	private outVolumeHistoricCap: number = 0;
@@ -737,19 +742,36 @@ export class SongEditor {
 			const operatorNumber: HTMLDivElement = div({ style: "margin-right: .1em; color: " + ColorConfig.secondaryText + ";" }, i + 1 + ".");
 			const frequencySelect: HTMLSelectElement = buildOptions(select({ style: "width: 100%;", title: "Frequency" }), Config.operatorFrequencies.map(freq => freq.name));
 			const amplitudeSlider: Slider = new Slider(input({ style: "margin: 0; width: 4em;", type: "range", min: "0", max: Config.operatorAmplitudeMax, value: "0", step: "1", title: "Volume" }), this._doc, (oldValue: number, newValue: number) => new ChangeOperatorAmplitude(this._doc, operatorIndex, oldValue, newValue), false);
-			const envelopeSelect: HTMLSelectElement = buildOptions(select({ style: "width: 100%;", title: "Envelope" }), Config.envelopes.map(envelope => envelope.name));
+            const envelopeSelect: HTMLSelectElement = buildOptions(select({ style: "width: 100%;", title: "Envelope" }), Config.envelopes.map(envelope => envelope.name));
+            const waveformSelect: HTMLSelectElement = buildOptions(select({ style: "width: 100%;", title: "Waveform" }), Config.operatorWaves.map(wave => wave.name));
+            const dropdown: HTMLButtonElement = button({ style: "margin-left:0em; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: () => this._toggleDropdownMenu(4, i) }, "▼");//typescript doesn't makes i a reference right?
+            const dropdownRow: HTMLElement = div({ class: "selectRow" }, span({ class: "tip", style: "margin-left:10px;", onclick: () => this._openPrompt("operatorWaveform") }, "Wave:"), 
+                div({ class: "selectContainer", style: "width: 5em; margin-left: .3em;" }, waveformSelect));
+            const DropdownGroup: HTMLDivElement = div({ class: "operatorRow" }, dropdownRow);
+
 			const row: HTMLDivElement = div({ class: "operatorRow" },
-				operatorNumber,
+                operatorNumber,
+                dropdown,
 				div({ class: "selectContainer", style: "width: 3em; margin-right: .3em;" }, frequencySelect),
 				amplitudeSlider.container,
 				div({ class: "selectContainer", style: "width: 5em; margin-left: .3em;" }, envelopeSelect),
-			);
+            );
+
 			this._phaseModGroup.appendChild(row);
 			this._operatorRows[i] = row;
 			this._operatorAmplitudeSliders[i] = amplitudeSlider;
-			this._operatorEnvelopeSelects[i] = envelopeSelect;
-			this._operatorFrequencySelects[i] = frequencySelect;
+            this._operatorEnvelopeSelects[i] = envelopeSelect;
+            this._operatorFrequencySelects[i] = frequencySelect;
+            this._operatorDropdowns[i] = dropdown;
+            this._operatorWaveformSelects[i] = waveformSelect;
+            this._operatorDropdownRows[i] = dropdownRow;
+            this._phaseModGroup.appendChild(DropdownGroup);
+            this._operatorDropdownGroups[i] = DropdownGroup;
+            this._openOperatorDropdowns[i] = false;
 
+            waveformSelect.addEventListener("change", () => {
+                this._doc.record(new ChangeOperatorWaveform(this._doc, operatorIndex, waveformSelect.selectedIndex));
+            });
 			envelopeSelect.addEventListener("change", () => {
 				this._doc.record(new ChangeOperatorEnvelope(this._doc, operatorIndex, envelopeSelect.selectedIndex));
 			});
@@ -911,7 +933,7 @@ export class SongEditor {
 		}
 	}
 
-	private _toggleDropdownMenu(dropdown: number): void {
+	private _toggleDropdownMenu(dropdown: number, instance: number = 0): void {
 		let target: HTMLButtonElement = this._vibratoDropdown;
 		let group: HTMLElement = this._vibratoDropdownGroup;
 		switch (dropdown) {
@@ -933,7 +955,13 @@ export class SongEditor {
 			case 3:
 				target = this._transitionDropdown;
 				this._openTransitionDropdown = this._openTransitionDropdown ? false : true;
-				group = this._transitionDropdownGroup;
+                group = this._transitionDropdownGroup;
+                break;
+            case 4:
+                target = this._operatorDropdowns[instance];
+                this._openOperatorDropdowns[instance] = this._openOperatorDropdowns[instance] ? false : true;
+                group = this._operatorDropdownGroups[instance];
+                break;
 		}
 
 		if (target.textContent == "▼") {
@@ -1446,12 +1474,15 @@ export class SongEditor {
 						this._operatorRows[i].style.color = isCarrier ? ColorConfig.primaryText : "";
 						setSelectedValue(this._operatorFrequencySelects[i], instrument.operators[i].frequency);
 						this._operatorAmplitudeSliders[i].updateValue(instrument.operators[i].amplitude);
-						setSelectedValue(this._operatorEnvelopeSelects[i], instrument.operators[i].envelope);
+                        setSelectedValue(this._operatorEnvelopeSelects[i], instrument.operators[i].envelope);
+                        setSelectedValue(this._operatorWaveformSelects[i], instrument.operators[i].waveform);
+                        this._operatorDropdownGroups[i].style.color = isCarrier ? ColorConfig.primaryText : "";
 						const operatorName: string = (isCarrier ? "Voice " : "Modulator ") + (i + 1);
 						this._operatorFrequencySelects[i].title = operatorName + " Frequency";
 						this._operatorAmplitudeSliders[i].input.title = operatorName + (isCarrier ? " Volume" : " Amplitude");
 						this._operatorEnvelopeSelects[i].title = operatorName + " Envelope";
-						this._operatorEnvelopeSelects[i].parentElement!.style.color = (instrument.operators[i].amplitude > 0) ? "" : ColorConfig.secondaryText;
+                        this._operatorEnvelopeSelects[i].parentElement!.style.color = (instrument.operators[i].amplitude > 0) ? "" : ColorConfig.secondaryText;
+                        this._operatorDropdownGroups[i].style.display = (this._openOperatorDropdowns[i] ? "" : "none");
 					}
 				}
 				else {

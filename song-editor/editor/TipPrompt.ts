@@ -333,7 +333,14 @@ export class TipPrompt implements Prompt {
 					h2("Clickless Transition"),
 					p("Sometimes, seamless and other transition types can make audible 'clicks' when changing between notes. Ticking this option will cause those clicks to be silenced as much as possible."),
 				);
-			} break;
+            } break;
+            case "operatorWaveform": {
+                message = div(
+                    h2("Operator Waveform"),
+                    p('This setting controls the what kind of sound wave an individual FM wave uses.'),
+                    p('By defualt the FM synth only uses sinewaves, but you can change that now.'),
+                );
+            } break;
 
 			default: throw new Error("Unhandled TipPrompt type: " + type);
 		}

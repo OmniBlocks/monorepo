@@ -1383,6 +1383,20 @@ export class ChangeOperatorEnvelope extends Change {
 	}
 }
 
+export class ChangeOperatorWaveform extends Change {
+    constructor(doc: SongDocument, operatorIndex: number, newValue: number) {
+        super();
+        const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+        const oldValue: number = instrument.operators[operatorIndex].waveform;
+        if (oldValue != newValue) {
+            instrument.operators[operatorIndex].waveform = newValue;
+            instrument.preset = instrument.type;
+            doc.notifier.changed();
+            this._didSomething();
+        }
+    }
+}
+
 export class ChangeOperatorFrequency extends Change {
 	constructor(doc: SongDocument, operatorIndex: number, newValue: number) {
 		super();

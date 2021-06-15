@@ -6302,8 +6302,6 @@ export class Synth {
     }
 
     private static fmSourceTemplate: string[] = (`
-const sineWave = beepbox.Config.sawWave;
-
 let phaseDeltaScale = +tone.phaseDeltaScale;
 // I'm adding 1000 to the phase to ensure that it's never negative even when modulated by other waves because negative numbers don't work with the modulus operator very well.
 let operator#Phase       = +((tone.phases[#] % 1) + 1000) * beepbox.Config.sineWaveLength;
@@ -6386,11 +6384,12 @@ tone.filterSample1 = filterSample1;
 `).split("\n");
 
     private static operatorSourceTemplate: string[] = (`
+var operator#Wave     = beepbox.Config.operatorWaves[instrument.operators[#].waveform].samples;
 const operator#PhaseMix = operator#Phase/* + operator@Scaled*/;
 const operator#PhaseInt = operator#PhaseMix|0;
 const operator#Index    = operator#PhaseInt & ` + Config.sineWaveMask + `;
-const operator#Sample   = sineWave[operator#Index];
-operator#Output       = operator#Sample + (sineWave[operator#Index + 1] - operator#Sample) * (operator#PhaseMix - operator#PhaseInt);
+const operator#Sample   = operator#Wave[operator#Index];
+operator#Output       = operator#Sample + (operator#Wave[operator#Index + 1] - operator#Sample) * (operator#PhaseMix - operator#PhaseInt);
 const operator#Scaled   = operator#OutputMult * operator#Output;
 `).split("\n");
 

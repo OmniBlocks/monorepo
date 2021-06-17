@@ -464,7 +464,7 @@ export class ChangeRandomGeneratedInstrument extends Change {
                 { item: "linear 1", weight: 2 },
                 { item: "linear 2", weight: 2 },
                 { item: "linear 3", weight: 2 },
-                { item: "hard", weight: 1 },
+                { item: "linear-1", weight: 1 },
 			])].index;
 			instrument.transition = Config.transitions.dictionary[selectWeightedRandom([
 				{ item: "seamless", weight: 1 },
@@ -575,7 +575,7 @@ export class ChangeRandomGeneratedInstrument extends Change {
                 { item: "linear 1", weight: 2 },
                 { item: "linear 2", weight: 2 },
                 { item: "linear 3", weight: 2 },
-                { item: "hard", weight: 1 },
+                { item: "linear-1", weight: 1 },
 			])].index;
 			instrument.transition = Config.transitions.dictionary[selectWeightedRandom([
 				{ item: "seamless", weight: 1 },
@@ -663,7 +663,7 @@ export class ChangeRandomGeneratedInstrument extends Change {
                         { item: "linear 1", weight: 2 },
                         { item: "linear 2", weight: 2 },
                         { item: "linear 3", weight: 2 },
-                        { item: "hard", weight: 1 },
+                        { item: "linear-1", weight: 1 },
 					])].index;
 					instrument.pulseWidth = selectCurvedDistribution(0, Config.pulseWidthRange - 1, Config.pulseWidthRange - 1, 2);
 				} break;
@@ -765,7 +765,7 @@ export class ChangeRandomGeneratedInstrument extends Change {
                             { item: "linear 1", weight: 2 },
                             { item: "linear 2", weight: 2 },
                             { item: "linear 3", weight: 2 },
-                            { item: "hard", weight: 1 },
+                            { item: "linear-1", weight: 1 },
                         ])].index;
                         instrument.operators[i].waveform = Config.operatorWaves.dictionary[selectWeightedRandom([
                             { item: "sine", weight: 4 },
@@ -802,7 +802,7 @@ export class ChangeRandomGeneratedInstrument extends Change {
                         { item: "linear 1", weight: 2 },
                         { item: "linear 2", weight: 2 },
                         { item: "linear 3", weight: 2 },
-                        { item: "hard", weight: 1 },
+                        { item: "linear-1", weight: 1 },
 					])].index;
 				} break;
 				default: throw new Error("Unhandled pitched instrument type in random generator.");

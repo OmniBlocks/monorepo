@@ -385,10 +385,10 @@ export class Config {
         { name: "wibble 1", type: EnvelopeType.wibble, speed: 24.0 },
         { name: "wibble 2", type: EnvelopeType.wibble, speed: 12.0 },
         { name: "wibble 3", type: EnvelopeType.wibble, speed: 4.0 },
-        { name: "linear 1", type: EnvelopeType.linear, speed: 12.0 },
-        { name: "linear 2", type: EnvelopeType.linear, speed: 4.0 },
-        { name: "linear 3", type: EnvelopeType.linear, speed: 1.0 },
-        { name: "hard", type: EnvelopeType.hard, speed: 6.0 },
+        { name: "linear 1", type: EnvelopeType.linear, speed: 32.0 },
+        { name: "linear 2", type: EnvelopeType.linear, speed: 8.0 },
+        { name: "linear 3", type: EnvelopeType.linear, speed: 2.0 },
+        { name: "linear-1", type: EnvelopeType.linear, speed: 64.0 },
 	]);
 	public static readonly feedbacks: DictionaryArray<Feedback> = toNameMap([
 		{ name: "1⟲", indices: [[1], [], [], []] },

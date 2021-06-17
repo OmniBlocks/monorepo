@@ -457,7 +457,14 @@ export class ChangeRandomGeneratedInstrument extends Change {
 				{ item: "tremolo6", weight: 1 },
 				{ item: "decay 1", weight: 4 },
 				{ item: "decay 2", weight: 4 },
-				{ item: "decay 3", weight: 4 },
+                { item: "decay 3", weight: 4 },
+                { item: "wibble 1", weight: 2 },
+                { item: "wibble 2", weight: 2 },
+                { item: "wibble 3", weight: 2 },
+                { item: "linear 1", weight: 2 },
+                { item: "linear 2", weight: 2 },
+                { item: "linear 3", weight: 2 },
+                { item: "hard", weight: 1 },
 			])].index;
 			instrument.transition = Config.transitions.dictionary[selectWeightedRandom([
 				{ item: "seamless", weight: 1 },
@@ -467,7 +474,8 @@ export class ChangeRandomGeneratedInstrument extends Change {
 				{ item: "cross fade", weight: 2 },
 				{ item: "hard fade", weight: 8 },
 				{ item: "medium fade", weight: 2 },
-				{ item: "soft fade", weight: 1 },
+                { item: "soft fade", weight: 1 },
+                { item: "sliding fade", weight: 1 },
 			])].index;
 			instrument.effects = Config.effectsNames.indexOf(selectWeightedRandom([
 				{ item: "none", weight: 1 },
@@ -560,7 +568,14 @@ export class ChangeRandomGeneratedInstrument extends Change {
 				{ item: "tremolo6", weight: 1 },
 				{ item: "decay 1", weight: 1 },
 				{ item: "decay 2", weight: 2 },
-				{ item: "decay 3", weight: 2 },
+                { item: "decay 3", weight: 2 },
+                { item: "wibble 1", weight: 4 },
+                { item: "wibble 2", weight: 4 },
+                { item: "wibble 3", weight: 4 },
+                { item: "linear 1", weight: 2 },
+                { item: "linear 2", weight: 2 },
+                { item: "linear 3", weight: 2 },
+                { item: "hard", weight: 1 },
 			])].index;
 			instrument.transition = Config.transitions.dictionary[selectWeightedRandom([
 				{ item: "seamless", weight: 1 },
@@ -570,7 +585,8 @@ export class ChangeRandomGeneratedInstrument extends Change {
 				{ item: "cross fade", weight: 4 },
 				{ item: "hard fade", weight: 4 },
 				{ item: "medium fade", weight: 2 },
-				{ item: "soft fade", weight: 2 },
+                { item: "soft fade", weight: 2 },
+                { item: "sliding fade", weight: 2 },
 			])].index;
 			instrument.effects = Config.effectsNames.indexOf(selectWeightedRandom([
 				{ item: "none", weight: 1 },
@@ -602,7 +618,8 @@ export class ChangeRandomGeneratedInstrument extends Change {
 					{ item: "fifth", weight: 1 },
 					{ item: "octave", weight: 2 },
 					{ item: "bowed", weight: 2 },
-					{ item: "piano", weight: 5 },
+                    { item: "piano", weight: 5 },
+                    { item: "warbled", weight: 5 },
 				])].index;
 			}
 			function normalize(harmonics: number[]): void {
@@ -639,7 +656,14 @@ export class ChangeRandomGeneratedInstrument extends Change {
 						{ item: "tremolo6", weight: 2 },
 						{ item: "decay 1", weight: 2 },
 						{ item: "decay 2", weight: 2 },
-						{ item: "decay 3", weight: 2 },
+                        { item: "decay 3", weight: 2 },
+                        { item: "wibble 1", weight: 2 },
+                        { item: "wibble 2", weight: 2 },
+                        { item: "wibble 3", weight: 2 },
+                        { item: "linear 1", weight: 2 },
+                        { item: "linear 2", weight: 2 },
+                        { item: "linear 3", weight: 2 },
+                        { item: "hard", weight: 1 },
 					])].index;
 					instrument.pulseWidth = selectCurvedDistribution(0, Config.pulseWidthRange - 1, Config.pulseWidthRange - 1, 2);
 				} break;
@@ -703,7 +727,13 @@ export class ChangeRandomGeneratedInstrument extends Change {
 					for (let i: number = 0; i < algorithm.carrierCount; i++) {
 						instrument.operators[i].frequency = selectCurvedDistribution(0, Config.operatorFrequencies.length - 1, 0, 3);
 						instrument.operators[i].amplitude = selectCurvedDistribution(0, Config.operatorAmplitudeMax, Config.operatorAmplitudeMax - 1, 2);
-						instrument.operators[i].envelope = Config.envelopes.dictionary["custom"].index;
+                        instrument.operators[i].envelope = Config.envelopes.dictionary["custom"].index;
+                        instrument.operators[i].waveform = Config.operatorWaves.dictionary[selectWeightedRandom([
+                            { item: "sine", weight: 4 },
+                            { item: "triangle", weight: 6 },
+                            { item: "sawtooth", weight: 2 },
+                            { item: "square", weight: 6 },
+                        ])].index;
 					}
 					for (let i: number = algorithm.carrierCount; i < Config.operatorCount; i++) {
 						instrument.operators[i].frequency = selectCurvedDistribution(3, Config.operatorFrequencies.length - 1, 0, 3);
@@ -728,8 +758,21 @@ export class ChangeRandomGeneratedInstrument extends Change {
 							{ item: "tremolo6", weight: 1 },
 							{ item: "decay 1", weight: 1 },
 							{ item: "decay 2", weight: 1 },
-							{ item: "decay 3", weight: 1 },
-						])].index;
+                            { item: "decay 3", weight: 1 },
+                            { item: "wibble 1", weight: 2 },
+                            { item: "wibble 2", weight: 2 },
+                            { item: "wibble 3", weight: 2 },
+                            { item: "linear 1", weight: 2 },
+                            { item: "linear 2", weight: 2 },
+                            { item: "linear 3", weight: 2 },
+                            { item: "hard", weight: 1 },
+                        ])].index;
+                        instrument.operators[i].waveform = Config.operatorWaves.dictionary[selectWeightedRandom([
+                            { item: "sine", weight: 4 },
+                            { item: "triangle", weight: 6 },
+                            { item: "sawtooth", weight: 2 },
+                            { item: "square", weight: 4 },
+                        ])].index;
 					}
 					instrument.feedbackAmplitude = (Math.pow(Math.random(), 3) * Config.operatorAmplitudeMax) | 0;
 					instrument.feedbackEnvelope = Config.envelopes.dictionary[selectWeightedRandom([
@@ -752,7 +795,14 @@ export class ChangeRandomGeneratedInstrument extends Change {
 						{ item: "tremolo6", weight: 1 },
 						{ item: "decay 1", weight: 1 },
 						{ item: "decay 2", weight: 1 },
-						{ item: "decay 3", weight: 1 },
+                        { item: "decay 3", weight: 1 },
+                        { item: "wibble 1", weight: 2 },
+                        { item: "wibble 2", weight: 2 },
+                        { item: "wibble 3", weight: 2 },
+                        { item: "linear 1", weight: 2 },
+                        { item: "linear 2", weight: 2 },
+                        { item: "linear 3", weight: 2 },
+                        { item: "hard", weight: 1 },
 					])].index;
 				} break;
 				default: throw new Error("Unhandled pitched instrument type in random generator.");

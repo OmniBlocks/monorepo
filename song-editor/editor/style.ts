@@ -1151,7 +1151,7 @@ li.select2-results__option[role=group] > strong:hover {
 		margin-left: 10px;
 	}
 	.beepboxEditor .settings-area {
-		width: 14em;
+		width: 15em;
 	}
 }
 

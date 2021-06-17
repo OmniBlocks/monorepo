@@ -388,7 +388,7 @@ export class Config {
         { name: "linear 1", type: EnvelopeType.linear, speed: 32.0 },
         { name: "linear 2", type: EnvelopeType.linear, speed: 8.0 },
         { name: "linear 3", type: EnvelopeType.linear, speed: 2.0 },
-        { name: "linear-1", type: EnvelopeType.linear, speed: 64.0 },
+        { name: "linear-1", type: EnvelopeType.linear, speed: 128.0 },
 	]);
 	public static readonly feedbacks: DictionaryArray<Feedback> = toNameMap([
 		{ name: "1⟲", indices: [[1], [], [], []] },

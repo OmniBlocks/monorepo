@@ -389,6 +389,7 @@ export class Config {
         { name: "linear 2", type: EnvelopeType.linear, speed: 8.0 },
         { name: "linear 3", type: EnvelopeType.linear, speed: 2.0 },
         { name: "linear-1", type: EnvelopeType.linear, speed: 128.0 },
+        { name: "swell -1", type: EnvelopeType.swell, speed: 128.0 },
 	]);
 	public static readonly feedbacks: DictionaryArray<Feedback> = toNameMap([
 		{ name: "1⟲", indices: [[1], [], [], []] },
@@ -450,6 +451,9 @@ export class Config {
         { name: "triangle", samples: generateTriWave() },
         { name: "sawtooth", samples: generateSawWave() },
         { name: "square", samples: generateSquareWave() },
+        { name: "25%pulse", samples: generateSquareWave(0.5) },
+        { name: "75%pulse", samples: generateSquareWave(-0.5) },
+        { name: "ramp", samples: generateSawWave(true) },
     ]);
 
 	// Height of the small editor column for inserting/deleting rows, in pixels.
@@ -666,19 +670,20 @@ function generateTriWave(): Float64Array {
     return wave;
 }
 
-function generateSquareWave(): Float64Array {
+function generateSquareWave(phasewidth: number = 0): Float64Array {
     const wave: Float64Array = new Float64Array(Config.sineWaveLength + 1);
     for (let i: number = 0; i < Config.sineWaveLength + 1; i++) {
         wave[i] = Math.sin(i * Math.PI * 2.0 / Config.sineWaveLength);
-        wave[i] = wave[i]>0?1.0:-1.0;
+        wave[i] = wave[i] > phasewidth ? 1.0 : -1.0;
     }
     return wave;
 }
 
-function generateSawWave(): Float64Array {
+function generateSawWave(inverse: boolean = false): Float64Array {
     const wave: Float64Array = new Float64Array(Config.sineWaveLength + 1);
     for (let i: number = 0; i < Config.sineWaveLength + 1; i++) {
         wave[i] = ((i - (Config.sineWaveLength * 0.75) + Config.sineWaveLength) * 2.0 / Config.sineWaveLength) % 2 - 1;
+        wave[i] = inverse ? wave[i] * -1 : wave[i];
     }
     return wave;
 }

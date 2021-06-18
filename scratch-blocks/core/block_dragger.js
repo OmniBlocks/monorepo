@@ -239,6 +239,9 @@ Blockly.BlockDragger.prototype.endBlockDrag = function(e, currentDragDeltaXY) {
   // Scratch-specific: note possible illegal definition deletion for rollback below.
   var isDeletingProcDef = this.wouldDeleteBlock_ &&
       (this.draggingBlock_.type == Blockly.PROCEDURES_DEFINITION_BLOCK_TYPE);
+  if (isDeletingProcDef) {
+    var procCodeBeingDeleted = this.draggingBlock_.getInput('custom_block').connection.targetBlock().getProcCode();
+  }
 
   var deleted = this.maybeDeleteBlock_();
   if (!deleted) {
@@ -284,7 +287,7 @@ Blockly.BlockDragger.prototype.endBlockDrag = function(e, currentDragDeltaXY) {
         if (block.type == Blockly.PROCEDURES_CALL_BLOCK_TYPE) {
           var procCode = block.getProcCode();
           // Check for call blocks with no associated define block.
-          if (!Blockly.Procedures.getDefineBlock(procCode, ws)) {
+          if (procCode === procCodeBeingDeleted) {
             alert(Blockly.Msg.PROCEDURE_USED);
             ws.undo();
             return; // There can only be one define deletion at a time.

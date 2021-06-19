@@ -731,8 +731,12 @@ export class ChangeRandomGeneratedInstrument extends Change {
                         instrument.operators[i].waveform = Config.operatorWaves.dictionary[selectWeightedRandom([
                             { item: "sine", weight: 4 },
                             { item: "triangle", weight: 6 },
-                            { item: "sawtooth", weight: 2 },
+                            { item: "sawtooth", weight: 3 },
                             { item: "square", weight: 6 },
+                            { item: "25%pulse", weight: 4 },
+                            { item: "75%pulse", weight: 4 },
+                            { item: "ramp", weight: 3 },
+                            { item: "trapezoid", weight: 4 },
                         ])].index;
 					}
 					for (let i: number = algorithm.carrierCount; i < Config.operatorCount; i++) {
@@ -770,8 +774,12 @@ export class ChangeRandomGeneratedInstrument extends Change {
                         instrument.operators[i].waveform = Config.operatorWaves.dictionary[selectWeightedRandom([
                             { item: "sine", weight: 4 },
                             { item: "triangle", weight: 6 },
-                            { item: "sawtooth", weight: 2 },
+                            { item: "sawtooth", weight: 4 },
                             { item: "square", weight: 4 },
+                            { item: "25%pulse", weight: 4 },
+                            { item: "75%pulse", weight: 4 },
+                            { item: "ramp", weight: 4 },
+                            { item: "trapezoid", weight: 6 },
                         ])].index;
 					}
 					instrument.feedbackAmplitude = (Math.pow(Math.random(), 3) * Config.operatorAmplitudeMax) | 0;

@@ -454,6 +454,7 @@ export class Config {
         { name: "25%pulse", samples: generateSquareWave(0.5) },
         { name: "75%pulse", samples: generateSquareWave(-0.5) },
         { name: "ramp", samples: generateSawWave(true) },
+        { name: "trapezoid", samples: generateTrapezoidWave(2) },
     ]);
 
 	// Height of the small editor column for inserting/deleting rows, in pixels.
@@ -666,6 +667,16 @@ function generateTriWave(): Float64Array {
     const wave: Float64Array = new Float64Array(Config.sineWaveLength + 1);
     for (let i: number = 0; i < Config.sineWaveLength + 1; i++) {
         wave[i] = Math.asin(Math.sin(i * Math.PI * 2.0 / Config.sineWaveLength))/(Math.PI/2);
+    }
+    return wave;
+}
+
+function generateTrapezoidWave(drive: number = 2): Float64Array {
+    const wave: Float64Array = new Float64Array(Config.sineWaveLength + 1);
+    for (let i: number = 0; i < Config.sineWaveLength + 1; i++) {
+        wave[i] = Math.asin(Math.sin(i * Math.PI * 2.0 / Config.sineWaveLength))*drive;
+        wave[i] = wave[i] >= 1 ? 1 : wave[i];
+        wave[i] = wave[i] <= -1 ? -1 : wave[i];
     }
     return wave;
 }

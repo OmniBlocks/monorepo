@@ -116,8 +116,8 @@ export class Piano {
 		this._documentChanged();
 	}
 
-	private _updateCursorPitch(): void {
-		const scale: ReadonlyArray<boolean> = Config.scales[this._doc.song.scale].flags;
+    private _updateCursorPitch(): void {
+        const scale: ReadonlyArray<boolean> = this._doc.song.scale == Config.scales["dictionary"]["Custom"].index ? this._doc.song.scaleCustom : Config.scales[this._doc.song.scale].flags;
 		const mousePitch: number = Math.max(0, Math.min(this._pitchCount - 1, this._pitchCount - (this._mouseY / this._pitchHeight)));
 		if (scale[Math.floor(mousePitch) % 12] || this._doc.song.getChannelIsNoise(this._doc.channel)) {
 			this._cursorPitch = Math.floor(mousePitch);
@@ -284,7 +284,7 @@ export class Piano {
 		const isDrum = this._doc.song.getChannelIsNoise(this._doc.channel);
 		const isMod = this._doc.song.getChannelIsMod(this._doc.channel);
 
-		if (this._renderedScale == this._doc.song.scale && this._renderedKey == this._doc.song.key && this._renderedDrums == isDrum && this._renderedMod == isMod) return;
+        if ((this._renderedScale == this._doc.song.scale && this._doc.song.scale != Config.scales["dictionary"]["Custom"].index) && this._renderedKey == this._doc.song.key && this._renderedDrums == isDrum && this._renderedMod == isMod) return;
 		this._renderedScale = this._doc.song.scale;
 		this._renderedKey = this._doc.song.key;
 		this._renderedDrums = isDrum;
@@ -299,8 +299,9 @@ export class Piano {
 			for (let j: number = 0; j < this._pitchCount; j++) {
 				const pitchNameIndex: number = (j + Config.keys[this._doc.song.key].basePitch) % 12;
 				const isWhiteKey: boolean = Config.keys[pitchNameIndex].isWhiteKey;
-				this._pianoKeys[j].style.background = isWhiteKey ? ColorConfig.whitePianoKey : ColorConfig.blackPianoKey;
-				if (!Config.scales[this._doc.song.scale].flags[j % 12]) {
+                this._pianoKeys[j].style.background = isWhiteKey ? ColorConfig.whitePianoKey : ColorConfig.blackPianoKey;
+                let scale = this._doc.song.scale == Config.scales["dictionary"]["Custom"].index ? this._doc.song.scaleCustom : Config.scales[this._doc.song.scale].flags;
+				if (!scale[j % 12]) {
 					this._pianoKeys[j].classList.add("disabled");
 					this._pianoLabels[j].style.display = "none";
 				} else {

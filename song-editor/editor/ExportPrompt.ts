@@ -540,9 +540,10 @@ export class ExportPrompt implements Prompt {
 				writer.writeUint8(song.beatsPerBar); // numerator.
 				writer.writeUint8(2); // denominator exponent in 2^E. 2^2 = 4, and we will always use "quarter" notes.
 				writer.writeUint8(24); // MIDI Clocks per metronome tick (should match beats), standard is 24
-				writer.writeUint8(8); // number of 1/32 notes per 24 MIDI Clocks, standard is 8, meaning 24 clocks per "quarter" note.
+                writer.writeUint8(8); // number of 1/32 notes per 24 MIDI Clocks, standard is 8, meaning 24 clocks per "quarter" note.
 
-				const isMinor: boolean = Config.scales[song.scale].flags[3] && !Config.scales[song.scale].flags[4];
+                let tempScale = song.scale == Config.scales["dictionary"]["Custom"].index ? song.scaleCustom : Config.scales[song.scale].flags;
+                const isMinor: boolean = tempScale[3] && !tempScale[4];
 				const key: number = song.key; // C=0, C#=1, counting up to B=11
 				let numSharps: number = key; // For even key values in major scale, number of sharps/flats is same...
 				if ((key & 1) == 1) numSharps += 6; // For odd key values (consider circle of fifths) rotate around the circle... kinda... Look conventional key signatures are just weird, okay?

@@ -18,6 +18,7 @@ import { InputBox, Slider } from "./HTMLWrapper";
 import { ImportPrompt } from "./ImportPrompt";
 import { LayoutPrompt } from "./LayoutPrompt";
 import { LimiterPrompt } from "./LimiterPrompt";
+import { CustomScalePrompt } from "./CustomScalePrompt";
 import { LoopEditor } from "./LoopEditor";
 import { MoveNotesSidewaysPrompt } from "./MoveNotesSidewaysPrompt";
 import { MuteEditor } from "./MuteEditor";
@@ -717,7 +718,8 @@ export class SongEditor {
 
 		this._scaleSelect.appendChild(optgroup({ label: "Edit" },
 			option({ value: "forceScale" }, "Snap Notes To Scale"),
-		));
+            option({ value: "customize" }, "Edit Custom Scale"),
+        ));
 		this._keySelect.appendChild(optgroup({ label: "Edit" },
 			option({ value: "detectKey" }, "Detect Key"),
 		));
@@ -1178,7 +1180,10 @@ export class SongEditor {
 					break;
 				case "theme":
 					this.prompt = new ThemePrompt(this._doc);
-					break;
+                    break;
+                case "customScale":
+                    this.prompt = new CustomScalePrompt(this._doc);
+                    break;
 				case "layout":
 					this.prompt = new LayoutPrompt(this._doc);
 					break;
@@ -2579,10 +2584,15 @@ export class SongEditor {
 	private _whenSetScale = (): void => {
 		if (isNaN(<number><unknown>this._scaleSelect.value)) {
 			switch (this._scaleSelect.value) {
-				case "forceScale":
-					this._doc.selection.forceScale();
-					break;
-			}
+                case "forceScale":
+                    this._doc.selection.forceScale();
+                    break;
+            }
+            switch (this._scaleSelect.value) {
+                case "customize":
+                    this._openPrompt("customScale")
+                    break;
+            }
 			this._doc.notifier.changed();
 		} else {
 			this._doc.record(new ChangeScale(this._doc, this._scaleSelect.selectedIndex));

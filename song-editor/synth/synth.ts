@@ -1424,6 +1424,7 @@ export class Song {
 
     public title: string;
     public scale: number;
+    public scaleCustom: boolean[] = [];
     public key: number;
     public tempo: number;
     public reverb: number;
@@ -1667,6 +1668,7 @@ export class Song {
 
     public initToDefault(andResetChannels: boolean = true): void {
         this.scale = 0;
+        this.scaleCustom = [true, false, true, true, false, false, false, true, true, false, true, true];
         this.key = 0;
         this.loopStart = 0;
         this.loopLength = 4;
@@ -1740,6 +1742,11 @@ export class Song {
 
         buffer.push(SongTagCode.channelCount, base64IntToCharCode[this.pitchChannelCount], base64IntToCharCode[this.noiseChannelCount], base64IntToCharCode[this.modChannelCount]);
         buffer.push(SongTagCode.scale, base64IntToCharCode[this.scale]);
+        if (this.scale == Config.scales["dictionary"]["Custom"].index) {
+            for (var i = 1; i < Config.pitchesPerOctave; i++) {
+                buffer.push(base64IntToCharCode[this.scaleCustom[i]?1:0]) // ineffiecent? yes, all we're going to do for now? hell yes
+            }
+        }
         buffer.push(SongTagCode.key, base64IntToCharCode[this.key]);
         buffer.push(SongTagCode.loopStart, base64IntToCharCode[this.loopStart >> 6], base64IntToCharCode[this.loopStart & 0x3f]);
         buffer.push(SongTagCode.loopEnd, base64IntToCharCode[(this.loopLength - 1) >> 6], base64IntToCharCode[(this.loopLength - 1) & 0x3f]);
@@ -2261,6 +2268,11 @@ export class Song {
             case SongTagCode.scale: {
                 this.scale = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                 // All the scales were jumbled around by Jummbox. Just convert to free.
+                if (this.scale == Config.scales["dictionary"]["Custom"].index) {
+                    for (var i = 1; i < Config.pitchesPerOctave; i++) {
+                        this.scaleCustom[i] = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] == 1; // ineffiecent? yes, all we're going to do for now? hell yes
+                    }
+                }
                 if (variant == "beepbox") this.scale = 0;
             } break;
             case SongTagCode.key: {
@@ -3078,6 +3090,7 @@ export class Song {
 
     public toJsonObject(enableIntro: boolean = true, loopCount: number = 1, enableOutro: boolean = true): Object {
         const channelArray: Object[] = [];
+
         for (let channel: number = 0; channel < this.getChannelCount(); channel++) {
             const instrumentArray: Object[] = [];
             const isNoiseChannel: boolean = this.getChannelIsNoise(channel);
@@ -3139,6 +3152,7 @@ export class Song {
             "format": Song._format,
             "version": Song._latestJummBoxVersion,
             "scale": Config.scales[this.scale].name,
+            "customScale": this.scaleCustom,
             "key": Config.keys[this.key].name,
             "introBars": this.loopStart,
             "loopBars": this.loopLength,
@@ -3174,6 +3188,13 @@ export class Song {
             const scaleName: string = (oldScaleNames[jsonObject["scale"]] != undefined) ? oldScaleNames[jsonObject["scale"]] : jsonObject["scale"];
             const scale: number = Config.scales.findIndex(scale => scale.name == scaleName);
             if (scale != -1) this.scale = scale;
+            if (this.scale == Config.scales["dictionary"]["Custom"].index) {
+                if (jsonObject["customScale"] != undefined) {
+                    for (var i of jsonObject["customScale"].keys()) {
+                        this.scaleCustom[i] = jsonObject["customScale"][i];
+                    }
+                }
+            }
         }
 
         if (jsonObject["key"] != undefined) {

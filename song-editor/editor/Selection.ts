@@ -574,7 +574,7 @@ export class Selection {
 			}
 		}
 
-		const scaleMap: number[] = generateScaleMap(scaleFlags, this._doc.song.scale);
+        const scaleMap: number[] = generateScaleMap(scaleFlags, this._doc.song.scale, this._doc.song.scaleCustom);
 
 		for (const channel of this._eachSelectedChannel()) {
 			if (this._doc.song.getChannelIsNoise(channel) || this._doc.song.getChannelIsMod(channel)) continue;

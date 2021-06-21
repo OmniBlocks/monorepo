@@ -1422,7 +1422,7 @@ export class Song {
     private static readonly _oldestGoldBoxVersion: number = 1;
     private static readonly _latestGoldBoxVersion: number = 2;
     // One-character variant detection at the start of URL to distinguish variants such as JummBox.
-    private static readonly _variant = 0x6A; //"j" ~ jummbox
+    private static readonly _variant = 0x67; //"g" ~ goldbox
 
     public title: string;
     public scale: number;
@@ -1729,7 +1729,7 @@ export class Song {
         let buffer: number[] = [];
 
         buffer.push(Song._variant);
-        buffer.push(base64IntToCharCode[Song._latestJummBoxVersion]);
+        buffer.push(base64IntToCharCode[Song._latestGoldBoxVersion]);
 
         buffer.push(SongTagCode.songTitle);
 
@@ -2455,6 +2455,7 @@ export class Song {
                 if (beforeSeven && variant == "beepbox") {
                     const legacyToCutoff: number[] = [10, 6, 3, 0, 8, 5, 2];
                     const legacyToEnvelope: number[] = [1, 1, 1, 1, 18, 19, 20];
+                    const pregoldToEnvelope: number[] = [0, 1, 2, 4, 5, 6, 8, 9, 10, 12, 13, 14, 16, 17, 18, 19, 20, 21, 23, 24, 25, 27, 28, 29, 32, 33, 34, 31, 11];
                     const filterNames: string[] = ["none", "bright", "medium", "soft", "decay bright", "decay medium", "decay soft"];
 
                     if (beforeThree && variant == "beepbox") {
@@ -2462,7 +2463,7 @@ export class Song {
                         const instrument: Instrument = this.channels[channel].instruments[0];
                         const legacyFilter: number = [1, 3, 4, 5][clamp(0, filterNames.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)])];
                         instrument.filterCutoff = legacyToCutoff[legacyFilter];
-                        instrument.filterEnvelope = legacyToEnvelope[legacyFilter];
+                        instrument.filterEnvelope = pregoldToEnvelope[legacyToEnvelope[legacyFilter]];
                         instrument.filterResonance = 0;
                     } else if (beforeSix && variant == "beepbox") {
                         for (channel = 0; channel < this.getChannelCount(); channel++) {
@@ -2471,7 +2472,7 @@ export class Song {
                                 const legacyFilter: number = clamp(0, filterNames.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)] + 1);
                                 if (channel < this.pitchChannelCount) {
                                     instrument.filterCutoff = legacyToCutoff[legacyFilter];
-                                    instrument.filterEnvelope = legacyToEnvelope[legacyFilter];
+                                    instrument.filterEnvelope = pregoldToEnvelope[legacyToEnvelope[legacyFilter]];
                                     instrument.filterResonance = 0;
                                 } else {
                                     instrument.filterCutoff = 10;
@@ -2484,7 +2485,7 @@ export class Song {
                         const legacyFilter: number = clamp(0, filterNames.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                         const instrument: Instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                         instrument.filterCutoff = legacyToCutoff[legacyFilter];
-                        instrument.filterEnvelope = legacyToEnvelope[legacyFilter];
+                        instrument.filterEnvelope = pregoldToEnvelope[legacyToEnvelope[legacyFilter]];
                         instrument.filterResonance = 0;
                     }
                 } else {
@@ -2497,12 +2498,23 @@ export class Song {
             } break;
             case SongTagCode.filterEnvelope: {
                 const instrument: Instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
-                if (instrument.type == InstrumentType.drumset) {
-                    for (let i: number = 0; i < Config.drumCount; i++) {
-                        instrument.drumsetEnvelopes[i] = clamp(0, Config.envelopes.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                if ((beforeTwo && variant == "goldbox") || variant != "goldbox") {
+                    const pregoldToEnvelope: number[] = [0, 1, 2, 4, 5, 6, 8, 9, 10, 12, 13, 14, 16, 17, 18, 19, 20, 21, 23, 24, 25, 27, 28, 29, 32, 33, 34, 31, 11];
+                    if (instrument.type == InstrumentType.drumset) {
+                        for (let i: number = 0; i < Config.drumCount; i++) {
+                            instrument.drumsetEnvelopes[i] = pregoldToEnvelope[clamp(0, pregoldToEnvelope.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)])];
+                        }
+                    } else {
+                        instrument.filterEnvelope = pregoldToEnvelope[clamp(0, pregoldToEnvelope.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)])];
                     }
                 } else {
-                    instrument.filterEnvelope = clamp(0, Config.envelopes.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                    if (instrument.type == InstrumentType.drumset) {
+                        for (let i: number = 0; i < Config.drumCount; i++) {
+                            instrument.drumsetEnvelopes[i] = clamp(0, Config.envelopes.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                        }
+                    } else {
+                        instrument.filterEnvelope = clamp(0, Config.envelopes.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                    }
                 }
             } break;
             case SongTagCode.pulseWidth: {
@@ -2516,7 +2528,12 @@ export class Song {
                 else {
                     const instrument: Instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                     instrument.pulseWidth = clamp(0, Config.pulseWidthRange + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
-                    instrument.pulseEnvelope = clamp(0, Config.envelopes.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                    if ((beforeTwo && variant == "goldbox") || variant != "goldbox") {
+                        const pregoldToEnvelope: number[] = [0, 1, 2, 4, 5, 6, 8, 9, 10, 12, 13, 14, 16, 17, 18, 19, 20, 21, 23, 24, 25, 27, 28, 29, 32, 33, 34, 31, 11];
+                        instrument.pulseEnvelope = pregoldToEnvelope[clamp(0, Config.envelopes.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)])];
+                    } else {
+                        instrument.pulseEnvelope = clamp(0, Config.envelopes.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                    }
                 }
             } break;
             case SongTagCode.transition: {
@@ -2529,7 +2546,7 @@ export class Song {
                             this.channels[channel].instruments[i].transition = clamp(0, Config.transitions.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                         }
                     }
-                } else if (beforeFour || variant == "beepbox") {
+                } else if ((beforeFour && variant == "jummbox") || variant == "beepbox") {
                     this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].transition = clamp(0, Config.transitions.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                 }
                 else {
@@ -2542,35 +2559,38 @@ export class Song {
                 if (beforeThree && variant == "beepbox") {
                     const legacyEffects: number[] = [0, 3, 2, 0];
                     const legacyEnvelopes: number[] = [1, 1, 1, 13];
+                    const pregoldToEnvelope: number[] = [0, 1, 2, 4, 5, 6, 8, 9, 10, 12, 13, 14, 16, 17, 18, 19, 20, 21, 23, 24, 25, 27, 28, 29, 32, 33, 34, 31, 11];
                     const channel: number = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                     const effect: number = clamp(0, legacyEffects.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                     const instrument: Instrument = this.channels[channel].instruments[0];
                     instrument.vibrato = legacyEffects[effect];
-                    instrument.filterEnvelope = (instrument.filterEnvelope == 1)
+                    instrument.filterEnvelope = pregoldToEnvelope[(instrument.filterEnvelope == 1)
                         ? legacyEnvelopes[effect]
-                        : instrument.filterEnvelope;
+                        : instrument.filterEnvelope];
                 } else if (beforeSix && variant == "beepbox") {
                     const legacyEffects: number[] = [0, 1, 2, 3, 0, 0];
                     const legacyEnvelopes: number[] = [1, 1, 1, 1, 16, 13];
+                    const pregoldToEnvelope: number[] = [0, 1, 2, 4, 5, 6, 8, 9, 10, 12, 13, 14, 16, 17, 18, 19, 20, 21, 23, 24, 25, 27, 28, 29, 32, 33, 34, 31, 11];
                     for (let channel: number = 0; channel < this.getChannelCount(); channel++) {
                         for (let i: number = 0; i < this.instrumentsPerChannel; i++) {
                             const effect: number = clamp(0, legacyEffects.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                             const instrument: Instrument = this.channels[channel].instruments[i];
                             instrument.vibrato = legacyEffects[effect];
-                            instrument.filterEnvelope = (instrument.filterEnvelope == 1)
+                            instrument.filterEnvelope = pregoldToEnvelope[(instrument.filterEnvelope == 1)
                                 ? legacyEnvelopes[effect]
-                                : instrument.filterEnvelope;
+                                : instrument.filterEnvelope];
                         }
                     }
                 } else if (beforeSeven && variant == "beepbox") {
                     const legacyEffects: number[] = [0, 1, 2, 3, 0, 0];
                     const legacyEnvelopes: number[] = [1, 1, 1, 1, 16, 13];
+                    const pregoldToEnvelope: number[] = [0, 1, 2, 4, 5, 6, 8, 9, 10, 12, 13, 14, 16, 17, 18, 19, 20, 21, 23, 24, 25, 27, 28, 29, 32, 33, 34, 31, 11];
                     const effect: number = clamp(0, legacyEffects.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                     const instrument: Instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                     instrument.vibrato = legacyEffects[effect];
-                    instrument.filterEnvelope = (instrument.filterEnvelope == 1)
+                    instrument.filterEnvelope = pregoldToEnvelope[(instrument.filterEnvelope == 1)
                         ? legacyEnvelopes[effect]
-                        : instrument.filterEnvelope;
+                        : instrument.filterEnvelope];
                 } else {
                     const vibrato: number = clamp(0, Config.vibratos.length + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                     const instrument: Instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
@@ -2671,7 +2691,7 @@ export class Song {
                 }
 
                 // Now, pan delay follows on new versions of jummbox.
-                if (variant == "jummbox" && !beforeThree)
+                if ((variant == "jummbox" && !beforeThree)|| variant == "goldbox")
                     instrument.panDelay = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
             } break;
             case SongTagCode.detune: {
@@ -2736,7 +2756,7 @@ export class Song {
                 for (let channel: number = 0; channel < this.getChannelCount(); channel++) {
                     // Length of channel name string. Due to some crazy Unicode characters this needs to be 2 bytes...
                     var channelNameLength;
-                    if (beforeFour)
+                    if (beforeFour && variant != "goldbox")
                         channelNameLength = base64CharCodeToInt[compressed.charCodeAt(charIndex++)]
                     else
                         channelNameLength = ((base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) + base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
@@ -2755,7 +2775,12 @@ export class Song {
                 this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].feedbackAmplitude = clamp(0, Config.operatorAmplitudeMax + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
             } break;
             case SongTagCode.feedbackEnvelope: {
-                this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].feedbackEnvelope = clamp(0, Config.envelopes.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                if ((beforeTwo && variant == "goldbox") || variant != "goldbox") {
+                    const pregoldToEnvelope: number[] = [0, 1, 2, 4, 5, 6, 8, 9, 10, 12, 13, 14, 16, 17, 18, 19, 20, 21, 23, 24, 25, 27, 28, 29, 32, 33, 34, 31, 11];
+                    this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].feedbackEnvelope = pregoldToEnvelope[clamp(0, pregoldToEnvelope.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)])];
+                } else {
+                    this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].feedbackEnvelope = clamp(0, Config.envelopes.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                }
             } break;
             case SongTagCode.operatorFrequencies: {
                 for (let o: number = 0; o < Config.operatorCount; o++) {
@@ -2768,8 +2793,15 @@ export class Song {
                 }
             } break;
             case SongTagCode.operatorEnvelopes: {
-                for (let o: number = 0; o < Config.operatorCount; o++) {
-                    this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].operators[o].envelope = clamp(0, Config.envelopes.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                if ((beforeTwo && variant == "goldbox") || variant != "goldbox") {
+                    const pregoldToEnvelope: number[] = [0, 1, 2, 4, 5, 6, 8, 9, 10, 12, 13, 14, 16, 17, 18, 19, 20, 21, 23, 24, 25, 27, 28, 29, 32, 33, 34, 31, 11];
+                    for (let o: number = 0; o < Config.operatorCount; o++) {
+                        this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].operators[o].envelope = pregoldToEnvelope[clamp(0, pregoldToEnvelope.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)])];
+                    }
+                } else {
+                    for (let o: number = 0; o < Config.operatorCount; o++) {
+                        this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].operators[o].envelope = clamp(0, Config.envelopes.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                    }
                 }
             } break;
             case SongTagCode.operatorWaves: {
@@ -3083,7 +3115,7 @@ export class Song {
                 } // while (true)
             } break;
             default: {
-                throw new Error("Unrecognized song tag code " + String.fromCharCode(command) + " at index " + (charIndex - 1));
+                throw new Error("Unrecognized song tag code " + String.fromCharCode(command) + " at index " + (charIndex - 1) + " " + compressed.substring(charIndex - 20, charIndex));
             } break;
         }
 
@@ -3156,7 +3188,7 @@ export class Song {
         return {
             "name": this.title,
             "format": Song._format,
-            "version": Song._latestJummBoxVersion,
+            "version": Song._latestGoldBoxVersion,
             "scale": Config.scales[this.scale].name,
             "customScale": this.scaleCustom,
             "key": Config.keys[this.key].name,

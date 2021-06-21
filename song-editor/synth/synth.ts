@@ -5207,12 +5207,16 @@ export class Synth {
                 temp = 1.0 / (1.0 + time * (envelope.speed - (temp / (1.5 / envelope.speed))));
                 temp = temp > 0.0 ? temp : 0.0;
                 return temp;
-            case EnvelopeType.hard:
-                return time < 8 / envelope.speed ? 1.0 : 0.0;
-            case EnvelopeType.linear:
+            case EnvelopeType.linear: {
                 let lin = (1.0 - (time / (16 / envelope.speed)));
                 lin = lin > 0.0 ? lin : 0.0;
                 return lin;
+            }
+            case EnvelopeType.rise: {
+                let lin = (time / (16 / envelope.speed));
+                lin = lin < 1.0 ? lin : 1.0;
+                return lin;
+            }
             default: throw new Error("Unrecognized operator envelope type.");
         }
     }

@@ -748,7 +748,7 @@ export class SongEditor {
             const waveformSelect: HTMLSelectElement = buildOptions(select({ style: "width: 100%;", title: "Waveform" }), Config.operatorWaves.map(wave => wave.name));
             const dropdown: HTMLButtonElement = button({ style: "margin-left:0em; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: () => this._toggleDropdownMenu(4, i) }, "▼");//typescript doesn't makes i a reference right?
             const dropdownRow: HTMLElement = div({ class: "selectRow" }, span({ class: "tip", style: "margin-left:10px;", onclick: () => this._openPrompt("operatorWaveform") }, "Wave:"), 
-                div({ class: "selectContainer", style: "width: 5em; margin-left: .3em;" }, waveformSelect));
+                div({ class: "selectContainer", style: "width: 6em; margin-left: .3em;" }, waveformSelect));
             const DropdownGroup: HTMLDivElement = div({ class: "operatorRow" }, dropdownRow);
 
 			const row: HTMLDivElement = div({ class: "operatorRow" },

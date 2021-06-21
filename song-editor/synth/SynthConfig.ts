@@ -42,6 +42,7 @@ export const enum EnvelopeType {
     wibble,
     hard,
     linear,
+    rise,
 }
 
 export const enum InstrumentType {
@@ -245,6 +246,7 @@ export class Config {
 		{ name: "organ", volume: 0.2, samples: centerAndNormalizeWave([11.0, 10.0, 12.0, 11.0, 14.0, 7.0, 5.0, 5.0, 12.0, 10.0, 10.0, 9.0, 12.0, 6.0, 4.0, 5.0, 13.0, 12.0, 12.0, 10.0, 12.0, 5.0, 2.0, 2.0, 8.0, 6.0, 6.0, 5.0, 8.0, 3.0, 2.0, 1.0]) },
 		{ name: "pan flute", volume: 0.35, samples: centerAndNormalizeWave([1.0, 4.0, 7.0, 6.0, 7.0, 9.0, 7.0, 7.0, 11.0, 12.0, 13.0, 15.0, 13.0, 11.0, 11.0, 12.0, 13.0, 10.0, 7.0, 5.0, 3.0, 6.0, 10.0, 7.0, 3.0, 3.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0]) },
         { name: "glitch", volume: 0.5, samples: centerWave([1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0, -1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0, -1.0, -1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0, -1.0, -1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0, -1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0, -1.0]) },
+        { name: "trapezoid", volume: 1.0, samples: centerWave([1.0 / 15.0, 6.0 / 15.0, 10.0 / 15.0, 14.0 / 15.0, 15.0 / 15.0, 15.0 / 15.0, 15.0 / 15.0, 15.0 / 15.0, 15.0 / 15.0, 15.0 / 15.0, 15.0 / 15.0, 15.0 / 15.0, 14.0 / 15.0, 10.0 / 15.0, 6.0 / 15.0, 1.0 / 15.0, -1.0 / 15.0, -6.0 / 15.0, -10.0 / 15.0, -14.0 / 15.0, -15.0 / 15.0, -15.0 / 15.0, -15.0 / 15.0, -15.0 / 15.0, -15.0 / 15.0, -15.0 / 15.0, -15.0 / 15.0, -15.0 / 15.0, -14.0 / 15.0, -10.0 / 15.0, -6.0 / 15.0, -1.0 / 15.0,])},
     ]); 
 	// Noise waves have too many samples to write by hand, they're generated on-demand by getDrumWave instead.
 	public static readonly chipNoises: DictionaryArray<ChipNoise> = toNameMap([
@@ -337,6 +339,7 @@ export class Config {
 		{ name: "(1 2 3)←4", carrierCount: 3, associatedCarrier: [1, 2, 3, 3], modulatedBy: [[4], [4], [4], []] },
         { name: "1 2 3 4", carrierCount: 4, associatedCarrier: [1, 2, 3, 4], modulatedBy: [[], [], [], []] },
         { name: "1←(2 3) 2←4", carrierCount: 2, associatedCarrier: [1, 2, 1, 2], modulatedBy: [[2, 3], [4], [], []] },
+        { name: "(1←( 2←( 3)←4", carrierCount: 3, associatedCarrier: [1, 2, 3, 3], modulatedBy: [[2, 3, 4], [3, 4], [4], []] },
 	]);
 	public static readonly operatorCarrierInterval: ReadonlyArray<number> = [0.0, 0.04, -0.073, 0.091];
 	public static readonly operatorAmplitudeMax: number = 15;
@@ -390,7 +393,19 @@ export class Config {
         { name: "linear 3", type: EnvelopeType.linear, speed: 2.0 },
         { name: "linear-1", type: EnvelopeType.linear, speed: 128.0 },
         { name: "swell -1", type: EnvelopeType.swell, speed: 128.0 },
-	]);
+
+        { name: "flare -1", type: EnvelopeType.flare, speed: 128.0 },
+        { name: "twang -1", type: EnvelopeType.twang, speed: 128.0 },
+        { name: "decay -1", type: EnvelopeType.decay, speed: 40.0 },
+        { name: "wibble-1", type: EnvelopeType.wibble, speed: 96.0 },
+        { name: "linear-2", type: EnvelopeType.linear, speed: 256.0 },
+        { name: "tremolo0", type: EnvelopeType.tremolo, speed: 8.0 },
+        { name: "rise -2", type: EnvelopeType.rise, speed: 256.0 },
+        { name: "rise -1", type: EnvelopeType.rise, speed: 128.0 },
+        { name: "rise 1", type: EnvelopeType.rise, speed: 32.0 },
+        { name: "rise 2", type: EnvelopeType.rise, speed: 8.0 },
+        { name: "rise 3", type: EnvelopeType.rise, speed: 2.0 },
+    ]);
 	public static readonly feedbacks: DictionaryArray<Feedback> = toNameMap([
 		{ name: "1⟲", indices: [[1], [], [], []] },
 		{ name: "2⟲", indices: [[], [2], [], []] },
@@ -413,6 +428,7 @@ export class Config {
         { name: "1↔2 3↔4", indices: [[2], [1], [4], [3]] },
         { name: "1↔4 2↔3", indices: [[4], [3], [2], [1]] },
         { name: "2→1→4→3→2", indices: [[2], [3], [4], [1]] },
+        { name: "1→2→3→4→1", indices: [[4], [1], [2], [3]] },
 	]);
 	public static readonly chipNoiseLength: number = 1 << 15; // 32768
 	public static readonly spectrumBasePitch: number = 24;

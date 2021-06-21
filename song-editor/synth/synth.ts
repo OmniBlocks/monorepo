@@ -1419,6 +1419,8 @@ export class Song {
     private static readonly _latestBeepboxVersion: number = 8;
     private static readonly _oldestJummBoxVersion: number = 1;
     private static readonly _latestJummBoxVersion: number = 4;
+    private static readonly _oldestGoldBoxVersion: number = 1;
+    private static readonly _latestGoldBoxVersion: number = 2;
     // One-character variant detection at the start of URL to distinguish variants such as JummBox.
     private static readonly _variant = 0x6A; //"j" ~ jummbox
 
@@ -2208,12 +2210,16 @@ export class Song {
         if (variantTest == 0x6A) { //"j"
             variant = "jummbox";
             charIndex++;
+        } else if (variantTest == 0x67) { //"g"
+            variant = "goldbox";
+            charIndex++;
         }
 
         const version: number = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
 
         if (variant == "beepbox" && (version == -1 || version > Song._latestBeepboxVersion || version < Song._oldestBeepboxVersion)) return;
         if (variant == "jummbox" && (version == -1 || version > Song._latestJummBoxVersion || version < Song._oldestJummBoxVersion)) return;
+        if (variant == "goldbox" && (version == -1 || version > Song._latestGoldBoxVersion || version < Song._oldestGoldBoxVersion)) return;
 
         const beforeTwo: boolean = version < 2;
         const beforeThree: boolean = version < 3;

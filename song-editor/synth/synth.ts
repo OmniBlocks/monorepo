@@ -584,6 +584,8 @@ export class Instrument {
     public pulseEnvelope: number = 1;
     public algorithm: number = 0;
     public feedbackType: number = 0;
+    public algorithm6Op: number = 0;
+    public feedbackType6Op: number = 0;
     public feedbackAmplitude: number = 0;
     public feedbackEnvelope: number = 1;
     public LFOtime: number = 0;
@@ -613,7 +615,7 @@ export class Instrument {
         }
 
         this.spectrumWave = new SpectrumWave(isNoiseChannel);
-        for (let i: number = 0; i < Config.operatorCount; i++) {
+        for (let i: number = 0; i < Config.operatorCount+2; i++) {//hopefully won't break everything
             this.operators[i] = new Operator(i);
         }
         for (let i: number = 0; i < Config.drumCount; i++) {
@@ -701,6 +703,22 @@ export class Instrument {
                 this.customChipWaveIntegral[64] = 0.0;
                 break;
             case InstrumentType.fm:
+                this.transition = 1;
+                this.vibrato = 0;
+                this.effects = 1;
+                this.chord = 3;
+                this.filterCutoff = 10;
+                this.filterResonance = 0;
+                this.filterEnvelope = 1;
+                this.algorithm = 0;
+                this.feedbackType = 0;
+                this.feedbackAmplitude = 0;
+                this.feedbackEnvelope = Config.envelopes.dictionary["steady"].index;
+                for (let i: number = 0; i < this.operators.length; i++) {
+                    this.operators[i].reset(i);
+                }
+                break;
+            case InstrumentType.fm6op:
                 this.transition = 1;
                 this.vibrato = 0;
                 this.effects = 1;
@@ -883,7 +901,7 @@ export class Instrument {
             for (let i: number = 0; i < Config.harmonicsControlPoints; i++) {
                 instrumentObject["harmonics"][i] = Math.round(100 * this.harmonicsWave.harmonics[i] / Config.harmonicsMax);
             }
-        } else if (this.type == InstrumentType.fm) {
+        } else if (this.type == InstrumentType.fm || this.type == InstrumentType.fm6op) {
             const operatorArray: Object[] = [];
             for (const operator of this.operators) {
                 operatorArray.push({
@@ -1128,7 +1146,7 @@ export class Instrument {
                 this.interval = 2;
                 this.chord = 3;
             }
-        } else if (this.type == InstrumentType.fm) {
+        } else if (this.type == InstrumentType.fm || this.type == InstrumentType.fm6op) {
             if (instrumentObject["vibrato"] != undefined) {
                 this.vibrato = Config.vibratos.findIndex(vibrato => vibrato.name == instrumentObject["vibrato"]);
                 if (this.vibrato == -1) this.vibrato = Config.vibratos.length; //custom
@@ -1402,6 +1420,8 @@ export enum ModSetting {
     mstPanDelay = 21,
     mstResetArpeggio = 22,
     mstMaxValue = 23,
+    mstFMSlider5 = 24,
+    mstFMSlider6 = 25,
 }
 
 export class Channel {
@@ -1477,6 +1497,8 @@ export class Song {
         [ModSetting.mstPanDelay, 20],
         [ModSetting.mstResetArpeggio, 1],
         [ModSetting.mstMaxValue, 6],
+        [ModSetting.mstFMSlider5, 15],
+        [ModSetting.mstFMSlider6, 15],
     ]
     );
 
@@ -1506,6 +1528,8 @@ export class Song {
         [ModSetting.mstPanDelay, 10],
         [ModSetting.mstResetArpeggio, 1],
         [ModSetting.mstMaxValue, 6],
+        [ModSetting.mstFMSlider5, 15],
+        [ModSetting.mstFMSlider6, 15],
     ])
 
     constructor(string?: string) {
@@ -1540,6 +1564,8 @@ export class Song {
             case ModSetting.mstFMSlider2:
             case ModSetting.mstFMSlider3:
             case ModSetting.mstFMSlider4:
+            case ModSetting.mstFMSlider5:
+            case ModSetting.mstFMSlider6:
             case ModSetting.mstFMFeedback:
             case ModSetting.mstPulseWidth:
             case ModSetting.mstVibratoDepth:
@@ -1591,6 +1617,8 @@ export class Song {
             case ModSetting.mstFMSlider2:
             case ModSetting.mstFMSlider3:
             case ModSetting.mstFMSlider4:
+            case ModSetting.mstFMSlider5:
+            case ModSetting.mstFMSlider6:
             case ModSetting.mstFMFeedback:
             case ModSetting.mstPulseWidth:
             case ModSetting.mstVibratoDepth:
@@ -1831,7 +1859,7 @@ export class Song {
                         buffer.push(base64IntToCharCode[+instrument.fastTwoNoteArp]); // Two note arp setting piggybacks on this
                     }
                     buffer.push(SongTagCode.interval, base64IntToCharCode[instrument.interval]);
-                } else if (instrument.type == InstrumentType.fm) {
+                } else if (instrument.type == InstrumentType.fm || instrument.type == InstrumentType.fm6op) {
                     buffer.push(SongTagCode.vibrato, base64IntToCharCode[instrument.vibrato]);
                     // Custom vibrato settings
                     if (instrument.vibrato == Config.vibratos.length) {
@@ -1852,19 +1880,19 @@ export class Song {
                     buffer.push(SongTagCode.feedbackEnvelope, base64IntToCharCode[instrument.feedbackEnvelope]);
 
                     buffer.push(SongTagCode.operatorFrequencies);
-                    for (let o: number = 0; o < Config.operatorCount; o++) {
+                    for (let o: number = 0; o < (instrument.type == InstrumentType.fm6op?6:Config.operatorCount); o++) {
                         buffer.push(base64IntToCharCode[instrument.operators[o].frequency]);
                     }
                     buffer.push(SongTagCode.operatorAmplitudes);
-                    for (let o: number = 0; o < Config.operatorCount; o++) {
+                    for (let o: number = 0; o < (instrument.type == InstrumentType.fm6op ? 6 : Config.operatorCount); o++) {
                         buffer.push(base64IntToCharCode[instrument.operators[o].amplitude]);
                     }
                     buffer.push(SongTagCode.operatorEnvelopes);
-                    for (let o: number = 0; o < Config.operatorCount; o++) {
+                    for (let o: number = 0; o < (instrument.type == InstrumentType.fm6op ? 6 : Config.operatorCount); o++) {
                         buffer.push(base64IntToCharCode[instrument.operators[o].envelope]);
                     }
                     buffer.push(SongTagCode.operatorWaves);
-                    for (let o: number = 0; o < Config.operatorCount; o++) {
+                    for (let o: number = 0; o < (instrument.type == InstrumentType.fm6op ? 6 : Config.operatorCount); o++) {
                         buffer.push(base64IntToCharCode[instrument.operators[o].waveform]);
                     }
                 } else if (instrument.type == InstrumentType.customChipWave) {
@@ -2783,30 +2811,34 @@ export class Song {
                 }
             } break;
             case SongTagCode.operatorFrequencies: {
-                for (let o: number = 0; o < Config.operatorCount; o++) {
-                    this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].operators[o].frequency = clamp(0, Config.operatorFrequencies.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                const instrument: Instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
+                for (let o: number = 0; o < (instrument.type == InstrumentType.fm6op ? 6 : Config.operatorCount); o++) {
+                    instrument.operators[o].frequency = clamp(0, Config.operatorFrequencies.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                 }
             } break;
             case SongTagCode.operatorAmplitudes: {
-                for (let o: number = 0; o < Config.operatorCount; o++) {
-                    this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].operators[o].amplitude = clamp(0, Config.operatorAmplitudeMax + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                const instrument: Instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
+                for (let o: number = 0; o < (instrument.type == InstrumentType.fm6op ? 6 : Config.operatorCount); o++) {
+                    instrument.operators[o].amplitude = clamp(0, Config.operatorAmplitudeMax + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                 }
             } break;
             case SongTagCode.operatorEnvelopes: {
+                const instrument: Instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                 if ((beforeTwo && variant == "goldbox") || variant != "goldbox") {
                     const pregoldToEnvelope: number[] = [0, 1, 2, 4, 5, 6, 8, 9, 10, 12, 13, 14, 16, 17, 18, 19, 20, 21, 23, 24, 25, 27, 28, 29, 32, 33, 34, 31, 11];
-                    for (let o: number = 0; o < Config.operatorCount; o++) {
-                        this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].operators[o].envelope = pregoldToEnvelope[clamp(0, pregoldToEnvelope.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)])];
+                    for (let o: number = 0; o < (instrument.type == InstrumentType.fm6op ? 6 : Config.operatorCount); o++) {
+                        instrument.operators[o].envelope = pregoldToEnvelope[clamp(0, pregoldToEnvelope.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)])];
                     }
                 } else {
-                    for (let o: number = 0; o < Config.operatorCount; o++) {
-                        this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].operators[o].envelope = clamp(0, Config.envelopes.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                    for (let o: number = 0; o < (instrument.type == InstrumentType.fm6op ? 6 : Config.operatorCount); o++) {
+                        instrument.operators[o].envelope = clamp(0, Config.envelopes.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                     }
                 }
             } break;
             case SongTagCode.operatorWaves: {
-                for (let o: number = 0; o < Config.operatorCount; o++) {
-                    this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].operators[o].waveform = clamp(0, Config.operatorWaves.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                const instrument: Instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
+                for (let o: number = 0; o < (instrument.type == InstrumentType.fm6op?6: Config.operatorCount); o++) {
+                    instrument.operators[o].waveform = clamp(0, Config.operatorWaves.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                 }
             } break;
             case SongTagCode.spectrum: {
@@ -3494,7 +3526,7 @@ export class Song {
 
 class Tone {
     public instrument: Instrument;
-    public readonly pitches: number[] = [0, 0, 0, 0];
+    public readonly pitches: number[] = [0, 0, 0, 0, 0, 0];
     public pitchCount: number = 0;
     public chordSize: number = 0;
     public drumsetPitch: number = 0;
@@ -3553,7 +3585,7 @@ class Tone {
     }
 
     public reset(): void {
-        for (let i: number = 0; i < Config.operatorCount; i++) {
+        for (let i: number = 0; i < Config.operatorCount+2; i++) {
             this.phases[i] = 0.0;
             this.feedbackOutputs[i] = 0.0;
         }
@@ -4016,6 +4048,8 @@ export class Synth {
             case ModSetting.mstFMSlider2:
             case ModSetting.mstFMSlider3:
             case ModSetting.mstFMSlider4:
+            case ModSetting.mstFMSlider5:
+            case ModSetting.mstFMSlider6:
             case ModSetting.mstFMFeedback:
             case ModSetting.mstVibratoDepth:
             case ModSetting.mstVibratoSpeed:
@@ -5358,7 +5392,7 @@ export class Synth {
             baseVolume = 0.19;
             volumeReferencePitch = basePitch;
             pitchDamping = Config.chipNoises[instrument.chipNoise].isSoft ? 24.0 : 60.0;
-        } else if (instrument.type == InstrumentType.fm) {
+        } else if (instrument.type == InstrumentType.fm || instrument.type == InstrumentType.fm6op) {
             basePitch = Config.keys[song.key].basePitch;
             baseVolume = 0.03;
             volumeReferencePitch = 16;
@@ -5387,7 +5421,7 @@ export class Synth {
             throw new Error("Unknown instrument type in computeTone.");
         }
 
-        for (let i: number = 0; i < Config.operatorCount; i++) {
+        for (let i: number = 0; i < Config.operatorCount+2; i++) {
             tone.phaseDeltas[i] = 0.0;
             tone.volumeStarts[i] = 0.0;
             tone.volumeDeltas[i] = 0.0;
@@ -5560,7 +5594,7 @@ export class Synth {
         const sampleTime: number = 1.0 / synth.samplesPerSecond;
         tone.active = true;
 
-        if (instrument.type == InstrumentType.chip || instrument.type == InstrumentType.fm || instrument.type == InstrumentType.harmonics || instrument.type == InstrumentType.pwm || instrument.type == InstrumentType.customChipWave || instrument.type == InstrumentType.spectrum) {
+        if (instrument.type == InstrumentType.chip || instrument.type == InstrumentType.fm || instrument.type == InstrumentType.fm6op || instrument.type == InstrumentType.harmonics || instrument.type == InstrumentType.pwm || instrument.type == InstrumentType.customChipWave || instrument.type == InstrumentType.spectrum) {
 
             const lfoEffectStart: number = Synth.getLFOAmplitude(instrument, secondsPerPart * instrument.LFOtime);
             const lfoEffectEnd: number = Synth.getLFOAmplitude(instrument, secondsPerPart * instrument.nextLFOtime);
@@ -5709,7 +5743,7 @@ export class Synth {
             tone.reset();
         }
 
-        if (instrument.type == InstrumentType.fm) {
+        if (instrument.type == InstrumentType.fm || instrument.type == InstrumentType.fm6op) {
             // phase modulation!
 
             let sineVolumeBoostStart: number = 1.0;
@@ -5735,10 +5769,10 @@ export class Synth {
                 detuneEnd += synth.getModValue(ModSetting.mstSongDetune, true, null, null, true) / 25;
             }
 
-            const carrierCount: number = Config.algorithms[instrument.algorithm].carrierCount;
-            for (let i: number = 0; i < Config.operatorCount; i++) {
+            const carrierCount: number = (instrument.type == InstrumentType.fm6op ? Config.algorithms6Op[instrument.algorithm].carrierCount : Config.algorithms[instrument.algorithm].carrierCount);
+            for (let i: number = 0; i < (instrument.type == InstrumentType.fm6op?6: Config.operatorCount); i++) {
 
-                const associatedCarrierIndex: number = Config.algorithms[instrument.algorithm].associatedCarrier[i] - 1;
+                const associatedCarrierIndex: number = (instrument.type == InstrumentType.fm6op ? Config.algorithms6Op[instrument.algorithm].associatedCarrier[i]-1:Config.algorithms[instrument.algorithm].associatedCarrier[i] - 1);
                 const pitch: number = tone.pitches[!chord.harmonizes ? 0 : ((i < tone.pitchCount) ? i : ((associatedCarrierIndex < tone.pitchCount) ? associatedCarrierIndex : 0))];
                 const freqMult = Config.operatorFrequencies[instrument.operators[i].frequency].mult;
                 const interval = Config.operatorCarrierInterval[associatedCarrierIndex] + arpeggioInterval;
@@ -5749,9 +5783,20 @@ export class Synth {
 
                 let amplitudeStart: number = instrument.operators[i].amplitude;
                 let amplitudeEnd: number = instrument.operators[i].amplitude;
-                if (synth.isModActive(ModSetting.mstFMSlider1 + i, false, channel, instrumentIdx)) {
-                    amplitudeStart *= synth.getModValue(ModSetting.mstFMSlider1 + i, false, channel, instrumentIdx, false) / 15.0;
-                    amplitudeEnd *= synth.getModValue(ModSetting.mstFMSlider1 + i, false, channel, instrumentIdx, true) / 15.0;
+                if (instrument.type == InstrumentType.fm) {
+                    if (synth.isModActive(ModSetting.mstFMSlider1 + i, false, channel, instrumentIdx)) {
+                        amplitudeStart *= synth.getModValue(ModSetting.mstFMSlider1 + i, false, channel, instrumentIdx, false) / 15.0;
+                        amplitudeEnd *= synth.getModValue(ModSetting.mstFMSlider1 + i, false, channel, instrumentIdx, true) / 15.0;
+                    }
+                }else {
+                    if (synth.isModActive(ModSetting.mstFMSlider1 + i, false, channel, instrumentIdx) && i < Config.operatorCount) {
+                        amplitudeStart *= synth.getModValue(ModSetting.mstFMSlider1 + i, false, channel, instrumentIdx, false) / 15.0;
+                        amplitudeEnd *= synth.getModValue(ModSetting.mstFMSlider1 + i, false, channel, instrumentIdx, true) / 15.0;
+                    }
+                    if (synth.isModActive(ModSetting.mstFMSlider5 + (i-4), false, channel, instrumentIdx)) {
+                        amplitudeStart *= synth.getModValue(ModSetting.mstFMSlider5 + (i - 4), false, channel, instrumentIdx, false) / 15.0;
+                        amplitudeEnd *= synth.getModValue(ModSetting.mstFMSlider5 + (i - 4), false, channel, instrumentIdx, true) / 15.0;
+                    }
                 }
 
                 const amplitudeCurveStart: number = Synth.operatorAmplitudeCurve(amplitudeStart);
@@ -5941,6 +5986,7 @@ export class Synth {
     }
 
     private static readonly fmSynthFunctionCache: Dictionary<Function> = {};
+    private static readonly fm6SynthFunctionCache: Dictionary<Function> = {};
 
     private static getInstrumentSynthFunction(instrument: Instrument): Function {
         if (instrument.type == InstrumentType.fm) {
@@ -6009,7 +6055,57 @@ export class Synth {
             return Synth.drumsetSynth;
         } else if (instrument.type == InstrumentType.mod) {
             return Synth.modSynth;
-        } else {
+        } else if (instrument.type == InstrumentType.fm6op) {
+            const fingerprint: string = instrument.algorithm + "_" + instrument.feedbackType;
+            if (Synth.fm6SynthFunctionCache[fingerprint] == undefined) {
+                const synthSource: string[] = [];
+
+                for (const line of Synth.fmSourceTemplate) {
+                    if (line.indexOf("// CARRIER OUTPUTS") != -1) {
+                        const outputs: string[] = [];
+                        for (let j: number = 0; j < Config.algorithms6Op[instrument.algorithm].carrierCount; j++) {
+                            outputs.push("operator" + j + "Scaled");
+                        }
+                        synthSource.push(line.replace("/*operator#Scaled*/", outputs.join(" + ")));
+                    } else if (line.indexOf("// INSERT OPERATOR COMPUTATION HERE") != -1) {
+                        for (let j: number = Config.operatorCount+2 - 1; j >= 0; j--) {
+                            for (const operatorLine of Synth.operatorSourceTemplate) {
+                                if (operatorLine.indexOf("/* + operator@Scaled*/") != -1) {
+                                    let modulators = "";
+                                    for (const modulatorNumber of Config.algorithms6Op[instrument.algorithm].modulatedBy[j]) {
+                                        modulators += " + operator" + (modulatorNumber - 1) + "Scaled";
+                                    }
+
+                                    const feedbackIndices: ReadonlyArray<number> = Config.feedbacks6Op[instrument.feedbackType].indices[j];
+                                    if (feedbackIndices.length > 0) {
+                                        modulators += " + feedbackMult * (";
+                                        const feedbacks: string[] = [];
+                                        for (const modulatorNumber of feedbackIndices) {
+                                            feedbacks.push("operator" + (modulatorNumber - 1) + "Output");
+                                        }
+                                        modulators += feedbacks.join(" + ") + ")";
+                                    }
+                                    synthSource.push(operatorLine.replace(/\#/g, j + "").replace("/* + operator@Scaled*/", modulators));
+                                } else {
+                                    synthSource.push(operatorLine.replace(/\#/g, j + ""));
+                                }
+                            }
+                        }
+                    } else if (line.indexOf("#") != -1) {
+                        for (let j = 0; j < Config.operatorCount+2; j++) {
+                            synthSource.push(line.replace(/\#/g, j + ""));
+                        }
+                    } else {
+                        synthSource.push(line);
+                    }
+                }
+
+                //console.log(synthSource.join("\n"));
+
+                Synth.fm6SynthFunctionCache[fingerprint] = new Function("synth", "data", "stereoBufferIndex", "stereoBufferLength", "runLength", "tone", "instrument", synthSource.join("\n"));
+            }
+            return Synth.fm6SynthFunctionCache[fingerprint];
+        }else{
             throw new Error("Unrecognized instrument type: " + instrument.type);
         }
     }

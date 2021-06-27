@@ -6,7 +6,7 @@ import { Config, InstrumentType } from "../synth/SynthConfig";
 import { BarScrollBar } from "./BarScrollBar";
 import { BeatsPerBarPrompt } from "./BeatsPerBarPrompt";
 import { Change, ChangeGroup } from "./Change";
-import { ChangeAlgorithm, ChangeChannelBar, ChangeChipWave, ChangeChannelOrder, ChangeChord, ChangeCustomWave, ChangeDetectKey, ChangeDetune, ChangeDrumsetEnvelope, ChangeEffects, ChangeFeedbackAmplitude, ChangeFeedbackEnvelope, ChangeFeedbackType, ChangeFilterCutoff, ChangeFilterEnvelope, ChangeFilterResonance, ChangeInterval, ChangeKey, ChangeNoiseWave, ChangeOperatorAmplitude, ChangeOperatorEnvelope, ChangeOperatorFrequency, ChangePan, ChangePasteInstrument, ChangePatternNumbers, ChangePatternsPerChannel, ChangePreset, ChangePulseEnvelope, ChangePulseWidth, ChangeRandomGeneratedInstrument, ChangeReverb, ChangeRhythm, ChangeScale, ChangeSong, ChangeSongTitle, ChangeTempo, ChangeTransition, ChangeVibrato, ChangeVibratoType, ChangeVolume, ChangeVibratoDepth, ChangeVibratoSpeed, ChangeVibratoDelay, ChangePanDelay, ChangeArpeggioSpeed, pickRandomPresetValue, ChangeFastTwoNoteArp, ChangeClicklessTransition, ChangeTieNoteTransition, ChangePatternSelection, ChangeOperatorWaveform } from "./changes";
+import { ChangeAlgorithm, ChangeChannelBar, ChangeChipWave, ChangeChannelOrder, ChangeChord, ChangeCustomWave, ChangeDetectKey, ChangeDetune, ChangeDrumsetEnvelope, ChangeEffects, ChangeFeedbackAmplitude, ChangeFeedbackEnvelope, ChangeFeedbackType, ChangeFilterCutoff, ChangeFilterEnvelope, ChangeFilterResonance, ChangeInterval, ChangeKey, ChangeNoiseWave, ChangeOperatorAmplitude, ChangeOperatorEnvelope, ChangeOperatorFrequency, ChangePan, ChangePasteInstrument, ChangePatternNumbers, ChangePatternsPerChannel, ChangePreset, ChangePulseEnvelope, ChangePulseWidth, ChangeRandomGeneratedInstrument, ChangeReverb, ChangeRhythm, ChangeScale, ChangeSong, ChangeSongTitle, ChangeTempo, ChangeTransition, ChangeVibrato, ChangeVibratoType, ChangeVolume, ChangeVibratoDepth, ChangeVibratoSpeed, ChangeVibratoDelay, ChangePanDelay, ChangeArpeggioSpeed, pickRandomPresetValue, ChangeFastTwoNoteArp, ChangeClicklessTransition, ChangeTieNoteTransition, ChangePatternSelection, ChangeOperatorWaveform, Change6OpFeedbackType, Change6OpAlgorithm } from "./changes";
 import { ChannelSettingsPrompt } from "./ChannelSettingsPrompt";
 import { ColorConfig } from "./ColorConfig";
 import { CustomChipPrompt } from "./CustomChipPrompt";
@@ -70,7 +70,8 @@ function buildPresetOptions(isNoise: boolean, idSet: string): HTMLSelectElement 
 		menu.appendChild(option({ value: InstrumentType.pwm }, EditorConfig.valueToPreset(InstrumentType.pwm)!.name));
 		menu.appendChild(option({ value: InstrumentType.harmonics }, EditorConfig.valueToPreset(InstrumentType.harmonics)!.name));
 		menu.appendChild(option({ value: InstrumentType.spectrum }, EditorConfig.valueToPreset(InstrumentType.spectrum)!.name));
-		menu.appendChild(option({ value: InstrumentType.fm }, EditorConfig.valueToPreset(InstrumentType.fm)!.name));
+        menu.appendChild(option({ value: InstrumentType.fm }, EditorConfig.valueToPreset(InstrumentType.fm)!.name));
+        menu.appendChild(option({ value: InstrumentType.fm6op }, EditorConfig.valueToPreset(InstrumentType.fm6op)!.name));
 		menu.appendChild(option({ value: InstrumentType.customChipWave }, EditorConfig.valueToPreset(InstrumentType.customChipWave)!.name));
 	}
 
@@ -453,7 +454,7 @@ export class SongEditor {
 	private readonly _vibratoTypeSelectRow: HTMLElement = div({ class: "selectRow" }, span({ class: "tip", style: "margin-left:10px;", onclick: () => this._openPrompt("vibratoType") }, "Type:"), div({ class: "selectContainer", style: "width: 61.5%;" }, this._vibratoTypeSelect));
 	private readonly _vibratoDropdownGroup: HTMLElement = div({ class: "editor-controls" }, this._vibratoDepthRow, this._vibratoSpeedRow, this._vibratoDelayRow, this._vibratoTypeSelectRow);
 	private readonly _phaseModGroup: HTMLElement = div({ class: "editor-controls" });
-	private readonly _feedbackTypeSelect: HTMLSelectElement = buildOptions(select(), Config.feedbacks.map(feedback => feedback.name));
+    private readonly _feedbackTypeSelect: HTMLSelectElement = buildOptions(select(), Config.feedbacks.map(feedback => feedback.name));
 	private readonly _feedbackRow1: HTMLDivElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("feedbackType") }, "Feedback:"), div({ class: "selectContainer" }, this._feedbackTypeSelect));
 	private readonly _spectrumEditor: SpectrumEditor = new SpectrumEditor(this._doc, null);
 	private readonly _spectrumRow: HTMLElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("spectrum") }, "Spectrum:"), this._spectrumEditor.container);
@@ -739,7 +740,7 @@ export class SongEditor {
 			div({ style: "width: 4em; margin: 0;", class: "tip", onclick: () => this._openPrompt("operatorVolume") }, "Volume:"),
 			div({ style: "width: 5em; margin-left: .3em;", class: "tip", onclick: () => this._openPrompt("operatorEnvelope") }, "Envelope:"),
 		));
-		for (let i: number = 0; i < Config.operatorCount; i++) {
+		for (let i: number = 0; i < Config.operatorCount+2; i++) {
 			const operatorIndex: number = i;
 			const operatorNumber: HTMLDivElement = div({ style: "margin-right: .1em; color: " + ColorConfig.secondaryText + ";" }, i + 1 + ".");
 			const frequencySelect: HTMLSelectElement = buildOptions(select({ style: "width: 100%;", title: "Frequency" }), Config.operatorFrequencies.map(freq => freq.name));
@@ -1090,7 +1091,11 @@ export class SongEditor {
 			case ModSetting.mstFMSlider3:
 				return this._operatorAmplitudeSliders[2];
 			case ModSetting.mstFMSlider4:
-				return this._operatorAmplitudeSliders[3];
+                return this._operatorAmplitudeSliders[3];
+            case ModSetting.mstFMSlider5:
+                return this._operatorAmplitudeSliders[4];
+            case ModSetting.mstFMSlider6:
+                return this._operatorAmplitudeSliders[5];
 			case ModSetting.mstFMFeedback:
 				return this._feedbackAmplitudeSlider;
 			case ModSetting.mstPulseWidth:
@@ -1463,7 +1468,7 @@ export class SongEditor {
 				}
 
 
-				if (instrument.type == InstrumentType.fm) {
+                if (instrument.type == InstrumentType.fm || instrument.type == InstrumentType.fm6op) {
 					this._algorithmSelectRow.style.display = "";
 					this._phaseModGroup.style.display = "";
 					this._feedbackRow1.style.display = "";
@@ -1474,8 +1479,9 @@ export class SongEditor {
 					this._feedbackAmplitudeSlider.updateValue(instrument.feedbackAmplitude);
 					setSelectedValue(this._feedbackEnvelopeSelect, instrument.feedbackEnvelope);
 					this._feedbackEnvelopeSelect.parentElement!.style.color = (instrument.feedbackAmplitude > 0) ? "" : ColorConfig.secondaryText;
-					for (let i: number = 0; i < Config.operatorCount; i++) {
-						const isCarrier: boolean = (i < Config.algorithms[instrument.algorithm].carrierCount);
+                    for (let i: number = 0; i < (Config.operatorCount+2); i++) {
+                        const isCarrier: boolean = (i < Config.algorithms[instrument.algorithm].carrierCount);
+                        this._operatorRows[i].style.display = "";
 						this._operatorRows[i].style.color = isCarrier ? ColorConfig.primaryText : "";
 						setSelectedValue(this._operatorFrequencySelects[i], instrument.operators[i].frequency);
 						this._operatorAmplitudeSliders[i].updateValue(instrument.operators[i].amplitude);
@@ -1488,6 +1494,11 @@ export class SongEditor {
 						this._operatorEnvelopeSelects[i].title = operatorName + " Envelope";
                         this._operatorEnvelopeSelects[i].parentElement!.style.color = (instrument.operators[i].amplitude > 0) ? "" : ColorConfig.secondaryText;
                         this._operatorDropdownGroups[i].style.display = (this._openOperatorDropdowns[i] ? "" : "none");
+
+                        if (instrument.type != InstrumentType.fm6op && i >= Config.operatorCount) {
+                            this._operatorRows[i].style.display = "none";
+                            this._operatorDropdownGroups[i].style.display = "none";
+                        }
 					}
 				}
 				else {
@@ -1509,7 +1520,7 @@ export class SongEditor {
 				} else {
 					this._vibratoSelectRow.style.display = "";
 					// Temporarily hide interval select, until I get them working for these instrument types!
-					if (instrument.type == InstrumentType.spectrum || instrument.type == InstrumentType.fm || instrument.type == InstrumentType.pwm) {
+                    if (instrument.type == InstrumentType.spectrum || instrument.type == InstrumentType.fm6op || instrument.type == InstrumentType.fm || instrument.type == InstrumentType.pwm) {
 						this._intervalSelectRow.style.display = "none";
 					}
 					else {
@@ -1759,7 +1770,7 @@ export class SongEditor {
 						settingList.push("detune");
 						settingList.push("arpeggio speed");
 						settingList.push("reset arpeggio");
-						if (tgtInstrument.type == InstrumentType.chip || tgtInstrument.type == InstrumentType.fm || tgtInstrument.type == InstrumentType.harmonics || tgtInstrument.type == InstrumentType.pwm || tgtInstrument.type == InstrumentType.customChipWave) {
+						if (tgtInstrument.type == InstrumentType.chip || tgtInstrument.type == InstrumentType.fm || tgtInstrument.type == InstrumentType.harmonics || tgtInstrument.type == InstrumentType.pwm || tgtInstrument.type == InstrumentType.customChipWave || tgtInstrument.type == InstrumentType.fm6op) {
 							settingList.push("vibrato depth");
 							settingList.push("vibrato speed");
 							settingList.push("vibrato delay");
@@ -1767,11 +1778,15 @@ export class SongEditor {
 						if (tgtInstrument.type == InstrumentType.pwm) {
 							settingList.push("pulse width");
 						}
-						else if (tgtInstrument.type == InstrumentType.fm) {
+                        else if (tgtInstrument.type == InstrumentType.fm || tgtInstrument.type == InstrumentType.fm6op) {
 							settingList.push("fm slider 1");
 							settingList.push("fm slider 2");
 							settingList.push("fm slider 3");
-							settingList.push("fm slider 4");
+                            settingList.push("fm slider 4");
+                            if (tgtInstrument.type == InstrumentType.fm6op) {
+                                settingList.push("fm slider 5");
+                                settingList.push("fm slider 6");
+                            }
 							settingList.push("fm feedback");
 						}
 					}
@@ -1890,31 +1905,43 @@ export class SongEditor {
 								needReset = true;
 							break;
 						case ModSetting.mstFMSlider1:
-							if ((modStatus == ModStatus.msForPitch || modStatus == ModStatus.msForNoise) && tgtInstrument.type == InstrumentType.fm)
+                            if ((modStatus == ModStatus.msForPitch || modStatus == ModStatus.msForNoise) && (tgtInstrument.type == InstrumentType.fm || tgtInstrument.type == InstrumentType.fm6op))
 								setIndex = 12;
 							else
 								needReset = true;
 							break;
 						case ModSetting.mstFMSlider2:
-							if ((modStatus == ModStatus.msForPitch || modStatus == ModStatus.msForNoise) && tgtInstrument.type == InstrumentType.fm)
+                            if ((modStatus == ModStatus.msForPitch || modStatus == ModStatus.msForNoise) && (tgtInstrument.type == InstrumentType.fm || tgtInstrument.type == InstrumentType.fm6op))
 								setIndex = 13;
 							else
 								needReset = true;
 							break;
 						case ModSetting.mstFMSlider3:
-							if ((modStatus == ModStatus.msForPitch || modStatus == ModStatus.msForNoise) && tgtInstrument.type == InstrumentType.fm)
+                            if ((modStatus == ModStatus.msForPitch || modStatus == ModStatus.msForNoise) && (tgtInstrument.type == InstrumentType.fm || tgtInstrument.type == InstrumentType.fm6op))
 								setIndex = 14;
 							else
 								needReset = true;
 							break;
 						case ModSetting.mstFMSlider4:
-							if ((modStatus == ModStatus.msForPitch || modStatus == ModStatus.msForNoise) && tgtInstrument.type == InstrumentType.fm)
+                            if ((modStatus == ModStatus.msForPitch || modStatus == ModStatus.msForNoise) && (tgtInstrument.type == InstrumentType.fm || tgtInstrument.type == InstrumentType.fm6op))
 								setIndex = 15;
 							else
 								needReset = true;
-							break;
+                            break;
+                        case ModSetting.mstFMSlider5:
+                            if ((modStatus == ModStatus.msForPitch || modStatus == ModStatus.msForNoise) && tgtInstrument.type == InstrumentType.fm6op)
+                                setIndex = 15;
+                            else
+                                needReset = true;
+                            break;
+                        case ModSetting.mstFMSlider6:
+                            if ((modStatus == ModStatus.msForPitch || modStatus == ModStatus.msForNoise) &&  tgtInstrument.type == InstrumentType.fm6op)
+                                setIndex = 15;
+                            else
+                                needReset = true;
+                            break;
 						case ModSetting.mstFMFeedback:
-							if ((modStatus == ModStatus.msForPitch || modStatus == ModStatus.msForNoise) && tgtInstrument.type == InstrumentType.fm)
+                            if ((modStatus == ModStatus.msForPitch || modStatus == ModStatus.msForNoise) && (tgtInstrument.type == InstrumentType.fm || tgtInstrument.type == InstrumentType.fm6op))
 								setIndex = 16;
 							else
 								needReset = true;
@@ -2534,7 +2561,7 @@ export class SongEditor {
 		}
 
 		if (this._doc.song.outVolumeCap != this.lastOutVolumeCap) {
-			this.lastOutVolumeCap = this._doc.song.outVolumeCap;
+            this.lastOutVolumeCap = this._doc.song.outVolumeCap;
 			this._animateVolume(this._doc.song.outVolumeCap, this.outVolumeHistoricCap);
 		}
 	}
@@ -2668,6 +2695,13 @@ export class SongEditor {
 	private _whenSetFeedbackEnvelope = (): void => {
 		this._doc.record(new ChangeFeedbackEnvelope(this._doc, this._feedbackEnvelopeSelect.selectedIndex));
 	}
+
+    private _whenSet6OpFeedbackType = (): void => {
+        this._doc.record(new Change6OpFeedbackType(this._doc, this._feedbackTypeSelect.selectedIndex));
+    }
+    private _whenSet6OpAlgorithm = (): void => {
+        this._doc.record(new Change6OpAlgorithm(this._doc, this._algorithmSelect.selectedIndex));
+    }
 
 	private _whenSetAlgorithm = (): void => {
 		this._doc.record(new ChangeAlgorithm(this._doc, this._algorithmSelect.selectedIndex));

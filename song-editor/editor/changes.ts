@@ -374,9 +374,9 @@ export class ChangePreset extends Change {
 		const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
 		const oldValue: number = instrument.preset;
 		if (oldValue != newValue) {
-			const preset: Preset | null = EditorConfig.valueToPreset(newValue);
+            const preset: Preset | null = EditorConfig.valueToPreset(newValue);
 			if (preset != null) {
-				if (preset.customType != undefined) {
+                if (preset.customType != undefined) {
 					instrument.type = preset.customType;
 					if (!Config.instrumentTypeHasSpecialInterval[instrument.type] && Config.chords[instrument.chord].isCustomInterval) {
 						instrument.chord = 0;
@@ -1416,14 +1416,42 @@ export class ChangeFeedbackType extends Change {
 	constructor(doc: SongDocument, newValue: number) {
 		super();
 		const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
-		const oldValue: number = instrument.feedbackType;
+        const oldValue: number = instrument.feedbackType6Op;
 		if (oldValue != newValue) {
-			instrument.feedbackType = newValue;
+            instrument.feedbackType6Op = newValue;
 			instrument.preset = instrument.type;
 			doc.notifier.changed();
 			this._didSomething();
 		}
 	}
+}
+
+export class Change6OpAlgorithm extends Change {
+    constructor(doc: SongDocument, newValue: number) {
+        super();
+        const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+        const oldValue: number = instrument.algorithm6Op;
+        if (oldValue != newValue) {
+            instrument.algorithm6Op = newValue;
+            instrument.preset = instrument.type;
+            doc.notifier.changed();
+            this._didSomething();
+        }
+    }
+}
+
+export class Change6OpFeedbackType extends Change {
+    constructor(doc: SongDocument, newValue: number) {
+        super();
+        const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+        const oldValue: number = instrument.feedbackType;
+        if (oldValue != newValue) {
+            instrument.feedbackType = newValue;
+            instrument.preset = instrument.type;
+            doc.notifier.changed();
+            this._didSomething();
+        }
+    }
 }
 
 export class ChangeFeedbackEnvelope extends Change {

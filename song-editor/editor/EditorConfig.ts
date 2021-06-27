@@ -37,7 +37,9 @@ export class EditorConfig {
 				{ name: "drumset", customType: InstrumentType.drumset },
 				{ name: "harmonics", customType: InstrumentType.harmonics },
 				{ name: "pulse width", customType: InstrumentType.pwm },
-				{ name: "custom chip", customType: InstrumentType.customChipWave },
+                { name: "custom chip", customType: InstrumentType.customChipWave },
+                { name: "spacer, don't use", customType: InstrumentType.mod }, //as the name suggests this is just so things can be inserted after mod, but also don't make this selectable by adding it to the songeditor preset dropdown
+                { name: "Six Op FM", customType: InstrumentType.fm6op },
 			])
 		},
 		{

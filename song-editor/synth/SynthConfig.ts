@@ -54,7 +54,8 @@ export const enum InstrumentType {
 	harmonics = 5,
 	pwm = 6,
 	customChipWave = 7,
-	mod = 8,
+    mod = 8,
+    fm6op = 9,
 	length,
 }
 
@@ -222,8 +223,8 @@ export class Config {
 		{ name: "freehand", stepsPerBeat: 24, /*ticksPerArpeggio: 3, arpeggioPatterns: [[0], [0, 1], [0, 1, 2, 1], [0, 1, 2, 3]]*/ roundUpThresholds: null },
 	]);
 
-	public static readonly instrumentTypeNames: ReadonlyArray<string> = ["chip", "FM", "noise", "spectrum", "drumset", "harmonics", "PWM", "custom chip", "mod"];
-	public static readonly instrumentTypeHasSpecialInterval: ReadonlyArray<boolean> = [true, true, false, false, false, true, false, true];
+    public static readonly instrumentTypeNames: ReadonlyArray<string> = ["chip", "FM", "noise", "spectrum", "drumset", "harmonics", "PWM", "custom chip", "mod", "FM6op"];
+	public static readonly instrumentTypeHasSpecialInterval: ReadonlyArray<boolean> = [true, true, false, false, false, true, false, true, true, true];
 	public static readonly chipWaves: DictionaryArray<ChipWave> = toNameMap([
 		{ name: "rounded", volume: 0.94, samples: centerWave([0.0, 0.2, 0.4, 0.5, 0.6, 0.7, 0.8, 0.85, 0.9, 0.95, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.95, 0.9, 0.85, 0.8, 0.7, 0.6, 0.5, 0.4, 0.2, 0.0, -0.2, -0.4, -0.5, -0.6, -0.7, -0.8, -0.85, -0.9, -0.95, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -0.95, -0.9, -0.85, -0.8, -0.7, -0.6, -0.5, -0.4, -0.2]) },
 		{ name: "triangle", volume: 1.0, samples: centerWave([1.0 / 15.0, 3.0 / 15.0, 5.0 / 15.0, 7.0 / 15.0, 9.0 / 15.0, 11.0 / 15.0, 13.0 / 15.0, 15.0 / 15.0, 15.0 / 15.0, 13.0 / 15.0, 11.0 / 15.0, 9.0 / 15.0, 7.0 / 15.0, 5.0 / 15.0, 3.0 / 15.0, 1.0 / 15.0, -1.0 / 15.0, -3.0 / 15.0, -5.0 / 15.0, -7.0 / 15.0, -9.0 / 15.0, -11.0 / 15.0, -13.0 / 15.0, -15.0 / 15.0, -15.0 / 15.0, -13.0 / 15.0, -11.0 / 15.0, -9.0 / 15.0, -7.0 / 15.0, -5.0 / 15.0, -3.0 / 15.0, -1.0 / 15.0]) },
@@ -339,9 +340,50 @@ export class Config {
 		{ name: "(1 2 3)←4", carrierCount: 3, associatedCarrier: [1, 2, 3, 3], modulatedBy: [[4], [4], [4], []] },
         { name: "1 2 3 4", carrierCount: 4, associatedCarrier: [1, 2, 3, 4], modulatedBy: [[], [], [], []] },
         { name: "1←(2 3) 2←4", carrierCount: 2, associatedCarrier: [1, 2, 1, 2], modulatedBy: [[2, 3], [4], [], []] },
-        { name: "(1←( 2←( 3)←4", carrierCount: 3, associatedCarrier: [1, 2, 3, 3], modulatedBy: [[2, 3, 4], [3, 4], [4], []] },
-	]);
-	public static readonly operatorCarrierInterval: ReadonlyArray<number> = [0.0, 0.04, -0.073, 0.091];
+        { name: "1←(2 (3 (4", carrierCount: 3, associatedCarrier: [1, 2, 3, 3], modulatedBy: [[2, 3, 4], [3, 4], [4], []] },
+    ]);
+    public static readonly algorithms6Op: DictionaryArray<Algorithm> = toNameMap([
+        //yoinked from SynthBox
+        //algortihm Section 1
+        { name: "1←2←3←4←5←6", carrierCount: 1, associatedCarrier: [1, 1, 1, 1, 1, 1], modulatedBy: [[2], [3], [4], [5], [6], []] },
+        { name: "1←3 2←4←5←6", carrierCount: 2, associatedCarrier: [1, 2, 2, 2, 2, 2], modulatedBy: [[3], [4], [], [5], [6], []] },
+        { name: "1←3←4 2←5←6", carrierCount: 2, associatedCarrier: [1, 1, 1, 2, 2, 2], modulatedBy: [[3], [5], [4], [], [6], []] },
+        { name: "1←4 2←5 3←6", carrierCount: 3, associatedCarrier: [1, 2, 3, 1, 2, 3], modulatedBy: [[4], [5], [6], [], [], []] },
+        //Algorithm Section 2
+        { name: "1←3 2←(4 5←6)", carrierCount: 2, associatedCarrier: [1, 2, 2, 2, 2, 2], modulatedBy: [[3], [4, 5], [], [], [6], []] },
+        { name: "1←(3 4) 2←5←6", carrierCount: 2, associatedCarrier: [1, 2, 2, 2, 2, 2], modulatedBy: [[3, 4], [5], [], [], [6], []] },
+        { name: "1←3 2←(4 5 6)", carrierCount: 2, associatedCarrier: [1, 2, 2, 2, 2, 2], modulatedBy: [[3], [4, 5, 6], [], [], [], []] },
+        { name: "1←3 2←(4 5)←6", carrierCount: 2, associatedCarrier: [1, 2, 2, 2, 2, 2], modulatedBy: [[3], [4, 5], [], [6], [6], []] },
+        { name: "1←3 2←4←(5 6)", carrierCount: 2, associatedCarrier: [1, 2, 2, 2, 2, 2], modulatedBy: [[3], [4], [], [5, 6], [], []] },
+        { name: "1←(2 3 4 5 6)", carrierCount: 1, associatedCarrier: [1, 1, 1, 1, 1, 1], modulatedBy: [[2, 3, 4, 5, 6], [], [], [], [], []] },
+        { name: "1←(2 3←5 4←6)", carrierCount: 1, associatedCarrier: [1, 1, 1, 1, 1, 1], modulatedBy: [[2, 3, 4], [], [5], [6], [], []] },
+        { name: "1←(2 3 4←5←6)", carrierCount: 1, associatedCarrier: [1, 1, 1, 1, 1, 1], modulatedBy: [[2, 3, 4], [], [], [5], [6], []] },
+        //Algorithm Section 3
+        { name: "1←4←5 (2 3)←6", carrierCount: 3, associatedCarrier: [1, 2, 3, 1, 2, 3], modulatedBy: [[4], [6], [6], [5], [], []] },
+        { name: "1←(3 4)←5 2←6", carrierCount: 2, associatedCarrier: [1, 2, 2, 2, 2, 2], modulatedBy: [[3, 4], [6], [5], [5], [], []] },
+        { name: "(1 2)←4 3←(5 6)", carrierCount: 3, associatedCarrier: [1, 2, 3, 1, 2, 3], modulatedBy: [[4], [4], [5, 6], [], [], []] },
+        { name: "(1 2)←5 (3 4)←6", carrierCount: 3, associatedCarrier: [1, 2, 3, 4, 4, 4], modulatedBy: [[5], [5], [6], [6], [], []] },
+        { name: "(1 2 3)←(4 5 6)", carrierCount: 3, associatedCarrier: [1, 2, 3, 1, 2, 3], modulatedBy: [[4, 5, 6], [4, 5, 6], [4, 5, 6], [], [], []] },
+        { name: "1←5 (2 3 4)←6", carrierCount: 4, associatedCarrier: [1, 2, 3, 4, 4, 4], modulatedBy: [[5], [6], [6], [6], [], []] },
+        { name: "1 2←5 (3 4)←6", carrierCount: 4, associatedCarrier: [1, 2, 3, 4, 4, 4], modulatedBy: [[], [5], [6], [6], [], []] },
+        { name: "1 2 (3 4 5)←6", carrierCount: 5, associatedCarrier: [1, 2, 3, 4, 5, 5], modulatedBy: [[], [], [6], [6], [6], []] },
+        { name: "1 2 3 (4 5)←6", carrierCount: 5, associatedCarrier: [1, 2, 3, 4, 5, 5], modulatedBy: [[], [], [], [6], [6], []] },
+        //Algorithm Section 3
+        { name: "1 2←4 3←(5 6)", carrierCount: 3, associatedCarrier: [1, 2, 3, 3, 3, 3], modulatedBy: [[], [4], [5, 6], [], [], []] },
+        { name: "1←4 2←(5 6) 3", carrierCount: 3, associatedCarrier: [1, 2, 3, 3, 3, 3,], modulatedBy: [[4], [5, 6], [], [], [], []] },
+        { name: "1 2 3←5 4←6", carrierCount: 4, associatedCarrier: [1, 2, 3, 4, 4, 4], modulatedBy: [[], [], [5], [6], [], []] },
+        { name: "1 (2 3)←5←6 4", carrierCount: 4, associatedCarrier: [1, 2, 3, 4, 4, 4,], modulatedBy: [[], [5], [5], [], [6], []] },
+        { name: "1 2 3←5←6 4", carrierCount: 4, associatedCarrier: [1, 2, 3, 4, 4, 4], modulatedBy: [[], [], [5, 6], [], [], []] },
+        { name: "(1 2 3 4 5)←6", carrierCount: 5, associatedCarrier: [1, 2, 3, 4, 5, 5], modulatedBy: [[6], [6], [6], [6], [6], []] },
+        { name: "1 2 3 4 5←6", carrierCount: 5, associatedCarrier: [1, 2, 3, 4, 5, 5], modulatedBy: [[], [], [], [], [6], []] },
+        { name: "1 2 3 4 5 6", carrierCount: 6, associatedCarrier: [1, 2, 3, 4, 5, 6], modulatedBy: [[], [], [], [], [], []] },
+        //Section 4 where we take our own previous ones for 4op and it gets weird
+        { name: "1←(2(3(4(5(6", carrierCount: 5, associatedCarrier: [1, 2, 3, 4, 5, 5], modulatedBy: [[2, 3, 4, 5, 6], [3, 4, 5, 6], [4, 5, 6], [5, 6], [6], []] },
+        { name: "1←(2(3(4(5(6", carrierCount: 1, associatedCarrier: [1, 1, 1, 1, 1, 1], modulatedBy: [[2, 3, 4, 5, 6], [3, 4, 5, 6], [4, 5, 6], [5, 6], [6], []] },
+        { name: "1←4(2←5(3←6", carrierCount: 3, associatedCarrier: [1, 2, 3, 1, 2, 3], modulatedBy: [[2, 3, 4], [3, 5], [6], [], [], []] },
+        { name: "1←4(2←5 3←6", carrierCount: 3, associatedCarrier: [1, 2, 3, 1, 2, 3], modulatedBy: [[2, 3, 4], [5], [6], [], [], []] },
+    ]);
+    public static readonly operatorCarrierInterval: ReadonlyArray<number> = [0.0, 0.04, -0.073, 0.091, 0.061, 0.024];
 	public static readonly operatorAmplitudeMax: number = 15;
 	public static readonly operatorFrequencies: DictionaryArray<OperatorFrequency> = toNameMap([
 		{ name: "1×", mult: 1.0, hzOffset: 0.0, amplitudeSign: 1.0 },
@@ -362,6 +404,10 @@ export class Config {
         { name: "0.5×", mult: 0.5, hzOffset: 0.0, amplitudeSign: 1.0 },
         { name: "0.25×", mult: 0.25, hzOffset: 0.0, amplitudeSign: 1.0 },
         { name: "3.5×", mult: 3.5, hzOffset: -0.05, amplitudeSign: 1.0 },
+        { name: "10×", mult: 10.0, hzOffset: 0.0, amplitudeSign: 1.0 },
+        { name: "12×", mult: 12.0, hzOffset: 0.0, amplitudeSign: 1.0 },
+        { name: "14×", mult: 14.0, hzOffset: 0.0, amplitudeSign: 1.0 },
+        { name: "18×", mult: 18.0, hzOffset: 0.0, amplitudeSign: 1.0 },
 	]);
     public static readonly envelopes: DictionaryArray<Envelope> = toNameMap([
         { name: "custom", type: EnvelopeType.custom, speed: 0.0 },
@@ -428,7 +474,40 @@ export class Config {
         { name: "1↔4 2↔3", indices: [[4], [3], [2], [1]] },
         { name: "2→1→4→3→2", indices: [[2], [3], [4], [1]] },
         { name: "1→2→3→4→1", indices: [[4], [1], [2], [3]] },
-	]);
+        { name: "(1 2 3)→4", indices: [[], [], [], [1,2,3]] },
+    ]);
+    public static readonly feedbacks6Op: DictionaryArray<Feedback> = toNameMap([
+        { name: "1⟲", indices: [[1], [], [], [], [], []] },
+        { name: "2⟲", indices: [[], [2], [], [], [], []] },
+        { name: "3⟲", indices: [[], [], [3], [], [], []] },
+        { name: "4⟲", indices: [[], [], [], [4], [], []] },
+        { name: "4⟲", indices: [[], [], [], [], [5], []] },
+        { name: "4⟲", indices: [[], [], [], [], [], [6]] },
+        { name: "1⟲ 2⟲", indices: [[1], [2], [], [], [], []] },
+        { name: "3⟲ 4⟲", indices: [[], [], [3], [4], [], []] },
+        { name: "1⟲ 2⟲ 3⟲", indices: [[1], [2], [3], [], [], []] },
+        { name: "2⟲ 3⟲ 4⟲", indices: [[], [2], [3], [4], [], []] },
+        { name: "1⟲ 2⟲ 3⟲ 4⟲", indices: [[1], [2], [3], [4], [], []] },
+        { name: "1⟲ 2⟲ 3⟲ 4⟲ 5⟲", indices: [[1], [2], [3], [4], [5], []] },
+        { name: "1⟲ 2⟲ 3⟲ 4⟲ 5⟲ 6⟲", indices: [[1], [2], [3], [4], [5], [6]] },
+        { name: "1→2", indices: [[], [1], [], [], [], []] },
+        { name: "1→3", indices: [[], [], [1], [], [], []] },
+        { name: "1→4", indices: [[], [], [], [1], [], []] },
+        { name: "1→5", indices: [[], [], [], [], [1], []] },
+        { name: "1→6", indices: [[], [], [], [], [], [1]] },
+        { name: "2→3", indices: [[], [], [2], [], [], []] },
+        { name: "2→4", indices: [[], [], [], [2], [], []] },
+        { name: "3→4", indices: [[], [], [], [3], [], []] },
+        { name: "4→5", indices: [[], [], [], [], [4], []] },
+        { name: "1→4 2→5 3→6", indices: [[], [], [], [1], [2], [3]] },
+        { name: "1→5 2→6 3→4", indices: [[], [], [], [3], [1], [6]] },
+        { name: "1→2→3→4→5→6", indices: [[], [1], [2], [3], [4], [5]] },
+        { name: "2→1→6→5→4→3→2", indices: [[2], [3], [4], [5], [6], [1]] },
+        { name: "1→2→3→4→5→6→1", indices: [[6], [1], [2], [3], [4], [5]] },
+        { name: "1↔2 3↔4 5↔6", indices: [[2], [1], [4], [3], [6], [5]] },
+        { name: "1↔4 2↔5 3↔6", indices: [[3], [5], [6], [1], [2], [3]] },
+        { name: "(1,2,3,4,5)→6", indices: [[], [], [], [], [], [1,2,3,4,5]] },
+    ]);
 	public static readonly chipNoiseLength: number = 1 << 15; // 32768
 	public static readonly spectrumBasePitch: number = 24;
 	public static readonly spectrumControlPoints: number = 30;
@@ -470,6 +549,7 @@ export class Config {
         { name: "75%pulse", samples: generateSquareWave(-0.5) },
         { name: "ramp", samples: generateSawWave(true) },
         { name: "trapezoid", samples: generateTrapezoidWave(2) },
+        { name: "12.5%pulse", samples: generateSquareWave(0.25) },
     ]);
 
 	// Height of the small editor column for inserting/deleting rows, in pixels.

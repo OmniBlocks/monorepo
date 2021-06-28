@@ -466,7 +466,11 @@ export class SongEditor {
 	private readonly _modChannelBoxes: HTMLSelectElement[];
 	private readonly _modInstrumentBoxes: HTMLSelectElement[];
 	private readonly _modSetRows: HTMLElement[];
-	private readonly _modSetBoxes: HTMLSelectElement[];
+    private readonly _modSetBoxes: HTMLSelectElement[];
+    private readonly _feedback6OpTypeSelect: HTMLSelectElement = buildOptions(select(), Config.feedbacks6Op.map(feedback => feedback.name));
+    private readonly _feedback6OpRow1: HTMLDivElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("feedbackType") }, "Feedback:"), div({ class: "selectContainer" }, this._feedback6OpTypeSelect));
+    private readonly _algorithm6OpSelect: HTMLSelectElement = buildOptions(select(), Config.algorithms6Op.map(algorithm => algorithm.name));
+    private readonly _algorithm6OpSelectRow: HTMLDivElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("algorithm") }, "Algorithm: "), div({ class: "selectContainer" }, this._algorithm6OpSelect));//temp
 
 	private readonly _instrumentCopyButton: HTMLButtonElement = button({ style: "max-width:86px;", class: "copyButton" }, [
 		"Copy",
@@ -535,8 +539,10 @@ export class SongEditor {
 		this._vibratoDropdownGroup,
 		this._intervalSelectRow,
 		this._algorithmSelectRow,
+		this._algorithm6OpSelectRow,
 		this._phaseModGroup,
 		this._feedbackRow1,
+		this._feedback6OpRow1,
 		this._feedbackRow2,
 		this._spectrumRow,
 		this._harmonicsRow,
@@ -854,7 +860,9 @@ export class SongEditor {
 		this._instrumentSelect.addEventListener("change", this._whenSetInstrument);
 		//this._customizeInstrumentButton.addEventListener("click", this._whenCustomizePressed);
 		this._feedbackTypeSelect.addEventListener("change", this._whenSetFeedbackType);
-		this._feedbackEnvelopeSelect.addEventListener("change", this._whenSetFeedbackEnvelope);
+        this._feedbackEnvelopeSelect.addEventListener("change", this._whenSetFeedbackEnvelope);
+        this._algorithm6OpSelect.addEventListener("change", this._whenSet6OpAlgorithm);
+        this._feedback6OpTypeSelect.addEventListener("change", this._whenSet6OpFeedbackType);
 		this._chipWaveSelect.addEventListener("change", this._whenSetChipWave);
 		this._chipNoiseSelect.addEventListener("change", this._whenSetNoiseWave);
 		this._transitionSelect.addEventListener("change", this._whenSetTransition);

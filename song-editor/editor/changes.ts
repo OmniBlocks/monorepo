@@ -1416,9 +1416,9 @@ export class ChangeFeedbackType extends Change {
 	constructor(doc: SongDocument, newValue: number) {
 		super();
 		const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
-        const oldValue: number = instrument.feedbackType6Op;
+        const oldValue: number = instrument.feedbackType;
 		if (oldValue != newValue) {
-            instrument.feedbackType6Op = newValue;
+            instrument.feedbackType = newValue;
 			instrument.preset = instrument.type;
 			doc.notifier.changed();
 			this._didSomething();
@@ -1444,9 +1444,9 @@ export class Change6OpFeedbackType extends Change {
     constructor(doc: SongDocument, newValue: number) {
         super();
         const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
-        const oldValue: number = instrument.feedbackType;
+        const oldValue: number = instrument.feedbackType6Op;
         if (oldValue != newValue) {
-            instrument.feedbackType = newValue;
+            instrument.feedbackType6Op = newValue;
             instrument.preset = instrument.type;
             doc.notifier.changed();
             this._didSomething();

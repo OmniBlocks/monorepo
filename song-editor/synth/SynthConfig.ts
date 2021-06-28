@@ -474,7 +474,8 @@ export class Config {
         { name: "1↔4 2↔3", indices: [[4], [3], [2], [1]] },
         { name: "2→1→4→3→2", indices: [[2], [3], [4], [1]] },
         { name: "1→2→3→4→1", indices: [[4], [1], [2], [3]] },
-        { name: "(1 2 3)→4", indices: [[], [], [], [1,2,3]] },
+        { name: "(1 2 3)→4", indices: [[], [], [], [1, 2, 3]] },
+        { name: "ALL", indices: [[1,2,3,4], [1,2,3,4], [1,2,3,4], [1, 2, 3,4]] },
     ]);
     public static readonly feedbacks6Op: DictionaryArray<Feedback> = toNameMap([
         { name: "1⟲", indices: [[1], [], [], [], [], []] },

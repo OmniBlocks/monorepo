@@ -400,6 +400,55 @@ export class Operator {
     }
 }
 
+export class CustomAlgorithm {
+    public name: string = "";
+    public carrierCount: number = 0;
+    public modulatedBy: number[][] = [[], [], [], [], [], []];
+    public associatedCarrier: number[] = [];
+
+    constructor(carriers: number, modulation: number[][]) {
+        this.reset();
+        this.carrierCount = carriers;
+        for (let i = 0; i < this.modulatedBy.length; i++) {
+            this.modulatedBy[i] = modulation[i];
+            if (i + 1 <= carriers) {
+                this.associatedCarrier[i] = i;
+            }
+            for (let j = 0; j < modulation[i].length;j++) {
+                this.name += modulation[i][j-1];
+                if (modulation[i][j-1] > carriers) {
+                    this.associatedCarrier[modulation[i][j-1]] = i;
+                }
+            }
+        }
+    }
+
+    public reset(): void {
+        this.name = ""
+        this.carrierCount = 1;
+        this.modulatedBy = [[2, 3, 4, 5, 6], [], [], [], [], []];
+        this.associatedCarrier = [1, 1, 1, 1, 1, 1];
+    }
+
+    public copy(other: CustomAlgorithm): void {
+        this.name = other.name;
+        this.carrierCount = other.carrierCount;
+        this.modulatedBy = other.modulatedBy;
+        this.associatedCarrier = other.associatedCarrier;
+    }
+
+    public fromPreset(other: number): void {
+        this.reset();
+        let preset = Config.algorithms6Op[other]
+        this.name = preset.name;
+        this.carrierCount = preset.carrierCount;
+        for (var i = 0; i < preset.modulatedBy.length; i++) {
+            this.modulatedBy[i] = Array.from(preset.modulatedBy[i]);
+            this.associatedCarrier[i] = preset.associatedCarrier[i];
+        }
+    }
+}
+
 export class SpectrumWave {
     public spectrum: number[] = [];
     private _wave: Float32Array | null = null;
@@ -586,6 +635,8 @@ export class Instrument {
     public feedbackType: number = 0;
     public algorithm6Op: number = 0;
     public feedbackType6Op: number = 0;
+    public customAlgorithm = { name: "1←4(2←5 3←6", carrierCount: 3, associatedCarrier: [1, 2, 3, 1, 2, 3], modulatedBy: [[2, 3, 4], [5], [6], [], [], []] };
+    public customFeedbackType = { name: "1↔4 2↔5 3↔6", indices: [[3], [5], [6], [1], [2], [3]] };
     public feedbackAmplitude: number = 0;
     public feedbackEnvelope: number = 1;
     public LFOtime: number = 0;

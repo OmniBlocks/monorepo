@@ -1,15 +1,18 @@
-# JummBox
+# GoldBox
 
-JummBox is an online tool for sketching and sharing instrumental melodies.
+GoldBox is an online tool for sketching and sharing instrumental melodies.
 You can find it [here](https://aurysystem.github.io/goldbox).
-It is a modification of the [original BeepBox](https://beepbox.co), focused on improving ease-of-use.
+It is a modification of JummBox which inturn is a modifcation of the [original BeepBox](https://beepbox.co).
+
+The primary goal of GoldBox is to incrase the range of sounds an timbres Beepbox is capable of as well as adding new automations and small features to reduce repetive actions.
+
 
 All song data is packaged into the URL at the top of your browser. When you make
 changes to the song, the URL is updated to reflect your changes. When you are
 satisfied with your song, just copy and paste the URL to save and share your
 song!
 
-JummBox is free, as is BeepBox. If you ever feel so inclined, definitely send something to the original creator, [John Nesky](http://www.johnnesky.com/)'s
+GoldBox is free, as is BeepBox. If you ever feel so inclined, definitely send something to the original creator, [John Nesky](http://www.johnnesky.com/)'s
 [PayPal](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=QZJTX9GRYEV9N&currency_code=USD). He deserves it :)
 
 ## Compiling
@@ -28,7 +31,7 @@ npm install
 npm run build
 ```
 
-A note for JummBox: You may also have to install these additional dependencies if they are not picked up automatically.
+A note for GoldBox: You may also have to install these additional dependencies if they are not picked up automatically.
 
 ```
 npm install select2

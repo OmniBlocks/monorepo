@@ -28,7 +28,7 @@ const snapToNearest = function (rect, decimals = 3) {
 
 test('translate by position', t => {
     const expected = new Rectangle();
-    const drawable = new Drawable();
+    const drawable = new Drawable(null, {});
     drawable.skin = new MockSkin();
     drawable.skin.size = [200, 50];
 
@@ -44,7 +44,7 @@ test('translate by position', t => {
 
 test('translate by costume center', t => {
     const expected = new Rectangle();
-    const drawable = new Drawable();
+    const drawable = new Drawable(null, {});
     drawable.skin = new MockSkin();
     drawable.skin.size = [200, 50];
 
@@ -61,7 +61,7 @@ test('translate by costume center', t => {
 
 test('translate and rotate', t => {
     const expected = new Rectangle();
-    const drawable = new Drawable();
+    const drawable = new Drawable(null, {});
     drawable.skin = new MockSkin();
     drawable.skin.size = [200, 50];
 
@@ -86,7 +86,7 @@ test('translate and rotate', t => {
 
 test('rotate by non-right-angles', t => {
     const expected = new Rectangle();
-    const drawable = new Drawable();
+    const drawable = new Drawable(null, {});
     drawable.skin = new MockSkin();
     drawable.skin.size = [10, 10];
     drawable.skin.rotationCenter = [5, 5];
@@ -103,7 +103,7 @@ test('rotate by non-right-angles', t => {
 
 test('scale', t => {
     const expected = new Rectangle();
-    const drawable = new Drawable();
+    const drawable = new Drawable(null, {});
     drawable.skin = new MockSkin();
     drawable.skin.size = [200, 50];
 
@@ -125,7 +125,7 @@ test('scale', t => {
 
 test('rotate and scale', t => {
     const expected = new Rectangle();
-    const drawable = new Drawable();
+    const drawable = new Drawable(null, {});
     drawable.skin = new MockSkin();
     drawable.skin.size = [100, 1000];
 

@@ -215,6 +215,8 @@ class RenderWebGL extends EventEmitter {
         // tw: add high quality render option
         this.useHighQualityRender = false;
 
+        this.dirty = true;
+
         this._createGeometry();
 
         this.on(RenderConstants.Events.NativeSizeChanged, this.onNativeSizeChanged);
@@ -231,6 +233,7 @@ class RenderWebGL extends EventEmitter {
 
     // tw: implement high quality pen option
     setUseHighQualityRender (enabled) {
+        this.dirty = true;
         this.useHighQualityRender = enabled;
         this.emit(RenderConstants.Events.UseHighQualityRenderChanged, enabled);
         this._updateRenderQuality();
@@ -274,6 +277,7 @@ class RenderWebGL extends EventEmitter {
      * @param {int} pixelsTall The desired height in device-independent pixels.
      */
     resize (pixelsWide, pixelsTall) {
+        this.dirty = true;
         const {canvas} = this._gl;
         const pixelRatio = window.devicePixelRatio || 1;
         const newWidth = pixelsWide * pixelRatio;
@@ -517,7 +521,7 @@ class RenderWebGL extends EventEmitter {
             return;
         }
         const drawableID = this._nextDrawableId++;
-        const drawable = new Drawable(drawableID);
+        const drawable = new Drawable(drawableID, this);
         this._allDrawables[drawableID] = drawable;
         this._addToDrawList(drawableID, group);
         // tw: implement high quality render
@@ -588,6 +592,7 @@ class RenderWebGL extends EventEmitter {
             log.warn('Cannot destroy drawable without known layer group.');
             return;
         }
+        this.dirty = true;
         const drawable = this._allDrawables[drawableID];
         drawable.dispose();
         delete this._allDrawables[drawableID];
@@ -643,6 +648,7 @@ class RenderWebGL extends EventEmitter {
             return;
         }
 
+        this.dirty = true;
         const currentLayerGroup = this._layerGroups[group];
         const startIndex = currentLayerGroup.drawListOffset;
         const endIndex = this._endIndexForKnownLayerGroup(currentLayerGroup);
@@ -686,6 +692,11 @@ class RenderWebGL extends EventEmitter {
      * Draw all current drawables and present the frame on the canvas.
      */
     draw () {
+        if (!this.dirty) {
+            return;
+        }
+        this.dirty = false;
+
         this._doExitDrawRegion();
 
         const gl = this._gl;
@@ -1708,6 +1719,7 @@ class RenderWebGL extends EventEmitter {
      * @param {int} penSkinID - the unique ID of a Pen Skin.
      */
     penClear (penSkinID) {
+        this.dirty = true;
         const skin = /** @type {PenSkin} */ this._allSkins[penSkinID];
         skin.clear();
     }
@@ -1720,6 +1732,7 @@ class RenderWebGL extends EventEmitter {
      * @param {number} y - the Y coordinate of the point to draw.
      */
     penPoint (penSkinID, penAttributes, x, y) {
+        this.dirty = true;
         const skin = /** @type {PenSkin} */ this._allSkins[penSkinID];
         skin.drawPoint(penAttributes, x, y);
     }
@@ -1734,6 +1747,7 @@ class RenderWebGL extends EventEmitter {
      * @param {number} y1 - the Y coordinate of the end of the line.
      */
     penLine (penSkinID, penAttributes, x0, y0, x1, y1) {
+        this.dirty = true;
         const skin = /** @type {PenSkin} */ this._allSkins[penSkinID];
         skin.drawLine(penAttributes, x0, y0, x1, y1);
     }
@@ -1744,6 +1758,7 @@ class RenderWebGL extends EventEmitter {
      * @param {int} stampID - the unique ID of the Drawable to use as the stamp.
      */
     penStamp (penSkinID, stampID) {
+        this.dirty = true;
         const stampDrawable = this._allDrawables[stampID];
         if (!stampDrawable) {
             return;
@@ -1829,6 +1844,7 @@ class RenderWebGL extends EventEmitter {
      * @private
      */
     onNativeSizeChanged (event) {
+        this.dirty = true;
         const [width, height] = event.newSize;
 
         const gl = this._gl;
@@ -2157,6 +2173,7 @@ class RenderWebGL extends EventEmitter {
      * @param {snapshotCallback} callback Function called in the next frame with the snapshot data
      */
     requestSnapshot (callback) {
+        this.dirty = true;
         this._snapshotCallbacks.push(callback);
     }
 }

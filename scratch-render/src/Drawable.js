@@ -59,11 +59,13 @@ class Drawable {
      * An object which can be drawn by the renderer.
      * @todo double-buffer all rendering state (position, skin, effects, etc.)
      * @param {!int} id - This Drawable's unique ID.
+     * @param {!RenderWebGL} renderer - The renderer that created this Drawable
      * @constructor
      */
-    constructor (id) {
+    constructor (id, renderer) {
         /** @type {!int} */
         this._id = id;
+        this._renderer = renderer;
 
         /**
          * The uniforms to be used by the vertex and pixel shaders.
@@ -222,6 +224,7 @@ class Drawable {
                 this._position[0] = Math.round(position[0]);
                 this._position[1] = Math.round(position[1]);
             }
+            this._renderer.dirty = true;
             this.setTransformDirty();
         }
     }
@@ -233,6 +236,7 @@ class Drawable {
     updateDirection (direction) {
         if (this._direction !== direction) {
             this._direction = direction;
+            this._renderer.dirty = true;
             this._rotationTransformDirty = true;
             this.setTransformDirty();
         }
@@ -247,6 +251,7 @@ class Drawable {
             this._scale[1] !== scale[1]) {
             this._scale[0] = scale[0];
             this._scale[1] = scale[1];
+            this._renderer.dirty = true;
             this._rotationCenterDirty = true;
             this._skinScaleDirty = true;
             this.setTransformDirty();
@@ -260,6 +265,7 @@ class Drawable {
     updateVisible (visible) {
         if (this._visible !== visible) {
             this._visible = visible;
+            this._renderer.dirty = true;
             this.setConvexHullDirty();
         }
     }
@@ -270,6 +276,7 @@ class Drawable {
      * @param {number} rawValue A new effect value.
      */
     updateEffect (effectName, rawValue) {
+        this._renderer.dirty = true;
         const effectInfo = ShaderManager.EFFECT_INFO[effectName];
         if (rawValue) {
             this.enabledEffects |= effectInfo.mask;
@@ -675,6 +682,7 @@ class Drawable {
      * @private
      */
     _skinWasAltered () {
+        this._renderer.dirty = true;
         this._rotationCenterDirty = true;
         this._skinScaleDirty = true;
         this.setConvexHullDirty();

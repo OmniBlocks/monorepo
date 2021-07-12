@@ -129,7 +129,7 @@ const HighQualityPen = props => (
                 values={{
                     comparison: (
                         <a
-                            href="https://github.com/TurboWarp/scratch-gui/wiki/Advanced-Settings#high-quality-pen"
+                            href="https://docs.turbowarp.org/advanced-settings#high-quality-pen"
                             target="_blank"
                             rel="noopener noreferrer"
                         >

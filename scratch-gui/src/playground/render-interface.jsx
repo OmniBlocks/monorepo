@@ -125,21 +125,21 @@ const Footer = () => (
                         {/* Do not translate */}
                         {'TurboWarp Packager'}
                     </a>
-                    <a href="https://github.com/TurboWarp/scratch-gui/wiki/Embedding">
+                    <a href="https://docs.turbowarp.org/embedding">
                         <FormattedMessage
                             defaultMessage="Embedding"
                             description="Menu bar item for embedding link"
                             id="tw.footer.embed"
                         />
                     </a>
-                    <a href="https://github.com/TurboWarp/scratch-gui/wiki/URL-Parameters">
+                    <a href="https://docs.turbowarp.org/url-parameters">
                         <FormattedMessage
                             defaultMessage="URL Parameters"
                             description="Menu bar item for URL parameters link"
                             id="tw.footer.parameters"
                         />
                     </a>
-                    <a href="https://github.com/TurboWarp/scratch-gui/wiki/Help-translate-TurboWarp">
+                    <a href="https://docs.turbowarp.org/translate">
                         <FormattedMessage
                             defaultMessage="Help Translate TurboWarp"
                             description="Menu bar item for translating TurboWarp link"

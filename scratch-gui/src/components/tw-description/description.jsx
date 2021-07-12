@@ -47,7 +47,7 @@ const Description = ({
         {instructions === 'unshared' && credits === 'unshared' ? (
             <div>
                 <a
-                    href="https://github.com/TurboWarp/scratch-gui/wiki/Unshared-Projects"
+                    href="https://docs.turbowarp.org/unshared-projects"
                     target="_blank"
                     rel="noreferrer"
                 >

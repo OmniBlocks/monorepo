@@ -290,7 +290,7 @@
     },
     "zh-cn": {
         "tw.addons.settings.addonFeedback": "插件反馈",
-        "tw.addons.settings.confirmResetAll": "你确定要将所有加载项设置重置为其默认值吗？",
+        "tw.addons.settings.confirmResetAll": "你确定要将所有插件设置重置为其默认值吗？",
         "tw.addons.settings.credits": "鸣谢：",
         "tw.addons.settings.dirty": "重新加载 TurboWarp 以生效设置。",
         "tw.addons.settings.dirtyButton": "立即重新加载",
@@ -326,6 +326,6 @@
         "tw.addons.settings.tags.recommended": "推薦",
         "tw.addons.settings.tags.theme": "主題",
         "tw.addons.settings.title": "擴充功能設定",
-        "tw.addons.settings.unsupported": "這些擴充功能在這個瀏覽器不可用："
+        "tw.addons.settings.unsupported": "下些擴充功能在此瀏覽器不可用："
     }
 }

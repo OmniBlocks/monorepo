@@ -768,6 +768,7 @@ class MenuBar extends React.Component {
                             >
                                 <div>
                                     <FormattedMessage
+                                        // Note: this string is used by scratch-vm for the addons blocks category
                                         defaultMessage="Addons"
                                         description="Menu bar item for addon settings"
                                         id="tw.menuBar.addons"

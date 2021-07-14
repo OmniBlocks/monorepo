@@ -153,6 +153,46 @@ const translations = getAddonTranslations(language);
 
 const getDisplayNoneWhileDisabledClass = id => `addons-display-none-${id}`;
 
+const SHARED_SPACES = {
+    stageHeader: {
+        element: () => document.querySelector("[class^='stage-header_stage-size-row']"),
+        from: () => [],
+        until: () => [
+            document.querySelector("[class^='stage-header_stage-size-toggle-group']"),
+            document.querySelector("[class^='stage-header_stage-size-row']").lastChild
+        ]
+    },
+    fullscreenStageHeader: {
+        element: () => document.querySelector("[class^='stage-header_stage-menu-wrapper']"),
+        from: function () {
+            let emptyDiv = this.element().querySelector('.addon-spacer');
+            if (!emptyDiv) {
+                emptyDiv = document.createElement('div');
+                emptyDiv.style.marginLeft = 'auto';
+                emptyDiv.className = 'addon-spacer';
+                this.element().insertBefore(emptyDiv, this.element().lastChild);
+            }
+            return [emptyDiv];
+        },
+        until: () => [document.querySelector("[class^='stage-header_stage-menu-wrapper']").lastChild]
+    },
+    afterGreenFlag: {
+        element: () => document.querySelector("[class^='controls_controls-container']"),
+        from: () => [],
+        until: () => [document.querySelector("[class^='stop-all_stop-all']")]
+    },
+    afterStopButton: {
+        element: () => document.querySelector("[class^='controls_controls-container']"),
+        from: () => [document.querySelector("[class^='stop-all_stop-all']")],
+        until: () => []
+    },
+    afterSoundTab: {
+        element: () => document.querySelector("[class^='react-tabs_react-tabs__tab-list']"),
+        from: () => [document.querySelector("[class^='react-tabs_react-tabs__tab-list']").children[2]],
+        until: () => [document.querySelector('.s3devToolBar')]
+    }
+};
+
 let _firstAddBlockRan = false;
 
 class Tab extends EventTargetShim {
@@ -180,6 +220,33 @@ class Tab extends EventTargetShim {
                     };
                     this.addEventListener('urlChange', handler);
                 });
+            },
+            getPaper: async () => {
+                const modeSelector = await this.waitForElement("[class*='paint-editor_mode-selector']", {
+                    reduxCondition: state => state.scratchGui.editorTab.activeTabIndex === 1 && !state.scratchGui.mode.isPlayerOnly,
+                });
+                const reactInternalKey = Object.keys(modeSelector).find(key => key.startsWith('__reactInternalInstance$'));
+                const internalState = modeSelector[reactInternalKey].child;
+                // .tool or .blob.tool only exists on the selected tool
+                let toolState = internalState;
+                let tool;
+                while (toolState) {
+                    const toolInstance = toolState.child.stateNode;
+                    if (toolInstance.tool) {
+                        tool = toolInstance.tool;
+                        break;
+                    }
+                    if (toolInstance.blob && toolInstance.blob.tool) {
+                        tool = toolInstance.blob.tool;
+                        break;
+                    }
+                    toolState = toolState.sibling;
+                }
+                if (tool) {
+                    const paperScope = tool._scope;
+                    return paperScope;
+                }
+                throw new Error('cannot find paper :(');
             }
         };
     }
@@ -246,14 +313,86 @@ class Tab extends EventTargetShim {
         });
     }
 
-    addBlock (procedureCode, args, callback) {
+    appendToSharedSpace ({space, element, order}) {
+        const spaceInfo = SHARED_SPACES[space];
+        const spaceElement = spaceInfo.element();
+        if (!spaceElement) return false;
+        const from = spaceInfo.from();
+        const until = spaceInfo.until();
+
+        element.dataset.saSharedSpaceOrder = order;
+
+        let foundFrom = false;
+        if (from.length === 0) foundFrom = true;
+
+        // insertAfter = element whose nextSibling will be the new element
+        // -1 means append at beginning of space (prepend)
+        // This will stay null if we need to append at the end of space
+        let insertAfter = null;
+
+        const children = Array.from(spaceElement.children);
+        for (const indexString of children.keys()) {
+            const child = children[indexString];
+            const i = Number(indexString);
+
+            // Find either element from "from" before doing anything
+            if (!foundFrom) {
+                if (from.includes(child)) {
+                    foundFrom = true;
+                    // If this is the last child, insertAfter will stay null
+                    // and the element will be appended at the end of space
+                }
+                continue;
+            }
+
+            if (until.includes(child)) {
+                // This is the first SA element appended to this space
+                // If from = [] then prepend, otherwise append after
+                // previous child (likely a "from" element)
+                if (i === 0) insertAfter = -1;
+                else insertAfter = children[i - 1];
+                break;
+            }
+
+            if (child.dataset.addonSharedSpaceOrder) {
+                if (Number(child.dataset.addonSharedSpaceOrder) > order) {
+                    // We found another SA element with higher order number
+                    // If from = [] and this is the first child, prepend.
+                    // Otherwise, append before this child.
+                    if (i === 0) insertAfter = -1;
+                    else insertAfter = children[i - 1];
+                    break;
+                }
+            }
+        }
+
+        if (!foundFrom) return false;
+        // It doesn't matter if we didn't find an "until"
+
+        if (insertAfter === null) {
+            // This might happen with until = []
+            spaceElement.appendChild(element);
+        } else if (insertAfter === -1) {
+            // This might happen with from = []
+            spaceElement.prepend(element);
+        } else {
+            // Works like insertAfter but using insertBefore API.
+            // nextSibling cannot be null because insertAfter
+            // is always set to children[i-1], so it must exist
+            spaceElement.insertBefore(element, insertAfter.nextSibling);
+        }
+        return true;
+    }
+
+    addBlock (procedureCode, {args, displayName, callback}) {
         const vm = this.traps.vm;
         vm.addAddonBlock({
             procedureCode,
             arguments: args,
             callback,
             color: '#29beb8',
-            secondaryColor: '#3aa8a4'
+            secondaryColor: '#3aa8a4',
+            displayName: displayName || procedureCode
         });
 
         if (!_firstAddBlockRan) {
@@ -274,6 +413,18 @@ class Tab extends EventTargetShim {
                         }
                     }
                     return oldUpdateColour.call(this, ...args2);
+                };
+                const originalCreateAllInputs = ScratchBlocks.Blocks.procedures_call.createAllInputs_;
+                ScratchBlocks.Blocks.procedures_call.createAllInputs_ = function (...args2) {
+                    const block = this.procCode_ && vm.runtime.getAddonBlock(this.procCode_);
+                    if (block) {
+                        const originalProcCode = this.procCode_;
+                        this.procCode_ = block.displayName;
+                        const ret = originalCreateAllInputs.call(this, ...args2);
+                        this.procCode_ = originalProcCode;
+                        return ret;
+                    }
+                    return originalCreateAllInputs.call(this, ...args2);
                 };
                 if (vm.editingTarget) {
                     vm.emitWorkspaceUpdate();

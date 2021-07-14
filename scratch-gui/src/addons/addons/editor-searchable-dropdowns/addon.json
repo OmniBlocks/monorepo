@@ -22,5 +22,6 @@
   ],
   "versionAdded": "1.0.0",
   "tags": ["editor", "codeEditor", "recommended"],
-  "enabledByDefault": true
+  "enabledByDefault": true,
+  "enabledByDefaultMobile": false
 }

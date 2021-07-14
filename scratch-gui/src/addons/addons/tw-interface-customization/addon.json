@@ -1,6 +1,6 @@
 {
-  "name": "Interface customization",
-  "description": "Customize some other parts of the interface.",
+  "name": "Dangerous customizations",
+  "description": "Obscure customization options that few people will want to use. Not recommended.",
   "userscripts": [
     {
       "url": "remove-backpack.js",
@@ -30,6 +30,5 @@
     }
   ],
   "tags": ["theme"],
-  "enabledByDefault": false,
-  "l10n": true
+  "enabledByDefault": false
 }

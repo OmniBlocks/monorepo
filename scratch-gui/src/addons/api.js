@@ -193,6 +193,8 @@ const SHARED_SPACES = {
     }
 };
 
+const fixDisplayName = displayName => displayName.replace(/([^\s])(%[nbs])/g, (_, before, arg) => `${before} ${arg}`);
+
 let _firstAddBlockRan = false;
 
 class Tab extends EventTargetShim {
@@ -385,6 +387,12 @@ class Tab extends EventTargetShim {
     }
 
     addBlock (procedureCode, {args, displayName, callback}) {
+        if (displayName) {
+            displayName = fixDisplayName(displayName);
+        } else {
+            displayName = procedureCode;
+        }
+
         const vm = this.traps.vm;
         vm.addAddonBlock({
             procedureCode,
@@ -392,7 +400,7 @@ class Tab extends EventTargetShim {
             callback,
             color: '#29beb8',
             secondaryColor: '#3aa8a4',
-            displayName: displayName || procedureCode
+            displayName
         });
 
         if (!_firstAddBlockRan) {

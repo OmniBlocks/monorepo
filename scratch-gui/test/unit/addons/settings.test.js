@@ -46,24 +46,6 @@ test('enabled, event', () => {
     expect(fn.mock.calls[3][0].detail.value).toBe(false);
 });
 
-test('setAddonEnabled reloadRequired', () => {
-    const store = new SettingStore();
-    const fn = jest.fn();
-    store.setAddonEnabled('editor-devtools', false);
-    store.setAddonEnabled('block-palette-icons', false);
-    store.addEventListener('setting-changed', fn);
-    store.setAddonEnabled('editor-devtools', true);
-    store.setAddonEnabled('block-palette-icons', true);
-    store.setAddonEnabled('block-palette-icons', false);
-    expect(fn).toHaveBeenCalledTimes(3);
-    expect(fn.mock.calls[0][0].detail.addonId).toBe('editor-devtools');
-    expect(fn.mock.calls[0][0].detail.reloadRequired).toBe(true);
-    expect(fn.mock.calls[1][0].detail.addonId).toBe('block-palette-icons');
-    expect(fn.mock.calls[1][0].detail.reloadRequired).toBe(false);
-    expect(fn.mock.calls[2][0].detail.addonId).toBe('block-palette-icons');
-    expect(fn.mock.calls[2][0].detail.reloadRequired).toBe(false);
-});
-
 test('settings, event, default values', () => {
     const store = new SettingStore();
     const fn = jest.fn();
@@ -79,11 +61,9 @@ test('settings, event, default values', () => {
     expect(fn).toHaveBeenCalledTimes(2);
     expect(fn.mock.calls[0][0].detail.addonId).toBe('onion-skinning');
     expect(fn.mock.calls[0][0].detail.settingId).toBe('default');
-    expect(fn.mock.calls[0][0].detail.reloadRequired).toBe(true);
     expect(fn.mock.calls[0][0].detail.value).toBe(true);
     expect(fn.mock.calls[1][0].detail.addonId).toBe('onion-skinning');
     expect(fn.mock.calls[1][0].detail.settingId).toBe('default');
-    expect(fn.mock.calls[1][0].detail.reloadRequired).toBe(true);
     expect(fn.mock.calls[1][0].detail.value).toBe(false);
 });
 
@@ -185,11 +165,9 @@ test('reset settings, event', () => {
     expect(fn).toHaveBeenCalledTimes(2);
     expect(fn.mock.calls[0][0].detail.addonId).toBe('onion-skinning');
     expect(fn.mock.calls[0][0].detail.settingId).toBe('default');
-    expect(fn.mock.calls[0][0].detail.reloadRequired).toBe(true);
     expect(fn.mock.calls[0][0].detail.value).toBe(false);
     expect(fn.mock.calls[1][0].detail.addonId).toBe('onion-skinning');
     expect(fn.mock.calls[1][0].detail.settingId).toBe('next');
-    expect(fn.mock.calls[1][0].detail.reloadRequired).toBe(true);
     expect(fn.mock.calls[1][0].detail.value).toBe(0);
 });
 
@@ -203,11 +181,9 @@ test('reset all addons', () => {
     expect(fn).toHaveBeenCalledTimes(2);
     expect(fn.mock.calls[0][0].detail.addonId).toBe('cat-blocks');
     expect(fn.mock.calls[0][0].detail.settingId).toBe('enabled');
-    expect(fn.mock.calls[0][0].detail.reloadRequired).toBe(true);
     expect(fn.mock.calls[0][0].detail.value).toBe(false);
     expect(fn.mock.calls[1][0].detail.addonId).toBe('onion-skinning');
     expect(fn.mock.calls[1][0].detail.settingId).toBe('default');
-    expect(fn.mock.calls[1][0].detail.reloadRequired).toBe(true);
     expect(fn.mock.calls[1][0].detail.value).toBe(false);
 });
 
@@ -278,11 +254,9 @@ test('import, event', () => {
     expect(fn).toHaveBeenCalledTimes(2);
     expect(fn.mock.calls[0][0].detail.addonId).toBe('onion-skinning');
     expect(fn.mock.calls[0][0].detail.settingId).toBe('enabled');
-    expect(fn.mock.calls[0][0].detail.reloadRequired).toBe(true);
     expect(fn.mock.calls[0][0].detail.value).toBe(false);
     expect(fn.mock.calls[1][0].detail.addonId).toBe('onion-skinning');
     expect(fn.mock.calls[1][0].detail.settingId).toBe('next');
-    expect(fn.mock.calls[1][0].detail.reloadRequired).toBe(true);
     expect(fn.mock.calls[1][0].detail.value).toBe(5);
 });
 

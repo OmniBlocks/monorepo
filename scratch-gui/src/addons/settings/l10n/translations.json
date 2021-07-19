@@ -266,7 +266,24 @@
         "tw.addons.settings.unsupported": "Nekateri dodatki v tem brskalniku niso na voljo:"
     },
     "sv": {
-        "tw.addons.settings.reset": "Starta om"
+        "tw.addons.settings.addonFeedback": "Tilläggsrespons",
+        "tw.addons.settings.confirmResetAll": "Är du säker på att du vill återställa alla tilläggsinställningar till standardvärdena?",
+        "tw.addons.settings.credits": "kreditera:",
+        "tw.addons.settings.dirty": "Ladda om Turbowarp för att acceptera ändringarna",
+        "tw.addons.settings.dirtyButton": "Ladda om nu",
+        "tw.addons.settings.export": "Exportera inställningar",
+        "tw.addons.settings.import": "Importera inställningar",
+        "tw.addons.settings.noResults": "Inga resutat",
+        "tw.addons.settings.presets": "Förinställningar",
+        "tw.addons.settings.reset": "Starta om",
+        "tw.addons.settings.resetAll": "Starta om allt",
+        "tw.addons.settings.search": "Sök",
+        "tw.addons.settings.tags.beta": "Beta",
+        "tw.addons.settings.tags.new": "Nytt!",
+        "tw.addons.settings.tags.recommended": "Rekomenderat",
+        "tw.addons.settings.tags.theme": "Tema",
+        "tw.addons.settings.title": "Tilläggsinställningar",
+        "tw.addons.settings.unsupported": "Vissa tillägg är inte tillgängliga i den här webbläsaren:"
     },
     "tr": {
         "tw.addons.settings.addonFeedback": "Eklenti geribildirim",
@@ -309,10 +326,10 @@
         "tw.addons.settings.unsupported": "某些插件在此浏览器中不可用："
     },
     "zh-tw": {
-        "tw.addons.settings.addonFeedback": "擴充功能回饋",
-        "tw.addons.settings.confirmResetAll": "你確定要重設所有擴充功能至初始設定？",
-        "tw.addons.settings.credits": "感謝：",
-        "tw.addons.settings.dirty": "你需要重新載入 TurboWarp 以應用設定。",
+        "tw.addons.settings.addonFeedback": "附件回饋",
+        "tw.addons.settings.confirmResetAll": "你確定要重設所有附件設定？",
+        "tw.addons.settings.credits": "作者：",
+        "tw.addons.settings.dirty": "重新載入 TurboWarp 以應用設定。",
         "tw.addons.settings.dirtyButton": "重新載入",
         "tw.addons.settings.export": "匯出設定",
         "tw.addons.settings.import": "匯入設定",
@@ -325,7 +342,7 @@
         "tw.addons.settings.tags.new": "新！",
         "tw.addons.settings.tags.recommended": "推薦",
         "tw.addons.settings.tags.theme": "主題",
-        "tw.addons.settings.title": "擴充功能設定",
-        "tw.addons.settings.unsupported": "下列擴充功能在此瀏覽器不可用："
+        "tw.addons.settings.title": "附件設定",
+        "tw.addons.settings.unsupported": "下列附件在此瀏覽器不可用："
     }
 }

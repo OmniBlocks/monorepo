@@ -408,6 +408,8 @@ export class Config {
         { name: "12×", mult: 12.0, hzOffset: 0.0, amplitudeSign: 1.0 },
         { name: "14×", mult: 14.0, hzOffset: 0.0, amplitudeSign: 1.0 },
         { name: "18×", mult: 18.0, hzOffset: 0.0, amplitudeSign: 1.0 },
+        { name: "0.12×", mult: 0.125, hzOffset: 0.0, amplitudeSign: 1.0 },
+        { name: "0.75×", mult: 0.75, hzOffset: 0.0, amplitudeSign: 1.0 },
 	]);
     public static readonly envelopes: DictionaryArray<Envelope> = toNameMap([
         { name: "custom", type: EnvelopeType.custom, speed: 0.0 },
@@ -780,7 +782,7 @@ function generateTrapezoidWave(drive: number = 2): Float64Array {
 function generateSquareWave(phasewidth: number = 0): Float64Array {
     const wave: Float64Array = new Float64Array(Config.sineWaveLength + 1);
     for (let i: number = 0; i < Config.sineWaveLength + 1; i++) {
-        wave[i] = Math.sin(i * Math.PI * 2.0 / Config.sineWaveLength);
+        wave[i] = Math.asin(Math.sin(i * Math.PI * 2.0 / Config.sineWaveLength)) / (Math.PI / 2);
         wave[i] = wave[i] > phasewidth ? 1.0 : -1.0;
     }
     return wave;

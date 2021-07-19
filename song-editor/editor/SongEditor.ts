@@ -1488,7 +1488,7 @@ export class SongEditor {
 					setSelectedValue(this._feedbackEnvelopeSelect, instrument.feedbackEnvelope);
 					this._feedbackEnvelopeSelect.parentElement!.style.color = (instrument.feedbackAmplitude > 0) ? "" : ColorConfig.secondaryText;
                     for (let i: number = 0; i < (Config.operatorCount+2); i++) {
-                        const isCarrier: boolean = (i < Config.algorithms[instrument.algorithm].carrierCount);
+                        const isCarrier: boolean = (instrument.type == InstrumentType.fm6op) ? (i < Config.algorithms6Op[instrument.algorithm6Op].carrierCount):(i < Config.algorithms[instrument.algorithm].carrierCount);
                         this._operatorRows[i].style.display = "";
 						this._operatorRows[i].style.color = isCarrier ? ColorConfig.primaryText : "";
 						setSelectedValue(this._operatorFrequencySelects[i], instrument.operators[i].frequency);
@@ -2705,10 +2705,10 @@ export class SongEditor {
 	}
 
     private _whenSet6OpFeedbackType = (): void => {
-        this._doc.record(new Change6OpFeedbackType(this._doc, this._feedbackTypeSelect.selectedIndex));
+        this._doc.record(new Change6OpFeedbackType(this._doc, this._feedback6OpTypeSelect.selectedIndex));
     }
     private _whenSet6OpAlgorithm = (): void => {
-        this._doc.record(new Change6OpAlgorithm(this._doc, this._algorithmSelect.selectedIndex));
+        this._doc.record(new Change6OpAlgorithm(this._doc, this._algorithm6OpSelect.selectedIndex));
     }
 
 	private _whenSetAlgorithm = (): void => {

@@ -15,6 +15,8 @@
  */
 
 import english from './addons-l10n/en.json';
+import entries from './generated/l10n-entries';
+import log from '../lib/log';
 
 /**
  * Get addon translations.
@@ -24,12 +26,12 @@ import english from './addons-l10n/en.json';
 export default async function getTranslations (lang) {
     const result = {};
     Object.assign(result, english);
-    if (lang !== 'en') {
+    if (entries[lang]) {
         try {
-            const translations = (await import(`./addons-l10n/${lang}.json`)).default;
+            const translations = await entries[lang]();
             Object.assign(result, translations);
         } catch (e) {
-            // ignore
+            log.error(e);
         }
     }
     return result;

@@ -87,7 +87,8 @@ if (AddonChannels.changeChannel) {
     });
 }
 
-import(/* webpackChunkName: "addons" */ '../addons/entry');
+// eslint-disable-next-line import/no-commonjs
+require('../addons/entry');
 
 const Footer = () => (
     <footer className={styles.footer}>

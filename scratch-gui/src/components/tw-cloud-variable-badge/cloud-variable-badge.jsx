@@ -16,9 +16,23 @@ const CloudVariableBadge = () => (
         <div className={styles.text}>
             <FormattedMessage
                 // eslint-disable-next-line max-len
-                defaultMessage="This project uses cloud variables. TurboWarp uses its own cloud variable server independent of Scratch. Note that users may not be who their username says they are."
-                description="Cloud variable badge under the project"
+                defaultMessage="This project uses cloud variables. TurboWarp uses its own cloud variable server independent of Scratch. Beware of impersonation as anyone can change their username to anything. {learnMore}"
+                description="Cloud variable information shown under projects with cloud variables"
                 id="tw.cloudVariableBadge"
+                values={{
+                    learnMore: (
+                        <a
+                            href="https://docs.turbowarp.org/cloud-variables"
+                            target="_blank"
+                            rel="noreferrer"
+                        >
+                            <FormattedMessage
+                                defaultMessage="Learn more."
+                                id="gui.alerts.cloudInfoLearnMore"
+                            />
+                        </a>
+                    )
+                }}
             />
         </div>
     </div>

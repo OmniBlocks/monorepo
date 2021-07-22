@@ -16,6 +16,7 @@
 
 import addons from './addons.json';
 import newAddons from './new-addons.json';
+import addonManifests from './generated/addon-manifests';
 import isMobile from './is-mobile';
 
 const clipboardSupported = !!(navigator.clipboard && navigator.clipboard.write);
@@ -36,7 +37,7 @@ const isSupported = (addonId, manifest) => {
 const addonMap = {};
 export const unsupportedAddons = {};
 for (const addonId of addons) {
-    const manifest = require(`./addons/${addonId}/addon.json`);
+    const manifest = addonManifests[addonId]();
     if (isMobile) {
         if (typeof manifest.enabledByDefaultMobile !== 'undefined') {
             manifest.enabledByDefault = manifest.enabledByDefaultMobile;

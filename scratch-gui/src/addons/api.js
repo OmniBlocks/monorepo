@@ -148,8 +148,6 @@ const getEditorMode = () => {
 };
 
 const tabReduxInstance = new Redux();
-const language = tabReduxInstance.state.locales.locale.split('-')[0];
-const translations = getAddonTranslations(language);
 
 const getDisplayNoneWhileDisabledClass = id => `addons-display-none-${id}`;
 
@@ -698,28 +696,38 @@ history.pushState = function (...args) {
     emitUrlChange();
 };
 
-SettingsStore.addEventListener('addon-changed', e => {
-    const addonId = e.detail.addonId;
-    const runner = AddonRunner.instances.find(i => i.id === addonId);
-    if (e.detail.dynamicEnable) {
-        if (runner) {
-            runner.dynamicEnable();
-        } else {
-            runAddon(addonId);
+const ready = () => {
+    SettingsStore.addEventListener('addon-changed', e => {
+        const addonId = e.detail.addonId;
+        const runner = AddonRunner.instances.find(i => i.id === addonId);
+        if (e.detail.dynamicEnable) {
+            if (runner) {
+                runner.dynamicEnable();
+            } else {
+                runAddon(addonId);
+            }
+        } else if (e.detail.dynamicDisable) {
+            if (runner) {
+                runner.dynamicDisable();
+            }
         }
-    } else if (e.detail.dynamicDisable) {
         if (runner) {
-            runner.dynamicDisable();
+            runner.settingsChanged();
         }
-    }
-    if (runner) {
-        runner.settingsChanged();
-    }
-});
+    });
 
-for (const id of Object.keys(addons)) {
-    if (!SettingsStore.getAddonEnabled(id)) {
-        continue;
+    for (const id of Object.keys(addons)) {
+        if (!SettingsStore.getAddonEnabled(id)) {
+            continue;
+        }
+        runAddon(id);
     }
-    runAddon(id);
-}
+};
+
+const language = tabReduxInstance.state.locales.locale.split('-')[0];
+let translations;
+getAddonTranslations(language)
+    .then(_translations => {
+        translations = _translations;
+        ready();
+    });

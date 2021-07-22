@@ -14,17 +14,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import english from './addons-l10n/en.json';
+
 /**
  * Get addon translations.
  * @param {string} lang The locale code
- * @returns {object} Object of translation ID to localized string or English fallback
+ * @returns {Promise<object>} Object of translation ID to localized string or English fallback
  */
-export default function getTranslations (lang) {
+export default async function getTranslations (lang) {
     const result = {};
-    Object.assign(result, require('./addons-l10n/en.json'));
+    Object.assign(result, english);
     if (lang !== 'en') {
         try {
-            const translations = require(`./addons-l10n/${lang}.json`);
+            const translations = (await import(`./addons-l10n/${lang}.json`)).default;
             Object.assign(result, translations);
         } catch (e) {
             // ignore

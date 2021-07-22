@@ -21,6 +21,7 @@ import dataURLToBlob from '../lib/data-uri-to-blob';
 import EventTargetShim from './event-target';
 import AddonHooks from './hooks';
 import addons from './addon-manifests';
+import addonEntries from './generated/addon-entries';
 import './polyfill';
 
 /* eslint-disable no-console */
@@ -629,17 +630,15 @@ class AddonRunner {
     async run () {
         this.updateCSSVariables();
 
+        const {resources} = await addonEntries[this.id]();
+
         if (this.manifest.userstyles) {
             for (const userstyle of this.manifest.userstyles) {
                 if (!this.settingsMatch(userstyle.settingMatch)) {
                     continue;
                 }
-                const m = await import(
-                    /* webpackInclude: /\.css$/ */
-                    /* webpackMode: "eager" */
-                    `!css-loader!./addons/${this.id}/${userstyle.url}`
-                );
-                const source = m.default[0][1];
+                const m = resources[userstyle.url]();
+                const source = m[0][1];
                 const style = createStylesheet(source);
                 style.className = 'scratch-addons-theme';
                 style.dataset.addonId = this.id;
@@ -653,11 +652,7 @@ class AddonRunner {
                 if (!this.settingsMatch(userscript.settingMatch)) {
                     continue;
                 }
-                const m = await import(
-                    /* webpackInclude: /\.js$/ */
-                    /* webpackMode: "eager" */
-                    `./addons/${this.id}/${userscript.url}`
-                );
+                const m = resources[userscript.url]();
                 m.default(this.publicAPI);
             }
         }

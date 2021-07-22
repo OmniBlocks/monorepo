@@ -1,6 +1,12 @@
 import log from './log.js';
 import throttle from 'lodash.throttle';
 
+const anonymizeUsername = username => {
+    if (/^player\d{2,7}$/i.test(username)) {
+        return 'player';
+    }
+    return username;
+};
 
 class CloudProvider {
     /**
@@ -15,7 +21,7 @@ class CloudProvider {
      */
     constructor (cloudHost, vm, username, projectId) {
         this.vm = vm;
-        this.username = username;
+        this.username = anonymizeUsername(username);
         this.projectId = projectId;
         this.cloudHost = cloudHost;
 

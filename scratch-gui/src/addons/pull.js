@@ -244,8 +244,10 @@ for (const file of l10nFiles) {
     if (!fs.statSync(oldDirectory).isDirectory()) {
         continue;
     }
-    languages.push(file);
-    const newPath = pathUtil.resolve(__dirname, 'addons-l10n', `${file}.json`);
+    // Convert pt-br to just pt
+    const fixedName = file === 'pt-br' ? 'pt' : file;
+    languages.push(fixedName);
+    const newPath = pathUtil.resolve(__dirname, 'addons-l10n', `${fixedName}.json`);
     fs.writeFileSync(newPath, JSON.stringify(getAllMessages(oldDirectory)));
 }
 

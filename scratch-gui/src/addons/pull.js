@@ -162,7 +162,8 @@ const removeUnusedPropertiesFromManifestInPlace = manifest => {
     }
 };
 
-const processAddon = (oldDirectory, newDirectory) => {
+const addonIdToManifest = {};
+const processAddon = (id, oldDirectory, newDirectory) => {
     for (const file of walk(oldDirectory)) {
         const oldPath = pathUtil.join(oldDirectory, file);
         let contents = fs.readFileSync(oldPath);
@@ -173,6 +174,7 @@ const processAddon = (oldDirectory, newDirectory) => {
         if (file === 'addon.json') {
             contents = contents.toString('utf-8');
             const parsedManifest = JSON.parse(contents);
+            addonIdToManifest[id] = parsedManifest;
             removeUnusedPropertiesFromManifestInPlace(parsedManifest);
             contents = JSON.stringify(parsedManifest, null, 2);
             const entryPath = pathUtil.join(newDirectory, '_entry.js');
@@ -234,7 +236,9 @@ const generateAddonEntries = () => generateEntries(
     addons,
     id => ({
         name: `addon-entry-${id}`,
-        src: `../addons/${id}/_entry.js`
+        src: `../addons/${id}/_entry.js`,
+        // Addons that are enabled by default and active outside the editor should not be loaded async
+        async: !(addonIdToManifest[id].enabledByDefault && !addonIdToManifest[id].onlyInEditor)
     })
 );
 
@@ -249,7 +253,7 @@ const generateAddonManifestEntries = () => generateEntries(
 for (const addon of addons) {
     const oldDirectory = pathUtil.resolve(__dirname, 'ScratchAddons', 'addons', addon);
     const newDirectory = pathUtil.resolve(__dirname, 'addons', addon);
-    processAddon(oldDirectory, newDirectory);
+    processAddon(addon, oldDirectory, newDirectory);
 }
 
 const l10nFiles = fs.readdirSync(pathUtil.resolve(__dirname, 'ScratchAddons', 'addons-l10n'));

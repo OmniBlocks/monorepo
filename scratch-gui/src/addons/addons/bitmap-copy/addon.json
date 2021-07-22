@@ -4,20 +4,23 @@
   "info": [
     {
       "type": "notice",
-      "text": "\"Right click \u2192 copy\" is not supported. You must press Ctrl+C while a bitmap image is selected.",
+      "text": "\"Right click → copy\" is not supported. You must press Ctrl+C while a bitmap image is selected.",
       "id": "norightclick"
     }
   ],
   "userscripts": [
     {
-      "url": "userscript.js",
-      "matches": ["https://scratch.mit.edu/projects/*"]
+      "url": "userscript.js"
     }
   ],
   "dynamicEnable": true,
   "dynamicDisable": true,
-  "versionAdded": "1.0.0",
-  "tags": ["editor", "costumeEditor"],
-  "permissions": ["clipboardWrite"],
+  "tags": [
+    "editor",
+    "costumeEditor"
+  ],
+  "permissions": [
+    "clipboardWrite"
+  ],
   "enabledByDefault": true
 }

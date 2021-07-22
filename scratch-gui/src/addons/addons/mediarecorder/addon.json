@@ -1,19 +1,20 @@
 {
   "name": "Record project video",
   "description": "Adds a \"start recording\" button to the editor that allows you to record the project's stage.",
-  "tags": ["editor", "editorMenuBar", "recommended"],
+  "tags": [
+    "editor",
+    "editorMenuBar",
+    "recommended"
+  ],
   "userscripts": [
     {
-      "url": "userscript.js",
-      "matches": ["https://scratch.mit.edu/projects/*"]
+      "url": "userscript.js"
     }
   ],
   "userstyles": [
     {
-      "url": "style.css",
-      "matches": ["https://scratch.mit.edu/projects/*"]
+      "url": "style.css"
     }
   ],
-  "versionAdded": "1.6.0",
   "enabledByDefault": false
 }

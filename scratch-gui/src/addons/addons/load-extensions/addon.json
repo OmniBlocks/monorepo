@@ -3,8 +3,7 @@
   "description": "Adds music, pen, and other editor extensions automatically to the block category list.",
   "userscripts": [
     {
-      "url": "userscript.js",
-      "matches": ["https://scratch.mit.edu/projects/*"]
+      "url": "userscript.js"
     }
   ],
   "settings": [
@@ -33,6 +32,8 @@
       "default": false
     }
   ],
-  "versionAdded": "1.10.0",
-  "tags": ["editor", "codeEditor"]
+  "tags": [
+    "editor",
+    "codeEditor"
+  ]
 }

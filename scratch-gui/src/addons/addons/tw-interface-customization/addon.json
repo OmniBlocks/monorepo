@@ -4,7 +4,6 @@
   "userscripts": [
     {
       "url": "remove-backpack.js",
-      "matches": ["https://scratch.mit.edu/projects/*"],
       "settingMatch": {
         "id": "removeBackpack",
         "value": true
@@ -14,7 +13,6 @@
   "userstyles": [
     {
       "url": "remove-backpack.css",
-      "matches": ["https://scratch.mit.edu/projects/*"],
       "settingMatch": {
         "id": "removeBackpack",
         "value": true
@@ -29,6 +27,8 @@
       "default": false
     }
   ],
-  "tags": ["theme"],
+  "tags": [
+    "theme"
+  ],
   "enabledByDefault": false
 }

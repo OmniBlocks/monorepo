@@ -12,18 +12,14 @@
   ],
   "dynamicEnable": true,
   "dynamicDisable": true,
-  "injectAsStyleElt": true,
-  "versionAdded": "1.2.0",
   "userscripts": [
     {
-      "url": "theme3.js",
-      "matches": ["https://scratch.mit.edu/projects/*"]
+      "url": "theme3.js"
     }
   ],
   "userstyles": [
     {
-      "url": "theme3.css",
-      "matches": ["https://scratch.mit.edu/projects/*"]
+      "url": "theme3.css"
     }
   ],
   "settings": [
@@ -156,7 +152,12 @@
       "reloadRequired": false
     }
   ],
-  "tags": ["editor", "theme", "codeEditor", "recommended"],
+  "tags": [
+    "editor",
+    "theme",
+    "codeEditor",
+    "recommended"
+  ],
   "enabledByDefault": false,
   "presets": [
     {

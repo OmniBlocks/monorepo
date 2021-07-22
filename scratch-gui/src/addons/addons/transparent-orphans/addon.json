@@ -1,8 +1,10 @@
 {
   "name": "Block transparency",
   "description": "Adjust the transparency for blocks in the editor, with separate options for orphaned blocks (those without a hat block at the top) and blocks that are being dragged.",
-  "tags": ["editor", "codeEditor"],
-  "versionAdded": "1.15.0",
+  "tags": [
+    "editor",
+    "codeEditor"
+  ],
   "dynamicDisable": true,
   "dynamicEnable": true,
   "credits": [
@@ -45,8 +47,7 @@
   ],
   "userstyles": [
     {
-      "url": "userstyle.css",
-      "matches": ["projects"]
+      "url": "userstyle.css"
     }
   ]
 }

@@ -8,20 +8,20 @@
   ],
   "dynamicEnable": true,
   "dynamicDisable": true,
-  "versionAdded": "1.0.0",
-  "injectAsStyleElt": true,
   "userscripts": [
     {
-      "url": "userscript.js",
-      "matches": ["https://scratch.mit.edu/projects/*"]
+      "url": "userscript.js"
     }
   ],
   "userstyles": [
     {
-      "url": "userscript.css",
-      "matches": ["https://scratch.mit.edu/projects/*"]
+      "url": "userscript.css"
     }
   ],
-  "tags": ["editor", "codeEditor", "theme"],
+  "tags": [
+    "editor",
+    "codeEditor",
+    "theme"
+  ],
   "enabledByDefault": false
 }

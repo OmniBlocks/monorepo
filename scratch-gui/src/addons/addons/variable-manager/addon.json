@@ -11,19 +11,19 @@
   ],
   "userscripts": [
     {
-      "url": "userscript.js",
-      "matches": ["https://scratch.mit.edu/projects/*"]
+      "url": "userscript.js"
     }
   ],
   "userstyles": [
     {
-      "url": "style.css",
-      "matches": ["https://scratch.mit.edu/projects/*"]
+      "url": "style.css"
     }
   ],
   "dynamicEnable": true,
   "dynamicDisable": true,
-  "versionAdded": "1.11.0",
-  "tags": ["editor", "recommended"],
+  "tags": [
+    "editor",
+    "recommended"
+  ],
   "enabledByDefault": false
 }

@@ -9,11 +9,13 @@
   ],
   "userscripts": [
     {
-      "url": "userscript.js",
-      "matches": ["https://scratch.mit.edu/projects/*"]
+      "url": "userscript.js"
     }
   ],
-  "versionAdded": "1.7.0",
   "enabledByDefault": true,
-  "tags": ["editor", "projectPlayer", "recommended"]
+  "tags": [
+    "editor",
+    "projectPlayer",
+    "recommended"
+  ]
 }

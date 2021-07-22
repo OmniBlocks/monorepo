@@ -8,20 +8,20 @@
   ],
   "userscripts": [
     {
-      "url": "fix-share-the-love.js",
-      "matches": ["https://scratch.mit.edu/projects/*"]
+      "url": "fix-share-the-love.js"
     }
   ],
   "dynamicEnable": true,
   "dynamicDisable": true,
-  "injectAsStyleElt": true,
   "userstyles": [
     {
-      "url": "stageleft.css",
-      "matches": ["https://scratch.mit.edu/projects/*"]
+      "url": "stageleft.css"
     }
   ],
-  "tags": ["editor", "theme", "recommended"],
-  "versionAdded": "1.1.0",
+  "tags": [
+    "editor",
+    "theme",
+    "recommended"
+  ],
   "enabledByDefault": false
 }

@@ -145,6 +145,23 @@ const generateAddonEntry = manifest => {
     return result;
 };
 
+const removeUnusedPropertiesFromManifestInPlace = manifest => {
+    delete manifest.versionAdded;
+    delete manifest.libraries;
+    delete manifest.injectAsStyleElt;
+    if (manifest.userscripts) {
+        for (const userscript of manifest.userscripts) {
+            delete userscript.matches;
+            delete userscript.runAtComplete;
+        }
+    }
+    if (manifest.userstyles) {
+        for (const userstyle of manifest.userstyles) {
+            delete userstyle.matches;
+        }
+    }
+};
+
 const processAddon = (oldDirectory, newDirectory) => {
     for (const file of walk(oldDirectory)) {
         const oldPath = pathUtil.join(oldDirectory, file);
@@ -156,7 +173,8 @@ const processAddon = (oldDirectory, newDirectory) => {
         if (file === 'addon.json') {
             contents = contents.toString('utf-8');
             const parsedManifest = JSON.parse(contents);
-            // TODO: remove unused properties
+            removeUnusedPropertiesFromManifestInPlace(parsedManifest);
+            contents = JSON.stringify(parsedManifest, null, 2);
             const entryPath = pathUtil.join(newDirectory, '_entry.js');
             fs.writeFileSync(entryPath, generateAddonEntry(parsedManifest));
         }

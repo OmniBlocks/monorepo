@@ -16,17 +16,14 @@
   ],
   "userscripts": [
     {
-      "url": "userscript.js",
-      "matches": ["https://scratch.mit.edu/projects/*"]
+      "url": "userscript.js"
     }
   ],
   "userstyles": [
     {
-      "url": "style.css",
-      "matches": ["https://scratch.mit.edu/projects/*"]
+      "url": "style.css"
     }
   ],
-  "versionAdded": "1.8.0",
   "settings": [
     {
       "name": "Toggle on...",
@@ -74,5 +71,9 @@
       "default": "default"
     }
   ],
-  "tags": ["editor", "codeEditor", "recommended"]
+  "tags": [
+    "editor",
+    "codeEditor",
+    "recommended"
+  ]
 }

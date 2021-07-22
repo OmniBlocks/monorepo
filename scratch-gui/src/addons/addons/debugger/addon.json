@@ -14,17 +14,17 @@
   ],
   "userscripts": [
     {
-      "url": "userscript.js",
-      "matches": ["projects"]
+      "url": "userscript.js"
     }
   ],
   "userstyles": [
     {
-      "url": "style.css",
-      "matches": ["projects"]
+      "url": "style.css"
     }
   ],
-  "tags": ["editor", "beta"],
-  "enabledByDefault": false,
-  "versionAdded": "1.16.0"
+  "tags": [
+    "editor",
+    "beta"
+  ],
+  "enabledByDefault": false
 }

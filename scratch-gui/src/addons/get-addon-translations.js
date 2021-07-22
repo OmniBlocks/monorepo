@@ -14,8 +14,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import addons from './addons.json';
-
 /**
  * Get addon translations.
  * @param {string} lang The locale code
@@ -23,20 +21,13 @@ import addons from './addons.json';
  */
 export default function getTranslations (lang) {
     const result = {};
-    for (const addonId of addons) {
+    Object.assign(result, require('./addons-l10n/en.json'));
+    if (lang !== 'en') {
         try {
-            const english = require(`./addons-l10n/en/${addonId}.json`);
-            Object.assign(result, english);
+            const translations = require(`./addons-l10n/${lang}.json`);
+            Object.assign(result, translations);
         } catch (e) {
             // ignore
-        }
-        if (lang !== 'en') {
-            try {
-                const translations = require(`./addons-l10n/${lang}/${addonId}.json`);
-                Object.assign(result, translations);
-            } catch (e) {
-                // ignore
-            }
         }
     }
     return result;

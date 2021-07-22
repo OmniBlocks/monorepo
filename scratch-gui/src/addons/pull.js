@@ -157,24 +157,23 @@ request('https://raw.githubusercontent.com/ScratchAddons/contributors/master/.al
     const languages = [];
     for (const file of l10nFiles) {
         const oldDirectory = pathUtil.resolve(__dirname, 'ScratchAddons', 'addons-l10n', file);
-        const newDirectory = pathUtil.resolve(__dirname, 'addons-l10n', file);
+        const newPath = pathUtil.resolve(__dirname, 'addons-l10n', `${file}.json`);
         if (!fs.statSync(oldDirectory).isDirectory()) {
             continue;
         }
         languages.push(file);
-        fs.mkdirSync(newDirectory, {recursive: true});
+        const allMessages = {};
         for (const addon of addons) {
-            const oldFile = pathUtil.join(oldDirectory, `${addon}.json`);
-            const newFile = pathUtil.join(newDirectory, `${addon}.json`);
+            const path = pathUtil.join(oldDirectory, `${addon}.json`);
             try {
-                const contents = fs.readFileSync(oldFile, 'utf-8');
-                // Parse and stringify to minimize
+                const contents = fs.readFileSync(path, 'utf-8');
                 const parsed = JSON.parse(contents);
-                fs.writeFileSync(newFile, JSON.stringify(parsed));
+                Object.assign(allMessages, parsed);
             } catch (e) {
                 // Ignore
             }
         }
+        fs.writeFileSync(newPath, JSON.stringify(allMessages));
     }
 
     const extensionManifestPath = pathUtil.resolve(__dirname, 'ScratchAddons', 'manifest.json');

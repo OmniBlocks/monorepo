@@ -635,9 +635,9 @@ class AddonRunner {
     }
 
     async run () {
-        this.updateCSSVariables();
-
         const {resources} = await addonEntries[this.id]();
+
+        this.updateCSSVariables();
 
         if (this.manifest.userstyles) {
             for (const userstyle of this.manifest.userstyles) {

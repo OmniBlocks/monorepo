@@ -11,6 +11,7 @@
       "url": "userscript.js"
     }
   ],
+  "onlyInEditor": true,
   "settings": [
     {
       "name": "Separate List Category",

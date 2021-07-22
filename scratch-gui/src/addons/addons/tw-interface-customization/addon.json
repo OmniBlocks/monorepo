@@ -19,6 +19,7 @@
       }
     }
   ],
+  "onlyInEditor": true,
   "settings": [
     {
       "name": "Remove backpack",

@@ -6,6 +6,7 @@
       "url": "userscript.js"
     }
   ],
+  "onlyInEditor": true,
   "settings": [
     {
       "name": "Music",

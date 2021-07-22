@@ -14,6 +14,7 @@
       "url": "userstyle.css"
     }
   ],
+  "onlyInEditor": true,
   "credits": [
     {
       "name": "--Explosion--",

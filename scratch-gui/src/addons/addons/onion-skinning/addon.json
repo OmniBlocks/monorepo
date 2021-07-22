@@ -16,6 +16,7 @@
       "url": "style.css"
     }
   ],
+  "onlyInEditor": true,
   "settings": [
     {
       "id": "default",

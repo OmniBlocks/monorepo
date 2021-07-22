@@ -24,6 +24,7 @@
       "url": "style.css"
     }
   ],
+  "onlyInEditor": true,
   "dynamicEnable": true,
   "dynamicDisable": true,
   "enabledByDefault": true

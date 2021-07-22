@@ -18,6 +18,7 @@
       "url": "style.css"
     }
   ],
+  "onlyInEditor": true,
   "tags": [
     "editor",
     "projectPlayer",

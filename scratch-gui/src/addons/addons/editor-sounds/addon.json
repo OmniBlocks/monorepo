@@ -11,6 +11,7 @@
       "url": "userscript.js"
     }
   ],
+  "onlyInEditor": true,
   "tags": [
     "editor",
     "codeEditor"

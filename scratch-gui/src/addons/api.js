@@ -150,6 +150,22 @@ const getEditorMode = () => {
 
 const tabReduxInstance = new Redux();
 
+const untilInEditor = () => {
+    if (!tabReduxInstance.state.scratchGui.mode.isPlayerOnly) {
+        return;
+    }
+    return new Promise(resolve => {
+        const handler = () => {
+            if (!tabReduxInstance.state.scratchGui.mode.isPlayerOnly) {
+                resolve();
+                tabReduxInstance.removeEventListener('statechanged', handler);
+            }
+        };
+        tabReduxInstance.initialize();
+        tabReduxInstance.addEventListener('statechanged', handler);
+    });
+};
+
 const getDisplayNoneWhileDisabledClass = id => `addons-display-none-${id}`;
 
 const SHARED_SPACES = {
@@ -635,6 +651,10 @@ class AddonRunner {
     }
 
     async run () {
+        if (this.manifest.onlyInEditor) {
+            await untilInEditor();
+        }
+
         const {resources} = await addonEntries[this.id]();
 
         this.updateCSSVariables();

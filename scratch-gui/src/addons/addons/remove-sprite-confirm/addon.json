@@ -6,6 +6,7 @@
       "url": "userscript.js"
     }
   ],
+  "onlyInEditor": true,
   "dynamicEnable": true,
   "dynamicDisable": true,
   "tags": [

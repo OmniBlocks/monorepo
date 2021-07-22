@@ -46,6 +46,7 @@
       "url": "userscript.css"
     }
   ],
+  "onlyInEditor": true,
   "tags": [
     "editor",
     "codeEditor",

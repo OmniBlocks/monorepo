@@ -20,5 +20,6 @@
       "url": "style.css"
     }
   ],
+  "onlyInEditor": true,
   "enabledByDefault": false
 }

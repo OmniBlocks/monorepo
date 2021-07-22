@@ -15,6 +15,7 @@
       "url": "userscript.js"
     }
   ],
+  "onlyInEditor": true,
   "info": [
     {
       "type": "warning",

@@ -216,9 +216,7 @@ const generateAddonEntries = () => generateEntries(
     addons,
     id => ({
         name: `addon-entry-${id}`,
-        src: `../addons/${id}/_entry.js`,
-        // TODO: reconsider
-        async: false
+        src: `../addons/${id}/_entry.js`
     })
 );
 

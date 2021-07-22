@@ -530,6 +530,7 @@ class AddonRunner {
         this.messageCache = {};
         this.stylesheets = [];
         this.disabledStylesheet = null;
+        this.loading = true;
 
         this.publicAPI = {
             global,
@@ -596,6 +597,9 @@ class AddonRunner {
     }
 
     dynamicEnable () {
+        if (this.loading) {
+            return;
+        }
         this.publicAPI.addon.self.dispatchEvent(new CustomEvent('reenabled'));
         this.publicAPI.addon.self.disabled = false;
         this.appendStylesheets();
@@ -606,6 +610,9 @@ class AddonRunner {
     }
 
     dynamicDisable () {
+        if (this.loading) {
+            return;
+        }
         this.publicAPI.addon.self.dispatchEvent(new CustomEvent('disabled'));
         this.publicAPI.addon.self.disabled = true;
         this.removeStylesheets();
@@ -656,6 +663,8 @@ class AddonRunner {
                 m.default(this.publicAPI);
             }
         }
+
+        this.loading = false;
     }
 }
 AddonRunner.instances = [];

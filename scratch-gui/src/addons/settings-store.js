@@ -15,7 +15,7 @@
  */
 
 import addons from './addon-manifests';
-import upstreamMeta from './upstream-meta.json';
+import upstreamMeta from './generated/upstream-meta.json';
 import EventTargetShim from './event-target';
 
 const SETTINGS_KEY = 'tw:addons';

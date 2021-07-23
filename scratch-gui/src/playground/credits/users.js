@@ -1,4 +1,4 @@
-import addonTranslatorsJSON from '../../addons/translators.json';
+import addonTranslatorsJSON from '../../addons/generated/translators.json';
 
 const shuffle = list => {
     for (let i = list.length - 1; i > 0; i--) {

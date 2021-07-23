@@ -55,6 +55,10 @@ fs.mkdirSync(pathUtil.resolve(__dirname, 'addons'), {recursive: true});
 fs.mkdirSync(pathUtil.resolve(__dirname, 'addons-l10n'), {recursive: true});
 fs.mkdirSync(pathUtil.resolve(__dirname, 'libraries'), {recursive: true});
 
+const generatedPath = pathUtil.resolve(__dirname, 'generated');
+rimraf.sync(generatedPath);
+fs.mkdirSync(generatedPath, {recursive: true});
+
 process.chdir(repoPath);
 const commitHash = childProcess.execSync('git rev-parse --short HEAD')
     .toString()
@@ -63,7 +67,7 @@ const commitHash = childProcess.execSync('git rev-parse --short HEAD')
 request('https://raw.githubusercontent.com/ScratchAddons/contributors/master/.all-contributorsrc', (err, response, body) => {
     const parsed = JSON.parse(body);
     const contributors = parsed.contributors.filter(({contributions}) => contributions.includes('translation'));
-    const contributorsPath = pathUtil.resolve(__dirname, 'translators.json');
+    const contributorsPath = pathUtil.resolve(generatedPath, 'translators.json');
     fs.writeFileSync(contributorsPath, JSON.stringify(contributors, null, 4));
 });
 
@@ -271,14 +275,12 @@ for (const file of l10nFiles) {
     fs.writeFileSync(newPath, JSON.stringify(getAllMessages(oldDirectory)));
 }
 
-const generatedPath = pathUtil.resolve(__dirname, 'generated');
-fs.mkdirSync(generatedPath, {recursive: true});
 fs.writeFileSync(pathUtil.resolve(generatedPath, 'l10n-entries.js'), generateL10nEntries(languages));
 fs.writeFileSync(pathUtil.resolve(generatedPath, 'addon-entries.js'), generateAddonEntries(languages));
 fs.writeFileSync(pathUtil.resolve(generatedPath, 'addon-manifests.js'), generateAddonManifestEntries(languages));
 
 const extensionManifestPath = pathUtil.resolve(__dirname, 'ScratchAddons', 'manifest.json');
-const upstreamMetaPath = pathUtil.resolve(__dirname, 'upstream-meta.json');
+const upstreamMetaPath = pathUtil.resolve(generatedPath, 'upstream-meta.json');
 const extensionManifest = JSON.parse(fs.readFileSync(extensionManifestPath, 'utf8'));
 const versionName = extensionManifest.version_name;
 fs.writeFileSync(upstreamMetaPath, JSON.stringify({

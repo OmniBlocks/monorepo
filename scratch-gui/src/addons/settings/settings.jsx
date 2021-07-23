@@ -23,7 +23,7 @@ import importedAddons, {unsupportedAddons} from '../addon-manifests';
 import getAddonTranslations from '../get-addon-translations';
 import settingsTranslationsEnglish from './l10n/en.json';
 import settingsTranslationsOther from './l10n/translations.json';
-import upstreamMeta from '../upstream-meta.json';
+import upstreamMeta from '../generated/upstream-meta.json';
 import {detectLocale} from '../../lib/detect-locale';
 import {getInitialDarkMode} from '../../lib/tw-theme-hoc.jsx';
 import SettingsStore from '../settings-store-singleton';

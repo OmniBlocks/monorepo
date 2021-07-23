@@ -1,5 +1,5 @@
 import SettingStore from '../../../src/addons/settings-store';
-import upstreamMeta from '../../../src/addons/upstream-meta.json';
+import upstreamMeta from '../../../src/addons/generated/upstream-meta.json';
 
 class LocalStorageShim {
     constructor () {

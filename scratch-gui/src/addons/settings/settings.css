@@ -574,7 +574,7 @@ a:active, a:focus {
 .dirty-outer {
     display: flex;
     position: absolute;
-    top: 100%;
+    top: calc(100% - 2px);
     left: 0;
     width: calc(100% - 20px);
     margin-left: 10px;
@@ -582,7 +582,6 @@ a:active, a:focus {
     justify-content: center;
     animation: dirty-appear 0.2s ease;
     pointer-events: none;
-    margin-top: 2px;
 }
 .dirty-inner {
     padding: 8px;

@@ -522,6 +522,7 @@ a:active, a:focus {
 .select-option:active, .select-option:focus-within {
     outline: none;
     box-shadow: 0 0 0 3px $motion-transparent;
+    z-index: 10;
 }
 
 .presets {

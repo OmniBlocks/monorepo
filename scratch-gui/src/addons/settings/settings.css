@@ -469,6 +469,7 @@ a:active, a:focus {
 .setting input[type="number"] {
     border-radius: 20px;
     font-size: 14px;
+    width: 75px;
 }
 .setting input[type="color"] {
     height: 30px;

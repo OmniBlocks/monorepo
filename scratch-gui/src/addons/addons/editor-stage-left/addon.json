@@ -11,6 +11,7 @@
       "url": "fix-share-the-love.js"
     }
   ],
+  "noTranslations": true,
   "dynamicEnable": true,
   "dynamicDisable": true,
   "userstyles": [

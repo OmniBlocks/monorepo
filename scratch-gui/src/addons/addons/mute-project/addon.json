@@ -12,6 +12,7 @@
       "url": "userscript.js"
     }
   ],
+  "noTranslations": true,
   "enabledByDefault": true,
   "tags": [
     "editor",

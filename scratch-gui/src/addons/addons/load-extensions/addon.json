@@ -6,6 +6,7 @@
       "url": "userscript.js"
     }
   ],
+  "noTranslations": true,
   "onlyInEditor": true,
   "settings": [
     {

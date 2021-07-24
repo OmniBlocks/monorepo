@@ -16,6 +16,7 @@
       "url": "dragged-over.css"
     }
   ],
+  "noTranslations": true,
   "dynamicEnable": true,
   "dynamicDisable": true,
   "tags": [

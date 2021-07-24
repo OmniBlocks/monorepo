@@ -28,6 +28,7 @@
     }
   ],
   "onlyInEditor": true,
+  "noTranslations": true,
   "info": [
     {
       "type": "warning",

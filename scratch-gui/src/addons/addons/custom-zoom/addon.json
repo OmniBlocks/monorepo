@@ -23,6 +23,7 @@
     }
   ],
   "onlyInEditor": true,
+  "noTranslations": true,
   "settings": [
     {
       "name": "Maximum Zoom (50-500%)",

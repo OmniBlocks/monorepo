@@ -25,6 +25,7 @@
     }
   ],
   "onlyInEditor": true,
+  "noTranslations": true,
   "settings": [
     {
       "name": "Toggle on...",

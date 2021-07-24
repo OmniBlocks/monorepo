@@ -14,6 +14,7 @@
     }
   ],
   "onlyInEditor": true,
+  "noTranslations": true,
   "dynamicEnable": true,
   "dynamicDisable": true,
   "tags": [

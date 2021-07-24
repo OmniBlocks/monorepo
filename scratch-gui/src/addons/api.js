@@ -150,6 +150,13 @@ const getEditorMode = () => {
 
 const tabReduxInstance = new Redux();
 
+const language = tabReduxInstance.state.locales.locale.split('-')[0];
+let addonMessages;
+const addonMessagesPromise = getAddonTranslations(language)
+    .then(_l10n => {
+        addonMessages = _l10n;
+    });
+
 const untilInEditor = () => {
     if (!tabReduxInstance.state.scratchGui.mode.isPlayerOnly) {
         return;
@@ -566,7 +573,7 @@ class AddonRunner {
         if (this.messageCache[namespacedKey]) {
             return this.messageCache[namespacedKey].format(vars);
         }
-        let translation = translations[namespacedKey];
+        let translation = addonMessages[namespacedKey];
         if (!translation) {
             return namespacedKey;
         }
@@ -656,6 +663,9 @@ class AddonRunner {
         }
 
         const {resources} = await addonEntries[this.id]();
+        if (!this.manifest.noTranslations) {
+            await addonMessagesPromise;
+        }
 
         this.updateCSSVariables();
 
@@ -720,38 +730,28 @@ history.pushState = function (...args) {
     emitUrlChange();
 };
 
-const ready = () => {
-    SettingsStore.addEventListener('addon-changed', e => {
-        const addonId = e.detail.addonId;
-        const runner = AddonRunner.instances.find(i => i.id === addonId);
-        if (e.detail.dynamicEnable) {
-            if (runner) {
-                runner.dynamicEnable();
-            } else {
-                runAddon(addonId);
-            }
-        } else if (e.detail.dynamicDisable) {
-            if (runner) {
-                runner.dynamicDisable();
-            }
-        }
+SettingsStore.addEventListener('addon-changed', e => {
+    const addonId = e.detail.addonId;
+    const runner = AddonRunner.instances.find(i => i.id === addonId);
+    if (e.detail.dynamicEnable) {
         if (runner) {
-            runner.settingsChanged();
+            runner.dynamicEnable();
+        } else {
+            runAddon(addonId);
         }
-    });
-
-    for (const id of Object.keys(addons)) {
-        if (!SettingsStore.getAddonEnabled(id)) {
-            continue;
+    } else if (e.detail.dynamicDisable) {
+        if (runner) {
+            runner.dynamicDisable();
         }
-        runAddon(id);
     }
-};
+    if (runner) {
+        runner.settingsChanged();
+    }
+});
 
-const language = tabReduxInstance.state.locales.locale.split('-')[0];
-let translations;
-getAddonTranslations(language)
-    .then(_translations => {
-        translations = _translations;
-        ready();
-    });
+for (const id of Object.keys(addons)) {
+    if (!SettingsStore.getAddonEnabled(id)) {
+        continue;
+    }
+    runAddon(id);
+}

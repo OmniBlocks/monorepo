@@ -1,6 +1,6 @@
 /* inserted by pull.js */
-import _twAsset0 from "./lock.svg";
-import _twAsset1 from "./unlock.svg";
+import _twAsset0 from "!url-loader!./lock.svg";
+import _twAsset1 from "!url-loader!./unlock.svg";
 const _twGetAsset = (path) => {
   if (path === "/lock.svg") return _twAsset0;
   if (path === "/unlock.svg") return _twAsset1;

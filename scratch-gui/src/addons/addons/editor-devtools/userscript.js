@@ -1,5 +1,5 @@
 /* inserted by pull.js */
-import _twAsset0 from "./icon--close.svg";
+import _twAsset0 from "!url-loader!./icon--close.svg";
 const _twGetAsset = (path) => {
   if (path === "/icon--close.svg") return _twAsset0;
   throw new Error(`Unknown asset: ${path}`);

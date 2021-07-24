@@ -1,6 +1,6 @@
 /* inserted by pull.js */
-import _twAsset0 from "./pause.svg";
-import _twAsset1 from "./play.svg";
+import _twAsset0 from "!url-loader!./pause.svg";
+import _twAsset1 from "!url-loader!./play.svg";
 const _twGetAsset = (path) => {
   if (path === "/pause.svg") return _twAsset0;
   if (path === "/play.svg") return _twAsset1;

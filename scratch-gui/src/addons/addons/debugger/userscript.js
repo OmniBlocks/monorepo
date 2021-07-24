@@ -1,12 +1,12 @@
 /* inserted by pull.js */
-import _twAsset0 from "./add.svg";
-import _twAsset1 from "./debug-unread.svg";
-import _twAsset2 from "./debug.svg";
-import _twAsset3 from "./delete.svg";
-import _twAsset4 from "./download-white.svg";
-import _twAsset5 from "./error.svg";
-import _twAsset6 from "./play.svg";
-import _twAsset7 from "./warning.svg";
+import _twAsset0 from "!url-loader!./add.svg";
+import _twAsset1 from "!url-loader!./debug-unread.svg";
+import _twAsset2 from "!url-loader!./debug.svg";
+import _twAsset3 from "!url-loader!./delete.svg";
+import _twAsset4 from "!url-loader!./download-white.svg";
+import _twAsset5 from "!url-loader!./error.svg";
+import _twAsset6 from "!url-loader!./play.svg";
+import _twAsset7 from "!url-loader!./warning.svg";
 const _twGetAsset = (path) => {
   if (path === "/add.svg") return _twAsset0;
   if (path === "/debug-unread.svg") return _twAsset1;

@@ -1,5 +1,5 @@
 /* inserted by pull.js */
-import _twAsset0 from "./folder.svg";
+import _twAsset0 from "!url-loader!./folder.svg";
 const _twGetAsset = (path) => {
   if (path === "/folder.svg") return _twAsset0;
   throw new Error(`Unknown asset: ${path}`);

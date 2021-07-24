@@ -1,6 +1,6 @@
 /* inserted by pull.js */
-import _twAsset0 from "./icon.svg";
-import _twAsset1 from "./search.svg";
+import _twAsset0 from "!url-loader!./icon.svg";
+import _twAsset1 from "!url-loader!./search.svg";
 const _twGetAsset = (path) => {
   if (path === "/icon.svg") return _twAsset0;
   if (path === "/search.svg") return _twAsset1;

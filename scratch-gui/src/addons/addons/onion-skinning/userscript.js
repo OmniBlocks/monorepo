@@ -1,8 +1,8 @@
 /* inserted by pull.js */
-import _twAsset0 from "./decrement.svg";
-import _twAsset1 from "./increment.svg";
-import _twAsset2 from "./settings.svg";
-import _twAsset3 from "./toggle.svg";
+import _twAsset0 from "!url-loader!./decrement.svg";
+import _twAsset1 from "!url-loader!./increment.svg";
+import _twAsset2 from "!url-loader!./settings.svg";
+import _twAsset3 from "!url-loader!./toggle.svg";
 const _twGetAsset = (path) => {
   if (path === "/decrement.svg") return _twAsset0;
   if (path === "/increment.svg") return _twAsset1;

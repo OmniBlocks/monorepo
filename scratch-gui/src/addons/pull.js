@@ -107,7 +107,7 @@ const includeImports = (folder, contents) => {
     // Then we'll generate some JS to import them.
     let header = '/* inserted by pull.js */\n';
     dynamicAssets.forEach((file, index) => {
-        header += `import _twAsset${index} from ${stringifyPath(`./${file}`)};\n`;
+        header += `import _twAsset${index} from ${stringifyPath(`!url-loader!./${file}`)};\n`;
     });
     header += `const _twGetAsset = (path) => {\n`;
     dynamicAssets.forEach((file, index) => {

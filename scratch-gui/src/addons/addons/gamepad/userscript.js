@@ -1,9 +1,9 @@
 /* inserted by pull.js */
-import _twAsset0 from "./active.png";
-import _twAsset1 from "./close.svg";
-import _twAsset2 from "./cursor.png";
-import _twAsset3 from "./dot.svg";
-import _twAsset4 from "./gamepad.svg";
+import _twAsset0 from "!url-loader!./active.png";
+import _twAsset1 from "!url-loader!./close.svg";
+import _twAsset2 from "!url-loader!./cursor.png";
+import _twAsset3 from "!url-loader!./dot.svg";
+import _twAsset4 from "!url-loader!./gamepad.svg";
 const _twGetAsset = (path) => {
   if (path === "/active.png") return _twAsset0;
   if (path === "/close.svg") return _twAsset1;

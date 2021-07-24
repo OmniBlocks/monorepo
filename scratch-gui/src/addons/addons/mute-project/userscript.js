@@ -1,5 +1,5 @@
 /* inserted by pull.js */
-import _twAsset0 from "./icon--mute.svg";
+import _twAsset0 from "!url-loader!./icon--mute.svg";
 const _twGetAsset = (path) => {
   if (path === "/icon--mute.svg") return _twAsset0;
   throw new Error(`Unknown asset: ${path}`);

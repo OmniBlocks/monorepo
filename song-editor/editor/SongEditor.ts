@@ -1483,7 +1483,11 @@ export class SongEditor {
 					this._feedbackRow2.style.display = "";
 					this._chipWaveSelectRow.style.display = "none";
 					setSelectedValue(this._algorithmSelect, instrument.algorithm);
-					setSelectedValue(this._feedbackTypeSelect, instrument.feedbackType);
+                    setSelectedValue(this._feedbackTypeSelect, instrument.feedbackType);
+
+                    setSelectedValue(this._algorithm6OpSelect , instrument.algorithm6Op);
+                    setSelectedValue(this._feedback6OpTypeSelect, instrument.feedbackType6Op);
+
 					this._feedbackAmplitudeSlider.updateValue(instrument.feedbackAmplitude);
 					setSelectedValue(this._feedbackEnvelopeSelect, instrument.feedbackEnvelope);
 					this._feedbackEnvelopeSelect.parentElement!.style.color = (instrument.feedbackAmplitude > 0) ? "" : ColorConfig.secondaryText;

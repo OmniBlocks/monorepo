@@ -261,7 +261,7 @@ export class Config {
 		{ name: "deep", volume: 1.5, basePitch: 120, pitchFilterMult: 1024.0, isSoft: true, samples: null },
 		{ name: "cutter", volume: 0.005, basePitch: 96, pitchFilterMult: 1024.0, isSoft: false, samples: null },
         { name: "metallic", volume: 1.0, basePitch: 96, pitchFilterMult: 1024.0, isSoft: false, samples: null },
-        { name: "uhhh??", volume: 1.0, basePitch: 96, pitchFilterMult: 1024.0, isSoft: false, samples: null },
+        { name: "static", volume: 1.0, basePitch: 96, pitchFilterMult: 1024.0, isSoft: false, samples: null },
 	]);
 	public static readonly filterCutoffMaxHz: number = 8000; // This is carefully calculated to correspond to no change when filtering at 48000 samples per second.
 	public static readonly filterCutoffMinHz: number = 1;
@@ -343,6 +343,8 @@ export class Config {
         { name: "1←(2 (3 (4", carrierCount: 3, associatedCarrier: [1, 2, 3, 3], modulatedBy: [[2, 3, 4], [3, 4], [4], []] },
     ]);
     public static readonly algorithms6Op: DictionaryArray<Algorithm> = toNameMap([
+        //placeholder makes life easier for later
+        { name: "Custom", carrierCount: 1, associatedCarrier: [1, 1, 1, 1, 1, 1], modulatedBy: [[2, 3, 4, 5, 6], [], [], [], [], []] },
         //yoinked from SynthBox
         //algortihm Section 1
         { name: "1←2←3←4←5←6", carrierCount: 1, associatedCarrier: [1, 1, 1, 1, 1, 1], modulatedBy: [[2], [3], [4], [5], [6], []] },
@@ -378,7 +380,7 @@ export class Config {
         { name: "1 2 3 4 5←6", carrierCount: 5, associatedCarrier: [1, 2, 3, 4, 5, 5], modulatedBy: [[], [], [], [], [6], []] },
         { name: "1 2 3 4 5 6", carrierCount: 6, associatedCarrier: [1, 2, 3, 4, 5, 6], modulatedBy: [[], [], [], [], [], []] },
         //Section 4 where we take our own previous ones for 4op and it gets weird
-        { name: "1←(2(3(4(5(6", carrierCount: 5, associatedCarrier: [1, 2, 3, 4, 5, 5], modulatedBy: [[2, 3, 4, 5, 6], [3, 4, 5, 6], [4, 5, 6], [5, 6], [6], []] },
+        { name: "1←(2 (3 (4 (5 (6", carrierCount: 5, associatedCarrier: [1, 2, 3, 4, 5, 5], modulatedBy: [[2, 3, 4, 5, 6], [3, 4, 5, 6], [4, 5, 6], [5, 6], [6], []] },
         { name: "1←(2(3(4(5(6", carrierCount: 1, associatedCarrier: [1, 1, 1, 1, 1, 1], modulatedBy: [[2, 3, 4, 5, 6], [3, 4, 5, 6], [4, 5, 6], [5, 6], [6], []] },
         { name: "1←4(2←5(3←6", carrierCount: 3, associatedCarrier: [1, 2, 3, 1, 2, 3], modulatedBy: [[2, 3, 4], [3, 5], [6], [], [], []] },
         { name: "1←4(2←5 3←6", carrierCount: 3, associatedCarrier: [1, 2, 3, 1, 2, 3], modulatedBy: [[2, 3, 4], [5], [6], [], [], []] },
@@ -410,6 +412,8 @@ export class Config {
         { name: "18×", mult: 18.0, hzOffset: 0.0, amplitudeSign: 1.0 },
         { name: "0.12×", mult: 0.125, hzOffset: 0.0, amplitudeSign: 1.0 },
         { name: "0.75×", mult: 0.75, hzOffset: 0.0, amplitudeSign: 1.0 },
+        { name: "4~", mult: 4.0, hzOffset: -2.4, amplitudeSign: -0.5 },
+        { name: "1?", mult: 1.0, hzOffset: -2.4, amplitudeSign: 0.5 },
 	]);
     public static readonly envelopes: DictionaryArray<Envelope> = toNameMap([
         { name: "custom", type: EnvelopeType.custom, speed: 0.0 },
@@ -480,6 +484,9 @@ export class Config {
         { name: "ALL", indices: [[1,2,3,4], [1,2,3,4], [1,2,3,4], [1, 2, 3,4]] },
     ]);
     public static readonly feedbacks6Op: DictionaryArray<Feedback> = toNameMap([
+        //placeholder makes life easier for later
+        { name: "Custom", indices: [[2, 3, 4, 5, 6], [], [], [], [], []] },
+
         { name: "1⟲", indices: [[1], [], [], [], [], []] },
         { name: "2⟲", indices: [[], [2], [], [], [], []] },
         { name: "3⟲", indices: [[], [], [3], [], [], []] },
@@ -699,7 +706,7 @@ export function getDrumWave(index: number, inverseRealFourierTransform: Function
 				drumBuffer = newBuffer;
             }
         } else if (index == 9) {
-            // New Drum noise? New Drum Noise!
+            // a noise more like old static than white noise
             let drumBuffer: number = 1;
             for (let i: number = 0; i < Config.chipNoiseLength; i++) {
                 wave[i] = (drumBuffer & 1) * 2.0 - 1.1;

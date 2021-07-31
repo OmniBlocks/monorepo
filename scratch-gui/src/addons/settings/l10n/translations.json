@@ -326,8 +326,8 @@
         "tw.addons.settings.unsupported": "某些插件在此浏览器中不可用："
     },
     "zh-tw": {
-        "tw.addons.settings.addonFeedback": "附件回饋",
-        "tw.addons.settings.confirmResetAll": "你確定要重設所有附件設定？",
+        "tw.addons.settings.addonFeedback": "附加元件回饋",
+        "tw.addons.settings.confirmResetAll": "你確定要重設所有附加元件設定？",
         "tw.addons.settings.credits": "作者：",
         "tw.addons.settings.dirty": "重新載入 TurboWarp 以應用設定。",
         "tw.addons.settings.dirtyButton": "重新載入",
@@ -342,7 +342,7 @@
         "tw.addons.settings.tags.new": "新！",
         "tw.addons.settings.tags.recommended": "推薦",
         "tw.addons.settings.tags.theme": "主題",
-        "tw.addons.settings.title": "附件設定",
-        "tw.addons.settings.unsupported": "下列附件在此瀏覽器不可用："
+        "tw.addons.settings.title": "附加元件設定",
+        "tw.addons.settings.unsupported": "下列附加元件在此瀏覽器不可用："
     }
 }

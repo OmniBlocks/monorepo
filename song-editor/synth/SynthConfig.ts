@@ -412,8 +412,8 @@ export class Config {
         { name: "18×", mult: 18.0, hzOffset: 0.0, amplitudeSign: 1.0 },
         { name: "0.12×", mult: 0.125, hzOffset: 0.0, amplitudeSign: 1.0 },
         { name: "0.75×", mult: 0.75, hzOffset: 0.0, amplitudeSign: 1.0 },
-        { name: "4~", mult: 4.0, hzOffset: -2.4, amplitudeSign: -0.5 },
-        { name: "1?", mult: 1.0, hzOffset: -2.4, amplitudeSign: 0.5 },
+        { name: "4~", mult: 4.0, hzOffset: -2.4, amplitudeSign: -1.0 },
+        { name: "1?", mult: 1.0, hzOffset: -2.4, amplitudeSign: 1.5 },
 	]);
     public static readonly envelopes: DictionaryArray<Envelope> = toNameMap([
         { name: "custom", type: EnvelopeType.custom, speed: 0.0 },
@@ -510,13 +510,14 @@ export class Config {
         { name: "3→4", indices: [[], [], [], [3], [], []] },
         { name: "4→5", indices: [[], [], [], [], [4], []] },
         { name: "1→4 2→5 3→6", indices: [[], [], [], [1], [2], [3]] },
-        { name: "1→5 2→6 3→4", indices: [[], [], [], [3], [1], [6]] },
+        { name: "1→5 2→6 3→4", indices: [[], [], [], [3], [1], [2]] },
         { name: "1→2→3→4→5→6", indices: [[], [1], [2], [3], [4], [5]] },
         { name: "2→1→6→5→4→3→2", indices: [[2], [3], [4], [5], [6], [1]] },
         { name: "1→2→3→4→5→6→1", indices: [[6], [1], [2], [3], [4], [5]] },
         { name: "1↔2 3↔4 5↔6", indices: [[2], [1], [4], [3], [6], [5]] },
-        { name: "1↔4 2↔5 3↔6", indices: [[3], [5], [6], [1], [2], [3]] },
-        { name: "(1,2,3,4,5)→6", indices: [[], [], [], [], [], [1,2,3,4,5]] },
+        { name: "1↔4 2↔5 3↔6", indices: [[4], [5], [6], [1], [2], [3]] },
+        { name: "(1,2,3,4,5)→6", indices: [[], [], [], [], [], [1, 2, 3, 4, 5]] },
+        { name: "ALL", indices: [[1, 2, 3, 4, 5, 6], [1, 2, 3, 4, 5, 6], [1, 2, 3, 4, 5, 6], [1, 2, 3, 4, 5, 6], [1, 2, 3, 4, 5, 6], [1, 2, 3, 4, 5, 6]] },
     ]);
 	public static readonly chipNoiseLength: number = 1 << 15; // 32768
 	public static readonly spectrumBasePitch: number = 24;

@@ -421,8 +421,10 @@ export class CustomAlgorithm {
             for (let j = 0; j < modulation[i].length;j++) {
                 this.name += modulation[i][j-1];
                 if (modulation[i][j-1] > carriers) {
-                    this.associatedCarrier[modulation[i][j-1]] = i;
+                    this.associatedCarrier[modulation[i][j - 1]] = i;
+                    this.name += ",";
                 }
+                this.name += ".";
             }
         }
     }
@@ -449,6 +451,51 @@ export class CustomAlgorithm {
         for (var i = 0; i < preset.modulatedBy.length; i++) {
             this.modulatedBy[i] = Array.from(preset.modulatedBy[i]);
             this.associatedCarrier[i] = preset.associatedCarrier[i];
+        }
+    }
+}
+
+export class CustomFeedBack { //feels redunant
+    public name: string = "";
+    public indices: number[][] = [[], [], [], [], [], []];
+
+    constructor() {
+        this.reset;
+    }
+
+    public set(inIndices: number[][]) {
+        this.reset();
+        for (let i = 0; i < this.indices.length; i++) {
+            this.indices[i] = inIndices[i];
+            for (let j = 0; j < inIndices[i].length; j++) {
+                this.name += inIndices[i][j - 1];
+                this.name += ",";
+            }
+            this.name += ".";
+        }
+    }
+
+    public reset(): void {
+        this.reset;
+        this.name = "";
+        this.indices = [[1], [], [], [], [], []];
+    }
+
+    public copy(other: CustomFeedBack): void {
+        this.name = other.name;
+        this.indices = other.indices;
+    }
+
+    public fromPreset(other: number): void {
+        this.reset();
+        let preset = Config.feedbacks6Op[other]
+        for (var i = 0; i < preset.indices.length; i++) {
+            this.indices[i] = Array.from(preset.indices[i]);
+            for (let j = 0; j < preset.indices[i].length; j++) {
+                this.name += preset.indices[i][j - 1];
+                this.name += ",";
+            }
+            this.name += ".";
         }
     }
 }
@@ -639,8 +686,8 @@ export class Instrument {
     public feedbackType: number = 0;
     public algorithm6Op: number = 0;
     public feedbackType6Op: number = 0;
-    public customAlgorithm = { name: "1←4(2←5 3←6", carrierCount: 3, associatedCarrier: [1, 2, 3, 1, 2, 3], modulatedBy: [[2, 3, 4], [5], [6], [], [], []] };
-    public customFeedbackType = { name: "1↔4 2↔5 3↔6", indices: [[3], [5], [6], [1], [2], [3]] };
+    public customAlgorithm: CustomAlgorithm = new CustomAlgorithm(); //{ name: "1←4(2←5 3←6", carrierCount: 3, associatedCarrier: [1, 2, 3, 1, 2, 3], modulatedBy: [[2, 3, 4], [5], [6], [], [], []] };
+    public customFeedbackType: CustomFeedBack = new CustomFeedBack(); //{ name: "1↔4 2↔5 3↔6", indices: [[3], [5], [6], [1], [2], [3]] };
     public feedbackAmplitude: number = 0;
     public feedbackEnvelope: number = 1;
     public LFOtime: number = 0;
@@ -1929,8 +1976,34 @@ export class Song {
                         buffer.push(base64IntToCharCode[+instrument.fastTwoNoteArp]); // Two note arp setting piggybacks on this
                     }
                     buffer.push(SongTagCode.interval, base64IntToCharCode[instrument.interval]);
-                    buffer.push(SongTagCode.algorithm, base64IntToCharCode[instrument.algorithm]);
-                    buffer.push(SongTagCode.feedbackType, base64IntToCharCode[instrument.feedbackType]);
+                    if (instrument.type == InstrumentType.fm) {
+                        buffer.push(SongTagCode.algorithm, base64IntToCharCode[instrument.algorithm]);
+                        buffer.push(SongTagCode.feedbackType, base64IntToCharCode[instrument.feedbackType]);
+                    } else {
+                        buffer.push(SongTagCode.algorithm, base64IntToCharCode[instrument.algorithm6Op]);
+                        if (instrument.algorithm6Op == 0) {
+                            buffer.push(SongTagCode.chord, base64IntToCharCode[instrument.customAlgorithm.carrierCount]);
+                            buffer.push(SongTagCode.effects);
+                            for (let o: number = 0; o < instrument.customAlgorithm.modulatedBy.length; o++) {
+                                for (let j: number = 0; j < instrument.customAlgorithm.modulatedBy[o].length; j++) {
+                                    buffer.push(base64IntToCharCode[instrument.customAlgorithm.modulatedBy[o][j]]);
+                                }
+                                buffer.push(SongTagCode.operatorWaves);
+                            }
+                            buffer.push(SongTagCode.effects);
+                        }
+                        buffer.push(SongTagCode.feedbackType, base64IntToCharCode[instrument.feedbackType6Op]);
+                        if (instrument.feedbackType6Op == 0) {
+                            buffer.push(SongTagCode.effects);
+                            for (let o: number = 0; o < instrument.customFeedbackType.indices.length; o++) {
+                                for (let j: number = 0; j < instrument.customFeedbackType.indices[o].length; j++) {
+                                    buffer.push(base64IntToCharCode[instrument.customFeedbackType.indices[o][j]]);
+                                }
+                                buffer.push(SongTagCode.operatorWaves);
+                            }
+                            buffer.push(SongTagCode.effects);
+                        }
+                    }
                     buffer.push(SongTagCode.feedbackAmplitude, base64IntToCharCode[instrument.feedbackAmplitude]);
                     buffer.push(SongTagCode.feedbackEnvelope, base64IntToCharCode[instrument.feedbackEnvelope]);
 
@@ -2849,10 +2922,65 @@ export class Song {
                 }
             } break;
             case SongTagCode.algorithm: {
-                this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].algorithm = clamp(0, Config.algorithms.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                const instrument: Instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
+                if (instrument.type == InstrumentType.fm) {
+                    instrument.algorithm = clamp(0, Config.algorithms.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                }
+                else {
+                    instrument.algorithm6Op = clamp(0, Config.algorithms6Op.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                    instrument.customAlgorithm.fromPreset(instrument.algorithm6Op)
+                    if (compressed.charCodeAt(charIndex + 1) == SongTagCode.chord) {
+                        let carrierCountTemp = clamp(0, Config.operatorCount + 2, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                        let tempModArray: number[][] = [];
+                        if (compressed.charCodeAt(charIndex + 1) == SongTagCode.effects) {
+                            charIndex++
+                            let j: number = 0;
+                            charIndex++
+                            while (charIndex != SongTagCode.effects) {
+                                tempModArray[j] = [];
+                                let o: number = 0;
+                                while (charIndex != SongTagCode.operatorWaves) {
+                                    tempModArray[j][o] = clamp(0, Config.operatorCount + 2, base64CharCodeToInt[compressed.charCodeAt(charIndex)]);
+                                    o++
+                                    charIndex++
+                                }
+                                j++;
+                                charIndex++
+                            }
+                            instrument.customAlgorithm.set(carrierCountTemp, tempModArray);
+                        }
+                    }
+                }
+
             } break;
             case SongTagCode.feedbackType: {
-                this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].feedbackType = clamp(0, Config.feedbacks.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                const instrument: Instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
+                if (instrument.type == InstrumentType.fm) {
+                    instrument.feedbackType = clamp(0, Config.feedbacks.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                }
+                else {
+                    instrument.feedbackType6Op = clamp(0, Config.feedbacks6Op.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                    instrument.customFeedbackType.fromPreset(instrument.feedbackType6Op);
+                    let tempModArray: number[][] = [];
+                    if (compressed.charCodeAt(charIndex + 1) == SongTagCode.effects) {
+                        charIndex++
+                        let j: number = 0;
+                        charIndex++
+                        while (charIndex != SongTagCode.effects) {
+                            tempModArray[j] = [];
+                            let o: number = 0;
+                            while (charIndex != SongTagCode.operatorWaves) {
+                                tempModArray[j][o] = clamp(0, Config.operatorCount + 2, base64CharCodeToInt[compressed.charCodeAt(charIndex)]);
+                                o++
+                                charIndex++
+                            }
+                            j++;
+                            charIndex++
+                        }
+                        instrument.customFeedbackType.set(tempModArray);
+                    }
+                }
+
             } break;
             case SongTagCode.feedbackAmplitude: {
                 this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].feedbackAmplitude = clamp(0, Config.operatorAmplitudeMax + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);

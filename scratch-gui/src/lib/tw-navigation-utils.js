@@ -5,7 +5,7 @@ const setProjectId = (dispatch, projectId) => {
         if (projectId === '0') {
             projectId = '';
         }
-        location.href = `${process.env.ROOT}${projectId}${location.search}`;
+        location.href = `${process.env.ROOT}${projectId}`;
         return;
     }
     dispatch(reduxSetProjectId(projectId));

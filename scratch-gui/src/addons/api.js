@@ -251,9 +251,12 @@ class Tab extends EventTargetShim {
             },
             getPaper: async () => {
                 const modeSelector = await this.waitForElement("[class*='paint-editor_mode-selector']", {
-                    reduxCondition: state => state.scratchGui.editorTab.activeTabIndex === 1 && !state.scratchGui.mode.isPlayerOnly,
+                    reduxCondition: state => (
+                        state.scratchGui.editorTab.activeTabIndex === 1 && !state.scratchGui.mode.isPlayerOnly
+                    )
                 });
-                const reactInternalKey = Object.keys(modeSelector).find(key => key.startsWith('__reactInternalInstance$'));
+                const reactInternalKey = Object.keys(modeSelector)
+                    .find(key => key.startsWith('__reactInternalInstance$'));
                 const internalState = modeSelector[reactInternalKey].child;
                 // .tool or .blob.tool only exists on the selected tool
                 let toolState = internalState;
@@ -467,9 +470,15 @@ class Tab extends EventTargetShim {
         }
     }
 
+    removeBlock () {
+        throw new Error('not implemented');
+    }
+
     createBlockContextMenu (callback, {workspace = false, blocks = false, flyout = false, comments = false} = {}) {
         contextMenuCallbacks.push({addonId: this._id, callback, workspace, blocks, flyout, comments});
-        contextMenuCallbacks.sort((b, a) => CONTEXT_MENU_ORDER.indexOf(b.addonId) - CONTEXT_MENU_ORDER.indexOf(a.addonId));
+        contextMenuCallbacks.sort((b, a) => (
+            CONTEXT_MENU_ORDER.indexOf(b.addonId) - CONTEXT_MENU_ORDER.indexOf(a.addonId)
+        ));
 
         if (createdAnyBlockContextMenus) return;
         createdAnyBlockContextMenus = true;
@@ -480,6 +489,7 @@ class Tab extends EventTargetShim {
                 const gesture = blockly.mainWorkspace.currentGesture_;
                 const block = gesture.targetBlock_;
 
+                // eslint-disable-next-line no-shadow
                 for (const {callback, workspace, blocks, flyout, comments} of contextMenuCallbacks) {
                     const injectMenu =
                         // Workspace
@@ -510,10 +520,6 @@ class Tab extends EventTargetShim {
                 });
             };
         });
-    }
-
-    removeBlock () {
-        throw new Error('not implemented');
     }
 
     copyImage (dataURL) {

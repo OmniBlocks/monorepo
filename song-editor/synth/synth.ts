@@ -2928,18 +2928,18 @@ export class Song {
                 }
                 else {
                     instrument.algorithm6Op = clamp(0, Config.algorithms6Op.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
-                    instrument.customAlgorithm.fromPreset(instrument.algorithm6Op)
-                    if (compressed.charCodeAt(charIndex + 1) == SongTagCode.chord) {
+                    instrument.customAlgorithm.fromPreset(instrument.algorithm6Op);
+                    if (compressed.charCodeAt(charIndex) == SongTagCode.chord) {
                         let carrierCountTemp = clamp(0, Config.operatorCount + 2, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                         let tempModArray: number[][] = [];
-                        if (compressed.charCodeAt(charIndex + 1) == SongTagCode.effects) {
+                        if (compressed.charCodeAt(charIndex+1) == SongTagCode.effects) {
                             charIndex++
                             let j: number = 0;
                             charIndex++
-                            while (charIndex != SongTagCode.effects) {
+                            while (compressed.charCodeAt(charIndex) != SongTagCode.effects) {
                                 tempModArray[j] = [];
                                 let o: number = 0;
-                                while (charIndex != SongTagCode.operatorWaves) {
+                                while (compressed.charCodeAt(charIndex) != SongTagCode.operatorWaves) {
                                     tempModArray[j][o] = clamp(0, Config.operatorCount + 2, base64CharCodeToInt[compressed.charCodeAt(charIndex)]);
                                     o++
                                     charIndex++
@@ -2948,12 +2948,15 @@ export class Song {
                                 charIndex++
                             }
                             instrument.customAlgorithm.set(carrierCountTemp, tempModArray);
+                            charIndex++; //????
+                            console.log(charIndex + " " + String.fromCharCode(compressed.charCodeAt(charIndex)))
                         }
                     }
                 }
 
             } break;
             case SongTagCode.feedbackType: {
+                console.log(charIndex + " " + String.fromCharCode(compressed.charCodeAt(charIndex)))
                 const instrument: Instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                 if (instrument.type == InstrumentType.fm) {
                     instrument.feedbackType = clamp(0, Config.feedbacks.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
@@ -2962,14 +2965,13 @@ export class Song {
                     instrument.feedbackType6Op = clamp(0, Config.feedbacks6Op.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                     instrument.customFeedbackType.fromPreset(instrument.feedbackType6Op);
                     let tempModArray: number[][] = [];
-                    if (compressed.charCodeAt(charIndex + 1) == SongTagCode.effects) {
-                        charIndex++
+                    if (compressed.charCodeAt(charIndex) == SongTagCode.effects) {
                         let j: number = 0;
                         charIndex++
-                        while (charIndex != SongTagCode.effects) {
+                        while (compressed.charCodeAt(charIndex) != SongTagCode.effects) {
                             tempModArray[j] = [];
                             let o: number = 0;
-                            while (charIndex != SongTagCode.operatorWaves) {
+                            while (compressed.charCodeAt(charIndex) != SongTagCode.operatorWaves) {
                                 tempModArray[j][o] = clamp(0, Config.operatorCount + 2, base64CharCodeToInt[compressed.charCodeAt(charIndex)]);
                                 o++
                                 charIndex++
@@ -2977,12 +2979,15 @@ export class Song {
                             j++;
                             charIndex++
                         }
+                        console.log(tempModArray)
                         instrument.customFeedbackType.set(tempModArray);
+                        charIndex++; //???? weirdly needs to skip the end character or it'll use that next loop instead of like just moving to the next one itself
                     }
                 }
 
             } break;
             case SongTagCode.feedbackAmplitude: {
+                console.log(charIndex + " " + String.fromCharCode(compressed.charCodeAt(charIndex)))
                 this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].feedbackAmplitude = clamp(0, Config.operatorAmplitudeMax + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
             } break;
             case SongTagCode.feedbackEnvelope: {

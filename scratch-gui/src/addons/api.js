@@ -219,6 +219,10 @@ const fixDisplayName = displayName => displayName.replace(/([^\s])(%[nbs])/g, (_
 
 let _firstAddBlockRan = false;
 
+const contextMenuCallbacks = [];
+const CONTEXT_MENU_ORDER = ['editor-devtools', 'block-switching', 'blocks2image'];
+let createdAnyBlockContextMenus = false;
+
 class Tab extends EventTargetShim {
     constructor (id) {
         super();
@@ -461,6 +465,51 @@ class Tab extends EventTargetShim {
                 }
             });
         }
+    }
+
+    createBlockContextMenu (callback, {workspace = false, blocks = false, flyout = false, comments = false} = {}) {
+        contextMenuCallbacks.push({addonId: this._id, callback, workspace, blocks, flyout, comments});
+        contextMenuCallbacks.sort((b, a) => CONTEXT_MENU_ORDER.indexOf(b.addonId) - CONTEXT_MENU_ORDER.indexOf(a.addonId));
+
+        if (createdAnyBlockContextMenus) return;
+        createdAnyBlockContextMenus = true;
+
+        this.traps.getBlockly().then(blockly => {
+            const oldShow = blockly.ContextMenu.show;
+            blockly.ContextMenu.show = function (event, items, rtl) {
+                const gesture = blockly.mainWorkspace.currentGesture_;
+                const block = gesture.targetBlock_;
+
+                for (const {callback, workspace, blocks, flyout, comments} of contextMenuCallbacks) {
+                    const injectMenu =
+                        // Workspace
+                        (workspace && !block && !gesture.flyout_ && !gesture.startBubble_) ||
+                        // Block in workspace
+                        (blocks && block && !gesture.flyout_) ||
+                        // Block in flyout
+                        (flyout && gesture.flyout_) ||
+                        // Comments
+                        (comments && gesture.startBubble_);
+                    if (injectMenu) {
+                        try {
+                            items = callback(items, block);
+                        } catch (e) {
+                            console.error('Error while calling context menu callback: ', e);
+                        }
+                    }
+                }
+
+                oldShow.call(this, event, items, rtl);
+
+                items.forEach((item, i) => {
+                    if (item.separator) {
+                        const itemElt = document.querySelector('.blocklyContextMenu').children[i];
+                        itemElt.style.paddingTop = '2px';
+                        itemElt.style.borderTop = '1px solid hsla(0, 0%, 0%, 0.15)';
+                    }
+                });
+            };
+        });
     }
 
     removeBlock () {

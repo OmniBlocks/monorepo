@@ -22,7 +22,7 @@ const _twGetAsset = (path) => {
 import downloadBlob from "../../libraries/common/cs/download-blob.js";
 import { paused, setPaused, onPauseChanged } from "./../pause/module.js";
 
-export default async function ({ addon, global, console, msg }) {
+export default async function ({ addon, global, console, msg, safeMsg }) {
   let showingConsole, ScratchBlocks;
   const vm = addon.tab.traps.vm;
 
@@ -55,21 +55,21 @@ export default async function ({ addon, global, console, msg }) {
     args: ["content"],
     displayName: msg("block-log"),
     callback: ({ content }, thread) => {
-      addItem(content, thread, "log");
+      addLog(content, thread, "log");
     },
   });
   addon.tab.addBlock("\u200B\u200Bwarn\u200B\u200B %s", {
     args: ["content"],
     displayName: msg("block-warn"),
     callback: ({ content }, thread) => {
-      addItem(content, thread, "warn");
+      addLog(content, thread, "warn");
     },
   });
   addon.tab.addBlock("\u200B\u200Berror\u200B\u200B %s", {
     args: ["content"],
     displayName: msg("block-error"),
     callback: ({ content }, thread) => {
-      addItem(content, thread, "error");
+      addLog(content, thread, "error");
     },
   });
 
@@ -358,20 +358,24 @@ export default async function ({ addon, global, console, msg }) {
   });
   let logs = [];
   let scrollQueued = false;
-  const addItem = (content, thread, type) => {
+  const createLogWrapper = (type) => {
     const wrapper = document.createElement("div");
-    const span = (text, cl = "") => {
-      let s = document.createElement("span");
-      s.innerText = text;
-      s.className = cl;
-      return s;
-    };
+    wrapper.className = "log";
+    wrapper.classList.add(type);
+    return wrapper;
+  };
+  const createLogText = (text) => {
+    const s = document.createElement("span");
+    s.innerText = text;
+    return s;
+  };
+
+  const addLog = (content, thread, type) => {
+    const wrapper = createLogWrapper(type);
 
     const target = thread.target;
     const parentTarget = target.isOriginal ? target : target.sprite.clones[0];
     const targetId = parentTarget.id;
-    wrapper.className = "log";
-    wrapper.classList.add(type);
     consoleList.append(wrapper);
     if (type !== "log") {
       const imageURL = _twGetAsset((type === "error" ? "/error.svg" : "/warning.svg"));
@@ -447,7 +451,7 @@ export default async function ({ addon, global, console, msg }) {
       type,
       content,
     });
-    wrapper.append(span(content));
+    wrapper.append(createLogText(content));
 
     let link = document.createElement("a");
     link.textContent = target.isOriginal

@@ -24,8 +24,7 @@
   ],
   "onlyInEditor": true,
   "tags": [
-    "editor",
-    "beta"
+    "editor"
   ],
   "enabledByDefault": false
 }

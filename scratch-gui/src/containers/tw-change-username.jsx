@@ -30,9 +30,7 @@ class ChangeUsername extends React.Component {
         this.props.onOpenUsernameModal();
     }
     render () {
-        return this.props.children(this.changeUsername, {
-            running: this.props.running
-        });
+        return this.props.children(this.changeUsername);
     }
 }
 

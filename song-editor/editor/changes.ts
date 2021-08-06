@@ -1434,7 +1434,7 @@ export class Change6OpAlgorithm extends Change {
         if (oldValue != newValue) {
             instrument.algorithm6Op = newValue;
             if (newValue != 0) {
-                instrument.customAlgorithm.fromPreset;
+                instrument.customAlgorithm.fromPreset(newValue);
             }
             instrument.preset = instrument.type;
             doc.notifier.changed();
@@ -1451,7 +1451,7 @@ export class Change6OpFeedbackType extends Change {
         if (oldValue != newValue) {
             instrument.feedbackType6Op = newValue;
             if (newValue != 0) {
-                instrument.customFeedbackType.fromPreset;
+                instrument.customFeedbackType.fromPreset(newValue);
             }
             instrument.preset = instrument.type;
             doc.notifier.changed();

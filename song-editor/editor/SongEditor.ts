@@ -328,6 +328,7 @@ class CustomAlgorythmCanvas {
     }
 
     public fillDrawArray() {
+        this.drawArray = [];
         this.drawArray = [[], [], [], [], [], []];
         this.carriers = 1;
         this.newMods = [[], [], [], [], [], []];
@@ -349,11 +350,6 @@ class CustomAlgorythmCanvas {
             } else {
                 if (this.inverseModulation[i][0] != undefined) {
                     let testPos = [this.drawArray.length - (tempArray[this.inverseModulation[i][this.inverseModulation[i].length - 1] - 1][0]+2 ), tempArray[this.inverseModulation[i][this.inverseModulation[i].length - 1] - 1][1]];
-                    console.log((this.inverseModulation[i][0] - 1) + " " + (this.inverseModulation[i][0] - 1))
-                    console.log(this.drawArray.length - (tempArray[this.inverseModulation[i][this.inverseModulation[i].length - 1] - 1][0] + 1) + " " + tempArray[this.inverseModulation[i][this.inverseModulation[i].length - 1] - 1][1])
-                    console.log(this.drawArray)
-                    console.log(tempArray)
-                    console.log(this.inverseModulation)
                     if (this.drawArray[testPos[0]][testPos[1]] != undefined) {
                         while (this.drawArray[testPos[0]][testPos[1]] != undefined && testPos[1] < 6) {
                             testPos[1]++;
@@ -382,6 +378,10 @@ class CustomAlgorythmCanvas {
                 }
             }
         }
+        console.log(this.drawArray)
+        console.log(tempArray)
+        console.log(this.inverseModulation)
+        console.log(this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()].customAlgorithm.modulatedBy)
         console.log("refilled arrays")
     }
 

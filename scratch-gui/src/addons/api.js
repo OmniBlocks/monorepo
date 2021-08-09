@@ -16,11 +16,12 @@
 
 import IntlMessageFormat from 'intl-messageformat';
 import SettingsStore from './settings-store-singleton';
-import getAddonTranslations from './get-addon-translations';
 import dataURLToBlob from '../lib/data-uri-to-blob';
 import EventTargetShim from './event-target';
 import AddonHooks from './hooks';
 import addons from './addon-manifests';
+import addonMessages from './addons-l10n/en.json';
+import l10nEntries from './generated/l10n-entries';
 import addonEntries from './generated/addon-entries';
 import './polyfill';
 
@@ -149,13 +150,15 @@ const getEditorMode = () => {
 };
 
 const tabReduxInstance = new Redux();
-
 const language = tabReduxInstance.state.locales.locale.split('-')[0];
-let addonMessages;
-const addonMessagesPromise = getAddonTranslations(language)
-    .then(_l10n => {
-        addonMessages = _l10n;
-    });
+
+const getTranslations = async () => {
+    if (l10nEntries[language]) {
+        const localeMessages = await l10nEntries[language]();
+        Object.assign(addonMessages, localeMessages);
+    }
+};
+const addonMessagesPromise = getTranslations();
 
 const untilInEditor = () => {
     if (!tabReduxInstance.state.scratchGui.mode.isPlayerOnly) {

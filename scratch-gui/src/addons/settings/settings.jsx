@@ -20,6 +20,7 @@ import classNames from 'classnames';
 
 import Search from './search';
 import importedAddons, {unsupportedAddons} from '../addon-manifests';
+import messagesByLocale from '../generated/l10n-settings-entries';
 import getAddonTranslations from '../get-addon-translations';
 import settingsTranslationsEnglish from './l10n/en.json';
 import settingsTranslationsOther from './l10n/translations.json';
@@ -47,11 +48,7 @@ import '../../lib/normalize.css';
 const locale = detectLocale(upstreamMeta.languages);
 document.documentElement.lang = locale;
 
-let addonTranslations;
-const loadAddonTranslations = () => getAddonTranslations(locale)
-    .then(_l10n => {
-        addonTranslations = _l10n;
-    });
+const addonTranslations = messagesByLocale[locale] ? messagesByLocale[locale]() : {};
 
 const settingsTranslations = settingsTranslationsEnglish;
 if (locale !== 'en') {
@@ -701,7 +698,7 @@ class AddonSettingsComponent extends React.Component {
         this.searchRef = this.searchRef.bind(this);
         this.searchBar = null;
         this.state = {
-            loading: true,
+            loading: false,
             dirty: false,
             search: ''
         };
@@ -720,12 +717,6 @@ class AddonSettingsComponent extends React.Component {
         }
     }
     componentDidMount () {
-        loadAddonTranslations()
-            .then(() => {
-                this.setState({
-                    loading: false
-                });
-            });
         SettingsStore.addEventListener('setting-changed', this.handleSettingStoreChanged);
         document.body.addEventListener('keydown', this.handleKeyDown);
     }

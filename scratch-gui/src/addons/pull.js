@@ -48,12 +48,12 @@ if (!process.argv.includes('-')) {
     rimraf.sync(repoPath);
     childProcess.execSync(`git clone --depth=1 -b tw https://github.com/GarboMuffin/ScratchAddons ${repoPath}`);
 }
-rimraf.sync(pathUtil.resolve(__dirname, 'addons'));
-rimraf.sync(pathUtil.resolve(__dirname, 'addons-l10n'));
-rimraf.sync(pathUtil.resolve(__dirname, 'libraries'));
-fs.mkdirSync(pathUtil.resolve(__dirname, 'addons'), {recursive: true});
-fs.mkdirSync(pathUtil.resolve(__dirname, 'addons-l10n'), {recursive: true});
-fs.mkdirSync(pathUtil.resolve(__dirname, 'libraries'), {recursive: true});
+
+for (const folder of ['addons', 'addons-l10n', 'addons-l10n-settings', 'libraries']) {
+    const path = pathUtil.resolve(__dirname, folder);
+    rimraf.sync(path);
+    fs.mkdirSync(path, {recursive: true});
+}
 
 const generatedPath = pathUtil.resolve(__dirname, 'generated');
 rimraf.sync(generatedPath);
@@ -205,19 +205,30 @@ const processAddon = (id, oldDirectory, newDirectory) => {
     }
 };
 
-const getAllMessages = localePath => {
-    const allMessages = {};
+const parseMessages = localePath => {
+    const settings = {};
+    const runtime = {};
     for (const addon of addons) {
         const path = pathUtil.join(localePath, `${addon}.json`);
         try {
             const contents = fs.readFileSync(path, 'utf-8');
             const parsed = JSON.parse(contents);
-            Object.assign(allMessages, parsed);
+            for (const id of Object.keys(parsed)) {
+                const value = parsed[id];
+                if (id.includes('/@')) {
+                    settings[id] = value;
+                } else {
+                    runtime[id] = value;
+                }
+            }
         } catch (e) {
             // Ignore
         }
     }
-    return allMessages;
+    return {
+        settings,
+        runtime
+    };
 };
 
 const generateEntries = (items, callback) => {
@@ -241,6 +252,14 @@ const generateL10nEntries = locales => generateEntries(
     locale => ({
         name: `addon-l10n-${locale}`,
         src: `../addons-l10n/${locale}.json`
+    })
+);
+
+const generateL10nSettingsEntries = locales => generateEntries(
+    locales.filter(i => i !== 'en'),
+    locale => ({
+        src: `../addons-l10n-settings/${locale}.json`,
+        async: false
     })
 );
 
@@ -279,11 +298,17 @@ for (const file of l10nFiles) {
     // Convert pt-br to just pt
     const fixedName = file === 'pt-br' ? 'pt' : file;
     languages.push(fixedName);
-    const newPath = pathUtil.resolve(__dirname, 'addons-l10n', `${fixedName}.json`);
-    fs.writeFileSync(newPath, JSON.stringify(getAllMessages(oldDirectory)));
+    const runtimePath = pathUtil.resolve(__dirname, 'addons-l10n', `${fixedName}.json`);
+    const settingsPath = pathUtil.resolve(__dirname, 'addons-l10n-settings', `${fixedName}.json`);
+    const {settings, runtime} = parseMessages(oldDirectory);
+    fs.writeFileSync(runtimePath, JSON.stringify(runtime));
+    if (fixedName !== 'en') {
+        fs.writeFileSync(settingsPath, JSON.stringify(settings));
+    }
 }
 
 fs.writeFileSync(pathUtil.resolve(generatedPath, 'l10n-entries.js'), generateL10nEntries(languages));
+fs.writeFileSync(pathUtil.resolve(generatedPath, 'l10n-settings-entries.js'), generateL10nSettingsEntries(languages));
 fs.writeFileSync(pathUtil.resolve(generatedPath, 'addon-entries.js'), generateAddonEntries(languages));
 fs.writeFileSync(pathUtil.resolve(generatedPath, 'addon-manifests.js'), generateAddonManifestEntries(languages));
 

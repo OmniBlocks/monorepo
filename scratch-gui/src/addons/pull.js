@@ -98,6 +98,13 @@ const includeImportedLibraries = contents => {
     }
 };
 
+const includePolyfills = contents => {
+    if (contents.includes('EventTarget')) {
+        contents = `import EventTarget from "../../event-target.js"; /* inserted by pull.js */\n\n${contents}`;
+    }
+    return contents;
+};
+
 const includeImports = (folder, contents) => {
     const dynamicAssets = walk(folder)
         .filter(file => file.endsWith('.svg') || file.endsWith('.png'));
@@ -188,6 +195,7 @@ const processAddon = (id, oldDirectory, newDirectory) => {
         if (file.endsWith('.js')) {
             contents = contents.toString('utf-8');
             includeImportedLibraries(contents);
+            contents = includePolyfills(contents);
             if (contents.includes('addon.self.dir') || contents.includes('addon.self.lib')) {
                 contents = includeImports(oldDirectory, contents);
             }

@@ -1,3 +1,5 @@
+import EventTarget from "../../event-target.js"; /* inserted by pull.js */
+
 const vm = window.vm;
 
 export let paused = false;

@@ -8,21 +8,6 @@ const _twGetAsset = (path) => {
 import DevTools from "./DevTools.js";
 
 export default async function ({ addon, global, console, msg, safeMsg: m }) {
-  const untilInEditor = () => {
-    if (addon.tab.editorMode === "editor") return;
-    return new Promise((resolve, reject) => {
-      const handler = () => {
-        if (addon.tab.editorMode === "editor") {
-          resolve();
-          addon.tab.removeEventListener("urlChange", handler);
-        }
-      };
-      addon.tab.addEventListener("urlChange", handler);
-    });
-  };
-
-  await untilInEditor();
-
   const guiDirection = addon.tab.direction;
   const helpHTML = `
 <div id="s3devHelpPop" class="${addon.tab.scratchClass("modal_modal-overlay")}" dir="${guiDirection}">

@@ -34,5 +34,6 @@ export default {
   "remove-curved-stage-border": () => require("../addons/remove-curved-stage-border/addon.json"),
   "transparent-orphans": () => require("../addons/transparent-orphans/addon.json"),
   "debugger": () => require("../addons/debugger/addon.json"),
+  "better-img-uploads": () => require("../addons/better-img-uploads/addon.json"),
   "tw-interface-customization": () => require("../addons/tw-interface-customization/addon.json"),
 };

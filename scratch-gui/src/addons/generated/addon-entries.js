@@ -34,5 +34,6 @@ export default {
   "remove-curved-stage-border": () => import(/* webpackChunkName: "addon-entry-remove-curved-stage-border" */ "../addons/remove-curved-stage-border/_entry.js"),
   "transparent-orphans": () => import(/* webpackChunkName: "addon-entry-transparent-orphans" */ "../addons/transparent-orphans/_entry.js"),
   "debugger": () => import(/* webpackChunkName: "addon-entry-debugger" */ "../addons/debugger/_entry.js"),
+  "better-img-uploads": () => import(/* webpackChunkName: "addon-entry-better-img-uploads" */ "../addons/better-img-uploads/_entry.js"),
   "tw-interface-customization": () => import(/* webpackChunkName: "addon-entry-tw-interface-customization" */ "../addons/tw-interface-customization/_entry.js"),
 };

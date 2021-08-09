@@ -205,6 +205,13 @@ const processAddon = (id, oldDirectory, newDirectory) => {
     }
 };
 
+const SKIP_MESSAGES = [
+    'debugger/feedback-log',
+    'debugger/feedback-log-link',
+    'debugger/feedback-remove',
+    'editor-devtools/help-by'
+];
+
 const parseMessages = localePath => {
     const settings = {};
     const runtime = {};
@@ -214,6 +221,9 @@ const parseMessages = localePath => {
             const contents = fs.readFileSync(path, 'utf-8');
             const parsed = JSON.parse(contents);
             for (const id of Object.keys(parsed)) {
+                if (SKIP_MESSAGES.includes(id)) {
+                    continue;
+                }
                 const value = parsed[id];
                 if (id.includes('/@')) {
                     settings[id] = value;

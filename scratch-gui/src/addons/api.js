@@ -215,7 +215,13 @@ const SHARED_SPACES = {
     }
 };
 
+const parseArguments = code => code
+    .split(/(?=[^\\]%[nbs])/g)
+    .map(i => i.trim())
+    .filter(i => i.charAt(0) === '%')
+    .map(i => i.substring(0, 2));
 const fixDisplayName = displayName => displayName.replace(/([^\s])(%[nbs])/g, (_, before, arg) => `${before} ${arg}`);
+const compareArrays = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 
 let _firstAddBlockRan = false;
 
@@ -416,8 +422,18 @@ class Tab extends EventTargetShim {
     }
 
     addBlock (procedureCode, {args, displayName, callback}) {
+        const procCodeArguments = parseArguments(procedureCode);
+        if (args.length !== procCodeArguments.length) {
+            throw new Error('Procedure code and argument list do not match');
+        }
+
         if (displayName) {
             displayName = fixDisplayName(displayName);
+            const displayNameArguments = parseArguments(displayName);
+            if (!compareArrays(procCodeArguments, displayNameArguments)) {
+                console.warn(`displayName ${displayName} for ${procedureCode} has invalid arguments, ignoring it.`);
+                displayName = procedureCode;
+            }
         } else {
             displayName = procedureCode;
         }

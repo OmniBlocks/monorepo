@@ -18,8 +18,8 @@ export default async function ({ addon, console, safeMsg: m }) {
     "action-menu_more-button"
   )} sa-better-img-uploads-btn" data-for="sa-${id}-HD Upload" data-tip="${m("upload")}" currentitem="false">
     <img class="${addon.tab.scratchClass("action-menu_more-icon")} sa-better-img-uploader" draggable="false" src="${
-    _twGetAsset("/icon.svg"
-  }" height="10"), width="10">
+    _twGetAsset("/icon.svg")
+  }" height="10", width="10">
      <input accept=".svg, .png, .bmp, .jpg, .jpeg" class="${addon.tab.scratchClass(
        "action-menu_file-input"
      )}" multiple="" type="file">

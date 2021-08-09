@@ -135,7 +135,7 @@ const includeImports = (folder, contents) => {
         (_fullText, name) => `\${_twGetAsset(${name})}`
     );
     contents = contents.replace(
-        /addon\.self\.(?:dir|lib) *\+ *([^;,]+)/g,
+        /addon\.self\.(?:dir|lib) *\+ *([^;,\n]+)/g,
         (_fullText, name) => `_twGetAsset(${name})`
     );
 
@@ -220,7 +220,7 @@ const parseMessages = localePath => {
         try {
             const contents = fs.readFileSync(path, 'utf-8');
             const parsed = JSON.parse(contents);
-            for (const id of Object.keys(parsed)) {
+            for (const id of Object.keys(parsed).sort()) {
                 if (SKIP_MESSAGES.includes(id)) {
                     continue;
                 }

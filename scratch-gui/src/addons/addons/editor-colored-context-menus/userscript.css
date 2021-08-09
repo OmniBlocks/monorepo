@@ -4,7 +4,7 @@
 }
 .u-contextmenu-colored .blocklyContextMenu .goog-menuitem-highlight,
 .u-contextmenu-colored .s3dev-mi:hover {
-  background-color: var(--u-contextmenu-hover);
+  background-color: var(--u-contextmenu-hover) !important;
   border-color: transparent !important;
 }
 .u-contextmenu-colored .blocklyContextMenu .goog-menuitem[style*="border-top"] {

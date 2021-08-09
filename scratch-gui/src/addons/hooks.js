@@ -1,6 +1,8 @@
 const AddonHooks = {
     appStateReducer: () => {},
-    appStateStore: null
+    appStateStore: null,
+    blockly: null,
+    blocklyCallbacks: []
 };
 
 export default AddonHooks;

@@ -18,6 +18,7 @@ import {BLOCKS_DEFAULT_SCALE, STAGE_DISPLAY_SIZES} from '../lib/layout-constants
 import DropAreaHOC from '../lib/drop-area-hoc.jsx';
 import DragConstants from '../lib/drag-constants';
 import defineDynamicBlock from '../lib/define-dynamic-block';
+import AddonHooks from '../addons/hooks';
 
 import {connect} from 'react-redux';
 import {updateToolbox} from '../reducers/toolbox';
@@ -50,6 +51,9 @@ class Blocks extends React.Component {
         super(props);
         this.ScratchBlocks = VMScratchBlocks(props.vm);
         window.ScratchBlocks = this.ScratchBlocks;
+        AddonHooks.blockly = this.ScratchBlocks;
+        AddonHooks.blocklyCallbacks.forEach(i => i());
+        AddonHooks.blocklyCallbacks.length = 0;
         bindAll(this, [
             'attachVM',
             'detachVM',

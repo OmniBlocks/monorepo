@@ -240,22 +240,14 @@ class Tab extends EventTargetShim {
         // traps is public API
         this.traps = {
             get vm () {
-                // We expose VM on window
-                return window.vm;
+                return tabReduxInstance.state.scratchGui.vm;
             },
             getBlockly: () => {
-                // The real Blockly is exposed on window. It may not exist until the user enters the editor.
-                if (window.ScratchBlocks) {
-                    return Promise.resolve(window.ScratchBlocks);
+                if (AddonHooks.blockly) {
+                    return Promise.resolve(AddonHooks.blockly);
                 }
                 return new Promise(resolve => {
-                    const handler = () => {
-                        if (window.ScratchBlocks) {
-                            this.removeEventListener('urlChange', handler);
-                            resolve(window.ScratchBlocks);
-                        }
-                    };
-                    this.addEventListener('urlChange', handler);
+                    AddonHooks.blocklyCallbacks.push(() => resolve(AddonHooks.blockly));
                 });
             },
             getPaper: async () => {

@@ -21,7 +21,6 @@ import classNames from 'classnames';
 import Search from './search';
 import importedAddons, {unsupportedAddons} from '../addon-manifests';
 import messagesByLocale from '../generated/l10n-settings-entries';
-import getAddonTranslations from '../get-addon-translations';
 import settingsTranslationsEnglish from './l10n/en.json';
 import settingsTranslationsOther from './l10n/translations.json';
 import upstreamMeta from '../generated/upstream-meta.json';

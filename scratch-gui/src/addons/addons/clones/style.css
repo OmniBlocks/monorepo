@@ -27,15 +27,15 @@
   width: 16px;
 }
 
-.clone-container-container[data-count="0"] {
+.clone-container-container[data-count="none"] {
   display: none;
 }
 
-.clone-container-container[data-count="300"] {
+.clone-container-container[data-count="full"] {
   color: #ff6680;
 }
 
-.clone-container-container[data-count="300"] .clone-icon {
+.clone-container-container[data-count="full"] .clone-icon {
   background-image: url("./300cats.svg");
 }
 

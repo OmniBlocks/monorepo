@@ -42,7 +42,14 @@ export default async function ({ addon, global, console, msg }) {
     const v = vm.runtime._cloneCounter;
     // performance
     if (v === lastChecked) return;
-    countContainerContainer.dataset.count = lastChecked = v;
+    lastChecked = v;
+    if (v === 0) {
+      countContainerContainer.dataset.count = "none";
+    } else if (v >= vm.runtime.runtimeOptions.maxClones) {
+      countContainerContainer.dataset.count = "full";
+    } else {
+      countContainerContainer.dataset.count = "";
+    }
     count.dataset.str = cache[v] || msg("clones", { cloneCount: v });
 
     if (v === 0) countContainerContainer.style.display = "none";

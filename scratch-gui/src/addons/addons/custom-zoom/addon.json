@@ -90,7 +90,12 @@
         }
       ],
       "default": "default",
-      "reloadRequired": false
+      "reloadRequired": false,
+      "if": {
+        "settings": {
+          "autohide": true
+        }
+      }
     }
   ]
 }

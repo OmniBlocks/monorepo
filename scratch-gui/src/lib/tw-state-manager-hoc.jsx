@@ -356,9 +356,7 @@ const TWStateManager = function (WrappedComponent) {
             }
 
             for (const extension of urlParams.getAll('extension')) {
-                if (extension.startsWith('https://extensions.turbowarp.org/') || confirm(`Load extension: ${extension}`)) {
-                    this.props.vm.extensionManager.loadExtensionURL(extension);
-                }
+                this.props.vm.extensionManager.loadExtensionURL(extension);
             }
 
             const routerCallbacks = {

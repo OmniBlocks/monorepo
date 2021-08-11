@@ -699,7 +699,7 @@ class AddonSettingsComponent extends React.Component {
         this.state = {
             loading: false,
             dirty: false,
-            search: ''
+            search: location.hash ? location.hash.substr(1) : ''
         };
         for (const [id, manifest] of Object.entries(this.props.addons)) {
             const enabled = SettingsStore.getAddonEnabled(id);

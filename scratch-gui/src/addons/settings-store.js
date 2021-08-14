@@ -263,6 +263,13 @@ class SettingsStore extends EventTargetShim {
         }
     }
 
+    parseUrlParameter (parameter) {
+        const enabled = parameter.split(',');
+        for (const id of Object.keys(addons)) {
+            this.setAddonEnabled(id, enabled.includes(id));
+        }
+    }
+
     export ({theme}) {
         const result = {
             core: {

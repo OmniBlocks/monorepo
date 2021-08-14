@@ -431,3 +431,14 @@ test('setStoreWithVersionCheck', () => {
     });
     expect(store.setStore).toHaveBeenCalledTimes(0);
 });
+
+test('parseSearchParameter', () => {
+    const store = new SettingStore();
+    expect(store.getAddonEnabled('pause')).toBe(true);
+    expect(store.getAddonEnabled('mute-project')).toBe(true);
+    expect(store.getAddonEnabled('remove-curved-stage-border')).toBe(false);
+    store.parseUrlParameter('pause,remove-curved-stage-border');
+    expect(store.getAddonEnabled('pause')).toBe(true);
+    expect(store.getAddonEnabled('mute-project')).toBe(false);
+    expect(store.getAddonEnabled('remove-curved-stage-border')).toBe(true);
+});

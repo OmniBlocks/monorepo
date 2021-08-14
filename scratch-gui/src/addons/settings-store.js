@@ -25,6 +25,7 @@ class SettingsStore extends EventTargetShim {
     constructor () {
         super();
         this.store = this.createEmptyStore();
+        this.remote = false;
     }
 
     /**

@@ -437,8 +437,10 @@ test('parseSearchParameter', () => {
     expect(store.getAddonEnabled('pause')).toBe(true);
     expect(store.getAddonEnabled('mute-project')).toBe(true);
     expect(store.getAddonEnabled('remove-curved-stage-border')).toBe(false);
+    expect(store.remote).toBe(false);
     store.parseUrlParameter('pause,remove-curved-stage-border,,invalid addon??43t987(*&$');
     expect(store.getAddonEnabled('pause')).toBe(true);
     expect(store.getAddonEnabled('mute-project')).toBe(false);
     expect(store.getAddonEnabled('remove-curved-stage-border')).toBe(true);
+    expect(store.remote).toBe(true);
 });

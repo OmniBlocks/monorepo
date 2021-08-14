@@ -65,6 +65,9 @@ class SettingsStore extends EventTargetShim {
      * @private
      */
     saveToLocalStorage () {
+        if (this.remote) {
+            return;
+        }
         try {
             const result = {
                 _: VERSION
@@ -264,6 +267,7 @@ class SettingsStore extends EventTargetShim {
     }
 
     parseUrlParameter (parameter) {
+        this.remote = true;
         const enabled = parameter.split(',');
         for (const id of Object.keys(addons)) {
             this.setAddonEnabled(id, enabled.includes(id));

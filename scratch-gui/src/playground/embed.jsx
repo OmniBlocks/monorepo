@@ -7,6 +7,7 @@ import {setAppElement} from 'react-modal';
 import AppStateHOC from '../lib/app-state-hoc.jsx';
 import TWEmbedFullScreenHOC from '../lib/tw-embed-fullscreen-hoc.jsx';
 import TWStateManagerHOC from '../lib/tw-state-manager-hoc.jsx';
+import runAddons from '../addons/entry';
 
 import GUI from './render-gui.jsx';
 import appTarget from './app-target';
@@ -28,6 +29,7 @@ const getProjectId = () => {
 };
 
 const projectId = getProjectId();
+const urlParams = new URLSearchParams(location.search);
 
 let vm;
 
@@ -36,7 +38,6 @@ const onVmInit = _vm => {
 };
 
 const onProjectLoaded = () => {
-    const urlParams = new URLSearchParams(location.search);
     if (urlParams.has('autoplay')) {
         vm.start();
         vm.greenFlag();
@@ -57,3 +58,7 @@ ReactDOM.render(<WrappedGUI
     onProjectLoaded={onProjectLoaded}
     routingStyle="none"
 />, appTarget);
+
+if (urlParams.has('addons')) {
+    runAddons();
+}

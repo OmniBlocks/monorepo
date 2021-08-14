@@ -231,6 +231,9 @@ a:active, a:focus {
 .addon-title-text {
 
 }
+.addon-id {
+    margin-left: 10px;
+}
 
 .inline-description {
     margin-left: 10px;
@@ -549,6 +552,7 @@ a:active, a:focus {
 
 .version {
     margin-bottom: 10px;
+    cursor: pointer;
 }
 
 .footer-buttons {

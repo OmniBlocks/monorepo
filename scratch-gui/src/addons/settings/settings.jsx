@@ -424,7 +424,8 @@ Presets.propTypes = {
 const Addon = ({
     id,
     settings,
-    manifest
+    manifest,
+    extended
 }) => (
     <div className={classNames(styles.addon, {[styles.addonDirty]: settings.dirty})}>
         <div className={styles.addonHeader}>
@@ -449,6 +450,11 @@ const Addon = ({
                 <div className={styles.addonTitleText}>
                     {addonTranslations[`${id}/@name`] || manifest.name}
                 </div>
+                {extended && (
+                    <div className={styles.addonId}>
+                        {`(${id})`}
+                    </div>
+                )}
             </label>
             <Tags
                 tags={manifest.tags}
@@ -544,7 +550,8 @@ Addon.propTypes = {
         })),
         presets: PropTypes.array,
         tags: PropTypes.arrayOf(PropTypes.string)
-    })
+    }),
+    extended: PropTypes.bool
 };
 
 const Dirty = props => (
@@ -664,6 +671,7 @@ class AddonList extends React.Component {
                         id={id}
                         settings={state}
                         manifest={manifest}
+                        extended={this.props.extended}
                     />
                 ))}
             </div>
@@ -680,7 +688,8 @@ AddonList.propTypes = {
 
         }).isRequired
     })).isRequired,
-    search: PropTypes.string.isRequired
+    search: PropTypes.string.isRequired,
+    extended: PropTypes.bool.isRequired
 };
 
 class AddonSettingsComponent extends React.Component {
@@ -694,12 +703,14 @@ class AddonSettingsComponent extends React.Component {
         this.handleKeyDown = this.handleKeyDown.bind(this);
         this.handleSearch = this.handleSearch.bind(this);
         this.handleClickSearchButton = this.handleClickSearchButton.bind(this);
+        this.handleClickVersion = this.handleClickVersion.bind(this);
         this.searchRef = this.searchRef.bind(this);
         this.searchBar = null;
         this.state = {
             loading: false,
             dirty: false,
-            search: location.hash ? location.hash.substr(1) : ''
+            search: location.hash ? location.hash.substr(1) : '',
+            extended: false
         };
         for (const [id, manifest] of Object.entries(this.props.addons)) {
             const enabled = SettingsStore.getAddonEnabled(id);
@@ -812,6 +823,11 @@ class AddonSettingsComponent extends React.Component {
         });
         this.searchBar.focus();
     }
+    handleClickVersion () {
+        this.setState({
+            extended: !this.state.extended
+        });
+    }
     searchRef (searchBar) {
         this.searchBar = searchBar;
     }
@@ -877,6 +893,7 @@ class AddonSettingsComponent extends React.Component {
                             <AddonList
                                 addons={addonState}
                                 search={this.state.search}
+                                extended={this.state.extended}
                             />
                             <div className={styles.footerButtons}>
                                 <button
@@ -904,9 +921,16 @@ class AddonSettingsComponent extends React.Component {
                                         addons={unsupported}
                                     />
                                 ) : null}
-                                <div className={styles.version}>
-                                    {`v${upstreamMeta.version}`}
-                                </div>
+                                <span
+                                    className={styles.version}
+                                    onClick={this.handleClickVersion}
+                                >
+                                    {this.state.extended ?
+                                        // Don't bother translating, pretty much no one will ever see this.
+                                        // eslint-disable-next-line max-len
+                                        `You have enabled debug mode. v${upstreamMeta.version} (${upstreamMeta.commit})` :
+                                        `v${upstreamMeta.version}`}
+                                </span>
                             </footer>
                         </>
                     )}

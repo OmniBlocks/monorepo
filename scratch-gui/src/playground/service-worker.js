@@ -54,19 +54,26 @@ self.addEventListener('fetch', event => {
     if (url.origin !== location.origin) return;
     if (event.request.method !== 'GET') return;
 
+    const pathname = url.pathname.substr(base.length);
+    let rewrite;
+    if (/^(\d+\/?)?$/.test(pathname)) {
+        rewrite = 'index.html';
+    } else if (/^(\d+\/)?editor\/?$/i.test(pathname)) {
+        rewrite = 'editor.html';
+    } else if (/^(\d+\/)?fullscreen\/?$/i.test(pathname)) {
+        rewrite = 'fullscreen.html';
+    } else if (/^addons\/?$/i.test(pathname)) {
+        rewrite = 'addons.html';
+    }
+    if (!EDITOR_ASSETS.includes(pathname) && !rewrite) return;
+    const isImmutable = pathname.startsWith('static/assets');
+    if (isImmutable) {
+        event.respondWith(caches.match(event.request).catch(() => fetch(event.request)));
+        return;
+    }
     event.respondWith(fetch(event.request).catch(fetchError => {
-        const pathname = url.pathname.substr(base.length);
-        let rewrite;
-        if (/^(\d+\/?)?$/.test(pathname)) {
-            rewrite = 'index.html';
-        } else if (/^(\d+\/)?editor\/?$/i.test(pathname)) {
-            rewrite = 'editor.html';
-        } else if (/^(\d+\/)?fullscreen\/?$/i.test(pathname)) {
-            rewrite = 'fullscreen.html';
-        } else if (/^addons\/?$/i.test(pathname)) {
-            rewrite = 'addons.html';
-        }
-        return caches.match(rewrite ? new Request(rewrite) : event.request)
+        const request = rewrite ? new Request(rewrite) : event.request;
+        return caches.match(request)
             .catch(() => {
                 throw fetchError;
             });

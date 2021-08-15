@@ -1,7 +1,6 @@
 /* eslint-disable import/no-commonjs */
 
 const RawSource = require('webpack-sources').RawSource;
-const crypto = require('crypto');
 
 const PLUGIN_NAME = 'TWGenerateServiceWorkerPlugin';
 const SW_NAME = 'sw.js';
@@ -62,11 +61,7 @@ class TWGenerateServiceWorkerPlugin {
             const workerFile = compilation.getAsset(SW_NAME);
             const workerSource = workerFile.source.source().toString();
             const stringifiedAssets = JSON.stringify(assetNames);
-            const hash = crypto.createHash('sha1');
-            hash.update(stringifiedAssets);
-            const newSource = workerSource
-                .replace('[/* __EDITOR_ASSETS__ */]', stringifiedAssets)
-                .replace('__CACHE_NAME__', `tw-${hash.digest('hex')}`);
+            const newSource = workerSource.replace('[/* __EDITOR_ASSETS__ */]', stringifiedAssets);
             compilation.updateAsset(SW_NAME, new RawSource(newSource));
         });
     }

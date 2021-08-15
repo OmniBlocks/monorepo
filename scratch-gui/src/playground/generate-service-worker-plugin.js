@@ -23,7 +23,6 @@ class TWGenerateServiceWorkerPlugin {
             }
             const assetNames = Array.from(allAssetNames)
                 .filter(name => {
-                    /*
                     if (name.startsWith('static/blocks-media') || name.startsWith('static/assets')) {
                         // Assets that are only used in horizontal mode
                         if (
@@ -46,7 +45,6 @@ class TWGenerateServiceWorkerPlugin {
                         ) return false;
                         return true;
                     }
-                    */
                     if (name.startsWith('js/')) {
                         if (name.endsWith('.map')) return false;
                         // Extension worker
@@ -67,7 +65,7 @@ class TWGenerateServiceWorkerPlugin {
             const hash = crypto.createHash('sha1');
             hash.update(stringifiedAssets);
             const newSource = workerSource
-                .replace('[/* __ASSETS__ */]', stringifiedAssets)
+                .replace('[/* __EDITOR_ASSETS__ */]', stringifiedAssets)
                 .replace('__CACHE_NAME__', `tw-${hash.digest('hex')}`);
             compilation.updateAsset(SW_NAME, new RawSource(newSource));
         });

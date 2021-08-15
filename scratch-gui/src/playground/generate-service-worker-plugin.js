@@ -22,7 +22,16 @@ class TWGenerateServiceWorkerPlugin {
             }
             const assetNames = Array.from(allAssetNames)
                 .filter(name => {
+                    // Don't cache ourselves, that doesn't make sense
+                    if (name === SW_NAME) return false;
                     if (name.startsWith('static/blocks-media') || name.startsWith('static/assets')) {
+                        const asset = compilation.getAsset(name);
+                        if (!asset) return false;
+                        // Don't cache overly large non-font assets
+                        if (!name.endsWith('.ttf') && !name.endsWith('.otf')) {
+                            const size = asset.source.size();
+                            if (size > 10000) return false;
+                        }
                         // Assets that are only used in horizontal mode
                         if (
                             name.includes('event_broadcast_') ||
@@ -36,15 +45,21 @@ class TWGenerateServiceWorkerPlugin {
                             name.includes('microbit-block-icon') ||
                             name.includes('wedo2-block-icon')
                         ) return false;
+                        // Sounds
+                        if (name.endsWith('.wav')) return false;
+                        if (name.endsWith('.ogg')) return false;
+                        if (name.endsWith('.mp3')) return false;
                         // Assets that are extremely unlikely to be used
-                        if (
-                            name.endsWith('.wav') ||
-                            name.endsWith('.ogg') ||
-                            name.endsWith('.cur')
-                        ) return false;
+                        if (name.endsWith('.cur')) return false;
                         return true;
                     }
+                    // Webmanifest
+                    if (name.startsWith('images/')) return false;
+                    if (name.endsWith('.webmanifest')) return false;
+                    // Icons
+                    if (name.endsWith('.ico')) return false;
                     if (name.startsWith('js/')) {
+                        // Sourcemaps
                         if (name.endsWith('.map')) return false;
                         // Extension worker
                         if (name.includes('worker')) return false;
@@ -57,7 +72,8 @@ class TWGenerateServiceWorkerPlugin {
                     }
                     if (INCLUDE_HTML.includes(name)) return true;
                     return false;
-                });
+                })
+                .sort();
             const workerFile = compilation.getAsset(SW_NAME);
             const workerSource = workerFile.source.source().toString();
             const stringifiedAssets = JSON.stringify(assetNames);

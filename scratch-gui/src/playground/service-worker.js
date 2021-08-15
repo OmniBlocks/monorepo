@@ -32,7 +32,7 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('message', event => {
-    if (event.data === 'entered-editor') {
+    if (event.data === 'start-caching') {
         // Cache any unknown files
         caches.open(CACHE_NAME).then(cache => Promise.all(EDITOR_ASSETS.map(i => (
             cache.match(i)

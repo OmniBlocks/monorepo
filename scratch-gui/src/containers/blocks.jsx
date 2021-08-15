@@ -91,11 +91,6 @@ class Blocks extends React.Component {
         this.toolboxUpdateQueue = [];
     }
     componentDidMount () {
-        if (process.env.ENABLE_SERVICE_WORKER && 'serviceWorker' in navigator) {
-            navigator.serviceWorker.ready.then(({active}) => {
-                active.postMessage('entered-editor');
-            });
-        }
         this.props.vm.setCompilerOptions({
             warpTimer: true
         });

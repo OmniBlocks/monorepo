@@ -41,7 +41,7 @@ import BrowserModal from '../components/browser-modal/browser-modal.jsx';
 import CloudVariableBadge from '../components/tw-cloud-variable-badge/cloud-variable-badge.jsx';
 import {isRendererSupported, isBrowserSupported} from '../lib/tw-environment-support-prober';
 import AddonChannels from '../addons/channels';
-import {loadServiceWorker, startCaching} from './load-service-worker';
+import {loadServiceWorker} from './load-service-worker';
 import runAddons from '../addons/entry';
 
 import styles from './interface.css';
@@ -185,9 +185,6 @@ class Interface extends React.Component {
     componentDidUpdate (prevProps) {
         if (prevProps.isLoading && !this.props.isLoading) {
             loadServiceWorker();
-        }
-        if (!this.props.isLoading && !this.props.isPlayerOnly) {
-            startCaching();
         }
     }
     handleUpdateProjectTitle (title, isDefault) {

@@ -18,20 +18,7 @@ const loadServiceWorker = () => {
         }
     }
 };
-let hasEnteredEditor = false;
-const startCaching = () => {
-    if (hasEnteredEditor) return;
-    hasEnteredEditor = true;
-    if (process.env.ENABLE_SERVICE_WORKER && 'serviceWorker' in navigator) {
-        setTimeout(() => {
-            navigator.serviceWorker.ready.then(({active}) => {
-                active.postMessage('start-caching');
-            });
-        });
-    }
-};
 
 export {
-    loadServiceWorker,
-    startCaching
+    loadServiceWorker
 };

@@ -8,6 +8,7 @@ import Modal from '../../containers/modal.jsx';
 import FancyCheckbox from '../tw-fancy-checkbox/checkbox.jsx';
 import Input from '../forms/input.jsx';
 import BufferedInputHOC from '../forms/buffered-input-hoc.jsx';
+import DocumentationLink from '../tw-documentation-link/documentation-link.jsx';
 import styles from './settings-modal.css';
 
 /* eslint-disable react/no-multi-comp */
@@ -26,7 +27,6 @@ const messages = defineMessages({
         id: 'tw.settingsModal.help'
     }
 });
-
 
 class UnwrappedSetting extends React.Component {
     constructor (props) {
@@ -69,6 +69,15 @@ class UnwrappedSetting extends React.Component {
                 {this.state.helpVisible && (
                     <div className={styles.detail}>
                         {this.props.help}
+                        {this.props.slug && <React.Fragment>
+                            {' '}
+                            <DocumentationLink slug={this.props.slug}>
+                                <FormattedMessage
+                                    defaultMessage="Learn more."
+                                    id="gui.alerts.cloudInfoLearnMore"
+                                />
+                            </DocumentationLink>
+                        </React.Fragment>}
                     </div>
                 )}
                 {this.props.secondary}
@@ -82,7 +91,8 @@ UnwrappedSetting.propTypes = {
     help: PropTypes.node,
     primary: PropTypes.node,
     secondary: PropTypes.node,
-    showHelpAutomatically: PropTypes.bool
+    showHelpAutomatically: PropTypes.bool,
+    slug: PropTypes.string
 };
 const Setting = injectIntl(UnwrappedSetting);
 
@@ -123,26 +133,12 @@ const HighQualityPen = props => (
         help={
             <FormattedMessage
                 // eslint-disable-next-line max-len
-                defaultMessage="High Quality Pen allows pen projects to render at a higher resolution and disables some coordinate rounding in the editor. Not all projects benefit from this setting, and it may impact performance. {comparison}."
+                defaultMessage="High Quality Pen allows pen projects to render at a higher resolution and disables some coordinate rounding in the editor. Not all projects benefit from this setting, and it may impact performance."
                 description="High quality pen setting help"
                 id="tw.settingsModal.highQualityPenHelp"
-                values={{
-                    comparison: (
-                        <a
-                            href="https://docs.turbowarp.org/advanced-settings#high-quality-pen"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                        >
-                            <FormattedMessage
-                                defaultMessage="See comparison"
-                                description="Link to high quality pen comparison"
-                                id="tw.settingsModal.highQualityPenHelp.comparison"
-                            />
-                        </a>
-                    )
-                }}
             />
         }
+        slug="high-quality-pen"
     />
 );
 
@@ -179,6 +175,7 @@ const CustomFPS = props => (
                 }}
             />
         }
+        slug="custom-fps"
     />
 );
 CustomFPS.propTypes = {
@@ -205,6 +202,7 @@ const Interpolation = props => (
                 id="tw.settingsModal.interpolationHelp"
             />
         }
+        slug="interpolation"
     />
 );
 
@@ -225,6 +223,7 @@ const InfiniteClones = props => (
                 id="tw.settingsModal.infiniteClonesHelp"
             />
         }
+        slug="infinite-clones"
     />
 );
 
@@ -245,6 +244,7 @@ const RemoveFencing = props => (
                 id="tw.settingsModal.removeFencingHelp"
             />
         }
+        slug="remove-fencing"
     />
 );
 
@@ -265,6 +265,7 @@ const RemoveMiscLimits = props => (
                 id="tw.settingsModal.removeMiscLimitsHelp"
             />
         }
+        slug="remove-misc-limits"
     />
 );
 
@@ -286,6 +287,7 @@ const WarpTimer = props => (
                 id="tw.settingsModal.warpTimerHelp"
             />
         }
+        slug="warp-timer"
     />
 );
 
@@ -307,6 +309,7 @@ const DisableCompiler = props => (
                 id="tw.settingsModal.disableCompilerHelp"
             />
         }
+        slug="disable-compiler"
     />
 );
 
@@ -365,6 +368,7 @@ const CustomStageSize = ({
                 id="tw.settingsModal.customStageSizeHelp"
             />
         )}
+        slug="custom-stage-size"
     />
 );
 CustomStageSize.propTypes = {

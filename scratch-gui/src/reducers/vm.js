@@ -4,6 +4,7 @@ import storage from '../lib/storage';
 const SET_VM = 'scratch-gui/vm/SET_VM';
 const defaultVM = new VM();
 defaultVM.setCompatibilityMode(true);
+defaultVM.extensionManager.workerMode = 'iframe';
 defaultVM.attachStorage(storage);
 const initialState = defaultVM;
 

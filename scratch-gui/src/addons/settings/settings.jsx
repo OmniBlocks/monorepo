@@ -262,6 +262,9 @@ const Setting = ({
     setting,
     value
 }) => {
+    if (setting.if && setting.if.addonEnabled && !SettingsStore.getAddonEnabled(setting.if.addonEnabled)) {
+        return null;
+    }
     const settingId = setting.id;
     const settingName = addonTranslations[`${addonId}/@settings-name-${settingId}`] || setting.name;
     const uniqueId = `setting/${addonId}/${settingId}`;
@@ -348,7 +351,10 @@ Setting.propTypes = {
         potentialValues: PropTypes.arrayOf(PropTypes.shape({
             id: PropTypes.string,
             name: PropTypes.string
-        }))
+        })),
+        if: PropTypes.shape({
+            addonEnabled: PropTypes.string
+        })
     }),
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.bool, PropTypes.number])
 };

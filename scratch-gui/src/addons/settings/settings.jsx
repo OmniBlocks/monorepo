@@ -262,8 +262,13 @@ const Setting = ({
     setting,
     value
 }) => {
-    if (setting.if && setting.if.addonEnabled && !SettingsStore.getAddonEnabled(setting.if.addonEnabled)) {
-        return null;
+    if (setting.if && setting.if.addonEnabled) {
+        const addons = Array.isArray(setting.if.addonEnabled) ? setting.if.addonEnabled : [setting.if.addonEnabled];
+        for (const addon of addons) {
+            if (!SettingsStore.getAddonEnabled(addon)) {
+                return null;
+            }
+        }
     }
     if (setting.if && setting.if.settings) {
         for (const [settingName, expectedValue] of Object.entries(setting.if.settings)) {
@@ -360,7 +365,7 @@ Setting.propTypes = {
             name: PropTypes.string
         })),
         if: PropTypes.shape({
-            addonEnabled: PropTypes.string,
+            addonEnabled: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
             // eslint-disable-next-line react/forbid-prop-types
             settings: PropTypes.object
         })

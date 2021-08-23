@@ -265,6 +265,13 @@ const Setting = ({
     if (setting.if && setting.if.addonEnabled && !SettingsStore.getAddonEnabled(setting.if.addonEnabled)) {
         return null;
     }
+    if (setting.if && setting.if.settings) {
+        for (const [settingName, expectedValue] of Object.entries(setting.if.settings)) {
+            if (SettingsStore.getAddonSetting(addonId, settingName) !== expectedValue) {
+                return null;
+            }
+        }
+    }
     const settingId = setting.id;
     const settingName = addonTranslations[`${addonId}/@settings-name-${settingId}`] || setting.name;
     const uniqueId = `setting/${addonId}/${settingId}`;
@@ -353,7 +360,9 @@ Setting.propTypes = {
             name: PropTypes.string
         })),
         if: PropTypes.shape({
-            addonEnabled: PropTypes.string
+            addonEnabled: PropTypes.string,
+            // eslint-disable-next-line react/forbid-prop-types
+            settings: PropTypes.object
         })
     }),
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.bool, PropTypes.number])

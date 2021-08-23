@@ -122,6 +122,18 @@
       "reloadRequired": false
     },
     {
+      "name": "Addon blocks",
+      "id": "sa-color",
+      "type": "color",
+      "default": "#29BEB8",
+      "allowTransparency": true,
+      "if": {
+        "addonEnabled": [
+          "debugger"
+        ]
+      }
+    },
+    {
       "name": "Block inputs",
       "id": "input-color",
       "type": "color",
@@ -158,7 +170,7 @@
     "editor",
     "theme",
     "codeEditor",
-    "recommended"
+    "featured"
   ],
   "enabledByDefault": false,
   "presets": [
@@ -178,6 +190,7 @@
         "data-lists-color": "#FF661A",
         "custom-color": "#5f49d8",
         "Pen-color": "#0FBD8C",
+        "sa-color": "#29BEB8",
         "input-color": "#FFFFFF",
         "text": "white"
       }
@@ -198,6 +211,7 @@
         "data-lists-color": "#cc5b22",
         "custom-color": "#632d99",
         "Pen-color": "#0e9a6c",
+        "sa-color": "#29beb8",
         "input-color": "#ffffff",
         "text": "white"
       }
@@ -219,6 +233,7 @@
         "custom-color": "#99004d",
         "Pen-color": "#064734",
         "tw-color": "#660000",
+        "sa-color": "#166966",
         "input-color": "#202020",
         "text": "white"
       }
@@ -239,6 +254,7 @@
         "data-lists-color": "#FF661A",
         "custom-color": "#FF6680",
         "Pen-color": "#0FBD8C",
+        "sa-color": "#29BEB8",
         "input-color": "#202020",
         "text": "colorOnBlack"
       }

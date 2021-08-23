@@ -24,7 +24,8 @@
   ],
   "onlyInEditor": true,
   "tags": [
-    "editor"
+    "editor",
+    "featured"
   ],
   "enabledByDefault": false
 }

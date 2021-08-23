@@ -89,6 +89,11 @@ function updateSettings(addon, newStyle) {
       alt: "tw",
       var: "tw",
     },
+    sa: {
+      color: "#29beb8",
+      tertiaryColor: "#3aa8a4",
+      alt: "a-b",
+    },
   };
 
   for (var prop of Object.keys(categories)) {
@@ -168,6 +173,12 @@ function updateSettings(addon, newStyle) {
         #s3devIDD > li.extension:hover,
         #s3devIDD > li.extension.sel {
           background-color: ${tertiary};
+        }`;
+      }
+      if (prop === "sa") {
+        stylesheet += `path.blocklyBlockBackground[fill="#29beb8"] {
+          fill: var(--editorTheme3-${prop}Color);
+          ${textMode === "black" ? "--sa-block-text-color: #575e75;" : ""}
         }`;
       }
     } else {
@@ -351,6 +362,20 @@ function updateSettings(addon, newStyle) {
         #s3devIDD > li.extension:hover,
         #s3devIDD > li.extension.sel {
           background-color: ${secondaryActive};
+        }`;
+      }
+      if (prop === "sa") {
+        stylesheet += `path.blocklyBlockBackground[fill="#29beb8"] {
+          fill: ${background};
+          stroke: var(--editorTheme3-${prop}Color);
+          --sa-block-text-color: ${menuText};
+          --sa-block-secondary-color: ${secondaryActive};
+        }
+        path.blocklyBlockBackground[fill="#29beb8"] ~ .blocklyText {
+          fill: var(--editorTheme3-${prop}Color);
+        }
+        path.blocklyBlockBackground[fill="#29beb8"] ~ [data-argument-type="text"] > path {
+          stroke: var(--editorTheme3-${prop}Color);
         }`;
       }
     }

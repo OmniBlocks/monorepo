@@ -34,5 +34,7 @@
     "blocks2image",
     "remove-curved-stage-border",
     "transparent-orphans",
+    "paint-by-default",
+    "no-script-bumping",
     "tw-interface-customization"
 ]

@@ -1,0 +1,21 @@
+{
+  "name": "Do not automatically space overlapping scripts",
+  "description": "Allows scripts to be moved and modified without causing overlapping scripts to move around.",
+  "credits": [
+    {
+      "name": "GarboMuffin"
+    }
+  ],
+  "userscripts": [
+    {
+      "url": "userscript.js"
+    }
+  ],
+  "dynamicEnable": true,
+  "dynamicDisable": true,
+  "tags": [
+    "editor",
+    "codeEditor"
+  ],
+  "enabledByDefault": false
+}

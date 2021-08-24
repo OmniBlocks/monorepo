@@ -35,6 +35,7 @@
     "remove-curved-stage-border",
     "transparent-orphans",
     "paint-by-default",
+    "hide-delete-button",
     "no-script-bumping",
     "tw-interface-customization"
 ]

@@ -676,13 +676,19 @@ class AddonRunner {
         }
     }
 
-    settingsMatch (settingMatch) {
-        if (!settingMatch) {
-            // No settings to match.
+    meetsCondition (condition) {
+        if (!condition) {
+            // No condition, so always active.
             return true;
         }
-        const settingValue = this.publicAPI.addon.settings.get(settingMatch.id);
-        return settingValue === settingMatch.value;
+        if (condition.settings) {
+            for (const [settingId, expectedValue] of Object.entries(condition.settings)) {
+                if (this.publicAPI.addon.settings.get(settingId) !== expectedValue) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     dynamicEnable () {
@@ -737,7 +743,7 @@ class AddonRunner {
 
         if (this.manifest.userstyles) {
             for (const userstyle of this.manifest.userstyles) {
-                if (!this.settingsMatch(userstyle.settingMatch)) {
+                if (!this.meetsCondition(userstyle.if)) {
                     continue;
                 }
                 const m = resources[userstyle.url]();
@@ -752,7 +758,7 @@ class AddonRunner {
 
         if (this.manifest.userscripts) {
             for (const userscript of this.manifest.userscripts) {
-                if (!this.settingsMatch(userscript.settingMatch)) {
+                if (!this.meetsCondition(userscript.if)) {
                     continue;
                 }
                 const m = resources[userscript.url]();

@@ -4,18 +4,20 @@
   "userscripts": [
     {
       "url": "remove-backpack.js",
-      "settingMatch": {
-        "id": "removeBackpack",
-        "value": true
+      "if": {
+        "settings": {
+          "removeBackpack": true
+        }
       }
     }
   ],
   "userstyles": [
     {
       "url": "remove-backpack.css",
-      "settingMatch": {
-        "id": "removeBackpack",
-        "value": true
+      "if": {
+        "settings": {
+          "removeBackpack": true
+        }
       }
     }
   ],

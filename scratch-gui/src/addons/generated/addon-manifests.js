@@ -22,6 +22,7 @@ export default {
   "editor-theme3": () => require("../addons/editor-theme3/addon.json"),
   "folders": () => require("../addons/folders/addon.json"),
   "gamepad": () => require("../addons/gamepad/addon.json"),
+  "hide-delete-button": () => require("../addons/hide-delete-button/addon.json"),
   "hide-flyout": () => require("../addons/hide-flyout/addon.json"),
   "initialise-sprite-position": () => require("../addons/initialise-sprite-position/addon.json"),
   "load-extensions": () => require("../addons/load-extensions/addon.json"),

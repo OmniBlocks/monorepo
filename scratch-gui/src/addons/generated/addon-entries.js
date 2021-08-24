@@ -22,6 +22,7 @@ export default {
   "editor-theme3": () => import(/* webpackChunkName: "addon-entry-editor-theme3" */ "../addons/editor-theme3/_entry.js"),
   "folders": () => import(/* webpackChunkName: "addon-entry-folders" */ "../addons/folders/_entry.js"),
   "gamepad": () => import(/* webpackChunkName: "addon-entry-gamepad" */ "../addons/gamepad/_entry.js"),
+  "hide-delete-button": () => import(/* webpackChunkName: "addon-entry-hide-delete-button" */ "../addons/hide-delete-button/_entry.js"),
   "hide-flyout": () => import(/* webpackChunkName: "addon-entry-hide-flyout" */ "../addons/hide-flyout/_entry.js"),
   "initialise-sprite-position": () => import(/* webpackChunkName: "addon-entry-initialise-sprite-position" */ "../addons/initialise-sprite-position/_entry.js"),
   "load-extensions": () => import(/* webpackChunkName: "addon-entry-load-extensions" */ "../addons/load-extensions/_entry.js"),

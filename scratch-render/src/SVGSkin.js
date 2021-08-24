@@ -1,7 +1,7 @@
 const twgl = require('twgl.js');
 
 const Skin = require('./Skin');
-const SvgRenderer = require('scratch-svg-renderer').SVGRenderer;
+const {loadSvgString, serializeSvgToString} = require('scratch-svg-renderer');
 const ShaderManager = require('./ShaderManager');
 
 const MAX_TEXTURE_DIMENSION = 2048;
@@ -28,8 +28,20 @@ class SVGSkin extends Skin {
         /** @type {RenderWebGL} */
         this._renderer = renderer;
 
-        /** @type {SvgRenderer} */
-        this._svgRenderer = new SvgRenderer();
+        /** @type {HTMLImageElement} */
+        this._svgImage = document.createElement('img');
+
+        /** @type {boolean} */
+        this._svgImageLoaded = false;
+
+        /** @type {Array<number>} */
+        this._size = [0, 0];
+
+        /** @type {HTMLCanvasElement} */
+        this._canvas = document.createElement('canvas');
+
+        /** @type {CanvasRenderingContext2D} */
+        this._context = this._canvas.getContext('2d');
 
         /** @type {Array<WebGLTexture>} */
         this._scaledMIPs = [];
@@ -56,7 +68,7 @@ class SVGSkin extends Skin {
      * @return {Array<number>} the natural size, in Scratch units, of this skin.
      */
     get size () {
-        return this._svgRenderer.size;
+        return [this._size[0], this._size[1]];
     }
 
     useNearest (scale, drawable) {
@@ -94,18 +106,27 @@ class SVGSkin extends Skin {
      * @return {SVGMIP} An object that handles creating and updating SVG textures.
      */
     createMIP (scale) {
-        this._svgRenderer.draw(scale);
+        const [width, height] = this._size;
+        this._canvas.width = width * scale;
+        this._canvas.height = height * scale;
+        if (
+            this._canvas.width <= 0 ||
+            this._canvas.height <= 0 ||
+            // Even if the canvas at the current scale has a nonzero size, the image's dimensions are floored
+            // pre-scaling; e.g. if an image has a width of 0.4 and is being rendered at 3x scale, the canvas will have
+            // a width of 1, but the image's width will be rounded down to 0 on some browsers (Firefox) prior to being
+            // drawn at that scale, resulting in an IndexSizeError if we attempt to draw it.
+            this._svgImage.naturalWidth <= 0 ||
+            this._svgImage.naturalHeight <= 0
+        ) return super.getTexture();
+        this._context.clearRect(0, 0, this._canvas.width, this._canvas.height);
+        this._context.setTransform(scale, 0, 0, scale, 0, 0);
+        this._context.drawImage(this._svgImage, 0, 0);
 
         // Pull out the ImageData from the canvas. ImageData speeds up
         // updating Silhouette and is better handled by more browsers in
         // regards to memory.
-        const canvas = this._svgRenderer.canvas;
-        // If one of the canvas dimensions is 0, set this MIP to an empty image texture.
-        // This avoids an IndexSizeError from attempting to getImageData when one of the dimensions is 0.
-        if (canvas.width === 0 || canvas.height === 0) return super.getTexture();
-
-        const context = canvas.getContext('2d');
-        const textureData = context.getImageData(0, 0, canvas.width, canvas.height);
+        const textureData = this._context.getImageData(0, 0, this._canvas.width, this._canvas.height);
 
         canvas.width = 0;
         canvas.height = 0;
@@ -150,7 +171,7 @@ class SVGSkin extends Skin {
         // Can't use bitwise stuff here because we need to handle negative exponents
         const mipScale = Math.pow(2, mipLevel - INDEX_OFFSET);
 
-        if (this._svgRenderer.loaded && !this._scaledMIPs[mipLevel]) {
+        if (this._svgImageLoaded && !this._scaledMIPs[mipLevel]) {
             this._scaledMIPs[mipLevel] = this.createMIP(mipScale);
         }
 
@@ -174,14 +195,27 @@ class SVGSkin extends Skin {
      * @fires Skin.event:WasAltered
      */
     setSVG (svgData, rotationCenter) {
-        this._svgRenderer.loadSVG(svgData, false, () => {
-            const svgSize = this._svgRenderer.size;
-            if (svgSize[0] === 0 || svgSize[1] === 0) {
+        const svgTag = loadSvgString(svgData);
+        const svgText = serializeSvgToString(svgTag, true /* shouldInjectFonts */);
+        this._svgImageLoaded = false;
+
+        const {x, y, width, height} = svgTag.viewBox.baseVal;
+        // While we're setting the size before the image is loaded, this doesn't cause the skin to appear with the wrong
+        // size for a few frames while the new image is loading, because we don't emit the `WasAltered` event, telling
+        // drawables using this skin to update, until the image is loaded.
+        // We need to do this because the VM reads the skin's `size` directly after calling `setSVG`.
+        // TODO: return a Promise so that the VM can read the skin's `size` after the image is loaded.
+        this._size[0] = width;
+        this._size[1] = height;
+
+        // If there is another load already in progress, replace the old onload to effectively cancel the old load
+        this._svgImage.onload = () => {
+            if (width === 0 || height === 0) {
                 super.setEmptyImageData();
                 return;
             }
 
-            const maxDimension = Math.ceil(Math.max(this.size[0], this.size[1]));
+            const maxDimension = Math.ceil(Math.max(width, height));
             let testScale = 2;
             for (testScale; maxDimension * testScale <= MAX_TEXTURE_DIMENSION; testScale *= 2) {
                 this._maxTextureScale = testScale;
@@ -190,12 +224,17 @@ class SVGSkin extends Skin {
             this.resetMIPs();
 
             if (typeof rotationCenter === 'undefined') rotationCenter = this.calculateRotationCenter();
-            const viewOffset = this._svgRenderer.viewOffset;
-            this._rotationCenter[0] = rotationCenter[0] - viewOffset[0];
-            this._rotationCenter[1] = rotationCenter[1] - viewOffset[1];
+            // Compensate for viewbox offset.
+            // See https://github.com/LLK/scratch-render/pull/90.
+            this._rotationCenter[0] = rotationCenter[0] - x;
+            this._rotationCenter[1] = rotationCenter[1] - y;
+
+            this._svgImageLoaded = true;
 
             this.emit(Skin.Events.WasAltered);
-        });
+        };
+
+        this._svgImage.src = `data:image/svg+xml;utf8,${encodeURIComponent(svgText)}`;
     }
 
 }

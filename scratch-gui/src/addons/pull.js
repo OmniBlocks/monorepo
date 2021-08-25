@@ -210,7 +210,7 @@ const SKIP_MESSAGES = [
     'debugger/feedback-log-link',
     'debugger/feedback-remove',
     'editor-devtools/help-by',
-    'editor-theme3/@settings-sa-color'
+    'editor-theme3/@settings-name-sa-color'
 ];
 
 const parseMessages = localePath => {

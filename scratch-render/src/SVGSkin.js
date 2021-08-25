@@ -128,9 +128,6 @@ class SVGSkin extends Skin {
         // regards to memory.
         const textureData = this._context.getImageData(0, 0, this._canvas.width, this._canvas.height);
 
-        canvas.width = 0;
-        canvas.height = 0;
-
         const textureOptions = {
             auto: false,
             wrap: this._renderer.gl.CLAMP_TO_EDGE,

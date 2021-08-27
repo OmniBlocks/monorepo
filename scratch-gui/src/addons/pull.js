@@ -276,12 +276,16 @@ const generateL10nSettingsEntries = locales => generateEntries(
 
 const generateAddonEntries = () => generateEntries(
     addons,
-    id => ({
-        name: `addon-entry-${id}`,
-        src: `../addons/${id}/_entry.js`,
-        // Addons that are enabled by default and active outside the editor should not be loaded async
-        async: !(addonIdToManifest[id].enabledByDefault && !addonIdToManifest[id].onlyInEditor)
-    })
+    id => {
+        const manifest = addonIdToManifest[id];
+        return {
+            src: `../addons/${id}/_entry.js`,
+            // Include default addons in a single bundle
+            name: manifest.enabledByDefault ? 'addon-default-entry' : `addon-entry-${id}`,
+            // Include default addons useful outside of the editor in the original bundle, no request required
+            async: !(manifest.enabledByDefault && !manifest.onlyInEditor)
+        };
+    }
 );
 
 const generateAddonManifestEntries = () => generateEntries(

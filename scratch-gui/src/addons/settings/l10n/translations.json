@@ -121,6 +121,17 @@
         "tw.addons.settings.title": "アドオン設定",
         "tw.addons.settings.unsupported": "いくつかのアドオンがお使いのブラウザに対応していません:"
     },
+    "ja-hira": {
+        "tw.addons.settings.confirmResetAll": "アドオンのせっていを削除(さくじょ)し、デフォルトにもどします。よろしいですか？",
+        "tw.addons.settings.credits": "クレジット:",
+        "tw.addons.settings.dirty": "再読み込み(さいよみこみ)をしてアドオンの効果(こうか)を反映(はんえい)する。",
+        "tw.addons.settings.dirtyButton": "すぐに再読み込み(さいよみこみ)する",
+        "tw.addons.settings.presets": "プリセット",
+        "tw.addons.settings.reset": "リセット",
+        "tw.addons.settings.resetAll": "すべてリセットする",
+        "tw.addons.settings.tags.recommended": "おすすめ",
+        "tw.addons.settings.title": "アドオンせってい"
+    },
     "ko": {
         "tw.addons.settings.addonFeedback": "애드온에 문의하기",
         "tw.addons.settings.confirmResetAll": "정말로 애드온 설정을 기본값으로 초기화하시겠습니까?",
@@ -328,7 +339,7 @@
     },
     "tr": {
         "tw.addons.settings.addonFeedback": "Eklenti geribildirim",
-        "tw.addons.settings.confirmResetAll": "Sen bütün eklenti ayarlarını sıfarlamaya eminmisin?",
+        "tw.addons.settings.confirmResetAll": "Bütün eklenti ayarlarını varsayılan değerlerine sıfırlamak istediğinizden emin misiniz?",
         "tw.addons.settings.credits": "Krediler:",
         "tw.addons.settings.dirty": "Ayarı uygulamak için Turbowarp'u yeniden açın.",
         "tw.addons.settings.dirtyButton": "Şimdi yeniden yükle",
@@ -344,8 +355,8 @@
         "tw.addons.settings.tags.new": "Yeni!",
         "tw.addons.settings.tags.recommended": "Önerildi",
         "tw.addons.settings.tags.theme": "Tema",
-        "tw.addons.settings.title": "Eklenti Ayarlar",
-        "tw.addons.settings.unsupported": "Bazi içerikler bu web tarayacıda kullanamıyoruz:"
+        "tw.addons.settings.title": "Eklenti Ayarları",
+        "tw.addons.settings.unsupported": "Bazı eklentiler bu tarayıcıda kullanılamıyor:"
     },
     "zh-cn": {
         "tw.addons.settings.addonFeedback": "插件反馈",

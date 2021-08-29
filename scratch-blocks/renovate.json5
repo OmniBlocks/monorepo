@@ -1,20 +1,15 @@
 {
-  "extends": [
-    "config:base",
-    ":semanticCommits",
-    ":separateMultipleMajorReleases"
-  ],
-  "timezone": "America/New_York",
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
 
-  // no limit on open Renovate PR count
-  "prConcurrentLimit": 0,
+  "extends": [
+    "github>LLK/scratch-renovate-config"
+  ],
 
   "packageRules": [
-    // automerge minor & patch updates for most dependencies
+    // Closure compiler & library releases are always "major" so separating them leads to PR SPAM
     {
-      "matchCurrentVersion": "!/^0/", // SemVer spec says pre-1.0.0 can make breaking changes at any time
-      "matchUpdateTypes": ["minor", "patch"],
-      "automerge": true
+      "matchPackageNames": ["google-closure-compiler", "google-closure-library"],
+      "separateMultipleMajor": false
     }
   ]
 }

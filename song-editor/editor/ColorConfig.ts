@@ -36,6 +36,8 @@ export class ColorConfig {
 					--fifth-note: #468;
 					--white-piano-key: #bbb;
 					--black-piano-key: #444;
+                    --white-piano-key-text: #131200;
+                    --black-piano-key-text: #fff;
 					--use-color-formula: false;
 					--track-editor-bg-pitch: #444;
 					--track-editor-bg-pitch-dim: #333;
@@ -149,6 +151,8 @@ export class ColorConfig {
 					--fifth-note: #415498;
 					--white-piano-key: #bbb;
 					--black-piano-key: #444;
+                    --white-piano-key-text: #131200;
+                    --black-piano-key-text: #fff;
 					--use-color-formula: false;
 					--track-editor-bg-pitch: #444;
 					--track-editor-bg-pitch-dim: #333;
@@ -263,6 +267,8 @@ export class ColorConfig {
 					--fifth-note: #bbddf0;
 					--white-piano-key: #eee;
 					--black-piano-key: #666;
+                    --white-piano-key-text: #131200;
+                    --black-piano-key-text: #fff;
 					--use-color-formula: false;
 					--track-editor-bg-pitch: #ececec;
 					--track-editor-bg-pitch-dim: #fdfdfd;
@@ -383,6 +389,8 @@ export class ColorConfig {
 					--fifth-note: #54547a;
 					--white-piano-key: #eee;
 					--black-piano-key: #666;
+                    --white-piano-key-text: #131200;
+                    --black-piano-key-text: #fff;
 					--use-color-formula: true;
 					--track-editor-bg-pitch: #393e4f;
 					--track-editor-bg-pitch-dim: #1c1d28;
@@ -495,6 +503,8 @@ export class ColorConfig {
 					--fifth-note: #385840;
 					--white-piano-key: #bda;
 					--black-piano-key: #573;
+                    --white-piano-key-text: #131200;
+                    --black-piano-key-text: #ffffff;
 					--use-color-formula: true;
 					--track-editor-bg-pitch: #254820;
 					--track-editor-bg-pitch-dim: #102819;
@@ -607,6 +617,8 @@ export class ColorConfig {
 					--fifth-note: #5b3e6b;
 					--white-piano-key: #d89898;
 					--black-piano-key: #572b29;
+                    --white-piano-key-text: #131200;
+                    --black-piano-key-text: #ffffff;
 					--use-color-formula: true;
 					--track-editor-bg-pitch: #5e3a41;
 					--track-editor-bg-pitch-dim: #281d1c;
@@ -719,6 +731,8 @@ export class ColorConfig {
 			--fifth-note: #555955;
 			--white-piano-key: #a89e9e;
 			--black-piano-key: #2d2424;
+            --white-piano-key-text: #131200;
+            --black-piano-key-text: #ffffff;
 			--use-color-formula: true;
 			--track-editor-bg-pitch: #373737;
 			--track-editor-bg-pitch-dim: #131313;
@@ -832,6 +846,8 @@ export class ColorConfig {
                     --fifth-note: #d08c8c;
                     --white-piano-key: #f7efd7;
                     --black-piano-key: #56647b;
+                    --white-piano-key-text: #131200;
+                    --black-piano-key-text: #ffffff;
                     --use-color-formula: true;
                     --track-editor-bg-pitch: #bb8a83;
                     --track-editor-bg-pitch-dim: #bbbab8;
@@ -924,12 +940,119 @@ export class ColorConfig {
 					--mod-primary-note-lum-scale: 0;
 				}
 
-				.beepboxEditor button, .beepboxEditor select {
-					box-shadow: inset 0 0 0 1px var(--secondary-text);
-				}
-
-				.select2-selection__rendered {
-					box-shadow: inset 0 0 0 1px var(--secondary-text);
+			`,
+		"amoled dark": `
+				:root {
+					--page-margin: #000;
+					--editor-background: #020406;
+					--hover-preview: white;
+					--playhead: rgba(255, 255, 255, 0.9);
+					--primary-text: white;
+					--secondary-text: #8e88ce;
+					--inverted-text: black;
+					--text-selection: rgba(119,68,255,0.99);
+					--box-selection-fill: #044b94;
+					--loop-accent: #ad38f9;
+					--link-accent: #bd25ff;
+					--ui-widget-background: #080d1f;
+					--ui-widget-focus: #060f2d;
+					--pitch-background: #000;
+					--tonic: #00113a;
+					--fifth-note: #1b0019;
+					--white-piano-key: #02040c;
+					--black-piano-key: #02040c;
+                    --white-piano-key-text: #fff;
+                    --black-piano-key-text: #fff;
+					--use-color-formula: true;
+					--track-editor-bg-pitch: #050829;
+					--track-editor-bg-pitch-dim: #010213;
+					--track-editor-bg-noise: #051529;
+					--track-editor-bg-noise-dim: #010b13;
+					--track-editor-bg-mod: #150529;
+					--track-editor-bg-mod-dim: #0a0113;
+					--multiplicative-mod-slider: #2b409c;
+					--overwriting-mod-slider: #6850b5;
+					--indicator-primary: #7f3bec;
+					--indicator-secondary: #213888;
+					--select2-opt-group: #1d123c;
+					--input-box-outline: #1b1e48;
+					--mute-button-normal: #d234b0;
+					--mute-button-mod: #263d98;
+					--mod-label-primary: #090910;
+					--mod-label-secondary-text: rgb(73, 69, 214);
+					--mod-label-primary-text: white;
+					--pitch-secondary-channel-hue: 183;
+					--pitch-secondary-channel-hue-scale: 158.7;
+					--pitch-secondary-channel-sat: 83.3;
+					--pitch-secondary-channel-sat-scale: 0.1;
+					--pitch-secondary-channel-lum: 40;
+					--pitch-secondary-channel-lum-scale: 0.05;
+					--pitch-primary-channel-hue: 183;
+					--pitch-primary-channel-hue-scale: 158.7;
+					--pitch-primary-channel-sat: 100;
+					--pitch-primary-channel-sat-scale: 0.1;
+					--pitch-primary-channel-lum: 67.5;
+					--pitch-primary-channel-lum-scale: 0.05;
+					--pitch-secondary-note-hue: 183;
+					--pitch-secondary-note-hue-scale: 158.7;
+					--pitch-secondary-note-sat: 93.9;
+					--pitch-secondary-note-sat-scale: 0.1;
+					--pitch-secondary-note-lum: 25;
+					--pitch-secondary-note-lum-scale: 0.05;
+					--pitch-primary-note-hue: 183;
+					--pitch-primary-note-hue-scale: 158.7;
+					--pitch-primary-note-sat: 100;
+					--pitch-primary-note-sat-scale: 0.05;
+					--pitch-primary-note-lum: 85.6;
+					--pitch-primary-note-lum-scale: 0.025;
+					--noise-secondary-channel-hue: 30;
+					--noise-secondary-channel-hue-scale: 2;
+					--noise-secondary-channel-sat: 25;
+					--noise-secondary-channel-sat-scale: 0;
+					--noise-secondary-channel-lum: 42;
+					--noise-secondary-channel-lum-scale: 0;
+					--noise-primary-channel-hue: 30;
+					--noise-primary-channel-hue-scale: 2;
+					--noise-primary-channel-sat: 33;
+					--noise-primary-channel-sat-scale: 0;
+					--noise-primary-channel-lum: 63.5;
+					--noise-primary-channel-lum-scale: 0;
+					--noise-secondary-note-hue: 30;
+					--noise-secondary-note-hue-scale: 2;
+					--noise-secondary-note-sat: 33.5;
+					--noise-secondary-note-sat-scale: 0;
+					--noise-secondary-note-lum: 55;
+					--noise-secondary-note-lum-scale: 0;
+					--noise-primary-note-hue: 30;
+					--noise-primary-note-hue-scale: 2;
+					--noise-primary-note-sat: 46.5;
+					--noise-primary-note-sat-scale: 0;
+					--noise-primary-note-lum: 74;
+					--noise-primary-note-lum-scale: 0;
+					--mod-secondary-channel-hue: 0;
+					--mod-secondary-channel-hue-scale: 1.5;
+					--mod-secondary-channel-sat: 88;
+					--mod-secondary-channel-sat-scale: 0;
+					--mod-secondary-channel-lum: 50;
+					--mod-secondary-channel-lum-scale: 0;
+					--mod-primary-channel-hue: 0;
+					--mod-primary-channel-hue-scale: 1.5;
+					--mod-primary-channel-sat: 96;
+					--mod-primary-channel-sat-scale: 0;
+					--mod-primary-channel-lum: 80;
+					--mod-primary-channel-lum-scale: 0;
+					--mod-secondary-note-hue: 0;
+					--mod-secondary-note-hue-scale: 1.5;
+					--mod-secondary-note-sat: 92;
+					--mod-secondary-note-sat-scale: 0;
+					--mod-secondary-note-lum: 45;
+					--mod-secondary-note-lum-scale: 0;
+					--mod-primary-note-hue: 0;
+					--mod-primary-note-hue-scale: 1.5;
+					--mod-primary-note-sat: 96;
+					--mod-primary-note-sat-scale: 0;
+					--mod-primary-note-lum: 85;
+					--mod-primary-note-lum-scale: 0;
 				}
 			`,
 	};
@@ -951,7 +1074,9 @@ export class ColorConfig {
 	public static readonly tonic: string = "var(--tonic)";
 	public static readonly fifthNote: string = "var(--fifth-note)";
 	public static readonly whitePianoKey: string = "var(--white-piano-key)";
-	public static readonly blackPianoKey: string = "var(--black-piano-key)";
+    public static readonly blackPianoKey: string = "var(--black-piano-key)";
+    public static readonly whitePianoKeyText: string = "var(--white-piano-key-text)";
+    public static readonly blackPianoKeyText: string = "var(--black-piano-key-text)";
 	public static readonly useColorFormula: string = "var(--use-color-formula)";
 	public static readonly pitchSecondaryChannelHue: string = "var(--pitch-secondary-channel-hue)";
 	public static readonly pitchSecondaryChannelHueScale: string = "var(--pitch-secondary-channel-hue-scale)";

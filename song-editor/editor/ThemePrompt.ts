@@ -18,6 +18,7 @@ export class ThemePrompt implements Prompt {
 		option({ value: "forest" }, "Forest"),
 		option({ value: "canyon" }, "Canyon"),
 		option({ value: "midnight"}, "Midnight"),
+		option({ value: "amoled dark"}, "High Contrast Dark"),
 	);
 	private readonly _cancelButton: HTMLButtonElement = button({ class: "cancelButton" });
 	private readonly _okayButton: HTMLButtonElement = button({ class: "okayButton", style: "width:45%;" }, "Okay");

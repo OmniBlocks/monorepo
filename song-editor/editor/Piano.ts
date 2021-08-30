@@ -333,7 +333,7 @@ export class Piano {
 					}
 
 
-					label.style.color = Config.keys[pitchNameIndex].isWhiteKey ? "black" : "white";
+                    label.style.color = Config.keys[pitchNameIndex].isWhiteKey ? ColorConfig.whitePianoKeyText : ColorConfig.blackPianoKeyText;
 					label.textContent = text;
 				}
 			}

@@ -313,7 +313,7 @@ class CustomAlgorythmCanvas {
         canvas.addEventListener("mousemove", this._onMouseMove);
         canvas.addEventListener("mousedown", this._onMouseDown);
         canvas.addEventListener("mouseup", this._onMouseUp);
-        canvas.addEventListener("mouseleave", this._onMouseUp);
+        //canvas.addEventListener("mouseleave", this._onMouseUp);
 
         this.mouseDown = false;
         this.continuousEdit = false;
@@ -326,7 +326,6 @@ class CustomAlgorythmCanvas {
         this.newMods = [[], [], [], [], [], []];
         this.inverseModulation = [[], [], [], [], [], []];
 
-        // Init waveform
         this.redrawCanvas();
 
     }

@@ -364,7 +364,7 @@ export class Config {
         { name: "1←4←5 (2 3)←6", carrierCount: 3, associatedCarrier: [1, 2, 3, 1, 2, 3], modulatedBy: [[4], [6], [6], [5], [], []] },
         { name: "1←(3 4)←5 2←6", carrierCount: 2, associatedCarrier: [1, 2, 2, 2, 2, 2], modulatedBy: [[3, 4], [6], [5], [5], [], []] },
         { name: "(1 2)←4 3←(5 6)", carrierCount: 3, associatedCarrier: [1, 2, 3, 1, 2, 3], modulatedBy: [[4], [4], [5, 6], [], [], []] },
-        { name: "(1 2)←5 (3 4)←6", carrierCount: 3, associatedCarrier: [1, 2, 3, 4, 4, 4], modulatedBy: [[5], [5], [6], [6], [], []] },
+        { name: "(1 2)←5 (3 4)←6", carrierCount: 4, associatedCarrier: [1, 2, 3, 4, 4, 4], modulatedBy: [[5], [5], [6], [6], [], []] },
         { name: "(1 2 3)←(4 5 6)", carrierCount: 3, associatedCarrier: [1, 2, 3, 1, 2, 3], modulatedBy: [[4, 5, 6], [4, 5, 6], [4, 5, 6], [], [], []] },
         { name: "1←5 (2 3 4)←6", carrierCount: 4, associatedCarrier: [1, 2, 3, 4, 4, 4], modulatedBy: [[5], [6], [6], [6], [], []] },
         { name: "1 2←5 (3 4)←6", carrierCount: 4, associatedCarrier: [1, 2, 3, 4, 4, 4], modulatedBy: [[], [5], [6], [6], [], []] },
@@ -548,19 +548,19 @@ export class Config {
 	public static readonly sineWaveLength: number = 1 << 8; // 256
 	public static readonly sineWaveMask: number = Config.sineWaveLength - 1;
 	public static readonly sineWave: Float64Array = generateSineWave();
-    public static readonly triWave: Float64Array = generateTriWave();
-    public static readonly squareWave: Float64Array = generateSquareWave();
-    public static readonly sawWave: Float64Array = generateSawWave()
     public static readonly operatorWaves: DictionaryArray<OperatorWave> = toNameMap([
         { name: "sine", samples: generateSineWave() },
         { name: "triangle", samples: generateTriWave() },
         { name: "sawtooth", samples: generateSawWave() },
         { name: "square", samples: generateSquareWave() },
-        { name: "25%pulse", samples: generateSquareWave(0.5) },
-        { name: "75%pulse", samples: generateSquareWave(-0.5) },
+        { name: "1/3 pulse", samples: generateSquareWave(1 / 3) },
+        { name: "2/3 pulse", samples: generateSquareWave(-1 / 3) },
         { name: "ramp", samples: generateSawWave(true) },
         { name: "trapezoid", samples: generateTrapezoidWave(2) },
-        { name: "12.5%pulse", samples: generateSquareWave(0.25) },
+        { name: "12.5%pulse", samples: generateSquareWave(0.75) },
+        { name: "25%pulse", samples: generateSquareWave(0.5) },
+        { name: "37.5%pulse", samples: generateSquareWave(0.25) },
+        { name: "75%pulse", samples: generateSquareWave(-0.5) },
     ]);
 
 	// Height of the small editor column for inserting/deleting rows, in pixels.

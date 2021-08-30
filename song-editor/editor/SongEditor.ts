@@ -299,6 +299,8 @@ class CustomAlgorythmCanvas {
     private lastX: number;
     private lastY: number;
     public newMods: number[][];
+    public lookUpArray: number[][];
+    public selected: number;
     public inverseModulation: number[][];
     public carriers: number;
     public drawArray: number[][];
@@ -318,7 +320,9 @@ class CustomAlgorythmCanvas {
         this.lastX = 0;
         this.lastY = 0;
         this.drawArray = [[], [], [], [], [], []];
+        this.lookUpArray = [[], [], [], [], [], []];
         this.carriers = 1;
+        this.selected = -1;
         this.newMods = [[], [], [], [], [], []];
         this.inverseModulation = [[], [], [], [], [], []];
 
@@ -327,12 +331,13 @@ class CustomAlgorythmCanvas {
 
     }
 
-    public fillDrawArray() {
+    public fillDrawArray(): void {
         this.drawArray = [];
         this.drawArray = [[], [], [], [], [], []];
         this.carriers = 1;
         this.newMods = [[], [], [], [], [], []];
         this.inverseModulation = [[], [], [], [], [], []];
+        this.lookUpArray = [[], [], [], [], [], []];
 
         var oldMods = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()].customAlgorithm;
         this.carriers = oldMods.carrierCount;
@@ -342,27 +347,26 @@ class CustomAlgorythmCanvas {
                 this.newMods[i][o] = oldMods.modulatedBy[i][o];
             }
         }
-        let tempArray:number[][] = [[], [], [], [], [], []];
         for (let i: number = 0; i < this.inverseModulation.length; i++) {
             if (i < this.carriers) {
                 this.drawArray[this.drawArray.length - 1][i] = i + 1;
-                tempArray[i] = [0, i];
+                this.lookUpArray[i] = [0, i];
             } else {
                 if (this.inverseModulation[i][0] != undefined) {
-                    let testPos = [this.drawArray.length - (tempArray[this.inverseModulation[i][this.inverseModulation[i].length - 1] - 1][0]+2 ), tempArray[this.inverseModulation[i][this.inverseModulation[i].length - 1] - 1][1]];
+                    let testPos = [this.drawArray.length - (this.lookUpArray[this.inverseModulation[i][this.inverseModulation[i].length - 1] - 1][0] + 2), this.lookUpArray[this.inverseModulation[i][this.inverseModulation[i].length - 1] - 1][1]];
                     if (this.drawArray[testPos[0]][testPos[1]] != undefined) {
                         while (this.drawArray[testPos[0]][testPos[1]] != undefined && testPos[1] < 6) {
                             testPos[1]++;
                             if (this.drawArray[testPos[0]][testPos[1]] == undefined) {
                                 this.drawArray[testPos[0]][testPos[1]] = i + 1;
-                                tempArray[i] = [this.drawArray.length - (testPos[0] + 1), testPos[1]];
+                                this.lookUpArray[i] = [this.drawArray.length - (testPos[0] + 1), testPos[1]];
                                 break;
                             }
                             console.log(testPos[1])
                         }
                     } else {
                         this.drawArray[testPos[0] ][testPos[1]] = i + 1;
-                        tempArray[i] = [this.drawArray.length - (testPos[0] + 1), testPos[1]];
+                        this.lookUpArray[i] = [this.drawArray.length - (testPos[0] + 1), testPos[1]];
                     }
                 } else {
                     let testPos = [5, 0];
@@ -370,7 +374,7 @@ class CustomAlgorythmCanvas {
                         testPos[1]++;
                         if (this.drawArray[testPos[0]][testPos[1]] == undefined) {
                             this.drawArray[testPos[0]][testPos[1]] = i + 1;
-                            tempArray[i] = [5, 0];
+                            this.lookUpArray[i] = [testPos[0]],[testPos[1]];
                             console.log(testPos[1])
                             break;
                         }
@@ -378,36 +382,73 @@ class CustomAlgorythmCanvas {
                 }
             }
         }
-        console.log(this.drawArray)
-        console.log(tempArray)
-        console.log(this.inverseModulation)
-        console.log(this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()].customAlgorithm.modulatedBy)
-        console.log("refilled arrays")
     }
-
+    
     public redrawCanvas(): void {
         this.fillDrawArray();
         var ctx = this.canvas.getContext("2d") as CanvasRenderingContext2D;
 
         // Black BG
         ctx.fillStyle = ColorConfig.getComputed("--editor-background");
-        ctx.fillRect(0, 0, 132, 132);
+        ctx.fillRect(0, 0, 144, 144);
         
-        console.log("start draw array?")
         for (let x: number = 0; x < 6; x++) {
             for (let y: number = 0; y < 6; y++) {
                 ctx.fillStyle = ColorConfig.getComputed("--track-editor-bg-pitch-dim");
-                ctx.fillRect(x * 22, ((y) * 22),12, 12);
+                ctx.fillRect(x * 24 + 12, ((y) * 24), 12, 12);
+                ctx.fillStyle = ColorConfig.getComputed("--editor-background");
+                ctx.fillRect(x * 24 + 13, ((y) * 24)+1, 10, 10);
                 if (this.drawArray[y][x] != undefined) {
                     if (this.drawArray[y][x] <= this.carriers) {
                         ctx.fillStyle = ColorConfig.getComputed("--primary-text");
-                        ctx.fillRect(x * 22, ((y) * 22),12,12);
+                        ctx.fillRect(x * 24 + 12, ((y) * 24), 12, 12);
+                        ctx.fillStyle = ColorConfig.getComputed("--editor-background");
+                        ctx.fillRect(x * 24 + 13, ((y) * 24) + 1, 10, 10);
+                        ctx.fillStyle = ColorConfig.getComputedChannelColor(this._doc.song, this._doc.channel).primaryNote;
+                        ctx.fillText(this.drawArray[y][x] + "", x * 24 + 14, y * 24+10);
                     }
                     else {
                         ctx.fillStyle = ColorConfig.getComputedChannelColor(this._doc.song, this._doc.channel).primaryNote;
-                        ctx.fillRect(x * 22,  (y * 22),12,12);
+                        ctx.fillRect(x * 24 + 12, (y * 24), 12, 12);
+                        ctx.fillStyle = ColorConfig.getComputed("--editor-background");
+                        ctx.fillRect(x * 24 + 13, ((y) * 24) + 1, 10, 10);
+                        ctx.fillStyle = ColorConfig.getComputed("--primary-text");
+                        ctx.fillText(this.drawArray[y][x] + "", x * 24 + 14, y * 24+10);
                     }
                 }
+            }
+        }
+        console.log("draw lines")
+        for (let off: number = 0; off < 6; off++) {
+            ctx.strokeStyle = ColorConfig.getArbitaryChannelColor("pitch", off).primaryChannel;
+            const set = off * 2-1+0.5;
+            for (let i: number = 0; i < this.inverseModulation[off].length; i++) {
+                let tar: number = this.inverseModulation[off][i]-1;
+                ctx.beginPath();
+                ctx.moveTo(this.lookUpArray[off][1] * 24 + 12 + set, (6 - this.lookUpArray[off][0] - 1) * 24 + 12);
+                ctx.lineTo(this.lookUpArray[off][1] * 24 + 12 + set, (6 - this.lookUpArray[off][0] - 1) * 24 + 12 + set);
+                if ((this.lookUpArray[tar][1]) != this.lookUpArray[off][1]) {
+                    ctx.lineTo(this.lookUpArray[off][1] * 24 + set, (6 - this.lookUpArray[off][0] - 1) * 24 + 12 + set);
+                    if ((this.lookUpArray[tar][1] == (this.lookUpArray[off][1] - 1)) && (this.lookUpArray[tar][0] == (this.lookUpArray[off][0] - 1))) {
+                    } else {
+                        ctx.lineTo(this.lookUpArray[off][1] * 24 + set, (6 - this.lookUpArray[tar][0] - 1) * 24 + 12 + set);
+                        ctx.lineTo((this.lookUpArray[tar][1] + 1) * 24 + set, (6 - this.lookUpArray[tar][0] - 1) * 24 + 12 + set);
+                    }
+                    ctx.lineTo((this.lookUpArray[tar][1] + 1) * 24 + set, (6 - this.lookUpArray[tar][0] - 1) * 24 + set - 12);
+                    ctx.lineTo((this.lookUpArray[tar][1]) * 24 + 12 + set, (6 - this.lookUpArray[tar][0] - 1) * 24 + set - 12);
+                    ctx.lineTo((this.lookUpArray[tar][1]) * 24 + 12 + set, (6 - this.lookUpArray[tar][0] - 1) * 24);
+                } else {
+                    if (Math.abs(this.lookUpArray[tar][0] - this.lookUpArray[off][0]) == 1) {
+                        ctx.lineTo((this.lookUpArray[tar][1]) * 24 + 12 + set, (6 - this.lookUpArray[tar][0] - 1) * 24);
+                    } else {
+                        ctx.lineTo(this.lookUpArray[off][1] * 24 + set, (6 - this.lookUpArray[off][0] - 1) * 24 + 12 + set);
+                        ctx.lineTo(this.lookUpArray[off][1] * 24 + set, (6 - this.lookUpArray[tar][0] - 1) * 24 + set - 12);
+                        ctx.lineTo(this.lookUpArray[off][1] * 24 + 12 + set, (6 - this.lookUpArray[tar][0] - 1) * 24 + set - 12);
+                        ctx.lineTo(this.lookUpArray[off][1] * 24 + 12 + set, (6 - this.lookUpArray[tar][0] - 1) * 24);
+                    }
+                }
+                ctx.lineWidth = 1;
+                ctx.stroke();
             }
         }
         console.log("draw complete")
@@ -695,10 +736,10 @@ export class SongEditor {
 
     private readonly _feedback6OpTypeSelect: HTMLSelectElement = buildOptions(select(), Config.feedbacks6Op.map(feedback => feedback.name));
     private readonly _feedback6OpRow1: HTMLDivElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("feedbackType") }, "Feedback:"), div({ class: "selectContainer" }, this._feedback6OpTypeSelect));
-    private readonly _customAlgorithmCanvas: CustomAlgorythmCanvas = new CustomAlgorythmCanvas(canvas({ width: 132, height: 132, style: "border:2px solid " + ColorConfig.uiWidgetBackground, id: "customAlgorithmCanvas" }), this._doc, (newArray: Float64Array) => new ChangeCustomWave(this._doc, newArray));
+    private readonly _customAlgorithmCanvas: CustomAlgorythmCanvas = new CustomAlgorythmCanvas(canvas({ width: 144, height: 144, style: "border:2px solid " + ColorConfig.uiWidgetBackground, id: "customAlgorithmCanvas" }), this._doc, (newArray: Float64Array) => new ChangeCustomWave(this._doc, newArray));
     private readonly _algorithm6OpSelect: HTMLSelectElement = buildOptions(select(), Config.algorithms6Op.map(algorithm => algorithm.name));
     private readonly _algorithm6OpSelectRow: HTMLDivElement = div(div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("algorithm") }, "Algorithm: "), div({ class: "selectContainer" }, this._algorithm6OpSelect))
-        , div({ style: "height:132px; display:flex; justify-content:center;" }, [this._customAlgorithmCanvas.canvas]));//temp
+        , div({ style: "height:144px; display:flex; justify-content:center;" }, [this._customAlgorithmCanvas.canvas]));//temp
 
 	private readonly _instrumentCopyButton: HTMLButtonElement = button({ style: "max-width:86px;", class: "copyButton" }, [
 		"Copy",

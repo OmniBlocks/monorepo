@@ -1697,7 +1697,11 @@ class RenderWebGL extends EventEmitter {
         const projection = twgl.m4.ortho(bounds.left, bounds.right, bounds.top, bounds.bottom, -1, 1);
 
         // Draw the stamped sprite onto the PenSkin's framebuffer.
-        this._drawThese([stampID], ShaderManager.DRAW_MODE.default, projection, {ignoreVisibility: true});
+        this._drawThese([stampID], ShaderManager.DRAW_MODE.default, projection, {
+            ignoreVisibility: true,
+            framebufferWidth: this._nativeSize[0] * skin.renderQuality,
+            framebufferHeight: this._nativeSize[1] * skin.renderQuality
+        });
         skin._silhouetteDirty = true;
     }
 

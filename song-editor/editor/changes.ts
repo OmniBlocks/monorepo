@@ -368,6 +368,43 @@ export class ChangeCustomWave extends Change {
 	}
 }
 
+export class ChangeCustomAlgorythmorFeedback extends Change {
+    constructor(doc: SongDocument, newArray: number[][], carry: number, mode: string) {
+        super();
+        if (mode == "algorithm") {
+            const oldArray: number[][] = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()].customAlgorithm.modulatedBy;
+            const oldCarriercount: number = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()].customAlgorithm.carrierCount;
+            var comparisonResult: boolean = true;
+            if (carry != oldCarriercount) {
+                comparisonResult = false;
+            } else {
+                for (let i: number = 0; i < oldArray.length; i++) {
+                    if (oldArray[i].length != newArray[i].length) {
+                        comparisonResult = false;
+                        i = oldArray.length;
+                    } else {
+                        for (let j: number = 0; j < oldArray[i].length; j++) {
+                            if (oldArray[i][j] != newArray[i][j]) {
+                                comparisonResult = false;
+                                i = oldArray.length;
+                            }
+                        }
+                    }
+                }
+            }
+            if (comparisonResult == false) {
+                let instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+
+                instrument.customAlgorithm.set(carry, newArray);
+
+                instrument.algorithm6Op = 0;
+                doc.notifier.changed();
+                this._didSomething();
+            }
+        }
+    }
+}
+
 export class ChangePreset extends Change {
 	constructor(doc: SongDocument, newValue: number) {
 		super();

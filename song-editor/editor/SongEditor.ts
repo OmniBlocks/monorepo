@@ -6,7 +6,7 @@ import { Config, InstrumentType } from "../synth/SynthConfig";
 import { BarScrollBar } from "./BarScrollBar";
 import { BeatsPerBarPrompt } from "./BeatsPerBarPrompt";
 import { Change, ChangeGroup } from "./Change";
-import { ChangeAlgorithm, ChangeChannelBar, ChangeChipWave, ChangeChannelOrder, ChangeChord, ChangeCustomWave, ChangeDetectKey, ChangeDetune, ChangeDrumsetEnvelope, ChangeEffects, ChangeFeedbackAmplitude, ChangeFeedbackEnvelope, ChangeFeedbackType, ChangeFilterCutoff, ChangeFilterEnvelope, ChangeFilterResonance, ChangeInterval, ChangeKey, ChangeNoiseWave, ChangeOperatorAmplitude, ChangeOperatorEnvelope, ChangeOperatorFrequency, ChangePan, ChangePasteInstrument, ChangePatternNumbers, ChangePatternsPerChannel, ChangePreset, ChangePulseEnvelope, ChangePulseWidth, ChangeRandomGeneratedInstrument, ChangeReverb, ChangeRhythm, ChangeScale, ChangeSong, ChangeSongTitle, ChangeTempo, ChangeTransition, ChangeVibrato, ChangeVibratoType, ChangeVolume, ChangeVibratoDepth, ChangeVibratoSpeed, ChangeVibratoDelay, ChangePanDelay, ChangeArpeggioSpeed, pickRandomPresetValue, ChangeFastTwoNoteArp, ChangeClicklessTransition, ChangeTieNoteTransition, ChangePatternSelection, ChangeOperatorWaveform, Change6OpFeedbackType, Change6OpAlgorithm } from "./changes";
+import { ChangeAlgorithm, ChangeChannelBar, ChangeChipWave, ChangeChannelOrder, ChangeChord, ChangeCustomWave, ChangeDetectKey, ChangeDetune, ChangeDrumsetEnvelope, ChangeEffects, ChangeFeedbackAmplitude, ChangeFeedbackEnvelope, ChangeFeedbackType, ChangeFilterCutoff, ChangeFilterEnvelope, ChangeFilterResonance, ChangeInterval, ChangeKey, ChangeNoiseWave, ChangeOperatorAmplitude, ChangeOperatorEnvelope, ChangeOperatorFrequency, ChangePan, ChangePasteInstrument, ChangePatternNumbers, ChangePatternsPerChannel, ChangePreset, ChangePulseEnvelope, ChangePulseWidth, ChangeRandomGeneratedInstrument, ChangeReverb, ChangeRhythm, ChangeScale, ChangeSong, ChangeSongTitle, ChangeTempo, ChangeTransition, ChangeVibrato, ChangeVibratoType, ChangeVolume, ChangeVibratoDepth, ChangeVibratoSpeed, ChangeVibratoDelay, ChangePanDelay, ChangeArpeggioSpeed, pickRandomPresetValue, ChangeFastTwoNoteArp, ChangeClicklessTransition, ChangeTieNoteTransition, ChangePatternSelection, ChangeOperatorWaveform, Change6OpFeedbackType, Change6OpAlgorithm, ChangeCustomAlgorythmorFeedback } from "./changes";
 import { ChannelSettingsPrompt } from "./ChannelSettingsPrompt";
 import { ColorConfig } from "./ColorConfig";
 import { CustomChipPrompt } from "./CustomChipPrompt";
@@ -295,9 +295,9 @@ class CustomChipCanvas {
 
 class CustomAlgorythmCanvas {
     private mouseDown: boolean;
-    private continuousEdit: boolean;
-    private lastX: number;
-    private lastY: number;
+    //private continuousEdit: boolean;
+    //private lastX: number;
+    //private lastY: number;
     public newMods: number[][];
     public lookUpArray: number[][];
     public selected: number;
@@ -307,18 +307,18 @@ class CustomAlgorythmCanvas {
 
     private _change: Change | null = null;
 
-    constructor(public readonly canvas: HTMLCanvasElement, private readonly _doc: SongDocument, private readonly _getChange: (newArray: Float64Array) => Change) {
+    constructor(public readonly canvas: HTMLCanvasElement, private readonly _doc: SongDocument, private readonly _getChange: (newArray: number[][], carry: number, mode: string) => Change) {
         //canvas.addEventListener("input", this._whenInput);
         //canvas.addEventListener("change", this._whenChange);
         canvas.addEventListener("mousemove", this._onMouseMove);
         canvas.addEventListener("mousedown", this._onMouseDown);
         canvas.addEventListener("mouseup", this._onMouseUp);
-        //canvas.addEventListener("mouseleave", this._onMouseUp);
+        canvas.addEventListener("mouseleave", this._onMouseUp);
 
         this.mouseDown = false;
-        this.continuousEdit = false;
-        this.lastX = 0;
-        this.lastY = 0;
+        //this.continuousEdit = false;
+        //this.lastX = 0;
+        //this.lastY = 0;
         this.drawArray = [[], [], [], [], [], []];
         this.lookUpArray = [[], [], [], [], [], []];
         this.carriers = 1;
@@ -373,8 +373,7 @@ class CustomAlgorythmCanvas {
                         testPos[1]++;
                         if (this.drawArray[testPos[0]][testPos[1]] == undefined) {
                             this.drawArray[testPos[0]][testPos[1]] = i + 1;
-                            this.lookUpArray[i] = [testPos[0]],[testPos[1]];
-                            console.log(testPos[1])
+                            this.lookUpArray[i] = [this.drawArray.length - (testPos[0] + 1), testPos[1]];
                             break;
                         }
                     }
@@ -459,96 +458,53 @@ class CustomAlgorythmCanvas {
             var x = (event.clientX || event.pageX) - this.canvas.getBoundingClientRect().left;
             var y = Math.floor((event.clientY || event.pageY) - this.canvas.getBoundingClientRect().top);
 
-            if (y < 2) y = 2;
-            if (y > 50) y = 50;
-
             var ctx = this.canvas.getContext("2d") as CanvasRenderingContext2D;
 
-            if (this.continuousEdit == true && Math.abs(this.lastX - x) < 40) {
+            ctx.fillStyle = ColorConfig.getComputedChannelColor(this._doc.song, this._doc.channel).primaryNote;
 
-                var lowerBound = (x < this.lastX) ? x : this.lastX;
-                var upperBound = (x < this.lastX) ? this.lastX : x;
+            var yindex = Math.ceil(y / 12)
+            var xindex = Math.ceil(x / 12)
+            yindex = (yindex/2)-Math.floor(yindex / 2) >= 0.5 ? Math.floor(yindex / 2) : -1;
+            xindex = (xindex / 2)+0.5 - Math.floor(xindex / 2) <= 0.5 ? Math.floor(xindex / 2)-1 : -1;
+            yindex = yindex >= 0 && yindex <= 5 ? yindex : -1;
+            xindex = xindex >= 0 && xindex <= 5 ? xindex : -1;
+            ctx.fillRect(xindex * 24+12, yindex * 24, 2, 2);
 
-                for (let i = lowerBound; i <= upperBound; i += 2) {
-
-                    var progress = (Math.abs(x - this.lastX) > 2.0) ? ((x > this.lastX) ?
-                        1.0 - ((i - lowerBound) / (upperBound - lowerBound))
-                        : ((i - lowerBound) / (upperBound - lowerBound))) : 0.0;
-                    var j = Math.round(y + (this.lastY - y) * progress);
-
+            if (this.selected == -1) {
+                if (this.drawArray ?.[yindex] ?.[xindex] != undefined) {
+                    this.selected = this.drawArray[yindex][xindex];
+                    ctx.fillRect(xindex * 24 + 12, yindex * 24, 12, 12);
                     ctx.fillStyle = ColorConfig.getComputed("--editor-background");
-                    ctx.fillRect(Math.floor(i / 2) * 2, 0, 2, 53);
-                    ctx.fillStyle = ColorConfig.getComputed("--ui-widget-background");
-                    ctx.fillRect(Math.floor(i / 2) * 2, 25, 2, 2);
-                    ctx.fillStyle = ColorConfig.getComputed("--track-editor-bg-pitch-dim");
-                    ctx.fillRect(Math.floor(i / 2) * 2, 13, 2, 1);
-                    ctx.fillRect(Math.floor(i / 2) * 2, 39, 2, 1);
-                    ctx.fillStyle = ColorConfig.getComputedChannelColor(this._doc.song, this._doc.channel).primaryNote;
-                    ctx.fillRect(Math.floor(i / 2) * 2, j - 2, 2, 4);
-
-                    // Actually update current instrument's custom waveform
+                    ctx.fillText(this.drawArray[yindex][xindex] + "", xindex * 24 + 14, yindex * 24 + 10);
                 }
-
-            }
-            else {
-
-                ctx.fillStyle = ColorConfig.getComputed("--editor-background");
-                ctx.fillRect(Math.floor(x / 2) * 2, 0, 2, 52);
-                ctx.fillStyle = ColorConfig.getComputed("--ui-widget-background");
-                ctx.fillRect(Math.floor(x / 2) * 2, 25, 2, 2);
-                ctx.fillStyle = ColorConfig.getComputed("--track-editor-bg-pitch-dim");
-                ctx.fillRect(Math.floor(x / 2) * 2, 13, 2, 1);
-                ctx.fillRect(Math.floor(x / 2) * 2, 39, 2, 1);
-                ctx.fillStyle = ColorConfig.getComputedChannelColor(this._doc.song, this._doc.channel).primaryNote;
-                ctx.fillRect(Math.floor(x / 2) * 2, y - 2, 2, 4);
-
-                // Actually update current instrument's custom waveform
-
+            } else {
+                if (this.drawArray ?.[yindex] ?.[xindex] != undefined) {
+                    //important logic here
+                } else {
+                    this.selected = -1;
+                }
             }
 
-            this.continuousEdit = true;
-            this.lastX = x;
-            this.lastY = y;
 
-            // Preview - update integral used for sound synthesis based on new array, not actual stored array. When mouse is released, real update will happen.
-            /*let instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
-
-            let sum: number = 0.0;
-            for (let i: number = 0; i < this.newArray.length; i++) {
-                sum += this.newArray[i];
-            }
-            const average: number = sum / this.newArray.length;
-
-            // Perform the integral on the wave. The chipSynth will perform the derivative to get the original wave back but with antialiasing.
-            let cumulative: number = 0;
-            let wavePrev: number = 0;
-            for (let i: number = 0; i < this.newArray.length; i++) {
-                cumulative += wavePrev;
-                wavePrev = this.newArray[i] - average;
-                instrument.customChipWaveIntegral[i] = cumulative;
-            }
-
-            instrument.customChipWaveIntegral[64] = 0.0;*/
         }
 
     }
 
     private _onMouseDown = (event: MouseEvent): void => {
-        this.mouseDown = false;
+        this.mouseDown = true;
 
         // Allow single-click edit
         this._onMouseMove(event);
     }
     private _onMouseUp = (): void => {
         this.mouseDown = false;
-        this.continuousEdit = false;
+        //this.continuousEdit = false;
 
         this._whenChange();
     }
 
     private _whenChange = (): void => {
-        //this._change = this._getChange(this.newArray);
-        console.log(this._getChange(new Float64Array))
+        this._change = this._getChange(this.newMods, this.carriers, "Algorithm");
 
         this._doc.record(this._change!);
 
@@ -735,7 +691,7 @@ export class SongEditor {
 
     private readonly _feedback6OpTypeSelect: HTMLSelectElement = buildOptions(select(), Config.feedbacks6Op.map(feedback => feedback.name));
     private readonly _feedback6OpRow1: HTMLDivElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("feedbackType") }, "Feedback:"), div({ class: "selectContainer" }, this._feedback6OpTypeSelect));
-    private readonly _customAlgorithmCanvas: CustomAlgorythmCanvas = new CustomAlgorythmCanvas(canvas({ width: 144, height: 144, style: "border:2px solid " + ColorConfig.uiWidgetBackground, id: "customAlgorithmCanvas" }), this._doc, (newArray: Float64Array) => new ChangeCustomWave(this._doc, newArray));
+    private readonly _customAlgorithmCanvas: CustomAlgorythmCanvas = new CustomAlgorythmCanvas(canvas({ width: 144, height: 144, style: "border:2px solid " + ColorConfig.uiWidgetBackground, id: "customAlgorithmCanvas" }), this._doc, (newArray: number[][], carry: number, mode: string) => new ChangeCustomAlgorythmorFeedback(this._doc, newArray, carry, mode));
     private readonly _algorithm6OpSelect: HTMLSelectElement = buildOptions(select(), Config.algorithms6Op.map(algorithm => algorithm.name));
     private readonly _algorithm6OpSelectRow: HTMLDivElement = div(div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("algorithm") }, "Algorithm: "), div({ class: "selectContainer" }, this._algorithm6OpSelect))
         , div({ style: "height:144px; display:flex; justify-content:center;" }, [this._customAlgorithmCanvas.canvas]));//temp

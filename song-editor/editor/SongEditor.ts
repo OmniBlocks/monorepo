@@ -330,20 +330,32 @@ class CustomAlgorythmCanvas {
 
     }
 
-    public fillDrawArray(): void {
-        this.drawArray = [];
-        this.drawArray = [[], [], [], [], [], []];
-        this.carriers = 1;
-        this.newMods = [[], [], [], [], [], []];
-        this.inverseModulation = [[], [], [], [], [], []];
-        this.lookUpArray = [[], [], [], [], [], []];
+    public fillDrawArray(noReset: boolean = false): void {
+        if (noReset) {
+            this.drawArray = [];
+            this.drawArray = [[], [], [], [], [], []];
+            this.inverseModulation = [[], [], [], [], [], []];
+            this.lookUpArray = [[], [], [], [], [], []];
+            for (let i: number = 0; i < this.newMods.length; i++) {
+                for (let o: number = 0; o < this.newMods[i].length; o++) {
+                    this.inverseModulation[this.newMods[i][o] - 1].push(i + 1);
+                }
+            }
+        } else {
+            this.drawArray = [];
+            this.drawArray = [[], [], [], [], [], []];
+            this.carriers = 1;
+            this.newMods = [[], [], [], [], [], []];
+            this.inverseModulation = [[], [], [], [], [], []];
+            this.lookUpArray = [[], [], [], [], [], []];
 
-        var oldMods = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()].customAlgorithm;
-        this.carriers = oldMods.carrierCount;
-        for (let i:number = 0; i < oldMods.modulatedBy.length; i++) {
-            for (let o: number = 0; o < oldMods.modulatedBy[i].length; o++) {
-                this.inverseModulation[oldMods.modulatedBy[i][o] - 1].push(i + 1);
-                this.newMods[i][o] = oldMods.modulatedBy[i][o];
+            var oldMods = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()].customAlgorithm;
+            this.carriers = oldMods.carrierCount;
+            for (let i: number = 0; i < oldMods.modulatedBy.length; i++) {
+                for (let o: number = 0; o < oldMods.modulatedBy[i].length; o++) {
+                    this.inverseModulation[oldMods.modulatedBy[i][o] - 1].push(i + 1);
+                    this.newMods[i][o] = oldMods.modulatedBy[i][o];
+                }
             }
         }
         for (let i: number = 0; i < this.inverseModulation.length; i++) {
@@ -382,8 +394,8 @@ class CustomAlgorythmCanvas {
         }
     }
     
-    public redrawCanvas(): void {
-        this.fillDrawArray();
+    public redrawCanvas(noReset:boolean = false): void {
+        this.fillDrawArray(noReset);
         var ctx = this.canvas.getContext("2d") as CanvasRenderingContext2D;
 
         // Black BG
@@ -427,7 +439,7 @@ class CustomAlgorythmCanvas {
                 ctx.lineTo(this.lookUpArray[off][1] * 24 + 12 + set, (6 - this.lookUpArray[off][0] - 1) * 24 + 12 + set);
                 if ((this.lookUpArray[tar][1]) != this.lookUpArray[off][1]) {
                     ctx.lineTo(this.lookUpArray[off][1] * 24 + set, (6 - this.lookUpArray[off][0] - 1) * 24 + 12 + set);
-                    if ((this.lookUpArray[tar][1] == (this.lookUpArray[off][1] - 1)) && (this.lookUpArray[tar][0] == (this.lookUpArray[off][0] - 1))) {
+                    if ((this.lookUpArray[tar][1] == (this.lookUpArray[off][1] - 1)) && (this.lookUpArray[tar][0] <= (this.lookUpArray[off][0] - 1))) {
                     } else {
                         ctx.lineTo(this.lookUpArray[off][1] * 24 + set, (6 - this.lookUpArray[tar][0] - 1) * 24 + 12 + set);
                         ctx.lineTo((this.lookUpArray[tar][1] + 1) * 24 + set, (6 - this.lookUpArray[tar][0] - 1) * 24 + 12 + set);
@@ -480,6 +492,36 @@ class CustomAlgorythmCanvas {
             } else {
                 if (this.drawArray ?.[yindex] ?.[xindex] != undefined) {
                     //important logic here
+                    if (this.drawArray[yindex][xindex] == this.selected) {
+                        if (this.selected-1 < this.carriers) {
+                            this.carriers--;
+                            //do auto rebalence here
+                        } else {
+                            //do auto rebalence here if possible
+                            this.carriers++
+                        }
+                    } else {
+                        const newmod = this.drawArray[yindex][xindex]
+                        if (this.selected > newmod) {
+                            let check = this.newMods[newmod - 1].indexOf(this.selected);
+                            if (check != -1) {
+                                this.newMods[newmod - 1].splice(check, 1);
+                            } else {
+                                this.newMods[newmod - 1].push(this.selected);
+                            }
+                        } else {
+                            let check = this.newMods[this.selected - 1].indexOf(newmod);
+                            if (check != -1) {
+                                this.newMods[this.selected - 1].splice(check, 1);
+                            } else {
+                                this.newMods[this.selected - 1].push(newmod);
+                            }
+                        }
+                    }
+                    this.selected = -1;
+                    this.redrawCanvas(true);
+                    console.log(this.newMods);
+                    console.log(this.carriers);
                 } else {
                     this.selected = -1;
                 }
@@ -504,7 +546,7 @@ class CustomAlgorythmCanvas {
     }
 
     private _whenChange = (): void => {
-        this._change = this._getChange(this.newMods, this.carriers, "Algorithm");
+        this._change = this._getChange(this.newMods, this.carriers, "algorithm");
 
         this._doc.record(this._change!);
 

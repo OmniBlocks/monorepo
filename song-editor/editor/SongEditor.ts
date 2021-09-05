@@ -350,7 +350,6 @@ class CustomAlgorythmCanvas {
             this.lookUpArray = [[], [], [], [], [], []];
 
             var oldMods = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()].customAlgorithm;
-            console.log(oldMods);
             this.carriers = oldMods.carrierCount;
             for (let i: number = 0; i < oldMods.modulatedBy.length; i++) {
                 for (let o: number = 0; o < oldMods.modulatedBy[i].length; o++) {
@@ -521,8 +520,6 @@ class CustomAlgorythmCanvas {
                     }
                     this.selected = -1;
                     this.redrawCanvas(true);
-                    console.log(this.newMods);
-                    console.log(this.carriers);
                     this.mouseDown = false;
                 } else {
                     this.selected = -1;
@@ -553,7 +550,6 @@ class CustomAlgorythmCanvas {
         this._change = this._getChange(this.newMods, this.carriers, "algorithm");
 
         this._doc.record(this._change!);
-        console.log(this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()].customAlgorithm);
 
         this._change = null;
     };

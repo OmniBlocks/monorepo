@@ -305,6 +305,7 @@ export class Config {
 		{ name: "bowed", spread: 0.02, offset: 0.0, volume: 1.0, sign: -1.0 },
         { name: "piano", spread: 0.01, offset: 0.0, volume: 1.0, sign: 0.7 },
         { name: "warbled", spread: 0.25, offset: 0.05, volume: 0.9, sign: -0.8 },
+        { name: "hecking gosh", spread: 6.25, offset: -6.0, volume: 0.8, sign: -0.7 },
 	]);
 	public static readonly effectsNames: ReadonlyArray<string> = ["none", "reverb", "chorus", "chorus & reverb"];
 	public static readonly volumeRange: number = 50;

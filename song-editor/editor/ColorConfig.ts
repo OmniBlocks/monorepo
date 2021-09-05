@@ -938,8 +938,20 @@ export class ColorConfig {
 					--mod-primary-note-sat-scale: 0;
 					--mod-primary-note-lum: 55;
 					--mod-primary-note-lum-scale: 0;
+
 				}
 
+				.beepboxEditor button, .beepboxEditor select {
+					background-color: var(--secondary-text);
+				}
+
+				.select2-selection__rendered {
+					background-color: var(--secondary-text);
+				}
+
+				.beepboxEditor .piano-button::before {
+					display: none;
+				}
 			`,
 		"amoled dark": `
 				:root {
@@ -1053,7 +1065,9 @@ export class ColorConfig {
 					--mod-primary-note-sat-scale: 0;
 					--mod-primary-note-lum: 85;
 					--mod-primary-note-lum-scale: 0;
+
 				}
+
 			`,
 	};
 

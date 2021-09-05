@@ -1456,6 +1456,9 @@ export class ChangeFeedbackType extends Change {
         const oldValue: number = instrument.feedbackType;
 		if (oldValue != newValue) {
             instrument.feedbackType = newValue;
+            if (newValue != 0) {
+                instrument.customFeedbackType.fromPreset(newValue);
+            }
 			instrument.preset = instrument.type;
 			doc.notifier.changed();
 			this._didSomething();

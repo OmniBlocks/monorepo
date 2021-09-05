@@ -415,13 +415,13 @@ export class CustomAlgorithm {
         this.carrierCount = carriers;
         for (let i = 0; i < this.modulatedBy.length; i++) {
             this.modulatedBy[i] = modulation[i];
-            if (i + 1 <= carriers) {
-                this.associatedCarrier[i] = i;
+            if (i < carriers) {
+                this.associatedCarrier[i] = i+1;
             }
             for (let j = 0; j < modulation[i].length;j++) {
-                this.name += modulation[i][j-1];
-                if (modulation[i][j-1] > carriers) {
-                    this.associatedCarrier[modulation[i][j - 1]] = i;
+                this.name += modulation[i][j];
+                if (modulation[i][j]-1 > carriers) {
+                    this.associatedCarrier[modulation[i][j]-1] = i+1;
                     this.name += ",";
                 }
                 this.name += ".";
@@ -2930,7 +2930,9 @@ export class Song {
                     instrument.algorithm6Op = clamp(0, Config.algorithms6Op.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                     instrument.customAlgorithm.fromPreset(instrument.algorithm6Op);
                     if (compressed.charCodeAt(charIndex) == SongTagCode.chord) {
-                        let carrierCountTemp = clamp(0, Config.operatorCount + 2, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                        let carrierCountTemp = clamp(0, Config.operatorCount + 2, base64CharCodeToInt[compressed.charCodeAt(charIndex + 1)]);
+                        charIndex++
+                        console.log(carrierCountTemp)
                         let tempModArray: number[][] = [];
                         if (compressed.charCodeAt(charIndex+1) == SongTagCode.effects) {
                             charIndex++
@@ -2940,7 +2942,7 @@ export class Song {
                                 tempModArray[j] = [];
                                 let o: number = 0;
                                 while (compressed.charCodeAt(charIndex) != SongTagCode.operatorWaves) {
-                                    tempModArray[j][o] = clamp(0, Config.operatorCount + 2, base64CharCodeToInt[compressed.charCodeAt(charIndex)]);
+                                    tempModArray[j][o] = clamp(1, Config.operatorCount + 3, base64CharCodeToInt[compressed.charCodeAt(charIndex)]);
                                     o++
                                     charIndex++
                                 }
@@ -2970,7 +2972,7 @@ export class Song {
                             tempModArray[j] = [];
                             let o: number = 0;
                             while (compressed.charCodeAt(charIndex) != SongTagCode.operatorWaves) {
-                                tempModArray[j][o] = clamp(0, Config.operatorCount + 2, base64CharCodeToInt[compressed.charCodeAt(charIndex)]);
+                                tempModArray[j][o] = clamp(1, Config.operatorCount + 2, base64CharCodeToInt[compressed.charCodeAt(charIndex)]);
                                 o++
                                 charIndex++
                             }
@@ -5957,10 +5959,10 @@ export class Synth {
                 detuneEnd += synth.getModValue(ModSetting.mstSongDetune, true, null, null, true) / 25;
             }
 
-            const carrierCount: number = (instrument.type == InstrumentType.fm6op ? Config.algorithms6Op[instrument.algorithm6Op].carrierCount : Config.algorithms[instrument.algorithm].carrierCount);
+            const carrierCount: number = (instrument.type == InstrumentType.fm6op ? instrument.customAlgorithm.carrierCount : Config.algorithms[instrument.algorithm].carrierCount);
             for (let i: number = 0; i < (instrument.type == InstrumentType.fm6op?6: Config.operatorCount); i++) {
 
-                const associatedCarrierIndex: number = (instrument.type == InstrumentType.fm6op ? Config.algorithms6Op[instrument.algorithm6Op].associatedCarrier[i]-1:Config.algorithms[instrument.algorithm].associatedCarrier[i] - 1);
+                const associatedCarrierIndex: number = (instrument.type == InstrumentType.fm6op ? instrument.customAlgorithm.associatedCarrier[i]-1:Config.algorithms[instrument.algorithm].associatedCarrier[i] - 1);
                 const pitch: number = tone.pitches[!chord.harmonizes ? 0 : ((i < tone.pitchCount) ? i : ((associatedCarrierIndex < tone.pitchCount) ? associatedCarrierIndex : 0))];
                 const freqMult = Config.operatorFrequencies[instrument.operators[i].frequency].mult;
                 const interval = Config.operatorCarrierInterval[associatedCarrierIndex] + arpeggioInterval;
@@ -6244,14 +6246,14 @@ export class Synth {
         } else if (instrument.type == InstrumentType.mod) {
             return Synth.modSynth;
         } else if (instrument.type == InstrumentType.fm6op) {
-            const fingerprint: string = instrument.algorithm6Op + "_" + instrument.feedbackType6Op;
+            const fingerprint: string = instrument.customAlgorithm.name + "_" + instrument.customFeedbackType.name;
             if (Synth.fm6SynthFunctionCache[fingerprint] == undefined) {
                 const synthSource: string[] = [];
 
                 for (const line of Synth.fmSourceTemplate) {
                     if (line.indexOf("// CARRIER OUTPUTS") != -1) {
                         const outputs: string[] = [];
-                        for (let j: number = 0; j < Config.algorithms6Op[instrument.algorithm6Op].carrierCount; j++) {
+                        for (let j: number = 0; j < instrument.customAlgorithm.carrierCount; j++) {
                             outputs.push("operator" + j + "Scaled");
                         }
                         synthSource.push(line.replace("/*operator#Scaled*/", outputs.join(" + ")));
@@ -6260,11 +6262,11 @@ export class Synth {
                             for (const operatorLine of Synth.operatorSourceTemplate) {
                                 if (operatorLine.indexOf("/* + operator@Scaled*/") != -1) {
                                     let modulators = "";
-                                    for (const modulatorNumber of Config.algorithms6Op[instrument.algorithm6Op].modulatedBy[j]) {
+                                    for (const modulatorNumber of instrument.customAlgorithm.modulatedBy[j]) {
                                         modulators += " + operator" + (modulatorNumber - 1) + "Scaled";
                                     }
 
-                                    const feedbackIndices: ReadonlyArray<number> = Config.feedbacks6Op[instrument.feedbackType6Op].indices[j];
+                                    const feedbackIndices: ReadonlyArray<number> = instrument.customFeedbackType.indices[j];
                                     if (feedbackIndices.length > 0) {
                                         modulators += " + feedbackMult * (";
                                         const feedbacks: string[] = [];

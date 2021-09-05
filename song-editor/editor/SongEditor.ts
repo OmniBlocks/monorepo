@@ -350,6 +350,7 @@ class CustomAlgorythmCanvas {
             this.lookUpArray = [[], [], [], [], [], []];
 
             var oldMods = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()].customAlgorithm;
+            console.log(oldMods);
             this.carriers = oldMods.carrierCount;
             for (let i: number = 0; i < oldMods.modulatedBy.length; i++) {
                 for (let o: number = 0; o < oldMods.modulatedBy[i].length; o++) {
@@ -465,7 +466,7 @@ class CustomAlgorythmCanvas {
     }
 
     private _onMouseMove = (event: MouseEvent): void => {
-        if (this.mouseDown) {
+        if (this.mouseDown) {//todo rework to handle draging and single clicks differently
 
             var x = (event.clientX || event.pageX) - this.canvas.getBoundingClientRect().left;
             var y = Math.floor((event.clientY || event.pageY) - this.canvas.getBoundingClientRect().top);
@@ -488,21 +489,21 @@ class CustomAlgorythmCanvas {
                     ctx.fillRect(xindex * 24 + 12, yindex * 24, 12, 12);
                     ctx.fillStyle = ColorConfig.getComputed("--editor-background");
                     ctx.fillText(this.drawArray[yindex][xindex] + "", xindex * 24 + 14, yindex * 24 + 10);
+                    this.mouseDown = false;
                 }
             } else {
                 if (this.drawArray ?.[yindex] ?.[xindex] != undefined) {
-                    //important logic here
                     if (this.drawArray[yindex][xindex] == this.selected) {
-                        if (this.selected-1 < this.carriers) {
-                            this.carriers--;
-                            //do auto rebalence here
-                        } else {
-                            //do auto rebalence here if possible
+                        if (this.selected == this.carriers) {
+                            if (this.selected > 1) {
+                                this.carriers--;
+                            }
+                        } else if (this.selected - 1 == this.carriers) {
                             this.carriers++
                         }
                     } else {
                         const newmod = this.drawArray[yindex][xindex]
-                        if (this.selected > newmod) {
+                        if (this.selected > newmod) { //todo try to rebalence then do this in algorithm mode otherwise input as needed
                             let check = this.newMods[newmod - 1].indexOf(this.selected);
                             if (check != -1) {
                                 this.newMods[newmod - 1].splice(check, 1);
@@ -522,8 +523,11 @@ class CustomAlgorythmCanvas {
                     this.redrawCanvas(true);
                     console.log(this.newMods);
                     console.log(this.carriers);
+                    this.mouseDown = false;
                 } else {
                     this.selected = -1;
+                    this.redrawCanvas(true);
+                    this.mouseDown = false;
                 }
             }
 
@@ -549,6 +553,7 @@ class CustomAlgorythmCanvas {
         this._change = this._getChange(this.newMods, this.carriers, "algorithm");
 
         this._doc.record(this._change!);
+        console.log(this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()].customAlgorithm);
 
         this._change = null;
     };
@@ -1758,7 +1763,7 @@ export class SongEditor {
 					setSelectedValue(this._feedbackEnvelopeSelect, instrument.feedbackEnvelope);
 					this._feedbackEnvelopeSelect.parentElement!.style.color = (instrument.feedbackAmplitude > 0) ? "" : ColorConfig.secondaryText;
                     for (let i: number = 0; i < (Config.operatorCount+2); i++) {
-                        const isCarrier: boolean = (instrument.type == InstrumentType.fm6op) ? (i < Config.algorithms6Op[instrument.algorithm6Op].carrierCount):(i < Config.algorithms[instrument.algorithm].carrierCount);
+                        const isCarrier: boolean = (instrument.type == InstrumentType.fm6op) ? (i < instrument.customAlgorithm.carrierCount):(i < Config.algorithms[instrument.algorithm].carrierCount);
                         this._operatorRows[i].style.display = "";
 						this._operatorRows[i].style.color = isCarrier ? ColorConfig.primaryText : "";
 						setSelectedValue(this._operatorFrequencySelects[i], instrument.operators[i].frequency);

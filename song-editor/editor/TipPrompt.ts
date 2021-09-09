@@ -341,6 +341,13 @@ export class TipPrompt implements Prompt {
                     p('By defualt the FM synth only uses sinewaves, but you can change that now.'),
                 );
             } break;
+			case "aliases": {
+				message = div(
+					h2("Aliasing"),
+					p("JummBox applies a technique called 'anti-aliasing' to instruments normally to help them sound cleaner even at high frequencies and low sample rates."),
+					p("When this setting is ticked that technique is disabled, so you may hear strange audio artifacts especially at high pitches and when bending notes. However, this can lend a grungy sound to an instrument that could be desirable."),
+				);
+			} break;
 
 			default: throw new Error("Unhandled TipPrompt type: " + type);
 		}

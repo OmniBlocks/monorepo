@@ -59,6 +59,15 @@ export const enum InstrumentType {
 	length,
 }
 
+export const enum DropdownID {
+	Vibrato = 0,
+	Pan = 1,
+	Chord = 2,
+	Transition = 3,
+	FM = 4,
+
+}
+
 export interface BeepBoxOption {
 	readonly index: number;
 	readonly name: string;
@@ -83,7 +92,11 @@ export interface Rhythm extends BeepBoxOption {
 
 export interface ChipWave extends BeepBoxOption {
 	readonly volume: number;
-	readonly samples: Float64Array;
+	samples: Float64Array;
+}
+
+export interface OperatorWave extends BeepBoxOption {
+	samples: Float64Array;
 }
 
 export interface OperatorWave extends BeepBoxOption {
@@ -225,7 +238,7 @@ export class Config {
 
     public static readonly instrumentTypeNames: ReadonlyArray<string> = ["chip", "FM", "noise", "spectrum", "drumset", "harmonics", "PWM", "custom chip", "mod", "FM6op"];
 	public static readonly instrumentTypeHasSpecialInterval: ReadonlyArray<boolean> = [true, true, false, false, false, true, false, true, true, true];
-	public static readonly chipWaves: DictionaryArray<ChipWave> = toNameMap([
+	public static readonly rawChipWaves: DictionaryArray<ChipWave> = toNameMap([
 		{ name: "rounded", volume: 0.94, samples: centerWave([0.0, 0.2, 0.4, 0.5, 0.6, 0.7, 0.8, 0.85, 0.9, 0.95, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.95, 0.9, 0.85, 0.8, 0.7, 0.6, 0.5, 0.4, 0.2, 0.0, -0.2, -0.4, -0.5, -0.6, -0.7, -0.8, -0.85, -0.9, -0.95, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -0.95, -0.9, -0.85, -0.8, -0.7, -0.6, -0.5, -0.4, -0.2]) },
 		{ name: "triangle", volume: 1.0, samples: centerWave([1.0 / 15.0, 3.0 / 15.0, 5.0 / 15.0, 7.0 / 15.0, 9.0 / 15.0, 11.0 / 15.0, 13.0 / 15.0, 15.0 / 15.0, 15.0 / 15.0, 13.0 / 15.0, 11.0 / 15.0, 9.0 / 15.0, 7.0 / 15.0, 5.0 / 15.0, 3.0 / 15.0, 1.0 / 15.0, -1.0 / 15.0, -3.0 / 15.0, -5.0 / 15.0, -7.0 / 15.0, -9.0 / 15.0, -11.0 / 15.0, -13.0 / 15.0, -15.0 / 15.0, -15.0 / 15.0, -13.0 / 15.0, -11.0 / 15.0, -9.0 / 15.0, -7.0 / 15.0, -5.0 / 15.0, -3.0 / 15.0, -1.0 / 15.0]) },
 		{ name: "square", volume: 0.5, samples: centerWave([1.0, -1.0]) },
@@ -249,6 +262,7 @@ export class Config {
         { name: "glitch", volume: 0.5, samples: centerWave([1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0, -1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0, -1.0, -1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0, -1.0, -1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0, -1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0, -1.0]) },
         { name: "trapezoid", volume: 1.0, samples: centerWave([1.0 / 15.0, 6.0 / 15.0, 10.0 / 15.0, 14.0 / 15.0, 15.0 / 15.0, 15.0 / 15.0, 15.0 / 15.0, 15.0 / 15.0, 15.0 / 15.0, 15.0 / 15.0, 15.0 / 15.0, 15.0 / 15.0, 14.0 / 15.0, 10.0 / 15.0, 6.0 / 15.0, 1.0 / 15.0, -1.0 / 15.0, -6.0 / 15.0, -10.0 / 15.0, -14.0 / 15.0, -15.0 / 15.0, -15.0 / 15.0, -15.0 / 15.0, -15.0 / 15.0, -15.0 / 15.0, -15.0 / 15.0, -15.0 / 15.0, -15.0 / 15.0, -14.0 / 15.0, -10.0 / 15.0, -6.0 / 15.0, -1.0 / 15.0,])},
     ]); 
+	public static readonly chipWaves: DictionaryArray<ChipWave> = rawChipToIntegrated(Config.rawChipWaves);
 	// Noise waves have too many samples to write by hand, they're generated on-demand by getDrumWave instead.
 	public static readonly chipNoises: DictionaryArray<ChipNoise> = toNameMap([
 		{ name: "retro", volume: 0.25, basePitch: 69, pitchFilterMult: 1024.0, isSoft: false, samples: null },
@@ -388,7 +402,7 @@ export class Config {
     ]);
     public static readonly operatorCarrierInterval: ReadonlyArray<number> = [0.0, 0.04, -0.073, 0.091, 0.061, 0.024];
 	public static readonly operatorAmplitudeMax: number = 15;
-	public static readonly operatorFrequencies: DictionaryArray<OperatorFrequency> = toNameMap([
+	/*public static readonly operatorFrequencies: DictionaryArray<OperatorFrequency> = toNameMap([
 		{ name: "1×", mult: 1.0, hzOffset: 0.0, amplitudeSign: 1.0 },
 		{ name: "~1×", mult: 1.0, hzOffset: 1.5, amplitudeSign: -1.0 },
 		{ name: "2×", mult: 2.0, hzOffset: 0.0, amplitudeSign: 1.0 },
@@ -413,9 +427,37 @@ export class Config {
         { name: "18×", mult: 18.0, hzOffset: 0.0, amplitudeSign: 1.0 },
         { name: "0.12×", mult: 0.125, hzOffset: 0.0, amplitudeSign: 1.0 },
         { name: "0.75×", mult: 0.75, hzOffset: 0.0, amplitudeSign: 1.0 },
-        { name: "4~", mult: 4.0, hzOffset: -2.4, amplitudeSign: -1.0 },
-        { name: "1?", mult: 1.0, hzOffset: -2.4, amplitudeSign: 1.5 },
-	]);
+        { name: "~4x", mult: 4.0, hzOffset: -2.4, amplitudeSign: -1.0 },
+    ]);
+    public freqto3g = [4,5,6,7,8,10,12,13,14,15,16,18,20,22,24,2,1,9,17,19,21,23,11]*/
+    public static readonly operatorFrequencies: DictionaryArray<OperatorFrequency> = toNameMap([
+        { name: "0.12×", mult: 0.125, hzOffset: 0.0, amplitudeSign: 1.0 },
+        { name: "0.25×", mult: 0.25, hzOffset: 0.0, amplitudeSign: 1.0 },
+        { name: "0.5×", mult: 0.5, hzOffset: 0.0, amplitudeSign: 1.0 },
+        { name: "0.75×", mult: 0.75, hzOffset: 0.0, amplitudeSign: 1.0 },
+        { name: "1×", mult: 1.0, hzOffset: 0.0, amplitudeSign: 1.0 },
+        { name: "~1×", mult: 1.0, hzOffset: 1.5, amplitudeSign: -1.0 },
+        { name: "2×", mult: 2.0, hzOffset: 0.0, amplitudeSign: 1.0 },
+        { name: "~2×", mult: 2.0, hzOffset: -1.3, amplitudeSign: -1.0 },
+        { name: "3×", mult: 3.0, hzOffset: 0.0, amplitudeSign: 1.0 },
+        { name: "3.5×", mult: 3.5, hzOffset: -0.05, amplitudeSign: 1.0 },
+        { name: "4×", mult: 4.0, hzOffset: 0.0, amplitudeSign: 1.0 },
+        { name: "~4x", mult: 4.0, hzOffset: -2.4, amplitudeSign: -1.0 },
+        { name: "5×", mult: 5.0, hzOffset: 0.0, amplitudeSign: 1.0 },
+        { name: "6×", mult: 6.0, hzOffset: 0.0, amplitudeSign: 1.0 },
+        { name: "7×", mult: 7.0, hzOffset: 0.0, amplitudeSign: 1.0 },
+        { name: "8×", mult: 8.0, hzOffset: 0.0, amplitudeSign: 1.0 },
+        { name: "9×", mult: 9.0, hzOffset: 0.0, amplitudeSign: 1.0 },
+        { name: "10×", mult: 10.0, hzOffset: 0.0, amplitudeSign: 1.0 },
+        { name: "11×", mult: 11.0, hzOffset: 0.0, amplitudeSign: 1.0 },
+        { name: "12×", mult: 12.0, hzOffset: 0.0, amplitudeSign: 1.0 },
+        { name: "13×", mult: 13.0, hzOffset: 0.0, amplitudeSign: 1.0 },
+        { name: "14×", mult: 14.0, hzOffset: 0.0, amplitudeSign: 1.0 },
+        { name: "16×", mult: 16.0, hzOffset: 0.0, amplitudeSign: 1.0 },
+        { name: "18×", mult: 18.0, hzOffset: 0.0, amplitudeSign: 1.0 },
+        { name: "20×", mult: 20.0, hzOffset: 0.0, amplitudeSign: 1.0 },
+    ]);
+
     public static readonly envelopes: DictionaryArray<Envelope> = toNameMap([
         { name: "custom", type: EnvelopeType.custom, speed: 0.0 },
         { name: "steady", type: EnvelopeType.steady, speed: 0.0 },
@@ -549,7 +591,7 @@ export class Config {
 	public static readonly sineWaveLength: number = 1 << 8; // 256
 	public static readonly sineWaveMask: number = Config.sineWaveLength - 1;
 	public static readonly sineWave: Float64Array = generateSineWave();
-    public static readonly operatorWaves: DictionaryArray<OperatorWave> = toNameMap([
+   /* public static readonly operatorWaves: DictionaryArray<OperatorWave> = toNameMap([
         { name: "sine", samples: generateSineWave() },
         { name: "triangle", samples: generateTriWave() },
         { name: "sawtooth", samples: generateSawWave() },
@@ -558,11 +600,37 @@ export class Config {
         { name: "2/3 pulse", samples: generateSquareWave(-1 / 3) },
         { name: "ramp", samples: generateSawWave(true) },
         { name: "trapezoid", samples: generateTrapezoidWave(2) },
-        { name: "12.5%pulse", samples: generateSquareWave(0.75) },
-        { name: "25%pulse", samples: generateSquareWave(0.5) },
-        { name: "37.5%pulse", samples: generateSquareWave(0.25) },
-        { name: "75%pulse", samples: generateSquareWave(-0.5) },
     ]);
+    if(i = 3){
+    pwmwaves[5];
+    }else if(i = 4){
+    pwmwaves[5];
+    }else if(i = 5){
+    pwmwaves[6];
+    }
+    public pre3To3g = [0, 1, 3, 2, 2, 2, 4, 5];*/
+	public static readonly operatorWaves: DictionaryArray<OperatorWave> = toNameMap([
+		{ name: "sine", samples: Config.sineWave },
+		{ name: "triangle", samples: generateTriWave() },
+		{ name: "pulse width", samples: generateSquareWave() },
+		{ name: "sawtooth", samples: generateSawWave() },
+		{ name: "ramp", samples: generateSawWave(true) },
+		{ name: "trapezoid", samples: generateTrapezoidWave(2) },
+	]);
+	public static readonly pwmOperatorWaves: DictionaryArray<OperatorWave> = toNameMap([
+		{ name: "1%", samples: generateSquareWave(0.01) },
+		{ name: "5%", samples: generateSquareWave(0.05) },
+		{ name: "12.5%", samples: generateSquareWave(0.125) },
+		{ name: "25%", samples: generateSquareWave(0.25) },
+		{ name: "33%", samples: generateSquareWave(1/3) },
+		{ name: "50%", samples: generateSquareWave(0.5) },
+		{ name: "66%", samples: generateSquareWave(2/3) },
+		{ name: "75%", samples: generateSquareWave(0.75) },
+		{ name: "87.5%", samples: generateSquareWave(0.875) },
+		{ name: "95%", samples: generateSquareWave(0.95) },
+		{ name: "99%", samples: generateSquareWave(0.99) },
+	]);
+
 
 	// Height of the small editor column for inserting/deleting rows, in pixels.
 	public static readonly barEditorHeight: number = 10;
@@ -576,16 +644,10 @@ function centerWave(wave: Array<number>): Float64Array {
 	}
 	const average: number = sum / wave.length;
 
-	// Perform the integral on the wave. The chipSynth will perform the derivative to get the original wave back but with antialiasing.
-	let cumulative: number = 0;
-	let wavePrev: number = 0;
 	for (let i: number = 0; i < wave.length; i++) {
-		cumulative += wavePrev;
-		wavePrev = wave[i] - average;
-		wave[i] = cumulative;
+		wave[i] -= average;
 	}
-	// The first sample should be zero, and we'll duplicate it at the end for easier interpolation.
-	wave.push(0);
+
 	return new Float64Array(wave);
 }
 
@@ -599,17 +661,31 @@ function centerAndNormalizeWave(wave: Array<number>): Float64Array {
 	const average: number = sum / wave.length;
 	const magnAvg: number = magn / wave.length;
 
+	for (let i: number = 0; i < wave.length; i++) {
+		wave[i] = (wave[i] - average) / magnAvg;
+	}
+
+	return new Float64Array(wave);
+
+}
+
+function integrateWave(wave: Float64Array): Float64Array {
 	// Perform the integral on the wave. The chipSynth will perform the derivative to get the original wave back but with antialiasing.
 	let cumulative: number = 0;
 	let wavePrev: number = 0;
+	// The first sample should be zero, and we'll duplicate it at the end for easier interpolation.
+	let newWave: Float64Array = new Float64Array(wave.length + 1);
+	for (let i: number = 0; i < wave.length; i++) {
+		newWave[i] = wave[i];
+	}
+	newWave[wave.length] = 0.0;
+
 	for (let i: number = 0; i < wave.length; i++) {
 		cumulative += wavePrev;
-		wavePrev = (wave[i] - average) / (magnAvg);
-		wave[i] = cumulative;
+		wavePrev = newWave[i];
+		newWave[i] = cumulative;
 	}
-	// The first sample should be zero, and we'll duplicate it at the end for easier interpolation.
-	wave.push(0);
-	return new Float64Array(wave);
+	return newWave;
 }
 
 
@@ -771,39 +847,38 @@ function generateSineWave(): Float64Array {
 }
 
 function generateTriWave(): Float64Array {
-    const wave: Float64Array = new Float64Array(Config.sineWaveLength + 1);
-    for (let i: number = 0; i < Config.sineWaveLength + 1; i++) {
-        wave[i] = Math.asin(Math.sin(i * Math.PI * 2.0 / Config.sineWaveLength))/(Math.PI/2);
-    }
-    return wave;
+	const wave: Float64Array = new Float64Array(Config.sineWaveLength + 1);
+	for (let i: number = 0; i < Config.sineWaveLength + 1; i++) {
+		wave[i] = Math.asin(Math.sin(i * Math.PI * 2.0 / Config.sineWaveLength)) / (Math.PI / 2);
+	}
+	return wave;
 }
 
 function generateTrapezoidWave(drive: number = 2): Float64Array {
-    const wave: Float64Array = new Float64Array(Config.sineWaveLength + 1);
-    for (let i: number = 0; i < Config.sineWaveLength + 1; i++) {
-        wave[i] = Math.asin(Math.sin(i * Math.PI * 2.0 / Config.sineWaveLength))*drive;
-        wave[i] = wave[i] >= 1 ? 1 : wave[i];
-        wave[i] = wave[i] <= -1 ? -1 : wave[i];
-    }
-    return wave;
+	const wave: Float64Array = new Float64Array(Config.sineWaveLength + 1);
+	for (let i: number = 0; i < Config.sineWaveLength + 1; i++) {
+		wave[i] = Math.max( -1.0, Math.min( 1.0, Math.asin(Math.sin(i * Math.PI * 2.0 / Config.sineWaveLength)) * drive ) );
+	}
+	return wave;
 }
 
-function generateSquareWave(phasewidth: number = 0): Float64Array {
-    const wave: Float64Array = new Float64Array(Config.sineWaveLength + 1);
-    for (let i: number = 0; i < Config.sineWaveLength + 1; i++) {
-        wave[i] = Math.asin(Math.sin(i * Math.PI * 2.0 / Config.sineWaveLength)) / (Math.PI / 2);
-        wave[i] = wave[i] > phasewidth ? 1.0 : -1.0;
-    }
-    return wave;
+function generateSquareWave(phaseWidth: number = 0): Float64Array {
+	const wave: Float64Array = new Float64Array(Config.sineWaveLength + 1);
+	const centerPoint: number = Config.sineWaveLength / 4;
+	for (let i: number = 0; i < Config.sineWaveLength + 1; i++) {
+		wave[i] = +((Math.abs(i - centerPoint) < phaseWidth * Config.sineWaveLength / 2)
+			|| ((Math.abs(i - Config.sineWaveLength - centerPoint) < phaseWidth * Config.sineWaveLength / 2))) * 2 - 1;
+	}
+	return wave;
 }
 
 function generateSawWave(inverse: boolean = false): Float64Array {
-    const wave: Float64Array = new Float64Array(Config.sineWaveLength + 1);
-    for (let i: number = 0; i < Config.sineWaveLength + 1; i++) {
-        wave[i] = ((i - (Config.sineWaveLength * 0.75) + Config.sineWaveLength) * 2.0 / Config.sineWaveLength) % 2 - 1;
-        wave[i] = inverse ? wave[i] * -1 : wave[i];
-    }
-    return wave;
+	const wave: Float64Array = new Float64Array(Config.sineWaveLength + 1);
+	for (let i: number = 0; i < Config.sineWaveLength + 1; i++) {
+		wave[i] = ((i + (Config.sineWaveLength / 4.0)) * 2.0 / Config.sineWaveLength) % 2 - 1;
+		wave[i] = inverse ? -wave[i] : wave[i];
+	}
+	return wave;
 }
 
 export function getArpeggioPitchIndex(pitchCount: number, useFastTwoNoteArp: boolean, arpeggio: number): number {
@@ -827,6 +902,23 @@ export function toNameMap<T extends BeepBoxOption>(array: Array<Pick<T, Exclude<
 		dictionary[value.name] = <T>value;
 	}
 	const result: DictionaryArray<T> = <DictionaryArray<T>><any>array;
+	result.dictionary = dictionary;
+	return result;
+}
+
+export function rawChipToIntegrated(raw: DictionaryArray<ChipWave>): DictionaryArray<ChipWave> {
+	const newArray: Array<ChipWave> = new Array<ChipWave>(raw.length);
+	const dictionary: Dictionary<ChipWave> = {};
+	for (let i: number = 0; i < newArray.length; i++) {
+		newArray[i] = Object.assign([], raw[i]);
+		const value: any = newArray[i];
+		value.index = i;
+		dictionary[value.name] = <ChipWave>value;
+    }
+	for (let key in dictionary) {
+		dictionary[key].samples = integrateWave(dictionary[key].samples);
+	}
+	const result: DictionaryArray<ChipWave> = <DictionaryArray<ChipWave>><any>newArray;
 	result.dictionary = dictionary;
 	return result;
 }

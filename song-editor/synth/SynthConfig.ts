@@ -402,34 +402,6 @@ export class Config {
     ]);
     public static readonly operatorCarrierInterval: ReadonlyArray<number> = [0.0, 0.04, -0.073, 0.091, 0.061, 0.024];
 	public static readonly operatorAmplitudeMax: number = 15;
-	/*public static readonly operatorFrequencies: DictionaryArray<OperatorFrequency> = toNameMap([
-		{ name: "1×", mult: 1.0, hzOffset: 0.0, amplitudeSign: 1.0 },
-		{ name: "~1×", mult: 1.0, hzOffset: 1.5, amplitudeSign: -1.0 },
-		{ name: "2×", mult: 2.0, hzOffset: 0.0, amplitudeSign: 1.0 },
-		{ name: "~2×", mult: 2.0, hzOffset: -1.3, amplitudeSign: -1.0 },
-		{ name: "3×", mult: 3.0, hzOffset: 0.0, amplitudeSign: 1.0 },
-		{ name: "4×", mult: 4.0, hzOffset: 0.0, amplitudeSign: 1.0 },
-		{ name: "5×", mult: 5.0, hzOffset: 0.0, amplitudeSign: 1.0 },
-		{ name: "6×", mult: 6.0, hzOffset: 0.0, amplitudeSign: 1.0 },
-		{ name: "7×", mult: 7.0, hzOffset: 0.0, amplitudeSign: 1.0 },
-		{ name: "8×", mult: 8.0, hzOffset: 0.0, amplitudeSign: 1.0 },
-		{ name: "9×", mult: 9.0, hzOffset: 0.0, amplitudeSign: 1.0 },
-		{ name: "11×", mult: 11.0, hzOffset: 0.0, amplitudeSign: 1.0 },
-		{ name: "13×", mult: 13.0, hzOffset: 0.0, amplitudeSign: 1.0 },
-		{ name: "16×", mult: 16.0, hzOffset: 0.0, amplitudeSign: 1.0 },
-        { name: "20×", mult: 20.0, hzOffset: 0.0, amplitudeSign: 1.0 },
-        { name: "0.5×", mult: 0.5, hzOffset: 0.0, amplitudeSign: 1.0 },
-        { name: "0.25×", mult: 0.25, hzOffset: 0.0, amplitudeSign: 1.0 },
-        { name: "3.5×", mult: 3.5, hzOffset: -0.05, amplitudeSign: 1.0 },
-        { name: "10×", mult: 10.0, hzOffset: 0.0, amplitudeSign: 1.0 },
-        { name: "12×", mult: 12.0, hzOffset: 0.0, amplitudeSign: 1.0 },
-        { name: "14×", mult: 14.0, hzOffset: 0.0, amplitudeSign: 1.0 },
-        { name: "18×", mult: 18.0, hzOffset: 0.0, amplitudeSign: 1.0 },
-        { name: "0.12×", mult: 0.125, hzOffset: 0.0, amplitudeSign: 1.0 },
-        { name: "0.75×", mult: 0.75, hzOffset: 0.0, amplitudeSign: 1.0 },
-        { name: "~4x", mult: 4.0, hzOffset: -2.4, amplitudeSign: -1.0 },
-    ]);
-    public freqto3g = [4,5,6,7,8,10,12,13,14,15,16,18,20,22,24,2,1,9,17,19,21,23,11]*/
     public static readonly operatorFrequencies: DictionaryArray<OperatorFrequency> = toNameMap([
         { name: "0.12×", mult: 0.125, hzOffset: 0.0, amplitudeSign: 1.0 },
         { name: "0.25×", mult: 0.25, hzOffset: 0.0, amplitudeSign: 1.0 },
@@ -591,24 +563,6 @@ export class Config {
 	public static readonly sineWaveLength: number = 1 << 8; // 256
 	public static readonly sineWaveMask: number = Config.sineWaveLength - 1;
 	public static readonly sineWave: Float64Array = generateSineWave();
-   /* public static readonly operatorWaves: DictionaryArray<OperatorWave> = toNameMap([
-        { name: "sine", samples: generateSineWave() },
-        { name: "triangle", samples: generateTriWave() },
-        { name: "sawtooth", samples: generateSawWave() },
-        { name: "square", samples: generateSquareWave() },
-        { name: "1/3 pulse", samples: generateSquareWave(1 / 3) },
-        { name: "2/3 pulse", samples: generateSquareWave(-1 / 3) },
-        { name: "ramp", samples: generateSawWave(true) },
-        { name: "trapezoid", samples: generateTrapezoidWave(2) },
-    ]);
-    if(i = 3){
-    pwmwaves[5];
-    }else if(i = 4){
-    pwmwaves[5];
-    }else if(i = 5){
-    pwmwaves[6];
-    }
-    public pre3To3g = [0, 1, 3, 2, 2, 2, 4, 5];*/
 	public static readonly operatorWaves: DictionaryArray<OperatorWave> = toNameMap([
 		{ name: "sine", samples: Config.sineWave },
 		{ name: "triangle", samples: generateTriWave() },

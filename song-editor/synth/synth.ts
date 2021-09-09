@@ -377,7 +377,7 @@ export class Pattern {
 }
 
 export class Operator {
-    public frequency: number = 0;
+    public frequency: number = 4;
     public amplitude: number = 0;
     public envelope: number = 0;
     public waveform: number = 0;
@@ -388,7 +388,7 @@ export class Operator {
     }
 
     public reset(index: number): void {
-        this.frequency = 0;
+        this.frequency = 4; //defualt to 1x
         this.amplitude = (index <= 1) ? Config.operatorAmplitudeMax : 0;
         this.envelope = (index == 0) ? 0 : 1;
         this.waveform = 0;
@@ -411,7 +411,7 @@ export class CustomAlgorithm {
     public associatedCarrier: number[] = [];
 
     constructor(){
-        this.reset;
+        this.fromPreset(1);
     }
 
     public set(carriers: number, modulation: number[][]) {
@@ -464,7 +464,7 @@ export class CustomFeedBack { //feels redunant
     public indices: number[][] = [[], [], [], [], [], []];
 
     constructor() {
-        this.reset;
+        this.fromPreset(1);
     }
 
     public set(inIndices: number[][]) {
@@ -689,8 +689,8 @@ export class Instrument {
     public pulseEnvelope: number = 1;
     public algorithm: number = 0;
     public feedbackType: number = 0;
-    public algorithm6Op: number = 0;
-    public feedbackType6Op: number = 0;
+    public algorithm6Op: number = 1;
+    public feedbackType6Op: number = 1;//default to not custom
     public customAlgorithm: CustomAlgorithm = new CustomAlgorithm(); //{ name: "1←4(2←5 3←6", carrierCount: 3, associatedCarrier: [1, 2, 3, 1, 2, 3], modulatedBy: [[2, 3, 4], [5], [6], [], [], []] };
     public customFeedbackType: CustomFeedBack = new CustomFeedBack(); //{ name: "1↔4 2↔5 3↔6", indices: [[3], [5], [6], [1], [2], [3]] };
     public feedbackAmplitude: number = 0;
@@ -836,6 +836,9 @@ export class Instrument {
                 this.filterEnvelope = 1;
                 this.algorithm = 0;
                 this.feedbackType = 0;
+                this.algorithm6Op = 1;
+                this.feedbackType6Op = 1;
+                this.customAlgorithm.fromPreset(1);
                 this.feedbackAmplitude = 0;
                 this.feedbackEnvelope = Config.envelopes.dictionary["steady"].index;
                 for (let i: number = 0; i < this.operators.length; i++) {
@@ -3033,8 +3036,15 @@ export class Song {
             } break;
             case SongTagCode.operatorFrequencies: {
                 const instrument: Instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
-                for (let o: number = 0; o < (instrument.type == InstrumentType.fm6op ? 6 : Config.operatorCount); o++) {
-                    instrument.operators[o].frequency = clamp(0, Config.operatorFrequencies.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                if ((beforeThree && variant == "goldbox") || variant != "goldbox") {
+                    const freqToGold3: number[] = [4, 5, 6, 7, 8, 10, 12, 13, 14, 15, 16, 18, 20, 22, 24, 2, 1, 9, 17, 19, 21, 23, 0, 3];
+                    for (let o: number = 0; o < (instrument.type == InstrumentType.fm6op ? 6 : Config.operatorCount); o++) {
+                        instrument.operators[o].frequency = freqToGold3[clamp(0, freqToGold3.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)])];
+                    }
+                } else {
+                    for (let o: number = 0; o < (instrument.type == InstrumentType.fm6op ? 6 : Config.operatorCount); o++) {
+                        instrument.operators[o].frequency = clamp(0, Config.operatorFrequencies.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                    }
                 }
             } break;
             case SongTagCode.operatorAmplitudes: {
@@ -3058,13 +3068,35 @@ export class Song {
             } break;
             case SongTagCode.operatorWaves: {
                 const instrument: Instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
-                for (let o: number = 0; o < Config.operatorCount; o++) {
-                    instrument.operators[o].waveform = clamp(0, Config.operatorWaves.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
-                    // Pulse width follows, if it is a pulse width operator wave
-                    if (instrument.operators[o].waveform == 2) {
-                        instrument.operators[o].pulseWidth = clamp(0, Config.pwmOperatorWaves.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+
+                if (beforeThree && variant == "goldbox") {
+                    for (let o: number = 0; o < Config.operatorCount; o++) {
+                        const pre3To3g = [0, 1, 3, 2, 2, 2, 4, 5];
+                        const old: number = clamp(0, pre3To3g.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                        if (old == 3) {
+                            instrument.operators[o].pulseWidth = 5;
+                        } else if (old == 4) {
+                            instrument.operators[o].pulseWidth = 4;
+                        } else if (old == 5) {
+                            instrument.operators[o].pulseWidth = 6;
+                        }
+                        instrument.operators[o].waveform = pre3To3g[old];
+                    }
+                } else {
+                    for (let o: number = 0; o < (instrument.type == InstrumentType.fm6op ? 6 : Config.operatorCount); o++) {
+                        if (variant == "jummbox") {
+                            const jummToG = [0, 1, 3, 2, 4, 5];
+                            instrument.operators[o].waveform = jummToG[clamp(0, Config.operatorWaves.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)])];
+                        } else {
+                            instrument.operators[o].waveform = clamp(0, Config.operatorWaves.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                        }
+                        // Pulse width follows, if it is a pulse width operator wave
+                        if (instrument.operators[o].waveform == 2) {
+                            instrument.operators[o].pulseWidth = clamp(0, Config.pwmOperatorWaves.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                        }
                     }
                 }
+
             } break;
             case SongTagCode.spectrum: {
                 const instrument: Instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];

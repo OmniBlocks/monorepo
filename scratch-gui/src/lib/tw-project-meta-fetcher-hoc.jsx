@@ -68,13 +68,7 @@ const TWProjectMetaFetcherHOC = function (WrappedComponent) {
                     if (instructions || credits) {
                         this.props.onSetDescription(instructions, credits);
                     }
-                    // We only want projects that are somewhat noteworthy to appear in search engines.
-                    const {views, loves, favorites} = data.stats;
-                    setIndexable(
-                        views >= 50 &&
-                        loves >= 5 &&
-                        favorites >= 5
-                    );
+                    setIndexable(true);
                 })
                 .catch(err => {
                     setIndexable(false);

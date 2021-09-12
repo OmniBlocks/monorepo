@@ -158,7 +158,7 @@ class PenSkin extends Skin {
         // tw: use native size for Drawable positioning logic
         return this._nativeSize;
     }
-    
+
     useNearest (scale) {
         // Use nearest-neighbor interpolation when scaling up the pen skin-- this matches Scratch 2.0.
         // When scaling it down, use linear interpolation to avoid giving pen lines a "dashed" appearance.

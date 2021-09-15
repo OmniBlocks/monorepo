@@ -230,7 +230,7 @@ export default async function ({ addon, global, console, msg }) {
   }
 
   function fullReload() {
-    if (addon.tab.redux.state.scratchGui.editorTab.activeTabIndex !== 3 || preventUpdate) return;
+    if (addon.tab.redux.state?.scratchGui?.editorTab?.activeTabIndex !== 3 || preventUpdate) return;
 
     const editingTarget = vm.runtime.getEditingTarget();
     const stage = vm.runtime.getTargetForStage();
@@ -263,7 +263,7 @@ export default async function ({ addon, global, console, msg }) {
   }
 
   function quickReload() {
-    if (addon.tab.redux.state.scratchGui.editorTab.activeTabIndex !== 3 || preventUpdate) return;
+    if (addon.tab.redux.state?.scratchGui?.editorTab?.activeTabIndex !== 3 || preventUpdate) return;
 
     for (const variable of localVariables) {
       variable.updateValue();
@@ -313,13 +313,29 @@ export default async function ({ addon, global, console, msg }) {
     }
   });
 
-  vm.runtime.on("PROJECT_LOADED", () => fullReload());
-  vm.runtime.on("TOOLBOX_EXTENSIONS_NEED_UPDATE", () => fullReload());
+  vm.runtime.on("PROJECT_LOADED", () => {
+    try {
+      fullReload();
+    } catch (e) {
+      console.error(e);
+    }
+  });
+  vm.runtime.on("TOOLBOX_EXTENSIONS_NEED_UPDATE", () => {
+    try {
+      fullReload();
+    } catch (e) {
+      console.error(e);
+    }
+  });
 
   const oldStep = vm.runtime.constructor.prototype._step;
   vm.runtime.constructor.prototype._step = function (...args) {
     const ret = oldStep.call(this, ...args);
-    quickReload();
+    try {
+      quickReload();
+    } catch (e) {
+      console.error(e);
+    }
     return ret;
   };
 

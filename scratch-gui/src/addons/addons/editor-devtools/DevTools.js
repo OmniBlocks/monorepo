@@ -1515,6 +1515,7 @@ export default class DevTools {
       }
     } else if (e.button === 2) {
       // Right click...
+      /*
       let spriteSelector = e.target.closest("#react-tabs-3 div[class*='sprite-selector-item_sprite-selector-item']");
       if (spriteSelector) {
         let contextMenu = spriteSelector.getElementsByTagName("nav")[0];
@@ -1538,6 +1539,7 @@ export default class DevTools {
           );
         }
       }
+      */
     } else {
       let chk = e.target;
       if (chk && chk.tagName !== "BUTTON" && chk.getAttribute && !chk.getAttribute("role")) {

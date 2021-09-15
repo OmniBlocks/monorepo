@@ -762,11 +762,11 @@ class AddonSettingsComponent extends React.Component {
             const newState = {
                 [addonId]: {
                     ...state[addonId],
-                    [settingId]: value
+                    [settingId]: value,
+                    dirty: true
                 }
             };
             if (reloadRequired) {
-                newState[addonId].dirty = true;
                 newState.dirty = true;
             }
             return newState;

@@ -1,4 +1,5 @@
 [
-    "paint-by-default",
-    "hide-delete-button"
+    "hide-new-variables",
+    "block-cherry-picking",
+    "editor-extra-keys"
 ]

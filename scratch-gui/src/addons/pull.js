@@ -210,6 +210,8 @@ const SKIP_MESSAGES = [
     'debugger/feedback-log-link',
     'debugger/feedback-remove',
     'editor-devtools/help-by',
+    'editor-devtools/extension-description-not-for-addon',
+    'mediarecorder/added-by',
     'editor-theme3/@settings-name-sa-color',
     'block-switching/@settings-name-sa'
 ];

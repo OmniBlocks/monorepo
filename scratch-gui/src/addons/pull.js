@@ -336,6 +336,5 @@ const extensionManifest = JSON.parse(fs.readFileSync(extensionManifestPath, 'utf
 const versionName = extensionManifest.version_name;
 fs.writeFileSync(upstreamMetaPath, JSON.stringify({
     version: versionName,
-    commit: commitHash,
-    languages
+    commit: commitHash
 }));

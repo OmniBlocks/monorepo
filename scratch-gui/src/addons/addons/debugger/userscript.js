@@ -22,7 +22,7 @@ const _twGetAsset = (path) => {
 import downloadBlob from "../../libraries/common/cs/download-blob.js";
 import { paused, setPaused, onPauseChanged } from "./../pause/module.js";
 
-export default async function ({ addon, global, console, msg, safeMsg }) {
+export default async function ({ addon, global, console, msg }) {
   let showingConsole, ScratchBlocks;
   const vm = addon.tab.traps.vm;
 

@@ -22,13 +22,13 @@ import isMobile from './is-mobile';
 const clipboardSupported = !!(navigator.clipboard && navigator.clipboard.write);
 const mediaRecorderSupported = !!window.MediaRecorder && MediaRecorder.isTypeSupported('video/webm');
 const isSupported = (addonId, manifest) => {
+    if (!mediaRecorderSupported && addonId === 'mediarecorder') {
+        return false;
+    }
     if (!manifest.permissions) {
         return true;
     }
     if (!clipboardSupported && manifest.permissions.includes('clipboardWrite')) {
-        return false;
-    }
-    if (!mediaRecorderSupported && addonId === 'mediarecorder') {
         return false;
     }
     return true;

@@ -37,7 +37,9 @@
     "codeEditor",
     "featured"
   ],
+  "onlyInEditor": true,
+  "noTranslations": true,
   "dynamicDisable": true,
   "dynamicEnable": true,
-  "enabledByDefault": false
+  "enabledByDefault": true
 }

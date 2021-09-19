@@ -16,5 +16,6 @@
     {
       "url": "userscript.js"
     }
-  ]
+  ],
+  "onlyInEditor": true
 }

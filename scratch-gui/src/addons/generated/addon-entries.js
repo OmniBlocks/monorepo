@@ -3,7 +3,7 @@ export default {
   "2d-color-picker": () => import(/* webpackChunkName: "addon-entry-2d-color-picker" */ "../addons/2d-color-picker/_entry.js"),
   "better-img-uploads": () => import(/* webpackChunkName: "addon-entry-better-img-uploads" */ "../addons/better-img-uploads/_entry.js"),
   "bitmap-copy": () => import(/* webpackChunkName: "addon-default-entry" */ "../addons/bitmap-copy/_entry.js"),
-  "block-cherry-picking": () => import(/* webpackChunkName: "addon-entry-block-cherry-picking" */ "../addons/block-cherry-picking/_entry.js"),
+  "block-cherry-picking": () => import(/* webpackChunkName: "addon-default-entry" */ "../addons/block-cherry-picking/_entry.js"),
   "block-palette-icons": () => import(/* webpackChunkName: "addon-entry-block-palette-icons" */ "../addons/block-palette-icons/_entry.js"),
   "block-switching": () => import(/* webpackChunkName: "addon-default-entry" */ "../addons/block-switching/_entry.js"),
   "blocks2image": () => import(/* webpackChunkName: "addon-entry-blocks2image" */ "../addons/blocks2image/_entry.js"),

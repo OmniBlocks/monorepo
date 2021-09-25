@@ -526,6 +526,7 @@ class Tab extends EventTargetShim {
                     if (item.separator) {
                         const itemElt = document.querySelector('.blocklyContextMenu').children[i];
                         itemElt.style.paddingTop = '2px';
+                        itemElt.classList.add('sa-blockly-menu-item-border');
                         itemElt.style.borderTop = '1px solid hsla(0, 0%, 0%, 0.15)';
                     }
                 });

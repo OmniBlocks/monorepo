@@ -54,10 +54,16 @@
 }
 .blocklyWidgetDiv .goog-menu {
     background: var(--ui-primary);
-    border-color: hsla(0, 0%, 0%, 0.15);
+    border-color: var(--ui-secondary);
 }
 .blocklyWidgetDiv .goog-menuitem {
     color: var(--text-primary);
+}
+.blocklyWidgetDiv .goog-menuitem-disabled .goog-menuitem-content {
+    color: #666 !important;
+}
+.sa-blockly-menu-item-border {
+    border-top-color: var(--ui-secondary) !important;
 }
 .blocklyWidgetDiv .goog-menuitem.goog-menuitem-highlight {
     background-color: var(--ui-tertiary);

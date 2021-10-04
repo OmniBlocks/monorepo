@@ -71,7 +71,7 @@ const UsernameModalComponent = props => (
             <p className={styles.helpText}>
                 <FormattedMessage
                     // eslint-disable-next-line max-len
-                    defaultMessage="It is recommended to leave this value as-is or change it to your Scratch username, as other values may be unusable with cloud variables."
+                    defaultMessage="Values that do not correspond to a valid Scratch account will typically be rejected by the cloud variable server. We recommend leaving it as-is or changing it to your Scratch username."
                     description="Text in change username modal"
                     id="tw.usernameModal.help2"
                 />

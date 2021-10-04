@@ -60,7 +60,7 @@
         "tw.addons.settings.resetAll": "Reiniciar todos",
         "tw.addons.settings.search": "Buscar",
         "tw.addons.settings.tags.beta": "Beta",
-        "tw.addons.settings.tags.featured": "Destacado",
+        "tw.addons.settings.tags.featured": "Destacados",
         "tw.addons.settings.tags.new": "¡Nuevo!",
         "tw.addons.settings.tags.recommended": "Recomendado",
         "tw.addons.settings.tags.theme": "Tema",
@@ -143,15 +143,25 @@
         "tw.addons.settings.unsupported": "いくつかのアドオンがお使いのブラウザに対応していません:"
     },
     "ja-hira": {
+        "tw.addons.settings.addonFeedback": "アドオンのフィードバック",
         "tw.addons.settings.confirmResetAll": "アドオンのせっていを削除(さくじょ)し、デフォルトにもどします。よろしいですか？",
         "tw.addons.settings.credits": "クレジット:",
         "tw.addons.settings.dirty": "再読み込み(さいよみこみ)をしてアドオンの効果(こうか)を反映(はんえい)する。",
         "tw.addons.settings.dirtyButton": "すぐに再読み込み(さいよみこみ)する",
+        "tw.addons.settings.export": "設定(せってい)を保存(ほぞん)する",
+        "tw.addons.settings.import": "設定(せってい)をよみこむ",
+        "tw.addons.settings.noResults": "検索条件(けんさくじょうけん)に一致(いっち)する結果(けっか)はありません。",
         "tw.addons.settings.presets": "プリセット",
         "tw.addons.settings.reset": "リセット",
         "tw.addons.settings.resetAll": "すべてリセットする",
+        "tw.addons.settings.search": "けんさく",
+        "tw.addons.settings.tags.beta": "ベータばん",
+        "tw.addons.settings.tags.featured": "おすすめ",
+        "tw.addons.settings.tags.new": "しんきのう!",
         "tw.addons.settings.tags.recommended": "おすすめ",
-        "tw.addons.settings.title": "アドオンせってい"
+        "tw.addons.settings.tags.theme": "テーマ",
+        "tw.addons.settings.title": "アドオンせってい",
+        "tw.addons.settings.unsupported": "いくつかのアドオンがおつかいのブラウザに対応(たいおう)していません:"
     },
     "ko": {
         "tw.addons.settings.addonFeedback": "애드온에 문의하기",

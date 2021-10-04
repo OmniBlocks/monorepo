@@ -1,17 +1,42 @@
 // These will be replaced at build-time by generate-service-worker-plugin.js
-const ASSETS = [/* __ASSETS__ */];
-const CACHE_NAME = '__CACHE_NAME__';
+const EAGER_ASSETS = __EAGER_ASSETS__;
+const HTML_ASSETS = __HTML_ASSETS__;
+const EAGER_ASSETS_NAME = __EAGER_ASSETS_NAME__;
 
+const LAZY_ASSETS = __LAZY_ASSETS__;
+const LAZY_ASSETS_NAME = __LAZY_ASSETS_NAME__;
+
+const knownCaches = [
+    EAGER_ASSETS_NAME,
+    LAZY_ASSETS_NAME
+];
 const base = location.pathname.substr(0, location.pathname.indexOf('sw.js'));
 
 self.addEventListener('install', event => {
-    event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS)));
+    self.skipWaiting();
+    event.waitUntil(caches.open(EAGER_ASSETS_NAME).then(cache => cache.addAll([
+        ...HTML_ASSETS,
+        ...EAGER_ASSETS
+    ])));
 });
 
 self.addEventListener('activate', event => {
     event.waitUntil(
-        caches.keys().then(keys => Promise.all(keys.filter(i => i !== CACHE_NAME).map(i => caches.delete(i))))
+        caches.keys().then(keys => Promise.all(keys.filter(i => !knownCaches.includes(i)).map(i => caches.delete(i))))
     );
+});
+
+const fetchWithTimeout = req => new Promise((resolve, reject) => {
+    const timeout = setTimeout(reject, 5000);
+    fetch(req)
+        .then(res => {
+            clearTimeout(timeout);
+            resolve(res);
+        })
+        .catch(err => {
+            clearTimeout(timeout);
+            reject(err);
+        });
 });
 
 self.addEventListener('fetch', event => {
@@ -19,18 +44,29 @@ self.addEventListener('fetch', event => {
     if (url.origin !== location.origin) return;
     if (event.request.method !== 'GET') return;
 
-    let rewrite;
-    const pathname = url.pathname.substr(base.length);
-    if (/^(\d+\/?)?$/.test(pathname)) {
-        rewrite = 'index.html';
-    } else if (/^(\d+\/)?editor\/?$/i.test(pathname)) {
-        rewrite = 'editor.html';
-    } else if (/^(\d+\/)?fullscreen\/?$/i.test(pathname)) {
-        rewrite = 'fullscreen.html';
-    } else if (/^addons\/?$/i.test(pathname)) {
-        rewrite = 'addons.html';
+    let relativePathname = url.pathname.substr(base.length);
+    if (/^(\d+\/?)?$/.test(relativePathname)) {
+        relativePathname = 'index.html';
+    } else if (/^(\d+\/)?editor\/?$/i.test(relativePathname)) {
+        relativePathname = 'editor.html';
+    } else if (/^(\d+\/)?fullscreen\/?$/i.test(relativePathname)) {
+        relativePathname = 'fullscreen.html';
+    } else if (/^addons\/?$/i.test(relativePathname)) {
+        relativePathname = 'addons.html';
     }
-    if (rewrite) {
-        event.respondWith(fetch(event.request).catch(() => caches.match(new Request(rewrite))));
+
+    if (HTML_ASSETS.includes(relativePathname)) {
+        event.respondWith(
+            fetchWithTimeout(event.request).catch(() => caches.match(new Request(relativePathname)))
+        );
+    } else if (LAZY_ASSETS.includes(relativePathname)) {
+        event.respondWith(
+            caches.open(LAZY_ASSETS_NAME).then(cache => cache.match(new Request(relativePathname)).then(response => (
+                response || fetch(event.request).then(networkResponse => {
+                    cache.put(event.request, networkResponse.clone());
+                    return networkResponse;
+                })
+            )))
+        );
     }
 });

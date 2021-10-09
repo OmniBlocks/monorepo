@@ -153,6 +153,10 @@ const addonDevelopers = [
     {
         userId: '17340565',
         username: 'GarboMuffin'
+    },
+    {
+        userId: '5354974',
+        username: 'Chrome_Cat'
     }
     // TODO: summerscar if this is their Scratch account: https://scratch.mit.edu/users/summerscar/
 ].map(fromHardcoded);

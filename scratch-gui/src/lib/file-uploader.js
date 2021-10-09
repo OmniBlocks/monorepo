@@ -127,6 +127,14 @@ const costumeUpload = function (fileData, fileType, storage, handleCostume, hand
         assetType = storage.AssetType.ImageBitmap;
         break;
     }
+    case 'image/webp': {
+        // Scratch does not natively support webp, so convert to png
+        // see image/bmp logic above
+        bmpConverter(fileData, 'image/webp').then(dataUrl => {
+            costumeUpload(dataUrl, 'image/png', storage, handleCostume);
+        });
+        return;
+    }
     case 'image/gif': {
         let costumes = [];
         gifDecoder(fileData, (frameNumber, dataUrl, numFrames) => {
@@ -222,6 +230,7 @@ const spriteUpload = function (fileData, fileType, spriteName, storage, handleSp
     case 'image/png':
     case 'image/bmp':
     case 'image/jpeg':
+    case 'image/webp':
     case 'image/gif': {
         // Make a sprite from an image by making it a costume first
         costumeUpload(fileData, fileType, storage, vmCostumes => {

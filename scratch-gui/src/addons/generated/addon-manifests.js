@@ -14,6 +14,7 @@ export default {
   "custom-zoom": () => require("../addons/custom-zoom/addon.json"),
   "data-category-tweaks-v2": () => require("../addons/data-category-tweaks-v2/addon.json"),
   "debugger": () => require("../addons/debugger/addon.json"),
+  "disable-stage-drag-select": () => require("../addons/disable-stage-drag-select/addon.json"),
   "drag-drop": () => require("../addons/drag-drop/addon.json"),
   "editor-colored-context-menus": () => require("../addons/editor-colored-context-menus/addon.json"),
   "editor-devtools": () => require("../addons/editor-devtools/addon.json"),

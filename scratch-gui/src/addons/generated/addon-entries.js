@@ -14,6 +14,7 @@ export default {
   "custom-zoom": () => import(/* webpackChunkName: "addon-entry-custom-zoom" */ "../addons/custom-zoom/_entry.js"),
   "data-category-tweaks-v2": () => import(/* webpackChunkName: "addon-entry-data-category-tweaks-v2" */ "../addons/data-category-tweaks-v2/_entry.js"),
   "debugger": () => import(/* webpackChunkName: "addon-entry-debugger" */ "../addons/debugger/_entry.js"),
+  "disable-stage-drag-select": () => import(/* webpackChunkName: "addon-entry-disable-stage-drag-select" */ "../addons/disable-stage-drag-select/_entry.js"),
   "drag-drop": () => require("../addons/drag-drop/_entry.js"),
   "editor-colored-context-menus": () => import(/* webpackChunkName: "addon-entry-editor-colored-context-menus" */ "../addons/editor-colored-context-menus/_entry.js"),
   "editor-devtools": () => import(/* webpackChunkName: "addon-default-entry" */ "../addons/editor-devtools/_entry.js"),

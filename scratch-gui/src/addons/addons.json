@@ -40,5 +40,6 @@
     "editor-extra-keys",
     "hide-delete-button",
     "no-script-bumping",
+    "disable-stage-drag-select",
     "tw-interface-customization"
 ]

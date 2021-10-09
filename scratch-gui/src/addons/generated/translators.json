@@ -26,7 +26,7 @@
     },
     {
         "login": "mxmou",
-        "name": "MaxiMouse",
+        "name": "Maximouse",
         "avatar_url": "https://avatars1.githubusercontent.com/u/51849865?v=4",
         "profile": "https://scratch.mit.edu/users/Maximouse",
         "contributions": [
@@ -68,7 +68,7 @@
     },
     {
         "login": "locness3",
-        "name": "Locness",
+        "name": "locness3",
         "avatar_url": "https://avatars1.githubusercontent.com/u/37651007?v=4",
         "profile": "https://locness.duckdns.org",
         "contributions": [
@@ -107,7 +107,7 @@
     },
     {
         "login": "gohoski",
-        "name": "Глеб (Gleb)",
+        "name": "Gleb",
         "avatar_url": "https://avatars3.githubusercontent.com/u/72347897?v=4",
         "profile": "https://github.com/gohoski",
         "contributions": [
@@ -115,19 +115,19 @@
         ]
     },
     {
-        "login": "doruksarp",
-        "name": "doruksarp",
+        "login": "calvinmoment",
+        "name": "ItsCalvin",
         "avatar_url": "https://avatars3.githubusercontent.com/u/51460403?v=4",
-        "profile": "https://github.com/doruksarp",
+        "profile": "https://github.com/calvinmoment",
         "contributions": [
             "translation"
         ]
     },
     {
-        "login": "anoymousgamerhacker",
-        "name": "anoymousgamerhacker",
+        "login": "z-anonymouz",
+        "name": "anonymouz-z",
         "avatar_url": "https://avatars2.githubusercontent.com/u/71985679?v=4",
-        "profile": "https://github.com/anoymousgamerhacker",
+        "profile": "https://github.com/anonymouz-z",
         "contributions": [
             "bug",
             "translation"
@@ -164,8 +164,8 @@
         ]
     },
     {
-        "login": "wilamaxin",
-        "name": "wilamaxin",
+        "login": "Wilamaxin",
+        "name": "Wilamaxin",
         "avatar_url": "https://avatars2.githubusercontent.com/u/63302372?v=4",
         "profile": "https://github.com/Wilamaxin",
         "contributions": [
@@ -205,7 +205,8 @@
         "avatar_url": "https://avatars.githubusercontent.com/u/2651868?v=4",
         "profile": "https://github.com/sfederici",
         "contributions": [
-            "translation"
+            "translation",
+            "ideas"
         ]
     },
     {
@@ -292,7 +293,7 @@
     },
     {
         "login": "GignacKasztanski",
-        "name": "GignacKasztanski",
+        "name": "GignacPL",
         "avatar_url": "https://avatars.githubusercontent.com/u/78898180?v=4",
         "profile": "https://scratch.mit.edu/users/ignacyiwokarnecki",
         "contributions": [
@@ -328,7 +329,7 @@
     },
     {
         "login": "iltersinavv",
-        "name": "İlter | iltersinavv Hosting / isn | hogra",
+        "name": "İlter Kayra Güler",
         "avatar_url": "https://avatars.githubusercontent.com/u/80217178?v=4",
         "profile": "https://github.com/iltersinavv",
         "contributions": [
@@ -356,7 +357,7 @@
     },
     {
         "login": "Sly-Little-Fox",
-        "name": "Sly Little Fox",
+        "name": "Sly-Little-Fox",
         "avatar_url": "https://avatars.githubusercontent.com/u/69681150?v=4",
         "profile": "https://server-backuper.cloud",
         "contributions": [
@@ -375,7 +376,7 @@
     },
     {
         "login": "ShermanYeung",
-        "name": "GravityV",
+        "name": "ShermanY",
         "avatar_url": "https://avatars.githubusercontent.com/u/69072386?v=4",
         "profile": "https://github.com/ShermanYeung",
         "contributions": [
@@ -387,6 +388,26 @@
         "name": "buggy",
         "avatar_url": "https://avatars.githubusercontent.com/u/67200019?v=4",
         "profile": "https://github.com/TheBugCoder",
+        "contributions": [
+            "translation"
+        ]
+    },
+    {
+        "login": "Medericoder",
+        "name": "Médéric Niot",
+        "avatar_url": "https://avatars.githubusercontent.com/u/80577386?v=4",
+        "profile": "https://scratch.mit.edu/users/Medericoder/",
+        "contributions": [
+            "bug",
+            "ideas",
+            "translation"
+        ]
+    },
+    {
+        "login": "Nik0lyaZ",
+        "name": "Nikolyas",
+        "avatar_url": "https://avatars.githubusercontent.com/u/77118530?v=4",
+        "profile": "https://github.com/Nik0lyaZ",
         "contributions": [
             "translation"
         ]

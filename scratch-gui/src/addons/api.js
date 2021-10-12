@@ -23,6 +23,7 @@ import addons from './addon-manifests';
 import addonMessages from './addons-l10n/en.json';
 import l10nEntries from './generated/l10n-entries';
 import addonEntries from './generated/addon-entries';
+import {addContextMenu} from './contextmenu';
 import './polyfill';
 
 /* eslint-disable no-console */
@@ -178,46 +179,6 @@ const untilInEditor = () => {
 
 const getDisplayNoneWhileDisabledClass = id => `addons-display-none-${id}`;
 
-const SHARED_SPACES = {
-    stageHeader: {
-        element: () => document.querySelector("[class^='stage-header_stage-size-row']"),
-        from: () => [],
-        until: () => [
-            document.querySelector("[class^='stage-header_stage-size-toggle-group']"),
-            document.querySelector("[class^='stage-header_stage-size-row']").lastChild
-        ]
-    },
-    fullscreenStageHeader: {
-        element: () => document.querySelector("[class^='stage-header_stage-menu-wrapper']"),
-        from: function () {
-            let emptyDiv = this.element().querySelector('.addon-spacer');
-            if (!emptyDiv) {
-                emptyDiv = document.createElement('div');
-                emptyDiv.style.marginLeft = 'auto';
-                emptyDiv.className = 'addon-spacer';
-                this.element().insertBefore(emptyDiv, this.element().lastChild);
-            }
-            return [emptyDiv];
-        },
-        until: () => [document.querySelector("[class^='stage-header_stage-menu-wrapper']").lastChild]
-    },
-    afterGreenFlag: {
-        element: () => document.querySelector("[class^='controls_controls-container']"),
-        from: () => [],
-        until: () => [document.querySelector("[class^='stop-all_stop-all']")]
-    },
-    afterStopButton: {
-        element: () => document.querySelector("[class^='controls_controls-container']"),
-        from: () => [document.querySelector("[class^='stop-all_stop-all']")],
-        until: () => []
-    },
-    afterSoundTab: {
-        element: () => document.querySelector("[class^='react-tabs_react-tabs__tab-list']"),
-        from: () => [document.querySelector("[class^='react-tabs_react-tabs__tab-list']").children[2]],
-        until: () => [document.querySelector('#s3devToolBar')]
-    }
-};
-
 const parseArguments = code => code
     .split(/(?=[^\\]%[nbs])/g)
     .map(i => i.trim())
@@ -231,6 +192,8 @@ let _firstAddBlockRan = false;
 const contextMenuCallbacks = [];
 const CONTEXT_MENU_ORDER = ['editor-devtools', 'block-switching', 'blocks2image'];
 let createdAnyBlockContextMenus = false;
+
+const getInternalKey = element => Object.keys(element).find(key => key.startsWith('__reactInternalInstance$'));
 
 class Tab extends EventTargetShim {
     constructor (id) {
@@ -279,7 +242,8 @@ class Tab extends EventTargetShim {
                     return paperScope;
                 }
                 throw new Error('cannot find paper :(');
-            }
+            },
+            getInternalKey
         };
     }
 
@@ -345,7 +309,66 @@ class Tab extends EventTargetShim {
         });
     }
 
-    appendToSharedSpace ({space, element, order}) {
+    appendToSharedSpace ({space, element, order, scope}) {
+        const SHARED_SPACES = {
+            stageHeader: {
+                element: () => document.querySelector("[class^='stage-header_stage-size-row']"),
+                from: () => [],
+                until: () => [
+                    document.querySelector("[class^='stage-header_stage-size-toggle-group']"),
+                    document.querySelector("[class^='stage-header_stage-size-row']").lastChild
+                ]
+            },
+            fullscreenStageHeader: {
+                element: () => document.querySelector("[class^='stage-header_stage-menu-wrapper']"),
+                from: function () {
+                    let emptyDiv = this.element().querySelector('.addon-spacer');
+                    if (!emptyDiv) {
+                        emptyDiv = document.createElement('div');
+                        emptyDiv.style.marginLeft = 'auto';
+                        emptyDiv.className = 'addon-spacer';
+                        this.element().insertBefore(emptyDiv, this.element().lastChild);
+                    }
+                    return [emptyDiv];
+                },
+                until: () => [document.querySelector("[class^='stage-header_stage-menu-wrapper']").lastChild]
+            },
+            afterGreenFlag: {
+                element: () => document.querySelector("[class^='controls_controls-container']"),
+                from: () => [],
+                until: () => [document.querySelector("[class^='stop-all_stop-all']")]
+            },
+            afterStopButton: {
+                element: () => document.querySelector("[class^='controls_controls-container']"),
+                from: () => [document.querySelector("[class^='stop-all_stop-all']")],
+                until: () => []
+            },
+            afterSoundTab: {
+                element: () => document.querySelector("[class^='react-tabs_react-tabs__tab-list']"),
+                from: () => [document.querySelector("[class^='react-tabs_react-tabs__tab-list']").children[2]],
+                until: () => [document.querySelector('#s3devToolBar')]
+            },
+            assetContextMenuAfterExport: {
+                element: () => scope,
+                from: () => Array.prototype.filter.call(
+                    scope.children,
+                    c => c.textContent === this.scratchMessage('gui.spriteSelectorItem.contextMenuExport')
+                ),
+                until: () => Array.prototype.filter.call(
+                    scope.children,
+                    c => c.textContent === this.scratchMessage('gui.spriteSelectorItem.contextMenuDelete')
+                )
+            },
+            assetContextMenuAfterDelete: {
+                element: () => scope,
+                from: () => Array.prototype.filter.call(
+                    scope.children,
+                    c => c.textContent === this.scratchMessage('gui.spriteSelectorItem.contextMenuDelete')
+                ),
+                until: () => []
+            }
+        };
+
         const spaceInfo = SHARED_SPACES[space];
         const spaceElement = spaceInfo.element();
         if (!spaceElement) return false;
@@ -534,6 +557,10 @@ class Tab extends EventTargetShim {
         });
     }
 
+    createEditorContextMenu (callback, options) {
+        addContextMenu(this, callback, options);
+    }
+
     copyImage (dataURL) {
         if (!navigator.clipboard.write) {
             return Promise.reject(new Error('Clipboard API not supported'));
@@ -545,6 +572,10 @@ class Tab extends EventTargetShim {
             })
         ];
         return navigator.clipboard.write(items);
+    }
+
+    scratchMessage (id) {
+        return tabReduxInstance.state.locales.messages[id];
     }
 
     scratchClass (...args) {

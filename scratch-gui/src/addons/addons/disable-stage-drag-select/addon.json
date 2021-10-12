@@ -22,6 +22,8 @@
       "url": "userscript.js"
     }
   ],
+  "onlyInEditor": true,
+  "noTranslations": true,
   "tags": [
     "editor",
     "featured"

@@ -32,6 +32,7 @@ export default {
   "load-extensions": () => require("../addons/load-extensions/addon.json"),
   "mediarecorder": () => require("../addons/mediarecorder/addon.json"),
   "mouse-pos": () => require("../addons/mouse-pos/addon.json"),
+  "move-to-top-bottom": () => require("../addons/move-to-top-bottom/addon.json"),
   "mute-project": () => require("../addons/mute-project/addon.json"),
   "no-script-bumping": () => require("../addons/no-script-bumping/addon.json"),
   "onion-skinning": () => require("../addons/onion-skinning/addon.json"),

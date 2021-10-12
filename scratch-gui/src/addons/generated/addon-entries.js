@@ -32,6 +32,7 @@ export default {
   "load-extensions": () => import(/* webpackChunkName: "addon-entry-load-extensions" */ "../addons/load-extensions/_entry.js"),
   "mediarecorder": () => import(/* webpackChunkName: "addon-entry-mediarecorder" */ "../addons/mediarecorder/_entry.js"),
   "mouse-pos": () => import(/* webpackChunkName: "addon-entry-mouse-pos" */ "../addons/mouse-pos/_entry.js"),
+  "move-to-top-bottom": () => import(/* webpackChunkName: "addon-default-entry" */ "../addons/move-to-top-bottom/_entry.js"),
   "mute-project": () => require("../addons/mute-project/_entry.js"),
   "no-script-bumping": () => import(/* webpackChunkName: "addon-entry-no-script-bumping" */ "../addons/no-script-bumping/_entry.js"),
   "onion-skinning": () => import(/* webpackChunkName: "addon-default-entry" */ "../addons/onion-skinning/_entry.js"),

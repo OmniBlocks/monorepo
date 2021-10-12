@@ -42,5 +42,7 @@
     "no-script-bumping",
     "disable-stage-drag-select",
     "move-to-top-bottom",
+    "disable-paste-offset",
+    "block-duplicate",
     "tw-interface-customization"
 ]

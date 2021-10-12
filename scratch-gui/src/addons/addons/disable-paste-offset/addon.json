@@ -1,0 +1,23 @@
+{
+  "name": "Do not shift pasted items",
+  "description": "Paste copied items at their original position instead of shifted slightly in the costume editor.",
+  "credits": [
+    {
+      "name": "GarboMuffin"
+    }
+  ],
+  "dynamicEnable": true,
+  "dynamicDisable": true,
+  "userscripts": [
+    {
+      "url": "userscript.js"
+    }
+  ],
+  "tags": [
+    "editor",
+    "costumeEditor"
+  ],
+  "onlyInEditor": true,
+  "noTranslations": true,
+  "enabledByDefault": false
+}

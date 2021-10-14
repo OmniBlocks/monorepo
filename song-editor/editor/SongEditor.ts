@@ -302,6 +302,7 @@ class CustomAlgorythmCanvas {
     public lookUpArray: number[][];
     public selected: number;
     public inverseModulation: number[][];
+    public feedback: number[][];
     public carriers: number;
     public drawArray: number[][];
 
@@ -325,6 +326,7 @@ class CustomAlgorythmCanvas {
         this.selected = -1;
         this.newMods = [[], [], [], [], [], []];
         this.inverseModulation = [[], [], [], [], [], []];
+        this.feedback = [[], [], [], [], [], []];
 
         this.redrawCanvas();
 
@@ -556,6 +558,36 @@ class CustomAlgorythmCanvas {
 
 }
 
+class oscilascopeCanvas {
+
+    constructor(public readonly canvas: HTMLCanvasElement, private readonly _doc: SongDocument) {
+        this._updateCanvas();
+    }
+    public _updateCanvas(): void {
+        var arrays = this._doc.synth.exposedBuffer;
+        if (arrays[0] != undefined) {
+            if (arrays[0].length >= this.canvas.width && this._doc.synth.playing) {
+                var ctx = this.canvas.getContext("2d") as CanvasRenderingContext2D;
+
+                ctx.fillStyle = ColorConfig.getComputed("--editor-background");
+                ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                for (let i: number = arrays[0].length - 1; i > -1; i--) {
+                    let x = i - (arrays[0].length - 1) + this.canvas.width;
+                    let yl = (arrays[0][i] * (this.canvas.height / 2) + (this.canvas.height / 2));
+                    let yr = (arrays[1][i] * (this.canvas.height / 2) + (this.canvas.height / 2));
+
+                    ctx.fillStyle = ColorConfig.getComputed("--primary-text");
+                    ctx.fillRect(x - 1, yl-1, 1, 1.5);
+
+                    ctx.fillStyle = ColorConfig.getComputed("--secondary-text");
+                    ctx.fillRect(x - 1, yr-1, 1, 1.5);
+                    if (x == 0) break;
+                }
+            }
+        }
+    }
+}
+
 export class SongEditor {
 	public prompt: Prompt | null = null;
 
@@ -757,6 +789,7 @@ export class SongEditor {
 		]),
 	]);
 
+    private readonly _globalOscscope: oscilascopeCanvas = new oscilascopeCanvas(canvas({ width: 144, height: 32, style: "border:2px solid " + ColorConfig.uiWidgetBackground, id: "oscilascopeAll" }), this._doc);
 	private readonly _customWaveDrawCanvas: CustomChipCanvas = new CustomChipCanvas(canvas({ width: 128, height: 52, style: "border:2px solid " + ColorConfig.uiWidgetBackground, id: "customWaveDrawCanvas" }), this._doc, (newArray: Float64Array) => new ChangeCustomWave(this._doc, newArray));
 	private readonly _customWavePresetDrop: HTMLSelectElement = buildHeaderedOptions("Load Preset", select({ style: "width: 50%; height:1.5em; text-align: center; text-align-last: center;" }),
 		Config.chipWaves.map(wave => wave.name)
@@ -872,21 +905,24 @@ export class SongEditor {
 		this._barScrollBar.container,
 	);
 
-	public readonly _settingsArea: HTMLDivElement = div({ class: "settings-area noSelection" },
-		div({ class: "version-area" },
-			div({ style: "text-align: center; color: ${ColorConfig.secondaryText};" }, [this._songTitleInputBox.input]),
-		),
-		div({ class: "play-pause-area" },
-			this._volumeBarBox,
-			div({ class: "playback-bar-controls" },
-				this._playButton,
-				this._prevBarButton,
-				this._nextBarButton,
-			),
-			div({ class: "playback-volume-controls" },
-				span({ class: "volume-speaker" }),
-				this._volumeSlider.container,
-			),
+    public readonly _settingsArea: HTMLDivElement = div({ class: "settings-area noSelection" },
+        div({ class: "version-area" },
+            div({ style: "text-align: center; color: ${ColorConfig.secondaryText};" }, [this._songTitleInputBox.input]),
+        ),
+        div({ class: "play-pause-area" },
+            this._volumeBarBox,
+            div({ class: "playback-bar-controls" },
+                this._playButton,
+                this._prevBarButton,
+                this._nextBarButton,
+            ),
+            div({ class: "playback-volume-controls" },
+                span({ class: "volume-speaker" }),
+                this._volumeSlider.container,
+            ),
+            div({class: "selectRow"},
+                this._globalOscscope.canvas,
+            ),
 		),
 		div({ class: "menu-area" },
 			div({ class: "selectContainer menu file" },
@@ -2902,6 +2938,7 @@ export class SongEditor {
             this.lastOutVolumeCap = this._doc.song.outVolumeCap;
 			this._animateVolume(this._doc.song.outVolumeCap, this.outVolumeHistoricCap);
 		}
+        this._globalOscscope._updateCanvas();
 	}
 
 	private _animateVolume(outVolumeCap: number, historicOutCap: number): void {

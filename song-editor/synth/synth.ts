@@ -4037,6 +4037,8 @@ export class Synth {
     public liveInputChannel: number = 0;
     public loopRepeatCount: number = -1;
     public volume: number = 1.0;
+    public exposedBuffer: Float32Array[] = [new Float32Array(0),new Float32Array(0)];
+    private reloadbuffer: boolean = true;
 
     private wantToSkip: boolean = false;
     private playheadInternal: number = 0.0;
@@ -4456,6 +4458,7 @@ export class Synth {
             this.scriptNode.channelCountMode = 'explicit';
             this.scriptNode.channelInterpretation = 'speakers';
             this.scriptNode.connect(this.audioCtx.destination);
+            this.reloadbuffer = true;
         }
         this.audioCtx.resume();
     }
@@ -4643,6 +4646,11 @@ export class Synth {
             this.deactivateAudio();
         } else {
             this.synthesize(outputDataL, outputDataR, outputBuffer.length, this.isPlayingSong);
+        }
+        if (this.reloadbuffer) {
+            this.exposedBuffer[0] = outputDataL;
+            this.exposedBuffer[1] = outputDataR;
+            this.reloadbuffer = false;
         }
     }
 

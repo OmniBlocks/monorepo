@@ -1,5 +1,4 @@
 [
-    "hide-new-variables",
-    "block-cherry-picking",
-    "editor-extra-keys"
+    "disable-paste-offset",
+    "block-duplicate"
 ]

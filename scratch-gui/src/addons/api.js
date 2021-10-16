@@ -110,6 +110,7 @@ const removeMutationObserverCallback = callback => {
 class Redux extends EventTargetShim {
     constructor () {
         super();
+        this._isInReducer = false;
         this._initialized = false;
         this._nextState = null;
     }
@@ -117,6 +118,7 @@ class Redux extends EventTargetShim {
     initialize () {
         if (!this._initialized) {
             AddonHooks.appStateReducer = (action, next) => {
+                this._isInReducer = true;
                 this._nextState = next;
                 this.dispatchEvent(new CustomEvent('statechanged', {
                     detail: {
@@ -125,6 +127,7 @@ class Redux extends EventTargetShim {
                     }
                 }));
                 this._nextState = null;
+                this._isInReducer = false;
             };
 
             this._initialized = true;
@@ -132,7 +135,11 @@ class Redux extends EventTargetShim {
     }
 
     dispatch (m) {
-        return AddonHooks.appStateStore.dispatch(m);
+        if (this._isInReducer) {
+            queueMicrotask(() => AddonHooks.appStateStore.dispatch(m));
+        } else {
+            AddonHooks.appStateStore.dispatch(m);
+        }
     }
 
     get state () {

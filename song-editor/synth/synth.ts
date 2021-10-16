@@ -4,6 +4,7 @@ import { Dictionary, DictionaryArray, EnvelopeType, InstrumentType, Transition, 
 import { EditorConfig } from "../editor/EditorConfig";
 import { scaleElementsByFactor, inverseRealFourierTransform } from "./FFT";
 import { Deque } from "./Deque";
+import { events } from "../global/events";
 
 declare global {
     interface Window {
@@ -4037,8 +4038,10 @@ export class Synth {
     public liveInputChannel: number = 0;
     public loopRepeatCount: number = -1;
     public volume: number = 1.0;
-    public exposedBuffer: Float32Array[] = [new Float32Array(0),new Float32Array(0)];
+    public exposedBuffer: Float32Array[] = [];
     private reloadbuffer: boolean = true;
+    public copybroken: boolean = false;
+    public copybuffertimer: number = 0;
 
     private wantToSkip: boolean = false;
     private playheadInternal: number = 0.0;
@@ -4636,7 +4639,6 @@ export class Synth {
         const outputBuffer = audioProcessingEvent.outputBuffer;
         const outputDataL: Float32Array = outputBuffer.getChannelData(0);
         const outputDataR: Float32Array = outputBuffer.getChannelData(1);
-
         const isPlayingLiveTones = performance.now() < this.liveInputEndTime;
         if (!isPlayingLiveTones && !this.isPlayingSong) {
             for (let i: number = 0; i < outputBuffer.length; i++) {
@@ -4646,11 +4648,23 @@ export class Synth {
             this.deactivateAudio();
         } else {
             this.synthesize(outputDataL, outputDataR, outputBuffer.length, this.isPlayingSong);
-        }
-        if (this.reloadbuffer) {
-            this.exposedBuffer[0] = outputDataL;
-            this.exposedBuffer[1] = outputDataR;
-            this.reloadbuffer = false;
+
+            if (this.reloadbuffer) {
+                this.exposedBuffer[0] = outputBuffer.getChannelData(0);
+                this.exposedBuffer[1] = outputBuffer.getChannelData(1);
+                this.reloadbuffer = false;
+            }
+            if (this.exposedBuffer[0].length == 0) {
+                this.exposedBuffer[0] = new Float32Array(144);
+                this.exposedBuffer[1] = new Float32Array(144);
+                this.copybroken = true;
+            }
+            if (this.copybroken && this.copybuffertimer <= 0) {
+                events.raise("oscillascopeUpdate", outputDataL, outputDataR);
+                this.copybuffertimer = 2;
+            } else if (this.copybroken) {
+                this.copybuffertimer--;
+            }
         }
     }
 

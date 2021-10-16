@@ -33,6 +33,7 @@ import { SpectrumEditor } from "./SpectrumEditor";
 import { ThemePrompt } from "./ThemePrompt";
 import { TipPrompt } from "./TipPrompt";
 import { TrackEditor } from "./TrackEditor";
+import { events } from "../global/events";
 
 //namespace beepbox {
 const { button, div, input, select, span, optgroup, option, canvas } = HTML;
@@ -559,11 +560,38 @@ class CustomAlgorythmCanvas {
 }
 
 class oscilascopeCanvas {
+    public _EventUpdateCanvas:Function;
 
     constructor(public readonly canvas: HTMLCanvasElement, private readonly _doc: SongDocument) {
         this._updateCanvas();
+        this._EventUpdateCanvas = function(directlinkL: Float32Array, directlinkR ?: Float32Array): void {
+            if(directlinkR) {
+                var ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
+
+                ctx.fillStyle = ColorConfig.getComputed("--editor-background");
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                for (let i: number = directlinkL.length - 1; i >= directlinkL.length - 1 - canvas.width; i--) {
+                    let x = i - (directlinkL.length - 1) + canvas.width;
+                    let yl = (directlinkL[i] * (canvas.height / 2) + (canvas.height / 2));
+                    let yr = (directlinkR[i] * (canvas.height / 2) + (canvas.height / 2));
+
+                    ctx.fillStyle = ColorConfig.getComputed("--primary-text");
+                    ctx.fillRect(x - 1, yl - 1, 1, 1.5);
+
+                    ctx.fillStyle = ColorConfig.getComputed("--secondary-text");
+                    ctx.fillRect(x - 1, yr - 1, 1, 1.5);
+                    if (x == 0) break;
+                }
+            }
+        };
+        events.listen("oscillascopeUpdate", this._EventUpdateCanvas);
     }
-    public _updateCanvas(): void {
+
+    public _updateCanvas(directlinkL?: Float32Array, directlinkR?: Float32Array): void {
+        if (this._doc.synth.copybroken) {
+            return;
+        }
         var arrays = this._doc.synth.exposedBuffer;
         if (arrays[0] != undefined) {
             if (arrays[0].length >= this.canvas.width && this._doc.synth.playing) {
@@ -571,16 +599,17 @@ class oscilascopeCanvas {
 
                 ctx.fillStyle = ColorConfig.getComputed("--editor-background");
                 ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-                for (let i: number = arrays[0].length - 1; i > -1; i--) {
+
+                for (let i: number = arrays[0].length - 1; i >= arrays[0].length - 1 - this.canvas.width; i--) {
                     let x = i - (arrays[0].length - 1) + this.canvas.width;
                     let yl = (arrays[0][i] * (this.canvas.height / 2) + (this.canvas.height / 2));
                     let yr = (arrays[1][i] * (this.canvas.height / 2) + (this.canvas.height / 2));
 
                     ctx.fillStyle = ColorConfig.getComputed("--primary-text");
-                    ctx.fillRect(x - 1, yl-1, 1, 1.5);
+                    ctx.fillRect(x - 1, yl - 1, 1, 1.5);
 
                     ctx.fillStyle = ColorConfig.getComputed("--secondary-text");
-                    ctx.fillRect(x - 1, yr-1, 1, 1.5);
+                    ctx.fillRect(x - 1, yr - 1, 1, 1.5);
                     if (x == 0) break;
                 }
             }
@@ -789,7 +818,7 @@ export class SongEditor {
 		]),
 	]);
 
-    private readonly _globalOscscope: oscilascopeCanvas = new oscilascopeCanvas(canvas({ width: 144, height: 32, style: "border:2px solid " + ColorConfig.uiWidgetBackground, id: "oscilascopeAll" }), this._doc);
+    public readonly _globalOscscope: oscilascopeCanvas = new oscilascopeCanvas(canvas({ width: 144, height: 32, style: "border:2px solid " + ColorConfig.uiWidgetBackground, id: "oscilascopeAll" }), this._doc);
 	private readonly _customWaveDrawCanvas: CustomChipCanvas = new CustomChipCanvas(canvas({ width: 128, height: 52, style: "border:2px solid " + ColorConfig.uiWidgetBackground, id: "customWaveDrawCanvas" }), this._doc, (newArray: Float64Array) => new ChangeCustomWave(this._doc, newArray));
 	private readonly _customWavePresetDrop: HTMLSelectElement = buildHeaderedOptions("Load Preset", select({ style: "width: 50%; height:1.5em; text-align: center; text-align-last: center;" }),
 		Config.chipWaves.map(wave => wave.name)

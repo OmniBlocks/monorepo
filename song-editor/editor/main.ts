@@ -12,8 +12,8 @@ import { ChangePreset } from "./changes";
 
 
 //namespace beepbox {
-const doc: SongDocument = new SongDocument();
-const editor: SongEditor = new SongEditor(doc);
+export const doc: SongDocument = new SongDocument();//debug only
+export const editor: SongEditor = new SongEditor(doc);//same as above
 const beepboxEditorContainer: HTMLElement = document.getElementById("beepboxEditorContainer")!;
 beepboxEditorContainer.appendChild(editor.mainLayer);
 editor.whenUpdated();

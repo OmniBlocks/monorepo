@@ -33,9 +33,6 @@ const messages = defineMessages({
     }
 });
 
-let hasDefinedLaunchQueueConsumer = false;
-let hasConsumedFile = false;
-
 /**
  * Higher Order Component to provide behavior for loading local project files into editor.
  * @param {React.Component} WrappedComponent the component to add project file loading functionality to
@@ -64,29 +61,6 @@ const SBFileUploaderHOC = function (WrappedComponent) {
         componentDidUpdate (prevProps) {
             if (this.props.isLoadingUpload && !prevProps.isLoadingUpload && this.expectingFileUploadFinish) {
                 this.handleFinishedLoadingUpload(); // cue step 5 below
-            }
-            if (
-                this.props.isShowingProject &&
-                !prevProps.isShowingProject &&
-                'launchQueue' in window
-            ) {
-                launchQueue.setConsumer(async launchParams => {
-                    if (!launchParams.files.length) return;
-                    if (hasConsumedFile) return;
-                    hasConsumedFile = true;
-                    const [handle] = launchParams.files;
-                    this.props.onLoadingStarted();
-                    const file = await handle.getFile();
-                    this.expectingFileUploadFinish = true;
-                    this.fileReader = new FileReader();
-                    this.fileReader.onload = this.onload;
-                    this.handleChange({
-                        target: {
-                            files: [file]
-                        }
-                    });
-                    this.props.onSetFileHandle(handle);
-                });
             }
         }
         componentWillUnmount () {

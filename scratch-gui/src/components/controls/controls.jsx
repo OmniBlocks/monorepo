@@ -52,7 +52,7 @@ const Controls = function (props) {
                 title={intl.formatMessage(messages.stopTitle)}
                 onClick={onStopAllClick}
             />
-            {!isSmall && turbo ? (
+            {turbo ? (
                 <TurboMode isSmall={isSmall} />
             ) : null}
             {!isSmall && (

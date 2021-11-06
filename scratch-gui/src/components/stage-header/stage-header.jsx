@@ -82,7 +82,7 @@ const StageHeaderComponent = function (props) {
                     title={props.intl.formatMessage(messages.fullscreenControl)}
                 />
             </Button>
-            
+
         ) : (
             <Button
                 className={styles.stageButton}
@@ -157,7 +157,10 @@ const StageHeaderComponent = function (props) {
         header = (
             <Box className={styles.stageHeaderWrapper}>
                 <Box className={styles.stageMenuWrapper}>
-                    <Controls vm={vm} />
+                    <Controls
+                        vm={vm}
+                        isSmall={stageSizeMode === STAGE_SIZE_MODES.small}
+                    />
                     <div className={styles.stageSizeRow}>
                         {stageControls}
                         <div>

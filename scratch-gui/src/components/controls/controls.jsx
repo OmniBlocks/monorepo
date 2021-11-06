@@ -34,7 +34,7 @@ const Controls = function (props) {
         turbo,
         framerate,
         interpolation,
-        stageSizeMode,
+        isSmall,
         ...componentProps
     } = props;
     return (
@@ -52,16 +52,14 @@ const Controls = function (props) {
                 title={intl.formatMessage(messages.stopTitle)}
                 onClick={onStopAllClick}
             />
-            {stageSizeMode !== STAGE_SIZE_MODES.small && (
-                <React.Fragment>
-                    {turbo ? (
-                        <TurboMode />
-                    ) : null}
-                    <FramerateIndicator
-                        framerate={framerate}
-                        interpolation={interpolation}
-                    />
-                </React.Fragment>
+            {!isSmall && turbo ? (
+                <TurboMode isSmall={isSmall} />
+            ) : null}
+            {!isSmall && (
+                <FramerateIndicator
+                    framerate={framerate}
+                    interpolation={interpolation}
+                />
             )}
         </div>
     );
@@ -75,13 +73,14 @@ Controls.propTypes = {
     onStopAllClick: PropTypes.func.isRequired,
     framerate: PropTypes.number,
     interpolation: PropTypes.bool,
-    stageSizeMode: PropTypes.oneOf(Object.keys(STAGE_SIZE_MODES)),
+    isSmall: PropTypes.bool,
     turbo: PropTypes.bool
 };
 
 Controls.defaultProps = {
     active: false,
-    turbo: false
+    turbo: false,
+    isSmall: false
 };
 
 export default injectIntl(Controls);

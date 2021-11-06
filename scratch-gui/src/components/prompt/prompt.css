@@ -94,6 +94,9 @@
     width: 100%;
     margin: 0 auto;
 }
+[theme="dark"] .cloud-option {
+    border-color: rgba(255, 255, 255, .25);
+}
 
 .cloud-option-text {
     opacity: .5;

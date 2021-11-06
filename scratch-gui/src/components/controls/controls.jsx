@@ -7,6 +7,7 @@ import GreenFlag from '../green-flag/green-flag.jsx';
 import StopAll from '../stop-all/stop-all.jsx';
 import TurboMode from '../turbo-mode/turbo-mode.jsx';
 import FramerateIndicator from '../tw-framerate-indicator/framerate-indicator.jsx';
+import {STAGE_SIZE_MODES} from '../../lib/layout-constants.js';
 
 import styles from './controls.css';
 
@@ -33,6 +34,7 @@ const Controls = function (props) {
         turbo,
         framerate,
         interpolation,
+        stageSizeMode,
         ...componentProps
     } = props;
     return (
@@ -50,13 +52,17 @@ const Controls = function (props) {
                 title={intl.formatMessage(messages.stopTitle)}
                 onClick={onStopAllClick}
             />
-            {turbo ? (
-                <TurboMode />
-            ) : null}
-            <FramerateIndicator
-                framerate={framerate}
-                interpolation={interpolation}
-            />
+            {stageSizeMode !== STAGE_SIZE_MODES.small && (
+                <React.Fragment>
+                    {turbo ? (
+                        <TurboMode />
+                    ) : null}
+                    <FramerateIndicator
+                        framerate={framerate}
+                        interpolation={interpolation}
+                    />
+                </React.Fragment>
+            )}
         </div>
     );
 };
@@ -69,6 +75,7 @@ Controls.propTypes = {
     onStopAllClick: PropTypes.func.isRequired,
     framerate: PropTypes.number,
     interpolation: PropTypes.bool,
+    stageSizeMode: PropTypes.oneOf(Object.keys(STAGE_SIZE_MODES)),
     turbo: PropTypes.bool
 };
 

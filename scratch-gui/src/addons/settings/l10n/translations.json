@@ -100,6 +100,13 @@
     "ga": {
         "tw.addons.settings.title": "socruithe addon"
     },
+    "he": {
+        "tw.addons.settings.credits": "נקודות זכות:",
+        "tw.addons.settings.reset": "אִתחוּל",
+        "tw.addons.settings.resetAll": "לאפס הכל",
+        "tw.addons.settings.tags.beta": "בטא",
+        "tw.addons.settings.tags.new": "חָדָשׁ!"
+    },
     "it": {
         "tw.addons.settings.addonFeedback": "Feedback sull'Addon",
         "tw.addons.settings.confirmResetAll": "Sei sicuro di voler riportare tutte le impostazioni dell'addon al loro valore iniziale?",
@@ -388,6 +395,25 @@
         "tw.addons.settings.tags.theme": "Tema",
         "tw.addons.settings.title": "Eklenti Ayarları",
         "tw.addons.settings.unsupported": "Bazı eklentiler bu tarayıcıda kullanılamıyor:"
+    },
+    "uk": {
+        "tw.addons.settings.addonFeedback": "Відгук про доповнення",
+        "tw.addons.settings.confirmResetAll": "Ви впевнені, що хочете скинути усі налаштування доповненнь до їхніх значеннь за замовчуванням?",
+        "tw.addons.settings.credits": "Подяка:",
+        "tw.addons.settings.dirty": "Перезавантажте TurboWarp, щоб застосувати налаштування.",
+        "tw.addons.settings.dirtyButton": "Перезавантажити зараз",
+        "tw.addons.settings.export": "Експортувати налаштування",
+        "tw.addons.settings.import": "Імпортувати налаштування",
+        "tw.addons.settings.noResults": "Немає результатів.",
+        "tw.addons.settings.reset": "Скинути",
+        "tw.addons.settings.resetAll": "Скинути все",
+        "tw.addons.settings.search": "Пошук",
+        "tw.addons.settings.tags.beta": "У розробці",
+        "tw.addons.settings.tags.new": "Нове!",
+        "tw.addons.settings.tags.recommended": "Рекомендовано",
+        "tw.addons.settings.tags.theme": "Тема",
+        "tw.addons.settings.title": "Налаштування доповненнь",
+        "tw.addons.settings.unsupported": "Деякі доповнення не доступні у цьому браузері:"
     },
     "zh-cn": {
         "tw.addons.settings.addonFeedback": "插件反馈",

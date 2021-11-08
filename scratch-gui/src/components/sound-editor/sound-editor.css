@@ -84,8 +84,7 @@ $border-radius: 0.25rem;
     margin: 0px;
 }
 [theme="dark"] .button {
-    background-color: var(--ui-primary);
-    border-color: var(--ui-tertiary) !important;
+    background-color: $ui-primary;
 }
 
 .button > img {

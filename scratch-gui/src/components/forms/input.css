@@ -32,7 +32,6 @@
 }
 [theme="dark"] .input-form {
     background: $ui-secondary;
-    border-color: $ui-tertiary;
 }
 
 .input-form:hover {

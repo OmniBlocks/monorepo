@@ -81,7 +81,7 @@ stage doesn't "spill" out from under its rounded corners. instead, shift these o
     top: 0;
     left: 0;
     z-index: $z-index-dragging-sprite;
-    filter: drop-shadow(5px 5px 5px $ui-black-transparent);
+    filter: drop-shadow(5px 5px 5px $ui-black-transparent-default);
 }
 
 .stage-bottom-wrapper {

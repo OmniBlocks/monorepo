@@ -7,11 +7,12 @@
     --ui-secondary: rgb(30, 30, 30);
     --ui-tertiary: rgb(46, 46, 46);
     --ui-modal-overlay: #333a;
+    --ui-black-transparent: rgba(255, 255, 255, 0.15);
     --text-primary: #eee;
     /* scratch-paint */
-    --paint-ui-pane-border: rgb(46, 46, 46);
+    --paint-ui-pane-border: var(--ui-black-transparent);
     --paint-text-primary: #eee;
-    --paint-form-border: rgb(46, 46, 46);
+    --paint-form-border: var(--ui-black-transparent);
 }
 
 /* Blockly */
@@ -54,7 +55,7 @@
 }
 .blocklyWidgetDiv .goog-menu {
     background: var(--ui-primary);
-    border-color: var(--ui-secondary);
+    border-color: var(--ui-black-transparent);
 }
 .blocklyWidgetDiv .goog-menuitem {
     color: var(--text-primary);
@@ -63,7 +64,7 @@
     color: #666 !important;
 }
 .sa-blockly-menu-item-border {
-    border-top-color: var(--ui-secondary) !important;
+    border-top-color: var(--ui-black-transparent) !important;
 }
 .blocklyWidgetDiv .goog-menuitem.goog-menuitem-highlight {
     background-color: var(--ui-tertiary);
@@ -79,10 +80,10 @@
 /* Other / Multipurpose */
 .Popover-body {
     background: var(--ui-secondary);
-    border-color: var(--ui-tertiary);
+    border-color: var(--ui-black-transparent);
     color: var(--text-primary);
 }
 .Popover-tipShape {
     fill: var(--ui-secondary);
-    stroke: var(--ui-tertiary);
+    stroke: var(--ui-black-transparent);
 }

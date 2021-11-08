@@ -12,7 +12,7 @@
     /* max-width: 260px; */
     overflow: visible;
     color: $ui-white;
-    box-shadow: 0 8px 8px 0 $ui-black-transparent;
+    box-shadow: 0 8px 8px 0 $ui-black-transparent-default;
 }
 [theme="dark"] .menu {
     background-color: $motion-primary-dark;

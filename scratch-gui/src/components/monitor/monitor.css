@@ -6,7 +6,7 @@
     position: absolute;
     background: $ui-primary-light; /* tw: do not look different in dark mode */
     z-index: $z-index-monitor;
-    border: 1px solid $ui-black-transparent;
+    border: 1px solid $ui-black-transparent-default;
     border-radius: calc($space / 2);
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-size: 0.75rem;
@@ -76,7 +76,7 @@
 
 .list-header {
     background: $ui-white;
-    border-bottom: 1px solid $ui-black-transparent;
+    border-bottom: 1px solid $ui-black-transparent-default;
     text-align: center;
     padding: 3px;
     font-size: 0.75rem;
@@ -116,7 +116,7 @@
     color: white;
     margin: 0 3px;
     border-radius: calc($space / 2);
-    border: 1px solid $ui-black-transparent;
+    border: 1px solid $ui-black-transparent-default;
     flex-grow: 1;
     height: 22px;
 }

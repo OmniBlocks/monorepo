@@ -3,7 +3,7 @@
 
 .question-container {
     margin: $space;
-    border: 1px solid $ui-black-transparent;
+    border: 1px solid $ui-black-transparent-default;
     border-radius: $space;
     border-width: 2px;
     padding: 1rem;

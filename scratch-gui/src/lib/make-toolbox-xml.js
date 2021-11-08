@@ -731,14 +731,8 @@ const myBlocks = function () {
     `;
 };
 
-// tw: add custom category
 // eslint-disable-next-line max-len
-const turbowarpIsCompiledBlock = `<block type="argument_reporter_boolean"><field name="VALUE">is compiled?</field></block>`;
-const turbowarpCategory = `<category
-    name="TurboWarp"
-    id="tw"
-    colour="#FF4C4C"
-    secondaryColour="#FF3D3D">${turbowarpIsCompiledBlock}</category>`;
+const turbowarpIsCompiledBlock = '<block type="argument_reporter_boolean"><field name="VALUE">is compiled?</field></block>';
 /* eslint-enable no-unused-vars */
 
 const xmlOpen = '<xml style="display: none">';
@@ -787,10 +781,10 @@ const makeToolboxXML = function (isInitialSetup, isStage = true, targetId, categ
     const operatorsXML = moveCategory('operators') || operators(isInitialSetup, isStage, targetId);
     const variablesXML = moveCategory('data') || variables(isInitialSetup, isStage, targetId);
     const myBlocksXML = moveCategory('procedures') || myBlocks(isInitialSetup, isStage, targetId);
-    // tw: add custom category
-    let turbowarpXML = moveCategory('tw') || turbowarpCategory;
-    // terrible hack to add "is compiled" to the top of the category...
-    if (!turbowarpXML.includes(turbowarpIsCompiledBlock)) {
+    // Always display TurboWarp blocks as the first extension, if it exists,
+    // and also add an "is compiled?" block to the top.
+    let turbowarpXML = moveCategory('tw');
+    if (turbowarpXML && !turbowarpXML.includes(turbowarpIsCompiledBlock)) {
         turbowarpXML = turbowarpXML.replace('<block', `${turbowarpIsCompiledBlock}<block`);
     }
 
@@ -804,10 +798,11 @@ const makeToolboxXML = function (isInitialSetup, isStage = true, targetId, categ
         sensingXML, gap,
         operatorsXML, gap,
         variablesXML, gap,
-        // tw: add custom category
-        myBlocksXML, gap,
-        turbowarpXML
+        myBlocksXML, gap
     ];
+    if (turbowarpXML) {
+        everything.push(turbowarpXML);
+    }
 
     for (const extensionCategory of categoriesXML) {
         everything.push(gap, extensionCategory.xml);

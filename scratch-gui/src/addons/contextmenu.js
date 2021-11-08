@@ -55,7 +55,6 @@ const onReactContextMenu = function (e) {
   for (const item of hasDynamicContextMenu
     ? contextMenus.flatMap((menu) => (typeof menu === "function" ? menu(type, ctx) : menu))
     : contextMenus) {
-        debugger;
     if (!item) continue;
     if (item.types && !item.types.some((itemType) => type === itemType)) continue;
     if (item.condition && !item.condition(ctx)) continue;

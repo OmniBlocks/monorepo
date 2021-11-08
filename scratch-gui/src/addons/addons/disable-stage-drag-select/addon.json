@@ -1,4 +1,6 @@
 {
+  "editorOnly": true,
+  "noTranslations": true,
   "name": "Non-draggable sprites in editor",
   "description": "Removes the ability to drag sprites around on the stage in the editor, except those explicitly set as draggable.",
   "info": [
@@ -22,8 +24,6 @@
       "url": "userscript.js"
     }
   ],
-  "onlyInEditor": true,
-  "noTranslations": true,
   "tags": [
     "editor",
     "featured"

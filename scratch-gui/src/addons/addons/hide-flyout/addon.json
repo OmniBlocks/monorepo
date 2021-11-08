@@ -1,4 +1,6 @@
 {
+  "editorOnly": true,
+  "noTranslations": true,
   "name": "Auto-hiding block palette",
   "description": "Hides the block palette if not hovered. Click the lock icon to lock it in place temporarily. Alternatively, use \"category click\" mode.",
   "credits": [
@@ -24,8 +26,6 @@
       "url": "style.css"
     }
   ],
-  "onlyInEditor": true,
-  "noTranslations": true,
   "settings": [
     {
       "name": "Toggle on...",
@@ -48,6 +48,7 @@
       "default": "hover"
     },
     {
+      "dynamic": true,
       "name": "Animation duration",
       "id": "speed",
       "type": "select",
@@ -69,7 +70,6 @@
           "name": "Long"
         }
       ],
-      "reloadRequired": false,
       "default": "default"
     }
   ],

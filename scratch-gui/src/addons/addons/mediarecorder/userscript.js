@@ -1,11 +1,6 @@
 import downloadBlob from "../../libraries/common/cs/download-blob.js";
 
 export default async ({ addon, console, msg }) => {
-  // Safari supports mp4 but not webm
-  const CHECK_TYPES = ["video/webm", "video/mp4"];
-  const supportedVideoType = CHECK_TYPES.find((i) => MediaRecorder.isTypeSupported(i));
-  if (!supportedVideoType) throw new Error("no video types supported");
-
   let recordElem;
   let isRecording = false;
   let isWaitingForFlag = false;
@@ -44,10 +39,7 @@ export default async ({ addon, console, msg }) => {
 
       recordOptionInner.appendChild(
         Object.assign(document.createElement("p"), {
-          textContent:
-            supportedVideoType === "video/webm"
-              ? msg("record-description")
-              : msg("record-description").replace("WebM", "MP4"),
+          textContent: msg("record-description"),
           className: "recordOptionDescription",
         })
       );
@@ -242,8 +234,8 @@ export default async ({ addon, console, msg }) => {
         disposeRecorder();
       } else {
         recorder.onstop = () => {
-          const blob = new Blob(recordBuffer, { type: supportedVideoType });
-          downloadBlob("video." + supportedVideoType.split("/")[1], blob);
+          const blob = new Blob(recordBuffer, { type: "video/webm" });
+          downloadBlob("video.webm", blob);
           disposeRecorder();
         };
         recorder.stop();
@@ -295,7 +287,7 @@ export default async ({ addon, console, msg }) => {
       const videoStream = vm.runtime.renderer.canvas.captureStream();
       stream.addTrack(videoStream.getVideoTracks()[0]);
 
-      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const ctx = new AudioContext();
       const dest = ctx.createMediaStreamDestination();
       if (opts.audioEnabled) {
         const mediaStreamDestination = vm.runtime.audioEngine.audioContext.createMediaStreamDestination();
@@ -310,7 +302,7 @@ export default async ({ addon, console, msg }) => {
       if (opts.audioEnabled || opts.micEnabled) {
         stream.addTrack(dest.stream.getAudioTracks()[0]);
       }
-      recorder = new MediaRecorder(stream, { mimeType: supportedVideoType });
+      recorder = new MediaRecorder(stream, { mimeType: "video/webm" });
       recorder.ondataavailable = (e) => {
         recordBuffer.push(e.data);
       };

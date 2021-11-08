@@ -1,4 +1,5 @@
 {
+  "editorOnly": true,
   "name": "Searchable dropdowns",
   "description": "Allows you to search block dropdowns.",
   "credits": [
@@ -18,7 +19,6 @@
       "url": "userscript.css"
     }
   ],
-  "onlyInEditor": true,
   "tags": [
     "editor",
     "codeEditor",

@@ -1,4 +1,5 @@
 {
+  "editorOnly": true,
   "name": "Developer tools",
   "description": "Adds a find box and new menu options to the editor: copy/paste blocks, better clean up, go to custom block definition, and more!",
   "info": [
@@ -15,24 +16,24 @@
   ],
   "settings": [
     {
+      "dynamic": true,
       "name": "Enhance \"Clean up Blocks\"",
       "id": "enableCleanUpPlus",
       "type": "boolean",
-      "reloadRequired": false,
       "default": true
     },
     {
+      "dynamic": true,
       "name": "Paste blocks at mouse cursor",
       "id": "enablePasteBlocksAtMouse",
       "type": "boolean",
-      "reloadRequired": false,
       "default": true
     },
     {
+      "dynamic": true,
       "name": "Middle mouse click variables, custom blocks or events to navigate",
       "id": "enableMiddleClickFinder",
       "type": "boolean",
-      "reloadRequired": false,
       "default": true
     }
   ],
@@ -46,7 +47,6 @@
       "url": "userscript.css"
     }
   ],
-  "onlyInEditor": true,
   "tags": [
     "editor",
     "codeEditor",

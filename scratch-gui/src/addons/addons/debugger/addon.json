@@ -1,4 +1,5 @@
 {
+  "editorOnly": true,
   "name": "Debugger",
   "description": "Adds a new \"debugger\" block category and a \"logs\" window to the editor. The \"log\", \"warn\" and \"error\" blocks will print the specified message into the logs window. The \"breakpoint\" block will pause the project when executed.",
   "credits": [
@@ -22,7 +23,6 @@
       "url": "style.css"
     }
   ],
-  "onlyInEditor": true,
   "tags": [
     "editor",
     "featured"

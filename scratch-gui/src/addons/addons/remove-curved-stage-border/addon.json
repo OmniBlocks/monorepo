@@ -1,4 +1,5 @@
 {
+  "noTranslations": true,
   "name": "Remove curved stage border",
   "description": "Removes the curved border around the stage, allowing you to see the corners.",
   "tags": [
@@ -12,7 +13,6 @@
       "link": "https://github.com/Tacodude7729"
     }
   ],
-  "noTranslations": true,
   "enabledByDefault": false,
   "dynamicDisable": true,
   "dynamicEnable": true,

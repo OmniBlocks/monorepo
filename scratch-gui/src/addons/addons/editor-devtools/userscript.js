@@ -23,13 +23,6 @@ export default async function ({ addon, global, console, msg, safeMsg: m }) {
   </div>
 </div>
 <div id="s3devHelpContent">
-<!-- tw: we don't put this in because including "Scratch Addons" would probably violate BE/US policy :(
-<p>${m("help-title")} ${m("help-by", {
-    ndash: "&ndash;",
-    url: '<a target="_blank" rel="noreferrer noopener" href="https://www.youtube.com/griffpatch">Griffpatch</a>',
-  })}</p>
-<hr />
--->
 <h2><strong>${m("code-tab-features")}</strong></h2>
 <p dir="auto"><strong>${m("interactive-find-bar")}</strong> &ndash; ${m("interactive-find-bar-desc")}</p>
 <p dir="auto"><strong>${m("improved-tidy-up")}</strong> &ndash; ${m("improved-tidy-up-desc")}</p>

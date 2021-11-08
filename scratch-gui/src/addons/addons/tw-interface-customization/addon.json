@@ -1,4 +1,6 @@
 {
+  "editorOnly": true,
+  "noTranslations": true,
   "name": "Dangerous customizations",
   "description": "Obscure customization options that few people will want to use. Not recommended.",
   "userscripts": [
@@ -21,7 +23,6 @@
       }
     }
   ],
-  "onlyInEditor": true,
   "settings": [
     {
       "name": "Remove backpack",

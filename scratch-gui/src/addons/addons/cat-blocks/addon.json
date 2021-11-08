@@ -1,4 +1,6 @@
 {
+  "editorOnly": true,
+  "noTranslations": true,
   "name": "Cat blocks",
   "description": "Brings back editor cat hat blocks from April Fools 2020.",
   "credits": [
@@ -15,7 +17,6 @@
       "url": "userscript.js"
     }
   ],
-  "onlyInEditor": true,
   "info": [
     {
       "type": "warning",

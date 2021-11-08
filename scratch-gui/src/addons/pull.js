@@ -46,7 +46,7 @@ const walk = dir => {
 const repoPath = pathUtil.resolve(__dirname, 'ScratchAddons');
 if (!process.argv.includes('-')) {
     rimraf.sync(repoPath);
-    childProcess.execSync(`git clone --depth=1 -b tw https://github.com/GarboMuffin/ScratchAddons ${repoPath}`);
+    childProcess.execSync(`git clone --depth=1 https://github.com/TurboWarp/addons ${repoPath}`);
 }
 
 for (const folder of ['addons', 'addons-l10n', 'addons-l10n-settings', 'libraries']) {
@@ -286,7 +286,7 @@ const generateAddonEntries = () => generateEntries(
             // Include default addons in a single bundle
             name: manifest.enabledByDefault ? 'addon-default-entry' : `addon-entry-${id}`,
             // Include default addons useful outside of the editor in the original bundle, no request required
-            async: !(manifest.enabledByDefault && !manifest.onlyInEditor)
+            async: !(manifest.enabledByDefault && !manifest.editorOnly)
         };
     }
 );

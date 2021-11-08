@@ -1,4 +1,6 @@
 {
+  "editorOnly": true,
+  "noTranslations": true,
   "name": "Automatically add extensions",
   "description": "Auto-shows music, pen, and other extensions in the block category menu in the editor.",
   "userscripts": [
@@ -6,8 +8,6 @@
       "url": "userscript.js"
     }
   ],
-  "noTranslations": true,
-  "onlyInEditor": true,
   "settings": [
     {
       "name": "Music",

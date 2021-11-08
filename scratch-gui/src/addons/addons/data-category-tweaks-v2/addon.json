@@ -1,4 +1,5 @@
 {
+  "editorOnly": true,
   "name": "Data category tweaks",
   "description": "Provides tweaks for the Data (\"Variables\") block category.",
   "credits": [
@@ -11,28 +12,27 @@
       "url": "userscript.js"
     }
   ],
-  "onlyInEditor": true,
   "settings": [
     {
+      "dynamic": true,
       "name": "Separate List Category",
       "id": "separateListCategory",
       "type": "boolean",
-      "default": true,
-      "reloadRequired": false
+      "default": true
     },
     {
+      "dynamic": true,
       "name": "Separate Sprite-only Variables",
       "id": "separateLocalVariables",
       "type": "boolean",
-      "default": false,
-      "reloadRequired": false
+      "default": false
     },
     {
+      "dynamic": true,
       "name": "Move data blocks above variables list",
       "id": "moveReportersDown",
       "type": "boolean",
-      "default": false,
-      "reloadRequired": false
+      "default": false
     }
   ],
   "tags": [

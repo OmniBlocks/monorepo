@@ -1,4 +1,6 @@
 {
+  "editorOnly": true,
+  "noTranslations": true,
   "name": "Customizable block colors",
   "description": "Edit block colors for each category in the editor.",
   "credits": [
@@ -22,106 +24,105 @@
       "url": "theme3.css"
     }
   ],
-  "onlyInEditor": true,
-  "noTranslations": true,
   "settings": [
     {
+      "dynamic": true,
       "name": "motion",
       "id": "motion-color",
       "type": "color",
       "default": "#4C97FF",
-      "allowTransparency": true,
-      "reloadRequired": false
+      "allowTransparency": true
     },
     {
+      "dynamic": true,
       "name": "looks",
       "id": "looks-color",
       "type": "color",
       "default": "#9966FF",
-      "allowTransparency": true,
-      "reloadRequired": false
+      "allowTransparency": true
     },
     {
+      "dynamic": true,
       "name": "sounds",
       "id": "sounds-color",
       "type": "color",
       "default": "#CF63CF",
-      "allowTransparency": true,
-      "reloadRequired": false
+      "allowTransparency": true
     },
     {
+      "dynamic": true,
       "name": "events",
       "id": "events-color",
       "type": "color",
       "default": "#FFBF00",
-      "allowTransparency": true,
-      "reloadRequired": false
+      "allowTransparency": true
     },
     {
+      "dynamic": true,
       "name": "control",
       "id": "control-color",
       "type": "color",
       "default": "#FFAB19",
-      "allowTransparency": true,
-      "reloadRequired": false
+      "allowTransparency": true
     },
     {
+      "dynamic": true,
       "name": "sensing",
       "id": "sensing-color",
       "type": "color",
       "default": "#5CB1D6",
-      "allowTransparency": true,
-      "reloadRequired": false
+      "allowTransparency": true
     },
     {
+      "dynamic": true,
       "name": "operators",
       "id": "operators-color",
       "type": "color",
       "default": "#59C059",
-      "allowTransparency": true,
-      "reloadRequired": false
+      "allowTransparency": true
     },
     {
+      "dynamic": true,
       "name": "variables",
       "id": "data-color",
       "type": "color",
       "default": "#FF8C1A",
-      "allowTransparency": true,
-      "reloadRequired": false
+      "allowTransparency": true
     },
     {
+      "dynamic": true,
       "name": "lists",
       "id": "data-lists-color",
       "type": "color",
       "default": "#FF661A",
-      "allowTransparency": true,
-      "reloadRequired": false
+      "allowTransparency": true
     },
     {
+      "dynamic": true,
       "name": "custom",
       "id": "custom-color",
       "type": "color",
       "default": "#FF6680",
-      "allowTransparency": true,
-      "reloadRequired": false
+      "allowTransparency": true
     },
     {
+      "dynamic": true,
       "name": "extensions",
       "id": "Pen-color",
       "type": "color",
       "default": "#0FBD8C",
-      "allowTransparency": true,
-      "reloadRequired": false
+      "allowTransparency": true
     },
     {
+      "dynamic": true,
       "name": "TurboWarp",
       "id": "tw-color",
       "type": "color",
       "default": "#ff4c4c",
-      "allowTransparency": true,
-      "reloadRequired": false
+      "allowTransparency": true
     },
     {
+      "dynamic": true,
       "name": "Addon blocks",
       "id": "sa-color",
       "type": "color",
@@ -134,13 +135,14 @@
       }
     },
     {
+      "dynamic": true,
       "name": "Block inputs",
       "id": "input-color",
       "type": "color",
-      "default": "#FFFFFF",
-      "reloadRequired": false
+      "default": "#FFFFFF"
     },
     {
+      "dynamic": true,
       "name": "Text color",
       "id": "text",
       "type": "select",
@@ -162,8 +164,7 @@
           "id": "colorOnBlack",
           "name": "Colored on black background"
         }
-      ],
-      "reloadRequired": false
+      ]
     }
   ],
   "tags": [

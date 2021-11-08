@@ -80,7 +80,7 @@ export default async function ({ addon, global, console, msg }) {
     (changes) => {
       for (const change of changes) {
         const variable = rowToVariableMap.get(change.target);
-        variable.setVisible(change.intersectionRatio > 0);
+        variable.setVisible(change.isIntersecting);
       }
     },
     {

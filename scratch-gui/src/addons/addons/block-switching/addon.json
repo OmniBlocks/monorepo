@@ -1,4 +1,5 @@
 {
+  "editorOnly": true,
   "name": "Block switching",
   "description": "Right click on a block to switch it to a related block.",
   "credits": [
@@ -17,7 +18,6 @@
       "url": "userscript.js"
     }
   ],
-  "onlyInEditor": true,
   "tags": [
     "editor",
     "codeEditor",
@@ -25,72 +25,84 @@
   ],
   "settings": [
     {
+      "dynamic": true,
       "name": "Show option to change block to self",
       "id": "noop",
       "type": "boolean",
       "default": true
     },
     {
+      "dynamic": true,
       "name": "Add border",
       "id": "border",
       "type": "boolean",
       "default": true
     },
     {
+      "dynamic": true,
       "name": "Motion blocks",
       "id": "motion",
       "type": "boolean",
       "default": true
     },
     {
+      "dynamic": true,
       "name": "Looks blocks",
       "id": "looks",
       "type": "boolean",
       "default": true
     },
     {
+      "dynamic": true,
       "name": "Sound blocks",
       "id": "sound",
       "type": "boolean",
       "default": true
     },
     {
+      "dynamic": true,
       "name": "Event blocks",
       "id": "event",
       "type": "boolean",
       "default": true
     },
     {
+      "dynamic": true,
       "name": "Control blocks",
       "id": "control",
       "type": "boolean",
       "default": true
     },
     {
+      "dynamic": true,
       "name": "Operator blocks",
       "id": "operator",
       "type": "boolean",
       "default": true
     },
     {
+      "dynamic": true,
       "name": "Sensing blocks",
       "id": "sensing",
       "type": "boolean",
       "default": true
     },
     {
+      "dynamic": true,
       "name": "Data blocks",
       "id": "data",
       "type": "boolean",
       "default": true
     },
     {
+      "dynamic": true,
       "name": "Extension blocks",
       "id": "extension",
       "type": "boolean",
       "default": true
     },
     {
+      "dynamic": true,
       "name": "Addon blocks",
       "id": "sa",
       "type": "boolean",
@@ -102,12 +114,14 @@
       }
     },
     {
+      "dynamic": true,
       "name": "Custom block arguments",
       "id": "customargs",
       "type": "boolean",
       "default": true
     },
     {
+      "dynamic": true,
       "name": "Shown custom block arguments options",
       "id": "customargsmode",
       "type": "select",

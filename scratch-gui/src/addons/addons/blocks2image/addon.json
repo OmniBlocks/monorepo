@@ -1,4 +1,5 @@
 {
+  "editorOnly": true,
   "name": "Save blocks as image",
   "description": "Right click the code area to export blocks as SVG/PNG images.",
   "tags": [
@@ -15,6 +16,5 @@
       "url": "userscript.js"
     }
   ],
-  "onlyInEditor": true,
   "enabledByDefault": false
 }

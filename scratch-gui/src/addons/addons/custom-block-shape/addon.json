@@ -1,4 +1,6 @@
 {
+  "editorOnly": true,
+  "noTranslations": true,
   "name": "Customizable block shape",
   "description": "Adjust the padding, corner radius, and notch height of blocks.",
   "tags": [
@@ -27,8 +29,6 @@
       "url": "userscript.js"
     }
   ],
-  "onlyInEditor": true,
-  "noTranslations": true,
   "info": [
     {
       "type": "warning",
@@ -38,31 +38,31 @@
   ],
   "settings": [
     {
+      "dynamic": true,
       "name": "Padding size (50-200%)",
       "id": "paddingSize",
       "type": "integer",
       "min": 50,
       "default": 100,
-      "max": 200,
-      "reloadRequired": false
+      "max": 200
     },
     {
+      "dynamic": true,
       "name": "Corner size (0-300%)",
       "id": "cornerSize",
       "type": "integer",
       "min": 0,
       "default": 100,
-      "max": 300,
-      "reloadRequired": false
+      "max": 300
     },
     {
+      "dynamic": true,
       "name": "Notch height (0-150%)",
       "id": "notchSize",
       "type": "integer",
       "min": 0,
       "default": 100,
-      "max": 150,
-      "reloadRequired": false
+      "max": 150
     }
   ],
   "presets": [

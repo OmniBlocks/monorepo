@@ -1,4 +1,6 @@
 {
+  "editorOnly": true,
+  "noTranslations": true,
   "name": "Do not shift pasted items",
   "description": "Paste copied items at their original position instead of shifted slightly in the costume editor.",
   "credits": [
@@ -17,7 +19,5 @@
     "editor",
     "costumeEditor"
   ],
-  "onlyInEditor": true,
-  "noTranslations": true,
   "enabledByDefault": false
 }

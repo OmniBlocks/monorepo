@@ -1,4 +1,6 @@
 {
+  "editorOnly": true,
+  "noTranslations": true,
   "name": "Customizable new sprite position",
   "description": "Change the default x/y position of new sprites.",
   "credits": [
@@ -12,33 +14,31 @@
       "url": "userscript.js"
     }
   ],
-  "onlyInEditor": true,
-  "noTranslations": true,
   "settings": [
     {
+      "dynamic": true,
       "id": "x",
       "name": "X position",
       "type": "integer",
       "default": 0,
       "min": -240,
-      "max": 240,
-      "reloadRequired": false
+      "max": 240
     },
     {
+      "dynamic": true,
       "id": "y",
       "name": "Y position",
       "type": "integer",
       "default": 0,
       "min": -180,
-      "max": 180,
-      "reloadRequired": false
+      "max": 180
     },
     {
+      "dynamic": true,
       "id": "library",
       "name": "Randomize the position of library sprites",
       "type": "boolean",
-      "default": false,
-      "reloadRequired": false
+      "default": false
     }
   ],
   "tags": [

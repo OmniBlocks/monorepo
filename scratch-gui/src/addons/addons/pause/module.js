@@ -1,5 +1,6 @@
 import EventTarget from "../../event-target.js"; /* inserted by pull.js */
 
+// TW: TODO: this is a hack
 const vm = window.vm;
 
 export let paused = false;

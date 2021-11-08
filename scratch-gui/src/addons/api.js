@@ -770,7 +770,7 @@ class AddonRunner {
     }
 
     async run () {
-        if (this.manifest.onlyInEditor) {
+        if (this.manifest.editorOnly) {
             await untilInEditor();
         }
 

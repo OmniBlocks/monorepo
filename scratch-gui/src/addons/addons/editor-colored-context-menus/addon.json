@@ -1,4 +1,6 @@
 {
+  "editorOnly": true,
+  "noTranslations": true,
   "name": "Colored context menus",
   "description": "Makes block right click context menus colorful.",
   "credits": [
@@ -18,8 +20,6 @@
       "url": "userscript.css"
     }
   ],
-  "onlyInEditor": true,
-  "noTranslations": true,
   "tags": [
     "editor",
     "codeEditor",

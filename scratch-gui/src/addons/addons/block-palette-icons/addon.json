@@ -1,4 +1,5 @@
 {
+  "editorOnly": true,
   "name": "Block palette category icons",
   "description": "Adds icons inside the colored circles that identify block categories.",
   "tags": [
@@ -15,7 +16,6 @@
       "url": "userstyle.css"
     }
   ],
-  "onlyInEditor": true,
   "credits": [
     {
       "name": "--Explosion--",

@@ -1,4 +1,5 @@
 {
+  "editorOnly": true,
   "name": "Variable manager",
   "description": "Adds a tab next to \"sounds\" in the editor for easily updating variables and lists.",
   "credits": [
@@ -19,7 +20,6 @@
       "url": "style.css"
     }
   ],
-  "onlyInEditor": true,
   "dynamicEnable": true,
   "dynamicDisable": true,
   "tags": [

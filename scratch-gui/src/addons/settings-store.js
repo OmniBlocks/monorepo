@@ -216,7 +216,7 @@ class SettingsStore extends EventTargetShim {
                 detail: {
                     addonId,
                     settingId,
-                    reloadRequired: settingObject.reloadRequired !== false,
+                    reloadRequired: !settingObject.dynamic,
                     value
                 }
             }));

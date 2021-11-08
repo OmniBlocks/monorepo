@@ -948,8 +948,8 @@ class AddonSettingsComponent extends React.Component {
                                     {this.state.extended ?
                                         // Don't bother translating, pretty much no one will ever see this.
                                         // eslint-disable-next-line max-len
-                                        `You have enabled debug mode. v${upstreamMeta.version} (${upstreamMeta.commit})` :
-                                        `v${upstreamMeta.version}`}
+                                        `You have enabled debug mode. (Addons version ${upstreamMeta.commit})` :
+                                        `Addons version ${upstreamMeta.commit}`}
                                 </span>
                             </footer>
                         </>

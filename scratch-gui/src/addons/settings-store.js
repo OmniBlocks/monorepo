@@ -280,8 +280,8 @@ class SettingsStore extends EventTargetShim {
             core: {
                 // Upstream property. We don't use this.
                 lightTheme: theme === 'light',
-                // Append -tw to all versions, for example 1.8.0-prerelease-tw
-                version: `${upstreamMeta.version}-tw`
+                // Doesn't matter what we set this to
+                version: `v1.0.0-tw-${upstreamMeta.commit}`
             },
             addons: {}
         };

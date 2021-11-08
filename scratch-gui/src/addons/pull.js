@@ -330,11 +330,7 @@ fs.writeFileSync(pathUtil.resolve(generatedPath, 'l10n-settings-entries.js'), ge
 fs.writeFileSync(pathUtil.resolve(generatedPath, 'addon-entries.js'), generateAddonEntries(languages));
 fs.writeFileSync(pathUtil.resolve(generatedPath, 'addon-manifests.js'), generateAddonManifestEntries(languages));
 
-const extensionManifestPath = pathUtil.resolve(__dirname, 'ScratchAddons', 'manifest.json');
 const upstreamMetaPath = pathUtil.resolve(generatedPath, 'upstream-meta.json');
-const extensionManifest = JSON.parse(fs.readFileSync(extensionManifestPath, 'utf8'));
-const versionName = extensionManifest.version_name;
 fs.writeFileSync(upstreamMetaPath, JSON.stringify({
-    version: versionName,
     commit: commitHash
 }));

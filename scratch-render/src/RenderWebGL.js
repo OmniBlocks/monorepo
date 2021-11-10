@@ -218,8 +218,9 @@ class RenderWebGL extends EventEmitter {
         // tw: track id of pen skin
         this._penSkinId = null;
 
-        // tw: add high quality render option
         this.useHighQualityRender = false;
+
+        this.offscreenTouching = false;
 
         this.dirty = true;
 
@@ -1391,7 +1392,9 @@ class RenderWebGL extends EventEmitter {
         const bounds = drawable.getFastBounds();
 
         // Limit queries to the stage size.
-        bounds.clamp(this._xLeft, this._xRight, this._yBottom, this._yTop);
+        if (!this.offscreenTouching) {
+            bounds.clamp(this._xLeft, this._xRight, this._yBottom, this._yTop);
+        }
 
         // Use integer coordinates for queries - weird things happen
         // when you provide float width/heights to gl.viewport and projection.
@@ -1409,7 +1412,9 @@ class RenderWebGL extends EventEmitter {
         const drawable = this._allDrawables[drawableID];
         if (!drawable.skin || !drawable.skin.getTexture([100, 100])) return null;
         const bounds = drawable.getFastBounds();
-        bounds.clamp(this._xLeft, this._xRight, this._yBottom, this._yTop);
+        if (!this.offscreenTouching) {
+            bounds.clamp(this._xLeft, this._xRight, this._yBottom, this._yTop);
+        }
         if (bounds.width === 0 || bounds.height === 0) {
             return null;
         }

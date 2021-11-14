@@ -19,6 +19,7 @@ export default {
   "disable-stage-drag-select": () => import(/* webpackChunkName: "addon-entry-disable-stage-drag-select" */ "../addons/disable-stage-drag-select/_entry.js"),
   "drag-drop": () => require("../addons/drag-drop/_entry.js"),
   "editor-colored-context-menus": () => import(/* webpackChunkName: "addon-entry-editor-colored-context-menus" */ "../addons/editor-colored-context-menus/_entry.js"),
+  "editor-comment-previews": () => import(/* webpackChunkName: "addon-default-entry" */ "../addons/editor-comment-previews/_entry.js"),
   "editor-devtools": () => import(/* webpackChunkName: "addon-default-entry" */ "../addons/editor-devtools/_entry.js"),
   "editor-extra-keys": () => import(/* webpackChunkName: "addon-entry-editor-extra-keys" */ "../addons/editor-extra-keys/_entry.js"),
   "editor-searchable-dropdowns": () => import(/* webpackChunkName: "addon-default-entry" */ "../addons/editor-searchable-dropdowns/_entry.js"),

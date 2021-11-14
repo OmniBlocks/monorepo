@@ -19,6 +19,7 @@ export default {
   "disable-stage-drag-select": () => require("../addons/disable-stage-drag-select/addon.json"),
   "drag-drop": () => require("../addons/drag-drop/addon.json"),
   "editor-colored-context-menus": () => require("../addons/editor-colored-context-menus/addon.json"),
+  "editor-comment-previews": () => require("../addons/editor-comment-previews/addon.json"),
   "editor-devtools": () => require("../addons/editor-devtools/addon.json"),
   "editor-extra-keys": () => require("../addons/editor-extra-keys/addon.json"),
   "editor-searchable-dropdowns": () => require("../addons/editor-searchable-dropdowns/addon.json"),

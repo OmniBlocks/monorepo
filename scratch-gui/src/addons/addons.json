@@ -44,5 +44,6 @@
     "move-to-top-bottom",
     "disable-paste-offset",
     "block-duplicate",
+    "swap-local-global",
     "tw-interface-customization"
 ]

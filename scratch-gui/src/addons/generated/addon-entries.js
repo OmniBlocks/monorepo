@@ -42,6 +42,7 @@ export default {
   "pause": () => require("../addons/pause/_entry.js"),
   "remove-curved-stage-border": () => import(/* webpackChunkName: "addon-entry-remove-curved-stage-border" */ "../addons/remove-curved-stage-border/_entry.js"),
   "remove-sprite-confirm": () => import(/* webpackChunkName: "addon-entry-remove-sprite-confirm" */ "../addons/remove-sprite-confirm/_entry.js"),
+  "swap-local-global": () => import(/* webpackChunkName: "addon-entry-swap-local-global" */ "../addons/swap-local-global/_entry.js"),
   "transparent-orphans": () => import(/* webpackChunkName: "addon-entry-transparent-orphans" */ "../addons/transparent-orphans/_entry.js"),
   "tw-interface-customization": () => import(/* webpackChunkName: "addon-entry-tw-interface-customization" */ "../addons/tw-interface-customization/_entry.js"),
   "tw-project-info": () => import(/* webpackChunkName: "addon-entry-tw-project-info" */ "../addons/tw-project-info/_entry.js"),

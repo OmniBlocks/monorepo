@@ -42,6 +42,7 @@ export default {
   "pause": () => require("../addons/pause/addon.json"),
   "remove-curved-stage-border": () => require("../addons/remove-curved-stage-border/addon.json"),
   "remove-sprite-confirm": () => require("../addons/remove-sprite-confirm/addon.json"),
+  "swap-local-global": () => require("../addons/swap-local-global/addon.json"),
   "transparent-orphans": () => require("../addons/transparent-orphans/addon.json"),
   "tw-interface-customization": () => require("../addons/tw-interface-customization/addon.json"),
   "tw-project-info": () => require("../addons/tw-project-info/addon.json"),

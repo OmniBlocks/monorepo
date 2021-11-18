@@ -32,7 +32,8 @@
     }
   ],
   "tags": [
-    "theme"
+    "theme",
+    "danger"
   ],
   "enabledByDefault": false
 }

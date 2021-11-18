@@ -350,6 +350,11 @@ a:active, a:focus {
     background: #b117f8;
     border-color: #6f0073;
 }
+.tag-danger {
+    color: white;
+    background: #fd2b2b;
+    border-color: #d81212;
+}
 .tag-turbowarp {
     color: white;
     background: $motion-primary;

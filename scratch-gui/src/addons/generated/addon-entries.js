@@ -45,6 +45,7 @@ export default {
   "remove-sprite-confirm": () => import(/* webpackChunkName: "addon-entry-remove-sprite-confirm" */ "../addons/remove-sprite-confirm/_entry.js"),
   "swap-local-global": () => import(/* webpackChunkName: "addon-entry-swap-local-global" */ "../addons/swap-local-global/_entry.js"),
   "transparent-orphans": () => import(/* webpackChunkName: "addon-entry-transparent-orphans" */ "../addons/transparent-orphans/_entry.js"),
+  "tw-disable-compiler": () => import(/* webpackChunkName: "addon-entry-tw-disable-compiler" */ "../addons/tw-disable-compiler/_entry.js"),
   "tw-interface-customization": () => import(/* webpackChunkName: "addon-entry-tw-interface-customization" */ "../addons/tw-interface-customization/_entry.js"),
   "tw-project-info": () => import(/* webpackChunkName: "addon-entry-tw-project-info" */ "../addons/tw-project-info/_entry.js"),
   "variable-manager": () => import(/* webpackChunkName: "addon-entry-variable-manager" */ "../addons/variable-manager/_entry.js"),

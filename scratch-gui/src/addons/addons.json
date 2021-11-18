@@ -46,5 +46,6 @@
     "block-duplicate",
     "swap-local-global",
     "editor-comment-previews",
-    "tw-interface-customization"
+    "tw-interface-customization",
+    "tw-disable-compiler"
 ]

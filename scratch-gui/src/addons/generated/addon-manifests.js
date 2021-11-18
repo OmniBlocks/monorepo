@@ -45,6 +45,7 @@ export default {
   "remove-sprite-confirm": () => require("../addons/remove-sprite-confirm/addon.json"),
   "swap-local-global": () => require("../addons/swap-local-global/addon.json"),
   "transparent-orphans": () => require("../addons/transparent-orphans/addon.json"),
+  "tw-disable-compiler": () => require("../addons/tw-disable-compiler/addon.json"),
   "tw-interface-customization": () => require("../addons/tw-interface-customization/addon.json"),
   "tw-project-info": () => require("../addons/tw-project-info/addon.json"),
   "variable-manager": () => require("../addons/variable-manager/addon.json"),

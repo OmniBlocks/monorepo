@@ -196,11 +196,6 @@ const Tags = ({tags}) => tags.length > 0 && (
                 {settingsTranslations['tw.addons.settings.tags.danger']}
             </span>
         )}
-        {tags.includes('turbowarp') && (
-            <span className={classNames(styles.tag, styles.tagTurbowarp)}>
-                {'TurboWarp'}
-            </span>
-        )}
     </span>
 );
 Tags.propTypes = {

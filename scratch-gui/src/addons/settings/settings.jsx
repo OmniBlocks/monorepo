@@ -502,7 +502,15 @@ const Addon = ({
                     id={id}
                     aria-labelledby={`${id}-label`}
                     value={settings.enabled}
-                    onChange={value => SettingsStore.setAddonEnabled(id, value)}
+                    onChange={value => {
+                        if (
+                            !value ||
+                            !manifest.tags.includes('danger') ||
+                            confirm(settingsTranslations['tw.addons.settings.enableDangerous'])
+                        ) {
+                            SettingsStore.setAddonEnabled(id, value);
+                        }
+                    }}
                 />
             </div>
         </div>

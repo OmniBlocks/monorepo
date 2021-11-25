@@ -28,24 +28,28 @@
   ],
   "settings": [
     {
+      "dynamic": true,
       "name": "Hover collapsed comments to preview",
       "id": "hover-view",
       "type": "boolean",
       "default": true
     },
     {
+      "dynamic": true,
       "name": "Hover blocks to preview attached comments",
       "id": "hover-view-block",
       "type": "boolean",
       "default": true
     },
     {
+      "dynamic": true,
       "name": "Hover custom blocks to preview definition comments",
       "id": "hover-view-procedure",
       "type": "boolean",
       "default": true
     },
     {
+      "dynamic": true,
       "name": "Delay duration",
       "id": "delay",
       "type": "select",
@@ -66,18 +70,21 @@
       "default": "short"
     },
     {
+      "dynamic": true,
       "name": "Follow mouse",
       "id": "follow-mouse",
       "type": "boolean",
       "default": true
     },
     {
+      "dynamic": true,
       "name": "Reduce transparency",
       "id": "reduce-transparency",
       "type": "boolean",
       "default": false
     },
     {
+      "dynamic": true,
       "name": "Reduce animation",
       "id": "reduce-animation",
       "type": "boolean",

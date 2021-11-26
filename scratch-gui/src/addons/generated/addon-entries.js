@@ -25,6 +25,7 @@ export default {
   "editor-searchable-dropdowns": () => import(/* webpackChunkName: "addon-default-entry" */ "../addons/editor-searchable-dropdowns/_entry.js"),
   "editor-sounds": () => import(/* webpackChunkName: "addon-entry-editor-sounds" */ "../addons/editor-sounds/_entry.js"),
   "editor-stage-left": () => import(/* webpackChunkName: "addon-entry-editor-stage-left" */ "../addons/editor-stage-left/_entry.js"),
+  "editor-stepping": () => import(/* webpackChunkName: "addon-entry-editor-stepping" */ "../addons/editor-stepping/_entry.js"),
   "editor-theme3": () => import(/* webpackChunkName: "addon-entry-editor-theme3" */ "../addons/editor-theme3/_entry.js"),
   "folders": () => import(/* webpackChunkName: "addon-default-entry" */ "../addons/folders/_entry.js"),
   "gamepad": () => import(/* webpackChunkName: "addon-entry-gamepad" */ "../addons/gamepad/_entry.js"),

@@ -25,6 +25,7 @@ export default {
   "editor-searchable-dropdowns": () => require("../addons/editor-searchable-dropdowns/addon.json"),
   "editor-sounds": () => require("../addons/editor-sounds/addon.json"),
   "editor-stage-left": () => require("../addons/editor-stage-left/addon.json"),
+  "editor-stepping": () => require("../addons/editor-stepping/addon.json"),
   "editor-theme3": () => require("../addons/editor-theme3/addon.json"),
   "folders": () => require("../addons/folders/addon.json"),
   "gamepad": () => require("../addons/gamepad/addon.json"),

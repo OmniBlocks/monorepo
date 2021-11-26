@@ -47,5 +47,6 @@
     "swap-local-global",
     "editor-comment-previews",
     "tw-interface-customization",
-    "tw-disable-compiler"
+    "tw-disable-compiler",
+    "editor-stepping"
 ]

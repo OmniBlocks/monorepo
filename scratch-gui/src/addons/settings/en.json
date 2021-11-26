@@ -9,6 +9,7 @@
   "presets": "Presets",
   "tagRecommended": "Recommended",
   "tagDanger": "Dangerous",
+  "tagNoCompiler": "Only works with compiler disabled",
   "tagTheme": "Theme",
   "tagBeta": "Beta",
   "tagNew": "New!",

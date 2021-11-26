@@ -96,7 +96,7 @@ const groupAddons = () => {
         const manifest = manifests[index];
         if (manifest.tags.includes('new')) {
             groups.new.addons.push(index);
-        } else if (manifest.tags.includes('danger')) {
+        } else if (manifest.tags.includes('danger') || manifest.noCompiler) {
             groups.danger.addons.push(index);
         } else {
             groups.others.addons.push(index);
@@ -186,37 +186,45 @@ Select.propTypes = {
     }))
 };
 
-const Tags = ({tags}) => tags.length > 0 && (
+const Tags = ({manifest}) => (manifest.tags.length > 0 || manifest.noCompiler) && (
     <span className={styles.tagContainer}>
-        {tags.includes('recommended') && (
+        {manifest.tags.includes('recommended') && (
             <span className={classNames(styles.tag, styles.tagRecommended)}>
                 {settingsTranslations.tagRecommended}
             </span>
         )}
-        {tags.includes('theme') && (
+        {manifest.tags.includes('theme') && (
             <span className={classNames(styles.tag, styles.tagTheme)}>
                 {settingsTranslations.tagTheme}
             </span>
         )}
-        {tags.includes('beta') && (
+        {manifest.tags.includes('beta') && (
             <span className={classNames(styles.tag, styles.tagBeta)}>
                 {settingsTranslations.tagBeta}
             </span>
         )}
-        {tags.includes('new') && (
+        {manifest.tags.includes('new') && (
             <span className={classNames(styles.tag, styles.tagNew)}>
                 {settingsTranslations.tagNew}
             </span>
         )}
-        {tags.includes('danger') && (
+        {manifest.tags.includes('danger') && (
             <span className={classNames(styles.tag, styles.tagDanger)}>
                 {settingsTranslations.tagDanger}
+            </span>
+        )}
+        {manifest.noCompiler && (
+            <span className={classNames(styles.tag, styles.tagDanger)}>
+                {settingsTranslations.tagNoCompiler}
             </span>
         )}
     </span>
 );
 Tags.propTypes = {
-    tags: PropTypes.arrayOf(PropTypes.string)
+    manifest: PropTypes.shape({
+        tags: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,
+        noCompiler: PropTypes.bool
+    }).isRequired
 };
 
 class BufferedInput extends React.Component {
@@ -506,9 +514,7 @@ const Addon = ({
                     </div>
                 )}
             </label>
-            <Tags
-                tags={manifest.tags}
-            />
+            <Tags manifest={manifest} />
             {!settings.enabled && (
                 <div className={styles.inlineDescription}>
                     {addonTranslations[`${id}/@description`] || manifest.description}

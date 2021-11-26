@@ -50,10 +50,12 @@ a:active, a:focus {
     overflow: hidden;
 }
 
+.section {
+    max-width: 1280px;
+    margin: auto;
+}
+
 .header {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
     position: relative;
     padding: 8px 20px;
     background-color: #fcfcfc;
@@ -67,6 +69,11 @@ a:active, a:focus {
         padding-left: 5px;
         padding-right: 5px;
     }
+}
+.header .section {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
 }
 
 .button {
@@ -139,14 +146,8 @@ a:active, a:focus {
     background-color: #111111;
     border-color: #222222;
 }
-[theme="dark"] .search-button {
-    background-image: url("./search-white.svg");
-}
 .search-input:not([value=""]) ~ .search-button {
     background-image: url("./clear-black.svg") !important;
-}
-[theme="dark"] .search-input:not([value=""]) ~ .search-button {
-    background-image: url("./clear-white.svg") !important;
 }
 
 .feedback-button-outer {
@@ -177,6 +178,13 @@ a:active, a:focus {
     text-align: center;
 }
 
+[theme="dark"] .search-button,
+[theme="dark"] .addon-group-expand,
+[theme="dark"] .extension-image,
+[theme="dark"] .reset-button img {
+    filter: invert(100%);
+}
+
 .addons {
     overflow-y: auto;
     overflow-x: hidden;
@@ -188,6 +196,39 @@ a:active, a:focus {
         padding-left: 5px;
         padding-right: 5px;
     }
+}
+
+.addon-group {
+    margin: 0 0 10px 0;
+}
+.addon-group-name {
+    background: none;
+    border: none;
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+.addon-group-name::after {
+    margin-left: 16px;
+    content: '';
+    border-top: 1px solid #cfcfcf;
+    width: 100px;
+    flex: 1;
+}
+[theme="dark"] .addon-group-name::after {
+    border-color: #333;
+}
+.addon-group-expand {
+    width: 24px;
+    height: 24px;
+    margin-right: 8px;
+    border-radius: 5px;
+}
+.addon-group-expand[data-open="true"] {
+    transform: scaleY(-100%);
+}
+.addon-group-name:hover .addon-group-expand {
+    background: #ccc;
 }
 
 .addon {
@@ -228,6 +269,9 @@ a:active, a:focus {
     align-items: center;
     white-space: nowrap;
 }
+.addon-switch {
+    margin-right: 8px;
+}
 .addon-title-text {
 
 }
@@ -252,7 +296,6 @@ a:active, a:focus {
 
 .reset-button {
     display: flex;
-    margin-right: 8px;
     border-radius: 4px;
     cursor: pointer;
     border: none;
@@ -580,7 +623,7 @@ a:active, a:focus {
 .dirty-outer {
     display: flex;
     position: absolute;
-    top: calc(100% - 2px);
+    top: calc(100% - 8px);
     left: 0;
     width: calc(100% - 20px);
     margin-left: 10px;

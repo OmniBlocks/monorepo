@@ -19,7 +19,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
 import Search from './search';
-import importedAddons, {unsupportedAddons} from '../addon-manifests';
+import importedAddons from '../generated/addon-manifests';
 import messagesByLocale from '../generated/l10n-settings-entries';
 import settingsTranslationsEnglish from './en.json';
 import settingsTranslationsOther from './translations.json';
@@ -73,6 +73,23 @@ const postThrottledSettingsChange = store => {
     }, 100);
 };
 
+const filterAddonsBySupport = () => {
+    const supported = {};
+    const unsupported = {};
+    for (const [id, manifest] of Object.entries(importedAddons)) {
+        if (manifest.unsupported) {
+            unsupported[id] = manifest;
+        } else {
+            supported[id] = manifest;
+        }
+    }
+    return {
+        supported,
+        unsupported
+    };
+};
+const {supported: supportedAddons, unsupported: unsupportedAddons} = filterAddonsBySupport();
+
 const groupAddons = () => {
     const groups = {
         new: {
@@ -91,7 +108,7 @@ const groupAddons = () => {
             addons: []
         }
     };
-    const manifests = Object.values(importedAddons);
+    const manifests = Object.values(supportedAddons);
     for (let index = 0; index < manifests.length; index++) {
         const manifest = manifests[index];
         if (manifest.tags.includes('new')) {
@@ -104,7 +121,6 @@ const groupAddons = () => {
     }
     return groups;
 };
-
 const groupedAddons = groupAddons();
 
 const CreditList = ({credits}) => (
@@ -829,7 +845,7 @@ class AddonSettingsComponent extends React.Component {
             search: location.hash ? location.hash.substr(1) : '',
             extended: false
         };
-        for (const [id, manifest] of Object.entries(importedAddons)) {
+        for (const [id, manifest] of Object.entries(supportedAddons)) {
             const enabled = SettingsStore.getAddonEnabled(id);
             const addonState = {
                 enabled: enabled,
@@ -878,7 +894,7 @@ class AddonSettingsComponent extends React.Component {
         this.setState({
             dirty: false
         });
-        for (const addonId of Object.keys(importedAddons)) {
+        for (const addonId of Object.keys(supportedAddons)) {
             if (this.state[addonId].dirty) {
                 this.setState(state => ({
                     [addonId]: {
@@ -961,7 +977,7 @@ class AddonSettingsComponent extends React.Component {
         }
     }
     render () {
-        const addonState = Object.entries(importedAddons).map(([id, manifest]) => ({
+        const addonState = Object.entries(supportedAddons).map(([id, manifest]) => ({
             id,
             manifest,
             state: this.state[id]

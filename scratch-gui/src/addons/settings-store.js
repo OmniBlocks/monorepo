@@ -14,7 +14,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import addons from './addon-manifests';
+import addons from './generated/addon-manifests';
 import upstreamMeta from './generated/upstream-meta.json';
 import EventTargetShim from './event-target';
 
@@ -121,11 +121,14 @@ class SettingsStore extends EventTargetShim {
     }
 
     getAddonEnabled (addonId) {
+        const manifest = this.getAddonManifest(addonId);
+        if (manifest.unsupported) {
+            return false;
+        }
         const storage = this.getAddonStorage(addonId);
         if (storage.hasOwnProperty('enabled')) {
             return storage.enabled;
         }
-        const manifest = this.getAddonManifest(addonId);
         return !!manifest.enabledByDefault;
     }
 

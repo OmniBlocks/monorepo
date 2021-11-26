@@ -19,7 +19,7 @@ import SettingsStore from './settings-store-singleton';
 import dataURLToBlob from '../lib/data-uri-to-blob';
 import EventTargetShim from './event-target';
 import AddonHooks from './hooks';
-import addons from './addon-manifests';
+import addons from './generated/addon-manifests';
 import addonMessages from './addons-l10n/en.json';
 import l10nEntries from './generated/l10n-entries';
 import addonEntries from './generated/addon-entries';

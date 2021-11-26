@@ -169,10 +169,7 @@ const manifest = {
     }
   ],
   "tags": [
-    "editor",
-    "theme",
-    "codeEditor",
-    "featured"
+    "theme"
   ],
   "enabledByDefault": false,
   "presets": [

@@ -22,8 +22,6 @@ const manifest = {
     }
   ],
   "tags": [
-    "editor",
-    "projectPlayer",
     "recommended"
   ],
   "enabledByDefault": false

@@ -19,9 +19,6 @@ const manifest = {
     }
   ],
   "tags": [
-    "editor",
-    "codeEditor",
-    "featured",
     "beta",
     "new"
   ],

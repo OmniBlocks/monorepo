@@ -25,10 +25,7 @@ const manifest = {
       "url": "userscript.js"
     }
   ],
-  "tags": [
-    "editor",
-    "featured"
-  ],
+  "tags": [],
   "enabledByDefault": false,
   "dynamicDisable": true,
   "dynamicEnable": true

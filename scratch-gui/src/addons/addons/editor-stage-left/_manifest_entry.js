@@ -21,9 +21,7 @@ const manifest = {
     }
   ],
   "tags": [
-    "editor",
-    "theme",
-    "featured"
+    "theme"
   ],
   "enabledByDefault": false
 };

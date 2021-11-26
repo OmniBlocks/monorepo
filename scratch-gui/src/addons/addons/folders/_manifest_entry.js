@@ -31,7 +31,6 @@ const manifest = {
     }
   ],
   "tags": [
-    "editor",
     "recommended"
   ],
   "enabledByDefault": true

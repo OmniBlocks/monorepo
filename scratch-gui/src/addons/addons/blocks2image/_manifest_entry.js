@@ -3,10 +3,7 @@ const manifest = {
   "editorOnly": true,
   "name": "Save blocks as image",
   "description": "Right click the code area to export blocks as SVG/PNG images.",
-  "tags": [
-    "editor",
-    "codeEditor"
-  ],
+  "tags": [],
   "credits": [
     {
       "name": "summerscar"

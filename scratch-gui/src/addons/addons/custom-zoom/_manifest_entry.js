@@ -4,11 +4,7 @@ const manifest = {
   "noTranslations": true,
   "name": "Customizable code area zoom",
   "description": "Choose custom settings for the minimum, maximum, speed, and start size of the zoom of scripts in the code area, and autohide the controls.",
-  "tags": [
-    "editor",
-    "codeEditor",
-    "featured"
-  ],
+  "tags": [],
   "credits": [
     {
       "name": "ErrorGamer2000",

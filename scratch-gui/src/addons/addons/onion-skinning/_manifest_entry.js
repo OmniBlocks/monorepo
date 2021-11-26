@@ -103,8 +103,6 @@ const manifest = {
     }
   ],
   "tags": [
-    "editor",
-    "costumeEditor",
     "recommended"
   ],
   "dynamicEnable": true,

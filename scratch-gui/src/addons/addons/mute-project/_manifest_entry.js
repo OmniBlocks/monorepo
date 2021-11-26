@@ -16,8 +16,6 @@ const manifest = {
   ],
   "enabledByDefault": true,
   "tags": [
-    "editor",
-    "projectPlayer",
     "recommended"
   ]
 };

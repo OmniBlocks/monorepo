@@ -4,8 +4,6 @@ const manifest = {
   "name": "Extra key support",
   "description": "Adds more keys to the \"key () pressed?\" and \"when () key pressed\" block dropdowns, such as enter, dot, comma, and more.",
   "tags": [
-    "editor",
-    "codeEditor",
     "beta"
   ],
   "credits": [

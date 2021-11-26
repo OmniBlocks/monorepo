@@ -14,10 +14,7 @@ const manifest = {
   ],
   "dynamicEnable": true,
   "dynamicDisable": true,
-  "tags": [
-    "editor",
-    "codeEditor"
-  ],
+  "tags": [],
   "enabledByDefault": false
 };
 export default manifest;

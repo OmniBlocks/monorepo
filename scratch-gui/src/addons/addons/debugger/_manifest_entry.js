@@ -24,10 +24,7 @@ const manifest = {
       "url": "style.css"
     }
   ],
-  "tags": [
-    "editor",
-    "featured"
-  ],
+  "tags": [],
   "enabledByDefault": false
 };
 export default manifest;

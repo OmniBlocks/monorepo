@@ -21,8 +21,6 @@ const manifest = {
     }
   ],
   "tags": [
-    "editor",
-    "codeEditor",
     "recommended"
   ],
   "enabledByDefault": true

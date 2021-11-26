@@ -2,9 +2,7 @@
 const manifest = {
   "name": "Block count",
   "description": "Shows the number of blocks a project has.",
-  "tags": [
-    "community"
-  ],
+  "tags": [],
   "credits": [
     {
       "name": "TheColaber",

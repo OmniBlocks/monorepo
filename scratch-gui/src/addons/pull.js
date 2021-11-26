@@ -149,6 +149,13 @@ const includeImports = (folder, contents) => {
 };
 
 const generateManifestEntry = (id, manifest) => {
+    const KEEP_TAGS = [
+        'recommended',
+        'theme',
+        'beta',
+        'danger'
+    ];
+    manifest.tags = manifest.tags.filter(i => KEEP_TAGS.includes(i));
     if (newAddons.includes(id)) {
         manifest.tags.push('new');
     }

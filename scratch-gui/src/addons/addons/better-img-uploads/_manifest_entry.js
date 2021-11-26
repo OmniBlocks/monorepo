@@ -3,9 +3,7 @@ const manifest = {
   "name": "HD image uploads",
   "description": "Adds a new button above the \"upload costume\" button that automatically converts uploaded bitmap images into SVG (vector) images to avoid losing quality.",
   "tags": [
-    "editor",
-    "beta",
-    "costumeEditor"
+    "beta"
   ],
   "info": [
     {

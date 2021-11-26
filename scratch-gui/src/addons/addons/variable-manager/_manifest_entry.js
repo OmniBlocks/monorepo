@@ -23,10 +23,7 @@ const manifest = {
   ],
   "dynamicEnable": true,
   "dynamicDisable": true,
-  "tags": [
-    "editor",
-    "featured"
-  ],
+  "tags": [],
   "enabledByDefault": false
 };
 export default manifest;

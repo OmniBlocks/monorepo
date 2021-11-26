@@ -5,10 +5,7 @@ const manifest = {
   "name": "Customizable block shape",
   "description": "Adjust the padding, corner radius, and notch height of blocks.",
   "tags": [
-    "editor",
-    "codeEditor",
-    "theme",
-    "featured"
+    "theme"
   ],
   "credits": [
     {

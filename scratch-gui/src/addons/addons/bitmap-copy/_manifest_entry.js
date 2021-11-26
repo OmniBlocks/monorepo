@@ -18,10 +18,7 @@ const manifest = {
   ],
   "dynamicEnable": true,
   "dynamicDisable": true,
-  "tags": [
-    "editor",
-    "costumeEditor"
-  ],
+  "tags": [],
   "enabledByDefault": true
 };
 import {clipboardSupported} from "../../environment";

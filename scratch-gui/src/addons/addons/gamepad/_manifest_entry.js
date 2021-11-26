@@ -29,11 +29,7 @@ const manifest = {
       "id": "hide"
     }
   ],
-  "tags": [
-    "editor",
-    "projectPlayer",
-    "featured"
-  ],
+  "tags": [],
   "enabledByDefault": false,
   "dynamicEnable": true,
   "dynamicDisable": true

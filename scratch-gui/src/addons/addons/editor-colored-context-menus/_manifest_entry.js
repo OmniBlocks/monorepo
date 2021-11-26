@@ -22,10 +22,7 @@ const manifest = {
     }
   ],
   "tags": [
-    "editor",
-    "codeEditor",
-    "theme",
-    "featured"
+    "theme"
   ],
   "enabledByDefault": false
 };

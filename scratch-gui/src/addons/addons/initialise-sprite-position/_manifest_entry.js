@@ -42,10 +42,7 @@ const manifest = {
       "default": false
     }
   ],
-  "tags": [
-    "editor",
-    "featured"
-  ],
+  "tags": [],
   "enabledByDefault": false
 };
 export default manifest;

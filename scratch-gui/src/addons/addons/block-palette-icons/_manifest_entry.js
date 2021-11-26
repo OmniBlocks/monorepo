@@ -4,10 +4,7 @@ const manifest = {
   "name": "Block palette category icons",
   "description": "Adds icons inside the colored circles that identify block categories.",
   "tags": [
-    "editor",
-    "codeEditor",
-    "theme",
-    "featured"
+    "theme"
   ],
   "enabledByDefault": false,
   "dynamicEnable": true,

@@ -20,8 +20,6 @@ const manifest = {
     }
   ],
   "tags": [
-    "editor",
-    "codeEditor",
     "recommended"
   ],
   "settings": [

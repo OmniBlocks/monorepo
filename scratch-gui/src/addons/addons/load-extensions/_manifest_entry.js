@@ -35,10 +35,6 @@ const manifest = {
       "default": false
     }
   ],
-  "tags": [
-    "editor",
-    "codeEditor",
-    "featured"
-  ]
+  "tags": []
 };
 export default manifest;

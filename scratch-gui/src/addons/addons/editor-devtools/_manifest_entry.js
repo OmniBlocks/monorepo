@@ -49,9 +49,6 @@ const manifest = {
     }
   ],
   "tags": [
-    "editor",
-    "codeEditor",
-    "costumeEditor",
     "recommended"
   ],
   "enabledByDefault": true

@@ -14,11 +14,7 @@ const manifest = {
       "url": "userscript.js"
     }
   ],
-  "tags": [
-    "editor",
-    "codeEditor",
-    "featured"
-  ],
+  "tags": [],
   "dynamicDisable": true,
   "dynamicEnable": true
 };

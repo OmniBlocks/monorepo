@@ -4,10 +4,7 @@ const manifest = {
   "noTranslations": true,
   "name": "Block transparency",
   "description": "Adjust the transparency for blocks in the editor, with separate options for orphaned blocks (those without a hat block at the top) and blocks that are being dragged.",
-  "tags": [
-    "editor",
-    "codeEditor"
-  ],
+  "tags": [],
   "dynamicDisable": true,
   "dynamicEnable": true,
   "credits": [

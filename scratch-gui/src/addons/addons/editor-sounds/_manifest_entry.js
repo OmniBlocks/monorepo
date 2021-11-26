@@ -14,10 +14,7 @@ const manifest = {
       "url": "userscript.js"
     }
   ],
-  "tags": [
-    "editor",
-    "codeEditor"
-  ],
+  "tags": [],
   "enabledByDefault": false
 };
 export default manifest;

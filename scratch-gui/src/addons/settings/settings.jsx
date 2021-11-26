@@ -202,7 +202,7 @@ Select.propTypes = {
     }))
 };
 
-const Tags = ({manifest}) => (manifest.tags.length > 0 || manifest.noCompiler) && (
+const Tags = ({manifest}) => (
     <span className={styles.tagContainer}>
         {manifest.tags.includes('recommended') && (
             <span className={classNames(styles.tag, styles.tagRecommended)}>

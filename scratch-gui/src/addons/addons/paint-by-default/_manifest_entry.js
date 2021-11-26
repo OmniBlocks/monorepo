@@ -119,7 +119,6 @@ const manifest = {
   "dynamicEnable": true,
   "dynamicDisable": true,
   "tags": [
-    "editor",
     "recommended"
   ],
   "enabledByDefault": false

@@ -39,11 +39,7 @@ const manifest = {
       "default": false
     }
   ],
-  "tags": [
-    "editor",
-    "codeEditor",
-    "featured"
-  ],
+  "tags": [],
   "dynamicDisable": true,
   "dynamicEnable": true,
   "enabledByDefault": true

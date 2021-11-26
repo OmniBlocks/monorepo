@@ -19,11 +19,7 @@ const manifest = {
       "default": "#0000ff"
     }
   ],
-  "tags": [
-    "editor",
-    "codeEditor",
-    "featured"
-  ],
+  "tags": [],
   "enabledByDefault": false
 };
 export default manifest;

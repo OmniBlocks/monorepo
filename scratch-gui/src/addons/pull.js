@@ -286,7 +286,7 @@ const generateEntries = (items, callback) => {
     let importSection = '';
     let importCount = 0;
     let exportSection = 'export default {\n';
-    for (const i of items.sort()) {
+    for (const i of items) {
         const {src, name, type} = callback(i);
         if (type === 'lazy-import') {
             // eslint-disable-next-line max-len

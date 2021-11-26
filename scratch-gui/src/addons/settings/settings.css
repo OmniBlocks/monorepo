@@ -181,7 +181,8 @@ a:active, a:focus {
 [theme="dark"] .search-button,
 [theme="dark"] .addon-group-expand,
 [theme="dark"] .extension-image,
-[theme="dark"] .reset-button img {
+[theme="dark"] .reset-button img,
+[theme="dark"] .reset-color-button img {
     filter: invert(100%);
 }
 
@@ -531,6 +532,10 @@ a:active, a:focus {
     border-radius: 0 4px 4px 0px;
     box-sizing: border-box;
     height: 30px;
+}
+.reset-color-button img {
+    width: 20px;
+    height: 20px;
 }
 .select {
     display: flex;

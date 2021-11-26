@@ -370,8 +370,12 @@ const Setting = ({
                     <button
                         className={classNames(styles.button, styles.resetColorButton)}
                         onClick={() => SettingsStore.setAddonSetting(addonId, settingId, setting.default)}
+                        title={settingsTranslations.reset}
                     >
-                        {settingsTranslations.reset}
+                        <img
+                            src={undoImage}
+                            alt={settingsTranslations.reset}
+                        />
                     </button>
                 </React.Fragment>
             )}

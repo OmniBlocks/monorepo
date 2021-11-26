@@ -56,7 +56,8 @@ const addons = [
 
 const newAddons = [
     'swap-local-global',
-    'editor-comment-previews'
+    'editor-comment-previews',
+    'columns'
 ];
 
 // eslint-disable-next-line import/no-commonjs

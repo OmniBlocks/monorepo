@@ -225,7 +225,7 @@ a:active, a:focus {
     border-radius: 5px;
 }
 .addon-group-expand[data-open="true"] {
-    transform: scaleY(-100%);
+    transform: scaleY(-1);
 }
 .addon-group-name:hover .addon-group-expand {
     background: #ccc;

@@ -24,8 +24,7 @@ const childProcess = require('child_process');
 const rimraf = require('rimraf');
 const request = require('request');
 const pathUtil = require('path');
-const addons = require('./addons.json');
-const newAddons = require('./new-addons.json');
+const {addons, newAddons} = require('./addons.js');
 
 const walk = dir => {
     const children = fs.readdirSync(dir);

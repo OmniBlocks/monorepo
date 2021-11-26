@@ -843,8 +843,26 @@ class AddonSettingsComponent extends React.Component {
             loading: false,
             dirty: false,
             search: location.hash ? location.hash.substr(1) : '',
-            extended: false
+            extended: false,
+            ...this.readFullAddonState()
         };
+        if (Channels.changeChannel) {
+            Channels.changeChannel.addEventListener('message', () => {
+                SettingsStore.readLocalStorage();
+                this.setState(this.readFullAddonState());
+            });
+        }
+    }
+    componentDidMount () {
+        SettingsStore.addEventListener('setting-changed', this.handleSettingStoreChanged);
+        document.body.addEventListener('keydown', this.handleKeyDown);
+    }
+    componentWillUnmount () {
+        SettingsStore.removeEventListener('setting-changed', this.handleSettingStoreChanged);
+        document.body.removeEventListener('keydown', this.handleKeyDown);
+    }
+    readFullAddonState () {
+        const result = {};
         for (const [id, manifest] of Object.entries(supportedAddons)) {
             const enabled = SettingsStore.getAddonEnabled(id);
             const addonState = {
@@ -856,16 +874,9 @@ class AddonSettingsComponent extends React.Component {
                     addonState[setting.id] = SettingsStore.getAddonSetting(id, setting.id);
                 }
             }
-            this.state[id] = addonState;
+            result[id] = addonState;
         }
-    }
-    componentDidMount () {
-        SettingsStore.addEventListener('setting-changed', this.handleSettingStoreChanged);
-        document.body.addEventListener('keydown', this.handleKeyDown);
-    }
-    componentWillUnmount () {
-        SettingsStore.removeEventListener('setting-changed', this.handleSettingStoreChanged);
-        document.body.removeEventListener('keydown', this.handleKeyDown);
+        return result;
     }
     handleSettingStoreChanged (e) {
         const {addonId, settingId, value} = e.detail;

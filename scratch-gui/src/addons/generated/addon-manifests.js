@@ -10,45 +10,46 @@ import _import7 from "../addons/blocks2image/_manifest_entry.js";
 import _import8 from "../addons/cat-blocks/_manifest_entry.js";
 import _import9 from "../addons/clones/_manifest_entry.js";
 import _import10 from "../addons/color-picker/_manifest_entry.js";
-import _import11 from "../addons/custom-block-shape/_manifest_entry.js";
-import _import12 from "../addons/custom-zoom/_manifest_entry.js";
-import _import13 from "../addons/data-category-tweaks-v2/_manifest_entry.js";
-import _import14 from "../addons/debugger/_manifest_entry.js";
-import _import15 from "../addons/disable-paste-offset/_manifest_entry.js";
-import _import16 from "../addons/disable-stage-drag-select/_manifest_entry.js";
-import _import17 from "../addons/drag-drop/_manifest_entry.js";
-import _import18 from "../addons/editor-colored-context-menus/_manifest_entry.js";
-import _import19 from "../addons/editor-comment-previews/_manifest_entry.js";
-import _import20 from "../addons/editor-devtools/_manifest_entry.js";
-import _import21 from "../addons/editor-extra-keys/_manifest_entry.js";
-import _import22 from "../addons/editor-searchable-dropdowns/_manifest_entry.js";
-import _import23 from "../addons/editor-sounds/_manifest_entry.js";
-import _import24 from "../addons/editor-stage-left/_manifest_entry.js";
-import _import25 from "../addons/editor-stepping/_manifest_entry.js";
-import _import26 from "../addons/editor-theme3/_manifest_entry.js";
-import _import27 from "../addons/folders/_manifest_entry.js";
-import _import28 from "../addons/gamepad/_manifest_entry.js";
-import _import29 from "../addons/hide-delete-button/_manifest_entry.js";
-import _import30 from "../addons/hide-flyout/_manifest_entry.js";
-import _import31 from "../addons/hide-new-variables/_manifest_entry.js";
-import _import32 from "../addons/initialise-sprite-position/_manifest_entry.js";
-import _import33 from "../addons/load-extensions/_manifest_entry.js";
-import _import34 from "../addons/mediarecorder/_manifest_entry.js";
-import _import35 from "../addons/mouse-pos/_manifest_entry.js";
-import _import36 from "../addons/move-to-top-bottom/_manifest_entry.js";
-import _import37 from "../addons/mute-project/_manifest_entry.js";
-import _import38 from "../addons/no-script-bumping/_manifest_entry.js";
-import _import39 from "../addons/onion-skinning/_manifest_entry.js";
-import _import40 from "../addons/paint-by-default/_manifest_entry.js";
-import _import41 from "../addons/pause/_manifest_entry.js";
-import _import42 from "../addons/remove-curved-stage-border/_manifest_entry.js";
-import _import43 from "../addons/remove-sprite-confirm/_manifest_entry.js";
-import _import44 from "../addons/swap-local-global/_manifest_entry.js";
-import _import45 from "../addons/transparent-orphans/_manifest_entry.js";
-import _import46 from "../addons/tw-disable-compiler/_manifest_entry.js";
-import _import47 from "../addons/tw-interface-customization/_manifest_entry.js";
-import _import48 from "../addons/tw-project-info/_manifest_entry.js";
-import _import49 from "../addons/variable-manager/_manifest_entry.js";
+import _import11 from "../addons/columns/_manifest_entry.js";
+import _import12 from "../addons/custom-block-shape/_manifest_entry.js";
+import _import13 from "../addons/custom-zoom/_manifest_entry.js";
+import _import14 from "../addons/data-category-tweaks-v2/_manifest_entry.js";
+import _import15 from "../addons/debugger/_manifest_entry.js";
+import _import16 from "../addons/disable-paste-offset/_manifest_entry.js";
+import _import17 from "../addons/disable-stage-drag-select/_manifest_entry.js";
+import _import18 from "../addons/drag-drop/_manifest_entry.js";
+import _import19 from "../addons/editor-colored-context-menus/_manifest_entry.js";
+import _import20 from "../addons/editor-comment-previews/_manifest_entry.js";
+import _import21 from "../addons/editor-devtools/_manifest_entry.js";
+import _import22 from "../addons/editor-extra-keys/_manifest_entry.js";
+import _import23 from "../addons/editor-searchable-dropdowns/_manifest_entry.js";
+import _import24 from "../addons/editor-sounds/_manifest_entry.js";
+import _import25 from "../addons/editor-stage-left/_manifest_entry.js";
+import _import26 from "../addons/editor-stepping/_manifest_entry.js";
+import _import27 from "../addons/editor-theme3/_manifest_entry.js";
+import _import28 from "../addons/folders/_manifest_entry.js";
+import _import29 from "../addons/gamepad/_manifest_entry.js";
+import _import30 from "../addons/hide-delete-button/_manifest_entry.js";
+import _import31 from "../addons/hide-flyout/_manifest_entry.js";
+import _import32 from "../addons/hide-new-variables/_manifest_entry.js";
+import _import33 from "../addons/initialise-sprite-position/_manifest_entry.js";
+import _import34 from "../addons/load-extensions/_manifest_entry.js";
+import _import35 from "../addons/mediarecorder/_manifest_entry.js";
+import _import36 from "../addons/mouse-pos/_manifest_entry.js";
+import _import37 from "../addons/move-to-top-bottom/_manifest_entry.js";
+import _import38 from "../addons/mute-project/_manifest_entry.js";
+import _import39 from "../addons/no-script-bumping/_manifest_entry.js";
+import _import40 from "../addons/onion-skinning/_manifest_entry.js";
+import _import41 from "../addons/paint-by-default/_manifest_entry.js";
+import _import42 from "../addons/pause/_manifest_entry.js";
+import _import43 from "../addons/remove-curved-stage-border/_manifest_entry.js";
+import _import44 from "../addons/remove-sprite-confirm/_manifest_entry.js";
+import _import45 from "../addons/swap-local-global/_manifest_entry.js";
+import _import46 from "../addons/transparent-orphans/_manifest_entry.js";
+import _import47 from "../addons/tw-disable-compiler/_manifest_entry.js";
+import _import48 from "../addons/tw-interface-customization/_manifest_entry.js";
+import _import49 from "../addons/tw-project-info/_manifest_entry.js";
+import _import50 from "../addons/variable-manager/_manifest_entry.js";
 export default {
   "2d-color-picker": _import0,
   "better-img-uploads": _import1,
@@ -61,43 +62,44 @@ export default {
   "cat-blocks": _import8,
   "clones": _import9,
   "color-picker": _import10,
-  "custom-block-shape": _import11,
-  "custom-zoom": _import12,
-  "data-category-tweaks-v2": _import13,
-  "debugger": _import14,
-  "disable-paste-offset": _import15,
-  "disable-stage-drag-select": _import16,
-  "drag-drop": _import17,
-  "editor-colored-context-menus": _import18,
-  "editor-comment-previews": _import19,
-  "editor-devtools": _import20,
-  "editor-extra-keys": _import21,
-  "editor-searchable-dropdowns": _import22,
-  "editor-sounds": _import23,
-  "editor-stage-left": _import24,
-  "editor-stepping": _import25,
-  "editor-theme3": _import26,
-  "folders": _import27,
-  "gamepad": _import28,
-  "hide-delete-button": _import29,
-  "hide-flyout": _import30,
-  "hide-new-variables": _import31,
-  "initialise-sprite-position": _import32,
-  "load-extensions": _import33,
-  "mediarecorder": _import34,
-  "mouse-pos": _import35,
-  "move-to-top-bottom": _import36,
-  "mute-project": _import37,
-  "no-script-bumping": _import38,
-  "onion-skinning": _import39,
-  "paint-by-default": _import40,
-  "pause": _import41,
-  "remove-curved-stage-border": _import42,
-  "remove-sprite-confirm": _import43,
-  "swap-local-global": _import44,
-  "transparent-orphans": _import45,
-  "tw-disable-compiler": _import46,
-  "tw-interface-customization": _import47,
-  "tw-project-info": _import48,
-  "variable-manager": _import49,
+  "columns": _import11,
+  "custom-block-shape": _import12,
+  "custom-zoom": _import13,
+  "data-category-tweaks-v2": _import14,
+  "debugger": _import15,
+  "disable-paste-offset": _import16,
+  "disable-stage-drag-select": _import17,
+  "drag-drop": _import18,
+  "editor-colored-context-menus": _import19,
+  "editor-comment-previews": _import20,
+  "editor-devtools": _import21,
+  "editor-extra-keys": _import22,
+  "editor-searchable-dropdowns": _import23,
+  "editor-sounds": _import24,
+  "editor-stage-left": _import25,
+  "editor-stepping": _import26,
+  "editor-theme3": _import27,
+  "folders": _import28,
+  "gamepad": _import29,
+  "hide-delete-button": _import30,
+  "hide-flyout": _import31,
+  "hide-new-variables": _import32,
+  "initialise-sprite-position": _import33,
+  "load-extensions": _import34,
+  "mediarecorder": _import35,
+  "mouse-pos": _import36,
+  "move-to-top-bottom": _import37,
+  "mute-project": _import38,
+  "no-script-bumping": _import39,
+  "onion-skinning": _import40,
+  "paint-by-default": _import41,
+  "pause": _import42,
+  "remove-curved-stage-border": _import43,
+  "remove-sprite-confirm": _import44,
+  "swap-local-global": _import45,
+  "transparent-orphans": _import46,
+  "tw-disable-compiler": _import47,
+  "tw-interface-customization": _import48,
+  "tw-project-info": _import49,
+  "variable-manager": _import50,
 };

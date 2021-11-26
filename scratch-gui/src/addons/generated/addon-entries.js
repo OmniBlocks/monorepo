@@ -11,6 +11,7 @@ export default {
   "cat-blocks": () => import(/* webpackChunkName: "addon-entry-cat-blocks" */ "../addons/cat-blocks/_runtime_entry.js"),
   "clones": () => import(/* webpackChunkName: "addon-entry-clones" */ "../addons/clones/_runtime_entry.js"),
   "color-picker": () => import(/* webpackChunkName: "addon-default-entry" */ "../addons/color-picker/_runtime_entry.js"),
+  "columns": () => import(/* webpackChunkName: "addon-entry-columns" */ "../addons/columns/_runtime_entry.js"),
   "custom-block-shape": () => import(/* webpackChunkName: "addon-entry-custom-block-shape" */ "../addons/custom-block-shape/_runtime_entry.js"),
   "custom-zoom": () => import(/* webpackChunkName: "addon-entry-custom-zoom" */ "../addons/custom-zoom/_runtime_entry.js"),
   "data-category-tweaks-v2": () => import(/* webpackChunkName: "addon-entry-data-category-tweaks-v2" */ "../addons/data-category-tweaks-v2/_runtime_entry.js"),

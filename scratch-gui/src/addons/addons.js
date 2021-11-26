@@ -48,6 +48,7 @@ const addons = [
     'block-duplicate',
     'swap-local-global',
     'editor-comment-previews',
+    'columns',
     'tw-interface-customization',
     'tw-disable-compiler',
     'editor-stepping'

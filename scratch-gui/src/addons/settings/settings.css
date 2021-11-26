@@ -137,7 +137,7 @@ a:active, a:focus {
     outline: none;
     cursor: pointer;
     background-color: transparent;
-    background-image: url("./search-black.svg");
+    background-image: url("./search.svg");
     background-repeat: no-repeat;
     background-position: center;
 }
@@ -147,7 +147,7 @@ a:active, a:focus {
     border-color: #222222;
 }
 .search-input:not([value=""]) ~ .search-button {
-    background-image: url("./clear-black.svg") !important;
+    background-image: url("./clear.svg") !important;
 }
 
 .feedback-button-outer {

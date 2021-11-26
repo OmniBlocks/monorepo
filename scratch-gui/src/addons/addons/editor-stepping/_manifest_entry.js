@@ -12,6 +12,7 @@ const manifest = {
   ],
   "settings": [
     {
+      "dynamic": true,
       "name": "Highlight color",
       "id": "highlight-color",
       "type": "color",

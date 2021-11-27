@@ -44,6 +44,7 @@
         "tagBeta": "Beta",
         "tagDanger": "Gefährlich",
         "tagNew": "Neu!",
+        "tagNoCompiler": "Funktioniert nur mit deaktiviertem Compiler",
         "tagRecommended": "Empfohlen",
         "tagTheme": "Design",
         "title": "Addon-Einstellungen",

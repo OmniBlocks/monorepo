@@ -23,6 +23,7 @@
     color: $motion-primary;
     text-align: center;
     background: none;
+    pointer-events: none;
 }
 
 $fade-out-distance: 100px;

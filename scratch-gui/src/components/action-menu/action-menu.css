@@ -10,6 +10,7 @@ $more-button-size: 2.25rem;
     flex-direction: column-reverse;
     transition: 0.2s;
     position: relative;
+    pointer-events: auto;
 }
 
 .button {

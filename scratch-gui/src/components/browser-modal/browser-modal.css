@@ -22,7 +22,7 @@
     user-select: none;
     width: 500px;
 
-    color: $text-primary;
+    color: $text-primary-light;
     overflow: hidden;
 }
 

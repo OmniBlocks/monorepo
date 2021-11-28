@@ -3,7 +3,7 @@ import React from 'react';
 import ReactModal from 'react-modal';
 import Box from '../box/box.jsx';
 import {defineMessages, injectIntl, intlShape, FormattedMessage} from 'react-intl';
-import {isEvalSupported, isAudioContextSupported} from '../../lib/tw-environment-support-prober.js';
+import {canConstructNewFunctions, isAudioContextSupported} from '../../lib/tw-environment-support-prober.js';
 
 import styles from './browser-modal.css';
 import unhappyBrowser from './unsupported-browser.svg';
@@ -36,13 +36,11 @@ const BrowserModal = ({intl, ...props}) => {
                         <FormattedMessage {...label} />
                     </h2>
                     {/* eslint-disable max-len */}
-                    {isEvalSupported() ? null : (
+                    {canConstructNewFunctions() ? null : (
+                        // This message is only intended to be read by website operators
+                        // We don't need to make it translatable
                         <p>
-                            <FormattedMessage
-                                defaultMessage="A browser extension is interfering with TurboWarp's ability to compile scripts. Try turning off your adblocker and refreshing. This site does not contain advertisements."
-                                description="A message that can appear in the browser not supported modal"
-                                id="tw.browserModal.eval"
-                            />
+                            {'This site is unable to compile arbitrary JavaScript. This is most likely caused by an overly-strict Content-Security-Policy set by the server.'}
                         </p>
                     )}
                     {isAudioContextSupported() ? null : (

@@ -8,20 +8,21 @@ export const isRendererSupported = () => {
     return _isRendererSupported;
 };
 
-let _isEvalSupported = null;
-export const isEvalSupported = () => {
-    if (_isEvalSupported === null) {
-        /* eslint-disable */
-        let evalCheck = 0;
+let _canConstructNewFunctions = null;
+export const canConstructNewFunctions = () => {
+    if (_canConstructNewFunctions === null) {
         try {
-            eval('evalCheck=1');
-        } catch (e) { /* ignore */ }
-        _isEvalSupported = evalCheck === 1;
-        /* eslint-enable */
+            // This will throw if blocked by CSP
+            // eslint-disable-next-line no-new
+            new Function('');
+            _canConstructNewFunctions = true;
+        } catch (e) {
+            _canConstructNewFunctions = true;
+        }
     }
-    return _isEvalSupported;
+    return _canConstructNewFunctions;
 };
 
 export const isAudioContextSupported = () => !!(window.AudioContext || window.webkitAudioContext);
 
-export const isBrowserSupported = () => isEvalSupported() && isAudioContextSupported();
+export const isBrowserSupported = () => canConstructNewFunctions() && isAudioContextSupported();

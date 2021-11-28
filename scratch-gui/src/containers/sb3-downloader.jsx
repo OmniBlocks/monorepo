@@ -8,6 +8,7 @@ import {setProjectUnchanged} from '../reducers/project-changed';
 import {showStandardAlert, showAlertWithTimeout} from '../reducers/alerts';
 import {setFileHandle} from '../reducers/tw';
 import FileSystemAPI from '../lib/tw-filesystem-api';
+import {getIsShowingProject} from '../reducers/project-state';
 import log from '../lib/log';
 
 // from sb-file-uploader-hoc.jsx
@@ -55,6 +56,9 @@ class SB3Downloader extends React.Component {
         }
     }
     downloadProject () {
+        if (!this.props.canSaveProject) {
+            return;
+        }
         this.startedSaving();
         this.props.saveProjectSb3().then(content => {
             this.finishedSaving();
@@ -62,6 +66,9 @@ class SB3Downloader extends React.Component {
         });
     }
     async saveAsNew () {
+        if (!this.props.canSaveProject) {
+            return;
+        }
         try {
             const handle = await FileSystemAPI.showSaveFilePicker(this.props.projectFilename);
             await this.saveToHandle(handle);
@@ -88,6 +95,9 @@ class SB3Downloader extends React.Component {
         return this.saveAsNew();
     }
     async saveToHandle (handle) {
+        if (!this.props.canSaveProject) {
+            return;
+        }
         // Obtain the writable very early, otherwise browsers won't give us the handle when we ask.
         const writable = await FileSystemAPI.createWritable(handle);
         try {
@@ -147,6 +157,7 @@ SB3Downloader.propTypes = {
     onSaveFinished: PropTypes.func,
     projectFilename: PropTypes.string,
     saveProjectSb3: PropTypes.func,
+    canSaveProject: PropTypes.bool,
     onSetFileHandle: PropTypes.func,
     onSetProjectTitle: PropTypes.func,
     onShowSavingAlert: PropTypes.func,
@@ -161,6 +172,7 @@ SB3Downloader.defaultProps = {
 const mapStateToProps = state => ({
     fileHandle: state.scratchGui.tw.fileHandle,
     saveProjectSb3: state.scratchGui.vm.saveProjectSb3.bind(state.scratchGui.vm),
+    canSaveProject: getIsShowingProject(state.scratchGui.projectState.loadingState),
     projectFilename: getProjectFilename(state.scratchGui.projectTitle, projectTitleInitialState)
 });
 

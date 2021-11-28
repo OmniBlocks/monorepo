@@ -22,18 +22,32 @@ const manifest = {
       "type": "warning",
       "text": "The \"Shift keys\" include keys which typically require the Shift key and a number key, like hashtag, exclamation mark and more. These keys only work with the \"when () key pressed\" block and do not work on all operating systems or keyboard layouts.",
       "id": "shiftKeysWarn"
+    },
+    {
+      "type": "warning",
+      "text": "The \"TurboWarp keys\" will only work in TurboWarp, not in Scratch.",
+      "id": "shiftKeysWarn"
     }
   ],
   "settings": [
     {
+      "dynamic": true,
       "name": "Enable experimental keys",
       "id": "experimentalKeys",
       "type": "boolean",
       "default": false
     },
     {
+      "dynamic": true,
       "name": "Enable Shift keys",
       "id": "shiftKeys",
+      "type": "boolean",
+      "default": false
+    },
+    {
+      "dynamic": true,
+      "name": "Enable TurboWarp keys",
+      "id": "twKeys",
       "type": "boolean",
       "default": false
     }

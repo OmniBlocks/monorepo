@@ -56,6 +56,24 @@ export default async function ({ addon, global, cons, msg }) {
           ]
         );
       }
+      if (addon.settings.get("twKeys")) {
+        keys.push(
+          ...[
+            ["backspace", "backspace"],
+            ["delete", "delete"],
+            ["shift", "shift"],
+            ["caps lock", "caps lock"],
+            ["scroll lock", "scroll lock"],
+            ["control", "control"],
+            ["escape", "escape"],
+            ["insert", "insert"],
+            ["home", "home"],
+            ["end", "end"],
+            ["page up", "page up"],
+            ["page down", "page down"],
+          ]
+        );
+      }
     }
     return keys;
   }

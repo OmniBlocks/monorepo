@@ -2,4 +2,5 @@
 export const resources = {
   "remove-backpack.js": () => require("./remove-backpack.js"),
   "remove-backpack.css": () => require("!css-loader!./remove-backpack.css"),
+  "remove-feedback.css": () => require("!css-loader!./remove-feedback.css"),
 };

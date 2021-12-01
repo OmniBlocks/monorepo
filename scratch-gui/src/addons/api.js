@@ -197,7 +197,7 @@ const compareArrays = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 let _firstAddBlockRan = false;
 
 const contextMenuCallbacks = [];
-const CONTEXT_MENU_ORDER = ['editor-devtools', 'block-switching', 'blocks2image'];
+const CONTEXT_MENU_ORDER = ['editor-devtools', 'block-switching', 'blocks2image', 'swap-local-global'];
 let createdAnyBlockContextMenus = false;
 
 const getInternalKey = element => Object.keys(element).find(key => key.startsWith('__reactInternalInstance$'));

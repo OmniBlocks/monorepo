@@ -314,13 +314,12 @@ Blockly.ScratchBlockComment.prototype.autoPosition_ = function() {
         this.iconXY_.x + minimizedOffset;
     this.y_ = this.iconXY_.y - (Blockly.ScratchBubble.TOP_BAR_HEIGHT / 2);
   } else {
-    // Position comment so that the expanded bubble does not overlap
-    // blocks below it in the stack that are wider than this block
-    // Overhang is the difference between this blocks trailing edge and
-    // the largest block below (zero if this block is the widest)
-    var thisBlockWidth = Math.floor(this.block_.svgPath_.getBBox().width);
-    var fullStackWidth = Math.floor(this.block_.getHeightWidth().width);
-    var overhang = fullStackWidth - thisBlockWidth;
+    // TW: We remove comment overhang entirely. We've found that it tends
+    // to put comments very far away from their target block or even
+    // completely offscreen far too often. Users end up having to move
+    // the comment anyways, so let's do them a favor and not make them
+    // scroll to find the comment.
+    var overhang = 0;
     var offset = 8 * Blockly.BlockSvg.GRID_UNIT;
     this.x_ = this.block_.RTL ?
         this.iconXY_.x - this.width_ - overhang - offset :

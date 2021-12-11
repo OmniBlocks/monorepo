@@ -173,7 +173,7 @@ class Scratch3PenBlocks {
             if (penState) {
                 newTarget.setCustomState(Scratch3PenBlocks.STATE_KEY, Clone.simple(penState));
                 if (penState.penDown) {
-                    newTarget.addListener(RenderedTarget.EVENT_TARGET_MOVED, this._onTargetMoved);
+                    newTarget.onTargetMoved = this._onTargetMoved;
                 }
             }
         }
@@ -542,7 +542,7 @@ class Scratch3PenBlocks {
 
         if (!penState.penDown) {
             penState.penDown = true;
-            target.addListener(RenderedTarget.EVENT_TARGET_MOVED, this._onTargetMoved);
+            target.onTargetMoved = this._onTargetMoved;
         }
 
         const penSkinId = this._getPenLayerID();
@@ -565,7 +565,7 @@ class Scratch3PenBlocks {
 
         if (penState.penDown) {
             penState.penDown = false;
-            target.removeListener(RenderedTarget.EVENT_TARGET_MOVED, this._onTargetMoved);
+            target.onTargetMoved = null;
         }
     }
 

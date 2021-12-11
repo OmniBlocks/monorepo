@@ -162,6 +162,8 @@ class RenderedTarget extends Target {
          */
         this.textToSpeechLanguage = null;
 
+        this.onTargetMoved = null;
+
         this.interpolationData = null;
     }
 
@@ -205,14 +207,6 @@ class RenderedTarget extends Target {
      * Initialize the audio player for this sprite or clone.
      */
     initAudio () {
-    }
-
-    /**
-     * Event which fires when a target moves.
-     * @type {string}
-     */
-    static get EVENT_TARGET_MOVED () {
-        return 'TARGET_MOVED';
     }
 
     /**
@@ -286,7 +280,9 @@ class RenderedTarget extends Target {
             this.x = x;
             this.y = y;
         }
-        this.emitFast(RenderedTarget.EVENT_TARGET_MOVED, this, oldX, oldY, force);
+        if (this.onTargetMoved) {
+            this.onTargetMoved(this, oldX, oldY, force);
+        }
         this.runtime.requestTargetsUpdate(this);
     }
 

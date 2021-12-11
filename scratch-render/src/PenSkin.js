@@ -30,6 +30,9 @@ const DefaultPenAttributes = {
  */
 const __premultipliedColor = [0, 0, 0, 0];
 
+const PEN_BUFFER_SIZE_LARGER = 65520;
+const PEN_BUFFER_SIZE_SMALLER = 32760;
+
 class PenSkin extends Skin {
     /**
      * Create a Skin which implements a Scratch pen layer.
@@ -82,10 +85,10 @@ class PenSkin extends Skin {
 
         // tw: create the extra data structures needed to buffer pen
         this._resetAttributeIndexes();
-        this.a_lineColor = new Float32Array(65520);
-        this.a_lineThicknessAndLength = new Float32Array(32760);
-        this.a_penPoints = new Float32Array(65520);
-        this.a_position = new Float32Array(32760);
+        this.a_lineColor = new Float32Array(PEN_BUFFER_SIZE_LARGER);
+        this.a_lineThicknessAndLength = new Float32Array(PEN_BUFFER_SIZE_SMALLER);
+        this.a_penPoints = new Float32Array(PEN_BUFFER_SIZE_LARGER);
+        this.a_position = new Float32Array(PEN_BUFFER_SIZE_SMALLER);
         for (let i = 0; i < this.a_position.length; i += 12) {
             this.a_position[i + 0] = 1;
             this.a_position[i + 1] = 0;
@@ -330,7 +333,9 @@ class PenSkin extends Skin {
         this._renderer.enterDrawRegion(this._lineOnBufferDrawRegionId);
 
         // tw: flush if this line would overflow buffers
-        if (this.a_lineColorIndex + 24 > this.a_lineColor.length) {
+        // For some reason, looking up the size of a_lineColor with .length is very slow in some browsers.
+        // We see measurable performance improvements by comparing to a constant instead.
+        if (this.a_lineColorIndex + 24 > PEN_BUFFER_SIZE_LARGER) {
             this._flushLines();
         }
 

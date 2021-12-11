@@ -21,6 +21,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable prefer-template */
 /* eslint-disable valid-jsdoc */
+/* eslint-disable max-len */
 
 const globalState = {
     Timer: require('../util/timer'),
@@ -260,7 +261,7 @@ baseRuntime += `const isWhiteSpace = val => (
  * @param {*} v2 Second value
  * @returns {boolean} true if v1 is equal to v2
  */
-baseRuntime += `const compareEqual = (v1, v2) => {
+baseRuntime += `const compareEqualSlow = (v1, v2) => {
     let n1 = +v1;
     let n2 = +v2;
     if (n1 === 0 && isWhiteSpace(v1)) {
@@ -274,7 +275,8 @@ baseRuntime += `const compareEqual = (v1, v2) => {
         return s1 === s2;
     }
     return n1 === n2;
-};`;
+};
+const compareEqual = (v1, v2) => typeof v1 === 'number' && typeof v2 === 'number' && !isNaN(v1) && !isNaN(v2) ? v1 === v2 : compareEqualSlow(v1, v2);`;
 
 /**
  * Determine if one value is greater than another.
@@ -282,7 +284,7 @@ baseRuntime += `const compareEqual = (v1, v2) => {
  * @param {*} v2 Second value
  * @returns {boolean} true if v1 is greater than v2
  */
-runtimeFunctions.compareGreaterThan = `const compareGreaterThan = (v1, v2) => {
+runtimeFunctions.compareGreaterThan = `const compareGreaterThanSlow = (v1, v2) => {
     let n1 = +v1;
     let n2 = +v2;
     if (n1 === 0 && isWhiteSpace(v1)) {
@@ -296,7 +298,8 @@ runtimeFunctions.compareGreaterThan = `const compareGreaterThan = (v1, v2) => {
         return s1 > s2;
     }
     return n1 > n2;
-}`;
+};
+const compareGreaterThan = (v1, v2) => typeof v1 === 'number' && typeof v2 === 'number' && !isNaN(v1) && !isNaN(v2) ? v1 > v2 : compareGreaterThanSlow(v1, v2)`;
 
 /**
  * Determine if one value is less than another.
@@ -304,7 +307,7 @@ runtimeFunctions.compareGreaterThan = `const compareGreaterThan = (v1, v2) => {
  * @param {*} v2 Second value
  * @returns {boolean} true if v1 is less than v2
  */
-runtimeFunctions.compareLessThan = `const compareLessThan = (v1, v2) => {
+runtimeFunctions.compareLessThan = `const compareLessThanSlow = (v1, v2) => {
     let n1 = +v1;
     let n2 = +v2;
     if (n1 === 0 && isWhiteSpace(v1)) {
@@ -318,7 +321,8 @@ runtimeFunctions.compareLessThan = `const compareLessThan = (v1, v2) => {
         return s1 < s2;
     }
     return n1 < n2;
-}`;
+};
+const compareLessThan = (v1, v2) => typeof v1 === 'number' && typeof v2 === 'number' && !isNaN(v1) && !isNaN(v2) ? v1 < v2 : compareLessThanSlow(v1, v2)`;
 
 /**
  * Generate a random integer.
@@ -390,26 +394,27 @@ runtimeFunctions.distance = `const distance = menu => {
  * @param {number} length Length of the list.
  * @returns {number} 0 based list index, or -1 if invalid.
  */
-baseRuntime += `const listIndex = (index, length) => {
-    if (typeof index !== 'number') {
-        if (index === 'last') {
-            if (length > 0) {
-                return length - 1;
-            }
-            return -1;
-        } else if (index === 'random' || index === '*') {
-            if (length > 0) {
-                return (Math.random() * length) | 0;
-            }
-            return -1;
+baseRuntime += `const listIndexSlow = (index, length) => {
+    if (index === 'last') {
+        return length - 1;
+    } else if (index === 'random' || index === '*') {
+        if (length > 0) {
+            return (Math.random() * length) | 0;
         }
-        index = +index || 0;
+        return -1;
     }
-    index = index | 0;
+    index = (+index || 0) | 0;
     if (index < 1 || index > length) {
         return -1;
     }
     return index - 1;
+};
+const listIndex = (index, length) => {
+    if (typeof index !== 'number') {
+      return listIndexSlow(index, length);
+    }
+    index = index | 0;
+    return index < 1 || index > length ? -1 : index - 1;
 };`;
 
 /**
@@ -570,7 +575,7 @@ const insertRuntime = source => {
  * @returns {*} The result of evaluating the string.
  */
 const scopedEval = source => {
-        const withRuntime = insertRuntime(source);
+    const withRuntime = insertRuntime(source);
     try {
         return new Function('globalState', withRuntime)(globalState);
     } catch (e) {

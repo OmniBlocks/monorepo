@@ -106,6 +106,8 @@ class Scratch3PenBlocks {
      * @type {string}
      */
     static get STATE_KEY () {
+        // tw: We've hardcoded this value in various places for slight performance gains
+        // Make sure to update those if this changes.
         return 'Scratch.pen';
     }
 
@@ -150,7 +152,7 @@ class Scratch3PenBlocks {
      * @private
      */
     _getPenState (target) {
-        let penState = target.getCustomState(Scratch3PenBlocks.STATE_KEY);
+        let penState = target._customState['Scratch.pen'];
         if (!penState) {
             penState = Clone.simple(Scratch3PenBlocks.DEFAULT_PEN_STATE);
             target.setCustomState(Scratch3PenBlocks.STATE_KEY, penState);

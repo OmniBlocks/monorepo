@@ -18,7 +18,6 @@ const log = require('../util/log');
 const Cast = require('../util/cast');
 const VariablePool = require('./variable-pool');
 const jsexecute = require('./jsexecute');
-const {disableToString} = require('./util');
 const environment = require('./environment');
 
 // Imported for JSDoc types, not to actually use
@@ -277,20 +276,6 @@ class VariableInput {
         return false;
     }
 }
-
-// Running toString() on any of these methods is a mistake.
-disableToString(ConstantInput.prototype);
-disableToString(ConstantInput.prototype.asNumber);
-disableToString(ConstantInput.prototype.asString);
-disableToString(ConstantInput.prototype.asBoolean);
-disableToString(ConstantInput.prototype.asUnknown);
-disableToString(ConstantInput.prototype.asSafe);
-disableToString(TypedInput.prototype);
-disableToString(TypedInput.prototype.asNumber);
-disableToString(TypedInput.prototype.asString);
-disableToString(TypedInput.prototype.asBoolean);
-disableToString(TypedInput.prototype.asUnknown);
-disableToString(TypedInput.prototype.asSafe);
 
 const getNamesOfCostumesAndSounds = runtime => {
     const result = new Set();

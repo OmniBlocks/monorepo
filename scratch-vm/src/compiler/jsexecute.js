@@ -570,11 +570,11 @@ const insertRuntime = source => {
  * @returns {*} The result of evaluating the string.
  */
 const scopedEval = source => {
-    try {
         const withRuntime = insertRuntime(source);
+    try {
         return new Function('globalState', withRuntime)(globalState);
     } catch (e) {
-        globalState.log.error('was unable to compile script', source);
+        globalState.log.error('was unable to compile script', withRuntime);
         throw e;
     }
 };

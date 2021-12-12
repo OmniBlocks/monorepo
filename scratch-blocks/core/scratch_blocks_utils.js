@@ -50,21 +50,6 @@ Blockly.scratchBlocksUtils.measureText = function(fontSize, fontFamily,
 };
 
 /**
- * Encode a string's HTML entities.
- * E.g., <a> -> &lt;a&gt;
- * Does not exist in Blockly, but needed in scratch-blocks
- * @param {string} rawStr Unencoded raw string to encode.
- * @return {string} String with HTML entities encoded.
- * @package
- */
-Blockly.scratchBlocksUtils.encodeEntities = function(rawStr) {
-  // CC-BY-SA https://stackoverflow.com/questions/18749591/encode-html-entities-in-javascript
-  return rawStr.replace(/[\u00A0-\u9999<>&]/gim, function(i) {
-    return '&#' + i.charCodeAt(0) + ';';
-  });
-};
-
-/**
  * Re-assign obscured shadow blocks new IDs to prevent collisions
  * Scratch specific to help the VM handle deleting obscured shadows.
  * @param {Blockly.Block} block the root block to be processed.

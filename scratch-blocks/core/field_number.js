@@ -245,7 +245,7 @@ Blockly.FieldNumber.prototype.addButtons_ = function(contentDiv) {
         'background:' + buttonColour + ';' +
         'border: 1px solid ' + buttonBorderColour + ';');
     button.title = buttonText;
-    button.innerHTML = buttonText;
+    button.textContent = buttonText;
     Blockly.bindEvent_(button, 'mousedown', button,
         Blockly.FieldNumber.numPadButtonTouch);
     if (buttonText == '.' && !this.decimalAllowed_) {

@@ -44,7 +44,7 @@ class DragRecognizer {
     gestureInProgress () {
         return this._gestureState !== DragRecognizer.STATE_UNIDENTIFIED;
     }
-    
+
     reset () {
         this._unbindListeners();
         this._initialOffset = null;

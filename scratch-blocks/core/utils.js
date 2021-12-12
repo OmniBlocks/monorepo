@@ -806,48 +806,9 @@ Blockly.utils.wrapToText_ = function(words, wordBreaks) {
  * @return {boolean} true if 3D transforms are supported.
  */
 Blockly.utils.is3dSupported = function() {
-  if (Blockly.utils.is3dSupported.cached_ !== undefined) {
-    return Blockly.utils.is3dSupported.cached_;
-  }
-  // CC-BY-SA Lorenzo Polidori
-  // stackoverflow.com/questions/5661671/detecting-transform-translate3d-support
-  if (!goog.global.getComputedStyle) {
-    return false;
-  }
-
-  var el = document.createElement('p');
-  var has3d = 'none';
-  var transforms = {
-    'webkitTransform': '-webkit-transform',
-    'OTransform': '-o-transform',
-    'msTransform': '-ms-transform',
-    'MozTransform': '-moz-transform',
-    'transform': 'transform'
-  };
-
-  // Add it to the body to get the computed style.
-  document.body.insertBefore(el, null);
-
-  for (var t in transforms) {
-    if (el.style[t] !== undefined) {
-      el.style[t] = 'translate3d(1px,1px,1px)';
-      var computedStyle = goog.global.getComputedStyle(el);
-      if (!computedStyle) {
-        // getComputedStyle in Firefox returns null when blockly is loaded
-        // inside an iframe with display: none.  Returning false and not
-        // caching is3dSupported means we try again later.  This is most likely
-        // when users are interacting with blocks which should mean blockly is
-        // visible again.
-        // See https://bugzilla.mozilla.org/show_bug.cgi?id=548397
-        document.body.removeChild(el);
-        return false;
-      }
-      has3d = computedStyle.getPropertyValue(transforms[t]);
-    }
-  }
-  document.body.removeChild(el);
-  Blockly.utils.is3dSupported.cached_ = has3d !== 'none';
-  return Blockly.utils.is3dSupported.cached_;
+  // TW: Every browser we care about supports 3d. Don't bother checking.
+  // This saves about 0.5ms on every page load.
+  return true;
 };
 
 /**

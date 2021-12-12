@@ -37,6 +37,9 @@ class DragRecognizer {
     }
 
     start (event) {
+        if (typeof event.button === 'number' && event.button !== 0) {
+            return;
+        }
         this._initialOffset = getEventXY(event);
         this._bindListeners();
     }

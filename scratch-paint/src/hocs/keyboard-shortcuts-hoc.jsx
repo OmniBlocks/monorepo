@@ -67,8 +67,10 @@ const KeyboardShortcutsHOC = function (WrappedComponent) {
                 }
             } else if (event.metaKey || event.ctrlKey) {
                 if ((event.shiftKey && event.key.toLowerCase() === 'z') || event.key.toLowerCase() === 'y') {
+                    event.preventDefault();
                     this.props.onRedo();
                 } else if (event.key === 'z') {
+                    event.preventDefault();
                     this.props.onUndo();
                 } else if (event.shiftKey && event.key.toLowerCase() === 'g') {
                     if (shouldShowUngroup()) {

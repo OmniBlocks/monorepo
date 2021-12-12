@@ -353,6 +353,11 @@ Blockly.init_ = function(mainWorkspace) {
   var options = mainWorkspace.options;
   var svg = mainWorkspace.getParentSvg();
 
+  // This fixes wheel events in Safari.
+  // This makes no sense, but it really does work.
+  // https://bugs.webkit.org/show_bug.cgi?id=226683#c4
+  svg.parentNode.addEventListener('wheel', function() {});
+
   // Suppress the browser's context menu.
   Blockly.bindEventWithChecks_(svg.parentNode, 'contextmenu', null,
       function(e) {

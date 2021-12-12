@@ -243,11 +243,11 @@ Blockly.onKeyDown_ = function(e) {
         workspace.paste(Blockly.clipboardXml_);
         Blockly.Events.setGroup(false);
       }
-    } else if (e.keyCode == 90) {
-      // 'z' for undo 'Z' is for redo.
+    } else if (e.keyCode == 90 || e.keyCode === 89) {
+      // 'z' for undo 'Z' is for redo. 'y' is always redo.
       e.preventDefault();
       Blockly.hideChaff();
-      Blockly.mainWorkspace.undo(e.shiftKey);
+      Blockly.mainWorkspace.undo(e.shiftKey || e.keyCode === 89);
     }
   }
   // Common code for delete and cut.

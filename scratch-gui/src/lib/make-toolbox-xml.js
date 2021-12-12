@@ -732,7 +732,10 @@ const myBlocks = function () {
 };
 
 // eslint-disable-next-line max-len
-const turbowarpIsCompiledBlock = '<block type="argument_reporter_boolean"><field name="VALUE">is compiled?</field></block>';
+const extraTurboWarpBlocks = `
+<block type="argument_reporter_boolean"><field name="VALUE">is compiled?</field></block>
+<block type="argument_reporter_boolean"><field name="VALUE">is TurboWarp?</field></block>
+`;
 /* eslint-enable no-unused-vars */
 
 const xmlOpen = '<xml style="display: none">';
@@ -784,8 +787,8 @@ const makeToolboxXML = function (isInitialSetup, isStage = true, targetId, categ
     // Always display TurboWarp blocks as the first extension, if it exists,
     // and also add an "is compiled?" block to the top.
     let turbowarpXML = moveCategory('tw');
-    if (turbowarpXML && !turbowarpXML.includes(turbowarpIsCompiledBlock)) {
-        turbowarpXML = turbowarpXML.replace('<block', `${turbowarpIsCompiledBlock}<block`);
+    if (turbowarpXML && !turbowarpXML.includes(extraTurboWarpBlocks)) {
+        turbowarpXML = turbowarpXML.replace('<block', `${extraTurboWarpBlocks}<block`);
     }
 
     const everything = [

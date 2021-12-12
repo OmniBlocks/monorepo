@@ -66,7 +66,7 @@ const KeyboardShortcutsHOC = function (WrappedComponent) {
                     this.props.setSelectedItems(this.props.format);
                 }
             } else if (event.metaKey || event.ctrlKey) {
-                if (event.shiftKey && event.key.toLowerCase() === 'z') {
+                if ((event.shiftKey && event.key.toLowerCase() === 'z') || event.key.toLowerCase() === 'y') {
                     this.props.onRedo();
                 } else if (event.key === 'z') {
                     this.props.onUndo();

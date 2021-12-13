@@ -5,32 +5,35 @@ import {FormattedMessage} from 'react-intl';
 import styles from './framerate-indicator.css';
 
 const FramerateIndicator = ({framerate, interpolation}) => (
-    // do not show an indicator at 30 FPS with interpolation disabled
-    (framerate === 30 && !interpolation) ? null : (
-        <div className={styles.framerateContainer}>
-            <div className={styles.framerateLabel}>
-                {interpolation ? (
-                    <FormattedMessage
-                        defaultMessage="{framerate} FPS with interpolation"
-                        description="Label indicating project framerate when interpolation is enabled"
-                        id="tw.framerateIndicatorInterpolated"
-                        values={{
-                            framerate: framerate
-                        }}
-                    />
-                ) : (
+    <React.Fragment>
+        {/* 0 is technically a valid framerate that means "at monitor refresh rate" */}
+        {/* we won't display anything for that yet because we don't know how to explain it */}
+        {framerate !== 30 && framerate !== 0 && (
+            <div className={styles.framerateContainer}>
+                <div className={styles.framerateLabel}>
                     <FormattedMessage
                         defaultMessage="{framerate} FPS"
-                        description="Label indicating project framerate when interpolation is disabled"
-                        id="tw.framerateIndicator"
+                        description="Label to indicate custom framerate"
+                        id="tw.fps"
                         values={{
                             framerate: framerate
                         }}
                     />
-                )}
+                </div>
             </div>
-        </div>
-    )
+        )}
+        {interpolation && (
+            <div className={styles.framerateContainer}>
+                <div className={styles.framerateLabel}>
+                    <FormattedMessage
+                        defaultMessage="Interpolation"
+                        description="Label to indicate interpolation is enabled"
+                        id="tw.interpolationEnabled"
+                    />
+                </div>
+            </div>
+        )}
+    </React.Fragment>
 );
 
 FramerateIndicator.propTypes = {

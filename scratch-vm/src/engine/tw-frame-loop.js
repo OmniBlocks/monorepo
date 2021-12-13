@@ -22,17 +22,14 @@ const animationFrameWrapper = callback => {
     };
 };
 
-const DEFAULT_FRAMERATE = 60;
-
 class FrameLoop {
-    constructor (vm) {
+    constructor (runtime) {
         this.running = false;
-        this.framerate = DEFAULT_FRAMERATE;
-        this.interpolation = false;
-        this.stepTime = 1000 / DEFAULT_FRAMERATE;
+        this.setFramerate(60);
+        this.setInterpolation(false);
 
-        this.stepCallback = vm._step.bind(vm);
-        this.interpolationCallback = vm._renderInterpolatedPositions.bind(vm);
+        this.stepCallback = runtime._step.bind(runtime);
+        this.interpolationCallback = runtime._renderInterpolatedPositions.bind(runtime);
 
         this._stepInterval = null;
         this._interpolationAnimation = null;
@@ -41,6 +38,11 @@ class FrameLoop {
 
     setFramerate (fps) {
         this.framerate = fps;
+        if (fps === 0) {
+            this.stepTime = 1000 / 60;
+        } else {
+            this.stepTime = 1000 / this.framerate;
+        }
         this._restart();
     }
 
@@ -60,14 +62,12 @@ class FrameLoop {
         this.running = true;
         if (this.framerate === 0) {
             this._stepAnimation = animationFrameWrapper(this.stepCallback);
-            this.stepTime = 1000 / DEFAULT_FRAMERATE;
         } else {
             // Interpolation should never be enabled when framerate === 0 as that's just redundant
             if (this.interpolation) {
                 this._interpolationAnimation = animationFrameWrapper(this.interpolationCallback);
             }
             this._stepInterval = setInterval(this.stepCallback, 1000 / this.framerate);
-            this.stepTime = 1000 / this.framerate;
         }
     }
 

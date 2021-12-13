@@ -123,7 +123,7 @@ fs.readdirSync(executeDir)
             // Stop the runtime interval once the test is complete so the test
             // process may naturally exit.
             t.tearDown(() => {
-                clearInterval(vm.runtime._steppingInterval);
+                vm.stop();
             });
 
             // Report the text of SAY events as testing instructions.

@@ -446,16 +446,6 @@ const SettingsModalComponent = props => (
                 value={props.interpolation}
                 onChange={props.onInterpolationChange}
             />
-            {(props.framerate === 60 && props.interpolation) && (
-                <div className={styles.warning}>
-                    <FormattedMessage
-                        // eslint-disable-next-line max-len
-                        defaultMessage="Using 60 FPS and interpolation together can cause unexpected behavior. You most likely want to enable just 60 FPS or just interpolation, not both. If you're not sure which to use, try interpolation first."
-                        description="Settings modal warning when both 60 FPS mode and interpolation are enabled"
-                        id="tw.settingsModal.interp60Warning"
-                    />
-                </div>
-            )}
             <HighQualityPen
                 value={props.highQualityPen}
                 onChange={props.onHighQualityPenChange}

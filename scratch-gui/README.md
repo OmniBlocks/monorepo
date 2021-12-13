@@ -10,7 +10,7 @@ If you just want to play with the GUI then it's the same process as upstream scr
 
 TurboWarp's modifications to Scratch are licensed under the GNU General Public License v3.0. See LICENSE or https://www.gnu.org/licenses/ for details.
 
-Original license for scratch-gui:
+The following is the original license for scratch-gui, which we are required to retain. This is NOT the license of this project.
 
 ```
 Copyright (c) 2016, Massachusetts Institute of Technology

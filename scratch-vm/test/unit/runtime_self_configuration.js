@@ -16,7 +16,7 @@ test('Parses framerate', t => {
     const project = readFileToBuffer(path.resolve(__dirname, '../fixtures/tw-self-configuration/framerate.sb3'));
     const vm = makeVM();
     vm.loadProject(project).then(() => {
-        t.equal(vm.runtime.framerate, 40);
+        t.equal(vm.runtime.frameLoop.framerate, 40);
         t.end();
     });
 });

@@ -44,6 +44,7 @@ const defaultBlockPackages = {
 };
 
 const interpolate = require('./tw-interpolate');
+const FrameLoop = require('./tw-frame-loop');
 
 const defaultExtensionColors = ['#0FBD8C', '#0DA57A', '#0B8E69'];
 
@@ -176,14 +177,6 @@ let stepThreadsProfilerId = -1;
  */
 let rendererDrawProfilerId = -1;
 
-// Use setTimeout to polyfill requestAnimationFrame in Node environments
-const _requestAnimationFrame = typeof requestAnimationFrame === 'function' ?
-    requestAnimationFrame :
-    (f => setTimeout(f, 1000 / 60));
-const _cancelAnimationFrame = typeof requestAnimationFrame === 'function' ?
-    cancelAnimationFrame :
-    clearTimeout;
-
 /**
  * Manages targets, scripts, and the sequencer.
  * @constructor
@@ -313,11 +306,9 @@ class Runtime extends EventEmitter {
         this.turboMode = false;
 
         /**
-         * A reference to the current runtime stepping interval, set
-         * by a `setInterval`.
-         * @type {!number}
+         * tw: Responsible for managing the VM's many timers.
          */
-        this._steppingInterval = null;
+        this.frameLoop = new FrameLoop(this);
 
         /**
          * Current length of a step.
@@ -416,10 +407,6 @@ class Runtime extends EventEmitter {
 
         this._stageTarget = null;
 
-        // 60 to match default of compatibility mode off
-        // scratch-gui will set this to 30
-        this.framerate = 60;
-
         this.addonBlocks = {};
 
         this.stageWidth = Runtime.STAGE_WIDTH;
@@ -438,8 +425,6 @@ class Runtime extends EventEmitter {
 
         this.debug = false;
 
-        this._animationFrame = this._animationFrame.bind(this);
-        this._animationFrameId = null;
         this._lastStepTime = Date.now();
         this.interpolationEnabled = false;
     }
@@ -2186,9 +2171,7 @@ class Runtime extends EventEmitter {
         this.threadMap.clear();
     }
 
-    _animationFrame () {
-        this._animationFrameId = _requestAnimationFrame(this._animationFrame);
-
+    _renderInterpolatedPositions () {
         const frameStarted = this._lastStepTime;
         const now = Date.now();
         const timeSinceStart = now - frameStarted;
@@ -2268,7 +2251,8 @@ class Runtime extends EventEmitter {
                 this.profiler.start(rendererDrawProfilerId);
             }
             // tw: do not draw if document is hidden or a rAF loop is running
-            if (!document.hidden && this._animationFrameId === null) {
+            // Checking for the animation frame callback is more reliable than using interpolationEnabled in some edge cases
+            if (!document.hidden && !this.frameLoop._interpolationAnimation) {
                 this.renderer.draw();
             }
             if (this.profiler !== null) {
@@ -2353,14 +2337,9 @@ class Runtime extends EventEmitter {
      */
     setFramerate (framerate) {
         // Setting framerate to anything greater than this is unnecessary and can break the sequencer
-        // Additonally, the JS spec says intervals can't run more than once every 4ms anyways
+        // Additionally, the JS spec says intervals can't run more than once every 4ms (250/s) anyways
         if (framerate > 250) framerate = 250;
-        this.framerate = framerate;
-        if (this._steppingInterval) {
-            clearInterval(this._steppingInterval);
-            this._steppingInterval = null;
-            this.start();
-        }
+        this.frameLoop.setFramerate(framerate);
         this.emit(Runtime.FRAMERATE_CHANGED, framerate);
     }
 
@@ -2370,10 +2349,7 @@ class Runtime extends EventEmitter {
      */
     setInterpolation (interpolationEnabled) {
         this.interpolationEnabled = interpolationEnabled;
-        if (this._steppingInterval) {
-            this.stop();
-            this.start();
-        }
+        this.frameLoop.setInterpolation(this.interpolationEnabled);
         this.emit(Runtime.INTERPOLATION_CHANGED, interpolationEnabled);
     }
 
@@ -2519,7 +2495,7 @@ class Runtime extends EventEmitter {
 
     generateProjectOptions () {
         const options = {};
-        options.framerate = this.framerate;
+        options.framerate = this.frameLoop.framerate;
         options.runtimeOptions = this.runtimeOptions;
         options.interpolation = this.interpolationEnabled;
         options.turbo = this.turboMode;
@@ -2986,17 +2962,9 @@ class Runtime extends EventEmitter {
      */
     start () {
         // Do not start if we are already running
-        if (this._steppingInterval) return;
-
-        if (this.interpolationEnabled) {
-            this._animationFrameId = _requestAnimationFrame(this._animationFrame);
-        }
-
-        const interval = 1000 / this.framerate;
-        this.currentStepTime = interval;
-        this._steppingInterval = setInterval(() => {
-            this._step();
-        }, interval);
+        if (this.frameLoop.running) return;
+        this.currentStepTime = this.frameLoop.stepTime;
+        this.frameLoop.start();
         this.emit(Runtime.RUNTIME_STARTED);
     }
 
@@ -3005,18 +2973,10 @@ class Runtime extends EventEmitter {
      * Note: This only stops the loop. It will not stop any threads the next time the VM starts
      */
     stop () {
-        if (!this._steppingInterval) {
+        if (!this.frameLoop.running) {
             return;
         }
-        clearInterval(this._steppingInterval);
-        this._steppingInterval = null;
-
-        // tw: also cancel the animation frame loop
-        if (this._animationFrameId !== null) {
-            _cancelAnimationFrame(this._animationFrameId);
-            this._animationFrameId = null;
-        }
-
+        this.frameLoop.stop();
         this.emit(Runtime.RUNTIME_STOPPED);
     }
 

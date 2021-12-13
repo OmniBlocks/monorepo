@@ -214,21 +214,6 @@ test('Runtime cannot be started while already running', t => {
     t.end();
 });
 
-test('setCompatibilityMode restarts if it was already running', t => {
-    const rt = new Runtime();
-    rt.start(); // Start the first time
-
-    // Set up a flag/listener to check if it gets started again
-    let started = false;
-    rt.addListener('RUNTIME_STARTED', () => {
-        started = true;
-    });
-
-    rt.setCompatibilityMode(true);
-    t.equal(started, true);
-    t.end();
-});
-
 test('setCompatibilityMode does not restart if it was not running', t => {
     const rt = new Runtime();
 
@@ -242,22 +227,7 @@ test('setCompatibilityMode does not restart if it was not running', t => {
     t.end();
 });
 
-test('setFramerate restarts if it was already running', t => {
-    const rt = new Runtime();
-    rt.start(); // Start the first time
-
-    // Set up a flag/listener to check if it gets started again
-    let started = false;
-    rt.addListener('RUNTIME_STARTED', () => {
-        started = true;
-    });
-
-    rt.setFramerate(30);
-    t.equal(started, true);
-    t.end();
-});
-
-test('setFramerate does not restart if it was not running', t => {
+test('setFramerate does not emit start if runtime was not running', t => {
     const rt = new Runtime();
     let started = false;
     rt.addListener('RUNTIME_STARTED', () => {
@@ -268,7 +238,7 @@ test('setFramerate does not restart if it was not running', t => {
     t.end();
 });
 
-test('setFramrate emits an event', t => {
+test('setFramerate emits an event', t => {
     t.plan(1);
     const rt = new Runtime();
     rt.addListener('FRAMERATE_CHANGED', framerate => {
@@ -280,7 +250,7 @@ test('setFramrate emits an event', t => {
     t.end();
 });
 
-test('setFramrate and setCompatibilityMode do not emit a stop event', t => {
+test('setFramerate and setCompatibilityMode do not emit a stop event if not running', t => {
     const rt = new Runtime();
     rt.addListener('RUNTIME_STOPPED', () => {
         t.fail();
@@ -315,23 +285,6 @@ test('setInterpolation does not restart runtime if not running', t => {
     rt.setInterpolation(true);
     t.equal(started, false);
     t.equal(stopped, false);
-    t.end();
-});
-
-test('setInterpolation restarts runtime if it is running', t => {
-    const rt = new Runtime();
-    rt.start();
-    let started = false;
-    let stopped = false;
-    rt.addListener('RUNTIME_STARTED', () => {
-        started = true;
-    });
-    rt.addListener('RUNTIME_STOPPED', () => {
-        stopped = true;
-    });
-    rt.setInterpolation(true);
-    t.equal(started, true);
-    t.equal(stopped, true);
     t.end();
 });
 

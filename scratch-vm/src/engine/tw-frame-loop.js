@@ -39,11 +39,6 @@ class FrameLoop {
 
     setFramerate (fps) {
         this.framerate = fps;
-        if (fps === 0) {
-            this.runtime.currentStepTime = 1000 / 60;
-        } else {
-            this.runtime.currentStepTime = 1000 / this.framerate;
-        }
         this._restart();
     }
 
@@ -63,12 +58,14 @@ class FrameLoop {
         this.running = true;
         if (this.framerate === 0) {
             this._stepAnimation = animationFrameWrapper(this.stepCallback);
+            this.runtime.currentStepTime = 1000 / 60;
         } else {
             // Interpolation should never be enabled when framerate === 0 as that's just redundant
             if (this.interpolation) {
                 this._interpolationAnimation = animationFrameWrapper(this.interpolationCallback);
             }
             this._stepInterval = setInterval(this.stepCallback, 1000 / this.framerate);
+            this.runtime.currentStepTime = 1000 / this.framerate;
         }
     }
 

@@ -2251,7 +2251,8 @@ class Runtime extends EventEmitter {
                 this.profiler.start(rendererDrawProfilerId);
             }
             // tw: do not draw if document is hidden or a rAF loop is running
-            // Checking for the animation frame callback is more reliable than using interpolationEnabled in some edge cases
+            // Checking for the animation frame loop is more reliable than using
+            // interpolationEnabled in some edge cases
             if (!document.hidden && !this.frameLoop._interpolationAnimation) {
                 this.renderer.draw();
             }
@@ -2963,7 +2964,6 @@ class Runtime extends EventEmitter {
     start () {
         // Do not start if we are already running
         if (this.frameLoop.running) return;
-        this.currentStepTime = this.frameLoop.stepTime;
         this.frameLoop.start();
         this.emit(Runtime.RUNTIME_STARTED);
     }

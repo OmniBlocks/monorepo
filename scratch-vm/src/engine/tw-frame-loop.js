@@ -24,6 +24,7 @@ const animationFrameWrapper = callback => {
 
 class FrameLoop {
     constructor (runtime) {
+        this.runtime = runtime;
         this.running = false;
         this.setFramerate(60);
         this.setInterpolation(false);
@@ -39,9 +40,9 @@ class FrameLoop {
     setFramerate (fps) {
         this.framerate = fps;
         if (fps === 0) {
-            this.stepTime = 1000 / 60;
+            this.runtime.currentStepTime = 1000 / 60;
         } else {
-            this.stepTime = 1000 / this.framerate;
+            this.runtime.currentStepTime = 1000 / this.framerate;
         }
         this._restart();
     }

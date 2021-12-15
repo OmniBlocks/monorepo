@@ -735,25 +735,25 @@ class AddonRunner {
         if (this.loading) {
             return;
         }
-        this.publicAPI.addon.self.dispatchEvent(new CustomEvent('reenabled'));
-        this.publicAPI.addon.self.disabled = false;
         this.appendStylesheets();
         if (this.disabledStylesheet) {
             this.disabledStylesheet.remove();
             this.disabledStylesheet = null;
         }
+        this.publicAPI.addon.self.disabled = false;
+        this.publicAPI.addon.self.dispatchEvent(new CustomEvent('reenabled'));
     }
 
     dynamicDisable () {
         if (this.loading) {
             return;
         }
-        this.publicAPI.addon.self.dispatchEvent(new CustomEvent('disabled'));
-        this.publicAPI.addon.self.disabled = true;
         this.removeStylesheets();
         const disabledCSS = `.${getDisplayNoneWhileDisabledClass(this.id)}{display:none !important;}`;
         this.disabledStylesheet = createStylesheet(disabledCSS);
         document.body.insertBefore(this.disabledStylesheet, document.body.firstChild);
+        this.publicAPI.addon.self.disabled = true;
+        this.publicAPI.addon.self.dispatchEvent(new CustomEvent('disabled'));
     }
 
     removeStylesheets () {

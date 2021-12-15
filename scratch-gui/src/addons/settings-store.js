@@ -19,7 +19,39 @@ import upstreamMeta from './generated/upstream-meta.json';
 import EventTargetShim from './event-target';
 
 const SETTINGS_KEY = 'tw:addons';
-const VERSION = 1;
+const VERSION = 2;
+
+const migrateSettings = settings => {
+    const oldVersion = settings._;
+    if (oldVersion === VERSION || !oldVersion) {
+        return settings;
+    }
+    // Migrate 1 -> 2
+    // tw-project-info is now block-count
+    // tw-interface-customization split into tw-remove-backpack and tw-remove-feedback
+    if (oldVersion < 2) {
+        const projectInfo = settings['tw-project-info'];
+        if (projectInfo && projectInfo.enabled) {
+            settings['block-count'] = {
+                enabled: true
+            };
+        }
+        const interfaceCustomization = settings['tw-interface-customization'];
+        if (interfaceCustomization && interfaceCustomization.enabled) {
+            if (interfaceCustomization.removeBackpack) {
+                settings['tw-remove-backpack'] = {
+                    enabled: true
+                };
+            }
+            if (interfaceCustomization.removeFeedback) {
+                settings['tw-remove-feedback'] = {
+                    enabled: true
+                };
+            }
+        }
+    }
+    return settings;
+};
 
 class SettingsStore extends EventTargetShim {
     constructor () {
@@ -44,8 +76,9 @@ class SettingsStore extends EventTargetShim {
         try {
             const local = localStorage.getItem(SETTINGS_KEY);
             if (local) {
-                const result = JSON.parse(local);
-                if (result && typeof result === 'object' && result._ === VERSION) {
+                let result = JSON.parse(local);
+                if (result && typeof result === 'object') {
+                    result = migrateSettings(result);
                     for (const key of Object.keys(result)) {
                         if (base.hasOwnProperty(key)) {
                             const value = result[key];

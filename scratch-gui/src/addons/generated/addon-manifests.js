@@ -14,7 +14,7 @@ import _import11 from "../addons/clones/_manifest_entry.js";
 import _import12 from "../addons/mouse-pos/_manifest_entry.js";
 import _import13 from "../addons/color-picker/_manifest_entry.js";
 import _import14 from "../addons/remove-sprite-confirm/_manifest_entry.js";
-import _import15 from "../addons/tw-project-info/_manifest_entry.js";
+import _import15 from "../addons/block-count/_manifest_entry.js";
 import _import16 from "../addons/onion-skinning/_manifest_entry.js";
 import _import17 from "../addons/bitmap-copy/_manifest_entry.js";
 import _import18 from "../addons/2d-color-picker/_manifest_entry.js";
@@ -47,9 +47,10 @@ import _import44 from "../addons/block-duplicate/_manifest_entry.js";
 import _import45 from "../addons/swap-local-global/_manifest_entry.js";
 import _import46 from "../addons/editor-comment-previews/_manifest_entry.js";
 import _import47 from "../addons/columns/_manifest_entry.js";
-import _import48 from "../addons/tw-interface-customization/_manifest_entry.js";
-import _import49 from "../addons/tw-disable-compiler/_manifest_entry.js";
-import _import50 from "../addons/editor-stepping/_manifest_entry.js";
+import _import48 from "../addons/tw-remove-backpack/_manifest_entry.js";
+import _import49 from "../addons/tw-remove-feedback/_manifest_entry.js";
+import _import50 from "../addons/tw-disable-compiler/_manifest_entry.js";
+import _import51 from "../addons/editor-stepping/_manifest_entry.js";
 export default {
   "cat-blocks": _import0,
   "editor-devtools": _import1,
@@ -66,7 +67,7 @@ export default {
   "mouse-pos": _import12,
   "color-picker": _import13,
   "remove-sprite-confirm": _import14,
-  "tw-project-info": _import15,
+  "block-count": _import15,
   "onion-skinning": _import16,
   "bitmap-copy": _import17,
   "2d-color-picker": _import18,
@@ -99,7 +100,8 @@ export default {
   "swap-local-global": _import45,
   "editor-comment-previews": _import46,
   "columns": _import47,
-  "tw-interface-customization": _import48,
-  "tw-disable-compiler": _import49,
-  "editor-stepping": _import50,
+  "tw-remove-backpack": _import48,
+  "tw-remove-feedback": _import49,
+  "tw-disable-compiler": _import50,
+  "editor-stepping": _import51,
 };

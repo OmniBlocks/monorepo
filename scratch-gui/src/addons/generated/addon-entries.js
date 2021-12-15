@@ -15,7 +15,7 @@ export default {
   "mouse-pos": () => import(/* webpackChunkName: "addon-entry-mouse-pos" */ "../addons/mouse-pos/_runtime_entry.js"),
   "color-picker": () => import(/* webpackChunkName: "addon-default-entry" */ "../addons/color-picker/_runtime_entry.js"),
   "remove-sprite-confirm": () => import(/* webpackChunkName: "addon-entry-remove-sprite-confirm" */ "../addons/remove-sprite-confirm/_runtime_entry.js"),
-  "tw-project-info": () => import(/* webpackChunkName: "addon-entry-tw-project-info" */ "../addons/tw-project-info/_runtime_entry.js"),
+  "block-count": () => import(/* webpackChunkName: "addon-entry-block-count" */ "../addons/block-count/_runtime_entry.js"),
   "onion-skinning": () => import(/* webpackChunkName: "addon-default-entry" */ "../addons/onion-skinning/_runtime_entry.js"),
   "bitmap-copy": () => import(/* webpackChunkName: "addon-default-entry" */ "../addons/bitmap-copy/_runtime_entry.js"),
   "2d-color-picker": () => import(/* webpackChunkName: "addon-entry-2d-color-picker" */ "../addons/2d-color-picker/_runtime_entry.js"),
@@ -48,7 +48,8 @@ export default {
   "swap-local-global": () => import(/* webpackChunkName: "addon-entry-swap-local-global" */ "../addons/swap-local-global/_runtime_entry.js"),
   "editor-comment-previews": () => import(/* webpackChunkName: "addon-default-entry" */ "../addons/editor-comment-previews/_runtime_entry.js"),
   "columns": () => import(/* webpackChunkName: "addon-entry-columns" */ "../addons/columns/_runtime_entry.js"),
-  "tw-interface-customization": () => import(/* webpackChunkName: "addon-entry-tw-interface-customization" */ "../addons/tw-interface-customization/_runtime_entry.js"),
+  "tw-remove-backpack": () => import(/* webpackChunkName: "addon-entry-tw-remove-backpack" */ "../addons/tw-remove-backpack/_runtime_entry.js"),
+  "tw-remove-feedback": () => import(/* webpackChunkName: "addon-entry-tw-remove-feedback" */ "../addons/tw-remove-feedback/_runtime_entry.js"),
   "tw-disable-compiler": () => import(/* webpackChunkName: "addon-entry-tw-disable-compiler" */ "../addons/tw-disable-compiler/_runtime_entry.js"),
   "editor-stepping": () => import(/* webpackChunkName: "addon-entry-editor-stepping" */ "../addons/editor-stepping/_runtime_entry.js"),
 };

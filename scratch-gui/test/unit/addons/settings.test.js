@@ -444,3 +444,21 @@ test('parseSearchParameter', () => {
     expect(store.getAddonEnabled('remove-curved-stage-border')).toBe(true);
     expect(store.remote).toBe(true);
 });
+
+test('Settings migration 1 -> 2', () => {
+    const store = new SettingStore();
+
+    // eslint-disable-next-line max-len
+    global.localStorage.getItem = () => `{"_":1,"tw-project-info":{"enabled":false},"tw-interface-customization":{"enabled":false,"removeFeedback":true,"removeBackpack":true}}`;
+    store.readLocalStorage();
+    expect(store.getAddonEnabled('block-count')).toBe(false);
+    expect(store.getAddonEnabled('tw-remove-backpack')).toBe(false);
+    expect(store.getAddonEnabled('tw-remove-feedback')).toBe(false);
+
+    // eslint-disable-next-line max-len
+    global.localStorage.getItem = () => `{"_":1,"tw-project-info":{"enabled":true},"tw-interface-customization":{"enabled":true,"removeFeedback":true,"removeBackpack":true}}`;
+    store.readLocalStorage();
+    expect(store.getAddonEnabled('block-count')).toBe(true);
+    expect(store.getAddonEnabled('tw-remove-backpack')).toBe(true);
+    expect(store.getAddonEnabled('tw-remove-feedback')).toBe(true);
+});

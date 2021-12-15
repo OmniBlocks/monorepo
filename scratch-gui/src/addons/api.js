@@ -258,10 +258,6 @@ class Tab extends EventTargetShim {
         return tabReduxInstance;
     }
 
-    loadScript () {
-        throw new Error('loadScript is not supported');
-    }
-
     waitForElement (selector, {markAsSeen = false, condition, reduxCondition, reduxEvents} = {}) {
         let externalEventSatisfied = true;
         const evaluateCondition = () => {
@@ -509,10 +505,6 @@ class Tab extends EventTargetShim {
                 }
             });
         }
-    }
-
-    removeBlock () {
-        throw new Error('not implemented');
     }
 
     createBlockContextMenu (callback, {workspace = false, blocks = false, flyout = false, comments = false} = {}) {

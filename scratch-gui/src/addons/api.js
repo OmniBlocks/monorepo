@@ -202,6 +202,26 @@ let createdAnyBlockContextMenus = false;
 
 const getInternalKey = element => Object.keys(element).find(key => key.startsWith('__reactInternalInstance$'));
 
+// Stylesheets are added at the start of <body> so that they have higher precedence
+// than those in <head>
+const stylesheetContainer = document.createElement('div');
+document.body.insertBefore(stylesheetContainer, document.body.firstChild);
+const getStylesheetPrecedence = styleElement => {
+    // columns must have higher precedence than hide-flyout
+    if (styleElement.dataset.addonId === 'columns') return 1;
+    return 0;
+};
+const addStylesheet = styleElement => {
+    const priority = getStylesheetPrecedence(styleElement);
+    for (const child of stylesheetContainer.children) {
+        if (getStylesheetPrecedence(child) >= priority) {
+            stylesheetContainer.insertBefore(styleElement, child);
+            return;
+        }
+    }
+    stylesheetContainer.appendChild(styleElement);
+};
+
 class Tab extends EventTargetShim {
     constructor (id) {
         super();
@@ -743,7 +763,7 @@ class AddonRunner {
         this.removeStylesheets();
         const disabledCSS = `.${getDisplayNoneWhileDisabledClass(this.id)}{display:none !important;}`;
         this.disabledStylesheet = createStylesheet(disabledCSS);
-        document.body.insertBefore(this.disabledStylesheet, document.body.firstChild);
+        addStylesheet(this.disabledStylesheet);
         this.publicAPI.addon.self.disabled = true;
         this.publicAPI.addon.self.dispatchEvent(new CustomEvent('disabled'));
     }
@@ -756,8 +776,7 @@ class AddonRunner {
 
     appendStylesheets () {
         for (const style of this.stylesheets) {
-            // Insert styles at the start of the body so that they have higher precedence than those in <head>
-            document.body.insertBefore(style, document.body.firstChild);
+            addStylesheet(style);
         }
     }
 

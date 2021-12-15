@@ -775,6 +775,7 @@ class AddonRunner {
         }
 
         const {resources} = await addonEntries[this.id]();
+
         if (!this.manifest.noTranslations) {
             await addonMessagesPromise;
         }
@@ -786,7 +787,7 @@ class AddonRunner {
                 if (!this.meetsCondition(userstyle.if)) {
                     continue;
                 }
-                const m = resources[userstyle.url]();
+                const m = resources[userstyle.url];
                 const source = m[0][1];
                 const style = createStylesheet(source);
                 style.className = 'scratch-addons-theme';
@@ -801,8 +802,8 @@ class AddonRunner {
                 if (!this.meetsCondition(userscript.if)) {
                     continue;
                 }
-                const m = resources[userscript.url]();
-                m.default(this.publicAPI);
+                const fn = resources[userscript.url];
+                fn(this.publicAPI);
             }
         }
 

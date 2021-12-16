@@ -29,8 +29,8 @@ class FrameLoop {
         this.setFramerate(60);
         this.setInterpolation(false);
 
-        this.stepCallback = runtime._step.bind(runtime);
-        this.interpolationCallback = runtime._renderInterpolatedPositions.bind(runtime);
+        this.stepCallback = this.stepCallback.bind(this);
+        this.interpolationCallback = this.interpolationCallback.bind(this);
 
         this._stepInterval = null;
         this._interpolationAnimation = null;
@@ -45,6 +45,14 @@ class FrameLoop {
     setInterpolation (interpolation) {
         this.interpolation = interpolation;
         this._restart();
+    }
+
+    stepCallback () {
+        this.runtime._step();
+    }
+
+    interpolationCallback () {
+        this.runtime._renderInterpolatedPositions();
     }
 
     _restart () {

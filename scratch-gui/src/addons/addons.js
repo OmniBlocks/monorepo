@@ -50,6 +50,7 @@ const addons = [
     'editor-comment-previews',
     'columns',
     'script-snap',
+    'tw-straighten-comments',
     'tw-remove-backpack',
     'tw-remove-feedback',
     'tw-disable-compiler',
@@ -57,7 +58,8 @@ const addons = [
 ];
 
 const newAddons = [
-    'script-snap'
+    'script-snap',
+    'tw-straighten-comments'
 ];
 
 // eslint-disable-next-line import/no-commonjs

@@ -49,6 +49,7 @@ export default {
   "editor-comment-previews": () => import(/* webpackChunkName: "addon-default-entry" */ "../addons/editor-comment-previews/_runtime_entry.js"),
   "columns": () => import(/* webpackChunkName: "addon-entry-columns" */ "../addons/columns/_runtime_entry.js"),
   "script-snap": () => import(/* webpackChunkName: "addon-entry-script-snap" */ "../addons/script-snap/_runtime_entry.js"),
+  "tw-straighten-comments": () => import(/* webpackChunkName: "addon-entry-tw-straighten-comments" */ "../addons/tw-straighten-comments/_runtime_entry.js"),
   "tw-remove-backpack": () => import(/* webpackChunkName: "addon-entry-tw-remove-backpack" */ "../addons/tw-remove-backpack/_runtime_entry.js"),
   "tw-remove-feedback": () => import(/* webpackChunkName: "addon-entry-tw-remove-feedback" */ "../addons/tw-remove-feedback/_runtime_entry.js"),
   "tw-disable-compiler": () => import(/* webpackChunkName: "addon-entry-tw-disable-compiler" */ "../addons/tw-disable-compiler/_runtime_entry.js"),

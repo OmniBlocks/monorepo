@@ -4,9 +4,7 @@ const manifest = {
   "noTranslations": true,
   "name": "Editor comment previews",
   "description": "Allows you to preview the contents of comments by hovering over collapsed comments and blocks. You can use this to view comments that are off-screen, identify a loop block from the bottom by its preview, fit many long comments in a small space, and more.",
-  "tags": [
-    "new"
-  ],
+  "tags": [],
   "credits": [
     {
       "name": "lisa_wolfgang",

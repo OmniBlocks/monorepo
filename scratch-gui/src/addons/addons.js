@@ -49,6 +49,7 @@ const addons = [
     'swap-local-global',
     'editor-comment-previews',
     'columns',
+    'script-snap',
     'tw-remove-backpack',
     'tw-remove-feedback',
     'tw-disable-compiler',
@@ -56,9 +57,7 @@ const addons = [
 ];
 
 const newAddons = [
-    'swap-local-global',
-    'editor-comment-previews',
-    'columns'
+    'script-snap'
 ];
 
 // eslint-disable-next-line import/no-commonjs

@@ -857,6 +857,9 @@ history.pushState = function (...args) {
 SettingsStore.addEventListener('addon-changed', e => {
     const addonId = e.detail.addonId;
     const runner = AddonRunner.instances.find(i => i.id === addonId);
+    if (runner) {
+        runner.settingsChanged();
+    }
     if (e.detail.dynamicEnable) {
         if (runner) {
             runner.dynamicEnable();
@@ -867,9 +870,6 @@ SettingsStore.addEventListener('addon-changed', e => {
         if (runner) {
             runner.dynamicDisable();
         }
-    }
-    if (runner) {
-        runner.settingsChanged();
     }
 });
 

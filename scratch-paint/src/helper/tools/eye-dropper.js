@@ -47,6 +47,8 @@ class EyeDropperTool extends paper.Tool {
         this.pickX = -1;
         this.pickY = -1;
         this.hideLoupe = true;
+
+        this.previousColorInfo = null;
     }
     handleMouseMove (event) {
         // Set the pickX/Y for the color picker loop to pick up
@@ -88,13 +90,16 @@ class EyeDropperTool extends paper.Tool {
         }
     }
     getColorInfo (x, y, hideLoupe) {
+        if (this.previousColorInfo && this.previousColorInfo.x === x && this.previousColorInfo.y === y) {
+            return this.previousColorInfo;
+        }
         const artX = x / this.pixelRatio;
         const artY = y / this.pixelRatio;
         if (!this.bufferLoaded) return null;
         const colorContext = this.colorCanvas.getContext('2d');
         const bufferContext = this.bufferCanvas.getContext('2d');
         const colors = colorContext.getImageData(artX * ZOOM_SCALE, artY * ZOOM_SCALE, 1, 1);
-        return {
+        const colorInfo = {
             x: x,
             y: y,
             color: colors.data,
@@ -106,6 +111,8 @@ class EyeDropperTool extends paper.Tool {
             ).data,
             hideLoupe: hideLoupe
         };
+        this.previousColorInfo = colorInfo;
+        return colorInfo;
     }
 }
 

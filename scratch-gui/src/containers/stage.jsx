@@ -127,14 +127,16 @@ class Stage extends React.Component {
         });
     }
     startColorPickingLoop () {
-        this.intervalId = setInterval(() => {
+        const callback = () => {
+            this.animationFrameId = requestAnimationFrame(callback);
             if (typeof this.pickX === 'number') {
                 this.setState({colorInfo: this.getColorInfo(this.pickX, this.pickY)});
             }
-        }, 30);
+        };
+        this.animationFrameId = requestAnimationFrame(callback);
     }
     stopColorPickingLoop () {
-        clearInterval(this.intervalId);
+        cancelAnimationFrame(this.animationFrameId);
     }
     attachMouseEvents (canvas) {
         document.addEventListener('mousemove', this.onMouseMove);

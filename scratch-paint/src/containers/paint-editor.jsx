@@ -283,7 +283,8 @@ class PaintEditor extends React.Component {
         this.eyeDropper.pickY = -1;
         this.eyeDropper.activate();
 
-        this.intervalId = setInterval(() => {
+        const callback = () => {
+            this.animationFrameId = requestAnimationFrame(callback);
             const colorInfo = this.eyeDropper.getColorInfo(
                 this.eyeDropper.pickX,
                 this.eyeDropper.pickY,
@@ -299,10 +300,11 @@ class PaintEditor extends React.Component {
                     colorInfo: colorInfo
                 });
             }
-        }, 30);
+        };
+        this.animationFrameId = requestAnimationFrame(callback);
     }
     stopEyeDroppingLoop () {
-        clearInterval(this.intervalId);
+        cancelAnimationFrame(this.animationFrameId);
         this.setState({colorInfo: null});
     }
     render () {

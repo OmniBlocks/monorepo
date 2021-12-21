@@ -142,6 +142,10 @@ class ConstantInput {
             // Using the constant value allows numbers such as "010" to be interpreted as 8 (or SyntaxError in strict mode) instead of 10.
             return numberValue.toString();
         }
+        // numberValue is one of 0, -0, or NaN
+        if (Object.is(numberValue, -0)) {
+            return '-0';
+        }
         return '0';
     }
 

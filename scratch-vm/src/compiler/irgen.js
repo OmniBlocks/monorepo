@@ -258,6 +258,17 @@ class ScriptTreeGenerator {
                 list: this.descendVariable(block, 'LIST', LIST_TYPE)
             };
 
+        case 'event_broadcast_menu': {
+            const broadcastOption = block.fields.BROADCAST_OPTION;
+            const broadcastVariable = this.target.lookupBroadcastMsg(broadcastOption.id, broadcastOption.value);
+            // TODO: empty string probably isn't the correct fallback
+            const broadcastName = broadcastVariable ? broadcastVariable.name : '';
+            return {
+                kind: 'constant',
+                value: broadcastName
+            };
+        }
+
         case 'looks_backdropnumbername':
             if (block.fields.NUMBER_NAME.value === 'number') {
                 return {

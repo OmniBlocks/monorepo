@@ -252,9 +252,7 @@ runtimeFunctions.toBoolean = `const toBoolean = value => {
  * @param {*} val Value to check
  * @returns {boolean} true if the value is whitespace
  */
-baseRuntime += `const isWhiteSpace = val => (
-    val === null || (typeof val === 'string' && val.trim().length === 0)
-);`;
+baseRuntime += `const isWhiteSpace = val => typeof val === 'string' && val.trim().length === 0;`;
 
 /**
  * Determine if two values are equal.

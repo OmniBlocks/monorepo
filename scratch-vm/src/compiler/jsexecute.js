@@ -261,21 +261,13 @@ baseRuntime += `const isWhiteSpace = val => typeof val === 'string' && val.trim(
  * @returns {boolean} true if v1 is equal to v2
  */
 baseRuntime += `const compareEqualSlow = (v1, v2) => {
-    let n1 = +v1;
-    let n2 = +v2;
-    if (n1 === 0 && isWhiteSpace(v1)) {
-        n1 = NaN;
-    } else if (n2 === 0 && isWhiteSpace(v2)) {
-        n2 = NaN;
-    }
-    if (isNaN(n1) || isNaN(n2)) {
-        const s1 = ('' + v1).toLowerCase();
-        const s2 = ('' + v2).toLowerCase();
-        return s1 === s2;
-    }
+    const n1 = +v1;
+    if (isNaN(n1) || (n1 === 0 && isWhiteSpace(v1))) return ('' + v1).toLowerCase() === ('' + v2).toLowerCase();
+    const n2 = +v2;
+    if (isNaN(n2) || (n2 === 0 && isWhiteSpace(v2))) return ('' + v1).toLowerCase() === ('' + v2).toLowerCase();
     return n1 === n2;
 };
-const compareEqual = (v1, v2) => typeof v1 === 'number' && typeof v2 === 'number' && !isNaN(v1) && !isNaN(v2) ? v1 === v2 : compareEqualSlow(v1, v2);`;
+const compareEqual = (v1, v2) => (typeof v1 === 'number' && typeof v2 === 'number' && !isNaN(v1) && !isNaN(v2) || v1 === v2) ? v1 === v2 : compareEqualSlow(v1, v2);`;
 
 /**
  * Determine if one value is greater than another.

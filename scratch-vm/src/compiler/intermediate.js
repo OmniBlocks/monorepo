@@ -43,7 +43,7 @@ class IntermediateScript {
         this.isProcedure = false;
 
         /**
-         * The name of this procedure, if any.
+         * This procedure's code, if any.
          * @type {string}
          */
         this.procedureCode = '';
@@ -100,7 +100,7 @@ class IntermediateRepresentation {
         this.entry = null;
 
         /**
-         * Maps procedure IDs to their intermediate script.
+         * Maps procedure variants to their intermediate script.
          * @type {Object.<string, IntermediateScript>}
          */
         this.procedures = {};

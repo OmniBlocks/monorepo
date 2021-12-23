@@ -927,8 +927,9 @@ class JSGenerator {
 
         case 'procedures.call': {
             const procedureCode = node.code;
+            const procedureVariant = node.variant;
             // Do not generate any code for empty procedures.
-            const procedureData = this.ir.procedures[procedureCode];
+            const procedureData = this.ir.procedures[procedureVariant];
             if (procedureData.stack === null) {
                 break;
             }
@@ -945,7 +946,7 @@ class JSGenerator {
                     throw new Error('Script uses yielding procedure but is not marked as yielding.');
                 }
             }
-            this.source += `thread.procedures["${sanitize(procedureCode)}"](`;
+            this.source += `thread.procedures["${sanitize(procedureVariant)}"](`;
             // Only include arguments if the procedure accepts any.
             if (procedureData.arguments.length) {
                 const args = [];

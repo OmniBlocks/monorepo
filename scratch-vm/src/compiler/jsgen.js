@@ -730,7 +730,7 @@ class JSGenerator {
             // always yield at least once, even on 0 second durations
             this.yieldNotWarp();
             this.source += `while (thread.timer.timeElapsed() < ${duration}) {\n`;
-            this.yieldNotWarpOrStuck();
+            this.yieldStuckOrNotWarp();
             this.source += '}\n';
             this.source += 'thread.timer = null;\n';
             break;
@@ -738,7 +738,7 @@ class JSGenerator {
         case 'control.waitUntil': {
             this.resetVariableInputs();
             this.source += `while (!${this.descendInput(node.condition).asBoolean()}) {\n`;
-            this.yieldNotWarpOrStuck();
+            this.yieldStuckOrNotWarp();
             this.source += `}\n`;
             break;
         }
@@ -1057,7 +1057,7 @@ class JSGenerator {
 
     yieldLoop () {
         if (this.warpTimer) {
-            this.yieldNotWarpOrStuck();
+            this.yieldStuckOrNotWarp();
         } else {
             this.yieldNotWarp();
         }
@@ -1076,7 +1076,7 @@ class JSGenerator {
     /**
      * Write JS to yield the current thread if warp mode is disabled or if the script seems to be stuck.
      */
-    yieldNotWarpOrStuck () {
+    yieldStuckOrNotWarp () {
         if (this.isWarp) {
             this.source += 'if (isStuck()) yield;\n';
         } else {

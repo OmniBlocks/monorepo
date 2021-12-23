@@ -933,10 +933,7 @@ class JSGenerator {
             if (procedureData.stack === null) {
                 break;
             }
-            const callingFromNonWarpToWarp = !this.isWarp && procedureData.isWarp;
-            if (callingFromNonWarpToWarp) {
-                this.source += 'thread.warp++;\n';
-            } else if (procedureCode === this.script.procedureCode) {
+            if (!this.isWarp && procedureCode === this.script.procedureCode) {
                 // Direct recursion yields.
                 this.yieldNotWarp();
             }
@@ -956,9 +953,6 @@ class JSGenerator {
                 this.source += args.join(',');
             }
             this.source += `);\n`;
-            if (callingFromNonWarpToWarp) {
-                this.source += 'thread.warp--;\n';
-            }
             // Variable input types may have changes after a procedure call.
             this.resetVariableInputs();
             break;
@@ -1069,7 +1063,7 @@ class JSGenerator {
      */
     yieldNotWarp () {
         if (!this.isWarp) {
-            this.source += 'if (thread.warp === 0) yield;\n';
+            this.source += 'yield;\n';
             this.yielded();
         }
     }
@@ -1081,7 +1075,7 @@ class JSGenerator {
         if (this.isWarp) {
             this.source += 'if (isStuck()) yield;\n';
         } else {
-            this.source += 'if (thread.warp === 0 || isStuck()) yield;\n';
+            this.source += 'yield;\n';
         }
         this.yielded();
     }

@@ -198,11 +198,6 @@ class Thread {
         // these values only make sense if isCompiled == true
         this.timer = null;
         /**
-         * Warp level
-         * @type {number}
-         */
-        this.warp = 0;
-        /**
          * The thread's generator.
          * @type {Generator}
          */

@@ -613,8 +613,34 @@ class JSGenerator {
             return new TypedInput(`(new Date().getMinutes())`, TYPE_NUMBER);
         case 'sensing.month':
             return new TypedInput(`(new Date().getMonth() + 1)`, TYPE_NUMBER);
-        case 'sensing.of':
-            return new TypedInput(`runtime.ext_scratch3_sensing.getAttributeOf({OBJECT: ${this.descendInput(node.object).asString()}, PROPERTY: "${sanitize(node.property)}" })`, TYPE_UNKNOWN);
+        case 'sensing.of': {
+            const object = this.descendInput(node.object).asString();
+            const property = node.property;
+            if (node.object.kind === 'constant') {
+                const isStage = node.object.value === '_stage_';
+                const objectReference = isStage ? 'stage' : this.evaluateOnce(`runtime.getSpriteTargetByName(${object})`);
+                if (property === 'volume') return new TypedInput(`${objectReference}.volume`, TYPE_NUMBER);
+                if (isStage) {
+                    switch (property) {
+                    case 'background #': // fallthrough for scratch 1.0 compatibility
+                    case 'backdrop #': return new TypedInput(`(${objectReference}.currentCostume + 1)`, TYPE_NUMBER);
+                    case 'backdrop name': return new TypedInput(`${objectReference}.getCostumes()[${objectReference}.currentCostume].name`, TYPE_STRING);
+                    }
+                } else {
+                    switch (property) {
+                    case 'x position': return new TypedInput(`${objectReference}.x`, TYPE_NUMBER);
+                    case 'y position': return new TypedInput(`${objectReference}.y`, TYPE_NUMBER);
+                    case 'direction': return new TypedInput(`${objectReference}.direction`, TYPE_NUMBER);
+                    case 'costume #': return new TypedInput(`(${objectReference}.currentCostume + 1)`, TYPE_NUMBER);
+                    case 'costume name': return new TypedInput(`${objectReference}.getCostumes()[${objectReference}.currentCostume].name`, TYPE_STRING);
+                    case 'size': return new TypedInput(`${objectReference}.size`, TYPE_NUMBER);
+                    }
+                }
+                const variableReference = this.evaluateOnce(`${objectReference} && ${objectReference}.lookupVariableByNameAndType("${sanitize(property)}", "", true)`);
+                return new TypedInput(`(${variableReference} ? ${variableReference}.value : 0)`, TYPE_UNKNOWN);
+            }
+            return new TypedInput(`runtime.ext_scratch3_sensing.getAttributeOf({OBJECT: ${object}, PROPERTY: "${sanitize(property)}" })`, TYPE_UNKNOWN);
+        }
         case 'sensing.second':
             return new TypedInput(`(new Date().getSeconds())`, TYPE_NUMBER);
         case 'sensing.touching':

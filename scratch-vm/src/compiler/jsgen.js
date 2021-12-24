@@ -618,22 +618,34 @@ class JSGenerator {
             const property = node.property;
             if (node.object.kind === 'constant') {
                 const isStage = node.object.value === '_stage_';
+                // Note that if target isn't a stage, we can't assume it exists
                 const objectReference = isStage ? 'stage' : this.evaluateOnce(`runtime.getSpriteTargetByName(${object})`);
-                if (property === 'volume') return new TypedInput(`${objectReference}.volume`, TYPE_NUMBER);
+                if (property === 'volume') {
+                    return new TypedInput(`(${objectReference} ? ${objectReference}.volume : 0)`, TYPE_NUMBER);
+                }
                 if (isStage) {
                     switch (property) {
-                    case 'background #': // fallthrough for scratch 1.0 compatibility
-                    case 'backdrop #': return new TypedInput(`(${objectReference}.currentCostume + 1)`, TYPE_NUMBER);
-                    case 'backdrop name': return new TypedInput(`${objectReference}.getCostumes()[${objectReference}.currentCostume].name`, TYPE_STRING);
+                    case 'background #':
+                        // fallthrough for scratch 1.0 compatibility
+                    case 'backdrop #':
+                        return new TypedInput(`(${objectReference}.currentCostume + 1)`, TYPE_NUMBER);
+                    case 'backdrop name':
+                        return new TypedInput(`${objectReference}.getCostumes()[${objectReference}.currentCostume].name`, TYPE_STRING);
                     }
                 } else {
                     switch (property) {
-                    case 'x position': return new TypedInput(`${objectReference}.x`, TYPE_NUMBER);
-                    case 'y position': return new TypedInput(`${objectReference}.y`, TYPE_NUMBER);
-                    case 'direction': return new TypedInput(`${objectReference}.direction`, TYPE_NUMBER);
-                    case 'costume #': return new TypedInput(`(${objectReference}.currentCostume + 1)`, TYPE_NUMBER);
-                    case 'costume name': return new TypedInput(`${objectReference}.getCostumes()[${objectReference}.currentCostume].name`, TYPE_STRING);
-                    case 'size': return new TypedInput(`${objectReference}.size`, TYPE_NUMBER);
+                    case 'x position':
+                        return new TypedInput(`(${objectReference} ? ${objectReference}.x : 0)`, TYPE_NUMBER);
+                    case 'y position':
+                        return new TypedInput(`(${objectReference} ? ${objectReference}.y : 0)`, TYPE_NUMBER);
+                    case 'direction':
+                        return new TypedInput(`(${objectReference} ? ${objectReference}.direction : 0)`, TYPE_NUMBER);
+                    case 'costume #':
+                        return new TypedInput(`(${objectReference} ? ${objectReference}.currentCostume + 1 : 0)`, TYPE_NUMBER);
+                    case 'costume name':
+                        return new TypedInput(`(${objectReference} ? ${objectReference}.getCostumes()[${objectReference}.currentCostume].name : 0)`, TYPE_UNKNOWN);
+                    case 'size':
+                        return new TypedInput(`(${objectReference} ? ${objectReference}.size : 0)`, TYPE_NUMBER);
                     }
                 }
                 const variableReference = this.evaluateOnce(`${objectReference} && ${objectReference}.lookupVariableByNameAndType("${sanitize(property)}", "", true)`);

@@ -1159,7 +1159,7 @@ class JSGenerator {
             result += `"${sanitize(fieldName)}":"${sanitize(field)}",`;
         }
         const opcodeFunction = this.evaluateOnce(`runtime.getOpcodeFunction("${sanitize(opcode)}")`);
-        result += `}, ${opcodeFunction}, ${setFlags})`;
+        result += `}, ${opcodeFunction}, ${this.isWarp}, ${setFlags})`;
 
         return result;
     }

@@ -105,7 +105,10 @@ class CloudProvider {
         }
         // tw: code 4004 is "Project Unavailable" -- do not try to reconnect
         if (e && e.code === 4004) {
-            log.info('Cloud project is unavailable. Not reconnect.');
+            // this is temporary
+            // eslint-disable-next-line no-alert
+            alert('TurboWarp cloud variables are temporarily disabled in this project.');
+            log.info('Cloud project is unavailable. Not reconnecting.');
             return;
         }
         log.info(`Closed connection to websocket`);

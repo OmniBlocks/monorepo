@@ -73,6 +73,7 @@ const generatorNameVariablePool = new VariablePool('gen');
  * @property {() => string} asUnknown
  * @property {() => string} asSafe
  * @property {() => boolean} isAlwaysNumber
+ * @property {() => boolean} isAlwaysNumberOrNaN
  * @property {() => boolean} isNeverNumber
  */
 
@@ -118,6 +119,10 @@ class TypedInput {
 
     isAlwaysNumber () {
         return this.type === TYPE_NUMBER;
+    }
+
+    isAlwaysNumberOrNaN () {
+        return this.type === TYPE_NUMBER || this.type === TYPE_NUMBER_NAN;
     }
 
     isNeverNumber () {
@@ -192,6 +197,10 @@ class ConstantInput {
             return this.constantValue.toString().trim() !== '';
         }
         return true;
+    }
+
+    isAlwaysNumberOrNaN () {
+        return this.isAlwaysNumber();
     }
 
     isNeverNumber () {
@@ -269,6 +278,13 @@ class VariableInput {
     isAlwaysNumber () {
         if (this._value) {
             return this._value.isAlwaysNumber();
+        }
+        return false;
+    }
+
+    isAlwaysNumberOrNaN () {
+        if (this._value) {
+            return this._value.isAlwaysNumberOrNaN();
         }
         return false;
     }
@@ -432,7 +448,7 @@ class JSGenerator {
         case 'list.get': {
             const index = this.descendInput(node.index);
             if (environment.supportsNullishCoalescing) {
-                if (index.isAlwaysNumber()) {
+                if (index.isAlwaysNumberOrNaN()) {
                     return new TypedInput(`(${this.referenceVariable(node.list)}.value[(${index.asNumber()} | 0) - 1] ?? "")`, TYPE_UNKNOWN);
                 }
                 if (index instanceof ConstantInput && index.constantValue === 'last') {

@@ -134,7 +134,7 @@ class Scratch3LooksBlocks {
             bubbleState.skinId = null;
             this.runtime.requestRedraw();
         }
-        target.removeListener(RenderedTarget.EVENT_TARGET_VISUAL_CHANGE, this._onTargetChanged);
+        target.onTargetVisualChange = null;
     }
 
     /**
@@ -230,7 +230,7 @@ class Scratch3LooksBlocks {
         if (bubbleState.skinId) {
             this.runtime.renderer.updateTextSkin(bubbleState.skinId, type, text, onSpriteRight, [0, 0]);
         } else {
-            target.addListener(RenderedTarget.EVENT_TARGET_VISUAL_CHANGE, this._onTargetChanged);
+            target.onTargetVisualChange = this._onTargetChanged;
             bubbleState.drawableId = this.runtime.renderer.createDrawable(StageLayering.SPRITE_LAYER);
             bubbleState.skinId = this.runtime.renderer.createTextSkin(type, text, bubbleState.onSpriteRight, [0, 0]);
             this.runtime.renderer.updateDrawableSkinId(bubbleState.drawableId, bubbleState.skinId);

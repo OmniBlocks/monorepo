@@ -16,6 +16,9 @@ export default function (blockId) {
     // blocking the drag end from finishing promptly.
     return new Promise(resolve => {
         setTimeout(() => {
+            // TW: Fixes issues caused by scratch-blocks block hiding
+            blockSvg.style.display = '';
+
             // Strip &nbsp; entities that cannot be inlined
             blockSvg.innerHTML = blockSvg.innerHTML.replace(/&nbsp;/g, ' ');
 

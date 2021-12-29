@@ -12,6 +12,12 @@ test('runtimeFunctions are valid', t => {
     t.end();
 });
 
+test('all runtimeFunctions can be used together', t => {
+    const script = Object.keys(jsexecute.runtimeFunctions).join(';');
+    jsexecute.scopedEval(script);
+    t.end();
+});
+
 test('comparisons', t => {
     const VALUES = [
         0,

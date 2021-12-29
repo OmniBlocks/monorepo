@@ -93,9 +93,9 @@ class Blocks extends React.Component {
     }
     componentDidMount () {
         this.props.vm.setCompilerOptions({
-            warpTimer: true,
-            inEditor: true
+            warpTimer: true
         });
+        this.props.vm.setInEditor(false);
 
         this.ScratchBlocks.FieldColourSlider.activateEyedropper_ = this.props.onActivateColorPicker;
         this.ScratchBlocks.Procedures.externalProcedureDefCallback = this.props.onActivateCustomProcedures;
@@ -224,9 +224,7 @@ class Blocks extends React.Component {
         this.detachVM();
         this.workspace.dispose();
         clearTimeout(this.toolboxUpdateTimeout);
-        this.props.vm.setCompilerOptions({
-            inEditor: false
-        });
+        this.props.vm.setInEditor(false);
     }
     requestToolboxUpdate () {
         clearTimeout(this.toolboxUpdateTimeout);

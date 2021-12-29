@@ -447,7 +447,7 @@ class RenderedTarget extends Target {
             index, 0, this.sprite.costumes.length - 1
         );
         if (this.renderer) {
-            const costume = this.getCostumes()[this.currentCostume];
+            const costume = this.sprite.costumes[this.currentCostume];
             this.renderer.updateDrawableSkinId(this.drawableID, costume.skinId);
 
             if (this.visible) {

@@ -260,6 +260,10 @@ class VirtualMachine extends EventEmitter {
         this.runtime.setCompilerOptions(compilerOptions);
     }
 
+    setInEditor (inEditor) {
+        this.runtime.setInEditor(inEditor);
+    }
+
     addAddonBlock (options) {
         this.runtime.addAddonBlock(options);
     }

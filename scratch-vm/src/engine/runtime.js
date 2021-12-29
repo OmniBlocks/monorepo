@@ -420,8 +420,7 @@ class Runtime extends EventEmitter {
 
         this.compilerOptions = {
             enabled: true,
-            warpTimer: false,
-            inEditor: false
+            warpTimer: false
         };
 
         this.debug = false;
@@ -2375,6 +2374,10 @@ class Runtime extends EventEmitter {
         this.compilerOptions = Object.assign({}, this.compilerOptions, compilerOptions);
         this.resetAllCaches();
         this.emit(Runtime.COMPILER_OPTIONS_CHANGED, this.compilerOptions);
+    }
+
+    setInEditor (inEditor) {
+        // no-op
     }
 
     /**

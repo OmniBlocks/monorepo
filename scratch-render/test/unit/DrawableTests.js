@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-vars */
-
 const test = require('tap').test;
 
 // Mock `window` and `document.createElement` for twgl.js.
@@ -28,11 +26,16 @@ const snapToNearest = function (rect, decimals = 3) {
     };
 };
 
-/*
+const mockRenderer = drawable => ({
+    skinWasAltered: () => {
+        drawable._skinWasAltered();
+    }
+});
+
 test('translate by position', t => {
     const expected = new Rectangle();
     const drawable = new Drawable(null, {});
-    drawable.skin = new MockSkin();
+    drawable.skin = new MockSkin(0, mockRenderer(drawable));
     drawable.skin.size = [200, 50];
 
     expected.initFromBounds(0, 200, -50, 0);
@@ -48,7 +51,7 @@ test('translate by position', t => {
 test('translate by costume center', t => {
     const expected = new Rectangle();
     const drawable = new Drawable(null, {});
-    drawable.skin = new MockSkin();
+    drawable.skin = new MockSkin(0, mockRenderer(drawable));
     drawable.skin.size = [200, 50];
 
     drawable.skin.rotationCenter = [1, 0];
@@ -65,7 +68,7 @@ test('translate by costume center', t => {
 test('translate and rotate', t => {
     const expected = new Rectangle();
     const drawable = new Drawable(null, {});
-    drawable.skin = new MockSkin();
+    drawable.skin = new MockSkin(0, mockRenderer(drawable));
     drawable.skin.size = [200, 50];
 
     drawable.updateProperties({position: [1, 2], direction: 0});
@@ -90,7 +93,7 @@ test('translate and rotate', t => {
 test('rotate by non-right-angles', t => {
     const expected = new Rectangle();
     const drawable = new Drawable(null, {});
-    drawable.skin = new MockSkin();
+    drawable.skin = new MockSkin(0, mockRenderer(drawable));
     drawable.skin.size = [10, 10];
     drawable.skin.rotationCenter = [5, 5];
 
@@ -107,7 +110,7 @@ test('rotate by non-right-angles', t => {
 test('scale', t => {
     const expected = new Rectangle();
     const drawable = new Drawable(null, {});
-    drawable.skin = new MockSkin();
+    drawable.skin = new MockSkin(0, mockRenderer(drawable));
     drawable.skin.size = [200, 50];
 
     drawable.updateProperties({scale: [100, 50]});
@@ -129,7 +132,7 @@ test('scale', t => {
 test('rotate and scale', t => {
     const expected = new Rectangle();
     const drawable = new Drawable(null, {});
-    drawable.skin = new MockSkin();
+    drawable.skin = new MockSkin(0, mockRenderer(drawable));
     drawable.skin.size = [100, 1000];
 
     drawable.skin.rotationCenter = [50, 50];
@@ -143,4 +146,3 @@ test('rotate and scale', t => {
 
     t.end();
 });
-*/

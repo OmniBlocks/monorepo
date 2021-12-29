@@ -136,8 +136,7 @@ class Skin extends EventEmitter {
     }
 
     emitWasAltered () {
-        this._renderer.skinsWereAltered = true;
-        this.wasAltered = true;
+        this._renderer.skinWasAltered(this);
     }
 
     /**

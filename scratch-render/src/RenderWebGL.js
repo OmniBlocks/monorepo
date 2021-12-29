@@ -697,15 +697,10 @@ class RenderWebGL extends EventEmitter {
         return null;
     }
 
-    checkAlteredSkins () {
-        if (this.skinsWereAltered) {
-            this.skinsWereAltered = false;
-            for (const drawable of this._allDrawables) {
-                const skin = drawable && drawable.skin;
-                if (skin && skin.wasAltered) {
-                    drawable._skinWasAltered();
-                    skin.wasAltered = false;
-                }
+    skinWasAltered (skin) {
+        for (const drawable of this._allDrawables) {
+            if (drawable && drawable.skin === skin) {
+                drawable._skinWasAltered();
             }
         }
     }
@@ -714,9 +709,6 @@ class RenderWebGL extends EventEmitter {
      * Draw all current drawables and present the frame on the canvas.
      */
     draw () {
-        // Checking altered skins could set dirty, so do this first.
-        this.checkAlteredSkins();
-
         if (!this.dirty) {
             return;
         }

@@ -224,6 +224,8 @@ class RenderWebGL extends EventEmitter {
 
         this.dirty = true;
 
+        this.skinsWereAltered = false;
+
         this._createGeometry();
 
         this.on(RenderConstants.Events.NativeSizeChanged, this.onNativeSizeChanged);
@@ -695,10 +697,26 @@ class RenderWebGL extends EventEmitter {
         return null;
     }
 
+    checkAlteredSkins () {
+        if (this.skinsWereAltered) {
+            this.skinsWereAltered = false;
+            for (const drawable of this._allDrawables) {
+                const skin = drawable && drawable.skin;
+                if (skin && skin.wasAltered) {
+                    drawable._skinWasAltered();
+                    skin.wasAltered = false;
+                }
+            }
+        }
+    }
+
     /**
      * Draw all current drawables and present the frame on the canvas.
      */
     draw () {
+        // Checking altered skins could set dirty, so do this first.
+        this.checkAlteredSkins();
+
         if (!this.dirty) {
             return;
         }

@@ -12,13 +12,6 @@ module.exports = {
     ID_NONE: -1,
 
     /**
-     * Optimize for fewer than this number of Drawables sharing the same Skin.
-     * Going above this may cause middleware warnings or a performance penalty but should otherwise behave correctly.
-     * @const {int}
-     */
-    SKIN_SHARE_SOFT_LIMIT: Infinity,
-
-    /**
      * @enum {string}
      */
     Events: {

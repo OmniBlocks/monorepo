@@ -174,13 +174,7 @@ class Drawable {
      */
     set skin (newSkin) {
         if (this._skin !== newSkin) {
-            if (this._skin) {
-                this._skin.removeListener(Skin.Events.WasAltered, this._skinWasAltered);
-            }
             this._skin = newSkin;
-            if (this._skin) {
-                this._skin.addListener(Skin.Events.WasAltered, this._skinWasAltered);
-            }
             this._skinWasAltered();
         }
     }
@@ -679,7 +673,6 @@ class Drawable {
 
     /**
      * Respond to an internal change in the current Skin.
-     * @private
      */
     _skinWasAltered () {
         this._renderer.dirty = true;

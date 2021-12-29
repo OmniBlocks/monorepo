@@ -52,8 +52,6 @@ class Skin extends EventEmitter {
          * @private
          */
         this._silhouette = new Silhouette();
-
-        this.setMaxListeners(RenderConstants.SKIN_SHARE_SOFT_LIMIT);
     }
 
     /**
@@ -137,6 +135,11 @@ class Skin extends EventEmitter {
         return this._uniforms;
     }
 
+    emitWasAltered () {
+        this._renderer.skinsWereAltered = true;
+        this.wasAltered = true;
+    }
+
     /**
      * If the skin defers silhouette operations until the last possible minute,
      * this will be called before isTouching uses the silhouette.
@@ -193,7 +196,7 @@ class Skin extends EventEmitter {
         this._rotationCenter[1] = 0;
 
         this._silhouette.update(this._emptyImageData);
-        this.emit(Skin.Events.WasAltered);
+        this.emitWasAltered();
     }
 
     /**
@@ -223,17 +226,5 @@ class Skin extends EventEmitter {
     }
 
 }
-
-/**
- * These are the events which can be emitted by instances of this class.
- * @enum {string}
- */
-Skin.Events = {
-    /**
-     * Emitted when anything about the Skin has been altered, such as the appearance or rotation center.
-     * @event Skin.event:WasAltered
-     */
-    WasAltered: 'WasAltered'
-};
 
 module.exports = Skin;

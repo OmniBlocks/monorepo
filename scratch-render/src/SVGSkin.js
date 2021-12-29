@@ -225,7 +225,7 @@ class SVGSkin extends Skin {
 
             this._svgImageLoaded = true;
 
-            this.emit(Skin.Events.WasAltered);
+            this.emitWasAltered();
         };
 
         this._svgImage.src = `data:image/svg+xml;utf8,${encodeURIComponent(svgText)}`;

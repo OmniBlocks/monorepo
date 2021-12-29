@@ -26,6 +26,7 @@ const snapToNearest = function (rect, decimals = 3) {
     };
 };
 
+/*
 test('translate by position', t => {
     const expected = new Rectangle();
     const drawable = new Drawable(null, {});
@@ -140,3 +141,4 @@ test('rotate and scale', t => {
 
     t.end();
 });
+*/

@@ -91,7 +91,7 @@ class BitmapSkin extends Skin {
         this._rotationCenter[0] = rotationCenter[0];
         this._rotationCenter[1] = rotationCenter[1];
 
-        this.emit(Skin.Events.WasAltered);
+        this.emitWasAltered();
     }
 
     /**

@@ -112,7 +112,7 @@ class TextBubbleSkin extends Skin {
 
         this._textDirty = true;
         this._textureDirty = true;
-        this.emit(Skin.Events.WasAltered);
+        this.emitWasAltered();
     }
 
     /**

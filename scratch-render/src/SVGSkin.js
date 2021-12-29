@@ -23,10 +23,7 @@ class SVGSkin extends Skin {
      * @extends Skin
      */
     constructor (id, renderer) {
-        super(id);
-
-        /** @type {RenderWebGL} */
-        this._renderer = renderer;
+        super(id, renderer);
 
         /** @type {HTMLImageElement} */
         this._svgImage = document.createElement('img');

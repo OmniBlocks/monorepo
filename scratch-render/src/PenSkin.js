@@ -42,13 +42,7 @@ class PenSkin extends Skin {
      * @listens RenderWebGL#event:NativeSizeChanged
      */
     constructor (id, renderer) {
-        super(id);
-
-        /**
-         * @private
-         * @type {RenderWebGL}
-         */
-        this._renderer = renderer;
+        super(id, renderer);
 
         /** @type {Array<number>} */
         this._size = null;

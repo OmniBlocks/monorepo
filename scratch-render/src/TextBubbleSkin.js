@@ -42,10 +42,7 @@ class TextBubbleSkin extends Skin {
      * @extends Skin
      */
     constructor (id, renderer) {
-        super(id);
-
-        /** @type {RenderWebGL} */
-        this._renderer = renderer;
+        super(id, renderer);
 
         /** @type {HTMLCanvasElement} */
         this._canvas = document.createElement('canvas');

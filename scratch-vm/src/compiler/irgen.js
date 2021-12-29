@@ -983,31 +983,13 @@ class ScriptTreeGenerator {
 
         case 'motion_changexby':
             return {
-                kind: 'motion.setXY',
-                x: {
-                    kind: 'op.add',
-                    left: {
-                        kind: 'motion.x'
-                    },
-                    right: this.descendInputOfBlock(block, 'DX')
-                },
-                y: {
-                    kind: 'motion.y'
-                }
+                kind: 'motion.changeX',
+                dx: this.descendInputOfBlock(block, 'DX')
             };
         case 'motion_changeyby':
             return {
-                kind: 'motion.setXY',
-                x: {
-                    kind: 'motion.x'
-                },
-                y: {
-                    kind: 'op.add',
-                    left: {
-                        kind: 'motion.y'
-                    },
-                    right: this.descendInputOfBlock(block, 'DY')
-                }
+                kind: 'motion.changeY',
+                dy: this.descendInputOfBlock(block, 'DY')
             };
         case 'motion_gotoxy':
             return {
@@ -1036,18 +1018,12 @@ class ScriptTreeGenerator {
             };
         case 'motion_setx':
             return {
-                kind: 'motion.setXY',
-                x: this.descendInputOfBlock(block, 'X'),
-                y: {
-                    kind: 'motion.y'
-                }
+                kind: 'motion.setX',
+                x: this.descendInputOfBlock(block, 'X')
             };
         case 'motion_sety':
             return {
-                kind: 'motion.setXY',
-                x: {
-                    kind: 'motion.x'
-                },
+                kind: 'motion.setY',
                 y: this.descendInputOfBlock(block, 'Y')
             };
         case 'motion_turnleft':

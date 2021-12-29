@@ -476,9 +476,9 @@ class JSGenerator {
         case 'motion.direction':
             return new TypedInput('target.direction', TYPE_NUMBER);
         case 'motion.x':
-            return new TypedInput('target.x', TYPE_NUMBER);
+            return new TypedInput('limitPrecision(target.x)', TYPE_NUMBER);
         case 'motion.y':
-            return new TypedInput('target.y', TYPE_NUMBER);
+            return new TypedInput('limitPrecision(target.y)', TYPE_NUMBER);
 
         case 'mouse.down':
             return new TypedInput('runtime.ioDevices.mouse.getIsDown()', TYPE_BOOLEAN);
@@ -917,6 +917,12 @@ class JSGenerator {
             this.source += `runtime.ext_scratch3_looks._setCostume(target, ${this.descendInput(node.costume).asSafe()});\n`;
             break;
 
+        case 'motion.changeX':
+            this.source += `target.setXY(target.x + ${this.descendInput(node.dx).asNumber()}, target.y);\n`;
+            break;
+        case 'motion.changeY':
+            this.source += `target.setXY(target.x, target.y + ${this.descendInput(node.dy).asNumber()});\n`;
+            break;
         case 'motion.ifOnEdgeBounce':
             this.source += `runtime.ext_scratch3_motion._ifOnEdgeBounce(target);\n`;
             break;
@@ -926,13 +932,18 @@ class JSGenerator {
         case 'motion.setRotationStyle':
             this.source += `target.setRotationStyle("${sanitize(node.style)}");\n`;
             break;
-        case 'motion.setXY':
+        case 'motion.setX': // fallthrough
+        case 'motion.setY': // fallthrough
+        case 'motion.setXY': {
             this.descendedIntoModulo = false;
-            this.source += `target.setXY(${this.descendInput(node.x).asNumber()}, ${this.descendInput(node.y).asNumber()});\n`;
+            const x = 'x' in node ? this.descendInput(node.x).asNumber() : 'target.x';
+            const y = 'y' in node ? this.descendInput(node.y).asNumber() : 'target.y';
+            this.source += `target.setXY(${x}, ${y});\n`;
             if (this.descendedIntoModulo) {
                 this.source += `if (target.interpolationData) target.interpolationData = null;\n`;
             }
             break;
+        }
         case 'motion.step':
             this.source += `runtime.ext_scratch3_motion._moveSteps(${this.descendInput(node.steps).asNumber()}, target);\n`;
             break;

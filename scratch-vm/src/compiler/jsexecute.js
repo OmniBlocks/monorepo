@@ -246,6 +246,17 @@ runtimeFunctions.toBoolean = `const toBoolean = value => {
 }`;
 
 /**
+ * If a number is very close to a whole number, round to that whole number.
+ * @param {number} value Value to round
+ * @returns {number} Rounded number or original number
+ */
+runtimeFunctions.limitPrecision = `const limitPrecision = value => {
+    const rounded = Math.round(value);
+    const delta = value - rounded;
+    return (Math.abs(delta) < 1e-9) ? rounded : value;
+}`;
+
+/**
  * Check if a value is considered whitespace.
  * Similar to Cast.isWhiteSpace()
  * @param {*} val Value to check

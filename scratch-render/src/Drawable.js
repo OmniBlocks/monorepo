@@ -3,7 +3,6 @@ const twgl = require('twgl.js');
 const Rectangle = require('./Rectangle');
 const RenderConstants = require('./RenderConstants');
 const ShaderManager = require('./ShaderManager');
-const Skin = require('./Skin');
 const EffectTransform = require('./EffectTransform');
 const log = require('./util/log');
 

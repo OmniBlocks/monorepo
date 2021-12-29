@@ -9,7 +9,7 @@ class Skin extends EventEmitter {
     /**
      * Create a Skin, which stores and/or generates textures for use in rendering.
      * @param {int} id - The unique ID for this Skin.
-     * @param {RenderWebGL} renderer
+     * @param {RenderWebGL} renderer - The renderer which will use this skin.
      * @constructor
      */
     constructor (id, renderer) {

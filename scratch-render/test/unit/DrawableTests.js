@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+
 const test = require('tap').test;
 
 // Mock `window` and `document.createElement` for twgl.js.

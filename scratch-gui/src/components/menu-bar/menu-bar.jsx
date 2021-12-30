@@ -586,9 +586,9 @@ class MenuBar extends React.Component {
                                                         {extended.name !== null && (
                                                             <MenuItem onClick={this.getSaveToComputerHandler(extended.saveToLastFile)}>
                                                                 <FormattedMessage
-                                                                    defaultMessage="Save as {file}"
+                                                                    defaultMessage="Save to {file}"
                                                                     description="Menu bar item to save project to an existing file on the user's computer"
-                                                                    id="tw.menuBar.saveAs"
+                                                                    id="tw.saveTo"
                                                                     values={{
                                                                         file: extended.name
                                                                     }}
@@ -597,9 +597,9 @@ class MenuBar extends React.Component {
                                                         )}
                                                         <MenuItem onClick={this.getSaveToComputerHandler(extended.saveAsNew)}>
                                                             <FormattedMessage
-                                                                defaultMessage="Save to your computer"
-                                                                description="Menu bar item for downloading a project to your computer" // eslint-disable-line max-len
-                                                                id="gui.menuBar.downloadToComputer"
+                                                                defaultMessage="Save as..."
+                                                                description="Menu bar item to select a new file to save the project as" // eslint-disable-line max-len
+                                                                id="tw.saveAs"
                                                             />
                                                         </MenuItem>
                                                     </React.Fragment>
@@ -607,18 +607,9 @@ class MenuBar extends React.Component {
                                                 <MenuItem onClick={this.getSaveToComputerHandler(downloadProject)}>
                                                     {extended.available ? (
                                                         <FormattedMessage
-                                                            defaultMessage="{saveToYourComputer} (legacy)"
-                                                            description="Wrapper around 'Save to your computer' when a more modern API is available" // eslint-disable-line max-len
-                                                            id="tw.menuBar.legacyDownloadToComputer"
-                                                            values={{
-                                                                saveToYourComputer: (
-                                                                    <FormattedMessage
-                                                                        defaultMessage="Save to your computer"
-                                                                        description="Menu bar item for downloading a project to your computer" // eslint-disable-line max-len
-                                                                        id="gui.menuBar.downloadToComputer"
-                                                                    />
-                                                                )
-                                                            }}
+                                                            defaultMessage="Save as new file..."
+                                                            description="Download the project once, without being able to easily save to the same spot"
+                                                            id="tw.oldDownload"
                                                         />
                                                     ) : (
                                                         <FormattedMessage

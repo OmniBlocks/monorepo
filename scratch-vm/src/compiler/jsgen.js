@@ -866,7 +866,9 @@ class JSGenerator {
             break;
 
         case 'looks.backwardLayers':
-            this.source += `target.goBackwardLayers(${this.descendInput(node.layers).asNumber()});\n`;
+            if (!this.target.isStage) {
+                this.source += `target.goBackwardLayers(${this.descendInput(node.layers).asNumber()});\n`;
+            }
             break;
         case 'looks.clearEffects':
             this.source += 'target.clearEffects();\n';
@@ -880,13 +882,19 @@ class JSGenerator {
             this.source += `target.setSize(target.size + ${this.descendInput(node.size).asNumber()});\n`;
             break;
         case 'looks.forwardLayers':
-            this.source += `target.goForwardLayers(${this.descendInput(node.layers).asNumber()});\n`;
+            if (!this.target.isStage) {
+                this.source += `target.goForwardLayers(${this.descendInput(node.layers).asNumber()});\n`;
+            }
             break;
         case 'looks.goToBack':
-            this.source += 'target.goToBack();\n';
+            if (!this.target.isStage) {
+                this.source += 'target.goToBack();\n';
+            }
             break;
         case 'looks.goToFront':
-            this.source += 'target.goToFront();\n';
+            if (!this.target.isStage) {
+                this.source += 'target.goToFront();\n';
+            }
             break;
         case 'looks.hide':
             this.source += 'target.setVisible(false);\n';

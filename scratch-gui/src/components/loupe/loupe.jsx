@@ -67,6 +67,8 @@ class LoupeComponent extends React.Component {
             colorInfo,
             ...boxProps
         } = this.props;
+        const x = colorInfo.x - ((zoomScale * colorInfo.width) / 2);
+        const y = colorInfo.y - ((zoomScale * colorInfo.height) / 2);
         return (
             <Box
                 {...boxProps}
@@ -75,8 +77,7 @@ class LoupeComponent extends React.Component {
                 element="canvas"
                 height={colorInfo.height}
                 style={{
-                    top: colorInfo.y - ((zoomScale * colorInfo.height) / 2),
-                    left: colorInfo.x - ((zoomScale * colorInfo.width) / 2),
+                    transform: `translate(${x}px, ${y}px)`,
                     width: colorInfo.width * zoomScale,
                     height: colorInfo.height * zoomScale
                 }}

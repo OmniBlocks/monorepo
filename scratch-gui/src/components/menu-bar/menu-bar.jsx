@@ -607,7 +607,7 @@ class MenuBar extends React.Component {
                                                 <MenuItem onClick={this.getSaveToComputerHandler(downloadProject)}>
                                                     {extended.available ? (
                                                         <FormattedMessage
-                                                            defaultMessage="Save as new file..."
+                                                            defaultMessage="Save to separate file..."
                                                             description="Download the project once, without being able to easily save to the same spot"
                                                             id="tw.oldDownload"
                                                         />

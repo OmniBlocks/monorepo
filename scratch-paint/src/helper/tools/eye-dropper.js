@@ -26,6 +26,14 @@ class EyeDropperTool extends paper.Tool {
             contentRaster3x.onLoad = () => {
                 colorCanvasContext.drawImage(contentRaster3x.canvas, 0, 0);
                 bufferCanvasContext.drawImage(this.colorCanvas, 0, 0);
+                // getImageData() is slow, but it's best to eat the performance penalty up front
+                // instead of every time we get color info
+                this.colorCanvasData = colorCanvasContext.getImageData(
+                    0,
+                    0,
+                    this.colorCanvas.width,
+                    this.colorCanvas.height
+                ).data;
                 this.bufferLoaded = true;
             };
             if (contentRaster3x.loaded) contentRaster3x.onLoad();
@@ -96,19 +104,25 @@ class EyeDropperTool extends paper.Tool {
         const artX = x / this.pixelRatio;
         const artY = y / this.pixelRatio;
         if (!this.bufferLoaded) return null;
-        const colorContext = this.colorCanvas.getContext('2d');
-        const bufferContext = this.bufferCanvas.getContext('2d');
-        const colors = colorContext.getImageData(artX * ZOOM_SCALE, artY * ZOOM_SCALE, 1, 1);
+        const pickX = Math.floor(artX * ZOOM_SCALE);
+        const pickY = Math.floor(artY * ZOOM_SCALE);
+        const colorIndex = 4 * ((pickY * this.colorCanvas.width) + pickX);
+        const colorsData = new Uint8ClampedArray(4);
+        colorsData[0] = this.colorCanvasData[colorIndex];
+        colorsData[1] = this.colorCanvasData[colorIndex + 1];
+        colorsData[2] = this.colorCanvasData[colorIndex + 2];
+        colorsData[3] = this.colorCanvasData[colorIndex + 3];
         const colorInfo = {
             x: x,
             y: y,
-            color: colors.data,
-            data: bufferContext.getImageData(
-                ZOOM_SCALE * (artX - LOUPE_RADIUS),
-                ZOOM_SCALE * (artY - LOUPE_RADIUS),
-                LOUPE_RADIUS * 2 * ZOOM_SCALE,
-                LOUPE_RADIUS * 2 * ZOOM_SCALE
-            ).data,
+            color: colorsData,
+            data: {
+                image: this.bufferCanvas,
+                x: ZOOM_SCALE * (artX - LOUPE_RADIUS),
+                y: ZOOM_SCALE * (artY - LOUPE_RADIUS),
+                width: LOUPE_RADIUS * 2 * ZOOM_SCALE,
+                height: LOUPE_RADIUS * 2 * ZOOM_SCALE
+            },
             hideLoupe: hideLoupe
         };
         this.previousColorInfo = colorInfo;

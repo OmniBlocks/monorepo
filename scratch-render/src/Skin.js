@@ -45,7 +45,7 @@ class Skin {
 
         /**
          * A silhouette to store touching data, skins are responsible for keeping it up to date.
-         * @private
+         * @protected
          */
         this._silhouette = new Silhouette();
     }
@@ -138,9 +138,10 @@ class Skin {
     /**
      * If the skin defers silhouette operations until the last possible minute,
      * this will be called before isTouching uses the silhouette.
-     * @abstract
      */
-    updateSilhouette () {}
+    updateSilhouette () {
+        this._silhouette.unlazy();
+    }
 
     /**
      * Set this skin's texture to the given image.

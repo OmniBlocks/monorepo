@@ -120,10 +120,9 @@ class SVGSkin extends Skin {
         this._context.setTransform(scale, 0, 0, scale, 0, 0);
         this._context.drawImage(this._svgImage, 0, 0);
 
-        // Pull out the ImageData from the canvas. ImageData speeds up
-        // updating Silhouette and is better handled by more browsers in
-        // regards to memory.
-        const textureData = this._context.getImageData(0, 0, this._canvas.width, this._canvas.height);
+        // TW: Reading image data from <canvas> is very slow and causes animations to stutter,
+        // so we just use the canvas directly instead.
+        const textureData = this._canvas;
 
         const textureOptions = {
             auto: false,
@@ -146,6 +145,7 @@ class SVGSkin extends Skin {
     updateSilhouette (scale = [100, 100]) {
         // Ensure a silhouette exists.
         this.getTexture(scale);
+        this._silhouette.unlazy();
     }
 
     /**

@@ -107,6 +107,8 @@ class Silhouette {
          */
         this._height = 0;
 
+        this._lazyData = null;
+
         /**
          * The data representing a skin's silhouette shape.
          * @type {Uint8ClampedArray}
@@ -134,20 +136,18 @@ class Silhouette {
             imageData = bitmapData;
             this._width = bitmapData.width;
             this._height = bitmapData.height;
+            this._lazyData = null;
+            this._colorData = imageData.data;
         } else {
-            // Draw about anything else to our update canvas and poll image data
-            // from that.
-            const canvas = Silhouette._updateCanvas();
-            const width = this._width = canvas.width = bitmapData.width;
-            const height = this._height = canvas.height = bitmapData.height;
-            const ctx = canvas.getContext('2d');
-
-            if (!(width && height)) {
+            // TW: No reason to read the image data now, there's a high chance it won't be needed and will
+            // just waste memory and CPU time. We'll read it lazily, only when necessary.
+            this._width = bitmapData.width;
+            this._height = bitmapData.height;
+            this._lazyData = bitmapData;
+            this._colorData = null;
+            if (!(this._width && this._height)) {
                 return;
             }
-            ctx.clearRect(0, 0, width, height);
-            ctx.drawImage(bitmapData, 0, 0, width, height);
-            imageData = ctx.getImageData(0, 0, width, height);
         }
 
         if (isPremultiplied) {
@@ -156,11 +156,27 @@ class Silhouette {
             this._getColor = getColor4b;
         }
 
-        this._colorData = imageData.data;
         // delete our custom overriden "uninitalized" color functions
         // let the prototype work for itself
         delete this.colorAtNearest;
         delete this.colorAtLinear;
+    }
+
+    unlazy () {
+        if (!this._lazyData) {
+            return;
+        }
+
+        const canvas = Silhouette._updateCanvas();
+        const width = canvas.width = this._width;
+        const height = canvas.height = this._height;
+        const ctx = canvas.getContext('2d');
+
+        ctx.clearRect(0, 0, width, height);
+        ctx.drawImage(this._lazyData, 0, 0, width, height);
+        const textureData = ctx.getImageData(0, 0, width, height);
+        this._colorData = textureData.data;
+        this._lazyData = null;
     }
 
     /**

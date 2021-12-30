@@ -1120,10 +1120,15 @@ class RenderWebGL extends EventEmitter {
             return false;
         }
         const bounds = this.clientSpaceToScratchBounds(centerX, centerY, touchWidth, touchHeight);
-        const worldPos = twgl.v3.create();
+
+        const drawableBounds = drawable.getFastBounds();
+        if (!drawableBounds.intersects(bounds)) {
+            return false;
+        }
 
         drawable.updateCPURenderAttributes();
 
+        const worldPos = twgl.v3.create();
         for (worldPos[1] = bounds.bottom; worldPos[1] <= bounds.top; worldPos[1]++) {
             for (worldPos[0] = bounds.left; worldPos[0] <= bounds.right; worldPos[0]++) {
                 if (drawable.isTouching(worldPos)) {

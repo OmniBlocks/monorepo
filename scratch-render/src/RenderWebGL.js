@@ -1122,6 +1122,7 @@ class RenderWebGL extends EventEmitter {
         const bounds = this.clientSpaceToScratchBounds(centerX, centerY, touchWidth, touchHeight);
 
         const drawableBounds = drawable.getFastBounds();
+        drawableBounds.snapToInt();
         if (!drawableBounds.intersects(bounds)) {
             return false;
         }

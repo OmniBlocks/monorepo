@@ -1,11 +1,9 @@
-const EventEmitter = require('events');
-
 const twgl = require('twgl.js');
 
 const RenderConstants = require('./RenderConstants');
 const Silhouette = require('./Silhouette');
 
-class Skin extends EventEmitter {
+class Skin {
     /**
      * Create a Skin, which stores and/or generates textures for use in rendering.
      * @param {int} id - The unique ID for this Skin.
@@ -13,8 +11,6 @@ class Skin extends EventEmitter {
      * @constructor
      */
     constructor (id, renderer) {
-        super();
-
         /** @type {RenderWebGL} */
         this._renderer = renderer;
 

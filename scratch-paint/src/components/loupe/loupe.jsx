@@ -77,6 +77,8 @@ class LoupeComponent extends React.Component {
             ...boxProps
         } = this.props;
         const loupeDiameter = ZOOM_SCALE * LOUPE_RADIUS * 2;
+        const x = (colorInfo.x / pixelRatio) - (loupeDiameter / 2);
+        const y = (colorInfo.y / pixelRatio) - (loupeDiameter / 2);
         return (
             <Box
                 {...boxProps}
@@ -85,8 +87,7 @@ class LoupeComponent extends React.Component {
                 element="canvas"
                 height={LOUPE_RADIUS * 2}
                 style={{
-                    top: (colorInfo.y / pixelRatio) - (loupeDiameter / 2),
-                    left: (colorInfo.x / pixelRatio) - (loupeDiameter / 2),
+                    transform: `translate(${x}px, ${y}px)`,
                     width: loupeDiameter,
                     height: loupeDiameter
                 }}

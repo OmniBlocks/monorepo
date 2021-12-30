@@ -359,7 +359,7 @@ class Runtime extends EventEmitter {
         this.profiler = null;
 
         this.cloudOptions = {
-            limit: 100
+            limit: 10
         };
 
         const newCloudDataManager = cloudDataManager(this.cloudOptions);

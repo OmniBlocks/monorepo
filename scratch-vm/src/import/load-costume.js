@@ -187,6 +187,20 @@ const fetchBitmapCanvas_ = function (costume, runtime, rotationCenter) {
         });
 };
 
+const toDataURL = imageOrCanvas => {
+    if (imageOrCanvas instanceof HTMLCanvasElement) {
+        return imageOrCanvas.toDataURL();
+    }
+    const canvas = canvasPool.create();
+    canvas.width = imageOrCanvas.width;
+    canvas.height = imageOrCanvas.height;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(imageOrCanvas, 0, 0);
+    const url = canvas.toDataURL();
+    canvasPool.release(canvas);
+    return url;
+};
+
 const loadBitmap_ = function (costume, runtime, _rotationCenter) {
     return fetchBitmapCanvas_(costume, runtime, _rotationCenter)
         .then(fetched => {
@@ -215,7 +229,7 @@ const loadBitmap_ = function (costume, runtime, _rotationCenter) {
             };
 
             if (!fetched.assetMatchesBase) {
-                updateCostumeAsset(fetched.canvas.toDataURL());
+                updateCostumeAsset(toDataURL(fetched.image));
             }
 
             return fetched;

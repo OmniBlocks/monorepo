@@ -158,7 +158,7 @@ const _transformPath = function (pathString, transform) {
     };
 
     const roundTo4Places = function (num) {
-        return Number(num.toFixed(4));
+        return Math.round(num * 1e4) / 1e4;
     };
 
     // Returns the transformed point as a string

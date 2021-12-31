@@ -21,10 +21,8 @@ import {
     setInterpolationState,
     setHasCloudVariables
 } from '../reducers/tw';
-import analytics from './analytics';
 
 let compileErrorCounter = 0;
-let sentCompileErrorEvent = false;
 
 /*
  * Higher Order Component to manage events emitted by the VM
@@ -113,11 +111,6 @@ const vmListenerHOC = function (WrappedComponent) {
             // Ignore intentonal errors
             if (errorMessage.includes('Script explicitly disables compilation')) {
                 return;
-            }
-            // Send an analytics event the first time this happens
-            if (!sentCompileErrorEvent) {
-                sentCompileErrorEvent = true;
-                analytics.twEvent('Compile Error');
             }
             this.props.onCompileError({
                 sprite: target.getName(),

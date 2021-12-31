@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import CrashMessageComponent from '../components/crash-message/crash-message.jsx';
 import log from '../lib/log.js';
 import {recommendedBrowser} from '../lib/supported-browser';
-import analytics from '../lib/analytics';
 
 class ErrorBoundary extends React.Component {
     constructor (props) {
@@ -30,11 +29,6 @@ class ErrorBoundary extends React.Component {
                 scope.setExtra('action', this.props.action);
                 window.Sentry.captureException(error);
             });
-        }
-
-        // tw: Track error event. Error message will be included when plausible's custom props are ready.
-        if (recommendedBrowser()) {
-            analytics.twEvent('Crash');
         }
 
         // Display fallback UI

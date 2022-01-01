@@ -1,16 +1,9 @@
 // Use JS implemented TextDecoder and TextEncoder if it is not provided by the
 // browser.
-let _TextDecoder;
-let _TextEncoder;
 if (typeof TextDecoder === 'undefined' || typeof TextEncoder === 'undefined') {
     // Wait to require the text encoding polyfill until we know it's needed.
     // eslint-disable-next-line global-require
-    const encoding = require('fastestsmallesttextencoderdecoder');
-    _TextDecoder = encoding.TextDecoder;
-    _TextEncoder = encoding.TextEncoder;
-} else {
-    _TextDecoder = TextDecoder;
-    _TextEncoder = TextEncoder;
+    require('fastestsmallesttextencoderdecoder');
 }
 
 const md5 = require('js-md5');
@@ -119,7 +112,7 @@ class Asset {
      * @returns {string} - This asset's data, decoded as text.
      */
     decodeText () {
-        const decoder = new _TextDecoder();
+        const decoder = new TextDecoder();
         return decoder.decode(this.data);
     }
 
@@ -130,7 +123,7 @@ class Asset {
      * @param {bool} generateId - after setting data, set the id to an md5 of the data?
      */
     encodeTextData (data, dataFormat, generateId) {
-        const encoder = new _TextEncoder();
+        const encoder = new TextEncoder();
         this.setData(encoder.encode(data), dataFormat, generateId);
     }
 

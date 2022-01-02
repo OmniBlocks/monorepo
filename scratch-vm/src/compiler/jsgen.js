@@ -1058,9 +1058,13 @@ class JSGenerator {
             this.source += `runtime.monitorBlocks.changeBlock({ id: "${sanitize(node.variable.id)}", element: "checkbox", value: true }, runtime);\n`;
             break;
 
-        case 'visualReport':
-            this.source += `runtime.visualReport("${sanitize(this.script.topBlockId)}", ${this.descendInput(node.input).asUnknown()});\n`;
+        case 'visualReport': {
+            const value = this.localVariables.next();
+            this.source += `const ${value} = ${this.descendInput(node.input).asUnknown()};`;
+            // blocks like legacy no-ops can return a literal `undefined`
+            this.source += `if (${value} !== undefined) runtime.visualReport("${sanitize(this.script.topBlockId)}", ${value});\n`;
             break;
+        }
 
         default:
             log.warn(`JS: Unknown stacked block: ${node.kind}`, node);

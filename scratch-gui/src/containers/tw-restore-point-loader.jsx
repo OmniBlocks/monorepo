@@ -7,6 +7,7 @@ import VM from 'scratch-vm';
 import {closeFileMenu} from '../reducers/menus';
 import {closeLoadingProject, openLoadingProject} from '../reducers/modals';
 import {onLoadedProject, requestProjectUpload} from '../reducers/project-state';
+import {setFileHandle} from '../reducers/tw';
 import RestorePointAPI from '../lib/tw-restore-point-api';
 
 const messages = defineMessages({
@@ -79,6 +80,7 @@ const mapDispatchToProps = dispatch => ({
         dispatch(onLoadedProject(loadingState, false, success));
         dispatch(closeLoadingProject());
         dispatch(closeFileMenu());
+        dispatch(setFileHandle(null));
     },
     requestProjectUpload: loadingState => dispatch(requestProjectUpload(loadingState)),
     onLoadingStarted: () => dispatch(openLoadingProject())

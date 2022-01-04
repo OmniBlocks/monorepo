@@ -209,6 +209,7 @@ $border-radius: 0.25rem;
 }
 
 .text-area {
+    color: black;
     background: transparent;
     border: none;
     display: none;

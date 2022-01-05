@@ -10,6 +10,9 @@
     justify-content: center;
     align-items: center;
 }
+[theme="dark"] .crash-wrapper {
+    background-color: $motion-primary-dark;
+}
 .body {
     width: 50%;
     color: white;

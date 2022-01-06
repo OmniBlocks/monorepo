@@ -511,7 +511,7 @@ class Tab extends EventTargetShim {
                 const originalCreateAllInputs = ScratchBlocks.Blocks.procedures_call.createAllInputs_;
                 ScratchBlocks.Blocks.procedures_call.createAllInputs_ = function (...args2) {
                     const block = this.procCode_ && vm.runtime.getAddonBlock(this.procCode_);
-                    if (block) {
+                    if (block && block.displayName) {
                         const originalProcCode = this.procCode_;
                         this.procCode_ = block.displayName;
                         const ret = originalCreateAllInputs.call(this, ...args2);

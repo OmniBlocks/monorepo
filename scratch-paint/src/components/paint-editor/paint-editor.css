@@ -140,6 +140,9 @@ $border-radius: 0.25rem;
     position: relative;
     overflow: visible;
 }
+[theme="dark"] .canvas-container {
+    border-color: $form-border;
+}
 
 .mode-selector {
     display: flex;

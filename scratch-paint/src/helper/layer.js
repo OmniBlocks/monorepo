@@ -64,6 +64,10 @@ const getBackgroundGuideLayer = function () {
     return _getLayer('isBackgroundGuideLayer');
 };
 
+const getOutlineLayer = function () {
+    return _getLayer('isOutlineLayer');
+};
+
 const _convertLayer = function (layer, format) {
     layer.bitmapBackground.visible = isBitmap(format);
     layer.vectorBackground.visible = isVector(format);
@@ -178,6 +182,8 @@ const _makeRasterLayer = function () {
 
 const BACKGROUND_LIGHT = '#FFFFFF';
 const BACKGROUND_TILE_LIGHT = '#D9E3F2';
+const BACKGROUND_DARK = '#111';
+const BACKGROUND_TILE_DARK = '#222';
 
 const _makeBackgroundPaper = function (width, height, opacity) {
     // creates a checkerboard path of width * height squares in color on white
@@ -278,6 +284,7 @@ const _makeDragCrosshairLayer = function () {
 
 const OUTLINE_INNER_LIGHT = '#FFFFFF';
 const OUTLINE_OUTER_LIGHT = '#4280D7';
+const OUTLINE_INNER_DARK = '#555555';
 
 const _makeOutlineLayer = function () {
     const outlineLayer = new paper.Layer();
@@ -295,6 +302,7 @@ const _makeOutlineLayer = function () {
 };
 
 const WORKSPACE_BOUNDS_LIGHT = '#ECF1F9';
+const WORKSPACE_BOUNDS_DARK = '#333';
 
 const _makeBackgroundGuideLayer = function (format) {
     const guideLayer = new paper.Layer();
@@ -337,6 +345,23 @@ const _makeBackgroundGuideLayer = function (format) {
     return guideLayer;
 };
 
+const updateTheme = function (theme) {
+    const isDark = theme === 'dark';
+
+    const backgroundGuideLayer = getBackgroundGuideLayer();
+    const bitmapChildren = backgroundGuideLayer.bitmapBackground.children;
+    bitmapChildren[0].fillColor = isDark ? BACKGROUND_DARK : BACKGROUND_LIGHT;
+    bitmapChildren[1].fillColor = isDark ? BACKGROUND_TILE_DARK : BACKGROUND_TILE_LIGHT;
+
+    const vectorChildren = backgroundGuideLayer.vectorBackground.children;
+    vectorChildren[0].fillColor = WORKSPACE_BOUNDS_DARK;
+    vectorChildren[1].children[0].fillColor = isDark ? BACKGROUND_DARK : BACKGROUND_LIGHT;
+    vectorChildren[1].children[1].fillColor = isDark ? BACKGROUND_TILE_DARK : BACKGROUND_TILE_LIGHT;
+
+    const outlineLayer = getOutlineLayer();
+    outlineLayer.children[0].strokeColor = isDark ? OUTLINE_INNER_DARK : OUTLINE_INNER_LIGHT;
+};
+
 const setupLayers = function (format) {
     const backgroundGuideLayer = _makeBackgroundGuideLayer(format);
     _makeRasterLayer();
@@ -364,5 +389,6 @@ export {
     clearRaster,
     getRaster,
     setGuideItem,
+    updateTheme,
     setupLayers
 };

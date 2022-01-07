@@ -211,6 +211,7 @@ const PaintEditorComponent = props => (
                         imageId={props.imageId}
                         rotationCenterX={props.rotationCenterX}
                         rotationCenterY={props.rotationCenterY}
+                        theme={props.theme}
                         zoomLevelId={props.zoomLevelId}
                         onUpdateImage={props.onUpdateImage}
                     />
@@ -335,6 +336,7 @@ PaintEditorComponent.propTypes = {
     setCanvas: PropTypes.func.isRequired,
     setTextArea: PropTypes.func.isRequired,
     textArea: PropTypes.instanceOf(Element),
+    theme: PropTypes.string,
     zoomLevelId: PropTypes.string
 };
 

@@ -9,7 +9,7 @@ import log from '../log/log';
 import {performSnapshot} from '../helper/undo';
 import {undoSnapshot, clearUndoState} from '../reducers/undo';
 import {isGroup, ungroupItems} from '../helper/group';
-import {clearRaster, convertBackgroundGuideLayer, getRaster, setupLayers} from '../helper/layer';
+import {clearRaster, convertBackgroundGuideLayer, getRaster, setupLayers, updateTheme} from '../helper/layer';
 import {clearSelectedItems} from '../reducers/selected-items';
 import {
     ART_BOARD_WIDTH, ART_BOARD_HEIGHT, CENTER, MAX_WORKSPACE_BOUNDS,
@@ -63,6 +63,7 @@ class PaperCanvas extends React.Component {
         paper.settings.handleSize = 0;
         // Make layers.
         setupLayers(this.props.format);
+        updateTheme(this.props.theme);
         this.importImage(
             this.props.imageFormat, this.props.image, this.props.rotationCenterX, this.props.rotationCenterY);
     }
@@ -75,6 +76,9 @@ class PaperCanvas extends React.Component {
         if (this.props.format !== newProps.format) {
             this.recalibrateSize();
             convertBackgroundGuideLayer(newProps.format);
+        }
+        if (this.props.theme !== newProps.theme) {
+            updateTheme(newProps.theme);
         }
     }
     componentWillUnmount () {
@@ -341,6 +345,7 @@ class PaperCanvas extends React.Component {
                 ref={this.setCanvas}
                 style={{cursor: this.props.cursor}}
                 resize="true"
+                theme={this.props.theme}
             />
         );
     }
@@ -365,6 +370,7 @@ PaperCanvas.propTypes = {
     rotationCenterY: PropTypes.number,
     saveZoomLevel: PropTypes.func.isRequired,
     setZoomLevelId: PropTypes.func.isRequired,
+    theme: PropTypes.string,
     undoSnapshot: PropTypes.func.isRequired,
     updateViewBounds: PropTypes.func.isRequired,
     zoomLevelId: PropTypes.string,

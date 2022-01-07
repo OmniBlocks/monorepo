@@ -7,3 +7,6 @@
     position: absolute;
     background-color: #D9E3F2;
 }
+.paper-canvas[theme="dark"] {
+    background-color: #222;
+}

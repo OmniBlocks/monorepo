@@ -326,6 +326,7 @@ class PaintEditor extends React.Component {
                 setCanvas={this.setCanvas}
                 setTextArea={this.setTextArea}
                 textArea={this.state.textArea}
+                theme={this.props.theme}
                 zoomLevelId={this.props.zoomLevelId}
                 onRedo={this.props.onRedo}
                 onSwitchToBitmap={this.props.handleSwitchToBitmap}
@@ -376,6 +377,7 @@ PaintEditor.propTypes = {
     setSelectedItems: PropTypes.func.isRequired,
     shouldShowRedo: PropTypes.func.isRequired,
     shouldShowUndo: PropTypes.func.isRequired,
+    theme: PropTypes.oneOf(['light', 'dark']),
     updateViewBounds: PropTypes.func.isRequired,
     viewBounds: PropTypes.instanceOf(paper.Matrix).isRequired,
     zoomLevelId: PropTypes.string

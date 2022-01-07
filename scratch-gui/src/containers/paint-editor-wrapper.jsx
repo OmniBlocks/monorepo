@@ -18,7 +18,8 @@ class PaintEditorWrapper extends React.Component {
     shouldComponentUpdate (nextProps) {
         return this.props.imageId !== nextProps.imageId ||
             this.props.rtl !== nextProps.rtl ||
-            this.props.name !== nextProps.name;
+            this.props.name !== nextProps.name ||
+            this.props.isDark !== nextProps.isDark;
     }
     handleUpdateName (name) {
         this.props.vm.renameCostume(this.props.selectedCostumeIndex, name);
@@ -54,6 +55,7 @@ class PaintEditorWrapper extends React.Component {
                 onUpdateImage={this.handleUpdateImage}
                 onUpdateName={this.handleUpdateName}
                 fontInlineFn={inlineSvgFonts}
+                theme={this.props.isDark ? 'dark' : 'light'}
             />
         );
     }
@@ -62,6 +64,7 @@ class PaintEditorWrapper extends React.Component {
 PaintEditorWrapper.propTypes = {
     imageFormat: PropTypes.string.isRequired,
     imageId: PropTypes.string.isRequired,
+    isDark: PropTypes.bool,
     name: PropTypes.string,
     rotationCenterX: PropTypes.number,
     rotationCenterY: PropTypes.number,

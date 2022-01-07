@@ -74,6 +74,7 @@ const ThemeHOC = function (WrappedComponent) {
             return (
                 <WrappedComponent
                     onClickTheme={this.handleClickTheme}
+                    isDark={this.state.dark}
                     {...this.props}
                 />
             );

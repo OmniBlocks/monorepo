@@ -3,5 +3,8 @@
 .button-group {
     display: inline-flex;
     flex-direction: row;
-    padding: 0 $grid-unit;
+    padding: 0 0 0 $grid-unit;
+}
+[dir="rtl"] .button-group {
+    padding: 0 $grid-unit 0 0;
 }

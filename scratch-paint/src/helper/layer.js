@@ -354,7 +354,7 @@ const updateTheme = function (theme) {
     bitmapChildren[1].fillColor = isDark ? BACKGROUND_TILE_DARK : BACKGROUND_TILE_LIGHT;
 
     const vectorChildren = backgroundGuideLayer.vectorBackground.children;
-    vectorChildren[0].fillColor = WORKSPACE_BOUNDS_DARK;
+    vectorChildren[0].fillColor = isDark ? WORKSPACE_BOUNDS_DARK : WORKSPACE_BOUNDS_LIGHT;
     vectorChildren[1].children[0].fillColor = isDark ? BACKGROUND_DARK : BACKGROUND_LIGHT;
     vectorChildren[1].children[1].fillColor = isDark ? BACKGROUND_TILE_DARK : BACKGROUND_TILE_LIGHT;
 

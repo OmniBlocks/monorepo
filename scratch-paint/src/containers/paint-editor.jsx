@@ -17,6 +17,7 @@ import {deactivateEyeDropper} from '../reducers/eye-dropper';
 import {setTextEditTarget} from '../reducers/text-edit-target';
 import {updateViewBounds} from '../reducers/view-bounds';
 import {setLayout} from '../reducers/layout';
+import {setTheme as setReduxTheme} from '../reducers/theme';
 
 import {getSelectedLeafItems} from '../helper/selection';
 import {convertToBitmap, convertToVector} from '../helper/bitmap';
@@ -91,7 +92,6 @@ class PaintEditor extends React.Component {
             'handleZoomReset'
         ]);
         this.state = {
-            theme: props.theme,
             canvas: null,
             colorInfo: null
         };
@@ -117,10 +117,7 @@ class PaintEditor extends React.Component {
             this.props.setLayout(newProps.rtl ? 'rtl' : 'ltr');
         }
         if (this.props.theme !== newProps.theme) {
-            // eslint-disable-next-line react/no-did-update-set-state
-            this.setState({
-                theme: newProps.theme
-            });
+            this.props.setReduxTheme('default');
         }
     }
     componentDidUpdate (prevProps) {
@@ -218,10 +215,12 @@ class PaintEditor extends React.Component {
             }
         }
     }
+    getEffectiveTheme () {
+        return this.props.reduxTheme === 'default' ? this.props.theme : this.props.reduxTheme;
+    }
     handleChangeTheme () {
-        this.setState({
-            theme: this.state.theme === 'dark' ? 'light' : 'dark'
-        });
+        const newTheme = this.getEffectiveTheme() === 'light' ? 'dark' : 'light';
+        this.props.setReduxTheme(newTheme === this.props.theme ? 'default' : newTheme);
     }
     handleZoomIn () {
         // Make the "next step" after the outermost zoom level be the default
@@ -339,7 +338,7 @@ class PaintEditor extends React.Component {
                 setCanvas={this.setCanvas}
                 setTextArea={this.setTextArea}
                 textArea={this.state.textArea}
-                theme={this.state.theme}
+                theme={this.getEffectiveTheme()}
                 zoomLevelId={this.props.zoomLevelId}
                 onChangeTheme={this.handleChangeTheme}
                 onRedo={this.props.onRedo}
@@ -392,6 +391,8 @@ PaintEditor.propTypes = {
     shouldShowRedo: PropTypes.func.isRequired,
     shouldShowUndo: PropTypes.func.isRequired,
     theme: PropTypes.oneOf(['light', 'dark']),
+    reduxTheme: PropTypes.oneOf(['default', 'light', 'dark']),
+    setReduxTheme: PropTypes.func.isRequired,
     updateViewBounds: PropTypes.func.isRequired,
     viewBounds: PropTypes.instanceOf(paper.Matrix).isRequired,
     zoomLevelId: PropTypes.string
@@ -403,6 +404,7 @@ const mapStateToProps = state => ({
     isEyeDropping: state.scratchPaint.color.eyeDropper.active,
     mode: state.scratchPaint.mode,
     previousTool: state.scratchPaint.color.eyeDropper.previousTool,
+    reduxTheme: state.scratchPaint.theme,
     viewBounds: state.scratchPaint.viewBounds
 });
 const mapDispatchToProps = dispatch => ({
@@ -423,6 +425,9 @@ const mapDispatchToProps = dispatch => ({
     },
     setLayout: layout => {
         dispatch(setLayout(layout));
+    },
+    setReduxTheme: theme => {
+        dispatch(setReduxTheme(theme));
     },
     setSelectedItems: format => {
         dispatch(setSelectedItems(getSelectedLeafItems(), isBitmap(format)));

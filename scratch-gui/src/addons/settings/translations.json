@@ -229,7 +229,7 @@
         "credits": "Dank aan:",
         "dirty": "Herlaad TurboWarp om de instellingen te accepteren.",
         "dirtyButton": "Herlaad nu",
-        "enableDangerous": "Deze addon is gevaarlijk en kan opzettelijk kenmerken UITSCHAKELEN. Meeste gebruiker ZOUDEN NIET deze addon inschakelen. Weet je zeker dat je het wilt inschakelen?",
+        "enableDangerous": "Deze addon is gevaarlijk en kan opzettelijk functies UITSCHAKELEN. Meeste gebruikers ZOUDEN NIET deze addon inschakelen. Weet je zeker dat je het wilt inschakelen?",
         "export": "Exporteer instellingen",
         "groupDanger": "Gevaarlijk ({number})",
         "groupNew": "Nieuw ({number})",

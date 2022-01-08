@@ -41,6 +41,7 @@ import bitmapIcon from './icons/bitmap.svg';
 import zoomInIcon from './icons/zoom-in.svg';
 import zoomOutIcon from './icons/zoom-out.svg';
 import zoomResetIcon from './icons/zoom-reset.svg';
+import themeIcon from './icons/theme.svg';
 
 const messages = defineMessages({
     bitmap: {
@@ -299,6 +300,19 @@ const PaintEditorComponent = props => (
                                 />
                             </Button>
                         </ButtonGroup>
+                        <ButtonGroup>
+                            <Button
+                                className={styles.buttonGroupButton}
+                                onClick={props.onChangeTheme}
+                            >
+                                <img
+                                    alt="Change theme"
+                                    className={styles.buttonGroupButtonIcon}
+                                    draggable={false}
+                                    src={themeIcon}
+                                />
+                            </Button>
+                        </ButtonGroup>
                     </InputGroup>
                 </div>
             </div>
@@ -321,6 +335,7 @@ PaintEditorComponent.propTypes = {
     intl: intlShape,
     isEyeDropping: PropTypes.bool,
     name: PropTypes.string,
+    onChangeTheme: PropTypes.func.isRequired,
     onRedo: PropTypes.func.isRequired,
     onSwitchToBitmap: PropTypes.func.isRequired,
     onSwitchToVector: PropTypes.func.isRequired,

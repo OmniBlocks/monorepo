@@ -85,11 +85,13 @@ class PaintEditor extends React.Component {
             'startEyeDroppingLoop',
             'stopEyeDroppingLoop',
             'handleSetSelectedItems',
+            'handleChangeTheme',
             'handleZoomIn',
             'handleZoomOut',
             'handleZoomReset'
         ]);
         this.state = {
+            theme: props.theme,
             canvas: null,
             colorInfo: null
         };
@@ -113,6 +115,12 @@ class PaintEditor extends React.Component {
         }
         if (newProps.rtl !== this.props.rtl) {
             this.props.setLayout(newProps.rtl ? 'rtl' : 'ltr');
+        }
+        if (this.props.theme !== newProps.theme) {
+            // eslint-disable-next-line react/no-did-update-set-state
+            this.setState({
+                theme: newProps.theme
+            });
         }
     }
     componentDidUpdate (prevProps) {
@@ -209,6 +217,11 @@ class PaintEditor extends React.Component {
                 this.props.changeMode(Modes.BIT_BRUSH);
             }
         }
+    }
+    handleChangeTheme () {
+        this.setState({
+            theme: this.state.theme === 'dark' ? 'light' : 'dark'
+        });
     }
     handleZoomIn () {
         // Make the "next step" after the outermost zoom level be the default
@@ -326,8 +339,9 @@ class PaintEditor extends React.Component {
                 setCanvas={this.setCanvas}
                 setTextArea={this.setTextArea}
                 textArea={this.state.textArea}
-                theme={this.props.theme}
+                theme={this.state.theme}
                 zoomLevelId={this.props.zoomLevelId}
+                onChangeTheme={this.handleChangeTheme}
                 onRedo={this.props.onRedo}
                 onSwitchToBitmap={this.props.handleSwitchToBitmap}
                 onSwitchToVector={this.props.handleSwitchToVector}

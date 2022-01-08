@@ -304,6 +304,7 @@ class ColorPickerComponent extends React.Component {
                         className={styles.pickerText}
                         value={this.props.hexColor || '#00000000'}
                         onSubmit={this.props.onHexColorChange}
+                        placeholder="#123abc"
                     />
                 </div>
                 <div className={styles.swatchRow}>

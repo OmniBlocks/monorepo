@@ -3,9 +3,12 @@ import parseColor from 'parse-color';
 const TRANSPARENT_BLACK = '#00000000';
 
 const safeParseColor = color => {
-    const result = parseColor(color);
+    let result = parseColor(color);
     if (!result.rgba) {
-        return parseColor(TRANSPARENT_BLACK);
+        result = parseColor(`#${color}`);
+        if (!result.rgba) {
+            return parseColor(TRANSPARENT_BLACK);
+        }
     }
     return result;
 };

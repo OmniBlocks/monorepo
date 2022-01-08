@@ -134,7 +134,6 @@ $border-radius: 0.25rem;
     width: 100%;
     flex-grow: 1;
     min-width: 402px; /* Leave room for the border */
-    box-sizing: content-box;
     border: 1px solid #e8edf1;
     border-radius: .25rem;
     position: relative;

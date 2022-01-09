@@ -55,11 +55,13 @@ class Pool {
 const optimize = projectData => {
     // projectData is modified in-place
 
-    // The optimization here is not optimal. This is intentional because we want to be truly lossless and maintain
-    // all editor functionality and compatibility with third-party tools.
+    // The optimization here is not optimal. This is intentional.
+    // We only optimize block and comment IDs because we want to maintain 100% (not 99.99%; 100%) compatibility and be
+    // truly lossless. Optimizing things like variable IDs will cause things such as the editor's backpack feature
+    // to misbehave.
 
-    // Optimization happens in two "passes", one to find all IDs and sort them so that we can generate the most
-    // optimized new IDs, then one more pass to actually apply those new IDs.
+    // We use the same variable pool for all objects to avoid any possible issues if IDs are ever treated as unique
+    // within a given project.
     const pool = new Pool();
 
     for (const target of projectData.targets) {
@@ -67,7 +69,7 @@ const optimize = projectData => {
             const block = target.blocks[blockId];
             pool.addReference(blockId);
             if (Array.isArray(block)) {
-                // Compressed primitive
+                // Compressed native
                 continue;
             }
             if (block.parent) {
@@ -79,15 +81,16 @@ const optimize = projectData => {
             if (block.comment) {
                 pool.addReference(block.comment);
             }
-            for (const inputName of Object.keys(block.inputs)) {
-                const input = block.inputs[inputName];
-                const inputValue = input[1];
-                if (typeof inputValue === 'string') {
-                    const childBlockId = input[1];
-                    pool.addReference(childBlockId);
+            for (const input of Object.values(block.inputs)) {
+                for (let i = 1; i < input.length; i++) {
+                    const inputValue = input[i];
+                    if (typeof inputValue === 'string') {
+                        pool.addReference(inputValue);
+                    }
                 }
             }
         }
+
         for (const commentId of Object.keys(target.comments)) {
             const comment = target.comments[commentId];
             pool.addReference(commentId);
@@ -105,6 +108,7 @@ const optimize = projectData => {
             const block = target.blocks[blockId];
             newBlocks[pool.getNewId(blockId)] = block;
             if (Array.isArray(block)) {
+                // Compressed native
                 continue;
             }
             if (block.parent) {
@@ -116,15 +120,16 @@ const optimize = projectData => {
             if (block.comment) {
                 block.comment = pool.getNewId(block.comment);
             }
-            for (const inputName of Object.keys(block.inputs)) {
-                const input = block.inputs[inputName];
-                const inputValue = input[1];
-                if (typeof inputValue === 'string') {
-                    const childBlockId = input[1];
-                    input[1] = pool.getNewId(childBlockId);
+            for (const input of Object.values(block.inputs)) {
+                for (let i = 1; i < input.length; i++) {
+                    const inputValue = input[i];
+                    if (typeof inputValue === 'string') {
+                        input[i] = pool.getNewId(inputValue);
+                    }
                 }
             }
         }
+
         for (const commentId of Object.keys(target.comments)) {
             const comment = target.comments[commentId];
             newComments[pool.getNewId(commentId)] = comment;
@@ -132,6 +137,7 @@ const optimize = projectData => {
                 comment.blockId = pool.getNewId(comment.blockId);
             }
         }
+
         target.blocks = newBlocks;
         target.comments = newComments;
     }

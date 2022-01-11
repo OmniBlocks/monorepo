@@ -4,7 +4,6 @@
  * JSON and then generates all needed scratch-vm runtime structures.
  */
 
-const vmPackage = require('../../package.json');
 const Blocks = require('../engine/blocks');
 const Sprite = require('../sprites/sprite');
 const Variable = require('../engine/variable');
@@ -564,7 +563,8 @@ const serialize = function (runtime, targetId, {allowOptimization = true} = {}) 
     // Assemble metadata
     const meta = Object.create(null);
     meta.semver = '3.0.0';
-    meta.vm = vmPackage.version;
+    // TW: There isn't a good reason to put the full version number in the json, so we don't.
+    meta.vm = '0.2.0';
     if (runtime.origin) {
         meta.origin = runtime.origin;
     }

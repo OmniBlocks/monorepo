@@ -552,6 +552,7 @@ class Blocks extends React.Component {
         const {
             anyModalVisible,
             canUseCloud,
+            customStageSize,
             customProceduresVisible,
             extensionLibraryVisible,
             options,

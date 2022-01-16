@@ -533,8 +533,15 @@ const TWStateManager = function (WrappedComponent) {
         isEmbedded: PropTypes.bool,
         projectChanged: PropTypes.bool,
         projectId: PropTypes.string,
-        compilerOptions: PropTypes.shape({}),
-        runtimeOptions: PropTypes.shape({}),
+        compilerOptions: PropTypes.shape({
+            enabled: PropTypes.bool,
+            warpTimer: PropTypes.bool
+        }),
+        runtimeOptions: PropTypes.shape({
+            miscLimits: PropTypes.bool,
+            fencing: PropTypes.bool,
+            maxClones: PropTypes.number
+        }),
         highQualityPen: PropTypes.bool,
         framerate: PropTypes.number,
         interpolation: PropTypes.bool,

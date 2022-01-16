@@ -2523,6 +2523,9 @@ class Runtime extends EventEmitter {
         if (parsed.hq && this.renderer) {
             this.renderer.setUseHighQualityRender(true);
         }
+        if (parsed.width && parsed.height) {
+            this.setStageSize(+parsed.width, +parsed.height);
+        }
     }
 
     generateProjectOptions () {
@@ -2532,6 +2535,8 @@ class Runtime extends EventEmitter {
         options.interpolation = this.interpolationEnabled;
         options.turbo = this.turboMode;
         options.hq = this.renderer ? this.renderer.useHighQualityRender : false;
+        options.width = this.stageWidth;
+        options.height = this.stageHeight;
         return options;
     }
 

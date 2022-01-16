@@ -537,6 +537,14 @@ class Runtime extends EventEmitter {
     }
 
     /**
+     * Event name for stage size changing.
+     * @const {string}
+     */
+    static get STAGE_SIZE_CHANGED () {
+        return 'STAGE_SIZE_CHANGED';
+    }
+
+    /**
      * Event name for compiler errors.
      * @const {string}
      */
@@ -2374,6 +2382,25 @@ class Runtime extends EventEmitter {
         this.compilerOptions = Object.assign({}, this.compilerOptions, compilerOptions);
         this.resetAllCaches();
         this.emit(Runtime.COMPILER_OPTIONS_CHANGED, this.compilerOptions);
+    }
+
+    /**
+     * Change width and height of stage. This will also inform the renderer of the new stage size.
+     * @param {number} width New stage width
+     * @param {number} height New stage height
+     */
+    setStageSize (width, height) {
+        this.stageWidth = width;
+        this.stageHeight = height;
+        if (this.renderer) {
+            this.renderer.setStageSize(
+                -width / 2,
+                width / 2,
+                -height / 2,
+                height / 2
+            );
+        }
+        this.emit(Runtime.STAGE_SIZE_CHANGED, width, height);
     }
 
     setInEditor (inEditor) {

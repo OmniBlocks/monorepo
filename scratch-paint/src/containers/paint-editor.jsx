@@ -21,7 +21,7 @@ import {setTheme as setReduxTheme} from '../reducers/theme';
 
 import {getSelectedLeafItems} from '../helper/selection';
 import {convertToBitmap, convertToVector} from '../helper/bitmap';
-import {resetZoom, zoomOnSelection, OUTERMOST_ZOOM_LEVEL} from '../helper/view';
+import {resizeView, resetZoom, zoomOnSelection, OUTERMOST_ZOOM_LEVEL} from '../helper/view';
 import EyeDropperTool from '../helper/tools/eye-dropper';
 
 import Modes, {BitmapModes, VectorModes} from '../lib/modes';
@@ -96,6 +96,7 @@ class PaintEditor extends React.Component {
             colorInfo: null
         };
         this.props.setLayout(this.props.rtl ? 'rtl' : 'ltr');
+        resizeView(this.props.width, this.props.height);
     }
     componentDidMount () {
         document.addEventListener('keydown', this.props.onKeyPress);
@@ -118,6 +119,9 @@ class PaintEditor extends React.Component {
         }
         if (this.props.theme !== newProps.theme) {
             this.props.setReduxTheme('default');
+        }
+        if (this.props.width !== newProps.width || this.props.height !== newProps.height) {
+            log.warn('dynamic width/height prop change not supported; re-mount the component');
         }
     }
     componentDidUpdate (prevProps) {
@@ -393,9 +397,16 @@ PaintEditor.propTypes = {
     theme: PropTypes.oneOf(['light', 'dark']),
     reduxTheme: PropTypes.oneOf(['default', 'light', 'dark']),
     setReduxTheme: PropTypes.func.isRequired,
+    width: PropTypes.number,
+    height: PropTypes.number,
     updateViewBounds: PropTypes.func.isRequired,
     viewBounds: PropTypes.instanceOf(paper.Matrix).isRequired,
     zoomLevelId: PropTypes.string
+};
+
+PaintEditor.defaultProps = {
+    width: 480,
+    height: 360
 };
 
 const mapStateToProps = state => ({

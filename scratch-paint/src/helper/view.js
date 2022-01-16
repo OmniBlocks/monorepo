@@ -3,29 +3,40 @@ import {CROSSHAIR_SIZE, getBackgroundGuideLayer, getDragCrosshairLayer, getRaste
 import {getAllRootItems, getSelectedRootItems} from './selection';
 import {getHitBounds} from './bitmap';
 import log from '../log/log';
-import twStageSize from '../lib/tw-stage-size';
 
 // Vectors are imported and exported at SVG_ART_BOARD size.
 // Once they are imported however, both SVGs and bitmaps are on
 // canvases of ART_BOARD size.
-// (This is for backwards compatibility, to handle both assets
-// designed for 480 x 360, and bitmap resolution 2 bitmaps)
-const SVG_ART_BOARD_WIDTH = twStageSize.width;
-const SVG_ART_BOARD_HEIGHT = twStageSize.height;
-const ART_BOARD_WIDTH = SVG_ART_BOARD_WIDTH * 2;
-const ART_BOARD_HEIGHT = SVG_ART_BOARD_HEIGHT * 2;
-const CENTER = new paper.Point(ART_BOARD_WIDTH / 2, ART_BOARD_HEIGHT / 2);
+
+/* eslint-disable import/no-mutable-exports */
+let SVG_ART_BOARD_WIDTH;
+let SVG_ART_BOARD_HEIGHT;
+let ART_BOARD_WIDTH;
+let ART_BOARD_HEIGHT;
+let CENTER;
 const PADDING_PERCENT = 25; // Padding as a percent of the max of width/height of the sprite
 const BUFFER = 50; // Number of pixels of allowance around objects at the edges of the workspace
 const MIN_RATIO = .125; // Zoom in to at least 1/8 of the screen. This way you don't end up incredibly
 //                         zoomed in for tiny costumes.
 const OUTERMOST_ZOOM_LEVEL = 0.333;
-const ART_BOARD_BOUNDS = new paper.Rectangle(0, 0, ART_BOARD_WIDTH, ART_BOARD_HEIGHT);
-const MAX_WORKSPACE_BOUNDS = new paper.Rectangle(
-    -ART_BOARD_WIDTH / 4,
-    -ART_BOARD_HEIGHT / 4,
-    ART_BOARD_WIDTH * 1.5,
-    ART_BOARD_HEIGHT * 1.5);
+let ART_BOARD_BOUNDS;
+let MAX_WORKSPACE_BOUNDS;
+/* eslint-enable import/no-mutable-exports */
+
+const resizeView = (width, height) => {
+    SVG_ART_BOARD_WIDTH = width;
+    SVG_ART_BOARD_HEIGHT = height;
+    ART_BOARD_WIDTH = SVG_ART_BOARD_WIDTH * 2;
+    ART_BOARD_HEIGHT = SVG_ART_BOARD_HEIGHT * 2;
+    CENTER = new paper.Point(ART_BOARD_WIDTH / 2, ART_BOARD_HEIGHT / 2);
+    ART_BOARD_BOUNDS = new paper.Rectangle(0, 0, ART_BOARD_WIDTH, ART_BOARD_HEIGHT);
+    MAX_WORKSPACE_BOUNDS = new paper.Rectangle(
+        -ART_BOARD_WIDTH / 4,
+        -ART_BOARD_HEIGHT / 4,
+        ART_BOARD_WIDTH * 1.5,
+        ART_BOARD_HEIGHT * 1.5);
+};
+resizeView(480, 360);
 
 let _workspaceBounds = ART_BOARD_BOUNDS;
 
@@ -211,6 +222,7 @@ export {
     SVG_ART_BOARD_WIDTH,
     SVG_ART_BOARD_HEIGHT,
     MAX_WORKSPACE_BOUNDS,
+    resizeView,
     clampViewBounds,
     getActionBounds,
     pan,

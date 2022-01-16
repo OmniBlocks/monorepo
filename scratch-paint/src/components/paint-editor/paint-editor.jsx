@@ -73,6 +73,7 @@ const PaintEditorComponent = props => (
                         onUndo={props.onUndo}
                         onUpdateImage={props.onUpdateImage}
                         onUpdateName={props.onUpdateName}
+                        width={props.width}
                     />
                 </div>
                 {/* Second Row */}
@@ -352,6 +353,7 @@ PaintEditorComponent.propTypes = {
     setTextArea: PropTypes.func.isRequired,
     textArea: PropTypes.instanceOf(Element),
     theme: PropTypes.string,
+    width: PropTypes.number,
     zoomLevelId: PropTypes.string
 };
 

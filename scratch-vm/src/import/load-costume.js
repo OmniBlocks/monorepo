@@ -111,12 +111,6 @@ const fetchBitmapCanvas_ = function (costume, runtime, rotationCenter) {
             return null;
         }
 
-        if (typeof createImageBitmap !== 'undefined') {
-            return createImageBitmap(
-                new Blob([asset.data], {type: asset.assetType.contentType})
-            );
-        }
-
         return new Promise((resolve, reject) => {
             const image = new Image();
             image.onload = function () {

@@ -127,6 +127,10 @@ const fetchBitmapCanvas_ = function (costume, runtime, rotationCenter) {
         });
     }))
         .then(([baseImageElement, textImageElement]) => {
+            if (!baseImageElement) {
+                throw new Error('Loading bitmap costume base failed.');
+            }
+
             const scale = costume.bitmapResolution === 1 ? 2 : 1;
 
             let imageOrCanvas;

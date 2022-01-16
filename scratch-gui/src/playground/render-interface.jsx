@@ -29,7 +29,6 @@ import TWStateManagerHOC from '../lib/tw-state-manager-hoc.jsx';
 import TWThemeHOC from '../lib/tw-theme-hoc.jsx';
 import SBFileUploaderHOC from '../lib/sb-file-uploader-hoc.jsx';
 import SettingsStore from '../addons/settings-store-singleton';
-import twStageSize from '../lib/tw-stage-size';
 import '../lib/tw-fix-history-api';
 import GUI from './render-gui.jsx';
 import MenuBar from '../components/menu-bar/menu-bar.jsx';
@@ -233,7 +232,7 @@ class Interface extends React.Component {
                     className={styles.center}
                     style={isPlayerOnly ? ({
                         // add a couple pixels to account for border (TODO: remove weird hack)
-                        width: `${Math.max(480, twStageSize.width) + 2}px`
+                        width: `${Math.max(480, props.customStageSize.width) + 2}px`
                     }) : null}
                 >
                     {isHomepage && announcement ? <DOMElementRenderer domElement={announcement} /> : null}
@@ -295,6 +294,10 @@ class Interface extends React.Component {
 Interface.propTypes = {
     intl: intlShape,
     hasCloudVariables: PropTypes.bool,
+    customStageSize: PropTypes.shape({
+        width: PropTypes.number,
+        height: PropTypes.number
+    }),
     description: PropTypes.shape({
         credits: PropTypes.string,
         instructions: PropTypes.string
@@ -309,6 +312,7 @@ Interface.propTypes = {
 
 const mapStateToProps = state => ({
     hasCloudVariables: state.scratchGui.tw.hasCloudVariables,
+    customStageSize: state.scratchGui.customStageSize,
     description: state.scratchGui.tw.description,
     isFullScreen: state.scratchGui.mode.isFullScreen,
     isLoading: getIsLoading(state.scratchGui.projectState.loadingState),

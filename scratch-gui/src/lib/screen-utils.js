@@ -1,5 +1,4 @@
 import layout, {STAGE_DISPLAY_SCALES, STAGE_SIZE_MODES, STAGE_DISPLAY_SIZES} from '../lib/layout-constants';
-import twStageSize from './tw-stage-size';
 
 const maxScaleParam = typeof URLSearchParams !== 'undefined' && new URLSearchParams(location.search).get('scale');
 
@@ -41,13 +40,14 @@ const resolveStageSize = (stageSizeMode, isFullSize) => {
 /**
  * Retrieve info used to determine the actual stage size based on the current GUI and browser state.
  * @param {STAGE_DISPLAY_SIZES} stageSize - the current fully-resolved stage size.
+ * @param {{width: number, height: number}} customStageSize Custom stage size
  * @param {boolean} isFullScreen - true if full-screen mode is enabled.
  * @return {StageDimensions} - an object describing the dimensions of the stage.
  */
-const getStageDimensions = (stageSize, isFullScreen) => {
+const getStageDimensions = (stageSize, customStageSize, isFullScreen) => {
     const stageDimensions = {
-        heightDefault: layout.standardStageHeight,
-        widthDefault: layout.standardStageWidth,
+        heightDefault: customStageSize.height,
+        widthDefault: customStageSize.width,
         height: 0,
         width: 0,
         scale: 0
@@ -58,14 +58,14 @@ const getStageDimensions = (stageSize, isFullScreen) => {
             STAGE_DIMENSION_DEFAULTS.menuHeightAdjustment -
             STAGE_DIMENSION_DEFAULTS.fullScreenSpacingBorderAdjustment;
 
-        stageDimensions.width = stageDimensions.height * (twStageSize.width / twStageSize.height);
+        stageDimensions.width = stageDimensions.height * (customStageSize.width / customStageSize.height);
 
         const maxWidth = maxScaleParam ? (
-            Math.min(window.innerWidth, maxScaleParam * twStageSize.width)
+            Math.min(window.innerWidth, maxScaleParam * customStageSize.width)
         ) : window.innerWidth;
         if (stageDimensions.width > maxWidth) {
             stageDimensions.width = maxWidth;
-            stageDimensions.height = stageDimensions.width * (twStageSize.height / twStageSize.width);
+            stageDimensions.height = stageDimensions.width * (customStageSize.height / customStageSize.width);
         }
 
         stageDimensions.scale = stageDimensions.width / stageDimensions.widthDefault;

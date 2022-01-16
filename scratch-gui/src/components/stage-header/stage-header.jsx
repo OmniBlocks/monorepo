@@ -50,6 +50,7 @@ const messages = defineMessages({
 
 const StageHeaderComponent = function (props) {
     const {
+        customStageSize,
         isFullScreen,
         isPlayerOnly,
         onKeyPress,
@@ -65,7 +66,7 @@ const StageHeaderComponent = function (props) {
     let header = null;
 
     if (isFullScreen || isEmbedded) {
-        const stageDimensions = getStageDimensions(null, true);
+        const stageDimensions = getStageDimensions(null, customStageSize, true);
         const stageButton = isEmbedded && !FullscreenAPI.available() ? (
             null
         ) : isFullScreen ? (
@@ -187,12 +188,17 @@ const StageHeaderComponent = function (props) {
 };
 
 const mapStateToProps = state => ({
+    customStageSize: state.scratchGui.customStageSize,
     // This is the button's mode, as opposed to the actual current state
     stageSizeMode: state.scratchGui.stageSize.stageSize
 });
 
 StageHeaderComponent.propTypes = {
     intl: intlShape,
+    customStageSize: PropTypes.shape({
+        width: PropTypes.number,
+        height: PropTypes.number
+    }),
     isFullScreen: PropTypes.bool.isRequired,
     isPlayerOnly: PropTypes.bool.isRequired,
     onKeyPress: PropTypes.func.isRequired,

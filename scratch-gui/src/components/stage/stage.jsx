@@ -17,6 +17,7 @@ import styles from './stage.css';
 const StageComponent = props => {
     const {
         canvas,
+        customStageSize,
         dragRef,
         isColorPicking,
         isFullScreen,
@@ -33,7 +34,7 @@ const StageComponent = props => {
         ...boxProps
     } = props;
 
-    const stageDimensions = getStageDimensions(stageSize, isFullScreen);
+    const stageDimensions = getStageDimensions(stageSize, customStageSize, isFullScreen);
     const minWidth = getMinWidth(stageSize);
     const transformStyle = stageDimensions.width < minWidth && !isFullScreen ? {
         transform: `translateX(${(minWidth - stageDimensions.width) / 2}px)`
@@ -145,6 +146,10 @@ const StageComponent = props => {
 };
 StageComponent.propTypes = {
     canvas: PropTypes.instanceOf(Element).isRequired,
+    customStageSize: PropTypes.shape({
+        width: PropTypes.number,
+        height: PropTypes.height
+    }),
     colorInfo: Loupe.propTypes.colorInfo,
     dragRef: PropTypes.func,
     isColorPicking: PropTypes.bool,

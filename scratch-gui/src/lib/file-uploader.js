@@ -3,7 +3,6 @@ import randomizeSpritePosition from './randomize-sprite-position.js';
 import bmpConverter from './bmp-converter';
 import gifDecoder from './gif-decoder';
 import fixSVG from './tw-svg-fixer';
-import twStageSize from './tw-stage-size';
 
 /**
  * Extract the file name given a string of the form fileName + ext
@@ -93,13 +92,14 @@ const createVMAsset = function (storage, assetType, dataFormat, data) {
  * @param {ArrayBuffer | string} fileData The costume data to load (this can be a base64 string
  * iff the image is a bitmap)
  * @param {string} fileType The MIME type of this file
- * @param {ScratchStorage} storage The ScratchStorage instance to cache the costume data
+ * @param {VM} vm The ScratchStorage instance to cache the costume data
  * @param {Function} handleCostume The function to execute on the costume object returned after
  * caching this costume in storage - This function should be responsible for
  * adding the costume to the VM and handling other UI flow that should come after adding the costume
  * @param {Function} handleError The function to execute if there is an error parsing the costume
  */
-const costumeUpload = function (fileData, fileType, storage, handleCostume, handleError = () => {}) {
+const costumeUpload = function (fileData, fileType, vm, handleCostume, handleError = () => {}) {
+    const storage = vm.runtime.storage;
     let costumeFormat = null;
     let assetType = null;
     switch (fileType) {
@@ -154,7 +154,9 @@ const costumeUpload = function (fileData, fileType, storage, handleCostume, hand
 
     const bitmapAdapter = new BitmapAdapter();
     if (bitmapAdapter.setStageSize) {
-        bitmapAdapter.setStageSize(twStageSize.width, twStageSize.height);
+        const width = vm.runtime.stageWidth;
+        const height = vm.runtime.stageHeight;
+        bitmapAdapter.setStageSize(width, height);
     }
     const addCostumeFromBuffer = function (dataBuffer) {
         const vmCostume = createVMAsset(
@@ -219,7 +221,7 @@ const soundUpload = function (fileData, fileType, storage, handleSound, handleEr
     handleSound(vmSound);
 };
 
-const spriteUpload = function (fileData, fileType, spriteName, storage, handleSprite, handleError = () => {}) {
+const spriteUpload = function (fileData, fileType, spriteName, vm, handleSprite, handleError = () => {}) {
     switch (fileType) {
     case '':
     case 'application/zip': { // We think this is a .sprite2 or .sprite3 file
@@ -233,7 +235,7 @@ const spriteUpload = function (fileData, fileType, spriteName, storage, handleSp
     case 'image/webp':
     case 'image/gif': {
         // Make a sprite from an image by making it a costume first
-        costumeUpload(fileData, fileType, storage, vmCostumes => {
+        costumeUpload(fileData, fileType, vm, vmCostumes => {
             vmCostumes.forEach((costume, i) => {
                 costume.name = `${spriteName}${i ? i + 1 : ''}`;
             });

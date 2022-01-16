@@ -139,10 +139,10 @@ class TargetPane extends React.Component {
         this.fileInput.click();
     }
     handleSpriteUpload (e) {
-        const storage = this.props.vm.runtime.storage;
+        const vm = this.props.vm;
         this.props.onShowImporting();
         handleFileUpload(e.target, (buffer, fileType, fileName, fileIndex, fileCount) => {
-            spriteUpload(buffer, fileType, fileName, storage, newSprite => {
+            spriteUpload(buffer, fileType, fileName, vm, newSprite => {
                 this.handleNewSprite(newSprite)
                     .then(() => {
                         if (fileIndex === fileCount - 1) {

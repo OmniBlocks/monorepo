@@ -5,7 +5,6 @@ import bindAll from 'lodash.bindall';
 import {connect} from 'react-redux';
 import {closeSettingsModal} from '../reducers/modals';
 import SettingsModalComponent from '../components/tw-settings-modal/settings-modal.jsx';
-import twStageSize from '../lib/tw-stage-size';
 import {searchParamsToString} from '../lib/tw-navigation-utils';
 
 const messages = defineMessages({
@@ -41,15 +40,14 @@ class UsernameModal extends React.Component {
             'handleDisableCompilerChange',
             'handleStoreProjectOptions'
         ]);
-        this.initialStageWidth = twStageSize.width;
-        this.initialStageHeight = twStageSize.height;
         this.state = {
-            stageWidth: this.initialStageWidth,
-            stageHeight: this.initialStageHeight
+            stageWidth: this.props.customStageSize.width,
+            stageHeight: this.props.customStageSize.height
         };
     }
     getNeedsReload () {
-        return this.state.stageWidth !== this.initialStageWidth || this.state.stageHeight !== this.initialStageHeight;
+        return this.state.stageWidth !== this.props.customStageSize.width ||
+            this.state.stageHeight !== this.props.customStageSize.height;
     }
     handleClose () {
         if (this.getNeedsReload()) {
@@ -178,6 +176,10 @@ UsernameModal.propTypes = {
     removeFencing: PropTypes.bool,
     removeLimits: PropTypes.bool,
     warpTimer: PropTypes.bool,
+    customStageSize: PropTypes.shape({
+        width: PropTypes.number,
+        height: PropTypes.number
+    }),
     disableCompiler: PropTypes.bool
 };
 
@@ -190,6 +192,7 @@ const mapStateToProps = state => ({
     removeFencing: !state.scratchGui.tw.runtimeOptions.fencing,
     removeLimits: !state.scratchGui.tw.runtimeOptions.miscLimits,
     warpTimer: state.scratchGui.tw.compilerOptions.warpTimer,
+    customStageSize: state.scratchGui.customStageSize,
     disableCompiler: !state.scratchGui.tw.compilerOptions.enabled
 });
 

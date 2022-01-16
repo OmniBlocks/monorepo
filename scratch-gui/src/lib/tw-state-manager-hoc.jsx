@@ -19,6 +19,7 @@ import {
 } from '../reducers/mode';
 import {generateRandomUsername} from './tw-username';
 import {setSearchParams} from './tw-navigation-utils';
+import {defaultStageSize} from '../reducers/custom-stage-size';
 
 /* eslint-disable no-alert */
 
@@ -393,6 +394,7 @@ const TWStateManager = function (WrappedComponent) {
             }
 
             if (
+                this.props.customStageSize !== prevProps.customStageSize ||
                 this.props.runtimeOptions !== prevProps.runtimeOptions ||
                 this.props.compilerOptions !== prevProps.compilerOptions ||
                 this.props.highQualityPen !== prevProps.highQualityPen ||
@@ -406,6 +408,13 @@ const TWStateManager = function (WrappedComponent) {
 
                 // Always remove legacy parameter
                 searchParams.delete('60fps');
+
+                const {width, height} = this.props.customStageSize;
+                if (width === defaultStageSize.width && height === defaultStageSize.height) {
+                    searchParams.delete('size');
+                } else {
+                    searchParams.set('size', `${width}x${height}`);
+                }
 
                 if (this.props.framerate === 30) {
                     searchParams.delete('fps');
@@ -498,6 +507,7 @@ const TWStateManager = function (WrappedComponent) {
             const {
                 /* eslint-disable no-unused-vars */
                 intl,
+                customStageSize,
                 isFullScreen,
                 isPlayerOnly,
                 isEmbedded,
@@ -528,6 +538,10 @@ const TWStateManager = function (WrappedComponent) {
     }
     StateManagerComponent.propTypes = {
         intl: intlShape,
+        customStageSize: PropTypes.shape({
+            width: PropTypes.number,
+            height: PropTypes.number
+        }),
         isFullScreen: PropTypes.bool,
         isPlayerOnly: PropTypes.bool,
         isEmbedded: PropTypes.bool,
@@ -559,6 +573,7 @@ const TWStateManager = function (WrappedComponent) {
         routingStyle: process.env.ROUTING_STYLE
     };
     const mapStateToProps = state => ({
+        customStageSize: state.scratchGui.customStageSize,
         isFullScreen: state.scratchGui.mode.isFullScreen,
         isPlayerOnly: state.scratchGui.mode.isPlayerOnly,
         isEmbedded: state.scratchGui.mode.isEmbedded,

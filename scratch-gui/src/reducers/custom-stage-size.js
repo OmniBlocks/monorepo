@@ -1,5 +1,4 @@
-const SET_WIDTH = 'custom-stage-size/SET_WIDTH';
-const SET_HEIGHT = 'custom-stage-size/SET_HEIGHT';
+const SET_CUSTOM_STAGE_SIZE = 'tw/custom-stage-size/SET';
 
 const getDimensions = () => {
     // Running in node.js
@@ -31,20 +30,19 @@ const getDimensions = () => {
     };
 };
 
-const initialState = getDimensions() || {
+const defaultStageSize = {
     width: 480,
     height: 360
 };
 
+const initialState = getDimensions() || defaultStageSize;
+
 const reducer = function (state, action) {
     if (typeof state === 'undefined') state = initialState;
     switch (action.type) {
-    case SET_WIDTH:
+    case SET_CUSTOM_STAGE_SIZE:
         return Object.assign({}, state, {
-            width: action.width
-        });
-    case SET_HEIGHT:
-        return Object.assign({}, state, {
+            width: action.width,
             height: action.height
         });
     default:
@@ -52,23 +50,17 @@ const reducer = function (state, action) {
     }
 };
 
-const setWidth = function (width) {
+const setCustomStageSize = function (width, height) {
     return {
-        type: SET_WIDTH,
-        width: width
-    };
-};
-
-const setHeight = function (height) {
-    return {
-        type: SET_HEIGHT,
-        height: height
+        type: SET_CUSTOM_STAGE_SIZE,
+        width,
+        height
     };
 };
 
 export {
     reducer as default,
     initialState as customStageSizeInitialState,
-    setWidth,
-    setHeight
+    defaultStageSize,
+    setCustomStageSize
 };

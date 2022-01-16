@@ -66,8 +66,10 @@ class Stage extends React.Component {
                 -this.props.customStageSize.height / 2,
                 this.props.customStageSize.height / 2
             );
-            this.props.vm.runtime.stageWidth = this.props.customStageSize.width;
-            this.props.vm.runtime.stageHeight = this.props.customStageSize.height;
+            this.props.vm.setStageSize(
+                this.props.customStageSize.width,
+                this.props.customStageSize.height
+            );
             this.props.vm.attachRenderer(this.renderer);
 
             // Only attach a video provider once because it is stateful
@@ -95,12 +97,12 @@ class Stage extends React.Component {
             this.props.isColorPicking !== nextProps.isColorPicking ||
             this.state.colorInfo !== nextState.colorInfo ||
             this.props.isFullScreen !== nextProps.isFullScreen ||
-            // tw: update when dimensions or isWindowFullScreen changes
             this.props.isWindowFullScreen !== nextProps.isWindowFullScreen ||
             this.props.dimensions !== nextProps.dimensions ||
             this.state.question !== nextState.question ||
             this.props.micIndicator !== nextProps.micIndicator ||
-            this.props.isStarted !== nextProps.isStarted;
+            this.props.isStarted !== nextProps.isStarted ||
+            this.props.customStageSize !== nextProps.customStageSize;
     }
     componentDidUpdate (prevProps) {
         if (this.props.isColorPicking && !prevProps.isColorPicking) {

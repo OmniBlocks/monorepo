@@ -21,6 +21,7 @@ import {
     setInterpolationState,
     setHasCloudVariables
 } from '../reducers/tw';
+import {setCustomStageSize} from '../reducers/custom-stage-size';
 
 let compileErrorCounter = 0;
 
@@ -69,6 +70,7 @@ const vmListenerHOC = function (WrappedComponent) {
             this.props.vm.on('INTERPOLATION_CHANGED', this.props.onInterpolationChanged);
             this.props.vm.on('COMPILE_ERROR', this.handleCompileError);
             this.props.vm.on('RUNTIME_STARTED', this.props.onClearCompileErrors);
+            this.props.vm.on('STAGE_SIZE_CHANGED', this.props.onStageSizeChanged);
         }
         componentDidMount () {
             if (this.props.attachKeyboardEvents) {
@@ -197,6 +199,7 @@ const vmListenerHOC = function (WrappedComponent) {
                 onInterpolationChanged,
                 onCompilerOptionsChanged,
                 onRuntimeOptionsChanged,
+                onStageSizeChanged,
                 onCompileError,
                 onClearCompileErrors,
                 onShowExtensionAlert,
@@ -230,6 +233,7 @@ const vmListenerHOC = function (WrappedComponent) {
         onInterpolationChanged: PropTypes.func.isRequired,
         onCompilerOptionsChanged: PropTypes.func.isRequired,
         onRuntimeOptionsChanged: PropTypes.func.isRequired,
+        onStageSizeChanged: PropTypes.func,
         onCompileError: PropTypes.func,
         onClearCompileErrors: PropTypes.func,
         projectChanged: PropTypes.bool,
@@ -278,6 +282,7 @@ const vmListenerHOC = function (WrappedComponent) {
         onInterpolationChanged: interpolation => dispatch(setInterpolationState(interpolation)),
         onCompilerOptionsChanged: options => dispatch(setCompilerOptionsState(options)),
         onRuntimeOptionsChanged: options => dispatch(setRuntimeOptionsState(options)),
+        onStageSizeChanged: (width, height) => dispatch(setCustomStageSize(width, height)),
         onCompileError: errors => dispatch(addCompileError(errors)),
         onClearCompileErrors: () => dispatch(clearCompileErrors()),
         onShowExtensionAlert: data => {

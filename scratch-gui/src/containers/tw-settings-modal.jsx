@@ -19,7 +19,6 @@ class UsernameModal extends React.Component {
     constructor (props) {
         super(props);
         bindAll(this, [
-            'handleClose',
             'handleFramerateChange',
             'handleCustomizeFramerate',
             'handleHighQualityPenChange',
@@ -33,9 +32,6 @@ class UsernameModal extends React.Component {
             'handleDisableCompilerChange',
             'handleStoreProjectOptions'
         ]);
-    }
-    handleClose () {
-        this.props.onCloseSettingsModal();
     }
     handleFramerateChange (e) {
         this.props.vm.setFramerate(e.target.checked ? 60 : 30);
@@ -91,14 +87,14 @@ class UsernameModal extends React.Component {
     render () {
         const {
             /* eslint-disable no-unused-vars */
-            onCloseSettingsModal,
+            onClose,
             vm,
             /* eslint-enable no-unused-vars */
             ...props
         } = this.props;
         return (
             <SettingsModalComponent
-                onClose={this.handleClose}
+                onClose={this.props.onClose}
                 onFramerateChange={this.handleFramerateChange}
                 onCustomizeFramerate={this.handleCustomizeFramerate}
                 onHighQualityPenChange={this.handleHighQualityPenChange}
@@ -125,7 +121,7 @@ class UsernameModal extends React.Component {
 
 UsernameModal.propTypes = {
     intl: intlShape,
-    onCloseSettingsModal: PropTypes.func,
+    onClose: PropTypes.func,
     vm: PropTypes.shape({
         renderer: PropTypes.shape({
             setUseHighQualityRender: PropTypes.func
@@ -165,7 +161,7 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-    onCloseSettingsModal: () => dispatch(closeSettingsModal())
+    onClose: () => dispatch(closeSettingsModal())
 });
 
 export default injectIntl(connect(

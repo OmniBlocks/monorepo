@@ -56,10 +56,6 @@ export default async function ({ addon, global, console, msg }) {
     else countContainerContainer.style.display = "flex";
   }
 
-  vm.runtime.on("targetWasRemoved", (t) => {
-    // Fix bug with inaccurate clone counter
-    if (t.isOriginal) vm.runtime.changeCloneCounter(1);
-  });
   const oldStep = vm.runtime.constructor.prototype._step;
   vm.runtime.constructor.prototype._step = function (...args) {
     const ret = oldStep.call(this, ...args);

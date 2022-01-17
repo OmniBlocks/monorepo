@@ -439,5 +439,32 @@
             "bug",
             "translation"
         ]
+    },
+    {
+        "login": "lercdsgn",
+        "name": "lercdsgn",
+        "avatar_url": "https://avatars.githubusercontent.com/u/75680333?v=4",
+        "profile": "https://github.com/LercDsgn",
+        "contributions": [
+            "translation"
+        ]
+    },
+    {
+        "login": "newcat07",
+        "name": "newcat07",
+        "avatar_url": "https://avatars.githubusercontent.com/u/97903646?v=4",
+        "profile": "https://github.com/newcat07",
+        "contributions": [
+            "translation"
+        ]
+    },
+    {
+        "login": "kebabo13",
+        "name": "kebabo",
+        "avatar_url": "https://avatars.githubusercontent.com/u/96626459?v=4",
+        "profile": "https://github.com/kebabo13",
+        "contributions": [
+            "translation"
+        ]
     }
 ]

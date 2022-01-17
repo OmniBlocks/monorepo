@@ -14,17 +14,6 @@ class PaintEditorWrapper extends React.Component {
             'handleUpdateImage',
             'handleUpdateName'
         ]);
-        this.state = {
-            key: 0
-        };
-    }
-    componentWillReceiveProps (nextProps) {
-        if (this.props.customStageSize !== nextProps.customStageSize) {
-            this.setState(oldState => ({
-                // This will force the paint editor to completely re-render
-                key: oldState + 1
-            }));
-        }
     }
     shouldComponentUpdate (nextProps) {
         return this.props.imageId !== nextProps.imageId ||
@@ -70,7 +59,6 @@ class PaintEditorWrapper extends React.Component {
                 theme={this.props.isDark ? 'dark' : 'light'}
                 width={this.props.customStageSize.width}
                 height={this.props.customStageSize.height}
-                key={this.state.key}
             />
         );
     }

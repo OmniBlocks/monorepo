@@ -75,10 +75,10 @@
   position: absolute;
   bottom: 0;
   transform: translateY(100%);
-  right: 101px;
+  right: 138px;
 }
 [dir="rtl"] .sa-onion-settings-tip {
-  right: 118px;
+  right: 84px;
 }
 .sa-onion-settings-polygon {
   fill: white;

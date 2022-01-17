@@ -120,9 +120,6 @@ class PaintEditor extends React.Component {
         if (this.props.theme !== newProps.theme) {
             this.props.setReduxTheme('default');
         }
-        if (this.props.width !== newProps.width || this.props.height !== newProps.height) {
-            log.warn('dynamic width/height prop change not supported; re-mount the component');
-        }
     }
     componentDidUpdate (prevProps) {
         if (this.props.isEyeDropping && !prevProps.isEyeDropping) {

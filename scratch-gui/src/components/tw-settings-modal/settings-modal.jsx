@@ -51,7 +51,7 @@ class UnwrappedSetting extends React.Component {
         };
     }
     componentDidUpdate (prevProps) {
-        if (this.props.showHelpAutomatically && this.props.active && !prevProps.active) {
+        if (this.props.active && !prevProps.active) {
             // eslint-disable-next-line react/no-did-update-set-state
             this.setState({
                 helpVisible: true
@@ -95,7 +95,6 @@ UnwrappedSetting.propTypes = {
     help: PropTypes.node,
     primary: PropTypes.node,
     secondary: PropTypes.node,
-    showHelpAutomatically: PropTypes.bool,
     slug: PropTypes.string
 };
 const Setting = injectIntl(UnwrappedSetting);
@@ -103,7 +102,6 @@ const Setting = injectIntl(UnwrappedSetting);
 const BooleanSetting = ({value, onChange, label, ...props}) => (
     <Setting
         {...props}
-        showHelpAutomatically
         active={value}
         primary={
             <label className={styles.label}>

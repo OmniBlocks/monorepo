@@ -113,8 +113,8 @@ class UsernameModal extends React.Component {
                 stageWidth={this.props.customStageSize.width}
                 stageHeight={this.props.customStageSize.height}
                 customStageSizeEnabled={
-                    this.props.customStageSize.width === defaultStageSize.width &&
-                    this.props.customStageSize.height === defaultStageSize.height
+                    this.props.customStageSize.width !== defaultStageSize.width ||
+                    this.props.customStageSize.height !== defaultStageSize.height
                 }
                 onStoreProjectOptions={this.handleStoreProjectOptions}
                 {...props}

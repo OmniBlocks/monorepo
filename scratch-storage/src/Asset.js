@@ -85,7 +85,7 @@ const addFinalizationReference = finalizationRegistry ? asset => {
     const assetId = asset.assetId;
     const count = assetIdCounts[assetId] || 0;
     assetIdCounts[assetId] = count + 1;
-    finalizationRegistry.register(asset, asset.assetId);
+    finalizationRegistry.register(asset, assetId);
 } : () => {};
 
 class Asset {

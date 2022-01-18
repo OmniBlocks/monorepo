@@ -67,6 +67,27 @@ const memoizedToString = (assetId, data) => {
     return memoizedStrings[assetId];
 };
 
+const assetIdCounts = {};
+
+/* globals FinalizationRegistry */
+const finalizationRegistry = typeof FinalizationRegistry === 'function' ? new FinalizationRegistry(assetId => {
+    const count = assetIdCounts[assetId];
+    if (count === 1) {
+        // This was the last reference
+        delete assetIdCounts[assetId];
+        delete memoizedStrings[assetId];
+    } else {
+        assetIdCounts[assetId] = count - 1;
+    }
+}) : null;
+
+const addFinalizationReference = finalizationRegistry ? asset => {
+    const assetId = asset.assetId;
+    const count = assetIdCounts[assetId] || 0;
+    assetIdCounts[assetId] = count + 1;
+    finalizationRegistry.register(asset, asset.assetId);
+} : () => {};
+
 class Asset {
     /**
      * Construct an Asset.
@@ -87,6 +108,8 @@ class Asset {
 
         /** @type {Asset[]} */
         this.dependencies = [];
+
+        addFinalizationReference(this);
     }
 
     setData (data, dataFormat, generateId) {

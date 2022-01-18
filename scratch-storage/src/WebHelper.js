@@ -86,7 +86,7 @@ class WebHelper extends Helper {
      */
     load (assetType, assetId, dataFormat) {
 
-        /** @type {Array.<{url:string, result:*}>} List of URLs attempted & errors encountered. */
+        /** @type {Array<string>} List of errors encountered. */
         const errors = [];
         const stores = this.stores.slice()
             .filter(store => store.types.indexOf(assetType.name) >= 0);
@@ -100,25 +100,23 @@ class WebHelper extends Helper {
         let storeIndex = 0;
         const tryNextSource = () => {
             const store = stores[storeIndex++];
+            if (!store) {
+                throw new Error(`All stores returned errors: ${errors.join(', ')}`);
+            }
 
             /** @type {UrlFunction} */
             const reqConfigFunction = store.get;
-
-            if (reqConfigFunction) {
-                const reqConfig = ensureRequestConfig(reqConfigFunction(asset));
-                if (reqConfig === false) {
-                    return tryNextSource();
-                }
-
-                return tool.get(reqConfig)
-                    .then(body => asset.setData(body, dataFormat))
-                    .catch(tryNextSource);
-            } else if (errors.length > 0) {
-                return Promise.reject(errors);
+            const reqConfig = ensureRequestConfig(reqConfigFunction(asset));
+            if (reqConfig === false) {
+                return tryNextSource();
             }
 
-            // no stores matching asset
-            return Promise.resolve(null);
+            return tool.get(reqConfig)
+                .then(body => asset.setData(body, dataFormat))
+                .catch(error => {
+                    errors.push(`${error}`);
+                    return tryNextSource();
+                });
         };
 
         return tryNextSource().then(() => asset);

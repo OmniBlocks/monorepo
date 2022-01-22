@@ -229,17 +229,11 @@ const Tags = ({manifest}) => (
                 {settingsTranslations.tagDanger}
             </span>
         )}
-        {manifest.noCompiler && (
-            <span className={classNames(styles.tag, styles.tagDanger)}>
-                {settingsTranslations.tagNoCompiler}
-            </span>
-        )}
     </span>
 );
 Tags.propTypes = {
     manifest: PropTypes.shape({
-        tags: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,
-        noCompiler: PropTypes.bool
+        tags: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired
     }).isRequired
 };
 
@@ -419,37 +413,29 @@ Setting.propTypes = {
 };
 
 const Notice = ({
-    addonId,
-    notice
-}) => {
-    const noticeId = notice.id;
-    const text = addonTranslations[`${addonId}/@info-${noticeId}`] || notice.text;
-    return (
-        <div
-            className={styles.notice}
-            type={notice.type}
-        >
-            <div>
-                <img
-                    className={styles.noticeIcon}
-                    src={infoImage}
-                    alt=""
-                    draggable={false}
-                />
-            </div>
-            <div>
-                {text}
-            </div>
+    type,
+    text
+}) => (
+    <div
+        className={styles.notice}
+        type={type}
+    >
+        <div>
+            <img
+                className={styles.noticeIcon}
+                src={infoImage}
+                alt=""
+                draggable={false}
+            />
         </div>
-    );
-};
+        <div>
+            {text}
+        </div>
+    </div>
+);
 Notice.propTypes = {
-    addonId: PropTypes.string,
-    notice: PropTypes.shape({
-        type: PropTypes.string,
-        text: PropTypes.string,
-        id: PropTypes.string
-    })
+    type: PropTypes.string,
+    text: PropTypes.string
 };
 
 const Presets = ({
@@ -571,15 +557,19 @@ const Addon = ({
                     </div>
                 )}
                 {manifest.info && (
-                    <div className={styles.noticeContainer}>
-                        {manifest.info.map(info => (
-                            <Notice
-                                key={info.id}
-                                addonId={id}
-                                notice={info}
-                            />
-                        ))}
-                    </div>
+                    manifest.info.map(info => (
+                        <Notice
+                            key={info.id}
+                            type={info.type}
+                            text={addonTranslations[`${id}/@info-${info.id}`] || info.text}
+                        />
+                    ))
+                )}
+                {manifest.noCompiler && (
+                    <Notice
+                        type="warning"
+                        text={settingsTranslations.noCompiler}
+                    />
                 )}
                 {manifest.settings && (
                     <div className={styles.settingContainer}>
@@ -620,7 +610,8 @@ Addon.propTypes = {
             id: PropTypes.string
         })),
         presets: PropTypes.arrayOf(PropTypes.shape({})),
-        tags: PropTypes.arrayOf(PropTypes.string)
+        tags: PropTypes.arrayOf(PropTypes.string),
+        noCompiler: PropTypes.bool
     }),
     extended: PropTypes.bool
 };

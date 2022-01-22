@@ -2390,15 +2390,17 @@ class Runtime extends EventEmitter {
      * @param {number} height New stage height
      */
     setStageSize (width, height) {
-        this.stageWidth = width;
-        this.stageHeight = height;
-        if (this.renderer) {
-            this.renderer.setStageSize(
-                -width / 2,
-                width / 2,
-                -height / 2,
-                height / 2
-            );
+        if (this.stageWidth !== width || this.stageHeight !== height) {
+            this.stageWidth = width;
+            this.stageHeight = height;
+            if (this.renderer) {
+                this.renderer.setStageSize(
+                    -width / 2,
+                    width / 2,
+                    -height / 2,
+                    height / 2
+                );
+            }
         }
         this.emit(Runtime.STAGE_SIZE_CHANGED, width, height);
     }

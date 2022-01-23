@@ -143,11 +143,11 @@ class Silhouette {
             // just waste memory and CPU time. We'll read it lazily, only when necessary.
             this._width = bitmapData.width;
             this._height = bitmapData.height;
-            this._lazyData = bitmapData;
-            this._colorData = null;
             if (!(this._width && this._height)) {
                 return;
             }
+            this._lazyData = bitmapData;
+            this._colorData = null;
         }
 
         if (isPremultiplied) {

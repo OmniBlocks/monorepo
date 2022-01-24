@@ -167,15 +167,20 @@ class Silhouette {
             return;
         }
 
-        const canvas = Silhouette._updateCanvas();
-        const width = canvas.width = this._width;
-        const height = canvas.height = this._height;
-        const ctx = canvas.getContext('2d');
+        const width = this._width;
+        const height = this._height;
+        if (width && height) {
+            const canvas = Silhouette._updateCanvas();
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
 
-        ctx.clearRect(0, 0, width, height);
-        ctx.drawImage(this._lazyData, 0, 0, width, height);
-        const textureData = ctx.getImageData(0, 0, width, height);
-        this._colorData = textureData.data;
+            ctx.clearRect(0, 0, width, height);
+            ctx.drawImage(this._lazyData, 0, 0, width, height);
+            const textureData = ctx.getImageData(0, 0, width, height);
+            this._colorData = textureData.data;
+        }
+
         this._lazyData = null;
     }
 

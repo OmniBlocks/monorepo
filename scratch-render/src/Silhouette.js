@@ -167,8 +167,8 @@ class Silhouette {
             return;
         }
 
-        const width = this._width;
-        const height = this._height;
+        const width = this._lazyData.width;
+        const height = this._lazyData.height;
         if (width && height) {
             const canvas = Silhouette._updateCanvas();
             canvas.width = width;

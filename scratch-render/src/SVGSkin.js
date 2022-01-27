@@ -103,6 +103,16 @@ class SVGSkin extends Skin {
      * @return {SVGMIP} An object that handles creating and updating SVG textures.
      */
     createMIP (scale) {
+        const isLargestMIP = this._largestMIPScale < scale;
+        // TW: Silhouette will lazily read image data from our <canvas>. However, this canvas is shared
+        // between the Skin and Silhouette so changing it here can mess up Silhouette. To prevent that,
+        // we will force the silhouette to synchronously read the image data before we mutate the
+        // canvas, unless the new MIP is the largest MIP, in which case doing so is unnecessary as we
+        // will update the silhouette later anyways.
+        if (!isLargestMIP) {
+            this._silhouette.unlazy();
+        }
+
         const [width, height] = this._size;
         this._canvas.width = width * scale;
         this._canvas.height = height * scale;
@@ -134,7 +144,7 @@ class SVGSkin extends Skin {
         const mip = twgl.createTexture(this._renderer.gl, textureOptions);
 
         // Check if this is the largest MIP created so far. Currently, silhouettes only get scaled up.
-        if (this._largestMIPScale < scale) {
+        if (isLargestMIP) {
             this._silhouette.update(textureData);
             this._largestMIPScale = scale;
         }

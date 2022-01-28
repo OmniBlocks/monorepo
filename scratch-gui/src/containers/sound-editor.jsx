@@ -277,7 +277,13 @@ class SoundEditor extends React.Component {
         const endIndex = this.state.trimEnd === null ?
             numChunks - 1 : Math.ceil(this.state.trimEnd * numChunks);
         const trimChunks = this.state.chunkLevels.slice(startIndex, endIndex);
-        return Math.max(...trimChunks) > MAX_RMS;
+        let max = 0;
+        for (const i of trimChunks) {
+            if (i > max) {
+                max = i;
+            }
+        }
+        return max > MAX_RMS;
     }
     getUndoItem () {
         return {

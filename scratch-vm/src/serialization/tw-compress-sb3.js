@@ -52,11 +52,11 @@ class Pool {
     }
 }
 
-const optimize = projectData => {
+const compress = projectData => {
     // projectData is modified in-place
 
     // The optimization here is not optimal. This is intentional.
-    // We only optimize block and comment IDs because we want to maintain 100% (not 99.99%; 100%) compatibility and be
+    // We only compress block and comment IDs because we want to maintain 100% (not 99.99%; 100%) compatibility and be
     // truly lossless. Optimizing things like variable IDs will cause things such as the editor's backpack feature
     // to misbehave.
 
@@ -143,4 +143,4 @@ const optimize = projectData => {
     }
 };
 
-module.exports = optimize;
+module.exports = compress;

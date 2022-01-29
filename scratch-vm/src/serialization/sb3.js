@@ -15,7 +15,7 @@ const uid = require('../util/uid');
 const MathUtil = require('../util/math-util');
 const StringUtil = require('../util/string-util');
 const VariableUtil = require('../util/variable-util');
-const optimize = require('./tw-optimize-sb3');
+const compress = require('./tw-compress-sb3');
 
 const {loadCostume} = require('../import/load-costume.js');
 const {loadSound} = require('../import/load-sound.js');
@@ -578,7 +578,7 @@ const serialize = function (runtime, targetId, {allowOptimization = true} = {}) 
     obj.meta = meta;
 
     if (allowOptimization) {
-        optimize(obj);
+        compress(obj);
     }
 
     return obj;

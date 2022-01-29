@@ -1,5 +1,5 @@
 const {test} = require('tap');
-const optimize = require('../../src/serialization/tw-optimize-sb3');
+const compress = require('../../src/serialization/tw-compress-sb3');
 
 test('handles type INPUT_DIFF_BLOCK_SHADOW (3) compressed inputs', t => {
     const data = {
@@ -72,7 +72,7 @@ test('handles type INPUT_DIFF_BLOCK_SHADOW (3) compressed inputs', t => {
             agent: ''
         }
     };
-    optimize(data);
+    compress(data);
 
     const blocks = Object.entries(data.targets[0].blocks);
     t.equal(blocks.length, 3);

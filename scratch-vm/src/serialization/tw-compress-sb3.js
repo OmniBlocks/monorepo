@@ -16,9 +16,6 @@
 
 const SOUP = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!#%()*+,-./:;=?@[]^_`{|}~';
 const generateId = i => {
-    // IDs in Object.keys(vm.runtime.monitorBlocks._blocks) already have meaning, so make sure to skip those
-    // We don't bother listing many here because most would take more than ten million items to be used
-    if (i > 1309) i++; // of
     let str = '';
     while (i >= 0) {
         str = SOUP[i % SOUP.length] + str;
@@ -31,6 +28,13 @@ class Pool {
     constructor () {
         this.generatedIds = new Map();
         this.references = new Map();
+        this.skippedIds = new Set();
+        // IDs in Object.keys(vm.runtime.monitorBlocks._blocks) already have meaning, so make sure to skip those
+        // We don't bother listing many here because most would take more than ten million items to be used
+        this.skippedIds.add('of');
+    }
+    skip (id) {
+        this.skippedIds.add(id);
     }
     addReference (id) {
         const currentCount = this.references.get(id) || 0;
@@ -40,8 +44,21 @@ class Pool {
         const entries = Array.from(this.references.entries());
         // The most used original IDs should get the shortest new IDs.
         entries.sort((a, b) => b[1] - a[1]);
-        for (let i = 0; i < entries.length; i++) {
-            this.generatedIds.set(entries[i][0], generateId(i));
+
+        let i = 0;
+        let newId;
+        for (const entry of entries) {
+            const oldId = entry[0];
+            while (true) {
+                newId = generateId(i);
+                if (this.skippedIds.has(newId)) {
+                    i++;
+                } else {
+                    break;
+                }
+            }
+            this.generatedIds.set(oldId, newId);
+            i++;
         }
     }
     getNewId (originalId) {
@@ -65,6 +82,18 @@ const compress = projectData => {
     const pool = new Pool();
 
     for (const target of projectData.targets) {
+        // While we don't compress these IDs, we need to make sure that our compressed IDs
+        // do not intersect, which could happen if the project was compressed with a
+        // different tool.
+        for (const variableId of Object.keys(target.variables)) {
+            pool.skip(variableId);
+        }
+        for (const listId of Object.keys(target.lists)) {
+            pool.skip(listId);
+        }
+        for (const broadcastId of Object.keys(target.broadcasts)) {
+            pool.skip(broadcastId);
+        }
         for (const blockId of Object.keys(target.blocks)) {
             const block = target.blocks[blockId];
             pool.addReference(blockId);

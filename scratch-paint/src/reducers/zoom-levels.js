@@ -3,6 +3,7 @@ import log from '../log/log';
 
 const SAVE_ZOOM_LEVEL = 'scratch-paint/zoom-levels/SAVE_ZOOM_LEVEL';
 const SET_ZOOM_LEVEL_ID = 'scratch-paint/zoom-levels/SET_ZOOM_LEVEL_ID';
+const RESET_ZOOM_LEVELS = 'scratch-paint/zoom-levels/RESET_ZOOM_LEVELS';
 const initialState = {};
 
 const reducer = function (state, action) {
@@ -20,6 +21,8 @@ const reducer = function (state, action) {
         return Object.assign({}, state, {
             [state.currentZoomLevelId]: action.zoomLevel
         });
+    case RESET_ZOOM_LEVELS:
+        return {};
     default:
         return state;
     }
@@ -41,9 +44,15 @@ const setZoomLevelId = function (zoomLevelId) {
         zoomLevelId: zoomLevelId
     };
 };
+const resetZoomLevels = function () {
+    return {
+        type: RESET_ZOOM_LEVELS
+    };
+};
 
 export {
     reducer as default,
     saveZoomLevel,
-    setZoomLevelId
+    setZoomLevelId,
+    resetZoomLevels
 };

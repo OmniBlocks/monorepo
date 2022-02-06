@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import PaintEditor from './paint-editor.jsx';
+import {connect} from 'react-redux';
+import {resetZoomLevels} from '../reducers/zoom-levels.js';
 
 // PaintEditor currently can not handle dynamically changing width and height for various nontrivial reasons
 // However, we can work around that by creating a new PaintEditor whenever the width or height changes,
@@ -15,6 +17,7 @@ class TWPaintEditorWrapper extends React.Component {
     }
     componentWillUpdate (nextProps) {
         if (this.props.width !== nextProps.width || this.props.height !== nextProps.height) {
+            this.props.resetZoomLevels();
             this.setState({
                 key: this.state.key + 1
             });
@@ -32,7 +35,16 @@ class TWPaintEditorWrapper extends React.Component {
 
 TWPaintEditorWrapper.propTypes = {
     width: PropTypes.number,
-    height: PropTypes.number
+    height: PropTypes.number,
+    resetZoomLevels: PropTypes.func
 };
 
-export default TWPaintEditorWrapper;
+const mapStateToProps = () => ({});
+const mapDispatchToProps = dispatch => ({
+    resetZoomLevels: () => dispatch(resetZoomLevels())
+});
+
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(TWPaintEditorWrapper);

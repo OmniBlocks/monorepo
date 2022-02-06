@@ -52,6 +52,7 @@ const addons = [
     'editor-comment-previews',
     'columns',
     'script-snap',
+    'fullscreen',
     'tw-straighten-comments',
     'tw-remove-backpack',
     'tw-remove-feedback',
@@ -61,7 +62,8 @@ const addons = [
 
 const newAddons = [
     'custom-block-text',
-    'search-sprites'
+    'search-sprites',
+    'fullscreen'
 ];
 
 // eslint-disable-next-line import/no-commonjs

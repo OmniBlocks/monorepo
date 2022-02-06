@@ -50,11 +50,12 @@ import _import47 from "../addons/swap-local-global/_manifest_entry.js";
 import _import48 from "../addons/editor-comment-previews/_manifest_entry.js";
 import _import49 from "../addons/columns/_manifest_entry.js";
 import _import50 from "../addons/script-snap/_manifest_entry.js";
-import _import51 from "../addons/tw-straighten-comments/_manifest_entry.js";
-import _import52 from "../addons/tw-remove-backpack/_manifest_entry.js";
-import _import53 from "../addons/tw-remove-feedback/_manifest_entry.js";
-import _import54 from "../addons/tw-disable-compiler/_manifest_entry.js";
-import _import55 from "../addons/editor-stepping/_manifest_entry.js";
+import _import51 from "../addons/fullscreen/_manifest_entry.js";
+import _import52 from "../addons/tw-straighten-comments/_manifest_entry.js";
+import _import53 from "../addons/tw-remove-backpack/_manifest_entry.js";
+import _import54 from "../addons/tw-remove-feedback/_manifest_entry.js";
+import _import55 from "../addons/tw-disable-compiler/_manifest_entry.js";
+import _import56 from "../addons/editor-stepping/_manifest_entry.js";
 export default {
   "cat-blocks": _import0,
   "editor-devtools": _import1,
@@ -107,9 +108,10 @@ export default {
   "editor-comment-previews": _import48,
   "columns": _import49,
   "script-snap": _import50,
-  "tw-straighten-comments": _import51,
-  "tw-remove-backpack": _import52,
-  "tw-remove-feedback": _import53,
-  "tw-disable-compiler": _import54,
-  "editor-stepping": _import55,
+  "fullscreen": _import51,
+  "tw-straighten-comments": _import52,
+  "tw-remove-backpack": _import53,
+  "tw-remove-feedback": _import54,
+  "tw-disable-compiler": _import55,
+  "editor-stepping": _import56,
 };

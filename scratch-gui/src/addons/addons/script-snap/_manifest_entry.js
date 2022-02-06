@@ -2,9 +2,7 @@
 const manifest = {
   "name": "Snap scripts to grid",
   "description": "Drag a script to automatically align its position to the code area dots.",
-  "tags": [
-    "new"
-  ],
+  "tags": [],
   "credits": [
     {
       "name": "CST1229",

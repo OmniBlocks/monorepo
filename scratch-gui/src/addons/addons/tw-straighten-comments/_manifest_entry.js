@@ -2,9 +2,7 @@
 const manifest = {
   "name": "Keep block comment connections straight",
   "description": "Forces block comments to always be connected to their source block by a horizontal straight line, not at an angle.",
-  "tags": [
-    "new"
-  ],
+  "tags": [],
   "credits": [
     {
       "name": "lisa_wolfgang",

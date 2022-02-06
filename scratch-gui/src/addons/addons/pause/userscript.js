@@ -7,16 +7,18 @@ const _twGetAsset = (path) => {
   throw new Error(`Unknown asset: ${path}`);
 };
 
-import { paused, setPaused, onPauseChanged } from "./module.js";
+import { isPaused, setPaused, onPauseChanged, setup } from "../debugger/module.js";
 
 export default async function ({ addon, global, console, msg }) {
+  setup(addon.tab.traps.vm);
+
   const img = document.createElement("img");
   img.className = "pause-btn";
   img.draggable = false;
   img.title = msg("pause");
 
-  const setSrc = () => (img.src = _twGetAsset((paused ? "/play.svg" : "/pause.svg")));
-  img.addEventListener("click", () => setPaused(!paused));
+  const setSrc = () => (img.src = _twGetAsset((isPaused() ? "/play.svg" : "/pause.svg")));
+  img.addEventListener("click", () => setPaused(!isPaused()));
   addon.tab.displayNoneWhileDisabled(img);
   addon.self.addEventListener("disabled", () => setPaused(false));
   setSrc();

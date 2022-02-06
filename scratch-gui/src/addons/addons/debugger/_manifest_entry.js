@@ -2,8 +2,15 @@
 const manifest = {
   "editorOnly": true,
   "name": "Debugger",
-  "description": "Adds a new \"debugger\" block category and a \"logs\" window to the editor. The \"log\", \"warn\" and \"error\" blocks will print the specified message into the logs window. The \"breakpoint\" block will pause the project when executed.",
+  "description": "Adds a new \"debugger\" window to the editor. Allows for logging into the \"Logs\" tab of the debugger window using the \"log\", \"warn\" and \"error\" blocks.",
   "credits": [
+    {
+      "name": "Tacodude7729",
+      "link": "https://scratch.mit.edu/users/Tacodude7729/"
+    },
+    {
+      "name": "GarboMuffin"
+    },
     {
       "name": "GrahamSH"
     },
@@ -24,7 +31,46 @@ const manifest = {
       "url": "style.css"
     }
   ],
-  "tags": [],
+  "settings": [
+    {
+      "dynamic": true,
+      "name": "Clear logs on green flag",
+      "id": "log_clear_greenflag",
+      "type": "boolean",
+      "default": false
+    },
+    {
+      "dynamic": true,
+      "name": "Log green flag clicks",
+      "id": "log_greenflag",
+      "type": "boolean",
+      "default": false
+    },
+    {
+      "dynamic": true,
+      "name": "Log clone creation",
+      "id": "log_clone_create",
+      "type": "boolean",
+      "default": false
+    },
+    {
+      "dynamic": true,
+      "name": "Log when max clones exceeded",
+      "id": "log_failed_clone_creation",
+      "type": "boolean",
+      "default": true
+    },
+    {
+      "dynamic": true,
+      "name": "Log broadcasts",
+      "id": "log_broadcasts",
+      "type": "boolean",
+      "default": false
+    }
+  ],
+  "tags": [
+    "beta"
+  ],
   "enabledByDefault": false
 };
 export default manifest;

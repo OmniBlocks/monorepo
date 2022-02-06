@@ -18,9 +18,7 @@ const manifest = {
       "url": "style.css"
     }
   ],
-  "tags": [
-    "beta"
-  ],
+  "tags": [],
   "dynamicEnable": true,
   "dynamicDisable": true,
   "enabledByDefault": false

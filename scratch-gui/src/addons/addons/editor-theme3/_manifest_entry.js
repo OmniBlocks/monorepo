@@ -15,6 +15,7 @@ const manifest = {
   ],
   "dynamicEnable": true,
   "dynamicDisable": true,
+  "updateUserstylesOnSettingsChange": true,
   "userscripts": [
     {
       "url": "theme3.js"
@@ -166,6 +167,12 @@ const manifest = {
           "name": "Colored on black background"
         }
       ]
+    },
+    {
+      "name": "Change the colors of blocks in the forums",
+      "id": "forums",
+      "type": "boolean",
+      "default": false
     }
   ],
   "tags": [

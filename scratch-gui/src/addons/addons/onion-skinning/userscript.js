@@ -27,7 +27,6 @@ export default async function ({ addon, global, console, msg }) {
   const paperCanvas =
     paintEditorCanvasContainer[addon.tab.traps.getInternalKey(paintEditorCanvasContainer)].child.child.child.stateNode;
 
-  let paperCenter;
   const storedOnionLayers = [];
 
   const parseHexColor = (color) => {
@@ -52,10 +51,12 @@ export default async function ({ addon, global, console, msg }) {
     afterTint: parseHexColor(addon.settings.get("afterTint")),
   };
 
-  const injectPaper = () => {
+  const getPaperCenter = () => {
     const backgroundGuideLayer = paper.project.layers.find((i) => i.data.isBackgroundGuideLayer);
-    paperCenter = backgroundGuideLayer.children[0].position;
+    return backgroundGuideLayer.children[0].position;
+  };
 
+  const injectPaper = () => {
     // When background guide layer is added, show onion layers.
     // https://github.com/LLK/scratch-paint/blob/cdf0afc217633e6cfb8ba90ea4ae38b79882cf6c/src/helper/layer.js#L145
     const originalAddLayer = paper.Project.prototype.addLayer;
@@ -373,6 +374,7 @@ export default async function ({ addon, global, console, msg }) {
           });
         }
 
+        const paperCenter = getPaperCenter();
         // https://github.com/LLK/scratch-paint/blob/cdf0afc217633e6cfb8ba90ea4ae38b79882cf6c/src/containers/paper-canvas.jsx#L277-L287
         if (typeof rotationCenterX !== "undefined" && typeof rotationCenterY !== "undefined") {
           let rotationPoint = new paper.Point(rotationCenterX, rotationCenterY);
@@ -406,6 +408,7 @@ export default async function ({ addon, global, console, msg }) {
 
       const image = new Image();
       image.onload = () => {
+        const paperCenter = getPaperCenter();
         const width = Math.min(paperCenter.x * 2, image.width);
         const height = Math.min(paperCenter.y * 2, image.height);
 

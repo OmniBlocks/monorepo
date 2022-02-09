@@ -112,9 +112,13 @@ export class EnvelopeEditor {
 		for (let envelopeIndex: number = instrument.envelopeCount; envelopeIndex < this._renderedEnvelopeCount; envelopeIndex++) {
 			this._rows[envelopeIndex].style.display = "none";
 		}
+
+		let useControlPointCount: number = instrument.noteFilter.controlPointCount;
+		if (instrument.noteFilterType)
+			useControlPointCount = 1;
 		
 		if (this._renderedEqFilterCount != instrument.eqFilter.controlPointCount ||
-			this._renderedNoteFilterCount != instrument.noteFilter.controlPointCount ||
+			this._renderedNoteFilterCount != useControlPointCount ||
 			this._renderedInstrumentType != instrument.type ||
 			this._renderedEffects != instrument.effects)
 		{
@@ -131,7 +135,7 @@ export class EnvelopeEditor {
 		
 		this._renderedEnvelopeCount = instrument.envelopeCount;
 		this._renderedEqFilterCount = instrument.eqFilter.controlPointCount;
-		this._renderedNoteFilterCount = instrument.noteFilter.controlPointCount;
+		this._renderedNoteFilterCount = useControlPointCount;
 		this._renderedInstrumentType = instrument.type;
 		this._renderedEffects = instrument.effects;
 	}

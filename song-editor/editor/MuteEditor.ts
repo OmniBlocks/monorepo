@@ -4,7 +4,7 @@ import { SongDocument } from "./SongDocument";
 import { HTML } from "imperative-html/dist/esm/elements-strict";
 import { ColorConfig } from "./ColorConfig";
 import { InputBox } from "./HTMLWrapper";
-import { ChangeChannelOrder, ChangeChannelName, ChangeChannelCount, ChangeRemoveChannel } from "./changes";
+import { ChangeChannelOrder, ChangeChannelName, ChangeRemoveChannel } from "./changes";
 import { Config } from "../synth/SynthConfig";
 import { SongEditor } from "./SongEditor";
 
@@ -180,30 +180,9 @@ export class MuteEditor {
 				break;
 			}
 			case "chnInsert": {
-				// Add a channel at the end, then swap it in.
-				let newPitchChannelCount: number = this._doc.song.pitchChannelCount;
-				let newNoiseChannelCount: number = this._doc.song.noiseChannelCount;
-				let newModChannelCount: number = this._doc.song.modChannelCount;
-				let swapIndex: number;
-
-				if (this._channelDropDownChannel < this._doc.song.pitchChannelCount) {
-					newPitchChannelCount++;
-					swapIndex = newPitchChannelCount;
-				}
-				else if (this._channelDropDownChannel < this._doc.song.pitchChannelCount + this._doc.song.noiseChannelCount) {
-					newNoiseChannelCount++;
-					swapIndex = newPitchChannelCount + newNoiseChannelCount;
-				}
-				else {
-					newModChannelCount++;
-					swapIndex = newPitchChannelCount + newNoiseChannelCount + newModChannelCount;
-				}
-
-				this._doc.record(new ChangeChannelCount(this._doc, newPitchChannelCount, newNoiseChannelCount, newModChannelCount));
-
-				for (let channel: number = swapIndex - 1; channel > this._channelDropDownChannel + 1; channel--) {
-					this._doc.record(new ChangeChannelOrder(this._doc, channel, channel, -1), true);
-				}
+				this._doc.channel = this._channelDropDownChannel;
+				this._doc.selection.resetBoxSelection();
+				this._doc.selection.insertChannel();
 				break;
 			}
 			case "chnDelete": {

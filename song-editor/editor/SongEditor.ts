@@ -2059,7 +2059,7 @@ export class SongEditor {
                         }
 
                         if (anyInstrumentArps) {
-                            settingList.push("arpeggio speed");
+                            settingList.push("arp speed");
                             settingList.push("reset arp");
                         }
                         if (anyInstrumentPitchShifts) {
@@ -2212,7 +2212,9 @@ export class SongEditor {
                         instrument.invalidModulators[mod] = true;
                         let useName: string = ((instrument.modFilterTypes[mod] - 1) % 2 == 1) ?
                             "dot " + (Math.floor((instrument.modFilterTypes[mod]-1) / 2) + 1) + " y"
-                            : "dot " + (Math.floor((instrument.modFilterTypes[mod]-1) / 2) + 1) + " x";
+                            : "dot " + (Math.floor((instrument.modFilterTypes[mod] - 1) / 2) + 1) + " x";
+                        if (instrument.modFilterTypes[mod] == 0)
+                            useName = "morph";
                         this._modFilterBoxes[mod].insertBefore(option({ value: useName, style: "color: red;" }, useName), this._modFilterBoxes[mod].children[0]);
                         this._modFilterBoxes[mod].selectedIndex = 0;
 

@@ -2019,12 +2019,13 @@ export class Instrument {
     }
 
     public addEnvelope(target: number, index: number, envelope: number): void {
-        if (!this.supportsEnvelopeTarget(target, index)) throw new Error();
+        let makeEmpty: boolean = false;
+        if (!this.supportsEnvelopeTarget(target, index)) makeEmpty = true;
         if (this.envelopeCount >= Config.maxEnvelopeCount) throw new Error();
         while (this.envelopes.length <= this.envelopeCount) this.envelopes[this.envelopes.length] = new EnvelopeSettings();
         const envelopeSettings: EnvelopeSettings = this.envelopes[this.envelopeCount];
-        envelopeSettings.target = target;
-        envelopeSettings.index = index;
+        envelopeSettings.target = makeEmpty ? Config.instrumentAutomationTargets.dictionary["none"].index : target;
+        envelopeSettings.index = makeEmpty ? 0 : index;
         envelopeSettings.envelope = envelope;
         this.envelopeCount++;
     }
@@ -2042,7 +2043,10 @@ export class Instrument {
         }
         if (automationTarget.isFilter) {
             //if (automationTarget.perNote) {
-            if (index >= this.noteFilter.controlPointCount || this.noteFilterType) return false;
+            let useControlPointCount: number = this.noteFilter.controlPointCount;
+            if (this.noteFilterType)
+                useControlPointCount = 1;
+            if (index >= useControlPointCount) return false;
             //} else {
             //	if (index >= this.eqFilter.controlPointCount)   return false;
             //}
@@ -6173,7 +6177,7 @@ export class Synth {
                     || (tgtInstrument.type != InstrumentType.fm && (str == "fm slider 1" || str == "fm slider 2" || str == "fm slider 3" || str == "fm slider 4" || str == "fm feedback"))
                     || (tgtInstrument.type != InstrumentType.pwm && (str == "pulse width"))
                     // Arp check
-                    || (!tgtInstrument.getChord().arpeggiates && (str == "arpeggio speed" || str == "reset arp"))
+                    || (!tgtInstrument.getChord().arpeggiates && (str == "arp speed" || str == "reset arp"))
                     // EQ Filter check
                     || (tgtInstrument.eqFilterType && str == "eq filter")
                     || (!tgtInstrument.eqFilterType && (str == "eq filt cut" || str == "eq filt peak"))
@@ -7332,7 +7336,8 @@ export class Synth {
             }
 
             let modToneCount: number = 0;
-            const instrumentState: InstrumentState = channelState.instruments[0];
+            const newInstrumentIndex: number = (song.patternInstruments && (pattern != null)) ? pattern!.instruments[0] : 0;
+            const instrumentState: InstrumentState = channelState.instruments[newInstrumentIndex];
             const toneList: Deque<Tone> = instrumentState.activeModTones;
             for (let mod: number = 0; mod < Config.modCount; mod++) {
                 if (notes[mod] != null) {
@@ -7341,7 +7346,6 @@ export class Synth {
 
                 }
 
-                const newInstrumentIndex: number = (song.patternInstruments && (pattern != null)) ? pattern!.instruments[0] : 0;
                 if (channelState.singleSeamlessInstrument != null && channelState.singleSeamlessInstrument != newInstrumentIndex && channelState.singleSeamlessInstrument < channelState.instruments.length) {
                     const sourceInstrumentState: InstrumentState = channelState.instruments[channelState.singleSeamlessInstrument];
                     const destInstrumentState: InstrumentState = channelState.instruments[newInstrumentIndex];

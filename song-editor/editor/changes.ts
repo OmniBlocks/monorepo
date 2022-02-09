@@ -1225,6 +1225,7 @@ export class ChangeChannelOrder extends Change {
         doc.song.channels.splice(selectionMin + offset, 0, ...doc.song.channels.splice(selectionMin, selectionMax - selectionMin + 1));
 
         // Update mods for each channel
+        selectionMax = Math.max(selectionMax, selectionMin);
         for (let channelIndex: number = doc.song.pitchChannelCount + doc.song.noiseChannelCount; channelIndex < doc.song.getChannelCount(); channelIndex++) {
             for (let instrumentIdx: number = 0; instrumentIdx < doc.song.channels[channelIndex].instruments.length; instrumentIdx++) {
                 let instrument: Instrument = doc.song.channels[channelIndex].instruments[instrumentIdx];
@@ -1308,6 +1309,11 @@ export class ChangeChannelCount extends Change {
                         // Boundary checking
                         if ((modChannel >= doc.song.pitchChannelCount && modChannel < oldPitchCount) || modChannel >= doc.song.pitchChannelCount + doc.song.noiseChannelCount) {
                             instrument.modulators[mod] = Config.modulators.dictionary["none"].index;
+                        }
+
+                        // Bump indices - new pitch channel added, bump all noise mods.
+                        if (modChannel >= oldPitchCount && oldPitchCount < newPitchChannelCount) {
+                            instrument.modChannels[mod] += newPitchChannelCount - oldPitchCount;
                         }
                     }
                 }

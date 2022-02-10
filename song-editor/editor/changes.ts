@@ -1338,7 +1338,12 @@ export class ChangeAddChannel extends ChangeGroup {
         if (newPitchChannelCount <= Config.pitchChannelCountMax && newNoiseChannelCount <= Config.noiseChannelCountMax && newModChannelCount <= Config.modChannelCountMax) {
             const addedChannelIndex: number = isNoise ? doc.song.pitchChannelCount + doc.song.noiseChannelCount : doc.song.pitchChannelCount;
             this.append(new ChangeChannelCount(doc, newPitchChannelCount, newNoiseChannelCount, newModChannelCount));
-			this.append(new ChangeChannelOrder(doc, index, addedChannelIndex - 1, 1));
+            if (addedChannelIndex - 1 >= index) {
+                this.append(new ChangeChannelOrder(doc, index, addedChannelIndex - 1, 1));
+            }
+
+            doc.synth.computeLatestModValues();
+            doc.recalcChannelNames = true;
 		}
 	}
 }
@@ -1386,6 +1391,8 @@ export class ChangeRemoveChannel extends ChangeGroup {
         doc.recalcChannelNames = true;
 
 		this.append(new ChangeChannelBar(doc, Math.max(0, minIndex - 1), doc.bar));
+
+        doc.synth.computeLatestModValues();
 
 		this._didSomething();
 		doc.notifier.changed();
@@ -3020,6 +3027,7 @@ export class ChangeSong extends ChangeGroup {
         } else {
             this.append(new ChangeValidateTrackSelection(doc));
         }
+        doc.synth.computeLatestModValues();
         doc.notifier.changed();
         this._didSomething();
     }

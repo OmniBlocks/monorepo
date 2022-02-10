@@ -901,7 +901,7 @@ export class SongEditor {
 
             let modNameRow: HTMLDivElement = div({ class: "operatorRow", style: "height: 1em; margin-bottom: 0.65em;" },
                 div({ class: "tip", style: "width: 10%; max-width: 5.4em;", id: "modChannelText" + mod, onclick: () => this._openPrompt("modChannel") }, "Ch:"),
-                div({ class: "selectContainer", style: 'width: 25%;' }, modChannelBox),
+                div({ class: "selectContainer", style: 'width: 35%;' }, modChannelBox),
                 div({ class: "tip", style: "width: 1.2em; margin-left: 0.8em;", id: "modInstrumentText" + mod, onclick: () => this._openPrompt("modInstrument") }, "Ins:"),
                 div({ class: "selectContainer", style: "width: 10%;" }, modInstrumentBox),
             );
@@ -2649,6 +2649,29 @@ export class SongEditor {
                         this._doc.selection.setChannelBar(this._doc.channel, Math.floor(this._doc.synth.playhead));
                     }
                     event.preventDefault();
+                }
+                break;
+            case 74: // j
+                // Ctrl Alt Shift J: Jummbify - set all prefs to my preferred ones lol
+                if (event.shiftKey && event.ctrlKey && event.altKey) {
+                    this._doc.autoPlay = false;
+                    this._doc.autoFollow = false;
+                    this._doc.enableNotePreview = true;
+                    this._doc.showFifth = true;
+                    this._doc.notesOutsideScale = false;
+                    this._doc.defaultScale = 0;
+                    this._doc.showLetters = true;
+                    this._doc.showChannels = true;
+                    this._doc.showScrollBar = true;
+                    this._doc.alwaysFineNoteVol = false;
+                    this._doc.enableChannelMuting = true;
+                    this._doc.displayBrowserUrl = true;
+                    this._doc.displayVolumeBar = true;
+                    this._doc.layout = "wide";
+                    this._doc.visibleOctaves = 5;
+                    this._doc.savePreferences();
+                    event.preventDefault();
+                    location.reload();
                 }
                 break;
             case 76: // l

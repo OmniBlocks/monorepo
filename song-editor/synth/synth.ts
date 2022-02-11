@@ -6132,7 +6132,7 @@ export class Synth {
                                                 }
                                                 else this.setModValue(latestPinValues[mod], latestPinValues[mod], mod, instrument.modChannels[mod], usedInstruments[instrumentIndex], modulatorAdjust);
 
-                                                latestModInsTimes[instrument.modChannels[mod]][instrumentIndex][modulatorAdjust] = currentBar * Config.partsPerBeat * this.song.beatsPerBar + latestPinParts[mod];
+                                                latestModInsTimes[instrument.modChannels[mod]][usedInstruments[instrumentIndex]][modulatorAdjust] = currentBar * Config.partsPerBeat * this.song.beatsPerBar + latestPinParts[mod];
                                             }
                                         }
                                     }
@@ -9845,7 +9845,7 @@ operator#Output       = operator#Sample + (operator#Wave[operator#Index + 1] - o
             }
             // Extra info for eq filter target needs to be set as well
             else if (setting == Config.modulators.dictionary["eq filter"].index && !instrument.eqFilterType) {
-                let dotTarget = instrument.modFilterTypes[mod];
+                let dotTarget = instrument.modFilterTypes[mod] | 0;
                 const tgtInstrument = synth.song.channels[instrument.modChannels[mod]].instruments[usedInstruments[instrumentIndex]];
 
                 if (dotTarget == 0) { // Morph. Figure out the target filter's X/Y coords for this point. If no point exists with this index, or point types don't match, do lerp-out for this point and lerp-in of a new point
@@ -9855,7 +9855,7 @@ operator#Output       = operator#Sample + (operator#Wave[operator#Index + 1] - o
                     while (tone.note!.start + tone.note!.pins[pinIdx].time <= currentPart) pinIdx++;
                     // 0 to 1 based on distance to next morph
                     //let lerpStartRatio: number = (currentPart - tone.note!.pins[pinIdx - 1].time) / (tone.note!.pins[pinIdx].time - tone.note!.pins[pinIdx - 1].time);
-                    let lerpEndRatio: number = ((currentPart + (runLength / (synth.getSamplesPerTick() * Config.ticksPerPart)) * Config.ticksPerPart) - tone.note!.pins[pinIdx - 1].time) / (tone.note!.pins[pinIdx].time - tone.note!.pins[pinIdx - 1].time);
+                    let lerpEndRatio: number = ((currentPart - tone.note!.start + (runLength / (synth.getSamplesPerTick() * Config.ticksPerPart)) * Config.ticksPerPart) - tone.note!.pins[pinIdx - 1].time) / (tone.note!.pins[pinIdx].time - tone.note!.pins[pinIdx - 1].time);
 
                     // Compute the new settings to go to.
                     if (tgtInstrument.eqSubFilters[tone.note!.pins[pinIdx - 1].size] != null || tgtInstrument.eqSubFilters[tone.note!.pins[pinIdx].size] != null) {
@@ -9890,7 +9890,7 @@ operator#Output       = operator#Sample + (operator#Wave[operator#Index + 1] - o
             }
             // Extra info for note filter target needs to be set as well
             else if (setting == Config.modulators.dictionary["note filter"].index && !instrument.noteFilterType) {
-                let dotTarget = instrument.modFilterTypes[mod];
+                let dotTarget = instrument.modFilterTypes[mod] | 0;
                 const tgtInstrument = synth.song.channels[instrument.modChannels[mod]].instruments[usedInstruments[instrumentIndex]];
 
                 if (dotTarget == 0) { // Morph. Figure out the target filter's X/Y coords for this point. If no point exists with this index, or point types don't match, do lerp-out for this point and lerp-in of a new point
@@ -9900,7 +9900,7 @@ operator#Output       = operator#Sample + (operator#Wave[operator#Index + 1] - o
                     while (tone.note!.start + tone.note!.pins[pinIdx].time <= currentPart) pinIdx++;
                     // 0 to 1 based on distance to next morph
                     //let lerpStartRatio: number = (currentPart - tone.note!.pins[pinIdx - 1].time) / (tone.note!.pins[pinIdx].time - tone.note!.pins[pinIdx - 1].time);
-                    let lerpEndRatio: number = ((currentPart + (runLength / (synth.getSamplesPerTick() * Config.ticksPerPart)) * Config.ticksPerPart) - tone.note!.pins[pinIdx - 1].time) / (tone.note!.pins[pinIdx].time - tone.note!.pins[pinIdx - 1].time);
+                    let lerpEndRatio: number = ((currentPart - tone.note!.start + (runLength / (synth.getSamplesPerTick() * Config.ticksPerPart)) * Config.ticksPerPart) - tone.note!.pins[pinIdx - 1].time) / (tone.note!.pins[pinIdx].time - tone.note!.pins[pinIdx - 1].time);
 
                     // Compute the new settings to go to.
                     if (tgtInstrument.noteSubFilters[tone.note!.pins[pinIdx - 1].size] != null || tgtInstrument.noteSubFilters[tone.note!.pins[pinIdx].size] != null) {

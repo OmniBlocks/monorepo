@@ -623,16 +623,17 @@ export class SongEditor {
     private readonly _instrumentSettingsTextRow: HTMLDivElement = div({ id: "instrumentSettingsText", style: `padding: 3px 0; max-width: 15em; text-align: center; color: ${ColorConfig.secondaryText};` },
         "Instrument Settings"
     );
+    private readonly _instrumentTypeSelectRow: HTMLDivElement = div({ class: "selectRow", id: "typeSelectRow" },
+        span({ class: "tip", onclick: () => this._openPrompt("instrumentType") }, "Type:"),
+        div(
+            div({ class: "pitchSelect" }, this._pitchedPresetSelect),
+            div({ class: "drumSelect" }, this._drumPresetSelect)
+        ),
+    );
     private readonly _instrumentSettingsGroup: HTMLDivElement = div({ class: "editor-controls" },
         this._instrumentSettingsTextRow,
         this._instrumentsButtonRow,
-        div({ class: "selectRow", id: "typeSelectRow" },
-            span({ class: "tip", onclick: () => this._openPrompt("instrumentType") }, "Type:"),
-            div(
-                div({ class: "pitchSelect" }, this._pitchedPresetSelect),
-                div({ class: "drumSelect" }, this._drumPresetSelect)
-            ),
-        ),
+        this._instrumentTypeSelectRow,
         this._instrumentVolumeSliderRow,
         //this._customizeInstrumentButton,
         this._customInstrumentSettingsGroup,
@@ -1482,7 +1483,7 @@ export class SongEditor {
             this._panDropdownGroup.style.display = (this._openPanDropdown ? "" : "none");
             this._detuneSliderRow.style.display = "";
             this._instrumentVolumeSliderRow.style.display = "";
-            $("#typeSelectRow").css("display", "");
+            this._instrumentTypeSelectRow.style.setProperty("display", "");
             this._instrumentSettingsGroup.appendChild(this._instrumentCopyGroup);
             this._instrumentSettingsGroup.insertBefore(this._instrumentsButtonRow, this._instrumentSettingsGroup.firstChild);
             this._instrumentSettingsGroup.insertBefore(this._instrumentSettingsTextRow, this._instrumentSettingsGroup.firstChild);
@@ -1528,6 +1529,7 @@ export class SongEditor {
                 //this._customInstrumentSettingsGroup.style.display = "";
 
                 if (instrument.type == InstrumentType.noise) {
+                    this._chipWaveSelectRow.style.display = "none";
                     this._chipNoiseSelectRow.style.display = "";
                     setSelectedValue(this._chipNoiseSelect, instrument.chipNoise);
                 } else {
@@ -1548,6 +1550,7 @@ export class SongEditor {
                     this._harmonicsRow.style.display = "none";
                 }
                 if (instrument.type == InstrumentType.pickedString) {
+                    this._chipWaveSelectRow.style.display = "none";
                     this._stringSustainRow.style.display = "";
                     this._stringSustainSlider.updateValue(instrument.stringSustain);
                 } else {
@@ -1555,6 +1558,7 @@ export class SongEditor {
                 }
                 if (instrument.type == InstrumentType.drumset) {
                     this._drumsetGroup.style.display = "";
+                    this._chipWaveSelectRow.style.display = "none";
                     this._fadeInOutRow.style.display = "none";
                     for (let i: number = 0; i < Config.drumCount; i++) {
                         setSelectedValue(this._drumsetEnvelopeSelects[i], instrument.drumsetEnvelopes[i]);
@@ -2250,7 +2254,7 @@ export class SongEditor {
             this._panSliderRow.style.display = "none";
             this._panDropdownGroup.style.display = "none";
             this._instrumentVolumeSliderRow.style.display = "none";
-            $("#typeSelectRow").css("display", "none");
+            this._instrumentTypeSelectRow.style.setProperty("display", "none");
 
             this._instrumentSettingsGroup.style.color = ColorConfig.getChannelColor(this._doc.song, this._doc.channel).primaryNote;
 

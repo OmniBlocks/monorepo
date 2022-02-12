@@ -2409,6 +2409,10 @@ class Runtime extends EventEmitter {
         // no-op
     }
 
+    convertToPackagedRuntime () {
+        // no-op
+    }
+
     /**
      * tw: Reset the cache of all block containers.
      */

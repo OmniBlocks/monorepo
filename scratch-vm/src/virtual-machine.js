@@ -271,6 +271,10 @@ class VirtualMachine extends EventEmitter {
         this.runtime.setInEditor(inEditor);
     }
 
+    convertToPackagedRuntime () {
+        this.runtime.convertToPackagedRuntime();
+    }
+
     addAddonBlock (options) {
         this.runtime.addAddonBlock(options);
     }

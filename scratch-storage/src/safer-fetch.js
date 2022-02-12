@@ -47,7 +47,7 @@ const checkStartNextFetch = () => {
     }
 };
 
-const saferFetchAsArrayBuffer = (url, options) => new Promise((resolve, reject) => {
+const saferFetchAsArrayBuffer = (url, options) => new Promise(resolve => {
     queue.push([resolve, url, options]);
     checkStartNextFetch();
 });

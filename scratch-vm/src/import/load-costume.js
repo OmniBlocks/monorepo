@@ -84,6 +84,40 @@ const canvasPool = (function () {
     return new CanvasPool();
 }());
 
+const readImage = src => new Promise((resolve, reject) => {
+    const image = new Image();
+    image.onload = function () {
+        resolve(image);
+        image.onload = null;
+        image.onerror = null;
+    };
+    image.onerror = function () {
+        reject(new Error('Costume load failed. Asset could not be read.'));
+        image.onload = null;
+        image.onerror = null;
+    };
+    image.src = src;
+});
+
+const persistentReadImage = async src => {
+    // Sometimes, when a lot of images are loaded at once, especially in Chrome, reading an image
+    // can throw an error even on valid images. To mitigate this, we'll retry image reading a few
+    // time with delays.
+    let firstError;
+    for (let i = 0; i < 3; i++) {
+        try {
+            return await readImage(src);
+        } catch (e) {
+            if (!firstError) {
+                firstError = e;
+            }
+            log.warn(e);
+            await new Promise(resolve => setTimeout(resolve, (i + Math.random()) * 5000));
+        }
+    }
+    throw firstError;
+};
+
 /**
  * Return a promise to fetch a bitmap from storage and return it as a canvas
  * If the costume has bitmapResolution 1, it will be converted to bitmapResolution 2 here (the standard for Scratch 3)
@@ -111,20 +145,7 @@ const fetchBitmapCanvas_ = function (costume, runtime, rotationCenter) {
             return null;
         }
 
-        return new Promise((resolve, reject) => {
-            const image = new Image();
-            image.onload = function () {
-                resolve(image);
-                image.onload = null;
-                image.onerror = null;
-            };
-            image.onerror = function () {
-                reject('Costume load failed. Asset could not be read.');
-                image.onload = null;
-                image.onerror = null;
-            };
-            image.src = asset.encodeDataURI();
-        });
+        return persistentReadImage(asset.encodeDataURI());
     }))
         .then(([baseImageElement, textImageElement]) => {
             if (!baseImageElement) {

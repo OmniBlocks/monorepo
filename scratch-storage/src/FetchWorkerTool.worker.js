@@ -1,5 +1,7 @@
 /* eslint-env worker */
 
+const saferFetchAsArrayBuffer = require('./safer-fetch');
+
 const complete = [];
 
 let timeoutId = null;
@@ -32,8 +34,7 @@ const checkCompleted = () => {
  * @param {object} options.job A job id, url, and options descriptor to perform.
  */
 const onMessage = ({data: job}) => {
-    fetch(job.url, job.options)
-        .then(response => response.arrayBuffer())
+    saferFetchAsArrayBuffer(job.url, job.options)
         .then(buffer => complete.push({id: job.id, buffer}))
         .catch(error => complete.push({id: job.id, error}))
         .then(checkCompleted);

@@ -1,5 +1,7 @@
 /* eslint-env browser */
 
+const saferFetchAsArrayBuffer = require('./safer-fetch');
+
 /**
  * Get and send assets with the fetch standard web api.
  */
@@ -19,8 +21,7 @@ class FetchTool {
      * @returns {Promise.<Uint8Array>} Resolve to Buffer of data from server.
      */
     get ({url, ...options}) {
-        return fetch(url, Object.assign({method: 'GET'}, options))
-            .then(result => result.arrayBuffer())
+        return saferFetchAsArrayBuffer(url, Object.assign({method: 'GET'}, options))
             .then(body => new Uint8Array(body));
     }
 

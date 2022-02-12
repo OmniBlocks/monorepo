@@ -9,45 +9,46 @@ const log = require('./log');
 let currentFetches = 0;
 const queue = [];
 
-const startNextFetch = async ({resolve, reject, args}) => {
+const startNextFetch = ([resolve, url, options]) => {
     let firstError;
-    let result;
-    for (let i = 0; i < 3; i++) {
-        try {
-            const response = await fetch(...args);
-            result = await response.arrayBuffer();
-            break;
-        } catch (e) {
-            log.warn(e);
+    let attempts = 0;
+
+    const attemptToFetch = () => fetch(url, options)
+        .then(r => r.arrayBuffer())
+        .then(buffer => {
+            currentFetches--;
+            checkStartNextFetch();
+            return buffer;
+        })
+        .catch(error => {
+            log.warn(`Attempt to fetch ${url} failed`, error);
             if (!firstError) {
-                firstError = e;
+                firstError = error;
             }
-            await new Promise(cb => setTimeout(cb, (i + Math.random()) * 5000));
-        }
-    }
-    currentFetches--;
-    if (result) {
-        resolve(result);
-    } else {
-        reject(firstError);
-    }
-    checkStartNextFetch();
+
+            if (attempts < 3) {
+                attempts++;
+                return new Promise(cb => setTimeout(cb, (attempts + Math.random() - 1) * 5000))
+                    .then(attemptToFetch);
+            }
+
+            currentFetches--;
+            checkStartNextFetch();
+            throw firstError;
+        });
+
+    return resolve(attemptToFetch());
 };
 
 const checkStartNextFetch = () => {
-    if (currentFetches >= 100 || queue.length === 0) {
-        return;
+    if (currentFetches < 100 && queue.length > 0) {
+        currentFetches++;
+        startNextFetch(queue.shift());
     }
-    currentFetches++;
-    startNextFetch(queue.shift());
 };
 
 const saferFetchAsArrayBuffer = (url, options) => new Promise((resolve, reject) => {
-    queue.push({
-        resolve,
-        reject,
-        args: [url, options]
-    });
+    queue.push([resolve, url, options]);
     checkStartNextFetch();
 });
 

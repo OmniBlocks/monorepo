@@ -118,7 +118,7 @@ const costumeUpload = function (fileData, fileType, vm, handleCostume, handleErr
         // Convert .bmp files to .png to compress them. .bmps are completely uncompressed,
         // and would otherwise take up a lot of storage space and take much longer to upload and download.
         bmpConverter(fileData).then(dataUrl => {
-            costumeUpload(dataUrl, 'image/png', storage, handleCostume);
+            costumeUpload(dataUrl, 'image/png', vm, handleCostume);
         });
         return; // Return early because we're triggering another proper costumeUpload
     }
@@ -131,14 +131,14 @@ const costumeUpload = function (fileData, fileType, vm, handleCostume, handleErr
         // Scratch does not natively support webp, so convert to png
         // see image/bmp logic above
         bmpConverter(fileData, 'image/webp').then(dataUrl => {
-            costumeUpload(dataUrl, 'image/png', storage, handleCostume);
+            costumeUpload(dataUrl, 'image/png', vm, handleCostume);
         });
         return;
     }
     case 'image/gif': {
         let costumes = [];
         gifDecoder(fileData, (frameNumber, dataUrl, numFrames) => {
-            costumeUpload(dataUrl, 'image/png', storage, costumes_ => {
+            costumeUpload(dataUrl, 'image/png', vm, costumes_ => {
                 costumes = costumes.concat(costumes_);
                 if (frameNumber === numFrames - 1) {
                     handleCostume(costumes);

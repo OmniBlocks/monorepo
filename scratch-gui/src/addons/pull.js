@@ -288,6 +288,7 @@ const SKIP_MESSAGES = [
     'editor-devtools/extension-description-not-for-addon',
     'mediarecorder/added-by',
     'editor-theme3/@settings-name-sa-color',
+    'editor-theme3/@settings-name-forums',
     'block-switching/@settings-name-sa'
 ];
 

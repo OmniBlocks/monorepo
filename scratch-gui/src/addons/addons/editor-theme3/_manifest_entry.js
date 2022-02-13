@@ -167,12 +167,6 @@ const manifest = {
           "name": "Colored on black background"
         }
       ]
-    },
-    {
-      "name": "Change the colors of blocks in the forums",
-      "id": "forums",
-      "type": "boolean",
-      "default": false
     }
   ],
   "tags": [

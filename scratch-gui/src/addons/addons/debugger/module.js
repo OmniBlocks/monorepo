@@ -60,9 +60,8 @@ export const setPaused = (_paused) => {
       if (pauseState) {
         // TW: Compiler state is stored differently
         if (thread.timer) {
-          const dt = now - pauseState.pauseTime;
-          thread.timer.startTime += dt;
-        }       
+          thread.timer.startTime += vm.runtime.currentMSecs - pauseState.time;
+        }
         const stackFrame = thread.peekStackFrame();
         if (stackFrame && stackFrame.executionContext && stackFrame.executionContext.timer) {
           stackFrame.executionContext.timer.startTime += vm.runtime.currentMSecs - pauseState.time;

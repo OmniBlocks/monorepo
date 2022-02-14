@@ -9835,6 +9835,8 @@ operator#Output       = operator#Sample + (operator#Wave[operator#Index + 1] - o
 
             synth.setModValue(tone.expressionStarts[0], tone.expressionStarts[0] + tone.expressionDeltas[0], mod, instrument.modChannels[mod], usedInstruments[instrumentIndex], setting);
 
+            const tgtInstrument = synth.song.channels[instrument.modChannels[mod]].instruments[usedInstruments[instrumentIndex]];
+
             // Reset arps, but only at the start of the note
             if (setting == Config.modulators.dictionary["reset arp"].index && synth.tick == 0 && tone.noteStartPart == synth.beat * Config.partsPerBeat + synth.part) {
                 synth.song.channels[instrument.modChannels[mod]].instruments[usedInstruments[instrumentIndex]].arpTime = 0;
@@ -9844,9 +9846,8 @@ operator#Output       = operator#Sample + (operator#Wave[operator#Index + 1] - o
                 synth.wantToSkip = true;
             }
             // Extra info for eq filter target needs to be set as well
-            else if (setting == Config.modulators.dictionary["eq filter"].index && !instrument.eqFilterType) {
+            else if (setting == Config.modulators.dictionary["eq filter"].index && !tgtInstrument.eqFilterType) {
                 let dotTarget = instrument.modFilterTypes[mod] | 0;
-                const tgtInstrument = synth.song.channels[instrument.modChannels[mod]].instruments[usedInstruments[instrumentIndex]];
 
                 if (dotTarget == 0) { // Morph. Figure out the target filter's X/Y coords for this point. If no point exists with this index, or point types don't match, do lerp-out for this point and lerp-in of a new point
 
@@ -9889,9 +9890,8 @@ operator#Output       = operator#Sample + (operator#Wave[operator#Index + 1] - o
                 }
             }
             // Extra info for note filter target needs to be set as well
-            else if (setting == Config.modulators.dictionary["note filter"].index && !instrument.noteFilterType) {
+            else if (setting == Config.modulators.dictionary["note filter"].index && !tgtInstrument.noteFilterType) {
                 let dotTarget = instrument.modFilterTypes[mod] | 0;
-                const tgtInstrument = synth.song.channels[instrument.modChannels[mod]].instruments[usedInstruments[instrumentIndex]];
 
                 if (dotTarget == 0) { // Morph. Figure out the target filter's X/Y coords for this point. If no point exists with this index, or point types don't match, do lerp-out for this point and lerp-in of a new point
 

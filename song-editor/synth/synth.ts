@@ -9835,8 +9835,6 @@ operator#Output       = operator#Sample + (operator#Wave[operator#Index + 1] - o
 
             synth.setModValue(tone.expressionStarts[0], tone.expressionStarts[0] + tone.expressionDeltas[0], mod, instrument.modChannels[mod], usedInstruments[instrumentIndex], setting);
 
-            const tgtInstrument = synth.song.channels[instrument.modChannels[mod]].instruments[usedInstruments[instrumentIndex]];
-
             // Reset arps, but only at the start of the note
             if (setting == Config.modulators.dictionary["reset arp"].index && synth.tick == 0 && tone.noteStartPart == synth.beat * Config.partsPerBeat + synth.part) {
                 synth.song.channels[instrument.modChannels[mod]].instruments[usedInstruments[instrumentIndex]].arpTime = 0;
@@ -9846,95 +9844,103 @@ operator#Output       = operator#Sample + (operator#Wave[operator#Index + 1] - o
                 synth.wantToSkip = true;
             }
             // Extra info for eq filter target needs to be set as well
-            else if (setting == Config.modulators.dictionary["eq filter"].index && !tgtInstrument.eqFilterType) {
-                let dotTarget = instrument.modFilterTypes[mod] | 0;
+            else if (setting == Config.modulators.dictionary["eq filter"].index) {
+                const tgtInstrument = synth.song.channels[instrument.modChannels[mod]].instruments[usedInstruments[instrumentIndex]];
 
-                if (dotTarget == 0) { // Morph. Figure out the target filter's X/Y coords for this point. If no point exists with this index, or point types don't match, do lerp-out for this point and lerp-in of a new point
+                if (!tgtInstrument.eqFilterType) {
 
-                    let pinIdx: number = 0;
-                    const currentPart: number = synth.getTicksIntoBar() / Config.ticksPerPart;
-                    while (tone.note!.start + tone.note!.pins[pinIdx].time <= currentPart) pinIdx++;
-                    // 0 to 1 based on distance to next morph
-                    //let lerpStartRatio: number = (currentPart - tone.note!.pins[pinIdx - 1].time) / (tone.note!.pins[pinIdx].time - tone.note!.pins[pinIdx - 1].time);
-                    let lerpEndRatio: number = ((currentPart - tone.note!.start + (runLength / (synth.getSamplesPerTick() * Config.ticksPerPart)) * Config.ticksPerPart) - tone.note!.pins[pinIdx - 1].time) / (tone.note!.pins[pinIdx].time - tone.note!.pins[pinIdx - 1].time);
+                    let dotTarget = instrument.modFilterTypes[mod] | 0;
 
-                    // Compute the new settings to go to.
-                    if (tgtInstrument.eqSubFilters[tone.note!.pins[pinIdx - 1].size] != null || tgtInstrument.eqSubFilters[tone.note!.pins[pinIdx].size] != null) {
-                        tgtInstrument.tmpEqFilterEnd = FilterSettings.lerpFilters(tgtInstrument.eqSubFilters[tone.note!.pins[pinIdx - 1].size]!, tgtInstrument.eqSubFilters[tone.note!.pins[pinIdx].size]!, lerpEndRatio);
-                    } else {
-                        // No mutation will occur to the filter object so we can safely return it without copying
-                        tgtInstrument.tmpEqFilterEnd = tgtInstrument.eqFilter;
-                    }
+                    if (dotTarget == 0) { // Morph. Figure out the target filter's X/Y coords for this point. If no point exists with this index, or point types don't match, do lerp-out for this point and lerp-in of a new point
 
-                } // Target (1 is dot 1 X, 2 is dot 1 Y, etc.)
-                else {
-                    // Since we are directly manipulating the filter, make sure it is a new one and not an actual one of the instrument's filters
-                    for (let i: number = 0; i < Config.filterMorphCount; i++) {
-                        if (tgtInstrument.tmpEqFilterEnd == tgtInstrument.eqSubFilters[i] && tgtInstrument.tmpEqFilterEnd != null) {
-                            tgtInstrument.tmpEqFilterEnd = new FilterSettings();
-                            tgtInstrument.tmpEqFilterEnd.fromJsonObject(tgtInstrument.eqSubFilters[i]!.toJsonObject());
+                        let pinIdx: number = 0;
+                        const currentPart: number = synth.getTicksIntoBar() / Config.ticksPerPart;
+                        while (tone.note!.start + tone.note!.pins[pinIdx].time <= currentPart) pinIdx++;
+                        // 0 to 1 based on distance to next morph
+                        //let lerpStartRatio: number = (currentPart - tone.note!.pins[pinIdx - 1].time) / (tone.note!.pins[pinIdx].time - tone.note!.pins[pinIdx - 1].time);
+                        let lerpEndRatio: number = ((currentPart - tone.note!.start + (runLength / (synth.getSamplesPerTick() * Config.ticksPerPart)) * Config.ticksPerPart) - tone.note!.pins[pinIdx - 1].time) / (tone.note!.pins[pinIdx].time - tone.note!.pins[pinIdx - 1].time);
+
+                        // Compute the new settings to go to.
+                        if (tgtInstrument.eqSubFilters[tone.note!.pins[pinIdx - 1].size] != null || tgtInstrument.eqSubFilters[tone.note!.pins[pinIdx].size] != null) {
+                            tgtInstrument.tmpEqFilterEnd = FilterSettings.lerpFilters(tgtInstrument.eqSubFilters[tone.note!.pins[pinIdx - 1].size]!, tgtInstrument.eqSubFilters[tone.note!.pins[pinIdx].size]!, lerpEndRatio);
+                        } else {
+                            // No mutation will occur to the filter object so we can safely return it without copying
+                            tgtInstrument.tmpEqFilterEnd = tgtInstrument.eqFilter;
                         }
-                    }
-                    if (tgtInstrument.tmpEqFilterEnd == null) {
-                        tgtInstrument.tmpEqFilterEnd = new FilterSettings();
-                        tgtInstrument.tmpEqFilterEnd.fromJsonObject(tgtInstrument.eqFilter.toJsonObject());
-                    }
 
-                    if (tgtInstrument.tmpEqFilterEnd.controlPointCount > Math.floor((dotTarget - 1) / 2)) {
-                        if (dotTarget % 2) { // X
-                            tgtInstrument.tmpEqFilterEnd.controlPoints[Math.floor((dotTarget - 1) / 2)].freq = tone.expressionStarts[0] + tone.expressionDeltas[0];
-                        } else { // Y
-                            tgtInstrument.tmpEqFilterEnd.controlPoints[Math.floor((dotTarget - 1) / 2)].gain = tone.expressionStarts[0] + tone.expressionDeltas[0];
+                    } // Target (1 is dot 1 X, 2 is dot 1 Y, etc.)
+                    else {
+                        // Since we are directly manipulating the filter, make sure it is a new one and not an actual one of the instrument's filters
+                        for (let i: number = 0; i < Config.filterMorphCount; i++) {
+                            if (tgtInstrument.tmpEqFilterEnd == tgtInstrument.eqSubFilters[i] && tgtInstrument.tmpEqFilterEnd != null) {
+                                tgtInstrument.tmpEqFilterEnd = new FilterSettings();
+                                tgtInstrument.tmpEqFilterEnd.fromJsonObject(tgtInstrument.eqSubFilters[i]!.toJsonObject());
+                            }
+                        }
+                        if (tgtInstrument.tmpEqFilterEnd == null) {
+                            tgtInstrument.tmpEqFilterEnd = new FilterSettings();
+                            tgtInstrument.tmpEqFilterEnd.fromJsonObject(tgtInstrument.eqFilter.toJsonObject());
+                        }
+
+                        if (tgtInstrument.tmpEqFilterEnd.controlPointCount > Math.floor((dotTarget - 1) / 2)) {
+                            if (dotTarget % 2) { // X
+                                tgtInstrument.tmpEqFilterEnd.controlPoints[Math.floor((dotTarget - 1) / 2)].freq = tone.expressionStarts[0] + tone.expressionDeltas[0];
+                            } else { // Y
+                                tgtInstrument.tmpEqFilterEnd.controlPoints[Math.floor((dotTarget - 1) / 2)].gain = tone.expressionStarts[0] + tone.expressionDeltas[0];
+                            }
                         }
                     }
                 }
             }
             // Extra info for note filter target needs to be set as well
-            else if (setting == Config.modulators.dictionary["note filter"].index && !tgtInstrument.noteFilterType) {
-                let dotTarget = instrument.modFilterTypes[mod] | 0;
+            else if (setting == Config.modulators.dictionary["note filter"].index) {
+                const tgtInstrument = synth.song.channels[instrument.modChannels[mod]].instruments[usedInstruments[instrumentIndex]];
 
-                if (dotTarget == 0) { // Morph. Figure out the target filter's X/Y coords for this point. If no point exists with this index, or point types don't match, do lerp-out for this point and lerp-in of a new point
+                if (!tgtInstrument.noteFilterType) {
+                    let dotTarget = instrument.modFilterTypes[mod] | 0;
 
-                    let pinIdx: number = 0;
-                    const currentPart: number = synth.getTicksIntoBar() / Config.ticksPerPart;
-                    while (tone.note!.start + tone.note!.pins[pinIdx].time <= currentPart) pinIdx++;
-                    // 0 to 1 based on distance to next morph
-                    //let lerpStartRatio: number = (currentPart - tone.note!.pins[pinIdx - 1].time) / (tone.note!.pins[pinIdx].time - tone.note!.pins[pinIdx - 1].time);
-                    let lerpEndRatio: number = ((currentPart - tone.note!.start + (runLength / (synth.getSamplesPerTick() * Config.ticksPerPart)) * Config.ticksPerPart) - tone.note!.pins[pinIdx - 1].time) / (tone.note!.pins[pinIdx].time - tone.note!.pins[pinIdx - 1].time);
+                    if (dotTarget == 0) { // Morph. Figure out the target filter's X/Y coords for this point. If no point exists with this index, or point types don't match, do lerp-out for this point and lerp-in of a new point
 
-                    // Compute the new settings to go to.
-                    if (tgtInstrument.noteSubFilters[tone.note!.pins[pinIdx - 1].size] != null || tgtInstrument.noteSubFilters[tone.note!.pins[pinIdx].size] != null) {
-                        tgtInstrument.tmpNoteFilterEnd = FilterSettings.lerpFilters(tgtInstrument.noteSubFilters[tone.note!.pins[pinIdx - 1].size]!, tgtInstrument.noteSubFilters[tone.note!.pins[pinIdx].size]!, lerpEndRatio);
-                    } else {
-                        // No mutation will occur to the filter object so we can safely return it without copying
-                        tgtInstrument.tmpNoteFilterEnd = tgtInstrument.noteFilter;
-                    }
+                        let pinIdx: number = 0;
+                        const currentPart: number = synth.getTicksIntoBar() / Config.ticksPerPart;
+                        while (tone.note!.start + tone.note!.pins[pinIdx].time <= currentPart) pinIdx++;
+                        // 0 to 1 based on distance to next morph
+                        //let lerpStartRatio: number = (currentPart - tone.note!.pins[pinIdx - 1].time) / (tone.note!.pins[pinIdx].time - tone.note!.pins[pinIdx - 1].time);
+                        let lerpEndRatio: number = ((currentPart - tone.note!.start + (runLength / (synth.getSamplesPerTick() * Config.ticksPerPart)) * Config.ticksPerPart) - tone.note!.pins[pinIdx - 1].time) / (tone.note!.pins[pinIdx].time - tone.note!.pins[pinIdx - 1].time);
 
-                } // Target (1 is dot 1 X, 2 is dot 1 Y, etc.)
-                else {
-                    // Since we are directly manipulating the filter, make sure it is a new one and not an actual one of the instrument's filters
-
-                    for (let i: number = 0; i < Config.filterMorphCount; i++) {
-                        if (tgtInstrument.tmpNoteFilterEnd == tgtInstrument.noteSubFilters[i] && tgtInstrument.tmpNoteFilterEnd != null) {
-                            tgtInstrument.tmpNoteFilterEnd = new FilterSettings();
-                            tgtInstrument.tmpNoteFilterEnd.fromJsonObject(tgtInstrument.noteSubFilters[i]!.toJsonObject());
+                        // Compute the new settings to go to.
+                        if (tgtInstrument.noteSubFilters[tone.note!.pins[pinIdx - 1].size] != null || tgtInstrument.noteSubFilters[tone.note!.pins[pinIdx].size] != null) {
+                            tgtInstrument.tmpNoteFilterEnd = FilterSettings.lerpFilters(tgtInstrument.noteSubFilters[tone.note!.pins[pinIdx - 1].size]!, tgtInstrument.noteSubFilters[tone.note!.pins[pinIdx].size]!, lerpEndRatio);
+                        } else {
+                            // No mutation will occur to the filter object so we can safely return it without copying
+                            tgtInstrument.tmpNoteFilterEnd = tgtInstrument.noteFilter;
                         }
-                    }
-                    if (tgtInstrument.tmpNoteFilterEnd == null) {
-                        tgtInstrument.tmpNoteFilterEnd = new FilterSettings();
-                        tgtInstrument.tmpNoteFilterEnd.fromJsonObject(tgtInstrument.noteFilter.toJsonObject());
-                    }
 
-                    if (tgtInstrument.tmpNoteFilterEnd.controlPointCount > Math.floor((dotTarget - 1) / 2)) {
-                        if (dotTarget % 2) { // X
-                            tgtInstrument.tmpNoteFilterEnd.controlPoints[Math.floor((dotTarget - 1) / 2)].freq = tone.expressionStarts[0] + tone.expressionDeltas[0];
-                        } else { // Y
-                            tgtInstrument.tmpNoteFilterEnd.controlPoints[Math.floor((dotTarget - 1) / 2)].gain = tone.expressionStarts[0] + tone.expressionDeltas[0];
+                    } // Target (1 is dot 1 X, 2 is dot 1 Y, etc.)
+                    else {
+                        // Since we are directly manipulating the filter, make sure it is a new one and not an actual one of the instrument's filters
+
+                        for (let i: number = 0; i < Config.filterMorphCount; i++) {
+                            if (tgtInstrument.tmpNoteFilterEnd == tgtInstrument.noteSubFilters[i] && tgtInstrument.tmpNoteFilterEnd != null) {
+                                tgtInstrument.tmpNoteFilterEnd = new FilterSettings();
+                                tgtInstrument.tmpNoteFilterEnd.fromJsonObject(tgtInstrument.noteSubFilters[i]!.toJsonObject());
+                            }
+                        }
+                        if (tgtInstrument.tmpNoteFilterEnd == null) {
+                            tgtInstrument.tmpNoteFilterEnd = new FilterSettings();
+                            tgtInstrument.tmpNoteFilterEnd.fromJsonObject(tgtInstrument.noteFilter.toJsonObject());
+                        }
+
+                        if (tgtInstrument.tmpNoteFilterEnd.controlPointCount > Math.floor((dotTarget - 1) / 2)) {
+                            if (dotTarget % 2) { // X
+                                tgtInstrument.tmpNoteFilterEnd.controlPoints[Math.floor((dotTarget - 1) / 2)].freq = tone.expressionStarts[0] + tone.expressionDeltas[0];
+                            } else { // Y
+                                tgtInstrument.tmpNoteFilterEnd.controlPoints[Math.floor((dotTarget - 1) / 2)].gain = tone.expressionStarts[0] + tone.expressionDeltas[0];
+                            }
                         }
                     }
                 }
             }
-
         }
     }
 

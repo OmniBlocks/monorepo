@@ -2524,7 +2524,7 @@ export class Song {
                     if (instrument.vibrato == Config.vibratos.length) {
                         buffer.push(base64IntToCharCode[Math.round(instrument.vibratoDepth * 25)]);
                         buffer.push(base64IntToCharCode[instrument.vibratoSpeed]);
-                        buffer.push(base64IntToCharCode[instrument.vibratoDelay]);
+                        buffer.push(base64IntToCharCode[Math.round(instrument.vibratoDelay)]);
                         buffer.push(base64IntToCharCode[instrument.vibratoType]);
                     }
                 }
@@ -3547,7 +3547,7 @@ export class Song {
                         if (vibrato == Config.vibratos.length) {
                             instrument.vibratoDepth = clamp(0, Config.modulators.dictionary["vibrato depth"].maxRawVol + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]) / 25;
                             instrument.vibratoSpeed = clamp(0, Config.modulators.dictionary["vibrato speed"].maxRawVol + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
-                            instrument.vibratoDelay = clamp(0, Config.modulators.dictionary["vibrato delay"].maxRawVol + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                            instrument.vibratoDelay = clamp(0, Config.modulators.dictionary["vibrato delay"].maxRawVol + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]) / 2;
                             instrument.vibratoType = clamp(0, Config.vibratoTypes.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                             instrument.effects |= 1 << EffectType.vibrato;
                         }
@@ -5675,6 +5675,11 @@ class InstrumentState {
                 //const eqPeakEnvelopeEnd:   number = envelopeEnds[  InstrumentAutomationIndex.eqFilterGain0 + i];
                 let startPoint: FilterControlPoint = eqFilterSettings.controlPoints[i];
                 let endPoint: FilterControlPoint = (instrument.tmpEqFilterEnd != null && instrument.tmpEqFilterEnd.controlPoints[i] != null) ? instrument.tmpEqFilterEnd.controlPoints[i] : eqFilterSettings.controlPoints[i];
+
+                // If switching dot type, do it all at once and do not try to interpolate since no valid interpolation exists.
+                if (startPoint.type != endPoint.type) {
+                    startPoint = endPoint;
+                }
 
                 startPoint.toCoefficients(Synth.tempFilterStartCoefficients, samplesPerSecond, /*eqAllFreqsEnvelopeStart * eqFreqEnvelopeStart*/ 1.0, /*eqPeakEnvelopeStart*/ 1.0);
                 endPoint.toCoefficients(Synth.tempFilterEndCoefficients, samplesPerSecond, /*eqAllFreqsEnvelopeEnd   * eqFreqEnvelopeEnd*/   1.0, /*eqPeakEnvelopeEnd*/   1.0);
@@ -8108,8 +8113,13 @@ export class Synth {
                     const noteFreqEnvelopeEnd: number = envelopeEnds[NoteAutomationIndex.noteFilterFreq0 + i];
                     const notePeakEnvelopeStart: number = envelopeStarts[NoteAutomationIndex.noteFilterGain0 + i];
                     const notePeakEnvelopeEnd: number = envelopeEnds[NoteAutomationIndex.noteFilterGain0 + i];
-                    const startPoint: FilterControlPoint = noteFilterSettings.controlPoints[i];
+                    let startPoint: FilterControlPoint = noteFilterSettings.controlPoints[i];
                     const endPoint: FilterControlPoint = (instrument.tmpNoteFilterEnd != null && instrument.tmpNoteFilterEnd.controlPoints[i] != null) ? instrument.tmpNoteFilterEnd.controlPoints[i] : noteFilterSettings.controlPoints[i];
+
+                    // If switching dot type, do it all at once and do not try to interpolate since no valid interpolation exists.
+                    if (startPoint.type != endPoint.type) {
+                        startPoint = endPoint;
+                    }
 
                     startPoint.toCoefficients(Synth.tempFilterStartCoefficients, synth.samplesPerSecond, noteAllFreqsEnvelopeStart * noteFreqEnvelopeStart, notePeakEnvelopeStart);
                     endPoint.toCoefficients(Synth.tempFilterEndCoefficients, synth.samplesPerSecond, noteAllFreqsEnvelopeEnd * noteFreqEnvelopeEnd, notePeakEnvelopeEnd);

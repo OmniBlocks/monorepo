@@ -1021,7 +1021,6 @@ export class SongEditor {
         this._detuneSliderInputBox.addEventListener("input", () => { this._doc.record(new ChangeDetune(this._doc, this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()].detune, Math.min(Config.detuneMax - Config.detuneCenter, Math.max(Config.detuneMin - Config.detuneCenter, Math.round(+this._detuneSliderInputBox.value))))) });
         this._customWaveDraw.addEventListener("input", () => { this._doc.record(new ChangeCustomWave(this._doc, this._customWaveDrawCanvas.newArray)) });
         this._twoNoteArpBox.addEventListener("input", () => { this._doc.record(new ChangeFastTwoNoteArp(this._doc, this._twoNoteArpBox.checked)) });
-        //this._tieNoteTransitionBox.addEventListener("input", () => { this._doc.record(new ChangeTieNoteTransition(this._doc, this._tieNoteTransitionBox.checked)) });
         this._clicklessTransitionBox.addEventListener("input", () => { this._doc.record(new ChangeClicklessTransition(this._doc, this._clicklessTransitionBox.checked)) });
         this._aliasingBox.addEventListener("input", () => { this._doc.record(new ChangeAliasing(this._doc, this._aliasingBox.checked)) });
 
@@ -1802,12 +1801,12 @@ export class SongEditor {
             this._instrumentVolumeSlider.updateValue(instrument.volume);
             this._instrumentVolumeSliderInputBox.value = "" + (instrument.volume);
             this._vibratoDepthSlider.updateValue(Math.round(instrument.vibratoDepth * 25));
-            this._vibratoDelaySlider.updateValue(instrument.vibratoDelay);
+            this._vibratoDelaySlider.updateValue(Math.round(instrument.vibratoDelay));
             this._vibratoSpeedSlider.updateValue(instrument.vibratoSpeed);
             setSelectedValue(this._vibratoTypeSelect, instrument.vibratoType);
             this._arpeggioSpeedSlider.updateValue(instrument.arpeggioSpeed);
             this._panDelaySlider.updateValue(instrument.panDelay);
-            this._vibratoDelaySlider.input.title = "" + instrument.vibratoDelay;
+            this._vibratoDelaySlider.input.title = "" + Math.round(instrument.vibratoDelay);
             this._vibratoDepthSlider.input.title = "" + instrument.vibratoDepth;
             this._vibratoSpeedSlider.input.title = "" + instrument.vibratoSpeed;
             this._panDelaySlider.input.title = "" + instrument.panDelay;

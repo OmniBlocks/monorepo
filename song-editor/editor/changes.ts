@@ -183,7 +183,7 @@ function projectNoteIntoBar(oldNote: Note, timeOffset: number, noteStartPart: nu
             }
         }
     }
-
+    
     // Fix from Jummbus: Ensure the first pin's interval is zero, adjust pitches and pins to compensate.
     const offsetInterval: number = newNote.pins[0].interval;
     for (let pitchIdx: number = 0; pitchIdx < newNote.pitches.length; pitchIdx++) {
@@ -2376,6 +2376,10 @@ export class ChangePaste extends ChangeGroup {
 
             selectionStart += oldPartDuration;
         }
+
+        // Need to re-sort the notes by start time as they might change order because of paste.
+        if (pattern != null && doc.song.getChannelIsMod(doc.channel)) pattern.notes.sort(function (a, b) { return (a.start == b.start) ? a.pitches[0] - b.pitches[0] : a.start - b.start; });
+
 
         doc.notifier.changed();
         this._didSomething();

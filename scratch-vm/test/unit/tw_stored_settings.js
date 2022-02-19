@@ -12,33 +12,6 @@ const makeVM = () => {
     return vm;
 };
 
-test('Parses framerate', t => {
-    const project = readFileToBuffer(path.resolve(__dirname, '../fixtures/tw-stored-settings/framerate.sb3'));
-    const vm = makeVM();
-    vm.loadProject(project).then(() => {
-        t.equal(vm.runtime.frameLoop.framerate, 40);
-        t.end();
-    });
-});
-
-test('Parses turbo', t => {
-    const project = readFileToBuffer(path.resolve(__dirname, '../fixtures/tw-stored-settings/turbo-on.sb3'));
-    const vm = makeVM();
-    vm.loadProject(project).then(() => {
-        t.equal(vm.runtime.turboMode, true);
-        t.end();
-    });
-});
-
-test('Parses infinite clones', t => {
-    const project = readFileToBuffer(path.resolve(__dirname, '../fixtures/tw-stored-settings/infinite-clones.sb3'));
-    const vm = makeVM();
-    vm.loadProject(project).then(() => {
-        t.equal(vm.runtime.runtimeOptions.maxClones, Infinity);
-        t.end();
-    });
-});
-
 for (const file of ['empty-comment.sb3', 'no-comment.sb3']) {
     test(`serializes and deserializes settings (${file})`, t => {
         const project = readFileToBuffer(path.resolve(__dirname, `../fixtures/tw-stored-settings/${file}`));
@@ -48,8 +21,11 @@ for (const file of ['empty-comment.sb3', 'no-comment.sb3']) {
             vm.setTurboMode(true);
             vm.setInterpolation(true);
             vm.setRuntimeOptions({
-                maxClones: Infinity
+                maxClones: Infinity,
+                miscLimits: false,
+                fencing: false
             });
+            vm.setStageSize(100, 101);
             vm.storeProjectOptions();
 
             const newVM = makeVM();
@@ -59,6 +35,8 @@ for (const file of ['empty-comment.sb3', 'no-comment.sb3']) {
                     t.equal(newVM.runtime.turboMode, vm.runtime.turboMode);
                     t.same(newVM.runtime.runtimeOptions, vm.runtime.runtimeOptions);
                     t.equal(newVM.runtime.interpolationEnabled, vm.runtime.interpolationEnabled);
+                    t.equal(newVM.runtime.stageWidth, vm.runtime.stageWidth);
+                    t.equal(newVM.runtime.stageHeight, vm.runtime.stageHeight);
                     t.end();
                 });
         });

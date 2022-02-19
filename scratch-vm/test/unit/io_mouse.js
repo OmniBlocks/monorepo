@@ -229,3 +229,25 @@ test('mousedown activating click hats', t => {
 
     t.end();
 });
+
+test('tw: no rounding when misc limits disabled', t => {
+    const rt = new Runtime();
+    const m = new Mouse(rt);
+
+    m.postData({
+        x: 241,
+        y: 541,
+        canvasWidth: 960,
+        canvasHeight: 720
+    });
+    t.equal(m.getScratchX(), -119);
+    t.equal(m.getScratchY(), -90);
+
+    rt.setRuntimeOptions({
+        miscLimits: false
+    });
+    t.equal(m.getScratchX(), -119.5);
+    t.equal(m.getScratchY(), -90.5);
+
+    t.end();
+});

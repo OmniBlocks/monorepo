@@ -63,19 +63,19 @@ class Mouse {
     postData (data) {
         if (data.x) {
             this._clientX = data.x;
-            this._scratchX = Math.round(MathUtil.clamp(
+            this._scratchX = MathUtil.clamp(
                 this.runtime.stageWidth * ((data.x / data.canvasWidth) - 0.5),
                 -(this.runtime.stageWidth / 2),
                 (this.runtime.stageWidth / 2)
-            ));
+            );
         }
         if (data.y) {
             this._clientY = data.y;
-            this._scratchY = Math.round(MathUtil.clamp(
+            this._scratchY = MathUtil.clamp(
                 -this.runtime.stageHeight * ((data.y / data.canvasHeight) - 0.5),
                 -(this.runtime.stageHeight / 2),
                 (this.runtime.stageHeight / 2)
-            ));
+            );
         }
         if (typeof data.isDown !== 'undefined') {
             // If no button specified, default to left button for compatibility
@@ -134,6 +134,9 @@ class Mouse {
      * @return {number} Clamped and integer rounded X position of the mouse cursor.
      */
     getScratchX () {
+        if (this.runtime.runtimeOptions.miscLimits) {
+            return Math.round(this._scratchX);
+        }
         return this._scratchX;
     }
 
@@ -142,6 +145,9 @@ class Mouse {
      * @return {number} Clamped and integer rounded Y position of the mouse cursor.
      */
     getScratchY () {
+        if (this.runtime.runtimeOptions.miscLimits) {
+            return Math.round(this._scratchY);
+        }
         return this._scratchY;
     }
 

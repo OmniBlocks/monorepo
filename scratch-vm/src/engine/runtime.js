@@ -427,6 +427,8 @@ class Runtime extends EventEmitter {
 
         this._lastStepTime = Date.now();
         this.interpolationEnabled = false;
+
+        this._defaultStoredSettings = this._generateAllProjectOptions();
     }
 
     /**
@@ -2534,20 +2536,40 @@ class Runtime extends EventEmitter {
         }
     }
 
-    generateProjectOptions () {
-        const options = {};
-        options.framerate = this.frameLoop.framerate;
-        options.runtimeOptions = this.runtimeOptions;
-        options.interpolation = this.interpolationEnabled;
-        options.turbo = this.turboMode;
-        options.hq = this.renderer ? this.renderer.useHighQualityRender : false;
-        options.width = this.stageWidth;
-        options.height = this.stageHeight;
-        return options;
+    _generateAllProjectOptions () {
+        return {
+            framerate: this.frameLoop.framerate,
+            runtimeOptions: this.runtimeOptions,
+            interpolation: this.interpolationEnabled,
+            turbo: this.turboMode,
+            hq: this.renderer ? this.renderer.useHighQualityRender : false,
+            width: this.stageWidth,
+            height: this.stageHeight
+        };
+    }
+
+    generateDifferingProjectOptions () {
+        const difference = (oldObject, newObject) => {
+            const result = {};
+            for (const key of Object.keys(newObject)) {
+                const newValue = newObject[key];
+                const oldValue = oldObject[key];
+                if (typeof newValue === 'object' && newValue) {
+                    const valueDiffering = difference(oldValue, newValue);
+                    if (Object.keys(valueDiffering).length > 0) {
+                        result[key] = valueDiffering;
+                    }
+                } else if (newValue !== oldValue) {
+                    result[key] = newValue;
+                }
+            }
+            return result;
+        };
+        return difference(this._defaultStoredSettings, this._generateAllProjectOptions());
     }
 
     storeProjectOptions () {
-        const options = this.generateProjectOptions();
+        const options = this.generateDifferingProjectOptions();
         // TODO: translate
         const text = `Configuration for https://turbowarp.org/\nYou can move, resize, and minimize this comment, but don't edit it by hand. This comment can be deleted to remove the stored settings.\n${ExtendedJSON.stringify(options)}${COMMENT_CONFIG_MAGIC}`;
         const existingComment = this.findProjectOptionsComment();

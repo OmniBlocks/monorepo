@@ -1,5 +1,12 @@
 const MathUtil = require('../util/math-util');
 
+const roundIfCloseToInteger = number => {
+    if (Math.abs(number - Math.round(number)) < 0.0001) {
+        return Math.round(number);
+    }
+    return number;
+};
+
 class Mouse {
     constructor (runtime) {
         this._clientX = 0;
@@ -137,7 +144,7 @@ class Mouse {
         if (this.runtime.runtimeOptions.miscLimits) {
             return Math.round(this._scratchX);
         }
-        return this._scratchX;
+        return roundIfCloseToInteger(this._scratchX);
     }
 
     /**
@@ -148,7 +155,7 @@ class Mouse {
         if (this.runtime.runtimeOptions.miscLimits) {
             return Math.round(this._scratchY);
         }
-        return this._scratchY;
+        return roundIfCloseToInteger(this._scratchY);
     }
 
     /**

@@ -62,8 +62,7 @@ const addons = [
 
 const newAddons = [
     'custom-block-text',
-    'search-sprites',
-    'fullscreen'
+    'search-sprites'
 ];
 
 // eslint-disable-next-line import/no-commonjs

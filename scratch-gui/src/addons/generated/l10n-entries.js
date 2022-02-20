@@ -6,6 +6,7 @@ export default {
   "it": () => import(/* webpackChunkName: "addon-l10n-it" */ "../addons-l10n/it.json"),
   "ja": () => import(/* webpackChunkName: "addon-l10n-ja" */ "../addons-l10n/ja.json"),
   "ko": () => import(/* webpackChunkName: "addon-l10n-ko" */ "../addons-l10n/ko.json"),
+  "nl": () => import(/* webpackChunkName: "addon-l10n-nl" */ "../addons-l10n/nl.json"),
   "pl": () => import(/* webpackChunkName: "addon-l10n-pl" */ "../addons-l10n/pl.json"),
   "pt": () => import(/* webpackChunkName: "addon-l10n-pt" */ "../addons-l10n/pt.json"),
   "ro": () => import(/* webpackChunkName: "addon-l10n-ro" */ "../addons-l10n/ro.json"),

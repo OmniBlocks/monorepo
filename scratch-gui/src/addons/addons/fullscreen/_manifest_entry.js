@@ -70,6 +70,7 @@ const manifest = {
     }
   ],
   "tags": [
+    "beta",
     "new"
   ],
   "enabledByDefault": false

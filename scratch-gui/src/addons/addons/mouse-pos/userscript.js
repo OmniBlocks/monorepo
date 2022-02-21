@@ -19,7 +19,7 @@ export default async function ({ addon, global, console }) {
   var x = vm.runtime.ioDevices.mouse.__scratchX ? vm.runtime.ioDevices.mouse.__scratchX : 0;
   var y = vm.runtime.ioDevices.mouse.__scratchY ? vm.runtime.ioDevices.mouse.__scratchY : 0;
 
-  const showUpdatedValue = () => pos.setAttribute("data-content", `${x}, ${y}`);
+  const showUpdatedValue = () => pos.setAttribute("data-content", `${Math.round(x)}, ${Math.round(y)}`);
 
   Object.defineProperty(vm.runtime.ioDevices.mouse, "_scratchX", {
     get: function () {

@@ -790,6 +790,9 @@ export class PatternEditor {
     }
 
     private _whenMouseMoved = (event: MouseEvent): void => {
+        this.controlMode = event.ctrlKey;
+        this.shiftMode = event.shiftKey;
+
         const boundingRect: ClientRect = this._svg.getBoundingClientRect();
         this._mouseX = ((event.clientX || event.pageX) - boundingRect.left) * this._editorWidth / (boundingRect.right - boundingRect.left);
         this._mouseY = ((event.clientY || event.pageY) - boundingRect.top) * this._editorHeight / (boundingRect.bottom - boundingRect.top);
@@ -1385,7 +1388,7 @@ export class PatternEditor {
         this._editorWidth = this.container.clientWidth;
         this._editorHeight = this.container.clientHeight;
         this._partWidth = this._editorWidth / (this._doc.song.beatsPerBar * Config.partsPerBeat);
-        this._octaveOffset = this._doc.song.channels[this._doc.channel].octave * Config.pitchesPerOctave;
+        this._octaveOffset = (this._doc.channel >= this._doc.song.pitchChannelCount) ? 0 : this._doc.song.channels[this._doc.channel].octave * Config.pitchesPerOctave;
 
         if (this._doc.song.getChannelIsNoise(this._doc.channel)) {
             this._pitchBorder = 0;
@@ -1421,7 +1424,7 @@ export class PatternEditor {
         }
 
         this._pitchHeight = this._editorHeight / this._pitchCount;
-        this._octaveOffset = this._doc.getBaseVisibleOctave(this._doc.channel) * Config.pitchesPerOctave;
+        this._octaveOffset = (this._doc.channel >= this._doc.song.pitchChannelCount) ? 0 : this._doc.getBaseVisibleOctave(this._doc.channel) * Config.pitchesPerOctave;
 
         if (this._renderedRhythm != this._doc.song.rhythm ||
             this._renderedPitchChannelCount != this._doc.song.pitchChannelCount ||

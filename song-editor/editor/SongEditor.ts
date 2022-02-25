@@ -909,8 +909,8 @@ export class SongEditor {
 
             let modSetBox: HTMLSelectElement = select();
             let modFilterBox: HTMLSelectElement = select();
-            let modSetRow: HTMLDivElement = div({ class: "selectRow", id: "modSettingText" + mod, style: "margin-bottom: 0.9em; color: currentColor;" }, span({ class: "tip", onclick: () => this._openPrompt("modSet") }, "Setting: "), div({ class: "selectContainer" }, modSetBox));
-            let modFilterRow: HTMLDivElement = div({ class: "selectRow", id: "modFilterText" + mod, style: "margin-bottom: 0.9em; color: currentColor;" }, span({ class: "tip", onclick: () => this._openPrompt("modFilter") }, "Target: "), div({ class: "selectContainer" }, modFilterBox));
+            let modSetRow: HTMLDivElement = div({ class: "selectRow", id: "modSettingText" + mod, style: "margin-bottom: 0.9em; color: currentColor;" }, span({ class: "tip", onclick: () => this._openPrompt("modSet") }, "Setting: "), span({ class: "tip", style: "font-size:x-small;", onclick: () => this._openPrompt("modSetInfo" + mod) }, "?"), div({ class: "selectContainer" }, modSetBox));
+            let modFilterRow: HTMLDivElement = div({ class: "selectRow", id: "modFilterText" + mod, style: "margin-bottom: 0.9em; color: currentColor;" }, span({ class: "tip", onclick: () => this._openPrompt("modFilter" + mod) }, "Target: "), div({ class: "selectContainer" }, modFilterBox));
 
             // @jummbus: I could template this up above and simply create from the template, especially since I also reuse it in song settings, but unsure how to do that with imperative-html :P
             let modTarget: SVGElement = SVG.svg({ style:"transform: translate(0px, 1px);", width: "1.5em", height: "1em", viewBox: "0 0 200 200" }, [
@@ -1208,7 +1208,13 @@ export class SongEditor {
                 return this._reverbSlider;
             case Config.modulators.dictionary["distortion"].index:
                 return this._distortionSlider;
-            case Config.modulators.dictionary["volume"].index:
+            case Config.modulators.dictionary["note volume"].index:
+                // So, this should technically not affect this slider, but it will look better as legacy songs used this mod as 'volume'.
+                // In the case that mix volume is used as well, they'd fight for the display, so just don't use this.
+                if (!this._showModSliders[Config.modulators.dictionary["mix volume"].index])
+                    return this._instrumentVolumeSlider;
+                return null;
+            case Config.modulators.dictionary["mix volume"].index:
                 return this._instrumentVolumeSlider;
             case Config.modulators.dictionary["vibrato depth"].index:
                 return this._vibratoDepthSlider;
@@ -1608,6 +1614,7 @@ export class SongEditor {
                         this._operatorAmplitudeSliders[i].updateValue(instrument.operators[i].amplitude);
                         setSelectedValue(this._operatorWaveformSelects[i], instrument.operators[i].waveform);
                         this._operatorWaveformPulsewidthSliders[i].updateValue(instrument.operators[i].pulseWidth);
+                        this._operatorWaveformPulsewidthSliders[i].input.title = "" + Config.pwmOperatorWaves[instrument.operators[i].pulseWidth].name;
                         this._operatorDropdownGroups[i].style.color = isCarrier ? ColorConfig.primaryText : "";
                         const operatorName: string = (isCarrier ? "Voice " : "Modulator ") + (i + 1);
                         this._operatorFrequencySelects[i].title = operatorName + " Frequency";
@@ -1978,7 +1985,8 @@ export class SongEditor {
                     // Populate mod setting options for instrument scope.
                     else {
 
-                        settingList.push("volume");
+                        settingList.push("note volume");
+                        settingList.push("mix volume");
 
                         // Build a list of target instrument indices, types and other info. It will be a single type for a single instrument, but with "all" and "active" it could be more.
                         // All or active are included together. Active allows any to be set, just in case the user fiddles with which are active later.
@@ -2481,10 +2489,10 @@ export class SongEditor {
     
     private _whenKeyUp = (event: KeyboardEvent): void => {
 		this._muteEditor.onKeyUp(event);
-		if (event.keyCode == 17) { // Ctrl
+		if (!event.ctrlKey) { // Ctrl
 			this._patternEditor.controlMode = false;
 		}
-		else if (event.keyCode == 16) { // Shift
+		if (!event.shiftKey) { // Shift
 			this._patternEditor.shiftMode = false;
 		}
 	}

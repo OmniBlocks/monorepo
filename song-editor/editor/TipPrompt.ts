@@ -3,6 +3,7 @@
 import { HTML } from "imperative-html/dist/esm/elements-strict";
 import { Prompt } from "./Prompt";
 import { SongDocument } from "./SongDocument";
+import { Config } from "../synth/SynthConfig";
 
 const { button, div, p, h2, h3 } = HTML;
 
@@ -385,7 +386,7 @@ export class TipPrompt implements Prompt {
 					h2("Modulator Setting"),
 					p("This is the parameter that you want to change with this modulator. For example, if you set this to 'Tempo', you can speed up or slow down your song by laying notes in the pattern editor."),
 					p("Note that you'll see different options if your channel is set to 'Song' versus a channel number. With 'Song', you'll see song-wide settings such as tempo. With a channel, you'll see specific instrument settings. Adding more effects to the instrument causes modulators for them to be available, so be sure to experiment!"),
-					p("Most modulators behave as you'd expect and work just as if you were moving their associated slider. But with the special setting 'Next Bar', the first note you lay will cause the playhead to skip the rest of the bar and jump right to the next one."),
+					p("Most modulators behave as you'd expect and work just as if you were moving their associated slider. Click the '?' when you have a setting selected to get more info about it!"),
 				);
 			} break;
 			case "modFilter": {
@@ -446,7 +447,32 @@ export class TipPrompt implements Prompt {
 				);
 			} break;
 
-			default: throw new Error("Unhandled TipPrompt type: " + type);
+			default:
+				// Check for modSetinfo#
+				if (type.indexOf("modSetInfo") >= 0) {
+					let modNum: number = +type[type.length - 1];
+					let modulator: number = _doc.song.channels[_doc.channel].instruments[_doc.getCurrentInstrument()].modulators[modNum];
+					let pList: HTMLParagraphElement[] = [];
+					for (let s: number = 0; s < Config.modulators[modulator].promptDesc.length; s++) {
+						pList.push(p(
+							Config.modulators[modulator].promptDesc[s]
+								.replace("$LO", "" + Config.modulators[modulator].convertRealFactor)
+								.replace("$MID", "" + (Config.modulators[modulator].convertRealFactor + Config.modulators[modulator].maxRawVol / 2))
+								.replace("$HI", "" + (Config.modulators[modulator].convertRealFactor + Config.modulators[modulator].maxRawVol))
+
+						));
+					}
+					// Last element for mod settings is just some miscellaneous data for nerds like me.
+					pList[pList.length-1].style.setProperty("color", "var(--secondary-text)");
+					message = div(
+						h2(Config.modulators[modulator].promptName),
+						pList,
+					);
+					break;
+				}
+				else {
+					throw new Error("Unhandled TipPrompt type: " + type);
+				}
 		}
 		
 		this.container = div({class: "prompt", style: "width: 300px;"},

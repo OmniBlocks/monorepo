@@ -5694,7 +5694,17 @@ class InstrumentState {
 
         const mainInstrumentVolume: number = Synth.instrumentVolumeToVolumeMult(instrument.volume);
         this.mixVolumeStart = mainInstrumentVolume /** envelopeStarts[InstrumentAutomationIndex.mixVolume]*/;
-        const mixVolumeEnd = mainInstrumentVolume /** envelopeEnds[  InstrumentAutomationIndex.mixVolume]*/;
+        let mixVolumeEnd: number = mainInstrumentVolume /** envelopeEnds[  InstrumentAutomationIndex.mixVolume]*/;
+
+        // Check for mod-related volume delta
+        if (synth.isModActive(Config.modulators.dictionary["mix volume"].index, channelIndex, instrumentIndex)) {
+            // Linear falloff below 0, normal volume formula above 0. Seems to work best for scaling since the normal volume mult formula has a big gap from -25 to -24.
+            const startVal: number = synth.getModValue(Config.modulators.dictionary["mix volume"].index, channelIndex, instrumentIndex, false);
+            const endVal: number = synth.getModValue(Config.modulators.dictionary["mix volume"].index, channelIndex, instrumentIndex, true)
+            this.mixVolumeStart *= ((startVal <= 0) ? ((startVal + Config.volumeRange / 2) / (Config.volumeRange / 2)) : Synth.instrumentVolumeToVolumeMult(startVal));
+            mixVolumeEnd *= ((endVal <= 0) ? ((endVal + Config.volumeRange / 2) / (Config.volumeRange / 2)) : Synth.instrumentVolumeToVolumeMult(endVal));
+        }
+
         this.mixVolumeDelta = (mixVolumeEnd - this.mixVolumeStart) / runLength;
 
         let eqFilterVolumeStart: number = eqFilterVolume;
@@ -8253,13 +8263,14 @@ export class Synth {
                 expressionEnd *= envelopeEnds[NoteAutomationIndex.operatorAmplitude0 + i];
 
                 // Check for mod-related volume delta
-                // @jummbus - BUG/TODO: This amplification is also applied to modulator FM operators which distorts the sound. Need a setting to toggle this on or off.
-                // Just wrap it in "i < carrierCount" for the fixed ver, include the song vol one as well
+                // @jummbus - This amplification is also applied to modulator FM operators which distorts the sound.
+                // The fix is to apply this only to carriers, but as this is a legacy bug and it can cause some interesting sounds, it's left in.
+                // You can use the mix volume modulator instead to avoid this effect.
 
-                if (synth.isModActive(Config.modulators.dictionary["volume"].index, channelIndex, tone.instrumentIndex)) {
+                if (synth.isModActive(Config.modulators.dictionary["note volume"].index, channelIndex, tone.instrumentIndex)) {
                     // Linear falloff below 0, normal volume formula above 0. Seems to work best for scaling since the normal volume mult formula has a big gap from -25 to -24.
-                    const startVal: number = synth.getModValue(Config.modulators.dictionary["volume"].index, channelIndex, tone.instrumentIndex, false);
-                    const endVal: number = synth.getModValue(Config.modulators.dictionary["volume"].index, channelIndex, tone.instrumentIndex, true);
+                    const startVal: number = synth.getModValue(Config.modulators.dictionary["note volume"].index, channelIndex, tone.instrumentIndex, false);
+                    const endVal: number = synth.getModValue(Config.modulators.dictionary["note volume"].index, channelIndex, tone.instrumentIndex, true);
                     expressionStart *= ((startVal <= 0) ? ((startVal + Config.volumeRange / 2) / (Config.volumeRange / 2)) : this.instrumentVolumeToVolumeMult(startVal));
                     expressionEnd *= ((endVal <= 0) ? ((endVal + Config.volumeRange / 2) / (Config.volumeRange / 2)) : this.instrumentVolumeToVolumeMult(endVal));
                 }
@@ -8395,10 +8406,10 @@ export class Synth {
             let expressionEnd: number = settingsExpressionMult * transitionExpressionEnd * chordExpressionEnd * pitchExpressionEnd * envelopeEnds[NoteAutomationIndex.noteVolume];
 
             // Check for mod-related volume delta
-            if (synth.isModActive(Config.modulators.dictionary["volume"].index, channelIndex, tone.instrumentIndex)) {
+            if (synth.isModActive(Config.modulators.dictionary["note volume"].index, channelIndex, tone.instrumentIndex)) {
                 // Linear falloff below 0, normal volume formula above 0. Seems to work best for scaling since the normal volume mult formula has a big gap from -25 to -24.
-                const startVal: number = synth.getModValue(Config.modulators.dictionary["volume"].index, channelIndex, tone.instrumentIndex, false);
-                const endVal: number = synth.getModValue(Config.modulators.dictionary["volume"].index, channelIndex, tone.instrumentIndex, true)
+                const startVal: number = synth.getModValue(Config.modulators.dictionary["note volume"].index, channelIndex, tone.instrumentIndex, false);
+                const endVal: number = synth.getModValue(Config.modulators.dictionary["note volume"].index, channelIndex, tone.instrumentIndex, true)
                 expressionStart *= ((startVal <= 0) ? ((startVal + Config.volumeRange / 2) / (Config.volumeRange / 2)) : this.instrumentVolumeToVolumeMult(startVal));
                 expressionEnd *= ((endVal <= 0) ? ((endVal + Config.volumeRange / 2) / (Config.volumeRange / 2)) : this.instrumentVolumeToVolumeMult(endVal));
             }

@@ -165,10 +165,6 @@ class PaperCanvas extends React.Component {
                     imgElement,
                     (ART_BOARD_WIDTH / 2) - rotationCenterX,
                     (ART_BOARD_HEIGHT / 2) - rotationCenterY);
-                getRaster().drawImage(
-                    imgElement,
-                    (ART_BOARD_WIDTH / 2) - rotationCenterX,
-                    (ART_BOARD_HEIGHT / 2) - rotationCenterY);
 
                 this.maybeZoomToFit(true /* isBitmap */);
                 performSnapshot(this.props.undoSnapshot, Formats.BITMAP_SKIP_CONVERT);

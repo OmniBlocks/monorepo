@@ -41,6 +41,7 @@ Edited to add input-range-small
 [theme="dark"] .input-form {
     background: rgb(30, 30, 30);
     border-color: rgba(255, 255, 255, 0.15);
+    color-scheme: dark;
 }
 
 .input-form:focus {

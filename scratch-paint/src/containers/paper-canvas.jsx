@@ -112,6 +112,13 @@ class PaperCanvas extends React.Component {
             }
             this.props.setZoomLevelId(newZoomLevelId);
         }
+        this.props.clearUndo();
+        this.props.clearSelectedItems();
+        this.props.clearHoveredItem();
+        this.props.clearPasteOffset();
+        this.importImage(format, image, rotationCenterX, rotationCenterY);
+    }
+    clearPaperCanvas () {
         for (const layer of paper.project.layers) {
             if (layer.data.isRasterLayer) {
                 clearRaster();
@@ -121,17 +128,13 @@ class PaperCanvas extends React.Component {
                 layer.removeChildren();
             }
         }
-        this.props.clearUndo();
-        this.props.clearSelectedItems();
-        this.props.clearHoveredItem();
-        this.props.clearPasteOffset();
-        this.importImage(format, image, rotationCenterX, rotationCenterY);
     }
     importImage (format, image, rotationCenterX, rotationCenterY) {
         // Stop any in-progress imports
         this.clearQueuedImport();
 
         if (!image) {
+            this.clearPaperCanvas();
             this.props.changeFormat(Formats.VECTOR_SKIP_CONVERT);
             performSnapshot(this.props.undoSnapshot, Formats.VECTOR_SKIP_CONVERT);
             this.recalibrateSize();
@@ -151,6 +154,8 @@ class PaperCanvas extends React.Component {
             const imgElement = new Image();
             this.queuedImageToLoad = imgElement;
             imgElement.onload = () => {
+                this.clearPaperCanvas();
+
                 if (!this.queuedImageToLoad) return;
                 this.queuedImageToLoad = null;
 
@@ -175,6 +180,7 @@ class PaperCanvas extends React.Component {
             this.props.changeFormat(Formats.VECTOR_SKIP_CONVERT);
             this.importSvg(image, rotationCenterX, rotationCenterY);
         } else {
+            this.clearPaperCanvas();
             log.error(`Didn't recognize format: ${format}. Use 'jpg', 'png' or 'svg'.`);
             this.props.changeFormat(Formats.VECTOR_SKIP_CONVERT);
             performSnapshot(this.props.undoSnapshot, Formats.VECTOR_SKIP_CONVERT);
@@ -242,6 +248,8 @@ class PaperCanvas extends React.Component {
         });
     }
     initializeSvg (item, rotationCenterX, rotationCenterY, viewBox) {
+        this.clearPaperCanvas();
+
         if (this.queuedImport) this.queuedImport = null;
         const itemWidth = item.bounds.width;
         const itemHeight = item.bounds.height;

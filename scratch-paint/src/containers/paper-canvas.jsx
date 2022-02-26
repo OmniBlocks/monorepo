@@ -226,6 +226,7 @@ class PaperCanvas extends React.Component {
 
         paper.project.importSVG(svg, {
             expandShapes: true,
+            insert: false,
             onLoad: function (item) {
                 if (!item) {
                     log.error('SVG import failed:');
@@ -234,7 +235,6 @@ class PaperCanvas extends React.Component {
                     performSnapshot(paperCanvas.props.undoSnapshot, Formats.VECTOR_SKIP_CONVERT);
                     return;
                 }
-                item.remove();
 
                 // Without the callback, rasters' load function has not been called yet, and they are
                 // positioned incorrectly

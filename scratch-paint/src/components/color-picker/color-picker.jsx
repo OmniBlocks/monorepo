@@ -98,6 +98,8 @@ class ColorPickerComponent extends React.Component {
                                     draggable={false}
                                     src={fillSolidIcon}
                                     onClick={this.props.onChangeGradientTypeSolid}
+                                    width={20}
+                                    height={20}
                                 />
                                 <img
                                     className={classNames({
@@ -108,6 +110,8 @@ class ColorPickerComponent extends React.Component {
                                     draggable={false}
                                     src={fillHorzGradientIcon}
                                     onClick={this.props.onChangeGradientTypeHorizontal}
+                                    width={20}
+                                    height={20}
                                 />
                                 <img
                                     className={classNames({
@@ -117,6 +121,8 @@ class ColorPickerComponent extends React.Component {
                                     draggable={false}
                                     src={fillVertGradientIcon}
                                     onClick={this.props.onChangeGradientTypeVertical}
+                                    width={20}
+                                    height={20}
                                 />
                                 <img
                                     className={classNames({
@@ -126,6 +132,8 @@ class ColorPickerComponent extends React.Component {
                                     draggable={false}
                                     src={fillRadialIcon}
                                     onClick={this.props.onChangeGradientTypeRadial}
+                                    width={20}
+                                    height={20}
                                 />
                             </div>
                         </div>

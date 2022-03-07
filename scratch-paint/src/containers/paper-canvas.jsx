@@ -156,11 +156,11 @@ class PaperCanvas extends React.Component {
             const imgElement = new Image();
             this.queuedImageToLoad = imgElement;
             imgElement.onload = () => {
-                this.clearPaperCanvas();
-                setImportingImage(false);
-
                 if (!this.queuedImageToLoad) return;
                 this.queuedImageToLoad = null;
+
+                this.clearPaperCanvas();
+                setImportingImage(false);
 
                 if (typeof rotationCenterX === 'undefined') {
                     rotationCenterX = imgElement.width / 2;

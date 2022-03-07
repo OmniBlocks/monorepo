@@ -3,6 +3,13 @@ const manifest = {
   "noTranslations": true,
   "name": "Muted project player mode",
   "description": "Ctrl+Click the green flag to mute/unmute the project.",
+  "info": [
+    {
+      "type": "notice",
+      "text": "On macOS, use the Cmd key instead of the Ctrl key.",
+      "id": "macOS"
+    }
+  ],
   "credits": [
     {
       "name": "TheColaber",

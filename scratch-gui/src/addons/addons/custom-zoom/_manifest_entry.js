@@ -25,7 +25,7 @@ const manifest = {
   "settings": [
     {
       "dynamic": true,
-      "name": "Maximum Zoom (50-500%)",
+      "name": "Maximum Zoom (100-500%)",
       "id": "maxZoom",
       "type": "integer",
       "min": 100,

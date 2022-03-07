@@ -348,11 +348,11 @@
         "resetAll": "Сбросить всё",
         "search": "Поиск",
         "tagBeta": "Бета",
-        "tagDanger": "Опасно",
+        "tagDanger": "Опасное",
         "tagNew": "Новое!",
         "tagRecommended": "Рекомендованно",
         "tagTheme": "Тема",
-        "title": "Настройки дополнений",
+        "title": "Настройки аддонов",
         "unsupported": "Некоторые дополнения не доступны в данном браузере:"
     },
     "sl": {
@@ -421,6 +421,7 @@
         "credits": "Krediler:",
         "dirty": "Ayarı uygulamak için Turbowarp'u yeniden açın.",
         "dirtyButton": "Şimdi yeniden yükle",
+        "enableDangerous": "Bu eklenti tehlikelidir ve bilerek özellikleri DEVRE DIŞI BIRAKABİLİR. Çoğu kullanıcı bu eklentiyi ETKİNLEŞTİRMEMELİDİR. Etkinleştirmek istediğinizden emin misiniz?",
         "export": "Dışarıya aktarmak ayarları",
         "groupDanger": "Tehlikeli ({number})",
         "groupNew": "Yeni ({number})",

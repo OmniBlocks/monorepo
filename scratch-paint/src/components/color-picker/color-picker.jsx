@@ -24,6 +24,7 @@ import alphaBackground from './alpha.png';
 import BufferedInputHOC from '../forms/buffered-input-hoc.jsx';
 import Input from '../forms/input.jsx';
 import {makeAlphaComponent} from '../../lib/tw-color-utils';
+import TWColorReadout from '../tw-color-readout/tw-color-readout.jsx';
 
 const BufferedInput = BufferedInputHOC(Input);
 
@@ -220,9 +221,10 @@ class ColorPickerComponent extends React.Component {
                                 id="paint.paintEditor.hue"
                             />
                         </span>
-                        <span className={styles.labelReadout}>
-                            {Math.round(this.props.hue)}
-                        </span>
+                        <TWColorReadout
+                            value={this.props.hue}
+                            onChange={this.props.onHueChange}
+                        />
                     </div>
                     <div className={styles.rowSlider}>
                         <Slider
@@ -241,9 +243,10 @@ class ColorPickerComponent extends React.Component {
                                 id="paint.paintEditor.saturation"
                             />
                         </span>
-                        <span className={styles.labelReadout}>
-                            {Math.round(this.props.saturation)}
-                        </span>
+                        <TWColorReadout
+                            value={this.props.saturation}
+                            onChange={this.props.onSaturationChange}
+                        />
                     </div>
                     <div className={styles.rowSlider}>
                         <Slider
@@ -262,9 +265,10 @@ class ColorPickerComponent extends React.Component {
                                 id="paint.paintEditor.brightness"
                             />
                         </span>
-                        <span className={styles.labelReadout}>
-                            {Math.round(this.props.brightness)}
-                        </span>
+                        <TWColorReadout
+                            value={this.props.brightness}
+                            onChange={this.props.onBrightnessChange}
+                        />
                     </div>
                     <div className={styles.rowSlider}>
                         <Slider
@@ -285,9 +289,10 @@ class ColorPickerComponent extends React.Component {
                                     id="tw.paint.alpha"
                                 />
                             </span>
-                            <span className={styles.labelReadout}>
-                                {Math.round(this.props.alpha)}
-                            </span>
+                            <TWColorReadout
+                                value={this.props.alpha}
+                                onChange={this.props.onAlphaChange}
+                            />
                         </div>
                         <div className={styles.rowSlider}>
                             <Slider

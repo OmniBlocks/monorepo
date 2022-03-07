@@ -30,18 +30,10 @@
     font-family: "Helvetica Neue", Helvetica, sans-serif;
     font-size: 0.65rem;
     color: #575E75;
-    margin: 8px;
+    margin: 8px 8px 0 8px;
 }
 [theme="dark"] .row-header {
     color: #ccc;
-}
-
-[dir="ltr"] .label-readout {
-    margin-left: 10px;
-}
-
-[dir="rtl"] .label-readout {
-    margin-right: 10px;
 }
 
 .label-name {

@@ -21,6 +21,7 @@ import {clearPasteOffset} from '../reducers/clipboard';
 import {changeFormat} from '../reducers/format';
 import {updateViewBounds} from '../reducers/view-bounds';
 import {saveZoomLevel, setZoomLevelId} from '../reducers/zoom-levels';
+import {setImportingImage} from '../lib/tw-is-importing-image';
 
 import styles from './paper-canvas.css';
 
@@ -144,6 +145,7 @@ class PaperCanvas extends React.Component {
         if (format === 'jpg' || format === 'png') {
             // import bitmap
             this.props.changeFormat(Formats.BITMAP_SKIP_CONVERT);
+            setImportingImage(true);
 
             const mask = new paper.Shape.Rectangle(getRaster().getBounds());
             mask.guide = true;
@@ -155,6 +157,7 @@ class PaperCanvas extends React.Component {
             this.queuedImageToLoad = imgElement;
             imgElement.onload = () => {
                 this.clearPaperCanvas();
+                setImportingImage(false);
 
                 if (!this.queuedImageToLoad) return;
                 this.queuedImageToLoad = null;
@@ -200,6 +203,8 @@ class PaperCanvas extends React.Component {
         this.props.updateViewBounds(paper.view.matrix);
     }
     importSvg (svg, rotationCenterX, rotationCenterY) {
+        setImportingImage(true);
+
         const paperCanvas = this;
         // Pre-process SVG to prevent parsing errors (discussion from #213)
         // 1. Remove svg: namespace on elements.
@@ -248,6 +253,7 @@ class PaperCanvas extends React.Component {
         });
     }
     initializeSvg (item, rotationCenterX, rotationCenterY, viewBox) {
+        setImportingImage(false);
         this.clearPaperCanvas();
 
         if (this.queuedImport) this.queuedImport = null;

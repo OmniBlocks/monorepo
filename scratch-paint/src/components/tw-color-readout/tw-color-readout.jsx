@@ -25,7 +25,7 @@ class TWColorReadout extends React.Component {
             <BufferedInput
                 className={styles.readout}
                 onSubmit={this.handleSubmit}
-                value={Math.round(this.props.value)}
+                value={Math.round(this.props.value * 10) / 10}
                 type="number"
                 min={0}
                 max={100}

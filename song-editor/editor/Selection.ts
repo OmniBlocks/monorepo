@@ -96,6 +96,13 @@ export class Selection {
         const canReplaceLastChange: boolean = this._doc.lastChangeWas(this._changeTrack);
         this._changeTrack = new ChangeGroup();
         this._changeTrack.append(new ChangeChannelBar(this._doc, channelIndex, bar));
+        // @jummbus - changing current viewed instrument to the first for the current pattern if the viewedInstrument is not in the pattern
+        const pattern: Pattern | null = this._doc.getCurrentPattern(0);
+        if (pattern != null) {
+            if (pattern.instruments.indexOf(this._doc.viewedInstrument[this._doc.channel]) < 0) {
+                this._doc.viewedInstrument[this._doc.channel] = pattern.instruments[0];
+            }
+        }
         // Don't erase existing redo history just to look at highlighted pattern.
         if (!this._doc.hasRedoHistory()) {
             this._doc.record(this._changeTrack, canReplaceLastChange);

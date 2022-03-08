@@ -1,6 +1,6 @@
 // Copyright (C) 2021 John Nesky, distributed under the MIT license.
 
-import { Algorithm, Dictionary, FilterType, InstrumentType, EffectType, AutomationTarget, Config, effectsIncludePanning, effectsIncludeDistortion } from "../synth/SynthConfig";
+import { Algorithm, Dictionary, FilterType, InstrumentType, EffectType, AutomationTarget, Config, effectsIncludeDistortion } from "../synth/SynthConfig";
 import { NotePin, Note, makeNotePin, Pattern, FilterSettings, FilterControlPoint, SpectrumWave, HarmonicsWave, Instrument, Channel, Song, Synth } from "../synth/synth";
 import { Preset, PresetCategory, EditorConfig } from "./EditorConfig";
 import { Change, ChangeGroup, ChangeSequence, UndoableChange } from "./Change";
@@ -451,14 +451,15 @@ export class ChangePreset extends Change {
                     const tempVolume: number = instrument.volume;
                     const tempPan: number = instrument.pan;
                     const tempPanDelay = instrument.panDelay;
-                    const usesPanning: boolean = effectsIncludePanning(instrument.effects);
+                    //const usesPanning: boolean = effectsIncludePanning(instrument.effects);
                     instrument.fromJsonObject(preset.settings, doc.song.getChannelIsNoise(doc.channel), doc.song.getChannelIsMod(doc.channel), doc.song.rhythm == 0 || doc.song.rhythm == 2, doc.song.rhythm >= 2);
                     instrument.volume = tempVolume;
                     instrument.pan = tempPan;
                     instrument.panDelay = tempPanDelay;
-                    if (usesPanning && instrument.pan != Config.panCenter) {
+                    //@jummbus - Disable this check, pan will be on by default.
+                    //if (usesPanning && instrument.pan != Config.panCenter) {
                         instrument.effects = (instrument.effects | (1 << EffectType.panning));
-                    }
+                    //}
                 }
             }
             instrument.preset = newValue;

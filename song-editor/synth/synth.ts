@@ -1129,7 +1129,7 @@ export class Instrument {
         this.type = type;
         this.preset = type;
         this.volume = 0;
-        this.effects = 0;
+        this.effects = (1 << EffectType.panning); // Panning enabled by default in JB.
         this.chorus = Config.chorusRange - 1;
         this.reverb = 0;
         this.echoSustain = Math.floor((Config.echoSustainRange - 1) * 0.5);
@@ -1689,6 +1689,8 @@ export class Instrument {
             }
         } else {
             this.pan = Config.panCenter;
+            // Still enabling pan effect, to make it a default
+            this.effects = (this.effects | (1 << EffectType.panning));
         }
 
         if (instrumentObject["panDelay"] != undefined) {
@@ -3626,10 +3628,10 @@ export class Song {
                     } else if (effectsIncludeReverb(instrument.effects)) {
                         instrument.reverb = legacyGlobalReverb;
                     }
-                    if (instrument.pan != Config.panCenter) {
-                        // Enable panning if panning slider isn't centered.
+                    // @jummbus - Enabling pan effect on song import no matter what to make it a default.
+                    //if (instrument.pan != Config.panCenter) {
                         instrument.effects |= 1 << EffectType.panning;
-                    }
+                    //}
                     if (instrument.vibrato != Config.vibratos.dictionary["none"].index) {
                         // Enable vibrato if it was used.
                         instrument.effects |= 1 << EffectType.vibrato;

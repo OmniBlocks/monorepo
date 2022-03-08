@@ -564,6 +564,8 @@ export class SongEditor {
     */
     private readonly _addEnvelopeButton: HTMLButtonElement = button({ type: "button", class: "add-envelope" });
     private readonly _customInstrumentSettingsGroup: HTMLDivElement = div({ class: "editor-controls" },
+        this._panSliderRow,
+        this._panDropdownGroup,
         this._chipWaveSelectRow,
         this._chipNoiseSelectRow,
         this._customWaveDraw,
@@ -602,8 +604,6 @@ export class SongEditor {
         this._aliasingRow,
         this._bitcrusherQuantizationRow,
         this._bitcrusherFreqRow,
-        this._panSliderRow,
-        this._panDropdownGroup,
         this._chorusRow,
         this._echoSustainRow,
         this._echoDelayRow,
@@ -1256,12 +1256,6 @@ export class SongEditor {
                 return null;
         }
 
-    }
-
-    public changeInstrument(index: number): void {
-        // TODO: Port feature from beepbox
-        //this._instrumentSelect.selectedIndex = index;
-        //this._whenSetInstrument();
     }
 
     private _openPrompt(promptName: string): void {

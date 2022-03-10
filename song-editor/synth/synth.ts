@@ -5707,6 +5707,12 @@ class InstrumentState {
             mixVolumeEnd *= ((endVal <= 0) ? ((endVal + Config.volumeRange / 2) / (Config.volumeRange / 2)) : Synth.instrumentVolumeToVolumeMult(endVal));
         }
 
+        // Check for SONG mod-related volume delta
+        if (synth.isModActive(Config.modulators.dictionary["song volume"].index)) {
+            this.mixVolumeStart *= (synth.getModValue(Config.modulators.dictionary["song volume"].index, undefined, undefined, false)) / 100.0;
+            mixVolumeEnd *= (synth.getModValue(Config.modulators.dictionary["song volume"].index, undefined, undefined, true)) / 100.0;
+        }
+
         this.mixVolumeDelta = (mixVolumeEnd - this.mixVolumeStart) / runLength;
 
         let eqFilterVolumeStart: number = eqFilterVolume;
@@ -8277,12 +8283,6 @@ export class Synth {
                     expressionEnd *= ((endVal <= 0) ? ((endVal + Config.volumeRange / 2) / (Config.volumeRange / 2)) : this.instrumentVolumeToVolumeMult(endVal));
                 }
 
-                // Check for SONG mod-related volume delta
-                if (synth.isModActive(Config.modulators.dictionary["song volume"].index)) {
-                    expressionStart *= (synth.getModValue(Config.modulators.dictionary["song volume"].index, undefined, undefined, false)) / 100.0;
-                    expressionEnd *= (synth.getModValue(Config.modulators.dictionary["song volume"].index, undefined, undefined, true)) / 100.0;
-                }
-
                 tone.expressionStarts[i] = expressionStart;
                 tone.expressionDeltas[i] = (expressionEnd - expressionStart) / runLength;
             }
@@ -8414,11 +8414,6 @@ export class Synth {
                 const endVal: number = synth.getModValue(Config.modulators.dictionary["note volume"].index, channelIndex, tone.instrumentIndex, true)
                 expressionStart *= ((startVal <= 0) ? ((startVal + Config.volumeRange / 2) / (Config.volumeRange / 2)) : this.instrumentVolumeToVolumeMult(startVal));
                 expressionEnd *= ((endVal <= 0) ? ((endVal + Config.volumeRange / 2) / (Config.volumeRange / 2)) : this.instrumentVolumeToVolumeMult(endVal));
-            }
-            // Check for SONG mod-related volume delta
-            if (synth.isModActive(Config.modulators.dictionary["song volume"].index)) {
-                expressionStart *= (synth.getModValue(Config.modulators.dictionary["song volume"].index, undefined, undefined, false)) / 100.0;
-                expressionEnd *= (synth.getModValue(Config.modulators.dictionary["song volume"].index, undefined, undefined, true)) / 100.0;
             }
 
             tone.expressionStarts[0] = expressionStart;

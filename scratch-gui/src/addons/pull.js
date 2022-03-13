@@ -22,7 +22,6 @@
 const fs = require('fs');
 const childProcess = require('child_process');
 const rimraf = require('rimraf');
-const request = require('request');
 const pathUtil = require('path');
 const {addons, newAddons} = require('./addons.js');
 
@@ -66,13 +65,6 @@ process.chdir(repoPath);
 const commitHash = childProcess.execSync('git rev-parse --short HEAD')
     .toString()
     .trim();
-
-request('https://raw.githubusercontent.com/ScratchAddons/contributors/master/.all-contributorsrc', (err, response, body) => {
-    const parsed = JSON.parse(body);
-    const contributors = parsed.contributors.filter(({contributions}) => contributions.includes('translation'));
-    const contributorsPath = pathUtil.resolve(generatedPath, 'translators.json');
-    fs.writeFileSync(contributorsPath, JSON.stringify(contributors, null, 4));
-});
 
 class GeneratedImports {
     constructor () {

@@ -59,15 +59,12 @@ const Credits = () => (
             <p>
                 Thank you to everyone that makes this project possible.
             </p>
-            <p>
-                The TurboWarp project does not accept donations. Instead, donate to <a href="https://fosshost.org/donate">Fosshost</a> or <a href="https://scratch.mit.edu/donate">Scratch</a> (or both!). Thank you.
-            </p>
         </section>
         <section>
             <h2>{'Fosshost'}</h2>
             <p>
-                <a href="https://fosshost.org/">Fosshost</a> provides free high quality hosting services to open source projects, including TurboWarp.
-                {' '}<a href="https://fosshost.org/donate">Donate to them</a> to support their work.
+                <a href="https://fosshost.org/">Fosshost</a> provides free high quality hosting services to open source projects including TurboWarp.
+                {' '}Fosshost <a href="https://fosshost.org/donate">accepts donations</a> to support their work.
             </p>
             <a href="https://fosshost.org/">
                 <img
@@ -79,20 +76,11 @@ const Credits = () => (
         </section>
         <section>
             <h2>{'Scratch'}</h2>
-            <p>TurboWarp is based on the work of the <a href="https://scratch.mit.edu/credits">Scratch contributors</a>. TurboWarp is not affiliated with Scratch.</p>
+            <p>TurboWarp is based on the work of the <a href="https://scratch.mit.edu/credits">Scratch contributors</a> but is not endorsed by Scratch in any way. Scratch <a href="https://scratch.mit.edu/donate">accepts donations</a> to support their work.</p>
         </section>
-        {/* It's really tempting to uncomment this */}
-        {/* <section>
-            <h2>{'Core Contributors'}</h2>
-            <UserList users={UserData.coreContributors} />
-        </section> */}
         <section>
             <h2>{'Addons'}</h2>
             <UserList users={UserData.addonDevelopers} />
-        </section>
-        <section>
-            <h2>{'Translators'}</h2>
-            <UserList users={UserData.translators} />
         </section>
         <section>
             <p>Individual contributors are listed in no particular order.</p>

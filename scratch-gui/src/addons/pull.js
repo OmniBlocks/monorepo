@@ -49,7 +49,7 @@ const clone = obj => JSON.parse(JSON.stringify(obj));
 const repoPath = pathUtil.resolve(__dirname, 'ScratchAddons');
 if (!process.argv.includes('-')) {
     rimraf.sync(repoPath);
-    childProcess.execSync(`git clone --depth=1 https://github.com/TurboWarp/addons ${repoPath}`);
+    childProcess.execSync(`git clone --depth=1 --branch=tw https://github.com/TurboWarp/addons ${repoPath}`);
 }
 
 for (const folder of ['addons', 'addons-l10n', 'addons-l10n-settings', 'libraries']) {

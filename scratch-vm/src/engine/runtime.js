@@ -2393,13 +2393,13 @@ class Runtime extends EventEmitter {
      */
     setStageSize (width, height) {
         if (this.stageWidth !== width || this.stageHeight !== height) {
-            // Preserve monitor location relative to the center of the stage
             const deltaX = width - this.stageWidth;
             const deltaY = height - this.stageHeight;
+            // Preserve monitor location relative to the center of the stage
             if (this._monitorState.size > 0) {
+                const offsetX = deltaX / 2;
+                const offsetY = deltaY / 2;
                 for (const monitor of this._monitorState.valueSeq()) {
-                    const offsetX = Math.round(deltaX / 2);
-                    const offsetY = Math.round(deltaY / 2);
                     const newMonitor = monitor
                         .set('x', monitor.get('x') + offsetX)
                         .set('y', monitor.get('y') + offsetY);

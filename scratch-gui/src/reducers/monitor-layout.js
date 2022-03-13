@@ -4,6 +4,7 @@ const ADD_MONITOR_RECT = 'scratch-gui/monitors/ADD_MONITOR_RECT';
 const MOVE_MONITOR_RECT = 'scratch-gui/monitors/MOVE_MONITOR_RECT';
 const RESIZE_MONITOR_RECT = 'scratch-gui/monitors/RESIZE_MONITOR_RECT';
 const REMOVE_MONITOR_RECT = 'scratch-gui/monitors/REMOVE_MONITOR_RECT';
+const RESET_MONITOR_LAYOUT = 'scratch-gui/monitors/RESET_MONITOR_LAYOUT';
 
 const initialState = {
     monitors: {},
@@ -137,6 +138,8 @@ const reducer = function (state, action) {
         return _resizeMonitorRect(state, action);
     case REMOVE_MONITOR_RECT:
         return _removeMonitorRect(state, action);
+    case RESET_MONITOR_LAYOUT:
+        return initialState;
     default:
         return state;
     }
@@ -305,6 +308,12 @@ const removeMonitorRect = function (monitorId) {
     };
 };
 
+const resetMonitorLayout = function () {
+    return {
+        type: RESET_MONITOR_LAYOUT
+    };
+};
+
 export {
     reducer as default,
     initialState as monitorLayoutInitialState,
@@ -313,6 +322,7 @@ export {
     moveMonitorRect,
     resizeMonitorRect,
     removeMonitorRect,
+    resetMonitorLayout,
     PADDING,
     SCREEN_HEIGHT,
     SCREEN_WIDTH

@@ -144,7 +144,6 @@ class PaperCanvas extends React.Component {
 
         if (format === 'jpg' || format === 'png') {
             // import bitmap
-            this.props.changeFormat(Formats.BITMAP_SKIP_CONVERT);
             setImportingImage(true);
 
             const mask = new paper.Shape.Rectangle(getRaster().getBounds());
@@ -159,6 +158,7 @@ class PaperCanvas extends React.Component {
                 if (!this.queuedImageToLoad) return;
                 this.queuedImageToLoad = null;
 
+                this.props.changeFormat(Formats.BITMAP_SKIP_CONVERT);
                 this.clearPaperCanvas();
                 setImportingImage(false);
 
@@ -180,7 +180,6 @@ class PaperCanvas extends React.Component {
             };
             imgElement.src = image;
         } else if (format === 'svg') {
-            this.props.changeFormat(Formats.VECTOR_SKIP_CONVERT);
             this.importSvg(image, rotationCenterX, rotationCenterY);
         } else {
             this.clearPaperCanvas();
@@ -253,6 +252,7 @@ class PaperCanvas extends React.Component {
         });
     }
     initializeSvg (item, rotationCenterX, rotationCenterY, viewBox) {
+        this.props.changeFormat(Formats.VECTOR_SKIP_CONVERT);
         setImportingImage(false);
         this.clearPaperCanvas();
 

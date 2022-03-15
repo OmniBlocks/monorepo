@@ -237,7 +237,8 @@ class PaperCanvas extends React.Component {
                 if (!item) {
                     log.error('SVG import failed:');
                     log.info(svg);
-                    this.props.changeFormat(Formats.VECTOR_SKIP_CONVERT);
+                    setImportingImage(false);
+                    paperCanvas.props.changeFormat(Formats.VECTOR_SKIP_CONVERT);
                     performSnapshot(paperCanvas.props.undoSnapshot, Formats.VECTOR_SKIP_CONVERT);
                     return;
                 }

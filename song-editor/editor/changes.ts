@@ -2149,8 +2149,9 @@ export class ChangeAddChannelInstrument extends Change {
 
                     let instrument: Instrument = doc.song.channels[channelIndex].instruments[instrumentIndex];
                     let modInstrument: number = instrument.modInstruments[mod];
+                    let modChannel: number = instrument.modChannels[mod];
 
-                    if (modInstrument >= doc.song.channels[channelIndex].instruments.length) {
+                    if (modInstrument >= doc.song.channels[channelIndex].instruments.length && modChannel == doc.channel) {
                         instrument.modInstruments[mod]++;
                     }
                 }
@@ -2194,15 +2195,18 @@ export class ChangeRemoveChannelInstrument extends Change {
 
                     let instrument: Instrument = doc.song.channels[channelIndex].instruments[instrumentIdx];
                     let modInstrument: number = instrument.modInstruments[mod];
+                    let modChannel: number = instrument.modChannels[mod];
 
-                    // Boundary checking - check if setting was 'all' or 'active' previously
-                    if (modInstrument > doc.song.channels[channelIndex].instruments.length) {
-                        instrument.modInstruments[mod]--;
-                    }
-                    // Boundary checking - check if setting was set to the last instrument before splice
-                    else if (modInstrument == doc.song.channels[channelIndex].instruments.length) {
-                        instrument.modInstruments[mod] = 0;
-                        instrument.modulators[mod] = 0;
+                    if (modChannel == doc.channel) {
+                        // Boundary checking - check if setting was 'all' or 'active' previously
+                        if (modInstrument > doc.song.channels[channelIndex].instruments.length) {
+                            instrument.modInstruments[mod]--;
+                        }
+                        // Boundary checking - check if setting was set to the last instrument before splice
+                        else if (modInstrument == doc.song.channels[channelIndex].instruments.length) {
+                            instrument.modInstruments[mod] = 0;
+                            instrument.modulators[mod] = 0;
+                        }
                     }
 
                 }

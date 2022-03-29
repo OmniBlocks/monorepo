@@ -102,7 +102,7 @@ class RenderWebGL extends EventEmitter {
             return !!(
                 optCanvas.getContext('webgl', options) ||
                 optCanvas.getContext('experimental-webgl', options) ||
-                optCanvas.getContext('webgl2')
+                optCanvas.getContext('webgl2', options)
             );
         } catch (e) {
             return false;

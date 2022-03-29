@@ -1695,7 +1695,4 @@ class VirtualMachine extends EventEmitter {
     }
 }
 
-// tw: special value to indicate this is the TurboWarp vm
-VirtualMachine.isTurboWarp = true;
-
 module.exports = VirtualMachine;

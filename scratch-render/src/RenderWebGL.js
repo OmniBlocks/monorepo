@@ -2131,7 +2131,4 @@ RenderWebGL.UseGpuModes = {
     ForceCPU: 'ForceCPU'
 };
 
-// tw: special value to indicate the TurboWarp renderer
-RenderWebGL.isTurboWarp = true;
-
 module.exports = RenderWebGL;

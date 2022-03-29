@@ -1411,6 +1411,12 @@ export class ChangeChannelBar extends Change {
             doc.barScrollPos = Math.min(doc.bar, Math.max(doc.bar - (doc.trackVisibleBars - 1), doc.barScrollPos));
             doc.channelScrollPos = Math.min(doc.channel, Math.max(doc.channel - (doc.trackVisibleChannels - 1), doc.channelScrollPos));
         }
+        // Mod channels always jump to viewing the active instrument for the mod.
+        if (doc.song.getChannelIsMod(doc.channel)) {
+            const pattern: Pattern | null = doc.song!.getPattern(doc.channel, doc.bar);
+            if (pattern != null)
+                doc.viewedInstrument[doc.channel] = pattern.instruments[0];
+        }
         doc.notifier.changed();
         if (oldChannel != newChannel || oldBar != newBar) {
             this._didSomething();

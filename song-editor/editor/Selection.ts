@@ -739,7 +739,7 @@ export class Selection {
             this._changeInstrument = new ChangeGroup();
             this._changeInstrument.append(new ChangeViewInstrument(this._doc, instrument));
 
-            if (!this._doc.song.layeredInstruments && this._doc.song.patternInstruments) {
+            if (!(this._doc.song.layeredInstruments && this._doc.channel < this._doc.song.pitchChannelCount + this._doc.song.noiseChannelCount) && this._doc.song.patternInstruments) {
                 if (this.boxSelectionWidth > 1 || this.boxSelectionHeight > 1) {
                     this._changeInstrument.append(new ChangeDuplicateSelectedReusedPatterns(this._doc, this.boxSelectionBar, this.boxSelectionWidth, this.boxSelectionChannel, this.boxSelectionHeight));
                 }

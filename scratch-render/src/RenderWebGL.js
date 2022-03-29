@@ -189,9 +189,6 @@ class RenderWebGL extends EventEmitter {
         /** @type {ShaderManager} */
         this._shaderManager = new ShaderManager(gl);
 
-        /** @type {HTMLCanvasElement} */
-        this._tempCanvas = document.createElement('canvas');
-
         /** @type {any} */
         this._regionId = null;
 

@@ -198,23 +198,39 @@ module.exports = [
                 noSplash: true,
                 ...htmlWebpackPluginCommon
             }),
-            new CopyWebpackPlugin([{
-                from: 'static',
-                to: ''
-            }]),
-            new CopyWebpackPlugin([{
-                from: 'node_modules/scratch-blocks/media',
-                to: 'static/blocks-media'
-            }]),
-            new CopyWebpackPlugin([{
-                from: 'extensions/**',
-                to: 'static',
-                context: 'src/examples'
-            }]),
-            new CopyWebpackPlugin([{
-                from: 'extension-worker.{js,js.map}',
-                context: 'node_modules/scratch-vm/dist/web'
-            }]),
+            new CopyWebpackPlugin({
+                patterns: [
+                    {
+                        from: 'static',
+                        to: ''
+                    }
+                ]
+            }),
+            new CopyWebpackPlugin({
+                patterns: [
+                    {
+                        from: 'node_modules/scratch-blocks/media',
+                        to: 'static/blocks-media'
+                    }
+                ]
+            }),
+            new CopyWebpackPlugin({
+                patterns: [
+                    {
+                        from: 'extensions/**',
+                        to: 'static',
+                        context: 'src/examples'
+                    }
+                ]
+            }),
+            new CopyWebpackPlugin({
+                patterns: [
+                    {
+                        from: 'extension-worker.{js,js.map}',
+                        context: 'node_modules/scratch-vm/dist/web'
+                    }
+                ]
+            }),
             new TWGenerateServiceWorkerPlugin()
         ])
     })
@@ -249,20 +265,32 @@ module.exports = [
                 ])
             },
             plugins: base.plugins.concat([
-                new CopyWebpackPlugin([{
-                    from: 'node_modules/scratch-blocks/media',
-                    to: 'static/blocks-media'
-                }]),
-                new CopyWebpackPlugin([{
-                    from: 'extension-worker.{js,js.map}',
-                    context: 'node_modules/scratch-vm/dist/web'
-                }]),
+                new CopyWebpackPlugin({
+                    patterns: [
+                        {
+                            from: 'node_modules/scratch-blocks/media',
+                            to: 'static/blocks-media'
+                        }
+                    ]
+                }),
+                new CopyWebpackPlugin({
+                    patterns: [
+                        {
+                            from: 'extension-worker.{js,js.map}',
+                            context: 'node_modules/scratch-vm/dist/web'
+                        }
+                    ]
+                }),
                 // Include library JSON files for scratch-desktop to use for downloading
-                new CopyWebpackPlugin([{
-                    from: 'src/lib/libraries/*.json',
-                    to: 'libraries',
-                    flatten: true
-                }])
+                new CopyWebpackPlugin({
+                    patterns: [
+                        {
+                            from: 'src/lib/libraries/*.json',
+                            to: 'libraries',
+                            flatten: true
+                        }
+                    ]
+                })
             ])
         })) : []
 );

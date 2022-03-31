@@ -27,8 +27,8 @@ import {
 
 const messages = defineMessages({
     loadError: {
-        id: 'gui.projectLoader.loadError',
-        defaultMessage: 'The project file that was selected failed to load.',
+        id: 'tw.loadError',
+        defaultMessage: 'Could not load project: {error}',
         description: 'An error that displays when a local project file fails to load.'
     }
 });
@@ -196,7 +196,10 @@ const SBFileUploaderHOC = function (WrappedComponent) {
                     })
                     .catch(error => {
                         log.warn(error);
-                        alert(this.props.intl.formatMessage(messages.loadError)); // eslint-disable-line no-alert
+                        // eslint-disable-next-line no-alert
+                        alert(this.props.intl.formatMessage(messages.loadError, {
+                            error: `${error}`
+                        }));
                     })
                     .then(() => {
                         this.props.onLoadingFinished(this.props.loadingState, loadingSuccess);

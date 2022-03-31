@@ -223,14 +223,6 @@ module.exports = [
                     }
                 ]
             }),
-            new CopyWebpackPlugin({
-                patterns: [
-                    {
-                        from: 'extension-worker.{js,js.map}',
-                        context: 'node_modules/scratch-vm/dist/web'
-                    }
-                ]
-            }),
             new TWGenerateServiceWorkerPlugin()
         ])
     })
@@ -270,14 +262,6 @@ module.exports = [
                         {
                             from: 'node_modules/scratch-blocks/media',
                             to: 'static/blocks-media'
-                        }
-                    ]
-                }),
-                new CopyWebpackPlugin({
-                    patterns: [
-                        {
-                            from: 'extension-worker.{js,js.map}',
-                            context: 'node_modules/scratch-vm/dist/web'
                         }
                     ]
                 }),

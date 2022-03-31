@@ -53,7 +53,8 @@ class IframeExtensionWorker {
 
         window.addEventListener('message', this._onWindowMessage.bind(this));
         const blob = new Blob([
-            `<body><script>window.__WRAPPED_IFRAME_ID__=${JSON.stringify(this.id)};${frameSource}</script></body>`
+            // eslint-disable-next-line max-len
+            `<!DOCTYPE html><body><script>window.__WRAPPED_IFRAME_ID__=${JSON.stringify(this.id)};${frameSource}</script></body>`
         ], {
             type: 'text/html'
         });

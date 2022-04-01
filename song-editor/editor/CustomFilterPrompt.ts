@@ -10,7 +10,7 @@ import { FilterSettings } from "../synth/synth";
 import { ColorConfig } from "./ColorConfig";
 
 //namespace beepbox {
-const { button, div, h2 } = HTML;
+const { button, div, h2, p } = HTML;
 
 export class CustomFilterPrompt implements Prompt {
 
@@ -51,6 +51,8 @@ export class CustomFilterPrompt implements Prompt {
 	]);
 	private readonly _filterCopyPasteContainer: HTMLDivElement = div({ style: "width: 185px;" }, this._filterCopyButton, this._filterPasteButton);
 
+	private readonly _filterCoordinateText: HTMLDivElement = div({ style: "text-align: left; margin-bottom: 0px; font-size: x-small; height: 1.3em; color: " + ColorConfig.secondaryText + ";"}, p(""));
+
 	public readonly container: HTMLDivElement = div({ class: "prompt noSelection", style: "width: 600px;" },
 		this._editorTitle,
 		div({ style: "display: flex; width: 55%; align-self: center; flex-direction: row; align-items: center; justify-content: center;" },
@@ -60,7 +62,7 @@ export class CustomFilterPrompt implements Prompt {
 		this._filterContainer,
 		div({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between;" },
 			this._okayButton,
-			this._filterCopyPasteContainer
+			this._filterCopyPasteContainer,
 		),
 		this._cancelButton,
 	);
@@ -77,6 +79,10 @@ export class CustomFilterPrompt implements Prompt {
 
 		this.filterEditor = new FilterEditor(_doc, _useNoteFilter, true);
 		this._filterContainer.appendChild(this.filterEditor.container);
+
+		// Add coordinates to editor
+		this.filterEditor.container.insertBefore(this._filterCoordinateText, this.filterEditor.container.firstChild);
+		this.filterEditor.coordText = this._filterCoordinateText;
 
 		this._editorTitle.children[0].innerHTML = (_useNoteFilter) ? "Edit Note Filter" : "Edit EQ Filter";
 

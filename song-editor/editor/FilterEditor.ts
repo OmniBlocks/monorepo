@@ -31,6 +31,7 @@ export class FilterEditor {
     private selfUndoHistoryPos: number = 0;
     private readonly _label: HTMLDivElement = HTML.div({ style: "position: absolute; bottom: 0; left: 2px; font-size: 8px; line-height: 1; pointer-events: none;" });
 
+    public coordText: HTMLElement | null = null;
     public readonly container: HTMLElement = HTML.div({ class: "filterEditor", style: "height: 100%; position: relative;" },
         this._svg,
         this._label,
@@ -153,12 +154,16 @@ export class FilterEditor {
         this._mouseOver = true;
 
         if (!this._larger)
-        this._controlPointPath.style.setProperty("fill", "currentColor");
+            this._controlPointPath.style.setProperty("fill", "currentColor");
     }
 
     private _whenMouseOut = (event: MouseEvent): void => {
         this._mouseOver = false;
         this._updatePath();
+
+        if (this.coordText != null) {
+            this.coordText.innerText = "";
+        }
     }
 
     private _whenMousePressed = (event: MouseEvent): void => {
@@ -191,6 +196,7 @@ export class FilterEditor {
         if (isNaN(this._mouseX)) this._mouseX = 0;
         if (isNaN(this._mouseY)) this._mouseY = 0;
         if (!this._mouseDown) this._updateCursor();
+
         this._whenCursorMoved();
     }
 
@@ -252,6 +258,15 @@ export class FilterEditor {
         this._dragChange = null;
         this._deletingPoint = false;
 
+        if (this.coordText != null && !this._mouseDown) {
+            let gain: number = Math.round(this._yToGain(this._mouseY));
+            let freq: number = Math.round(this._xToFreq(this._mouseX));
+            if (freq >= 0 && freq < Config.filterFreqRange && gain >= 0 && gain < Config.filterGainRange)
+                this.coordText.innerText = "(" + freq + ", " + gain + ")";
+            else
+                this.coordText.innerText = "";
+        }
+
         if (this._mouseDown) {
             const sequence: ChangeSequence = new ChangeSequence();
             this._dragChange = sequence;
@@ -266,6 +281,10 @@ export class FilterEditor {
                     point.freq = freq;
                     point.gain = gain;
                     sequence.append(new ChangeFilterAddPoint(this._doc, this._filterSettings, point, this._filterSettings.controlPointCount, this._useNoteFilter));
+
+                    if (this.coordText != null) {
+                        this.coordText.innerText = "(" + freq + ", " + gain + ")";
+                    }
                 } else {
                     this._deletingPoint = true;
                 }
@@ -285,6 +304,9 @@ export class FilterEditor {
 
                 if (freq >= 0 && freq < Config.filterFreqRange) {
                     sequence.append(new ChangeFilterMovePoint(this._doc, point, point.freq, freq, point.gain, gain));
+                    if (this.coordText != null) {
+                        this.coordText.innerText = "(" + freq + ", " + gain + ")";
+                    }
                 } else {
                     sequence.append(new ChangeFilterAddPoint(this._doc, this._filterSettings, point, this._selectedIndex, this._useNoteFilter, true));
                     this._deletingPoint = true;
@@ -375,9 +397,13 @@ export class FilterEditor {
                 this._highlight.setAttribute("cx", String(pointX));
                 this._highlight.setAttribute("cy", String(pointY));
                 this._highlight.style.display = "";
+
+                if (this.coordText != null) {
+                    this.coordText.innerText = "(" + point.freq + ", " + point.gain + ")";
+                }
             }
             if ((this._selectedIndex == i || (this._addingPoint && this._mouseDown && i == this._filterSettings.controlPointCount - 1)) && (this._mouseOver || this._mouseDown) && !this._deletingPoint) {
-                this._label.textContent = (i + 1) + ": " + Config.filterTypeNames[point.type];// + " " + prettyNumber(point.getHz()) + "Hz";
+                this._label.textContent = (i + 1) + ": " + Config.filterTypeNames[point.type] + (this._larger ? " @" + prettyNumber(point.getHz()) + "Hz" : "");
             }
 
             if (this._larger) {

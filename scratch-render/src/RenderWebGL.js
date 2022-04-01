@@ -1689,7 +1689,7 @@ class RenderWebGL extends EventEmitter {
             return;
         }
 
-        // tw: snapping occurs later
+        // TW: The bounds will be snapped later
         const bounds = this._unsnappedTouchingBounds(stampID);
         if (!bounds) {
             return;
@@ -1703,28 +1703,35 @@ class RenderWebGL extends EventEmitter {
         twgl.bindFramebufferInfo(gl, skin._framebuffer);
 
         // Limit size of viewport to the bounds around the stamp Drawable and create the projection matrix for the draw.
-        // tw: scale for high quality render
-        if (!this.useHighQualityRender) {
-            bounds.snapToInt();
-        }
-        let x = (this._nativeSize[0] * 0.5) + bounds.left;
-        let y = (this._nativeSize[1] * 0.5) - bounds.top;
-        let width = bounds.width;
-        let height = bounds.height;
-        if (this.useHighQualityRender) {
-            x = Math.floor(x * skin.renderQuality);
-            y = Math.floor(y * skin.renderQuality);
-            width = Math.ceil(width * skin.renderQuality);
-            height = Math.ceil(height * skin.renderQuality);
-        }
-        gl.viewport(x, y, width, height);
-        const projection = twgl.m4.ortho(bounds.left, bounds.right, bounds.top, bounds.bottom, -1, 1);
+        // TW: We upscale the "stage space" to "screen space" and then snap the coordinates so that tiled projects
+        // don't have seems between sprites.
+        const quality = skin.renderQuality;
+        bounds.left *= quality;
+        bounds.right *= quality;
+        bounds.top *= quality;
+        bounds.bottom *= quality;
+        bounds.snapToInt();
+        gl.viewport(
+            (this._nativeSize[0] * 0.5 * quality) + bounds.left,
+            (this._nativeSize[1] * 0.5 * quality) - bounds.top,
+            bounds.width,
+            bounds.height
+        );
+        const projection = twgl.m4.ortho(
+            // TW: We have to convert the snapped "screen-space" back to "stage-space" for rendering.
+            bounds.left / quality,
+            bounds.right / quality,
+            bounds.top / quality,
+            bounds.bottom / quality,
+            -1,
+            1
+        );
 
         // Draw the stamped sprite onto the PenSkin's framebuffer.
         this._drawThese([stampID], ShaderManager.DRAW_MODE.default, projection, {
             ignoreVisibility: true,
-            framebufferWidth: this._nativeSize[0] * skin.renderQuality,
-            framebufferHeight: this._nativeSize[1] * skin.renderQuality
+            framebufferWidth: this._nativeSize[0] * quality,
+            framebufferHeight: this._nativeSize[1] * quality
         });
         skin._silhouetteDirty = true;
     }

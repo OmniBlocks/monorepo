@@ -1155,9 +1155,13 @@ class ScriptTreeGenerator {
                 };
             }
 
-            // These are guaranteed to exist by previous checks
             const definitionId = this.blocks.getProcedureDefinition(procedureCode);
             const definitionBlock = this.blocks.getBlock(definitionId);
+            if (!definitionBlock) {
+                return {
+                    kind: 'noop'
+                };
+            }
             const innerDefinition = this.blocks.getBlock(definitionBlock.inputs.custom_block.block);
 
             let isWarp = this.script.isWarp;

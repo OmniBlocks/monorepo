@@ -398,7 +398,7 @@ runtimeFunctions.distance = `const distance = menu => {
 baseRuntime += `const listIndexSlow = (index, length) => {
     if (index === 'last') {
         return length - 1;
-    } else if (index === 'random' || index === '*') {
+    } else if (index === 'random' || index === 'any') {
         if (length > 0) {
             return (Math.random() * length) | 0;
         }

@@ -920,6 +920,10 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
   background-color: transparent !important;
 }
 
+.select2-results__option--highlighted[aria-selected] {
+	color: white !important;
+}
+
 .beepboxEditor .menu select {
 	padding: 0 var(--button-size);
 }

@@ -26,6 +26,10 @@ export class ThemePrompt implements Prompt {
 		option({ value: "toxic" }, "Toxic"),
 		option({ value: "roe" }, "Roe"),
 		option({ value: "moonlight" }, "Moonlight"),
+		option({ value: "portal" }, "Portal"),
+		option({ value: "fusion" }, "Fusion"),
+		option({ value: "inverse" }, "Inverse"),
+		option({ value: "nebula" }, "Nebula")
 	);
 	private readonly _cancelButton: HTMLButtonElement = button({ class: "cancelButton" });
 	private readonly _okayButton: HTMLButtonElement = button({ class: "okayButton", style: "width:45%;" }, "Okay");

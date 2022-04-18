@@ -4498,7 +4498,7 @@ export class Song {
                 for (const note of pattern.notes) {
                     // Only one ins per pattern is enforced in mod channels.
                     let instrument: Instrument = channel.instruments[pattern.instruments[0]];
-                    let mod: number = Config.modCount - note.pitches[0] - 1;
+                    let mod: number = Math.max( 0, Config.modCount - note.pitches[0] - 1 );
                     let volumeCap: number = this.getVolumeCapForSetting(isModChannel, instrument.modulators[mod], instrument.modFilterTypes[mod]);
                     const pointArray: Object[] = [];
                     for (const pin of note.pins) {
@@ -4834,7 +4834,7 @@ export class Song {
                                 const time: number = Math.round((+pointObject["tick"]) * Config.partsPerBeat / importedPartsPerBeat);
 
                                 let instrument: Instrument = channel.instruments[pattern.instruments[0]];
-                                let mod: number = Config.modCount - note.pitches[0] - 1;
+                                let mod: number = Math.max( 0, Config.modCount - note.pitches[0] - 1 );
 
                                 // Only one instrument per pattern allowed in mod channels.
                                 let volumeCap: number = this.getVolumeCapForSetting(isModChannel, instrument.modulators[mod], instrument.modFilterTypes[mod]);

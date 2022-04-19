@@ -541,13 +541,17 @@ class JSGenerator {
         case 'op.greater': {
             const left = this.descendInput(node.left);
             const right = this.descendInput(node.right);
+            // When the left operand is a number and the right operand is a number or NaN, we can use >
+            if (left.isAlwaysNumber() && right.isAlwaysNumberOrNaN()) {
+                return new TypedInput(`(${left.asNumber()} > ${right.asNumberOrNaN()})`, TYPE_BOOLEAN);
+            }
+            // When the left operand is a number or NaN and the right operand is a number, we can negate <=
+            if (left.isAlwaysNumberOrNaN() && right.isAlwaysNumber()) {
+                return new TypedInput(`!(${left.asNumberOrNaN()} <= ${right.asNumber()})`, TYPE_BOOLEAN);
+            }
             // When both operands are known to never be numbers, only use string comparison to avoid all number parsing.
             if (left.isNeverNumber() || right.isNeverNumber()) {
                 return new TypedInput(`(${left.asString()}.toLowerCase() > ${right.asString()}.toLowerCase())`, TYPE_BOOLEAN);
-            }
-            // When both operands are known to be numbers, we can use >
-            if (left.isAlwaysNumber() && right.isAlwaysNumber()) {
-                return new TypedInput(`(${left.asNumber()} > ${right.asNumber()})`, TYPE_BOOLEAN);
             }
             // No compile-time optimizations possible - use fallback method.
             return new TypedInput(`compareGreaterThan(${left.asUnknown()}, ${right.asUnknown()})`, TYPE_BOOLEAN);
@@ -559,13 +563,17 @@ class JSGenerator {
         case 'op.less': {
             const left = this.descendInput(node.left);
             const right = this.descendInput(node.right);
+            // When the left operand is a number or NaN and the right operand is a number, we can use <
+            if (left.isAlwaysNumberOrNaN() && right.isAlwaysNumber()) {
+                return new TypedInput(`(${left.asNumberOrNaN()} < ${right.asNumber()})`, TYPE_BOOLEAN);
+            }
+            // When the left operand is a number and the right operand is a number or NaN, we can negate >=
+            if (left.isAlwaysNumber() && right.isAlwaysNumberOrNaN()) {
+                return new TypedInput(`!(${left.asNumber()} >= ${right.asNumberOrNaN()})`, TYPE_BOOLEAN);
+            }
             // When both operands are known to never be numbers, only use string comparison to avoid all number parsing.
             if (left.isNeverNumber() || right.isNeverNumber()) {
                 return new TypedInput(`(${left.asString()}.toLowerCase() < ${right.asString()}.toLowerCase())`, TYPE_BOOLEAN);
-            }
-            // When both operands are known to be numbers, we can use >
-            if (left.isAlwaysNumber() && right.isAlwaysNumber()) {
-                return new TypedInput(`(${left.asNumber()} < ${right.asNumber()})`, TYPE_BOOLEAN);
             }
             // No compile-time optimizations possible - use fallback method.
             return new TypedInput(`compareLessThan(${left.asUnknown()}, ${right.asUnknown()})`, TYPE_BOOLEAN);

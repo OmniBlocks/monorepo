@@ -4,8 +4,6 @@
 // This throttles and retries fetch() to mitigate the effect of random network errors and
 // random browser errors (especially in Chrome)
 
-const log = require('./log');
-
 let currentFetches = 0;
 const queue = [];
 
@@ -21,7 +19,7 @@ const startNextFetch = ([resolve, url, options]) => {
             return buffer;
         })
         .catch(error => {
-            log.warn(`Attempt to fetch ${url} failed`, error);
+            console.warn(`Attempt to fetch ${url} failed`, error);
             if (!firstError) {
                 firstError = error;
             }

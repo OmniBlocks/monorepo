@@ -549,7 +549,7 @@ class JSGenerator {
             if (left.isAlwaysNumberOrNaN() && right.isAlwaysNumber()) {
                 return new TypedInput(`!(${left.asNumberOrNaN()} <= ${right.asNumber()})`, TYPE_BOOLEAN);
             }
-            // When both operands are known to never be numbers, only use string comparison to avoid all number parsing.
+            // When either operand is known to never be a number, avoid all number parsing.
             if (left.isNeverNumber() || right.isNeverNumber()) {
                 return new TypedInput(`(${left.asString()}.toLowerCase() > ${right.asString()}.toLowerCase())`, TYPE_BOOLEAN);
             }
@@ -571,7 +571,7 @@ class JSGenerator {
             if (left.isAlwaysNumber() && right.isAlwaysNumberOrNaN()) {
                 return new TypedInput(`!(${left.asNumber()} >= ${right.asNumberOrNaN()})`, TYPE_BOOLEAN);
             }
-            // When both operands are known to never be numbers, only use string comparison to avoid all number parsing.
+            // When either operand is known to never be a number, avoid all number parsing.
             if (left.isNeverNumber() || right.isNeverNumber()) {
                 return new TypedInput(`(${left.asString()}.toLowerCase() < ${right.asString()}.toLowerCase())`, TYPE_BOOLEAN);
             }

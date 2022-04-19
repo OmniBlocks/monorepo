@@ -553,10 +553,6 @@ class JSGenerator {
             if (left.isNeverNumber() || right.isNeverNumber()) {
                 return new TypedInput(`(${left.asString()}.toLowerCase() > ${right.asString()}.toLowerCase())`, TYPE_BOOLEAN);
             }
-            // When both operands are known to be numbers, we can use >
-            if (left.isAlwaysNumber() && right.isAlwaysNumber()) {
-                return new TypedInput(`(${left.asNumber()} > ${right.asNumber()})`, TYPE_BOOLEAN);
-            }
             // No compile-time optimizations possible - use fallback method.
             return new TypedInput(`compareGreaterThan(${left.asUnknown()}, ${right.asUnknown()})`, TYPE_BOOLEAN);
         }
@@ -578,10 +574,6 @@ class JSGenerator {
             // When both operands are known to never be numbers, only use string comparison to avoid all number parsing.
             if (left.isNeverNumber() || right.isNeverNumber()) {
                 return new TypedInput(`(${left.asString()}.toLowerCase() < ${right.asString()}.toLowerCase())`, TYPE_BOOLEAN);
-            }
-            // When both operands are known to be numbers, we can use <
-            if (left.isAlwaysNumber() && right.isAlwaysNumber()) {
-                return new TypedInput(`(${left.asNumber()} < ${right.asNumber()})`, TYPE_BOOLEAN);
             }
             // No compile-time optimizations possible - use fallback method.
             return new TypedInput(`compareLessThan(${left.asUnknown()}, ${right.asUnknown()})`, TYPE_BOOLEAN);

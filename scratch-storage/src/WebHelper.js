@@ -1,5 +1,3 @@
-const log = require('./log');
-
 const Asset = require('./Asset');
 const Helper = require('./Helper');
 const ProxyTool = require('./ProxyTool');
@@ -57,7 +55,6 @@ class WebHelper extends Helper {
      * @param {UrlFunction} urlFunction - A function which computes a URL from an Asset.
      */
     addSource (types, urlFunction) {
-        log.warn('Deprecation: WebHelper.addSource has been replaced with WebHelper.addStore.');
         this.addStore(types, urlFunction);
     }
 

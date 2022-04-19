@@ -1,5 +1,3 @@
-const log = require('./log');
-
 const BuiltinHelper = require('./BuiltinHelper');
 const WebHelper = require('./WebHelper');
 
@@ -99,7 +97,6 @@ class ScratchStorage {
      * @returns {string} The calculated id of the cached asset, or the supplied id if the asset is mutable.
      */
     cache (assetType, dataFormat, data, id) {
-        log.warn('Deprecation: Storage.cache is deprecated. Use Storage.createAsset, and store assets externally.');
         return this.builtinHelper._store(assetType, dataFormat, data, id);
     }
 
@@ -135,7 +132,6 @@ class ScratchStorage {
      * @param {UrlFunction} urlFunction - A function which computes a GET URL from an Asset.
      */
     addWebSource (types, urlFunction) {
-        log.warn('Deprecation: Storage.addWebSource has been replaced by addWebStore.');
         this.addWebStore(types, urlFunction);
     }
 

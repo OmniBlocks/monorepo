@@ -514,7 +514,7 @@ class JSGenerator {
         case 'op.equals': {
             const left = this.descendInput(node.left);
             const right = this.descendInput(node.right);
-            // When either operand is known to never be a number, only use string comparison to avoid all number parsing.
+            // When both operands are known to never be numbers, only use string comparison to avoid all number parsing.
             if (left.isNeverNumber() || right.isNeverNumber()) {
                 return new TypedInput(`(${left.asString()}.toLowerCase() === ${right.asString()}.toLowerCase())`, TYPE_BOOLEAN);
             }
@@ -541,7 +541,7 @@ class JSGenerator {
         case 'op.greater': {
             const left = this.descendInput(node.left);
             const right = this.descendInput(node.right);
-            // When either operand is known to never be a number, only use string comparison to avoid all number parsing.
+            // When both operands are known to never be numbers, only use string comparison to avoid all number parsing.
             if (left.isNeverNumber() || right.isNeverNumber()) {
                 return new TypedInput(`(${left.asString()}.toLowerCase() > ${right.asString()}.toLowerCase())`, TYPE_BOOLEAN);
             }

@@ -40,7 +40,11 @@ test('comparisons', t => {
         '0.23',
         '.23',
         '-.23',
-        '0.0'
+        '0.0',
+        NaN,
+        'NaN',
+        Infinity,
+        'Infinity'
     ];
     const compareEqual = evaluateRuntimeFunction('compareEqual');
     const compareGreaterThan = evaluateRuntimeFunction('compareGreaterThan');

@@ -52,9 +52,15 @@ test('comparisons', t => {
     for (const a of VALUES) {
         for (const b of VALUES) {
             const cast = Cast.compare(a, b);
-            t.equal(compareEqual(a, b), cast === 0, `${a} === ${b}`);
-            t.equal(compareGreaterThan(a, b), cast > 0, `${a} > ${b}`);
-            t.equal(compareLessThan(a, b), cast < 0, `${a} < ${b}`);
+            if (compareEqual(a, b) !== (cast === 0)) {
+                t.fail(`${a} should be === ${b}`);
+            }
+            if (compareGreaterThan(a, b) !== (cast > 0)) {
+                t.fail(`${a} should be > ${b}`);
+            }
+            if (compareLessThan(a, b) !== (cast < 0)) {
+                t.fail(`${a} should be < ${b}`);
+            }
         }
     }
     t.end();

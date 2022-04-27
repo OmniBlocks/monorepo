@@ -2,7 +2,7 @@
 
 Addons and translations are from the [Scratch Addons browser extension](https://scratchaddons.com/). Feature requests should be sent [upstream](https://github.com/ScratchAddons/ScratchAddons/issues), but bug reports should be opened here first incase it's a bug caused by TurboWarp.
 
-We apply some patches on top of the original source files. These patches are maintained in https://github.com/GarboMuffin/ScratchAddons/tree/tw.
+We apply some patches on top of the original source files. These patches are maintained in https://github.com/TurboWarp/addons.
 
 entry.js is the script that will begin running addons.
 

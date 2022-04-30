@@ -16,10 +16,7 @@ const reducer = function (state, action) {
 const updateMonitors = function (monitors) {
     return {
         type: UPDATE_MONITORS,
-        monitors: monitors,
-        meta: {
-            throttle: 30
-        }
+        monitors: monitors
     };
 };
 

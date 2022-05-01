@@ -72,19 +72,14 @@ class GeneratedImports {
         this.namespaces = new Map();
     }
 
-    add (src, namespace = '') {
+    add (src, namespace) {
         namespace = namespace.replace(/[^\w\d_]/g, '_');
 
         const count = this.namespaces.get(namespace) || 1;
         this.namespaces.set(namespace, count + 1);
 
         // All identifiers should start with _ so things like debugger and 2d-color-picker will be valid identifiers
-        let importName = '_';
-        if (namespace) {
-            importName += namespace;
-        } else {
-            importName += 'resource';
-        }
+        let importName = `_${namespace}`;
         if (count !== 1) {
             importName += `${count}`;
         }
@@ -232,12 +227,12 @@ const generateRuntimeEntry = (id, manifest) => {
     let exportSection = 'export const resources = {\n';
     for (const userscript of manifest.userscripts || []) {
         const src = userscript.url;
-        const importName = importSection.add(`./${src}`);
+        const importName = importSection.add(`./${src}`, 'js');
         exportSection += `  ${JSON.stringify(src)}: ${importName},\n`;
     }
     for (const userstyle of manifest.userstyles || []) {
         const src = userstyle.url;
-        const importName = importSection.add(`!css-loader!./${src}`);
+        const importName = importSection.add(`!css-loader!./${src}`, 'css');
         exportSection += `  ${JSON.stringify(src)}: ${importName},\n`;
     }
     exportSection += '};\n';

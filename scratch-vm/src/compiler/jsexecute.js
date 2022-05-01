@@ -300,7 +300,7 @@ runtimeFunctions.compareGreaterThan = `const compareGreaterThanSlow = (v1, v2) =
     }
     return n1 > n2;
 };
-const compareGreaterThan = (v1, v2) => typeof v1 === 'number' && typeof v2 === 'number' && !isNaN(v1) && !isNaN(v2) ? v1 > v2 : compareGreaterThanSlow(v1, v2)`;
+const compareGreaterThan = (v1, v2) => typeof v1 === 'number' && typeof v2 === 'number' && !isNaN(v1) ? v1 > v2 : compareGreaterThanSlow(v1, v2)`;
 
 /**
  * Determine if one value is less than another.
@@ -323,7 +323,7 @@ runtimeFunctions.compareLessThan = `const compareLessThanSlow = (v1, v2) => {
     }
     return n1 < n2;
 };
-const compareLessThan = (v1, v2) => typeof v1 === 'number' && typeof v2 === 'number' && !isNaN(v1) && !isNaN(v2) ? v1 < v2 : compareLessThanSlow(v1, v2)`;
+const compareLessThan = (v1, v2) => typeof v1 === 'number' && typeof v2 === 'number' && !isNaN(v2) ? v1 < v2 : compareLessThanSlow(v1, v2)`;
 
 /**
  * Generate a random integer.

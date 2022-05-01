@@ -18,6 +18,7 @@ const addons = [
     'remove-sprite-confirm',
     'block-count',
     'onion-skinning',
+    'default-costume-editor-color',
     'bitmap-copy',
     '2d-color-picker',
     'better-img-uploads',
@@ -61,8 +62,7 @@ const addons = [
 ];
 
 const newAddons = [
-    'custom-block-text',
-    'search-sprites'
+    'default-costume-editor-color'
 ];
 
 // eslint-disable-next-line import/no-commonjs

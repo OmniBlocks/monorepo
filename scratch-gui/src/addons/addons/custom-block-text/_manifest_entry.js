@@ -2,9 +2,7 @@
 const manifest = {
   "name": "Customizable block text style",
   "description": "Changes the thickness of the text on blocks and optionally adds a text shadow.",
-  "tags": [
-    "new"
-  ],
+  "tags": [],
   "credits": [
     {
       "name": "Secret-chest"

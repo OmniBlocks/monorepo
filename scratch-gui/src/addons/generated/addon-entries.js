@@ -17,6 +17,7 @@ export default {
   "remove-sprite-confirm": () => import(/* webpackChunkName: "addon-entry-remove-sprite-confirm" */ "../addons/remove-sprite-confirm/_runtime_entry.js"),
   "block-count": () => import(/* webpackChunkName: "addon-entry-block-count" */ "../addons/block-count/_runtime_entry.js"),
   "onion-skinning": () => import(/* webpackChunkName: "addon-default-entry" */ "../addons/onion-skinning/_runtime_entry.js"),
+  "default-costume-editor-color": () => import(/* webpackChunkName: "addon-entry-default-costume-editor-color" */ "../addons/default-costume-editor-color/_runtime_entry.js"),
   "bitmap-copy": () => import(/* webpackChunkName: "addon-default-entry" */ "../addons/bitmap-copy/_runtime_entry.js"),
   "2d-color-picker": () => import(/* webpackChunkName: "addon-entry-2d-color-picker" */ "../addons/2d-color-picker/_runtime_entry.js"),
   "better-img-uploads": () => import(/* webpackChunkName: "addon-entry-better-img-uploads" */ "../addons/better-img-uploads/_runtime_entry.js"),

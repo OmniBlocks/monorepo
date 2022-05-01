@@ -83,10 +83,10 @@ const AppStateHOC = function (WrappedComponent, localesOnly) {
                 enhancer = composeEnhancers(guiMiddleware);
             }
             const reducer = combineReducers(reducers);
-            const reducer2 = (state, action) => {
-                const next = reducer(state, action);
-                AddonHooks.appStateReducer(action, next);
-                return next;
+            const reducer2 = (previousState, action) => {
+                const nextState = reducer(previousState, action);
+                AddonHooks.appStateReducer(action, previousState, nextState);
+                return nextState;
             };
             this.store = createStore(
                 reducer2,

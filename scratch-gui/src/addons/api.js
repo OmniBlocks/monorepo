@@ -117,12 +117,13 @@ class Redux extends EventTargetShim {
 
     initialize () {
         if (!this._initialized) {
-            AddonHooks.appStateReducer = (action, next) => {
+            AddonHooks.appStateReducer = (action, prev, next) => {
                 this._isInReducer = true;
                 this._nextState = next;
                 this.dispatchEvent(new CustomEvent('statechanged', {
                     detail: {
                         action,
+                        prev,
                         next
                     }
                 }));

@@ -406,9 +406,9 @@ for (const file of l10nFiles) {
     const runtimePath = pathUtil.resolve(__dirname, 'addons-l10n', `${fixedName}.json`);
     const settingsPath = pathUtil.resolve(__dirname, 'addons-l10n-settings', `${fixedName}.json`);
     const {settings, runtime} = parseMessages(oldDirectory);
-    fs.writeFileSync(runtimePath, JSON.stringify(runtime));
+    fs.writeFileSync(runtimePath, JSON.stringify(runtime, null, 4));
     if (fixedName !== 'en') {
-        fs.writeFileSync(settingsPath, JSON.stringify(settings));
+        fs.writeFileSync(settingsPath, JSON.stringify(settings, null, 4));
     }
 }
 

@@ -42,65 +42,47 @@ const Description = ({
     instructions,
     credits,
     projectId
-}) => (
+}) => instructions !== 'unshared' && credits !== 'unshared' && (
     <div className={styles.description}>
-        {instructions === 'unshared' && credits === 'unshared' ? (
+        <div className={styles.projectLink}>
+            <a
+                href={`https://scratch.mit.edu/projects/${projectId}/`}
+                target="_blank"
+                rel="noreferrer"
+            >
+                <FormattedMessage
+                    defaultMessage="View project on Scratch"
+                    description="Link to view project on Scratch"
+                    id="tw.viewOnScratch"
+                />
+            </a>
+        </div>
+        {instructions ? (
             <div>
-                <a
-                    href="https://docs.turbowarp.org/unshared-projects"
-                    target="_blank"
-                    rel="noreferrer"
-                >
+                <h2 className={styles.header}>
                     <FormattedMessage
-                        defaultMessage="Regarding unshared projects"
-                        description="Link to information about unshared projects in description"
-                        id="tw.regardingUnshared"
+                        defaultMessage="Instructions"
+                        description="Header for instructions section of description"
+                        id="tw.home.instructions"
                     />
-                </a>
+                </h2>
+                {decorate(instructions)}
             </div>
-        ) : (
-            <React.Fragment>
-                <div className={styles.projectLink}>
-                    <a
-                        href={`https://scratch.mit.edu/projects/${projectId}/`}
-                        target="_blank"
-                        rel="noreferrer"
-                    >
-                        <FormattedMessage
-                            defaultMessage="View project on Scratch"
-                            description="Link to view project on Scratch"
-                            id="tw.viewOnScratch"
-                        />
-                    </a>
-                </div>
-                {instructions ? (
-                    <div>
-                        <h2 className={styles.header}>
-                            <FormattedMessage
-                                defaultMessage="Instructions"
-                                description="Header for instructions section of description"
-                                id="tw.home.instructions"
-                            />
-                        </h2>
-                        {decorate(instructions)}
-                    </div>
-                ) : null}
-                {instructions && credits ? (
-                    <div className={styles.divider} />
-                ) : null}
-                {credits ? (
-                    <div>
-                        <h2 className={styles.header}>
-                            <FormattedMessage
-                                defaultMessage="Notes and Credits"
-                                description="Header for notes and credits section of description"
-                                id="tw.home.credit"
-                            />
-                        </h2>
-                        {decorate(credits)}
-                    </div>
-                ) : null}
-            </React.Fragment>
+        ) : null}
+        {instructions && credits ? (
+            <div className={styles.divider} />
+        ) : null}
+        {credits && (
+            <div>
+                <h2 className={styles.header}>
+                    <FormattedMessage
+                        defaultMessage="Notes and Credits"
+                        description="Header for notes and credits section of description"
+                        id="tw.home.credit"
+                    />
+                </h2>
+                {decorate(credits)}
+            </div>
         )}
     </div>
 );

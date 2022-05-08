@@ -255,6 +255,52 @@ class Interface extends React.Component {
                             <div className={styles.section}>
                                 <ProjectInput />
                             </div>
+                            {(
+                                projectId === '0' || description.instructions === 'unshared' || description.credits === 'unshared'
+                            ) && (
+                                <div className={styles.unsharedUpdate}>
+                                    {/* I won't link these in the public website because there will be way too much spam if we do that, */}
+                                    {/* but here are the relevant links: */}
+                                    {/* https://github.com/LLK/scratch-gui/pull/8269 */}
+                                    {/* https://github.com/LLK/scratch-www/pull/6773 */}
+                                    <p>
+                                        <b>
+                                            <FormattedMessage
+                                                defaultMessage="May 7, 2022 - Important notice regarding unshared projects"
+                                                description="Update regarding unshared projects"
+                                                id="tw.unshared.1"
+                                            />
+                                        </b>
+                                    </p>
+                                    <p>
+                                        <FormattedMessage
+                                            defaultMessage="The latest code changes to Scratch indicate the Scratch Team is finally making unshared projects inaccessible to anyone who isn't the owner of the project."
+                                            description="Update regarding unshared projects"
+                                            id="tw.unshared.2"
+                                        />
+                                    </p>
+                                    <p>
+                                        <FormattedMessage
+                                            defaultMessage="We aren't sure when the changes will happen or their exact impact, but we expect that unshared projects will no longer be viewable or embeddable in TurboWarp or other third-party websites. This includes your own unshared projects."
+                                            description="Update regarding unshared projects"
+                                            id="tw.unshared.3"
+                                        />
+                                    </p>
+                                    <p>
+                                        <a
+                                            href="https://docs.turbowarp.org/unshared-projects"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                        >
+                                            <FormattedMessage
+                                                defaultMessage="More information"
+                                                description="Link to more information about changes regarding unshared projects"
+                                                id="tw.unshared.more"
+                                            />
+                                        </a>
+                                    </p>
+                                </div>
+                            )}
                             {hasCloudVariables && projectId !== '0' && (
                                 <div className={styles.section}>
                                     <CloudVariableBadge />

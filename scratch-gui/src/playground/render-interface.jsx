@@ -273,11 +273,6 @@ class Interface extends React.Component {
                                         </b>
                                     </p>
                                     <p>
-                                        <i>
-                                            {'Disregard any earlier version of this message you have seen as it may have been misleading.'}
-                                        </i>
-                                    </p>
-                                    <p>
                                         <FormattedMessage
                                             defaultMessage="May 8, 2022 - The future of viewing unshared projects in TurboWarp is currently unknown due to upcoming changes to the Scratch API. {more}"
                                             description="Update about unshared projects"

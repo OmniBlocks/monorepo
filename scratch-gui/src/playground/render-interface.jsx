@@ -266,39 +266,50 @@ class Interface extends React.Component {
                                     <p>
                                         <b>
                                             <FormattedMessage
-                                                defaultMessage="May 7, 2022 - Important notice regarding unshared projects"
-                                                description="Update regarding unshared projects"
-                                                id="tw.unshared.1"
+                                                defaultMessage="The future of unshared projects"
+                                                description="Header of update regarding unshared projects"
+                                                id="tw.unshared.header"
                                             />
                                         </b>
                                     </p>
                                     <p>
                                         <FormattedMessage
-                                            defaultMessage="The latest code changes to Scratch indicate the Scratch Team is finally making unshared projects inaccessible to anyone who isn't the owner of the project."
-                                            description="Update regarding unshared projects"
-                                            id="tw.unshared.2"
+                                            defaultMessage="May 7, 2022 - The future of viewing, editing, or embedding unshared projects is uncertain and may no longer be possible in the future due to upcoming API changes from the Scratch Team. This includes your own unshared projects. {moreInformation}."
+                                            description="Update regarding unshared projects. The date is when the notice was added so people can understand that this is new."
+                                            id="tw.unshared.info"
+                                            values={{
+                                                moreInformation: (
+                                                    <a
+                                                        href="https://docs.turbowarp.org/unshared-projects"
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                    >
+                                                        <FormattedMessage
+                                                            defaultMessage="More information"
+                                                            description="Link to more information about changes regarding unshared projects"
+                                                            id="tw.unshared.more"
+                                                        />
+                                                    </a>
+                                                )
+                                            }}
                                         />
                                     </p>
                                     <p>
                                         <FormattedMessage
-                                            defaultMessage="We aren't sure when the changes will happen or their exact impact, but we expect that unshared projects will no longer be viewable or embeddable in TurboWarp or other third-party websites in the future. This includes your own unshared projects."
-                                            description="Update regarding unshared projects"
-                                            id="tw.unshared.3"
+                                            defaultMessage=" You will always be able to manually do File > Save to your computer and File > Load from your computer instead."
+                                            description="Workaround for Scratch probably preventing viewing unshared projects in the future."
+                                            id="tw.unshared.workaround"
                                         />
                                     </p>
-                                    <p>
-                                        <a
-                                            href="https://docs.turbowarp.org/unshared-projects"
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                        >
+                                    {(description.instructions === 'unshared' || description.credits === 'unshared') && (
+                                        <p>
                                             <FormattedMessage
-                                                defaultMessage="More information"
-                                                description="Link to more information about changes regarding unshared projects"
-                                                id="tw.unshared.more"
+                                                defaultMessage="If this project was recently shared, this message may incorrectly appear for up to an hour."
+                                                description="The unshared project information notice may appear incorrectly for a little while due to caching."
+                                                id="tw.unshared.cache"
                                             />
-                                        </a>
-                                    </p>
+                                        </p>
+                                    )}
                                 </div>
                             )}
                             {hasCloudVariables && projectId !== '0' && (

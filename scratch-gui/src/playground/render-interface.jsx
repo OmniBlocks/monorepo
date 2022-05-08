@@ -273,32 +273,30 @@ class Interface extends React.Component {
                                         </b>
                                     </p>
                                     <p>
+                                        <i>
+                                            {'Disregard any earlier version of this message you have seen as it may have been misleading.'}
+                                        </i>
+                                    </p>
+                                    <p>
                                         <FormattedMessage
-                                            defaultMessage="May 7, 2022 - The future of viewing, editing, or embedding unshared projects is uncertain and may no longer be possible at an unknown time in the future due to upcoming API changes from the Scratch Team. This includes your own unshared projects. {moreInformation}."
-                                            description="Update regarding unshared projects. The date is when the notice was added so people can understand that this is new."
+                                            defaultMessage="May 8, 2022 - The future of viewing unshared projects in TurboWarp is currently unknown due to upcoming changes to the Scratch API. {more}"
+                                            description="Update about unshared projects"
                                             id="tw.unshared.info"
                                             values={{
-                                                moreInformation: (
+                                                more: (
                                                     <a
                                                         href="https://docs.turbowarp.org/unshared-projects"
                                                         target="_blank"
                                                         rel="noopener noreferrer"
                                                     >
                                                         <FormattedMessage
-                                                            defaultMessage="More information"
-                                                            description="Link to more information about changes regarding unshared projects"
+                                                            defaultMessage="More information."
+                                                            description="Link to more information about unshared projects."
                                                             id="tw.unshared.more"
                                                         />
                                                     </a>
                                                 )
                                             }}
-                                        />
-                                    </p>
-                                    <p>
-                                        <FormattedMessage
-                                            defaultMessage=" You will always be able to manually do File > Save to your computer and File > Load from your computer instead."
-                                            description="Workaround for Scratch probably preventing viewing unshared projects in the future."
-                                            id="tw.unshared.workaround"
                                         />
                                     </p>
                                     {(description.instructions === 'unshared' || description.credits === 'unshared') && (

@@ -274,7 +274,7 @@ class Interface extends React.Component {
                                     </p>
                                     <p>
                                         <FormattedMessage
-                                            defaultMessage="May 7, 2022 - The future of viewing, editing, or embedding unshared projects is uncertain and may no longer be possible in the future due to upcoming API changes from the Scratch Team. This includes your own unshared projects. {moreInformation}."
+                                            defaultMessage="May 7, 2022 - The future of viewing, editing, or embedding unshared projects is uncertain and may no longer be possible at an unknown time in the future due to upcoming API changes from the Scratch Team. This includes your own unshared projects. {moreInformation}."
                                             description="Update regarding unshared projects. The date is when the notice was added so people can understand that this is new."
                                             id="tw.unshared.info"
                                             values={{

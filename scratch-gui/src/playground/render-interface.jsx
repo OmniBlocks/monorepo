@@ -281,7 +281,7 @@ class Interface extends React.Component {
                                     </p>
                                     <p>
                                         <FormattedMessage
-                                            defaultMessage="We aren't sure when the changes will happen or their exact impact, but we expect that unshared projects will no longer be viewable or embeddable in TurboWarp or other third-party websites. This includes your own unshared projects."
+                                            defaultMessage="We aren't sure when the changes will happen or their exact impact, but we expect that unshared projects will no longer be viewable or embeddable in TurboWarp or other third-party websites in the future. This includes your own unshared projects."
                                             description="Update regarding unshared projects"
                                             id="tw.unshared.3"
                                         />

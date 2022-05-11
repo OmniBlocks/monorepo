@@ -402,16 +402,18 @@ export default async function ({ addon, global, console, msg }) {
   };
   const handleGamepadButtonDown = (e) => postKeyboardData(e.detail, true);
   const handleGamepadButtonUp = (e) => postKeyboardData(e.detail, false);
-  const handleGamepadMouseDown = () => {
+  const handleGamepadMouseDown = (e) => {
     virtualCursorSetDown(true);
     postMouseData({
       isDown: true,
+      button: e.detail,
     });
   };
-  const handleGamepadMouseUp = () => {
+  const handleGamepadMouseUp = (e) => {
     virtualCursorSetDown(false);
     postMouseData({
       isDown: false,
+      button: e.detail,
     });
   };
   const handleGamepadMouseMove = (e) => {

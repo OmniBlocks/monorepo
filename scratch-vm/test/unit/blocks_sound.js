@@ -14,7 +14,7 @@ test('effect clamping runtime option', t => {
 
     sound.setEffect({
         EFFECT: 'pitch',
-        VALUE: 99999
+        VALUE: 720
     }, {
         target
     });
@@ -25,11 +25,11 @@ test('effect clamping runtime option', t => {
     });
     sound.setEffect({
         EFFECT: 'pitch',
-        VALUE: 99999
+        VALUE: 720
     }, {
         target
     });
-    t.equal(sound._getSoundState(target).effects.pitch, 99999);
+    t.equal(sound._getSoundState(target).effects.pitch, 720);
 
     t.end();
 });

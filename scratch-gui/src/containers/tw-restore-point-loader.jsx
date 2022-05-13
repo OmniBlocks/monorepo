@@ -12,13 +12,13 @@ import RestorePointAPI from '../lib/tw-restore-point-api';
 
 const messages = defineMessages({
     error: {
-        defaultMessage: 'Could not load restore point.\n\nDebug: {error}',
+        defaultMessage: 'Could not load restore point: {error}',
         description: 'Alert displayed when restore point loading failed',
         id: 'tw.restorePoint.loadFail'
     },
     confirm: {
         // eslint-disable-next-line max-len
-        defaultMessage: 'TurboWarp records one automatic restore point in case something went wrong and you forgot to save. You shouldn\'t rely on this and we can\'t guarantee it will recover your project. Try to load it?',
+        defaultMessage: 'The editor automatically records one restore point in case something goes wrong and you forget to save. You shouldn\'t rely on this and we can\'t guarantee it will recover your project. Try to load it?',
         description: 'Confirmation to load restore point',
         id: 'tw.restorePoint.confirm'
     }

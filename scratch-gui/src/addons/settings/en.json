@@ -4,7 +4,7 @@
   "reset": "Reset",
   "resetAll": "Reset all",
   "confirmResetAll": "Are you sure you want to reset all addon settings to their default values?",
-  "dirty": "Reload TurboWarp to apply settings.",
+  "dirty": "Reload tabs to apply settings.",
   "dirtyButton": "Reload now",
   "presets": "Presets",
   "noCompiler": "This addon only works when the compiler is disabled through the Advanced > Disable Compiler menu or using the \"Disable compiler in editor\" addon.",

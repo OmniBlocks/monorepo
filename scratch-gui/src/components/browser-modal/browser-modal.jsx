@@ -3,7 +3,7 @@ import React from 'react';
 import ReactModal from 'react-modal';
 import Box from '../box/box.jsx';
 import {defineMessages, injectIntl, intlShape, FormattedMessage} from 'react-intl';
-import {canConstructNewFunctions, isAudioContextSupported} from '../../lib/tw-environment-support-prober.js';
+import {canConstructNewFunctions} from '../../lib/tw-environment-support-prober.js';
 
 import styles from './browser-modal.css';
 import unhappyBrowser from './unsupported-browser.svg';
@@ -41,15 +41,6 @@ const BrowserModal = ({intl, ...props}) => {
                         // We don't need to make it translatable
                         <p>
                             {'This site is unable to compile arbitrary JavaScript. This is most likely caused by an overly-strict Content-Security-Policy set by the server.'}
-                        </p>
-                    )}
-                    {isAudioContextSupported() ? null : (
-                        <p>
-                            <FormattedMessage
-                                defaultMessage="This browser does not support features that this app requires. If you're using a &quot;privacy&quot; browser, try switching to a normal browser."
-                                description="A message that can appear in the browser not supported modal"
-                                id="tw.browserModal.audio"
-                            />
                         </p>
                     )}
                     <p>

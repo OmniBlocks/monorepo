@@ -22,7 +22,7 @@ const CrashMessage = props => (
             </p>
             <p>
                 <FormattedMessage
-                    defaultMessage={'We are so sorry, but it looks like TurboWarp has crashed.' +
+                    defaultMessage={'We are so sorry, but it looks like the page has crashed.' +
                         ' Please refresh your page to try' +
                         ' again.'}
                     description="Message to inform the user that page has crashed."

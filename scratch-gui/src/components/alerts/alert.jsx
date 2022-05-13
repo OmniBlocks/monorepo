@@ -53,9 +53,9 @@ const AlertComponent = ({
         <div className={styles.alertMessage}>
             {extensionName ? (
                 <FormattedMessage
-                    defaultMessage="Scratch lost connection to {extensionName}."
+                    defaultMessage="Lost connection to {extensionName}."
                     description="Message indicating that an extension peripheral has been disconnected"
-                    id="gui.alerts.lostPeripheralConnection"
+                    id="tw.alerts.lostPeripheralConnection"
                     values={{
                         extensionName: (
                             `${extensionName}`

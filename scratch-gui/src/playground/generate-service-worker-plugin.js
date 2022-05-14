@@ -61,12 +61,14 @@ class TWGenerateServiceWorkerPlugin {
             }
             const id = hash(allAssetNames);
             const workerFile = compilation.getAsset(SW_NAME);
-            const workerSource = workerFile.source.source().toString();
-            const newSource = workerSource
-                .replace('__HTML_ASSETS__', JSON.stringify(htmlAssets))
-                .replace('__LAZY_ASSETS__', JSON.stringify(lazyAssets))
-                .replace('__LAZY_ASSETS_NAME__', JSON.stringify(`tw-lazy-${id}`));
-            compilation.updateAsset(SW_NAME, new RawSource(newSource));
+            if (workerFile) {
+                const workerSource = workerFile.source.source().toString();
+                const newSource = workerSource
+                    .replace('__HTML_ASSETS__', JSON.stringify(htmlAssets))
+                    .replace('__LAZY_ASSETS__', JSON.stringify(lazyAssets))
+                    .replace('__LAZY_ASSETS_NAME__', JSON.stringify(`tw-lazy-${id}`));
+                compilation.updateAsset(SW_NAME, new RawSource(newSource));
+            }
         });
     }
 }

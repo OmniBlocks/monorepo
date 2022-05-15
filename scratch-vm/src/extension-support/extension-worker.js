@@ -14,7 +14,7 @@ const loadScripts = url => {
         return new Promise((resolve, reject) => {
             const script = document.createElement('script');
             script.onload = () => resolve();
-            script.onerror = () => reject(new Error('Cannot run script'));
+            script.onerror = () => reject(new Error(`Error when loading custom extension script: ${url}`));
             script.src = url;
             document.body.appendChild(script);
         });

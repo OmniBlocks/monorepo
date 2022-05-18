@@ -41,7 +41,7 @@
     "immutable": "3.8.2",
     "jszip": "^3.1.5",
     "minilog": "3.1.0",
-    "scratch-parser": "github:TurboWarp/scratch-parser",
+    "scratch-parser": "git+https://github.com/TurboWarp/scratch-parser#64dfc0cce7821c5482a5d422d4ea25c74408904e",
     "scratch-sb1-converter": "0.2.7",
     "scratch-translate-extension-languages": "0.0.20191118205314",
     "text-encoding": "0.7.0",

@@ -229,7 +229,6 @@ module.exports = [
 ].concat(
     process.env.NODE_ENV === 'production' || process.env.BUILD_MODE === 'dist' ? (
         // export as library
-        // tw: TODO: need to see if this even works anymore
         defaultsDeep({}, base, {
             target: 'web',
             entry: {
@@ -237,6 +236,8 @@ module.exports = [
             },
             output: {
                 libraryTarget: 'umd',
+                filename: 'js/[name].js',
+                chunkFilename: 'js/[name].js',
                 path: path.resolve('dist'),
                 publicPath: `${STATIC_PATH}/`
             },

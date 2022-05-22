@@ -54,15 +54,13 @@ const saveBackpackObject = ({
     thumbnail // Base64-encoded JPEG thumbnail of the object being saved
 }) => new Promise((resolve, reject) => {
     if (host === LOCAL_API) {
-        return localBackpackAPI.saveBackpackObject({
+        return resolve(localBackpackAPI.saveBackpackObject({
             type,
             mime,
             name,
             body,
             thumbnail
-        })
-            .then(resolve)
-            .catch(reject);
+        }));
     }
     xhr({
         method: 'POST',
@@ -84,11 +82,9 @@ const deleteBackpackObject = ({
     id
 }) => new Promise((resolve, reject) => {
     if (host === LOCAL_API) {
-        return localBackpackAPI.deleteBackpackObject({
+        return resolve(localBackpackAPI.deleteBackpackObject({
             id
-        })
-            .then(resolve)
-            .catch(reject);
+        }));
     }
     xhr({
         method: 'DELETE',
@@ -108,12 +104,10 @@ const updateBackpackObject = ({
     name
 }) => new Promise((resolve, reject) => {
     if (host === LOCAL_API) {
-        return localBackpackAPI.updateBackpackObject({
+        return resolve(localBackpackAPI.updateBackpackObject({
             id,
             name
-        })
-            .then(resolve)
-            .catch(reject);
+        }));
     }
     reject(new Error('updateBackpackObject not supported'));
 });

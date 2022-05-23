@@ -472,7 +472,20 @@ class ExtensionManager {
             const callBlockFunc = (() => {
                 if (dispatch._isRemoteService(serviceName)) {
                     return (args, util, realBlockInfo) =>
-                        dispatch.call(serviceName, funcName, args, util, realBlockInfo);
+                        dispatch.call(serviceName, funcName, args, util, realBlockInfo)
+                            .then(result => {
+                                // Scratch is only designed to handle these types.
+                                // If any other value comes in such as undefined, null, an object, etc.
+                                // we'll convert it to a string to avoid undefined behavior.
+                                if (
+                                    typeof result === 'number' ||
+                                    typeof result === 'string' ||
+                                    typeof result === 'boolean'
+                                ) {
+                                    return result;
+                                }
+                                return `${result}`;
+                            });
                 }
 
                 // avoid promise latency if we can call direct

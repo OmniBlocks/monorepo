@@ -485,7 +485,10 @@ class ExtensionManager {
                                     return result;
                                 }
                                 return `${result}`;
-                            });
+                            })
+                            // When an error happens, instead of returning undefined, we'll return a stringified
+                            // version of the error so that it can be debugged.
+                            .catch(err => `${err}`);
                 }
 
                 // avoid promise latency if we can call direct

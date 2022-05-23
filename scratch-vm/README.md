@@ -2,7 +2,7 @@
 
 Modified Scratch VM with a JIT compiler and more features.
 
-The public API of TurboWarp/scratch-vm should be compatible with LLK/scratch-vm. See "Public API" section below for more information.
+This is a drop-in replacement for LLK/scratch-vm.
 
 ## Setup
 
@@ -22,67 +22,7 @@ For more technical information, read the code in src/compiler.
 
 ## Public API
 
-**This section has not been updated in a while and is probably out of date.**
-
-Any public-facing API in LLK/scratch-vm *should* work just fine in TurboWarp/scratch-vm. Anything that doesn't is a bug. TurboWarp adds some new methods to the public API.
-
-### Runtime.setFramerate / VirtualMachine.setFramerate
-
-setCompatibilityMode is deprecated (but still works) in favor of a generic setFramerate method.
-
-```js
-runtime.setFramerate(60);
-```
-
-There is an event for framerate changes on Runtime and VirtualMachine: FRAMERATE_CHANGED (emitted with new framerate as only argument)
-
-### Runtime.setInterpolation / VirtualMachine.setInterpolation
-
-Toggles frame interpolation, an experimental feature that tries to make project motion smoother without changing the script tick rate.
-
-There is an event for changes on Runtime and VirtualMachine: INTERPOLATION_CHANGED
-
-### Runtime.setCompilerOptions / VirtualMachine.setCompilerOptions
-
-This lets you change the behavior of the compiler. This method takes an object with the following arguments:
-
- - enabled (boolean; default true) - controls whether the JIT compiler is enabled
- - warpTimer (boolean; default false) - controls whether to use a warp timer to limit how long warp scripts can run. Can have significant performance impact
-
-```js
-runtime.setCompilerOptions({
-  enabled: true,
-  warpTimer: true
-});
-// Partial updates are also supported -- this will only change `enabled` and not any other properties
-runtime.setCompilerOptions({ enabled: false });
-```
-
-There is an event for compiler option changes on Runtime and VirtualMachine: COMPILER_OPTIONS_CHANGED (called with current options)
-
-### Runtime.setRuntimeOptions / VirtualMachine.setRuntimeOptions
-
-Similar to setCompilerOption. This lets you control some behavior of the runtime.
-
- - maxClones (number; default 300) - controls the clone limit; Infinity to disable
- - miscLimits (boolean; default true) - controls various limits such as pitch, pan, etc.
- - fencing (number; default true) - controls whether sprite fencing should be enabled
-
-There is an event for runtime option changes on Runtime and VirtualMachine: RUNTIME_OPTIONS_CHANGED (called with current options)
-
-### Runtime.stop / VirtualMachine.stop
-
-Stops the tick loop. This does not touch the active thread list. Anything currently active will be resumed when start is called again.
-
-There is an event for stop on Runtime and VirtualMachine: RUNTIME_STOPPED (similar to RUNTIME_STARTED)
-
-### Runtime.stageWidth / Runtime.stageHeight
-
-These control the width and height of the stage. Set them to values other than 480 and 360 respectively to get custom stage sizes. Keep in mind that you need to manually resize the renderer as well.
-
-### COMPILE_ERROR event
-
-A COMPILE_ERROR is fired on Runtime and VirtualMachine when a script couldn't be compiled.
+This section was too out of date to be useful. We hope to re-add it as some point.
 
 <!--
 

@@ -83,10 +83,12 @@ class WebHelper extends Helper {
      */
     load (assetType, assetId, dataFormat) {
 
-        /** @type {Array<string>} List of errors encountered. */
+        /** @type {Array.<{url:string, result:*}>} List of URLs attempted & errors encountered. */
         const errors = [];
         const stores = this.stores.slice()
             .filter(store => store.types.indexOf(assetType.name) >= 0);
+        
+        // New empty asset but it doesn't have data yet
         const asset = new Asset(assetType, assetId, dataFormat);
 
         let tool = this.assetTool;
@@ -95,28 +97,39 @@ class WebHelper extends Helper {
         }
 
         let storeIndex = 0;
-        const tryNextSource = () => {
-            const store = stores[storeIndex++];
-            if (!store) {
-                throw new Error(`All stores returned errors: ${errors.join(', ')}`);
+        const tryNextSource = err => {
+            if (err) {
+                errors.push(err);
             }
+            const store = stores[storeIndex++];
 
             /** @type {UrlFunction} */
-            const reqConfigFunction = store.get;
-            const reqConfig = ensureRequestConfig(reqConfigFunction(asset));
-            if (reqConfig === false) {
-                return tryNextSource();
+            const reqConfigFunction = store && store.get;
+
+            if (reqConfigFunction) {
+                const reqConfig = ensureRequestConfig(reqConfigFunction(asset));
+                if (reqConfig === false) {
+                    return tryNextSource();
+                }
+
+                return tool.get(reqConfig)
+                    .then(body => {
+                        if (body) {
+                            asset.setData(body, dataFormat);
+                            return asset;
+                        }
+                        return tryNextSource();
+                    })
+                    .catch(tryNextSource);
+            } else if (errors.length > 0) {
+                return Promise.reject(errors);
             }
 
-            return tool.get(reqConfig)
-                .then(body => asset.setData(body, dataFormat))
-                .catch(error => {
-                    errors.push(`${error}`);
-                    return tryNextSource();
-                });
+            // no stores matching asset
+            return Promise.resolve(null);
         };
 
-        return tryNextSource().then(() => asset);
+        return tryNextSource();
     }
 
     /**

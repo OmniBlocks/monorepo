@@ -22,7 +22,12 @@ class FetchTool {
      */
     get ({url, ...options}) {
         return saferFetchAsArrayBuffer(url, Object.assign({method: 'GET'}, options))
-            .then(body => new Uint8Array(body));
+            .then(arrayBufferOrNull => {
+                if (arrayBufferOrNull) {
+                    return new Uint8Array(arrayBufferOrNull);
+                }
+                return arrayBufferOrNull;
+            });
     }
 
     /**

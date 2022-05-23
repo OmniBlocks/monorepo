@@ -12,7 +12,11 @@ const startNextFetch = ([resolve, url, options]) => {
     let attempts = 0;
 
     const attemptToFetch = () => fetch(url, options)
-        .then(r => r.arrayBuffer())
+        .then(result => {
+            if (result.ok) return result.arrayBuffer();
+            if (result.status === 404) return null;
+            return Promise.reject(result.status);
+        })
         .then(buffer => {
             currentFetches--;
             checkStartNextFetch();

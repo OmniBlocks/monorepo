@@ -393,15 +393,20 @@ const isVariableValueSafeForJSON = value => (
 );
 const makeSafeForJSON = value => {
     if (Array.isArray(value)) {
-        if (value.includes(null)) {
-            const copy = value.slice();
-            for (let i = 0; i < copy.length; i++) {
-                if (!isVariableValueSafeForJSON(copy[i])) {
-                    copy[i] = `${copy[i]}`;
+        let copy = null;
+        for (let i = 0; i < value.length; i++) {
+            if (!isVariableValueSafeForJSON(value[i])) {
+                if (!copy) {
+                    // Only copy the list when needed
+                    copy = value.slice();
                 }
+                copy[i] = `${copy[i]}`;
             }
+        }
+        if (copy) {
             return copy;
         }
+        return value;
     }
     if (isVariableValueSafeForJSON(value)) {
         return value;

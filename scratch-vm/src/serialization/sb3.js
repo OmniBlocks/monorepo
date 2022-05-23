@@ -382,24 +382,31 @@ const serializeSound = function (sound) {
     return obj;
 };
 
-// Using things like custom extensions, it's possible to get a `null` in a variable or list.
-// This will cause make the project unusable without JSON editing as it will fail scratch-parser validation.
-// We'll convert `null` to `"null"` to avoid this.
+// Using some bugs, it can be possible to get values like undefined, null, or complex objects into
+// variables or lists. This will cause make the project unusable after exporting without JSON editing
+// as it will fail validation in scratch-parser.
+// To avoid this, we'll convert those objects to strings before saving them.
+const isVariableValueSafeForJSON = value => (
+    typeof value === 'number' ||
+    typeof value === 'string' ||
+    typeof value === 'boolean'
+);
 const makeSafeForJSON = value => {
     if (Array.isArray(value)) {
         if (value.includes(null)) {
             const copy = value.slice();
             for (let i = 0; i < copy.length; i++) {
-                if (copy[i] === null) {
-                    copy[i] = 'null';
+                if (!isVariableValueSafeForJSON(copy[i])) {
+                    copy[i] = `${copy[i]}`;
                 }
             }
             return copy;
         }
-    } else if (value === null) {
-        return 'null';
     }
-    return value;
+    if (isVariableValueSafeForJSON(value)) {
+        return value;
+    }
+    return `${value}`;
 };
 
 /**

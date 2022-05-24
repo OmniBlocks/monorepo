@@ -578,6 +578,7 @@ class VirtualMachine extends EventEmitter {
     /**
      * Export project or sprite as a Scratch 3.0 JSON representation.
      * @param {string=} optTargetId - Optional id of a sprite to serialize
+     * @param {*} serializationOptions Options to pass to the serializer
      * @return {string} Serialized state of the runtime.
      */
     toJSON (optTargetId, serializationOptions) {

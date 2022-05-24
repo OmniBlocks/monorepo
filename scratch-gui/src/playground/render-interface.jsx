@@ -265,42 +265,29 @@ class Interface extends React.Component {
                                     {/* https://github.com/LLK/scratch-www/pull/6773 */}
                                     <p>
                                         <b>
-                                            <FormattedMessage
-                                                defaultMessage="The future of unshared projects"
-                                                description="Header of update regarding unshared projects"
-                                                id="tw.unshared.header"
-                                            />
+                                            {'The end of viewing unshared projects is soon, probably'}
                                         </b>
                                     </p>
                                     <p>
-                                        <FormattedMessage
-                                            defaultMessage="May 8, 2022 - The future of viewing unshared projects in TurboWarp is currently unknown due to upcoming changes to the Scratch API. {more}"
-                                            description="Update about unshared projects"
-                                            id="tw.unshared.info"
-                                            values={{
-                                                more: (
-                                                    <a
-                                                        href="https://docs.turbowarp.org/unshared-projects"
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                    >
-                                                        <FormattedMessage
-                                                            defaultMessage="More information."
-                                                            description="Link to more information about unshared projects."
-                                                            id="tw.unshared.more"
-                                                        />
-                                                    </a>
-                                                )
-                                            }}
-                                        />
+                                        <i>{'Updated May 23, 2022'}</i>
+                                    </p>
+                                    <p>
+                                        {'Loading unshared projects in TurboWarp and other third-party will probably no longer be possible in the near future due to upcoming changes to the Scratch API.'}
+                                    </p>
+                                    <p>
+                                        {'For more information, please visit: '}
+                                        <a
+                                            href="https://docs.turbowarp.org/unshared-projects"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                        >
+                                            {'https://docs.turbowarp.org/unshared-projects'}
+                                        </a>
+                                        {'. Most questions are answered there.'}
                                     </p>
                                     {(description.instructions === 'unshared' || description.credits === 'unshared') && (
                                         <p>
-                                            <FormattedMessage
-                                                defaultMessage="If this project was recently shared, this message may incorrectly appear for up to an hour."
-                                                description="The unshared project information notice may appear incorrectly for a little while due to caching."
-                                                id="tw.unshared.cache"
-                                            />
+                                            {'If this project was recently shared, this message may incorrectly appear for up to an hour.'}
                                         </p>
                                     )}
                                 </div>

@@ -256,26 +256,32 @@ class Interface extends React.Component {
                                 <ProjectInput />
                             </div>
                             {(
+                                // eslint-disable-next-line max-len
                                 projectId === '0' || description.instructions === 'unshared' || description.credits === 'unshared'
                             ) && (
                                 <div className={styles.unsharedUpdate}>
-                                    {/* I won't link these in the public website because there will be way too much spam if we do that, */}
-                                    {/* but here are the relevant links: */}
+                                    {/* I won't link these in the public website because there will be way */}
+                                    {/* too much spam if we do that, but here are the relevant links: */}
                                     {/* https://github.com/LLK/scratch-gui/pull/8269 */}
                                     {/* https://github.com/LLK/scratch-www/pull/6773 */}
                                     <p>
                                         <b>
-                                            {'The end of viewing unshared projects is soon, probably'}
+                                            {'The end of viewing unshared projects is soon'}
                                         </b>
                                     </p>
                                     <p>
-                                        <i>{'Updated May 23, 2022'}</i>
+                                        <i>{'Updated May 24, 2022'}</i>
                                     </p>
                                     <p>
-                                        {'Loading unshared projects in TurboWarp and other third-party will probably no longer be possible in the near future due to upcoming changes to the Scratch API.'}
+                                        {/* eslint-disable-next-line max-len */}
+                                        {'Unshared projects will no longer accessible using their project ID in the near future due to upcoming Scratch API changes.'}
                                     </p>
                                     <p>
-                                        {'For more information, please visit: '}
+                                        {/* eslint-disable-next-line max-len */}
+                                        {'Instead, you can either share the project or save the project to your computer (File > Save to your computer) and load the file instead.'}
+                                    </p>
+                                    <p>
+                                        {'For more information, visit: '}
                                         <a
                                             href="https://docs.turbowarp.org/unshared-projects"
                                             target="_blank"
@@ -283,10 +289,13 @@ class Interface extends React.Component {
                                         >
                                             {'https://docs.turbowarp.org/unshared-projects'}
                                         </a>
-                                        {'. Most questions are answered there.'}
                                     </p>
-                                    {(description.instructions === 'unshared' || description.credits === 'unshared') && (
+                                    {(
+                                        description.instructions === 'unshared' ||
+                                        description.credits === 'unshared'
+                                    ) && (
                                         <p>
+                                            {/* eslint-disable-next-line max-len */}
                                             {'If this project was recently shared, this message may incorrectly appear for up to an hour.'}
                                         </p>
                                     )}

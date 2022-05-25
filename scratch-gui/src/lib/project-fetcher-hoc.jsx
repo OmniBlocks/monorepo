@@ -123,7 +123,8 @@ const ProjectFetcherHOC = function (WrappedComponent) {
                 // TW: Temporary hack for project tokens
                 assetPromise = fetchProjectToken(projectId)
                     .then(token => {
-                        storage.setProjectToken(token);
+                        // TODO: for now we won't actually set the token until we're sure there won't be any surprises
+                        // storage.setProjectToken(token);
                         return storage.load(storage.AssetType.Project, projectId, storage.DataFormat.JSON);
                     });
             }

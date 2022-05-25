@@ -32,6 +32,10 @@ const fetchProjectToken = projectId => {
     if (projectId === '0') {
         return Promise.resolve(null);
     }
+    const params = new URLSearchParams(location.search);
+    if (params.has('token')) {
+        return Promise.resolve(params.get('token'));
+    }
     return fetch(`https://trampoline.turbowarp.org/proxy/projects/${projectId}`)
         .then(r => {
             if (!r.ok) return null;

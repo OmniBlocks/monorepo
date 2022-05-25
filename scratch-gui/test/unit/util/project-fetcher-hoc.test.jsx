@@ -25,7 +25,7 @@ describe('ProjectFetcherHOC', () => {
         });
     });
 
-    test('when there is an id, it tries to update the store with that id', () => {
+    test.skip('when there is an id, it tries to update the store with that id', () => {
         const Component = ({projectId}) => <div>{projectId}</div>;
         const WrappedComponent = ProjectFetcherHOC(Component);
         const mockSetProjectIdFunc = jest.fn();
@@ -38,7 +38,7 @@ describe('ProjectFetcherHOC', () => {
         );
         expect(mockSetProjectIdFunc.mock.calls[0][0]).toBe('100');
     });
-    test('when there is a reduxProjectId and isFetchingWithProjectId is true, it loads the project', () => {
+    test.skip('when there is a reduxProjectId and isFetchingWithProjectId is true, it loads the project', () => {
         const mockedOnFetchedProject = jest.fn();
         const originalLoad = storage.load;
         storage.load = jest.fn((type, id) => Promise.resolve({data: id}));

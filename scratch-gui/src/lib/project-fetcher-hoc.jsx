@@ -27,6 +27,26 @@ import {MISSING_PROJECT_ID} from './tw-missing-project';
 import VM from 'scratch-vm';
 import * as progressMonitor from '../components/loader/tw-progress-monitor';
 
+// TW: Temporary hack for project tokens
+const fetchProjectToken = projectId => {
+    if (projectId === '0') {
+        return Promise.resolve(null);
+    }
+    return fetch(`https://trampoline.turbowarp.org/proxy/projects/${projectId}`)
+        .then(r => {
+            if (!r.ok) return null;
+            return r.json();
+        })
+        .then(dataOrNull => {
+            const token = dataOrNull ? dataOrNull.project_token : null;
+            return token;
+        })
+        .catch(err => {
+            log.error(err);
+            return null;
+        });
+};
+
 /* Higher Order Component to provide behavior for loading projects by id. If
  * there's no id, the default project is loaded.
  * @param {React.Component} WrappedComponent component to receive projectData prop
@@ -100,8 +120,12 @@ const ProjectFetcherHOC = function (WrappedComponent) {
                     })
                     .then(buffer => ({data: buffer}));
             } else {
-                assetPromise = storage
-                    .load(storage.AssetType.Project, projectId, storage.DataFormat.JSON);
+                // TW: Temporary hack for project tokens
+                assetPromise = fetchProjectToken(projectId)
+                    .then(token => {
+                        storage.setProjectToken(token);
+                        return storage.load(storage.AssetType.Project, projectId, storage.DataFormat.JSON);
+                    });
             }
 
             return assetPromise

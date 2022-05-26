@@ -29,7 +29,7 @@ global.Image = function () {
         width: 1,
         height: 1
     };
-    setTimeout(() => image.onload(), 1000);
+    setTimeout(() => image.onload(), 100);
     return image;
 };
 

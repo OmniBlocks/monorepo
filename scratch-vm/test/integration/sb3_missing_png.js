@@ -41,6 +41,8 @@ global.document = {
 
 let vm;
 
+tap.setTimeout(30000);
+
 tap.beforeEach(() => {
     const storage = makeTestStorage();
 

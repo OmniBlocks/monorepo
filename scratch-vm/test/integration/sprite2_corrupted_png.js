@@ -59,6 +59,8 @@ global.document = {
 let vm;
 let defaultBitmapAssetId;
 
+tap.setTimeout(30000);
+
 tap.beforeEach(() => {
     const storage = makeTestStorage();
 

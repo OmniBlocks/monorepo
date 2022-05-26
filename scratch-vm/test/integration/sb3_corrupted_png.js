@@ -38,7 +38,7 @@ global.Image = function () {
         } else {
             image.onload();
         }
-    }, 1000);
+    }, 100);
     return image;
 };
 

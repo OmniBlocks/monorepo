@@ -265,16 +265,11 @@ class Interface extends React.Component {
                                     {/* https://github.com/LLK/scratch-gui/pull/8269 */}
                                     {/* https://github.com/LLK/scratch-www/pull/6773 */}
                                     <p>
-                                        <b>
-                                            {'The end of viewing unshared projects is soon'}
-                                        </b>
-                                    </p>
-                                    <p>
-                                        <i>{'Updated May 24, 2022'}</i>
+                                        <i>{'Updated May 26, 2022'}</i>
                                     </p>
                                     <p>
                                         {/* eslint-disable-next-line max-len */}
-                                        {'Unshared projects will no longer accessible using their project ID in the near future due to upcoming Scratch API changes.'}
+                                        {'Unshared projects will PROBABLY no longer accessible using their project ID in the near future due to upcoming Scratch API changes.'}
                                     </p>
                                     <p>
                                         {/* eslint-disable-next-line max-len */}

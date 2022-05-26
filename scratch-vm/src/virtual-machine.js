@@ -925,6 +925,7 @@ class VirtualMachine extends EventEmitter {
      */
     updateSoundBuffer (soundIndex, newBuffer, soundEncoding) {
         const sound = this.editingTarget.sprite.sounds[soundIndex];
+        if (sound && sound.broken) delete sound.broken;
         const id = sound ? sound.soundId : null;
         if (id && this.runtime && this.runtime.audioEngine) {
             this.editingTarget.sprite.soundBank.getSoundPlayer(id).buffer = newBuffer;
@@ -1010,6 +1011,7 @@ class VirtualMachine extends EventEmitter {
     updateBitmap (costumeIndex, bitmap, rotationCenterX, rotationCenterY, bitmapResolution) {
         const costume = this.editingTarget.getCostumes()[costumeIndex];
         if (!(costume && this.runtime && this.runtime.renderer)) return;
+        if (costume && costume.broken) delete costume.broken;
 
         costume.rotationCenterX = rotationCenterX;
         costume.rotationCenterY = rotationCenterY;

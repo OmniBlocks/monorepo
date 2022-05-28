@@ -112,7 +112,7 @@ const persistentReadImage = async src => {
                 firstError = e;
             }
             log.warn(e);
-            await new Promise(resolve => setTimeout(resolve, (i + Math.random()) * 2000));
+            await new Promise(resolve => setTimeout(resolve, Math.random() * 2000));
         }
     }
     throw firstError;

@@ -434,3 +434,27 @@ test('setStageSize preserves monitor position relative to center of stage', t =>
     t.equal(finalState.get('y'), 1);
     t.end();
 });
+
+test('setStageSize argument range', t => {
+    const rt = new Runtime();
+
+    rt.once('STAGE_SIZE_CHANGED', (width, height) => {
+        t.equal(width, 101);
+        t.equal(height, 103);
+    });
+    rt.setStageSize(101, 103);
+
+    rt.once('STAGE_SIZE_CHANGED', (width, height) => {
+        t.equal(width, 1);
+        t.equal(height, 1);
+    });
+    rt.setStageSize(-3.1, 0);
+
+    rt.once('STAGE_SIZE_CHANGED', (width, height) => {
+        t.equal(width, 99);
+        t.equal(height, 10000);
+    });
+    rt.setStageSize(99.3, 10000);
+
+    t.end();
+});

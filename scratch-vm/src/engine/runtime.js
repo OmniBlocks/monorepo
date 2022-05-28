@@ -2392,6 +2392,8 @@ class Runtime extends EventEmitter {
      * @param {number} height New stage height
      */
     setStageSize (width, height) {
+        width = Math.round(Math.max(1, width));
+        height = Math.round(Math.max(1, height));
         if (this.stageWidth !== width || this.stageHeight !== height) {
             const deltaX = width - this.stageWidth;
             const deltaY = height - this.stageHeight;

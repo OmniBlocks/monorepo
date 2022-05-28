@@ -111,9 +111,10 @@ fs.readdirSync(executeDir)
             vm.setTurboMode(false);
             vm.setCompilerOptions({enabled: enableCompiler});
 
-            // tw: fail test when certain errors happen
+            // TW: Script compilation errors should fail.
             if (enableCompiler) {
                 vm.on('COMPILE_ERROR', (target, error) => {
+                    // Edge-activated hats are a known error.
                     if (!`${error}`.includes('edge-activated hat')) {
                         throw new Error(`Could not compile script in ${target.getName()}: ${error}`);
                     }

@@ -71,7 +71,7 @@ test('non-english key', t => {
     t.end();
 });
 
-/* tw: disable test: we intentionally add support for modifier keys
+/* TW: This test is disabled because we intentionally add support for modifier keys.
 test('ignore modifier key', t => {
     const rt = new Runtime();
     const k = new Keyboard(rt);

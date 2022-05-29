@@ -24,6 +24,7 @@ import addonMessages from './addons-l10n/en.json';
 import l10nEntries from './generated/l10n-entries';
 import addonEntries from './generated/addon-entries';
 import {addContextMenu} from './contextmenu';
+import * as modal from './modal';
 import './polyfill';
 
 /* eslint-disable no-console */
@@ -637,6 +638,18 @@ class Tab extends EventTargetShim {
 
     get direction () {
         return this.redux.state.locales.isRtl ? 'rtl' : 'ltr';
+    }
+
+    createModal (title, {isOpen = false} = {}) {
+        return modal.createEditorModal(this, title, {isOpen});
+    }
+
+    confirm (...args) {
+        return modal.confirm(this, ...args);
+    }
+
+    prompt (...args) {
+        return modal.prompt(this, ...args);
     }
 }
 

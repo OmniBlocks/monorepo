@@ -535,5 +535,10 @@ exports[`Sound Editor Component matches snapshot 1`] = `
       </div>
     </div>
   </div>
+  <div
+    className={undefined}
+  >
+    00:00.30 / 00:00.60
+  </div>
 </div>
 `;

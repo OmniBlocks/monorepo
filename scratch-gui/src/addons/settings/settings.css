@@ -25,6 +25,7 @@ body {
 body[theme="dark"] {
     background-color: #222222;
     color: white;
+    color-scheme: dark;
 }
 
 a[href] {

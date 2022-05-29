@@ -24,6 +24,9 @@
 
     /* enforce overflow + reset position of absolutely-positioned children */
     position: relative;
+
+    /* anything in the stage such as monitor scrollbars should always use light theme */
+    color-scheme: light;
 }
 
 .stage.full-screen {

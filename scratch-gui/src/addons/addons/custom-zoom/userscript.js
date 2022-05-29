@@ -64,9 +64,6 @@ export default async function ({ addon, global, console }) {
   }
 
   await addon.tab.waitForElement(".blocklyZoom");
-  if (document.querySelector('[class^="backpack_backpack-container"]')) {
-    window.dispatchEvent(new Event("resize"));
-  }
   update();
   addon.tab.addEventListener("urlChange", update);
   addon.settings.addEventListener("change", update);

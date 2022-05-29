@@ -1,10 +1,30 @@
 const test = require('tap').test;
-const VirtualMachine = require('../../src');
-const Variable = require('../../src/engine/variable');
+const VirtualMachine = require('../../src/virtual-machine');
 const RenderedTarget = require('../../src/sprites/rendered-target');
 const Sprite = require('../../src/sprites/sprite');
+const Variable = require('../../src/engine/variable');
 
-test('tw: non-primitive values in lists and variables converted to strings', t => {
+test('emitTargetsUpdate targetList is lazy', t => {
+    const vm = new VirtualMachine();
+    let calledToJSON = false;
+    vm.runtime.targets = [{
+        toJSON () {
+            calledToJSON = true;
+            return {};
+        }
+    }];
+    let targetsUpdateEvent;
+    vm.on('targetsUpdate', e => {
+        targetsUpdateEvent = e;
+    });
+    vm.emitTargetsUpdate();
+    t.equal(calledToJSON, false);
+    void targetsUpdateEvent.targetList; // should trigger lazy compute
+    t.equal(calledToJSON, true);
+    t.end();
+});
+
+test('non-primitive values in lists and variables converted to strings', t => {
     const vm = new VirtualMachine();
     const sprite = new Sprite();
     const target = new RenderedTarget(sprite, vm.runtime);

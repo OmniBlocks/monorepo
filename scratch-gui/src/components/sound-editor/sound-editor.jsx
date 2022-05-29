@@ -138,6 +138,35 @@ const messages = defineMessages({
     }
 });
 
+const formatTime = timeSeconds => {
+    const minutes = (Math.floor(timeSeconds / 60))
+        .toString()
+        .padStart(2, '0');
+    const seconds = (timeSeconds % 60)
+        .toFixed(2)
+        .padStart(5, '0');
+    return `${minutes}:${seconds}`;
+};
+
+const formatDuration = (playheadPercent, trimStartPercent, trimEndPercent, durationSeconds) => {
+    // If no selection, the trim is the entire sound.
+    trimStartPercent = trimStartPercent === null ? 0 : trimStartPercent;
+    trimEndPercent = trimEndPercent === null ? 1 : trimEndPercent;
+
+    // If the playhead doesn't exist, assume it's at the start of the selection.
+    playheadPercent = playheadPercent === null ? trimStartPercent : playheadPercent;
+
+    // If selection has zero length, treat it as the entire sound being selected.
+    // This happens when the user first clicks to start making a selection.
+    const trimSize = (trimEndPercent - trimStartPercent) || 1;
+    const trimDuration = trimSize * durationSeconds;
+
+    const progressInTrim = (playheadPercent - trimStartPercent) / trimSize;
+    const currentTime = progressInTrim * trimDuration;
+
+    return `${formatTime(currentTime)} / ${formatTime(trimDuration)}`;
+};
+
 const SoundEditor = props => (
     <div
         className={styles.editorContainer}
@@ -315,10 +344,14 @@ const SoundEditor = props => (
                 onClick={props.onEcho}
             />
         </div>
+        <div className={styles.duration}>
+            {formatDuration(props.playhead, props.trimStart, props.trimEnd, props.duration)}
+        </div>
     </div>
 );
 
 SoundEditor.propTypes = {
+    duration: PropTypes.number.isRequired,
     canPaste: PropTypes.bool.isRequired,
     canRedo: PropTypes.bool.isRequired,
     canUndo: PropTypes.bool.isRequired,

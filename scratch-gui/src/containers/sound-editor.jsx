@@ -438,6 +438,7 @@ class SoundEditor extends React.Component {
         const {effectTypes} = AudioEffects;
         return (
             <SoundEditorComponent
+                duration={this.props.samples.length / this.props.sampleRate}
                 canPaste={this.state.copyBuffer !== null}
                 canRedo={this.redoStack.length > 0}
                 canUndo={this.undoStack.length > 0}

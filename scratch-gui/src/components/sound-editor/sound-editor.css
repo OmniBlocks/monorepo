@@ -229,3 +229,9 @@ $border-radius: 0.25rem;
 .button:disabled > img {
     opacity: 0.25;
 }
+
+.duration {
+    margin-top: calc(2 * $space);
+    font-weight: bold;
+    font-weight: 0.75rem;
+}

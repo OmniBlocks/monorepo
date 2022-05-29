@@ -385,6 +385,7 @@ export default async function ({ addon, global, console, msg }) {
         const [x, y] = PREVIEW_POSITIONS[i];
         let src;
         if (item.asset) {
+          // TW: We can be 100% certain that escaping here is unnecessary
           src = item.asset.encodeDataURI();
         } else if (item.costume && item.costume.asset) {
           src = item.costume.asset.encodeDataURI();
@@ -395,7 +396,7 @@ export default async function ({ addon, global, console, msg }) {
           result += `<image width="${width}" height="${height}" x="${x}" y="${y}" href="${src}"/>`;
         }
       }
-      result += '</svg>';
+      result += "</svg>";
       return result;
     };
 
@@ -754,8 +755,13 @@ export default async function ({ addon, global, console, msg }) {
           fixSoundOrder();
         }
       };
-      const renameFolder = () => {
-        let newName = prompt(msg("rename-folder-prompt"), data.folder);
+      const renameFolder = async () => {
+        let newName = await addon.tab.prompt(
+          msg("rename-folder-prompt-title"),
+          msg("rename-folder-prompt"),
+          data.folder,
+          { useEditorClasses: true }
+        );
         // Prompt cancelled, do not rename
         if (newName === null) {
           return;
@@ -813,8 +819,13 @@ export default async function ({ addon, global, console, msg }) {
         }
       };
 
-      const createFolder = () => {
-        const name = prompt(msg("name-prompt"), getNameWithoutFolder(data.realName));
+      const createFolder = async () => {
+        const name = await addon.tab.prompt(
+          msg("name-prompt-title"),
+          msg("name-prompt"),
+          getNameWithoutFolder(data.realName),
+          { useEditorClasses: true }
+        );
         if (name === null) {
           return;
         }
@@ -1254,10 +1265,11 @@ export default async function ({ addon, global, console, msg }) {
       const dragInfo = args[0];
       const folderItems = dragInfo && dragInfo.payload && dragInfo.payload.sa_folder_items;
       if (Array.isArray(folderItems)) {
-        if (confirm(msg("confirm-backpack-folder"))) {
+        addon.tab.confirm("", msg("confirm-backpack-folder"), { useEditorClasses: true }).then((result) => {
+          if (!result) return;
           this.sa_queuedItems = folderItems;
           this.sa_loadNextItem();
-        }
+        });
         return;
       }
       return originalHandleDrop.call(this, ...args);

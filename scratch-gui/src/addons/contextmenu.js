@@ -1,6 +1,5 @@
-// This file is copied and pasted from ScratchAddons/addon-api/content-script/contextmenu.js
-// I really want to rewrite this, but just looking at it fills me with dread.
-// So that will happen later.
+// This file is imported from
+// https://github.com/ScratchAddons/ScratchAddons/blob/master/addon-api/content-script/contextmenu.js
 
 /* eslint-disable */
 

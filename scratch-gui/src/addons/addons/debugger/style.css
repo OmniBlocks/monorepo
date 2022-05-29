@@ -18,6 +18,9 @@
   width: 565px;
   height: 25rem;
 }
+[theme="dark"] .sa-debugger-interface {
+  background: var(--ui-primary);
+}
 
 .sa-debugger-interface h1 {
   padding: 10px;
@@ -145,6 +148,10 @@
   font-family: monospace;
   color: #000;
 }
+[theme="dark"] .sa-debugger-log {
+  color: var(--text-primary);
+  border-color: rgba(255, 255, 255, 0.15);
+}
 .sa-debugger-log[data-type="warn"] {
   border-color: hsl(50deg, 100%, 75%);
   color: hsl(39deg 100% 18%);
@@ -155,6 +162,16 @@
   color: red;
   background-color: hsl(0deg 100% 95%);
 }
+[theme="dark"] .sa-debugger-log[data-type="warn"] {
+  border-color: hsl(50deg, 100%, 15%);
+  color: hsl(39deg 100% 90%);
+  background-color: hsl(50deg 100% 10%);
+}
+[theme="dark"] .sa-debugger-log[data-type="error"] {
+  border-color: hsl(0deg 100% 15%);
+  color: hsl(0deg 100% 77%);
+  background-color: hsl(0deg 100% 10%);
+}
 
 .sa-debugger-log-repeats {
   background-color: hsla(163, 85%, 40%, 1);
@@ -162,6 +179,9 @@
   border-radius: 100px;
   padding: 1px 6px;
   margin-right: 4px;
+}
+[theme="dark"] .sa-debugger-log-repeats {
+  color: var(--ui-primary);
 }
 
 .sa-debugger-log-icon {
@@ -190,6 +210,9 @@
   padding-left: 4px;
   margin-right: 4px;
   margin-left: auto;
+}
+[theme="dark"] .sa-debugger-log-link {
+  color: inherit;
 }
 .sa-debugger-log-link:hover {
   text-decoration: underline;

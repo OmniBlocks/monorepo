@@ -23,12 +23,10 @@ const getBackpackContents = ({
     offset
 }) => new Promise((resolve, reject) => {
     if (host === LOCAL_API) {
-        return localBackpackAPI.getBackpackContents({
+        return resolve(localBackpackAPI.getBackpackContents({
             limit,
             offset
-        })
-            .then(resolve)
-            .catch(reject);
+        }));
     }
     xhr({
         method: 'GET',

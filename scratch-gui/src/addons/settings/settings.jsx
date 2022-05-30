@@ -237,7 +237,7 @@ Tags.propTypes = {
     }).isRequired
 };
 
-class BufferedInput extends React.Component {
+class TextInput extends React.Component {
     constructor (props) {
         super(props);
         this.handleChange = this.handleChange.bind(this);
@@ -286,10 +286,33 @@ class BufferedInput extends React.Component {
         );
     }
 }
-BufferedInput.propTypes = {
+TextInput.propTypes = {
     onChange: PropTypes.func.isRequired,
     type: PropTypes.string,
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+};
+
+const ResetButton = ({
+    addonId,
+    settingId,
+    forTextInput
+}) => (
+    <button
+        className={classNames(styles.button, styles.resetSettingButton)}
+        onClick={() => SettingsStore.setAddonSetting(addonId, settingId, null)}
+        title={settingsTranslations.reset}
+        data-for-text-input={forTextInput}
+    >
+        <img
+            src={undoImage}
+            alt={settingsTranslations.reset}
+        />
+    </button>
+);
+ResetButton.propTypes = {
+    addonId: PropTypes.string,
+    settingId: PropTypes.string,
+    forTextInput: PropTypes.bool
 };
 
 const Setting = ({
@@ -341,7 +364,7 @@ const Setting = ({
             {setting.type === 'integer' && (
                 <React.Fragment>
                     {label}
-                    <BufferedInput
+                    <TextInput
                         id={uniqueId}
                         type="number"
                         min={setting.min}
@@ -349,6 +372,11 @@ const Setting = ({
                         step="1"
                         value={value}
                         onChange={newValue => SettingsStore.setAddonSetting(addonId, settingId, newValue)}
+                    />
+                    <ResetButton
+                        addonId={addonId}
+                        settingId={settingId}
+                        forTextInput
                     />
                 </React.Fragment>
             )}
@@ -361,16 +389,10 @@ const Setting = ({
                         value={value}
                         onChange={e => SettingsStore.setAddonSetting(addonId, settingId, e.target.value)}
                     />
-                    <button
-                        className={classNames(styles.button, styles.resetColorButton)}
-                        onClick={() => SettingsStore.setAddonSetting(addonId, settingId, setting.default)}
-                        title={settingsTranslations.reset}
-                    >
-                        <img
-                            src={undoImage}
-                            alt={settingsTranslations.reset}
-                        />
-                    </button>
+                    <ResetButton
+                        addonId={addonId}
+                        settingId={settingId}
+                    />
                 </React.Fragment>
             )}
             {setting.type === 'select' && (

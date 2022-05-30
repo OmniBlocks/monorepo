@@ -33,4 +33,7 @@ const soundPayload = sound => {
     return new Promise(resolve => resolve(payload));
 };
 
-export default soundPayload;
+export {
+    soundPayload as default,
+    soundThumbnail
+};

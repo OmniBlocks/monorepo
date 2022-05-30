@@ -1,5 +1,6 @@
 import storage from './storage';
 import md5 from 'js-md5';
+import {soundThumbnail} from './backpack/sound-payload';
 
 // Special constants -- do not change without care.
 const DATABASE_NAME = 'TW_Backpack';
@@ -30,8 +31,15 @@ const idbItemToBackpackItem = item => {
     // convert id to string
     item.id = `${item.id}`;
 
-    // Thumbnail could be any image format. The browser will figure out which format it is.
-    item.thumbnailUrl = `data:;base64,${arrayBufferToBase64(item.thumbnailData)}`;
+    if (item.type === 'sound') {
+        // For sounds, use the local thumbnail instead of what was stored in the backpack.
+        // The thumbnail was updated and it doesn't make sense for already backpacked sounds to
+        // use the old icon instead of the new one.
+        item.thumbnailUrl = `data:;base64,${soundThumbnail}`;
+    } else {
+        // Thumbnail could be any image format. The browser will figure out which format it is.
+        item.thumbnailUrl = `data:;base64,${arrayBufferToBase64(item.thumbnailData)}`;
+    }
 
     let assetType;
     if (item.type === 'script') {

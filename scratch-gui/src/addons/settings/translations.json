@@ -358,6 +358,7 @@
         "addonFeedback": "Dar Feedback sobre Addons",
         "confirmResetAll": "Tem certeza que quer restaurar todas as configurações de addons aos seus valores originais?",
         "credits": "Créditos:",
+        "dirty": "Recarregue a página para aplicar as opções.",
         "dirtyButton": "Recarregar agora",
         "enableDangerous": "Este addon é perigoso e pode intencionalmente DESATIVAR funcionalidades. A maioria dos usuários NÃO DEVEM ativar este addon. Tem certeza que quer ativá-lo?",
         "export": "Exportar configurações",

@@ -24,7 +24,8 @@ const jpegThumbnail = dataUrl => new Promise((resolve, reject) => {
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
         }
-        resolve(canvas.toDataURL('image/jpeg', 0.92 /* quality */)); // Default quality is 0.92
+        const dataURL = canvas.toDataURL('image/jpeg', 0.92).replace('data:image/jpeg;base64,', '');
+        resolve(dataURL);
     };
     image.onerror = err => {
         reject(err);

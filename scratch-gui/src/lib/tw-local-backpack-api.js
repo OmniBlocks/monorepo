@@ -30,6 +30,7 @@ const idbItemToBackpackItem = item => {
     // convert id to string
     item.id = `${item.id}`;
 
+    // Thumbnail could be any image format. The browser will figure out which format it is.
     item.thumbnailUrl = `data:;base64,${arrayBufferToBase64(item.thumbnailData)}`;
 
     let assetType;

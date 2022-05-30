@@ -1,4 +1,4 @@
-import jpegThumbnail from './jpeg-thumbnail';
+import createThumbnail from './thumbnail';
 
 const spritePayload = (id, vm) => {
     const target = vm.runtime.getTargetById(id);
@@ -19,8 +19,8 @@ const spritePayload = (id, vm) => {
 
         const costumeDataUrl = target.sprite.costumes[target.currentCostume].asset.encodeDataURI();
 
-        return jpegThumbnail(costumeDataUrl).then(thumbnail => {
-            payload.thumbnail = thumbnail.replace('data:image/jpeg;base64,', '');
+        return createThumbnail(costumeDataUrl).then(thumbnail => {
+            payload.thumbnail = thumbnail;
             return payload;
         });
     });

@@ -1,5 +1,5 @@
 import blockToImage from './block-to-image';
-import jpegThumbnail from './jpeg-thumbnail';
+import createThumbnail from './thumbnail';
 import {Base64} from 'js-base64';
 
 const codePayload = ({blockObjects, topBlockId}) => {
@@ -13,9 +13,9 @@ const codePayload = ({blockObjects, topBlockId}) => {
     };
 
     return blockToImage(topBlockId)
-        .then(jpegThumbnail)
+        .then(createThumbnail)
         .then(thumbnail => {
-            payload.thumbnail = thumbnail.replace('data:image/jpeg;base64,', '');
+            payload.thumbnail = thumbnail;
             return payload;
         });
 };

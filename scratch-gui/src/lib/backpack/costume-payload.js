@@ -1,4 +1,4 @@
-import jpegThumbnail from './jpeg-thumbnail';
+import createThumbnail from './thumbnail';
 import getCostumeUrl from '../get-costume-url';
 
 const costumePayload = costume => {
@@ -30,8 +30,8 @@ const costumePayload = costume => {
     // Do not generate the thumbnail from the raw asset. Instead use the getCostumeUrl
     // utility which inlines the fonts to make the thumbnail show the right fonts.
     const inlinedFontDataUrl = getCostumeUrl(costume.asset);
-    return jpegThumbnail(inlinedFontDataUrl).then(thumbnail => {
-        payload.thumbnail = thumbnail.replace('data:image/jpeg;base64,', '');
+    return createThumbnail(inlinedFontDataUrl).then(thumbnail => {
+        payload.thumbnail = thumbnail;
         return payload;
     });
 };

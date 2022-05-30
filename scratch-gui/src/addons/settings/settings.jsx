@@ -240,11 +240,13 @@ Tags.propTypes = {
 class TextInput extends React.Component {
     constructor (props) {
         super(props);
-        this.handleChange = this.handleChange.bind(this);
         this.handleKeyPress = this.handleKeyPress.bind(this);
+        this.handleFocus = this.handleFocus.bind(this);
         this.handleFlush = this.handleFlush.bind(this);
+        this.handleChange = this.handleChange.bind(this);
         this.state = {
-            value: null
+            value: null,
+            focused: false
         };
     }
     handleKeyPress (e) {
@@ -253,7 +255,15 @@ class TextInput extends React.Component {
             e.target.blur();
         }
     }
+    handleFocus () {
+        this.setState({
+            focused: true
+        });
+    }
     handleFlush (e) {
+        this.setState({
+            focused: false
+        });
         if (this.state.value === null) {
             return;
         }
@@ -272,13 +282,20 @@ class TextInput extends React.Component {
         this.setState({value: null});
     }
     handleChange (e) {
-        this.setState({value: e.target.value});
+        e.persist();
+        this.setState({value: e.target.value}, () => {
+            // A change event can be fired when not focused by using the browser's number spinners
+            if (!this.state.focused) {
+                this.handleFlush(e);
+            }
+        });
     }
     render () {
         return (
             <input
                 {...this.props}
                 value={this.state.value === null ? this.props.value : this.state.value}
+                onFocus={this.handleFocus}
                 onBlur={this.handleFlush}
                 onChange={this.handleChange}
                 onKeyPress={this.handleKeyPress}

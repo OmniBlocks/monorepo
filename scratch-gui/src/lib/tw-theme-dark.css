@@ -19,6 +19,7 @@
 /* Blockly */
 .blocklySvg {
     background-color: var(--ui-secondary) !important;
+    color-scheme: light;
 }
 [id^="blocklyGridPattern"] > line {
     stroke: #484848;
@@ -53,6 +54,9 @@
 }
 .valueReportBox {
     color: black;
+}
+.blocklyWidgetDiv {
+    color-scheme: light;
 }
 .blocklyWidgetDiv .goog-menu {
     background: var(--ui-primary);

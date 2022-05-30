@@ -1,5 +1,5 @@
 jest.mock('../../../src/lib/backpack/block-to-image', () => () => Promise.resolve('block-image'));
-jest.mock('../../../src/lib/backpack/jpeg-thumbnail', () => () => Promise.resolve('thumbnail'));
+jest.mock('../../../src/lib/backpack/thumbnail', () => () => Promise.resolve('thumbnail'));
 
 import codePayload from '../../../src/lib/backpack/code-payload';
 import {Base64} from 'js-base64';

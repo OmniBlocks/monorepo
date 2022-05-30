@@ -6,12 +6,12 @@ const jpegThumbnail = dataUrl => new Promise((resolve, reject) => {
 
         const maxDimension = 96; // 3x the maximum displayed size of 32px
 
+        // TW: After setting canvas width/height, the canvas is automatically cleared.
+
         if (image.height < 1 || image.width < 1) {
             canvas.width = canvas.height = maxDimension;
             // drawImage can fail if image height/width is less than 1
             // Use blank image; the costume is too small to render anyway
-            ctx.fillStyle = 'white'; // Create white background, since jpeg doesn't have transparency
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
         } else {
             if (image.height > image.width) {
                 canvas.height = maxDimension;
@@ -20,11 +20,12 @@ const jpegThumbnail = dataUrl => new Promise((resolve, reject) => {
                 canvas.width = maxDimension;
                 canvas.height = (maxDimension / image.width) * image.height;
             }
-            ctx.fillStyle = 'white';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
             ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
         }
-        const dataURL = canvas.toDataURL('image/jpeg', 0.92).replace('data:image/jpeg;base64,', '');
+
+        // TW: PNG allows using transparency while JPEG does not.
+        // A white background looks quite ugly in dark mode.
+        const dataURL = canvas.toDataURL('image/png').replace('data:image/png;base64,', '');
         resolve(dataURL);
     };
     image.onerror = err => {

@@ -29,9 +29,8 @@ const _twGetAsset = (path) => {
   throw new Error(`Unknown asset: ${path}`);
 };
 
-import { onPauseChanged, isPaused, singleStep, onSingleStep, getRunningThread } from "./module.js";
+import { getRunningThread } from "./module.js";
 import LogView from "./log-view.js";
-import Highlighter from "../editor-stepping/highlighter.js";
 
 const concatInPlace = (copyInto, copyFrom) => {
   for (const i of copyFrom) {
@@ -51,8 +50,6 @@ export default async function createThreadsTab({ debug, addon, console, msg }) {
   logView.canAutoScrollToEnd = false;
   logView.outerElement.classList.add("sa-debugger-threads");
   logView.placeholderElement.textContent = msg("no-threads-running");
-
-  const highlighter = new Highlighter(10, "#ff0000");
 
   logView.generateRow = (row) => {
     const root = document.createElement("div");
@@ -91,6 +88,13 @@ export default async function createThreadsTab({ debug, addon, console, msg }) {
       if (preview) {
         root.appendChild(preview);
       }
+    }
+
+    if (row.type === "compiled") {
+      const el = document.createElement('div');
+      el.className = "sa-debugger-thread-compiled";
+      el.textContent = "Stack information not available for compiled threads.";
+      root.appendChild(el);
     }
 
     if (row.targetId && row.blockId) {
@@ -144,6 +148,10 @@ export default async function createThreadsTab({ debug, addon, console, msg }) {
             targetName: target.getName(),
             id,
           },
+          compiledItem: thread.isCompiled ? {
+            type: "compiled",
+            depth: 2,
+          } : null,
           blockCache: new WeakMap(),
         });
       }
@@ -201,6 +209,10 @@ export default async function createThreadsTab({ debug, addon, console, msg }) {
         }
       }
 
+      if (cacheInfo.compiledItem) {
+        result.push(cacheInfo.compiledItem);
+      }
+
       return result;
     };
 
@@ -219,32 +231,7 @@ export default async function createThreadsTab({ debug, addon, console, msg }) {
 
   debug.addAfterStepCallback(() => {
     updateContent();
-
-    const runningThread = getRunningThread();
-    if (runningThread) {
-      highlighter.setGlowingThreads([runningThread]);
-    } else {
-      highlighter.setGlowingThreads([]);
-    }
   });
-
-  const stepButton = debug.createHeaderButton({
-    text: msg("step"),
-    icon: _twGetAsset("/icons/step.svg"),
-    description: msg("step-desc"),
-  });
-  stepButton.element.addEventListener("click", () => {
-    singleStep();
-  });
-
-  const handlePauseChanged = (paused) => {
-    stepButton.element.style.display = paused ? "" : "none";
-    updateContent();
-  };
-  handlePauseChanged(isPaused());
-  onPauseChanged(handlePauseChanged);
-
-  onSingleStep(updateContent);
 
   const show = () => {
     logView.show();
@@ -257,7 +244,7 @@ export default async function createThreadsTab({ debug, addon, console, msg }) {
   return {
     tab,
     content: logView.outerElement,
-    buttons: [stepButton],
+    buttons: [],
     show,
     hide,
   };

@@ -92,6 +92,7 @@
     "debugger/log-msg-clone-created": "'{sprite}' geklont.",
     "debugger/log-msg-flag-clicked": "Grüne Flagge angeklickt.",
     "debugger/no-logs": "Es gibt keine Logs zum Anzeigen.",
+    "debugger/no-threads-running": "Es werden momentan keine Threads ausgeführt.",
     "debugger/unknown-sprite": "(unbekannte Figur)",
     "debugger/unpause": "Fortsetzen",
     "clones/clones": "Klone: {cloneCount}",

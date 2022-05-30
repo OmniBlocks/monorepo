@@ -262,3 +262,7 @@
 .sa-debugger-block-preview[data-shape="stacked"] {
   border-radius: 3px;
 }
+
+.sa-debugger-thread-compiled {
+  font-style: italic;
+}

@@ -87,6 +87,7 @@
     "debugger/log-msg-clone-created": "Kloon gemaakt van '{sprite}'.",
     "debugger/log-msg-flag-clicked": "Groene vlag geklikt.",
     "debugger/no-logs": "Er zijn geen logs om weer te geven.",
+    "debugger/no-threads-running": "Geen threads aan de gang.",
     "debugger/unknown-sprite": "(onbekende sprite)",
     "debugger/unpause": "Hervatten",
     "pause/pause": "Pauzeren",

@@ -1009,7 +1009,16 @@ class VirtualMachine extends EventEmitter {
      *     2 for double-resolution bitmaps
      */
     updateBitmap (costumeIndex, bitmap, rotationCenterX, rotationCenterY, bitmapResolution) {
-        const costume = this.editingTarget.getCostumes()[costumeIndex];
+        return this._updateBitmap(
+            this.editingTarget.getCostumes()[costumeIndex],
+            bitmap,
+            rotationCenterX,
+            rotationCenterY,
+            bitmapResolution
+        );
+    }
+
+    _updateBitmap (costume, bitmap, rotationCenterX, rotationCenterY, bitmapResolution) {
         if (!(costume && this.runtime && this.runtime.renderer)) return;
         if (costume && costume.broken) delete costume.broken;
 
@@ -1069,7 +1078,15 @@ class VirtualMachine extends EventEmitter {
      * @param {number} rotationCenterY y of point about which the costume rotates, relative to its upper left corner
      */
     updateSvg (costumeIndex, svg, rotationCenterX, rotationCenterY) {
-        const costume = this.editingTarget.getCostumes()[costumeIndex];
+        return this._updateSvg(
+            this.editingTarget.getCostumes()[costumeIndex],
+            svg,
+            rotationCenterX,
+            rotationCenterY
+        );
+    }
+
+    _updateSvg (costume, svg, rotationCenterX, rotationCenterY) {
         if (costume && costume.broken) delete costume.broken;
         if (costume && this.runtime && this.runtime.renderer) {
             costume.rotationCenterX = rotationCenterX;

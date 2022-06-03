@@ -13,7 +13,10 @@ const startNextFetch = ([resolve, url, options]) => {
 
     const attemptToFetch = () => fetch(url, options)
         .then(result => {
-            if (result.ok) return result.arrayBuffer();
+            // In a macOS WKWebView, requests from file: URLs to other file: URLs always have status: 0 and ok: false
+            // even though the requests were successful. If the requested file doesn't exist, fetch() rejects instead.
+            // We aren't aware of any other cases where fetch() can resolve with status 0, so this should be safe.
+            if (result.ok || result.status === 0) return result.arrayBuffer();
             if (result.status === 404) return null;
             return Promise.reject(result.status);
         })

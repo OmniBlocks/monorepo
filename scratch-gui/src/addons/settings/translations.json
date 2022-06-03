@@ -280,7 +280,7 @@
     },
     "nl": {
         "addonFeedback": "Addonfeedback",
-        "confirmResetAll": "Weet je zeker dat je alle addonsinstellingen wilt herstellen naar hun standaardinstellingen?",
+        "confirmResetAll": "Weet je zeker dat je alle addonsinstellingen wilt resetten naar hun standaardinstellingen?",
         "credits": "Dank aan:",
         "dirty": "Tabbladen verversen om instellingen toe te passen.",
         "dirtyButton": "Verversen",
@@ -294,7 +294,7 @@
         "noResults": "Geen resultaten.",
         "presets": "Voorinstellingen",
         "reset": "Reset",
-        "resetAll": "Reset alles",
+        "resetAll": "Alles resetten",
         "search": "Zoek",
         "tagBeta": "Bèta",
         "tagDanger": "Gevaarlijk",

@@ -9,7 +9,7 @@ const queue = [];
 
 const startNextFetch = ([resolve, url, options]) => {
     let firstError;
-    let attempts = 0;
+    let failedAttempts = 0;
 
     const attemptToFetch = () => fetch(url, options)
         .then(result => {
@@ -31,9 +31,9 @@ const startNextFetch = ([resolve, url, options]) => {
                 firstError = error;
             }
 
-            if (attempts < 3) {
-                attempts++;
-                return new Promise(cb => setTimeout(cb, (attempts + Math.random() - 1) * 5000))
+            if (failedAttempts < 2) {
+                failedAttempts++;
+                return new Promise(cb => setTimeout(cb, (failedAttempts + Math.random() - 1) * 5000))
                     .then(attemptToFetch);
             }
 

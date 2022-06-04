@@ -269,7 +269,7 @@ class Interface extends React.Component {
                                     </p>
                                     <p>
                                         {/* eslint-disable-next-line max-len */}
-                                        {'Unshared projects will no longer be accessible using just their project ID at some point in the future due to upcoming Scratch API changes.'}
+                                        {'Unshared projects will no longer be accessible using just their project ID **at some point in the future** due to upcoming Scratch API changes.'}
                                     </p>
                                     <p>
                                         {/* eslint-disable-next-line max-len */}

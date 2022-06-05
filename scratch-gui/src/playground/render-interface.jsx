@@ -28,6 +28,7 @@ import TWProjectMetaFetcherHOC from '../lib/tw-project-meta-fetcher-hoc.jsx';
 import TWStateManagerHOC from '../lib/tw-state-manager-hoc.jsx';
 import TWThemeHOC from '../lib/tw-theme-hoc.jsx';
 import SBFileUploaderHOC from '../lib/sb-file-uploader-hoc.jsx';
+import TWPackagerIntegrationHOC from '../lib/tw-packager-integration-hoc.jsx';
 import SettingsStore from '../addons/settings-store-singleton';
 import '../lib/tw-fix-history-api';
 import GUI from './render-gui.jsx';
@@ -72,7 +73,8 @@ const messages = defineMessages({
 });
 
 const WrappedMenuBar = compose(
-    SBFileUploaderHOC
+    SBFileUploaderHOC,
+    TWPackagerIntegrationHOC
 )(MenuBar);
 
 if (AddonChannels.reloadChannel) {

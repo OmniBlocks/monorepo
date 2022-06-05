@@ -100,6 +100,7 @@ const GUIComponent = props => {
         onCloseAccountNav,
         onClickAddonSettings,
         onClickTheme,
+        onClickPackager,
         onLogOut,
         onOpenRegistration,
         onToggleLoginOpen,
@@ -252,6 +253,7 @@ const GUIComponent = props => {
                     onClickAccountNav={onClickAccountNav}
                     onClickAddonSettings={onClickAddonSettings}
                     onClickTheme={onClickTheme}
+                    onClickPackager={onClickPackager}
                     onClickLogo={onClickLogo}
                     onCloseAccountNav={onCloseAccountNav}
                     onLogOut={onLogOut}
@@ -436,6 +438,7 @@ GUIComponent.propTypes = {
     onClickAccountNav: PropTypes.func,
     onClickAddonSettings: PropTypes.func,
     onClickTheme: PropTypes.func,
+    onClickPackager: PropTypes.func,
     onClickLogo: PropTypes.func,
     onCloseAccountNav: PropTypes.func,
     onExtensionButtonClick: PropTypes.func,

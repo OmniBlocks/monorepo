@@ -50,7 +50,6 @@ const manifest = {
     "beta",
     "new"
   ],
-  "dynamicEnable": true,
   "dynamicDisable": true,
   "enabledByDefault": false
 };

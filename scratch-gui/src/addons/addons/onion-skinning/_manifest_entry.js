@@ -105,7 +105,6 @@ const manifest = {
   "tags": [
     "recommended"
   ],
-  "dynamicEnable": true,
   "dynamicDisable": true,
   "enabledByDefault": true
 };

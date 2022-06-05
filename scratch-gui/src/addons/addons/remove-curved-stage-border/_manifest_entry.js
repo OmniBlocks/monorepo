@@ -14,7 +14,6 @@ const manifest = {
   ],
   "enabledByDefault": false,
   "dynamicDisable": true,
-  "dynamicEnable": true,
   "userstyles": [
     {
       "url": "remove-borders.css"

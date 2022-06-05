@@ -13,7 +13,6 @@ const manifest = {
       "url": "fix-share-the-love.js"
     }
   ],
-  "dynamicEnable": true,
   "dynamicDisable": true,
   "userstyles": [
     {

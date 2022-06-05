@@ -7,7 +7,6 @@ const manifest = {
     "theme"
   ],
   "enabledByDefault": false,
-  "dynamicEnable": true,
   "dynamicDisable": true,
   "userstyles": [
     {

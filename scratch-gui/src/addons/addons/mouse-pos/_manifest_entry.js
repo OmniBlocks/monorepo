@@ -9,7 +9,6 @@ const manifest = {
       "name": "Jeffalo"
     }
   ],
-  "dynamicEnable": true,
   "dynamicDisable": true,
   "userscripts": [
     {

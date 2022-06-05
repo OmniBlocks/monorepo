@@ -19,7 +19,6 @@ const manifest = {
     }
   ],
   "tags": [],
-  "dynamicEnable": true,
   "dynamicDisable": true,
   "enabledByDefault": false
 };

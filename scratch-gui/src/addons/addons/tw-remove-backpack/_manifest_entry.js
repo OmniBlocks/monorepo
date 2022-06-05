@@ -16,7 +16,6 @@ const manifest = {
   "tags": [
     "danger"
   ],
-  "dynamicEnable": true,
   "dynamicDisable": true,
   "enabledByDefault": false
 };

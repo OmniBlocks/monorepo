@@ -89,7 +89,6 @@ const manifest = {
       "default": false
     }
   ],
-  "dynamicEnable": true,
   "dynamicDisable": true,
   "enabledByDefault": true
 };

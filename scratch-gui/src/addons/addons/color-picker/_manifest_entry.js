@@ -24,7 +24,6 @@ const manifest = {
       "url": "style.css"
     }
   ],
-  "dynamicEnable": true,
   "dynamicDisable": true,
   "enabledByDefault": true
 };

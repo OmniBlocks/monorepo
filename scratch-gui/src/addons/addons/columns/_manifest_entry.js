@@ -11,7 +11,6 @@ const manifest = {
     }
   ],
   "tags": [],
-  "dynamicEnable": true,
   "dynamicDisable": true,
   "userscripts": [
     {

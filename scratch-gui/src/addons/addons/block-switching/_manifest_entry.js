@@ -12,7 +12,6 @@ const manifest = {
       "link": "https://scratch.mit.edu/users/pufferfish101007"
     }
   ],
-  "dynamicEnable": true,
   "dynamicDisable": true,
   "userscripts": [
     {

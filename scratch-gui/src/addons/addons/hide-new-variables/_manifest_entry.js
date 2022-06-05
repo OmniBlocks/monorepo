@@ -15,7 +15,6 @@ const manifest = {
     }
   ],
   "tags": [],
-  "dynamicDisable": true,
-  "dynamicEnable": true
+  "dynamicDisable": true
 };
 export default manifest;

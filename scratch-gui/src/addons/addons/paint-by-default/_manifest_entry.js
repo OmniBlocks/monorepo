@@ -116,7 +116,6 @@ const manifest = {
       "default": "library"
     }
   ],
-  "dynamicEnable": true,
   "dynamicDisable": true,
   "tags": [
     "recommended"

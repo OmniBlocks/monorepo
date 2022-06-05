@@ -57,7 +57,6 @@ const manifest = {
       }
     }
   ],
-  "dynamicEnable": true,
   "dynamicDisable": true,
   "enabledByDefault": false
 };

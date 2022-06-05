@@ -13,7 +13,6 @@ const manifest = {
       "link": "https://scratch.mit.edu/users/TheColaber"
     }
   ],
-  "dynamicEnable": true,
   "dynamicDisable": true,
   "updateUserstylesOnSettingsChange": true,
   "userscripts": [

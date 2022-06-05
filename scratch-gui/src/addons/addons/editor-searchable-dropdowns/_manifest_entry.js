@@ -8,7 +8,6 @@ const manifest = {
       "name": "GarboMuffin"
     }
   ],
-  "dynamicEnable": true,
   "dynamicDisable": true,
   "userscripts": [
     {

@@ -184,6 +184,9 @@ const normalizeManifest = (id, manifest) => {
     delete manifest.libraries;
     delete manifest.injectAsStyleElt;
 
+    // All addons have dynamic enable
+    delete manifest.dynamicEnable;
+
     const filterUserscripts = scripts => scripts
         .filter(({matches}) => matches.includes('projects') || matches.includes('https://scratch.mit.edu/projects/*'))
         .map(obj => ({

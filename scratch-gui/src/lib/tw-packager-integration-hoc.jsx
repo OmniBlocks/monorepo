@@ -2,6 +2,7 @@ import React from 'react';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import log from './log';
+import {getIsShowingProject} from '../reducers/project-state';
 
 const PACKAGER = 'https://packager.turbowarp.org';
 
@@ -26,10 +27,16 @@ const PackagerIntegrationHOC = function (WrappedComponent) {
             window.removeEventListener('message', this.handleMessage);
         }
         handleClickPackager () {
-            window.open(`${PACKAGER}/?import_from=${location.origin}`);
+            if (this.props.canOpenPackager) {
+                window.open(`${PACKAGER}/?import_from=${location.origin}`);
+            }
         }
         handleMessage (e) {
             if (e.origin !== PACKAGER) {
+                return;
+            }
+
+            if (!this.props.canOpenPackager) {
                 return;
             }
 
@@ -71,12 +78,14 @@ const PackagerIntegrationHOC = function (WrappedComponent) {
         }
     }
     PackagerIntegrationComponent.propTypes = {
+        canOpenPackager: PropTypes.bool,
         projectTitle: PropTypes.string,
         vm: PropTypes.shape({
             saveProjectSb3: PropTypes.func
         })
     };
     const mapStateToProps = state => ({
+        canOpenPackager: getIsShowingProject(state.scratchGui.projectState.loadingState),
         projectTitle: state.scratchGui.projectTitle,
         vm: state.scratchGui.vm
     });

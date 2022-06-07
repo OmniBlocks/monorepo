@@ -49,7 +49,8 @@ const fetchProjectToken = projectId => {
         })
         .then(dataOrNull => {
             const token = dataOrNull ? dataOrNull.project_token : null;
-            return token;
+            // We won't use the token for now.
+            return null;
         })
         .catch(err => {
             log.error(err);
@@ -133,8 +134,7 @@ const ProjectFetcherHOC = function (WrappedComponent) {
                 // TW: Temporary hack for project tokens
                 assetPromise = fetchProjectToken(projectId)
                     .then(token => {
-                        // TODO: for now we won't actually set the token until we're sure there won't be any surprises
-                        // storage.setProjectToken(token);
+                        storage.setProjectToken(token);
                         return storage.load(storage.AssetType.Project, projectId, storage.DataFormat.JSON);
                     });
             }

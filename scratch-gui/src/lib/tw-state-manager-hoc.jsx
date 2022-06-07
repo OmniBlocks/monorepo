@@ -90,7 +90,8 @@ class HashRouter extends Router {
     }
 
     generateURL ({projectId}) {
-        return `${location.pathname}${location.search}#${projectId}`;
+        const hashQuery = location.hash.split('?')[1];
+        return `${location.pathname}${location.search}#${projectId}${hashQuery ? `?${hashQuery}` : ''}`;
     }
 }
 
@@ -121,7 +122,11 @@ class FileHashRouter extends HashRouter {
         let newHash = '';
 
         if (projectId !== '0') {
-            newHash = `#${projectId}`;
+            newHash = projectId;
+        }
+        const hashQuery = location.hash.split('?')[1];
+        if (hashQuery) {
+            newHash += `?${hashQuery}`;
         }
 
         if (isFullScreen) {
@@ -132,7 +137,7 @@ class FileHashRouter extends HashRouter {
             newPathname = this.editorPath;
         }
 
-        return `${newPathname}${location.search}${newHash}`;
+        return `${newPathname}${location.search}${newHash ? `#${newHash}` : ''}`;
     }
 }
 

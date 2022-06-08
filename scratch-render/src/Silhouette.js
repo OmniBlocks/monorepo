@@ -144,6 +144,8 @@ class Silhouette {
             this._width = bitmapData.width;
             this._height = bitmapData.height;
             if (!(this._width && this._height)) {
+                // TW: It might seem really weird to return here before updating anything else, but this is what
+                // LLK/scratch-render does.
                 return;
             }
             this._lazyData = bitmapData;

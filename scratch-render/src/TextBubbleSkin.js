@@ -33,6 +33,8 @@ const BubbleStyle = {
     }
 };
 
+const MAX_SCALE = 10;
+
 class TextBubbleSkin extends Skin {
     /**
      * Create a new text bubble skin.
@@ -258,7 +260,7 @@ class TextBubbleSkin extends Skin {
     getTexture (scale) {
         // The texture only ever gets uniform scale. Take the larger of the two axes.
         const scaleMax = scale ? Math.max(Math.abs(scale[0]), Math.abs(scale[1])) : 100;
-        const requestedScale = scaleMax / 100;
+        const requestedScale = Math.min(MAX_SCALE, scaleMax / 100);
 
         // If we already rendered the text bubble at this scale, we can skip re-rendering it.
         if (this._textureDirty || this._renderedScale !== requestedScale) {

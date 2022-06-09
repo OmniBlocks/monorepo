@@ -239,6 +239,7 @@
         "addonFeedback": "Įskiepių atsiliepimas",
         "confirmResetAll": "Ar jūs tikras kad norite nustatyti visus įskiepių nustatymus į jų numatytąsias vertes?",
         "credits": "Padėkos:",
+        "dirty": "Perkrauk skirtukus nustatymų pritaikymui.",
         "dirtyButton": "Perkrauti dabar",
         "enableDangerous": "Šis įskiepis yra pavojingas ir gali tyčia IŠJUNGTI funkcijas. Dauguma naudotojų NETURĖTŲ įjungti šio priedo. Ar tikrai norite jį įjungti?",
         "export": "Eksportuoti nustatymus",

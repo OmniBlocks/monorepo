@@ -37,8 +37,6 @@ import vmListenerHOC from '../lib/vm-listener-hoc.jsx';
 import vmManagerHOC from '../lib/vm-manager-hoc.jsx';
 import cloudManagerHOC from '../lib/cloud-manager-hoc.jsx';
 import TWFullScreenResizerHOC from '../lib/tw-fullscreen-resizer-hoc.jsx';
-import TWRestorePointHOC from '../lib/tw-restore-point-hoc.jsx';
-import TWPackagerIntegrationHOC from '../lib/tw-packager-integration-hoc.jsx';
 
 import GUIComponent from '../components/gui/gui.jsx';
 import {setIsScratchDesktop} from '../lib/isScratchDesktop.js';
@@ -192,9 +190,7 @@ const WrappedGui = compose(
     vmManagerHOC,
     SBFileUploaderHOC,
     cloudManagerHOC,
-    TWFullScreenResizerHOC,
-    TWRestorePointHOC,
-    TWPackagerIntegrationHOC
+    TWFullScreenResizerHOC
 )(ConnectedGUI);
 
 WrappedGui.setAppElement = ReactModal.setAppElement;

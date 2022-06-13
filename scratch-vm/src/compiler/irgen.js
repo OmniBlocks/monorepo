@@ -676,6 +676,8 @@ class ScriptTreeGenerator {
                     value: block.fields[fields[0]].value
                 };
             }
+
+            log.warn(`IR: Unknown input: ${block.opcode}`, block);
             throw new Error(`IR: Unknown input: ${block.opcode}`);
         }
         }

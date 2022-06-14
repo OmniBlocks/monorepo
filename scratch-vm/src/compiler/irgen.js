@@ -80,6 +80,8 @@ class ScriptTreeGenerator {
          * @private
          */
         this.variableCache = {};
+
+        this.usesTimer = false;
     }
 
     setProcedureVariant (procedureVariant) {
@@ -620,6 +622,7 @@ class ScriptTreeGenerator {
                 object: this.descendInputOfBlock(block, 'OBJECT')
             };
         case 'sensing_timer':
+            this.usesTimer = true;
             return {
                 kind: 'timer.get'
             };
@@ -751,16 +754,26 @@ class ScriptTreeGenerator {
                 times: this.descendInputOfBlock(block, 'TIMES'),
                 do: this.descendSubstack(block, 'SUBSTACK')
             };
-        case 'control_repeat_until':
+        case 'control_repeat_until': {
             this.analyzeLoop();
+            // Dirty hack: automatically enable warp timer for this block if it uses timer
+            // This fixes project that do things like "repeat until timer > 0.5"
+            this.usesTimer = false;
+            const condition = this.descendInputOfBlock(block, 'CONDITION');
+            const needsWarpTimer = this.usesTimer;
+            if (needsWarpTimer) {
+                this.script.yields = true;
+            }
             return {
                 kind: 'control.while',
                 condition: {
                     kind: 'op.not',
-                    operand: this.descendInputOfBlock(block, 'CONDITION')
+                    operand: condition
                 },
-                do: this.descendSubstack(block, 'SUBSTACK')
+                do: this.descendSubstack(block, 'SUBSTACK'),
+                warpTimer: needsWarpTimer
             };
+        }
         case 'control_stop': {
             const level = block.fields.STOP_OPTION.value;
             if (level === 'all') {
@@ -798,7 +811,9 @@ class ScriptTreeGenerator {
             return {
                 kind: 'control.while',
                 condition: this.descendInputOfBlock(block, 'CONDITION'),
-                do: this.descendSubstack(block, 'SUBSTACK')
+                do: this.descendSubstack(block, 'SUBSTACK'),
+                // We should consider analyzing this like we do for control_repeat_until
+                warpTimer: false
             };
 
         case 'data_addtolist':

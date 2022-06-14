@@ -50,7 +50,7 @@ const PackagerIntegrationHOC = function (WrappedComponent) {
             this.props.vm.saveProjectSb3()
                 .then(readBlobAsArrayBuffer)
                 .then(buffer => {
-                    const name = `${this.props.projectTitle}.sb3`;
+                    const name = `${this.props.reduxProjectTitle}.sb3`;
                     e.source.postMessage({
                         p4: {
                             type: 'finish-import',
@@ -85,14 +85,14 @@ const PackagerIntegrationHOC = function (WrappedComponent) {
     }
     PackagerIntegrationComponent.propTypes = {
         canOpenPackager: PropTypes.bool,
-        projectTitle: PropTypes.string,
+        reduxProjectTitle: PropTypes.string,
         vm: PropTypes.shape({
             saveProjectSb3: PropTypes.func
         })
     };
     const mapStateToProps = state => ({
         canOpenPackager: getIsShowingProject(state.scratchGui.projectState.loadingState),
-        projectTitle: state.scratchGui.projectTitle,
+        reduxProjectTitle: state.scratchGui.projectTitle,
         vm: state.scratchGui.vm
     });
     const mapDispatchToProps = () => ({});

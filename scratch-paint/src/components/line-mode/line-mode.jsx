@@ -10,6 +10,7 @@ const LineModeComponent = props => (
         imgSrc={lineIcon}
         isSelected={props.isSelected}
         onMouseDown={props.onMouseDown}
+        keybinding="L"
     />
 );
 

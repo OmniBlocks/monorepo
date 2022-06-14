@@ -10,6 +10,7 @@ const BrushModeComponent = props => (
         imgSrc={brushIcon}
         isSelected={props.isSelected}
         onMouseDown={props.onMouseDown}
+        keybinding="B"
     />
 );
 

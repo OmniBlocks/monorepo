@@ -10,6 +10,7 @@ const EraserModeComponent = props => (
         imgSrc={eraserIcon}
         isSelected={props.isSelected}
         onMouseDown={props.onMouseDown}
+        keybinding="E"
     />
 );
 

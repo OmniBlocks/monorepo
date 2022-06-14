@@ -11,6 +11,7 @@ const BitRectComponent = props => (
         imgSrc={rectIcon}
         isSelected={props.isSelected}
         onMouseDown={props.onMouseDown}
+        keybinding="R"
     />
 );
 

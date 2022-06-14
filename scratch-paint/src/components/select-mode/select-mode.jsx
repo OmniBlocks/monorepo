@@ -11,6 +11,7 @@ const SelectModeComponent = props => (
         imgSrc={selectIcon}
         isSelected={props.isSelected}
         onMouseDown={props.onMouseDown}
+        keybinding="S"
     />
 );
 

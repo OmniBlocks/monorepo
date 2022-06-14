@@ -11,6 +11,7 @@ const ReshapeModeComponent = props => (
         imgSrc={reshapeIcon}
         isSelected={props.isSelected}
         onMouseDown={props.onMouseDown}
+        keybinding="A"
     />
 );
 

@@ -7,6 +7,13 @@ import Button from '../button/button.jsx';
 
 import styles from './tool-select-base.css';
 
+const formatWithKeyBinding = (description, keybinding) => {
+    if (!keybinding) {
+        return description;
+    }
+    return `${description} (${keybinding})`;
+};
+
 const ToolSelectComponent = props => (
     <Button
         className={
@@ -15,7 +22,7 @@ const ToolSelectComponent = props => (
             })
         }
         disabled={props.disabled}
-        title={props.intl.formatMessage(props.imgDescriptor)}
+        title={formatWithKeyBinding(props.intl.formatMessage(props.imgDescriptor), props.keybinding)}
         onClick={props.onMouseDown}
     >
         <img
@@ -35,6 +42,7 @@ ToolSelectComponent.propTypes = {
         description: PropTypes.string,
         id: PropTypes.string
     }).isRequired,
+    keybinding: PropTypes.string,
     imgSrc: PropTypes.string.isRequired,
     intl: intlShape.isRequired,
     isSelected: PropTypes.bool.isRequired,

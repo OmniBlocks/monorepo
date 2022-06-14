@@ -10,6 +10,7 @@ const OvalModeComponent = props => (
         imgSrc={ovalIcon}
         isSelected={props.isSelected}
         onMouseDown={props.onMouseDown}
+        keybinding="C"
     />
 );
 

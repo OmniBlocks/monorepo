@@ -29,6 +29,7 @@ const manifest = {
       "link": "https://scratch.mit.edu/users/Sheep_maker/"
     }
   ],
+  "dynamicDisable": true,
   "userscripts": [
     {
       "url": "userscript.js"

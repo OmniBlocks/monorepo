@@ -9,6 +9,7 @@ const manifest = {
       "name": "summerscar"
     }
   ],
+  "dynamicDisable": true,
   "userscripts": [
     {
       "url": "userscript.js"

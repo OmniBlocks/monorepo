@@ -21,6 +21,7 @@ const manifest = {
       "url": "userscript.js"
     }
   ],
+  "dynamicDisable": true,
   "enabledByDefault": true,
   "tags": [
     "recommended"

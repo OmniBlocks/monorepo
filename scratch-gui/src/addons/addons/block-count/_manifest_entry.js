@@ -10,6 +10,7 @@ const manifest = {
       "link": "https://scratch.mit.edu/users/TheColaber"
     }
   ],
+  "dynamicDisable": true,
   "userscripts": [
     {
       "url": "blockcount.js"

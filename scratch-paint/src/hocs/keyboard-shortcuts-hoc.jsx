@@ -103,12 +103,12 @@ const KeyboardShortcutsHOC = function (WrappedComponent) {
                 }
             } else if (!event.ctrlKey && !event.metaKey && !event.altKey) {
                 if (isVector(this.props.format)) {
-                    if (Object.hasOwnProperty.call(VECTOR_KEYBINDINGS, event.key)) {
+                    if (Object.prototype.hasOwnProperty.call(VECTOR_KEYBINDINGS, event.key)) {
                         this.props.changeMode(VECTOR_KEYBINDINGS[event.key]);
                         event.preventDefault();
                     }
                 } else if (isBitmap(this.props.format)) {
-                    if (Object.hasOwnProperty.call(BITMAP_KEYBINDINGS, event.key)) {
+                    if (Object.prototype.hasOwnProperty.call(BITMAP_KEYBINDINGS, event.key)) {
                         this.props.changeMode(BITMAP_KEYBINDINGS[event.key]);
                         event.preventDefault();
                     }

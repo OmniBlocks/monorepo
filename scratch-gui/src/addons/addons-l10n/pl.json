@@ -93,6 +93,8 @@
     "debugger/log-msg-flag-clicked": "Zielona Flaga została naciśnięta.",
     "debugger/no-logs": "Na razie nie ma żadnych informacji do wyświetlenia.",
     "debugger/no-threads-running": "Żadne wątki nie działają.",
+    "debugger/step": "Krok",
+    "debugger/step-desc": "Wywołuje jeden blok.",
     "debugger/tab-logs": "Logi",
     "debugger/tab-threads": "Wątki",
     "debugger/thread": "Wątek {id}",

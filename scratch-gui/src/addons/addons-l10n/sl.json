@@ -93,6 +93,8 @@
     "debugger/log-msg-flag-clicked": "Zelena zastavica kliknjena.",
     "debugger/no-logs": "Ni zapiskov za prikaz.",
     "debugger/no-threads-running": "Nobena nit ne deluje.",
+    "debugger/step": "Korak",
+    "debugger/step-desc": "Izvede en blok.",
     "debugger/tab-logs": "Zapiski",
     "debugger/tab-threads": "Niti",
     "debugger/thread": "Nit {id}",

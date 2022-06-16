@@ -138,6 +138,21 @@ export default async function ({ addon, global, console, msg }) {
     className: "sa-debugger-tab-content",
   });
 
+  const compilerWarning = document.createElement("a");
+  compilerWarning.addEventListener("click", () => {
+    addon.tab.redux.dispatch({
+      type: "scratch-gui/modals/OPEN_MODAL",
+      modal: "settingsModal"
+    });
+  });
+  compilerWarning.className = "sa-debugger-log sa-debugger-compiler-warning";
+  compilerWarning.textContent = "The debugger works best when the compiler is disabled.";
+  const updateCompilerWarningVisibility = () => {
+    compilerWarning.hidden = !vm.runtime.compilerOptions.enabled;
+  };
+  vm.on("COMPILER_OPTIONS_CHANGED", updateCompilerWarningVisibility);
+  updateCompilerWarningVisibility();
+
   let isInterfaceVisible = false;
   const setInterfaceVisible = (_isVisible) => {
     isInterfaceVisible = _isVisible;
@@ -186,7 +201,7 @@ export default async function ({ addon, global, console, msg }) {
   interfaceHeader.addEventListener("mousedown", handleStartDrag);
 
   interfaceHeader.append(tabListElement, buttonContainerElement);
-  interfaceContainer.append(interfaceHeader, tabContentContainer);
+  interfaceContainer.append(interfaceHeader, compilerWarning, tabContentContainer);
   document.body.append(interfaceContainer);
 
   const createHeaderButton = ({ text, icon, description }) => {
@@ -262,6 +277,8 @@ export default async function ({ addon, global, console, msg }) {
     afterStepCallbacks.push(cb);
   };
 
+  const getBlock = (target, id) => target.blocks.getBlock(id) || vm.runtime.flyoutBlocks.getBlock(id);
+
   const getTargetInfoById = (id) => {
     const target = vm.runtime.getTargetById(id);
     if (target) {
@@ -286,11 +303,11 @@ export default async function ({ addon, global, console, msg }) {
     };
   };
 
-  const createBlockLink = (targetId, blockId) => {
+  const createBlockLink = (targetInfo, blockId) => {
     const link = document.createElement("a");
     link.className = "sa-debugger-log-link";
 
-    const { exists, name, originalId } = getTargetInfoById(targetId);
+    const { exists, name, originalId } = targetInfo;
     link.textContent = name;
     if (exists) {
       // We use mousedown instead of click so that you can still go to blocks when logs are rapidly scrolling
@@ -396,7 +413,7 @@ export default async function ({ addon, global, console, msg }) {
       return null;
     }
 
-    const block = target.blocks.getBlock(blockId);
+    const block = getBlock(target, blockId);
     if (!block || block.opcode === "text") {
       return null;
     }
@@ -432,7 +449,7 @@ export default async function ({ addon, global, console, msg }) {
       }
     } else if (block.opcode === "procedures_definition") {
       const prototypeBlockId = block.inputs.custom_block.block;
-      const prototypeBlock = target.blocks.getBlock(prototypeBlockId);
+      const prototypeBlock = getBlock(target, prototypeBlockId);
       const proccode = prototypeBlock.mutation.proccode;
       text = ScratchBlocks.ScratchMsgs.translate("PROCEDURES_DEFINITION", "define %1").replace(
         "%1",
@@ -513,6 +530,7 @@ export default async function ({ addon, global, console, msg }) {
       createHeaderTab,
       setHasUnreadMessage,
       addAfterStepCallback,
+      getBlock,
       getTargetInfoById,
       createBlockLink,
       createBlockPreview,

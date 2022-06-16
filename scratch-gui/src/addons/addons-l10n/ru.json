@@ -70,6 +70,8 @@
     "debugger/log-msg-flag-clicked": "Зелёный флаг нажат.",
     "debugger/no-logs": "Нет логов для показа.",
     "debugger/no-threads-running": "Потоки не выполняются.",
+    "debugger/step": "Шаг",
+    "debugger/step-desc": "Выполнить один блок.",
     "debugger/tab-logs": "Логи",
     "debugger/tab-threads": "Потоки",
     "debugger/thread": "Поток {id}",

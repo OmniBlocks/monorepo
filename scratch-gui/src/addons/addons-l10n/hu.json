@@ -95,6 +95,8 @@
     "debugger/log-msg-flag-clicked": "A zöld zászló le volt nyomva.",
     "debugger/no-logs": "Nincs esemény feljegyezve.",
     "debugger/no-threads-running": "Nincsenek éppen futó szálak.",
+    "debugger/step": "Továbblépés",
+    "debugger/step-desc": "Lefuttat egy blokkot",
     "debugger/tab-logs": "Napló",
     "debugger/tab-threads": "Szálak",
     "debugger/thread": "Szál {id}",

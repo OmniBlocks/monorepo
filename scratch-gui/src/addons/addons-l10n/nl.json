@@ -88,6 +88,8 @@
     "debugger/log-msg-flag-clicked": "Groene vlag geklikt.",
     "debugger/no-logs": "Er zijn geen logs om weer te geven.",
     "debugger/no-threads-running": "Geen threads aan de gang.",
+    "debugger/step": "Stap",
+    "debugger/step-desc": "Voert één blok uit.",
     "debugger/unknown-sprite": "(onbekende sprite)",
     "debugger/unpause": "Hervatten",
     "pause/pause": "Pauzeren",

@@ -95,6 +95,8 @@
     "debugger/log-msg-flag-clicked": "緑の旗が押されました。",
     "debugger/no-logs": "表示する内容がありません。",
     "debugger/no-threads-running": "実行中のスレッドはありません。",
+    "debugger/step": "次に進む",
+    "debugger/step-desc": "ブロックを一つずつ実行する。",
     "debugger/tab-logs": "ログ",
     "debugger/tab-threads": "スレッド",
     "debugger/thread": "スレッド {id}",

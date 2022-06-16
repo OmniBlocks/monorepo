@@ -289,8 +289,6 @@ const SKIP_MESSAGES = [
     'debugger/@settings-name-log_invalid_cloud_data',
     'debugger/log-cloud-data-nan',
     'debugger/log-cloud-data-too-long',
-    'debugger/step',
-    'debugger/step-desc',
     'debugger/tab-performance',
     'debugger/performance-framerate-title',
     'debugger/performance-framerate-graph-tooltip',

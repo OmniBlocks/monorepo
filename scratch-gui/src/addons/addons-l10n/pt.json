@@ -91,6 +91,8 @@
     "debugger/log-msg-flag-clicked": "Bandeira verde clicada.",
     "debugger/no-logs": "Não há registros para mostrar.",
     "debugger/no-threads-running": "Nenhuma linha em execução.",
+    "debugger/step": "Avançar um passo",
+    "debugger/step-desc": "Executa um bloco.",
     "debugger/tab-logs": "Registros",
     "debugger/tab-threads": "Linhas de execução",
     "debugger/thread": "Linha de execução {id}",

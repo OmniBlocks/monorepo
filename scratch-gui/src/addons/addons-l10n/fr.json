@@ -94,6 +94,8 @@
     "debugger/log-msg-flag-clicked": "Drapeau vert cliqué.",
     "debugger/no-logs": "Il y a aucune activité à montrer.",
     "debugger/no-threads-running": "Aucun processus en cours d'exécution.",
+    "debugger/step": "Avancer",
+    "debugger/step-desc": "Exécute un seul bloc.",
     "debugger/tab-logs": "Activités",
     "debugger/tab-threads": "Processus",
     "debugger/unknown-sprite": "(sprite inconnu)",

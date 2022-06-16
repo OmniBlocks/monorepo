@@ -95,6 +95,8 @@
     "debugger/log-msg-flag-clicked": "Green flag clicked.",
     "debugger/no-logs": "There are no logs to display.",
     "debugger/no-threads-running": "No threads running.",
+    "debugger/step": "Step",
+    "debugger/step-desc": "Executes one block.",
     "debugger/tab-logs": "Logs",
     "debugger/tab-threads": "Threads",
     "debugger/thread": "Thread {id}",

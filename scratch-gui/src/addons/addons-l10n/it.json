@@ -92,6 +92,8 @@
     "debugger/log-msg-flag-clicked": "Bandiera verde cliccata.",
     "debugger/no-logs": "Non ci sono log da mostrare.",
     "debugger/no-threads-running": "Nessun thread in esecuzione.",
+    "debugger/step": "Passi",
+    "debugger/step-desc": "Esegue un blocco.",
     "debugger/tab-logs": "Log",
     "debugger/tab-threads": "Thread",
     "debugger/unknown-sprite": "(sprite sconosciuto)",

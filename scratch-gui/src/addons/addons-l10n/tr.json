@@ -95,6 +95,8 @@
     "debugger/log-msg-flag-clicked": "Yeşil bayrağa tıklandı.",
     "debugger/no-logs": "Görüntülenecek günlük yok.",
     "debugger/no-threads-running": "Çalışan blok dizesi yok.",
+    "debugger/step": "Adım",
+    "debugger/step-desc": "Bir bloğu çalıştırır.",
     "debugger/tab-logs": "Günlükler",
     "debugger/tab-threads": "Blok Dizeleri",
     "debugger/thread": "{id} numaralı blok dizesi",

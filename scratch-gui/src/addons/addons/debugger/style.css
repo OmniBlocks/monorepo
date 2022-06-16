@@ -266,3 +266,17 @@
 .sa-debugger-thread-compiled {
   font-style: italic;
 }
+
+.sa-debugger-compiler-warning {
+  position: relative;
+  display: block;
+  text-align: center;
+  height: 24px;
+  color: #2121bf;
+}
+.sa-debugger-compiler-warning[hidden] {
+  display: none;
+}
+[theme="dark"] .sa-debugger-compiler-warning {
+  color: #bdbdf9;
+}

@@ -304,8 +304,10 @@ class CustomAlgorythmCanvas {
     public selected: number;
     public inverseModulation: number[][];
     public feedback: number[][];
+    public inverseFeedback: number[][];
     public carriers: number;
     public drawArray: number[][];
+    public mode: string;
 
     private _change: Change | null = null;
 
@@ -328,6 +330,8 @@ class CustomAlgorythmCanvas {
         this.newMods = [[], [], [], [], [], []];
         this.inverseModulation = [[], [], [], [], [], []];
         this.feedback = [[], [], [], [], [], []];
+        this.inverseFeedback = [[], [], [], [], [], []];
+        this.mode = "algorithm";
 
         this.redrawCanvas();
 
@@ -344,6 +348,14 @@ class CustomAlgorythmCanvas {
                     this.inverseModulation[this.newMods[i][o] - 1].push(i + 1);
                 }
             }
+            if (this.mode == "feedback") {
+                this.inverseFeedback = [[], [], [], [], [], []];
+                for (let i: number = 0; i < this.feedback.length; i++) {
+                    for (let o: number = 0; o < this.feedback[i].length; o++) {
+                        this.inverseFeedback[this.feedback[i][o] - 1].push(i + 1);
+                    }
+                }
+            }
         } else {
             this.drawArray = [];
             this.drawArray = [[], [], [], [], [], []];
@@ -358,6 +370,18 @@ class CustomAlgorythmCanvas {
                 for (let o: number = 0; o < oldMods.modulatedBy[i].length; o++) {
                     this.inverseModulation[oldMods.modulatedBy[i][o] - 1].push(i + 1);
                     this.newMods[i][o] = oldMods.modulatedBy[i][o];
+                }
+            }
+            if (this.mode == "feedback") {
+                this.feedback = [[], [], [], [], [], []];
+                this.inverseFeedback = [[], [], [], [], [], []];
+
+                var oldfeed = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()].customFeedbackType.indices;
+                for (let i: number = 0; i < oldfeed.length; i++) {
+                    for (let o: number = 0; o < oldfeed[i].length; o++) {
+                        this.inverseFeedback[oldfeed[i][o] - 1].push(i + 1);
+                        this.feedback[i][o] = oldfeed[i][o];
+                    }
                 }
             }
         }
@@ -397,6 +421,97 @@ class CustomAlgorythmCanvas {
         }
     }
     
+    private drawLines(ctx:CanvasRenderingContext2D):void {
+        if (this.mode == "feedback") {
+            for (let off: number = 0; off < 6; off++) {
+                ctx.strokeStyle = ColorConfig.getArbitaryChannelColor("pitch", off).primaryChannel;
+                const set = off * 2  + 0.5;
+                for (let i: number = 0; i < this.inverseFeedback[off].length; i++) {
+                    let tar: number = this.inverseFeedback[off][i] - 1;
+					let srtpos:number[] = this.lookUpArray[off];
+					let tarpos:number[] = this.lookUpArray[tar];
+                    ctx.beginPath();
+                    ctx.moveTo(srtpos[1] * 24 + 12 + set, (6 - srtpos[0] - 1) * 24 + 12);
+                    ctx.lineTo(srtpos[1] * 24 + 12 + set, (6 - srtpos[0] - 1) * 24 + 12 + set);
+                    if (tarpos[1] != srtpos[1]) {
+						let side:number =0;
+						if(tarpos[0] >= srtpos[0]){
+							side = 24;
+						}
+                        ctx.lineTo(srtpos[1] * 24 + side + set, (6 - srtpos[0] - 1) * 24 + 12 + set);
+                        if ((tarpos[1] == (srtpos[1] - 1)) && (tarpos[0] <= (srtpos[0] - 1))) {
+                        } else {
+							if(tarpos[0] >= srtpos[0]){
+								ctx.lineTo((tarpos[1] + 1) * 24 + set, (6 - srtpos[0] - 1) * 24 + 12 + set);
+								ctx.lineTo((tarpos[1] + 1) * 24 + set, (6 - tarpos[0] - 1) * 24 + 12 + set);
+							}else{
+								ctx.lineTo(srtpos[1] * 24 + set, (6 - tarpos[0] - 1) * 24 + 12 + set);
+								ctx.lineTo((tarpos[1] + 1) * 24 + set, (6 - tarpos[0] - 1) * 24 + 12 + set);
+							}
+                        }
+                        ctx.lineTo((tarpos[1] + 1) * 24 + set, (6 - tarpos[0] - 1) * 24 + set - 12);
+                        ctx.lineTo((tarpos[1]) * 24 + 12 + set, (6 - tarpos[0] - 1) * 24 + set - 12);
+                        ctx.lineTo((tarpos[1]) * 24 + 12 + set, (6 - tarpos[0] - 1) * 24);
+                    } else {
+                        if (srtpos[0] - tarpos[0] == 1) {
+                            ctx.lineTo((tarpos[1]) * 24 + 12 + set, (6 - tarpos[0] - 1) * 24);
+                        } else {
+							if(tarpos[0] >= srtpos[0]){
+								ctx.lineTo(srtpos[1] * 24 + 24 + set, (6 - srtpos[0] - 1) * 24 + 12 + set);
+								ctx.lineTo(srtpos[1] * 24 + 24 + set, (6 - tarpos[0] - 1) * 24 + set - 12);
+								ctx.lineTo(tarpos[1] * 24 + set + 12, (6 - tarpos[0] - 1) * 24 + set - 12);
+								ctx.lineTo(tarpos[1] * 24 + set + 12, (6 - tarpos[0] - 1) * 24);
+							}else{
+								ctx.lineTo(srtpos[1] * 24 + set, (6 - srtpos[0] - 1) * 24 + 12 + set);
+								ctx.lineTo(srtpos[1] * 24 + set, (6 - tarpos[0] - 1) * 24 + set - 12);
+								ctx.lineTo(tarpos[1] * 24 + 12 + set, (6 - tarpos[0] - 1) * 24 + set - 12);
+								ctx.lineTo(tarpos[1] * 24 + 12 + set, (6 - tarpos[0] - 1) * 24);
+							}
+                        }
+                    }
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                }
+            }
+            return;
+        };
+
+        for (let off: number = 0; off < 6; off++) {
+            ctx.strokeStyle = ColorConfig.getArbitaryChannelColor("pitch", off).primaryChannel;
+            const set = off * 2 - 1 + 0.5;
+            for (let i: number = 0; i < this.inverseModulation[off].length; i++) {
+                let tar: number = this.inverseModulation[off][i] - 1;
+				let srtpos:number[] = this.lookUpArray[off];
+				let tarpos:number[] = this.lookUpArray[tar];
+                ctx.beginPath();
+                ctx.moveTo(srtpos[1] * 24 + 12 + set, (6 - srtpos[0] - 1) * 24 + 12);
+                ctx.lineTo(srtpos[1] * 24 + 12 + set, (6 - srtpos[0] - 1) * 24 + 12 + set);
+                if ((tarpos[1]) != srtpos[1]) {
+                    ctx.lineTo(srtpos[1] * 24 + set, (6 - srtpos[0] - 1) * 24 + 12 + set);
+                    if ((tarpos[1] == (srtpos[1] - 1)) && (tarpos[0] <= (srtpos[0] - 1))) {
+                    } else {
+                        ctx.lineTo(srtpos[1] * 24 + set, (6 - tarpos[0] - 1) * 24 + 12 + set);
+                        ctx.lineTo((tarpos[1] + 1) * 24 + set, (6 - tarpos[0] - 1) * 24 + 12 + set);
+                    }
+                    ctx.lineTo((tarpos[1] + 1) * 24 + set, (6 - tarpos[0] - 1) * 24 + set - 12);
+                    ctx.lineTo((tarpos[1]) * 24 + 12 + set, (6 - tarpos[0] - 1) * 24 + set - 12);
+                    ctx.lineTo((tarpos[1]) * 24 + 12 + set, (6 - tarpos[0] - 1) * 24);
+                } else {
+                    if (Math.abs(tarpos[0] - srtpos[0]) == 1) {
+                        ctx.lineTo((tarpos[1]) * 24 + 12 + set, (6 - tarpos[0] - 1) * 24);
+                    } else {
+						ctx.lineTo(srtpos[1] * 24 + set, (6 - srtpos[0] - 1) * 24 + 12 + set);
+						ctx.lineTo(srtpos[1] * 24 + set, (6 - tarpos[0] - 1) * 24 + set - 12);
+						ctx.lineTo(srtpos[1] * 24 + 12 + set, (6 - tarpos[0] - 1) * 24 + set - 12);
+						ctx.lineTo(srtpos[1] * 24 + 12 + set, (6 - tarpos[0] - 1) * 24);
+                    }
+                }
+                ctx.lineWidth = 1;
+                ctx.stroke();
+            }
+        }
+    }
+
     public redrawCanvas(noReset:boolean = false): void {
         this.fillDrawArray(noReset);
         var ctx = this.canvas.getContext("2d") as CanvasRenderingContext2D;
@@ -431,40 +546,9 @@ class CustomAlgorythmCanvas {
                 }
             }
         }
-        console.log("draw lines")
-        for (let off: number = 0; off < 6; off++) {
-            ctx.strokeStyle = ColorConfig.getArbitaryChannelColor("pitch", off).primaryChannel;
-            const set = off * 2-1+0.5;
-            for (let i: number = 0; i < this.inverseModulation[off].length; i++) {
-                let tar: number = this.inverseModulation[off][i]-1;
-                ctx.beginPath();
-                ctx.moveTo(this.lookUpArray[off][1] * 24 + 12 + set, (6 - this.lookUpArray[off][0] - 1) * 24 + 12);
-                ctx.lineTo(this.lookUpArray[off][1] * 24 + 12 + set, (6 - this.lookUpArray[off][0] - 1) * 24 + 12 + set);
-                if ((this.lookUpArray[tar][1]) != this.lookUpArray[off][1]) {
-                    ctx.lineTo(this.lookUpArray[off][1] * 24 + set, (6 - this.lookUpArray[off][0] - 1) * 24 + 12 + set);
-                    if ((this.lookUpArray[tar][1] == (this.lookUpArray[off][1] - 1)) && (this.lookUpArray[tar][0] <= (this.lookUpArray[off][0] - 1))) {
-                    } else {
-                        ctx.lineTo(this.lookUpArray[off][1] * 24 + set, (6 - this.lookUpArray[tar][0] - 1) * 24 + 12 + set);
-                        ctx.lineTo((this.lookUpArray[tar][1] + 1) * 24 + set, (6 - this.lookUpArray[tar][0] - 1) * 24 + 12 + set);
-                    }
-                    ctx.lineTo((this.lookUpArray[tar][1] + 1) * 24 + set, (6 - this.lookUpArray[tar][0] - 1) * 24 + set - 12);
-                    ctx.lineTo((this.lookUpArray[tar][1]) * 24 + 12 + set, (6 - this.lookUpArray[tar][0] - 1) * 24 + set - 12);
-                    ctx.lineTo((this.lookUpArray[tar][1]) * 24 + 12 + set, (6 - this.lookUpArray[tar][0] - 1) * 24);
-                } else {
-                    if (Math.abs(this.lookUpArray[tar][0] - this.lookUpArray[off][0]) == 1) {
-                        ctx.lineTo((this.lookUpArray[tar][1]) * 24 + 12 + set, (6 - this.lookUpArray[tar][0] - 1) * 24);
-                    } else {
-                        ctx.lineTo(this.lookUpArray[off][1] * 24 + set, (6 - this.lookUpArray[off][0] - 1) * 24 + 12 + set);
-                        ctx.lineTo(this.lookUpArray[off][1] * 24 + set, (6 - this.lookUpArray[tar][0] - 1) * 24 + set - 12);
-                        ctx.lineTo(this.lookUpArray[off][1] * 24 + 12 + set, (6 - this.lookUpArray[tar][0] - 1) * 24 + set - 12);
-                        ctx.lineTo(this.lookUpArray[off][1] * 24 + 12 + set, (6 - this.lookUpArray[tar][0] - 1) * 24);
-                    }
-                }
-                ctx.lineWidth = 1;
-                ctx.stroke();
-            }
-        }
-        console.log("draw complete")
+        this.drawLines(ctx);
+        
+        //console.log("draw complete")
     }
 
     private _onMouseMove = (event: MouseEvent): void => {
@@ -495,32 +579,42 @@ class CustomAlgorythmCanvas {
                 }
             } else {
                 if (this.drawArray ?.[yindex] ?.[xindex] != undefined) {
-                    if (this.drawArray[yindex][xindex] == this.selected) {
-                        if (this.selected == this.carriers) {
-                            if (this.selected > 1) {
-                                this.carriers--;
-                            }
-                        } else if (this.selected - 1 == this.carriers) {
-                            this.carriers++
-                        }
-                    } else {
+					if(this.mode == "feedback"){
                         const newmod = this.drawArray[yindex][xindex]
-                        if (this.selected > newmod) { //todo try to rebalence then do this in algorithm mode otherwise input as needed
-                            let check = this.newMods[newmod - 1].indexOf(this.selected);
-                            if (check != -1) {
-                                this.newMods[newmod - 1].splice(check, 1);
-                            } else {
-                                this.newMods[newmod - 1].push(this.selected);
-                            }
-                        } else {
-                            let check = this.newMods[this.selected - 1].indexOf(newmod);
-                            if (check != -1) {
-                                this.newMods[this.selected - 1].splice(check, 1);
-                            } else {
-                                this.newMods[this.selected - 1].push(newmod);
-                            }
-                        }
-                    }
+						let check = this.feedback[newmod - 1].indexOf(this.selected);
+						if (check != -1) {
+							this.feedback[newmod - 1].splice(check, 1);
+						} else {
+							this.feedback[newmod - 1].push(this.selected);
+						}
+					} else {
+						if (this.drawArray[yindex][xindex] == this.selected) {
+							if (this.selected == this.carriers) {
+								if (this.selected > 1) {
+									this.carriers--;
+								}
+							} else if (this.selected - 1 == this.carriers) {
+								this.carriers++
+							}
+						} else {
+							const newmod = this.drawArray[yindex][xindex]
+							if (this.selected > newmod) { //todo try to rebalence then do this in algorithm mode otherwise input as needed
+								let check = this.newMods[newmod - 1].indexOf(this.selected);
+								if (check != -1) {
+									this.newMods[newmod - 1].splice(check, 1);
+								} else {
+									this.newMods[newmod - 1].push(this.selected);
+								}
+							} else {
+								let check = this.newMods[this.selected - 1].indexOf(newmod);
+								if (check != -1) {
+									this.newMods[this.selected - 1].splice(check, 1);
+								} else {
+									this.newMods[this.selected - 1].push(newmod);
+								}
+							}
+						}
+					}
                     this.selected = -1;
                     this.redrawCanvas(true);
                     this.mouseDown = false;
@@ -550,7 +644,7 @@ class CustomAlgorythmCanvas {
     }
 
     private _whenChange = (): void => {
-        this._change = this._getChange(this.newMods, this.carriers, "algorithm");
+        this._change = this._getChange(this.mode == "algorithm" ? this.newMods : this.feedback, this.carriers, this.mode);
 
         this._doc.record(this._change!);
 
@@ -571,15 +665,19 @@ class oscilascopeCanvas {
                 ctx.fillStyle = ColorConfig.getComputed("--editor-background");
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+                ctx.fillStyle = ColorConfig.getComputed("--primary-text");
                 for (let i: number = directlinkL.length - 1; i >= directlinkL.length - 1 - canvas.width; i--) {
                     let x = i - (directlinkL.length - 1) + canvas.width;
                     let yl = (directlinkL[i] * (canvas.height / 2) + (canvas.height / 2));
-                    let yr = (directlinkR[i] * (canvas.height / 2) + (canvas.height / 2));
 
-                    ctx.fillStyle = ColorConfig.getComputed("--primary-text");
                     ctx.fillRect(x - 1, yl - 1, 1, 1.5);
-
-                    ctx.fillStyle = ColorConfig.getComputed("--secondary-text");
+                    if (x == 0) break;
+                }
+                ctx.fillStyle = ColorConfig.getComputed("--text-selection"); //less ctx style calls = less expensive??? also avoiding uncached colors
+                for (let i: number = directlinkR.length - 1; i >= directlinkR.length - 1 - canvas.width; i--) {
+                    let x = i - (directlinkR.length - 1) + canvas.width;
+                    let yr = (directlinkR[i] * (canvas.height / 2) + (canvas.height / 2));
+                    
                     ctx.fillRect(x - 1, yr - 1, 1, 1.5);
                     if (x == 0) break;
                 }
@@ -600,15 +698,19 @@ class oscilascopeCanvas {
                 ctx.fillStyle = ColorConfig.getComputed("--editor-background");
                 ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
+                ctx.fillStyle = ColorConfig.getComputed("--primary-text");
                 for (let i: number = arrays[0].length - 1; i >= arrays[0].length - 1 - this.canvas.width; i--) {
                     let x = i - (arrays[0].length - 1) + this.canvas.width;
                     let yl = (arrays[0][i] * (this.canvas.height / 2) + (this.canvas.height / 2));
+
+                    ctx.fillRect(x - 1, yl - 1, 1, 1.5);
+                    if (x == 0) break;
+                }
+                ctx.fillStyle = ColorConfig.getComputed("--text-selection");
+                for (let i: number = arrays[1].length - 1; i >= arrays[1].length - 1 - this.canvas.width; i--) {
+                    let x = i - (arrays[1].length - 1) + this.canvas.width;
                     let yr = (arrays[1][i] * (this.canvas.height / 2) + (this.canvas.height / 2));
 
-                    ctx.fillStyle = ColorConfig.getComputed("--primary-text");
-                    ctx.fillRect(x - 1, yl - 1, 1, 1.5);
-
-                    ctx.fillStyle = ColorConfig.getComputed("--secondary-text");
                     ctx.fillRect(x - 1, yr - 1, 1, 1.5);
                     if (x == 0) break;
                 }
@@ -797,10 +899,12 @@ export class SongEditor {
 
     private readonly _feedback6OpTypeSelect: HTMLSelectElement = buildOptions(select(), Config.feedbacks6Op.map(feedback => feedback.name));
     private readonly _feedback6OpRow1: HTMLDivElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("feedbackType") }, "Feedback:"), div({ class: "selectContainer" }, this._feedback6OpTypeSelect));
+
+    private readonly _algorithmCanvasSwitch: HTMLButtonElement = button({ style: "margin-left:0em; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: () => this._toggleAlgorithmCanvas() }, "A");
     private readonly _customAlgorithmCanvas: CustomAlgorythmCanvas = new CustomAlgorythmCanvas(canvas({ width: 144, height: 144, style: "border:2px solid " + ColorConfig.uiWidgetBackground, id: "customAlgorithmCanvas" }), this._doc, (newArray: number[][], carry: number, mode: string) => new ChangeCustomAlgorythmorFeedback(this._doc, newArray, carry, mode));
     private readonly _algorithm6OpSelect: HTMLSelectElement = buildOptions(select(), Config.algorithms6Op.map(algorithm => algorithm.name));
     private readonly _algorithm6OpSelectRow: HTMLDivElement = div(div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("algorithm") }, "Algorithm: "), div({ class: "selectContainer" }, this._algorithm6OpSelect))
-        , div({ style: "height:144px; display:flex; justify-content:center;" }, [this._customAlgorithmCanvas.canvas]));//temp
+        , div({ style: "height:144px; display:flex; flex-direction: row; align-items:center; justify-content:center;" }, div({style:"display:block; width:10px; margin-right: 0.2em"},this._algorithmCanvasSwitch), div({style: "width:144px; height:144px;"},this._customAlgorithmCanvas.canvas)));//temp
 
 	private readonly _instrumentCopyButton: HTMLButtonElement = button({ style: "max-width:86px;", class: "copyButton" }, [
 		"Copy",
@@ -1284,6 +1388,15 @@ export class SongEditor {
 			fullScreenOption.setAttribute("hidden", "");
 		}
 	}
+
+    private _toggleAlgorithmCanvas():void {
+        if (this._customAlgorithmCanvas.mode != "feedback") {
+            this._customAlgorithmCanvas.mode = "feedback";
+        } else {
+            this._customAlgorithmCanvas.mode = "algorithm";
+        }
+        this._customAlgorithmCanvas.redrawCanvas();
+    }
 
 	private _toggleDropdownMenu(dropdown: DropdownID, submenu: number = 0): void {
 		let target: HTMLButtonElement = this._vibratoDropdown;

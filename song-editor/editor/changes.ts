@@ -381,12 +381,12 @@ export class ChangeCustomAlgorythmorFeedback extends Change {
                 for (let i: number = 0; i < oldArray.length; i++) {
                     if (oldArray[i].length != newArray[i].length) {
                         comparisonResult = false;
-                        i = oldArray.length;
+                        break;
                     } else {
                         for (let j: number = 0; j < oldArray[i].length; j++) {
                             if (oldArray[i][j] != newArray[i][j]) {
                                 comparisonResult = false;
-                                i = oldArray.length;
+                                break;
                             }
                         }
                     }
@@ -398,6 +398,32 @@ export class ChangeCustomAlgorythmorFeedback extends Change {
                 instrument.customAlgorithm.set(carry, newArray);
 
                 instrument.algorithm6Op = 0;
+                doc.notifier.changed();
+                this._didSomething();
+            }
+        }else if (mode == "feedback") {
+            const oldArray: number[][] = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()].customFeedbackType.indices;
+            var comparisonResult: boolean = true;
+			for (let i: number = 0; i < oldArray.length; i++) {
+				if (oldArray[i].length != newArray[i].length) {
+					comparisonResult = false;
+					break;
+				} else {
+					for (let j: number = 0; j < oldArray[i].length; j++) {
+						if (oldArray[i][j] != newArray[i][j]) {
+							comparisonResult = false;
+							break;
+						}
+					}
+				}
+			}
+            
+            if (!comparisonResult) {
+                let instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+
+                instrument.customFeedbackType.set(newArray);
+
+                instrument.feedbackType6Op = 0;
                 doc.notifier.changed();
                 this._didSomething();
             }

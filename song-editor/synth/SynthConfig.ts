@@ -369,12 +369,12 @@ export class Config {
         //Algorithm Section 2
         { name: "1←3 2←(4 5←6)", carrierCount: 2, associatedCarrier: [1, 2, 2, 2, 2, 2], modulatedBy: [[3], [4, 5], [], [], [6], []] },
         { name: "1←(3 4) 2←5←6", carrierCount: 2, associatedCarrier: [1, 2, 2, 2, 2, 2], modulatedBy: [[3, 4], [5], [], [], [6], []] },
-        { name: "1←3 2←(4 5 6)", carrierCount: 2, associatedCarrier: [1, 2, 2, 2, 2, 2], modulatedBy: [[3], [4, 5, 6], [], [], [], []] },
+        { name: "1←3 2←(4 5 6)", carrierCount: 2, associatedCarrier: [1, 2, 2, 2, 2, 2], modulatedBy: [[3], [4, 5, 6], [], [], [], []] },
         { name: "1←3 2←(4 5)←6", carrierCount: 2, associatedCarrier: [1, 2, 2, 2, 2, 2], modulatedBy: [[3], [4, 5], [], [6], [6], []] },
-        { name: "1←3 2←4←(5 6)", carrierCount: 2, associatedCarrier: [1, 2, 2, 2, 2, 2], modulatedBy: [[3], [4], [], [5, 6], [], []] },
-        { name: "1←(2 3 4 5 6)", carrierCount: 1, associatedCarrier: [1, 1, 1, 1, 1, 1], modulatedBy: [[2, 3, 4, 5, 6], [], [], [], [], []] },
-        { name: "1←(2 3←5 4←6)", carrierCount: 1, associatedCarrier: [1, 1, 1, 1, 1, 1], modulatedBy: [[2, 3, 4], [], [5], [6], [], []] },
-        { name: "1←(2 3 4←5←6)", carrierCount: 1, associatedCarrier: [1, 1, 1, 1, 1, 1], modulatedBy: [[2, 3, 4], [], [], [5], [6], []] },
+        { name: "1←3 2←4←(5 6)", carrierCount: 2, associatedCarrier: [1, 2, 2, 2, 2, 2], modulatedBy: [[3], [4], [], [5, 6], [], []] },
+        { name: "1←(2 3 4 5 6)", carrierCount: 1, associatedCarrier: [1, 1, 1, 1, 1, 1], modulatedBy: [[2, 3, 4, 5, 6], [], [], [], [], []] },
+        { name: "1←(2 3←5 4←6)", carrierCount: 1, associatedCarrier: [1, 1, 1, 1, 1, 1], modulatedBy: [[2, 3, 4], [], [5], [6], [], []] },
+        { name: "1←(2 3 4←5←6)", carrierCount: 1, associatedCarrier: [1, 1, 1, 1, 1, 1], modulatedBy: [[2, 3, 4], [], [], [5], [6], []] },
         //Algorithm Section 3
         { name: "1←4←5 (2 3)←6", carrierCount: 3, associatedCarrier: [1, 2, 3, 1, 2, 3], modulatedBy: [[4], [6], [6], [5], [], []] },
         { name: "1←(3 4)←5 2←6", carrierCount: 2, associatedCarrier: [1, 2, 2, 2, 2, 2], modulatedBy: [[3, 4], [6], [5], [5], [], []] },
@@ -508,10 +508,10 @@ export class Config {
         { name: "4⟲", indices: [[], [], [], [4], [], []] },
         { name: "4⟲", indices: [[], [], [], [], [5], []] },
         { name: "4⟲", indices: [[], [], [], [], [], [6]] },
-        { name: "1⟲ 2⟲", indices: [[1], [2], [], [], [], []] },
-        { name: "3⟲ 4⟲", indices: [[], [], [3], [4], [], []] },
-        { name: "1⟲ 2⟲ 3⟲", indices: [[1], [2], [3], [], [], []] },
-        { name: "2⟲ 3⟲ 4⟲", indices: [[], [2], [3], [4], [], []] },
+        { name: "1⟲ 2⟲", indices: [[1], [2], [], [], [], []] },
+        { name: "3⟲ 4⟲", indices: [[], [], [3], [4], [], []] },
+        { name: "1⟲ 2⟲ 3⟲", indices: [[1], [2], [3], [], [], []] },
+        { name: "2⟲ 3⟲ 4⟲", indices: [[], [2], [3], [4], [], []] },
         { name: "1⟲ 2⟲ 3⟲ 4⟲", indices: [[1], [2], [3], [4], [], []] },
         { name: "1⟲ 2⟲ 3⟲ 4⟲ 5⟲", indices: [[1], [2], [3], [4], [5], []] },
         { name: "1⟲ 2⟲ 3⟲ 4⟲ 5⟲ 6⟲", indices: [[1], [2], [3], [4], [5], [6]] },
@@ -524,8 +524,8 @@ export class Config {
         { name: "2→4", indices: [[], [], [], [2], [], []] },
         { name: "3→4", indices: [[], [], [], [3], [], []] },
         { name: "4→5", indices: [[], [], [], [], [4], []] },
-        { name: "1→4 2→5 3→6", indices: [[], [], [], [1], [2], [3]] },
-        { name: "1→5 2→6 3→4", indices: [[], [], [], [3], [1], [2]] },
+        { name: "1→4 2→5 3→6", indices: [[], [], [], [1], [2], [3]] },
+        { name: "1→5 2→6 3→4", indices: [[], [], [], [3], [1], [2]] },
         { name: "1→2→3→4→5→6", indices: [[], [1], [2], [3], [4], [5]] },
         { name: "2→1→6→5→4→3→2", indices: [[2], [3], [4], [5], [6], [1]] },
         { name: "1→2→3→4→5→6→1", indices: [[6], [1], [2], [3], [4], [5]] },
@@ -551,7 +551,7 @@ export class Config {
 	public static readonly noiseChannelCountMin: number = 0;
 	public static readonly noiseChannelCountMax: number = 8;
 	public static readonly modChannelCountMin: number = 0;
-	public static readonly modChannelCountMax: number = 8;
+	public static readonly modChannelCountMax: number = 16;
 	public static readonly noiseInterval: number = 6;
 	public static readonly pitchesPerOctave: number = 12; // TODO: Use this for converting pitch to frequency.
 	public static readonly drumCount: number = 12;

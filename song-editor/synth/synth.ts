@@ -423,12 +423,17 @@ export class CustomAlgorithm {
             if (i < carriers) {
                 this.associatedCarrier[i] = i+1;
             }
+            this.name += (i+1);
             for (let j = 0; j < modulation[i].length;j++) {
                 this.name += modulation[i][j];
-                if (modulation[i][j]-1 > carriers) {
-                    this.associatedCarrier[modulation[i][j]-1] = i+1;
-                    this.name += ",";
+                if (modulation[i][j] > carriers-1) {
+                    this.associatedCarrier[modulation[i][j] - 1] = i + 1;
                 }
+                this.name += ",";
+            }
+            if (i < carriers) {
+                this.name += "|";
+            } else {
                 this.name += ".";
             }
         }
@@ -473,7 +478,7 @@ export class CustomFeedBack { //feels redunant
         for (let i = 0; i < this.indices.length; i++) {
             this.indices[i] = inIndices[i];
             for (let j = 0; j < inIndices[i].length; j++) {
-                this.name += inIndices[i][j - 1];
+                this.name += inIndices[i][j];
                 this.name += ",";
             }
             this.name += ".";
@@ -497,7 +502,7 @@ export class CustomFeedBack { //feels redunant
         for (var i = 0; i < preset.indices.length; i++) {
             this.indices[i] = Array.from(preset.indices[i]);
             for (let j = 0; j < preset.indices[i].length; j++) {
-                this.name += preset.indices[i][j - 1];
+                this.name += preset.indices[i][j];
                 this.name += ",";
             }
             this.name += ".";
@@ -1056,7 +1061,7 @@ export class Instrument {
         if (instrumentObject == undefined) instrumentObject = {};
 
         let type: InstrumentType = Config.instrumentTypeNames.indexOf(instrumentObject["type"]);
-        if (type == -1) type = isModChannel ? InstrumentType.mod : (isNoiseChannel ? InstrumentType.noise : InstrumentType.chip);
+        if (type.valueOf() == -1) type = isModChannel ? InstrumentType.mod : (isNoiseChannel ? InstrumentType.noise : InstrumentType.chip);
         this.setTypeAndReset(type, isNoiseChannel, isModChannel);
 
         if (instrumentObject["preset"] != undefined) {

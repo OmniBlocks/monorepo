@@ -538,27 +538,34 @@ const serializeMonitors = function (monitors, runtime) {
     // Monitors position is always stored as position from top-left corner in 480x360 stage.
     const xOffset = (runtime.stageWidth - 480) / 2;
     const yOffset = (runtime.stageHeight - 360) / 2;
-    return monitors.valueSeq().map(monitorData => {
-        const serializedMonitor = {
-            id: monitorData.id,
-            mode: monitorData.mode,
-            opcode: monitorData.opcode,
-            params: monitorData.params,
-            spriteName: monitorData.spriteName,
-            value: Array.isArray(monitorData.value) ? [] : 0,
-            width: monitorData.width,
-            height: monitorData.height,
-            x: monitorData.x - xOffset,
-            y: monitorData.y - yOffset,
-            visible: monitorData.visible
-        };
-        if (monitorData.mode !== 'list') {
-            serializedMonitor.sliderMin = monitorData.sliderMin;
-            serializedMonitor.sliderMax = monitorData.sliderMax;
-            serializedMonitor.isDiscrete = monitorData.isDiscrete;
-        }
-        return serializedMonitor;
-    });
+    return monitors.valueSeq()
+        // TW: Old versions let people enable a monitor for "last key pressed" which Scratch won't remove
+        // automatically. As a temporary hack until upstream fixes this, we'll make sure to remove this
+        // monitor from any serialized projects so that projects won't use the TW blocks extension
+        // unnecessarily as they won't be able to load in Scratch.
+        // https://github.com/LLK/scratch-vm/issues/2331
+        .filter(monitorData => monitorData.id !== 'tw_getLastKeyPressed')
+        .map(monitorData => {
+            const serializedMonitor = {
+                id: monitorData.id,
+                mode: monitorData.mode,
+                opcode: monitorData.opcode,
+                params: monitorData.params,
+                spriteName: monitorData.spriteName,
+                value: Array.isArray(monitorData.value) ? [] : 0,
+                width: monitorData.width,
+                height: monitorData.height,
+                x: monitorData.x - xOffset,
+                y: monitorData.y - yOffset,
+                visible: monitorData.visible
+            };
+            if (monitorData.mode !== 'list') {
+                serializedMonitor.sliderMin = monitorData.sliderMin;
+                serializedMonitor.sliderMax = monitorData.sliderMax;
+                serializedMonitor.isDiscrete = monitorData.isDiscrete;
+            }
+            return serializedMonitor;
+        });
 };
 
 /**

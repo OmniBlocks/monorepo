@@ -17,7 +17,20 @@ export class ThemePrompt implements Prompt {
 		 option({ value: "jummbox light" }, "Sandy Light"), // It's not ready to see the world yet...
 		option({ value: "forest" }, "Forest"),
 		option({ value: "canyon" }, "Canyon"),
-		option({ value: "midnight"}, "Midnight"),
+		option({ value: "midnight" }, "Midnight"),
+		option({ value: "beachcombing" }, "Beachcombing"),
+		option({ value: "violet verdant" }, "Violet Verdant"),
+		option({ value: "sunset" }, "Sunset"),
+		option({ value: "autumn" }, "Autumn"),
+		option({ value: "fruit" }, "Shadowfruit"),
+		option({ value: "toxic" }, "Toxic"),
+		option({ value: "roe" }, "Roe"),
+		option({ value: "moonlight" }, "Moonlight"),
+		option({ value: "portal" }, "Portal"),
+		option({ value: "fusion" }, "Fusion"),
+		option({ value: "inverse" }, "Inverse"),
+		option({ value: "nebula" }, "Nebula"),
+		option({ value: "roe light" }, "Roe Light"),
 		option({ value: "amoled dark"}, "High Contrast Dark"),
 	);
 	private readonly _cancelButton: HTMLButtonElement = button({ class: "cancelButton" });
@@ -75,6 +88,7 @@ export class ThemePrompt implements Prompt {
 
 	private _previewTheme = (): void => {
 		ColorConfig.setTheme(this._themeSelect.value);
+		this._doc.notifier.changed();
 	}
 }
 //}

@@ -3123,7 +3123,7 @@ export class Song {
         const beforeSeven: boolean = version < 7;
         const beforeEight: boolean = version < 8;
         const beforeNine: boolean = version < 9;
-        this.initToDefault((fromBeepBox && beforeNine) || (fromJummBox && beforeFive));
+        this.initToDefault((fromBeepBox && beforeNine) || ((fromJummBox && beforeFive) || (beforeFour && fromGoldBox)));
         const forceSimpleFilter: boolean = (fromBeepBox && beforeNine || fromJummBox && beforeFive);
 
         if (beforeThree && fromBeepBox) {
@@ -3622,6 +3622,7 @@ export class Song {
                         { transition: "normal", fadeInSeconds: 0.0, fadeOutTicks: 48 },
                         { transition: "normal", fadeInSeconds: 0.0125, fadeOutTicks: 72 },
                         { transition: "normal", fadeInSeconds: 0.06, fadeOutTicks: 96 },
+                        { transition: "slide in pattern", fadeInSeconds: 0.025, fadeOutTicks: -3 },
                     ];
                     if (beforeThree && fromBeepBox) {
                         const channelIndex: number = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
@@ -3647,7 +3648,7 @@ export class Song {
                                 }
                             }
                         }
-                    } else if (beforeFour || fromBeepBox) {
+                    } else if ((beforeFour && !fromGoldBox) || fromBeepBox) {
                         const settings = legacySettings[clamp(0, legacySettings.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)])];
                         const instrument: Instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                         instrument.fadeIn = Synth.secondsToFadeInSetting(settings.fadeInSeconds);
@@ -3681,7 +3682,7 @@ export class Song {
                     const instrument: Instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                     instrument.fadeIn = clamp(0, Config.fadeInRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                     instrument.fadeOut = clamp(0, Config.fadeOutTicks.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
-                    if (fromJummBox)
+                    if (fromJummBox||fromGoldBox)
                         instrument.clicklessTransition = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] ? true : false;
                 }
             } break;
@@ -3837,7 +3838,7 @@ export class Song {
                 const instrument: Instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                 if ((beforeNine && fromBeepBox) || ((fromJummBox && beforeFive) || (beforeFour && fromGoldBox))) {
                     instrument.effects = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] & ((1 << EffectType.length) - 1));
-                    if (legacyGlobalReverb == 0 && !(fromJummBox && beforeFive)) {
+                    if (legacyGlobalReverb == 0 && !((fromJummBox && beforeFive) || (beforeFour && fromGoldBox))) {
                         // Disable reverb if legacy song reverb was zero.
                         instrument.effects &= ~(1 << EffectType.reverb);
                     } else if (effectsIncludeReverb(instrument.effects)) {
@@ -3888,7 +3889,7 @@ export class Song {
 
                             // Get subfilters as well. Skip Index 0, is a copy of the base filter.
                             instrument.noteSubFilters[0] = instrument.noteFilter;
-                            if ((fromJummBox && !beforeFive) || (!beforeFour && fromGoldBox)) {
+                            if ((fromJummBox && !beforeFive) || (fromGoldBox)) {
                                 let usingSubFilterBitfield: number = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) | (base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                                 for (let j: number = 0; j < Config.filterMorphCount - 1; j++) {
                                     if (usingSubFilterBitfield & (1 << j)) {
@@ -3926,7 +3927,7 @@ export class Song {
                     if (effectsIncludeChord(instrument.effects)) {
                         instrument.chord = clamp(0, Config.chords.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                         // Custom arpeggio speed... only in JB, and only if the instrument arpeggiates.
-                        if (instrument.chord == Config.chords.dictionary["arpeggio"].index && fromJummBox) {
+                        if (instrument.chord == Config.chords.dictionary["arpeggio"].index && (fromJummBox||fromGoldBox)) {
                             instrument.arpeggioSpeed = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                             instrument.fastTwoNoteArp = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)]) ? true : false;
                         }
@@ -3947,7 +3948,7 @@ export class Song {
                         instrument.vibrato = clamp(0, Config.vibratos.length + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
 
                         // Custom vibrato
-                        if (instrument.vibrato == Config.vibratos.length && fromJummBox) {
+                        if (instrument.vibrato == Config.vibratos.length && (fromJummBox||fromGoldBox)) {
                             instrument.vibratoDepth = clamp(0, Config.modulators.dictionary["vibrato depth"].maxRawVol + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]) / 25;
                             instrument.vibratoSpeed = clamp(0, Config.modulators.dictionary["vibrato speed"].maxRawVol + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                             instrument.vibratoDelay = clamp(0, Config.modulators.dictionary["vibrato delay"].maxRawVol + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
@@ -3963,7 +3964,7 @@ export class Song {
                     }
                     if (effectsIncludeDistortion(instrument.effects)) {
                         instrument.distortion = clamp(0, Config.distortionRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
-                        if ((fromJummBox && beforeFive) || (beforeFour && fromGoldBox))
+                        if ((fromJummBox && !beforeFive) || fromGoldBox)
                             instrument.aliases = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] ? true : false;
                     }
                     if (effectsIncludeBitcrusher(instrument.effects)) {
@@ -3980,7 +3981,7 @@ export class Song {
                         }
 
                         // Now, pan delay follows on new versions of jummbox.
-                        if (fromJummBox && !beforeTwo)
+                        if ((fromJummBox && !beforeTwo) || fromGoldBox)
                             instrument.panDelay = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                     }
                     if (effectsIncludeChorus(instrument.effects)) {
@@ -4737,7 +4738,7 @@ export class Song {
                 } // while (true)
 
                 // Correction for old JB songs that had song reverb mods. Change all instruments using reverb to max reverb
-                if (fromJummBox && beforeFive && songReverbIndex >= 0) {
+                if (((fromJummBox && beforeFive)||(beforeFour && fromGoldBox)) && songReverbIndex >= 0) {
                     for (let channelIndex: number = 0; channelIndex < this.channels.length; channelIndex++) {
                         for (let instrumentIndex: number = 0; instrumentIndex < this.channels[channelIndex].instruments.length; instrumentIndex++) {
                             const instrument: Instrument = this.channels[channelIndex].instruments[instrumentIndex];
@@ -4788,7 +4789,7 @@ export class Song {
                 }
             } break;
             default: {
-                throw new Error("Unrecognized song tag code " + String.fromCharCode(command) + " at index " + (charIndex - 1) + " " + compressed.substring(charIndex - 20, charIndex));
+                throw new Error("Unrecognized song tag code " + String.fromCharCode(command) + " at index " + (charIndex - 1) + " " + compressed.substring(/*charIndex - 2*/0, charIndex));
             } break;
         }
     }
@@ -8599,9 +8600,9 @@ export class Synth {
                         amplitudeEnd *= synth.getModValue(Config.modulators.dictionary["fm slider 1"].index + i, channelIndex, tone.instrumentIndex, true) / 15.0;
                     }
                 } else {
-                    if (synth.isModActive(Config.modulators.dictionary["fm slider 5"].index + i, channelIndex, tone.instrumentIndex)) {
-                        amplitudeStart *= synth.getModValue(Config.modulators.dictionary["fm slider 5"].index + i, channelIndex, tone.instrumentIndex, false) / 15.0;
-                        amplitudeEnd *= synth.getModValue(Config.modulators.dictionary["fm slider 5"].index + i, channelIndex, tone.instrumentIndex, true) / 15.0;
+                    if (synth.isModActive(Config.modulators.dictionary["fm slider 5"].index + i-4, channelIndex, tone.instrumentIndex)) {
+                        amplitudeStart *= synth.getModValue(Config.modulators.dictionary["fm slider 5"].index + i-4, channelIndex, tone.instrumentIndex, false) / 15.0;
+                        amplitudeEnd *= synth.getModValue(Config.modulators.dictionary["fm slider 5"].index + i-4, channelIndex, tone.instrumentIndex, true) / 15.0;
                     }
                 }
 
@@ -8911,7 +8912,7 @@ export class Synth {
 
                 //console.log(synthSource.join("\n"));
 
-                Synth.fm6SynthFunctionCache[fingerprint] = new Function("synth", "data", "stereoBufferIndex", "stereoBufferLength", "runLength", "tone", "instrument", synthSource.join("\n"));
+                Synth.fm6SynthFunctionCache[fingerprint] = new Function("synth", "bufferIndex", "runLength", "tone", "instrument", synthSource.join("\n"));
             }
             return Synth.fm6SynthFunctionCache[fingerprint];
         }else{

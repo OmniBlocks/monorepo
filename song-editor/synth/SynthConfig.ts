@@ -66,6 +66,8 @@ export const enum InstrumentType {
     length,
 }
 
+export const TypePresets: ReadonlyArray<string> = ["chip wave", "FM", "basic noise", "spectrum", "drumset", "harmonics", "pulse width", "picked string", "custom chip", "mod", "advanced FM"];
+
 export const enum DropdownID {
     Vibrato = 0,
     Pan = 1,
@@ -279,7 +281,7 @@ export class Config {
         { name: "Whole Tone", realName: "whole tone", flags: [true, false, true, false, true, false, true, false, true, false, true, false] }, // Whole Tone
         { name: "Octatonic", realName: "octatonic", flags: [true, false, true, true, false, true, true, false, true, true, false, true] }, // Octatonic
         { name: "Hexatonic", realName: "hexatonic", flags: [true, false, false, true, true, false, false, true, true, false, false, true] }, // Hexatonic
-        { name: "Custom", realName: "custom", flags:                        [true, false, true, true, false, false, false, true, true, false, true, true] }, // Custom? considering allowing this one to be be completely configurable
+        { name: "Custom", realName: "custom", flags: [true, false, true, true, false, false, false, true, true, false, true, true] }, // Custom? considering allowing this one to be be completely configurable
 	]);
 	public static readonly keys: DictionaryArray<Key> = toNameMap([
 		{ name: "C", isWhiteKey: true, basePitch: 12 }, // C0 has index 12 on the MIDI scale. C7 is 96, and C9 is 120. C10 is barely in the audible range.

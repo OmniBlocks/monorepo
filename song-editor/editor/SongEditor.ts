@@ -80,8 +80,8 @@ function buildPresetOptions(isNoise: boolean, idSet: string): HTMLSelectElement 
         menu.appendChild(option({ value: InstrumentType.pickedString }, EditorConfig.valueToPreset(InstrumentType.pickedString)!.name));
         menu.appendChild(option({ value: InstrumentType.spectrum }, EditorConfig.valueToPreset(InstrumentType.spectrum)!.name));
         menu.appendChild(option({ value: InstrumentType.fm }, EditorConfig.valueToPreset(InstrumentType.fm)!.name));
-        menu.appendChild(option({ value: InstrumentType.fm6op }, EditorConfig.valueToPreset(InstrumentType.fm6op)!.name));
         menu.appendChild(option({ value: InstrumentType.customChipWave }, EditorConfig.valueToPreset(InstrumentType.customChipWave)!.name));
+        menu.appendChild(option({ value: InstrumentType.fm6op }, EditorConfig.instrumentToPreset(InstrumentType.fm6op)!.name));
     }
 
     const randomGroup: HTMLElement = optgroup({ label: "Randomize ▾" });
@@ -343,6 +343,11 @@ class CustomAlgorythmCanvas {
 
         this.redrawCanvas();
 
+    }
+
+    public reset(): void {
+        this.redrawCanvas(false);
+        this.selected = -1;
     }
 
     public fillDrawArray(noReset: boolean = false): void {
@@ -1140,9 +1145,7 @@ export class SongEditor {
                 span({ class: "volume-speaker" }),
                 this._volumeSlider.container,
             ),
-        ),
-        div({class: "selectRow"},
-            this._globalOscscope.canvas,
+            div({style: "height: 38px"},this._globalOscscope.canvas),
         ),
         div({ class: "menu-area" },
             div({ class: "selectContainer menu file" },
@@ -2055,16 +2058,14 @@ export class SongEditor {
                 }
 
 
-                if (instrument.type == InstrumentType.fm) {
-                    this._algorithmSelectRow.style.display = "";
+                if (instrument.type == InstrumentType.fm || instrument.type == InstrumentType.fm6op) {
                     this._phaseModGroup.style.display = "";
-                    this._feedbackRow1.style.display = "";
                     this._feedbackRow2.style.display = "";
                     this._chipWaveSelectRow.style.display = "none";
                     setSelectedValue(this._algorithmSelect, instrument.algorithm);
                     setSelectedValue(this._feedbackTypeSelect, instrument.feedbackType);
                     this._feedbackAmplitudeSlider.updateValue(instrument.feedbackAmplitude);
-                    for (let i: number = 0; i < Config.operatorCount; i++) {
+                    for (let i: number = 0; i < Config.operatorCount + (instrument.type == InstrumentType.fm6op? 2 : 0); i++) {
                         const isCarrier: boolean = (i < Config.algorithms[instrument.algorithm].carrierCount);
                         this._operatorRows[i].style.color = isCarrier ? ColorConfig.primaryText : "";
                         setSelectedValue(this._operatorFrequencySelects[i], instrument.operators[i].frequency);
@@ -2077,7 +2078,7 @@ export class SongEditor {
                         this._operatorFrequencySelects[i].title = operatorName + " Frequency";
                         this._operatorAmplitudeSliders[i].input.title = operatorName + (isCarrier ? " Volume" : " Amplitude");
                         this._operatorDropdownGroups[i].style.display = (this._openOperatorDropdowns[i] ? "" : "none");
-                        if (instrument.operators[i].waveform == 3) {
+                        if (instrument.operators[i].waveform == 2) {
                             this._operatorWaveformPulsewidthSliders[i].container.style.display = "";
                             this._operatorWaveformHints[i].style.display = "none";
                         } else {
@@ -2085,8 +2086,31 @@ export class SongEditor {
                             this._operatorWaveformHints[i].style.display = "";
                         }
                     }
+                    if (instrument.type == InstrumentType.fm6op){
+                        setSelectedValue(this._algorithm6OpSelect, instrument.algorithm6Op);
+                        setSelectedValue(this._feedback6OpTypeSelect, instrument.feedbackType6Op);
+                        this._algorithm6OpSelectRow.style.display = "";
+                        this._feedback6OpRow1.style.display = "";
+                        this._operatorRows[4].style.display = "";
+                        this._operatorRows[5].style.display = "";
+                        this._operatorDropdownGroups[4].style.display = "";
+                        this._operatorDropdownGroups[5].style.display = "";
+                        this._algorithmSelectRow.style.display = "none";
+                        this._feedbackRow1.style.display = "none";
+                    }else{
+                        this._algorithm6OpSelectRow.style.display = "none";
+                        this._feedback6OpRow1.style.display = "none";
+                        this._operatorRows[4].style.display = "none";
+                        this._operatorRows[5].style.display = "none";
+                        this._operatorDropdownGroups[4].style.display = "none";
+                        this._operatorDropdownGroups[5].style.display = "none";
+                        this._feedbackRow1.style.display = "";
+                        this._algorithmSelectRow.style.display = "";
+                    }
                 }
                 else {
+                    this._algorithm6OpSelectRow.style.display = "none";
+                    this._feedback6OpRow1.style.display = "none";
                     this._algorithmSelectRow.style.display = "none";
                     this._phaseModGroup.style.display = "none";
                     this._feedbackRow1.style.display = "none";
@@ -2517,6 +2541,15 @@ export class SongEditor {
                             settingList.push("fm slider 2");
                             settingList.push("fm slider 3");
                             settingList.push("fm slider 4");
+                            settingList.push("fm feedback");
+                        }
+                        if (tgtInstrumentTypes.includes(InstrumentType.fm6op)) {
+                            settingList.push("fm slider 1");
+                            settingList.push("fm slider 2");
+                            settingList.push("fm slider 3");
+                            settingList.push("fm slider 4");
+                            settingList.push("fm slider 5");
+                            settingList.push("fm slider 6");
                             settingList.push("fm feedback");
                         }
                         if (tgtInstrumentTypes.includes(InstrumentType.pwm)) {
@@ -3672,9 +3705,11 @@ export class SongEditor {
 
     private _whenSet6OpFeedbackType = (): void => {
         this._doc.record(new Change6OpFeedbackType(this._doc, this._feedback6OpTypeSelect.selectedIndex));
+        this._customAlgorithmCanvas.reset()
     }
     private _whenSet6OpAlgorithm = (): void => {
         this._doc.record(new Change6OpAlgorithm(this._doc, this._algorithm6OpSelect.selectedIndex));
+        this._customAlgorithmCanvas.reset()
     }
     
     private _whenSelectInstrument = (event: MouseEvent): void => {

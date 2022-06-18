@@ -1,6 +1,6 @@
 // Copyright (C) 2021 John Nesky, distributed under the MIT license.
 
-import { DictionaryArray, BeepBoxOption, InstrumentType, toNameMap } from "../synth/SynthConfig";
+import { DictionaryArray, BeepBoxOption, InstrumentType, toNameMap, TypePresets } from "../synth/SynthConfig";
 
 export interface PresetCategory extends BeepBoxOption {
     readonly presets: DictionaryArray<Preset>;
@@ -34,16 +34,16 @@ export class EditorConfig {
     public static readonly presetCategories: DictionaryArray<PresetCategory> = toNameMap([
         {
             name: "Custom Instruments", presets: <DictionaryArray<Preset>>toNameMap([
-                { name: "chip wave", customType: InstrumentType.chip },
-                { name: "FM (expert)", customType: InstrumentType.fm },
-                { name: "basic noise", customType: InstrumentType.noise },
-                { name: "spectrum", customType: InstrumentType.spectrum },
-                { name: "drumset", customType: InstrumentType.drumset },
-                { name: "harmonics", customType: InstrumentType.harmonics },
-                { name: "pulse width", customType: InstrumentType.pwm },
-                { name: "picked string", customType: InstrumentType.pickedString },
-                { name: "custom chip", customType: InstrumentType.customChipWave },
-                { name: "Six Op FM", customType: InstrumentType.fm6op },
+                { name: TypePresets[InstrumentType.chip], customType: InstrumentType.chip },
+                { name: TypePresets[InstrumentType.fm], customType: InstrumentType.fm },
+                { name: TypePresets[InstrumentType.noise], customType: InstrumentType.noise },
+                { name: TypePresets[InstrumentType.spectrum], customType: InstrumentType.spectrum },
+                { name: TypePresets[InstrumentType.drumset], customType: InstrumentType.drumset },
+                { name: TypePresets[InstrumentType.harmonics], customType: InstrumentType.harmonics },
+                { name: TypePresets[InstrumentType.pwm], customType: InstrumentType.pwm },
+                { name: TypePresets[InstrumentType.pickedString], customType: InstrumentType.pickedString },
+                { name: TypePresets[InstrumentType.customChipWave], customType: InstrumentType.customChipWave },
+                { name: TypePresets[InstrumentType.fm6op], customType: InstrumentType.fm6op },
             ])
         },
         {
@@ -323,5 +323,9 @@ export class EditorConfig {
             }
         }
         return null;
+    }
+
+    public static instrumentToPreset(instrument: InstrumentType): Preset | null {
+        return EditorConfig.presetCategories[0].presets.dictionary?.[TypePresets?.[instrument]];
     }
 }

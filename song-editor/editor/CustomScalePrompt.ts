@@ -44,7 +44,7 @@ export class CustomScalePrompt implements Prompt {
             ),
             this._cancelButton,
         )
-        this.container.addEventListener("keydown", this._whenKeyPressed);
+        this.container.addEventListener("keydown", this.whenKeyPressed);
     }
 
     private _close = (): void => {
@@ -54,10 +54,10 @@ export class CustomScalePrompt implements Prompt {
     public cleanUp = (): void => {
         this._okayButton.removeEventListener("click", this._saveChanges);
         this._cancelButton.removeEventListener("click", this._close);
-        this.container.removeEventListener("keydown", this._whenKeyPressed);
+        this.container.removeEventListener("keydown", this.whenKeyPressed);
     }
 
-    private _whenKeyPressed = (event: KeyboardEvent): void => {
+    public whenKeyPressed = (event: KeyboardEvent): void => {
         if ((<Element>event.target).tagName != "BUTTON" && event.keyCode == 13) { // Enter key
             this._saveChanges();
         }

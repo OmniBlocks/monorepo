@@ -502,7 +502,8 @@ export class ChangePreset extends Change {
         const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
         const oldValue: number = instrument.preset;
         if (oldValue != newValue) {
-            const preset: Preset | null = EditorConfig.valueToPreset(newValue);
+            const preset1: Preset | null = EditorConfig.instrumentToPreset(newValue);
+            const preset: Preset | null = preset1 ?? EditorConfig.valueToPreset(newValue);
             if (preset != null) {
                 if (preset.customType != undefined) {
                     instrument.type = preset.customType;

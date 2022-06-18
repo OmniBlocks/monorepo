@@ -3,9 +3,10 @@
 import { Dictionary, DictionaryArray, EnvelopeType, InstrumentType, Transition, Chord, Envelope, Config } from "../synth/SynthConfig";
 import { ColorConfig } from "../editor/ColorConfig";
 import { NotePin, Note, Pattern, Instrument, Channel, Synth } from "../synth/synth";
+import { oscilascopeCanvas } from "../global/Oscilascope";
 import { HTML, SVG } from "imperative-html/dist/esm/elements-strict";
 
-	const {a, button, div, h1, input} = HTML;
+	const {a, button, div, h1, input, canvas} = HTML;
 	const {svg, circle, rect, path} = SVG;
 
 	document.head.appendChild(HTML.style({type: "text/css"}, `
@@ -159,6 +160,7 @@ let outVolumeHistoricTimer: number = 0;
 let outVolumeHistoricCap: number = 0;
 
 const synth: Synth = new Synth();
+const oscilascope: oscilascopeCanvas = new oscilascopeCanvas(canvas({ width: 288, height: 64, style: "border:2px solid " + ColorConfig.uiWidgetBackground, id: "oscilascopeAll" }), synth, 2);
 let titleText: HTMLHeadingElement = h1({ style: "flex-grow: 1; margin: 0 1px; margin-left: 10px; overflow: hidden;" }, "");
 	let editLink: HTMLAnchorElement = a({target: "_top", style: "margin: 0 4px;"}, "✎ Edit");
 	let copyLink: HTMLAnchorElement = a({href: "javascript:void(0)", style: "margin: 0 4px;"}, "⎘ Copy URL");
@@ -217,6 +219,7 @@ document.body.appendChild(
 		volumeSlider,
 		zoomButton,
 		volumeBarContainer,
+		oscilascope.canvas,
 		titleText,
 		editLink,
 		copyLink,
@@ -316,6 +319,7 @@ function volumeUpdate(): void {
 	}
 
 	animateVolume(synth.song.outVolumeCap, outVolumeHistoricCap);
+	oscilascope._updateCanvas();
 
 	if (!synth.playing) {
 		outVolumeCap.setAttribute("x", "5%");

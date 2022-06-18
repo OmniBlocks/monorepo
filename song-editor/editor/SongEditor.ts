@@ -40,7 +40,7 @@ import { ChangeTempo, ChangeChorus, ChangeEchoDelay, ChangeEchoSustain, ChangeRe
 import { Change6OpFeedbackType, Change6OpAlgorithm, ChangeCustomAlgorythmorFeedback} from "./changes"
 
 import { TrackEditor } from "./TrackEditor";
-import { events } from "../global/events";
+import {oscilascopeCanvas} from "../global/Oscilascope"
 
 const { button, div, input, select, span, optgroup, option, canvas } = HTML;
 
@@ -666,72 +666,6 @@ class CustomAlgorythmCanvas {
 
 }
 
-class oscilascopeCanvas {
-    public _EventUpdateCanvas:Function;
-
-    constructor(public readonly canvas: HTMLCanvasElement, private readonly _doc: SongDocument) {
-        this._updateCanvas();
-        this._EventUpdateCanvas = function(directlinkL: Float32Array, directlinkR ?: Float32Array): void {
-            if(directlinkR) {
-                var ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
-
-                ctx.fillStyle = ColorConfig.getComputed("--editor-background");
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-                ctx.fillStyle = ColorConfig.getComputed("--primary-text");
-                for (let i: number = directlinkL.length - 1; i >= directlinkL.length - 1 - canvas.width; i--) {
-                    let x = i - (directlinkL.length - 1) + canvas.width;
-                    let yl = (directlinkL[i] * (canvas.height / 2) + (canvas.height / 2));
-
-                    ctx.fillRect(x - 1, yl - 1, 1, 1.5);
-                    if (x == 0) break;
-                }
-                ctx.fillStyle = ColorConfig.getComputed("--text-selection"); //less ctx style calls = less expensive??? also avoiding uncached colors
-                for (let i: number = directlinkR.length - 1; i >= directlinkR.length - 1 - canvas.width; i--) {
-                    let x = i - (directlinkR.length - 1) + canvas.width;
-                    let yr = (directlinkR[i] * (canvas.height / 2) + (canvas.height / 2));
-                    
-                    ctx.fillRect(x - 1, yr - 1, 1, 1.5);
-                    if (x == 0) break;
-                }
-            }
-        };
-        events.listen("oscillascopeUpdate", this._EventUpdateCanvas);
-    }
-
-    public _updateCanvas(directlinkL?: Float32Array, directlinkR?: Float32Array): void {
-        if (this._doc.synth.copybroken) {
-            return;
-        }
-        var arrays = this._doc.synth.exposedBuffer;
-        if (arrays[0] != undefined) {
-            if (arrays[0].length >= this.canvas.width && this._doc.synth.playing) {
-                var ctx = this.canvas.getContext("2d") as CanvasRenderingContext2D;
-
-                ctx.fillStyle = ColorConfig.getComputed("--editor-background");
-                ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-
-                ctx.fillStyle = ColorConfig.getComputed("--primary-text");
-                for (let i: number = arrays[0].length - 1; i >= arrays[0].length - 1 - this.canvas.width; i--) {
-                    let x = i - (arrays[0].length - 1) + this.canvas.width;
-                    let yl = (arrays[0][i] * (this.canvas.height / 2) + (this.canvas.height / 2));
-
-                    ctx.fillRect(x - 1, yl - 1, 1, 1.5);
-                    if (x == 0) break;
-                }
-                ctx.fillStyle = ColorConfig.getComputed("--text-selection");
-                for (let i: number = arrays[1].length - 1; i >= arrays[1].length - 1 - this.canvas.width; i--) {
-                    let x = i - (arrays[1].length - 1) + this.canvas.width;
-                    let yr = (arrays[1][i] * (this.canvas.height / 2) + (this.canvas.height / 2));
-
-                    ctx.fillRect(x - 1, yr - 1, 1, 1.5);
-                    if (x == 0) break;
-                }
-            }
-        }
-    }
-}
-
 export class SongEditor {
     public prompt: Prompt | null = null;
 
@@ -982,7 +916,7 @@ export class SongEditor {
         ]),
     ]);
 
-    public readonly _globalOscscope: oscilascopeCanvas = new oscilascopeCanvas(canvas({ width: 144, height: 32, style: "border:2px solid " + ColorConfig.uiWidgetBackground, id: "oscilascopeAll" }), this._doc);
+    public readonly _globalOscscope: oscilascopeCanvas = new oscilascopeCanvas(canvas({ width: 144, height: 32, style: "border:2px solid " + ColorConfig.uiWidgetBackground, id: "oscilascopeAll" }), this._doc.synth);
     private readonly _customWaveDrawCanvas: CustomChipCanvas = new CustomChipCanvas(canvas({ width: 128, height: 52, style: "border:2px solid " + ColorConfig.uiWidgetBackground, id: "customWaveDrawCanvas" }), this._doc, (newArray: Float64Array) => new ChangeCustomWave(this._doc, newArray));
     private readonly _customWavePresetDrop: HTMLSelectElement = buildHeaderedOptions("Load Preset", select({ style: "width: 50%; height:1.5em; text-align: center; text-align-last: center;" }),
         Config.chipWaves.map(wave => wave.name)

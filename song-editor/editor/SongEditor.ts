@@ -2023,6 +2023,7 @@ export class SongEditor {
                     if (instrument.type == InstrumentType.fm6op){
                         setSelectedValue(this._algorithm6OpSelect, instrument.algorithm6Op);
                         setSelectedValue(this._feedback6OpTypeSelect, instrument.feedbackType6Op);
+                        this._customAlgorithmCanvas.redrawCanvas();
                         this._algorithm6OpSelectRow.style.display = "";
                         this._feedback6OpRow1.style.display = "";
                         this._operatorRows[4].style.display = "";

@@ -1762,7 +1762,7 @@ export class Instrument {
                     this.chord = Config.chords.dictionary["strum"].index;
                 } else if (this.type == InstrumentType.chip) {
                     this.chord = Config.chords.dictionary["arpeggio"].index;
-                } else if (this.type == InstrumentType.fm) {
+                } else if (this.type == InstrumentType.fm||this.type == InstrumentType.fm6op) {
                     this.chord = Config.chords.dictionary["custom interval"].index;
                 } else {
                     this.chord = Config.chords.dictionary["simultaneous"].index;
@@ -1949,10 +1949,18 @@ export class Instrument {
             } else {
                 this.algorithm6Op = Config.algorithms6Op.findIndex(algorithm6Op => algorithm6Op.name == instrumentObject["algorithm"]);
                 if (this.algorithm6Op == -1) this.algorithm6Op = 1;
-                if(this.algorithm6Op == 0) this.customAlgorithm.set(instrumentObject["customAlgorithm"]["carrierCount"], instrumentObject["customAlgorithm"]["mods"]);
+                if(this.algorithm6Op == 0){ 
+                    this.customAlgorithm.set(instrumentObject["customAlgorithm"]["carrierCount"], instrumentObject["customAlgorithm"]["mods"]);
+                } else{
+                    this.customAlgorithm.fromPreset(this.algorithm6Op);
+                }
                 this.feedbackType6Op = Config.feedbacks6Op.findIndex(feedback6Op => feedback6Op.name == instrumentObject["feedbackType"]);
                 if (this.feedbackType6Op == -1) this.feedbackType6Op = 1;
-                if(this.feedbackType6Op == 0) this.customFeedbackType.set(instrumentObject["customFeedback"]["mods"]);
+                if(this.feedbackType6Op == 0) {
+                    this.customFeedbackType.set(instrumentObject["customFeedback"]["mods"]);
+                }else{
+                    this.customFeedbackType.fromPreset(this.feedbackType6Op)
+                }
             }
             if (instrumentObject["feedbackAmplitude"] != undefined) {
                 this.feedbackAmplitude = clamp(0, Config.operatorAmplitudeMax + 1, instrumentObject["feedbackAmplitude"] | 0);
@@ -1960,7 +1968,7 @@ export class Instrument {
                 this.feedbackAmplitude = 0;
             }
 
-            for (let j: number = 0; j < Config.operatorCount; j++) {
+            for (let j: number = 0; j < Config.operatorCount + (this.type == InstrumentType.fm6op?2:0); j++) {
                 const operator: Operator = this.operators[j];
                 let operatorObject: any = undefined;
                 if (instrumentObject["operators"] != undefined) operatorObject = instrumentObject["operators"][j];

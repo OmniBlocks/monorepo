@@ -2028,8 +2028,8 @@ export class SongEditor {
                         this._feedback6OpRow1.style.display = "";
                         this._operatorRows[4].style.display = "";
                         this._operatorRows[5].style.display = "";
-                        this._operatorDropdownGroups[4].style.display = "";
-                        this._operatorDropdownGroups[5].style.display = "";
+                        this._operatorDropdownGroups[4].style.display = (this._openOperatorDropdowns[4] ? "" : "none");
+                        this._operatorDropdownGroups[5].style.display = (this._openOperatorDropdowns[5] ? "" : "none");
                         this._algorithmSelectRow.style.display = "none";
                         this._feedbackRow1.style.display = "none";
                     }else{

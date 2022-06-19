@@ -120,7 +120,7 @@ ul.s3devDD {
   border: none;
   border-radius: 4px;
 }
-[theme="dark"] div.s3devDDOut.vis {
+[theme="dark"] .s3devDDOut.vis {
   background-color: #111;
 }
 

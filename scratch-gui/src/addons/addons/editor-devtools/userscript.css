@@ -10,21 +10,22 @@
   width: 100%;
 }
 
-.s3devLabel > span:first-child {
-  line-height: 2;
-  margin-left: 1.5em;
-  margin-right: 1em;
+.s3devLabel > label {
+  /* padding instead of margin so clicking on the empty area will select the input */
+  padding-left: 1.5em;
+  padding-right: 1em;
   font-weight: bold;
   font-size: 0.625rem;
   user-select: none;
   cursor: default;
   white-space: nowrap;
   padding-top: 2px;
+  line-height: 2;
 }
 
-[dir="rtl"] .s3devLabel > span:first-child {
-  margin-right: 1.5em;
-  margin-left: 1em;
+[dir="rtl"] .s3devLabel > label {
+  padding-right: 1.5em;
+  padding-left: 1em;
 }
 
 .s3devAction {
@@ -85,6 +86,7 @@ input.s3devInp:focus {
 
 /* Drop down from find button */
 .s3devDDOut {
+  display: block;
   top: -6px;
   z-index: 100;
   width: 100%;
@@ -109,7 +111,7 @@ ul.s3devDD {
   max-width: 100%;
 }
 
-div.s3devDDOut.vis {
+.s3devDDOut.vis {
   position: absolute;
   width: 16em;
   /*box-shadow: 0 2px 3px rgba(0,0,0,0.3), 0 5px 8px rgba(0,0,0,0.2);*/
@@ -122,7 +124,7 @@ div.s3devDDOut.vis {
   background-color: #111;
 }
 
-div.s3devDDOut.vis ul.s3devDD {
+.s3devDDOut.vis ul.s3devDD {
   display: block;
   border: none;
 }

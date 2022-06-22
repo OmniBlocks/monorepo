@@ -992,7 +992,7 @@ export class ColorConfig {
 					--link-accent: #bd25ff;
 					--ui-widget-background: #080d1f;
 					--ui-widget-focus: #060f2d;
-					--pitch-background: #000;
+					--pitch-background: #02060b;
 					--tonic: #00113a;
 					--fifth-note: #1b0019;
 					--white-piano-key: #02040c;
@@ -1089,7 +1089,8 @@ export class ColorConfig {
 					--mod-primary-note-sat-scale: 0;
 					--mod-primary-note-lum: 85;
 					--mod-primary-note-lum-scale: 0;
-
+					--disabled-note-primary: #91879f;
+					--disabled-note-secondary: #6a677a;
 				}
 
 			`,

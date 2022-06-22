@@ -1649,6 +1649,10 @@ export class SongEditor {
                 return this._echoDelaySlider;
             case Config.modulators.dictionary["sustain"].index:
                 return this._stringSustainSlider;
+            case Config.modulators.dictionary["fm slider 5"].index:
+                return this._operatorAmplitudeSliders[4];
+            case Config.modulators.dictionary["fm slider 6"].index:
+                return this._operatorAmplitudeSliders[5];
             default:
                 return null;
         }

@@ -3956,7 +3956,7 @@ export class Song {
                         instrument.vibrato = clamp(0, Config.vibratos.length + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
 
                         // Custom vibrato
-                        if (instrument.vibrato == Config.vibratos.length && (fromJummBox||fromGoldBox)) {
+                        if (instrument.vibrato == Config.vibratos.length && (fromJummBox || fromGoldBox)) {
                             instrument.vibratoDepth = clamp(0, Config.modulators.dictionary["vibrato depth"].maxRawVol + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]) / 25;
                             instrument.vibratoSpeed = clamp(0, Config.modulators.dictionary["vibrato speed"].maxRawVol + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                             instrument.vibratoDelay = clamp(0, Config.modulators.dictionary["vibrato delay"].maxRawVol + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
@@ -4135,7 +4135,7 @@ export class Song {
                     instrument.algorithm6Op = clamp(0, Config.algorithms6Op.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                     instrument.customAlgorithm.fromPreset(instrument.algorithm6Op);
                     if (compressed.charCodeAt(charIndex) == SongTagCode.chord) {
-                        let carrierCountTemp = clamp(0, Config.operatorCount + 2, base64CharCodeToInt[compressed.charCodeAt(charIndex + 1)]);
+                        let carrierCountTemp = clamp(1, Config.operatorCount + 2+1, base64CharCodeToInt[compressed.charCodeAt(charIndex + 1)]);
                         charIndex++
                         console.log(carrierCountTemp)
                         let tempModArray: number[][] = [];
@@ -6541,7 +6541,8 @@ export class Synth {
                 // Check effects
                 if (!((Config.modulators[instrument.modulators[mod]].associatedEffect != EffectType.length && !(tgtInstrument.effects & (1 << Config.modulators[instrument.modulators[mod]].associatedEffect)))
                     // Instrument type specific
-                    || (tgtInstrument.type != InstrumentType.fm && (str == "fm slider 1" || str == "fm slider 2" || str == "fm slider 3" || str == "fm slider 4" || str == "fm feedback"))
+                    || ((tgtInstrument.type != InstrumentType.fm && tgtInstrument.type != InstrumentType.fm6op) && (str == "fm slider 1" || str == "fm slider 2" || str == "fm slider 3" || str == "fm slider 4" || str == "fm feedback"))
+                    || tgtInstrument.type != InstrumentType.fm6op && (str == "fm slider 5" || str == "fm slider 6")
                     || (tgtInstrument.type != InstrumentType.pwm && (str == "pulse width"))
                     // Arp check
                     || (!tgtInstrument.getChord().arpeggiates && (str == "arp speed" || str == "reset arp"))

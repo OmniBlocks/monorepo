@@ -273,7 +273,7 @@ const findNewSteppingThread = (startingIndex) => {
       continue;
     }
     // TW: Can't single-step compiled threads
-    if (thread.isCompiled) {
+    if (possibleNewThread.isCompiled) {
       continue;
     }
     const status = getRealStatus(possibleNewThread);

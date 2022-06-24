@@ -1,4 +1,4 @@
-// Copyright (C) 2021 John Nesky, distributed under the MIT license.
+// Copyright (c) 2012-2022 John Nesky and contributing authors, distributed under the MIT license, see accompanying the LICENSE.md file.
 
 import { Algorithm, Dictionary, FilterType, InstrumentType, EffectType, AutomationTarget, Config, effectsIncludeDistortion } from "../synth/SynthConfig";
 import { NotePin, Note, makeNotePin, Pattern, FilterSettings, FilterControlPoint, SpectrumWave, HarmonicsWave, Instrument, Channel, Song, Synth } from "../synth/synth";
@@ -394,9 +394,9 @@ export class ChangeCustomizeInstrument extends Change {
 }
 
 export class ChangeCustomWave extends Change {
-    constructor(doc: SongDocument, newArray: Float64Array) {
+    constructor(doc: SongDocument, newArray: Float32Array) {
         super();
-        const oldArray: Float64Array = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()].customChipWave;
+        const oldArray: Float32Array = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()].customChipWave;
         var comparisonResult: boolean = true;
         for (let i: number = 0; i < oldArray.length; i++) {
             if (oldArray[i] != newArray[i]) {
@@ -1071,9 +1071,11 @@ export class ChangeTransition extends Change {
 }
 
 export class ChangeToggleEffects extends Change {
-    constructor(doc: SongDocument, toggleFlag: number) {
+    constructor(doc: SongDocument, toggleFlag: number, useInstrument: Instrument | null) {
         super();
-        const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+        let instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+        if (useInstrument != null)
+            instrument = useInstrument;
         const oldValue: number = instrument.effects;
         const wasSelected: boolean = ((oldValue & (1 << toggleFlag)) != 0);
         const newValue: number = wasSelected ? (oldValue & (~(1 << toggleFlag))) : (oldValue | (1 << toggleFlag));
@@ -1098,6 +1100,17 @@ export class ChangePatternNumbers extends Change {
                     doc.song.channels[channelIndex].bars[bar] = value;
                     this._didSomething();
                 }
+            }
+        }
+
+        //Make mod channels shift viewed instrument over when pattern numbers change
+        if (startChannel >= doc.song.pitchChannelCount + doc.song.noiseChannelCount) {
+            const pattern: Pattern | null = doc.getCurrentPattern();
+            if (pattern != null) {
+                doc.viewedInstrument[startChannel] = pattern.instruments[0];
+            }
+            else {
+                doc.viewedInstrument[startChannel] = 0;
             }
         }
 
@@ -1134,7 +1147,6 @@ export class ChangeBarCount extends Change {
                 doc.song.loopStart = Math.max(0, doc.song.loopStart + diff);
             }
             doc.bar = Math.min(doc.bar, newValue - 1);
-            doc.barScrollPos = Math.max(0, Math.min(newValue - doc.trackVisibleBars, doc.barScrollPos));
             doc.song.loopLength = Math.min(newValue, doc.song.loopLength);
             doc.song.loopStart = Math.min(newValue - doc.song.loopLength, doc.song.loopStart);
             doc.song.barCount = newValue;
@@ -1161,7 +1173,7 @@ export class ChangeInsertBars extends Change {
         doc.song.barCount = newLength;
 
         doc.bar += count;
-        doc.barScrollPos = Math.min(newLength - doc.trackVisibleBars, doc.barScrollPos + count);
+        doc.barScrollPos += count;
         if (doc.song.loopStart >= start) {
             doc.song.loopStart += count;
         } else if (doc.song.loopStart + doc.song.loopLength >= start) {
@@ -1297,7 +1309,6 @@ export class ChangeChannelCount extends Change {
             doc.song.channels.length = doc.song.getChannelCount();
 
             doc.channel = Math.min(doc.channel, newPitchChannelCount + newNoiseChannelCount + newModChannelCount - 1);
-            doc.channelScrollPos = Math.max(0, Math.min(doc.song.getChannelCount() - doc.trackVisibleChannels, doc.channelScrollPos));
 
             // Determine if any mod instruments now refer to an invalid channel. Unset them if so
             for (let channelIndex: number = doc.song.pitchChannelCount + doc.song.noiseChannelCount; channelIndex < doc.song.getChannelCount(); channelIndex++) {
@@ -1408,8 +1419,7 @@ export class ChangeChannelBar extends Change {
         doc.channel = newChannel;
         doc.bar = newBar;
         if (!silently) {
-            doc.barScrollPos = Math.min(doc.bar, Math.max(doc.bar - (doc.trackVisibleBars - 1), doc.barScrollPos));
-            doc.channelScrollPos = Math.min(doc.channel, Math.max(doc.channel - (doc.trackVisibleChannels - 1), doc.channelScrollPos));
+            doc.selection.scrollToSelectedPattern();
         }
         // Mod channels always jump to viewing the active instrument for the mod.
         if (doc.song.getChannelIsMod(doc.channel)) {
@@ -2457,8 +2467,42 @@ export class ChangeModSetting extends Change {
     constructor(doc: SongDocument, mod: number, text: string) {
         super();
 
-        let setting: number = Config.modulators.dictionary[text].index;
         let instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+
+        // Populate all instruments that could be targeted by this mod setting.
+        let tgtChannel: number = instrument.modChannels[mod];
+        let usedInstruments: Instrument[] = [];
+        if (tgtChannel >= 0) { // Ignore song/none.
+            if (instrument.modInstruments[mod] == doc.song.channels[tgtChannel].instruments.length) {
+                // All - Populate list of all instruments
+                usedInstruments = usedInstruments.concat(doc.song.channels[tgtChannel].instruments);
+            } else if (instrument.modInstruments[mod] > doc.song.channels[tgtChannel].instruments.length) {
+                // Active - Populate list of only used instruments
+                let tgtPattern: Pattern | null = doc.song.getPattern(tgtChannel, doc.bar);
+                if (tgtPattern != null) {
+                    for (let i: number = 0; i < tgtPattern.instruments.length; i++) {
+                        usedInstruments.push(doc.song.channels[tgtChannel].instruments[tgtPattern.instruments[i]]);
+                    }
+                }
+            }
+            else {
+                // Single instrument used.
+                usedInstruments.push(doc.song.channels[tgtChannel].instruments[instrument.modInstruments[mod]]);
+            }
+        }
+
+        // Check if a new effect is being added - if so add the proper associated effect to the instrument(s), and truncate "+ " from start of text.
+        if (text.startsWith("+ ")) {
+            text = text.substr(2);
+            for (let i: number = 0; i < usedInstruments.length; i++) {
+                const tgtInstrument: Instrument = usedInstruments[i];
+                if (!(tgtInstrument.effects & (1 << Config.modulators.dictionary[text].associatedEffect))) {
+                    doc.record(new ChangeToggleEffects(doc, Config.modulators.dictionary[text].associatedEffect, tgtInstrument));
+                }
+            }
+        }
+
+        let setting: number = Config.modulators.dictionary[text].index;
 
         if (instrument.modulators[mod] != setting) {
 
@@ -3032,7 +3076,7 @@ export class ChangeSong extends ChangeGroup {
             this.append(new ChangePatternSelection(doc, 0, 0));
             doc.selection.resetBoxSelection();
             setDefaultInstruments(doc.song);
-            doc.song.scale = doc.defaultScale;
+            doc.song.scale = doc.prefs.defaultScale;
 
             for (let i: number = 0; i <= doc.song.channels.length; i++) {
                 doc.viewedInstrument[i] = 0;
@@ -3053,16 +3097,13 @@ export class ChangeValidateTrackSelection extends Change {
         super();
         const channelIndex: number = Math.min(doc.channel, doc.song.getChannelCount() - 1);
         const bar: number = Math.max(0, Math.min(doc.song.barCount - 1, doc.bar));
-        const barScrollPos: number = Math.min(doc.bar, Math.max(doc.bar - (doc.trackVisibleBars - 1), Math.max(0, Math.min(doc.song.barCount - doc.trackVisibleBars, doc.barScrollPos))));
-        const channelScrollPos: number = Math.min(doc.channel, Math.max(doc.channel - (doc.trackVisibleChannels - 1), Math.max(0, Math.min(doc.song.getChannelCount() - doc.trackVisibleChannels, doc.channelScrollPos))));
-        if (doc.channel != channelIndex || doc.bar != bar || doc.channelScrollPos != channelScrollPos || doc.barScrollPos != barScrollPos) {
-            doc.channel = channelIndex;
-            doc.channelScrollPos = channelScrollPos;
-            doc.bar = bar;
-            doc.barScrollPos = barScrollPos;
-            doc.notifier.changed();
-            this._didSomething();
-        }
+        if (doc.channel != channelIndex || doc.bar != bar) {
+			doc.bar = bar;
+			doc.channel = channelIndex;
+			this._didSomething();
+		}
+		doc.selection.scrollToSelectedPattern();
+		doc.notifier.changed();
     }
 }
 
@@ -3666,7 +3707,7 @@ export class ChangeDragSelectedNotes extends ChangeSequence {
             this.append(new ChangeNoteLength(doc, note, Math.max(note.start, newStart), Math.min(newEnd, note.end)));
 
             for (let i: number = 0; i < Math.abs(transpose); i++) {
-                this.append(new ChangeTransposeNote(doc, channelIndex, note, transpose > 0, doc.notesOutsideScale));
+                this.append(new ChangeTransposeNote(doc, channelIndex, note, transpose > 0, doc.prefs.notesOutsideScale));
             }
 
         }

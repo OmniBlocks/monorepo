@@ -1,4 +1,4 @@
-// Copyright (C) 2021 John Nesky, distributed under the MIT license.
+// Copyright (c) 2012-2022 John Nesky and contributing authors, distributed under the MIT license, see accompanying the LICENSE.md file.
 
 import { Config } from "../synth/SynthConfig";
 import { SongDocument } from "./SongDocument";
@@ -38,6 +38,8 @@ export class Piano {
 	private _renderedMod: boolean = false;
 	private _renderedKey: number = -1;
 	private _renderedPitchCount: number = -1;
+	private readonly _renderedLiveInputPitches: number[] = [];
+	
 		
 	public forceRender(): void {
 		this._renderedScale = -1;
@@ -48,8 +50,7 @@ export class Piano {
 			
 		for (let i: number = 0; i < Config.drumCount; i++) {
 			const scale: number = (1.0 - (i / Config.drumCount) * 0.35) * 100;
-			const brightness: number = 1.0 + ((i - Config.drumCount / 2.0) / Config.drumCount) * 0.5;
-				this._drumContainer.appendChild(HTML.div({class: "drum-button", style: `background-size: ${scale}% ${scale}%; filter: brightness(${brightness})`}));
+			this._drumContainer.appendChild(HTML.div({class: "drum-button", style: `background-size: ${scale}% ${scale}%;`}));
 		}
 			
 		for (let i: number = 0; i < Config.modCount; i++) {
@@ -105,6 +106,8 @@ export class Piano {
 			
 		this._doc.notifier.watch(this._documentChanged);
 		this._documentChanged();
+		
+		window.requestAnimationFrame(this._onAnimationFrame);
 	}
 		
 	private _updateCursorPitch(): void {
@@ -137,15 +140,14 @@ export class Piano {
 		const octaveOffset: number = this._doc.getBaseVisibleOctave(this._doc.channel) * Config.pitchesPerOctave;
 		const currentPitch: number = this._cursorPitch + octaveOffset;
 		if (this._playedPitch == currentPitch) return;
+		this._doc.performance.removePerformedPitch(this._playedPitch);
 		this._playedPitch = currentPitch;
-		this._doc.synth.liveInputDuration = Number.MAX_SAFE_INTEGER;
-		this._doc.synth.liveInputPitches = [this._playedPitch];
-		this._doc.synth.liveInputStarted = true;
+		this._doc.performance.addPerformedPitch(currentPitch);
 	}
 		
 	private _releaseLiveInput(): void {
+		this._doc.performance.removePerformedPitch(this._playedPitch);
 		this._playedPitch = -1;
-		this._doc.synth.liveInputDuration = 0;
 	}
 		
 	private _whenMouseOver = (event: MouseEvent): void => {
@@ -168,6 +170,7 @@ export class Piano {
 		//this._mouseX = (event.clientX || event.pageX) - boundingRect.left;
 		this._mouseY = ((event.clientY || event.pageY) - boundingRect.top) * this._editorHeight / (boundingRect.bottom - boundingRect.top);
 		if (isNaN(this._mouseY)) this._mouseY = 0;
+		this._updateCursorPitch();
 		this._playLiveInput();
 		this._updatePreview();
 	}
@@ -214,21 +217,56 @@ export class Piano {
 		
 	private _whenTouchReleased = (event: TouchEvent): void => {
 		event.preventDefault();
+		this._mouseDown = false;
 		this._releaseLiveInput();
 	}
+	
+	private _onAnimationFrame = (): void => {
+		window.requestAnimationFrame(this._onAnimationFrame);
 		
+		let liveInputChanged: boolean = false;
+		const liveInputPitchCount: number = !this._doc.performance.pitchesAreTemporary() ? this._doc.synth.liveInputPitches.length : 0;
+		if (this._renderedLiveInputPitches.length != liveInputPitchCount) {
+			liveInputChanged = true;
+		}
+		for (let i: number = 0; i < liveInputPitchCount; i++) {
+			if (this._renderedLiveInputPitches[i] != this._doc.synth.liveInputPitches[i]) {
+				this._renderedLiveInputPitches[i] = this._doc.synth.liveInputPitches[i];
+				liveInputChanged = true;
+			}
+		}
+		this._renderedLiveInputPitches.length = liveInputPitchCount;
+		
+		if (liveInputChanged) {
+			this._updatePreview();
+		}
+	}
+	
 	private _updatePreview(): void {
 		this._preview.style.visibility = (!this._mouseOver || this._mouseDown) ? "hidden" : "visible";
-		if (!this._mouseOver || this._mouseDown) return;
-			
-		const boundingRect: ClientRect = this.container.getBoundingClientRect();
-		const pitchHeight: number = this._pitchHeight / (this._editorHeight / (boundingRect.bottom - boundingRect.top));
-			
-		this._preview.style.left = "0px";
-		this._preview.style.top = pitchHeight * (this._pitchCount - this._cursorPitch - 1) + "px";
-		this._preview.style.height = pitchHeight + "px";
-	}
 		
+		if (this._mouseOver && !this._mouseDown) {
+			const boundingRect: ClientRect = this.container.getBoundingClientRect();
+			const pitchHeight: number = this._pitchHeight / (this._editorHeight / (boundingRect.bottom - boundingRect.top));
+			
+			this._preview.style.left = "0px";
+			this._preview.style.top = pitchHeight * (this._pitchCount - this._cursorPitch - 1) + "px";
+			this._preview.style.height = pitchHeight + "px";
+		}
+		
+		const octaveOffset: number = this._doc.getBaseVisibleOctave(this._doc.channel) * Config.pitchesPerOctave;
+		const container: HTMLDivElement = this._doc.song.getChannelIsNoise(this._doc.channel) ? this._drumContainer : this._pianoContainer;
+		const children: HTMLCollection = container.children;
+		for (let i: number = 0; i < children.length; i++) {
+			const child: Element = children[i];
+			if (this._renderedLiveInputPitches.indexOf(i + octaveOffset) == -1) {
+				child.classList.remove("pressed");
+			} else {
+				child.classList.add("pressed");
+			}
+		}
+	}
+	
 	private _documentChanged = (): void => {
 		const isDrum: boolean = this._doc.song.getChannelIsNoise(this._doc.channel);
 		const isMod: boolean = this._doc.song.getChannelIsMod(this._doc.channel);
@@ -237,12 +275,8 @@ export class Piano {
 		this._pitchHeight = this._editorHeight / this._pitchCount;
 		this._updateCursorPitch();
 		if (this._mouseDown) this._playLiveInput();
-		this._doc.synth.liveInputChannel = this._doc.channel;
-		this._doc.synth.liveInputInstruments = this._doc.recentPatternInstruments[this._doc.channel];
-
-		if (!this._doc.showLetters) return;
-			
-
+		
+		if (!this._doc.prefs.showLetters) return;
 		if (this._renderedScale == this._doc.song.scale && this._renderedKey == this._doc.song.key && this._renderedDrums == isDrum && this._renderedMod == isMod && this._renderedPitchCount == this._pitchCount) return;
 		
 		this._renderedScale = this._doc.song.scale;
@@ -281,24 +315,9 @@ export class Piano {
 					this._pianoKeys[j].classList.remove("disabled");
 					this._pianoLabels[j].style.display = "";
 						
-					let text: string;
-						
-					if (Config.keys[pitchNameIndex].isWhiteKey) {
-						text = Config.keys[pitchNameIndex].name;
-					} else {
-						const shiftDir: number = Config.blackKeyNameParents[j % Config.pitchesPerOctave];
-						text = Config.keys[(pitchNameIndex + Config.pitchesPerOctave + shiftDir) % Config.pitchesPerOctave].name;
-						if (shiftDir == 1) {
-							text += "♭";
-						} else if (shiftDir == -1) {
-							text += "♯";
-						}
-					}
-						
 					const label: HTMLDivElement = this._pianoLabels[j];
 
 					if ((j % 12) == 0) {
-						text += Math.floor(j / 12) + this._doc.getBaseVisibleOctave(this._doc.channel);
 						label.style.transform = "translate(-5px, 0px)";
 					}
 					else {
@@ -307,7 +326,7 @@ export class Piano {
 
 
 					label.style.color = Config.keys[pitchNameIndex].isWhiteKey ? "black" : "white";
-					label.textContent = text;
+					label.textContent = Piano.getPitchName(pitchNameIndex, j, this._doc.getBaseVisibleOctave(this._doc.channel));
 				}
 			}
 		}
@@ -511,8 +530,30 @@ export class Piano {
 					let height: number = firstLabel.parentElement!.parentElement!.getBoundingClientRect().height;
 					firstLabel.style.transform = "rotate(-90deg) translate(" + (-20 - Math.round(Math.max(0, (height - 80) / 2))) + "px, 39px) scale(1, 1)";
 				}
-		}
+			}
 		}
 		this._updatePreview();
+	}
+
+	public static getPitchName(pitchNameIndex: number, scaleIndex: number, baseVisibleOctave: number): string {
+		let text: string;
+
+		if (Config.keys[pitchNameIndex].isWhiteKey) {
+			text = Config.keys[pitchNameIndex].name;
+		} else {
+			const shiftDir: number = Config.blackKeyNameParents[scaleIndex % Config.pitchesPerOctave];
+			text = Config.keys[(pitchNameIndex + Config.pitchesPerOctave + shiftDir) % Config.pitchesPerOctave].name;
+			if (shiftDir == 1) {
+				text += "♭";
+			} else if (shiftDir == -1) {
+				text += "♯";
+			}
+		}
+
+		if (scaleIndex % 12 == 0) {
+			text += Math.floor(scaleIndex / 12) + baseVisibleOctave;
+		}
+
+		return text;
 	}
 }

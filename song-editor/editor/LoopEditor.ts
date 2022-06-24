@@ -1,4 +1,4 @@
-// Copyright (C) 2021 John Nesky, distributed under the MIT license.
+// Copyright (c) 2012-2022 John Nesky and contributing authors, distributed under the MIT license, see accompanying the LICENSE.md file.
 
 import { SongDocument } from "./SongDocument";
 import { HTML, SVG } from "imperative-html/dist/esm/elements-strict";
@@ -202,7 +202,7 @@ export class LoopEditor {
 				this._change = new ChangeLoop(this._doc, oldStart, oldEnd - oldStart, endPoints.start, endPoints.length);
 			}
 			this._doc.synth.jumpIntoLoop();
-			if (this._doc.autoFollow) {
+			if (this._doc.prefs.autoFollow) {
 				new ChangeChannelBar(this._doc, this._doc.channel, Math.floor(this._doc.synth.playhead), true);
 			}
 			this._doc.setProspectiveChange(this._change);

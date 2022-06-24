@@ -339,14 +339,8 @@ export class LimiterPrompt implements Prompt {
 	}
 
 	private _togglePlay = (): void => {
-		if (this._doc.synth.playing) {
-			this._songEditor._pause();
-			this.updatePlayButton();
-		} else {
-			this._doc.synth.snapToBar();
-			this._songEditor._play();
-			this.updatePlayButton();
-		}
+		this._songEditor.togglePlay();
+		this.updatePlayButton();
 	}
 
 	public updatePlayButton(): void {

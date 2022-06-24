@@ -1,4 +1,4 @@
-// Copyright (C) 2021 John Nesky, distributed under the MIT license.
+// Copyright (c) 2012-2022 John Nesky and contributing authors, distributed under the MIT license, see accompanying the LICENSE.md file.
 
 import { Dictionary, DictionaryArray, EnvelopeType, InstrumentType, Transition, Chord, Envelope, Config } from "../synth/SynthConfig";
 import { ColorConfig } from "../editor/ColorConfig";
@@ -533,19 +533,23 @@ function onKeyPressed(event: KeyboardEvent): void {
 	switch (event.keyCode) {
 		case 70: // first bar
 			synth.playhead = 0;
+			synth.computeLatestModValues();
 			event.preventDefault();
 			break;
 		case 32: // space
 			onTogglePlay();
+			synth.computeLatestModValues();
 			event.preventDefault();
 			break;
 		case 219: // left brace
 			synth.goToPrevBar();
+			synth.computeLatestModValues();
 			renderPlayhead();
 			event.preventDefault();
 			break;
 		case 221: // right brace
 			synth.goToNextBar();
+			synth.computeLatestModValues();
 			renderPlayhead();
 			event.preventDefault();
 			break;

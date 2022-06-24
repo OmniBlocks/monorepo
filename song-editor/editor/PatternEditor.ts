@@ -1,4 +1,4 @@
-// Copyright (C) 2021 John Nesky, distributed under the MIT license.
+// Copyright (c) 2012-2022 John Nesky and contributing authors, distributed under the MIT license, see accompanying the LICENSE.md file.
 
 import { Chord, Transition, Config } from "../synth/SynthConfig";
 import { NotePin, Note, makeNotePin, Pattern, Instrument } from "../synth/synth";
@@ -516,7 +516,7 @@ export class PatternEditor {
     private _snapToPitch(guess: number, min: number, max: number): number {
         if (guess < min) guess = min;
         if (guess > max) guess = max;
-        const scale: ReadonlyArray<boolean> = this._doc.notesOutsideScale ? Config.scales.dictionary["Free"].flags : Config.scales[this._doc.song.scale].flags;
+        const scale: ReadonlyArray<boolean> = this._doc.prefs.notesOutsideScale ? Config.scales.dictionary["Free"].flags : Config.scales[this._doc.song.scale].flags;
         if (scale[Math.floor(guess) % Config.pitchesPerOctave] || this._doc.song.getChannelIsNoise(this._doc.channel) || this._doc.song.getChannelIsMod(this._doc.channel)) {
 
             return Math.floor(guess);
@@ -601,10 +601,12 @@ export class PatternEditor {
     private _animatePlayhead = (timestamp: number): void => {
 
         if (this._usingTouch && !this.shiftMode && !this._mouseDragging && this._mouseDown && performance.now() > this._touchTime + 1000 && this._cursor.valid && this._doc.lastChangeWas(this._dragChange)) {
+            // On a mobile device, the pattern editor supports using a long stationary touch to activate selection.
             this._dragChange!.undo();
             this._shiftHeld = true;
             this._dragConfirmed = false;
             this._whenCursorPressed();
+            // The full interface is usually only rerendered in response to user input events, not animation events, but in this case go ahead and rerender everything.
             this._doc.notifier.notifyWatchers();
         }
 
@@ -623,11 +625,18 @@ export class PatternEditor {
             this._svgPlayhead.setAttribute("visibility", "hidden");
         }
 
-        if (this._doc.synth.playing && this._doc.autoFollow && this._followPlayheadBar != playheadBar) {
+        if (this._doc.synth.playing && (this._doc.synth.recording || this._doc.prefs.autoFollow) && this._followPlayheadBar != playheadBar) {
+            // When autofollow is enabled, select the current bar (but don't record it in undo history).
             new ChangeChannelBar(this._doc, this._doc.channel, playheadBar);
+            // The full interface is usually only rerendered in response to user input events, not animation events, but in this case go ahead and rerender everything.
             this._doc.notifier.notifyWatchers();
         }
         this._followPlayheadBar = playheadBar;
+
+        if (this._doc.currentPatternIsDirty) {
+            this._redrawNotePatterns();
+        }
+
         window.requestAnimationFrame(this._animatePlayhead);
     }
 
@@ -729,7 +738,7 @@ export class PatternEditor {
             this.editingModLabel = true;
         } else {
             this.stopEditingModLabel(false);
-            if (this._doc.enableNotePreview) this._doc.synth.maintainLiveInput();
+            if (this._doc.prefs.enableNotePreview) this._doc.synth.maintainLiveInput();
             this._mouseDown = true;
             this._mouseXStart = this._mouseX;
             this._mouseYStart = this._mouseY;
@@ -777,12 +786,10 @@ export class PatternEditor {
                 if (pattern == null) throw new Error();
                 sequence.append(new ChangeNoteAdded(this._doc, pattern, note, this._cursor.curIndex));
 
-                if (this._doc.enableNotePreview && !this._doc.synth.playing) {
+                if (this._doc.prefs.enableNotePreview && !this._doc.synth.playing) {
                     // Play the new note out loud if enabled.
                     const duration: number = Math.min(Config.partsPerBeat, this._cursor.end - this._cursor.start);
-                    this._doc.synth.liveInputDuration = duration;
-                    this._doc.synth.liveInputPitches = [this._cursor.pitch];
-                    this._doc.synth.liveInputStarted = true;
+                    this._doc.performance.setTemporaryPitches([this._cursor.pitch], duration);
                 }
             }
             this._updateSelection();
@@ -814,7 +821,7 @@ export class PatternEditor {
     }
 
     private _whenCursorMoved(): void {
-        if (this._doc.enableNotePreview && this._mouseOver) this._doc.synth.maintainLiveInput();
+        if (this._doc.prefs.enableNotePreview && this._mouseOver) this._doc.synth.maintainLiveInput();
 
         // HACK: Undoable pattern changes rely on persistent instance
         // references. Loading song from hash via undo/redo breaks that,
@@ -1097,7 +1104,7 @@ export class PatternEditor {
                         const sizeRatio: number = (bendPart - prevPin.time) / (nextPin.time - prevPin.time);
                         bendSize = Math.round(prevPin.size * (1.0 - sizeRatio) + nextPin.size * sizeRatio + dragSign * dragCounts);
                         // If not in fine control mode, round to 0~2~4~6 (normal 4 settings)
-                        if (!this.controlMode && !this._doc.alwaysFineNoteVol && !this._doc.song.getChannelIsMod(this._doc.channel)) {
+                        if (!this.controlMode && !this._doc.prefs.alwaysFineNoteVol && !this._doc.song.getChannelIsMod(this._doc.channel)) {
                             bendSize = Math.floor(bendSize / 2) * 2;
                         }
                         if (bendSize < 0) bendSize = 0;
@@ -1253,11 +1260,9 @@ export class PatternEditor {
                     sequence.append(new ChangePitchAdded(this._doc, this._cursor.curNote, this._cursor.pitch, this._cursor.curNote.pitches.length));
                     this._copyPins(this._cursor.curNote);
 
-                    if (this._doc.enableNotePreview && !this._doc.synth.playing) {
+                    if (this._doc.prefs.enableNotePreview && !this._doc.synth.playing) {
                         const duration: number = Math.min(Config.partsPerBeat, this._cursor.end - this._cursor.start);
-                        this._doc.synth.liveInputDuration = duration;
-                        this._doc.synth.liveInputPitches = this._cursor.curNote.pitches.concat();
-                        this._doc.synth.liveInputStarted = true;
+                        this._doc.performance.setTemporaryPitches([this._cursor.pitch], duration);
                     }
                 } else {
                     if (this._cursor.curNote.pitches.length == 1) {
@@ -1478,17 +1483,15 @@ export class PatternEditor {
             }
         }
 
-        this._svgNoteContainer = makeEmptyReplacementElement(this._svgNoteContainer);
-
         if (this._interactive) {
             if (!this._mouseDown) this._updateCursorStatus();
             this._updatePreview();
             this._updateSelection();
         }
 
-        if (this._renderedFifths != this._doc.showFifth) {
-            this._renderedFifths = this._doc.showFifth;
-            this._backgroundPitchRows[7].setAttribute("fill", this._doc.showFifth ? ColorConfig.fifthNote : ColorConfig.pitchBackground);
+        if (this._renderedFifths != this._doc.prefs.showFifth) {
+            this._renderedFifths = this._doc.prefs.showFifth;
+            this._backgroundPitchRows[7].setAttribute("fill", this._doc.prefs.showFifth ? ColorConfig.fifthNote : ColorConfig.pitchBackground);
         }
 
         for (let j: number = 0; j < Config.pitchesPerOctave; j++) {
@@ -1516,7 +1519,13 @@ export class PatternEditor {
             }
         }
 
-        if (this._doc.showChannels) {
+        this._redrawNotePatterns();
+    }
+
+    private _redrawNotePatterns(): void {
+        this._svgNoteContainer = makeEmptyReplacementElement(this._svgNoteContainer);
+
+        if (this._doc.prefs.showChannels) {
             if (!this._doc.song.getChannelIsMod(this._doc.channel)) {
                 for (let channel: number = this._doc.song.pitchChannelCount + this._doc.song.noiseChannelCount - 1; channel >= 0; channel--) {
                     if (channel == this._doc.channel) continue;
@@ -1625,6 +1634,8 @@ export class PatternEditor {
                 }
             }
         }
+
+        this._doc.currentPatternIsDirty = false;
     }
 
     private _drawNote(svgElement: SVGPathElement, pitch: number, start: number, pins: NotePin[], radius: number, showSize: boolean, offset: number): void {

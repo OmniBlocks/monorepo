@@ -1,4 +1,4 @@
-// Copyright (C) 2021 John Nesky, distributed under the MIT license.
+// Copyright (c) 2012-2022 John Nesky and contributing authors, distributed under the MIT license, see accompanying the LICENSE.md file.
 
 import { Pattern } from "../synth/synth";
 import { ColorConfig, ChannelColors } from "./ColorConfig";
@@ -603,8 +603,8 @@ export class TrackEditor {
 		}
 			
 		this._select.style.display = this._touchMode ? "" : "none";
-			
-		if (this._doc.selection.boxSelectionWidth > 1 || this._doc.selection.boxSelectionHeight > 1) {
+		
+		if (this._doc.selection.boxSelectionActive) {
 			// TODO: This causes the selection rectangle to repaint every time the
 			// editor renders and the selection is visible. Check if anything changed
 			// before overwriting the attributes?

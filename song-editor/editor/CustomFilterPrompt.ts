@@ -86,12 +86,12 @@ export class CustomFilterPrompt implements Prompt {
 
 		this._editorTitle.children[0].innerHTML = (_useNoteFilter) ? "Edit Note Filter" : "Edit EQ Filter";
 
-		let newButton: HTMLButtonElement = button({ style: "max-width: 5em;"}, "Main");
+		let newButton: HTMLButtonElement = button({ class: "no-underline", style: "max-width: 5em;"}, "Main");
 		this._filterButtonContainer.appendChild(newButton);
 		this._filterButtons.push(newButton);
 		newButton.addEventListener("click", () => { this._setSubfilter(0); });
 		for (let i: number = 1; i < Config.filterMorphCount; i++) {
-			let newSubButton: HTMLButtonElement = button({ style: "max-width: 2em;"}, "" + i);
+			let newSubButton: HTMLButtonElement = button({ class: "no-underline", style: "max-width: 2em;"}, "" + i);
 			this._filterButtons.push(newSubButton);
 			this._filterButtonContainer.appendChild(newSubButton);
 			newSubButton.addEventListener("click", () => { this._setSubfilter(i); });
@@ -153,20 +153,16 @@ export class CustomFilterPrompt implements Prompt {
 		}
 		// Number 1-9
 		if (event.keyCode >= 49 && event.keyCode <= 57) {
-			this.filterEditor.swapSubfilterIndices(event.keyCode - 49);
-			event.stopPropagation();
+			if (!event.shiftKey) {
+				this.filterEditor.swapSubfilterIndices(event.keyCode - 49);
+				event.stopPropagation();
+			}
 		}
 	}
 
 	private _togglePlay = (): void => {
-		if (this._doc.synth.playing) {
-			this._songEditor._pause();
-			this.updatePlayButton();
-		} else {
-			this._doc.synth.snapToBar();
-			this._songEditor._play();
-			this.updatePlayButton();
-		}
+		this._songEditor.togglePlay();
+		this.updatePlayButton();
 	}
 
 	public updatePlayButton(): void {
@@ -202,18 +198,30 @@ export class CustomFilterPrompt implements Prompt {
 		if ((<Element>event.target).tagName != "BUTTON" && event.keyCode == 13) { // Enter key
 			this._saveChanges();
 		}
-		if (event.keyCode == 32) {
+		else if (event.keyCode == 32) { // space
 			this._togglePlay();
 			event.preventDefault();
 		}
-		if (event.keyCode == 90) { // z
+		else if (event.keyCode == 90) { // z
 			this.filterEditor.undo();
 			event.stopPropagation();
 		}
-		if (event.keyCode == 89) { // y
+		else if (event.keyCode == 89) { // y
 			this.filterEditor.redo();
 			event.stopPropagation();
 		}
+		else if (event.keyCode == 219) { // [
+			this._doc.synth.goToPrevBar();
+		}
+		else if (event.keyCode == 221) { // ]
+			this._doc.synth.goToNextBar();
+		}
+		else if (event.keyCode >= 48 && event.keyCode <= 57) { // 0-9
+			if (event.shiftKey) {
+				this._setSubfilter(event.keyCode - 48);
+			}
+		}
+
 	}
 
 	private _saveChanges = (): void => {

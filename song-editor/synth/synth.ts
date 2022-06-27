@@ -3298,6 +3298,8 @@ export class Song {
                 // Anti-aliasing was added in BeepBox 3.0 (v6->v7) and JummBox 1.3 (v1->v2 roughly but some leakage possible)
                 if (((beforeSeven && fromBeepBox) || (beforeTwo && fromJummBox)) && (instrumentType == InstrumentType.chip || instrumentType == InstrumentType.customChipWave || instrumentType == InstrumentType.pwm)) {
                     instrument.aliases = true;
+                    instrument.distortion = 0;
+                    instrument.effects |= 1 << EffectType.distortion;
                 }
                 if (useSlowerArpSpeed) {
                     instrument.arpeggioSpeed = 9; // x3/4 speed. This used to be tied to rhythm, but now it is decoupled to each instrument's arp speed slider. This flag gets set when importing older songs to keep things consistent.
@@ -3767,7 +3769,10 @@ export class Song {
                         // Enable detune if it was used.
                         instrument.effects |= 1 << EffectType.detune;
                     }
-                    instrument.effects &= ~(1 << EffectType.distortion);
+                    if (instrument.aliases)
+                        instrument.effects |= 1 << EffectType.distortion;
+                    else
+                        instrument.effects &= ~(1 << EffectType.distortion);
 
                     // convertLegacySettings may need to force-enable note filter, call
                     // it again here to make sure that this override takes precedence.
@@ -8014,7 +8019,7 @@ export class Synth {
         const channelState: ChannelState = this.channels[channelIndex];
         const instrumentState: InstrumentState = channelState.instruments[tone.instrumentIndex];
 
-        instrumentState.synthesizer!(this, bufferIndex, runLength, tone, instrumentState);
+        if (instrumentState.synthesizer != null) instrumentState.synthesizer!(this, bufferIndex, runLength, tone, instrumentState);
         tone.envelopeComputer.clearEnvelopes();
     }
 

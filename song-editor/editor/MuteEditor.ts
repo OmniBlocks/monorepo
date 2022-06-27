@@ -288,7 +288,7 @@ export class MuteEditor {
 		if (this._renderedChannelCount != this._doc.song.getChannelCount()) {
 			for (let y: number = this._renderedChannelCount; y < this._doc.song.getChannelCount(); y++) {
 
-				const channelCountText: HTMLDivElement = HTML.div({ class: "noSelection muteButtonText", style: "display: table-cell; -webkit-text-stroke-width: thick; vertical-align: middle; text-align: center; -webkit-user-select: none; -webkit-touch-callout: none; -moz-user-select: none; -ms-user-select: none; user-select: none; pointer-events: none; width: 12px; height: 20px; transform: translate(0px, 1px);" });
+				const channelCountText: HTMLDivElement = HTML.div({ class: "noSelection muteButtonText", style: "display: table-cell; -webkit-text-stroke: 1.5px; vertical-align: middle; text-align: center; -webkit-user-select: none; -webkit-touch-callout: none; -moz-user-select: none; -ms-user-select: none; user-select: none; pointer-events: none; width: 12px; height: 20px; transform: translate(0px, 1px);" });
 				const muteButton: HTMLDivElement = HTML.div({ class: "mute-button", title: "Mute (M), Mute All (⇧M), Solo (S), Exclude (⇧S)", style: `display: block; pointer-events: none; width: 16px; height: 20px; transform: translate(2px, 1px);` });
 
 				const muteContainer: HTMLDivElement = HTML.div({ style: "align-items: center; height: 20px; margin: 0px; display: table; flex-direction: row; justify-content: space-between;" }, [

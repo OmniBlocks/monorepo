@@ -1,4 +1,4 @@
-// Copyright (C) 2021 John Nesky, distributed under the MIT license.
+// Copyright (c) 2012-2022 John Nesky and contributing authors, distributed under the MIT license, see accompanying the LICENSE.md file.
 
 //import {Layout} from "./Layout";
 import { InstrumentType, EffectType, Config, effectsIncludeTransition, effectsIncludeChord, effectsIncludePitchShift, effectsIncludeDetune, effectsIncludeVibrato, effectsIncludeNoteFilter, effectsIncludeDistortion, effectsIncludeBitcrusher, effectsIncludePanning, effectsIncludeChorus, effectsIncludeEcho, effectsIncludeReverb, DropdownID } from "../synth/SynthConfig";
@@ -14,6 +14,7 @@ import { ExportPrompt } from "./ExportPrompt";
 import "./Layout"; // Imported here for the sake of ensuring this code is transpiled early.
 import { Instrument, Channel, Synth } from "../synth/synth";
 import { HTML, SVG } from "imperative-html/dist/esm/elements-strict";
+import { Preferences } from "./Preferences";
 import { HarmonicsEditor } from "./HarmonicsEditor";
 import { InputBox, Slider } from "./HTMLWrapper";
 import { ImportPrompt } from "./ImportPrompt";
@@ -27,12 +28,15 @@ import { LoopEditor } from "./LoopEditor";
 import { MoveNotesSidewaysPrompt } from "./MoveNotesSidewaysPrompt";
 import { MuteEditor } from "./MuteEditor";
 import { OctaveScrollBar } from "./OctaveScrollBar";
+import { MidiInputHandler } from "./MidiInput";
+import { KeyboardLayout } from "./KeyboardLayout";
 import { PatternEditor } from "./PatternEditor";
 import { Piano } from "./Piano";
 import { Prompt } from "./Prompt";
 import { SongDocument } from "./SongDocument";
 import { SongDurationPrompt } from "./SongDurationPrompt";
 import { SongRecoveryPrompt } from "./SongRecoveryPrompt";
+import { RecordingSetupPrompt } from "./RecordingSetupPrompt";
 import { SpectrumEditor } from "./SpectrumEditor";
 import { ThemePrompt } from "./ThemePrompt";
 import { TipPrompt } from "./TipPrompt";
@@ -145,11 +149,11 @@ class CustomChipCanvas {
     private continuousEdit: boolean;
     private lastX: number;
     private lastY: number;
-    public newArray: Float64Array;
+    public newArray: Float32Array;
 
     private _change: Change | null = null;
 
-    constructor(public readonly canvas: HTMLCanvasElement, private readonly _doc: SongDocument, private readonly _getChange: (newArray: Float64Array) => Change) {
+    constructor(public readonly canvas: HTMLCanvasElement, private readonly _doc: SongDocument, private readonly _getChange: (newArray: Float32Array) => Change) {
         //canvas.addEventListener("input", this._whenInput);
         //canvas.addEventListener("change", this._whenChange);
         canvas.addEventListener("mousemove", this._onMouseMove);
@@ -162,7 +166,7 @@ class CustomChipCanvas {
         this.lastX = 0;
         this.lastY = 0;
 
-        this.newArray = new Float64Array(64);
+        this.newArray = new Float32Array(64);
 
         // Init waveform
         this.redrawCanvas();
@@ -669,6 +673,7 @@ class CustomAlgorythmCanvas {
 export class SongEditor {
     public prompt: Prompt | null = null;
 
+    private readonly _keyboardLayout: KeyboardLayout = new KeyboardLayout(this._doc);
     private readonly _patternEditorPrev: PatternEditor = new PatternEditor(this._doc, false, -1);
     private readonly _patternEditor: PatternEditor = new PatternEditor(this._doc, true, 0);
     private readonly _patternEditorNext: PatternEditor = new PatternEditor(this._doc, false, 1);
@@ -677,9 +682,12 @@ export class SongEditor {
     private readonly _loopEditor: LoopEditor = new LoopEditor(this._doc);
     private readonly _piano: Piano = new Piano(this._doc);
     private readonly _octaveScrollBar: OctaveScrollBar = new OctaveScrollBar(this._doc, this._piano);
-    private readonly _playButton: HTMLButtonElement = button({ style: "width: 80px;", type: "button" });
-    private readonly _prevBarButton: HTMLButtonElement = button({ class: "prevBarButton", style: "width: 40px;", type: "button", title: "Previous Bar (left bracket)" });
-    private readonly _nextBarButton: HTMLButtonElement = button({ class: "nextBarButton", style: "width: 40px;", type: "button", title: "Next Bar (right bracket)" });
+    private readonly _playButton: HTMLButtonElement = button({ class: "playButton", type: "button", title: "Play (Space)" }, span("Play"));
+    private readonly _pauseButton: HTMLButtonElement = button({ class: "pauseButton", style: "display: none;", type: "button", title: "Pause (Space)" }, "Pause");
+    private readonly _recordButton: HTMLButtonElement = button({ class: "recordButton", style: "display: none;", type: "button", title: "Record (Ctrl+Space)" }, span("Record"));
+    private readonly _stopButton: HTMLButtonElement = button({ class: "stopButton", style: "display: none;", type: "button", title: "Stop Recording (Space)" }, "Stop Recording");
+    private readonly _prevBarButton: HTMLButtonElement = button({ class: "prevBarButton", type: "button", title: "Previous Bar (left bracket)" });
+    private readonly _nextBarButton: HTMLButtonElement = button({ class: "nextBarButton", type: "button", title: "Next Bar (right bracket)" });
     private readonly _volumeSlider: Slider = new Slider(input({ title: "main volume", style: "width: 5em; flex-grow: 1; margin: 0;", type: "range", min: "0", max: "75", value: "50", step: "1" }), this._doc, null, false);
     private readonly _outVolumeBarBg: SVGRectElement = SVG.rect({ "pointer-events": "none", width: "90%", height: "50%", x: "5%", y: "25%", fill: ColorConfig.uiWidgetBackground });
     private readonly _outVolumeBar: SVGRectElement = SVG.rect({ "pointer-events": "none", height: "50%", width: "0%", x: "5%", y: "25%", fill: "url('#volumeGrad2')" });
@@ -734,21 +742,22 @@ export class SongEditor {
     );
     private readonly _optionsMenu: HTMLSelectElement = select({ style: "width: 100%;" },
         option({ selected: true, disabled: true, hidden: false }, "Preferences"), // todo: "hidden" should be true but looks wrong on mac chrome, adds checkmark next to first visible option even though it's not selected. :(
-        option({ value: "autoPlay" }, "Auto Play On Load"),
-        option({ value: "autoFollow" }, "Auto Follow Track"),
-        option({ value: "enableNotePreview" }, "Preview Added Notes"),
+        option({ value: "autoPlay" }, "Auto Play on Load"),
+        option({ value: "autoFollow" }, "Keep Current Pattern Selected"),
+        option({ value: "enableNotePreview" }, "Hear Preview of Added Notes"),
         option({ value: "showLetters" }, "Show Piano Keys"),
-        option({ value: "showFifth" }, 'Highlight "Fifth" Notes'),
-        option({ value: "notesOutsideScale" }, "Allow Notes Outside Scale"),
+        option({ value: "showFifth" }, 'Highlight "Fifth" of Song Key'),
+        option({ value: "notesOutsideScale" }, "Allow Adding Notes Not in Scale"),
         option({ value: "setDefaultScale" }, "Use Current Scale as Default"),
-        option({ value: "showChannels" }, "Show All Channels"),
-        option({ value: "showScrollBar" }, "Octave Scroll Bar"),
-        option({ value: "alwaysFineNoteVol" }, "Always Fine Note Vol."),
+        option({ value: "showChannels" }, "Show Notes From All Channels"),
+        option({ value: "showScrollBar" }, "Show Octave Scroll Bar"),
+        option({ value: "alwaysFineNoteVol" }, "Always Fine Note Volume"),
         option({ value: "enableChannelMuting" }, "Enable Channel Muting"),
         option({ value: "displayBrowserUrl" }, "Display Song Data in URL"),
         option({ value: "displayVolumeBar" }, "Show Playback Volume"),
         option({ value: "layout" }, "Set Layout..."),
         option({ value: "colorTheme" }, "Set Theme..."),
+        option({ value: "recordingSetup" }, "Set Up Note Recording..."),
     );
     private readonly _scaleSelect: HTMLSelectElement = buildOptions(select(), Config.scales.map(scale => scale.name));
     private readonly _keySelect: HTMLSelectElement = buildOptions(select(), Config.keys.map(key => key.name).reverse());
@@ -803,8 +812,8 @@ export class SongEditor {
     private readonly _transitionDropdownGroup: HTMLElement = div({ class: "editor-controls", style: "display: none;" }, this._clicklessTransitionRow);
 
     private readonly _effectsSelect: HTMLSelectElement = select(option({ selected: true, disabled: true, hidden: false })); // todo: "hidden" should be true but looks wrong on mac chrome, adds checkmark next to first visible option even though it's not selected. :(
-    private readonly _eqFilterSimpleButton: HTMLButtonElement = button({ style: "font-size: x-small; width: 50%; height: 40%", onclick: () => this._switchEQFilterType(true) }, "simple");
-    private readonly _eqFilterAdvancedButton: HTMLButtonElement = button({ style: "font-size: x-small; width: 50%; height: 40%", class: "last-button", onclick: () => this._switchEQFilterType(false) }, "advanced");
+    private readonly _eqFilterSimpleButton: HTMLButtonElement = button({ style: "font-size: x-small; width: 50%; height: 40%", class: "no-underline", onclick: () => this._switchEQFilterType(true) }, "simple");
+    private readonly _eqFilterAdvancedButton: HTMLButtonElement = button({ style: "font-size: x-small; width: 50%; height: 40%", class: "last-button no-underline", onclick: () => this._switchEQFilterType(false) }, "advanced");
     private readonly _eqFilterTypeRow: HTMLElement = div({ class: "selectRow", style: "padding-top: 4px; margin-bottom: 0px;" }, span({ style: "font-size: x-small;", class: "tip", onclick: () => this._openPrompt("filterType") }, "EQ Filt.Type:"), div({ class: "instrument-bar" }, this._eqFilterSimpleButton, this._eqFilterAdvancedButton));
     private readonly _eqFilterEditor: FilterEditor = new FilterEditor(this._doc);
     private readonly _eqFilterZoom: HTMLButtonElement = button({ style: "margin-left:0em; padding-left:0.2em; height:1.5em; max-width: 12px;", onclick: () => this._openPrompt("customEQFilterSettings") }, "+");
@@ -814,8 +823,8 @@ export class SongEditor {
     private readonly _eqFilterSimplePeakSlider: Slider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.filterSimplePeakRange - 1, value: "6", step: "1" }), this._doc, (oldValue: number, newValue: number) => new ChangeEQFilterSimplePeak(this._doc, oldValue, newValue), false);
     private _eqFilterSimplePeakRow: HTMLDivElement = div({ class: "selectRow", title: "Low-pass Filter Peak Resonance" }, span({ class: "tip", onclick: () => this._openPrompt("filterResonance") }, "Filter Peak:"), this._eqFilterSimplePeakSlider.container);
 
-    private readonly _noteFilterSimpleButton: HTMLButtonElement = button({ style: "font-size: x-small; width: 50%; height: 40%", onclick: () => this._switchNoteFilterType(true) }, "simple");
-    private readonly _noteFilterAdvancedButton: HTMLButtonElement = button({ style: "font-size: x-small; width: 50%; height: 40%", class: "last-button", onclick: () => this._switchNoteFilterType(false) }, "advanced");
+    private readonly _noteFilterSimpleButton: HTMLButtonElement = button({ style: "font-size: x-small; width: 50%; height: 40%", class: "no-underline", onclick: () => this._switchNoteFilterType(true) }, "simple");
+    private readonly _noteFilterAdvancedButton: HTMLButtonElement = button({ style: "font-size: x-small; width: 50%; height: 40%", class: "last-button no-underline", onclick: () => this._switchNoteFilterType(false) }, "advanced");
     private readonly _noteFilterTypeRow: HTMLElement = div({ class: "selectRow", style: "padding-top: 4px; margin-bottom: 0px;" }, span({ style: "font-size: x-small;", class: "tip", onclick: () => this._openPrompt("filterType") }, "Note Filt.Type:"), div({ class: "instrument-bar" }, this._noteFilterSimpleButton, this._noteFilterAdvancedButton));
     private readonly _noteFilterEditor: FilterEditor = new FilterEditor(this._doc, true);
     private readonly _noteFilterZoom: HTMLButtonElement = button({ style: "margin-left:0em; padding-left:0.2em; height:1.5em; max-width: 12px;", onclick: () => this._openPrompt("customNoteFilterSettings") }, "+");
@@ -900,7 +909,7 @@ export class SongEditor {
     private readonly _algorithm6OpSelectRow: HTMLDivElement = div(div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("algorithm") }, "Algorithm: "), div({ class: "selectContainer" }, this._algorithm6OpSelect))
         , div({ style: "height:144px; display:flex; flex-direction: row; align-items:center; justify-content:center;" }, div({style:"display:block; width:10px; margin-right: 0.2em"},this._algorithmCanvasSwitch), div({style: "width:144px; height:144px;"},this._customAlgorithmCanvas.canvas)));//temp
 
-    private readonly _instrumentCopyButton: HTMLButtonElement = button({ style: "max-width:86px;", class: "copyButton" }, [
+    private readonly _instrumentCopyButton: HTMLButtonElement = button({ style: "max-width:86px; width: 86px;", class: "copyButton" }, [
         "Copy",
         // Copy icon:
         SVG.svg({ style: "flex-shrink: 0; position: absolute; left: 0; top: 50%; margin-top: -1em; pointer-events: none;", width: "2em", height: "2em", viewBox: "-5 -21 26 26" }, [
@@ -917,7 +926,7 @@ export class SongEditor {
     ]);
 
     public readonly _globalOscscope: oscilascopeCanvas = new oscilascopeCanvas(canvas({ width: 144, height: 32, style: "border:2px solid " + ColorConfig.uiWidgetBackground, id: "oscilascopeAll" }), this._doc.synth);
-    private readonly _customWaveDrawCanvas: CustomChipCanvas = new CustomChipCanvas(canvas({ width: 128, height: 52, style: "border:2px solid " + ColorConfig.uiWidgetBackground, id: "customWaveDrawCanvas" }), this._doc, (newArray: Float64Array) => new ChangeCustomWave(this._doc, newArray));
+    private readonly _customWaveDrawCanvas: CustomChipCanvas = new CustomChipCanvas(canvas({ width: 128, height: 52, style: "border:2px solid " + ColorConfig.uiWidgetBackground, id: "customWaveDrawCanvas" }), this._doc, (newArray: Float32Array) => new ChangeCustomWave(this._doc, newArray));
     private readonly _customWavePresetDrop: HTMLSelectElement = buildHeaderedOptions("Load Preset", select({ style: "width: 50%; height:1.5em; text-align: center; text-align-last: center;" }),
         Config.chipWaves.map(wave => wave.name)
     );
@@ -1021,7 +1030,7 @@ export class SongEditor {
     );
     private readonly _usedPatternIndicator: SVGElement = SVG.path({ d: "M -6 -6 H 6 V 6 H -6 V -6 M -2 -3 L -2 -3 L -1 -4 H 1 V 4 H -1 V -1.2 L -1.2 -1 H -2 V -3 z", fill: ColorConfig.indicatorSecondary, "fill-rule": "evenodd" });
     private readonly _usedInstrumentIndicator: SVGElement = SVG.path({ d: "M -6 -0.8 H -3.8 V -6 H 0.8 V 4.4 H 2.2 V -0.8 H 6 V 0.8 H 3.8 V 6 H -0.8 V -4.4 H -2.2 V 0.8 H -6 z", fill: ColorConfig.indicatorSecondary });
-    private readonly _jumpToModIndicator: SVGElement = SVG.svg({style: "width: 92%; height: 1.3em; flex-shrink: 0; position: absolute;", viewBox: "0 0 200 200" }, [
+    private readonly _jumpToModIndicator: SVGElement = SVG.svg({ style: "width: 92%; height: 1.3em; flex-shrink: 0; position: absolute;", viewBox: "0 0 200 200" }, [
         SVG.path({ d: "M90 155 l0 -45 -45 0 c-25 0 -45 -4 -45 -10 0 -5 20 -10 45 -10 l45 0 0 -45 c0 -25 5 -45 10 -45 6 0 10 20 10 45 l0 45 45 0 c25 0 45 5 45 10 0 6 -20 10 -45 10 l -45 0 0 45 c0 25 -4 45 -10 45 -5 0 -10 -20 -10 -45z" }),
         SVG.path({ d: "M42 158 c-15 -15 -16 -38 -2 -38 6 0 10 7 10 15 0 8 7 15 15 15 8 0 15 5 15 10 0 14 -23 13 -38 -2z" }),
         SVG.path({ d: "M120 160 c0 -5 7 -10 15 -10 8 0 15 -7 15 -15 0 -8 5 -15 10 -15 14 0 13 23 -2 38 -15 15 -38 16 -38 2z" }),
@@ -1059,6 +1068,56 @@ export class SongEditor {
         this._barScrollBar.container,
     );
 
+    private readonly _menuArea: HTMLDivElement = div({ class: "menu-area" },
+        div({ class: "selectContainer menu file" },
+            this._fileMenu,
+        ),
+        div({ class: "selectContainer menu edit" },
+            this._editMenu,
+        ),
+        div({ class: "selectContainer menu preferences" },
+            this._optionsMenu,
+        ),
+    );
+    private readonly _songSettingsArea: HTMLDivElement = div({ class: "song-settings-area" },
+        div({ class: "editor-controls" },
+            div({ class: "editor-song-settings" },
+                div({ style: "margin: 3px 0; position: relative; text-align: center; color: ${ColorConfig.secondaryText};" },
+                    div({ class: "tip", style: "flex-shrink: 0; position:absolute; left: 0; top: 0; width: 12px; height: 12px", onclick: () => this._openPrompt("usedPattern") },
+                        SVG.svg({ style: "flex-shrink: 0; position: absolute; left: 0; top: 0; pointer-events: none;", width: "12px", height: "12px", "margin-right": "0.5em", viewBox: "-6 -6 12 12" },
+                            this._usedPatternIndicator,
+                        ),
+                    ),
+                    div({ class: "tip", style: "flex-shrink: 0; position: absolute; left: 14px; top: 0; width: 12px; height: 12px", onclick: () => this._openPrompt("usedInstrument") },
+                        SVG.svg({ style: "flex-shrink: 0; position: absolute; left: 0; top: 0; pointer-events: none;", width: "12px", height: "12px", "margin-right": "1em", viewBox: "-6 -6 12 12" },
+                            this._usedInstrumentIndicator,
+                        ),
+                    ),
+                    "Song Settings",
+                    div({ style: "width: 100%; left: 0; top: -1px; position:absolute; overflow-x:clip;" }, this._jumpToModIndicator),
+                ),
+            ),
+            div({ class: "selectRow" },
+                span({ class: "tip", onclick: () => this._openPrompt("scale") }, "Scale: "),
+                div({ class: "selectContainer" }, this._scaleSelect),
+            ),
+            div({ class: "selectRow" },
+                span({ class: "tip", onclick: () => this._openPrompt("key") }, "Key: "),
+                div({ class: "selectContainer" }, this._keySelect),
+            ),
+            div({ class: "selectRow" },
+                span({ class: "tip", onclick: () => this._openPrompt("tempo") }, "Tempo: "),
+                span({ style: "display: flex;" },
+                    this._tempoSlider.container,
+                    this._tempoStepper,
+                ),
+            ),
+            div({ class: "selectRow" },
+                span({ class: "tip", onclick: () => this._openPrompt("rhythm") }, "Rhythm: "),
+                div({ class: "selectContainer" }, this._rhythmSelect),
+            ),
+        ),
+    );
     private readonly _instrumentSettingsArea: HTMLDivElement = div({ class: "instrument-settings-area" },
         this._instrumentSettingsGroup,
         this._modulatorGroup);
@@ -1072,6 +1131,9 @@ export class SongEditor {
             this._volumeBarBox,
             div({ class: "playback-bar-controls" },
                 this._playButton,
+                this._pauseButton,
+                this._recordButton,
+                this._stopButton,
                 this._prevBarButton,
                 this._nextBarButton,
             ),
@@ -1081,56 +1143,8 @@ export class SongEditor {
             ),
             div({style: "height: 38px"},this._globalOscscope.canvas),
         ),
-        div({ class: "menu-area" },
-            div({ class: "selectContainer menu file" },
-                this._fileMenu,
-            ),
-            div({ class: "selectContainer menu edit" },
-                this._editMenu,
-            ),
-            div({ class: "selectContainer menu preferences" },
-                this._optionsMenu,
-            ),
-        ),
-        div({ class: "song-settings-area" },
-            div({ class: "editor-controls" },
-                div({ class: "editor-song-settings" },
-                    div({ style: "margin: 3px 0; position: relative; text-align: center; color: ${ColorConfig.secondaryText};" },
-                        div({ class: "tip", style: "flex-shrink: 0; position:absolute; left: 0; top: 0; width: 12px; height: 12px", onclick: () => this._openPrompt("usedPattern") },
-                            SVG.svg({ style: "flex-shrink: 0; position: absolute; left: 0; top: 0; pointer-events: none;", width: "12px", height: "12px", "margin-right": "0.5em", viewBox: "-6 -6 12 12" },
-                                this._usedPatternIndicator,
-                            ),
-                        ),
-                        div({ class: "tip", style: "flex-shrink: 0; position: absolute; left: 14px; top: 0; width: 12px; height: 12px", onclick: () => this._openPrompt("usedInstrument") },
-                            SVG.svg({ style: "flex-shrink: 0; position: absolute; left: 0; top: 0; pointer-events: none;", width: "12px", height: "12px", "margin-right": "1em", viewBox: "-6 -6 12 12" },
-                                this._usedInstrumentIndicator,
-                            ),
-                        ),
-                        "Song Settings",
-                        div({ style: "width: 100%; left: 0; top: -1px; position:absolute; overflow-x:clip;" }, this._jumpToModIndicator),
-                    ),
-                ),
-                div({ class: "selectRow" },
-                    span({ class: "tip", onclick: () => this._openPrompt("scale") }, "Scale: "),
-                    div({ class: "selectContainer" }, this._scaleSelect),
-                ),
-                div({ class: "selectRow" },
-                    span({ class: "tip", onclick: () => this._openPrompt("key") }, "Key: "),
-                    div({ class: "selectContainer" }, this._keySelect),
-                ),
-                div({ class: "selectRow" },
-                    span({ class: "tip", onclick: () => this._openPrompt("tempo") }, "Tempo: "),
-                    span({ style: "display: flex;" },
-                        this._tempoSlider.container,
-                        this._tempoStepper,
-                    ),
-                ),
-                div({ class: "selectRow" },
-                    span({ class: "tip", onclick: () => this._openPrompt("rhythm") }, "Rhythm: "),
-                    div({ class: "selectContainer" }, this._rhythmSelect),
-                ),
-            ),
-        ),
+        this._menuArea,
+        this._songSettingsArea,
         this._instrumentSettingsArea,
     );
 
@@ -1145,6 +1159,11 @@ export class SongEditor {
     private _currentPromptName: string | null = null;
     private _highlightedInstrumentIndex: number = -1;
     private _renderedInstrumentCount: number = 0;
+    private _renderedIsPlaying: boolean = false;
+    private _renderedIsRecording: boolean = false;
+    private _renderedShowRecordButton: boolean = false;
+    private _renderedCtrlHeld: boolean = false;
+    private _ctrlHeld: boolean = false;
     private _deactivatedInstruments: boolean = false;
     private readonly _operatorRows: HTMLDivElement[] = [];
     private readonly _operatorAmplitudeSliders: Slider[] = [];
@@ -1161,9 +1180,6 @@ export class SongEditor {
     private _newShowModSliders: boolean[] = [];
     private _modSliderValues: number[] = [];
     private _hasActiveModSliders: boolean = false;
-    private _modSliderHandle: number = 0;
-    private _volumeHandle: number = 0;
-    private _barScrollbarHandle: number = 0;
 
     private _openPanDropdown: boolean = false;
     private _openVibratoDropdown: boolean = false;
@@ -1178,7 +1194,10 @@ export class SongEditor {
     constructor(private _doc: SongDocument) {
 
         this._doc.notifier.watch(this.whenUpdated);
+        new MidiInputHandler(this._doc);
         window.addEventListener("resize", this.whenUpdated);
+        window.requestAnimationFrame(this.updatePlayButton);
+        window.requestAnimationFrame(this._animate);
 
         if (!("share" in navigator)) {
             this._fileMenu.removeChild(this._fileMenu.querySelector("[value='shareUrl']")!);
@@ -1296,7 +1315,7 @@ export class SongEditor {
             let modFilterRow: HTMLDivElement = div({ class: "selectRow", id: "modFilterText" + mod, style: "margin-bottom: 0.9em; color: currentColor;" }, span({ class: "tip", onclick: () => this._openPrompt("modFilter" + mod) }, "Target: "), div({ class: "selectContainer" }, modFilterBox));
 
             // @jummbus: I could template this up above and simply create from the template, especially since I also reuse it in song settings, but unsure how to do that with imperative-html :P
-            let modTarget: SVGElement = SVG.svg({ style:"transform: translate(0px, 1px);", width: "1.5em", height: "1em", viewBox: "0 0 200 200" }, [
+            let modTarget: SVGElement = SVG.svg({ style: "transform: translate(0px, 1px);", width: "1.5em", height: "1em", viewBox: "0 0 200 200" }, [
                 SVG.path({ d: "M90 155 l0 -45 -45 0 c-25 0 -45 -4 -45 -10 0 -5 20 -10 45 -10 l45 0 0 -45 c0 -25 5 -45 10 -45 6 0 10 20 10 45 l0 45 45 0 c25 0 45 5 45 10 0 6 -20 10 -45 10 l -45 0 0 45 c0 25 -4 45 -10 45 -5 0 -10 -20 -10 -45z" }),
                 SVG.path({ d: "M42 158 c-15 -15 -16 -38 -2 -38 6 0 10 7 10 15 0 8 7 15 15 15 8 0 15 5 15 10 0 14 -23 13 -38 -2z" }),
                 SVG.path({ d: "M120 160 c0 -5 7 -10 15 -10 8 0 15 -7 15 -15 0 -8 5 -15 10 -15 14 0 13 23 -2 38 -15 15 -38 16 -38 2z" }),
@@ -1347,7 +1366,23 @@ export class SongEditor {
         this._chordSelect.addEventListener("change", this._whenSetChord);
         this._vibratoSelect.addEventListener("change", this._whenSetVibrato);
         this._vibratoTypeSelect.addEventListener("change", this._whenSetVibratoType);
-        this._playButton.addEventListener("click", this._togglePlay);
+        this._playButton.addEventListener("click", this.togglePlay);
+        this._pauseButton.addEventListener("click", this.togglePlay);
+        this._recordButton.addEventListener("click", this._toggleRecord);
+        this._stopButton.addEventListener("click", this._toggleRecord);
+        // Start recording instead of opening context menu when control-clicking the record button on a Mac.
+        this._recordButton.addEventListener("contextmenu", (event: MouseEvent) => {
+            if (event.ctrlKey) {
+                event.preventDefault();
+                this._toggleRecord();
+            }
+        });
+        this._stopButton.addEventListener("contextmenu", (event: MouseEvent) => {
+            if (event.ctrlKey) {
+                event.preventDefault();
+                this._toggleRecord();
+            }
+        });
         this._prevBarButton.addEventListener("click", this._whenPrevBarPressed);
         this._nextBarButton.addEventListener("click", this._whenNextBarPressed);
         this._volumeSlider.input.addEventListener("input", this._setVolumeSlider);
@@ -1397,7 +1432,8 @@ export class SongEditor {
         this._patternArea.addEventListener("contextmenu", this._disableCtrlContextMenu);
         this._trackArea.addEventListener("contextmenu", this._disableCtrlContextMenu);
         this.mainLayer.addEventListener("keydown", this._whenKeyPressed);
-	this.mainLayer.addEventListener("keyup", this._whenKeyUp);
+        this.mainLayer.addEventListener("keyup", this._whenKeyReleased);
+        this.mainLayer.addEventListener("focusin", this._onFocusIn);
         this._instrumentCopyButton.addEventListener("click", this._copyInstrument.bind(this));
         this._instrumentPasteButton.addEventListener("click", this._pasteInstrument.bind(this));
 
@@ -1670,7 +1706,7 @@ export class SongEditor {
 
         if (this.prompt) {
             if (this._wasPlaying && !(this.prompt instanceof TipPrompt || this.prompt instanceof LimiterPrompt || this.prompt instanceof CustomScalePrompt || this.prompt instanceof CustomChipPrompt || this.prompt instanceof CustomFilterPrompt)) {
-                this._play();
+                this._doc.performance.play();
             }
             this._wasPlaying = false;
             this._promptContainer.style.display = "none";
@@ -1724,6 +1760,9 @@ export class SongEditor {
                 case "layout":
                     this.prompt = new LayoutPrompt(this._doc);
                     break;
+                case "recordingSetup":
+                    this.prompt = new RecordingSetupPrompt(this._doc);
+                    break;
                 default:
                     this.prompt = new TipPrompt(this._doc, promptName);
                     break;
@@ -1732,7 +1771,7 @@ export class SongEditor {
             if (this.prompt) {
                 if (!(this.prompt instanceof TipPrompt || this.prompt instanceof LimiterPrompt || this.prompt instanceof CustomChipPrompt || this.prompt instanceof CustomFilterPrompt)) {
                     this._wasPlaying = this._doc.synth.playing;
-                    this._pause();
+                    this._doc.performance.pause();
                 }
                 this._promptContainer.style.display = "";
                 this._promptContainer.appendChild(this.prompt.container);
@@ -1742,6 +1781,14 @@ export class SongEditor {
 
     public refocusStage = (): void => {
         this.mainLayer.focus({ preventScroll: true });
+    }
+
+    private _onFocusIn = (event: Event): void => {
+        if (this._doc.synth.recording && event.target != this.mainLayer && event.target != this._stopButton && event.target != this._volumeSlider.input) {
+            // Don't allow using tab to focus on the song settings while recording,
+            // since interacting with them while recording would mess up the recording.
+            this.refocusStage();
+        }
     }
 
     // Refocus stage if a sub-element that needs focus isn't being edited.
@@ -1755,9 +1802,10 @@ export class SongEditor {
     }
 
     public whenUpdated = (): void => {
-        this._muteEditor.container.style.display = this._doc.enableChannelMuting ? "" : "none";
+        const prefs: Preferences = this._doc.prefs;
+        this._muteEditor.container.style.display = prefs.enableChannelMuting ? "" : "none";
         const trackBounds: DOMRect = this._trackVisibleArea.getBoundingClientRect();
-        this._doc.trackVisibleBars = Math.floor((trackBounds.right - trackBounds.left - (this._doc.enableChannelMuting ? 32 : 0)) / this._doc.getBarWidth());
+        this._doc.trackVisibleBars = Math.floor((trackBounds.right - trackBounds.left - (prefs.enableChannelMuting ? 32 : 0)) / this._doc.getBarWidth());
         this._doc.trackVisibleChannels = Math.floor((trackBounds.bottom - trackBounds.top - 30) / this._doc.getChannelHeight());
         for (let i: number = this._doc.song.pitchChannelCount + this._doc.song.noiseChannelCount; i < this._doc.song.channels.length; i++) {
             const channel: Channel = this._doc.song.channels[i];
@@ -1773,10 +1821,10 @@ export class SongEditor {
             this._patternEditor.stopEditingModLabel(false);
         }
 
-        this._piano.container.style.display = this._doc.showLetters ? "" : "none";
-        this._octaveScrollBar.container.style.display = this._doc.showScrollBar ? "" : "none";
+        this._piano.container.style.display = prefs.showLetters ? "" : "none";
+        this._octaveScrollBar.container.style.display = prefs.showScrollBar ? "" : "none";
         this._barScrollBar.container.style.display = this._doc.song.barCount > this._doc.trackVisibleBars ? "" : "none";
-        this._volumeBarBox.style.display = this._doc.displayVolumeBar ? "" : "none";
+        this._volumeBarBox.style.display = this._doc.prefs.displayVolumeBar ? "" : "none";
 
         if (this._doc.getFullScreen()) {
             const semitoneHeight: number = this._patternEditorRow.clientHeight / this._doc.getVisiblePitchCount();
@@ -1798,8 +1846,8 @@ export class SongEditor {
             this._patternEditorNext.render();
             this._zoomInButton.style.display = (this._doc.channel < this._doc.song.pitchChannelCount) ? "" : "none";
             this._zoomOutButton.style.display = (this._doc.channel < this._doc.song.pitchChannelCount) ? "" : "none";
-            this._zoomInButton.style.right = this._doc.showScrollBar ? "24px" : "4px";
-            this._zoomOutButton.style.right = this._doc.showScrollBar ? "24px" : "4px";
+            this._zoomInButton.style.right = prefs.showScrollBar ? "24px" : "4px";
+            this._zoomOutButton.style.right = prefs.showScrollBar ? "24px" : "4px";
         } else {
             this._patternEditor.container.style.width = "";
             this._patternEditor.container.style.flexShrink = "";
@@ -1811,21 +1859,22 @@ export class SongEditor {
         this._patternEditor.render();
 
         const optionCommands: ReadonlyArray<string> = [
-            (this._doc.autoPlay ? "✓ " : "　") + "Auto Play On Load",
-            (this._doc.autoFollow ? "✓ " : "　") + "Auto Follow Track",
-            (this._doc.enableNotePreview ? "✓ " : "　") + "Preview Added Notes",
-            (this._doc.showLetters ? "✓ " : "　") + "Show Piano Keys",
-            (this._doc.showFifth ? "✓ " : "　") + 'Highlight "Fifth" Notes',
-            (this._doc.notesOutsideScale ? "✓ " : "　") + "Allow Notes Outside Scale",
-            (this._doc.defaultScale == this._doc.song.scale ? "✓ " : "　") + "Use Current Scale as Default",
-            (this._doc.showChannels ? "✓ " : "　") + "Show All Channels",
-            (this._doc.showScrollBar ? "✓ " : "　") + "Octave Scroll Bar",
-            (this._doc.alwaysFineNoteVol ? "✓ " : "") + "Always Fine Note Vol.",
-            (this._doc.enableChannelMuting ? "✓ " : "　") + "Enable Channel Muting",
-            (this._doc.displayBrowserUrl ? "✓ " : "　") + "Display Song Data in URL",
-            (this._doc.displayVolumeBar ? "✓ " : "　") + "Show Playback Volume",
+            (prefs.autoPlay ? "✓ " : "　") + "Auto Play on Load",
+            (prefs.autoFollow ? "✓ " : "　") + "Keep Current Pattern Selected",
+            (prefs.enableNotePreview ? "✓ " : "　") + "Hear Preview of Added Notes",
+            (prefs.showLetters ? "✓ " : "　") + "Show Piano Keys",
+            (prefs.showFifth ? "✓ " : "　") + 'Highlight "Fifth" of Song Key',
+            (prefs.notesOutsideScale ? "✓ " : "　") + "Allow Adding Notes Not in Scale",
+            (prefs.defaultScale == this._doc.song.scale ? "✓ " : "　") + "Use Current Scale as Default",
+            (prefs.showChannels ? "✓ " : "　") + "Show Notes From All Channels",
+            (prefs.showScrollBar ? "✓ " : "　") + "Show Octave Scroll Bar",
+            (prefs.alwaysFineNoteVol ? "✓ " : "") + "Always Fine Note Volume",
+            (prefs.enableChannelMuting ? "✓ " : "　") + "Enable Channel Muting",
+            (prefs.displayBrowserUrl ? "✓ " : "　") + "Display Song Data in URL",
+            (prefs.displayVolumeBar ? "✓ " : "　") + "Show Playback Volume",
             "　Set Layout...",
             "　Set Theme...",
+            "　Set Up Note Recording...",
         ];
         for (let i: number = 0; i < optionCommands.length; i++) {
             const option: HTMLOptionElement = <HTMLOptionElement>this._optionsMenu.children[i + 1];
@@ -1924,286 +1973,278 @@ export class SongEditor {
                 setSelectedValue(this._pitchedPresetSelect, instrument.preset);
             }
 
-            if (!this._doc.alwaysShowSettings && instrument.preset != instrument.type) {
-                //this._customizeInstrumentButton.style.display = "";
-                //this._customInstrumentSettingsGroup.style.display = "none";
+            if (instrument.type == InstrumentType.noise) {
+                this._chipWaveSelectRow.style.display = "none";
+                this._chipNoiseSelectRow.style.display = "";
+                setSelectedValue(this._chipNoiseSelect, instrument.chipNoise);
             } else {
-                //this._customizeInstrumentButton.style.display = "none";
-                //this._customInstrumentSettingsGroup.style.display = "";
+                this._chipNoiseSelectRow.style.display = "none";
+            }
+            if (instrument.type == InstrumentType.spectrum) {
+                this._chipWaveSelectRow.style.display = "none";
+                this._spectrumRow.style.display = "";
+                this._spectrumEditor.render();
+            } else {
+                this._spectrumRow.style.display = "none";
+            }
+            if (instrument.type == InstrumentType.harmonics || instrument.type == InstrumentType.pickedString) {
+                this._chipWaveSelectRow.style.display = "none";
+                this._harmonicsRow.style.display = "";
+                this._harmonicsEditor.render();
+            } else {
+                this._harmonicsRow.style.display = "none";
+            }
+            if (instrument.type == InstrumentType.pickedString) {
+                this._chipWaveSelectRow.style.display = "none";
+                this._stringSustainRow.style.display = "";
+                this._stringSustainSlider.updateValue(instrument.stringSustain);
+            } else {
+                this._stringSustainRow.style.display = "none";
+            }
+            if (instrument.type == InstrumentType.drumset) {
+                this._drumsetGroup.style.display = "";
+                this._chipWaveSelectRow.style.display = "none";
+                this._fadeInOutRow.style.display = "none";
+                for (let i: number = 0; i < Config.drumCount; i++) {
+                    setSelectedValue(this._drumsetEnvelopeSelects[i], instrument.drumsetEnvelopes[i]);
+                    this._drumsetSpectrumEditors[i].render();
+                }
+            } else {
+                this._drumsetGroup.style.display = "none";
+                this._fadeInOutRow.style.display = "";
+                this._fadeInOutEditor.render();
+            }
 
-                if (instrument.type == InstrumentType.noise) {
-                    this._chipWaveSelectRow.style.display = "none";
-                    this._chipNoiseSelectRow.style.display = "";
-                    setSelectedValue(this._chipNoiseSelect, instrument.chipNoise);
-                } else {
-                    this._chipNoiseSelectRow.style.display = "none";
-                }
-                if (instrument.type == InstrumentType.spectrum) {
-                    this._chipWaveSelectRow.style.display = "none";
-                    this._spectrumRow.style.display = "";
-                    this._spectrumEditor.render();
-                } else {
-                    this._spectrumRow.style.display = "none";
-                }
-                if (instrument.type == InstrumentType.harmonics || instrument.type == InstrumentType.pickedString) {
-                    this._chipWaveSelectRow.style.display = "none";
-                    this._harmonicsRow.style.display = "";
-                    this._harmonicsEditor.render();
-                } else {
-                    this._harmonicsRow.style.display = "none";
-                }
-                if (instrument.type == InstrumentType.pickedString) {
-                    this._chipWaveSelectRow.style.display = "none";
-                    this._stringSustainRow.style.display = "";
-                    this._stringSustainSlider.updateValue(instrument.stringSustain);
-                } else {
-                    this._stringSustainRow.style.display = "none";
-                }
-                if (instrument.type == InstrumentType.drumset) {
-                    this._drumsetGroup.style.display = "";
-                    this._chipWaveSelectRow.style.display = "none";
-                    this._fadeInOutRow.style.display = "none";
-                    for (let i: number = 0; i < Config.drumCount; i++) {
-                        setSelectedValue(this._drumsetEnvelopeSelects[i], instrument.drumsetEnvelopes[i]);
-                        this._drumsetSpectrumEditors[i].render();
-                    }
-                } else {
-                    this._drumsetGroup.style.display = "none";
-                    this._fadeInOutRow.style.display = "";
-                    this._fadeInOutEditor.render();
-                }
+            if (instrument.type == InstrumentType.chip) {
+                this._chipWaveSelectRow.style.display = "";
+                setSelectedValue(this._chipWaveSelect, instrument.chipWave);
+            }
 
-                if (instrument.type == InstrumentType.chip) {
-                    this._chipWaveSelectRow.style.display = "";
-                    setSelectedValue(this._chipWaveSelect, instrument.chipWave);
-                }
+            if (instrument.type == InstrumentType.customChipWave) {
+                this._customWaveDraw.style.display = "";
+                this._chipWaveSelectRow.style.display = "none";
+            }
+            else {
+                this._customWaveDraw.style.display = "none";
+            }
 
-                if (instrument.type == InstrumentType.customChipWave) {
-                    this._customWaveDraw.style.display = "";
-                    this._chipWaveSelectRow.style.display = "none";
-                }
-                else {
-                    this._customWaveDraw.style.display = "none";
-                }
-
-                if (instrument.type == InstrumentType.pwm) {
-                    this._chipWaveSelectRow.style.display = "none";
-                    this._pulseWidthRow.style.display = "";
-                    this._pulseWidthSlider.input.title = prettyNumber(instrument.pulseWidth) + "%";
-                    this._pulseWidthSlider.updateValue(instrument.pulseWidth);
-                } else {
-                    this._pulseWidthRow.style.display = "none";
-                }
+            if (instrument.type == InstrumentType.pwm) {
+                this._chipWaveSelectRow.style.display = "none";
+                this._pulseWidthRow.style.display = "";
+                this._pulseWidthSlider.input.title = prettyNumber(instrument.pulseWidth) + "%";
+                this._pulseWidthSlider.updateValue(instrument.pulseWidth);
+            } else {
+                this._pulseWidthRow.style.display = "none";
+            }
 
 
-                if (instrument.type == InstrumentType.fm || instrument.type == InstrumentType.fm6op) {
-                    this._phaseModGroup.style.display = "";
-                    this._feedbackRow2.style.display = "";
-                    this._chipWaveSelectRow.style.display = "none";
-                    setSelectedValue(this._algorithmSelect, instrument.algorithm);
-                    setSelectedValue(this._feedbackTypeSelect, instrument.feedbackType);
-                    this._feedbackAmplitudeSlider.updateValue(instrument.feedbackAmplitude);
-                    for (let i: number = 0; i < Config.operatorCount + (instrument.type == InstrumentType.fm6op? 2 : 0); i++) {
-                        const isCarrier: boolean = (i < Config.algorithms[instrument.algorithm].carrierCount);
-                        this._operatorRows[i].style.color = isCarrier ? ColorConfig.primaryText : "";
-                        setSelectedValue(this._operatorFrequencySelects[i], instrument.operators[i].frequency);
-                        this._operatorAmplitudeSliders[i].updateValue(instrument.operators[i].amplitude);
-                        setSelectedValue(this._operatorWaveformSelects[i], instrument.operators[i].waveform);
-                        this._operatorWaveformPulsewidthSliders[i].updateValue(instrument.operators[i].pulseWidth);
-                        this._operatorWaveformPulsewidthSliders[i].input.title = "" + Config.pwmOperatorWaves[instrument.operators[i].pulseWidth].name;
-                        this._operatorDropdownGroups[i].style.color = isCarrier ? ColorConfig.primaryText : "";
-                        const operatorName: string = (isCarrier ? "Voice " : "Modulator ") + (i + 1);
-                        this._operatorFrequencySelects[i].title = operatorName + " Frequency";
-                        this._operatorAmplitudeSliders[i].input.title = operatorName + (isCarrier ? " Volume" : " Amplitude");
-                        this._operatorDropdownGroups[i].style.display = (this._openOperatorDropdowns[i] ? "" : "none");
-                        if (instrument.operators[i].waveform == 2) {
-                            this._operatorWaveformPulsewidthSliders[i].container.style.display = "";
-                            this._operatorWaveformHints[i].style.display = "none";
-                        } else {
-                            this._operatorWaveformPulsewidthSliders[i].container.style.display = "none";
-                            this._operatorWaveformHints[i].style.display = "";
-                        }
-                    }
-                    if (instrument.type == InstrumentType.fm6op){
-                        setSelectedValue(this._algorithm6OpSelect, instrument.algorithm6Op);
-                        setSelectedValue(this._feedback6OpTypeSelect, instrument.feedbackType6Op);
-                        this._customAlgorithmCanvas.redrawCanvas();
-                        this._algorithm6OpSelectRow.style.display = "";
-                        this._feedback6OpRow1.style.display = "";
-                        this._operatorRows[4].style.display = "";
-                        this._operatorRows[5].style.display = "";
-                        this._operatorDropdownGroups[4].style.display = (this._openOperatorDropdowns[4] ? "" : "none");
-                        this._operatorDropdownGroups[5].style.display = (this._openOperatorDropdowns[5] ? "" : "none");
-                        this._algorithmSelectRow.style.display = "none";
-                        this._feedbackRow1.style.display = "none";
-                    }else{
-                        this._algorithm6OpSelectRow.style.display = "none";
-                        this._feedback6OpRow1.style.display = "none";
-                        this._operatorRows[4].style.display = "none";
-                        this._operatorRows[5].style.display = "none";
-                        this._operatorDropdownGroups[4].style.display = "none";
-                        this._operatorDropdownGroups[5].style.display = "none";
-                        this._feedbackRow1.style.display = "";
-                        this._algorithmSelectRow.style.display = "";
+            if (instrument.type == InstrumentType.fm || instrument.type == InstrumentType.fm6op) {
+                this._phaseModGroup.style.display = "";
+                this._feedbackRow2.style.display = "";
+                this._chipWaveSelectRow.style.display = "none";
+                setSelectedValue(this._algorithmSelect, instrument.algorithm);
+                setSelectedValue(this._feedbackTypeSelect, instrument.feedbackType);
+                this._feedbackAmplitudeSlider.updateValue(instrument.feedbackAmplitude);
+                for (let i: number = 0; i < Config.operatorCount + (instrument.type == InstrumentType.fm6op? 2 : 0); i++) {
+                    const isCarrier: boolean = instrument.type == InstrumentType.fm ? (i < Config.algorithms[instrument.algorithm].carrierCount): (i < instrument.customAlgorithm.carrierCount);
+                    this._operatorRows[i].style.color = isCarrier ? ColorConfig.primaryText : "";
+                    setSelectedValue(this._operatorFrequencySelects[i], instrument.operators[i].frequency);
+                    this._operatorAmplitudeSliders[i].updateValue(instrument.operators[i].amplitude);
+                    setSelectedValue(this._operatorWaveformSelects[i], instrument.operators[i].waveform);
+                    this._operatorWaveformPulsewidthSliders[i].updateValue(instrument.operators[i].pulseWidth);
+                    this._operatorWaveformPulsewidthSliders[i].input.title = "" + Config.pwmOperatorWaves[instrument.operators[i].pulseWidth].name;
+                    this._operatorDropdownGroups[i].style.color = isCarrier ? ColorConfig.primaryText : "";
+                    const operatorName: string = (isCarrier ? "Voice " : "Modulator ") + (i + 1);
+                    this._operatorFrequencySelects[i].title = operatorName + " Frequency";
+                    this._operatorAmplitudeSliders[i].input.title = operatorName + (isCarrier ? " Volume" : " Amplitude");
+                    this._operatorDropdownGroups[i].style.display = (this._openOperatorDropdowns[i] ? "" : "none");
+                    if (instrument.operators[i].waveform == 2) {
+                        this._operatorWaveformPulsewidthSliders[i].container.style.display = "";
+                        this._operatorWaveformHints[i].style.display = "none";
+                    } else {
+                        this._operatorWaveformPulsewidthSliders[i].container.style.display = "none";
+                        this._operatorWaveformHints[i].style.display = "";
                     }
                 }
-                else {
+                if (instrument.type == InstrumentType.fm6op){
+                    setSelectedValue(this._algorithm6OpSelect, instrument.algorithm6Op);
+                    setSelectedValue(this._feedback6OpTypeSelect, instrument.feedbackType6Op);
+                    this._customAlgorithmCanvas.redrawCanvas();
+                    this._algorithm6OpSelectRow.style.display = "";
+                    this._feedback6OpRow1.style.display = "";
+                    this._operatorRows[4].style.display = "";
+                    this._operatorRows[5].style.display = "";
+                    this._operatorDropdownGroups[4].style.display = (this._openOperatorDropdowns[4] ? "" : "none");
+                    this._operatorDropdownGroups[5].style.display = (this._openOperatorDropdowns[5] ? "" : "none");
+                    this._algorithmSelectRow.style.display = "none";
+                    this._feedbackRow1.style.display = "none";
+                }else{
                     this._algorithm6OpSelectRow.style.display = "none";
                     this._feedback6OpRow1.style.display = "none";
-                    this._algorithmSelectRow.style.display = "none";
-                    this._phaseModGroup.style.display = "none";
-                    this._feedbackRow1.style.display = "none";
-                    this._feedbackRow2.style.display = "none";
+                    this._operatorRows[4].style.display = "none";
+                    this._operatorRows[5].style.display = "none";
+                    this._operatorDropdownGroups[4].style.display = "none";
+                    this._operatorDropdownGroups[5].style.display = "none";
+                    this._feedbackRow1.style.display = "";
+                    this._algorithmSelectRow.style.display = "";
                 }
-                this._pulseWidthSlider.input.title = prettyNumber(instrument.pulseWidth) + "%";
+            }
+            else {
+                this._algorithm6OpSelectRow.style.display = "none";
+                this._feedback6OpRow1.style.display = "none";
+                this._algorithmSelectRow.style.display = "none";
+                this._phaseModGroup.style.display = "none";
+                this._feedbackRow1.style.display = "none";
+                this._feedbackRow2.style.display = "none";
+            }
+            this._pulseWidthSlider.input.title = prettyNumber(instrument.pulseWidth) + "%";
 
 
-                if (effectsIncludeTransition(instrument.effects)) {
-                    this._transitionRow.style.display = "";
-                    if (this._openTransitionDropdown)
-                        this._transitionDropdownGroup.style.display = "";
-                    setSelectedValue(this._transitionSelect, instrument.transition);
-                } else {
-                    this._transitionDropdownGroup.style.display = "none";
-                    this._transitionRow.style.display = "none";
+            if (effectsIncludeTransition(instrument.effects)) {
+                this._transitionRow.style.display = "";
+                if (this._openTransitionDropdown)
+                    this._transitionDropdownGroup.style.display = "";
+                setSelectedValue(this._transitionSelect, instrument.transition);
+            } else {
+                this._transitionDropdownGroup.style.display = "none";
+                this._transitionRow.style.display = "none";
+            }
+
+            if (effectsIncludeChord(instrument.effects)) {
+                this._chordSelectRow.style.display = "";
+                this._chordDropdown.style.display = (instrument.chord == Config.chords.dictionary["arpeggio"].index) ? "" : "none";
+                this._chordDropdownGroup.style.display = (instrument.chord == Config.chords.dictionary["arpeggio"].index && this._openChordDropdown) ? "" : "none";
+                setSelectedValue(this._chordSelect, instrument.chord);
+            } else {
+                this._chordSelectRow.style.display = "none";
+                this._chordDropdown.style.display = "none";
+                this._chordDropdownGroup.style.display = "none";
+            }
+
+            if (effectsIncludePitchShift(instrument.effects)) {
+                this._pitchShiftRow.style.display = "";
+                this._pitchShiftSlider.updateValue(instrument.pitchShift);
+                this._pitchShiftSlider.input.title = (instrument.pitchShift - Config.pitchShiftCenter) + " semitone(s)";
+                for (const marker of this._pitchShiftFifthMarkers) {
+                    marker.style.display = prefs.showFifth ? "" : "none";
                 }
+            } else {
+                this._pitchShiftRow.style.display = "none";
+            }
 
-                if (effectsIncludeChord(instrument.effects)) {
-                    this._chordSelectRow.style.display = "";
-                    this._chordDropdown.style.display = (instrument.chord == Config.chords.dictionary["arpeggio"].index) ? "" : "none";
-                    this._chordDropdownGroup.style.display = (instrument.chord == Config.chords.dictionary["arpeggio"].index && this._openChordDropdown) ? "" : "none";
-                    setSelectedValue(this._chordSelect, instrument.chord);
-                } else {
-                    this._chordSelectRow.style.display = "none";
-                    this._chordDropdown.style.display = "none";
-                    this._chordDropdownGroup.style.display = "none";
-                }
+            if (effectsIncludeDetune(instrument.effects)) {
+                this._detuneSliderRow.style.display = "";
+                this._detuneSlider.updateValue(instrument.detune - Config.detuneCenter);
+                this._detuneSlider.input.title = (Synth.detuneToCents(instrument.detune)) + " cent(s)";
+            } else {
+                this._detuneSliderRow.style.display = "none";
+            }
 
-                if (effectsIncludePitchShift(instrument.effects)) {
-                    this._pitchShiftRow.style.display = "";
-                    this._pitchShiftSlider.updateValue(instrument.pitchShift);
-                    this._pitchShiftSlider.input.title = (instrument.pitchShift - Config.pitchShiftCenter) + " semitone(s)";
-                    for (const marker of this._pitchShiftFifthMarkers) {
-                        marker.style.display = this._doc.showFifth ? "" : "none";
-                    }
-                } else {
-                    this._pitchShiftRow.style.display = "none";
-                }
+            if (effectsIncludeVibrato(instrument.effects)) {
+                this._vibratoSelectRow.style.display = "";
+                if (this._openVibratoDropdown)
+                    this._vibratoDropdownGroup.style.display = "";
+                setSelectedValue(this._vibratoSelect, instrument.vibrato);
+            } else {
+                this._vibratoDropdownGroup.style.display = "none";
+                this._vibratoSelectRow.style.display = "none";
+            }
 
-                if (effectsIncludeDetune(instrument.effects)) {
-                    this._detuneSliderRow.style.display = "";
-                    this._detuneSlider.updateValue(instrument.detune - Config.detuneCenter);
-                    this._detuneSlider.input.title = (Synth.detuneToCents(instrument.detune)) + " cent(s)";
-                } else {
-                    this._detuneSliderRow.style.display = "none";
-                }
+            if (effectsIncludeNoteFilter(instrument.effects)) {
 
-                if (effectsIncludeVibrato(instrument.effects)) {
-                    this._vibratoSelectRow.style.display = "";
-                    if (this._openVibratoDropdown)
-                        this._vibratoDropdownGroup.style.display = "";
-                    setSelectedValue(this._vibratoSelect, instrument.vibrato);
-                } else {
-                    this._vibratoDropdownGroup.style.display = "none";
-                    this._vibratoSelectRow.style.display = "none";
-                }
+                this._noteFilterTypeRow.style.setProperty("--text-color-lit", colors.primaryNote);
+                this._noteFilterTypeRow.style.setProperty("--text-color-dim", colors.secondaryNote);
+                this._noteFilterTypeRow.style.setProperty("--background-color-lit", colors.primaryChannel);
+                this._noteFilterTypeRow.style.setProperty("--background-color-dim", colors.secondaryChannel);
+                this._noteFilterTypeRow.style.display = "";
 
-                if (effectsIncludeNoteFilter(instrument.effects)) {
+                this._noteFilterEditor.render();
 
-                    this._noteFilterTypeRow.style.setProperty("--text-color-lit", colors.primaryNote);
-                    this._noteFilterTypeRow.style.setProperty("--text-color-dim", colors.secondaryNote);
-                    this._noteFilterTypeRow.style.setProperty("--background-color-lit", colors.primaryChannel);
-                    this._noteFilterTypeRow.style.setProperty("--background-color-dim", colors.secondaryChannel);
-                    this._noteFilterTypeRow.style.display = "";
-
-                    this._noteFilterEditor.render();
-
-                    if (instrument.noteFilterType) {
-                        this._noteFilterSimpleButton.classList.remove("deactivated");
-                        this._noteFilterAdvancedButton.classList.add("deactivated");
-                        this._noteFilterRow.style.display = "none";
-                        this._noteFilterSimpleCutRow.style.display = "";
-                        this._noteFilterSimplePeakRow.style.display = "";
-                    } else {
-                        this._noteFilterSimpleButton.classList.add("deactivated");
-                        this._noteFilterAdvancedButton.classList.remove("deactivated");
-                        this._noteFilterRow.style.display = "";
-                        this._noteFilterSimpleCutRow.style.display = "none";
-                        this._noteFilterSimplePeakRow.style.display = "none";
-                    }
-                } else {
+                if (instrument.noteFilterType) {
+                    this._noteFilterSimpleButton.classList.remove("deactivated");
+                    this._noteFilterAdvancedButton.classList.add("deactivated");
                     this._noteFilterRow.style.display = "none";
+                    this._noteFilterSimpleCutRow.style.display = "";
+                    this._noteFilterSimplePeakRow.style.display = "";
+                } else {
+                    this._noteFilterSimpleButton.classList.add("deactivated");
+                    this._noteFilterAdvancedButton.classList.remove("deactivated");
+                    this._noteFilterRow.style.display = "";
                     this._noteFilterSimpleCutRow.style.display = "none";
                     this._noteFilterSimplePeakRow.style.display = "none";
-                    this._noteFilterTypeRow.style.display = "none";
                 }
-
-                if (effectsIncludeDistortion(instrument.effects)) {
-                    this._distortionRow.style.display = "";
-                    if (instrument.type == InstrumentType.chip || instrument.type == InstrumentType.customChipWave || instrument.type == InstrumentType.pwm)
-                        this._aliasingRow.style.display = "";
-                    else
-                        this._aliasingRow.style.display = "none";
-                    this._distortionSlider.updateValue(instrument.distortion);
-                } else {
-                    this._distortionRow.style.display = "none";
-                    this._aliasingRow.style.display = "none";
-                }
-
-                if (effectsIncludeBitcrusher(instrument.effects)) {
-                    this._bitcrusherQuantizationRow.style.display = "";
-                    this._bitcrusherFreqRow.style.display = "";
-                    this._bitcrusherQuantizationSlider.updateValue(instrument.bitcrusherQuantization);
-                    this._bitcrusherFreqSlider.updateValue(instrument.bitcrusherFreq);
-                } else {
-                    this._bitcrusherQuantizationRow.style.display = "none";
-                    this._bitcrusherFreqRow.style.display = "none";
-                }
-
-                if (effectsIncludePanning(instrument.effects)) {
-                    this._panSliderRow.style.display = "";
-                    if (this._openPanDropdown)
-                        this._panDropdownGroup.style.display = "";
-                    this._panSlider.updateValue(instrument.pan);
-                } else {
-                    this._panSliderRow.style.display = "none";
-                    this._panDropdownGroup.style.display = "none";
-                }
-
-                if (effectsIncludeChorus(instrument.effects)) {
-                    this._chorusRow.style.display = "";
-                    this._chorusSlider.updateValue(instrument.chorus);
-                } else {
-                    this._chorusRow.style.display = "none";
-                }
-
-                if (effectsIncludeEcho(instrument.effects)) {
-                    this._echoSustainRow.style.display = "";
-                    this._echoSustainSlider.updateValue(instrument.echoSustain);
-                    this._echoDelayRow.style.display = "";
-                    this._echoDelaySlider.updateValue(instrument.echoDelay);
-                    this._echoDelaySlider.input.title = (Math.round((instrument.echoDelay + 1) * Config.echoDelayStepTicks / (Config.ticksPerPart * Config.partsPerBeat) * 1000) / 1000) + " beat(s)";
-                } else {
-                    this._echoSustainRow.style.display = "none";
-                    this._echoDelayRow.style.display = "none";
-                }
-
-                if (effectsIncludeReverb(instrument.effects)) {
-                    this._reverbRow.style.display = "";
-                    this._reverbSlider.updateValue(instrument.reverb);
-                } else {
-                    this._reverbRow.style.display = "none";
-                }
-
-                if (instrument.type == InstrumentType.chip || instrument.type == InstrumentType.customChipWave || instrument.type == InstrumentType.harmonics || instrument.type == InstrumentType.pickedString) {
-                    this._unisonSelectRow.style.display = "";
-                    setSelectedValue(this._unisonSelect, instrument.unison);
-                } else {
-                    this._unisonSelectRow.style.display = "none";
-                }
-
-                this._envelopeEditor.render();
+            } else {
+                this._noteFilterRow.style.display = "none";
+                this._noteFilterSimpleCutRow.style.display = "none";
+                this._noteFilterSimplePeakRow.style.display = "none";
+                this._noteFilterTypeRow.style.display = "none";
             }
+
+            if (effectsIncludeDistortion(instrument.effects)) {
+                this._distortionRow.style.display = "";
+                if (instrument.type == InstrumentType.chip || instrument.type == InstrumentType.customChipWave || instrument.type == InstrumentType.pwm)
+                    this._aliasingRow.style.display = "";
+                else
+                    this._aliasingRow.style.display = "none";
+                this._distortionSlider.updateValue(instrument.distortion);
+            } else {
+                this._distortionRow.style.display = "none";
+                this._aliasingRow.style.display = "none";
+            }
+
+            if (effectsIncludeBitcrusher(instrument.effects)) {
+                this._bitcrusherQuantizationRow.style.display = "";
+                this._bitcrusherFreqRow.style.display = "";
+                this._bitcrusherQuantizationSlider.updateValue(instrument.bitcrusherQuantization);
+                this._bitcrusherFreqSlider.updateValue(instrument.bitcrusherFreq);
+            } else {
+                this._bitcrusherQuantizationRow.style.display = "none";
+                this._bitcrusherFreqRow.style.display = "none";
+            }
+
+            if (effectsIncludePanning(instrument.effects)) {
+                this._panSliderRow.style.display = "";
+                if (this._openPanDropdown)
+                    this._panDropdownGroup.style.display = "";
+                this._panSlider.updateValue(instrument.pan);
+            } else {
+                this._panSliderRow.style.display = "none";
+                this._panDropdownGroup.style.display = "none";
+            }
+
+            if (effectsIncludeChorus(instrument.effects)) {
+                this._chorusRow.style.display = "";
+                this._chorusSlider.updateValue(instrument.chorus);
+            } else {
+                this._chorusRow.style.display = "none";
+            }
+
+            if (effectsIncludeEcho(instrument.effects)) {
+                this._echoSustainRow.style.display = "";
+                this._echoSustainSlider.updateValue(instrument.echoSustain);
+                this._echoDelayRow.style.display = "";
+                this._echoDelaySlider.updateValue(instrument.echoDelay);
+                this._echoDelaySlider.input.title = (Math.round((instrument.echoDelay + 1) * Config.echoDelayStepTicks / (Config.ticksPerPart * Config.partsPerBeat) * 1000) / 1000) + " beat(s)";
+            } else {
+                this._echoSustainRow.style.display = "none";
+                this._echoDelayRow.style.display = "none";
+            }
+
+            if (effectsIncludeReverb(instrument.effects)) {
+                this._reverbRow.style.display = "";
+                this._reverbSlider.updateValue(instrument.reverb);
+            } else {
+                this._reverbRow.style.display = "none";
+            }
+
+            if (instrument.type == InstrumentType.chip || instrument.type == InstrumentType.customChipWave || instrument.type == InstrumentType.harmonics || instrument.type == InstrumentType.pickedString) {
+                this._unisonSelectRow.style.display = "";
+                setSelectedValue(this._unisonSelect, instrument.unison);
+            } else {
+                this._unisonSelectRow.style.display = "none";
+            }
+
+            this._envelopeEditor.render();
 
             for (let chordIndex: number = 0; chordIndex < Config.chords.length; chordIndex++) {
                 let hidden: boolean = (!Config.instrumentTypeHasSpecialInterval[instrument.type] && Config.chords[chordIndex].customInterval);
@@ -2389,6 +2430,7 @@ export class SongEditor {
                 if (instrument.modChannels[mod] != -2) {
                     while (this._modSetBoxes[mod].firstChild) this._modSetBoxes[mod].remove(0);
                     const settingList: string[] = [];
+                    const unusedSettingList: string[] = [];
 
                     // Make sure these names match the names declared for modulators in SynthConfig.ts.
 
@@ -2411,7 +2453,31 @@ export class SongEditor {
                         // Build a list of target instrument indices, types and other info. It will be a single type for a single instrument, but with "all" and "active" it could be more.
                         // All or active are included together. Active allows any to be set, just in case the user fiddles with which are active later.
                         let tgtInstrumentTypes: InstrumentType[] = [];
-                        let anyInstrumentAdvancedEQ, anyInstrumentSimpleEQ, anyInstrumentAdvancedNote, anyInstrumentSimpleNote, anyInstrumentArps, anyInstrumentPitchShifts, anyInstrumentDetunes, anyInstrumentVibratos, anyInstrumentNoteFilters, anyInstrumentDistorts, anyInstrumentBitcrushes, anyInstrumentPans, anyInstrumentChorus, anyInstrumentEchoes, anyInstrumentReverbs: boolean = false;
+                        let anyInstrumentAdvancedEQ:   boolean = false,
+                            anyInstrumentSimpleEQ:     boolean = false,
+                            anyInstrumentAdvancedNote: boolean = false,
+                            anyInstrumentSimpleNote:   boolean = false,
+                            anyInstrumentArps:         boolean = false,
+                            anyInstrumentPitchShifts:  boolean = false,
+                            anyInstrumentDetunes:      boolean = false,
+                            anyInstrumentVibratos:     boolean = false,
+                            anyInstrumentNoteFilters:  boolean = false,
+                            anyInstrumentDistorts:     boolean = false,
+                            anyInstrumentBitcrushes:   boolean = false,
+                            anyInstrumentPans:         boolean = false,
+                            anyInstrumentChorus:       boolean = false,
+                            anyInstrumentEchoes:       boolean = false,
+                            anyInstrumentReverbs:      boolean = false;
+                        let allInstrumentPitchShifts:  boolean = true,
+                            allInstrumentNoteFilters:  boolean = true,
+                            allInstrumentDetunes:      boolean = true,
+                            allInstrumentVibratos:     boolean = true,
+                            allInstrumentDistorts:     boolean = true,
+                            allInstrumentBitcrushes:   boolean = true,
+                            allInstrumentPans:         boolean = true,
+                            allInstrumentChorus:       boolean = true,
+                            allInstrumentEchoes:       boolean = true,
+                            allInstrumentReverbs:      boolean = true;
                         let instrumentCandidates: number[] = [];
                         if (modInstrument >= channel.instruments.length) {
                             for (let i: number = 0; i < channel.instruments.length; i++) {
@@ -2438,8 +2504,14 @@ export class SongEditor {
                             if (effectsIncludeDetune(channel.instruments[instrumentIndex].effects)) {
                                 anyInstrumentDetunes = true;
                             }
+                            else {
+                                allInstrumentDetunes = false;
+                            }
                             if (effectsIncludeVibrato(channel.instruments[instrumentIndex].effects)) {
                                 anyInstrumentVibratos = true;
+                            }
+                            else {
+                                allInstrumentVibratos = false;
                             }
                             if (effectsIncludeNoteFilter(channel.instruments[instrumentIndex].effects)) {
                                 anyInstrumentNoteFilters = true;
@@ -2448,23 +2520,44 @@ export class SongEditor {
                                 else
                                     anyInstrumentAdvancedNote = true;
                             }
+                            else {
+                                allInstrumentNoteFilters = false;
+                            }
                             if (effectsIncludeDistortion(channel.instruments[instrumentIndex].effects)) {
                                 anyInstrumentDistorts = true;
+                            }
+                            else {
+                                allInstrumentDistorts = false;
                             }
                             if (effectsIncludeBitcrusher(channel.instruments[instrumentIndex].effects)) {
                                 anyInstrumentBitcrushes = true;
                             }
+                            else {
+                                allInstrumentBitcrushes = false;
+                            }
                             if (effectsIncludePanning(channel.instruments[instrumentIndex].effects)) {
                                 anyInstrumentPans = true;
+                            }
+                            else {
+                                allInstrumentPans = false;
                             }
                             if (effectsIncludeChorus(channel.instruments[instrumentIndex].effects)) {
                                 anyInstrumentChorus = true;
                             }
+                            else {
+                                allInstrumentChorus = false;
+                            }
                             if (effectsIncludeEcho(channel.instruments[instrumentIndex].effects)) {
                                 anyInstrumentEchoes = true;
                             }
+                            else {
+                                allInstrumentEchoes = false;
+                            }
                             if (effectsIncludeReverb(channel.instruments[instrumentIndex].effects)) {
                                 anyInstrumentReverbs = true;
+                            }
+                            else {
+                                allInstrumentReverbs = false;
                             }
 
                         }
@@ -2497,7 +2590,6 @@ export class SongEditor {
                         if (tgtInstrumentTypes.includes(InstrumentType.pickedString)) {
                             settingList.push("sustain");
                         }
-
                         if (anyInstrumentArps) {
                             settingList.push("arp speed");
                             settingList.push("reset arp");
@@ -2505,13 +2597,24 @@ export class SongEditor {
                         if (anyInstrumentPitchShifts) {
                             settingList.push("pitch shift");
                         }
-                        if (anyInstrumentDetunes)
+                        if (!allInstrumentPitchShifts) {
+                            unusedSettingList.push("+ pitch shift");
+                        }
+                        if (anyInstrumentDetunes) {
                             settingList.push("detune");
-
+                        }
+                        if (!allInstrumentDetunes) {
+                            unusedSettingList.push("+ detune");
+                        }
                         if (anyInstrumentVibratos) {
                             settingList.push("vibrato depth");
                             settingList.push("vibrato speed");
                             settingList.push("vibrato delay");
+                        }
+                        if (!allInstrumentVibratos) {
+                            unusedSettingList.push("+ vibrato depth");
+                            unusedSettingList.push("+ vibrato speed");
+                            unusedSettingList.push("+ vibrato delay");
                         }
                         if (anyInstrumentNoteFilters) {
                             if (anyInstrumentAdvancedNote) {
@@ -2522,32 +2625,60 @@ export class SongEditor {
                                 settingList.push("note filt peak");
                             }
                         }
+                        if (!allInstrumentNoteFilters) {
+                            unusedSettingList.push("+ note filter");
+                        }
                         if (anyInstrumentDistorts) {
                             settingList.push("distortion");
+                        }
+                        if (!allInstrumentDistorts) {
+                            unusedSettingList.push("+ distortion");
                         }
                         if (anyInstrumentBitcrushes) {
                             settingList.push("bit crush");
                             settingList.push("freq crush");
                         }
+                        if (!allInstrumentBitcrushes) {
+                            unusedSettingList.push("+ bit crush");
+                            unusedSettingList.push("+ freq crush");
+                        }
                         if (anyInstrumentPans) {
                             settingList.push("pan");
                             settingList.push("pan delay");
                         }
+                        if (!allInstrumentPans) {
+                            unusedSettingList.push("+ pan");
+                            unusedSettingList.push("+ pan delay");
+                        }
                         if (anyInstrumentChorus) {
                             settingList.push("chorus");
+                        }
+                        if (!allInstrumentChorus) {
+                            unusedSettingList.push("+ chorus");
                         }
                         if (anyInstrumentEchoes) {
                             settingList.push("echo");
                             // Disabled currently!
                             //settingList.push("echo delay");
                         }
+                        if (!allInstrumentEchoes) {
+                            unusedSettingList.push("+ echo");
+                            //unusedSettingList.push("echo delay");
+                        }
                         if (anyInstrumentReverbs) {
                             settingList.push("reverb");
+                        }
+                        if (!allInstrumentReverbs) {
+                            unusedSettingList.push("+ reverb");
                         }
 
                     }
 
                     buildOptions(this._modSetBoxes[mod], settingList);
+                    if (unusedSettingList.length > 0) {
+                        this._modSetBoxes[mod].appendChild(option({ selected: false, disabled: true, value: "Add Effect" }, "Add Effect"));
+                        buildOptions(this._modSetBoxes[mod], unusedSettingList);
+                    }
 
                     let setIndex: number = settingList.indexOf(Config.modulators[instrument.modulators[mod]].name);
 
@@ -2651,7 +2782,7 @@ export class SongEditor {
                         this._modFilterBoxes[mod].classList.add("invalidSetting");
                         instrument.invalidModulators[mod] = true;
                         let useName: string = ((instrument.modFilterTypes[mod] - 1) % 2 == 1) ?
-                            "dot " + (Math.floor((instrument.modFilterTypes[mod]-1) / 2) + 1) + " y"
+                            "dot " + (Math.floor((instrument.modFilterTypes[mod] - 1) / 2) + 1) + " y"
                             : "dot " + (Math.floor((instrument.modFilterTypes[mod] - 1) / 2) + 1) + " x";
                         if (instrument.modFilterTypes[mod] == 0)
                             useName = "morph";
@@ -2713,7 +2844,7 @@ export class SongEditor {
         this._aliasingBox.checked = instrument.aliases ? true : false;
         this._addEnvelopeButton.disabled = (instrument.envelopeCount >= Config.maxEnvelopeCount);
 
-        this._volumeSlider.updateValue(this._doc.volume);
+        this._volumeSlider.updateValue(prefs.volume);
 
         // If an interface element was selected, but becomes invisible (e.g. an instrument
         // select menu) just select the editor container so keyboard commands still work.
@@ -2723,7 +2854,7 @@ export class SongEditor {
 
         this._setPrompt(this._doc.prompt);
 
-        if (this._doc.autoFollow && !this._doc.synth.playing) {
+        if (prefs.autoFollow && !this._doc.synth.playing) {
             this._doc.synth.goToBar(this._doc.bar);
         }
 
@@ -2807,23 +2938,83 @@ export class SongEditor {
                 }
                 this._deactivatedInstruments = false;
             }
+
+            if ((this._doc.song.layeredInstruments && this._doc.song.patternInstruments) && channel.instruments.length > 1 && (this._doc.channel < this._doc.song.pitchChannelCount + this._doc.song.noiseChannelCount)) {
+                for (let i: number = 0; i < channel.instruments.length; i++) {
+                    this._instrumentButtons[i].classList.remove("no-underline");
+                }
+            }
+            else {
+                for (let i: number = 0; i < channel.instruments.length; i++) {
+                    this._instrumentButtons[i].classList.add("no-underline");
+                }
+            }
         } else {
             this._instrumentsButtonRow.style.display = "none";
         }
     }
 
-    public updatePlayButton(): void {
-        if (this._doc.synth.playing) {
-            this._playButton.classList.remove("playButton");
-            this._playButton.classList.add("pauseButton");
-            this._playButton.title = "Pause (Space)";
-            this._playButton.textContent = "Pause";
-        } else {
-            this._playButton.classList.remove("pauseButton");
-            this._playButton.classList.add("playButton");
-            this._playButton.title = "Play (Space)";
-            this._playButton.textContent = "Play";
+    public updatePlayButton = (): void => {
+        if (this._renderedIsPlaying != this._doc.synth.playing || this._renderedIsRecording != this._doc.synth.recording || this._renderedShowRecordButton != this._doc.prefs.showRecordButton || this._renderedCtrlHeld != this._ctrlHeld) {
+            this._renderedIsPlaying = this._doc.synth.playing;
+            this._renderedIsRecording = this._doc.synth.recording;
+            this._renderedShowRecordButton = this._doc.prefs.showRecordButton;
+            this._renderedCtrlHeld = this._ctrlHeld;
+
+            if (document.activeElement == this._playButton || document.activeElement == this._pauseButton || document.activeElement == this._recordButton || document.activeElement == this._stopButton) {
+                // When a focused element is hidden, focus is transferred to the document, so let's refocus the editor instead to make sure we can still capture keyboard input.
+                this.refocusStage();
+            }
+
+            this._playButton.style.display = "none";
+            this._pauseButton.style.display = "none";
+            this._recordButton.style.display = "none";
+            this._stopButton.style.display = "none";
+            this._prevBarButton.style.display = "";
+            this._nextBarButton.style.display = "";
+            this._playButton.classList.remove("shrunk");
+            this._recordButton.classList.remove("shrunk");
+            this._patternEditorRow.style.pointerEvents = "";
+            this._octaveScrollBar.container.style.pointerEvents = "";
+            this._octaveScrollBar.container.style.opacity = "";
+            this._trackContainer.style.pointerEvents = "";
+            this._loopEditor.container.style.opacity = "";
+            this._instrumentSettingsArea.style.pointerEvents = "";
+            this._instrumentSettingsArea.style.opacity = "";
+            this._menuArea.style.pointerEvents = "";
+            this._menuArea.style.opacity = "";
+            this._songSettingsArea.style.pointerEvents = "";
+            this._songSettingsArea.style.opacity = "";
+
+            if (this._doc.synth.recording) {
+                this._stopButton.style.display = "";
+                this._prevBarButton.style.display = "none";
+                this._nextBarButton.style.display = "none";
+                this._patternEditorRow.style.pointerEvents = "none";
+                this._octaveScrollBar.container.style.pointerEvents = "none";
+                this._octaveScrollBar.container.style.opacity = "0.5";
+                this._trackContainer.style.pointerEvents = "none";
+                this._loopEditor.container.style.opacity = "0.5";
+                this._instrumentSettingsArea.style.pointerEvents = "none";
+                this._instrumentSettingsArea.style.opacity = "0.5";
+                this._menuArea.style.pointerEvents = "none";
+                this._menuArea.style.opacity = "0.5";
+                this._songSettingsArea.style.pointerEvents = "none";
+                this._songSettingsArea.style.opacity = "0.5";
+            } else if (this._doc.synth.playing) {
+                this._pauseButton.style.display = "";
+            } else if (this._doc.prefs.showRecordButton) {
+                this._playButton.style.display = "";
+                this._recordButton.style.display = "";
+                this._playButton.classList.add("shrunk");
+                this._recordButton.classList.add("shrunk");
+            } else if (this._ctrlHeld) {
+                this._recordButton.style.display = "";
+            } else {
+                this._playButton.style.display = "";
+            }
         }
+        window.requestAnimationFrame(this.updatePlayButton);
     }
 
     private _disableCtrlContextMenu = (event: MouseEvent): boolean => {
@@ -2915,16 +3106,6 @@ export class SongEditor {
         }
 
     }
-    
-    private _whenKeyUp = (event: KeyboardEvent): void => {
-		this._muteEditor.onKeyUp(event);
-		if (!event.ctrlKey) { // Ctrl
-			this._patternEditor.controlMode = false;
-		}
-		if (!event.shiftKey) { // Shift
-			this._patternEditor.shiftMode = false;
-		}
-	}
 
     private _tempoStepperCaptureNumberKeys = (event: KeyboardEvent): void => {
         // When the number input is in focus, allow some keyboard events to
@@ -2952,6 +3133,8 @@ export class SongEditor {
     }
 
     private _whenKeyPressed = (event: KeyboardEvent): void => {
+        this._ctrlHeld = event.ctrlKey;
+
         if (this.prompt) {
             if (this.prompt instanceof CustomChipPrompt || this.prompt instanceof LimiterPrompt || this.prompt instanceof CustomScalePrompt || this.prompt instanceof CustomFilterPrompt) {
                 this.prompt.whenKeyPressed(event);
@@ -2984,6 +3167,27 @@ export class SongEditor {
             return;
         }
 
+        if (this._doc.synth.recording) {
+            // The only valid keyboard interactions when recording are playing notes or pressing space OR P to stop.
+            if (!event.ctrlKey && !event.metaKey) {
+                this._keyboardLayout.handleKeyEvent(event, true);
+            }
+            if (event.keyCode == 32) { // space
+                this._toggleRecord();
+                event.preventDefault();
+                this.refocusStage();
+            } else if (event.keyCode == 80 && (event.ctrlKey || event.metaKey)) { // p
+                this._toggleRecord();
+                event.preventDefault();
+                this.refocusStage();
+            }
+            return;
+        }
+
+        const needControlForShortcuts: boolean = (this._doc.prefs.pressControlForShortcuts != event.getModifierState("CapsLock"));
+        const canPlayNotes: boolean = (!event.ctrlKey && !event.metaKey && needControlForShortcuts);
+        if (canPlayNotes) this._keyboardLayout.handleKeyEvent(event, true);
+
         //this._trackEditor.onKeyPressed(event);
         switch (event.keyCode) {
             case 27: // ESC key
@@ -2992,25 +3196,36 @@ export class SongEditor {
                     this._doc.selection.resetBoxSelection();
                 }
                 break;
-	    case 16: // Shift
-		this._patternEditor.shiftMode = true;
-		break;
-	    case 17: // Ctrl
-		this._patternEditor.controlMode = true;
-	    	break;
+            case 16: // Shift
+                this._patternEditor.shiftMode = true;
+                break;
+            case 17: // Ctrl
+                this._patternEditor.controlMode = true;
+                break;
             case 32: // space
-                if (event.shiftKey) {
+                if (event.ctrlKey) {
+                    this._toggleRecord();
+                } else if (event.shiftKey) {
                     // Jump to mouse
                     if (this._trackEditor.movePlayheadToMouse() || this._patternEditor.movePlayheadToMouse()) {
-                        if (!this._doc.synth.playing) this._play();
+                        if (!this._doc.synth.playing) this._doc.performance.play();
                     }
                 } else {
-                    this._togglePlay();
+                    this.togglePlay();
                 }
                 event.preventDefault();
                 this.refocusStage();
                 break;
+            case 80: // p
+                if (canPlayNotes) break;
+                if (event.ctrlKey || event.metaKey) {
+                    this._toggleRecord();
+                    event.preventDefault();
+                    this.refocusStage();
+                }
+                break;
             case 90: // z
+                if (canPlayNotes) break;
                 if (event.shiftKey) {
                     this._doc.redo();
                 } else {
@@ -3019,10 +3234,12 @@ export class SongEditor {
                 event.preventDefault();
                 break;
             case 89: // y
+                if (canPlayNotes) break;
                 this._doc.redo();
                 event.preventDefault();
                 break;
             case 67: // c
+                if (canPlayNotes) break;
                 if (event.shiftKey) {
                     this._copyInstrument();
                 } else {
@@ -3050,6 +3267,7 @@ export class SongEditor {
                 event.preventDefault();
                 break;
             case 65: // a
+                if (canPlayNotes) break;
                 if (event.shiftKey) {
                     this._doc.selection.selectChannel();
                 } else {
@@ -3058,7 +3276,8 @@ export class SongEditor {
                 event.preventDefault();
                 break;
             case 68: // d
-                if (!event.ctrlKey && !event.metaKey) {
+                if (canPlayNotes) break;
+                if (needControlForShortcuts == (event.ctrlKey || event.metaKey)) {
                     this._doc.selection.duplicatePatterns();
                     event.preventDefault();
                 }
@@ -3071,50 +3290,54 @@ export class SongEditor {
                 }
                 break;
             case 70: // f
-                if (!event.ctrlKey && !event.metaKey) {
+                if (canPlayNotes) break;
+                if (needControlForShortcuts == (event.ctrlKey || event.metaKey)) {
                     this._doc.synth.snapToStart();
                     this._doc.synth.computeLatestModValues();
-                    if (this._doc.autoFollow) {
+                    if (this._doc.prefs.autoFollow) {
                         this._doc.selection.setChannelBar(this._doc.channel, Math.floor(this._doc.synth.playhead));
                     }
                     event.preventDefault();
                 }
                 break;
             case 72: // h
-                if (!event.ctrlKey && !event.metaKey) {
+                if (canPlayNotes) break;
+                if (needControlForShortcuts == (event.ctrlKey || event.metaKey)) {
                     this._doc.synth.goToBar(this._doc.bar);
                     this._doc.synth.snapToBar();
                     this._doc.synth.computeLatestModValues();
-                    if (this._doc.autoFollow) {
+                    if (this._doc.prefs.autoFollow) {
                         this._doc.selection.setChannelBar(this._doc.channel, Math.floor(this._doc.synth.playhead));
                     }
                     event.preventDefault();
                 }
                 break;
             case 74: // j
+                if (canPlayNotes) break;
                 // Ctrl Alt Shift J: Jummbify - set all prefs to my preferred ones lol
                 if (event.shiftKey && event.ctrlKey && event.altKey) {
-                    this._doc.autoPlay = false;
-                    this._doc.autoFollow = false;
-                    this._doc.enableNotePreview = true;
-                    this._doc.showFifth = true;
-                    this._doc.notesOutsideScale = false;
-                    this._doc.defaultScale = 0;
-                    this._doc.showLetters = true;
-                    this._doc.showChannels = true;
-                    this._doc.showScrollBar = true;
-                    this._doc.alwaysFineNoteVol = false;
-                    this._doc.enableChannelMuting = true;
-                    this._doc.displayBrowserUrl = true;
-                    this._doc.displayVolumeBar = true;
-                    this._doc.layout = "wide";
-                    this._doc.visibleOctaves = 5;
-                    this._doc.savePreferences();
+                    this._doc.prefs.autoPlay = false;
+                    this._doc.prefs.autoFollow = false;
+                    this._doc.prefs.enableNotePreview = true;
+                    this._doc.prefs.showFifth = true;
+                    this._doc.prefs.notesOutsideScale = false;
+                    this._doc.prefs.defaultScale = 0;
+                    this._doc.prefs.showLetters = true;
+                    this._doc.prefs.showChannels = true;
+                    this._doc.prefs.showScrollBar = true;
+                    this._doc.prefs.alwaysFineNoteVol = false;
+                    this._doc.prefs.enableChannelMuting = true;
+                    this._doc.prefs.displayBrowserUrl = true;
+                    this._doc.prefs.displayVolumeBar = true;
+                    this._doc.prefs.layout = "wide";
+                    this._doc.prefs.visibleOctaves = 5;
+                    this._doc.prefs.save();
                     event.preventDefault();
                     location.reload();
                 }
                 break;
             case 76: // l
+                if (canPlayNotes) break;
                 if (event.shiftKey) {
                     this._openPrompt("limiterSettings");
                 }
@@ -3123,14 +3346,16 @@ export class SongEditor {
                 }
                 break;
             case 77: // m
-                if (!event.ctrlKey && !event.metaKey) {
-                    if (this._doc.enableChannelMuting) {
+                if (canPlayNotes) break;
+                if (needControlForShortcuts == (event.ctrlKey || event.metaKey)) {
+                    if (this._doc.prefs.enableChannelMuting) {
                         this._doc.selection.muteChannels(event.shiftKey);
                         event.preventDefault();
                     }
                 }
                 break;
             case 78: // n
+                if (canPlayNotes) break;
                 // Find lowest-index unused pattern for current channel
                 // Ctrl+n - lowest-index completely empty pattern
                 // Shift+n - note filter settings
@@ -3191,17 +3416,19 @@ export class SongEditor {
                 event.preventDefault();
                 break;
             case 81: // q
-                if (!event.ctrlKey && !event.metaKey) {
+                if (canPlayNotes) break;
+                if (needControlForShortcuts == (event.ctrlKey || event.metaKey)) {
                     this._openPrompt("channelSettings");
                     event.preventDefault();
                 }
                 break;
             case 83: // s
+                if (canPlayNotes) break;
                 if (event.ctrlKey || event.metaKey) {
                     this._openPrompt("export");
                     event.preventDefault();
                 } else {
-                    if (this._doc.enableChannelMuting) {
+                    if (this._doc.prefs.enableChannelMuting) {
                         // JummBox deviation: I like shift+s as just another mute toggle personally.
                         // Easier to reach than M and the shift+s invert functionality I am overwriting could be 
                         // obtained with M anyway. Useability-wise you very often want to 'add' channels on to a solo as you work.
@@ -3215,13 +3442,15 @@ export class SongEditor {
                 }
                 break;
             case 79: // o
+                if (canPlayNotes) break;
                 if (event.ctrlKey || event.metaKey) {
                     this._openPrompt("import");
                     event.preventDefault();
                 }
                 break;
             case 86: // v
-                if ((event.ctrlKey || event.metaKey) && event.shiftKey) {
+                if (canPlayNotes) break;
+                if ((event.ctrlKey || event.metaKey) && event.shiftKey && !needControlForShortcuts) {
                     this._doc.selection.pasteNumbers();
                 } else if (event.shiftKey) {
                     this._pasteInstrument();
@@ -3231,10 +3460,12 @@ export class SongEditor {
                 event.preventDefault();
                 break;
             case 87: // w
+                if (canPlayNotes) break;
                 this._openPrompt("moveNotesSideways");
                 break;
             case 73: // i
-                if (!event.ctrlKey && !event.metaKey && event.shiftKey) {
+                if (canPlayNotes) break;
+                if (needControlForShortcuts == (event.ctrlKey || event.metaKey) && event.shiftKey) {
                     // Copy the current instrument as a preset to the clipboard.
                     const instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
                     const instrumentObject: any = instrument.toJsonObject();
@@ -3257,7 +3488,8 @@ export class SongEditor {
                 }
                 break;
             case 82: // r
-                if (!event.ctrlKey && !event.metaKey) {
+                if (canPlayNotes) break;
+                if (needControlForShortcuts == (event.ctrlKey || event.metaKey)) {
                     if (event.shiftKey) {
                         this._randomGenerated();
                     } else {
@@ -3267,18 +3499,20 @@ export class SongEditor {
                 }
                 break;
             case 219: // left brace
-                if (!event.ctrlKey && !event.metaKey) {
+                if (canPlayNotes) break;
+                if (needControlForShortcuts == (event.ctrlKey || event.metaKey)) {
                     this._doc.synth.goToPrevBar();
-                    if (this._doc.autoFollow) {
+                    if (this._doc.prefs.autoFollow) {
                         this._doc.selection.setChannelBar(this._doc.channel, Math.floor(this._doc.synth.playhead));
                     }
                     event.preventDefault();
                 }
                 break;
             case 221: // right brace
-                if (!event.ctrlKey && !event.metaKey) {
+                if (canPlayNotes) break;
+                if (needControlForShortcuts == (event.ctrlKey || event.metaKey)) {
                     this._doc.synth.goToNextBar();
-                    if (this._doc.autoFollow) {
+                    if (this._doc.prefs.autoFollow) {
                         this._doc.selection.setChannelBar(this._doc.channel, Math.floor(this._doc.synth.playhead));
                     }
                     event.preventDefault();
@@ -3286,7 +3520,8 @@ export class SongEditor {
                 break;
             case 189: // -
             case 173: // Firefox -
-                if (!event.ctrlKey && !event.metaKey) {
+                if (canPlayNotes) break;
+                if (needControlForShortcuts == (event.ctrlKey || event.metaKey)) {
                     this._doc.selection.transpose(false, event.shiftKey);
                     event.preventDefault();
                 }
@@ -3294,7 +3529,8 @@ export class SongEditor {
             case 187: // +
             case 61: // Firefox +
             case 171: // Some users have this as +? Hmm.
-                if (!event.ctrlKey && !event.metaKey) {
+                if (canPlayNotes) break;
+                if (needControlForShortcuts == (event.ctrlKey || event.metaKey)) {
                     this._doc.selection.transpose(true, event.shiftKey);
                     event.preventDefault();
                 }
@@ -3304,7 +3540,7 @@ export class SongEditor {
                     this._doc.selection.swapChannels(-1);
                 } else if (event.shiftKey) {
                     this._doc.selection.boxSelectionY1 = Math.max(0, this._doc.selection.boxSelectionY1 - 1);
-                    this._doc.selection.scrollToSelection();
+                    this._doc.selection.scrollToEndOfSelection();
                     this._doc.selection.selectionUpdated();
                 } else {
                     this._doc.selection.setChannelBar((this._doc.channel - 1 + this._doc.song.getChannelCount()) % this._doc.song.getChannelCount(), this._doc.bar);
@@ -3317,7 +3553,7 @@ export class SongEditor {
                     this._doc.selection.swapChannels(1);
                 } else if (event.shiftKey) {
                     this._doc.selection.boxSelectionY1 = Math.min(this._doc.song.getChannelCount() - 1, this._doc.selection.boxSelectionY1 + 1);
-                    this._doc.selection.scrollToSelection();
+                    this._doc.selection.scrollToEndOfSelection();
                     this._doc.selection.selectionUpdated();
                 } else {
                     this._doc.selection.setChannelBar((this._doc.channel + 1) % this._doc.song.getChannelCount(), this._doc.bar);
@@ -3328,7 +3564,7 @@ export class SongEditor {
             case 37: // left
                 if (event.shiftKey) {
                     this._doc.selection.boxSelectionX1 = Math.max(0, this._doc.selection.boxSelectionX1 - 1);
-                    this._doc.selection.scrollToSelection();
+                    this._doc.selection.scrollToEndOfSelection();
                     this._doc.selection.selectionUpdated();
                 } else {
                     this._doc.selection.setChannelBar(this._doc.channel, (this._doc.bar + this._doc.song.barCount - 1) % this._doc.song.barCount);
@@ -3339,7 +3575,7 @@ export class SongEditor {
             case 39: // right
                 if (event.shiftKey) {
                     this._doc.selection.boxSelectionX1 = Math.min(this._doc.song.barCount - 1, this._doc.selection.boxSelectionX1 + 1);
-                    this._doc.selection.scrollToSelection();
+                    this._doc.selection.scrollToEndOfSelection();
                     this._doc.selection.selectionUpdated();
                 } else {
                     this._doc.selection.setChannelBar(this._doc.channel, (this._doc.bar + 1) % this._doc.song.barCount);
@@ -3352,43 +3588,53 @@ export class SongEditor {
                 this._doc.selection.nextDigit("0", false, false);
                 break;
             case 48: // 0
-                this._doc.selection.nextDigit("0", event.shiftKey || event.ctrlKey, event.altKey);
+                if (canPlayNotes) break;
+                this._doc.selection.nextDigit("0", needControlForShortcuts != (event.shiftKey || event.ctrlKey || event.metaKey), event.altKey);
                 event.preventDefault();
                 break;
             case 49: // 1
-                this._doc.selection.nextDigit("1", event.shiftKey || event.ctrlKey, event.altKey);
+                if (canPlayNotes) break;
+                this._doc.selection.nextDigit("1", needControlForShortcuts != (event.shiftKey || event.ctrlKey || event.metaKey), event.altKey);
                 event.preventDefault();
                 break;
             case 50: // 2
-                this._doc.selection.nextDigit("2", event.shiftKey || event.ctrlKey, event.altKey);
+                if (canPlayNotes) break;
+                this._doc.selection.nextDigit("2", needControlForShortcuts != (event.shiftKey || event.ctrlKey || event.metaKey), event.altKey);
                 event.preventDefault();
                 break;
             case 51: // 3
-                this._doc.selection.nextDigit("3", event.shiftKey || event.ctrlKey, event.altKey);
+                if (canPlayNotes) break;
+                this._doc.selection.nextDigit("3", needControlForShortcuts != (event.shiftKey || event.ctrlKey || event.metaKey), event.altKey);
                 event.preventDefault();
                 break;
             case 52: // 4
-                this._doc.selection.nextDigit("4", event.shiftKey || event.ctrlKey, event.altKey);
+                if (canPlayNotes) break;
+                this._doc.selection.nextDigit("4", needControlForShortcuts != (event.shiftKey || event.ctrlKey || event.metaKey), event.altKey);
                 event.preventDefault();
                 break;
             case 53: // 5
-                this._doc.selection.nextDigit("5", event.shiftKey || event.ctrlKey, event.altKey);
+                if (canPlayNotes) break;
+                this._doc.selection.nextDigit("5", needControlForShortcuts != (event.shiftKey || event.ctrlKey || event.metaKey), event.altKey);
                 event.preventDefault();
                 break;
             case 54: // 6
-                this._doc.selection.nextDigit("6", event.shiftKey || event.ctrlKey, event.altKey);
+                if (canPlayNotes) break;
+                this._doc.selection.nextDigit("6", needControlForShortcuts != (event.shiftKey || event.ctrlKey || event.metaKey), event.altKey);
                 event.preventDefault();
                 break;
             case 55: // 7
-                this._doc.selection.nextDigit("7", event.shiftKey || event.ctrlKey, event.altKey);
+                if (canPlayNotes) break;
+                this._doc.selection.nextDigit("7", needControlForShortcuts != (event.shiftKey || event.ctrlKey || event.metaKey), event.altKey);
                 event.preventDefault();
                 break;
             case 56: // 8
-                this._doc.selection.nextDigit("8", event.shiftKey || event.ctrlKey, event.altKey);
+                if (canPlayNotes) break;
+                this._doc.selection.nextDigit("8", needControlForShortcuts != (event.shiftKey || event.ctrlKey || event.metaKey), event.altKey);
                 event.preventDefault();
                 break;
             case 57: // 9
-                this._doc.selection.nextDigit("9", event.shiftKey || event.ctrlKey, event.altKey);
+                if (canPlayNotes) break;
+                this._doc.selection.nextDigit("9", needControlForShortcuts != (event.shiftKey || event.ctrlKey || event.metaKey), event.altKey);
                 event.preventDefault();
                 break;
             default:
@@ -3396,6 +3642,26 @@ export class SongEditor {
                 this._doc.selection.instrumentDigits = "";
                 break;
         }
+
+        if (canPlayNotes) {
+            this._doc.selection.digits = "";
+            this._doc.selection.instrumentDigits = "";
+        }
+    }
+
+
+    private _whenKeyReleased = (event: KeyboardEvent): void => {
+        this._muteEditor.onKeyUp(event);
+        if (!event.ctrlKey) { // Ctrl
+            this._patternEditor.controlMode = false;
+        }
+        if (!event.shiftKey) { // Shift
+            this._patternEditor.shiftMode = false;
+        }
+
+        this._ctrlHeld = event.ctrlKey;
+        // Release live pitches regardless of control or caps lock so that any pitches played before will get released even if the modifier keys changed.
+        this._keyboardLayout.handleKeyEvent(event, false);
     }
 
     private _copyTextToClipboard(text: string): void {
@@ -3429,41 +3695,29 @@ export class SongEditor {
         this._barScrollBar.animatePlayhead();
     }
 
-    private _togglePlay = (): void => {
+    public togglePlay = (): void => {
         if (this._doc.synth.playing) {
-            this._pause();
+            this._doc.performance.pause();
+            this.outVolumeHistoricCap = 0;
         } else {
             this._doc.synth.snapToBar();
-            this._play();
+            this._doc.performance.play();
         }
     }
 
-    public _play(): void {
-        this._doc.synth.play();
-        this.updatePlayButton();
-        window.requestAnimationFrame(this._animate);
-    }
-
-    public _pause(): void {
-        this._doc.synth.pause();
-        this._doc.synth.resetEffects();
-        if (this._doc.autoFollow) {
-            this._doc.synth.goToBar(this._doc.bar);
+    private _toggleRecord = (): void => {
+        if (this._doc.synth.playing) {
+            this._doc.performance.pause();
+        } else {
+            this._doc.performance.record();
         }
-        this._doc.synth.snapToBar();
-        this.updatePlayButton();
-        window.clearInterval(this._modSliderHandle);
-        window.clearInterval(this._volumeHandle);
-        window.clearInterval(this._barScrollbarHandle);
-        window.requestAnimationFrame(this._animate);
-        this.outVolumeHistoricCap = 0;
     }
 
     public _animate = (): void => {
         // Need to update mods once more to clear the slider display
         this._modSliderUpdate();
         // Same for volume display
-        if (this._doc.displayVolumeBar) {
+        if (this._doc.prefs.displayVolumeBar) {
             this._volumeUpdate();
         }
         // ...and barscrollbar playhead
@@ -3722,7 +3976,7 @@ export class SongEditor {
 
     private _whenClickModTarget = (mod: number): void => {
         if (this._modChannelBoxes[mod].selectedIndex >= 2) {
-            this._doc.selection.setChannelBar(this._modChannelBoxes[mod].selectedIndex-2, this._doc.bar);
+            this._doc.selection.setChannelBar(this._modChannelBoxes[mod].selectedIndex - 2, this._doc.bar);
         }
     }
 
@@ -3769,7 +4023,7 @@ export class SongEditor {
         const instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
         const oldValue: number = instrument.effects;
         const toggleFlag: number = Config.effectOrder[this._effectsSelect.selectedIndex - 1];
-        this._doc.record(new ChangeToggleEffects(this._doc, toggleFlag));
+        this._doc.record(new ChangeToggleEffects(this._doc, toggleFlag, null));
         this._effectsSelect.selectedIndex = 0;
         if (instrument.effects > oldValue) {
             this._doc.addedEffect = true;
@@ -3800,15 +4054,15 @@ export class SongEditor {
     }
 
     private _zoomIn = (): void => {
-        this._doc.visibleOctaves = Math.max(1, this._doc.visibleOctaves - 1);
-        this._doc.savePreferences();
+        this._doc.prefs.visibleOctaves = Math.max(1, this._doc.prefs.visibleOctaves - 1);
+        this._doc.prefs.save();
         this._doc.notifier.changed();
         this.refocusStage();
     }
 
     private _zoomOut = (): void => {
-        this._doc.visibleOctaves = Math.min(Config.pitchOctaves, this._doc.visibleOctaves + 1);
-        this._doc.savePreferences();
+        this._doc.prefs.visibleOctaves = Math.min(Config.pitchOctaves, this._doc.prefs.visibleOctaves + 1);
+        this._doc.prefs.save();
         this._doc.notifier.changed();
         this.refocusStage();
     }
@@ -3918,44 +4172,44 @@ export class SongEditor {
     private _optionsMenuHandler = (event: Event): void => {
         switch (this._optionsMenu.value) {
             case "autoPlay":
-                this._doc.autoPlay = !this._doc.autoPlay;
+                this._doc.prefs.autoPlay = !this._doc.prefs.autoPlay;
                 break;
             case "autoFollow":
-                this._doc.autoFollow = !this._doc.autoFollow;
+                this._doc.prefs.autoFollow = !this._doc.prefs.autoFollow;
                 break;
             case "enableNotePreview":
-                this._doc.enableNotePreview = !this._doc.enableNotePreview;
+                this._doc.prefs.enableNotePreview = !this._doc.prefs.enableNotePreview;
                 break;
             case "showLetters":
-                this._doc.showLetters = !this._doc.showLetters;
+                this._doc.prefs.showLetters = !this._doc.prefs.showLetters;
                 break;
             case "showFifth":
-                this._doc.showFifth = !this._doc.showFifth;
+                this._doc.prefs.showFifth = !this._doc.prefs.showFifth;
                 break;
             case "notesOutsideScale":
-                this._doc.notesOutsideScale = !this._doc.notesOutsideScale;
+                this._doc.prefs.notesOutsideScale = !this._doc.prefs.notesOutsideScale;
                 break;
             case "setDefaultScale":
-                this._doc.defaultScale = this._doc.song.scale;
+                this._doc.prefs.defaultScale = this._doc.song.scale;
                 break;
             case "showChannels":
-                this._doc.showChannels = !this._doc.showChannels;
+                this._doc.prefs.showChannels = !this._doc.prefs.showChannels;
                 break;
             case "showScrollBar":
-                this._doc.showScrollBar = !this._doc.showScrollBar;
+                this._doc.prefs.showScrollBar = !this._doc.prefs.showScrollBar;
                 break;
             case "alwaysFineNoteVol":
-                this._doc.alwaysFineNoteVol = !this._doc.alwaysFineNoteVol;
+                this._doc.prefs.alwaysFineNoteVol = !this._doc.prefs.alwaysFineNoteVol;
                 break;
             case "enableChannelMuting":
-                this._doc.enableChannelMuting = !this._doc.enableChannelMuting;
+                this._doc.prefs.enableChannelMuting = !this._doc.prefs.enableChannelMuting;
                 for (const channel of this._doc.song.channels) channel.muted = false;
                 break;
             case "displayBrowserUrl":
                 this._doc.toggleDisplayBrowserUrl();
                 break;
             case "displayVolumeBar":
-                this._doc.displayVolumeBar = !this._doc.displayVolumeBar;
+                this._doc.prefs.displayVolumeBar = !this._doc.prefs.displayVolumeBar;
                 break;
             case "layout":
                 this._openPrompt("layout");
@@ -3963,16 +4217,19 @@ export class SongEditor {
             case "colorTheme":
                 this._openPrompt("theme");
                 break;
+            case "recordingSetup":
+                this._openPrompt("recordingSetup");
+                break;
         }
         this._optionsMenu.selectedIndex = 0;
         this._doc.notifier.changed();
-        this._doc.savePreferences();
+        this._doc.prefs.save();
     }
 
     private _customWavePresetHandler = (event: Event): void => {
 
         // Update custom wave value
-        let customWaveArray: Float64Array = new Float64Array(64);
+        let customWaveArray: Float32Array = new Float32Array(64);
         let index: number = this._customWavePresetDrop.selectedIndex - 1;
         let maxValue: number = Number.MIN_VALUE;
         let minValue: number = Number.MAX_VALUE;
@@ -4016,6 +4273,6 @@ export class SongEditor {
 
         this._customWavePresetDrop.selectedIndex = 0;
         this._doc.notifier.changed();
-        this._doc.savePreferences();
+        this._doc.prefs.save();
     }
 }

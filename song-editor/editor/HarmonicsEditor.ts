@@ -1,4 +1,4 @@
-// Copyright (C) 2021 John Nesky, distributed under the MIT license.
+// Copyright (c) 2012-2022 John Nesky and contributing authors, distributed under the MIT license, see accompanying the LICENSE.md file.
 
 import { Config } from "../synth/SynthConfig";
 import { HarmonicsWave, Instrument } from "../synth/synth";
@@ -179,9 +179,9 @@ export class HarmonicsEditor {
 			this._renderedPath = path;
 			this._curve.setAttribute("d", path);
 		}
-		if (this._renderedFifths != this._doc.showFifth) {
-			this._renderedFifths = this._doc.showFifth;
-			this._fifths.style.display = this._doc.showFifth ? "" : "none";
+		if (this._renderedFifths != this._doc.prefs.showFifth) {
+			this._renderedFifths = this._doc.prefs.showFifth;
+			this._fifths.style.display = this._doc.prefs.showFifth ? "" : "none";
 		}
 	}
 }

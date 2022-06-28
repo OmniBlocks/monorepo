@@ -1,11 +1,14 @@
-// Copyright (C) 2021 John Nesky, distributed under the MIT license.
+// Copyright (c) 2012-2022 John Nesky and contributing authors, distributed under the MIT license, see accompanying the LICENSE.md file.
 
-import {Scale, Config} from "../synth/SynthConfig";
+import {Config} from "../synth/SynthConfig";
+import {isMobile} from "./EditorConfig";
 import {Pattern, Channel, Song, Synth} from "../synth/synth";
 import { SongRecovery, generateUid } from "./SongRecovery";
 import { ColorConfig } from "./ColorConfig";
 import { Layout } from "./Layout";
+import { SongPerformance } from "./SongPerformance";
 import { Selection } from "./Selection";
+import { Preferences } from "./Preferences";
 import { Change } from "./Change";
 import { ChangeNotifier } from "./ChangeNotifier";
 import {ChangeSong, setDefaultInstruments, discardInvalidPatternInstruments} from "./changes";
@@ -22,35 +25,16 @@ interface HistoryState {
 }
 
 export class SongDocument {
-	public static readonly defaultVisibleOctaves: number = 3;
-	
 	public song: Song;
 	public synth: Synth;
-	public notifier: ChangeNotifier = new ChangeNotifier();
-	public selection: Selection = new Selection(this);
+	public performance: SongPerformance;
+	public readonly notifier: ChangeNotifier = new ChangeNotifier();
+	public readonly selection: Selection = new Selection(this);
+	public readonly prefs: Preferences = new Preferences();
 	public channel: number = 0;
 	public muteEditorChannel: number = 0;
 	public bar: number = 0;
 	public recalcChannelNames: boolean;
-	public autoPlay: boolean;
-	public autoFollow: boolean;
-	public enableNotePreview: boolean;
-	public showFifth: boolean;
-	public notesOutsideScale: boolean;
-	public defaultScale: number;
-	public showLetters: boolean;
-	public showChannels: boolean;
-	public showScrollBar: boolean;
-	public alwaysFineNoteVol: boolean = false;
-	public alwaysShowSettings: boolean = true;
-	public fullScreen: string;
-	public enableChannelMuting: boolean;
-	public colorTheme: string;
-	public layout: string;
-	public displayBrowserUrl: boolean;
-	public displayVolumeBar: boolean = true;
-	public volume: number = 75;
-	public visibleOctaves: number = SongDocument.defaultVisibleOctaves;
 	public recentPatternInstruments: number[][] = [];
 	public viewedInstrument: number[] = [];
 	
@@ -62,6 +46,7 @@ export class SongDocument {
 	
 	public addedEffect: boolean = false;
 	public addedEnvelope: boolean = false;
+	public currentPatternIsDirty: boolean = false;
 	
 	private static readonly _maximumUndoHistory: number = 300;
 	private _recovery: SongRecovery = new SongRecovery();
@@ -75,37 +60,9 @@ export class SongDocument {
 		
 	constructor() {
 		this.notifier.watch(this._validateDocState);
-			
-		this.autoPlay = window.localStorage.getItem("autoPlay") == "true";
-		this.autoFollow = window.localStorage.getItem("autoFollow") == "true";
-		this.enableNotePreview = window.localStorage.getItem("enableNotePreview") == "true";
-		this.showFifth = window.localStorage.getItem("showFifth") == "true";
-		this.notesOutsideScale = window.localStorage.getItem("notesOutsideScale") == "true";
-		this.showLetters = window.localStorage.getItem("showLetters") == "true";
-		this.showChannels = window.localStorage.getItem("showChannels") == "true";
-		this.showScrollBar = window.localStorage.getItem("showScrollBar") == "true";
-		this.alwaysFineNoteVol = window.localStorage.getItem("alwaysFineNoteVol") == "true";
-		this.enableChannelMuting = window.localStorage.getItem("enableChannelMuting") == "true";
-		this.displayBrowserUrl = window.localStorage.getItem("displayBrowserUrl") != "false";
-		this.displayVolumeBar = window.localStorage.getItem("displayVolumeBar") != "false";
-		this.layout = window.localStorage.getItem("layout") || "small";
-		this.colorTheme = window.localStorage.getItem("colorTheme") || "jummbox classic";
-		this.visibleOctaves = ((<any>window.localStorage.getItem("visibleOctaves")) >>> 0) || SongDocument.defaultVisibleOctaves;
 		
-		const defaultScale: Scale | undefined = Config.scales.dictionary[window.localStorage.getItem("defaultScale")!];
-		this.defaultScale = (defaultScale != undefined) ? defaultScale.index : 0;
-		
-		if (window.localStorage.getItem("volume") != null) {
-			this.volume = Math.min(<any>window.localStorage.getItem("volume") >>> 0, 75);
-		}
-			
-		if (window.localStorage.getItem("fullScreen") != null) {
-			if (window.localStorage.getItem("fullScreen") == "true") this.layout = "long";
-			window.localStorage.removeItem("fullScreen");
-		}
-		
-		ColorConfig.setTheme(this.colorTheme);
-		Layout.setLayout(this.layout);
+		ColorConfig.setTheme(this.prefs.colorTheme);
+		Layout.setLayout(this.prefs.layout);
 		
 		if (window.sessionStorage.getItem("currentUndoIndex") == null) {
 			window.sessionStorage.setItem("currentUndoIndex", "0");
@@ -120,12 +77,13 @@ export class SongDocument {
 		this.song = new Song(songString);
 		if (songString == "" || songString == undefined) {
 			setDefaultInstruments(this.song);
-			this.song.scale = this.defaultScale;
+			this.song.scale = this.prefs.defaultScale;
 		}
 		songString = this.song.toBase64String();
 		this.synth = new Synth(this.song);
 		this.synth.volume = this._calcVolume();
-			
+		this.synth.anticipatePoorPerformance = isMobile;
+		
 		let state: HistoryState | null = this._getHistoryState();
 		if (state == null) {
 			// When the page is first loaded, indicate that undo is NOT possible.
@@ -154,16 +112,17 @@ export class SongDocument {
 		}
 		
 		this._validateDocState();
+		this.performance = new SongPerformance(this);
 	}
 		
 	public toggleDisplayBrowserUrl() {
 		const state: HistoryState = this._getHistoryState()!;
-		this.displayBrowserUrl = !this.displayBrowserUrl;
+		this.prefs.displayBrowserUrl = !this.prefs.displayBrowserUrl;
 		this._replaceState(state, this.song.toBase64String());
 	}
 		
 	private _getHistoryState(): HistoryState | null {
-		if (this.displayBrowserUrl) {
+		if (this.prefs.displayBrowserUrl) {
 			return window.history.state;
 		} else {
 			const json: any = JSON.parse(window.sessionStorage.getItem(window.sessionStorage.getItem("currentUndoIndex")!)!);
@@ -172,7 +131,7 @@ export class SongDocument {
 	}
 		
 	private _getHash(): string {
-		if (this.displayBrowserUrl) {
+		if (this.prefs.displayBrowserUrl) {
 			return window.location.hash;
 		} else {
 			const json: any = JSON.parse(window.sessionStorage.getItem(window.sessionStorage.getItem("currentUndoIndex")!)!);
@@ -181,16 +140,16 @@ export class SongDocument {
 	}
 		
 	private _replaceState(state: HistoryState, hash: string): void {
-		if (this.displayBrowserUrl) {
+		if (this.prefs.displayBrowserUrl) {
 			window.history.replaceState(state, "", "#" + hash);
 		} else {
-				window.sessionStorage.setItem(window.sessionStorage.getItem("currentUndoIndex") || "0", JSON.stringify({state, hash}));
+			window.sessionStorage.setItem(window.sessionStorage.getItem("currentUndoIndex") || "0", JSON.stringify({state, hash}));
 			window.history.replaceState(null, "", location.pathname);
 		}
 	}
 		
 	private _pushState(state: HistoryState, hash: string): void {
-		if (this.displayBrowserUrl) {
+		if (this.prefs.displayBrowserUrl) {
 			window.history.pushState(state, "", "#" + hash);
 		} else {
 			let currentIndex: number = Number(window.sessionStorage.getItem("currentUndoIndex"));
@@ -213,7 +172,7 @@ export class SongDocument {
 	}	
 		
 	private _forward(): void {
-		if (this.displayBrowserUrl) {
+		if (this.prefs.displayBrowserUrl) {
 			window.history.forward();
 		} else {
 			let currentIndex: number = Number(window.sessionStorage.getItem("currentUndoIndex"));
@@ -227,7 +186,7 @@ export class SongDocument {
 	}
 		
 	private _back(): void {
-		if (this.displayBrowserUrl) {
+		if (this.prefs.displayBrowserUrl) {
 			window.history.back();
 		} else {
 			let currentIndex: number = Number(window.sessionStorage.getItem("currentUndoIndex"));
@@ -241,6 +200,11 @@ export class SongDocument {
 	}
 		
 	private _whenHistoryStateChanged = (): void => {
+		if (this.synth.recording) {
+			// Changes to the song while it's recording to could mess up the recording so just abort the recording.
+			this.performance.abortRecording();
+		}
+		
 		if (window.history.state == null && window.location.hash != "") {
 			// The user changed the hash directly.
 			this._sequenceNumber++;
@@ -248,13 +212,16 @@ export class SongDocument {
 			const state: HistoryState = {canUndo: true, sequenceNumber: this._sequenceNumber, bar: this.bar, channel: this.channel, instrument: this.viewedInstrument[this.channel], recoveryUid: this._recoveryUid, prompt: null, selection: this.selection.toJSON()};
 			new ChangeSong(this, window.location.hash);
 			this.prompt = state.prompt;
-			if (this.displayBrowserUrl) {
+			if (this.prefs.displayBrowserUrl) {
 				this._replaceState(state, this.song.toBase64String());
 			} else {
 				this._pushState(state, this.song.toBase64String());
 			}
 			this.forgetLastChange();
 			this.notifier.notifyWatchers();
+			// Stop playing, and go to start when pasting new song in.
+			this.synth.pause();
+			this.synth.goToBar(0);
 			return;
 		}
 			
@@ -420,42 +387,22 @@ export class SongDocument {
 	}
 		
 	public goBackToStart(): void {
-		this.channel = 0;
 		this.bar = 0;
+		this.channel = 0;
 		this.barScrollPos = 0;
-		this.notifier.changed();
+		this.channelScrollPos = 0;
 		this.synth.snapToStart();
 		this.notifier.changed();
 	}
-		
-	public savePreferences(): void {
-		window.localStorage.setItem("autoPlay", this.autoPlay ? "true" : "false");
-		window.localStorage.setItem("autoFollow", this.autoFollow ? "true" : "false");
-		window.localStorage.setItem("enableNotePreview", this.enableNotePreview ? "true" : "false");
-		window.localStorage.setItem("showFifth", this.showFifth ? "true" : "false");
-		window.localStorage.setItem("notesOutsideScale", this.notesOutsideScale ? "true" : "false");
-		window.localStorage.setItem("defaultScale", Config.scales[this.defaultScale].name);
-		window.localStorage.setItem("showLetters", this.showLetters ? "true" : "false");
-		window.localStorage.setItem("showChannels", this.showChannels ? "true" : "false");
-		window.localStorage.setItem("showScrollBar", this.showScrollBar ? "true" : "false");
-		window.localStorage.setItem("alwaysFineNoteVol", this.alwaysFineNoteVol ? "true" : "false");
-		window.localStorage.setItem("enableChannelMuting", this.enableChannelMuting ? "true" : "false");
-		window.localStorage.setItem("displayBrowserUrl", this.displayBrowserUrl ? "true" : "false");
-		window.localStorage.setItem("displayVolumeBar", this.displayVolumeBar ? "true" : "false");
-		window.localStorage.setItem("layout", this.layout);
-		window.localStorage.setItem("colorTheme", this.colorTheme);
-		window.localStorage.setItem("volume", String(this.volume));
-		window.localStorage.setItem("visibleOctaves", String(this.visibleOctaves));
-	}
-		
+	
 	public setVolume(val: number): void {
-		this.volume = val;
-		this.savePreferences();
+		this.prefs.volume = val;
+		this.prefs.save();
 		this.synth.volume = this._calcVolume();
 	}
 		
 	private _calcVolume(): number {
-		return Math.min(1.0, Math.pow(this.volume / 50.0, 0.5)) * Math.pow(2.0, (this.volume - 75.0) / 25.0);
+		return Math.min(1.0, Math.pow(this.prefs.volume / 50.0, 0.5)) * Math.pow(2.0, (this.prefs.volume - 75.0) / 25.0);
 	}
 		
 	public getCurrentPattern(barOffset: number = 0): Pattern | null {
@@ -472,27 +419,27 @@ export class SongDocument {
 	}
 		
 	public getMobileLayout(): boolean {
-		return (this.layout == "wide") ? window.innerWidth <= 1000 : window.innerWidth <= 710;
+		return (this.prefs.layout == "wide") ? window.innerWidth <= 1000 : window.innerWidth <= 710;
 	}
 		
 	public getBarWidth(): number {
 		// Bugfix: In wide fullscreen, the 32 pixel display doesn't work as the trackEditor is still horizontally constrained
-		return (!this.getMobileLayout() && this.enableChannelMuting && (!this.getFullScreen() || this.layout == "wide")) ? 30 : 32;
+		return (!this.getMobileLayout() && this.prefs.enableChannelMuting && (!this.getFullScreen() || this.prefs.layout == "wide")) ? 30 : 32;
 	}
 		
 	public getChannelHeight(): number {
 		const squashed: boolean = this.getMobileLayout() || this.song.getChannelCount() > 4 || (this.song.barCount > this.trackVisibleBars && this.song.getChannelCount() > 3);
 		// TODO: Jummbox widescreen should allow more channels before squashing or megasquashing
-		const megaSquashed: boolean = !this.getMobileLayout() && (((this.layout != "wide") && this.song.getChannelCount() > 11) || this.song.getChannelCount() > 22);
+		const megaSquashed: boolean = !this.getMobileLayout() && (((this.prefs.layout != "wide") && this.song.getChannelCount() > 11) || this.song.getChannelCount() > 22);
 		return megaSquashed ? 23 : (squashed ? 27 : 32);
 	}
 		
 	public getFullScreen(): boolean {
-		return !this.getMobileLayout() && (this.layout != "small");
+		return !this.getMobileLayout() && (this.prefs.layout != "small");
 	}
 	
 	public getVisibleOctaveCount(): number {
-		return this.getFullScreen() ? this.visibleOctaves : SongDocument.defaultVisibleOctaves;
+		return this.getFullScreen() ? this.prefs.visibleOctaves : Preferences.defaultVisibleOctaves;
 }
 	
 	public getVisiblePitchCount(): number {

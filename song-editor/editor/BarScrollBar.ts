@@ -1,4 +1,4 @@
-// Copyright (C) 2021 John Nesky, distributed under the MIT license.
+// Copyright (c) 2012-2022 John Nesky and contributing authors, distributed under the MIT license, see accompanying the LICENSE.md file.
 
 
 import { SongDocument } from "./SongDocument";
@@ -34,8 +34,8 @@ export class BarScrollBar {
 	private _dragStart: number;
 	private _notchSpace: number;
 	private _renderedNotchCount: number = -1;
-	private _renderedBarPos: number = -1;
-		
+	private _renderedScrollBarPos: number = -1;
+	
 	constructor(private _doc: SongDocument, private _trackContainer: HTMLDivElement) {
 		const center: number = this._editorHeight * 0.5;
 		const base: number = 20;
@@ -224,9 +224,12 @@ export class BarScrollBar {
 					this._notches.appendChild(SVG.rect({fill: ColorConfig.uiWidgetBackground, x: i * this._notchSpace - 1, y: lineHeight, width: 2, height: this._editorHeight - lineHeight * 2}));
 			}
 		}
-			
-		if (resized || this._renderedBarPos != this._doc.barScrollPos) {
-			this._renderedBarPos = this._doc.barScrollPos;
+		
+		this._doc.barScrollPos     = Math.max(0, Math.min(this._doc.song.barCount          - this._doc.trackVisibleBars,     this._doc.barScrollPos));
+		this._doc.channelScrollPos = Math.max(0, Math.min(this._doc.song.getChannelCount() - this._doc.trackVisibleChannels, this._doc.channelScrollPos));
+		
+		if (resized || this._renderedScrollBarPos != this._doc.barScrollPos) {
+			this._renderedScrollBarPos = this._doc.barScrollPos;
 			this._handle.setAttribute("x", String(this._notchSpace * this._doc.barScrollPos));
 			this._handle.setAttribute("width", String(this._notchSpace * this._doc.trackVisibleBars));
 			this._handleHighlight.setAttribute("x", String(this._notchSpace * this._doc.barScrollPos));

@@ -17,10 +17,10 @@ export class CustomChipPromptCanvas {
 	private _lastIndex: number = 0;
 	private _lastAmp: number = 0;
 	private _mouseDown: boolean = false;
-	public chipData: Float64Array = new Float64Array(64);
-	public startingChipData: Float64Array = new Float64Array(64);
+	public chipData: Float32Array = new Float32Array(64);
+	public startingChipData: Float32Array = new Float32Array(64);
 	private _undoHistoryState: number = 0;
-	private _changeQueue: Float64Array[] = [];
+	private _changeQueue: Float32Array[] = [];
 	private readonly _editorWidth: number = 768; // 64*12
 	private readonly _editorHeight: number = 294; // 49*6
 	private readonly _fill: SVGPathElement = SVG.path({ fill: ColorConfig.uiWidgetBackground, "pointer-events": "none" });
@@ -137,7 +137,7 @@ export class CustomChipPromptCanvas {
 			this.undo();
 			event.stopPropagation();
 		}
-		if (event.keyCode == 89) { // y
+		else if (event.keyCode == 89) { // y
 			this.redo();
 			event.stopPropagation();
 		}
@@ -282,14 +282,8 @@ export class CustomChipPrompt implements Prompt {
 	}
 
 	private _togglePlay = (): void => {
-		if (this._doc.synth.playing) {
-			this._songEditor._pause();
-			this.updatePlayButton();
-		} else {
-			this._doc.synth.snapToBar();
-			this._songEditor._play();
-			this.updatePlayButton();
-		}
+		this._songEditor.togglePlay();
+		this.updatePlayButton();
 	}
 
 	public updatePlayButton(): void {
@@ -323,17 +317,23 @@ export class CustomChipPrompt implements Prompt {
 		if ((<Element>event.target).tagName != "BUTTON" && event.keyCode == 13) { // Enter key
 			this._saveChanges();
 		}
-		if (event.keyCode == 32) {
+		else if (event.keyCode == 32) {
 			this._togglePlay();
 			event.preventDefault();
 		}
-		if (event.keyCode == 90) { // z
+		else if (event.keyCode == 90) { // z
 			this.customChipCanvas.undo();
 			event.stopPropagation();
 		}
-		if (event.keyCode == 89) { // y
+		else if (event.keyCode == 89) { // y
 			this.customChipCanvas.redo();
 			event.stopPropagation();
+		}
+		else if (event.keyCode == 219) { // [
+			this._doc.synth.goToPrevBar();
+		}
+		else if (event.keyCode == 221) { // ]
+			this._doc.synth.goToNextBar();
 		}
 	}
 

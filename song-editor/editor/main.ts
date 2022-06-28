@@ -1,14 +1,14 @@
-// Copyright (C) 2021 John Nesky, distributed under the MIT license.
+// Copyright (c) 2012-2022 John Nesky and contributing authors, distributed under the MIT license, see accompanying the LICENSE.md file.
 
 import { Dictionary, DictionaryArray, EnvelopeType, InstrumentType, Transition, Chord, Envelope, Config } from "../synth/SynthConfig";
 import { isMobile, EditorConfig } from "./EditorConfig";
 import { ColorConfig } from "./ColorConfig";
 import "./style"; // Import for the side effects, there's no exports.
-import { SongEditor } from "./SongEditor";
-import { NotePin, Note, Pattern, Instrument, Channel, Synth } from "../synth/synth";
-import { SongDocument } from "./SongDocument";
-import { ExportPrompt } from "./ExportPrompt";
-import { ChangePreset } from "./changes";
+import {SongEditor} from "./SongEditor";
+import {NotePin, Note, Pattern, Instrument, Channel, Song, Synth} from "../synth/synth";
+import {SongDocument} from "./SongDocument";
+import {ExportPrompt} from "./ExportPrompt";
+import {ChangePreset} from "./changes";
 
 
 //namespace beepbox {
@@ -92,7 +92,7 @@ $('#drumPresetSelect').on("select2:close", editor._refocus);
 editor.mainLayer.focus();
 
 // don't autoplay on mobile devices, wait for input.
-if (!isMobile && doc.autoPlay) {
+if (!isMobile && doc.prefs.autoPlay) {
 	function autoplay(): void {
 		if (!document.hidden) {
 			doc.synth.play();
@@ -120,4 +120,4 @@ if ("serviceWorker" in navigator) {
 }
 
 // When compiling synth.ts as a standalone module named "beepbox", expose these classes as members to JavaScript:
-	export {Dictionary, DictionaryArray, EnvelopeType, InstrumentType, Transition, Chord, Envelope, Config, NotePin, Note, Pattern, Instrument, Channel, Synth, ColorConfig, EditorConfig, SongDocument, SongEditor, ExportPrompt, ChangePreset};
+	export {Dictionary, DictionaryArray, EnvelopeType, InstrumentType, Transition, Chord, Envelope, Config, NotePin, Note, Pattern, Instrument, Channel, Song, Synth, ColorConfig, EditorConfig, SongDocument, SongEditor, ExportPrompt, ChangePreset};

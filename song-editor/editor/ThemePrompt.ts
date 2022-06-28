@@ -32,6 +32,9 @@ export class ThemePrompt implements Prompt {
 		option({ value: "nebula" }, "Nebula"),
 		option({ value: "roe light" }, "Roe Light"),
 		option({ value: "amoled dark"}, "High Contrast Dark"),
+		option({ value: "energized" }, "Energized"),
+		option({ value: "neapolitan" }, "Neapolitan"),
+		option({ value: "mono" }, "Mono"),
 	);
 	private readonly _cancelButton: HTMLButtonElement = button({ class: "cancelButton" });
 	private readonly _okayButton: HTMLButtonElement = button({ class: "okayButton", style: "width:45%;" }, "Okay");
@@ -82,7 +85,7 @@ export class ThemePrompt implements Prompt {
 	private _saveChanges = (): void => {
 		window.localStorage.setItem("colorTheme", this._themeSelect.value);
 		this._doc.prompt = null;
-		this._doc.colorTheme = this._themeSelect.value;
+		this._doc.prefs.colorTheme = this._themeSelect.value;
 		this._doc.undo();
 	}
 

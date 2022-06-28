@@ -1,4 +1,4 @@
-// Copyright (C) 2021 John Nesky, distributed under the MIT license.
+// Copyright (c) 2012-2022 John Nesky and contributing authors, distributed under the MIT license, see accompanying the LICENSE.md file.
 
 import {SongDocument} from "./SongDocument";
 import {Layout} from "./Layout";
@@ -81,7 +81,7 @@ export class LayoutPrompt implements Prompt {
 		this._cancelButton.addEventListener("click", this._close);
 		this.container.addEventListener("keydown", this._whenKeyPressed);
 		
-		(<any> this._form.elements)["layout"].value = this._doc.layout;
+		(<any> this._form.elements)["layout"].value = this._doc.prefs.layout;
 	}
 	
 	private _close = (): void => { 
@@ -101,9 +101,9 @@ export class LayoutPrompt implements Prompt {
 	}
 	
 	private _confirm = (): void => { 
-		this._doc.layout = (<any> this._form.elements)["layout"].value;
-		this._doc.savePreferences();
-		Layout.setLayout(this._doc.layout);
+		this._doc.prefs.layout = (<any> this._form.elements)["layout"].value;
+		this._doc.prefs.save();
+		Layout.setLayout(this._doc.prefs.layout);
 		this._close();
 	}
 }

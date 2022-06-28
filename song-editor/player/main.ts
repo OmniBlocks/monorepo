@@ -1,4 +1,4 @@
-// Copyright (C) 2021 John Nesky, distributed under the MIT license.
+// Copyright (c) 2012-2022 John Nesky and contributing authors, distributed under the MIT license, see accompanying the LICENSE.md file.
 
 import { Dictionary, DictionaryArray, EnvelopeType, InstrumentType, Transition, Chord, Envelope, Config } from "../synth/SynthConfig";
 import { ColorConfig } from "../editor/ColorConfig";
@@ -8,6 +8,8 @@ import { HTML, SVG } from "imperative-html/dist/esm/elements-strict";
 
 	const {a, button, div, h1, input, canvas} = HTML;
 	const {svg, circle, rect, path} = SVG;
+
+	const isMobile: boolean = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|android|ipad|playbook|silk/i.test(navigator.userAgent);
 
 	document.head.appendChild(HTML.style({type: "text/css"}, `
 	body {
@@ -160,7 +162,7 @@ let outVolumeHistoricTimer: number = 0;
 let outVolumeHistoricCap: number = 0;
 
 const synth: Synth = new Synth();
-const oscilascope: oscilascopeCanvas = new oscilascopeCanvas(canvas({ width: 288, height: 64, style: "border:2px solid " + ColorConfig.uiWidgetBackground, id: "oscilascopeAll" }), synth, 2);
+const oscilascope: oscilascopeCanvas = new oscilascopeCanvas(canvas({ width: isMobile? 144:288, height: isMobile?32:64, style: "border:2px solid " + ColorConfig.uiWidgetBackground, id: "oscilascopeAll" }), synth, isMobile?1:2);
 let titleText: HTMLHeadingElement = h1({ style: "flex-grow: 1; margin: 0 1px; margin-left: 10px; overflow: hidden;" }, "");
 	let editLink: HTMLAnchorElement = a({target: "_top", style: "margin: 0 4px;"}, "✎ Edit");
 	let copyLink: HTMLAnchorElement = a({href: "javascript:void(0)", style: "margin: 0 4px;"}, "⎘ Copy URL");
@@ -228,6 +230,27 @@ document.body.appendChild(
 	),
 );
 
+// Some browsers have an option to "block third-party cookies" (it's enabled by
+// default in icognito Chrome windows) that throws an error on trying to access
+// localStorage from cross-domain iframe such as this song player, so wrap the
+// access in a try-catch block to ignore the error instead of interrupting
+// execution.
+function setLocalStorage(key: string, value: string): void {
+	try {
+		localStorage.setItem(key, value);
+	} catch (error) {
+		console.error(error);
+	}
+}
+function getLocalStorage(key: string): string | null {
+	try {
+		return localStorage.getItem(key);
+	} catch (error) {
+		console.error(error);
+		return null;
+	}
+}
+
 function loadSong(songString: string, reuseParams: boolean): void {
 	synth.setSong(songString);
 	synth.snapToStart();
@@ -289,7 +312,7 @@ function onWindowResize(): void {
 function animate(): void {
 	if (synth.playing) {
 		animationRequest = requestAnimationFrame(animate);
-		if (localStorage.getItem("playerId") != id) {
+		if (getLocalStorage("playerId") != id) {
 			onTogglePlay();
 		}
 		renderPlayhead();
@@ -341,7 +364,7 @@ function onTogglePlay(): void {
 			volumeUpdate();
 		} else {
 			synth.play();
-			localStorage.setItem("playerId", id);
+			setLocalStorage("playerId", id);
 			animate();
 		}
 	}
@@ -358,7 +381,7 @@ function onToggleLoop(): void {
 }
 
 function onVolumeChange(): void {
-	localStorage.setItem("volume", volumeSlider.value);
+	setLocalStorage("volume", volumeSlider.value);
 	setSynthVolume();
 }
 
@@ -537,19 +560,23 @@ function onKeyPressed(event: KeyboardEvent): void {
 	switch (event.keyCode) {
 		case 70: // first bar
 			synth.playhead = 0;
+			synth.computeLatestModValues();
 			event.preventDefault();
 			break;
 		case 32: // space
 			onTogglePlay();
+			synth.computeLatestModValues();
 			event.preventDefault();
 			break;
 		case 219: // left brace
 			synth.goToPrevBar();
+			synth.computeLatestModValues();
 			renderPlayhead();
 			event.preventDefault();
 			break;
 		case 221: // right brace
 			synth.goToNextBar();
+			synth.computeLatestModValues();
 			renderPlayhead();
 			event.preventDefault();
 			break;
@@ -590,8 +617,8 @@ function onShareClicked(): void {
 	if (!("share" in navigator)) shareLink.style.display = "none";
 }
 
-if (localStorage.getItem("volume") != null) {
-	volumeSlider.value = localStorage.getItem("volume")!;
+if (getLocalStorage("volume") != null) {
+	volumeSlider.value = getLocalStorage("volume")!;
 }
 setSynthVolume();
 

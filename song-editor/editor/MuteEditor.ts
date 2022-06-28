@@ -1,4 +1,4 @@
-// Copyright (C) 2020 John Nesky, distributed under the MIT license.
+// Copyright (c) 2012-2022 John Nesky and contributing authors, distributed under the MIT license, see accompanying the LICENSE.md file.
 
 import { SongDocument } from "./SongDocument";
 import { HTML } from "imperative-html/dist/esm/elements-strict";
@@ -281,14 +281,14 @@ export class MuteEditor {
 	}
 
 	public render(): void {
-		if (!this._doc.enableChannelMuting) return;
-
+		if (!this._doc.prefs.enableChannelMuting) return;
+		
 		const channelHeight = this._doc.getChannelHeight();
 
 		if (this._renderedChannelCount != this._doc.song.getChannelCount()) {
 			for (let y: number = this._renderedChannelCount; y < this._doc.song.getChannelCount(); y++) {
 
-				const channelCountText: HTMLDivElement = HTML.div({ class: "noSelection muteButtonText", style: "display: table-cell; vertical-align: middle; text-align: center; -webkit-user-select: none; -webkit-touch-callout: none; -moz-user-select: none; -ms-user-select: none; user-select: none; pointer-events: none; width: 12px; height: 20px; transform: translate(0px, 1px);" });
+				const channelCountText: HTMLDivElement = HTML.div({ class: "noSelection muteButtonText", style: "display: table-cell; -webkit-text-stroke: 1.5px; vertical-align: middle; text-align: center; -webkit-user-select: none; -webkit-touch-callout: none; -moz-user-select: none; -ms-user-select: none; user-select: none; pointer-events: none; width: 12px; height: 20px; transform: translate(0px, 1px);" });
 				const muteButton: HTMLDivElement = HTML.div({ class: "mute-button", title: "Mute (M), Mute All (⇧M), Solo (S), Exclude (⇧S)", style: `display: block; pointer-events: none; width: 16px; height: 20px; transform: translate(2px, 1px);` });
 
 				const muteContainer: HTMLDivElement = HTML.div({ style: "align-items: center; height: 20px; margin: 0px; display: table; flex-direction: row; justify-content: space-between;" }, [

@@ -1,4 +1,4 @@
-// Copyright (C) 2021 John Nesky, distributed under the MIT license.
+// Copyright (c) 2012-2022 John Nesky and contributing authors, distributed under the MIT license, see accompanying the LICENSE.md file.
 
 import { Config } from "../synth/SynthConfig";
 import { SpectrumWave, Instrument } from "../synth/synth";
@@ -181,9 +181,9 @@ export class SpectrumEditor {
 			this._arrow.setAttribute("d", "M " + this._editorWidth + " " + prettyNumber(lastHeight) + " L " + (this._editorWidth - 4) + " " + prettyNumber(lastHeight - 4) + " L " + (this._editorWidth - 4) + " " + prettyNumber(lastHeight + 4) + " z");
 			this._arrow.style.display = (lastValue > 0) ? "" : "none";
 		}
-		if (this._renderedFifths != this._doc.showFifth) {
-			this._renderedFifths = this._doc.showFifth;
-			this._fifths.style.display = this._doc.showFifth ? "" : "none";
+		if (this._renderedFifths != this._doc.prefs.showFifth) {
+			this._renderedFifths = this._doc.prefs.showFifth;
+			this._fifths.style.display = this._doc.prefs.showFifth ? "" : "none";
 		}
 	}
 }

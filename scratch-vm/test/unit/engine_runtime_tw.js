@@ -192,3 +192,24 @@ test('setStageSize argument range', t => {
 
     t.end();
 });
+
+test('getNumberOfCloudVariables', t => {
+    const rt = new Runtime();
+
+    t.equal(rt.getNumberOfCloudVariables(), 0);
+    rt.addCloudVariable();
+    t.equal(rt.getNumberOfCloudVariables(), 1);
+    rt.addCloudVariable();
+    t.equal(rt.getNumberOfCloudVariables(), 2);
+    rt.removeCloudVariable();
+    t.equal(rt.getNumberOfCloudVariables(), 1);
+    rt.removeCloudVariable();
+    t.equal(rt.getNumberOfCloudVariables(), 0);
+
+    rt.dispose();
+    t.equal(rt.getNumberOfCloudVariables(), 0);
+    rt.addCloudVariable();
+    t.equal(rt.getNumberOfCloudVariables(), 1);
+
+    t.end();
+});

@@ -122,6 +122,8 @@ const ArgumentTypeMap = (() => {
  * removing an existing cloud variable.
  * @property {function} hasCloudVariables A function to call to check that
  * the runtime has any cloud variables.
+ * @property {function} getNumberOfCloudVariables A function that returns the
+ * number of cloud variables in the project.
  */
 
 /**
@@ -151,11 +153,14 @@ const cloudDataManager = cloudOptions => {
 
     const hasCloudVariables = () => count > 0;
 
+    const getNumberOfCloudVariables = () => count;
+
     return {
         canAddCloudVariable,
         addCloudVariable,
         removeCloudVariable,
-        hasCloudVariables
+        hasCloudVariables,
+        getNumberOfCloudVariables
     };
 };
 
@@ -380,6 +385,12 @@ class Runtime extends EventEmitter {
          * to the runtime.
          */
         this.canAddCloudVariable = newCloudDataManager.canAddCloudVariable;
+
+        /**
+         * A function which returns the number of cloud variables in the runtime.
+         * @returns {number}
+         */
+        this.getNumberOfCloudVariables = newCloudDataManager.getNumberOfCloudVariables;
 
         /**
          * A function that tracks a new cloud variable in the runtime,
@@ -2028,6 +2039,7 @@ class Runtime extends EventEmitter {
         const newCloudDataManager = cloudDataManager(this.cloudOptions);
         this.hasCloudData = newCloudDataManager.hasCloudVariables;
         this.canAddCloudVariable = newCloudDataManager.canAddCloudVariable;
+        this.getNumberOfCloudVariables = newCloudDataManager.getNumberOfCloudVariables;
         this.addCloudVariable = this._initializeAddCloudVariable(newCloudDataManager);
         this.removeCloudVariable = this._initializeRemoveCloudVariable(newCloudDataManager);
     }

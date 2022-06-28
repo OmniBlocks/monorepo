@@ -6808,10 +6808,7 @@ export class Synth {
     public liveInputInstruments: number[] = [];
     public loopRepeatCount: number = -1;
     public volume: number = 1.0;
-    public exposedBuffer: Float32Array[] = [];
-    private reloadbuffer: boolean = true;
-    public copybroken: boolean = false;
-    public copybuffertimer: number = 0;
+    public oscRefreshEventTimer: number = 0;
     public enableMetronome: boolean = false;
     public countInMetronome: boolean = false;
     public renderingSong: boolean = false;
@@ -7154,7 +7151,6 @@ export class Synth {
             this.scriptNode.channelCountMode = 'explicit';
             this.scriptNode.channelInterpretation = 'speakers';
             this.scriptNode.connect(this.audioCtx.destination);
-            this.reloadbuffer = true;
 
             this.computeDelayBufferSizes();
         }
@@ -7412,20 +7408,11 @@ export class Synth {
         } else {
             this.synthesize(outputDataL, outputDataR, outputBuffer.length, this.isPlayingSong);
 
-            if (this.reloadbuffer && !this.copybroken) {
-                this.exposedBuffer[0] = outputBuffer.getChannelData(0);
-                this.exposedBuffer[1] = outputBuffer.getChannelData(1);
-                this.reloadbuffer = false;
-                if (this.exposedBuffer[0].length == 0) {
-                    this.copybroken = true;
-                }
-            }
-            if (this.copybroken) {
-                console.log(this.isPlayingSong + " what?");
+            if (this.oscRefreshEventTimer <= 0) {
                 events.raise("oscillascopeUpdate", outputDataL, outputDataR);
-                this.copybuffertimer = 0;
-            } else if (this.copybroken) {
-                this.copybuffertimer--;
+                this.oscRefreshEventTimer = 2;
+            } else {
+                this.oscRefreshEventTimer--;
             }
         }
     }

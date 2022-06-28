@@ -162,7 +162,7 @@ let outVolumeHistoricTimer: number = 0;
 let outVolumeHistoricCap: number = 0;
 
 const synth: Synth = new Synth();
-const oscilascope: oscilascopeCanvas = new oscilascopeCanvas(canvas({ width: isMobile? 144:288, height: isMobile?32:64, style: "border:2px solid " + ColorConfig.uiWidgetBackground, id: "oscilascopeAll" }), synth, isMobile?1:2);
+const oscilascope: oscilascopeCanvas = new oscilascopeCanvas(canvas({ width: isMobile? 144:288, height: isMobile?32:64, style: "border:2px solid " + ColorConfig.uiWidgetBackground, id: "oscilascopeAll" }), isMobile?1:2);
 let titleText: HTMLHeadingElement = h1({ style: "flex-grow: 1; margin: 0 1px; margin-left: 10px; overflow: hidden;" }, "");
 	let editLink: HTMLAnchorElement = a({target: "_top", style: "margin: 0 4px;"}, "✎ Edit");
 	let copyLink: HTMLAnchorElement = a({href: "javascript:void(0)", style: "margin: 0 4px;"}, "⎘ Copy URL");
@@ -342,7 +342,6 @@ function volumeUpdate(): void {
 	}
 
 	animateVolume(synth.song.outVolumeCap, outVolumeHistoricCap);
-	oscilascope._updateCanvas();
 
 	if (!synth.playing) {
 		outVolumeCap.setAttribute("x", "5%");

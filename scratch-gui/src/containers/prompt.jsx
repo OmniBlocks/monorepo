@@ -3,6 +3,7 @@ import React from 'react';
 import bindAll from 'lodash.bindall';
 import PromptComponent from '../components/prompt/prompt.jsx';
 import VM from 'scratch-vm';
+import {SCRATCH_MAX_CLOUD_VARIABLES} from '../lib/tw-cloud-limits.js';
 
 class Prompt extends React.Component {
     constructor (props) {
@@ -16,6 +17,10 @@ class Prompt extends React.Component {
             'handleCloudVariableOptionChange'
         ]);
         this.state = {
+            isAddingCloudVariableScratchSafe: (
+                props.vm &&
+                props.vm.runtime.getNumberOfCloudVariables() < SCRATCH_MAX_CLOUD_VARIABLES
+            ) || false,
             inputValue: '',
             globalSelected: true,
             cloudSelected: false,
@@ -55,6 +60,7 @@ class Prompt extends React.Component {
     render () {
         return (
             <PromptComponent
+                isAddingCloudVariableScratchSafe={this.state.isAddingCloudVariableScratchSafe}
                 canAddCloudVariable={this.state.canAddCloudVariable}
                 cloudSelected={this.state.cloudSelected}
                 defaultValue={this.props.defaultValue}

@@ -7,6 +7,7 @@ import Box from '../box/box.jsx';
 import Modal from '../../containers/modal.jsx';
 
 import styles from './prompt.css';
+import {SCRATCH_MAX_CLOUD_VARIABLES} from '../../lib/tw-cloud-limits.js';
 
 
 const messages = defineMessages({
@@ -121,6 +122,21 @@ const PromptComponent = props => (
                         </Box> : null}
                 </div> : null}
 
+            {props.cloudSelected && !props.isAddingCloudVariableScratchSafe && (
+                <Box className={styles.infoMessage}>
+                    <FormattedMessage
+                        // eslint-disable-next-line max-len
+                        defaultMessage="If you make this cloud variable, the project will exceed Scratch's limit of {number} variables, and some variables will not function if you upload the project to Scratch."
+                        // eslint-disable-next-line max-len
+                        description="Warning that appears when adding a new cloud variable will make it exceeded Scratch's cloud variable limit. number will be 10."
+                        id="tw.scratchUnsafeCloud"
+                        values={{
+                            number: SCRATCH_MAX_CLOUD_VARIABLES
+                        }}
+                    />
+                </Box>
+            )}
+
             {props.cloudSelected && props.canAddCloudVariable && (
                 <Box className={styles.infoMessage}>
                     <FormattedMessage
@@ -171,6 +187,7 @@ const PromptComponent = props => (
 );
 
 PromptComponent.propTypes = {
+    isAddingCloudVariableScratchSafe: PropTypes.bool.isRequired,
     canAddCloudVariable: PropTypes.bool.isRequired,
     cloudSelected: PropTypes.bool.isRequired,
     defaultValue: PropTypes.string,

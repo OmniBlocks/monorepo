@@ -125,7 +125,7 @@ const PromptComponent = props => (
                 <Box className={styles.infoMessage}>
                     <FormattedMessage
                         /* eslint-disable-next-line max-len */
-                        defaultMessage="Although you can create cloud variables, they won't work unless this project is uploaded to Scratch or using a tool such as the {packager}."
+                        defaultMessage="Although you can create cloud variables, they won't work unless this project is uploaded to Scratch or converted using a tool like the {packager}."
                         description="Reminder that cloud variables may not work when the editor is open"
                         values={{
                             packager: (

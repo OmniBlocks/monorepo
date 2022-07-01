@@ -65,3 +65,19 @@ test('non-primitive values in lists and variables converted to strings', t => {
 
     t.end();
 });
+
+test('addSound error handling when sprite does not exist', async t => {
+    t.plan(1);
+    const vm = new VirtualMachine();
+    const id = 'Inva1id5pri731D$!';
+    try {
+        await vm.addSound({
+            thisObjectDoesNotMatter: true
+        }, id);
+    } catch (e) {
+        if (e && e.message === `No target with ID: ${id}`) {
+            t.pass();
+        }
+    }
+    t.end();
+});

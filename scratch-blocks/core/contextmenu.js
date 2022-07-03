@@ -156,6 +156,9 @@ Blockly.ContextMenu.position_ = function(menu, e, rtl) {
   // correctly.  Otherwise it will cause a page scroll to get the misplaced menu
   // in view.  See issue #1329.
   menu.getElement().focus();
+
+  // https://github.com/LLK/scratch-blocks/pull/2834
+  menu.setVisible(true, true, e);
 };
 
 /**

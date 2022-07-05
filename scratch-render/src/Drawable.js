@@ -128,7 +128,6 @@ class Drawable {
 
         this.isTouching = this._isTouchingNever;
 
-        // tw: implement high quality render
         this._highQuality = false;
     }
 
@@ -209,7 +208,6 @@ class Drawable {
     updatePosition (position) {
         if (this._position[0] !== position[0] ||
             this._position[1] !== position[1]) {
-            // tw: implement high quality render
             if (this._highQuality) {
                 this._position[0] = position[0];
                 this._position[1] = position[1];

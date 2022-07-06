@@ -539,6 +539,18 @@ class RenderWebGL extends EventEmitter {
     }
 
     /**
+     * Mark a skin as containing private information.
+     * @param {number} skinID The skin's ID
+     */
+    markSkinAsPrivate (skinID) {
+        const skin = this._allSkins[skinID];
+        if (!skin) {
+            return;
+        }
+        skin.private = true;
+    }
+
+    /**
      * Set the layer group ordering for the renderer.
      * @param {Array<string>} groupOrdering The ordered array of layer group
      * names

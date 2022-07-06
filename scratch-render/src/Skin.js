@@ -48,6 +48,11 @@ class Skin {
          * @protected
          */
         this._silhouette = new Silhouette();
+
+        /**
+         * Whether this skin might include private information about the user.
+         */
+        this.private = false;
     }
 
     /**

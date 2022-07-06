@@ -49,8 +49,7 @@ const fetchProjectToken = projectId => {
         })
         .then(dataOrNull => {
             const token = dataOrNull ? dataOrNull.project_token : null;
-            // We won't use the token for now.
-            return null;
+            return token;
         })
         .catch(err => {
             log.error(err);

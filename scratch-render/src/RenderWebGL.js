@@ -235,6 +235,15 @@ class RenderWebGL extends EventEmitter {
         /** @todo disable when no partial transparency? */
         gl.enable(gl.BLEND);
         gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+
+        /**
+         * Whether projects should be able to access the contents of private skins such as webcams.
+         * If set to false, routines such as isTouchingColor will ignore private skins.
+         * Private skins will still be rendered on the canvas regardless of this setting.
+         * This is set to true by default for compatibility with vanilla Scratch.
+         * @type {boolean}
+         */
+        this.allowPrivateSkinAccess = true;
     }
 
     // tw: implement high quality pen option
@@ -260,6 +269,15 @@ class RenderWebGL extends EventEmitter {
                 drawable.setHighQuality(this.useHighQualityRender);
             }
         }
+    }
+
+    /**
+     * Configure whether the renderer should let projects access private skins.
+     * @param {boolean} allowPrivateSkinAccess Whether projects can access private skins or not.
+     */
+    setPrivateSkinAccess (allowPrivateSkinAccess) {
+        this.allowPrivateSkinAccess = allowPrivateSkinAccess;
+        this.emit(RenderConstants.Events.AllowPrivateSkinAccessChanged, allowPrivateSkinAccess);
     }
 
     /**
@@ -1469,6 +1487,10 @@ class RenderWebGL extends EventEmitter {
                 // Text bubbles aren't considered in "touching" queries
                 if (drawable.skin instanceof TextBubbleSkin) continue;
                 if (drawable.skin && drawable._visible) {
+                    // If private skin access is disabled, do not allow projects to use touching blocks to guess the
+                    // contents of a private skin.
+                    if (!this.allowPrivateSkinAccess && drawable.skin.private) continue;
+
                     // Update the CPU position data
                     drawable.updateCPURenderAttributes();
                     const candidateBounds = drawable.getFastBounds();

@@ -16,9 +16,14 @@ module.exports = {
      */
     Events: {
         /**
-         * Event for when the high quality render option is changed
+         * Event emitted when the high quality render option changes.
          */
         UseHighQualityRenderChanged: 'UseHighQualityRenderChanged',
+
+        /**
+         * Event emitted when the private skin access option changes.
+         */
+        AllowPrivateSkinAccessChanged: 'AllowPrivateSkinAccessChanged',
 
         /**
          * NativeSizeChanged event

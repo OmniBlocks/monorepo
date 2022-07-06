@@ -35,6 +35,7 @@ let vm;
 
 const onVmInit = _vm => {
     vm = _vm;
+    vm.runtime.renderer.setPrivateSkinAccess(false);
 };
 
 const onProjectLoaded = () => {

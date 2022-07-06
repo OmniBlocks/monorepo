@@ -123,6 +123,7 @@ const ProjectFetcherHOC = function (WrappedComponent) {
                 }
                 assetPromise = progressMonitor.fetchWithProgress(projectUrl)
                     .then(r => {
+                        this.props.vm.runtime.renderer.setPrivateSkinAccess(false);
                         if (!r.ok) {
                             throw new Error(`Request returned status ${r.status}`);
                         }

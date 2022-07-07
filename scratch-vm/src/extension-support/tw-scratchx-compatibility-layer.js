@@ -95,6 +95,10 @@ const convert = (name, descriptor, functions) => {
         getInfo: () => info
     };
 
+    if (descriptor.url) {
+        info.docsURI = descriptor.url;
+    }
+
     for (const blockDescriptor of descriptor.blocks) {
         const scratchXBlockType = blockDescriptor[0];
         const blockText = blockDescriptor[1];

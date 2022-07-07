@@ -35,7 +35,8 @@ test('complex extension', t => {
             ],
             menus: {
                 myMenu: ['abc', 'def', 123, true, false]
-            }
+            },
+            url: 'https://turbowarp.org/myextensiondocs.html'
         },
         {
             unusedGarbage: 10,
@@ -49,6 +50,7 @@ test('complex extension', t => {
 
     const info = converted.getInfo();
     t.equal(info.id, 'scratchxmyextension');
+    t.equal(info.docsURI, 'https://turbowarp.org/myextensiondocs.html');
 
     t.same(info.blocks, [
         {

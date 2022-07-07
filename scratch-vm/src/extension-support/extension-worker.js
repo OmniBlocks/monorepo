@@ -80,3 +80,5 @@ const extensionWorker = new ExtensionWorker();
 global.Scratch.extensions = {
     register: extensionWorker.register.bind(extensionWorker)
 };
+
+global.ScratchExtensions = require('./tw-scratchx-compatibility-layer');

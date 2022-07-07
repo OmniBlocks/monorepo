@@ -6,24 +6,31 @@
 const ArgumentType = require('./argument-type');
 const BlockType = require('./block-type');
 
-const convertScratchXBlockTypeToScratch3BlockType = type => {
-    // empty or space: command blocks
-    // w: command blocks that wait
+const parseScratchXBlockType = type => {
     if (type === '' || type === ' ' || type === 'w') {
-        return BlockType.COMMAND;
+        return {
+            type: BlockType.COMMAND,
+            async: type === 'w'
+        };
     }
-    // r: reporter blocks
-    // R: reporter blocks that wait
     if (type === 'r' || type === 'R') {
-        return BlockType.REPORTER;
+        return {
+            type: BlockType.REPORTER,
+            async: type === 'R'
+        };
     }
-    // b: boolean blocks
     if (type === 'b') {
-        return BlockType.BOOLEAN;
+        return {
+            type: BlockType.BOOLEAN,
+            // ScratchX docs don't seem to mention boolean reporters that wait
+            async: false
+        };
     }
-    // h: hat blocks
     if (type === 'h') {
-        return BlockType.HAT;
+        return {
+            type: BlockType.HAT,
+            async: false
+        };
     }
     throw new Error(`Unknown ScratchX block type: ${type}`);
 };
@@ -55,11 +62,16 @@ const parseScratchXArgument = (argument, defaultValue) => {
     return result;
 };
 
-const wrapScratchXFunction = (originalFunction, argumentCount) => args => {
+const wrapScratchXFunction = (originalFunction, argumentCount, async) => args => {
     // Convert Scratch 3's argument object to an argument list expected by ScratchX
     const argumentList = [];
     for (let i = 0; i < argumentCount; i++) {
         argumentList.push(args[i.toString()]);
+    }
+    if (async) {
+        return new Promise(resolve => {
+            originalFunction(...argumentList, resolve);
+        });
     }
     return originalFunction(...argumentList);
 };
@@ -122,9 +134,10 @@ const convert = (name, descriptor, functions) => {
             }
         }
 
+        const scratch3BlockType = parseScratchXBlockType(scratchXBlockType);
         const blockInfo = {
             opcode: functionName,
-            blockType: convertScratchXBlockTypeToScratch3BlockType(scratchXBlockType),
+            blockType: scratch3BlockType.type,
             text: scratchText,
             arguments: argumentInfo
         };
@@ -132,7 +145,11 @@ const convert = (name, descriptor, functions) => {
 
         const originalFunction = functions[functionName];
         const argumentCount = argumentInfo.length;
-        scratch3Extension[functionName] = wrapScratchXFunction(originalFunction, argumentCount);
+        scratch3Extension[functionName] = wrapScratchXFunction(
+            originalFunction,
+            argumentCount,
+            scratch3BlockType.async
+        );
     }
 
     const menus = descriptor.menus;

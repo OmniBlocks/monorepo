@@ -6,7 +6,7 @@ test('register', t => {
     t.end();
 });
 
-test('complex extension', t => {
+test('complex extension', async t => {
     let stepsMoved = 0;
     const moveSteps = n => {
         stepsMoved += n;
@@ -19,7 +19,10 @@ test('complex extension', t => {
 
     const multiplyAndAppend = (a, b, c) => `${a * b}${c}`;
 
-    const repeat = (string, count) => string.repeat(count);
+    const repeat = (string, count, callback) => {
+        callback(string.repeat(count));
+        return 'This value should be ignored.';
+    };
 
     const touching = sprite => sprite === 'Sprite9';
 
@@ -28,7 +31,7 @@ test('complex extension', t => {
         {
             blocks: [
                 ['', 'move %n steps', 'moveSteps', 50],
-                ['w', 'do nothing', 'doNothing', 100, 200],
+                ['', 'do nothing', 'doNothing', 100, 200],
                 ['r', 'multiply %n by %n and append %s', 'multiplyAndAppend'],
                 ['R', 'repeat %m.myMenu %n', 'repeat', ''],
                 ['b', 'touching %s', 'touching', 'Sprite1']
@@ -136,6 +139,15 @@ test('complex extension', t => {
         1: 7,
         2: 'Cat'
     }), '217Cat');
+
+    t.type(converted.repeat({
+        0: '',
+        1: 0
+    }).then, 'function');
+    t.equal(await converted.repeat({
+        0: 'scratchx',
+        1: 3
+    }), 'scratchxscratchxscratchx');
 
     t.equal(converted.touching({
         0: 'Sprite1'

@@ -101,13 +101,16 @@ test('complex extension', async t => {
             blockType: 'reporter',
             arguments: [
                 {
-                    type: 'number'
+                    type: 'number',
+                    defaultValue: 0
                 },
                 {
-                    type: 'number'
+                    type: 'number',
+                    defaultValue: 0
                 },
                 {
-                    type: 'string'
+                    type: 'string',
+                    defaultValue: ''
                 }
             ]
         },
@@ -122,7 +125,8 @@ test('complex extension', async t => {
                     defaultValue: ''
                 },
                 {
-                    type: 'number'
+                    type: 'number',
+                    defaultValue: 0
                 }
             ]
         },

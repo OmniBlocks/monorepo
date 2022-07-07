@@ -43,14 +43,21 @@ const isScratchCompatibleValue = v => typeof v === 'string' || typeof v === 'num
  */
 const parseScratchXArgument = (argument, defaultValue) => {
     const result = {};
-    if (isScratchCompatibleValue(defaultValue)) {
+    const hasDefaultValue = isScratchCompatibleValue(defaultValue);
+    if (hasDefaultValue) {
         result.defaultValue = defaultValue;
     }
     // TODO: ScratchX docs don't mention support for boolean arguments?
     if (argument === 's') {
         result.type = ArgumentType.STRING;
+        if (!hasDefaultValue) {
+            result.defaultValue = '';
+        }
     } else if (argument === 'n') {
         result.type = ArgumentType.NUMBER;
+        if (!hasDefaultValue) {
+            result.defaultValue = 0;
+        }
     } else if (argument[0] === 'm') {
         result.type = ArgumentType.STRING;
         const split = argument.split(/\.|:/);

@@ -61,16 +61,8 @@ class BitmapSkin extends Skin {
         }
         const gl = this._renderer.gl;
 
-        // Preferably bitmapData is ImageData. ImageData speeds up updating
-        // Silhouette and is better handled by more browsers in regards to
-        // memory.
-        let textureData = bitmapData;
-        if (bitmapData instanceof HTMLCanvasElement) {
-            // Given a HTMLCanvasElement get the image data to pass to webgl and
-            // Silhouette.
-            const context = bitmapData.getContext('2d');
-            textureData = context.getImageData(0, 0, bitmapData.width, bitmapData.height);
-        }
+        // TW: Never convert to ImageData here. That's unnecessary and wastes memory.
+        const textureData = bitmapData;
 
         if (this._texture === null) {
             const textureOptions = {

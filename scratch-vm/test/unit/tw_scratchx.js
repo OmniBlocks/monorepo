@@ -32,8 +32,10 @@ test('complex extension', async t => {
             blocks: [
                 ['', 'move %n steps', 'moveSteps', 50],
                 ['', 'do nothing', 'doNothing', 100, 200],
+                ['-'],
                 ['r', 'multiply %n by %n and append %s', 'multiplyAndAppend'],
                 ['R', 'repeat %m.myMenu %n', 'repeat', ''],
+                ['-'],
                 ['b', 'touching %s', 'touching', 'Sprite1']
             ],
             menus: {
@@ -73,6 +75,7 @@ test('complex extension', async t => {
             blockType: 'command',
             arguments: []
         },
+        '---',
         {
             opcode: 'multiplyAndAppend',
             text: 'multiply [0] by [1] and append [2]',
@@ -104,6 +107,7 @@ test('complex extension', async t => {
                 }
             ]
         },
+        '---',
         {
             opcode: 'touching',
             text: 'touching [0]',

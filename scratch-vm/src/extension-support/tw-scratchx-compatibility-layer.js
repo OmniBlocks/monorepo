@@ -1,4 +1,4 @@
-// API Documentation: https://github.com/LLK/scratchx/wiki/
+// ScratchX API Documentation: https://github.com/LLK/scratchx/wiki/
 
 // Global Scratch API from extension-worker.js
 /* globals Scratch */
@@ -44,6 +44,11 @@ const parseScratchXArgument = (argument, defaultValue) => {
         result.type = ArgumentType.STRING;
     } else if (argument === 'n') {
         result.type = ArgumentType.NUMBER;
+    } else if (argument[0] === 'm') {
+        result.type = ArgumentType.STRING;
+        const split = argument.split('.');
+        const menuName = split[1];
+        result.menu = menuName;
     } else {
         throw new Error(`Unknown ScratchX argument type: ${argument}`);
     }
@@ -98,7 +103,7 @@ const convert = (name, descriptor, functions) => {
 
         let scratchText = '';
         const argumentInfo = [];
-        const blockTextParts = blockText.split(/%(\w+)/g);
+        const blockTextParts = blockText.split(/%([\w.]+)/g);
         for (let i = 0; i < blockTextParts.length; i++) {
             const part = blockTextParts[i];
             const isArgument = i % 2 === 1;
@@ -124,6 +129,19 @@ const convert = (name, descriptor, functions) => {
         const originalFunction = functions[functionName];
         const argumentCount = argumentInfo.length;
         scratch3Extension[functionName] = wrapScratchXFunction(originalFunction, argumentCount);
+    }
+
+    const menus = descriptor.menus;
+    if (menus) {
+        const scratch3Menus = {};
+        for (const menuName of Object.keys(menus) || {}) {
+            const menuItems = menus[menuName];
+            const menuInfo = {
+                items: menuItems
+            };
+            scratch3Menus[menuName] = menuInfo;
+        }
+        info.menus = scratch3Menus;
     }
 
     return scratch3Extension;

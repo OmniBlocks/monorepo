@@ -6,7 +6,7 @@ test('register', t => {
     t.end();
 });
 
-test('convert extension', t => {
+test('complex extension', t => {
     let stepsMoved = 0;
     const moveSteps = n => {
         stepsMoved += n;
@@ -19,6 +19,8 @@ test('convert extension', t => {
 
     const multiplyAndAppend = (a, b, c) => `${a * b}${c}`;
 
+    const repeat = (string, count) => string.repeat(count);
+
     const touching = sprite => sprite === 'Sprite9';
 
     const converted = ScratchExtensions.convert(
@@ -26,15 +28,21 @@ test('convert extension', t => {
         {
             blocks: [
                 ['', 'move %n steps', 'moveSteps', 50],
-                [' ', 'do nothing', 'doNothing', 100, 200],
+                ['w', 'do nothing', 'doNothing', 100, 200],
                 ['r', 'multiply %n by %n and append %s', 'multiplyAndAppend'],
+                ['R', 'repeat %m.myMenu %n', 'repeat', ''],
                 ['b', 'touching %s', 'touching', 'Sprite1']
-            ]
+            ],
+            menus: {
+                myMenu: ['abc', 'def', 123, true, false]
+            }
         },
         {
+            unusedGarbage: 10,
             moveSteps,
             doNothing,
             multiplyAndAppend,
+            repeat,
             touching
         }
     );
@@ -77,6 +85,21 @@ test('convert extension', t => {
             ]
         },
         {
+            opcode: 'repeat',
+            text: 'repeat [0] [1]',
+            blockType: 'reporter',
+            arguments: [
+                {
+                    type: 'string',
+                    menu: 'myMenu',
+                    defaultValue: ''
+                },
+                {
+                    type: 'number'
+                }
+            ]
+        },
+        {
             opcode: 'touching',
             text: 'touching [0]',
             blockType: 'Boolean',
@@ -88,6 +111,12 @@ test('convert extension', t => {
             ]
         }
     ]);
+
+    t.same(info.menus, {
+        myMenu: {
+            items: ['abc', 'def', 123, true, false]
+        }
+    });
 
     // Now let's make sure that the converter has properly wrapped our functions.
     t.equal(stepsMoved, 0);

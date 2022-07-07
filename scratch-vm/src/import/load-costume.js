@@ -168,14 +168,22 @@ const fetchBitmapCanvas_ = function (costume, runtime, rotationCenter) {
                 imageOrCanvas = baseImageElement;
             }
             if (scale !== 1) {
+                // resize() returns a new canvas.
                 imageOrCanvas = runtime.v2BitmapAdapter.resize(
                     imageOrCanvas,
                     imageOrCanvas.width * scale,
                     imageOrCanvas.height * scale
                 );
+                // Old canvas is no longer used.
+                if (canvas) {
+                    canvasPool.release(canvas);
+                }
             }
-            if (canvas) {
-                canvasPool.release(canvas);
+
+            // This informs TurboWarp/scratch-render that this canvas won't be reused by the canvas pool,
+            // which helps it optimize memory use.
+            if (imageOrCanvas instanceof HTMLCanvasElement) {
+                imageOrCanvas.reusable = false;
             }
 
             // By scaling, we've converted it to bitmap resolution 2

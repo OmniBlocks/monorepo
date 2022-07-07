@@ -17,6 +17,11 @@ test('complex extension', async t => {
         doNothingCalled = true;
     };
 
+    const fetch = (url, callback) => {
+        callback(`Fetched: ${url}`);
+        return 'This value should be ignored.';
+    };
+
     const multiplyAndAppend = (a, b, c) => `${a * b}${c}`;
 
     const repeat = (string, count, callback) => {
@@ -32,6 +37,7 @@ test('complex extension', async t => {
             blocks: [
                 ['', 'move %n steps', 'moveSteps', 50],
                 ['', 'do nothing', 'doNothing', 100, 200],
+                ['w', 'fetch %m:urls1', 'fetch'],
                 [' '],
                 ['r', 'multiply %n by %n and append %s', 'multiplyAndAppend'],
                 ['R', 'repeat %m.myMenu %n', 'repeat', ''],
@@ -39,7 +45,8 @@ test('complex extension', async t => {
                 ['b', 'touching %s', 'touching', 'Sprite1']
             ],
             menus: {
-                myMenu: ['abc', 'def', 123, true, false]
+                myMenu: ['abc', 'def', 123, true, false],
+                urls1: ['https://example.com/', 'https://example.org/']
             },
             url: 'https://turbowarp.org/myextensiondocs.html'
         },
@@ -47,6 +54,7 @@ test('complex extension', async t => {
             unusedGarbage: 10,
             moveSteps,
             doNothing,
+            fetch,
             multiplyAndAppend,
             repeat,
             touching
@@ -74,6 +82,17 @@ test('complex extension', async t => {
             text: 'do nothing',
             blockType: 'command',
             arguments: []
+        },
+        {
+            opcode: 'fetch',
+            text: 'fetch [0]',
+            blockType: 'command',
+            arguments: [
+                {
+                    type: 'string',
+                    menu: 'urls1'
+                }
+            ]
         },
         '---',
         {
@@ -124,6 +143,9 @@ test('complex extension', async t => {
     t.same(info.menus, {
         myMenu: {
             items: ['abc', 'def', 123, true, false]
+        },
+        urls1: {
+            items: ['https://example.com/', 'https://example.org/']
         }
     });
 
@@ -137,6 +159,13 @@ test('complex extension', async t => {
     t.equal(doNothingCalled, false);
     t.equal(converted.doNothing({}), undefined);
     t.equal(doNothingCalled, true);
+
+    t.type(converted.fetch({
+        0: 'https://example.com/'
+    }).then, 'function');
+    t.equal(await converted.fetch({
+        0: 'https://example.com/'
+    }), 'Fetched: https://example.com/');
 
     t.equal(converted.multiplyAndAppend({
         0: 31,

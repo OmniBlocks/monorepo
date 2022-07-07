@@ -53,7 +53,7 @@ const parseScratchXArgument = (argument, defaultValue) => {
         result.type = ArgumentType.NUMBER;
     } else if (argument[0] === 'm') {
         result.type = ArgumentType.STRING;
-        const split = argument.split('.');
+        const split = argument.split(/\.|:/);
         const menuName = split[1];
         result.menu = menuName;
     } else {
@@ -124,7 +124,7 @@ const convert = (name, descriptor, functions) => {
 
         let scratchText = '';
         const argumentInfo = [];
-        const blockTextParts = blockText.split(/%([\w.]+)/g);
+        const blockTextParts = blockText.split(/%([\w.:]+)/g);
         for (let i = 0; i < blockTextParts.length; i++) {
             const part = blockTextParts[i];
             const isArgument = i % 2 === 1;

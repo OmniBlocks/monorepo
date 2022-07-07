@@ -182,9 +182,7 @@ const fetchBitmapCanvas_ = function (costume, runtime, rotationCenter) {
 
             // This informs TurboWarp/scratch-render that this canvas won't be reused by the canvas pool,
             // which helps it optimize memory use.
-            if (imageOrCanvas instanceof HTMLCanvasElement) {
-                imageOrCanvas.reusable = false;
-            }
+            imageOrCanvas.reusable = false;
 
             // By scaling, we've converted it to bitmap resolution 2
             if (rotationCenter) {

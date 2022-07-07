@@ -62,7 +62,7 @@ test('complex extension', async t => {
     );
 
     const info = converted.getInfo();
-    t.equal(info.id, 'scratchxmyextension');
+    t.equal(info.id, 'sbxmyextension');
     t.equal(info.docsURI, 'https://turbowarp.org/myextensiondocs.html');
 
     t.same(info.blocks, [

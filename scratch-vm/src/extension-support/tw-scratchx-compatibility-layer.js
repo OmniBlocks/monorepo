@@ -83,7 +83,7 @@ const wrapScratchXFunction = (originalFunction, argumentCount, async) => args =>
 const generateExtensionId = scratchXName => {
     // Changing this logic will break any existing projects.
     const sanitizedName = scratchXName.replace(/[^a-z0-9]/gi, '').toLowerCase();
-    return `scratchx${sanitizedName}`;
+    return `sbx${sanitizedName}`;
 };
 
 /**

@@ -32,7 +32,7 @@ test('complex extension', async t => {
             blocks: [
                 ['', 'move %n steps', 'moveSteps', 50],
                 ['', 'do nothing', 'doNothing', 100, 200],
-                ['-'],
+                [' '],
                 ['r', 'multiply %n by %n and append %s', 'multiplyAndAppend'],
                 ['R', 'repeat %m.myMenu %n', 'repeat', ''],
                 ['-'],

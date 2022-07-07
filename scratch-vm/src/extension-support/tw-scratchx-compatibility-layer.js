@@ -112,12 +112,12 @@ const convert = (name, descriptor, functions) => {
     }
 
     for (const blockDescriptor of descriptor.blocks) {
-        const scratchXBlockType = blockDescriptor[0];
-        if (scratchXBlockType === '-') {
+        if (blockDescriptor.length === 1) {
             // Separator
             info.blocks.push('---');
             continue;
         }
+        const scratchXBlockType = blockDescriptor[0];
         const blockText = blockDescriptor[1];
         const functionName = blockDescriptor[2];
         const defaultArgumentValues = blockDescriptor.slice(3);

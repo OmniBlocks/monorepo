@@ -1,0 +1,142 @@
+// API Documentation: https://github.com/LLK/scratchx/wiki/
+
+// Global Scratch API from extension-worker.js
+/* globals Scratch */
+
+const ArgumentType = require('./argument-type');
+const BlockType = require('./block-type');
+
+const convertScratchXBlockTypeToScratch3BlockType = type => {
+    // empty or space: command blocks
+    // w: command blocks that wait
+    if (type === '' || type === ' ' || type === 'w') {
+        return BlockType.COMMAND;
+    }
+    // r: reporter blocks
+    // R: reporter blocks that wait
+    if (type === 'r' || type === 'R') {
+        return BlockType.REPORTER;
+    }
+    // b: boolean blocks
+    if (type === 'b') {
+        return BlockType.BOOLEAN;
+    }
+    // h: hat blocks
+    if (type === 'h') {
+        return BlockType.HAT;
+    }
+    throw new Error(`Unknown ScratchX block type: ${type}`);
+};
+
+const isScratchCompatibleValue = v => typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean';
+
+/**
+ * @param {string} argument ScratchX argument with leading % removed.
+ * @param {unknown} defaultValue Default value, if any
+ */
+const parseScratchXArgument = (argument, defaultValue) => {
+    const result = {};
+    if (isScratchCompatibleValue(defaultValue)) {
+        result.defaultValue = defaultValue;
+    }
+    // TODO: ScratchX docs don't mention support for boolean arguments?
+    if (argument === 's') {
+        result.type = ArgumentType.STRING;
+    } else if (argument === 'n') {
+        result.type = ArgumentType.NUMBER;
+    } else {
+        throw new Error(`Unknown ScratchX argument type: ${argument}`);
+    }
+    return result;
+};
+
+const wrapScratchXFunction = (originalFunction, argumentCount) => args => {
+    // Convert Scratch 3's argument object to an argument list expected by ScratchX
+    const argumentList = [];
+    for (let i = 0; i < argumentCount; i++) {
+        argumentList.push(args[i.toString()]);
+    }
+    return originalFunction(...argumentList);
+};
+
+/**
+ * @param {string} scratchXName
+ * @returns {string}
+ */
+const generateExtensionId = scratchXName => {
+    // Changing this logic will break any existing projects.
+    const sanitizedName = scratchXName.replace(/[^a-z0-9]/gi, '').toLowerCase();
+    return `scratchx${sanitizedName}`;
+};
+
+/**
+ * @typedef ScratchXDescriptor
+ * @property {any[][]} blocks
+ */
+
+/**
+ * @param {string} name
+ * @param {ScratchXDescriptor} descriptor
+ * @param {Record<string, () => unknown>} functions
+ */
+const convert = (name, descriptor, functions) => {
+    const extensionId = generateExtensionId(name);
+    const info = {
+        id: extensionId,
+        name: name,
+        blocks: []
+    };
+    const scratch3Extension = {
+        getInfo: () => info
+    };
+
+    for (const blockDescriptor of descriptor.blocks) {
+        const scratchXBlockType = blockDescriptor[0];
+        const blockText = blockDescriptor[1];
+        const functionName = blockDescriptor[2];
+        const defaultArgumentValues = blockDescriptor.slice(3);
+
+        let scratchText = '';
+        const argumentInfo = [];
+        const blockTextParts = blockText.split(/%(\w+)/g);
+        for (let i = 0; i < blockTextParts.length; i++) {
+            const part = blockTextParts[i];
+            const isArgument = i % 2 === 1;
+            if (isArgument) {
+                parseScratchXArgument(part);
+                const argumentIndex = Math.floor(i / 2).toString();
+                const argumentDefaultValue = defaultArgumentValues[argumentIndex];
+                argumentInfo[argumentIndex] = parseScratchXArgument(part, argumentDefaultValue);
+                scratchText += `[${argumentIndex}]`;
+            } else {
+                scratchText += part;
+            }
+        }
+
+        const blockInfo = {
+            opcode: functionName,
+            blockType: convertScratchXBlockTypeToScratch3BlockType(scratchXBlockType),
+            text: scratchText,
+            arguments: argumentInfo
+        };
+        info.blocks.push(blockInfo);
+
+        const originalFunction = functions[functionName];
+        const argumentCount = argumentInfo.length;
+        scratch3Extension[functionName] = wrapScratchXFunction(originalFunction, argumentCount);
+    }
+
+    return scratch3Extension;
+};
+
+const register = (name, descriptor, functions) => {
+    const scratch3Extension = convert(name, descriptor, functions);
+    Scratch.extensions.register(scratch3Extension);
+};
+
+module.exports = {
+    register,
+    
+    // For tests
+    convert
+};

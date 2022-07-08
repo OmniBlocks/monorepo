@@ -185,9 +185,13 @@ const register = (name, descriptor, functions) => {
     Scratch.extensions.register(scratch3Extension);
 };
 
+// temporary hack for the spotify extension
+const getStatus = () => 0;
+
 module.exports = {
     register,
-    
+    getStatus,
+
     // For tests
     convert
 };

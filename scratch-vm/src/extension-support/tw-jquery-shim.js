@@ -85,7 +85,12 @@ jQuery.ajax = async (arg1, arg2) => {
             jQuery.getScript(getFinalURL());
             return;
         }
-    
+
+        if (options.dataType === 'script') {
+            jQuery.getScript(getFinalURL(), successCallback);
+            return;
+        }
+
         const res = await fetch(getFinalURL(), {
             headers: options.headers
         });

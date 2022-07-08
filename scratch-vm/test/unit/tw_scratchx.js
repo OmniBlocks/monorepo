@@ -195,3 +195,18 @@ test('complex extension', async t => {
 
     t.end();
 });
+
+test('display name', t => {
+    const converted = ScratchExtensions.convert(
+        'Internal Name',
+        {
+            blocks: [],
+            displayName: 'Display Name'
+        },
+        {
+
+        }
+    );
+    t.equal(converted.getInfo().name, 'Display Name');
+    t.end();
+});

@@ -6,6 +6,20 @@
 const ArgumentType = require('./argument-type');
 const BlockType = require('./block-type');
 
+/**
+ * @typedef ScratchXDescriptor
+ * @property {unknown[][]} blocks
+ * @property {Record<string, unknown[]>} [menus]
+ * @property {string} [url]
+ * @property {string} [displayName]
+ */
+
+/**
+ * @typedef ScratchXStatus
+ * @property {0|1|2} status 0 is red/error, 1 is yellow/not ready, 2 is green/ready
+ * @property {string} msg
+ */
+
 const parseScratchXBlockType = type => {
     if (type === '' || type === ' ' || type === 'w') {
         return {
@@ -101,16 +115,6 @@ const generateExtensionId = scratchXName => {
 };
 
 /**
- * @typedef ScratchXDescriptor
- * @property {any[][]} blocks
- */
-
-/**
- * @typedef ScratchXStatus
- * @property {0|1|2} status 0 is red/error, 1 is yellow/not ready, 2 is green/ready
- */
-
-/**
  * @param {string} name
  * @param {ScratchXDescriptor} descriptor
  * @param {Record<string, () => unknown>} functions
@@ -119,7 +123,7 @@ const convert = (name, descriptor, functions) => {
     const extensionId = generateExtensionId(name);
     const info = {
         id: extensionId,
-        name: name,
+        name: descriptor.displayName || name,
         blocks: []
     };
     const scratch3Extension = {

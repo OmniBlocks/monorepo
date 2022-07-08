@@ -106,6 +106,11 @@ const generateExtensionId = scratchXName => {
  */
 
 /**
+ * @typedef ScratchXStatus
+ * @property {0|1|2} status 0 is red/error, 1 is yellow/not ready, 2 is green/ready
+ */
+
+/**
  * @param {string} name
  * @param {ScratchXDescriptor} descriptor
  * @param {Record<string, () => unknown>} functions
@@ -118,7 +123,8 @@ const convert = (name, descriptor, functions) => {
         blocks: []
     };
     const scratch3Extension = {
-        getInfo: () => info
+        getInfo: () => info,
+        _getStatus: functions._getStatus
     };
 
     if (descriptor.url) {
@@ -188,13 +194,28 @@ const convert = (name, descriptor, functions) => {
     return scratch3Extension;
 };
 
+const extensionNameToExtension = new Map();
+
 const register = (name, descriptor, functions) => {
     const scratch3Extension = convert(name, descriptor, functions);
+    extensionNameToExtension.set(name, scratch3Extension);
     Scratch.extensions.register(scratch3Extension);
 };
 
-// temporary hack for the spotify extension
-const getStatus = () => 0;
+/**
+ * @param {string} extensionName
+ * @returns {ScratchXStatus}
+ */
+const getStatus = extensionName => {
+    const extension = extensionNameToExtension.get(extensionName);
+    if (extension) {
+        return extension._getStatus();
+    }
+    return {
+        status: 0,
+        msg: 'does not exist'
+    };
+};
 
 module.exports = {
     register,

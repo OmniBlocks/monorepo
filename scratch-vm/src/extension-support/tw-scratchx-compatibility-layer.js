@@ -69,11 +69,18 @@ const parseScratchXArgument = (argument, defaultValue) => {
     return result;
 };
 
+/**
+ * @param {number} i 0-indexed index of argument in list
+ * @returns {string} Scratch 3 argument name
+ * Changing this logic will break any existing projects.
+ */
+const argumentIndexToId = i => i.toString();
+
 const wrapScratchXFunction = (originalFunction, argumentCount, async) => args => {
     // Convert Scratch 3's argument object to an argument list expected by ScratchX
     const argumentList = [];
     for (let i = 0; i < argumentCount; i++) {
-        argumentList.push(args[i.toString()]);
+        argumentList.push(args[argumentIndexToId(i)]);
     }
     if (async) {
         return new Promise(resolve => {
@@ -139,8 +146,9 @@ const convert = (name, descriptor, functions) => {
                 parseScratchXArgument(part);
                 const argumentIndex = Math.floor(i / 2).toString();
                 const argumentDefaultValue = defaultArgumentValues[argumentIndex];
-                argumentInfo[argumentIndex] = parseScratchXArgument(part, argumentDefaultValue);
-                scratchText += `[${argumentIndex}]`;
+                const argumentId = argumentIndexToId(argumentIndex);
+                argumentInfo[argumentId] = parseScratchXArgument(part, argumentDefaultValue);
+                scratchText += `[${argumentId}]`;
             } else {
                 scratchText += part;
             }

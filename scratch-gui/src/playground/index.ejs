@@ -10,6 +10,9 @@
     <% if (htmlWebpackPlugin.options.root === "/" || htmlWebpackPlugin.options.root === "") { %>
       <link rel="manifest" href="<%= htmlWebpackPlugin.options.root %>manifest.webmanifest">
     <% } %>
+    <% if (htmlWebpackPlugin.options.monetization) { %>
+      <meta name="monetization" content="<%= htmlWebpackPlugin.options.monetization %>">
+    <% } %>
     <style>
       #splash {
         position: absolute; width: 100%; height: 100%; top: 0; left: 0;

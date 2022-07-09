@@ -20,7 +20,8 @@ if (root.length > 0 && !root.endsWith('/')) {
 }
 
 const htmlWebpackPluginCommon = {
-    root: root
+    root: root,
+    monetization: process.env.MONETIZATION
 };
 
 const base = {

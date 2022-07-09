@@ -70,7 +70,10 @@ const handleReport = function (resolvedValue, sequencer, thread, blockCached, la
                 );
 
                 const edgeWasActivated = hasOldEdgeValue ? (!oldEdgeValue && resolvedValue) : resolvedValue;
-                if (!edgeWasActivated) {
+                if (edgeWasActivated) {
+                    // TW: Resume the thread if we were paused for a promise.
+                    thread.status = Thread.STATUS_RUNNING;
+                } else {
                     sequencer.retireThread(thread);
                 }
             }
@@ -113,7 +116,9 @@ const handlePromise = (primitiveReportedValue, sequencer, thread, blockCached, l
     primitiveReportedValue.then(resolvedValue => {
         handleReport(resolvedValue, sequencer, thread, blockCached, lastOperation);
         // If it's a command block or a top level reporter in a stackClick.
-        if (lastOperation) {
+        // TW: Don't mangle the stack when we just finished executing a hat block.
+        // Hat block is always the top and first block of the script. There are no loops to find.
+        if (lastOperation && !blockCached._isHat) {
             let stackFrame;
             let nextBlockId;
             do {

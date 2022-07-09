@@ -213,3 +213,10 @@ test('getNumberOfCloudVariables', t => {
 
     t.end();
 });
+
+test('currentStepTime default value', t => {
+    const rt = new Runtime();
+    t.type(rt.currentStepTime, 'number');
+    t.ok(rt.currentStepTime > 0);
+    t.end();
+});

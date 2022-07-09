@@ -321,7 +321,7 @@ class Runtime extends EventEmitter {
          * WORK_TIME.
          * @type {!number}
          */
-        this.currentStepTime = null;
+        this.currentStepTime = 1000 / 30;
 
         // Set an intial value for this.currentMSecs
         this.updateCurrentMSecs();

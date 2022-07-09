@@ -18,6 +18,7 @@ const Comment = require('../engine/comment');
 const Variable = require('../engine/variable');
 const MonitorRecord = require('../engine/monitor-record');
 const StageLayering = require('../engine/stage-layering');
+const ScratchXUtilities = require('../extension-support/tw-scratchx-utilities');
 
 const {loadCostume} = require('../import/load-costume.js');
 const {loadSound} = require('../import/load-sound.js');
@@ -43,6 +44,48 @@ const CORE_EXTENSIONS = [
 // @todo: Determine more precisely the right formulas here.
 const WORKSPACE_X_SCALE = 1.5;
 const WORKSPACE_Y_SCALE = 2.2;
+
+// By examining ScratchX projects, we've found that ScratchX can use either "\u001f" or "."
+// to separate the extension name from the extension method opcode eg. "Text To Speech.say"
+// eslint-disable-next-line no-control-regex
+const SCRATCHX_OPCODE_SEPARATOR = /\u001f|\./;
+
+/**
+ * @param {string} opcode
+ * @returns {boolean}
+ */
+const isPossiblyScratchXBlock = opcode => SCRATCHX_OPCODE_SEPARATOR.test(opcode);
+
+/**
+ * @param {string} opcode
+ * @returns {string}
+ */
+const mapScratchXOpcode = opcode => {
+    const [extensionName, extensionMethod] = opcode.split(SCRATCHX_OPCODE_SEPARATOR);
+    const newOpcodeBase = ScratchXUtilities.generateExtensionId(extensionName);
+    return `${newOpcodeBase}_${extensionMethod}`;
+};
+
+/**
+ * @param {object} block
+ * @returns {object}
+ */
+const mapScratchXBlock = block => {
+    const opcode = block[0];
+    const argumentCount = block.length - 1;
+    const args = [];
+    for (let i = 0; i < argumentCount; i++) {
+        args.push({
+            type: 'input',
+            inputOp: 'text',
+            inputName: ScratchXUtilities.argumentIndexToId(i)
+        });
+    }
+    return {
+        opcode: mapScratchXOpcode(opcode),
+        argMap: args
+    };
+};
 
 /**
  * Convert a Scratch 2.0 procedure string (e.g., "my_procedure %s %b %n")
@@ -883,6 +926,9 @@ const specMapBlock = function (block) {
     const opcode = block[0];
     const mapped = opcode && specMap[opcode];
     if (!mapped) {
+        if (opcode && isPossiblyScratchXBlock(opcode)) {
+            return mapScratchXBlock(block);
+        }
         log.warn(`Couldn't find SB2 block: ${opcode}`);
         return null;
     }

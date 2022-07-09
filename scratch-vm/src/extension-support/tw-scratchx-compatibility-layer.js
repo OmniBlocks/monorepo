@@ -6,6 +6,11 @@
 const ArgumentType = require('./argument-type');
 const BlockType = require('./block-type');
 
+const {
+    argumentIndexToId,
+    generateExtensionId
+} = require('./tw-scratchx-utilities');
+
 /**
  * @typedef ScratchXDescriptor
  * @property {unknown[][]} blocks
@@ -83,13 +88,6 @@ const parseScratchXArgument = (argument, defaultValue) => {
     return result;
 };
 
-/**
- * @param {number} i 0-indexed index of argument in list
- * @returns {string} Scratch 3 argument name
- * Changing this logic will break any existing projects.
- */
-const argumentIndexToId = i => i.toString();
-
 const wrapScratchXFunction = (originalFunction, argumentCount, async) => args => {
     // Convert Scratch 3's argument object to an argument list expected by ScratchX
     const argumentList = [];
@@ -102,16 +100,6 @@ const wrapScratchXFunction = (originalFunction, argumentCount, async) => args =>
         });
     }
     return originalFunction(...argumentList);
-};
-
-/**
- * @param {string} scratchXName
- * @returns {string}
- */
-const generateExtensionId = scratchXName => {
-    // Changing this logic will break any existing projects.
-    const sanitizedName = scratchXName.replace(/[^a-z0-9]/gi, '').toLowerCase();
-    return `sbx${sanitizedName}`;
 };
 
 /**

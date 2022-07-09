@@ -1,5 +1,23 @@
+const ScratchXUtilities = require('../../src/extension-support/tw-scratchx-utilities');
 const ScratchExtensions = require('../../src/extension-support/tw-scratchx-compatibility-layer');
 const {test} = require('tap');
+
+test('argument index to id', t => {
+    t.equal(ScratchXUtilities.argumentIndexToId(0), '0');
+    t.equal(ScratchXUtilities.argumentIndexToId(1), '1');
+    t.equal(ScratchXUtilities.argumentIndexToId(2), '2');
+    t.equal(ScratchXUtilities.argumentIndexToId(3), '3');
+    t.equal(ScratchXUtilities.argumentIndexToId(39), '39');
+    t.equal(ScratchXUtilities.argumentIndexToId(1000000000), '1000000000');
+    t.end();
+});
+
+test('generate extension id', t => {
+    t.equal(ScratchXUtilities.generateExtensionId('Spotify'), 'sbxspotify');
+    t.equal(ScratchXUtilities.generateExtensionId('Spo _t ify'), 'sbxspotify');
+    t.equal(ScratchXUtilities.generateExtensionId('Spo _t $#@! 3ify😮'), 'sbxspot3ify');
+    t.end();
+});
 
 test('register', t => {
     t.type(ScratchExtensions.register, 'function');
@@ -208,5 +226,25 @@ test('display name', t => {
         }
     );
     t.equal(converted.getInfo().name, 'Display Name');
+    t.end();
+});
+
+test('_getStatus', t => {
+    const _getStatus = () => ({
+        status: 2,
+        msg: 'Ready'
+    });
+    const converted = ScratchExtensions.convert(
+        'Name',
+        {
+            blocks: []
+        },
+        {
+            _getStatus: _getStatus,
+            unusedProperty: 10
+        }
+    );
+    t.equal(converted._getStatus, _getStatus);
+    t.equal('unusedProperty' in converted, false);
     t.end();
 });

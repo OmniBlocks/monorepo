@@ -51,10 +51,16 @@ jQuery.ajax = async (arg1, arg2) => {
     const urlParameters = objectToQueryString(options.data);
     const getFinalURL = () => {
         const query = urlParameters.toString();
+        let url = options.url;
         if (query) {
-            return `${options.url}?${query}`;
+            url += `?${query}`;
         }
-        return options.url;
+        // Forcibly upgrade all HTTP requests to HTTPS so that they don't error on HTTPS sites
+        // All the extensions we care about work fine with this
+        if (url.startsWith('http://')) {
+            url = url.replace('http://', 'https://');
+        }
+        return url;
     };
 
     const successCallback = result => {

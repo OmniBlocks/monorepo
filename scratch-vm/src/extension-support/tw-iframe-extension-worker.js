@@ -2,7 +2,6 @@ const uid = require('../util/uid');
 const frameSource = require('./tw-load-script-as-plain-text!./tw-iframe-extension-worker-entry');
 
 const none = "'none'";
-const allow = '*';
 const featurePolicy = {
     'accelerometer': none,
     'ambient-light-sensor': none,
@@ -13,7 +12,6 @@ const featurePolicy = {
     'document-domain': none,
     'encrypted-media': none,
     'fullscreen': none,
-    'gamepad': allow,
     'geolocation': none,
     'gyroscope': none,
     'magnetometer': none,

@@ -1,3 +1,29 @@
+# TurboWarp/scratch-paint
+
+Modified version of scratch-paint for TurboWarp
+
+## License
+
+TurboWarp/scratch-paint is licensed under the GNU General Public License version 3.0 (and not any later version).
+
+The origin scratch-paint that this is based on uses the following license:
+
+```
+Copyright (c) 2016, Massachusetts Institute of Technology
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+
+3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+```
+
+<!--
 # scratch-paint
 #### Scratch-paint provides a paint editor React component that takes and outputs SVGs or PNGs. It can convert between vector and bitmap modes.
 
@@ -149,3 +175,4 @@ An individual unit test: (run from `scratch-paint` directory)
 We provide [Scratch](https://scratch.mit.edu) free of charge, and want to keep it that way! Please consider making a [donation](https://secure.donationpay.org/scratchfoundation/) to support our continued engineering, design, community, and resource development efforts. Donations of any size are appreciated. Thank you!
 
 Scratch-paint couldn't exist without [w00dn/papergrapher](https://github.com/w00dn/papergrapher) and [Paper.js](https://github.com/paperjs/paper.js). If you are amazed and/or baffled by the insane boolean operation math that makes the brush and eraser tools possible, please check out and consider contributing to Paper. Thank you!
+-->

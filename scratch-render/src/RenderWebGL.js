@@ -1943,6 +1943,9 @@ class RenderWebGL extends EventEmitter {
                 });
             }
 
+            // TW: Make sure the skin's texture is ready before rendering
+            drawable.skin.prepareForGPU();
+
             Object.assign(uniforms,
                 drawable.skin.getUniforms(drawableScale),
                 drawable.getUniforms());

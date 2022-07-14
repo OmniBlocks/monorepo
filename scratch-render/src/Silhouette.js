@@ -187,6 +187,17 @@ class Silhouette {
     }
 
     /**
+     * Gets the full texture data in whatever format is available.
+     * @returns {HTMLCanvasElement|HTMLImageElement|ImageBitmap|Uint8ClampedArray|null} image data or null
+     */
+    getRawTexture () {
+        if (this._lazyData) {
+            return this._lazyData;
+        }
+        return this._colorData;
+    }
+
+    /**
      * Sample a color from the silhouette at a given local position using
      * "nearest neighbor"
      * @param {twgl.v3} vec [x,y] texture space (0-1)

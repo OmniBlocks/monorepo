@@ -49,7 +49,7 @@ const idbItemToBackpackItem = item => {
     } else if (item.type === 'costume') {
         if (item.mime === 'image/svg+xml') {
             assetType = storage.AssetType.ImageVector;
-        } else if (item.mime === 'image/png') {
+        } else if (item.mime === 'image/png' || item.mime === 'image/jpeg') {
             assetType = storage.AssetType.ImageBitmap;
         }
     } else if (item.type === 'sound') {

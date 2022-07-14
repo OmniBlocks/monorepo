@@ -21,7 +21,7 @@ if (root.length > 0 && !root.endsWith('/')) {
 
 const htmlWebpackPluginCommon = {
     root: root,
-    monetization: process.env.MONETIZATION
+    meta: JSON.parse(process.env.EXTRA_META || '{}')
 };
 
 const base = {

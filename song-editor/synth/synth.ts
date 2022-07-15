@@ -8503,7 +8503,7 @@ export class Synth {
             let arpeggioInterval: number = 0;
             const arpeggiates: boolean = chord.arpeggiates;
             if (tone.pitchCount > 1 && arpeggiates) {
-                const arpeggio: number = Math.floor((this.tick + this.part * Config.ticksPerPart) / Config.ticksPerArpeggio);
+                const arpeggio: number = Math.floor(instrument.arpTime / Config.ticksPerArpeggio);
                 arpeggioInterval = tone.pitches[getArpeggioPitchIndex(tone.pitchCount, instrument.fastTwoNoteArp, arpeggio)] - tone.pitches[0];
             }
 

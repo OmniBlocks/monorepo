@@ -54,6 +54,7 @@ const addons = [
     'columns',
     'script-snap',
     'fullscreen',
+    'hide-stage',
     'tw-straighten-comments',
     'tw-remove-backpack',
     'tw-remove-feedback',
@@ -62,7 +63,7 @@ const addons = [
 ];
 
 const newAddons = [
-    'default-costume-editor-color'
+    'hide-stage'
 ];
 
 // eslint-disable-next-line import/no-commonjs

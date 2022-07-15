@@ -276,6 +276,8 @@
     "fullscreen/@name": "Pantalla completa mejorada",
     "fullscreen/@settings-name-browserFullscreen": "Abrir reproductor de proyectos en modo pantalla completa del navegador",
     "fullscreen/@settings-name-hideToolbar": "Esconder barra de herramientas en pantalla completa",
+    "hide-stage/@description": "Agrega un botón al lado de los botones de \"escenario pequeño\" y \"escenario grande\" que esconde el escenario y el panel de objetos, haciendo mucho más grande el área de código.",
+    "hide-stage/@name": "Esconder escenario y panel de objetos",
     "editor-stepping/@description": "Agrega un borde colorido a los bloques que están ejecutándose actualmente en un proyecto.",
     "editor-stepping/@name": "Borde de bloque en ejecución",
     "editor-stepping/@settings-name-highlight-color": "Color de destacado"

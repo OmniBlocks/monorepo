@@ -242,5 +242,6 @@
     "swap-local-global/edit-variable-header": "Változó szerkesztése",
     "swap-local-global/edit-variable-option": "Változó átnevezése vagy szerkesztése",
     "swap-local-global/to-global": "Konvertálás \"Minden szereplőé\"-vé",
-    "swap-local-global/to-local": "Konvertálás \"A kiválasztott szereplőé\"-vé"
+    "swap-local-global/to-local": "Konvertálás \"A kiválasztott szereplőé\"-vé",
+    "hide-stage/hide-stage": "Színpad elrejtése"
 }

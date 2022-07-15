@@ -232,5 +232,6 @@
     "swap-local-global/edit-variable-header": "Editar Variable",
     "swap-local-global/edit-variable-option": "Renombrar o editar variable",
     "swap-local-global/to-global": "Convertir a \"Para todos los objetos\"",
-    "swap-local-global/to-local": "Convertir a \"Solo para este objeto\""
+    "swap-local-global/to-local": "Convertir a \"Solo para este objeto\"",
+    "hide-stage/hide-stage": "Esconder escenario"
 }

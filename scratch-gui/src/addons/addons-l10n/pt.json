@@ -236,5 +236,6 @@
     "swap-local-global/edit-variable-header": "Editar Variável",
     "swap-local-global/edit-variable-option": "Renomear ou editar variável",
     "swap-local-global/to-global": "Converter para \"Para todos os atores\"",
-    "swap-local-global/to-local": "Converter para \"Apenas para este ator\""
+    "swap-local-global/to-local": "Converter para \"Apenas para este ator\"",
+    "hide-stage/hide-stage": "Esconder palco"
 }

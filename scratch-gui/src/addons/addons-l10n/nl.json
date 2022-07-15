@@ -229,5 +229,6 @@
     "swap-local-global/edit-variable-header": "Variabele Bewerken",
     "swap-local-global/edit-variable-option": "Variabele hernoemen of bewerken",
     "swap-local-global/to-global": "Veranderen naar \"Voor alle sprites\"",
-    "swap-local-global/to-local": "Veranderen naar \"Alleen voor deze sprite\""
+    "swap-local-global/to-local": "Veranderen naar \"Alleen voor deze sprite\"",
+    "hide-stage/hide-stage": "Speelveld verbergen"
 }

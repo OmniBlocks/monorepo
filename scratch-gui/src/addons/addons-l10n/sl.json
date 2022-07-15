@@ -240,5 +240,6 @@
     "swap-local-global/edit-variable-header": "Uredi spremenljivko",
     "swap-local-global/edit-variable-option": "Preimenuj ali uredi spremenljivko",
     "swap-local-global/to-global": "Spremeni v \"Za vse figure\"",
-    "swap-local-global/to-local": "Spremeni v \"Samo za to figuro\""
+    "swap-local-global/to-local": "Spremeni v \"Samo za to figuro\"",
+    "hide-stage/hide-stage": "Skrij oder"
 }

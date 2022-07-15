@@ -277,6 +277,8 @@
     "fullscreen/@name": "Polepszony pełny ekran",
     "fullscreen/@settings-name-browserFullscreen": "Otwórz pełny ekran, gdy użytkownik jest w trybie pełnoekranowym przeglądarki",
     "fullscreen/@settings-name-hideToolbar": "Ukryj pasek narzędzi w pełnym ekranie",
+    "hide-stage/@description": "Dodaje przycisk obok przycisków \"zmniejsz/zwiększ scenę\", który ukrywa scenę i listę duszków,znacznie zwiększając obszar kodowania.",
+    "hide-stage/@name": "Ukryj scenę i listę duszków",
     "editor-stepping/@description": "Dodaje kolorowe podkreślenie do bloków, których kod wykonuje się w danym momencie.",
     "editor-stepping/@name": "Obramowanie wykonujących się bloków",
     "editor-stepping/@settings-name-highlight-color": "Kolor podkreślenia"

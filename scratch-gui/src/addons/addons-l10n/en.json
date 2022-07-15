@@ -252,5 +252,6 @@
     "swap-local-global/edit-variable-header": "Edit Variable",
     "swap-local-global/edit-variable-option": "Rename or edit variable",
     "swap-local-global/to-global": "Convert to \"For all sprites\"",
-    "swap-local-global/to-local": "Convert to \"For this sprite only\""
+    "swap-local-global/to-local": "Convert to \"For this sprite only\"",
+    "hide-stage/hide-stage": "Hide stage"
 }

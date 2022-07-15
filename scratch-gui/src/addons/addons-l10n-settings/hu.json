@@ -276,6 +276,7 @@
     "fullscreen/@name": "Fejlesztett teljes képernyő",
     "fullscreen/@settings-name-browserFullscreen": "Teljes képernyős projekt lejátszó megnyitása a böngésző teljes képernyős módjában",
     "fullscreen/@settings-name-hideToolbar": "Eszköztár elrejtése teljes képernyőben",
+    "hide-stage/@name": "A Színpad és a Szereplőmező elrejtése",
     "editor-stepping/@description": "Hozzáad egy színes körvonalat azon blokkokhoz, amik éppen futnak egy projektben.",
     "editor-stepping/@name": "Futó blokkok körvonalai",
     "editor-stepping/@settings-name-highlight-color": "Kiemelés színe"

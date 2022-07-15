@@ -244,5 +244,6 @@
     "swap-local-global/edit-variable-header": "変数を編集",
     "swap-local-global/edit-variable-option": "変数を改名・編集",
     "swap-local-global/to-global": "「すべてのスプライト用」にする",
-    "swap-local-global/to-local": "「このスプライトのみ」にする"
+    "swap-local-global/to-local": "「このスプライトのみ」にする",
+    "hide-stage/hide-stage": "ステージを隠す"
 }

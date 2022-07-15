@@ -200,6 +200,10 @@ const normalizeManifest = (id, manifest) => {
     if (manifest.userstyles) {
         manifest.userstyles = filterUserscripts(manifest.userstyles);
     }
+
+    if (manifest.customCssVariables) {
+        console.warn(`Warning: ${id} has unsupported feature: customCssVariables`);
+    }
 };
 
 const generateManifestEntry = (id, manifest) => {

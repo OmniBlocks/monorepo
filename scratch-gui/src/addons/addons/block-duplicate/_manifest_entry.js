@@ -11,7 +11,6 @@ const manifest = {
   ],
   "info": [
     {
-      "type": "notice",
       "text": "On macOS, use the Option key instead of the Alt key and Command key instead of the Control key.",
       "id": "mac"
     }

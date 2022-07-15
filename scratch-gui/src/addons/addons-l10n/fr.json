@@ -55,6 +55,8 @@
     "data-category-tweaks-v2/for-all-sprites": "Pour tous les sprites :",
     "data-category-tweaks-v2/for-this-sprite-only": "Pour ce sprite uniquement :",
     "data-category-tweaks-v2/list-category": "Listes",
+    "hide-flyout/lock": "Vérouiller la palette",
+    "hide-flyout/unlock": "Dévérouiller la palette",
     "mediarecorder/cancel": "Annuler",
     "mediarecorder/click-flag": "En attente...",
     "mediarecorder/click-flag-description": "Cliquez sur le drapeau vert pour démarrer l'enregistrement. Cliquez sur ce bouton pour arrêter.",

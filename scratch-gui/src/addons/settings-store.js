@@ -19,13 +19,14 @@ import upstreamMeta from './generated/upstream-meta.json';
 import EventTargetShim from './event-target';
 
 const SETTINGS_KEY = 'tw:addons';
-const VERSION = 2;
+const VERSION = 3;
 
 const migrateSettings = settings => {
     const oldVersion = settings._;
     if (oldVersion === VERSION || !oldVersion) {
         return settings;
     }
+
     // Migrate 1 -> 2
     // tw-project-info is now block-count
     // tw-interface-customization split into tw-remove-backpack and tw-remove-feedback
@@ -50,6 +51,17 @@ const migrateSettings = settings => {
             }
         }
     }
+
+    // Migrate 2 -> 3
+    // The default value of hide-flyout's toggle setting changed from "hover" to "cathover"
+    // We want to keep the old default value for existing users.
+    if (oldVersion < 3) {
+        const hideFlyout = settings['hide-flyout'];
+        if (hideFlyout && hideFlyout.enabled && typeof hideFlyout.toggled === 'undefined') {
+            hideFlyout.toggle = 'hover';
+        }
+    }
+
     return settings;
 };
 

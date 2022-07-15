@@ -55,6 +55,8 @@
     "data-category-tweaks-v2/for-all-sprites": "Dla wszystkich duszków:",
     "data-category-tweaks-v2/for-this-sprite-only": "Tylko dla tego duszka:",
     "data-category-tweaks-v2/list-category": "Listy",
+    "hide-flyout/lock": "Zablokuj paletę bloków",
+    "hide-flyout/unlock": "Odblokuj paletę bloków",
     "mediarecorder/cancel": "Anuluj",
     "mediarecorder/click-flag": "Czekanie...",
     "mediarecorder/click-flag-description": "Kliknij zieloną flagę by zacząć nagrywanie. Kliknij ten przycisk by zatrzymać nagranie.",

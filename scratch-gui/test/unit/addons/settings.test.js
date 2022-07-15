@@ -462,3 +462,16 @@ test('Settings migration 1 -> 2', () => {
     expect(store.getAddonEnabled('tw-remove-backpack')).toBe(true);
     expect(store.getAddonEnabled('tw-remove-feedback')).toBe(true);
 });
+
+test('Settings migration 2 -> 3', () => {
+    const store = new SettingStore();
+
+    global.localStorage.getItem = () => JSON.stringify({
+        '_': 2,
+        'hide-flyout': {
+            enabled: true
+        }
+    });
+    store.readLocalStorage();
+    expect(store.getAddonSetting('hide-flyout', 'toggle')).toBe('hover');
+});

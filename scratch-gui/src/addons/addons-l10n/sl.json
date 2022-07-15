@@ -55,6 +55,8 @@
     "data-category-tweaks-v2/for-all-sprites": "Za vse figure:",
     "data-category-tweaks-v2/for-this-sprite-only": "Samo za to figuro:",
     "data-category-tweaks-v2/list-category": "Seznami",
+    "hide-flyout/lock": "Zakleni paleto",
+    "hide-flyout/unlock": "Odkleni paleto",
     "mediarecorder/cancel": "Prekliči",
     "mediarecorder/click-flag": "Čakanje...",
     "mediarecorder/click-flag-description": "Kliknite zeleno zastavico, da začnete snemanje. Kliknite ta gumb, da ga ustavite.",

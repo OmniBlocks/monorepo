@@ -91,7 +91,6 @@
     "editor-sounds/@description": "Redă efecte sonore la conectarea și la ștergerea blocurilor.",
     "editor-sounds/@name": "Efecte sonore în editor",
     "folders/@info-notice-folders-are-public": "Utilizatorii cu această funcție activată vor putea să vadă dosarele din proiectul tău. Oricine altcineva va vedea lista personajelor normal (fără dosare).",
-    "folders/@info-notice-sprite-names": "Această funcție funcționează prin adăugarea „[numeleDosarului]//” la începutul numelui personajelor tale.",
     "folders/@name": "Dosare de Personaje",
     "block-switching/@description": "Dați click-dreapta pe un bloc pentru a-l schimba într-unul cu un conținut asemânător.",
     "block-switching/@name": "Schimbarea blocurilor",

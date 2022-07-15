@@ -55,6 +55,8 @@
     "data-category-tweaks-v2/for-all-sprites": "Voor alle sprites:",
     "data-category-tweaks-v2/for-this-sprite-only": "Alleen voor deze sprite:",
     "data-category-tweaks-v2/list-category": "Lijsten",
+    "hide-flyout/lock": "Palet Vergrendelen",
+    "hide-flyout/unlock": "Palet Ontgrendelen",
     "mediarecorder/cancel": "Annuleren",
     "mediarecorder/click-flag": "Wachten...",
     "mediarecorder/click-flag-description": "Klik op de groene vlag om te starten met opnemen. Klik op deze knop om te stoppen.",

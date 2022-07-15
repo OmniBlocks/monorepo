@@ -30,7 +30,7 @@ const manifest = {
   ],
   "info": [
     {
-      "type": "warning",
+      "type": "notice",
       "text": "Decreasing the padding size is only visible to you, so when your projects are viewed by other users, your scripts may overlap.",
       "id": "paddingWarning"
     }

@@ -56,6 +56,8 @@
     "data-category-tweaks-v2/for-all-sprites": "Per tutti gli sprite:",
     "data-category-tweaks-v2/for-this-sprite-only": "Solo per questo sprite:",
     "data-category-tweaks-v2/list-category": "Liste",
+    "hide-flyout/lock": "Blocca Elenco Blocchi",
+    "hide-flyout/unlock": "Sblocca Elenco Blocchi",
     "mediarecorder/cancel": "Annulla",
     "mediarecorder/click-flag": "In attesa...",
     "mediarecorder/click-flag-description": "Clicca la bandiera verde per avviare la registrazione. Clicca questo tasto per fermarla.",

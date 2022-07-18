@@ -87,3 +87,14 @@ test('Storing settings emits project changed', t => {
             t.end();
         });
 });
+
+test('Stored turbo mode emits event on VM', async t => {
+    const vm = makeVM();
+    const project = readFileToBuffer(path.resolve(__dirname, '../fixtures/tw-stored-settings/turbo-mode.sb3'));
+    t.plan(1);
+    vm.on('TURBO_MODE_ON', () => {
+        t.pass('emitted TURBO_MODE_ON');
+    });
+    await vm.loadProject(project);
+    t.end();
+});

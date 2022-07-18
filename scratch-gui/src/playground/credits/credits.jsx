@@ -52,19 +52,23 @@ const Credits = () => (
     <main className={styles.main}>
         <header className={styles.headerContainer}>
             <h1 className={styles.headerText}>
-                {'TurboWarp Credits'}
+                TurboWarp Credits
             </h1>
         </header>
         <section>
             <p>
-                Thank you to everyone that makes this project possible.
+                The TurboWarp project is made possible by the work of many volunteers.
             </p>
         </section>
         <section>
-            <h2>{'Fosshost'}</h2>
+            <h2>Fosshost</h2>
             <p>
-                <a href="https://fosshost.org/">Fosshost</a> provides free high quality hosting services to open source projects including TurboWarp.
-                {' '}Fosshost <a href="https://fosshost.org/donate">accepts donations</a> to support their work.
+                The TurboWarp project is proudly hosted by <a href="https://fosshost.org/">Fosshost</a> who provide free computing resources to the open source community.
+            </p>
+            <p>
+                <a href="https://fosshost.org/donate">
+                    Donate to support Fosshost.
+                </a>
             </p>
             <a href="https://fosshost.org/">
                 <img
@@ -76,14 +80,25 @@ const Credits = () => (
         </section>
         <section>
             <h2>{'Scratch'}</h2>
-            <p>TurboWarp is based on the work of the <a href="https://scratch.mit.edu/credits">Scratch contributors</a> but is not endorsed by Scratch in any way. Scratch <a href="https://scratch.mit.edu/donate">accepts donations</a> to support their work.</p>
+            <p>
+                TurboWarp is based on the work of the <a href="https://scratch.mit.edu/credits">Scratch contributors</a> but is not endorsed by Scratch in any way.
+            </p>
+            <p>
+                <a href="https://scratch.mit.edu/donate">
+                    Donate to support Scratch.
+                </a>
+            </p>
         </section>
         <section>
-            <h2>{'Addons'}</h2>
+            <h2>Addons</h2>
             <UserList users={UserData.addonDevelopers} />
+            <p>Individual contributors are listed in no particular order.</p>
         </section>
         <section>
-            <p>Individual contributors are listed in no particular order.</p>
+            <h2>Translators</h2>
+            <p>
+                More than 100 people have helped translate TurboWarp into many languages.
+            </p>
         </section>
     </main>
 );

@@ -70,8 +70,33 @@ const addonDevelopers = [
     {
         userId: '5354974',
         username: 'Chrome_Cat'
+    },
+    {
+        // actual ID is 34455896 but their avatar is the wrong resolution and looks really weird
+        userId: '0',
+        username: 'summerscar'
+    },
+    {
+        userId: '55742784',
+        username: 'RedGuy7'
+    },
+    {
+        userId: '9636514',
+        username: 'Tacodude7729'
+    },
+    {
+        userId: '14792872',
+        username: '_nix'
+    },
+    {
+        userId: '30323614',
+        username: 'BarelySmooth'
+    },
+    {
+        userId: '64691048',
+        username: 'CST1229'
     }
-    // TODO: summerscar if this is their Scratch account: https://scratch.mit.edu/users/summerscar/
+    // TODO: retronbv is banned?
 ].map(fromHardcoded);
 
 export default {

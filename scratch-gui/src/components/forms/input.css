@@ -31,7 +31,7 @@
     min-width: 0;
 }
 [theme="dark"] .input-form {
-    background: $ui-secondary;
+    background-color: $ui-secondary;
 }
 
 .input-form:hover {

@@ -9,7 +9,7 @@ const manifest = {
     },
     {
       "name": "pufferfish101007",
-      "link": "https://scratch.mit.edu/users/pufferfish101007"
+      "link": "https://scratch.mit.edu/users/pufferfish101007/"
     }
   ],
   "dynamicDisable": true,

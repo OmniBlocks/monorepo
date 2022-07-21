@@ -8,7 +8,7 @@ const manifest = {
   "credits": [
     {
       "name": "lisa_wolfgang",
-      "link": "https://scratch.mit.edu/users/lisa_wolfgang"
+      "link": "https://scratch.mit.edu/users/lisa_wolfgang/"
     },
     {
       "name": "GarboMuffin"

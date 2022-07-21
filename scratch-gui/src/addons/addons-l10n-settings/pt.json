@@ -240,6 +240,7 @@
     "hide-delete-button/@settings-name-sprites": "Atores",
     "no-script-bumping/@description": "Permite que você mova e modifique scripts sem que eles movam ao serem sobrepostos por outro script.",
     "no-script-bumping/@name": "Não mover scripts sobrepostos automaticamente",
+    "disable-stage-drag-select/@description": "Remove a habilidade de arrastar atores no palco no Editor, exceto aqueles que explicitamente estão definidos como arrastável. Segure Shift enquanto arrasta um personagem pra movê-lo normalmente.",
     "disable-stage-drag-select/@name": "Atores não arrastáveis no editor",
     "move-to-top-bottom/@description": "Adiciona uma opção no menu de botão direito de uma fantasia ou som para movê-lo para o topo ou fundo da lista. Antes parte das ferramentas de desenvolvedor.",
     "move-to-top-bottom/@name": "Mover fantasia ao topo ou ao fundo da lista",

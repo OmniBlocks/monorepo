@@ -14,11 +14,11 @@ const manifest = {
     },
     {
       "name": "lisa_wolfgang",
-      "link": "https://scratch.mit.edu/users/lisa_wolfgang"
+      "link": "https://scratch.mit.edu/users/lisa_wolfgang/"
     },
     {
       "name": "GarboMuffin",
-      "link": "https://scratch.mit.edu/users/GarboMuffin"
+      "link": "https://scratch.mit.edu/users/GarboMuffin/"
     }
   ],
   "enabledByDefault": false,

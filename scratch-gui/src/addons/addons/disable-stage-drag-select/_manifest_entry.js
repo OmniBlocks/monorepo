@@ -7,7 +7,7 @@ const manifest = {
   "credits": [
     {
       "name": "Chrome_Cat",
-      "link": "https://scratch.mit.edu/users/Chrome_Cat"
+      "link": "https://scratch.mit.edu/users/Chrome_Cat/"
     },
     {
       "name": "GarboMuffin"

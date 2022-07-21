@@ -139,6 +139,8 @@
     "editor-colored-context-menus/@name": "Menu contestuali colorati",
     "editor-stage-left/@description": "Sposta lo stage nella parte sinistra dell'editor.",
     "editor-stage-left/@name": "Sposta stage a sinistra",
+    "editor-buttons-reverse-order/@description": "Sposta la bandiera verde e il pulsante di stop a destra e il pulsante modalità presentazione a sinistra, come in Scratch 2.0.",
+    "editor-buttons-reverse-order/@name": "Inverti l'ordine dei controlli del progetto",
     "variable-manager/@description": "Aggiunge una scheda nell'editor a fianco a \"suoni\" per gestire facilmente variabili e liste.",
     "variable-manager/@name": "Gestore variabili",
     "search-sprites/@description": "Aggiunge una casella di ricerca all'area degli sprite per cercare uno sprite basandosi sul nome.",

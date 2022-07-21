@@ -139,6 +139,8 @@
     "editor-colored-context-menus/@name": "Farbige Kontextmenüs",
     "editor-stage-left/@description": "Verschiebt die Bühne auf die linke Seite des Editors.",
     "editor-stage-left/@name": "Bühne links anzeigen",
+    "editor-buttons-reverse-order/@description": "Verschiebt die grüne Flagge und den Stopp-Knopf auf die rechte und den Vollbild-Knopf auf die linke Seite, wie in Scratch 2.0.",
+    "editor-buttons-reverse-order/@name": "Verkehrte Anordnung von Playersteuerelementen",
     "variable-manager/@description": "Fügt einen Tab neben \"Klänge\" im Editor hinzu, um Variablen und Listen einfach zu aktualisieren.",
     "variable-manager/@name": "Variablenmanager",
     "search-sprites/@description": "Fügt ein Suchfeld zur Figurenleiste hinzu.",

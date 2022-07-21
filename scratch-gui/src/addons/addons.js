@@ -27,6 +27,7 @@ const addons = [
     'custom-block-text',
     'editor-colored-context-menus',
     'editor-stage-left',
+    'editor-buttons-reverse-order',
     'variable-manager',
     'search-sprites',
     'gamepad',
@@ -63,7 +64,8 @@ const addons = [
 ];
 
 const newAddons = [
-    'hide-stage'
+    'hide-stage',
+    'editor-buttons-reverse-order'
 ];
 
 // eslint-disable-next-line import/no-commonjs

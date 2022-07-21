@@ -140,6 +140,8 @@
     "editor-colored-context-menus/@name": "Renkli bağlam menüleri",
     "editor-stage-left/@description": "Sahneyi editörün sol tarafına taşır.",
     "editor-stage-left/@name": "Sahneyi sol tarafta göster",
+    "editor-buttons-reverse-order/@description": "Scratch 2.0'daki gibi yeşil bayrak ve durdurma düğmelerini sağa, tam ekran düğmesini ise sola götürür.",
+    "editor-buttons-reverse-order/@name": "Ters çevrilmiş proje kontrolleri",
     "variable-manager/@description": "Editörde \"sesler\" sekmesinin yanına değişken ve listelerinizi kolaylıkla yönetebileceğiniz bir sekme ekler.",
     "variable-manager/@name": "Değişken yöneticisi",
     "search-sprites/@description": "Karakterleri ismine göre aramak için kukla bölmesine bir arama kutusu ekler.",

@@ -138,6 +138,8 @@
     "editor-colored-context-menus/@name": "Kolorowe menu zawartości",
     "editor-stage-left/@description": "Przesuwa scenę na lewą stronę edytora.",
     "editor-stage-left/@name": "Przenieś scenę na lewą stronę",
+    "editor-buttons-reverse-order/@description": "Przesuwa zieloną flagę oraz przyciski do zatrzymania na prawą stronę, a przycisk powiększenia ekranu na lewą stronę, tak samo jak w Scratch 2.0.",
+    "editor-buttons-reverse-order/@name": "Odwrócona kolejność kontrolek projektu",
     "variable-manager/@description": "Dodaje zakładkę obok \"dźwięków\" w edytorze żeby łatwo aktualizować zmienne i listy",
     "variable-manager/@name": "Menedżer zmiennych",
     "search-sprites/@description": "Dodaje pole wyszukiwania w liście duszków, za pomocą którego możesz wyszukać duszka po jego nazwie.",

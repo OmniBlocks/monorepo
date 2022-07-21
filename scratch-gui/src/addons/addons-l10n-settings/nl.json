@@ -139,6 +139,8 @@
     "editor-colored-context-menus/@name": "Gekleurde rechterklikmenu's",
     "editor-stage-left/@description": "Zet het speelveld aan de linkerkant van de editor.",
     "editor-stage-left/@name": "Zet speelveld aan linkerkant",
+    "editor-buttons-reverse-order/@description": "Verplaatst de groene vlag en stopknop naar rechts en de volledig scherm-knop naar links, zoals in Scratch 2.0.",
+    "editor-buttons-reverse-order/@name": "Volgorde van projectbesturingen omkeren",
     "variable-manager/@description": "Voegt een tabblad naast \"geluiden\" toe in de editor om makkelijk variabelen en lijsten aan te passen.",
     "variable-manager/@name": "Variabele manager",
     "search-sprites/@description": "Voegt een zoekbalk aan het spritevenster toe om sprites bij naam te zoeken.",

@@ -139,6 +139,8 @@
     "editor-colored-context-menus/@name": "右クリックメニューを色付け",
     "editor-stage-left/@description": "ステージを左側に表示する。",
     "editor-stage-left/@name": "ステージを左側に表示",
+    "editor-buttons-reverse-order/@description": "Scratch 2.0のように、緑の旗と停止ボタンを右に、全画面表示ボタンを左に移動させる。",
+    "editor-buttons-reverse-order/@name": "プロジェクト操作ボタン反転",
     "variable-manager/@description": "エディターに変数とリストを管理するためのタブを追加する。",
     "variable-manager/@name": "変数マネージャー",
     "search-sprites/@description": "スプライトペインに、スプライトを名前で検索する項目を追加する。",

@@ -138,6 +138,8 @@
     "editor-colored-context-menus/@name": "Barvni meniji",
     "editor-stage-left/@description": "Premakne oder na levo stran urejevalnika.",
     "editor-stage-left/@name": "Pokaži oder na levi strani",
+    "editor-buttons-reverse-order/@description": "Premakne zeleno zastavico in gumb Ustavi na desno in gumb za celozaslonski način na desno, kot v Scratchu 2.0.",
+    "editor-buttons-reverse-order/@name": "Obratno zaporedje gumbov za nadzor projekta",
     "variable-manager/@description": "Doda zavihek za enostavno urejanje spremenljivk in seznamov v urejevalnik, poleg zavihka \"zvoki\".",
     "variable-manager/@name": "Upravitelj spremenljivk",
     "search-sprites/@description": "Poleg seznama figur doda polje za iskanje figur glede na ime.",

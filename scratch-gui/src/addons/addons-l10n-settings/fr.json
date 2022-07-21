@@ -135,6 +135,8 @@
     "editor-colored-context-menus/@name": "Menus déroulants colorés",
     "editor-stage-left/@description": "Déplace la scène sur le côté gauche de l'éditeur.",
     "editor-stage-left/@name": "Afficher la scène sur le côté gauche",
+    "editor-buttons-reverse-order/@description": "Bouge le drapeau vert et le bouton stop sur la droite, et le bouton plein écran à la gauche, comme dans Scratch 2.0",
+    "editor-buttons-reverse-order/@name": "Inverser l'ordre des contrôles du projet",
     "variable-manager/@description": "Ajoute un nouvel onglet à côté de \"sons\" dans l'éditeur pour mettre à jour facilement les variables et les listes.",
     "variable-manager/@name": "Gestionnaire de variables",
     "search-sprites/@description": "Ajoute un champ de recherche au volet des sprites pour les rechercher par nom.",

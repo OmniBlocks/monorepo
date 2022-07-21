@@ -139,6 +139,8 @@
     "editor-colored-context-menus/@name": "Színezett helyi menük",
     "editor-stage-left/@description": "Áthelyezi a színpadot a szerkesztő bal oldalára.",
     "editor-stage-left/@name": "Színpad áthelyezése bal oldalra",
+    "editor-buttons-reverse-order/@description": "Áthelyezi a zöld zászlót és a megállító gombot a jobboldalra, valamint a teljes képernyő gombot pedig baloldalra, ahogy a Scratch 2.0-ban volt.",
+    "editor-buttons-reverse-order/@name": "Projektirányító gombok fordított sorrendben",
     "variable-manager/@description": "Hozzáad egy fület a \"hangok\" mellé a szerkesztőben, melyben könnyen frissítheted a változókat és listákat.",
     "variable-manager/@name": "Változó kezelő",
     "search-sprites/@description": "Hozzáad egy kereső mezőt a szereplő kijelzőhőz, hogy kereshess a szereplők között név alapján.",

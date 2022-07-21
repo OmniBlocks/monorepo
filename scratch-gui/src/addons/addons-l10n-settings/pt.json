@@ -138,6 +138,8 @@
     "editor-colored-context-menus/@name": "Menus de contexto coloridos",
     "editor-stage-left/@description": "Move o palco para o lado esquerdo do editor.",
     "editor-stage-left/@name": "Mostrar palco do lado esquerdo",
+    "editor-buttons-reverse-order/@description": "Moverá a bandeira verde e o botão de pare para direita e no modo tela cheia os moverá para a direita, como no Scratch 2.0.",
+    "editor-buttons-reverse-order/@name": "Reverter ordem dos botões de controle de projeto",
     "variable-manager/@description": "Adiciona uma aba do lado de \"Sons\" no editor para facilmente editar variáveis e listas.",
     "variable-manager/@name": "Administrador de variáveis",
     "search-sprites/@description": "Adiciona uma barra de busca ao painel de atores para pesquisar por atores pelo nome.",

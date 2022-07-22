@@ -209,8 +209,11 @@ const getInternalKey = element => Object.keys(element).find(key => key.startsWit
 const stylesheetContainer = document.createElement('div');
 document.body.insertBefore(stylesheetContainer, document.body.firstChild);
 const getStylesheetPrecedence = styleElement => {
+    const addonId = styleElement.dataset.addonId;
     // columns must have higher precedence than hide-flyout
-    if (styleElement.dataset.addonId === 'columns') return 1;
+    if (addonId === 'columns') return 1;
+    // editor-stage-left must have higher precedence than hide-stage
+    if (addonId === 'editor-stage-left') return 1;
     return 0;
 };
 const addStylesheet = styleElement => {

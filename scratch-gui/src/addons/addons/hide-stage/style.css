@@ -68,6 +68,14 @@
   /* makes small and large stage buttons appear unselected */
   filter: var(--editorDarkMode-accent-desaturateFilter, saturate(0));
 }
+/* from stage-header.css */
+[theme="dark"]
+  .sa-stage-hidden
+  /* specificity --> */ [class*="stage-header_stage-size-row_"] /* <-- specificity */
+  [class*="stage-header_stage-button_"]:not(.sa-hide-stage-button)
+  [class*="stage-header_stage-button-icon_"] {
+  filter: brightness(0) invert(1);
+}
 
 .sa-stage-hidden-outer .scratchEyedropper {
   display: none;

@@ -4,7 +4,7 @@ const Skin = require('./Skin');
 const {loadSvgString, serializeSvgToString} = require('scratch-svg-renderer');
 const ShaderManager = require('./ShaderManager');
 
-const MAX_TEXTURE_DIMENSION = 3584;
+const MAX_TEXTURE_DIMENSION = 2048;
 
 /**
  * All scaled renderings of the SVG are stored in an array. The 1.0 scale of

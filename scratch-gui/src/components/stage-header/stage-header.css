@@ -113,3 +113,13 @@
     filter: brightness(0) invert(1);
     opacity: 0.8;
 }
+
+.embed-buttons {
+    display: flex;
+}
+[dir="ltr"] .embed-buttons > *:not(:last-child) {
+    margin-right: .2rem;
+}
+[dir="rtl"] .embed-buttons > *:not(:last-child) {
+    margin-left: .2rem;
+}

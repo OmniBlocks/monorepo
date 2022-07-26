@@ -2,6 +2,10 @@
 @import "../../css/colors";
 
 /* Popover styles */
+:global(.Popover) {
+    z-index: 40;
+}
+
 :global(.Popover-body) {
     background: white;
     border: 1px solid #ddd;

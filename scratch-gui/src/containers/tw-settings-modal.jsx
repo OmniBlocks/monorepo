@@ -133,6 +133,7 @@ UsernameModal.propTypes = {
         setStageSize: PropTypes.func,
         storeProjectOptions: PropTypes.func
     }),
+    isEmbedded: PropTypes.bool,
     framerate: PropTypes.number,
     highQualityPen: PropTypes.bool,
     interpolation: PropTypes.bool,
@@ -149,6 +150,7 @@ UsernameModal.propTypes = {
 
 const mapStateToProps = state => ({
     vm: state.scratchGui.vm,
+    isEmbedded: state.scratchGui.mode.isEmbedded,
     framerate: state.scratchGui.tw.framerate,
     highQualityPen: state.scratchGui.tw.highQualityPen,
     interpolation: state.scratchGui.tw.interpolation,

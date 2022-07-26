@@ -481,16 +481,20 @@ const SettingsModalComponent = props => (
                     id="tw.settingsModal.dangerZone"
                 />
             </Header>
-            <CustomStageSize
-                {...props}
-            />
+            {!props.isEmbedded && (
+                <CustomStageSize
+                    {...props}
+                />
+            )}
             <DisableCompiler
                 value={props.disableCompiler}
                 onChange={props.onDisableCompilerChange}
             />
-            <StoreProjectOptions
-                {...props}
-            />
+            {!props.isEmbedded && (
+                <StoreProjectOptions
+                    {...props}
+                />
+            )}
         </Box>
     </Modal>
 );
@@ -498,6 +502,7 @@ const SettingsModalComponent = props => (
 SettingsModalComponent.propTypes = {
     intl: intlShape,
     onClose: PropTypes.func,
+    isEmbedded: PropTypes.bool,
     framerate: PropTypes.number,
     onFramerateChange: PropTypes.func,
     onCustomizeFramerate: PropTypes.func,

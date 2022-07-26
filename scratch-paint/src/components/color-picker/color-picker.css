@@ -3,7 +3,8 @@
 
 /* Popover styles */
 :global(.Popover) {
-    z-index: 40;
+    /* should be above menu bar */
+    z-index: 500;
 }
 
 :global(.Popover-body) {

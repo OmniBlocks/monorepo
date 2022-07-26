@@ -334,6 +334,7 @@ const CustomStageSize = ({
                 <BufferedInput
                     value={stageWidth}
                     onSubmit={onStageWidthChange}
+                    className={styles.customStageSizeInput}
                     type="number"
                     min="0"
                     max="1024"
@@ -343,6 +344,7 @@ const CustomStageSize = ({
                 <BufferedInput
                     value={stageHeight}
                     onSubmit={onStageHeightChange}
+                    className={styles.customStageSizeInput}
                     type="number"
                     min="0"
                     max="1024"

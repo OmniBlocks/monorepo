@@ -77,6 +77,9 @@
 .custom-stage-size > * {
     margin-right: 0.5rem;
 }
+.custom-stage-size-input {
+    width: 80px;
+}
 
 .info {
     margin-bottom: 0.25rem;

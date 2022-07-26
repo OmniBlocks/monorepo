@@ -411,7 +411,7 @@ export default async function ({ addon, global, console, msg }) {
 
   while (true) {
     const target = await addon.tab.waitForElement(
-      '[class^="stage-header_stage-size-row"], [class^="stage-header_stage-menu-wrapper"] > [class^="button_outlined-button"]',
+      '[class^="stage-header_embed-buttons_"], [class^="stage-header_stage-size-row"], [class^="stage-header_stage-menu-wrapper"] > [class^="button_outlined-button"]',
       {
         markAsSeen: true,
         reduxEvents: [

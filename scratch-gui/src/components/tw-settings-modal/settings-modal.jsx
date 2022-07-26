@@ -241,6 +241,7 @@ const RemoveFencing = props => (
         }
         help={
             <FormattedMessage
+                // eslint-disable-next-line max-len
                 defaultMessage="Allows sprites to move offscreen, become as large or as small as they want, and makes touching blocks work offscreen."
                 description="Remove Fencing setting help"
                 id="tw.settingsModal.removeFencingHelp"

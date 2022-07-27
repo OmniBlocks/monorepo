@@ -23,6 +23,7 @@ import {highlightTarget} from '../reducers/targets';
 import {fetchSprite, fetchCode} from '../lib/backpack-api';
 import randomizeSpritePosition from '../lib/randomize-sprite-position';
 import downloadBlob from '../lib/download-blob';
+import log from '../lib/log';
 
 class TargetPane extends React.Component {
     constructor (props) {
@@ -133,7 +134,10 @@ class TargetPane extends React.Component {
     }
     handleNewSprite (spriteJSONString) {
         return this.props.vm.addSprite(spriteJSONString)
-            .then(this.handleActivateBlocksTab);
+            .then(this.handleActivateBlocksTab)
+            .catch(err => {
+                log.error(err);
+            });
     }
     handleFileUploadClick () {
         this.fileInput.click();

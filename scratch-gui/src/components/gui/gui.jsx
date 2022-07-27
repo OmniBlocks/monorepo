@@ -53,6 +53,16 @@ const messages = defineMessages({
     }
 });
 
+const getFullscreenBackgroundColor = () => {
+    const params = new URLSearchParams(location.search);
+    if (params.has('fullscreen-background')) {
+        return params.get('fullscreen-background');
+    }
+    return 'white';
+};
+
+const fullscreenBackgroundColor = getFullscreenBackgroundColor();
+
 const GUIComponent = props => {
     const {
         accountNavOpen,
@@ -150,9 +160,16 @@ const GUIComponent = props => {
 
         return isPlayerOnly ? (
             <React.Fragment>
-                {/* tw: when window is fullscreen, put a solid white background behind the stage */}
+                {/* TW: When the window is fullscreen, use an element to display the background color */}
+                {/* The default color for transparency is inconsistent between browsers and there isn't an existing */}
+                {/* element for us to style that fills the entire screen. */}
                 {isWindowFullScreen ? (
-                    <div className={styles.fullscreenBackground} />
+                    <div
+                        className={styles.fullscreenBackground}
+                        style={{
+                            backgroundColor: fullscreenBackgroundColor
+                        }}
+                    />
                 ) : null}
                 <StageWrapper
                     isFullScreen={isFullScreen}

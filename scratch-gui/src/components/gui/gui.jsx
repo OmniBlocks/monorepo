@@ -58,6 +58,9 @@ const getFullscreenBackgroundColor = () => {
     if (params.has('fullscreen-background')) {
         return params.get('fullscreen-background');
     }
+    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        return '#111';
+    }
     return 'white';
 };
 

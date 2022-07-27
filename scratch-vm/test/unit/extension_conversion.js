@@ -209,7 +209,8 @@ const testCommand = function (t, command) {
     });
     t.notOk(command.json.hasOwnProperty('args1'));
     t.equal(command.xml,
-        '<block type="test_command"><value name="ARG"><shadow type="text"></shadow></value>' +
+        // eslint-disable-next-line max-len
+        '<block type="test_command"><value name="ARG"><shadow type="text"><field name="TEXT"></field></shadow></value>' +
         '<value name="ARG_WITH_DEFAULT"><shadow type="text"><field name="TEXT">' +
         'default text</field></shadow></value></block>');
 };
@@ -268,7 +269,8 @@ const testLoop = function (t, loop) {
     t.equal(loop.json.args2[0].flip_rtl, true);
     t.notOk(loop.json.hasOwnProperty('args3'));
     t.equal(loop.xml,
-        '<block type="test_loop"><value name="MANY"><shadow type="math_number"></shadow></value></block>');
+        // eslint-disable-next-line max-len
+        '<block type="test_loop"><value name="MANY"><shadow type="math_number"><field name="NUM"></field></shadow></value></block>');
 };
 
 test('registerExtensionPrimitives', t => {

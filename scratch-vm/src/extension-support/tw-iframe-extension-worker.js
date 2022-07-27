@@ -5,7 +5,6 @@ const none = "'none'";
 const featurePolicy = {
     'accelerometer': none,
     'ambient-light-sensor': none,
-    'autoplay': none,
     'battery': none,
     'camera': none,
     'display-capture': none,

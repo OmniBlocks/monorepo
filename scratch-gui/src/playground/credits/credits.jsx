@@ -10,6 +10,8 @@ import UserData from './users';
 
 /* eslint-disable react/jsx-no-literals */
 
+document.documentElement.lang = 'en';
+
 const User = ({image, text, href}) => (
     <a
         href={href}
@@ -79,7 +81,7 @@ const Credits = () => (
             </a>
         </section>
         <section>
-            <h2>{'Scratch'}</h2>
+            <h2>Scratch</h2>
             <p>
                 TurboWarp is based on the work of the <a href="https://scratch.mit.edu/credits">Scratch contributors</a> but is not endorsed by Scratch in any way.
             </p>
@@ -92,12 +94,20 @@ const Credits = () => (
         <section>
             <h2>Addons</h2>
             <UserList users={UserData.addonDevelopers} />
-            <p>Individual contributors are listed in no particular order.</p>
         </section>
         <section>
             <h2>Translators</h2>
             <p>
-                More than 100 people have helped translate TurboWarp into many languages.
+                More than 100 people have helped translate TurboWarp and its addons into many languages --
+                far more than we could hope to list here.
+            </p>
+        </section>
+        <section>
+            <p>
+                <i>
+                    Individual contributors are listed in no particular order.
+                    The order is randomized each visit.
+                </i>
             </p>
         </section>
     </main>

@@ -84,7 +84,11 @@ const canvasPool = (function () {
     return new CanvasPool();
 }());
 
-const readImage = src => new Promise((resolve, reject) => {
+/**
+ * @param {string} src URL of image
+ * @returns {Promise<HTMLImageElement>}
+ */
+const readAsImageElement = src => new Promise((resolve, reject) => {
     const image = new Image();
     image.onload = function () {
         resolve(image);
@@ -99,14 +103,23 @@ const readImage = src => new Promise((resolve, reject) => {
     image.src = src;
 });
 
-const persistentReadImage = async src => {
+/**
+ * @param {Asset} asset scratch-storage asset
+ * @returns {Promise<HTMLImageElement|ImageBitmap>}
+ */
+const persistentReadImage = async asset => {
     // Sometimes, when a lot of images are loaded at once, especially in Chrome, reading an image
     // can throw an error even on valid images. To mitigate this, we'll retry image reading a few
     // time with delays.
     let firstError;
     for (let i = 0; i < 3; i++) {
         try {
-            return await readImage(src);
+            if (typeof createImageBitmap === 'function') {
+                return await createImageBitmap(
+                    new Blob([asset.data.buffer], {type: asset.assetType.contentType})
+                );
+            }
+            return await readAsImageElement(asset.encodeDataURI());
         } catch (e) {
             if (!firstError) {
                 firstError = e;
@@ -145,7 +158,7 @@ const fetchBitmapCanvas_ = function (costume, runtime, rotationCenter) {
             return null;
         }
 
-        return persistentReadImage(asset.encodeDataURI());
+        return persistentReadImage(asset);
     }))
         .then(([baseImageElement, textImageElement]) => {
             if (!baseImageElement) {

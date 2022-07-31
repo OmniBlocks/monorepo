@@ -116,9 +116,17 @@ const _persistentReadImage = async asset => {
     for (let i = 0; i < 3; i++) {
         try {
             if (typeof createImageBitmap === 'function') {
-                return await createImageBitmap(
+                const imageBitmap = await createImageBitmap(
                     new Blob([asset.data.buffer], {type: asset.assetType.contentType})
                 );
+                // If we do too many createImageBitmap at the same time, some browsers (Chrome) will
+                // sometimes resolve with undefined. We limit concurrency so this shouldn't ever
+                // happen, but if it somehow does, throw an error so it can be retried or so that it
+                // falls back to scratch's broken costume handling.
+                if (!imageBitmap) {
+                    throw new Error(`createImageBitmap resolved with ${imageBitmap}`);
+                }
+                return imageBitmap;
             }
             return await readAsImageElement(asset.encodeDataURI());
         } catch (e) {

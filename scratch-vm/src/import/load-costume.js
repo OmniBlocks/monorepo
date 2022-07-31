@@ -1,5 +1,6 @@
 const StringUtil = require('../util/string-util');
 const log = require('../util/log');
+const AsyncLimiter = require('../util/async-limiter');
 const {loadSvgString, serializeSvgToString} = require('scratch-svg-renderer');
 
 const loadVector_ = function (costume, runtime, rotationCenter, optVersion) {
@@ -107,7 +108,7 @@ const readAsImageElement = src => new Promise((resolve, reject) => {
  * @param {Asset} asset scratch-storage asset
  * @returns {Promise<HTMLImageElement|ImageBitmap>}
  */
-const persistentReadImage = async asset => {
+const _persistentReadImage = async asset => {
     // Sometimes, when a lot of images are loaded at once, especially in Chrome, reading an image
     // can throw an error even on valid images. To mitigate this, we'll retry image reading a few
     // time with delays.
@@ -130,6 +131,9 @@ const persistentReadImage = async asset => {
     }
     throw firstError;
 };
+
+// Browsers break when we do too many createImageBitmap at the same time.
+const readImage = new AsyncLimiter(_persistentReadImage, 25);
 
 /**
  * Return a promise to fetch a bitmap from storage and return it as a canvas
@@ -158,7 +162,7 @@ const fetchBitmapCanvas_ = function (costume, runtime, rotationCenter) {
             return null;
         }
 
-        return persistentReadImage(asset);
+        return readImage.do(asset);
     }))
         .then(([baseImageElement, textImageElement]) => {
             if (!baseImageElement) {

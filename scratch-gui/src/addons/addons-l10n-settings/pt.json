@@ -136,7 +136,6 @@
     "custom-block-text/@settings-name-shadow": "Sombra no texto",
     "editor-colored-context-menus/@description": "Põe cor no menu que aparece ao clicar em um bloco com o botão direito.",
     "editor-colored-context-menus/@name": "Menus de contexto coloridos",
-    "editor-stage-left/@description": "Move o palco para o lado esquerdo do editor.",
     "editor-stage-left/@name": "Mostrar palco do lado esquerdo",
     "editor-buttons-reverse-order/@description": "Moverá a bandeira verde e o botão de pare para direita e no modo tela cheia os moverá para a direita, como no Scratch 2.0.",
     "editor-buttons-reverse-order/@name": "Reverter ordem dos botões de controle de projeto",

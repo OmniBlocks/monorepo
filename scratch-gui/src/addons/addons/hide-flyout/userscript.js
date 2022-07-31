@@ -9,7 +9,8 @@ const _twGetAsset = (path) => {
 
 export default async function ({ addon, global, console, msg }) {
   let placeHolderDiv = null;
-  let lockDisplay = null;
+  let lockObject = null;
+  let lockButton = null;
   let lockIcon = null;
   let flyOut = null;
   let scrollBar = null;
@@ -17,6 +18,8 @@ export default async function ({ addon, global, console, msg }) {
   let flyoutLock = false;
   let closeOnMouseUp = false;
   let scrollAnimation = true;
+
+  const SVG_NS = "http://www.w3.org/2000/svg";
 
   const Blockly = await addon.tab.traps.getBlockly();
 
@@ -53,22 +56,21 @@ export default async function ({ addon, global, console, msg }) {
   }
 
   function setTransition(speed) {
-    for (let element of [flyOut, scrollBar, lockDisplay]) {
+    for (let element of [flyOut, scrollBar]) {
       element.style.transitionDuration = `${speed}s`;
     }
   }
 
   function removeTransition() {
-    for (let element of [flyOut, scrollBar, lockDisplay]) {
+    for (let element of [flyOut, scrollBar]) {
       element.style.removeProperty("transition-duration");
     }
   }
 
   function updateLockDisplay() {
-    lockDisplay.title = flyoutLock ? msg("unlock") : msg("lock");
+    lockObject.classList.toggle("locked", flyoutLock);
+    lockButton.title = flyoutLock ? msg("unlock") : msg("lock");
     lockIcon.src = _twGetAsset(`/${flyoutLock ? "" : "un"}lock.svg`);
-    if (flyoutLock) lockDisplay.classList.add("locked");
-    else lockDisplay.classList.remove("locked");
   }
 
   function onmouseenter(e, speed = {}) {
@@ -82,7 +84,6 @@ export default async function ({ addon, global, console, msg }) {
       setTransition(speed);
       flyOut.classList.remove("sa-flyoutClose");
       scrollBar.classList.remove("sa-flyoutClose");
-      lockDisplay.classList.remove("sa-flyoutClose");
       setTimeout(() => {
         Blockly.getMainWorkspace().recordCachedAreas();
         removeTransition();
@@ -101,7 +102,6 @@ export default async function ({ addon, global, console, msg }) {
     setTransition(speed);
     flyOut.classList.add("sa-flyoutClose");
     scrollBar.classList.add("sa-flyoutClose");
-    lockDisplay.classList.add("sa-flyoutClose");
     setTimeout(() => {
       Blockly.getMainWorkspace().recordCachedAreas();
       removeTransition();
@@ -246,10 +246,22 @@ export default async function ({ addon, global, console, msg }) {
   while (true) {
     flyOut = await addon.tab.waitForElement(".blocklyFlyout", {
       markAsSeen: true,
+      reduxEvents: ["scratch-gui/mode/SET_PLAYER", "scratch-gui/locales/SELECT_LOCALE", "fontsLoaded/SET_FONTS_LOADED"],
       reduxCondition: (state) => !state.scratchGui.mode.isPlayerOnly,
     });
     scrollBar = document.querySelector(".blocklyFlyoutScrollbar");
     const blocksWrapper = document.querySelector('[class*="gui_blocks-wrapper_"]');
+    const injectionDiv = document.querySelector(".injectionDiv");
+
+    // Code editor left border
+    const borderElement1 = document.createElement("div");
+    borderElement1.className = "sa-flyout-border-1";
+    addon.tab.displayNoneWhileDisabled(borderElement1);
+    injectionDiv.appendChild(borderElement1);
+    const borderElement2 = document.createElement("div");
+    borderElement2.className = "sa-flyout-border-2";
+    addon.tab.displayNoneWhileDisabled(borderElement2);
+    injectionDiv.appendChild(borderElement2);
 
     // Placeholder Div
     if (placeHolderDiv) placeHolderDiv.remove();
@@ -258,20 +270,23 @@ export default async function ({ addon, global, console, msg }) {
     placeHolderDiv.className = "sa-flyout-placeHolder";
     placeHolderDiv.style.display = "none"; // overridden by userstyle if the addon is enabled
 
-    // Lock Img
-    if (lockDisplay) lockDisplay.remove();
-    lockDisplay = document.createElement("button");
-    blocksWrapper.appendChild(lockDisplay);
-    lockDisplay.className = "sa-lock-image";
-    lockDisplay.style.display = "none"; // overridden by userstyle if the addon is enabled
+    // Lock image
+    if (lockObject) lockObject.remove();
+    lockObject = document.createElementNS(SVG_NS, "foreignObject");
+    lockObject.setAttribute("class", "sa-lock-object");
+    lockObject.style.display = "none"; // overridden by userstyle if the addon is enabled
+    lockButton = document.createElement("button");
+    lockButton.className = "sa-lock-button";
     lockIcon = document.createElement("img");
     lockIcon.alt = "";
-    lockDisplay.appendChild(lockIcon);
     updateLockDisplay();
-    lockDisplay.onclick = () => {
+    lockButton.onclick = () => {
       flyoutLock = !flyoutLock;
       updateLockDisplay();
     };
+    lockButton.appendChild(lockIcon);
+    lockObject.appendChild(lockButton);
+    flyOut.appendChild(lockObject);
 
     onmouseleave(null, 0);
     toggle = false;
@@ -279,7 +294,7 @@ export default async function ({ addon, global, console, msg }) {
     const toolbox = document.querySelector(".blocklyToolboxDiv");
     const addExtensionButton = document.querySelector("[class^=gui_extension-button-container_]");
 
-    for (let element of [toolbox, addExtensionButton, flyOut, scrollBar, lockDisplay]) {
+    for (let element of [toolbox, addExtensionButton, flyOut, scrollBar]) {
       element.onmouseenter = (e) => {
         const toggleSetting = getToggleSetting();
         if (!addon.self.disabled && (toggleSetting === "hover" || toggleSetting === "cathover")) onmouseenter(e);

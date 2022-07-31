@@ -127,7 +127,6 @@
     "custom-block-text/@settings-name-shadow": "글자 아래에 그림자 추가하기",
     "editor-colored-context-menus/@description": "우클릭 메뉴에 색상을 입힙니다.",
     "editor-colored-context-menus/@name": "우클릭 메뉴 색상",
-    "editor-stage-left/@description": "무대를 편집기의 왼쪽으로 옮깁니다.",
     "editor-stage-left/@name": "무대 왼쪽에서 보이기",
     "variable-manager/@description": "변수 및 리스트를 쉽게 업데이트할 수 있도록 편집기의 \"소리\"탭 옆에 탭을 추가합니다.",
     "variable-manager/@name": "변수 관리자",

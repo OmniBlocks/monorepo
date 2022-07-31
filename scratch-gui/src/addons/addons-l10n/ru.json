@@ -31,6 +31,8 @@
     "data-category-tweaks-v2/for-all-sprites": "Для всех спрайтов:",
     "data-category-tweaks-v2/for-this-sprite-only": "Только для этого спрайта:",
     "data-category-tweaks-v2/list-category": "Списки",
+    "hide-flyout/lock": "Заблокировать палитру",
+    "hide-flyout/unlock": "Разблокировать палитру",
     "mediarecorder/cancel": "Отмена",
     "mediarecorder/click-flag": "Ожидание...",
     "mediarecorder/click-flag-description": "Нажмите зеленый флаг, чтобы начать запись. Нажмите эту кнопку, чтобы остановить.",
@@ -127,11 +129,13 @@
     "folders/create-folder": "создать папку",
     "folders/name-not-allowed": "Неверное имя папки",
     "folders/name-prompt": "Название папки:",
+    "folders/name-prompt-title": "Создание папки",
     "folders/open-folder": "Открыто",
     "folders/remove-folder": "удалить папку",
     "folders/remove-from-folder": "удалить из папки",
     "folders/rename-folder": "переименовать папку",
     "folders/rename-folder-prompt": "Переименовать папку в:",
+    "folders/rename-folder-prompt-title": "Переименование папки",
     "block-switching/control_forever": "всегда",
     "block-switching/control_if": "если",
     "block-switching/control_if_else": "если... иначе",
@@ -189,6 +193,7 @@
     "block-switching/sensing_mousey": "y мыши",
     "block-switching/sound_changeeffectby": "изменить эффект",
     "block-switching/sound_changevolumeby": "изменить громкость",
+    "block-switching/sound_play": "включить звук",
     "block-switching/sound_playuntildone": "проигрывать до конца",
     "block-switching/sound_seteffectto": "задать эффект",
     "block-switching/sound_setvolumeto": "задать громкость",
@@ -211,5 +216,6 @@
     "swap-local-global/edit-variable-header": "Изменить переменную",
     "swap-local-global/edit-variable-option": "Переименовать или изменить переменную",
     "swap-local-global/to-global": "Конвертировать в \"Для всех спрайтов\"",
-    "swap-local-global/to-local": "Конвертировать в \"Для всех спрайтов\""
+    "swap-local-global/to-local": "Конвертировать в \"Для всех спрайтов\"",
+    "hide-stage/hide-stage": "Скрыть сцену"
 }

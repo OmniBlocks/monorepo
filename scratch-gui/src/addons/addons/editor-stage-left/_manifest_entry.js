@@ -2,7 +2,13 @@
 const manifest = {
   "noTranslations": true,
   "name": "Display stage on left side",
-  "description": "Moves the stage to the left side of the editor.",
+  "description": "Moves the stage to the left side of the editor, like in Scratch 2.0.",
+  "info": [
+    {
+      "id": "reverseOrder",
+      "text": "To change the position of buttons above the stage, use the \"reverse order of project controls\" addon."
+    }
+  ],
   "credits": [
     {
       "name": "NitroCipher/ZenithRogue"

@@ -50,6 +50,12 @@ class Skin {
         this._silhouette = new Silhouette();
 
         /**
+         * Whether this skin's WebGLTexture is out of date and the current image data must be uploaded
+         * before the texture can be used.
+         */
+        this._textureOutOfDate = false;
+
+        /**
          * Whether this skin might include private information about the user.
          */
         this.private = false;
@@ -153,16 +159,41 @@ class Skin {
      * @param {ImageData|HTMLCanvasElement} textureData - The canvas or image data to set the texture to.
      */
     _setTexture (textureData) {
+        this._textureOutOfDate = true;
+        // We'll let the Silhouette manage the texture data to avoid unnecessary copies of the same data.
+        this._silhouette.update(textureData);
+    }
+
+    /**
+     * Ensure that this skin is ready for rendering on the GPU.
+     */
+    prepareForGPU () {
+        if (!this._textureOutOfDate) {
+            return;
+        }
+        this._textureOutOfDate = false;
+
+        const width = this._silhouette._width;
+        const height = this._silhouette._height;
+        if (width === 0 || height === 0) {
+            return;
+        }
+
         const gl = this._renderer.gl;
 
         gl.bindTexture(gl.TEXTURE_2D, this._texture);
         // Premultiplied alpha is necessary for proper blending.
         // See http://www.realtimerendering.com/blog/gpus-prefer-premultiplication/
         gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, textureData);
-        gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
 
-        this._silhouette.update(textureData);
+        const textureData = this._silhouette.getRawTexture();
+        if (ArrayBuffer.isView(textureData)) {
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, textureData);
+        } else {
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, textureData);
+        }
+
+        gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
     }
 
     /**
@@ -172,6 +203,8 @@ class Skin {
     setEmptyImageData () {
         // Free up the current reference to the _texture
         this._texture = null;
+
+        this._textureOutOfDate = false;
 
         if (!this._emptyImageData) {
             // Create a transparent pixel

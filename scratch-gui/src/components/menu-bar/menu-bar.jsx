@@ -354,6 +354,7 @@ class MenuBar extends React.Component {
                 <img
                     className={styles.aboutIcon}
                     src={aboutIcon}
+                    draggable={false}
                 />
                 <MenuBarMenu
                     className={classNames(styles.menuBarMenu)}
@@ -477,6 +478,7 @@ class MenuBar extends React.Component {
                                     src={themeIcon}
                                     width="24"
                                     height="24"
+                                    draggable={false}
                                 />
                             </div>
                         )}

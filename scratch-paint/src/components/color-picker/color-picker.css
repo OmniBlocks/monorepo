@@ -2,7 +2,8 @@
 @import "../../css/colors";
 
 /* Popover styles */
-:global(.Popover) {
+/* body is for specificity to override some addons that set a lower z-index */
+body :global(.Popover) {
     /* should be above menu bar */
     z-index: 500;
 }

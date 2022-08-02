@@ -2,10 +2,22 @@ const StringUtil = require('../util/string-util');
 const log = require('../util/log');
 const AsyncLimiter = require('../util/async-limiter');
 const {loadSvgString, serializeSvgToString} = require('scratch-svg-renderer');
+const {parseVectorMetadata} = require('../serialization/tw-costume-import-export');
 
 const loadVector_ = function (costume, runtime, rotationCenter, optVersion) {
     return new Promise(resolve => {
         let svgString = costume.asset.decodeText();
+
+        // TW: We allow SVGs to specify their rotation center using a special comment.
+        if (typeof rotationCenter === 'undefined') {
+            const parsedRotationCenter = parseVectorMetadata(svgString);
+            if (parsedRotationCenter) {
+                rotationCenter = parsedRotationCenter;
+                costume.rotationCenterX = rotationCenter[0];
+                costume.rotationCenterY = rotationCenter[1];
+            }
+        }
+    
         // SVG Renderer load fixes "quirks" associated with Scratch 2 projects
         if (optVersion && optVersion === 2) {
             // scratch-svg-renderer fixes syntax that causes loading issues,

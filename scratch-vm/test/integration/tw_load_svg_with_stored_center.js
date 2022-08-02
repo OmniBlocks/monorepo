@@ -1,0 +1,25 @@
+const {loadCostume} = require('../../src/import/load-costume');
+const Runtime = require('../../src/engine/runtime');
+const makeTestStorage = require('../fixtures/make-test-storage');
+const FakeRenderer = require('../fixtures/fake-renderer');
+const {test} = require('tap');
+
+/* global TextEncoder */
+
+test('importing SVG with stored rotation center', async t => {
+    const runtime = new Runtime();
+    const storage = makeTestStorage();
+    runtime.attachStorage(storage);
+    const renderer = new FakeRenderer();
+    runtime.attachRenderer(renderer);
+    const svg = new TextEncoder().encode(
+        `<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"></svg><!--rotationCenter:106.62300344745225:-11.822572945859918-->`
+    );
+    const asset = new storage.Asset(storage.AssetType.ImageVector, null, storage.DataFormat.SVG, svg, true);
+    const costume = await loadCostume(`${asset.assetId}.svg`, {
+        asset
+    }, runtime);
+    t.equal(costume.rotationCenterX, 106.62300344745225);
+    t.equal(costume.rotationCenterY, -11.822572945859918);
+    t.end();
+});

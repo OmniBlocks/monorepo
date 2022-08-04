@@ -122,6 +122,7 @@ ul.s3devDD {
 }
 [theme="dark"] .s3devDDOut.vis {
   background-color: #111;
+  box-shadow: 0px 0px 0px 1px var(--ui-black-transparent);
 }
 
 .s3devDDOut.vis ul.s3devDD {

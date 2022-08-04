@@ -3676,7 +3676,7 @@ export class Song {
                         }
                         // Custom vibrato
                         if (vibrato == Config.vibratos.length) {
-                            instrument.vibratoDepth = clamp(0, Config.modulators.dictionary["vibrato depth"].maxRawVol + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]) / 25;
+                            instrument.vibratoDepth = clamp(0, Config.modulators.dictionary["vibrato depth"].maxRawVol + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]) / 50;
                             instrument.vibratoSpeed = clamp(0, Config.modulators.dictionary["vibrato speed"].maxRawVol + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                             instrument.vibratoDelay = clamp(0, Config.modulators.dictionary["vibrato delay"].maxRawVol + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]) / 2;
                             instrument.vibratoType = clamp(0, Config.vibratoTypes.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
@@ -8507,7 +8507,6 @@ export class Synth {
                 arpeggioInterval = tone.pitches[getArpeggioPitchIndex(tone.pitchCount, instrument.fastTwoNoteArp, arpeggio)] - tone.pitches[0];
             }
 
-
             const carrierCount: number = Config.algorithms[instrument.algorithm].carrierCount;
             for (let i: number = 0; i < Config.operatorCount; i++) {
 
@@ -8731,10 +8730,10 @@ export class Synth {
                     stringDecayStart = tone.prevStringDecay;
                 } else {
                     const sustainEnvelopeStart: number = tone.envelopeComputer.envelopeStarts[EnvelopeComputeIndex.stringSustain];
-                    stringDecayStart = 1.0 - Math.min(1.0, sustainEnvelopeStart * instrument.stringSustain / (Config.stringSustainRange - 1));
+                    stringDecayStart = 1.0 - Math.min(1.0, sustainEnvelopeStart * tone.stringSustainStart / (Config.stringSustainRange - 1));
                 }
                 const sustainEnvelopeEnd: number = tone.envelopeComputer.envelopeEnds[EnvelopeComputeIndex.stringSustain];
-                let stringDecayEnd: number = 1.0 - Math.min(1.0, sustainEnvelopeEnd * instrument.stringSustain / (Config.stringSustainRange - 1));
+                let stringDecayEnd: number = 1.0 - Math.min(1.0, sustainEnvelopeEnd * tone.stringSustainEnd / (Config.stringSustainRange - 1));
                 tone.prevStringDecay = stringDecayEnd;
 
                 const unison: Unison = Config.unisons[instrument.unison];

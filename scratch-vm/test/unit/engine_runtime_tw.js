@@ -228,3 +228,17 @@ test('convertToPackagedRuntime', t => {
     t.equal(rt.isPackaged, true);
     t.end();
 });
+
+test('convertToPackagedRuntime and attachStorage call order', t => {
+    try {
+        const rt1 = new Runtime();
+        rt1.attachStorage({});
+        rt1.convertToPackagedRuntime();
+    } catch (e) {
+        t.equal(e.message, 'convertToPackagedRuntime must be called before attachStorage');
+    }
+    const rt2 = new Runtime();
+    rt2.convertToPackagedRuntime();
+    rt2.attachStorage({});
+    t.end();
+});

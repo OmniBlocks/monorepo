@@ -88,3 +88,34 @@ test('load sound in packaged runtime', async t => {
     t.equal(costume.asset, null);
     t.end();
 });
+
+test('storage.createAsset never generates real asset IDs', t => {
+    const rt = new Runtime();
+    rt.convertToPackagedRuntime();
+    const storage = makeTestStorage();
+    rt.attachStorage(storage);
+    const shouldUseGivenID = storage.createAsset(
+        storage.AssetType.ImageBitmap,
+        storage.DataFormat.PNG,
+        new ArrayBuffer(10),
+        'a'.repeat(32)
+    );
+    t.equal(shouldUseGivenID.assetId, 'a'.repeat(32));
+    const shouldUseFakeID = storage.createAsset(
+        storage.AssetType.ImageBitmap,
+        storage.DataFormat.PNG,
+        new ArrayBuffer(11),
+        null,
+        true
+    );
+    t.equal(shouldUseFakeID.assetId, '1');
+    const shouldUseDifferentFakeID = storage.createAsset(
+        storage.AssetType.ImageBitmap,
+        storage.DataFormat.PNG,
+        new ArrayBuffer(12),
+        null,
+        true
+    );
+    t.equal(shouldUseDifferentFakeID.assetId, '2');
+    t.end();
+});

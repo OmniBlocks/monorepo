@@ -1736,6 +1736,28 @@ class Runtime extends EventEmitter {
      */
     attachStorage (storage) {
         this.storage = storage;
+
+        if (this.isPackaged) {
+            // In packaged runtime mode, generating real asset IDs is a waste of time.
+            // We do still want to preserve every asset having a unique ID.
+            const originalCreateAsset = storage.createAsset;
+            let assetIdCounter = 0;
+            // eslint-disable-next-line no-unused-vars
+            storage.createAsset = function packagedCreateAsset (assetType, dataFormat, data, assetId, generateId) {
+                if (!assetId) {
+                    assetId = (++assetIdCounter).toString();
+                }
+                return originalCreateAsset.call(
+                    this,
+                    assetType,
+                    dataFormat,
+                    data,
+                    assetId,
+                    // Never generate real asset ID
+                    false
+                );
+            };
+        }
     }
 
     // -----------------------------------------------------------------------------
@@ -2460,6 +2482,10 @@ class Runtime extends EventEmitter {
      * TW: Enable "packaged runtime" mode. This is a one-way operation.
      */
     convertToPackagedRuntime () {
+        if (this.storage) {
+            throw new Error('convertToPackagedRuntime must be called before attachStorage');
+        }
+
         this.isPackaged = true;
     }
 

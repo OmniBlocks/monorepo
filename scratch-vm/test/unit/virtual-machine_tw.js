@@ -81,3 +81,13 @@ test('addSound error handling when sprite does not exist', async t => {
     }
     t.end();
 });
+
+test('convertToPackagedRuntime forwards to runtime', t => {
+    t.plan(1);
+    const vm = new VirtualMachine();
+    vm.runtime.convertToPackagedRuntime = () => {
+        t.pass();
+    };
+    vm.convertToPackagedRuntime();
+    t.end();
+});

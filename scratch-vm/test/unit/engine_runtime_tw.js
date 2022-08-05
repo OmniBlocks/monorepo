@@ -220,3 +220,11 @@ test('currentStepTime default value', t => {
     t.ok(rt.currentStepTime > 0);
     t.end();
 });
+
+test('convertToPackagedRuntime', t => {
+    const rt = new Runtime();
+    t.equal(rt.isPackaged, false);
+    rt.convertToPackagedRuntime();
+    t.equal(rt.isPackaged, true);
+    t.end();
+});

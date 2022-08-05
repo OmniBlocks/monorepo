@@ -440,6 +440,19 @@ class Runtime extends EventEmitter {
         this.interpolationEnabled = false;
 
         this._defaultStoredSettings = this._generateAllProjectOptions();
+
+        /**
+         * TW: We support a "packaged runtime" mode. This can be used when:
+         *  - there will never be an editor attached such as scratch-gui or scratch-blocks
+         *  - the project will never be exported with saveProjectSb3()
+         *  - original costume and sound data is not needed
+         * In this mode, the runtime is able to discard large amounts of data and avoid some processing
+         * to make projects load faster and use less memory.
+         * This is not designed to protect projects from copying as someone can still copy the data that
+         * gets fed into the runtime in the first place.
+         * This mode is used by the TurboWarp Packager.
+         */
+        this.isPackaged = false;
     }
 
     /**
@@ -2443,8 +2456,11 @@ class Runtime extends EventEmitter {
         // no-op
     }
 
+    /**
+     * TW: Enable "packaged runtime" mode. This is a one-way operation.
+     */
     convertToPackagedRuntime () {
-        // no-op
+        this.isPackaged = true;
     }
 
     /**

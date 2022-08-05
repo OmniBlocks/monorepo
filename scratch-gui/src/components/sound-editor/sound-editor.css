@@ -235,3 +235,18 @@ $border-radius: 0.25rem;
     font-weight: bold;
     font-weight: 0.75rem;
 }
+
+.alert {
+    margin-top: calc(2 * $space);
+    border-radius: $border-radius;
+    padding: $space;
+    display: flex;
+    align-items: center;
+    border-width: 1px;
+    border-style: solid;
+}
+
+.stereo {
+    background-color: rgba(145, 145, 255, 0.3);
+    border-color: rgb(145, 145, 255)
+}

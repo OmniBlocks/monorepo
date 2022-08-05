@@ -347,10 +347,21 @@ const SoundEditor = props => (
         <div className={styles.duration}>
             {formatDuration(props.playhead, props.trimStart, props.trimEnd, props.duration)}
         </div>
+        {props.isStereo && (
+            <div className={classNames(styles.alert, styles.stereo)}>
+                <FormattedMessage
+                    // eslint-disable-next-line max-len
+                    defaultMessage="This sound is in stereo. Editing this sound will convert it to mono. Stereo sounds may sound better but are usually larger and use more memory."
+                    description="Message that appears when editing a sound in stereo mode."
+                    id="tw.stereo"
+                />
+            </div>
+        )}
     </div>
 );
 
 SoundEditor.propTypes = {
+    isStereo: PropTypes.bool.isRequired,
     duration: PropTypes.number.isRequired,
     canPaste: PropTypes.bool.isRequired,
     canRedo: PropTypes.bool.isRequired,

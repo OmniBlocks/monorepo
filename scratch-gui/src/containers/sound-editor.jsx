@@ -438,6 +438,7 @@ class SoundEditor extends React.Component {
         const {effectTypes} = AudioEffects;
         return (
             <SoundEditorComponent
+                isStereo={this.props.isStereo}
                 duration={this.props.duration}
                 canPaste={this.state.copyBuffer !== null}
                 canRedo={this.redoStack.length > 0}
@@ -476,6 +477,7 @@ class SoundEditor extends React.Component {
 }
 
 SoundEditor.propTypes = {
+    isStereo: PropTypes.bool,
     duration: PropTypes.number,
     isFullScreen: PropTypes.bool,
     name: PropTypes.string.isRequired,
@@ -493,6 +495,7 @@ const mapStateToProps = (state, {soundIndex}) => {
     const sound = state.scratchGui.vm.editingTarget.sprite.sounds[index];
     const audioBuffer = state.scratchGui.vm.getSoundBuffer(index);
     return {
+        isStereo: audioBuffer.numberOfChannels !== 1,
         duration: sound.sampleCount / sound.rate,
         soundId: sound.soundId,
         sampleRate: audioBuffer.sampleRate,

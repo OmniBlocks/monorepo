@@ -22,6 +22,7 @@ describe('Sound Editor Container', () => {
     beforeEach(() => {
         soundIndex = 0;
         soundBuffer = {
+            numberOfChannels: 1,
             sampleRate: 0,
             getChannelData: jest.fn(() => samples)
         };
@@ -277,5 +278,29 @@ describe('Sound Editor Container', () => {
         await component.props().onRedo();
         expect(mockAudioBufferPlayer.instance.play).toHaveBeenCalled();
         expect(vm.updateSoundBuffer).toHaveBeenCalled();
+    });
+
+    test('isStereo numberOfChannels=1', () => {
+        soundBuffer.numberOfChannels = 1;
+        const wrapper = mountWithIntl(
+            <SoundEditor
+                soundIndex={soundIndex}
+                store={store}
+            />
+        );
+        const component = wrapper.find(SoundEditorComponent);
+        expect(component.props().isStereo).toEqual(false);
+    });
+
+    test('isStereo numberOfChannels=2', () => {
+        soundBuffer.numberOfChannels = 2;
+        const wrapper = mountWithIntl(
+            <SoundEditor
+                soundIndex={soundIndex}
+                store={store}
+            />
+        );
+        const component = wrapper.find(SoundEditorComponent);
+        expect(component.props().isStereo).toEqual(true);
     });
 });

@@ -34,6 +34,10 @@ const loadSoundFromAsset = function (sound, soundAsset, runtime, soundBank) {
             soundBank.addSoundPlayer(soundPlayer);
         }
 
+        if (runtime.isPackaged) {
+            sound.asset = null;
+        }
+
         return sound;
     });
 };

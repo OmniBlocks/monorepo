@@ -46,6 +46,10 @@ const loadVector_ = function (costume, runtime, rotationCenter, optVersion) {
             costume.bitmapResolution = 1;
         }
 
+        if (runtime.isPackaged) {
+            costume.asset = null;
+        }
+
         resolve(costume);
     });
 };
@@ -321,6 +325,11 @@ const loadBitmap_ = function (costume, runtime, _rotationCenter) {
                 costume.rotationCenterY = rotationCenter[1] * 2;
                 costume.bitmapResolution = 2;
             }
+
+            if (runtime.isPackaged) {
+                costume.asset = null;
+            }
+
             return costume;
         });
 };

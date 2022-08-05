@@ -38,11 +38,11 @@ test('load bitmap in packaged runtime', async t => {
     rt.attachV2BitmapAdapter(new FakeBitmapAdapter());
     const storage = makeTestStorage();
     rt.attachStorage(storage);
-    const asset = new storage.Asset(
+    const asset = storage.createAsset(
         storage.AssetType.ImageBitmap,
-        null,
         storage.DataFormat.PNG,
         new ArrayBuffer(10),
+        null,
         true
     );
     const costume = await loadCostume(`${asset.assetId}.png`, {asset}, rt);
@@ -56,11 +56,11 @@ test('load vector in packaged runtime', async t => {
     rt.attachRenderer(new FakeRenderer());
     const storage = makeTestStorage();
     rt.attachStorage(storage);
-    const asset = new storage.Asset(
+    const asset = storage.createAsset(
         storage.AssetType.ImageVector,
-        null,
         storage.DataFormat.SVG,
         new ArrayBuffer(10),
+        null,
         true
     );
     const costume = await loadCostume(`${asset.assetId}.svg`, {asset}, rt);
@@ -74,11 +74,11 @@ test('load sound in packaged runtime', async t => {
     const storage = makeTestStorage();
     rt.attachStorage(storage);
     rt.attachAudioEngine(new FakeAudioEngine());
-    const asset = new storage.Asset(
+    const asset = storage.createAsset(
         storage.AssetType.Sound,
-        null,
         storage.DataFormat.MP3,
         new ArrayBuffer(10),
+        null,
         true
     );
     const costume = await loadSound({

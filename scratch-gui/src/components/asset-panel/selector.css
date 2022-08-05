@@ -52,6 +52,7 @@ $fade-out-distance: 100px;
     height: 0;
     flex-grow: 1;
     overflow-y: auto;
+    overflow-x: hidden;
     display: flex;
     flex-direction: column;
 }

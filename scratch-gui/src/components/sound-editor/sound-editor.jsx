@@ -257,7 +257,7 @@ const SoundEditor = props => (
             </div>
         </div>
         <div className={classNames(styles.row, styles.rowReverse)}>
-            <div className={styles.inputGroup}>
+            <div className={classNames(styles.roundButtonOuter, styles.inputGroup)}>
                 {props.playhead ? (
                     <button
                         className={classNames(styles.roundButton, styles.stopButtonn)}

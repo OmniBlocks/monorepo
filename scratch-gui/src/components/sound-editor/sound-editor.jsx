@@ -282,67 +282,69 @@ const SoundEditor = props => (
                     </button>
                 )}
             </div>
-            <IconButton
-                className={styles.effectButton}
-                img={fasterIcon}
-                title={<FormattedMessage {...messages.faster} />}
-                onClick={props.onFaster}
-            />
-            <IconButton
-                className={styles.effectButton}
-                img={slowerIcon}
-                title={<FormattedMessage {...messages.slower} />}
-                onClick={props.onSlower}
-            />
-            <IconButton
-                disabled={props.tooLoud}
-                className={classNames(styles.effectButton, styles.flipInRtl)}
-                img={louderIcon}
-                title={<FormattedMessage {...messages.louder} />}
-                onClick={props.onLouder}
-            />
-            <IconButton
-                className={classNames(styles.effectButton, styles.flipInRtl)}
-                img={softerIcon}
-                title={<FormattedMessage {...messages.softer} />}
-                onClick={props.onSofter}
-            />
-            <IconButton
-                className={classNames(styles.effectButton, styles.flipInRtl)}
-                img={muteIcon}
-                title={<FormattedMessage {...messages.mute} />}
-                onClick={props.onMute}
-            />
-            <IconButton
-                className={styles.effectButton}
-                img={fadeInIcon}
-                title={<FormattedMessage {...messages.fadeIn} />}
-                onClick={props.onFadeIn}
-            />
-            <IconButton
-                className={styles.effectButton}
-                img={fadeOutIcon}
-                title={<FormattedMessage {...messages.fadeOut} />}
-                onClick={props.onFadeOut}
-            />
-            <IconButton
-                className={styles.effectButton}
-                img={reverseIcon}
-                title={<FormattedMessage {...messages.reverse} />}
-                onClick={props.onReverse}
-            />
-            <IconButton
-                className={styles.effectButton}
-                img={robotIcon}
-                title={<FormattedMessage {...messages.robot} />}
-                onClick={props.onRobot}
-            />
-            <IconButton
-                className={styles.effectButton}
-                img={echoIcon}
-                title={<FormattedMessage {...messages.echo} />}
-                onClick={props.onEcho}
-            />
+            <div className={styles.effects}>
+                <IconButton
+                    className={styles.effectButton}
+                    img={fasterIcon}
+                    title={<FormattedMessage {...messages.faster} />}
+                    onClick={props.onFaster}
+                />
+                <IconButton
+                    className={styles.effectButton}
+                    img={slowerIcon}
+                    title={<FormattedMessage {...messages.slower} />}
+                    onClick={props.onSlower}
+                />
+                <IconButton
+                    disabled={props.tooLoud}
+                    className={classNames(styles.effectButton, styles.flipInRtl)}
+                    img={louderIcon}
+                    title={<FormattedMessage {...messages.louder} />}
+                    onClick={props.onLouder}
+                />
+                <IconButton
+                    className={classNames(styles.effectButton, styles.flipInRtl)}
+                    img={softerIcon}
+                    title={<FormattedMessage {...messages.softer} />}
+                    onClick={props.onSofter}
+                />
+                <IconButton
+                    className={classNames(styles.effectButton, styles.flipInRtl)}
+                    img={muteIcon}
+                    title={<FormattedMessage {...messages.mute} />}
+                    onClick={props.onMute}
+                />
+                <IconButton
+                    className={styles.effectButton}
+                    img={fadeInIcon}
+                    title={<FormattedMessage {...messages.fadeIn} />}
+                    onClick={props.onFadeIn}
+                />
+                <IconButton
+                    className={styles.effectButton}
+                    img={fadeOutIcon}
+                    title={<FormattedMessage {...messages.fadeOut} />}
+                    onClick={props.onFadeOut}
+                />
+                <IconButton
+                    className={styles.effectButton}
+                    img={reverseIcon}
+                    title={<FormattedMessage {...messages.reverse} />}
+                    onClick={props.onReverse}
+                />
+                <IconButton
+                    className={styles.effectButton}
+                    img={robotIcon}
+                    title={<FormattedMessage {...messages.robot} />}
+                    onClick={props.onRobot}
+                />
+                <IconButton
+                    className={styles.effectButton}
+                    img={echoIcon}
+                    title={<FormattedMessage {...messages.echo} />}
+                    onClick={props.onEcho}
+                />
+            </div>
         </div>
         <div className={styles.duration}>
             {formatDuration(props.playhead, props.trimStart, props.trimEnd, props.duration)}

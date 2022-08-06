@@ -141,6 +141,12 @@ $border-radius: 0.25rem;
     width: 1.25rem;
 }
 
+.effects {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
 .effect-button {
     flex-basis: 60px;
     color: $text-primary;

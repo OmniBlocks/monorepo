@@ -10569,6 +10569,18 @@
         "rotationCenterY": 37
     },
     {
+        "name": "Turbo Robot",
+        "tags": [
+            "robot"
+        ],
+        "bitmapResolution": 1,
+        "dataFormat": "svg",
+        "assetId": "9546f547835649c415959fc86c9a1717",
+        "md5ext": "9546f547835649c415959fc86c9a1717.svg",
+        "rotationCenterX": 33.402360253924,
+        "rotationCenterY": 62.05085241467614
+    },
+    {
         "name": "Unicorn",
         "tags": [
             "fantasy",

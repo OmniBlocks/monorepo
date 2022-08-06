@@ -347,16 +347,35 @@ const SoundEditor = props => (
                 />
             </div>
         </div>
-        <div className={styles.duration}>
-            {formatDuration(props.playhead, props.trimStart, props.trimEnd, props.duration)}
+        <div className={styles.infoRow}>
+            <div className={styles.duration}>
+                {formatDuration(props.playhead, props.trimStart, props.trimEnd, props.duration)}
+            </div>
+            <div className={styles.advancedInfo}>
+                {props.sampleRate}
+                {'Hz '}
+                {props.isStereo ? (
+                    <FormattedMessage
+                        defaultMessage="Stereo"
+                        description="Refers to a 'Stereo Sound' (2 channels)"
+                        id="tw.stereo"
+                    />
+                ) : (
+                    <FormattedMessage
+                        defaultMessage="Mono"
+                        description="Refers to a 'Mono Sound' (1 channel)"
+                        id="tw.mono"
+                    />
+                )}
+            </div>
         </div>
         {props.isStereo && (
             <div className={classNames(styles.alert, styles.stereo)}>
                 <FormattedMessage
                     // eslint-disable-next-line max-len
-                    defaultMessage="This sound is in stereo. Editing this sound will convert it to mono. Stereo sounds may sound better but are usually larger and use more memory."
-                    description="Message that appears when editing a sound in stereo mode."
-                    id="tw.stereo"
+                    defaultMessage="Editing this stereo sound will irreversibly convert it to mono."
+                    description="Message that appears when editing a stereo sound."
+                    id="tw.stereoAlert"
                 />
             </div>
         )}
@@ -366,6 +385,7 @@ const SoundEditor = props => (
 SoundEditor.propTypes = {
     isStereo: PropTypes.bool.isRequired,
     duration: PropTypes.number.isRequired,
+    sampleRate: PropTypes.number.isRequired,
     canPaste: PropTypes.bool.isRequired,
     canRedo: PropTypes.bool.isRequired,
     canUndo: PropTypes.bool.isRequired,

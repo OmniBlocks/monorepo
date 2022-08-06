@@ -246,10 +246,16 @@ $border-radius: 0.25rem;
     opacity: 0.25;
 }
 
-.duration {
+.info-row {
+    display: flex;
+    justify-content: space-between;
     margin-top: calc(2 * $space);
+}
+.duration {
     font-weight: bold;
-    font-weight: 0.75rem;
+}
+.advanced-info {
+
 }
 
 .alert {

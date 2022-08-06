@@ -181,6 +181,7 @@ const SoundEditor = props => (
                         type="text"
                         value={props.name}
                         onSubmit={props.onChangeName}
+                        className={styles.nameInput}
                     />
                 </Label>
                 <div className={styles.buttonGroup}>

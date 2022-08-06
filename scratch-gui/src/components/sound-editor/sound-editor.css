@@ -52,6 +52,10 @@
     border-right: 1px dashed $ui-black-transparent;
 }
 
+.name-input {
+    width: 100%;
+}
+
 .waveform-container {
     display: flex;
     justify-content: space-around;

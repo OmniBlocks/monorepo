@@ -3900,7 +3900,7 @@ export class Song {
                         }
                         // Custom vibrato
                         if (vibrato == Config.vibratos.length) {
-                            instrument.vibratoDepth = clamp(0, Config.modulators.dictionary["vibrato depth"].maxRawVol + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]) / 25;
+                            instrument.vibratoDepth = clamp(0, Config.modulators.dictionary["vibrato depth"].maxRawVol + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]) / 50;
                             instrument.vibratoSpeed = clamp(0, Config.modulators.dictionary["vibrato speed"].maxRawVol + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                             instrument.vibratoDelay = clamp(0, Config.modulators.dictionary["vibrato delay"].maxRawVol + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]) / 2;
                             instrument.vibratoType = clamp(0, Config.vibratoTypes.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
@@ -8856,7 +8856,7 @@ export class Synth {
             let arpeggioInterval: number = 0;
             const arpeggiates: boolean = chord.arpeggiates;
             if (tone.pitchCount > 1 && arpeggiates) {
-                const arpeggio: number = Math.floor((this.tick + this.part * Config.ticksPerPart) / Config.ticksPerArpeggio);
+                const arpeggio: number = Math.floor(instrument.arpTime / Config.ticksPerArpeggio);
                 arpeggioInterval = tone.pitches[getArpeggioPitchIndex(tone.pitchCount, instrument.fastTwoNoteArp, arpeggio)] - tone.pitches[0];
             }
 
@@ -9037,7 +9037,7 @@ export class Synth {
                 let useSustainEnd: number = instrument.stringSustain;
                 if (this.isModActive(Config.modulators.dictionary["sustain"].index, channelIndex, tone.instrumentIndex)) {
                     useSustainStart = this.getModValue(Config.modulators.dictionary["sustain"].index, channelIndex, tone.instrumentIndex, false);
-                    useSustainEnd = this.getModValue(Config.modulators.dictionary["sustain"].index, channelIndex, tone.instrumentIndex, false);
+                    useSustainEnd = this.getModValue(Config.modulators.dictionary["sustain"].index, channelIndex, tone.instrumentIndex, true);
                 }
 
                 tone.stringSustainStart = useSustainStart;
@@ -9091,10 +9091,10 @@ export class Synth {
                     stringDecayStart = tone.prevStringDecay;
                 } else {
                     const sustainEnvelopeStart: number = tone.envelopeComputer.envelopeStarts[EnvelopeComputeIndex.stringSustain];
-                    stringDecayStart = 1.0 - Math.min(1.0, sustainEnvelopeStart * instrument.stringSustain / (Config.stringSustainRange - 1));
+                    stringDecayStart = 1.0 - Math.min(1.0, sustainEnvelopeStart * tone.stringSustainStart / (Config.stringSustainRange - 1));
                 }
                 const sustainEnvelopeEnd: number = tone.envelopeComputer.envelopeEnds[EnvelopeComputeIndex.stringSustain];
-                let stringDecayEnd: number = 1.0 - Math.min(1.0, sustainEnvelopeEnd * instrument.stringSustain / (Config.stringSustainRange - 1));
+                let stringDecayEnd: number = 1.0 - Math.min(1.0, sustainEnvelopeEnd * tone.stringSustainEnd / (Config.stringSustainRange - 1));
                 tone.prevStringDecay = stringDecayEnd;
 
                 const unison: Unison = Config.unisons[instrument.unison];

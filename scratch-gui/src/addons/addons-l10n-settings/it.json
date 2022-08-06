@@ -48,6 +48,7 @@
     "mute-project/@name": "Modalità dell'editor di progetti con audio disattivato",
     "clones/@description": "Mostra sopra lo stage dell'editor il numero totale di cloni.",
     "clones/@name": "Numero dei cloni",
+    "clones/@settings-name-showicononly": "Mostra solo icona",
     "mouse-pos/@description": "Mostra la posizione x/y del mouse sopra lo stage dell'editor.",
     "mouse-pos/@name": "Posizione del mouse",
     "color-picker/@description": "Aggiunge la selezione del colore esadecimale alla selezione dei colori.",

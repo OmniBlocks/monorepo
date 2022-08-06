@@ -48,6 +48,7 @@
     "mute-project/@name": "Gedempte projectspeler",
     "clones/@description": "Voegt een teller boven het speelveld toe in de editor die het totale aantal klonen laat zien.",
     "clones/@name": "Kloonteller",
+    "clones/@settings-name-showicononly": "Alleen pictogram tonen",
     "mouse-pos/@description": "Laat de x/y-posities van je muisaanwijzer zien boven het speelveld in de editor.",
     "mouse-pos/@name": "Muispositie",
     "color-picker/@description": "Voegt hex-codeingangen toe aan kleurenkiezers.",

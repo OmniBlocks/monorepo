@@ -49,6 +49,7 @@
     "mute-project/@name": "プロジェクトをミュート",
     "clones/@description": "クローンの合計数をステージの上に表示する。",
     "clones/@name": "クローンカウンター",
+    "clones/@settings-name-showicononly": "アイコンのみ表示",
     "mouse-pos/@description": "ステージの上にマウスの座標を表示する。",
     "mouse-pos/@name": "マウスの座標",
     "color-picker/@description": "16進数カラーコードの入力欄を追加する。",

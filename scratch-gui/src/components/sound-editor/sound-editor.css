@@ -254,7 +254,7 @@ $border-radius: 0.25rem;
 
 .alert {
     margin-top: calc(2 * $space);
-    border-radius: $border-radius;
+    border-radius: 5px;
     padding: $space;
     display: flex;
     align-items: center;

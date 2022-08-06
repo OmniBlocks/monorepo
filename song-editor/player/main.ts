@@ -221,7 +221,7 @@ document.body.appendChild(
 		volumeSlider,
 		zoomButton,
 		volumeBarContainer,
-		oscilascope.canvas,
+		//oscilascope.canvas, //make it auto remove itself later
 		titleText,
 		editLink,
 		copyLink,

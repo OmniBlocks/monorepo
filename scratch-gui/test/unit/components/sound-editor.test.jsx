@@ -6,7 +6,9 @@ describe('Sound Editor Component', () => {
     let props;
     beforeEach(() => {
         props = {
+            isStereo: false,
             duration: 1,
+            size: 10507,
             canUndo: true,
             canRedo: false,
             chunkLevels: [1, 2, 3],

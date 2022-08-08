@@ -378,21 +378,22 @@ const SoundEditor = props => (
                 {` (${formatSoundSize(props.size)})`}
             </div>
         </div>
+        {/* TODO: don't know whether this should be > or >=. Using >= for now to be safe */}
+        {props.size >= SOUND_BYTE_LIMIT && (
+            <div className={classNames(styles.alert, styles.tooLarge)}>
+                <FormattedMessage
+                    defaultMessage="This sound may be too large to upload to Scratch."
+                    description="Message that appears when a sound exceeds the Scratch sound size limit."
+                    id="tw.tooLarge"
+                />
+            </div>
+        )}
         {props.isStereo && (
             <div className={classNames(styles.alert, styles.stereo)}>
                 <FormattedMessage
                     defaultMessage="Editing this stereo sound will irreversibly convert it to mono."
                     description="Message that appears when editing a stereo sound."
                     id="tw.stereoAlert"
-                />
-            </div>
-        )}
-        {props.size > SOUND_BYTE_LIMIT && (
-            <div className={classNames(styles.alert, styles.tooLarge)}>
-                <FormattedMessage
-                    defaultMessage="This sound may be too large to upload to Scratch."
-                    description="Message that appears when a sound exceeds the Scratch sound size limit."
-                    id="tw.tooLarge"
                 />
             </div>
         )}

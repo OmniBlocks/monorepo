@@ -372,10 +372,18 @@ const SoundEditor = props => (
         {props.isStereo && (
             <div className={classNames(styles.alert, styles.stereo)}>
                 <FormattedMessage
-                    // eslint-disable-next-line max-len
                     defaultMessage="Editing this stereo sound will irreversibly convert it to mono."
                     description="Message that appears when editing a stereo sound."
                     id="tw.stereoAlert"
+                />
+            </div>
+        )}
+        {props.tooLarge && (
+            <div className={classNames(styles.alert, styles.tooLarge)}>
+                <FormattedMessage
+                    defaultMessage="This sound may be too large to upload to Scratch."
+                    description="Message that appears when a sound exceeds the Scratch sound size limit."
+                    id="tw.tooLarge"
                 />
             </div>
         )}
@@ -385,6 +393,7 @@ const SoundEditor = props => (
 SoundEditor.propTypes = {
     isStereo: PropTypes.bool.isRequired,
     duration: PropTypes.number.isRequired,
+    tooLarge: PropTypes.bool.isRequired,
     sampleRate: PropTypes.number.isRequired,
     canPaste: PropTypes.bool.isRequired,
     canRedo: PropTypes.bool.isRequired,

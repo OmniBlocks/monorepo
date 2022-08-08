@@ -10,6 +10,7 @@ import Input from '../forms/input.jsx';
 import BufferedInputHOC from '../forms/buffered-input-hoc.jsx';
 import AudioSelector from '../../containers/audio-selector.jsx';
 import IconButton from '../icon-button/icon-button.jsx';
+import {SOUND_BYTE_LIMIT} from '../../lib/audio/audio-util.js';
 
 import styles from './sound-editor.css';
 
@@ -165,6 +166,13 @@ const formatDuration = (playheadPercent, trimStartPercent, trimEndPercent, durat
     const currentTime = progressInTrim * trimDuration;
 
     return `${formatTime(currentTime)} / ${formatTime(trimDuration)}`;
+};
+
+const formatSoundSize = bytes => {
+    if (bytes > 1000 * 1000) {
+        return `${(bytes / 1000 / 1000).toFixed(2)}MB`;
+    }
+    return `${(bytes / 1000).toFixed(2)}KB`;
 };
 
 const SoundEditor = props => (
@@ -367,6 +375,7 @@ const SoundEditor = props => (
                         id="tw.mono"
                     />
                 )}
+                {` (${formatSoundSize(props.size)})`}
             </div>
         </div>
         {props.isStereo && (
@@ -378,7 +387,7 @@ const SoundEditor = props => (
                 />
             </div>
         )}
-        {props.tooLarge && (
+        {props.size > SOUND_BYTE_LIMIT && (
             <div className={classNames(styles.alert, styles.tooLarge)}>
                 <FormattedMessage
                     defaultMessage="This sound may be too large to upload to Scratch."
@@ -393,7 +402,7 @@ const SoundEditor = props => (
 SoundEditor.propTypes = {
     isStereo: PropTypes.bool.isRequired,
     duration: PropTypes.number.isRequired,
-    tooLarge: PropTypes.bool.isRequired,
+    size: PropTypes.bool.isRequired,
     sampleRate: PropTypes.number.isRequired,
     canPaste: PropTypes.bool.isRequired,
     canRedo: PropTypes.bool.isRequired,

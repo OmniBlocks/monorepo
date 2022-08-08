@@ -10,8 +10,7 @@ import {
     computeChunkedRMS,
     encodeAndAddSoundToVM,
     downsampleIfNeeded,
-    dropEveryOtherSample,
-    SOUND_BYTE_LIMIT
+    dropEveryOtherSample
 } from '../lib/audio/audio-util.js';
 import AudioEffects from '../lib/audio/audio-effects.js';
 import SoundEditorComponent from '../components/sound-editor/sound-editor.jsx';
@@ -441,7 +440,7 @@ class SoundEditor extends React.Component {
             <SoundEditorComponent
                 isStereo={this.props.isStereo}
                 duration={this.props.duration}
-                tooLarge={this.props.tooLarge}
+                size={this.props.size}
                 sampleRate={this.props.sampleRate}
                 canPaste={this.state.copyBuffer !== null}
                 canRedo={this.redoStack.length > 0}
@@ -482,7 +481,7 @@ class SoundEditor extends React.Component {
 SoundEditor.propTypes = {
     isStereo: PropTypes.bool,
     duration: PropTypes.number,
-    tooLarge: PropTypes.bool,
+    size: PropTypes.number,
     isFullScreen: PropTypes.bool,
     name: PropTypes.string.isRequired,
     sampleRate: PropTypes.number,
@@ -501,7 +500,7 @@ const mapStateToProps = (state, {soundIndex}) => {
     return {
         isStereo: audioBuffer.numberOfChannels !== 1,
         duration: sound.sampleCount / sound.rate,
-        tooLarge: sound.asset.data.byteLength >= SOUND_BYTE_LIMIT,
+        size: sound.asset.data.byteLength,
         soundId: sound.soundId,
         sampleRate: audioBuffer.sampleRate,
         samples: audioBuffer.getChannelData(0),

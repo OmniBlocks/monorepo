@@ -341,7 +341,7 @@ exports[`Sound Editor Component matches snapshot 1`] = `
     className=""
   >
     <div
-      className={undefined}
+      className=""
     >
       <button
         className=""
@@ -355,190 +355,206 @@ exports[`Sound Editor Component matches snapshot 1`] = `
       </button>
     </div>
     <div
-      className=""
-      onClick={[Function]}
-      role="button"
+      className={undefined}
     >
-      <img
-        className={undefined}
-        draggable={false}
-        src="test-file-stub"
-      />
       <div
-        className={undefined}
+        className=""
+        onClick={[Function]}
+        role="button"
       >
-        <span>
-          Faster
-        </span>
+        <img
+          className={undefined}
+          draggable={false}
+          src="test-file-stub"
+        />
+        <div
+          className={undefined}
+        >
+          <span>
+            Faster
+          </span>
+        </div>
       </div>
-    </div>
-    <div
-      className=""
-      onClick={[Function]}
-      role="button"
-    >
-      <img
-        className={undefined}
-        draggable={false}
-        src="test-file-stub"
-      />
       <div
-        className={undefined}
+        className=""
+        onClick={[Function]}
+        role="button"
       >
-        <span>
-          Slower
-        </span>
+        <img
+          className={undefined}
+          draggable={false}
+          src="test-file-stub"
+        />
+        <div
+          className={undefined}
+        >
+          <span>
+            Slower
+          </span>
+        </div>
       </div>
-    </div>
-    <div
-      className=""
-      onClick={[Function]}
-      role="button"
-    >
-      <img
-        className={undefined}
-        draggable={false}
-        src="test-file-stub"
-      />
       <div
-        className={undefined}
+        className=""
+        onClick={[Function]}
+        role="button"
       >
-        <span>
-          Louder
-        </span>
+        <img
+          className={undefined}
+          draggable={false}
+          src="test-file-stub"
+        />
+        <div
+          className={undefined}
+        >
+          <span>
+            Louder
+          </span>
+        </div>
       </div>
-    </div>
-    <div
-      className=""
-      onClick={[Function]}
-      role="button"
-    >
-      <img
-        className={undefined}
-        draggable={false}
-        src="test-file-stub"
-      />
       <div
-        className={undefined}
+        className=""
+        onClick={[Function]}
+        role="button"
       >
-        <span>
-          Softer
-        </span>
+        <img
+          className={undefined}
+          draggable={false}
+          src="test-file-stub"
+        />
+        <div
+          className={undefined}
+        >
+          <span>
+            Softer
+          </span>
+        </div>
       </div>
-    </div>
-    <div
-      className=""
-      onClick={undefined}
-      role="button"
-    >
-      <img
-        className={undefined}
-        draggable={false}
-        src="test-file-stub"
-      />
       <div
-        className={undefined}
+        className=""
+        onClick={undefined}
+        role="button"
       >
-        <span>
-          Mute
-        </span>
+        <img
+          className={undefined}
+          draggable={false}
+          src="test-file-stub"
+        />
+        <div
+          className={undefined}
+        >
+          <span>
+            Mute
+          </span>
+        </div>
       </div>
-    </div>
-    <div
-      className=""
-      onClick={undefined}
-      role="button"
-    >
-      <img
-        className={undefined}
-        draggable={false}
-        src="test-file-stub"
-      />
       <div
-        className={undefined}
+        className=""
+        onClick={undefined}
+        role="button"
       >
-        <span>
-          Fade in
-        </span>
+        <img
+          className={undefined}
+          draggable={false}
+          src="test-file-stub"
+        />
+        <div
+          className={undefined}
+        >
+          <span>
+            Fade in
+          </span>
+        </div>
       </div>
-    </div>
-    <div
-      className=""
-      onClick={undefined}
-      role="button"
-    >
-      <img
-        className={undefined}
-        draggable={false}
-        src="test-file-stub"
-      />
       <div
-        className={undefined}
+        className=""
+        onClick={undefined}
+        role="button"
       >
-        <span>
-          Fade out
-        </span>
+        <img
+          className={undefined}
+          draggable={false}
+          src="test-file-stub"
+        />
+        <div
+          className={undefined}
+        >
+          <span>
+            Fade out
+          </span>
+        </div>
       </div>
-    </div>
-    <div
-      className=""
-      onClick={[Function]}
-      role="button"
-    >
-      <img
-        className={undefined}
-        draggable={false}
-        src="test-file-stub"
-      />
       <div
-        className={undefined}
+        className=""
+        onClick={[Function]}
+        role="button"
       >
-        <span>
-          Reverse
-        </span>
+        <img
+          className={undefined}
+          draggable={false}
+          src="test-file-stub"
+        />
+        <div
+          className={undefined}
+        >
+          <span>
+            Reverse
+          </span>
+        </div>
       </div>
-    </div>
-    <div
-      className=""
-      onClick={[Function]}
-      role="button"
-    >
-      <img
-        className={undefined}
-        draggable={false}
-        src="test-file-stub"
-      />
       <div
-        className={undefined}
+        className=""
+        onClick={[Function]}
+        role="button"
       >
-        <span>
-          Robot
-        </span>
+        <img
+          className={undefined}
+          draggable={false}
+          src="test-file-stub"
+        />
+        <div
+          className={undefined}
+        >
+          <span>
+            Robot
+          </span>
+        </div>
       </div>
-    </div>
-    <div
-      className=""
-      onClick={[Function]}
-      role="button"
-    >
-      <img
-        className={undefined}
-        draggable={false}
-        src="test-file-stub"
-      />
       <div
-        className={undefined}
+        className=""
+        onClick={[Function]}
+        role="button"
       >
-        <span>
-          Echo
-        </span>
+        <img
+          className={undefined}
+          draggable={false}
+          src="test-file-stub"
+        />
+        <div
+          className={undefined}
+        >
+          <span>
+            Echo
+          </span>
+        </div>
       </div>
     </div>
   </div>
   <div
     className={undefined}
   >
-    00:00.30 / 00:00.60
+    <div
+      className={undefined}
+    >
+      00:00.30 / 00:00.60
+    </div>
+    <div
+      className={undefined}
+    >
+      Hz 
+      <span>
+        Mono
+      </span>
+    </div>
   </div>
 </div>
 `;

@@ -500,7 +500,7 @@ const mapStateToProps = (state, {soundIndex}) => {
     return {
         isStereo: audioBuffer.numberOfChannels !== 1,
         duration: sound.sampleCount / sound.rate,
-        size: sound.asset.data.byteLength,
+        size: sound.asset ? sound.asset.data.byteLength : 0,
         soundId: sound.soundId,
         sampleRate: audioBuffer.sampleRate,
         samples: audioBuffer.getChannelData(0),

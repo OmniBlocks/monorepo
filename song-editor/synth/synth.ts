@@ -8862,7 +8862,7 @@ export class Synth {
 
 
             const carrierCount: number = (instrument.type == InstrumentType.fm6op ? instrument.customAlgorithm.carrierCount : Config.algorithms[instrument.algorithm].carrierCount);
-            for (let i: number = 0; i < (instrument.type == InstrumentType.fm6op?6: Config.operatorCount); i++) {
+            for (let i: number = 0; i < (instrument.type == InstrumentType.fm6op? 6 : Config.operatorCount); i++) {
 
                 const associatedCarrierIndex: number = (instrument.type == InstrumentType.fm6op ? instrument.customAlgorithm.associatedCarrier[i]-1:Config.algorithms[instrument.algorithm].associatedCarrier[i] - 1);
                 const pitch: number = tone.pitches[arpeggiates ? 0 : ((i < tone.pitchCount) ? i : ((associatedCarrierIndex < tone.pitchCount) ? associatedCarrierIndex : 0))];
@@ -8876,6 +8876,7 @@ export class Synth {
                 const targetFreqStart: number = freqMult * baseFreqStart + hzOffset;
                 const targetFreqEnd: number = freqMult * baseFreqEnd + hzOffset;
 
+                
                 const freqEnvelopeStart: number = envelopeStarts[EnvelopeComputeIndex.operatorFrequency0 + i];
                 const freqEnvelopeEnd: number = envelopeEnds[EnvelopeComputeIndex.operatorFrequency0 + i];
                 let freqStart: number;

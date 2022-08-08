@@ -3,13 +3,13 @@
 import { Dictionary, DictionaryArray, EnvelopeType, InstrumentType, Transition, Chord, Envelope, Config } from "../synth/SynthConfig";
 import { ColorConfig } from "../editor/ColorConfig";
 import { NotePin, Note, Pattern, Instrument, Channel, Synth } from "../synth/synth";
-//import { oscilascopeCanvas } from "../global/Oscilascope";
+import { oscilascopeCanvas } from "../global/Oscilascope";
 import { HTML, SVG } from "imperative-html/dist/esm/elements-strict";
 
-	const {a, button, div, h1, input, /*canvas*/} = HTML;
+	const {a, button, div, h1, input, canvas} = HTML;
 	const {svg, circle, rect, path} = SVG;
 
-	//const isMobile: boolean = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|android|ipad|playbook|silk/i.test(navigator.userAgent);
+	const isMobile: boolean = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|android|ipad|playbook|silk/i.test(navigator.userAgent);
 
 	document.head.appendChild(HTML.style({type: "text/css"}, `
 	body {
@@ -149,8 +149,8 @@ import { HTML, SVG } from "imperative-html/dist/esm/elements-strict";
 		cursor: pointer;
 	}
 `));
-
-ColorConfig.setTheme("jummbox classic");
+let aaa: string|null = window.localStorage.getItem("colorTheme");
+ColorConfig.setTheme(aaa===null?"jummbox classic":aaa);
 
 let prevHash: string | null = null;
 let id: string = ((Math.random() * 0xffffffff) >>> 0).toString(16);
@@ -162,7 +162,7 @@ let outVolumeHistoricTimer: number = 0;
 let outVolumeHistoricCap: number = 0;
 
 const synth: Synth = new Synth();
-//const oscilascope: oscilascopeCanvas = new oscilascopeCanvas(canvas({ width: isMobile? 144:288, height: isMobile?32:64, style: "border:2px solid " + ColorConfig.uiWidgetBackground, id: "oscilascopeAll" }), isMobile?1:2);
+const oscilascope: oscilascopeCanvas = new oscilascopeCanvas(canvas({ width: isMobile? 144:288, height: isMobile?32:64, style: `border:2px solid ${ColorConfig.uiWidgetBackground}; overflow: hidden;` , id: "oscilascopeAll" }), isMobile?1:2);
 let titleText: HTMLHeadingElement = h1({ style: "flex-grow: 1; margin: 0 1px; margin-left: 10px; overflow: hidden;" }, "");
 	let editLink: HTMLAnchorElement = a({target: "_top", style: "margin: 0 4px;"}, "✎ Edit");
 	let copyLink: HTMLAnchorElement = a({href: "javascript:void(0)", style: "margin: 0 4px;"}, "⎘ Copy URL");
@@ -211,7 +211,6 @@ const volumeBarContainer: SVGSVGElement = SVG.svg({ style: `touch-action: none; 
 	outVolumeBar,
 	outVolumeCap,
 );
-
 document.body.appendChild(visualizationContainer);
 document.body.appendChild(
 		div({style: `flex-shrink: 0; height: 20vh; min-height: 22px; max-height: 70px; display: flex; align-items: center;`},
@@ -221,7 +220,7 @@ document.body.appendChild(
 		volumeSlider,
 		zoomButton,
 		volumeBarContainer,
-		//oscilascope.canvas, //make it auto remove itself later
+		oscilascope.canvas, //make it auto remove itself later
 		titleText,
 		editLink,
 		copyLink,

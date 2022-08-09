@@ -77,19 +77,14 @@ const encodeAndAddSoundToVM = function (vm, samples, sampleRate, name, callback)
  */
 const downsampleIfNeeded = (buffer, resampler) => {
     const {samples, sampleRate} = buffer;
-    const duration = samples.length / sampleRate;
     const encodedByteLength = samples.length * 2; /* bitDepth 16 bit */
     // Resolve immediately if already within byte limit
     if (encodedByteLength < SOUND_BYTE_LIMIT) {
         return Promise.resolve({samples, sampleRate});
     }
-    // If encodeable at 22khz, resample and call submitNewSamples again
-    if (duration * 22050 * 2 < SOUND_BYTE_LIMIT) {
-        return resampler({samples, sampleRate}, 22050);
-    }
-    // Cannot save this sound at 22khz, refuse to edit
-    // In the future we could introduce further compression here
-    return Promise.reject(new Error('Sound too large to save, refusing to edit'));
+    // TW: Don't check if the sound will still fit at this reduced sample rate.
+    // Instead the GUI will show a warning if it's too large.
+    return resampler({samples, sampleRate}, 22050);
 };
 
 /**

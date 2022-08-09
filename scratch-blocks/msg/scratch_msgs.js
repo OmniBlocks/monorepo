@@ -6206,8 +6206,8 @@ Blockly.ScratchMsgs.locales["fa"] =
     "OPERATORS_MATHOP_ATAN": "atan",
     "OPERATORS_MATHOP_LN": "ln",
     "OPERATORS_MATHOP_LOG": "log",
-    "OPERATORS_MATHOP_EEXP": "توان e",
-    "OPERATORS_MATHOP_10EXP": "توان 10",
+    "OPERATORS_MATHOP_EEXP": "e به توان",
+    "OPERATORS_MATHOP_10EXP": "۱۰ به توان",
     "PROCEDURES_DEFINITION": "تعریف %1",
     "SENSING_TOUCHINGOBJECT": "خوردی به %1 ؟",
     "SENSING_TOUCHINGOBJECT_POINTER": "اشاره‌گر ماوس",
@@ -10046,9 +10046,9 @@ Blockly.ScratchMsgs.locales["it"] =
     "DEFAULT_LIST_ITEM": "cosa",
     "DELETE_LIST": "Cancella la lista \"%1\"",
     "RENAME_LIST": "Rinomina lista",
-    "NEW_BROADCAST_MESSAGE": "Nuovo messaggio",
+    "NEW_BROADCAST_MESSAGE": "Nuovo messaggio...",
     "NEW_BROADCAST_MESSAGE_TITLE": "Nome del nuovo messaggio:",
-    "BROADCAST_MODAL_TITLE": "Nuovo Messaggio",
+    "BROADCAST_MODAL_TITLE": "Nuovo Messaggio...",
     "DEFAULT_BROADCAST_MESSAGE_NAME": "messaggio1"
 };
 
@@ -16757,7 +16757,7 @@ Blockly.ScratchMsgs.locales["pt-br"] =
     "MOTION_MOVESTEPS": "mova %1 passos",
     "MOTION_TURNLEFT": "gire %1 %2 graus",
     "MOTION_TURNRIGHT": "gire %1 %2 graus",
-    "MOTION_POINTINDIRECTION": "aponte  para a direção %1",
+    "MOTION_POINTINDIRECTION": "aponte para a direção %1",
     "MOTION_POINTTOWARDS": "aponte para %1",
     "MOTION_POINTTOWARDS_POINTER": "ponteiro do mouse",
     "MOTION_POINTTOWARDS_RANDOM": "direção aleatória",

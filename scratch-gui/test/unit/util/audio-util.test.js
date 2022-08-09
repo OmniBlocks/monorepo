@@ -71,7 +71,8 @@ describe('downsampleIfNeeded', () => {
         expect(resampler).toHaveBeenCalledWith({samples, sampleRate}, 22050);
         expect(res).toEqual('TEST');
     });
-    test('fails if resampling would not put it under the limit', async () => {
+    // TW: We allow resampling even if it would exceed the limit because our GUI handles this better.
+    test.skip('fails if resampling would not put it under the limit', async () => {
         samples.length = 44100 * 4 * 60;
         try {
             await downsampleIfNeeded({samples, sampleRate}, null);

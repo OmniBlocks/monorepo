@@ -147,7 +147,7 @@ import { HTML, SVG } from "imperative-html/dist/esm/elements-strict";
 	}
 `));
 
-ColorConfig.setTheme("jummbox classic");
+ColorConfig.setTheme(window.localStorage.getItem("colorTheme") || "jummbox classic");
 
 let prevHash: string | null = null;
 let id: string = ((Math.random() * 0xffffffff) >>> 0).toString(16);

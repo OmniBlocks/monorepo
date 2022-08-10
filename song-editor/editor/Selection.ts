@@ -725,6 +725,9 @@ export class Selection {
         }
 
         for (const channelIndex of this._eachSelectedChannel()) {
+            // Can't transpose mod channels.
+            if (channelIndex >= this._doc.song.pitchChannelCount + this._doc.song.noiseChannelCount)
+                continue;
             for (const pattern of this._eachSelectedPattern(channelIndex)) {
                 this._changeTranspose.append(new ChangeTranspose(this._doc, channelIndex, pattern, upward, this._doc.prefs.notesOutsideScale, octave));
 			}

@@ -162,6 +162,16 @@
         "tagBeta": "בטא",
         "tagNew": "חָדָשׁ!"
     },
+    "hu": {
+        "reset": "Visszaállítás"
+    },
+    "id": {
+        "export": "Pengaturan Export",
+        "import": "Pengaturan Import",
+        "reset": "Mengatur Ulang ",
+        "search": "Cari",
+        "tagRecommended": "Di Rekomendasikan"
+    },
     "it": {
         "addonFeedback": "Feedback sull'Addon",
         "confirmResetAll": "Sei sicuro di voler riportare tutte le impostazioni dell'addon al loro stato iniziale?",

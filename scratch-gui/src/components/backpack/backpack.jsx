@@ -90,13 +90,15 @@ const Backpack = ({
                 onMouseEnter={onMouseEnter}
                 onMouseLeave={onMouseLeave}
             >
-                {error ? (
+                {/* eslint-disable-next-line no-negated-condition */}
+                {error !== false ? (
                     <div className={styles.statusMessage}>
                         <FormattedMessage
                             defaultMessage="Error loading backpack"
                             description="Error backpack message"
                             id="gui.backpack.errorBackpack"
                         />
+                        <div className={styles.errorMessage}>{error}</div>
                     </div>
                 ) : (
                     loading ? (
@@ -166,7 +168,7 @@ Backpack.propTypes = {
         name: PropTypes.string
     })),
     dragOver: PropTypes.bool,
-    error: PropTypes.bool,
+    error: PropTypes.oneOf([PropTypes.bool, PropTypes.string]),
     expanded: PropTypes.bool,
     intl: intlShape,
     loading: PropTypes.bool,

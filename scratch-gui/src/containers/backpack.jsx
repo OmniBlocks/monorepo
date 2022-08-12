@@ -93,6 +93,14 @@ class Backpack extends React.Component {
             this.getContents();
         }
     }
+    handleError (error) {
+        this.setState({
+            error: `${error}`,
+            loading: false
+        });
+        // Log error to console and make the Promise reject.
+        throw error;
+    }
     handleDrop (dragInfo) {
         let payloader = null;
         let presaveAsset = null;
@@ -143,8 +151,7 @@ class Backpack extends React.Component {
                     });
                 })
                 .catch(error => {
-                    this.setState({error: true, loading: false});
-                    throw error;
+                    this.handleError(error);
                 });
         });
     }
@@ -163,8 +170,7 @@ class Backpack extends React.Component {
                     });
                 })
                 .catch(error => {
-                    this.setState({error: true, loading: false});
-                    throw error;
+                    this.handleError(error);
                 });
         });
     }
@@ -191,8 +197,7 @@ class Backpack extends React.Component {
                     });
                 })
                 .catch(error => {
-                    this.setState({error: true, loading: false});
-                    throw error;
+                    this.handleError(error);
                 });
         });
     }
@@ -214,8 +219,7 @@ class Backpack extends React.Component {
                         });
                     })
                     .catch(error => {
-                        this.setState({error: true, loading: false});
-                        throw error;
+                        this.handleError(error);
                     });
             });
         }

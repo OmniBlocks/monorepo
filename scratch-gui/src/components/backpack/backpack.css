@@ -71,6 +71,10 @@
     color: $text-primary;
 }
 
+.error-message {
+    font-family: monospace;
+}
+
 .backpack-item {
     width: 4rem;
     height: 4.5rem;

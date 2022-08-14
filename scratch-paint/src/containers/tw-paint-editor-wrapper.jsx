@@ -17,17 +17,23 @@ class TWPaintEditorWrapper extends React.Component {
     }
     componentWillUpdate (nextProps) {
         if (this.props.width !== nextProps.width || this.props.height !== nextProps.height) {
-            this.props.resetZoomLevels();
+            this.props.onResetZoomLevels();
             this.setState({
                 key: this.state.key + 1
             });
         }
     }
     render () {
+        const {
+            /* eslint-disable no-unused-vars */
+            onResetZoomLevels,
+            /* eslint-enable no-unused-vars */
+            ...props
+        } = this.props;
         return (
             <PaintEditor
                 key={this.state.key}
-                {...this.props}
+                {...props}
             />
         );
     }
@@ -36,12 +42,12 @@ class TWPaintEditorWrapper extends React.Component {
 TWPaintEditorWrapper.propTypes = {
     width: PropTypes.number,
     height: PropTypes.number,
-    resetZoomLevels: PropTypes.func
+    onResetZoomLevels: PropTypes.func
 };
 
 const mapStateToProps = () => ({});
 const mapDispatchToProps = dispatch => ({
-    resetZoomLevels: () => dispatch(resetZoomLevels())
+    onResetZoomLevels: () => dispatch(resetZoomLevels())
 });
 
 export default connect(

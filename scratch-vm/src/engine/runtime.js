@@ -1,5 +1,6 @@
 const EventEmitter = require('events');
 const {OrderedMap} = require('immutable');
+const ExtendedJSON = require('@turbowarp/json');
 
 const ArgumentType = require('../extension-support/argument-type');
 const Blocks = require('./blocks');
@@ -17,7 +18,6 @@ const StageLayering = require('./stage-layering');
 const Variable = require('./variable');
 const xmlEscape = require('../util/xml-escape');
 const ScratchLinkWebSocket = require('../util/scratch-link-websocket');
-const ExtendedJSON = require('../util/tw-extended-json');
 
 // Virtual I/O devices.
 const Clock = require('../io/clock');

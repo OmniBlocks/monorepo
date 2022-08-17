@@ -21,6 +21,7 @@ import _bitmap_copy from "../addons/bitmap-copy/_manifest_entry.js";
 import _2d_color_picker from "../addons/2d-color-picker/_manifest_entry.js";
 import _better_img_uploads from "../addons/better-img-uploads/_manifest_entry.js";
 import _custom_block_shape from "../addons/custom-block-shape/_manifest_entry.js";
+import _zebra_striping from "../addons/zebra-striping/_manifest_entry.js";
 import _editor_theme3 from "../addons/editor-theme3/_manifest_entry.js";
 import _custom_block_text from "../addons/custom-block-text/_manifest_entry.js";
 import _editor_colored_context_menus from "../addons/editor-colored-context-menus/_manifest_entry.js";
@@ -82,6 +83,7 @@ export default {
   "2d-color-picker": _2d_color_picker,
   "better-img-uploads": _better_img_uploads,
   "custom-block-shape": _custom_block_shape,
+  "zebra-striping": _zebra_striping,
   "editor-theme3": _editor_theme3,
   "custom-block-text": _custom_block_text,
   "editor-colored-context-menus": _editor_colored_context_menus,

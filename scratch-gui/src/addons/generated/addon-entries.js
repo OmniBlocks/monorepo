@@ -22,6 +22,7 @@ export default {
   "2d-color-picker": () => import(/* webpackChunkName: "addon-entry-2d-color-picker" */ "../addons/2d-color-picker/_runtime_entry.js"),
   "better-img-uploads": () => import(/* webpackChunkName: "addon-entry-better-img-uploads" */ "../addons/better-img-uploads/_runtime_entry.js"),
   "custom-block-shape": () => import(/* webpackChunkName: "addon-entry-custom-block-shape" */ "../addons/custom-block-shape/_runtime_entry.js"),
+  "zebra-striping": () => import(/* webpackChunkName: "addon-entry-zebra-striping" */ "../addons/zebra-striping/_runtime_entry.js"),
   "editor-theme3": () => import(/* webpackChunkName: "addon-entry-editor-theme3" */ "../addons/editor-theme3/_runtime_entry.js"),
   "custom-block-text": () => import(/* webpackChunkName: "addon-entry-custom-block-text" */ "../addons/custom-block-text/_runtime_entry.js"),
   "editor-colored-context-menus": () => import(/* webpackChunkName: "addon-entry-editor-colored-context-menus" */ "../addons/editor-colored-context-menus/_runtime_entry.js"),

@@ -23,6 +23,7 @@ const addons = [
     '2d-color-picker',
     'better-img-uploads',
     'custom-block-shape',
+    'zebra-striping',
     'editor-theme3',
     'custom-block-text',
     'editor-colored-context-menus',
@@ -64,8 +65,7 @@ const addons = [
 ];
 
 const newAddons = [
-    'hide-stage',
-    'editor-buttons-reverse-order'
+    'zebra-striping'
 ];
 
 // eslint-disable-next-line import/no-commonjs

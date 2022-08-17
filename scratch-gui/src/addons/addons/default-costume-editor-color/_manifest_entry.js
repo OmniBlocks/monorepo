@@ -46,9 +46,7 @@ const manifest = {
       "default": true
     }
   ],
-  "tags": [
-    "beta"
-  ],
+  "tags": [],
   "dynamicDisable": true,
   "enabledByDefault": false
 };

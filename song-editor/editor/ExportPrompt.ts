@@ -316,8 +316,8 @@ export class ExportPrompt implements Prompt {
             }
         }
 
-        this.synth.warmUpSynthesizer(this._doc.song);
         this.synth.computeLatestModValues();
+        this.synth.warmUpSynthesizer(this._doc.song);
 
         this.sampleFrames = this.synth.getTotalSamples(this._enableIntro.checked, this._enableOutro.checked, this.synth.loopRepeatCount);
         // Compute how many UI updates will need to run to determine how many 

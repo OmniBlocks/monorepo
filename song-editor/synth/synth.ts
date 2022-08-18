@@ -6225,6 +6225,10 @@ export class Synth {
 
             }
         }
+        var dummyArray = new Float32Array(1);
+        this.isPlayingSong = true;
+        this.synthesize(dummyArray, dummyArray, 1, true);
+        this.isPlayingSong = false;
     }
 
     public computeLatestModValues(): void {
@@ -6827,10 +6831,10 @@ export class Synth {
 
     public play(): void {
         if (this.isPlayingSong) return;
+        this.computeLatestModValues();
+        this.warmUpSynthesizer(this.song);
         this.isPlayingSong = true;
         this.activateAudio();
-        this.warmUpSynthesizer(this.song);
-        this.computeLatestModValues();
     }
 
     public pause(): void {
@@ -7031,6 +7035,7 @@ export class Synth {
         this.part = 0;
         this.tick = 0;
         this.tickSampleCountdown = samplesPerTick;
+        this.isAtStartOfTick = true;
 
         if (this.loopRepeatCount != 0 && this.bar == this.song.loopStart + this.song.loopLength) {
             this.bar = this.song.loopStart;
@@ -7121,6 +7126,8 @@ export class Synth {
         const limitDecay: number = 1.0 - Math.pow(0.5, 4.0 / this.samplesPerSecond);
         const limitRise: number = 1.0 - Math.pow(0.5, 4000.0 / this.samplesPerSecond);
         let limit: number = +this.limit;
+        let skippedBars: number[] = [];
+        let firstSkippedBufferIndex: number = -1;
 
         let bufferIndex: number = 0;
         while (bufferIndex < outputBufferLength && !ended) {
@@ -7132,7 +7139,7 @@ export class Synth {
             const samplesLeftInTick: number = Math.ceil(this.tickSampleCountdown);
             const runLength: number = Math.min(samplesLeftInTick, samplesLeftInBuffer);
             const runEnd: number = bufferIndex + runLength;
-
+            
             // Handle mod synth
             if (this.isPlayingSong || this.renderingSong) {
                 for (let channelIndex: number = song.pitchChannelCount + song.noiseChannelCount; channelIndex < song.getChannelCount(); channelIndex++) {
@@ -7154,8 +7161,20 @@ export class Synth {
 
             // Handle next bar mods if they were set
             if (this.wantToSkip) {
+                // Unable to continue, as we have skipped back to a previously visited bar without generating new samples, which means we are infinitely skipping.
+                // In this case processing will return before the designated number of samples are processed. In other words, silence will be generated.
+                let barVisited: boolean = skippedBars.includes(this.bar);
+                if (barVisited && bufferIndex == firstSkippedBufferIndex)
+                    return;
+                if (firstSkippedBufferIndex == -1) {
+                    firstSkippedBufferIndex = bufferIndex;
+                }
+                if (!barVisited)
+                    skippedBars.push(this.bar);
+                
                 this.wantToSkip = false;
                 this.skipBar();
+                continue;
             }
 
             for (let channelIndex: number = 0; channelIndex < song.pitchChannelCount + song.noiseChannelCount; channelIndex++) {
@@ -8393,7 +8412,6 @@ export class Synth {
             }
         }
 
-
         if (instrument.type == InstrumentType.drumset && tone.drumsetPitch == null) {
             // It's possible that the note will change while the user is editing it,
             // but the tone's pitches don't get updated because the tone has already
@@ -8844,7 +8862,8 @@ export class Synth {
         const wave: Float32Array = instrumentState.wave!;
         const volumeScale = instrumentState.volumeScale;
 
-        const waveLength: number = wave.length - 1; // The first sample is duplicated at the end, don't double-count it.
+        // For all but aliasing custom chip, the first sample is duplicated at the end, so don't double-count it.
+        const waveLength: number = (aliases && instrumentState.type == InstrumentType.customChipWave) ? wave.length : wave.length - 1;
 
         const unisonSign: number = tone.specialIntervalExpressionMult * instrumentState.unison!.sign;
         if (instrumentState.unison!.voices == 1 && !instrumentState.chord!.customInterval) tone.phases[1] = tone.phases[0];
@@ -8910,14 +8929,14 @@ export class Synth {
                 inputSample = waveA + waveB * unisonSign;
             }
 
-            const sample: number = applyFilters(inputSample, initialFilterInput1, initialFilterInput2, filterCount, filters);
+            const sample: number = applyFilters(inputSample * volumeScale, initialFilterInput1, initialFilterInput2, filterCount, filters);
             initialFilterInput2 = initialFilterInput1;
-            initialFilterInput1 = inputSample;
+            initialFilterInput1 = inputSample * volumeScale;
 
             phaseDeltaA *= phaseDeltaScaleA;
             phaseDeltaB *= phaseDeltaScaleB;
 
-            const output: number = sample * expression * volumeScale;
+            const output: number = sample * expression;
             expression += expressionDelta;
 
             data[sampleIndex] += output;

@@ -2167,7 +2167,7 @@ export class ChangeAddChannelInstrument extends Change {
                     let modInstrument: number = instrument.modInstruments[mod];
                     let modChannel: number = instrument.modChannels[mod];
 
-                    if (modInstrument >= doc.song.channels[channelIndex].instruments.length && modChannel == doc.channel) {
+                    if (modChannel == doc.channel && modInstrument >= doc.song.channels[modChannel].instruments.length-1 ) {
                         instrument.modInstruments[mod]++;
                     }
                 }
@@ -2214,12 +2214,12 @@ export class ChangeRemoveChannelInstrument extends Change {
                     let modChannel: number = instrument.modChannels[mod];
 
                     if (modChannel == doc.channel) {
-                        // Boundary checking - check if setting was 'all' or 'active' previously
-                        if (modInstrument > doc.song.channels[channelIndex].instruments.length) {
+                        // Boundary checking - check if setting was previously higher index
+                        if (modInstrument > removedIndex) {
                             instrument.modInstruments[mod]--;
                         }
                         // Boundary checking - check if setting was set to the last instrument before splice
-                        else if (modInstrument == doc.song.channels[channelIndex].instruments.length) {
+                        else if (modInstrument == removedIndex) {
                             instrument.modInstruments[mod] = 0;
                             instrument.modulators[mod] = 0;
                         }

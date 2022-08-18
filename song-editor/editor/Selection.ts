@@ -142,14 +142,14 @@ export class Selection {
             if (digit == "0") digit = "10";
             this.instrumentDigits += digit;
             var parsed = parseInt(this.instrumentDigits);
-            var pattern: Pattern | null = this._doc.getCurrentPattern();
-            if (pattern != null && parsed != 0 && parsed <= this._doc.song.channels[this._doc.channel].instruments.length) {
+            //var pattern: Pattern | null = this._doc.getCurrentPattern();
+            if (parsed != 0 && parsed <= this._doc.song.channels[this._doc.channel].instruments.length) {
                 this.selectInstrument(parsed - 1);
                 return;
             }
             this.instrumentDigits = digit;
             parsed = parseInt(this.instrumentDigits);
-            if (pattern != null && parsed != 0 && parsed <= this._doc.song.channels[this._doc.channel].instruments.length) {
+            if (parsed != 0 && parsed <= this._doc.song.channels[this._doc.channel].instruments.length) {
                 this.selectInstrument(parsed - 1);
                 return;
             }
@@ -795,7 +795,8 @@ export class Selection {
                         this._changeInstrument.append(new ChangeSetPatternInstruments(this._doc, channelIndex, instruments, pattern));
                     }
                 }
-                this._doc.record(this._changeInstrument, canReplaceLastChange);
+                if (!this._changeInstrument.isNoop())
+                    this._doc.record(this._changeInstrument, canReplaceLastChange);
             }
         } else {
             const canReplaceLastChange: boolean = this._doc.lastChangeWas(this._changeInstrument);

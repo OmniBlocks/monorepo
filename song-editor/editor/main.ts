@@ -100,7 +100,8 @@ if (!isMobile && doc.prefs.autoPlay) {
 		// Wait until the tab is visible to autoplay:
 		window.addEventListener("visibilitychange", autoplay);
 	} else {
-		autoplay();
+		// Can't call this immediately, as main.ts needs to finish executing for the beepbox namespace to finish being declared.
+		window.setTimeout(autoplay);
 	}
 }
 

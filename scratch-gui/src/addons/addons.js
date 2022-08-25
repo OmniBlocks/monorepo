@@ -22,6 +22,7 @@ const addons = [
     'bitmap-copy',
     '2d-color-picker',
     'better-img-uploads',
+    'pick-colors-from-stage',
     'custom-block-shape',
     'zebra-striping',
     'editor-theme3',
@@ -65,6 +66,7 @@ const addons = [
 ];
 
 const newAddons = [
+    'pick-colors-from-stage',
     'zebra-striping'
 ];
 

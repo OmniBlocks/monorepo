@@ -21,6 +21,7 @@ export default {
   "bitmap-copy": () => import(/* webpackChunkName: "addon-default-entry" */ "../addons/bitmap-copy/_runtime_entry.js"),
   "2d-color-picker": () => import(/* webpackChunkName: "addon-entry-2d-color-picker" */ "../addons/2d-color-picker/_runtime_entry.js"),
   "better-img-uploads": () => import(/* webpackChunkName: "addon-entry-better-img-uploads" */ "../addons/better-img-uploads/_runtime_entry.js"),
+  "pick-colors-from-stage": () => import(/* webpackChunkName: "addon-default-entry" */ "../addons/pick-colors-from-stage/_runtime_entry.js"),
   "custom-block-shape": () => import(/* webpackChunkName: "addon-entry-custom-block-shape" */ "../addons/custom-block-shape/_runtime_entry.js"),
   "zebra-striping": () => import(/* webpackChunkName: "addon-entry-zebra-striping" */ "../addons/zebra-striping/_runtime_entry.js"),
   "editor-theme3": () => import(/* webpackChunkName: "addon-entry-editor-theme3" */ "../addons/editor-theme3/_runtime_entry.js"),

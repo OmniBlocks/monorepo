@@ -1,9 +1,6 @@
-scratch-render modified for use in [TurboWarp](https://turbowarp.org/)
+# TurboWarp/scratch-render
 
-Changes to upstream:
-
- - faster pen line rendering (by buffering)
- - "High Quality Render"/"High Quality Pen" mode
+scratch-render modified for use in [TurboWarp](https://turbowarp.org/). We've optimized some operations and added a lot of options.
 
 ## Setup
 
@@ -13,9 +10,16 @@ If you just want to play with the render then it's the same process as upstream 
 
 ## API
 
-Compatible with upstream scratch-render.
+Public APIs are compatible with a vanilla scratch-render. TurboWarp/scratch-render is a drop-in replacement for scratch-render.
 
-Renderer.setUseHighQualityRender(boolean) toggles high quality rendering. A UseHighQualityRenderChanged event is emitted on the renderer when this is called.
+Notable public API additions include:
+
+ - `renderer.setUseHighQualityRender(enabled: boolean)` toggles high quality rendering. A `UseHighQualityRenderChanged` event is emitted on the renderer when this is called. You can read the current setting with `renderer.useHighQualityRender` but don't try to directly modify this value.
+ - `renderer.markSkinAsPrivate(skinID: number)` marks a skin as "private".
+ - `renderer.allowPrivateSkinAccess` controls whether blocks like "touching color" can access "private" skins.
+ - `renderer.offscreenTouching` controls whether collision blocks work offscreen.
+ - Skins no longer extend EventEmitter
+ - `RenderWebGL.powerPreference` can be set to change the WebGL powerPreference option for future RenderWebGL instances. (default, high-performance, or low-power)
 
 <!--
 

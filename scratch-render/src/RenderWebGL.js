@@ -116,7 +116,12 @@ class RenderWebGL extends EventEmitter {
      * @private
      */
     static _getContext (canvas) {
-        const contextAttribs = {alpha: false, stencil: true, antialias: false};
+        const contextAttribs = {
+            alpha: false,
+            stencil: true,
+            antialias: false,
+            powerPreference: RenderWebGL.powerPreference
+        };
         // getWebGLContext = try WebGL 1.0 only
         // getContext = try WebGL 2.0 and if that doesn't work, try WebGL 1.0
         // getWebGLContext || getContext = try WebGL 1.0 and if that doesn't work, try WebGL 2.0
@@ -2176,5 +2181,12 @@ RenderWebGL.UseGpuModes = {
      */
     ForceCPU: 'ForceCPU'
 };
+
+/**
+ * WebGL powerPreference used for future RenderWebGL instances.
+ * The power preference of a renderer cannot be changed after instantiation.
+ * @type {'default'|'high-performance'|'low-power'}
+ */
+RenderWebGL.powerPreference = 'default';
 
 module.exports = RenderWebGL;

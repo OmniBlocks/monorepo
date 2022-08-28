@@ -453,7 +453,10 @@ class PenSkin extends Skin {
     onNativeSizeChanged (event) {
         // tw: keep track of native size
         this._nativeSize = event.newSize;
-        this._setCanvasSize(event.newSize);
+        this._setCanvasSize([
+            event.newSize[0] * this.renderQuality,
+            event.newSize[1] * this.renderQuality
+        ]);
         this.emitWasAltered();
     }
 

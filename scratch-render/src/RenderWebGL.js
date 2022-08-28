@@ -306,7 +306,6 @@ class RenderWebGL extends EventEmitter {
      * @param {int} pixelsTall The desired height in device-independent pixels.
      */
     resize (pixelsWide, pixelsTall) {
-        this.dirty = true;
         const {canvas} = this._gl;
         const pixelRatio = window.devicePixelRatio || 1;
         const newWidth = pixelsWide * pixelRatio;
@@ -318,6 +317,7 @@ class RenderWebGL extends EventEmitter {
             canvas.width = newWidth;
             canvas.height = newHeight;
             // Resizing the canvas causes it to be cleared, so redraw it.
+            this.dirty = true;
             this.draw();
 
             this._updateRenderQuality();

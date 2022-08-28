@@ -6,6 +6,39 @@ import {ART_BOARD_WIDTH, ART_BOARD_HEIGHT, CENTER, MAX_WORKSPACE_BOUNDS} from '.
 import Formats from '../lib/format';
 import log from '../log/log';
 
+/**
+ * @param {string|CanvasGradient} color The canvas's fillStyle.
+ * @returns {boolean} True if the style will require using a mask to draw.
+ */
+const doesColorRequireMask = color => (
+    color instanceof CanvasGradient ||
+    color.startsWith('rgba(') ||
+    (color.startsWith('#') && color.length > 7)
+);
+
+const createMaskingCanvas = (originalContext, fillStyle) => {
+    const originalCanvas = originalContext.canvas;
+    if (doesColorRequireMask(fillStyle)) {
+        const tempCanvas = createCanvas(originalCanvas.width, originalCanvas.height);
+        const tempContext = tempCanvas.getContext('2d');
+        return {
+            context: tempContext,
+            unmask: () => {
+                tempContext.globalCompositeOperation = 'source-in';
+                tempContext.fillStyle = fillStyle;
+                tempContext.fillRect(0, 0, originalCanvas.width, originalCanvas.height);
+                originalContext.drawImage(tempCanvas, 0, 0);
+            }
+        };
+    }
+    // Simple colors do not require any tricks to draw.
+    originalContext.fillStyle = fillStyle;
+    return {
+        context: originalContext,
+        unmask: () => {}
+    };
+};
+
 const forEachLinePoint = function (point1, point2, callback) {
     // Bresenham line algorithm
     let x1 = ~~point1.x;
@@ -206,9 +239,8 @@ const getBrushMark = function (size, color, isEraser) {
     const roundedUpRadius = Math.ceil(size / 2);
     canvas.width = roundedUpRadius * 2;
     canvas.height = roundedUpRadius * 2;
-    const context = canvas.getContext('2d');
+    const {context, unmask} = createMaskingCanvas(canvas.getContext('2d'), isEraser ? 'white' : color);
     context.imageSmoothingEnabled = false;
-    context.fillStyle = isEraser ? 'white' : color;
     // Small squares for pixel artists
     if (size <= 5) {
         let offset = 0;
@@ -244,6 +276,7 @@ const getBrushMark = function (size, color, isEraser) {
             }, context);
         }
     }
+    unmask();
     return canvas;
 };
 
@@ -275,7 +308,7 @@ const drawEllipse = function (options, context) {
     if (!matrix.isInvertible()) return false;
     const inverse = matrix.clone().invert();
 
-    const isGradient = context.fillStyle instanceof CanvasGradient;
+    const needsMask = doesColorRequireMask(context.fillStyle);
 
     // If drawing a gradient, we need to draw the shape onto a temporary canvas, then draw the gradient atop that canvas
     // only where the shape appears. drawShearedEllipse draws some pixels twice, which would be a problem if the
@@ -285,14 +318,14 @@ const drawEllipse = function (options, context) {
     let origContext;
     let tmpCanvas;
     const {width: canvasWidth, height: canvasHeight} = context.canvas;
-    if (isGradient) {
+    if (needsMask) {
         tmpCanvas = createCanvas(canvasWidth, canvasHeight);
         origContext = context;
         context = tmpCanvas.getContext('2d');
     }
 
     if (!isFilled) {
-        const brushMark = getBrushMark(thickness, isGradient ? 'black' : context.fillStyle);
+        const brushMark = getBrushMark(thickness, needsMask ? 'black' : context.fillStyle);
         const roundedUpRadius = Math.ceil(thickness / 2);
         drawFn = (x, y) => {
             context.drawImage(brushMark, ~~x - roundedUpRadius, ~~y - roundedUpRadius);
@@ -323,7 +356,7 @@ const drawEllipse = function (options, context) {
 
     // Mask in the gradient only where the shape was drawn, and draw it. Then draw the gradientified shape onto the
     // original canvas normally.
-    if (isGradient && wasDrawn) {
+    if (needsMask && wasDrawn) {
         context.globalCompositeOperation = 'source-in';
         context.fillStyle = origContext.fillStyle;
         context.fillRect(0, 0, canvasWidth, canvasHeight);
@@ -689,7 +722,7 @@ const outlineRect = function (rect, thickness, context) {
         context.drawImage(brushMark, ~~x - roundedUpRadius, ~~y - roundedUpRadius);
     };
 
-    const isGradient = context.fillStyle instanceof CanvasGradient;
+    const needsMask = doesColorRequireMask(context.fillStyle);
 
     // If drawing a gradient, we need to draw the shape onto a temporary canvas, then draw the gradient atop that canvas
     // only where the shape appears. Outlines are drawn as a series of brush mark images and as such can't be drawn as
@@ -697,7 +730,7 @@ const outlineRect = function (rect, thickness, context) {
     let origContext;
     let tmpCanvas;
     const {width: canvasWidth, height: canvasHeight} = context.canvas;
-    if (isGradient) {
+    if (needsMask) {
         tmpCanvas = createCanvas(canvasWidth, canvasHeight);
         origContext = context;
         context = tmpCanvas.getContext('2d');
@@ -715,7 +748,7 @@ const outlineRect = function (rect, thickness, context) {
 
     // Mask in the gradient only where the shape was drawn, and draw it. Then draw the gradientified shape onto the
     // original canvas normally.
-    if (isGradient) {
+    if (needsMask) {
         context.globalCompositeOperation = 'source-in';
         context.fillStyle = origContext.fillStyle;
         context.fillRect(0, 0, canvasWidth, canvasHeight);
@@ -950,6 +983,7 @@ const selectAllBitmap = function (clearSelectedItems) {
 };
 
 export {
+    createMaskingCanvas,
     commitSelectionToBitmap,
     commitOvalToBitmap,
     commitRectToBitmap,

@@ -17,7 +17,6 @@ const ColorIndicatorComponent = props => (
         <Popover
             body={
                 <ColorPicker
-                    allowTransparency={props.allowTransparency}
                     color={props.color}
                     color2={props.color2}
                     gradientType={props.gradientType}
@@ -45,7 +44,6 @@ const ColorIndicatorComponent = props => (
 );
 
 ColorIndicatorComponent.propTypes = {
-    allowTransparency: PropTypes.bool,
     className: PropTypes.string,
     disabled: PropTypes.bool.isRequired,
     color: PropTypes.string,

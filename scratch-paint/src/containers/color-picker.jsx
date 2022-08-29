@@ -125,7 +125,7 @@ class ColorPicker extends React.Component {
             this.state.hue,
             this.state.saturation,
             this.state.brightness,
-            this.props.allowTransparency ? this.state.alpha : 1
+            this.state.alpha
         ));
     }
     handleAlphaChange (alpha) {
@@ -191,7 +191,6 @@ class ColorPicker extends React.Component {
                 mode={this.props.mode}
                 rtl={this.props.rtl}
                 saturation={this.state.saturation}
-                allowTransparency={this.props.allowTransparency}
                 alpha={this.state.alpha * 100}
                 onAlphaChange={this.handleAlphaChange}
                 hexColor={normalizeToHex8(this.props.colorIndex === 0 ? this.props.color : this.props.color2)}
@@ -215,7 +214,6 @@ class ColorPicker extends React.Component {
 }
 
 ColorPicker.propTypes = {
-    allowTransparency: PropTypes.bool,
     color: PropTypes.string,
     color2: PropTypes.string,
     colorIndex: PropTypes.number.isRequired,

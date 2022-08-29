@@ -272,38 +272,35 @@ class ColorPickerComponent extends React.Component {
                     </div>
                     <div className={styles.rowSlider}>
                         <Slider
-                            lastSlider={!this.props.allowTransparency}
                             background={this._makeBackground('brightness')}
                             value={this.props.brightness}
                             onChange={this.props.onBrightnessChange}
                         />
                     </div>
                 </div>
-                {this.props.allowTransparency && (
-                    <div className={styles.row}>
-                        <div className={styles.rowHeader}>
-                            <span className={styles.labelName}>
-                                <FormattedMessage
-                                    defaultMessage="Opacity"
-                                    description="Label for the transparency component in the color picker"
-                                    id="tw.paint.alpha"
-                                />
-                            </span>
-                            <TWColorReadout
-                                value={this.props.alpha}
-                                onChange={this.props.onAlphaChange}
+                <div className={styles.row}>
+                    <div className={styles.rowHeader}>
+                        <span className={styles.labelName}>
+                            <FormattedMessage
+                                defaultMessage="Opacity"
+                                description="Label for the transparency component in the color picker"
+                                id="tw.paint.alpha"
                             />
-                        </div>
-                        <div className={styles.rowSlider}>
-                            <Slider
-                                lastSlider
-                                background={this._makeBackground('alpha')}
-                                value={this.props.alpha}
-                                onChange={this.props.onAlphaChange}
-                            />
-                        </div>
+                        </span>
+                        <TWColorReadout
+                            value={this.props.alpha}
+                            onChange={this.props.onAlphaChange}
+                        />
                     </div>
-                )}
+                    <div className={styles.rowSlider}>
+                        <Slider
+                            lastSlider
+                            background={this._makeBackground('alpha')}
+                            value={this.props.alpha}
+                            onChange={this.props.onAlphaChange}
+                        />
+                    </div>
+                </div>
                 <div className={styles.pickerRow}>
                     <Input
                         type="color"
@@ -367,7 +364,6 @@ class ColorPickerComponent extends React.Component {
 }
 
 ColorPickerComponent.propTypes = {
-    allowTransparency: PropTypes.bool,
     alpha: PropTypes.number.isRequired,
     onAlphaChange: PropTypes.func.isRequired,
     hexColor: PropTypes.string,

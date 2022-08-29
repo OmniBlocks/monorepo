@@ -1,6 +1,6 @@
 import paper from '@scratch/paper';
 import {getRaster, createCanvas, getGuideLayer} from '../layer';
-import {forEachLinePoint, getBrushMark} from '../bitmap';
+import {createMaskingCanvas, forEachLinePoint, getBrushMark} from '../bitmap';
 import {ART_BOARD_WIDTH, ART_BOARD_HEIGHT} from '../view';
 
 /**
@@ -37,10 +37,14 @@ class LineTool extends paper.Tool {
         this.size = Math.max(1, ~~size);
         this.tmpCanvas = getBrushMark(this.size, this.color);
     }
-    // Draw a brush mark at the given point
-    draw (x, y) {
+    drawLine (startPoint, endPoint) {
         const roundedUpRadius = Math.ceil(this.size / 2);
-        this.drawTarget.drawImage(this.tmpCanvas, new paper.Point(~~x - roundedUpRadius, ~~y - roundedUpRadius));
+        const originalContext = this.drawTarget.getContext('2d');
+        const {context, unmask} = createMaskingCanvas(originalContext, this.color);
+        forEachLinePoint(startPoint, endPoint, (x, y) => {
+            context.drawImage(this.tmpCanvas, ~~x - roundedUpRadius, ~~y - roundedUpRadius);
+        });
+        unmask();
     }
     updateCursorIfNeeded () {
         if (!this.size) {
@@ -83,7 +87,7 @@ class LineTool extends paper.Tool {
         this.drawTarget.locked = true;
         this.drawTarget.position = getRaster().position;
 
-        this.draw(event.point.x, event.point.y);
+        this.drawLine(event.point, event.point);
         this.startPoint = event.point;
     }
     handleMouseDrag (event) {
@@ -93,14 +97,14 @@ class LineTool extends paper.Tool {
         const context = this.drawTarget.canvas.getContext('2d');
         context.clearRect(0, 0, ART_BOARD_WIDTH, ART_BOARD_HEIGHT);
 
-        forEachLinePoint(this.startPoint, event.point, this.draw.bind(this));
+        this.drawLine(this.startPoint, event.point);
     }
     handleMouseUp (event) {
         if (event.event.button > 0 || !this.active) return; // only first mouse button
         
         this.drawTarget.remove();
         this.drawTarget = getRaster();
-        forEachLinePoint(this.startPoint, event.point, this.draw.bind(this));
+        this.drawLine(this.startPoint, event.point);
         this.drawTarget = null;
         this.onUpdateImage();
 

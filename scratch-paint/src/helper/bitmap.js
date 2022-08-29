@@ -983,6 +983,7 @@ const selectAllBitmap = function (clearSelectedItems) {
 };
 
 export {
+    doesColorRequireMask,
     createMaskingCanvas,
     commitSelectionToBitmap,
     commitOvalToBitmap,

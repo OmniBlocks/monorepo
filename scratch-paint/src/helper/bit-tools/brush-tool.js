@@ -1,6 +1,6 @@
 import paper from '@scratch/paper';
-import {getRaster, getGuideLayer} from '../layer';
-import {forEachLinePoint, getBrushMark} from '../bitmap';
+import {getRaster, getGuideLayer, createCanvas} from '../layer';
+import {doesColorRequireMask, forEachLinePoint, getBrushMark} from '../bitmap';
 
 /**
  * Tool for drawing with the bitmap brush and eraser
@@ -26,6 +26,9 @@ class BrushTool extends paper.Tool {
         this.active = false;
         this.lastPoint = null;
         this.cursorPreview = null;
+        this.drawTarget = null;
+        this.maskTarget = null;
+        this.maskBrush = null;
     }
     setColor (color) {
         this.color = color;
@@ -36,16 +39,26 @@ class BrushTool extends paper.Tool {
         this.size = Math.max(1, ~~size);
         this.tmpCanvas = getBrushMark(this.size, this.color, this.isEraser || !this.color);
     }
-    // Draw a brush mark at the given point
-    draw (x, y) {
+    drawNextLine (previousPoint, nextPoint) {
         const roundedUpRadius = Math.ceil(this.size / 2);
-        const context = getRaster().getContext('2d');
+        const context = this.maskTarget || this.drawTarget.getContext('2d');
         if (this.isEraser || !this.color) {
             context.globalCompositeOperation = 'destination-out';
         }
-        getRaster().drawImage(this.tmpCanvas, new paper.Point(~~x - roundedUpRadius, ~~y - roundedUpRadius));
+        forEachLinePoint(previousPoint, nextPoint, (x, y) => {
+            context.drawImage(this.maskBrush || this.tmpCanvas, ~~x - roundedUpRadius, ~~y - roundedUpRadius);
+        });
         if (this.isEraser || !this.color) {
             context.globalCompositeOperation = 'source-over';
+        }
+        if (this.maskTarget) {
+            const drawContext = this.drawTarget.getContext('2d');
+            const {width, height} = drawContext.canvas;
+            drawContext.globalCompositeOperation = 'source-over';
+            drawContext.drawImage(this.maskTarget.canvas, 0, 0);
+            drawContext.globalCompositeOperation = 'source-in';
+            drawContext.fillStyle = this.color;
+            drawContext.fillRect(0, 0, width, height);
         }
     }
     updateCursorIfNeeded () {
@@ -86,19 +99,42 @@ class BrushTool extends paper.Tool {
             this.cursorPreview.remove();
         }
 
-        this.draw(event.point.x, event.point.y);
+        if (this.isEraser) {
+            this.drawTarget = getRaster();
+        } else {
+            const drawCanvas = createCanvas();
+            this.drawTarget = new paper.Raster(drawCanvas);
+            this.drawTarget.parent = getGuideLayer();
+            this.drawTarget.guide = true;
+            this.drawTarget.locked = true;
+            this.drawTarget.position = getRaster().position;
+
+            if (this.color && doesColorRequireMask(this.color)) {
+                this.maskTarget = createCanvas().getContext('2d');
+                this.maskBrush = getBrushMark(this.size, 'black', false);
+            }
+        }
+
+        this.drawNextLine(event.point, event.point);
         this.lastPoint = event.point;
     }
     handleMouseDrag (event) {
         if (event.event.button > 0 || !this.active) return; // only first mouse button
 
-        forEachLinePoint(this.lastPoint, event.point, this.draw.bind(this));
+        this.drawNextLine(this.lastPoint, event.point);
         this.lastPoint = event.point;
     }
     handleMouseUp (event) {
         if (event.event.button > 0 || !this.active) return; // only first mouse button
 
-        forEachLinePoint(this.lastPoint, event.point, this.draw.bind(this));
+        this.drawNextLine(this.lastPoint, event.point);
+        if (!this.isEraser) {
+            getRaster().drawImage(this.drawTarget.canvas, new paper.Point(0, 0));
+            this.drawTarget.remove();
+        }
+        this.drawTarget = null;
+        this.maskTarget = null;
+        this.maskBrush = null;
         this.onUpdateImage();
 
         this.lastPoint = null;

@@ -146,7 +146,7 @@
         "groupOthers": "Autres ({number})",
         "import": "Importer les paramètres",
         "noCompiler": "Cet addon ne fonctionne que lorsque le compilateur est désactivé via le menu Avancé > Désactiver le compilateur ou en utilisant l'addon \"Désactiver le compilateur dans l'éditeur\".",
-        "noResults": "Aucun résultat",
+        "noResults": "Aucun résultat.",
         "presets": "Préconfigurations",
         "reset": "Réinitialiser",
         "resetAll": "Tout réinitialiser",
@@ -157,7 +157,7 @@
         "tagRecommended": "Recommandé",
         "tagTheme": "Thème",
         "title": "Paramètres des addons",
-        "unsupported": "Les addons suivants ne sont pas pris en charge par votre navigateur"
+        "unsupported": "Les addons suivants ne sont pas pris en charge par votre navigateur:"
     },
     "ga": {
         "title": "socruithe addon"
@@ -601,7 +601,7 @@
         "reset": "Скинути",
         "resetAll": "Скинути все",
         "search": "Пошук",
-        "tagBeta": "У розробці",
+        "tagBeta": "Бета",
         "tagDanger": "Небезпечно",
         "tagNew": "Нове!",
         "tagRecommended": "Рекомендовано",

@@ -5,6 +5,7 @@ updates:
     schedule:
       interval: "daily"
     allow:
+      - dependency-name: "scratch-audio"
       - dependency-name: "scratch-render"
       - dependency-name: "scratch-vm"
       - dependency-name: "scratch-paint"

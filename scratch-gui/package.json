@@ -76,7 +76,7 @@
     "react-virtualized": "9.20.1",
     "redux": "3.7.2",
     "redux-throttle": "0.1.1",
-    "scratch-audio": "0.1.0-prerelease.20200528195344",
+    "scratch-audio": "git+https://github.com/TurboWarp/scratch-audio.git#develop",
     "scratch-blocks": "git+https://github.com/TurboWarp/scratch-blocks.git#develop-builds",
     "@turbowarp/scratch-l10n": "^3.999.20220825224513",
     "scratch-paint": "git+https://github.com/TurboWarp/scratch-paint.git#develop",

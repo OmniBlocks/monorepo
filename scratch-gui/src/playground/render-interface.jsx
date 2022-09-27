@@ -305,8 +305,12 @@ class Interface extends React.Component {
                                         description.credits === 'unshared'
                                     ) && (
                                         <p>
-                                            {/* eslint-disable-next-line max-len */}
-                                            {'If this project was recently shared, this message may incorrectly appear for up to an hour.'}
+                                            <FormattedMessage
+                                                // eslint-disable-next-line max-len
+                                                defaultMessage="If the project was shared recently, this message may appear incorrectly for a few minutes."
+                                                description="Appears on unshared projects"
+                                                id="tw.unshared.cache"
+                                            />
                                         </p>
                                     )}
                                 </div>

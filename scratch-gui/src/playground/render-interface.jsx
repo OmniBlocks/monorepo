@@ -275,25 +275,30 @@ class Interface extends React.Component {
                                     {/* https://github.com/LLK/scratch-gui/pull/8269 */}
                                     {/* https://github.com/LLK/scratch-www/pull/6773 */}
                                     <p>
-                                        <i>{'Updated June 1, 2022'}</i>
+                                        <FormattedMessage
+                                            // eslint-disable-next-line max-len
+                                            defaultMessage="Unshared projects will no longer be accessible using just their project ID at some point in the future due to upcoming Scratch API changes."
+                                            description="Appears on unshared projects"
+                                            id="tw.unshared.1"
+                                        />
                                     </p>
                                     <p>
-                                        {/* eslint-disable-next-line max-len */}
-                                        {'Unshared projects will no longer be accessible using just their project ID **at some point in the future** due to upcoming Scratch API changes.'}
-                                    </p>
-                                    <p>
-                                        {/* eslint-disable-next-line max-len */}
-                                        {'Instead, you can either share the project or save the project to your computer (File > Save to your computer) and load the file instead.'}
-                                    </p>
-                                    <p>
-                                        {'For more information, visit: '}
-                                        <a
-                                            href="https://docs.turbowarp.org/unshared-projects"
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                        >
-                                            {'https://docs.turbowarp.org/unshared-projects'}
-                                        </a>
+                                        <FormattedMessage
+                                            defaultMessage="For more information, visit: {link}"
+                                            description="Appears on unshared projects"
+                                            id="tw.unshared.2"
+                                            values={{
+                                                link: (
+                                                    <a
+                                                        href="https://docs.turbowarp.org/unshared-projects"
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                    >
+                                                        {'https://docs.turbowarp.org/unshared-projects'}
+                                                    </a>
+                                                )
+                                            }}
+                                        />
                                     </p>
                                     {(
                                         description.instructions === 'unshared' ||

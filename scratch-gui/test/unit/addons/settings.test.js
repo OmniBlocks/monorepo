@@ -146,6 +146,26 @@ test('changing settings checks value validity and throws', () => {
     expect(fn).toHaveBeenCalledTimes(4);
 });
 
+test('colors with alpha channel', () => {
+    const store = new SettingStore();
+    store.setAddonSetting('onion-skinning', 'beforeTint', '#123456');
+    expect(store.getAddonSetting('onion-skinning', 'beforeTint')).toBe('#123456');
+    store.setAddonSetting('onion-skinning', 'beforeTint', '#234567ff');
+    expect(store.getAddonSetting('onion-skinning', 'beforeTint')).toBe('#234567');
+    store.setAddonSetting('onion-skinning', 'beforeTint', '#abc67800');
+    expect(store.getAddonSetting('onion-skinning', 'beforeTint')).toBe('#abc678');
+    store.import({
+        addons: {
+            'onion-skinning': {
+                settings: {
+                    beforeTint: '#56789aff'
+                }
+            }
+        }
+    });
+    expect(store.getAddonSetting('onion-skinning', 'beforeTint')).toBe('#56789a');
+});
+
 test('reset does not change enabled', () => {
     const store = new SettingStore();
     store.setAddonEnabled('cat-blocks', true);

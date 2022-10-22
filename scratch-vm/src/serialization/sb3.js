@@ -539,12 +539,12 @@ const serializeMonitors = function (monitors, runtime) {
     const xOffset = (runtime.stageWidth - 480) / 2;
     const yOffset = (runtime.stageHeight - 360) / 2;
     return monitors.valueSeq()
-        // TW: Old versions let people enable a monitor for "last key pressed" which Scratch won't remove
-        // automatically. As a temporary hack until upstream fixes this, we'll make sure to remove this
-        // monitor from any serialized projects so that projects won't use the TW blocks extension
-        // unnecessarily as they won't be able to load in Scratch.
+        // Don't include hidden monitors from extensions
         // https://github.com/LLK/scratch-vm/issues/2331
-        .filter(monitorData => monitorData.id !== 'tw_getLastKeyPressed')
+        .filter(monitorData => {
+            const extensionID = getExtensionIdForOpcode(monitorData.opcode);
+            return !extensionID || monitorData.visible;
+        })
         .map(monitorData => {
             const serializedMonitor = {
                 id: monitorData.id,

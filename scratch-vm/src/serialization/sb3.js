@@ -609,6 +609,23 @@ const serialize = function (runtime, targetId, {allowOptimization = true} = {}) 
     // Assemble extension list
     obj.extensions = Array.from(extensions);
 
+    // Save list of URLs to load the current extensions
+    // Extension manager only exists when runtime is wrapped by VirtualMachine
+    if (runtime.extensionManager) {
+        // Not all the URLs that are loaded are necessarily used.
+        const extensionURLs = runtime.extensionManager.getExtensionURLs();
+        const urlsToSave = [];
+        for (const extension of extensions) {
+            const url = extensionURLs[extension];
+            if (typeof url === 'string') {
+                urlsToSave.push(url);
+            }
+        }
+        if (urlsToSave.length) {
+            obj.extensionURLs = urlsToSave;
+        }
+    }
+
     // Assemble metadata
     const meta = Object.create(null);
     meta.semver = '3.0.0';

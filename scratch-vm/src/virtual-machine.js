@@ -197,6 +197,7 @@ class VirtualMachine extends EventEmitter {
         });
 
         this.extensionManager = new ExtensionManager(this.runtime);
+        this.runtime.extensionManager = this.extensionManager;
 
         // Load core extensions
         for (const id of CORE_EXTENSIONS) {

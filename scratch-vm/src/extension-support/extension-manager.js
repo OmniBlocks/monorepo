@@ -165,18 +165,7 @@ class ExtensionManager {
      */
     loadExtensionURL (extensionURL) {
         if (builtinExtensions.hasOwnProperty(extensionURL)) {
-            /** @TODO dupe handling for non-builtin extensions. See commit 670e51d33580e8a2e852b3b038bb3afc282f81b9 */
-            if (this.isExtensionLoaded(extensionURL)) {
-                const message = `Rejecting attempt to load a second extension with ID ${extensionURL}`;
-                log.warn(message);
-                return Promise.resolve();
-            }
-
-            const extension = builtinExtensions[extensionURL]();
-            const extensionInstance = new extension(this.runtime);
-            const serviceName = this._registerInternalExtension(extensionInstance);
-            this._loadedExtensions.set(extensionURL, serviceName);
-            this.runtime.compilerRegisterExtension(extensionURL, extensionInstance);
+            this.loadExtensionIdSync(extensionURL);
             return Promise.resolve();
         }
 

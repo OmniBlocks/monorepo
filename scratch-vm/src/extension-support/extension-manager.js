@@ -268,6 +268,7 @@ class ExtensionManager {
         const id = this.nextExtensionWorker++;
         const workerInfo = this.pendingExtensions.shift();
         this.pendingWorkers[id] = workerInfo;
+        this.workerURLs[id] = workerInfo.extensionURL;
         return [id, workerInfo.extensionURL];
     }
 
@@ -548,6 +549,23 @@ class ExtensionManager {
         }
 
         return blockInfo;
+    }
+
+    getExtensionURLs () {
+        const extensionURLs = {};
+        for (const [extensionId, serviceName] of this._loadedExtensions.entries()) {
+            if (builtinExtensions.hasOwnProperty(extensionId)) {
+                continue;
+            }
+
+            // Service names for extension workers are in the format "extension.WORKER_ID.EXTENSION_ID"
+            const workerId = +serviceName.split('.')[1];
+            const extensionURL = this.workerURLs[workerId];
+            if (typeof extensionURL === 'string') {
+                extensionURLs[extensionId] = extensionURL;
+            }
+        }
+        return extensionURLs;
     }
 }
 

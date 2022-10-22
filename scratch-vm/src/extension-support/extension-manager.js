@@ -158,6 +158,15 @@ class ExtensionManager {
         this.runtime.compilerRegisterExtension(extensionId, extensionInstance);
     }
 
+    _isValidExtensionURL (extensionURL) {
+        try {
+            const parsedURL = new URL(extensionURL);
+            return parsedURL.protocol === 'https:' || parsedURL.protocol === 'http:' || parsedURL.protocol === 'data:'
+        } catch (e) {
+            return false;
+        }
+    }
+
     /**
      * Load an extension by URL or internal extension ID
      * @param {string} extensionURL - the URL for the extension to load OR the ID of an internal extension
@@ -167,6 +176,10 @@ class ExtensionManager {
         if (builtinExtensions.hasOwnProperty(extensionURL)) {
             this.loadExtensionIdSync(extensionURL);
             return Promise.resolve();
+        }
+
+        if (!this._isValidExtensionURL(extensionURL)) {
+            return Promise.reject(new Error(`Invalid extension URL ${extensionURL}`));
         }
 
         this.loadingAsyncExtensions++;

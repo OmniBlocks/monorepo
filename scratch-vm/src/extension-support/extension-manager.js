@@ -92,8 +92,14 @@ class ExtensionManager {
         this.pendingWorkers = [];
 
         /**
-         * Set of loaded extension URLs/IDs (equivalent for built-in extensions).
-         * @type {Set.<string>}
+         * Map of worker ID to the URL where it was loaded from.
+         * @type {Array<string>}
+         */
+        this.workerURLs = [];
+
+        /**
+         * Map of loaded extension URLs/IDs to service names.
+         * @type {Map.<string, string>}
          * @private
          */
         this._loadedExtensions = new Map();
@@ -185,13 +191,21 @@ class ExtensionManager {
         this.loadingAsyncExtensions++;
 
         if (this.workerMode === 'unsandboxed') {
-            return require('./tw-unsandboxed-extension-runner')
-                .load(
-                    extensionURL,
-                    this._registerInternalExtension.bind(this)
-                )
-                .then(() => {
-                    this._finishedLoadingExtension();
+            const {load} = require('./tw-unsandboxed-extension-runner');
+            return load(extensionURL)
+                .then(extensionObjects => {
+                    const fakeWorkerId = this.nextExtensionWorker++;
+                    this.workerURLs[fakeWorkerId] = extensionURL;
+
+                    for (const extensionObject of extensionObjects) {
+                        const extensionInfo = extensionObject.getInfo();
+                        const serviceName = `unsandboxed.${fakeWorkerId}.${extensionInfo.id}`;
+                        dispatch.setServiceSync(serviceName, extensionObject);
+                        dispatch.callSync('extensions', 'registerExtensionServiceSync', serviceName);
+                        this._loadedExtensions.set(extensionInfo.id, serviceName);
+                    }
+
+                    this._finishedLoadingExtensionScript();
                 });
         }
 
@@ -274,11 +288,11 @@ class ExtensionManager {
         dispatch.call(serviceName, 'getInfo').then(info => {
             this._loadedExtensions.set(info.id, serviceName);
             this._registerExtensionInfo(serviceName, info);
-            this._finishedLoadingExtension();
+            this._finishedLoadingExtensionScript();
         });
     }
 
-    _finishedLoadingExtension () {
+    _finishedLoadingExtensionScript () {
         this.loadingAsyncExtensions--;
         if (this.loadingAsyncExtensions === 0) {
             this.asyncExtensionsLoadedCallbacks.forEach(i => i());

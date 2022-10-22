@@ -1,36 +1,37 @@
 const ArgumentType = require('../extension-support/argument-type');
 const BlockType = require('../extension-support/block-type');
 const TargetType = require('../extension-support/target-type');
+const AsyncLimiter = require('../util/async-limiter');
 
-// Custom extensions by nature rely on the single global Scratch object to register themselves
-// To make this work, we'll have to track the most recent callback and just hope that we don't
-// have two VMs on the same page trying to load unsandboxed extensions.
-let mostRecentRegisterExtensionCallback = null;
+const loadUnsandboxedExtension = extensionURL => new Promise((resolve, reject) => {
+    global.Scratch = global.Scratch || {};
+    global.Scratch.ArgumentType = ArgumentType;
+    global.Scratch.BlockType = BlockType;
+    global.Scratch.TargetType = TargetType;
+    global.Scratch.ArgumentType = ArgumentType;
 
-const register = extensionObject => {
-    mostRecentRegisterExtensionCallback(extensionObject);
-};
+    // When we load the script, wait for it to eventually call Scratch.extensions.register
+    // before resolving. Note that extension scripts may register multiple extensions.
 
-const Scratch = {
-    ArgumentType,
-    BlockType,
-    TargetType,
-    extensions: {
+    const extensionObjects = [];
+    const register = extensionObject => {
+        extensionObjects.push(extensionObject);
+        resolve(extensionObjects);
+    };
+    global.Scratch.extensions = {
         register
-    }
-};
-
-global.Scratch = Scratch;
-
-const load = (extensionURL, registerExtensionCallback) => new Promise((resolve, reject) => {
-    mostRecentRegisterExtensionCallback = registerExtensionCallback;
+    };
 
     const script = document.createElement('script');
-    script.onload = () => resolve();
     script.onerror = () => reject(new Error(`Error in unsandboxed script ${extensionURL}`));
     script.src = extensionURL;
     document.body.appendChild(script);
 });
+
+// Because loading unsandboxed extensions requires messing with global state (global.Scratch),
+// only let one extension load at a time.
+const limiter = new AsyncLimiter(loadUnsandboxedExtension, 1);
+const load = extensionURL => limiter.do(extensionURL);
 
 module.exports = {
     load

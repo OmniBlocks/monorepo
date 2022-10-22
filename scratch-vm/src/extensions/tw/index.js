@@ -34,7 +34,6 @@ class TurboWarpBlocks {
                         default: 'last key pressed',
                         description: 'Block that returns the last key that was pressed'
                     }),
-                    disableMonitor: true,
                     blockType: BlockType.REPORTER
                 },
                 {

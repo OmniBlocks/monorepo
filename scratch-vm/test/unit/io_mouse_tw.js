@@ -121,3 +121,28 @@ test('no rounding when misc limits disabled', t => {
 
     t.end();
 });
+
+test('accepts 0 as x and y position', t => {
+    const rt = new Runtime();
+    const m = new Mouse(rt);
+
+    m.postData({
+        x: 1,
+        y: 2,
+        canvasWidth: 480,
+        canvasHeight: 360
+    });
+    t.equal(m.getClientX(), 1);
+    t.equal(m.getClientY(), 2);
+
+    m.postData({
+        x: 0,
+        y: 0,
+        canvasWidth: 480,
+        canvasHeight: 360
+    });
+    t.equal(m.getClientX(), 0);
+    t.equal(m.getClientY(), 0);
+
+    t.end();
+});

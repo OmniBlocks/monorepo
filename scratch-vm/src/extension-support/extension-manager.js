@@ -103,6 +103,7 @@ class ExtensionManager {
          * One of the strings:
          *  - "worker" (default)
          *  - "iframe"
+         *  - "unsandboxed"
          */
         this.workerMode = 'worker';
 
@@ -180,6 +181,17 @@ class ExtensionManager {
         }
 
         this.loadingAsyncExtensions++;
+
+        if (this.workerMode === 'unsandboxed') {
+            return require('./tw-unsandboxed-extension-runner')
+                .load(
+                    extensionURL,
+                    this._registerInternalExtension.bind(this)
+                )
+                .then(() => {
+                    this._finishedLoadingExtension();
+                });
+        }
 
         return new Promise((resolve, reject) => {
             this.pendingExtensions.push({extensionURL, resolve, reject});
@@ -260,13 +272,16 @@ class ExtensionManager {
         dispatch.call(serviceName, 'getInfo').then(info => {
             this._loadedExtensions.set(info.id, serviceName);
             this._registerExtensionInfo(serviceName, info);
-
-            this.loadingAsyncExtensions--;
-            if (this.loadingAsyncExtensions === 0) {
-                this.asyncExtensionsLoadedCallbacks.forEach(i => i());
-                this.asyncExtensionsLoadedCallbacks = [];
-            }
+            this._finishedLoadingExtension();
         });
+    }
+
+    _finishedLoadingExtension () {
+        this.loadingAsyncExtensions--;
+        if (this.loadingAsyncExtensions === 0) {
+            this.asyncExtensionsLoadedCallbacks.forEach(i => i());
+            this.asyncExtensionsLoadedCallbacks = [];
+        }
     }
 
     /**

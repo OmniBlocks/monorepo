@@ -137,12 +137,22 @@ class ExtensionManager {
     }
 
     /**
+     * Determine whether an extension with a given ID is built in to the VM, such as pen.
+     * Note that "core extensions" like motion will return false here.
+     * @param {string} extensionId
+     * @returns {boolean}
+     */
+    isBuiltinExtension (extensionId) {
+        return Object.prototype.hasOwnProperty.call(builtinExtensions, extensionId);
+    }
+
+    /**
      * Synchronously load an internal extension (core or non-core) by ID. This call will
      * fail if the provided id is not does not match an internal extension.
      * @param {string} extensionId - the ID of an internal extension
      */
     loadExtensionIdSync (extensionId) {
-        if (!builtinExtensions.hasOwnProperty(extensionId)) {
+        if (!this.isBuiltinExtension(extensionId)) {
             log.warn(`Could not find extension ${extensionId} in the built in extensions.`);
             return;
         }
@@ -176,7 +186,7 @@ class ExtensionManager {
      * @returns {Promise} resolved once the extension is loaded and initialized or rejected on failure
      */
     async loadExtensionURL (extensionURL) {
-        if (builtinExtensions.hasOwnProperty(extensionURL)) {
+        if (this.isBuiltinExtension(extensionURL)) {
             this.loadExtensionIdSync(extensionURL);
             return;
         }

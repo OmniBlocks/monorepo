@@ -612,16 +612,23 @@ const serialize = function (runtime, targetId, {allowOptimization = true} = {}) 
     // Save list of URLs to load the current extensions
     // Extension manager only exists when runtime is wrapped by VirtualMachine
     if (runtime.extensionManager) {
-        // Not all the URLs that are loaded are necessarily used.
+        // We'll save the extensions in the format:
+        // {
+        //   "extension_id": "https://..."
+        // }
+        // Which lets the VM know which URLs correspond to which IDs, which might be useful
+        // later. For example, if a custom extension is converted to a builtin extension,
+        // the VM will know that it doesn't need to load the old extension's URL.
         const extensionURLs = runtime.extensionManager.getExtensionURLs();
-        const urlsToSave = [];
+        const urlsToSave = {};
         for (const extension of extensions) {
             const url = extensionURLs[extension];
             if (typeof url === 'string') {
-                urlsToSave.push(url);
+                urlsToSave[extension] = url;
             }
         }
-        if (urlsToSave.length) {
+        // Only save this object if any URLs would actually be saved.
+        if (Object.keys(urlsToSave).length !== 0) {
             obj.extensionURLs = urlsToSave;
         }
     }

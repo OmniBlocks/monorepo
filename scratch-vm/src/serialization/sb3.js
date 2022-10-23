@@ -1336,6 +1336,11 @@ const deserialize = function (json, runtime, zip, isSingleSprite) {
         runtime.origin = null;
     }
 
+    // Extract custom extension IDs, if they exist.
+    if (json.extensionURLs) {
+        extensions.extensionURLs = new Map(Object.entries(json.extensionURLs));
+    }
+
     // First keep track of the current target order in the json,
     // then sort by the layer order property before parsing the targets
     // so that their corresponding render drawables can be created in

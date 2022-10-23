@@ -641,6 +641,35 @@ class VirtualMachine extends EventEmitter {
     }
 
     /**
+     * @param {string[]} extensionIDs The IDs of the extensions
+     * @param {Map<string, string>} extensionURLs A map of extension ID to URL
+     */
+    async _loadExtensions (extensionIDs, extensionURLs = new Map()) {
+        const extensionPromises = [];
+        for (const extensionID of extensionIDs) {
+            if (this.extensionManager.isExtensionLoaded(extensionID)) {
+                // Already loaded
+            } else if (this.extensionManager.isBuiltinExtension(extensionID)) {
+                // Builtin extension
+                this.extensionManager.loadExtensionIdSync(extensionID);
+                continue;
+            } else {
+                // Custom extension
+                const url = extensionURLs.get(extensionID);
+                if (!url) {
+                    throw new Error(`Unknown extension: ${extensionID}`);
+                }
+                if (await this.securityManager.canLoadExtensionFromProject(url)) {
+                    extensionPromises.push(this.extensionManager.loadExtensionURL(url));
+                } else {
+                    throw new Error(`Permission to load extension denied: ${extensionID}`);
+                }
+            }
+        }
+        return Promise.all(extensionPromises);
+    }
+
+    /**
      * Install `deserialize` results: zero or more targets after the extensions (if any) used by those targets.
      * @param {Array.<Target>} targets - the targets to be installed
      * @param {ImportedExtensionsInfo} extensions - metadata about extensions used by these targets
@@ -650,18 +679,9 @@ class VirtualMachine extends EventEmitter {
     async installTargets (targets, extensions, wholeProject) {
         await this.extensionManager.allAsyncExtensionsLoaded();
 
-        const extensionPromises = [];
-
-        extensions.extensionIDs.forEach(extensionID => {
-            if (!this.extensionManager.isExtensionLoaded(extensionID)) {
-                const extensionURL = extensions.extensionURLs.get(extensionID) || extensionID;
-                extensionPromises.push(this.extensionManager.loadExtensionURL(extensionURL));
-            }
-        });
-
         targets = targets.filter(target => !!target);
 
-        return Promise.all(extensionPromises).then(() => {
+        return this._loadExtensions(extensions.extensionIDs, extensions.extensionURLs).then(() => {
             targets.forEach(target => {
                 this.runtime.addTarget(target);
                 (/** @type RenderedTarget */ target).updateAllDrawableProperties();
@@ -1420,12 +1440,7 @@ class VirtualMachine extends EventEmitter {
             .filter(id => !this.extensionManager.isExtensionLoaded(id)) // and remove loaded extensions
         );
 
-        // Create an array promises for extensions to load
-        const extensionPromises = Array.from(extensionIDs,
-            id => this.extensionManager.loadExtensionURL(id)
-        );
-
-        return Promise.all(extensionPromises).then(() => {
+        return this._loadExtensions(extensionIDs).then(() => {
             copiedBlocks.forEach(block => {
                 target.blocks.createBlock(block);
             });

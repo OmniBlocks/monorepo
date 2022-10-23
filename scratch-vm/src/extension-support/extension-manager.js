@@ -182,14 +182,14 @@ class ExtensionManager {
         }
 
         if (!this._isValidExtensionURL(extensionURL)) {
-            throw new Error(`Invalid extension URL ${extensionURL}`);
+            throw new Error(`Invalid extension URL: ${extensionURL}`);
         }
 
         this.loadingAsyncExtensions++;
 
-        const workerMode = await this.securityManager.getWorkerMode(extensionURL);
+        const sandboxMode = await this.securityManager.getSandboxMode(extensionURL);
 
-        if (workerMode === 'unsandboxed') {
+        if (sandboxMode === 'unsandboxed') {
             const {load} = require('./tw-unsandboxed-extension-runner');
             const extensionObjects = await load(extensionURL);
             const fakeWorkerId = this.nextExtensionWorker++;
@@ -209,12 +209,12 @@ class ExtensionManager {
 
         /* eslint-disable max-len */
         let ExtensionWorker;
-        if (workerMode === 'worker') {
+        if (sandboxMode === 'worker') {
             ExtensionWorker = require('worker-loader?name=js/extension-worker/extension-worker.[hash].js!./extension-worker');
-        } else if (workerMode === 'iframe') {
+        } else if (sandboxMode === 'iframe') {
             ExtensionWorker = (await import(/* webpackChunkName: "iframe-extension-worker" */ './tw-iframe-extension-worker')).default;
         } else {
-            throw new Error(`Invalid worker mode ${workerMode}`);
+            throw new Error(`Invalid sandbox mode: ${sandboxMode}`);
         }
         /* eslint-enable max-len */
 

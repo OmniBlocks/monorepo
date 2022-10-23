@@ -63,6 +63,21 @@ const messages = defineMessages({
         description: 'Label for the answer monitor when shown on the stage',
         id: 'gui.opcodeLabels.answer'
     },
+    sensing_mousedown: {
+        defaultMessage: 'mouse down?',
+        description: 'Label for the mouse down monitor when show on the stage',
+        id: 'tw.opcode.mousedown'
+    },
+    sensing_mousex: {
+        defaultMessage: 'mouse x',
+        description: 'Label for the mouse x monitor when show on the stage',
+        id: 'tw.opcode.mousex'
+    },
+    sensing_mousey: {
+        defaultMessage: 'mouse y',
+        description: 'Label for the mouse y monitor when show on the stage',
+        id: 'tw.opcode.mousey'
+    },
     sensing_loudness: {
         defaultMessage: 'loudness',
         description: 'Label for the loudness monitor when shown on the stage',
@@ -112,6 +127,11 @@ const messages = defineMessages({
         defaultMessage: 'timer',
         description: 'Label for the timer monitor when shown on the stage',
         id: 'gui.opcodeLabels.timer'
+    },
+    sensing_dayssince2000: {
+        defaultMessage: 'days since 2000',
+        description: 'Label for the days since 2000 monitor when show on the stage',
+        id: 'tw.opcode.2000'
     }
 });
 
@@ -151,10 +171,14 @@ class OpcodeLabels {
 
             // Sensing
             sensing_answer: {category: 'sensing'},
+            sensing_mousedown: {category: 'sensing'},
+            sensing_mousex: {category: 'sensing'},
+            sensing_mousey: {category: 'sensing'},
             sensing_loudness: {category: 'sensing'},
             sensing_username: {category: 'sensing'},
             sensing_current: {category: 'sensing'},
-            sensing_timer: {category: 'sensing'}
+            sensing_timer: {category: 'sensing'},
+            sensing_dayssince2000: {category: 'sensing'}
         };
 
         // Initialize opcodeMap with default strings
@@ -207,6 +231,9 @@ class OpcodeLabels {
 
         // Sensing
         this._opcodeMap.sensing_answer.labelFn = () => this._translator(messages.sensing_answer);
+        this._opcodeMap.sensing_mousedown.labelFn = () => this._translator(messages.sensing_mousedown);
+        this._opcodeMap.sensing_mousex.labelFn = () => this._translator(messages.sensing_mousex);
+        this._opcodeMap.sensing_mousey.labelFn = () => this._translator(messages.sensing_mousey);
         this._opcodeMap.sensing_loudness.labelFn = () => this._translator(messages.sensing_loudness);
         this._opcodeMap.sensing_username.labelFn = () => this._translator(messages.sensing_username);
         this._opcodeMap.sensing_current.labelFn = params => {
@@ -228,6 +255,7 @@ class OpcodeLabels {
             }
         };
         this._opcodeMap.sensing_timer.labelFn = () => this._translator(messages.sensing_timer);
+        this._opcodeMap.sensing_dayssince2000.labelFn = () => this._translator(messages.sensing_dayssince2000);
     }
 
     /**

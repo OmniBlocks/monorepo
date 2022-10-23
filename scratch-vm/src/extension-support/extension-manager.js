@@ -178,42 +178,52 @@ class ExtensionManager {
      * @param {string} extensionURL - the URL for the extension to load OR the ID of an internal extension
      * @returns {Promise} resolved once the extension is loaded and initialized or rejected on failure
      */
-    loadExtensionURL (extensionURL) {
+    async loadExtensionURL (extensionURL) {
         if (builtinExtensions.hasOwnProperty(extensionURL)) {
             this.loadExtensionIdSync(extensionURL);
-            return Promise.resolve();
+            return;
         }
 
         if (!this._isValidExtensionURL(extensionURL)) {
-            return Promise.reject(new Error(`Invalid extension URL ${extensionURL}`));
+            throw new Error(`Invalid extension URL ${extensionURL}`);
         }
 
         this.loadingAsyncExtensions++;
 
-        if (this.workerMode === 'unsandboxed') {
+        const workerMode = this.workerMode;
+
+        if (workerMode === 'unsandboxed') {
             const {load} = require('./tw-unsandboxed-extension-runner');
-            return load(extensionURL)
-                .then(extensionObjects => {
-                    const fakeWorkerId = this.nextExtensionWorker++;
-                    this.workerURLs[fakeWorkerId] = extensionURL;
+            const extensionObjects = await load(extensionURL);
+            const fakeWorkerId = this.nextExtensionWorker++;
+            this.workerURLs[fakeWorkerId] = extensionURL;
 
-                    for (const extensionObject of extensionObjects) {
-                        const extensionInfo = extensionObject.getInfo();
-                        const serviceName = `unsandboxed.${fakeWorkerId}.${extensionInfo.id}`;
-                        dispatch.setServiceSync(serviceName, extensionObject);
-                        dispatch.callSync('extensions', 'registerExtensionServiceSync', serviceName);
-                        this._loadedExtensions.set(extensionInfo.id, serviceName);
-                    }
+            for (const extensionObject of extensionObjects) {
+                const extensionInfo = extensionObject.getInfo();
+                const serviceName = `unsandboxed.${fakeWorkerId}.${extensionInfo.id}`;
+                dispatch.setServiceSync(serviceName, extensionObject);
+                dispatch.callSync('extensions', 'registerExtensionServiceSync', serviceName);
+                this._loadedExtensions.set(extensionInfo.id, serviceName);
+            }
 
-                    this._finishedLoadingExtensionScript();
-                });
+            this._finishedLoadingExtensionScript();
+            return;
         }
+
+        /* eslint-disable max-len */
+        let ExtensionWorker;
+        if (workerMode === 'worker') {
+            ExtensionWorker = require('worker-loader?name=js/extension-worker/extension-worker.[hash].js!./extension-worker');
+        } else if (workerMode === 'iframe') {
+            ExtensionWorker = (await import(/* webpackChunkName: "iframe-extension-worker" */ './tw-iframe-extension-worker')).default;
+        } else {
+            throw new Error(`Invalid worker mode ${workerMode}`);
+        }
+        /* eslint-enable max-len */
 
         return new Promise((resolve, reject) => {
             this.pendingExtensions.push({extensionURL, resolve, reject});
-            this.createExtensionWorker()
-                .then(worker => dispatch.addWorker(worker))
-                .catch(error => reject(error));
+            dispatch.addWorker(new ExtensionWorker());
         });
     }
 
@@ -228,22 +238,6 @@ class ExtensionManager {
         return new Promise(resolve => {
             this.asyncExtensionsLoadedCallbacks.push(resolve);
         });
-    }
-
-    /**
-     * Creates a new extension worker.
-     * @returns {Promise}
-     */
-    createExtensionWorker () {
-        if (this.workerMode === 'worker') {
-            // eslint-disable-next-line max-len
-            const ExtensionWorker = require('worker-loader?name=js/extension-worker/extension-worker.[hash].js!./extension-worker');
-            return Promise.resolve(new ExtensionWorker());
-        } else if (this.workerMode === 'iframe') {
-            return import(/* webpackChunkName: "iframe-extension-worker" */ './tw-iframe-extension-worker')
-                .then(mod => new mod.default());
-        }
-        return Promise.reject(new Error('Unknown extension worker mode'));
     }
 
     /**

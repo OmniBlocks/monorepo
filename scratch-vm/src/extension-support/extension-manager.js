@@ -3,6 +3,7 @@ const log = require('../util/log');
 const maybeFormatMessage = require('../util/maybe-format-message');
 
 const BlockType = require('./block-type');
+const SecurityManager = require('./tw-security-manager');
 
 // These extensions are currently built into the VM repository but should not be loaded at startup.
 // TODO: move these out into a separate repository?
@@ -105,13 +106,9 @@ class ExtensionManager {
         this._loadedExtensions = new Map();
 
         /**
-         * Controls how remote custom extensions are loaded.
-         * One of the strings:
-         *  - "worker" (default)
-         *  - "iframe"
-         *  - "unsandboxed"
+         * Responsible for determining security policies related to custom extensions.
          */
-        this.workerMode = 'worker';
+        this.securityManager = new SecurityManager();
 
         /**
          * Keep a reference to the runtime so we can construct internal extension objects.
@@ -190,7 +187,7 @@ class ExtensionManager {
 
         this.loadingAsyncExtensions++;
 
-        const workerMode = this.workerMode;
+        const workerMode = await this.securityManager.getWorkerMode(extensionURL);
 
         if (workerMode === 'unsandboxed') {
             const {load} = require('./tw-unsandboxed-extension-runner');

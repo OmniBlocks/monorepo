@@ -5,7 +5,6 @@ import appTarget from '../app-target';
 import styles from './credits.css';
 import {getInitialDarkMode} from '../../lib/tw-theme-hoc.jsx';
 
-import fosshostLogo from './fosshost-light.png';
 import UserData from './users';
 
 /* eslint-disable react/jsx-no-literals */
@@ -63,24 +62,6 @@ const Credits = () => (
             </p>
         </section>
         <section>
-            <h2>Fosshost</h2>
-            <p>
-                The TurboWarp project is proudly hosted by <a href="https://fosshost.org/">Fosshost</a> who provide free computing resources to the open source community.
-            </p>
-            <p>
-                <a href="https://fosshost.org/donate">
-                    Donate to support Fosshost.
-                </a>
-            </p>
-            <a href="https://fosshost.org/">
-                <img
-                    src={fosshostLogo}
-                    width="250"
-                    height="125"
-                />
-            </a>
-        </section>
-        <section>
             <h2>Scratch</h2>
             <p>
                 TurboWarp is based on the work of the <a href="https://scratch.mit.edu/credits">Scratch contributors</a> but is not endorsed by Scratch in any way.
@@ -98,8 +79,8 @@ const Credits = () => (
         <section>
             <h2>Translators</h2>
             <p>
-                More than 100 people have helped translate TurboWarp and its addons into many languages --
-                far more than we could hope to list here.
+                More than 100 people have helped translate TurboWarp and its addons into many languages
+                &mdash; far more than we could hope to list here.
             </p>
         </section>
         <section>

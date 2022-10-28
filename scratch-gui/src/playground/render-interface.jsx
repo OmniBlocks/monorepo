@@ -105,13 +105,6 @@ const Footer = () => (
             </div>
             <div className={styles.footerColumns}>
                 <div className={styles.footerSection}>
-                    <a href="https://fosshost.org/">
-                        <FormattedMessage
-                            defaultMessage="Hosting provided by Fosshost"
-                            description="Fosshost link in footer"
-                            id="tw.footer.fosshost"
-                        />
-                    </a>
                     <a href="credits.html">
                         <FormattedMessage
                             defaultMessage="Credits"

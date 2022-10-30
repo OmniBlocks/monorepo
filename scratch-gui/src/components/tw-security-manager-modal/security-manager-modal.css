@@ -1,0 +1,44 @@
+@import "../../css/colors.css";
+
+.modal-content {
+    width: 400px;
+}
+
+.body {
+    background: $ui-white;
+    padding: 1.5rem 2.25rem;
+}
+[theme="dark"] .body {
+    color: $text-primary;
+    background: $ui-primary;
+}
+
+.body p {
+    margin: 8px 0;
+}
+
+.extension {
+    font-family: monospace;
+    user-select: text;
+}
+
+.buttons {
+    display: flex;
+    justify-content: flex-end;
+}
+.deny-button, .allow-button {
+    font: inherit;
+    color: inherit;
+    padding: 0.75rem 1rem;
+    border-radius: 0.25rem;
+    border: 1px solid $ui-black-transparent;
+    font-weight: 600;
+    font-size: 0.85rem;
+    margin: 0 0 0 8px;
+}
+.deny-button {
+    background-color: rgb(255, 92, 92);
+}
+.allow-button {
+    background-color: #24cd11;
+}

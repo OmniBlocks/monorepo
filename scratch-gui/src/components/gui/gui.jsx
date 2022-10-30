@@ -33,6 +33,7 @@ import ConnectionModal from '../../containers/connection-modal.jsx';
 import TelemetryModal from '../telemetry-modal/telemetry-modal.jsx';
 import TWUsernameModal from '../../containers/tw-username-modal.jsx';
 import TWSettingsModal from '../../containers/tw-settings-modal.jsx';
+import TWSecurityManager from '../../containers/tw-security-manager.jsx';
 
 import layout, {STAGE_SIZE_MODES} from '../../lib/layout-constants';
 import {resolveStageSize} from '../../lib/screen-utils';
@@ -161,6 +162,14 @@ const GUIComponent = props => {
     return (<MediaQuery minWidth={minWidth}>{isFullSize => {
         const stageSize = resolveStageSize(stageSizeMode, isFullSize);
 
+        const alwaysEnabledModals = (
+            <React.Fragment>
+                <TWSecurityManager />
+                {usernameModalVisible && <TWUsernameModal />}
+                {settingsModalVisible && <TWSettingsModal />}
+            </React.Fragment>
+        );
+
         return isPlayerOnly ? (
             <React.Fragment>
                 {/* TW: When the window is fullscreen, use an element to display the background color */}
@@ -187,8 +196,7 @@ const GUIComponent = props => {
                         <Alerts className={styles.alertsContainer} />
                     ) : null}
                 </StageWrapper>
-                {usernameModalVisible && <TWUsernameModal />}
-                {settingsModalVisible && <TWSettingsModal />}
+                {alwaysEnabledModals}
             </React.Fragment>
         ) : (
             <Box
@@ -196,8 +204,7 @@ const GUIComponent = props => {
                 dir={isRtl ? 'rtl' : 'ltr'}
                 {...componentProps}
             >
-                {usernameModalVisible && <TWUsernameModal />}
-                {settingsModalVisible && <TWSettingsModal />}
+                {alwaysEnabledModals}
                 {telemetryModalVisible ? (
                     <TelemetryModal
                         isRtl={isRtl}

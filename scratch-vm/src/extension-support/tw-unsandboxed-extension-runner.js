@@ -49,7 +49,9 @@ const loadUnsandboxedExtension = (extensionURL, vm) => new Promise((resolve, rej
     createUnsandboxedExtensionAPI(vm).then(resolve);
 
     const script = document.createElement('script');
-    script.onerror = () => reject(new Error(`Error in unsandboxed script ${extensionURL}`));
+    script.onerror = () => {
+        reject(new Error(`Error in unsandboxed script ${extensionURL}. Check the console for more information.`));
+    };
     script.src = extensionURL;
     document.body.appendChild(script);
 }).then(objects => {

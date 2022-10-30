@@ -21,6 +21,7 @@ const loadUnsandboxedExtension = (extensionURL, vm) => new Promise((resolve, rej
         resolve(extensionObjects);
     };
     global.Scratch.extensions = {
+        unsandboxed: true,
         register
     };
 

@@ -958,15 +958,16 @@ test('shareBlocksToTarget loads extensions that have not yet been loaded', t => 
     runtime.targets = [stage];
 
     const fakeBlocks = [
-        {opcode: 'loaded_fakeblock'},
-        {opcode: 'notloaded_fakeblock'}
+        {opcode: 'pen_something'},
+        {opcode: 'translate_something'}
     ];
 
     // Stub the extension manager
     const loadedIds = [];
     vm.extensionManager = {
-        isExtensionLoaded: id => id === 'loaded',
-        loadExtensionURL: id => new Promise(resolve => {
+        isBuiltinExtension: () => true,
+        isExtensionLoaded: id => id === 'pen',
+        loadExtensionIdSync: id => new Promise(resolve => {
             loadedIds.push(id);
             resolve();
         })
@@ -974,7 +975,7 @@ test('shareBlocksToTarget loads extensions that have not yet been loaded', t => 
 
     vm.shareBlocksToTarget(fakeBlocks, stage.id).then(() => {
         // Verify that only the not-loaded extension gets loaded
-        t.deepEqual(loadedIds, ['notloaded']);
+        t.deepEqual(loadedIds, ['translate']);
         t.end();
     });
 });

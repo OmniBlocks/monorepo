@@ -206,7 +206,8 @@ class ExtensionManager {
 
         if (sandboxMode === 'unsandboxed') {
             const {load} = require('./tw-unsandboxed-extension-runner');
-            const extensionObjects = await load(extensionURL, this.vm);
+            const extensionObjects = await load(extensionURL, this.vm)
+                .catch(error => this._failedLoadingExtensionScript(error));
             const fakeWorkerId = this.nextExtensionWorker++;
             this.workerURLs[fakeWorkerId] = extensionURL;
 
@@ -236,7 +237,7 @@ class ExtensionManager {
         return new Promise((resolve, reject) => {
             this.pendingExtensions.push({extensionURL, resolve, reject});
             dispatch.addWorker(new ExtensionWorker());
-        });
+        }).catch(error => this._failedLoadingExtensionScript(error));
     }
 
     /**
@@ -247,8 +248,11 @@ class ExtensionManager {
         if (this.loadingAsyncExtensions === 0) {
             return;
         }
-        return new Promise(resolve => {
-            this.asyncExtensionsLoadedCallbacks.push(resolve);
+        return new Promise((resolve, reject) => {
+            this.asyncExtensionsLoadedCallbacks.push({
+                resolve,
+                reject
+            });
         });
     }
 
@@ -302,9 +306,19 @@ class ExtensionManager {
     _finishedLoadingExtensionScript () {
         this.loadingAsyncExtensions--;
         if (this.loadingAsyncExtensions === 0) {
-            this.asyncExtensionsLoadedCallbacks.forEach(i => i());
+            this.asyncExtensionsLoadedCallbacks.forEach(i => i.resolve());
             this.asyncExtensionsLoadedCallbacks = [];
         }
+    }
+
+    _failedLoadingExtensionScript (error) {
+        // Don't set the current extension counter to 0, otherwise it will go negative if another
+        // extension finishes or fails to load.
+        this.loadingAsyncExtensions--;
+        this.asyncExtensionsLoadedCallbacks.forEach(i => i.reject(error));
+        this.asyncExtensionsLoadedCallbacks = [];
+        // Re-throw error so the promise still rejects.
+        throw error;
     }
 
     /**

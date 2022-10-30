@@ -3,8 +3,10 @@ const BlockType = require('../extension-support/block-type');
 const TargetType = require('../extension-support/target-type');
 const AsyncLimiter = require('../util/async-limiter');
 
-const loadUnsandboxedExtension = extensionURL => new Promise((resolve, reject) => {
+const loadUnsandboxedExtension = (extensionURL, vm) => new Promise((resolve, reject) => {
     global.Scratch = global.Scratch || {};
+    global.Scratch.vm = vm;
+    global.Scratch.renderer = vm.runtime.renderer;
     global.Scratch.ArgumentType = ArgumentType;
     global.Scratch.BlockType = BlockType;
     global.Scratch.TargetType = TargetType;
@@ -31,7 +33,7 @@ const loadUnsandboxedExtension = extensionURL => new Promise((resolve, reject) =
 // Because loading unsandboxed extensions requires messing with global state (global.Scratch),
 // only let one extension load at a time.
 const limiter = new AsyncLimiter(loadUnsandboxedExtension, 1);
-const load = extensionURL => limiter.do(extensionURL);
+const load = (extensionURL, vm) => limiter.do(extensionURL, vm);
 
 module.exports = {
     load

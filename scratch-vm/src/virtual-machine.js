@@ -196,7 +196,7 @@ class VirtualMachine extends EventEmitter {
             this.emit(Runtime.TURBO_MODE_ON);
         });
 
-        this.extensionManager = new ExtensionManager(this.runtime);
+        this.extensionManager = new ExtensionManager(this);
         this.securityManager = this.extensionManager.securityManager;
         this.runtime.extensionManager = this.extensionManager;
 

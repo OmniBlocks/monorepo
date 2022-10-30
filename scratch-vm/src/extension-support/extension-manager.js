@@ -71,7 +71,7 @@ const createExtensionService = extensionManager => {
 };
 
 class ExtensionManager {
-    constructor (runtime) {
+    constructor (vm) {
         /**
          * The ID number to provide to the next extension worker.
          * @type {int}
@@ -111,11 +111,16 @@ class ExtensionManager {
         this.securityManager = new SecurityManager();
 
         /**
+         * @type {VirtualMachine}
+         */
+        this.vm = vm;
+
+        /**
          * Keep a reference to the runtime so we can construct internal extension objects.
          * TODO: remove this in favor of extensions accessing the runtime as a service.
          * @type {Runtime}
          */
-        this.runtime = runtime;
+        this.runtime = vm.runtime;
 
         this.loadingAsyncExtensions = 0;
         this.asyncExtensionsLoadedCallbacks = [];
@@ -201,7 +206,7 @@ class ExtensionManager {
 
         if (sandboxMode === 'unsandboxed') {
             const {load} = require('./tw-unsandboxed-extension-runner');
-            const extensionObjects = await load(extensionURL);
+            const extensionObjects = await load(extensionURL, this.vm);
             const fakeWorkerId = this.nextExtensionWorker++;
             this.workerURLs[fakeWorkerId] = extensionURL;
 

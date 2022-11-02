@@ -50,6 +50,7 @@ import _disable_stage_drag_select from "../addons/disable-stage-drag-select/_man
 import _move_to_top_bottom from "../addons/move-to-top-bottom/_manifest_entry.js";
 import _disable_paste_offset from "../addons/disable-paste-offset/_manifest_entry.js";
 import _block_duplicate from "../addons/block-duplicate/_manifest_entry.js";
+import _rename_broadcasts from "../addons/rename-broadcasts/_manifest_entry.js";
 import _swap_local_global from "../addons/swap-local-global/_manifest_entry.js";
 import _editor_comment_previews from "../addons/editor-comment-previews/_manifest_entry.js";
 import _columns from "../addons/columns/_manifest_entry.js";
@@ -113,6 +114,7 @@ export default {
   "move-to-top-bottom": _move_to_top_bottom,
   "disable-paste-offset": _disable_paste_offset,
   "block-duplicate": _block_duplicate,
+  "rename-broadcasts": _rename_broadcasts,
   "swap-local-global": _swap_local_global,
   "editor-comment-previews": _editor_comment_previews,
   "columns": _columns,

@@ -17,9 +17,7 @@ const manifest = {
       "link": "https://scratch.mit.edu/users/thecolaber"
     }
   ],
-  "tags": [
-    "new"
-  ],
+  "tags": [],
   "userscripts": [
     {
       "url": "userscript.js"

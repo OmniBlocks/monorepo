@@ -257,6 +257,7 @@
     "block-duplicate/@description": "Dupliceer snel een script door het te slepen met de Alt-toets ingedrukt. Houd Ctrl ook ingedrukt om alleen een enkel blok te dupliceren in plaats van het hele script eronder.",
     "block-duplicate/@info-mac": "Gebruik de Option-toets in plaats van de Alt-toets en de Command-toets in plaats van de Control-toets op macOS.",
     "block-duplicate/@name": "Scripts dupliceren met de Alt-toets",
+    "rename-broadcasts/@name": "Signalen hernoemen",
     "swap-local-global/@description": "Geeft meer opties voor het hernoemen van variabelen of lijsten: laat je kiezen tussen \"Voor alle sprites\" en \"Alleen voor deze sprite\" en of variabelen voor de cloud moeten zijn. Voegt ook een optie toe voor rechterklikken op een variabele/lijst om snel zijn type te veranderen.",
     "swap-local-global/@name": "Wissel variabelen tussen \"Voor alle sprites\" en \"Alleen voor deze sprite\"",
     "editor-comment-previews/@description": "Geeft je de mogelijkheid om de inhoud van opmerkingen te zien door je muisaanwijzer over samengeklapte opmerkingen en blokken te zetten. Hiermee kun je opmerkingen zien die van het scherm af zijn, herhalingsblokken te onderscheiden vanaf de onderkant door zijn voorbeeld, veel grote opmerkingen in een kleine plek passen, en meer.",

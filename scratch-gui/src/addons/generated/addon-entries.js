@@ -51,6 +51,7 @@ export default {
   "move-to-top-bottom": () => import(/* webpackChunkName: "addon-default-entry" */ "../addons/move-to-top-bottom/_runtime_entry.js"),
   "disable-paste-offset": () => import(/* webpackChunkName: "addon-entry-disable-paste-offset" */ "../addons/disable-paste-offset/_runtime_entry.js"),
   "block-duplicate": () => import(/* webpackChunkName: "addon-default-entry" */ "../addons/block-duplicate/_runtime_entry.js"),
+  "rename-broadcasts": () => import(/* webpackChunkName: "addon-default-entry" */ "../addons/rename-broadcasts/_runtime_entry.js"),
   "swap-local-global": () => import(/* webpackChunkName: "addon-entry-swap-local-global" */ "../addons/swap-local-global/_runtime_entry.js"),
   "editor-comment-previews": () => import(/* webpackChunkName: "addon-default-entry" */ "../addons/editor-comment-previews/_runtime_entry.js"),
   "columns": () => import(/* webpackChunkName: "addon-entry-columns" */ "../addons/columns/_runtime_entry.js"),

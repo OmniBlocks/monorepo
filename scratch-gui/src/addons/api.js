@@ -437,8 +437,8 @@ class Tab extends EventTargetShim {
                 break;
             }
 
-            if (child.dataset.addonSharedSpaceOrder) {
-                if (Number(child.dataset.addonSharedSpaceOrder) > order) {
+            if (child.dataset.saSharedSpaceOrder) {
+                if (Number(child.dataset.saSharedSpaceOrder) > order) {
                     // We found another SA element with higher order number
                     // If from = [] and this is the first child, prepend.
                     // Otherwise, append before this child.

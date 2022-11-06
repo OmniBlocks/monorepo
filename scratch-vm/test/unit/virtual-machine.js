@@ -965,6 +965,7 @@ test('shareBlocksToTarget loads extensions that have not yet been loaded', t => 
     // Stub the extension manager
     const loadedIds = [];
     vm.extensionManager = {
+        allAsyncExtensionsLoaded: () => Promise.resolve(),
         isBuiltinExtension: () => true,
         isExtensionLoaded: id => id === 'pen',
         loadExtensionIdSync: id => new Promise(resolve => {

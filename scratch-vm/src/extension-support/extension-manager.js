@@ -179,7 +179,12 @@ class ExtensionManager {
     _isValidExtensionURL (extensionURL) {
         try {
             const parsedURL = new URL(extensionURL);
-            return parsedURL.protocol === 'https:' || parsedURL.protocol === 'http:' || parsedURL.protocol === 'data:'
+            return (
+                parsedURL.protocol === 'https:' ||
+                parsedURL.protocol === 'http:' ||
+                parsedURL.protocol === 'data:' ||
+                parsedURL.protocol === 'file:'
+            );
         } catch (e) {
             return false;
         }

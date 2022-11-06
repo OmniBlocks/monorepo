@@ -51,8 +51,9 @@ tap.afterEach(() => {
 const {test} = tap;
 
 test('basic API', async t => {
-    t.plan(6);
+    t.plan(8);
     const vm = mockVM();
+    class MyExtension {}
     setScript('https://turbowarp.org/1.js', () => {
         t.equal(global.Scratch.vm, vm);
         t.equal(global.Scratch.renderer, vm.runtime.renderer);
@@ -60,41 +61,71 @@ test('basic API', async t => {
         t.equal(global.Scratch.ArgumentType.NUMBER, 'number');
         t.equal(global.Scratch.BlockType.REPORTER, 'reporter');
         t.equal(global.Scratch.TargetType.SPRITE, 'sprite');
-        global.Scratch.extensions.register({});
+        global.Scratch.extensions.register(new MyExtension());
     });
-    await UnsandboxedExtensionRunner.load('https://turbowarp.org/1.js', vm);
+    const extensions = await UnsandboxedExtensionRunner.load('https://turbowarp.org/1.js', vm);
+    t.equal(extensions.length, 1);
+    t.ok(extensions[0] instanceof MyExtension);
     t.end();
 });
 
-test('multiple extensions', async t => {
-    const vm = mockVM();
+test('multiple VMs loading extensions', async t => {
+    const vm1 = mockVM();
+    const vm2 = mockVM();
+
+    class Extension1 {}
+    class Extension2 {}
 
     let api1 = null;
     setScript('https://turbowarp.org/1.js', async () => {
-        // Even if this extension takes a while to run, we should still have our own
+        // Even if this extension takes a while to register, we should still have our own
         // global.Scratch.
-        await new Promise(resolve => setTimeout(resolve, 200));
+        await new Promise(resolve => setTimeout(resolve, 100));
 
         if (api1) throw new Error('already ran 1');
         api1 = global.Scratch;
-        global.Scratch.extensions.register({});
+        global.Scratch.extensions.register(new Extension1());
     });
 
     let api2 = null;
     setScript('https://turbowarp.org/2.js', () => {
         if (api2) throw new Error('already ran 2');
         api2 = global.Scratch;
-        global.Scratch.extensions.register({});
+        global.Scratch.extensions.register(new Extension2());
     });
 
-    await Promise.all([
-        UnsandboxedExtensionRunner.load('https://turbowarp.org/1.js', vm),
-        UnsandboxedExtensionRunner.load('https://turbowarp.org/2.js', vm)
+    const extensions = await Promise.all([
+        UnsandboxedExtensionRunner.load('https://turbowarp.org/1.js', vm1),
+        UnsandboxedExtensionRunner.load('https://turbowarp.org/2.js', vm2)
     ]);
 
+    t.not(api1, api2);
     t.type(api1.extensions.register, 'function');
     t.type(api2.extensions.register, 'function');
-    t.not(api1, api2);
+    t.equal(api1.vm, vm1);
+    t.equal(api2.vm, vm2);
+
+    t.equal(extensions.length, 2);
+    t.equal(extensions[0].length, 1);
+    t.equal(extensions[1].length, 1);
+    t.ok(extensions[0][0] instanceof Extension1);
+    t.ok(extensions[1][0] instanceof Extension2);
+
+    t.end();
+});
+
+test('register multiple extensions in one script', async t => {
+    const vm = mockVM();
+    class Extension1 {}
+    class Extension2 {}
+    setScript('https://turbowarp.org/multiple.js', () => {
+        global.Scratch.extensions.register(new Extension1());
+        global.Scratch.extensions.register(new Extension2());
+    });
+    const extensions = await UnsandboxedExtensionRunner.load('https://turbowarp.org/multiple.js', vm);
+    t.equal(extensions.length, 2);
+    t.ok(extensions[0] instanceof Extension1);
+    t.ok(extensions[1] instanceof Extension2);
     t.end();
 });
 
@@ -107,5 +138,24 @@ test('extension error results in rejection', async t => {
     } catch (e) {
         t.pass();
     }
+    t.end();
+});
+
+test('ScratchX', async t => {
+    const vm = mockVM();
+    setScript('https://turbowarp.org/scratchx.js', () => {
+        const ext = {
+            test: () => 2
+        };
+        const descriptor = {
+            blocks: [
+                ['r', 'test', 'test']
+            ]
+        };
+        global.ScratchExtensions.register('Test', descriptor, ext);
+    });
+    const extensions = await UnsandboxedExtensionRunner.load('https://turbowarp.org/scratchx.js', vm);
+    t.equal(extensions.length, 1);
+    t.equal(extensions[0].test(), 2);
     t.end();
 });

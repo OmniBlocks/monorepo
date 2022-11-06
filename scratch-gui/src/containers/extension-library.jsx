@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import VM from 'scratch-vm';
 import {defineMessages, injectIntl, intlShape} from 'react-intl';
+import {setSearchParams} from '../lib/tw-navigation-utils';
 
 import extensionLibraryContent from '../lib/libraries/extensions/index.jsx';
 
@@ -65,15 +66,9 @@ class ExtensionLibrary extends React.PureComponent {
                     .then(() => {
                         this.props.onCategorySelected(id);
                         if (isCustomURL) {
-                            let newUrl = location.pathname;
-                            if (location.search) {
-                                newUrl += location.search;
-                                newUrl += '&';
-                            } else {
-                                newUrl += '?';
-                            }
-                            newUrl += `extension=${encodeURIComponent(url)}`;
-                            history.replaceState('', '', newUrl);
+                            const searchParams = new URLSearchParams(location.search);
+                            searchParams.append('extension', url);
+                            setSearchParams(searchParams);
                         }
                     })
                     .catch(err => {

@@ -26,6 +26,8 @@ const createUnsandboxedExtensionAPI = vm => new Promise(resolve => {
         unsandboxed: true,
         register
     };
+
+    global.ScratchExtensions = require('./tw-scratchx-compatibility-layer');
 });
 
 /**

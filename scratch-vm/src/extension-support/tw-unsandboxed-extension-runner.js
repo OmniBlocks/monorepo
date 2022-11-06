@@ -9,7 +9,8 @@ const AsyncLimiter = require('../util/async-limiter');
  * @returns {Promise<object[]>} Resolves with a list of extension objects when Scratch.extensions.register is called.
  */
 const createUnsandboxedExtensionAPI = vm => new Promise(resolve => {
-    global.Scratch = global.Scratch || {};
+    // Create a new copy of global.Scratch per-extension
+    global.Scratch = Object.assign({}, global.Scratch || {});
     global.Scratch.vm = vm;
     global.Scratch.renderer = vm.runtime.renderer;
     global.Scratch.ArgumentType = ArgumentType;

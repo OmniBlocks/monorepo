@@ -15,7 +15,6 @@ const createUnsandboxedExtensionAPI = vm => new Promise(resolve => {
     global.Scratch.ArgumentType = ArgumentType;
     global.Scratch.BlockType = BlockType;
     global.Scratch.TargetType = TargetType;
-    global.Scratch.ArgumentType = ArgumentType;
 
     const extensionObjects = [];
     const register = extensionObject => {

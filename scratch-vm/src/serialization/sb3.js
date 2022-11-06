@@ -614,11 +614,12 @@ const serialize = function (runtime, targetId, {allowOptimization = true} = {}) 
     if (runtime.extensionManager) {
         // We'll save the extensions in the format:
         // {
-        //   "extension_id": "https://..."
+        //   "extension_id": "https://...",
+        //   "other_id": "https://..."
         // }
-        // Which lets the VM know which URLs correspond to which IDs, which might be useful
-        // later. For example, if a custom extension is converted to a builtin extension,
-        // the VM will know that it doesn't need to load the old extension's URL.
+        // Which lets the VM know which URLs correspond to which IDs, which is useful when the project
+        // is being loaded. For example, if the extension is eventually converted to a builtin extension
+        // or if it is already loaded, then it doesn't need to fetch the script again.
         const extensionURLs = runtime.extensionManager.getExtensionURLs();
         const urlsToSave = {};
         for (const extension of extensions) {

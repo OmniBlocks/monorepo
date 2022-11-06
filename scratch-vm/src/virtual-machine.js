@@ -645,6 +645,10 @@ class VirtualMachine extends EventEmitter {
      * @param {Map<string, string>} extensionURLs A map of extension ID to URL
      */
     async _loadExtensions (extensionIDs, extensionURLs = new Map()) {
+        // Wait for any custom extensions that are loading to finish loading.
+        // We won't be able to determine which URLs we still need to load until this happens.
+        await this.extensionManager.allAsyncExtensionsLoaded();
+
         const extensionPromises = [];
         for (const extensionID of extensionIDs) {
             if (this.extensionManager.isExtensionLoaded(extensionID)) {
@@ -676,9 +680,7 @@ class VirtualMachine extends EventEmitter {
      * @param {boolean} wholeProject - set to true if installing a whole project, as opposed to a single sprite.
      * @returns {Promise} resolved once targets have been installed
      */
-    async installTargets (targets, extensions, wholeProject) {
-        await this.extensionManager.allAsyncExtensionsLoaded();
-
+    installTargets (targets, extensions, wholeProject) {
         targets = targets.filter(target => !!target);
 
         return this._loadExtensions(extensions.extensionIDs, extensions.extensionURLs).then(() => {

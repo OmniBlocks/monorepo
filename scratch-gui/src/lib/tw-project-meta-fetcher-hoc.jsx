@@ -9,7 +9,7 @@ import {setAuthor, setDescription} from '../reducers/tw';
 export const fetchProjectMeta = async projectId => {
     let res;
     try {
-        res = await fetch(`https://trampoline.turbowarp.org2/proxy/projects/${projectId}`);
+        res = await fetch(`https://trampoline.turbowarp.org/proxy/projects/${projectId}`);
     } catch (e) {
         // If turbowarp.org is blocked, try turbowarp.xyz
         res = await fetch(`https://trampoline.turbowarp.xyz/proxy/projects/${projectId}`);

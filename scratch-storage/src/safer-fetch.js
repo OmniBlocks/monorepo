@@ -26,6 +26,11 @@ const startNextFetch = ([resolve, url, options]) => {
             return buffer;
         })
         .catch(error => {
+            if (error === 403) {
+                // Retrying this request will not help, so return an error now.
+                throw error;
+            }
+
             console.warn(`Attempt to fetch ${url} failed`, error);
             if (!firstError) {
                 firstError = error;

@@ -7,20 +7,29 @@ import {setProjectTitle} from '../reducers/project-title';
 import {setAuthor, setDescription} from '../reducers/tw';
 
 export const fetchProjectMeta = async projectId => {
-    let res;
-    try {
-        res = await fetch(`https://trampoline.turbowarp.org/proxy/projects/${projectId}`);
-    } catch (e) {
-        // If turbowarp.org is blocked, try turbowarp.xyz
-        res = await fetch(`https://trampoline.turbowarp.xyz/proxy/projects/${projectId}`);
+    const urls = [
+        `https://trampoline.turbowarp.org/proxy/projects/${projectId}`,
+        `https://trampoline.turbowarp.xyz/proxy/projects/${projectId}`
+    ];
+    let firstError;
+    for (const url of urls) {
+        try {
+            const res = await fetch(url);
+            const data = await res.json();
+            if (res.ok) {
+                return data;
+            }
+            if (res.status === 404) {
+                throw new Error('Project is probably unshared');
+            }
+            throw new Error(`Unexpected status code: ${res.status}`);
+        } catch (err) {
+            if (!firstError) {
+                firstError = err;
+            }
+        }
     }
-    if (res.status === 404) {
-        throw new Error('Project is probably unshared');
-    }
-    if (res.status !== 200) {
-        throw new Error(`Unexpected status code: ${res.status}`);
-    }
-    return res.json();
+    throw firstError;
 };
 
 const getNoIndexTag = () => document.querySelector('meta[name="robots"][content="noindex"]');

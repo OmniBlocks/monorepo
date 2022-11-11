@@ -26,35 +26,30 @@ import storage from './storage';
 import {MISSING_PROJECT_ID} from './tw-missing-project';
 import VM from 'scratch-vm';
 import * as progressMonitor from '../components/loader/tw-progress-monitor';
+import {fetchProjectMeta} from './tw-project-meta-fetcher-hoc.jsx';
 
 // TW: Temporary hack for project tokens
-const fetchProjectToken = projectId => {
+const fetchProjectToken = async projectId => {
     if (projectId === '0') {
-        return Promise.resolve(null);
+        return null;
     }
     // Parse ?token=abcdef
     const searchParams = new URLSearchParams(location.search);
     if (searchParams.has('token')) {
-        return Promise.resolve(searchParams.get('token'));
+        return searchParams.get('token');
     }
     // Parse #1?token=abcdef
     const hashParams = new URLSearchParams(location.hash.split('?')[1]);
     if (hashParams.has('token')) {
-        return Promise.resolve(hashParams.get('token'));
+        return hashParams.get('token');
     }
-    return fetch(`https://trampoline.turbowarp.org/proxy/projects/${projectId}`)
-        .then(r => {
-            if (!r.ok) return null;
-            return r.json();
-        })
-        .then(dataOrNull => {
-            const token = dataOrNull ? dataOrNull.project_token : null;
-            return token;
-        })
-        .catch(err => {
-            log.error(err);
-            return null;
-        });
+    try {
+        const metadata = await fetchProjectMeta(projectId);
+        return metadata.project_token;
+    } catch (e) {
+        log.error(e);
+        throw new Error('Cannot access project token. Project is probably unshared. See https://docs.turbowarp.org/unshared-projects');
+    }
 };
 
 /* Higher Order Component to provide behavior for loading projects by id. If

@@ -694,15 +694,13 @@ class JSGenerator {
      */
     descendStackedBlock (node) {
         switch (node.kind) {
-        case 'addons.call':
-            this.source += `yield* callAddonBlock("${sanitize(node.code)}","${sanitize(node.blockId)}",{`;
-            this.yielded();
-            for (const argumentName of Object.keys(node.arguments)) {
-                const argumentValue = node.arguments[argumentName];
-                this.source += `"${sanitize(argumentName)}":${this.descendInput(argumentValue).asSafe()},`;
-            }
-            this.source += '});\n';
+        case 'addons.call': {
+            const inputs = this.descendInputRecord(node.arguments);
+            const blockFunction = `runtime.getAddonBlock("${sanitize(node.code)}").callback`;
+            const blockId = `"${sanitize(node.blockId)}"`;
+            this.source += `yield* executeInCompatibilityLayer(${inputs}, ${blockFunction}, ${this.isWarp}, false, ${blockId});\n`;
             break;
+        }
 
         case 'compat': {
             // If the last command in a loop returns a promise, immediately continue to the next iteration.
@@ -1068,6 +1066,21 @@ class JSGenerator {
         }
     }
 
+    /**
+     * Compile a Record of input objects into a safe JS string.
+     * @param {Record<string, unknown>} inputs
+     * @returns {string}
+     */
+    descendInputRecord (inputs) {
+        let result = '{';
+        for (const name of Object.keys(inputs)) {
+            const node = inputs[name];
+            result += `"${sanitize(name)}":${this.descendInput(node).asSafe()},`;
+        }
+        result += '}';
+        return result;
+    }
+
     resetVariableInputs () {
         this.variableInputs = {};
     }
@@ -1196,7 +1209,7 @@ class JSGenerator {
             result += `"${sanitize(fieldName)}":"${sanitize(field)}",`;
         }
         const opcodeFunction = this.evaluateOnce(`runtime.getOpcodeFunction("${sanitize(opcode)}")`);
-        result += `}, ${opcodeFunction}, ${this.isWarp}, ${setFlags})`;
+        result += `}, ${opcodeFunction}, ${this.isWarp}, ${setFlags}, null)`;
 
         return result;
     }

@@ -29,14 +29,10 @@ class CompatibilityLayerBlockUtility extends BlockUtility {
         throw new Error('getParam is not supported by this BlockUtility');
     }
 
-    peekStack () {
-        return this._fakeBlockId;
-    }
-
     init (thread, fakeBlockId) {
         this.thread = thread;
         this.sequencer = thread.target.runtime.sequencer;
-        this.fakeBlockId = fakeBlockId;
+        thread.stack[0] = fakeBlockId;
     }
 }
 

@@ -100,6 +100,7 @@ runtimeFunctions.waitThreads = `const waitThreads = function*(threads) {
  * @param {*} inputs The inputs to pass to the block.
  * @param {function} blockFunction The primitive's function.
  * @param {boolean} useFlags Whether to set flags (hasResumedFromPromise)
+ * @param {string} blockId Block ID to set on the emulated block utility.
  * @returns {*} the value returned by the block, if any.
  */
 runtimeFunctions.executeInCompatibilityLayer = `let hasResumedFromPromise = false;
@@ -130,7 +131,7 @@ const isPromise = value => (
     typeof value === 'object' &&
     typeof value.then === 'function'
 );
-const executeInCompatibilityLayer = function*(inputs, blockFunction, isWarp, useFlags) {
+const executeInCompatibilityLayer = function*(inputs, blockFunction, isWarp, useFlags, blockId) {
     const thread = globalState.thread;
 
     // reset the stackframe
@@ -139,7 +140,7 @@ const executeInCompatibilityLayer = function*(inputs, blockFunction, isWarp, use
 
     const executeBlock = () => {
         const blockUtility = globalState.blockUtility;
-        blockUtility.init(thread);
+        blockUtility.init(thread, blockId);
         return blockFunction(inputs, blockUtility);
     };
 
@@ -192,25 +193,6 @@ const executeInCompatibilityLayer = function*(inputs, blockFunction, isWarp, use
     // todo: do we have to do anything extra if status is STATUS_DONE?
 
     return returnValue;
-}`;
-
-/**
- * Run an addon block.
- * @param {string} procedureCode The block's procedure code
- * @param {string} blockId The ID of the block being run
- * @param {object} args The arguments to pass to the block
- */
-runtimeFunctions.callAddonBlock = `const callAddonBlock = function*(procedureCode, blockId, args) {
-    const thread = globalState.thread;
-    const addonBlock = thread.target.runtime.getAddonBlock(procedureCode);
-    if (addonBlock) {
-        const blockUtility = globalState.blockUtility;
-        blockUtility.init(thread, blockId);
-        addonBlock.callback(args, blockUtility);
-        if (thread.status === 1 /* STATUS_PROMISE_WAIT */) {
-            yield;
-        }
-    }
 }`;
 
 /**

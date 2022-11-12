@@ -12,6 +12,7 @@ const runTests = compilerEnabled => async test => {
             enabled: compilerEnabled
         });
         await vm.loadProject(fixtureData);
+        vm.on('COMPILE_ERROR', (target, error) => test.fail(`Compile error ${target.getName()} ${error}`));
         return vm;
     };
 
@@ -30,7 +31,9 @@ const runTests = compilerEnabled => async test => {
             callback: (args, util) => {
                 calledBlock1 = true;
                 t.type(util.thread, 'object');
-                t.type(util.thread.peekStack, 'function');
+                // may have to update this ID when the project changes to match whatever the ID is for the
+                // procedures_call block to block 2 %s
+                t.equal(util.thread.peekStack(), 'c');
                 t.deepEqual(args, {
                     'number or text': 'banana'
                 });
@@ -61,7 +64,7 @@ const runTests = compilerEnabled => async test => {
         t.end();
     });
 
-    await test.test('yield by STATUS_PROMISE_WAIT', async t => {
+    await test.test('yield by thread.status = STATUS_PROMISE_WAIT', async t => {
         const vm = await load();
 
         let threadToResume;
@@ -72,7 +75,7 @@ const runTests = compilerEnabled => async test => {
                 util.thread.status = 1; // STATUS_PROMISE_WAIT
                 threadToResume = util.thread;
             },
-            arguments: ['number or text'],
+            arguments: [],
             color: '#ff4c4c',
             secondaryColor: '#4cffff'
         });
@@ -85,6 +88,35 @@ const runTests = compilerEnabled => async test => {
 
         t.equal(getOutput(vm), 'initial value');
         threadToResume.status = 0; // STATUS_RUNNING
+        vm.runtime._step();
+        t.equal(getOutput(vm), 'block 3 value');
+
+        t.end();
+    });
+
+    await test.test('yield by block utility methods', async t => {
+        const vm = await load();
+
+        let isFirstCall = true;
+
+        vm.addAddonBlock({
+            procedureCode: 'block 1',
+            callback: (args, util) => {
+                if (isFirstCall) {
+                    util.runtime.requestRedraw();
+                    util.yield();
+                    isFirstCall = false;
+                }
+            },
+            arguments: [],
+            color: '#ff4c4c',
+            secondaryColor: '#4cffff'
+        });
+
+        vm.greenFlag();
+        vm.runtime._step();
+        t.equal(isFirstCall, false);
+        t.equal(getOutput(vm), 'initial value');
         vm.runtime._step();
         t.equal(getOutput(vm), 'block 3 value');
 

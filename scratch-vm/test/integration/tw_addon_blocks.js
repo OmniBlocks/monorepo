@@ -91,25 +91,26 @@ const runExecutionTests = compilerEnabled => async test => {
     await test.test('yield by block utility methods', async t => {
         const vm = await load();
 
-        let isFirstCall = true;
+        let shouldYield = true;
 
         vm.addAddonBlock({
             procedureCode: 'block 1',
             callback: (args, util) => {
-                if (isFirstCall) {
+                if (shouldYield) {
                     util.runtime.requestRedraw();
                     util.yield();
-                    isFirstCall = false;
                 }
             },
             arguments: []
         });
 
         vm.greenFlag();
-        vm.runtime._step();
-        t.equal(isFirstCall, false);
+        for (let i = 0; i < 10; i++) {
+            vm.runtime._step();
+        }
         t.equal(getOutput(vm), 'initial value');
 
+        shouldYield = false;
         vm.runtime._step();
         t.equal(getOutput(vm), 'block 3 value');
 

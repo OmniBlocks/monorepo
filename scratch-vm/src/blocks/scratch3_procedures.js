@@ -50,12 +50,18 @@ class Scratch3ProcedureBlocks {
                 }
             }
 
-            util.stackFrame.executed = true;
-
             const addonBlock = util.runtime.getAddonBlock(procedureCode);
             if (addonBlock) {
-                return addonBlock.callback(util.thread.getAllparams(), util);
+                const result = addonBlock.callback(util.thread.getAllparams(), util);
+                if (util.thread.status === 1 /* STATUS_PROMISE_WAIT */) {
+                    // If the addon block is using STATUS_PROMISE_WAIT to force us to sleep,
+                    // make sure to not re-run this block when we resume.
+                    util.stackFrame.executed = true;
+                }
+                return result;
             }
+
+            util.stackFrame.executed = true;
 
             util.startProcedure(procedureCode);
         }

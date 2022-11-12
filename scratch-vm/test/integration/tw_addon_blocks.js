@@ -5,7 +5,7 @@ const VirtualMachine = require('../../src/virtual-machine');
 
 const fixtureData = fs.readFileSync(path.join(__dirname, '..', 'fixtures', 'tw-addon-blocks.sb3'));
 
-const runTests = compilerEnabled => async test => {
+const runExecutionTests = compilerEnabled => async test => {
     const load = async () => {
         const vm = new VirtualMachine();
         vm.setCompilerOptions({
@@ -34,7 +34,7 @@ const runTests = compilerEnabled => async test => {
                 // may have to update this ID when the project changes to match whatever the ID is for the
                 // procedures_call block to block 2 %s
                 t.equal(util.thread.peekStack(), 'c');
-                t.deepEqual(args, {
+                t.same(args, {
                     'number or text': 'banana'
                 });
             },
@@ -46,7 +46,7 @@ const runTests = compilerEnabled => async test => {
             // eslint-disable-next-line no-unused-vars
             callback: (args, util) => {
                 calledBlock2 = true;
-                t.deepEqual(args, {});
+                t.same(args, {});
             },
             arguments: []
         });
@@ -145,5 +145,43 @@ const runTests = compilerEnabled => async test => {
     test.end();
 };
 
-tap.test('with compiler disabled', runTests(false));
-tap.test('with compiler enabled', runTests(true));
+tap.test('with compiler disabled', runExecutionTests(false));
+tap.test('with compiler enabled', runExecutionTests(true));
+
+tap.test('block info', t => {
+    const vm = new VirtualMachine();
+
+    const BLOCK_INFO_ID = 'a-b';
+
+    vm.addAddonBlock({
+        procedureCode: 'hidden %s',
+        arguments: ['number or text'],
+        callback: () => {},
+        hidden: true
+    });
+
+    let blockInfo = vm.runtime._blockInfo.find(i => i.id === BLOCK_INFO_ID);
+    t.equal(blockInfo, undefined);
+
+    vm.addAddonBlock({
+        procedureCode: 'something %s',
+        arguments: ['number or text'],
+        callback: () => {}
+    });
+
+    blockInfo = vm.runtime._blockInfo.find(i => i.id === BLOCK_INFO_ID);
+    t.type(blockInfo.id, 'string');
+    t.type(blockInfo.name, 'string');
+    t.type(blockInfo.color1, 'string');
+    t.type(blockInfo.color2, 'string');
+    t.type(blockInfo.color3, 'string');
+    t.same(blockInfo.blocks, [
+        {
+            info: {},
+            // eslint-disable-next-line max-len
+            xml: '<block type="procedures_call" gap="16"><mutation generateshadows="true" warp="false" proccode="something %s" argumentnames="[&quot;number or text&quot;]" argumentids="[&quot;arg0&quot;]" argumentdefaults="[&quot;&quot;]"></mutation></block>'
+        }
+    ]);
+
+    t.end();
+});

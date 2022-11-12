@@ -2507,6 +2507,7 @@ class Runtime extends EventEmitter {
      * @param {string} options.procedureCode The ID of the block
      * @param {function} options.callback The callback, called with (args, BlockUtility). May return a promise.
      * @param {string[]} options.arguments Names of the arguments accepted
+     * @param {boolean} [hidden] True to not include this block in the block palette
      */
     addAddonBlock (options) {
         const procedureCode = options.procedureCode;
@@ -2518,31 +2519,33 @@ class Runtime extends EventEmitter {
             ...options
         };
 
-        const ID = 'a-b';
-        let blockInfo = this._blockInfo.find(i => i.id === ID);
-        if (!blockInfo) {
-            blockInfo = {
-                id: ID,
-                name: 'Addons',
-                color1: '#29beb8',
-                color2: '#3aa8a4',
-                color3: '#3aa8a4',
-                blocks: [],
-                customFieldTypes: {},
-                menus: []
-            };
-            this._blockInfo.unshift(blockInfo);
+        if (!options.hidden) {
+            const ID = 'a-b';
+            let blockInfo = this._blockInfo.find(i => i.id === ID);
+            if (!blockInfo) {
+                blockInfo = {
+                    id: ID,
+                    name: 'Addons',
+                    color1: '#29beb8',
+                    color2: '#3aa8a4',
+                    color3: '#3aa8a4',
+                    blocks: [],
+                    customFieldTypes: {},
+                    menus: []
+                };
+                this._blockInfo.unshift(blockInfo);
+            }
+            blockInfo.blocks.push({
+                info: {},
+                xml:
+                   '<block type="procedures_call" gap="16"><mutation generateshadows="true" warp="false"' +
+                    ` proccode="${xmlEscape(procedureCode)}"` +
+                    ` argumentnames="${xmlEscape(JSON.stringify(names))}"` +
+                    ` argumentids="${xmlEscape(JSON.stringify(ids))}"` +
+                    ` argumentdefaults="${xmlEscape(JSON.stringify(defaults))}"` +
+                    '></mutation></block>'
+            });
         }
-        blockInfo.blocks.push({
-            info: {},
-            xml:
-               '<block type="procedures_call" gap="16"><mutation generateshadows="true" warp="false"' +
-                ` proccode="${xmlEscape(procedureCode)}"` +
-                ` argumentnames="${xmlEscape(JSON.stringify(names))}"` +
-                ` argumentids="${xmlEscape(JSON.stringify(ids))}"` +
-                ` argumentdefaults="${xmlEscape(JSON.stringify(defaults))}"` +
-                '></mutation></block>'
-        });
 
         this.resetAllCaches();
     }

@@ -153,7 +153,7 @@ class BlockUtility {
     startProcedure (procedureCode) {
         const addonBlock = this.runtime.getAddonBlock(procedureCode);
         if (addonBlock) {
-            addonBlock.callback(this.thread.getAllparams(), this.thread);
+            addonBlock.callback(this.thread.getAllparams(), this);
             return;
         }
         this.sequencer.stepToProcedure(this.thread, procedureCode);

@@ -1,6 +1,15 @@
 const BlockUtility = require('../engine/block-utility');
 
 class CompatibilityLayerBlockUtility extends BlockUtility {
+    constructor () {
+        super();
+
+        /**
+         * @type {string|null}
+         */
+        this._fakeBlockId = null;
+    }
+
     // Branching operations are not supported.
     startBranch () {
         throw new Error('startBranch is not supported by this BlockUtility');
@@ -18,6 +27,16 @@ class CompatibilityLayerBlockUtility extends BlockUtility {
     }
     getParam () {
         throw new Error('getParam is not supported by this BlockUtility');
+    }
+
+    peekStack () {
+        return this._fakeBlockId;
+    }
+
+    init (thread, fakeBlockId) {
+        this.thread = thread;
+        this.sequencer = thread.target.runtime.sequencer;
+        this.fakeBlockId = fakeBlockId;
     }
 }
 

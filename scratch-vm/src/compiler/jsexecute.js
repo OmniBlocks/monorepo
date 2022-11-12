@@ -11,7 +11,7 @@ const globalState = {
     Timer: require('../util/timer'),
     Cast: require('../util/cast'),
     log: require('../util/log'),
-    compatibilityLayerBlockUtility: require('./compat-block-utility'),
+    blockUtility: require('./compat-block-utility'),
     thread: null
 };
 
@@ -126,10 +126,9 @@ const executeInCompatibilityLayer = function*(inputs, blockFunction, isWarp, use
     thread.stackFrames[thread.stackFrames.length - 1].reuse(isWarp);
 
     const executeBlock = () => {
-        const compatibilityLayerBlockUtility = globalState.compatibilityLayerBlockUtility;
-        compatibilityLayerBlockUtility.thread = thread;
-        compatibilityLayerBlockUtility.sequencer = thread.target.runtime.sequencer;
-        return blockFunction(inputs, compatibilityLayerBlockUtility);
+        const blockUtility = globalState.blockUtility;
+        blockUtility.init(thread);
+        return blockFunction(inputs, blockUtility);
     };
 
     const isPromise = value => (
@@ -188,14 +187,9 @@ runtimeFunctions.callAddonBlock = `const callAddonBlock = function*(procedureCod
     const thread = globalState.thread;
     const addonBlock = thread.target.runtime.getAddonBlock(procedureCode);
     if (addonBlock) {
-        const target = thread.target;
-        addonBlock.callback(args, {
-            // Shim enough of BlockUtility to make addons work
-            peekStack () {
-                return blockId;
-            },
-            target
-        });
+        const blockUtility = globalState.blockUtility;
+        blockUtility.init(thread, blockId);
+        addonBlock.callback(args, blockUtility);
         if (thread.status === 1 /* STATUS_PROMISE_WAIT */) {
             yield;
         }

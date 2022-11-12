@@ -84,13 +84,19 @@ runtimeFunctions.waitThreads = `const waitThreads = function*(threads) {
 }`;
 
 /**
- * Wait until a Promise resolves or rejects before continuing.
+ * waitPromise: Wait until a Promise resolves or rejects before continuing.
  * @param {Promise} promise The promise to wait for.
  * @returns {*} the value that the promise resolves to, otherwise undefined if the promise rejects
  */
 
 /**
- * Execute a scratch-vm primitive.
+ * isPromise: Determine if a value is Promise-like
+ * @param {unknown} promise The value to check
+ * @returns {promise is PromiseLike} True if the value is Promise-like (has a .then())
+ */
+
+/**
+ * executeInCompatibilityLayer: Execute a scratch-vm primitive.
  * @param {*} inputs The inputs to pass to the block.
  * @param {function} blockFunction The primitive's function.
  * @param {boolean} useFlags Whether to set flags (hasResumedFromPromise)
@@ -118,6 +124,12 @@ const waitPromise = function*(promise) {
 
     return returnValue;
 };
+const isPromise = value => (
+    // see engine/execute.js
+    value !== null &&
+    typeof value === 'object' &&
+    typeof value.then === 'function'
+);
 const executeInCompatibilityLayer = function*(inputs, blockFunction, isWarp, useFlags) {
     const thread = globalState.thread;
 
@@ -130,13 +142,6 @@ const executeInCompatibilityLayer = function*(inputs, blockFunction, isWarp, use
         blockUtility.init(thread);
         return blockFunction(inputs, blockUtility);
     };
-
-    const isPromise = value => (
-        // see engine/execute.js
-        value !== null &&
-        typeof value === 'object' &&
-        typeof value.then === 'function'
-    );
 
     let returnValue = executeBlock();
 

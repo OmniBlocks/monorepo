@@ -153,6 +153,13 @@ const executeInCompatibilityLayer = function*(inputs, blockFunction, isWarp, use
         return returnValue;
     }
 
+    if (thread.status === 1 /* STATUS_PROMISE_WAIT */) {
+        // Something external is forcing us to stop
+        yield;
+        // Make up a return value because whatever is forcing us to stop can't specify one
+        return '';
+    }
+
     while (thread.status === 2 /* STATUS_YIELD */ || thread.status === 3 /* STATUS_YIELD_TICK */) {
         // Yielded threads will run next iteration.
         if (thread.status === 2 /* STATUS_YIELD */) {
@@ -174,6 +181,11 @@ const executeInCompatibilityLayer = function*(inputs, blockFunction, isWarp, use
                 hasResumedFromPromise = true;
             }
             return returnValue;
+        }
+
+        if (thread.status === 1 /* STATUS_PROMISE_WAIT */) {
+            yield;
+            return '';
         }
     }
 

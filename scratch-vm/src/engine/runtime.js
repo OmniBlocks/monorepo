@@ -2507,8 +2507,6 @@ class Runtime extends EventEmitter {
      * @param {string} options.procedureCode The ID of the block
      * @param {function} options.callback The callback, called with (args, BlockUtility). May return a promise.
      * @param {string[]} options.arguments Names of the arguments accepted
-     * @param {string} options.color Primary color
-     * @param {string} options.secondaryColor Secondary color
      */
     addAddonBlock (options) {
         const procedureCode = options.procedureCode;
@@ -2526,9 +2524,9 @@ class Runtime extends EventEmitter {
             blockInfo = {
                 id: ID,
                 name: 'Addons',
-                color1: options.color,
-                color2: options.secondaryColor,
-                color3: options.secondaryColor,
+                color1: '#29beb8',
+                color2: '#3aa8a4',
+                color3: '#3aa8a4',
                 blocks: [],
                 customFieldTypes: {},
                 menus: []

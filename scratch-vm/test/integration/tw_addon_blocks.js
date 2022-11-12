@@ -38,9 +38,7 @@ const runTests = compilerEnabled => async test => {
                     'number or text': 'banana'
                 });
             },
-            arguments: ['number or text'],
-            color: '#ff4c4c',
-            secondaryColor: '#4cffff'
+            arguments: ['number or text']
         });
     
         vm.addAddonBlock({
@@ -50,9 +48,7 @@ const runTests = compilerEnabled => async test => {
                 calledBlock2 = true;
                 t.deepEqual(args, {});
             },
-            arguments: [],
-            color: '#ff4c4c',
-            secondaryColor: '#4cffff'
+            arguments: []
         });
     
         vm.greenFlag();
@@ -75,9 +71,7 @@ const runTests = compilerEnabled => async test => {
                 util.thread.status = 1; // STATUS_PROMISE_WAIT
                 threadToResume = util.thread;
             },
-            arguments: [],
-            color: '#ff4c4c',
-            secondaryColor: '#4cffff'
+            arguments: []
         });
 
         vm.greenFlag();
@@ -108,9 +102,7 @@ const runTests = compilerEnabled => async test => {
                     isFirstCall = false;
                 }
             },
-            arguments: [],
-            color: '#ff4c4c',
-            secondaryColor: '#4cffff'
+            arguments: []
         });
 
         vm.greenFlag();
@@ -133,9 +125,7 @@ const runTests = compilerEnabled => async test => {
             callback: () => new Promise(resolve => {
                 resolveCallback = resolve;
             }),
-            arguments: [],
-            color: '#ff4c4c',
-            secondaryColor: '#4cffff'
+            arguments: []
         });
 
         vm.greenFlag();

@@ -484,13 +484,14 @@ class Tab extends EventTargetShim {
             displayName = procedureCode;
         }
 
+        const wrappedCallback = (a, util) => callback(a, util.thread);
+
         const vm = this.traps.vm;
         vm.addAddonBlock({
             procedureCode,
             arguments: args,
-            callback,
-            color: '#29beb8',
-            secondaryColor: '#3aa8a4',
+            callback: wrappedCallback,
+            // Ignored by VM but used by scratch-blocks traps
             displayName
         });
 

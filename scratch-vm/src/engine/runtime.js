@@ -2505,7 +2505,7 @@ class Runtime extends EventEmitter {
      * Add an "addon block"
      * @param {object} options Options object
      * @param {string} options.procedureCode The ID of the block
-     * @param {function} options.callback The callback, called with (args, BlockUtility)
+     * @param {function} options.callback The callback, called with (args, BlockUtility). May return a promise.
      * @param {string[]} options.arguments Names of the arguments accepted
      * @param {string} options.color Primary color
      * @param {string} options.secondaryColor Secondary color

@@ -51,6 +51,12 @@ class Scratch3ProcedureBlocks {
             }
 
             util.stackFrame.executed = true;
+
+            const addonBlock = util.runtime.getAddonBlock(procedureCode);
+            if (addonBlock) {
+                return addonBlock.callback(util.thread.getAllparams(), util);
+            }
+
             util.startProcedure(procedureCode);
         }
     }

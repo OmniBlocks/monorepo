@@ -117,6 +117,35 @@ const runTests = compilerEnabled => async test => {
         vm.runtime._step();
         t.equal(isFirstCall, false);
         t.equal(getOutput(vm), 'initial value');
+
+        vm.runtime._step();
+        t.equal(getOutput(vm), 'block 3 value');
+
+        t.end();
+    });
+
+    await test.test('yield by returning Promise', async t => {
+        const vm = await load();
+
+        let resolveCallback;
+        vm.addAddonBlock({
+            procedureCode: 'block 1',
+            callback: () => new Promise(resolve => {
+                resolveCallback = resolve;
+            }),
+            arguments: [],
+            color: '#ff4c4c',
+            secondaryColor: '#4cffff'
+        });
+
+        vm.greenFlag();
+        vm.runtime._step();
+        t.equal(getOutput(vm), 'initial value');
+
+        resolveCallback();
+        // Allow the promise callback to run
+        await Promise.resolve();
+
         vm.runtime._step();
         t.equal(getOutput(vm), 'block 3 value');
 

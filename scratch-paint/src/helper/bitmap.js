@@ -18,6 +18,9 @@ const doesColorRequireMask = color => (
 
 const createMaskingCanvas = (originalContext, fillStyle) => {
     const originalCanvas = originalContext.canvas;
+    if (fillStyle === null) {
+        fillStyle = '#00000000';
+    }
     if (doesColorRequireMask(fillStyle)) {
         const tempCanvas = createCanvas(originalCanvas.width, originalCanvas.height);
         const tempContext = tempCanvas.getContext('2d');

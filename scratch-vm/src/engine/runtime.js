@@ -453,6 +453,26 @@ class Runtime extends EventEmitter {
          * This mode is used by the TurboWarp Packager.
          */
         this.isPackaged = false;
+
+        /**
+         * Contains information about the external communication methods that the scripts inside the project
+         * can use to send data from inside the project to an external server.
+         * Do not update this directly. Use Runtime.setExternalCommunicationMethod() instead.
+         */
+        this.externalCommunicationMethods = {
+            cloudVariables: false,
+            customExtensions: false
+        };
+        this.on(Runtime.HAS_CLOUD_DATA_UPDATE, enabled => {
+            this.setExternalCommunicationMethod('cloudVariables', enabled);
+        });
+
+        /**
+         * If set to true, features such as reading colors from the user's webcam will be disabled
+         * when the project has access to any external communication method to protect user privacy.
+         * Do not update this directly. Use Runtime.setEnforcePrivacy() instead.
+         */
+        this.enforcePrivacy = true;
     }
 
     /**
@@ -1718,6 +1738,7 @@ class Runtime extends EventEmitter {
         this.renderer = renderer;
         this.renderer.setLayerGroupOrdering(StageLayering.LAYER_GROUPS);
         this.renderer.offscreenTouching = !this.runtimeOptions.fencing;
+        this.updatePrivacy();
     }
 
     /**
@@ -3145,6 +3166,36 @@ class Runtime extends EventEmitter {
      */
     updateCurrentMSecs () {
         this.currentMSecs = Date.now();
+    }
+
+    updatePrivacy () {
+        const enforceRestrictions = (
+            this.enforcePrivacy &&
+            Object.values(this.externalCommunicationMethods).some(i => i)
+        );
+        if (this.renderer) {
+            this.renderer.setPrivateSkinAccess(!enforceRestrictions);
+        }
+    }
+
+    /**
+     * @param {boolean} enabled True if restrictions should be enforced to protect user privacy.
+     */
+    setEnforcePrivacy (enabled) {
+        this.enforcePrivacy = enabled;
+        this.updatePrivacy();
+    }
+
+    /**
+     * @param {string} method Name of the method in Runtime.externalCommunicationMethods
+     * @param {boolean} enabled True if the feature is enabled.
+     */
+    setExternalCommunicationMethod (method, enabled) {
+        if (!Object.prototype.hasOwnProperty.call(this.externalCommunicationMethods, method)) {
+            throw new Error(`Unknown method: ${method}`);
+        }
+        this.externalCommunicationMethods[method] = enabled;
+        this.updatePrivacy();
     }
 }
 

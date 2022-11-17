@@ -205,6 +205,8 @@ class ExtensionManager {
             throw new Error(`Invalid extension URL: ${extensionURL}`);
         }
 
+        this.runtime.setExternalCommunicationMethod('customExtensions', true);
+
         this.loadingAsyncExtensions++;
 
         const sandboxMode = await this.securityManager.getSandboxMode(extensionURL);

@@ -470,6 +470,7 @@ class Runtime extends EventEmitter {
         /**
          * If set to true, features such as reading colors from the user's webcam will be disabled
          * when the project has access to any external communication method to protect user privacy.
+         * Requires TurboWarp/scratch-render.
          * Do not update this directly. Use Runtime.setEnforcePrivacy() instead.
          */
         this.enforcePrivacy = true;
@@ -3173,7 +3174,7 @@ class Runtime extends EventEmitter {
             this.enforcePrivacy &&
             Object.values(this.externalCommunicationMethods).some(i => i)
         );
-        if (this.renderer) {
+        if (this.renderer && this.renderer.setPrivateSkinAccess) {
             this.renderer.setPrivateSkinAccess(!enforceRestrictions);
         }
     }

@@ -226,8 +226,6 @@ class RenderWebGL extends EventEmitter {
 
         this.dirty = true;
 
-        this.skinsWereAltered = false;
-
         this._createGeometry();
 
         this.on(RenderConstants.Events.NativeSizeChanged, this.onNativeSizeChanged);

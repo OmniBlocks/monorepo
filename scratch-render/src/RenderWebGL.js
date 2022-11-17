@@ -333,6 +333,8 @@ class RenderWebGL extends EventEmitter {
      * @param {number} blue The blue component for the background.
      */
     setBackgroundColor (red, green, blue) {
+        this.dirty = true;
+
         this._backgroundColor4f[0] = red;
         this._backgroundColor4f[1] = green;
         this._backgroundColor4f[2] = blue;

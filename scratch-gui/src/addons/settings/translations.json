@@ -1,9 +1,4 @@
 {
-    "ar": {
-        "credits": "الاعتمادات:",
-        "reset": "إعادة تعيين",
-        "resetAll": "إعادة ضبط الجميع"
-    },
     "ca": {
         "addonFeedback": "Comentaris del addon",
         "confirmResetAll": "Segur que vols restablir tota la configuració del addon als valors predeterminats?",
@@ -108,36 +103,9 @@
         "title": "Ajustes de Addons",
         "unsupported": "Algunos addons no están disponibles en este navegador:"
     },
-    "fi": {
-        "addonFeedback": "Lisäosien Palaute",
-        "confirmResetAll": "Oletko varma että haluat nollata kaikkien lisäosien asetukset oletukseen?",
-        "credits": "Krediitit",
-        "dirtyButton": "Lataa Sivu Uudelleen Nyt",
-        "enableDangerous": "Tämä Lisäosa on vaarallinen ja saattaa tarkoituksella poistaa joitain ominaisuuksia käytöstä. useimpien käyttäjien EI PITÄISI Ottaa tätä lisäosaa käyttöön.Oletko varma että haluat sen käyttöön?",
-        "export": "Tallenna Asetukset",
-        "groupDanger": "Vaarallinen ( Yksi )",
-        "groupNew": "{number}Uusi! ( Yksi ) ",
-        "groupOthers": "Muut (Yksi)",
-        "import": "Tuo Asetukset",
-        "noCompiler": "Tämä lisäosa toimii vain kun laatija on pois käytöstä,laatijan voi poistaa käytöstä Edistynyt Napista Sitten Paina Poista Laatija editorista lisäosa.",
-        "noResults": "Ei Osumia",
-        "presets": "Esiasetukset",
-        "reset": "Resetoi",
-        "resetAll": "Resetoi Kaikki",
-        "search": "Etsi",
-        "tagBeta": "Beta Ominaisuus",
-        "tagDanger": "Vaarallinen",
-        "tagNew": "Uusi!",
-        "tagRecommended": "Suositeltu",
-        "tagTheme": "Teema",
-        "title": "Lisäosien Asetukset",
-        "unsupported": "Jotkut Lisäosat eivät toimi tässä selaimessa:"
-    },
     "fr": {
         "addonFeedback": "Commentaires sur les addons",
-        "confirmResetAll": "Êtes-vous sûr de vouloir réinitialiser tous les paramètres des addons à leurs valeurs par défaut?",
         "credits": "Crédits:",
-        "dirty": "Rechargez les onglets pour appliquer les paramètres.",
         "dirtyButton": "Recharger maintenant",
         "enableDangerous": "Cet addon est dangereux et va intentionnellement DÉSACTIVER certaines fonctionnalitées. La plupart des utilisateurs NE DOIVENT PAS activer cet addon. Êtes-vous sûr de vouloir l'activer ?",
         "export": "Exporter les paramètres",
@@ -145,7 +113,6 @@
         "groupNew": "New ({number})",
         "groupOthers": "Autres ({number})",
         "import": "Importer les paramètres",
-        "noCompiler": "Cet addon ne fonctionne que lorsque le compilateur est désactivé via le menu Avancé > Désactiver le compilateur ou en utilisant l'addon \"Désactiver le compilateur dans l'éditeur\".",
         "noResults": "Aucun résultat.",
         "presets": "Préconfigurations",
         "reset": "Réinitialiser",
@@ -158,9 +125,6 @@
         "tagTheme": "Thème",
         "title": "Paramètres des addons",
         "unsupported": "Les addons suivants ne sont pas pris en charge par votre navigateur:"
-    },
-    "ga": {
-        "title": "socruithe addon"
     },
     "he": {
         "addonFeedback": "משוב עבור הרחבות",
@@ -187,16 +151,6 @@
         "tagTheme": "ערכת נושא",
         "title": "הגדרות תוסף",
         "unsupported": "חלק מהתוספות אינן נגישות בדפדפן שלך:"
-    },
-    "hu": {
-        "reset": "Visszaállítás"
-    },
-    "id": {
-        "export": "Pengaturan Export",
-        "import": "Pengaturan Import",
-        "reset": "Mengatur Ulang ",
-        "search": "Cari",
-        "tagRecommended": "Di Rekomendasikan"
     },
     "it": {
         "addonFeedback": "Feedback sull'Addon",
@@ -445,23 +399,6 @@
         "title": "Configurações de Addon",
         "unsupported": "Alguns addons não estão disponíveis neste navegador:"
     },
-    "ro": {
-        "addonFeedback": "Spune-ți Părerea despre Extensii",
-        "confirmResetAll": "Ești sigur că vrei să resetezi toate setările extensiilor la valorile lor implicite?",
-        "credits": "Credite:",
-        "dirtyButton": "Reîncarcă acum",
-        "export": "Exportă setările",
-        "import": "Importă setările",
-        "noResults": "Niciun rezultat.",
-        "presets": "Presetări",
-        "reset": "Resetează",
-        "resetAll": "Resetează toate",
-        "search": "Caută",
-        "tagBeta": "Beta",
-        "tagRecommended": "Recomandat",
-        "title": "Setările Addon-urilor",
-        "unsupported": "Unele extensii nu sunt disponibile în acest browser:"
-    },
     "ru": {
         "addonFeedback": "Отзывы о дополнениях",
         "confirmResetAll": "Вы уверены, что хотите сбросить настройки всех дополнений до значений по умолчанию?",
@@ -564,25 +501,6 @@
         "tagTheme": "Tema",
         "title": "Tilläggsinställningar",
         "unsupported": "Vissa tillägg är inte tillgängliga i den här webbläsaren:"
-    },
-    "th": {
-        "addonFeedback": "ความคิดเห็น Addon",
-        "confirmResetAll": "คุณแน่ใจหรือไม่ว่าต้องการรีเซ็ตการตั้งค่า Addons กลับไปเป็นการตั้งค่าเริ่มต้น",
-        "credits": "เครดิต :",
-        "dirtyButton": "แตะเพื่อรีโหลด",
-        "export": "Export การตั้งค่า",
-        "import": "Import การตั้งค่า",
-        "noResults": "ไม่พบข้อมูล",
-        "presets": "Presets",
-        "reset": "รีเซ็ต",
-        "resetAll": "รีเซ็ตทั้งหมด",
-        "search": "ค้นหา",
-        "tagBeta": "อยู่ระหว่างการพัฒนาระบบ",
-        "tagNew": "ใหม่",
-        "tagRecommended": "คำแนะนำ",
-        "tagTheme": "ธีม",
-        "title": "การตั้งค่า Addons",
-        "unsupported": "Addon บางอย่างยังไม่ได้รับการสนับสนุนในบราวเซอร์นี้"
     },
     "tr": {
         "addonFeedback": "Eklenti geribildirim",

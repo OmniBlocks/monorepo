@@ -16,17 +16,40 @@ test('importing ScratchX/.sbx project', async t => {
             ],
             sounds: [],
             costumes: [],
-            children: []
+            children: [],
+            info: {
+                savedExtensions: [
+                    {
+                        menus: {
+                            // not important for this test
+                        },
+                        extensionName: 'Spotify',
+                        javascriptURL: 'https://ericrosenbaum.github.io/spotify-extension/extension.js',
+                        blockSpecs: [
+                            // not important for this test
+                        ]
+                    },
+                    {
+                        extensionName: 'Weather extension',
+                        javascriptURL: 'http://khanning.github.io/scratch-weather-extension/weather_extension.js'
+                    }
+                ]
+            }
         },
         rt
     );
 
-    const extensions = deserialized.extensions.extensionIDs;
-    t.equal(extensions.size, 4);
-    t.ok(extensions.has('sbxtexttospeech'));
-    t.ok(extensions.has('sbxspotify'));
-    t.ok(extensions.has('sbxweatherextension'));
-    t.ok(extensions.has('sbxsynthextension'));
+    const extensionIDs = deserialized.extensions.extensionIDs;
+    t.equal(extensionIDs.size, 4);
+    t.ok(extensionIDs.has('sbxtexttospeech'));
+    t.ok(extensionIDs.has('sbxspotify'));
+    t.ok(extensionIDs.has('sbxweatherextension'));
+    t.ok(extensionIDs.has('sbxsynthextension'));
+
+    const extensionURLs = deserialized.extensions.extensionURLs;
+    t.equal(extensionURLs.size, 2);
+    t.equal(extensionURLs.get('sbxspotify'), 'https://ericrosenbaum.github.io/spotify-extension/extension.js');
+    t.equal(extensionURLs.get('sbxweatherextension'), 'http://khanning.github.io/scratch-weather-extension/weather_extension.js');
 
     const stage = deserialized.targets[0];
     const blocks = Object.values(stage.blocks._blocks);

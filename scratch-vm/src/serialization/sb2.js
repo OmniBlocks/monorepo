@@ -800,6 +800,18 @@ const parseScratchObject = function (object, runtime, extensions, topLevel, zip,
         }
     }
 
+    // Parse extension list from ScratchX projects.
+    if (topLevel) {
+        const savedExtensions = object.info && object.info.savedExtensions;
+        if (Array.isArray(savedExtensions)) {
+            for (const extension of savedExtensions) {
+                const id = ScratchXUtilities.generateExtensionId(extension.extensionName);
+                const url = extension.javascriptURL;
+                extensions.extensionURLs.set(id, url);
+            }
+        }
+    }
+
     return Promise.all(
         costumePromises.concat(soundPromises)
     ).then(() =>

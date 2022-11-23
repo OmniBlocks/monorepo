@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import VM from 'scratch-vm';
 import {defineMessages, injectIntl, intlShape} from 'react-intl';
-import {setSearchParams} from '../lib/tw-navigation-utils';
 
 import extensionLibraryContent from '../lib/libraries/extensions/index.jsx';
 
@@ -65,11 +64,6 @@ class ExtensionLibrary extends React.PureComponent {
                 this.props.vm.extensionManager.loadExtensionURL(parsedURL)
                     .then(() => {
                         this.props.onCategorySelected(id);
-                        if (isCustomURL) {
-                            const searchParams = new URLSearchParams(location.search);
-                            searchParams.append('extension', url);
-                            setSearchParams(searchParams);
-                        }
                     })
                     .catch(err => {
                         // eslint-disable-next-line no-alert

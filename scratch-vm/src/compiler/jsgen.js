@@ -54,6 +54,7 @@ const generatorNameVariablePool = new VariablePool('gen');
  * @property {() => string} asNumberOrNaN
  * @property {() => string} asString
  * @property {() => string} asBoolean
+ * @property {() => string} asColor
  * @property {() => string} asUnknown
  * @property {() => string} asSafe
  * @property {() => boolean} isAlwaysNumber
@@ -91,6 +92,10 @@ class TypedInput {
     asBoolean () {
         if (this.type === TYPE_BOOLEAN) return this.source;
         return `toBoolean(${this.source})`;
+    }
+
+    asColor () {
+        return this.asUnknown();
     }
 
     asUnknown () {
@@ -149,6 +154,15 @@ class ConstantInput {
     asBoolean () {
         // Compute at compilation time
         return Cast.toBoolean(this.constantValue).toString();
+    }
+
+    asColor () {
+        // Attempt to parse hex code at compilation time
+        if (/^#[0-9a-f]{6,8}$/i.test(this.constantValue)) {
+            const hex = this.constantValue.substr(1);
+            return Number.parseInt(hex, 16).toString();
+        }
+        return this.asUnknown();
     }
 
     asUnknown () {
@@ -249,6 +263,10 @@ class VariableInput {
     asBoolean () {
         if (this.type === TYPE_BOOLEAN) return this.source;
         return `toBoolean(${this.source})`;
+    }
+
+    asColor () {
+        return this.asUnknown();
     }
 
     asUnknown () {
@@ -607,7 +625,7 @@ class JSGenerator {
         case 'sensing.answer':
             return new TypedInput(`runtime.ext_scratch3_sensing._answer`, TYPE_STRING);
         case 'sensing.colorTouchingColor':
-            return new TypedInput(`target.colorIsTouchingColor(colorToList(${this.descendInput(node.target).asUnknown()}), colorToList(${this.descendInput(node.mask).asUnknown()}))`, TYPE_BOOLEAN);
+            return new TypedInput(`target.colorIsTouchingColor(colorToList(${this.descendInput(node.target).asColor()}), colorToList(${this.descendInput(node.mask).asColor()}))`, TYPE_BOOLEAN);
         case 'sensing.date':
             return new TypedInput(`(new Date().getDate())`, TYPE_NUMBER);
         case 'sensing.dayofweek':
@@ -668,7 +686,7 @@ class JSGenerator {
         case 'sensing.touching':
             return new TypedInput(`target.isTouchingObject(${this.descendInput(node.object).asUnknown()})`, TYPE_BOOLEAN);
         case 'sensing.touchingColor':
-            return new TypedInput(`target.isTouchingColor(colorToList(${this.descendInput(node.color).asUnknown()}))`, TYPE_BOOLEAN);
+            return new TypedInput(`target.isTouchingColor(colorToList(${this.descendInput(node.color).asColor()}))`, TYPE_BOOLEAN);
         case 'sensing.username':
             return new TypedInput('runtime.ioDevices.userData.getUsername()', TYPE_STRING);
         case 'sensing.year':
@@ -979,7 +997,7 @@ class JSGenerator {
             this.source += `${PEN_EXT}._setPenShadeToNumber(${this.descendInput(node.shade).asNumber()}, target);\n`;
             break;
         case 'pen.setColor':
-            this.source += `${PEN_EXT}._setPenColorToColor(${this.descendInput(node.color).asUnknown()}, target);\n`;
+            this.source += `${PEN_EXT}._setPenColorToColor(${this.descendInput(node.color).asColor()}, target);\n`;
             break;
         case 'pen.setParam':
             this.source += `${PEN_EXT}._setOrChangeColorParam(${this.descendInput(node.param).asString()}, ${this.descendInput(node.value).asNumber()}, ${PEN_STATE}, false);\n`;

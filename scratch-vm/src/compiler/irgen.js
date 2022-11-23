@@ -162,20 +162,11 @@ class ScriptTreeGenerator {
      */
     descendInput (block) {
         switch (block.opcode) {
-        case 'colour_picker': {
-            const color = block.fields.COLOUR.value;
-            const hex = color.substr(1);
-            if (/^[0-9a-f]{6,8}$/.test(hex)) {
-                return {
-                    kind: 'constant',
-                    value: Number.parseInt(hex, 16)
-                };
-            }
+        case 'colour_picker':
             return {
                 kind: 'constant',
-                value: color
+                value: block.fields.COLOUR.value
             };
-        }
         case 'math_angle':
         case 'math_integer':
         case 'math_number':

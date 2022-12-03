@@ -339,7 +339,7 @@ class ExtensionManager {
         if (e) {
             workerInfo.reject(e);
         } else {
-            workerInfo.resolve(id);
+            workerInfo.resolve();
         }
     }
 

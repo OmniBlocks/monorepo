@@ -824,7 +824,7 @@ class AddonRunner {
                 const sheets = resources[userstyle.url];
                 const source = sheets.map(i => i[1]).join('\n');
                 const style = createStylesheet(source);
-                style.className = 'scratch-addons-theme';
+                style.className = 'scratch-addons-style';
                 style.dataset.addonId = this.id;
                 this.stylesheets.push(style);
             }

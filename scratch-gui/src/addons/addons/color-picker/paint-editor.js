@@ -1,3 +1,7 @@
+/**
+ * !!! TW: This file is unused.
+ */
+
 import { normalizeHex, getHexRegex } from "../../libraries/common/cs/normalize-color.js";
 import RateLimiter from "../../libraries/common/cs/rate-limiter.js";
 import tinycolor from "../../libraries/thirdparty/cs/tinycolor-min.js";
@@ -36,7 +40,9 @@ export default async ({ addon, console, msg }) => {
       setTimeout(() => {
         const previousTool = addon.tab.redux.state.scratchPaint.color.eyeDropper.previousTool;
         if (previousTool) previousTool.activate();
-        addon.tab.redux.state.scratchPaint.color.eyeDropper.callback(hex);
+        addon.tab.redux.state.scratchPaint.color.eyeDropper.callback(
+          tinycolor(hex).setAlpha(scratchAddons.opacitySliderAlpha).toRgbString()
+        );
         addon.tab.redux.dispatch({
           type: "scratch-paint/eye-dropper/DEACTIVATE_COLOR_PICKER",
         });

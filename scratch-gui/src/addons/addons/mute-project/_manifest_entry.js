@@ -20,6 +20,16 @@ const manifest = {
       "url": "userscript.js"
     }
   ],
+  "userstyles": [
+    {
+      "url": "hide-icon.css",
+      "if": {
+        "addonEnabled": [
+          "vol-slider"
+        ]
+      }
+    }
+  ],
   "dynamicDisable": true,
   "enabledByDefault": true,
   "tags": [

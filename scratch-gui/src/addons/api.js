@@ -198,6 +198,11 @@ const fixDisplayName = displayName => displayName.replace(/([^\s])(%[nbs])/g, (_
 const compareArrays = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 
 let _firstAddBlockRan = false;
+const addonBlockColor = {
+    color: '#29beb8',
+    secondaryColor: '#3aa8a4',
+    tertiaryColor: '#3aa8a4'
+};
 
 const contextMenuCallbacks = [];
 const CONTEXT_MENU_ORDER = ['editor-devtools', 'block-switching', 'blocks2image', 'swap-local-global'];
@@ -507,9 +512,9 @@ class Tab extends EventTargetShim {
                     if (this.type === 'procedures_call') {
                         const block = this.procCode_ && vm.runtime.getAddonBlock(this.procCode_);
                         if (block) {
-                            this.colour_ = '#29beb8';
-                            this.colourSecondary_ = '#3aa8a4';
-                            this.colourTertiary_ = '#3aa8a4';
+                            this.colour_ = addonBlockColor.color;
+                            this.colourSecondary_ = addonBlockColor.secondaryColor;
+                            this.colourTertiary_ = addonBlockColor.tertiaryColor;
                             this.customContextMenu = null;
                         }
                     }
@@ -539,8 +544,12 @@ class Tab extends EventTargetShim {
         return vm.getAddonBlock(procedureCode);
     }
 
-    setCustomBlockColor () {
-        // TODO
+    getCustomBlockColor () {
+        return addonBlockColor;
+    }
+
+    setCustomBlockColor (newColor) {
+        Object.assign(addonBlockColor, newColor);
     }
 
     createBlockContextMenu (callback, {workspace = false, blocks = false, flyout = false, comments = false} = {}) {

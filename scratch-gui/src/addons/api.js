@@ -821,8 +821,8 @@ class AddonRunner {
                 if (!this.meetsCondition(userstyle.if)) {
                     continue;
                 }
-                const m = resources[userstyle.url];
-                const source = m[0][1];
+                const sheets = resources[userstyle.url];
+                const source = sheets.map(i => i[1]).join('\n');
                 const style = createStylesheet(source);
                 style.className = 'scratch-addons-theme';
                 style.dataset.addonId = this.id;

@@ -25,6 +25,7 @@ import l10nEntries from './generated/l10n-entries';
 import addonEntries from './generated/addon-entries';
 import {addContextMenu} from './contextmenu';
 import * as modal from './modal';
+import * as textColorHelpers from './libraries/common/cs/text-color.esm.js';
 import './polyfill';
 
 /* eslint-disable no-console */
@@ -740,15 +741,59 @@ class AddonRunner {
     }
 
     updateCSSVariables () {
+        const addonId = kebabCaseToCamelCase(this.id);
+
         if (this.manifest.settings) {
-            const kebabCaseId = kebabCaseToCamelCase(this.id);
             for (const setting of this.manifest.settings) {
                 const settingId = setting.id;
-                const variable = `--${kebabCaseId}-${kebabCaseToCamelCase(settingId)}`;
+                const cssProperty = `--${addonId}-${kebabCaseToCamelCase(settingId)}`;
                 const value = this.publicAPI.addon.settings.get(settingId);
-                document.documentElement.style.setProperty(variable, value);
+                document.documentElement.style.setProperty(cssProperty, value);
             }
         }
+
+        if (this.manifest.customCssVariables) {
+            for (const variable of this.manifest.customCssVariables) {
+                const name = variable.name;
+                const cssProperty = `--${addonId}-${name}`;
+                const value = variable.value;
+                const evaluated = this.evaluateCustomCssVariable(value);
+                document.documentElement.style.setProperty(cssProperty, evaluated);
+            }
+        }
+    }
+
+    evaluateCustomCssVariable (variable) {
+        if (typeof variable !== 'object' || variable === null) {
+            return variable;
+        }
+        switch (variable.type) {
+        case 'alphaThreshold': {
+            const source = this.evaluateCustomCssVariable(variable.source);
+            const alpha = textColorHelpers.parseHex(source).a;
+            const threshold = this.evaluateCustomCssVariable(variable.threshold) || 0.5;
+            if (alpha >= threshold) {
+                return this.evaluateCustomCssVariable(variable.opaque);
+            }
+            return this.evaluateCustomCssVariable(variable.transparent);
+        }
+        case 'settingValue': {
+            return this.publicAPI.addon.settings.get(variable.settingId);
+        }
+        case 'textColor': {
+            const hex = this.evaluateCustomCssVariable(variable.source);
+            const black = this.evaluateCustomCssVariable(variable.black);
+            const white = this.evaluateCustomCssVariable(variable.white);
+            const threshold = this.evaluateCustomCssVariable(variable.threshold);
+            return textColorHelpers.textColor(hex, black, white, threshold);
+        }
+        case 'multiply': {
+            const hex = this.evaluateCustomCssVariable(variable.source);
+            return textColorHelpers.multiply(hex, variable);
+        }
+        }
+        console.warn(`Unknown customCssVariable`, variable);
+        return '#000000';
     }
 
     meetsCondition (condition) {

@@ -4,6 +4,24 @@
 
  - **Vertical blocks**: https://turbowarp.github.io/scratch-blocks/tests/vertical_playground_compressed.html
 
+## Local development
+
+Install dependencies:
+
+```
+npm ci
+```
+
+The playground to use for local testing is tests/vertical_playground.html.
+
+To build, run:
+
+```
+npm run prepublish
+```
+
+requires Python 2. scratch-gui development server must be restarted to update linked scratch-blocks.
+
 <!--
 #### Scratch Blocks is a library for building creative computing interfaces.
 [![Build Status](https://travis-ci.org/LLK/scratch-blocks.svg?branch=develop)](https://travis-ci.org/LLK/scratch-blocks)

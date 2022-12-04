@@ -56,6 +56,22 @@ const manifest = {
       "max": 100
     }
   ],
+  "customCssVariables": [
+    {
+      "name": "shadeNumber",
+      "value": {
+        "type": "map",
+        "source": {
+          "type": "settingValue",
+          "settingId": "shade"
+        },
+        "options": {
+          "lighter": "1",
+          "darker": "-1"
+        }
+      }
+    }
+  ],
   "dynamicDisable": true
 };
 export default manifest;

@@ -21,6 +21,38 @@ const manifest = {
     }
   ],
   "dynamicDisable": true,
+  "customCssVariables": [
+    {
+      "name": "lockDisplay",
+      "value": {
+        "type": "map",
+        "source": {
+          "type": "settingValue",
+          "settingId": "toggle"
+        },
+        "options": {
+          "hover": "flex",
+          "cathover": "flex",
+          "category": "none"
+        }
+      }
+    },
+    {
+      "name": "placeholderDisplay",
+      "value": {
+        "type": "map",
+        "source": {
+          "type": "settingValue",
+          "settingId": "toggle"
+        },
+        "options": {
+          "hover": "block",
+          "cathover": "none",
+          "category": "none"
+        }
+      }
+    }
+  ],
   "userscripts": [
     {
       "url": "userscript.js"

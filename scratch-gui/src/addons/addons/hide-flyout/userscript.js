@@ -23,24 +23,6 @@ export default async function ({ addon, global, console, msg }) {
 
   const Blockly = await addon.tab.traps.getBlockly();
 
-  const updateCSSVariables = () => {
-    const mode = getToggleSetting();
-    const modeToLockDisplay = {
-      hover: "flex",
-      cathover: "flex",
-      category: "none"
-    };
-    document.documentElement.style.setProperty('--hideFlyout-lockDisplay', modeToLockDisplay[mode]);
-    const modeToPlaceholderDisplay = {
-      hover: "block",
-      cathover: "none",
-      category: "none"
-    };
-    document.documentElement.style.setProperty('--hideFlyout-placeholderDisplay', modeToPlaceholderDisplay[mode]);
-  };
-  addon.settings.addEventListener("change", updateCSSVariables);
-  updateCSSVariables();
-
   function getSpeedValue() {
     let data = {
       none: "0",

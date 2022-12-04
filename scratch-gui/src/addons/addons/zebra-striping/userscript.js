@@ -2,16 +2,6 @@ export default async function ({ addon, msg, global, console }) {
   const vm = addon.tab.traps.vm;
   const ScratchBlocks = await addon.tab.traps.getBlockly();
 
-  const updateCssVariables = () => {
-    const map = {
-      lighter: 1,
-      darker: -1
-    };
-    document.documentElement.style.setProperty('--zebraStriping-shadeNumber', map[addon.settings.get("shade")]);
-  };
-  addon.settings.addEventListener("change", updateCssVariables);
-  updateCssVariables();
-
   const originalRender = ScratchBlocks.BlockSvg.prototype.render;
   ScratchBlocks.BlockSvg.prototype.render = function (opt_bubble) {
     // Any changes that affect block striping should bubble to the top block of the script.

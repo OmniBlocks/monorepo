@@ -804,6 +804,9 @@ class AddonRunner {
             const hex = this.evaluateCustomCssVariable(variable.source);
             return textColorHelpers.multiply(hex, variable);
         }
+        case 'map': {
+            return variable.options[this.evaluateCustomCssVariable(variable.source)];
+        }
         }
         console.warn(`Unknown customCssVariable`, variable);
         return '#000000';

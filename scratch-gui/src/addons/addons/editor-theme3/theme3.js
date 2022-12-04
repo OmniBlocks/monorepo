@@ -5,6 +5,11 @@ const extensionsCategory = {
   settingId: "Pen-color",
   colorId: "pen",
 };
+const twCategory = {
+  id: null,
+  settingId: "tw-color",
+  colorId: "tw"
+};
 const saCategory = {
   settingId: "sa-color",
   colorId: "sa",
@@ -61,6 +66,7 @@ const categories = [
     colorId: "more",
   },
   extensionsCategory,
+  twCategory,
   saCategory,
 ];
 
@@ -157,6 +163,12 @@ export default async function ({ addon, console }) {
       colour = primaryColor(extensionsCategory);
       colourSecondary = secondaryColor(extensionsCategory);
       colourTertiary = tertiaryColor(extensionsCategory);
+    }
+    // TurboWarp Blocks
+    if (this.type.startsWith("tw_")) {
+      colour = primaryColor(twCategory);
+      colourSecondary = secondaryColor(twCategory);
+      colourTertiary = tertiaryColor(twCategory);
     }
     return oldBlockSetColour.call(this, colour, colourSecondary, colourTertiary);
   };

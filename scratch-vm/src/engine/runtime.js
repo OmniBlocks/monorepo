@@ -2545,12 +2545,15 @@ class Runtime extends EventEmitter {
             const ID = 'a-b';
             let blockInfo = this._blockInfo.find(i => i.id === ID);
             if (!blockInfo) {
+                // eslint-disable-next-line max-len
+                const ICON = '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48"><path d="M14.92 1.053A13.835 13.835 0 0 0 1.052 14.919v18.162a13.835 13.835 0 0 0 13.866 13.866h18.162a13.835 13.835 0 0 0 13.866-13.866V14.919A13.835 13.835 0 0 0 33.081 1.053zm16.6 12.746L41.72 24 31.52 34.201l-3.276-3.275L35.17 24l-6.926-6.926Zm-15.116.073 3.278 3.278L12.83 24l6.926 6.926L16.48 34.2 6.28 24Z" style="fill:#29beb8;fill-opacity:1;stroke:none;stroke-width:1.51371;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"/></svg>';
                 blockInfo = {
                     id: ID,
                     name: 'Addons',
                     color1: '#29beb8',
                     color2: '#3aa8a4',
                     color3: '#3aa8a4',
+                    menuIconURI: `data:image/svg+xml;base64,${btoa(ICON)}`,
                     blocks: [],
                     customFieldTypes: {},
                     menus: []

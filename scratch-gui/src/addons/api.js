@@ -380,7 +380,7 @@ class Tab extends EventTargetShim {
             afterSoundTab: {
                 element: () => document.querySelector("[class^='react-tabs_react-tabs__tab-list']"),
                 from: () => [document.querySelector("[class^='react-tabs_react-tabs__tab-list']").children[2]],
-                until: () => [document.querySelector('#s3devToolBar')]
+                until: () => [document.querySelector('.sa-find-bar')]
             },
             assetContextMenuAfterExport: {
                 element: () => scope,

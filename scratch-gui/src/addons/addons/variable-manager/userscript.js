@@ -7,7 +7,7 @@ const _twGetAsset = (path) => {
   throw new Error(`Unknown asset: ${path}`);
 };
 
-export default async function ({ addon, global, console, msg }) {
+export default async function ({ addon, console, msg }) {
   const vm = addon.tab.traps.vm;
 
   let localVariables = [];

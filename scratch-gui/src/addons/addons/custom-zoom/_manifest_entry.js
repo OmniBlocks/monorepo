@@ -67,17 +67,17 @@ const manifest = {
     },
     {
       "dynamic": true,
-      "name": "Autohide Animation duration",
+      "name": "Autohide Animation Speed",
       "id": "speed",
       "type": "select",
       "potentialValues": [
         {
           "id": "none",
-          "name": "None"
+          "name": "Instant"
         },
         {
           "id": "short",
-          "name": "Short"
+          "name": "Quick"
         },
         {
           "id": "default",
@@ -85,7 +85,7 @@ const manifest = {
         },
         {
           "id": "long",
-          "name": "Long"
+          "name": "Slow"
         }
       ],
       "default": "default",

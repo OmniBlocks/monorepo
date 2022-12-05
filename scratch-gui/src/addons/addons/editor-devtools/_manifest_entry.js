@@ -2,7 +2,7 @@
 const manifest = {
   "editorOnly": true,
   "name": "Developer tools",
-  "description": "Adds new menu options to the editor: copy/paste blocks, better clean up, and more! Use Ctrl+Space (Shift+Space on macOS) to bring up the \"add block by name\" popup.",
+  "description": "Adds new menu options to the editor: copy/paste blocks, better clean up, and more!",
   "credits": [
     {
       "name": "griffpatch"
@@ -27,11 +27,6 @@ const manifest = {
   "userscripts": [
     {
       "url": "userscript.js"
-    }
-  ],
-  "userstyles": [
-    {
-      "url": "userscript.css"
     }
   ],
   "tags": [

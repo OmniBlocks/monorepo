@@ -2,7 +2,7 @@
  * Used for the automatic browser full screen setting
  * and for hiding the scrollbar in full screen.
  */
-export default async function ({ addon, global, console }) {
+export default async function ({ addon, console }) {
   const vm = addon.tab.traps.vm;
   const updateStageSize = () => {
     document.documentElement.style.setProperty('--sa-fullscreen-width', vm.runtime.stageWidth);

@@ -1,5 +1,5 @@
 import Utils from "../find-bar/blockly/Utils.js";
-export default async function ({ addon, msg, global, console }) {
+export default async function ({ addon, msg, console }) {
   const utils = new Utils(addon);
 
   const Blockly = await addon.tab.traps.getBlockly();

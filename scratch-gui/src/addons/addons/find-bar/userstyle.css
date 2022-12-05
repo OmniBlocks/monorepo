@@ -50,8 +50,8 @@
 .sa-find-dropdown-out.visible {
   position: absolute;
   width: 16em;
-  box-shadow: 0px 0px 8px 1px rgba(0, 0, 0, 0.3);
-  background-color: white;
+  box-shadow: 0px 0px 8px 1px var(--ui-black-transparent, rgba(0, 0, 0, 0.3));
+  background-color: var(--ui-primary, white);
 }
 
 /* We need to modify Scratch styles so that the place where the find bar is injected */

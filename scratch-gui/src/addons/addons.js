@@ -4,6 +4,7 @@ const addons = [
     'cat-blocks',
     'editor-devtools',
     'find-bar',
+    'middle-click-popup',
     'jump-to-def',
     'editor-searchable-dropdowns',
     'data-category-tweaks-v2',

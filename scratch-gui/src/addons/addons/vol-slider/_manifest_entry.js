@@ -7,6 +7,9 @@ const manifest = {
     {
       "name": "samq64",
       "link": "https://scratch.mit.edu/users/samq64/"
+    },
+    {
+      "name": "GarboMuffin"
     }
   ],
   "userscripts": [

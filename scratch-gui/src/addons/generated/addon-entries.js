@@ -2,7 +2,8 @@
 export default {
   "cat-blocks": () => import(/* webpackChunkName: "addon-entry-cat-blocks" */ "../addons/cat-blocks/_runtime_entry.js"),
   "editor-devtools": () => import(/* webpackChunkName: "addon-default-entry" */ "../addons/editor-devtools/_runtime_entry.js"),
-  "find-bar": () => require("../addons/find-bar/_runtime_entry.js"),
+  "find-bar": () => import(/* webpackChunkName: "addon-default-entry" */ "../addons/find-bar/_runtime_entry.js"),
+  "middle-click-popup": () => import(/* webpackChunkName: "addon-default-entry" */ "../addons/middle-click-popup/_runtime_entry.js"),
   "jump-to-def": () => require("../addons/jump-to-def/_runtime_entry.js"),
   "editor-searchable-dropdowns": () => import(/* webpackChunkName: "addon-default-entry" */ "../addons/editor-searchable-dropdowns/_runtime_entry.js"),
   "data-category-tweaks-v2": () => import(/* webpackChunkName: "addon-entry-data-category-tweaks-v2" */ "../addons/data-category-tweaks-v2/_runtime_entry.js"),

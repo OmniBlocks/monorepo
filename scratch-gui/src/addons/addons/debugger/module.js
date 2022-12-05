@@ -17,6 +17,8 @@ let steppingThread = null;
 
 const eventTarget = new EventTarget();
 
+let audioContextStateChange = Promise.resolve();
+
 export const isPaused = () => paused;
 
 const pauseThread = (thread) => {
@@ -90,13 +92,17 @@ const stepUnsteppedThreads = (lastSteppedThread) => {
 };
 
 export const setPaused = (_paused) => {
-  if (paused !== _paused) {
+  const didChange = paused !== _paused;
+  if (didChange) {
     paused = _paused;
     eventTarget.dispatchEvent(new CustomEvent("change"));
   }
 
-  if (_paused) {
-    vm.runtime.audioEngine.audioContext.suspend();
+  // Don't check didChange as new threads could've started that we need to pause.
+  if (paused) {
+    audioContextStateChange = audioContextStateChange.then(() => {
+      return vm.runtime.audioEngine.audioContext.suspend();
+    });
     if (!vm.runtime.ioDevices.clock._paused) {
       vm.runtime.ioDevices.clock.pause();
     }
@@ -107,8 +113,13 @@ export const setPaused = (_paused) => {
       setSteppingThread(activeThread);
       eventTarget.dispatchEvent(new CustomEvent("step"));
     }
-  } else {
-    vm.runtime.audioEngine.audioContext.resume();
+  }
+
+  // Only run unpausing logic when pause state changed to avoid unnecessary work
+  if (!paused && didChange) {
+    audioContextStateChange = audioContextStateChange.then(() => {
+      return vm.runtime.audioEngine.audioContext.resume();
+    });
     vm.runtime.ioDevices.clock.resume();
     for (const thread of vm.runtime.threads) {
       const pauseState = pausedThreadState.get(thread);

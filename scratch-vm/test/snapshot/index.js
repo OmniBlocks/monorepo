@@ -1,4 +1,4 @@
-const Snapshot = require('./snapshots.js');
+const Snapshot = require('./lib.js');
 
 /* eslint-disable no-console */
 

@@ -1,5 +1,5 @@
 const {test} = require('tap');
-const Snapshots = require('../../snapshot-tests/snapshots');
+const Snapshots = require('../snapshot/lib');
 
 for (const testName of Snapshots.tests) {
     test(testName, async t => {

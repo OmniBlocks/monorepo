@@ -1,5 +1,10 @@
 const Snapshot = require('./lib.js');
 
+/**
+ * @fileoverview
+ * CLI for testing and generating snapshot tests.
+ */
+
 /* eslint-disable no-console */
 
 const RESET = `\u001b[0m`;
@@ -87,7 +92,7 @@ const run = async () => {
     if (failed.length) {
         console.log('');
         console.log(`If the compiler's behavior has changed, this failure is expected.`);
-        console.log(`Update snapshots with ${BOLD}node snapshot-tests --update${RESET}`);
+        console.log(`Update snapshots with ${BOLD}node test/snapshot --update${RESET}`);
         console.log(`Review the diff in version control, then commit the updated snapshot files.`);
         process.exit(1);
     }

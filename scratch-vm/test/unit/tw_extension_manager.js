@@ -24,7 +24,7 @@ test('_isValidExtensionURL', t => {
     t.end();
 });
 
-test('does not re-run extensions that are already loaded', async t => {
+test('loadExtensionURL, getExtensionURLs, deduplication', async t => {
     const vm = new VM();
 
     let loadedExtensions = 0;
@@ -35,7 +35,9 @@ test('does not re-run extensions that are already loaded', async t => {
             const element = {};
             setTimeout(() => {
                 global.Scratch.extensions.register({
-                    getInfo: () => ({})
+                    getInfo: () => ({
+                        id: `extension${loadedExtensions}`
+                    })
                 });
             });
             return element;
@@ -45,13 +47,34 @@ test('does not re-run extensions that are already loaded', async t => {
         }
     };
 
-    const url = 'data:application/javascript;,';
-    t.equal(vm.extensionManager.isExtensionURLLoaded(url), false);
-
-    await vm.extensionManager.loadExtensionURL(url);
-    await vm.extensionManager.loadExtensionURL(url);
-
-    t.equal(vm.extensionManager.isExtensionURLLoaded(url), true);
+    const url1 = 'https://turbowarp.org/1.js';
+    t.equal(vm.extensionManager.isExtensionURLLoaded(url1), false);
+    t.same(vm.extensionManager.getExtensionURLs(), {});
+    await vm.extensionManager.loadExtensionURL(url1);
+    t.equal(vm.extensionManager.isExtensionURLLoaded(url1), true);
     t.equal(loadedExtensions, 1);
+    t.same(vm.extensionManager.getExtensionURLs(), {
+        extension1: url1
+    });
+
+    // Loading the extension again should do nothing.
+    await vm.extensionManager.loadExtensionURL(url1);
+    t.equal(vm.extensionManager.isExtensionURLLoaded(url1), true);
+    t.equal(loadedExtensions, 1);
+    t.same(vm.extensionManager.getExtensionURLs(), {
+        extension1: url1
+    });
+
+    // Loading another extension should work
+    const url2 = 'https://turbowarp.org/2.js';
+    t.equal(vm.extensionManager.isExtensionURLLoaded(url2), false);
+    await vm.extensionManager.loadExtensionURL(url2);
+    t.equal(vm.extensionManager.isExtensionURLLoaded(url2), true);
+    t.equal(loadedExtensions, 2);
+    t.same(vm.extensionManager.getExtensionURLs(), {
+        extension1: url1,
+        extension2: url2
+    });
+
     t.end();
 });

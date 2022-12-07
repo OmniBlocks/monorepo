@@ -1,12 +1,12 @@
 # Snapshot tests
 
-Snapshot testing runs the compiler on all the test projects in test/fixtures/execute and verifies that the compiled output is identical to what we expect. This results in some benefits:
+Snapshot testing runs the compiler on many of the test projects in test/fixtures/execute and verifies that the compiled output is identical to a pre-calculated "snapshot". This verifies:
 
- - We verify that the compiler is deterministic (mostly)
- - We verify that the compiler's output does change unexpectedly
- - We verify that optimizations and type analysis in the generated code is working properly
+ - The compiler is deterministic (mostly)
+ - The compiler's output does not change unexpectedly
+ - Optimizations and type analysis in the generated code are working properly
 
-These snapshots are automatically verified as part of the integration tests. There is also a more readable CLI. To verify the snapshots:
+These snapshots are automatically verified as part of the integration tests. There is also a more readable CLI for humans. To verify the snapshots:
 
 ```
 node test/snapshot

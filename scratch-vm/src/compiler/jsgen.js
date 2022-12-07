@@ -1310,8 +1310,15 @@ class JSGenerator {
             log.info(`JS: ${this.target.getName()}: compiled ${this.script.procedureCode || 'script'}`, factory);
         }
 
+        if (JSGenerator.testingApparatus) {
+            JSGenerator.testingApparatus.report(this, factory);
+        }
+
         return fn;
     }
 }
+
+// Test hook used by automated snapshot testing.
+JSGenerator.testingApparatus = null;
 
 module.exports = JSGenerator;

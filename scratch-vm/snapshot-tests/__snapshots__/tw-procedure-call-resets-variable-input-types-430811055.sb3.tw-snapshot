@@ -1,0 +1,23 @@
+// TW Snapshot
+
+// Sprite1 script
+(function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
+const b0 = runtime.getOpcodeFunction("looks_say");
+const b1 = stage.variables["`jEk@4|i[#Fk?(8x)AV.-my variable"];
+return function* genXYZ () {
+yield* executeInCompatibilityLayer({"MESSAGE":"plan 1",}, b0, false, false, null);
+b1.value = "";
+thread.procedures["Zdo something"]();
+if (!compareEqual(b1.value, "")) {
+yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b0, false, false, null);
+}
+yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, null);
+retire();
+}; })
+
+// Sprite1 do something
+(function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
+const b0 = stage.variables["`jEk@4|i[#Fk?(8x)AV.-my variable"];
+return function funXYZ_do_something () {
+b0.value = "help";
+}; })

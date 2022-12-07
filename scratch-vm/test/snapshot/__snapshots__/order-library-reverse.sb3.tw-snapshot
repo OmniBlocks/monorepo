@@ -1,4 +1,5 @@
 // TW Snapshot
+// Input SHA-256: b677669506b60e3ba350be8ae545db93d7bcbb5f368ba21d86b0d4e966e7e09c
 
 // Sprite2 script
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();

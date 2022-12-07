@@ -1,5 +1,6 @@
 const path = require('path');
 const fs = require('fs');
+const crypto = require('crypto');
 const VM = require('../../src/virtual-machine');
 const JSGenerator = require('../../src/compiler/jsgen');
 
@@ -16,8 +17,23 @@ const getProjectData = file => fs.readFileSync(path.join(executeDir, file));
 
 const getSnapshotPath = file => path.join(snapshotDir, `${file}.tw-snapshot`);
 
+const computeSHA256 = buffer => crypto
+    .createHash('SHA256')
+    .update(buffer)
+    .digest('hex');
+
+/**
+ * @param {string} snapshot a snapshot
+ * @returns {string} SHA-256
+ */
+const parseSnapshotSHA256 = snapshot => snapshot.match(/^\/\/ Input SHA-256: ([0-9a-f]{64})$/m)[1];
+
 const generateActualSnapshot = async file => {
     const vm = new VM();
+
+    const projectData = getProjectData(file);
+    const inputSHA256 = computeSHA256(projectData);
+
     await vm.loadProject(getProjectData(file));
 
     /*
@@ -48,7 +64,7 @@ const generateActualSnapshot = async file => {
 
     vm.runtime.precompile();
 
-    return `// TW Snapshot\n\n${generatedJS.join('\n\n')}\n`;
+    return `// TW Snapshot\n// Input SHA-256: ${inputSHA256}\n\n${generatedJS.join('\n\n')}\n`;
 };
 
 const getExpectedSnapshot = test => {
@@ -62,6 +78,25 @@ const getExpectedSnapshot = test => {
     }
 };
 
+/**
+ * @param {string} expected from getExpectedSnapshot
+ * @param {string} actual from getActualSnapshot
+ * @returns {'VALID'|'INPUT_MODIFIED'|'INVALID'} result of comparison
+ */
+const compareSnapshots = (expected, actual) => {
+    if (expected === actual) {
+        return 'VALID';
+    }
+
+    const expectedSHA256 = parseSnapshotSHA256(expected);
+    const actualSHA256 = parseSnapshotSHA256(actual);
+    if (expectedSHA256 !== actualSHA256) {
+        return 'INPUT_MODIFIED';
+    }
+
+    return 'INVALID';
+};
+
 const saveSnapshot = (test, data) => {
     fs.writeFileSync(getSnapshotPath(test), data);
 };
@@ -70,5 +105,6 @@ module.exports = {
     tests: testProjects,
     generateActualSnapshot,
     getExpectedSnapshot,
+    compareSnapshots,
     saveSnapshot
 };

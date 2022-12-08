@@ -8,7 +8,7 @@ const b1 = stage.variables["`jEk@4|i[#Fk?(8x)AV.-my variable"];
 return function* genXYZ () {
 yield* executeInCompatibilityLayer({"MESSAGE":"plan 6",}, b0, false, false, null);
 b1.value = runtime.ext_scratch3_operators._random(("an invalid number" + "."), 1);
-if ((b1.value > 0)) {
+if (!(b1.value <= 0)) {
 yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b0, false, false, null);
 }
 if (compareLessThan(b1.value, 1)) {
@@ -18,7 +18,7 @@ if ((("" + b1.value).toLowerCase().indexOf(".".toLowerCase()) !== -1)) {
 yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b0, false, false, null);
 }
 b1.value = runtime.ext_scratch3_operators._random(1, ("an invalid number" + "."));
-if ((b1.value > 0)) {
+if (!(b1.value <= 0)) {
 yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b0, false, false, null);
 }
 if (compareLessThan(b1.value, 1)) {

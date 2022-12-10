@@ -601,7 +601,7 @@ class ExtensionManager {
     }
 
     isExtensionURLLoaded (url) {
-        return Object.values(this.getExtensionURLs()).includes(url);
+        return Object.values(this.workerURLs).includes(url);
     }
 }
 

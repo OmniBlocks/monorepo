@@ -2553,7 +2553,7 @@ class Runtime extends EventEmitter {
                     color1: '#29beb8',
                     color2: '#3aa8a4',
                     color3: '#3aa8a4',
-                    menuIconURI: `data:image/svg+xml;base64,${btoa(ICON)}`,
+                    menuIconURI: `data:image/svg+xml;,${encodeURIComponent(ICON)}`,
                     blocks: [],
                     customFieldTypes: {},
                     menus: []

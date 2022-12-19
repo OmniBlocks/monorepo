@@ -25,6 +25,7 @@ import l10nEntries from './generated/l10n-entries';
 import addonEntries from './generated/addon-entries';
 import {addContextMenu} from './contextmenu';
 import * as modal from './modal';
+import * as textColorHelpers from './libraries/common/cs/text-color.esm.js';
 import './polyfill';
 
 /* eslint-disable no-console */
@@ -197,6 +198,11 @@ const fixDisplayName = displayName => displayName.replace(/([^\s])(%[nbs])/g, (_
 const compareArrays = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 
 let _firstAddBlockRan = false;
+const addonBlockColor = {
+    color: '#29beb8',
+    secondaryColor: '#3aa8a4',
+    tertiaryColor: '#3aa8a4'
+};
 
 const contextMenuCallbacks = [];
 const CONTEXT_MENU_ORDER = ['editor-devtools', 'block-switching', 'blocks2image', 'swap-local-global'];
@@ -374,7 +380,7 @@ class Tab extends EventTargetShim {
             afterSoundTab: {
                 element: () => document.querySelector("[class^='react-tabs_react-tabs__tab-list']"),
                 from: () => [document.querySelector("[class^='react-tabs_react-tabs__tab-list']").children[2]],
-                until: () => [document.querySelector('#s3devToolBar')]
+                until: () => [document.querySelector('.sa-find-bar')]
             },
             assetContextMenuAfterExport: {
                 element: () => scope,
@@ -506,9 +512,9 @@ class Tab extends EventTargetShim {
                     if (this.type === 'procedures_call') {
                         const block = this.procCode_ && vm.runtime.getAddonBlock(this.procCode_);
                         if (block) {
-                            this.colour_ = '#29beb8';
-                            this.colourSecondary_ = '#3aa8a4';
-                            this.colourTertiary_ = '#3aa8a4';
+                            this.colour_ = addonBlockColor.color;
+                            this.colourSecondary_ = addonBlockColor.secondaryColor;
+                            this.colourTertiary_ = addonBlockColor.tertiaryColor;
                             this.customContextMenu = null;
                         }
                     }
@@ -536,6 +542,14 @@ class Tab extends EventTargetShim {
     getCustomBlock (procedureCode) {
         const vm = this.traps.vm;
         return vm.getAddonBlock(procedureCode);
+    }
+
+    getCustomBlockColor () {
+        return addonBlockColor;
+    }
+
+    setCustomBlockColor (newColor) {
+        Object.assign(addonBlockColor, newColor);
     }
 
     createBlockContextMenu (callback, {workspace = false, blocks = false, flyout = false, comments = false} = {}) {
@@ -740,15 +754,62 @@ class AddonRunner {
     }
 
     updateCSSVariables () {
+        const addonId = kebabCaseToCamelCase(this.id);
+
         if (this.manifest.settings) {
-            const kebabCaseId = kebabCaseToCamelCase(this.id);
             for (const setting of this.manifest.settings) {
                 const settingId = setting.id;
-                const variable = `--${kebabCaseId}-${kebabCaseToCamelCase(settingId)}`;
+                const cssProperty = `--${addonId}-${kebabCaseToCamelCase(settingId)}`;
                 const value = this.publicAPI.addon.settings.get(settingId);
-                document.documentElement.style.setProperty(variable, value);
+                document.documentElement.style.setProperty(cssProperty, value);
             }
         }
+
+        if (this.manifest.customCssVariables) {
+            for (const variable of this.manifest.customCssVariables) {
+                const name = variable.name;
+                const cssProperty = `--${addonId}-${name}`;
+                const value = variable.value;
+                const evaluated = this.evaluateCustomCssVariable(value);
+                document.documentElement.style.setProperty(cssProperty, evaluated);
+            }
+        }
+    }
+
+    evaluateCustomCssVariable (variable) {
+        if (typeof variable !== 'object' || variable === null) {
+            return variable;
+        }
+        switch (variable.type) {
+        case 'alphaThreshold': {
+            const source = this.evaluateCustomCssVariable(variable.source);
+            const alpha = textColorHelpers.parseHex(source).a;
+            const threshold = this.evaluateCustomCssVariable(variable.threshold) || 0.5;
+            if (alpha >= threshold) {
+                return this.evaluateCustomCssVariable(variable.opaque);
+            }
+            return this.evaluateCustomCssVariable(variable.transparent);
+        }
+        case 'settingValue': {
+            return this.publicAPI.addon.settings.get(variable.settingId);
+        }
+        case 'textColor': {
+            const hex = this.evaluateCustomCssVariable(variable.source);
+            const black = this.evaluateCustomCssVariable(variable.black);
+            const white = this.evaluateCustomCssVariable(variable.white);
+            const threshold = this.evaluateCustomCssVariable(variable.threshold);
+            return textColorHelpers.textColor(hex, black, white, threshold);
+        }
+        case 'multiply': {
+            const hex = this.evaluateCustomCssVariable(variable.source);
+            return textColorHelpers.multiply(hex, variable);
+        }
+        case 'map': {
+            return variable.options[this.evaluateCustomCssVariable(variable.source)];
+        }
+        }
+        console.warn(`Unknown customCssVariable`, variable);
+        return '#000000';
     }
 
     meetsCondition (condition) {
@@ -821,10 +882,10 @@ class AddonRunner {
                 if (!this.meetsCondition(userstyle.if)) {
                     continue;
                 }
-                const m = resources[userstyle.url];
-                const source = m[0][1];
+                const sheets = resources[userstyle.url];
+                const source = sheets.map(i => i[1]).join('\n');
                 const style = createStylesheet(source);
-                style.className = 'scratch-addons-theme';
+                style.className = 'scratch-addons-style';
                 style.dataset.addonId = this.id;
                 this.stylesheets.push(style);
             }

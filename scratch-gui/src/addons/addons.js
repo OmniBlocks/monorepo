@@ -3,6 +3,9 @@
 const addons = [
     'cat-blocks',
     'editor-devtools',
+    'find-bar',
+    'middle-click-popup',
+    'jump-to-def',
     'editor-searchable-dropdowns',
     'data-category-tweaks-v2',
     'block-palette-icons',
@@ -12,6 +15,7 @@ const addons = [
     'debugger',
     'pause',
     'mute-project',
+    'vol-slider',
     'clones',
     'mouse-pos',
     'color-picker',
@@ -56,6 +60,7 @@ const addons = [
     'swap-local-global',
     'editor-comment-previews',
     'columns',
+    'number-pad',
     'script-snap',
     'fullscreen',
     'hide-stage',
@@ -67,6 +72,7 @@ const addons = [
 ];
 
 const newAddons = [
+    'vol-slider',
     'rename-broadcasts'
 ];
 

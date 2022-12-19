@@ -20,8 +20,8 @@ const manifest = {
   ],
   "info": [
     {
-      "type": "warning",
-      "text": "The \"Watch mouse cursor\" option may impact performance when the editor is open.",
+      "type": "notice",
+      "text": "The \"watch mouse cursor\" setting may impact performance when the editor is open.",
       "id": "watch"
     }
   ],

@@ -2,7 +2,7 @@
 const manifest = {
   "editorOnly": true,
   "name": "Developer tools",
-  "description": "Adds a find box and new menu options to the editor: copy/paste blocks, better clean up, go to custom block definition, and more! Press Ctrl+F to focus the find box, Ctrl+Space to bring up the \"add block by name\" popup, Ctrl+Left/Right to navigate find history.",
+  "description": "Adds new menu options to the editor: copy/paste blocks, better clean up, and more!",
   "credits": [
     {
       "name": "griffpatch"
@@ -22,23 +22,11 @@ const manifest = {
       "id": "enablePasteBlocksAtMouse",
       "type": "boolean",
       "default": true
-    },
-    {
-      "dynamic": true,
-      "name": "Middle mouse click variables, custom blocks or events to navigate",
-      "id": "enableMiddleClickFinder",
-      "type": "boolean",
-      "default": true
     }
   ],
   "userscripts": [
     {
       "url": "userscript.js"
-    }
-  ],
-  "userstyles": [
-    {
-      "url": "userscript.css"
     }
   ],
   "tags": [

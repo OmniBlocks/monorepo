@@ -40,7 +40,7 @@ const manifest = {
     },
     {
       "dynamic": true,
-      "name": "Use previous color instead of default when switching tools",
+      "name": "Use previous color instead of resetting after switching tools",
       "id": "persistence",
       "type": "boolean",
       "default": true

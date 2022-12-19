@@ -21,6 +21,38 @@ const manifest = {
     }
   ],
   "dynamicDisable": true,
+  "customCssVariables": [
+    {
+      "name": "lockDisplay",
+      "value": {
+        "type": "map",
+        "source": {
+          "type": "settingValue",
+          "settingId": "toggle"
+        },
+        "options": {
+          "hover": "flex",
+          "cathover": "flex",
+          "category": "none"
+        }
+      }
+    },
+    {
+      "name": "placeholderDisplay",
+      "value": {
+        "type": "map",
+        "source": {
+          "type": "settingValue",
+          "settingId": "toggle"
+        },
+        "options": {
+          "hover": "block",
+          "cathover": "none",
+          "category": "none"
+        }
+      }
+    }
+  ],
   "userscripts": [
     {
       "url": "userscript.js"
@@ -55,17 +87,17 @@ const manifest = {
     },
     {
       "dynamic": true,
-      "name": "Animation duration",
+      "name": "Animation speed",
       "id": "speed",
       "type": "select",
       "potentialValues": [
         {
           "id": "none",
-          "name": "None"
+          "name": "Instant"
         },
         {
           "id": "short",
-          "name": "Short"
+          "name": "Quick"
         },
         {
           "id": "default",
@@ -73,7 +105,7 @@ const manifest = {
         },
         {
           "id": "long",
-          "name": "Long"
+          "name": "Slow"
         }
       ],
       "default": "default"

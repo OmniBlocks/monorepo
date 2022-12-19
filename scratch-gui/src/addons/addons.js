@@ -60,6 +60,7 @@ const addons = [
     'swap-local-global',
     'editor-comment-previews',
     'columns',
+    'number-pad',
     'script-snap',
     'fullscreen',
     'hide-stage',

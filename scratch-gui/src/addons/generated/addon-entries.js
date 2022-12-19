@@ -59,6 +59,7 @@ export default {
   "swap-local-global": () => import(/* webpackChunkName: "addon-entry-swap-local-global" */ "../addons/swap-local-global/_runtime_entry.js"),
   "editor-comment-previews": () => import(/* webpackChunkName: "addon-default-entry" */ "../addons/editor-comment-previews/_runtime_entry.js"),
   "columns": () => import(/* webpackChunkName: "addon-entry-columns" */ "../addons/columns/_runtime_entry.js"),
+  "number-pad": () => import(/* webpackChunkName: "addon-entry-number-pad" */ "../addons/number-pad/_runtime_entry.js"),
   "script-snap": () => import(/* webpackChunkName: "addon-entry-script-snap" */ "../addons/script-snap/_runtime_entry.js"),
   "fullscreen": () => import(/* webpackChunkName: "addon-entry-fullscreen" */ "../addons/fullscreen/_runtime_entry.js"),
   "hide-stage": () => import(/* webpackChunkName: "addon-entry-hide-stage" */ "../addons/hide-stage/_runtime_entry.js"),

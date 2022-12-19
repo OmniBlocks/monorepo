@@ -73,6 +73,7 @@ const addons = [
 
 const newAddons = [
     'vol-slider',
+    'number-pad',
     'rename-broadcasts'
 ];
 

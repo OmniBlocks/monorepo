@@ -15,7 +15,9 @@ const manifest = {
       "id": "explanation"
     }
   ],
-  "tags": [],
+  "tags": [
+    "new"
+  ],
   "userscripts": [
     {
       "url": "userscript.js"

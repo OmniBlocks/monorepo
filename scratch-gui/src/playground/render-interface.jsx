@@ -260,7 +260,7 @@ class Interface extends React.Component {
                             </div>
                             {(
                                 // eslint-disable-next-line max-len
-                                projectId === '0' || description.instructions === 'unshared' || description.credits === 'unshared'
+                                description.instructions === 'unshared' || description.credits === 'unshared'
                             ) && (
                                 <div className={styles.unsharedUpdate}>
                                     <p>
@@ -288,29 +288,22 @@ class Interface extends React.Component {
                                             }}
                                         />
                                     </p>
-                                    {(
-                                        description.instructions === 'unshared' ||
-                                        description.credits === 'unshared'
-                                    ) && (
-                                        <React.Fragment>
-                                            <p>
-                                                <FormattedMessage
-                                                    // eslint-disable-next-line max-len
-                                                    defaultMessage="If the project was shared recently, this message may appear incorrectly for a few minutes."
-                                                    description="Appears on unshared projects"
-                                                    id="tw.unshared.cache"
-                                                />
-                                            </p>
-                                            <p>
-                                                <FormattedMessage
-                                                    // eslint-disable-next-line max-len
-                                                    defaultMessage="If this project is actually shared, please report a bug."
-                                                    description="Appears on unshared projects"
-                                                    id="tw.unshared.bug"
-                                                />
-                                            </p>
-                                        </React.Fragment>
-                                    )}
+                                    <p>
+                                        <FormattedMessage
+                                            // eslint-disable-next-line max-len
+                                            defaultMessage="If the project was shared recently, this message may appear incorrectly for a few minutes."
+                                            description="Appears on unshared projects"
+                                            id="tw.unshared.cache"
+                                        />
+                                    </p>
+                                    <p>
+                                        <FormattedMessage
+                                            // eslint-disable-next-line max-len
+                                            defaultMessage="If this project is actually shared, please report a bug."
+                                            description="Appears on unshared projects"
+                                            id="tw.unshared.bug"
+                                        />
+                                    </p>
                                 </div>
                             )}
                             {hasCloudVariables && projectId !== '0' && (

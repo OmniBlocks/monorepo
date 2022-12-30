@@ -276,6 +276,7 @@
     "move-to-top-bottom/@info-developer-tools": "Dieses Addon gehörte früher zum \"Entwicklertools\"-Addon, aber es wurde hierher verschoben.",
     "move-to-top-bottom/@name": "Element an erste/letzte Stelle verschieben",
     "disable-paste-offset/@description": "Fügt kopierte Elemente an ihrer ursprünglichen Position im Kostümeditor ein, antstatt die leicht zu verschieben.",
+    "disable-paste-offset/@info-vanilla": "Dieses Verhalten kann auch ohne das Addon durch Alt+Klick auf das Objekt erhalten werden.",
     "disable-paste-offset/@name": "Eingefügte Elemente nicht verschieben",
     "block-duplicate/@description": "Dupliziere schnell ein SKript, indem du es mit gedrückter Alt-Taste ziehst. Halte gleichzeitig auch Strg gedrückt, um nur den einzelnen Block zu duplizieren.",
     "block-duplicate/@info-mac": "Verwende auf macOS die Option-Taste statt der Alt-Taste und die Command-Taste statt der Strg-Taste.",

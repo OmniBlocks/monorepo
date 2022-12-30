@@ -274,6 +274,7 @@
     "move-to-top-bottom/@info-developer-tools": "Deze addon maakte voorheen deel uit van de \"ontwikkelaarstools\"-addon maar is nu hierheen verhuisd.",
     "move-to-top-bottom/@name": "Verplaats uiterlijk naar boven of beneden",
     "disable-paste-offset/@description": "Plak gekopieerde items op hun originele plek in plaats van een beetje verplaatst in de uiterlijkeditor.",
+    "disable-paste-offset/@info-vanilla": "Dit kan ook gedaan worden zonder deze addon, namelijk door op het object te klikken met Alt ingedrukt.",
     "disable-paste-offset/@name": "Geplakte items niet verplaatsen",
     "block-duplicate/@description": "Dupliceer snel een script door het te slepen met de Alt-toets ingedrukt. Houd Ctrl ook ingedrukt om alleen een enkel blok te dupliceren in plaats van het hele script eronder.",
     "block-duplicate/@info-mac": "Gebruik de Option-toets in plaats van de Alt-toets en de Command-toets in plaats van de Control-toets op macOS.",

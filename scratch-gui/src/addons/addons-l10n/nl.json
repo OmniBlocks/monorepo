@@ -13,6 +13,7 @@
     "editor-devtools/unused-var": "{count, plural, one {Ontwikkelaarstools: 1 ongebruikte lokale variabele verwijderen? Hier is het:\n} other {Ontwikkelaarstools: # ongebruikte lokale variabelen verwijderen? Hier zijn ze:\n} }",
     "editor-devtools/var-not-exist": "Die variabele bestaat niet...",
     "editor-devtools/variables": "variabelen",
+    "find-bar/complex-broadcast": "(expressie)",
     "find-bar/find": "Zoeken",
     "find-bar/find-placeholder": "Zoeken (Ctrl+F)",
     "middle-click-popup/start-typing": "Begin met Typen...",

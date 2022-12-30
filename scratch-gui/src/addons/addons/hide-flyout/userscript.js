@@ -90,6 +90,12 @@ export default async function ({ addon, console, msg }) {
     }, speed * 1000);
   }
 
+  const updateIsFullScreen = () => {
+    const isFullScreen = addon.tab.redux.state.scratchGui.mode.isFullScreen;
+    document.documentElement.classList.toggle("sa-hide-flyout-not-fullscreen", !isFullScreen);
+  };
+  updateIsFullScreen();
+
   let didOneTimeSetup = false;
   function doOneTimeSetup() {
     if (didOneTimeSetup) {
@@ -114,6 +120,9 @@ export default async function ({ addon, console, msg }) {
           }
           break;
         }
+        case "scratch-gui/mode/SET_FULL_SCREEN":
+          updateIsFullScreen();
+          break;
       }
     });
 

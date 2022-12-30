@@ -13,6 +13,7 @@
     "editor-devtools/unused-var": "{count, plural, one {Developer tools: Delete 1 unused local variable? Here it is:\n} other {Developer tools: Delete # unused local variables? Here they are:\n} }",
     "editor-devtools/var-not-exist": "That variable does not exist...",
     "editor-devtools/variables": "variables",
+    "find-bar/complex-broadcast": "(expression)",
     "find-bar/find": "Find",
     "find-bar/find-placeholder": "Find (Ctrl+F)",
     "middle-click-popup/start-typing": "Start Typing...",

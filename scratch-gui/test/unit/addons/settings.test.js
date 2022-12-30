@@ -495,3 +495,26 @@ test('Settings migration 2 -> 3', () => {
     store.readLocalStorage();
     expect(store.getAddonSetting('hide-flyout', 'toggle')).toBe('hover');
 });
+
+test('Settings migration 3 -> 4', () => {
+    const store = new SettingStore();
+
+    global.localStorage.getItem = () => JSON.stringify({
+        _: 3
+    });
+    store.readLocalStorage();
+    expect(store.getAddonEnabled('editor-devtools')).toBe(true);
+    expect(store.getAddonEnabled('find-bar')).toBe(true);
+    expect(store.getAddonEnabled('middle-click-popup')).toBe(true);
+
+    global.localStorage.getItem = () => JSON.stringify({
+        '_': 3,
+        'editor-devtools': {
+            enabled: false
+        }
+    });
+    store.readLocalStorage();
+    expect(store.getAddonEnabled('editor-devtools')).toBe(false);
+    expect(store.getAddonEnabled('find-bar')).toBe(false);
+    expect(store.getAddonEnabled('middle-click-popup')).toBe(false);
+});

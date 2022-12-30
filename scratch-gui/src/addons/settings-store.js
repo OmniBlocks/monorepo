@@ -19,7 +19,7 @@ import upstreamMeta from './generated/upstream-meta.json';
 import EventTargetShim from './event-target';
 
 const SETTINGS_KEY = 'tw:addons';
-const VERSION = 3;
+const VERSION = 4;
 
 const migrateSettings = settings => {
     const oldVersion = settings._;
@@ -59,6 +59,21 @@ const migrateSettings = settings => {
         const hideFlyout = settings['hide-flyout'];
         if (hideFlyout && hideFlyout.enabled && typeof hideFlyout.toggled === 'undefined') {
             hideFlyout.toggle = 'hover';
+        }
+    }
+
+    // Migrate 3 -> 4
+    // editor-devtools was broken up into find-bar and middle-click-popup.
+    // If someone disabled editor-devtools, we want to keep these disabled.
+    if (oldVersion < 4) {
+        const editorDevtools = settings['editor-devtools'];
+        if (editorDevtools && editorDevtools.enabled === false) {
+            settings['find-bar'] = {
+                enabled: false
+            };
+            settings['middle-click-popup'] = {
+                enabled: false
+            };
         }
     }
 

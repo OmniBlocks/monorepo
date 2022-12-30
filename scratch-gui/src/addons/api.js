@@ -400,6 +400,26 @@ class Tab extends EventTargetShim {
                     c => c.textContent === this.scratchMessage('gui.spriteSelectorItem.contextMenuDelete')
                 ),
                 until: () => []
+            },
+            paintEditorZoomControls: {
+                element: () => document.querySelector('.sa-paintEditorZoomControls-wrapper') || (() => {
+                    const wrapper = Object.assign(document.createElement('div'), {
+                        className: 'sa-paintEditorZoomControls-wrapper'
+                    });
+
+                    wrapper.style.display = 'flex';
+                    wrapper.style.flexDirection = 'row-reverse';
+                    wrapper.style.height = 'calc(1.95rem + 2px)';
+
+                    const zoomControls = document.querySelector("[class^='paint-editor_zoom-controls']");
+
+                    zoomControls.replaceWith(wrapper);
+                    wrapper.appendChild(zoomControls);
+
+                    return wrapper;
+                })(),
+                from: () => [],
+                until: () => []
             }
         };
 

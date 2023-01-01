@@ -273,7 +273,6 @@ const manifest = {
       "default": "#FEF49C"
     },
     {
-      "dynamic": true,
       "name": "Text color",
       "id": "text",
       "type": "select",

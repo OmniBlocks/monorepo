@@ -1,16 +1,3 @@
-/* inserted by pull.js */
-import _twAsset0 from "!url-loader!./decrement.svg";
-import _twAsset1 from "!url-loader!./increment.svg";
-import _twAsset2 from "!url-loader!./settings.svg";
-import _twAsset3 from "!url-loader!./toggle.svg";
-const _twGetAsset = (path) => {
-  if (path === "/decrement.svg") return _twAsset0;
-  if (path === "/increment.svg") return _twAsset1;
-  if (path === "/settings.svg") return _twAsset2;
-  if (path === "/toggle.svg") return _twAsset3;
-  throw new Error(`Unknown asset: ${path}`);
-};
-
 export default async function ({ addon, console, msg }) {
   const paper = await addon.tab.traps.getPaper();
 
@@ -584,7 +571,7 @@ export default async function ({ addon, console, msg }) {
     el.draggable = false;
     el.dataset.image = name;
     el.loading = "lazy";
-    el.src = _twGetAsset("/" + name + ".svg");
+    el.src = addon.self.getResource("/" + name + ".svg") /* rewritten by pull.js */;
     return el;
   };
 

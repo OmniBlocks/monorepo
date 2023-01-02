@@ -1,12 +1,3 @@
-/* inserted by pull.js */
-import _twAsset0 from "!url-loader!./icon.svg";
-import _twAsset1 from "!url-loader!./search.svg";
-const _twGetAsset = (path) => {
-  if (path === "/icon.svg") return _twAsset0;
-  if (path === "/search.svg") return _twAsset1;
-  throw new Error(`Unknown asset: ${path}`);
-};
-
 export default async function ({ addon, console, msg }) {
   const vm = addon.tab.traps.vm;
 
@@ -60,7 +51,7 @@ export default async function ({ addon, console, msg }) {
 
   const varTabIcon = document.createElement("img");
   varTabIcon.draggable = false;
-  varTabIcon.src = _twGetAsset("/icon.svg");
+  varTabIcon.src = addon.self.getResource("/icon.svg") /* rewritten by pull.js */;
 
   const varTabText = document.createElement("span");
   varTabText.innerText = msg("variables");

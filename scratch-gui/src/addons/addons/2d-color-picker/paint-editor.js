@@ -1,10 +1,3 @@
-/* inserted by pull.js */
-import _twAsset0 from "!url-loader!./assets/sv-gr.png";
-const _twGetAsset = (path) => {
-  if (path === "/assets/sv-gr.png") return _twAsset0;
-  throw new Error(`Unknown asset: ${path}`);
-};
-
 // this script was happily stolen from the color-picker addon, developed by Richie Bendall and apple502j
 
 // import required libraries
@@ -116,7 +109,7 @@ export default async ({ addon, console, msg }) => {
 
     const saColorPickerImage = Object.assign(document.createElement("img"), {
       className: "sa-2dcolor-picker-image",
-      src: _twGetAsset("/assets/sv-gr.png"),
+      src: addon.self.getResource("/assets/sv-gr.png") /* rewritten by pull.js */,
       draggable: false,
     });
     const saColorPickerHandle = Object.assign(document.createElement("div"), {

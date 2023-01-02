@@ -677,17 +677,11 @@ class Settings extends EventTargetShim {
 }
 
 class Self extends EventTargetShim {
-    constructor (id) {
+    constructor (id, getResource) {
         super();
         this.id = id;
         this.disabled = false;
-    }
-    // These are removed at build-time by pull.js. Throw if attempting to access them at runtime.
-    get dir () {
-        throw new Error(`Addon tried to access addon.self.dir`);
-    }
-    get lib () {
-        throw new Error(`Addon tried to access addon.self.lib`);
+        this.getResource = getResource;
     }
 }
 
@@ -701,13 +695,18 @@ class AddonRunner {
         this.messageCache = {};
         this.loading = true;
 
+        /**
+         * @type {Record<string, unknown>}
+         */
+        this.resources = null;
+
         this.publicAPI = {
             global,
             console,
             addon: {
                 tab: new Tab(id),
                 settings: new Settings(id, manifest),
-                self: new Self(id)
+                self: new Self(id, this.getResource.bind(this))
             },
             msg: this.msg.bind(this),
             safeMsg: this.safeMsg.bind(this)
@@ -737,6 +736,15 @@ class AddonRunner {
 
     safeMsg (key, vars) {
         return this._msg(key, vars, escapeHTML);
+    }
+
+    getResource (path) {
+        const withoutSlash = path.substring(1);
+        const url = this.resources[withoutSlash];
+        if (typeof url !== 'string') {
+            throw new Error(`Unknown asset: ${path}`);
+        }
+        return url;
     }
 
     updateAllStyles () {
@@ -837,7 +845,8 @@ class AddonRunner {
             await untilInEditor();
         }
 
-        const {resources} = await addonEntries[this.id]();
+        const mod = await addonEntries[this.id]();
+        this.resources = mod.resources;
 
         if (!this.manifest.noTranslations) {
             await addonMessagesPromise;
@@ -845,7 +854,7 @@ class AddonRunner {
 
         if (this.manifest.userstyles) {
             for (const userstyle of this.manifest.userstyles) {
-                for (const [moduleId, cssText] of resources[userstyle.url]) {
+                for (const [moduleId, cssText] of this.resources[userstyle.url]) {
                     const sheet = ConditionalStyle.get(moduleId, cssText);
                     sheet.addDependent(
                         this.id,
@@ -869,7 +878,7 @@ class AddonRunner {
                 if (!SettingsStore.evaluateCondition(userscript.if)) {
                     continue;
                 }
-                const fn = resources[userscript.url];
+                const fn = this.resources[userscript.url];
                 fn(this.publicAPI);
             }
         }

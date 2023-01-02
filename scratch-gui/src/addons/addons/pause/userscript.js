@@ -1,12 +1,3 @@
-/* inserted by pull.js */
-import _twAsset0 from "!url-loader!./pause.svg";
-import _twAsset1 from "!url-loader!./play.svg";
-const _twGetAsset = (path) => {
-  if (path === "/pause.svg") return _twAsset0;
-  if (path === "/play.svg") return _twAsset1;
-  throw new Error(`Unknown asset: ${path}`);
-};
-
 import { isPaused, setPaused, onPauseChanged, setup } from "../debugger/module.js";
 
 export default async function ({ addon, console, msg }) {
@@ -17,7 +8,7 @@ export default async function ({ addon, console, msg }) {
   img.draggable = false;
   img.title = msg("pause");
 
-  const setSrc = () => (img.src = _twGetAsset((isPaused() ? "/play.svg" : "/pause.svg")));
+  const setSrc = () => (img.src = addon.self.getResource((isPaused() ? "/play.svg" : "/pause.svg"))) /* rewritten by pull.js */;
   img.addEventListener("click", () => setPaused(!isPaused()));
   addon.tab.displayNoneWhileDisabled(img);
   addon.self.addEventListener("disabled", () => setPaused(false));

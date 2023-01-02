@@ -1,42 +1,13 @@
-/* inserted by pull.js */
-import _twAsset0 from "!url-loader!./icons/close.svg";
-import _twAsset1 from "!url-loader!./icons/debug.svg";
-import _twAsset2 from "!url-loader!./icons/delete.svg";
-import _twAsset3 from "!url-loader!./icons/download-white.svg";
-import _twAsset4 from "!url-loader!./icons/error.svg";
-import _twAsset5 from "!url-loader!./icons/logs.svg";
-import _twAsset6 from "!url-loader!./icons/performance.svg";
-import _twAsset7 from "!url-loader!./icons/play.svg";
-import _twAsset8 from "!url-loader!./icons/step.svg";
-import _twAsset9 from "!url-loader!./icons/subthread.svg";
-import _twAsset10 from "!url-loader!./icons/threads.svg";
-import _twAsset11 from "!url-loader!./icons/warning.svg";
-const _twGetAsset = (path) => {
-  if (path === "/icons/close.svg") return _twAsset0;
-  if (path === "/icons/debug.svg") return _twAsset1;
-  if (path === "/icons/delete.svg") return _twAsset2;
-  if (path === "/icons/download-white.svg") return _twAsset3;
-  if (path === "/icons/error.svg") return _twAsset4;
-  if (path === "/icons/logs.svg") return _twAsset5;
-  if (path === "/icons/performance.svg") return _twAsset6;
-  if (path === "/icons/play.svg") return _twAsset7;
-  if (path === "/icons/step.svg") return _twAsset8;
-  if (path === "/icons/subthread.svg") return _twAsset9;
-  if (path === "/icons/threads.svg") return _twAsset10;
-  if (path === "/icons/warning.svg") return _twAsset11;
-  throw new Error(`Unknown asset: ${path}`);
-};
-
 import { onPauseChanged, isPaused } from "./module.js";
 
 export default async function createPerformanceTab({ debug, addon, console, msg }) {
   const vm = addon.tab.traps.vm;
 
-  await addon.tab.loadScript(_twGetAsset("/thirdparty/cs/chart.min.js"));
+  await addon.tab.loadScript(addon.self.getResource("/thirdparty/cs/chart.min.js")) /* rewritten by pull.js */;
 
   const tab = debug.createHeaderTab({
     text: msg("tab-performance"),
-    icon: _twGetAsset("/icons/performance.svg"),
+    icon: addon.self.getResource("/icons/performance.svg") /* rewritten by pull.js */,
   });
 
   const content = Object.assign(document.createElement("div"), {

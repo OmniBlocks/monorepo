@@ -1,10 +1,3 @@
-/* inserted by pull.js */
-import _twAsset0 from "!url-loader!./icon.svg";
-const _twGetAsset = (path) => {
-  if (path === "/icon.svg") return _twAsset0;
-  throw new Error(`Unknown asset: ${path}`);
-};
-
 export default async function ({ addon, console, msg }) {
   let mode = addon.settings.get("fitting");
 
@@ -26,7 +19,7 @@ export default async function ({ addon, console, msg }) {
     const img = Object.assign(document.createElement("img"), {
       className: `${addon.tab.scratchClass("action-menu_more-icon")} sa-better-img-uploader`,
       draggable: "false",
-      src: _twGetAsset("/icon.svg"),
+      src: addon.self.getResource("/icon.svg") /* rewritten by pull.js */,
       height: "10",
       width: "10",
     });

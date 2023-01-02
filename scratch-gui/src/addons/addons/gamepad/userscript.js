@@ -1,18 +1,3 @@
-/* inserted by pull.js */
-import _twAsset0 from "!url-loader!./active.png";
-import _twAsset1 from "!url-loader!./close.svg";
-import _twAsset2 from "!url-loader!./cursor.png";
-import _twAsset3 from "!url-loader!./dot.svg";
-import _twAsset4 from "!url-loader!./gamepad.svg";
-const _twGetAsset = (path) => {
-  if (path === "/active.png") return _twAsset0;
-  if (path === "/close.svg") return _twAsset1;
-  if (path === "/cursor.png") return _twAsset2;
-  if (path === "/dot.svg") return _twAsset3;
-  if (path === "/gamepad.svg") return _twAsset4;
-  throw new Error(`Unknown asset: ${path}`);
-};
-
 import GamepadLib from "./gamepadlib.js";
 
 export default async function ({ addon, console, msg }) {
@@ -147,7 +132,7 @@ export default async function ({ addon, console, msg }) {
   const buttonImage = document.createElement("img");
   buttonImage.className = addon.tab.scratchClass("stage-header_stage-button-icon");
   buttonImage.draggable = false;
-  buttonImage.src = _twGetAsset("/gamepad.svg");
+  buttonImage.src = addon.self.getResource("/gamepad.svg") /* rewritten by pull.js */;
   buttonContent.appendChild(buttonImage);
   buttonContainer.appendChild(buttonContent);
   container.appendChild(buttonContainer);
@@ -322,7 +307,7 @@ export default async function ({ addon, console, msg }) {
   const virtualCursorElement = document.createElement("img");
   virtualCursorElement.hidden = true;
   virtualCursorElement.className = "sa-gamepad-cursor";
-  virtualCursorElement.src = _twGetAsset("/cursor.png");
+  virtualCursorElement.src = addon.self.getResource("/cursor.png") /* rewritten by pull.js */;
   addon.self.addEventListener("disabled", () => {
     virtualCursorElement.hidden = true;
   });

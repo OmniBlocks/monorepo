@@ -1,10 +1,3 @@
-/* inserted by pull.js */
-import _twAsset0 from "!url-loader!./icon.svg";
-const _twGetAsset = (path) => {
-  if (path === "/icon.svg") return _twAsset0;
-  throw new Error(`Unknown asset: ${path}`);
-};
-
 export default async function ({ addon, console, msg }) {
   let stageHidden = false;
   let bodyWrapper;
@@ -56,7 +49,7 @@ export default async function ({ addon, console, msg }) {
     hideStageButton.appendChild(
       Object.assign(document.createElement("img"), {
         className: addon.tab.scratchClass("stage-header_stage-button-icon"),
-        src: _twGetAsset("/icon.svg"),
+        src: addon.self.getResource("/icon.svg") /* rewritten by pull.js */,
         alt: msg("hide-stage"),
         draggable: false,
       })

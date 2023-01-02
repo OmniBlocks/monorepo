@@ -1,32 +1,3 @@
-/* inserted by pull.js */
-import _twAsset0 from "!url-loader!./icons/close.svg";
-import _twAsset1 from "!url-loader!./icons/debug.svg";
-import _twAsset2 from "!url-loader!./icons/delete.svg";
-import _twAsset3 from "!url-loader!./icons/download-white.svg";
-import _twAsset4 from "!url-loader!./icons/error.svg";
-import _twAsset5 from "!url-loader!./icons/logs.svg";
-import _twAsset6 from "!url-loader!./icons/performance.svg";
-import _twAsset7 from "!url-loader!./icons/play.svg";
-import _twAsset8 from "!url-loader!./icons/step.svg";
-import _twAsset9 from "!url-loader!./icons/subthread.svg";
-import _twAsset10 from "!url-loader!./icons/threads.svg";
-import _twAsset11 from "!url-loader!./icons/warning.svg";
-const _twGetAsset = (path) => {
-  if (path === "/icons/close.svg") return _twAsset0;
-  if (path === "/icons/debug.svg") return _twAsset1;
-  if (path === "/icons/delete.svg") return _twAsset2;
-  if (path === "/icons/download-white.svg") return _twAsset3;
-  if (path === "/icons/error.svg") return _twAsset4;
-  if (path === "/icons/logs.svg") return _twAsset5;
-  if (path === "/icons/performance.svg") return _twAsset6;
-  if (path === "/icons/play.svg") return _twAsset7;
-  if (path === "/icons/step.svg") return _twAsset8;
-  if (path === "/icons/subthread.svg") return _twAsset9;
-  if (path === "/icons/threads.svg") return _twAsset10;
-  if (path === "/icons/warning.svg") return _twAsset11;
-  throw new Error(`Unknown asset: ${path}`);
-};
-
 import downloadBlob from "../../libraries/common/cs/download-blob.js";
 import LogView from "./log-view.js";
 
@@ -35,7 +6,7 @@ export default async function createLogsTab({ debug, addon, console, msg }) {
 
   const tab = debug.createHeaderTab({
     text: msg("tab-logs"),
-    icon: _twGetAsset("/icons/logs.svg"),
+    icon: addon.self.getResource("/icons/logs.svg") /* rewritten by pull.js */,
   });
 
   const logView = new LogView();
@@ -115,7 +86,7 @@ export default async function createLogsTab({ debug, addon, console, msg }) {
 
   const exportButton = debug.createHeaderButton({
     text: msg("export"),
-    icon: _twGetAsset("/icons/download-white.svg"),
+    icon: addon.self.getResource("/icons/download-white.svg") /* rewritten by pull.js */,
     description: msg("export-desc"),
   });
   const downloadText = (filename, text) => {
@@ -147,7 +118,7 @@ export default async function createLogsTab({ debug, addon, console, msg }) {
 
   const trashButton = debug.createHeaderButton({
     text: msg("clear"),
-    icon: _twGetAsset("/icons/delete.svg"),
+    icon: addon.self.getResource("/icons/delete.svg") /* rewritten by pull.js */,
   });
   trashButton.element.addEventListener("click", () => {
     clearLogs();

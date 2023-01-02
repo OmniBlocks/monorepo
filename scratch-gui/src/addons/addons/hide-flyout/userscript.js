@@ -1,12 +1,3 @@
-/* inserted by pull.js */
-import _twAsset0 from "!url-loader!./lock.svg";
-import _twAsset1 from "!url-loader!./unlock.svg";
-const _twGetAsset = (path) => {
-  if (path === "/lock.svg") return _twAsset0;
-  if (path === "/unlock.svg") return _twAsset1;
-  throw new Error(`Unknown asset: ${path}`);
-};
-
 export default async function ({ addon, console, msg }) {
   let placeHolderDiv = null;
   let lockObject = null;
@@ -52,7 +43,7 @@ export default async function ({ addon, console, msg }) {
   function updateLockDisplay() {
     lockObject.classList.toggle("locked", flyoutLock);
     lockButton.title = flyoutLock ? msg("unlock") : msg("lock");
-    lockIcon.src = _twGetAsset(`/${flyoutLock ? "" : "un"}lock.svg`);
+    lockIcon.src = addon.self.getResource(`/${flyoutLock ? "" : "un"}lock.svg`) /* rewritten by pull.js */;
   }
 
   function onmouseenter(e, speed = {}) {

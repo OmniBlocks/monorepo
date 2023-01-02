@@ -19,6 +19,8 @@ const getPrecedence = addonId => {
     if (addonId === 'columns') return 1;
     // editor-stage-left must have higher precedence than hide-stage
     if (addonId === 'editor-stage-left') return 1;
+    // editor-theme3 must have higher precedence than middle-click-popup and find-bar
+    if (addonId === 'editor-theme3') return 1;
     return 0;
 };
 

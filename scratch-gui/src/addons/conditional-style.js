@@ -132,6 +132,7 @@ class ConditionalStyle {
     getElement () {
         if (!this.el) {
             const el = document.createElement('style');
+            el.className = 'scratch-addons-style';
             el.dataset.precedence = this.precedence;
             el.textContent = this.styleText;
             this.styleText = null;

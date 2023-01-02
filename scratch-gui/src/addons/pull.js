@@ -130,7 +130,17 @@ const includePolyfills = contents => {
     return contents;
 };
 
+const detectUnimplementedAPIs = (addonId, contents) => {
+    if (contents.includes('data-addon-id')) {
+        console.warn(`Warning: ${addonId} seems to use data-addon-id. It should use [data-addons*=...] instead.`);
+    }
+};
+
 const includeImports = (folder, contents) => {
+    if (!contents.includes('addon.self.dir') && !contents.includes('addon.self.lib')) {
+        return contents;
+    }
+
     const dynamicAssets = walk(folder)
         .filter(file => file.endsWith('.svg') || file.endsWith('.png'));
 
@@ -268,11 +278,13 @@ const processAddon = (id, oldDirectory, newDirectory) => {
             continue;
         }
 
-        if (file.endsWith('.js')) {
+        if (file.endsWith('.js') || file.endsWith('.css')) {
             contents = contents.toString('utf-8');
-            includeImportedLibraries(contents);
-            contents = includePolyfills(contents);
-            if (contents.includes('addon.self.dir') || contents.includes('addon.self.lib')) {
+            detectUnimplementedAPIs(id, contents);
+
+            if (file.endsWith('.js')) {
+                includeImportedLibraries(contents);
+                contents = includePolyfills(contents);
                 contents = includeImports(oldDirectory, contents);
             }
         }

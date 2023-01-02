@@ -27,16 +27,12 @@ import {addContextMenu} from './contextmenu';
 import * as modal from './modal';
 import * as textColorHelpers from './libraries/common/cs/text-color.esm.js';
 import './polyfill';
+import ConditionalStyle from './conditional-style';
 
 /* eslint-disable no-console */
 
 const escapeHTML = str => str.replace(/([<>'"&])/g, (_, l) => `&#${l.charCodeAt(0)};`);
 const kebabCaseToCamelCase = str => str.replace(/-([a-z])/g, g => g[1].toUpperCase());
-const createStylesheet = css => {
-    const style = document.createElement('style');
-    style.textContent = css;
-    return style;
-};
 
 let _scratchClassNames = null;
 const getScratchClassNames = () => {
@@ -209,29 +205,6 @@ const CONTEXT_MENU_ORDER = ['editor-devtools', 'block-switching', 'blocks2image'
 let createdAnyBlockContextMenus = false;
 
 const getInternalKey = element => Object.keys(element).find(key => key.startsWith('__reactInternalInstance$'));
-
-// Stylesheets are added at the start of <body> so that they have higher precedence
-// than those in <head>
-const stylesheetContainer = document.createElement('div');
-document.body.insertBefore(stylesheetContainer, document.body.firstChild);
-const getStylesheetPrecedence = styleElement => {
-    const addonId = styleElement.dataset.addonId;
-    // columns must have higher precedence than hide-flyout
-    if (addonId === 'columns') return 1;
-    // editor-stage-left must have higher precedence than hide-stage
-    if (addonId === 'editor-stage-left') return 1;
-    return 0;
-};
-const addStylesheet = styleElement => {
-    const priority = getStylesheetPrecedence(styleElement);
-    for (const child of stylesheetContainer.children) {
-        if (getStylesheetPrecedence(child) >= priority) {
-            stylesheetContainer.insertBefore(styleElement, child);
-            return;
-        }
-    }
-    stylesheetContainer.appendChild(styleElement);
-};
 
 class Tab extends EventTargetShim {
     constructor (id) {
@@ -726,8 +699,6 @@ class AddonRunner {
         this.id = id;
         this.manifest = manifest;
         this.messageCache = {};
-        this.stylesheets = [];
-        this.disabledStylesheet = null;
         this.loading = true;
 
         this.publicAPI = {
@@ -768,12 +739,12 @@ class AddonRunner {
         return this._msg(key, vars, escapeHTML);
     }
 
-    settingsChanged () {
-        this.publicAPI.addon.settings.dispatchEvent(new CustomEvent('change'));
-        this.updateCSSVariables();
+    updateAllStyles () {
+        ConditionalStyle.updateAddon(this.id);
+        this.updateCssVariables();
     }
 
-    updateCSSVariables () {
+    updateCssVariables () {
         const addonId = kebabCaseToCamelCase(this.id);
 
         if (this.manifest.settings) {
@@ -847,16 +818,21 @@ class AddonRunner {
         return true;
     }
 
+    settingsChanged () {
+        this.updateAllStyles();
+        this.publicAPI.addon.settings.dispatchEvent(new CustomEvent('change'));
+    }
+
     dynamicEnable () {
         if (this.loading) {
             return;
         }
-        this.appendStylesheets();
-        if (this.disabledStylesheet) {
-            this.disabledStylesheet.remove();
-            this.disabledStylesheet = null;
-        }
+
+        // This order is important. We need to update styles before calling the addon's dynamic
+        // toggle event. We also need to update `disabled` before we can update styles because
+        // the ConditionalStyle callbacks are implemented using the API.
         this.publicAPI.addon.self.disabled = false;
+        this.updateAllStyles();
         this.publicAPI.addon.self.dispatchEvent(new CustomEvent('reenabled'));
     }
 
@@ -864,24 +840,11 @@ class AddonRunner {
         if (this.loading) {
             return;
         }
-        this.removeStylesheets();
-        const disabledCSS = `.${getDisplayNoneWhileDisabledClass(this.id)}{display:none !important;}`;
-        this.disabledStylesheet = createStylesheet(disabledCSS);
-        addStylesheet(this.disabledStylesheet);
+
+        // See comment in dynamicEnable().
         this.publicAPI.addon.self.disabled = true;
+        this.updateAllStyles();
         this.publicAPI.addon.self.dispatchEvent(new CustomEvent('disabled'));
-    }
-
-    removeStylesheets () {
-        for (const style of this.stylesheets) {
-            style.remove();
-        }
-    }
-
-    appendStylesheets () {
-        for (const style of this.stylesheets) {
-            addStylesheet(style);
-        }
     }
 
     async run () {
@@ -895,22 +858,23 @@ class AddonRunner {
             await addonMessagesPromise;
         }
 
-        this.updateCSSVariables();
-
         if (this.manifest.userstyles) {
             for (const userstyle of this.manifest.userstyles) {
-                if (!this.meetsCondition(userstyle.if)) {
-                    continue;
+                for (const [moduleId, cssText] of resources[userstyle.url]) {
+                    const sheet = ConditionalStyle.get(moduleId, cssText);
+                    sheet.addDependent(
+                        this.id,
+                        () => !this.publicAPI.addon.self.disabled && this.meetsCondition(userstyle.if)
+                    );
                 }
-                const sheets = resources[userstyle.url];
-                const source = sheets.map(i => i[1]).join('\n');
-                const style = createStylesheet(source);
-                style.className = 'scratch-addons-style';
-                style.dataset.addonId = this.id;
-                this.stylesheets.push(style);
             }
         }
-        this.appendStylesheets();
+
+        const disabledCSS = `.${getDisplayNoneWhileDisabledClass(this.id)}{display:none !important;}`;
+        const disabledStylesheet = ConditionalStyle.get(`_disabled/${this.id}`, disabledCSS);
+        disabledStylesheet.addDependent(this.id, () => this.publicAPI.addon.self.disabled);
+
+        this.updateCssVariables();
 
         if (this.manifest.userscripts) {
             for (const userscript of this.manifest.userscripts) {

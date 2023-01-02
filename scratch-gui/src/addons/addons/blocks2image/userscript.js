@@ -15,7 +15,7 @@ export default async function ({ addon, console, msg }) {
         fill: #fff !important;
     }
     `;
-    for (let userstyle of document.querySelectorAll(".scratch-addons-style[data-addon-id='editor-theme3']")) {
+    for (let userstyle of document.querySelectorAll(".scratch-addons-style[data-addons*='editor-theme3']")) {
       if (userstyle.disabled) continue;
       style.textContent += userstyle.textContent;
     }

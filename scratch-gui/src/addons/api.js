@@ -168,7 +168,10 @@ const getTranslations = async () => {
 const addonMessagesPromise = getTranslations();
 
 const untilInEditor = () => {
-    if (!tabReduxInstance.state.scratchGui.mode.isPlayerOnly) {
+    if (
+        !tabReduxInstance.state.scratchGui.mode.isPlayerOnly ||
+        tabReduxInstance.state.scratchGui.mode.isEmbedded
+    ) {
         return;
     }
     return new Promise(resolve => {

@@ -4,7 +4,6 @@
 
 import { normalizeHex, getHexRegex } from "../../libraries/common/cs/normalize-color.js";
 import RateLimiter from "../../libraries/common/cs/rate-limiter.js";
-import tinycolor from "../../libraries/thirdparty/cs/tinycolor-min.js";
 
 export default async ({ addon, console, msg }) => {
   let prevEventHandler;
@@ -81,7 +80,7 @@ export default async ({ addon, console, msg }) => {
     const saColorPickerText = Object.assign(document.createElement("input"), {
       className: `sa-color-picker-text sa-color-picker-paint-text ${inputClass}`,
       type: "text",
-      pattern: "^#[0-9a-fA-F]{3,8}$",
+      pattern: "^#?([0-9a-fA-F]{3}){1,2}$",
       placeholder: msg("hex"),
       value: defaultColor || "",
     });

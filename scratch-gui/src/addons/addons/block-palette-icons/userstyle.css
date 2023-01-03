@@ -53,7 +53,3 @@
 .scratchCategoryId-myBlocks .scratchCategoryItemBubble::after {
   background-image: url(icons/block_icon.svg);
 }
-
-.scratchCategoryId-tw .scratchCategoryItemBubble {
-  background-image: url(icons/tw_icon.svg);
-}

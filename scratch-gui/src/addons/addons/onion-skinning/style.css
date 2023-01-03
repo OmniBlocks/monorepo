@@ -4,6 +4,9 @@
 .sa-onion-button:focus-within {
   background-color: hsla(0, 100%, 65%, 0.2);
 }
+[theme="dark"] .sa-onion-image {
+  filter: brightness(0) invert(0.8);
+}
 .sa-onion-button[data-enabled="true"] .sa-onion-image {
   filter: brightness(0) invert(1);
 }
@@ -31,15 +34,14 @@
   /* based on the styles for the color dropdown */
   padding: 4px;
   border-radius: 4px;
-  border: 1px solid #ddd;
+  border: 1px solid var(--paint-ui-pane-border, #ddd);
   box-shadow: 0px 0px 8px 1px rgba(0, 0, 0, 0.3);
   transition-property: bottom, opacity;
   transition-duration: 500ms;
   transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
   opacity: 0;
   pointer-events: none;
-  background: white;
-  color: black;
+  background: var(--ui-primary, white);
   min-height: 100%;
   min-width: 100%;
   display: flex;
@@ -87,8 +89,8 @@
   right: calc(50% - 7px);
 }
 .sa-onion-settings-polygon {
-  fill: white;
-  stroke: #ddd;
+  fill: var(--ui-primary, white);
+  stroke: var(--paint-ui-pane-border, #ddd);
 }
 
 .sa-onion-settings-label {

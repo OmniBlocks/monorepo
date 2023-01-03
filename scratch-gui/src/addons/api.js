@@ -27,7 +27,8 @@ import {addContextMenu} from './contextmenu';
 import * as modal from './modal';
 import * as textColorHelpers from './libraries/common/cs/text-color.esm.js';
 import './polyfill';
-import ConditionalStyle from './conditional-style';
+import * as conditionalStyles from './conditional-style';
+import getPrecedence from './addon-precedence';
 
 /* eslint-disable no-console */
 
@@ -751,7 +752,7 @@ class AddonRunner {
     }
 
     updateAllStyles () {
-        ConditionalStyle.updateAll();
+        conditionalStyles.updateAll();
         this.updateCssVariables();
     }
 
@@ -855,24 +856,30 @@ class AddonRunner {
             await addonMessagesPromise;
         }
 
+        // Multiply by big number because the first userstyle is + 0, second is + 1, third is + 2, etc.
+        // This number just has to be larger than the maximum number of userstyles in a single addon.
+        const baseStylePrecedence = getPrecedence(this.id) * 100;
+
         if (this.manifest.userstyles) {
-            for (const userstyle of this.manifest.userstyles) {
+            for (let i = 0; i < this.manifest.userstyles.length; i++) {
+                const userstyle = this.manifest.userstyles[i];
+                const userstylePrecedence = baseStylePrecedence + i;
+                const userstyleCondition = () => (
+                    !this.publicAPI.addon.self.disabled &&
+                    SettingsStore.evaluateCondition(this.id, userstyle.if)
+                );
+
                 for (const [moduleId, cssText] of this.resources[userstyle.url]) {
-                    const sheet = ConditionalStyle.get(moduleId, cssText);
-                    sheet.addDependent(
-                        this.id,
-                        () => (
-                            !this.publicAPI.addon.self.disabled &&
-                            SettingsStore.evaluateCondition(this.id, userstyle.if)
-                        )
-                    );
+                    const sheet = conditionalStyles.create(moduleId, cssText);
+                    sheet.addDependent(this.id, userstylePrecedence, userstyleCondition);
                 }
             }
+
         }
 
         const disabledCSS = `.${getDisplayNoneWhileDisabledClass(this.id)}{display:none !important;}`;
-        const disabledStylesheet = ConditionalStyle.get(`_disabled/${this.id}`, disabledCSS);
-        disabledStylesheet.addDependent(this.id, () => this.publicAPI.addon.self.disabled);
+        const disabledStylesheet = conditionalStyles.create(`_disabled/${this.id}`, disabledCSS);
+        disabledStylesheet.addDependent(this.id, baseStylePrecedence, () => this.publicAPI.addon.self.disabled);
 
         this.updateCssVariables();
 

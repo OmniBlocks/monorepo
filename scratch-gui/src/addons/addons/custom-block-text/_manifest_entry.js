@@ -32,12 +32,14 @@ const manifest = {
   ],
   "settings": [
     {
+      "dynamic": true,
       "name": "Bold text",
       "id": "bold",
       "type": "boolean",
       "default": false
     },
     {
+      "dynamic": true,
       "name": "Shadow under text",
       "id": "shadow",
       "type": "boolean",

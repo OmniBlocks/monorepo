@@ -17,12 +17,14 @@ const manifest = {
   ],
   "settings": [
     {
+      "dynamic": true,
       "name": "Open full screen project player in full screen browser mode",
       "id": "browserFullscreen",
       "type": "boolean",
       "default": true
     },
     {
+      "dynamic": true,
       "name": "Hide toolbar in full screen",
       "id": "hideToolbar",
       "type": "boolean",

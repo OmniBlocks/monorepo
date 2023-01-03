@@ -32,7 +32,6 @@ const manifest = {
     }
   ],
   "dynamicDisable": true,
-  "updateUserstylesOnSettingsChange": true,
   "userstyles": [
     {
       "url": "hideOverflow.css"

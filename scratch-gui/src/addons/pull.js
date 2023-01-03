@@ -178,6 +178,7 @@ const normalizeManifest = (id, manifest) => {
     delete manifest.latestUpdate;
     delete manifest.libraries;
     delete manifest.injectAsStyleElt;
+    delete manifest.updateUserstylesOnSettingsChange;
 
     // All addons have dynamic enable
     delete manifest.dynamicEnable;

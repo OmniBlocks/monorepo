@@ -4,7 +4,6 @@ const manifest = {
   "description": "Hides delete button (trash can icon) from sprites, costumes and sounds. They can still be deleted using the right click context menu.",
   "tags": [],
   "dynamicDisable": true,
-  "updateUserstylesOnSettingsChange": true,
   "settings": [
     {
       "dynamic": true,

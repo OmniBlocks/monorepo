@@ -47,7 +47,6 @@ const manifest = {
     }
   ],
   "dynamicDisable": true,
-  "updateUserstylesOnSettingsChange": true,
   "enabledByDefault": false
 };
 export default manifest;

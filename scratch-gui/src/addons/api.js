@@ -740,7 +740,7 @@ class AddonRunner {
     }
 
     updateAllStyles () {
-        ConditionalStyle.updateAddon(this.id);
+        ConditionalStyle.updateAll();
         this.updateCssVariables();
     }
 
@@ -803,21 +803,6 @@ class AddonRunner {
         return '#000000';
     }
 
-    meetsCondition (condition) {
-        if (!condition) {
-            // No condition, so always active.
-            return true;
-        }
-        if (condition.settings) {
-            for (const [settingId, expectedValue] of Object.entries(condition.settings)) {
-                if (this.publicAPI.addon.settings.get(settingId) !== expectedValue) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
     settingsChanged () {
         this.updateAllStyles();
         this.publicAPI.addon.settings.dispatchEvent(new CustomEvent('change'));
@@ -864,7 +849,10 @@ class AddonRunner {
                     const sheet = ConditionalStyle.get(moduleId, cssText);
                     sheet.addDependent(
                         this.id,
-                        () => !this.publicAPI.addon.self.disabled && this.meetsCondition(userstyle.if)
+                        () => (
+                            !this.publicAPI.addon.self.disabled &&
+                            SettingsStore.evaluateCondition(this.id, userstyle.if)
+                        )
                     );
                 }
             }
@@ -878,7 +866,7 @@ class AddonRunner {
 
         if (this.manifest.userscripts) {
             for (const userscript of this.manifest.userscripts) {
-                if (!this.meetsCondition(userscript.if)) {
+                if (!SettingsStore.evaluateCondition(userscript.if)) {
                     continue;
                 }
                 const fn = resources[userscript.url];

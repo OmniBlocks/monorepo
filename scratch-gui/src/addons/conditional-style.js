@@ -57,14 +57,6 @@ class ConditionalStyle {
         }
     }
 
-    static updateAddon (addonId) {
-        for (const sheet of allSheets.values()) {
-            if (sheet.dependsOn(addonId)) {
-                sheet.update();
-            }
-        }
-    }
-
     /**
      * @param {string} styleText CSS text
      */

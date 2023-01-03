@@ -80,6 +80,18 @@ const migrateSettings = settings => {
     return settings;
 };
 
+/**
+ * @template T
+ * @param {T|T[]} v A value
+ * @returns {T[]} The value if it is a list, otherwise a 1 item list
+ */
+const asArray = v => {
+    if (Array.isArray(v)) {
+        return v;
+    }
+    return [v];
+};
+
 class SettingsStore extends EventTargetShim {
     constructor () {
         super();
@@ -426,6 +438,38 @@ class SettingsStore extends EventTargetShim {
                 }));
             }
         }
+    }
+
+    /**
+     * Evaluate an `if` value from addon.json.
+     * @param {string} addonId The ID of the addon.
+     * @param {unknown} condition Condition from addon.json
+     * @returns {boolean} True if the condition is met.
+     */
+    evaluateCondition (addonId, condition) {
+        if (!condition) {
+            // No condition. Default to true.
+            return true;
+        }
+
+        if (condition.addonEnabled) {
+            // addonEnabled is an OR
+            const addonsToCheck = asArray(condition.addonEnabled);
+            if (addonsToCheck.every(id => !this.getAddonEnabled(id))) {
+                return false;
+            }
+        }
+
+        if (condition.settings) {
+            // settings is an AND
+            for (const [settingName, expectedValue] of Object.entries(condition.settings)) {
+                if (this.getAddonSetting(addonId, settingName) !== expectedValue) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 }
 

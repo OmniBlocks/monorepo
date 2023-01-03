@@ -337,20 +337,8 @@ const Setting = ({
     setting,
     value
 }) => {
-    if (setting.if && setting.if.addonEnabled) {
-        const addons = Array.isArray(setting.if.addonEnabled) ? setting.if.addonEnabled : [setting.if.addonEnabled];
-        for (const addon of addons) {
-            if (!SettingsStore.getAddonEnabled(addon)) {
-                return null;
-            }
-        }
-    }
-    if (setting.if && setting.if.settings) {
-        for (const [settingName, expectedValue] of Object.entries(setting.if.settings)) {
-            if (SettingsStore.getAddonSetting(addonId, settingName) !== expectedValue) {
-                return null;
-            }
-        }
+    if (!SettingsStore.evaluateCondition(addonId, setting.if)) {
+        return null;
     }
     const settingId = setting.id;
     const settingName = addonTranslations[`${addonId}/@settings-name-${settingId}`] || setting.name;

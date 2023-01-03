@@ -452,7 +452,7 @@ test('setStoreWithVersionCheck', () => {
     expect(store.setStore).toHaveBeenCalledTimes(0);
 });
 
-test('parseSearchParameter', () => {
+test('parseUrlParameter', () => {
     const store = new SettingStore();
     expect(store.getAddonEnabled('pause')).toBe(true);
     expect(store.getAddonEnabled('mute-project')).toBe(true);

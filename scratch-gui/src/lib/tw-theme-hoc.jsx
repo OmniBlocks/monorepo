@@ -55,7 +55,7 @@ const ThemeHOC = function (WrappedComponent) {
             const dark = this.state.dark;
             document.body.setAttribute('theme', dark ? 'dark' : 'light');
             if (dark && !darkModeStylesheet.parentNode) {
-                document.body.insertBefore(darkModeStylesheet, document.body.firstChild);
+                document.head.appendChild(darkModeStylesheet);
             } else if (!dark && darkModeStylesheet.parentNode) {
                 darkModeStylesheet.parentNode.removeChild(darkModeStylesheet);
             }

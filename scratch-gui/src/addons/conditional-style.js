@@ -1,8 +1,8 @@
-// Stylesheets are added at the start of <body> so that they have higher precedence
-// than those in <head>
+// Stylesheets are added at the end of <body> so that they have higher precedence
+// than those in <head> and above dark mode which is appended at the start of <body>
 const stylesheetContainer = document.createElement('div');
 stylesheetContainer.style.display = 'none';
-document.body.insertBefore(stylesheetContainer, document.body.firstChild);
+document.body.appendChild(stylesheetContainer);
 
 /**
  * Maps opaque module IDs to its ConditionalStyle.

@@ -55,6 +55,8 @@ const ThemeHOC = function (WrappedComponent) {
             const dark = this.state.dark;
             document.body.setAttribute('theme', dark ? 'dark' : 'light');
             if (dark && !darkModeStylesheet.parentNode) {
+                // Append at the start of <body> we override scratch-gui styles in <head>
+                // but are overridden by addon styles at the end of <body>
                 document.body.insertBefore(darkModeStylesheet, document.body.firstChild);
             } else if (!dark && darkModeStylesheet.parentNode) {
                 darkModeStylesheet.parentNode.removeChild(darkModeStylesheet);

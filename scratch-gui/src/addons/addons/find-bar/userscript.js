@@ -17,6 +17,8 @@ export default async function ({ addon, msg, console }) {
       this.findInput = null;
       this.dropdownOut = null;
       this.dropdown = new Dropdown(this.utils);
+
+      document.addEventListener("keydown", (e) => this.eventKeyDown(e), true);
     }
 
     get workspace() {
@@ -60,17 +62,15 @@ export default async function ({ addon, msg, console }) {
       this.findInput.addEventListener("keydown", (e) => this.inputKeyDown(e));
       this.findInput.addEventListener("keyup", () => this.inputChange());
       this.findInput.addEventListener("focusout", () => this.hideDropDown());
-
-      document.addEventListener("keydown", (e) => this.eventKeyDown(e), true);
     }
 
-    tabChanged () {
+    tabChanged() {
       if (!this.findBarOuter) {
         return;
       }
       const tab = addon.tab.redux.state.scratchGui.editorTab.activeTabIndex;
       const visible = tab === 0 || tab === 1 || tab === 2;
-      this.findBarOuter.style.display = visible ? '' : 'none';
+      this.findBarOuter.hidden = !visible;
     }
 
     inputChange() {
@@ -134,7 +134,7 @@ export default async function ({ addon, msg, console }) {
     }
 
     eventKeyDown(e) {
-      if (addon.self.disabled) return;
+      if (addon.self.disabled || !this.findBarOuter) return;
 
       let ctrlKey = e.ctrlKey || e.metaKey;
 

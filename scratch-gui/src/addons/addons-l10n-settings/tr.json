@@ -277,6 +277,7 @@
     "move-to-top-bottom/@info-developer-tools": "Bu eklenti öncesinde \"geliştirici araçları\" eklentisinin bir parçasıydı ancak artık buraya taşındı.",
     "move-to-top-bottom/@name": "Kostümü yukarı veya aşağı taşı",
     "disable-paste-offset/@description": "Çoğaltılan ögeleri kostüm düzenleyicide hafifçe kaydırmak yerine orijinal konumlarına yapıştırın.",
+    "disable-paste-offset/@info-vanilla": "Bu davranış bu eklenti olmadan da Alt+Ögeye tıklatılarak gerçekleştirilebilir.",
     "disable-paste-offset/@name": "Yapıştırılan öğeleri kenara kaydırmama",
     "block-duplicate/@description": "Alt tuşunu basılı tutarken bir kodu sürükleyerek onu hızlıca çoğaltın. Altına eklenen yığının tamamı yerine yalnızca tek bir bloğu çoğaltmak için Ctrl tuşuna da basılı tutun.",
     "block-duplicate/@info-mac": "macOS’ta Alt tuşu yerine Option tuşunu ve Kontrol tuşu yerine Komut tuşunu kullanın.",

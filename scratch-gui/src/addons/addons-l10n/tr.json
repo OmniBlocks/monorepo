@@ -13,6 +13,7 @@
     "editor-devtools/unused-var": "{count, plural, one {Geliştirici araçları: Kullanılmayan 1 yerel değişken silinsin mi? İşte buradalar:\n} other {Geliştirici araçları: Kullanılmayan # yerel değişken silinsin mi? İşte buradalar:\n} }",
     "editor-devtools/var-not-exist": "Bu değişken mevcut değil...",
     "editor-devtools/variables": "değişkenler",
+    "find-bar/complex-broadcast": "(ifade)",
     "find-bar/find": "Ara",
     "find-bar/find-placeholder": "Ara (Ctrl+F)",
     "middle-click-popup/start-typing": "Yazmaya Başla...",

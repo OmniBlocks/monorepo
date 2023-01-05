@@ -510,6 +510,19 @@ class VirtualMachine extends EventEmitter {
     }
 
     /**
+     * @param {JSZip.OutputType} [type] JSZip output type. Defaults to 'arraybuffer'.
+     * @returns {StreamHelper} JSZip StreamHelper object generating the compressed sb3.
+     * See: https://stuk.github.io/jszip/documentation/api_streamhelper.html
+     */
+    saveProjectSb3Stream (type) {
+        return this._saveProjectZip().generateInternalStream({
+            type: type || 'arraybuffer',
+            mimeType: 'application/x.scratch.sb3',
+            compression: 'DEFLATE'
+        });
+    }
+
+    /**
      * tw: Serialize the project into a map of files without actually zipping the project.
      * @returns {Record<Uint8Array>} Files of the project.
      */

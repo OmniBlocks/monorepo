@@ -36,6 +36,38 @@ test('saveProjectSb3', async t => {
     t.end();
 });
 
+test('saveProjectSb3Stream', async t => {
+    t.plan(6);
+
+    const vm = new VirtualMachine();
+    vm.attachStorage(makeTestStorage());
+    await vm.loadProject(fixture);
+
+    let receivedDataEvent = false;
+    const stream = vm.saveProjectSb3Stream();
+    stream.on('data', data => {
+        if (receivedDataEvent) {
+            return;
+        }
+        receivedDataEvent = true;
+        t.type(data, Uint8Array);
+    });
+    stream.resume();
+    const buffer = await stream.accumulate();
+    t.type(buffer, ArrayBuffer);
+
+    const stream2 = vm.saveProjectSb3Stream('uint8array');
+    const uint8array = await stream2.accumulate();
+    t.type(uint8array, Uint8Array);
+
+    const zip = await JSZip.loadAsync(buffer);
+    t.equal((await zip.file('project.json').async('string'))[0], '{');
+    t.equal((await zip.file('d9c625ae1996b615a146ac2a7dbe74d7.svg').async('uint8array')).byteLength, 691);
+    t.equal((await zip.file('cd21514d0531fdffb22204e0ec5ed84a.svg').async('uint8array')).byteLength, 202);
+
+    t.end();
+});
+
 test('saveProjectSb3DontZip', async t => {
     const vm = new VirtualMachine();
     vm.attachStorage(makeTestStorage());

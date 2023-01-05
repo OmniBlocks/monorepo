@@ -505,7 +505,7 @@ class VirtualMachine extends EventEmitter {
     }
 
     /**
-     * tw: Serailize the project into a map of files without actually zipping the project.
+     * tw: Serialize the project into a map of files without actually zipping the project.
      * @returns {Record<Uint8Array>} Files of the project.
      */
     saveProjectSb3DontZip () {

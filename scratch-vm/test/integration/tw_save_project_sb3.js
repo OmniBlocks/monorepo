@@ -35,3 +35,16 @@ test('saveProjectSb3', async t => {
 
     t.end();
 });
+
+test('saveProjectSb3DontZip', async t => {
+    const vm = new VirtualMachine();
+    vm.attachStorage(makeTestStorage());
+    await vm.loadProject(fixture);
+
+    const map = vm.saveProjectSb3DontZip();
+    t.equal(map['project.json'][0], '{'.charCodeAt(0));
+    t.equal(map['d9c625ae1996b615a146ac2a7dbe74d7.svg'].byteLength, 691);
+    t.equal(map['cd21514d0531fdffb22204e0ec5ed84a.svg'].byteLength, 202);
+
+    t.end();
+});

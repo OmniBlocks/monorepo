@@ -22,6 +22,33 @@ const getProjectTitleFromFilename = fileInputFilename => {
 };
 
 /**
+ * @param {Uint8Array[]} arrays List of byte arrays
+ * @returns {number} Total length of the arrays
+ */
+const getLengthOfByteArrays = arrays => {
+    let length = 0;
+    for (let i = 0; i < arrays.length; i++) {
+        length += arrays[i].byteLength;
+    }
+    return length;
+};
+
+/**
+ * @param {Uint8Array[]} arrays List of byte arrays
+ * @returns {Uint8Array} One big array containing all of the little arrays in order.
+ */
+const concatenateByteArrays = arrays => {
+    const totalLength = getLengthOfByteArrays(arrays);
+    const newArray = new Uint8Array(totalLength);
+    let p = 0;
+    for (let i = 0; i < arrays.length; i++) {
+        newArray.set(arrays[i], p);
+        p += arrays[i].byteLength;
+    }
+    return newArray;
+};
+
+/**
  * Project saver component passes a downloadProject function to its child.
  * It expects this child to be a function with the signature
  *     function (downloadProject, props) {}
@@ -98,16 +125,70 @@ class SB3Downloader extends React.Component {
         if (!this.props.canSaveProject) {
             return;
         }
-        // Obtain the writable very early, otherwise browsers won't give us the handle when we ask.
-        const writable = await FileSystemAPI.createWritable(handle);
+
+        const writable = await handle.createWritable();
         try {
             this.startedSaving();
-            const content = await this.props.saveProjectSb3();
-            await FileSystemAPI.writeToWritable(writable, content);
+
+            // Projects can be very large, so we'll utilize JSZip's stream API to avoid having the
+            // entire sb3 in memory at the same time.
+            const jszipStream = this.props.saveProjectSb3Stream();
+            const zipStream = new ReadableStream({
+                start: controller => {
+                    jszipStream.on('data', data => {
+                        controller.enqueue(data);
+                        if (controller.desiredSize <= 0) {
+                            // Note that JSZip will keep sending some data after you ask it to pause.
+                            jszipStream.pause();
+                        }
+                    });
+                    jszipStream.on('end', () => {
+                        controller.close();
+                    });
+                    jszipStream.resume();
+                },
+                pull: () => {
+                    jszipStream.resume();
+                },
+                cancel: () => {
+                    jszipStream.pause();
+                }
+            });
+
+            // Buffer small messages into one bigger message to improve performance of write() later.
+            const MIN_BUFFER_SIZE = 1024 * 256;
+            const queuedChunks = [];
+            // eslint-disable-next-line no-undef
+            const bufferTransformer = new TransformStream({
+                transform: (chunk, controller) => {
+                    queuedChunks.push(chunk);
+
+                    const currentSize = getLengthOfByteArrays(queuedChunks);
+                    if (currentSize >= MIN_BUFFER_SIZE) {
+                        const newArray = concatenateByteArrays(queuedChunks);
+                        controller.enqueue(newArray);
+                        queuedChunks.length = 0;
+                    }
+                },
+                flush: controller => {
+                    const newArray = concatenateByteArrays(queuedChunks);
+                    if (newArray.byteLength) {
+                        controller.enqueue(newArray);
+                    }
+                }
+            });
+
+            const fileStream = new WritableStream({
+                write: chunk => writable.write(chunk)
+            });
+
+            await zipStream
+                .pipeThrough(bufferTransformer)
+                .pipeTo(fileStream);
+
             this.finishedSaving();
         } finally {
-            // Always close the handle regardless of errors.
-            await FileSystemAPI.closeWritable(writable);
+            await writable.close();
         }
     }
     handleSaveError (e) {
@@ -157,6 +238,7 @@ SB3Downloader.propTypes = {
     onSaveFinished: PropTypes.func,
     projectFilename: PropTypes.string,
     saveProjectSb3: PropTypes.func,
+    saveProjectSb3Stream: PropTypes.func,
     canSaveProject: PropTypes.bool,
     onSetFileHandle: PropTypes.func,
     onSetProjectTitle: PropTypes.func,
@@ -172,6 +254,7 @@ SB3Downloader.defaultProps = {
 const mapStateToProps = state => ({
     fileHandle: state.scratchGui.tw.fileHandle,
     saveProjectSb3: state.scratchGui.vm.saveProjectSb3.bind(state.scratchGui.vm),
+    saveProjectSb3Stream: state.scratchGui.vm.saveProjectSb3Stream.bind(state.scratchGui.vm),
     canSaveProject: getIsShowingProject(state.scratchGui.projectState.loadingState),
     projectFilename: getProjectFilename(state.scratchGui.projectTitle, projectTitleInitialState)
 });

@@ -28,21 +28,8 @@ const showOpenFilePicker = async () => {
     return handle;
 };
 
-const createWritable = handle => handle.createWritable();
-
-const closeWritable = async writable => {
-    await writable.close();
-};
-
-const writeToWritable = async (writable, content) => {
-    await writable.write(content);
-};
-
 export default {
     available,
     showOpenFilePicker,
-    showSaveFilePicker,
-    createWritable,
-    closeWritable,
-    writeToWritable
+    showSaveFilePicker
 };

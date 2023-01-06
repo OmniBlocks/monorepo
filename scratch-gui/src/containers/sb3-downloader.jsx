@@ -186,9 +186,14 @@ class SB3Downloader extends React.Component {
                 .pipeThrough(bufferTransformer)
                 .pipeTo(fileStream);
 
-            this.finishedSaving();
-        } finally {
             await writable.close();
+            this.finishedSaving();
+        } catch (e) {
+            // Always need to close this file handle.
+            await writable.close();
+
+            // The caller will deal with this error.
+            throw e;
         }
     }
     handleSaveError (e) {

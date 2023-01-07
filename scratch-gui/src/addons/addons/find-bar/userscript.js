@@ -509,7 +509,7 @@ export default async function ({ addon, msg, console }) {
         const assetPanel = document.querySelector("[class^=asset-panel_wrapper]");
         if (assetPanel) {
           const reactInstance = assetPanel[addon.tab.traps.getInternalKey(assetPanel)];
-          const reactProps = reactInstance.pendingProps.children[0].props;
+          const reactProps = reactInstance.child.stateNode.props;
           reactProps.onItemClick(item.data.y);
           const selectorList = assetPanel.firstChild.firstChild;
           selectorList.children[item.data.y].scrollIntoView({

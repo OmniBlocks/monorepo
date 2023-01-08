@@ -4,7 +4,8 @@ import PropTypes from 'prop-types';
 import log from './log';
 import {getIsShowingProject} from '../reducers/project-state';
 
-const PACKAGER = 'https://packager.turbowarp.org';
+const PACKAGER_URL = 'https://packager.turbowarp.org';
+const PACKAGER_ORIGIN = PACKAGER_URL;
 
 const readBlobAsArrayBuffer = blob => new Promise((resolve, reject) => {
     const fr = new FileReader();
@@ -28,15 +29,20 @@ const PackagerIntegrationHOC = function (WrappedComponent) {
         }
         handleClickPackager () {
             if (this.props.canOpenPackager) {
-                window.open(`${PACKAGER}/?import_from=${location.origin}`);
+                window.open(`${PACKAGER_URL}/?import_from=${location.origin}`);
             }
         }
         handleMessage (e) {
-            if (e.origin !== PACKAGER) {
+            if (e.origin !== PACKAGER_ORIGIN) {
                 return;
             }
 
             if (!this.props.canOpenPackager) {
+                return;
+            }
+
+            const packagerData = e.data.p4;
+            if (packagerData.type !== 'ready-for-import') {
                 return;
             }
 
@@ -45,7 +51,7 @@ const PackagerIntegrationHOC = function (WrappedComponent) {
                 p4: {
                     type: 'start-import'
                 }
-            }, PACKAGER);
+            }, e.origin);
 
             this.props.vm.saveProjectSb3()
                 .then(readBlobAsArrayBuffer)
@@ -57,7 +63,7 @@ const PackagerIntegrationHOC = function (WrappedComponent) {
                             data: buffer,
                             name
                         }
-                    }, PACKAGER, [buffer]);
+                    }, e.origin, [buffer]);
                 })
                 .catch(err => {
                     log.error(err);
@@ -65,7 +71,7 @@ const PackagerIntegrationHOC = function (WrappedComponent) {
                         p4: {
                             type: 'cancel-import'
                         }
-                    }, PACKAGER);
+                    }, e.origin);
                 });
         }
         render () {

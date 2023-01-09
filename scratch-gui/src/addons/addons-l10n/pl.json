@@ -201,6 +201,7 @@
     "move-to-top-bottom/top": "przenieś na górę",
     "rename-broadcasts/RENAME_BROADCAST": "Zmień wiadomość",
     "rename-broadcasts/RENAME_BROADCAST_MODAL_TITLE": "Zmień Wiadomość",
+    "rename-broadcasts/RENAME_BROADCAST_TITLE": "Zmień nazwę wszystkich wiadomości \"{name}\" na:",
     "swap-local-global/cant-convert-cloud": "\"Zmienne w chmurze\" nie mogą być zamienione na \"Dla jednego duszka\"",
     "swap-local-global/cant-convert-conflict": "Nie można zamienić, ponieważ koliduje ze zmiennymi w innym duszku: {sprites}",
     "swap-local-global/cant-convert-stage": "Scena nie może mieć zmiennych \"Tylko dla tego duszka\".",

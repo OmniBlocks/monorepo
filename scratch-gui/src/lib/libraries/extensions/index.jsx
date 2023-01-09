@@ -69,6 +69,7 @@ export default [
                 id="gui.extension.music.description"
             />
         ),
+        tags: ['scratch'],
         featured: true
     },
     {
@@ -89,6 +90,7 @@ export default [
                 id="gui.extension.pen.description"
             />
         ),
+        tags: ['scratch'],
         featured: true
     },
     {
@@ -109,6 +111,7 @@ export default [
                 id="gui.extension.videosensing.description"
             />
         ),
+        tags: ['scratch'],
         featured: true
     },
     {
@@ -130,6 +133,7 @@ export default [
                 id="gui.extension.text2speech.description"
             />
         ),
+        tags: ['scratch'],
         featured: true,
         internetConnectionRequired: true
     },
@@ -152,6 +156,7 @@ export default [
                 id="gui.extension.translate.description"
             />
         ),
+        tags: ['scratch'],
         featured: true,
         internetConnectionRequired: true
     },
@@ -168,6 +173,7 @@ export default [
                 id="gui.extension.makeymakey.description"
             />
         ),
+        tags: ['scratch'],
         featured: true
     },
     {
@@ -183,6 +189,7 @@ export default [
                 id="gui.extension.microbit.description"
             />
         ),
+        tags: ['scratch'],
         featured: true,
         disabled: false,
         bluetoothRequired: true,
@@ -213,6 +220,7 @@ export default [
                 id="gui.extension.ev3.description"
             />
         ),
+        tags: ['scratch'],
         featured: true,
         disabled: false,
         bluetoothRequired: true,
@@ -243,6 +251,7 @@ export default [
                 id="gui.extension.boost.description"
             />
         ),
+        tags: ['scratch'],
         featured: true,
         disabled: false,
         bluetoothRequired: true,
@@ -274,6 +283,7 @@ export default [
                 id="gui.extension.wedo2.description"
             />
         ),
+        tags: ['scratch'],
         featured: true,
         disabled: false,
         bluetoothRequired: true,
@@ -305,6 +315,7 @@ export default [
                 id="gui.extension.gdxfor.description"
             />
         ),
+        tags: ['scratch'],
         featured: true,
         disabled: false,
         bluetoothRequired: true,
@@ -339,6 +350,7 @@ export default [
                 id="tw.twExtension.description"
             />
         ),
+        tags: ['tw'],
         featured: true,
         incompatibleWithScratch: true
     },
@@ -359,6 +371,7 @@ export default [
                 id="tw.customExtension.description"
             />
         ),
+        tags: ['tw'],
         featured: true
     },
     {
@@ -379,6 +392,7 @@ export default [
                 id="tw.extensionGallery.description"
             />
         ),
+        tags: ['tw'],
         featured: true
     }
 ];

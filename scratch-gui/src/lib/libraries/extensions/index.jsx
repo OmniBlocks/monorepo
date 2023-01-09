@@ -47,8 +47,8 @@ import gdxforConnectionIconURL from './gdxfor/gdxfor-illustration.svg';
 import gdxforConnectionSmallIconURL from './gdxfor/gdxfor-small.svg';
 
 import twIcon from './tw/tw.svg';
-
 import customExtensionIcon from './custom/custom.svg';
+import galleryIcon from './gallery/gallery.svg';
 
 export default [
     {
@@ -357,6 +357,26 @@ export default [
                 defaultMessage="Load custom extensions from URLs."
                 description="Description of custom extension category"
                 id="tw.customExtension.description"
+            />
+        ),
+        featured: true
+    },
+    {
+        name: (
+            <FormattedMessage
+                defaultMessage="TurboWarp Extension Gallery"
+                description="Name of extensions.turbowarp.org in extension library"
+                id="tw.extensionGallery.name"
+            />
+        ),
+        href: 'https://extensions.turbowarp.org/',
+        extensionId: '',
+        iconURL: galleryIcon,
+        description: (
+            <FormattedMessage
+                defaultMessage="Find advanced custom extensions on extensions.turbowarp.org."
+                description="Description of extensions.turbowarp.org in extension library"
+                id="tw.extensionGallery.description"
             />
         ),
         featured: true

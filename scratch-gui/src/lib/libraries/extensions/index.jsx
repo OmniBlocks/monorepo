@@ -350,7 +350,7 @@ export default [
         iconURL: twIcon,
         description: (
             <FormattedMessage
-                defaultMessage="Weird new blocks. Not compatible with Scratch."
+                defaultMessage="Weird new blocks."
                 description="Description of TW extension"
                 id="tw.twExtension.description"
             />
@@ -359,6 +359,7 @@ export default [
         tags: ['tw'],
         featured: true
     },
+    // Extensions loaded from URLs do not support localization, so unfortunately we will just leave English names here.
     {
         name: 'Stretch',
         extensionId: 'stretch',
@@ -402,7 +403,7 @@ export default [
         iconURL: galleryIcon,
         description: (
             <FormattedMessage
-                defaultMessage="Find even more user-contributed custom extensions on extensions.turbowarp.org."
+                defaultMessage="extensions.turbowarp.org is the place to find powerful and safe custom extensions."
                 description="Description of extensions.turbowarp.org in extension library"
                 id="tw.extensionGallery.description"
             />

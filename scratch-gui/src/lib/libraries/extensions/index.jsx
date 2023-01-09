@@ -47,8 +47,13 @@ import gdxforConnectionIconURL from './gdxfor/gdxfor-illustration.svg';
 import gdxforConnectionSmallIconURL from './gdxfor/gdxfor-small.svg';
 
 import twIcon from './tw/tw.svg';
+
 import customExtensionIcon from './custom/custom.svg';
+
 import galleryIcon from './gallery/gallery.svg';
+import stretchIcon from './gallery/stretch.svg';
+import gamepadIcon from './gallery/gamepad.svg';
+import cursorIcon from './gallery/cursor.svg';
 
 export default [
     {
@@ -355,22 +360,29 @@ export default [
         incompatibleWithScratch: true
     },
     {
-        name: (
-            <FormattedMessage
-                defaultMessage="Custom Extension"
-                description="Name of custom extension category"
-                id="tw.customExtension.name"
-            />
-        ),
-        extensionId: '',
-        iconURL: customExtensionIcon,
-        description: (
-            <FormattedMessage
-                defaultMessage="Load custom extensions from URLs."
-                description="Description of custom extension category"
-                id="tw.customExtension.description"
-            />
-        ),
+        name: 'Stretch',
+        extensionId: 'stretch',
+        extensionURL: 'https://extensions.turbowarp.org/stretch.js',
+        iconURL: stretchIcon,
+        description: 'Stretch sprites horizontally or vertically.',
+        tags: ['tw'],
+        featured: true
+    },
+    {
+        name: 'Gamepad',
+        extensionId: 'Gamepad',
+        extensionURL: 'https://extensions.turbowarp.org/gamepad.js',
+        iconURL: gamepadIcon,
+        description: 'Directly access gamepads instead of just mapping buttons to keys.',
+        tags: ['tw'],
+        featured: true
+    },
+    {
+        name: 'Mouse Cursor',
+        extensionId: 'MouseCursor',
+        extensionURL: 'https://extensions.turbowarp.org/cursor.js',
+        iconURL: cursorIcon,
+        description: 'Use custom cursors or hide the cursor. Also allows replacing the cursor with any costume image.',
         tags: ['tw'],
         featured: true
     },
@@ -387,9 +399,29 @@ export default [
         iconURL: galleryIcon,
         description: (
             <FormattedMessage
-                defaultMessage="Find advanced custom extensions on extensions.turbowarp.org."
+                defaultMessage="Find even more user-contributed custom extensions on extensions.turbowarp.org."
                 description="Description of extensions.turbowarp.org in extension library"
                 id="tw.extensionGallery.description"
+            />
+        ),
+        tags: ['tw'],
+        featured: true
+    },
+    {
+        name: (
+            <FormattedMessage
+                defaultMessage="Custom Extension"
+                description="Name of custom extension category"
+                id="tw.customExtension.name"
+            />
+        ),
+        extensionId: '',
+        iconURL: customExtensionIcon,
+        description: (
+            <FormattedMessage
+                defaultMessage="Load custom extensions from URLs."
+                description="Description of custom extension category"
+                id="tw.customExtension.description"
             />
         ),
         tags: ['tw'],

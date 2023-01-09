@@ -355,9 +355,9 @@ export default [
                 id="tw.twExtension.description"
             />
         ),
+        incompatibleWithScratch: true,
         tags: ['tw'],
-        featured: true,
-        incompatibleWithScratch: true
+        featured: true
     },
     {
         name: 'Stretch',
@@ -366,6 +366,7 @@ export default [
         iconURL: stretchIcon,
         description: 'Stretch sprites horizontally or vertically.',
         tags: ['tw'],
+        incompatibleWithScratch: true,
         featured: true
     },
     {
@@ -375,6 +376,7 @@ export default [
         iconURL: gamepadIcon,
         description: 'Directly access gamepads instead of just mapping buttons to keys.',
         tags: ['tw'],
+        incompatibleWithScratch: true,
         featured: true
     },
     {
@@ -384,6 +386,7 @@ export default [
         iconURL: cursorIcon,
         description: 'Use custom cursors or hide the cursor. Also allows replacing the cursor with any costume image.',
         tags: ['tw'],
+        incompatibleWithScratch: true,
         featured: true
     },
     {

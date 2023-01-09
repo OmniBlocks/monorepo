@@ -124,6 +124,7 @@ class LibraryItem extends React.PureComponent {
                 iconURL={iconURL}
                 icons={this.props.icons}
                 id={this.props.id}
+                incompatibleWithScratch={this.props.incompatibleWithScratch}
                 insetIconURL={this.props.insetIconURL}
                 internetConnectionRequired={this.props.internetConnectionRequired}
                 isPlaying={this.props.isPlaying}
@@ -163,6 +164,7 @@ LibraryItem.propTypes = {
         })
     ),
     id: PropTypes.number.isRequired,
+    incompatibleWithScratch: PropTypes.bool,
     insetIconURL: PropTypes.string,
     internetConnectionRequired: PropTypes.bool,
     isPlaying: PropTypes.bool,

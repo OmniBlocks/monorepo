@@ -239,6 +239,7 @@ class LibraryComponent extends React.Component {
                             iconRawURL={dataItem.rawURL}
                             icons={dataItem.costumes}
                             id={index}
+                            incompatibleWithScratch={dataItem.incompatibleWithScratch}
                             insetIconURL={dataItem.insetIconURL}
                             internetConnectionRequired={dataItem.internetConnectionRequired}
                             isPlaying={this.state.playingItem === index}

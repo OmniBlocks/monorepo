@@ -354,7 +354,7 @@ export default [
         iconURL: customExtensionIcon,
         description: (
             <FormattedMessage
-                defaultMessage="Load custom extensions from URLs. For developers. Experimental."
+                defaultMessage="Load custom extensions from URLs."
                 description="Description of custom extension category"
                 id="tw.customExtension.description"
             />

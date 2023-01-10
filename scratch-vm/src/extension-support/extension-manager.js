@@ -201,6 +201,11 @@ class ExtensionManager {
             return;
         }
 
+        if (this.isExtensionURLLoaded(extensionURL)) {
+            // Extension is already loaded.
+            return;
+        }
+
         if (!this._isValidExtensionURL(extensionURL)) {
             throw new Error(`Invalid extension URL: ${extensionURL}`);
         }
@@ -339,7 +344,7 @@ class ExtensionManager {
         if (e) {
             workerInfo.reject(e);
         } else {
-            workerInfo.resolve(id);
+            workerInfo.resolve();
         }
     }
 
@@ -593,6 +598,10 @@ class ExtensionManager {
             }
         }
         return extensionURLs;
+    }
+
+    isExtensionURLLoaded (url) {
+        return Object.values(this.workerURLs).includes(url);
     }
 }
 

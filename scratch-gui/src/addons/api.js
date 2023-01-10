@@ -506,7 +506,7 @@ class Tab extends EventTargetShim {
                 const oldUpdateColour = BlockSvg.prototype.updateColour;
                 BlockSvg.prototype.updateColour = function (...args2) {
                     // procedures_prototype also has a procedure code but we do not want to color them.
-                    if (this.type === 'procedures_call') {
+                    if (!this.isInsertionMarker() && this.type === 'procedures_call') {
                         const block = this.procCode_ && vm.runtime.getAddonBlock(this.procCode_);
                         if (block) {
                             this.colour_ = addonBlockColor.color;

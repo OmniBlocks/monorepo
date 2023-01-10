@@ -13,6 +13,7 @@
     "editor-devtools/unused-var": "{count, plural, one {Strumenti per sviluppatori: Rimuovere 1 variabile locale inutilizzata? Eccola qui:\n} many {Strumenti per sviluppatori: Rimuovere # variabili locali inutilizzate? Eccole qui:\n} other {Strumenti per sviluppatori: Rimuovere # variabili locali inutilizzate? Eccole qui:\n} }",
     "editor-devtools/var-not-exist": "Questa variabile non esiste...",
     "editor-devtools/variables": "variabili",
+    "find-bar/complex-broadcast": "(espressione)",
     "find-bar/find": "Cerca",
     "find-bar/find-placeholder": "Cerca (Ctrl+F)",
     "middle-click-popup/start-typing": "Inizia a Scrivere...",

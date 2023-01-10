@@ -259,7 +259,7 @@
     "block-duplicate/@description": "Szybko zduplikuj skrypt, przeciągając go, trzymając klawisz Alt. Możesz także przytrzymać również klawisz Ctrl, aby zduplikować tylko pojedynczy blok zamiast całego stosu dołączonego pod nim.",
     "block-duplicate/@info-mac": "W systemie macOS zamiast klawisza Alt należy użyć klawisza Option, a zamiast klawisza Control - klawisza Command.",
     "block-duplicate/@name": "Duplikuj skrypt przyciskiem Alt",
-    "rename-broadcasts/@description": "Dodaje możliwość zmiany nazwy wiadomości nadawanych w blokach nadawczych.",
+    "rename-broadcasts/@description": "Dodaje możliwość zmiany nazwy komunikatów w blokach nadawczych.",
     "rename-broadcasts/@name": "Zmień ogłoszenie",
     "swap-local-global/@description": "Dodaje więcej opcji w czasie zmieniania nazwy zmiennej lub listy. Możesz zmienić czy dana zmienna jest dla \"Wszystkich duszków\" lub \"Tylko dla tego duszka\" oraz czy jest zapisywana w chmurze.",
     "swap-local-global/@name": "Przełącz zmienną między ustawieniami \"Dla wszystkich duszków\" na \"Tylko dla tego duszka\"",

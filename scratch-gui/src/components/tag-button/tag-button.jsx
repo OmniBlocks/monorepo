@@ -28,18 +28,23 @@ const TagButtonComponent = ({
         )}
         {...props}
     >
-        <FormattedMessage {...intlLabel} />
+        {typeof intlLabel === 'string' ? intlLabel : (
+            <FormattedMessage {...intlLabel} />
+        )}
     </Button>
 );
 
 TagButtonComponent.propTypes = {
     ...Button.propTypes,
     active: PropTypes.bool,
-    intlLabel: PropTypes.shape({
-        defaultMessage: PropTypes.string,
-        description: PropTypes.string,
-        id: PropTypes.string
-    }).isRequired,
+    intlLabel: PropTypes.oneOfType([
+        PropTypes.shape({
+            defaultMessage: PropTypes.string,
+            description: PropTypes.string,
+            id: PropTypes.string
+        }),
+        PropTypes.string
+    ]).isRequired,
     tag: PropTypes.string.isRequired
 };
 

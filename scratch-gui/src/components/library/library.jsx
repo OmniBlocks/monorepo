@@ -234,10 +234,12 @@ class LibraryComponent extends React.Component {
                             extensionId={dataItem.extensionId}
                             featured={dataItem.featured}
                             hidden={dataItem.hidden}
+                            href={dataItem.href}
                             iconMd5={dataItem.costumes ? dataItem.costumes[0].md5ext : dataItem.md5ext}
                             iconRawURL={dataItem.rawURL}
                             icons={dataItem.costumes}
                             id={index}
+                            incompatibleWithScratch={dataItem.incompatibleWithScratch}
                             insetIconURL={dataItem.insetIconURL}
                             internetConnectionRequired={dataItem.internetConnectionRequired}
                             isPlaying={this.state.playingItem === index}

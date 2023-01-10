@@ -50,6 +50,11 @@ import twIcon from './tw/tw.svg';
 
 import customExtensionIcon from './custom/custom.svg';
 
+import galleryIcon from './gallery/gallery.svg';
+import stretchIcon from './gallery/stretch.svg';
+import gamepadIcon from './gallery/gamepad.svg';
+import cursorIcon from './gallery/cursor.svg';
+
 export default [
     {
         name: (
@@ -69,6 +74,7 @@ export default [
                 id="gui.extension.music.description"
             />
         ),
+        tags: ['scratch'],
         featured: true
     },
     {
@@ -89,6 +95,7 @@ export default [
                 id="gui.extension.pen.description"
             />
         ),
+        tags: ['scratch'],
         featured: true
     },
     {
@@ -109,6 +116,7 @@ export default [
                 id="gui.extension.videosensing.description"
             />
         ),
+        tags: ['scratch'],
         featured: true
     },
     {
@@ -130,6 +138,7 @@ export default [
                 id="gui.extension.text2speech.description"
             />
         ),
+        tags: ['scratch'],
         featured: true,
         internetConnectionRequired: true
     },
@@ -152,6 +161,7 @@ export default [
                 id="gui.extension.translate.description"
             />
         ),
+        tags: ['scratch'],
         featured: true,
         internetConnectionRequired: true
     },
@@ -168,6 +178,7 @@ export default [
                 id="gui.extension.makeymakey.description"
             />
         ),
+        tags: ['scratch'],
         featured: true
     },
     {
@@ -183,6 +194,7 @@ export default [
                 id="gui.extension.microbit.description"
             />
         ),
+        tags: ['scratch'],
         featured: true,
         disabled: false,
         bluetoothRequired: true,
@@ -213,6 +225,7 @@ export default [
                 id="gui.extension.ev3.description"
             />
         ),
+        tags: ['scratch'],
         featured: true,
         disabled: false,
         bluetoothRequired: true,
@@ -243,6 +256,7 @@ export default [
                 id="gui.extension.boost.description"
             />
         ),
+        tags: ['scratch'],
         featured: true,
         disabled: false,
         bluetoothRequired: true,
@@ -274,6 +288,7 @@ export default [
                 id="gui.extension.wedo2.description"
             />
         ),
+        tags: ['scratch'],
         featured: true,
         disabled: false,
         bluetoothRequired: true,
@@ -305,6 +320,7 @@ export default [
                 id="gui.extension.gdxfor.description"
             />
         ),
+        tags: ['scratch'],
         featured: true,
         disabled: false,
         bluetoothRequired: true,
@@ -334,13 +350,66 @@ export default [
         iconURL: twIcon,
         description: (
             <FormattedMessage
-                defaultMessage="Weird new blocks. Not compatible with Scratch."
+                defaultMessage="Weird new blocks."
                 description="Description of TW extension"
                 id="tw.twExtension.description"
             />
         ),
-        featured: true,
-        incompatibleWithScratch: true
+        incompatibleWithScratch: true,
+        tags: ['tw'],
+        featured: true
+    },
+    // Extensions loaded from URLs do not support localization, so unfortunately we will just leave English names here.
+    {
+        name: 'Stretch',
+        extensionId: 'stretch',
+        extensionURL: 'https://extensions.turbowarp.org/stretch.js',
+        iconURL: stretchIcon,
+        description: 'Stretch sprites horizontally or vertically.',
+        tags: ['tw'],
+        incompatibleWithScratch: true,
+        featured: true
+    },
+    {
+        name: 'Gamepad',
+        extensionId: 'Gamepad',
+        extensionURL: 'https://extensions.turbowarp.org/gamepad.js',
+        iconURL: gamepadIcon,
+        description: 'Directly access gamepads instead of just mapping buttons to keys.',
+        tags: ['tw'],
+        incompatibleWithScratch: true,
+        featured: true
+    },
+    {
+        name: 'Mouse Cursor',
+        extensionId: 'MouseCursor',
+        extensionURL: 'https://extensions.turbowarp.org/cursor.js',
+        iconURL: cursorIcon,
+        description: 'Use custom cursors or hide the cursor. Also allows replacing the cursor with any costume image.',
+        tags: ['tw'],
+        incompatibleWithScratch: true,
+        featured: true
+    },
+    {
+        name: (
+            <FormattedMessage
+                defaultMessage="TurboWarp Extension Gallery"
+                description="Name of extensions.turbowarp.org in extension library"
+                id="tw.extensionGallery.name"
+            />
+        ),
+        href: 'https://extensions.turbowarp.org/',
+        extensionId: '',
+        iconURL: galleryIcon,
+        description: (
+            <FormattedMessage
+                defaultMessage="extensions.turbowarp.org is the place to find powerful and safe custom extensions."
+                description="Description of extensions.turbowarp.org in extension library"
+                id="tw.extensionGallery.description"
+            />
+        ),
+        tags: ['tw'],
+        featured: true
     },
     {
         name: (
@@ -354,11 +423,12 @@ export default [
         iconURL: customExtensionIcon,
         description: (
             <FormattedMessage
-                defaultMessage="Load custom extensions from URLs. For developers. Experimental."
+                defaultMessage="Load custom extensions from URLs."
                 description="Description of custom extension category"
                 id="tw.customExtension.description"
             />
         ),
+        tags: ['tw'],
         featured: true
     }
 ];

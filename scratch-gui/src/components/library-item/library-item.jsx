@@ -103,6 +103,16 @@ class LibraryItemComponent extends React.PureComponent {
                         </div>
                     </div>
                 ) : null}
+                {this.props.incompatibleWithScratch && (
+                    <div className={styles.incompatibleWithScratch}>
+                        <FormattedMessage
+                            // eslint-disable-next-line max-len
+                            defaultMessage="This extension is incompatible with Scratch."
+                            description="Warning that appears on extensions that won't work in Scratch."
+                            id="tw.extensions.incompatible"
+                        />
+                    </div>
+                )}
             </div>
         ) : (
             <Box
@@ -161,6 +171,7 @@ LibraryItemComponent.propTypes = {
     featured: PropTypes.bool,
     hidden: PropTypes.bool,
     iconURL: PropTypes.string,
+    incompatibleWithScratch: PropTypes.bool,
     insetIconURL: PropTypes.string,
     internetConnectionRequired: PropTypes.bool,
     isPlaying: PropTypes.bool,

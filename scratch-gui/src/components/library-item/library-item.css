@@ -206,3 +206,10 @@
 [dir="rtl"] .coming-soon-text {
     transform: translate(calc(-2 * $space), calc(2 * $space));
 }
+
+.incompatible-with-scratch {
+    font-size: 12px;
+    padding: 0 1.25rem 1rem 1.25rem;
+    width: 100%;
+    text-align: left;
+}

@@ -36,6 +36,7 @@ const addons = [
     'editor-buttons-reverse-order',
     'variable-manager',
     'search-sprites',
+    'sprite-properties',
     'gamepad',
     'editor-sounds',
     'folders',
@@ -74,7 +75,8 @@ const addons = [
 const newAddons = [
     'vol-slider',
     'number-pad',
-    'rename-broadcasts'
+    'rename-broadcasts',
+    'sprite-properties'
 ];
 
 // eslint-disable-next-line import/no-commonjs

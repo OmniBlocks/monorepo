@@ -92,6 +92,8 @@
     "variable-manager/search": "Suchen",
     "variable-manager/variables": "Variablen",
     "search-sprites/placeholder": "Figuren suchen",
+    "sprite-properties/close-properties-panel-tooltip": "Eigenschaften schließen",
+    "sprite-properties/open-properties-panel-tooltip": "Eigenschaften öffnen",
     "gamepad/axes-a-b": "Achsen {a} & {b}",
     "gamepad/axis-arrows": "Pfeiltasten",
     "gamepad/axis-custom": "Benutzerdefiniert",

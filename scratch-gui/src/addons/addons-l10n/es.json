@@ -89,6 +89,8 @@
     "variable-manager/for-this-sprite": "Variables para este objeto",
     "variable-manager/search": "Buscar",
     "search-sprites/placeholder": "Buscar objetos...",
+    "sprite-properties/close-properties-panel-tooltip": "Colapsar panel de propiedades",
+    "sprite-properties/open-properties-panel-tooltip": "Abrir panel de propiedades",
     "gamepad/axes-a-b": "Ejes {a} y {b}",
     "gamepad/axis-arrows": "Flechas del Teclado",
     "gamepad/axis-custom": "Personalizado",

@@ -95,6 +95,7 @@
     "variable-manager/search": "Szukaj",
     "variable-manager/variables": "Zmienne",
     "search-sprites/placeholder": "Szukaj duszków...",
+    "sprite-properties/open-properties-panel-tooltip": "Otwórz panel właściwości",
     "gamepad/axes-a-b": "Osie {a} i {b}",
     "gamepad/axis-arrows": "Przyciski Strzałek",
     "gamepad/axis-cursor": "Kursor",

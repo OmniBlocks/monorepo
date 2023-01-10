@@ -87,6 +87,8 @@
     "variable-manager/search": "Zoeken",
     "variable-manager/variables": "Variabelen",
     "search-sprites/placeholder": "Sprites zoeken...",
+    "sprite-properties/close-properties-panel-tooltip": "Eigenschappenpaneel samenvouwen",
+    "sprite-properties/open-properties-panel-tooltip": "Eigenschappenpaneel openvouwen",
     "gamepad/axes-a-b": "Assen {a} & {b}",
     "gamepad/axis-arrows": "Pijltjestoetsen",
     "gamepad/axis-cursor": "Muisaanwijzer",

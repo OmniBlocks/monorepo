@@ -98,6 +98,8 @@
     "variable-manager/too-big": "Click to display very large value.",
     "variable-manager/variables": "Variables",
     "search-sprites/placeholder": "Search sprites...",
+    "sprite-properties/close-properties-panel-tooltip": "Collapse properties panel",
+    "sprite-properties/open-properties-panel-tooltip": "Open properties panel",
     "gamepad/axes-a-b": "Axes {a} & {b}",
     "gamepad/axis-arrows": "Arrow Keys",
     "gamepad/axis-cursor": "Cursor",

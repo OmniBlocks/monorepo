@@ -97,6 +97,8 @@
     "variable-manager/search": "検索",
     "variable-manager/variables": "変数",
     "search-sprites/placeholder": "スプライトを検索...",
+    "sprite-properties/close-properties-panel-tooltip": "プロパティ―パネルを閉じる",
+    "sprite-properties/open-properties-panel-tooltip": "プロパティ―パネルを開く",
     "gamepad/axes-a-b": "軸 {a} と {b}",
     "gamepad/axis-arrows": "矢印キー",
     "gamepad/axis-cursor": "カーソル",

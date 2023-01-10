@@ -97,6 +97,8 @@
     "variable-manager/search": "Поиск",
     "variable-manager/variables": "Переменные",
     "search-sprites/placeholder": "Искать спрайты...",
+    "sprite-properties/close-properties-panel-tooltip": "Спрятать панель со свойствами",
+    "sprite-properties/open-properties-panel-tooltip": "Открыть панель со свойствами",
     "gamepad/axes-a-b": "Оси {a}и{b}",
     "gamepad/axis-arrows": "Клавиши стрелок",
     "gamepad/axis-cursor": "Курсор",

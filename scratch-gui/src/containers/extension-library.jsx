@@ -58,7 +58,7 @@ class ExtensionLibrary extends React.PureComponent {
             url = prompt(this.props.intl.formatMessage(messages.extensionUrl));
         }
         if (url && !item.disabled) {
-            if (this.props.vm.extensionManager.isExtensionLoaded(url)) {
+            if (this.props.vm.extensionManager.isExtensionLoaded(id)) {
                 this.props.onCategorySelected(id);
             } else {
                 const parsedURL = isCustomURL ? parseExtensionURL(url) : url;

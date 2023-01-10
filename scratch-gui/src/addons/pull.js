@@ -196,6 +196,14 @@ const normalizeManifest = (id, manifest) => {
     if (manifest.userstyles) {
         manifest.userstyles = filterUserscripts(manifest.userstyles);
     }
+
+    if (manifest.credits) {
+        for (const {link} of manifest.credits) {
+            if (link && !link.startsWith('https://scratch.mit.edu/')) {
+                console.warn(`Warning: ${id} contains unsafe credit link: ${link}`);
+            }
+        }
+    }
 };
 
 const generateManifestEntry = (id, manifest) => {

@@ -28,7 +28,7 @@ class TurboWarpBlocks {
             name: 'TurboWarp',
             color1: '#ff4c4c',
             color2: '#e64444',
-            color3: '#e64444',
+            color3: '#c73a3a',
             docsURI: 'https://docs.turbowarp.org/blocks',
             menuIconURI: iconURI,
             blockIconURI: iconURI,

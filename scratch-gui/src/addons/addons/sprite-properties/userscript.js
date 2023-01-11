@@ -1,4 +1,4 @@
-export default async function ({ addon, global, console, msg }) {
+export default async function ({ addon, console, msg }) {
   const SHOW_PROPS_CLASS = "sa-show-sprite-properties";
   const HIDE_PROPS_CLASS = "sa-hide-sprite-properties";
   const PROPS_INFO_BTN_CLASS = "sa-sprite-properties-info-btn";
@@ -7,6 +7,8 @@ export default async function ({ addon, global, console, msg }) {
   /** @type {HTMLElement} */
   let propertiesPanel;
 
+  // A mutation observer is the only reliable way to detect when a different sprite has
+  // been selected or when the folder that contains the focused sprite has been opened.
   const observer = new MutationObserver(() => {
     injectInfoButton();
   });
@@ -128,11 +130,15 @@ export default async function ({ addon, global, console, msg }) {
       reduxEvents: ["scratch-gui/mode/SET_PLAYER", "fontsLoaded/SET_FONTS_LOADED", "scratch-gui/locales/SELECT_LOCALE"],
       reduxCondition: (state) => !state.scratchGui.mode.isPlayerOnly,
     });
-    observer.observe(propertiesPanel.parentNode, {
+
+    const spriteSelector = propertiesPanel.parentNode;
+    const scrollWrapper = spriteSelector.querySelector('[class*="sprite-selector_scroll-wrapper_"]');
+    const itemsWrapper = scrollWrapper.firstChild;
+    observer.observe(itemsWrapper, {
       childList: true,
-      attributes: true,
-      subtree: true
+      subtree: true,
     });
+
     updateWideLocaleMode();
     injectInfoButton();
     injectCloseButton();

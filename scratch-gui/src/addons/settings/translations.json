@@ -269,23 +269,6 @@
         "title": "Įskiepių nustatymai",
         "unsupported": "Keletas įskiepių yra nepalaikomi šioje naršyklėje:"
     },
-    "nb": {
-        "addonFeedback": "Utvidelse tilbakemelding",
-        "confirmResetAll": "Er du sikkert at du vil tilbakestill alle utvidelser?",
-        "credits": "Fra:",
-        "dirtyButton": "Oppdater siden nå",
-        "export": "Eksportinnstillinger",
-        "import": "Importinnstillinger",
-        "noResults": "Ingen resultater.",
-        "reset": "Tilbakestill",
-        "resetAll": "Tilbakestill alt",
-        "search": "Søk",
-        "tagNew": "Ny!",
-        "tagRecommended": "Anbefalt",
-        "tagTheme": "Tema",
-        "title": "Innstillinger for utvidelser",
-        "unsupported": "Noen utvidelser er ikke tilgjengelig på dette nettleser."
-    },
     "nl": {
         "addonFeedback": "Addonfeedback",
         "confirmResetAll": "Weet je zeker dat je alle addonsinstellingen wilt resetten naar hun standaardinstellingen?",

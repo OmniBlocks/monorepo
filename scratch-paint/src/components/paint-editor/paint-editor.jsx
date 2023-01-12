@@ -60,6 +60,7 @@ const PaintEditorComponent = props => (
     <div
         className={styles.editorContainer}
         dir={props.rtl ? 'rtl' : 'ltr'}
+        data-paint-theme={props.theme}
     >
         {props.canvas !== null ? ( // eslint-disable-line no-negated-condition
             <div className={styles.editorContainerTop}>

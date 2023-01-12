@@ -356,7 +356,6 @@ class PaperCanvas extends React.Component {
                 ref={this.setCanvas}
                 style={{cursor: this.props.cursor}}
                 resize="true"
-                theme={this.props.theme}
             />
         );
     }

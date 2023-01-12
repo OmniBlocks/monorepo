@@ -404,7 +404,8 @@ PaintEditor.propTypes = {
 
 PaintEditor.defaultProps = {
     width: 480,
-    height: 360
+    height: 360,
+    theme: 'light'
 };
 
 const mapStateToProps = state => ({

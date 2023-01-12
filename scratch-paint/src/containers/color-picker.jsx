@@ -13,7 +13,7 @@ import GradientTypes from '../lib/gradient-types';
 import ColorPickerComponent from '../components/color-picker/color-picker.jsx';
 import {MIXED} from '../helper/style-path';
 import Modes from '../lib/modes';
-import {normalizeToHex8, makeAlphaComponent} from '../lib/tw-color-utils';
+import {colorToHex, makeAlphaComponent} from '../lib/tw-color-utils';
 
 const colorStringToHsv = hexString => {
     let hsv;
@@ -142,7 +142,7 @@ class ColorPicker extends React.Component {
         } else {
             color = e.target.value;
         }
-        color = normalizeToHex8(color);
+        color = colorToHex(color);
         if (!color) {
             return;
         }
@@ -191,7 +191,7 @@ class ColorPicker extends React.Component {
                 saturation={this.state.saturation}
                 alpha={this.state.alpha * 100}
                 onAlphaChange={this.handleAlphaChange}
-                hexColor={normalizeToHex8(this.props.colorIndex === 0 ? this.props.color : this.props.color2)}
+                hexColor={colorToHex(this.props.colorIndex === 0 ? this.props.color : this.props.color2)}
                 onHexColorChange={this.handleHexColorChange}
                 shouldShowGradientTools={this.props.shouldShowGradientTools}
                 onActivateEyeDropper={this.handleActivateEyeDropper}

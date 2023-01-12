@@ -48,14 +48,14 @@ class LoupeComponent extends React.Component {
         // Draw an outlined square at the cursor position (cursor is hidden)
         ctx.lineWidth = boxLineWidth;
         ctx.strokeStyle = 'black';
-        ctx.fillStyle = `rgba(${color[0]}, ${color[1]}, ${color[2]}, ${color[3]})`;
+        ctx.fillStyle = `rgba(${color[0]}, ${color[1]}, ${color[2]}, ${color[3] / 255})`;
         ctx.beginPath();
         ctx.rect(loupeRadius - (boxSize / 2), loupeRadius - (boxSize / 2), boxSize, boxSize);
         ctx.fill();
         ctx.stroke();
 
         // Draw a thick ring around the loupe showing the current color
-        ctx.strokeStyle = `rgba(${color[0]}, ${color[1]}, ${color[2]}, ${color[3]})`;
+        ctx.strokeStyle = `rgba(${color[0]}, ${color[1]}, ${color[2]}, ${color[3] / 255})`;
         ctx.lineWidth = colorRingWidth;
         ctx.beginPath();
         ctx.moveTo(loupeDiameter, loupeDiameter);

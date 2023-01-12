@@ -524,7 +524,9 @@ class VirtualMachine extends EventEmitter {
 
     /**
      * tw: Serialize the project into a map of files without actually zipping the project.
-     * @returns {Record<Uint8Array>} Files of the project.
+     * The buffers returned are the exact same ones used internally, not copies. Avoid directly
+     * manipulating them (except project.json, which is created by this function).
+     * @returns {Record<string, Uint8Array>} Map of file name to the raw data for that file.
      */
     saveProjectSb3DontZip () {
         const soundDescs = serializeSounds(this.runtime);

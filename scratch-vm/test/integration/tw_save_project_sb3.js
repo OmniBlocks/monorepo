@@ -78,5 +78,9 @@ test('saveProjectSb3DontZip', async t => {
     t.equal(map['d9c625ae1996b615a146ac2a7dbe74d7.svg'].byteLength, 691);
     t.equal(map['cd21514d0531fdffb22204e0ec5ed84a.svg'].byteLength, 202);
 
+    // Make sure that the asset buffers returned are the exact same as the ones used internally, not copies.
+    const costume = vm.runtime.targets[0].getCostumes()[0];
+    t.equal(map['cd21514d0531fdffb22204e0ec5ed84a.svg'], costume.asset.data);
+
     t.end();
 });

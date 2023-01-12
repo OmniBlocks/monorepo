@@ -228,6 +228,7 @@ const PaintEditorComponent = props => (
                                 <Loupe
                                     colorInfo={props.colorInfo}
                                     pixelRatio={paper.project.view.pixelRatio}
+                                    theme={props.theme}
                                 />
                             </Box>
                         ) : null

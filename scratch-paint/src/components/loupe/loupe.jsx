@@ -47,7 +47,7 @@ class LoupeComponent extends React.Component {
 
         // Draw an outlined square at the cursor position (cursor is hidden)
         ctx.lineWidth = boxLineWidth;
-        ctx.strokeStyle = 'black';
+        ctx.strokeStyle = this.props.theme === 'light' ? 'black' : '#888';
         ctx.fillStyle = `rgba(${color[0]}, ${color[1]}, ${color[2]}, ${color[3] / 255})`;
         ctx.beginPath();
         ctx.rect(loupeRadius - (boxSize / 2), loupeRadius - (boxSize / 2), boxSize, boxSize);
@@ -110,7 +110,8 @@ LoupeComponent.propTypes = {
             height: PropTypes.number
         })
     }),
-    pixelRatio: PropTypes.number.isRequired
+    pixelRatio: PropTypes.number.isRequired,
+    theme: PropTypes.string.isRequired
 };
 
 export default LoupeComponent;

@@ -751,7 +751,7 @@ Blockly.Field.prototype.onMouseDown_ = function(e) {
   if (gesture) {
     gesture.setStartField(this);
   }
-  this.useTouchInteraction_ = Blockly.Touch.getTouchIdentifierFromEvent(event) !== 'mouse';
+  this.useTouchInteraction_ = Blockly.Touch.getTouchIdentifierFromEvent(e) !== 'mouse';
 };
 
 /**

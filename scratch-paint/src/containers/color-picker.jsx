@@ -13,7 +13,7 @@ import GradientTypes from '../lib/gradient-types';
 import ColorPickerComponent from '../components/color-picker/color-picker.jsx';
 import {MIXED} from '../helper/style-path';
 import Modes from '../lib/modes';
-import {normalizeToHex8} from '../lib/tw-color-utils';
+import {normalizeToHex8, makeAlphaComponent} from '../lib/tw-color-utils';
 
 const colorStringToHsv = hexString => {
     let hsv;
@@ -34,8 +34,6 @@ const colorStringToHsv = hexString => {
     }
     return hsv;
 };
-
-const makeAlphaComponent = alpha => Math.round(alpha * 255).toString(16).padStart(2, '0');
 
 const hsvToHex = (h, s, v, a) => {
     let color = parseColor(`hsv(${3.6 * h}, ${s}, ${v})`).hex;

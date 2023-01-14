@@ -57,6 +57,7 @@ const KeyboardShortcutsHOC = function (WrappedComponent) {
             // Don't activate keyboard shortcuts during text editing
             if (this.props.textEditing) return;
 
+            const lowercaseKey = event.key.toLowerCase();
             if (event.key === 'Escape') {
                 event.preventDefault();
                 clearSelection(this.props.clearSelectedItems);
@@ -66,28 +67,28 @@ const KeyboardShortcutsHOC = function (WrappedComponent) {
                     this.props.setSelectedItems(this.props.format);
                 }
             } else if (event.metaKey || event.ctrlKey) {
-                if ((event.shiftKey && event.key.toLowerCase() === 'z') || event.key.toLowerCase() === 'y') {
+                if ((event.shiftKey && lowercaseKey === 'z') || lowercaseKey === 'y') {
                     event.preventDefault();
                     this.props.onRedo();
-                } else if (event.key === 'z') {
+                } else if (lowercaseKey === 'z') {
                     event.preventDefault();
                     this.props.onUndo();
-                } else if (event.shiftKey && event.key.toLowerCase() === 'g') {
+                } else if (event.shiftKey && lowercaseKey === 'g') {
                     if (shouldShowUngroup()) {
                         ungroupSelection(clearSelectedItems, setSelectedItems, this.props.onUpdateImage);
                     }
                     event.preventDefault();
-                } else if (event.key === 'g') {
+                } else if (lowercaseKey === 'g') {
                     if (shouldShowGroup()) {
                         groupSelection(clearSelectedItems, setSelectedItems, this.props.onUpdateImage);
                     }
                     event.preventDefault();
-                } else if (event.key === 'c') {
+                } else if (lowercaseKey === 'c') {
                     this.props.onCopyToClipboard();
-                } else if (event.key === 'v') {
+                } else if (lowercaseKey === 'v') {
                     this.changeToASelectMode();
                     this.props.onPasteFromClipboard();
-                } else if (event.key === 'x') {
+                } else if (lowercaseKey === 'x') {
                     const selectedItems = getSelectedRootItems();
                     if (selectedItems.length > 0) {
                         this.props.onCopyToClipboard();
@@ -96,20 +97,20 @@ const KeyboardShortcutsHOC = function (WrappedComponent) {
                         }
                     }
                     event.preventDefault();
-                } else if (event.key === 'a') {
+                } else if (lowercaseKey === 'a') {
                     this.changeToASelectMode();
                     event.preventDefault();
                     this.selectAll();
                 }
             } else if (!event.ctrlKey && !event.metaKey && !event.altKey) {
                 if (isVector(this.props.format)) {
-                    if (Object.prototype.hasOwnProperty.call(VECTOR_KEYBINDINGS, event.key)) {
-                        this.props.changeMode(VECTOR_KEYBINDINGS[event.key]);
+                    if (Object.prototype.hasOwnProperty.call(VECTOR_KEYBINDINGS, lowercaseKey)) {
+                        this.props.changeMode(VECTOR_KEYBINDINGS[lowercaseKey]);
                         event.preventDefault();
                     }
                 } else if (isBitmap(this.props.format)) {
-                    if (Object.prototype.hasOwnProperty.call(BITMAP_KEYBINDINGS, event.key)) {
-                        this.props.changeMode(BITMAP_KEYBINDINGS[event.key]);
+                    if (Object.prototype.hasOwnProperty.call(BITMAP_KEYBINDINGS, lowercaseKey)) {
+                        this.props.changeMode(BITMAP_KEYBINDINGS[lowercaseKey]);
                         event.preventDefault();
                     }
                 }

@@ -13,6 +13,9 @@ input.sa-search-sprites-box {
   outline: none;
   padding: 5px 20px 5px 10px;
 }
+[theme="dark"] input.sa-search-sprites-box {
+  border-color: var(--ui-black-transparent);
+}
 
 .sa-search-sprites-reset {
   display: none;

@@ -20,7 +20,12 @@ const isNotActuallyZero = val => {
     if (typeof val !== 'string') return false;
     for (let i = 0; i < val.length; i++) {
         const code = val.charCodeAt(i);
-        if (code === 48) {
+        // '0'.charCodeAt(0) === 48
+        // '\t'.charCodeAt(0) === 9
+        // We include tab for compatibility with scratch-www's broken trim() polyfill.
+        // https://github.com/TurboWarp/scratch-vm/issues/115
+        // https://scratch.mit.edu/projects/788261699/
+        if (code === 48 || code === 9) {
             return false;
         }
     }

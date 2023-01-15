@@ -2,8 +2,6 @@ const Cast = require('../../src/util/cast');
 const {test} = require('tap');
 
 test('Cast.compare with assorted whitespace characters', t => {
-    // The lack of tab characters in these tests is intentional.
-
     t.equal(Cast.compare('', ''), 0);
     t.equal(Cast.compare('  ', ''), 1);
     t.equal(Cast.compare(' ', '  '), -1);
@@ -24,6 +22,16 @@ test('Cast.compare with assorted whitespace characters', t => {
     t.equal(Cast.compare('\n', ' false'), -1);
     t.equal(Cast.compare(false, ''), 1);
     t.equal(Cast.compare(false, ' '), 1);
+
+    t.equal(Cast.compare('\t', '0'), 0);
+    t.equal(Cast.compare('\t', 0), 0);
+    t.equal(Cast.compare('\t', ''), 1);
+    t.equal(Cast.compare('  \t    ', '0'), 0);
+    t.equal(Cast.compare('\r\n \t\u00a0', 0), 0);
+    t.equal(Cast.compare('\t', false), 0);
+    t.equal(Cast.compare('\t', 'false'), -1);
+    t.equal(Cast.compare('\t', '1'), -1);
+    t.equal(Cast.compare('\t', 1), -1);
 
     t.end();
 });

@@ -44,7 +44,9 @@ test('comparison functions are equivalent to Cast.compare', t => {
         NaN,
         'NaN',
         Infinity,
-        'Infinity'
+        'Infinity',
+        '\t',
+        '\r\n\u00a0'
     ];
     const compareEqual = evaluateRuntimeFunction('compareEqual');
     const compareGreaterThan = evaluateRuntimeFunction('compareGreaterThan');
@@ -53,13 +55,13 @@ test('comparison functions are equivalent to Cast.compare', t => {
         for (const b of VALUES) {
             const cast = Cast.compare(a, b);
             if (compareEqual(a, b) !== (cast === 0)) {
-                t.fail(`${a} should be === ${b}`);
+                t.fail(`${JSON.stringify(a)} should be === ${JSON.stringify(b)}`);
             }
             if (compareGreaterThan(a, b) !== (cast > 0)) {
-                t.fail(`${a} should be > ${b}`);
+                t.fail(`${JSON.stringify(a)} should be > ${JSON.stringify(b)}`);
             }
             if (compareLessThan(a, b) !== (cast < 0)) {
-                t.fail(`${a} should be < ${b}`);
+                t.fail(`${JSON.stringify(a)} should be < ${JSON.stringify(b)}`);
             }
         }
     }

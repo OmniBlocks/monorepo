@@ -234,12 +234,21 @@ runtimeFunctions.limitPrecision = `const limitPrecision = value => {
 }`;
 
 /**
- * Check if a value is considered whitespace.
- * Similar to Cast.isWhiteSpace()
- * @param {*} val Value to check
- * @returns {boolean} true if the value is whitespace
+ * Used internally by the compare family of function.
+ * See similar method in cast.js.
+ * @param {*} val A value that evaluates to 0 in JS string-to-number conversation such as empty string, 0, or tab.
+ * @returns {boolean} True if the value should not be treated as the number zero.
  */
-baseRuntime += `const isWhiteSpace = val => typeof val === 'string' && val.trim().length === 0;`;
+baseRuntime += `const isNotActuallyZero = val => {
+    if (typeof val !== 'string') return false;
+    for (let i = 0; i < val.length; i++) {
+        const code = val.charCodeAt(i);
+        if (code === 48) {
+            return false;
+        }
+    }
+    return true;
+};`;
 
 /**
  * Determine if two values are equal.
@@ -249,9 +258,9 @@ baseRuntime += `const isWhiteSpace = val => typeof val === 'string' && val.trim(
  */
 baseRuntime += `const compareEqualSlow = (v1, v2) => {
     const n1 = +v1;
-    if (isNaN(n1) || (n1 === 0 && isWhiteSpace(v1))) return ('' + v1).toLowerCase() === ('' + v2).toLowerCase();
+    if (isNaN(n1) || (n1 === 0 && isNotActuallyZero(v1))) return ('' + v1).toLowerCase() === ('' + v2).toLowerCase();
     const n2 = +v2;
-    if (isNaN(n2) || (n2 === 0 && isWhiteSpace(v2))) return ('' + v1).toLowerCase() === ('' + v2).toLowerCase();
+    if (isNaN(n2) || (n2 === 0 && isNotActuallyZero(v2))) return ('' + v1).toLowerCase() === ('' + v2).toLowerCase();
     return n1 === n2;
 };
 const compareEqual = (v1, v2) => (typeof v1 === 'number' && typeof v2 === 'number' && !isNaN(v1) && !isNaN(v2) || v1 === v2) ? v1 === v2 : compareEqualSlow(v1, v2);`;
@@ -265,9 +274,9 @@ const compareEqual = (v1, v2) => (typeof v1 === 'number' && typeof v2 === 'numbe
 runtimeFunctions.compareGreaterThan = `const compareGreaterThanSlow = (v1, v2) => {
     let n1 = +v1;
     let n2 = +v2;
-    if (n1 === 0 && isWhiteSpace(v1)) {
+    if (n1 === 0 && isNotActuallyZero(v1)) {
         n1 = NaN;
-    } else if (n2 === 0 && isWhiteSpace(v2)) {
+    } else if (n2 === 0 && isNotActuallyZero(v2)) {
         n2 = NaN;
     }
     if (isNaN(n1) || isNaN(n2)) {
@@ -288,9 +297,9 @@ const compareGreaterThan = (v1, v2) => typeof v1 === 'number' && typeof v2 === '
 runtimeFunctions.compareLessThan = `const compareLessThanSlow = (v1, v2) => {
     let n1 = +v1;
     let n2 = +v2;
-    if (n1 === 0 && isWhiteSpace(v1)) {
+    if (n1 === 0 && isNotActuallyZero(v1)) {
         n1 = NaN;
-    } else if (n2 === 0 && isWhiteSpace(v2)) {
+    } else if (n2 === 0 && isNotActuallyZero(v2)) {
         n2 = NaN;
     }
     if (isNaN(n1) || isNaN(n2)) {

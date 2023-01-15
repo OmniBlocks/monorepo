@@ -18,7 +18,7 @@ test('all runtimeFunctions can be used together', t => {
     t.end();
 });
 
-test('comparisons', t => {
+test('comparison functions are equivalent to Cast.compare', t => {
     const VALUES = [
         0,
         -0,

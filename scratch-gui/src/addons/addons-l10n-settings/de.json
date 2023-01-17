@@ -10,7 +10,6 @@
     "find-bar/@description": "Fügt eine Leiste neben dem Klänge-Tab im Editor hinzu, mit der du Skripte, Kostüme und Klänge durchsuchen kannst. Verwende Strg+Links und Strg+Rechts im Codebereich, um zur vorher bzw. nachher besuchten Position nach Verwendung der Finden-Leiste zu navigieren.",
     "find-bar/@info-developer-tools": "Dieses Addon gehörte früher zum \"Entwicklertools\"-Addon, aber es wurde hierher verschoben.",
     "find-bar/@name": "Finden-Leiste im Editor",
-    "middle-click-popup/@description": "Drücke Strg+Leertaste, Umschalt+Leertaste oder klicke mit der mittleren Maustaste auf den Codebereich, um ein schwebendes Eingabefeld hervorzubringen, in dem du den Namen eines Blocks (oder Teile davon) eingeben und in den Codebereich ziehen kannst. Halte die Umschalttaste während des Ziehens gedrückt, um das Popup beim Hinzufügen von mehreren Blöcken geöffnet zu halten.",
     "middle-click-popup/@info-developer-tools": "Dieses Addon gehörte früher zum \"Entwicklertools\"-Addon, aber es wurde hierher verschoben.",
     "middle-click-popup/@name": "Blöcke mit Namen einfügen",
     "jump-to-def/@description": "Ermöglicht das Springen zur Definition eines benutzerdefinierten Blocks durch Klicken mit der mittleren oder rechten Maustaste mit gedrückter Umschalttaste.",

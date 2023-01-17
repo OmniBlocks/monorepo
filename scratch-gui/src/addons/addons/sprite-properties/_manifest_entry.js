@@ -43,21 +43,23 @@ const manifest = {
   ],
   "settings": [
     {
-      "dynamic": true,
-      "name": "Collapse panel by default",
-      "id": "hideByDefault",
-      "type": "boolean",
-      "default": true
-    },
-    {
-      "dynamic": true,
       "name": "Automatically collapse when mouse leaves sprite panel",
       "id": "autoCollapse",
       "type": "boolean",
       "default": false
     },
     {
-      "dynamic": true,
+      "name": "Collapse panel by default",
+      "id": "hideByDefault",
+      "type": "boolean",
+      "default": true,
+      "if": {
+        "settings": {
+          "autoCollapse": false
+        }
+      }
+    },
+    {
       "name": "Animation speed",
       "id": "transitionDuration",
       "type": "select",

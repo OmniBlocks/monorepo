@@ -95,6 +95,7 @@
     "variable-manager/for-all-sprites": "すべてのスプライト用の変数",
     "variable-manager/for-this-sprite": "このスプライトの変数",
     "variable-manager/search": "検索",
+    "variable-manager/too-big": "クリックして非常に大きな値を表示",
     "variable-manager/variables": "変数",
     "search-sprites/placeholder": "スプライトを検索...",
     "sprite-properties/close-properties-panel-tooltip": "プロパティ―パネルを閉じる",

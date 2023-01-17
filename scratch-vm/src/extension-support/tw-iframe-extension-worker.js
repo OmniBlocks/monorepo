@@ -53,7 +53,7 @@ class IframeExtensionWorker {
             // eslint-disable-next-line max-len
             `<!DOCTYPE html><body><script>window.__WRAPPED_IFRAME_ID__=${JSON.stringify(this.id)};${frameSource}</script></body>`
         ], {
-            type: 'text/html'
+            type: 'text/html; charset=utf-8'
         });
         this.iframe.src = URL.createObjectURL(blob);
     }

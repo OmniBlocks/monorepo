@@ -1,6 +1,7 @@
 const {test} = require('tap');
 const jsexecute = require('../../src/compiler/jsexecute');
 const Cast = require('../../src/util/cast');
+const {stringify} = require('@turbowarp/json');
 
 const evaluateRuntimeFunction = functionName => jsexecute.scopedEval(functionName);
 
@@ -31,7 +32,9 @@ test('comparison functions are equivalent to Cast.compare', t => {
         'true',
         'false',
         'true ',
-        'str',
+        'apple',
+        'Apple',
+        'Apple ',
         ' 123',
         ' 123.0',
         '+123.5',
@@ -44,7 +47,9 @@ test('comparison functions are equivalent to Cast.compare', t => {
         NaN,
         'NaN',
         Infinity,
+        -Infinity,
         'Infinity',
+        '-Infinity',
         '\t',
         '\r\n\u00a0'
     ];
@@ -53,15 +58,17 @@ test('comparison functions are equivalent to Cast.compare', t => {
     const compareLessThan = evaluateRuntimeFunction('compareLessThan');
     for (const a of VALUES) {
         for (const b of VALUES) {
+            // Because there are so many tests, calling t.ok() each time is actually quite slow,
+            // so only call into tap when something failed.
             const cast = Cast.compare(a, b);
             if (compareEqual(a, b) !== (cast === 0)) {
-                t.fail(`${JSON.stringify(a)} should be === ${JSON.stringify(b)}`);
+                t.fail(`${stringify(a)} should be === ${stringify(b)}`);
             }
             if (compareGreaterThan(a, b) !== (cast > 0)) {
-                t.fail(`${JSON.stringify(a)} should be > ${JSON.stringify(b)}`);
+                t.fail(`${stringify(a)} should be > ${stringify(b)}`);
             }
             if (compareLessThan(a, b) !== (cast < 0)) {
-                t.fail(`${JSON.stringify(a)} should be < ${JSON.stringify(b)}`);
+                t.fail(`${stringify(a)} should be < ${stringify(b)}`);
             }
         }
     }

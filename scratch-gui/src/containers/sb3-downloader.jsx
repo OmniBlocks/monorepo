@@ -133,63 +133,84 @@ class SB3Downloader extends React.Component {
             // Projects can be very large, so we'll utilize JSZip's stream API to avoid having the
             // entire sb3 in memory at the same time.
             const jszipStream = this.props.saveProjectSb3Stream();
+
+            // JSZip's stream pause() and resume() methods are not necessarily completely no-ops
+            // if they are already paused or resumed. These also make it easier to add debug
+            // logging of when we actually pause or resume.
+            // Note that JSZip will keep sending some data after you ask it to pause.
+            let jszipStreamRunning = false;
+            const pauseJSZipStream = () => {
+                if (jszipStreamRunning) {
+                    jszipStreamRunning = false;
+                    jszipStream.pause();
+                }
+            };
+            const resumeJSZipStream = () => {
+                if (!jszipStreamRunning) {
+                    jszipStreamRunning = true;
+                    jszipStream.resume();
+                }
+            };
+
+            // Allow the JSZip stream to run quite a bit ahead of file writing. This helps
+            // reduce zip stream pauses on systems with slow storage.
+            const HIGH_WATER_MARK_BYTES = 1024 * 1024 * 5;
+
+            // Minimum size of buffer to pass into write(). Small buffers will be queued and
+            // written in batches as they reach or exceed this size.
+            const WRITE_BUFFER_TARGET_SIZE_BYTES = 1024 * 1024;
+
             const zipStream = new ReadableStream({
                 start: controller => {
                     jszipStream.on('data', data => {
                         controller.enqueue(data);
                         if (controller.desiredSize <= 0) {
-                            // Note that JSZip will keep sending some data after you ask it to pause.
-                            jszipStream.pause();
+                            pauseJSZipStream();
                         }
                     });
                     jszipStream.on('end', () => {
                         controller.close();
                     });
-                    jszipStream.resume();
+                    resumeJSZipStream();
                 },
                 pull: () => {
-                    jszipStream.resume();
+                    resumeJSZipStream();
                 },
                 cancel: () => {
-                    jszipStream.pause();
+                    pauseJSZipStream();
                 }
-            });
+            }, new ByteLengthQueuingStrategy({
+                highWaterMark: HIGH_WATER_MARK_BYTES
+            }));
 
-            // Buffer small messages into one bigger message to improve performance of write() later.
-            const MIN_BUFFER_SIZE = 1024 * 256;
             const queuedChunks = [];
-            // eslint-disable-next-line no-undef
-            const bufferTransformer = new TransformStream({
-                transform: (chunk, controller) => {
+            const fileStream = new WritableStream({
+                write: chunk => {
                     queuedChunks.push(chunk);
-
                     const currentSize = getLengthOfByteArrays(queuedChunks);
-                    if (currentSize >= MIN_BUFFER_SIZE) {
-                        const newArray = concatenateByteArrays(queuedChunks);
-                        controller.enqueue(newArray);
+                    if (currentSize >= WRITE_BUFFER_TARGET_SIZE_BYTES) {
+                        const newBuffer = concatenateByteArrays(queuedChunks);
                         queuedChunks.length = 0;
+                        return writable.write(newBuffer);
+                    } else {
+                        // Wait for more data.
                     }
                 },
-                flush: controller => {
-                    const newArray = concatenateByteArrays(queuedChunks);
-                    if (newArray.byteLength) {
-                        controller.enqueue(newArray);
+                close: async () => {
+                    // Write the last batch of data.
+                    const lastBuffer = concatenateByteArrays(queuedChunks);
+                    if (lastBuffer.byteLength) {
+                        await writable.write(lastBuffer);
                     }
+                    // File handle must be closed at the end.
+                    await writable.close();
                 }
             });
 
-            const fileStream = new WritableStream({
-                write: chunk => writable.write(chunk)
-            });
-
-            await zipStream
-                .pipeThrough(bufferTransformer)
-                .pipeTo(fileStream);
-
-            await writable.close();
+            await zipStream.pipeTo(fileStream);
             this.finishedSaving();
         } catch (e) {
-            // Always need to close this file handle.
+            // Always need to close the file handle.
             await writable.close();
 
             // The caller will deal with this error.

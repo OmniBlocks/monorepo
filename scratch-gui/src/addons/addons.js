@@ -22,6 +22,7 @@ const addons = [
     'remove-sprite-confirm',
     'block-count',
     'onion-skinning',
+    'paint-snap',
     'default-costume-editor-color',
     'bitmap-copy',
     '2d-color-picker',
@@ -77,7 +78,8 @@ const newAddons = [
     'vol-slider',
     'number-pad',
     'rename-broadcasts',
-    'sprite-properties'
+    'sprite-properties',
+    'paint-snap'
 ];
 
 // eslint-disable-next-line import/no-commonjs

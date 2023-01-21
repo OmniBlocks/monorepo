@@ -138,7 +138,7 @@ a:active, a:focus {
     outline: none;
     cursor: pointer;
     background-color: transparent;
-    background-image: url("./search.svg");
+    background-image: url("./icons/search.svg");
     background-repeat: no-repeat;
     background-position: center;
 }
@@ -148,7 +148,7 @@ a:active, a:focus {
     border-color: #222222;
 }
 .search-input:not([value=""]) ~ .search-button {
-    background-image: url("./clear.svg") !important;
+    background-image: url("./icons/clear.svg") !important;
 }
 
 .feedback-button-outer {
@@ -503,7 +503,7 @@ a:active, a:focus {
 .setting input[type="checkbox"]:checked {
     border-color: $motion-primary;
     background-color: $motion-primary;
-    background-image: url("./check.svg");
+    background-image: url("./icons/check.svg");
 }
 .setting input[type="checkbox"]:hover:not(:focus) {
     border-color: $motion-tertiary;

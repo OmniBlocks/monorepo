@@ -784,6 +784,11 @@ class AddonRunner {
             return variable;
         }
         switch (variable.type) {
+        case 'alphaBlend': {
+            const opaqueSource = this.evaluateCustomCssVariable(variable.opaqueSource);
+            const transparentSource = this.evaluateCustomCssVariable(variable.transparentSource);
+            return textColorHelpers.alphaBlend(opaqueSource, transparentSource);
+        }
         case 'alphaThreshold': {
             const source = this.evaluateCustomCssVariable(variable.source);
             const alpha = textColorHelpers.parseHex(source).a;
@@ -792,6 +797,27 @@ class AddonRunner {
                 return this.evaluateCustomCssVariable(variable.opaque);
             }
             return this.evaluateCustomCssVariable(variable.transparent);
+        }
+        case 'brighten': {
+            const source = this.evaluateCustomCssVariable(variable.source);
+            return textColorHelpers.brighten(source, variable);
+        }
+        case 'makeHsv': {
+            const h = this.evaluateCustomCssVariable(variable.h);
+            const s = this.evaluateCustomCssVariable(variable.s);
+            const v = this.evaluateCustomCssVariable(variable.v);
+            return textColorHelpers.makeHsv(h, s, v);
+        }
+        case 'map': {
+            return variable.options[this.evaluateCustomCssVariable(variable.source)];
+        }
+        case 'multiply': {
+            const hex = this.evaluateCustomCssVariable(variable.source);
+            return textColorHelpers.multiply(hex, variable);
+        }
+        case 'recolorFilter': {
+            const source = this.evaluateCustomCssVariable(variable.source);
+            return textColorHelpers.recolorFilter(source);
         }
         case 'settingValue': {
             return this.publicAPI.addon.settings.get(variable.settingId);
@@ -802,13 +828,6 @@ class AddonRunner {
             const white = this.evaluateCustomCssVariable(variable.white);
             const threshold = this.evaluateCustomCssVariable(variable.threshold);
             return textColorHelpers.textColor(hex, black, white, threshold);
-        }
-        case 'multiply': {
-            const hex = this.evaluateCustomCssVariable(variable.source);
-            return textColorHelpers.multiply(hex, variable);
-        }
-        case 'map': {
-            return variable.options[this.evaluateCustomCssVariable(variable.source)];
         }
         }
         console.warn(`Unknown customCssVariable`, variable);

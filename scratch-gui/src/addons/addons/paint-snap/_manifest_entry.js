@@ -23,6 +23,7 @@ const manifest = {
       "default": true
     },
     {
+      "dynamic": true,
       "type": "color",
       "id": "guide-color",
       "name": "Snapping guide color",

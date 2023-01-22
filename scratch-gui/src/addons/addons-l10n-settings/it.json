@@ -10,6 +10,7 @@
     "find-bar/@description": "Aggiunge una barra di ricerca a fianco alla scheda suoni per trovare script, costumi e suoni e per passare direttamente agli elementi trovati. Usa Ctrl+Sinistra a Ctrl+Destra nell'area degli script per andare alla precedente o alla seguente posizione che hai visitato dopo che hai usato la barra di ricerca.",
     "find-bar/@info-developer-tools": " Questo addon faceva parte in precedenza dell'addon \"strumenti per sviluppatori\" ma è stato spostato qui.",
     "find-bar/@name": "Barra di ricerca dell'editor",
+    "middle-click-popup/@description": "Cliccando con il tasto centrale nell'area degli script oppure usando Ctrl+Spazio o Shift+Click puoi far comparire una casella dove digitare il nome di un blocco (o parte del nome) e trascinare il blocco nell'area del codice. Se vuoi aggiungere più di un blocco e non non vuoi che la casella si chiuda mentre lo trascini, tieni premuto Shift mentre lo trascini.",
     "middle-click-popup/@info-developer-tools": " Questo addon faceva parte in precedenza dell'addon \"strumenti per sviluppatori\" ma è stato spostato qui.",
     "middle-click-popup/@name": "Inserisci il nome dei blocchi ",
     "jump-to-def/@description": "Ti permette di andare alla definizione di un blocco personalizzato usando il pulsante centrale del mouse oppure cliccando il blocco mentre si preme Shift.",

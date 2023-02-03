@@ -45,7 +45,7 @@ const manifest = {
       }
     },
     {
-      "name": "inputColor-forumText",
+      "name": "inputColor-blackText",
       "value": {
         "type": "alphaThreshold",
         "source": {

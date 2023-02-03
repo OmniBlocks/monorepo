@@ -13,6 +13,7 @@
     "editor-devtools/unused-var": "{count, plural, one {Narzędzia Developerskie: Usunąć 1 nieużywaną zmienną o nazwie: \n} few {Narzędzia Developerskie: Usunąć # nieużywanych zmiennych? Oto one: \n} many {Narzędzia Developerskie: Usunąć # nieużywanych zmiennych? Oto one: \n} other {Narzędzia Developerskie: Usunąć # nieużywanych zmiennych? Oto one: \n} }",
     "editor-devtools/var-not-exist": "Ta zmienna nie istnieje...",
     "editor-devtools/variables": "zmienne",
+    "find-bar/complex-broadcast": "(działanie)",
     "find-bar/find-placeholder": "Szukaj (Ctr+F)",
     "middle-click-popup/start-typing": "Zacznij pisać...",
     "editor-searchable-dropdowns/createBroadcast": "Stwórz wiadomość \"{name}\"",

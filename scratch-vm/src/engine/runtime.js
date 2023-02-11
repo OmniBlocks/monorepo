@@ -2495,6 +2495,7 @@ class Runtime extends EventEmitter {
         this.emit(Runtime.STAGE_SIZE_CHANGED, width, height);
     }
 
+    // eslint-disable-next-line no-unused-vars
     setInEditor (inEditor) {
         // no-op
     }

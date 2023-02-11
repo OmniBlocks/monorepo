@@ -7,7 +7,11 @@ const Scratch = {
     ArgumentType,
     BlockType,
     TargetType,
-    Cast
+    Cast,
+
+    // Default implementation, should be overridden
+    // eslint-disable-next-line no-unused-vars
+    canFetchResource: url => Promise.resolve(true)
 };
 
 module.exports = Scratch;

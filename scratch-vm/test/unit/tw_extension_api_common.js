@@ -32,3 +32,11 @@ test('Cast', t => {
     t.equal(ScratchCommon.Cast.toListIndex('1.5', 10, false), 1);
     t.end();
 });
+
+test('canFetchResource', async t => {
+    // Default implementation should allow all requuests.
+    const result = ScratchCommon.canFetchResource('https://example.com/');
+    t.type(result, Promise);
+    t.equal(await result, true);
+    t.end();
+});

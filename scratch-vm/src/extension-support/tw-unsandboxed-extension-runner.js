@@ -6,7 +6,7 @@ const AsyncLimiter = require('../util/async-limiter');
  * @param {VirtualMachine} vm
  * @returns {Promise<object[]>} Resolves with a list of extension objects when Scratch.extensions.register is called.
  */
-const createUnsandboxedExtensionAPI = vm => new Promise(resolve => {
+const setupUnsandboxedExtensionAPI = vm => new Promise(resolve => {
     const extensionObjects = [];
     const register = extensionObject => {
         extensionObjects.push(extensionObject);
@@ -15,11 +15,29 @@ const createUnsandboxedExtensionAPI = vm => new Promise(resolve => {
 
     // Create a new copy of global.Scratch for each extension
     global.Scratch = Object.assign({}, global.Scratch || {}, ScratchCommon);
-    global.Scratch.vm = vm;
-    global.Scratch.renderer = vm.runtime.renderer;
     global.Scratch.extensions = {
         unsandboxed: true,
         register
+    };
+
+    global.Scratch.vm = vm;
+    global.Scratch.renderer = vm.runtime.renderer;
+
+    // This always returns a promise because the security manager may have asynchronous logic,
+    // and we need to ensure that any users of this method will handle that.
+    global.Scratch.canFetchResource = async url => {
+        let parsed;
+        try {
+            parsed = new URL(url, location.href);
+        } catch (e) {
+            // Invalid URL.
+            return false;
+        }
+        // Always allow protocols that don't involve a remote request.
+        if (parsed.protocol === 'blob:' || parsed.protocol === 'data:') {
+            return true;
+        }
+        return vm.securityManager.canFetchResource(parsed.href);
     };
 
     global.ScratchExtensions = require('./tw-scratchx-compatibility-layer');
@@ -43,7 +61,7 @@ const teardownUnsandboxedExtensionAPI = () => {
  * @returns {Promise<object[]>} Resolves with a list of extension objects if the extension was loaded successfully.
  */
 const loadUnsandboxedExtension = (extensionURL, vm) => new Promise((resolve, reject) => {
-    createUnsandboxedExtensionAPI(vm).then(resolve);
+    setupUnsandboxedExtensionAPI(vm).then(resolve);
 
     const script = document.createElement('script');
     script.onerror = () => {
@@ -62,6 +80,6 @@ const limiter = new AsyncLimiter(loadUnsandboxedExtension, 1);
 const load = (extensionURL, vm) => limiter.do(extensionURL, vm);
 
 module.exports = {
-    createUnsandboxedExtensionAPI,
+    setupUnsandboxedExtensionAPI,
     load
 };

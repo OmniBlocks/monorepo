@@ -1,5 +1,6 @@
 const tap = require('tap');
 const UnsandboxedExtensionRunner = require('../../src/extension-support/tw-unsandboxed-extension-runner');
+const VirtualMachine = require('../../src/virtual-machine');
 
 // Mock enough of the document API for the extension runner to think it works.
 // To more accurately test this, we want to make sure that the URLs we pass in are just strings.
@@ -161,5 +162,25 @@ test('ScratchX', async t => {
     const extensions = await UnsandboxedExtensionRunner.load('https://turbowarp.org/scratchx.js', vm);
     t.equal(extensions.length, 1);
     t.equal(extensions[0].test(), 2);
+    t.end();
+});
+
+test('canFetchResource', async t => {
+    // tested more thoroughly in tw_security_manager.js
+
+    const vm = new VirtualMachine();
+    UnsandboxedExtensionRunner.setupUnsandboxedExtensionAPI(vm);
+    global.location = {
+        href: 'https://turbowarp.org'
+    };
+
+    vm.securityManager.canFetchResource = url => url === 'https://example.com/';
+    t.equal(await global.Scratch.canFetchResource('http://example.com/'), false);
+    t.equal(await global.Scratch.canFetchResource('https://example.com/'), true);
+
+    // Should always return a Promise, even if the security manager doesn't
+    const result = global.Scratch.canFetchResource('https://example.com');
+    t.type(result, Promise);
+
     t.end();
 });

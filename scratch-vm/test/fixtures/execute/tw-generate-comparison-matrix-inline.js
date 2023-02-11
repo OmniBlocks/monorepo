@@ -2,12 +2,16 @@ const fs = require('fs');
 const Cast = require('../../../src/util/cast');
 
 /*
+This is a command-line tool to generate the tw-comparison-matrix-inline test project.
+
 To use output:
 Blockly.Xml.domToWorkspace(
     new DOMParser().parseFromString(XML_GOES_HERE, 'text/xml').documentElement,
     Blockly.getMainWorkspace()
 );
 */
+
+/* eslint-disable no-console */
 
 const VALUES = [
     '0',

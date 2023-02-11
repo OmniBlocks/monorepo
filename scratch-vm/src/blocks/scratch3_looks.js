@@ -1,6 +1,5 @@
 const Cast = require('../util/cast');
 const Clone = require('../util/clone');
-const RenderedTarget = require('../sprites/rendered-target');
 const uid = require('../util/uid');
 const StageLayering = require('../engine/stage-layering');
 const getMonitorIdForBlockWithArgs = require('../util/get-monitor-id');

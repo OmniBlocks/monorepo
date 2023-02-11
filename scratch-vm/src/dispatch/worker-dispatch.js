@@ -63,7 +63,9 @@ class WorkerDispatch extends SharedDispatch {
             log.warn(`Worker dispatch replacing existing service provider for ${service}`);
         }
         this.services[service] = provider;
-        return this.waitForConnection.then(() => this._remoteCall(centralDispatchService, 'dispatch', 'setService', service));
+        return this.waitForConnection.then(() => (
+            this._remoteCall(centralDispatchService, 'dispatch', 'setService', service)
+        ));
     }
 
     /**

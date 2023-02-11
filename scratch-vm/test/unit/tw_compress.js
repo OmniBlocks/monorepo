@@ -94,28 +94,25 @@ test('handles type INPUT_DIFF_BLOCK_SHADOW (3) compressed inputs', t => {
 
 test('all IDs unique', t => {
     const soup = 'abcdefghjijklmnopqstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ123456789';
-    for (const [
-        variableSoup,
-        listSoup,
-        broadcastSoup
-    ] of [
+    const items = [
         [soup, '', ''],
         ['', soup, ''],
-        ['', '', soup],
-    ]) {
+        ['', '', soup]
+    ];
+    for (const [variableSoup, listSoup, broadcastSoup] of items) {
         const data = {
             targets: [
                 {
                     isStage: true,
                     name: 'Stage',
                     variables: Object.fromEntries(
-                        variableSoup.split('').map((id) => [id, [id, 0]])
+                        variableSoup.split('').map(id => [id, [id, 0]])
                     ),
                     lists: Object.fromEntries(
-                        listSoup.split('').map((id) => [id, [id, []]])
+                        listSoup.split('').map(id => [id, [id, []]])
                     ),
                     broadcasts: Object.fromEntries(
-                        broadcastSoup.split('').map((id) => [id, id])
+                        broadcastSoup.split('').map(id => [id, id])
                     ),
                     blocks: {
                         'CmRa^i]o}QL77;hk:54o': {

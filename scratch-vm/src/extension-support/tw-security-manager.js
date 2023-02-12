@@ -66,6 +66,7 @@ class SecurityManager {
     /**
      * Determine whether an extension is allowed to open a new window or tab to a given URL.
      * This only applies to unsandboxed extensions. Sandboxed extensions are unable to open windows.
+     * javascript: URLs are always rejected (this method is never called).
      * @param {string} websiteURL
      * @returns {Promise<boolean>|boolean}
      */
@@ -77,9 +78,8 @@ class SecurityManager {
     /**
      * Determine whether an extension is allowed to redirect the current tab to a given URL.
      * This only applies to unsandboxed extensions. Sandboxed extensions are unable to redirect the parent
-     * window, but are free to redirect their sandbox.
-     * javascript: URLs are always rejected (this method is never called) as it would allow arbitrary
-     * code execution in the parent window.
+     * window, but are free to redirect their own sandboxed window.
+     * javascript: URLs are always rejected (this method is never called).
      * @param {string} websiteURL
      * @returns {Promise<boolean>|boolean}
      */

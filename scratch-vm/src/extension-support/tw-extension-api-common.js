@@ -7,14 +7,7 @@ const Scratch = {
     ArgumentType,
     BlockType,
     TargetType,
-    Cast,
-
-    // Stubs:
-    /* eslint-disable no-unused-vars */
-    canFetch: url => Promise.resolve(true),
-    canOpenWindow: url => Promise.resolve(true),
-    canRedirect: url => Promise.resolve(true)
-    /* eslint-enable no-unused-vars */
+    Cast
 };
 
 module.exports = Scratch;

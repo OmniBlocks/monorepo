@@ -128,11 +128,14 @@ test('canOpenWindow', async t => {
         href: 'https://example.com/'
     };
 
+    // javascript: should never be allowed, shouldn't call security manager
+    vm.securityManager.canOpenWindow = () => t.fail('should not call security manager for javascript:');
+    t.equal(await global.Scratch.canOpenWindow('javascript:alert(1)'), false);
+    
     vm.securityManager.canOpenWindow = () => false;
     t.equal(await global.Scratch.canOpenWindow('data:text/html,test'), false);
     t.equal(await global.Scratch.canOpenWindow('blob:https://example.com/8c071bf8-c0b6-4a48-81d7-6413c2adf3dd'), false);
     t.equal(await global.Scratch.canOpenWindow('file:///etc/hosts'), false);
-    t.equal(await global.Scratch.canOpenWindow('javascript:alert(1)'), false);
     t.equal(await global.Scratch.canOpenWindow('https://example.com/'), false);
     t.equal(await global.Scratch.canOpenWindow('index.html'), false);
     t.equal(await global.Scratch.canOpenWindow(null), false);
@@ -141,7 +144,6 @@ test('canOpenWindow', async t => {
     t.equal(await global.Scratch.canOpenWindow('data:text/html,test'), false);
     t.equal(await global.Scratch.canOpenWindow('blob:https://example.com/8c071bf8-c0b6-4a48-81d7-6413c2adf3dd'), false);
     t.equal(await global.Scratch.canOpenWindow('file:///etc/hosts'), false);
-    t.equal(await global.Scratch.canOpenWindow('javascript:alert(1)'), false);
     t.equal(await global.Scratch.canOpenWindow('https://example.com/'), false);
     t.equal(await global.Scratch.canOpenWindow('index.html'), false);
     t.equal(await global.Scratch.canOpenWindow(null), false);
@@ -150,7 +152,6 @@ test('canOpenWindow', async t => {
     t.equal(await global.Scratch.canOpenWindow('data:text/html,test'), true);
     t.equal(await global.Scratch.canOpenWindow('blob:https://example.com/8c071bf8-c0b6-4a48-81d7-6413c2adf3dd'), true);
     t.equal(await global.Scratch.canOpenWindow('file:///etc/hosts'), true);
-    t.equal(await global.Scratch.canOpenWindow('javascript:alert(1)'), true);
     t.equal(await global.Scratch.canOpenWindow('https://example.com/'), true);
     t.equal(await global.Scratch.canOpenWindow('index.html'), true);
     t.equal(await global.Scratch.canOpenWindow(null), true);
@@ -163,7 +164,6 @@ test('canOpenWindow', async t => {
     t.equal(await global.Scratch.canOpenWindow('data:text/html,test'), false);
     t.equal(await global.Scratch.canOpenWindow('blob:https://example.com/8c071bf8-c0b6-4a48-81d7-6413c2adf3dd'), false);
     t.equal(await global.Scratch.canOpenWindow('file:///etc/hosts'), true);
-    t.equal(await global.Scratch.canOpenWindow('javascript:alert(1)'), false);
     t.equal(await global.Scratch.canOpenWindow('https://example.com/'), false);
     t.equal(await global.Scratch.canOpenWindow('index.html'), false);
     t.equal(await global.Scratch.canOpenWindow(null), false);
@@ -171,7 +171,6 @@ test('canOpenWindow', async t => {
         'data:text/html,test',
         'blob:https://example.com/8c071bf8-c0b6-4a48-81d7-6413c2adf3dd',
         'file:///etc/hosts',
-        'javascript:alert(1)',
         'https://example.com/',
         'https://example.com/index.html',
         'https://example.com/null'

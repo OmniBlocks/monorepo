@@ -16,7 +16,7 @@
  * vm.securityManager.canAutomaticallyLoadExtension = (url) => {
  *   return confirm("Automatically load extension: " + url);
  * };
- * vm.securityManager.canFetchResource = (url) => {
+ * vm.securityManager.canFetch = (url) => {
  *   return url.startsWith('https://turbowarp.org/');
  * };
  * vm.securityManager.canOpenWindow = (url) => {
@@ -58,7 +58,7 @@ class SecurityManager {
      * @param {string} resourceURL
      * @returns {Promise<boolean>|boolean}
      */
-    canFetchResource (resourceURL) {
+    canFetch (resourceURL) {
         // By default, allow any requests.
         return Promise.resolve(true);
     }

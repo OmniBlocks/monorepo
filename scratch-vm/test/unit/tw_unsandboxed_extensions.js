@@ -166,40 +166,40 @@ test('ScratchX', async t => {
 });
 
 test('canFetch', async t => {
-    // tested thoroughly in tw_security_manager.js
+    // see tw_security_manager.js
     const vm = new VirtualMachine();
     UnsandboxedExtensionRunner.setupUnsandboxedExtensionAPI(vm);
     global.location = {
         href: 'https://turbowarp.org'
     };
-    vm.securityManager.canFetch = () => false;
-    const result = global.Scratch.canFetch('https://example.com');
+    const result = global.Scratch.canFetch('https://example.com/');
     t.type(result, Promise);
+    t.equal(await result, true);
     t.end();
 });
 
 test('canOpenWindow', async t => {
-    // tested thoroughly in tw_security_manager.js
+    // see tw_security_manager.js
     const vm = new VirtualMachine();
     UnsandboxedExtensionRunner.setupUnsandboxedExtensionAPI(vm);
     global.location = {
         href: 'https://turbowarp.org'
     };
-    vm.securityManager.canOpenWindow = () => false;
-    const result = global.Scratch.canOpenWindow('https://example.com');
+    const result = global.Scratch.canOpenWindow('https://example.com/');
     t.type(result, Promise);
+    t.equal(await result, true);
     t.end();
 });
 
 test('canRedirect', async t => {
-    // tested thoroughly in tw_security_manager.js
+    // see tw_security_manager.js
     const vm = new VirtualMachine();
     UnsandboxedExtensionRunner.setupUnsandboxedExtensionAPI(vm);
     global.location = {
         href: 'https://turbowarp.org'
     };
-    vm.securityManager.canRedirect = () => false;
-    const result = global.Scratch.canRedirect('https://example.com');
+    const result = global.Scratch.canRedirect('https://example.com/');
     t.type(result, Promise);
+    t.equal(await result, true);
     t.end();
 });

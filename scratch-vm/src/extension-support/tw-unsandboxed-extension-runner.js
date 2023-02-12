@@ -78,7 +78,10 @@ const setupUnsandboxedExtensionAPI = vm => new Promise(resolve => {
         if (!await Scratch.canFetch(actualURL)) {
             throw new Error(`Permission to fetch ${actualURL} rejected.`);
         }
-        return fetch(url, options);
+        return fetch(url, {
+            ...options,
+            redirect: 'error'
+        });
     };
 
     Scratch.openWindow = async (url, features) => {

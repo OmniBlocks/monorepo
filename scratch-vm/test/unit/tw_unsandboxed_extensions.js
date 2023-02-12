@@ -39,21 +39,30 @@ global.document = {
     }
 };
 
-const mockVM = () => ({
-    runtime: {
-        renderer: {}
+// Mock various DOM APIs for fetching, window opening, redirecting, etc.
+/* globals Request */
+global.Request = class {
+    constructor (url) {
+        this.url = url;
     }
-});
+};
+global.fetch = url => Promise.resolve(`[Response ${url instanceof Request ? url.url : url}]`);
+global.window = {
+    open: (url, target, features) => `[Window ${url} target=${target || ''} features=${features || ''}]`
+};
 
-tap.afterEach(() => {
+tap.beforeEach(async () => {
     scriptCallbacks.clear();
+    global.location = {
+        href: 'https://example.com/'
+    };
 });
 
 const {test} = tap;
 
 test('basic API', async t => {
     t.plan(9);
-    const vm = mockVM();
+    const vm = new VirtualMachine();
     class MyExtension {}
     setScript('https://turbowarp.org/1.js', () => {
         t.equal(global.Scratch.vm, vm);
@@ -75,8 +84,8 @@ test('basic API', async t => {
 });
 
 test('multiple VMs loading extensions', async t => {
-    const vm1 = mockVM();
-    const vm2 = mockVM();
+    const vm1 = new VirtualMachine();
+    const vm2 = new VirtualMachine();
 
     class Extension1 {}
     class Extension2 {}
@@ -120,7 +129,7 @@ test('multiple VMs loading extensions', async t => {
 });
 
 test('register multiple extensions in one script', async t => {
-    const vm = mockVM();
+    const vm = new VirtualMachine();
     class Extension1 {}
     class Extension2 {}
     setScript('https://turbowarp.org/multiple.js', () => {
@@ -135,7 +144,7 @@ test('register multiple extensions in one script', async t => {
 });
 
 test('extension error results in rejection', async t => {
-    const vm = mockVM();
+    const vm = new VirtualMachine();
     try {
         await UnsandboxedExtensionRunner.load('https://turbowarp.org/404.js', vm);
         // Above should throw an error as the script will not load successfully
@@ -147,7 +156,7 @@ test('extension error results in rejection', async t => {
 });
 
 test('ScratchX', async t => {
-    const vm = mockVM();
+    const vm = new VirtualMachine();
     setScript('https://turbowarp.org/scratchx.js', () => {
         const ext = {
             test: () => 2
@@ -166,40 +175,63 @@ test('ScratchX', async t => {
 });
 
 test('canFetch', async t => {
-    // tested thoroughly in tw_security_manager.js
+    // see tw_security_manager.js
     const vm = new VirtualMachine();
     UnsandboxedExtensionRunner.setupUnsandboxedExtensionAPI(vm);
-    global.location = {
-        href: 'https://turbowarp.org'
-    };
-    vm.securityManager.canFetch = () => false;
-    const result = global.Scratch.canFetch('https://example.com');
+    const result = global.Scratch.canFetch('https://example.com/');
     t.type(result, Promise);
+    t.equal(await result, true);
+    t.end();
+});
+
+test('fetch', async t => {
+    const vm = new VirtualMachine();
+    UnsandboxedExtensionRunner.setupUnsandboxedExtensionAPI(vm);
+    global.Scratch.canFetch = url => url === 'https://example.com/2';
+    await t.rejects(global.Scratch.fetch('https://example.com/1'), /Permission to fetch https:\/\/example.com\/1 rejected/);
+    await t.rejects(global.Scratch.fetch(new Request('https://example.com/1')), /Permission to fetch https:\/\/example.com\/1 rejected/);
+    t.equal(await global.Scratch.fetch('https://example.com/2'), '[Response https://example.com/2]');
+    t.equal(await global.Scratch.fetch(new Request('https://example.com/2')), '[Response https://example.com/2]');
     t.end();
 });
 
 test('canOpenWindow', async t => {
-    // tested thoroughly in tw_security_manager.js
+    // see tw_security_manager.js
     const vm = new VirtualMachine();
     UnsandboxedExtensionRunner.setupUnsandboxedExtensionAPI(vm);
-    global.location = {
-        href: 'https://turbowarp.org'
-    };
-    vm.securityManager.canOpenWindow = () => false;
-    const result = global.Scratch.canOpenWindow('https://example.com');
+    const result = global.Scratch.canOpenWindow('https://example.com/');
     t.type(result, Promise);
+    t.equal(await result, true);
+    t.end();
+});
+
+test('openWindow', async t => {
+    const vm = new VirtualMachine();
+    UnsandboxedExtensionRunner.setupUnsandboxedExtensionAPI(vm);
+    global.Scratch.canOpenWindow = url => url === 'https://example.com/2';
+    await t.rejects(global.Scratch.openWindow('https://example.com/1'), /Permission to open tab https:\/\/example.com\/1 rejected/);
+    t.equal(await global.Scratch.openWindow('https://example.com/2'), '[Window https://example.com/2 target=_blank features=]');
+    t.equal(await global.Scratch.openWindow('https://example.com/2', 'popup=1'), '[Window https://example.com/2 target=_blank features=popup=1]');
     t.end();
 });
 
 test('canRedirect', async t => {
-    // tested thoroughly in tw_security_manager.js
+    // see tw_security_manager.js
     const vm = new VirtualMachine();
     UnsandboxedExtensionRunner.setupUnsandboxedExtensionAPI(vm);
-    global.location = {
-        href: 'https://turbowarp.org'
-    };
-    vm.securityManager.canRedirect = () => false;
-    const result = global.Scratch.canRedirect('https://example.com');
+    const result = global.Scratch.canRedirect('https://example.com/');
     t.type(result, Promise);
+    t.equal(await result, true);
+    t.end();
+});
+
+test('redirect', async t => {
+    const vm = new VirtualMachine();
+    UnsandboxedExtensionRunner.setupUnsandboxedExtensionAPI(vm);
+    global.Scratch.canRedirect = url => url === 'https://example.com/2';
+    await t.rejects(global.Scratch.redirect('https://example.com/1'), /Permission to redirect to https:\/\/example.com\/1 rejected/);
+    t.equal(global.location.href, 'https://example.com/');
+    await global.Scratch.redirect('https://example.com/2');
+    t.equal(global.location.href, 'https://example.com/2');
     t.end();
 });

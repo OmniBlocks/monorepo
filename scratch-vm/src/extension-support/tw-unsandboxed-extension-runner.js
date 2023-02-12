@@ -27,16 +27,15 @@ const setupUnsandboxedExtensionAPI = vm => new Promise(resolve => {
     };
 
     // Create a new copy of global.Scratch for each extension
-    global.Scratch = Object.assign({}, global.Scratch || {}, ScratchCommon);
-    global.Scratch.extensions = {
+    const Scratch = Object.assign({}, global.Scratch || {}, ScratchCommon);
+    Scratch.extensions = {
         unsandboxed: true,
         register
     };
+    Scratch.vm = vm;
+    Scratch.renderer = vm.runtime.renderer;
 
-    global.Scratch.vm = vm;
-    global.Scratch.renderer = vm.runtime.renderer;
-
-    global.Scratch.canFetch = async url => {
+    Scratch.canFetch = async url => {
         const parsed = parseURL(url);
         if (!parsed) {
             return false;
@@ -48,15 +47,20 @@ const setupUnsandboxedExtensionAPI = vm => new Promise(resolve => {
         return vm.securityManager.canFetch(parsed.href);
     };
 
-    global.Scratch.canOpenWindow = async url => {
+    Scratch.canOpenWindow = async url => {
         const parsed = parseURL(url);
         if (!parsed) {
+            return false;
+        }
+        // Always reject protocols that would allow code execution.
+        // eslint-disable-next-line no-script-url
+        if (parsed.protocol === 'javascript:') {
             return false;
         }
         return vm.securityManager.canOpenWindow(parsed.href);
     };
 
-    global.Scratch.canRedirect = async url => {
+    Scratch.canRedirect = async url => {
         const parsed = parseURL(url);
         if (!parsed) {
             return false;
@@ -69,6 +73,29 @@ const setupUnsandboxedExtensionAPI = vm => new Promise(resolve => {
         return vm.securityManager.canRedirect(parsed.href);
     };
 
+    Scratch.fetch = async (url, options) => {
+        const actualURL = url instanceof Request ? url.url : url;
+        if (!await Scratch.canFetch(actualURL)) {
+            throw new Error(`Permission to fetch ${actualURL} rejected.`);
+        }
+        return fetch(url, options);
+    };
+
+    Scratch.openWindow = async (url, features) => {
+        if (!await Scratch.canOpenWindow(url)) {
+            throw new Error(`Permission to open tab ${url} rejected.`);
+        }
+        return window.open(url, '_blank', features);
+    };
+
+    Scratch.redirect = async url => {
+        if (!await Scratch.canRedirect(url)) {
+            throw new Error(`Permission to redirect to ${url} rejected.`);
+        }
+        location.href = url;
+    };
+
+    global.Scratch = Scratch;
     global.ScratchExtensions = require('./tw-scratchx-compatibility-layer');
 });
 

@@ -2,6 +2,19 @@ const ScratchCommon = require('./tw-extension-api-common');
 const AsyncLimiter = require('../util/async-limiter');
 
 /**
+ * Parse a URL object or return null.
+ * @param {string} url
+ * @returns {URL|null}
+ */
+const parseURL = url => {
+    try {
+        return new URL(url, location.href);
+    } catch (e) {
+        return null;
+    }
+};
+
+/**
  * Sets up the global.Scratch API for an unsandboxed extension.
  * @param {VirtualMachine} vm
  * @returns {Promise<object[]>} Resolves with a list of extension objects when Scratch.extensions.register is called.
@@ -23,14 +36,9 @@ const setupUnsandboxedExtensionAPI = vm => new Promise(resolve => {
     global.Scratch.vm = vm;
     global.Scratch.renderer = vm.runtime.renderer;
 
-    // This always returns a promise because the security manager may have asynchronous logic,
-    // and we need to ensure that any users of this method will handle that.
     global.Scratch.canFetchResource = async url => {
-        let parsed;
-        try {
-            parsed = new URL(url, location.href);
-        } catch (e) {
-            // Invalid URL.
+        const parsed = parseURL(url);
+        if (!parsed) {
             return false;
         }
         // Always allow protocols that don't involve a remote request.
@@ -38,6 +46,27 @@ const setupUnsandboxedExtensionAPI = vm => new Promise(resolve => {
             return true;
         }
         return vm.securityManager.canFetchResource(parsed.href);
+    };
+
+    global.Scratch.canOpenWindow = async url => {
+        const parsed = parseURL(url);
+        if (!parsed) {
+            return false;
+        }
+        return vm.securityManager.canOpenWindow(parsed.href);
+    };
+
+    global.Scratch.canRedirect = async url => {
+        const parsed = parseURL(url);
+        if (!parsed) {
+            return false;
+        }
+        // Always reject protocols that would allow code execution.
+        // eslint-disable-next-line no-script-url
+        if (parsed.protocol === 'javascript:') {
+            return false;
+        }
+        return vm.securityManager.canRedirect(parsed.href);
     };
 
     global.ScratchExtensions = require('./tw-scratchx-compatibility-layer');

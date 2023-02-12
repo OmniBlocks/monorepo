@@ -166,21 +166,40 @@ test('ScratchX', async t => {
 });
 
 test('canFetchResource', async t => {
-    // tested more thoroughly in tw_security_manager.js
-
+    // tested thoroughly in tw_security_manager.js
     const vm = new VirtualMachine();
     UnsandboxedExtensionRunner.setupUnsandboxedExtensionAPI(vm);
     global.location = {
         href: 'https://turbowarp.org'
     };
-
-    vm.securityManager.canFetchResource = url => url === 'https://example.com/';
-    t.equal(await global.Scratch.canFetchResource('http://example.com/'), false);
-    t.equal(await global.Scratch.canFetchResource('https://example.com/'), true);
-
-    // Should always return a Promise, even if the security manager doesn't
+    vm.securityManager.canFetchResource = () => false;
     const result = global.Scratch.canFetchResource('https://example.com');
     t.type(result, Promise);
+    t.end();
+});
 
+test('canOpenWindow', async t => {
+    // tested thoroughly in tw_security_manager.js
+    const vm = new VirtualMachine();
+    UnsandboxedExtensionRunner.setupUnsandboxedExtensionAPI(vm);
+    global.location = {
+        href: 'https://turbowarp.org'
+    };
+    vm.securityManager.canOpenWindow = () => false;
+    const result = global.Scratch.canOpenWindow('https://example.com');
+    t.type(result, Promise);
+    t.end();
+});
+
+test('canRedirect', async t => {
+    // tested thoroughly in tw_security_manager.js
+    const vm = new VirtualMachine();
+    UnsandboxedExtensionRunner.setupUnsandboxedExtensionAPI(vm);
+    global.location = {
+        href: 'https://turbowarp.org'
+    };
+    vm.securityManager.canRedirect = () => false;
+    const result = global.Scratch.canRedirect('https://example.com');
+    t.type(result, Promise);
     t.end();
 });

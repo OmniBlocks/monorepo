@@ -9,9 +9,12 @@ const Scratch = {
     TargetType,
     Cast,
 
-    // Default implementation, should be overridden
-    // eslint-disable-next-line no-unused-vars
-    canFetchResource: url => Promise.resolve(true)
+    // Stubs:
+    /* eslint-disable no-unused-vars */
+    canFetchResource: url => Promise.resolve(true),
+    canOpenWindow: url => Promise.resolve(true),
+    canRedirect: url => Promise.resolve(true)
+    /* eslint-enable no-unused-vars */
 };
 
 module.exports = Scratch;

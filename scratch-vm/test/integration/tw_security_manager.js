@@ -10,6 +10,8 @@ const testProject = fs.readFileSync(path.join(__dirname, '..', 'fixtures', 'tw-p
 const FETCH_EXTENSION = 'https://extensions.turbowarp.org/fetch.js';
 const BITWISE_EXTENSION = 'https://extensions.turbowarp.org/bitwise.js';
 
+/* eslint-disable no-script-url */
+
 test('Deny both extensions', async t => {
     const vm = new VirtualMachine();
     vm.extensionManager.loadExtensionURL = () => {
@@ -64,8 +66,6 @@ test('Allow both extensions', async t => {
 });
 
 test('canFetchResource', async t => {
-    // see also: tw_unsandboxed_extensions.js
-
     const vm = new VirtualMachine();
     setupUnsandboxedExtensionAPI(vm);
     global.location = {
@@ -113,6 +113,113 @@ test('canFetchResource', async t => {
         'https://example.com/special.html',
         'https://example.com/boring.html',
         'https://example.com/special.html'
+    ]);
+
+    t.end();
+});
+
+test('canOpenWindow', async t => {
+    const vm = new VirtualMachine();
+    setupUnsandboxedExtensionAPI(vm);
+    global.location = {
+        href: 'https://example.com/'
+    };
+
+    vm.securityManager.canOpenWindow = () => false;
+    t.equal(await global.Scratch.canOpenWindow('data:text/html,test'), false);
+    t.equal(await global.Scratch.canOpenWindow('blob:https://example.com/8c071bf8-c0b6-4a48-81d7-6413c2adf3dd'), false);
+    t.equal(await global.Scratch.canOpenWindow('file:///etc/hosts'), false);
+    t.equal(await global.Scratch.canOpenWindow('javascript:alert(1)'), false);
+    t.equal(await global.Scratch.canOpenWindow('https://example.com/'), false);
+    t.equal(await global.Scratch.canOpenWindow('index.html'), false);
+
+    vm.securityManager.canOpenWindow = () => Promise.resolve(false);
+    t.equal(await global.Scratch.canOpenWindow('data:text/html,test'), false);
+    t.equal(await global.Scratch.canOpenWindow('blob:https://example.com/8c071bf8-c0b6-4a48-81d7-6413c2adf3dd'), false);
+    t.equal(await global.Scratch.canOpenWindow('file:///etc/hosts'), false);
+    t.equal(await global.Scratch.canOpenWindow('javascript:alert(1)'), false);
+    t.equal(await global.Scratch.canOpenWindow('https://example.com/'), false);
+    t.equal(await global.Scratch.canOpenWindow('index.html'), false);
+
+    vm.securityManager.canOpenWindow = () => true;
+    t.equal(await global.Scratch.canOpenWindow('data:text/html,test'), true);
+    t.equal(await global.Scratch.canOpenWindow('blob:https://example.com/8c071bf8-c0b6-4a48-81d7-6413c2adf3dd'), true);
+    t.equal(await global.Scratch.canOpenWindow('file:///etc/hosts'), true);
+    t.equal(await global.Scratch.canOpenWindow('javascript:alert(1)'), true);
+    t.equal(await global.Scratch.canOpenWindow('https://example.com/'), true);
+    t.equal(await global.Scratch.canOpenWindow('index.html'), true);
+
+    const calledWithURLs = [];
+    vm.securityManager.canOpenWindow = async url => {
+        calledWithURLs.push(url);
+        return url === 'file:///etc/hosts';
+    };
+    t.equal(await global.Scratch.canOpenWindow('data:text/html,test'), false);
+    t.equal(await global.Scratch.canOpenWindow('blob:https://example.com/8c071bf8-c0b6-4a48-81d7-6413c2adf3dd'), false);
+    t.equal(await global.Scratch.canOpenWindow('file:///etc/hosts'), true);
+    t.equal(await global.Scratch.canOpenWindow('javascript:alert(1)'), false);
+    t.equal(await global.Scratch.canOpenWindow('https://example.com/'), false);
+    t.equal(await global.Scratch.canOpenWindow('index.html'), false);
+    t.same(calledWithURLs, [
+        'data:text/html,test',
+        'blob:https://example.com/8c071bf8-c0b6-4a48-81d7-6413c2adf3dd',
+        'file:///etc/hosts',
+        'javascript:alert(1)',
+        'https://example.com/',
+        'https://example.com/index.html'
+    ]);
+
+    t.end();
+});
+
+test('canRedirect', async t => {
+    const vm = new VirtualMachine();
+    setupUnsandboxedExtensionAPI(vm);
+    global.location = {
+        href: 'https://example.com/'
+    };
+
+    // javascript: should never be allowed, shouldn't call security manager
+    vm.securityManager.canRedirect = () => t.fail('should not call security manager for javascript:');
+    t.equal(await global.Scratch.canRedirect('javascript:alert(1)'), false);
+
+    vm.securityManager.canRedirect = () => false;
+    t.equal(await global.Scratch.canRedirect('data:text/html,test'), false);
+    t.equal(await global.Scratch.canRedirect('blob:https://example.com/8c071bf8-c0b6-4a48-81d7-6413c2adf3dd'), false);
+    t.equal(await global.Scratch.canRedirect('file:///etc/hosts'), false);
+    t.equal(await global.Scratch.canRedirect('https://example.com/'), false);
+    t.equal(await global.Scratch.canRedirect('index.html'), false);
+
+    vm.securityManager.canRedirect = () => Promise.resolve(false);
+    t.equal(await global.Scratch.canRedirect('data:text/html,test'), false);
+    t.equal(await global.Scratch.canRedirect('blob:https://example.com/8c071bf8-c0b6-4a48-81d7-6413c2adf3dd'), false);
+    t.equal(await global.Scratch.canRedirect('file:///etc/hosts'), false);
+    t.equal(await global.Scratch.canRedirect('https://example.com/'), false);
+    t.equal(await global.Scratch.canRedirect('index.html'), false);
+
+    vm.securityManager.canRedirect = () => true;
+    t.equal(await global.Scratch.canRedirect('data:text/html,test'), true);
+    t.equal(await global.Scratch.canRedirect('blob:https://example.com/8c071bf8-c0b6-4a48-81d7-6413c2adf3dd'), true);
+    t.equal(await global.Scratch.canRedirect('file:///etc/hosts'), true);
+    t.equal(await global.Scratch.canRedirect('https://example.com/'), true);
+    t.equal(await global.Scratch.canRedirect('index.html'), true);
+
+    const calledWithURLs = [];
+    vm.securityManager.canRedirect = async url => {
+        calledWithURLs.push(url);
+        return url === 'file:///etc/hosts';
+    };
+    t.equal(await global.Scratch.canRedirect('data:text/html,test'), false);
+    t.equal(await global.Scratch.canRedirect('blob:https://example.com/8c071bf8-c0b6-4a48-81d7-6413c2adf3dd'), false);
+    t.equal(await global.Scratch.canRedirect('file:///etc/hosts'), true);
+    t.equal(await global.Scratch.canRedirect('https://example.com/'), false);
+    t.equal(await global.Scratch.canRedirect('index.html'), false);
+    t.same(calledWithURLs, [
+        'data:text/html,test',
+        'blob:https://example.com/8c071bf8-c0b6-4a48-81d7-6413c2adf3dd',
+        'file:///etc/hosts',
+        'https://example.com/',
+        'https://example.com/index.html'
     ]);
 
     t.end();

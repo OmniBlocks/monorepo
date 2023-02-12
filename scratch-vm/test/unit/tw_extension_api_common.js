@@ -40,3 +40,19 @@ test('canFetchResource', async t => {
     t.equal(await result, true);
     t.end();
 });
+
+test('canOpenWindow', async t => {
+    // Default implementation should allow all.
+    const result = ScratchCommon.canOpenWindow('https://example.com/');
+    t.type(result, Promise);
+    t.equal(await result, true);
+    t.end();
+});
+
+test('canRedirect', async t => {
+    // Default implementation should allow all.
+    const result = ScratchCommon.canRedirect('https://example.com/');
+    t.type(result, Promise);
+    t.equal(await result, true);
+    t.end();
+});

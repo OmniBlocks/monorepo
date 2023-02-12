@@ -33,9 +33,9 @@ test('Cast', t => {
     t.end();
 });
 
-test('canFetchResource', async t => {
+test('canFetch', async t => {
     // Default implementation should allow all requuests.
-    const result = ScratchCommon.canFetchResource('https://example.com/');
+    const result = ScratchCommon.canFetch('https://example.com/');
     t.type(result, Promise);
     t.equal(await result, true);
     t.end();

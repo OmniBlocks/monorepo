@@ -11,7 +11,7 @@ const Scratch = {
 
     // Stubs:
     /* eslint-disable no-unused-vars */
-    canFetchResource: url => Promise.resolve(true),
+    canFetch: url => Promise.resolve(true),
     canOpenWindow: url => Promise.resolve(true),
     canRedirect: url => Promise.resolve(true)
     /* eslint-enable no-unused-vars */

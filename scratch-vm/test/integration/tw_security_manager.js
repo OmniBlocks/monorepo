@@ -65,7 +65,7 @@ test('Allow both extensions', async t => {
     t.end();
 });
 
-test('canFetchResource', async t => {
+test('canFetch', async t => {
     const vm = new VirtualMachine();
     setupUnsandboxedExtensionAPI(vm);
     global.location = {
@@ -73,40 +73,40 @@ test('canFetchResource', async t => {
     };
 
     // data: and blob: are always allowed, shouldn't call security manager
-    vm.securityManager.canFetchResource = () => t.fail('security manager should be ignored for these protocols');
-    t.equal(await global.Scratch.canFetchResource('data:text/html,test'), true);
-    t.equal(await global.Scratch.canFetchResource('blob:https://example.com/8c071bf8-c0b6-4a48-81d7-6413c2adf3dd'), true);
+    vm.securityManager.canFetch = () => t.fail('security manager should be ignored for these protocols');
+    t.equal(await global.Scratch.canFetch('data:text/html,test'), true);
+    t.equal(await global.Scratch.canFetch('blob:https://example.com/8c071bf8-c0b6-4a48-81d7-6413c2adf3dd'), true);
 
-    vm.securityManager.canFetchResource = () => false;
-    t.equal(await global.Scratch.canFetchResource('file:///etc/hosts'), false);
-    t.equal(await global.Scratch.canFetchResource('http://example.com/'), false);
-    t.equal(await global.Scratch.canFetchResource('https://example.com/'), false);
-    t.equal(await global.Scratch.canFetchResource('special.html'), false);
+    vm.securityManager.canFetch = () => false;
+    t.equal(await global.Scratch.canFetch('file:///etc/hosts'), false);
+    t.equal(await global.Scratch.canFetch('http://example.com/'), false);
+    t.equal(await global.Scratch.canFetch('https://example.com/'), false);
+    t.equal(await global.Scratch.canFetch('special.html'), false);
 
-    vm.securityManager.canFetchResource = () => Promise.resolve(false);
-    t.equal(await global.Scratch.canFetchResource('file:///etc/hosts'), false);
-    t.equal(await global.Scratch.canFetchResource('http://example.com/'), false);
-    t.equal(await global.Scratch.canFetchResource('https://example.com/'), false);
-    t.equal(await global.Scratch.canFetchResource('boring.html'), false);
-    t.equal(await global.Scratch.canFetchResource('special.html'), false);
+    vm.securityManager.canFetch = () => Promise.resolve(false);
+    t.equal(await global.Scratch.canFetch('file:///etc/hosts'), false);
+    t.equal(await global.Scratch.canFetch('http://example.com/'), false);
+    t.equal(await global.Scratch.canFetch('https://example.com/'), false);
+    t.equal(await global.Scratch.canFetch('boring.html'), false);
+    t.equal(await global.Scratch.canFetch('special.html'), false);
 
-    vm.securityManager.canFetchResource = () => true;
-    t.equal(await global.Scratch.canFetchResource('file:///etc/hosts'), true);
-    t.equal(await global.Scratch.canFetchResource('http://example.com/'), true);
-    t.equal(await global.Scratch.canFetchResource('https://example.com/'), true);
-    t.equal(await global.Scratch.canFetchResource('boring.html'), true);
-    t.equal(await global.Scratch.canFetchResource('special.html'), true);
+    vm.securityManager.canFetch = () => true;
+    t.equal(await global.Scratch.canFetch('file:///etc/hosts'), true);
+    t.equal(await global.Scratch.canFetch('http://example.com/'), true);
+    t.equal(await global.Scratch.canFetch('https://example.com/'), true);
+    t.equal(await global.Scratch.canFetch('boring.html'), true);
+    t.equal(await global.Scratch.canFetch('special.html'), true);
 
     const calledWithURLs = [];
-    vm.securityManager.canFetchResource = async url => {
+    vm.securityManager.canFetch = async url => {
         calledWithURLs.push(url);
         return url === 'https://example.com/special.html';
     };
-    t.equal(await global.Scratch.canFetchResource('file:///etc/hosts'), false);
-    t.equal(await global.Scratch.canFetchResource('http://example.com/'), false);
-    t.equal(await global.Scratch.canFetchResource('https://example.com/special.html'), true);
-    t.equal(await global.Scratch.canFetchResource('boring.html'), false);
-    t.equal(await global.Scratch.canFetchResource('special.html'), true);
+    t.equal(await global.Scratch.canFetch('file:///etc/hosts'), false);
+    t.equal(await global.Scratch.canFetch('http://example.com/'), false);
+    t.equal(await global.Scratch.canFetch('https://example.com/special.html'), true);
+    t.equal(await global.Scratch.canFetch('boring.html'), false);
+    t.equal(await global.Scratch.canFetch('special.html'), true);
     t.same(calledWithURLs, [
         'file:///etc/hosts',
         'http://example.com/',

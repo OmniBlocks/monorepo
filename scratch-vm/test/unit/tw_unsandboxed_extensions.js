@@ -165,15 +165,15 @@ test('ScratchX', async t => {
     t.end();
 });
 
-test('canFetchResource', async t => {
+test('canFetch', async t => {
     // tested thoroughly in tw_security_manager.js
     const vm = new VirtualMachine();
     UnsandboxedExtensionRunner.setupUnsandboxedExtensionAPI(vm);
     global.location = {
         href: 'https://turbowarp.org'
     };
-    vm.securityManager.canFetchResource = () => false;
-    const result = global.Scratch.canFetchResource('https://example.com');
+    vm.securityManager.canFetch = () => false;
+    const result = global.Scratch.canFetch('https://example.com');
     t.type(result, Promise);
     t.end();
 });

@@ -36,7 +36,7 @@ const setupUnsandboxedExtensionAPI = vm => new Promise(resolve => {
     global.Scratch.vm = vm;
     global.Scratch.renderer = vm.runtime.renderer;
 
-    global.Scratch.canFetchResource = async url => {
+    global.Scratch.canFetch = async url => {
         const parsed = parseURL(url);
         if (!parsed) {
             return false;
@@ -45,7 +45,7 @@ const setupUnsandboxedExtensionAPI = vm => new Promise(resolve => {
         if (parsed.protocol === 'blob:' || parsed.protocol === 'data:') {
             return true;
         }
-        return vm.securityManager.canFetchResource(parsed.href);
+        return vm.securityManager.canFetch(parsed.href);
     };
 
     global.Scratch.canOpenWindow = async url => {

@@ -81,38 +81,41 @@ test('canFetch', async t => {
     t.equal(await global.Scratch.canFetch('file:///etc/hosts'), false);
     t.equal(await global.Scratch.canFetch('http://example.com/'), false);
     t.equal(await global.Scratch.canFetch('https://example.com/'), false);
-    t.equal(await global.Scratch.canFetch('special.html'), false);
+    t.equal(await global.Scratch.canFetch('null'), false);
+    t.equal(await global.Scratch.canFetch(null), false);
 
     vm.securityManager.canFetch = () => Promise.resolve(false);
     t.equal(await global.Scratch.canFetch('file:///etc/hosts'), false);
     t.equal(await global.Scratch.canFetch('http://example.com/'), false);
     t.equal(await global.Scratch.canFetch('https://example.com/'), false);
     t.equal(await global.Scratch.canFetch('boring.html'), false);
-    t.equal(await global.Scratch.canFetch('special.html'), false);
+    t.equal(await global.Scratch.canFetch('null'), false);
+    t.equal(await global.Scratch.canFetch(null), false);
 
     vm.securityManager.canFetch = () => true;
     t.equal(await global.Scratch.canFetch('file:///etc/hosts'), true);
     t.equal(await global.Scratch.canFetch('http://example.com/'), true);
     t.equal(await global.Scratch.canFetch('https://example.com/'), true);
     t.equal(await global.Scratch.canFetch('boring.html'), true);
-    t.equal(await global.Scratch.canFetch('special.html'), true);
+    t.equal(await global.Scratch.canFetch('null'), true);
+    t.equal(await global.Scratch.canFetch(null), true);
 
     const calledWithURLs = [];
     vm.securityManager.canFetch = async url => {
         calledWithURLs.push(url);
-        return url === 'https://example.com/special.html';
+        return url === 'https://example.com/null';
     };
     t.equal(await global.Scratch.canFetch('file:///etc/hosts'), false);
     t.equal(await global.Scratch.canFetch('http://example.com/'), false);
-    t.equal(await global.Scratch.canFetch('https://example.com/special.html'), true);
-    t.equal(await global.Scratch.canFetch('boring.html'), false);
-    t.equal(await global.Scratch.canFetch('special.html'), true);
+    t.equal(await global.Scratch.canFetch('https://example.com/null'), true);
+    t.equal(await global.Scratch.canFetch('null'), true);
+    t.equal(await global.Scratch.canFetch(null), true);
     t.same(calledWithURLs, [
         'file:///etc/hosts',
         'http://example.com/',
-        'https://example.com/special.html',
-        'https://example.com/boring.html',
-        'https://example.com/special.html'
+        'https://example.com/null',
+        'https://example.com/null',
+        'https://example.com/null'
     ]);
 
     t.end();
@@ -132,6 +135,7 @@ test('canOpenWindow', async t => {
     t.equal(await global.Scratch.canOpenWindow('javascript:alert(1)'), false);
     t.equal(await global.Scratch.canOpenWindow('https://example.com/'), false);
     t.equal(await global.Scratch.canOpenWindow('index.html'), false);
+    t.equal(await global.Scratch.canOpenWindow(null), false);
 
     vm.securityManager.canOpenWindow = () => Promise.resolve(false);
     t.equal(await global.Scratch.canOpenWindow('data:text/html,test'), false);
@@ -140,6 +144,7 @@ test('canOpenWindow', async t => {
     t.equal(await global.Scratch.canOpenWindow('javascript:alert(1)'), false);
     t.equal(await global.Scratch.canOpenWindow('https://example.com/'), false);
     t.equal(await global.Scratch.canOpenWindow('index.html'), false);
+    t.equal(await global.Scratch.canOpenWindow(null), false);
 
     vm.securityManager.canOpenWindow = () => true;
     t.equal(await global.Scratch.canOpenWindow('data:text/html,test'), true);
@@ -148,6 +153,7 @@ test('canOpenWindow', async t => {
     t.equal(await global.Scratch.canOpenWindow('javascript:alert(1)'), true);
     t.equal(await global.Scratch.canOpenWindow('https://example.com/'), true);
     t.equal(await global.Scratch.canOpenWindow('index.html'), true);
+    t.equal(await global.Scratch.canOpenWindow(null), true);
 
     const calledWithURLs = [];
     vm.securityManager.canOpenWindow = async url => {
@@ -160,13 +166,15 @@ test('canOpenWindow', async t => {
     t.equal(await global.Scratch.canOpenWindow('javascript:alert(1)'), false);
     t.equal(await global.Scratch.canOpenWindow('https://example.com/'), false);
     t.equal(await global.Scratch.canOpenWindow('index.html'), false);
+    t.equal(await global.Scratch.canOpenWindow(null), false);
     t.same(calledWithURLs, [
         'data:text/html,test',
         'blob:https://example.com/8c071bf8-c0b6-4a48-81d7-6413c2adf3dd',
         'file:///etc/hosts',
         'javascript:alert(1)',
         'https://example.com/',
-        'https://example.com/index.html'
+        'https://example.com/index.html',
+        'https://example.com/null'
     ]);
 
     t.end();
@@ -189,6 +197,7 @@ test('canRedirect', async t => {
     t.equal(await global.Scratch.canRedirect('file:///etc/hosts'), false);
     t.equal(await global.Scratch.canRedirect('https://example.com/'), false);
     t.equal(await global.Scratch.canRedirect('index.html'), false);
+    t.equal(await global.Scratch.canRedirect(null), false);
 
     vm.securityManager.canRedirect = () => Promise.resolve(false);
     t.equal(await global.Scratch.canRedirect('data:text/html,test'), false);
@@ -196,6 +205,7 @@ test('canRedirect', async t => {
     t.equal(await global.Scratch.canRedirect('file:///etc/hosts'), false);
     t.equal(await global.Scratch.canRedirect('https://example.com/'), false);
     t.equal(await global.Scratch.canRedirect('index.html'), false);
+    t.equal(await global.Scratch.canRedirect(null), false);
 
     vm.securityManager.canRedirect = () => true;
     t.equal(await global.Scratch.canRedirect('data:text/html,test'), true);
@@ -203,6 +213,7 @@ test('canRedirect', async t => {
     t.equal(await global.Scratch.canRedirect('file:///etc/hosts'), true);
     t.equal(await global.Scratch.canRedirect('https://example.com/'), true);
     t.equal(await global.Scratch.canRedirect('index.html'), true);
+    t.equal(await global.Scratch.canRedirect(null), true);
 
     const calledWithURLs = [];
     vm.securityManager.canRedirect = async url => {
@@ -214,12 +225,14 @@ test('canRedirect', async t => {
     t.equal(await global.Scratch.canRedirect('file:///etc/hosts'), true);
     t.equal(await global.Scratch.canRedirect('https://example.com/'), false);
     t.equal(await global.Scratch.canRedirect('index.html'), false);
+    t.equal(await global.Scratch.canRedirect(null), false);
     t.same(calledWithURLs, [
         'data:text/html,test',
         'blob:https://example.com/8c071bf8-c0b6-4a48-81d7-6413c2adf3dd',
         'file:///etc/hosts',
         'https://example.com/',
-        'https://example.com/index.html'
+        'https://example.com/index.html',
+        'https://example.com/null'
     ]);
 
     t.end();

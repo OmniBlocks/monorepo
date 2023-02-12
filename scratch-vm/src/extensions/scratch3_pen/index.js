@@ -6,7 +6,6 @@ const Clone = require('../../util/clone');
 const Color = require('../../util/color');
 const formatMessage = require('format-message');
 const MathUtil = require('../../util/math-util');
-const RenderedTarget = require('../../sprites/rendered-target');
 const log = require('../../util/log');
 const StageLayering = require('../../engine/stage-layering');
 

@@ -1,6 +1,7 @@
 const fs = require('fs');
 const VirtualMachine = require('../index');
 
+/* eslint-env node */
 /* eslint-disable no-console */
 
 const file = process.argv[2];

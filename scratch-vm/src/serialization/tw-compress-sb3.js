@@ -30,17 +30,15 @@ class Pool {
         entries.sort((a, b) => b[1] - a[1]);
 
         let i = 0;
-        let newId;
         for (const entry of entries) {
             const oldId = entry[0];
-            while (true) {
+
+            let newId = generateId(i);
+            while (this.skippedIds.has(newId)) {
+                i++;
                 newId = generateId(i);
-                if (this.skippedIds.has(newId)) {
-                    i++;
-                } else {
-                    break;
-                }
             }
+
             this.generatedIds.set(oldId, newId);
             i++;
         }

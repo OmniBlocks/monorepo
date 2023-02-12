@@ -273,4 +273,3 @@ test('Clock is reset on runtime dispose', t => {
     t.ok(c.projectTimer() === 0);
     t.end();
 });
-

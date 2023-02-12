@@ -32,3 +32,27 @@ test('Cast', t => {
     t.equal(ScratchCommon.Cast.toListIndex('1.5', 10, false), 1);
     t.end();
 });
+
+test('canFetch', async t => {
+    // Default implementation should allow all requuests.
+    const result = ScratchCommon.canFetch('https://example.com/');
+    t.type(result, Promise);
+    t.equal(await result, true);
+    t.end();
+});
+
+test('canOpenWindow', async t => {
+    // Default implementation should allow all.
+    const result = ScratchCommon.canOpenWindow('https://example.com/');
+    t.type(result, Promise);
+    t.equal(await result, true);
+    t.end();
+});
+
+test('canRedirect', async t => {
+    // Default implementation should allow all.
+    const result = ScratchCommon.canRedirect('https://example.com/');
+    t.type(result, Promise);
+    t.equal(await result, true);
+    t.end();
+});

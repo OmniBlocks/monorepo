@@ -1,5 +1,6 @@
 const tap = require('tap');
 const UnsandboxedExtensionRunner = require('../../src/extension-support/tw-unsandboxed-extension-runner');
+const VirtualMachine = require('../../src/virtual-machine');
 
 // Mock enough of the document API for the extension runner to think it works.
 // To more accurately test this, we want to make sure that the URLs we pass in are just strings.
@@ -161,5 +162,44 @@ test('ScratchX', async t => {
     const extensions = await UnsandboxedExtensionRunner.load('https://turbowarp.org/scratchx.js', vm);
     t.equal(extensions.length, 1);
     t.equal(extensions[0].test(), 2);
+    t.end();
+});
+
+test('canFetch', async t => {
+    // tested thoroughly in tw_security_manager.js
+    const vm = new VirtualMachine();
+    UnsandboxedExtensionRunner.setupUnsandboxedExtensionAPI(vm);
+    global.location = {
+        href: 'https://turbowarp.org'
+    };
+    vm.securityManager.canFetch = () => false;
+    const result = global.Scratch.canFetch('https://example.com');
+    t.type(result, Promise);
+    t.end();
+});
+
+test('canOpenWindow', async t => {
+    // tested thoroughly in tw_security_manager.js
+    const vm = new VirtualMachine();
+    UnsandboxedExtensionRunner.setupUnsandboxedExtensionAPI(vm);
+    global.location = {
+        href: 'https://turbowarp.org'
+    };
+    vm.securityManager.canOpenWindow = () => false;
+    const result = global.Scratch.canOpenWindow('https://example.com');
+    t.type(result, Promise);
+    t.end();
+});
+
+test('canRedirect', async t => {
+    // tested thoroughly in tw_security_manager.js
+    const vm = new VirtualMachine();
+    UnsandboxedExtensionRunner.setupUnsandboxedExtensionAPI(vm);
+    global.location = {
+        href: 'https://turbowarp.org'
+    };
+    vm.securityManager.canRedirect = () => false;
+    const result = global.Scratch.canRedirect('https://example.com');
+    t.type(result, Promise);
     t.end();
 });

@@ -3,81 +3,83 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import Box from '../box/box.jsx';
 import Modal from '../../containers/modal.jsx';
+import SecurityModals from '../../lib/tw-security-manager-constants';
+import LoadExtensionModal from './load-extension.jsx';
+import FetchModal from './fetch.jsx';
+import OpenWindowModal from './open-window.jsx';
+import RedirectModal from './redirect.jsx';
 
 import styles from './security-manager-modal.css';
 
 const messages = defineMessages({
     title: {
-        defaultMessage: 'Custom Extensions',
-        description: 'Title of modal shown when asking for permission to automatically load custom extension',
+        defaultMessage: 'Extension Security',
+        // eslint-disable-next-line max-len
+        description: 'Title of modal thats asks the user for permission to let the project load an extension, fetch a resource, open a window, etc.',
         id: 'tw.securityManager.title'
     }
 });
 
-const SecurityManagerModalComponent = props => (
-    <Modal
-        className={styles.modalContent}
-        onRequestClose={props.onDenied}
-        contentLabel={props.intl.formatMessage(messages.title)}
-        id="securitymanagermodal"
-    >
-        <Box className={styles.body}>
-            <p>
-                <FormattedMessage
-                    defaultMessage="The project wants to load the custom extension:"
-                    description="Part of modal shown when asking for permission to automatically load custom extension"
-                    id="tw.securityManager.label"
-                />
-            </p>
-            <p className={styles.extension}>
-                {props.extensionURL}
-            </p>
-            <p>
-                <FormattedMessage
-                    // eslint-disable-next-line max-len
-                    defaultMessage="If you allow this, the extension's code will be downloaded and run on your computer."
-                    description="Part of modal shown when asking for permission to automatically load custom extension"
-                    id="tw.securityManager.download"
-                />
-            </p>
-            <p>
-                <FormattedMessage
-                    // eslint-disable-next-line max-len
-                    defaultMessage="While the code will be sandboxed, we can't guarantee this will be 100% safe. Make sure you trust the author of this extension before continuing."
-                    description="Part of modal shown when asking for permission to automatically load custom extension"
-                    id="tw.securityManager.sandbox"
-                />
-                
-            </p>
-            <Box className={styles.buttons}>
-                <button
-                    className={styles.denyButton}
-                    onClick={props.onDenied}
-                >
-                    <FormattedMessage
-                        defaultMessage="Deny"
-                        description="Refuse modal asking for permission to automatically load custom extension"
-                        id="tw.securityManager.deny"
+const SecurityManagerModalComponent = props => {
+    const MAX_LENGTH = 100;
+    const trimmedURL = props.url.length > MAX_LENGTH ? `${props.url.substring(0, MAX_LENGTH)}...` : props.url;
+    return (
+        <Modal
+            className={styles.modalContent}
+            onRequestClose={props.onDenied}
+            contentLabel={props.intl.formatMessage(messages.title)}
+            id="securitymanagermodal"
+        >
+            <Box className={styles.body}>
+                {props.type === SecurityModals.LoadExtension ? (
+                    <LoadExtensionModal
+                        url={trimmedURL}
                     />
-                </button>
-                <button
-                    className={styles.allowButton}
-                    onClick={props.onAllowed}
-                >
-                    <FormattedMessage
-                        defaultMessage="Allow"
-                        description="Refuse modal asking for permission to automatically load custom extension"
-                        id="tw.securityManager.allow"
+                ) : props.type === SecurityModals.Fetch ? (
+                    <FetchModal
+                        url={trimmedURL}
                     />
-                </button>
+                ) : props.type === SecurityModals.OpenWindow ? (
+                    <OpenWindowModal
+                        url={trimmedURL}
+                    />
+                ) : props.type === SecurityModals.Redirect ? (
+                    <RedirectModal
+                        url={trimmedURL}
+                    />
+                ) : '?'}
+
+                <Box className={styles.buttons}>
+                    <button
+                        className={styles.denyButton}
+                        onClick={props.onDenied}
+                    >
+                        <FormattedMessage
+                            defaultMessage="Deny"
+                            description="Refuse modal asking for permission to automatically load custom extension"
+                            id="tw.securityManager.deny"
+                        />
+                    </button>
+                    <button
+                        className={styles.allowButton}
+                        onClick={props.onAllowed}
+                    >
+                        <FormattedMessage
+                            defaultMessage="Allow"
+                            description="Refuse modal asking for permission to automatically load custom extension"
+                            id="tw.securityManager.allow"
+                        />
+                    </button>
+                </Box>
             </Box>
-        </Box>
-    </Modal>
-);
+        </Modal>
+    );
+};
 
 SecurityManagerModalComponent.propTypes = {
     intl: intlShape,
-    extensionURL: PropTypes.string.isRequired,
+    type: PropTypes.oneOf(Object.values(SecurityModals)),
+    url: PropTypes.string.isRequired,
     onAllowed: PropTypes.func.isRequired,
     onDenied: PropTypes.func.isRequired
 };

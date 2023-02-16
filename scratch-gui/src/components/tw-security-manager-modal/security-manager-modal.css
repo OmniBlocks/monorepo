@@ -17,9 +17,16 @@
     margin: 8px 0;
 }
 
-.extension {
+.url {
     font-family: monospace;
     user-select: text;
+    word-wrap: break-word;
+}
+.url::before {
+    content: '"';
+}
+.url::after {
+    content: '"';
 }
 
 .buttons {
@@ -38,7 +45,9 @@
 }
 .deny-button {
     background-color: rgb(255, 92, 92);
+    color: white;
 }
 .allow-button {
     background-color: #24cd11;
+    color: black;
 }

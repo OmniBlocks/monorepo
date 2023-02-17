@@ -1,6 +1,7 @@
 const {test} = require('tap');
 const compress = require('../../src/serialization/tw-compress-sb3');
 const nodeCrypto = require('crypto');
+const uid = require('../../src/util/uid');
 
 test('handles type INPUT_DIFF_BLOCK_SHADOW (3) compressed inputs', t => {
     const data = {
@@ -224,7 +225,100 @@ test('ID uniqueness is preserved', t => {
     const sha256 = nodeCrypto.createHash('sha256')
         .update(stringified)
         .digest('hex');
-    t.equal(sha256, '41ccf6163fed035fd3224f355c37365f4c4b96d8968eaca5dc8362982f981b82');
+    t.equal(sha256, 'dabc5a37816950afd37b843c056e2fd7cd8979a76eaf5d2225c6863c7a4d3698');
+
+    t.end();
+});
+
+test('Script execution order is preserved', t => {
+    const originalBlocks = {};
+
+    const blockIds = [];
+    for (let i = 0; i < 1000; i++) {
+        if (i === 339) {
+            blockIds.push('muffin');
+        } else if (i === 555) {
+            blockIds.push('555');
+        }
+        blockIds.push(uid());
+    }
+    blockIds.push('apple');
+    blockIds.push('-1');
+    blockIds.push('45');
+
+    for (const blockId of blockIds) {
+        originalBlocks[blockId] = {
+            opcode: 'event_whenbroadcastreceived',
+            next: null,
+            parent: null,
+            inputs: {},
+            fields: {
+                BROADCAST_OPTION: [
+                    `broadcast-name-${blockId}`,
+                    `broadcast-id-${blockId}`
+                ]
+            },
+            shadow: false,
+            topLevel: true,
+            x: -10,
+            y: 420
+        };
+    }
+
+    const data = {
+        targets: [
+            {
+                isStage: true,
+                name: 'Stage',
+                variables: {},
+                lists: {},
+                broadcasts: {},
+                blocks: originalBlocks,
+                comments: {},
+                currentCostume: 0,
+                costumes: [],
+                sounds: [],
+                volume: 100,
+                layerOrder: 0,
+                tempo: 60,
+                videoTransparency: 50,
+                videoState: 'on',
+                textToSpeechLanguage: null
+            }
+        ],
+        monitors: [],
+        extensions: [],
+        meta: {
+            semver: '3.0.0',
+            vm: '0.2.0',
+            agent: ''
+        }
+    };
+    compress(data);
+
+    // Sanity check: Make sure the new object is actually different
+    const newBlocks = data.targets[0].blocks;
+    t.not(originalBlocks, newBlocks);
+    t.notSame(Object.keys(originalBlocks), Object.keys(newBlocks));
+
+    // Check that the order has not changed
+    const newBlockValues = Object.values(newBlocks);
+    t.same(Object.values(originalBlocks), newBlockValues);
+    t.equal(newBlockValues[0].fields.BROADCAST_OPTION[0], 'broadcast-name-45');
+    t.equal(newBlockValues[1].fields.BROADCAST_OPTION[0], 'broadcast-name-555');
+    t.equal(newBlockValues[339 + 2].fields.BROADCAST_OPTION[0], 'broadcast-name-muffin');
+    t.equal(newBlockValues[newBlockValues.length - 2].fields.BROADCAST_OPTION[0], 'broadcast-name-apple');
+    t.equal(newBlockValues[newBlockValues.length - 1].fields.BROADCAST_OPTION[0], 'broadcast-name--1');
+
+    // Check that the new IDs do not look like array indexes as their enumeration
+    // order could cause unexpected behavior in other places.
+    for (const newBlockId of Object.keys(newBlocks)) {
+        // The actual definition of an array index is: https://tc39.es/ecma262/#array-index
+        // This approximation is currently good enough
+        if (!Number.isNaN(+newBlockId)) {
+            t.fail(`${newBlockId} might be treated as an array index`);
+        }
+    }
 
     t.end();
 });

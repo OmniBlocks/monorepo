@@ -1,4 +1,7 @@
-const SOUP = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!#%()*+,-./:;=?@[]^_`{|}~';
+// We don't generate new IDs using numbers at this time because their enumeration
+// order can affect script execution order as they always come first.
+// https://tc39.es/ecma262/#sec-ordinaryownpropertykeys
+const SOUP = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!#%()*+,-./:;=?@[]^_`{|}~';
 const generateId = i => {
     let str = '';
     while (i >= 0) {

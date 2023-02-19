@@ -132,22 +132,22 @@ const Footer = () => (
                     <a href="https://docs.turbowarp.org/embedding">
                         <FormattedMessage
                             defaultMessage="Embedding"
-                            description="Menu bar item for embedding link"
+                            description="Link in footer to embedding documentation for embedding link"
                             id="tw.footer.embed"
                         />
                     </a>
                     <a href="https://docs.turbowarp.org/url-parameters">
                         <FormattedMessage
                             defaultMessage="URL Parameters"
-                            description="Menu bar item for URL parameters link"
+                            description="Link in footer to URL parameters documentation"
                             id="tw.footer.parameters"
                         />
                     </a>
-                    <a href="https://docs.turbowarp.org/translate">
+                    <a href="https://docs.turbowarp.org/">
                         <FormattedMessage
-                            defaultMessage="Help Translate TurboWarp"
-                            description="Menu bar item for translating TurboWarp link"
-                            id="tw.footer.translate"
+                            defaultMessage="Documentation"
+                            description="Link in footer to additional documentation"
+                            id="tw.footer.documentation"
                         />
                     </a>
                 </div>

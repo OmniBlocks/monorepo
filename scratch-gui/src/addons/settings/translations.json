@@ -198,14 +198,15 @@
     },
     "ja-hira": {
         "addonFeedback": "アドオンのフィードバック",
-        "confirmResetAll": "アドオンのせっていを削除(さくじょ)し、デフォルトにもどします。よろしいですか？",
+        "confirmResetAll": "アドオンのせっていをさくじょして、もとにもどします。よろしいですか？",
         "credits": "クレジット:",
-        "dirtyButton": "すぐに再読み込み(さいよみこみ)する",
-        "export": "設定(せってい)を保存(ほぞん)する",
+        "dirty": "タブをもういちどよみこんでせっていをてきおうします",
+        "dirtyButton": "すぐにもういちどよみこむ",
+        "export": "せっていをほぞんする",
         "groupDanger": "きけん({number})",
         "groupNew": "しんきのう({number})",
-        "groupOthers": "そのた({number})",
-        "import": "設定(せってい)をよみこむ",
+        "groupOthers": "そのほか({number})",
+        "import": "せっていをよみこむ",
         "noResults": "検索条件(けんさくじょうけん)に一致(いっち)する結果(けっか)はありません。",
         "presets": "プリセット",
         "reset": "リセット",
@@ -217,7 +218,7 @@
         "tagRecommended": "おすすめ",
         "tagTheme": "テーマ",
         "title": "アドオンせってい",
-        "unsupported": "いくつかのアドオンがおつかいのブラウザに対応(たいおう)していません:"
+        "unsupported": "いくつかのアドオンがおつかいのブラウザにたいおうしていません:"
     },
     "ko": {
         "addonFeedback": "애드온 피드백하기",
@@ -475,6 +476,7 @@
         "addonFeedback": "Eklenti geribildirim",
         "confirmResetAll": "Bütün eklenti ayarlarını varsayılan değerlerine sıfırlamak istediğinizden emin misiniz?",
         "credits": "Krediler:",
+        "dirty": "Ayarı uygulamak için sekmeleri yeniden yükleyin.",
         "dirtyButton": "Şimdi yeniden yükle",
         "enableDangerous": "Bu eklenti tehlikelidir ve bilerek özellikleri DEVRE DIŞI BIRAKABİLİR. Çoğu kullanıcı bu eklentiyi ETKİNLEŞTİRMEMELİDİR. Etkinleştirmek istediğinizden emin misiniz?",
         "export": "Dışarıya aktarmak ayarları",

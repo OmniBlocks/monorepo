@@ -44,7 +44,7 @@ const isAlwaysTrustedForFetching = parsed => (
     /^https:\/\/[a-z0-9-]{1,40}\.github\.io$/.test(parsed.origin) ||
 
     // GitLab
-    /^https:\/\/[a-z0-9.-]{1,255}\.gitlab\.io$/.test(parsed.origin)
+    /^https:\/\/[a-z0-9_.-]{1,255}\.gitlab\.io$/.test(parsed.origin)
 );
 
 /**

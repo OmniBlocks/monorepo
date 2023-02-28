@@ -31,14 +31,20 @@ const fetchOriginsTrustedByUser = new Set();
  */
 const isAlwaysTrustedForFetching = parsed => (
     // Note that the regexes here don't need to be perfect. It's okay if we let extensions try to fetch
-    // resources from GitHub Pages domains that are invalid usernames. They'll just get an error.
+    // resources from eg. GitHub Pages domains that aren't actually valid usernames. They'll just get
+    // a network error.
+    // URL parsing will always convert the parsed origin to lowercase, so we don't need case
+    // insensitivity here.
 
     // If we would trust loading an extension from here, we can trust loading resources too.
     isTrustedExtension(parsed.href) ||
 
     // GitHub
     parsed.origin === 'https://raw.githubusercontent.com' ||
-    /^https:\/\/[a-z0-9-]{1,40}\.github\.io$/.test(parsed.origin)
+    /^https:\/\/[a-z0-9-]{1,40}\.github\.io$/.test(parsed.origin) ||
+
+    // GitLab
+    /^https:\/\/[a-z0-9.-]{1,255}\.gitlab\.io$/.test(parsed.origin)
 );
 
 /**

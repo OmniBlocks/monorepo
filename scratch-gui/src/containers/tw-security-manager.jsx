@@ -39,12 +39,28 @@ const isAlwaysTrustedForFetching = parsed => (
     // If we would trust loading an extension from here, we can trust loading resources too.
     isTrustedExtension(parsed.href) ||
 
+    // Any TurboWarp service such as trampoline
+    parsed.origin === 'https://turbowarp.org' ||
+    /\.turbowarp\.org$/.test(parsed.origin) ||
+    /\.turbowarp\.xyz$/.test(parsed.origin) ||
+
     // GitHub
     parsed.origin === 'https://raw.githubusercontent.com' ||
-    /^https:\/\/[a-z0-9-]{1,40}\.github\.io$/.test(parsed.origin) ||
+    parsed.origin === 'https://api.github.com' ||
+    /\.github\.io$/.test(parsed.origin) ||
 
     // GitLab
-    /^https:\/\/[a-z0-9_.-]{1,255}\.gitlab\.io$/.test(parsed.origin)
+    parsed.origin === 'https://gitlab.com' ||
+    /\.gitlab\.io$/.test(parsed.origin) ||
+
+    // Itch
+    /\.itch\.io$/ ||
+
+    // GameJolt
+    parsed.origin === 'https://api.gamejolt.com' ||
+
+    // httpbin
+    parsed.origin === 'https://httpbin.org'
 );
 
 /**

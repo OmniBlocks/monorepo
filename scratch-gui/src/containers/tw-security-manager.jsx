@@ -41,20 +41,23 @@ const isAlwaysTrustedForFetching = parsed => (
 
     // Any TurboWarp service such as trampoline
     parsed.origin === 'https://turbowarp.org' ||
-    /\.turbowarp\.org$/.test(parsed.origin) ||
-    /\.turbowarp\.xyz$/.test(parsed.origin) ||
+    parsed.origin.endsWith('.turbowarp.org') ||
+    parsed.origin.endsWith('.turbowarp.xyz') ||
 
     // GitHub
     parsed.origin === 'https://raw.githubusercontent.com' ||
     parsed.origin === 'https://api.github.com' ||
-    /\.github\.io$/.test(parsed.origin) ||
+    parsed.origin.endsWith('.github.io') ||
 
     // GitLab
     parsed.origin === 'https://gitlab.com' ||
-    /\.gitlab\.io$/.test(parsed.origin) ||
+    parsed.origin.endsWith('.gitlab.io') ||
+
+    // BitBucket
+    parsed.origin.endsWith('.bitbucket.io') ||
 
     // Itch
-    /\.itch\.io$/ ||
+    parsed.origin.endsWith('.itch.io') ||
 
     // GameJolt
     parsed.origin === 'https://api.gamejolt.com' ||

@@ -942,7 +942,7 @@ class Runtime extends EventEmitter {
      * @private
      */
     _makeExtensionMenuId (menuName, extensionId) {
-        return `${extensionId}_menu_${xmlEscape(menuName)}`;
+        return `${extensionId}_menu_${menuName}`;
     }
 
     /**
@@ -1370,7 +1370,7 @@ class Runtime extends EventEmitter {
 
         const mutation = blockInfo.isDynamic ? `<mutation blockInfo="${xmlEscape(JSON.stringify(blockInfo))}"/>` : '';
         const inputs = context.inputList.join('');
-        const blockXML = `<block type="${extendedOpcode}">${mutation}${inputs}</block>`;
+        const blockXML = `<block type="${xmlEscape(extendedOpcode)}">${mutation}${inputs}</block>`;
 
         return {
             info: context.blockInfo,
@@ -1412,7 +1412,7 @@ class Runtime extends EventEmitter {
         const buttonText = maybeFormatMessage(buttonInfo.text, extensionMessageContext);
         return {
             info: buttonInfo,
-            xml: `<button text="${buttonText}" callbackKey="${buttonInfo.func}"></button>`
+            xml: `<button text="${xmlEscape(buttonText)}" callbackKey="${xmlEscape(buttonInfo.func)}"></button>`
         };
     }
 
@@ -1449,9 +1449,6 @@ class Runtime extends EventEmitter {
      * @private
      */
     _convertPlaceholders (context, match, placeholder) {
-        // Sanitize the placeholder to ensure valid XML
-        placeholder = placeholder.replace(/[<"&]/, '_');
-
         // Determine whether the argument type is one of the known standard field types
         const argInfo = context.blockInfo.arguments[placeholder] || {};
         let argTypeInfo = ArgumentTypeMap[argInfo.type] || {};
@@ -1513,19 +1510,19 @@ class Runtime extends EventEmitter {
 
             // <value> is the ScratchBlocks name for a block input.
             if (valueName) {
-                context.inputList.push(`<value name="${placeholder}">`);
+                context.inputList.push(`<value name="${xmlEscape(placeholder)}">`);
             }
 
             // The <shadow> is a placeholder for a reporter and is visible when there's no reporter in this input.
             // Boolean inputs don't need to specify a shadow in the XML.
             if (shadowType) {
-                context.inputList.push(`<shadow type="${shadowType}">`);
+                context.inputList.push(`<shadow type="${xmlEscape(shadowType)}">`);
             }
 
             // A <field> displays a dynamic value: a user-editable text field, a drop-down menu, etc.
             // Leave out the field if defaultValue or fieldName are not specified
             if (defaultValue && fieldName) {
-                context.inputList.push(`<field name="${fieldName}">${defaultValue}</field>`);
+                context.inputList.push(`<field name="${xmlEscape(fieldName)}">${defaultValue}</field>`);
             }
 
             if (shadowType) {
@@ -1570,7 +1567,7 @@ class Runtime extends EventEmitter {
                 return blockFilterIncludesTarget && !block.info.hideFromPalette;
             });
 
-            const colorXML = `colour="${color1}" secondaryColour="${color2}"`;
+            const colorXML = `colour="${xmlEscape(color1)}" secondaryColour="${xmlEscape(color2)}"`;
 
             // Use a menu icon if there is one. Otherwise, use the block icon. If there's no icon,
             // the category menu will show its default colored circle.
@@ -1581,17 +1578,24 @@ class Runtime extends EventEmitter {
                 menuIconURI = categoryInfo.blockIconURI;
             }
             const menuIconXML = menuIconURI ?
-                `iconURI="${menuIconURI}"` : '';
+                `iconURI="${xmlEscape(menuIconURI)}"` : '';
 
             let statusButtonXML = '';
             if (categoryInfo.showStatusButton) {
                 statusButtonXML = 'showStatusButton="true"';
             }
 
+            let xml = `<category name="${xmlEscape(name)}"`;
+            xml += ` id="${xmlEscape(categoryInfo.id)}"`;
+            xml += ` ${statusButtonXML}`;
+            xml += ` ${colorXML}`;
+            xml += ` ${menuIconXML}>`;
+            xml += paletteBlocks.map(block => block.xml).join('');
+            xml += '</category>';
+
             return {
                 id: categoryInfo.id,
-                xml: `<category name="${name}" id="${categoryInfo.id}" ${statusButtonXML} ${colorXML} ${menuIconXML}>${
-                    paletteBlocks.map(block => block.xml).join('')}</category>`
+                xml
             };
         });
     }

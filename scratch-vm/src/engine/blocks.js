@@ -1177,8 +1177,8 @@ class Blocks {
         const tagName = (block.shadow) ? 'shadow' : 'block';
         let xmlString =
             `<${tagName}
-                id="${block.id}"
-                type="${block.opcode}"
+                id="${xmlEscape(block.id)}"
+                type="${xmlEscape(block.opcode)}"
                 ${block.topLevel ? `x="${block.x}" y="${block.y}"` : ''}
             >`;
         const commentId = block.comment;
@@ -1203,7 +1203,7 @@ class Blocks {
             const blockInput = block.inputs[input];
             // Only encode a value tag if the value input is occupied.
             if (blockInput.block || blockInput.shadow) {
-                xmlString += `<value name="${blockInput.name}">`;
+                xmlString += `<value name="${xmlEscape(blockInput.name)}">`;
                 if (blockInput.block) {
                     xmlString += this.blockToXML(blockInput.block, comments);
                 }
@@ -1218,14 +1218,14 @@ class Blocks {
         for (const field in block.fields) {
             if (!block.fields.hasOwnProperty(field)) continue;
             const blockField = block.fields[field];
-            xmlString += `<field name="${blockField.name}"`;
+            xmlString += `<field name="${xmlEscape(blockField.name)}"`;
             const fieldId = blockField.id;
             if (fieldId) {
-                xmlString += ` id="${fieldId}"`;
+                xmlString += ` id="${xmlEscape(fieldId)}"`;
             }
             const varType = blockField.variableType;
             if (typeof varType === 'string') {
-                xmlString += ` variabletype="${varType}"`;
+                xmlString += ` variabletype="${xmlEscape(varType)}"`;
             }
             let value = blockField.value;
             if (typeof value === 'string') {

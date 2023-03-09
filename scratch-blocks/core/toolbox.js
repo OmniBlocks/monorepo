@@ -40,6 +40,7 @@ goog.require('goog.math.Rect');
 goog.require('goog.style');
 goog.require('goog.ui.tree.TreeControl');
 goog.require('goog.ui.tree.TreeNode');
+goog.require('goog.string');
 
 
 /**
@@ -198,10 +199,10 @@ Blockly.Toolbox.prototype.showAll_ = function() {
     var category = this.categoryMenu_.categories_[i];
 
     // create a label node to go at the top of the category
-    var labelString = '<xml><label text="' + category.name_ + '"' +
-      ' id="' + category.id_ + '"' +
+    var labelString = '<xml><label text="' + goog.string.htmlEscape(category.name_) + '"' +
+      ' id="' + goog.string.htmlEscape(category.id_) + '"' +
       ' category-label="true"' +
-      ' showStatusButton="' + category.showStatusButton_ + '"' +
+      ' showStatusButton="' + goog.string.htmlEscape(category.showStatusButton_) + '"' +
       ' web-class="categoryLabel">' +
       '</label></xml>';
     var labelXML = Blockly.Xml.textToDom(labelString);

@@ -54,6 +54,7 @@ import galleryIcon from './gallery/gallery.svg';
 import stretchIcon from './gallery/stretch.svg';
 import gamepadIcon from './gallery/gamepad.svg';
 import cursorIcon from './gallery/cursor.svg';
+import fileIcon from './gallery/file.svg';
 
 export default [
     {
@@ -386,6 +387,16 @@ export default [
         extensionURL: 'https://extensions.turbowarp.org/cursor.js',
         iconURL: cursorIcon,
         description: 'Use custom cursors or hide the cursor. Also allows replacing the cursor with any costume image.',
+        tags: ['tw'],
+        incompatibleWithScratch: true,
+        featured: true
+    },
+    {
+        name: 'Files',
+        extensionId: 'files',
+        extensionURL: 'https://extensions.turbowarp.org/files.js',
+        iconURL: fileIcon,
+        description: 'Read and download files.',
         tags: ['tw'],
         incompatibleWithScratch: true,
         featured: true

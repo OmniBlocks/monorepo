@@ -345,6 +345,29 @@ export default [
     {
         name: (
             <FormattedMessage
+                defaultMessage="TurboWarp Extension Gallery"
+                description="Name of extensions.turbowarp.org in extension library"
+                id="tw.extensionGallery.name"
+            />
+        ),
+        href: 'https://extensions.turbowarp.org/',
+        extensionId: '',
+        iconURL: galleryIcon,
+        description: (
+            <FormattedMessage
+                // eslint-disable-next-line max-len
+                defaultMessage="We list many extensions here for convenience. You can find even more on extensions.turbowarp.org."
+                description="Description of extensions.turbowarp.org in extension library"
+                id="tw.extensionGallery.description"
+            />
+        ),
+        tags: ['tw'],
+        incompatibleWithScratch: true,
+        featured: true
+    },
+    {
+        name: (
+            <FormattedMessage
                 defaultMessage="TurboWarp Blocks"
                 description="Name of TW extension"
                 id="tw.twExtension.name"
@@ -431,28 +454,6 @@ export default [
         extensionURL: 'https://extensions.turbowarp.org/utilities.js',
         iconURL: utilitiesIcon,
         description: 'A bunch of interesting blocks. Originally created by Sheep_maker.',
-        tags: ['tw'],
-        incompatibleWithScratch: true,
-        featured: true
-    },
-    {
-        name: (
-            <FormattedMessage
-                defaultMessage="TurboWarp Extension Gallery"
-                description="Name of extensions.turbowarp.org in extension library"
-                id="tw.extensionGallery.name"
-            />
-        ),
-        href: 'https://extensions.turbowarp.org/',
-        extensionId: '',
-        iconURL: galleryIcon,
-        description: (
-            <FormattedMessage
-                defaultMessage="extensions.turbowarp.org is the place to find powerful and safe custom extensions."
-                description="Description of extensions.turbowarp.org in extension library"
-                id="tw.extensionGallery.description"
-            />
-        ),
         tags: ['tw'],
         incompatibleWithScratch: true,
         featured: true

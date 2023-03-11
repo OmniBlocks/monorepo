@@ -46,11 +46,11 @@ class ExtensionLibrary extends React.PureComponent {
         ]);
     }
     handleItemSelect (item) {
+        const id = item.extensionId;
         // eslint-disable-next-line no-alert
-        if (item.incompatibleWithScratch && !confirm(this.props.intl.formatMessage(messages.incompatible))) {
+        if (item.incompatibleWithScratch && id && !confirm(this.props.intl.formatMessage(messages.incompatible))) {
             return;
         }
-        const id = item.extensionId;
         let url = item.extensionURL ? item.extensionURL : id;
         const isCustomURL = !item.disabled && !id;
         if (isCustomURL) {

@@ -1,7 +1,8 @@
 @import "../../css/colors.css";
 
 .modal-content {
-    width: 400px;
+    width: 440px;
+    margin-top: 25px;
 }
 
 .body {
@@ -31,9 +32,12 @@
 
 .buttons {
     display: flex;
-    justify-content: flex-end;
+}
+.buttons :disabled {
+    opacity: 0.8;
 }
 .deny-button, .allow-button {
+    flex-grow: 1;
     font: inherit;
     color: inherit;
     padding: 0.75rem 1rem;
@@ -41,11 +45,11 @@
     border: 1px solid $ui-black-transparent;
     font-weight: 600;
     font-size: 0.85rem;
-    margin: 0 0 0 8px;
 }
 .deny-button {
     background-color: rgb(255, 92, 92);
     color: white;
+    margin-right: 8px;
 }
 .allow-button {
     background-color: #24cd11;

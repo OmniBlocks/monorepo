@@ -8,6 +8,7 @@ import LoadExtensionModal from './load-extension.jsx';
 import FetchModal from './fetch.jsx';
 import OpenWindowModal from './open-window.jsx';
 import RedirectModal from './redirect.jsx';
+import DelayedMountPropertyHOC from './delayed-mount-property-hoc.jsx';
 
 import styles from './security-manager-modal.css';
 
@@ -20,13 +21,15 @@ const messages = defineMessages({
     }
 });
 
+const noop = () => {};
+
 const SecurityManagerModalComponent = props => {
     const MAX_LENGTH = 100;
     const trimmedURL = props.url.length > MAX_LENGTH ? `${props.url.substring(0, MAX_LENGTH)}...` : props.url;
     return (
         <Modal
             className={styles.modalContent}
-            onRequestClose={props.onDenied}
+            onRequestClose={props.enableButtons ? props.onDenied : noop}
             contentLabel={props.intl.formatMessage(messages.title)}
             id="securitymanagermodal"
         >
@@ -53,6 +56,7 @@ const SecurityManagerModalComponent = props => {
                     <button
                         className={styles.denyButton}
                         onClick={props.onDenied}
+                        disabled={!props.enableButtons}
                     >
                         <FormattedMessage
                             defaultMessage="Deny"
@@ -63,6 +67,7 @@ const SecurityManagerModalComponent = props => {
                     <button
                         className={styles.allowButton}
                         onClick={props.onAllowed}
+                        disabled={!props.enableButtons}
                     >
                         <FormattedMessage
                             defaultMessage="Allow"
@@ -79,9 +84,12 @@ const SecurityManagerModalComponent = props => {
 SecurityManagerModalComponent.propTypes = {
     intl: intlShape,
     type: PropTypes.oneOf(Object.values(SecurityModals)),
+    enableButtons: PropTypes.bool,
     url: PropTypes.string.isRequired,
     onAllowed: PropTypes.func.isRequired,
     onDenied: PropTypes.func.isRequired
 };
 
-export default injectIntl(SecurityManagerModalComponent);
+export default DelayedMountPropertyHOC(injectIntl(SecurityManagerModalComponent), 750, {
+    enableButtons: true
+});

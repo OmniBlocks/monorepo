@@ -27,3 +27,6 @@ Created by @True-Fantom in https://github.com/TurboWarp/extensions/issues/204. F
 
 ## pointerlock.svg
 Created by @David-Orangemoon in https://github.com/TurboWarp/extensions/issues/90#issuecomment-1367723798. The font is Noto Sans.
+
+## runtime-options.svg
+The image is based on TurboWarp's advanced settings menu. Idea from https://github.com/TurboWarp/extensions/issues/90#issuecomment-1366314834. Font is Noto Sans. The check icon is from https://akaricons.com/ licensed under [MIT](https://raw.githubusercontent.com/artcoholic/akar-icons/master/LICENSE).

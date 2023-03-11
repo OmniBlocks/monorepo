@@ -56,6 +56,7 @@ import gamepadIcon from './gallery/gamepad.svg';
 import cursorIcon from './gallery/cursor.svg';
 import fileIcon from './gallery/file.svg';
 import pointerlockIcon from './gallery/pointerlock.svg';
+import runtimeOptionsIcon from './gallery/runtime-options.svg';
 
 export default [
     {
@@ -409,6 +410,16 @@ export default [
         iconURL: pointerlockIcon,
         // eslint-disable-next-line max-len
         description: 'Adds blocks for mouse locking. Mouse x & y blocks will report the change since the previous frame while the pointer is locked.',
+        tags: ['tw'],
+        incompatibleWithScratch: true,
+        featured: true
+    },
+    {
+        name: 'Runtime Options',
+        extensionId: 'runtimeoptions',
+        extensionURL: 'https://extensions.turbowarp.org/runtime-options.js',
+        iconURL: runtimeOptionsIcon,
+        description: 'Get and modify turbo mode, framerate, interpolation, clone limit, stage size, and more.',
         tags: ['tw'],
         incompatibleWithScratch: true,
         featured: true

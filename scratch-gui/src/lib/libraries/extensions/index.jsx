@@ -409,6 +409,7 @@ export default [
             />
         ),
         tags: ['tw'],
+        incompatibleWithScratch: true,
         featured: true
     },
     {
@@ -429,6 +430,7 @@ export default [
             />
         ),
         tags: ['tw'],
+        incompatibleWithScratch: true,
         featured: true
     }
 ];

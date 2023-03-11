@@ -107,7 +107,7 @@ class LibraryItemComponent extends React.PureComponent {
                     <div className={styles.incompatibleWithScratch}>
                         <FormattedMessage
                             // eslint-disable-next-line max-len
-                            defaultMessage="This extension is incompatible with Scratch."
+                            defaultMessage="Not compatible with Scratch."
                             description="Warning that appears on extensions that won't work in Scratch."
                             id="tw.extensions.incompatible"
                         />

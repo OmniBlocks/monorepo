@@ -30,3 +30,6 @@ Created by @David-Orangemoon in https://github.com/TurboWarp/extensions/issues/9
 
 ## runtime-options.svg
 The image is based on TurboWarp's advanced settings menu. Idea from https://github.com/TurboWarp/extensions/issues/90#issuecomment-1366314834. Font is Noto Sans. The check icon is from https://akaricons.com/ licensed under [MIT](https://raw.githubusercontent.com/artcoholic/akar-icons/master/LICENSE).
+
+## utilities.svg
+Created by @David-Orangemoon in https://github.com/TurboWarp/extensions/issues/90#issuecomment-1367709835. The font is Deja Vu Sans.

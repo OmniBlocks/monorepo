@@ -57,6 +57,7 @@ import cursorIcon from './gallery/cursor.svg';
 import fileIcon from './gallery/file.svg';
 import pointerlockIcon from './gallery/pointerlock.svg';
 import runtimeOptionsIcon from './gallery/runtime-options.svg';
+import utilitiesIcon from './gallery/utilities.svg';
 
 export default [
     {
@@ -420,6 +421,16 @@ export default [
         extensionURL: 'https://extensions.turbowarp.org/runtime-options.js',
         iconURL: runtimeOptionsIcon,
         description: 'Get and modify turbo mode, framerate, interpolation, clone limit, stage size, and more.',
+        tags: ['tw'],
+        incompatibleWithScratch: true,
+        featured: true
+    },
+    {
+        name: 'Utilities',
+        extensionId: 'utilities',
+        extensionURL: 'https://extensions.turbowarp.org/utilities.js',
+        iconURL: utilitiesIcon,
+        description: 'A bunch of interesting blocks. Originally created by Sheep_maker.',
         tags: ['tw'],
         incompatibleWithScratch: true,
         featured: true

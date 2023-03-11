@@ -55,6 +55,7 @@ import stretchIcon from './gallery/stretch.svg';
 import gamepadIcon from './gallery/gamepad.svg';
 import cursorIcon from './gallery/cursor.svg';
 import fileIcon from './gallery/file.svg';
+import pointerlockIcon from './gallery/pointerlock.svg';
 
 export default [
     {
@@ -397,6 +398,17 @@ export default [
         extensionURL: 'https://extensions.turbowarp.org/files.js',
         iconURL: fileIcon,
         description: 'Read and download files.',
+        tags: ['tw'],
+        incompatibleWithScratch: true,
+        featured: true
+    },
+    {
+        name: 'Pointerlock',
+        extensionId: 'pointerlock',
+        extensionURL: 'https://extensions.turbowarp.org/pointerlock.js',
+        iconURL: pointerlockIcon,
+        // eslint-disable-next-line max-len
+        description: 'Adds blocks for mouse locking. Mouse x & y blocks will report the change since the previous frame while the pointer is locked.',
         tags: ['tw'],
         incompatibleWithScratch: true,
         featured: true

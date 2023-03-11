@@ -24,3 +24,6 @@ Most of these images are adapted from: https://github.com/TurboWarp/extensions/t
 
 ## files.svg
 Created by @True-Fantom in https://github.com/TurboWarp/extensions/issues/204. File icons are from https://icon-icons.com/ru/%D0%B7%D0%BD%D0%B0%D1%87%D0%BE%D0%BA/%D1%84%D0%B0%D0%B9%D0%BB-%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%82-PDF/153412 under CC-BY 4.0. Folder icon is based on https://fontawesome.com/icons/folder-open?s=regular&f=classic under CC-BY 4.0. Background is from https://bgjar.com/rect-light under CC-BY 4.0.
+
+## pointerlock.svg
+Created by @David-Orangemoon in https://github.com/TurboWarp/extensions/issues/90#issuecomment-1367723798. The font is Noto Sans.

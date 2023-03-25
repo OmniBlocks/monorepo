@@ -1476,8 +1476,8 @@ class Runtime extends EventEmitter {
             };
 
             const defaultValue =
-                typeof argInfo.defaultValue === 'undefined' ? '' :
-                    xmlEscape(maybeFormatMessage(argInfo.defaultValue, this.makeMessageContextForTarget()).toString());
+                typeof argInfo.defaultValue === 'undefined' ? null :
+                    maybeFormatMessage(argInfo.defaultValue, this.makeMessageContextForTarget()).toString();
 
             if (argTypeInfo.check) {
                 // Right now the only type of 'check' we have specifies that the
@@ -1521,8 +1521,8 @@ class Runtime extends EventEmitter {
 
             // A <field> displays a dynamic value: a user-editable text field, a drop-down menu, etc.
             // Leave out the field if defaultValue or fieldName are not specified
-            if (defaultValue && fieldName) {
-                context.inputList.push(`<field name="${xmlEscape(fieldName)}">${defaultValue}</field>`);
+            if (defaultValue !== null && fieldName) {
+                context.inputList.push(`<field name="${xmlEscape(fieldName)}">${xmlEscape(defaultValue)}</field>`);
             }
 
             if (shadowType) {

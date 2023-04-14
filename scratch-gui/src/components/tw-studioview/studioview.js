@@ -298,7 +298,7 @@ StudioView.prototype.onselect = function (id, el) { };
 StudioView.prototype.onpageload = function () { };
 StudioView.prototype.onend = function () { };
 
-StudioView.STUDIO_API = 'https://trampoline.turbowarp.org/proxy/studios/$id/projects?offset=$offset';
+StudioView.STUDIO_API = 'https://trampoline.turbowarp.org/api/studios/$id/projects?offset=$offset';
 
 // The URL to download thumbnails from.
 // $id is replaced with the project's ID.

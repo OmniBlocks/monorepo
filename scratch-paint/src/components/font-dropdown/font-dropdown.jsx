@@ -156,7 +156,7 @@ const ModeToolsComponent = props => (
         onOpen={props.onOpenDropdown}
         onOuterAction={props.onClickOutsideDropdown}
     >
-        <span className={classNames(props.getFontStyle(props.font), styles.displayedFontName)}>
+        <span className={classNames(props.getFontStyle(props.font), styles.displayedFontName)} style={props.font === "Bits and Bytes" ? { transform: "scale(0.5)", transformOrigin: "left" } : {}}>
             {props.getFontName(props.font)}
         </span>
     </Dropdown>

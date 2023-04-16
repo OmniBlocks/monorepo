@@ -28,6 +28,8 @@ class FontDropdown extends React.Component {
             'handleChangeFontBitsAndBytes',
             'handleChangeFontArcade',
             'handleChangeFontScratch',
+            'handleChangeFontArchivo',
+            'handleChangeFontArchivoBlack',
             'handleChangeFontChinese',
             'handleChangeFontJapanese',
             'handleChangeFontKorean',
@@ -61,6 +63,10 @@ class FontDropdown extends React.Component {
             return styles.technological;
         case Fonts.ARCADE:
             return styles.arcade;
+        case Fonts.ARCHIVO:
+            return styles.archivo;
+        case Fonts.ARCHIVOBLACK:
+            return styles.archivoblack;
         case Fonts.SCRATCH:
             return styles.scratch;
         case Fonts.CHINESE:
@@ -140,6 +146,16 @@ class FontDropdown extends React.Component {
             this.props.changeFont(Fonts.ARCADE);
         }
     }
+    handleChangeFontArchivo() {
+        if (this.dropDown.isOpen()) {
+            this.props.changeFont(Fonts.ARCHIVO);
+        }
+    }
+    handleChangeFontArchivoBlack() {
+        if (this.dropDown.isOpen()) {
+            this.props.changeFont(Fonts.ARCHIVOBLACK);
+        }
+    }
     handleChangeFontScratch() {
         if (this.dropDown.isOpen()) {
             this.props.changeFont(Fonts.SCRATCH);
@@ -209,6 +225,8 @@ class FontDropdown extends React.Component {
                 onHoverBitsAndBytes={this.handleChangeFontBitsAndBytes}
                 onHoverTechnological={this.handleChangeFontTechnological}
                 onHoverArcade={this.handleChangeFontArcade}
+                onHoverArchivo={this.handleChangeFontArchivo}
+                onHoverArchivoBlack={this.handleChangeFontArchivoBlack}
                 onHoverScratch={this.handleChangeFontScratch}
                 onHoverSansSerif={this.handleChangeFontSansSerif}
                 onHoverSerif={this.handleChangeFontSerif}

@@ -125,6 +125,24 @@ const ModeToolsComponent = props => (
                 <Button
                     className={classNames(styles.modMenuItem)}
                     onClick={props.onChoose}
+                    onMouseOver={props.onHoverArchivo}
+                >
+                    <span className={styles.archivo}>
+                        {props.getFontName(Fonts.ARCHIVO)}
+                    </span>
+                </Button>
+                <Button
+                    className={classNames(styles.modMenuItem)}
+                    onClick={props.onChoose}
+                    onMouseOver={props.onHoverArchivoBlack}
+                >
+                    <span className={styles.archivoblack}>
+                        {props.getFontName(Fonts.ARCHIVOBLACK)}
+                    </span>
+                </Button>
+                <Button
+                    className={classNames(styles.modMenuItem)}
+                    onClick={props.onChoose}
                     onMouseOver={props.onHoverChinese}
                 >
                     <span className={styles.chinese}>
@@ -182,6 +200,8 @@ ModeToolsComponent.propTypes = {
     onHoverTechnological: PropTypes.func,
     onHoverArcade: PropTypes.func,
     onHoverScratch: PropTypes.func,
+    onHoverArchivo: PropTypes.func,
+    onHoverArchivoBlack: PropTypes.func,
     onHoverSansSerif: PropTypes.func,
     onHoverSerif: PropTypes.func,
     onOpenDropdown: PropTypes.func

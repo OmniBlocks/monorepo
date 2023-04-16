@@ -71,6 +71,60 @@ const ModeToolsComponent = props => (
                 <Button
                     className={classNames(styles.modMenuItem)}
                     onClick={props.onChoose}
+                    onMouseOver={props.onHoverPlayful}
+                >
+                    <span className={styles.playful}>
+                        {props.getFontName(Fonts.PLAYFUL)}
+                    </span>
+                </Button>
+                <Button
+                    className={classNames(styles.modMenuItem)}
+                    onClick={props.onChoose}
+                    onMouseOver={props.onHoverBubbly}
+                >
+                    <span className={styles.bubbly}>
+                        {props.getFontName(Fonts.BUBBLY)}
+                    </span>
+                </Button>
+                <Button
+                    className={classNames(styles.modMenuItem)}
+                    onClick={props.onChoose}
+                    onMouseOver={props.onHoverArcade}
+                >
+                    <span className={styles.arcade}>
+                        {props.getFontName(Fonts.ARCADE)}
+                    </span>
+                </Button>
+                <Button
+                    className={classNames(styles.modMenuItem)}
+                    onClick={props.onChoose}
+                    onMouseOver={props.onHoverBitsAndBytes}
+                >
+                    <span className={styles.bitsandbytes} style={{ transform: "scaleX(0.5)", transformOrigin: "left" }}>
+                        {props.getFontName(Fonts.BITSANDBYTES)}
+                    </span>
+                </Button>
+                <Button
+                    className={classNames(styles.modMenuItem)}
+                    onClick={props.onChoose}
+                    onMouseOver={props.onHoverTechnological}
+                >
+                    <span className={styles.technological}>
+                        {props.getFontName(Fonts.TECHNOLOGICAL)}
+                    </span>
+                </Button>
+                <Button
+                    className={classNames(styles.modMenuItem)}
+                    onClick={props.onChoose}
+                    onMouseOver={props.onHoverScratch}
+                >
+                    <span className={styles.scratch}>
+                        {props.getFontName(Fonts.SCRATCH)}
+                    </span>
+                </Button>
+                <Button
+                    className={classNames(styles.modMenuItem)}
+                    onClick={props.onChoose}
                     onMouseOver={props.onHoverChinese}
                 >
                     <span className={styles.chinese}>
@@ -122,6 +176,12 @@ ModeToolsComponent.propTypes = {
     onHoverKorean: PropTypes.func,
     onHoverMarker: PropTypes.func,
     onHoverPixel: PropTypes.func,
+    onHoverPlayful: PropTypes.func,
+    onHoverBubbly: PropTypes.func,
+    onHoverBitsAndBytes: PropTypes.func,
+    onHoverTechnological: PropTypes.func,
+    onHoverArcade: PropTypes.func,
+    onHoverScratch: PropTypes.func,
     onHoverSansSerif: PropTypes.func,
     onHoverSerif: PropTypes.func,
     onOpenDropdown: PropTypes.func

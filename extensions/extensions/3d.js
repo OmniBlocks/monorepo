@@ -104,6 +104,14 @@
           if (this[IN_3D]) return false;
           return originalGetVisible.call(this);
         };
+        const originalUpdatePosition = Drawable.prototype.updatePosition;
+        Drawable.prototype.getVisible = function(position) {
+          if (this[IN_3D]) {
+            dr[OBJECT].position = new THREE.Vector3(position[0], position[1], dr[Z_POS]);
+            this.updateRenderer();
+          }
+          return originalUpdatePosition.call(this, position);
+        };
         Drawable.threeDPatchesApplied = true;
       }
     }
@@ -150,18 +158,19 @@
       dr[IN_3D] = true;
       dr[Z_POS] = 0;
 
-      const obj = new THREE.Mesh(geometry, material);
+      const obj = new THREE.Mesh();
       obj.material = new THREE.MeshBasicMaterial({color: 0x00ff00});
+      dr[OBJECT] = obj;
       this.updateMeshForDrawable(drawableID);
 
       this.scene.add(obj);
-      dr[OBJECT] = obj;
     }
 
     updateMeshForDrawable(drawableID) {
       const dr = Scratch.renderer._allDrawables[drawableID];
       if (!dr[IN_3D]) return;
       const obj = dr[OBJECT];
+      obj.geometry = new THREE.PlaneGeometry(100, 100);
     }
 
     disable3DForDrawable(drawableID) {
@@ -182,8 +191,8 @@
     enable(_args, util) {
       if (util.target.isStage) return;
 
-      this.enable3DForDrawable(util.target.drawableID);
       this.init();
+      this.enable3DForDrawable(util.target.drawableID);
     }
   }
 

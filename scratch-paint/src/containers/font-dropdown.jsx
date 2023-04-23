@@ -348,6 +348,10 @@ class FontDropdown extends React.Component {
                     const fileNameLabel = document.createElement("p");
                     prompt.textarea.append(fileNameLabel);
                     fileNameLabel.innerHTML = "No font file selected";
+                    prompt.textarea.append(document.createElement("br"));
+                    const fileTypesLabel = document.createElement("p");
+                    prompt.textarea.append(fileTypesLabel);
+                    fileTypesLabel.innerHTML = "Select a file of .ttf, .otf, .woff, or .woff2 type";
                     filePicker.onchange = () => {
                         fileNameLabel.innerText = filePicker.files[0].name;
                     }

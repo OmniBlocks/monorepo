@@ -194,7 +194,7 @@ class FontDropdown extends React.Component {
 
     loadAndUseFontBlob (blob) {
         const fileNameSplit = String(blob.name).split(".");
-        if (!["ttf", "woff", "woff2", "otf"].includes(fileNameSplit.pop())) {
+        if (!["ttf", "woff", "woff2", "otf"].includes(fileNameSplit.pop().toLowerCase())) {
             console.log(blob.name, "not usable");
             return alert("Only .ttf, .woff, .woff2 and .otf files can be used for custom fonts.");
         }

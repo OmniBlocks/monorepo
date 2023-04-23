@@ -336,6 +336,7 @@ class FontDropdown extends React.Component {
                     prompt.textarea.style = `width: 100%;height: 75%;display: flex;justify-content: center;align-items: center;flex-direction: column;`;
                     prompt.textarea.append(filePicker);
                     filePicker.type = "file";
+                    filePicker.accept = ".ttf,.otf,.woff,.woff2"
                     // dont make the file input hidden otherwise you cant press Tab to get to it
                     filePicker.style = "width:0px;height:0px;";
                     filePicker.id = "filePicker-penguinmod-paint-font-dropdown-903274031753195632894310537203491-32957197531-4815-3715489-abc"

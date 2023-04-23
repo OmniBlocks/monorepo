@@ -9,6 +9,7 @@ import Fonts from '../lib/fonts';
 import {changeFont} from '../reducers/font';
 import {getSelectedLeafItems} from '../helper/selection';
 import styles from '../components/font-dropdown/font-dropdown.css';
+import confirmStyles from './confirmation.css';
 
 class FontDropdown extends React.Component {
     constructor (props) {
@@ -36,61 +37,191 @@ class FontDropdown extends React.Component {
             'handleOpenDropdown',
             'handleClickOutsideDropdown',
             'setDropdown',
-            'handleChoose'
+            'handleChoose',
+            'handleChooseCustom',
+            'handleChooseExisting'
         ]);
+        this.customFonts = {};
+        this.acceptedCustomFontAgreement = false;
+
+        this.latestCustomFont = null;
     }
     getFontStyle (font) {
+        if (this.customFonts.hasOwnProperty(font)) {
+            return font;
+        }
         switch (font) {
-        case Fonts.SERIF:
-            return styles.serif;
-        case Fonts.SANS_SERIF:
-            return styles.sansSerif;
-        case Fonts.HANDWRITING:
-            return styles.handwriting;
-        case Fonts.MARKER:
-            return styles.marker;
-        case Fonts.CURLY:
-            return styles.curly;
-        case Fonts.PIXEL:
-            return styles.pixel;
-        case Fonts.PLAYFUL:
-            return styles.playful;
-        case Fonts.BUBBLY:
-            return styles.bubbly;
-        case Fonts.BITSANDBYTES:
-            return styles.bitsandbytes;
-        case Fonts.TECHNOLOGICAL:
-            return styles.technological;
-        case Fonts.ARCADE:
-            return styles.arcade;
-        case Fonts.ARCHIVO:
-            return styles.archivo;
-        case Fonts.ARCHIVOBLACK:
-            return styles.archivoblack;
-        case Fonts.SCRATCH:
-            return styles.scratch;
-        case Fonts.CHINESE:
-            return styles.chinese;
-        case Fonts.JAPANESE:
-            return styles.japanese;
-        case Fonts.KOREAN:
-            return styles.korean;
-        default:
-            return '';
+            case Fonts.SERIF:
+                return styles.serif;
+            case Fonts.SANS_SERIF:
+                return styles.sansSerif;
+            case Fonts.HANDWRITING:
+                return styles.handwriting;
+            case Fonts.MARKER:
+                return styles.marker;
+            case Fonts.CURLY:
+                return styles.curly;
+            case Fonts.PIXEL:
+                return styles.pixel;
+            case Fonts.PLAYFUL:
+                return styles.playful;
+            case Fonts.BUBBLY:
+                return styles.bubbly;
+            case Fonts.BITSANDBYTES:
+                return styles.bitsandbytes;
+            case Fonts.TECHNOLOGICAL:
+                return styles.technological;
+            case Fonts.ARCADE:
+                return styles.arcade;
+            case Fonts.ARCHIVO:
+                return styles.archivo;
+            case Fonts.ARCHIVOBLACK:
+                return styles.archivoblack;
+            case Fonts.SCRATCH:
+                return styles.scratch;
+            case Fonts.CHINESE:
+                return styles.chinese;
+            case Fonts.JAPANESE:
+                return styles.japanese;
+            case Fonts.KOREAN:
+                return styles.korean;
+            default:
+                return '';
         }
     }
     getFontName (font) {
+        if (this.customFonts.hasOwnProperty(font)) {
+            return this.customFonts[font];
+        }
         switch (font) {
-        case Fonts.CHINESE:
-            return '中文';
-        case Fonts.KOREAN:
-            return '한국어';
-        case Fonts.JAPANESE:
-            return '日本語';
-        default:
-            return font;
+            case Fonts.CHINESE:
+                return '中文';
+            case Fonts.KOREAN:
+                return '한국어';
+            case Fonts.JAPANESE:
+                return '日本語';
+            default:
+                return font;
         }
     }
+
+    displayConfirmMessage (titlehtml, html, acceptInstantlyIfTrue) {
+        return new Promise((resolve, reject) => {
+            if (acceptInstantlyIfTrue === true) {
+                return resolve(true);
+            }
+            const div = document.createElement("div");
+            document.body.append(div);
+            div.classList.add(confirmStyles.base);
+            const box = document.createElement("div");
+            div.append(box);
+            box.classList.add(confirmStyles.promptBox);
+            const header = document.createElement("div");
+            box.append(header);
+            header.classList.add(confirmStyles.header);
+            header.innerHTML = titlehtml;
+            box.innerHTML += `<div>${html}</div>`;
+            const buttonRow = document.createElement("div");
+            box.append(buttonRow);
+            buttonRow.classList.add(confirmStyles.buttonRow);
+            const deny = document.createElement("button");
+            buttonRow.append(deny);
+            deny.classList.add(confirmStyles.promptButton);
+            deny.classList.add(confirmStyles.deny);
+            deny.innerHTML = "Deny";
+            const accept = document.createElement("button");
+            buttonRow.append(accept);
+            accept.classList.add(confirmStyles.promptButton);
+            accept.classList.add(confirmStyles.accept);
+            accept.innerHTML = "Accept";
+            accept.onclick = () => {
+                div.remove();
+                resolve(true);
+            }
+            deny.onclick = () => {
+                div.remove();
+                reject(false);
+            }
+        })
+    }
+
+    displayPopup(title, width, height, accepted, cancelled) {
+        const div = document.createElement("div");
+        document.body.append(div);
+        div.classList.add(confirmStyles.base);
+        const box = document.createElement("div");
+        div.append(box);
+        box.classList.add(confirmStyles.promptBox);
+        box.style.width = `${width}px`;
+        box.style.height = `${height}px`;
+        const header = document.createElement("div");
+        box.append(header);
+        header.classList.add(confirmStyles.header);
+        header.innerText = title;
+        const textarea = document.createElement("div");
+        box.append(textarea);
+        const buttonRow = document.createElement("div");
+        box.append(buttonRow);
+        buttonRow.classList.add(confirmStyles.buttonRow);
+        const deny = document.createElement("button");
+        buttonRow.append(deny);
+        deny.classList.add(confirmStyles.promptButton);
+        deny.classList.add(confirmStyles.deny);
+        deny.innerHTML = "Cancel";
+        const accept = document.createElement("button");
+        buttonRow.append(accept);
+        accept.classList.add(confirmStyles.promptButton);
+        accept.classList.add(confirmStyles.accept);
+        accept.innerHTML = "OK";
+        accept.onclick = () => {
+            div.remove();
+            if (accepted) accepted();
+        }
+        deny.onclick = () => {
+            div.remove();
+            if (cancelled) cancelled();
+        }
+        return {
+            popup: div,
+            container: box,
+            header: header,
+            buttonRow: buttonRow,
+            textarea: textarea,
+            cancel: deny,
+            ok: accept
+        }
+    }
+
+    loadAndUseFontBlob (blob) {
+        const fileNameSplit = String(blob.name).split(".");
+        if (!["ttf", "woff", "woff2", "otf"].includes(fileNameSplit.pop())) {
+            console.log(blob.name, "not usable");
+            return alert("Only .ttf, .woff, .woff2 and .otf files can be used for custom fonts.");
+        }
+        const fr = new FileReader();
+        fr.onload = (e) => {
+            const uri = e.target.result;
+            const fontName = `PENGUINMOD_CustomFontPicker_${uri.substring(100, 200)}_PM`.replace(/[^A-Za-z0-9_]+/gmi, "");
+            this.customFonts[fontName] = `${fileNameSplit.join(".")}`;
+            let style;
+            if (document.getElementById("penguinmod-custom-fonts")) {
+                style = document.getElementById("penguinmod-custom-fonts");
+            } else {
+                style = document.createElement("style");
+                style.id = "penguinmod-custom-fonts";
+                document.body.prepend(style);
+            }
+            style.innerHTML += `@font-face { font-family: "${fontName}"; src: url("${uri}"); }\n\n.${fontName} { font-family: "${fontName}"; }\n\n`;
+            this.latestCustomFont = {
+                name: this.customFonts[fontName],
+                class: fontName
+            }
+            this.props.changeFont(fontName);
+            this.props.onUpdateImage();
+        }
+        fr.readAsDataURL(blob);
+    }
+
     handleChangeFontSansSerif () {
         if (this.dropDown.isOpen()) {
             this.props.changeFont(Fonts.SANS_SERIF);
@@ -182,6 +313,47 @@ class FontDropdown extends React.Component {
             this.props.onUpdateImage();
         }
     }
+    handleChooseExisting () {
+        if (!this.latestCustomFont) return;
+        if (this.dropDown.isOpen()) {
+            this.props.changeFont(this.latestCustomFont.class);
+            this.dropDown.handleClosePopover();
+            this.props.onUpdateImage();
+        }
+    }
+    handleChooseCustom () {
+        if (this.dropDown.isOpen()) {
+            this.dropDown.handleClosePopover();
+            this.displayConfirmMessage(`<p>Read this before continuing!</p>`, `<div style="width:100%;height:100%;text-align:center;"><br><p>To use a custom font, you will need a .ttf, .woff, .woff2, or .otf file.<br><b>ONLY USE FONTS YOU HAVE THE LICENSE TO USE!</b><br>If you are downloading online fonts, you should use the ones that are either listed as 100% free, OFL / GPL, or Public Domain.<br>If you get in trouble for using a font that you weren't allowed to legally use, it's YOUR fault, not ours.</p><br><p><b>You are also only able to use custom fonts properly in Bitmap mode currently.</b> Using them in Vector mode will cause it to appear as a different font on the stage.</p></div>`, this.acceptedCustomFontAgreement)
+                .then(() => {
+                    this.acceptedCustomFontAgreement = true;
+
+                    const filePicker = document.createElement("input");
+                    const prompt = this.displayPopup("Import a Font", 460, 360, () => {
+                        if (!filePicker.files[0]) return;
+                        this.loadAndUseFontBlob(filePicker.files[0]);
+                    });
+                    prompt.textarea.style = `width: 100%;height: 75%;display: flex;justify-content: center;align-items: center;flex-direction: column;`;
+                    prompt.textarea.append(filePicker);
+                    filePicker.type = "file";
+                    // dont make the file input hidden otherwise you cant press Tab to get to it
+                    filePicker.style = "width:0px;height:0px;";
+                    filePicker.id = "filePicker-penguinmod-paint-font-dropdown-903274031753195632894310537203491-32957197531-4815-3715489-abc"
+                    const fakeFileButton = document.createElement("label");
+                    fakeFileButton.setAttribute("for", filePicker.id);
+                    fakeFileButton.classList.add(confirmStyles.filePicker);
+                    fakeFileButton.innerHTML = "Choose a file";
+                    prompt.textarea.append(fakeFileButton);
+                    const fileNameLabel = document.createElement("p");
+                    prompt.textarea.append(fileNameLabel);
+                    fileNameLabel.innerHTML = "No font file selected";
+                    filePicker.onchange = () => {
+                        fileNameLabel.innerText = filePicker.files[0].name;
+                    }
+                })
+            return;
+        }
+    }
     handleOpenDropdown () {
         this.savedFont = this.props.font;
         this.savedSelection = getSelectedLeafItems();
@@ -212,6 +384,8 @@ class FontDropdown extends React.Component {
                 getFontName={this.getFontName}
                 getFontStyle={this.getFontStyle}
                 onChoose={this.handleChoose}
+                onChooseCustom={this.handleChooseCustom}
+                onChooseExisting={this.handleChooseExisting}
                 onClickOutsideDropdown={this.handleClickOutsideDropdown}
                 onHoverChinese={this.handleChangeFontChinese}
                 onHoverCurly={this.handleChangeFontCurly}
@@ -231,6 +405,9 @@ class FontDropdown extends React.Component {
                 onHoverSansSerif={this.handleChangeFontSansSerif}
                 onHoverSerif={this.handleChangeFontSerif}
                 onOpenDropdown={this.handleOpenDropdown}
+                customExists={this.latestCustomFont !== null}
+                customClass={this.latestCustomFont?.class}
+                customName={this.latestCustomFont?.name}
             />
         );
     }

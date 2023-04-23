@@ -167,6 +167,22 @@ const ModeToolsComponent = props => (
                         {props.getFontName(Fonts.KOREAN)}
                     </span>
                 </Button>
+                <Button
+                    className={classNames(styles.modMenuItem)}
+                    onClick={props.onChooseCustom}
+                >
+                    <span>
+                        Choose a file
+                    </span>
+                </Button>
+                {props.customExists ? <Button
+                    className={classNames(styles.modMenuItem)}
+                    onClick={props.onChooseExisting}
+                >
+                    <span className={props.customClass}>
+                        {props.customName}
+                    </span>
+                </Button> : null}
             </InputGroup>
         }
         ref={props.componentRef}
@@ -182,10 +198,15 @@ const ModeToolsComponent = props => (
 
 ModeToolsComponent.propTypes = {
     componentRef: PropTypes.func.isRequired,
+    customExists: PropTypes.bool,
+    customClass: PropTypes.string,
+    customName: PropTypes.string,
     font: PropTypes.string,
     getFontName: PropTypes.func.isRequired,
     getFontStyle: PropTypes.func.isRequired,
     onChoose: PropTypes.func.isRequired,
+    onChooseCustom: PropTypes.func,
+    onChooseExisting: PropTypes.func,
     onClickOutsideDropdown: PropTypes.func,
     onHoverChinese: PropTypes.func,
     onHoverCurly: PropTypes.func,

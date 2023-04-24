@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import ToolSelectComponent from '../tool-select-base/tool-select-base.jsx';
 import messages from '../../lib/messages.js';
-import triangleIcon from './temporary.png';
+import triangleIcon from './triangle.svg';
 
 const TriangleModeComponent = props => (
     <ToolSelectComponent

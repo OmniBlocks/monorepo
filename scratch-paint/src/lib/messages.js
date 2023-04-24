@@ -50,6 +50,16 @@ const messages = defineMessages({
         defaultMessage: 'Text',
         description: 'Label for the text tool',
         id: 'paint.textMode.text'
+    },
+    sussy: {
+        defaultMessage: 'Sussy',
+        description: 'Label for the sussy tool',
+        id: 'paint.sussyMode.sussy'
+    },
+    triangle: {
+        defaultMessage: 'Triangle',
+        description: 'Label for the triangle tool',
+        id: 'paint.triangleMode.triangle'
     }
 });
 

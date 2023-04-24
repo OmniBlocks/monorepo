@@ -1,39 +1,38 @@
 import paper from '@scratch/paper';
 import PropTypes from 'prop-types';
 import React from 'react';
-import {connect} from 'react-redux';
+import { connect } from 'react-redux';
 import bindAll from 'lodash.bindall';
 import Modes from '../lib/modes';
-import {MIXED} from '../helper/style-path';
+import { MIXED } from '../helper/style-path';
 import ColorStyleProptype from '../lib/color-style-proptype';
 import GradientTypes from '../lib/gradient-types';
 
-import {changeFillColor, clearFillGradient, DEFAULT_COLOR} from '../reducers/fill-style';
-import {changeStrokeColor, clearStrokeGradient} from '../reducers/stroke-style';
-import {changeMode} from '../reducers/modes';
-import {clearSelectedItems, setSelectedItems} from '../reducers/selected-items';
-import {setCursor} from '../reducers/cursor';
+import { changeFillColor, clearFillGradient, DEFAULT_COLOR } from '../reducers/fill-style';
+import { changeStrokeColor, clearStrokeGradient } from '../reducers/stroke-style';
+import { changeMode } from '../reducers/modes';
+import { clearSelectedItems, setSelectedItems } from '../reducers/selected-items';
+import { setCursor } from '../reducers/cursor';
 
-import {clearSelection, getSelectedLeafItems} from '../helper/selection';
-import RoundedRectTool from '../helper/tools/rounded-rect-tool';
-import RoundedRectModeComponent from '../components/rounded-rect-mode/rounded-rect-mode.jsx';
+import { clearSelection, getSelectedLeafItems } from '../helper/selection';
+import TriangleTool from '../helper/tools/triangle-tool';
+import TriangleModeComponent from '../components/triangle-mode/triangle-mode.jsx';
 
-class RoundedRectMode extends React.Component {
-    constructor (props) {
+class TriangleMode extends React.Component {
+    constructor(props) {
         super(props);
         bindAll(this, [
             'activateTool',
             'deactivateTool',
             'validateColorState'
         ]);
-        console.log(props)
     }
-    componentDidMount () {
-        if (this.props.isRoundedRectModeActive) {
+    componentDidMount() {
+        if (this.props.isTriangleModeActive) {
             this.activateTool(this.props);
         }
     }
-    componentWillReceiveProps (nextProps) {
+    componentWillReceiveProps(nextProps) {
         if (this.tool && nextProps.colorState !== this.props.colorState) {
             this.tool.setColorState(nextProps.colorState);
         }
@@ -41,25 +40,25 @@ class RoundedRectMode extends React.Component {
             this.tool.onSelectionChanged(nextProps.selectedItems);
         }
 
-        if (nextProps.isRoundedRectModeActive && !this.props.isRoundedRectModeActive) {
+        if (nextProps.isTriangleModeActive && !this.props.isTriangleModeActive) {
             this.activateTool();
-        } else if (!nextProps.isRoundedRectModeActive && this.props.isRoundedRectModeActive) {
+        } else if (!nextProps.isTriangleModeActive && this.props.isTriangleModeActive) {
             this.deactivateTool();
         }
     }
-    shouldComponentUpdate (nextProps) {
-        return nextProps.isRoundedRectModeActive !== this.props.isRoundedRectModeActive;
+    shouldComponentUpdate(nextProps) {
+        return nextProps.isTriangleModeActive !== this.props.isTriangleModeActive;
     }
-    componentWillUnmount () {
+    componentWillUnmount() {
         if (this.tool) {
             this.deactivateTool();
         }
     }
-    activateTool () {
+    activateTool() {
         clearSelection(this.props.clearSelectedItems);
         this.validateColorState();
 
-        this.tool = new RoundedRectTool(
+        this.tool = new TriangleTool(
             this.props.setSelectedItems,
             this.props.clearSelectedItems,
             this.props.setCursor,
@@ -68,11 +67,11 @@ class RoundedRectMode extends React.Component {
         this.tool.setColorState(this.props.colorState);
         this.tool.activate();
     }
-    validateColorState () { // TODO move to shared class
+    validateColorState() { // TODO move to shared class
         // Make sure that at least one of fill/stroke is set, and that MIXED is not one of the colors.
         // If fill and stroke color are both missing, set fill to default and stroke to transparent.
         // If exactly one of fill or stroke color is set, set the other one to transparent.
-        const {strokeWidth} = this.props.colorState;
+        const { strokeWidth } = this.props.colorState;
         const fillColor1 = this.props.colorState.fillColor.primary;
         let fillColor2 = this.props.colorState.fillColor.secondary;
         let fillGradient = this.props.colorState.fillColor.gradientType;
@@ -113,25 +112,22 @@ class RoundedRectMode extends React.Component {
             this.props.clearStrokeGradient();
         }
     }
-    deactivateTool () {
+    deactivateTool() {
         this.tool.deactivateTool();
         this.tool.remove();
         this.tool = null;
     }
-    render () {
+    render() {
         return (
-            <RoundedRectModeComponent
-                isSelected={this.props.isRoundedRectModeActive}
+            <TriangleModeComponent
+                isSelected={this.props.isTriangleModeActive}
                 onMouseDown={this.props.handleMouseDown}
             />
         );
     }
 }
 
-RoundedRectMode.propTypes = {
-    roundedCornerModeState: PropTypes.shape({
-        roundedCornerSize: PropTypes.number.isRequired
-    }),
+TriangleMode.propTypes = {
     clearFillGradient: PropTypes.func.isRequired,
     clearStrokeGradient: PropTypes.func.isRequired,
     clearSelectedItems: PropTypes.func.isRequired,
@@ -141,7 +137,7 @@ RoundedRectMode.propTypes = {
         strokeWidth: PropTypes.number
     }).isRequired,
     handleMouseDown: PropTypes.func.isRequired,
-    isRoundedRectModeActive: PropTypes.bool.isRequired,
+    isTriangleModeActive: PropTypes.bool.isRequired,
     onChangeFillColor: PropTypes.func.isRequired,
     onChangeStrokeColor: PropTypes.func.isRequired,
     onUpdateImage: PropTypes.func.isRequired,
@@ -152,7 +148,7 @@ RoundedRectMode.propTypes = {
 
 const mapStateToProps = state => ({
     colorState: state.scratchPaint.color,
-    isRoundedRectModeActive: state.scratchPaint.mode === Modes.ROUNDED_RECT,
+    isTriangleModeActive: state.scratchPaint.mode === Modes.TRIANGLE,
     selectedItems: state.scratchPaint.selectedItems
 });
 const mapDispatchToProps = dispatch => ({
@@ -172,7 +168,7 @@ const mapDispatchToProps = dispatch => ({
         dispatch(setCursor(cursorString));
     },
     handleMouseDown: () => {
-        dispatch(changeMode(Modes.ROUNDED_RECT));
+        dispatch(changeMode(Modes.TRIANGLE));
     },
     onChangeFillColor: fillColor => {
         dispatch(changeFillColor(fillColor));
@@ -185,4 +181,4 @@ const mapDispatchToProps = dispatch => ({
 export default connect(
     mapStateToProps,
     mapDispatchToProps
-)(RoundedRectMode);
+)(TriangleMode);

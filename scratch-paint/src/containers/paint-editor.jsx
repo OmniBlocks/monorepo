@@ -193,6 +193,10 @@ class PaintEditor extends React.Component {
             case Modes.OVAL:
                 this.props.changeMode(Modes.BIT_OVAL);
                 break;
+            case Modes.ROUNDED_RECT:
+                /* falls through */
+            case Modes.SUSSY:
+                /* falls through */
             case Modes.RECT:
                 this.props.changeMode(Modes.BIT_RECT);
                 break;

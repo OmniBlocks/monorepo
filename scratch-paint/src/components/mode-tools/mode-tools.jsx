@@ -5,6 +5,7 @@ import React from 'react';
 
 import {changeBrushSize} from '../../reducers/brush-mode';
 import {changeBrushSize as changeEraserSize} from '../../reducers/eraser-mode';
+import {changeRoundedCornerSize} from '../../reducers/rounded-rect-mode';
 import {changeBitBrushSize} from '../../reducers/bit-brush-size';
 import {changeBitEraserSize} from '../../reducers/bit-eraser-size';
 import {setShapesFilled} from '../../reducers/fill-bitmap-shapes';
@@ -31,6 +32,7 @@ import bitLineIcon from '../bit-line-mode/line.svg';
 import brushIcon from '../brush-mode/brush.svg';
 import curvedPointIcon from './icons/curved-point.svg';
 import eraserIcon from '../eraser-mode/eraser.svg';
+import roundedRectIcon from '../rounded-rect-mode/rounded-rectangle.svg';
 import flipHorizontalIcon from './icons/flip-horizontal.svg';
 import flipVerticalIcon from './icons/flip-vertical.svg';
 import straightPointIcon from './icons/straight-point.svg';
@@ -53,6 +55,11 @@ const ModeToolsComponent = props => {
             defaultMessage: 'Eraser size',
             description: 'Label for the eraser size input',
             id: 'paint.modeTools.eraserSize'
+        },
+        roundedCornerSize: {
+            defaultMessage: 'Rounded corner size',
+            description: 'Label for the Rounded corner size input',
+            id: 'paint.modeTools.roundedCornerSize'
         },
         copy: {
             defaultMessage: 'Copy',
@@ -164,6 +171,33 @@ const ModeToolsComponent = props => {
                     min="1"
                     type="number"
                     value={currentEraserValue}
+                    onSubmit={changeFunction}
+                />
+            </div>
+        );
+    }
+    case Modes.ROUNDED_RECT:
+    {
+        const currentIcon = roundedRectIcon;
+        const currentCornerValue = props.roundedCornerValue;
+        const changeFunction = props.onRoundedCornerSliderChange;
+        return (
+            <div className={classNames(props.className, styles.modeTools)}>
+                <div>
+                    <img
+                        alt={props.intl.formatMessage(messages.roundedCornerSize)}
+                        className={styles.modeToolsIcon}
+                        draggable={false}
+                        src={currentIcon}
+                    />
+                </div>
+                <LiveInput
+                    range
+                    small
+                    max={1000}
+                    min="1"
+                    type="number"
+                    value={currentCornerValue}
                     onSubmit={changeFunction}
                 />
             </div>
@@ -311,6 +345,7 @@ ModeToolsComponent.propTypes = {
     className: PropTypes.string,
     clipboardItems: PropTypes.arrayOf(PropTypes.array),
     eraserValue: PropTypes.number,
+    roundedCornerValue: PropTypes.number,
     fillBitmapShapes: PropTypes.bool,
     format: PropTypes.oneOf(Object.keys(Formats)),
     hasSelectedUncurvedPoints: PropTypes.bool,
@@ -341,11 +376,15 @@ const mapStateToProps = state => ({
     bitEraserSize: state.scratchPaint.bitEraserSize,
     brushValue: state.scratchPaint.brushMode.brushSize,
     clipboardItems: state.scratchPaint.clipboard.items,
-    eraserValue: state.scratchPaint.eraserMode.brushSize
+    eraserValue: state.scratchPaint.eraserMode.brushSize,
+    roundedCornerValue: state.scratchPaint.roundedRectMode.roundedCornerSize
 });
 const mapDispatchToProps = dispatch => ({
     onBrushSliderChange: brushSize => {
         dispatch(changeBrushSize(brushSize));
+    },
+    onRoundedCornerSliderChange: roundedCornerSize => {
+        dispatch(changeRoundedCornerSize(roundedCornerSize));
     },
     onBitBrushSliderChange: bitBrushSize => {
         dispatch(changeBitBrushSize(bitBrushSize));

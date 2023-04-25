@@ -16,11 +16,22 @@ const getTextColor = text => {
     return firstStop.color;
 };
 
+const textAlignment = {
+    value: "left"
+}
+
 /**
  * Tool for adding text. Text elements have limited editability; they can't be reshaped,
  * drawn on or erased. This way they can preserve their ability to have the text edited.
  */
 class TextTool extends paper.Tool {
+    static set textAlignment (value) {
+        textAlignment.value = value;
+    }
+    static get textAlignment () {
+        return textAlignment.value;
+    }
+
     static get TOLERANCE () {
         return 2;
     }
@@ -170,8 +181,11 @@ class TextTool extends paper.Tool {
         // In RTL, the element is moved relative to its parent's right edge instead of its left
         // edge. We need to correct for this in order for the element to overlap the object in paper.
         let tx = 0;
-        if (this.rtl && this.element.parentElement) {
+        if ((TextTool.textAlignment === "right") && this.element.parentElement) {
             tx = -this.element.parentElement.clientWidth;
+        }
+        if ((TextTool.textAlignment === "center") && this.element.parentElement) {
+            tx = -this.element.parentElement.clientWidth / 2;
         }
         // The transform origin in paper is x at justification side, y at the baseline of the text.
         // The offset from (0, 0) to the upper left corner is recorded by internalBounds
@@ -188,9 +202,9 @@ class TextTool extends paper.Tool {
     setColorState (colorState) {
         this.colorState = colorState;
     }
-    /** @param {boolean} isRtl True if paint editor is in right-to-left layout (e.g. Hebrew language) */
-    setRtl (isRtl) {
-        this.rtl = isRtl;
+    /** @deprecated Use textAlignment instead. This is a no-op function for compatibility. */
+    setRtl () {
+        return;
     }
     handleMouseMove (event) {
         const hitResults = paper.project.hitTestAll(event.point, this.getTextEditHitOptions());
@@ -326,9 +340,13 @@ class TextTool extends paper.Tool {
         this.element.style.height = `${this.textBox.internalBounds.height}px`;
         // The transform origin needs to be updated in RTL because this.textBox.internalBounds.x
         // changes as you type
-        if (this.rtl) {
+        if (TextTool.textAlignment === "right") {
             this.element.style.transformOrigin =
                 `${-this.textBox.internalBounds.x}px ${-this.textBox.internalBounds.y}px`;
+        }
+        if (TextTool.textAlignment === "center") {
+            this.element.style.transformOrigin =
+                `${-this.textBox.internalBounds.x / 2}px ${-this.textBox.internalBounds.y}px`;
         }
     }
     beginSelect () {
@@ -352,6 +370,9 @@ class TextTool extends paper.Tool {
         if (this.font !== this.textBox.font) {
             this.changeFont(this.textBox.font);
         }
+        if (TextTool.textAlignment !== this.textBox.justification) {
+            this.textBox.justification = 'center';
+        }
         this.element.style.fontSize = `${this.textBox.fontSize}px`;
         this.element.style.lineHeight = this.textBox.leading / this.textBox.fontSize;
 
@@ -362,9 +383,11 @@ class TextTool extends paper.Tool {
         this.element.value = textBox.content ? textBox.content : '';
         this.calculateMatrix(paper.view.matrix);
 
-        if (this.rtl) {
+        if (TextTool.textAlignment === "right") {
             // make both the textbox and the textarea element grow to the left
             this.textBox.justification = 'right';
+        } else if (TextTool.textAlignment === "center") {
+            this.textBox.justification = 'center';
         } else {
             this.textBox.justification = 'left';
         }

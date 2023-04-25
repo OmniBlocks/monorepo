@@ -8,6 +8,7 @@ import CopyPasteHOC from '../hocs/copy-paste-hoc.jsx';
 import ModeToolsComponent from '../components/mode-tools/mode-tools.jsx';
 import {clearSelectedItems, setSelectedItems} from '../reducers/selected-items';
 import {
+    setItemSelection,
     deleteSelection,
     getSelectedLeafItems,
     getSelectedRootItems,
@@ -16,10 +17,13 @@ import {
     selectAllSegments
 } from '../helper/selection';
 import {HANDLE_RATIO, ensureClockwise} from '../helper/math';
+import {groupItems} from '../helper/group';
 import {getRaster} from '../helper/layer';
 import {flipBitmapHorizontal, flipBitmapVertical, selectAllBitmap} from '../helper/bitmap';
 import Formats, {isBitmap} from '../lib/format';
 import Modes from '../lib/modes';
+
+import TextTool from '../helper/tools/text-tool.js';
 
 class ModeTools extends React.Component {
     constructor (props) {
@@ -34,7 +38,14 @@ class ModeTools extends React.Component {
             'handleFlipVertical',
             'handleDelete',
             'handlePasteFromClipboard',
-            'handlePointPoints'
+            'handlePointPoints',
+            'handleTextAlignLeft',
+            'handleTextAlignRight',
+            'handleTextAlignCenter',
+            'handleMergeShape',
+            'handleMaskShape',
+            'handleSubtractShape',
+            'handleExcludeShape'
         ]);
     }
     _getSelectedUncurvedPoints () {
@@ -147,6 +158,72 @@ class ModeTools extends React.Component {
             this.props.onUpdateImage();
         }
     }
+
+    handleTextAlignLeft () {
+        TextTool.textAlignment = "left";
+    }
+    handleTextAlignCenter () {
+        TextTool.textAlignment = "center";
+    }
+    handleTextAlignRight () {
+        TextTool.textAlignment = "right";
+    }
+
+    handleMergeShape (specificOperation) {
+        const selectedItems = getSelectedRootItems();
+        if (selectedItems.length < 2) {
+            // If nothing or not enough items are selected,
+            // we probably shouldnt select and merge everything
+            return;
+        }
+        if (!selectedItems[0].unite) {
+            // we cant unite this item, cancel
+            return;
+        }
+        const results = [];
+        // unite the shapes together, creating a clone on top of the original
+        if (typeof specificOperation === "string") {
+            let idx = 0;
+            selectedItems.forEach(item => {
+                if (idx === 0) {
+                    idx++;
+                    return;
+                }
+                const result = selectedItems[0][specificOperation](item);
+                results.push(result);
+                idx++;
+            });
+        } else {
+            let idx = 0;
+            selectedItems.forEach(item => {
+                if (idx === 0) {
+                    idx++;
+                    return;
+                }
+                const result = selectedItems[0].unite(item);
+                results.push(result);
+                idx++;
+            });
+        }
+
+        if (results.length <= 1) {
+            setItemSelection(results[0], true);
+            this.props.onUpdateImage();
+        } else {
+            groupItems(results, this.props.clearSelectedItems, this.props.setSelectedItems, this.props.onUpdateImage);
+        }
+    }
+
+    handleMaskShape () {
+        this.handleMergeShape("intersect");
+    }
+    handleSubtractShape () {
+        this.handleMergeShape("subtract");
+    }
+    handleExcludeShape () {
+        this.handleMergeShape("exclude");
+    }
+
     _handleFlip (horizontalScale, verticalScale, selectedItems) {
         if (selectedItems.length === 0) {
             // If nothing is selected, select everything
@@ -215,6 +292,7 @@ class ModeTools extends React.Component {
                 hasSelectedUncurvedPoints={this.hasSelectedUncurvedPoints()}
                 hasSelectedUnpointedPoints={this.hasSelectedUnpointedPoints()}
                 onCopyToClipboard={this.props.onCopyToClipboard}
+                onCutToClipboard={this.props.onCutToClipboard}
                 onCurvePoints={this.handleCurvePoints}
                 onDelete={this.handleDelete}
                 onFlipHorizontal={this.handleFlipHorizontal}
@@ -222,6 +300,15 @@ class ModeTools extends React.Component {
                 onPasteFromClipboard={this.handlePasteFromClipboard}
                 onPointPoints={this.handlePointPoints}
                 onUpdateImage={this.props.onUpdateImage}
+
+                onTextAlignLeft={this.handleTextAlignLeft}
+                onTextAlignRight={this.handleTextAlignRight}
+                onTextAlignCenter={this.handleTextAlignCenter}
+
+                onMergeShape={this.handleMergeShape}
+                onMaskShape={this.handleMaskShape}
+                onSubtractShape={this.handleSubtractShape}
+                onExcludeShape={this.handleExcludeShape}
             />
         );
     }
@@ -232,6 +319,7 @@ ModeTools.propTypes = {
     format: PropTypes.oneOf(Object.keys(Formats)),
     mode: PropTypes.oneOf(Object.keys(Modes)),
     onCopyToClipboard: PropTypes.func.isRequired,
+    onCutToClipboard: PropTypes.func.isRequired,
     onPasteFromClipboard: PropTypes.func.isRequired,
     onUpdateImage: PropTypes.func.isRequired,
     // Listen on selected items to update hasSelectedPoints

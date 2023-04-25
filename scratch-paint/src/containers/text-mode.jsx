@@ -51,9 +51,6 @@ class TextMode extends React.Component {
             if (nextProps.font !== this.props.font) {
                 this.tool.setFont(nextProps.font);
             }
-            if (nextProps.rtl !== this.props.rtl) {
-                this.tool.setRtl(nextProps.rtl);
-            }
         }
 
         if (nextProps.isTextModeActive && !this.props.isTextModeActive) {
@@ -111,7 +108,6 @@ class TextMode extends React.Component {
             this.props.changeFont,
             nextProps.isBitmap
         );
-        this.tool.setRtl(this.props.rtl);
         this.tool.setColorState(nextProps.colorState);
         this.tool.setFont(nextProps.font);
         this.tool.activate();

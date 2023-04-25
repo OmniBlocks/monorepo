@@ -6,10 +6,21 @@ import { getSquareDimensions } from '../math';
 import BoundingBoxTool from '../selection-tools/bounding-box-tool';
 import NudgeTool from '../selection-tools/nudge-tool';
 
+const sideCount = {
+    value: 3
+}
+
 /**
  * Tool for drawing triangles.
  */
 class TriangleTool extends paper.Tool {
+    static set sideCount (value) {
+        sideCount.value = value;
+    }
+    static get sideCount () {
+        return sideCount.value;
+    }
+
     static get TOLERANCE() {
         return 2;
     }
@@ -101,8 +112,8 @@ class TriangleTool extends paper.Tool {
             tri.size = squareDimensions.size.abs();
         }
 
-        this.tri = new paper.Path.RegularPolygon(tri, 3, 50);
-        this.tri.scale(tri.size.divide(100));
+        this.tri = new paper.Path.RegularPolygon(event.downPoint, TriangleTool.sideCount, 50);
+        this.tri.scale(tri.size.width / 100, tri.size.height / 100, event.downPoint);
         if (event.modifiers.alt) {
             this.tri.position = event.downPoint;
         } else if (event.modifiers.shift) {

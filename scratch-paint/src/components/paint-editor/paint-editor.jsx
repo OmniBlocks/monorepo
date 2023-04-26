@@ -67,7 +67,7 @@ const PaintEditorComponent = props => (
     >
         {props.canvas !== null ? ( // eslint-disable-line no-negated-condition
             <div className={styles.editorContainerTop}>
-                {/* First row */}
+                {/* First Row */}
                 <div className={styles.row}>
                     <FixedToolsContainer
                         canRedo={props.canRedo}

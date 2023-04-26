@@ -20,7 +20,7 @@ const reducer = function (state, action) {
     }
 };
 
-// Action creators ==================================
+// Action creators ===================================
 const changeTrianglePolyCount = function (trianglePolyCount) {
     return {
         type: CHANGE_TRIANGLE_SIDE_COUNT,

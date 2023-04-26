@@ -411,8 +411,8 @@ class FontDropdown extends React.Component {
                 onHoverSerif={this.handleChangeFontSerif}
                 onOpenDropdown={this.handleOpenDropdown}
                 customExists={this.latestCustomFont !== null}
-                customClass={this.latestCustomFont?.class}
-                customName={this.latestCustomFont?.name}
+                customClass={this.latestCustomFont ? this.latestCustomFont.class : null}
+                customName={this.latestCustomFont ? this.latestCustomFont.name : null}
             />
         );
     }

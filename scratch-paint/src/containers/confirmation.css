@@ -19,6 +19,7 @@
     outline-style: solid;
     overflow: hidden;
     position: relative;
+    color: black;
 }
 
 .header {

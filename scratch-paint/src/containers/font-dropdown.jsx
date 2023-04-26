@@ -324,7 +324,7 @@ class FontDropdown extends React.Component {
     handleChooseCustom () {
         if (this.dropDown.isOpen()) {
             this.dropDown.handleClosePopover();
-            this.displayConfirmMessage(`<p>Read this before continuing!</p>`, `<div style="color:darkgray;width:100%;height:100%;text-align:center;"><br><p>To use a custom font, you will need a .ttf, .woff, .woff2, or .otf file.<br><b>ONLY USE FONTS YOU HAVE THE LICENSE TO USE!</b><br>If you are downloading online fonts, you should use the ones that are either listed as 100% free, OFL / GPL, or Public Domain.<br>If you get in trouble for using a font that you weren't allowed to legally use, it's YOUR fault, not ours.</p><br><p><b>You are also only able to use custom fonts properly in Bitmap mode currently.</b> Using them in Vector mode will cause it to appear as a different font on the stage.</p></div>`, this.acceptedCustomFontAgreement)
+            this.displayConfirmMessage(`<p>Read this before continuing!</p>`, `<div style="width:100%;height:100%;text-align:center;"><br><p>To use a custom font, you will need a .ttf, .woff, .woff2, or .otf file.<br><b>ONLY USE FONTS YOU HAVE THE LICENSE TO USE!</b><br>If you are downloading online fonts, you should use the ones that are either listed as 100% free, OFL / GPL, or Public Domain.<br>If you get in trouble for using a font that you weren't allowed to legally use, it's YOUR fault, not ours.</p><br><p><b>You are also only able to use custom fonts properly in Bitmap mode currently.</b> Using them in Vector mode will cause it to appear as a different font on the stage.</p></div>`, this.acceptedCustomFontAgreement)
                 .then(() => {
                     this.acceptedCustomFontAgreement = true;
 

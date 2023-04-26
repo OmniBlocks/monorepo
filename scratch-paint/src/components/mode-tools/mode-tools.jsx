@@ -28,8 +28,14 @@ import {hideLabel} from '../../lib/hide-label';
 import styles from './mode-tools.css';
 
 import copyIcon from './icons/copy.svg';
+import cutIcon from './icons/cut.svg';
 import pasteIcon from './icons/paste.svg';
 import deleteIcon from './icons/delete.svg';
+
+import shapeMergeIcon from './icons/merge.svg';
+import shapeMaskIcon from './icons/mask.svg';
+import shapeSubtractIcon from './icons/subtract.svg';
+import shapeFilterIcon from './icons/filter.svg';
 
 import alignLeftIcon from './icons/alignLeft.svg';
 import alignRightIcon from './icons/alignRight.svg';
@@ -286,25 +292,25 @@ const ModeToolsComponent = props => {
                 <InputGroup className={classNames(styles.modDashedBorder, styles.modLabeledIconHeight)}>
                     <LabeledIconButton
                         hideLabel={hideLabel(props.intl.locale)}
-                        imgSrc={copyIcon}
+                        imgSrc={shapeMergeIcon}
                         title={"Merge"}
                         onClick={props.onMergeShape}
                     />
                     <LabeledIconButton
                         hideLabel={hideLabel(props.intl.locale)}
-                        imgSrc={copyIcon}
+                        imgSrc={shapeMaskIcon}
                         title={"Mask"}
                         onClick={props.onMaskShape}
                     />
                     <LabeledIconButton
                         hideLabel={hideLabel(props.intl.locale)}
-                        imgSrc={copyIcon}
+                        imgSrc={shapeSubtractIcon}
                         title={"Subtract"}
                         onClick={props.onSubtractShape}
                     />
                     <LabeledIconButton
                         hideLabel={hideLabel(props.intl.locale)}
-                        imgSrc={copyIcon}
+                        imgSrc={shapeFilterIcon}
                         title={"Filter"}
                         onClick={props.onExcludeShape}
                     />
@@ -337,7 +343,7 @@ const ModeToolsComponent = props => {
                         />
                         <LabeledIconButton
                             hideLabel={hideLabel(props.intl.locale)}
-                            imgSrc={copyIcon}
+                            imgSrc={cutIcon}
                             title={props.intl.formatMessage(messages.cut)}
                             onClick={props.onCutToClipboard}
                         />

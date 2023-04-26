@@ -357,17 +357,17 @@ const ModeToolsComponent = props => {
                             onClick={props.onDelete}
                         />
                     </InputGroup>
-                    <MediaQuery minWidth={layout.fullSizeEditorMinWidthWithFolders}>
+                    <MediaQuery minWidth={layout.fullSizeEditorMinWidthExtraToolsCollapsed}>
                         {/* Flip Options */}
                         {flipOptions}
                         {/* Reshaping Methods */}
                         {(props.mode === Modes.SELECT) ? (
-                            <MediaQuery minWidth={layout.fullSizeEditorMinWidth}>
+                            <MediaQuery minWidth={layout.fullSizeEditorMinWidthExtraTools}>
                                 {reshapingMethods}
                             </MediaQuery>
                         ) : null}
                         {(props.mode === Modes.SELECT) ? (
-                            <MediaQuery maxWidth={layout.fullSizeEditorMinWidth - 1}>
+                            <MediaQuery maxWidth={layout.fullSizeEditorMinWidthExtraTools - 1}>
                                 <InputGroup className={classNames(styles.modDashedBorder, styles.modLabeledIconHeight)}>
                                     <Dropdown
                                         className={styles.modUnselect}
@@ -382,13 +382,13 @@ const ModeToolsComponent = props => {
                                         }
                                         tipSize={.01}
                                     >
-                                        Shape
+                                        More
                                     </Dropdown>
                                 </InputGroup>
                             </MediaQuery>
                         ) : null}
                     </MediaQuery>
-                    <MediaQuery maxWidth={layout.fullSizeEditorMinWidthWithFolders - 1}>
+                    <MediaQuery maxWidth={layout.fullSizeEditorMinWidthExtraToolsCollapsed - 1}>
                         <InputGroup className={classNames(styles.modDashedBorder, styles.modLabeledIconHeight)}>
                             <Dropdown
                                 className={styles.modUnselect}

@@ -1,5 +1,6 @@
 export default {
-    fullSizeEditorMinWidth: 1100,
-    fullSizeEditorMinWidthWithFolders: 800,
+    fullSizeEditorMinWidth: 1150,
+    fullSizeEditorMinWidthExtraTools: 1510,
+    fullSizeEditorMinWidthExtraToolsCollapsed: 1370,
     referenceWidth: 480
 };

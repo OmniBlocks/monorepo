@@ -10,7 +10,7 @@
     "deploy": "touch playground/.nojekyll && gh-pages -t -d playground -m \"[skip ci] Build for $(git log --pretty=format:%H -n1)\"",
     "i18n:push": "tx-push-src scratch-editor paint-editor ./translations/en.json",
     "i18n:src": "rimraf ./translations/messages && babel src > tmp.js && rimraf tmp.js && ./scripts/build-i18n-source.js ./translations/messages/ ./translations/",
-    "lint": "eslint . --ext .js,.jsx",
+    "lint": "eslint . --fix --ext .js,.jsx",
     "start": "webpack-dev-server",
     "test": "npm run lint && npm run unit && NODE_ENV=production npm run build",
     "unit": "jest --reporters=default",

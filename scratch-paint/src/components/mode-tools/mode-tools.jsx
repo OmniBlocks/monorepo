@@ -342,17 +342,17 @@ const ModeToolsComponent = props => {
                             onClick={props.onCopyToClipboard}
                         />
                         <LabeledIconButton
-                            hideLabel={hideLabel(props.intl.locale)}
-                            imgSrc={cutIcon}
-                            title={props.intl.formatMessage(messages.cut)}
-                            onClick={props.onCutToClipboard}
-                        />
-                        <LabeledIconButton
                             disabled={!(props.clipboardItems.length > 0)}
                             hideLabel={hideLabel(props.intl.locale)}
                             imgSrc={pasteIcon}
                             title={props.intl.formatMessage(messages.paste)}
                             onClick={props.onPasteFromClipboard}
+                        />
+                        <LabeledIconButton
+                            hideLabel={hideLabel(props.intl.locale)}
+                            imgSrc={cutIcon}
+                            title={props.intl.formatMessage(messages.cut)}
+                            onClick={props.onCutToClipboard}
                         />
                     </InputGroup>
                     <InputGroup className={classNames(styles.modDashedBorder, styles.modLabeledIconHeight)}>

@@ -63,7 +63,10 @@ const isAlwaysTrustedForFetching = parsed => (
     parsed.origin === 'https://api.gamejolt.com' ||
 
     // httpbin
-    parsed.origin === 'https://httpbin.org'
+    parsed.origin === 'https://httpbin.org' ||
+
+    // ScratchDB
+    parsed.origin === 'https://scratchdb.lefty.one'
 );
 
 /**

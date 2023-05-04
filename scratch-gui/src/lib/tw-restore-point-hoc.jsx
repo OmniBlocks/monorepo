@@ -16,6 +16,8 @@ const INTERVAL = 1000 * 60 * 5;
 
 let bailed = false;
 
+const disabled = () => bailed || window.DISABLE_RESTORE_POINTS;
+
 const TWRestorePointHOC = function (WrappedComponent) {
     class RestorePointComponent extends React.Component {
         constructor (props) {
@@ -26,7 +28,7 @@ const TWRestorePointHOC = function (WrappedComponent) {
             this.timeout = null;
         }
         componentDidUpdate (prevProps) {
-            if (bailed) {
+            if (disabled()) {
                 return;
             }
             if (
@@ -47,6 +49,9 @@ const TWRestorePointHOC = function (WrappedComponent) {
             clearTimeout(this.timeout);
         }
         async createRestorePoint () {
+            if (disabled()) {
+                return;
+            }
             try {
                 this.props.onAutosavingStart();
                 await RestorePointAPI.save(this.props.vm);

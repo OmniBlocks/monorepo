@@ -56,6 +56,11 @@ const messages = defineMessages({
         description: 'Label for the sussy tool',
         id: 'paint.sussyMode.sussy'
     },
+    dragon: {
+        defaultMessage: 'Dragon',
+        description: 'Label for the totally a normal dragon head drawer dragon drawing tool',
+        id: 'paint.dragonMode.dragon'
+    },
     triangle: {
         defaultMessage: 'Triangle',
         description: 'Label for the triangle tool',

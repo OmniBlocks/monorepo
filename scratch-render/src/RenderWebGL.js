@@ -757,14 +757,19 @@ class RenderWebGL extends EventEmitter {
         gl.clearColor(...this._backgroundColor4f);
         gl.clear(gl.COLOR_BUFFER_BIT);
 
+        const snapshotRequested = this._snapshotCallbacks.length > 0;
         this._drawThese(this._drawList, ShaderManager.DRAW_MODE.default, this._projection, {
             framebufferWidth: gl.canvas.width,
-            framebufferHeight: gl.canvas.height
+            framebufferHeight: gl.canvas.height,
+            skipPrivateSkins: snapshotRequested
         });
-        if (this._snapshotCallbacks.length > 0) {
+        if (snapshotRequested) {
             const snapshot = gl.canvas.toDataURL();
             this._snapshotCallbacks.forEach(cb => cb(snapshot));
             this._snapshotCallbacks = [];
+            // We need to make sure to render again next frame, so that again private skins
+            // that were skipped this frame will become visible again shortly.
+            this.dirty = true;
         }
     }
 
@@ -1891,6 +1896,7 @@ class RenderWebGL extends EventEmitter {
      * @param {boolean} opts.ignoreVisibility Draw all, despite visibility (e.g. stamping, touching color)
      * @param {int} opts.framebufferWidth The width of the framebuffer being drawn onto. Defaults to "native" width
      * @param {int} opts.framebufferHeight The height of the framebuffer being drawn onto. Defaults to "native" height
+     * @param {boolean} opts.skipPrivateSkins Do not draw private skins.
      * @private
      */
     _drawThese (drawables, drawMode, projection, opts = {}) {
@@ -1927,6 +1933,9 @@ class RenderWebGL extends EventEmitter {
 
             // If the skin or texture isn't ready yet, skip it.
             if (!drawable.skin || !drawable.skin.getTexture(drawableScale)) continue;
+
+            // Skip private skins, if requested.
+            if (opts.skipPrivateSkins && drawable.skin.private) continue;
 
             const uniforms = {};
 

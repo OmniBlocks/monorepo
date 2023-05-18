@@ -5,10 +5,17 @@ const MonitorRecord = require('../../src/engine/monitor-record');
 test('Correctly serializes native extension only used by monitors', t => {
     const vm = new VM();
     vm.runtime.requestAddMonitor(MonitorRecord({
-        opcode: 'pen_fakeblock'
+        id: 'fakeblock1',
+        opcode: 'pen_fakeblock',
+        visiblle: true
+    }));
+    vm.runtime.requestAddMonitor(MonitorRecord({
+        id: 'fakeblock2',
+        opcode: 'translate_fakeblock',
+        visiblle: false
     }));
     const json = JSON.parse(vm.toJSON());
-    t.same(json.extensions, ['pen']);
+    t.same(json.extensions, ['pen', 'translate']);
     t.not('customExtensions' in json);
     t.end();
 });
@@ -16,7 +23,15 @@ test('Correctly serializes native extension only used by monitors', t => {
 test('Correctly serializes custom extension only used by monitors', t => {
     const vm = new VM();
     vm.runtime.requestAddMonitor(MonitorRecord({
-        opcode: 'fetch_fakeblock'
+        id: 'fakeblock1',
+        opcode: 'fetch_fakeblock',
+        visible: true
+    }));
+    vm.runtime.requestAddMonitor(MonitorRecord({
+        // should not be serialized at all
+        id: 'fakeblock2',
+        opcode: 'bitwise_fakeblock',
+        visible: false
     }));
     vm.extensionManager.getExtensionURLs = () => ({
         fetch: 'https://extensions.turbowarp.org/fetch.js'

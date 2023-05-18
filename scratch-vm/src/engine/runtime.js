@@ -1232,6 +1232,10 @@ class Runtime extends EventEmitter {
             return this._convertSeparatorForScratchBlocks(blockInfo);
         }
 
+        if (blockInfo.blockType === BlockType.LABEL) {
+            return this._convertLabelForScratchBlocks(blockInfo);
+        }
+
         if (blockInfo.blockType === BlockType.BUTTON) {
             return this._convertButtonForScratchBlocks(blockInfo);
         }
@@ -1404,6 +1408,19 @@ class Runtime extends EventEmitter {
         };
     }
 
+    /**
+     * Generate a label between blocks categories or sub-categories.
+     * @param {ExtensionBlockMetadata} blockInfo - the block to convert
+     * @returns {ConvertedBlockInfo} - the converted & original block information
+     * @private
+     */
+    _convertLabelForScratchBlocks (blockInfo) {
+        return {
+            info: blockInfo,
+            xml: `<label text="${xmlEscape(blockInfo.text)}"></label>`
+        };
+    }
+    
     /**
      * Convert a button for scratch-blocks. A button has no opcode but specifies a callback name in the `func` field.
      * @param {ExtensionBlockMetadata} buttonInfo - the button to convert

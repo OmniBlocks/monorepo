@@ -767,7 +767,7 @@ class RenderWebGL extends EventEmitter {
             const snapshot = gl.canvas.toDataURL();
             this._snapshotCallbacks.forEach(cb => cb(snapshot));
             this._snapshotCallbacks = [];
-            // We need to make sure to render again next frame, so that again private skins
+            // We need to make sure to always render next frame so that private skins
             // that were skipped this frame will become visible again shortly.
             this.dirty = true;
         }
@@ -1923,6 +1923,9 @@ class RenderWebGL extends EventEmitter {
             // the ignoreVisibility flag is used (e.g. for stamping or touchingColor).
             if (!drawable.getVisible() && !opts.ignoreVisibility) continue;
 
+            // Skip private skins, if requested.
+            if (opts.skipPrivateSkins && drawable.skin.private) continue;
+
             // drawableScale is the "framebuffer-pixel-space" scale of the drawable, as percentages of the drawable's
             // "native size" (so 100 = same as skin's "native size", 200 = twice "native size").
             // If the framebuffer dimensions are the same as the stage's "native" size, there's no need to calculate it.
@@ -1933,9 +1936,6 @@ class RenderWebGL extends EventEmitter {
 
             // If the skin or texture isn't ready yet, skip it.
             if (!drawable.skin || !drawable.skin.getTexture(drawableScale)) continue;
-
-            // Skip private skins, if requested.
-            if (opts.skipPrivateSkins && drawable.skin.private) continue;
 
             const uniforms = {};
 

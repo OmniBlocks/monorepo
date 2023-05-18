@@ -247,6 +247,18 @@ class RenderWebGL extends EventEmitter {
          * @type {boolean}
          */
         this.allowPrivateSkinAccess = true;
+
+        /**
+         * Export internals for third-party extensions.
+         */
+        this.exports = {
+            twgl,
+            Drawable,
+            BitmapSkin,
+            TextBubbleSkin,
+            PenSkin,
+            SVGSkin
+        };
     }
 
     // tw: implement high quality pen option

@@ -534,7 +534,7 @@ const getSimplifiedLayerOrdering = function (targets) {
     return MathUtil.reducedSortOrdering(layerOrders);
 };
 
-const serializeMonitors = function (monitors, runtime) {
+const serializeMonitors = function (monitors, runtime, extensions) {
     // Monitors position is always stored as position from top-left corner in 480x360 stage.
     const xOffset = (runtime.stageWidth - 480) / 2;
     const yOffset = (runtime.stageHeight - 360) / 2;
@@ -543,7 +543,15 @@ const serializeMonitors = function (monitors, runtime) {
         // https://github.com/LLK/scratch-vm/issues/2331
         .filter(monitorData => {
             const extensionID = getExtensionIdForOpcode(monitorData.opcode);
-            return !extensionID || monitorData.visible;
+            if (!extensionID) {
+                // Native block, always safe
+                return true;
+            }
+            if (monitorData.visible) {
+                extensions.add(extensionID);
+                return true;
+            }
+            return false;
         })
         .map(monitorData => {
             const serializedMonitor = {
@@ -565,7 +573,10 @@ const serializeMonitors = function (monitors, runtime) {
                 serializedMonitor.isDiscrete = monitorData.isDiscrete;
             }
             return serializedMonitor;
-        });
+        })
+        // By default the sequence is lazily evaluated, but we want it to be evaluated right
+        // now to update the used extension list.
+        .toArray();
 };
 
 /**
@@ -604,7 +615,7 @@ const serialize = function (runtime, targetId, {allowOptimization = true} = {}) 
 
     obj.targets = serializedTargets;
 
-    obj.monitors = serializeMonitors(runtime.getMonitorState(), runtime);
+    obj.monitors = serializeMonitors(runtime.getMonitorState(), runtime, extensions);
 
     // Assemble extension list
     obj.extensions = Array.from(extensions);

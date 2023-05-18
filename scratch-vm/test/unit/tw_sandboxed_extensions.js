@@ -56,3 +56,53 @@ test('redirect', async t => {
     await t.rejects(global.Scratch.redirect('https://example.com/'), /^Scratch\.redirect not supported in sandboxed extensions$/);
     t.end();
 });
+
+test('translate', t => {
+    t.equal(global.Scratch.translate({
+        id: 'test1',
+        default: 'Message 1: {var}',
+        description: 'Description'
+    }, {
+        var: 'test'
+    }), 'Message 1: test');
+    t.equal(global.Scratch.translate('test1'), 'test1');
+    t.equal(global.Scratch.translate('test1 {VAR}', {
+        VAR: '3'
+    }), 'test1 3');
+
+    const messages = {
+        en: {
+            test1: 'EN Message 1: {var}'
+        },
+        es: {
+            test1: 'ES Message 1: {var}'
+        }
+    };
+
+    // Should default to English when no navigator object
+    global.Scratch.translate.setup(messages);
+    t.equal(global.Scratch.translate({
+        id: 'test1',
+        default: 'Message 1',
+        description: 'Description'
+    }, {
+        var: 'ok'
+    }), 'EN Message 1: ok');
+
+    // But if there is a navigator object, it should use its language
+    // This is slightly contrived because setup() should only be run once in real extensions,
+    // but this should still be useful as a test.
+    global.navigator = {
+        language: 'es'
+    };
+    global.Scratch.translate.setup(messages);
+    t.equal(global.Scratch.translate({
+        id: 'test1',
+        default: 'Message 1',
+        description: 'Description'
+    }, {
+        var: 'ok'
+    }), 'ES Message 1: ok');
+
+    t.end();
+});

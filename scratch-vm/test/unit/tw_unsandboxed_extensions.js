@@ -243,3 +243,58 @@ test('redirect', async t => {
     t.equal(global.location.href, 'https://example.com/2');
     t.end();
 });
+
+test('translate', async t => {
+    const vm = new VirtualMachine();
+    UnsandboxedExtensionRunner.setupUnsandboxedExtensionAPI(vm);
+
+    t.equal(global.Scratch.translate({
+        id: 'test1',
+        default: 'Message 1: {var}',
+        description: 'Description'
+    }, {
+        var: 'test'
+    }), 'Message 1: test');
+    t.equal(global.Scratch.translate('test1 {var}', {
+        var: 'ok'
+    }), 'test1 ok');
+
+    global.Scratch.translate.setup({
+        en: {
+            test1: 'EN Message 1: {var}'
+        },
+        es: {
+            test1: 'ES Message 1: {var}'
+        }
+    });
+    t.equal(global.Scratch.translate({
+        id: 'test1',
+        default: 'Message 1: {var}',
+        description: 'Description'
+    }, {
+        var: 'test'
+    }), 'EN Message 1: test');
+    t.equal(global.Scratch.translate('test1 {var}', {
+        var: 'ok'
+    }), 'test1 ok');
+
+    await vm.setLocale('es');
+
+    global.Scratch.translate.setup({
+        en: {
+            test1: 'EN Message 1: {var}'
+        },
+        es: {
+            test1: 'ES Message 1: {var}'
+        }
+    });
+    t.equal(global.Scratch.translate({
+        id: 'test1',
+        default: 'Message 1: {var}',
+        description: 'Description'
+    }, {
+        var: 'test'
+    }), 'ES Message 1: test');
+
+    t.end();
+});

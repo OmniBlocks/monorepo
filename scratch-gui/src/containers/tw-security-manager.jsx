@@ -7,6 +7,15 @@ import SecurityManagerModal from '../components/tw-security-manager-modal/securi
 import SecurityModals from '../lib/tw-security-manager-constants';
 
 /**
+ * Set of extension URLs that the user has manually trusted to load unsandboxed.
+ */
+const extensionsTrustedByUser = new Set();
+
+const manuallyTrustExtension = url => {
+    extensionsTrustedByUser.add(url);
+};
+
+/**
  * Trusted extensions are loaded automatically and without a sandbox.
  * @param {string} url URL as a string.
  * @returns {boolean} True if the extension can is trusted
@@ -16,7 +25,9 @@ const isTrustedExtension = url => (
     url.startsWith('https://extensions.turbowarp.org/') ||
 
     // For development.
-    url.startsWith('http://localhost:8000/')
+    url.startsWith('http://localhost:8000/') ||
+
+    extensionsTrustedByUser.has(url)
 );
 
 /**
@@ -102,7 +113,9 @@ class TWSecurityManagerComponent extends React.Component {
         this.nextModalCallbacks = [];
         this.modalLocked = false;
         this.state = {
-            modal: null
+            type: null,
+            data: null,
+            callback: null
         };
     }
 
@@ -141,18 +154,18 @@ class TWSecurityManagerComponent extends React.Component {
             } else {
                 this.modalLocked = false;
                 this.setState({
-                    modal: null
+                    // only clear type in case other data needs to be accessed
+                    type: null
                 });
             }
         };
 
-        const showModal = async data => {
+        const showModal = async (type, data) => {
             const result = await new Promise(resolve => {
                 this.setState({
-                    modal: {
-                        ...data,
-                        callback: resolve
-                    }
+                    type,
+                    data,
+                    callback: resolve
                 });
             });
             releaseLock();
@@ -166,11 +179,11 @@ class TWSecurityManagerComponent extends React.Component {
     }
 
     handleAllowed () {
-        this.state.modal.callback(true);
+        this.state.callback(true);
     }
 
     handleDenied () {
-        this.state.modal.callback(false);
+        this.state.callback(false);
     }
 
     /**
@@ -185,6 +198,16 @@ class TWSecurityManagerComponent extends React.Component {
         return 'iframe';
     }
 
+    handleChangeUnsandboxed (e) {
+        const checked = e.target.checked;
+        this.setState(oldState => ({
+            data: {
+                ...oldState.data,
+                unsandboxed: checked
+            }
+        }));
+    }
+
     /**
      * @param {string} url The extension's URL
      * @returns {Promise<boolean>} Whether the extension can be loaded
@@ -195,9 +218,20 @@ class TWSecurityManagerComponent extends React.Component {
             return true;
         }
         const {showModal} = await this.acquireModalLock();
-        return showModal({
-            type: SecurityModals.LoadExtension,
-            url
+        if (url.startsWith('data:')) {
+            const allowed = await showModal(SecurityModals.LoadExtension, {
+                url,
+                unsandboxed: false,
+                onChangeUnsandboxed: this.handleChangeUnsandboxed.bind(this)
+            });
+            if (this.state.data.unsandboxed) {
+                manuallyTrustExtension(url);
+            }
+            return allowed;
+        }
+        return showModal(SecurityModals.LoadExtension, {
+            url,
+            unsandboxed: false
         });
     }
 
@@ -218,8 +252,7 @@ class TWSecurityManagerComponent extends React.Component {
             releaseLock();
             return true;
         }
-        const allowed = await showModal({
-            type: SecurityModals.Fetch,
+        const allowed = await showModal(SecurityModals.Fetch, {
             url
         });
         if (allowed) {
@@ -238,8 +271,7 @@ class TWSecurityManagerComponent extends React.Component {
             return false;
         }
         const {showModal} = await this.acquireModalLock();
-        return showModal({
-            type: SecurityModals.OpenWindow,
+        return showModal(SecurityModals.OpenWindow, {
             url
         });
     }
@@ -254,19 +286,17 @@ class TWSecurityManagerComponent extends React.Component {
             return false;
         }
         const {showModal} = await this.acquireModalLock();
-        return showModal({
-            type: SecurityModals.Redirect,
+        return showModal(SecurityModals.Redirect, {
             url
         });
     }
 
     render () {
-        if (this.state.modal) {
-            const modal = this.state.modal;
+        if (this.state.type) {
             return (
                 <SecurityManagerModal
-                    type={modal.type}
-                    url={modal.url}
+                    type={this.state.type}
+                    data={this.state.data}
                     onAllowed={this.handleAllowed}
                     onDenied={this.handleDenied}
                 />
@@ -296,7 +326,13 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = () => ({});
 
-export default connect(
+const ConnectedSecurityManagerComponent = connect(
     mapStateToProps,
     mapDispatchToProps
 )(TWSecurityManagerComponent);
+
+export {
+    ConnectedSecurityManagerComponent as default,
+    manuallyTrustExtension,
+    isTrustedExtension
+};

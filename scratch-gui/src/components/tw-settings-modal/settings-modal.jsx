@@ -106,7 +106,6 @@ const BooleanSetting = ({value, onChange, label, ...props}) => (
         primary={
             <label className={styles.label}>
                 <FancyCheckbox
-                    type="checkbox"
                     className={styles.checkbox}
                     checked={value}
                     onChange={onChange}

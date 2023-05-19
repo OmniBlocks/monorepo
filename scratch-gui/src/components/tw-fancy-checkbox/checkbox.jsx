@@ -6,6 +6,7 @@ import classNames from 'classnames';
 const FancyCheckbox = props => (
     <input
         {...props}
+        type="checkbox"
         className={classNames(props.className, styles.checkbox)}
     />
 );

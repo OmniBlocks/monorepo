@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {FormattedMessage} from 'react-intl';
-import styles from './security-manager-modal.css';
+import URL from './url.jsx';
 
 const FetchModal = props => (
     <div>
@@ -10,9 +10,7 @@ const FetchModal = props => (
             description="Part of modal when a project asks permission to fetch a URL"
             id="tw.fetch.title"
         />
-        <p className={styles.url}>
-            {props.url}
-        </p>
+        <URL url={props.url} />
         <p>
             <FormattedMessage
                 // eslint-disable-next-line max-len

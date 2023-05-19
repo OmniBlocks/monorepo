@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {FormattedMessage} from 'react-intl';
-import styles from './security-manager-modal.css';
 import {APP_NAME} from '../../lib/brand';
+import URL from './url.jsx';
 
 const RedirectModal = props => (
     <div>
@@ -11,9 +11,7 @@ const RedirectModal = props => (
             description="Part of modal when a project attempts to navigate the current tab"
             id="tw.redirect.title"
         />
-        <p className={styles.url}>
-            {props.url}
-        </p>
+        <URL url={props.url} />
         <p>
             <FormattedMessage
                 // eslint-disable-next-line max-len

@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {FormattedMessage} from 'react-intl';
-import styles from './security-manager-modal.css';
 import {APP_NAME} from '../../lib/brand';
+import URL from './url.jsx';
 
 const OpenWindowModal = props => (
     <div>
@@ -11,9 +11,7 @@ const OpenWindowModal = props => (
             description="Part of modal when a project attempts to open a window"
             id="tw.openWindow.title"
         />
-        <p className={styles.url}>
-            {props.url}
-        </p>
+        <URL url={props.url} />
         <p>
             <FormattedMessage
                 // eslint-disable-next-line max-len

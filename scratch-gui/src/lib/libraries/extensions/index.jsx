@@ -462,7 +462,7 @@ export default [
         name: (
             <FormattedMessage
                 defaultMessage="Custom Extension"
-                description="Name of custom extension category"
+                description="Name of library item to load a custom extension from a remote source"
                 id="tw.customExtension.name"
             />
         ),
@@ -470,8 +470,8 @@ export default [
         iconURL: customExtensionIcon,
         description: (
             <FormattedMessage
-                defaultMessage="Load custom extensions from URLs."
-                description="Description of custom extension category"
+                defaultMessage="Load custom extensions from URLs, files, or JavaScript source code."
+                description="Description of library item to load a custom extension from a custom source"
                 id="tw.customExtension.description"
             />
         ),

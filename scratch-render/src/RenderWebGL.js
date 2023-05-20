@@ -12,6 +12,7 @@ const ShaderManager = require('./ShaderManager');
 const SVGSkin = require('./SVGSkin');
 const TextBubbleSkin = require('./TextBubbleSkin');
 const EffectTransform = require('./EffectTransform');
+const CanvasMeasurementProvider = require('./util/canvas-measurement-provider');
 const log = require('./util/log');
 
 const __isTouchingDrawablesPoint = twgl.v3.create();
@@ -86,6 +87,16 @@ const colorMatches = (a, b, offset) => (
  * @type {number}
  */
 const FENCE_WIDTH = 15;
+
+// Loading text wrapper takes a while because of some of its dependencies, so only do so when needed.
+let _TextWrapper;
+const lazilyLoadTextWrapper = () => {
+    if (!_TextWrapper) {
+        // eslint-disable-next-line global-require
+        _TextWrapper = require('./util/text-wrapper');
+    }
+    return _TextWrapper;
+};
 
 
 class RenderWebGL extends EventEmitter {
@@ -257,7 +268,8 @@ class RenderWebGL extends EventEmitter {
             BitmapSkin,
             TextBubbleSkin,
             PenSkin,
-            SVGSkin
+            SVGSkin,
+            CanvasMeasurementProvider
         };
     }
 
@@ -571,6 +583,14 @@ class RenderWebGL extends EventEmitter {
         drawable.skin = null;
 
         return drawableID;
+    }
+
+    /**
+     * @param {CanvasMeasurementProvider} measurementProvider helper for measuring text
+     * @returns {TextWrapper} an instance of TextWrapper
+     */
+    createTextWrapper (measurementProvider) {
+        return new (lazilyLoadTextWrapper())(measurementProvider);
     }
 
     /**

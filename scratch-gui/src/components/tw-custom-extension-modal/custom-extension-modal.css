@@ -26,15 +26,21 @@
     justify-content: space-around;
 }
 .type-selector-button {
-    width: 25%;
+    width: 100%;
     cursor: pointer;
     border-bottom: 0.25rem solid $ui-tertiary;
-    text-align: center;
     margin: 0 1rem;
     padding: 0.5rem 0;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 .type-selector-button[data-active="true"] {
     border-color: $motion-primary;
+}
+.type-selector-button:active {
+    border-color: $motion-transparent;
 }
 
 .url-input,
@@ -54,7 +60,10 @@
     height: 3rem;
 }
 .text-code-input {
-    height: 10rem;
+    min-height: 3rem;
+    height: 8rem;
+    min-width: 100%;
+    max-width: 100%;
     font-family: monospace;
 }
 

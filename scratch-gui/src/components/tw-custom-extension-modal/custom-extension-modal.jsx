@@ -86,7 +86,7 @@ const CustomExtensionModal = props => (
                         value={props.url}
                         onChange={props.onChangeURL}
                         onKeyDown={props.onKeyDown}
-                        placeholder="https://extensions.turbowarp.org/stretch.js"
+                        placeholder="https://extensions.turbowarp.org/..."
                         autoFocus
                     />
                 </React.Fragment>

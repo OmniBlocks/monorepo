@@ -5,20 +5,21 @@
     throw new Error('Runtime Options extension needs to be run unsandboxed');
   }
 
+  const greenFlagURI = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAMAAADXqc3KAAABFFBMVEUAAACAgABVqlVJkklAn0BNmTNLljxGlzpDmzdFmjpGmzxHmz9Fmj1FmT5Emj1GmT1GmD1EmDxGmTxEmT1GmjxGmT1FmDxEmT5EmTxGmT5FmD1GmT5FmT1Gmj1EmT5FmT1FmT1FmDxGmT1FmjxLs09LtE9Jr0xJsk1Js05JtVBKtU5KtVBKtlBJrkpJsE1KtlFIrEpIsExLt1FLuFJKuVNIqkhLulNIp0VJqkhKtlJLvVRMvFNFmT5GpUVFmT1HpEVHokNMvlVFmT1Ho0NFmTxLvlVGoUFMvlVLvlVGn0BFmT1Nv1ZEmz5FmTxFmTxFmT1NvlZFmz9FmT5FnT9FnD5GnT9Mv1ZMv1ZMv1ZFmT1Mv1b////70P2GAAAAWXRSTlMAAgMHCAoRFhcwMz0/RkdQVGFmaWpxcnh7gIGEhZKZo6eprLq/v8DAwMDAwMDBwcHCwsPDxcbIysrLzM3Pz9DQ1NTV1dfZ29vg4uXm5+jp6ens7fDx9Pv8/nPb5aAAAAABYktHRFt0vJU0AAAAsUlEQVQoz2NgwA3YhNiwS4hHykoou9goCrKiSUhGhqhZe7gbm3rxQwQ4BJihEupRYODooMDFyMAu6uMsgyoRFW5kHxjkqeuhL4cmAQM4JXRwSWjjktDEJaGFS0IVIeFtZuIaAZdQgUmY2/oqyTu5WcEkNGAS/kJMQJrbySAAJBxmGSoIlYAoYGCR8rPVM7QItuNlQJVgYGDlE5MU5kSErhz2+KCihEikNHYJJh5mBhIAADBcR/r5OJzCAAAAAElFTkSuQmCC';
   const TURBO_MODE = 'turbo mode';
   const INTERPOLATION = 'interpolation';
   const REMOVE_FENCING = 'remove fencing';
   const REMOVE_MISC_LIMITS = 'remove misc limits';
+  const HIGH_QUALITY_PEN = 'high quality pen';
 
   class RuntimeOptions {
     getInfo () {
       return {
         id: 'runtimeoptions',
         name: 'Runtime Options',
-        color1: '#3467eb',
-        color2: '#4e7bed',
-        color3: '#2d53b3',
-
+        color1: '#8c9abf',
+        color2: '#7d8aab',
+        color3: '#6f7b99',
         blocks: [
           {
             opcode: 'getEnabled',
@@ -54,12 +55,12 @@
 
           {
             opcode: 'getFramerate',
-            text: 'get framerate',
+            text: 'get framerate limit',
             blockType: Scratch.BlockType.REPORTER
           },
           {
             opcode: 'setFramerate',
-            text: 'set framerate to [fps]',
+            text: 'set framerate limit to [fps]',
             blockType: Scratch.BlockType.COMMAND,
             arguments: {
               fps: {
@@ -117,6 +118,31 @@
                 defaultValue: '360'
               }
             }
+          },
+
+          '---',
+
+          {
+            opcode: 'setUsername',
+            text: 'set username to [username]',
+            blockType: Scratch.BlockType.COMMAND,
+            arguments: {
+              username: {
+                type: Scratch.ArgumentType.STRING,
+                defaultValue: ''
+              }
+            }
+          },
+          {
+            opcode: 'greenFlag',
+            text: 'run green flag [flag]',
+            blockType: Scratch.BlockType.COMMAND,
+            arguments: {
+              flag: {
+                type: Scratch.ArgumentType.IMAGE,
+                dataURI: greenFlagURI
+              }
+            }
           }
         ],
         menus: {
@@ -138,6 +164,10 @@
               {
                 text: 'remove misc limits',
                 value: REMOVE_MISC_LIMITS
+              },
+              {
+                text: 'high quality pen',
+                value: HIGH_QUALITY_PEN
               }
             ]
           },
@@ -191,58 +221,52 @@
       if (thing === TURBO_MODE) {
         return Scratch.vm.runtime.turboMode;
       } else if (thing === INTERPOLATION) {
-        // @ts-expect-error
         return Scratch.vm.runtime.interpolationEnabled;
       } else if (thing === REMOVE_FENCING) {
-        // @ts-expect-error
         return !Scratch.vm.runtime.runtimeOptions.fencing;
       } else if (thing === REMOVE_MISC_LIMITS) {
-        // @ts-expect-error
         return !Scratch.vm.runtime.runtimeOptions.miscLimits;
+      } else if (thing === HIGH_QUALITY_PEN) {
+        return Scratch.renderer.useHighQualityRender;
       }
       return false;
     }
 
     setEnabled ({ thing, enabled }) {
-      enabled = enabled === 'true';
+      enabled = Scratch.Cast.toBoolean(enabled);
 
       if (thing === TURBO_MODE) {
         Scratch.vm.setTurboMode(enabled);
       } else if (thing === INTERPOLATION) {
-        // @ts-expect-error
         Scratch.vm.setInterpolation(enabled);
       } else if (thing === REMOVE_FENCING) {
-        // @ts-expect-error
         Scratch.vm.setRuntimeOptions({
           fencing: !enabled
         });
       } else if (thing === REMOVE_MISC_LIMITS) {
-        // @ts-expect-error
         Scratch.vm.setRuntimeOptions({
           miscLimits: !enabled
         });
+      } else if (thing === HIGH_QUALITY_PEN) {
+        Scratch.renderer.setUseHighQualityRender(enabled);
       }
     }
 
     getFramerate () {
-      // @ts-expect-error
       return Scratch.vm.runtime.frameLoop.framerate;
     }
 
     setFramerate ({ fps }) {
-      fps = +fps || 0;
-      // @ts-expect-error
+      fps = Scratch.Cast.toNumber(fps);
       Scratch.vm.setFramerate(fps);
     }
 
     getCloneLimit () {
-      // @ts-expect-error
       return Scratch.vm.runtime.runtimeOptions.maxClones;
     }
 
     setCloneLimit ({ limit }) {
-      limit = +limit || 0;
-      // @ts-expect-error
+      limit = Scratch.Cast.toNumber(limit);
       Scratch.vm.setRuntimeOptions({
         maxClones: limit
       });
@@ -250,20 +274,25 @@
 
     getDimension ({ dimension }) {
       if (dimension === 'width') {
-        // @ts-expect-error
         return Scratch.vm.runtime.stageWidth;
       } else if (dimension === 'height') {
-        // @ts-expect-error
         return Scratch.vm.runtime.stageHeight;
       }
       return 0;
     }
 
     setDimensions ({ width, height }) {
-      width = +width || 0;
-      height = +height || 0;
-      // @ts-expect-error
+      width = Scratch.Cast.toNumber(width);
+      height = Scratch.Cast.toNumber(height);
       Scratch.vm.setStageSize(width, height);
+    }
+
+    setUsername ({ username }) {
+      Scratch.vm.runtime.ioDevices.userData._username = Scratch.Cast.toString(username);
+    }
+
+    greenFlag () {
+      Scratch.vm.runtime.greenFlag();
     }
   }
 

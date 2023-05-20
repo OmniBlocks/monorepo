@@ -65,26 +65,48 @@
                 defaultValue: 100,
               },
             },
+            filter: [Scratch.TargetType.SPRITE],
+          },
+          {
+            opcode: 'changeStretch',
+            blockType: Scratch.BlockType.COMMAND,
+            text: 'change stretch by x: [DX] y: [DY]',
+            arguments: {
+              DX: {
+                type: Scratch.ArgumentType.NUMBER,
+                defaultValue: 0
+              },
+              DY: {
+                type: Scratch.ArgumentType.NUMBER,
+                defaultValue: 0
+              }
+            }
           },
           {
             opcode: 'getX',
             blockType: Scratch.BlockType.REPORTER,
             text: 'x stretch',
+            filter: [Scratch.TargetType.SPRITE],
             disableMonitor: true,
           },
           {
             opcode: 'getY',
             blockType: Scratch.BlockType.REPORTER,
             text: 'y stretch',
+            filter: [Scratch.TargetType.SPRITE],
             disableMonitor: true,
           },
         ],
       };
     }
     setStretch(args, util) {
-      // TODO: move to Scratch.Cast when it's merged
-      util.target[STRETCH_X] = +args.X || 0;
-      util.target[STRETCH_Y] = +args.Y || 0;
+      util.target[STRETCH_X] = Scratch.Cast.toNumber(args.X);
+      util.target[STRETCH_Y] = Scratch.Cast.toNumber(args.Y);
+      forceUpdateDirectionAndScale(util.target);
+    }
+    changeStretch(args, util) {
+      util.target[STRETCH_X] += Scratch.Cast.toNumber(args.DX);
+      util.target[STRETCH_Y] += Scratch.Cast.toNumber(args.DY);
       forceUpdateDirectionAndScale(util.target);
     }
     getX(args, util) {

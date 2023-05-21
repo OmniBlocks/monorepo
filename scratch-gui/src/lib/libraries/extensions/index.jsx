@@ -447,13 +447,6 @@ export default [
         iconURL: runtimeOptionsIcon
     }),
     galleryItem({
-        name: 'Sensing Plus',
-        description: 'An extension to the sensing category. Created by ObviousAlexC.',
-        extensionId: 'obviousalexsensing',
-        extensionURL: 'https://extensions.turbowarp.org/obviousAlexC/SensingPlus.js',
-        iconURL: sensingPlusIcon
-    }),
-    galleryItem({
         name: 'Clones Plus',
         description: 'Expansion of Scratch\'s clone features. Created by LukeManiaStudios.',
         extensionId: 'lmsclonesplus',

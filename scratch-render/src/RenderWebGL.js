@@ -3,6 +3,7 @@ const EventEmitter = require('events');
 const hull = require('hull.js');
 const twgl = require('twgl.js');
 
+const Skin = require('./Skin');
 const BitmapSkin = require('./BitmapSkin');
 const Drawable = require('./Drawable');
 const Rectangle = require('./Rectangle');
@@ -265,6 +266,7 @@ class RenderWebGL extends EventEmitter {
         this.exports = {
             twgl,
             Drawable,
+            Skin,
             BitmapSkin,
             TextBubbleSkin,
             PenSkin,

@@ -16,6 +16,7 @@ const MathUtil = require('../util/math-util');
 const StringUtil = require('../util/string-util');
 const VariableUtil = require('../util/variable-util');
 const compress = require('./tw-compress-sb3');
+const defaultExtensionURLs = require('./tw-default-extension-urls');
 
 const {loadCostume} = require('../import/load-costume.js');
 const {loadSound} = require('../import/load-sound.js');
@@ -1338,7 +1339,7 @@ const replaceUnsafeCharsInVariableIds = function (targets) {
 const deserialize = function (json, runtime, zip, isSingleSprite) {
     const extensions = {
         extensionIDs: new Set(),
-        extensionURLs: new Map()
+        extensionURLs: new Map(Object.entries(defaultExtensionURLs))
     };
 
     // Store the origin field (e.g. project originated at CSFirst) so that we can save it again.
@@ -1350,7 +1351,9 @@ const deserialize = function (json, runtime, zip, isSingleSprite) {
 
     // Extract custom extension IDs, if they exist.
     if (json.extensionURLs) {
-        extensions.extensionURLs = new Map(Object.entries(json.extensionURLs));
+        for (const [id, url] of Object.entries(json.extensionURLs)) {
+            extensions.extensionURLs.set(id, url);
+        }
     }
 
     // First keep track of the current target order in the json,

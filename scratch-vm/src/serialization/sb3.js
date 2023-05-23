@@ -26,7 +26,7 @@ const hasOwnProperty = Object.prototype.hasOwnProperty;
 /**
  * @typedef {object} ImportedProject
  * @property {Array.<Target>} targets - the imported Scratch 3.0 target objects.
- * @property {ImportedExtensionsInfo} extensionsInfo - the ID of each extension actually used by this project.
+ * @property {ImportedExtensionsInfo} extensions - the ID of each extension actually used by this project.
  */
 
 /**

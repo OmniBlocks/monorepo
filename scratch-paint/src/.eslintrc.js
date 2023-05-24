@@ -8,7 +8,8 @@ module.exports = {
         'import/no-mutable-exports': 'error',
         'import/no-commonjs': 'error',
         'import/no-amd': 'error',
-        'import/no-nodejs-modules': 'error'
+        'import/no-nodejs-modules': 'error',
+        'linebreak-style': 'off'
     },
     settings: {
         react: {

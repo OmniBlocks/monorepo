@@ -128,22 +128,14 @@ class Blocks extends React.Component {
         toolboxWorkspace.registerButtonCallback('MAKE_A_VARIABLE', varListButtonCallback(''));
         toolboxWorkspace.registerButtonCallback('MAKE_A_LIST', varListButtonCallback('list'));
         toolboxWorkspace.registerButtonCallback('MAKE_A_PROCEDURE', procButtonCallback);
-        toolboxWorkspace.registerButtonCallback('OPEN_DOCUMENTATION', block => {
-            const CLASS_PREFIX = 'docs-uri-';
-            const svgGroup = block.svgGroup_;
-            const docsURIClass = Array.from(svgGroup.classList).find(i => i.startsWith(CLASS_PREFIX));
-            if (!docsURIClass) {
-                return;
-            }
-            try {
-                const docsURI = docsURIClass.substr(CLASS_PREFIX.length);
-                const url = new URL(docsURI);
-                if (url.protocol !== 'http:' && url.protocol !== 'https:') {
-                    throw new Error('invalid protocol');
-                }
+        toolboxWorkspace.registerButtonCallback('EXTENSION_CALLBACK', block => {
+            this.props.vm.handleExtensionButtonPress(block.callbackData_);
+        });
+        toolboxWorkspace.registerButtonCallback('OPEN_EXTENSION_DOCS', block => {
+            const docsURI = block.callbackData_;
+            const url = new URL(docsURI);
+            if (url.protocol === 'http:' || url.protocol === 'https:') {
                 window.open(docsURI, '_blank');
-            } catch (e) {
-                log.warn('cannot open docs URI', e);
             }
         });
 

@@ -304,6 +304,10 @@ class VirtualMachine extends EventEmitter {
         return 'enabled debug mode';
     }
 
+    handleExtensionButtonPress (buttonData) {
+        this.runtime.handleExtensionButtonPress(buttonData);
+    }
+
     /**
      * Stop all threads and running activities.
      */

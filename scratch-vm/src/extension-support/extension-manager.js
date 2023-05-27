@@ -511,6 +511,9 @@ class ExtensionManager {
             if (blockInfo.opcode) {
                 log.warn(`Ignoring opcode "${blockInfo.opcode}" for button with text: ${blockInfo.text}`);
             }
+            blockInfo.callFunc = () => {
+                dispatch.call(serviceName, blockInfo.func);
+            };
             break;
         case BlockType.LABEL:
             if (blockInfo.opcode) {

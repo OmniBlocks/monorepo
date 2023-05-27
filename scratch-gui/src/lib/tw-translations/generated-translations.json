@@ -878,7 +878,7 @@
         "tw.opcode.mousex": "x del mouse",
         "tw.opcode.mousey": "y del mouse",
         "tw.openAdvanced": "Apri impostazioni avanzate",
-        "tw.openWindow.dangerous": "Questo sito web non è stato visitato dagli sviluppatori di {APP_NAME}. Può contenere codice pericoloso o dannoso.",
+        "tw.openWindow.dangerous": "Questo sito web non è stato recensito dagli sviluppatori di {APP_NAME}. Può contenere codice pericoloso o dannoso.",
         "tw.openWindow.title": "Il progetto richiede di aprire in una nuova finestra o scheda l'URL:",
         "tw.paint.alpha": "Opacità",
         "tw.privacy": "Politica della Privacy",

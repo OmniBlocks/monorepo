@@ -298,3 +298,55 @@ test('translate', async t => {
 
     t.end();
 });
+
+test('canRecordAudio', async t => {
+    const vm = new VirtualMachine();
+    UnsandboxedExtensionRunner.setupUnsandboxedExtensionAPI(vm);
+
+    vm.securityManager.canRecordAudio = () => false;
+    t.equal(await global.Scratch.canRecordAudio(), false);
+
+    vm.securityManager.canRecordAudio = () => true;
+    t.equal(await global.Scratch.canRecordAudio(), true);
+    
+    t.end();
+});
+
+test('canRecordVideo', async t => {
+    const vm = new VirtualMachine();
+    UnsandboxedExtensionRunner.setupUnsandboxedExtensionAPI(vm);
+
+    vm.securityManager.canRecordVideo = () => false;
+    t.equal(await global.Scratch.canRecordVideo(), false);
+
+    vm.securityManager.canRecordVideo = () => true;
+    t.equal(await global.Scratch.canRecordVideo(), true);
+    
+    t.end();
+});
+
+test('canReadClipboard', async t => {
+    const vm = new VirtualMachine();
+    UnsandboxedExtensionRunner.setupUnsandboxedExtensionAPI(vm);
+
+    vm.securityManager.canReadClipboard = () => false;
+    t.equal(await global.Scratch.canReadClipboard(), false);
+
+    vm.securityManager.canReadClipboard = () => true;
+    t.equal(await global.Scratch.canReadClipboard(), true);
+    
+    t.end();
+});
+
+test('canNotify', async t => {
+    const vm = new VirtualMachine();
+    UnsandboxedExtensionRunner.setupUnsandboxedExtensionAPI(vm);
+
+    vm.securityManager.canNotify = () => false;
+    t.equal(await global.Scratch.canNotify(), false);
+
+    vm.securityManager.canNotify = () => true;
+    t.equal(await global.Scratch.canNotify(), true);
+    
+    t.end();
+});

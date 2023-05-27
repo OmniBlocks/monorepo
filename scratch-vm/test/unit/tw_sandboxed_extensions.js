@@ -89,9 +89,7 @@ test('translate', t => {
         var: 'ok'
     }), 'EN Message 1: ok');
 
-    // But if there is a navigator object, it should use its language
-    // This is slightly contrived because setup() should only be run once in real extensions,
-    // but this should still be useful as a test.
+    // But if there is a navigator object, it should use its language.
     global.navigator = {
         language: 'es'
     };
@@ -104,5 +102,25 @@ test('translate', t => {
         var: 'ok'
     }), 'ES Message 1: ok');
 
+    t.end();
+});
+
+test('canRecordAudio', async t => {
+    t.equal(await global.Scratch.canRecordAudio(), false);
+    t.end();
+});
+
+test('canRecordVideo', async t => {
+    t.equal(await global.Scratch.canRecordVideo(), false);
+    t.end();
+});
+
+test('canReadClipboard', async t => {
+    t.equal(await global.Scratch.canReadClipboard(), false);
+    t.end();
+});
+
+test('canNotify', async t => {
+    t.equal(await global.Scratch.canNotify(), false);
     t.end();
 });

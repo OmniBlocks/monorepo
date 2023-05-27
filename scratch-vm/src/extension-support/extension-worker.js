@@ -79,6 +79,10 @@ Object.assign(global.Scratch, ScratchCommon, {
     openWindow: () => Promise.reject(new Error('Scratch.openWindow not supported in sandboxed extensions')),
     canRedirect: () => Promise.resolve(false),
     redirect: () => Promise.reject(new Error('Scratch.redirect not supported in sandboxed extensions')),
+    canRecordAudio: () => Promise.resolve(false),
+    canRecordVideo: () => Promise.resolve(false),
+    canReadClipboard: () => Promise.resolve(false),
+    canNotify: () => Promise.resolve(false),
     translate
 });
 

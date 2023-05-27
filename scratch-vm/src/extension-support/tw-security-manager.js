@@ -2,7 +2,7 @@
 
 /**
  * Responsible for determining various policies related to custom extension security.
- * The default implementation restricts automatic extension loading, but grants any
+ * The default implementation prevents automatic extension loading, but grants any
  * loaded extensions the maximum possible capabilities so as to retain compatibility
  * with a vanilla scratch-vm. You may override properties of an instance of this class
  * to customize the security policies as you see fit, for example:
@@ -85,6 +85,44 @@ class SecurityManager {
      */
     canRedirect (websiteURL) {
         // By default, allow all.
+        return Promise.resolve(true);
+    }
+
+    /**
+     * Determine whether an extension is allowed to record audio from the user's microphone.
+     * This could include raw audio data or a transcriptions.
+     * Note that, even if this returns true, success is not guaranteed.
+     * @returns {Promise<boolean>|boolean}
+     */
+    canRecordAudio () {
+        return Promise.resolve(true);
+    }
+
+    /**
+     * Determine whether an extension is allowed to record video from the user's camera.
+     * Note that, even if this returns true, success is not guaranteed.
+     * @returns {Promise<boolean>|boolean}
+     */
+    canRecordVideo () {
+        return Promise.resolve(true);
+    }
+
+    /**
+     * Determine whether an extension is allowed to read values from the user's clipboard
+     * without user interaction.
+     * Note that, even if this returns true, success is not guaranteed.
+     * @returns {Promise<boolean>|boolean}
+     */
+    canReadClipboard () {
+        return Promise.resolve(true);
+    }
+
+    /**
+     * Determine whether an extension is allowed to show notifications.
+     * Note that, even if this returns true, success is not guaranteed.
+     * @returns {Promise<boolean>|boolean}
+     */
+    canNotify () {
         return Promise.resolve(true);
     }
 }

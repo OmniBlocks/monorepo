@@ -97,6 +97,9 @@ const setupUnsandboxedExtensionAPI = vm => new Promise(resolve => {
         if (!await Scratch.canOpenWindow(url)) {
             throw new Error(`Permission to open tab ${url} rejected.`);
         }
+        // Use noreferrer to prevent new tab from accessing `window.opener`
+        const baseFeatures = 'noreferrer';
+        features = features ? `${baseFeatures},${features}` : baseFeatures;
         return window.open(url, '_blank', features);
     };
 

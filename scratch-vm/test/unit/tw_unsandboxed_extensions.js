@@ -218,8 +218,8 @@ test('openWindow', async t => {
     UnsandboxedExtensionRunner.setupUnsandboxedExtensionAPI(vm);
     global.Scratch.canOpenWindow = url => url === 'https://example.com/2';
     await t.rejects(global.Scratch.openWindow('https://example.com/1'), /Permission to open tab https:\/\/example.com\/1 rejected/);
-    t.equal(await global.Scratch.openWindow('https://example.com/2'), '[Window https://example.com/2 target=_blank features=]');
-    t.equal(await global.Scratch.openWindow('https://example.com/2', 'popup=1'), '[Window https://example.com/2 target=_blank features=popup=1]');
+    t.equal(await global.Scratch.openWindow('https://example.com/2'), '[Window https://example.com/2 target=_blank features=noreferrer]');
+    t.equal(await global.Scratch.openWindow('https://example.com/2', 'popup=1'), '[Window https://example.com/2 target=_blank features=noreferrer,popup=1]');
     t.end();
 });
 

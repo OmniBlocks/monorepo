@@ -7,7 +7,7 @@ const FetchModal = props => (
     <div>
         <FormattedMessage
             defaultMessage="The project wants to connect to the website:"
-            description="Part of modal when a project asks permission to fetch a URL"
+            description="Part of modal shown when a project asks for permission to fetch a URL using an extension"
             id="tw.fetch.title"
         />
         <URL url={props.url} />
@@ -15,15 +15,14 @@ const FetchModal = props => (
             <FormattedMessage
                 // eslint-disable-next-line max-len
                 defaultMessage="This could be used to download images or sounds, implement multiplayer, access an API, or for malicious purposes. This will share your IP address, general location, and possibly other data with the website."
-                description="Part of modal shown when a project asks permission to fetch a URL"
+                description="Part of modal shown when a project asks for permission to fetch a URL using an extension"
                 id="tw.securityManager.why"
             />
         </p>
         <p>
             <FormattedMessage
-                // eslint-disable-next-line max-len
                 defaultMessage="If allowed, further requests to the same website will be automatically allowed."
-                description="Part of modal shown when asking for permission to automatically load custom extension"
+                description="Part of modal shown when a project asks for permission to fetch a URL using an extension"
                 id="tw.securityManager.trust"
             />
         </p>

@@ -98,34 +98,46 @@ const parseURL = url => {
     return parsed;
 };
 
+let allowedAudio = false;
+let allowedVideo = false;
+let allowedReadClipboard = false;
+let allowedNotify = false;
+
+const SECURITY_MANAGER_METHODS = [
+    'getSandboxMode',
+    'canLoadExtensionFromProject',
+    'canFetch',
+    'canOpenWindow',
+    'canRedirect',
+    'canRecordAudio',
+    'canRecordVideo',
+    'canReadClipboard',
+    'canNotify'
+];
+
 class TWSecurityManagerComponent extends React.Component {
     constructor (props) {
         super(props);
         bindAll(this, [
-            'getSandboxMode',
-            'canLoadExtensionFromProject',
-            'canFetch',
-            'canOpenWindow',
-            'canRedirect',
             'handleAllowed',
             'handleDenied'
         ]);
+        bindAll(this, SECURITY_MANAGER_METHODS);
         this.nextModalCallbacks = [];
         this.modalLocked = false;
         this.state = {
             type: null,
             data: null,
-            callback: null
+            callback: null,
+            modalCount: 0
         };
     }
 
     componentDidMount () {
         const securityManager = this.props.vm.extensionManager.securityManager;
-        securityManager.getSandboxMode = this.getSandboxMode;
-        securityManager.canLoadExtensionFromProject = this.canLoadExtensionFromProject;
-        securityManager.canFetch = this.canFetch;
-        securityManager.canOpenWindow = this.canOpenWindow;
-        securityManager.canRedirect = this.canRedirect;
+        for (const method of SECURITY_MANAGER_METHODS) {
+            securityManager[method] = this[method];
+        }
     }
 
     // eslint-disable-next-line valid-jsdoc
@@ -162,11 +174,12 @@ class TWSecurityManagerComponent extends React.Component {
 
         const showModal = async (type, data) => {
             const result = await new Promise(resolve => {
-                this.setState({
+                this.setState(oldState => ({
                     type,
                     data,
-                    callback: resolve
-                });
+                    callback: resolve,
+                    modalCount: oldState.modalCount + 1
+                }));
             });
             releaseLock();
             return result;
@@ -291,6 +304,50 @@ class TWSecurityManagerComponent extends React.Component {
         });
     }
 
+    /**
+     * @returns {Promise<boolean>} True if audio can be recorded
+     */
+    async canRecordAudio () {
+        if (!allowedAudio) {
+            const {showModal} = await this.acquireModalLock();
+            allowedAudio = await showModal(SecurityModals.RecordAudio);
+        }
+        return allowedAudio;
+    }
+
+    /**
+     * @returns {Promise<boolean>} True if video can be recorded
+     */
+    async canRecordVideo () {
+        if (!allowedVideo) {
+            const {showModal} = await this.acquireModalLock();
+            allowedVideo = await showModal(SecurityModals.RecordVideo);
+        }
+        return allowedVideo;
+    }
+
+    /**
+     * @returns {Promise<boolean>} True if the clipboard can be read
+     */
+    async canReadClipboard () {
+        if (!allowedReadClipboard) {
+            const {showModal} = await this.acquireModalLock();
+            allowedReadClipboard = await showModal(SecurityModals.ReadClipboard);
+        }
+        return allowedReadClipboard;
+    }
+
+    /**
+     * @returns {Promise<boolean>} True if the notifications are allowed
+     */
+    async canNotify () {
+        if (!allowedNotify) {
+            const {showModal} = await this.acquireModalLock();
+            allowedNotify = await showModal(SecurityModals.Notify);
+        }
+        return allowedNotify;
+    }
+
     render () {
         if (this.state.type) {
             return (
@@ -299,6 +356,7 @@ class TWSecurityManagerComponent extends React.Component {
                     data={this.state.data}
                     onAllowed={this.handleAllowed}
                     onDenied={this.handleDenied}
+                    key={this.state.modalCount}
                 />
             );
         }
@@ -309,13 +367,12 @@ class TWSecurityManagerComponent extends React.Component {
 TWSecurityManagerComponent.propTypes = {
     vm: PropTypes.shape({
         extensionManager: PropTypes.shape({
-            securityManager: PropTypes.shape({
-                getSandboxMode: PropTypes.func.isRequired,
-                canLoadExtensionFromProject: PropTypes.func.isRequired,
-                canFetch: PropTypes.func.isRequired,
-                canOpenWindow: PropTypes.func.isRequired,
-                canRedirect: PropTypes.func.isRequired
-            }).isRequired
+            securityManager: PropTypes.shape(
+                SECURITY_MANAGER_METHODS.reduce((obj, method) => {
+                    obj[method] = PropTypes.func.isRequired;
+                    return obj;
+                }, {})
+            ).isRequired
         }).isRequired
     }).isRequired
 };

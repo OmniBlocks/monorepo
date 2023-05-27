@@ -8,8 +8,11 @@ import LoadExtensionModal from './load-extension.jsx';
 import FetchModal from './fetch.jsx';
 import OpenWindowModal from './open-window.jsx';
 import RedirectModal from './redirect.jsx';
+import RecordAudio from './record-audio.jsx';
+import RecordVideo from './record-video.jsx';
+import ReadClipboard from './read-clipboard.jsx';
+import Notify from './notify.jsx';
 import DelayedMountPropertyHOC from './delayed-mount-property-hoc.jsx';
-
 import styles from './security-manager-modal.css';
 
 const messages = defineMessages({
@@ -39,6 +42,14 @@ const SecurityManagerModalComponent = props => (
                 <OpenWindowModal {...props.data} />
             ) : props.type === SecurityModals.Redirect ? (
                 <RedirectModal {...props.data} />
+            ) : props.type === SecurityModals.RecordAudio ? (
+                <RecordAudio {...props.data} />
+            ) : props.type === SecurityModals.RecordVideo ? (
+                <RecordVideo {...props.data} />
+            ) : props.type === SecurityModals.ReadClipboard ? (
+                <ReadClipboard {...props.data} />
+            ) : props.type === SecurityModals.Notify ? (
+                <Notify {...props.data} />
             ) : null}
 
             <Box className={styles.buttons}>

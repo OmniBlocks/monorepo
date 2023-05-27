@@ -60,6 +60,8 @@ Blockly.FlyoutButton = function(workspace, targetWorkspace, xml, isLabel) {
   } else {
     this.callback_ = targetWorkspace.getButtonCallback(callbackKey);
   }
+
+  this.callbackData_ = xml.getAttribute('callbackData');
 };
 
 /**

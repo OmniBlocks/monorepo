@@ -74,6 +74,14 @@ const setupUnsandboxedExtensionAPI = vm => new Promise(resolve => {
         return vm.securityManager.canRedirect(parsed.href);
     };
 
+    Scratch.canRecordAudio = async () => vm.securityManager.canRecordAudio();
+
+    Scratch.canRecordVideo = async () => vm.securityManager.canRecordVideo();
+
+    Scratch.canReadClipboard = async () => vm.securityManager.canReadClipboard();
+
+    Scratch.canNotify = async () => vm.securityManager.canNotify();
+
     Scratch.fetch = async (url, options) => {
         const actualURL = url instanceof Request ? url.url : url;
         if (!await Scratch.canFetch(actualURL)) {

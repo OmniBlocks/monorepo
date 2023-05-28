@@ -774,31 +774,15 @@ class RenderWebGL extends EventEmitter {
     }
 
     /**
-     * @returns {boolean} true if draw() should actually render.
-     */
-    shouldDraw () {
-        if (this.dirty) {
-            return true;
-        }
-        for (let i = 0; i < this._allDrawables.length; i++) {
-            const drawable = this._allDrawables[i];
-            if (drawable && drawable._skin && drawable._skin.volatile) {
-                drawable._skinWasAltered();
-            }
-        }
-        return this.dirty;
-    }
-
-    /**
      * Draw all current drawables and present the frame on the canvas.
      */
     draw () {
-        if (!this.shouldDraw()) {
+        if (!this.dirty) {
             return;
         }
+        this.dirty = false;
 
         this._doExitDrawRegion();
-        this.dirty = false;
 
         const gl = this._gl;
 

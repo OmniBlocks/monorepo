@@ -42,7 +42,7 @@ class CustomExtensionModal extends React.Component {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
                 reader.onload = () => resolve(reader.result);
-                reader.onerror = () => reject(new Error('Could not read extension as data URL'));
+                reader.onerror = () => reject(new Error(`Could not read extension as data URL: ${reader.error}`));
                 reader.readAsDataURL(this.state.file);
             });
         }

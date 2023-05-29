@@ -93,6 +93,8 @@ test('translate', t => {
     global.navigator = {
         language: 'es'
     };
+    // Note that real extensions will only generally call setup() once, but we need to do this
+    // again so that it realizes the language changed.
     global.Scratch.translate.setup(messages);
     t.equal(global.Scratch.translate({
         id: 'test1',

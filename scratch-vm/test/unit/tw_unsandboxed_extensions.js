@@ -279,15 +279,8 @@ test('translate', async t => {
     }), 'test1 ok');
 
     await vm.setLocale('es');
-
-    global.Scratch.translate.setup({
-        en: {
-            test1: 'EN Message 1: {var}'
-        },
-        es: {
-            test1: 'ES Message 1: {var}'
-        }
-    });
+    // do not call setup() again; real extensions will not do that.
+    // need to make sure that the translatiosn are saved after calling setLocale.
     t.equal(global.Scratch.translate({
         id: 'test1',
         default: 'Message 1: {var}',

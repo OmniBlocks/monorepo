@@ -28,12 +28,16 @@ const createTranslate = vm => {
         return 'en';
     };
 
-    translate.setup = translations => {
+    let storedTranslations = {};
+    translate.setup = newTranslations => {
+        if (newTranslations) {
+            storedTranslations = newTranslations;
+        }
         namespace.setup({
             locale: getLocale(),
             missingTranslation: 'ignore',
             generateId,
-            translations
+            translations: storedTranslations
         });
     };
 
@@ -41,7 +45,7 @@ const createTranslate = vm => {
 
     if (vm) {
         vm.on('LOCALE_CHANGED', () => {
-            translate.setup({});
+            translate.setup(null);
         });
     }
 

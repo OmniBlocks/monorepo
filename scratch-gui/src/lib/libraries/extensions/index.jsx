@@ -52,6 +52,7 @@ import customExtensionIcon from './custom/custom.svg';
 
 import galleryIcon from './gallery/gallery.svg';
 import unknownIcon from './gallery/unknown.svg';
+import animatedTextIcon from './gallery/animated-text.svg';
 import stretchIcon from './gallery/stretch.svg';
 import gamepadIcon from './gallery/gamepad.svg';
 import cursorIcon from './gallery/cursor.svg';
@@ -403,6 +404,14 @@ export default [
         featured: true
     },
     // Extensions loaded from URLs do not support localization, so unfortunately we will just leave English names here.
+    galleryItem({
+        name: 'Animated Text',
+        // eslint-disable-next-line max-len
+        description: 'An easy way to display and animate text. Compatible with Scratch Lab\'s Animated Text experiment.',
+        extensionId: 'text',
+        extensionURL: 'https://extensions.turbowarp.org/lab/text.js',
+        iconURL: animatedTextIcon
+    }),
     galleryItem({
         name: 'Stretch',
         description: 'Stretch sprites horizontally or vertically.',

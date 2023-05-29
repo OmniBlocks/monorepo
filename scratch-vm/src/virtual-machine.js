@@ -14,6 +14,8 @@ const ExtensionManager = require('./extension-support/extension-manager');
 const log = require('./util/log');
 const MathUtil = require('./util/math-util');
 const Runtime = require('./engine/runtime');
+const RenderedTarget = require('./sprites/rendered-target');
+const Sprite = require('./sprites/sprite');
 const StringUtil = require('./util/string-util');
 const formatMessage = require('format-message');
 
@@ -209,6 +211,14 @@ class VirtualMachine extends EventEmitter {
         this.flyoutBlockListener = this.flyoutBlockListener.bind(this);
         this.monitorBlockListener = this.monitorBlockListener.bind(this);
         this.variableListener = this.variableListener.bind(this);
+
+        /**
+         * Export some internal classes for extensions.
+         */
+        this.exports = {
+            Sprite,
+            RenderedTarget
+        };
     }
 
     /**

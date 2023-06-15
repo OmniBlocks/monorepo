@@ -94,7 +94,7 @@
               MODE: {
                 type: Scratch.ArgumentType.MENU,
                 menu: "MODE_MENU",
-                defaultValue: "testing",
+                defaultValue: "flat",
               },
             },
           },
@@ -179,8 +179,13 @@
           {
             opcode: "rotateCam",
             blockType: Scratch.BlockType.COMMAND,
-            text: "turn camera right [DEGREES] degrees",
+            text: "turn camera [DIRECTION] [DEGREES] degrees",
             arguments: {
+              DIRECTION: {
+                type: Scratch.ArgumentType.STRING,
+                menu: "DIRECTION_DIR_MENU",
+                defaultValue: "right",
+              },
               DEGREES: {
                 type: Scratch.ArgumentType.NUMBER,
                 defaultValue: 15,
@@ -203,7 +208,28 @@
         menus: {
           MODE_MENU: {
             acceptReporters: true,
-            items: ["disabled", "plane", "sprite", "testing"],
+            items: ["disabled", "flat", "sprite"],
+          },
+          DIRECTION_DIR_MENU: {
+            acceptReporters: false,
+            items: ["left", "right"],
+          },
+          AIM_DIR_MENU: {
+            acceptReporters: false,
+            items: ["up", "down"],
+          },
+          ROLL_DIR_MENU: {
+            acceptReporters: false,
+            items: [
+              {
+                text: "⟲",
+                value: "ccw"
+              },
+              {
+                text: "⟳",
+                value: "cw"
+              }
+            ],
           },
           DIRECTION_MENU: {
             acceptReporters: true,
@@ -343,11 +369,87 @@
 
     // DRAWABLE STUFF //
 
-    enable3DForDrawable(drawableID, type = "plane") {
+    // thanks stackoverflow
+    // https://stackoverflow.com/a/18804083
+    getCanvasFromTexture(gl, texture, width, height) {
+      // Create a framebuffer backed by the texture
+      const framebuffer = gl.createFramebuffer();
+      gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
+      gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
+
+      // Read the contents of the framebuffer
+      const data = new Uint8Array(width * height * 4);
+      gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, data);
+
+      gl.deleteFramebuffer(framebuffer);
+
+      const imageData = new ImageData(width, height);
+      imageData.data.set(data);
+
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      const context = canvas.getContext("2d");
+
+      context.putImageData(imageData, 0, 0);
+
+      return canvas;
+    }
+
+    getCanvasFromSkin(skin) {
+      switch (skin.constructor) {
+        case Scratch.renderer.exports.BitmapSkin: {
+          return this.getCanvasFromTexture(
+              Scratch.renderer.gl,
+              skin.getTexture(),
+              skin._textureSize[0],
+              skin._textureSize[1]
+            );
+        }
+        case Scratch.renderer.exports.SVGSkin: {
+          // code copy-pasted from scratch-render
+          const INDEX_OFFSET = 8;
+
+          const textureScale = 200;
+
+          const scaleMax = textureScale ? Math.max(Math.abs(textureScale), Math.abs(textureScale)) : 100;
+          const requestedScale = Math.min(scaleMax / 100, skin._maxTextureScale);
+          const mipLevel = Math.max(Math.ceil(Math.log2(requestedScale)) + INDEX_OFFSET, 0);
+          const mipScale = Math.pow(2, mipLevel - INDEX_OFFSET);
+
+          return this.getCanvasFromTexture(
+              Scratch.renderer.gl,
+              skin.getTexture([textureScale, textureScale]),
+              Math.ceil(skin._size[0] * mipScale),
+              Math.ceil(skin._size[1] * mipScale)
+            );
+        }
+        default:
+          console.error("Could not get skin image data:", skin);
+          throw new TypeError("Could not get skin image data");
+      }
+    }
+
+    getSizeFromSkin(skin) {
+      switch (skin.constructor) {
+        case Scratch.renderer.exports.BitmapSkin: {
+          return [
+              skin._textureSize[0],
+              skin._textureSize[1]
+          ];
+        }
+        case Scratch.renderer.exports.SVGSkin: {
+          return skin._size;
+        }
+        default:
+          console.error("Could not get skin size:", skin);
+          throw new TypeError("Could not get skin size");
+      }
+    }
+
+    enable3DForDrawable(drawableID, type = "flat") {
       const dr = Scratch.renderer._allDrawables[drawableID];
       if (dr[IN_3D]) return;
-
-      this.disable3DForDrawable(drawableID);
 
       dr[IN_3D] = true;
       dr[Z_POS] = 0;
@@ -370,16 +472,22 @@
       if (!dr[IN_3D]) return;
       const obj = dr[OBJECT];
 
-      const source = new THREE.Source(dr.skin.getTexture());
-      if (type === "sprite") {
-        obj.material = new THREE.SpriteMaterial();
+      const texture = new THREE.CanvasTexture(this.getCanvasFromSkin(dr.skin));
+      if (obj.isSprite) {
+        obj.material = new THREE.SpriteMaterial({
+          map: texture,
+          side: THREE.DoubleSide,
+          transparent: true
+        });
+        const size = this.getSizeFromSkin(dr.skin);
+        obj.scale.x = size[0];
+        obj.scale.y = size[1];
       } else {
         obj.material = new THREE.MeshBasicMaterial();
         obj.geometry = new THREE.PlaneGeometry(dr.skin.size[0], dr.skin.size[1]);
+        obj.material.map = texture;
       }
-      obj.material.map = new THREE.Texture();
-      obj.material.map.source = source;
-      obj.material.map.offset.x = 0.5;
+      obj.material.transparent = true;
     }
 
     disable3DForDrawable(drawableID) {
@@ -391,6 +499,7 @@
 
       dr[OBJECT].removeFromParent();
       dr[OBJECT].material.dispose();
+      if (dr[OBJECT].material.map) dr[OBJECT].material.map.dispose();
       dr[OBJECT].geometry.dispose();
       dr[OBJECT] = null;
       this.updateRenderer();
@@ -403,9 +512,10 @@
 
       this.init();
       switch (MODE) {
-        case "testing":
-        case "plane":
+        case "flat":
         case "sprite":
+          this.disable3DForDrawable(util.target.drawableID);
+          this.init();
           this.enable3DForDrawable(util.target.drawableID, MODE);
           break;
         default:
@@ -463,10 +573,10 @@
       pos.set(pos.x + x, pos.y + y, pos.z + z);
       this.updateRenderer();
     }
-    rotateCam({ DEGREES }, util) {
+    rotateCam({ DIRECTION, DEGREES }, util) {
       this.init();
 
-      const deg = Scratch.Cast.toNumber(DEGREES);
+      const deg = Scratch.Cast.toNumber(DEGREES) * (DIRECTION === "left" ? -1 : 1);
 
       this.camera.rotateY(deg * (Math.PI / 180));
       this.updateRenderer();

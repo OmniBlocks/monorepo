@@ -81,7 +81,7 @@ class ListMonitorScroller extends React.Component {
             <List
                 activeIndex={activeIndex}
                 activeValue={activeValue}
-                height={(height) - 44 /* Header/footer size, approx */}
+                height={(height) - 42 /* Header/footer size, approx */}
                 noRowsRenderer={this.noRowsRenderer}
                 rowCount={values.length}
                 rowHeight={24 /* Row size is same for all rows */}

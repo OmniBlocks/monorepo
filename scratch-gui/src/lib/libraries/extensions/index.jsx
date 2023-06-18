@@ -50,24 +50,28 @@ import twIcon from './tw/tw.svg';
 
 import customExtensionIcon from './custom/custom.svg';
 
-import galleryIcon from './gallery/gallery.svg';
+// eslint-disable-next-line no-unused-vars
 import unknownIcon from './gallery/unknown.svg';
+import galleryIcon from './gallery/gallery.svg';
 import animatedTextIcon from './gallery/animated-text.svg';
 import stretchIcon from './gallery/stretch.svg';
 import gamepadIcon from './gallery/gamepad.svg';
 import cursorIcon from './gallery/cursor.svg';
-import fileIcon from './gallery/file.svg';
+import filesIcon from './gallery/files.svg';
 import pointerlockIcon from './gallery/pointerlock.svg';
 import runtimeOptionsIcon from './gallery/runtime-options.svg';
 import utilitiesIcon from './gallery/utilities.svg';
 import sensingPlusIcon from './gallery/sensingplus.svg';
 import clonesPlusIcon from './gallery/clonesplus.svg';
+import looksPlusIcon from './gallery/looksplus.svg';
 import clippingBlendingIcon from './gallery/clippingblending.svg';
 import regexIcon from './gallery/regex.svg';
 import bitwiseIcon from './gallery/bitwise.svg';
 import textIcon from './gallery/text.svg';
 import fetchIcon from './gallery/fetch.svg';
 import box2dIcon from './gallery/box2d.svg';
+import localStorageIcon from './gallery/local-storage.svg';
+import bigIntIcon from './gallery/bigint.svg';
 
 const galleryItem = object => ({
     ...object,
@@ -431,7 +435,7 @@ export default [
         description: 'Read and download files.',
         extensionId: 'files',
         extensionURL: 'https://extensions.turbowarp.org/files.js',
-        iconURL: fileIcon
+        iconURL: filesIcon
     }),
     galleryItem({
         name: 'Pointerlock',
@@ -464,10 +468,18 @@ export default [
     }),
     galleryItem({
         name: 'Clones Plus',
-        description: 'Expansion of Scratch\'s clone features. Created by LukeManiaStudios.',
+        description: 'Expansion of Scratch\'s clone features. Created by LilyMakesThings.',
         extensionId: 'lmsclonesplus',
-        extensionURL: 'https://extensions.turbowarp.org/LukeManiaStudios/ClonesPlus.js',
+        extensionURL: 'https://extensions.turbowarp.org/Lily/ClonesPlus.js',
         iconURL: clonesPlusIcon
+    }),
+    galleryItem({
+        name: 'Looks Plus',
+        // eslint-disable-next-line max-len
+        description: 'Expands upon the looks category, allowing you to show/hide, get costume data and edit SVG skins on sprites. Created by LilyMakesThings.',
+        extensionId: 'lmsLooksPlus',
+        extensionURL: 'https://extensions.turbowarp.org/Lily/LooksPlus.js',
+        iconURL: looksPlusIcon
     }),
     galleryItem({
         name: 'Clipping & Blending',
@@ -489,6 +501,13 @@ export default [
         extensionId: 'Bitwise',
         extensionURL: 'https://extensions.turbowarp.org/bitwise.js',
         iconURL: bitwiseIcon
+    }),
+    galleryItem({
+        name: 'BigInt',
+        description: 'Math blocks that work on infinitely large integers (no decimals). Created by Skyhigh173.',
+        extensionId: 'skyhigh173BigInt',
+        extensionURL: 'https://extensions.turbowarp.org/Skyhigh173/bigint.js',
+        iconURL: bigIntIcon
     }),
     galleryItem({
         name: 'RegExp',
@@ -516,7 +535,7 @@ export default [
         description: 'Store data persistently.',
         extensionId: 'localstorage',
         extensionURL: 'https://extensions.turbowarp.org/local-storage.js',
-        iconURL: unknownIcon
+        iconURL: localStorageIcon
     }),
     galleryItem({
         name: 'Utilities',

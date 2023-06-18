@@ -25,15 +25,6 @@ const messages = defineMessages({
     }
 });
 
-export const parseExtensionURL = url => {
-    // Parse real extension URL from scratchx.org URL
-    const match = url.match(/^https?:\/\/scratchx\.org\/\?url=(.*)$/);
-    if (match) {
-        return match[1];
-    }
-    return url;
-};
-
 class ExtensionLibrary extends React.PureComponent {
     constructor (props) {
         super(props);
@@ -59,8 +50,7 @@ class ExtensionLibrary extends React.PureComponent {
             if (this.props.vm.extensionManager.isExtensionLoaded(extensionId)) {
                 this.props.onCategorySelected(extensionId);
             } else {
-                const parsedURL = isCustomURL ? parseExtensionURL(url) : url;
-                this.props.vm.extensionManager.loadExtensionURL(parsedURL)
+                this.props.vm.extensionManager.loadExtensionURL(url)
                     .then(() => {
                         this.props.onCategorySelected(extensionId);
                     })

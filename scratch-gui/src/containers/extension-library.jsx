@@ -33,6 +33,10 @@ class ExtensionLibrary extends React.PureComponent {
         ]);
     }
     handleItemSelect (item) {
+        if (item.href) {
+            return;
+        }
+
         const extensionId = item.extensionId;
         const isCustomURL = !item.disabled && !extensionId;
         if (isCustomURL) {

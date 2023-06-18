@@ -34,11 +34,7 @@ class LibraryItem extends React.PureComponent {
     }
     handleClick (e) {
         if (!this.props.disabled) {
-            if (this.props.href) {
-                window.open(this.props.href);
-            } else {
-                this.props.onSelect(this.props.id);
-            }
+            this.props.onSelect(this.props.id);
         }
         e.preventDefault();
     }

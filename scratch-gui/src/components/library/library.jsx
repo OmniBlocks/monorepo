@@ -3,6 +3,7 @@ import bindAll from 'lodash.bindall';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {defineMessages, injectIntl, intlShape} from 'react-intl';
+import {isScratchDesktop} from '../../lib/isScratchDesktop';
 
 import LibraryItem from '../../containers/library-item.jsx';
 import Modal from '../../containers/modal.jsx';
@@ -81,7 +82,13 @@ class LibraryComponent extends React.Component {
         }
     }
     handleSelect (id) {
-        this.handleClose();
+        const extension = this.getFilteredData()[id];
+        if (extension.href) {
+            window.open(extension.href);
+        }
+        if (!extension.href || isScratchDesktop()) {
+            this.handleClose();
+        }
         this.props.onItemSelected(this.getFilteredData()[id]);
     }
     handleClose () {

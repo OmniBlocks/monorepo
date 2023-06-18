@@ -49,6 +49,7 @@ const MonitorComponent = props => (
                 componentRef={props.componentRef}
                 onDoubleClick={props.mode === 'list' || !props.draggable ? null : props.onNextMode}
                 data-id={props.id}
+                data-opcode={props.opcode}
             >
                 {React.createElement(modes[props.mode], {
                     categoryColor: categories[props.category],
@@ -135,6 +136,7 @@ MonitorComponent.propTypes = {
     id: PropTypes.string.isRequired,
     label: PropTypes.string.isRequired,
     mode: PropTypes.oneOf(monitorModes),
+    opcode: PropTypes.string.isRequired,
     onDragEnd: PropTypes.func.isRequired,
     onExport: PropTypes.func,
     onImport: PropTypes.func,

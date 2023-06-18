@@ -215,6 +215,7 @@ class Monitor extends React.Component {
                 <MonitorComponent
                     componentRef={this.setElement}
                     {...monitorProps}
+                    opcode={this.props.opcode}
                     draggable={this.props.draggable}
                     height={this.props.height}
                     isDiscrete={this.props.isDiscrete}

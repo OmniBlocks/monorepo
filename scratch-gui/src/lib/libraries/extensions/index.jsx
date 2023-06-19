@@ -72,6 +72,7 @@ import fetchIcon from './gallery/fetch.svg';
 import box2dIcon from './gallery/box2d.svg';
 import localStorageIcon from './gallery/local-storage.svg';
 import bigIntIcon from './gallery/bigint.svg';
+import jsonIcon from './gallery/json.svg';
 
 const galleryItem = object => ({
     ...object,
@@ -510,6 +511,13 @@ export default [
         iconURL: bigIntIcon
     }),
     galleryItem({
+        name: 'JSON',
+        description: 'Work with JSON objects and arrays.',
+        extensionId: 'skyhigh173JSON',
+        extensionURL: 'https://extensions.turbowarp.org/Skyhigh173/json.js',
+        iconURL: jsonIcon
+    }),
+    galleryItem({
         name: 'RegExp',
         description: 'Full interface for working with Regular Expressions. Created by TrueFantom.',
         extensionId: 'truefantomregexp',
@@ -532,7 +540,7 @@ export default [
     }),
     galleryItem({
         name: 'Local Storage',
-        description: 'Store data persistently.',
+        description: 'Store data persistently. Like cookies, but better.',
         extensionId: 'localstorage',
         extensionURL: 'https://extensions.turbowarp.org/local-storage.js',
         iconURL: localStorageIcon

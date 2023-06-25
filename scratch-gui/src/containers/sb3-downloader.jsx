@@ -135,15 +135,10 @@ class SB3Downloader extends React.Component {
             const jszipStream = this.props.saveProjectSb3Stream();
 
             const abortController = new AbortController();
-            const abort = error => {
-                reject(error);
-                abortController.abort();
-            };
-
             jszipStream.on('error', error => {
-                abort(error);
+                abortController.abort(error);
             });
-    
+
             // JSZip's stream pause() and resume() methods are not necessarily completely no-ops
             // if they are already paused or resumed. These also make it easier to add debug
             // logging of when we actually pause or resume.
@@ -213,6 +208,9 @@ class SB3Downloader extends React.Component {
                     }
                     // File handle must be closed at the end to actually save the file.
                     await writable.close();
+                },
+                abort: async () => {
+                    await writable.abort();
                 }
             });
 
@@ -224,7 +222,7 @@ class SB3Downloader extends React.Component {
                     resolve();
                 })
                 .catch(error => {
-                    abort(error);
+                    reject(error);
                 });
         });
     }

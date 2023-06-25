@@ -127,13 +127,23 @@ class SB3Downloader extends React.Component {
         }
 
         const writable = await handle.createWritable();
-        try {
-            this.startedSaving();
+        this.startedSaving();
 
+        await new Promise((resolve, reject) => {
             // Projects can be very large, so we'll utilize JSZip's stream API to avoid having the
             // entire sb3 in memory at the same time.
             const jszipStream = this.props.saveProjectSb3Stream();
 
+            const abortController = new AbortController();
+            const abort = error => {
+                reject(error);
+                abortController.abort();
+            };
+
+            jszipStream.on('error', error => {
+                abort(error);
+            });
+    
             // JSZip's stream pause() and resume() methods are not necessarily completely no-ops
             // if they are already paused or resumed. These also make it easier to add debug
             // logging of when we actually pause or resume.
@@ -153,7 +163,7 @@ class SB3Downloader extends React.Component {
             };
 
             // Allow the JSZip stream to run quite a bit ahead of file writing. This helps
-            // reduce zip stream pauses on systems with slow storage.
+            // reduce zip stream pauses on systems with high latency storage.
             const HIGH_WATER_MARK_BYTES = 1024 * 1024 * 5;
 
             // Minimum size of buffer to pass into write(). Small buffers will be queued and
@@ -192,9 +202,8 @@ class SB3Downloader extends React.Component {
                         const newBuffer = concatenateByteArrays(queuedChunks);
                         queuedChunks.length = 0;
                         return writable.write(newBuffer);
-                    } else {
-                        // Wait for more data.
                     }
+                    // Otherwise wait for more data
                 },
                 close: async () => {
                     // Write the last batch of data.
@@ -202,20 +211,22 @@ class SB3Downloader extends React.Component {
                     if (lastBuffer.byteLength) {
                         await writable.write(lastBuffer);
                     }
-                    // File handle must be closed at the end.
+                    // File handle must be closed at the end to actually save the file.
                     await writable.close();
                 }
             });
 
-            await zipStream.pipeTo(fileStream);
-            this.finishedSaving();
-        } catch (e) {
-            // Always need to close the file handle.
-            await writable.close();
-
-            // The caller will deal with this error.
-            throw e;
-        }
+            zipStream.pipeTo(fileStream, {
+                signal: abortController.signal
+            })
+                .then(() => {
+                    this.finishedSaving();
+                    resolve();
+                })
+                .catch(error => {
+                    abort(error);
+                });
+        });
     }
     handleSaveError (e) {
         // AbortError can happen when someone cancels the file selector dialog

@@ -261,6 +261,13 @@ class RenderWebGL extends EventEmitter {
         this.allowPrivateSkinAccess = true;
 
         /**
+         * Suggested maximum texture size in texels. This is not a hard limit.
+         * Defualt value is same as Scratch's SVGSkin max.
+         * @type {number}
+         */
+        this.maxTextureDimension = 2048;
+
+        /**
          * Export internals for third-party extensions.
          */
         this.exports = {
@@ -307,6 +314,15 @@ class RenderWebGL extends EventEmitter {
     setPrivateSkinAccess (allowPrivateSkinAccess) {
         this.allowPrivateSkinAccess = allowPrivateSkinAccess;
         this.emit(RenderConstants.Events.AllowPrivateSkinAccessChanged, allowPrivateSkinAccess);
+    }
+
+    /**
+     * Modify the suggested maximum texture dimension. This should be set before any skins are created.
+     * @param {number} newMax The new maximum in texels
+     */
+    setMaxTextureDimension (newMax) {
+        const hardwareLimit = this._gl.getParameter(this._gl.MAX_TEXTURE_SIZE);
+        this.maxTextureDimension = Math.min(newMax, hardwareLimit);
     }
 
     /**

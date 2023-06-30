@@ -1317,7 +1317,7 @@ class Runtime extends EventEmitter {
             }
             break;
         case BlockType.REPORTER:
-            blockJSON.output = 'String'; // TODO: distinguish number & string here?
+            blockJSON.output = blockInfo.allowDropAnywhere ? null : 'String'; // TODO: distinguish number & string here?
             blockJSON.outputShape = ScratchBlocksConstants.OUTPUT_SHAPE_ROUND;
             break;
         case BlockType.BOOLEAN:

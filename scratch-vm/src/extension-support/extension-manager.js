@@ -493,6 +493,12 @@ class ExtensionManager {
      * @private
      */
     _prepareBlockInfo (serviceName, blockInfo) {
+        if (blockInfo.blockType === BlockType.XML) {
+            blockInfo = Object.assign({}, blockInfo);
+            blockInfo.xml = String(blockInfo.xml) || '';
+            return blockInfo;
+        }
+
         blockInfo = Object.assign({}, {
             blockType: BlockType.COMMAND,
             terminal: false,

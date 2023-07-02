@@ -227,7 +227,11 @@ Blockly.Procedures.flyoutCategory = function(workspace) {
   var mutations = Blockly.Procedures.allProcedureMutations(workspace);
   mutations = Blockly.Procedures.sortProcedureMutations_(mutations);
   for (var i = 0; i < mutations.length; i++) {
-    var mutation = mutations[i];
+    var mutation = mutations[i].cloneNode(false);
+    var procCode = mutation.getAttribute('proccode');
+    if (Blockly.Procedures.procedureContainsReturn(procCode, workspace)) {
+      mutation.setAttribute('return', Blockly.PROCEDURES_CALL_TYPE_REPORTER);
+    }
     // <block type="procedures_call">
     //   <mutation ...></mutation>
     // </block>
@@ -237,6 +241,21 @@ Blockly.Procedures.flyoutCategory = function(workspace) {
     block.appendChild(mutation);
     xmlList.push(block);
   }
+
+  var returnBlock = goog.dom.createDom('block');
+  returnBlock.setAttribute('type', 'procedures_return');
+  returnBlock.setAttribute('gap', 16);
+  var returnBlockValue = goog.dom.createDom('value');
+  returnBlockValue.setAttribute('name', 'VALUE');
+  var returnBlockShadow = goog.dom.createDom('shadow');
+  returnBlockShadow.setAttribute('type', 'text');
+  var returnBlockField = goog.dom.createDom('field');
+  returnBlockField.setAttribute('name', 'TEXT');
+  returnBlockShadow.appendChild(returnBlockField);
+  returnBlockValue.appendChild(returnBlockShadow);
+  returnBlock.appendChild(returnBlockValue);
+  xmlList.push(returnBlock);
+
   return xmlList;
 };
 
@@ -516,6 +535,39 @@ Blockly.Procedures.makeEditOption = function(block) {
   return editOption;
 };
 
+Blockly.Procedures.makeChangeTypeOption = function(block) {
+  var isStatement = block.getReturn() === Blockly.PROCEDURES_CALL_TYPE_STATEMENT;
+  var option = {
+    enabled: true,
+    text: isStatement ? Blockly.Msg.PROCEDURES_TO_REPORTER : Blockly.Msg.PROCEDURES_TO_STATEMENT,
+    callback: function() {
+      try {
+        Blockly.Events.setGroup(true);
+
+        block.unplug(true);
+        var workspace = block.workspace;
+        var xml = Blockly.Xml.blockToDom(block);
+        var xy = block.getRelativeToSurfaceXY();
+        block.dispose();
+
+        var mutation = xml.querySelector('mutation');
+        if (isStatement) {
+          mutation.setAttribute('return', Blockly.PROCEDURES_CALL_TYPE_REPORTER);
+        } else {
+          mutation.setAttribute('return', Blockly.PROCEDURES_CALL_TYPE_STATEMENT);
+        }
+
+        var newBlock = Blockly.Xml.domToBlock(xml, workspace);
+        newBlock.moveBy(xy.x, xy.y);
+      } finally {
+        block.unplug(true);
+        Blockly.Events.setGroup(false);
+      }
+    }
+  };
+  return option;
+};
+
 /**
  * Callback to show the procedure definition corresponding to a custom command
  * block.
@@ -574,4 +626,32 @@ Blockly.Procedures.deleteProcedureDefCallback = function(procCode,
   workspace.refreshToolboxSelection_();
 
   return true;
+};
+
+/**
+ * @param {string} procCode The procedure code
+ * @param {Blockly.Workspace} workspace The workspace
+ * @returns {boolean} True if the procedure contains a return block.
+ */
+Blockly.Procedures.procedureContainsReturn = function(procCode, workspace) {
+  var defineBlock = Blockly.Procedures.getDefineBlock(procCode, workspace);
+  if (!defineBlock) {
+    return false;
+  }
+  return Blockly.Procedures.blockContainsReturn(defineBlock);
+};
+
+/**
+ * @param {Blockly.Block} block The block
+ * @returns {boolean} True if the block contains a return block.
+ */
+Blockly.Procedures.blockContainsReturn = function(block) {
+  /** @type {Blockly.Block[]} */
+  var descendants = block.getDescendants();
+  for (var i = 0; i < descendants.length; i++) {
+    if (descendants[i].type === Blockly.PROCEDURES_RETURN_BLOCK_TYPE) {
+      return true;
+    }
+  }
+  return false;
 };

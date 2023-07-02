@@ -116,6 +116,9 @@ Blockly.WorkspaceSvg = function(options, opt_blockDragSurface, opt_wsDragSurface
       Blockly.DataCategory);
   this.registerToolboxCategoryCallback(Blockly.PROCEDURE_CATEGORY_NAME,
       Blockly.Procedures.flyoutCategory);
+
+  this.procedureReturnChangeTimeout = null;
+  this.checkProcedureReturnAfterGesture = false;
 };
 goog.inherits(Blockly.WorkspaceSvg, Blockly.Workspace);
 
@@ -558,6 +561,9 @@ Blockly.WorkspaceSvg.prototype.dispose = function() {
     Blockly.unbindEvent_(this.resizeHandlerWrapper_);
     this.resizeHandlerWrapper_ = null;
   }
+  if (this.procedureReturnChangeTimeout) {
+    clearTimeout(this.procedureReturnChangeTimeout);
+  }
 };
 
 /**
@@ -688,6 +694,21 @@ Blockly.WorkspaceSvg.prototype.queueIntersectionCheck = function() {
   if (this.intersectionObserver) {
     this.intersectionObserver.queueIntersectionCheck();
   }
+};
+
+Blockly.WorkspaceSvg.prototype.procedureReturnsChanged = function() {
+  if (this.currentGesture_) {
+    this.checkProcedureReturnAfterGesture = true;
+  } else if (!this.procedureReturnChangeTimeout) {
+    this.procedureReturnChangeTimeout = setTimeout(function() {
+      this.procedureReturnChangeTimeout = null;
+      this.processProcedureReturnsChanged();
+    }.bind(this));
+  }
+};
+
+Blockly.WorkspaceSvg.prototype.processProcedureReturnsChanged = function() {
+  this.refreshToolboxSelection_();
 };
 
 /**
@@ -2231,6 +2252,11 @@ Blockly.WorkspaceSvg.prototype.getGesture = function(e) {
  */
 Blockly.WorkspaceSvg.prototype.clearGesture = function() {
   this.currentGesture_ = null;
+
+  if (this.checkProcedureReturnAfterGesture) {
+    this.checkProcedureReturnAfterGesture = false;
+    this.processProcedureReturnsChanged();
+  }
 };
 
 /**

@@ -220,6 +220,11 @@ Blockly.Msg.OPERATORS_MATHOP_10EXP = '10 ^';
 // Procedures blocks
 Blockly.Msg.PROCEDURES_DEFINITION = 'define %1';
 
+// TW Procedures blocks
+Blockly.Msg.PROCEDURES_RETURN = 'return %1';
+Blockly.Msg.PROCEDURES_TO_REPORTER = 'Change To Reporter';
+Blockly.Msg.PROCEDURES_TO_STATEMENT = 'Change To Stacked Block';
+
 // Sensing blocks
 Blockly.Msg.SENSING_TOUCHINGOBJECT = 'touching %1?';
 Blockly.Msg.SENSING_TOUCHINGOBJECT_POINTER = 'mouse-pointer';

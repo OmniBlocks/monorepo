@@ -220,6 +220,14 @@ Blockly.Connection.prototype.connect_ = function(childConnection) {
     previousParentConnection.connect(parentBlock.previousConnection);
   }
 
+  if (
+    Blockly.Events.isEnabled() &&
+    !childBlock.isInsertionMarker() &&
+    Blockly.Procedures.blockContainsReturn(childBlock)
+  ) {
+    childBlock.workspace.procedureReturnsChanged();
+  }
+
   var event;
   if (Blockly.Events.isEnabled()) {
     event = new Blockly.Events.BlockMove(childBlock);
@@ -588,6 +596,15 @@ Blockly.Connection.prototype.disconnectInternal_ = function(parentBlock,
   if (Blockly.Events.isEnabled()) {
     event = new Blockly.Events.BlockMove(childBlock);
   }
+
+  if (
+    Blockly.Events.isEnabled() &&
+    !childBlock.isInsertionMarker() &&
+    Blockly.Procedures.blockContainsReturn(childBlock)
+  ) {
+    childBlock.workspace.procedureReturnsChanged();
+  }
+
   var otherConnection = this.targetConnection;
   otherConnection.targetConnection = null;
   this.targetConnection = null;

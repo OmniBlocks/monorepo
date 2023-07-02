@@ -57,7 +57,9 @@ Blockly.ScratchBlocks.ProcedureUtils.callerMutationToDom = function() {
   container.setAttribute('proccode', this.procCode_);
   container.setAttribute('argumentids', JSON.stringify(this.argumentIds_));
   container.setAttribute('warp', JSON.stringify(this.warp_));
-  container.setAttribute('return', this.return_);
+  if (this.return_ !== Blockly.PROCEDURES_CALL_TYPE_STATEMENT) {
+    container.setAttribute('return', this.return_);
+  }
   return container;
 };
 

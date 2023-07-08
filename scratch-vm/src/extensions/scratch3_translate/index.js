@@ -278,7 +278,7 @@ class Scratch3TranslateBlocks {
             })
             .catch(err => {
                 log.warn(`error fetching translate result! ${err}`);
-                return '';
+                return args.WORDS;
             });
         return translatePromise;
     }

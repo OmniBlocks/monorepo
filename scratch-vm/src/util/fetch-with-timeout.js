@@ -15,6 +15,9 @@ const fetchWithTimeout = (resource, init, timeout) => {
         fetch(resource, Object.assign({signal}, init)).then(response => {
             clearTimeout(timeoutID);
             return response;
+        }, error => {
+            clearTimeout(timeoutID);
+            throw error;
         }),
         new Promise((resolve, reject) => {
             timeoutID = setTimeout(() => {

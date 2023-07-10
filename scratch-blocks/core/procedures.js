@@ -335,7 +335,12 @@ Blockly.Procedures.mutateCallersAndPrototype = function(name, ws, mutation) {
     for (var i = 0, caller; caller = callers[i]; i++) {
       var oldMutationDom = caller.mutationToDom();
       var oldMutation = oldMutationDom && Blockly.Xml.domToText(oldMutationDom);
-      caller.domToMutation(mutation);
+
+      // Preserve the block's existing shape
+      var mutationToReplaceWith = mutation.cloneNode(false);
+      mutationToReplaceWith.setAttribute('return', oldMutationDom.getAttribute('return'));
+      caller.domToMutation(mutationToReplaceWith);
+
       var newMutationDom = caller.mutationToDom();
       var newMutation = newMutationDom && Blockly.Xml.domToText(newMutationDom);
       if (oldMutation != newMutation) {

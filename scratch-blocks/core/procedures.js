@@ -546,31 +546,30 @@ Blockly.Procedures.makeChangeTypeOption = function(block) {
     enabled: true,
     text: isStatement ? Blockly.Msg.PROCEDURES_TO_REPORTER : Blockly.Msg.PROCEDURES_TO_STATEMENT,
     callback: function() {
+      var newType = isStatement ? Blockly.PROCEDURES_CALL_TYPE_REPORTER : Blockly.PROCEDURES_CALL_TYPE_STATEMENT;
+      Blockly.Events.setGroup(true);
       try {
-        Blockly.Events.setGroup(true);
-
-        block.unplug(true);
-        var workspace = block.workspace;
-        var xml = Blockly.Xml.blockToDom(block);
-        var xy = block.getRelativeToSurfaceXY();
-        block.dispose();
-
-        var mutation = xml.querySelector('mutation');
-        if (isStatement) {
-          mutation.setAttribute('return', Blockly.PROCEDURES_CALL_TYPE_REPORTER);
-        } else {
-          mutation.setAttribute('return', Blockly.PROCEDURES_CALL_TYPE_STATEMENT);
-        }
-
-        var newBlock = Blockly.Xml.domToBlock(xml, workspace);
-        newBlock.moveBy(xy.x, xy.y);
+        Blockly.Procedures.changeReturnType(block, newType);
       } finally {
-        block.unplug(true);
         Blockly.Events.setGroup(false);
       }
     }
   };
   return option;
+};
+
+Blockly.Procedures.changeReturnType = function(block, returnType) {
+  block.unplug(true);
+  var workspace = block.workspace;
+  var xml = Blockly.Xml.blockToDom(block);
+  var xy = block.getRelativeToSurfaceXY();
+  block.dispose();
+
+  var mutation = xml.querySelector('mutation');
+  mutation.setAttribute('return', returnType);
+
+  var newBlock = Blockly.Xml.domToBlock(xml, workspace);
+  newBlock.moveBy(xy.x, xy.y);
 };
 
 /**

@@ -708,6 +708,23 @@ Blockly.WorkspaceSvg.prototype.procedureReturnsChanged = function() {
 };
 
 Blockly.WorkspaceSvg.prototype.processProcedureReturnsChanged = function() {
+  Blockly.Events.setGroup(true);
+  var topBlocks = this.getTopBlocks(false);
+  for (var i = 0; i < topBlocks.length; i++) {
+    var block = topBlocks[i];
+    if (!block.getNextBlock() && block.type === Blockly.PROCEDURES_CALL_BLOCK_TYPE) {
+      var procCode = block.getProcCode();
+      var actuallyReturns = Blockly.Procedures.procedureContainsReturn(procCode, this);
+
+      if (actuallyReturns && block.getReturn() === Blockly.PROCEDURES_CALL_TYPE_STATEMENT) {
+        Blockly.Procedures.changeReturnType(block, Blockly.PROCEDURES_CALL_TYPE_REPORTER);
+      } else if (!actuallyReturns && block.getReturn() !== Blockly.PROCEDURES_CALL_TYPE_STATEMENT) {
+        Blockly.Procedures.changeReturnType(block, Blockly.PROCEDURES_CALL_TYPE_STATEMENT);
+      }
+    }
+  }
+  Blockly.Events.setGroup(false);
+
   this.refreshToolboxSelection_();
 };
 
@@ -2255,7 +2272,7 @@ Blockly.WorkspaceSvg.prototype.clearGesture = function() {
 
   if (this.checkProcedureReturnAfterGesture) {
     this.checkProcedureReturnAfterGesture = false;
-    this.processProcedureReturnsChanged();
+    this.procedureReturnsChanged();
   }
 };
 

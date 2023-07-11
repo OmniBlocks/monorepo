@@ -52,5 +52,5 @@ if (((tan(-450) || 0) === -Infinity)) {
 yield* executeInCompatibilityLayer({"MESSAGE":"pass -450",}, b0, false, false, null);
 }
 yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, null);
-retire();
+retire(); return;
 }; })

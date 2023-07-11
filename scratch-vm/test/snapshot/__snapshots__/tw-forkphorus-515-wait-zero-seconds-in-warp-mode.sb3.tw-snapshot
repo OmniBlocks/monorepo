@@ -18,7 +18,7 @@ yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b2, false, false, null);
 yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b2, false, false, null);
 runtime.stopAll();
 retire(); return;
-retire();
+retire(); return;
 }; })
 
 // Sprite1 no refresh
@@ -38,12 +38,14 @@ yield* executeInCompatibilityLayer({"BEATS":0,}, b0, true, false, null);
 yield* executeInCompatibilityLayer({"DRUM":1,"BEATS":0,}, b1, true, false, null);
 runtime.ext_scratch3_motion._moveSteps(0, target);
 }
+return "";
 }; })
 
 // Sprite1 runs below with no refresh
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
 return function* genXYZ_runs_below_with_no_r () {
 yield* thread.procedures["Whas refresh"]();
+return "";
 }; })
 
 // Sprite1 has refresh
@@ -63,6 +65,7 @@ yield* executeInCompatibilityLayer({"BEATS":0,}, b0, true, false, null);
 yield* executeInCompatibilityLayer({"DRUM":1,"BEATS":0,}, b1, true, false, null);
 runtime.ext_scratch3_motion._moveSteps(0, target);
 }
+return "";
 }; })
 
 // Sprite1 script
@@ -73,5 +76,5 @@ while (true) {
 b0.value = ((+b0.value || 0) + 1);
 yield;
 }
-retire();
+retire(); return;
 }; })

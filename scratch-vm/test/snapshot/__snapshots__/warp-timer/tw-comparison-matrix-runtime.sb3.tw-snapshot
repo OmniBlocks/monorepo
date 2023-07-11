@@ -8,7 +8,7 @@ return function* genXYZ () {
 yield* executeInCompatibilityLayer({"MESSAGE":"plan 0",}, b0, false, false, null);
 yield* thread.procedures["Wrun test"]();
 yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, null);
-retire();
+retire(); return;
 }; })
 
 // Sprite1 run test
@@ -45,6 +45,7 @@ if (isStuck()) yield;
 }
 if (isStuck()) yield;
 }
+return "";
 }; })
 
 // Sprite1 setup values
@@ -128,4 +129,5 @@ b0.value.push(" ");
 b0._monitorUpToDate = false;
 b0.value.push("🎉");
 b0._monitorUpToDate = false;
+return "";
 }; })

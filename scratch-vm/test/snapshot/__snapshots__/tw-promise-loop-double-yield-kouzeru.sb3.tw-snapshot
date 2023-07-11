@@ -18,7 +18,7 @@ if (hasResumedFromPromise) {hasResumedFromPromise = false;continue;}
 }
 yield;
 }
-retire();
+retire(); return;
 }; })
 
 // Sprite1 script
@@ -48,5 +48,5 @@ yield;
 yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b1, false, false, null);
 runtime.stopAll();
 retire(); return;
-retire();
+retire(); return;
 }; })

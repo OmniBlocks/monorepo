@@ -82,5 +82,5 @@ if (compareEqual(0, "")) {
 yield* executeInCompatibilityLayer({"MESSAGE":"fail",}, b0, false, false, null);
 }
 yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, null);
-retire();
+retire(); return;
 }; })

@@ -22,7 +22,7 @@ if (((+b1.value || 0) === 1)) {
 yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b0, false, false, null);
 }
 yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, null);
-retire();
+retire(); return;
 }; })
 
 // Sprite2 script
@@ -30,5 +30,5 @@ retire();
 const b0 = stage.variables["`jEk@4|i[#Fk?(8x)AV.-my variable"];
 return function* genXYZ () {
 b0.value = ((+b0.value || 0) + 1);
-retire();
+retire(); return;
 }; })

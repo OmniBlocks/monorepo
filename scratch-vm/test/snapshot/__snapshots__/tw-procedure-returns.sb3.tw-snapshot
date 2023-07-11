@@ -1,0 +1,267 @@
+// TW Snapshot
+// Input SHA-256: 0b663e531a92599af0cb4fdcd9c8a13594d67f9aa1a2cbb9b80ef6617dfd300c
+
+// Sprite1 script
+(function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
+const b0 = runtime.getOpcodeFunction("looks_say");
+const b1 = stage.variables["`jEk@4|i[#Fk?(8x)AV.-my variable"];
+const b2 = stage.variables["PsAI*C{QHI3*4?O8p#TM"];
+return function* genXYZ () {
+yield* executeInCompatibilityLayer({"MESSAGE":"plan 15",}, b0, false, false, null);
+if ((("" + (thread.procedures["Zsimplest"]())).toLowerCase() === "It works!".toLowerCase())) {
+yield* executeInCompatibilityLayer({"MESSAGE":"pass simplest",}, b0, false, false, null);
+}
+if ((("" + (thread.procedures["Znesting 1"]())).toLowerCase() === "42-54".toLowerCase())) {
+yield* executeInCompatibilityLayer({"MESSAGE":"pass nesting1",}, b0, false, false, null);
+}
+if (((+(thread.procedures["Wfib %s"](12)) || 0) === 144)) {
+yield* executeInCompatibilityLayer({"MESSAGE":"pass fib12",}, b0, false, false, null);
+}
+if (((+(yield* thread.procedures["Zfactorial %s"](12)) || 0) === 479001600)) {
+yield* executeInCompatibilityLayer({"MESSAGE":"pass factorial12",}, b0, false, false, null);
+}
+b1.value = (yield* thread.procedures["Zno shadowing 1 %s %s"]("f","g"));
+if (compareEqual(b1.value, "")) {
+yield* executeInCompatibilityLayer({"MESSAGE":"pass default return value",}, b0, false, false, null);
+}
+yield* thread.procedures["Zreturn stops the script immediately"]();
+if (((+b2.value || 0) === 25)) {
+yield* executeInCompatibilityLayer({"MESSAGE":"pass return stopped the script immediately",}, b0, false, false, null);
+}
+yield* waitThreads(startHats("event_whenbroadcastreceived", { BROADCAST_OPTION: "Test return outside of custom block" }));
+if (((+b2.value || 0) === 18)) {
+yield* executeInCompatibilityLayer({"MESSAGE":"pass return worked to stop outside of custom block",}, b0, false, false, null);
+}
+yield* thread.procedures["Znon warp"]();
+if (compareEqual((thread.procedures["Zinvalid params - reporter"]()), 0)) {
+yield* executeInCompatibilityLayer({"MESSAGE":"pass invalid params reporter",}, b0, false, false, null);
+}
+if (compareEqual((thread.procedures["Zinvalid params - boolean"]()), 0)) {
+yield* executeInCompatibilityLayer({"MESSAGE":"pass invalid params boolean",}, b0, false, false, null);
+}
+runtime.stopForTarget(target, thread);
+yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, null);
+retire(); return;
+}; })
+
+// Sprite1 simplest
+(function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
+return function funXYZ_simplest () {
+return "It works!";
+return "";
+}; })
+
+// Sprite1 nesting 1
+(function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
+return function funXYZ_nesting_1 () {
+thread.procedures["Znesting 2"]();
+return (("" + (thread.procedures["Znesting 3 %s %s"](6,7))) + ("" + (thread.procedures["Znesting 3 %s %s"](-1,54))));
+return "";
+}; })
+
+// Sprite1 fib %s
+(function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
+return function funXYZ_fib_ (p0) {
+if (compareLessThan(p0, 2)) {
+return p0;
+} else {
+return ((+(thread.procedures["Wfib %s"](((+p0 || 0) - 1))) || 0) + (+(thread.procedures["Wfib %s"](((+p0 || 0) - 2))) || 0));
+}
+return "";
+}; })
+
+// Sprite1 factorial %s
+(function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
+return function* genXYZ_factorial_ (p0) {
+if (compareGreaterThan(p0, 1)) {
+yield;
+return ((+p0 || 0) * (+(yield* thread.procedures["Zfactorial %s"](((+p0 || 0) - 1))) || 0));
+}
+return 1;
+return "";
+}; })
+
+// Sprite1 no shadowing 1 %s %s
+(function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
+const b0 = runtime.getOpcodeFunction("looks_say");
+const b1 = stage.variables["`jEk@4|i[#Fk?(8x)AV.-my variable"];
+return function* genXYZ_no_shadowing_1__ (p0,p1) {
+if (((("" + p0).toLowerCase() === "f".toLowerCase()) && (("" + p1).toLowerCase() === "g".toLowerCase()))) {
+yield* executeInCompatibilityLayer({"MESSAGE":"pass shadow check 1",}, b0, false, false, null);
+}
+b1.value = (thread.procedures["Zno shadowing 2 %s %s"](1,2));
+if (((("" + p0).toLowerCase() === "f".toLowerCase()) && (("" + p1).toLowerCase() === "g".toLowerCase()))) {
+yield* executeInCompatibilityLayer({"MESSAGE":"pass shadow check 2",}, b0, false, false, null);
+}
+b1.value = (thread.procedures["Zno shadowing 2 %s %s"](3,4));
+if (((("" + p0).toLowerCase() === "f".toLowerCase()) && (("" + p1).toLowerCase() === "g".toLowerCase()))) {
+yield* executeInCompatibilityLayer({"MESSAGE":"pass shadow check 3",}, b0, false, false, null);
+}
+return "";
+}; })
+
+// Sprite1 return stops the script immediately
+(function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
+const b0 = stage.variables["PsAI*C{QHI3*4?O8p#TM"];
+const b1 = runtime.getOpcodeFunction("looks_say");
+return function* genXYZ_return_stops_the_scr () {
+b0.value = 0;
+for (var a0 = 100; a0 >= 0.5; a0--) {
+b0.value = ((+b0.value || 0) + 1);
+if (((b0.value || 0) === 25)) {
+return "stopped!";
+}
+yield;
+}
+yield* executeInCompatibilityLayer({"MESSAGE":"fail return did not stop the script immediately",}, b1, false, false, null);
+return "";
+}; })
+
+// Sprite1 non warp
+(function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
+const b0 = stage.variables["Go=PJS7BFXYo_qi2S:kQ"];
+const b1 = runtime.getOpcodeFunction("looks_say");
+return function* genXYZ_non_warp () {
+b0.value = 0;
+for (var a0 = 5; a0 >= 0.5; a0--) {
+thread.timer = timer();
+var a1 = Math.max(0, 1000 * 0);
+runtime.requestRedraw();
+yield;
+while (thread.timer.timeElapsed() < a1) {
+yield;
+}
+thread.timer = null;
+yield;
+}
+if (((+b0.value || 0) === 10)) {
+yield* executeInCompatibilityLayer({"MESSAGE":"pass non warp 1",}, b1, false, false, null);
+}
+if ((("" + (yield* thread.procedures["Wverify runs warp %s"]((yield* thread.procedures["Zverify runs non warp %s"]((yield* thread.procedures["Wverify runs warp %s"]("abc"))))))).toLowerCase() === "warp: non warp: warp: abc".toLowerCase())) {
+yield* executeInCompatibilityLayer({"MESSAGE":"pass non warp and warp mix",}, b1, false, false, null);
+}
+b0.value = 0;
+for (var a2 = 5; a2 >= 0.5; a2--) {
+thread.timer = timer();
+var a3 = Math.max(0, 1000 * 0);
+runtime.requestRedraw();
+yield;
+while (thread.timer.timeElapsed() < a3) {
+yield;
+}
+thread.timer = null;
+yield;
+}
+if (((+b0.value || 0) === 10)) {
+yield* executeInCompatibilityLayer({"MESSAGE":"pass non warp 2",}, b1, false, false, null);
+}
+return "";
+}; })
+
+// Sprite1 invalid params - reporter
+(function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
+return function funXYZ_invalid_params___rep () {
+return 0;
+return "";
+}; })
+
+// Sprite1 invalid params - boolean
+(function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
+return function funXYZ_invalid_params___boo () {
+return 0;
+return "";
+}; })
+
+// Sprite1 nesting 2
+(function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
+return function funXYZ_nesting_2 () {
+return "discard nesting 2";
+return "";
+}; })
+
+// Sprite1 nesting 3 %s %s
+(function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
+return function funXYZ_nesting_3__ (p0,p1) {
+return ((+p0 || 0) * (+p1 || 0));
+return "";
+}; })
+
+// Sprite1 no shadowing 2 %s %s
+(function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
+return function funXYZ_no_shadowing_2__ (p0,p1) {
+return "discard shadow 2";
+return "";
+}; })
+
+// Sprite1 verify runs warp %s
+(function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
+const b0 = stage.variables["Go=PJS7BFXYo_qi2S:kQ"];
+const b1 = runtime.getOpcodeFunction("looks_say");
+return function* genXYZ_verify_runs_warp_ (p0) {
+b0.value = 0;
+for (var a0 = 5; a0 >= 0.5; a0--) {
+thread.timer = timer();
+var a1 = Math.max(0, 1000 * 0);
+runtime.requestRedraw();
+while (thread.timer.timeElapsed() < a1) {
+if (isStuck()) yield;
+}
+thread.timer = null;
+}
+if (!compareEqual(b0.value, 0)) {
+yield* executeInCompatibilityLayer({"MESSAGE":"fail did not run warp",}, b1, true, false, null);
+}
+return ("warp: " + ("" + p0));
+return "";
+}; })
+
+// Sprite1 verify runs non warp %s
+(function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
+const b0 = stage.variables["Go=PJS7BFXYo_qi2S:kQ"];
+const b1 = runtime.getOpcodeFunction("looks_say");
+return function* genXYZ_verify_runs_non_warp (p0) {
+b0.value = 0;
+for (var a0 = 5; a0 >= 0.5; a0--) {
+thread.timer = timer();
+var a1 = Math.max(0, 1000 * 0);
+runtime.requestRedraw();
+yield;
+while (thread.timer.timeElapsed() < a1) {
+yield;
+}
+thread.timer = null;
+yield;
+}
+if (compareEqual(b0.value, 0)) {
+yield* executeInCompatibilityLayer({"MESSAGE":"fail ran warp",}, b1, false, false, null);
+}
+return ("non warp: " + ("" + p0));
+return "";
+}; })
+
+// Sprite1 script
+(function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
+const b0 = stage.variables["PsAI*C{QHI3*4?O8p#TM"];
+return function* genXYZ () {
+b0.value = 0;
+while (true) {
+b0.value = ((+b0.value || 0) + 1);
+if (((b0.value || 0) === 18)) {
+retire(); return;
+}
+yield;
+}
+retire(); return;
+}; })
+
+// Sprite1 script
+(function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
+const b0 = stage.variables["Go=PJS7BFXYo_qi2S:kQ"];
+return function* genXYZ () {
+b0.value = 0;
+while (true) {
+b0.value = ((+b0.value || 0) + 1);
+yield;
+}
+retire(); return;
+}; })

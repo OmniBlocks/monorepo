@@ -490,6 +490,7 @@ const execute = function (sequencer, thread) {
 
         currentStackFrame.reporting = null;
         currentStackFrame.reported = null;
+        currentStackFrame.waitingReporter = false;
     }
 
     const start = i;
@@ -517,9 +518,11 @@ const execute = function (sequencer, thread) {
 
         const primitiveReportedValue = blockFunction(argValues, blockUtility);
 
-        // If it's a promise, wait until promise resolves.
-        if (isPromise(primitiveReportedValue)) {
-            handlePromise(primitiveReportedValue, sequencer, thread, opCached, lastOperation);
+        const primitiveIsPromise = isPromise(primitiveReportedValue);
+        if (primitiveIsPromise || currentStackFrame.waitingReporter) {
+            if (primitiveIsPromise) {
+                handlePromise(primitiveReportedValue, sequencer, thread, opCached, lastOperation);
+            }
 
             // Store the already reported values. They will be thawed into the
             // future versions of the same operations by block id. The reporting
@@ -543,7 +546,7 @@ const execute = function (sequencer, thread) {
                 };
             });
 
-            // We are waiting for a promise. Stop running this set of operations
+            // We are waiting to be resumed later. Stop running this set of operations
             // and continue them later after thawing the reported values.
             break;
         } else if (thread.status === Thread.STATUS_RUNNING) {

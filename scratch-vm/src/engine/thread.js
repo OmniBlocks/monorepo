@@ -307,7 +307,10 @@ class Thread {
         let blockID = this.peekStack();
         while (blockID !== null) {
             const block = this.target.blocks.getBlock(blockID);
-            if (typeof block !== 'undefined' && block.opcode === 'procedures_call') {
+            if (
+                (typeof block !== 'undefined' && block.opcode === 'procedures_call') ||
+                this.peekStackFrame().waitingReporter
+            ) {
                 break;
             }
             this.popStack();

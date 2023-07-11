@@ -242,19 +242,21 @@ Blockly.Procedures.flyoutCategory = function(workspace) {
     xmlList.push(block);
   }
 
-  var returnBlock = goog.dom.createDom('block');
-  returnBlock.setAttribute('type', 'procedures_return');
-  returnBlock.setAttribute('gap', 16);
-  var returnBlockValue = goog.dom.createDom('value');
-  returnBlockValue.setAttribute('name', 'VALUE');
-  var returnBlockShadow = goog.dom.createDom('shadow');
-  returnBlockShadow.setAttribute('type', 'text');
-  var returnBlockField = goog.dom.createDom('field');
-  returnBlockField.setAttribute('name', 'TEXT');
-  returnBlockShadow.appendChild(returnBlockField);
-  returnBlockValue.appendChild(returnBlockShadow);
-  returnBlock.appendChild(returnBlockValue);
-  xmlList.push(returnBlock);
+  if (mutations.length > 0) {
+    var returnBlock = goog.dom.createDom('block');
+    returnBlock.setAttribute('type', 'procedures_return');
+    returnBlock.setAttribute('gap', 16);
+    var returnBlockValue = goog.dom.createDom('value');
+    returnBlockValue.setAttribute('name', 'VALUE');
+    var returnBlockShadow = goog.dom.createDom('shadow');
+    returnBlockShadow.setAttribute('type', 'text');
+    var returnBlockField = goog.dom.createDom('field');
+    returnBlockField.setAttribute('name', 'TEXT');
+    returnBlockShadow.appendChild(returnBlockField);
+    returnBlockValue.appendChild(returnBlockShadow);
+    returnBlock.appendChild(returnBlockValue);
+    xmlList.push(returnBlock);
+  }
 
   return xmlList;
 };

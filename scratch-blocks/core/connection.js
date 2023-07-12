@@ -222,8 +222,7 @@ Blockly.Connection.prototype.connect_ = function(childConnection) {
 
   if (
     Blockly.Events.isEnabled() &&
-    !childBlock.isInsertionMarker() &&
-    Blockly.Procedures.blockContainsReturn(childBlock)
+    !childBlock.isInsertionMarker()
   ) {
     childBlock.workspace.procedureReturnsChanged();
   }
@@ -599,8 +598,7 @@ Blockly.Connection.prototype.disconnectInternal_ = function(parentBlock,
 
   if (
     Blockly.Events.isEnabled() &&
-    !childBlock.isInsertionMarker() &&
-    Blockly.Procedures.blockContainsReturn(childBlock)
+    !childBlock.isInsertionMarker()
   ) {
     childBlock.workspace.procedureReturnsChanged();
   }

@@ -229,8 +229,10 @@ Blockly.Procedures.flyoutCategory = function(workspace) {
   for (var i = 0; i < mutations.length; i++) {
     var mutation = mutations[i].cloneNode(false);
     var procCode = mutation.getAttribute('proccode');
-    if (Blockly.Procedures.procedureContainsReturn(procCode, workspace)) {
+    if (Blockly.Procedures.procedureContainsReturnType(procCode, workspace) === Blockly.PROCEDURES_CALL_TYPE_REPORTER) {
       mutation.setAttribute('return', Blockly.PROCEDURES_CALL_TYPE_REPORTER);
+    } else if (Blockly.Procedures.procedureContainsReturnType(procCode, workspace) === Blockly.PROCEDURES_CALL_TYPE_BOOLEAN) {
+      mutation.setAttribute('return', Blockly.PROCEDURES_CALL_TYPE_BOOLEAN);
     }
     // <block type="procedures_call">
     //   <mutation ...></mutation>
@@ -637,27 +639,37 @@ Blockly.Procedures.deleteProcedureDefCallback = function(procCode,
 /**
  * @param {string} procCode The procedure code
  * @param {Blockly.Workspace} workspace The workspace
- * @returns {boolean} True if the procedure contains a return block.
+ * @returns The type of the return block, or false if no define block
  */
-Blockly.Procedures.procedureContainsReturn = function(procCode, workspace) {
+Blockly.Procedures.procedureContainsReturnType = function(procCode, workspace) {
   var defineBlock = Blockly.Procedures.getDefineBlock(procCode, workspace);
   if (!defineBlock) {
     return false;
   }
-  return Blockly.Procedures.blockContainsReturn(defineBlock);
+  return Blockly.Procedures.blockContainsReturnType(defineBlock);
 };
 
 /**
  * @param {Blockly.Block} block The block
- * @returns {boolean} True if the block contains a return block.
+ * @returns The type of the return block
  */
-Blockly.Procedures.blockContainsReturn = function(block) {
+Blockly.Procedures.blockContainsReturnType = function(block) {
   /** @type {Blockly.Block[]} */
+  var hasSeenBooleanReturn = false;
   var descendants = block.getDescendants();
   for (var i = 0; i < descendants.length; i++) {
     if (descendants[i].type === Blockly.PROCEDURES_RETURN_BLOCK_TYPE) {
-      return true;
+      if (i+1 < descendants.length && descendants[i+1].outputShape_ === Blockly.OUTPUT_SHAPE_HEXAGONAL) {
+        //keep searching, because there may be other, non-boolean returns in this function definition.
+        hasSeenBooleanReturn = true;
+      } else {
+        return Blockly.PROCEDURES_CALL_TYPE_REPORTER;
+      }
     }
   }
-  return false;
+  if (hasSeenBooleanReturn) {
+    return Blockly.PROCEDURES_CALL_TYPE_BOOLEAN;
+  } else {
+    return Blockly.PROCEDURES_CALL_TYPE_STATEMENT;
+  }
 };

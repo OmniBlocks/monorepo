@@ -714,12 +714,10 @@ Blockly.WorkspaceSvg.prototype.processProcedureReturnsChanged = function() {
     var block = topBlocks[i];
     if (!block.getNextBlock() && block.type === Blockly.PROCEDURES_CALL_BLOCK_TYPE) {
       var procCode = block.getProcCode();
-      var actuallyReturns = Blockly.Procedures.procedureContainsReturn(procCode, this);
-
-      if (actuallyReturns && block.getReturn() === Blockly.PROCEDURES_CALL_TYPE_STATEMENT) {
-        Blockly.Procedures.changeReturnType(block, Blockly.PROCEDURES_CALL_TYPE_REPORTER);
-      } else if (!actuallyReturns && block.getReturn() !== Blockly.PROCEDURES_CALL_TYPE_STATEMENT) {
-        Blockly.Procedures.changeReturnType(block, Blockly.PROCEDURES_CALL_TYPE_STATEMENT);
+      var actuallyReturns = Blockly.Procedures.procedureContainsReturnType(procCode, this);
+      
+      if (actuallyReturns !== block.getReturn()) {
+        Blockly.Procedures.changeReturnType(block, actuallyReturns);
       }
     }
   }

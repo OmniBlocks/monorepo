@@ -162,10 +162,11 @@ Blockly.ScratchBlocks.ProcedureUtils.updateDisplay_ = function() {
       this.setPreviousStatement(true, null);
       this.setNextStatement(true, null);
     } else {
-      this.setOutput(true, null);
       if (this.getReturn() === Blockly.PROCEDURES_CALL_TYPE_BOOLEAN) {
+        this.setOutput(true, null);
         this.setOutputShape(Blockly.OUTPUT_SHAPE_HEXAGONAL);
       } else {
+        this.setOutput(true, 'Number');
         this.setOutputShape(Blockly.OUTPUT_SHAPE_ROUND);
       }
     }

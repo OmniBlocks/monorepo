@@ -229,10 +229,9 @@ Blockly.Procedures.flyoutCategory = function(workspace) {
   for (var i = 0; i < mutations.length; i++) {
     var mutation = mutations[i].cloneNode(false);
     var procCode = mutation.getAttribute('proccode');
-    if (Blockly.Procedures.procedureContainsReturnType(procCode, workspace) === Blockly.PROCEDURES_CALL_TYPE_REPORTER) {
-      mutation.setAttribute('return', Blockly.PROCEDURES_CALL_TYPE_REPORTER);
-    } else if (Blockly.Procedures.procedureContainsReturnType(procCode, workspace) === Blockly.PROCEDURES_CALL_TYPE_BOOLEAN) {
-      mutation.setAttribute('return', Blockly.PROCEDURES_CALL_TYPE_BOOLEAN);
+    var returnType = Blockly.Procedures.procedureContainsReturnType(procCode, workspace);
+    if (returnType !== Blockly.PROCEDURES_CALL_TYPE_STATEMENT) {
+      mutation.setAttribute('return', returnType);
     }
     // <block type="procedures_call">
     //   <mutation ...></mutation>

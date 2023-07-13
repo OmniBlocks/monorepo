@@ -639,7 +639,7 @@ Blockly.Procedures.deleteProcedureDefCallback = function(procCode,
 /**
  * @param {string} procCode The procedure code
  * @param {Blockly.Workspace} workspace The workspace
- * @returns The type of the return block, or false if no define block
+ * @returns {number} The type of the return block
  */
 Blockly.Procedures.procedureContainsReturnType = function(procCode, workspace) {
   var defineBlock = Blockly.Procedures.getDefineBlock(procCode, workspace);
@@ -651,15 +651,18 @@ Blockly.Procedures.procedureContainsReturnType = function(procCode, workspace) {
 
 /**
  * @param {Blockly.Block} block The block
- * @returns The type of the return block
+ * @returns {number} The type of the return block
  */
 Blockly.Procedures.blockContainsReturnType = function(block) {
-  /** @type {Blockly.Block[]} */
   var hasSeenBooleanReturn = false;
+  /** @type {Blockly.Block[]} */
   var descendants = block.getDescendants();
   for (var i = 0; i < descendants.length; i++) {
     if (descendants[i].type === Blockly.PROCEDURES_RETURN_BLOCK_TYPE) {
-      if (i+1 < descendants.length && descendants[i+1].outputShape_ === Blockly.OUTPUT_SHAPE_HEXAGONAL) {
+      // The block at i + 1 should be the block inside of the return block.
+      // Even if the return block is missing its input, this will still be fine, because the
+      // next block should a stacked block which won't be hexagon-shaped.
+      if (i + 1 < descendants.length && descendants[i + 1].outputShape_ === Blockly.OUTPUT_SHAPE_HEXAGONAL) {
         //keep searching, because there may be other, non-boolean returns in this function definition.
         hasSeenBooleanReturn = true;
       } else {

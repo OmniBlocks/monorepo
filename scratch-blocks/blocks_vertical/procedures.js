@@ -244,6 +244,7 @@ Blockly.ScratchBlocks.ProcedureUtils.createAllInputs_ = function(connectionMap) 
   });
   // Create arguments and labels as appropriate.
   var argumentCount = 0;
+  var hasAnyField = false;
   for (var i = 0, component; component = procComponents[i]; i++) {
     var labelText;
     if (component.substring(0, 1) == '%') {
@@ -262,6 +263,7 @@ Blockly.ScratchBlocks.ProcedureUtils.createAllInputs_ = function(connectionMap) 
       }
       this.populateArgument_(argumentType, argumentCount, connectionMap, id,
           input);
+      hasAnyField = true;
       argumentCount++;
     } else {
       labelText = component.trim();
@@ -270,7 +272,12 @@ Blockly.ScratchBlocks.ProcedureUtils.createAllInputs_ = function(connectionMap) 
     // don't add empty labels which will just waste space
     if (labelText) {
       this.addProcedureLabel_(labelText);
+      hasAnyField = true;
     }
+  }
+  // Custom reporters will crash editor if they have no fields.
+  if (!hasAnyField) {
+    this.addProcedureLabel_(' ');
   }
 };
 

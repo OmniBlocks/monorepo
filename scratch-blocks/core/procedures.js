@@ -636,6 +636,11 @@ Blockly.Procedures.deleteProcedureDefCallback = function(procCode,
 };
 
 /**
+ * If true, the user will be able to manually override the shape of procedure call blocks.
+ */
+Blockly.Procedures.USER_CAN_CHANGE_CALL_TYPE = true;
+
+/**
  * @param {string} procCode The procedure code
  * @param {Blockly.Workspace} workspace The workspace
  * @returns {number} The type of the return block

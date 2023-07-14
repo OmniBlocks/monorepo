@@ -719,7 +719,12 @@ Blockly.WorkspaceSvg.prototype.procedureReturnsWillChange = function() {
  * @private
  */
 Blockly.WorkspaceSvg.prototype.processProcedureReturnsChanged_ = function() {
-  var finalReturnTypes = Blockly.Procedures.getAllProcedureReturnTypes(this);
+  var initialTypes = this.initialProcedureReturnTypes_;
+  var finalTypes = Blockly.Procedures.getAllProcedureReturnTypes(this);
+
+  this.initialProcedureReturnTypes_ = null;
+  this.checkProcedureReturnAfterGesture_ = false;
+  this.procedureReturnChangeTimeout_ = null;
 
   Blockly.Events.setGroup(true);
   var topBlocks = this.getTopBlocks(false);
@@ -736,14 +741,14 @@ Blockly.WorkspaceSvg.prototype.processProcedureReturnsChanged_ = function() {
 
     var procCode = block.getProcCode();
     // If the procedure doesn't exist, we will ignore it.
-    if (!Object.prototype.hasOwnProperty.call(finalReturnTypes, procCode)) continue;
+    if (!Object.prototype.hasOwnProperty.call(finalTypes, procCode)) continue;
 
-    var actualReturnType = finalReturnTypes[procCode];
+    var actualReturnType = finalTypes[procCode];
     if (
       block.getReturn() !== actualReturnType &&
-      // Only change block shape when the procedure's shape has actually changed so that manually
-      // edited call blocks won't change shape unnecessarily.
-      this.initialProcedureReturnTypes_[procCode] !== actualReturnType
+      // If user is allowed to override call block shape, only update the shape if the definition's
+      // shape has actually changed.
+      (!Blockly.Procedures.USER_CAN_CHANGE_CALL_TYPE || initialTypes[procCode] !== actualReturnType)
     ) {
       Blockly.Procedures.changeReturnType(block, actualReturnType);
     }
@@ -752,12 +757,12 @@ Blockly.WorkspaceSvg.prototype.processProcedureReturnsChanged_ = function() {
 
   // Toolbox refresh can be slow, so only do when needed.
   var toolboxOutdated = false;
-  for (var procCode in finalReturnTypes) {
+  for (var procCode in finalTypes) {
     // If a current procedure existed but its type has changed, the toolbox must be updated.
     // If a new procedure was created, the toolbox is already updated elsewhere.
     if (
-      Object.prototype.hasOwnProperty.call(this.initialProcedureReturnTypes_, procCode) &&
-      this.initialProcedureReturnTypes_[procCode] !== finalReturnTypes[procCode]
+      Object.prototype.hasOwnProperty.call(initialTypes, procCode) &&
+      initialTypes[procCode] !== finalTypes[procCode]
     ) {
       toolboxOutdated = true;
       break;
@@ -766,10 +771,6 @@ Blockly.WorkspaceSvg.prototype.processProcedureReturnsChanged_ = function() {
   if (toolboxOutdated) {
     this.refreshToolboxSelection_();
   }
-
-  this.initialProcedureReturnTypes_ = null;
-  this.checkProcedureReturnAfterGesture_ = false;
-  this.procedureReturnChangeTimeout_ = null;
 };
 
 /**

@@ -725,21 +725,40 @@ Blockly.WorkspaceSvg.prototype.processProcedureReturnsChanged_ = function() {
   var topBlocks = this.getTopBlocks(false);
   for (var i = 0; i < topBlocks.length; i++) {
     var block = topBlocks[i];
-    if (!block.isInsertionMarker() && !block.getNextBlock() && block.type === Blockly.PROCEDURES_CALL_BLOCK_TYPE) {
-      var procCode = block.getProcCode();
-      var actuallyReturns = Blockly.Procedures.getProcedureReturnType(procCode, this);
-      
-      if (actuallyReturns !== block.getReturn()) {
-        Blockly.Procedures.changeReturnType(block, actuallyReturns);
-      }
+    if (block.type !== Blockly.PROCEDURES_CALL_BLOCK_TYPE) continue;
+
+    // After a gesture, we are called early enough that there could still be insertion markers.
+    if (block.isInsertionMarker()) continue;
+
+    // Because this block is a top block, it by definition won't have a parent, but if another
+    // block is connected below, we should leave it unchanged instead of unplugging.
+    if (block.getNextBlock()) continue;
+
+    var procCode = block.getProcCode();
+    // If the procedure doesn't exist, we will ignore it.
+    if (!Object.prototype.hasOwnProperty.call(finalReturnTypes, procCode)) continue;
+
+    var actualReturnType = finalReturnTypes[procCode];
+    if (
+      block.getReturn() !== actualReturnType &&
+      // Only change block shape when the procedure's shape has actually changed so that manually
+      // edited call blocks won't change shape unnecessarily.
+      this.initialProcedureReturnTypes_[procCode] !== actualReturnType
+    ) {
+      Blockly.Procedures.changeReturnType(block, actualReturnType);
     }
   }
   Blockly.Events.setGroup(false);
 
-  // Toolbox refresh is slow, so only do when necessary.
+  // Toolbox refresh can be slow, so only do when needed.
   var toolboxOutdated = false;
   for (var procCode in finalReturnTypes) {
-    if (this.initialProcedureReturnTypes_[procCode] !== finalReturnTypes[procCode]) {
+    // If a current procedure existed but its type has changed, the toolbox must be updated.
+    // If a new procedure was created, the toolbox is already updated elsewhere.
+    if (
+      Object.prototype.hasOwnProperty.call(this.initialProcedureReturnTypes_, procCode) &&
+      this.initialProcedureReturnTypes_[procCode] !== finalReturnTypes[procCode]
+    ) {
       toolboxOutdated = true;
       break;
     }

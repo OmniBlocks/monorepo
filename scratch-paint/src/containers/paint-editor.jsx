@@ -349,6 +349,7 @@ class PaintEditor extends React.Component {
                 textArea={this.state.textArea}
                 theme={this.getEffectiveTheme()}
                 width={this.props.width}
+                height={this.props.height}
                 zoomLevelId={this.props.zoomLevelId}
                 onChangeTheme={this.handleChangeTheme}
                 onRedo={this.props.onRedo}

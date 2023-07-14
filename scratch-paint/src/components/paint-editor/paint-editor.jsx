@@ -109,6 +109,8 @@ const PaintEditorComponent = props => (
                         <InputGroup className={styles.modModeTools}>
                             <ModeToolsContainer
                                 onUpdateImage={props.onUpdateImage}
+                                width={props.width}
+                                height={props.height}
                             />
                         </InputGroup>
                     </div> :
@@ -130,6 +132,8 @@ const PaintEditorComponent = props => (
                             <InputGroup className={styles.modModeTools}>
                                 <ModeToolsContainer
                                     onUpdateImage={props.onUpdateImage}
+                                    width={props.width}
+                                    height={props.height}
                                 />
                             </InputGroup>
                         </div> : null
@@ -374,6 +378,7 @@ PaintEditorComponent.propTypes = {
     textArea: PropTypes.instanceOf(Element),
     theme: PropTypes.string,
     width: PropTypes.number,
+    height: PropTypes.number,
     zoomLevelId: PropTypes.string
 };
 

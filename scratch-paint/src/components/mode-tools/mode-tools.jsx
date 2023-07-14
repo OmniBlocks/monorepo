@@ -51,6 +51,7 @@ import roundedRectIcon from '../rounded-rect-mode/rounded-rectangle.svg';
 import triangleIcon from '../triangle-mode/triangle.svg';
 import flipHorizontalIcon from './icons/flip-horizontal.svg';
 import flipVerticalIcon from './icons/flip-vertical.svg';
+import centerSelectionIcon from './icons/centerSelection.svg';
 import straightPointIcon from './icons/straight-point.svg';
 import bitOvalIcon from '../bit-oval-mode/oval.svg';
 import bitRectIcon from '../bit-rect-mode/rectangle.svg';
@@ -136,6 +137,11 @@ const ModeToolsComponent = props => {
             defaultMessage: 'Outlined',
             description: 'Label for the button that sets the bitmap rectangle/oval mode to draw filled-in shapes',
             id: 'paint.modeTools.outlined'
+        },
+        movementCenter: {
+            defaultMessage: 'Center',
+            description: 'Label for the button that moves the selected objects to the center of the canvas',
+            id: 'paint.modeTools.movementCenter'
         }
     });
 
@@ -332,6 +338,16 @@ const ModeToolsComponent = props => {
                     />
                 </InputGroup>
             )
+            const movementOptions = (
+                <InputGroup className={classNames(styles.modDashedBorder, styles.modLabeledIconHeight)}>
+                    <LabeledIconButton
+                        hideLabel={props.intl.locale !== 'en'}
+                        imgSrc={centerSelectionIcon}
+                        title={props.intl.formatMessage(messages.movementCenter)}
+                        onClick={props.onCenterSelection}
+                    />
+                </InputGroup>
+            )
             return (
                 <div className={classNames(props.className, styles.modeTools)}>
                     <InputGroup className={classNames(styles.modDashedBorder, styles.modLabeledIconHeight)}>
@@ -366,6 +382,8 @@ const ModeToolsComponent = props => {
                     <MediaQuery minWidth={layout.fullSizeEditorMinWidthExtraToolsCollapsed}>
                         {/* Flip Options */}
                         {flipOptions}
+                        {/* Movement Options */}
+                        {movementOptions}
                         {/* Reshaping Methods */}
                         {(props.mode === Modes.SELECT) ? (
                             <MediaQuery minWidth={layout.fullSizeEditorMinWidthExtraTools}>
@@ -405,6 +423,7 @@ const ModeToolsComponent = props => {
                                         rtl={props.rtl}
                                     >
                                         {flipOptions}
+                                        {movementOptions}
                                         {reshapingMethods}
                                     </InputGroup>
                                 }
@@ -524,6 +543,7 @@ ModeToolsComponent.propTypes = {
     onFillShapes: PropTypes.func.isRequired,
     onFlipHorizontal: PropTypes.func.isRequired,
     onFlipVertical: PropTypes.func.isRequired,
+    onCenterSelection: PropTypes.func.isRequired,
     onOutlineShapes: PropTypes.func.isRequired,
     onPasteFromClipboard: PropTypes.func.isRequired,
     onPointPoints: PropTypes.func.isRequired,

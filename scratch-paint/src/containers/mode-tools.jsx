@@ -17,7 +17,7 @@ import {
     selectAllSegments
 } from '../helper/selection';
 import {HANDLE_RATIO, ensureClockwise} from '../helper/math';
-import {groupItems} from '../helper/group';
+import {groupItems, ungroupItems} from '../helper/group';
 import {getRaster} from '../helper/layer';
 import {flipBitmapHorizontal, flipBitmapVertical, selectAllBitmap} from '../helper/bitmap';
 import Formats, {isBitmap} from '../lib/format';
@@ -36,6 +36,7 @@ class ModeTools extends React.Component {
             'handleCurvePoints',
             'handleFlipHorizontal',
             'handleFlipVertical',
+            'handleCenterSelection',
             'handleDelete',
             'handlePasteFromClipboard',
             'handlePointPoints',
@@ -267,6 +268,28 @@ class ModeTools extends React.Component {
             this._handleFlip(1, -1, selectedItems);
         }
     }
+    handleCenterSelection () {
+        let _selectedItems = getSelectedRootItems();
+        if (_selectedItems.length === 0) {
+            if (isBitmap(this.props.format)) {
+                selectAllBitmap(this.props.clearSelectedItems);
+                _selectedItems = getSelectedRootItems();
+            } else {
+                _selectedItems = getAllRootItems();
+            }
+        }
+        const selectedItems = _selectedItems;
+        // group to make easier
+        const group = new paper.Group(selectedItems);
+        // move corner to center
+        group.position = new paper.Point(this.props.width, this.props.height);
+        // move by bounds
+        const bounds = group.bounds;
+        group.position.subtract(new paper.Point(bounds.width, bounds.height) / 2);
+        // ungroup
+        ungroupItems([group]);
+        this.props.onUpdateImage();
+    }
     handlePasteFromClipboard () {
         if (this.props.onPasteFromClipboard()) {
             this.props.onUpdateImage();
@@ -297,6 +320,7 @@ class ModeTools extends React.Component {
                 onDelete={this.handleDelete}
                 onFlipHorizontal={this.handleFlipHorizontal}
                 onFlipVertical={this.handleFlipVertical}
+                onCenterSelection={this.handleCenterSelection}
                 onPasteFromClipboard={this.handlePasteFromClipboard}
                 onPointPoints={this.handlePointPoints}
                 onUpdateImage={this.props.onUpdateImage}
@@ -322,6 +346,8 @@ ModeTools.propTypes = {
     onCutToClipboard: PropTypes.func.isRequired,
     onPasteFromClipboard: PropTypes.func.isRequired,
     onUpdateImage: PropTypes.func.isRequired,
+    width: PropTypes.number,
+    height: PropTypes.number,
     // Listen on selected items to update hasSelectedPoints
     selectedItems:
         PropTypes.arrayOf(PropTypes.instanceOf(paper.Item)), // eslint-disable-line react/no-unused-prop-types

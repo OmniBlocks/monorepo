@@ -117,8 +117,9 @@ Blockly.WorkspaceSvg = function(options, opt_blockDragSurface, opt_wsDragSurface
   this.registerToolboxCategoryCallback(Blockly.PROCEDURE_CATEGORY_NAME,
       Blockly.Procedures.flyoutCategory);
 
-  this.procedureReturnChangeTimeout = null;
-  this.checkProcedureReturnAfterGesture = false;
+  this.initialProcedureReturnTypes_ = null;
+  this.procedureReturnChangeTimeout_ = null;
+  this.checkProcedureReturnAfterGesture_ = false;
 };
 goog.inherits(Blockly.WorkspaceSvg, Blockly.Workspace);
 
@@ -561,8 +562,8 @@ Blockly.WorkspaceSvg.prototype.dispose = function() {
     Blockly.unbindEvent_(this.resizeHandlerWrapper_);
     this.resizeHandlerWrapper_ = null;
   }
-  if (this.procedureReturnChangeTimeout) {
-    clearTimeout(this.procedureReturnChangeTimeout);
+  if (this.procedureReturnChangeTimeout_) {
+    clearTimeout(this.procedureReturnChangeTimeout_);
   }
 };
 
@@ -696,25 +697,37 @@ Blockly.WorkspaceSvg.prototype.queueIntersectionCheck = function() {
   }
 };
 
-Blockly.WorkspaceSvg.prototype.procedureReturnsChanged = function() {
+/**
+ * Call *before* modifying scripts.
+ */
+Blockly.WorkspaceSvg.prototype.procedureReturnsWillChange = function() {
+  if (this.initialProcedureReturnTypes_) {
+    // Already queued.
+    return;
+  }
+
+  this.initialProcedureReturnTypes_ = Blockly.Procedures.getAllProcedureReturnTypes(this);
+
   if (this.currentGesture_) {
-    this.checkProcedureReturnAfterGesture = true;
-  } else if (!this.procedureReturnChangeTimeout) {
-    this.procedureReturnChangeTimeout = setTimeout(function() {
-      this.procedureReturnChangeTimeout = null;
-      this.processProcedureReturnsChanged();
-    }.bind(this));
+    this.checkProcedureReturnAfterGesture_ = true;
+  } else {
+    this.procedureReturnChangeTimeout_ = setTimeout(this.processProcedureReturnsChanged_.bind(this));
   }
 };
 
-Blockly.WorkspaceSvg.prototype.processProcedureReturnsChanged = function() {
+/**
+ * @private
+ */
+Blockly.WorkspaceSvg.prototype.processProcedureReturnsChanged_ = function() {
+  var finalReturnTypes = Blockly.Procedures.getAllProcedureReturnTypes(this);
+
   Blockly.Events.setGroup(true);
   var topBlocks = this.getTopBlocks(false);
   for (var i = 0; i < topBlocks.length; i++) {
     var block = topBlocks[i];
-    if (!block.getNextBlock() && block.type === Blockly.PROCEDURES_CALL_BLOCK_TYPE) {
+    if (!block.isInsertionMarker() && !block.getNextBlock() && block.type === Blockly.PROCEDURES_CALL_BLOCK_TYPE) {
       var procCode = block.getProcCode();
-      var actuallyReturns = Blockly.Procedures.procedureContainsReturnType(procCode, this);
+      var actuallyReturns = Blockly.Procedures.getProcedureReturnType(procCode, this);
       
       if (actuallyReturns !== block.getReturn()) {
         Blockly.Procedures.changeReturnType(block, actuallyReturns);
@@ -723,7 +736,21 @@ Blockly.WorkspaceSvg.prototype.processProcedureReturnsChanged = function() {
   }
   Blockly.Events.setGroup(false);
 
-  this.refreshToolboxSelection_();
+  // Toolbox refresh is slow, so only do when necessary.
+  var toolboxOutdated = false;
+  for (var procCode in finalReturnTypes) {
+    if (this.initialProcedureReturnTypes_[procCode] !== finalReturnTypes[procCode]) {
+      toolboxOutdated = true;
+      break;
+    }
+  }
+  if (toolboxOutdated) {
+    this.refreshToolboxSelection_();
+  }
+
+  this.initialProcedureReturnTypes_ = null;
+  this.checkProcedureReturnAfterGesture_ = false;
+  this.procedureReturnChangeTimeout_ = null;
 };
 
 /**
@@ -2268,9 +2295,8 @@ Blockly.WorkspaceSvg.prototype.getGesture = function(e) {
 Blockly.WorkspaceSvg.prototype.clearGesture = function() {
   this.currentGesture_ = null;
 
-  if (this.checkProcedureReturnAfterGesture) {
-    this.checkProcedureReturnAfterGesture = false;
-    this.procedureReturnsChanged();
+  if (this.checkProcedureReturnAfterGesture_) {
+    this.processProcedureReturnsChanged_();
   }
 };
 

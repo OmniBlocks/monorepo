@@ -549,7 +549,22 @@ Blockly.Procedures.makeChangeTypeOption = function(block) {
     enabled: true,
     text: isStatement ? Blockly.Msg.PROCEDURES_TO_REPORTER : Blockly.Msg.PROCEDURES_TO_STATEMENT,
     callback: function() {
-      var newType = isStatement ? Blockly.PROCEDURES_CALL_TYPE_REPORTER : Blockly.PROCEDURES_CALL_TYPE_STATEMENT;
+      var newType;
+      if (isStatement) {
+        var procCode = block.getProcCode();
+        var workspace = block.workspace;
+        var actualReturnType = Blockly.Procedures.getProcedureReturnType(procCode, workspace);
+        // If the definition is boolean-shaped, then the reporter should be boolean-shaped,
+        // otherwise normal reporter shaped.
+        newType = (
+          actualReturnType === Blockly.PROCEDURES_CALL_TYPE_BOOLEAN ?
+          actualReturnType :
+          Blockly.PROCEDURES_CALL_TYPE_REPORTER
+        );
+      } else {
+        newType = Blockly.PROCEDURES_CALL_TYPE_STATEMENT;
+      }
+
       Blockly.Events.setGroup(true);
       try {
         Blockly.Procedures.changeReturnType(block, newType);

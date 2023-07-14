@@ -187,6 +187,8 @@ class PaintEditor extends React.Component {
             case Modes.BRUSH:
                 this.props.changeMode(Modes.BIT_BRUSH);
                 break;
+            case Modes.ARROW:
+                /* falls through */
             case Modes.LINE:
                 this.props.changeMode(Modes.BIT_LINE);
                 break;

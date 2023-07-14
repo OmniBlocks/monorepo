@@ -14,7 +14,9 @@ const vectorModesObj = {
     
     SUSSY: null,
     DRAGON: null,
-    TRIANGLE: null
+    TRIANGLE: null,
+
+    ARROW: null
 };
 const bitmapModesObj = {
     BIT_BRUSH: null,
@@ -48,7 +50,9 @@ const GradientToolsModes = keyMirror({
 
     SUSSY: null,
     DRAGON: null,
-    TRIANGLE: null
+    TRIANGLE: null,
+    
+    ARROW: null
 });
 
 export {

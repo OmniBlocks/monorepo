@@ -740,8 +740,11 @@ Blockly.WorkspaceSvg.prototype.processProcedureReturnsChanged_ = function() {
     if (block.getNextBlock()) continue;
 
     var procCode = block.getProcCode();
-    // If the procedure doesn't exist, we will ignore it.
-    if (!Object.prototype.hasOwnProperty.call(finalTypes, procCode)) continue;
+    // If the procedure doesn't exist or is new, ignore it.
+    if (
+      !Object.prototype.hasOwnProperty.call(initialTypes, procCode) ||
+      !Object.prototype.hasOwnProperty.call(finalTypes, procCode)
+    ) continue;
 
     var actualReturnType = finalTypes[procCode];
     if (

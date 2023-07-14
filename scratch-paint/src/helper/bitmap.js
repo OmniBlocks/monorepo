@@ -529,7 +529,7 @@ const matchesColor_ = function (x, y, imageData, oldColor) {
         imageData.data[index + 0] === oldColor[0] &&
         imageData.data[index + 1] === oldColor[1] &&
         imageData.data[index + 2] === oldColor[2] &&
-        imageData.data[index + 3 ] === oldColor[3]
+        imageData.data[index + 3] === oldColor[3]
     );
 };
 

@@ -498,6 +498,7 @@ const execute = function (sequencer, thread) {
     for (; i < length; i++) {
         const lastOperation = i === length - 1;
         const opCached = ops[i];
+        currentStackFrame.op = opCached;
 
         const blockFunction = opCached._blockFunction;
 

@@ -63,6 +63,13 @@ class _StackFrame {
          * @type {Object}
          */
         this.executionContext = null;
+
+        /**
+         * Internal block object being executed. This is *not* the same as the object found
+         * in target.blocks.
+         * @type {object}
+         */
+        this.op = null;
     }
 
     /**
@@ -79,6 +86,7 @@ class _StackFrame {
         this.waitingReporter = null;
         this.params = null;
         this.executionContext = null;
+        this.op = null;
 
         return this;
     }

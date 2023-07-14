@@ -271,6 +271,8 @@ class ModeTools extends React.Component {
     handleCenterSelection () {
         let _selectedItems = getSelectedRootItems();
         if (_selectedItems.length === 0) {
+            // no good way to do this currently
+            if (isBitmap(this.props.format)) return;
             _selectedItems = getAllRootItems();
         }
         const selectedItems = _selectedItems;

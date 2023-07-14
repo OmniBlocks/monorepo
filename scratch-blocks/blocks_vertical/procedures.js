@@ -166,7 +166,7 @@ Blockly.ScratchBlocks.ProcedureUtils.updateDisplay_ = function() {
         this.setOutput(true, null);
         this.setOutputShape(Blockly.OUTPUT_SHAPE_HEXAGONAL);
       } else {
-        this.setOutput(true, 'Number');
+        this.setOutput(true, Blockly.Procedures.ENFORCE_TYPES ? 'Number' : null);
         this.setOutputShape(Blockly.OUTPUT_SHAPE_ROUND);
       }
     }

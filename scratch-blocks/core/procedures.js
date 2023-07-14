@@ -656,6 +656,11 @@ Blockly.Procedures.deleteProcedureDefCallback = function(procCode,
 Blockly.Procedures.USER_CAN_CHANGE_CALL_TYPE = true;
 
 /**
+ * If false, a round procedure call reporter can be dropped into any input, including boolean ones.
+ */
+Blockly.Procedures.ENFORCE_TYPES = false;
+
+/**
  * @param {string} procCode The procedure code
  * @param {Blockly.Workspace} workspace The workspace
  * @returns {number} The type of the return block

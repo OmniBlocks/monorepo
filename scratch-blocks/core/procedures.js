@@ -681,12 +681,13 @@ Blockly.Procedures.getAllProcedureReturnTypes = function(workspace) {
   var result = Object.create(null);
   var blocks = workspace.getTopBlocks(false);
   for (var i = 0; i < blocks.length; i++) {
-    if (blocks[i].type == Blockly.PROCEDURES_DEFINITION_BLOCK_TYPE) {
-      var procCode = blocks[i].getInput('custom_block').connection.targetBlock().getProcCode();
+    var block = blocks[i];
+    if (block.type == Blockly.PROCEDURES_DEFINITION_BLOCK_TYPE && !block.isInsertionMarker()) {
+      var procCode = block.getInput('custom_block').connection.targetBlock().getProcCode();
       // To match behavior of getDefineBlock, if multiple instances of this procedure are
       // defined, only use the first one.
       if (!Object.prototype.hasOwnProperty.call(result, procCode)) {
-        result[procCode] = Blockly.Procedures.getBlockReturnType(blocks[i]);
+        result[procCode] = Blockly.Procedures.getBlockReturnType(block);
       }
     }
   }

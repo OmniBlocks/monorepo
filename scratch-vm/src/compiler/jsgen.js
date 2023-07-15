@@ -624,11 +624,34 @@ class JSGenerator {
             return new TypedInput(`(10 ** ${this.descendInput(node.value).asNumber()})`, TYPE_NUMBER);
 
         case 'procedures.call': {
-            const call = this.generateProcedureCall(node);
-            if (call) {
-                return new TypedInput(`(${call})`, TYPE_UNKNOWN);
+            const procedureCode = node.code;
+            const procedureVariant = node.variant;
+            const procedureData = this.ir.procedures[procedureVariant];
+            if (procedureData.stack === null) {
+                // TODO still need to evaluate arguments for side effects
+                return new TypedInput('""', TYPE_STRING);
             }
-            return new TypedInput('""', TYPE_STRING);
+
+            // Recursion makes this complicated because:
+            //  - We need to yield *between* each call in the same command block
+            //  - We need to evaluate arguments *before* that yield happens
+
+            const procedureReference = `thread.procedures["${sanitize(procedureVariant)}"]`;
+            const args = [];
+            for (const input of node.arguments) {
+                args.push(this.descendInput(input).asSafe());
+            }
+            const joinedArgs = args.join(',');
+
+            const yieldForRecursion = !this.isWarp && procedureCode === this.script.procedureCode;
+            if (yieldForRecursion) {
+                const runtimeFunction = procedureData.yields ? 'yieldThenCallGenerator' : 'yieldThenCall';
+                return new TypedInput(`(yield* ${runtimeFunction}(${procedureReference}, ${joinedArgs}))`, TYPE_UNKNOWN);
+            }
+            if (procedureData.yields) {
+                return new TypedInput(`(yield* ${procedureReference}(${joinedArgs}))`, TYPE_UNKNOWN);
+            }
+            return new TypedInput(`${procedureReference}(${joinedArgs})`, TYPE_UNKNOWN);
         }
 
         case 'sensing.answer':
@@ -1018,10 +1041,31 @@ class JSGenerator {
             break;
 
         case 'procedures.call': {
-            const call = this.generateProcedureCall(node);
-            if (call) {
-                this.source += `${call};\n`;
+            const procedureCode = node.code;
+            const procedureVariant = node.variant;
+            const procedureData = this.ir.procedures[procedureVariant];
+            if (procedureData.stack === null) {
+                // TODO still need to evaluate arguments
+                break;
             }
+
+            const yieldForRecursion = !this.isWarp && procedureCode === this.script.procedureCode;
+            if (yieldForRecursion) {
+                this.yieldNotWarp();
+            }
+
+            if (procedureData.yields) {
+                this.source += 'yield* ';
+            }
+            this.source += `thread.procedures["${sanitize(procedureVariant)}"](`;
+            const args = [];
+            for (const input of node.arguments) {
+                args.push(this.descendInput(input).asSafe());
+            }
+            this.source += args.join(',');
+            this.source += ');\n';
+
+            this.resetVariableInputs();
             break;
         }
         case 'procedures.return':
@@ -1206,46 +1250,6 @@ class JSGenerator {
     safeConstantInput (value) {
         const unsafe = typeof value === 'string' && this.namesOfCostumesAndSounds.has(value);
         return new ConstantInput(value, !unsafe);
-    }
-
-    generateProcedureCall (node) {
-        const procedureCode = node.code;
-        const procedureVariant = node.variant;
-
-        // Do not generate any code for empty procedures.
-        const procedureData = this.ir.procedures[procedureVariant];
-        if (procedureData.stack === null) {
-            return null;
-        }
-
-        // Direct recursion yields.
-        if (!this.isWarp && procedureCode === this.script.procedureCode) {
-            this.yieldNotWarp();
-        }
-
-        let result = '';
-        if (procedureData.yields) {
-            result += 'yield* ';
-            if (!this.script.yields) {
-                throw new Error('Script uses yielding procedure but is not marked as yielding.');
-            }
-        }
-
-        result += `thread.procedures["${sanitize(procedureVariant)}"](`;
-        // Only include arguments if the procedure accepts any.
-        if (procedureData.arguments.length) {
-            const args = [];
-            for (const input of node.arguments) {
-                args.push(this.descendInput(input).asSafe());
-            }
-            result += args.join(',');
-        }
-        result += ')';
-
-        // Variable input types may have changes after a procedure call.
-        this.resetVariableInputs();
-
-        return result;
     }
 
     /**

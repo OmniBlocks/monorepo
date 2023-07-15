@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
-        <title>Privacy Policy</title>
+        <title>TurboWarp Privacy Policy</title>
         <meta charset="utf8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <style>
@@ -33,19 +33,48 @@
 
         <main>
             <!-- UPDATE THIS WHEN MAKING CONTENT CHANGES -->
-            <p><i>Updated September 29th, 2021</i></p>
+            <p><i>Updated July 15th, 2023</i></p>
 
-            <p>This document applies to https://turbowarp.org, https://experiments.turbowarp.org, and https://staging.turbowarp.org.</p>
+            <p><b>The TurboWarp project respects your privacy.</b> Every website says this, but we mean it: We aren't interested in your data.</p>
 
-            <p>We may log anonymous aggregated data such as how many people use the site, how often a feature is used, what operating system and browser is used, and diagnostic information such as cache hit ratios.</p>
-            <p>When using cloud variables, the project ID and your username may be logged for up to 14 days.</p>
-            <p>Your randomly generated or chosen username is stored in your browser's local storage. To mitigate the potential to track users with this feature, all randomly generated usernames are anonymized before the server receives them. However, usernames explicitly set by a user may be logged to help prevent abuse.</p>
-            <p>Scratch extensions that require Wi-Fi (such as Translate, Text to Speech, LEGO, micro:bit, etc.) may connect to the Scratch API to implement these features. <a href="https://scratch.mit.edu/privacy_policy/">Refer to the Scratch privacy policy for more information</a>. The Translate extension may instead make requests to a TurboWarp API, which may then forward your request to the Scratch API and log the message being translated and the result for caching and performance.</p>
-            <p>In rare circumstances, connections that are appear to be spam may have their IP logged for up to 24 hours. This happens very infrequently and only in cases of extreme abuse.</p>
-            <p>This document does not apply to third-parties, including other users or bots connected to cloud variables, links to external websites, custom extensions, or some advanced URL parameters.</p>
+            <h2>Loading projects</h2>
+            <p>When you load a project from another website, you are subject to the privacy practices of that website. For example, when loading projects from Scratch, you are subject to the <a href="https://scratch.mit.edu/privacy_policy">Scratch privacy policy</a>. When loading projects from Scratch specifically, the project ID will also be shared with TurboWarp as part of Scratch's API does not allow direct access. We may briefly log the project ID for caching.</p>
+
+            <h2>Running projects</h2>
+            <p>When connecting to our cloud variable servers, the project ID and username may be logged for 14 days. Data in cloud variables is sent to anyone else connected at the same time. Custom cloud variable servers are outside of our control.</p>
+            <p>Some built-in Scratch extensions such as translate and text to speech rely on the Scratch API. See the <a href="https://scratch.mit.edu/privacy_policy">Scratch privacy policy</a> for their privacy practices. To improve performance, some extensions contact TurboWarp's servers instead, where both the request (for example, the text being translated) and the result after forwarding to Scratch (for example, the translated version of the text) may be cached.</p>
+            <p>The project may also contain custom extensions, such as those found on our official extension gallery, <a href="https://extensions.turbowarp.org/">extensions.turbowarp.org</a>. Projects may use official extensions to make requests to trusted static site hosts such as GitHub Pages automatically, but requests to unknown websites will first show a permission dialog.</p>
+            <p>When loading a custom extension from a place other than the official gallery such as a URL or file, a permission dialog will first be shown. If you approve this dialog, the extension may bypass the permission dialogs that official extensions show.</p>
+
+            <h2>Settings</h2>
+            <p>Many TurboWarp websites will store settings such as <a href="https://turbowarp.org/addons">addon settings</a> or <a href="https://packager.turbowarp.org/">packager settings</a> in your browser.</p>
+
+            <h2>Aggregated data</h2>
+            <p>We may log anonymous aggregated data such as how many people use a certain site per day.</p>
+
+            <h2>turbowarp.org</h2>
+            <p>A randomly generated username may be saved in your browser. You can replace this with a custom username. Randomly generated usernames are anonymized (the random part is removed) before being sent to any cloud variable server.</p>
+
+            <h2>TurboWarp Desktop</h2>
+            <p><a href="https://desktop.turbowarp.org/">TurboWarp Desktop</a> may make requests to check for updates. These requests can be disabled.</p>
+
+            <h2>docs.turbowarp.org</h2>
+            <p>The search bar is provided by Algolia. See the <a href="https://www.algolia.com/policies/privacy/">Algolia privacy policy</a>.</p>
+
+            <h2>TurboWarp Packager</h2>
+            <p>The <a href="https://packager.turbowarp.org/">TurboWarp Packager</a> may store settings and cache large downloads such as Electron in your browser for convenience and performance.</p>
+            <p>When packaging a project using custom extensions, the packager may access those websites to download the extensions.</p>
+
+            <h2>Projects generated by the TurboWarp Packager</h2>
+            <p>Packaged projects include all scripts, costumes, and sounds to run the project. The packager tries to include all custom extensions too, but in some cases, the packaged project may need to download certain extensions each time it runs.</p>
+            <p>Advanced features such as third-party custom extensions, custom cloud host, custom JS, and custom CSS are outside of our control.</p>
+            <p>Note that, unlike the TurboWarp editor, custom extensions in packaged projects will not ask for permission before contacting websites.</p>
+            <p>You are responsible for informing end users about the privacy practices of the files you distribute. Do not link to this document as your project's privacy policy as it may change in the future. You must write your own.</p>
+
+            <h2>TurboWarp Packager Extras</h2>
+            <p><a href="https://github.com/TurboWarp/packager-extras/releases">TurboWarp Packager Extras</a> may make requests to check for updates.</p>
 
             <h2>Contact</h2>
-
             <p>Any concerns related to privacy or any other matter should be sent to: <a href="mailto:contact@turbowarp.org">contact@turbowarp.org</a></p>
         </main>
     </body>

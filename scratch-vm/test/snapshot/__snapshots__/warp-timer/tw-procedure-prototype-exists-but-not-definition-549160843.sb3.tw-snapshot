@@ -6,6 +6,7 @@
 const b0 = runtime.getOpcodeFunction("looks_say");
 return function* genXYZ () {
 yield* executeInCompatibilityLayer({"MESSAGE":"plan 0",}, b0, false, false, null);
+void "";
 yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, null);
 retire(); return;
 }; })

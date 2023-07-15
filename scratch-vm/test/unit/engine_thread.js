@@ -267,12 +267,17 @@ test('isRecursiveCall', t => {
     rt.blocks.createBlock(block2);
     th.target = rt;
 
+    const pushStack = id => {
+        th.pushStack(id);
+        th.peekStackFrame().op = {id};
+    };
+
     t.strictEquals(th.isRecursiveCall('fakeCode'), false);
-    th.pushStack('secondString');
+    pushStack('secondString');
     t.strictEquals(th.isRecursiveCall('fakeCode'), false);
-    th.pushStack('arbitraryString');
+    pushStack('arbitraryString');
     t.strictEquals(th.isRecursiveCall('fakeCode'), true);
-    th.pushStack('arbitraryString');
+    pushStack('arbitraryString');
     t.strictEquals(th.isRecursiveCall('fakeCode'), true);
     th.popStack();
     t.strictEquals(th.isRecursiveCall('fakeCode'), true);

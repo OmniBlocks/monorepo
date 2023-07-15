@@ -1,13 +1,14 @@
 // TW Snapshot
-// Input SHA-256: 0b663e531a92599af0cb4fdcd9c8a13594d67f9aa1a2cbb9b80ef6617dfd300c
+// Input SHA-256: 943f7a3b48b7aadf0f8f04410238080040b4e1a70f1c31335742d477917cfb13
 
 // Sprite1 script
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
 const b0 = runtime.getOpcodeFunction("looks_say");
 const b1 = stage.variables["`jEk@4|i[#Fk?(8x)AV.-my variable"];
 const b2 = stage.variables["PsAI*C{QHI3*4?O8p#TM"];
+const b3 = stage.variables["Go=PJS7BFXYo_qi2S:kQ"];
 return function* genXYZ () {
-yield* executeInCompatibilityLayer({"MESSAGE":"plan 15",}, b0, false, false, null);
+yield* executeInCompatibilityLayer({"MESSAGE":"plan 17",}, b0, false, false, null);
 if ((("" + (thread.procedures["Zsimplest"]())).toLowerCase() === "It works!".toLowerCase())) {
 yield* executeInCompatibilityLayer({"MESSAGE":"pass simplest",}, b0, false, false, null);
 }
@@ -15,16 +16,16 @@ if ((("" + (thread.procedures["Znesting 1"]())).toLowerCase() === "42-54".toLowe
 yield* executeInCompatibilityLayer({"MESSAGE":"pass nesting1",}, b0, false, false, null);
 }
 if (((+(thread.procedures["Wfib %s"](12)) || 0) === 144)) {
-yield* executeInCompatibilityLayer({"MESSAGE":"pass fib12",}, b0, false, false, null);
+yield* executeInCompatibilityLayer({"MESSAGE":"pass fib 12",}, b0, false, false, null);
 }
-if (((+(yield* thread.procedures["Zfactorial %s"](12)) || 0) === 479001600)) {
-yield* executeInCompatibilityLayer({"MESSAGE":"pass factorial12",}, b0, false, false, null);
+if (((+(thread.procedures["Wfactorial %s"](12)) || 0) === 479001600)) {
+yield* executeInCompatibilityLayer({"MESSAGE":"pass factorial 12",}, b0, false, false, null);
 }
 b1.value = (yield* thread.procedures["Zno shadowing 1 %s %s"]("f","g"));
 if (compareEqual(b1.value, "")) {
 yield* executeInCompatibilityLayer({"MESSAGE":"pass default return value",}, b0, false, false, null);
 }
-yield* thread.procedures["Zreturn stops the script immediately"]();
+yield* thread.procedures["Wreturn stops the script immediately"]();
 if (((+b2.value || 0) === 25)) {
 yield* executeInCompatibilityLayer({"MESSAGE":"pass return stopped the script immediately",}, b0, false, false, null);
 }
@@ -39,8 +40,18 @@ yield* executeInCompatibilityLayer({"MESSAGE":"pass invalid params reporter",}, 
 if (compareEqual((thread.procedures["Zinvalid params - boolean"]()), 0)) {
 yield* executeInCompatibilityLayer({"MESSAGE":"pass invalid params boolean",}, b0, false, false, null);
 }
-runtime.stopForTarget(target, thread);
+b3.value = 0;
+b1.value = (yield* thread.procedures["Znon warp recursion should yield %s"](8));
+if (((+b3.value || 0) === 4)) {
+yield* executeInCompatibilityLayer({"MESSAGE":"pass non warp recursion yields",}, b0, false, false, null);
+}
+b3.value = 0;
+b1.value = (thread.procedures["Wwarp recursion should not yield %s"](8));
+if (compareEqual(b3.value, 0)) {
+yield* executeInCompatibilityLayer({"MESSAGE":"pass warp recursion does not yield",}, b0, false, false, null);
+}
 yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, null);
+runtime.stopForTarget(target, thread);
 retire(); return;
 }; })
 
@@ -72,10 +83,9 @@ return "";
 
 // Sprite1 factorial %s
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
-return function* genXYZ_factorial_ (p0) {
+return function funXYZ_factorial_ (p0) {
 if (compareGreaterThan(p0, 1)) {
-yield;
-return ((+p0 || 0) * (+(yield* thread.procedures["Zfactorial %s"](((+p0 || 0) - 1))) || 0));
+return ((+p0 || 0) * (+(thread.procedures["Wfactorial %s"](((+p0 || 0) - 1))) || 0));
 }
 return 1;
 return "";
@@ -111,9 +121,8 @@ b0.value = ((+b0.value || 0) + 1);
 if (((b0.value || 0) === 25)) {
 return "stopped!";
 }
-yield;
 }
-yield* executeInCompatibilityLayer({"MESSAGE":"fail return did not stop the script immediately",}, b1, false, false, null);
+yield* executeInCompatibilityLayer({"MESSAGE":"fail return did not stop the script immediately",}, b1, true, false, null);
 return "";
 }; })
 
@@ -134,7 +143,7 @@ yield;
 thread.timer = null;
 yield;
 }
-if (((+b0.value || 0) === 10)) {
+if (((+b0.value || 0) === 5)) {
 yield* executeInCompatibilityLayer({"MESSAGE":"pass non warp 1",}, b1, false, false, null);
 }
 if ((("" + (yield* thread.procedures["Wverify runs warp %s"]((yield* thread.procedures["Zverify runs non warp %s"]((yield* thread.procedures["Wverify runs warp %s"]("abc"))))))).toLowerCase() === "warp: non warp: warp: abc".toLowerCase())) {
@@ -152,7 +161,7 @@ yield;
 thread.timer = null;
 yield;
 }
-if (((+b0.value || 0) === 10)) {
+if (((+b0.value || 0) === 5)) {
 yield* executeInCompatibilityLayer({"MESSAGE":"pass non warp 2",}, b1, false, false, null);
 }
 return "";
@@ -169,6 +178,25 @@ return "";
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
 return function funXYZ_invalid_params___boo () {
 return 0;
+return "";
+}; })
+
+// Sprite1 non warp recursion should yield %s
+(function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
+return function* genXYZ_non_warp_recursion_s (p0) {
+if (compareGreaterThan(p0, 0)) {
+yield;
+return (yield* thread.procedures["Znon warp recursion should yield %s"](((+p0 || 0) - 1)));
+}
+return "";
+}; })
+
+// Sprite1 warp recursion should not yield %s
+(function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
+return function funXYZ_warp_recursion_shoul (p0) {
+if (compareGreaterThan(p0, 0)) {
+return (thread.procedures["Wwarp recursion should not yield %s"](((+p0 || 0) - 1)));
+}
 return "";
 }; })
 
@@ -261,6 +289,14 @@ return function* genXYZ () {
 b0.value = 0;
 while (true) {
 b0.value = ((+b0.value || 0) + 1);
+thread.timer = timer();
+var a0 = Math.max(0, 1000 * 0);
+runtime.requestRedraw();
+yield;
+while (thread.timer.timeElapsed() < a0) {
+yield;
+}
+thread.timer = null;
 yield;
 }
 retire(); return;

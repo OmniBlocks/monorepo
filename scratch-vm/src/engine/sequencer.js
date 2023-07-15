@@ -274,7 +274,7 @@ class Sequencer {
                     // This level of the stack was waiting for a value.
                     // This means a reporter has just returned - so don't go
                     // to the next block for this level of the stack.
-                    return;
+                    continue;
                 }
                 // Get next block of existing block on the stack.
                 thread.goToNextBlock();

@@ -49,6 +49,9 @@ class Scratch3ProcedureBlocks {
         // block is dragged between sprites without the definition.
         // Match Scratch 2.0 behavior and noop.
         if (paramNamesIdsAndDefaults === null) {
+            if (isReporter) {
+                return '';
+            }
             return;
         }
 

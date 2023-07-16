@@ -12,6 +12,7 @@ import RecordAudio from './record-audio.jsx';
 import RecordVideo from './record-video.jsx';
 import ReadClipboard from './read-clipboard.jsx';
 import Notify from './notify.jsx';
+import Geolocate from './geolocate.jsx';
 import DelayedMountPropertyHOC from './delayed-mount-property-hoc.jsx';
 import styles from './security-manager-modal.css';
 
@@ -50,6 +51,8 @@ const SecurityManagerModalComponent = props => (
                 <ReadClipboard {...props.data} />
             ) : props.type === SecurityModals.Notify ? (
                 <Notify {...props.data} />
+            ) : props.type === SecurityModals.Geolocate ? (
+                <Geolocate {...props.data} />
             ) : null}
 
             <Box className={styles.buttons}>

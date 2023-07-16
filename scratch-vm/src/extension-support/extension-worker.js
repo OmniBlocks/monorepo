@@ -83,6 +83,7 @@ Object.assign(global.Scratch, ScratchCommon, {
     canRecordVideo: () => Promise.resolve(false),
     canReadClipboard: () => Promise.resolve(false),
     canNotify: () => Promise.resolve(false),
+    canGeolocate: () => Promise.resolve(false),
     translate
 });
 

@@ -82,6 +82,8 @@ const setupUnsandboxedExtensionAPI = vm => new Promise(resolve => {
 
     Scratch.canNotify = async () => vm.securityManager.canNotify();
 
+    Scratch.canGeolocate = async () => vm.securityManager.canGeolocate();
+
     Scratch.fetch = async (url, options) => {
         const actualURL = url instanceof Request ? url.url : url;
         if (!await Scratch.canFetch(actualURL)) {

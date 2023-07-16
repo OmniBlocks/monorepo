@@ -343,3 +343,16 @@ test('canNotify', async t => {
     
     t.end();
 });
+
+test('canGeolocate', async t => {
+    const vm = new VirtualMachine();
+    UnsandboxedExtensionRunner.setupUnsandboxedExtensionAPI(vm);
+
+    vm.securityManager.canGeolocate = () => false;
+    t.equal(await global.Scratch.canGeolocate(), false);
+
+    vm.securityManager.canGeolocate = () => true;
+    t.equal(await global.Scratch.canGeolocate(), true);
+    
+    t.end();
+});

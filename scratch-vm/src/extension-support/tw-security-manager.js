@@ -125,6 +125,15 @@ class SecurityManager {
     canNotify () {
         return Promise.resolve(true);
     }
+
+    /**
+     * Determine whether an extension is allowed to find the user's precise location using GPS
+     * and other techniques. Note that, even if this returns true, success is not guaranteed.
+     * @returns {Promise<boolean>|boolean}
+     */
+    canGeolocate () {
+        return Promise.resolve(true);
+    }
 }
 
 module.exports = SecurityManager;

@@ -126,3 +126,8 @@ test('canNotify', async t => {
     t.equal(await global.Scratch.canNotify(), false);
     t.end();
 });
+
+test('canGeolocate', async t => {
+    t.equal(await global.Scratch.canGeolocate(), false);
+    t.end();
+});

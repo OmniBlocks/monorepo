@@ -27,7 +27,7 @@ const blockIconURI = 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNv
  * The url of the synthesis server.
  * @type {string}
  */
-const SERVER_HOST = 'https://trampoline.turbowarp.org/tts';
+const SERVER_HOST = 'https://synthesis-service.scratch.mit.edu';
 
 /**
  * How long to wait in ms before timing out requests to synthesis server.

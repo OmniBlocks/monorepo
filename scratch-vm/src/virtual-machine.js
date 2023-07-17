@@ -217,7 +217,8 @@ class VirtualMachine extends EventEmitter {
          */
         this.exports = {
             Sprite,
-            RenderedTarget
+            RenderedTarget,
+            JSZip
         };
     }
 
@@ -569,6 +570,7 @@ class VirtualMachine extends EventEmitter {
     }
 
     _addFileDescsToZip (fileDescs, zip) {
+        // TODO: sort files, smallest first
         for (let i = 0; i < fileDescs.length; i++) {
             const currFileDesc = fileDescs[i];
             zip.file(currFileDesc.fileName, currFileDesc.fileContent);

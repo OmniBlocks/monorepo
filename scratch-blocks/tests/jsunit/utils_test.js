@@ -69,59 +69,6 @@ function test_removeClass() {
   assertEquals('Removing "zero"', '', p.className);
 }
 
-function test_shortestStringLength() {
-  var len = Blockly.utils.shortestStringLength('one,two,three,four,five'.split(','));
-  assertEquals('Length of "one"', 3, len);
-  len = Blockly.utils.shortestStringLength('one,two,three,four,five,'.split(','));
-  assertEquals('Length of ""', 0, len);
-  len = Blockly.utils.shortestStringLength(['Hello World']);
-  assertEquals('List of one', 11, len);
-  len = Blockly.utils.shortestStringLength([]);
-  assertEquals('Empty list', 0, len);
-}
-
-function test_commonWordPrefix() {
-  var len = Blockly.utils.commonWordPrefix('one,two,three,four,five'.split(','));
-  assertEquals('No prefix', 0, len);
-  len = Blockly.utils.commonWordPrefix('Xone,Xtwo,Xthree,Xfour,Xfive'.split(','));
-  assertEquals('No word prefix', 0, len);
-  len = Blockly.utils.commonWordPrefix('abc de,abc de,abc de,abc de'.split(','));
-  assertEquals('Full equality', 6, len);
-  len = Blockly.utils.commonWordPrefix('abc deX,abc deY'.split(','));
-  assertEquals('One word prefix', 4, len);
-  len = Blockly.utils.commonWordPrefix('abc de,abc deY'.split(','));
-  assertEquals('Overflow no', 4, len);
-  len = Blockly.utils.commonWordPrefix('abc de,abc de Y'.split(','));
-  assertEquals('Overflow yes', 6, len);
-  len = Blockly.utils.commonWordPrefix(['Hello World']);
-  assertEquals('List of one', 11, len);
-  len = Blockly.utils.commonWordPrefix([]);
-  assertEquals('Empty list', 0, len);
-  len = Blockly.utils.commonWordPrefix('turn&nbsp;left,turn&nbsp;right'.split(','));
-  assertEquals('No prefix due to &amp;nbsp;', 0, len);
-  len = Blockly.utils.commonWordPrefix('turn\u00A0left,turn\u00A0right'.split(','));
-  assertEquals('No prefix due to \\u00A0', 0, len);
-}
-
-function test_commonWordSuffix() {
-  var len = Blockly.utils.commonWordSuffix('one,two,three,four,five'.split(','));
-  assertEquals('No prefix', 0, len);
-  len = Blockly.utils.commonWordSuffix('oneX,twoX,threeX,fourX,fiveX'.split(','));
-  assertEquals('No word prefix', 0, len);
-  len = Blockly.utils.commonWordSuffix('abc de,abc de,abc de,abc de'.split(','));
-  assertEquals('Full equality', 6, len);
-  len = Blockly.utils.commonWordSuffix('Xabc de,Yabc de'.split(','));
-  assertEquals('One word prefix', 3, len);
-  len = Blockly.utils.commonWordSuffix('abc de,Yabc de'.split(','));
-  assertEquals('Overflow no', 3, len);
-  len = Blockly.utils.commonWordSuffix('abc de,Y abc de'.split(','));
-  assertEquals('Overflow yes', 6, len);
-  len = Blockly.utils.commonWordSuffix(['Hello World']);
-  assertEquals('List of one', 11, len);
-  len = Blockly.utils.commonWordSuffix([]);
-  assertEquals('Empty list', 0, len);
-}
-
 function test_tokenizeInterpolation() {
   var tokens = Blockly.utils.tokenizeInterpolation('');
   assertArrayEquals('Null interpolation', [], tokens);

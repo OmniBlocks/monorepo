@@ -243,7 +243,12 @@ Blockly.Procedures.flyoutCategory = function(workspace) {
     xmlList.push(block);
   }
 
-  if (mutations.length > 0) {
+  var showReturn = (
+    Blockly.Procedures.DEFAULT_ENABLE_RETURNS ?
+    mutations.length > 0 :
+    workspace.procedureReturnsEnabled
+  );
+  if (showReturn) {
     var returnBlock = goog.dom.createDom('block');
     returnBlock.setAttribute('type', 'procedures_return');
     returnBlock.setAttribute('gap', 16);
@@ -659,6 +664,12 @@ Blockly.Procedures.USER_CAN_CHANGE_CALL_TYPE = true;
  * If false, a round procedure call reporter can be dropped into any input, including boolean ones.
  */
 Blockly.Procedures.ENFORCE_TYPES = false;
+
+/**
+ * If true, the return block will always be available. If false, either create a block that requires
+ * returns or call workspace.enableProcedureReturns() to enable return blocks.
+ */
+Blockly.Procedures.DEFAULT_ENABLE_RETURNS = false;
 
 /**
  * @param {string} procCode The procedure code

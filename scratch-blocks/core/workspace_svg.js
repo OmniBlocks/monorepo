@@ -117,6 +117,7 @@ Blockly.WorkspaceSvg = function(options, opt_blockDragSurface, opt_wsDragSurface
   this.registerToolboxCategoryCallback(Blockly.PROCEDURE_CATEGORY_NAME,
       Blockly.Procedures.flyoutCategory);
 
+  this.procedureReturnsEnabled = Blockly.Procedures.DEFAULT_ENABLE_RETURNS;
   this.initialProcedureReturnTypes_ = null;
   this.procedureReturnChangeTimeout_ = null;
   this.checkProcedureReturnAfterGesture_ = false;
@@ -774,6 +775,13 @@ Blockly.WorkspaceSvg.prototype.processProcedureReturnsChanged_ = function() {
   if (toolboxOutdated) {
     this.refreshToolboxSelection_();
   }
+};
+
+/**
+ * Does not refresh toolbox.
+ */
+Blockly.WorkspaceSvg.prototype.enableProcedureReturns = function() {
+  this.procedureReturnsEnabled = true;
 };
 
 /**

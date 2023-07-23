@@ -1,5 +1,5 @@
 // TW Snapshot
-// Input SHA-256: f471ef1fa15b4b136753a0a27fbe487291c7a38fdf2cce1fcb36f9e9b712cf13
+// Input SHA-256: b9110339d39947f68168cbb129a20b23b7d4e607ffd5624bd67e096451f6a329
 
 // Sprite1 script
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
@@ -25,19 +25,9 @@ retire(); return;
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
 const b0 = runtime.getOpcodeFunction("looks_say");
 const b1 = stage.variables["Go=PJS7BFXYo_qi2S:kQ"];
-const b2 = stage.variables["!Hlf`73W/F$a]t=WtfHK"];
 return function* genXYZ () {
-yield* executeInCompatibilityLayer({"MESSAGE":"plan 5",}, b0, false, false, null);
+yield* executeInCompatibilityLayer({"MESSAGE":"plan 2",}, b0, false, false, null);
 b1.value = 0;
-if (compareEqual((thread.procedures["Zbut it still runs this %s"]("yup"),""), "")) {
-yield* executeInCompatibilityLayer({"MESSAGE":"pass default return value for function that does not exist",}, b0, false, false, null);
-if (compareEqual(b1.value, 0)) {
-yield* executeInCompatibilityLayer({"MESSAGE":"pass calling function that does not exist is still instant",}, b0, false, false, null);
-}
-if ((("" + b2.value).toLowerCase() === "yup".toLowerCase())) {
-yield* executeInCompatibilityLayer({"MESSAGE":"pass still executes parameters for non existent functions",}, b0, false, false, null);
-}
-}
 if (compareEqual(thread.procedures["Zinvalid params - reporter"](), 0)) {
 yield* executeInCompatibilityLayer({"MESSAGE":"pass invalid params reporter",}, b0, false, false, null);
 }
@@ -47,14 +37,6 @@ yield* executeInCompatibilityLayer({"MESSAGE":"pass invalid params boolean",}, b
 runtime.stopForTarget(target, thread);
 yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, null);
 retire(); return;
-}; })
-
-// Sprite1 but it still runs this %s
-(function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
-const b0 = stage.variables["!Hlf`73W/F$a]t=WtfHK"];
-return function funXYZ_but_it_still_runs_th (p0) {
-b0.value = p0;
-return "";
 }; })
 
 // Sprite1 invalid params - reporter

@@ -1291,43 +1291,33 @@ class ScriptTreeGenerator {
         const procedureCode = block.mutation.proccode;
         const paramNamesIdsAndDefaults = this.blocks.getProcedureParamNamesIdsAndDefaults(procedureCode);
         if (paramNamesIdsAndDefaults === null) {
-            // Still need to evaluate arguments in case of side effects
-            const argumentList = [];
-            for (const inputName of Object.keys(block.inputs)) {
-                argumentList.push(this.descendInputOfBlock(block, inputName));
-            }
             return {
-                kind: 'procedures.discard',
-                values: argumentList
+                kind: 'noop'
             };
         }
 
         const [paramNames, paramIds, paramDefaults] = paramNamesIdsAndDefaults;
-        const argumentList = [];
-        for (let i = 0; i < paramIds.length; i++) {
-            let value;
-            if (block.inputs[paramIds[i]] && block.inputs[paramIds[i]].block) {
-                value = this.descendInputOfBlock(block, paramIds[i]);
-            } else {
-                value = {
-                    kind: 'constant',
-                    value: paramDefaults[i]
-                };
-            }
-            argumentList.push(value);
-        }
 
         const addonBlock = this.runtime.getAddonBlock(procedureCode);
         if (addonBlock) {
             this.script.yields = true;
-            const argumentNameMap = {};
-            for (let i = 0; i < argumentList.length; i++) {
-                argumentNameMap[paramNames[i]] = argumentList[i];
+            const args = {};
+            for (let i = 0; i < paramIds.length; i++) {
+                let value;
+                if (block.inputs[paramIds[i]] && block.inputs[paramIds[i]].block) {
+                    value = this.descendInputOfBlock(block, paramIds[i]);
+                } else {
+                    value = {
+                        kind: 'constant',
+                        value: paramDefaults[i]
+                    };
+                }
+                args[paramNames[i]] = value;
             }
             return {
                 kind: 'addons.call',
                 code: procedureCode,
-                arguments: argumentNameMap,
+                arguments: args,
                 blockId: block.id
             };
         }
@@ -1336,8 +1326,7 @@ class ScriptTreeGenerator {
         const definitionBlock = this.blocks.getBlock(definitionId);
         if (!definitionBlock) {
             return {
-                kind: 'procedures.discard',
-                values: argumentList
+                kind: 'noop'
             };
         }
         const innerDefinition = this.blocks.getBlock(definitionBlock.inputs.custom_block.block);
@@ -1361,15 +1350,31 @@ class ScriptTreeGenerator {
         }
 
         // Non-warp direct recursion yields.
-        if (!this.script.isWarp && procedureCode === this.script.procedureCode) {
-            this.script.yields = true;
+        if (!this.script.isWarp) {
+            if (procedureCode === this.script.procedureCode) {
+                this.script.yields = true;
+            }
+        }
+
+        const args = [];
+        for (let i = 0; i < paramIds.length; i++) {
+            let value;
+            if (block.inputs[paramIds[i]] && block.inputs[paramIds[i]].block) {
+                value = this.descendInputOfBlock(block, paramIds[i]);
+            } else {
+                value = {
+                    kind: 'constant',
+                    value: paramDefaults[i]
+                };
+            }
+            args.push(value);
         }
 
         return {
             kind: 'procedures.call',
             code: procedureCode,
             variant,
-            arguments: argumentList
+            arguments: args
         };
     }
 

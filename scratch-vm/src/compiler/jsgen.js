@@ -653,17 +653,6 @@ class JSGenerator {
             }
             return new TypedInput(`${procedureReference}(${joinedArgs})`, TYPE_UNKNOWN);
         }
-        case 'procedures.discard': {
-            const args = [];
-            for (const value of node.values) {
-                args.push(this.descendInput(value).asUnknown());
-            }
-            if (args.length > 0) {
-                // We can use the comma operator to discard the values.
-                return new TypedInput(`(${args.join(',')},"")`, TYPE_STRING);
-            }
-            return new TypedInput('""', TYPE_STRING);
-        }
 
         case 'sensing.answer':
             return new TypedInput(`runtime.ext_scratch3_sensing._answer`, TYPE_STRING);
@@ -1077,14 +1066,6 @@ class JSGenerator {
             this.source += ');\n';
 
             this.resetVariableInputs();
-            break;
-        }
-        case 'procedures.discard': {
-            for (const value of node.values) {
-                const input = this.descendInput(value).asUnknown();
-                // Don't need to use void, but it makes it explicit that we do not care about the result.
-                this.source += `void ${input};\n`;
-            }
             break;
         }
         case 'procedures.return':

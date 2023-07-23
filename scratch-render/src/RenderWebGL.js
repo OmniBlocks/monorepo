@@ -278,7 +278,8 @@ class RenderWebGL extends EventEmitter {
             TextBubbleSkin,
             PenSkin,
             SVGSkin,
-            CanvasMeasurementProvider
+            CanvasMeasurementProvider,
+            Rectangle
         };
     }
 

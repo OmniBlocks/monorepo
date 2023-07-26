@@ -4,6 +4,8 @@ const RenderedTarget = require('../../src/sprites/rendered-target');
 const Sprite = require('../../src/sprites/sprite');
 
 test('Serializes custom extensions', t => {
+    t.plan(6);
+
     const vm = new VirtualMachine();
 
     // Trick the extension manager into thinking a couple extensions are loaded.
@@ -13,21 +15,34 @@ test('Serializes custom extensions', t => {
     vm.extensionManager._loadedExtensions.set('test1', 'test.0.0');
     vm.extensionManager._loadedExtensions.set('test2', 'test.1.0');
 
-    // Create a block that uses the first extension
-    const sprite = new Sprite(null, vm.runtime);
-    const target = new RenderedTarget(sprite, vm.runtime);
-    target.blocks.createBlock({
+    const targetUsingBlock = new RenderedTarget(new Sprite(null, vm.runtime), vm.runtime);
+    vm.runtime.addTarget(targetUsingBlock);
+    targetUsingBlock.blocks.createBlock({
         id: 'a',
         opcode: 'test1_something'
     });
-    vm.runtime.addTarget(target);
+
+    const targetNotUsingBlock = new RenderedTarget(new Sprite(null, vm.runtime), vm.runtime);
+    vm.runtime.addTarget(targetNotUsingBlock);
 
     // test2 isn't used, so it shouldn't be included in the JSON
-    const serialized = JSON.parse(vm.toJSON());
-    t.same(serialized.extensions, ['test1']);
-    t.same(serialized.extensionURLs, {
+
+    const serializedProject = JSON.parse(vm.toJSON());
+    t.same(serializedProject.extensions, ['test1'], 'save extension IDs for project');
+    t.same(serializedProject.extensionURLs, {
         test1: 'https://example.com/test1.js'
-    });
+    }, 'save extension URLs for project');
+
+    const serializedTargetWithBlock = JSON.parse(vm.toJSON(targetUsingBlock.id));
+    t.same(serializedTargetWithBlock.extensions, ['test1'], 'save extension IDs for sprite');
+    t.same(serializedTargetWithBlock.extensionURLs, {
+        test1: 'https://example.com/test1.js'
+    }, 'save extension URLs for sprite');
+
+    // other sprite uses no extensions, so don't want extension stuff in the JSON
+    const serializedTargetWithoutBlock = JSON.parse(vm.toJSON(targetNotUsingBlock.id));
+    t.notOk('extensions' in serializedTargetWithoutBlock, 'dont save extension IDs for empty sprite');
+    t.notOk('extensionURLs' in serializedTargetWithoutBlock, 'dont save extension URLs for empty sprite');
 
     t.end();
 });

@@ -208,7 +208,11 @@ Blockly.ScratchBlocks.VerticalExtensions.PROCEDURE_CALL_CONTEXTMENU = {
    */
   customContextMenu: function(menuOptions) {
     menuOptions.push(Blockly.Procedures.makeEditOption(this));
-    if (!this.isInFlyout && Blockly.Procedures.USER_CAN_CHANGE_CALL_TYPE) {
+    if (
+      !this.isInFlyout &&
+      Blockly.Procedures.USER_CAN_CHANGE_CALL_TYPE &&
+      this.workspace.procedureReturnsEnabled
+    ) {
       menuOptions.push(Blockly.Procedures.makeChangeTypeOption(this));
     }
   }

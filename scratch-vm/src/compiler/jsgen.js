@@ -428,6 +428,9 @@ class JSGenerator {
      */
     descendInput (node) {
         switch (node.kind) {
+        case 'addons.call':
+            return new TypedInput(`(${this.descendAddonCall(node)})`, TYPE_UNKNOWN);
+
         case 'args.boolean':
             return new TypedInput(`toBoolean(p${node.index})`, TYPE_BOOLEAN);
         case 'args.stringNumber':
@@ -744,13 +747,9 @@ class JSGenerator {
      */
     descendStackedBlock (node) {
         switch (node.kind) {
-        case 'addons.call': {
-            const inputs = this.descendInputRecord(node.arguments);
-            const blockFunction = `runtime.getAddonBlock("${sanitize(node.code)}").callback`;
-            const blockId = `"${sanitize(node.blockId)}"`;
-            this.source += `yield* executeInCompatibilityLayer(${inputs}, ${blockFunction}, ${this.isWarp}, false, ${blockId});\n`;
+        case 'addons.call':
+            this.source += `${this.descendAddonCall(node)};\n`;
             break;
-        }
 
         case 'compat': {
             // If the last command in a loop returns a promise, immediately continue to the next iteration.
@@ -1161,6 +1160,13 @@ class JSGenerator {
             return this.evaluateOnce(`target.variables["${sanitize(variable.id)}"]`);
         }
         return this.evaluateOnce(`stage.variables["${sanitize(variable.id)}"]`);
+    }
+
+    descendAddonCall (node) {
+        const inputs = this.descendInputRecord(node.arguments);
+        const blockFunction = `runtime.getAddonBlock("${sanitize(node.code)}").callback`;
+        const blockId = `"${sanitize(node.blockId)}"`;
+        return `yield* executeInCompatibilityLayer(${inputs}, ${blockFunction}, ${this.isWarp}, false, ${blockId})`;
     }
 
     evaluateOnce (source) {

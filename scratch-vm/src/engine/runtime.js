@@ -2587,14 +2587,16 @@ class Runtime extends EventEmitter {
      * @param {object} options Options object
      * @param {string} options.procedureCode The ID of the block
      * @param {function} options.callback The callback, called with (args, BlockUtility). May return a promise.
-     * @param {string[]} options.arguments Names of the arguments accepted
+     * @param {string[]} [options.arguments] Names of the arguments accepted. Optional if no arguments.
      * @param {boolean} [hidden] True to not include this block in the block palette
      */
     addAddonBlock (options) {
         const procedureCode = options.procedureCode;
-        const names = options.arguments;
-        const ids = options.arguments.map((_, i) => `arg${i}`);
-        const defaults = options.arguments.map(() => '');
+
+        const argumentNames = options.arguments || [];
+        const names = argumentNames;
+        const ids = argumentNames.map((_, i) => `arg${i}`);
+        const defaults = argumentNames.map(() => '');
         this.addonBlocks[procedureCode] = {
             namesIdsDefaults: [names, ids, defaults],
             ...options

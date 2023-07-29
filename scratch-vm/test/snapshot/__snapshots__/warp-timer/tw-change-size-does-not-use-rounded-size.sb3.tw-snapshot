@@ -18,5 +18,5 @@ if (((+b1.value || 0) === 20)) {
 yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b0, false, false, null);
 }
 yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, null);
-retire();
+retire(); return;
 }; })

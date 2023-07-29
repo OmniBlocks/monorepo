@@ -16,7 +16,7 @@ yield;
 }
 yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b0, false, false, null);
 yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, null);
-retire();
+retire(); return;
 }; })
 
 // Sprite2 script
@@ -28,5 +28,5 @@ b0.value = ((+b0.value || 0) + 1);
 if (((b0.value || 0) === 5)) {
 b1.value = "end";
 }
-retire();
+retire(); return;
 }; })

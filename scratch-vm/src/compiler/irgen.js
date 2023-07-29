@@ -535,6 +535,9 @@ class ScriptTreeGenerator {
                 right: this.descendInputOfBlock(block, 'NUM2')
             };
 
+        case 'procedures_call':
+            return this.descendProcedure(block);
+
         case 'sensing_answer':
             return {
                 kind: 'sensing.answer'
@@ -1106,102 +1109,25 @@ class ScriptTreeGenerator {
             };
 
         case 'procedures_call': {
-            // setting of yields will be handled later in the analysis phase
-
             const procedureCode = block.mutation.proccode;
+            if (block.mutation.return) {
+                const visualReport = this.descendVisualReport(block);
+                if (visualReport) {
+                    return visualReport;
+                }
+            }
             if (procedureCode === 'tw:debugger;') {
                 return {
                     kind: 'tw.debugger'
                 };
             }
-            const paramNamesIdsAndDefaults = this.blocks.getProcedureParamNamesIdsAndDefaults(procedureCode);
-            if (paramNamesIdsAndDefaults === null) {
-                return {
-                    kind: 'noop'
-                };
-            }
-
-            const [paramNames, paramIds, paramDefaults] = paramNamesIdsAndDefaults;
-
-            const addonBlock = this.runtime.getAddonBlock(procedureCode);
-            if (addonBlock) {
-                this.script.yields = true;
-                const args = {};
-                for (let i = 0; i < paramIds.length; i++) {
-                    let value;
-                    if (block.inputs[paramIds[i]] && block.inputs[paramIds[i]].block) {
-                        value = this.descendInputOfBlock(block, paramIds[i]);
-                    } else {
-                        value = {
-                            kind: 'constant',
-                            value: paramDefaults[i]
-                        };
-                    }
-                    args[paramNames[i]] = value;
-                }
-                return {
-                    kind: 'addons.call',
-                    code: procedureCode,
-                    arguments: args,
-                    blockId: block.id
-                };
-            }
-
-            const definitionId = this.blocks.getProcedureDefinition(procedureCode);
-            const definitionBlock = this.blocks.getBlock(definitionId);
-            if (!definitionBlock) {
-                return {
-                    kind: 'noop'
-                };
-            }
-            const innerDefinition = this.blocks.getBlock(definitionBlock.inputs.custom_block.block);
-
-            let isWarp = this.script.isWarp;
-            if (!isWarp) {
-                if (innerDefinition && innerDefinition.mutation) {
-                    const warp = innerDefinition.mutation.warp;
-                    if (typeof warp === 'boolean') {
-                        isWarp = warp;
-                    } else if (typeof warp === 'string') {
-                        isWarp = JSON.parse(warp);
-                    }
-                }
-            }
-
-            const variant = generateProcedureVariant(procedureCode, isWarp);
-
-            if (!this.script.dependedProcedures.includes(variant)) {
-                this.script.dependedProcedures.push(variant);
-            }
-
-            // Non-warp direct recursion yields.
-            if (!this.script.isWarp) {
-                if (procedureCode === this.script.procedureCode) {
-                    this.script.yields = true;
-                }
-            }
-
-            const args = [];
-            for (let i = 0; i < paramIds.length; i++) {
-                let value;
-                if (block.inputs[paramIds[i]] && block.inputs[paramIds[i]].block) {
-                    value = this.descendInputOfBlock(block, paramIds[i]);
-                } else {
-                    value = {
-                        kind: 'constant',
-                        value: paramDefaults[i]
-                    };
-                }
-                args.push(value);
-            }
-
-            return {
-                kind: 'procedures.call',
-                code: procedureCode,
-                variant,
-                arguments: args
-            };
+            return this.descendProcedure(block);
         }
+        case 'procedures_return':
+            return {
+                kind: 'procedures.return',
+                value: this.descendInputOfBlock(block, 'VALUE')
+            };
 
         case 'sensing_resettimer':
             return {
@@ -1225,18 +1151,9 @@ class ScriptTreeGenerator {
                 }
             }
 
-            // When this thread was triggered by a stack click, attempt to compile as an input.
-            // TODO: perhaps this should be moved to generate()?
-            if (this.thread.stackClick) {
-                try {
-                    const inputNode = this.descendInput(block);
-                    return {
-                        kind: 'visualReport',
-                        input: inputNode
-                    };
-                } catch (e) {
-                    // Ignore
-                }
+            const asVisualReport = this.descendVisualReport(block);
+            if (asVisualReport) {
+                return asVisualReport;
             }
 
             log.warn(`IR: Unknown stacked block: ${block.opcode}`, block);
@@ -1370,6 +1287,97 @@ class ScriptTreeGenerator {
         return createVariableData('target', newVariable);
     }
 
+    descendProcedure (block) {
+        const procedureCode = block.mutation.proccode;
+        const paramNamesIdsAndDefaults = this.blocks.getProcedureParamNamesIdsAndDefaults(procedureCode);
+        if (paramNamesIdsAndDefaults === null) {
+            return {
+                kind: 'noop'
+            };
+        }
+
+        const [paramNames, paramIds, paramDefaults] = paramNamesIdsAndDefaults;
+
+        const addonBlock = this.runtime.getAddonBlock(procedureCode);
+        if (addonBlock) {
+            this.script.yields = true;
+            const args = {};
+            for (let i = 0; i < paramIds.length; i++) {
+                let value;
+                if (block.inputs[paramIds[i]] && block.inputs[paramIds[i]].block) {
+                    value = this.descendInputOfBlock(block, paramIds[i]);
+                } else {
+                    value = {
+                        kind: 'constant',
+                        value: paramDefaults[i]
+                    };
+                }
+                args[paramNames[i]] = value;
+            }
+            return {
+                kind: 'addons.call',
+                code: procedureCode,
+                arguments: args,
+                blockId: block.id
+            };
+        }
+
+        const definitionId = this.blocks.getProcedureDefinition(procedureCode);
+        const definitionBlock = this.blocks.getBlock(definitionId);
+        if (!definitionBlock) {
+            return {
+                kind: 'noop'
+            };
+        }
+        const innerDefinition = this.blocks.getBlock(definitionBlock.inputs.custom_block.block);
+
+        let isWarp = this.script.isWarp;
+        if (!isWarp) {
+            if (innerDefinition && innerDefinition.mutation) {
+                const warp = innerDefinition.mutation.warp;
+                if (typeof warp === 'boolean') {
+                    isWarp = warp;
+                } else if (typeof warp === 'string') {
+                    isWarp = JSON.parse(warp);
+                }
+            }
+        }
+
+        const variant = generateProcedureVariant(procedureCode, isWarp);
+
+        if (!this.script.dependedProcedures.includes(variant)) {
+            this.script.dependedProcedures.push(variant);
+        }
+
+        // Non-warp direct recursion yields.
+        if (!this.script.isWarp) {
+            if (procedureCode === this.script.procedureCode) {
+                this.script.yields = true;
+            }
+        }
+
+        const args = [];
+        for (let i = 0; i < paramIds.length; i++) {
+            let value;
+            if (block.inputs[paramIds[i]] && block.inputs[paramIds[i]].block) {
+                value = this.descendInputOfBlock(block, paramIds[i]);
+            } else {
+                value = {
+                    kind: 'constant',
+                    value: paramDefaults[i]
+                };
+            }
+            args.push(value);
+        }
+
+        return {
+            kind: 'procedures.call',
+            code: procedureCode,
+            variant,
+            arguments: args
+        };
+    }
+
     /**
      * Descend into a block that uses the compatibility layer.
      * @param {*} block The block to use the compatibility layer for.
@@ -1428,6 +1436,20 @@ class ScriptTreeGenerator {
 
             // Only the first 'tw' line is parsed.
             break;
+        }
+    }
+
+    descendVisualReport (block) {
+        if (!this.thread.stackClick || block.next) {
+            return null;
+        }
+        try {
+            return {
+                kind: 'visualReport',
+                input: this.descendInput(block)
+            };
+        } catch (e) {
+            return null;
         }
     }
 

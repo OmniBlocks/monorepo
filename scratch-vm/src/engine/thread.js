@@ -63,6 +63,13 @@ class _StackFrame {
          * @type {Object}
          */
         this.executionContext = null;
+
+        /**
+         * Internal block object being executed. This is *not* the same as the object found
+         * in target.blocks.
+         * @type {object}
+         */
+        this.op = null;
     }
 
     /**
@@ -79,6 +86,7 @@ class _StackFrame {
         this.waitingReporter = null;
         this.params = null;
         this.executionContext = null;
+        this.op = null;
 
         return this;
     }
@@ -307,7 +315,10 @@ class Thread {
         let blockID = this.peekStack();
         while (blockID !== null) {
             const block = this.target.blocks.getBlock(blockID);
-            if (typeof block !== 'undefined' && block.opcode === 'procedures_call') {
+            if (
+                (typeof block !== 'undefined' && block.opcode === 'procedures_call') ||
+                this.peekStackFrame().waitingReporter
+            ) {
                 break;
             }
             this.popStack();
@@ -426,9 +437,9 @@ class Thread {
      */
     isRecursiveCall (procedureCode) {
         let callCount = 5; // Max number of enclosing procedure calls to examine.
-        const sp = this.stack.length - 1;
+        const sp = this.stackFrames.length - 1;
         for (let i = sp - 1; i >= 0; i--) {
-            const block = this.target.blocks.getBlock(this.stack[i]);
+            const block = this.target.blocks.getBlock(this.stackFrames[i].op.id);
             if (block.opcode === 'procedures_call' &&
                 block.mutation.proccode === procedureCode) {
                 return true;

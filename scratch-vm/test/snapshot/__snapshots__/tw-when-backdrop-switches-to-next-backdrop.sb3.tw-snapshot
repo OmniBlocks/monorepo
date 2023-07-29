@@ -6,7 +6,7 @@
 const b0 = runtime.getOpcodeFunction("looks_say");
 return function* genXYZ () {
 yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, null);
-retire();
+retire(); return;
 }; })
 
 // Sprite1 script
@@ -15,5 +15,5 @@ const b0 = runtime.getOpcodeFunction("looks_say");
 return function* genXYZ () {
 yield* executeInCompatibilityLayer({"MESSAGE":"plan 0",}, b0, false, false, null);
 runtime.ext_scratch3_looks._setBackdrop(stage, stage.currentCostume + 1, true);
-retire();
+retire(); return;
 }; })

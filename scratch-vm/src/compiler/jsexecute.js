@@ -550,6 +550,26 @@ runtimeFunctions.tan = `const tan = (angle) => {
 }`;
 
 /**
+ * @param {function} callback The function to run
+ * @param {...unknown} args The arguments to pass to the function
+ * @returns {unknown} A generator that will yield once then call the function and return its value.
+ */
+runtimeFunctions.yieldThenCall = `const yieldThenCall = function* (callback, ...args) {
+    yield;
+    return callback(...args);
+}`;
+
+/**
+ * @param {function} callback The generator function to run
+ * @param {...unknown} args The arguments to pass to the generator function
+ * @returns {unknown} A generator that will yield once then delegate to the generator function and return its value.
+ */
+runtimeFunctions.yieldThenCallGenerator = `const yieldThenCallGenerator = function* (callback, ...args) {
+    yield;
+    return yield* callback(...args);
+}`;
+
+/**
  * Step a compiled thread.
  * @param {Thread} thread The thread to step.
  */

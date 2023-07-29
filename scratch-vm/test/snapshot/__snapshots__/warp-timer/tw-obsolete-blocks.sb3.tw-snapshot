@@ -29,5 +29,5 @@ yield* executeInCompatibilityLayer({"CHANGE":10,}, b9, false, false, null);
 yield* executeInCompatibilityLayer({}, b10, false, false, null);
 yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b0, false, false, null);
 yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, null);
-retire();
+retire(); return;
 }; })

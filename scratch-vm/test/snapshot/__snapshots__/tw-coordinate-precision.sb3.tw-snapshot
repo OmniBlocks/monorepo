@@ -32,5 +32,5 @@ if ((limitPrecision(target.x) === 0)) {
 yield* executeInCompatibilityLayer({"MESSAGE":"pass x slightly below 0 rounds",}, b0, false, false, null);
 }
 yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, null);
-retire();
+retire(); return;
 }; })

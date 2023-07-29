@@ -428,6 +428,9 @@ class JSGenerator {
      */
     descendInput (node) {
         switch (node.kind) {
+        case 'addons.call':
+            return new TypedInput(`(${this.descendAddonCall(node)})`, TYPE_UNKNOWN);
+
         case 'args.boolean':
             return new TypedInput(`toBoolean(p${node.index})`, TYPE_BOOLEAN);
         case 'args.stringNumber':
@@ -623,6 +626,37 @@ class JSGenerator {
         case 'op.10^':
             return new TypedInput(`(10 ** ${this.descendInput(node.value).asNumber()})`, TYPE_NUMBER);
 
+        case 'procedures.call': {
+            const procedureCode = node.code;
+            const procedureVariant = node.variant;
+            const procedureData = this.ir.procedures[procedureVariant];
+            if (procedureData.stack === null) {
+                // TODO still need to evaluate arguments for side effects
+                return new TypedInput('""', TYPE_STRING);
+            }
+
+            // Recursion makes this complicated because:
+            //  - We need to yield *between* each call in the same command block
+            //  - We need to evaluate arguments *before* that yield happens
+
+            const procedureReference = `thread.procedures["${sanitize(procedureVariant)}"]`;
+            const args = [];
+            for (const input of node.arguments) {
+                args.push(this.descendInput(input).asSafe());
+            }
+            const joinedArgs = args.join(',');
+
+            const yieldForRecursion = !this.isWarp && procedureCode === this.script.procedureCode;
+            if (yieldForRecursion) {
+                const runtimeFunction = procedureData.yields ? 'yieldThenCallGenerator' : 'yieldThenCall';
+                return new TypedInput(`(yield* ${runtimeFunction}(${procedureReference}, ${joinedArgs}))`, TYPE_UNKNOWN);
+            }
+            if (procedureData.yields) {
+                return new TypedInput(`(yield* ${procedureReference}(${joinedArgs}))`, TYPE_UNKNOWN);
+            }
+            return new TypedInput(`${procedureReference}(${joinedArgs})`, TYPE_UNKNOWN);
+        }
+
         case 'sensing.answer':
             return new TypedInput(`runtime.ext_scratch3_sensing._answer`, TYPE_STRING);
         case 'sensing.colorTouchingColor':
@@ -713,13 +747,9 @@ class JSGenerator {
      */
     descendStackedBlock (node) {
         switch (node.kind) {
-        case 'addons.call': {
-            const inputs = this.descendInputRecord(node.arguments);
-            const blockFunction = `runtime.getAddonBlock("${sanitize(node.code)}").callback`;
-            const blockId = `"${sanitize(node.blockId)}"`;
-            this.source += `yield* executeInCompatibilityLayer(${inputs}, ${blockFunction}, ${this.isWarp}, false, ${blockId});\n`;
+        case 'addons.call':
+            this.source += `${this.descendAddonCall(node)};\n`;
             break;
-        }
 
         case 'compat': {
             // If the last command in a loop returns a promise, immediately continue to the next iteration.
@@ -781,11 +811,7 @@ class JSGenerator {
             this.source += 'runtime.stopForTarget(target, thread);\n';
             break;
         case 'control.stopScript':
-            if (this.isProcedure) {
-                this.source += 'return;\n';
-            } else {
-                this.retire();
-            }
+            this.stopScript();
             break;
         case 'control.wait': {
             const duration = this.localVariables.next();
@@ -1016,35 +1042,34 @@ class JSGenerator {
         case 'procedures.call': {
             const procedureCode = node.code;
             const procedureVariant = node.variant;
-            // Do not generate any code for empty procedures.
             const procedureData = this.ir.procedures[procedureVariant];
             if (procedureData.stack === null) {
+                // TODO still need to evaluate arguments
                 break;
             }
-            if (!this.isWarp && procedureCode === this.script.procedureCode) {
-                // Direct recursion yields.
+
+            const yieldForRecursion = !this.isWarp && procedureCode === this.script.procedureCode;
+            if (yieldForRecursion) {
                 this.yieldNotWarp();
             }
+
             if (procedureData.yields) {
                 this.source += 'yield* ';
-                if (!this.script.yields) {
-                    throw new Error('Script uses yielding procedure but is not marked as yielding.');
-                }
             }
             this.source += `thread.procedures["${sanitize(procedureVariant)}"](`;
-            // Only include arguments if the procedure accepts any.
-            if (procedureData.arguments.length) {
-                const args = [];
-                for (const input of node.arguments) {
-                    args.push(this.descendInput(input).asSafe());
-                }
-                this.source += args.join(',');
+            const args = [];
+            for (const input of node.arguments) {
+                args.push(this.descendInput(input).asSafe());
             }
-            this.source += `);\n`;
-            // Variable input types may have changes after a procedure call.
+            this.source += args.join(',');
+            this.source += ');\n';
+
             this.resetVariableInputs();
             break;
         }
+        case 'procedures.return':
+            this.stopScriptAndReturn(this.descendInput(node.value).asSafe());
+            break;
 
         case 'timer.reset':
             this.source += 'runtime.ioDevices.clock.resetProjectTimer();\n';
@@ -1137,6 +1162,13 @@ class JSGenerator {
         return this.evaluateOnce(`stage.variables["${sanitize(variable.id)}"]`);
     }
 
+    descendAddonCall (node) {
+        const inputs = this.descendInputRecord(node.arguments);
+        const blockFunction = `runtime.getAddonBlock("${sanitize(node.code)}").callback`;
+        const blockId = `"${sanitize(node.blockId)}"`;
+        return `yield* executeInCompatibilityLayer(${inputs}, ${blockFunction}, ${this.isWarp}, false, ${blockId})`;
+    }
+
     evaluateOnce (source) {
         if (this._setupVariables.hasOwnProperty(source)) {
             return this._setupVariables[source];
@@ -1154,6 +1186,25 @@ class JSGenerator {
             this.source += 'retire(); yield;\n';
         } else {
             this.source += 'retire(); return;\n';
+        }
+    }
+
+    stopScript () {
+        if (this.isProcedure) {
+            this.source += 'return "";\n';
+        } else {
+            this.retire();
+        }
+    }
+
+    /**
+     * @param {string} valueJS JS code of value to return.
+     */
+    stopScriptAndReturn (valueJS) {
+        if (this.isProcedure) {
+            this.source += `return ${valueJS};\n`;
+        } else {
+            this.retire();
         }
     }
 
@@ -1286,10 +1337,6 @@ class JSGenerator {
 
         script += this.source;
 
-        if (!this.isProcedure) {
-            script += 'retire();\n';
-        }
-
         script += '}; })';
 
         return script;
@@ -1303,6 +1350,7 @@ class JSGenerator {
         if (this.script.stack) {
             this.descendStack(this.script.stack, new Frame(false));
         }
+        this.stopScript();
 
         const factory = this.createScriptFactory();
         const fn = jsexecute.scopedEval(factory);

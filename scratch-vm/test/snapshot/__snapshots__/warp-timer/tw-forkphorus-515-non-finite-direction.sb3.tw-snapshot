@@ -24,5 +24,5 @@ if ((target.direction === 90)) {
 yield* executeInCompatibilityLayer({"MESSAGE":"pass 4",}, b0, false, false, null);
 }
 yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, null);
-retire();
+retire(); return;
 }; })

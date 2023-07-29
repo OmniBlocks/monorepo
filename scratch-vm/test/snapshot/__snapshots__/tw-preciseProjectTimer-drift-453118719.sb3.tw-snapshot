@@ -23,5 +23,5 @@ yield;
 }
 b0.value = 1;
 yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b1, false, false, null);
-retire();
+retire(); return;
 }; })

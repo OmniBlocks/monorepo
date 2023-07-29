@@ -8,7 +8,7 @@ return function* genXYZ () {
 yield* executeInCompatibilityLayer({"MESSAGE":"plan 1",}, b0, false, false, null);
 yield* thread.procedures["Wrun without screen refresh"]();
 yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, null);
-retire();
+retire(); return;
 }; })
 
 // Sprite1 run without screen refresh
@@ -24,4 +24,5 @@ if (isStuck()) yield;
 if (compareLessThan((daysSince2000() * 86400), b0.value)) {
 yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b1, true, false, null);
 }
+return "";
 }; })

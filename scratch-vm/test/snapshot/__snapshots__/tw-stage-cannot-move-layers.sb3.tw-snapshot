@@ -18,7 +18,7 @@ yield;
 thread.timer = null;
 yield* waitThreads(startHats("event_whenbroadcastreceived", { BROADCAST_OPTION: "Test 1" }));
 yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, null);
-retire();
+retire(); return;
 }; })
 
 // Sprite1 script
@@ -29,13 +29,13 @@ return function* genXYZ () {
 if ((("" + b0.value).toLowerCase() === "Initial".toLowerCase())) {
 yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b1, false, false, null);
 }
-retire();
+retire(); return;
 }; })
 
 // Stage script
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
 return function* genXYZ () {
-retire();
+retire(); return;
 }; })
 
 // Stage script
@@ -43,5 +43,5 @@ retire();
 const b0 = target.variables["`jEk@4|i[#Fk?(8x)AV.-my variable"];
 return function* genXYZ () {
 b0.value = "Stage callback";
-retire();
+retire(); return;
 }; })

@@ -1,6 +1,9 @@
 // TW Snapshot
 // Input SHA-256: 19e0b3f9dcac763041039a8ffe87b6732eb744f9ebb136e8d61a53ccf19118e3
 
+// Errors:
+// Sprite1: Error: Not compiling an edge-activated hat: event_whengreaterthan
+
 // Sprite1 script
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
 const b0 = stage.variables["PsY$$vp$IVH;dDAr[q2h"];

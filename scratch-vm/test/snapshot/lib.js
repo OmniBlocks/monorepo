@@ -102,9 +102,24 @@ const generateActualSnapshot = async testCase => {
         }
     };
 
+    const errors = [];
+    vm.on('COMPILE_ERROR', (target, error) => {
+        errors.push({target, error});
+    });
+
     vm.runtime.precompile();
 
-    return `// TW Snapshot\n// Input SHA-256: ${inputSHA256}\n\n${generatedJS.join('\n\n')}\n`;
+    let result = '// TW Snapshot\n';
+    result += `// Input SHA-256: ${inputSHA256}\n`;
+    result += '\n';
+    if (errors.length) {
+        result += '// Errors:\n';
+        result += errors.map(i => `// ${i.target.getName()}: ${i.error}\n`);
+        result += '\n';
+    }
+    result += generatedJS.join('\n\n');
+    result += '\n';
+    return result;
 };
 
 /**

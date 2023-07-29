@@ -291,6 +291,39 @@ const getExtensionIdForOpcode = function (opcode) {
 };
 
 /**
+ * @param {Set<string>|string[]} extensionIDs Project extension IDs
+ * @param {Runtime} runtime
+ * @returns {Record<string, string>|null} extension ID -> URL map, or null if no custom extensions.
+ */
+const getExtensionURLsToSave = (extensionIDs, runtime) => {
+    // Extension manager only exists when runtime is wrapped by VirtualMachine
+    if (!runtime.extensionManager) {
+        return null;
+    }
+
+    // We'll save the extensions in the format:
+    // {
+    //   "extensionid": "https://...",
+    //   "otherid": "https://..."
+    // }
+    // Which lets the VM know which URLs correspond to which IDs, which is useful when the project
+    // is being loaded. For example, if the extension is eventually converted to a builtin extension
+    // or if it is already loaded, then it doesn't need to fetch the script again.
+    const extensionURLs = runtime.extensionManager.getExtensionURLs();
+    const toSave = {};
+    for (const extension of extensionIDs) {
+        const url = extensionURLs[extension];
+        if (typeof url === 'string') {
+            toSave[extension] = url;
+        }
+    }
+    if (Object.keys(toSave).length === 0) {
+        return null;
+    }
+    return toSave;
+};
+
+/**
  * Serialize the given blocks object (representing all the blocks for the target
  * currently being serialized.)
  * @param {object} blocks The blocks to be serialized
@@ -337,6 +370,58 @@ const serializeBlocks = function (blocks) {
         }
     }
     return [obj, Array.from(extensionIDs)];
+};
+
+/**
+ * @param {unknown} blocks Output of serializeStandaloneBlocks
+ * @returns {{blocks: Block[], extensionURLs: Map<string, string>}}
+ */
+const deserializeStandaloneBlocks = blocks => {
+    // deep clone to ensure it's safe to modify later
+    blocks = JSON.parse(JSON.stringify(blocks));
+
+    if (blocks.extensionURLs) {
+        const extensionURLs = new Map();
+        for (const [id, url] of Object.entries(blocks.extensionURLs)) {
+            extensionURLs.set(id, url);
+        }
+        return {
+            blocks: blocks.blocks,
+            extensionURLs
+        };
+    }
+
+    // Vanilla Scratch format is just a list of block objects
+    return {
+        blocks,
+        extensionURLs: new Map()
+    };
+};
+
+/**
+ * @param {Block[]} blocks List of block objects.
+ * @param {Runtime} runtime Runtime
+ * @returns {object} Something that can be understood by deserializeStandaloneBlocks
+ */
+const serializeStandaloneBlocks = (blocks, runtime) => {
+    const extensionIDs = new Set();
+    for (const block of blocks) {
+        const extensionID = getExtensionIdForOpcode(block.opcode);
+        if (extensionID) {
+            extensionIDs.add(extensionID);
+        }
+    }
+    const extensionURLs = getExtensionURLsToSave(extensionIDs, runtime);
+    if (extensionURLs) {
+        return {
+            blocks,
+            // same format as project.json
+            extensionURLs: extensionURLs
+        };
+    }
+    // Vanilla Scratch always just uses the block array as-is. To reduce compatibility concerns
+    // we too will use that when possible.
+    return blocks;
 };
 
 /**
@@ -595,27 +680,9 @@ const serializeExtensionMetadata = (obj, extensionIds, runtime, isSprite) => {
 
     // Save list of URLs to load the current extensions
     // Extension manager only exists when runtime is wrapped by VirtualMachine
-    if (runtime.extensionManager) {
-        // We'll save the extensions in the format:
-        // {
-        //   "extensionid": "https://...",
-        //   "otherid": "https://..."
-        // }
-        // Which lets the VM know which URLs correspond to which IDs, which is useful when the project
-        // is being loaded. For example, if the extension is eventually converted to a builtin extension
-        // or if it is already loaded, then it doesn't need to fetch the script again.
-        const extensionURLs = runtime.extensionManager.getExtensionURLs();
-        const urlsToSave = {};
-        for (const extension of extensionIds) {
-            const url = extensionURLs[extension];
-            if (typeof url === 'string') {
-                urlsToSave[extension] = url;
-            }
-        }
-        // Only save this object if any URLs would actually be saved.
-        if (Object.keys(urlsToSave).length !== 0) {
-            obj.extensionURLs = urlsToSave;
-        }
+    const extensionURLs = getExtensionURLsToSave(extensionIds, runtime);
+    if (extensionURLs) {
+        obj.extensionURLs = extensionURLs;
     }
 };
 
@@ -1422,5 +1489,7 @@ module.exports = {
     deserialize: deserialize,
     deserializeBlocks: deserializeBlocks,
     serializeBlocks: serializeBlocks,
+    deserializeStandaloneBlocks: deserializeStandaloneBlocks,
+    serializeStandaloneBlocks: serializeStandaloneBlocks,
     getExtensionIdForOpcode: getExtensionIdForOpcode
 };

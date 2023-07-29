@@ -246,7 +246,7 @@ class Backpack extends React.Component {
             this.handleDrop({
                 dragType: DragConstants.CODE,
                 payload: {
-                    blockObjects: blocks,
+                    blockObjects: this.props.vm.exportStandaloneBlocks(blocks),
                     topBlockId: topBlockId
                 }
             });

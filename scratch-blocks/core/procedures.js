@@ -249,8 +249,13 @@ Blockly.Procedures.flyoutCategory = function(workspace) {
     workspace.procedureReturnsEnabled
   );
   if (showReturn) {
+    var returnDocsButton = goog.dom.createDom('button');
+    returnDocsButton.setAttribute('callbackkey', 'OPEN_RETURN_DOCS');
+    returnDocsButton.setAttribute('text', Blockly.Msg.PROCEDURES_DOCS);
+    xmlList.push(returnDocsButton);
+
     var returnBlock = goog.dom.createDom('block');
-    returnBlock.setAttribute('type', 'procedures_return');
+    returnBlock.setAttribute('type', Blockly.PROCEDURES_RETURN_BLOCK_TYPE);
     returnBlock.setAttribute('gap', 16);
     var returnBlockValue = goog.dom.createDom('value');
     returnBlockValue.setAttribute('name', 'VALUE');

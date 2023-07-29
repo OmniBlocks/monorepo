@@ -224,6 +224,7 @@ Blockly.Msg.PROCEDURES_DEFINITION = 'define %1';
 Blockly.Msg.PROCEDURES_RETURN = 'return %1';
 Blockly.Msg.PROCEDURES_TO_REPORTER = 'Change To Reporter';
 Blockly.Msg.PROCEDURES_TO_STATEMENT = 'Change To Stacked Block';
+Blockly.Msg.PROCEDURES_DOCS = 'How to use return';
 
 // Sensing blocks
 Blockly.Msg.SENSING_TOUCHINGOBJECT = 'touching %1?';

@@ -15,8 +15,8 @@ for (const testCase of Snapshots.tests) {
             t.fail('snapshot is missing; run: node test/snapshot --update');
         } else {
             // This assertion will always fail, but tap will print out the snapshots
-            // for comparison.
-            t.equal(expected, actual, 'did not match; you may have to run: node snapshot-tests --update');
+            // for easier comparison.
+            t.equal(expected, actual, 'did not match; you may have to run: node test/snapshot --update');
         }
         t.end();
     });

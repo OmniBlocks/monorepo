@@ -378,6 +378,27 @@ Blockly.PROCEDURES_PROTOTYPE_BLOCK_TYPE = 'procedures_prototype';
 Blockly.PROCEDURES_CALL_BLOCK_TYPE = 'procedures_call';
 
 /**
+ * Enum for procedure call statements.
+ */
+Blockly.PROCEDURES_CALL_TYPE_STATEMENT = 0;
+
+/**
+ * Enum for procedure call round reporters.
+ */
+Blockly.PROCEDURES_CALL_TYPE_REPORTER = 1;
+
+/**
+ * Enum for procedure call booleans.
+ */
+Blockly.PROCEDURES_CALL_TYPE_BOOLEAN = 2;
+
+/**
+ * The type of all procedure return blocks.
+ * @const {string}
+ */
+Blockly.PROCEDURES_RETURN_BLOCK_TYPE = 'procedures_return';
+
+/**
  * ENUM for flyout status button states.
  * @const
  */

@@ -28,6 +28,11 @@ goog.require('Blockly.Blocks');
  * @fileoverview Provide a default toolbox XML.
  */
 
+/**
+ * NOTE: This is only used in the scratch-blocks development playground!
+ * The XML here is overridden by scratch-gui.
+ */
+
 Blockly.Blocks.defaultToolbox = '<xml id="toolbox-categories" style="display: none">' +
   '<category name="%{BKY_CATEGORY_MOTION}" id="motion" colour="#4C97FF" secondaryColour="#3373CC">' +
     '<block type="motion_movesteps" id="motion_movesteps">' +

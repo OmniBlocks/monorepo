@@ -116,6 +116,11 @@ Blockly.WorkspaceSvg = function(options, opt_blockDragSurface, opt_wsDragSurface
       Blockly.DataCategory);
   this.registerToolboxCategoryCallback(Blockly.PROCEDURE_CATEGORY_NAME,
       Blockly.Procedures.flyoutCategory);
+
+  this.procedureReturnsEnabled = Blockly.Procedures.DEFAULT_ENABLE_RETURNS;
+  this.initialProcedureReturnTypes_ = null;
+  this.procedureReturnChangeTimeout_ = null;
+  this.checkProcedureReturnAfterGesture_ = false;
 };
 goog.inherits(Blockly.WorkspaceSvg, Blockly.Workspace);
 
@@ -558,6 +563,9 @@ Blockly.WorkspaceSvg.prototype.dispose = function() {
     Blockly.unbindEvent_(this.resizeHandlerWrapper_);
     this.resizeHandlerWrapper_ = null;
   }
+  if (this.procedureReturnChangeTimeout_) {
+    clearTimeout(this.procedureReturnChangeTimeout_);
+  }
 };
 
 /**
@@ -688,6 +696,92 @@ Blockly.WorkspaceSvg.prototype.queueIntersectionCheck = function() {
   if (this.intersectionObserver) {
     this.intersectionObserver.queueIntersectionCheck();
   }
+};
+
+/**
+ * Call *before* modifying scripts.
+ */
+Blockly.WorkspaceSvg.prototype.procedureReturnsWillChange = function() {
+  if (this.initialProcedureReturnTypes_) {
+    // Already queued.
+    return;
+  }
+
+  this.initialProcedureReturnTypes_ = Blockly.Procedures.getAllProcedureReturnTypes(this);
+
+  if (this.currentGesture_) {
+    this.checkProcedureReturnAfterGesture_ = true;
+  } else {
+    this.procedureReturnChangeTimeout_ = setTimeout(this.processProcedureReturnsChanged_.bind(this));
+  }
+};
+
+/**
+ * @private
+ */
+Blockly.WorkspaceSvg.prototype.processProcedureReturnsChanged_ = function() {
+  var initialTypes = this.initialProcedureReturnTypes_;
+  var finalTypes = Blockly.Procedures.getAllProcedureReturnTypes(this);
+
+  this.initialProcedureReturnTypes_ = null;
+  this.checkProcedureReturnAfterGesture_ = false;
+  this.procedureReturnChangeTimeout_ = null;
+
+  Blockly.Events.setGroup(true);
+  var topBlocks = this.getTopBlocks(false);
+  for (var i = 0; i < topBlocks.length; i++) {
+    var block = topBlocks[i];
+    if (block.type !== Blockly.PROCEDURES_CALL_BLOCK_TYPE) continue;
+
+    // After a gesture, we are called early enough that there could still be insertion markers.
+    if (block.isInsertionMarker()) continue;
+
+    // Because this block is a top block, it by definition won't have a parent, but if another
+    // block is connected below, we should leave it unchanged instead of unplugging.
+    if (block.getNextBlock()) continue;
+
+    var procCode = block.getProcCode();
+    // If the procedure doesn't exist or is new, ignore it.
+    if (
+      !Object.prototype.hasOwnProperty.call(initialTypes, procCode) ||
+      !Object.prototype.hasOwnProperty.call(finalTypes, procCode)
+    ) continue;
+
+    var actualReturnType = finalTypes[procCode];
+    if (
+      block.getReturn() !== actualReturnType &&
+      // If user is allowed to override call block shape, only update the shape if the definition's
+      // shape has actually changed.
+      (!Blockly.Procedures.USER_CAN_CHANGE_CALL_TYPE || initialTypes[procCode] !== actualReturnType)
+    ) {
+      Blockly.Procedures.changeReturnType(block, actualReturnType);
+    }
+  }
+  Blockly.Events.setGroup(false);
+
+  // Toolbox refresh can be slow, so only do when needed.
+  var toolboxOutdated = false;
+  for (var procCode in finalTypes) {
+    // If a current procedure existed but its type has changed, the toolbox must be updated.
+    // If a new procedure was created, the toolbox is already updated elsewhere.
+    if (
+      Object.prototype.hasOwnProperty.call(initialTypes, procCode) &&
+      initialTypes[procCode] !== finalTypes[procCode]
+    ) {
+      toolboxOutdated = true;
+      break;
+    }
+  }
+  if (toolboxOutdated) {
+    this.refreshToolboxSelection_();
+  }
+};
+
+/**
+ * Does not refresh toolbox.
+ */
+Blockly.WorkspaceSvg.prototype.enableProcedureReturns = function() {
+  this.procedureReturnsEnabled = true;
 };
 
 /**
@@ -2231,6 +2325,10 @@ Blockly.WorkspaceSvg.prototype.getGesture = function(e) {
  */
 Blockly.WorkspaceSvg.prototype.clearGesture = function() {
   this.currentGesture_ = null;
+
+  if (this.checkProcedureReturnAfterGesture_) {
+    this.processProcedureReturnsChanged_();
+  }
 };
 
 /**

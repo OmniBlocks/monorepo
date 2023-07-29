@@ -38,6 +38,8 @@ class ExtensionLibrary extends React.PureComponent {
         }
 
         const extensionId = item.extensionId;
+
+        // Don't warn about Scratch compatibility before showing modal
         const isCustomURL = !item.disabled && !extensionId;
         if (isCustomURL) {
             this.props.onOpenCustomExtensionModal();
@@ -46,6 +48,12 @@ class ExtensionLibrary extends React.PureComponent {
 
         // eslint-disable-next-line no-alert
         if (item.incompatibleWithScratch && !confirm(this.props.intl.formatMessage(messages.incompatible))) {
+            return;
+        }
+
+        if (extensionId === 'procedures_enable_return') {
+            this.props.onEnableProcedureReturns();
+            this.props.onCategorySelected('myBlocks');
             return;
         }
 
@@ -89,6 +97,7 @@ class ExtensionLibrary extends React.PureComponent {
 ExtensionLibrary.propTypes = {
     intl: intlShape.isRequired,
     onCategorySelected: PropTypes.func,
+    onEnableProcedureReturns: PropTypes.func,
     onOpenCustomExtensionModal: PropTypes.func,
     onRequestClose: PropTypes.func,
     visible: PropTypes.bool,

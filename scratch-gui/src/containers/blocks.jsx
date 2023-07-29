@@ -85,7 +85,8 @@ class Blocks extends React.Component {
             'onWorkspaceUpdate',
             'onWorkspaceMetricsChange',
             'setBlocks',
-            'setLocale'
+            'setLocale',
+            'handleEnableProcedureReturns'
         ]);
         this.ScratchBlocks.prompt = this.handlePromptStart;
         this.ScratchBlocks.statusButtonCallback = this.handleConnectionModalStart;
@@ -137,6 +138,9 @@ class Blocks extends React.Component {
             if (url.protocol === 'http:' || url.protocol === 'https:') {
                 window.open(docsURI, '_blank');
             }
+        });
+        toolboxWorkspace.registerButtonCallback('OPEN_RETURN_DOCS', () => {
+            window.open('https://docs.turbowarp.org/return', '_blank');
         });
 
         // Store the xml of the toolbox that is actually rendered.
@@ -565,6 +569,10 @@ class Blocks extends React.Component {
                 this.updateToolbox(); // To show new variables/custom blocks
             });
     }
+    handleEnableProcedureReturns () {
+        this.workspace.enableProcedureReturns();
+        this.requestToolboxUpdate();
+    }
     render () {
         /* eslint-disable no-unused-vars */
         const {
@@ -617,6 +625,7 @@ class Blocks extends React.Component {
                     <ExtensionLibrary
                         vm={vm}
                         onCategorySelected={this.handleCategorySelected}
+                        onEnableProcedureReturns={this.handleEnableProcedureReturns}
                         onRequestClose={onRequestCloseExtensionLibrary}
                         onOpenCustomExtensionModal={this.props.onOpenCustomExtensionModal}
                     />

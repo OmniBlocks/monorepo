@@ -492,6 +492,9 @@ class JSGenerator {
         case 'mouse.y':
             return new TypedInput('runtime.ioDevices.mouse.getScratchY()', TYPE_NUMBER);
 
+        case 'noop':
+            return new TypedInput('""', TYPE_STRING);
+
         case 'op.abs':
             return new TypedInput(`Math.abs(${this.descendInput(node.value).asNumber()})`, TYPE_NUMBER);
         case 'op.acos':
@@ -996,7 +999,6 @@ class JSGenerator {
             break;
 
         case 'noop':
-            // todo: remove noop entirely
             break;
 
         case 'pen.clear':

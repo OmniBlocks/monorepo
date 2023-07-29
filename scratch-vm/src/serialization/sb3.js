@@ -666,27 +666,6 @@ const serializeMonitors = function (monitors, runtime, extensions) {
 };
 
 /**
- * @param {any} obj Project or target JSON. Modified in place.
- * @param {Set<string>} extensionIds
- * @param {Runtime} runtime
- * @param {boolean} isSprite
- * @returns {void} nothing, operates in-place
- */
-const serializeExtensionMetadata = (obj, extensionIds, runtime, isSprite) => {
-    const serializedExtensions = Array.from(extensionIds);
-    if (serializedExtensions.length || !isSprite) {
-        obj.extensions = serializedExtensions;
-    }
-
-    // Save list of URLs to load the current extensions
-    // Extension manager only exists when runtime is wrapped by VirtualMachine
-    const extensionURLs = getExtensionURLsToSave(extensionIds, runtime);
-    if (extensionURLs) {
-        obj.extensionURLs = extensionURLs;
-    }
-};
-
-/**
  * Serializes the specified VM runtime.
  * @param {!Runtime} runtime VM runtime instance to be serialized.
  * @param {string=} targetId Optional target id if serializing only a single target
@@ -718,7 +697,14 @@ const serialize = function (runtime, targetId, {allowOptimization = true} = {}) 
 
     if (targetId) {
         const target = serializedTargets[0];
-        serializeExtensionMetadata(target, extensions, runtime, true);
+        if (extensions.size) {
+            // Vanilla Scratch doesn't include extensions in sprites, so don't add this if it's not needed
+            target.extensions = Array.from(extensions);
+        }
+        const extensionURLs = getExtensionURLsToSave(extensions, runtime);
+        if (extensionURLs) {
+            target.extensionURLs = extensionURLs;
+        }
         return serializedTargets[0];
     }
 
@@ -726,7 +712,11 @@ const serialize = function (runtime, targetId, {allowOptimization = true} = {}) 
 
     obj.monitors = serializeMonitors(runtime.getMonitorState(), runtime, extensions);
 
-    serializeExtensionMetadata(obj, extensions, runtime, false);
+    obj.extensions = Array.from(extensions);
+    const extensionURLs = getExtensionURLsToSave(extensions, runtime);
+    if (extensionURLs) {
+        obj.extensionURLs = extensionURLs;
+    }
 
     // Assemble metadata
     const meta = Object.create(null);

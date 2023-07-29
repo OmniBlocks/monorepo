@@ -681,6 +681,7 @@ class VirtualMachine extends EventEmitter {
      * @param {Map<string, string>} extensionURLs A map of extension ID to URL
      */
     async _loadExtensions (extensionIDs, extensionURLs = new Map()) {
+        const defaultExtensionURLs = require('./extension-support/tw-default-extension-urls');
         const extensionPromises = [];
         for (const extensionID of extensionIDs) {
             if (this.extensionManager.isExtensionLoaded(extensionID)) {
@@ -688,10 +689,9 @@ class VirtualMachine extends EventEmitter {
             } else if (this.extensionManager.isBuiltinExtension(extensionID)) {
                 // Builtin extension
                 this.extensionManager.loadExtensionIdSync(extensionID);
-                continue;
             } else {
                 // Custom extension
-                const url = extensionURLs.get(extensionID);
+                const url = extensionURLs.get(extensionID) || defaultExtensionURLs.get(extensionID);
                 if (!url) {
                     throw new Error(`Unknown extension: ${extensionID}`);
                 }

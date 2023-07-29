@@ -1,12 +1,21 @@
 const {test} = require('tap');
-const {deserialize} = require('../../src/serialization/sb3');
-const Runtime = require('../../src/engine/runtime');
+const VirtualMachine = require('../../src/virtual-machine');
 
-// Note that at some point it is likely that this extension will break
-test('text extension defaults to URL', async t => {
-    t.plan(2);
-    const rt = new Runtime();
-    const deserialized = await deserialize({
+test('Loading project uses default extension URLs', t => {
+    t.plan(1);
+
+    const vm = new VirtualMachine();
+    const events = [];
+    vm.securityManager.canLoadExtensionFromProject = url => {
+        events.push(`canLoadExtensionFromProject ${url}`);
+        return true;
+    };
+    vm.extensionManager.loadExtensionURL = url => {
+        events.push(`loadExtensionURL ${url}`);
+        return Promise.resolve();
+    };
+
+    vm.loadProject({
         targets: [
             {
                 isStage: true,
@@ -51,7 +60,16 @@ test('text extension defaults to URL', async t => {
                 },
                 comments: {},
                 currentCostume: 0,
-                costumes: [],
+                costumes: [
+                    {
+                        assetId: 'cd21514d0531fdffb22204e0ec5ed84a',
+                        dataFormat: 'svg',
+                        md5ext: 'cd21514d0531fdffb22204e0ec5ed84a.svg',
+                        name: 'backdrop1',
+                        rotationCenterX: 240,
+                        rotationCenterY: 180
+                    }
+                ],
                 sounds: [],
                 volume: 100,
                 layerOrder: 0,
@@ -62,18 +80,25 @@ test('text extension defaults to URL', async t => {
             }
         ],
         monitors: [],
-        // this list intentionally wrong to make sure we don't rely on its contents
-        extensions: [],
+        extensions: [
+            // this list intentionally wrong to make sure we don't rely on its contents
+        ],
         extensionURLs: {
-            griffpatch: 'https://extensions.turbowarp.org/fake-box2d-url.js'
+            griffpatch: 'https://example.com/box2d.js'
         },
         meta: {
             semver: '3.0.0',
             vm: '0.2.0',
             agent: ''
         }
-    }, rt);
-    t.equal(deserialized.extensions.extensionURLs.get('text'), 'https://extensions.turbowarp.org/lab/text.js');
-    t.equal(deserialized.extensions.extensionURLs.get('griffpatch'), 'https://extensions.turbowarp.org/fake-box2d-url.js');
-    t.end();
+    }).then(() => {
+        t.same(events, [
+            'canLoadExtensionFromProject https://extensions.turbowarp.org/lab/text.js',
+            'loadExtensionURL https://extensions.turbowarp.org/lab/text.js',
+            'canLoadExtensionFromProject https://example.com/box2d.js',
+            'loadExtensionURL https://example.com/box2d.js'
+        ]);
+
+        t.end();
+    });
 });

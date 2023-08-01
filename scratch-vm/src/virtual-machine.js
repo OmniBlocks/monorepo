@@ -551,7 +551,7 @@ class VirtualMachine extends EventEmitter {
         const files = {
             'project.json': new _TextEncoder().encode(projectJson)
         };
-        for (const fileDesc of soundDescs.concat(costumeDescs)) {
+        for (const fileDesc of costumeDescs.concat(soundDescs)) {
             files[fileDesc.fileName] = fileDesc.fileContent;
         }
 

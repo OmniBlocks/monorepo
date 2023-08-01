@@ -54,3 +54,26 @@ test('exportSprite serialization order', t => {
         });
     });
 });
+
+test('saveProjectSb3DontZip', t => {
+    t.plan(13);
+    const vm = new VM();
+    vm.attachStorage(makeTestStorage());
+    vm.loadProject(fixture).then(() => {
+        const exported = vm.saveProjectSb3DontZip();
+        const files = Object.keys(exported);
+
+        for (let i = 0; i < files.length; i++) {
+            // 6 costumes, 6 sounds
+            if (i === 0) {
+                t.equal(files[i], 'project.json', 'first file is project.json');
+            } else if (i < 7) {
+                t.ok(files[i].endsWith('.svg'), `file ${i + 1} is costume`);
+            } else {
+                t.ok(files[i].endsWith('.wav'), `file ${i + 1} is sound`);
+            }
+        }
+
+        t.end();
+    });
+});

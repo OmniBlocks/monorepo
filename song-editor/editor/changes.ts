@@ -931,6 +931,14 @@ export class ChangeRandomGeneratedInstrument extends Change {
 			switch (type) {
 				case InstrumentType.chip: {
 					instrument.chipWave = (Math.random() * Config.chipWaves.length) | 0;
+												 // advloop addition
+                            instrument.isUsingAdvancedLoopControls = false;
+                            instrument.chipWaveLoopStart = 0;
+                            instrument.chipWaveLoopEnd = Config.rawRawChipWaves[instrument.chipWave].samples.length - 1;
+                            instrument.chipWaveLoopMode = 0;
+                            instrument.chipWavePlayBackwards = false;
+                            instrument.chipWaveStartOffset = 0;
+                            // advloop addition
 				} break;
 				case InstrumentType.pwm: {
                     instrument.pulseWidth = selectCurvedDistribution(0, Config.pulseWidthRange - 1, Config.pulseWidthRange - 1, 2);
@@ -1058,6 +1066,7 @@ export class ChangeRandomGeneratedInstrument extends Change {
                             { item: "sawtooth", weight: 3 },
                             { item: "ramp", weight: 3 },
                             { item: "trapezoid", weight: 4 },
+				{ item: "rounded", weight: 1 },
                         ])].index;
 						if (instrument.operators[i].waveform == 2/*"pulse width"*/) {
 							instrument.operators[i].pulseWidth = selectWeightedRandom([
@@ -1127,6 +1136,7 @@ export class ChangeRandomGeneratedInstrument extends Change {
                             { item: "sawtooth", weight: 3 },
                             { item: "ramp", weight: 3 },
                             { item: "trapezoid", weight: 4 },
+				{ item: "rounded", weight: 1 },
                         ])].index;
 						if (instrument.operators[i].waveform == 2) {
 							instrument.operators[i].pulseWidth = selectWeightedRandom([

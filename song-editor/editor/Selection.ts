@@ -142,14 +142,14 @@ export class Selection {
             if (digit == "0") digit = "10";
             this.instrumentDigits += digit;
             var parsed = parseInt(this.instrumentDigits);
-            var pattern: Pattern | null = this._doc.getCurrentPattern();
-            if (pattern != null && parsed != 0 && parsed <= this._doc.song.channels[this._doc.channel].instruments.length) {
+            //var pattern: Pattern | null = this._doc.getCurrentPattern();
+           if (parsed != 0 && parsed <= this._doc.song.channels[this._doc.channel].instruments.length) {
                 this.selectInstrument(parsed - 1);
                 return;
             }
             this.instrumentDigits = digit;
             parsed = parseInt(this.instrumentDigits);
-            if (pattern != null && parsed != 0 && parsed <= this._doc.song.channels[this._doc.channel].instruments.length) {
+           if (parsed != 0 && parsed <= this._doc.song.channels[this._doc.channel].instruments.length) {
                 this.selectInstrument(parsed - 1);
                 return;
             }
@@ -337,6 +337,56 @@ export class Selection {
         new ChangePatternSelection(this._doc, 0, 0);
     }
 
+		public remapToNoisePitches(oldPitches): void {
+          let newPitches = oldPitches.slice();
+            // There may be some very "pleasing" way to place these,
+           // but I'm not sure it's worth the effort.
+            newPitches.sort(function (a, b) { return a - b; });
+            let lowestPitch = newPitches[0] % Config.drumCount;
+            const numberOfPitches = newPitches.length;
+            let highestPitch = lowestPitch + (numberOfPitches - 1);
+            while (highestPitch >= Config.drumCount) {
+                lowestPitch--;
+                highestPitch--;
+            }
+            for (let notePitchIndex = 0; notePitchIndex < newPitches.length; notePitchIndex++) {
+                newPitches[notePitchIndex] = notePitchIndex + lowestPitch;
+           }
+           return newPitches;
+        }
+        convertCopiedPitchNotesToNoiseNotes(oldNotes) {
+            // When pasting from a pitch channel to a noise channel,
+            // we may have pitches beyond what a noise channel supports.
+            let newNotes = [];
+            for (let noteIndex = 0; noteIndex < oldNotes.length; noteIndex++) {
+                const oldNote = oldNotes[noteIndex];
+                const newNotePitches = this.remapToNoisePitches(oldNote["pitches"].slice());
+                const oldNotePins = oldNote["pins"];
+                let newNotePins = [];
+                for (let notePinIndex = 0; notePinIndex < oldNotePins.length; notePinIndex++) {
+                    const oldPin = oldNotePins[notePinIndex];
+                    // This should match the NotePin interface.
+                   newNotePins.push({
+                       interval: oldPin["interval"],
+                        time: oldPin["time"],
+                        size: oldPin["size"],
+                    });
+                }
+                const newNoteStart = oldNote["start"];
+                const newNoteEnd = oldNote["end"];
+                const newNoteContinuesLastPattern = oldNote["continuesLastPattern"];
+                // This should match the Note class.
+                newNotes.push({
+                    pitches: newNotePitches,
+                    pins: newNotePins,
+                    start: newNoteStart,
+                    end: newNoteEnd,
+                    continuesLastPattern: newNoteContinuesLastPattern,
+                });
+            }
+            return newNotes;
+        }
+	
     // I'm sorry this function is so complicated!
     // Basically I'm trying to avoid accidentally modifying patterns that are used
     // elsewhere in the song (unless we're just pasting a single pattern) but I'm
@@ -355,14 +405,21 @@ export class Selection {
         for (let pasteChannel: number = 0; pasteChannel < pasteHeight; pasteChannel++) {
             const channelCopy: ChannelCopy = channelCopies[pasteChannel % channelCopies.length];
             const channelIndex: number = this.boxSelectionChannel + pasteChannel;
-
+               const channelIsNoise = this._doc.song.getChannelIsNoise(channelIndex);
+                const channelIsMod = this._doc.song.getChannelIsMod(channelIndex);
+                const channelIsPitch = !channelIsNoise && !channelIsMod;
+		
             const isNoise: boolean = !!channelCopy["isNoise"];
             const isMod: boolean = !!channelCopy["isMod"];
+		const isPitch = !isNoise && !isMod;
             const patternCopies: Dictionary<PatternCopy> = channelCopy["patterns"] || {};
             const copiedBars: number[] = channelCopy["bars"] || [];
             if (copiedBars.length == 0) continue;
-            if (isNoise != this._doc.song.getChannelIsNoise(channelIndex)) continue;
+		// Allow pasting from a pitch channel to a noise channel (and the opposite).
+            if (isNoise && this._doc.song.getChannelIsMod(channelIndex)) continue;
             if (isMod != this._doc.song.getChannelIsMod(channelIndex)) continue;
+                // if (isNoise != this._doc.song.getChannelIsNoise(channelIndex))
+                //     continue;
 
             const pasteWidth: number = fillSelection ? this.boxSelectionWidth : Math.min(copiedBars.length, this._doc.song.barCount - this.boxSelectionBar);
             if (!fillSelection && copiedBars.length == 1 && channelCopies.length == 1) {
@@ -377,11 +434,16 @@ export class Selection {
 
                 const instrumentsCopy: number[] = this._parseCopiedInstrumentArray(patternCopy, channelIndex);
 
+                 let pastedNotes = patternCopy["notes"];
+                   if (isPitch && channelIsNoise) {
+                       pastedNotes = this.convertCopiedPitchNotesToNoiseNotes(pastedNotes);
+                    }
+		    
                 if (currentPatternIndex == 0) {
                     const existingPattern: Pattern | undefined = this._doc.song.channels[channelIndex].patterns[copiedPatternIndex - 1];
                     if (existingPattern != undefined &&
                         !this.patternSelectionActive &&
-                        ((comparePatternNotes(patternCopy["notes"], existingPattern.notes) && patternsContainSameInstruments(instrumentsCopy, existingPattern.instruments)) ||
+                        ((comparePatternNotes(pastedNotes, existingPattern.notes) && patternsContainSameInstruments(instrumentsCopy, existingPattern.instruments)) ||
                             this._patternIndexIsUnused(channelIndex, copiedPatternIndex))) {
                         group.append(new ChangePatternNumbers(this._doc, copiedPatternIndex, bar, channelIndex, 1, 1));
                     } else {
@@ -391,7 +453,7 @@ export class Selection {
 
                 const pattern: Pattern | null = this._doc.song.getPattern(channelIndex, bar);
                 if (pattern == null) throw new Error();
-                group.append(new ChangePaste(this._doc, pattern, patternCopy["notes"], this.patternSelectionActive ? this.patternSelectionStart : 0, this.patternSelectionActive ? this.patternSelectionEnd : Config.partsPerBeat * this._doc.song.beatsPerBar, copiedPartDuration));
+                group.append(new ChangePaste(this._doc, pattern, pastedNotes, this.patternSelectionActive ? this.patternSelectionStart : 0, this.patternSelectionActive ? this.patternSelectionEnd : Config.partsPerBeat * this._doc.song.beatsPerBar, copiedPartDuration));
                 // @jummbus - I actually like it better if instruments copy over, unless it's not a mod and there are notes in the pattern.
                 if (currentPatternIndex == 0 || patternCopy.notes.length == 0 || channelIndex >= this._doc.song.pitchChannelCount + this._doc.song.noiseChannelCount) {
                     this.selectInstrument(instrumentsCopy[0]);
@@ -434,7 +496,10 @@ export class Selection {
                             const newPattern: Pattern | null = this._doc.song.getPattern(channelIndex, bar);
                             if (newPattern == null) throw new Error();
                             for (const note of pattern.cloneNotes()) {
-                                group.append(new ChangeNoteAdded(this._doc, newPattern, note, newPattern.notes.length, false));
+                                   if (isPitch && channelIsNoise) {
+                                        note.pitches = this.remapToNoisePitches(note.pitches);
+                                    }
+				    group.append(new ChangeNoteAdded(this._doc, newPattern, note, newPattern.notes.length, false));
                             }
                             // Don't overwrite the existing pattern's instruments if only part of the pattern content is being replaced.
                             //group.append(new ChangeSetPatternInstruments(this._doc, channelIndex, pattern.instruments, newPattern));
@@ -473,9 +538,14 @@ export class Selection {
                     const instrumentsCopy: number[] = this._parseCopiedInstrumentArray(patternCopy, channelIndex);
                     const existingPattern: Pattern | undefined = this._doc.song.channels[channelIndex].patterns[copiedPatternIndex - 1];
 
-                    if (existingPattern != undefined &&
+                 let pastedNotes = patternCopy["notes"];
+                        if (isPitch && channelIsNoise) {
+                            pastedNotes = this.convertCopiedPitchNotesToNoiseNotes(pastedNotes);
+                        }
+			
+		if (existingPattern != undefined &&
                         copiedPartDuration == Config.partsPerBeat * this._doc.song.beatsPerBar &&
-                        comparePatternNotes(patternCopy["notes"], existingPattern.notes) &&
+                        comparePatternNotes(pastedNotes, existingPattern.notes) &&
                         patternsContainSameInstruments(instrumentsCopy, existingPattern.instruments)) {
                         group.append(new ChangePatternNumbers(this._doc, copiedPatternIndex, bar, channelIndex, 1, 1));
                     } else {
@@ -486,7 +556,7 @@ export class Selection {
                         }
                         const pattern: Pattern | null = this._doc.song.getPattern(channelIndex, bar);
                         if (pattern == null) throw new Error();
-                        group.append(new ChangePaste(this._doc, pattern, patternCopy["notes"], this.patternSelectionActive ? this.patternSelectionStart : 0, this.patternSelectionActive ? this.patternSelectionEnd : Config.partsPerBeat * this._doc.song.beatsPerBar, copiedPartDuration));
+                        group.append(new ChangePaste(this._doc, pattern, pastedNotes, this.patternSelectionActive ? this.patternSelectionStart : 0, this.patternSelectionActive ? this.patternSelectionEnd : Config.partsPerBeat * this._doc.song.beatsPerBar, copiedPartDuration));
                         group.append(new ChangeSetPatternInstruments(this._doc, channelIndex, instrumentsCopy, pattern));
                     }
 
@@ -674,7 +744,10 @@ export class Selection {
         }
 
         for (const channelIndex of this._eachSelectedChannel()) {
-            for (const pattern of this._eachSelectedPattern(channelIndex)) {
+                           // Can't transpose mod channels.
+            if (channelIndex >= this._doc.song.pitchChannelCount + this._doc.song.noiseChannelCount)
+                continue;
+	for (const pattern of this._eachSelectedPattern(channelIndex)) {
                 group.append(new ChangePatternRhythm(this._doc, pattern));
             }
         }
@@ -792,7 +865,8 @@ export class Selection {
                         this._changeInstrument.append(new ChangeSetPatternInstruments(this._doc, channelIndex, instruments, pattern));
                     }
                 }
-                this._doc.record(this._changeInstrument, canReplaceLastChange);
+                if (!this._changeInstrument.isNoop())
+		    this._doc.record(this._changeInstrument, canReplaceLastChange);
             }
         } else {
             const canReplaceLastChange: boolean = this._doc.lastChangeWas(this._changeInstrument);

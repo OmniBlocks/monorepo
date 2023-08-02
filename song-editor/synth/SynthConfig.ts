@@ -1596,20 +1596,20 @@ function generateSawWave(inverse: boolean = false): Float32Array {
     return wave;
 }
 
-	function generateWhiteNoiseFmWave() {
-        const wave = new Float32Array(Config.sineWaveLength + 1);
-        for (let i = 0; i < Config.sineWaveLength + 1; i++) {
-            wave[i] = Math.random() * 2.0 - 1.0;
-        }
-        return wave;
-    }
-	function generateOneBitWhiteNoiseFmWave() {
-        const wave = new Float32Array(Config.sineWaveLength + 1);
-        for (let i = 0; i < Config.sineWaveLength + 1; i++) {
-            wave[i] = Math.round(Math.random());
-        }
-        return wave;
-    }
+	// function generateWhiteNoiseFmWave() {
+        // const wave = new Float32Array(Config.sineWaveLength + 1);
+        // for (let i = 0; i < Config.sineWaveLength + 1; i++) {
+            // wave[i] = Math.random() * 2.0 - 1.0;
+        // }
+        // return wave;
+    // }
+	// function generateOneBitWhiteNoiseFmWave() {
+        // const wave = new Float32Array(Config.sineWaveLength + 1);
+        // for (let i = 0; i < Config.sineWaveLength + 1; i++) {
+            // wave[i] = Math.round(Math.random());
+        // }
+        // return wave;
+    // }
 	function generateRoundedSineWave() {
         const wave = new Float32Array(Config.sineWaveLength + 1);
         for (let i = 0; i < Config.sineWaveLength + 1; i++) {

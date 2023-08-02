@@ -1441,6 +1441,7 @@ export class ChangeChannelCount extends Change {
                         newChannels[channelIndex].octave = octave;
                         for (let j: number = 0; j < Config.instrumentCountMin; j++) {
                             const instrument: Instrument = new Instrument(isNoise, isMod);
+			    if (isMod) instrument.type = 9;
                             if (!isMod) {
                                 const presetValue: number = pickRandomPresetValue(isNoise);
                                 const preset: Preset = EditorConfig.valueToPreset(presetValue)!;
@@ -2365,7 +2366,8 @@ export class ChangeAddChannelInstrument extends Change {
                     let modInstrument: number = instrument.modInstruments[mod];
                     let modChannel: number = instrument.modChannels[mod];
 
-                    if (modInstrument >= doc.song.channels[channelIndex].instruments.length && modChannel == doc.channel) {
+                    if (modChannel == doc.channel && modInstrument >= doc.song.channels[modChannel].instruments.length-1 ) {
+							//BUGFIX FROM JUMMBOX
                         instrument.modInstruments[mod]++;
                     }
                 }
@@ -2413,11 +2415,11 @@ export class ChangeRemoveChannelInstrument extends Change {
 
                     if (modChannel == doc.channel) {
                         // Boundary checking - check if setting was 'all' or 'active' previously
-                        if (modInstrument > doc.song.channels[channelIndex].instruments.length) {
+                      if (modInstrument > removedIndex) {
                             instrument.modInstruments[mod]--;
                         }
                         // Boundary checking - check if setting was set to the last instrument before splice
-                        else if (modInstrument == doc.song.channels[channelIndex].instruments.length) {
+                       else if (modInstrument == removedIndex) {
                             instrument.modInstruments[mod] = 0;
                             instrument.modulators[mod] = 0;
                         }
@@ -4138,12 +4140,106 @@ export class ChangeChipWave extends Change {
         const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
         if (instrument.chipWave != newValue) {
             instrument.chipWave = newValue;
+						 // advloop addition
+                instrument.isUsingAdvancedLoopControls = false;
+                instrument.chipWaveLoopStart = 0;
+                instrument.chipWaveLoopEnd = Config.rawRawChipWaves[instrument.chipWave].samples.length - 1;
+                instrument.chipWaveLoopMode = 0;
+                instrument.chipWavePlayBackwards = false;
+                instrument.chipWaveStartOffset = 0;
+                // advloop addition
             instrument.preset = instrument.type;
             doc.notifier.changed();
             this._didSomething();
         }
     }
 }
+
+	// advloop addition
+    export class ChangeChipWaveUseAdvancedLoopControls extends Change {
+        constructor(doc, newValue) {
+            super();
+            const instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+            if (instrument.isUsingAdvancedLoopControls != newValue) {
+                instrument.isUsingAdvancedLoopControls = newValue;
+                instrument.chipWaveLoopStart = 0;
+                instrument.chipWaveLoopEnd = Config.rawRawChipWaves[instrument.chipWave].samples.length - 1;
+                instrument.chipWaveLoopMode = 0;
+                instrument.chipWavePlayBackwards = false;
+                instrument.chipWaveStartOffset = 0;
+                // instrument.preset = instrument.type;
+                doc.notifier.changed();
+                this._didSomething();
+            }
+        }
+    }
+    export class ChangeChipWaveLoopMode extends Change {
+        constructor(doc, newValue) {
+            super();
+            const instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+            if (instrument.chipWaveLoopMode != newValue) {
+                instrument.isUsingAdvancedLoopControls = true;
+                instrument.chipWaveLoopMode = newValue;
+                // instrument.preset = instrument.type;
+                doc.notifier.changed();
+                this._didSomething();
+            }
+        }
+    }
+   export class ChangeChipWaveLoopStart extends Change {
+        constructor(doc, newValue) {
+            super();
+            const instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+            if (instrument.chipWaveLoopStart != newValue) {
+                instrument.isUsingAdvancedLoopControls = true;
+                instrument.chipWaveLoopStart = newValue;
+                // instrument.preset = instrument.type;
+                doc.notifier.changed();
+                this._didSomething();
+            }
+        }
+    }
+   export class ChangeChipWaveLoopEnd extends Change {
+        constructor(doc, newValue) {
+            super();
+            const instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+            if (instrument.chipWaveLoopEnd != newValue) {
+                instrument.isUsingAdvancedLoopControls = true;
+                instrument.chipWaveLoopEnd = newValue;
+                instrument.chipWaveLoopStart = Math.max(0, Math.min(newValue - 1, instrument.chipWaveLoopStart));
+                // instrument.preset = instrument.type;
+                doc.notifier.changed();
+                this._didSomething();
+            }
+        }
+    }
+   export class ChangeChipWaveStartOffset extends Change {
+        constructor(doc, newValue) {
+            super();
+            const instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+            if (instrument.chipWaveStartOffset != newValue) {
+                instrument.isUsingAdvancedLoopControls = true;
+                instrument.chipWaveStartOffset = newValue;
+                // instrument.preset = instrument.type;
+                doc.notifier.changed();
+                this._didSomething();
+            }
+        }
+    }
+   export class ChangeChipWavePlayBackwards extends Change {
+        constructor(doc, newValue) {
+            super();
+            const instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+            if (instrument.chipWavePlayBackwards != newValue) {
+                instrument.isUsingAdvancedLoopControls = true;
+                instrument.chipWavePlayBackwards = newValue;
+                // instrument.preset = instrument.type;
+                doc.notifier.changed();
+                this._didSomething();
+            }
+        }
+    }
+    // advloop addition
 
 export class ChangeNoiseWave extends Change {
     constructor(doc: SongDocument, newValue: number) {

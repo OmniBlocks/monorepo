@@ -446,6 +446,36 @@ export class TipPrompt implements Prompt {
 					p("The filter preserves the volume of frequencies that are below the cutoff frequency, and reduces the volume of frequencies that are above the cutoff. If this setting is used, the filter also increases the volume of frequencies that are near the cutoff."),
 				);
 			} break;
+									 case "loopControls":
+                    {
+                        message = div(h2("Loop Controls"), p("This enables the use of parameters that control how a chip wave should repeat."));
+                    }
+                    break;
+					 case "loopMode":
+                    {
+                        message = div(h2("Loop Mode"), p("This sets the way the chip wave loops when its ends are reached."), p("The \"Loop\" mode is the default: when the end of the loop is reached, it will jump back to the starting point of the loop."), p("The \"Ping-Pong\" mode starts playing the chip wave backwards when the end of the loop is reached. Once it reaches the start of the loop, it will start playing forwards again, endlessly going back and forth."), p("The \"Play Once\" mode stops the chip wave once the end is reached."));
+                    }
+                    break;
+					 case "loopStart":
+                     {
+                        message = div(h2("Loop Start Point"), p("This specifies where the loop region of the chip wave starts. It's measured in \"samples\", or rather, it refers to a point on a waveform."), p("Be careful with tiny loop sizes (especially combined with high pitches), they may re-introduce aliasing even if the \"Aliasing\" checkbox is unchecked."));
+                     }
+                     break;
+ 					 case "loopEnd":
+                     {
+                       message = div(h2("Loop End Point"), p("This specifies where the loop region of the chip wave ends. It's measured in \"samples\", or rather, it refers to a point on a waveform."), p("The button next to the input box sets this to end of the chip wave."), p("Be careful with tiny loop sizes (especially combined with high pitches), they may re-introduce aliasing even if the \"Aliasing\" checkbox is unchecked."));
+                     }
+                    break;
+					 case "offset":
+                    {
+                        message = div(h2("Offset"), p("This specifies where the chip wave should start playing from. You can use this to chop up a large sample, to say, turn a drum loop into a drum kit! It's measured in \"samples\", or rather, it refers to a point on a waveform."));
+                    }
+                    break;
+					 case "backwards":
+                    {
+                        message = div(h2("Backwards"), p("When set, the chip wave will start playing from the end, the loop region ends will be flipped, and the offset will count starting at the end, so if it's 0, that means it starts at the end of the chip wave."));
+                    }
+                    break;
 
 			default:
 				// Check for modSetinfo#

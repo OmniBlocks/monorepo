@@ -1,8 +1,8 @@
 
-//import { Config } from "../synth/SynthConfig";
-//import { HTML } from "imperative-html/dist/esm/elements-strict";
-//import { SongDocument } from "./SongDocument";
-//import { Prompt } from "./Prompt";
+import { Config } from "../synth/SynthConfig";
+import { HTML } from "imperative-html/dist/esm/elements-strict";
+import { SongDocument } from "./SongDocument";
+import { Prompt } from "./Prompt";
 //import { ChangeBeatsPerBar } from "./changes";
 //EDIT THESE
 

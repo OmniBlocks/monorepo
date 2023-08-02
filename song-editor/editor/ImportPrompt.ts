@@ -165,6 +165,7 @@ export class ImportPrompt implements Prompt {
 			const noteEvents: NoteEvent[][] = [[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[]];
 			const pitchBendEvents: PitchBendEvent[][] = [[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[]];
 		const noteSizeEvents: NoteSizeEvent[][] = [[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[]];
+		let tempoChanges = [];
 		let microsecondsPerBeat: number = 500000; // Tempo in microseconds per "quarter" note, commonly known as a "beat", default is equivalent to 120 beats per minute.
 		let beatsPerBar: number = 8;
 		let numSharps: number = 0;
@@ -290,7 +291,12 @@ export class ImportPrompt implements Prompt {
 									track.reader.skipBytes(length);
 								} else if (message == MidiMetaEventMessage.tempo) {
 									microsecondsPerBeat = track.reader.readUint24();
-									track.reader.skipBytes(length - 3);
+									tempoChanges.push({
+                                                midiTick: currentMidiTick,
+                                               microsecondsPerBeat: microsecondsPerBeat,
+                                           });
+//midi tempo addition
+										   track.reader.skipBytes(length - 3);
 								} else if (message == MidiMetaEventMessage.timeSignature) {
 									const numerator: number = track.reader.readUint8();
 									let denominatorExponent: number = track.reader.readUint8();
@@ -368,6 +374,12 @@ export class ImportPrompt implements Prompt {
 		}
 			
 		// Now the MIDI file is fully parsed. Next, constuct BeepBox channels out of the data.
+					// Pick the first tempo value.
+            for (const change of tempoChanges) {
+                microsecondsPerBeat = change.microsecondsPerBeat;
+                break;
+            }
+			//midi tempo addition
 		const microsecondsPerMinute: number = 60 * 1000 * 1000;
 		const beatsPerMinute: number = Math.max(Config.tempoMin, Math.min(Config.tempoMax, Math.round(microsecondsPerMinute / microsecondsPerBeat)));
 		const midiTicksPerPart: number = midiTicksPerBeat / Config.partsPerBeat;
@@ -791,7 +803,66 @@ export class ImportPrompt implements Prompt {
 				channel.bars.push(0);
 			}
 		}
-			
+						 // Add mod channel to hold the tempo changes, if necessary.
+            if (tempoChanges.length > 1) {
+                let tempoModChannel = new Channel();
+                modChannels.push(tempoModChannel);
+                let tempoModInstrument = new Instrument(false, true);
+                tempoModInstrument.setTypeAndReset(9 /* InstrumentType.mod */, false, true);
+                tempoModInstrument.modulators[0] = Config.modulators.dictionary["tempo"].index;
+                tempoModInstrument.modChannels[0] = -1;
+                tempoModChannel.instruments.push(tempoModInstrument);
+                // We're using the first modulator in the channel, but the pitch values are
+                // flipped relative to the UI, so we need to pick a pitch value accordingly.
+                const tempoModPitch = Config.modCount - 1;
+                let currentBar = -1;
+                let pattern = null;
+                let prevChangeEndPart = 0;
+                for (let changeIndex = 0; changeIndex < tempoChanges.length; changeIndex++) {
+                    const change = tempoChanges[changeIndex];
+                    const changeStartMidiTick = change.midiTick;
+                    const changeStartPart = quantizeMidiTickToPart(changeStartMidiTick);
+                    let changeEndMidiTick = -1;
+                    let changeEndPart = -1;
+                    if (changeIndex === tempoChanges.length - 1) {
+                        changeEndMidiTick = changeStartMidiTick + 1;
+                        changeEndPart = changeStartPart + 1;
+                    }
+                    else {
+                        const nextChange = tempoChanges[changeIndex + 1];
+                        changeEndMidiTick = nextChange.midiTick;
+                        changeEndPart = quantizeMidiTickToPart(changeEndMidiTick);
+                    }
+                    let startBar = Math.floor(changeStartPart / partsPerBar);
+                    let endBar = Math.ceil(changeEndPart / partsPerBar);
+                    for (let bar = startBar; bar < endBar; bar++) {
+                        const barStartPart = bar * partsPerBar;
+                        const noteStartPart = Math.max(0, prevChangeEndPart - barStartPart);
+                        let noteEndPart = Math.min(partsPerBar, changeEndPart - barStartPart);
+                        if (noteStartPart < noteEndPart) {
+                            // Ensure a pattern exists for the current bar before inserting notes into it.
+                            if (currentBar != bar || pattern == null) {
+                                currentBar++;
+                                while (currentBar < bar) {
+                                    tempoModChannel.bars[currentBar] = 0;
+                                    currentBar++;
+                                }
+                                pattern = new Pattern();
+                                tempoModChannel.patterns.push(pattern);
+                                tempoModChannel.bars[currentBar] = tempoModChannel.patterns.length;
+                                pattern.instruments[0] = 0;
+                                pattern.instruments.length = 1;
+                            }
+                            // Create a new note.
+                            const newBPM = Math.max(Config.tempoMin, Math.min(Config.tempoMax, Math.round(microsecondsPerMinute / change.microsecondsPerBeat) - Config.modulators.dictionary["tempo"].convertRealFactor));
+                            const note = new Note(tempoModPitch, noteStartPart, noteEndPart, newBPM, false);
+                            pattern.notes.push(note);
+                        }
+                    }
+                    prevChangeEndPart = changeEndPart;
+                }
+           }
+//midi tempo addition
 		// For better or for worse, BeepBox has a more limited number of channels than Midi.
 		// To compensate, try to merge non-overlapping channels.
 		function compactChannels(channels: Channel[], maxLength: number): void {

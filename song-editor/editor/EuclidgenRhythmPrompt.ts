@@ -1,4 +1,13 @@
- function gcd(x, y) {
+
+//import { Config } from "../synth/SynthConfig";
+//import { HTML } from "imperative-html/dist/esm/elements-strict";
+//import { SongDocument } from "./SongDocument";
+//import { Prompt } from "./Prompt";
+//import { ChangeBeatsPerBar } from "./changes";
+//EDIT THESE
+
+
+function gcd(x, y) {
         while (y !== 0) {
             const z = x % y;
             x = y;
@@ -78,7 +87,7 @@
         }
         return pattern;
     }
-    class EuclideanRhythmPrompt {
+    export class EuclideanRhythmPrompt {
         constructor(_doc) {
             var _a, _b, _c, _d, _e, _f, _g, _h, _j;
             this._doc = _doc;

@@ -56,6 +56,7 @@ export class ExportPrompt implements Prompt {
     private readonly _formatSelect: HTMLSelectElement = select({ style: "width: 100%;" },
         option({ value: "wav" }, "Export to .wav file."),
         option({ value: "mp3" }, "Export to .mp3 file."),
+	//option({ value: "ogg" }, "Export to .ogg file."),
         option({ value: "midi" }, "Export to .mid file."),
         option({ value: "json" }, "Export to .json file."),
         option({ value: "html" }, "Export to .html file."),
@@ -316,8 +317,9 @@ export class ExportPrompt implements Prompt {
             }
         }
 
-        this.synth.warmUpSynthesizer(this._doc.song);
+      
         this.synth.computeLatestModValues();
+	      this.synth.warmUpSynthesizer(this._doc.song);
 
         this.sampleFrames = this.synth.getTotalSamples(this._enableIntro.checked, this._enableOutro.checked, this.synth.loopRepeatCount);
         // Compute how many UI updates will need to run to determine how many 
@@ -612,7 +614,7 @@ export class ExportPrompt implements Prompt {
                                     if (ExportPrompt.midiChipInstruments.length > instrument.chipWave) {
                                         instrumentProgram = ExportPrompt.midiChipInstruments[instrument.chipWave];
                                     }
-                                } else if (instrument.type == InstrumentType.pwm || instrument.type == InstrumentType.fm || instrument.type == InstrumentType.harmonics) {
+                                } else if (instrument.type == InstrumentType.pwm || instrument.type == InstrumentType.fm || instrument.type == InstrumentType.fm6op || instrument.type == InstrumentType.harmonics) {
                                     instrumentProgram = 81; // sawtooth
                                 } else if (instrument.type == InstrumentType.pickedString) {
                                     instrumentProgram = 0x19; // steel guitar

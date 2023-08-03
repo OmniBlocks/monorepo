@@ -83,15 +83,19 @@
 .restore-point-details {
 
 }
-.restore-point-thumbnail {
+.restore-point-title {
+    font-weight: bold;
+}
+
+.thumbnail-container {
+
+}
+.thumbnail {
     display: block;
     border-radius: 0.25rem;
     width: 100px;
     height: 100%;
     max-height: 100px;
-}
-.restore-point-title {
-    font-weight: bold;
 }
 
 .delete-button {

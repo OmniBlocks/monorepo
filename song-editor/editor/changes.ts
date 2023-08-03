@@ -4157,7 +4157,7 @@ export class ChangeChipWave extends Change {
 
 	// advloop addition
     export class ChangeChipWaveUseAdvancedLoopControls extends Change {
-        constructor(doc, newValue) {
+        constructor(doc: SongDocument, newValue: boolean) {
             super();
             const instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
             if (instrument.isUsingAdvancedLoopControls != newValue) {
@@ -4174,7 +4174,7 @@ export class ChangeChipWave extends Change {
         }
     }
     export class ChangeChipWaveLoopMode extends Change {
-        constructor(doc, newValue) {
+        constructor(doc: SongDocument, newValue: number) {
             super();
             const instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
             if (instrument.chipWaveLoopMode != newValue) {
@@ -4187,7 +4187,7 @@ export class ChangeChipWave extends Change {
         }
     }
    export class ChangeChipWaveLoopStart extends Change {
-        constructor(doc, newValue) {
+        constructor(doc: SongDocument, newValue: number) {
             super();
             const instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
             if (instrument.chipWaveLoopStart != newValue) {
@@ -4200,7 +4200,7 @@ export class ChangeChipWave extends Change {
         }
     }
    export class ChangeChipWaveLoopEnd extends Change {
-        constructor(doc, newValue) {
+        constructor(doc: SongDocument, newValue: number) {
             super();
             const instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
             if (instrument.chipWaveLoopEnd != newValue) {
@@ -4214,7 +4214,7 @@ export class ChangeChipWave extends Change {
         }
     }
    export class ChangeChipWaveStartOffset extends Change {
-        constructor(doc, newValue) {
+        constructor(doc: SongDocument, newValue: number) {
             super();
             const instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
             if (instrument.chipWaveStartOffset != newValue) {
@@ -4227,7 +4227,7 @@ export class ChangeChipWave extends Change {
         }
     }
    export class ChangeChipWavePlayBackwards extends Change {
-        constructor(doc, newValue) {
+        constructor(doc: SongDocument, newValue: boolean) {
             super();
             const instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
             if (instrument.chipWavePlayBackwards != newValue) {

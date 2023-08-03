@@ -27,7 +27,7 @@ const RestorePointModal = props => (
             <p>
                 <FormattedMessage
                     // eslint-disable-next-line max-len
-                    defaultMessage="{APP_NAME} periodically creates restore points to help recover your project if you forget to save. This is intended as a last resort for recovery. Your computer may silently delete these restore points at any time. Do not rely on this feature."
+                    defaultMessage="{APP_NAME} periodically saves restore points on your computer to help recover your project if you forget to save. This is intended as a last resort for recovery. Your computer may silently delete these restore points at any time. DO NOT rely on this feature."
                     id="tw.restorePoints.description"
                     values={{
                         APP_NAME: APP_NAME

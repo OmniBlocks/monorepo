@@ -29,10 +29,9 @@ import MenuBarHOC from '../../containers/menu-bar-hoc.jsx';
 import FramerateChanger from '../../containers/tw-framerate-changer.jsx';
 import ChangeUsername from '../../containers/tw-change-username.jsx';
 import CloudVariablesToggler from '../../containers/tw-cloud-toggler.jsx';
-import TWRestorePointLoader from '../../containers/tw-restore-point-loader.jsx';
 import TWSaveStatus from './tw-save-status.jsx';
 
-import {openTipsLibrary, openSettingsModal} from '../../reducers/modals';
+import {openTipsLibrary, openSettingsModal, openRestorePointModal} from '../../reducers/modals';
 import {setPlayer} from '../../reducers/mode';
 import {
     autoUpdateProject,
@@ -205,6 +204,7 @@ class MenuBar extends React.Component {
             'handleClickSave',
             'handleClickSaveAsCopy',
             'handleClickPackager',
+            'handleClickRestorePoints',
             'handleClickSeeCommunity',
             'handleClickShare',
             'handleKeyPress',
@@ -249,6 +249,10 @@ class MenuBar extends React.Component {
     }
     handleClickPackager () {
         this.props.onClickPackager();
+        this.props.onRequestCloseFile();
+    }
+    handleClickRestorePoints () {
+        this.props.onClickRestorePoints();
         this.props.onRequestCloseFile();
     }
     handleClickSeeCommunity (waitForUpdate) {
@@ -644,18 +648,13 @@ class MenuBar extends React.Component {
                                         </MenuSection>
                                     )}
                                     <MenuSection>
-                                        <TWRestorePointLoader>{(className, loadRestorePoint) => (
-                                            <MenuItem
-                                                className={className}
-                                                onClick={loadRestorePoint}
-                                            >
-                                                <FormattedMessage
-                                                    defaultMessage="Load restore point"
-                                                    description="Menu bar item for loading a restore point"
-                                                    id="tw.menuBar.loadRestorePoint"
-                                                />
-                                            </MenuItem>
-                                        )}</TWRestorePointLoader>
+                                        <MenuItem onClick={this.handleClickRestorePoints}>
+                                            <FormattedMessage
+                                                defaultMessage="Restore points"
+                                                description="Menu bar item to manage restore points"
+                                                id="tw.menuBar.restorePoints"
+                                            />
+                                        </MenuItem>
                                     </MenuSection>
                                 </MenuBarMenu>
                             </div>
@@ -963,6 +962,7 @@ MenuBar.propTypes = {
     onClickAddonSettings: PropTypes.func,
     onClickTheme: PropTypes.func,
     onClickPackager: PropTypes.func,
+    onClickRestorePoints: PropTypes.func,
     onClickEdit: PropTypes.func,
     onClickFile: PropTypes.func,
     onClickLanguage: PropTypes.func,
@@ -1061,6 +1061,7 @@ const mapDispatchToProps = dispatch => ({
     onClickRemix: () => dispatch(remixProject()),
     onClickSave: () => dispatch(manualUpdateProject()),
     onClickSaveAsCopy: () => dispatch(saveProjectAsCopy()),
+    onClickRestorePoints: () => dispatch(openRestorePointModal()),
     onClickSettings: () => {
         dispatch(openSettingsModal());
         dispatch(closeEditMenu());

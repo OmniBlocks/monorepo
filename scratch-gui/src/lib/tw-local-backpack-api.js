@@ -1,31 +1,12 @@
 import storage from './storage';
 import md5 from 'js-md5';
 import {soundThumbnail} from './backpack/sound-payload';
+import {arrayBufferToBase64, base64ToArrayBuffer} from './tw-base64-utils';
 
 // Special constants -- do not change without care.
 const DATABASE_NAME = 'TW_Backpack';
 const DATABASE_VERSION = 1;
 const STORE_NAME = 'backpack';
-
-const base64ToArrayBuffer = base64 => {
-    const binaryString = atob(base64);
-    const len = binaryString.length;
-    const array = new Uint8Array(len);
-    for (let i = 0; i < len; i++) {
-        array[i] = binaryString.charCodeAt(i);
-    }
-    return array.buffer;
-};
-
-const arrayBufferToBase64 = buffer => {
-    let binary = '';
-    const bytes = new Uint8Array(buffer);
-    const len = bytes.byteLength;
-    for (let i = 0; i < len; i++) {
-        binary += String.fromCharCode(bytes[i]);
-    }
-    return btoa(binary);
-};
 
 const idbItemToBackpackItem = item => {
     // convert id to string

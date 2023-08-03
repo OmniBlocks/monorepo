@@ -1,126 +1,578 @@
 import JSZip from 'jszip';
+import {base64ToArrayBuffer} from './tw-base64-utils';
 
-// Special constants -- do not change without care.
-const DATABASE_NAME = 'TW_AutoSave';
-const DATABASE_VERSION = 1;
-const STORE_NAME = 'project';
+const TYPE_AUTOMATIC = 0;
+const TYPE_MANUAL = 1;
 
-let _db;
+/**
+ * @typedef {0|1} MetadataType
+ */
 
+/**
+ * @typedef Metadata
+ * @property {string} title
+ * @property {number} created Unix seconds
+ * @property {Type} type
+ * @property {number} projectSize JSON size in bytes
+ * @property {number} thumbnailSize Thumbnail size in bytes
+ * @property {number} thumbnailWidth
+ * @property {number} thumbnailHeight
+ * @property {Record<string, number>} assets maps md5exts to size in bytes
+ */
+
+const DATABASE_NAME = 'TW_RestorePoints';
+const DATABASE_VERSION = 2;
+const METADATA_STORE = 'meta';
+const PROJECT_STORE = 'projects';
+const ASSET_STORE = 'assets';
+const THUMBNAIL_STORE = 'thumbnails';
+const ALL_STORES = [METADATA_STORE, PROJECT_STORE, ASSET_STORE, THUMBNAIL_STORE];
+
+const MAX_AUTOMATIC_RESTORE_POINTS = 5;
+
+/** @type {IDBDatabase|null} */
+let _cachedDB = null;
+
+/**
+ * @returns {Promise<IDBDatabase>} IDB database with all stores created.
+ */
 const openDB = () => {
-    if (_db) {
-        return _db;
+    if (_cachedDB) {
+        return Promise.resolve(_cachedDB);
     }
 
-    if (!window.indexedDB) {
-        throw new Error('indexedDB is not supported');
+    if (typeof indexedDB === 'undefined') {
+        return Promise.resolve(null);
     }
 
     return new Promise((resolve, reject) => {
         const request = indexedDB.open(DATABASE_NAME, DATABASE_VERSION);
 
-        request.onupgradeneeded = e => {
-            const db = e.target.result;
-            db.createObjectStore(STORE_NAME, {
-                keyPath: 'file'
+        request.onupgradeneeded = () => {
+            const db = request.result;
+            db.createObjectStore(METADATA_STORE, {
+                autoIncrement: true
             });
+            db.createObjectStore(PROJECT_STORE);
+            db.createObjectStore(ASSET_STORE);
+            db.createObjectStore(THUMBNAIL_STORE);
         };
 
-        request.onsuccess = e => {
-            _db = e.target.result;
-            resolve(_db);
+        request.onsuccess = () => {
+            _cachedDB = request.result;
+            resolve(request.result);
         };
 
         request.onerror = () => {
-            reject(new Error(`DB error: ${request.error}`));
+            reject(new Error(`Could not open database: ${request.error}`));
         };
     });
 };
 
 /**
- * Save a project to IDB.
- * @param {VirtualMachine} vm Scratch VM
+ * Converts a possibly unknown or corrupted object to a known-good metadata object.
+ * @param {Partial<Metadata>} obj Unknown object
+ * @returns {Metadata} Metadata object with ID
  */
-const save = async vm => {
-    // To save a project, we will get all the assets inside it and save them to IDB.
-    // We will not actually generate a zip as that is slow.
-    const files = vm.saveProjectSb3DontZip();
-    const db = await openDB();
-    return new Promise((resolve, reject) => {
-        const transaction = db.transaction(STORE_NAME, 'readwrite');
-        transaction.onerror = () => {
-            reject(new Error(`Save transaction error: ${transaction.error}`));
-        };
+const parseMetadata = obj => {
+    // Must not throw -- always return the most salvageable object possible.
+    if (!obj || typeof obj !== 'object') {
+        obj = {};
+    }
 
-        // Remove unused assets and don't waste time updating assets that are already in IDB.
-        const exists = [];
-        const projectStore = transaction.objectStore(STORE_NAME);
-        const request = projectStore.openCursor();
-        request.onsuccess = e => {
-            const cursor = e.target.result;
-            if (cursor) {
-                const key = cursor.key;
-                if (files[key]) {
-                    exists.push(key);
-                } else {
+    obj.title = typeof obj.title === 'string' ? obj.title : '?';
+    obj.created = typeof obj.created === 'number' ? obj.created : 0;
+    obj.type = [TYPE_AUTOMATIC, TYPE_MANUAL].includes(obj.type) ? obj.type : 1;
+
+    obj.thumbnailSize = typeof obj.thumbnailSize === 'number' ? obj.thumbnailSize : 0;
+    obj.projectSize = typeof obj.projectSize === 'number' ? obj.projectSize : 0;
+
+    obj.thumbnailWidth = typeof obj.thumbnailWidth === 'number' ? obj.thumbnailWidth : 480;
+    obj.thumbnailHeight = typeof obj.thumbnailHeight === 'number' ? obj.thumbnailHeight : 360;
+
+    obj.assets = (obj.assets && typeof obj.assets === 'object') ? obj.assets : {};
+    for (const [asestId, size] of Object.entries(obj.assets)) {
+        if (typeof size !== 'number') {
+            delete obj.assets[asestId];
+        }
+    }
+
+    return obj;
+};
+
+/**
+ * @param {IDBObjectStore} objectStore IDB object store
+ * @param {Set<IDBValidKey>} keysToKeep IDB keys that should continue to exist. Type sensitive.
+ * @returns {Promise<void>} Resolves when unused items have been deleted
+ */
+const deleteUnknownKeys = (objectStore, keysToKeep) => new Promise(resolve => {
+    const keysRequest = objectStore.getAllKeys();
+    keysRequest.onsuccess = async () => {
+        const allKeys = keysRequest.result;
+
+        for (const key of allKeys) {
+            if (!keysToKeep.has(key)) {
+                await new Promise(innerResolve => {
+                    const deleteRequest = objectStore.delete(key);
+                    deleteRequest.onsuccess = () => {
+                        innerResolve();
+                    };
+                });
+            }
+        }
+
+        resolve();
+    };
+});
+
+/**
+ * @param {IDBTransaction} transaction readwrite transaction with access to all stores
+ * @returns {Promise<void>} Resolves when data has finished being removed.
+ */
+const removeExtraneousData = transaction => new Promise(resolve => {
+    const metadataStore = transaction.objectStore(METADATA_STORE);
+    const projectStore = transaction.objectStore(PROJECT_STORE);
+    const assetStore = transaction.objectStore(ASSET_STORE);
+    const thumbnailStore = transaction.objectStore(THUMBNAIL_STORE);
+
+    const requiredProjects = new Set();
+    const requiredAssetIDs = new Set();
+
+    const request = metadataStore.openCursor();
+    request.onsuccess = () => {
+        const cursor = request.result;
+        if (cursor) {
+            requiredProjects.add(cursor.key);
+            const metadata = parseMetadata(cursor.value);
+            for (const assetId of Object.keys(metadata.assets)) {
+                requiredAssetIDs.add(assetId);
+            }
+            cursor.continue();
+        } else {
+            deleteUnknownKeys(projectStore, requiredProjects)
+                .then(() => deleteUnknownKeys(assetStore, requiredAssetIDs))
+                .then(() => deleteUnknownKeys(thumbnailStore, requiredProjects))
+                .then(() => resolve());
+        }
+    };
+});
+
+/**
+ * @returns {Promise<void>} Resolves when extraneous restore points have been removed.
+ */
+const removeExtraneousRestorePoints = () => openDB().then(db => new Promise((resolveTransaction, rejectTransaction) => {
+    const transaction = db.transaction(ALL_STORES, 'readwrite');
+    transaction.onerror = () => {
+        rejectTransaction(new Error(`Transaction error: ${transaction.error}`));
+    };
+
+    let automaticCount = 0;
+
+    const metadataStore = transaction.objectStore(METADATA_STORE);
+    const getRequest = metadataStore.openCursor(null, 'prev');
+    getRequest.onsuccess = () => {
+        const cursor = getRequest.result;
+        if (cursor) {
+            const manifest = parseMetadata(cursor.value);
+            if (manifest.type === TYPE_AUTOMATIC) {
+                automaticCount++;
+                if (automaticCount > MAX_AUTOMATIC_RESTORE_POINTS) {
                     cursor.delete();
                 }
-                cursor.continue();
-            } else {
-                // Cursor is done, save all new files and project.json to IDB.
-                for (const file of Object.keys(files)) {
-                    if (file === 'project.json' || !exists.includes(file)) {
-                        projectStore.put({
-                            file,
-                            data: files[file].buffer
-                        });
-                    }
-                }
-
-                resolve();
             }
-        };
+            cursor.continue();
+        } else {
+            removeExtraneousData(transaction)
+                .then(() => resolveTransaction());
+        }
+    };
+}));
+
+// eslint-disable-next-line valid-jsdoc
+/**
+ * @param {VirtualMachine} vm scratch-vm instance
+ * @returns {Promise<{type: string; data: ArrayBuffer;}>} Thumbnail data
+ */
+const generateThumbnail = vm => new Promise(resolve => {
+    // Piggyback off of the next draw if we can, otherwise just force it to render
+    const drawTimeout = setTimeout(() => {
+        vm.renderer.draw();
+    }, 100);
+
+    vm.renderer.requestSnapshot(dataURL => {
+        clearTimeout(drawTimeout);
+
+        const index = dataURL.indexOf(',');
+        const base64 = dataURL.substring(index + 1);
+        const arrayBuffer = base64ToArrayBuffer(base64);
+        const type = 'image/png';
+        resolve({
+            type,
+            data: arrayBuffer
+        });
     });
-};
+});
 
 /**
- * Load a project from IDB.
- * @returns {Promise<ArrayBuffer>} sb3 project to load.
+ * @param {VirtualMachine} vm scratch-vm instance
+ * @param {string} title project title
+ * @param {MetadataType} type restore point type
+ * @returns {Promise<void>} resolves when the restore point is created
  */
-const load = async () => {
-    // To load a project, read the files from IDB and generate a .sb3
-    const db = await openDB();
-    return new Promise((resolve, reject) => {
-        const transaction = db.transaction(STORE_NAME, 'readonly');
+const createRestorePoint = (
+    vm,
+    title,
+    type
+) => openDB().then(db => new Promise((resolveTransaction, rejectTransaction) => {
+    /** @type {Record<string, Uint8Array>} */
+    const projectFiles = vm.saveProjectSb3DontZip();
+    const jsonData = projectFiles['project.json'];
+    const projectAssetIDs = Object.keys(projectFiles).filter(i => i !== 'project.json');
+    if (projectAssetIDs.length === 0) {
+        throw new Error('There are no assets in this project');
+    }
+
+    generateThumbnail(vm).then(thumbnailData => {
+        const transaction = db.transaction(ALL_STORES, 'readwrite');
         transaction.onerror = () => {
-            reject(new Error(`Load transaction error: ${transaction.error}`));
+            rejectTransaction(new Error(`Transaction error: ${transaction.error}`));
+        };
+
+        // Will be generated by database
+        /** @type {IDBValidKey} */
+        let generatedId = null;
+
+        const writeThumbnail = () => {
+            const thumbnailStore = transaction.objectStore(THUMBNAIL_STORE);
+            const request = thumbnailStore.add(thumbnailData, generatedId);
+            request.onsuccess = () => {
+                resolveTransaction();
+            };
+        };
+
+        const writeMissingAssets = async missingAssets => {
+            const assetStore = transaction.objectStore(ASSET_STORE);
+            for (const assetId of missingAssets) {
+                await new Promise(resolveAsset => {
+                    // TODO: should we insert arraybuffer or uint8array?
+                    const assetData = projectFiles[assetId];
+                    const request = assetStore.add(assetData, assetId);
+                    request.onsuccess = () => {
+                        resolveAsset();
+                    };
+                });
+            }
+
+            writeThumbnail();
+        };
+
+        const checkMissingAssets = () => {
+            const assetStore = transaction.objectStore(ASSET_STORE);
+            const keyRequest = assetStore.getAllKeys();
+            keyRequest.onsuccess = () => {
+                const savedAssets = keyRequest.result;
+                const missingAssets = projectAssetIDs.filter(assetId => !savedAssets.includes(assetId));
+                writeMissingAssets(missingAssets);
+            };
+        };
+
+        const writeProjectJSON = () => {
+            const projectStore = transaction.objectStore(PROJECT_STORE);
+            const request = projectStore.add(jsonData, generatedId);
+            request.onsuccess = () => {
+                checkMissingAssets();
+            };
+        };
+
+        const writeMetadata = () => {
+            const assetSizeData = {};
+            for (const assetId of projectAssetIDs) {
+                const assetData = projectFiles[assetId];
+                assetSizeData[assetId] = assetData.byteLength;
+            }
+
+            /** @type {Metadata} */
+            const metadata = {
+                title,
+                created: Math.round(Date.now() / 1000),
+                type,
+                projectSize: jsonData.byteLength,
+                thumbnailSize: thumbnailData.data.byteLength,
+                thumbnailWidth: vm.runtime.stageWidth,
+                thumbnailHeight: vm.runtime.stageHeight,
+                assets: assetSizeData
+            };
+
+            const metadataStore = transaction.objectStore(METADATA_STORE);
+            const request = metadataStore.add(metadata);
+            request.onsuccess = () => {
+                generatedId = request.result;
+                writeProjectJSON();
+            };
+        };
+
+        writeMetadata();
+    });
+}));
+
+/**
+ * @param {number} id the restore point's ID
+ * @returns {Promise<void>} Resovles when the restore point has been deleted.
+ */
+const deleteRestorePoint = id => openDB().then(db => new Promise((resolve, reject) => {
+    const transaction = db.transaction(ALL_STORES, 'readwrite');
+    transaction.onerror = () => {
+        reject(new Error(`Transaction error: ${transaction.error}`));
+    };
+
+    const metadataStore = transaction.objectStore(METADATA_STORE);
+    const request = metadataStore.delete(id);
+    request.onsuccess = () => {
+        removeExtraneousData(transaction)
+            .then(() => resolve());
+    };
+}));
+
+/**
+ * @returns {Promise<void>} Resolves when all data in the database has been deleted.
+ */
+const deleteAllRestorePoints = () => openDB().then(db => new Promise((resolveTransaction, rejectTransaction) => {
+    const transaction = db.transaction(ALL_STORES, 'readwrite');
+    transaction.onerror = () => {
+        rejectTransaction(new Error(`Transaction error: ${transaction.error}`));
+    };
+
+    const deleteEverything = async () => {
+        for (const storeName of ALL_STORES) {
+            await new Promise(resolve => {
+                const store = transaction.objectStore(storeName);
+                const request = store.clear();
+                request.onsuccess = () => {
+                    resolve();
+                };
+            });
+        }
+
+        resolveTransaction();
+    };
+
+    deleteEverything();
+}));
+
+/**
+ * @param {VirtualMachine} vm scratch-vm instance
+ * @param {number} id the restore point's ID
+ * @returns {Promise<ArrayBuffer>} Resolves with sb3 file
+ */
+const loadRestorePoint = (vm, id) => openDB().then(db => new Promise((resolveTransaction, rejectTransaction) => {
+    const transaction = db.transaction([METADATA_STORE, PROJECT_STORE, ASSET_STORE], 'readonly');
+    transaction.onerror = () => {
+        rejectTransaction(new Error(`Transaction error: ${transaction.error}`));
+    };
+
+    const zip = new JSZip();
+    /** @type {Metadata} */
+    let metadata;
+
+    // TODO: we should be able to use a custom scratch-storage helper to avoid putting the
+    // zip in memory.
+
+    const loadVM = () => {
+        resolveTransaction(
+            zip.generateAsync({
+                // Don't bother compressing it since it will be immediately decompressed
+                type: 'arraybuffer'
+            })
+                .then(sb3 => vm.loadProject(sb3))
+                .then(() => {
+                    setTimeout(() => {
+                        vm.renderer.draw();
+                    });
+                })
+        );
+    };
+
+    const loadAssets = async () => {
+        const assetStore = transaction.objectStore(ASSET_STORE);
+        for (const assetId of Object.keys(metadata.assets)) {
+            await new Promise(resolve => {
+                const request = assetStore.get(assetId);
+                request.onsuccess = () => {
+                    const data = request.result;
+                    zip.file(assetId, data);
+                    resolve();
+                };
+            });
+        }
+
+        loadVM();
+    };
+
+    const loadProjectJSON = () => {
+        const projectStore = transaction.objectStore(PROJECT_STORE);
+        const request = projectStore.get(id);
+        request.onsuccess = () => {
+            zip.file('project.json', request.result);
+            loadAssets();
+        };
+    };
+
+    const loadMetadata = () => {
+        const metadataStore = transaction.objectStore(METADATA_STORE);
+        const request = metadataStore.get(id);
+        request.onsuccess = () => {
+            metadata = parseMetadata(request.result);
+            loadProjectJSON();
+        };
+    };
+
+    vm.stop();
+
+    loadMetadata();
+}));
+
+// eslint-disable-next-line valid-jsdoc
+/**
+ * @returns {Promise<{totalSize: number; restorePoints: Array<Manifest & {id: number}>}>} Restore point information.
+ */
+const getAllRestorePoints = () => openDB().then(db => new Promise((resolve, reject) => {
+    const transaction = db.transaction([METADATA_STORE], 'readonly');
+    transaction.onerror = () => {
+        reject(new Error(`Transaction error: ${transaction.error}`));
+    };
+
+    /** @type {Metadata[]} */
+    const restorePoints = [];
+    /** @type {Set<string>} */
+    const countedAssets = new Set();
+    let totalSize = 0;
+
+    const metadataStore = transaction.objectStore(METADATA_STORE);
+    const request = metadataStore.openCursor(null, 'prev');
+    request.onsuccess = () => {
+        const cursor = request.result;
+        if (cursor) {
+            const parsed = parseMetadata(cursor.value);
+            parsed.id = cursor.key;
+            restorePoints.push(parsed);
+
+            totalSize += parsed.projectSize;
+            totalSize += parsed.thumbnailSize;
+            for (const [assetId, assetSize] of Object.entries(parsed.assets)) {
+                if (!countedAssets.has(assetId)) {
+                    countedAssets.add(assetId);
+                    totalSize += assetSize;
+                }
+            }
+
+            cursor.continue();
+        } else {
+            resolve({
+                totalSize,
+                restorePoints
+            });
+        }
+    };
+}));
+
+/**
+ * @param {number} id restore point's ID
+ * @returns {Promise<string>} The URL to load
+ */
+const getThumbnail = id => openDB().then(db => new Promise((resolve, reject) => {
+    const transaction = db.transaction([THUMBNAIL_STORE], 'readonly');
+    transaction.onerror = () => {
+        reject(new Error(`Transaction error: ${transaction.error}`));
+    };
+
+    const thumbnailStore = transaction.objectStore(THUMBNAIL_STORE);
+    const request = thumbnailStore.get(id);
+    request.onsuccess = () => {
+        const thumbnail = request.result;
+        if (!thumbnail) {
+            reject(new Error('No thumbnail found'));
+            return;
+        }
+
+        const blob = new Blob([thumbnail.data], {
+            type: thumbnail.type
+        });
+        const url = URL.createObjectURL(blob);
+        resolve(url);
+    };
+}));
+
+// We will enable this after a couple days
+/*
+const deleteLegacyData = () => {
+    try {
+        if (typeof indexedDB !== 'undefined') {
+            const _request = indexedDB.deleteDatabase('TW_AutoSave');
+            // don't really care what happens to the request at this point
+        }
+    } catch (e) {
+        // ignore
+    }
+};
+*/
+
+const loadLegacyRestorePoint = () => new Promise((resolve, reject) => {
+    if (typeof indexedDB === 'undefined') {
+        reject(new Error('indexedDB not supported'));
+        return;
+    }
+
+    const LEGACY_DATABASE_NAME = 'TW_AutoSave';
+    const LEGACY_DATABASE_VERSION = 1;
+    const LEGACY_STORE_NAME = 'project';
+
+    const openRequest = indexedDB.open(LEGACY_DATABASE_NAME, LEGACY_DATABASE_VERSION);
+    openRequest.onerror = () => {
+        reject(new Error(`Error opening DB: ${openRequest.error}`));
+    };
+    openRequest.onsuccess = () => {
+        const db = openRequest.result;
+        if (!db.objectStoreNames.contains(LEGACY_STORE_NAME)) {
+            reject(new Error('Object store does not exist'));
+            return;
+        }
+
+        const transaction = db.transaction(LEGACY_STORE_NAME, 'readonly');
+        transaction.onerror = () => {
+            reject(new Error(`Transaction error: ${transaction.error}`));
         };
 
         const zip = new JSZip();
-        const projectStore = transaction.objectStore(STORE_NAME);
-        const request = projectStore.openCursor();
-        request.onsuccess = e => {
-            const cursor = e.target.result;
+        const projectStore = transaction.objectStore(LEGACY_STORE_NAME);
+        const cursorRequest = projectStore.openCursor();
+        cursorRequest.onsuccess = () => {
+            const cursor = cursorRequest.result;
             if (cursor) {
                 zip.file(cursor.key, cursor.value.data);
                 cursor.continue();
             } else {
-                // Cursor is done, all files added to zip.
-                const hasJSON = zip.file('project.json');
+                const hasJSON = !!zip.file('project.json');
                 if (hasJSON) {
                     resolve(zip.generateAsync({
                         type: 'arraybuffer'
-                        // No reason to compress this zip.
                     }));
                 } else {
-                    reject(new Error('Could not find project'));
+                    reject(new Error('Could not find project.json'));
                 }
             }
         };
-    });
-};
+    };
+});
 
 export default {
-    save,
-    load
+    TYPE_AUTOMATIC,
+    TYPE_MANUAL,
+    getAllRestorePoints,
+    createRestorePoint,
+    removeExtraneousRestorePoints,
+    deleteRestorePoint,
+    deleteAllRestorePoints,
+    getThumbnail,
+    loadRestorePoint,
+    loadLegacyRestorePoint
 };

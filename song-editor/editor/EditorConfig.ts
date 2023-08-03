@@ -32,8 +32,7 @@ export class EditorConfig {
     public static readonly ctrlSymbol: string = EditorConfig.isOnMac ? "⌘" : "Ctrl+";
     public static readonly ctrlName: string = EditorConfig.isOnMac ? "command" : "control";
 
-    public static customSamples;
-	//is this how you do it????
+    public static customSamples: string[];
 	
     public static readonly presetCategories: DictionaryArray<PresetCategory> = toNameMap([
         {

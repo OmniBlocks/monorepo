@@ -109,15 +109,21 @@
     appearance: none;
     background: none;
     border: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     border-radius: 100%;
     width: 2rem;
     height: 2rem;
-    font-size: 2rem;
-    line-height: 1;
     margin-left: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.delete-button img {
+    display: block;
+    width: 75%;
+    height: 75%;
+}
+[theme="dark"] .delete-button img {
+    filter: invert(100%);
 }
 .delete-button:hover {
     background-color: $ui-black-transparent;

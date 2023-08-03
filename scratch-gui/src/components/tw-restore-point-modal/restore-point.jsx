@@ -6,6 +6,7 @@ import styles from './restore-point-modal.css';
 import {formatBytes} from '../../lib/tw-bytes-utils';
 import RestorePointAPI from '../../lib/tw-restore-point-api';
 import log from '../../lib/log';
+import deleteIcon from './delete.svg';
 
 // Browser support is not perfect yet
 const relativeTimeSupported = () => typeof Intl !== 'undefined' && typeof Intl.RelativeTimeFormat !== 'undefined';
@@ -131,7 +132,7 @@ class RestorePoint extends React.Component {
                     className={styles.deleteButton}
                     onClick={this.handleClickDelete}
                 >
-                    {'\xd7'}
+                    <img src={deleteIcon} />
                 </button>
             </div>
         );

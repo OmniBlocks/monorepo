@@ -10,8 +10,8 @@ import { ColorConfig, ChannelColors } from "./ColorConfig";
 import { CustomChipPrompt } from "./CustomChipPrompt";
 import { CustomFilterPrompt } from "./CustomFilterPrompt";
 import { EditorConfig, isMobile, prettyNumber, Preset, PresetCategory } from "./EditorConfig";
-import { EuclidgenRhythmPrompt } from "./EuclideanRhythmPrompt";
-//is this correct????
+import { AddExternalPrompt } from "./AddExternalPrompt";
+import { EuclideanRhythmPrompt } from "./EuclidgenRhythmPrompt";
 import { ExportPrompt } from "./ExportPrompt";
 import "./Layout"; // Imported here for the sake of ensuring this code is transpiled early.
 import { Instrument, Channel, Synth } from "../synth/synth";
@@ -43,7 +43,7 @@ import { SpectrumEditor } from "./SpectrumEditor";
 import { CustomPrompt } from "./CustomPrompt";
 import { ThemePrompt } from "./ThemePrompt";
 import { TipPrompt } from "./TipPrompt";
-import { ChangeTempo, ChangeChorus, ChangeEchoDelay, ChangeEchoSustain, ChangeReverb, ChangeVolume, ChangePan, ChangePatternSelection, ChangePatternsPerChannel, ChangePatternNumbers, ChangePulseWidth, ChangeFeedbackAmplitude, ChangeOperatorAmplitude, ChangeOperatorFrequency, ChangeDrumsetEnvelope, ChangePasteInstrument, ChangePreset, pickRandomPresetValue, ChangeRandomGeneratedInstrument, ChangeEQFilterType, ChangeNoteFilterType, ChangeEQFilterSimpleCut, ChangeEQFilterSimplePeak, ChangeNoteFilterSimpleCut, ChangeNoteFilterSimplePeak, ChangeScale, ChangeDetectKey, ChangeKey, ChangeRhythm, ChangeFeedbackType, ChangeAlgorithm, ChangeChipWave, ChangeNoiseWave, ChangeTransition, ChangeToggleEffects, ChangeVibrato, ChangeUnison, ChangeChord, ChangeSong, ChangePitchShift, ChangeDetune, ChangeDistortion, ChangeStringSustain, ChangeBitcrusherFreq, ChangeBitcrusherQuantization, ChangeAddEnvelope, ChangeAddChannelInstrument, ChangeRemoveChannelInstrument, ChangeCustomWave, ChangeOperatorWaveform, ChangeOperatorPulseWidth, ChangeSongTitle, ChangeVibratoDepth, ChangeVibratoSpeed, ChangeVibratoDelay, ChangeVibratoType, ChangePanDelay, ChangeArpeggioSpeed, ChangeFastTwoNoteArp, ChangeClicklessTransition, ChangeAliasing } from "./changes";
+import { ChangeTempo, ChangeChorus, ChangeEchoDelay, ChangeEchoSustain, ChangeReverb, ChangeVolume, ChangePan, ChangePatternSelection, ChangePatternsPerChannel, ChangePatternNumbers, ChangePulseWidth, ChangeFeedbackAmplitude, ChangeOperatorAmplitude, ChangeOperatorFrequency, ChangeDrumsetEnvelope, ChangePasteInstrument, ChangePreset, pickRandomPresetValue, ChangeRandomGeneratedInstrument, ChangeEQFilterType, ChangeNoteFilterType, ChangeEQFilterSimpleCut, ChangeEQFilterSimplePeak, ChangeNoteFilterSimpleCut, ChangeNoteFilterSimplePeak, ChangeScale, ChangeDetectKey, ChangeKey, ChangeRhythm, ChangeFeedbackType, ChangeAlgorithm, ChangeChipWave, ChangeNoiseWave, ChangeTransition, ChangeToggleEffects, ChangeVibrato, ChangeUnison, ChangeChord, ChangeSong, ChangePitchShift, ChangeDetune, ChangeDistortion, ChangeStringSustain, ChangeBitcrusherFreq, ChangeBitcrusherQuantization, ChangeAddEnvelope, ChangeAddChannelInstrument, ChangeRemoveChannelInstrument, ChangeCustomWave, ChangeOperatorWaveform, ChangeOperatorPulseWidth, ChangeSongTitle, ChangeVibratoDepth, ChangeVibratoSpeed, ChangeVibratoDelay, ChangeVibratoType, ChangePanDelay, ChangeArpeggioSpeed, ChangeFastTwoNoteArp, ChangeClicklessTransition, ChangeAliasing, ChangeChipWavePlayBackwards, ChangeChipWaveStartOffset, ChangeChipWaveLoopEnd, ChangeChipWaveLoopStart, ChangeChipWaveLoopMode, ChangeChipWaveUseAdvancedLoopControls } from "./changes";
 import { Change6OpFeedbackType, Change6OpAlgorithm, ChangeCustomAlgorythmorFeedback} from "./changes"
 
 import { TrackEditor } from "./TrackEditor";
@@ -819,6 +819,12 @@ export class SongEditor {
 	//are these supposed to be readonly?????
 	private readonly _chipWaveSelectRow: HTMLDivElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("chipWave") }, "Wave: "), div({ class: "selectContainer" }, this._chipWaveSelect));
     private readonly _chipNoiseSelectRow: HTMLDivElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("chipNoise") }, "Noise: "), div({ class: "selectContainer" }, this._chipNoiseSelect));
+    private readonly _useChipWaveAdvancedLoopControlsRow: HTMLDivElement = div({ class: "selectRow" }, span({ class: "tip", style: "flex-shrink: 0;", onclick: () => this._openPrompt("loopControls") }, "Loop Controls: "), this._useChipWaveAdvancedLoopControlsBox);
+    private readonly _chipWaveLoopModeSelectRow = div({ class: "selectRow" }, span({ class: "tip", style: "font-size: x-small;", onclick: () => this._openPrompt("loopMode") }, "Loop Mode: "), div({ class: "selectContainer" }, this._chipWaveLoopModeSelect));
+    private readonly _chipWaveLoopStartRow = div({ class: "selectRow" }, span({ class: "tip", style: "font-size: x-small;", onclick: () => this._openPrompt("loopStart") }, "Loop Start: "), span({ style: "display: flex;" }, this._chipWaveLoopStartStepper));
+    private readonly _chipWaveLoopEndRow = div({ class: "selectRow" }, span({ class: "tip", style: "font-size: x-small;", onclick: () => this._openPrompt("loopEnd") }, "Loop End: "), span({ style: "display: flex;" }, this._chipWaveLoopEndStepper, this._setChipWaveLoopEndToEndButton));
+    private readonly _chipWaveStartOffsetRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("offset") }, "Offset: "), span({ style: "display: flex;" }, this._chipWaveStartOffsetStepper));
+    private readonly _chipWavePlayBackwardsRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("backwards") }, "Backwards: "), this._chipWavePlayBackwardsBox);
     private readonly _fadeInOutEditor: FadeInOutEditor = new FadeInOutEditor(this._doc);
     private readonly _fadeInOutRow: HTMLElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("fadeInOut") }, "Fade:"), this._fadeInOutEditor.container);
     private readonly _transitionSelect: HTMLSelectElement = buildOptions(select(), Config.transitions.map(transition => transition.name));
@@ -1802,7 +1808,7 @@ export class SongEditor {
                         this.prompt = new EuclideanRhythmPrompt(this._doc);
                         break;
 		case "custom":
-                        this.prompt = new CustomPrompt(this._doc, this._patternEditor, this._trackArea, beepboxEditorContainer);
+                        this.prompt = new CustomPrompt(this._doc, this._patternEditor, this._trackArea, document.getElementById("beepboxEditorContainer")!);
                         break;
                 default:
                     this.prompt = new TipPrompt(this._doc, promptName);
@@ -2119,7 +2125,6 @@ export class SongEditor {
 		    						 // advloop addition
                         this._useChipWaveAdvancedLoopControlsBox.checked = instrument.isUsingAdvancedLoopControls ? true : false;
                         setSelectedValue(this._chipWaveLoopModeSelect, instrument.chipWaveLoopMode);
-                        const chipWaveLength = Config.rawRawChipWaves[instrument.chipWave].samples.length;
                         this._chipWaveLoopStartStepper.value = instrument.chipWaveLoopStart + "";
                         // this._chipWaveLoopStartStepper.max = (chipWaveLength - 1) + "";
                         this._chipWaveLoopEndStepper.value = instrument.chipWaveLoopEnd + "";
@@ -4195,19 +4200,10 @@ export class SongEditor {
                 this._doc.record(new ChangeChipWaveLoopMode(this._doc, this._chipWaveLoopModeSelect.selectedIndex));
             }
            private _whenSetChipWaveLoopStart = (): void => {
-                const channel = this._doc.song.channels[this._doc.channel];
-                const instrument = channel.instruments[this._doc.getCurrentInstrument()];
-                const chipWave = Config.rawRawChipWaves[instrument.chipWave];
-                const chipWaveLength = chipWave.samples.length;
-                const chipWaveLoopEnd = instrument.chipWaveLoopEnd;
                 // this._doc.record(new ChangeChipWaveLoopStart(this._doc, Math.max(0, Math.min(chipWaveLoopEnd - 1, parseInt(this._chipWaveLoopStartStepper.value)))));
                 this._doc.record(new ChangeChipWaveLoopStart(this._doc, parseInt(this._chipWaveLoopStartStepper.value)));
             }
             private _whenSetChipWaveLoopEnd = (): void => {
-                const channel = this._doc.song.channels[this._doc.channel];
-                const instrument = channel.instruments[this._doc.getCurrentInstrument()];
-                const chipWave = Config.rawRawChipWaves[instrument.chipWave];
-                const chipWaveLength = chipWave.samples.length;
                 // this._doc.record(new ChangeChipWaveLoopEnd(this._doc, Math.max(0, Math.min(chipWaveLength - 1, parseInt(this._chipWaveLoopEndStepper.value)))));
                 this._doc.record(new ChangeChipWaveLoopEnd(this._doc, parseInt(this._chipWaveLoopEndStepper.value)));
             }
@@ -4219,10 +4215,6 @@ export class SongEditor {
                 this._doc.record(new ChangeChipWaveLoopEnd(this._doc, chipWaveLength - 1));
             }
             private _whenSetChipWaveStartOffset = (): void => {
-                const channel = this._doc.song.channels[this._doc.channel];
-                const instrument = channel.instruments[this._doc.getCurrentInstrument()];
-                const chipWave = Config.rawRawChipWaves[instrument.chipWave];
-                const chipWaveLength = chipWave.samples.length;
                 // this._doc.record(new ChangeChipWaveStartOffset(this._doc, Math.max(0, Math.min(chipWaveLength - 1, parseInt(this._chipWaveStartOffsetStepper.value)))));
                 this._doc.record(new ChangeChipWaveStartOffset(this._doc, parseInt(this._chipWaveStartOffsetStepper.value)));
             }

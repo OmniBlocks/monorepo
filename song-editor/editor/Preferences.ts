@@ -5,6 +5,8 @@ import {Scale, Config} from "../synth/SynthConfig";
 export class Preferences {
 	public static readonly defaultVisibleOctaves: number = 3;
 	
+	public customTheme: string | null;
+	public customTheme2: string | null;
 	public autoPlay: boolean;
 	public autoFollow: boolean;
 	public enableNotePreview: boolean;
@@ -102,8 +104,8 @@ export class Preferences {
 		window.localStorage.setItem("keyboardLayout", this.keyboardLayout);
 		window.localStorage.setItem("layout", this.layout);
 		window.localStorage.setItem("colorTheme", this.colorTheme);
-		window.localStorage.setItem("customTheme", this.customTheme);
-                window.localStorage.setItem("customTheme2", this.customTheme2);
+		window.localStorage.setItem("customTheme", this.customTheme!);
+                window.localStorage.setItem("customTheme2", this.customTheme2!);
 		window.localStorage.setItem("volume", String(this.volume));
 		window.localStorage.setItem("visibleOctaves", String(this.visibleOctaves));
 	}

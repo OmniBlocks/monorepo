@@ -123,20 +123,23 @@ const RestorePointModal = props => (
             )}
 
             {!props.isLoading && (
-                <div className={styles.legacyTransition}>
+                <details className={styles.legacyTransition}>
                     {/* This is going away within a few days */}
                     {/* No reason to bother translating */}
-                    <span>
+                    <summary>
+                        {'Don\'t see your project?'}
+                    </summary>
+                    <p>
                         {/* eslint-disable-next-line max-len */}
-                        {'We just rewrote restore points from the ground up. If you can\'t find your project in the list, try loading the old restore point:'}
-                    </span>
+                        {`If a restore point was made by an older version of ${APP_NAME}, it may not appear in the list. Please try clicking this button:`}
+                    </p>
                     <button
                         className={classNames(styles.button, styles.loadLegacyButton)}
                         onClick={props.onClickLoadLegacy}
                     >
-                        {'Load'}
+                        {'Load Legacy Restore Point'}
                     </button>
-                </div>
+                </details>
             )}
         </div>
     </Modal>

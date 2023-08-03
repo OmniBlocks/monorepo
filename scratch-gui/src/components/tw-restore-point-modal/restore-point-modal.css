@@ -117,16 +117,16 @@
 }
 
 .legacy-transition {
-    display: flex;
-    justify-content: space-between;
     padding: 0.5rem;
     border-radius: 0.5rem;
     background-color: rgba(128, 0, 128, 0.18);
     border: 2px solid rgba(128, 0, 128, 0.568);
-    text-align: center;
+}
+.legacy-transition summary {
+    display: list-item;
     font-weight: bold;
+    cursor: pointer;
 }
 .load-legacy-button {
-    margin-left: 1rem;
     background-color: $pen-primary;
 }

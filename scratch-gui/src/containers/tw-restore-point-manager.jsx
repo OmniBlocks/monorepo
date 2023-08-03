@@ -199,6 +199,9 @@ class TWRestorePointManager extends React.Component {
                     this.props.vm.renderer.draw();
                 });
                 this._finishLoading(true);
+
+                // Immediately migrate to new format
+                this.createRestorePoint(RestorePointAPI.TYPE_AUTOMATIC);
             })
             .catch(error => {
                 this.handleLoadError(error);

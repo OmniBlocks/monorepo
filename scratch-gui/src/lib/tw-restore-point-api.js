@@ -533,7 +533,7 @@ const loadLegacyRestorePoint = () => new Promise((resolve, reject) => {
     openRequest.onsuccess = () => {
         const db = openRequest.result;
         if (!db.objectStoreNames.contains(LEGACY_STORE_NAME)) {
-            reject(new Error('Object store does not exist'));
+            reject(new Error('Could not find local database for legacy restore point'));
             return;
         }
 

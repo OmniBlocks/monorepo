@@ -26,8 +26,8 @@ The source code is available under the MIT license. The code is written in
 build this project, open a command line and run:
 
 ```
-git clone https://github.com/jummbus/jummbox.git
-cd jummbox
+git clone https://github.com/ultraabox/ultrabox_typescript
+cd ultrabox_typescript
 npm install
 npm run build
 ```

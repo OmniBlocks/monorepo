@@ -132,7 +132,10 @@ class RestorePoint extends React.Component {
                     className={styles.deleteButton}
                     onClick={this.handleClickDelete}
                 >
-                    <img src={deleteIcon} />
+                    <img
+                        src={deleteIcon}
+                        alt="Delete"
+                    />
                 </button>
             </div>
         );
@@ -145,8 +148,6 @@ RestorePoint.propTypes = {
     created: PropTypes.number.isRequired,
     projectSize: PropTypes.number.isRequired,
     thumbnailSize: PropTypes.number.isRequired,
-    thumbnailWidth: PropTypes.number.isRequired,
-    thumbnailHeight: PropTypes.number.isRequired,
     assets: PropTypes.shape({}).isRequired, // Record<string, number>
     onClickDelete: PropTypes.func.isRequired,
     onClickLoad: PropTypes.func.isRequired

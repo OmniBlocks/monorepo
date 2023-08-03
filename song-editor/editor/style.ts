@@ -277,7 +277,7 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 
 .beepboxEditor .track-area {
 	grid-area: track-area;
- background-image: url(${localStorage.getItem('customTheme2') || 'https://media.istockphoto.com/videos/petals-sakura-cherry-blossom-falling-on-black-background-looped-video-id925176466?s=640x640'})
+ background-image: url(${localStorage.getItem('customTheme2')})
 }
 
 .beepboxEditor .loopEditor {

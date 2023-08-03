@@ -25,6 +25,7 @@ interface HistoryState {
 }
 
 export class SongDocument {
+	public colorTheme: string;
 	public song: Song;
 	public synth: Synth;
 	public performance: SongPerformance;

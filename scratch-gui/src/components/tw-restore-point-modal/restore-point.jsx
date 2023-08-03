@@ -5,6 +5,7 @@ import bindAll from 'lodash.bindall';
 import styles from './restore-point-modal.css';
 import {formatBytes} from '../../lib/tw-bytes-utils';
 import RestorePointAPI from '../../lib/tw-restore-point-api';
+import log from '../../lib/log';
 
 // Browser support is not perfect yet
 const relativeTimeSupported = () => typeof Intl !== 'undefined' && typeof Intl.RelativeTimeFormat !== 'undefined';
@@ -17,7 +18,8 @@ class RestorePoint extends React.Component {
             'handleClickLoad'
         ]);
         this.state = {
-            thumbnail: null
+            thumbnail: null,
+            error: false
         };
         this.unmounted = false;
 
@@ -33,6 +35,14 @@ class RestorePoint extends React.Component {
                 } else {
                     this.setState({
                         thumbnail: url
+                    });
+                }
+            })
+            .catch(error => {
+                log.error(error);
+                if (!this.unmounted) {
+                    this.setState({
+                        error: true
                     });
                 }
             });
@@ -71,15 +81,20 @@ class RestorePoint extends React.Component {
                 className={styles.restorePoint}
                 onClick={this.handleClickLoad}
             >
-                <img
-                    className={styles.restorePointThumbnail}
-                    src={this.state.thumbnail}
-                    // This sets the image's aspect ratio. CSS is responsible for figuring out how to size it.
-                    width={this.props.thumbnailWidth}
-                    height={this.props.thumbnailHeight}
-                />
+                <div className={styles.thumbnailContainer}>
+                    {this.state.error ? (
+                        <span className={styles.thumbnailPlaceholder}>
+                            {'?'}
+                        </span>
+                    ) : this.state.thumbnail ? (
+                        <img
+                            className={styles.thumbnailImage}
+                            src={this.state.thumbnail}
+                        />
+                    ) : null}
+                </div>
 
-                <div className={styles.restorePointDetails}>
+                <div>
                     <div className={styles.restorePointTitle}>
                         {this.props.title}
                     </div>
@@ -103,7 +118,7 @@ class RestorePoint extends React.Component {
                         <FormattedMessage
                             defaultMessage="{n} assets"
                             // eslint-disable-next-line max-len
-                            description="Describes how many assets (costumes and images) are in a restore poins. {n} is replaced with a number like 406"
+                            description="Describes how many assets (costumes and images) are in a restore point. {n} is replaced with a number like 406"
                             id="tw.restorePoints.assets"
                             values={{
                                 n: Object.keys(this.props.assets).length

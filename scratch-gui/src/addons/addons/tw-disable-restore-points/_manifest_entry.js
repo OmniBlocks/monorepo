@@ -2,7 +2,7 @@
 const manifest = {
   "noTranslations": true,
   "name": "Disable restore points",
-  "description": "Disables all restore point creation. Be careful.",
+  "description": "Disable automatic restore point creation. Does not delete existing restore points.",
   "userscripts": [
     {
       "url": "userscript.js"

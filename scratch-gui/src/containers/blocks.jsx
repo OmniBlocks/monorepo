@@ -4,6 +4,7 @@ import defaultsDeep from 'lodash.defaultsdeep';
 import makeToolboxXML from '../lib/make-toolbox-xml';
 import PropTypes from 'prop-types';
 import React from 'react';
+import {intlShape, injectIntl, defineMessages} from 'react-intl';
 import VMScratchBlocks from '../lib/blocks';
 import VM from 'scratch-vm';
 
@@ -38,6 +39,34 @@ import {
     activateTab,
     SOUNDS_TAB_INDEX
 } from '../reducers/editor-tab';
+
+// TW: Strings we add to scratch-blocks are localized here
+const messages = defineMessages({
+    PROCEDURES_RETURN: {
+        defaultMessage: 'return {v}',
+        // eslint-disable-next-line max-len
+        description: 'The name of the "return" block from the Custom Reporters extension. {v} is replaced with a slot to insert a value.',
+        id: 'tw.blocks.PROCEDURES_RETURN'
+    },
+    PROCEDURES_TO_REPORTER: {
+        defaultMessage: 'Change To Reporter',
+        // eslint-disable-next-line max-len
+        description: 'Context menu item to change a command-shaped custom block into a reporter. Part of the Custom Reporters extension.',
+        id: 'tw.blocks.PROCEDURES_TO_REPORTER'
+    },
+    PROCEDURES_TO_STATEMENT: {
+        defaultMessage: 'Change To Statement',
+        // eslint-disable-next-line max-len
+        description: 'Context menu item to change a reporter-shaped custom block into a statement/command. Part of the Custom Reporters extension.',
+        id: 'tw.blocks.PROCEDURES_TO_STATEMENT'
+    },
+    PROCEDURES_DOCS: {
+        defaultMessage: 'How to use return',
+        // eslint-disable-next-line max-len
+        description: 'Button in extension list to learn how to use the "return" block from the Custom Reporters extension.',
+        id: 'tw.blocks.PROCEDURES_DOCS'
+    }
+});
 
 const addFunctionListener = (object, property, callback) => {
     const oldFn = object[property];
@@ -107,6 +136,14 @@ class Blocks extends React.Component {
         this.ScratchBlocks.FieldColourSlider.activateEyedropper_ = this.props.onActivateColorPicker;
         this.ScratchBlocks.Procedures.externalProcedureDefCallback = this.props.onActivateCustomProcedures;
         this.ScratchBlocks.ScratchMsgs.setLocale(this.props.locale);
+
+        const Msg = this.ScratchBlocks.Msg;
+        Msg.PROCEDURES_RETURN = this.props.intl.formatMessage(messages.PROCEDURES_RETURN, {
+            v: '%1'
+        });
+        Msg.PROCEDURES_TO_REPORTER = this.props.intl.formatMessage(messages.PROCEDURES_TO_REPORTER);
+        Msg.PROCEDURES_TO_STATEMENT = this.props.intl.formatMessage(messages.PROCEDURES_TO_STATEMENT);
+        Msg.PROCEDURES_DOCS = this.props.intl.formatMessage(messages.PROCEDURES_DOCS);
 
         const workspaceConfig = defaultsDeep({},
             Blocks.defaultOptions,
@@ -644,6 +681,7 @@ class Blocks extends React.Component {
 }
 
 Blocks.propTypes = {
+    intl: intlShape,
     anyModalVisible: PropTypes.bool,
     canUseCloud: PropTypes.bool,
     customStageSize: PropTypes.shape({
@@ -769,9 +807,9 @@ const mapDispatchToProps = dispatch => ({
     }
 });
 
-export default errorBoundaryHOC('Blocks')(
+export default injectIntl(errorBoundaryHOC('Blocks')(
     connect(
         mapStateToProps,
         mapDispatchToProps
     )(LoadScratchBlocksHOC(Blocks))
-);
+));

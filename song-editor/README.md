@@ -2,9 +2,9 @@
 
 UltraBox is an online tool for sketching and sharing instrumental music.
 You can find it [here](https://ultraabox.github.io).
-It is a modification of Goldbox, which is a modifcation of, JummBox which inturn is a modifcation of the [original BeepBox](https://beepbox.co).
+It is a modification of Goldbox, which itself is a modification of JummBox, which inturn is a modification of the [original BeepBox](https://beepbox.co).
 
-The primary goal of UltraBox is to combine every beepbox mod into one.
+The goal of UltraBox is to combine every single beepbox mod into one. Feel free to contribute!
 
 
 All song data is packaged into the URL at the top of your browser. When you make
@@ -23,7 +23,7 @@ The compilation procedure is identical to the repository for BeepBox. I will inc
 The source code is available under the MIT license. The code is written in
 [TypeScript](https://www.typescriptlang.org/), which requires
 [node & npm](https://www.npmjs.com/get-npm), so install those first. Then to
-build this project, open git bash and run:
+build this project, open a command line and run:
 
 ```
 git clone https://github.com/jummbus/jummbox.git

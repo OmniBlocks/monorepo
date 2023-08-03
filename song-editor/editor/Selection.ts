@@ -1,7 +1,7 @@
 // Copyright (c) 2012-2022 John Nesky and contributing authors, distributed under the MIT license, see accompanying the LICENSE.md file.
 
 import { Dictionary, Config } from "../synth/SynthConfig";
-import { Note, Pattern } from "../synth/synth";
+import { Note, NotePin, Pattern } from "../synth/synth";
 import { SongDocument } from "./SongDocument";
 import { ChangeGroup } from "./Change";
 import { ColorConfig } from "./ColorConfig";
@@ -337,52 +337,50 @@ export class Selection {
         new ChangePatternSelection(this._doc, 0, 0);
     }
 
-		public remapToNoisePitches(oldPitches): void {
-          let newPitches = oldPitches.slice();
+		public remapToNoisePitches(oldPitches: number[]): number[] {
+          let newPitches: number[] = oldPitches.slice();
             // There may be some very "pleasing" way to place these,
            // but I'm not sure it's worth the effort.
-            newPitches.sort(function (a, b) { return a - b; });
-            let lowestPitch = newPitches[0] % Config.drumCount;
-            const numberOfPitches = newPitches.length;
-            let highestPitch = lowestPitch + (numberOfPitches - 1);
+            newPitches.sort(function (a: number, b: number): number { return a - b; });
+            let lowestPitch: number = newPitches[0] % Config.drumCount;
+            const numberOfPitches: number = newPitches.length;
+            let highestPitch: number = lowestPitch + (numberOfPitches - 1);
             while (highestPitch >= Config.drumCount) {
                 lowestPitch--;
                 highestPitch--;
             }
-            for (let notePitchIndex = 0; notePitchIndex < newPitches.length; notePitchIndex++) {
+            for (let notePitchIndex: number = 0; notePitchIndex < newPitches.length; notePitchIndex++) {
                 newPitches[notePitchIndex] = notePitchIndex + lowestPitch;
            }
            return newPitches;
         }
-        convertCopiedPitchNotesToNoiseNotes(oldNotes) {
+        convertCopiedPitchNotesToNoiseNotes(oldNotes: Note[]): Note[] {
             // When pasting from a pitch channel to a noise channel,
             // we may have pitches beyond what a noise channel supports.
-            let newNotes = [];
-            for (let noteIndex = 0; noteIndex < oldNotes.length; noteIndex++) {
-                const oldNote = oldNotes[noteIndex];
-                const newNotePitches = this.remapToNoisePitches(oldNote["pitches"].slice());
-                const oldNotePins = oldNote["pins"];
-                let newNotePins = [];
-                for (let notePinIndex = 0; notePinIndex < oldNotePins.length; notePinIndex++) {
-                    const oldPin = oldNotePins[notePinIndex];
+            let newNotes: Note[] = [];
+            for (let noteIndex: number = 0; noteIndex < oldNotes.length; noteIndex++) {
+                const oldNote: Note = oldNotes[noteIndex];
+                const newNotePitches: number[] = this.remapToNoisePitches(oldNote["pitches"].slice());
+                const oldNotePins: NotePin[] = oldNote.pins;
+                let newNotePins: NotePin[] = [];
+                for (let notePinIndex: number = 0; notePinIndex < oldNotePins.length; notePinIndex++) {
+                    const oldPin: NotePin = oldNotePins[notePinIndex];
                     // This should match the NotePin interface.
                    newNotePins.push({
-                       interval: oldPin["interval"],
-                        time: oldPin["time"],
-                        size: oldPin["size"],
+                       interval: oldPin.interval,
+                        time: oldPin.time,
+                        size: oldPin.size,
                     });
                 }
-                const newNoteStart = oldNote["start"];
-                const newNoteEnd = oldNote["end"];
-                const newNoteContinuesLastPattern = oldNote["continuesLastPattern"];
+                const newNoteStart: number = oldNote["start"];
+                const newNoteEnd: number = oldNote["end"];
+                const newNoteContinuesLastPattern: boolean = oldNote["continuesLastPattern"];
                 // This should match the Note class.
-                newNotes.push({
-                    pitches: newNotePitches,
-                    pins: newNotePins,
-                    start: newNoteStart,
-                    end: newNoteEnd,
-                    continuesLastPattern: newNoteContinuesLastPattern,
-                });
+                const newNote = new Note(0, newNoteStart, newNoteEnd, 0, false);
+                newNote.pitches = newNotePitches;
+                newNote.pins = newNotePins;
+                newNote.continuesLastPattern = newNoteContinuesLastPattern;
+                newNotes.push(newNote);
             }
             return newNotes;
         }
@@ -406,8 +404,6 @@ export class Selection {
             const channelCopy: ChannelCopy = channelCopies[pasteChannel % channelCopies.length];
             const channelIndex: number = this.boxSelectionChannel + pasteChannel;
                const channelIsNoise = this._doc.song.getChannelIsNoise(channelIndex);
-                const channelIsMod = this._doc.song.getChannelIsMod(channelIndex);
-                const channelIsPitch = !channelIsNoise && !channelIsMod;
 		
             const isNoise: boolean = !!channelCopy["isNoise"];
             const isMod: boolean = !!channelCopy["isMod"];

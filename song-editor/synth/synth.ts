@@ -1,10 +1,10 @@
 // Copyright (c) 2012-2022 John Nesky and contributing authors, distributed under the MIT license, see accompanying the LICENSE.md file.
 
-import { Dictionary, DictionaryArray, FilterType, EnvelopeType, InstrumentType, EffectType, EnvelopeComputeIndex, Transition, Unison, Chord, Vibrato, Envelope, AutomationTarget, Config, getDrumWave, drawNoiseSpectrum, getArpeggioPitchIndex, performIntegralOld, getPulseWidthRatio, effectsIncludeTransition, effectsIncludeChord, effectsIncludePitchShift, effectsIncludeDetune, effectsIncludeVibrato, effectsIncludeNoteFilter, effectsIncludeDistortion, effectsIncludeBitcrusher, effectsIncludePanning, effectsIncludeChorus, effectsIncludeEcho, effectsIncludeReverb, OperatorWave } from "./SynthConfig";
-import { EditorConfig } from "../editor/EditorConfig";
+import { startLoadingSample, loadBuiltInSamples, Dictionary, DictionaryArray, toNameMap, FilterType, EnvelopeType, InstrumentType, EffectType, EnvelopeComputeIndex, Transition, Unison, Chord, Vibrato, Envelope, AutomationTarget, Config, getDrumWave, drawNoiseSpectrum, getArpeggioPitchIndex, performIntegralOld, getPulseWidthRatio, effectsIncludeTransition, effectsIncludeChord, effectsIncludePitchShift, effectsIncludeDetune, effectsIncludeVibrato, effectsIncludeNoteFilter, effectsIncludeDistortion, effectsIncludeBitcrusher, effectsIncludePanning, effectsIncludeChorus, effectsIncludeEcho, effectsIncludeReverb, OperatorWave } from "./SynthConfig";
+import { Preset, EditorConfig } from "../editor/EditorConfig";
 import { scaleElementsByFactor, inverseRealFourierTransform } from "./FFT";
 import { Deque } from "./Deque";
-import { events } from "../global/events";
+import { events } from "../global/Events";
 import { FilterCoefficients, FrequencyResponse, DynamicBiquadFilter } from "./filtering";
 
 declare global {
@@ -2132,11 +2132,11 @@ export class Instrument {
 
         if (this.type == InstrumentType.chip) {
             const legacyWaveNames: Dictionary<number> = { "triangle": 1, "square": 2, "pulse wide": 3, "pulse narrow": 4, "sawtooth": 5, "double saw": 6, "double pulse": 7, "spiky": 8, "plateau": 0 };
-           				 const modboxWaveNames = { "10% pulse": 22, "sunsoft bass": 23, "loud pulse": 24, "sax": 25, "guitar": 26, "atari bass": 28, "atari pulse": 29, "1% pulse": 30, "curved sawtooth": 31, "viola": 32, "brass": 33, "acoustic bass": 34, "lyre": 35, "ramp pulse": 36, "piccolo": 37, "squaretooth": 38, "flatline": 39, "pnryshk a (u5)": 40, "pnryshk b (riff)": 41 };
-             	 const sandboxWaveNames = { "shrill lute": 42, "shrill bass": 44, "nes pulse": 45, "saw bass": 46, "euphonium": 47, "shrill pulse": 48, "r-sawtooth": 49, "recorder": 50, "narrow saw": 51, "deep square": 52, "ring pulse": 53, "double sine": 54, "contrabass": 55, "double bass": 56 };
-			 const zefboxWaveNames = {"semi-square": 63, "deep square": 64, "squaretal": 40, "saw wide": 65, "saw narrow ": 66, "deep sawtooth": 67, "sawtal": 68, "pulse": 69, "triple pulse": 70, "high pulse": 71,"deep pulse": 72 };
-			 const miscWaveNames = {"test1": 56, "pokey 4bit lfsr": 57, "pokey 5step bass": 58, "isolated spiky": 59, "unnamed 1": 60, "unnamed 2": 61, "guitar string": 75, "intense": 76, "buzz wave": 77, "pokey square": 57, "pokey bass": 58, "banana wave": 83, "test 1": 84, "test 2": 84, "real snare": 85, "earthbound o. guitar": 86 };
-			 const paandorasboxWaveNames = {"kick": 87, "snare": 88, "piano1": 89, "WOW": 90, "overdrive": 91, "trumpet": 92, "saxophone": 93, "orchestrahit": 94, "detached violin": 95, "synth": 96, "sonic3snare": 97, "come on": 98, "choir": 99, "overdriveguitar": 100, "legato violin": 102, "tremolo violin": 103, "amen break": 104, "pizzicato violin": 105, "tim allen grunt": 106, "tuba": 107, "loopingcymbal": 108, "standardkick": 109, "standardsnare": 110, "closedhihat": 111, "foothihat": 112, "openhihat": 113, "crashcymbal": 114, "pianoC4": 115, "liver pad": 116, "marimba": 117, "susdotwav": 118, "wackyboxtts": 119};
+           				 const modboxWaveNames: Dictionary<number> = { "10% pulse": 22, "sunsoft bass": 23, "loud pulse": 24, "sax": 25, "guitar": 26, "atari bass": 28, "atari pulse": 29, "1% pulse": 30, "curved sawtooth": 31, "viola": 32, "brass": 33, "acoustic bass": 34, "lyre": 35, "ramp pulse": 36, "piccolo": 37, "squaretooth": 38, "flatline": 39, "pnryshk a (u5)": 40, "pnryshk b (riff)": 41 };
+             	 const sandboxWaveNames: Dictionary<number> = { "shrill lute": 42, "shrill bass": 44, "nes pulse": 45, "saw bass": 46, "euphonium": 47, "shrill pulse": 48, "r-sawtooth": 49, "recorder": 50, "narrow saw": 51, "deep square": 52, "ring pulse": 53, "double sine": 54, "contrabass": 55, "double bass": 56 };
+			 const zefboxWaveNames: Dictionary<number> = {"semi-square": 63, "deep square": 64, "squaretal": 40, "saw wide": 65, "saw narrow ": 66, "deep sawtooth": 67, "sawtal": 68, "pulse": 69, "triple pulse": 70, "high pulse": 71,"deep pulse": 72 };
+			 const miscWaveNames: Dictionary<number> = {"test1": 56, "pokey 4bit lfsr": 57, "pokey 5step bass": 58, "isolated spiky": 59, "unnamed 1": 60, "unnamed 2": 61, "guitar string": 75, "intense": 76, "buzz wave": 77, "pokey square": 57, "pokey bass": 58, "banana wave": 83, "test 1": 84, "test 2": 84, "real snare": 85, "earthbound o. guitar": 86 };
+			 const paandorasboxWaveNames: Dictionary<number> = {"kick": 87, "snare": 88, "piano1": 89, "WOW": 90, "overdrive": 91, "trumpet": 92, "saxophone": 93, "orchestrahit": 94, "detached violin": 95, "synth": 96, "sonic3snare": 97, "come on": 98, "choir": 99, "overdriveguitar": 100, "legato violin": 102, "tremolo violin": 103, "amen break": 104, "pizzicato violin": 105, "tim allen grunt": 106, "tuba": 107, "loopingcymbal": 108, "standardkick": 109, "standardsnare": 110, "closedhihat": 111, "foothihat": 112, "openhihat": 113, "crashcymbal": 114, "pianoC4": 115, "liver pad": 116, "marimba": 117, "susdotwav": 118, "wackyboxtts": 119};
 			// const paandorasbetaWaveNames = {"contrabass": 55, "double bass": 56 };
 		//this.chipWave = legacyWaveNames[instrumentObject["wave"]] != undefined ? legacyWaveNames[instrumentObject["wave"]] : Config.chipWaves.findIndex(wave => wave.name == instrumentObject["wave"]);
             this.chipWave = legacyWaveNames[instrumentObject["wave"]] != undefined ? legacyWaveNames[instrumentObject["wave"]] : modboxWaveNames[instrumentObject["wave"]] != undefined ? modboxWaveNames[instrumentObject["wave"]] : sandboxWaveNames[instrumentObject["wave"]] != undefined ? sandboxWaveNames[instrumentObject["wave"]] : zefboxWaveNames[instrumentObject["wave"]] != undefined ? zefboxWaveNames[instrumentObject["wave"]] : miscWaveNames[instrumentObject["wave"]] != undefined ? miscWaveNames[instrumentObject["wave"]] : paandorasboxWaveNames[instrumentObject["wave"]] != undefined ? paandorasboxWaveNames[instrumentObject["wave"]] : Config.chipWaves.findIndex(wave => wave.name == instrumentObject["wave"]); 
@@ -3275,7 +3275,7 @@ export class Song {
 			// advloop addition
             // I don't think this will be the final serialization code.
             buffer.push(121 /* lowercase y */);
-            function encode32BitNumber(x) {
+            function encode32BitNumber(x: number): void {
                 // 0b11_
                 buffer.push(base64IntToCharCode[(x >>> (6 * 5)) & 0x3]);
                 //      111111_
@@ -3293,11 +3293,17 @@ export class Song {
             for (let channelIndex = 0; channelIndex < this.getChannelCount(); channelIndex++) {
                 for (let i = 0; i < this.channels[channelIndex].instruments.length; i++) {
                     const instrument = this.channels[channelIndex].instruments[i];
-                    let storedInfo = {};
+                    let storedInfo: {
+                        isUsingAdvancedLoopControls?: boolean;
+                        chipWaveLoopStart?: number;
+                        chipWaveLoopEnd?: number;
+                        chipWaveLoopMode?: number;
+                        chipWavePlayBackwards?: boolean;
+                        chipWaveStartOffset?: number;
+                    } = {};
                     let isStoringSomething = false;
                     if (instrument.type === 0) {
                         const isUsingAdvancedLoopControls = instrument.isUsingAdvancedLoopControls;
-                        const chipWaveLength = Config.rawRawChipWaves[instrument.chipWave].samples.length;
                         const chipWaveLoopStart = instrument.chipWaveLoopStart;
                         const chipWaveLoopEnd = instrument.chipWaveLoopEnd;
                         const chipWaveLoopMode = instrument.chipWaveLoopMode;
@@ -3363,12 +3369,14 @@ export class Song {
         }
 	    compressed = compressed.replaceAll("%7C", "|")
             var compressed_array = compressed.split("|");
-            compressed = compressed_array.shift();
+            compressed = compressed_array.shift()!;
             if(EditorConfig.customSamples == null || EditorConfig.customSamples.join(", ") != compressed_array.join(", ")) {
             
                 let willLoadLegacySamples = false;
+                let willLoadNintariboxSamples = false;
+                let willLoadMarioPaintboxSamples = false;
                 const customSampleUrls = [];
-                const customSamplePresets = [];
+                const customSamplePresets: Preset[] = [];
                 const defaultIndex = 0;
                 const defaultIntegratedSamples = Config.chipWaves[defaultIndex].samples;
                 const defaultSamples = Config.rawRawChipWaves[defaultIndex].samples;
@@ -3377,36 +3385,30 @@ export class Song {
                         if (!willLoadLegacySamples) {
                             willLoadLegacySamples = true;
                             customSampleUrls.push(url);
-                            
 							loadBuiltInSamples(0);
-						
                         }
                     } 
-					//else if (url.toLowerCase() === "nintariboxsamples") {
-                        //if (!willLoadLegacySamples) {
-                           // willLoadLegacySamples = true;
-                            //customSampleUrls.push(url);
-                            
-							//loadBuiltInSamples(1);
-						
-                        //}
-                    //}
-					//else if (url.toLowerCase() === "mariopaintboxsamples") {
-                        //if (!willLoadLegacySamples) {
-                           // willLoadLegacySamples = true;
-                            //customSampleUrls.push(url);
-                            
-							//loadBuiltInSamples(2);
-						
-                        //}
-                    //}
+					else if (url.toLowerCase() === "nintariboxsamples") {
+                        if (!willLoadNintariboxSamples) {
+                            willLoadNintariboxSamples = true;
+                            customSampleUrls.push(url);
+							loadBuiltInSamples(1);
+                        }
+                    }
+					else if (url.toLowerCase() === "mariopaintboxsamples") {
+                        if (!willLoadMarioPaintboxSamples) {
+                            willLoadMarioPaintboxSamples = true;
+                            customSampleUrls.push(url);
+							loadBuiltInSamples(2);
+                        }
+                    }
 					
 					else {
                         customSampleUrls.push(url);
                         // This depends on `Config.chipWaves` being the same
                         // length as `Config.rawRawChipWaves`.
                         const chipWaveIndex = Config.chipWaves.length;
-						function isProperUrl(string) {
+						function isProperUrl(string: string): boolean {
 							try { 
 								return Boolean(new URL(string)); 
 							}
@@ -3497,6 +3499,7 @@ export class Song {
 								index: chipWaveIndex,
 							};
 							customSamplePresets.push({
+                                index: customSamplePresets.length,
 								name: name,
 								midiProgram: 80,
 								settings: {
@@ -3526,9 +3529,10 @@ export class Song {
                     EditorConfig.customSamples = customSampleUrls;
                 }
                 if (customSamplePresets.length > 0) {
+                    const customSamplePresetsMap: DictionaryArray<Preset> = toNameMap(customSamplePresets);
                     EditorConfig.presetCategories[EditorConfig.presetCategories.length] = {
                         name: "Custom Sample Presets",
-                        presets: customSamplePresets,
+                        presets: customSamplePresetsMap,
                         index: EditorConfig.presetCategories.length,
                     };
 					// EditorConfig.presetCategories.splice(1, 0, {
@@ -3942,7 +3946,7 @@ export class Song {
 							const chipWaveForCompat = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
 							if ((chipWaveForCompat + 62) > 85) {
 								if (document.URL.substring(document.URL.length - 13).toLowerCase() != "legacysamples") {
-									document.location = document.URL.concat("|legacysamples");
+									document.location.href = document.URL.concat("|legacysamples");
 									location.reload();
 									//loadBuiltInSamples(0);
 									//run the loadBuiltInSamples function so it doesn't have to reload
@@ -3986,7 +3990,18 @@ export class Song {
                             const sampleLoopInfoEncodedLength = decode32BitNumber();
                             const sampleLoopInfoEncoded = compressed.slice(charIndex, charIndex + sampleLoopInfoEncodedLength);
                             charIndex += sampleLoopInfoEncodedLength;
-                            const sampleLoopInfo = JSON.parse(atob(sampleLoopInfoEncoded));
+                            const sampleLoopInfo: {
+                                channel: number;
+                                instrument: number;
+                                info: {
+                                    isUsingAdvancedLoopControls: boolean;
+                                    chipWaveLoopStart: number;
+                                    chipWaveLoopEnd: number;
+                                    chipWaveLoopMode: number;
+                                    chipWavePlayBackwards: boolean;
+                                    chipWaveStartOffset: number;
+                                };
+                            }[] = JSON.parse(atob(sampleLoopInfoEncoded));
                             // console.log("loading:", sampleLoopInfo);
                             for (const entry of sampleLoopInfo) {
                                 const channelIndex = entry["channel"];
@@ -4004,7 +4019,7 @@ export class Song {
 					
 						else if (fromGoldBox && !beforeFour && beforeSix) {
 							if (document.URL.substring(document.URL.length - 13).toLowerCase() != "legacysamples") {
-									document.location = document.URL.concat("|legacysamples");
+									document.location.href = document.URL.concat("|legacysamples");
 									location.reload();
 									//loadBuiltInSamples(0);
 									//run the loadBuiltInSamples function so it doesn't have to reload
@@ -6190,8 +6205,8 @@ class Tone {
     public readonly operatorWaves: OperatorWave[] = [];
     public readonly phaseDeltas: number[] = [];
 			// advloop addition
-        public directions = [];
-        public chipWaveCompletions = [];
+        public directions: number[] = [];
+        public chipWaveCompletions: boolean[] = [];
            // advloop addition
     public readonly phaseDeltaScales: number[] = [];
     public expression: number = 0.0;
@@ -8985,19 +9000,19 @@ export class Synth {
                 baseExpression = Config.chipBaseExpression;
 				if (Config.chipWaves[instrument.chipWave].isCustomSampled) {
 					if (Config.chipWaves[instrument.chipWave].isPercussion){
-						basePitch = -84.37 + Math.log2(Config.chipWaves[instrument.chipWave].samples.length/Config.chipWaves[instrument.chipWave].sampleRate) * -12 - (-60 + Config.chipWaves[instrument.chipWave].rootKey);
+						basePitch = -84.37 + Math.log2(Config.chipWaves[instrument.chipWave].samples.length/Config.chipWaves[instrument.chipWave].sampleRate!) * -12 - (-60 + Config.chipWaves[instrument.chipWave].rootKey!);
 					}
 					
 					else {
-						basePitch += -96.37 + Math.log2(Config.chipWaves[instrument.chipWave].samples.length/Config.chipWaves[instrument.chipWave].sampleRate) * -12 - (-60 + Config.chipWaves[instrument.chipWave].rootKey); 
+						basePitch += -96.37 + Math.log2(Config.chipWaves[instrument.chipWave].samples.length/Config.chipWaves[instrument.chipWave].sampleRate!) * -12 - (-60 + Config.chipWaves[instrument.chipWave].rootKey!); 
 					}
 				}
 				else {
 					if (Config.chipWaves[instrument.chipWave].isSampled && !Config.chipWaves[instrument.chipWave].isPercussion) {
-						basePitch = basePitch - 63 + Config.chipWaves[instrument.chipWave].extraSampleDetune
+						basePitch = basePitch - 63 + Config.chipWaves[instrument.chipWave].extraSampleDetune!
 					}
 					else if (Config.chipWaves[instrument.chipWave].isSampled && Config.chipWaves[instrument.chipWave].isPercussion) {
-					basePitch = -51 + Config.chipWaves[instrument.chipWave].extraSampleDetune
+					basePitch = -51 + Config.chipWaves[instrument.chipWave].extraSampleDetune!;
 					}
 				}
             } else if (instrument.type == InstrumentType.customChipWave) {
@@ -9721,7 +9736,6 @@ export class Synth {
             return Synth.fmSynthFunctionCache[fingerprint];
         } else if (instrument.type == InstrumentType.chip) {
 		                 // advloop addition
-                const chipWaveLength = Config.rawRawChipWaves[instrument.chipWave].samples.length;
                 if (instrument.isUsingAdvancedLoopControls) {
                     return Synth.loopableChipSynth;
                 }
@@ -9798,14 +9812,10 @@ export class Synth {
         }
     }
 // advloop addition
-        static wrap(x, b) {
+        static wrap(x: number, b: number): number {
             return (x % b + b) % b;
         }
-        static wrap2(x, a, b) {
-            const n = b - a;
-            return ((x - a) % n + n) % n + a;
-        }
-        static loopableChipSynth(synth, bufferIndex, roundedSamplesPerTick, tone, instrumentState) {
+        static loopableChipSynth(synth: Synth, bufferIndex: number, roundedSamplesPerTick: number, tone: Tone, instrumentState: InstrumentState): void {
             // @TODO:
             // - Add another loop mode to be used when the tone is released.
             //   "Rel. Mode"?
@@ -9825,46 +9835,44 @@ export class Synth {
             //   When determining this automatically is difficult (or the input
             //   samples are expected to vary too much), this is left up to the
             //   user.
-            const aliases = (effectsIncludeDistortion(instrumentState.effects) && instrumentState.aliases);
+            const aliases: boolean = (effectsIncludeDistortion(instrumentState.effects) && instrumentState.aliases);
             // const aliases = false;
-            const data = synth.tempMonoInstrumentSampleBuffer;
-            const wave = instrumentState.wave;
-            const volumeScale = instrumentState.volumeScale;
-            const waveLength = (aliases && instrumentState.type == 8) ? wave.length : wave.length - 1;
-            const chipWaveStartOffset = Math.max(0, Math.min(waveLength - 1, instrumentState.chipWaveStartOffset));
-            let chipWaveLoopEnd = Math.max(0, Math.min(waveLength, instrumentState.chipWaveLoopEnd));
-            let chipWaveLoopStart = Math.max(0, Math.min(chipWaveLoopEnd - 1, instrumentState.chipWaveLoopStart));
+            const data: Float32Array = synth.tempMonoInstrumentSampleBuffer!;
+            const wave: Float32Array = instrumentState.wave!;
+            const volumeScale: number = instrumentState.volumeScale;
+            const waveLength: number = (aliases && instrumentState.type == 8) ? wave.length : wave.length - 1;
+            let chipWaveLoopEnd: number = Math.max(0, Math.min(waveLength, instrumentState.chipWaveLoopEnd));
+            let chipWaveLoopStart: number = Math.max(0, Math.min(chipWaveLoopEnd - 1, instrumentState.chipWaveLoopStart));
 			// @TODO: This is where to set things up for the release loop mode.
            // const ticksSinceReleased = tone.ticksSinceReleased;
             // if (ticksSinceReleased > 0) {
             //     chipWaveLoopStart = 0;
             //     chipWaveLoopEnd = waveLength - 1;
             // }
-            let chipWaveLoopLength = chipWaveLoopEnd - chipWaveLoopStart;
+            let chipWaveLoopLength: number = chipWaveLoopEnd - chipWaveLoopStart;
 			if (chipWaveLoopLength < 2) {
                 chipWaveLoopStart = 0;
                 chipWaveLoopEnd = waveLength;
                 chipWaveLoopLength = waveLength;
             }
-            const chipWaveLoopMode = instrumentState.chipWaveLoopMode;
-            const chipWavePlayBackwards = instrumentState.chipWavePlayBackwards;
-            const unisonSign = tone.specialIntervalExpressionMult * instrumentState.unison.sign;
-            if (instrumentState.unison.voices == 1 && !instrumentState.chord.customInterval)
+            const chipWaveLoopMode: number = instrumentState.chipWaveLoopMode;
+            const unisonSign: number = tone.specialIntervalExpressionMult * instrumentState.unison!.sign;
+            if (instrumentState.unison!.voices == 1 && !instrumentState.chord!.customInterval)
                 tone.phases[1] = tone.phases[0];
-            let phaseDeltaA = tone.phaseDeltas[0] * waveLength;
-            let phaseDeltaB = tone.phaseDeltas[1] * waveLength;
-            let directionA = tone.directions[0];
-            let directionB = tone.directions[1];
-            let chipWaveCompletionA = tone.chipWaveCompletions[0];
-            let chipWaveCompletionB = tone.chipWaveCompletions[1];
-            const phaseDeltaScaleA = +tone.phaseDeltaScales[0];
-            const phaseDeltaScaleB = +tone.phaseDeltaScales[1];
-            let expression = +tone.expression;
-            const expressionDelta = +tone.expressionDelta;
-            let phaseA = Synth.wrap(tone.phases[0], 1) * waveLength;
-            let phaseB = Synth.wrap(tone.phases[1], 1) * waveLength;
-            let prevWaveIntegralA = 0;
-            let prevWaveIntegralB = 0;
+            let phaseDeltaA: number = tone.phaseDeltas[0] * waveLength;
+            let phaseDeltaB: number = tone.phaseDeltas[1] * waveLength;
+            let directionA: number = tone.directions[0];
+            let directionB: number = tone.directions[1];
+            let chipWaveCompletionA: boolean = tone.chipWaveCompletions[0];
+            let chipWaveCompletionB: boolean = tone.chipWaveCompletions[1];
+            const phaseDeltaScaleA: number = +tone.phaseDeltaScales[0];
+            const phaseDeltaScaleB: number = +tone.phaseDeltaScales[1];
+            let expression: number = +tone.expression;
+            const expressionDelta: number = +tone.expressionDelta;
+            let phaseA: number = Synth.wrap(tone.phases[0], 1) * waveLength;
+            let phaseB: number = Synth.wrap(tone.phases[1], 1) * waveLength;
+            let prevWaveIntegralA: number = 0;
+            let prevWaveIntegralB: number = 0;
             if (!aliases) {
                 const phaseAInt = Math.floor(phaseA);
                 const phaseBInt = Math.floor(phaseB);
@@ -9878,16 +9886,14 @@ export class Synth {
                 prevWaveIntegralB += (wave[Synth.wrap(indexB + 1, waveLength)] - prevWaveIntegralB) * phaseRatioB;
            }
             const filters = tone.noteFilters;
-            const filterCount = tone.noteFilterCount | 0;
-            let initialFilterInput1 = +tone.initialNoteFilterInput1;
-            let initialFilterInput2 = +tone.initialNoteFilterInput2;
-            const applyFilters = Synth.applyFilters;
-            const stopIndex = bufferIndex + roundedSamplesPerTick;
-            for (let sampleIndex = bufferIndex; sampleIndex < stopIndex; sampleIndex++) {
+            const filterCount: number = tone.noteFilterCount | 0;
+            let initialFilterInput1: number = +tone.initialNoteFilterInput1;
+            let initialFilterInput2: number = +tone.initialNoteFilterInput2;
+            const applyFilters: Function = Synth.applyFilters;
+            const stopIndex: number = bufferIndex + roundedSamplesPerTick;
+            for (let sampleIndex: number = bufferIndex; sampleIndex < stopIndex; sampleIndex++) {
                 if (chipWaveCompletionA && chipWaveCompletionB) break;
-               let wrapped = 0;
-			   const prevPhaseA = phaseA;
-                const prevPhaseB = phaseB;
+               let wrapped: number = 0;
                 phaseA += phaseDeltaA * directionA;
                 phaseB += phaseDeltaB * directionB;
                 if (chipWaveLoopMode === 2) {

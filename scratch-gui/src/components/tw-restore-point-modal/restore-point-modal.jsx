@@ -97,14 +97,25 @@ const RestorePointModal = props => (
 
                     <div className={styles.extraContainer}>
                         <div className={styles.totalSize}>
-                            <FormattedMessage
-                                defaultMessage="Estimated storage used: {size}"
-                                description="Part of restore point modal describing amount of disk space used"
-                                id="tw.restorePoints.size"
-                                values={{
-                                    size: formatBytes(props.totalSize)
-                                }}
-                            />
+                            <div>
+                                <FormattedMessage
+                                    defaultMessage="Estimated storage used: {size}"
+                                    description="Part of restore point modal describing amount of disk space used"
+                                    id="tw.restorePoints.size"
+                                    values={{
+                                        size: formatBytes(props.totalSize)
+                                    }}
+                                />
+                            </div>
+                            <div className={styles.totalSizeDescription}>
+                                <FormattedMessage
+                                    // eslint-disable-next-line max-len
+                                    defaultMessage="Costumes or images used by multiple restore points are only stored once."
+                                    // eslint-disable-next-line max-len
+                                    description="Part of the restore point modal that explains why the total storage used is less than may be expected."
+                                    id="tw.restorePoints.size2"
+                                />
+                            </div>
                         </div>
 
                         <button

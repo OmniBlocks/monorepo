@@ -34,6 +34,9 @@
 .total-size {
 
 }
+.total-size-description {
+    font-size: small;
+}
 .button {
     font: inherit;
     color: inherit;
@@ -48,8 +51,9 @@
     opacity: 0.8;
 }
 .delete-all-button {
-    margin-left: auto;
+    margin-left: 1rem;
     background-color: $data-primary;
+    white-space: nowrap;
 }
 
 .error-message {

@@ -1,6 +1,6 @@
 {
     "ca": {
-        "tw.alerts.autosaving": "S'està creant un punt de restauració...",
+        "tw.alerts.creatingRestorePoint": "S'està creant un punt de restauració...",
         "tw.alerts.lostPeripheralConnection": "S'ha perdut la connexió a {extensionName}.",
         "tw.alerts.savedToDisk": "Desat al teu ordinador.",
         "tw.backpack.rename": "Nou nom:",
@@ -75,7 +75,6 @@
         "tw.menuBar.cloudOn": "Activa les variables al núvol",
         "tw.menuBar.cloudUnavailable": "Les variables al núvol no estan disponibles",
         "tw.menuBar.cloudUnavailableAlert": "No es poden utilitzar variables del núvol, probablement perquè heu obert l'editor.",
-        "tw.menuBar.loadRestorePoint": "Carregar punt de restauració",
         "tw.menuBar.moreSettings": "Configuració avançada",
         "tw.menuBar.newFramerate": "Nova velocitat de fotogrames:",
         "tw.menuBar.package": "Empaquetar projecte",
@@ -162,7 +161,7 @@
         "tw.webglModal.description": "Desafortunadament, sembla que el teu explorador o ordinador {webGlLink}. Aquesta tecnologia és necessària perquè aquest lloc web funcioni. Prova d'actualitzar el navegador i els controladors/drivers de gràfics o reinicieu l'ordinador."
     },
     "cs": {
-        "tw.alerts.autosaving": "Vytvářím bod obnovení...",
+        "tw.alerts.creatingRestorePoint": "Vytvářím bod obnovení...",
         "tw.alerts.savedToDisk": "Uloženo na váš počítač.",
         "tw.backpack.rename": "Nové jméno:",
         "tw.blocks.addons": "Doplňky",
@@ -210,7 +209,6 @@
         "tw.menuBar.cloudUnavailable": "Cloudové proměnné nejsou dostupné",
         "tw.menuBar.cloudUnavailableAlert": "Nelze použít cloudové proměnné, protože jste pravděpodobně otevřeli editor.",
         "tw.menuBar.compileError": "{sprite}:{error}",
-        "tw.menuBar.loadRestorePoint": "Načíst bod obnovení",
         "tw.menuBar.moreSettings": "Pokročilé nastavení",
         "tw.menuBar.newFramerate": "Nová snímková frekvence:",
         "tw.menuBar.reportError1": "Některé skripty se nemohly zkompilovat.",
@@ -261,7 +259,7 @@
         "tw.webglModal.description": "Bohužel to vypadá, že váš prohlížeč nebo počítač {webGlLink}. Tato technologie je potřebná pro tuto stránku. Zkuste aktualizovat váš prohlížeč a grafické ovladače, nebo restartujte počítač."
     },
     "de": {
-        "tw.alerts.autosaving": "Wiederherstellungspunkt wird erstellt...",
+        "tw.alerts.creatingRestorePoint": "Wiederherstellungspunkt wird erstellt...",
         "tw.alerts.lostPeripheralConnection": "Verbindung zu {extensionName} verloren.",
         "tw.alerts.savedToDisk": "Auf deinem Computer gespeichert.",
         "tw.backpack.rename": "Neuer Name:",
@@ -335,7 +333,6 @@
         "tw.menuBar.cloudOn": "Cloud-Variablen einschalten",
         "tw.menuBar.cloudUnavailable": "Cloud-Variablen sind nicht Verfügbar",
         "tw.menuBar.cloudUnavailableAlert": "Kann Cloud-Variablen nicht verwenden, wahrscheinlich, weil du den Editor geöffnet hast.",
-        "tw.menuBar.loadRestorePoint": "Wiederherstellungspunkt laden",
         "tw.menuBar.moreSettings": "Erweitert",
         "tw.menuBar.newFramerate": "Neue Framefrequenz:",
         "tw.menuBar.package": "Paketisieren",
@@ -415,7 +412,7 @@
         "tw.webglModal.description": "Leider sieht es aus, als würde dein Computer oder Browser {webGlLink}. Diese Technologie ist erforderlich, damit diese Seite funktioniert. Versuche, deinen Browser und deine Grafiktreiber zu aktualisieren, oder deinen Computer neu zu starten."
     },
     "es": {
-        "tw.alerts.autosaving": "Creando punto de restauración...",
+        "tw.alerts.creatingRestorePoint": "Creando punto de restauración...",
         "tw.alerts.lostPeripheralConnection": "Se perdió la conexión con {extensionName}.",
         "tw.alerts.savedToDisk": "Guardado a tu computadora.",
         "tw.backpack.rename": "Nuevo nombre:",
@@ -473,7 +470,6 @@
         "tw.menuBar.cloudOn": "Activar Variables en la Nube",
         "tw.menuBar.cloudUnavailable": "Variables en la Nube no Disponibles",
         "tw.menuBar.cloudUnavailableAlert": "No se pueden usar variables en la nube, probablemente porque abriste el editor.",
-        "tw.menuBar.loadRestorePoint": "Cargar punto de restauración",
         "tw.menuBar.moreSettings": "Ajustes Avanzados",
         "tw.menuBar.newFramerate": "Nuevo FPS:",
         "tw.menuBar.package": "Convertir proyecto",
@@ -552,7 +548,7 @@
         "tw.webglModal.description": "Desafortunadamente parece que tu navegador o computadora {webGlLink}. Esta tecnología se necesita para que funcione este sitio. Intente actualizar su navegador y drivers gráficos o reinicie su computadora."
     },
     "fr": {
-        "tw.alerts.autosaving": "Création d'un point de restauration…",
+        "tw.alerts.creatingRestorePoint": "Création d'un point de restauration…",
         "tw.alerts.lostPeripheralConnection": "Le périphérique {extensionName} vient d’être déconnecté.",
         "tw.alerts.savedToDisk": "Enregistré sur votre ordinateur.",
         "tw.backpack.rename": "Nouveau nom :",
@@ -600,7 +596,6 @@
         "tw.menuBar.cloudUnavailable": "Les variables cloud ne sont pas disponibles",
         "tw.menuBar.cloudUnavailableAlert": "Impossible d'utiliser les variables cloud, probablement parce que vous avez ouvert l'éditeur.",
         "tw.menuBar.compileError": "{sprite} : {error}",
-        "tw.menuBar.loadRestorePoint": "Restaurer à la dernière sauvegarde ",
         "tw.menuBar.moreSettings": "Paramètres Avancés",
         "tw.menuBar.newFramerate": "Nouveau ratio d'images par seconde :",
         "tw.menuBar.package": "Empaqueter le projet",
@@ -668,7 +663,7 @@
         "tw.webglModal.description": "Malheureusement, cela ressemble à votre navigateur ou à votre ordinateur{webGlLink}. Cette technologie est nécessaire au fonctionnement de ce site. Essayez de mettre à jour votre navigateur et vos pilotes graphiques ou de redémarrer votre ordinateur."
     },
     "he": {
-        "tw.alerts.autosaving": "ביצוע נקודת שחזור קוד",
+        "tw.alerts.creatingRestorePoint": "ביצוע נקודת שחזור קוד",
         "tw.alerts.savedToDisk": "הקובץ נשמר בהתקן שלך.",
         "tw.blocks.addons": "הרחבות",
         "tw.blocks.buttonIsDown": "[MOUSE_BUTTON]לחצן העכבר נלחץ?",
@@ -701,7 +696,6 @@
         "tw.menuBar.cloudUnavailable": "משתני שרת אינם זמינים",
         "tw.menuBar.cloudUnavailableAlert": "משתני שרת אינם זמינים. אתה כנראה משתמש בעורך הקוד.",
         "tw.menuBar.compileError": "{sprite}:{error}",
-        "tw.menuBar.loadRestorePoint": "טען את נקודת שחזור הקוד",
         "tw.menuBar.newFramerate": "קצב חדש של מסגרות לשנייה:",
         "tw.menuBar.reportError1": "לא ניתן היה להרכיב חלק מהקוד.",
         "tw.menuBar.reportError2": "יש שגיאה. אנא צור איתי קשר בנושא.",
@@ -718,7 +712,7 @@
         "tw.webglModal.description": "לרוע המזל, נראה כי דפדפן האינטרנט או המחשב שלך{webGlLink} . טכנולוגיה זו נדרשת כדי שהאתר הזה יפעל כהלכה. נסה לעדכן את דפדפן האינטרנט או מנהלי ההתקן הגרפיים שלך; או הפעל מחדש את המחשב שלך."
     },
     "hu": {
-        "tw.alerts.autosaving": "Helyreállítási pont készítése...",
+        "tw.alerts.creatingRestorePoint": "Helyreállítási pont készítése...",
         "tw.alerts.savedToDisk": "Mentve a számítógépre.",
         "tw.backpack.rename": "Új név:",
         "tw.blocks.addons": "Kiegészítők",
@@ -765,7 +759,6 @@
         "tw.menuBar.cloudOn": "Megosztott Változók engedélyezése",
         "tw.menuBar.cloudUnavailable": "Nem érhetőek el a Megosztott Változók",
         "tw.menuBar.cloudUnavailableAlert": "Nem használhatóak a megosztott változók, legvalószínűbben azért, mert megnyitottad a szerkesztőt.",
-        "tw.menuBar.loadRestorePoint": "Helyreállítási pont visszatöltése",
         "tw.menuBar.moreSettings": "Haladó Beállítások",
         "tw.menuBar.newFramerate": "Új képkockaarány:",
         "tw.menuBar.reportError1": "Néhány szkriptet nem sikerült lefordítani.",
@@ -819,7 +812,7 @@
         "tw.webglModal.description": "Sajnos úgy tűnik, hogy a böngészője vagy számítógépe {webGlLink}. Ez a technológia szükséges ezenaz oldal lefutásához."
     },
     "it": {
-        "tw.alerts.autosaving": "Creazione del punto di ripristino...",
+        "tw.alerts.creatingRestorePoint": "Creazione del punto di ripristino...",
         "tw.alerts.lostPeripheralConnection": "Persa la connessione a {extensionName}.",
         "tw.alerts.savedToDisk": "Salvato sul computer.",
         "tw.backpack.rename": "Nuovo nome:",
@@ -896,7 +889,6 @@
         "tw.menuBar.cloudOn": "Abilita Variabili Cloud",
         "tw.menuBar.cloudUnavailable": "Le Variabili Cloud non sono Disponibili",
         "tw.menuBar.cloudUnavailableAlert": "Impossibile usare le variabili cloud, probabilmente perché è stato aperto l'editor.",
-        "tw.menuBar.loadRestorePoint": "Carica il punto di ripristino",
         "tw.menuBar.moreSettings": "Impostazioni Avanzate",
         "tw.menuBar.newFramerate": "Nuovo framerate:",
         "tw.menuBar.package": "Crea pacchetto",
@@ -981,7 +973,7 @@
         "tw.webglModal.description": "Sembra che il tuo browser o il tuo computer non siano compatibili con {webGlLink}. Questa tecnologia è necessaria per poter usare questo sito. Prova ad aggiornare il tuo browser e i tuoi driver video o a riavviare il tuo computer."
     },
     "ja": {
-        "tw.alerts.autosaving": "復元しています…",
+        "tw.alerts.creatingRestorePoint": "復元しています…",
         "tw.alerts.lostPeripheralConnection": "{extensionName}との接続が切れました。",
         "tw.alerts.savedToDisk": "コンピューターに保存する",
         "tw.backpack.rename": "新しい名前:",
@@ -1050,7 +1042,6 @@
         "tw.menuBar.cloudOn": "クラウド変数を有効にする",
         "tw.menuBar.cloudUnavailable": "クラウド変数は使用できません",
         "tw.menuBar.cloudUnavailableAlert": "中を見たのでクラウド変数を使用できません。",
-        "tw.menuBar.loadRestorePoint": "前回のプロジェクトを復元する",
         "tw.menuBar.moreSettings": "高度な設定",
         "tw.menuBar.newFramerate": "新しいフレームレート:",
         "tw.menuBar.package": "プロジェクトをパッケージ化する",
@@ -1125,7 +1116,7 @@
         "tw.webglModal.description": "残念ながら、お使いのブラウザやコンピュータは{webGlLink}のようです。このサイトを実行するには、操作が必要です。お使いのブラウザやグラフィックドライバをアップデートするか、コンピュータを再起動してみてください。"
     },
     "ja-hira": {
-        "tw.alerts.autosaving": "ふくげんしています…",
+        "tw.alerts.creatingRestorePoint": "ふくげんしています…",
         "tw.alerts.savedToDisk": "コンピューターに保存(ほぞん)する",
         "tw.backpack.rename": "あたらしいなまえ : ",
         "tw.blocks.addons": "アドオン",
@@ -1171,7 +1162,6 @@
         "tw.menuBar.cloudOff": "クラウドへんすうをむこうにする",
         "tw.menuBar.cloudOn": "クラウドへんすうをゆうこうにする",
         "tw.menuBar.cloudUnavailable": "クラウドへんすうはつかえません",
-        "tw.menuBar.loadRestorePoint": "ぜんかいのプロジェクトをふくげんする",
         "tw.menuBar.moreSettings": "こうどなせってい",
         "tw.menuBar.newFramerate": "あたらしいフレームレート:",
         "tw.menuBar.package": "プロジェクトをパッケージにする",
@@ -1225,7 +1215,7 @@
         "tw.viewOnScratch": "Scratchでプロジェクトをみる"
     },
     "ko": {
-        "tw.alerts.autosaving": "복원 지점 생성 중...",
+        "tw.alerts.creatingRestorePoint": "복원 지점 생성 중...",
         "tw.alerts.lostPeripheralConnection": "{extensionName} 확장 기능과 연결이 끊어졌습니다.",
         "tw.alerts.savedToDisk": "컴퓨터에 저장되었습니다.",
         "tw.backpack.rename": "새로운 이름:",
@@ -1303,7 +1293,6 @@
         "tw.menuBar.cloudOn": "클라우드 변수 활성화",
         "tw.menuBar.cloudUnavailable": "클라우드 변수를 이용할 수 없습니다",
         "tw.menuBar.cloudUnavailableAlert": "에디터를 열었기 때문에 클라우드 변수를 사용할 수 없습니다.",
-        "tw.menuBar.loadRestorePoint": "복원 지점 불러오기",
         "tw.menuBar.moreSettings": "고급 설정",
         "tw.menuBar.newFramerate": "사용할 FPS:",
         "tw.menuBar.package": "프로젝트 패키징",
@@ -1391,7 +1380,7 @@
         "tw.webglModal.description": "당신의 브라우저나 컴퓨터가 {webGlLink}. 이 기술은 TurboWarp를 실행하기 위해 필요합니다. 당신의 브라우저와 그래픽 드라이버를 업데이트하거나 컴퓨터를 재시작하세요."
     },
     "lt": {
-        "tw.alerts.autosaving": "Atkuriamas atkūrimo taškas...",
+        "tw.alerts.creatingRestorePoint": "Atkuriamas atkūrimo taškas...",
         "tw.alerts.lostPeripheralConnection": "Prarastas {extensionName} ryšys.",
         "tw.alerts.savedToDisk": "Išsaugota į jūsų kompiuterį.",
         "tw.backpack.rename": "Naujas vardas:",
@@ -1441,7 +1430,6 @@
         "tw.menuBar.cloudOn": "Įjungti debesies kintamuosius",
         "tw.menuBar.cloudUnavailable": "Debesies kintamieji nepasiekiami",
         "tw.menuBar.cloudUnavailableAlert": "Negalite naudotis debesies kintamaisiais, tikriausia kad jūs įjungėte redaguotoją.",
-        "tw.menuBar.loadRestorePoint": "Užkrauti atkurimo tašką",
         "tw.menuBar.moreSettings": "Išplėstiniai nustatymai",
         "tw.menuBar.newFramerate": "Naujas kadrų per sekundę greitis:",
         "tw.menuBar.package": "Supakuoti projektą",
@@ -1571,7 +1559,7 @@
         "tw.viewOnScratch": "Se prosjektet på Scratch"
     },
     "nl": {
-        "tw.alerts.autosaving": "Herstelpunt aan het maken...",
+        "tw.alerts.creatingRestorePoint": "Herstelpunt aan het maken...",
         "tw.alerts.lostPeripheralConnection": "Verbinding verloren met {extensionName}.",
         "tw.alerts.savedToDisk": "Opgeslagen op je computer.",
         "tw.backpack.rename": "Nieuwe naam:",
@@ -1644,7 +1632,6 @@
         "tw.menuBar.cloudOn": "Cloudvariabelen Inschakelen",
         "tw.menuBar.cloudUnavailable": "Cloudvariabelen zijn niet Beschikbaar",
         "tw.menuBar.cloudUnavailableAlert": "Kan geen cloudvariabelen gebruiken, waarschijnlijk omdat je de editor hebt geopend.",
-        "tw.menuBar.loadRestorePoint": "Herstelpunt laden",
         "tw.menuBar.moreSettings": "Geavanceerde Instellingen",
         "tw.menuBar.newFramerate": "Nieuwe framerate:",
         "tw.menuBar.package": "Project packagen",
@@ -1730,7 +1717,7 @@
         "tw.webglModal.description": "Het ziet er helaas uit dat je browser of computer {webGlLink}. Deze technologie is vereist voor deze site om goed te werken. Probeer je browser en grafische stuurprogramma's te updaten of start je computer opnieuw op."
     },
     "pl": {
-        "tw.alerts.autosaving": "Tworzenie punktu przywracania…",
+        "tw.alerts.creatingRestorePoint": "Tworzenie punktu przywracania…",
         "tw.alerts.lostPeripheralConnection": "Utracono połączenie do {extensionName}.",
         "tw.alerts.savedToDisk": "Zapisano na twoim komputerze.",
         "tw.backpack.rename": "Nowa nazwa:",
@@ -1784,7 +1771,6 @@
         "tw.menuBar.cloudOn": "Włącz Zmienne W Chmurze",
         "tw.menuBar.cloudUnavailable": "Zmienne W Chmurze nie są Dostępne",
         "tw.menuBar.cloudUnavailableAlert": "Nie można użyć zmiennych w chmurze, najprawdopodobniej dlatego, że masz włączony edytor.",
-        "tw.menuBar.loadRestorePoint": "Załaduj punkt przywracania",
         "tw.menuBar.moreSettings": "Zaawansowane Ustawienia",
         "tw.menuBar.newFramerate": "Nowa liczba klatek na sekundę:",
         "tw.menuBar.reportError1": "Nie można skompilować niektórych skryptów.",
@@ -1845,7 +1831,7 @@
         "tw.viewOnScratch": "Zobacz projekt w Scratchu"
     },
     "pt": {
-        "tw.alerts.autosaving": "Criando ponto de restauração...",
+        "tw.alerts.creatingRestorePoint": "Criando ponto de restauração...",
         "tw.alerts.savedToDisk": "Salvo no seu computador.",
         "tw.backpack.rename": "Novo nome:",
         "tw.blocks.buttonIsDown": "botão [MOUSE_BUTTON] do mouse pressionado?",
@@ -1889,7 +1875,6 @@
         "tw.menuBar.cloudOn": "Ativar variáveis na nuvem",
         "tw.menuBar.cloudUnavailable": "Variáveis na nuvem não estão disponíveis",
         "tw.menuBar.cloudUnavailableAlert": "Não pôde usar variáveis na nuvem, provavelmente porque você abriu o editor.",
-        "tw.menuBar.loadRestorePoint": "Carregar ponto de restauração",
         "tw.menuBar.moreSettings": "Configurações Avançadas",
         "tw.menuBar.newFramerate": "Novo FPS:",
         "tw.menuBar.reportError1": "Alguns scripts não puderam ser compilados.",
@@ -1943,7 +1928,7 @@
         "tw.webglModal.description": "Infelizmente parece que o seu navegador ou computador {webGlLink}. Essa tecnologia é necessária para o site funcionar. Tente atualizar o seu navegador e drivers gráficos ou reiniciar o seu computador."
     },
     "pt-br": {
-        "tw.alerts.autosaving": "Criando ponto de restauração...",
+        "tw.alerts.creatingRestorePoint": "Criando ponto de restauração...",
         "tw.alerts.lostPeripheralConnection": "Conexão com {extensionName} foi perdida.",
         "tw.alerts.savedToDisk": "Salvo no seu computador.",
         "tw.backpack.rename": "Novo nome:",
@@ -2001,7 +1986,6 @@
         "tw.menuBar.cloudOn": "Ativar variáveis na nuvem",
         "tw.menuBar.cloudUnavailable": "Variáveis na nuvem não estão disponíveis",
         "tw.menuBar.cloudUnavailableAlert": "Não pôde usar variáveis na nuvem, provavelmente porque você abriu o editor.",
-        "tw.menuBar.loadRestorePoint": "Carregar ponto de restauração",
         "tw.menuBar.moreSettings": "Configurações Avançadas",
         "tw.menuBar.newFramerate": "Novo FPS:",
         "tw.menuBar.package": "Exportar projeto",
@@ -2081,7 +2065,7 @@
         "tw.webglModal.description": "Infelizmente parece que o seu navegador ou computador {webGlLink}. Essa tecnologia é necessária para o site funcionar. Tente atualizar o seu navegador e drivers gráficos ou reiniciar o seu computador."
     },
     "ro": {
-        "tw.alerts.autosaving": "Se creează punctul de recuperare…",
+        "tw.alerts.creatingRestorePoint": "Se creează punctul de recuperare…",
         "tw.alerts.savedToDisk": "Salvat pe calculatorul tău.",
         "tw.blocks.addons": "Extensii",
         "tw.blocks.buttonIsDown": "butonul mouse-ului [MOUSE_BUTTON] apăsat?",
@@ -2117,7 +2101,6 @@
         "tw.menuBar.cloudOn": "Pornește Variabilele Cloud",
         "tw.menuBar.cloudUnavailable": "Variabilele Cloud nu sunt valabile",
         "tw.menuBar.cloudUnavailableAlert": "Nu se pot folosi variabilele cloud, cel mai probabil deoarece ai deschis editorul.",
-        "tw.menuBar.loadRestorePoint": "Încarcă punctul de recuperare",
         "tw.menuBar.newFramerate": "Cadre Pe Secundă:",
         "tw.menuBar.reportError1": "Unele script-uri nu au putut fi compilate (transpuse)",
         "tw.menuBar.reportError2": "Aceasta este o eroare. Vă rugăm s-o raportați.",
@@ -2135,7 +2118,7 @@
         "tw.webglModal.description": "Din păcate se pare că browserul sau calculatorul tău {webGlLink}. Această tehnologie trebuie să existe ca acest site să ruleze. Încearcă să-ți actualizezi browserul și discurile de grafici sau repornește-ți calculatorul."
     },
     "ru": {
-        "tw.alerts.autosaving": "Создание точки восстановления...",
+        "tw.alerts.creatingRestorePoint": "Создание точки восстановления...",
         "tw.alerts.lostPeripheralConnection": "Потеря соединения с {extensionName}.",
         "tw.alerts.savedToDisk": "Сохранено на ваш компьютер.",
         "tw.backpack.rename": "Новое имя:",
@@ -2186,7 +2169,6 @@
         "tw.menuBar.cloudOn": "Включить облачные переменные",
         "tw.menuBar.cloudUnavailable": "Облачные переменные недоступны",
         "tw.menuBar.cloudUnavailableAlert": "Невозможно использовать облачные переменные, скорее всего, потому, что вы открыли редактор.",
-        "tw.menuBar.loadRestorePoint": "Загрузить точку восстановления",
         "tw.menuBar.moreSettings": "Расширенные настройки",
         "tw.menuBar.newFramerate": "Новая частота кадров:",
         "tw.menuBar.package": "Упаковать проект",
@@ -2256,7 +2238,7 @@
         "tw.webglModal.description": "Похоже, ваш компьютер или браузер {webGlLink}. Эта технология нужна для работы TurboWarp. Попробуйте обновить драйвера и ваш браузер или перезагрузить компьютер."
     },
     "sl": {
-        "tw.alerts.autosaving": "Ustvarjanje obnovitvene različice...",
+        "tw.alerts.creatingRestorePoint": "Ustvarjanje obnovitvene različice...",
         "tw.alerts.savedToDisk": "Shranjeno na računalnik.",
         "tw.backpack.rename": "Novo ime:",
         "tw.blocks.addons": "Dodatki",
@@ -2305,7 +2287,6 @@
         "tw.menuBar.cloudOn": "Omogoči spremenljivke v oblaku",
         "tw.menuBar.cloudUnavailable": "Spremenljivke v oblaku niso na voljo",
         "tw.menuBar.cloudUnavailableAlert": "Ni mogoče uporabiti spremenljivk v oblaku, verjetno zato, ker ste odprli urejevalnik",
-        "tw.menuBar.loadRestorePoint": "Naloži obnovitveno različico",
         "tw.menuBar.moreSettings": "Napredne nastavitve",
         "tw.menuBar.newFramerate": "Nov FPS:",
         "tw.menuBar.reportError1": "Nekaterih skript ni bilo mogoče prevesti.",
@@ -2364,7 +2345,7 @@
         "tw.webglModal.description": "Žal je videti, da vaš brskalnik ali računalnik ne podpira {webGlLink}. Ta stran potrebuje to tehnologijo za delovanje. Poskusite posodobiti svoj brskalnik in gonilnike ali znova zagnati svoj računalnik."
     },
     "sr": {
-        "tw.alerts.autosaving": "Прављење тачке враћања...",
+        "tw.alerts.creatingRestorePoint": "Прављење тачке враћања...",
         "tw.alerts.savedToDisk": "Сачувано на вашем компјутеру.",
         "tw.backpack.rename": "Ново име:",
         "tw.blocks.addons": "Додаци",
@@ -2410,7 +2391,6 @@
         "tw.menuBar.cloudOn": "Омогући променљиве у облаку",
         "tw.menuBar.cloudUnavailable": "Променљиве у облаку нису доступне",
         "tw.menuBar.cloudUnavailableAlert": "Променљиве у облаку се не могу користити, вероватно зато што сте у едитору.",
-        "tw.menuBar.loadRestorePoint": "Учитај тачку враћања",
         "tw.menuBar.moreSettings": "Напредна подешавања",
         "tw.menuBar.newFramerate": "Нови FPS:",
         "tw.menuBar.reportError1": "Део кода се није могао превести.",
@@ -2465,7 +2445,7 @@
         "tw.webglModal.description": "Нажалост, изгледа да Ваш прегледач или компјутер {webGlLink}. Ова технологија је неопходна сајту да исправно ради. Пробајте да ажурирате прегледач и графичке драјвере или рестартујте компјутер."
     },
     "sv": {
-        "tw.alerts.autosaving": "Skapar återställningspunkt...",
+        "tw.alerts.creatingRestorePoint": "Skapar återställningspunkt...",
         "tw.alerts.lostPeripheralConnection": "Förlorade anslutningen till {extensionName}.",
         "tw.alerts.savedToDisk": "Sparad på datorn.",
         "tw.backpack.rename": "Nytt namn: ",
@@ -2541,7 +2521,6 @@
         "tw.menuBar.cloudUnavailable": "Molnvariabler är inte tillgängliga",
         "tw.menuBar.cloudUnavailableAlert": "Kan inte använda molnvariabler, mest troligt att du öppnade editorn.",
         "tw.menuBar.compileError": "{sprite}:{error}",
-        "tw.menuBar.loadRestorePoint": "Ladda in återställningspunkten",
         "tw.menuBar.moreSettings": "Avancerade inställningar",
         "tw.menuBar.newFramerate": "Ny upplösningshastighet:",
         "tw.menuBar.package": "Packa projektet",
@@ -2625,7 +2604,7 @@
         "tw.webglModal.description": "Olyckligtvis ser det ut som om din webbläsare eller dator {webGlLink}. Denna sidan kräver denna teknologin för att sidan ska fungera. Försök att uppdatera din webbläsare och grafikdrivrutiner eller starta om din dator."
     },
     "tr": {
-        "tw.alerts.autosaving": "Yükleme noktası yapılıyor",
+        "tw.alerts.creatingRestorePoint": "Yükleme noktası yapılıyor",
         "tw.alerts.savedToDisk": "Bilgisayarına kaydedilmiştir.",
         "tw.backpack.rename": "Yeni kullanıcı adı:",
         "tw.blocks.addons": "Eklentiler",
@@ -2672,7 +2651,6 @@
         "tw.menuBar.cloudOn": "Bulut değişkenleri aç",
         "tw.menuBar.cloudUnavailable": "Bulut Değişkenleri bulamıyoruz",
         "tw.menuBar.cloudUnavailableAlert": "Bulut değişkenleri kullanamıyoruz, büyük ihtimalle editörü açtığınız için.",
-        "tw.menuBar.loadRestorePoint": "Yükleme noktasını yükle",
         "tw.menuBar.moreSettings": "Gelişmiş Ayarlar",
         "tw.menuBar.newFramerate": "Yeni karehızı:",
         "tw.menuBar.reportError1": "Bazı komut dosyaları derlenemedi.",
@@ -2727,7 +2705,7 @@
         "tw.webglModal.description": "Ne yazık ki senin web tarayıcının yada bilgisayarın {webGlLink}. Bu sitenin çalışması için bu teknolojiye ihtiyaç vardır. Web tarayıcını ve grafik sürücülerini güncelle yada bilgisayarını yeniden başlatmayı  deneyin."
     },
     "uk": {
-        "tw.alerts.autosaving": "Створення точки відновлення...",
+        "tw.alerts.creatingRestorePoint": "Створення точки відновлення...",
         "tw.alerts.lostPeripheralConnection": "Втрачено зв'язок з {extensionName}",
         "tw.alerts.savedToDisk": "Збережено на ваш комп'ютер.",
         "tw.backpack.rename": "Нова назва:",
@@ -2780,7 +2758,6 @@
         "tw.menuBar.cloudOn": "Увімкнути хмарні змінні",
         "tw.menuBar.cloudUnavailable": "Хмарні змінні недоступні",
         "tw.menuBar.cloudUnavailableAlert": "Не вдається використати хмарні змінні, швидше за все, тому що ви відкрили редактор.",
-        "tw.menuBar.loadRestorePoint": "Завантажити точку відновлення",
         "tw.menuBar.moreSettings": "Налаштування Доповнень",
         "tw.menuBar.newFramerate": "Нова частота кадрів:",
         "tw.menuBar.package": "Упакувати проект",
@@ -2849,7 +2826,7 @@
         "tw.webglModal.description": "На жаль, ваш браузер або ком'пютер {webGlLink}. Ця технологія необхідна для роботи цього сайту. Спробуйте обновити браузер і драйвера або перезавантажте комп'ютер."
     },
     "vi": {
-        "tw.alerts.autosaving": "Đang tạo điiểm khôi phục",
+        "tw.alerts.creatingRestorePoint": "Đang tạo điiểm khôi phục",
         "tw.alerts.lostPeripheralConnection": "Mất kết nối từ {extensionName}",
         "tw.alerts.savedToDisk": "Đã lưu vời máy tính bạn.",
         "tw.backpack.rename": "Tên mới:",
@@ -2872,7 +2849,6 @@
         "tw.menuBar.cloudOn": "Kích hoạt biến đám mây",
         "tw.menuBar.cloudUnavailable": "Biến đám mây không có sẵn",
         "tw.menuBar.cloudUnavailableAlert": "Không thể dùng biến đám mây, hầu như vì bạn mở phần chỉnh sửa",
-        "tw.menuBar.loadRestorePoint": "Tải điểm khôi phục",
         "tw.menuBar.moreSettings": "Cài đặt nâng cao",
         "tw.menuBar.newFramerate": "Tỷ lệ mới:",
         "tw.menuBar.package": "Đóng gói dự án",
@@ -2911,7 +2887,7 @@
         "tw.viewOnScratch": "Xem dự án trên Scratch"
     },
     "zh-cn": {
-        "tw.alerts.autosaving": "新建还原点中...",
+        "tw.alerts.creatingRestorePoint": "新建还原点中...",
         "tw.alerts.lostPeripheralConnection": "与 {extensionName} 的连接中断了。",
         "tw.alerts.savedToDisk": "已保存至您的计算机。",
         "tw.backpack.rename": "新名称：",
@@ -2992,7 +2968,6 @@
         "tw.menuBar.cloudUnavailable": "云变量不可用",
         "tw.menuBar.cloudUnavailableAlert": "无法使用云变量，可能因为切换到编辑器模式了。",
         "tw.menuBar.compileError": "{sprite}：{error}",
-        "tw.menuBar.loadRestorePoint": "加载还原点",
         "tw.menuBar.moreSettings": "高级设置",
         "tw.menuBar.newFramerate": "新帧率：",
         "tw.menuBar.package": "打包作品",
@@ -3120,7 +3095,6 @@
         "tw.menuBar.cloudOn": "啟用雲端變數",
         "tw.menuBar.cloudUnavailable": "雲端變數不可用",
         "tw.menuBar.compileError": "{sprite}：{error}",
-        "tw.menuBar.loadRestorePoint": "回溯至還原點",
         "tw.menuBar.moreSettings": "進階設定",
         "tw.menuBar.reportError1": "某些程式可能沒被編譯。",
         "tw.menuBar.reportError2": "這是個錯誤，請回報。",

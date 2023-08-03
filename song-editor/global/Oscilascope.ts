@@ -1,5 +1,5 @@
 import { ColorConfig } from "../editor/ColorConfig";
-import { events } from "./events";
+import { events } from "./Events";
 
 export class oscilascopeCanvas {
     public _EventUpdateCanvas:Function;

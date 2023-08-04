@@ -254,36 +254,91 @@ export interface AutomationTarget extends BeepBoxOption {
     readonly compatibleInstruments: InstrumentType[] | null;
 }
 
-export function startLoadingSample(url: string, chipWaveIndex: number, customSampleRate: number): void {
-        // @TODO: Track loading status of samples, so that parts of the code
-        // that expect everything to already be in memory can work correctly.
-        // It would be easy to only instantiate `SongEditor` and company after
-        // everything is loaded, but if dynamic sample loading without a reload
-        // is deemed necessary, anything that involves chip waves has to be
-        // revisited so as to be able to work with a changing list of chip
-        // waves that may or may not be ready to be used.
-		const sampleLoaderAudioContext = new AudioContext({ sampleRate: customSampleRate });
-        const chipWave = Config.chipWaves[chipWaveIndex];
-        const rawChipWave = Config.rawRawChipWaves[chipWaveIndex];
-        fetch(url).then((response) => {
-            if (!response.ok) {
-                // @TODO: Be specific with the error handling.
-                return Promise.reject(new Error("Couldn't load sample"));
-            }
-            return response.arrayBuffer();
-        }).then((arrayBuffer) => {
-            return sampleLoaderAudioContext.decodeAudioData(arrayBuffer);
-        }).then((audioBuffer) => {
-            // @TODO: Downmix.
-            const samples = centerWave(Array.from(audioBuffer.getChannelData(0)));
-            const integratedSamples = performIntegral(samples);
-            chipWave.samples = integratedSamples;
-            rawChipWave.samples = samples;
-        }).catch((error) => {
-            //console.error(error);
-			alert("Failed to load " + url + ":\n" + error);
-        });
+export class SampleLoadingState {
+    public statusTable: Dictionary<string>;
+    public urlTable: Dictionary<string>;
+    public totalSamples: number;
+    public samplesLoaded: number;
+
+    constructor() {
+	this.statusTable = {};
+	this.urlTable = {};
+	this.totalSamples = 0;
+	this.samplesLoaded = 0;
     }
+}
+
+export const sampleLoadingState: SampleLoadingState = new SampleLoadingState();
+
+export class SampleLoadedEvent extends Event {
+    public readonly totalSamples: number;
+    public readonly samplesLoaded: number;
+
+    constructor(totalSamples: number, samplesLoaded: number) {
+	super("sampleloaded");
+	this.totalSamples = totalSamples;
+	this.samplesLoaded = samplesLoaded;
+    }
+}
+
+export interface SampleLoadEventMap {
+    "sampleloaded": SampleLoadedEvent;
+}
+
+export class SampleLoadEvents extends EventTarget {
+    constructor() {
+	super();
+    }
+}
+
+export const sampleLoadEvents: SampleLoadEvents = new SampleLoadEvents();
+
+export function startLoadingSample(url: string, chipWaveIndex: number, customSampleRate: number): void {
+    // @TODO: Make parts of the code that expect everything to already be
+    // in memory work correctly.
+    // It would be easy to only instantiate `SongEditor` and company after
+    // everything is loaded, but if dynamic sample loading without a reload
+    // is deemed necessary, anything that involves chip waves has to be
+    // revisited so as to be able to work with a changing list of chip
+    // waves that may or may not be ready to be used.
+	    const sampleLoaderAudioContext = new AudioContext({ sampleRate: customSampleRate });
+    const chipWave = Config.chipWaves[chipWaveIndex];
+    const rawChipWave = Config.rawRawChipWaves[chipWaveIndex];
+    fetch(url).then((response) => {
+	if (!response.ok) {
+	    // @TODO: Be specific with the error handling.
+	    sampleLoadingState.statusTable[chipWaveIndex] = "error";
+	    return Promise.reject(new Error("Couldn't load sample"));
+	}
+	return response.arrayBuffer();
+    }).then((arrayBuffer) => {
+	return sampleLoaderAudioContext.decodeAudioData(arrayBuffer);
+    }).then((audioBuffer) => {
+	// @TODO: Downmix.
+	const samples = centerWave(Array.from(audioBuffer.getChannelData(0)));
+	const integratedSamples = performIntegral(samples);
+	chipWave.samples = integratedSamples;
+	rawChipWave.samples = samples;
+	sampleLoadingState.samplesLoaded++;
+	sampleLoadingState.statusTable[chipWaveIndex] = "loaded";
+	sampleLoadEvents.dispatchEvent(new SampleLoadedEvent(
+	    sampleLoadingState.totalSamples,
+	    sampleLoadingState.samplesLoaded
+	));
+    }).catch((error) => {
+	//console.error(error);
+	sampleLoadingState.statusTable[chipWaveIndex] = "error";
+	alert("Failed to load " + url + ":\n" + error);
+    });
+}
+
+export function getLocalStorageItem<T>(key: string, defaultValue: T): T | string {
+    let value: T | string | null = localStorage.getItem(key);
+    if (value == null || value === "null" || value === "undefined") {
+        value = defaultValue;
+    }
+    return value;
+}
 
 // @HACK: This just assumes these exist, regardless of whether they actually do
 // or not.
@@ -466,16 +521,22 @@ export function loadBuiltInSamples(set: number): void {
 	    { name: "paandorasbeta sonor crash (tip)", expression: 1.0, isSampled: true, isPercussion: true, extraSampleDetune: -50.5 },
 	    { name: "paandorasbeta sonor ride", expression: 1.0, isSampled: true, isPercussion: true, extraSampleDetune: -46 }
 	];
+
+	sampleLoadingState.totalSamples += chipWaves.length;
+
 	// This assumes that Config.rawRawChipWaves and Config.chipWaves have
 	// the same number of elements.
 	const startIndex: number = Config.rawRawChipWaves.length;
 	for (const chipWave of chipWaves) {
-	    const rawChipWave = { index: Config.rawRawChipWaves.length, name: chipWave.name, expression: chipWave.expression, isSampled: chipWave.isSampled, isPercussion: chipWave.isPercussion, extraSampleDetune: chipWave.extraSampleDetune, samples: defaultSamples };
-	    const integratedChipWave = { index: Config.chipWaves.length, name: chipWave.name, expression: chipWave.expression, isSampled: chipWave.isSampled, isPercussion: chipWave.isPercussion, extraSampleDetune: chipWave.extraSampleDetune, samples: defaultIntegratedSamples };
-	    Config.rawRawChipWaves[Config.rawRawChipWaves.length] = rawChipWave;
+	    const chipWaveIndex: number = Config.rawRawChipWaves.length;
+	    const rawChipWave = { index: chipWaveIndex, name: chipWave.name, expression: chipWave.expression, isSampled: chipWave.isSampled, isPercussion: chipWave.isPercussion, extraSampleDetune: chipWave.extraSampleDetune, samples: defaultSamples };
+	    const integratedChipWave = { index: chipWaveIndex, name: chipWave.name, expression: chipWave.expression, isSampled: chipWave.isSampled, isPercussion: chipWave.isPercussion, extraSampleDetune: chipWave.extraSampleDetune, samples: defaultIntegratedSamples };
+	    Config.rawRawChipWaves[chipWaveIndex] = rawChipWave;
 	    Config.rawRawChipWaves.dictionary[chipWave.name] = rawChipWave;
-	    Config.chipWaves[Config.chipWaves.length] = integratedChipWave;
+	    Config.chipWaves[chipWaveIndex] = integratedChipWave;
 	    Config.chipWaves.dictionary[chipWave.name] = rawChipWave;
+	    sampleLoadingState.statusTable[chipWaveIndex] = "loading";
+	    sampleLoadingState.urlTable[chipWaveIndex] = "legacySamples";
 	}
 
 	loadScript("samples.js")
@@ -561,8 +622,15 @@ export function loadBuiltInSamples(set: number): void {
 	    ];
 	    let chipWaveIndexOffset: number = 0;
 	    for (const chipWaveSample of chipWaveSamples) {
-		Config.rawRawChipWaves[startIndex + chipWaveIndexOffset].samples = chipWaveSample;
-		Config.chipWaves[startIndex + chipWaveIndexOffset].samples = performIntegral(chipWaveSample);
+		const chipWaveIndex: number = startIndex + chipWaveIndexOffset;
+		Config.rawRawChipWaves[chipWaveIndex].samples = chipWaveSample;
+		Config.chipWaves[chipWaveIndex].samples = performIntegral(chipWaveSample);
+		sampleLoadingState.statusTable[chipWaveIndex] = "loaded";
+		sampleLoadingState.samplesLoaded++;
+		sampleLoadEvents.dispatchEvent(new SampleLoadedEvent(
+		    sampleLoadingState.totalSamples,
+		    sampleLoadingState.samplesLoaded
+		));
 		chipWaveIndexOffset++;
 	    }
 	});
@@ -576,16 +644,22 @@ export function loadBuiltInSamples(set: number): void {
 	    { name: "mcwoodclick1", expression: 4.0, isSampled: true, isPercussion: true, extraSampleDetune: 0 },
 	    { name: "acoustic snare", expression: 4.0, isSampled: true, isPercussion: true, extraSampleDetune: 0 }
 	];
+
+	sampleLoadingState.totalSamples += chipWaves.length;
+
 	// This assumes that Config.rawRawChipWaves and Config.chipWaves have
 	// the same number of elements.
 	const startIndex: number = Config.rawRawChipWaves.length;
 	for (const chipWave of chipWaves) {
-	    const rawChipWave = { index: Config.rawRawChipWaves.length, name: chipWave.name, expression: chipWave.expression, isSampled: chipWave.isSampled, isPercussion: chipWave.isPercussion, extraSampleDetune: chipWave.extraSampleDetune, samples: defaultSamples };
-	    const integratedChipWave = { index: Config.chipWaves.length, name: chipWave.name, expression: chipWave.expression, isSampled: chipWave.isSampled, isPercussion: chipWave.isPercussion, extraSampleDetune: chipWave.extraSampleDetune, samples: defaultIntegratedSamples };
-	    Config.rawRawChipWaves[Config.rawRawChipWaves.length] = rawChipWave;
+	    const chipWaveIndex: number = Config.rawRawChipWaves.length;
+	    const rawChipWave = { index: chipWaveIndex, name: chipWave.name, expression: chipWave.expression, isSampled: chipWave.isSampled, isPercussion: chipWave.isPercussion, extraSampleDetune: chipWave.extraSampleDetune, samples: defaultSamples };
+	    const integratedChipWave = { index: chipWaveIndex, name: chipWave.name, expression: chipWave.expression, isSampled: chipWave.isSampled, isPercussion: chipWave.isPercussion, extraSampleDetune: chipWave.extraSampleDetune, samples: defaultIntegratedSamples };
+	    Config.rawRawChipWaves[chipWaveIndex] = rawChipWave;
 	    Config.rawRawChipWaves.dictionary[chipWave.name] = rawChipWave;
-	    Config.chipWaves[Config.chipWaves.length] = integratedChipWave;
+	    Config.chipWaves[chipWaveIndex] = integratedChipWave;
 	    Config.chipWaves.dictionary[chipWave.name] = rawChipWave;
+	    sampleLoadingState.statusTable[chipWaveIndex] = "loading";
+	    sampleLoadingState.urlTable[chipWaveIndex] = "nintariboxSamples";
 	}
 
 	loadScript("nintaribox_samples.js")
@@ -600,8 +674,15 @@ export function loadBuiltInSamples(set: number): void {
 	    ];
 	    let chipWaveIndexOffset: number = 0;
 	    for (const chipWaveSample of chipWaveSamples) {
-		Config.rawRawChipWaves[startIndex + chipWaveIndexOffset].samples = chipWaveSample;
-		Config.chipWaves[startIndex + chipWaveIndexOffset].samples = performIntegral(chipWaveSample);
+		const chipWaveIndex: number = startIndex + chipWaveIndexOffset;
+		Config.rawRawChipWaves[chipWaveIndex].samples = chipWaveSample;
+		Config.chipWaves[chipWaveIndex].samples = performIntegral(chipWaveSample);
+		sampleLoadingState.statusTable[chipWaveIndex] = "loaded";
+		sampleLoadingState.samplesLoaded++;
+		sampleLoadEvents.dispatchEvent(new SampleLoadedEvent(
+		    sampleLoadingState.totalSamples,
+		    sampleLoadingState.samplesLoaded
+		));
 		chipWaveIndexOffset++;
 	    }
 	});
@@ -621,16 +702,22 @@ export function loadBuiltInSamples(set: number): void {
 	    { name: "swan", expression: 1, isSampled: true, isPercussion: false, extraSampleDetune: 1 },
 	    { name: "face", expression: 1, isSampled: true, isPercussion: false, extraSampleDetune: -12 }
 	];
+
+	sampleLoadingState.totalSamples += chipWaves.length;
+
 	// This assumes that Config.rawRawChipWaves and Config.chipWaves have
 	// the same number of elements.
 	const startIndex: number = Config.rawRawChipWaves.length;
 	for (const chipWave of chipWaves) {
-	    const rawChipWave = { index: Config.rawRawChipWaves.length, name: chipWave.name, expression: chipWave.expression, isSampled: chipWave.isSampled, isPercussion: chipWave.isPercussion, extraSampleDetune: chipWave.extraSampleDetune, samples: defaultSamples };
-	    const integratedChipWave = { index: Config.chipWaves.length, name: chipWave.name, expression: chipWave.expression, isSampled: chipWave.isSampled, isPercussion: chipWave.isPercussion, extraSampleDetune: chipWave.extraSampleDetune, samples: defaultIntegratedSamples };
-	    Config.rawRawChipWaves[Config.rawRawChipWaves.length] = rawChipWave;
+	    const chipWaveIndex: number = Config.rawRawChipWaves.length;
+	    const rawChipWave = { index: chipWaveIndex, name: chipWave.name, expression: chipWave.expression, isSampled: chipWave.isSampled, isPercussion: chipWave.isPercussion, extraSampleDetune: chipWave.extraSampleDetune, samples: defaultSamples };
+	    const integratedChipWave = { index: chipWaveIndex, name: chipWave.name, expression: chipWave.expression, isSampled: chipWave.isSampled, isPercussion: chipWave.isPercussion, extraSampleDetune: chipWave.extraSampleDetune, samples: defaultIntegratedSamples };
+	    Config.rawRawChipWaves[chipWaveIndex] = rawChipWave;
 	    Config.rawRawChipWaves.dictionary[chipWave.name] = rawChipWave;
-	    Config.chipWaves[Config.chipWaves.length] = integratedChipWave;
+	    Config.chipWaves[chipWaveIndex] = integratedChipWave;
 	    Config.chipWaves.dictionary[chipWave.name] = rawChipWave;
+	    sampleLoadingState.statusTable[chipWaveIndex] = "loading";
+	    sampleLoadingState.urlTable[chipWaveIndex] = "marioPaintboxSamples";
 	}
 
 	loadScript("mario_paintbox_samples.js")
@@ -652,14 +739,21 @@ export function loadBuiltInSamples(set: number): void {
 	    ];
 	    let chipWaveIndexOffset: number = 0;
 	    for (const chipWaveSample of chipWaveSamples) {
-		Config.rawRawChipWaves[startIndex + chipWaveIndexOffset].samples = chipWaveSample;
-		Config.chipWaves[startIndex + chipWaveIndexOffset].samples = performIntegral(chipWaveSample);
+		const chipWaveIndex: number = startIndex + chipWaveIndexOffset;
+		Config.rawRawChipWaves[chipWaveIndex].samples = chipWaveSample;
+		Config.chipWaves[chipWaveIndex].samples = performIntegral(chipWaveSample);
+		sampleLoadingState.statusTable[chipWaveIndex] = "loaded";
+		sampleLoadingState.samplesLoaded++;
+		sampleLoadEvents.dispatchEvent(new SampleLoadedEvent(
+		    sampleLoadingState.totalSamples,
+		    sampleLoadingState.samplesLoaded
+		));
 		chipWaveIndexOffset++;
 	    }
 	});
     }
     else {
-	    console.log("invalid set of built-in samples");
+        console.log("invalid set of built-in samples");
     }
 }
 

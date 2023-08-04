@@ -26,13 +26,15 @@ export class EditorConfig {
     public static readonly version: string = "2.1.0"; // Using patch versions in display right now, maybe TODAY.
     public static readonly versionDisplayName: string = "UltraBox " + EditorConfig.version;
 
-    public static readonly releaseNotesURL: string = "https://jummbus.bitbucket.io/patch_notes/" + EditorConfig.version + ".html";
+    public static readonly releaseNotesURL: string = "https://ultraabox.github.io/patch_notes";
 
     public static readonly isOnMac: boolean = /^Mac/i.test(navigator.platform) || /Mac OS X/i.test(navigator.userAgent) || /^(iPhone|iPad|iPod)/i.test(navigator.platform) || /(iPhone|iPad|iPod)/i.test(navigator.userAgent);
     public static readonly ctrlSymbol: string = EditorConfig.isOnMac ? "⌘" : "Ctrl+";
     public static readonly ctrlName: string = EditorConfig.isOnMac ? "command" : "control";
 
     public static customSamples: string[];
+    public static willReloadForCustomSamples: boolean = false;
+	//is this how you do it????
 	
     public static readonly presetCategories: DictionaryArray<PresetCategory> = toNameMap([
         {

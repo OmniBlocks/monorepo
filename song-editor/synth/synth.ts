@@ -1,6 +1,6 @@
 // Copyright (c) 2012-2022 John Nesky and contributing authors, distributed under the MIT license, see accompanying the LICENSE.md file.
 
-import { startLoadingSample, loadBuiltInSamples, Dictionary, DictionaryArray, toNameMap, FilterType, EnvelopeType, InstrumentType, EffectType, EnvelopeComputeIndex, Transition, Unison, Chord, Vibrato, Envelope, AutomationTarget, Config, getDrumWave, drawNoiseSpectrum, getArpeggioPitchIndex, performIntegralOld, getPulseWidthRatio, effectsIncludeTransition, effectsIncludeChord, effectsIncludePitchShift, effectsIncludeDetune, effectsIncludeVibrato, effectsIncludeNoteFilter, effectsIncludeDistortion, effectsIncludeBitcrusher, effectsIncludePanning, effectsIncludeChorus, effectsIncludeEcho, effectsIncludeReverb, OperatorWave } from "./SynthConfig";
+import { startLoadingSample, sampleLoadingState, loadBuiltInSamples, Dictionary, DictionaryArray, toNameMap, FilterType, EnvelopeType, InstrumentType, EffectType, EnvelopeComputeIndex, Transition, Unison, Chord, Vibrato, Envelope, AutomationTarget, Config, getDrumWave, drawNoiseSpectrum, getArpeggioPitchIndex, performIntegralOld, getPulseWidthRatio, effectsIncludeTransition, effectsIncludeChord, effectsIncludePitchShift, effectsIncludeDetune, effectsIncludeVibrato, effectsIncludeNoteFilter, effectsIncludeDistortion, effectsIncludeBitcrusher, effectsIncludePanning, effectsIncludeChorus, effectsIncludeEcho, effectsIncludeReverb, OperatorWave } from "./SynthConfig";
 import { Preset, EditorConfig } from "../editor/EditorConfig";
 import { scaleElementsByFactor, inverseRealFourierTransform } from "./FFT";
 import { Deque } from "./Deque";
@@ -3380,6 +3380,10 @@ export class Song {
                 const defaultIndex = 0;
                 const defaultIntegratedSamples = Config.chipWaves[defaultIndex].samples;
                 const defaultSamples = Config.rawRawChipWaves[defaultIndex].samples;
+                sampleLoadingState.statusTable = {};
+                sampleLoadingState.urlTable = {};
+                sampleLoadingState.totalSamples = 0;
+                sampleLoadingState.samplesLoaded = 0;
                 for (const url of compressed_array) {
                     if (url.toLowerCase() === "legacysamples") {
                         if (!willLoadLegacySamples) {
@@ -3404,10 +3408,11 @@ export class Song {
                     }
 					
 					else {
+                        const customSampleUrlIndex: number = customSampleUrls.length;
                         customSampleUrls.push(url);
                         // This depends on `Config.chipWaves` being the same
                         // length as `Config.rawRawChipWaves`.
-                        const chipWaveIndex = Config.chipWaves.length;
+                        const chipWaveIndex: number = Config.chipWaves.length;
 						function isProperUrl(string: string): boolean {
 							try { 
 								return Boolean(new URL(string)); 
@@ -3416,21 +3421,66 @@ export class Song {
 								return false; 
 							}
 						}
+
+						let urlSliced: string = url;
+
+						let customSampleRate: number = 44100;
+						let isCustomPercussive: boolean = false;
+						let customRootKey: number = 60;
+						let presetIsUsingAdvancedLoopControls: boolean = false;
+						let presetChipWaveLoopStart: number | null = null;
+						let presetChipWaveLoopEnd: number | null = null;
+						let presetChipWaveStartOffset: number | null = null;
 						
-					    if (isProperUrl(url)) {
-							let urlSliced = url;
-							let parsedUrl = new URL(url);
-							let customSampleRate = 44100;
-							let isCustomPercussive = false;
-							let customRootKey = 60;
-							
+					    let parsedSampleOptions: boolean = false;
+					    let optionsStartIndex: number = url.indexOf("!");
+					    let optionsEndIndex: number = -1;
+					    if (optionsStartIndex === 0) {
+					    	optionsEndIndex = url.indexOf("!", optionsStartIndex + 1);
+					    	if (optionsEndIndex !== -1) {
+					    		const rawOptions: string[] = url.slice(optionsStartIndex + 1, optionsEndIndex).split(",");
+					    		for (const rawOption of rawOptions) {
+					    			const optionCode: string = rawOption.charAt(0);
+					    			const optionData: string = rawOption.slice(1, rawOption.length);
+					    			if (optionCode === "s") {
+					    				customSampleRate = clamp(8000, 96000, parseFloat(optionData));
+					    			} else if (optionCode === "r") {
+					    				customRootKey = parseFloat(optionData);
+					    			} else if (optionCode === "p") {
+					    				isCustomPercussive = true;
+					    			} else if (optionCode === "a") {
+					    				presetIsUsingAdvancedLoopControls = true;
+					    				presetChipWaveLoopStart = parseInt(optionData);
+					    			} else if (optionCode === "b") {
+					    				presetIsUsingAdvancedLoopControls = true;
+					    				presetChipWaveLoopEnd = parseInt(optionData);
+					    			} else if (optionCode === "c") {
+					    				presetIsUsingAdvancedLoopControls = true;
+					    				presetChipWaveStartOffset = parseInt(optionData);
+					    			}
+					    		}
+					    		urlSliced = url.slice(optionsEndIndex + 1, url.length);
+					    		parsedSampleOptions = true;
+					    	}
+					    }
+
+					    let parsedUrl: URL | null = null;
+					    if (isProperUrl(urlSliced)) {
+					    	parsedUrl = new URL(urlSliced);
+					    }
+					    else {
+					    	alert(url + " is not a valid url");
+                            continue;
+					    }
+
+					    if (!parsedSampleOptions && parsedUrl != null) {
 							if (url.indexOf("@") != -1) {
 								//urlSliced = url.slice(url.indexOf("@"), url.indexOf("@"));
 								urlSliced = url.replaceAll("@", "")
 								parsedUrl = new URL(urlSliced);
 								isCustomPercussive = true;	
 							}	
-							
+
 							function sliceForSampleRate() {
 								urlSliced = url.slice(0, url.indexOf(","));
 								parsedUrl = new URL(urlSliced);
@@ -3443,10 +3493,9 @@ export class Song {
 								urlSliced = url.slice(0, url.indexOf("!"));
 								parsedUrl = new URL(urlSliced);
 								customRootKey = parseFloat(url.slice(url.indexOf("!") + 1));
-								
 							}
-							
-							
+
+
 							if (url.indexOf(",") != -1 && url.indexOf("!") != -1) {
 								if (url.indexOf(",") < url.indexOf("!")) {
 									sliceForRootKey();
@@ -3465,64 +3514,88 @@ export class Song {
 									sliceForRootKey();
 								}	
 							}
+						}
 
-							// @TODO: Could also remove known extensions, but it
-							// would probably be much better to be able to specify
-							// a custom name.
-							// @TODO: If for whatever inexplicable reason someone
-							// uses an url like `https://example.com`, this will
-							// result in an empty name here.
-							const name = decodeURIComponent(parsedUrl.pathname.replace(/^([^\/]*\/)+/, ""));
-							// @TODO: What to do about samples with the same name?
-							// The problem with using the url is that the name is
-							// user-facing and long names break assumptions of the
-							// UI.
-							const expression = 1.0;
-						  Config.chipWaves[chipWaveIndex] = {
-								name: name,
-								expression: expression,
-								isCustomSampled: true,
-								isPercussion: isCustomPercussive,
-								rootKey: customRootKey,
-								sampleRate: customSampleRate,
-								samples: defaultIntegratedSamples,
-								index: chipWaveIndex,
-							};
-							Config.rawRawChipWaves[chipWaveIndex] = {
-								name: name,
-								expression: expression,
-								isCustomSampled: true,
-								isPercussion: isCustomPercussive,
-								rootKey: customRootKey,
-								sampleRate: customSampleRate,
-								samples: defaultSamples,
-								index: chipWaveIndex,
-							};
-							customSamplePresets.push({
-                                index: customSamplePresets.length,
-								name: name,
-								midiProgram: 80,
-								settings: {
-									"type": "chip",
-									"eqFilter": [],
-									"effects": [],
-									"transition": "normal",
-									"fadeInSeconds": 0,
-									"fadeOutTicks": -3,
-									"chord": "harmony",
-									"wave": name,
-									"unison": "none",
-									"envelopes": [],
-								},
-							});
-							startLoadingSample(urlSliced, chipWaveIndex, customSampleRate);
-							
-						}
-						
-						else {
-							alert(url + " is not a valid url");
-						}
-						
+                        if (parsedUrl != null) {
+                            // Store in the new format.
+                            let urlWithNamedOptions = urlSliced;
+                            const namedOptions: string[] = [];
+                            if (customSampleRate !== 44100) namedOptions.push("s" + customSampleRate);
+                            if (customRootKey !== 60) namedOptions.push("r" + customRootKey);
+                            if (isCustomPercussive) namedOptions.push("p");
+                            if (presetIsUsingAdvancedLoopControls) {
+                            if (presetChipWaveLoopStart != null) namedOptions.push("a" + presetChipWaveLoopStart);
+                                if (presetChipWaveLoopEnd != null) namedOptions.push("a" + presetChipWaveLoopEnd);
+                                if (presetChipWaveStartOffset != null) namedOptions.push("a" + presetChipWaveStartOffset);
+                            }
+                            if (namedOptions.length > 0) {
+                                urlWithNamedOptions = "!" + namedOptions.join(",") + "!" + urlSliced;
+                            }
+                            customSampleUrls[customSampleUrlIndex] = urlWithNamedOptions;
+
+                            // @TODO: Could also remove known extensions, but it
+                            // would probably be much better to be able to specify
+                            // a custom name.
+                            // @TODO: If for whatever inexplicable reason someone
+                            // uses an url like `https://example.com`, this will
+                            // result in an empty name here.
+                            const name: string = decodeURIComponent(parsedUrl.pathname.replace(/^([^\/]*\/)+/, ""));
+                            // @TODO: What to do about samples with the same name?
+                            // The problem with using the url is that the name is
+                            // user-facing and long names break assumptions of the
+                            // UI.
+                            const expression: number = 1.0;
+                            Config.chipWaves[chipWaveIndex] = {
+                                name: name,
+                                expression: expression,
+                                isCustomSampled: true,
+                                isPercussion: isCustomPercussive,
+                                rootKey: customRootKey,
+                                sampleRate: customSampleRate,
+                                samples: defaultIntegratedSamples,
+                                index: chipWaveIndex,
+                            };
+                            Config.rawRawChipWaves[chipWaveIndex] = {
+                                name: name,
+                                expression: expression,
+                                isCustomSampled: true,
+                                isPercussion: isCustomPercussive,
+                                rootKey: customRootKey,
+                                sampleRate: customSampleRate,
+                                samples: defaultSamples,
+                                index: chipWaveIndex,
+                            };
+                            const customSamplePresetSettings: Dictionary<any> = {
+                                "type": "chip",
+                                "eqFilter": [],
+                                "effects": [],
+                                "transition": "normal",
+                                "fadeInSeconds": 0,
+                                "fadeOutTicks": -3,
+                                "chord": "harmony",
+                                "wave": name,
+                                "unison": "none",
+                                "envelopes": [],
+                            };
+                            if (presetIsUsingAdvancedLoopControls) {
+                                customSamplePresetSettings["isUsingAdvancedLoopControls"] = true;
+                                customSamplePresetSettings["chipWaveLoopStart"] = presetChipWaveLoopStart != null ? presetChipWaveLoopStart : 0;
+                                customSamplePresetSettings["chipWaveLoopEnd"] = presetChipWaveLoopEnd != null ? presetChipWaveLoopEnd : 2;
+                                customSamplePresetSettings["chipWaveLoopMode"] = 0;
+                                customSamplePresetSettings["chipWavePlayBackwards"] = false;
+                                customSamplePresetSettings["chipWaveStartOffset"] = presetChipWaveStartOffset != null ? presetChipWaveStartOffset : 0;
+                            }
+                            customSamplePresets.push({
+                                index: 0, // This will get overwritten by toNameMap below.
+                                name: name,
+                                midiProgram: 80,
+                                settings: customSamplePresetSettings,
+                            });
+                            startLoadingSample(urlSliced, chipWaveIndex, customSampleRate);
+                            sampleLoadingState.statusTable[chipWaveIndex] = "loading";
+                            sampleLoadingState.urlTable[chipWaveIndex] = urlSliced;
+                            sampleLoadingState.totalSamples++;
+                        }
                     }
                 }
                 if (customSampleUrls.length > 0) {
@@ -6206,7 +6279,9 @@ class Tone {
     public readonly phaseDeltas: number[] = [];
 			// advloop addition
         public directions: number[] = [];
-        public chipWaveCompletions: boolean[] = [];
+        public chipWaveCompletions: number[] = [];
+        public chipWavePrevWaves: number[] = [];
+        public chipWaveCompletionsLastWave: number[] = [];
            // advloop addition
     public readonly phaseDeltaScales: number[] = [];
     public expression: number = 0.0;
@@ -6254,7 +6329,9 @@ class Tone {
             this.phases[i] = 0.0;
 						// advloop addition
                 this.directions[i] = 1;
-                this.chipWaveCompletions[i] = false;
+                this.chipWaveCompletions[i] = 0;
+                this.chipWavePrevWaves[i] = 0;
+                this.chipWaveCompletionsLastWave[i] = 0;
                 // advloop addition
             this.operatorWaves[i] = Config.operatorWaves[0];
             this.feedbackOutputs[i] = 0.0;
@@ -9045,7 +9122,9 @@ export class Synth {
                 for (let i = 0; i < Config.maxPitchOrOperatorCount; i++) {
                     tone.phases[i] = instrument.chipWavePlayBackwards ? Math.min(lastOffset, lastOffset - firstOffset) : Math.max(0, firstOffset);
                     tone.directions[i] = instrument.chipWavePlayBackwards ? -1 : 1;
-                    tone.chipWaveCompletions[i] = false;
+                    tone.chipWaveCompletions[i] = 0;
+                    tone.chipWavePrevWaves[i] = 0;
+                    tone.chipWaveCompletionsLastWave[i] = 0;
                 }
                 // console.log(tone.directions);
                 // advloop addition
@@ -9856,6 +9935,7 @@ export class Synth {
                 chipWaveLoopLength = waveLength;
             }
             const chipWaveLoopMode: number = instrumentState.chipWaveLoopMode;
+            const chipWavePlayBackwards: boolean = instrumentState.chipWavePlayBackwards;
             const unisonSign: number = tone.specialIntervalExpressionMult * instrumentState.unison!.sign;
             if (instrumentState.unison!.voices == 1 && !instrumentState.chord!.customInterval)
                 tone.phases[1] = tone.phases[0];
@@ -9863,8 +9943,32 @@ export class Synth {
             let phaseDeltaB: number = tone.phaseDeltas[1] * waveLength;
             let directionA: number = tone.directions[0];
             let directionB: number = tone.directions[1];
-            let chipWaveCompletionA: boolean = tone.chipWaveCompletions[0];
-            let chipWaveCompletionB: boolean = tone.chipWaveCompletions[1];
+            let chipWaveCompletionA: number = tone.chipWaveCompletions[0];
+            let chipWaveCompletionB: number = tone.chipWaveCompletions[1];
+            if (chipWaveLoopMode === 2 || chipWaveLoopMode === 0) {
+                // If playing once or looping, we force the correct direction,
+                // since it shouldn't really change. This is mostly so that if
+                // the mode is changed midway through playback, it won't get
+                // stuck on the wrong direction.
+                if (!chipWavePlayBackwards) {
+                    directionA = 1;
+                    directionB = 1;
+                } else {
+                    directionA = -1;
+                    directionB = -1;
+                }
+            }
+            if (chipWaveLoopMode === 0 || chipWaveLoopMode === 1) {
+                // If looping or ping-ponging, we clear the completion status,
+                // as it's not relevant anymore. This is mostly so that if the
+                // mode is changed midway through playback, it won't get stuck
+                // on zero volume.
+                chipWaveCompletionA = 0;
+                chipWaveCompletionB = 0;
+            }
+            let lastWaveA: number = tone.chipWaveCompletionsLastWave[0];
+            let lastWaveB: number = tone.chipWaveCompletionsLastWave[1];
+            const chipWaveCompletionFadeLength: number = 1000;
             const phaseDeltaScaleA: number = +tone.phaseDeltaScales[0];
             const phaseDeltaScaleB: number = +tone.phaseDeltaScales[1];
             let expression: number = +tone.expression;
@@ -9891,8 +9995,15 @@ export class Synth {
             let initialFilterInput2: number = +tone.initialNoteFilterInput2;
             const applyFilters: Function = Synth.applyFilters;
             const stopIndex: number = bufferIndex + roundedSamplesPerTick;
+            let prevWaveA: number = tone.chipWavePrevWaves[0];
+            let prevWaveB: number = tone.chipWavePrevWaves[1];
             for (let sampleIndex: number = bufferIndex; sampleIndex < stopIndex; sampleIndex++) {
-                if (chipWaveCompletionA && chipWaveCompletionB) break;
+                if (chipWaveCompletionA > 0 && chipWaveCompletionA < chipWaveCompletionFadeLength) {
+                    chipWaveCompletionA++;
+                }
+                if (chipWaveCompletionB > 0 && chipWaveCompletionB < chipWaveCompletionFadeLength) {
+                    chipWaveCompletionB++;
+                }
                let wrapped: number = 0;
                 phaseA += phaseDeltaA * directionA;
                 phaseB += phaseDeltaB * directionB;
@@ -9900,23 +10011,35 @@ export class Synth {
                     // once
                     if (directionA === 1) {
                         if (phaseA > waveLength) {
-                            chipWaveCompletionA = true;
+                            if (chipWaveCompletionA <= 0) {
+                                lastWaveA = prevWaveA;
+                                chipWaveCompletionA++;
+                            }
                             wrapped = 1;
                         }
                     } else if (directionA === -1) {
                         if (phaseA < 0) {
-                            chipWaveCompletionA = true;
+                            if (chipWaveCompletionA <= 0) {
+                                lastWaveA = prevWaveA;
+                                chipWaveCompletionA++;
+                            }
                             wrapped = 1;
                         }
                     }
                     if (directionB === 1) {
                         if (phaseB > waveLength) {
-                            chipWaveCompletionB = true;
+                            if (chipWaveCompletionB <= 0) {
+                                lastWaveB = prevWaveB;
+                                chipWaveCompletionB++;
+                            }
                             wrapped = 1;
                         }
                     } else if (directionA === -1) {
                         if (phaseB < 0) {
-                            chipWaveCompletionB = true;
+                            if (chipWaveCompletionB <= 0) {
+                                lastWaveB = prevWaveB;
+                                chipWaveCompletionB++;
+                            }
                             wrapped = 1;
                         }
                     }
@@ -9985,11 +10108,23 @@ export class Synth {
                 let waveB = 0;
                 let inputSample = 0;
                 if (aliases) {
-                    if (!chipWaveCompletionA)
-                        waveA = wave[Synth.wrap(Math.floor(phaseA), waveLength)];
-                    if (!chipWaveCompletionB)
-                        waveB = wave[Synth.wrap(Math.floor(phaseB), waveLength)];
-                    inputSample = waveA + waveB;
+                    waveA = wave[Synth.wrap(Math.floor(phaseA), waveLength)];
+                    waveB = wave[Synth.wrap(Math.floor(phaseB), waveLength)];
+                    prevWaveA = waveA;
+                    prevWaveB = waveB;
+                    const completionFadeA: number = chipWaveCompletionA > 0 ? ((chipWaveCompletionFadeLength - Math.min(chipWaveCompletionA, chipWaveCompletionFadeLength)) / chipWaveCompletionFadeLength) : 1;
+                    const completionFadeB: number = chipWaveCompletionB > 0 ? ((chipWaveCompletionFadeLength - Math.min(chipWaveCompletionB, chipWaveCompletionFadeLength)) / chipWaveCompletionFadeLength) : 1;
+                    inputSample = 0;
+                    if (chipWaveCompletionA > 0) {
+                        inputSample += lastWaveA * completionFadeA;
+                    } else {
+                        inputSample += waveA;
+                    }
+                    if (chipWaveCompletionB > 0) {
+                        inputSample += lastWaveB * completionFadeB;
+                    } else {
+                        inputSample += waveB;
+                    }
                 }
                 else {
                     const phaseAInt = Math.floor(phaseA);
@@ -10005,27 +10140,42 @@ export class Synth {
                     if (!(chipWaveLoopMode === 0 && chipWaveLoopStart === 0 && chipWaveLoopEnd === waveLength) && wrapped !== 0) {
                         let pwia = 0;
                         let pwib = 0;
-                        const phaseA_ = phaseA - phaseDeltaA * directionA;
-                        const phaseB_ = phaseB - phaseDeltaB * directionB;
+                        const phaseA_ = Math.max(0, phaseA - phaseDeltaA * directionA);
+                        const phaseB_ = Math.max(0, phaseB - phaseDeltaB * directionB);
                         const phaseAInt = Math.floor(phaseA_);
                         const phaseBInt = Math.floor(phaseB_);
                         const indexA = Synth.wrap(phaseAInt, waveLength);
                         const indexB = Synth.wrap(phaseBInt, waveLength);
                         pwia = wave[indexA];
                         pwib = wave[indexB];
-                        pwia += (wave[Synth.wrap(indexA + 1, waveLength)] - pwia) * (phaseA_ - phaseAInt);
-                        pwib += (wave[Synth.wrap(indexB + 1, waveLength)] - pwib) * (phaseB_ - phaseBInt);
+                        pwia += (wave[Synth.wrap(indexA + 1, waveLength)] - pwia) * (phaseA_ - phaseAInt) * directionA;
+                        pwib += (wave[Synth.wrap(indexB + 1, waveLength)] - pwib) * (phaseB_ - phaseBInt) * directionB;
                         prevWaveIntegralA = pwia;
                         prevWaveIntegralB = pwib;
 				   }
-				   waveA = (nextWaveIntegralA - prevWaveIntegralA) / phaseDeltaA;
-				   waveB = (nextWaveIntegralB - prevWaveIntegralB) / phaseDeltaB;
+                   if (chipWaveLoopMode === 1 && wrapped !== 0) {
+                       waveA = prevWaveA;
+                       waveB = prevWaveB;
+                   } else {
+                       waveA = (nextWaveIntegralA - prevWaveIntegralA) / (phaseDeltaA * directionA);
+                       waveB = (nextWaveIntegralB - prevWaveIntegralB) / (phaseDeltaB * directionB);
+                   }
+                   prevWaveA = waveA;
+                   prevWaveB = waveB;
 				   prevWaveIntegralA = nextWaveIntegralA;
 				   prevWaveIntegralB = nextWaveIntegralB;
-                    if (!chipWaveCompletionA)
+                    const completionFadeA = chipWaveCompletionA > 0 ? ((chipWaveCompletionFadeLength - Math.min(chipWaveCompletionA, chipWaveCompletionFadeLength)) / chipWaveCompletionFadeLength) : 1;
+                    const completionFadeB = chipWaveCompletionB > 0 ? ((chipWaveCompletionFadeLength - Math.min(chipWaveCompletionB, chipWaveCompletionFadeLength)) / chipWaveCompletionFadeLength) : 1;
+                    if (chipWaveCompletionA > 0) {
+                        inputSample += lastWaveA * completionFadeA;
+                    } else {
                         inputSample += waveA;
-                    if (!chipWaveCompletionB)
+                    }
+                    if (chipWaveCompletionB > 0) {
+                        inputSample += lastWaveB * completionFadeB;
+                    } else {
                         inputSample += waveB * unisonSign;
+                    }
                 }
                 const sample = applyFilters(inputSample * volumeScale, initialFilterInput1, initialFilterInput2, filterCount, filters);
                 initialFilterInput2 = initialFilterInput1;
@@ -10044,6 +10194,10 @@ export class Synth {
             tone.directions[1] = directionB;
             tone.chipWaveCompletions[0] = chipWaveCompletionA;
             tone.chipWaveCompletions[1] = chipWaveCompletionB;
+            tone.chipWavePrevWaves[0] = prevWaveA;
+            tone.chipWavePrevWaves[1] = prevWaveB;
+            tone.chipWaveCompletionsLastWave[0] = lastWaveA;
+            tone.chipWaveCompletionsLastWave[1] = lastWaveB;
             tone.expression = expression;
             synth.sanitizeFilters(filters);
             tone.initialNoteFilterInput1 = initialFilterInput1;

@@ -1,7 +1,7 @@
 // Copyright (c) 2012-2022 John Nesky and contributing authors, distributed under the MIT license, see accompanying the LICENSE.md file.
 
 //import {Layout} from "./Layout";
-import { InstrumentType, EffectType, Config, effectsIncludeTransition, effectsIncludeChord, effectsIncludePitchShift, effectsIncludeDetune, effectsIncludeVibrato, effectsIncludeNoteFilter, effectsIncludeDistortion, effectsIncludeBitcrusher, effectsIncludePanning, effectsIncludeChorus, effectsIncludeEcho, effectsIncludeReverb, DropdownID } from "../synth/SynthConfig";
+import { sampleLoadEvents, SampleLoadedEvent, InstrumentType, EffectType, Config, effectsIncludeTransition, effectsIncludeChord, effectsIncludePitchShift, effectsIncludeDetune, effectsIncludeVibrato, effectsIncludeNoteFilter, effectsIncludeDistortion, effectsIncludeBitcrusher, effectsIncludePanning, effectsIncludeChorus, effectsIncludeEcho, effectsIncludeReverb, DropdownID } from "../synth/SynthConfig";
 import { BarScrollBar } from "./BarScrollBar";
 import { BeatsPerBarPrompt } from "./BeatsPerBarPrompt";
 import { Change, ChangeGroup } from "./Change";
@@ -10,7 +10,6 @@ import { ColorConfig, ChannelColors } from "./ColorConfig";
 import { CustomChipPrompt } from "./CustomChipPrompt";
 import { CustomFilterPrompt } from "./CustomFilterPrompt";
 import { EditorConfig, isMobile, prettyNumber, Preset, PresetCategory } from "./EditorConfig";
-import { AddExternalPrompt } from "./AddExternalPrompt";
 import { EuclideanRhythmPrompt } from "./EuclidgenRhythmPrompt";
 import { ExportPrompt } from "./ExportPrompt";
 import "./Layout"; // Imported here for the sake of ensuring this code is transpiled early.
@@ -47,7 +46,10 @@ import { ChangeTempo, ChangeChorus, ChangeEchoDelay, ChangeEchoSustain, ChangeRe
 import { Change6OpFeedbackType, Change6OpAlgorithm, ChangeCustomAlgorythmorFeedback} from "./changes"
 
 import { TrackEditor } from "./TrackEditor";
-import {oscilascopeCanvas} from "../global/Oscilascope"
+import {oscilascopeCanvas} from "../global/Oscilascope";
+import { VisualLoopControlsPrompt } from "./VisualLoopControlsPrompt";
+import { SampleLoadingStatusPrompt } from "./SampleLoadingStatusPrompt";
+import { AddSamplesPrompt } from "./AddSamplesPrompt";
 
 const { button, div, input, select, span, optgroup, option, canvas } = HTML;
 
@@ -819,9 +821,10 @@ export class SongEditor {
 	//are these supposed to be readonly?????
 	private readonly _chipWaveSelectRow: HTMLDivElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("chipWave") }, "Wave: "), div({ class: "selectContainer" }, this._chipWaveSelect));
     private readonly _chipNoiseSelectRow: HTMLDivElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("chipNoise") }, "Noise: "), div({ class: "selectContainer" }, this._chipNoiseSelect));
+    private readonly _visualLoopControlsButton: HTMLButtonElement = button({ style: "margin-left: 0em; padding-left: 0.2em; height: 1.5em; max-width: 12px;", onclick: () => this._openPrompt("visualLoopControls") }, "+");
     private readonly _useChipWaveAdvancedLoopControlsRow: HTMLDivElement = div({ class: "selectRow" }, span({ class: "tip", style: "flex-shrink: 0;", onclick: () => this._openPrompt("loopControls") }, "Loop Controls: "), this._useChipWaveAdvancedLoopControlsBox);
     private readonly _chipWaveLoopModeSelectRow = div({ class: "selectRow" }, span({ class: "tip", style: "font-size: x-small;", onclick: () => this._openPrompt("loopMode") }, "Loop Mode: "), div({ class: "selectContainer" }, this._chipWaveLoopModeSelect));
-    private readonly _chipWaveLoopStartRow = div({ class: "selectRow" }, span({ class: "tip", style: "font-size: x-small;", onclick: () => this._openPrompt("loopStart") }, "Loop Start: "), span({ style: "display: flex;" }, this._chipWaveLoopStartStepper));
+    private readonly _chipWaveLoopStartRow = div({ class: "selectRow" }, span({ class: "tip", style: "font-size: x-small;", onclick: () => this._openPrompt("loopStart") }, "Loop Start: "), this._visualLoopControlsButton, span({ style: "display: flex;" }, this._chipWaveLoopStartStepper));
     private readonly _chipWaveLoopEndRow = div({ class: "selectRow" }, span({ class: "tip", style: "font-size: x-small;", onclick: () => this._openPrompt("loopEnd") }, "Loop End: "), span({ style: "display: flex;" }, this._chipWaveLoopEndStepper, this._setChipWaveLoopEndToEndButton));
     private readonly _chipWaveStartOffsetRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("offset") }, "Offset: "), span({ style: "display: flex;" }, this._chipWaveStartOffsetStepper));
     private readonly _chipWavePlayBackwardsRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("backwards") }, "Backwards: "), this._chipWavePlayBackwardsBox);
@@ -1108,6 +1111,10 @@ export class SongEditor {
             this._optionsMenu,
         ),
     );
+
+    private readonly _sampleLoadingBar: HTMLDivElement = div({ style: `width: 0%; height: 100%; background-color: ${ColorConfig.indicatorPrimary};` });
+    private readonly _sampleLoadingBarContainer: HTMLDivElement = div({ style: `width: 80%; height: 3px; overflow: hidden; margin-left: auto; margin-right: auto; margin-top: 0.5em; cursor: pointer; background-color: ${ColorConfig.indicatorSecondary};` }, this._sampleLoadingBar);
+
     private readonly _songSettingsArea: HTMLDivElement = div({ class: "song-settings-area" },
         div({ class: "editor-controls" },
             div({ class: "editor-song-settings" },
@@ -1144,6 +1151,9 @@ export class SongEditor {
             div({ class: "selectRow" },
                 span({ class: "tip", onclick: () => this._openPrompt("rhythm") }, "Rhythm: "),
                 div({ class: "selectContainer" }, this._rhythmSelect),
+            ),
+            div({ class: "selectRow", style: "height: 10px;" },
+                this._sampleLoadingBarContainer,
             ),
         ),
     );
@@ -1397,6 +1407,7 @@ export class SongEditor {
             this._chipWaveStartOffsetStepper.addEventListener("change", this._whenSetChipWaveStartOffset);
             this._chipWavePlayBackwardsBox.addEventListener("input", this._whenSetChipWavePlayBackwards);
             // advloop addition
+        this._sampleLoadingBarContainer.addEventListener("click", this._whenSampleLoadingBarClicked);
 	    this._chipNoiseSelect.addEventListener("change", this._whenSetNoiseWave);
         this._transitionSelect.addEventListener("change", this._whenSetTransition);
         this._effectsSelect.addEventListener("change", this._whenSetEffects);
@@ -1475,6 +1486,8 @@ export class SongEditor {
         this._instrumentCopyButton.addEventListener("click", this._copyInstrument.bind(this));
         this._instrumentPasteButton.addEventListener("click", this._pasteInstrument.bind(this));
 
+        sampleLoadEvents.addEventListener("sampleloaded", this._updateSampleLoadingBar.bind(this));
+
         this._instrumentVolumeSliderInputBox.addEventListener("input", () => { this._doc.record(new ChangeVolume(this._doc, this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()].volume, Math.min(25.0, Math.max(-25.0, Math.round(+this._instrumentVolumeSliderInputBox.value))))) });
         this._panSliderInputBox.addEventListener("input", () => { this._doc.record(new ChangePan(this._doc, this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()].pan, Math.min(100.0, Math.max(0.0, Math.round(+this._panSliderInputBox.value))))) });
         this._detuneSliderInputBox.addEventListener("input", () => { this._doc.record(new ChangeDetune(this._doc, this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()].detune, Math.min(Config.detuneMax - Config.detuneCenter, Math.max(Config.detuneMin - Config.detuneCenter, Math.round(+this._detuneSliderInputBox.value))))) });
@@ -1501,6 +1514,21 @@ export class SongEditor {
             layoutOption.disabled = true;
             layoutOption.setAttribute("hidden", "");
         }
+    }
+
+    private _whenSampleLoadingBarClicked = (): void => {
+        this._openPrompt("sampleLoadingStatus");
+    }
+
+    private _updateSampleLoadingBar(_e: Event): void {
+        // @TODO: Avoid this cast and type EventTarget/Event properly.
+        const e: SampleLoadedEvent = <SampleLoadedEvent>_e;
+        const percent: number = (
+            e.totalSamples === 0
+            ? 0
+            : Math.floor((e.samplesLoaded / e.totalSamples) * 100)
+        );
+        this._sampleLoadingBar.style.width = `${percent}%`;
     }
 
     private _toggleAlgorithmCanvas(e:Event):void {
@@ -1743,7 +1771,7 @@ export class SongEditor {
         this._currentPromptName = promptName;
 
         if (this.prompt) {
-            if (this._wasPlaying && !(this.prompt instanceof TipPrompt || this.prompt instanceof LimiterPrompt || this.prompt instanceof CustomScalePrompt || this.prompt instanceof CustomChipPrompt || this.prompt instanceof CustomFilterPrompt)) {
+            if (this._wasPlaying && !(this.prompt instanceof TipPrompt || this.prompt instanceof LimiterPrompt || this.prompt instanceof CustomScalePrompt || this.prompt instanceof CustomChipPrompt || this.prompt instanceof CustomFilterPrompt || this.prompt instanceof VisualLoopControlsPrompt)) {
                 this._doc.performance.play();
             }
             this._wasPlaying = false;
@@ -1802,7 +1830,7 @@ export class SongEditor {
                     this.prompt = new RecordingSetupPrompt(this._doc);
                     break;
 		case "addExternal":
-                        this.prompt = new AddExternalPrompt(this._doc);
+                        this.prompt = new AddSamplesPrompt(this._doc);
                         break;
 		case "generateEuclideanRhythm":
                         this.prompt = new EuclideanRhythmPrompt(this._doc);
@@ -1810,13 +1838,19 @@ export class SongEditor {
 		case "custom":
                         this.prompt = new CustomPrompt(this._doc, this._patternEditor, this._trackArea, document.getElementById("beepboxEditorContainer")!);
                         break;
+                case "visualLoopControls":
+                    this.prompt = new VisualLoopControlsPrompt(this._doc, this);
+                    break;
+                case "sampleLoadingStatus":
+                    this.prompt = new SampleLoadingStatusPrompt(this._doc);
+                    break;
                 default:
                     this.prompt = new TipPrompt(this._doc, promptName);
                     break;
             }
 
             if (this.prompt) {
-                if (!(this.prompt instanceof TipPrompt || this.prompt instanceof LimiterPrompt || this.prompt instanceof CustomChipPrompt || this.prompt instanceof CustomFilterPrompt)) {
+                if (!(this.prompt instanceof TipPrompt || this.prompt instanceof LimiterPrompt || this.prompt instanceof CustomChipPrompt || this.prompt instanceof CustomFilterPrompt || this.prompt instanceof VisualLoopControlsPrompt)) {
                     this._wasPlaying = this._doc.synth.playing;
                     this._doc.performance.pause();
                 }
@@ -3580,7 +3614,7 @@ export class SongEditor {
                 if (canPlayNotes) break;
                 if (needControlForShortcuts == (event.ctrlKey || event.metaKey)) {
 			if (event.shiftKey) {
-				this._openPrompt("addExternalSample");
+				this._openPrompt("addExternal");
 				event.preventDefault();
 				break;
 			}
@@ -4379,10 +4413,10 @@ export class SongEditor {
             case "limiterSettings":
                 this._openPrompt("limiterSettings");
                 break;
-	    case "generateEuclideanRhythm":
-		this._openPrompt("generateEuclideanRhythm");
-		break;
-	case "addExternal":
+            case "generateEuclideanRhythm":
+                this._openPrompt("generateEuclideanRhythm");
+                break;
+            case "addExternal":
                 this._openPrompt("addExternal");
                 break;
         }

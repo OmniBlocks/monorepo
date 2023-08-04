@@ -165,8 +165,10 @@
         const image = localStorage.getItem('customTheme2');
         const el  = document.getElementById('secondImage');
         // console.log(image, el);
-        el.style.backgroundImage="url(" + image + ")";
-        el.style.backgroundRepeat= "repeat";
+        if (image != null && image !== "null" && image !== "undefined") {
+            el.style.backgroundImage="url(" + image + ")";
+            el.style.backgroundRepeat= "repeat";
+        }
     </script>
     <div id="beepboxEditorContainer">
         <noscript>
@@ -321,7 +323,7 @@
                 <!-- </h2> -->
                 <!-- <div style="background: black;"> -->
                     <!-- <a class="twitter-timeline" data-width="300" data-height="2000" data-link-color="#9988ff" data-chrome="noheader nofooter transparent" data-dnt="true" data-theme="dark" href="https://twitter-archive.beepbox.co/" target="_blank">Songs retweeted by @beepboxco</a> -->
-                   <script async src="https://twitter-archive.beepbox.co/" charset="utf-8"></script>
+                    <!-- <script async src="https://twitter-archive.beepbox.co/" charset="utf-8"></script> -->
                 <!-- </div> -->
             <!-- </aside> -->
         </div>

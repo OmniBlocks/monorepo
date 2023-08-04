@@ -41,7 +41,7 @@ export class AddSamplesPrompt {
     );
     private readonly _instructionsLink: HTMLAnchorElement = a({ href: "#" }, "Here's more information and some instructions on how to use custom samples in UltraBox.");
     private readonly _description: HTMLDivElement = div(
-        div({ style: "margin-bottom: 0.5em;" },
+        div({ style: "margin-bottom: 0.5em; -webkit-user-select: text; -moz-user-select: text; -ms-user-select: text; user-select: text; cursor: text;" },
             "In order to use the old UltraBox samples, you should add ",
             code("legacySamples"),
             " as an URL. You can also use ",
@@ -59,7 +59,7 @@ export class AddSamplesPrompt {
     );
     private readonly _closeInstructionsButton: HTMLButtonElement = button({ style: "height: auto; min-height: var(--button-size); width: 100%;" }, "Close instructions");
     private readonly _instructionsArea: HTMLDivElement = div(
-        { style: "display: none; margin-top: 0;" },
+        { style: "display: none; margin-top: 0; -webkit-user-select: text; -moz-user-select: text; -ms-user-select: text; user-select: text; cursor: text;" },
         h2("Add Samples"),
         div({ style: "margin-top: 0.5em; margin-bottom: 0.5em;" },
             "In UltraBox, custom samples are loaded from arbitrary URLs.",
@@ -169,6 +169,7 @@ export class AddSamplesPrompt {
     private _saveChanges = (): void => {
         const urlData: string = this._generateURLData();
         EditorConfig.customSamples = urlData.split("|").filter(x => x !== "");
+        EditorConfig.willReloadForCustomSamples = true;
         window.location.hash = this._doc.song.toBase64String();
         // The prompt seems to get stuck if reloading is done too quickly.
         setTimeout(() => { location.reload(); }, 50);

@@ -133,8 +133,8 @@ class VisualLoopControlsHandle {
     };
 
     private _whenMouseIsUp = (event: MouseEvent): void => {
-        event.preventDefault();
-        event.stopPropagation();
+        // event.preventDefault();
+        // event.stopPropagation();
         if (!this._mouseDown) return;
         this._mouseDown = false;
         this._handleDragOffset = null;
@@ -192,7 +192,7 @@ class VisualLoopControlsHandle {
 
     private _whenTouchIsUp = (event: TouchEvent): void => {
         event.preventDefault();
-        event.stopPropagation();
+        // event.stopPropagation();
 
         this._mouseDown = false;
         this._handleDragOffset = null;
@@ -685,6 +685,7 @@ export class VisualLoopControlsPrompt {
         const rawOffset: number = Math.max(0, Math.min(1, +(<HTMLInputElement>event.target).value));
         const newViewportOffset: number = Math.max(0, Math.min(this._waveformViewportMaxOffset, rawOffset * this._waveformViewportMaxOffset));
         this._waveformViewportOffset = Math.min(this._waveformViewportMaxOffset, newViewportOffset);
+        this._viewportOffsetSlider.value = "" + (this._waveformViewportOffset / this._waveformViewportMaxOffset);
         this._waveformViewportX0 = 0 + this._waveformViewportOffset;
         this._waveformViewportX1 = this._waveformViewportWidth + this._waveformViewportOffset;
         this._propagateViewportUpdate();
@@ -816,8 +817,8 @@ export class VisualLoopControlsPrompt {
     }
 
     private _whenOverlayMouseIsUp = (event: MouseEvent): void => {
-        event.preventDefault();
-        event.stopPropagation();
+        // event.preventDefault();
+        // event.stopPropagation();
         if (!this._overlayIsMouseDown) return;
         this.gotMouseUp = true;
         setTimeout(() => { this.gotMouseUp = false; }, 10);
@@ -910,7 +911,7 @@ export class VisualLoopControlsPrompt {
 
     private _whenOverlayTouchIsUp = (event: TouchEvent): void => {
         event.preventDefault();
-        event.stopPropagation();
+        // event.stopPropagation();
 
         if (!this._overlayIsMouseDown) return;
         this.gotMouseUp = true;

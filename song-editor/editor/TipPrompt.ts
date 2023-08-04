@@ -453,7 +453,7 @@ export class TipPrompt implements Prompt {
                     break;
 					 case "loopMode":
                     {
-                        message = div(h2("Loop Mode"), p("This sets the way the chip wave loops when its ends are reached."), p("The \"Loop\" mode is the default: when the end of the loop is reached, it will jump back to the starting point of the loop."), p("The \"Ping-Pong\" mode starts playing the chip wave backwards when the end of the loop is reached. Once it reaches the start of the loop, it will start playing forwards again, endlessly going back and forth."), p("The \"Play Once\" mode stops the chip wave once the end is reached."));
+                        message = div(h2("Loop Mode"), p("This sets the way the chip wave loops when its ends are reached."), p("The \"Loop\" mode is the default: when the end of the loop is reached, it will jump back to the starting point of the loop."), p("The \"Ping-Pong\" mode starts playing the chip wave backwards when the end of the loop is reached. Once it reaches the start of the loop, it will start playing forwards again, endlessly going back and forth."), p("The \"Play Once\" mode stops the chip wave once the end is reached (or the start of the loop, if it's playing backwards)."), p("The \"Play Loop Once\" mode stops the chip wave once the end of the loop is reached (or the start of the loop, if it's playing backwards)."));
                     }
                     break;
 					 case "loopStart":
@@ -473,7 +473,7 @@ export class TipPrompt implements Prompt {
                     break;
 					 case "backwards":
                     {
-                        message = div(h2("Backwards"), p("When set, the chip wave will start playing from the end, the loop region ends will be flipped, and the offset will count starting at the end, so if it's 0, that means it starts at the end of the chip wave."));
+                        message = div(h2("Backwards"), p("When set, the chip wave will start playing backwards. After checking this, you may want to adjust the offset to start from a different point that makes sense for this mode."));
                     }
                     break;
 

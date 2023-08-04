@@ -25,6 +25,7 @@ class VisualLoopControlsHandle {
     private _value: number;
     private readonly _validator: HandleValueValidator;
     private readonly _whenValueChanges: HandleValueChangeHandler;
+    private readonly _whenMouseUpHappens: () => void;
     private readonly _shapeFunction: ShapeFunction;
     private readonly _handleWidth: number = 40;
     private _mouseDown: boolean = false;
@@ -36,10 +37,11 @@ class VisualLoopControlsHandle {
     public canvas: HTMLCanvasElement | null = null;
     private _context: CanvasRenderingContext2D | null = null;
 
-    constructor(value: number, canvasWidth: number, canvasHeight: number, viewportX0: number, viewportX1: number, validator: HandleValueValidator, whenValueChanges: HandleValueChangeHandler, shapeFunction: ShapeFunction | null) {
+    constructor(value: number, canvasWidth: number, canvasHeight: number, viewportX0: number, viewportX1: number, validator: HandleValueValidator, whenValueChanges: HandleValueChangeHandler, whenMouseUpHappens: () => void, shapeFunction: ShapeFunction | null) {
         this._value = value;
         this._validator = validator;
         this._whenValueChanges = whenValueChanges;
+        this._whenMouseUpHappens = whenMouseUpHappens;
         this._shapeFunction = shapeFunction == null ? defaultShapeFunction : shapeFunction;
         this._viewportX0 = viewportX0;
         this._viewportX1 = viewportX1;
@@ -131,9 +133,12 @@ class VisualLoopControlsHandle {
     };
 
     private _whenMouseIsUp = (event: MouseEvent): void => {
+        event.preventDefault();
+        event.stopPropagation();
         if (!this._mouseDown) return;
         this._mouseDown = false;
         this._handleDragOffset = null;
+        this._whenMouseUpHappens();
     }
 
     private _whenTouchMoves = (event: TouchEvent): void => {
@@ -187,9 +192,11 @@ class VisualLoopControlsHandle {
 
     private _whenTouchIsUp = (event: TouchEvent): void => {
         event.preventDefault();
+        event.stopPropagation();
 
         this._mouseDown = false;
         this._handleDragOffset = null;
+        this._whenMouseUpHappens();
     }
     
     public cleanUp = (): void => {
@@ -259,6 +266,10 @@ export class VisualLoopControlsPrompt {
             this._renderOverlay();
             this._reconfigureLoopControls();
         },
+        (): void => {
+            this.gotMouseUp = true;
+            setTimeout(() => { this.gotMouseUp = false; }, 10);
+        },
         (cnv: HTMLCanvasElement, ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number): void => {
             const th: number = h / 4;
             ctx.beginPath();
@@ -283,6 +294,10 @@ export class VisualLoopControlsPrompt {
             this._renderOverlay();
             this._reconfigureLoopControls();
         },
+        (): void => {
+            this.gotMouseUp = true;
+            setTimeout(() => { this.gotMouseUp = false; }, 10);
+        },
         (cnv: HTMLCanvasElement, ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number): void => {
             const tw: number = w / 4;
             ctx.beginPath();
@@ -306,6 +321,10 @@ export class VisualLoopControlsPrompt {
             this._instrument!.chipWaveLoopEnd = this._chipWaveLoopEnd;
             this._renderOverlay();
             this._reconfigureLoopControls();
+        },
+        (): void => {
+            this.gotMouseUp = true;
+            setTimeout(() => { this.gotMouseUp = false; }, 10);
         },
         (cnv: HTMLCanvasElement, ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number): void => {
             const tw: number = w / 4;
@@ -339,7 +358,8 @@ export class VisualLoopControlsPrompt {
     private readonly _loopModeSelect: HTMLSelectElement = select({ style: "width: 100%; flex-grow: 1; margin-left: 0.5em;" },
         option({ value: 0 }, "Loop"),
         option({ value: 1 }, "Ping-Pong"),
-        option({ value: 2 }, "Play Once")
+        option({ value: 2 }, "Play Once"),
+        option({ value: 3 }, "Play Loop Once")
     );
     private _startOffsetStepper: HTMLInputElement = input({ style: "flex-grow: 1; margin-left: 1em; width: 100%;", type: "number", value: this._chipWaveStartOffset, min: "0", step: "1" });
     private _loopStartStepper: HTMLInputElement = input({ style: "flex-grow: 1; margin-left: 1em; width: 100%;", type: "number", value: this._chipWaveLoopStart, min: "0", step: "1" });
@@ -397,6 +417,8 @@ export class VisualLoopControlsPrompt {
         ),
         this._cancelButton
     );
+
+    public gotMouseUp: boolean = false;
 
     constructor(_doc: SongDocument, _songEditor: SongEditor) {
         this._doc = _doc;
@@ -794,7 +816,11 @@ export class VisualLoopControlsPrompt {
     }
 
     private _whenOverlayMouseIsUp = (event: MouseEvent): void => {
+        event.preventDefault();
+        event.stopPropagation();
         if (!this._overlayIsMouseDown) return;
+        this.gotMouseUp = true;
+        setTimeout(() => { this.gotMouseUp = false; }, 10);
         this._overlayIsMouseDown = false;
 
         const w: number = this._overlayCanvas.width;
@@ -883,9 +909,12 @@ export class VisualLoopControlsPrompt {
     }
 
     private _whenOverlayTouchIsUp = (event: TouchEvent): void => {
-        if (!this._overlayIsMouseDown) return;
-
         event.preventDefault();
+        event.stopPropagation();
+
+        if (!this._overlayIsMouseDown) return;
+        this.gotMouseUp = true;
+        setTimeout(() => { this.gotMouseUp = false; }, 10);
 
         this._overlayIsMouseDown = false;
 

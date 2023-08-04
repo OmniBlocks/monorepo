@@ -854,6 +854,10 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
   width: -webkit-fill-available !important;
 }
 
+.select2 {
+  width: calc(var(--settings-area-width) * 0.625) !important;
+}
+
 .select2-container--default .select2-selection--single{
   border-radius: 0px;
   border: 0px;

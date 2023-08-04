@@ -1,5 +1,6 @@
 // Copyright (c) 2012-2022 John Nesky and contributing authors, distributed under the MIT license, see accompanying the LICENSE.md file.
 
+import { getLocalStorageItem } from "../synth/SynthConfig";
 import {ColorConfig} from "./ColorConfig";
 import {HTML} from "imperative-html/dist/esm/elements-strict";
 
@@ -277,7 +278,7 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 
 .beepboxEditor .track-area {
 	grid-area: track-area;
- background-image: url(${localStorage.getItem('customTheme2')})
+	background-image: url(${getLocalStorageItem("customTheme2", "")});
 }
 
 .beepboxEditor .loopEditor {
@@ -1544,7 +1545,7 @@ li.select2-results__option[role=group] > strong:hover {
 /* wide screen */
 @media (min-width: 711px) {
 	#beepboxEditorContainer {
- background-image: url(${localStorage.getItem('customTheme2')});
+		background-image: url(${getLocalStorageItem("customTheme2", "")});
 		display: table;
 	}
 	.beepboxEditor {

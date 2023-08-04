@@ -3525,8 +3525,8 @@ export class Song {
                             if (isCustomPercussive) namedOptions.push("p");
                             if (presetIsUsingAdvancedLoopControls) {
                             if (presetChipWaveLoopStart != null) namedOptions.push("a" + presetChipWaveLoopStart);
-                                if (presetChipWaveLoopEnd != null) namedOptions.push("a" + presetChipWaveLoopEnd);
-                                if (presetChipWaveStartOffset != null) namedOptions.push("a" + presetChipWaveStartOffset);
+                                if (presetChipWaveLoopEnd != null) namedOptions.push("b" + presetChipWaveLoopEnd);
+                                if (presetChipWaveStartOffset != null) namedOptions.push("c" + presetChipWaveStartOffset);
                             }
                             if (namedOptions.length > 0) {
                                 urlWithNamedOptions = "!" + namedOptions.join(",") + "!" + urlSliced;

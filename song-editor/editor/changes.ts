@@ -4167,7 +4167,7 @@ export class ChangeChipWave extends Change {
                 instrument.chipWaveLoopMode = 0;
                 instrument.chipWavePlayBackwards = false;
                 instrument.chipWaveStartOffset = 0;
-                // instrument.preset = instrument.type;
+                instrument.preset = instrument.type;
                 doc.notifier.changed();
                 this._didSomething();
             }
@@ -4180,7 +4180,7 @@ export class ChangeChipWave extends Change {
             if (instrument.chipWaveLoopMode != newValue) {
                 instrument.isUsingAdvancedLoopControls = true;
                 instrument.chipWaveLoopMode = newValue;
-                // instrument.preset = instrument.type;
+                instrument.preset = instrument.type;
                 doc.notifier.changed();
                 this._didSomething();
             }
@@ -4193,7 +4193,7 @@ export class ChangeChipWave extends Change {
             if (instrument.chipWaveLoopStart != newValue) {
                 instrument.isUsingAdvancedLoopControls = true;
                 instrument.chipWaveLoopStart = newValue;
-                // instrument.preset = instrument.type;
+                instrument.preset = instrument.type;
                 doc.notifier.changed();
                 this._didSomething();
             }
@@ -4207,7 +4207,7 @@ export class ChangeChipWave extends Change {
                 instrument.isUsingAdvancedLoopControls = true;
                 instrument.chipWaveLoopEnd = newValue;
                 instrument.chipWaveLoopStart = Math.max(0, Math.min(newValue - 1, instrument.chipWaveLoopStart));
-                // instrument.preset = instrument.type;
+                instrument.preset = instrument.type;
                 doc.notifier.changed();
                 this._didSomething();
             }
@@ -4220,7 +4220,7 @@ export class ChangeChipWave extends Change {
             if (instrument.chipWaveStartOffset != newValue) {
                 instrument.isUsingAdvancedLoopControls = true;
                 instrument.chipWaveStartOffset = newValue;
-                // instrument.preset = instrument.type;
+                instrument.preset = instrument.type;
                 doc.notifier.changed();
                 this._didSomething();
             }
@@ -4233,7 +4233,7 @@ export class ChangeChipWave extends Change {
             if (instrument.chipWavePlayBackwards != newValue) {
                 instrument.isUsingAdvancedLoopControls = true;
                 instrument.chipWavePlayBackwards = newValue;
-                // instrument.preset = instrument.type;
+                instrument.preset = instrument.type;
                 doc.notifier.changed();
                 this._didSomething();
             }

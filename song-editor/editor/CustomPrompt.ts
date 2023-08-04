@@ -125,6 +125,7 @@ export class CustomPrompt implements Prompt {
 	}`});
 	private readonly _cancelButton: HTMLButtonElement = button({ class: "cancelButton" });
 	private readonly _okayButton: HTMLButtonElement = button({ class: "okayButton", style: "width:45%;" }, "Okay");
+	private readonly _resetButton: HTMLButtonElement = button({ style: "height: auto; min-height: var(--button-size);" }, "Reset to defaults");
 
 	public readonly container: HTMLDivElement = div({ class: "prompt noSelection", style: "width: 300px;" },
 		h2("Import"),
@@ -149,6 +150,9 @@ export class CustomPrompt implements Prompt {
 		),
 		this._colorInput,
 		div({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between;" },
+			this._resetButton
+		),
+		div({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between;" },
 			this._okayButton,
 		),
 		this._cancelButton,
@@ -159,21 +163,41 @@ export class CustomPrompt implements Prompt {
 		this._fileInput.addEventListener("change", this._whenFileSelected);
 		this._fileInput2.addEventListener("change", this._whenFileSelected2);
 		this._colorInput.addEventListener("change", this._whenColorsChanged);
-		this._okayButton.addEventListener("click", this._saveChanges);
+		this._okayButton.addEventListener("click", this._close);
 		this._cancelButton.addEventListener("click", this._close);
+		this._resetButton.addEventListener("click", this._reset);
 	}
 
 	private _close = (): void => {
+		this._doc.prompt = null;
 		this._doc.undo();
 		if(doReload) {
-			window.location.reload();
+			// The prompt seems to get stuck if reloading is done too quickly.
+			setTimeout(() => { window.location.reload(); }, 50);
 		}
 	}
 
 	public cleanUp = (): void => {
-		this._okayButton.removeEventListener("click", this._saveChanges);
+		this._okayButton.removeEventListener("click", this._close);
 		this._cancelButton.removeEventListener("click", this._close);
 		// this.container.removeEventListener("keydown", this._whenKeyPressed);
+		this._resetButton.removeEventListener("click", this._reset);
+	}
+	private _reset = (): void => {
+		window.localStorage.removeItem("colorTheme");
+		window.localStorage.removeItem("customTheme");
+		window.localStorage.removeItem("customTheme2");
+		window.localStorage.removeItem("customColors");
+		this._pattern._svg.style.backgroundImage = "";
+		document.body.style.backgroundImage = "";
+		this._pattern2.style.backgroundImage = "";
+		this._pattern3.style.backgroundImage = "";
+		const secondImage: HTMLElement | null = document.getElementById("secondImage");
+		if (secondImage != null) {
+			secondImage.style.backgroundImage = "";
+		}
+		doReload = true;
+		this._close();
 	}
 	private _whenColorsChanged = (): void => {
 		localStorage.setItem("customColors", this._colorInput.value);
@@ -210,7 +234,10 @@ export class CustomPrompt implements Prompt {
 			document.body.style.backgroundImage = `url(${base64})`;
 			this._pattern2.style.backgroundImage = value;
 			this._pattern3.style.backgroundImage = value;
-			document.getElementById('secondImage')!.style.backgroundImage = `url(${base64})`;
+			const secondImage: HTMLElement | null = document.getElementById("secondImage");
+			if (secondImage != null) {
+				secondImage.style.backgroundImage = `url(${base64})`;
+			}
 			// document.body.style.backgroundImage = `url(${newURL})`;
 			// window.localStorage.setItem("customTheme2", <string>reader.result);
 			// this._doc.record(new ChangeSong(this._doc, <string>reader.result), true, true);
@@ -222,16 +249,6 @@ export class CustomPrompt implements Prompt {
 	// 		this._saveChanges();
 	// 	}
 	// }
-
-	private _saveChanges = (): void => {
-		// window.localStorage.setItem("colorTheme", this._themeSelect.value);
-		this._doc.prompt = null;
-		// this._doc.colorTheme = this._themeSelect.value;
-		this._doc.undo();
-		if(doReload) {
-			window.location.reload();
-		}
-	}
 
 	// private _previewTheme = (): void => {
 	// 	ColorConfig.setTheme(this._themeSelect.value);

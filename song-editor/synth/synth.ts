@@ -1290,7 +1290,7 @@ export class Instrument {
 	public isUsingAdvancedLoopControls: boolean = false;
 	public chipWaveLoopStart: number = 0;
 	public chipWaveLoopEnd = Config.rawRawChipWaves[this.chipWave].samples.length - 1;
-	public chipWaveLoopMode: number = 0; // 0: loop, 1: ping-pong, 2: once
+	public chipWaveLoopMode: number = 0; // 0: loop, 1: ping-pong, 2: once, 3: play loop once
 	public chipWavePlayBackwards: boolean = false;
         public chipWaveStartOffset: number = 0;
         // advloop addition
@@ -3591,7 +3591,9 @@ export class Song {
                                 midiProgram: 80,
                                 settings: customSamplePresetSettings,
                             });
-                            startLoadingSample(urlSliced, chipWaveIndex, customSampleRate);
+                            if (!EditorConfig.willReloadForCustomSamples) {
+                                startLoadingSample(urlSliced, chipWaveIndex, customSampleRate);
+                            }
                             sampleLoadingState.statusTable[chipWaveIndex] = "loading";
                             sampleLoadingState.urlTable[chipWaveIndex] = urlSliced;
                             sampleLoadingState.totalSamples++;
@@ -9120,7 +9122,7 @@ export class Synth {
                 // to 0 once it's in `Synth.loopableChipSynth`.
                 const lastOffset = 0.999999999999999;
                 for (let i = 0; i < Config.maxPitchOrOperatorCount; i++) {
-                    tone.phases[i] = instrument.chipWavePlayBackwards ? Math.min(lastOffset, lastOffset - firstOffset) : Math.max(0, firstOffset);
+                    tone.phases[i] = instrument.chipWavePlayBackwards ? Math.max(0, Math.min(lastOffset, firstOffset)) : Math.max(0, firstOffset);
                     tone.directions[i] = instrument.chipWavePlayBackwards ? -1 : 1;
                     tone.chipWaveCompletions[i] = 0;
                     tone.chipWavePrevWaves[i] = 0;
@@ -9945,7 +9947,7 @@ export class Synth {
             let directionB: number = tone.directions[1];
             let chipWaveCompletionA: number = tone.chipWaveCompletions[0];
             let chipWaveCompletionB: number = tone.chipWaveCompletions[1];
-            if (chipWaveLoopMode === 2 || chipWaveLoopMode === 0) {
+            if (chipWaveLoopMode === 3 || chipWaveLoopMode === 2 || chipWaveLoopMode === 0) {
                 // If playing once or looping, we force the correct direction,
                 // since it shouldn't really change. This is mostly so that if
                 // the mode is changed midway through playback, it won't get
@@ -10036,6 +10038,42 @@ export class Synth {
                         }
                     } else if (directionA === -1) {
                         if (phaseB < 0) {
+                            if (chipWaveCompletionB <= 0) {
+                                lastWaveB = prevWaveB;
+                                chipWaveCompletionB++;
+                            }
+                            wrapped = 1;
+                        }
+                    }
+                } else if (chipWaveLoopMode === 3) {
+                    // loop once
+                    if (directionA === 1) {
+                        if (phaseA > chipWaveLoopEnd) {
+                            if (chipWaveCompletionA <= 0) {
+                                lastWaveA = prevWaveA;
+                                chipWaveCompletionA++;
+                            }
+                            wrapped = 1;
+                        }
+                    } else if (directionA === -1) {
+                        if (phaseA < chipWaveLoopStart) {
+                            if (chipWaveCompletionA <= 0) {
+                                lastWaveA = prevWaveA;
+                                chipWaveCompletionA++;
+                            }
+                            wrapped = 1;
+                        }
+                    }
+                    if (directionB === 1) {
+                        if (phaseB > chipWaveLoopEnd) {
+                            if (chipWaveCompletionB <= 0) {
+                                lastWaveB = prevWaveB;
+                                chipWaveCompletionB++;
+                            }
+                            wrapped = 1;
+                        }
+                    } else if (directionA === -1) {
+                        if (phaseB < chipWaveLoopStart) {
                             if (chipWaveCompletionB <= 0) {
                                 lastWaveB = prevWaveB;
                                 chipWaveCompletionB++;

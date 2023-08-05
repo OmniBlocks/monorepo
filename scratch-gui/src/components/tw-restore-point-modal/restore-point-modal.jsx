@@ -110,7 +110,7 @@ const RestorePointModal = props => (
                             <div className={styles.totalSizeDescription}>
                                 <FormattedMessage
                                     // eslint-disable-next-line max-len
-                                    defaultMessage="Costumes or images used by multiple restore points are only stored once."
+                                    defaultMessage="Costumes or sounds used by multiple restore points are only stored once."
                                     // eslint-disable-next-line max-len
                                     description="Part of the restore point modal that explains why the total storage used is less than may be expected."
                                     id="tw.restorePoints.size2"

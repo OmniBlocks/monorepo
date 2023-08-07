@@ -1252,6 +1252,10 @@ class Runtime extends EventEmitter {
             return this._convertButtonForScratchBlocks(blockInfo, categoryInfo);
         }
 
+        if (blockInfo.blockType === BlockType.XML) {
+            return this._convertXmlForScratchBlocks(blockInfo);
+        }
+
         return this._convertBlockForScratchBlocks(blockInfo, categoryInfo);
     }
 
@@ -1460,6 +1464,13 @@ class Runtime extends EventEmitter {
             xml: `<button text="${xmlEscape(buttonText)}"` +
                 ' callbackKey="EXTENSION_CALLBACK"' +
                 ` callbackData="${xmlEscape(id)}"></button>`
+        };
+    }
+
+    _convertXmlForScratchBlocks (xmlInfo) {
+        return {
+            info: xmlInfo,
+            xml: xmlInfo.xml
         };
     }
 

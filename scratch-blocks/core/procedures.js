@@ -249,11 +249,6 @@ Blockly.Procedures.flyoutCategory = function(workspace) {
     workspace.procedureReturnsEnabled
   );
   if (showReturn) {
-    var returnDocsButton = goog.dom.createDom('button');
-    returnDocsButton.setAttribute('callbackkey', 'OPEN_RETURN_DOCS');
-    returnDocsButton.setAttribute('text', Blockly.Msg.PROCEDURES_DOCS);
-    xmlList.push(returnDocsButton);
-
     var returnBlock = goog.dom.createDom('block');
     returnBlock.setAttribute('type', Blockly.PROCEDURES_RETURN_BLOCK_TYPE);
     returnBlock.setAttribute('gap', 16);
@@ -266,7 +261,12 @@ Blockly.Procedures.flyoutCategory = function(workspace) {
     returnBlockShadow.appendChild(returnBlockField);
     returnBlockValue.appendChild(returnBlockShadow);
     returnBlock.appendChild(returnBlockValue);
-    xmlList.push(returnBlock);
+    xmlList.unshift(returnBlock);
+
+    var returnDocsButton = goog.dom.createDom('button');
+    returnDocsButton.setAttribute('callbackkey', 'OPEN_RETURN_DOCS');
+    returnDocsButton.setAttribute('text', Blockly.Msg.PROCEDURES_DOCS);
+    xmlList.unshift(returnDocsButton);
   }
 
   return xmlList;

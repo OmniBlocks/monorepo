@@ -3443,7 +3443,7 @@ export class Song {
 					    			const optionCode: string = rawOption.charAt(0);
 					    			const optionData: string = rawOption.slice(1, rawOption.length);
 					    			if (optionCode === "s") {
-					    				customSampleRate = clamp(8000, 96000, parseFloat(optionData));
+					    				customSampleRate = clamp(8000, 96000 + 1, parseFloat(optionData));
 					    			} else if (optionCode === "r") {
 					    				customRootKey = parseFloat(optionData);
 					    			} else if (optionCode === "p") {
@@ -3484,7 +3484,7 @@ export class Song {
 							function sliceForSampleRate() {
 								urlSliced = url.slice(0, url.indexOf(","));
 								parsedUrl = new URL(urlSliced);
-								customSampleRate = clamp(8000, 96000, parseFloat(url.slice(url.indexOf(",") + 1)));
+								customSampleRate = clamp(8000, 96000 + 1, parseFloat(url.slice(url.indexOf(",") + 1)));
 								//should this be parseFloat or parseInt?
 								//ig floats let you do decimals and such, but idk where that would be useful
 							}

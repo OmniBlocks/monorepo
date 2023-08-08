@@ -374,7 +374,7 @@ export class AddSamplesPrompt {
         // @TODO: Duplicated code like this isn't great (in this case coming from Song.fromBase64String).
         function sliceForSampleRate(url: string): [string, number] {
             const newUrl = url.slice(0, url.indexOf(","));
-            const sampleRate = clamp(8000, 96000, parseFloat(url.slice(url.indexOf(",") + 1)));
+            const sampleRate = clamp(8000, 96000 + 1, parseFloat(url.slice(url.indexOf(",") + 1)));
             return [newUrl, sampleRate];
         }
         function sliceForRootKey(url: string): [string, number] {
@@ -446,7 +446,7 @@ export class AddSamplesPrompt {
                             const optionCode: string = rawOption.charAt(0);
                             const optionData: string = rawOption.slice(1, rawOption.length);
                             if (optionCode === "s") {
-                                sampleRate = clamp(8000, 96000, parseFloat(optionData));
+                                sampleRate = clamp(8000, 96000 + 1, parseFloat(optionData));
                             } else if (optionCode === "r") {
                                 rootKey = parseFloat(optionData);
                             } else if (optionCode === "p") {

@@ -226,7 +226,7 @@ export class EuclideanRhythmPrompt implements Prompt {
 	// Keep in mind this counts from 1 (to match the rest of the UI).
 	private readonly _channelStepper: HTMLInputElement = input({ style: "width: 3em; margin-left: 1em;", type: "number", min: "1", max: this._maxChannel + 1, value: "1", step: "1" });
 
-	private readonly _pitchStepper: HTMLInputElement = input({ style: "width: 3em; margin-left: 1em;", type: "number", min: "0", max: Config.maxPitch - 1, value: "0", step: "1" });
+	private readonly _pitchStepper: HTMLInputElement = input({ style: "width: 3em; margin-left: 1em;", type: "number", min: "0", max: Config.maxPitch, value: "0", step: "1" });
 	private readonly _barAmountStepper: HTMLInputElement = input({ style: "width: 3em; margin-left: 1em;", type: "number", min: "1", max: Config.barCountMax, value: "1", step: "1" });
 
 	private readonly _extendUntilLoopButton: HTMLButtonElement = button({ style: "height: auto; min-height: var(--button-size); margin-left: 1em;" }, "Extend until loop");
@@ -411,7 +411,7 @@ export class EuclideanRhythmPrompt implements Prompt {
 						const channel: number = Math.max(0, Math.min(this._maxChannel, this._doc.channel));
 						sequence.channel = channel;
 
-						const maxPitch: number = this._doc.song.getChannelIsNoise(channel) ? (Config.drumCount - 1) : (Config.maxPitch - 1);
+						const maxPitch: number = this._doc.song.getChannelIsNoise(channel) ? (Config.drumCount - 1) : Config.maxPitch;
 						sequence.pitch = Math.max(0, Math.min(maxPitch, sequence.pitch));
 					}
 				}
@@ -1017,10 +1017,11 @@ export class EuclideanRhythmPrompt implements Prompt {
 	}
 
 	private _whenStepsChanges = (event: Event): void => {
-		const steps: number = +this._stepsStepper.value;
+		const steps: number = Math.max(this._minSteps, Math.min(this._maxSteps, +this._stepsStepper.value));
 		const sequence: Sequence = this._sequences[this._sequenceIndex];
 		sequence.steps = steps;
 
+		this._stepsStepper.value = steps + "";
 		this._reconfigurePulsesStepper();
 		this._generateCurrentSequence();
 
@@ -1028,60 +1029,68 @@ export class EuclideanRhythmPrompt implements Prompt {
 	}
 
 	private _whenPulsesChanges = (event: Event): void => {
-		const pulses: number = +this._pulsesStepper.value;
 		const sequence: Sequence = this._sequences[this._sequenceIndex];
+		const pulses: number = Math.max(0, Math.min(sequence.steps, +this._pulsesStepper.value));
 		sequence.pulses = pulses;
 
+		this._pulsesStepper.value = pulses + "";
 		this._generateCurrentSequence();
 
 		this._render();
 	}
 
 	private _whenRotationChanges = (event: Event): void => {
-		const rotation: number = +this._rotationStepper.value;
+		const rotation: number = Math.max(0, Math.min(this._maxSteps, +this._rotationStepper.value));
 		const sequence: Sequence = this._sequences[this._sequenceIndex];
 		sequence.rotation = rotation;
 
+		this._rotationStepper.value = rotation + "";
 		this._generateCurrentSequence();
 
 		this._render();
 	}
 
 	private _whenStepSizeChanges = (event: Event): void => {
-		const numerator: number = +this._stepSizeNumeratorStepper.value;
-		const denominator: number = +this._stepSizeDenominatorStepper.value;
+		const numerator: number = Math.max(1, Math.min(Config.partsPerBeat, +this._stepSizeNumeratorStepper.value));
+		const denominator: number = Math.max(1, Math.min(Config.partsPerBeat, +this._stepSizeDenominatorStepper.value));
 		const sequence: Sequence = this._sequences[this._sequenceIndex];
 		sequence.stepSizeNumerator = numerator;
 		sequence.stepSizeDenominator = denominator;
 
+		this._stepSizeNumeratorStepper.value = numerator + "";
+		this._stepSizeDenominatorStepper.value = denominator + "";
 		this._renderBarPreview();
 	}
 
 	private _whenPitchChanges = (event: Event): void => {
-		const pitch: number = +this._pitchStepper.value;
 		const sequence: Sequence = this._sequences[this._sequenceIndex];
+		const maxPitch: number = this._doc.song.getChannelIsNoise(sequence.channel) ? (Config.drumCount - 1) : Config.maxPitch;
+		const pitch: number = Math.max(0, Math.min(maxPitch, +this._pitchStepper.value));
 		sequence.pitch = pitch;
 
+		this._pitchStepper.value = pitch + "";
 		this._renderLabel();
 	}
 
 	private _whenChannelChanges = (event: Event): void => {
-		const channel: number = (+this._channelStepper.value) - 1;
+		const channel: number = Math.max(0, Math.min(this._maxChannel, (+this._channelStepper.value) - 1));
 		const sequence: Sequence = this._sequences[this._sequenceIndex];
 		sequence.channel = channel;
 
+		this._channelStepper.value = (channel + 1) + "";
 		this._reconfigurePitchStepper();
 		this._render();
 	}
 
 	private _whenBarAmountChanges = (event: Event): void => {
-		const barAmount: number = +this._barAmountStepper.value;
+		const barAmount: number = Math.max(1, Math.min(this._barsAvailable, +this._barAmountStepper.value));
 		this._barAmount = barAmount;
 
 		const firstBar: number = this._startBar;
 		const lastBar: number = this._startBar + this._barAmount; // Exclusive.
 		this._barPreviewBarIndex = Math.max(firstBar, Math.min(lastBar - 1, this._barPreviewBarIndex));
 
+		this._barAmountStepper.value = barAmount + "";
 		this._renderBarPreview();
 		this._renderLabel();
 	}
@@ -1135,7 +1144,7 @@ export class EuclideanRhythmPrompt implements Prompt {
 	private _reconfigurePitchStepper = (): void => {
 		const sequence: Sequence = this._sequences[this._sequenceIndex];
 		const channel: number = sequence.channel;
-		const maxPitch: number = this._doc.song.getChannelIsNoise(channel) ? (Config.drumCount - 1) : (Config.maxPitch - 1);
+		const maxPitch: number = this._doc.song.getChannelIsNoise(channel) ? (Config.drumCount - 1) : Config.maxPitch;
 		this._pitchStepper.value = Math.max(0, Math.min(maxPitch, +this._pitchStepper.value)) + "";
 		this._pitchStepper.max = maxPitch + "";
 

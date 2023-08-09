@@ -98,6 +98,8 @@ function buildPresetOptions(isNoise: boolean, idSet: string): HTMLSelectElement 
     randomGroup.appendChild(option({ value: "randomGenerated" }, "Random Generated"));
     menu.appendChild(randomGroup);
 
+    let firstCategoryGroup: HTMLElement | null = null;
+    let customSampleCategoryGroup: HTMLElement | null = null;
 
     for (let categoryIndex: number = 1; categoryIndex < EditorConfig.presetCategories.length; categoryIndex++) {
         const category: PresetCategory = EditorConfig.presetCategories[categoryIndex];
@@ -109,6 +111,12 @@ function buildPresetOptions(isNoise: boolean, idSet: string): HTMLSelectElement 
                 group.appendChild(option({ value: (categoryIndex << 6) + presetIndex }, preset.name));
                 foundAny = true;
             }
+        }
+
+        if (categoryIndex === 1 && foundAny) {
+            firstCategoryGroup = group;
+        } else if (category.name === "Custom Sample Presets" && foundAny) {
+            customSampleCategoryGroup = group;
         }
 
         // Need to re-sort some elements for readability. Can't just do this in the menu, because indices are saved in URLs and would get broken if the ordering actually changed.
@@ -134,6 +142,13 @@ function buildPresetOptions(isNoise: boolean, idSet: string): HTMLSelectElement 
         }
 
         if (foundAny) menu.appendChild(group);
+    }
+
+    if (firstCategoryGroup != null && customSampleCategoryGroup != null) {
+        // Put the custom sample presets at the top.
+        const parent: HTMLSelectElement = <HTMLSelectElement>customSampleCategoryGroup.parentNode;
+        parent.removeChild(customSampleCategoryGroup);
+        parent.insertBefore(customSampleCategoryGroup, firstCategoryGroup);
     }
 
     return menu;

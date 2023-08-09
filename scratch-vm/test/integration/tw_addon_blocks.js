@@ -207,7 +207,9 @@ const runExecutionTests = compilerEnabled => test => {
         });
     });
 
-    test.skip('yield with resolved Promise', t => {
+    /*
+    // Doesn't work right now -- not clear whether it should or not
+    test.skip('yield with rejected Promise', t => {
         load().then(vm => {
             let rejectCallback;
             vm.addAddonBlock({
@@ -240,6 +242,7 @@ const runExecutionTests = compilerEnabled => test => {
             });
         });
     });
+    */
 
     test.test('returning values', t => {
         load().then(vm => {

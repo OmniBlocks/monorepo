@@ -149,8 +149,8 @@ import { HTML, SVG } from "imperative-html/dist/esm/elements-strict";
 		cursor: pointer;
 	}
 `));
-let aaa: string|null = window.localStorage.getItem("colorTheme");
-ColorConfig.setTheme(aaa===null?"jummbox classic":aaa);
+const colorTheme: string | null = getLocalStorage("colorTheme");
+ColorConfig.setTheme(colorTheme === null ? "dark classic" : colorTheme);
 
 let prevHash: string | null = null;
 let id: string = ((Math.random() * 0xffffffff) >>> 0).toString(16);
@@ -243,14 +243,14 @@ function setLocalStorage(key: string, value: string): void {
 	try {
 		localStorage.setItem(key, value);
 	} catch (error) {
-		console.error(error);
+		// Ignore the error since we can't fix it.
 	}
 }
 function getLocalStorage(key: string): string | null {
 	try {
 		return localStorage.getItem(key);
 	} catch (error) {
-		console.error(error);
+		// Ignore the error since we can't fix it.
 		return null;
 	}
 }
@@ -313,17 +313,28 @@ function onWindowResize(): void {
 	renderTimeline();
 }
 
+let pauseIfAnotherPlayerStartsHandle: ReturnType<typeof setInterval> | null = null;
+function pauseIfAnotherPlayerStarts(): void {
+	if (!synth.playing) {
+		clearInterval(pauseIfAnotherPlayerStartsHandle!);
+		return;
+	}
+
+	const storedPlayerId: string | null = getLocalStorage("playerId");
+	if (storedPlayerId != null && storedPlayerId != id) {
+		onTogglePlay();
+		renderPlayhead();
+		clearInterval(pauseIfAnotherPlayerStartsHandle!);
+	}
+}
+
 function animate(): void {
 	if (synth.playing) {
 		animationRequest = requestAnimationFrame(animate);
-		if (getLocalStorage("playerId") != id) {
-			onTogglePlay();
-		}
 		renderPlayhead();
 
 		volumeUpdate();
 	}
-		
 	if (pauseButtonDisplayed != synth.playing) {
 		renderPlayButton();
 	}
@@ -369,6 +380,8 @@ function onTogglePlay(): void {
 			synth.play();
 			setLocalStorage("playerId", id);
 			animate();
+			clearInterval(pauseIfAnotherPlayerStartsHandle!);
+			pauseIfAnotherPlayerStartsHandle = setInterval(pauseIfAnotherPlayerStarts, 100);
 		}
 	}
 	renderPlayButton();
@@ -400,6 +413,7 @@ function onTimelineMouseDown(event: MouseEvent): void {
 }
 
 function onTimelineMouseMove(event: MouseEvent): void {
+	if (!draggingPlayhead) return;
 	event.preventDefault();
 	onTimelineCursorMove(event.clientX || event.pageX);
 }

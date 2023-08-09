@@ -372,6 +372,11 @@ export class VisualLoopControlsPrompt {
         "Sample is loading"
     );
     private _loopControlsContainer: HTMLDivElement = div(
+        div({ style: "display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 0.5em;" },
+            div({ style: `width: 100%; margin-bottom: 0.5em; text-align: center; color: ${ColorConfig.secondaryText};` },
+                "You can also zoom by dragging horizontally on the waveform."
+            )
+        ),
         this._startOffsetHandle.canvas,
         this._waveformContainer,
         this._loopStartHandle.canvas,

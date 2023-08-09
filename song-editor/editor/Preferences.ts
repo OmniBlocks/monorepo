@@ -34,6 +34,7 @@ export class Preferences {
 	public metronomeCountIn: boolean;
 	public metronomeWhileRecording: boolean;
 	public showOscilloscope: boolean;
+	public showSampleLoadingStatus: boolean;
 	
 	constructor() {
 		this.reload();
@@ -61,6 +62,7 @@ export class Preferences {
 		this.metronomeCountIn = window.localStorage.getItem("metronomeCountIn") != "false";
 		this.metronomeWhileRecording = window.localStorage.getItem("metronomeWhileRecording") != "false";
 		this.showOscilloscope = window.localStorage.getItem("showOscilloscope") != "false";
+		this.showSampleLoadingStatus = window.localStorage.getItem("showSampleLoadingStatus") != "false";
 		this.keyboardLayout = window.localStorage.getItem("keyboardLayout") || "wickiHayden";
 		this.layout = window.localStorage.getItem("layout") || "small";
 		this.colorTheme = window.localStorage.getItem("colorTheme") || "dark classic";
@@ -104,6 +106,7 @@ export class Preferences {
 		window.localStorage.setItem("metronomeCountIn", this.metronomeCountIn ? "true" : "false");
 		window.localStorage.setItem("metronomeWhileRecording", this.metronomeWhileRecording ? "true" : "false");
 		window.localStorage.setItem("showOscilloscope", this.showOscilloscope ? "true" : "false");
+		window.localStorage.setItem("showSampleLoadingStatus", this.showSampleLoadingStatus ? "true" : "false");
 		window.localStorage.setItem("keyboardLayout", this.keyboardLayout);
 		window.localStorage.setItem("layout", this.layout);
 		window.localStorage.setItem("colorTheme", this.colorTheme);

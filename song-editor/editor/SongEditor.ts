@@ -763,6 +763,7 @@ export class SongEditor {
         option({ value: "displayBrowserUrl" }, "Display Song Data in URL"),
         option({ value: "displayVolumeBar" }, "Show Playback Volume"),
         option({ value: "showOscilloscope" }, "Show Oscilloscope"),
+        option({ value: "showSampleLoadingStatus" }, "Show Sample Loading Status"),
         option({ value: "layout" }, "Set Layout..."),
         option({ value: "colorTheme" }, "Set Theme..."),
 	option({ value: "customTheme" }, "Custom Theme..."),
@@ -1117,7 +1118,13 @@ export class SongEditor {
     );
 
     private readonly _sampleLoadingBar: HTMLDivElement = div({ style: `width: 0%; height: 100%; background-color: ${ColorConfig.indicatorPrimary};` });
-    private readonly _sampleLoadingBarContainer: HTMLDivElement = div({ style: `width: 80%; height: 3px; overflow: hidden; margin-left: auto; margin-right: auto; margin-top: 0.5em; cursor: pointer; background-color: ${ColorConfig.indicatorSecondary};` }, this._sampleLoadingBar);
+    private readonly _sampleLoadingBarContainer: HTMLDivElement = div({ style: `width: 80%; height: 4px; overflow: hidden; margin-left: auto; margin-right: auto; margin-top: 0.5em; cursor: pointer; background-color: ${ColorConfig.indicatorSecondary};` }, this._sampleLoadingBar);
+    private readonly _sampleLoadingStatusContainer: HTMLDivElement = div(
+        div({ style: `margin-top: 0.5em; text-align: center; color: ${ColorConfig.secondaryText};` }, "Sample Loading Status"),
+        div({ class: "selectRow", style: "height: 6px; margin-bottom: 0.5em;" },
+            this._sampleLoadingBarContainer,
+        ),
+    );
 
     private readonly _songSettingsArea: HTMLDivElement = div({ class: "song-settings-area" },
         div({ class: "editor-controls" },
@@ -1156,9 +1163,7 @@ export class SongEditor {
                 span({ class: "tip", onclick: () => this._openPrompt("rhythm") }, "Rhythm: "),
                 div({ class: "selectContainer" }, this._rhythmSelect),
             ),
-            div({ class: "selectRow", style: "height: 10px;" },
-                this._sampleLoadingBarContainer,
-            ),
+            this._sampleLoadingStatusContainer,
         ),
     );
     private readonly _instrumentSettingsArea: HTMLDivElement = div({ class: "instrument-settings-area" },
@@ -1913,6 +1918,7 @@ export class SongEditor {
         this._volumeBarBox.style.display = this._doc.prefs.displayVolumeBar ? "" : "none";
         this._globalOscscopeContainer.style.display = this._doc.prefs.showOscilloscope ? "" : "none";
         this._doc.synth.oscEnabled = this._doc.prefs.showOscilloscope;
+        this._sampleLoadingStatusContainer.style.display = this._doc.prefs.showSampleLoadingStatus ? "" : "none";
 
         if (this._doc.getFullScreen()) {
             const semitoneHeight: number = this._patternEditorRow.clientHeight / this._doc.getVisiblePitchCount();
@@ -1961,6 +1967,7 @@ export class SongEditor {
             (prefs.displayBrowserUrl ? "✓ " : "　") + "Display Song Data in URL",
             (prefs.displayVolumeBar ? "✓ " : "　") + "Show Playback Volume",
             (prefs.showOscilloscope ? "✓ " : "　") + "Show Oscilloscope",
+            (prefs.showSampleLoadingStatus ? "✓ " : "　") + "Show Sample Loading Status",
             "　Set Layout...",
             "　Set Theme...",
 	    "　Custom Theme...",
@@ -4487,6 +4494,9 @@ export class SongEditor {
                 break;
             case "showOscilloscope":
                 this._doc.prefs.showOscilloscope = !this._doc.prefs.showOscilloscope;
+                break;
+            case "showSampleLoadingStatus":
+                this._doc.prefs.showSampleLoadingStatus = !this._doc.prefs.showSampleLoadingStatus;
                 break;
         }
         this._optionsMenu.selectedIndex = 0;

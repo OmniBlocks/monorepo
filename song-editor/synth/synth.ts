@@ -7390,6 +7390,7 @@ export class Synth {
     public loopRepeatCount: number = -1;
     public volume: number = 1.0;
     public oscRefreshEventTimer: number = 0;
+    public oscEnabled: boolean = true;
     public enableMetronome: boolean = false;
     public countInMetronome: boolean = false;
     public renderingSong: boolean = false;
@@ -7994,11 +7995,13 @@ export class Synth {
         } else {
             this.synthesize(outputDataL, outputDataR, outputBuffer.length, this.isPlayingSong);
 
-            if (this.oscRefreshEventTimer <= 0) {
-                events.raise("oscillascopeUpdate", outputDataL, outputDataR);
-                this.oscRefreshEventTimer = 2;
-            } else {
-                this.oscRefreshEventTimer--;
+            if (this.oscEnabled) {
+                if (this.oscRefreshEventTimer <= 0) {
+                    events.raise("oscillascopeUpdate", outputDataL, outputDataR);
+                    this.oscRefreshEventTimer = 2;
+                } else {
+                    this.oscRefreshEventTimer--;
+                }
             }
         }
     }

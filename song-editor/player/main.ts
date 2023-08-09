@@ -163,6 +163,11 @@ let outVolumeHistoricCap: number = 0;
 
 const synth: Synth = new Synth();
 const oscilascope: oscilascopeCanvas = new oscilascopeCanvas(canvas({ width: isMobile? 144:288, height: isMobile?32:64, style: `border:2px solid ${ColorConfig.uiWidgetBackground}; overflow: hidden;` , id: "oscilascopeAll" }), isMobile?1:2);
+const showOscilloscope: boolean = getLocalStorage("showOscilloscope") != "false";
+if (!showOscilloscope) {
+	oscilascope.canvas.style.display = "none";
+	synth.oscEnabled = false;
+}
 let titleText: HTMLHeadingElement = h1({ style: "flex-grow: 1; margin: 0 1px; margin-left: 10px; overflow: hidden;" }, "");
 	let editLink: HTMLAnchorElement = a({target: "_top", style: "margin: 0 4px;"}, "✎ Edit");
 	let copyLink: HTMLAnchorElement = a({href: "javascript:void(0)", style: "margin: 0 4px;"}, "⎘ Copy URL");

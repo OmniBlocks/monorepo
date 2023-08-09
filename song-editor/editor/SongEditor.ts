@@ -762,6 +762,7 @@ export class SongEditor {
         option({ value: "enableChannelMuting" }, "Enable Channel Muting"),
         option({ value: "displayBrowserUrl" }, "Display Song Data in URL"),
         option({ value: "displayVolumeBar" }, "Show Playback Volume"),
+        option({ value: "showOscilloscope" }, "Show Oscilloscope"),
         option({ value: "layout" }, "Set Layout..."),
         option({ value: "colorTheme" }, "Set Theme..."),
 	option({ value: "customTheme" }, "Custom Theme..."),
@@ -951,7 +952,10 @@ export class SongEditor {
         ]),
     ]);
 
-    public readonly _globalOscscope: oscilascopeCanvas = new oscilascopeCanvas(canvas({ width: 144, height: 32, style: "border:2px solid " + ColorConfig.uiWidgetBackground, id: "oscilascopeAll" }), 1);
+    public readonly _globalOscscope: oscilascopeCanvas = new oscilascopeCanvas(canvas({ width: 144, height: 32, style: `border: 2px solid ${ColorConfig.uiWidgetBackground}; position: static;`, id: "oscilascopeAll" }), 1);
+    private readonly _globalOscscopeContainer: HTMLDivElement = div({ style: "height: 38px; margin-left: auto; margin-right: auto;" },
+        this._globalOscscope.canvas
+    );
     private readonly _customWaveDrawCanvas: CustomChipCanvas = new CustomChipCanvas(canvas({ width: 128, height: 52, style: "border:2px solid " + ColorConfig.uiWidgetBackground, id: "customWaveDrawCanvas" }), this._doc, (newArray: Float32Array) => new ChangeCustomWave(this._doc, newArray));
     private readonly _customWavePresetDrop: HTMLSelectElement = buildHeaderedOptions("Load Preset", select({ style: "width: 50%; height:1.5em; text-align: center; text-align-last: center;" }),
         Config.chipWaves.map(wave => wave.name)
@@ -1180,7 +1184,7 @@ export class SongEditor {
                 span({ class: "volume-speaker" }),
                 this._volumeSlider.container,
             ),
-            div({style: "height: 38px"},this._globalOscscope.canvas),
+            this._globalOscscopeContainer,
         ),
         this._menuArea,
         this._songSettingsArea,
@@ -1907,6 +1911,8 @@ export class SongEditor {
         this._octaveScrollBar.container.style.display = prefs.showScrollBar ? "" : "none";
         this._barScrollBar.container.style.display = this._doc.song.barCount > this._doc.trackVisibleBars ? "" : "none";
         this._volumeBarBox.style.display = this._doc.prefs.displayVolumeBar ? "" : "none";
+        this._globalOscscopeContainer.style.display = this._doc.prefs.showOscilloscope ? "" : "none";
+        this._doc.synth.oscEnabled = this._doc.prefs.showOscilloscope;
 
         if (this._doc.getFullScreen()) {
             const semitoneHeight: number = this._patternEditorRow.clientHeight / this._doc.getVisiblePitchCount();
@@ -1954,6 +1960,7 @@ export class SongEditor {
             (prefs.enableChannelMuting ? "✓ " : "　") + "Enable Channel Muting",
             (prefs.displayBrowserUrl ? "✓ " : "　") + "Display Song Data in URL",
             (prefs.displayVolumeBar ? "✓ " : "　") + "Show Playback Volume",
+            (prefs.showOscilloscope ? "✓ " : "　") + "Show Oscilloscope",
             "　Set Layout...",
             "　Set Theme...",
 	    "　Custom Theme...",
@@ -4477,6 +4484,9 @@ export class SongEditor {
 		break;
             case "recordingSetup":
                 this._openPrompt("recordingSetup");
+                break;
+            case "showOscilloscope":
+                this._doc.prefs.showOscilloscope = !this._doc.prefs.showOscilloscope;
                 break;
         }
         this._optionsMenu.selectedIndex = 0;

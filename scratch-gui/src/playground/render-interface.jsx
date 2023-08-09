@@ -43,6 +43,7 @@ import {isRendererSupported, isBrowserSupported} from '../lib/tw-environment-sup
 import AddonChannels from '../addons/channels';
 import {loadServiceWorker} from './load-service-worker';
 import runAddons from '../addons/entry';
+import {APP_NAME} from '../lib/brand';
 
 import styles from './interface.css';
 
@@ -329,10 +330,13 @@ class Interface extends React.Component {
                                         {/* This will be here a few weeks, so we can translate it */}
                                         <FormattedMessage
                                             // eslint-disable-next-line max-len
-                                            defaultMessage="Parts of TurboWarp may be temporarily unavailable due to upcoming Scratch maintenance"
+                                            defaultMessage="Upcoming Scratch maintenance may affect parts of {APP_NAME}"
                                             // eslint-disable-next-line max-len
                                             description="Temporary message with a link to learn about upcoming Scratch maintenance"
                                             id="tw.aug23downtime"
+                                            values={{
+                                                APP_NAME
+                                            }}
                                         />
                                     </a>
                                 </p>

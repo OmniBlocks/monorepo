@@ -323,7 +323,7 @@ class Interface extends React.Component {
                             <div className={styles.section}>
                                 <p className={styles.infobox}>
                                     <a
-                                        href="https://turbowarp.org/august-2023-scratch-maintenance.html"
+                                        href={`${process.env.ROOT}august-2023-scratch-maintenance.html`}
                                         target="_blank"
                                         rel="noreferrer"
                                     >

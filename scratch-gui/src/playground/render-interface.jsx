@@ -261,7 +261,7 @@ class Interface extends React.Component {
                                 // eslint-disable-next-line max-len
                                 description.instructions === 'unshared' || description.credits === 'unshared'
                             ) && (
-                                <div className={styles.unsharedUpdate}>
+                                <div className={classNames(styles.infobox, styles.unsharedUpdate)}>
                                     <p>
                                         <FormattedMessage
                                             defaultMessage="Unshared projects are no longer visible."
@@ -320,6 +320,22 @@ class Interface extends React.Component {
                                 </div>
                             ) : null}
                             <div className={styles.section}>
+                                <p className={styles.infobox}>
+                                    <a
+                                        href="https://turbowarp.org/august-2023-scratch-maintenance.html"
+                                        target="_blank"
+                                        rel="noreferrer"
+                                    >
+                                        {/* This will be here a few weeks, so we can translate it */}
+                                        <FormattedMessage
+                                            // eslint-disable-next-line max-len
+                                            defaultMessage="Parts of TurboWarp may be temporarily unavailable due to upcoming Scratch maintenance"
+                                            // eslint-disable-next-line max-len
+                                            description="Temporary message with a link to learn about upcoming Scratch maintenance"
+                                            id="tw.aug23downtime"
+                                        />
+                                    </a>
+                                </p>
                                 <p>
                                     <FormattedMessage
                                         // eslint-disable-next-line max-len

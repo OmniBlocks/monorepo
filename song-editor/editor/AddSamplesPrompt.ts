@@ -101,7 +101,7 @@ export class AddSamplesPrompt {
         ),
         div({ style: "margin-top: 0.5em; margin-bottom: 1em;" },
             "Finally, if have a soundfont you'd like to get samples from, consider using this ",
-            a({ href: "https://ultraabox.github.io/sample_extractor.html", target: "_blank" }, "sample extractor"),
+            a({ href: "./sample_extractor.html", target: "_blank" }, "sample extractor"),
             "."
         ),
         div({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between; margin-top: 0.5em;" }, this._closeInstructionsButton)

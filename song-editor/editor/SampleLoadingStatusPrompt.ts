@@ -10,8 +10,8 @@ export class SampleLoadingStatusPrompt {
     private readonly _intervalDuration: number = 2000;
 
     private readonly _doc: SongDocument;
-    private _interval: number | null = null;
-    private _renderedWhenAllAreLoaded: boolean = false;
+    private _interval: ReturnType<typeof setInterval> | null = null;
+    private _renderedWhenAllHaveStoppedChanging: boolean = false;
     private readonly _cancelButton: HTMLButtonElement = button({ class: "cancelButton" });
     private _statusesContainer: HTMLDivElement = div();
     private _noSamplesMessage: HTMLDivElement = div({ style: "margin-top: 0.5em; display: none;" }, "There's no custom samples in this song.");
@@ -28,7 +28,7 @@ export class SampleLoadingStatusPrompt {
 
     constructor(_doc: SongDocument) {
         this._doc = _doc;
-        this._interval = window.setInterval(() => this._render(), this._intervalDuration);
+        this._interval = setInterval(() => this._render(), this._intervalDuration);
         this._render();
         this._cancelButton.addEventListener("click", this._close);
     }
@@ -54,18 +54,18 @@ export class SampleLoadingStatusPrompt {
             this._noSamplesMessage.style.display = "";
         }
 
-        if (hasNoCustomSamples || this._renderedWhenAllAreLoaded) {
+        if (hasNoCustomSamples || this._renderedWhenAllHaveStoppedChanging) {
             clearInterval(this._interval!);
             return;
         }
 
-        let allAreLoaded: boolean = true;
+        let allHaveStoppedChanging: boolean = true;
         for (let chipWaveIndex: number = 0; chipWaveIndex < Config.chipWaves.length; chipWaveIndex++) {
             const chipWave: ChipWave = Config.chipWaves[chipWaveIndex];
             if (chipWave.isCustomSampled !== true && chipWave.isSampled !== true) continue;
             const loadingStatus: SampleLoadingStatus = sampleLoadingState.statusTable[chipWaveIndex];
-            if (loadingStatus !== SampleLoadingStatus.loaded) {
-                allAreLoaded = false;
+            if (loadingStatus === SampleLoadingStatus.loading) {
+                allHaveStoppedChanging = false;
                 break;
             }
         }
@@ -106,8 +106,8 @@ export class SampleLoadingStatusPrompt {
             this._statusesContainer.appendChild(chipWaveElement);
         }
 
-        if (allAreLoaded) {
-            this._renderedWhenAllAreLoaded = true;
+        if (allHaveStoppedChanging) {
+            this._renderedWhenAllHaveStoppedChanging = true;
         }
     }
 }

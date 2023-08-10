@@ -6220,6 +6220,8 @@ function refreshSampleInfo(group, sample, hasMultipleSamplesSelected) {
     let loopEnd = null;
 
     if (hasMultipleSamplesSelected) {
+        outputSampleInfoContainer.style.display = "none";
+        exportArea.style.display = "";
         sampleInfoContainer.innerHTML = "";
         const n = sampleList.selectedOptions.length;
         const message = document.createTextNode(`There are ${n} samples selected.`);

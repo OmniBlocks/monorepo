@@ -262,9 +262,11 @@ export class EuclideanRhythmPrompt implements Prompt {
 			),
 		),
 		div({ style: "display: flex; flex-direction: row; align-items: center; justify-content: space-evenly;" },
-			SVG.svg({ "pointer-events": "none", style: "touch-action: none; overflow: hidden; margin-right: 1.5em; max-width: 150px; height: auto;", viewBox: `0 0 ${this._clockWidth} ${this._clockHeight}`, preserveAspectRatio: "none" },
-				this._clockWire,
-				this._clockPoints
+			div({ style: "max-width: 150px; height: 100%;" },
+				SVG.svg({ "pointer-events": "none", width: "100%", height: "100%", style: "touch-action: none; overflow: hidden; margin-right: 1.5em; max-width: 150px; height: 100%;", viewBox: `0 0 ${this._clockWidth} ${this._clockHeight}`, preserveAspectRatio: "none" },
+					this._clockWire,
+					this._clockPoints
+				),
 			),
 			div({ style: "display: flex; height: 100%;" },
 				div({ style: "flex-grow: 1; " },

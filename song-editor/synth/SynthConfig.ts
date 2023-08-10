@@ -254,8 +254,22 @@ export interface AutomationTarget extends BeepBoxOption {
     readonly compatibleInstruments: InstrumentType[] | null;
 }
 
+export const enum SampleLoadingStatus {
+    loading,
+    loaded,
+    error,
+}
+
+export function getSampleLoadingStatusName(status: SampleLoadingStatus): string {
+    switch (status) {
+	case SampleLoadingStatus.loading: return "loading";
+	case SampleLoadingStatus.loaded: return "loaded";
+	case SampleLoadingStatus.error: return "error";
+    }
+}
+
 export class SampleLoadingState {
-    public statusTable: Dictionary<string>;
+    public statusTable: Dictionary<SampleLoadingStatus>;
     public urlTable: Dictionary<string>;
     public totalSamples: number;
     public samplesLoaded: number;
@@ -301,13 +315,13 @@ export function startLoadingSample(url: string, chipWaveIndex: number, customSam
     // is deemed necessary, anything that involves chip waves has to be
     // revisited so as to be able to work with a changing list of chip
     // waves that may or may not be ready to be used.
-	    const sampleLoaderAudioContext = new AudioContext({ sampleRate: customSampleRate });
+    const sampleLoaderAudioContext = new AudioContext({ sampleRate: customSampleRate });
     const chipWave = Config.chipWaves[chipWaveIndex];
     const rawChipWave = Config.rawRawChipWaves[chipWaveIndex];
     fetch(url).then((response) => {
 	if (!response.ok) {
 	    // @TODO: Be specific with the error handling.
-	    sampleLoadingState.statusTable[chipWaveIndex] = "error";
+	    sampleLoadingState.statusTable[chipWaveIndex] = SampleLoadingStatus.error;
 	    return Promise.reject(new Error("Couldn't load sample"));
 	}
 	return response.arrayBuffer();
@@ -320,14 +334,14 @@ export function startLoadingSample(url: string, chipWaveIndex: number, customSam
 	chipWave.samples = integratedSamples;
 	rawChipWave.samples = samples;
 	sampleLoadingState.samplesLoaded++;
-	sampleLoadingState.statusTable[chipWaveIndex] = "loaded";
+	sampleLoadingState.statusTable[chipWaveIndex] = SampleLoadingStatus.loaded;
 	sampleLoadEvents.dispatchEvent(new SampleLoadedEvent(
 	    sampleLoadingState.totalSamples,
 	    sampleLoadingState.samplesLoaded
 	));
     }).catch((error) => {
 	//console.error(error);
-	sampleLoadingState.statusTable[chipWaveIndex] = "error";
+	sampleLoadingState.statusTable[chipWaveIndex] = SampleLoadingStatus.error;
 	alert("Failed to load " + url + ":\n" + error);
     });
 }
@@ -535,7 +549,7 @@ export function loadBuiltInSamples(set: number): void {
 	    Config.rawRawChipWaves.dictionary[chipWave.name] = rawChipWave;
 	    Config.chipWaves[chipWaveIndex] = integratedChipWave;
 	    Config.chipWaves.dictionary[chipWave.name] = rawChipWave;
-	    sampleLoadingState.statusTable[chipWaveIndex] = "loading";
+	    sampleLoadingState.statusTable[chipWaveIndex] = SampleLoadingStatus.loading;
 	    sampleLoadingState.urlTable[chipWaveIndex] = "legacySamples";
 	}
 
@@ -625,7 +639,7 @@ export function loadBuiltInSamples(set: number): void {
 		const chipWaveIndex: number = startIndex + chipWaveIndexOffset;
 		Config.rawRawChipWaves[chipWaveIndex].samples = chipWaveSample;
 		Config.chipWaves[chipWaveIndex].samples = performIntegral(chipWaveSample);
-		sampleLoadingState.statusTable[chipWaveIndex] = "loaded";
+		sampleLoadingState.statusTable[chipWaveIndex] = SampleLoadingStatus.loaded;
 		sampleLoadingState.samplesLoaded++;
 		sampleLoadEvents.dispatchEvent(new SampleLoadedEvent(
 		    sampleLoadingState.totalSamples,
@@ -658,7 +672,7 @@ export function loadBuiltInSamples(set: number): void {
 	    Config.rawRawChipWaves.dictionary[chipWave.name] = rawChipWave;
 	    Config.chipWaves[chipWaveIndex] = integratedChipWave;
 	    Config.chipWaves.dictionary[chipWave.name] = rawChipWave;
-	    sampleLoadingState.statusTable[chipWaveIndex] = "loading";
+	    sampleLoadingState.statusTable[chipWaveIndex] = SampleLoadingStatus.loading;
 	    sampleLoadingState.urlTable[chipWaveIndex] = "nintariboxSamples";
 	}
 
@@ -677,7 +691,7 @@ export function loadBuiltInSamples(set: number): void {
 		const chipWaveIndex: number = startIndex + chipWaveIndexOffset;
 		Config.rawRawChipWaves[chipWaveIndex].samples = chipWaveSample;
 		Config.chipWaves[chipWaveIndex].samples = performIntegral(chipWaveSample);
-		sampleLoadingState.statusTable[chipWaveIndex] = "loaded";
+		sampleLoadingState.statusTable[chipWaveIndex] = SampleLoadingStatus.loaded;
 		sampleLoadingState.samplesLoaded++;
 		sampleLoadEvents.dispatchEvent(new SampleLoadedEvent(
 		    sampleLoadingState.totalSamples,
@@ -716,7 +730,7 @@ export function loadBuiltInSamples(set: number): void {
 	    Config.rawRawChipWaves.dictionary[chipWave.name] = rawChipWave;
 	    Config.chipWaves[chipWaveIndex] = integratedChipWave;
 	    Config.chipWaves.dictionary[chipWave.name] = rawChipWave;
-	    sampleLoadingState.statusTable[chipWaveIndex] = "loading";
+	    sampleLoadingState.statusTable[chipWaveIndex] = SampleLoadingStatus.loading;
 	    sampleLoadingState.urlTable[chipWaveIndex] = "marioPaintboxSamples";
 	}
 
@@ -742,7 +756,7 @@ export function loadBuiltInSamples(set: number): void {
 		const chipWaveIndex: number = startIndex + chipWaveIndexOffset;
 		Config.rawRawChipWaves[chipWaveIndex].samples = chipWaveSample;
 		Config.chipWaves[chipWaveIndex].samples = performIntegral(chipWaveSample);
-		sampleLoadingState.statusTable[chipWaveIndex] = "loaded";
+		sampleLoadingState.statusTable[chipWaveIndex] = SampleLoadingStatus.loaded;
 		sampleLoadingState.samplesLoaded++;
 		sampleLoadEvents.dispatchEvent(new SampleLoadedEvent(
 		    sampleLoadingState.totalSamples,

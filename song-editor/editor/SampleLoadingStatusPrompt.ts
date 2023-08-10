@@ -1,5 +1,5 @@
 import { HTML } from "imperative-html/dist/esm/elements-strict";
-import { sampleLoadingState, ChipWave, Config } from "../synth/SynthConfig";
+import { sampleLoadingState, SampleLoadingStatus, getSampleLoadingStatusName, ChipWave, Config } from "../synth/SynthConfig";
 import { ColorConfig } from "./ColorConfig";
 import { EditorConfig } from "./EditorConfig";
 import { SongDocument } from "./SongDocument";
@@ -63,8 +63,8 @@ export class SampleLoadingStatusPrompt {
         for (let chipWaveIndex: number = 0; chipWaveIndex < Config.chipWaves.length; chipWaveIndex++) {
             const chipWave: ChipWave = Config.chipWaves[chipWaveIndex];
             if (chipWave.isCustomSampled !== true && chipWave.isSampled !== true) continue;
-            const loadingStatus: string = sampleLoadingState.statusTable[chipWaveIndex];
-            if (loadingStatus !== "loaded") {
+            const loadingStatus: SampleLoadingStatus = sampleLoadingState.statusTable[chipWaveIndex];
+            if (loadingStatus !== SampleLoadingStatus.loaded) {
                 allAreLoaded = false;
                 break;
             }
@@ -82,7 +82,7 @@ export class SampleLoadingStatusPrompt {
             if (chipWave.isCustomSampled !== true && chipWave.isSampled !== true) continue;
             const sampleName: string = chipWave.name;
             const url: string = sampleLoadingState.urlTable[chipWaveIndex];
-            const loadingStatus: string = sampleLoadingState.statusTable[chipWaveIndex];
+            const loadingStatus: string = getSampleLoadingStatusName(sampleLoadingState.statusTable[chipWaveIndex]);
             const urlDisplay: HTMLInputElement = input({ style: `margin-left: 0.5em; color: ${ColorConfig.primaryText}; background-color: ${ColorConfig.editorBackground}; width: 100%; border: 1px solid ${ColorConfig.uiWidgetBackground}; -webkit-user-select: none; -webkit-touch-callout: none; -moz-user-select: none; -ms-user-select: none; user-select: none;`, value: url, title: url, disabled: true });
             const loadingStatusColor: string = loadingStatus === "loaded" ? ColorConfig.indicatorPrimary : ColorConfig.secondaryText;
             const loadingStatusDisplay: HTMLSpanElement = span({ style: `margin-left: 0.5em; color: ${loadingStatusColor}` }, loadingStatus);

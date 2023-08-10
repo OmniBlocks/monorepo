@@ -1,5 +1,5 @@
 import { HTML, SVG } from "imperative-html/dist/esm/elements-strict";
-import { sampleLoadingState, ChipWave, Config } from "../synth/SynthConfig";
+import { sampleLoadingState, SampleLoadingStatus, ChipWave, Config } from "../synth/SynthConfig";
 import { Instrument } from "../synth/synth";
 import { ColorConfig } from "./ColorConfig";
 import { ChangeGroup } from "./Change";
@@ -432,7 +432,7 @@ export class VisualLoopControlsPrompt {
         this._overlayContext = this._overlayCanvas.getContext("2d");
         this._instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
         const rawChipWave: ChipWave = Config.rawRawChipWaves[this._instrument.chipWave];
-        const customSampleIsLoading: boolean = (rawChipWave.isCustomSampled === true || rawChipWave.isSampled == true) && sampleLoadingState.statusTable[this._instrument.chipWave] !== "loaded";
+        const customSampleIsLoading: boolean = (rawChipWave.isCustomSampled === true || rawChipWave.isSampled == true) && sampleLoadingState.statusTable[this._instrument.chipWave] !== SampleLoadingStatus.loaded;
         if (customSampleIsLoading) {
             this._sampleIsLoadingMessage.style.display = "";
             this._loopControlsContainer.style.display = "none";

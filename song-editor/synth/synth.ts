@@ -3431,6 +3431,8 @@ export class Song {
 						let presetChipWaveLoopStart: number | null = null;
 						let presetChipWaveLoopEnd: number | null = null;
 						let presetChipWaveStartOffset: number | null = null;
+						let presetChipWaveLoopMode: number | null = null;
+						let presetChipWavePlayBackwards: boolean = false;
 						
 					    let parsedSampleOptions: boolean = false;
 					    let optionsStartIndex: number = url.indexOf("!");
@@ -3457,6 +3459,12 @@ export class Song {
 					    			} else if (optionCode === "c") {
 					    				presetIsUsingAdvancedLoopControls = true;
 					    				presetChipWaveStartOffset = parseInt(optionData);
+					    			} else if (optionCode === "d") {
+					    				presetIsUsingAdvancedLoopControls = true;
+					    				presetChipWaveLoopMode = parseInt(optionData);
+					    			} else if (optionCode === "e") {
+					    				presetIsUsingAdvancedLoopControls = true;
+					    				presetChipWavePlayBackwards = true;
 					    			}
 					    		}
 					    		urlSliced = url.slice(optionsEndIndex + 1, url.length);
@@ -3524,9 +3532,11 @@ export class Song {
                             if (customRootKey !== 60) namedOptions.push("r" + customRootKey);
                             if (isCustomPercussive) namedOptions.push("p");
                             if (presetIsUsingAdvancedLoopControls) {
-                            if (presetChipWaveLoopStart != null) namedOptions.push("a" + presetChipWaveLoopStart);
+                                if (presetChipWaveLoopStart != null) namedOptions.push("a" + presetChipWaveLoopStart);
                                 if (presetChipWaveLoopEnd != null) namedOptions.push("b" + presetChipWaveLoopEnd);
                                 if (presetChipWaveStartOffset != null) namedOptions.push("c" + presetChipWaveStartOffset);
+                                if (presetChipWaveLoopMode != null) namedOptions.push("d" + presetChipWaveLoopMode);
+                                if (presetChipWavePlayBackwards) namedOptions.push("e");
                             }
                             if (namedOptions.length > 0) {
                                 urlWithNamedOptions = "!" + namedOptions.join(",") + "!" + urlSliced;
@@ -3581,8 +3591,8 @@ export class Song {
                                 customSamplePresetSettings["isUsingAdvancedLoopControls"] = true;
                                 customSamplePresetSettings["chipWaveLoopStart"] = presetChipWaveLoopStart != null ? presetChipWaveLoopStart : 0;
                                 customSamplePresetSettings["chipWaveLoopEnd"] = presetChipWaveLoopEnd != null ? presetChipWaveLoopEnd : 2;
-                                customSamplePresetSettings["chipWaveLoopMode"] = 0;
-                                customSamplePresetSettings["chipWavePlayBackwards"] = false;
+                                customSamplePresetSettings["chipWaveLoopMode"] = presetChipWaveLoopMode != null ? presetChipWaveLoopMode : 0;
+                                customSamplePresetSettings["chipWavePlayBackwards"] = presetChipWavePlayBackwards;
                                 customSamplePresetSettings["chipWaveStartOffset"] = presetChipWaveStartOffset != null ? presetChipWaveStartOffset : 0;
                             }
                             customSamplePresets.push({

@@ -337,7 +337,7 @@ export class Selection {
         new ChangePatternSelection(this._doc, 0, 0);
     }
 
-		public remapToNoisePitches(oldPitches: number[]): number[] {
+		private _remapToNoisePitches(oldPitches: number[]): number[] {
           let newPitches: number[] = oldPitches.slice();
             // There may be some very "pleasing" way to place these,
            // but I'm not sure it's worth the effort.
@@ -354,18 +354,17 @@ export class Selection {
            }
            return newPitches;
         }
-        convertCopiedPitchNotesToNoiseNotes(oldNotes: Note[]): Note[] {
+        private _convertCopiedPitchNotesToNoiseNotes(oldNotes: Note[]): Note[] {
             // When pasting from a pitch channel to a noise channel,
             // we may have pitches beyond what a noise channel supports.
             let newNotes: Note[] = [];
             for (let noteIndex: number = 0; noteIndex < oldNotes.length; noteIndex++) {
                 const oldNote: Note = oldNotes[noteIndex];
-                const newNotePitches: number[] = this.remapToNoisePitches(oldNote["pitches"].slice());
+                const newNotePitches: number[] = this._remapToNoisePitches(oldNote["pitches"].slice());
                 const oldNotePins: NotePin[] = oldNote.pins;
                 let newNotePins: NotePin[] = [];
                 for (let notePinIndex: number = 0; notePinIndex < oldNotePins.length; notePinIndex++) {
                     const oldPin: NotePin = oldNotePins[notePinIndex];
-                    // This should match the NotePin interface.
                    newNotePins.push({
                        interval: oldPin.interval,
                         time: oldPin.time,
@@ -375,7 +374,6 @@ export class Selection {
                 const newNoteStart: number = oldNote["start"];
                 const newNoteEnd: number = oldNote["end"];
                 const newNoteContinuesLastPattern: boolean = oldNote["continuesLastPattern"];
-                // This should match the Note class.
                 const newNote = new Note(0, newNoteStart, newNoteEnd, 0, false);
                 newNote.pitches = newNotePitches;
                 newNote.pins = newNotePins;
@@ -430,9 +428,9 @@ export class Selection {
 
                 const instrumentsCopy: number[] = this._parseCopiedInstrumentArray(patternCopy, channelIndex);
 
-                 let pastedNotes = patternCopy["notes"];
+                 let pastedNotes: Note[] = patternCopy["notes"];
                    if (isPitch && channelIsNoise) {
-                       pastedNotes = this.convertCopiedPitchNotesToNoiseNotes(pastedNotes);
+                       pastedNotes = this._convertCopiedPitchNotesToNoiseNotes(pastedNotes);
                     }
 		    
                 if (currentPatternIndex == 0) {
@@ -493,7 +491,7 @@ export class Selection {
                             if (newPattern == null) throw new Error();
                             for (const note of pattern.cloneNotes()) {
                                    if (isPitch && channelIsNoise) {
-                                        note.pitches = this.remapToNoisePitches(note.pitches);
+                                        note.pitches = this._remapToNoisePitches(note.pitches);
                                     }
 				    group.append(new ChangeNoteAdded(this._doc, newPattern, note, newPattern.notes.length, false));
                             }
@@ -508,7 +506,11 @@ export class Selection {
                         group.append(new ChangeNoteTruncate(this._doc, pattern, this.patternSelectionStart, this.patternSelectionEnd));
                     } else {
                         const patternCopy: PatternCopy = patternCopies[String(copiedPatternIndex)];
-                        group.append(new ChangePaste(this._doc, pattern, patternCopy["notes"], this.patternSelectionStart, this.patternSelectionEnd, copiedPartDuration));
+                        let pastedNotes: Note[] = patternCopy["notes"];
+                        if (isPitch && channelIsNoise) {
+                            pastedNotes = this._convertCopiedPitchNotesToNoiseNotes(pastedNotes);
+                        }
+                        group.append(new ChangePaste(this._doc, pattern, pastedNotes, this.patternSelectionStart, this.patternSelectionEnd, copiedPartDuration));
                     }
 
                     reusablePatterns[reusedIndex] = this._doc.song.channels[channelIndex].bars[bar];
@@ -534,9 +536,9 @@ export class Selection {
                     const instrumentsCopy: number[] = this._parseCopiedInstrumentArray(patternCopy, channelIndex);
                     const existingPattern: Pattern | undefined = this._doc.song.channels[channelIndex].patterns[copiedPatternIndex - 1];
 
-                 let pastedNotes = patternCopy["notes"];
+                 let pastedNotes: Note[] = patternCopy["notes"];
                         if (isPitch && channelIsNoise) {
-                            pastedNotes = this.convertCopiedPitchNotesToNoiseNotes(pastedNotes);
+                            pastedNotes = this._convertCopiedPitchNotesToNoiseNotes(pastedNotes);
                         }
 			
 		if (existingPattern != undefined &&
@@ -740,10 +742,7 @@ export class Selection {
         }
 
         for (const channelIndex of this._eachSelectedChannel()) {
-                           // Can't transpose mod channels.
-            if (channelIndex >= this._doc.song.pitchChannelCount + this._doc.song.noiseChannelCount)
-                continue;
-	for (const pattern of this._eachSelectedPattern(channelIndex)) {
+            for (const pattern of this._eachSelectedPattern(channelIndex)) {
                 group.append(new ChangePatternRhythm(this._doc, pattern));
             }
         }
@@ -794,6 +793,9 @@ export class Selection {
         }
 
         for (const channelIndex of this._eachSelectedChannel()) {
+		    // Can't transpose mod channels.
+		    if (channelIndex >= this._doc.song.pitchChannelCount + this._doc.song.noiseChannelCount)
+                continue;
             for (const pattern of this._eachSelectedPattern(channelIndex)) {
                 this._changeTranspose.append(new ChangeTranspose(this._doc, channelIndex, pattern, upward, this._doc.prefs.notesOutsideScale, octave));
 			}

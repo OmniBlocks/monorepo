@@ -150,6 +150,11 @@ export class ImportPrompt implements Prompt {
 			midiTick: number;
 			size: number;
 		}
+
+		interface TempoChange {
+			midiTick: number;
+			microsecondsPerBeat: number;
+		}
 			
 		// To read a MIDI file we have to simulate state changing over time.
 		// Keep a record of various parameters for each channel that may
@@ -165,7 +170,7 @@ export class ImportPrompt implements Prompt {
 			const noteEvents: NoteEvent[][] = [[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[]];
 			const pitchBendEvents: PitchBendEvent[][] = [[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[]];
 		const noteSizeEvents: NoteSizeEvent[][] = [[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[]];
-		let tempoChanges = [];
+		let tempoChanges: TempoChange[] = [];
 		let microsecondsPerBeat: number = 500000; // Tempo in microseconds per "quarter" note, commonly known as a "beat", default is equivalent to 120 beats per minute.
 		let beatsPerBar: number = 8;
 		let numSharps: number = 0;
@@ -296,7 +301,6 @@ export class ImportPrompt implements Prompt {
                                                microsecondsPerBeat: microsecondsPerBeat,
                                            });
 //midi tempo addition
-										   track.reader.skipBytes(length - 3);
 								} else if (message == MidiMetaEventMessage.timeSignature) {
 									const numerator: number = track.reader.readUint8();
 									let denominatorExponent: number = track.reader.readUint8();

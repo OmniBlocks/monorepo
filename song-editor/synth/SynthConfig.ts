@@ -316,6 +316,7 @@ export function startLoadingSample(url: string, chipWaveIndex: number, customSam
     // revisited so as to be able to work with a changing list of chip
     // waves that may or may not be ready to be used.
     const sampleLoaderAudioContext = new AudioContext({ sampleRate: customSampleRate });
+    let closedSampleLoaderAudioContext: boolean = false;
     const chipWave = Config.chipWaves[chipWaveIndex];
     const rawChipWave = Config.rawRawChipWaves[chipWaveIndex];
     fetch(url).then((response) => {
@@ -339,10 +340,18 @@ export function startLoadingSample(url: string, chipWaveIndex: number, customSam
 	    sampleLoadingState.totalSamples,
 	    sampleLoadingState.samplesLoaded
 	));
+	if (!closedSampleLoaderAudioContext) {
+	    closedSampleLoaderAudioContext = true;
+	    sampleLoaderAudioContext.close();
+	}
     }).catch((error) => {
 	//console.error(error);
 	sampleLoadingState.statusTable[chipWaveIndex] = SampleLoadingStatus.error;
 	alert("Failed to load " + url + ":\n" + error);
+	if (!closedSampleLoaderAudioContext) {
+	    closedSampleLoaderAudioContext = true;
+	    sampleLoaderAudioContext.close();
+	}
     });
 }
 

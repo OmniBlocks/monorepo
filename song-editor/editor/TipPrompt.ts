@@ -30,6 +30,15 @@ export class TipPrompt implements Prompt {
 					p("If you've already placed some notes but they don't emphasize \"tonic\" pitches then the selected key isn't very meaningful. You can select the \"Detect Key\" option in the key menu to automatically align the most emphasized notes with \"tonic\" pitches."),
 				);
 			} break;
+			case "key_octave": {
+				message = div(
+					h2("Octave"),
+					p("This setting can shift the \"key\" by an octave, allowing you to use a B- or C+ key."),
+					// @TODO: Use Config.octaveMin/Config.octaveMax in this
+					// message.
+					p("This goes from -2 to 2."),
+				);
+			} break;
 			case "tempo": {
 				message = div(
 					h2("Song Tempo"),

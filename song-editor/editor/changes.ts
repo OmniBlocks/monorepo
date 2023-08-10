@@ -3456,6 +3456,15 @@ export function removeDuplicatePatterns(channels: Channel[]): void {
     }
 }
 
+export class ChangeKeyOctave extends Change {
+    constructor(doc: SongDocument, oldValue: number, newValue: number) {
+        super();
+        doc.song.octave = Math.max(Config.octaveMin, Math.min(Config.octaveMax, Math.round(newValue)));
+        doc.notifier.changed();
+        if (oldValue != newValue) this._didSomething();
+    }
+}
+
 export class ChangeTempo extends Change {
     constructor(doc: SongDocument, oldValue: number, newValue: number) {
         super();

@@ -148,6 +148,7 @@ const enum SongTagCode {
     harmonics = CharCode.H, // added in 7
     stringSustain = CharCode.I, // added in 9
 
+    octave = CharCode.J, // [UB] added in 2
     pan = CharCode.L, // added between 8 and 9, DEPRECATED
     customChipWave = CharCode.M, // [JB], added in 1(?)
     songTitle = CharCode.N, // [JB], added in 1(?)
@@ -2492,6 +2493,7 @@ export class Song {
     public scale: number;
     public scaleCustom: boolean[] = [];
     public key: number;
+    public octave: number;
     public tempo: number;
     public reverb: number;
     public beatsPerBar: number;
@@ -2639,6 +2641,7 @@ export class Song {
         //this.scaleCustom = [true, false, true, true, false, false, false, true, true, false, true, true];
 	this.scaleCustom = [true, false, false, false, false, false, false, false, false, false, false, false];
         this.key = 0;
+        this.octave = 0;
         this.loopStart = 0;
         this.loopLength = 4;
         this.tempo = 120;
@@ -2721,6 +2724,9 @@ export class Song {
         buffer.push(SongTagCode.loopStart, base64IntToCharCode[this.loopStart >> 6], base64IntToCharCode[this.loopStart & 0x3f]);
         buffer.push(SongTagCode.loopEnd, base64IntToCharCode[(this.loopLength - 1) >> 6], base64IntToCharCode[(this.loopLength - 1) & 0x3f]);
         buffer.push(SongTagCode.tempo, base64IntToCharCode[this.tempo >> 6], base64IntToCharCode[this.tempo & 0x3F]);
+        // @TODO: Use Config.octaveMin/Config.octaveMax to figure out how to
+        // make this non-negative.
+        buffer.push(SongTagCode.octave, base64IntToCharCode[this.octave + 2]);
         buffer.push(SongTagCode.beatCount, base64IntToCharCode[this.beatsPerBar - 1]);
         buffer.push(SongTagCode.barCount, base64IntToCharCode[(this.barCount - 1) >> 6], base64IntToCharCode[(this.barCount - 1) & 0x3f]);
         buffer.push(SongTagCode.patternCount, base64IntToCharCode[(this.patternsPerChannel - 1) >> 6], base64IntToCharCode[(this.patternsPerChannel - 1) & 0x3f]);
@@ -3769,6 +3775,11 @@ export class Song {
                 } else {
                     this.key = clamp(0, Config.keys.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                 }
+            } break;
+            case SongTagCode.octave: {
+                // @TODO: Use Config.octaveMin/Config.octaveMax to figure out how to
+                // bring this back into the right range.
+                this.octave = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] - 2;
             } break;
             case SongTagCode.loopStart: {
                 if (beforeFive && fromBeepBox) {
@@ -5531,6 +5542,7 @@ export class Song {
             "scale": Config.scales[this.scale].name,
             "customScale": this.scaleCustom,
             "key": Config.keys[this.key].name,
+            "keyOctave": this.octave,
             "introBars": this.loopStart,
             "loopBars": this.loopLength,
             "beatsPerBar": this.beatsPerBar,
@@ -5612,6 +5624,10 @@ export class Song {
 
         if (jsonObject["beatsPerMinute"] != undefined) {
             this.tempo = clamp(Config.tempoMin, Config.tempoMax + 1, jsonObject["beatsPerMinute"] | 0);
+        }
+
+        if (jsonObject["keyOctave"] != undefined) {
+            this.octave = clamp(Config.octaveMin, Config.octaveMax + 1, jsonObject["keyOctave"] | 0);
         }
 
         let legacyGlobalReverb: number = 0; // In older songs, reverb was song-global, record that here and pass it to Instrument.fromJsonObject() for context.
@@ -6684,7 +6700,7 @@ class InstrumentState {
                 quantizationSettingEnd = synth.getModValue(Config.modulators.dictionary["bit crush"].index, channelIndex, instrumentIndex, true);
             }
 
-            const basePitch: number = Config.keys[synth.song!.key].basePitch; // TODO: What if there's a key change mid-song?
+            const basePitch: number = Config.keys[synth.song!.key].basePitch + (Config.pitchesPerOctave * synth.song!.octave); // TODO: What if there's a key change mid-song?
             const freqStart: number = Instrument.frequencyFromPitch(basePitch + 60) * Math.pow(2.0, (Config.bitcrusherFreqRange - 1 - freqSettingStart) * Config.bitcrusherOctaveStep);
             const freqEnd: number = Instrument.frequencyFromPitch(basePitch + 60) * Math.pow(2.0, (Config.bitcrusherFreqRange - 1 - freqSettingEnd) * Config.bitcrusherOctaveStep);
             const phaseDeltaStart: number = Math.min(1.0, freqStart / samplesPerSecond);
@@ -9066,7 +9082,7 @@ export class Synth {
         let chordExpressionEnd: number = chordExpression;
 
         let expressionReferencePitch: number = 16; // A low "E" as a MIDI pitch.
-        let basePitch: number = Config.keys[song.key].basePitch;
+        let basePitch: number = Config.keys[song.key].basePitch + (Config.pitchesPerOctave * song.octave);
         let baseExpression: number = 1.0;
         let pitchDamping: number = 48;
         if (instrument.type == InstrumentType.spectrum) {

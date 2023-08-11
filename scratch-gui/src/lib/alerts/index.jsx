@@ -143,7 +143,8 @@ const alerts = [
     {
         alertId: 'saveSuccess',
         alertType: AlertTypes.INLINE,
-        clearList: ['saveSuccess', 'saving', 'savingError', 'twSaveToDiskSuccess'],
+        clearList: ['saveSuccess', 'saving', 'savingError', 'twSaveToDiskSuccess',
+            'twCreatingRestorePoint', 'twRestorePointSuccess', 'twRestorePointError'],
         content: (
             <FormattedMessage
                 defaultMessage="Project saved."
@@ -158,7 +159,8 @@ const alerts = [
     {
         alertId: 'twSaveToDiskSuccess',
         alertType: AlertTypes.INLINE,
-        clearList: ['saveSuccess', 'saving', 'savingError', 'twSaveToDiskSuccess'],
+        clearList: ['saveSuccess', 'saving', 'savingError', 'twCreatingRestorePoint',
+            'twRestorePointSuccess', 'twRestorePointError'],
         content: (
             <FormattedMessage
                 defaultMessage="Saved to your computer."
@@ -173,7 +175,8 @@ const alerts = [
     {
         alertId: 'saving',
         alertType: AlertTypes.INLINE,
-        clearList: ['saveSuccess', 'saving', 'savingError', 'twSaveToDiskSuccess'],
+        clearList: ['saveSuccess', 'saving', 'savingError', 'twSaveToDiskSuccess',
+            'twCreatingRestorePoint', 'twRestorePointSuccess', 'twRestorePointError'],
         content: (
             <FormattedMessage
                 defaultMessage="Saving project…"
@@ -201,7 +204,7 @@ const alerts = [
     {
         alertId: 'twRestorePointSuccess',
         alertType: AlertTypes.INLINE,
-        clearList: ['twCreatingRestorePoint'],
+        clearList: ['twCreatingRestorePoint', 'twRestorePointError'],
         content: (
             <FormattedMessage
                 defaultMessage="Access restore points in &quot;File&quot;"
@@ -217,7 +220,7 @@ const alerts = [
     {
         alertId: 'twRestorePointError',
         alertType: AlertTypes.INLINE,
-        clearList: ['twCreatingRestorePoint'],
+        clearList: ['twCreatingRestorePoint', 'twRestorePointSuccess'],
         content: (
             <FormattedMessage
                 defaultMessage="Could not create restore point"

@@ -502,29 +502,26 @@ const getThumbnail = id => openDB().then(db => new Promise((resolve, reject) => 
     };
 }));
 
-// We will enable this after a couple days
-/*
-const deleteLegacyData = () => {
+const LEGACY_DATABASE_NAME = 'TW_AutoSave';
+const LEGACY_DATABASE_VERSION = 1;
+const LEGACY_STORE_NAME = 'project';
+
+const deleteLegacyRestorePoint = () => {
     try {
         if (typeof indexedDB !== 'undefined') {
-            const _request = indexedDB.deleteDatabase('TW_AutoSave');
+            const _request = indexedDB.deleteDatabase(LEGACY_DATABASE_NAME);
             // don't really care what happens to the request at this point
         }
     } catch (e) {
         // ignore
     }
 };
-*/
 
 const loadLegacyRestorePoint = () => new Promise((resolve, reject) => {
     if (typeof indexedDB === 'undefined') {
         reject(new Error('indexedDB not supported'));
         return;
     }
-
-    const LEGACY_DATABASE_NAME = 'TW_AutoSave';
-    const LEGACY_DATABASE_VERSION = 1;
-    const LEGACY_STORE_NAME = 'project';
 
     const openRequest = indexedDB.open(LEGACY_DATABASE_NAME, LEGACY_DATABASE_VERSION);
     openRequest.onerror = () => {
@@ -564,6 +561,42 @@ const loadLegacyRestorePoint = () => new Promise((resolve, reject) => {
     };
 });
 
+const DEFAULT_INTERVAL = 1000 * 60 * 5;
+const INTERVAL_STORAGE_KEY = 'tw:restore-point-interval';
+
+const readInterval = () => {
+    try {
+        const stored = localStorage.getItem(INTERVAL_STORAGE_KEY);
+        if (stored) {
+            const number = +stored;
+            if (Number.isFinite(number)) {
+                return number;
+            }
+        }
+
+        // TODO: this is temporary, remove it after enough has passed for people that care to have migrated
+        const addonSettings = localStorage.getItem('tw:addons');
+        if (addonSettings) {
+            const parsedAddonSettings = JSON.parse(addonSettings);
+            const addonObject = parsedAddonSettings['tw-disable-restore-points'];
+            if (addonObject && addonObject.enabled) {
+                return -1;
+            }
+        }
+    } catch (e) {
+        // ignore
+    }
+    return DEFAULT_INTERVAL;
+};
+
+const setInterval = interval => {
+    try {
+        localStorage.setItem(INTERVAL_STORAGE_KEY, interval);
+    } catch (err) {
+        // ignore
+    }
+};
+
 export default {
     TYPE_AUTOMATIC,
     TYPE_MANUAL,
@@ -574,5 +607,8 @@ export default {
     deleteAllRestorePoints,
     getThumbnail,
     loadRestorePoint,
-    loadLegacyRestorePoint
+    loadLegacyRestorePoint,
+    deleteLegacyRestorePoint,
+    readInterval,
+    setInterval
 };

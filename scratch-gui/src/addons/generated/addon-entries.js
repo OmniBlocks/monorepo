@@ -70,6 +70,5 @@ export default {
   "tw-remove-feedback": () => import(/* webpackChunkName: "addon-entry-tw-remove-feedback" */ "../addons/tw-remove-feedback/_runtime_entry.js"),
   "tw-disable-cloud-variables": () => import(/* webpackChunkName: "addon-entry-tw-disable-cloud-variables" */ "../addons/tw-disable-cloud-variables/_runtime_entry.js"),
   "tw-disable-compiler": () => import(/* webpackChunkName: "addon-entry-tw-disable-compiler" */ "../addons/tw-disable-compiler/_runtime_entry.js"),
-  "tw-disable-restore-points": () => import(/* webpackChunkName: "addon-entry-tw-disable-restore-points" */ "../addons/tw-disable-restore-points/_runtime_entry.js"),
   "editor-stepping": () => import(/* webpackChunkName: "addon-entry-editor-stepping" */ "../addons/editor-stepping/_runtime_entry.js"),
 };

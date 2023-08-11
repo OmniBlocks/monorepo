@@ -10,20 +10,13 @@
     padding: 1.5rem 2.25rem;
     max-height: calc(100vh - 150px);
     overflow: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
 }
 [theme="dark"] .body {
     color: $text-primary;
     background: $ui-primary;
-}
-
-.extra-container,
-.disabled,
-.loading,
-.error,
-.empty,
-.restore-point-container,
-.legacy-transition {
-    margin: 1rem 0 0 0;
 }
 
 .extra-container {

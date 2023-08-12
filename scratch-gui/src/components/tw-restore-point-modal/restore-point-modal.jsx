@@ -17,13 +17,19 @@ const messages = defineMessages({
     never: {
         defaultMessage: 'never',
         id: 'tw.restorePoints.never',
-        description: 'Part of restore point modal. Appears in a message like "Restore points are created [never v]".'
+        description: 'Part of restore point modal. Appears as dropdown in context "Restore points are created [never]"'
+    },
+    oneMinute: {
+        defaultMessage: 'every minute',
+        id: 'tw.restorePoints.1minute',
+        // eslint-disable-next-line max-len
+        description: 'Part of restore point modal. Appears as dropdown in context "Restore points are created [every minute]"'
     },
     minutes: {
-        defaultMessage: 'every {minutes, plural, one {# minute} other {# minutes}}',
+        defaultMessage: 'every {n} minutes',
         id: 'tw.restorePoints.minutes',
         // eslint-disable-next-line max-len
-        description: 'Part of restore point modal. Appears in a message like "Restore points are created [every one minute v]".'
+        description: 'Part of restore point modal. Appears as dropdown in context "Restore points are created [every 5 minutes]". {n} will be replaced with a number greater than 1.'
     }
 });
 
@@ -48,9 +54,11 @@ const IntervalSelector = props => (
             >
                 {interval < 0 ? (
                     props.intl.formatMessage(messages.never)
+                ) : interval === MINUTE ? (
+                    props.intl.formatMessage(messages.oneMinute)
                 ) : (
                     props.intl.formatMessage(messages.minutes, {
-                        minutes: Math.round(interval / MINUTE)
+                        n: Math.round(interval / MINUTE)
                     })
                 )}
             </option>
@@ -94,7 +102,7 @@ const RestorePointModal = props => (
                     defaultMessage="Restore points are created {time}."
                     id="tw.restorePoints.intervalOption"
                     // eslint-disable-next-line max-len
-                    description="{time} will be replaced with a dropdown with values such as [every 5 minutes v] and [never v]"
+                    description="{time} will be replaced with a dropdown with values such as [every 5 minutes] and [never]"
                     values={{
                         time: (
                             <IntervalSelector

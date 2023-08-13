@@ -176,6 +176,10 @@ class ExtensionManager {
         this.runtime.compilerRegisterExtension(extensionId, extensionInstance);
     }
 
+    addBuiltinExtension (extensionId, extensionClass) {
+        builtinExtensions[extensionId] = () => extensionClass;
+    }
+
     _isValidExtensionURL (extensionURL) {
         try {
             const parsedURL = new URL(extensionURL);

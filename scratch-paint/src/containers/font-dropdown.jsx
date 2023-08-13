@@ -8,13 +8,11 @@ import FontDropdownComponent from '../components/font-dropdown/font-dropdown.jsx
 import Fonts from '../lib/fonts';
 import {changeFont} from '../reducers/font';
 import {getSelectedLeafItems} from '../helper/selection';
-import styles from '../components/font-dropdown/font-dropdown.css';
 
 class FontDropdown extends React.Component {
     constructor (props) {
         super(props);
         bindAll(this, [
-            'getFontStyle',
             'getFontName',
             'handleChangeFontSerif',
             'handleChangeFontSansSerif',
@@ -30,30 +28,6 @@ class FontDropdown extends React.Component {
             'setDropdown',
             'handleChoose'
         ]);
-    }
-    getFontStyle (font) {
-        switch (font) {
-        case Fonts.SERIF:
-            return styles.serif;
-        case Fonts.SANS_SERIF:
-            return styles.sansSerif;
-        case Fonts.HANDWRITING:
-            return styles.handwriting;
-        case Fonts.MARKER:
-            return styles.marker;
-        case Fonts.CURLY:
-            return styles.curly;
-        case Fonts.PIXEL:
-            return styles.pixel;
-        case Fonts.CHINESE:
-            return styles.chinese;
-        case Fonts.JAPANESE:
-            return styles.japanese;
-        case Fonts.KOREAN:
-            return styles.korean;
-        default:
-            return '';
-        }
     }
     getFontName (font) {
         switch (font) {
@@ -146,7 +120,6 @@ class FontDropdown extends React.Component {
                 componentRef={this.setDropdown}
                 font={this.props.font}
                 getFontName={this.getFontName}
-                getFontStyle={this.getFontStyle}
                 onChoose={this.handleChoose}
                 onClickOutsideDropdown={this.handleClickOutsideDropdown}
                 onHoverChinese={this.handleChangeFontChinese}

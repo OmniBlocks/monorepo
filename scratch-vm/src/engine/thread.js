@@ -214,6 +214,7 @@ class Thread {
          * @type {Object.<string, import('../compiler/compile').CompiledScript>}
          */
         this.procedures = null;
+        this.executableHat = false;
     }
 
     /**
@@ -462,10 +463,15 @@ class Thread {
 
         this.triedToCompile = true;
 
+        // stackClick === true disables hat block generation
+        // It would be great to cache these separately, but for now it's easiest to just disable them to avoid
+        // cached versions of scripts breaking projects.
+        const canCache = !this.stackClick;
+
         const topBlock = this.topBlock;
         // Flyout blocks are stored in a special block container.
         const blocks = this.blockContainer.getBlock(topBlock) ? this.blockContainer : this.target.runtime.flyoutBlocks;
-        const cachedResult = blocks.getCachedCompileResult(topBlock);
+        const cachedResult = canCache && blocks.getCachedCompileResult(topBlock);
         // If there is a cached error, do not attempt to recompile.
         if (cachedResult && !cachedResult.success) {
             return;
@@ -477,10 +483,14 @@ class Thread {
         } else {
             try {
                 result = compile(this);
-                blocks.cacheCompileResult(topBlock, result);
+                if (canCache) {
+                    blocks.cacheCompileResult(topBlock, result);
+                }
             } catch (error) {
                 log.error('cannot compile script', this.target.getName(), error);
-                blocks.cacheCompileError(topBlock, error);
+                if (canCache) {
+                    blocks.cacheCompileError(topBlock, error);
+                }
                 this.target.runtime.emitCompileError(this.target, error);
                 return;
             }
@@ -492,6 +502,8 @@ class Thread {
         }
 
         this.generator = result.startingFunction(this)();
+
+        this.executableHat = result.executableHat;
 
         if (!this.blockContainer.forceNoGlow) {
             this.blockGlowInFrame = this.topBlock;

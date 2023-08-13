@@ -58,28 +58,29 @@ const handleReport = function (resolvedValue, sequencer, thread, blockCached, la
     thread.pushReportedValue(resolvedValue);
     if (isHat) {
         // Hat predicate was evaluated.
-        if (sequencer.runtime.getIsEdgeActivatedHat(opcode)) {
+        if (thread.stackClick) {
+            thread.status = Thread.STATUS_RUNNING;
+        } else if (sequencer.runtime.getIsEdgeActivatedHat(opcode)) {
             // If this is an edge-activated hat, only proceed if the value is
             // true and used to be false, or the stack was activated explicitly
             // via stack click
-            if (!thread.stackClick) {
-                const hasOldEdgeValue = thread.target.hasEdgeActivatedValue(currentBlockId);
-                const oldEdgeValue = thread.target.updateEdgeActivatedValue(
-                    currentBlockId,
-                    resolvedValue
-                );
+            const hasOldEdgeValue = thread.target.hasEdgeActivatedValue(currentBlockId);
+            const oldEdgeValue = thread.target.updateEdgeActivatedValue(
+                currentBlockId,
+                resolvedValue
+            );
 
-                const edgeWasActivated = hasOldEdgeValue ? (!oldEdgeValue && resolvedValue) : resolvedValue;
-                if (edgeWasActivated) {
-                    // TW: Resume the thread if we were paused for a promise.
-                    thread.status = Thread.STATUS_RUNNING;
-                } else {
-                    sequencer.retireThread(thread);
-                }
+            const edgeWasActivated = hasOldEdgeValue ? (!oldEdgeValue && resolvedValue) : resolvedValue;
+            if (edgeWasActivated) {
+                thread.status = Thread.STATUS_RUNNING;
+            } else {
+                sequencer.retireThread(thread);
             }
-        } else if (!resolvedValue) {
-            // Not an edge-activated hat: retire the thread
-            // if predicate was false.
+        } else if (resolvedValue) {
+            // Predicate returned true: allow the script to run.
+            thread.status = Thread.STATUS_RUNNING;
+        } else {
+            // Predicate returned false: do not allow script to run
             sequencer.retireThread(thread);
         }
     } else {
@@ -118,7 +119,7 @@ const handlePromise = (primitiveReportedValue, sequencer, thread, blockCached, l
         // If it's a command block or a top level reporter in a stackClick.
         // TW: Don't mangle the stack when we just finished executing a hat block.
         // Hat block is always the top and first block of the script. There are no loops to find.
-        if (lastOperation && !blockCached._isHat) {
+        if (lastOperation && (!blockCached._isHat || thread.stackClick)) {
             let stackFrame;
             let nextBlockId;
             do {

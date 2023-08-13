@@ -1,9 +1,6 @@
 // TW Snapshot
 // Input SHA-256: 19e0b3f9dcac763041039a8ffe87b6732eb744f9ebb136e8d61a53ccf19118e3
 
-// Errors:
-// Sprite1: Error: Not compiling an edge-activated hat: event_whengreaterthan
-
 // Sprite1 script
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
 const b0 = stage.variables["PsY$$vp$IVH;dDAr[q2h"];
@@ -26,5 +23,29 @@ yield;
 }
 b0.value = 1;
 yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b1, false, false, null);
+retire(); return;
+}; })
+
+// Sprite1 script
+(function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
+const b0 = stage.variables["l^q!%fq]Bv;72dlGf}^Z"];
+const b1 = runtime.getOpcodeFunction("event_whengreaterthan");
+const b2 = stage.variables["PsY$$vp$IVH;dDAr[q2h"];
+const b3 = runtime.getOpcodeFunction("looks_say");
+return function* genXYZ () {
+{
+const resolvedValue = toBoolean((yield* executeInCompatibilityLayer({"VALUE":b0.value,"WHENGREATERTHANMENU":"TIMER",}, b1, false, false, null)));
+const id = "iNmua~6veGey6O-_UB9.";
+const hasOldEdgeValue = target.hasEdgeActivatedValue(id);
+const oldEdgeValue = target.updateEdgeActivatedValue(id, resolvedValue);
+const edgeWasActivated = hasOldEdgeValue ? (!oldEdgeValue && resolvedValue) : resolvedValue;
+if (!edgeWasActivated) {
+retire(); return;
+}
+yield;
+}
+if (compareEqual(b2.value, 0)) {
+yield* executeInCompatibilityLayer({"MESSAGE":"fail",}, b3, false, false, null);
+}
 retire(); return;
 }; })

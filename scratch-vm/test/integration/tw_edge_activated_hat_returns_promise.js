@@ -3,13 +3,22 @@ const {test} = require('tap');
 const fs = require('fs');
 const path = require('path');
 
-test('edge activated hats returning promises work properly', async t => {
-    const vm = new VM();
-
-    // Compiler currently does not support edge activated hats.
-    vm.runtime.setCompilerOptions({
-        enabled: false
+const compilerAndInterpreter = (name, callback) => {
+    test(`${name} - interpreted`, t => {
+        callback(t, {
+            enabled: false
+        });
     });
+    test(`${name} - compiled`, t => {
+        callback(t, {
+            enabled: true
+        });
+    });
+};
+
+compilerAndInterpreter('edge activated hats returning promises work properly', async (t, co) => {
+    const vm = new VM();
+    vm.setCompilerOptions(co);
 
     // Modify event_whengreaterthan to return a Promise (like a custom extension would) and allow us
     // to replace the value. This is a bit of a hack.

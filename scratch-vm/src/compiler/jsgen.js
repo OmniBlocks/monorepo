@@ -385,6 +385,7 @@ class JSGenerator {
         this._setupVariables = {};
 
         this.descendedIntoModulo = false;
+        this.isInHat = false;
 
         this.debug = this.target.runtime.debug;
     }
@@ -650,7 +651,8 @@ class JSGenerator {
             const joinedArgs = args.join(',');
 
             const yieldForRecursion = !this.isWarp && procedureCode === this.script.procedureCode;
-            if (yieldForRecursion) {
+            const yieldForHat = this.isInHat;
+            if (yieldForRecursion || yieldForHat) {
                 const runtimeFunction = procedureData.yields ? 'yieldThenCallGenerator' : 'yieldThenCall';
                 return new TypedInput(`(yield* ${runtimeFunction}(${procedureReference}, ${joinedArgs}))`, TYPE_UNKNOWN);
             }
@@ -846,6 +848,32 @@ class JSGenerator {
                 this.yieldLoop();
             }
             this.source += `}\n`;
+            break;
+
+        case 'hat.edge':
+            this.isInHat = true;
+            this.source += '{\n';
+            // For exact Scratch parity, evaluate the input before checking old edge state.
+            // Can matter if the input is not instantly evaluated.
+            this.source += `const resolvedValue = ${this.descendInput(node.condition).asBoolean()};\n`;
+            this.source += `const id = "${sanitize(node.id)}";\n`;
+            this.source += 'const hasOldEdgeValue = target.hasEdgeActivatedValue(id);\n';
+            this.source += `const oldEdgeValue = target.updateEdgeActivatedValue(id, resolvedValue);\n`;
+            this.source += `const edgeWasActivated = hasOldEdgeValue ? (!oldEdgeValue && resolvedValue) : resolvedValue;\n`;
+            this.source += `if (!edgeWasActivated) {\n`;
+            this.retire();
+            this.source += '}\n';
+            this.source += 'yield;\n';
+            this.source += '}\n';
+            this.isInHat = false;
+            break;
+        case 'hat.predicate':
+            this.isInHat = true;
+            this.source += `if (!${this.descendInput(node.condition).asBoolean()}) {\n`;
+            this.retire();
+            this.source += '}\n';
+            this.source += 'yield;\n';
+            this.isInHat = false;
             break;
 
         case 'event.broadcast':

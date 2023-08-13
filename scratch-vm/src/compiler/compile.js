@@ -29,7 +29,8 @@ const compile = thread => {
 
     return {
         startingFunction: entry,
-        procedures
+        procedures,
+        executableHat: ir.entry.executableHat
     };
 };
 

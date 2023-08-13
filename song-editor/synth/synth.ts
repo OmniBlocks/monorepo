@@ -1,6 +1,6 @@
 // Copyright (c) 2012-2022 John Nesky and contributing authors, distributed under the MIT license, see accompanying the LICENSE.md file.
 
-import { startLoadingSample, sampleLoadingState, SampleLoadingStatus, loadBuiltInSamples, Dictionary, DictionaryArray, toNameMap, FilterType, EnvelopeType, InstrumentType, EffectType, EnvelopeComputeIndex, Transition, Unison, Chord, Vibrato, Envelope, AutomationTarget, Config, getDrumWave, drawNoiseSpectrum, getArpeggioPitchIndex, performIntegralOld, getPulseWidthRatio, effectsIncludeTransition, effectsIncludeChord, effectsIncludePitchShift, effectsIncludeDetune, effectsIncludeVibrato, effectsIncludeNoteFilter, effectsIncludeDistortion, effectsIncludeBitcrusher, effectsIncludePanning, effectsIncludeChorus, effectsIncludeEcho, effectsIncludeReverb, OperatorWave } from "./SynthConfig";
+import { startLoadingSample, sampleLoadingState, SampleLoadingState, sampleLoadEvents, SampleLoadedEvent, SampleLoadingStatus, loadBuiltInSamples, Dictionary, DictionaryArray, toNameMap, FilterType, EnvelopeType, InstrumentType, EffectType, EnvelopeComputeIndex, Transition, Unison, Chord, Vibrato, Envelope, AutomationTarget, Config, getDrumWave, drawNoiseSpectrum, getArpeggioPitchIndex, performIntegralOld, getPulseWidthRatio, effectsIncludeTransition, effectsIncludeChord, effectsIncludePitchShift, effectsIncludeDetune, effectsIncludeVibrato, effectsIncludeNoteFilter, effectsIncludeDistortion, effectsIncludeBitcrusher, effectsIncludePanning, effectsIncludeChorus, effectsIncludeEcho, effectsIncludeReverb, OperatorWave } from "./SynthConfig";
 import { Preset, EditorConfig } from "../editor/EditorConfig";
 import { scaleElementsByFactor, inverseRealFourierTransform } from "./FFT";
 import { Deque } from "./Deque";
@@ -2534,7 +2534,7 @@ export class Channel {
 }
 
 export class Song {
-    private static readonly _format: string = "BeepBox";
+    private static readonly _format: string = "UltraBox";
     private static readonly _oldestBeepboxVersion: number = 2;
     private static readonly _latestBeepboxVersion: number = 9;
     private static readonly _oldestJummBoxVersion: number = 1;
@@ -3387,272 +3387,11 @@ export class Song {
 
     public fromBase64String(compressed: string): void {
         if (compressed == null || compressed == "") {
+            Song._clearSamples();
+
             this.initToDefault(true);
             return;
         }
-	    compressed = compressed.replaceAll("%7C", "|")
-            var compressed_array = compressed.split("|");
-            compressed = compressed_array.shift()!;
-            if(EditorConfig.customSamples == null || EditorConfig.customSamples.join(", ") != compressed_array.join(", ")) {
-            
-                let willLoadLegacySamples = false;
-                let willLoadNintariboxSamples = false;
-                let willLoadMarioPaintboxSamples = false;
-                const customSampleUrls = [];
-                const customSamplePresets: Preset[] = [];
-                const defaultIndex = 0;
-                const defaultIntegratedSamples = Config.chipWaves[defaultIndex].samples;
-                const defaultSamples = Config.rawRawChipWaves[defaultIndex].samples;
-                sampleLoadingState.statusTable = {};
-                sampleLoadingState.urlTable = {};
-                sampleLoadingState.totalSamples = 0;
-                sampleLoadingState.samplesLoaded = 0;
-                for (const url of compressed_array) {
-                    if (url.toLowerCase() === "legacysamples") {
-                        if (!willLoadLegacySamples) {
-                            willLoadLegacySamples = true;
-                            customSampleUrls.push(url);
-							loadBuiltInSamples(0);
-                        }
-                    } 
-					else if (url.toLowerCase() === "nintariboxsamples") {
-                        if (!willLoadNintariboxSamples) {
-                            willLoadNintariboxSamples = true;
-                            customSampleUrls.push(url);
-							loadBuiltInSamples(1);
-                        }
-                    }
-					else if (url.toLowerCase() === "mariopaintboxsamples") {
-                        if (!willLoadMarioPaintboxSamples) {
-                            willLoadMarioPaintboxSamples = true;
-                            customSampleUrls.push(url);
-							loadBuiltInSamples(2);
-                        }
-                    }
-					
-					else {
-                        const customSampleUrlIndex: number = customSampleUrls.length;
-                        customSampleUrls.push(url);
-                        // This depends on `Config.chipWaves` being the same
-                        // length as `Config.rawRawChipWaves`.
-                        const chipWaveIndex: number = Config.chipWaves.length;
-						function isProperUrl(string: string): boolean {
-							try { 
-								return Boolean(new URL(string)); 
-							}
-							catch(x){ 
-								return false; 
-							}
-						}
-
-						let urlSliced: string = url;
-
-						let customSampleRate: number = 44100;
-						let isCustomPercussive: boolean = false;
-						let customRootKey: number = 60;
-						let presetIsUsingAdvancedLoopControls: boolean = false;
-						let presetChipWaveLoopStart: number | null = null;
-						let presetChipWaveLoopEnd: number | null = null;
-						let presetChipWaveStartOffset: number | null = null;
-						let presetChipWaveLoopMode: number | null = null;
-						let presetChipWavePlayBackwards: boolean = false;
-						
-					    let parsedSampleOptions: boolean = false;
-					    let optionsStartIndex: number = url.indexOf("!");
-					    let optionsEndIndex: number = -1;
-					    if (optionsStartIndex === 0) {
-					    	optionsEndIndex = url.indexOf("!", optionsStartIndex + 1);
-					    	if (optionsEndIndex !== -1) {
-					    		const rawOptions: string[] = url.slice(optionsStartIndex + 1, optionsEndIndex).split(",");
-					    		for (const rawOption of rawOptions) {
-					    			const optionCode: string = rawOption.charAt(0);
-					    			const optionData: string = rawOption.slice(1, rawOption.length);
-					    			if (optionCode === "s") {
-					    				customSampleRate = clamp(8000, 96000 + 1, parseFloat(optionData));
-					    			} else if (optionCode === "r") {
-					    				customRootKey = parseFloat(optionData);
-					    			} else if (optionCode === "p") {
-					    				isCustomPercussive = true;
-					    			} else if (optionCode === "a") {
-					    				presetIsUsingAdvancedLoopControls = true;
-					    				presetChipWaveLoopStart = parseInt(optionData);
-					    			} else if (optionCode === "b") {
-					    				presetIsUsingAdvancedLoopControls = true;
-					    				presetChipWaveLoopEnd = parseInt(optionData);
-					    			} else if (optionCode === "c") {
-					    				presetIsUsingAdvancedLoopControls = true;
-					    				presetChipWaveStartOffset = parseInt(optionData);
-					    			} else if (optionCode === "d") {
-					    				presetIsUsingAdvancedLoopControls = true;
-					    				presetChipWaveLoopMode = parseInt(optionData);
-					    			} else if (optionCode === "e") {
-					    				presetIsUsingAdvancedLoopControls = true;
-					    				presetChipWavePlayBackwards = true;
-					    			}
-					    		}
-					    		urlSliced = url.slice(optionsEndIndex + 1, url.length);
-					    		parsedSampleOptions = true;
-					    	}
-					    }
-
-					    let parsedUrl: URL | null = null;
-					    if (isProperUrl(urlSliced)) {
-					    	parsedUrl = new URL(urlSliced);
-					    }
-					    else {
-					    	alert(url + " is not a valid url");
-                            continue;
-					    }
-
-					    if (!parsedSampleOptions && parsedUrl != null) {
-							if (url.indexOf("@") != -1) {
-								//urlSliced = url.slice(url.indexOf("@"), url.indexOf("@"));
-								urlSliced = url.replaceAll("@", "")
-								parsedUrl = new URL(urlSliced);
-								isCustomPercussive = true;	
-							}	
-
-							function sliceForSampleRate() {
-								urlSliced = url.slice(0, url.indexOf(","));
-								parsedUrl = new URL(urlSliced);
-								customSampleRate = clamp(8000, 96000 + 1, parseFloat(url.slice(url.indexOf(",") + 1)));
-								//should this be parseFloat or parseInt?
-								//ig floats let you do decimals and such, but idk where that would be useful
-							}
-							
-							function sliceForRootKey() {
-								urlSliced = url.slice(0, url.indexOf("!"));
-								parsedUrl = new URL(urlSliced);
-								customRootKey = parseFloat(url.slice(url.indexOf("!") + 1));
-							}
-
-
-							if (url.indexOf(",") != -1 && url.indexOf("!") != -1) {
-								if (url.indexOf(",") < url.indexOf("!")) {
-									sliceForRootKey();
-									sliceForSampleRate();
-								}
-								else {
-									sliceForSampleRate();
-									sliceForRootKey();
-								}	
-							}
-							else {
-								if (url.indexOf(",") != -1) {
-									sliceForSampleRate();
-								}	
-								if (url.indexOf("!") != -1) {
-									sliceForRootKey();
-								}	
-							}
-						}
-
-                        if (parsedUrl != null) {
-                            // Store in the new format.
-                            let urlWithNamedOptions = urlSliced;
-                            const namedOptions: string[] = [];
-                            if (customSampleRate !== 44100) namedOptions.push("s" + customSampleRate);
-                            if (customRootKey !== 60) namedOptions.push("r" + customRootKey);
-                            if (isCustomPercussive) namedOptions.push("p");
-                            if (presetIsUsingAdvancedLoopControls) {
-                                if (presetChipWaveLoopStart != null) namedOptions.push("a" + presetChipWaveLoopStart);
-                                if (presetChipWaveLoopEnd != null) namedOptions.push("b" + presetChipWaveLoopEnd);
-                                if (presetChipWaveStartOffset != null) namedOptions.push("c" + presetChipWaveStartOffset);
-                                if (presetChipWaveLoopMode != null) namedOptions.push("d" + presetChipWaveLoopMode);
-                                if (presetChipWavePlayBackwards) namedOptions.push("e");
-                            }
-                            if (namedOptions.length > 0) {
-                                urlWithNamedOptions = "!" + namedOptions.join(",") + "!" + urlSliced;
-                            }
-                            customSampleUrls[customSampleUrlIndex] = urlWithNamedOptions;
-
-                            // @TODO: Could also remove known extensions, but it
-                            // would probably be much better to be able to specify
-                            // a custom name.
-                            // @TODO: If for whatever inexplicable reason someone
-                            // uses an url like `https://example.com`, this will
-                            // result in an empty name here.
-                            const name: string = decodeURIComponent(parsedUrl.pathname.replace(/^([^\/]*\/)+/, ""));
-                            // @TODO: What to do about samples with the same name?
-                            // The problem with using the url is that the name is
-                            // user-facing and long names break assumptions of the
-                            // UI.
-                            const expression: number = 1.0;
-                            Config.chipWaves[chipWaveIndex] = {
-                                name: name,
-                                expression: expression,
-                                isCustomSampled: true,
-                                isPercussion: isCustomPercussive,
-                                rootKey: customRootKey,
-                                sampleRate: customSampleRate,
-                                samples: defaultIntegratedSamples,
-                                index: chipWaveIndex,
-                            };
-                            Config.rawRawChipWaves[chipWaveIndex] = {
-                                name: name,
-                                expression: expression,
-                                isCustomSampled: true,
-                                isPercussion: isCustomPercussive,
-                                rootKey: customRootKey,
-                                sampleRate: customSampleRate,
-                                samples: defaultSamples,
-                                index: chipWaveIndex,
-                            };
-                            const customSamplePresetSettings: Dictionary<any> = {
-                                "type": "chip",
-                                "eqFilter": [],
-                                "effects": [],
-                                "transition": "normal",
-                                "fadeInSeconds": 0,
-                                "fadeOutTicks": -3,
-                                "chord": "harmony",
-                                "wave": name,
-                                "unison": "none",
-                                "envelopes": [],
-                            };
-                            if (presetIsUsingAdvancedLoopControls) {
-                                customSamplePresetSettings["isUsingAdvancedLoopControls"] = true;
-                                customSamplePresetSettings["chipWaveLoopStart"] = presetChipWaveLoopStart != null ? presetChipWaveLoopStart : 0;
-                                customSamplePresetSettings["chipWaveLoopEnd"] = presetChipWaveLoopEnd != null ? presetChipWaveLoopEnd : 2;
-                                customSamplePresetSettings["chipWaveLoopMode"] = presetChipWaveLoopMode != null ? presetChipWaveLoopMode : 0;
-                                customSamplePresetSettings["chipWavePlayBackwards"] = presetChipWavePlayBackwards;
-                                customSamplePresetSettings["chipWaveStartOffset"] = presetChipWaveStartOffset != null ? presetChipWaveStartOffset : 0;
-                            }
-                            customSamplePresets.push({
-                                index: 0, // This will get overwritten by toNameMap below.
-                                name: name,
-                                midiProgram: 80,
-                                settings: customSamplePresetSettings,
-                            });
-                            if (!EditorConfig.willReloadForCustomSamples) {
-                                startLoadingSample(urlSliced, chipWaveIndex, customSampleRate);
-                            }
-                            sampleLoadingState.statusTable[chipWaveIndex] = SampleLoadingStatus.loading;
-                            sampleLoadingState.urlTable[chipWaveIndex] = urlSliced;
-                            sampleLoadingState.totalSamples++;
-                        }
-                    }
-                }
-                if (customSampleUrls.length > 0) {
-                    EditorConfig.customSamples = customSampleUrls;
-                }
-                if (customSamplePresets.length > 0) {
-                    const customSamplePresetsMap: DictionaryArray<Preset> = toNameMap(customSamplePresets);
-                    EditorConfig.presetCategories[EditorConfig.presetCategories.length] = {
-                        name: "Custom Sample Presets",
-                        presets: customSamplePresetsMap,
-                        index: EditorConfig.presetCategories.length,
-                    };
-					// EditorConfig.presetCategories.splice(1, 0, {
-                         // name: "Custom Sample Presets",
-                         // presets: customSamplePresets,
-                         // index: EditorConfig.presetCategories.length,
-                    // });
-                }
-
-           
-			}
-			//samplemark
         let charIndex: number = 0;
         // skip whitespace.
         while (compressed.charCodeAt(charIndex) <= CharCode.SPACE) charIndex++;
@@ -3711,6 +3450,79 @@ export class Song {
         const beforeNine: boolean = version < 9;
         this.initToDefault((fromBeepBox && beforeNine) || ((fromJummBox && beforeFive) || (beforeFour && fromGoldBox)));
         const forceSimpleFilter: boolean = (fromBeepBox && beforeNine || fromJummBox && beforeFive);
+
+        if (fromUltraBox || fromGoldBox) {
+            compressed = compressed.replaceAll("%7C", "|")
+                var compressed_array = compressed.split("|");
+                compressed = compressed_array.shift()!;
+                if(EditorConfig.customSamples == null || EditorConfig.customSamples.join(", ") != compressed_array.join(", ")) {
+
+                    Song._restoreChipWaveListToDefault();
+
+                    let willLoadLegacySamples = false;
+                    let willLoadNintariboxSamples = false;
+                    let willLoadMarioPaintboxSamples = false;
+                    const customSampleUrls = [];
+                    const customSamplePresets: Preset[] = [];
+                    sampleLoadingState.statusTable = {};
+                    sampleLoadingState.urlTable = {};
+                    sampleLoadingState.totalSamples = 0;
+                    sampleLoadingState.samplesLoaded = 0;
+                    sampleLoadEvents.dispatchEvent(new SampleLoadedEvent(
+                        sampleLoadingState.totalSamples,
+                        sampleLoadingState.samplesLoaded
+                    ));
+                    for (const url of compressed_array) {
+                        if (url.toLowerCase() === "legacysamples") {
+                            if (!willLoadLegacySamples) {
+                                willLoadLegacySamples = true;
+                                customSampleUrls.push(url);
+                                loadBuiltInSamples(0);
+                            }
+                        } 
+                        else if (url.toLowerCase() === "nintariboxsamples") {
+                            if (!willLoadNintariboxSamples) {
+                                willLoadNintariboxSamples = true;
+                                customSampleUrls.push(url);
+                                loadBuiltInSamples(1);
+                            }
+                        }
+                        else if (url.toLowerCase() === "mariopaintboxsamples") {
+                            if (!willLoadMarioPaintboxSamples) {
+                                willLoadMarioPaintboxSamples = true;
+                                customSampleUrls.push(url);
+                                loadBuiltInSamples(2);
+                            }
+                        }
+                        
+                        else {
+                            const ok: boolean = Song._parseAndConfigureCustomSample(url, customSampleUrls, customSamplePresets, sampleLoadingState);
+                            if (!ok) {
+                                continue;
+                            }
+                        }
+                    }
+                    if (customSampleUrls.length > 0) {
+                        EditorConfig.customSamples = customSampleUrls;
+                    }
+                    if (customSamplePresets.length > 0) {
+                        const customSamplePresetsMap: DictionaryArray<Preset> = toNameMap(customSamplePresets);
+                        EditorConfig.presetCategories[EditorConfig.presetCategories.length] = {
+                            name: "Custom Sample Presets",
+                            presets: customSamplePresetsMap,
+                            index: EditorConfig.presetCategories.length,
+                        };
+                        // EditorConfig.presetCategories.splice(1, 0, {
+                             // name: "Custom Sample Presets",
+                             // presets: customSamplePresets,
+                             // index: EditorConfig.presetCategories.length,
+                        // });
+                    }
+
+               
+                }
+                //samplemark
+        }
 
         if (beforeThree && fromBeepBox) {
             // Originally, the only instrument transition was "instant" and the only drum wave was "retro".
@@ -5527,6 +5339,248 @@ export class Song {
         }
     }
 
+    private static _isProperUrl(string: string): boolean {
+        try { 
+            return Boolean(new URL(string)); 
+        }
+        catch(x){ 
+            return false; 
+        }
+    }
+
+    // @TODO: Share more of this code with AddSamplesPrompt.
+    private static _parseAndConfigureCustomSample(url: string, customSampleUrls: string[], customSamplePresets: Preset[], sampleLoadingState: SampleLoadingState): boolean {
+        const defaultIndex: number = 0;
+        const defaultIntegratedSamples: Float32Array = Config.chipWaves[defaultIndex].samples;
+        const defaultSamples: Float32Array = Config.rawRawChipWaves[defaultIndex].samples;
+
+        const customSampleUrlIndex: number = customSampleUrls.length;
+        customSampleUrls.push(url);
+        // This depends on `Config.chipWaves` being the same
+        // length as `Config.rawRawChipWaves`.
+        const chipWaveIndex: number = Config.chipWaves.length;
+
+        let urlSliced: string = url;
+
+        let customSampleRate: number = 44100;
+        let isCustomPercussive: boolean = false;
+        let customRootKey: number = 60;
+        let presetIsUsingAdvancedLoopControls: boolean = false;
+        let presetChipWaveLoopStart: number | null = null;
+        let presetChipWaveLoopEnd: number | null = null;
+        let presetChipWaveStartOffset: number | null = null;
+        let presetChipWaveLoopMode: number | null = null;
+        let presetChipWavePlayBackwards: boolean = false;
+
+        let parsedSampleOptions: boolean = false;
+        let optionsStartIndex: number = url.indexOf("!");
+        let optionsEndIndex: number = -1;
+        if (optionsStartIndex === 0) {
+            optionsEndIndex = url.indexOf("!", optionsStartIndex + 1);
+            if (optionsEndIndex !== -1) {
+                const rawOptions: string[] = url.slice(optionsStartIndex + 1, optionsEndIndex).split(",");
+                for (const rawOption of rawOptions) {
+                    const optionCode: string = rawOption.charAt(0);
+                    const optionData: string = rawOption.slice(1, rawOption.length);
+                    if (optionCode === "s") {
+                        customSampleRate = clamp(8000, 96000 + 1, parseFloat(optionData));
+                    } else if (optionCode === "r") {
+                        customRootKey = parseFloat(optionData);
+                    } else if (optionCode === "p") {
+                        isCustomPercussive = true;
+                    } else if (optionCode === "a") {
+                        presetIsUsingAdvancedLoopControls = true;
+                        presetChipWaveLoopStart = parseInt(optionData);
+                    } else if (optionCode === "b") {
+                        presetIsUsingAdvancedLoopControls = true;
+                        presetChipWaveLoopEnd = parseInt(optionData);
+                    } else if (optionCode === "c") {
+                        presetIsUsingAdvancedLoopControls = true;
+                        presetChipWaveStartOffset = parseInt(optionData);
+                    } else if (optionCode === "d") {
+                        presetIsUsingAdvancedLoopControls = true;
+                        presetChipWaveLoopMode = parseInt(optionData);
+                    } else if (optionCode === "e") {
+                        presetIsUsingAdvancedLoopControls = true;
+                        presetChipWavePlayBackwards = true;
+                    }
+                }
+                urlSliced = url.slice(optionsEndIndex + 1, url.length);
+                parsedSampleOptions = true;
+            }
+        }
+
+        let parsedUrl: URL | null = null;
+        if (Song._isProperUrl(urlSliced)) {
+            parsedUrl = new URL(urlSliced);
+        }
+        else {
+            alert(url + " is not a valid url");
+            return false;
+        }
+
+        if (!parsedSampleOptions && parsedUrl != null) {
+            if (url.indexOf("@") != -1) {
+                //urlSliced = url.slice(url.indexOf("@"), url.indexOf("@"));
+                urlSliced = url.replaceAll("@", "")
+                parsedUrl = new URL(urlSliced);
+                isCustomPercussive = true;	
+            }	
+
+            function sliceForSampleRate() {
+                urlSliced = url.slice(0, url.indexOf(","));
+                parsedUrl = new URL(urlSliced);
+                customSampleRate = clamp(8000, 96000 + 1, parseFloat(url.slice(url.indexOf(",") + 1)));
+                //should this be parseFloat or parseInt?
+                //ig floats let you do decimals and such, but idk where that would be useful
+            }
+
+            function sliceForRootKey() {
+                urlSliced = url.slice(0, url.indexOf("!"));
+                parsedUrl = new URL(urlSliced);
+                customRootKey = parseFloat(url.slice(url.indexOf("!") + 1));
+            }
+
+
+            if (url.indexOf(",") != -1 && url.indexOf("!") != -1) {
+                if (url.indexOf(",") < url.indexOf("!")) {
+                    sliceForRootKey();
+                    sliceForSampleRate();
+                }
+                else {
+                    sliceForSampleRate();
+                    sliceForRootKey();
+                }	
+            }
+            else {
+                if (url.indexOf(",") != -1) {
+                    sliceForSampleRate();
+                }	
+                if (url.indexOf("!") != -1) {
+                    sliceForRootKey();
+                }	
+            }
+        }
+
+        if (parsedUrl != null) {
+            // Store in the new format.
+            let urlWithNamedOptions = urlSliced;
+            const namedOptions: string[] = [];
+            if (customSampleRate !== 44100) namedOptions.push("s" + customSampleRate);
+            if (customRootKey !== 60) namedOptions.push("r" + customRootKey);
+            if (isCustomPercussive) namedOptions.push("p");
+            if (presetIsUsingAdvancedLoopControls) {
+                if (presetChipWaveLoopStart != null) namedOptions.push("a" + presetChipWaveLoopStart);
+                if (presetChipWaveLoopEnd != null) namedOptions.push("b" + presetChipWaveLoopEnd);
+                if (presetChipWaveStartOffset != null) namedOptions.push("c" + presetChipWaveStartOffset);
+                if (presetChipWaveLoopMode != null) namedOptions.push("d" + presetChipWaveLoopMode);
+                if (presetChipWavePlayBackwards) namedOptions.push("e");
+            }
+            if (namedOptions.length > 0) {
+                urlWithNamedOptions = "!" + namedOptions.join(",") + "!" + urlSliced;
+            }
+            customSampleUrls[customSampleUrlIndex] = urlWithNamedOptions;
+
+            // @TODO: Could also remove known extensions, but it
+            // would probably be much better to be able to specify
+            // a custom name.
+            // @TODO: If for whatever inexplicable reason someone
+            // uses an url like `https://example.com`, this will
+            // result in an empty name here.
+            const name: string = decodeURIComponent(parsedUrl.pathname.replace(/^([^\/]*\/)+/, ""));
+            // @TODO: What to do about samples with the same name?
+            // The problem with using the url is that the name is
+            // user-facing and long names break assumptions of the
+            // UI.
+            const expression: number = 1.0;
+            Config.chipWaves[chipWaveIndex] = {
+                name: name,
+                expression: expression,
+                isCustomSampled: true,
+                isPercussion: isCustomPercussive,
+                rootKey: customRootKey,
+                sampleRate: customSampleRate,
+                samples: defaultIntegratedSamples,
+                index: chipWaveIndex,
+            };
+            Config.rawChipWaves[chipWaveIndex] = {
+                name: name,
+                expression: expression,
+                isCustomSampled: true,
+                isPercussion: isCustomPercussive,
+                rootKey: customRootKey,
+                sampleRate: customSampleRate,
+                samples: defaultSamples,
+                index: chipWaveIndex,
+            };
+            Config.rawRawChipWaves[chipWaveIndex] = {
+                name: name,
+                expression: expression,
+                isCustomSampled: true,
+                isPercussion: isCustomPercussive,
+                rootKey: customRootKey,
+                sampleRate: customSampleRate,
+                samples: defaultSamples,
+                index: chipWaveIndex,
+            };
+            const customSamplePresetSettings: Dictionary<any> = {
+                "type": "chip",
+                "eqFilter": [],
+                "effects": [],
+                "transition": "normal",
+                "fadeInSeconds": 0,
+                "fadeOutTicks": -3,
+                "chord": "harmony",
+                "wave": name,
+                "unison": "none",
+                "envelopes": [],
+            };
+            if (presetIsUsingAdvancedLoopControls) {
+                customSamplePresetSettings["isUsingAdvancedLoopControls"] = true;
+                customSamplePresetSettings["chipWaveLoopStart"] = presetChipWaveLoopStart != null ? presetChipWaveLoopStart : 0;
+                customSamplePresetSettings["chipWaveLoopEnd"] = presetChipWaveLoopEnd != null ? presetChipWaveLoopEnd : 2;
+                customSamplePresetSettings["chipWaveLoopMode"] = presetChipWaveLoopMode != null ? presetChipWaveLoopMode : 0;
+                customSamplePresetSettings["chipWavePlayBackwards"] = presetChipWavePlayBackwards;
+                customSamplePresetSettings["chipWaveStartOffset"] = presetChipWaveStartOffset != null ? presetChipWaveStartOffset : 0;
+            }
+            customSamplePresets.push({
+                index: 0, // This should be overwritten by toNameMap, in our caller.
+                name: name,
+                midiProgram: 80,
+                settings: customSamplePresetSettings,
+            });
+            if (!Config.willReloadForCustomSamples) {
+                startLoadingSample(urlSliced, chipWaveIndex, customSampleRate);
+            }
+            sampleLoadingState.statusTable[chipWaveIndex] = SampleLoadingStatus.loading;
+            sampleLoadingState.urlTable[chipWaveIndex] = urlSliced;
+            sampleLoadingState.totalSamples++;
+        }
+
+        return true;
+    }
+
+    private static _restoreChipWaveListToDefault(): void {
+        Config.chipWaves = toNameMap(Config.chipWaves.slice(0, Config.firstIndexForSamplesInChipWaveList));
+        Config.rawChipWaves = toNameMap(Config.rawChipWaves.slice(0, Config.firstIndexForSamplesInChipWaveList));
+        Config.rawRawChipWaves = toNameMap(Config.rawRawChipWaves.slice(0, Config.firstIndexForSamplesInChipWaveList));
+    }
+
+    private static _clearSamples(): void {
+        EditorConfig.customSamples = null;
+
+        Song._restoreChipWaveListToDefault();
+
+        sampleLoadingState.statusTable = {};
+        sampleLoadingState.urlTable = {};
+        sampleLoadingState.totalSamples = 0;
+        sampleLoadingState.samplesLoaded = 0;
+        sampleLoadEvents.dispatchEvent(new SampleLoadedEvent(
+            sampleLoadingState.totalSamples,
+            sampleLoadingState.samplesLoaded
+        ));
+    }
+
     public toJsonObject(enableIntro: boolean = true, loopCount: number = 1, enableOutro: boolean = true): Object {
         const channelArray: Object[] = [];
         for (let channelIndex: number = 0; channelIndex < this.getChannelCount(); channelIndex++) {
@@ -5568,7 +5622,7 @@ export class Song {
             channelArray.push(channelObject);
         }
 
-        return {
+        const result: any = {
             "name": this.title,
             "format": Song._format,
             "version": Song._latestUltraBoxVersion,
@@ -5595,6 +5649,12 @@ export class Song {
             "patternInstruments": this.patternInstruments,
             "channels": channelArray,
         };
+
+        if (EditorConfig.customSamples != null && EditorConfig.customSamples.length > 0) {
+            result["customSamples"] = EditorConfig.customSamples;
+        }
+
+        return result;
     }
 
     public fromJsonObject(jsonObject: any): void {
@@ -5615,6 +5675,265 @@ export class Song {
             // }
 			//jsonmark
 			//this doesn't work
+
+        if (jsonObject["customSamples"] != undefined) {
+            const customSamples: string[] = jsonObject["customSamples"];
+            if (EditorConfig.customSamples == null || EditorConfig.customSamples.join(", ") != customSamples.join(", ")) {
+                // Have to duplicate the work done in Song.fromBase64String
+                // early here, because Instrument.fromJsonObject depends on the
+                // chip wave list having the correct items already in memory.
+
+                Config.willReloadForCustomSamples = true;
+
+                Song._restoreChipWaveListToDefault();
+
+                let willLoadLegacySamples: boolean = false;
+                let willLoadNintariboxSamples: boolean = false;
+                let willLoadMarioPaintboxSamples: boolean = false;
+                const customSampleUrls: string[] = [];
+                const customSamplePresets: Preset[] = [];
+                for (const url of customSamples) {
+                    if (url.toLowerCase() === "legacysamples") {
+                        if (!willLoadLegacySamples) {
+                            willLoadLegacySamples = true;
+                            customSampleUrls.push(url);
+                            loadBuiltInSamples(0);
+                        }
+                    } 
+                    else if (url.toLowerCase() === "nintariboxsamples") {
+                        if (!willLoadNintariboxSamples) {
+                            willLoadNintariboxSamples = true;
+                            customSampleUrls.push(url);
+                            loadBuiltInSamples(1);
+                        }
+                    }
+                    else if (url.toLowerCase() === "mariopaintboxsamples") {
+                        if (!willLoadMarioPaintboxSamples) {
+                            willLoadMarioPaintboxSamples = true;
+                            customSampleUrls.push(url);
+                            loadBuiltInSamples(2);
+                        }
+                    }
+                    
+                    else {
+                        Song._parseAndConfigureCustomSample(url, customSampleUrls, customSamplePresets, sampleLoadingState);
+                    }
+                }
+                if (customSampleUrls.length > 0) {
+                    EditorConfig.customSamples = customSampleUrls;
+                }
+                if (customSamplePresets.length > 0) {
+                    const customSamplePresetsMap: DictionaryArray<Preset> = toNameMap(customSamplePresets);
+                    EditorConfig.presetCategories[EditorConfig.presetCategories.length] = {
+                        name: "Custom Sample Presets",
+                        presets: customSamplePresetsMap,
+                        index: EditorConfig.presetCategories.length,
+                    };
+                }
+            }
+        } else {
+            // No custom samples, so the only possibility at this point is that
+            // we need to load the legacy samples. Let's check whether that's
+            // necessary.
+            let shouldLoadLegacySamples: boolean = false;
+            if (jsonObject["channels"] != undefined) {
+                for (let channelIndex: number = 0; channelIndex < jsonObject["channels"].length; channelIndex++) {
+                    const channelObject: any = jsonObject["channels"][channelIndex];
+                    if (channelObject["type"] !== "pitch") {
+                        // Legacy samples can only exist in pitch channels.
+                        continue;
+                    }
+                    if (Array.isArray(channelObject["instruments"])) {
+                        const instrumentObjects: any[] = channelObject["instruments"];
+                        for (let i: number = 0; i < instrumentObjects.length; i++) {
+                            const instrumentObject: any = instrumentObjects[i];
+                            if (instrumentObject["type"] !== "chip") {
+                                // Legacy samples can only exist in chip wave
+                                // instruments.
+                                continue;
+                            }
+                            if (instrumentObject["wave"] == null) {
+                                // This should exist if things got saved
+                                // correctly, but if they didn't, skip this.
+                                continue;
+                            }
+                            const waveName: string = instrumentObject["wave"];
+                            // @TODO: Avoid this duplication.
+                            const names: string[] = [
+                                "paandorasbox kick",
+                                "paandorasbox snare",
+                                "paandorasbox piano1",
+                                "paandorasbox WOW",
+                                "paandorasbox overdrive",
+                                "paandorasbox trumpet",
+                                "paandorasbox saxophone",
+                                "paandorasbox orchestrahit",
+                                "paandorasbox detatched violin",
+                                "paandorasbox synth",
+                                "paandorasbox sonic3snare",
+                                "paandorasbox come on",
+                                "paandorasbox choir",
+                                "paandorasbox overdriveguitar",
+                                "paandorasbox flute",
+                                "paandorasbox legato violin",
+                                "paandorasbox tremolo violin",
+                                "paandorasbox amen break",
+                                "paandorasbox pizzicato violin",
+                                "paandorasbox tim allen grunt",
+                                "paandorasbox tuba",
+                                "paandorasbox loopingcymbal",
+                                "paandorasbox standardkick",
+                                "paandorasbox standardsnare",
+                                "paandorasbox closedhihat",
+                                "paandorasbox foothihat",
+                                "paandorasbox openhihat",
+                                "paandorasbox crashcymbal",
+                                "paandorasbox pianoC4",
+                                "paandorasbox liver pad",
+                                "paandorasbox marimba",
+                                "paandorasbox susdotwav",
+                                "paandorasbox wackyboxtts",
+                                "paandorasbox peppersteak_1",
+                                "paandorasbox peppersteak_2",
+                                "paandorasbox vinyl_noise",
+                                "paandorasbeta slap bass",
+                                "paandorasbeta HD EB overdrive guitar",
+                                "paandorasbeta sunsoft bass",
+                                "paandorasbeta masculine choir",
+                                "paandorasbeta feminine choir",
+                                "paandorasbeta tololoche",
+                                "paandorasbeta harp",
+                                "paandorasbeta pan flute",
+                                "paandorasbeta krumhorn",
+                                "paandorasbeta timpani",
+                                "paandorasbeta crowd hey",
+                                "paandorasbeta wario land 4 brass",
+                                "paandorasbeta wario land 4 rock organ",
+                                "paandorasbeta wario land 4 DAOW",
+                                "paandorasbeta wario land 4 hour chime",
+                                "paandorasbeta wario land 4 tick",
+                                "paandorasbeta kirby kick",
+                                "paandorasbeta kirby snare",
+                                "paandorasbeta kirby bongo",
+                                "paandorasbeta kirby click",
+                                "paandorasbeta sonor kick",
+                                "paandorasbeta sonor snare",
+                                "paandorasbeta sonor snare (left hand)",
+                                "paandorasbeta sonor snare (right hand)",
+                                "paandorasbeta sonor high tom",
+                                "paandorasbeta sonor low tom",
+                                "paandorasbeta sonor hihat (closed)",
+                                "paandorasbeta sonor hihat (half opened)",
+                                "paandorasbeta sonor hihat (open)",
+                                "paandorasbeta sonor hihat (open tip)",
+                                "paandorasbeta sonor hihat (pedal)",
+                                "paandorasbeta sonor crash",
+                                "paandorasbeta sonor crash (tip)",
+                                "paandorasbeta sonor ride"
+                            ];
+                            // The difference for these is in the doubled a.
+                            const oldNames: string[] = [
+                                "pandoraasbox kick",
+                                "pandoraasbox snare",
+                                "pandoraasbox piano1",
+                                "pandoraasbox WOW",
+                                "pandoraasbox overdrive",
+                                "pandoraasbox trumpet",
+                                "pandoraasbox saxophone",
+                                "pandoraasbox orchestrahit",
+                                "pandoraasbox detatched violin",
+                                "pandoraasbox synth",
+                                "pandoraasbox sonic3snare",
+                                "pandoraasbox come on",
+                                "pandoraasbox choir",
+                                "pandoraasbox overdriveguitar",
+                                "pandoraasbox flute",
+                                "pandoraasbox legato violin",
+                                "pandoraasbox tremolo violin",
+                                "pandoraasbox amen break",
+                                "pandoraasbox pizzicato violin",
+                                "pandoraasbox tim allen grunt",
+                                "pandoraasbox tuba",
+                                "pandoraasbox loopingcymbal",
+                                "pandoraasbox standardkick",
+                                "pandoraasbox standardsnare",
+                                "pandoraasbox closedhihat",
+                                "pandoraasbox foothihat",
+                                "pandoraasbox openhihat",
+                                "pandoraasbox crashcymbal",
+                                "pandoraasbox pianoC4",
+                                "pandoraasbox liver pad",
+                                "pandoraasbox marimba",
+                                "pandoraasbox susdotwav",
+                                "pandoraasbox wackyboxtts",
+                                "pandoraasbox peppersteak_1",
+                                "pandoraasbox peppersteak_2",
+                                "pandoraasbox vinyl_noise",
+                                "pandoraasbeta slap bass",
+                                "pandoraasbeta HD EB overdrive guitar",
+                                "pandoraasbeta sunsoft bass",
+                                "pandoraasbeta masculine choir",
+                                "pandoraasbeta feminine choir",
+                                "pandoraasbeta tololoche",
+                                "pandoraasbeta harp",
+                                "pandoraasbeta pan flute",
+                                "pandoraasbeta krumhorn",
+                                "pandoraasbeta timpani",
+                                "pandoraasbeta crowd hey",
+                                "pandoraasbeta wario land 4 brass",
+                                "pandoraasbeta wario land 4 rock organ",
+                                "pandoraasbeta wario land 4 DAOW",
+                                "pandoraasbeta wario land 4 hour chime",
+                                "pandoraasbeta wario land 4 tick",
+                                "pandoraasbeta kirby kick",
+                                "pandoraasbeta kirby snare",
+                                "pandoraasbeta kirby bongo",
+                                "pandoraasbeta kirby click",
+                                "pandoraasbeta sonor kick",
+                                "pandoraasbeta sonor snare",
+                                "pandoraasbeta sonor snare (left hand)",
+                                "pandoraasbeta sonor snare (right hand)",
+                                "pandoraasbeta sonor high tom",
+                                "pandoraasbeta sonor low tom",
+                                "pandoraasbeta sonor hihat (closed)",
+                                "pandoraasbeta sonor hihat (half opened)",
+                                "pandoraasbeta sonor hihat (open)",
+                                "pandoraasbeta sonor hihat (open tip)",
+                                "pandoraasbeta sonor hihat (pedal)",
+                                "pandoraasbeta sonor crash",
+                                "pandoraasbeta sonor crash (tip)",
+                                "pandoraasbeta sonor ride"
+                            ];
+                            if (names.includes(waveName)) {
+                                shouldLoadLegacySamples = true;
+                            } else if (oldNames.includes(waveName)) {
+                                shouldLoadLegacySamples = true;
+                                // If we see one of these old names, update it
+                                // to the corresponding new name.
+                                instrumentObject["wave"] = names[oldNames.findIndex(x => x === waveName)];
+                            }
+                        }
+                    }
+                }
+            }
+            if (shouldLoadLegacySamples) {
+                Config.willReloadForCustomSamples = true;
+
+                Song._restoreChipWaveListToDefault();
+
+                loadBuiltInSamples(0);
+                EditorConfig.customSamples = ["legacySamples"];
+            } else {
+                // We don't need to load the legacy samples, but we may have
+                // leftover samples in memory. If we do, clear them.
+                if (EditorConfig.customSamples != null && EditorConfig.customSamples.length > 0) {
+                    // We need to reload anyway in this case, because (for now)
+                    // the chip wave lists won't be correctly updated.
+                    Config.willReloadForCustomSamples = true;
+                    Song._clearSamples();
+                }
+            }
+        }
 
         this.scale = 0; // default to free.
         if (jsonObject["scale"] != undefined) {
@@ -5857,6 +6176,12 @@ export class Song {
         Array.prototype.push.apply(this.channels, newPitchChannels);
         Array.prototype.push.apply(this.channels, newNoiseChannels);
         Array.prototype.push.apply(this.channels, newModChannels);
+
+        if (Config.willReloadForCustomSamples) {
+            window.location.hash = this.toBase64String();
+            // The prompt seems to get stuck if reloading is done too quickly.
+            setTimeout(() => { location.reload(); }, 50);
+        }
     }
 
     public getPattern(channelIndex: number, bar: number): Pattern | null {

@@ -318,7 +318,8 @@ export function startLoadingSample(url: string, chipWaveIndex: number, customSam
     const sampleLoaderAudioContext = new AudioContext({ sampleRate: customSampleRate });
     let closedSampleLoaderAudioContext: boolean = false;
     const chipWave = Config.chipWaves[chipWaveIndex];
-    const rawChipWave = Config.rawRawChipWaves[chipWaveIndex];
+    const rawChipWave = Config.rawChipWaves[chipWaveIndex];
+    const rawRawChipWave = Config.rawRawChipWaves[chipWaveIndex];
     fetch(url).then((response) => {
 	if (!response.ok) {
 	    // @TODO: Be specific with the error handling.
@@ -334,6 +335,7 @@ export function startLoadingSample(url: string, chipWaveIndex: number, customSam
 	const integratedSamples = performIntegral(samples);
 	chipWave.samples = integratedSamples;
 	rawChipWave.samples = samples;
+	rawRawChipWave.samples = samples;
 	sampleLoadingState.samplesLoaded++;
 	sampleLoadingState.statusTable[chipWaveIndex] = SampleLoadingStatus.loaded;
 	sampleLoadEvents.dispatchEvent(new SampleLoadedEvent(
@@ -455,12 +457,18 @@ declare global {
 
 function loadScript(url: string): Promise<void> {
     const result: Promise<void> = new Promise((resolve, reject) => {
-	const script = document.createElement("script");
-	script.src = url;
-	document.head.appendChild(script);
-	script.addEventListener("load", (event) => {
-	    resolve();
-	});
+	if (!Config.willReloadForCustomSamples) {
+	    const script = document.createElement("script");
+	    script.src = url;
+	    document.head.appendChild(script);
+	    script.addEventListener("load", (event) => {
+		resolve();
+	    });
+	} else {
+	    // There's not really any errors that show up if the loading for
+	    // this script is stopped early, but it won't really do anything
+	    // particularly useful either in that case.
+	}
     });
     return result;
 }
@@ -553,9 +561,12 @@ export function loadBuiltInSamples(set: number): void {
 	for (const chipWave of chipWaves) {
 	    const chipWaveIndex: number = Config.rawRawChipWaves.length;
 	    const rawChipWave = { index: chipWaveIndex, name: chipWave.name, expression: chipWave.expression, isSampled: chipWave.isSampled, isPercussion: chipWave.isPercussion, extraSampleDetune: chipWave.extraSampleDetune, samples: defaultSamples };
+	    const rawRawChipWave = { index: chipWaveIndex, name: chipWave.name, expression: chipWave.expression, isSampled: chipWave.isSampled, isPercussion: chipWave.isPercussion, extraSampleDetune: chipWave.extraSampleDetune, samples: defaultSamples };
 	    const integratedChipWave = { index: chipWaveIndex, name: chipWave.name, expression: chipWave.expression, isSampled: chipWave.isSampled, isPercussion: chipWave.isPercussion, extraSampleDetune: chipWave.extraSampleDetune, samples: defaultIntegratedSamples };
-	    Config.rawRawChipWaves[chipWaveIndex] = rawChipWave;
-	    Config.rawRawChipWaves.dictionary[chipWave.name] = rawChipWave;
+	    Config.rawRawChipWaves[chipWaveIndex] = rawRawChipWave;
+	    Config.rawRawChipWaves.dictionary[chipWave.name] = rawRawChipWave;
+	    Config.rawChipWaves[chipWaveIndex] = rawChipWave;
+	    Config.rawChipWaves.dictionary[chipWave.name] = rawChipWave;
 	    Config.chipWaves[chipWaveIndex] = integratedChipWave;
 	    Config.chipWaves.dictionary[chipWave.name] = rawChipWave;
 	    sampleLoadingState.statusTable[chipWaveIndex] = SampleLoadingStatus.loading;
@@ -646,6 +657,7 @@ export function loadBuiltInSamples(set: number): void {
 	    let chipWaveIndexOffset: number = 0;
 	    for (const chipWaveSample of chipWaveSamples) {
 		const chipWaveIndex: number = startIndex + chipWaveIndexOffset;
+		Config.rawChipWaves[chipWaveIndex].samples = chipWaveSample;
 		Config.rawRawChipWaves[chipWaveIndex].samples = chipWaveSample;
 		Config.chipWaves[chipWaveIndex].samples = performIntegral(chipWaveSample);
 		sampleLoadingState.statusTable[chipWaveIndex] = SampleLoadingStatus.loaded;
@@ -676,9 +688,12 @@ export function loadBuiltInSamples(set: number): void {
 	for (const chipWave of chipWaves) {
 	    const chipWaveIndex: number = Config.rawRawChipWaves.length;
 	    const rawChipWave = { index: chipWaveIndex, name: chipWave.name, expression: chipWave.expression, isSampled: chipWave.isSampled, isPercussion: chipWave.isPercussion, extraSampleDetune: chipWave.extraSampleDetune, samples: defaultSamples };
+	    const rawRawChipWave = { index: chipWaveIndex, name: chipWave.name, expression: chipWave.expression, isSampled: chipWave.isSampled, isPercussion: chipWave.isPercussion, extraSampleDetune: chipWave.extraSampleDetune, samples: defaultSamples };
 	    const integratedChipWave = { index: chipWaveIndex, name: chipWave.name, expression: chipWave.expression, isSampled: chipWave.isSampled, isPercussion: chipWave.isPercussion, extraSampleDetune: chipWave.extraSampleDetune, samples: defaultIntegratedSamples };
-	    Config.rawRawChipWaves[chipWaveIndex] = rawChipWave;
-	    Config.rawRawChipWaves.dictionary[chipWave.name] = rawChipWave;
+	    Config.rawRawChipWaves[chipWaveIndex] = rawRawChipWave;
+	    Config.rawRawChipWaves.dictionary[chipWave.name] = rawRawChipWave;
+	    Config.rawChipWaves[chipWaveIndex] = rawChipWave;
+	    Config.rawChipWaves.dictionary[chipWave.name] = rawChipWave;
 	    Config.chipWaves[chipWaveIndex] = integratedChipWave;
 	    Config.chipWaves.dictionary[chipWave.name] = rawChipWave;
 	    sampleLoadingState.statusTable[chipWaveIndex] = SampleLoadingStatus.loading;
@@ -698,6 +713,7 @@ export function loadBuiltInSamples(set: number): void {
 	    let chipWaveIndexOffset: number = 0;
 	    for (const chipWaveSample of chipWaveSamples) {
 		const chipWaveIndex: number = startIndex + chipWaveIndexOffset;
+		Config.rawChipWaves[chipWaveIndex].samples = chipWaveSample;
 		Config.rawRawChipWaves[chipWaveIndex].samples = chipWaveSample;
 		Config.chipWaves[chipWaveIndex].samples = performIntegral(chipWaveSample);
 		sampleLoadingState.statusTable[chipWaveIndex] = SampleLoadingStatus.loaded;
@@ -734,9 +750,12 @@ export function loadBuiltInSamples(set: number): void {
 	for (const chipWave of chipWaves) {
 	    const chipWaveIndex: number = Config.rawRawChipWaves.length;
 	    const rawChipWave = { index: chipWaveIndex, name: chipWave.name, expression: chipWave.expression, isSampled: chipWave.isSampled, isPercussion: chipWave.isPercussion, extraSampleDetune: chipWave.extraSampleDetune, samples: defaultSamples };
+	    const rawRawChipWave = { index: chipWaveIndex, name: chipWave.name, expression: chipWave.expression, isSampled: chipWave.isSampled, isPercussion: chipWave.isPercussion, extraSampleDetune: chipWave.extraSampleDetune, samples: defaultSamples };
 	    const integratedChipWave = { index: chipWaveIndex, name: chipWave.name, expression: chipWave.expression, isSampled: chipWave.isSampled, isPercussion: chipWave.isPercussion, extraSampleDetune: chipWave.extraSampleDetune, samples: defaultIntegratedSamples };
-	    Config.rawRawChipWaves[chipWaveIndex] = rawChipWave;
-	    Config.rawRawChipWaves.dictionary[chipWave.name] = rawChipWave;
+	    Config.rawRawChipWaves[chipWaveIndex] = rawRawChipWave;
+	    Config.rawRawChipWaves.dictionary[chipWave.name] = rawRawChipWave;
+	    Config.rawChipWaves[chipWaveIndex] = rawChipWave;
+	    Config.rawChipWaves.dictionary[chipWave.name] = rawChipWave;
 	    Config.chipWaves[chipWaveIndex] = integratedChipWave;
 	    Config.chipWaves.dictionary[chipWave.name] = rawChipWave;
 	    sampleLoadingState.statusTable[chipWaveIndex] = SampleLoadingStatus.loading;
@@ -763,6 +782,7 @@ export function loadBuiltInSamples(set: number): void {
 	    let chipWaveIndexOffset: number = 0;
 	    for (const chipWaveSample of chipWaveSamples) {
 		const chipWaveIndex: number = startIndex + chipWaveIndexOffset;
+		Config.rawChipWaves[chipWaveIndex].samples = chipWaveSample;
 		Config.rawRawChipWaves[chipWaveIndex].samples = chipWaveSample;
 		Config.chipWaves[chipWaveIndex].samples = performIntegral(chipWaveSample);
 		sampleLoadingState.statusTable[chipWaveIndex] = SampleLoadingStatus.loaded;
@@ -787,6 +807,8 @@ export class Config {
     public static ratioVal: number = 12;
     public static attackVal: number = 0;
     public static releaseVal: number = 0.25;
+
+    public static willReloadForCustomSamples: boolean = false;
 
     public static readonly scales: DictionaryArray<Scale> = toNameMap([
 
@@ -897,7 +919,7 @@ export class Config {
     public static readonly pickedStringBaseExpression: number = 0.025; // Same as harmonics.
     public static readonly distortionBaseVolume: number = 0.011; // Distortion is not affected by pitchDamping, which otherwise approximately halves expression for notes around the middle of the range.
     public static readonly bitcrusherBaseVolume: number = 0.010; // Also not affected by pitchDamping, used when bit crushing is maxed out (aka "1-bit" output).
-	public static readonly rawChipWaves: DictionaryArray<ChipWave> = toNameMap([
+	public static rawChipWaves: DictionaryArray<ChipWave> = toNameMap([
         { name: "rounded", expression: 0.94, samples: centerWave([0.0, 0.2, 0.4, 0.5, 0.6, 0.7, 0.8, 0.85, 0.9, 0.95, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.95, 0.9, 0.85, 0.8, 0.7, 0.6, 0.5, 0.4, 0.2, 0.0, -0.2, -0.4, -0.5, -0.6, -0.7, -0.8, -0.85, -0.9, -0.95, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -0.95, -0.9, -0.85, -0.8, -0.7, -0.6, -0.5, -0.4, -0.2]) },
         { name: "triangle", expression: 1.0, samples: centerWave([1.0 / 15.0, 3.0 / 15.0, 5.0 / 15.0, 7.0 / 15.0, 9.0 / 15.0, 11.0 / 15.0, 13.0 / 15.0, 15.0 / 15.0, 15.0 / 15.0, 13.0 / 15.0, 11.0 / 15.0, 9.0 / 15.0, 7.0 / 15.0, 5.0 / 15.0, 3.0 / 15.0, 1.0 / 15.0, -1.0 / 15.0, -3.0 / 15.0, -5.0 / 15.0, -7.0 / 15.0, -9.0 / 15.0, -11.0 / 15.0, -13.0 / 15.0, -15.0 / 15.0, -15.0 / 15.0, -13.0 / 15.0, -11.0 / 15.0, -9.0 / 15.0, -7.0 / 15.0, -5.0 / 15.0, -3.0 / 15.0, -1.0 / 15.0]) },
         { name: "square", expression: 0.5, samples: centerWave([1.0, -1.0]) },
@@ -1024,6 +1046,8 @@ export class Config {
 	//public static readonly chipWaves: DictionaryArray<ChipWave> = rawChipToIntegrated(Config.rawChipWaves);
 	public static chipWaves: DictionaryArray<ChipWave> = rawChipToIntegrated(Config.rawChipWaves);
 	public static rawRawChipWaves: DictionaryArray<ChipWave> = Config.rawChipWaves;
+
+	public static firstIndexForSamplesInChipWaveList: number = Config.chipWaves.length;
   
 	// Noise waves have too many samples to write by hand, they're generated on-demand by getDrumWave instead.
 	public static readonly chipNoises: DictionaryArray<ChipNoise> = toNameMap([

@@ -175,7 +175,7 @@ export class AddSamplesPrompt {
     private _saveChanges = (): void => {
         const urlData: string = this._generateURLData();
         EditorConfig.customSamples = urlData.split("|").filter(x => x !== "");
-        EditorConfig.willReloadForCustomSamples = true;
+        Config.willReloadForCustomSamples = true;
         window.location.hash = this._doc.song.toBase64String();
         // The prompt seems to get stuck if reloading is done too quickly.
         setTimeout(() => { location.reload(); }, 50);

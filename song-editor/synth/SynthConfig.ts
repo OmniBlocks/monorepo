@@ -836,13 +836,13 @@ export class Config {
 		{ name: "A", isWhiteKey: true, basePitch: 21 },
 		{ name: "A♯", isWhiteKey: false, basePitch: 22 },
         { name: "B", isWhiteKey: true, basePitch: 23 },
-				{ name: "C+", isWhiteKey: false, basePitch: 24 },
+				// { name: "C+", isWhiteKey: false, basePitch: 24 },
 		//taken from todbox, called "B#" for some reason lol
-		{ name: "G- (actually F#-)", isWhiteKey: false, basePitch: 6 },
-        { name: "C-", isWhiteKey: true, basePitch: 0 },
+		// { name: "G- (actually F#-)", isWhiteKey: false, basePitch: 6 },
+        // { name: "C-", isWhiteKey: true, basePitch: 0 },
 	    //brucebox
 		//g- isn't actually g-???
-		{ name: "oh no (F-)", isWhiteKey: true, basePitch: 5 },
+		// { name: "oh no (F-)", isWhiteKey: true, basePitch: 5 },
 		//shitbox
 	]);
 	public static readonly blackKeyNameParents: ReadonlyArray<number> = [-1, 1, -1, 1, -1, 1, -1, -1, 1, -1, 1, -1];

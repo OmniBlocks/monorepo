@@ -34,9 +34,7 @@ export class TipPrompt implements Prompt {
 				message = div(
 					h2("Octave"),
 					p("This setting can shift the \"key\" by an octave, allowing you to use a B- or C+ key."),
-					// @TODO: Use Config.octaveMin/Config.octaveMax in this
-					// message.
-					p("This goes from -2 to 2."),
+					p(`This goes from ${Config.octaveMin} to ${Config.octaveMax}.`),
 				);
 			} break;
 			case "tempo": {

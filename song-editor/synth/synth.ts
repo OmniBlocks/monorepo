@@ -35,6 +35,65 @@ function validateRange(min: number, max: number, val: number): number {
     throw new Error(`Value ${val} not in range [${min}, ${max}]`);
 }
 
+function encode32BitNumber(buffer: number[], x: number): void {
+    // 0b11_
+    buffer.push(base64IntToCharCode[(x >>> (6 * 5)) & 0x3]);
+    //      111111_
+    buffer.push(base64IntToCharCode[(x >>> (6 * 4)) & 0x3f]);
+    //             111111_
+    buffer.push(base64IntToCharCode[(x >>> (6 * 3)) & 0x3f]);
+    //                    111111_
+    buffer.push(base64IntToCharCode[(x >>> (6 * 2)) & 0x3f]);
+    //                           111111_
+    buffer.push(base64IntToCharCode[(x >>> (6 * 1)) & 0x3f]);
+    //                                  111111
+    buffer.push(base64IntToCharCode[(x >>> (6 * 0)) & 0x3f]);
+}
+
+// @TODO: This is error-prone, because the caller has to remember to increment
+// charIndex by 6 afterwards.
+function decode32BitNumber(compressed: string, charIndex: number): number {
+    let x: number = 0;
+    // 0b11_
+    x |= base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << (6 * 5);
+    //      111111_
+    x |= base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << (6 * 4);
+    //             111111_
+    x |= base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << (6 * 3);
+    //                    111111_
+    x |= base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << (6 * 2);
+    //                           111111_
+    x |= base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << (6 * 1);
+    //                                  111111
+    x |= base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << (6 * 0);
+    return x;
+}
+
+function convertLegacyKeyToKeyAndOctave(rawKeyIndex: number): [number, number] {
+    let key: number = clamp(0, Config.keys.length, rawKeyIndex);
+    let octave: number = 0;
+    // This conversion code depends on C through B being
+    // available as keys, of course.
+    if (rawKeyIndex === 12) {
+        // { name: "C+", isWhiteKey: false, basePitch: 24 }
+        key = 0;
+        octave = 1;
+    } else if (rawKeyIndex === 13) {
+        // { name: "G- (actually F#-)", isWhiteKey: false, basePitch: 6 }
+        key = 6;
+        octave = -1;
+    } else if (rawKeyIndex === 14) {
+        // { name: "C-", isWhiteKey: true, basePitch: 0 }
+        key = 0;
+        octave = -1;
+    } else if (rawKeyIndex === 15) {
+        // { name: "oh no (F-)", isWhiteKey: true, basePitch: 5 }
+        key = 5;
+        octave = -1;
+    }
+    return [key, octave];
+}
+
 const enum CharCode {
     SPACE = 32,
     HASH = 35,
@@ -136,7 +195,7 @@ const enum SongTagCode {
     volume = CharCode.v, // added in 2
     wave = CharCode.w, // added in 2
 
-    filterResonance = CharCode.y, // added in 7, DEPRECATED
+    filterResonance = CharCode.y, // added in 7, DEPRECATED, [UB] repurposed for chip wave loop controls
     drumsetEnvelopes = CharCode.z, // added in 7 for filter envelopes, still used for drumset envelopes
     algorithm = CharCode.A, // added in 6
     feedbackAmplitude = CharCode.B, // added in 6
@@ -148,7 +207,6 @@ const enum SongTagCode {
     harmonics = CharCode.H, // added in 7
     stringSustain = CharCode.I, // added in 9
 
-    octave = CharCode.J, // [UB] added in 2
     pan = CharCode.L, // added between 8 and 9, DEPRECATED
     customChipWave = CharCode.M, // [JB], added in 1(?)
     songTitle = CharCode.N, // [JB], added in 1(?)
@@ -2484,7 +2542,7 @@ export class Song {
     private static readonly _oldestGoldBoxVersion: number = 1;
     private static readonly _latestGoldBoxVersion: number = 4;
     private static readonly _oldestUltraBoxVersion: number = 1;
-    private static readonly _latestUltraBoxVersion: number = 2;
+    private static readonly _latestUltraBoxVersion: number = 3;
     // One-character variant detection at the start of URL to distinguish variants such as JummBox, Or Goldbox. "j" and "g" respectively
 	//also "u" is ultrabox lol
     private static readonly _variant = 0x75; //"u" ~ ultrabox
@@ -2720,13 +2778,10 @@ export class Song {
                 buffer.push(base64IntToCharCode[this.scaleCustom[i]?1:0]) // ineffiecent? yes, all we're going to do for now? hell yes
             }
         }
-        buffer.push(SongTagCode.key, base64IntToCharCode[this.key]);
+        buffer.push(SongTagCode.key, base64IntToCharCode[this.key], base64IntToCharCode[this.octave - Config.octaveMin]);
         buffer.push(SongTagCode.loopStart, base64IntToCharCode[this.loopStart >> 6], base64IntToCharCode[this.loopStart & 0x3f]);
         buffer.push(SongTagCode.loopEnd, base64IntToCharCode[(this.loopLength - 1) >> 6], base64IntToCharCode[(this.loopLength - 1) & 0x3f]);
         buffer.push(SongTagCode.tempo, base64IntToCharCode[this.tempo >> 6], base64IntToCharCode[this.tempo & 0x3F]);
-        // @TODO: Use Config.octaveMin/Config.octaveMax to figure out how to
-        // make this non-negative.
-        buffer.push(SongTagCode.octave, base64IntToCharCode[this.octave + 2]);
         buffer.push(SongTagCode.beatCount, base64IntToCharCode[this.beatsPerBar - 1]);
         buffer.push(SongTagCode.barCount, base64IntToCharCode[(this.barCount - 1) >> 6], base64IntToCharCode[(this.barCount - 1) & 0x3f]);
         buffer.push(SongTagCode.patternCount, base64IntToCharCode[(this.patternsPerChannel - 1) >> 6], base64IntToCharCode[(this.patternsPerChannel - 1) & 0x3f]);
@@ -2939,6 +2994,31 @@ export class Song {
 							buffer.push(base64IntToCharCode[0]);	
 						}
 						buffer.push(104, base64IntToCharCode[instrument.unison]);
+
+						// Repurposed for chip wave loop controls.
+						buffer.push(SongTagCode.filterResonance);
+						// The encoding here is as follows:
+						// 0b11111_1
+						//         ^-- isUsingAdvancedLoopControls
+						//   ^^^^^---- chipWaveLoopMode
+						// This essentially allocates 32 different loop modes,
+						// which should be plenty.
+						const encodedLoopMode: number = (
+							(clamp(0, 31 + 1, instrument.chipWaveLoopMode) << 1)
+							| (instrument.isUsingAdvancedLoopControls ? 1 : 0)
+						);
+						buffer.push(base64IntToCharCode[encodedLoopMode]);
+						// The same encoding above is used here, but with the release mode
+						// (which isn't implemented currently), and the backwards toggle.
+						const encodedReleaseMode: number = (
+							(clamp(0, 31 + 1, 0) << 1)
+							| (instrument.chipWavePlayBackwards ? 1 : 0)
+						);
+						buffer.push(base64IntToCharCode[encodedReleaseMode]);
+						encode32BitNumber(buffer, instrument.chipWaveLoopStart);
+						encode32BitNumber(buffer, instrument.chipWaveLoopEnd);
+						encode32BitNumber(buffer, instrument.chipWaveStartOffset);
+
 					 //code bookmark
                 } else if (instrument.type == InstrumentType.fm || instrument.type == InstrumentType.fm6op) {
                     if (instrument.type == InstrumentType.fm) {
@@ -3277,69 +3357,6 @@ export class Song {
         buffer.push(base64IntToCharCode[digits.length]);
         Array.prototype.push.apply(buffer, digits); // append digits to buffer.
         bits.encodeBase64(buffer);
-
-			// advloop addition
-            // I don't think this will be the final serialization code.
-            buffer.push(121 /* lowercase y */);
-            function encode32BitNumber(x: number): void {
-                // 0b11_
-                buffer.push(base64IntToCharCode[(x >>> (6 * 5)) & 0x3]);
-                //      111111_
-                buffer.push(base64IntToCharCode[(x >>> (6 * 4)) & 0x3f]);
-                //             111111_
-                buffer.push(base64IntToCharCode[(x >>> (6 * 3)) & 0x3f]);
-                //                    111111_
-                buffer.push(base64IntToCharCode[(x >>> (6 * 2)) & 0x3f]);
-                //                           111111_
-                buffer.push(base64IntToCharCode[(x >>> (6 * 1)) & 0x3f]);
-                //                                  111111
-                buffer.push(base64IntToCharCode[(x >>> (6 * 0)) & 0x3f]);
-            }
-            const sampleLoopInfo = [];
-            for (let channelIndex = 0; channelIndex < this.getChannelCount(); channelIndex++) {
-                for (let i = 0; i < this.channels[channelIndex].instruments.length; i++) {
-                    const instrument = this.channels[channelIndex].instruments[i];
-                    let storedInfo: {
-                        isUsingAdvancedLoopControls?: boolean;
-                        chipWaveLoopStart?: number;
-                        chipWaveLoopEnd?: number;
-                        chipWaveLoopMode?: number;
-                        chipWavePlayBackwards?: boolean;
-                        chipWaveStartOffset?: number;
-                    } = {};
-                    let isStoringSomething = false;
-                    if (instrument.type === 0) {
-                        const isUsingAdvancedLoopControls = instrument.isUsingAdvancedLoopControls;
-                        const chipWaveLoopStart = instrument.chipWaveLoopStart;
-                        const chipWaveLoopEnd = instrument.chipWaveLoopEnd;
-                        const chipWaveLoopMode = instrument.chipWaveLoopMode;
-                        const chipWavePlayBackwards = instrument.chipWavePlayBackwards;
-                        const chipWaveStartOffset = instrument.chipWaveStartOffset;
-                        storedInfo["isUsingAdvancedLoopControls"] = isUsingAdvancedLoopControls;
-                        storedInfo["chipWaveLoopStart"] = chipWaveLoopStart;
-                        storedInfo["chipWaveLoopEnd"] = chipWaveLoopEnd;
-                        storedInfo["chipWaveLoopMode"] = chipWaveLoopMode;
-                        storedInfo["chipWavePlayBackwards"] = chipWavePlayBackwards;
-                        storedInfo["chipWaveStartOffset"] = chipWaveStartOffset;
-                        isStoringSomething = true;
-                    }
-                    if (isStoringSomething) {
-                        sampleLoopInfo.push({
-                            channel: channelIndex,
-                            instrument: i,
-                            info: storedInfo,
-                        });
-                    }
-                }
-            }
-            // console.log("saving:", sampleLoopInfo);
-            const sampleLoopInfoEncoded = btoa(JSON.stringify(sampleLoopInfo)).replace(/=+$/, "");
-            const sampleLoopInfoEncodedLength = sampleLoopInfoEncoded.length;
-           encode32BitNumber(sampleLoopInfoEncodedLength);
-            for (const c of sampleLoopInfoEncoded) {
-                buffer.push(c.charCodeAt(0));
-            }
-           // advloop addition
 	    
         const maxApplyArgs: number = 64000;
 	    			            let customSamplesStr = "";
@@ -3772,14 +3789,24 @@ export class Song {
             case SongTagCode.key: {
                 if (beforeSeven && fromBeepBox) {
                     this.key = clamp(0, Config.keys.length, 11 - base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                    this.octave = 0;
+                } else if (fromBeepBox || fromJummBox) {
+                    this.key = clamp(0, Config.keys.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                    this.octave = 0;
+                } else if (fromGoldBox || (beforeThree && fromUltraBox)) {
+                    // GoldBox (so far) didn't introduce any new keys, but old
+                    // songs made with early versions of UltraBox share the
+                    // same URL format, and those can have more keys. This
+                    // shouldn't really result in anything other than 0-11 for
+                    // the key and 0 for the octave for GoldBox songs.
+                    const rawKeyIndex: number = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                    const [key, octave]: [number, number] = convertLegacyKeyToKeyAndOctave(rawKeyIndex);
+                    this.key = key;
+                    this.octave = octave;
                 } else {
                     this.key = clamp(0, Config.keys.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                    this.octave = clamp(Config.octaveMin, Config.octaveMax + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)] + Config.octaveMin);
                 }
-            } break;
-            case SongTagCode.octave: {
-                // @TODO: Use Config.octaveMin/Config.octaveMax to figure out how to
-                // bring this back into the right range.
-                this.octave = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] - 2;
             } break;
             case SongTagCode.loopStart: {
                 if (beforeFive && fromBeepBox) {
@@ -4064,67 +4091,6 @@ export class Song {
 						}
 						//is it more useful to save base64 characters or url length?
 					break;
-					case 121:
-						if (fromUltraBox) {
-							 // I don't think this will be the final deserialization code.
-                            function decode32BitNumber() {
-                                let x = 0;
-                                // 0b11_
-                                x |= base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << (6 * 5);
-                                //      111111_
-                                x |= base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << (6 * 4);
-                                //             111111_
-                                x |= base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << (6 * 3);
-                                //                    111111_
-                                x |= base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << (6 * 2);
-                                //                           111111_
-                                x |= base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << (6 * 1);
-                                //                                  111111
-                                x |= base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << (6 * 0);
-                                return x;
-                            }
-                            const sampleLoopInfoEncodedLength = decode32BitNumber();
-                            const sampleLoopInfoEncoded = compressed.slice(charIndex, charIndex + sampleLoopInfoEncodedLength);
-                            charIndex += sampleLoopInfoEncodedLength;
-                            const sampleLoopInfo: {
-                                channel: number;
-                                instrument: number;
-                                info: {
-                                    isUsingAdvancedLoopControls: boolean;
-                                    chipWaveLoopStart: number;
-                                    chipWaveLoopEnd: number;
-                                    chipWaveLoopMode: number;
-                                    chipWavePlayBackwards: boolean;
-                                    chipWaveStartOffset: number;
-                                };
-                            }[] = JSON.parse(atob(sampleLoopInfoEncoded));
-                            // console.log("loading:", sampleLoopInfo);
-                            for (const entry of sampleLoopInfo) {
-                                const channelIndex = entry["channel"];
-                                const instrumentIndex = entry["instrument"];
-                                const info = entry["info"];
-                                const instrument = this.channels[channelIndex].instruments[instrumentIndex];
-                                instrument.isUsingAdvancedLoopControls = info["isUsingAdvancedLoopControls"];
-                                instrument.chipWaveLoopStart = info["chipWaveLoopStart"];
-                                instrument.chipWaveLoopEnd = info["chipWaveLoopEnd"];
-                                instrument.chipWaveLoopMode = info["chipWaveLoopMode"];
-                                instrument.chipWavePlayBackwards = info["chipWavePlayBackwards"];
-                                instrument.chipWaveStartOffset = info["chipWaveStartOffset"];
-                            }
-						}
-					
-						else if (fromGoldBox && !beforeFour && beforeSix) {
-							if (document.URL.substring(document.URL.length - 13).toLowerCase() != "legacysamples") {
-									document.location.href = document.URL.concat("|legacysamples");
-									location.reload();
-									//loadBuiltInSamples(0);
-									//run the loadBuiltInSamples function so it doesn't have to reload
-							}
-							
-							this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].chipWave = clamp(0, Config.chipWaves.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)] + 125);						
-							
-						}
-					break;
             case SongTagCode.eqFilter: {
                 if ((beforeNine && fromBeepBox) || (beforeFive && fromJummBox) || (beforeFour && fromGoldBox)) {
                     if (beforeSeven && fromBeepBox) {
@@ -4233,7 +4199,74 @@ export class Song {
                 }
             } break;
             case SongTagCode.filterResonance: {
-                if ((beforeNine && fromBeepBox) || ((fromJummBox && beforeFive) || (beforeFour && fromGoldBox))) {
+                if (fromUltraBox) {
+                    if (beforeThree) {
+                        // Still have to support the old and bad loop control data format written as a test, sigh.
+                        const sampleLoopInfoEncodedLength = decode32BitNumber(compressed, charIndex);
+                        charIndex += 6;
+                        const sampleLoopInfoEncoded = compressed.slice(charIndex, charIndex + sampleLoopInfoEncodedLength);
+                        charIndex += sampleLoopInfoEncodedLength;
+                        interface SampleLoopInfo {
+                            isUsingAdvancedLoopControls: boolean;
+                            chipWaveLoopStart: number;
+                            chipWaveLoopEnd: number;
+                            chipWaveLoopMode: number;
+                            chipWavePlayBackwards: boolean;
+                            chipWaveStartOffset: number;
+                        }
+                        interface SampleLoopInfoEntry {
+                            channel: number;
+                            instrument: number;
+                            info: SampleLoopInfo;
+                        }
+                        const sampleLoopInfo: SampleLoopInfoEntry[] = JSON.parse(atob(sampleLoopInfoEncoded));
+                        for (const entry of sampleLoopInfo) {
+                            const channelIndex: number = entry["channel"];
+                            const instrumentIndex: number = entry["instrument"];
+                            const info: SampleLoopInfo = entry["info"];
+                            const instrument: Instrument = this.channels[channelIndex].instruments[instrumentIndex];
+                            instrument.isUsingAdvancedLoopControls = info["isUsingAdvancedLoopControls"];
+                            instrument.chipWaveLoopStart = info["chipWaveLoopStart"];
+                            instrument.chipWaveLoopEnd = info["chipWaveLoopEnd"];
+                            instrument.chipWaveLoopMode = info["chipWaveLoopMode"];
+                            instrument.chipWavePlayBackwards = info["chipWavePlayBackwards"];
+                            instrument.chipWaveStartOffset = info["chipWaveStartOffset"];
+                            // @TODO: Whenever chipWaveReleaseMode is implemented, it should be set here to the default.
+                        }
+                    } else {
+                        // Read the new loop control data format.
+                        // See Song.toBase64String for details on the encodings used here.
+                        const encodedLoopMode: number = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                        const isUsingAdvancedLoopControls: boolean = Boolean(encodedLoopMode & 1);
+                        const chipWaveLoopMode: number = encodedLoopMode >> 1;
+                        const encodedReleaseMode: number = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                        const chipWavePlayBackwards: boolean = Boolean(encodedReleaseMode & 1);
+                        // const chipWaveReleaseMode: number = encodedReleaseMode >> 1;
+                        const chipWaveLoopStart: number = decode32BitNumber(compressed, charIndex);
+                        charIndex += 6;
+                        const chipWaveLoopEnd: number = decode32BitNumber(compressed, charIndex);
+                        charIndex += 6;
+                        const chipWaveStartOffset: number = decode32BitNumber(compressed, charIndex);
+                        charIndex += 6;
+                        const instrument: Instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
+                        instrument.isUsingAdvancedLoopControls = isUsingAdvancedLoopControls;
+                        instrument.chipWaveLoopStart = chipWaveLoopStart;
+                        instrument.chipWaveLoopEnd = chipWaveLoopEnd;
+                        instrument.chipWaveLoopMode = chipWaveLoopMode;
+                        instrument.chipWavePlayBackwards = chipWavePlayBackwards;
+                        instrument.chipWaveStartOffset = chipWaveStartOffset;
+                        // instrument.chipWaveReleaseMode = chipWaveReleaseMode;
+                    }
+                }
+                else if (fromGoldBox && !beforeFour && beforeSix) {
+                    if (document.URL.substring(document.URL.length - 13).toLowerCase() != "legacysamples") {
+                            document.location.href = document.URL.concat("|legacysamples");
+                            location.reload();
+                            //loadBuiltInSamples(0);
+                            //run the loadBuiltInSamples function so it doesn't have to reload
+                    }
+                    this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].chipWave = clamp(0, Config.chipWaves.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)] + 125);						
+                } else if ((beforeNine && fromBeepBox) || ((fromJummBox && beforeFive) || (beforeFour && fromGoldBox))) {
                     const filterResonanceRange: number = 8;
                     const instrument: Instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                     const legacySettings: LegacySettings = legacySettingsCache![instrumentChannelIterator][instrumentIndexIterator];
@@ -5607,17 +5640,33 @@ export class Song {
                 this.key = ((jsonObject["key"] + 1200) >>> 0) % Config.keys.length;
             } else if (typeof (jsonObject["key"]) == "string") {
                 const key: string = jsonObject["key"];
-                const letter: string = key.charAt(0).toUpperCase();
-                const symbol: string = key.charAt(1).toLowerCase();
-                const letterMap: Readonly<Dictionary<number>> = { "C": 0, "D": 2, "E": 4, "F": 5, "G": 7, "A": 9, "B": 11 };
-                const accidentalMap: Readonly<Dictionary<number>> = { "#": 1, "♯": 1, "b": -1, "♭": -1 };
-                let index: number | undefined = letterMap[letter];
-                const offset: number | undefined = accidentalMap[symbol];
-                if (index != undefined) {
-                    if (offset != undefined) index += offset;
-                    if (index < 0) index += 12;
-                    index = index % 12;
-                    this.key = index;
+                // This conversion code depends on C through B being
+                // available as keys, of course.
+                if (key === "C+") {
+                    this.key = 0;
+                    this.octave = 1;
+                } else if (key === "G- (actually F#-)") {
+                    this.key = 6;
+                    this.octave = -1;
+                } else if (key === "C-") {
+                    this.key = 0;
+                    this.octave = -1;
+                } else if (key === "oh no (F-)") {
+                    this.key = 5;
+                    this.octave = -1;
+                } else {
+                    const letter: string = key.charAt(0).toUpperCase();
+                    const symbol: string = key.charAt(1).toLowerCase();
+                    const letterMap: Readonly<Dictionary<number>> = { "C": 0, "D": 2, "E": 4, "F": 5, "G": 7, "A": 9, "B": 11 };
+                    const accidentalMap: Readonly<Dictionary<number>> = { "#": 1, "♯": 1, "b": -1, "♭": -1 };
+                    let index: number | undefined = letterMap[letter];
+                    const offset: number | undefined = accidentalMap[symbol];
+                    if (index != undefined) {
+                        if (offset != undefined) index += offset;
+                        if (index < 0) index += 12;
+                        index = index % 12;
+                        this.key = index;
+                    }
                 }
             }
         }

@@ -268,6 +268,19 @@ class RenderWebGL extends EventEmitter {
         this.maxTextureDimension = 2048;
 
         /**
+         * Custom fonts, used by SVGs. Maps font families to their @font-face statement.
+         * Do not modify directly -- use {@link setCustomFonts}.
+         * @type {Record<string, string>}
+         */
+        this.customFonts = {};
+
+        /**
+         * <style> element used for custom fonts.
+         * @type {HTMLStyleElement|null}
+         */
+        this._customFontStyles = null;
+
+        /**
          * Export internals for third-party extensions.
          */
         this.exports = {
@@ -2212,6 +2225,29 @@ class RenderWebGL extends EventEmitter {
     requestSnapshot (callback) {
         this.dirty = true;
         this._snapshotCallbacks.push(callback);
+    }
+
+    /**
+     * Update the list of custom fonts. These fonts will be added to the DOM.
+     * SEURITY CONSIDERATIONS: It is the caller's responsibility to ensure that the @font-face
+     * statements do not contain malicious styles.
+     * @param {Record<string, string>} customFonts Maps full font families (with fallbacks) to @font-face statements.
+     */
+    setCustomFonts (customFonts) {
+        this.customFonts = customFonts;
+        const css = Object.values(customFonts).join('\n');
+
+        if (css.length) {
+            if (!this._customFontStyles) {
+                this._customFontStyles = document.createElement('style');
+                this._customFontStyles.className = 'renderer-custom-fonts';
+                document.head.appendChild(this._customFontStyles);
+            }
+            this._customFontStyles.textContent = css;
+        } else if (this._customFontStyles) {
+            this._customFontStyles.remove();
+            this._customFontStyles = null;
+        }
     }
 }
 

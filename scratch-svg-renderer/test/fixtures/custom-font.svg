@@ -1,0 +1,9 @@
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="48.45996" height="23.075" viewBox="0,0,48.45996,23.075">
+    <g transform="translate(-173.6227,-137.79608)">
+        <g data-paper-data="{&quot;isPaintingLayer&quot;:true}" fill="#9966ff" fill-rule="nonzero" stroke="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10" stroke-dasharray="" stroke-dashoffset="0" font-family="&quot;Custom Font 1&quot;, sans-serif" font-weight="normal" font-size="40" text-anchor="start" style="mix-blend-mode: normal">
+            <text transform="translate(173.8727,153.04608) scale(0.5,0.5)" font-size="40" xml:space="preserve" fill="#9966ff" fill-rule="nonzero" stroke="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10" stroke-dasharray="" stroke-dashoffset="0" font-family="Custom Font 1" font-weight="normal" text-anchor="start" style="mix-blend-mode: normal">
+                <tspan x="0" dy="0">Test 123!</tspan>
+            </text>
+        </g>
+    </g>
+</svg>

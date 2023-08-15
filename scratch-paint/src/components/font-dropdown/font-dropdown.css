@@ -12,6 +12,7 @@
     cursor: pointer;
     transition: 0.1s ease;
     align-items: center;
+    overflow-wrap: anywhere;
 }
 
 .mod-menu-item:hover {
@@ -30,6 +31,8 @@
 
 .displayed-font-name {
     font-size: .8rem;
+    overflow: hidden;
+    white-space: nowrap;
 }
 
 .font-dropdown {

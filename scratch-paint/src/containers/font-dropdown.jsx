@@ -14,6 +14,8 @@ class FontDropdown extends React.Component {
         super(props);
         bindAll(this, [
             'getFontName',
+            'handleHoverCustom',
+            'handleManageFonts',
             'handleChangeFontSerif',
             'handleChangeFontSansSerif',
             'handleChangeFontHandwriting',
@@ -30,16 +32,34 @@ class FontDropdown extends React.Component {
         ]);
     }
     getFontName (font) {
-        switch (font) {
-        case Fonts.CHINESE:
-            return '中文';
-        case Fonts.KOREAN:
-            return '한국어';
-        case Fonts.JAPANESE:
-            return '日本語';
-        default:
-            return font;
+        const NATIVE_FONTS = Object.values(Fonts);
+        if (NATIVE_FONTS.includes(font)) {
+            switch (font) {
+            case Fonts.CHINESE:
+                return '中文';
+            case Fonts.KOREAN:
+                return '한국어';
+            case Fonts.JAPANESE:
+                return '日本語';
+            default:
+                return font;
+            }
         }
+
+        const customFont = this.props.customFonts.find(i => i.family === font);
+        if (customFont) {
+            return customFont.name;
+        }
+        return font;
+    }
+    handleHoverCustom (family) {
+        if (this.dropDown.isOpen()) {
+            this.props.changeFont(family);
+        }
+    }
+    handleManageFonts () {
+        this.cancelFontChange();
+        this.props.onManageFonts();
     }
     handleChangeFontSansSerif () {
         if (this.dropDown.isOpen()) {
@@ -98,6 +118,9 @@ class FontDropdown extends React.Component {
     }
     handleClickOutsideDropdown (e) {
         e.stopPropagation();
+        this.cancelFontChange();
+    }
+    cancelFontChange () {
         this.dropDown.handleClosePopover();
 
         // Cancel font change
@@ -120,6 +143,9 @@ class FontDropdown extends React.Component {
                 componentRef={this.setDropdown}
                 font={this.props.font}
                 getFontName={this.getFontName}
+                customFonts={this.props.customFonts}
+                onHoverCustom={this.handleHoverCustom}
+                onManageFonts={this.props.onManageFonts && this.handleManageFonts}
                 onChoose={this.handleChoose}
                 onClickOutsideDropdown={this.handleClickOutsideDropdown}
                 onHoverChinese={this.handleChangeFontChinese}
@@ -139,12 +165,18 @@ class FontDropdown extends React.Component {
 
 FontDropdown.propTypes = {
     changeFont: PropTypes.func.isRequired,
+    customFonts: PropTypes.arrayOf(PropTypes.shape({
+        name: PropTypes.string.isRequired,
+        family: PropTypes.string.isRequired
+    })).isRequired,
+    onManageFonts: PropTypes.func,
     font: PropTypes.string,
     onUpdateImage: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
-    font: state.scratchPaint.font
+    font: state.scratchPaint.font,
+    customFonts: state.scratchPaint.customFonts
 });
 const mapDispatchToProps = dispatch => ({
     changeFont: font => {

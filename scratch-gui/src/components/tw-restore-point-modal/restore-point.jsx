@@ -135,6 +135,7 @@ class RestorePoint extends React.Component {
                     <img
                         src={deleteIcon}
                         alt="Delete"
+                        draggable={false}
                     />
                 </button>
             </div>

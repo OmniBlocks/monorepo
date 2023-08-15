@@ -554,15 +554,20 @@ class VirtualMachine extends EventEmitter {
         return files;
     }
 
-    /*
-     * @type {Array<object>} Array of all costumes and sounds currently in the runtime
+    /**
+     * @type {Array<object>} Array of all assets currently in the runtime
      */
     get assets () {
-        return this.runtime.targets.reduce((acc, target) => (
+        const costumesAndSounds = this.runtime.targets.reduce((acc, target) => (
             acc
                 .concat(target.sprite.sounds.map(sound => sound.asset))
                 .concat(target.sprite.costumes.map(costume => costume.asset))
         ), []);
+        const fonts = this.runtime.fontManager.serializeAssets();
+        return [
+            ...costumesAndSounds,
+            ...fonts
+        ];
     }
 
     /**
@@ -572,7 +577,15 @@ class VirtualMachine extends EventEmitter {
     serializeAssets (targetId) {
         const costumeDescs = serializeCostumes(this.runtime, targetId);
         const soundDescs = serializeSounds(this.runtime, targetId);
-        return costumeDescs.concat(soundDescs);
+        const fontDescs = this.runtime.fontManager.serializeAssets().map(asset => ({
+            fileName: `${asset.assetId}.${asset.dataFormat}`,
+            fileContent: asset.data
+        }));
+        return [
+            ...costumeDescs,
+            ...soundDescs,
+            ...fontDescs
+        ];
     }
 
     _addFileDescsToZip (fileDescs, zip) {

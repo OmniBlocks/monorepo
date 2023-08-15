@@ -19,6 +19,7 @@ const StageLayering = require('./stage-layering');
 const Variable = require('./variable');
 const xmlEscape = require('../util/xml-escape');
 const ScratchLinkWebSocket = require('../util/scratch-link-websocket');
+const FontManager = require('./tw-font-manager');
 
 // Virtual I/O devices.
 const Clock = require('../io/clock');
@@ -493,6 +494,11 @@ class Runtime extends EventEmitter {
          * @type {Map<string, function>}
          */
         this.extensionButtons = new Map();
+
+        /**
+         * Responsible for managing custom fonts.
+         */
+        this.fontManager = new FontManager(this);
     }
 
     /**
@@ -2153,6 +2159,7 @@ class Runtime extends EventEmitter {
         }
         this.emit(Runtime.RUNTIME_DISPOSED);
         this.ioDevices.clock.resetProjectTimer();
+        this.fontManager.clear();
         // @todo clear out extensions? turboMode? etc.
 
         // *********** Cloud *******************

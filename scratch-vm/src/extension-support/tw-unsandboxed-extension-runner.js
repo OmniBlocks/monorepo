@@ -1,4 +1,5 @@
 const ScratchCommon = require('./tw-extension-api-common');
+const createScratchX = require('./tw-scratchx-compatibility-layer');
 const AsyncLimiter = require('../util/async-limiter');
 const createTranslate = require('./tw-l10n');
 
@@ -115,7 +116,7 @@ const setupUnsandboxedExtensionAPI = vm => new Promise(resolve => {
     Scratch.translate = createTranslate(vm);
 
     global.Scratch = Scratch;
-    global.ScratchExtensions = require('./tw-scratchx-compatibility-layer');
+    global.ScratchExtensions = createScratchX(Scratch);
 });
 
 /**

@@ -1,5 +1,5 @@
 const ScratchXUtilities = require('../../src/extension-support/tw-scratchx-utilities');
-const ScratchExtensions = require('../../src/extension-support/tw-scratchx-compatibility-layer');
+const createScratchX = require('../../src/extension-support/tw-scratchx-compatibility-layer');
 const {test} = require('tap');
 
 test('argument index to id', t => {
@@ -19,7 +19,34 @@ test('generate extension id', t => {
     t.end();
 });
 
+const mockScratchExtensions = () => {
+    const mockScratch = {};
+    return createScratchX(mockScratch);
+};
+
+const convert = (...args) => {
+    let registered = null;
+    const mockScratch = {
+        extensions: {
+            register: extensionObject => {
+                if (registered) {
+                    // In tests we don't want this
+                    throw new Error('register() called twice');
+                }
+                registered = extensionObject;
+            }
+        }
+    };
+    const ScratchExtensions = createScratchX(mockScratch);
+    ScratchExtensions.register(...args);
+    if (!registered) {
+        throw new Error('Did not register()');
+    }
+    return registered;
+};
+
 test('register', t => {
+    const ScratchExtensions = mockScratchExtensions();
     t.type(ScratchExtensions.register, 'function');
     t.end();
 });
@@ -49,7 +76,7 @@ test('complex extension', async t => {
 
     const touching = sprite => sprite === 'Sprite9';
 
-    const converted = ScratchExtensions.convert(
+    const converted = convert(
         'My Extension',
         {
             blocks: [
@@ -215,7 +242,7 @@ test('complex extension', async t => {
 });
 
 test('display name', t => {
-    const converted = ScratchExtensions.convert(
+    const converted = convert(
         'Internal Name',
         {
             blocks: [],
@@ -234,7 +261,7 @@ test('_getStatus', t => {
         status: 2,
         msg: 'Ready'
     });
-    const converted = ScratchExtensions.convert(
+    const converted = convert(
         'Name',
         {
             blocks: []

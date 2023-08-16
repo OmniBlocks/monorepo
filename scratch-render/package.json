@@ -57,7 +57,7 @@
     "linebreak": "0.3.0",
     "minilog": "3.1.0",
     "raw-loader": "^0.5.1",
-    "scratch-svg-renderer": "0.2.0-prerelease.20210727023023",
+    "scratch-svg-renderer": "git+https://github.com/TurboWarp/scratch-svg-renderer.git",
     "twgl.js": "4.4.0"
   },
   "private": true

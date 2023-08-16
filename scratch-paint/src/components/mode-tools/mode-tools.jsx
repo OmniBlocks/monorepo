@@ -250,6 +250,7 @@ const ModeToolsComponent = props => {
                 <InputGroup>
                     <FontDropdown
                         onUpdateImage={props.onUpdateImage}
+                        onManageFonts={props.onManageFonts}
                     />
                 </InputGroup>
             </div>
@@ -327,6 +328,7 @@ ModeToolsComponent.propTypes = {
     onFillShapes: PropTypes.func.isRequired,
     onFlipHorizontal: PropTypes.func.isRequired,
     onFlipVertical: PropTypes.func.isRequired,
+    onManageFonts: PropTypes.func,
     onOutlineShapes: PropTypes.func.isRequired,
     onPasteFromClipboard: PropTypes.func.isRequired,
     onPointPoints: PropTypes.func.isRequired,

@@ -219,6 +219,7 @@ class ModeTools extends React.Component {
                 onDelete={this.handleDelete}
                 onFlipHorizontal={this.handleFlipHorizontal}
                 onFlipVertical={this.handleFlipVertical}
+                onManageFonts={this.props.onManageFonts}
                 onPasteFromClipboard={this.handlePasteFromClipboard}
                 onPointPoints={this.handlePointPoints}
                 onUpdateImage={this.props.onUpdateImage}
@@ -232,6 +233,7 @@ ModeTools.propTypes = {
     format: PropTypes.oneOf(Object.keys(Formats)),
     mode: PropTypes.oneOf(Object.keys(Modes)),
     onCopyToClipboard: PropTypes.func.isRequired,
+    onManageFonts: PropTypes.func,
     onPasteFromClipboard: PropTypes.func.isRequired,
     onUpdateImage: PropTypes.func.isRequired,
     // Listen on selected items to update hasSelectedPoints

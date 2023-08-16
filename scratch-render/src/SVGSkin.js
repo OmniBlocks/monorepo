@@ -198,7 +198,7 @@ class SVGSkin extends Skin {
      */
     setSVG (svgData, rotationCenter) {
         const svgTag = loadSvgString(svgData);
-        const svgText = serializeSvgToString(svgTag, true /* shouldInjectFonts */);
+        const svgText = serializeSvgToString(svgTag, this._renderer.customFonts);
         this._svgImageLoaded = false;
 
         const {x, y, width, height} = svgTag.viewBox.baseVal;

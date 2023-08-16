@@ -15,6 +15,7 @@ const MODAL_USERNAME = 'usernameModal';
 const MODAL_SETTINGS = 'settingsModal';
 const MODAL_CUSTOM_EXTENSION = 'customExtensionModal';
 const MODAL_RESTORE_POINTS = 'restorePointModal';
+const MODAL_FONTS = 'fontsModal';
 
 const initialState = {
     [MODAL_BACKDROP_LIBRARY]: false,
@@ -30,7 +31,8 @@ const initialState = {
     [MODAL_USERNAME]: false,
     [MODAL_SETTINGS]: false,
     [MODAL_CUSTOM_EXTENSION]: false,
-    [MODAL_RESTORE_POINTS]: false
+    [MODAL_RESTORE_POINTS]: false,
+    [MODAL_FONTS]: false
 };
 
 const reducer = function (state, action) {
@@ -102,6 +104,9 @@ const openCustomExtensionModal = function () {
 const openRestorePointModal = function () {
     return openModal(MODAL_RESTORE_POINTS);
 };
+const openFontsModal = function () {
+    return openModal(MODAL_FONTS);
+};
 const closeBackdropLibrary = function () {
     return closeModal(MODAL_BACKDROP_LIBRARY);
 };
@@ -144,6 +149,9 @@ const closeCustomExtensionModal = function () {
 const closeRestorePointModal = function () {
     return closeModal(MODAL_RESTORE_POINTS);
 };
+const closeFontsModal = function () {
+    return closeModal(MODAL_FONTS);
+};
 export {
     reducer as default,
     initialState as modalsInitialState,
@@ -161,6 +169,7 @@ export {
     openSettingsModal,
     openCustomExtensionModal,
     openRestorePointModal,
+    openFontsModal,
     closeBackdropLibrary,
     closeCostumeLibrary,
     closeExtensionLibrary,
@@ -174,5 +183,6 @@ export {
     closeUsernameModal,
     closeSettingsModal,
     closeCustomExtensionModal,
-    closeRestorePointModal
+    closeRestorePointModal,
+    closeFontsModal
 };

@@ -21,7 +21,7 @@ class NudgeTool {
         this.boundingBoxTool.isBitmap = mode in BitmapModes;
     }
     onKeyDown (event) {
-        if (event.event.target instanceof HTMLInputElement) {
+        if (event.event.target instanceof HTMLInputElement || event.event.target instanceof HTMLTextAreaElement) {
             // Ignore nudge if a text input field is focused
             return;
         }

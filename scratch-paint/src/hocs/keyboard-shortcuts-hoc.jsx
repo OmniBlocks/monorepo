@@ -50,7 +50,7 @@ const KeyboardShortcutsHOC = function (WrappedComponent) {
             ]);
         }
         handleKeyPress (event) {
-            if (event.target instanceof HTMLInputElement) {
+            if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) {
                 // Ignore keyboard shortcuts if a text input field is focused
                 return;
             }

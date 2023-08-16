@@ -40,6 +40,12 @@ const AssetType = {
         name: 'Sprite',
         runtimeFormat: DataFormat.JSON,
         immutable: true
+    },
+    Font: {
+        contentType: 'font/ttf',
+        name: 'Font',
+        runtimeFormat: DataFormat.TTF,
+        immutable: true
     }
 };
 

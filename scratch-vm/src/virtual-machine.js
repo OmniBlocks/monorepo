@@ -497,8 +497,6 @@ class VirtualMachine extends EventEmitter {
      * @returns {JSZip} JSZip zip object representing the sb3.
      */
     _saveProjectZip () {
-        const soundDescs = serializeSounds(this.runtime);
-        const costumeDescs = serializeCostumes(this.runtime);
         const projectJson = this.toJSON();
 
         // TODO want to eventually move zip creation out of here, and perhaps
@@ -507,7 +505,7 @@ class VirtualMachine extends EventEmitter {
 
         // Put everything in a zip file
         zip.file('project.json', projectJson);
-        this._addFileDescsToZip(costumeDescs.concat(soundDescs), zip);
+        this._addFileDescsToZip(this.serializeAssets(), zip);
 
         return zip;
     }
@@ -544,29 +542,50 @@ class VirtualMachine extends EventEmitter {
      * @returns {Record<string, Uint8Array>} Map of file name to the raw data for that file.
      */
     saveProjectSb3DontZip () {
-        const soundDescs = serializeSounds(this.runtime);
-        const costumeDescs = serializeCostumes(this.runtime);
         const projectJson = this.toJSON();
 
         const files = {
             'project.json': new _TextEncoder().encode(projectJson)
         };
-        for (const fileDesc of costumeDescs.concat(soundDescs)) {
+        for (const fileDesc of this.serializeAssets()) {
             files[fileDesc.fileName] = fileDesc.fileContent;
         }
 
         return files;
     }
 
-    /*
-     * @type {Array<object>} Array of all costumes and sounds currently in the runtime
+    /**
+     * @type {Array<object>} Array of all assets currently in the runtime
      */
     get assets () {
-        return this.runtime.targets.reduce((acc, target) => (
+        const costumesAndSounds = this.runtime.targets.reduce((acc, target) => (
             acc
                 .concat(target.sprite.sounds.map(sound => sound.asset))
                 .concat(target.sprite.costumes.map(costume => costume.asset))
         ), []);
+        const fonts = this.runtime.fontManager.serializeAssets();
+        return [
+            ...costumesAndSounds,
+            ...fonts
+        ];
+    }
+
+    /**
+     * @param {string} targetId Optional ID of target to export
+     * @returns {Array<{fileName: string; fileContent: Uint8Array;}} list of file descs
+     */
+    serializeAssets (targetId) {
+        const costumeDescs = serializeCostumes(this.runtime, targetId);
+        const soundDescs = serializeSounds(this.runtime, targetId);
+        const fontDescs = this.runtime.fontManager.serializeAssets().map(asset => ({
+            fileName: `${asset.assetId}.${asset.dataFormat}`,
+            fileContent: asset.data
+        }));
+        return [
+            ...costumeDescs,
+            ...soundDescs,
+            ...fontDescs
+        ];
     }
 
     _addFileDescsToZip (fileDescs, zip) {
@@ -590,13 +609,11 @@ class VirtualMachine extends EventEmitter {
      * specified by optZipType or blob by default.
      */
     exportSprite (targetId, optZipType) {
-        const soundDescs = serializeSounds(this.runtime, targetId);
-        const costumeDescs = serializeCostumes(this.runtime, targetId);
         const spriteJson = this.toJSON(targetId);
 
         const zip = new JSZip();
         zip.file('sprite.json', spriteJson);
-        this._addFileDescsToZip(costumeDescs.concat(soundDescs), zip);
+        this._addFileDescsToZip(this.serializeAssets(targetId), zip);
 
         return zip.generateAsync({
             type: typeof optZipType === 'string' ? optZipType : 'blob',

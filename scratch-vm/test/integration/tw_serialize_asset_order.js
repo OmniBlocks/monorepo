@@ -7,6 +7,25 @@ const makeTestStorage = require('../fixtures/make-test-storage');
 
 const fixture = fs.readFileSync(path.join(__dirname, '..', 'fixtures', 'tw-serialize-asset-order.sb3'));
 
+test('serializeAssets serialization order', t => {
+    t.plan(15);
+    const vm = new VM();
+    vm.attachStorage(makeTestStorage());
+    vm.loadProject(fixture).then(() => {
+        const assets = vm.serializeAssets();
+        for (let i = 0; i < assets.length; i++) {
+            // won't deduplicate assets, so expecting 8 costumes, 7 sounds
+            // 8 costumes, 6 sounds
+            if (i < 8) {
+                t.ok(assets[i].fileName.endsWith('.svg'), `file ${i + 1} is costume`);
+            } else {
+                t.ok(assets[i].fileName.endsWith('.wav'), `file ${i + 1} is sound`);
+            }
+        }
+        t.end();
+    });
+});
+
 test('saveProjectSb3 serialization order', t => {
     t.plan(13);
     const vm = new VM();

@@ -86,6 +86,7 @@ import scratchLogo from './scratch-logo.svg';
 import sharedMessages from '../../lib/shared-messages';
 
 import SeeInsideButton from './tw-see-inside.jsx';
+import { notScratchDesktop } from '../../lib/isScratchDesktop.js';
 
 const ariaMessages = defineMessages({
     language: {
@@ -613,9 +614,11 @@ class MenuBar extends React.Component {
                                                 {extended.available && (
                                                     <React.Fragment>
                                                         {extended.name !== null && (
+                                                            // eslint-disable-next-line max-len
                                                             <MenuItem onClick={this.getSaveToComputerHandler(extended.saveToLastFile)}>
                                                                 <FormattedMessage
                                                                     defaultMessage="Save to {file}"
+                                                                    // eslint-disable-next-line max-len
                                                                     description="Menu bar item to save project to an existing file on the user's computer"
                                                                     id="tw.saveTo"
                                                                     values={{
@@ -624,30 +627,35 @@ class MenuBar extends React.Component {
                                                                 />
                                                             </MenuItem>
                                                         )}
+                                                        {/* eslint-disable-next-line max-len */}
                                                         <MenuItem onClick={this.getSaveToComputerHandler(extended.saveAsNew)}>
                                                             <FormattedMessage
                                                                 defaultMessage="Save as..."
-                                                                description="Menu bar item to select a new file to save the project as" // eslint-disable-line max-len
+                                                                // eslint-disable-next-line max-len
+                                                                description="Menu bar item to select a new file to save the project as"
                                                                 id="tw.saveAs"
                                                             />
                                                         </MenuItem>
                                                     </React.Fragment>
                                                 )}
-                                                <MenuItem onClick={this.getSaveToComputerHandler(downloadProject)}>
-                                                    {extended.available ? (
-                                                        <FormattedMessage
-                                                            defaultMessage="Save to separate file..."
-                                                            description="Download the project once, without being able to easily save to the same spot"
-                                                            id="tw.oldDownload"
-                                                        />
-                                                    ) : (
-                                                        <FormattedMessage
-                                                            defaultMessage="Save to your computer"
-                                                            description="Menu bar item for downloading a project to your computer" // eslint-disable-line max-len
-                                                            id="gui.menuBar.downloadToComputer"
-                                                        />
-                                                    )}
-                                                </MenuItem>
+                                                {notScratchDesktop() && (
+                                                    <MenuItem onClick={this.getSaveToComputerHandler(downloadProject)}>
+                                                        {extended.available ? (
+                                                            <FormattedMessage
+                                                                defaultMessage="Save to separate file..."
+                                                                // eslint-disable-next-line max-len
+                                                                description="Download the project once, without being able to easily save to the same spot"
+                                                                id="tw.oldDownload"
+                                                            />
+                                                        ) : (
+                                                            <FormattedMessage
+                                                                defaultMessage="Save to your computer"
+                                                                description="Menu bar item for downloading a project to your computer" // eslint-disable-line max-len
+                                                                id="gui.menuBar.downloadToComputer"
+                                                            />
+                                                        )}
+                                                    </MenuItem>
+                                                )}
                                             </React.Fragment>
                                         )}</SB3Downloader>
                                     </MenuSection>

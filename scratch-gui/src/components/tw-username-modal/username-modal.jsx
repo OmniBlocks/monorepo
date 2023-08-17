@@ -6,6 +6,7 @@ import Modal from '../../containers/modal.jsx';
 import classNames from 'classnames';
 
 import styles from './username-modal.css';
+import isScratchDesktop from '../../lib/isScratchDesktop.js';
 
 const messages = defineMessages({
     title: {
@@ -47,6 +48,15 @@ const UsernameModalComponent = props => (
                     />
                 </p>
             </React.Fragment>}
+            {isScratchDesktop() ? (
+                <p className={styles.helpText}>
+                    <FormattedMessage
+                        defaultMessage="New username:"
+                        description="Appears in the username changing modal in the desktop app"
+                        id="tw.usernameModal.new"
+                    />
+                </p>
+            ) : null}
             <Box>
                 <input
                     autoFocus
@@ -60,22 +70,28 @@ const UsernameModalComponent = props => (
                     spellCheck="false"
                 />
             </Box>
-            <p className={styles.helpText}>
-                <FormattedMessage
-                    // eslint-disable-next-line max-len
-                    defaultMessage="This value will be stored in your browser's storage. It may be logged when you interact with projects that contain cloud variables."
-                    description="Text in change username modal"
-                    id="tw.usernameModal.help"
-                />
-            </p>
-            <p className={styles.helpText}>
-                <FormattedMessage
-                    // eslint-disable-next-line max-len
-                    defaultMessage="Values that do not correspond to a valid Scratch account will typically be rejected by the cloud variable server. We recommend leaving it as-is or changing it to your Scratch username."
-                    description="Text in change username modal"
-                    id="tw.usernameModal.help2"
-                />
-            </p>
+            {isScratchDesktop() ? (
+                null
+            ) : (
+                <React.Fragment>
+                    <p className={styles.helpText}>
+                        <FormattedMessage
+                            // eslint-disable-next-line max-len
+                            defaultMessage="This value will be stored in your browser's storage. It may be logged when you interact with projects that contain cloud variables."
+                            description="Text in change username modal"
+                            id="tw.usernameModal.help"
+                        />
+                    </p>
+                    <p className={styles.helpText}>
+                        <FormattedMessage
+                            // eslint-disable-next-line max-len
+                            defaultMessage="Values that do not correspond to a valid Scratch account will typically be rejected by the cloud variable server. We recommend leaving it as-is or changing it to your Scratch username."
+                            description="Text in change username modal"
+                            id="tw.usernameModal.help2"
+                        />
+                    </p>
+                </React.Fragment>
+            )}
             <Box className={styles.buttonRow}>
                 <button
                     className={styles.cancelButton}

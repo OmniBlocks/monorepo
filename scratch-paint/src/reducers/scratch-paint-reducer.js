@@ -9,6 +9,7 @@ import triangleModeReducer from './triangle-mode';
 import colorReducer from './color';
 import clipboardReducer from './clipboard';
 import cursorReducer from './cursor';
+import customFontsReducer from './custom-fonts';
 import fillBitmapShapesReducer from './fill-bitmap-shapes';
 import fillModeReducer from './fill-mode';
 import fontReducer from './font';
@@ -31,6 +32,7 @@ export default combineReducers({
     color: colorReducer,
     clipboard: clipboardReducer,
     cursor: cursorReducer,
+    customFonts: customFontsReducer,
     eraserMode: eraserModeReducer,
     roundedRectMode: roundedRectModeReducer,
     triangleMode: triangleModeReducer,

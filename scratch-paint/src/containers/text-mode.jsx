@@ -93,8 +93,7 @@ class TextMode extends React.Component {
         } else if (fillColorPresent && !strokeColorPresent) {
             this.props.onChangeStrokeColor(null);
         }
-        if (!nextProps.font || Object.keys(Fonts).map(key => Fonts[key])
-            .indexOf(nextProps.font) < 0) {
+        if (!nextProps.font) {
             this.props.changeFont(Fonts.SANS_SERIF);
         }
 

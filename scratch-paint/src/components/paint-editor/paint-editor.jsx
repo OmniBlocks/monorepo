@@ -111,6 +111,7 @@ const PaintEditorComponent = props => (
                                 onUpdateImage={props.onUpdateImage}
                                 width={props.width}
                                 height={props.height}
+                                onManageFonts={props.onManageFonts}
                             />
                         </InputGroup>
                     </div> :
@@ -134,6 +135,7 @@ const PaintEditorComponent = props => (
                                     onUpdateImage={props.onUpdateImage}
                                     width={props.width}
                                     height={props.height}
+                                    onManageFonts={props.onManageFonts}
                                 />
                             </InputGroup>
                         </div> : null
@@ -361,6 +363,7 @@ PaintEditorComponent.propTypes = {
     isEyeDropping: PropTypes.bool,
     name: PropTypes.string,
     onChangeTheme: PropTypes.func.isRequired,
+    onManageFonts: PropTypes.func,
     onRedo: PropTypes.func.isRequired,
     onSwitchToBitmap: PropTypes.func.isRequired,
     onSwitchToVector: PropTypes.func.isRequired,

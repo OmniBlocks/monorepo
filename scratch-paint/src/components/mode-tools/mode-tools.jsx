@@ -443,6 +443,7 @@ const ModeToolsComponent = props => {
                     <InputGroup className={classNames(styles.modDashedBorder)}>
                         <FontDropdown
                             onUpdateImage={props.onUpdateImage}
+                            onManageFonts={props.onManageFonts}
                         />
                     </InputGroup>
                     <InputGroup className={classNames(styles.modDashedBorder, styles.modLabeledIconHeight)}>
@@ -544,6 +545,7 @@ ModeToolsComponent.propTypes = {
     onFlipHorizontal: PropTypes.func.isRequired,
     onFlipVertical: PropTypes.func.isRequired,
     onCenterSelection: PropTypes.func.isRequired,
+    onManageFonts: PropTypes.func,
     onOutlineShapes: PropTypes.func.isRequired,
     onPasteFromClipboard: PropTypes.func.isRequired,
     onPointPoints: PropTypes.func.isRequired,

@@ -18,6 +18,7 @@ import {setTextEditTarget} from '../reducers/text-edit-target';
 import {updateViewBounds} from '../reducers/view-bounds';
 import {setLayout} from '../reducers/layout';
 import {setTheme as setReduxTheme} from '../reducers/theme';
+import {setCustomFonts} from '../reducers/custom-fonts';
 
 import {getSelectedLeafItems} from '../helper/selection';
 import {convertToBitmap, convertToVector} from '../helper/bitmap';
@@ -96,6 +97,7 @@ class PaintEditor extends React.Component {
             colorInfo: null
         };
         this.props.setLayout(this.props.rtl ? 'rtl' : 'ltr');
+        this.props.onCustomFontsChanged(this.props.customFonts);
         resizeView(this.props.width, this.props.height);
     }
     componentDidMount () {
@@ -119,6 +121,9 @@ class PaintEditor extends React.Component {
         }
         if (this.props.theme !== newProps.theme) {
             this.props.setReduxTheme('default');
+        }
+        if (this.props.customFonts !== newProps.customFonts) {
+            this.props.onCustomFontsChanged(newProps.customFonts);
         }
     }
     componentDidUpdate (prevProps) {
@@ -352,6 +357,7 @@ class PaintEditor extends React.Component {
                 height={this.props.height}
                 zoomLevelId={this.props.zoomLevelId}
                 onChangeTheme={this.handleChangeTheme}
+                onManageFonts={this.props.onManageFonts}
                 onRedo={this.props.onRedo}
                 onSwitchToBitmap={this.props.handleSwitchToBitmap}
                 onSwitchToVector={this.props.handleSwitchToVector}
@@ -370,6 +376,12 @@ PaintEditor.propTypes = {
     changeColorToEyeDropper: PropTypes.func,
     changeMode: PropTypes.func.isRequired,
     clearSelectedItems: PropTypes.func.isRequired,
+    customFonts: PropTypes.arrayOf(PropTypes.shape({
+        name: PropTypes.string.isRequired,
+        family: PropTypes.string.isRequired
+    })).isRequired,
+    onCustomFontsChanged: PropTypes.func.isRequired,
+    onManageFonts: PropTypes.func,
     format: PropTypes.oneOf(Object.keys(Formats)), // Internal, up-to-date data format
     fontInlineFn: PropTypes.func,
     handleSwitchToBitmap: PropTypes.func.isRequired,
@@ -414,7 +426,8 @@ PaintEditor.propTypes = {
 PaintEditor.defaultProps = {
     width: 480,
     height: 360,
-    theme: 'light'
+    theme: 'light',
+    customFonts: []
 };
 
 const mapStateToProps = state => ({
@@ -432,6 +445,9 @@ const mapDispatchToProps = dispatch => ({
     },
     clearSelectedItems: () => {
         dispatch(clearSelectedItems());
+    },
+    onCustomFontsChanged: customFonts => {
+        dispatch(setCustomFonts(customFonts));
     },
     handleSwitchToBitmap: () => {
         dispatch(changeFormat(Formats.BITMAP));

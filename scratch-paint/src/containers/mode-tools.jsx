@@ -318,6 +318,7 @@ class ModeTools extends React.Component {
                 onFlipHorizontal={this.handleFlipHorizontal}
                 onFlipVertical={this.handleFlipVertical}
                 onCenterSelection={this.handleCenterSelection}
+                onManageFonts={this.props.onManageFonts}
                 onPasteFromClipboard={this.handlePasteFromClipboard}
                 onPointPoints={this.handlePointPoints}
                 onUpdateImage={this.props.onUpdateImage}
@@ -341,6 +342,7 @@ ModeTools.propTypes = {
     mode: PropTypes.oneOf(Object.keys(Modes)),
     onCopyToClipboard: PropTypes.func.isRequired,
     onCutToClipboard: PropTypes.func.isRequired,
+    onManageFonts: PropTypes.func,
     onPasteFromClipboard: PropTypes.func.isRequired,
     onUpdateImage: PropTypes.func.isRequired,
     width: PropTypes.number,

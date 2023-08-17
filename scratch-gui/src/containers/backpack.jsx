@@ -177,10 +177,11 @@ class Backpack extends React.Component {
     findItemById (id) {
         return this.state.contents.find(i => i.id === id);
     }
-    handleRename (id) {
+    async handleRename (id) {
         const item = this.findItemById(id);
+        // prompt() returns Promise in desktop app
         // eslint-disable-next-line no-alert
-        const newName = prompt(this.props.intl.formatMessage(messages.rename), item.name);
+        const newName = await prompt(this.props.intl.formatMessage(messages.rename), item.name);
         if (!newName) {
             return;
         }

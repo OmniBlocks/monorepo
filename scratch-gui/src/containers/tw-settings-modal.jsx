@@ -36,9 +36,10 @@ class UsernameModal extends React.Component {
     handleFramerateChange (e) {
         this.props.vm.setFramerate(e.target.checked ? 60 : 30);
     }
-    handleCustomizeFramerate () {
+    async handleCustomizeFramerate () {
+        // prompt() returns Promise in desktop app
         // eslint-disable-next-line no-alert
-        const newFramerate = prompt(this.props.intl.formatMessage(messages.newFramerate), this.props.framerate);
+        const newFramerate = await prompt(this.props.intl.formatMessage(messages.newFramerate), this.props.framerate);
         const parsed = parseFloat(newFramerate);
         if (isFinite(parsed)) {
             this.props.vm.setFramerate(parsed);

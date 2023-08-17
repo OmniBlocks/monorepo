@@ -19,7 +19,7 @@
 }
 
 .text-input {
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
     width: 100%;
     border: 1px solid $ui-black-transparent;
     border-radius: 5px;
@@ -67,7 +67,7 @@
 }
 
 .help-text {
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
 }
 
 .must-change {

@@ -200,6 +200,7 @@ class MenuBar extends React.Component {
         bindAll(this, [
             'handleClickSeeInside',
             'handleClickNew',
+            'handleClickNewWindow',
             'handleClickRemix',
             'handleClickSave',
             'handleClickSaveAsCopy',
@@ -233,6 +234,10 @@ class MenuBar extends React.Component {
         if (readyToReplaceProject) {
             this.props.onClickNew(this.props.canSave && this.props.canCreateNew);
         }
+        this.props.onRequestCloseFile();
+    }
+    handleClickNewWindow () {
+        this.props.onClickNewWindow();
         this.props.onRequestCloseFile();
     }
     handleClickRemix () {
@@ -565,6 +570,19 @@ class MenuBar extends React.Component {
                                             {newProjectMessage}
                                         </MenuItem>
                                     </MenuSection>
+                                    {this.props.onClickNewWindow && (
+                                        <MenuItem
+                                            isRtl={this.props.isRtl}
+                                            onClick={this.handleClickNewWindow}
+                                        >
+                                            <FormattedMessage
+                                                defaultMessage="New window"
+                                                // eslint-disable-next-line max-len
+                                                description="Part of desktop app. Menu bar item that creates a new window."
+                                                id="tw.menuBar.newWindow"
+                                            />
+                                        </MenuItem>
+                                    )}
                                     {(this.props.canSave || this.props.canCreateCopy || this.props.canRemix) && (
                                         <MenuSection>
                                             {this.props.canSave && (
@@ -969,6 +987,7 @@ MenuBar.propTypes = {
     onClickLogin: PropTypes.func,
     onClickLogo: PropTypes.func,
     onClickNew: PropTypes.func,
+    onClickNewWindow: PropTypes.func,
     onClickRemix: PropTypes.func,
     onClickSave: PropTypes.func,
     onClickSaveAsCopy: PropTypes.func,

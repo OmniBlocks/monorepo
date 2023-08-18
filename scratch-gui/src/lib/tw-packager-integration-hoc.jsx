@@ -7,13 +7,6 @@ import {getIsShowingProject} from '../reducers/project-state';
 const PACKAGER_URL = 'https://packager.turbowarp.org';
 const PACKAGER_ORIGIN = PACKAGER_URL;
 
-const readBlobAsArrayBuffer = blob => new Promise((resolve, reject) => {
-    const fr = new FileReader();
-    fr.onload = () => resolve(fr.result);
-    fr.onerror = () => reject(new Error('Cannot read blob as array buffer'));
-    fr.readAsArrayBuffer(blob);
-});
-
 const PackagerIntegrationHOC = function (WrappedComponent) {
     class PackagerIntegrationComponent extends React.Component {
         constructor (props) {
@@ -53,8 +46,7 @@ const PackagerIntegrationHOC = function (WrappedComponent) {
                 }
             }, e.origin);
 
-            this.props.vm.saveProjectSb3()
-                .then(readBlobAsArrayBuffer)
+            this.props.vm.saveProjectSb3('arraybuffer')
                 .then(buffer => {
                     const name = `${this.props.reduxProjectTitle}.sb3`;
                     e.source.postMessage({

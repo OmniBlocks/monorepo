@@ -156,22 +156,38 @@
 	<h2>Version 2.1.0</h2>
 	<h3>
 	<ul>
-	<li>Fixed nes white and nes ping presets (again)</li>
-	<li>Added MicroBox theme and made changes to the Wackybox theme</li>
-	<li>Custom sample presets now appear at the top</li>
 	<!-- <li>Fixed custom samples not saving in json (DIDN'T ACTUALLY FIX THIS YET, EDIT THIS)</li> -->
-	<li>Fixed legacy samples loading in when they weren't needed</li>
-	<li>Added nintaribox and paintbox samples (use <code>nintariboxSamples</code> and <code>marioPaintboxSamples</code> respectively as URLs in the "Add Samples" prompt to load them)</li>
-	<li>Added loop controls prompt, to visually set the loop region or start offset</li>
-	<li>Added new prompt when adding samples</li>
-	<li>Added a reset button for custom themes</li>
+	<li>Various quality of life changes were made to the UI:</li>
+		<ul>
+		<li>Added new prompt when adding samples</li>
+		<li>Added loop controls prompt, to visually set the loop region or start offset</li>
+		<li>Added loading bar and loading status prompt for custom samples</li>
+		<li>Custom sample presets now appear at the top of the instrument list</li>
+		<li>Added a reset button for custom themes</li>
+		</ul>
 	<li>Added loop start/end/offset for custom sample presets</li>
 	<li>Added a new loop mode ("Play Loop Once")</li>
-	<li>Added loading bar and loading status prompt for custom samples</li>
 	<li>Changed the offset to not be flipped anymore when playing samples backwards</li>
-	<li>Fixed ping-pong loop mode not inverting the sample when going backwards while anti-aliased</li>
-	<li>Fixed clicking when playing samples that end with non-zero values once</li>
-	<li>Fixed ping-pong loop mode getting stuck when changing to another loop mode during playback</li>
+	<li>Added nintaribox and paintbox samples</li>
+	<ul>
+	<li>Use <code>nintariboxSamples</code> and <code>marioPaintboxSamples</code> respectively as URLs in the "Add Samples" prompt to load them</li>
+	</ul>
+	<li>Various custom sample-related bugfixes:</li>
+		<ul>
+		<li>Fixed ping-pong loop mode not inverting the sample when going backwards while anti-aliased</li>
+		<li>Fixed clicking when playing samples that end with non-zero values once</li>
+		<li>Fixed ping-pong loop mode getting stuck when changing to another loop mode during playback</li>
+		<li>Legacy samples no longer load in when they aren't needed</li>
+			<ul>
+			<li>This should improve load times</li>
+			</ul>
+		</ul>
+	<li>And finally, various misc additions:</li>
+		<ul>
+		<li>Added MicroBox theme and made changes to the Wackybox theme</li>
+		<li>Fixed nes white and nes ping presets (again)</li>
+		<li>Renamed the Blackbox presets for consistency</li>
+			</ul>
 	</ul> </h3>
 	<p>8/?/2023</p>
 	

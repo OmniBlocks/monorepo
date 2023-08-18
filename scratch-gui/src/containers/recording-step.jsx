@@ -4,6 +4,7 @@ import bindAll from 'lodash.bindall';
 import RecordingStepComponent from '../components/record-modal/recording-step.jsx';
 import AudioRecorder from '../lib/audio/audio-recorder.js';
 import {defineMessages, injectIntl, intlShape} from 'react-intl';
+import log from '../lib/log';
 
 const messages = defineMessages({
     alertMsg: {
@@ -40,7 +41,8 @@ class RecordingStep extends React.Component {
     handleStarted () {
         this.setState({listening: true});
     }
-    handleRecordingError () {
+    handleRecordingError (error) {
+        log.error(error);
         alert(this.props.intl.formatMessage(messages.alertMsg)); // eslint-disable-line no-alert
     }
     handleLevelUpdate (level) {

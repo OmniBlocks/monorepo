@@ -5249,7 +5249,7 @@ const FILE_FORMAT_PLAIN_TEXT = 4;
 const SAMPLE_FORMAT_UNKNOWN = 0;
 const SAMPLE_FORMAT_S16 = 1;
 const SAMPLE_FORMAT_F32 = 2;
-const SAMPLE_FORMAT_S8 = 3;
+const SAMPLE_FORMAT_U8 = 3;
 const SAMPLE_FORMAT_F64 = 4;
 
 const EXTENSION_RE = /\.([a-zA-Z0-9_]+)$/;
@@ -5309,6 +5309,16 @@ function s8ToF64(x) {
     return x >= 0x80 ? (x / 0x80) : (x / 0x7F);
 }
 
+function f64ToU8(x) {
+    x = clamp(x, -1, 1);
+    return x < 0 ? ((x * 0x7F + 0x7F) | 0) : ((x * 0x80 + 0x7F) | 0);
+}
+
+function u8ToF64(x) {
+    x = clamp(x, 0, 255);
+    return x / 127 - 1;
+}
+
 function s16ToS8(x) {
     return f64ToS8(s16ToF64(x));
 }
@@ -5317,11 +5327,19 @@ function s8ToS16(x) {
     return f64ToS16(s8ToF64(x));
 }
 
+function s16ToU8(x) {
+    return f64ToU8(s16ToF64(x));
+}
+
+function u8ToS16(x) {
+    return f64ToS16(u8ToF64(x));
+}
+
 function getSampleFormatName(format) {
     switch (format) {
         case SAMPLE_FORMAT_S16: return "16-bit signed integer";
         case SAMPLE_FORMAT_F32: return "32-bit floating point";
-        case SAMPLE_FORMAT_S8: return "8-bit signed integer";
+        case SAMPLE_FORMAT_U8: return "8-bit unsigned integer";
         case SAMPLE_FORMAT_F64: return "64-bit floating point";
         default: return "Unknown";
     }
@@ -5352,22 +5370,22 @@ class Sample {
             // [input format, output format, function]
             [SAMPLE_FORMAT_S16, SAMPLE_FORMAT_S16, identity],
             [SAMPLE_FORMAT_S16, SAMPLE_FORMAT_F32, s16ToF64],
-            [SAMPLE_FORMAT_S16, SAMPLE_FORMAT_S8, s16ToS8],
+            [SAMPLE_FORMAT_S16, SAMPLE_FORMAT_U8, s16ToS8],
             [SAMPLE_FORMAT_S16, SAMPLE_FORMAT_F64, s16ToF64],
 
             [SAMPLE_FORMAT_F32, SAMPLE_FORMAT_S16, f64ToS16],
             [SAMPLE_FORMAT_F32, SAMPLE_FORMAT_F32, identity],
-            [SAMPLE_FORMAT_F32, SAMPLE_FORMAT_S8, f64ToS8],
+            [SAMPLE_FORMAT_F32, SAMPLE_FORMAT_U8, f64ToS8],
             [SAMPLE_FORMAT_F32, SAMPLE_FORMAT_F64, identity],
 
-            [SAMPLE_FORMAT_S8, SAMPLE_FORMAT_S16, s8ToS16],
-            [SAMPLE_FORMAT_S8, SAMPLE_FORMAT_F32, s8ToF64],
-            [SAMPLE_FORMAT_S8, SAMPLE_FORMAT_S8, identity],
-            [SAMPLE_FORMAT_S8, SAMPLE_FORMAT_F64, s8ToF64],
+            [SAMPLE_FORMAT_U8, SAMPLE_FORMAT_S16, u8ToS16],
+            [SAMPLE_FORMAT_U8, SAMPLE_FORMAT_F32, u8ToF64],
+            [SAMPLE_FORMAT_U8, SAMPLE_FORMAT_U8, identity],
+            [SAMPLE_FORMAT_U8, SAMPLE_FORMAT_F64, u8ToF64],
 
             [SAMPLE_FORMAT_F64, SAMPLE_FORMAT_S16, f64ToS16],
             [SAMPLE_FORMAT_F64, SAMPLE_FORMAT_F32, identity],
-            [SAMPLE_FORMAT_F64, SAMPLE_FORMAT_S8, f64ToS8],
+            [SAMPLE_FORMAT_F64, SAMPLE_FORMAT_U8, f64ToS8],
             [SAMPLE_FORMAT_F64, SAMPLE_FORMAT_F64, identity],
         ];
 
@@ -5518,7 +5536,7 @@ function createWavFile(shouldResample, outputSampleRate, sample) {
     switch (sampleFormat) {
         case SAMPLE_FORMAT_S16: bitDepth = "16"; break;
         case SAMPLE_FORMAT_F32: bitDepth = "32f"; break;
-        case SAMPLE_FORMAT_S8: bitDepth = "8"; break;
+        case SAMPLE_FORMAT_U8: bitDepth = "8"; break;
         case SAMPLE_FORMAT_F64: bitDepth = "64"; break;
         default: throw new Error("Unknown sample format");
     }
@@ -5896,8 +5914,8 @@ function createSampleFromWav(name, arrayBuffer) {
             break;
         }
         case "8": {
-            sampleFormat = SAMPLE_FORMAT_S8;
-            TypedArray = Int8Array;
+            sampleFormat = SAMPLE_FORMAT_U8;
+            TypedArray = Uint8Array;
             break;
         }
         case "8m": {

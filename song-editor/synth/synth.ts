@@ -2195,10 +2195,29 @@ export class Instrument {
              	 const sandboxWaveNames: Dictionary<number> = { "shrill lute": 42, "shrill bass": 44, "nes pulse": 45, "saw bass": 46, "euphonium": 47, "shrill pulse": 48, "r-sawtooth": 49, "recorder": 50, "narrow saw": 51, "deep square": 52, "ring pulse": 53, "double sine": 54, "contrabass": 55, "double bass": 56 };
 			 const zefboxWaveNames: Dictionary<number> = {"semi-square": 63, "deep square": 64, "squaretal": 40, "saw wide": 65, "saw narrow ": 66, "deep sawtooth": 67, "sawtal": 68, "pulse": 69, "triple pulse": 70, "high pulse": 71,"deep pulse": 72 };
 			 const miscWaveNames: Dictionary<number> = {"test1": 56, "pokey 4bit lfsr": 57, "pokey 5step bass": 58, "isolated spiky": 59, "unnamed 1": 60, "unnamed 2": 61, "guitar string": 75, "intense": 76, "buzz wave": 77, "pokey square": 57, "pokey bass": 58, "banana wave": 83, "test 1": 84, "test 2": 84, "real snare": 85, "earthbound o. guitar": 86 };
-			 const paandorasboxWaveNames: Dictionary<number> = {"kick": 87, "snare": 88, "piano1": 89, "WOW": 90, "overdrive": 91, "trumpet": 92, "saxophone": 93, "orchestrahit": 94, "detached violin": 95, "synth": 96, "sonic3snare": 97, "come on": 98, "choir": 99, "overdriveguitar": 100, "legato violin": 102, "tremolo violin": 103, "amen break": 104, "pizzicato violin": 105, "tim allen grunt": 106, "tuba": 107, "loopingcymbal": 108, "standardkick": 109, "standardsnare": 110, "closedhihat": 111, "foothihat": 112, "openhihat": 113, "crashcymbal": 114, "pianoC4": 115, "liver pad": 116, "marimba": 117, "susdotwav": 118, "wackyboxtts": 119};
+			 const paandorasboxWaveNames: Dictionary<number> = {"kick": 87, "snare": 88, "piano1": 89, "WOW": 90, "overdrive": 91, "trumpet": 92, "saxophone": 93, "orchestrahit": 94, "detached violin": 95, "synth": 96, "sonic3snare": 97, "come on": 98, "choir": 99, "overdriveguitar": 100, "flute": 101, "legato violin": 102, "tremolo violin": 103, "amen break": 104, "pizzicato violin": 105, "tim allen grunt": 106, "tuba": 107, "loopingcymbal": 108, "standardkick": 109, "standardsnare": 110, "closedhihat": 111, "foothihat": 112, "openhihat": 113, "crashcymbal": 114, "pianoC4": 115, "liver pad": 116, "marimba": 117, "susdotwav": 118, "wackyboxtts": 119};
 			// const paandorasbetaWaveNames = {"contrabass": 55, "double bass": 56 };
 		//this.chipWave = legacyWaveNames[instrumentObject["wave"]] != undefined ? legacyWaveNames[instrumentObject["wave"]] : Config.chipWaves.findIndex(wave => wave.name == instrumentObject["wave"]);
-            this.chipWave = legacyWaveNames[instrumentObject["wave"]] != undefined ? legacyWaveNames[instrumentObject["wave"]] : modboxWaveNames[instrumentObject["wave"]] != undefined ? modboxWaveNames[instrumentObject["wave"]] : sandboxWaveNames[instrumentObject["wave"]] != undefined ? sandboxWaveNames[instrumentObject["wave"]] : zefboxWaveNames[instrumentObject["wave"]] != undefined ? zefboxWaveNames[instrumentObject["wave"]] : miscWaveNames[instrumentObject["wave"]] != undefined ? miscWaveNames[instrumentObject["wave"]] : paandorasboxWaveNames[instrumentObject["wave"]] != undefined ? paandorasboxWaveNames[instrumentObject["wave"]] : Config.chipWaves.findIndex(wave => wave.name == instrumentObject["wave"]); 
+            this.chipWave = -1;
+            const rawName: string = instrumentObject["wave"];
+            for (const table of [
+                legacyWaveNames,
+                modboxWaveNames,
+                sandboxWaveNames,
+                zefboxWaveNames,
+                miscWaveNames,
+                paandorasboxWaveNames
+            ]) {
+                if (this.chipWave == -1 && table[rawName] != undefined && Config.chipWaves[table[rawName]] != undefined) {
+                    this.chipWave = table[rawName];
+                    break;
+                }
+            }
+            if (this.chipWave == -1) {
+                const potentialChipWaveIndex: number = Config.chipWaves.findIndex(wave => wave.name == rawName);
+                if (potentialChipWaveIndex != -1) this.chipWave = potentialChipWaveIndex;
+            }
+            // this.chipWave = legacyWaveNames[instrumentObject["wave"]] != undefined ? legacyWaveNames[instrumentObject["wave"]] : modboxWaveNames[instrumentObject["wave"]] != undefined ? modboxWaveNames[instrumentObject["wave"]] : sandboxWaveNames[instrumentObject["wave"]] != undefined ? sandboxWaveNames[instrumentObject["wave"]] : zefboxWaveNames[instrumentObject["wave"]] != undefined ? zefboxWaveNames[instrumentObject["wave"]] : miscWaveNames[instrumentObject["wave"]] != undefined ? miscWaveNames[instrumentObject["wave"]] : paandorasboxWaveNames[instrumentObject["wave"]] != undefined ? paandorasboxWaveNames[instrumentObject["wave"]] : Config.chipWaves.findIndex(wave => wave.name == instrumentObject["wave"]); 
 		if (this.chipWave == -1) this.chipWave = 1;
         }
 
@@ -5904,6 +5923,42 @@ export class Song {
                                 "pandoraasbeta sonor crash (tip)",
                                 "pandoraasbeta sonor ride"
                             ];
+                            // This mirrors paandorasboxWaveNames, which is unprefixed.
+                            const veryOldNames: string[] = [
+                                "kick",
+                                "snare",
+                                "piano1",
+                                "WOW",
+                                "overdrive",
+                                "trumpet",
+                                "saxophone",
+                                "orchestrahit",
+                                "detatched violin",
+                                "synth",
+                                "sonic3snare",
+                                "come on",
+                                "choir",
+                                "overdriveguitar",
+                                "flute",
+                                "legato violin",
+                                "tremolo violin",
+                                "amen break",
+                                "pizzicato violin",
+                                "tim allen grunt",
+                                "tuba",
+                                "loopingcymbal",
+                                "standardkick",
+                                "standardsnare",
+                                "closedhihat",
+                                "foothihat",
+                                "openhihat",
+                                "crashcymbal",
+                                "pianoC4",
+                                "liver pad",
+                                "marimba",
+                                "susdotwav",
+                                "wackyboxtts"
+                            ];
                             if (names.includes(waveName)) {
                                 shouldLoadLegacySamples = true;
                             } else if (oldNames.includes(waveName)) {
@@ -5911,6 +5966,19 @@ export class Song {
                                 // If we see one of these old names, update it
                                 // to the corresponding new name.
                                 instrumentObject["wave"] = names[oldNames.findIndex(x => x === waveName)];
+                            } else if (veryOldNames.includes(waveName)) {
+                                if (waveName === "trumpet" || waveName === "flute") {
+                                    // @TODO: This isn't exactly correct, but for now, if we see one of these two,
+                                    // leave them with the JummBox chip waves. The actual solution here will probably
+                                    // involve disambiguation via user input.
+                                } else {
+                                    // There's no other chip waves with ambiguous names like that, so it should
+                                    // be okay to assume we'll need to load the legacy samples now.
+                                    shouldLoadLegacySamples = true;
+                                    // If we see one of these old names, update it
+                                    // to the corresponding new name.
+                                    instrumentObject["wave"] = names[veryOldNames.findIndex(x => x === waveName)];
+                                }
                             }
                         }
                     }

@@ -3385,6 +3385,7 @@ export class SongEditor {
                     || document.activeElement == this._chipWaveLoopEndStepper
                     || document.activeElement == this._chipWaveStartOffsetStepper
                     // advloop addition
+                    || document.activeElement == this._octaveStepper
                 ) {
             // Enter/esc returns focus to form
             if (event.keyCode == 13 || event.keyCode == 27) {

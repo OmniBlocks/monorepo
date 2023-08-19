@@ -5370,12 +5370,12 @@ class Sample {
             // [input format, output format, function]
             [SAMPLE_FORMAT_S16, SAMPLE_FORMAT_S16, identity],
             [SAMPLE_FORMAT_S16, SAMPLE_FORMAT_F32, s16ToF64],
-            [SAMPLE_FORMAT_S16, SAMPLE_FORMAT_U8, s16ToS8],
+            [SAMPLE_FORMAT_S16, SAMPLE_FORMAT_U8, s16ToU8],
             [SAMPLE_FORMAT_S16, SAMPLE_FORMAT_F64, s16ToF64],
 
             [SAMPLE_FORMAT_F32, SAMPLE_FORMAT_S16, f64ToS16],
             [SAMPLE_FORMAT_F32, SAMPLE_FORMAT_F32, identity],
-            [SAMPLE_FORMAT_F32, SAMPLE_FORMAT_U8, f64ToS8],
+            [SAMPLE_FORMAT_F32, SAMPLE_FORMAT_U8, f64ToU8],
             [SAMPLE_FORMAT_F32, SAMPLE_FORMAT_F64, identity],
 
             [SAMPLE_FORMAT_U8, SAMPLE_FORMAT_S16, u8ToS16],
@@ -5385,7 +5385,7 @@ class Sample {
 
             [SAMPLE_FORMAT_F64, SAMPLE_FORMAT_S16, f64ToS16],
             [SAMPLE_FORMAT_F64, SAMPLE_FORMAT_F32, identity],
-            [SAMPLE_FORMAT_F64, SAMPLE_FORMAT_U8, f64ToS8],
+            [SAMPLE_FORMAT_F64, SAMPLE_FORMAT_U8, f64ToU8],
             [SAMPLE_FORMAT_F64, SAMPLE_FORMAT_F64, identity],
         ];
 

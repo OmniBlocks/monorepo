@@ -209,26 +209,6 @@ const RestorePointModal = props => (
                     </div>
                 </React.Fragment>
             )}
-
-            {!props.isLoading && props.onClickLoadLegacy && (
-                <details className={styles.legacyTransition}>
-                    {/* This is going away within a few days */}
-                    {/* No reason to bother translating */}
-                    <summary>
-                        {'Don\'t see your project?'}
-                    </summary>
-                    <p>
-                        {/* eslint-disable-next-line max-len */}
-                        {`If a restore point was made by an older version of ${APP_NAME}, it may not appear in the list. Please try clicking this button:`}
-                    </p>
-                    <button
-                        className={classNames(styles.button, styles.loadLegacyButton)}
-                        onClick={props.onClickLoadLegacy}
-                    >
-                        {'Load Legacy Restore Point'}
-                    </button>
-                </details>
-            )}
         </div>
     </Modal>
 );
@@ -242,7 +222,6 @@ RestorePointModal.propTypes = {
     onClickDelete: PropTypes.func.isRequired,
     onClickDeleteAll: PropTypes.func.isRequired,
     onClickLoad: PropTypes.func.isRequired,
-    onClickLoadLegacy: PropTypes.func,
     isLoading: PropTypes.bool.isRequired,
     totalSize: PropTypes.number.isRequired,
     restorePoints: PropTypes.arrayOf(PropTypes.shape({})),

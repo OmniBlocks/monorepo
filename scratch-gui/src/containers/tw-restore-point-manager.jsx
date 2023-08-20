@@ -10,7 +10,6 @@ import {setFileHandle} from '../reducers/tw';
 import TWRestorePointModal from '../components/tw-restore-point-modal/restore-point-modal.jsx';
 import RestorePointAPI from '../lib/tw-restore-point-api';
 import log from '../lib/log';
-import isScratchDesktop from '../lib/isScratchDesktop';
 
 /* eslint-disable no-alert */
 
@@ -18,9 +17,6 @@ const SAVE_DELAY = 250;
 const MINIMUM_SAVE_TIME = 750;
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
-
-// TODO: remove legacy stuff completely after next desktop app update
-const shouldRemoveLegacyRestorePoint = () => !isScratchDesktop();
 
 const messages = defineMessages({
     confirmLoad: {
@@ -53,8 +49,7 @@ class TWRestorePointManager extends React.Component {
             'handleClickDelete',
             'handleClickDeleteAll',
             'handleChangeInterval',
-            'handleClickLoad',
-            'handleClickLoadLegacy'
+            'handleClickLoad'
         ]);
         this.state = {
             loading: true,
@@ -72,9 +67,7 @@ class TWRestorePointManager extends React.Component {
             this.queueRestorePoint();
         }
 
-        if (shouldRemoveLegacyRestorePoint()) {
-            RestorePointAPI.deleteLegacyRestorePoint();
-        }
+        RestorePointAPI.deleteLegacyRestorePoint();
     }
 
     componentWillReceiveProps (nextProps) {
@@ -153,18 +146,6 @@ class TWRestorePointManager extends React.Component {
             });
     }
 
-    _startLoading () {
-        this.props.onCloseModal();
-        this.props.onStartLoadingRestorePoint(this.props.loadingState);
-    }
-
-    _finishLoading (success) {
-        setTimeout(() => {
-            this.props.vm.renderer.draw();
-        });
-        this.props.onFinishLoadingRestorePoint(success, this.props.loadingState);
-    }
-
     canLoadProject () {
         if (!this.props.isShowingProject) {
             // Loading a project now will break the state machine
@@ -180,44 +161,24 @@ class TWRestorePointManager extends React.Component {
         if (!this.canLoadProject()) {
             return;
         }
-        this._startLoading();
+
+        this.props.onCloseModal();
+        this.props.onStartLoadingRestorePoint(this.props.loadingState);
+
         RestorePointAPI.loadRestorePoint(this.props.vm, id)
             .then(() => {
-                this._finishLoading(true);
-            })
-            .catch(error => {
-                this.handleLoadError(error);
-            });
-    }
-
-    handleClickLoadLegacy () {
-        if (!this.canLoadProject()) {
-            return;
-        }
-        this._startLoading();
-        this.props.vm.stop();
-        RestorePointAPI.loadLegacyRestorePoint()
-            .then(buffer => this.props.vm.loadProject(buffer))
-            .then(() => {
+                this.props.onFinishLoadingRestorePoint(true, this.props.loadingState);
                 setTimeout(() => {
                     this.props.vm.renderer.draw();
                 });
-                this._finishLoading(true);
-
-                // Immediately migrate to new format
-                this.createRestorePoint(RestorePointAPI.TYPE_AUTOMATIC);
             })
             .catch(error => {
-                this.handleLoadError(error);
+                log.error(error);
+                alert(this.props.intl.formatMessage(messages.loadError, {
+                    error
+                }));
+                this.props.onFinishLoadingRestorePoint(false, this.props.loadingState);
             });
-    }
-
-    handleLoadError (error) {
-        log.error(error);
-        alert(this.props.intl.formatMessage(messages.loadError, {
-            error
-        }));
-        this._finishLoading(false);
     }
 
     handleChangeInterval (e) {
@@ -321,7 +282,6 @@ class TWRestorePointManager extends React.Component {
                     onClickDelete={this.handleClickDelete}
                     onClickDeleteAll={this.handleClickDeleteAll}
                     onClickLoad={this.handleClickLoad}
-                    onClickLoadLegacy={shouldRemoveLegacyRestorePoint() ? null : this.handleClickLoadLegacy}
                     interval={this.state.interval}
                     onChangeInterval={this.handleChangeInterval}
                     isLoading={this.state.loading}

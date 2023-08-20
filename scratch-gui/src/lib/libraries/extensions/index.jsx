@@ -47,40 +47,9 @@ import gdxforConnectionIconURL from './gdxfor/gdxfor-illustration.svg';
 import gdxforConnectionSmallIconURL from './gdxfor/gdxfor-small.svg';
 
 import twIcon from './tw/tw.svg';
-
 import customExtensionIcon from './custom/custom.svg';
-
-// eslint-disable-next-line no-unused-vars
-import unknownIcon from './gallery/unknown.svg';
-import galleryIcon from './gallery/gallery.svg';
-import animatedTextIcon from './gallery/animated-text.svg';
-import stretchIcon from './gallery/stretch.svg';
-import gamepadIcon from './gallery/gamepad.svg';
-import cursorIcon from './gallery/cursor.svg';
-import filesIcon from './gallery/files.svg';
-import pointerlockIcon from './gallery/pointerlock.svg';
-import runtimeOptionsIcon from './gallery/runtime-options.svg';
-import utilitiesIcon from './gallery/utilities.svg';
-import sensingPlusIcon from './gallery/sensingplus.svg';
-import clonesPlusIcon from './gallery/clonesplus.svg';
-import looksPlusIcon from './gallery/looksplus.svg';
-import clippingBlendingIcon from './gallery/clippingblending.svg';
-import regexIcon from './gallery/regex.svg';
-import bitwiseIcon from './gallery/bitwise.svg';
-import textIcon from './gallery/text.svg';
-import fetchIcon from './gallery/fetch.svg';
-import box2dIcon from './gallery/box2d.svg';
-import localStorageIcon from './gallery/local-storage.svg';
-import bigIntIcon from './gallery/bigint.svg';
-import jsonIcon from './gallery/json.svg';
 import returnIcon from './custom/return.svg';
-
-const galleryItem = object => ({
-    ...object,
-    tags: ['tw'],
-    incompatibleWithScratch: true,
-    featured: true
-});
+import galleryIcon from './gallery/gallery.svg';
 
 export default [
     {
@@ -93,6 +62,7 @@ export default [
         ),
         extensionId: 'music',
         iconURL: musicIconURL,
+        iconAspectRatio: 600 / 372,
         insetIconURL: musicInsetIconURL,
         description: (
             <FormattedMessage
@@ -114,6 +84,7 @@ export default [
         ),
         extensionId: 'pen',
         iconURL: penIconURL,
+        iconAspectRatio: 600 / 372,
         insetIconURL: penInsetIconURL,
         description: (
             <FormattedMessage
@@ -135,6 +106,7 @@ export default [
         ),
         extensionId: 'videoSensing',
         iconURL: videoSensingIconURL,
+        iconAspectRatio: 600 / 372,
         insetIconURL: videoSensingInsetIconURL,
         description: (
             <FormattedMessage
@@ -157,6 +129,7 @@ export default [
         extensionId: 'text2speech',
         collaborator: 'Amazon Web Services',
         iconURL: text2speechIconURL,
+        iconAspectRatio: 600 / 372,
         insetIconURL: text2speechInsetIconURL,
         description: (
             <FormattedMessage
@@ -180,6 +153,7 @@ export default [
         extensionId: 'translate',
         collaborator: 'Google',
         iconURL: translateIconURL,
+        iconAspectRatio: 600 / 372,
         insetIconURL: translateInsetIconURL,
         description: (
             <FormattedMessage
@@ -197,6 +171,7 @@ export default [
         extensionId: 'makeymakey',
         collaborator: 'JoyLabz',
         iconURL: makeymakeyIconURL,
+        iconAspectRatio: 600 / 372,
         insetIconURL: makeymakeyInsetIconURL,
         description: (
             <FormattedMessage
@@ -213,6 +188,7 @@ export default [
         extensionId: 'microbit',
         collaborator: 'micro:bit',
         iconURL: microbitIconURL,
+        iconAspectRatio: 600 / 372,
         insetIconURL: microbitInsetIconURL,
         description: (
             <FormattedMessage
@@ -244,6 +220,7 @@ export default [
         extensionId: 'ev3',
         collaborator: 'LEGO',
         iconURL: ev3IconURL,
+        iconAspectRatio: 600 / 372,
         insetIconURL: ev3InsetIconURL,
         description: (
             <FormattedMessage
@@ -275,6 +252,7 @@ export default [
         extensionId: 'boost',
         collaborator: 'LEGO',
         iconURL: boostIconURL,
+        iconAspectRatio: 600 / 372,
         insetIconURL: boostInsetIconURL,
         description: (
             <FormattedMessage
@@ -307,6 +285,7 @@ export default [
         extensionId: 'wedo2',
         collaborator: 'LEGO',
         iconURL: wedo2IconURL,
+        iconAspectRatio: 600 / 372,
         insetIconURL: wedo2InsetIconURL,
         description: (
             <FormattedMessage
@@ -339,6 +318,7 @@ export default [
         extensionId: 'gdxfor',
         collaborator: 'Vernier',
         iconURL: gdxforIconURL,
+        iconAspectRatio: 600 / 372,
         insetIconURL: gdxforInsetIconURL,
         description: (
             <FormattedMessage
@@ -376,34 +356,12 @@ export default [
         ),
         extensionId: 'procedures_enable_return',
         iconURL: returnIcon,
+        iconAspectRatio: 600 / 372,
         description: (
             <FormattedMessage
                 defaultMessage="Allow custom blocks to output values and be used as inputs."
                 description="Description of custom reporters extension"
                 id="tw.customReporters.description"
-            />
-        ),
-        tags: ['tw'],
-        incompatibleWithScratch: true,
-        featured: true
-    },
-    {
-        name: (
-            <FormattedMessage
-                defaultMessage="TurboWarp Extension Gallery"
-                description="Name of extensions.turbowarp.org in extension library"
-                id="tw.extensionGallery.name"
-            />
-        ),
-        href: 'https://extensions.turbowarp.org/',
-        extensionId: '',
-        iconURL: galleryIcon,
-        description: (
-            <FormattedMessage
-                // eslint-disable-next-line max-len
-                defaultMessage="We list many extensions here for convenience. You can find even more on extensions.turbowarp.org."
-                description="Description of extensions.turbowarp.org in extension library"
-                id="tw.extensionGallery.description"
             />
         ),
         tags: ['tw'],
@@ -420,6 +378,7 @@ export default [
         ),
         extensionId: 'tw',
         iconURL: twIcon,
+        iconAspectRatio: 600 / 372,
         description: (
             <FormattedMessage
                 defaultMessage="Weird new blocks."
@@ -431,150 +390,6 @@ export default [
         tags: ['tw'],
         featured: true
     },
-    // Extensions loaded from URLs do not support localization, so unfortunately we will just leave English names here.
-    galleryItem({
-        name: 'Animated Text',
-        // eslint-disable-next-line max-len
-        description: 'An easy way to display and animate text. Compatible with Scratch Lab\'s Animated Text experiment.',
-        extensionId: 'text',
-        extensionURL: 'https://extensions.turbowarp.org/lab/text.js',
-        iconURL: animatedTextIcon
-    }),
-    galleryItem({
-        name: 'Stretch',
-        description: 'Stretch sprites horizontally or vertically.',
-        extensionId: 'stretch',
-        extensionURL: 'https://extensions.turbowarp.org/stretch.js',
-        iconURL: stretchIcon
-    }),
-    galleryItem({
-        name: 'Gamepad',
-        description: 'Directly access gamepads instead of just mapping buttons to keys.',
-        extensionId: 'Gamepad',
-        extensionURL: 'https://extensions.turbowarp.org/gamepad.js',
-        iconURL: gamepadIcon
-    }),
-    galleryItem({
-        name: 'Files',
-        description: 'Read and download files.',
-        extensionId: 'files',
-        extensionURL: 'https://extensions.turbowarp.org/files.js',
-        iconURL: filesIcon
-    }),
-    galleryItem({
-        name: 'Pointerlock',
-        // eslint-disable-next-line max-len
-        description: 'Adds blocks for mouse locking. Mouse x & y blocks will report the change since the previous frame while the pointer is locked.',
-        extensionId: 'pointerlock',
-        extensionURL: 'https://extensions.turbowarp.org/pointerlock.js',
-        iconURL: pointerlockIcon
-    }),
-    galleryItem({
-        name: 'Mouse Cursor',
-        description: 'Use custom cursors or hide the cursor. Also allows replacing the cursor with any costume image.',
-        extensionId: 'MouseCursor',
-        extensionURL: 'https://extensions.turbowarp.org/cursor.js',
-        iconURL: cursorIcon
-    }),
-    galleryItem({
-        name: 'Runtime Options',
-        description: 'Get and modify turbo mode, framerate, interpolation, clone limit, stage size, and more.',
-        extensionId: 'runtimeoptions',
-        extensionURL: 'https://extensions.turbowarp.org/runtime-options.js',
-        iconURL: runtimeOptionsIcon
-    }),
-    galleryItem({
-        name: 'Sensing Plus',
-        description: 'An extension to the sensing category. Created by ObviousAlexC.',
-        extensionId: 'obviousalexsensing',
-        extensionURL: 'https://extensions.turbowarp.org/obviousAlexC/SensingPlus.js',
-        iconURL: sensingPlusIcon
-    }),
-    galleryItem({
-        name: 'Clones Plus',
-        description: 'Expansion of Scratch\'s clone features. Created by LilyMakesThings.',
-        extensionId: 'lmsclonesplus',
-        extensionURL: 'https://extensions.turbowarp.org/Lily/ClonesPlus.js',
-        iconURL: clonesPlusIcon
-    }),
-    galleryItem({
-        name: 'Looks Plus',
-        // eslint-disable-next-line max-len
-        description: 'Expands upon the looks category, allowing you to show/hide, get costume data and edit SVG skins on sprites. Created by LilyMakesThings.',
-        extensionId: 'lmsLooksPlus',
-        extensionURL: 'https://extensions.turbowarp.org/Lily/LooksPlus.js',
-        iconURL: looksPlusIcon
-    }),
-    galleryItem({
-        name: 'Clipping & Blending',
-        description: 'Clipping outside of a specified rectangular area and additive color blending. Created by Vadik1.',
-        extensionId: 'xeltallivclipblend',
-        extensionURL: 'https://extensions.turbowarp.org/Xeltalliv/clippingblending.js',
-        iconURL: clippingBlendingIcon
-    }),
-    galleryItem({
-        name: 'Text',
-        description: 'Manipulate characters and text. Originally created by CST1229.',
-        extensionId: 'strings',
-        extensionURL: 'https://extensions.turbowarp.org/text.js',
-        iconURL: textIcon
-    }),
-    galleryItem({
-        name: 'Bitwise',
-        description: 'Blocks that operate on the binary representation of numbers in computers.',
-        extensionId: 'Bitwise',
-        extensionURL: 'https://extensions.turbowarp.org/bitwise.js',
-        iconURL: bitwiseIcon
-    }),
-    galleryItem({
-        name: 'BigInt',
-        description: 'Math blocks that work on infinitely large integers (no decimals). Created by Skyhigh173.',
-        extensionId: 'skyhigh173BigInt',
-        extensionURL: 'https://extensions.turbowarp.org/Skyhigh173/bigint.js',
-        iconURL: bigIntIcon
-    }),
-    galleryItem({
-        name: 'JSON',
-        description: 'Work with JSON objects and arrays.',
-        extensionId: 'skyhigh173JSON',
-        extensionURL: 'https://extensions.turbowarp.org/Skyhigh173/json.js',
-        iconURL: jsonIcon
-    }),
-    galleryItem({
-        name: 'RegExp',
-        description: 'Full interface for working with Regular Expressions. Created by TrueFantom.',
-        extensionId: 'truefantomregexp',
-        extensionURL: 'https://extensions.turbowarp.org/true-fantom/regexp.js',
-        iconURL: regexIcon
-    }),
-    galleryItem({
-        name: 'Box2D Physics',
-        description: 'Two dimensional physics. Originally created by griffpatch.',
-        extensionId: 'griffpatch',
-        extensionURL: 'https://extensions.turbowarp.org/box2d.js',
-        iconURL: box2dIcon
-    }),
-    galleryItem({
-        name: 'Fetch',
-        description: 'Make requests to the broader internet.',
-        extensionId: 'fetch',
-        extensionURL: 'https://extensions.turbowarp.org/fetch.js',
-        iconURL: fetchIcon
-    }),
-    galleryItem({
-        name: 'Local Storage',
-        description: 'Store data persistently. Like cookies, but better.',
-        extensionId: 'localstorage',
-        extensionURL: 'https://extensions.turbowarp.org/local-storage.js',
-        iconURL: localStorageIcon
-    }),
-    galleryItem({
-        name: 'Utilities',
-        description: 'A bunch of interesting blocks. Originally created by Sheep_maker.',
-        extensionId: 'utilities',
-        extensionURL: 'https://extensions.turbowarp.org/utilities.js',
-        iconURL: utilitiesIcon
-    }),
     {
         name: (
             <FormattedMessage
@@ -585,6 +400,7 @@ export default [
         ),
         extensionId: '',
         iconURL: customExtensionIcon,
+        iconAspectRatio: 600 / 372,
         description: (
             <FormattedMessage
                 defaultMessage="Load custom extensions from URLs, files, or JavaScript source code."
@@ -593,7 +409,79 @@ export default [
             />
         ),
         tags: ['tw'],
-        incompatibleWithScratch: true,
         featured: true
+        // Not marked as incompatible with Scratch so that clicking on it doesn't show a prompt
     }
 ];
+
+export const galleryLoading = {
+    name: (
+        <FormattedMessage
+            defaultMessage="TurboWarp Extension Gallery"
+            description="Name of extensions.turbowarp.org in extension library"
+            id="tw.extensionGallery.name"
+        />
+    ),
+    href: 'https://extensions.turbowarp.org/',
+    extensionId: '',
+    iconURL: galleryIcon,
+    iconAspectRatio: 2,
+    description: (
+        <FormattedMessage
+            // eslint-disable-next-line max-len
+            defaultMessage="Loading extension gallery..."
+            description="Appears while loading extension list from the custom extension gallery"
+            id="tw.extensionGallery.loading"
+        />
+    ),
+    tags: ['tw'],
+    featured: true
+};
+
+export const galleryMore = {
+    name: (
+        <FormattedMessage
+            defaultMessage="TurboWarp Extension Gallery"
+            description="Name of extensions.turbowarp.org in extension library"
+            id="tw.extensionGallery.name"
+        />
+    ),
+    href: 'https://extensions.turbowarp.org/',
+    extensionId: '',
+    iconURL: galleryIcon,
+    iconAspectRatio: 2,
+    description: (
+        <FormattedMessage
+            // eslint-disable-next-line max-len
+            defaultMessage="Learn more about extensions at extensions.turbowarp.org."
+            description="Appears after the extension list from the gallery was loaded successfully"
+            id="tw.extensionGallery.more"
+        />
+    ),
+    tags: ['tw'],
+    featured: true
+};
+
+export const galleryError = {
+    name: (
+        <FormattedMessage
+            defaultMessage="TurboWarp Extension Gallery"
+            description="Name of extensions.turbowarp.org in extension library"
+            id="tw.extensionGallery.name"
+        />
+    ),
+    href: 'https://extensions.turbowarp.org/',
+    extensionId: '',
+    iconURL: galleryIcon,
+    iconAspectRatio: 2,
+    description: (
+        <FormattedMessage
+            // eslint-disable-next-line max-len
+            defaultMessage="Error loading extension gallery. Visit extensions.turbowarp.org to find more extensions."
+            description="Appears when an error occurred loading extension list from the custom extension gallery"
+            id="tw.extensionGallery.error"
+        />
+    ),
+    tags: ['tw'],
+    featured: true
+};

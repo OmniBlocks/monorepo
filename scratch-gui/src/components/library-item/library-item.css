@@ -116,6 +116,7 @@
 
 .featured-image-container {
     position: relative;
+    width: 100%;
 }
 
 .featured-image {
@@ -184,9 +185,32 @@
     font-weight: bold;
 }
 
-.featured-extension-metadata-detail img{
+.featured-extension-metadata-detail img {
+    margin-right: 0.25rem;
+    width: 20px;
+    height: 20px;
+}
+
+.credits-outer {
+    width: 300px;
+    padding: 0 1.25rem 1rem 1.25rem;
+    display: flex;
+    flex-direction: row;
+    opacity: 0.75;
+    text-align: left;
+}
+.credits-inner {
+    display: flex;
+    flex-direction: row;
+}
+.credits-title {
     margin-right: 0.25rem;
 }
+.credits-list a {
+    color: inherit !important;
+    text-decoration: underline;
+}
+
 
 .coming-soon-text {
     position: absolute;

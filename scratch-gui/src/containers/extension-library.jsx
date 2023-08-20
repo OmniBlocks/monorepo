@@ -5,25 +5,70 @@ import VM from 'scratch-vm';
 import {defineMessages, injectIntl, intlShape} from 'react-intl';
 import log from '../lib/log';
 
-import extensionLibraryContent from '../lib/libraries/extensions/index.jsx';
+import extensionLibraryContent, {
+    galleryError,
+    galleryLoading,
+    galleryMore
+} from '../lib/libraries/extensions/index.jsx';
 import extensionTags from '../lib/libraries/tw-extension-tags';
 
 import LibraryComponent from '../components/library/library.jsx';
 import extensionIcon from '../components/action-menu/icon--sprite.svg';
+import Separator from '../components/tw-extension-separator/separator.jsx';
 
 const messages = defineMessages({
     extensionTitle: {
         defaultMessage: 'Choose an Extension',
         description: 'Heading for the extension library',
         id: 'gui.extensionLibrary.chooseAnExtension'
-    },
-    incompatible: {
-        // eslint-disable-next-line max-len
-        defaultMessage: 'This extension is incompatible with Scratch. Projects made with it cannot be uploaded to the Scratch website. Are you sure you want to enable it?',
-        description: 'Confirm loading Scratch-incompatible extension',
-        id: 'tw.confirmIncompatibleExtension'
     }
 });
+
+const toLibraryItem = extension => ({
+    rawURL: extension.iconURL || extensionIcon,
+    ...extension
+});
+
+let cachedGallery = null;
+
+const fetchLibrary = async () => {
+    const res = await fetch('https://extensions.turbowarp.org/generated-metadata/extensions-v0.json');
+    if (!res.ok) {
+        throw new Error(`HTTP status ${res.status}`);
+    }
+    const data = await res.json();
+    return data.extensions.map(extension => {
+        const allCredits = [
+            ...(extension.by || []),
+            ...(extension.original || [])
+        ];
+        return {
+            name: extension.name,
+            description: extension.description,
+            extensionId: extension.id,
+            extensionURL: `https://extensions.turbowarp.org/${extension.slug}.js`,
+            iconURL: `https://extensions.turbowarp.org/${extension.image || 'images/unknown.svg'}`,
+            iconAspectRatio: 2,
+            tags: ['tw'],
+            credits: allCredits.map(credit => {
+                if (credit.link) {
+                    return (
+                        <a
+                            href={credit.link}
+                            target="_blank"
+                            rel="noreferrer"
+                        >
+                            {credit.name}
+                        </a>
+                    );
+                }
+                return credit.name;
+            }),
+            incompatibleWithScratch: true,
+            featured: true
+        };
+    });
+};
 
 class ExtensionLibrary extends React.PureComponent {
     constructor (props) {
@@ -31,6 +76,27 @@ class ExtensionLibrary extends React.PureComponent {
         bindAll(this, [
             'handleItemSelect'
         ]);
+        this.state = {
+            gallery: cachedGallery,
+            galleryError: null
+        };
+    }
+    componentDidMount () {
+        if (!this.state.gallery) {
+            fetchLibrary()
+                .then(gallery => {
+                    cachedGallery = gallery;
+                    this.setState({
+                        gallery
+                    });
+                })
+                .catch(error => {
+                    log.error(error);
+                    this.setState({
+                        galleryError: error
+                    });
+                });
+        }
     }
     handleItemSelect (item) {
         if (item.href) {
@@ -43,11 +109,6 @@ class ExtensionLibrary extends React.PureComponent {
         const isCustomURL = !item.disabled && !extensionId;
         if (isCustomURL) {
             this.props.onOpenCustomExtensionModal();
-            return;
-        }
-
-        // eslint-disable-next-line no-alert
-        if (item.incompatibleWithScratch && !confirm(this.props.intl.formatMessage(messages.incompatible))) {
             return;
         }
 
@@ -75,14 +136,21 @@ class ExtensionLibrary extends React.PureComponent {
         }
     }
     render () {
-        const extensionLibraryThumbnailData = extensionLibraryContent.map(extension => ({
-            rawURL: extension.iconURL || extensionIcon,
-            ...extension
-        }));
+        const library = extensionLibraryContent.map(toLibraryItem);
+        library.push(<Separator />);
+        if (this.state.gallery) {
+            library.push(...this.state.gallery.map(toLibraryItem));
+            library.push(toLibraryItem(galleryMore));
+        } else if (this.state.galleryError) {
+            library.push(toLibraryItem(galleryError));
+        } else {
+            library.push(toLibraryItem(galleryLoading));
+        }
+
         return (
             <LibraryComponent
-                data={extensionLibraryThumbnailData}
-                filterable={false}
+                data={library}
+                filterable
                 id="extensionLibrary"
                 tags={extensionTags}
                 title={this.props.intl.formatMessage(messages.extensionTitle)}

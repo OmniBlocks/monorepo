@@ -3,7 +3,6 @@ import bindAll from 'lodash.bindall';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {defineMessages, injectIntl, intlShape} from 'react-intl';
-import {isScratchDesktop} from '../../lib/isScratchDesktop';
 
 import LibraryItem from '../../containers/library-item.jsx';
 import Modal from '../../containers/modal.jsx';
@@ -82,13 +81,7 @@ class LibraryComponent extends React.Component {
         }
     }
     handleSelect (id) {
-        const extension = this.getFilteredData()[id];
-        if (extension.href) {
-            window.open(extension.href);
-        }
-        if (!extension.href || isScratchDesktop()) {
-            this.handleClose();
-        }
+        this.handleClose();
         this.props.onItemSelected(this.getFilteredData()[id]);
     }
     handleClose () {
@@ -154,19 +147,27 @@ class LibraryComponent extends React.Component {
     getFilteredData () {
         if (this.state.selectedTag === 'all') {
             if (!this.state.filterQuery) return this.state.data;
-            return this.state.data.filter(dataItem => (
-                (dataItem.tags || [])
-                    // Second argument to map sets `this`
-                    .map(String.prototype.toLowerCase.call, String.prototype.toLowerCase)
-                    .concat(dataItem.name ?
-                        (typeof dataItem.name === 'string' ?
-                        // Use the name if it is a string, else use formatMessage to get the translated name
-                            dataItem.name : this.props.intl.formatMessage(dataItem.name.props)
-                        ).toLowerCase() :
-                        null)
-                    .join('\n') // unlikely to partially match newlines
-                    .indexOf(this.state.filterQuery.toLowerCase()) !== -1
-            ));
+            return this.state.data.filter(dataItem => {
+                if (React.isValidElement(dataItem)) {
+                    return false;
+                }
+                const search = [...dataItem.tags];
+                if (dataItem.name) {
+                    // Use the name if it is a string, else use formatMessage to get the translated name
+                    if (typeof dataItem.name === 'string') {
+                        search.push(dataItem.name);
+                    } else {
+                        search.push(this.props.intl.formatMessage(dataItem.name.props));
+                    }
+                }
+                if (dataItem.description) {
+                    search.push(dataItem.description);
+                }
+                return search
+                    .join('\n')
+                    .toLowerCase()
+                    .includes(this.state.filterQuery.toLowerCase());
+            });
         }
         return this.state.data.filter(dataItem => (
             dataItem.tags &&
@@ -233,30 +234,38 @@ class LibraryComponent extends React.Component {
                     ref={this.setFilteredDataRef}
                 >
                     {this.state.loaded ? this.getFilteredData().map((dataItem, index) => (
-                        <LibraryItem
-                            bluetoothRequired={dataItem.bluetoothRequired}
-                            collaborator={dataItem.collaborator}
-                            description={dataItem.description}
-                            disabled={dataItem.disabled}
-                            extensionId={dataItem.extensionId}
-                            featured={dataItem.featured}
-                            hidden={dataItem.hidden}
-                            href={dataItem.href}
-                            iconMd5={dataItem.costumes ? dataItem.costumes[0].md5ext : dataItem.md5ext}
-                            iconRawURL={dataItem.rawURL}
-                            icons={dataItem.costumes}
-                            id={index}
-                            incompatibleWithScratch={dataItem.incompatibleWithScratch}
-                            insetIconURL={dataItem.insetIconURL}
-                            internetConnectionRequired={dataItem.internetConnectionRequired}
-                            isPlaying={this.state.playingItem === index}
-                            key={typeof dataItem.name === 'string' ? dataItem.name : dataItem.rawURL}
-                            name={dataItem.name}
-                            showPlayButton={this.props.showPlayButton}
-                            onMouseEnter={this.handleMouseEnter}
-                            onMouseLeave={this.handleMouseLeave}
-                            onSelect={this.handleSelect}
-                        />
+                        React.isValidElement(dataItem) ? (
+                            <React.Fragment key={index}>
+                                {dataItem}
+                            </React.Fragment>
+                        ) : (
+                            <LibraryItem
+                                bluetoothRequired={dataItem.bluetoothRequired}
+                                collaborator={dataItem.collaborator}
+                                description={dataItem.description}
+                                disabled={dataItem.disabled}
+                                extensionId={dataItem.extensionId}
+                                href={dataItem.href}
+                                featured={dataItem.featured}
+                                hidden={dataItem.hidden}
+                                iconMd5={dataItem.costumes ? dataItem.costumes[0].md5ext : dataItem.md5ext}
+                                iconRawURL={dataItem.rawURL}
+                                iconAspectRatio={dataItem.iconAspectRatio}
+                                icons={dataItem.costumes}
+                                id={index}
+                                incompatibleWithScratch={dataItem.incompatibleWithScratch}
+                                insetIconURL={dataItem.insetIconURL}
+                                internetConnectionRequired={dataItem.internetConnectionRequired}
+                                isPlaying={this.state.playingItem === index}
+                                key={typeof dataItem.name === 'string' ? dataItem.name : dataItem.rawURL}
+                                name={dataItem.name}
+                                credits={dataItem.credits}
+                                showPlayButton={this.props.showPlayButton}
+                                onMouseEnter={this.handleMouseEnter}
+                                onMouseLeave={this.handleMouseLeave}
+                                onSelect={this.handleSelect}
+                            />
+                        )
                     )) : (
                         <div className={styles.spinnerWrapper}>
                             <Spinner
@@ -272,20 +281,24 @@ class LibraryComponent extends React.Component {
 }
 
 LibraryComponent.propTypes = {
-    data: PropTypes.oneOfType([PropTypes.arrayOf(
-        /* eslint-disable react/no-unused-prop-types, lines-around-comment */
-        // An item in the library
-        PropTypes.shape({
-            // @todo remove md5/rawURL prop from library, refactor to use storage
-            md5: PropTypes.string,
-            name: PropTypes.oneOfType([
-                PropTypes.string,
-                PropTypes.node
-            ]),
-            rawURL: PropTypes.string
-        })
-        /* eslint-enable react/no-unused-prop-types, lines-around-comment */
-    ), PropTypes.instanceOf(Promise)]),
+    data: PropTypes.oneOfType([
+        PropTypes.arrayOf(
+            /* eslint-disable react/no-unused-prop-types, lines-around-comment */
+            // An item in the library
+            PropTypes.shape({
+                // @todo remove md5/rawURL prop from library, refactor to use storage
+                md5: PropTypes.string,
+                name: PropTypes.oneOfType([
+                    PropTypes.string,
+                    PropTypes.node
+                ]),
+                rawURL: PropTypes.string
+            })
+            /* eslint-enable react/no-unused-prop-types, lines-around-comment */
+        ),
+        PropTypes.node,
+        PropTypes.instanceOf(Promise)
+    ]),
     filterable: PropTypes.bool,
     id: PropTypes.string.isRequired,
     intl: intlShape.isRequired,

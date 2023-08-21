@@ -140,8 +140,7 @@ const ModeToolsComponent = props => (
                         getFontName={props.getFontName}
                     />
                 </Button>
-                {/* can we legally provide this font? */}
-                {/* <Button
+                <Button
                     className={classNames(styles.modMenuItem)}
                     onClick={props.onChoose}
                     onMouseOver={props.onHoverScratch}
@@ -150,7 +149,7 @@ const ModeToolsComponent = props => (
                         font={Fonts.SCRATCH}
                         getFontName={props.getFontName}
                     />
-                </Button> */}
+                </Button>
                 <Button
                     className={classNames(styles.modMenuItem)}
                     onClick={props.onChoose}

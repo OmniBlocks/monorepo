@@ -4,16 +4,17 @@ const {test} = require('tap');
 const VirtualMachine = require('../../src/virtual-machine');
 const Scratch = require('../../src/extension-support/tw-extension-api-common');
 
+// Based on https://github.com/TurboWarp/scratch-vm/pull/141
 class LoopsAndThings {
-    getInfo () {
+    getInfo() {
         return {
-            id: 'loopsAndThings',
-            name: 'Loops and things test',
+            id: "loopsAndThings",
+            name: "Loops and things test",
             blocks: [
                 {
-                    opcode: 'conditional',
+                    opcode: "conditional",
                     blockType: Scratch.BlockType.CONDITIONAL,
-                    text: 'run branch [BRANCH] of',
+                    text: "run branch [BRANCH] of",
                     arguments: {
                         BRANCH: {
                             type: Scratch.ArgumentType.NUMBER,
@@ -23,13 +24,25 @@ class LoopsAndThings {
                     branchCount: 3
                 },
                 {
-                    opcode: 'loop',
+                    opcode: "loop",
                     blockType: Scratch.BlockType.LOOP,
-                    text: 'my repeat [TIMES]',
+                    text: "my repeat [TIMES]",
                     arguments: {
                         TIMES: {
                             type: Scratch.ArgumentType.NUMBER,
                             defaultValue: 10
+                        }
+                    },
+                },
+                '---',
+                {
+                    opcode: "testPromise",
+                    blockType: Scratch.BlockType.REPORTER,
+                    text: "return [VALUE] in a Promise",
+                    arguments: {
+                        VALUE: {
+                            type: Scratch.ArgumentType.STRING,
+                            defaultValue: ''
                         }
                     }
                 }
@@ -37,19 +50,23 @@ class LoopsAndThings {
         };
     }
 
-    conditional ({BRANCH}, util) {
+    conditional({BRANCH}, util) {
         return Scratch.Cast.toNumber(BRANCH);
     }
 
-    loop ({TIMES}, util) {
+    loop({TIMES}, util) {
         const times = Math.round(Scratch.Cast.toNumber(TIMES));
-        if (typeof util.stackFrame.loopCounter === 'undefined') {
+        if (typeof util.stackFrame.loopCounter === "undefined") {
             util.stackFrame.loopCounter = times;
         }
         util.stackFrame.loopCounter--;
         if (util.stackFrame.loopCounter >= 0) {
             return true;
         }
+    }
+
+    testPromise({VALUE}) {
+        return Promise.resolve(VALUE);
     }
 }
 
@@ -80,11 +97,12 @@ compilerAndInterpreter('CONDITIONAL', (t, co) => {
                 okayCount++;
             } else if (text === 'end') {
                 t.equal(okayCount, 5);
+                vm.runtime.stop();
                 t.end();
             }
         });
 
         vm.greenFlag();
-        vm.runtime._step();
+        vm.runtime.start();
     });
 });

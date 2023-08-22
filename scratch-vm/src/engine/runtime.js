@@ -270,6 +270,13 @@ class Runtime extends EventEmitter {
         this._hats = {};
 
         /**
+         * Map of opcode to information about whether the block's return value should be interpreted
+         * for control flow purposes.
+         * @type {Record<string, {conditional: boolean}>}
+         */
+        this._flowing = {};
+
+        /**
          * A list of script block IDs that were glowing during the previous frame.
          * @type {!Array.<!string>}
          */
@@ -1119,6 +1126,11 @@ class Runtime extends EventEmitter {
                         this._hats[opcode] = {
                             edgeActivated: blockInfo.isEdgeActivated,
                             restartExistingThreads: blockInfo.shouldRestartExistingThreads
+                        };
+                    }
+                    if (blockInfo.blockType === BlockType.CONDITIONAL) {
+                        this._flowing[opcode] = {
+                            conditional: true
                         };
                     }
                 }

@@ -54,6 +54,7 @@ const handleReport = function (resolvedValue, sequencer, thread, blockCached, la
     const currentBlockId = blockCached.id;
     const opcode = blockCached.opcode;
     const isHat = blockCached._isHat;
+    const isConditional = blockCached._isConditional;
 
     thread.pushReportedValue(resolvedValue);
     if (isHat) {
@@ -83,6 +84,9 @@ const handleReport = function (resolvedValue, sequencer, thread, blockCached, la
             // Predicate returned false: do not allow script to run
             sequencer.retireThread(thread);
         }
+    } else if (isConditional) {
+        const branch = Math.round(resolvedValue);
+        sequencer.stepToBranch(thread, branch, false);
     } else {
         // In a non-hat, report the value visually if necessary if
         // at the top of the thread stack.
@@ -291,6 +295,9 @@ class BlockCached {
         this._isHat = runtime.getIsHat(opcode);
         this._blockFunction = runtime.getOpcodeFunction(opcode);
         this._definedBlockFunction = typeof this._blockFunction !== 'undefined';
+
+        const flowing = runtime._flowing[opcode];
+        this._isConditional = !!(flowing && flowing.conditional);
 
         // Store the current shadow value if there is a shadow value.
         const fieldKeys = Object.keys(fields);

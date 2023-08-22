@@ -64,24 +64,13 @@ class AddSystemFont extends React.Component {
                     />
                 </p>
 
-                {/* TODO: datalist is pretty bad at this. we should try our own dropdown? */}
                 <FontName
                     name={this.state.name}
                     onChange={this.handleChangeName}
                     fontManager={this.props.fontManager}
                     placeholder="Wingdings"
-                    list="fontslist"
+                    options={this.state.localFonts}
                 />
-                {this.state.localFonts && (
-                    <datalist id="fontslist">
-                        {this.state.localFonts.map(family => (
-                            <option
-                                key={family}
-                                value={family}
-                            />
-                        ))}
-                    </datalist>
-                )}
 
                 {this.state.name && (
                     <React.Fragment>

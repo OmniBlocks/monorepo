@@ -1,15 +1,6 @@
 const BlockUtility = require('../engine/block-utility');
 
 class CompatibilityLayerBlockUtility extends BlockUtility {
-    constructor () {
-        super();
-
-        /**
-         * @type {string|null}
-         */
-        this._fakeBlockId = null;
-    }
-
     // Branching operations are not supported.
     startBranch () {
         throw new Error('startBranch is not supported by this BlockUtility');

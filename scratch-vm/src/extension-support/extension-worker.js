@@ -1,6 +1,7 @@
 /* eslint-env worker */
 
 const ScratchCommon = require('./tw-extension-api-common');
+const createScratchX = require('./tw-scratchx-compatibility-layer');
 const dispatch = require('../dispatch/worker-dispatch');
 const log = require('../util/log');
 const {isWorker} = require('./tw-extension-worker-context');
@@ -95,4 +96,4 @@ global.Scratch.extensions = {
     register: extensionWorker.register.bind(extensionWorker)
 };
 
-global.ScratchExtensions = require('./tw-scratchx-compatibility-layer');
+global.ScratchExtensions = createScratchX(global.Scratch);

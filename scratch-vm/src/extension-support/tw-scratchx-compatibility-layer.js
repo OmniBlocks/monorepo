@@ -1,8 +1,5 @@
 // ScratchX API Documentation: https://github.com/LLK/scratchx/wiki/
 
-// Global Scratch API from extension-worker.js
-/* globals Scratch */
-
 const ArgumentType = require('./argument-type');
 const BlockType = require('./block-type');
 
@@ -191,31 +188,36 @@ const convert = (name, descriptor, functions) => {
 
 const extensionNameToExtension = new Map();
 
-const register = (name, descriptor, functions) => {
-    const scratch3Extension = convert(name, descriptor, functions);
-    extensionNameToExtension.set(name, scratch3Extension);
-    Scratch.extensions.register(scratch3Extension);
-};
-
 /**
- * @param {string} extensionName
- * @returns {ScratchXStatus}
+ * @param {*} Scratch Scratch 3.0 extension API object
+ * @returns {*} ScratchX-compatible API object
  */
-const getStatus = extensionName => {
-    const extension = extensionNameToExtension.get(extensionName);
-    if (extension) {
-        return extension._getStatus();
-    }
+const createScratchX = Scratch => {
+    const register = (name, descriptor, functions) => {
+        const scratch3Extension = convert(name, descriptor, functions);
+        extensionNameToExtension.set(name, scratch3Extension);
+        Scratch.extensions.register(scratch3Extension);
+    };
+
+    /**
+     * @param {string} extensionName
+     * @returns {ScratchXStatus}
+     */
+    const getStatus = extensionName => {
+        const extension = extensionNameToExtension.get(extensionName);
+        if (extension) {
+            return extension._getStatus();
+        }
+        return {
+            status: 0,
+            msg: 'does not exist'
+        };
+    };
+
     return {
-        status: 0,
-        msg: 'does not exist'
+        register,
+        getStatus
     };
 };
 
-module.exports = {
-    register,
-    getStatus,
-
-    // For tests
-    convert
-};
+module.exports = createScratchX;

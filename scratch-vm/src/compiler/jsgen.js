@@ -774,6 +774,12 @@ class JSGenerator {
                     this.source += `}\n`;
                 }
                 this.source += `}\n`;
+            } else if (node.blockType === BlockType.LOOP) {
+                const stackFrameName = this.localVariables.next();
+                this.source += `const ${stackFrameName} = persistentStackFrame();\n`;
+                this.source += `while (toBoolean(${this.generateCompatibilityLayerCall(node, isLastInLoop, stackFrameName)})) {\n`;
+                this.descendStack(node.substacks[0], new Frame(true));
+                this.source += '}\n';
             }
 
             if (isLastInLoop) {
@@ -1307,9 +1313,10 @@ class JSGenerator {
      * Generate a call into the compatibility layer.
      * @param {*} node The "compat" kind node to generate from.
      * @param {boolean} setFlags Whether flags should be set describing how this function was processed.
+     * @param {string|null} [frameName] Name of the stack frame variable, if any
      * @returns {string} The JS of the call.
      */
-    generateCompatibilityLayerCall (node, setFlags) {
+    generateCompatibilityLayerCall (node, setFlags, frameName = null) {
         const opcode = node.opcode;
 
         let result = 'yield* executeInCompatibilityLayer({';
@@ -1324,7 +1331,7 @@ class JSGenerator {
             result += `"${sanitize(fieldName)}":"${sanitize(field)}",`;
         }
         const opcodeFunction = this.evaluateOnce(`runtime.getOpcodeFunction("${sanitize(opcode)}")`);
-        result += `}, ${opcodeFunction}, ${this.isWarp}, ${setFlags}, null)`;
+        result += `}, ${opcodeFunction}, ${this.isWarp}, ${setFlags}, null, ${frameName})`;
 
         return result;
     }

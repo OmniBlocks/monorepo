@@ -1145,7 +1145,7 @@ class ScriptTreeGenerator {
                 const blockInfo = this.getBlockInfo(block.opcode);
                 if (blockInfo) {
                     const type = blockInfo.info.blockType;
-                    if (type === BlockType.COMMAND || type === BlockType.CONDITIONAL) {
+                    if (type === BlockType.COMMAND || type === BlockType.CONDITIONAL || type === BlockType.LOOP) {
                         return this.descendCompatLayer(block);
                     }
                 }
@@ -1402,7 +1402,7 @@ class ScriptTreeGenerator {
         const blockInfo = this.getBlockInfo(block.opcode);
         const blockType = (blockInfo && blockInfo.info && blockInfo.info.blockType) || BlockType.COMMAND;
         const substacks = [];
-        if (blockType === BlockType.LOOP || blockType === BlockType.CONDITIONAL) {
+        if (blockType === BlockType.CONDITIONAL || blockType === BlockType.LOOP) {
             const branchCount = blockInfo.info.branchCount;
             for (let i = 0; i < branchCount; i++) {
                 const inputName = i === 0 ? 'SUBSTACK' : `SUBSTACK${i + 1}`;

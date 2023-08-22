@@ -17,18 +17,19 @@ const parseURL = url => {
 };
 
 /**
- * Create the unsandboxed extension API objects.
+ * Sets up the global.Scratch API for an unsandboxed extension.
  * @param {VirtualMachine} vm
- * @returns {*} The objects
+ * @returns {Promise<object[]>} Resolves with a list of extension objects when Scratch.extensions.register is called.
  */
-const createAPI = vm => {
-    const extensions = [];
-    const register = extension => {
-        extensions.push(extension);
+const setupUnsandboxedExtensionAPI = vm => new Promise(resolve => {
+    const extensionObjects = [];
+    const register = extensionObject => {
+        extensionObjects.push(extensionObject);
+        resolve(extensionObjects);
     };
 
-    // Each extension should get its own copy of Scratch so they don't break things badly
-    const Scratch = Object.assign({}, global.Scratch, ScratchCommon);
+    // Create a new copy of global.Scratch for each extension
+    const Scratch = Object.assign({}, global.Scratch || {}, ScratchCommon);
     Scratch.extensions = {
         unsandboxed: true,
         register
@@ -114,12 +115,18 @@ const createAPI = vm => {
 
     Scratch.translate = createTranslate(vm);
 
-    const ScratchExtensions = createScratchX(Scratch);
+    global.Scratch = Scratch;
+    global.ScratchExtensions = createScratchX(Scratch);
+});
 
-    return {
-        Scratch,
-        ScratchExtensions,
-        extensions
+/**
+ * Disable the existing global.Scratch unsandboxed extension APIs.
+ * This helps debug poorly designed extensions.
+ */
+const teardownUnsandboxedExtensionAPI = () => {
+    // We can assume global.Scratch already exists.
+    global.Scratch.extensions.register = () => {
+        throw new Error('Too late to register new extensions.');
     };
 };
 
@@ -129,34 +136,26 @@ const createAPI = vm => {
  * @param {Virtualmachine} vm
  * @returns {Promise<object[]>} Resolves with a list of extension objects if the extension was loaded successfully.
  */
-const loadUnsandboxedExtension = async (extensionURL, vm) => {
-    const res = await fetch(extensionURL);
-    if (!res.ok) {
-        throw new Error(`HTTP status ${extensionURL}`);
-    }
+const loadUnsandboxedExtension = (extensionURL, vm) => new Promise((resolve, reject) => {
+    setupUnsandboxedExtensionAPI(vm).then(resolve);
 
-    const text = await res.text();
+    const script = document.createElement('script');
+    script.onerror = () => {
+        reject(new Error(`Error in unsandboxed script ${extensionURL}. Check the console for more information.`));
+    };
+    script.src = extensionURL;
+    document.body.appendChild(script);
+}).then(objects => {
+    teardownUnsandboxedExtensionAPI();
+    return objects;
+});
 
-    // AsyncFunction isn't a global like Function, but we can still access it indirectly like this
-    const AsyncFunction = (async () => {}).constructor;
-
-    const api = createAPI(vm);
-    const fn = new AsyncFunction('Scratch', 'ScratchExtensions', text);
-    await fn(api.Scratch, api.ScratchExtensions);
-
-    if (api.extensions.length === 0) {
-        throw new Error('Extension called register() 0 times');
-    }
-    return api.extensions;
-};
-
-// For now we force them to load one at a time to ensure consistent order
+// Because loading unsandboxed extensions requires messing with global state (global.Scratch),
+// only let one extension load at a time.
 const limiter = new AsyncLimiter(loadUnsandboxedExtension, 1);
 const load = (extensionURL, vm) => limiter.do(extensionURL, vm);
 
 module.exports = {
-    load,
-
-    // For tests:
-    createAPI
+    setupUnsandboxedExtensionAPI,
+    load
 };

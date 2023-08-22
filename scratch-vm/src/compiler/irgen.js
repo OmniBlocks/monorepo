@@ -1145,7 +1145,7 @@ class ScriptTreeGenerator {
                 const blockInfo = this.getBlockInfo(block.opcode);
                 if (blockInfo) {
                     const type = blockInfo.info.blockType;
-                    if (type === BlockType.COMMAND) {
+                    if (type === BlockType.COMMAND || type === BlockType.CONDITIONAL) {
                         return this.descendCompatLayer(block);
                     }
                 }
@@ -1386,19 +1386,37 @@ class ScriptTreeGenerator {
      */
     descendCompatLayer (block) {
         this.script.yields = true;
+
         const inputs = {};
-        const fields = {};
         for (const name of Object.keys(block.inputs)) {
-            inputs[name] = this.descendInputOfBlock(block, name);
+            if (!name.startsWith('SUBSTACK')) {
+                inputs[name] = this.descendInputOfBlock(block, name);
+            }
         }
+
+        const fields = {};
         for (const name of Object.keys(block.fields)) {
             fields[name] = block.fields[name].value;
         }
+
+        const blockInfo = this.getBlockInfo(block.opcode);
+        const blockType = (blockInfo && blockInfo.info && blockInfo.info.blockType) || BlockType.COMMAND;
+        const substacks = [];
+        if (blockType === BlockType.LOOP || blockType === BlockType.CONDITIONAL) {
+            const branchCount = blockInfo.info.branchCount;
+            for (let i = 0; i < branchCount; i++) {
+                const inputName = i === 0 ? 'SUBSTACK' : `SUBSTACK${i + 1}`;
+                substacks.push(this.descendSubstack(block, inputName));
+            }
+        }
+
         return {
             kind: 'compat',
             opcode: block.opcode,
+            blockType,
             inputs,
-            fields
+            fields,
+            substacks
         };
     }
 

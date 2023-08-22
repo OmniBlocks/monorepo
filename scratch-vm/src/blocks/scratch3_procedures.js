@@ -36,7 +36,8 @@ class Scratch3ProcedureBlocks {
                 // Can't use reset() because that will reset too much.
                 const threadStackFrame = util.thread.peekStackFrame();
                 threadStackFrame.params = null;
-                threadStackFrame.executionContext = null;
+                delete stackFrame.returnValue;
+                delete stackFrame.executed;
                 return returnValue;
             }
             return;

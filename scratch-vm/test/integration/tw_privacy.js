@@ -94,23 +94,13 @@ test('custom extensions', async t => {
     vm.attachRenderer(mockRenderer());
 
     vm.extensionManager.securityManager.getSandboxMode = () => 'unsandboxed';
-    global.document = {
-        createElement: () => {
-            const element = {};
-            setTimeout(() => {
-                global.Scratch.extensions.register({
-                    getInfo: () => ({})
-                });
-            });
-            return element;
-        },
-        body: {
-            appendChild: () => {}
-        }
-    };
+    global.fetch = () => Promise.resolve({
+        ok: true,
+        text: () => Promise.resolve('Scratch.extensions.register({getInfo: () => ({id: "test", blocks: []})})')
+    });
 
     t.equal(vm.renderer.privateSkinAccess, true);
-    await vm.extensionManager.loadExtensionURL('data:application/javascript;,');
+    await vm.extensionManager.loadExtensionURL('data:application/javascript;,fake URL see fetch() mock');
     t.equal(vm.renderer.privateSkinAccess, false);
     t.end();
 });

@@ -27,42 +27,38 @@ test('_isValidExtensionURL', t => {
 test('loadExtensionURL, getExtensionURLs, deduplication', async t => {
     const vm = new VM();
 
-    let loadedExtensions = 0;
     vm.extensionManager.securityManager.getSandboxMode = () => 'unsandboxed';
-    global.document = {
-        createElement: () => {
-            loadedExtensions++;
-            const element = {};
-            setTimeout(() => {
-                global.Scratch.extensions.register({
-                    getInfo: () => ({
-                        id: `extension${loadedExtensions}`
-                    })
-                });
+
+    global.loadedExtensionCount = 0;
+    global.fetch = () => Promise.resolve({
+        ok: true,
+        text: () => Promise.resolve(`
+            const id = ++global.loadedExtensionCount;
+            Scratch.extensions.register({
+                getInfo: () => ({
+                    id: "testextension" + id
+                }),
+                blocks: []
             });
-            return element;
-        },
-        body: {
-            appendChild: () => {}
-        }
-    };
+        `)
+    });
 
     const url1 = 'https://turbowarp.org/1.js';
     t.equal(vm.extensionManager.isExtensionURLLoaded(url1), false);
     t.same(vm.extensionManager.getExtensionURLs(), {});
     await vm.extensionManager.loadExtensionURL(url1);
     t.equal(vm.extensionManager.isExtensionURLLoaded(url1), true);
-    t.equal(loadedExtensions, 1);
+    t.equal(global.loadedExtensionCount, 1);
     t.same(vm.extensionManager.getExtensionURLs(), {
-        extension1: url1
+        testextension1: url1
     });
 
     // Loading the extension again should do nothing.
     await vm.extensionManager.loadExtensionURL(url1);
     t.equal(vm.extensionManager.isExtensionURLLoaded(url1), true);
-    t.equal(loadedExtensions, 1);
+    t.equal(global.loadedExtensionCount, 1);
     t.same(vm.extensionManager.getExtensionURLs(), {
-        extension1: url1
+        testextension1: url1
     });
 
     // Loading another extension should work
@@ -70,10 +66,10 @@ test('loadExtensionURL, getExtensionURLs, deduplication', async t => {
     t.equal(vm.extensionManager.isExtensionURLLoaded(url2), false);
     await vm.extensionManager.loadExtensionURL(url2);
     t.equal(vm.extensionManager.isExtensionURLLoaded(url2), true);
-    t.equal(loadedExtensions, 2);
+    t.equal(global.loadedExtensionCount, 2);
     t.same(vm.extensionManager.getExtensionURLs(), {
-        extension1: url1,
-        extension2: url2
+        testextension1: url1,
+        testextension2: url2
     });
 
     t.end();

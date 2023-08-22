@@ -18,9 +18,9 @@ yield;
 thread.timer = null;
 b0.value = ((+b0.value || 0) + 1);
 if (((b0.value || 0) === 1)) {
-yield* executeInCompatibilityLayer({"MESSAGE":"pass order is correct (1)",}, b2, false, false, null);
+yield* executeInCompatibilityLayer({"MESSAGE":"pass order is correct (1)",}, b2, false, false, null, null);
 } else {
-yield* executeInCompatibilityLayer({"MESSAGE":("fail order is incorrect 1 != " + ("" + b0.value)),}, b2, false, false, null);
+yield* executeInCompatibilityLayer({"MESSAGE":("fail order is incorrect 1 != " + ("" + b0.value)),}, b2, false, false, null, null);
 }
 retire(); return;
 }; })
@@ -30,7 +30,7 @@ retire(); return;
 const b0 = runtime.getOpcodeFunction("looks_say");
 const b1 = stage.variables["p]KODv+)+:l=%NT~j3/d-wait"];
 return function* genXYZ () {
-yield* executeInCompatibilityLayer({"MESSAGE":"plan 2",}, b0, false, false, null);
+yield* executeInCompatibilityLayer({"MESSAGE":"plan 2",}, b0, false, false, null, null);
 thread.timer = timer();
 var a0 = Math.max(0, 1000 * (+b1.value || 0));
 runtime.requestRedraw();
@@ -55,7 +55,7 @@ while (thread.timer.timeElapsed() < a2) {
 yield;
 }
 thread.timer = null;
-yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, null);
+yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, null, null);
 retire(); return;
 }; })
 
@@ -76,9 +76,9 @@ yield;
 thread.timer = null;
 b0.value = ((+b0.value || 0) + 1);
 if (((b0.value || 0) === 2)) {
-yield* executeInCompatibilityLayer({"MESSAGE":"pass order is correct (2)",}, b2, false, false, null);
+yield* executeInCompatibilityLayer({"MESSAGE":"pass order is correct (2)",}, b2, false, false, null, null);
 } else {
-yield* executeInCompatibilityLayer({"MESSAGE":("fail order is incorrect 2 != " + ("" + b0.value)),}, b2, false, false, null);
+yield* executeInCompatibilityLayer({"MESSAGE":("fail order is incorrect 2 != " + ("" + b0.value)),}, b2, false, false, null, null);
 }
 retire(); return;
 }; })

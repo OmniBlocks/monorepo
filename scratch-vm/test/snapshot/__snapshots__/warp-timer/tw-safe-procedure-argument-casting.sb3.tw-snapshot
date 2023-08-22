@@ -5,16 +5,16 @@
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
 const b0 = runtime.getOpcodeFunction("looks_say");
 return function* genXYZ () {
-yield* executeInCompatibilityLayer({"MESSAGE":"plan 2",}, b0, false, false, null);
+yield* executeInCompatibilityLayer({"MESSAGE":"plan 2",}, b0, false, false, null, null);
 thread.procedures["Zswitch %s"]("1");
 if ((((target.currentCostume + 1) === 2) && ((+target.getCostumes()[target.currentCostume].name || 0) === 1))) {
-yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b0, false, false, null);
+yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b0, false, false, null, null);
 }
 thread.procedures["Zswitch %s"]("2");
 if ((((target.currentCostume + 1) === 1) && ((+target.getCostumes()[target.currentCostume].name || 0) === 2))) {
-yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b0, false, false, null);
+yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b0, false, false, null, null);
 }
-yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, null);
+yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, null, null);
 retire(); return;
 }; })
 

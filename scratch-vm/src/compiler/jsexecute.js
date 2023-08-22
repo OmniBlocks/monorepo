@@ -101,6 +101,7 @@ runtimeFunctions.waitThreads = `const waitThreads = function*(threads) {
  * @param {function} blockFunction The primitive's function.
  * @param {boolean} useFlags Whether to set flags (hasResumedFromPromise)
  * @param {string} blockId Block ID to set on the emulated block utility.
+ * @param {*|null} stackFrame Object to use as stack frame.
  * @returns {*} the value returned by the block, if any.
  */
 runtimeFunctions.executeInCompatibilityLayer = `let hasResumedFromPromise = false;
@@ -131,16 +132,13 @@ const isPromise = value => (
     typeof value === 'object' &&
     typeof value.then === 'function'
 );
-const executeInCompatibilityLayer = function*(inputs, blockFunction, isWarp, useFlags, blockId) {
+const executeInCompatibilityLayer = function*(inputs, blockFunction, isWarp, useFlags, blockId, stackFrame) {
     const thread = globalState.thread;
-
-    // reset the stackframe
-    // we only ever use one stackframe at a time, so this shouldn't cause issues
-    thread.stackFrames[thread.stackFrames.length - 1].reuse(isWarp);
+    const blockUtility = globalState.blockUtility;
+    if (!stackFrame) stackFrame = {};
 
     const executeBlock = () => {
-        const blockUtility = globalState.blockUtility;
-        blockUtility.init(thread, blockId);
+        blockUtility.init(thread, blockId, stackFrame);
         return blockFunction(inputs, blockUtility);
     };
 
@@ -194,6 +192,11 @@ const executeInCompatibilityLayer = function*(inputs, blockFunction, isWarp, use
 
     return returnValue;
 }`;
+
+/**
+ * @returns {unknown} An object to use as a stack frame.
+ */
+runtimeFunctions.persistentStackFrame = `const persistentStackFrame = () => ({});`;
 
 /**
  * End the current script.

@@ -1127,10 +1127,15 @@ class Runtime extends EventEmitter {
                             edgeActivated: blockInfo.isEdgeActivated,
                             restartExistingThreads: blockInfo.shouldRestartExistingThreads
                         };
-                    }
-                    if (blockInfo.blockType === BlockType.CONDITIONAL) {
+                    } else if (blockInfo.blockType === BlockType.CONDITIONAL) {
                         this._flowing[opcode] = {
-                            conditional: true
+                            conditional: true,
+                            loop: false
+                        };
+                    } else if (blockInfo.blockType === BlockType.LOOP) {
+                        this._flowing[opcode] = {
+                            conditional: false,
+                            loop: true
                         };
                     }
                 }

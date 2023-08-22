@@ -89,6 +89,9 @@ compilerAndInterpreter('CONDITIONAL', (t, co) => {
     const vm = new VirtualMachine();
     vm.setCompilerOptions(co);
     vm.extensionManager.addBuiltinExtension('loopsAndThings', LoopsAndThings);
+    vm.runtime.on('COMPILE_ERROR', () => {
+        t.fail('Compile error');
+    });
     
     vm.loadProject(fs.readFileSync(path.join(__dirname, '../fixtures/tw-conditional.sb3'))).then(() => {
         let okayCount = 0;
@@ -96,13 +99,35 @@ compilerAndInterpreter('CONDITIONAL', (t, co) => {
             if (text === 'OK!') {
                 okayCount++;
             } else if (text === 'end') {
+                vm.stop();
                 t.equal(okayCount, 5);
-                vm.runtime.stop();
                 t.end();
             }
         });
 
         vm.greenFlag();
-        vm.runtime.start();
+        vm.start();
+    });
+});
+
+compilerAndInterpreter('LOOP', (t, co) => {
+    t.plan(1);
+
+    const vm = new VirtualMachine();
+    vm.setCompilerOptions(co);
+    vm.extensionManager.addBuiltinExtension('loopsAndThings', LoopsAndThings);    
+    vm.runtime.on('COMPILE_ERROR', () => {
+        t.fail('Compile error');
+    });
+
+    vm.loadProject(fs.readFileSync(path.join(__dirname, '../fixtures/tw-loop.sb3'))).then(() => {
+        vm.runtime.on('SAY', (target, type, text) => {
+            vm.stop();
+            t.equal(text, 'a 5 b 50 c 200');
+            t.end();
+        });
+
+        vm.greenFlag();
+        vm.start();
     });
 });

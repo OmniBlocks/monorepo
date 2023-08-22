@@ -5,7 +5,7 @@
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
 const b0 = runtime.getOpcodeFunction("looks_say");
 return function* genXYZ () {
-yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, null);
+yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, null, null);
 retire(); return;
 }; })
 
@@ -13,7 +13,7 @@ retire(); return;
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
 const b0 = runtime.getOpcodeFunction("looks_say");
 return function* genXYZ () {
-yield* executeInCompatibilityLayer({"MESSAGE":"plan 0",}, b0, false, false, null);
+yield* executeInCompatibilityLayer({"MESSAGE":"plan 0",}, b0, false, false, null, null);
 runtime.ext_scratch3_looks._setBackdrop(stage, stage.currentCostume + 1, true);
 retire(); return;
 }; })

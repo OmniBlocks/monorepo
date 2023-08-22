@@ -25,10 +25,10 @@ retire(); return;
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
 const b0 = runtime.getOpcodeFunction("looks_say");
 return function* genXYZ () {
-yield* executeInCompatibilityLayer({"MESSAGE":"plan 3",}, b0, false, false, null);
+yield* executeInCompatibilityLayer({"MESSAGE":"plan 3",}, b0, false, false, null, null);
 yield* thread.procedures["Znon warp"]();
 runtime.stopForTarget(target, thread);
-yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, null);
+yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, null, null);
 retire(); return;
 }; })
 
@@ -50,10 +50,10 @@ thread.timer = null;
 yield;
 }
 if (((+b0.value || 0) === 5)) {
-yield* executeInCompatibilityLayer({"MESSAGE":"pass non warp 1",}, b1, false, false, null);
+yield* executeInCompatibilityLayer({"MESSAGE":"pass non warp 1",}, b1, false, false, null, null);
 }
 if ((("" + (yield* thread.procedures["Wverify runs warp %s"]((yield* thread.procedures["Zverify runs non warp %s"]((yield* thread.procedures["Wverify runs warp %s"]("abc"))))))).toLowerCase() === "warp: non warp: warp: abc".toLowerCase())) {
-yield* executeInCompatibilityLayer({"MESSAGE":"pass non warp and warp mix",}, b1, false, false, null);
+yield* executeInCompatibilityLayer({"MESSAGE":"pass non warp and warp mix",}, b1, false, false, null, null);
 }
 b0.value = 0;
 for (var a2 = 5; a2 >= 0.5; a2--) {
@@ -68,7 +68,7 @@ thread.timer = null;
 yield;
 }
 if (((+b0.value || 0) === 5)) {
-yield* executeInCompatibilityLayer({"MESSAGE":"pass non warp 2",}, b1, false, false, null);
+yield* executeInCompatibilityLayer({"MESSAGE":"pass non warp 2",}, b1, false, false, null, null);
 }
 return "";
 }; })
@@ -90,7 +90,7 @@ thread.timer = null;
 if (isStuck()) yield;
 }
 if (!compareEqual(b0.value, 0)) {
-yield* executeInCompatibilityLayer({"MESSAGE":"fail did not run warp",}, b1, true, false, null);
+yield* executeInCompatibilityLayer({"MESSAGE":"fail did not run warp",}, b1, true, false, null, null);
 }
 return ("warp: " + ("" + p0));
 return "";
@@ -114,7 +114,7 @@ thread.timer = null;
 yield;
 }
 if (compareEqual(b0.value, 0)) {
-yield* executeInCompatibilityLayer({"MESSAGE":"fail ran warp",}, b1, false, false, null);
+yield* executeInCompatibilityLayer({"MESSAGE":"fail ran warp",}, b1, false, false, null, null);
 }
 return ("non warp: " + ("" + p0));
 return "";

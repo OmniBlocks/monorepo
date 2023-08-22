@@ -6,16 +6,16 @@
 const b0 = runtime.getOpcodeFunction("looks_say");
 const b1 = stage.variables["PsAI*C{QHI3*4?O8p#TM"];
 return function* genXYZ () {
-yield* executeInCompatibilityLayer({"MESSAGE":"plan 2",}, b0, false, false, null);
+yield* executeInCompatibilityLayer({"MESSAGE":"plan 2",}, b0, false, false, null, null);
 yield* thread.procedures["Wreturn stops the script immediately"]();
 if (((+b1.value || 0) === 25)) {
-yield* executeInCompatibilityLayer({"MESSAGE":"pass return stopped the script immediately",}, b0, false, false, null);
+yield* executeInCompatibilityLayer({"MESSAGE":"pass return stopped the script immediately",}, b0, false, false, null, null);
 }
 yield* waitThreads(startHats("event_whenbroadcastreceived", { BROADCAST_OPTION: "Test return outside of custom block" }));
 if (((+b1.value || 0) === 18)) {
-yield* executeInCompatibilityLayer({"MESSAGE":"pass return worked to stop outside of custom block",}, b0, false, false, null);
+yield* executeInCompatibilityLayer({"MESSAGE":"pass return worked to stop outside of custom block",}, b0, false, false, null, null);
 }
-yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, null);
+yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, null, null);
 retire(); return;
 }; })
 
@@ -31,7 +31,7 @@ if (((b0.value || 0) === 25)) {
 return "stopped!";
 }
 }
-yield* executeInCompatibilityLayer({"MESSAGE":"fail return did not stop the script immediately",}, b1, true, false, null);
+yield* executeInCompatibilityLayer({"MESSAGE":"fail return did not stop the script immediately",}, b1, true, false, null, null);
 return "";
 }; })
 

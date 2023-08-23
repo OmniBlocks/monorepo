@@ -3472,9 +3472,9 @@ export class SongEditor {
                     this._copyInstrument();
                 } else {
                     this._doc.selection.copy();
+                    this._doc.selection.resetBoxSelection();
+                    this._doc.selection.selectionUpdated();
                 }
-                this._doc.selection.resetBoxSelection();
-                this._doc.selection.selectionUpdated();
                 event.preventDefault();
                 break;
             case 13: // enter/return

@@ -101,7 +101,7 @@ runtimeFunctions.waitThreads = `const waitThreads = function*(threads) {
  * @param {function} blockFunction The primitive's function.
  * @param {boolean} useFlags Whether to set flags (hasResumedFromPromise)
  * @param {string} blockId Block ID to set on the emulated block utility.
- * @param {*|null} stackFrame Object to use as stack frame.
+ * @param {*|null} branchInfo Extra information object for CONDITIONAL and LOOP blocks. See createBranchInfo().
  * @returns {*} the value returned by the block, if any.
  */
 runtimeFunctions.executeInCompatibilityLayer = `let hasResumedFromPromise = false;
@@ -132,10 +132,22 @@ const isPromise = value => (
     typeof value === 'object' &&
     typeof value.then === 'function'
 );
-const executeInCompatibilityLayer = function*(inputs, blockFunction, isWarp, useFlags, blockId, stackFrame) {
+const executeInCompatibilityLayer = function*(inputs, blockFunction, isWarp, useFlags, blockId, branchInfo) {
     const thread = globalState.thread;
     const blockUtility = globalState.blockUtility;
-    if (!stackFrame) stackFrame = {};
+    const stackFrame = branchInfo ? branchInfo.stackFrame : {};
+
+    const finish = (returnValue) => {
+        if (branchInfo) {
+            if (typeof returnValue === 'undefined' && blockUtility._startedBranch) {
+                branchInfo.isLoop = blockUtility._startedBranch[1];
+                return blockUtility._startedBranch[0];
+            }
+            branchInfo.isLoop = branchInfo.defaultIsLoop;
+            return returnValue;
+        }
+        return returnValue;
+    };
 
     const executeBlock = () => {
         blockUtility.init(thread, blockId, stackFrame);
@@ -143,13 +155,8 @@ const executeInCompatibilityLayer = function*(inputs, blockFunction, isWarp, use
     };
 
     let returnValue = executeBlock();
-
     if (isPromise(returnValue)) {
-        returnValue = yield* waitPromise(returnValue);
-        if (useFlags) {
-            hasResumedFromPromise = true;
-        }
-        return returnValue;
+        return finish(yield* waitPromise(returnValue));
     }
 
     if (thread.status === 1 /* STATUS_PROMISE_WAIT */) {
@@ -173,30 +180,31 @@ const executeInCompatibilityLayer = function*(inputs, blockFunction, isWarp, use
         }
 
         returnValue = executeBlock();
-
         if (isPromise(returnValue)) {
-            returnValue = yield* waitPromise(returnValue);
-            if (useFlags) {
-                hasResumedFromPromise = true;
-            }
-            return returnValue;
+            return finish(yield* waitPromise(returnValue));
         }
 
         if (thread.status === 1 /* STATUS_PROMISE_WAIT */) {
             yield;
-            return '';
+            return finish('');
         }
     }
 
     // todo: do we have to do anything extra if status is STATUS_DONE?
 
-    return returnValue;
+    return finish(returnValue);
 }`;
 
 /**
- * @returns {unknown} An object to use as a stack frame.
+ * @param {boolean} isLoop True if the block is a LOOP by default (can be overridden by startBranch() call)
+ * @returns {unknown} Branch info object for compatibility layer.
  */
-runtimeFunctions.persistentStackFrame = `const persistentStackFrame = () => ({});`;
+runtimeFunctions.createBranchInfo = `const createBranchInfo = (isLoop) => ({
+    defaultIsLoop: isLoop,
+    isLoop: false,
+    branch: 0,
+    stackFrame: {}
+});`;
 
 /**
  * End the current script.

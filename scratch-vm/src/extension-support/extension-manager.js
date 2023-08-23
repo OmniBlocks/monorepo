@@ -9,7 +9,7 @@ const SecurityManager = require('./tw-security-manager');
 // TODO: move these out into a separate repository?
 // TODO: change extension spec so that library info, including extension ID, can be collected through static methods
 
-const builtinExtensions = {
+const defaultBuiltinExtensions = {
     // This is an example that isn't loaded with the other core blocks,
     // but serves as a reference for loading core blocks as extensions.
     coreExample: () => require('../blocks/scratch3_core_example'),
@@ -125,6 +125,8 @@ class ExtensionManager {
         this.loadingAsyncExtensions = 0;
         this.asyncExtensionsLoadedCallbacks = [];
 
+        this.builtinExtensions = Object.assign({}, defaultBuiltinExtensions);
+
         dispatch.setService('extensions', createExtensionService(this)).catch(e => {
             log.error(`ExtensionManager was unable to register extension service: ${JSON.stringify(e)}`);
         });
@@ -148,7 +150,7 @@ class ExtensionManager {
      * @returns {boolean}
      */
     isBuiltinExtension (extensionId) {
-        return Object.prototype.hasOwnProperty.call(builtinExtensions, extensionId);
+        return Object.prototype.hasOwnProperty.call(this.builtinExtensions, extensionId);
     }
 
     /**
@@ -169,7 +171,7 @@ class ExtensionManager {
             return;
         }
 
-        const extension = builtinExtensions[extensionId]();
+        const extension = this.builtinExtensions[extensionId]();
         const extensionInstance = new extension(this.runtime);
         const serviceName = this._registerInternalExtension(extensionInstance);
         this._loadedExtensions.set(extensionId, serviceName);
@@ -177,7 +179,7 @@ class ExtensionManager {
     }
 
     addBuiltinExtension (extensionId, extensionClass) {
-        builtinExtensions[extensionId] = () => extensionClass;
+        this.builtinExtensions[extensionId] = () => extensionClass;
     }
 
     _isValidExtensionURL (extensionURL) {
@@ -593,7 +595,7 @@ class ExtensionManager {
     getExtensionURLs () {
         const extensionURLs = {};
         for (const [extensionId, serviceName] of this._loadedExtensions.entries()) {
-            if (builtinExtensions.hasOwnProperty(extensionId)) {
+            if (this.builtinExtensions.hasOwnProperty(extensionId)) {
                 continue;
             }
 

@@ -1441,12 +1441,13 @@ export class ChangeChannelCount extends Change {
                         newChannels[channelIndex].octave = octave;
                         for (let j: number = 0; j < Config.instrumentCountMin; j++) {
                             const instrument: Instrument = new Instrument(isNoise, isMod);
-			    if (isMod) instrument.type = 9;
                             if (!isMod) {
                                 const presetValue: number = pickRandomPresetValue(isNoise);
                                 const preset: Preset = EditorConfig.valueToPreset(presetValue)!;
                                 instrument.fromJsonObject(preset.settings, isNoise, isMod, doc.song.rhythm == 0 || doc.song.rhythm == 2, doc.song.rhythm >= 2);
                                 instrument.preset = presetValue;
+                            } else {
+                                instrument.setTypeAndReset(InstrumentType.mod, isNoise, isMod);
                             }
                             newChannels[channelIndex].instruments[j] = instrument;
                         }

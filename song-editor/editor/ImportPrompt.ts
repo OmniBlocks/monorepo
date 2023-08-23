@@ -301,6 +301,7 @@ export class ImportPrompt implements Prompt {
                                                microsecondsPerBeat: microsecondsPerBeat,
                                            });
 //midi tempo addition
+									track.reader.skipBytes(length - 3);
 								} else if (message == MidiMetaEventMessage.timeSignature) {
 									const numerator: number = track.reader.readUint8();
 									let denominatorExponent: number = track.reader.readUint8();

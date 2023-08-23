@@ -766,7 +766,7 @@ class JSGenerator {
             if (blockType === BlockType.COMMAND || blockType === BlockType.HAT) {
                 this.source += `${this.generateCompatibilityLayerCall(node, isLastInLoop)};\n`;
             } else if (blockType === BlockType.CONDITIONAL) {
-                this.source += `switch (Math.round(${this.generateCompatibilityLayerCall(node, isLastInLoop)})) {\n`;
+                this.source += `switch (+(${this.generateCompatibilityLayerCall(node, isLastInLoop)})) {\n`;
                 for (let i = 0; i < node.substacks.length; i++) {
                     this.source += `case ${i + 1}: {\n`;
                     this.descendStack(node.substacks[i], new Frame(false));

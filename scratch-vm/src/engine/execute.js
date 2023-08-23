@@ -85,11 +85,8 @@ const handleReport = function (resolvedValue, sequencer, thread, blockCached, la
             // Predicate returned false: do not allow script to run
             sequencer.retireThread(thread);
         }
-    } else if (isConditional) {
-        const branch = Math.round(resolvedValue);
-        sequencer.stepToBranch(thread, branch, false);
-    } else if (isLoop && cast.toBoolean(resolvedValue)) {
-        sequencer.stepToBranch(thread, 1, true);
+    } else if ((isConditional || isLoop) && typeof resolvedValue !== 'undefined') {
+        sequencer.stepToBranch(thread, cast.toNumber(resolvedValue), isLoop);
     } else {
         // In a non-hat, report the value visually if necessary if
         // at the top of the thread stack.

@@ -765,21 +765,23 @@ class JSGenerator {
             const blockType = node.blockType;
             if (blockType === BlockType.COMMAND || blockType === BlockType.HAT) {
                 this.source += `${this.generateCompatibilityLayerCall(node, isLastInLoop)};\n`;
-            } else if (blockType === BlockType.CONDITIONAL) {
-                this.source += `switch (Math.round(${this.generateCompatibilityLayerCall(node, isLastInLoop)})) {\n`;
+            } else if (blockType === BlockType.CONDITIONAL || blockType === BlockType.LOOP) {
+                const branchVariable = this.localVariables.next();
+                this.source += `const ${branchVariable} = createBranchInfo(${blockType === BlockType.LOOP});\n`;
+                this.source += `while (${branchVariable}.branch = +(${this.generateCompatibilityLayerCall(node, false, branchVariable)})) {\n`;
+                this.source += `switch (${branchVariable}.branch) {\n`;
                 for (let i = 0; i < node.substacks.length; i++) {
                     this.source += `case ${i + 1}: {\n`;
                     this.descendStack(node.substacks[i], new Frame(false));
                     this.source += `break;\n`;
-                    this.source += `}\n`;
+                    this.source += `}\n`; // close case
                 }
-                this.source += `}\n`;
-            } else if (node.blockType === BlockType.LOOP) {
-                const stackFrameName = this.localVariables.next();
-                this.source += `const ${stackFrameName} = persistentStackFrame();\n`;
-                this.source += `while (toBoolean(${this.generateCompatibilityLayerCall(node, isLastInLoop, stackFrameName)})) {\n`;
-                this.descendStack(node.substacks[0], new Frame(true));
-                this.source += '}\n';
+                this.source += '}\n'; // close switch
+                this.source += `if (!${branchVariable}.isLoop) break;\n`;
+                this.yieldLoop();
+                this.source += '}\n'; // close while
+            } else {
+                throw new Error(`Unknown block type: ${blockType}`);
             }
 
             if (isLastInLoop) {

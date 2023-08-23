@@ -4,16 +4,17 @@ class CompatibilityLayerBlockUtility extends BlockUtility {
     constructor () {
         super();
         this._stackFrame = {};
+        this._startedBranch = null;
     }
 
     get stackFrame () {
         return this._stackFrame;
     }
 
-    // Branching operations are not supported.
-    startBranch () {
-        throw new Error('startBranch is not supported by this BlockUtility');
+    startBranch (branchNumber, isLoop) {
+        this._startedBranch = [branchNumber, isLoop];
     }
+
     startProcedure () {
         throw new Error('startProcedure is not supported by this BlockUtility');
     }
@@ -33,6 +34,7 @@ class CompatibilityLayerBlockUtility extends BlockUtility {
         this.thread = thread;
         this.sequencer = thread.target.runtime.sequencer;
         this._stackFrame = stackFrame;
+        this._startedBranch = null;
         thread.stack[0] = fakeBlockId;
     }
 }

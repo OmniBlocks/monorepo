@@ -46,3 +46,15 @@ test('addBuiltingExtension', t => {
         vm.runtime._step();
     });
 });
+
+test('each runtime has own set of extensions', t => {
+    const vm1 = new VM();
+    const vm2 = new VM();
+
+    vm1.extensionManager.addBuiltinExtension('testbuiltin', TestBuiltinExtension)
+
+    t.ok(vm1.extensionManager.isBuiltinExtension('testbuiltin'));
+    t.notOk(vm2.extensionManager.isBuiltinExtension('testbuiltin'));
+
+    t.end();
+});

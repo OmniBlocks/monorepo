@@ -129,7 +129,7 @@ export class AddSamplesPrompt {
         ),
         div({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between;" }, this._bulkAddConfirmButton),
     );
-    public container: HTMLDivElement = div({ class: "prompt noSelection", style: "width: 350px;" },
+    public container: HTMLDivElement = div({ class: "prompt noSelection", style: "width: 450px;" },
         this._addSamplesArea,
         this._bulkAddArea,
         this._instructionsArea,
@@ -683,8 +683,8 @@ export class AddSamplesPrompt {
             const moveUpButton: HTMLButtonElement = button({ style: "height: auto; min-height: var(--button-size); margin-left: 0.5em;" }, SVG.svg({ width: "16", height: "16", viewBox: "-13 -14 26 26", "pointer-events": "none", style: "width: 100%; height: 100%;" }, SVG.path({ d: "M -6 6 L 0 -6 L 6 6 z", fill: ColorConfig.primaryText })));
             const moveDownButton: HTMLButtonElement = button({ style: "height: auto; min-height: var(--button-size); margin-left: 0.5em;" }, SVG.svg({ width: "16", height: "16", viewBox: "-13 -14 26 26", "pointer-events": "none", style: "width: 100%; height: 100%;" }, SVG.path({ d: "M -6 -6 L 6 -6 L 0 6 z", fill: ColorConfig.primaryText })));
             const optionsContainer: HTMLDetailsElement = details(
-                { open: optionsVisible },
-                summary({ style: "margin-bottom: 0.5em;" }, "Options"),
+                { open: optionsVisible, style: "margin-bottom: 2em; margin-top: 1em;" },
+                summary({ style: "margin-bottom: 1em;" }, "Options"),
                 div({ style: "display: flex; flex-direction: row; align-items: center; justify-content: flex-end; margin-bottom: 0.5em;" },
                     div({ style: `flex-shrink: 0; :text-align: right; color: ${ColorConfig.primaryText};` }, span({ title: "What rate to resample to" }, "Sample rate")),
                     sampleRateStepper

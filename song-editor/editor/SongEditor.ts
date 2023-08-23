@@ -1135,7 +1135,7 @@ export class SongEditor {
 
     private readonly _sampleLoadingBar: HTMLDivElement = div({ style: `width: 0%; height: 100%; background-color: ${ColorConfig.indicatorPrimary};` });
     private readonly _sampleLoadingBarContainer: HTMLDivElement = div({ style: `width: 80%; height: 4px; overflow: hidden; margin-left: auto; margin-right: auto; margin-top: 0.5em; cursor: pointer; background-color: ${ColorConfig.indicatorSecondary};` }, this._sampleLoadingBar);
-    private readonly _sampleLoadingStatusContainer: HTMLDivElement = div(
+    private readonly _sampleLoadingStatusContainer: HTMLDivElement = div({ style: "cursor: pointer;" },
         div({ style: `margin-top: 0.5em; text-align: center; color: ${ColorConfig.secondaryText};` }, "Sample Loading Status"),
         div({ class: "selectRow", style: "height: 6px; margin-bottom: 0.5em;" },
             this._sampleLoadingBarContainer,
@@ -1437,7 +1437,7 @@ export class SongEditor {
             this._chipWaveStartOffsetStepper.addEventListener("change", this._whenSetChipWaveStartOffset);
             this._chipWavePlayBackwardsBox.addEventListener("input", this._whenSetChipWavePlayBackwards);
             // advloop addition
-        this._sampleLoadingBarContainer.addEventListener("click", this._whenSampleLoadingBarClicked);
+        this._sampleLoadingStatusContainer.addEventListener("click", this._whenSampleLoadingStatusClicked);
 	    this._chipNoiseSelect.addEventListener("change", this._whenSetNoiseWave);
         this._transitionSelect.addEventListener("change", this._whenSetTransition);
         this._effectsSelect.addEventListener("change", this._whenSetEffects);
@@ -1547,7 +1547,7 @@ export class SongEditor {
         }
     }
 
-    private _whenSampleLoadingBarClicked = (): void => {
+    private _whenSampleLoadingStatusClicked = (): void => {
         this._openPrompt("sampleLoadingStatus");
     }
 

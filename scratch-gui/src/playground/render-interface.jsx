@@ -321,25 +321,6 @@ class Interface extends React.Component {
                                 </div>
                             ) : null}
                             <div className={styles.section}>
-                                <p className={styles.infobox}>
-                                    <a
-                                        href={`${process.env.ROOT}august-2023-scratch-maintenance.html`}
-                                        target="_blank"
-                                        rel="noreferrer"
-                                    >
-                                        {/* This will be here a few weeks, so we can translate it */}
-                                        <FormattedMessage
-                                            // eslint-disable-next-line max-len
-                                            defaultMessage="Upcoming Scratch maintenance may affect parts of {APP_NAME}"
-                                            // eslint-disable-next-line max-len
-                                            description="Temporary message with a link to learn about upcoming Scratch maintenance"
-                                            id="tw.aug23downtime"
-                                            values={{
-                                                APP_NAME
-                                            }}
-                                        />
-                                    </a>
-                                </p>
                                 <p>
                                     <FormattedMessage
                                         // eslint-disable-next-line max-len

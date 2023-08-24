@@ -62,7 +62,6 @@ export default [
         ),
         extensionId: 'music',
         iconURL: musicIconURL,
-        iconAspectRatio: 600 / 372,
         insetIconURL: musicInsetIconURL,
         description: (
             <FormattedMessage
@@ -84,7 +83,6 @@ export default [
         ),
         extensionId: 'pen',
         iconURL: penIconURL,
-        iconAspectRatio: 600 / 372,
         insetIconURL: penInsetIconURL,
         description: (
             <FormattedMessage
@@ -106,7 +104,6 @@ export default [
         ),
         extensionId: 'videoSensing',
         iconURL: videoSensingIconURL,
-        iconAspectRatio: 600 / 372,
         insetIconURL: videoSensingInsetIconURL,
         description: (
             <FormattedMessage
@@ -129,7 +126,6 @@ export default [
         extensionId: 'text2speech',
         collaborator: 'Amazon Web Services',
         iconURL: text2speechIconURL,
-        iconAspectRatio: 600 / 372,
         insetIconURL: text2speechInsetIconURL,
         description: (
             <FormattedMessage
@@ -153,7 +149,6 @@ export default [
         extensionId: 'translate',
         collaborator: 'Google',
         iconURL: translateIconURL,
-        iconAspectRatio: 600 / 372,
         insetIconURL: translateInsetIconURL,
         description: (
             <FormattedMessage
@@ -171,7 +166,6 @@ export default [
         extensionId: 'makeymakey',
         collaborator: 'JoyLabz',
         iconURL: makeymakeyIconURL,
-        iconAspectRatio: 600 / 372,
         insetIconURL: makeymakeyInsetIconURL,
         description: (
             <FormattedMessage
@@ -188,7 +182,6 @@ export default [
         extensionId: 'microbit',
         collaborator: 'micro:bit',
         iconURL: microbitIconURL,
-        iconAspectRatio: 600 / 372,
         insetIconURL: microbitInsetIconURL,
         description: (
             <FormattedMessage
@@ -220,7 +213,6 @@ export default [
         extensionId: 'ev3',
         collaborator: 'LEGO',
         iconURL: ev3IconURL,
-        iconAspectRatio: 600 / 372,
         insetIconURL: ev3InsetIconURL,
         description: (
             <FormattedMessage
@@ -252,7 +244,6 @@ export default [
         extensionId: 'boost',
         collaborator: 'LEGO',
         iconURL: boostIconURL,
-        iconAspectRatio: 600 / 372,
         insetIconURL: boostInsetIconURL,
         description: (
             <FormattedMessage
@@ -285,7 +276,6 @@ export default [
         extensionId: 'wedo2',
         collaborator: 'LEGO',
         iconURL: wedo2IconURL,
-        iconAspectRatio: 600 / 372,
         insetIconURL: wedo2InsetIconURL,
         description: (
             <FormattedMessage
@@ -318,7 +308,6 @@ export default [
         extensionId: 'gdxfor',
         collaborator: 'Vernier',
         iconURL: gdxforIconURL,
-        iconAspectRatio: 600 / 372,
         insetIconURL: gdxforInsetIconURL,
         description: (
             <FormattedMessage
@@ -356,7 +345,6 @@ export default [
         ),
         extensionId: 'procedures_enable_return',
         iconURL: returnIcon,
-        iconAspectRatio: 600 / 372,
         description: (
             <FormattedMessage
                 defaultMessage="Allow custom blocks to output values and be used as inputs."
@@ -378,7 +366,6 @@ export default [
         ),
         extensionId: 'tw',
         iconURL: twIcon,
-        iconAspectRatio: 600 / 372,
         description: (
             <FormattedMessage
                 defaultMessage="Weird new blocks."
@@ -400,7 +387,6 @@ export default [
         ),
         extensionId: 'custom_extension',
         iconURL: customExtensionIcon,
-        iconAspectRatio: 600 / 372,
         description: (
             <FormattedMessage
                 defaultMessage="Load custom extensions from URLs, files, or JavaScript source code."
@@ -425,7 +411,6 @@ export const galleryLoading = {
     href: 'https://extensions.turbowarp.org/',
     extensionId: 'gallery',
     iconURL: galleryIcon,
-    iconAspectRatio: 2,
     description: (
         <FormattedMessage
             // eslint-disable-next-line max-len
@@ -449,7 +434,6 @@ export const galleryMore = {
     href: 'https://extensions.turbowarp.org/',
     extensionId: 'gallery',
     iconURL: galleryIcon,
-    iconAspectRatio: 2,
     description: (
         <FormattedMessage
             // eslint-disable-next-line max-len
@@ -473,7 +457,6 @@ export const galleryError = {
     href: 'https://extensions.turbowarp.org/',
     extensionId: 'gallery',
     iconURL: galleryIcon,
-    iconAspectRatio: 2,
     description: (
         <FormattedMessage
             // eslint-disable-next-line max-len

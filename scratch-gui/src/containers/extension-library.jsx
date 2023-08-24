@@ -52,7 +52,6 @@ const fetchLibrary = async () => {
             extensionId: extension.id,
             extensionURL: `https://extensions.turbowarp.org/${extension.slug}.js`,
             iconURL: `https://extensions.turbowarp.org/${extension.image || 'images/unknown.svg'}`,
-            iconAspectRatio: 2,
             tags: ['tw'],
             credits: allCredits.map(credit => {
                 if (credit.link) {

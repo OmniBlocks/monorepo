@@ -71,9 +71,6 @@ class LibraryItemComponent extends React.PureComponent {
                     ) : null}
                     <img
                         className={styles.featuredImage}
-                        style={{
-                            aspectRatio: this.props.iconAspectRatio ? this.props.iconAspectRatio.toString() : ''
-                        }}
                         loading="lazy"
                         draggable={false}
                         src={this.props.iconURL}
@@ -237,7 +234,6 @@ LibraryItemComponent.propTypes = {
     featured: PropTypes.bool,
     hidden: PropTypes.bool,
     iconURL: PropTypes.string,
-    iconAspectRatio: PropTypes.number,
     insetIconURL: PropTypes.string,
     internetConnectionRequired: PropTypes.bool,
     isPlaying: PropTypes.bool,

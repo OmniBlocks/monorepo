@@ -151,7 +151,6 @@ class LibraryItem extends React.PureComponent {
                 featured={this.props.featured}
                 hidden={this.props.hidden}
                 iconURL={iconURL}
-                iconAspectRatio={this.props.iconAspectRatio}
                 icons={this.props.icons}
                 id={this.props.id}
                 insetIconURL={this.props.insetIconURL}
@@ -190,7 +189,6 @@ LibraryItem.propTypes = {
     hidden: PropTypes.bool,
     iconMd5: PropTypes.string,
     iconRawURL: PropTypes.string,
-    iconAspectRatio: PropTypes.number,
     icons: PropTypes.arrayOf(
         PropTypes.shape({
             baseLayerMD5: PropTypes.string, // 2.0 library format, TODO GH-5084

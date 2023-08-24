@@ -325,7 +325,6 @@ class LibraryComponent extends React.Component {
                                 hidden={dataItem.hidden}
                                 iconMd5={dataItem.costumes ? dataItem.costumes[0].md5ext : dataItem.md5ext}
                                 iconRawURL={dataItem.rawURL}
-                                iconAspectRatio={dataItem.iconAspectRatio}
                                 icons={dataItem.costumes}
                                 id={index}
                                 incompatibleWithScratch={dataItem.incompatibleWithScratch}

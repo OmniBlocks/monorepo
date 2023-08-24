@@ -20,6 +20,7 @@ class LibraryItem extends React.PureComponent {
         bindAll(this, [
             'handleBlur',
             'handleClick',
+            'handleFavorite',
             'handleFocus',
             'handleKeyPress',
             'handleMouseEnter',
@@ -60,6 +61,10 @@ class LibraryItem extends React.PureComponent {
             }
         }
         e.preventDefault();
+    }
+    handleFavorite (e) {
+        e.stopPropagation();
+        this.props.onFavorite(this.props.id);
     }
     handleFocus (id) {
         if (!this.props.showPlayButton) {
@@ -133,6 +138,7 @@ class LibraryItem extends React.PureComponent {
             this.props.iconRawURL;
         return (
             <LibraryItemComponent
+                intl={this.props.intl}
                 bluetoothRequired={this.props.bluetoothRequired}
                 collaborator={this.props.collaborator}
                 description={this.props.description}
@@ -149,6 +155,8 @@ class LibraryItem extends React.PureComponent {
                 isPlaying={this.props.isPlaying}
                 name={this.props.name}
                 credits={this.props.credits}
+                favorite={this.props.favorite}
+                onFavorite={this.handleFavorite}
                 showPlayButton={this.props.showPlayButton}
                 onBlur={this.handleBlur}
                 onClick={this.handleClick}
@@ -198,6 +206,8 @@ LibraryItem.propTypes = {
         PropTypes.string,
         PropTypes.node
     ])),
+    favorite: PropTypes.bool,
+    onFavorite: PropTypes.func,
     onMouseEnter: PropTypes.func.isRequired,
     onMouseLeave: PropTypes.func.isRequired,
     onSelect: PropTypes.func.isRequired,

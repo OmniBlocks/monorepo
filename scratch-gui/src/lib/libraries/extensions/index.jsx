@@ -398,7 +398,7 @@ export default [
                 id="tw.customExtension.name"
             />
         ),
-        extensionId: '',
+        extensionId: 'custom_extension',
         iconURL: customExtensionIcon,
         iconAspectRatio: 600 / 372,
         description: (
@@ -423,7 +423,7 @@ export const galleryLoading = {
         />
     ),
     href: 'https://extensions.turbowarp.org/',
-    extensionId: '',
+    extensionId: 'gallery',
     iconURL: galleryIcon,
     iconAspectRatio: 2,
     description: (
@@ -447,7 +447,7 @@ export const galleryMore = {
         />
     ),
     href: 'https://extensions.turbowarp.org/',
-    extensionId: '',
+    extensionId: 'gallery',
     iconURL: galleryIcon,
     iconAspectRatio: 2,
     description: (
@@ -471,7 +471,7 @@ export const galleryError = {
         />
     ),
     href: 'https://extensions.turbowarp.org/',
-    extensionId: '',
+    extensionId: 'gallery',
     iconURL: galleryIcon,
     iconAspectRatio: 2,
     description: (

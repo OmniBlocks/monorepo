@@ -231,8 +231,21 @@
     transform: translate(calc(-2 * $space), calc(2 * $space));
 }
 
-.incompatible-with-scratch {
-    padding: 0 1.25rem 1rem 1.25rem;
-    width: 100%;
-    text-align: left;
+.favorite-container {
+    display: none;
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    position: absolute;
+    top: 0.5rem;
+    left: 0.5rem;
+}
+.favorite-icon {
+    width: 32px;
+    height: 32px;
+}
+.favorite-container.active,
+.library-item:hover .favorite-container {
+    display: block;
 }

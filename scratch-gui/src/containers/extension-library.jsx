@@ -14,7 +14,6 @@ import extensionTags from '../lib/libraries/tw-extension-tags';
 
 import LibraryComponent from '../components/library/library.jsx';
 import extensionIcon from '../components/action-menu/icon--sprite.svg';
-import Separator from '../components/tw-extension-separator/separator.jsx';
 
 const messages = defineMessages({
     extensionTitle: {
@@ -24,10 +23,15 @@ const messages = defineMessages({
     }
 });
 
-const toLibraryItem = extension => ({
-    rawURL: extension.iconURL || extensionIcon,
-    ...extension
-});
+const toLibraryItem = extension => {
+    if (typeof extension === 'object') {
+        return ({
+            rawURL: extension.iconURL || extensionIcon,
+            ...extension
+        });
+    }
+    return extension;
+};
 
 let cachedGallery = null;
 
@@ -105,9 +109,7 @@ class ExtensionLibrary extends React.PureComponent {
 
         const extensionId = item.extensionId;
 
-        // Don't warn about Scratch compatibility before showing modal
-        const isCustomURL = !item.disabled && !extensionId;
-        if (isCustomURL) {
+        if (extensionId === 'custom_extension') {
             this.props.onOpenCustomExtensionModal();
             return;
         }
@@ -137,10 +139,10 @@ class ExtensionLibrary extends React.PureComponent {
     }
     render () {
         const library = extensionLibraryContent.map(toLibraryItem);
-        library.push(<Separator />);
+        library.push('---');
         if (this.state.gallery) {
-            library.push(...this.state.gallery.map(toLibraryItem));
             library.push(toLibraryItem(galleryMore));
+            library.push(...this.state.gallery.map(toLibraryItem));
         } else if (this.state.galleryError) {
             library.push(toLibraryItem(galleryError));
         } else {
@@ -151,6 +153,7 @@ class ExtensionLibrary extends React.PureComponent {
             <LibraryComponent
                 data={library}
                 filterable
+                persistableKey="extensionId"
                 id="extensionLibrary"
                 tags={extensionTags}
                 title={this.props.intl.formatMessage(messages.extensionTitle)}

@@ -51,6 +51,15 @@ class SecurityManager {
     }
 
     /**
+     * Allows last-minute changing the real URL of the extension that gets loaded.
+     * @param {*} extensionURL The URL requested to be loaded.
+     * @returns {Promise<string>|string} The URL to actually load.
+     */
+    rewriteExtensionURL (extensionURL) {
+        return Promise.resolve(extensionURL);
+    }
+
+    /**
      * Determine whether an extension is allowed to fetch a remote resource URL.
      * This only applies to unsandboxed extensions that use the appropriate Scratch.* APIs.
      * Sandboxed extensions ignore this entirely as there is no way to force them to use our APIs.

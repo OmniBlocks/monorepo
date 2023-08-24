@@ -356,3 +356,49 @@ test('canGeolocate', async t => {
     
     t.end();
 });
+
+test('rewriteExtensionURL', async t => {
+    const vm = new VirtualMachine();
+
+    let createdRewrittenExtension = false;
+    class RewrittenExtension {
+        getInfo () {
+            createdRewrittenExtension = true;
+            return {
+                id: 'extensionid',
+                blocks: []
+            };
+        }
+    }
+    setScript('https://turbowarp.org/rewritten.js', () => {
+        global.Scratch.extensions.register(new RewrittenExtension());
+    });
+
+    class OriginalExtension {
+        getInfo () {
+            t.fail('Should not create original extension');
+            return {
+                id: 'extensionid',
+                blocks: []
+            };
+        }
+    }
+    setScript('https://turbowarp.org/original.js', () => {
+        global.Scratch.extensions.register(new OriginalExtension());
+    });
+
+    vm.securityManager.getSandboxMode = () => 'unsandboxed';
+    vm.securityManager.rewriteExtensionURL = url => {
+        if (url === 'https://turbowarp.org/original.js') {
+            return 'https://turbowarp.org/rewritten.js';
+        }
+        return url;
+    };
+
+    await vm.extensionManager.loadExtensionURL('https://turbowarp.org/original.js');
+
+    t.ok(createdRewrittenExtension, 'used rewritten extension');
+    t.ok(vm.extensionManager.isExtensionURLLoaded('https://turbowarp.org/original.js'), 'marks original URL as loaded');
+    t.notOk(vm.extensionManager.isExtensionURLLoaded('https://turbowarp.org/rewritten.js'), 'does not mark new URL as loaded');
+    t.end();
+});

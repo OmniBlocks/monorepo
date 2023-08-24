@@ -221,10 +221,11 @@ class ExtensionManager {
         this.loadingAsyncExtensions++;
 
         const sandboxMode = await this.securityManager.getSandboxMode(extensionURL);
+        const rewritten = await this.securityManager.rewriteExtensionURL(extensionURL);
 
         if (sandboxMode === 'unsandboxed') {
             const {load} = require('./tw-unsandboxed-extension-runner');
-            const extensionObjects = await load(extensionURL, this.vm)
+            const extensionObjects = await load(rewritten, this.vm)
                 .catch(error => this._failedLoadingExtensionScript(error));
             const fakeWorkerId = this.nextExtensionWorker++;
             this.workerURLs[fakeWorkerId] = extensionURL;
@@ -253,7 +254,7 @@ class ExtensionManager {
         /* eslint-enable max-len */
 
         return new Promise((resolve, reject) => {
-            this.pendingExtensions.push({extensionURL, resolve, reject});
+            this.pendingExtensions.push({extensionURL: rewritten, resolve, reject});
             dispatch.addWorker(new ExtensionWorker());
         }).catch(error => this._failedLoadingExtensionScript(error));
     }

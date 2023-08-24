@@ -143,6 +143,15 @@ class SecurityManager {
     canGeolocate () {
         return Promise.resolve(true);
     }
+
+    /**
+     * Determine whether an extension is allowed to embed content from a given URL.
+     * @param {string} documentURL The URL of the embed.
+     * @returns {Promise<boolean>|boolean}
+     */
+    canEmbed (documentURL) {
+        return Promise.resolve(true);
+    }
 }
 
 module.exports = SecurityManager;

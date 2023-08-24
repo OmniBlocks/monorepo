@@ -402,3 +402,14 @@ test('rewriteExtensionURL', async t => {
     t.notOk(vm.extensionManager.isExtensionURLLoaded('https://turbowarp.org/rewritten.js'), 'does not mark new URL as loaded');
     t.end();
 });
+
+test('canEmbed', async t => {
+    const vm = new VirtualMachine();
+    UnsandboxedExtensionRunner.setupUnsandboxedExtensionAPI(vm);
+
+    vm.securityManager.canEmbed = url => url === 'https://example.com/safe';
+    t.ok(await global.Scratch.canEmbed('https://example.com/safe'));
+    t.notOk(await global.Scratch.canEmbed('https://example.com/unsafe'));
+    
+    t.end();
+});

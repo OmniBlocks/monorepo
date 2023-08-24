@@ -85,6 +85,8 @@ const setupUnsandboxedExtensionAPI = vm => new Promise(resolve => {
 
     Scratch.canGeolocate = async () => vm.securityManager.canGeolocate();
 
+    Scratch.canEmbed = async url => vm.securityManager.canEmbed(url);
+
     Scratch.fetch = async (url, options) => {
         const actualURL = url instanceof Request ? url.url : url;
         if (!await Scratch.canFetch(actualURL)) {

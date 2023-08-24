@@ -131,3 +131,8 @@ test('canGeolocate', async t => {
     t.equal(await global.Scratch.canGeolocate(), false);
     t.end();
 });
+
+test('canEmbed', async t => {
+    t.equal(await global.Scratch.canEmbed('https://example.com/'), false);
+    t.end();
+});

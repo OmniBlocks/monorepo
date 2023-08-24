@@ -7,7 +7,8 @@ const SecurityModals = {
     RecordVideo: 'RecordVideo',
     ReadClipboard: 'ReadClipboard',
     Notify: 'Notify',
-    Geolocate: 'Geolocate'
+    Geolocate: 'Geolocate',
+    Embed: 'Embed'
 };
 
 export default SecurityModals;

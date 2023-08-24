@@ -37,6 +37,12 @@ const isTrustedExtension = url => (
 const fetchOriginsTrustedByUser = new Set();
 
 /**
+ * Set of origins manually trusted by the user for embedding.
+ * @type {Set<string>}
+ */
+const embedOriginsTrustedByUser = new Set();
+
+/**
  * @param {URL} parsed Parsed URL object
  * @returns {boolean} True if the URL is part of the builtin set of URLs to always trust fetching from.
  */
@@ -114,7 +120,8 @@ const SECURITY_MANAGER_METHODS = [
     'canRecordVideo',
     'canReadClipboard',
     'canNotify',
-    'canGeolocate'
+    'canGeolocate',
+    'canEmbed'
 ];
 
 class TWSecurityManagerComponent extends React.Component {
@@ -359,6 +366,28 @@ class TWSecurityManagerComponent extends React.Component {
             allowedGeolocation = await showModal(SecurityModals.Geolocate);
         }
         return allowedGeolocation;
+    }
+
+    /**
+     * @param {string} url Frame URL
+     * @returns {Promise<boolean>} True if embed is allowed.
+     */
+    async canEmbed (url) {
+        const parsed = parseURL(url);
+        if (!parsed) {
+            return false;
+        }
+        const origin = (parsed.protocol === 'http:' || parsed.protocol === 'https:') ? parsed.origin : null;
+        const {showModal, releaseLock} = await this.acquireModalLock();
+        if (origin && embedOriginsTrustedByUser.has(origin)) {
+            releaseLock();
+            return true;
+        }
+        const allowed = await showModal(SecurityModals.Embed, {url});
+        if (origin && allowed) {
+            embedOriginsTrustedByUser.add(origin);
+        }
+        return allowed;
     }
 
     render () {

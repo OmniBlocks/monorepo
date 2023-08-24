@@ -5562,14 +5562,23 @@ export class Song {
                 customSamplePresetSettings["chipWavePlayBackwards"] = presetChipWavePlayBackwards;
                 customSamplePresetSettings["chipWaveStartOffset"] = presetChipWaveStartOffset != null ? presetChipWaveStartOffset : 0;
             }
-            customSamplePresets.push({
+            const customSamplePreset: Preset = {
                 index: 0, // This should be overwritten by toNameMap, in our caller.
                 name: name,
                 midiProgram: 80,
                 settings: customSamplePresetSettings,
-            });
+            };
+            customSamplePresets.push(customSamplePreset);
             if (!Config.willReloadForCustomSamples) {
-                startLoadingSample(urlSliced, chipWaveIndex, customSampleRate);
+                const rawLoopOptions: any = {
+                    "isUsingAdvancedLoopControls": presetIsUsingAdvancedLoopControls,
+                    "chipWaveLoopStart": presetChipWaveLoopStart,
+                    "chipWaveLoopEnd": presetChipWaveLoopEnd,
+                    "chipWaveLoopMode": presetChipWaveLoopMode,
+                    "chipWavePlayBackwards": presetChipWavePlayBackwards,
+                    "chipWaveStartOffset": presetChipWaveStartOffset,
+                };
+                startLoadingSample(urlSliced, chipWaveIndex, customSamplePresetSettings, rawLoopOptions, customSampleRate);
             }
             sampleLoadingState.statusTable[chipWaveIndex] = SampleLoadingStatus.loading;
             sampleLoadingState.urlTable[chipWaveIndex] = urlSliced;

@@ -307,7 +307,7 @@ export class SampleLoadEvents extends EventTarget {
 
 export const sampleLoadEvents: SampleLoadEvents = new SampleLoadEvents();
 
-export function startLoadingSample(url: string, chipWaveIndex: number, customSampleRate: number): void {
+export function startLoadingSample(url: string, chipWaveIndex: number, presetSettings: Dictionary<any>, rawLoopOptions: any, customSampleRate: number): void {
     // @TODO: Make parts of the code that expect everything to already be
     // in memory work correctly.
     // It would be easy to only instantiate `SongEditor` and company after
@@ -336,6 +336,13 @@ export function startLoadingSample(url: string, chipWaveIndex: number, customSam
 	chipWave.samples = integratedSamples;
 	rawChipWave.samples = samples;
 	rawRawChipWave.samples = samples;
+	if (rawLoopOptions["isUsingAdvancedLoopControls"]) {
+	    presetSettings["chipWaveLoopStart"] = rawLoopOptions["chipWaveLoopStart"] != null ? rawLoopOptions["chipWaveLoopStart"] : 0;
+	    presetSettings["chipWaveLoopEnd"] = rawLoopOptions["chipWaveLoopEnd"] != null ? rawLoopOptions["chipWaveLoopEnd"] : samples.length - 1;
+	    presetSettings["chipWaveLoopMode"] = rawLoopOptions["chipWaveLoopMode"] != null ? rawLoopOptions["chipWaveLoopMode"] : 0;
+	    presetSettings["chipWavePlayBackwards"] = rawLoopOptions["chipWavePlayBackwards"];
+	    presetSettings["chipWaveStartOffset"] = rawLoopOptions["chipWaveStartOffset"] != null ? rawLoopOptions["chipWaveStartOffset"] : 0;
+	}
 	sampleLoadingState.samplesLoaded++;
 	sampleLoadingState.statusTable[chipWaveIndex] = SampleLoadingStatus.loaded;
 	sampleLoadEvents.dispatchEvent(new SampleLoadedEvent(

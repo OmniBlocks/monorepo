@@ -10,6 +10,7 @@ import Divider from '../divider/divider.jsx';
 import Filter from '../filter/filter.jsx';
 import TagButton from '../../containers/tag-button.jsx';
 import Spinner from '../spinner/spinner.jsx';
+import Separator from '../tw-extension-separator/separator.jsx';
 
 import styles from './library.css';
 
@@ -40,15 +41,19 @@ class LibraryComponent extends React.Component {
             'handleMouseLeave',
             'handlePlayingEnd',
             'handleSelect',
+            'handleFavorite',
             'handleTagClick',
             'setFilteredDataRef'
         ]);
+        const favorites = this.readFavoritesFromStorage();
         this.state = {
             playingItem: null,
             filterQuery: '',
             selectedTag: ALL_TAG.tag,
             loaded: false,
-            data: props.data
+            data: props.data,
+            favorites,
+            initialFavorites: favorites
         };
     }
     componentDidMount () {
@@ -63,26 +68,63 @@ class LibraryComponent extends React.Component {
         } else {
             // Allow the spinner to display before loading the content
             setTimeout(() => {
-                this.setState({loaded: true});
+                this.setState({
+                    loaded: true
+                });
             });
         }
         if (this.props.setStopHandler) this.props.setStopHandler(this.handlePlayingEnd);
+    }
+    componentWillReceiveProps (nextProps) {
+        if (nextProps.data !== this.props.data && Array.isArray(nextProps.data)) {
+            this.setState({
+                data: nextProps.data
+            });
+        }
     }
     componentDidUpdate (prevProps, prevState) {
         if (prevState.filterQuery !== this.state.filterQuery ||
             prevState.selectedTag !== this.state.selectedTag) {
             this.scrollToTop();
         }
-        if (prevProps.data !== this.props.data) {
-            // eslint-disable-next-line react/no-did-update-set-state
-            this.setState({
-                data: this.props.data
-            });
+
+        if (this.state.favorites !== prevState.favorites) {
+            try {
+                localStorage.setItem(this.getFavoriteStorageKey(), JSON.stringify(this.state.favorites));
+            } catch (error) {
+                // ignore
+            }
         }
     }
     handleSelect (id) {
         this.handleClose();
         this.props.onItemSelected(this.getFilteredData()[id]);
+    }
+    readFavoritesFromStorage () {
+        let data;
+        try {
+            data = JSON.parse(localStorage.getItem(this.getFavoriteStorageKey()));
+        } catch (error) {
+            // ignore
+        }
+        if (!Array.isArray(data)) {
+            data = [];
+        }
+        return data;
+    }
+    getFavoriteStorageKey () {
+        return `tw:library-favorites:${this.props.id}`;
+    }
+    handleFavorite (id) {
+        const data = this.getFilteredData()[id];
+        const key = data[this.props.persistableKey];
+        this.setState(oldState => ({
+            favorites: oldState.favorites.includes(key) ? (
+                oldState.favorites.filter(i => i !== key)
+            ) : (
+                [...oldState.favorites, key]
+            )
+        }));
     }
     handleClose () {
         this.props.onRequestClose();
@@ -145,12 +187,51 @@ class LibraryComponent extends React.Component {
         this.setState({filterQuery: ''});
     }
     getFilteredData () {
-        if (this.state.selectedTag === 'all') {
-            if (!this.state.filterQuery) return this.state.data;
-            return this.state.data.filter(dataItem => {
-                if (React.isValidElement(dataItem)) {
-                    return false;
-                }
+        // When no filtering, favorites get their own section
+        if (this.state.selectedTag === 'all' && !this.state.filterQuery) {
+            const favoriteItems = this.state.data
+                .filter(dataItem => (
+                    this.state.initialFavorites.includes(dataItem[this.props.persistableKey])
+                ))
+                .map(dataItem => ({
+                    ...dataItem,
+                    key: `favorite-${dataItem[this.props.persistableKey]}`
+                }));
+
+            if (favoriteItems.length) {
+                favoriteItems.push('---');
+            }
+
+            return [
+                ...favoriteItems,
+                ...this.state.data
+            ];
+        }
+
+        // When filtering, favorites are just listed first, not in a separte section.
+        const favoriteItems = [];
+        const nonFavoriteItems = [];
+        for (const dataItem of this.state.data) {
+            if (dataItem === '---') {
+                // ignore
+            } else if (this.state.initialFavorites.includes(dataItem[this.props.persistableKey])) {
+                favoriteItems.push(dataItem);
+            } else {
+                nonFavoriteItems.push(dataItem);
+            }
+        }
+
+        let filteredItems = favoriteItems.concat(nonFavoriteItems);
+
+        if (this.state.selectedTag !== 'all') {
+            filteredItems = filteredItems.filter(dataItem => (
+                dataItem.tags &&
+                dataItem.tags.map(i => i.toLowerCase()).includes(this.state.selectedTag)
+            ));
+        }
+
+        if (this.state.filterQuery) {
+            filteredItems = filteredItems.filter(dataItem => {
                 const search = [...dataItem.tags];
                 if (dataItem.name) {
                     // Use the name if it is a string, else use formatMessage to get the translated name
@@ -169,12 +250,8 @@ class LibraryComponent extends React.Component {
                     .includes(this.state.filterQuery.toLowerCase());
             });
         }
-        return this.state.data.filter(dataItem => (
-            dataItem.tags &&
-            dataItem.tags
-                .map(String.prototype.toLowerCase.call, String.prototype.toLowerCase)
-                .indexOf(this.state.selectedTag) !== -1
-        ));
+
+        return filteredItems;
     }
     scrollToTop () {
         this.filteredDataRef.scrollTop = 0;
@@ -234,10 +311,8 @@ class LibraryComponent extends React.Component {
                     ref={this.setFilteredDataRef}
                 >
                     {this.state.loaded ? this.getFilteredData().map((dataItem, index) => (
-                        React.isValidElement(dataItem) ? (
-                            <React.Fragment key={index}>
-                                {dataItem}
-                            </React.Fragment>
+                        dataItem === '---' ? (
+                            <Separator key={index} />
                         ) : (
                             <LibraryItem
                                 bluetoothRequired={dataItem.bluetoothRequired}
@@ -254,10 +329,16 @@ class LibraryComponent extends React.Component {
                                 icons={dataItem.costumes}
                                 id={index}
                                 incompatibleWithScratch={dataItem.incompatibleWithScratch}
+                                favorite={this.state.favorites.includes(dataItem[this.props.persistableKey])}
+                                onFavorite={this.handleFavorite}
                                 insetIconURL={dataItem.insetIconURL}
                                 internetConnectionRequired={dataItem.internetConnectionRequired}
                                 isPlaying={this.state.playingItem === index}
-                                key={typeof dataItem.name === 'string' ? dataItem.name : dataItem.rawURL}
+                                key={dataItem.key || (
+                                    typeof dataItem.name === 'string' ?
+                                        dataItem.name :
+                                        dataItem.rawURL
+                                )}
                                 name={dataItem.name}
                                 credits={dataItem.credits}
                                 showPlayButton={this.props.showPlayButton}
@@ -282,7 +363,7 @@ class LibraryComponent extends React.Component {
 
 LibraryComponent.propTypes = {
     data: PropTypes.oneOfType([
-        PropTypes.arrayOf(
+        PropTypes.arrayOf(PropTypes.oneOfType([
             /* eslint-disable react/no-unused-prop-types, lines-around-comment */
             // An item in the library
             PropTypes.shape({
@@ -293,14 +374,15 @@ LibraryComponent.propTypes = {
                     PropTypes.node
                 ]),
                 rawURL: PropTypes.string
-            })
+            }),
+            PropTypes.string
             /* eslint-enable react/no-unused-prop-types, lines-around-comment */
-        ),
-        PropTypes.node,
+        ])),
         PropTypes.instanceOf(Promise)
     ]),
     filterable: PropTypes.bool,
     id: PropTypes.string.isRequired,
+    persistableKey: PropTypes.string,
     intl: intlShape.isRequired,
     onItemMouseEnter: PropTypes.func,
     onItemMouseLeave: PropTypes.func,
@@ -314,6 +396,7 @@ LibraryComponent.propTypes = {
 
 LibraryComponent.defaultProps = {
     filterable: true,
+    persistableKey: 'name',
     showPlayButton: false
 };
 

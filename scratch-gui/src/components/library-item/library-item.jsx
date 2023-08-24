@@ -17,12 +17,20 @@ const messages = defineMessages({
         defaultMessage: 'Favorite',
         description: 'Alt text of icon in costume, sound, and extension libraries to mark an item as favorite.',
         id: 'tw.favorite'
+    },
+    unfavorite: {
+        defaultMessage: 'Unfavorite',
+        description: 'Alt text of icon in costume, sound, and extension libraries to unmark an item as favorite.',
+        id: 'tw.unfavorite'
     }
 });
 
 /* eslint-disable react/prefer-stateless-function */
 class LibraryItemComponent extends React.PureComponent {
     render () {
+        const favoriteMessage = this.props.intl.formatMessage(
+            this.props.favorite ? messages.unfavorite : messages.favorite
+        );
         const favorite = (
             <button
                 className={classNames(styles.favoriteContainer, {[styles.active]: this.props.favorite})}
@@ -32,8 +40,8 @@ class LibraryItemComponent extends React.PureComponent {
                     src={this.props.favorite ? favoriteActiveIcon : favoriteInactiveIcon}
                     className={styles.favoriteIcon}
                     draggable={false}
-                    alt={this.props.intl.formatMessage(messages.favorite)}
-                    title={this.props.intl.formatMessage(messages.favorite)}
+                    alt={favoriteMessage}
+                    title={favoriteMessage}
                 />
             </button>
         );

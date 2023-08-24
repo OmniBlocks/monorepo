@@ -1412,6 +1412,7 @@ class ScriptTreeGenerator {
 
         return {
             kind: 'compat',
+            id: block.id,
             opcode: block.opcode,
             blockType,
             inputs,

@@ -141,8 +141,8 @@ class ExtensionLibrary extends React.PureComponent {
         const library = extensionLibraryContent.map(toLibraryItem);
         library.push('---');
         if (this.state.gallery) {
-            library.push(...this.state.gallery.map(toLibraryItem));
             library.push(toLibraryItem(galleryMore));
+            library.push(...this.state.gallery.map(toLibraryItem));
         } else if (this.state.galleryError) {
             library.push(toLibraryItem(galleryError));
         } else {

@@ -48,8 +48,12 @@ class LibraryItem extends React.PureComponent {
             return;
         }
 
-        // eslint-disable-next-line no-alert
-        if (this.props.incompatibleWithScratch && !confirm(this.props.intl.formatMessage(messages.incompatible))) {
+        if (
+            !this.props.favorite &&
+            this.props.incompatibleWithScratch &&
+            // eslint-disable-next-line no-alert
+            !confirm(this.props.intl.formatMessage(messages.incompatible))
+        ) {
             return;
         }
 

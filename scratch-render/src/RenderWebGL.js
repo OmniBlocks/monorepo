@@ -99,6 +99,17 @@ const lazilyLoadTextWrapper = () => {
     return _TextWrapper;
 };
 
+let _stylesheet;
+const loadStyles = () => {
+    if (!_stylesheet) {
+        _stylesheet = document.createElement('style');
+        // eslint-disable-next-line global-require
+        _stylesheet.textContent = require('!raw-loader!./renderer.css');
+        _stylesheet.className = 'scratch-render-styles';
+        document.head.appendChild(_stylesheet);
+    }
+};
+
 
 class RenderWebGL extends EventEmitter {
     /**
@@ -244,18 +255,15 @@ class RenderWebGL extends EventEmitter {
          * @type {HTMLElement}
          */
         this.scaledOverlay = document.createElement('div');
-        this.scaledOverlay.style.position = 'absolute';
-        this.scaledOverlay.style.top = '0';
-        this.scaledOverlay.style.left = '0';
-        this.scaledOverlay.style.transformOrigin = 'top left';
+        this.scaledOverlay.className = 'scratch-render-scaled-overlay';
 
         /**
          * Stage overlay element with dimensions set to stage's actual size. No automatic upscaling.
          */
         this.unscaledOverlay = document.createElement('div');
-        this.unscaledOverlay.style.position = 'absolute';
-        this.unscaledOverlay.style.top = '0';
-        this.unscaledOverlay.style.left = '0';
+        this.unscaledOverlay.className = 'scratch-render-unscaled-overlay';
+
+        loadStyles();
 
         this._createGeometry();
 

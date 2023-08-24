@@ -109,9 +109,7 @@ class ExtensionLibrary extends React.PureComponent {
 
         const extensionId = item.extensionId;
 
-        // Don't warn about Scratch compatibility before showing modal
-        const isCustomURL = !item.disabled && !extensionId;
-        if (isCustomURL) {
+        if (extensionId === 'custom_extension') {
             this.props.onOpenCustomExtensionModal();
             return;
         }

@@ -3,33 +3,9 @@ import PropTypes from 'prop-types';
 import {FormattedMessage} from 'react-intl';
 import styles from './load-extension.css';
 import URL from './url.jsx';
+import DataURL from './data-url.jsx';
 import FancyCheckbox from '../tw-fancy-checkbox/checkbox.jsx';
 import {APP_NAME} from '../../lib/brand';
-
-/**
- * @param {string} dataURI data: URI
- * @returns {string} A hopefully human-readable version
- */
-const decodeDataURI = dataURI => {
-    const delimeter = dataURI.indexOf(',');
-    if (delimeter === -1) {
-        return dataURI;
-    }
-    const contentType = dataURI.substring(0, delimeter);
-    const data = dataURI.substring(delimeter + 1);
-    if (contentType.endsWith(';base64')) {
-        try {
-            return atob(data);
-        } catch (e) {
-            return dataURI;
-        }
-    }
-    try {
-        return decodeURIComponent(data);
-    } catch (e) {
-        return dataURI;
-    }
-};
 
 const LoadExtensionModal = props => (
     <div>
@@ -40,12 +16,7 @@ const LoadExtensionModal = props => (
                     description="Part of modal asking for permission to automatically load custom extension"
                     id="tw.loadExtension.embedded"
                 />
-                <textarea
-                    className={styles.code}
-                    value={decodeDataURI(props.url)}
-                    readOnly
-                    spellCheck={false}
-                />
+                <DataURL url={props.url} />
             </React.Fragment>
         ) : (
             <React.Fragment>

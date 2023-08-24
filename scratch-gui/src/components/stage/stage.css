@@ -78,6 +78,11 @@ stage doesn't "spill" out from under its rounded corners. instead, shift these o
     left: 0;
     pointer-events: none;
 }
+.custom-overlays {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
 
 .dragging-sprite {
     position: absolute;

@@ -70,6 +70,14 @@ const StageComponent = props => {
                         }}
                         {...boxProps}
                     />
+                    <Box className={styles.customOverlays}>
+                        {props.overlays.map((element, index) => (
+                            <DOMElementRenderer
+                                key={index}
+                                domElement={element}
+                            />
+                        ))}
+                    </Box>
                     <Box className={styles.monitorWrapper}>
                         <MonitorList
                             draggable={useEditorDragStyle}
@@ -150,6 +158,7 @@ StageComponent.propTypes = {
         width: PropTypes.number,
         height: PropTypes.height
     }),
+    overlays: PropTypes.arrayOf(PropTypes.instanceOf(Element)),
     colorInfo: Loupe.propTypes.colorInfo,
     dragRef: PropTypes.func,
     isColorPicking: PropTypes.bool,

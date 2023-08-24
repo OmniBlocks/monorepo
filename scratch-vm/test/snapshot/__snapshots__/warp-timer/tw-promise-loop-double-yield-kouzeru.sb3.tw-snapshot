@@ -11,9 +11,9 @@ return function* genXYZ () {
 while (true) {
 if (compareEqual(b0.value, b1.value)) {
 } else {
-yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b2, false, false, null, null);
+yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b2, false, false, "89/dl$1dp$~nj81:jj@H", null);
 b1.value = b0.value;
-yield* executeInCompatibilityLayer({"VALUE":b0.value,"EFFECT":"pitch",}, b3, false, true, null, null);
+yield* executeInCompatibilityLayer({"VALUE":b0.value,"EFFECT":"pitch",}, b3, false, true, "*=8r,g4Pzvxo?aSMcpfX", null);
 if (hasResumedFromPromise) {hasResumedFromPromise = false;continue;}
 }
 yield;
@@ -28,7 +28,7 @@ const b1 = runtime.getOpcodeFunction("looks_say");
 const b2 = stage.variables["JbF5exWEi*m?-UEmkASS"];
 return function* genXYZ () {
 b0.value = 0;
-yield* executeInCompatibilityLayer({"MESSAGE":"plan 15",}, b1, false, false, null, null);
+yield* executeInCompatibilityLayer({"MESSAGE":"plan 15",}, b1, false, false, "0/2-)Gp^^=haQ1OMD.xb", null);
 for (var a0 = 15; a0 >= 0.5; a0--) {
 if (((+b2.value || 0) === 200)) {
 b2.value = 50;
@@ -45,7 +45,7 @@ yield;
 thread.timer = null;
 yield;
 }
-yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b1, false, false, null, null);
+yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b1, false, false, "--nBRXyJfqS0MM9`#S3}", null);
 runtime.stopAll();
 retire(); return;
 retire(); return;

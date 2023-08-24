@@ -5,10 +5,10 @@
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
 const b0 = runtime.getOpcodeFunction("looks_say");
 return function* genXYZ () {
-yield* executeInCompatibilityLayer({"MESSAGE":"plan 2",}, b0, false, false, null, null);
+yield* executeInCompatibilityLayer({"MESSAGE":"plan 2",}, b0, false, false, "J#qm1yA(@Z6mj%Mgh;0X", null);
 yield* thread.procedures["Znumber or text %s %s"]("bad","ok");
 yield* thread.procedures["Zboolean %b %b"]("false",!false);
-yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, null, null);
+yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, "$R-1lb(Mu?gdTIH^;kC_", null);
 retire(); return;
 }; })
 
@@ -17,7 +17,7 @@ retire(); return;
 const b0 = runtime.getOpcodeFunction("looks_say");
 return function* genXYZ_number_or_text__ (p0,p1) {
 if ((("" + p1).toLowerCase() === "ok".toLowerCase())) {
-yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b0, false, false, null, null);
+yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b0, false, false, "HH`yRe9(x5%D:eV@EmkE", null);
 }
 return "";
 }; })
@@ -27,7 +27,7 @@ return "";
 const b0 = runtime.getOpcodeFunction("looks_say");
 return function* genXYZ_boolean__ (p0,p1) {
 if (toBoolean(p1)) {
-yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b0, false, false, null, null);
+yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b0, false, false, "M^!cgco]B(V)je$a6lF7", null);
 }
 return "";
 }; })

@@ -5,7 +5,7 @@
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
 const b0 = runtime.getOpcodeFunction("looks_say");
 return function* genXYZ () {
-yield* executeInCompatibilityLayer({"MESSAGE":"plan 0",}, b0, false, false, null, null);
-yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, null, null);
+yield* executeInCompatibilityLayer({"MESSAGE":"plan 0",}, b0, false, false, "a", null);
+yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, "f", null);
 retire(); return;
 }; })

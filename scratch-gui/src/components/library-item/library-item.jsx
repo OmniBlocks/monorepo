@@ -42,6 +42,7 @@ class LibraryItemComponent extends React.PureComponent {
                             aspectRatio: this.props.iconAspectRatio ? this.props.iconAspectRatio.toString() : ''
                         }}
                         loading="lazy"
+                        draggable={false}
                         src={this.props.iconURL}
                     />
                 </div>
@@ -50,6 +51,7 @@ class LibraryItemComponent extends React.PureComponent {
                         <img
                             className={styles.libraryItemInsetImage}
                             src={this.props.insetIconURL}
+                            draggable={false}
                         />
                     </div>
                 ) : null}
@@ -103,10 +105,16 @@ class LibraryItemComponent extends React.PureComponent {
                                         className={styles.featuredExtensionMetadataDetail}
                                     >
                                         {this.props.bluetoothRequired ? (
-                                            <img src={bluetoothIconURL} />
+                                            <img
+                                                src={bluetoothIconURL}
+                                                draggable={false}
+                                            />
                                         ) : null}
                                         {this.props.internetConnectionRequired ? (
-                                            <img src={internetConnectionIconURL} />
+                                            <img
+                                                src={internetConnectionIconURL}
+                                                draggable={false}
+                                            />
                                         ) : null}
                                     </div>
                                 </div>
@@ -160,6 +168,7 @@ class LibraryItemComponent extends React.PureComponent {
                             className={styles.libraryItemImage}
                             loading="lazy"
                             src={this.props.iconURL}
+                            draggable={false}
                         />
                     </Box>
                 </Box>

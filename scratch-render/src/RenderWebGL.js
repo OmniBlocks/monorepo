@@ -238,6 +238,25 @@ class RenderWebGL extends EventEmitter {
 
         this.dirty = true;
 
+        /**
+         * Stage overlay element with dimensions set to stage's native size. Automatically upscaled
+         * using CSS transform.
+         * @type {HTMLElement}
+         */
+        this.scaledOverlay = document.createElement('div');
+        this.scaledOverlay.style.position = 'absolute';
+        this.scaledOverlay.style.top = '0';
+        this.scaledOverlay.style.left = '0';
+        this.scaledOverlay.style.transformOrigin = 'top left';
+
+        /**
+         * Stage overlay element with dimensions set to stage's actual size. No automatic upscaling.
+         */
+        this.unscaledOverlay = document.createElement('div');
+        this.unscaledOverlay.style.position = 'absolute';
+        this.unscaledOverlay.style.top = '0';
+        this.unscaledOverlay.style.left = '0';
+
         this._createGeometry();
 
         this.on(RenderConstants.Events.NativeSizeChanged, this.onNativeSizeChanged);
@@ -370,11 +389,18 @@ class RenderWebGL extends EventEmitter {
         if (canvas.width !== newWidth || canvas.height !== newHeight) {
             canvas.width = newWidth;
             canvas.height = newHeight;
+
+            this._updateRenderQuality();
+
+            this.unscaledOverlay.style.width = `${pixelsWide}px`;
+            this.unscaledOverlay.style.height = `${pixelsTall}px`;
+            const xScale = pixelsWide / this._nativeSize[0];
+            const yScale = pixelsTall / this._nativeSize[1];
+            this.scaledOverlay.style.transform = `scale(${xScale},${yScale})`;
+
             // Resizing the canvas causes it to be cleared, so redraw it.
             this.dirty = true;
             this.draw();
-
-            this._updateRenderQuality();
         }
 
     }
@@ -451,7 +477,13 @@ class RenderWebGL extends EventEmitter {
      */
     _setNativeSize (width, height) {
         this._nativeSize = [width, height];
+        this.scaledOverlay.style.width = `${width}px`;
+        this.scaledOverlay.style.height = `${height}px`;
         this.emit(RenderConstants.Events.NativeSizeChanged, {newSize: this._nativeSize});
+    }
+
+    getOverlays () {
+        return [this.unscaledOverlay, this.scaledOverlay];
     }
 
     /**

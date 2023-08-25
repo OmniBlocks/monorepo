@@ -1,6 +1,6 @@
 import { HTML, SVG } from "imperative-html/dist/esm/elements-strict";
 import { Dictionary, Config } from "../synth/SynthConfig";
-import { clamp } from "../synth/synth";
+import { clamp, parseFloatWithDefault, parseIntWithDefault } from "../synth/synth";
 import { ColorConfig } from "./ColorConfig";
 import { EditorConfig } from "./EditorConfig";
 import { SongDocument } from "./SongDocument";
@@ -139,7 +139,10 @@ export class AddSamplesPrompt {
     constructor(_doc: SongDocument) {
         this._doc = _doc;
         if (EditorConfig.customSamples != null) {
-            const parsed = this._parseURLs(EditorConfig.customSamples);
+            // In this case, `EditorConfig.customSamples` should have the URLs
+            // with the new syntax, as we only use that when saving, and we
+            // also force the new syntax on load, in `Song._parseAndConfigureCustomSample`.
+            const parsed = this._parseURLs(EditorConfig.customSamples, false);
             this._entries = parsed.entries;
         }
         this._addSampleButton.addEventListener("click", this._whenAddSampleClicked);
@@ -219,12 +222,15 @@ export class AddSamplesPrompt {
     private _whenBulkAddConfirmClicked = (event: Event): void => {
         this._addSamplesArea.style.display = "";
         this._bulkAddArea.style.display = "none";
+        // In this case, we shouldn't really bother supporting the old syntax,
+        // as people are only really sharing URLs with the new one.
         const parsed: ParsedEntries = this._parseURLs(
             this._bulkAddTextarea.value
                 .replace(/\n/g, "|")
                 .split("|")
                 .map((x: string) => decodeURIComponent(x.trim()))
-                .filter((x: string) => x !== "")
+                .filter((x: string) => x !== ""),
+            false
         );
         const seen: Map<string, boolean> = new Map();
         for (const entry of this._entries) {
@@ -267,21 +273,15 @@ export class AddSamplesPrompt {
     private _whenSampleRateChanges = (event: Event): void => {
         const element: HTMLInputElement = <HTMLInputElement>event.target;
         const entryIndex: number = +(element.dataset.index!);
-        if (element.value === "") {
-            this._entries[entryIndex].sampleRate = 44100;
-        } else {
-            this._entries[entryIndex].sampleRate = clamp(8000, 96000 + 1, +element.value);
-        }
+        const value: number = clamp(8000, 96000 + 1, parseFloatWithDefault(element.value, 44100));
+        this._entries[entryIndex].sampleRate = value;
     }
 
     private _whenRootKeyChanges = (event: Event): void => {
         const element: HTMLInputElement = <HTMLInputElement>event.target;
         const entryIndex: number = +(element.dataset.index!);
-        if (element.value === "") {
-            this._entries[entryIndex].rootKey = 60;
-        } else {
-            this._entries[entryIndex].rootKey = +element.value;
-        }
+        const value: number = parseFloatWithDefault(element.value, 60);
+        this._entries[entryIndex].rootKey = value;
         const rootKeyDisplay: HTMLSpanElement | null | undefined = element.parentNode?.parentNode?.querySelector(".add-sample-prompt-root-key-display");
         if (rootKeyDisplay != null) {
             const noteName: string = this._noteNameFromPitchNumber(this._entries[entryIndex].rootKey);
@@ -300,31 +300,22 @@ export class AddSamplesPrompt {
     private _whenChipWaveLoopStartChanges = (event: Event): void => {
         const element: HTMLInputElement = <HTMLInputElement>event.target;
         const entryIndex: number = +(element.dataset.index!);
-        if (element.value === "") {
-            this._entries[entryIndex].chipWaveLoopStart = null;
-        } else {
-            this._entries[entryIndex].chipWaveLoopStart = +element.value;
-        }
+        const value: number | null = parseIntWithDefault(element.value, null);
+        this._entries[entryIndex].chipWaveLoopStart = value;
     }
 
     private _whenChipWaveLoopEndChanges = (event: Event): void => {
         const element: HTMLInputElement = <HTMLInputElement>event.target;
         const entryIndex: number = +(element.dataset.index!);
-        if (element.value === "") {
-            this._entries[entryIndex].chipWaveLoopEnd = null;
-        } else {
-            this._entries[entryIndex].chipWaveLoopEnd = +element.value;
-        }
+        const value: number | null = parseIntWithDefault(element.value, null);
+        this._entries[entryIndex].chipWaveLoopEnd = value;
     }
 
     private _whenChipWaveStartOffsetChanges = (event: Event): void => {
         const element: HTMLInputElement = <HTMLInputElement>event.target;
         const entryIndex: number = +(element.dataset.index!);
-        if (element.value === "") {
-            this._entries[entryIndex].chipWaveStartOffset = null;
-        } else {
-            this._entries[entryIndex].chipWaveStartOffset = +element.value;
-        }
+        const value: number | null = parseIntWithDefault(element.value, null);
+        this._entries[entryIndex].chipWaveStartOffset = value;
     }
 
     private _whenChipWaveLoopModeChanges = (event: Event): void => {
@@ -425,16 +416,16 @@ export class AddSamplesPrompt {
         }
     }
 
-    private _parseURLs = (urls: string[]): ParsedEntries => {
+    private _parseURLs = (urls: string[], parseOldSyntax: boolean): ParsedEntries => {
         // @TODO: Duplicated code like this isn't great (in this case coming from Song.fromBase64String).
         function sliceForSampleRate(url: string): [string, number] {
             const newUrl = url.slice(0, url.indexOf(","));
-            const sampleRate = clamp(8000, 96000 + 1, parseFloat(url.slice(url.indexOf(",") + 1)));
+            const sampleRate = clamp(8000, 96000 + 1, parseFloatWithDefault(url.slice(url.indexOf(",") + 1), 44100));
             return [newUrl, sampleRate];
         }
         function sliceForRootKey(url: string): [string, number] {
             const newUrl = url.slice(0, url.indexOf("!"));
-            const rootKey = parseFloat(url.slice(url.indexOf("!") + 1));
+            const rootKey = parseFloatWithDefault(url.slice(url.indexOf("!") + 1), 60);
             return [newUrl, rootKey];
         }
         let useLegacySamples: boolean = false;
@@ -509,19 +500,25 @@ export class AddSamplesPrompt {
                             const optionCode: string = rawOption.charAt(0);
                             const optionData: string = rawOption.slice(1, rawOption.length);
                             if (optionCode === "s") {
-                                sampleRate = clamp(8000, 96000 + 1, parseFloat(optionData));
+                                sampleRate = clamp(8000, 96000 + 1, parseFloatWithDefault(optionData, 44100));
                             } else if (optionCode === "r") {
-                                rootKey = parseFloat(optionData);
+                                rootKey = parseFloatWithDefault(optionData, 60);
                             } else if (optionCode === "p") {
                                 percussion = true;
                             } else if (optionCode === "a") {
-                                chipWaveLoopStart = parseInt(optionData);
+                                chipWaveLoopStart = parseIntWithDefault(optionData, null);
                             } else if (optionCode === "b") {
-                                chipWaveLoopEnd = parseInt(optionData);
+                                chipWaveLoopEnd = parseIntWithDefault(optionData, null);
                             } else if (optionCode === "c") {
-                                chipWaveStartOffset = parseInt(optionData);
+                                chipWaveStartOffset = parseIntWithDefault(optionData, null);
                             } else if (optionCode === "d") {
-                                chipWaveLoopMode = parseInt(optionData);
+                                chipWaveLoopMode = parseIntWithDefault(optionData, null);
+                                if (chipWaveLoopMode != null) {
+                                    // @TODO: Error-prone. This should be
+                                    // automatically derived from the list of
+                                    // available loop modes.
+                                    chipWaveLoopMode = clamp(0, 3 + 1, chipWaveLoopMode);
+                                }
                             } else if (optionCode === "e") {
                                 chipWavePlayBackwards = true;
                             }
@@ -530,27 +527,29 @@ export class AddSamplesPrompt {
                         parsedSampleOptions = true;
                     }
                 }
-                if (!parsedSampleOptions) {
-                    if (url.indexOf("@") != -1) {
-                        urlSliced = url.replaceAll("@", "");
-                        percussion = true;
-                    }
-                    if (url.indexOf(",") != -1 && url.indexOf("!") != -1) {
-                        if (url.indexOf(",") < url.indexOf("!")) {
-                            [urlSliced, rootKey] = sliceForRootKey(urlSliced);
-                            [urlSliced, sampleRate] = sliceForSampleRate(urlSliced);
+                if (parseOldSyntax) {
+                    if (!parsedSampleOptions) {
+                        if (url.indexOf("@") != -1) {
+                            urlSliced = url.replaceAll("@", "");
+                            percussion = true;
+                        }
+                        if (url.indexOf(",") != -1 && url.indexOf("!") != -1) {
+                            if (url.indexOf(",") < url.indexOf("!")) {
+                                [urlSliced, rootKey] = sliceForRootKey(urlSliced);
+                                [urlSliced, sampleRate] = sliceForSampleRate(urlSliced);
+                            }
+                            else {
+                                [urlSliced, sampleRate] = sliceForSampleRate(urlSliced);
+                                [urlSliced, rootKey] = sliceForRootKey(urlSliced);
+                            }
                         }
                         else {
-                            [urlSliced, sampleRate] = sliceForSampleRate(urlSliced);
-                            [urlSliced, rootKey] = sliceForRootKey(urlSliced);
-                        }
-                    }
-                    else {
-                        if (url.indexOf(",") != -1) {
-                            [urlSliced, sampleRate] = sliceForSampleRate(urlSliced);
-                        }
-                        if (url.indexOf("!") != -1) {
-                            [urlSliced, rootKey] = sliceForRootKey(urlSliced);
+                            if (url.indexOf(",") != -1) {
+                                [urlSliced, sampleRate] = sliceForSampleRate(urlSliced);
+                            }
+                            if (url.indexOf("!") != -1) {
+                                [urlSliced, rootKey] = sliceForRootKey(urlSliced);
+                            }
                         }
                     }
                 }

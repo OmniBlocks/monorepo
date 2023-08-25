@@ -35,6 +35,18 @@ function validateRange(min: number, max: number, val: number): number {
     throw new Error(`Value ${val} not in range [${min}, ${max}]`);
 }
 
+export function parseFloatWithDefault<T>(s: string, defaultValue: T): number | T {
+    let result: number | T = parseFloat(s);
+    if (Number.isNaN(result)) result = defaultValue;
+    return result;
+}
+
+export function parseIntWithDefault<T>(s: string, defaultValue: T): number | T {
+    let result: number | T = parseInt(s);
+    if (Number.isNaN(result)) result = defaultValue;
+    return result;
+}
+
 function encode32BitNumber(buffer: number[], x: number): void {
     // 0b11_
     buffer.push(base64IntToCharCode[(x >>> (6 * 5)) & 0x3]);
@@ -3515,7 +3527,10 @@ export class Song {
                         }
                         
                         else {
-                            const ok: boolean = Song._parseAndConfigureCustomSample(url, customSampleUrls, customSamplePresets, sampleLoadingState);
+                            // UB version 2 URLs and below will be using the old syntax, so we do need to parse it in that case.
+                            // UB version 3 URLs should only have the new syntax, though, unless the user has edited the URL manually.
+                            const parseOldSyntax: boolean = beforeThree;
+                            const ok: boolean = Song._parseAndConfigureCustomSample(url, customSampleUrls, customSamplePresets, sampleLoadingState, parseOldSyntax);
                             if (!ok) {
                                 continue;
                             }
@@ -5368,7 +5383,7 @@ export class Song {
     }
 
     // @TODO: Share more of this code with AddSamplesPrompt.
-    private static _parseAndConfigureCustomSample(url: string, customSampleUrls: string[], customSamplePresets: Preset[], sampleLoadingState: SampleLoadingState): boolean {
+    private static _parseAndConfigureCustomSample(url: string, customSampleUrls: string[], customSamplePresets: Preset[], sampleLoadingState: SampleLoadingState, parseOldSyntax: boolean): boolean {
         const defaultIndex: number = 0;
         const defaultIntegratedSamples: Float32Array = Config.chipWaves[defaultIndex].samples;
         const defaultSamples: Float32Array = Config.rawRawChipWaves[defaultIndex].samples;
@@ -5402,26 +5417,37 @@ export class Song {
                     const optionCode: string = rawOption.charAt(0);
                     const optionData: string = rawOption.slice(1, rawOption.length);
                     if (optionCode === "s") {
-                        customSampleRate = clamp(8000, 96000 + 1, parseFloat(optionData));
+                        customSampleRate = clamp(8000, 96000 + 1, parseFloatWithDefault(optionData, 44100));
                     } else if (optionCode === "r") {
-                        customRootKey = parseFloat(optionData);
+                        customRootKey = parseFloatWithDefault(optionData, 60);
                     } else if (optionCode === "p") {
                         isCustomPercussive = true;
                     } else if (optionCode === "a") {
-                        presetIsUsingAdvancedLoopControls = true;
-                        presetChipWaveLoopStart = parseInt(optionData);
+                        presetChipWaveLoopStart = parseIntWithDefault(optionData, null);
+                        if (presetChipWaveLoopStart != null) {
+                            presetIsUsingAdvancedLoopControls = true;
+                        }
                     } else if (optionCode === "b") {
-                        presetIsUsingAdvancedLoopControls = true;
-                        presetChipWaveLoopEnd = parseInt(optionData);
+                        presetChipWaveLoopEnd = parseIntWithDefault(optionData, null);
+                        if (presetChipWaveLoopEnd != null) {
+                            presetIsUsingAdvancedLoopControls = true;
+                        }
                     } else if (optionCode === "c") {
-                        presetIsUsingAdvancedLoopControls = true;
-                        presetChipWaveStartOffset = parseInt(optionData);
+                        presetChipWaveStartOffset = parseIntWithDefault(optionData, null);
+                        if (presetChipWaveStartOffset != null) {
+                            presetIsUsingAdvancedLoopControls = true;
+                        }
                     } else if (optionCode === "d") {
-                        presetIsUsingAdvancedLoopControls = true;
-                        presetChipWaveLoopMode = parseInt(optionData);
+                        presetChipWaveLoopMode = parseIntWithDefault(optionData, null);
+                        if (presetChipWaveLoopMode != null) {
+                            // @TODO: Error-prone. This should be automatically
+                            // derived from the list of available loop modes.
+                            presetChipWaveLoopMode = clamp(0, 3 + 1, presetChipWaveLoopMode);
+                            presetIsUsingAdvancedLoopControls = true;
+                        }
                     } else if (optionCode === "e") {
-                        presetIsUsingAdvancedLoopControls = true;
                         presetChipWavePlayBackwards = true;
+                        presetIsUsingAdvancedLoopControls = true;
                     }
                 }
                 urlSliced = url.slice(optionsEndIndex + 1, url.length);
@@ -5438,46 +5464,48 @@ export class Song {
             return false;
         }
 
-        if (!parsedSampleOptions && parsedUrl != null) {
-            if (url.indexOf("@") != -1) {
-                //urlSliced = url.slice(url.indexOf("@"), url.indexOf("@"));
-                urlSliced = url.replaceAll("@", "")
-                parsedUrl = new URL(urlSliced);
-                isCustomPercussive = true;	
-            }	
+        if (parseOldSyntax) {
+            if (!parsedSampleOptions && parsedUrl != null) {
+                if (url.indexOf("@") != -1) {
+                    //urlSliced = url.slice(url.indexOf("@"), url.indexOf("@"));
+                    urlSliced = url.replaceAll("@", "")
+                    parsedUrl = new URL(urlSliced);
+                    isCustomPercussive = true;	
+                }	
 
-            function sliceForSampleRate() {
-                urlSliced = url.slice(0, url.indexOf(","));
-                parsedUrl = new URL(urlSliced);
-                customSampleRate = clamp(8000, 96000 + 1, parseFloat(url.slice(url.indexOf(",") + 1)));
-                //should this be parseFloat or parseInt?
-                //ig floats let you do decimals and such, but idk where that would be useful
-            }
+                function sliceForSampleRate() {
+                    urlSliced = url.slice(0, url.indexOf(","));
+                    parsedUrl = new URL(urlSliced);
+                    customSampleRate = clamp(8000, 96000 + 1, parseFloatWithDefault(url.slice(url.indexOf(",") + 1), 44100));
+                    //should this be parseFloat or parseInt?
+                    //ig floats let you do decimals and such, but idk where that would be useful
+                }
 
-            function sliceForRootKey() {
-                urlSliced = url.slice(0, url.indexOf("!"));
-                parsedUrl = new URL(urlSliced);
-                customRootKey = parseFloat(url.slice(url.indexOf("!") + 1));
-            }
+                function sliceForRootKey() {
+                    urlSliced = url.slice(0, url.indexOf("!"));
+                    parsedUrl = new URL(urlSliced);
+                    customRootKey = parseFloatWithDefault(url.slice(url.indexOf("!") + 1), 60);
+                }
 
 
-            if (url.indexOf(",") != -1 && url.indexOf("!") != -1) {
-                if (url.indexOf(",") < url.indexOf("!")) {
-                    sliceForRootKey();
-                    sliceForSampleRate();
+                if (url.indexOf(",") != -1 && url.indexOf("!") != -1) {
+                    if (url.indexOf(",") < url.indexOf("!")) {
+                        sliceForRootKey();
+                        sliceForSampleRate();
+                    }
+                    else {
+                        sliceForSampleRate();
+                        sliceForRootKey();
+                    }	
                 }
                 else {
-                    sliceForSampleRate();
-                    sliceForRootKey();
-                }	
-            }
-            else {
-                if (url.indexOf(",") != -1) {
-                    sliceForSampleRate();
-                }	
-                if (url.indexOf("!") != -1) {
-                    sliceForRootKey();
-                }	
+                    if (url.indexOf(",") != -1) {
+                        sliceForSampleRate();
+                    }	
+                    if (url.indexOf("!") != -1) {
+                        sliceForRootKey();
+                    }	
+                }
             }
         }
 
@@ -5744,7 +5772,12 @@ export class Song {
                     }
                     
                     else {
-                        Song._parseAndConfigureCustomSample(url, customSampleUrls, customSamplePresets, sampleLoadingState);
+                        // When EditorConfig.customSamples is saved in the json
+                        // export, it should be using the new syntax, unless
+                        // the user has manually modified the URL, so we don't
+                        // really need to parse the old syntax here.
+                        const parseOldSyntax: boolean = false;
+                        Song._parseAndConfigureCustomSample(url, customSampleUrls, customSamplePresets, sampleLoadingState, parseOldSyntax);
                     }
                 }
                 if (customSampleUrls.length > 0) {

@@ -192,13 +192,18 @@
     height: 20px;
 }
 
-.credits-outer {
+.extension-links {
     width: 300px;
     padding: 0 1.25rem 1rem 1.25rem;
     display: flex;
     flex-direction: row;
+    justify-content: space-between;
     opacity: 0.75;
     text-align: left;
+}
+.extension-links a {
+    color: inherit !important;
+    text-decoration: underline;
 }
 .credits-inner {
     display: flex;
@@ -207,11 +212,6 @@
 .credits-title {
     margin-right: 0.25rem;
 }
-.credits-list a {
-    color: inherit !important;
-    text-decoration: underline;
-}
-
 
 .coming-soon-text {
     position: absolute;

@@ -340,6 +340,8 @@ class LibraryComponent extends React.Component {
                                 )}
                                 name={dataItem.name}
                                 credits={dataItem.credits}
+                                samples={dataItem.samples}
+                                docsURI={dataItem.docsURI}
                                 showPlayButton={this.props.showPlayButton}
                                 onMouseEnter={this.handleMouseEnter}
                                 onMouseLeave={this.handleMouseLeave}

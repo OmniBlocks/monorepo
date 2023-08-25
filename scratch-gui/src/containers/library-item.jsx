@@ -43,7 +43,7 @@ class LibraryItem extends React.PureComponent {
         this.handleMouseLeave(id);
     }
     handleClick (e) {
-        if (e.target.href) {
+        if (e.target.closest('a')) {
             // Allow clicking on links inside the item
             return;
         }
@@ -158,6 +158,8 @@ class LibraryItem extends React.PureComponent {
                 isPlaying={this.props.isPlaying}
                 name={this.props.name}
                 credits={this.props.credits}
+                docsURI={this.props.docsURI}
+                samples={this.props.samples}
                 favorite={this.props.favorite}
                 onFavorite={this.handleFavorite}
                 showPlayButton={this.props.showPlayButton}
@@ -208,6 +210,11 @@ LibraryItem.propTypes = {
         PropTypes.string,
         PropTypes.node
     ])),
+    docsURI: PropTypes.string,
+    samples: PropTypes.arrayOf(PropTypes.shape({
+        href: PropTypes.string,
+        text: PropTypes.string
+    })),
     favorite: PropTypes.bool,
     onFavorite: PropTypes.func,
     onMouseEnter: PropTypes.func.isRequired,

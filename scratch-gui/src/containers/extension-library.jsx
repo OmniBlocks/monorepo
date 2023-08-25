@@ -41,36 +41,38 @@ const fetchLibrary = async () => {
         throw new Error(`HTTP status ${res.status}`);
     }
     const data = await res.json();
-    return data.extensions.map(extension => {
-        const allCredits = [
+    return data.extensions.map(extension => ({
+        name: extension.name,
+        description: extension.description,
+        extensionId: extension.id,
+        extensionURL: `https://extensions.turbowarp.org/${extension.slug}.js`,
+        iconURL: `https://extensions.turbowarp.org/${extension.image || 'images/unknown.svg'}`,
+        tags: ['tw'],
+        credits: [
             ...(extension.by || []),
             ...(extension.original || [])
-        ];
-        return {
-            name: extension.name,
-            description: extension.description,
-            extensionId: extension.id,
-            extensionURL: `https://extensions.turbowarp.org/${extension.slug}.js`,
-            iconURL: `https://extensions.turbowarp.org/${extension.image || 'images/unknown.svg'}`,
-            tags: ['tw'],
-            credits: allCredits.map(credit => {
-                if (credit.link) {
-                    return (
-                        <a
-                            href={credit.link}
-                            target="_blank"
-                            rel="noreferrer"
-                        >
-                            {credit.name}
-                        </a>
-                    );
-                }
-                return credit.name;
-            }),
-            incompatibleWithScratch: true,
-            featured: true
-        };
-    });
+        ].map(credit => {
+            if (credit.link) {
+                return (
+                    <a
+                        href={credit.link}
+                        target="_blank"
+                        rel="noreferrer"
+                    >
+                        {credit.name}
+                    </a>
+                );
+            }
+            return credit.name;
+        }),
+        docsURI: extension.docs ? `https://extensions.turbowarp.org/${extension.slug}` : null,
+        samples: extension.samples ? extension.samples.map(sample => ({
+            href: `${process.env.ROOT}?project_url=https://extensions.turbowarp.org/samples/${encodeURIComponent(sample)}.sb3`,
+            text: sample
+        })) : null,
+        incompatibleWithScratch: true,
+        featured: true
+    }));
 };
 
 class ExtensionLibrary extends React.PureComponent {

@@ -3482,6 +3482,8 @@ export class Song {
         this.initToDefault((fromBeepBox && beforeNine) || ((fromJummBox && beforeFive) || (beforeFour && fromGoldBox)));
         const forceSimpleFilter: boolean = (fromBeepBox && beforeNine || fromJummBox && beforeFive);
 
+        let willLoadLegacySamplesForOldSongs: boolean = false;
+
         if (fromUltraBox || fromGoldBox) {
             compressed = compressed.replaceAll("%7C", "|")
                 var compressed_array = compressed.split("|");
@@ -3915,10 +3917,12 @@ export class Song {
 							const chipWaveForCompat = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
 							if ((chipWaveForCompat + 62) > 85) {
 								if (document.URL.substring(document.URL.length - 13).toLowerCase() != "legacysamples") {
-									document.location.href = document.URL.concat("|legacysamples");
-									location.reload();
-									//loadBuiltInSamples(0);
-									//run the loadBuiltInSamples function so it doesn't have to reload
+									if (!willLoadLegacySamplesForOldSongs) {
+										willLoadLegacySamplesForOldSongs = true;
+										Config.willReloadForCustomSamples = true;
+										EditorConfig.customSamples = ["legacySamples"];
+										loadBuiltInSamples(0);
+									}
 								}
 							}
 							
@@ -4106,10 +4110,12 @@ export class Song {
                 }
                 else if (fromGoldBox && !beforeFour && beforeSix) {
                     if (document.URL.substring(document.URL.length - 13).toLowerCase() != "legacysamples") {
-                            document.location.href = document.URL.concat("|legacysamples");
-                            location.reload();
-                            //loadBuiltInSamples(0);
-                            //run the loadBuiltInSamples function so it doesn't have to reload
+                            if (!willLoadLegacySamplesForOldSongs) {
+                                willLoadLegacySamplesForOldSongs = true;
+                                Config.willReloadForCustomSamples = true;
+                                EditorConfig.customSamples = ["legacySamples"];
+                                loadBuiltInSamples(0);
+                            }
                     }
                     this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].chipWave = clamp(0, Config.chipWaves.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)] + 125);						
                 } else if ((beforeNine && fromBeepBox) || ((fromJummBox && beforeFive) || (beforeFour && fromGoldBox))) {
@@ -5370,6 +5376,11 @@ export class Song {
             default: {
                 throw new Error("Unrecognized song tag code " + String.fromCharCode(command) + " at index " + (charIndex - 1) + " " + compressed.substring(/*charIndex - 2*/0, charIndex));
             } break;
+        }
+
+        if (Config.willReloadForCustomSamples) {
+            window.location.hash = this.toBase64String();
+            setTimeout(() => { location.reload(); }, 50);
         }
     }
 

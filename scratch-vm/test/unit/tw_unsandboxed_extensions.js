@@ -192,14 +192,13 @@ test('fetch', async t => {
     global.Scratch.canFetch = url => url === 'https://example.com/2';
     await t.rejects(global.Scratch.fetch('https://example.com/1'), /Permission to fetch https:\/\/example.com\/1 rejected/);
     await t.rejects(global.Scratch.fetch(new Request('https://example.com/1')), /Permission to fetch https:\/\/example.com\/1 rejected/);
-    t.equal(await global.Scratch.fetch('https://example.com/2'), '[Response https://example.com/2 options={"redirect":"error"}]');
-    t.equal(await global.Scratch.fetch(new Request('https://example.com/2')), '[Response https://example.com/2 options={"redirect":"error"}]');
+    t.equal(await global.Scratch.fetch('https://example.com/2'), '[Response https://example.com/2 options={}]');
+    t.equal(await global.Scratch.fetch(new Request('https://example.com/2')), '[Response https://example.com/2 options={}]');
     t.equal(await global.Scratch.fetch('https://example.com/2', {
-        // redirect should be ignored and always set to error
         redirect: 'follow',
         method: 'POST',
         body: 'abc'
-    }), '[Response https://example.com/2 options={"redirect":"error","method":"POST","body":"abc"}]');
+    }), '[Response https://example.com/2 options={"redirect":"follow","method":"POST","body":"abc"}]');
     t.end();
 });
 

@@ -531,7 +531,7 @@ class RenderWebGL extends EventEmitter {
                 container.style.transformOrigin = 'top left';
 
                 const scale = `scale(${xScale}, ${yScale})`;
-                if (overlay.lay === 'scale') {
+                if (overlay.mode === 'scale') {
                     container.style.transform = scale;
                 } else {
                     const shiftToCenter = `translate(${nativeWidth / 2}px, ${nativeHeight / 2}px)`;

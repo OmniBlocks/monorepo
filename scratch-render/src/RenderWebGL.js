@@ -250,18 +250,16 @@ class RenderWebGL extends EventEmitter {
         this.dirty = true;
 
         /**
-         * Stage overlay element with dimensions set to stage's native size. Automatically upscaled
-         * using CSS transform.
+         * Element that contains all overlays.
          * @type {HTMLElement}
          */
-        this.scaledOverlay = document.createElement('div');
-        this.scaledOverlay.className = 'scratch-render-scaled-overlay';
+        this.overlayContainer = document.createElement('div');
+        this.overlayContainer.className = 'scratch-render-overlays';
 
         /**
-         * Stage overlay element with dimensions set to stage's actual size. No automatic upscaling.
+         * @type {Array<{container: HTMLElement; userElement: HTMLElement; mode: string;}>}
          */
-        this.unscaledOverlay = document.createElement('div');
-        this.unscaledOverlay.className = 'scratch-render-unscaled-overlay';
+        this._overlays = [];
 
         loadStyles();
 
@@ -399,12 +397,7 @@ class RenderWebGL extends EventEmitter {
             canvas.height = newHeight;
 
             this._updateRenderQuality();
-
-            this.unscaledOverlay.style.width = `${pixelsWide}px`;
-            this.unscaledOverlay.style.height = `${pixelsTall}px`;
-            const xScale = pixelsWide / this._nativeSize[0];
-            const yScale = pixelsTall / this._nativeSize[1];
-            this.scaledOverlay.style.transform = `scale(${xScale},${yScale})`;
+            this._updateOverlays();
 
             // Resizing the canvas causes it to be cleared, so redraw it.
             this.dirty = true;
@@ -485,13 +478,56 @@ class RenderWebGL extends EventEmitter {
      */
     _setNativeSize (width, height) {
         this._nativeSize = [width, height];
-        this.scaledOverlay.style.width = `${width}px`;
-        this.scaledOverlay.style.height = `${height}px`;
+        this._updateOverlays();
         this.emit(RenderConstants.Events.NativeSizeChanged, {newSize: this._nativeSize});
     }
 
-    getOverlays () {
-        return [this.unscaledOverlay, this.scaledOverlay];
+    /**
+     * @param {HTMLElement} element HTML element
+     * @param {string} mode Resize mode
+     */
+    addOverlay (element, mode = 'scale') {
+        const container = document.createElement('div');
+        container.appendChild(element);
+        this.overlayContainer.appendChild(container);
+        this._overlays.push({
+            container,
+            userElement: element,
+            mode
+        });
+        this._updateOverlays();
+    }
+
+    /**
+     * @param {HTMLElement} element HTML element
+     */
+    removeOverlay (element) {
+        const overlayIndex = this._overlays.findIndex(i => i.userElement === element);
+        if (overlayIndex !== -1) {
+            this._overlays[overlayIndex].container.remove();
+            this._overlays.splice(overlayIndex, 1);
+        }
+    }
+
+    _updateOverlays () {
+        const [nativeWidth, nativeHeight] = this._nativeSize;
+        const dpiIndependentWidth = this.canvas.width / window.devicePixelRatio;
+        const dpiIndependentHeight = this.canvas.height / window.devicePixelRatio;
+
+        for (const overlay of this._overlays) {
+            const container = overlay.container;
+            if (overlay.mode === 'scale') {
+                const xScale = dpiIndependentWidth / nativeWidth;
+                const yScale = dpiIndependentHeight / nativeHeight;
+                container.style.width = `${nativeWidth}px`;
+                container.style.height = `${nativeHeight}px`;
+                container.style.transform = `scale(${xScale}, ${yScale})`;
+                container.style.transformOrigin = 'top left';
+            } else {
+                container.style.width = `${dpiIndependentWidth}px`;
+                container.style.height = `${dpiIndependentHeight}px`;
+            }
+        }
     }
 
     /**

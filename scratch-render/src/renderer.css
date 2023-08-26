@@ -1,12 +1,7 @@
-.scratch-render-scaled-overlay,
-.scratch-render-unscaled-overlay,
-.scratch-render-scaled-overlay > *,
-.scratch-render-unscaled-overlay > * {
+.scratch-render-overlays,
+.scratch-render-overlays > * {
     position: absolute;
     top: 0;
     left: 0;
-}
-
-.scratch-render-scaled-overlay {
-    transform-origin: top left;
+    pointer-events: none;
 }

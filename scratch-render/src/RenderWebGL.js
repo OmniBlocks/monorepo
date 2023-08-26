@@ -489,6 +489,10 @@ class RenderWebGL extends EventEmitter {
     addOverlay (element, mode = 'scale') {
         const container = document.createElement('div');
         container.appendChild(element);
+        if (mode !== 'scale') {
+            container.style.width = '100%';
+            container.style.height = '100%';
+        }
         this.overlayContainer.appendChild(container);
         this._overlays.push({
             container,
@@ -514,6 +518,9 @@ class RenderWebGL extends EventEmitter {
         const dpiIndependentWidth = this.canvas.width / window.devicePixelRatio;
         const dpiIndependentHeight = this.canvas.height / window.devicePixelRatio;
 
+        this.overlayContainer.style.width = `${dpiIndependentWidth}px`;
+        this.overlayContainer.style.height = `${dpiIndependentHeight}px`;
+
         for (const overlay of this._overlays) {
             const container = overlay.container;
             if (overlay.mode === 'scale') {
@@ -523,9 +530,6 @@ class RenderWebGL extends EventEmitter {
                 container.style.height = `${nativeHeight}px`;
                 container.style.transform = `scale(${xScale}, ${yScale})`;
                 container.style.transformOrigin = 'top left';
-            } else {
-                container.style.width = `${dpiIndependentWidth}px`;
-                container.style.height = `${dpiIndependentHeight}px`;
             }
         }
     }

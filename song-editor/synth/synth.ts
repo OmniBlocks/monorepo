@@ -10422,20 +10422,6 @@ export class Synth {
         }
         static loopableChipSynth(synth: Synth, bufferIndex: number, roundedSamplesPerTick: number, tone: Tone, instrumentState: InstrumentState): void {
             // @TODO:
-            // - Add another loop mode to be used when the tone is released.
-            //   "Rel. Mode"?
-            //   Options:
-            //   - Use Loop Mode
-            //   - Loop
-            //   - Ping-Pong
-            //   - Play Once
-            //   - Loop Sample
-            //     This uses 0 and the sample length as loop points.
-            //   - Ping-Pong Sample
-            //     This uses 0 and the sample length as loop points.
-            // - Needs a fancy waveform view to pick sample points.
-            // - Make the relationship between "Offset" and "Backwards" less
-            //   awkward.
             // - Longer declicking? This is more difficult than I thought.
             //   When determining this automatically is difficult (or the input
             //   samples are expected to vary too much), this is left up to the

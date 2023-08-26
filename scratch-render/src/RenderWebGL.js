@@ -485,21 +485,20 @@ class RenderWebGL extends EventEmitter {
     /**
      * @param {HTMLElement} element HTML element
      * @param {string} mode Resize mode
+     * @returns {*} Internal overlay object
      */
     addOverlay (element, mode = 'scale') {
         const container = document.createElement('div');
         container.appendChild(element);
-        if (mode === 'manual') {
-            container.style.width = '100%';
-            container.style.height = '100%';
-        }
         this.overlayContainer.appendChild(container);
-        this._overlays.push({
+        const overlay = {
             container,
             userElement: element,
             mode
-        });
+        };
+        this._overlays.push(overlay);
         this._updateOverlays();
+        return overlay;
     }
 
     /**
@@ -528,15 +527,19 @@ class RenderWebGL extends EventEmitter {
                 const yScale = dpiIndependentHeight / nativeHeight;
                 container.style.width = `${nativeWidth}px`;
                 container.style.height = `${nativeHeight}px`;
-                container.style.transformOrigin = 'top left';
 
                 const scale = `scale(${xScale}, ${yScale})`;
+                container.style.transformOrigin = 'top left';
                 if (overlay.mode === 'scale') {
                     container.style.transform = scale;
                 } else {
                     const shiftToCenter = `translate(${nativeWidth / 2}px, ${nativeHeight / 2}px)`;
                     container.style.transform = `${scale} ${shiftToCenter}`;
                 }
+            } else {
+                container.style.transform = '';
+                container.style.width = '100%';
+                container.style.height = '100%';
             }
         }
     }

@@ -450,7 +450,7 @@ class Stage extends React.Component {
         return (
             <StageComponent
                 canvas={this.canvas}
-                overlays={this.props.vm.runtime.renderer.getOverlays()}
+                overlay={this.props.vm.runtime.renderer.overlayContainer}
                 colorInfo={this.state.colorInfo}
                 dragRef={this.setDragCanvas}
                 question={this.state.question}

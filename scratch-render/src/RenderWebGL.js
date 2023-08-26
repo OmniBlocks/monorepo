@@ -489,7 +489,7 @@ class RenderWebGL extends EventEmitter {
     addOverlay (element, mode = 'scale') {
         const container = document.createElement('div');
         container.appendChild(element);
-        if (mode !== 'scale') {
+        if (mode === 'manual') {
             container.style.width = '100%';
             container.style.height = '100%';
         }
@@ -523,13 +523,20 @@ class RenderWebGL extends EventEmitter {
 
         for (const overlay of this._overlays) {
             const container = overlay.container;
-            if (overlay.mode === 'scale') {
+            if (overlay.mode === 'scale' || overlay.mode === 'scale-centered') {
                 const xScale = dpiIndependentWidth / nativeWidth;
                 const yScale = dpiIndependentHeight / nativeHeight;
                 container.style.width = `${nativeWidth}px`;
                 container.style.height = `${nativeHeight}px`;
-                container.style.transform = `scale(${xScale}, ${yScale})`;
                 container.style.transformOrigin = 'top left';
+
+                const scale = `scale(${xScale}, ${yScale})`;
+                if (overlay.lay === 'scale') {
+                    container.style.transform = scale;
+                } else {
+                    const shiftToCenter = `translate(${nativeWidth / 2}px, ${nativeHeight / 2}px)`;
+                    container.style.transform = `${scale} ${shiftToCenter}`;
+                }
             }
         }
     }

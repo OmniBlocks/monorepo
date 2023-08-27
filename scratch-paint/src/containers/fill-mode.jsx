@@ -29,7 +29,7 @@ class FillMode extends React.Component {
             this.activateTool(this.props);
         }
     }
-    UNSAFE_componentWillReceiveProps (nextProps) {
+    componentWillReceiveProps (nextProps) {
         if (this.tool) {
             if (nextProps.fillColor !== this.props.fillColor) {
                 this.tool.setFillColor(nextProps.fillColor);

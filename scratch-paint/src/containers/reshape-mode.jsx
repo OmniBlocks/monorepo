@@ -25,7 +25,7 @@ class ReshapeMode extends React.Component {
             this.activateTool(this.props);
         }
     }
-    UNSAFE_componentWillReceiveProps (nextProps) {
+    componentWillReceiveProps (nextProps) {
         if (this.tool && nextProps.hoveredItemId !== this.props.hoveredItemId) {
             this.tool.setPrevHoveredItemId(nextProps.hoveredItemId);
         }

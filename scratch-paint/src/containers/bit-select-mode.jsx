@@ -27,7 +27,7 @@ class BitSelectMode extends React.Component {
             this.activateTool(this.props);
         }
     }
-    UNSAFE_componentWillReceiveProps (nextProps) {
+    componentWillReceiveProps (nextProps) {
         if (this.tool && nextProps.selectedItems !== this.props.selectedItems) {
             this.tool.onSelectionChanged(nextProps.selectedItems);
         }

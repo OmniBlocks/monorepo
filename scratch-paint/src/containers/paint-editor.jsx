@@ -110,7 +110,7 @@ class PaintEditor extends React.Component {
         document.addEventListener('mouseup', this.onMouseUp);
         document.addEventListener('touchend', this.onMouseUp);
     }
-    UNSAFE_componentWillReceiveProps (newProps) {
+    componentWillReceiveProps (newProps) {
         if (!isBitmap(this.props.format) && isBitmap(newProps.format)) {
             this.switchModeForFormat(Formats.BITMAP);
         } else if (!isVector(this.props.format) && isVector(newProps.format)) {

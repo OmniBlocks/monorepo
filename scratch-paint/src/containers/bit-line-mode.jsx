@@ -26,7 +26,7 @@ class BitLineMode extends React.Component {
             this.activateTool(this.props);
         }
     }
-    UNSAFE_componentWillReceiveProps (nextProps) {
+    componentWillReceiveProps (nextProps) {
         if (this.tool && nextProps.color !== this.props.color) {
             this.tool.setColor(nextProps.color);
         }

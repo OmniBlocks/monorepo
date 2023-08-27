@@ -29,7 +29,7 @@ class BrushMode extends React.Component {
             this.activateTool(this.props);
         }
     }
-    UNSAFE_componentWillReceiveProps (nextProps) {
+    componentWillReceiveProps (nextProps) {
         if (nextProps.isBrushModeActive && !this.props.isBrushModeActive) {
             this.activateTool();
         } else if (!nextProps.isBrushModeActive && this.props.isBrushModeActive) {

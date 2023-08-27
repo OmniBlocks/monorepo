@@ -28,7 +28,7 @@ class BitFillMode extends React.Component {
             this.activateTool(this.props);
         }
     }
-    UNSAFE_componentWillReceiveProps (nextProps) {
+    componentWillReceiveProps (nextProps) {
         if (this.tool) {
             if (nextProps.color !== this.props.color) {
                 this.tool.setColor(nextProps.color);

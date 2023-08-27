@@ -156,7 +156,9 @@ const executeInCompatibilityLayer = function*(inputs, blockFunction, isWarp, use
 
     let returnValue = executeBlock();
     if (isPromise(returnValue)) {
-        return finish(yield* waitPromise(returnValue));
+        returnValue = finish(yield* waitPromise(returnValue));
+        if (useFlags) hasResumedFromPromise = true;
+        return returnValue;
     }
 
     if (thread.status === 1 /* STATUS_PROMISE_WAIT */) {
@@ -181,7 +183,9 @@ const executeInCompatibilityLayer = function*(inputs, blockFunction, isWarp, use
 
         returnValue = executeBlock();
         if (isPromise(returnValue)) {
-            return finish(yield* waitPromise(returnValue));
+            returnValue = finish(yield* waitPromise(returnValue));
+            if (useFlags) hasResumedFromPromise = true;
+            return returnValue;
         }
 
         if (thread.status === 1 /* STATUS_PROMISE_WAIT */) {

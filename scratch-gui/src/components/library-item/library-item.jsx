@@ -131,24 +131,21 @@ class LibraryItemComponent extends React.PureComponent {
 
                 {this.props.credits && this.props.credits.length > 0 && (
                     <div className={styles.extensionLinks}>
-                        <div className={styles.creditsInner}>
-                            <div className={styles.creditsTitle}>
-                                <FormattedMessage
-                                    defaultMessage="Created by:"
-                                    description="Appears in the extension list. Followed by a list of names."
-                                    id="tw.createdBy"
-                                />
-                            </div>
-                            <div className={styles.creditsList}>
-                                {this.props.credits.map((credit, index) => (
-                                    <React.Fragment key={index}>
-                                        {credit}
-                                        {index !== this.props.credits.length - 1 && (
-                                            ', '
-                                        )}
-                                    </React.Fragment>
-                                ))}
-                            </div>
+                        <div>
+                            <FormattedMessage
+                                defaultMessage="Created by:"
+                                description="Appears in the extension list. Followed by a list of names."
+                                id="tw.createdBy"
+                            />
+                            {' '}
+                            {this.props.credits.map((credit, index) => (
+                                <React.Fragment key={index}>
+                                    {credit}
+                                    {index !== this.props.credits.length - 1 && (
+                                        ', '
+                                    )}
+                                </React.Fragment>
+                            ))}
                         </div>
                     </div>
                 )}

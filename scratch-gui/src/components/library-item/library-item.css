@@ -205,13 +205,6 @@
     color: inherit !important;
     text-decoration: underline;
 }
-.credits-inner {
-    display: flex;
-    flex-direction: row;
-}
-.credits-title {
-    margin-right: 0.25rem;
-}
 
 .coming-soon-text {
     position: absolute;

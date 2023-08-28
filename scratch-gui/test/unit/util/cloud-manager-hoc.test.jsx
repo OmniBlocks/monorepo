@@ -31,7 +31,8 @@ describe('CloudManagerHOC', () => {
                 },
                 mode: {
                     hasEverEnteredEditor: false
-                }
+                },
+                tw: {}
             }
         });
         stillLoadingStore = mockStore({

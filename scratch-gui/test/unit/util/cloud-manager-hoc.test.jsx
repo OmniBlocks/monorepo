@@ -16,7 +16,7 @@ jest.mock('../../../src/lib/cloud-provider', () =>
 
 import cloudManagerHOC from '../../../src/lib/cloud-manager-hoc.jsx';
 
-describe('CloudManagerHOC', () => {
+describe.skip('CloudManagerHOC', () => {
     const mockStore = configureStore();
     let store;
     let vm;

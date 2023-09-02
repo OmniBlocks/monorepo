@@ -4,16 +4,12 @@
 (function (Scratch) {
   "use strict";
 
-  const IN_3D = Symbol("threed.in3d");
-  const Z_POS = Symbol("threed.z");
-  const OBJECT = Symbol("threed.object");
-  const THREED_DIRTY = Symbol("threed.dirty");
+  const IN_3D = "threed.in3d";
+  const Z_POS = "threed.z";
+  const OBJECT = "threed.object";
+  const THREED_DIRTY = "threed.dirty";
 
-  // Obtain Skin
-  let tempSkin = Scratch.renderer.createTextSkin("say", "", true);
-  const Skin =
-    Scratch.renderer._allSkins[tempSkin].__proto__.__proto__.constructor;
-  Scratch.renderer.destroySkin(tempSkin);
+  const Skin = Scratch.renderer.exports.Skin;
 
   class SimpleSkin extends Skin {
     constructor(id, renderer) {
@@ -384,12 +380,10 @@
     getCanvasFromTexture(gl, texture, width, height) {
       if (texture._3dCachedCanvas) return texture._3dCachedCanvas;
 
-      // Create a framebuffer backed by the texture
       const framebuffer = gl.createFramebuffer();
       gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
       gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
 
-      // Read the contents of the framebuffer
       const data = new Uint8Array(width * height * 4);
       gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, data);
 
@@ -492,9 +486,15 @@
           side: THREE.DoubleSide,
           transparent: true
         });
-        const size = this.getSizeFromSkin(dr.skin);
-        obj.scale.x = size[0];
-        obj.scale.y = size[1];
+        try {
+          const size = this.getSizeFromSkin(dr.skin);
+          obj.scale.x = size[0];
+          obj.scale.y = size[1];
+        } catch (e) {
+          console.error(e);
+          obj.scale.x = 0;
+          obj.scale.y = 0;
+        }
       } else {
         obj.material = new THREE.MeshBasicMaterial();
         obj.geometry = new THREE.PlaneGeometry(dr.skin.size[0], dr.skin.size[1]);
@@ -524,15 +524,12 @@
       if (util.target.isStage) return;
 
       this.init();
+      this.disable3DForDrawable(util.target.drawableID);
       switch (MODE) {
         case "flat":
         case "sprite":
-          this.disable3DForDrawable(util.target.drawableID);
-          this.init();
           this.enable3DForDrawable(util.target.drawableID, MODE);
           break;
-        default:
-          this.disable3DForDrawable(util.target.drawableID);
       }
     }
 
@@ -559,12 +556,34 @@
       this.updateRenderer();
     }
 
-    getZ({ Z }, util) {
+    getZ(args, util) {
       if (util.target.isStage) return 0;
 
       const dr = Scratch.renderer._allDrawables[util.target.drawableID];
       if (!dr[IN_3D]) return 0;
       return dr[Z_POS];
+    }
+
+    preUpdateCameraAngle() {
+      if (!("_yaw" in this.camera)) this.camera._yaw = 0;
+      if (!("_pitch" in this.camera)) this.camera._pitch = 0;
+      if (!("_roll" in this.camera)) this.camera._roll = 0;
+    }
+
+    updateCameraAngle() {
+      this.camera.rotation.x = 0;
+      this.camera.rotation.y = 0;
+      this.camera.rotation.z = 0;
+
+      this.camera.rotation.y = this.camera._yaw;
+      this.camera.rotateOnAxis(
+        new THREE.Vector3(1, 0, 0),
+        this.camera._pitch
+      );
+      this.camera.rotateOnAxis(
+        new THREE.Vector3(0, 0, 1),
+        this.camera._roll
+      );
     }
 
     setCam({ X, Y, Z }, util) {
@@ -592,64 +611,58 @@
       DEGREES = Scratch.Cast.toNumber(DEGREES) *
         ((DIRECTION === "left" || DIRECTION === "down" || DIRECTION === "ccw") ? -1 : 1);
 
+      this.preUpdateCameraAngle();
       switch (DIRECTION) {
         case "left":
         case "right":
-          this.camera.rotateOnWorldAxis(
-            new THREE.Vector3(0, 1, 0).applyAxisAngle(
-              new THREE.Vector3(0, 1, 0),
-              this.camera.rotation.y
-            ),
-            -THREE.MathUtils.degToRad(DEGREES)
-          );
+          this.camera._yaw -= THREE.MathUtils.degToRad(DEGREES);
           break;
         case "up":
         case "down":
-          this.camera.rotateOnWorldAxis(
-            new THREE.Vector3(1, 0, 0).applyAxisAngle(
-              new THREE.Vector3(0, 1, 0),
-              this.camera.rotation.y
-            ),
-            THREE.MathUtils.degToRad(DEGREES)
-          );
+          this.camera._pitch += THREE.MathUtils.degToRad(DEGREES);
           break;
         case "cw":
         case "ccw":
-          this.camera.rotation.z += THREE.MathUtils.degToRad(DEGREES);
+          this.camera._roll += THREE.MathUtils.degToRad(DEGREES);
           break;
       }
+      this.updateCameraAngle();
       this.updateRenderer();
     }
     setCamDir({ DEGREES, DIRECTION }, util) {
       this.init();
 
-      DEGREES = Scratch.Cast.toNumber(DEGREES);
+      DEGREES = Scratch.Cast.toNumber(DEGREES) *
+        ((DIRECTION === "left" || DIRECTION === "down" || DIRECTION === "ccw") ? -1 : 1);
 
-      let axis = "y";
-      if (DIRECTION === "aim") {
-        axis = "x";
-      } else if (DIRECTION === "roll") {
-        axis = "z";
-      } else {
-        axis = "y";
-        DEGREES = -DEGREES;
+      this.preUpdateCameraAngle();
+      switch (DIRECTION) {
+        case "angle":
+          this.camera._yaw = -THREE.MathUtils.degToRad(DEGREES);
+          break;
+        case "aim":
+          this.camera._pitch = THREE.MathUtils.degToRad(DEGREES);
+          break;
+        case "roll":
+          this.camera._roll = THREE.MathUtils.degToRad(DEGREES);
+          break;
       }
-
-      this.camera.rotation[axis] = THREE.MathUtils.degToRad(DEGREES);
+      this.updateCameraAngle();
 
       this.updateRenderer();
     }
     camDir({ DIRECTION }, util) {
       this.init();
 
-      const rot = this.camera.rotation;
       switch (DIRECTION) {
+        case "angle":
+          return -THREE.MathUtils.radToDeg(this.camera._yaw);
         case "aim":
-          return THREE.MathUtils.radToDeg(rot.x);
+          return THREE.MathUtils.radToDeg(this.camera._pitch);
         case "roll":
-          return THREE.MathUtils.radToDeg(rot.z);
-        default: // angle
-          return -THREE.MathUtils.radToDeg(rot.y);
+          return THREE.MathUtils.radToDeg(this.camera._roll);
+        default:
+          return 0;
       }
     }
   }

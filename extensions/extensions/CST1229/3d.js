@@ -1,3 +1,8 @@
+// Name: 3D
+// ID: cst12293d
+// Description: Move your sprites into the third dimension.
+// By: CST1229 <https://scratch.mit.edu/users/CST1229/>
+
 /* global THREE */
 // @ts-nocheck
 
@@ -78,7 +83,7 @@
 
     getInfo() {
       return {
-        id: "CST12293d",
+        id: "cst12293d",
         name: "3D",
 
         blocks: [

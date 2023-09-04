@@ -64,14 +64,22 @@ class SoundLibrary extends React.PureComponent {
          */
         this.handleStop = null;
 
-        const soundLibrary = getSoundLibrary();
-        this.data = Array.isArray(soundLibrary) ? (
-            getSoundLibraryThumbnailData(soundLibrary, this.props.isRtl)
-        ) : (
-            soundLibrary.then(data => getSoundLibraryThumbnailData(data, this.props.isRtl))
-        );
+        this.state = {
+            data: null
+        };
     }
     componentDidMount () {
+        const soundLibrary = getSoundLibrary();
+        if (soundLibrary.then) {
+            soundLibrary.then(data => this.setState({
+                data: getSoundLibraryThumbnailData(data, this.props.isRtl)
+            }));
+        } else {
+            this.setState({
+                data: getSoundLibraryThumbnailData(soundLibrary, this.props.isRtl)
+            })
+        }
+
         this.audioEngine = new AudioEngine();
         this.playingSoundPromise = null;
     }
@@ -173,7 +181,7 @@ class SoundLibrary extends React.PureComponent {
         return (
             <LibraryComponent
                 showPlayButton
-                data={this.data}
+                data={this.state.data}
                 id="soundLibrary"
                 setStopHandler={this.setStopHandler}
                 tags={soundTags}

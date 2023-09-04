@@ -24,6 +24,16 @@ class SpriteLibrary extends React.PureComponent {
         bindAll(this, [
             'handleItemSelect'
         ]);
+        this.state = {
+            data: getSpriteLibrary()
+        };
+    }
+    componentDidMount () {
+        if (this.state.data.then) {
+            this.state.data.then(data => this.setState({
+                data
+            }));
+        }
     }
     handleItemSelect (item) {
         // Randomize position of library sprite
@@ -35,7 +45,7 @@ class SpriteLibrary extends React.PureComponent {
     render () {
         return (
             <LibraryComponent
-                data={getSpriteLibrary()}
+                data={this.state.data.then ? null : this.state.data}
                 id="spriteLibrary"
                 tags={spriteTags}
                 title={this.props.intl.formatMessage(messages.libraryTitle)}

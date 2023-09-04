@@ -50,37 +50,20 @@ class LibraryComponent extends React.Component {
             playingItem: null,
             filterQuery: '',
             selectedTag: ALL_TAG.tag,
-            loaded: false,
-            data: props.data,
+            canDisplay: false,
             favorites,
             initialFavorites: favorites
         };
     }
     componentDidMount () {
-        if (this.state.data.then) {
-            // If data is a promise, wait for the promise to resolve
-            this.state.data.then(data => {
-                this.setState({
-                    loaded: true,
-                    data
-                });
-            });
-        } else {
-            // Allow the spinner to display before loading the content
-            setTimeout(() => {
-                this.setState({
-                    loaded: true
-                });
-            });
-        }
-        if (this.props.setStopHandler) this.props.setStopHandler(this.handlePlayingEnd);
-    }
-    componentWillReceiveProps (nextProps) {
-        if (nextProps.data !== this.props.data && Array.isArray(nextProps.data)) {
+        // Rendering all the items in the library can take a bit, so we'll always
+        // show one frame with a loading spinner.
+        setTimeout(() => {
             this.setState({
-                data: nextProps.data
+                canDisplay: true
             });
-        }
+        });
+        if (this.props.setStopHandler) this.props.setStopHandler(this.handlePlayingEnd);
     }
     componentDidUpdate (prevProps, prevState) {
         if (prevState.filterQuery !== this.state.filterQuery ||
@@ -189,7 +172,7 @@ class LibraryComponent extends React.Component {
     getFilteredData () {
         // When no filtering, favorites get their own section
         if (this.state.selectedTag === 'all' && !this.state.filterQuery) {
-            const favoriteItems = this.state.data
+            const favoriteItems = this.props.data
                 .filter(dataItem => (
                     this.state.initialFavorites.includes(dataItem[this.props.persistableKey])
                 ))
@@ -204,14 +187,14 @@ class LibraryComponent extends React.Component {
 
             return [
                 ...favoriteItems,
-                ...this.state.data
+                ...this.props.data
             ];
         }
 
         // When filtering, favorites are just listed first, not in a separte section.
         const favoriteItems = [];
         const nonFavoriteItems = [];
-        for (const dataItem of this.state.data) {
+        for (const dataItem of this.props.data) {
             if (dataItem === '---') {
                 // ignore
             } else if (this.state.initialFavorites.includes(dataItem[this.props.persistableKey])) {
@@ -310,7 +293,7 @@ class LibraryComponent extends React.Component {
                     })}
                     ref={this.setFilteredDataRef}
                 >
-                    {this.state.loaded ? this.getFilteredData().map((dataItem, index) => (
+                    {(this.state.canDisplay && this.props.data) ? this.getFilteredData().map((dataItem, index) => (
                         dataItem === '---' ? (
                             <Separator key={index} />
                         ) : (

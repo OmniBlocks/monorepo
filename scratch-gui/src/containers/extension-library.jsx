@@ -83,23 +83,32 @@ class ExtensionLibrary extends React.PureComponent {
         ]);
         this.state = {
             gallery: cachedGallery,
-            galleryError: null
+            galleryError: null,
+            galleryTimedOut: false
         };
     }
     componentDidMount () {
         if (!this.state.gallery) {
+            const timeout = setTimeout(() => {
+                this.setState({
+                    galleryTimedOut: true
+                });
+            }, 750);
+
             fetchLibrary()
                 .then(gallery => {
                     cachedGallery = gallery;
                     this.setState({
                         gallery
                     });
+                    clearTimeout(timeout);
                 })
                 .catch(error => {
                     log.error(error);
                     this.setState({
                         galleryError: error
                     });
+                    clearTimeout(timeout);
                 });
         }
     }
@@ -139,15 +148,18 @@ class ExtensionLibrary extends React.PureComponent {
         }
     }
     render () {
-        const library = extensionLibraryContent.map(toLibraryItem);
-        library.push('---');
-        if (this.state.gallery) {
-            library.push(toLibraryItem(galleryMore));
-            library.push(...this.state.gallery.map(toLibraryItem));
-        } else if (this.state.galleryError) {
-            library.push(toLibraryItem(galleryError));
-        } else {
-            library.push(toLibraryItem(galleryLoading));
+        let library = null;
+        if (this.state.gallery || this.state.galleryError || this.state.galleryTimedOut) {
+            library = extensionLibraryContent.map(toLibraryItem);
+            library.push('---');
+            if (this.state.gallery) {
+                library.push(toLibraryItem(galleryMore));
+                library.push(...this.state.gallery.map(toLibraryItem));
+            } else if (this.state.galleryError) {
+                library.push(toLibraryItem(galleryError));
+            } else {
+                library.push(toLibraryItem(galleryLoading));
+            }
         }
 
         return (

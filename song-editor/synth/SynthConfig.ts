@@ -1521,7 +1521,7 @@ export class Config {
 		{ name: "sawtooth", samples: generateSawWave() },
 		{ name: "ramp", samples: generateSawWave(true) },
 		{ name: "trapezoid", samples: generateTrapezoidWave(2) },
-	    		{ name: "rounded", samples: generateRoundedSineWave() },
+	    { name: "rounded", samples: generateRoundedSineWave() },
 		//{ name: "white noise", samples: generateWhiteNoiseFmWave() },
 		//{ name: "1-bit white noise", samples: generateOneBitWhiteNoiseFmWave() },
     ]);

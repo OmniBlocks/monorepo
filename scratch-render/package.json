@@ -58,7 +58,7 @@
     "minilog": "3.1.0",
     "raw-loader": "^0.5.1",
     "scratch-svg-renderer": "git+https://github.com/TurboWarp/scratch-svg-renderer.git",
-    "twgl.js": "4.4.0"
+    "twgl.js": "^5.5.3"
   },
   "private": true
 }

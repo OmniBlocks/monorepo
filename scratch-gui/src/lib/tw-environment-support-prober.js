@@ -23,10 +23,7 @@ export const isNewFunctionSupported = () => {
     return cachedNewFunctionSupport;
 };
 
-export const isAudioContextSupported = () => !!(window.AudioContext || window.webkitAudioContext);
-
 export const isBrowserSupported = () => (
-    isAudioContextSupported() &&
     isNewFunctionSupported() &&
     isRendererSupported()
 );

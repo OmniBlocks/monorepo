@@ -3,11 +3,7 @@ import React from 'react';
 import ReactModal from 'react-modal';
 import Box from '../box/box.jsx';
 import {defineMessages, injectIntl, intlShape, FormattedMessage} from 'react-intl';
-import {
-    isRendererSupported,
-    isNewFunctionSupported,
-    isAudioContextSupported
-} from '../../lib/tw-environment-support-prober.js';
+import {isRendererSupported, isNewFunctionSupported} from '../../lib/tw-environment-support-prober.js';
 
 import styles from './browser-modal.css';
 import unhappyBrowser from './unsupported-browser.svg';
@@ -70,21 +66,6 @@ const BrowserModal = ({intl, ...props}) => {
                                     }}
                                 />
                             </p>
-                        </React.Fragment>
-                    )}
-
-                    {!isAudioContextSupported() && (
-                        <p>
-                            <FormattedMessage
-                                defaultMessage="Your browser does not support Web Audio, which is required for this site to play sounds."
-                                description="Part of the browser unsupported modal"
-                                id="tw.webAudio"
-                            />
-                        </p>
-                    )}
-
-                    {(!isRendererSupported() || !isAudioContextSupported()) && (
-                        <React.Fragment>
                             <p>
                                 <FormattedMessage
                                     defaultMessage="Make sure you're using a recent version of Google Chrome, Mozilla Firefox, Microsoft Edge, or Apple Safari."

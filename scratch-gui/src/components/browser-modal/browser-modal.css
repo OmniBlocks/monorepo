@@ -48,39 +48,15 @@
     background: $ui-white;
     padding: 1.5rem 2.25rem;
     text-align: center;
-}
-
-/* Confirmation buttons at the bottom of the modal */
-.button-row {
-    margin: 1.5rem 0;
-    font-weight: bolder;
-    text-align: right;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    gap: 0.25rem;
 }
-
-.button-row button {
-    border: 1px solid $motion-primary;
-    border-radius: 0.25rem;
-    padding: 0.5rem 2rem;
-    background: $motion-primary;
-    color: white;
-    font-weight: bold;
-    font-size: 0.875rem;
-    cursor: pointer;
-}
-
-.faq-link-text {
-    margin: 2rem 0 .5rem 0;
-    font-size: .875rem;
+[theme="dark"] .body {
     color: $text-primary;
+    background: $ui-primary;
 }
 
-.faq-link {
-    color: $motion-primary;
-    text-decoration: none;
-}
-
-.body p {
-    margin-bottom: 1em;
+.body a {
+    color: $motion-primary !important;
 }

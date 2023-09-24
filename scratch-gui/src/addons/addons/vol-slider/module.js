@@ -45,6 +45,10 @@ export const onVolumeChanged = (callback) => {
 };
 
 const gotAudioEngine = (audioEngine) => {
+  if (!audioEngine) {
+    console.error('could not get audio engine; sound-related addons will not work');
+    return;
+  }
   gainNode = audioEngine.inputNode.gain;
   gainNode.value = volumeBeforeFinishSetup;
 };

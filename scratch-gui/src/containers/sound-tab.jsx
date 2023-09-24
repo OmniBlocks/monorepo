@@ -16,12 +16,14 @@ import searchIcon from '../components/action-menu/icon--search.svg';
 import RecordModal from './record-modal.jsx';
 import SoundEditor from './sound-editor.jsx';
 import SoundLibrary from './sound-library.jsx';
+import SoundEditorNotSupported from '../components/tw-sound-editor-not-supported/sound-editor-not-supported.jsx';
 
 import {getSoundLibrary} from '../lib/libraries/tw-async-libraries';
 import {handleFileUpload, soundUpload} from '../lib/file-uploader.js';
 import errorBoundaryHOC from '../lib/error-boundary-hoc.jsx';
 import DragConstants from '../lib/drag-constants';
 import downloadBlob from '../lib/download-blob';
+import SharedAudioContext from '../lib/audio/shared-audio-context.js';
 
 import {connect} from 'react-redux';
 
@@ -186,6 +188,8 @@ class SoundTab extends React.Component {
             return null;
         }
 
+        const isSupported = !!(vm.runtime.audioEngine && new SharedAudioContext());
+
         const sprite = vm.editingTarget.sprite;
 
         const sounds = sprite.sounds ? sprite.sounds.map(sound => (
@@ -222,7 +226,7 @@ class SoundTab extends React.Component {
 
         return (
             <AssetPanel
-                buttons={[{
+                buttons={isSupported ? [{
                     title: intl.formatMessage(messages.addSound),
                     img: addSoundFromLibraryIcon,
                     onClick: onNewSoundFromLibraryClick
@@ -246,7 +250,7 @@ class SoundTab extends React.Component {
                     title: intl.formatMessage(messages.addSound),
                     img: searchIcon,
                     onClick: onNewSoundFromLibraryClick
-                }]}
+                }] : []}
                 dragType={DragConstants.SOUND}
                 isRtl={isRtl}
                 items={sounds}
@@ -258,7 +262,11 @@ class SoundTab extends React.Component {
                 onItemClick={this.handleSelectSound}
             >
                 {sprite.sounds && sprite.sounds[this.state.selectedSoundIndex] ? (
-                    <SoundEditor soundIndex={this.state.selectedSoundIndex} />
+                    isSupported ? (
+                        <SoundEditor soundIndex={this.state.selectedSoundIndex} />
+                    ) : (
+                        <SoundEditorNotSupported />
+                    )
                 ) : null}
                 {this.props.soundRecorderVisible ? (
                     <RecordModal

@@ -13,6 +13,7 @@ import {
     onLoadedProject,
     projectError
 } from '../reducers/project-state';
+import log from './log';
 
 /*
  * Higher Order Component to manage events emitted by the VM
@@ -30,8 +31,12 @@ const vmManagerHOC = function (WrappedComponent) {
         componentDidMount () {
             if (!this.props.vm.initialized) {
                 window.vm = this.props.vm;
-                this.audioEngine = new AudioEngine();
-                this.props.vm.attachAudioEngine(this.audioEngine);
+                try {
+                    this.audioEngine = new AudioEngine();
+                    this.props.vm.attachAudioEngine(this.audioEngine);
+                } catch (e) {
+                    log.error('could not create scratch-audio', e);
+                }
                 this.props.vm.initialized = true;
                 this.props.vm.setLocale(this.props.locale, this.props.messages);
             }

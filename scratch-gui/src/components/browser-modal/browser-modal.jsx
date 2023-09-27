@@ -51,7 +51,7 @@ const BrowserModal = ({intl, ...props}) => {
                             <p>
                                 <FormattedMessage
                                     defaultMessage="Your browser {webGlLink} which is needed for this site to run. Try updating your browser and graphics drivers or restarting your computer."
-                                    description="WebGL missing message"
+                                    description="WebGL missing message. {webGLLink} is a link with the text 'does not support WebGL' from Scratch's translations"
                                     id="tw.webglModal.description"
                                     values={{
                                         webGlLink: (

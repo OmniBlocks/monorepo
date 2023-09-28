@@ -199,8 +199,7 @@
         "tw.usesCloudVariables2": "Les variables al núvol de {APP_NAME} no estan connectades a Scratch. Qualsevol pot {changeTheirUsername} per qualsevol, així que aneu amb compte amb la suplantació d'identitat.",
         "tw.usesCloudVariables2.change": "canviar el seu nom d'usuari",
         "tw.viewFeaturedProjects": "Fes click per veure els projectes destacats.",
-        "tw.viewOnScratch": "Veure a l'Scratch",
-        "tw.webglModal.description": "Desafortunadament, sembla que el teu explorador o ordinador {webGlLink}. Aquesta tecnologia és necessària perquè aquest lloc web funcioni. Prova d'actualitzar el navegador i els controladors/drivers de gràfics o reinicieu l'ordinador."
+        "tw.viewOnScratch": "Veure a l'Scratch"
     },
     "cs": {
         "tw.alerts.creatingRestorePoint": "Vytvářím bod obnovení...",
@@ -296,8 +295,7 @@
         "tw.usernameModal.reset": "Obnovit",
         "tw.usernameModal.title": "Změnit jméno",
         "tw.viewFeaturedProjects": "Klikněte sem pro zhlédnutí vybraných projektů.",
-        "tw.viewOnScratch": "Zhlédnout projekt na Scratchi",
-        "tw.webglModal.description": "Bohužel to vypadá, že váš prohlížeč nebo počítač {webGlLink}. Tato technologie je potřebná pro tuto stránku. Zkuste aktualizovat váš prohlížeč a grafické ovladače, nebo restartujte počítač."
+        "tw.viewOnScratch": "Zhlédnout projekt na Scratchi"
     },
     "de": {
         "tw.alerts.creatingRestorePoint": "Wiederherstellungspunkt wird erstellt...",
@@ -345,6 +343,7 @@
         "tw.customReporters.name": "Eigene Wertblöcke",
         "tw.documentation": "Dokumentation",
         "tw.embed.persistent": "Wenn zugelassen, werden künftige EInbettungen zur selben Seite automatisch zugelassen.",
+        "tw.embed.risks": "Während die Einbettung isoliert sein wird, wird sie weiterhin Zugriff auf Geräteinformationen wie deine IP-Adresse und Region haben.",
         "tw.embed.title1": "Dieses Projekt möchte HTML-Inhalt über die Bühne einbetten:",
         "tw.embed.title2": "Dieses Projekt möchte eine andere Seite über die Bühne einbetten:",
         "tw.extensionGallery.error": "Erweiterungen-Sammlung konnte nicht laden werden. Besuche extensions.turbowarp.org, um mehr Erweiterungen zu finden.",
@@ -400,6 +399,8 @@
         "tw.loader.assets.unknown": "Ressourcen werden heruntergeladen ...",
         "tw.loader.data": "Projektdaten werden heruntergeladen ...",
         "tw.loader.generic": "Projekt wird geladen ...",
+        "tw.lockdownMode": "Auf Apple-Geräten musst du den {lockdownMode} deaktivieren.",
+        "tw.lockdownMode2": "Blockierungsmodus",
         "tw.menuBar.60off": "60 FPS-Modus ausschalten",
         "tw.menuBar.60on": "60 FPS-Modus einschalten",
         "tw.menuBar.advanced": "Erweitert",
@@ -489,6 +490,7 @@
         "tw.settingsModal.storeProjectOptionsHelp": "Speichert die ausgewählten Einstellungen im Projekt, damit sie beim Laden in TurboWarp automatisch angewendet werden. Der Compiler und der Warp Timer werden nicht gespeichert.",
         "tw.settingsModal.title": "Erweiterte Einstellungen",
         "tw.settingsModal.warpTimerHelp": "Überprüft, ob Skripte in einer langen oder endlosen Schleife feststecken, und führt sie mit einer niedrigeren Framefrequenz aus, anstatt sie auf das Ende der Schleife warten zu zu lassen. was die meisten Abstürze verbessert aber einen bedeutenden Einfluss auf die Leistung hat, deshalb ist es standardmäßig außerhalb des Editors deaktiviert.",
+        "tw.soundEditorNotSupported": "Der Klängeeditor wird von diesem Browser nicht unterstützt.",
         "tw.spriteSelectorItem.rename": "umbenennnen",
         "tw.stereoAlert": "Dieses Stereogeräusch zu ändern wird es zu Mono umwandeln, ohne dass man es wieder zurückumwandeln kann.",
         "tw.studioview.authorAttribution": "von {author}",
@@ -514,7 +516,7 @@
         "tw.usesCloudVariables2.change": "seinen Benutzernamen ändern",
         "tw.viewFeaturedProjects": "Klicke, um vorgestellte Projekte anzusehen.",
         "tw.viewOnScratch": "Projekt auf Scratch anzeigen",
-        "tw.webglModal.description": "Leider sieht es aus, als würde dein Computer oder Browser {webGlLink}. Diese Technologie ist erforderlich, damit diese Seite funktioniert. Versuche, deinen Browser und deine Grafiktreiber zu aktualisieren, oder deinen Computer neu zu starten."
+        "tw.webglModal.description": "Dein Browser {webGlLink}, doch es wird für das Ausführen dieser Seite benötigt. Versuche, deinen Browser und deine Grafiktreiber zu aktualisieren und deinen Computer neuzustarten."
     },
     "es": {
         "tw.alerts.creatingRestorePoint": "Creando punto de restauración...",
@@ -539,8 +541,12 @@
         "tw.clipboard.danger": "Si su portapapeles tiene cosas como contraseñas, el proyecto podría compartirlas con otros usuarios o servidores.",
         "tw.clipboard.permission": "El acceso a el portapapeles podría no funcionaren algunos navegadores. Si se permite, las próximas lecturas del portapapeles se permitirán automáticamente.",
         "tw.clipboard.title": "El proyecto quiere leer los datos de su portapapeles.",
+        "tw.cloudProvider": "Servidor proporcionado por {name}.",
+        "tw.cloudServers": "Elija un servidor cerca de usted:",
         "tw.code": "Código Fuente",
         "tw.confirmIncompatibleExtension": "Esta extensión es incompatible con Scratch. Proyectos hechos con ella no podrán ser subidos al sitio web de Scratch. ¿Está seguro de que quiere activarla?",
+        "tw.createdBy": "Creado por:",
+        "tw.customCloudServer": "Usando un servidor de variables en la nube personalizado: {server}",
         "tw.customExtension.description": "Cargar extensiones personalizadas desde URLs, archivos o código fuente JavaScript.",
         "tw.customExtension.name": "Extensión Personalizada",
         "tw.customExtensionModal.file": "Archivo",
@@ -558,7 +564,15 @@
         "tw.customReporters.description": "Permitir a bloques personalizados devolver resultados y ser usados como entradas.",
         "tw.customReporters.name": "Reporteros Personalizados",
         "tw.documentation": "Documentación",
+        "tw.embed.persistent": "Si se permite, se permitirán automáticamente más incrustaciones en el mismo sitio.",
+        "tw.embed.risks": "Si bien la inserción estará protegida, seguirá teniendo acceso a información sobre su dispositivo, como su IP y ubicación general.",
+        "tw.embed.title1": "El proyecto quiere incrustar contenido HTML en el escenario:",
+        "tw.embed.title2": "El proyecto quiere incorporar contenido remoto sobre el escenario:",
+        "tw.extensionGallery.error": "Error al cargar la galería de extensiones. Visita extensions.turbowarp.org para encontrar más extensiones.",
+        "tw.extensionGallery.loading": "Cargando galería de extensiones...",
+        "tw.extensionGallery.more": "Obtenga más información sobre las extensiones en extensions.turbowarp.org.",
         "tw.extensionGallery.name": "Galería de Extensiones de TurboWarp",
+        "tw.favorite": "Favorito",
         "tw.featuredProjectsStudio": "Ver estudio en Scratch",
         "tw.feedback": "Comentarios y Bugs",
         "tw.feedbackButton": "Enviar comentarios (feedback)",
@@ -608,6 +622,8 @@
         "tw.loader.assets.unknown": "Descargando assets ...",
         "tw.loader.data": "Descargando información del proyecto...",
         "tw.loader.generic": "Cargando proyecto ...",
+        "tw.lockdownMode": "En dispositivos Apple, debes desactivar {lockdownMode}.",
+        "tw.lockdownMode2": "Modo de bloqueo",
         "tw.menuBar.60off": "Desactivar modo 60 FPS",
         "tw.menuBar.60on": "Activar modo 60 FPS",
         "tw.menuBar.advanced": "Avanzado",
@@ -616,14 +632,17 @@
         "tw.menuBar.cloudOn": "Activar Variables en la Nube",
         "tw.menuBar.cloudUnavailable": "Variables en la Nube no Disponibles",
         "tw.menuBar.cloudUnavailableAlert": "No se pueden usar variables en la nube, probablemente porque abriste el editor.",
+        "tw.menuBar.cloudUnavailableDesktop": "No se pueden utilizar variables de nube en la aplicación de escritorio.",
         "tw.menuBar.moreSettings": "Ajustes Avanzados",
         "tw.menuBar.newFramerate": "Nuevo FPS:",
+        "tw.menuBar.newWindow": "Nueva ventana",
         "tw.menuBar.package": "Convertir proyecto",
         "tw.menuBar.reportError1": "Algunos scripts no pudieron ser compilados",
         "tw.menuBar.reportError2": "Esto es un bug. Por favor repórtelo.",
         "tw.menuBar.restorePoints": "Puntos de restauración",
         "tw.menuBar.saveAs": "Guardar como {file}",
         "tw.menuBar.seeInside": "Ver dentro",
+        "tw.moreCloud": "Obtenga más información sobre las variables de la nube.",
         "tw.notify.permission": "Si se permite, puede que su navegador le pida habilitar notificaciones, y próximas notificaciones serán permitidas automáticamente.",
         "tw.notify.title": "El proyecto quiere mostrar notificaciones.",
         "tw.oldDownload": "Guardar a archivo separado...",
@@ -659,6 +678,7 @@
         "tw.restorePoints.size": "Estimación del almacenamiento usado: {size}",
         "tw.restorePoints.size2": "Los disfraces y sonidos usados por múltiples puntos de recuperación son solo almacenados una vez.",
         "tw.restorePoints.title": "Puntos de Restauración",
+        "tw.sample": "Proyecto de muestra",
         "tw.saveAs": "Guardar como...",
         "tw.saveTo": "Guardar a {file}",
         "tw.scratchUnsafeCloud": "Si hace esto una variable en la nube, el proyecto exederá el límite de Scratch de {number} variables y algunas variables no funcionarán si sube el proyecto a Scratch.",
@@ -693,6 +713,7 @@
         "tw.settingsModal.storeProjectOptionsHelp": "Guarda los ajustes seleccionados en el proyecto para que sean aplicados automáticamente cuando TurboWarp carga este proyecto. Warp Timer y desactivar compilador no serán guardados.",
         "tw.settingsModal.title": "Ajustes Avanzados",
         "tw.settingsModal.warpTimerHelp": "Hace que los scripts revisen si están atascados en un bucle infinito y si es así, hace que vayan a una menor tasa de refresco hasta que el bucle termine, logrando evitar la mayoría de colapsos por este tipo de errores. Este ajuste tiene un impacto negativo significante en el rendimiento, por lo que solo está habilitado por defecto en el editor.",
+        "tw.soundEditorNotSupported": "El editor de sonido no es compatible con este navegador.",
         "tw.spriteSelectorItem.rename": "renombrar",
         "tw.stereo": "Estéreo",
         "tw.stereoAlert": "Editar este sonido estéreo lo convertirá irreversiblemente en mono.",
@@ -702,6 +723,7 @@
         "tw.tooLarge": "Este sonido podría ser demasiado grande como para cargarlo en Scratch.",
         "tw.twExtension.description": "Nuevos bloques extraños.",
         "tw.twExtension.name": "Bloques TurboWarp",
+        "tw.unfavorite": "No favorito",
         "tw.unshared.2": "Para más información, visite: {link}",
         "tw.unshared.bug": "Si el proyecto está realmente compartido, por favor reporte un error.",
         "tw.unshared.cache": "Si el proyecto se a compartido recientemente, este mensaje podría aparecer incorrectamente por algunos minutos.",
@@ -713,9 +735,12 @@
         "tw.usernameModal.new": "Nuevo nombre de usuario:",
         "tw.usernameModal.reset": "Reiniciar",
         "tw.usernameModal.title": "Cambiar Nombre de Usuario",
+        "tw.usesCloudVariables": "Este proyecto utiliza variables de nube.",
+        "tw.usesCloudVariables2": "Las variables de la nube de {APP_NAME} no están conectadas a las de Scratch. Cualquiera puede {changeTheirUsername}, así que tenga cuidado con la suplantación.",
+        "tw.usesCloudVariables2.change": "cambiar su nombre de usuario",
         "tw.viewFeaturedProjects": "Clickee para ver proyectos destacados.",
         "tw.viewOnScratch": "Ver proyecto en Scratch",
-        "tw.webglModal.description": "Desafortunadamente parece que tu navegador o computadora {webGlLink}. Esta tecnología se necesita para que funcione este sitio. Intente actualizar su navegador y drivers gráficos o reinicie su computadora."
+        "tw.webglModal.description": "Su navegador {webGlLink}, que es necesario para que este sitio funcione. Intente actualizar su navegador y controladores de gráficos o reiniciar su computadora."
     },
     "fr": {
         "tw.alerts.creatingRestorePoint": "Création d'un point de restauration…",
@@ -826,8 +851,7 @@
         "tw.usernameModal.reset": "Réinitialiser",
         "tw.usernameModal.title": "Changer votre nom d'utilisateur",
         "tw.viewFeaturedProjects": "Cliquez pour voir les projets sélectionnés.",
-        "tw.viewOnScratch": "Voir le projet sur Scratch",
-        "tw.webglModal.description": "Malheureusement, cela ressemble à votre navigateur ou à votre ordinateur{webGlLink}. Cette technologie est nécessaire au fonctionnement de ce site. Essayez de mettre à jour votre navigateur et vos pilotes graphiques ou de redémarrer votre ordinateur."
+        "tw.viewOnScratch": "Voir le projet sur Scratch"
     },
     "he": {
         "tw.alerts.creatingRestorePoint": "ביצוע נקודת שחזור קוד",
@@ -874,8 +898,7 @@
         "tw.studioview.hoverText": "{title}נוצר על ידי{author}",
         "tw.usernameModal.reset": "אִתחוּל",
         "tw.usernameModal.title": "לשנות את שם המשתמש",
-        "tw.viewFeaturedProjects": "לחץ על כפתור זה כדי להציג פרויקטי קוד נבחרים.",
-        "tw.webglModal.description": "לרוע המזל, נראה כי דפדפן האינטרנט או המחשב שלך{webGlLink} . טכנולוגיה זו נדרשת כדי שהאתר הזה יפעל כהלכה. נסה לעדכן את דפדפן האינטרנט או מנהלי ההתקן הגרפיים שלך; או הפעל מחדש את המחשב שלך."
+        "tw.viewFeaturedProjects": "לחץ על כפתור זה כדי להציג פרויקטי קוד נבחרים."
     },
     "hu": {
         "tw.alerts.creatingRestorePoint": "Helyreállítási pont készítése...",
@@ -971,8 +994,7 @@
         "tw.usernameModal.reset": "Visszaállítás",
         "tw.usernameModal.title": "Felhasználónév Megváltoztatása",
         "tw.viewFeaturedProjects": "Egy kattintás a kiemelt projektek megtekintéséhez.",
-        "tw.viewOnScratch": "Projekt megtekintése a Scratchen.",
-        "tw.webglModal.description": "Sajnos úgy tűnik, hogy a böngészője vagy számítógépe {webGlLink}. Ez a technológia szükséges ezenaz oldal lefutásához."
+        "tw.viewOnScratch": "Projekt megtekintése a Scratchen."
     },
     "it": {
         "tw.alerts.creatingRestorePoint": "Creazione di un punto di ripristino...",
@@ -1078,6 +1100,8 @@
         "tw.loader.assets.unknown": "Scaricamento risorse in corso ...",
         "tw.loader.data": "Scaricamento dati del progetto in corso...",
         "tw.loader.generic": "Caricamento del progetto in corso …",
+        "tw.lockdownMode": "Nei dispositivi Apple devi disabilitare la {lockdownMode}.",
+        "tw.lockdownMode2": "Modalità di Isolamento",
         "tw.menuBar.60off": "Disabilita modalità 60 FPS",
         "tw.menuBar.60on": "Abilita modalità 60 FPS",
         "tw.menuBar.addons": "Addon",
@@ -1169,6 +1193,7 @@
         "tw.settingsModal.storeProjectOptionsHelp": "Memorizza nel progetto le impostazioni selezionate in modo che siano applicate automaticamente quando il progetto viene caricato in TurboWarp. Il warp timer e la disabilitazione del compilatore non verranno memorizzati.",
         "tw.settingsModal.title": "Impostazioni Avanzate",
         "tw.settingsModal.warpTimerHelp": "Permette ai progetti di verificare se sono bloccati in un loop molto lungo o infinito e di essere quindi eseguiti ad un framerate più basso invece di apparire bloccati fino a che il loop non termina. Questa opzione risolve molte cause di blocco ma ha un impatto significativo sulla performance, quindi è abilitata come impostazione predeterminata solo all'interno dell'editor.",
+        "tw.soundEditorNotSupported": "L'editor di suoni non è supportato in questo browser.",
         "tw.spriteSelectorItem.rename": "rinomina",
         "tw.stereoAlert": "Modificando questo suono stereo verrà convertito in modo in maniera irreversibile. ",
         "tw.studioview.authorAttribution": "di {author}",
@@ -1353,8 +1378,7 @@
         "tw.usernameModal.reset": "リセット",
         "tw.usernameModal.title": "ユーザー名を変える",
         "tw.viewFeaturedProjects": "クリックしてプロジェクトの特集を見る。",
-        "tw.viewOnScratch": "Scratchでプロジェクトを見る",
-        "tw.webglModal.description": "残念ながら、お使いのブラウザやコンピュータは{webGlLink}のようです。このサイトを実行するには、操作が必要です。お使いのブラウザやグラフィックドライバをアップデートするか、コンピュータを再起動してみてください。"
+        "tw.viewOnScratch": "Scratchでプロジェクトを見る"
     },
     "ja-hira": {
         "tw.alerts.creatingRestorePoint": "ふくげんしています…",
@@ -1448,6 +1472,7 @@
         "tw.twExtension.name": "TurboWarpのブロック",
         "tw.usernameModal.mustChange": "もうしわけありません、あなたのユーザーめいが安全(あんぜん)でない可能性(かのうせい)があります。ほかのユーザーめいに変更(へんこう)するか、{resetIt}をしてください。",
         "tw.usernameModal.mustChange.resetIt": "リセット(おすすめ)",
+        "tw.usernameModal.new": "あたらしいゆーざーめい:",
         "tw.usernameModal.reset": "リセット",
         "tw.usernameModal.title": "ユーザーめいをかえる",
         "tw.viewFeaturedProjects": "クリックしてプロジェクトの特集(とくしゅう)をみる。",
@@ -1558,6 +1583,8 @@
         "tw.loader.assets.unknown": "정보를 내려받는 중입니다...",
         "tw.loader.data": "프로젝트 자료를 내려받는 중입니다...",
         "tw.loader.generic": "프로젝트를 불러오는 중입니다...",
+        "tw.lockdownMode": "Apple 기기에서는 {lockdownMode}를 비활성화해야 합니다.",
+        "tw.lockdownMode2": "차단 모드",
         "tw.menuBar.60off": "60 FPS 모드 비활성화",
         "tw.menuBar.60on": "60 FPS 모드 활성화",
         "tw.menuBar.addons": "애드온",
@@ -1632,7 +1659,7 @@
         "tw.settingsModal.featured": "추천 기능",
         "tw.settingsModal.fps": "60 FPS (또는 사용자 지정 FPS) 활성화",
         "tw.settingsModal.fpsHelp": "스크립트를 초당 30회로 실행하는 대신 초당 60회 실행합니다. 대부분의 프로젝트는 이 기능이 활성화된 상태에서 제대로 작동하지 않으며, 이 같은 경우에는 60 FPS모드 대신 보간법을 사용해야 합니다. {customFramerate}",
-        "tw.settingsModal.fpsHelp.customFramerate": "30 또는 60 이외의 프레임률을 사용하려면 클릭합니다.",
+        "tw.settingsModal.fpsHelp.customFramerate": "30 또는 60 이외의 사용자 정의 FPS 사용하기",
         "tw.settingsModal.help": "클릭하여 도움말 열기",
         "tw.settingsModal.highQualityPen": "고품질 펜 활성화",
         "tw.settingsModal.highQualityPenHelp": "펜 프로젝트가 더 높은 해상도에서 렌더링될 수 있도록 해주며, 편집기에서 적용되는 일부 좌표 반올림을 비활성화합니다. 이 옵션은 모든 프로젝트에 도움이 되지는 않으며 성능에 영향을 미칠 수 있습니다.",
@@ -1651,6 +1678,7 @@
         "tw.settingsModal.title": "고급 설정",
         "tw.settingsModal.warpTimer": "워프 타이머 활성화",
         "tw.settingsModal.warpTimerHelp": "스크립트가 긴 반복문 또는 무한 반복문에 갇힌 경우, 반복문이 끝날 때까지 코드가 멈춰 있지 않고 낮은 프레임에서 실행되고 있는지 확인합니다.\n이 기능은 대부분의 충돌을 막을 수 있지만 성능을 확연히 저하시킵니다. 따라서 해당 기능은 편집기에서만 활성화됩니다.",
+        "tw.soundEditorNotSupported": "해당 브라우저에서는 소리 편집기가 지원되지 않습니다.",
         "tw.spriteSelectorItem.rename": "이름 재설정하기",
         "tw.stereo": "스테레오",
         "tw.stereoAlert": "해당 스테레오 음원을 수정하면 자동으로 모노 음원으로 변환되며 이 작업은 되돌릴 수 없습니다.",
@@ -1677,7 +1705,7 @@
         "tw.usesCloudVariables2.change": "다른 사용자 이름 변경하기",
         "tw.viewFeaturedProjects": "여기를 클릭하여 특집 프로젝트를 볼 수 있습니다.",
         "tw.viewOnScratch": "프로젝트 스크래치에서 보기",
-        "tw.webglModal.description": "당신의 브라우저나 컴퓨터가 {webGlLink}. 이 기술은 TurboWarp를 실행하기 위해 필요합니다. 당신의 브라우저와 그래픽 드라이버를 업데이트하거나 컴퓨터를 재시작하세요."
+        "tw.webglModal.description": "해당 웹사이트를 실행하기 위해 {webGlLink}가 필요합니다. 브라우저 또는 그래픽 드라이버를 업데이트한 후 컴퓨터를 재시작해 보세요."
     },
     "lt": {
         "tw.alerts.creatingRestorePoint": "Atkuriamas atkūrimo taškas...",
@@ -1781,8 +1809,7 @@
         "tw.usernameModal.reset": "nustatyti iš naujo",
         "tw.usernameModal.title": "Pakeisti Naudotojo vardą",
         "tw.viewFeaturedProjects": "Spustelkite kad pažiurėtumėte rekomenduojamus projektus.",
-        "tw.viewOnScratch": "Peržiurėti projektą per Scratch",
-        "tw.webglModal.description": "Deja, atrodo, kad jūsų naršyklė arba kompiuteris nepalaiko {webGlLink}. Ši technologija reikalinga, kad ši svetainė veiktų. Pabandykite atnaujinti naršyklę ir grafikos tvarkykles arba iš naujo paleiskite kompiuterį."
+        "tw.viewOnScratch": "Peržiurėti projektą per Scratch"
     },
     "nb": {
         "tw.alerts.savedToDisk": "Lagret på datamaskinet.",
@@ -1956,6 +1983,8 @@
         "tw.loader.assets.unknown": "Onderdelen aan het downloaden …",
         "tw.loader.data": "Projectgegevens aan het downloaden …",
         "tw.loader.generic": "Project aan het laden ...",
+        "tw.lockdownMode": "Als je Apple gebruikt, schakel {lockdownMode} uit.",
+        "tw.lockdownMode2": "de isolatiemodus",
         "tw.menuBar.60off": "60 FPS-Modus Uitzetten",
         "tw.menuBar.60on": "60 FPS-Modus Aanzetten",
         "tw.menuBar.advanced": "Geavanceerd",
@@ -2047,6 +2076,7 @@
         "tw.settingsModal.title": "Geavanceerde Instellingen",
         "tw.settingsModal.warpTimer": "Warp-Stopwatch",
         "tw.settingsModal.warpTimerHelp": "Controleert of scripts vastzitten in een lange of oneindige lus en voor een lage framerate zorgen in plaats van vastzitten tot de lus eindigt. Dit lost de meeste crashes op maar heeft een grote invloed op prestaties, dus het is alleen standaard ingeschakeld in de editor.",
+        "tw.soundEditorNotSupported": "Geluidseditor is niet ondersteund in deze browser.",
         "tw.spriteSelectorItem.rename": "hernoemen",
         "tw.stereoAlert": "Het bewerken van dit stereogeluid zal het onomkeerbaar veranderen naar mono.",
         "tw.studioview.authorAttribution": "door {author}",
@@ -2072,7 +2102,7 @@
         "tw.usesCloudVariables2.change": "zijn/haar gebruikersnaam veranderen",
         "tw.viewFeaturedProjects": "Klik om uitgelichte projecten te zien.",
         "tw.viewOnScratch": "Dit project op Scratch laten zien",
-        "tw.webglModal.description": "Het ziet er helaas uit dat je browser of computer {webGlLink}. Deze technologie is vereist voor deze site om goed te werken. Probeer je browser en grafische stuurprogramma's te updaten of start je computer opnieuw op."
+        "tw.webglModal.description": "Je browser {webGlLink}, wat nodig is zodat deze site kan werken. Probeer je browser en grafische stuurprogramma's te updaten of start je computer opnieuw op."
     },
     "pl": {
         "tw.alerts.creatingRestorePoint": "Tworzenie punktu przywracania…",
@@ -2281,8 +2311,7 @@
         "tw.usernameModal.reset": "Redefinir",
         "tw.usernameModal.title": "Mudar nome de usuário",
         "tw.viewFeaturedProjects": "Clique para ver projetos em destaque.",
-        "tw.viewOnScratch": "Ver projeto no Scratch",
-        "tw.webglModal.description": "Infelizmente parece que o seu navegador ou computador {webGlLink}. Essa tecnologia é necessária para o site funcionar. Tente atualizar o seu navegador e drivers gráficos ou reiniciar o seu computador."
+        "tw.viewOnScratch": "Ver projeto no Scratch"
     },
     "pt-br": {
         "tw.alerts.creatingRestorePoint": "Criando ponto de restauração...",
@@ -2415,8 +2444,7 @@
         "tw.usernameModal.reset": "Redefinir",
         "tw.usernameModal.title": "Mudar nome de usuário",
         "tw.viewFeaturedProjects": "Clique para ver projetos em destaque.",
-        "tw.viewOnScratch": "Ver projeto no Scratch",
-        "tw.webglModal.description": "Infelizmente parece que o seu navegador ou computador {webGlLink}. Essa tecnologia é necessária para o site funcionar. Tente atualizar o seu navegador e drivers gráficos ou reiniciar o seu computador."
+        "tw.viewOnScratch": "Ver projeto no Scratch"
     },
     "ro": {
         "tw.alerts.creatingRestorePoint": "Se creează punctul de recuperare…",
@@ -2469,8 +2497,7 @@
         "tw.usernameModal.new": "Nume de utilizator nou:",
         "tw.usernameModal.reset": "Resetează",
         "tw.usernameModal.title": "Schimbă Utilizatorul",
-        "tw.viewFeaturedProjects": "Vezi proiectele recomandate (dați click).",
-        "tw.webglModal.description": "Din păcate se pare că browserul sau calculatorul tău {webGlLink}. Această tehnologie trebuie să existe ca acest site să ruleze. Încearcă să-ți actualizezi browserul și discurile de grafici sau repornește-ți calculatorul."
+        "tw.viewFeaturedProjects": "Vezi proiectele recomandate (dați click)."
     },
     "ru": {
         "tw.alerts.creatingRestorePoint": "Создание точки восстановления...",
@@ -2586,8 +2613,7 @@
         "tw.usernameModal.reset": "Сбросить",
         "tw.usernameModal.title": "Изменить имя пользователя",
         "tw.viewFeaturedProjects": "Нажмите, чтобы посмотреть избранные проекты.",
-        "tw.viewOnScratch": "Посмотреть проект на Scratch",
-        "tw.webglModal.description": "Похоже, ваш компьютер или браузер {webGlLink}. Эта технология нужна для работы TurboWarp. Попробуйте обновить драйвера и ваш браузер или перезагрузить компьютер."
+        "tw.viewOnScratch": "Посмотреть проект на Scratch"
     },
     "sl": {
         "tw.alerts.creatingRestorePoint": "Ustvarjanje obnovitvene različice...",
@@ -2690,8 +2716,7 @@
         "tw.usernameModal.reset": "Ponastavi",
         "tw.usernameModal.title": "Spremeni uporabniško ime",
         "tw.viewFeaturedProjects": "Kliknite za ogled izpostavljenih projektov.",
-        "tw.viewOnScratch": "Ogled projekta na Scratchu",
-        "tw.webglModal.description": "Žal je videti, da vaš brskalnik ali računalnik ne podpira {webGlLink}. Ta stran potrebuje to tehnologijo za delovanje. Poskusite posodobiti svoj brskalnik in gonilnike ali znova zagnati svoj računalnik."
+        "tw.viewOnScratch": "Ogled projekta na Scratchu"
     },
     "sr": {
         "tw.alerts.creatingRestorePoint": "Прављење тачке враћања...",
@@ -2789,8 +2814,7 @@
         "tw.usernameModal.reset": "Ресетуј",
         "tw.usernameModal.title": "Промени корисничко име",
         "tw.viewFeaturedProjects": "Кликни да видиш истакнуте пројекте",
-        "tw.viewOnScratch": "Погледај пројекат на Scratch-у",
-        "tw.webglModal.description": "Нажалост, изгледа да Ваш прегледач или компјутер {webGlLink}. Ова технологија је неопходна сајту да исправно ради. Пробајте да ажурирате прегледач и графичке драјвере или рестартујте компјутер."
+        "tw.viewOnScratch": "Погледај пројекат на Scratch-у"
     },
     "sv": {
         "tw.alerts.creatingRestorePoint": "Skapar återställningspunkt...",
@@ -2954,8 +2978,7 @@
         "tw.usernameModal.reset": "Starta om",
         "tw.usernameModal.title": "Ändra användarnamn",
         "tw.viewFeaturedProjects": "Klicka för att se utvalda projekt",
-        "tw.viewOnScratch": "Se projektet på Scratch",
-        "tw.webglModal.description": "Olyckligtvis ser det ut som om din webbläsare eller dator {webGlLink}. Denna sidan kräver denna teknologin för att sidan ska fungera. Försök att uppdatera din webbläsare och grafikdrivrutiner eller starta om din dator."
+        "tw.viewOnScratch": "Se projektet på Scratch"
     },
     "tr": {
         "tw.alerts.creatingRestorePoint": "Yükleme noktası yapılıyor",
@@ -3179,8 +3202,7 @@
         "tw.usesCloudVariables2": "{APP_NAME}'in bulut değişkenleri Scratch'inkilere bağlı değil. Herkes {changeTheirUsername} herhangi bir şey yapabilir, bu nedenle kimliğe bürünmeye karşı dikkatli olun.",
         "tw.usesCloudVariables2.change": "kullanıcı adını değiştir",
         "tw.viewFeaturedProjects": "Özellikli projeleri görmek için buraya tıklayınız.",
-        "tw.viewOnScratch": "Projeyi Scratch'te görüntüleyin.",
-        "tw.webglModal.description": "Ne yazık ki senin web tarayıcının yada bilgisayarın {webGlLink}. Bu sitenin çalışması için bu teknolojiye ihtiyaç vardır. Web tarayıcını ve grafik sürücülerini güncelle yada bilgisayarını yeniden başlatmayı  deneyin."
+        "tw.viewOnScratch": "Projeyi Scratch'te görüntüleyin."
     },
     "uk": {
         "tw.alerts.creatingRestorePoint": "Створення точки відновлення...",
@@ -3296,8 +3318,7 @@
         "tw.usernameModal.reset": "Скинути",
         "tw.usernameModal.title": "Змінити ім'я користувача",
         "tw.viewFeaturedProjects": "Натисніть щоб переглянути обрані проекти.",
-        "tw.viewOnScratch": "Проглянути проєкт на Scratch",
-        "tw.webglModal.description": "На жаль, ваш браузер або ком'пютер {webGlLink}. Ця технологія необхідна для роботи цього сайту. Спробуйте обновити браузер і драйвера або перезавантажте комп'ютер."
+        "tw.viewOnScratch": "Проглянути проєкт на Scratch"
     },
     "vi": {
         "tw.alerts.creatingRestorePoint": "Đang tạo điiểm khôi phục",
@@ -3584,8 +3605,7 @@
         "tw.usesCloudVariables2": "{APP_NAME} 的云变量与 Scratch 的云变量没有关联。任何人都可以把自己的用户名 {changeTheirUsername} 改成任何东西，所以要小心冒名顶替",
         "tw.usesCloudVariables2.change": "更改用户名",
         "tw.viewFeaturedProjects": "点击以查看特色作品。",
-        "tw.viewOnScratch": "在 Scratch 网站上查看作品",
-        "tw.webglModal.description": "很抱歉，您的浏览器或电脑可能缺少 {webGlLink}。运行此网站需要此技术。请尝试更新浏览器和图形驱动程序或重启电脑。"
+        "tw.viewOnScratch": "在 Scratch 网站上查看作品"
     },
     "zh-tw": {
         "tw.backpack.rename": "新名稱:",

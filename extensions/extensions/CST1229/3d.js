@@ -14,6 +14,33 @@
   const OBJECT = "threed.object";
   const THREED_DIRTY = "threed.dirty";
 
+	const PATCHES_ID = "__patches_cst12293d";
+	const patch = (obj, functions) => {
+		if (obj[PATCHES_ID]) return;
+		obj[PATCHES_ID] = {};
+		for (const name in functions) {
+			const original = obj[name];
+			obj[PATCHES_ID][name] = obj[name];
+			if (original) {
+				obj[name] = function(...args) {
+					const callOriginal = (...ogArgs) => original.call(this, ...ogArgs);
+					return functions[name].call(this, callOriginal, ...args);
+				};
+			} else {
+				obj[name] = function (...args) {
+					return functions[name].call(this, () => {}, ...args);
+				}
+			}
+		}
+	}
+	const unpatch = (obj) => {
+		if (!obj[PATCHES_ID]) return;
+		for (const name in obj[PATCHES_ID]) {
+			obj[name] = obj[PATCHES_ID][name];
+		}
+		delete obj[PATCHES_ID];
+	}
+
   const Skin = Scratch.renderer.exports.Skin;
 
   class SimpleSkin extends Skin {
@@ -57,8 +84,6 @@
       this.emitWasAltered();
     }
   }
-
-  // this probably won't be finished
 
   /* eslint-disable */
   // prettier-ignore
@@ -315,24 +340,21 @@
       const Drawable = drawable.constructor;
 
       Drawable.threed = this;
-      if (!Drawable.threeDPatchesApplied) {
-        const originalGetVisible = Drawable.prototype.getVisible;
-        Drawable.prototype.getVisible = function () {
+      patch(Drawable.prototype, {
+        getVisible(og) {
           if (this[IN_3D]) return false;
-          return originalGetVisible.call(this);
-        };
-        const originalUpdatePosition = Drawable.prototype.updatePosition;
-        Drawable.prototype.updatePosition = function (position) {
+          return og();
+        },
+        updatePosition(og, position) {
           if (this[IN_3D]) {
             const o = this[OBJECT];
             o.translateX(position[0] - o.position.x);
             o.translateY(position[1] - o.position.y);
             Drawable.threed.updateRenderer();
           }
-          return originalUpdatePosition.call(this, position);
-        };
-        const originalDispose = Drawable.prototype.dispose;
-        Drawable.prototype.dispose = function () {
+          return og(position);
+        },
+        dispose(og) {
           if (this[OBJECT]) {
             this[OBJECT].removeFromParent();
             this[OBJECT].material.dispose();
@@ -340,24 +362,21 @@
             this[OBJECT].geometry.dispose();
             this[OBJECT] = null;
           }
-          return originalDispose.call(this);
-        };
-        Drawable.threeDPatchesApplied = true;
-      }
+          return og();
+        },
+      });
 
       Scratch.renderer.threed = this;
-      if (!Scratch.renderer.threeDPatchesApplied) {
-        const originalDraw = Scratch.renderer.draw;
-        Scratch.renderer.draw = function () {
+      patch(Scratch.renderer, {
+        draw(og) {
           if (this[THREED_DIRTY]) {
             // Do a 3D redraw
             Drawable.threed.doUpdateRenderer();
             this[THREED_DIRTY] = false;
           }
-          return originalDraw.call(this);
-        };
-        Drawable.threeDPatchesApplied = true;
-      }
+          return og();
+        },
+      });
     }
 
     updateRenderer() {

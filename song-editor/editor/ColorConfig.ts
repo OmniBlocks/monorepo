@@ -4783,12 +4783,12 @@ export class ColorConfig {
 		 --white-piano-key-text: #131200;
 		 --black-piano-key-text: #fff;
 		 --use-color-formula: false;
-		 --track-editor-bg-pitch: #444;
-		 --track-editor-bg-pitch-dim: #333;
-		 --track-editor-bg-noise: #444;
-		 --track-editor-bg-noise-dim: #333;
-		 --track-editor-bg-mod: #234;
-		 --track-editor-bg-mod-dim: #123;
+		 --track-editor-bg-pitch: #2D1C4C;
+		 --track-editor-bg-pitch-dim: #21162B;
+		 --track-editor-bg-noise: #39385B;
+		 --track-editor-bg-noise-dim: #1C1B26;
+		 --track-editor-bg-mod: #2B2F87;
+		 --track-editor-bg-mod-dim: #171933;
 		 --multiplicative-mod-slider: #456;
 		 --overwriting-mod-slider: #654;
 		 --indicator-primary: #8153E0;

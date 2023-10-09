@@ -333,9 +333,10 @@
     <script type="text/javascript">
 
         // Randomize display of header
-        // 1-in-19 (hopefully 20 soon?)
+        // 1-in-23
+        //I should rework this sometime (maybe add the midbox tips thingy?)
         if (Math.floor(Math.random() * 8) == 0) {
-            switch (Math.floor(Math.random() * 18)) {
+            switch (Math.floor(Math.random() * 22)) {
                 case 0:
                     document.getElementById("goldboxPlant").innerHTML = "  🍂";
                     break;
@@ -382,11 +383,12 @@
 			    case 13:
                     document.getElementById("goldboxPlant").innerHTML = "  🪱";
                     break;
-                // suggested by mel(?), meant to supplement the lack of a worm logo 
+                // suggested by mel, meant to supplement the lack of a worm logo 
+                // (in case it doesn't show up, this is meant to be a worm emoji)
 			     case 14:
                     document.getElementById("goldboxPlant").innerHTML = "  :wackybox:";
                     break;
-                // don't remember where this one is from, most likely it's unique to ultrabox 
+                // don't remember where this one is from, most likely it's from ultrabox or familiarbox
 			    case 15:
                     document.getElementById("goldboxPlant").innerHTML = "  🚫 🍽️ 🐟";
                     break;
@@ -405,6 +407,19 @@
                     document.getElementById("goldboxPlant").innerHTML = "  👽";
                     break;
                   // blubox 2.0 plants 
+                case 20:
+                    document.getElementById("goldboxPlant").innerHTML = "  🍕";
+                    break;
+                case 21:
+                    document.getElementById("goldboxPlant").innerHTML = "  🌭";
+                    break;
+                case 22:
+                    document.getElementById("goldboxPlant").innerHTML = "  🍔";
+                    break;
+                case 23:
+                    document.getElementById("goldboxPlant").innerHTML = "  🍟";
+                    break;
+                //dogebox2 plants   
             }
         }
 

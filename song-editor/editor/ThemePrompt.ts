@@ -38,8 +38,8 @@ export class ThemePrompt implements Prompt {
 			option({ value: "slushie" }, "Slushie"),
 			option({ value: "ultrabox rainbow" }, "Rainbow"),
 			option({ value: "ultrabox terminal" }, "Terminal"),
+			option({ value: "azur lane" }, "Azur Lane"),
 			option({ value: "ultrabox upside-down beepbox" }, "Upside-down Beepbox"),
-			//is moving these above the themes taken from other beepmods a good choice?
 			option({ value: "modbox classic" }, "Modbox Classic"),
 			option({ value: "sandbox classic" }, "Sandbox 3.0"),
 			option({ value: "harrybox" }, "Haileybox"),
@@ -57,6 +57,7 @@ export class ThemePrompt implements Prompt {
 			option({ value: "microbox" }, "MicroBox"),
 			option({ value: "paandorasbox" }, "PaandorasBox"),
 			option({ value: "foxbox" }, "FoxBox"),
+			option({ value: "midbox" }, "Midbox"),
 			// option({ value: "modbox reimagined" }, "Modbox Reimagined"),
 			option({ value: "mainbox reimagined" }, "Mainbox Reimagined"),
 			option({ value: "custom" }, "Custom")

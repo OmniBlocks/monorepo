@@ -6249,18 +6249,18 @@ export class ColorConfig {
 		}
 		.instructions-column > section:first-of-type > p:first-of-type:after {
 		display: block;
-		content: url("https://file.garden/ZSRSdEIH-j7BkJA-/UltraboxAzurLaneThemeStarterSquad.png");
+		content: url("UltraboxAzurLaneThemeStarterSquad.png");
 		width: 100%;
 		text-align: center;
 		margin-top: 25px;
 		}
 		/* sets cursor */
 		* {
-		cursor: url("https://file.garden/ZSRSdEIH-j7BkJA-/Azur%20Lane%20Theme%20Mouse.png"), auto !important;
+		cursor: url("UltraBoxAzurLaneThemeMouse.png"), auto !important;
 		}
 		/* sets background image */
 		body {
-		background-image: url("https://azurlane.netojuu.com/images/4/44/Memory_Task_Background.png") !important;
+		background-image: url("UltraBoxAzurLaneThemeMemoryTaskBackground.png") !important;
 		background-size: cover;
 		background-position: center;
 		background-repeat: no-repeat;
@@ -6274,7 +6274,7 @@ export class ColorConfig {
 		}
 		#text-content > section > h1 {
 		margin: auto;
-		content: url("https://file.garden/ZSRSdEIH-j7BkJA-/UltraboxALThemeLogoSmall.png");
+		content: url("UltraBoxALThemeLogo.png");
 		}
 	}`,
 			  "custom": `${localStorage.getItem("customColors") || `:root {

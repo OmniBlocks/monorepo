@@ -1828,6 +1828,16 @@ export class ChangePulseWidth extends ChangeInstrumentSlider {
     }
 }
 
+export class ChangeDecimalOffset extends ChangeInstrumentSlider {
+    constructor(doc: SongDocument, oldValue: number, newValue: number) {
+        super(doc);
+        this._instrument.decimalOffset = newValue;
+        // doc.synth.unsetMod(Config.modulators.dictionary["decimalOffset"].index, doc.channel, doc.getCurrentInstrument());
+        doc.notifier.changed();
+        if (oldValue != newValue) this._didSomething();
+    }
+}
+
 export class ChangePitchShift extends ChangeInstrumentSlider {
     constructor(doc: SongDocument, oldValue: number, newValue: number) {
         super(doc);

@@ -233,6 +233,7 @@ const enum SongTagCode {
     feedbackEnvelope = CharCode.V, // added in 6, DEPRECATED
     pulseWidth = CharCode.W, // added in 7
     aliases = CharCode.X, // [JB], added in 4, DEPRECATED
+    decimalOffset = CharCode.X, // [UB], will likely remove and merge with pulse width with url version 4
 
 }
 
@@ -1405,6 +1406,7 @@ export class Instrument {
     public clicklessTransition: boolean = false;
     public aliases: boolean = false;
     public pulseWidth: number = Config.pulseWidthRange;
+    public decimalOffset: number = 0;
     public stringSustain: number = 10;
     public distortion: number = 0;
     public bitcrusherFreq: number = 0;
@@ -3149,6 +3151,8 @@ export class Song {
                     buffer.push(SongTagCode.unison, base64IntToCharCode[instrument.unison]);
                 } else if (instrument.type == InstrumentType.pwm) {
                     buffer.push(SongTagCode.pulseWidth, base64IntToCharCode[instrument.pulseWidth]);
+                    buffer.push(SongTagCode.decimalOffset, base64IntToCharCode[instrument.decimalOffset]);
+                    // buffer.push(SongTagCode.decimalOffset, base64IntToCharCode[instrument.decimalOffset >> 6], base64IntToCharCode[instrument.decimalOffset & 0x3f]); 
                 } else if (instrument.type == InstrumentType.pickedString) {
                     buffer.push(SongTagCode.unison, base64IntToCharCode[instrument.unison]);
                     buffer.push(SongTagCode.stringSustain, base64IntToCharCode[instrument.stringSustain]);
@@ -4177,6 +4181,14 @@ export class Song {
                     if((beforeTwo && fromGoldBox) || (!fromGoldBox && !fromUltraBox)) aa = pregoldToEnvelope[aa];
                     legacySettings.pulseEnvelope = Song._envelopeFromLegacyIndex(aa);
                     instrument.convertLegacySettings(legacySettings, forceSimpleFilter);
+                }
+            } break;
+            case SongTagCode.decimalOffset: {
+                // if (fromUltraBox && !beforeFour) {
+                if (fromUltraBox) {
+                    const instrument: Instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];  
+                    instrument.decimalOffset = clamp(0, 51 + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                    // instrument.decimalOffset = clamp(0, 100 + 1, (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) + base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                 }
             } break;
             case SongTagCode.stringSustain: {
@@ -10179,7 +10191,7 @@ export class Synth {
                 settingsExpressionMult *= Config.chipWaves[instrument.chipWave].expression;
             }
             if (instrument.type == InstrumentType.pwm) {
-                const basePulseWidth: number = getPulseWidthRatio(instrument.pulseWidth);
+                const basePulseWidth: number = getPulseWidthRatio(instrument.pulseWidth - ((instrument.decimalOffset - 1) * 0.01));
 
                 // Check for PWM mods to this instrument
                 let pulseWidthModStart: number = basePulseWidth;

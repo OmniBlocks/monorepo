@@ -483,6 +483,12 @@ export class TipPrompt implements Prompt {
                         message = div(h2("Backwards"), p("When set, the chip wave will start playing backwards. After checking this, you may want to adjust the offset to start from a different point that makes sense for this mode."));
                     }
                     break;
+					case "decimalOffset": {
+						message = div(
+							h2("Decimal Offset"),
+							p("This setting controls the offset for pulse widths. use this for making 12.5 or 6.25 EDIT THIS"),
+						);
+					} break;
 
 			default:
 				// Check for modSetinfo#

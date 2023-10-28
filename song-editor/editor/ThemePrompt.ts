@@ -36,16 +36,13 @@ export class ThemePrompt implements Prompt {
 			option({ value: "neapolitan" }, "Neapolitan"),
 			option({ value: "mono" }, "Mono"),
 			option({ value: "slushie" }, "Slushie"),
-			option({ value: "ultrabox rainbow" }, "Rainbow"),
-			option({ value: "ultrabox terminal" }, "Terminal"),
 			option({ value: "azur lane" }, "Azur Lane"),
-			option({ value: "ultrabox upside-down beepbox" }, "Upside-down Beepbox"),
-			option({ value: "modbox classic" }, "Modbox Classic"),
-			option({ value: "sandbox classic" }, "Sandbox 3.0"),
+			option({ value: "modbox classic" }, "Modbox"),
+			option({ value: "sandbox classic" }, "Sandbox"),
 			option({ value: "harrybox" }, "Haileybox"),
 			option({ value: "brucebox" }, "Brucebox"),
+			option({ value: "shitbox 3.0" }, "Shitbox 1.0/3.0"),
 			option({ value: "shitbox 2.0" }, "Shitbox 2.0"),
-			option({ value: "shitbox 3.0" }, "Shitbox 3.0"),
 			option({ value: "nerdbox" }, "Nerdbox"),
 			option({ value: "zefbox" }, "Zefbox"),
 			option({ value: "cardboardbox classic" }, "Cardboardbox"),
@@ -58,8 +55,6 @@ export class ThemePrompt implements Prompt {
 			option({ value: "paandorasbox" }, "PaandorasBox"),
 			option({ value: "foxbox" }, "FoxBox"),
 			option({ value: "midbox" }, "Midbox"),
-			// option({ value: "modbox reimagined" }, "Modbox Reimagined"),
-			option({ value: "mainbox reimagined" }, "Mainbox Reimagined"),
 			option({ value: "custom" }, "Custom")
 	);
 	private readonly _cancelButton: HTMLButtonElement = button({ class: "cancelButton" });

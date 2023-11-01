@@ -486,7 +486,7 @@ export class TipPrompt implements Prompt {
 					case "decimalOffset": {
 						message = div(
 							h2("Decimal Offset"),
-							p("This setting controls the offset for pulse widths. use this for making 12.5 or 6.25 EDIT THIS"),
+							p("The decimal offset is subtracted from the pulse width value, enabling the use of numbers such as 12.5 or 6.25. This could be useful if you're trying to recreate the sound of old soundchips."),
 						);
 					} break;
 

@@ -880,7 +880,7 @@ export class SongEditor {
 
     private readonly _pulseWidthSlider: Slider = new Slider(input({ style: "margin: 0;", type: "range", min: "1", max: Config.pulseWidthRange, value: "1", step: "1" }), this._doc, (oldValue: number, newValue: number) => new ChangePulseWidth(this._doc, oldValue, newValue), false);
     private readonly _pulseWidthRow: HTMLDivElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("pulseWidth") }, "Pulse Width:"), this._pulseWidthSlider.container);
-    private readonly _decimalOffsetSlider: Slider = new Slider(input({ style: "margin: 0;", type: "range", min: "1", max: "51", value: "1", step: "1" }), this._doc, (oldValue: number, newValue: number) => new ChangeDecimalOffset(this._doc, oldValue, newValue), false);
+    private readonly _decimalOffsetSlider: Slider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: "50", value: "0", step: "1" }), this._doc, (oldValue: number, newValue: number) => new ChangeDecimalOffset(this._doc, oldValue, newValue), false);
     private readonly _decimalOffsetRow: HTMLDivElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("decimalOffset") }, "Offset:"), this._decimalOffsetSlider.container);
     private readonly _pitchShiftSlider: Slider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.pitchShiftRange - 1, value: "0", step: "1" }), this._doc, (oldValue: number, newValue: number) => new ChangePitchShift(this._doc, oldValue, newValue), true);
     private readonly _pitchShiftTonicMarkers: HTMLDivElement[] = [div({ class: "pitchShiftMarker", style: { color: ColorConfig.tonic } }), div({ class: "pitchShiftMarker", style: { color: ColorConfig.tonic, left: "50%" } }), div({ class: "pitchShiftMarker", style: { color: ColorConfig.tonic, left: "100%" } })];
@@ -1737,6 +1737,8 @@ export class SongEditor {
                 return this._feedbackAmplitudeSlider;
             case Config.modulators.dictionary["pulse width"].index:
                 return this._pulseWidthSlider;
+            case Config.modulators.dictionary["decimal offset"].index:
+                return this._decimalOffsetSlider;
             case Config.modulators.dictionary["reverb"].index:
                 return this._reverbSlider;
             case Config.modulators.dictionary["distortion"].index:
@@ -2240,7 +2242,7 @@ export class SongEditor {
                 this._pulseWidthSlider.updateValue(instrument.pulseWidth);
 
                 this._decimalOffsetRow.style.display = "";
-                this._decimalOffsetSlider.input.title = ((Number(prettyNumber(instrument.decimalOffset)) - 1) * 0.01) == 0 ? "none" : "-" + ((Number(prettyNumber(instrument.decimalOffset)) - 1) * 0.01) + "%";
+                this._decimalOffsetSlider.input.title = (Number(prettyNumber(instrument.decimalOffset)) / 100) <= 0 ? "none" : "-" + (Number(prettyNumber(instrument.decimalOffset)) / 100) + "%";
                 this._decimalOffsetSlider.updateValue(instrument.decimalOffset);
             } else {
                 this._pulseWidthRow.style.display = "none";
@@ -2813,6 +2815,7 @@ export class SongEditor {
                         }
                         if (tgtInstrumentTypes.includes(InstrumentType.pwm)) {
                             settingList.push("pulse width");
+                            settingList.push("decimal offset");
                         }
                         if (tgtInstrumentTypes.includes(InstrumentType.pickedString)) {
                             settingList.push("sustain");

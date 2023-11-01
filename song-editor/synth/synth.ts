@@ -4183,14 +4183,6 @@ export class Song {
                     instrument.convertLegacySettings(legacySettings, forceSimpleFilter);
                 }
             } break;
-            case SongTagCode.decimalOffset: {
-                // if (fromUltraBox && !beforeFour) {
-                if (fromUltraBox) {
-                    const instrument: Instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];  
-                    instrument.decimalOffset = clamp(0, 51 + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
-                    // instrument.decimalOffset = clamp(0, 100 + 1, (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) + base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
-                }
-            } break;
             case SongTagCode.stringSustain: {
                 const instrument: Instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                 instrument.stringSustain = clamp(0, Config.stringSustainRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
@@ -4922,7 +4914,12 @@ export class Song {
                         instrument.effects |= 1 << EffectType.distortion;
                     }
                 } else {
-                    // Do nothing, deprecated
+                     // if (fromUltraBox && !beforeFour) {
+                    if (fromUltraBox) {
+                        const instrument: Instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];  
+                        instrument.decimalOffset = clamp(0, 50 + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                        // instrument.decimalOffset = clamp(0, 100 + 1, (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) + base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                    }
                 }
             }
                 break;
@@ -6828,6 +6825,7 @@ class Tone {
     public prevStringDecay: number | null = null;
     public pulseWidth: number = 0.0;
     public pulseWidthDelta: number = 0.0;
+    public decimalOffset: number = 0.0;
     public readonly pickedStrings: PickedString[] = [];
 
     public readonly noteFilters: DynamicBiquadFilter[] = [];
@@ -10191,7 +10189,7 @@ export class Synth {
                 settingsExpressionMult *= Config.chipWaves[instrument.chipWave].expression;
             }
             if (instrument.type == InstrumentType.pwm) {
-                const basePulseWidth: number = getPulseWidthRatio(instrument.pulseWidth - ((instrument.decimalOffset - 1) * 0.01));
+                const basePulseWidth: number = getPulseWidthRatio(instrument.pulseWidth);
 
                 // Check for PWM mods to this instrument
                 let pulseWidthModStart: number = basePulseWidth;
@@ -10205,6 +10203,21 @@ export class Synth {
                 const pulseWidthEnd: number = pulseWidthModEnd * envelopeEnds[EnvelopeComputeIndex.pulseWidth];
                 tone.pulseWidth = pulseWidthStart;
                 tone.pulseWidthDelta = (pulseWidthEnd - pulseWidthStart) / roundedSamplesPerTick;
+
+                 //decimal offset mods
+                 let decimalOffsetModStart: number = instrument.decimalOffset;
+                //  let decimalOffsetModEnd: number = instrument.decimalOffset;
+                 if (this.isModActive(Config.modulators.dictionary["decimal offset"].index, channelIndex, tone.instrumentIndex)) {
+                     decimalOffsetModStart = this.getModValue(Config.modulators.dictionary["decimal offset"].index, channelIndex, tone.instrumentIndex, false);
+                    //  decimalOffsetModEnd = this.getModValue(Config.modulators.dictionary["decimal offset"].index, channelIndex, tone.instrumentIndex, true);
+                 }
+ 
+                 const decimalOffsetStart: number = decimalOffsetModStart * envelopeStarts[EnvelopeComputeIndex.decimalOffset];
+                //  const decimalOffsetEnd: number = decimalOffsetModEnd * envelopeEnds[EnvelopeComputeIndex.decimalOffset];
+                 tone.decimalOffset = decimalOffsetStart;
+                //  tone.decimalOffsetDelta = (decimalOffsetEnd - decimalOffsetStart) / roundedSamplesPerTick;
+
+                 tone.pulseWidth -= (tone.decimalOffset) / 10000;
             }
             if (instrument.type == InstrumentType.pickedString) {
                 // Check for sustain mods

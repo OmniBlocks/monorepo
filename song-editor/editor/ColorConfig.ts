@@ -5911,6 +5911,9 @@ export class ColorConfig {
     public static readonly blackPianoKey: string = "var(--black-piano-key)";
     public static readonly whitePianoKeyText: string = "var(--white-piano-key-text)";
     public static readonly blackPianoKeyText: string = "var(--black-piano-key-text)";
+	public static readonly oscilloscopeLineL: string = "var(--oscilloscope-line-L)";
+	public static readonly oscilloscopeLineR: string = "var(--oscilloscope-line-R)";
+	public static readonly modTitle: string = "var(--mod-title)";
     public static readonly useColorFormula: string = "var(--use-color-formula)";
     public static readonly pitchSecondaryChannelHue: string = "var(--pitch-secondary-channel-hue)";
     public static readonly pitchSecondaryChannelHueScale: string = "var(--pitch-secondary-channel-hue-scale)";

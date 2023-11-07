@@ -3462,7 +3462,28 @@ export class SongEditor {
                     this._toggleRecord();
                     event.preventDefault();
                     this.refocusStage();
+                } else if (canPlayNotes) break;
+                if (needControlForShortcuts == (event.ctrlKey || event.metaKey) && event.shiftKey) {
+                    location.href = "player/#song=" + this._doc.song.toBase64String();
+                    event.preventDefault();
                 }
+                break;
+            case 192: // `/~
+                if (canPlayNotes) break;
+                if (event.shiftKey) {
+                    this._doc.goBackToStart();
+                this._doc.song.restoreLimiterDefaults();
+                for (const channel of this._doc.song.channels) {
+                    channel.muted = false;
+                    channel.name = "";
+                    this._doc.record(new ChangeSong(this._doc, ""), false, true);
+                    event.preventDefault();
+                }} else {
+                    if (canPlayNotes) break;
+                    if (needControlForShortcuts == (event.ctrlKey || event.metaKey)) {
+                    this._openPrompt("songRecovery");
+                }}
+                event.preventDefault();
                 break;
             case 90: // z
                 if (canPlayNotes) break;
@@ -3471,6 +3492,11 @@ export class SongEditor {
                 } else {
                     this._doc.undo();
                 }
+                event.preventDefault();
+                break;
+            case 88: // x
+                if (canPlayNotes) break;
+                this._doc.selection.cutNotes();
                 event.preventDefault();
                 break;
             case 89: // y

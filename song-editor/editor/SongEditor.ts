@@ -3472,17 +3472,17 @@ export class SongEditor {
                 if (canPlayNotes) break;
                 if (event.shiftKey) {
                     this._doc.goBackToStart();
-                this._doc.song.restoreLimiterDefaults();
-                for (const channel of this._doc.song.channels) {
-                    channel.muted = false;
-                    channel.name = "";
+                    this._doc.song.restoreLimiterDefaults();
+                    for (const channel of this._doc.song.channels) {
+                        channel.muted = false;
+                        channel.name = "";
+                    }
                     this._doc.record(new ChangeSong(this._doc, ""), false, true);
-                    event.preventDefault();
-                }} else {
-                    if (canPlayNotes) break;
+                } else {
                     if (needControlForShortcuts == (event.ctrlKey || event.metaKey)) {
-                    this._openPrompt("songRecovery");
-                }}
+                        this._openPrompt("songRecovery");
+                    }
+                }
                 event.preventDefault();
                 break;
             case 90: // z

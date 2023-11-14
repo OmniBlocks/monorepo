@@ -879,9 +879,12 @@ export class SongEditor {
     private _noteFilterSimplePeakRow: HTMLDivElement = div({ class: "selectRow", title: "Low-pass Filter Peak Resonance" }, span({ class: "tip", onclick: () => this._openPrompt("filterResonance") }, "Filter Peak:"), this._noteFilterSimplePeakSlider.container);
 
     private readonly _pulseWidthSlider: Slider = new Slider(input({ style: "margin: 0;", type: "range", min: "1", max: Config.pulseWidthRange, value: "1", step: "1" }), this._doc, (oldValue: number, newValue: number) => new ChangePulseWidth(this._doc, oldValue, newValue), false);
-    private readonly _pulseWidthRow: HTMLDivElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("pulseWidth") }, "Pulse Width:"), this._pulseWidthSlider.container);
+    private readonly _pulseWidthDropdown: HTMLButtonElement = button({ style: "margin-left:0em; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: () => this._toggleDropdownMenu(DropdownID.PulseWidth) }, "▼");
+    private readonly _pulseWidthRow: HTMLDivElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("pulseWidth") }, "Pulse Width:"), this._pulseWidthDropdown, this._pulseWidthSlider.container);
     private readonly _decimalOffsetSlider: Slider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: "50", value: "0", step: "1" }), this._doc, (oldValue: number, newValue: number) => new ChangeDecimalOffset(this._doc, oldValue, newValue), false);
     private readonly _decimalOffsetRow: HTMLDivElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("decimalOffset") }, "Offset:"), this._decimalOffsetSlider.container);
+    private readonly _pulseWidthDropdownGroup: HTMLElement = div({ class: "editor-controls", style: "display: none;" }, this._decimalOffsetRow);
+
     private readonly _pitchShiftSlider: Slider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.pitchShiftRange - 1, value: "0", step: "1" }), this._doc, (oldValue: number, newValue: number) => new ChangePitchShift(this._doc, oldValue, newValue), true);
     private readonly _pitchShiftTonicMarkers: HTMLDivElement[] = [div({ class: "pitchShiftMarker", style: { color: ColorConfig.tonic } }), div({ class: "pitchShiftMarker", style: { color: ColorConfig.tonic, left: "50%" } }), div({ class: "pitchShiftMarker", style: { color: ColorConfig.tonic, left: "100%" } })];
     private readonly _pitchShiftFifthMarkers: HTMLDivElement[] = [div({ class: "pitchShiftMarker", style: { color: ColorConfig.fifthNote, left: (100 * 7 / 24) + "%" } }), div({ class: "pitchShiftMarker", style: { color: ColorConfig.fifthNote, left: (100 * 19 / 24) + "%" } })];
@@ -1027,7 +1030,8 @@ export class SongEditor {
         this._harmonicsRow,
         this._drumsetGroup,
         this._pulseWidthRow,
-        this._decimalOffsetRow,
+        // this._decimalOffsetRow,
+        this._pulseWidthDropdownGroup,
         this._stringSustainRow,
         this._unisonSelectRow,
         div({ style: `padding: 2px 0; margin-left: 2em; display: flex; align-items: center;` },
@@ -1257,6 +1261,7 @@ export class SongEditor {
     private _openChordDropdown: boolean = false;
     private _openTransitionDropdown: boolean = false;
     private _openOperatorDropdowns: boolean[] = [];
+    private _openPulseWidthDropdown: boolean = false;
 
     private outVolumeHistoricTimer: number = 0;
     private outVolumeHistoricCap: number = 0;
@@ -1605,6 +1610,11 @@ export class SongEditor {
                 target = this._operatorDropdowns[submenu];
                 this._openOperatorDropdowns[submenu] = this._openOperatorDropdowns[submenu] ? false : true;
                 group = this._operatorDropdownGroups[submenu];
+                break;
+            case DropdownID.PulseWidth:
+                target = this._pulseWidthDropdown;
+                this._openPulseWidthDropdown = this._openPulseWidthDropdown ? false : true;
+                group = this._pulseWidthDropdownGroup;
                 break;
         }
 
@@ -2241,12 +2251,16 @@ export class SongEditor {
                 this._pulseWidthSlider.input.title = prettyNumber(instrument.pulseWidth) + "%";
                 this._pulseWidthSlider.updateValue(instrument.pulseWidth);
 
-                this._decimalOffsetRow.style.display = "";
+                // this._decimalOffsetRow.style.display = "";
                 this._decimalOffsetSlider.input.title = (Number(prettyNumber(instrument.decimalOffset)) / 100) <= 0 ? "none" : "-" + (Number(prettyNumber(instrument.decimalOffset)) / 100) + "%";
                 this._decimalOffsetSlider.updateValue(instrument.decimalOffset);
+
+                // this._pulseWidthDropdownGroup.style.display = "";
+                this._pulseWidthDropdownGroup.style.display = (this._openPulseWidthDropdown ? "" : "none");
             } else {
                 this._pulseWidthRow.style.display = "none";
                 this._decimalOffsetRow.style.display = "none";
+                this._pulseWidthDropdownGroup.style.display = "none";
             }
 
 
@@ -2566,6 +2580,7 @@ export class SongEditor {
             this._detuneSliderRow.style.display = "none";
             this._panSliderRow.style.display = "none";
             this._panDropdownGroup.style.display = "none";
+            this._pulseWidthDropdownGroup.style.display = "none";
 
             this._modulatorGroup.style.display = "";
             this._modulatorGroup.style.color = ColorConfig.getChannelColor(this._doc.song, this._doc.channel).primaryNote;

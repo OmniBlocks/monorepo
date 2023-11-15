@@ -33,6 +33,12 @@ const toLibraryItem = extension => {
     return extension;
 };
 
+const translateGalleryItem = (extension, locale) => ({
+    ...extension,
+    name: extension.nameTranslations[locale] || extension.name,
+    description: extension.descriptionTranslations[locale] || extension.description
+});
+
 let cachedGallery = null;
 
 const fetchLibrary = async () => {
@@ -43,7 +49,9 @@ const fetchLibrary = async () => {
     const data = await res.json();
     return data.extensions.map(extension => ({
         name: extension.name,
+        nameTranslations: extension.nameTranslations || {},
         description: extension.description,
+        descriptionTranslations: extension.descriptionTranslations || {},
         extensionId: extension.id,
         extensionURL: `https://extensions.turbowarp.org/${extension.slug}.js`,
         iconURL: `https://extensions.turbowarp.org/${extension.image || 'images/unknown.svg'}`,
@@ -154,7 +162,12 @@ class ExtensionLibrary extends React.PureComponent {
             library.push('---');
             if (this.state.gallery) {
                 library.push(toLibraryItem(galleryMore));
-                library.push(...this.state.gallery.map(toLibraryItem));
+                const locale = this.props.intl.locale;
+                library.push(
+                    ...this.state.gallery
+                        .map(i => translateGalleryItem(i, locale))
+                        .map(toLibraryItem)
+                );
             } else if (this.state.galleryError) {
                 library.push(toLibraryItem(galleryError));
             } else {

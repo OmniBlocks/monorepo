@@ -8332,6 +8332,11 @@ export class Synth {
     public setModValue(volumeStart: number, volumeEnd: number, mod: number, channelIndex: number, instrumentIndex: number, setting: number): number {
         let val: number = volumeStart + Config.modulators[setting].convertRealFactor;
         let nextVal: number = volumeEnd + Config.modulators[setting].convertRealFactor;
+        if (Config.modulators[setting].optionalModify == "invert-0to50") {
+            val = 50 - val;
+            nextVal = 50 - nextVal;
+        }
+        //should this be turned into a function?
         if (Config.modulators[setting].forSong) {
             if (this.modValues[setting] == null || this.modValues[setting] != val || this.nextModValues[setting] != nextVal) {
                 this.modValues[setting] = val;

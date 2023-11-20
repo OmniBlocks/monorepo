@@ -11,6 +11,7 @@ import {changeBrushSize} from '../../reducers/brush-mode';
 import {changeBrushSize as changeEraserSize} from '../../reducers/eraser-mode';
 import {changeRoundedCornerSize} from '../../reducers/rounded-rect-mode';
 import {changeTrianglePolyCount} from '../../reducers/triangle-mode';
+import {changeCurrentlySelectedShape} from '../../reducers/sussy-mode';
 import {changeBitBrushSize} from '../../reducers/bit-brush-size';
 import {changeBitEraserSize} from '../../reducers/bit-eraser-size';
 import {setShapesFilled} from '../../reducers/fill-bitmap-shapes';
@@ -59,6 +60,8 @@ import bitOvalOutlinedIcon from '../bit-oval-mode/oval-outlined.svg';
 import bitRectOutlinedIcon from '../bit-rect-mode/rectangle-outlined.svg';
 
 import {MAX_STROKE_WIDTH} from '../../reducers/stroke-width';
+
+import selectableShapes from '../../helper/selectable-shapes.js';
 
 const LiveInput = LiveInputHOC(Input);
 const ModeToolsComponent = props => {
@@ -259,6 +262,73 @@ const ModeToolsComponent = props => {
                         value={currentSideValue}
                         onSubmit={changeFunction}
                     />
+                </div>
+            );
+        }
+        case Modes.SUSSY:
+        {
+            const currentlySelectedShape = props.currentlySelectedShape;
+            const changeFunction = props.onCurrentlySelectedShapeChange;
+            const selectedShapeObject = selectableShapes
+                .filter(shape => shape.id === currentlySelectedShape)[0];
+            const generateShapeSVG = (shapeObject) => {
+                return `<svg
+                version="1.1"
+                xmlns="http://www.w3.org/2000/svg"
+                xmlns:xlink="http://www.w3.org/1999/xlink"
+
+                width="${shapeObject.icon.width}"
+                height="${shapeObject.icon.height}"
+                viewBox="${shapeObject.icon.viewBox}"
+                
+                >
+                <g transform="translate(${shapeObject.icon.x},${shapeObject.icon.y})">
+                <g data-paper-data="{&quot;isPaintingLayer&quot;:true}"
+                fill="none" fill-rule="nonzero" stroke="#575E75"
+
+                stroke-width="${shapeObject.icon.strokeWidth}"
+
+                stroke-linecap="butt"
+                stroke-linejoin="round" stroke-dashoffset="0" style="mix-blend-mode: normal">
+
+                <path d="${shapeObject.path}"/>
+
+                </g></g></svg>`
+            };
+            const selectableShapesList = (
+                <InputGroup className={classNames(styles.modDashedBorder, styles.modLabeledIconHeight)}>
+                    {selectableShapes.map(shape => {
+                        return (<LabeledIconButton
+                            hideLabel={hideLabel(props.intl.locale)}
+                            imgSrc={`data:image/svg+xml,${encodeURIComponent(generateShapeSVG(shape))}`}
+                            title={shape.name}
+                            onClick={() => changeFunction(shape.id)}
+                        />)
+                    })}
+                </InputGroup>
+            )
+            return (
+                <div className={classNames(props.className, styles.modeTools)}>
+                    <Dropdown
+                        className={styles.modUnselect}
+                        enterExitTransitionDurationMs={20}
+                        popoverContent={
+                            <InputGroup
+                                className={styles.modContextMenu}
+                                rtl={props.rtl}
+                            >
+                                {selectableShapesList}
+                            </InputGroup>
+                        }
+                        tipSize={.01}
+                    >
+                        <img
+                            src={`data:image/svg+xml,${encodeURIComponent(generateShapeSVG(selectedShapeObject))}`}
+                            alt={selectedShapeObject.name}
+                            title={selectedShapeObject.name}
+                            height={16}
+                        />
+                    </Dropdown>
                 </div>
             );
         }
@@ -527,6 +597,7 @@ ModeToolsComponent.propTypes = {
     eraserValue: PropTypes.number,
     roundedCornerValue: PropTypes.number,
     trianglePolyValue: PropTypes.number,
+    currentlySelectedShape: PropTypes.string,
     fillBitmapShapes: PropTypes.bool,
     format: PropTypes.oneOf(Object.keys(Formats)),
     hasSelectedUncurvedPoints: PropTypes.bool,
@@ -571,7 +642,8 @@ const mapStateToProps = state => ({
     clipboardItems: state.scratchPaint.clipboard.items,
     eraserValue: state.scratchPaint.eraserMode.brushSize,
     roundedCornerValue: state.scratchPaint.roundedRectMode.roundedCornerSize,
-    trianglePolyValue: state.scratchPaint.triangleMode.trianglePolyCount
+    trianglePolyValue: state.scratchPaint.triangleMode.trianglePolyCount,
+    currentlySelectedShape: state.scratchPaint.sussyMode.currentlySelectedShape
 });
 const mapDispatchToProps = dispatch => ({
     onBrushSliderChange: brushSize => {
@@ -582,6 +654,9 @@ const mapDispatchToProps = dispatch => ({
     },
     onPolyCountSliderChange: polyCount => {
         dispatch(changeTrianglePolyCount(polyCount));
+    },
+    onCurrentlySelectedShapeChange: shape => {
+        dispatch(changeCurrentlySelectedShape(shape));
     },
     onBitBrushSliderChange: bitBrushSize => {
         dispatch(changeBitBrushSize(bitBrushSize));

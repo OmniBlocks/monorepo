@@ -8,7 +8,7 @@ import NudgeTool from '../selection-tools/nudge-tool';
 
 const sideCount = {
     value: 3
-}
+};
 
 /**
  * Tool for drawing triangles.

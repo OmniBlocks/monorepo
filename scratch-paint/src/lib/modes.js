@@ -13,7 +13,6 @@ const vectorModesObj = {
     TEXT: null,
     
     SUSSY: null,
-    DRAGON: null,
     TRIANGLE: null,
 
     ARROW: null
@@ -49,7 +48,6 @@ const GradientToolsModes = keyMirror({
     TEXT: null,
 
     SUSSY: null,
-    DRAGON: null,
     TRIANGLE: null,
     
     ARROW: null

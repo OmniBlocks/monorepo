@@ -5,11 +5,22 @@ import { clearSelection } from '../selection';
 import { getSquareDimensions } from '../math';
 import BoundingBoxTool from '../selection-tools/bounding-box-tool';
 import NudgeTool from '../selection-tools/nudge-tool';
+import selectableShapes from '../selectable-shapes';
+
+const currentlySelectedShape = {
+    value: "smile"
+};
 
 /**
  * Tool for drawing sussys.
  */
 class SussyTool extends paper.Tool {
+    static set currentlySelectedShape (value) {
+        currentlySelectedShape.value = value;
+    }
+    static get currentlySelectedShape () {
+        return currentlySelectedShape.value;
+    }
     static get TOLERANCE() {
         return 2;
     }
@@ -100,8 +111,11 @@ class SussyTool extends paper.Tool {
             sussy.size = squareDimensions.size.abs();
         }
 
-        this.sussy = new paper.Path(`m 77 0 h 28 a 20 20 0 0 1 20 20 v 0 a 20 20 0 0 1 -20 20 V 40 H 77 V 112 A 1 1 0 0 1 42 111 A 1 1 0 0 0 16 112 A 1 1 0 0 1 -18 111 V 74 H -29 C -35 74 -36 73 -36 67 V 5 C -36 -1 -35 -2 -29 -2 H -18 A 1 1 0 0 1 76 0`);
-        this.sussy.scale(sussy.size.divide(100));
+        const shapeObject = selectableShapes
+            .filter(shape => shape.id === currentlySelectedShape.value)[0];
+        const path = shapeObject.path;
+        this.sussy = new paper.CompoundPath(path);
+        this.sussy.scale(sussy.size.divide(shapeObject.size));
         if (event.modifiers.alt) {
             this.sussy.position = event.downPoint;
         } else if (event.modifiers.shift) {

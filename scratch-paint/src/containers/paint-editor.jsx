@@ -197,8 +197,6 @@ class PaintEditor extends React.Component {
             case Modes.LINE:
                 this.props.changeMode(Modes.BIT_LINE);
                 break;
-            case Modes.DRAGON:
-                /* falls through */
             case Modes.OVAL:
                 this.props.changeMode(Modes.BIT_OVAL);
                 break;

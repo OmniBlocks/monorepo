@@ -52,9 +52,9 @@ const messages = defineMessages({
         id: 'paint.textMode.text'
     },
     sussy: {
-        defaultMessage: 'Sussy',
-        description: 'Label for the sussy tool',
-        id: 'paint.sussyMode.sussy'
+        defaultMessage: 'Shapes',
+        description: 'Label for the shape tool',
+        id: 'paint.shapeMode.shape'
     },
     dragon: {
         defaultMessage: 'Dragon',

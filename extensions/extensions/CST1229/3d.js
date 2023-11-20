@@ -10,7 +10,6 @@
   "use strict";
 
   const IN_3D = "threed.in3d";
-  const Z_POS = "threed.z";
   const OBJECT = "threed.object";
   const THREED_DIRTY = "threed.dirty";
 
@@ -151,6 +150,89 @@
             opcode: "getZ",
             blockType: Scratch.BlockType.REPORTER,
             text: "z position",
+          },
+          "---",
+          {
+            opcode: "set3DPos",
+            blockType: Scratch.BlockType.COMMAND,
+            text: "go to x: [X] y: [Y] z: [Z]",
+            arguments: {
+              X: {
+                type: Scratch.ArgumentType.NUMBER,
+                defaultValue: 0,
+              },
+              Y: {
+                type: Scratch.ArgumentType.NUMBER,
+                defaultValue: 0,
+              },
+              Z: {
+                type: Scratch.ArgumentType.NUMBER,
+                defaultValue: 0,
+              },
+            },
+          },
+          {
+            opcode: "change3DPos",
+            blockType: Scratch.BlockType.COMMAND,
+            text: "change position by x: [X] y: [Y] z: [Z]",
+            arguments: {
+              X: {
+                type: Scratch.ArgumentType.NUMBER,
+                defaultValue: 10,
+              },
+              Y: {
+                type: Scratch.ArgumentType.NUMBER,
+                defaultValue: 0,
+              },
+              Z: {
+                type: Scratch.ArgumentType.NUMBER,
+                defaultValue: 0,
+              },
+            },
+          },
+          {
+            opcode: "set3DDir",
+            blockType: Scratch.BlockType.COMMAND,
+            text: "point in [DIRECTION] [DEGREES]",
+            arguments: {
+              DIRECTION: {
+                type: Scratch.ArgumentType.STRING,
+                menu: "direction",
+                defaultValue: "angle",
+              },
+              DEGREES: {
+                type: Scratch.ArgumentType.NUMBER,
+                defaultValue: 0,
+              },
+            },
+          },
+          {
+            opcode: "rotate3D",
+            blockType: Scratch.BlockType.COMMAND,
+            text: "turn [DIRECTION] [DEGREES] degrees",
+            arguments: {
+              DIRECTION: {
+                type: Scratch.ArgumentType.STRING,
+                menu: "turnDirection",
+                defaultValue: "right",
+              },
+              DEGREES: {
+                type: Scratch.ArgumentType.NUMBER,
+                defaultValue: 15,
+              },
+            },
+          },
+          {
+            opcode: "direction3D",
+            blockType: Scratch.BlockType.REPORTER,
+            text: "my [DIRECTION]",
+            arguments: {
+              DIRECTION: {
+                type: Scratch.ArgumentType.MENU,
+                menu: "direction",
+                defaultValue: "angle",
+              },
+            },
           },
           "---",
           {
@@ -298,7 +380,6 @@
         if (!dr) continue;
         this.disable3DForDrawable(dr.id);
         delete dr[IN_3D];
-        delete dr[Z_POS];
         delete dr[OBJECT];
       }
       if (this.scene) this.scene.clear();
@@ -483,7 +564,6 @@
       if (dr[IN_3D]) return;
 
       dr[IN_3D] = true;
-      dr[Z_POS] = 0;
 
       let obj;
       if (type === "sprite") {
@@ -493,6 +573,9 @@
       }
       dr[OBJECT] = obj;
       this.updateMeshForDrawable(drawableID, type);
+      if (!("_yaw" in dr)) dr._yaw = 0;
+      if (!("_pitch" in dr)) dr._pitch = 0;
+      if (!("_roll" in dr)) dr._roll = 0;
 
       this.scene.add(obj);
       this.updateRenderer();
@@ -521,6 +604,7 @@
         }
       } else {
         obj.material = new THREE.MeshBasicMaterial();
+        obj.material.side = THREE.DoubleSide;
         obj.geometry = new THREE.PlaneGeometry(dr.skin.size[0], dr.skin.size[1]);
         obj.material.map = texture;
       }
@@ -532,7 +616,6 @@
       if (!dr[IN_3D]) return;
 
       dr[IN_3D] = false;
-      dr[Z_POS] = 0;
 
       dr[OBJECT].removeFromParent();
       dr[OBJECT].material.dispose();
@@ -585,7 +668,111 @@
 
       const dr = Scratch.renderer._allDrawables[util.target.drawableID];
       if (!dr[IN_3D]) return 0;
-      return dr[Z_POS];
+      return dr[OBJECT].position.z;
+    }
+
+    updateSpriteAngle(util) {
+      if (util.target.isStage) return;
+      const dr = Scratch.renderer._allDrawables[util.target.drawableID];
+
+      if (!dr[IN_3D]) return;
+      const obj = dr[OBJECT];
+
+      obj.rotation.x = 0;
+      obj.rotation.y = 0;
+      obj.rotation.z = 0;
+
+      obj.rotation.y = dr._yaw;
+      obj.rotateOnAxis(
+        new THREE.Vector3(1, 0, 0),
+        -dr._pitch
+      );
+      obj.rotateOnAxis(
+        new THREE.Vector3(0, 0, 1),
+        dr._roll
+      );
+    }
+
+    set3DPos({X, Y, Z}, util) {
+      if (util.target.isStage) return;
+
+      this.setZ({Z}, util);
+    }
+
+    change3DPos({X, Y, Z}, util) {
+      if (util.target.isStage) return;
+      const dx = Scratch.Cast.toNumber(X);
+      const dy = Scratch.Cast.toNumber(Y);
+      util.target.setXY(util.target.x + dx, util.target.y + dy);
+
+      this.changeZ({Z}, util);
+    }
+    
+    rotate3D({DIRECTION, DEGREES}, util) {
+      if (util.target.isStage) return;
+      const dr = Scratch.renderer._allDrawables[util.target.drawableID];
+
+      if (!dr[IN_3D]) return;
+
+      DEGREES = Scratch.Cast.toNumber(DEGREES) *
+        ((DIRECTION === "left" || DIRECTION === "down" || DIRECTION === "ccw") ? -1 : 1);
+
+      switch (DIRECTION) {
+        case "left":
+        case "right":
+          dr._yaw -= THREE.MathUtils.degToRad(DEGREES);
+          break;
+        case "up":
+        case "down":
+          dr._pitch += THREE.MathUtils.degToRad(DEGREES);
+          break;
+        case "cw":
+        case "ccw":
+          dr._roll += THREE.MathUtils.degToRad(DEGREES);
+          break;
+      }
+      this.updateSpriteAngle(util);
+      this.updateRenderer();
+    }
+
+    set3DDir({DIRECTION, DEGREES}, util) {
+      if (util.target.isStage) return;
+      const dr = Scratch.renderer._allDrawables[util.target.drawableID];
+
+      if (!dr[IN_3D]) return;
+
+      DEGREES = Scratch.Cast.toNumber(DEGREES);
+
+      switch (DIRECTION) {
+        case "angle":
+          dr._yaw = -THREE.MathUtils.degToRad(DEGREES);
+          break;
+        case "aim":
+          dr._pitch = THREE.MathUtils.degToRad(DEGREES);
+          break;
+        case "roll":
+          dr._roll = THREE.MathUtils.degToRad(DEGREES);
+          break;
+      }
+      this.updateSpriteAngle(util);
+      this.updateRenderer();
+    }
+
+    direction3D({DIRECTION}, util) {
+      if (util.target.isStage) return 0;
+      const dr = Scratch.renderer._allDrawables[util.target.drawableID];
+      if (!dr[IN_3D]) return 0;
+
+      switch (DIRECTION) {
+        case "angle":
+          return -THREE.MathUtils.radToDeg(dr._yaw);
+        case "aim":
+          return THREE.MathUtils.radToDeg(dr._pitch);
+        case "roll":
+          return THREE.MathUtils.radToDeg(dr._roll);
+        default:
+          return 0;
+      }
     }
 
     preUpdateCameraAngle() {
@@ -656,8 +843,7 @@
     setCamDir({ DEGREES, DIRECTION }, util) {
       this.init();
 
-      DEGREES = Scratch.Cast.toNumber(DEGREES) *
-        ((DIRECTION === "left" || DIRECTION === "down" || DIRECTION === "ccw") ? -1 : 1);
+      DEGREES = Scratch.Cast.toNumber(DEGREES);
 
       this.preUpdateCameraAngle();
       switch (DIRECTION) {

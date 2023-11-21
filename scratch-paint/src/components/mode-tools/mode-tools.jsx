@@ -272,31 +272,45 @@ const ModeToolsComponent = props => {
             const selectedShapeObject = selectableShapes
                 .filter(shape => shape.id === currentlySelectedShape)[0];
             const generateShapeSVG = (shapeObject) => {
-                return `<svg
-                version="1.1"
-                xmlns="http://www.w3.org/2000/svg"
-                xmlns:xlink="http://www.w3.org/1999/xlink"
-
-                width="${shapeObject.icon.width}"
-                height="${shapeObject.icon.height}"
-                viewBox="${shapeObject.icon.viewBox}"
-                
-                >
-                <g transform="translate(${shapeObject.icon.x},${shapeObject.icon.y})">
-                <g data-paper-data="{&quot;isPaintingLayer&quot;:true}"
-                fill="none" fill-rule="nonzero" stroke="#575E75"
-
-                stroke-width="${shapeObject.icon.strokeWidth}"
-
-                stroke-linecap="butt"
-                stroke-linejoin="round" stroke-dashoffset="0" style="mix-blend-mode: normal">
-
-                <path d="${shapeObject.path}"/>
-
-                </g></g></svg>`
+                const strokeColor = "#575e75";
+                const icon = shapeObject.icon;
+                // extract viewbox
+                const viewBoxStart = icon.substring(icon.indexOf('viewBox="') + 9);
+                const viewBoxString = viewBoxStart
+                    .substring(0, viewBoxStart.indexOf('"'));
+                // extract fill color
+                const fillColorStart = icon.substring(icon.indexOf('fill="') + 6);
+                const fillColorString = fillColorStart
+                    .substring(0, fillColorStart.indexOf('"'));
+                // extract stroke width
+                const strokeWidthStart = icon.substring(icon.indexOf('stroke-width="') + 14);
+                const strokeWidthString = strokeWidthStart
+                    .substring(0, strokeWidthStart.indexOf('"'));
+                // extract viewbox to array
+                const viewBox = viewBoxString
+                    .replace(/ /gmi, ',')
+                    .split(',')
+                    .map(value => value.trim())
+                    .map(num => Number(num));
+                const newViewBox = [
+                    viewBox[0] - 1.5,
+                    viewBox[1] - 1.5,
+                    viewBox[2] + (1.5 * 2),
+                    viewBox[3] + (1.5 * 2)
+                ].join(',');
+                const newIcon = icon
+                    .replace(`viewBox="${viewBoxString}"`, `viewBox="${newViewBox}"`)
+                    .replace('stroke="none"', `stroke="${strokeColor}"`)
+                    .replace(`fill="${fillColorString}"`, 'fill="none"')
+                    .replace(`stroke-width="${strokeWidthString}"`, `stroke-width="${shapeObject.strokeWidth}"`);
+                return `${newIcon}`
             };
             const selectableShapesList = (
-                <InputGroup className={classNames(styles.modDashedBorder, styles.modLabeledIconHeight)}>
+                <InputGroup className={classNames(
+                    styles.modDashedBorder,
+                    // styles.modLabeledIconHeight,
+                    styles.dropdownMaxItemList
+                )}>
                     {selectableShapes.map(shape => {
                         return (<LabeledIconButton
                             hideLabel={hideLabel(props.intl.locale)}

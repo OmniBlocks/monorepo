@@ -43,7 +43,7 @@ export class ThemePrompt implements Prompt {
 			option({ value: "brucebox" }, "Brucebox"),
 			option({ value: "shitbox 3.0" }, "Shitbox 1.0/3.0"),
 			option({ value: "shitbox 2.0" }, "Shitbox 2.0"),
-			option({ value: "nerdbox" }, "Nerdbox"),
+			option({ value: "nerdbox" }, "NerdBox"),
 			option({ value: "zefbox" }, "Zefbox"),
 			option({ value: "cardboardbox classic" }, "Cardboardbox"),
 			option({ value: "blubox classic" }, "Blubox 1.0"),

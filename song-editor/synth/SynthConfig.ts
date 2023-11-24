@@ -101,7 +101,6 @@ export const enum EnvelopeComputeIndex {
     noteVolume,
     noteFilterAllFreqs,
     pulseWidth,
-    decimalOffset,
     stringSustain,
     unison,
     operatorFrequency0, operatorFrequency1, operatorFrequency2, operatorFrequency3, operatorFrequency4, operatorFrequency5,
@@ -113,6 +112,7 @@ export const enum EnvelopeComputeIndex {
     noteFilterFreq0, noteFilterFreq1, noteFilterFreq2, noteFilterFreq3, noteFilterFreq4, noteFilterFreq5, noteFilterFreq6, noteFilterFreq7,
     noteFilterGain0, noteFilterGain1, noteFilterGain2, noteFilterGain3, noteFilterGain4, noteFilterGain5, noteFilterGain6, noteFilterGain7,
     length,
+    decimalOffset,
 }
 
 /*

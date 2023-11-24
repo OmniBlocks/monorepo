@@ -233,7 +233,6 @@ const enum SongTagCode {
     feedbackEnvelope = CharCode.V, // added in 6, DEPRECATED
     pulseWidth = CharCode.W, // added in 7
     aliases = CharCode.X, // [JB], added in 4, DEPRECATED
-    decimalOffset = CharCode.X, // [UB], will likely remove and merge with pulse width with url version 4
 
 }
 
@@ -2575,7 +2574,7 @@ export class Song {
     private static readonly _oldestGoldBoxVersion: number = 1;
     private static readonly _latestGoldBoxVersion: number = 4;
     private static readonly _oldestUltraBoxVersion: number = 1;
-    private static readonly _latestUltraBoxVersion: number = 3;
+    private static readonly _latestUltraBoxVersion: number = 4;
     // One-character variant detection at the start of URL to distinguish variants such as JummBox, Or Goldbox. "j" and "g" respectively
 	//also "u" is ultrabox lol
     private static readonly _variant = 0x75; //"u" ~ ultrabox
@@ -3151,7 +3150,7 @@ export class Song {
                     buffer.push(SongTagCode.unison, base64IntToCharCode[instrument.unison]);
                 } else if (instrument.type == InstrumentType.pwm) {
                     buffer.push(SongTagCode.pulseWidth, base64IntToCharCode[instrument.pulseWidth]);
-                    buffer.push(SongTagCode.decimalOffset, base64IntToCharCode[instrument.decimalOffset]);
+                    buffer.push(base64IntToCharCode[instrument.decimalOffset]);
                     // buffer.push(SongTagCode.decimalOffset, base64IntToCharCode[instrument.decimalOffset >> 6], base64IntToCharCode[instrument.decimalOffset & 0x3f]); 
                 } else if (instrument.type == InstrumentType.pickedString) {
                     buffer.push(SongTagCode.unison, base64IntToCharCode[instrument.unison]);
@@ -3449,32 +3448,32 @@ export class Song {
             fromBeepBox = false;
             fromJummBox = true;
             fromGoldBox = false;
-	fromUltraBox = false;
+	        fromUltraBox = false;
             charIndex++;
         } else if (variantTest == 0x67) { //"g"
             fromBeepBox = false;
             fromJummBox = false;
             fromGoldBox = true;
-	fromUltraBox = false;
+	        fromUltraBox = false;
             charIndex++;
         } else if (variantTest == 0x75) { //"u"
                 fromBeepBox = false;
                 fromJummBox = false;
                 fromGoldBox = false;
-		fromUltraBox = true;
+		        fromUltraBox = true;
                 charIndex++;
             } else {
             fromBeepBox = true;
             fromJummBox = false;
             fromGoldBox = false;
-	fromUltraBox = false;
+	        fromUltraBox = false;
         }
 
         const version: number = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
         if (fromBeepBox && (version == -1 || version > Song._latestBeepboxVersion || version < Song._oldestBeepboxVersion)) return;
         if (fromJummBox && (version == -1 || version > Song._latestJummBoxVersion || version < Song._oldestJummBoxVersion)) return;
         if (fromGoldBox && (version == -1 || version > Song._latestGoldBoxVersion || version < Song._oldestGoldBoxVersion)) return;
-	if (fromUltraBox && (version == -1 || version > Song._latestUltraBoxVersion || version < Song._oldestUltraBoxVersion)) return;
+	    if (fromUltraBox && (version == -1 || version > Song._latestUltraBoxVersion || version < Song._oldestUltraBoxVersion)) return;
         const beforeTwo: boolean = version < 2;
         const beforeThree: boolean = version < 3;
         const beforeFour: boolean = version < 4;
@@ -4182,6 +4181,13 @@ export class Song {
                     legacySettings.pulseEnvelope = Song._envelopeFromLegacyIndex(aa);
                     instrument.convertLegacySettings(legacySettings, forceSimpleFilter);
                 }
+
+                    if (fromUltraBox && !beforeFour) {
+                    // if (fromUltraBox) {
+                        const instrument: Instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];  
+                        instrument.decimalOffset = clamp(0, 50 + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                        // instrument.decimalOffset = clamp(0, 100 + 1, (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) + base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                    }
             } break;
             case SongTagCode.stringSustain: {
                 const instrument: Instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
@@ -4820,6 +4826,12 @@ export class Song {
                     for (let o: number = 0; o < (instrument.type == InstrumentType.fm6op ? 6 : Config.operatorCount); o++) {
                         let aa:number = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                         if ((beforeTwo && fromGoldBox) || (!fromGoldBox && !fromUltraBox)) aa = pregoldToEnvelope[aa];
+                        
+                        //ultrabox envelope shift
+                        if ((!fromUltraBox) || (fromUltraBox && beforeFour)) {
+                            if (aa > 2) aa += 1;
+                        }
+                        
                         legacySettings.operatorEnvelopes[o] = Song._envelopeFromLegacyIndex(aa);
                     }
                     instrument.convertLegacySettings(legacySettings, forceSimpleFilter);
@@ -4834,10 +4846,24 @@ export class Song {
                         }
                         let aa:number = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                         if ((beforeTwo && fromGoldBox) || (!fromGoldBox && !fromUltraBox)) aa = pregoldToEnvelope[aa];
+                        
+                        //ultrabox envelope shift
+                        if ((!fromUltraBox) || (fromUltraBox && beforeFour)) {
+                            if (aa > 2) aa += 1;
+                        }
+                        
                         const envelope: number = clamp(0, Config.envelopes.length, aa);
                         instrument.addEnvelope(target, index, envelope);
                     }
                 }
+                
+                // const nooffsetToEnvelope: number[] = [0, 1, 2, 4, 5, 6, 7,];
+                // if ((!fromUltraBox) || (fromUltraBox && beforeFour)) {
+                //     if (aa > 2) {
+                //         aa += 1;
+                //     }
+                // }   
+
             } break;
             case SongTagCode.operatorWaves: {
                 const instrument: Instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
@@ -4914,12 +4940,7 @@ export class Song {
                         instrument.effects |= 1 << EffectType.distortion;
                     }
                 } else {
-                     // if (fromUltraBox && !beforeFour) {
-                    if (fromUltraBox) {
-                        const instrument: Instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];  
-                        instrument.decimalOffset = clamp(0, 50 + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
-                        // instrument.decimalOffset = clamp(0, 100 + 1, (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) + base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
-                    }
+                    //do nothing, decaprecated
                 }
             }
                 break;
@@ -10213,15 +10234,13 @@ export class Synth {
                  let decimalOffsetModStart: number = instrument.decimalOffset;
                 //  let decimalOffsetModEnd: number = instrument.decimalOffset;
                  if (this.isModActive(Config.modulators.dictionary["decimal offset"].index, channelIndex, tone.instrumentIndex)) {
-                     decimalOffsetModStart = this.getModValue(Config.modulators.dictionary["decimal offset"].index, channelIndex, tone.instrumentIndex, false);
-                    //  decimalOffsetModEnd = this.getModValue(Config.modulators.dictionary["decimal offset"].index, channelIndex, tone.instrumentIndex, true);
+                    decimalOffsetModStart = this.getModValue(Config.modulators.dictionary["decimal offset"].index, channelIndex, tone.instrumentIndex, false);
+                    console.log(decimalOffsetModStart);
                  }
  
                  const decimalOffsetStart: number = decimalOffsetModStart * envelopeStarts[EnvelopeComputeIndex.decimalOffset];
-                //  const decimalOffsetEnd: number = decimalOffsetModEnd * envelopeEnds[EnvelopeComputeIndex.decimalOffset];
                  tone.decimalOffset = decimalOffsetStart;
-                //  tone.decimalOffsetDelta = (decimalOffsetEnd - decimalOffsetStart) / roundedSamplesPerTick;
-
+                
                  tone.pulseWidth -= (tone.decimalOffset) / 10000;
             }
             if (instrument.type == InstrumentType.pickedString) {

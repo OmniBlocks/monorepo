@@ -2574,7 +2574,7 @@ export class Song {
     private static readonly _oldestGoldBoxVersion: number = 1;
     private static readonly _latestGoldBoxVersion: number = 4;
     private static readonly _oldestUltraBoxVersion: number = 1;
-    private static readonly _latestUltraBoxVersion: number = 3;
+    private static readonly _latestUltraBoxVersion: number = 4;
     // One-character variant detection at the start of URL to distinguish variants such as JummBox, Or Goldbox. "j" and "g" respectively
 	//also "u" is ultrabox lol
     private static readonly _variant = 0x75; //"u" ~ ultrabox
@@ -3151,7 +3151,8 @@ export class Song {
                 } else if (instrument.type == InstrumentType.pwm) {
                     buffer.push(SongTagCode.pulseWidth, base64IntToCharCode[instrument.pulseWidth]);
                     // buffer.push(base64IntToCharCode[instrument.decimalOffset]);
-                    buffer.push(SongTagCode.aliases, base64IntToCharCode[instrument.decimalOffset]); 
+                    //buffer.push(SongTagCode.aliases, base64IntToCharCode[instrument.decimalOffset]); 
+                    buffer.push(base64IntToCharCode[instrument.decimalOffset >> 6], base64IntToCharCode[instrument.decimalOffset & 0x3f]); 
                 } else if (instrument.type == InstrumentType.pickedString) {
                     buffer.push(SongTagCode.unison, base64IntToCharCode[instrument.unison]);
                     buffer.push(SongTagCode.stringSustain, base64IntToCharCode[instrument.stringSustain]);
@@ -4180,6 +4181,11 @@ export class Song {
                     if((beforeTwo && fromGoldBox) || (!fromGoldBox && !fromUltraBox)) aa = pregoldToEnvelope[aa];
                     legacySettings.pulseEnvelope = Song._envelopeFromLegacyIndex(aa);
                     instrument.convertLegacySettings(legacySettings, forceSimpleFilter);
+                }
+
+                if (fromUltraBox && !beforeFour) {
+                    const instrument: Instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];  
+                    instrument.decimalOffset = clamp(0, 99 + 1, (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) + base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                 }
 
             } break;
@@ -8333,6 +8339,10 @@ export class Synth {
         if (Config.modulators[setting].optionalModify == "invert-0to50") {
             val = 50 - val;
             nextVal = 50 - nextVal;
+        }
+        if (Config.modulators[setting].optionalModify == "invert-0to99") {
+            val = 99 - val;
+            nextVal = 99 - nextVal;
         }
         //should this be turned into a function?
         if (Config.modulators[setting].forSong) {

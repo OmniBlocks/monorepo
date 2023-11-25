@@ -137,6 +137,7 @@ const GUIComponent = props => {
         onTelemetryModalCancel,
         onTelemetryModalOptIn,
         onTelemetryModalOptOut,
+        securityManager,
         showComingSoon,
         soundsTabVisible,
         stageSizeMode,
@@ -169,7 +170,7 @@ const GUIComponent = props => {
 
         const alwaysEnabledModals = (
             <React.Fragment>
-                <TWSecurityManager />
+                <TWSecurityManager securityManager={securityManager} />
                 <TWRestorePointManager />
                 {usernameModalVisible && <TWUsernameModal />}
                 {settingsModalVisible && <TWSettingsModal />}
@@ -491,6 +492,7 @@ GUIComponent.propTypes = {
     onTelemetryModalOptOut: PropTypes.func,
     onToggleLoginOpen: PropTypes.func,
     renderLogin: PropTypes.func,
+    securityManager: PropTypes.shape({}),
     showComingSoon: PropTypes.bool,
     soundsTabVisible: PropTypes.bool,
     stageSizeMode: PropTypes.oneOf(Object.keys(STAGE_SIZE_MODES)),

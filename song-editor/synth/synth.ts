@@ -1394,6 +1394,11 @@ export class Instrument {
     public vibratoDelay: number = 0;
     public vibratoType: number = 0;
     public unison: number = 0;
+    public unisonVoices: number = 1;
+    public unisonSpread: number = 1;
+    public unisonOffset: number = 1;
+    public unisonExpression: number = 1;
+    public unisonSign: number = 1;
     public effects: number = 0;
     public chord: number = 1;
     public volume: number = 0;
@@ -2970,6 +2975,7 @@ export class Song {
                         buffer.push(base64IntToCharCode[Math.round(instrument.vibratoDelay)]);
                         buffer.push(base64IntToCharCode[instrument.vibratoType]);
                     }
+                    //BOOKMARK (search for "custom vibrato")
                 }
                 if (effectsIncludeDistortion(instrument.effects)) {
                     buffer.push(base64IntToCharCode[instrument.distortion]);
@@ -6921,6 +6927,11 @@ class InstrumentState {
     public unison: Unison | null = null;
     public chord: Chord | null = null;
     public effects: number = 0;
+    public unisonVoices: number = 1;
+    public unisonSpread: number = 1;
+    public unisonOffset: number = 1;
+    public unisonExpression: number = 1;
+    public unisonSign: number = 1;
 
     public volumeScale: number = 0;
     public aliases: boolean = false;
@@ -10248,15 +10259,22 @@ export class Synth {
             const startFreq: number = Instrument.frequencyFromPitch(startPitch);
             if (instrument.type == InstrumentType.chip || instrument.type == InstrumentType.customChipWave || instrument.type == InstrumentType.harmonics || instrument.type == InstrumentType.pickedString) {
                 // These instruments have two waves at different frequencies for the unison feature.
-                const unison: Unison = Config.unisons[instrument.unison];
-                const voiceCountExpression: number = (instrument.type == InstrumentType.pickedString) ? 1 : unison.voices / 2.0;
-                settingsExpressionMult *= unison.expression * voiceCountExpression;
+                //const unison: Unison = Config.unisons[instrument.unison];
+                const unisonVoices: number = instrument.unisonVoices;
+                const unisonSpread: number = instrument.unisonSpread;
+                const unisonOffset: number = instrument.unisonOffset;
+                const unisonExpression: number = instrument.unisonExpression;
+                //const unisonSign: number = Config.unisons[instrument.unisonSign];
+                //const unison: Unison = [voices:, ];
+                const voiceCountExpression: number = (instrument.type == InstrumentType.pickedString) ? 1 : unisonVoices / 2.0;
+                settingsExpressionMult *= unisonExpression * voiceCountExpression;
+                console.log("original:" + EnvelopeComputeIndex.unison + "envelopeStart:" + envelopeStarts[EnvelopeComputeIndex.unison] + "envelopeEnd:" + envelopeEnds[EnvelopeComputeIndex.unison]);
                 const unisonEnvelopeStart = envelopeStarts[EnvelopeComputeIndex.unison];
                 const unisonEnvelopeEnd = envelopeEnds[EnvelopeComputeIndex.unison];
-                const unisonAStart: number = Math.pow(2.0, (unison.offset + unison.spread) * unisonEnvelopeStart / 12.0);
-                const unisonAEnd: number = Math.pow(2.0, (unison.offset + unison.spread) * unisonEnvelopeEnd / 12.0);
-                const unisonBStart: number = Math.pow(2.0, (unison.offset - unison.spread) * unisonEnvelopeStart / 12.0) * specialIntervalMult;
-                const unisonBEnd: number = Math.pow(2.0, (unison.offset - unison.spread) * unisonEnvelopeEnd / 12.0) * specialIntervalMult;
+                const unisonAStart: number = Math.pow(2.0, (unisonOffset + unisonSpread) * unisonEnvelopeStart / 12.0);
+                const unisonAEnd: number = Math.pow(2.0, (unisonOffset + unisonSpread) * unisonEnvelopeEnd / 12.0);
+                const unisonBStart: number = Math.pow(2.0, (unisonOffset - unisonSpread) * unisonEnvelopeStart / 12.0) * specialIntervalMult;
+                const unisonBEnd: number = Math.pow(2.0, (unisonOffset- unisonSpread) * unisonEnvelopeEnd / 12.0) * specialIntervalMult;
                 tone.phaseDeltas[0] = startFreq * sampleTime * unisonAStart;
                 tone.phaseDeltas[1] = startFreq * sampleTime * unisonBStart;
                 tone.phaseDeltaScales[0] = basePhaseDeltaScale * Math.pow(unisonAEnd / unisonAStart, 1.0 / roundedSamplesPerTick);
@@ -10294,8 +10312,9 @@ export class Synth {
                 let stringDecayEnd: number = 1.0 - Math.min(1.0, sustainEnvelopeEnd * tone.stringSustainEnd / (Config.stringSustainRange - 1));
                 tone.prevStringDecay = stringDecayEnd;
 
-                const unison: Unison = Config.unisons[instrument.unison];
-                for (let i: number = tone.pickedStrings.length; i < unison.voices; i++) {
+                //const unison: Unison = Config.unisons[instrument.unison];
+                const unisonVoices: number = instrument.unisonVoices;
+                for (let i: number = tone.pickedStrings.length; i < unisonVoices; i++) {
                     tone.pickedStrings[i] = new PickedString();
                 }
 
@@ -10306,7 +10325,7 @@ export class Synth {
                     }
                 }
 
-                for (let i: number = 0; i < unison.voices; i++) {
+                for (let i: number = 0; i < unisonVoices; i++) {
                     tone.pickedStrings[i].update(this, instrumentState, tone, i, roundedSamplesPerTick, stringDecayStart, stringDecayEnd);
                 }
             }
@@ -10482,8 +10501,8 @@ export class Synth {
             }
             const chipWaveLoopMode: number = instrumentState.chipWaveLoopMode;
             const chipWavePlayBackwards: boolean = instrumentState.chipWavePlayBackwards;
-            const unisonSign: number = tone.specialIntervalExpressionMult * instrumentState.unison!.sign;
-            if (instrumentState.unison!.voices == 1 && !instrumentState.chord!.customInterval)
+            const unisonSign: number = tone.specialIntervalExpressionMult * instrumentState.unisonSign;
+            if (instrumentState.unisonVoices == 1 && !instrumentState.chord!.customInterval)
                 tone.phases[1] = tone.phases[0];
             let phaseDeltaA: number = tone.phaseDeltas[0] * waveLength;
             let phaseDeltaB: number = tone.phaseDeltas[1] * waveLength;
@@ -10795,8 +10814,8 @@ export class Synth {
         const waveLength = (aliases && instrumentState.type == 8) ? wave.length : wave.length - 1;
 			//BUGFIX FROM JUMMBOX
 
-        const unisonSign: number = tone.specialIntervalExpressionMult * instrumentState.unison!.sign;
-        if (instrumentState.unison!.voices == 1 && !instrumentState.chord!.customInterval) tone.phases[1] = tone.phases[0];
+        const unisonSign: number = tone.specialIntervalExpressionMult * instrumentState.unisonSign;
+        if (instrumentState.unisonVoices == 1 && !instrumentState.chord!.customInterval) tone.phases[1] = tone.phases[0];
         let phaseDeltaA: number = tone.phaseDeltas[0] * waveLength;
         let phaseDeltaB: number = tone.phaseDeltas[1] * waveLength;
         const phaseDeltaScaleA: number = +tone.phaseDeltaScales[0];
@@ -10890,8 +10909,8 @@ export class Synth {
         const wave: Float32Array = instrumentState.wave!;
         const waveLength: number = wave.length - 1; // The first sample is duplicated at the end, don't double-count it.
 
-        const unisonSign: number = tone.specialIntervalExpressionMult * instrumentState.unison!.sign;
-        if (instrumentState.unison!.voices == 1 && !instrumentState.chord!.customInterval) tone.phases[1] = tone.phases[0];
+        const unisonSign: number = tone.specialIntervalExpressionMult * instrumentState.unisonSign;
+        if (instrumentState.unisonVoices == 1 && !instrumentState.chord!.customInterval) tone.phases[1] = tone.phases[0];
         let phaseDeltaA: number = tone.phaseDeltas[0] * waveLength;
         let phaseDeltaB: number = tone.phaseDeltas[1] * waveLength;
         const phaseDeltaScaleA: number = +tone.phaseDeltaScales[0];
@@ -10974,7 +10993,7 @@ export class Synth {
         // processing extra ones if possible. Any line containing a "#" is duplicated for
         // each required voice, replacing the "#" with the voice index.
 
-        const voiceCount: number = instrumentState.unison!.voices;
+        const voiceCount: number = instrumentState.unisonVoices;
         let pickedStringFunction: Function = Synth.pickedStringFunctionCache[voiceCount];
         if (pickedStringFunction == undefined) {
             let pickedStringSource: string = "";
@@ -11008,7 +11027,7 @@ export class Synth {
 				let expression = +tone.expression;
 				const expressionDelta = +tone.expressionDelta;
 				
-				const unisonSign = tone.specialIntervalExpressionMult * instrumentState.unison.sign;
+				const unisonSign = tone.specialIntervalExpressionMult * instrumentState.unisonSign;
 				const delayResetOffset# = pickedString#.delayResetOffset|0;
 				
 				const filters = tone.noteFilters;

@@ -77,6 +77,7 @@ export const enum DropdownID {
     Transition = 3,
     FM = 4,
     PulseWidth = 5,
+    Unison = 6,
 
 }
 

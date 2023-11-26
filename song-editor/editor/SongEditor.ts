@@ -42,7 +42,7 @@ import { SpectrumEditor } from "./SpectrumEditor";
 import { CustomPrompt } from "./CustomPrompt";
 import { ThemePrompt } from "./ThemePrompt";
 import { TipPrompt } from "./TipPrompt";
-import { ChangeTempo, ChangeKeyOctave, ChangeChorus, ChangeEchoDelay, ChangeEchoSustain, ChangeReverb, ChangeVolume, ChangePan, ChangePatternSelection, ChangePatternsPerChannel, ChangePatternNumbers, ChangePulseWidth, ChangeFeedbackAmplitude, ChangeOperatorAmplitude, ChangeOperatorFrequency, ChangeDrumsetEnvelope, ChangePasteInstrument, ChangePreset, pickRandomPresetValue, ChangeRandomGeneratedInstrument, ChangeEQFilterType, ChangeNoteFilterType, ChangeEQFilterSimpleCut, ChangeEQFilterSimplePeak, ChangeNoteFilterSimpleCut, ChangeNoteFilterSimplePeak, ChangeScale, ChangeDetectKey, ChangeKey, ChangeRhythm, ChangeFeedbackType, ChangeAlgorithm, ChangeChipWave, ChangeNoiseWave, ChangeTransition, ChangeToggleEffects, ChangeVibrato, ChangeUnison, ChangeChord, ChangeSong, ChangePitchShift, ChangeDetune, ChangeDistortion, ChangeStringSustain, ChangeBitcrusherFreq, ChangeBitcrusherQuantization, ChangeAddEnvelope, ChangeAddChannelInstrument, ChangeRemoveChannelInstrument, ChangeCustomWave, ChangeOperatorWaveform, ChangeOperatorPulseWidth, ChangeSongTitle, ChangeVibratoDepth, ChangeVibratoSpeed, ChangeVibratoDelay, ChangeVibratoType, ChangePanDelay, ChangeArpeggioSpeed, ChangeFastTwoNoteArp, ChangeClicklessTransition, ChangeAliasing, ChangeChipWavePlayBackwards, ChangeChipWaveStartOffset, ChangeChipWaveLoopEnd, ChangeChipWaveLoopStart, ChangeChipWaveLoopMode, ChangeChipWaveUseAdvancedLoopControls, ChangeDecimalOffset } from "./changes";
+import { ChangeTempo, ChangeKeyOctave, ChangeChorus, ChangeEchoDelay, ChangeEchoSustain, ChangeReverb, ChangeVolume, ChangePan, ChangePatternSelection, ChangePatternsPerChannel, ChangePatternNumbers, ChangePulseWidth, ChangeFeedbackAmplitude, ChangeOperatorAmplitude, ChangeOperatorFrequency, ChangeDrumsetEnvelope, ChangePasteInstrument, ChangePreset, pickRandomPresetValue, ChangeRandomGeneratedInstrument, ChangeEQFilterType, ChangeNoteFilterType, ChangeEQFilterSimpleCut, ChangeEQFilterSimplePeak, ChangeNoteFilterSimpleCut, ChangeNoteFilterSimplePeak, ChangeScale, ChangeDetectKey, ChangeKey, ChangeRhythm, ChangeFeedbackType, ChangeAlgorithm, ChangeChipWave, ChangeNoiseWave, ChangeTransition, ChangeToggleEffects, ChangeVibrato, ChangeUnison, ChangeChord, ChangeSong, ChangePitchShift, ChangeDetune, ChangeDistortion, ChangeStringSustain, ChangeBitcrusherFreq, ChangeBitcrusherQuantization, ChangeAddEnvelope, ChangeAddChannelInstrument, ChangeRemoveChannelInstrument, ChangeCustomWave, ChangeOperatorWaveform, ChangeOperatorPulseWidth, ChangeSongTitle, ChangeVibratoDepth, ChangeVibratoSpeed, ChangeVibratoDelay, ChangeVibratoType, ChangePanDelay, ChangeArpeggioSpeed, ChangeFastTwoNoteArp, ChangeClicklessTransition, ChangeAliasing, ChangeChipWavePlayBackwards, ChangeChipWaveStartOffset, ChangeChipWaveLoopEnd, ChangeChipWaveLoopStart, ChangeChipWaveLoopMode, ChangeChipWaveUseAdvancedLoopControls, ChangeDecimalOffset, ChangeUnisonVoices, ChangeUnisonSpread, ChangeUnisonOffset, ChangeUnisonExpression, ChangeUnisonSign } from "./changes";
 import { Change6OpFeedbackType, Change6OpAlgorithm, ChangeCustomAlgorythmorFeedback} from "./changes"
 
 import { TrackEditor } from "./TrackEditor";
@@ -906,8 +906,41 @@ export class SongEditor {
     private readonly _bitcrusherFreqRow: HTMLDivElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("bitcrusherFreq") }, "Freq Crush:"), this._bitcrusherFreqSlider.container);
     private readonly _stringSustainSlider: Slider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.stringSustainRange - 1, value: "0", step: "1" }), this._doc, (oldValue: number, newValue: number) => new ChangeStringSustain(this._doc, oldValue, newValue), false);
     private readonly _stringSustainRow: HTMLDivElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("stringSustain") }, "Sustain:"), this._stringSustainSlider.container);
+    
+    private readonly _unisonDropdown:  HTMLButtonElement = button({ style: "margin-left:0em; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: () => this._toggleDropdownMenu(DropdownID.Unison) }, "▼");
+
     private readonly _unisonSelect: HTMLSelectElement = buildOptions(select(), Config.unisons.map(unison => unison.name));
-    private readonly _unisonSelectRow: HTMLElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("unison") }, "Unison:"), div({ class: "selectContainer" }, this._unisonSelect));
+    private readonly _unisonSelectRow: HTMLElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("unison") }, "Unison:"), this._unisonDropdown, div({ class: "selectContainer", style: "width: 61.5%;" }, this._unisonSelect));
+    
+    private readonly _unisonVoicesInputBox: HTMLInputElement = input({ style: "width: 16em; font-size: 80%; margin-left:10px;; ", id: "unisonVoicesInputBox", type: "number", step: "1", min: 1, max: 2, value: 1 });
+    private readonly _unisonVoicesRow: HTMLDivElement = div({ class: "selectRow" }, div({},
+        span({ class: "tip", style: "height:1em; font-size: smaller;", onclick: () => this._openPrompt("unisonVoices") }, "Voices: "),
+        div({ style: "color: " + ColorConfig.secondaryText + "; margin-top: -3px;" }, this._unisonVoicesInputBox),
+    ));
+    private readonly _unisonSpreadInputBox: HTMLInputElement = input({ style: "width: 16em; font-size: 80%; margin-left:10px;", id: "unisonSpreadInputBox", type: "number", step: "1", min: 1, max: 2, value: 1 });
+    private readonly _unisonSpreadRow: HTMLDivElement = div({ class: "selectRow" }, div({},
+        span({ class: "tip", style: "height:1em; font-size: smaller;", onclick: () => this._openPrompt("unisonSpread") }, "Spread: "),
+        div({ style: "color: " + ColorConfig.secondaryText + "; margin-top: -3px;" }, this._unisonSpreadInputBox),
+    ));
+    private readonly _unisonOffsetInputBox: HTMLInputElement = input({ style: "width: 16em; font-size: 80%; margin-left:10px;", id: "unisonOffsetInputBox", type: "number", step: "1", min: 1, max: 2, value: 1 });
+    private readonly _unisonOffsetRow: HTMLDivElement = div({ class: "selectRow" }, div({},
+        span({ class: "tip", style: "height:1em; font-size: smaller;", onclick: () => this._openPrompt("unisonOffset") }, "Offset: "),
+        div({ style: "color: " + ColorConfig.secondaryText + "; margin-top: -3px;" }, this._unisonOffsetInputBox),
+    ));
+    private readonly _unisonExpressionInputBox: HTMLInputElement = input({ style: "width: 16em; font-size: 80%; margin-left:10px;", id: "unisonExpressionInputBox", type: "number", step: "1", min: 1, max: 2, value: 1 });
+    private readonly _unisonExpressionRow: HTMLDivElement = div({ class: "selectRow" }, div({},
+        span({ class: "tip", style: "height:1em; font-size: smaller;", onclick: () => this._openPrompt("unisonExpression") }, "Expression: "),
+        div({ style: "color: " + ColorConfig.secondaryText + "; margin-top: -3px;" }, this._unisonExpressionInputBox),
+    ));
+    private readonly _unisonSignInputBox: HTMLInputElement = input({ style: "width: 16em; font-size: 80%; margin-left:10px;", id: "unisonSignInputBox", type: "number", step: "1", min: 1, max: 2, value: 1 });
+    private readonly _unisonSignRow: HTMLDivElement = div({ class: "selectRow" }, div({},
+        span({ class: "tip", style: "height:1em; font-size: smaller;", onclick: () => this._openPrompt("unisonSign") }, "Sign: "),
+        div({ style: "color: " + ColorConfig.secondaryText + "; margin-top: -3px;" }, this._unisonSignInputBox),
+    ));
+    
+    
+    private readonly _unisonDropdownGroup: HTMLElement = div({ class: "editor-controls", style: "display: none;" }, this._unisonVoicesRow, this._unisonSpreadRow, this._unisonOffsetRow, this._unisonExpressionRow, this._unisonSignRow);
+   
     private readonly _chordSelect: HTMLSelectElement = buildOptions(select(), Config.chords.map(chord => chord.name));
     private readonly _chordDropdown: HTMLButtonElement = button({ style: "margin-left:0em; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: () => this._toggleDropdownMenu(DropdownID.Chord) }, "▼");
 
@@ -1034,6 +1067,7 @@ export class SongEditor {
         this._pulseWidthDropdownGroup,
         this._stringSustainRow,
         this._unisonSelectRow,
+        this._unisonDropdownGroup,
         div({ style: `padding: 2px 0; margin-left: 2em; display: flex; align-items: center;` },
             span({ style: `flex-grow: 1; text-align: center;` }, span({ class: "tip", onclick: () => this._openPrompt("effects") }, "Effects")),
             div({ class: "effects-menu" }, this._effectsSelect),
@@ -1262,6 +1296,7 @@ export class SongEditor {
     private _openTransitionDropdown: boolean = false;
     private _openOperatorDropdowns: boolean[] = [];
     private _openPulseWidthDropdown: boolean = false;
+    private _openUnisonDropdown: boolean = false;
 
     private outVolumeHistoricTimer: number = 0;
     private outVolumeHistoricCap: number = 0;
@@ -1291,6 +1326,10 @@ export class SongEditor {
         ));
 
         this._vibratoSelect.appendChild(option({ hidden: true, value: 5 }, "custom"));
+
+        //this._unisonSelect.appendChild(option({ hidden: true, value: 28 }, "custom"));
+        
+        this._unisonSelect.appendChild(option({ hidden: true, value: Config.unisons.length }, "custom"));
 
         this._showModSliders = new Array<boolean>(Config.modulators.length);
         this._modSliderValues = new Array<number>(Config.modulators.length);
@@ -1529,6 +1568,13 @@ export class SongEditor {
         this._instrumentVolumeSliderInputBox.addEventListener("input", () => { this._doc.record(new ChangeVolume(this._doc, this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()].volume, Math.min(25.0, Math.max(-25.0, Math.round(+this._instrumentVolumeSliderInputBox.value))))) });
         this._panSliderInputBox.addEventListener("input", () => { this._doc.record(new ChangePan(this._doc, this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()].pan, Math.min(100.0, Math.max(0.0, Math.round(+this._panSliderInputBox.value))))) });
         this._detuneSliderInputBox.addEventListener("input", () => { this._doc.record(new ChangeDetune(this._doc, this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()].detune, Math.min(Config.detuneMax - Config.detuneCenter, Math.max(Config.detuneMin - Config.detuneCenter, Math.round(+this._detuneSliderInputBox.value))))) });
+        
+        this._unisonVoicesInputBox.addEventListener("input", () => { this._doc.record(new ChangeUnisonVoices(this._doc, this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()].volume, Math.min(2.0, Math.max(1.0, Math.round(+this._unisonVoicesInputBox.value))))) });
+        this._unisonSpreadInputBox.addEventListener("input", () => { this._doc.record(new ChangeUnisonSpread(this._doc, this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()].volume, Math.min(20.0, Math.max(0.0, +this._unisonSpreadInputBox.value)))) });
+        this._unisonOffsetInputBox.addEventListener("input", () => { this._doc.record(new ChangeUnisonOffset(this._doc, this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()].volume, Math.min(2.0, Math.max(1.0, +this._unisonOffsetInputBox.value)))) });
+        this._unisonExpressionInputBox.addEventListener("input", () => { this._doc.record(new ChangeUnisonExpression(this._doc, this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()].volume, Math.min(2.0, Math.max(1.0, +this._unisonExpressionInputBox.value)))) });
+        this._unisonSignInputBox.addEventListener("input", () => { this._doc.record(new ChangeUnisonSign(this._doc, this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()].volume, Math.min(2.0, Math.max(1.0, +this._unisonSignInputBox.value)))) });
+        
         this._customWaveDraw.addEventListener("input", () => { this._doc.record(new ChangeCustomWave(this._doc, this._customWaveDrawCanvas.newArray)) });
         this._twoNoteArpBox.addEventListener("input", () => { this._doc.record(new ChangeFastTwoNoteArp(this._doc, this._twoNoteArpBox.checked)) });
         this._clicklessTransitionBox.addEventListener("input", () => { this._doc.record(new ChangeClicklessTransition(this._doc, this._clicklessTransitionBox.checked)) });
@@ -1615,6 +1661,11 @@ export class SongEditor {
                 target = this._pulseWidthDropdown;
                 this._openPulseWidthDropdown = this._openPulseWidthDropdown ? false : true;
                 group = this._pulseWidthDropdownGroup;
+                break;
+            case DropdownID.Unison:
+                target = this._unisonDropdown;
+                this._openUnisonDropdown = this._openUnisonDropdown ? false : true;
+                group = this._unisonDropdownGroup;
                 break;
         }
 
@@ -2474,8 +2525,15 @@ export class SongEditor {
             if (instrument.type == InstrumentType.chip || instrument.type == InstrumentType.customChipWave || instrument.type == InstrumentType.harmonics || instrument.type == InstrumentType.pickedString) {
                 this._unisonSelectRow.style.display = "";
                 setSelectedValue(this._unisonSelect, instrument.unison);
+                this._unisonVoicesInputBox.value = instrument.unisonVoices + "";
+                this._unisonSpreadInputBox.value = instrument.unisonSpread + "";
+                this._unisonOffsetInputBox.value = instrument.unisonOffset + "";
+                this._unisonExpressionInputBox.value = instrument.unisonExpression + "";
+                this._unisonSignInputBox.value = instrument.unisonSign + "";
+                this._unisonDropdownGroup.style.display = (this._unisonDropdownGroup ? "" : "none");
             } else {
                 this._unisonSelectRow.style.display = "none";
+                this._unisonDropdownGroup.style.display = "none";
             }
 
             this._envelopeEditor.render();
@@ -2581,6 +2639,7 @@ export class SongEditor {
             this._panSliderRow.style.display = "none";
             this._panDropdownGroup.style.display = "none";
             this._pulseWidthDropdownGroup.style.display = "none";
+            this._unisonDropdownGroup.style.display = "none";
 
             this._modulatorGroup.style.display = "";
             this._modulatorGroup.style.color = ColorConfig.getChannelColor(this._doc.song, this._doc.channel).primaryNote;

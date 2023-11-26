@@ -1607,10 +1607,90 @@ export class ChangeUnison extends Change {
         const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
         const oldValue: number = instrument.unison;
         if (oldValue != newValue) {
-            this._didSomething();
             instrument.unison = newValue;
+            instrument.unisonVoices = Config.unisons[instrument.unison].voices;
+            instrument.unisonSpread = Config.unisons[instrument.unison].spread;
+            instrument.unisonOffset = Config.unisons[instrument.unison].offset;
+            instrument.unisonExpression = Config.unisons[instrument.unison].expression;
+            instrument.unisonSign = Config.unisons[instrument.unison].sign;
             instrument.preset = instrument.type;
             doc.notifier.changed();
+            this._didSomething();
+        }
+    }
+}
+
+export class ChangeUnisonVoices extends Change {
+    constructor(doc: SongDocument, oldValue: number, newValue: number) {
+        super();
+        const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+        let prevUnison: number = instrument.unison;
+        doc.notifier.changed();
+        if (oldValue != newValue || prevUnison != Config.unisons.length) {            
+            instrument.unisonVoices = newValue;
+            instrument.unison = Config.unisons.length; // Custom
+            doc.notifier.changed();
+            this._didSomething();
+        }
+    }
+}
+
+export class ChangeUnisonSpread extends Change {
+    constructor(doc: SongDocument, oldValue: number, newValue: number) {
+        super();
+        const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+        let prevUnison: number = instrument.unison;
+        doc.notifier.changed();
+        if (oldValue != newValue || prevUnison != Config.unisons.length) {
+            instrument.unisonSpread = newValue;
+            instrument.unison = Config.unisons.length; // Custom
+            doc.notifier.changed();
+            this._didSomething();
+        }
+    }
+}
+
+export class ChangeUnisonOffset extends Change {
+    constructor(doc: SongDocument, oldValue: number, newValue: number) {
+        super();
+        const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+        let prevUnison: number = instrument.unison;
+        doc.notifier.changed();
+        if (oldValue != newValue || prevUnison != Config.unisons.length) {
+            instrument.unisonOffset = newValue;
+            instrument.unison = Config.unisons.length; // Custom
+            doc.notifier.changed();
+            this._didSomething();
+        }
+    }
+}
+
+export class ChangeUnisonExpression extends Change {
+    constructor(doc: SongDocument, oldValue: number, newValue: number) {
+        super();
+        const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+        let prevUnison: number = instrument.unison;
+        doc.notifier.changed();
+        if (oldValue != newValue || prevUnison != Config.unisons.length) {
+            instrument.unisonExpression = newValue;
+            instrument.unison = Config.unisons.length; // Custom
+            doc.notifier.changed();
+            this._didSomething();
+        }
+    }
+}
+
+export class ChangeUnisonSign extends Change {
+    constructor(doc: SongDocument, oldValue: number, newValue: number) {
+        super();
+        const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+        let prevUnison: number = instrument.unison;
+        doc.notifier.changed();
+        if (oldValue != newValue || prevUnison != Config.unisons.length) {
+            instrument.unisonSign = newValue;
+            instrument.unison = Config.unisons.length; // Custom
+            doc.notifier.changed();
+            this._didSomething();
         }
     }
 }

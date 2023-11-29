@@ -1614,6 +1614,7 @@ export class ChangeUnison extends Change {
             instrument.unisonExpression = Config.unisons[instrument.unison].expression;
             instrument.unisonSign = Config.unisons[instrument.unison].sign;
             instrument.preset = instrument.type;
+            //what is the piece of above code for??? is it necessary??? help???
             doc.notifier.changed();
             this._didSomething();
         }
@@ -1625,7 +1626,6 @@ export class ChangeUnisonVoices extends Change {
         super();
         const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
         let prevUnison: number = instrument.unison;
-        doc.notifier.changed();
         if (oldValue != newValue || prevUnison != Config.unisons.length) {            
             instrument.unisonVoices = newValue;
             instrument.unison = Config.unisons.length; // Custom
@@ -1640,7 +1640,6 @@ export class ChangeUnisonSpread extends Change {
         super();
         const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
         let prevUnison: number = instrument.unison;
-        doc.notifier.changed();
         if (oldValue != newValue || prevUnison != Config.unisons.length) {
             instrument.unisonSpread = newValue;
             instrument.unison = Config.unisons.length; // Custom
@@ -1655,7 +1654,6 @@ export class ChangeUnisonOffset extends Change {
         super();
         const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
         let prevUnison: number = instrument.unison;
-        doc.notifier.changed();
         if (oldValue != newValue || prevUnison != Config.unisons.length) {
             instrument.unisonOffset = newValue;
             instrument.unison = Config.unisons.length; // Custom
@@ -1670,7 +1668,6 @@ export class ChangeUnisonExpression extends Change {
         super();
         const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
         let prevUnison: number = instrument.unison;
-        doc.notifier.changed();
         if (oldValue != newValue || prevUnison != Config.unisons.length) {
             instrument.unisonExpression = newValue;
             instrument.unison = Config.unisons.length; // Custom
@@ -1685,7 +1682,6 @@ export class ChangeUnisonSign extends Change {
         super();
         const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
         let prevUnison: number = instrument.unison;
-        doc.notifier.changed();
         if (oldValue != newValue || prevUnison != Config.unisons.length) {
             instrument.unisonSign = newValue;
             instrument.unison = Config.unisons.length; // Custom

@@ -81,6 +81,24 @@ function decode32BitNumber(compressed: string, charIndex: number): number {
     return x;
 }
 
+function encodeUnisonSettings(buffer: number[], v: number, s: number, o: number, e: number, i: number): void {
+    buffer.push(base64IntToCharCode[v]);
+    //temp encoding
+    //please replace this. this code is so bad
+
+    buffer.push(base64IntToCharCode[Number((s > 0))]);
+    encode32BitNumber(buffer, Math.round(Math.abs(s) * 1000));
+
+    buffer.push(base64IntToCharCode[Number((o > 0))]);
+    encode32BitNumber(buffer, Math.round(Math.abs(o) * 1000));
+    
+    buffer.push(base64IntToCharCode[Number((e > 0))]);
+    encode32BitNumber(buffer, Math.round(Math.abs(e) * 1000));
+
+    buffer.push(base64IntToCharCode[Number((i > 0))]);
+    encode32BitNumber(buffer, Math.round(Math.abs(i) * 1000));
+}
+
 function convertLegacyKeyToKeyAndOctave(rawKeyIndex: number): [number, number] {
     let key: number = clamp(0, Config.keys.length, rawKeyIndex);
     let octave: number = 0;
@@ -1395,10 +1413,10 @@ export class Instrument {
     public vibratoType: number = 0;
     public unison: number = 0;
     public unisonVoices: number = 1;
-    public unisonSpread: number = 1;
-    public unisonOffset: number = 1;
-    public unisonExpression: number = 1;
-    public unisonSign: number = 1;
+    public unisonSpread: number = 0.0;
+    public unisonOffset: number = 0.0;
+    public unisonExpression: number = 1.4;
+    public unisonSign: number = 1.0;
     public effects: number = 0;
     public chord: number = 1;
     public volume: number = 0;
@@ -3032,6 +3050,7 @@ export class Song {
 							buffer.push(base64IntToCharCode[0]);	
 						}
 						buffer.push(104, base64IntToCharCode[instrument.unison]);
+                        if (instrument.unison == Config.unisons.length) encodeUnisonSettings(buffer, instrument.unisonVoices, instrument.unisonSpread, instrument.unisonOffset, instrument.unisonExpression, instrument.unisonSign);
 
 						// Repurposed for chip wave loop controls.
 						buffer.push(SongTagCode.filterResonance);
@@ -3123,7 +3142,7 @@ export class Song {
 							buffer.push(base64IntToCharCode[0]);	
 						}
 						buffer.push(104, base64IntToCharCode[instrument.unison]);
-					 //code bookmark
+                        if (instrument.unison == Config.unisons.length) encodeUnisonSettings(buffer, instrument.unisonVoices, instrument.unisonSpread, instrument.unisonOffset, instrument.unisonExpression, instrument.unisonSign);
                     buffer.push(SongTagCode.customChipWave);
                     // Push custom wave values
                     for (let j: number = 0; j < 64; j++) {
@@ -3154,13 +3173,13 @@ export class Song {
                     spectrumBits.encodeBase64(buffer);
                 } else if (instrument.type == InstrumentType.harmonics) {
                     buffer.push(SongTagCode.unison, base64IntToCharCode[instrument.unison]);
+                    if (instrument.unison == Config.unisons.length) encodeUnisonSettings(buffer, instrument.unisonVoices, instrument.unisonSpread, instrument.unisonOffset, instrument.unisonExpression, instrument.unisonSign);
                 } else if (instrument.type == InstrumentType.pwm) {
                     buffer.push(SongTagCode.pulseWidth, base64IntToCharCode[instrument.pulseWidth]);
-                    // buffer.push(base64IntToCharCode[instrument.decimalOffset]);
-                    //buffer.push(SongTagCode.aliases, base64IntToCharCode[instrument.decimalOffset]); 
                     buffer.push(base64IntToCharCode[instrument.decimalOffset >> 6], base64IntToCharCode[instrument.decimalOffset & 0x3f]); 
                 } else if (instrument.type == InstrumentType.pickedString) {
                     buffer.push(SongTagCode.unison, base64IntToCharCode[instrument.unison]);
+                    if (instrument.unison == Config.unisons.length) encodeUnisonSettings(buffer, instrument.unisonVoices, instrument.unisonSpread, instrument.unisonOffset, instrument.unisonExpression, instrument.unisonSign);
                     buffer.push(SongTagCode.stringSustain, base64IntToCharCode[instrument.stringSustain]);
                 } else if (instrument.type == InstrumentType.mod) {
                     // Handled down below. Could be moved, but meh.
@@ -4408,8 +4427,49 @@ export class Song {
                     }
                     this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].unison = unison;
                 } else {
-                    this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].unison = clamp(0, Config.unisons.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                    this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].unison = clamp(0, Config.unisons.length + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                 }
+                const instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
+                
+                if (instrument.unison == Config.unisons.length) {
+                    instrument.unisonVoices = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+
+                    const unisonSpreadNegative = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                    const unisonSpread: number = decode32BitNumber(compressed, charIndex);
+                    charIndex += 6;
+
+                    const unisonOffsetNegative = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                    const unisonOffset: number = decode32BitNumber(compressed, charIndex);
+                    charIndex += 6;
+
+                    const unisonExpressionNegative = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                    const unisonExpression: number = decode32BitNumber(compressed, charIndex);
+                    charIndex += 6;
+
+                    const unisonSignNegative = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                    const unisonSign: number = decode32BitNumber(compressed, charIndex);
+                    charIndex += 6;
+
+
+                    instrument.unisonSpread = unisonSpread / 1000;
+                    if (unisonSpreadNegative == 0) instrument.unisonSpread *= -1;
+
+                    instrument.unisonOffset = unisonOffset / 1000;
+                    if (unisonOffsetNegative == 0) instrument.unisonOffset *= -1;
+
+                    instrument.unisonExpression = unisonExpression / 1000;
+                    if (unisonExpressionNegative == 0) instrument.unisonExpression *= -1;
+
+                    instrument.unisonSign = unisonSign / 1000;
+                    if (unisonSignNegative == 0) instrument.unisonSign *= -1;
+                } else {
+                    instrument.unisonVoices = Config.unisons[instrument.unison].voices;
+                    instrument.unisonSpread = Config.unisons[instrument.unison].spread;
+                    instrument.unisonOffset = Config.unisons[instrument.unison].offset;
+                    instrument.unisonExpression = Config.unisons[instrument.unison].expression;
+                    instrument.unisonSign = Config.unisons[instrument.unison].sign;
+                }
+            
             } break;
             case SongTagCode.chord: {
                 if ((beforeNine && fromBeepBox) || ((fromJummBox && beforeFive) || (beforeFour && fromGoldBox))) {
@@ -6925,13 +6985,13 @@ class InstrumentState {
             // advloop addition
     public noisePitchFilterMult: number = 1.0;
     public unison: Unison | null = null;
+    public unisonVoices: number = 1;
+    public unisonSpread: number = 0.0;
+    public unisonOffset: number = 0.0;
+    public unisonExpression: number = 1.4;
+    public unisonSign: number = 1.0;
     public chord: Chord | null = null;
     public effects: number = 0;
-    public unisonVoices: number = 1;
-    public unisonSpread: number = 1;
-    public unisonOffset: number = 1;
-    public unisonExpression: number = 1;
-    public unisonSign: number = 1;
 
     public volumeScale: number = 0;
     public aliases: boolean = false;
@@ -7595,15 +7655,36 @@ class InstrumentState {
                 this.chipWavePlayBackwards = instrument.chipWavePlayBackwards;
                 this.chipWaveStartOffset = instrument.chipWaveStartOffset;
                // advloop addition
+
+               this.unisonVoices = instrument.unisonVoices;
+            this.unisonSpread = instrument.unisonSpread;
+            this.unisonOffset = instrument.unisonOffset;
+            this.unisonExpression = instrument.unisonExpression;
+            this.unisonSign = instrument.unisonSign;
         } else if (instrument.type == InstrumentType.customChipWave) {
             this.wave = (this.aliases) ? instrument.customChipWave! : instrument.customChipWaveIntegral!;
             this.volumeScale = 0.05;
+            this.unisonVoices = instrument.unisonVoices;
+            this.unisonSpread = instrument.unisonSpread;
+            this.unisonOffset = instrument.unisonOffset;
+            this.unisonExpression = instrument.unisonExpression;
+            this.unisonSign = instrument.unisonSign;
         } else if (instrument.type == InstrumentType.noise) {
             this.wave = getDrumWave(instrument.chipNoise, inverseRealFourierTransform, scaleElementsByFactor);
         } else if (instrument.type == InstrumentType.harmonics) {
             this.wave = this.harmonicsWave.getCustomWave(instrument.harmonicsWave, instrument.type);
+            this.unisonVoices = instrument.unisonVoices;
+            this.unisonSpread = instrument.unisonSpread;
+            this.unisonOffset = instrument.unisonOffset;
+            this.unisonExpression = instrument.unisonExpression;
+            this.unisonSign = instrument.unisonSign;
         } else if (instrument.type == InstrumentType.pickedString) {
             this.wave = this.harmonicsWave.getCustomWave(instrument.harmonicsWave, instrument.type);
+            this.unisonVoices = instrument.unisonVoices;
+            this.unisonSpread = instrument.unisonSpread;
+            this.unisonOffset = instrument.unisonOffset;
+            this.unisonExpression = instrument.unisonExpression;
+            this.unisonSign = instrument.unisonSign;
         } else if (instrument.type == InstrumentType.spectrum) {
             this.wave = this.spectrumWave.getCustomWave(instrument.spectrumWave, 8);
         } else if (instrument.type == InstrumentType.drumset) {
@@ -10268,7 +10349,6 @@ export class Synth {
                 //const unison: Unison = [voices:, ];
                 const voiceCountExpression: number = (instrument.type == InstrumentType.pickedString) ? 1 : unisonVoices / 2.0;
                 settingsExpressionMult *= unisonExpression * voiceCountExpression;
-                console.log("original:" + EnvelopeComputeIndex.unison + "envelopeStart:" + envelopeStarts[EnvelopeComputeIndex.unison] + "envelopeEnd:" + envelopeEnds[EnvelopeComputeIndex.unison]);
                 const unisonEnvelopeStart = envelopeStarts[EnvelopeComputeIndex.unison];
                 const unisonEnvelopeEnd = envelopeEnds[EnvelopeComputeIndex.unison];
                 const unisonAStart: number = Math.pow(2.0, (unisonOffset + unisonSpread) * unisonEnvelopeStart / 12.0);

@@ -126,6 +126,7 @@ const GUIComponent = props => {
         onActivateTab,
         onClickLogo,
         onExtensionButtonClick,
+        onOpenCustomExtensionModal,
         onProjectTelemetryEvent,
         onRequestCloseBackdropLibrary,
         onRequestCloseCostumeLibrary,
@@ -368,6 +369,7 @@ const GUIComponent = props => {
                                                 media: `${basePath}static/blocks-media/`
                                             }}
                                             stageSize={stageSize}
+                                            onOpenCustomExtensionModal={onOpenCustomExtensionModal}
                                             vm={vm}
                                         />
                                     </Box>
@@ -477,6 +479,7 @@ GUIComponent.propTypes = {
     onClickLogo: PropTypes.func,
     onCloseAccountNav: PropTypes.func,
     onExtensionButtonClick: PropTypes.func,
+    onOpenCustomExtensionModal: PropTypes.func,
     onLogOut: PropTypes.func,
     onOpenRegistration: PropTypes.func,
     onRequestCloseBackdropLibrary: PropTypes.func,

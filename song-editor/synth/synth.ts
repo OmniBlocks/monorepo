@@ -92,11 +92,25 @@ function encodeUnisonSettings(buffer: number[], v: number, s: number, o: number,
     buffer.push(base64IntToCharCode[Number((o > 0))]);
     encode32BitNumber(buffer, Math.round(Math.abs(o) * 1000));
     
+    // function encodeTwoCharUnisonSettings(x: number) {
+    //     var i = 0;
+    //     var currentX = x;
+    //     for (i = 0, currentX = x; currentX < 63; currentX -= 63, i++) {
+    //         console.log(i);
+    //         console.log(currentX);
+    //     }
+    //     
+    //     buffer.push(base64IntToCharCode[currentX], base64CharCodeToInt[i]);
+    // }
+    //USE % AND / INSTEAD OF FUNCTION
+
     buffer.push(base64IntToCharCode[Number((e > 0))]);
     encode32BitNumber(buffer, Math.round(Math.abs(e) * 1000));
+    // encodeTwoCharUnisonSettings(Math.round(Math.abs(e) * 1000));
 
     buffer.push(base64IntToCharCode[Number((i > 0))]);
     encode32BitNumber(buffer, Math.round(Math.abs(i) * 1000));
+    // encodeTwoCharUnisonSettings(Math.round(Math.abs(i) * 1000));
 }
 
 function convertLegacyKeyToKeyAndOctave(rawKeyIndex: number): [number, number] {
@@ -2993,7 +3007,6 @@ export class Song {
                         buffer.push(base64IntToCharCode[Math.round(instrument.vibratoDelay)]);
                         buffer.push(base64IntToCharCode[instrument.vibratoType]);
                     }
-                    //BOOKMARK (search for "custom vibrato")
                 }
                 if (effectsIncludeDistortion(instrument.effects)) {
                     buffer.push(base64IntToCharCode[instrument.distortion]);
@@ -3076,7 +3089,6 @@ export class Song {
 						encode32BitNumber(buffer, instrument.chipWaveLoopEnd);
 						encode32BitNumber(buffer, instrument.chipWaveStartOffset);
 
-					 //code bookmark
                 } else if (instrument.type == InstrumentType.fm || instrument.type == InstrumentType.fm6op) {
                     if (instrument.type == InstrumentType.fm) {
                         buffer.push(SongTagCode.algorithm, base64IntToCharCode[instrument.algorithm]);
@@ -4445,10 +4457,12 @@ export class Song {
                     const unisonExpressionNegative = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                     const unisonExpression: number = decode32BitNumber(compressed, charIndex);
                     charIndex += 6;
+                    // const unisonExpression: number = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] + (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] * 63);
 
                     const unisonSignNegative = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                     const unisonSign: number = decode32BitNumber(compressed, charIndex);
                     charIndex += 6;
+                    // const unisonSign: number = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] + (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] * 63);
 
 
                     instrument.unisonSpread = unisonSpread / 1000;

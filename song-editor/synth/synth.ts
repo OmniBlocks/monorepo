@@ -1905,6 +1905,7 @@ export class Instrument {
                 // advloop addition
         } else if (this.type == InstrumentType.pwm) {
             instrumentObject["pulseWidth"] = this.pulseWidth;
+            instrumentObject["decimalOffset"] = this.decimalOffset;
         } else if (this.type == InstrumentType.pickedString) {
             instrumentObject["unison"] = Config.unisons[this.unison].name;
             instrumentObject["stringSustain"] = Math.round(100 * this.stringSustain / (Config.stringSustainRange - 1));
@@ -2186,6 +2187,12 @@ export class Instrument {
             this.pulseWidth = clamp(1, Config.pulseWidthRange + 1, Math.round(instrumentObject["pulseWidth"]));
         } else {
             this.pulseWidth = Config.pulseWidthRange;
+        }
+
+        if (instrumentObject["decimalOffset"] != undefined) {
+            this.decimalOffset = clamp(0, 99 + 1, Math.round(instrumentObject["decimalOffset"]));
+        } else {
+            this.decimalOffset = 0;
         }
 
         if (instrumentObject["harmonics"] != undefined) {

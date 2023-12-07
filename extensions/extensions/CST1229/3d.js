@@ -671,6 +671,13 @@
       return dr[OBJECT].position.z;
     }
 
+    mod(n, modulus) {
+      let result = n % modulus;
+      // Scratch mod uses floored division instead of truncated division.
+      if (result / modulus < 0) result += modulus;
+      return result;
+    }
+
     updateSpriteAngle(util) {
       if (util.target.isStage) return;
       const dr = Scratch.renderer._allDrawables[util.target.drawableID];
@@ -681,6 +688,10 @@
       obj.rotation.x = 0;
       obj.rotation.y = 0;
       obj.rotation.z = 0;
+
+      dr._yaw = this.mod(dr._yaw, 180);
+      dr._pitch = this.mod(dr._pitch, 180);
+      dr._roll = this.mod(dr._roll, 180);
 
       obj.rotation.y = dr._yaw;
       obj.rotateOnAxis(
@@ -785,6 +796,10 @@
       this.camera.rotation.x = 0;
       this.camera.rotation.y = 0;
       this.camera.rotation.z = 0;
+
+      this.camera._yaw = this.mod(this.camera._yaw, 180);
+      this.camera._pitch = this.mod(this.camera._pitch, 180);
+      this.camera._roll = this.mod(this.camera._roll, 180);
 
       this.camera.rotation.y = this.camera._yaw;
       this.camera.rotateOnAxis(

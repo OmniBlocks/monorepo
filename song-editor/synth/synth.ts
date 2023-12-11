@@ -84,12 +84,16 @@ function decode32BitNumber(compressed: string, charIndex: number): number {
 function encodeUnisonSettings(buffer: number[], v: number, s: number, o: number, e: number, i: number): void {
     buffer.push(base64IntToCharCode[v]);
     
-    // change the encoding to use something other than encode32BitNumber
+    // logically this should be done with bitshifts... but I don't know how to do that, so
     buffer.push(base64IntToCharCode[Number((s > 0))]);
-    encode32BitNumber(buffer, Math.round(Math.abs(s) * 1000));
+    let cleanS = Math.round(Math.abs(s) * 1000);
+    let cleanSDivided = Math.floor(cleanS / 63);
+    buffer.push(base64IntToCharCode[cleanS % 63], base64IntToCharCode[cleanSDivided % 63], base64IntToCharCode[Math.floor(cleanSDivided / 63)]);
 
     buffer.push(base64IntToCharCode[Number((o > 0))]);
-    encode32BitNumber(buffer, Math.round(Math.abs(o) * 1000));
+    let cleanO = Math.round(Math.abs(o) * 1000);
+    let cleanODivided = Math.floor(cleanO / 63);
+    buffer.push(base64IntToCharCode[cleanO % 63], base64IntToCharCode[cleanODivided % 63], base64IntToCharCode[Math.floor(cleanODivided / 63)]);
     
     buffer.push(base64IntToCharCode[Number((e > 0))]);
     let cleanE = Math.round(Math.abs(e) * 1000);
@@ -2097,14 +2101,12 @@ export class Instrument {
             const legacyChorusNames: Dictionary<string> = { "union": "none", "fifths": "fifth", "octaves": "octave" };
             const unison: Unison | undefined = Config.unisons.dictionary[legacyChorusNames[unisonProperty]] || Config.unisons.dictionary[unisonProperty];
             if (unison != undefined) this.unison = unison.index;
-            if (this.unison == Config.unisons.length) {
-                //clamp these???
-                this.unisonVoices = instrumentObject["unisonVoices"] ;
-                this.unisonSpread = instrumentObject["unisonSpread"];
-                this.unisonOffset = instrumentObject["unisonOffset"];
-                this.unisonExpression = instrumentObject["unisonExpression"];
-                this.unisonSign = instrumentObject["unisonSign"];
-            }
+            //clamp these???
+            this.unisonVoices = (instrumentObject["unisonVoices"] == undefined) ? Config.unisons[this.unison].voices : instrumentObject["unisonVoices"];
+            this.unisonSpread = (instrumentObject["unisonSpread"] == undefined) ? Config.unisons[this.unison].spread : instrumentObject["unisonSpread"];
+            this.unisonOffset = (instrumentObject["unisonOffset"] == undefined) ? Config.unisons[this.unison].offset : instrumentObject["unisonOffset"];
+            this.unisonExpression = (instrumentObject["unisonExpression"] == undefined) ? Config.unisons[this.unison].expression : instrumentObject["unisonExpression"];
+            this.unisonSign = (instrumentObject["unisonSign"] == undefined) ? Config.unisons[this.unison].sign : instrumentObject["unisonSign"];
         }
         if (instrumentObject["chorus"] == "custom harmony") {
             // The original chorus setting had an option that now maps to two different settings. Override those if necessary.
@@ -4479,12 +4481,10 @@ export class Song {
                     instrument.unisonVoices = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
 
                     const unisonSpreadNegative = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
-                    const unisonSpread: number = decode32BitNumber(compressed, charIndex);
-                    charIndex += 6;
+                    const unisonSpread: number = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] + ((base64CharCodeToInt[compressed.charCodeAt(charIndex++)] + (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] * 63)) * 63);
 
                     const unisonOffsetNegative = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
-                    const unisonOffset: number = decode32BitNumber(compressed, charIndex);
-                    charIndex += 6;
+                    const unisonOffset: number = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] + ((base64CharCodeToInt[compressed.charCodeAt(charIndex++)] + (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] * 63)) * 63);
 
                     const unisonExpressionNegative = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                     const unisonExpression: number = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] + (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] * 63);
@@ -9751,6 +9751,9 @@ export class Synth {
             expressionReferencePitch = basePitch;
         } else if (instrument.type == InstrumentType.noise) {
             basePitch = Config.chipNoises[instrument.chipNoise].basePitch;
+            // dogebox2 code, makes basic noise affected by keys in pitch channels
+            // basePitch = isNoiseChannel ? Config.chipNoises[instrument.chipNoise].basePitch : basePitch + Config.chipNoises[instrument.chipNoise].basePitch - 12;
+            // maybe also lower expression in pitch channels?
             baseExpression = Config.noiseBaseExpression;
             expressionReferencePitch = basePitch;
             pitchDamping = Config.chipNoises[instrument.chipNoise].isSoft ? 24.0 : 60.0;

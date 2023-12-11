@@ -1614,7 +1614,6 @@ export class ChangeUnison extends Change {
             instrument.unisonExpression = Config.unisons[instrument.unison].expression;
             instrument.unisonSign = Config.unisons[instrument.unison].sign;
             instrument.preset = instrument.type;
-            //what is the piece of above code for??? is it necessary??? help???
             doc.notifier.changed();
             this._didSomething();
         }

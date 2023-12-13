@@ -46,9 +46,11 @@ export class ThemePrompt implements Prompt {
 			option({ value: "nerdbox" }, "NerdBox"),
 			option({ value: "zefbox" }, "Zefbox"),
 			option({ value: "cardboardbox classic" }, "Cardboardbox"),
-			option({ value: "blubox classic" }, "Blubox 1.0"),
+			option({ value: "blubox classic" }, "Blubox"),
 			option({ value: "dogebox classic" }, "Dogebox"),
 			option({ value: "wackybox" }, "Wackybox"),
+			// for some reason the todbox theme isn't looping properly. also the "todbox" theme is just old beepbox
+			// option({ value: "todbox classic" }, "Todbox"),
 			option({ value: "todbox dark mode" }, "Todbox Dark Mode"),
 			option({ value: "mainbox 1.0" }, "Mainbox"),
 			option({ value: "microbox" }, "MicroBox"),

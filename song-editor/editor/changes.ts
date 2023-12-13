@@ -796,7 +796,24 @@ export class ChangeRandomGeneratedInstrument extends Change {
                     { item: "piano", weight: 5 },
                     { item: "warbled", weight: 3 },
                     { item: "hecking gosh", weight: 2 },
+                    // { item: "custom", weight: 55 },
                 ])].index;
+                // randomly generated unisons don't work correctly - instead of trying to fix them, just ignore it
+
+                // if (instrument.unison == Config.unisons.length) {
+                //     instrument.unisonVoices = 2;
+                //     instrument.unisonSpread = Math.floor(Math.random() * 12000 - 6000) / 1000;
+                //     instrument.unisonOffset = Math.floor(Math.random() * 12000 - 6000) / 1000;
+                //     instrument.unisonExpression = 1;
+                //     instrument.unisonSign = Math.floor(Math.random() * 2000 - 1000) / 1000;
+                //     // console.log(instrument.unisonVoices, instrument.unisonSpread, instrument.unisonOffset, instrument.unisonExpression, instrument.unisonSign);
+                // } else {
+                    instrument.unisonVoices = Config.unisons[instrument.unison].voices;
+                    instrument.unisonSpread = Config.unisons[instrument.unison].spread;
+                    instrument.unisonOffset = Config.unisons[instrument.unison].offset;
+                    instrument.unisonExpression = Config.unisons[instrument.unison].expression;
+                    instrument.unisonSign = Config.unisons[instrument.unison].sign;
+                // } 
             }
 
             if (Math.random() < 0.1) {

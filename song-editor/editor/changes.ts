@@ -959,6 +959,7 @@ export class ChangeRandomGeneratedInstrument extends Change {
 				} break;
 				case InstrumentType.pwm: {
                     instrument.pulseWidth = selectCurvedDistribution(0, Config.pulseWidthRange - 1, Config.pulseWidthRange - 1, 2);
+                    instrument.decimalOffset = 0;
 
                     if (Math.random() < 0.6) {
                         instrument.addEnvelope(Config.instrumentAutomationTargets.dictionary["pulseWidth"].index, 0, Config.envelopes.dictionary[selectWeightedRandom([

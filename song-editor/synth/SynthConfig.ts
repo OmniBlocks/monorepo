@@ -68,7 +68,7 @@ export const enum InstrumentType {
     length,
 }
 
-export const TypePresets: ReadonlyArray<string> = ["chip wave", "FM", "basic noise", "spectrum", "drumset", "harmonics", "pulse width", "picked string", "custom chip", "mod", "advanced FM"];
+export const TypePresets: ReadonlyArray<string> = ["chip", "FM", "noise", "spectrum", "drumset", "harmonics", "pulse width", "picked string", "chip (custom)", "mod", "FM (6-op)"];
 
 export const enum DropdownID {
     Vibrato = 0,
@@ -906,10 +906,8 @@ export class Config {
 	public static readonly ticksPerArpeggio: number = 3;
 	public static readonly arpeggioPatterns: ReadonlyArray<ReadonlyArray<number>> = [[0], [0, 1], [0, 1, 2, 1], [0, 1, 2, 3], [0, 1, 2, 3, 4], [0, 1, 2, 3, 4, 5], [0, 1, 2, 3, 4, 5, 6], [0, 1, 2, 3, 4, 5, 6, 7] ];
 	public static readonly rhythms: DictionaryArray<Rhythm> = toNameMap([
-		//{ name: "÷0 (song corrupter)", stepsPerBeat: 0, ticksPerArpeggio: 7, arpeggioPatterns: [[0], [0, 0, 1, 1], [0, 1, 2, 1]], roundUpThresholds: [] },
 		{ name: "÷1 (whole notes)", stepsPerBeat: 1, /*ticksPerArpeggio: 6, arpeggioPatterns: [[0], [0, 0, 1, 1], [0, 1, 2, 1]],*/ roundUpThresholds: [3] },
 		{ name: "÷2 (half notes)", stepsPerBeat: 2, /*ticksPerArpeggio: 5, arpeggioPatterns: [[0], [0, 0, 1, 1], [0, 1, 2, 1]],*/ roundUpThresholds: [3, 9] },
-		// these ones are from dogebox - names are from todbox
 		{ name: "÷3 (triplets)", stepsPerBeat: 3, /*ticksPerArpeggio: 4, arpeggioPatterns: [[0], [0, 0, 1, 1], [0, 1, 2, 1], [0, 1, 2, 3]]*/ roundUpThresholds: [/*0*/ 5, /*8*/ 12, /*16*/ 18 /*24*/] },
 		{ name: "÷4 (standard)", stepsPerBeat: 4, /*ticksPerArpeggio: 3, arpeggioPatterns: [[0], [0, 0, 1, 1], [0, 1, 2, 1], [0, 1, 2, 3]]*/ roundUpThresholds: [/*0*/ 3, /*6*/ 9, /*12*/ 17, /*18*/ 21 /*24*/] },
 		{ name: "÷6 (sextuplets)", stepsPerBeat: 6, /*ticksPerArpeggio: 4, arpeggioPatterns: [[0], [0, 1], [0, 1, 2, 1], [0, 1, 2, 3]]*/ roundUpThresholds: null },
@@ -1050,7 +1048,6 @@ export class Config {
 	//based off an old mp3 in #modded-beepbox where someone tried to shorten the overdrive guitar into the size of other chip waves 
 	//search "normie alert" in beepcord
 ]); 
-	//public static readonly chipWaves: DictionaryArray<ChipWave> = rawChipToIntegrated(Config.rawChipWaves);
 	public static chipWaves: DictionaryArray<ChipWave> = rawChipToIntegrated(Config.rawChipWaves);
 	public static rawRawChipWaves: DictionaryArray<ChipWave> = Config.rawChipWaves;
 
@@ -1069,10 +1066,10 @@ export class Config {
 		{ name: "cutter", expression: 0.005, basePitch: 96, pitchFilterMult: 1024.0, isSoft: false, samples: null },
         { name: "metallic", expression: 1.0, basePitch: 96, pitchFilterMult: 1024.0, isSoft: false, samples: null },
         { name: "static", expression: 1.0, basePitch: 96, pitchFilterMult: 1024.0, isSoft: false, samples: null },
-		 //sandbox
+		// technically these are from the pandorasbox beta but whatever
 		{ name: "1-bit white", expression: 0.5, basePitch: 74.41, pitchFilterMult: 1024.0, isSoft: false, samples: null },
 		{ name: "1-bit metallic", expression: 0.5, basePitch: 86.41, pitchFilterMult: 1024.0, isSoft: false, samples: null },
-		//technically these are from the pandorasbox beta but whatever
+		// ultrabox noises
 		{ name: "crackling", expression: 0.9, basePitch: 69, pitchFilterMult: 1024.0, isSoft: false, samples: null },
 		{ name: "pink noise", expression: 1.0, basePitch: 69, pitchFilterMult: 8.0, isSoft: true, samples: null },
 		{ name: "brownian noise", expression: 1.0, basePitch: 69, pitchFilterMult: 8.0, isSoft: true, samples: null },
@@ -1476,7 +1473,7 @@ export class Config {
         { name: "noteVolume", computeIndex: EnvelopeComputeIndex.noteVolume, displayName: "note volume",      /*perNote:  true,*/ interleave: false, isFilter: false, /*range: Config.volumeRange,             */    maxCount: 1, effect: null, compatibleInstruments: null },
         { name: "pulseWidth", computeIndex: EnvelopeComputeIndex.pulseWidth, displayName: "pulse width",      /*perNote:  true,*/ interleave: false, isFilter: false, /*range: Config.pulseWidthRange,         */    maxCount: 1, effect: null, compatibleInstruments: [InstrumentType.pwm] },
         { name: "stringSustain", computeIndex: EnvelopeComputeIndex.stringSustain, displayName: "sustain",          /*perNote:  true,*/ interleave: false, isFilter: false, /*range: Config.stringSustainRange,      */    maxCount: 1, effect: null, compatibleInstruments: [InstrumentType.pickedString] },
-        { name: "unison", computeIndex: EnvelopeComputeIndex.unison, displayName: "unison",           /*perNote:  true,*/ interleave: false, isFilter: false, /*range: Config.defaultAutomationRange,  */    maxCount: 1, effect: null, compatibleInstruments: [InstrumentType.chip, InstrumentType.harmonics, InstrumentType.pickedString] },
+        { name: "unison", computeIndex: EnvelopeComputeIndex.unison, displayName: "unison",           /*perNote:  true,*/ interleave: false, isFilter: false, /*range: Config.defaultAutomationRange,  */    maxCount: 1, effect: null, compatibleInstruments: [InstrumentType.chip, InstrumentType.harmonics, InstrumentType.pickedString, InstrumentType.customChipWave] },
         { name: "operatorFrequency", computeIndex: EnvelopeComputeIndex.operatorFrequency0, displayName: "fm# freq",         /*perNote:  true,*/ interleave: true, isFilter: false, /*range: Config.defaultAutomationRange,  */    maxCount: Config.operatorCount+2, effect: null, compatibleInstruments: [InstrumentType.fm, InstrumentType.fm6op] },
         { name: "operatorAmplitude", computeIndex: EnvelopeComputeIndex.operatorAmplitude0, displayName: "fm# volume",       /*perNote:  true,*/ interleave: false, isFilter: false, /*range: Config.operatorAmplitudeMax + 1,*/    maxCount: Config.operatorCount+2, effect: null, compatibleInstruments: [InstrumentType.fm, InstrumentType.fm6op] },
         { name: "feedbackAmplitude", computeIndex: EnvelopeComputeIndex.feedbackAmplitude, displayName: "fm feedback",      /*perNote:  true,*/ interleave: false, isFilter: false, /*range: Config.operatorAmplitudeMax + 1,*/    maxCount: 1, effect: null, compatibleInstruments: [InstrumentType.fm, InstrumentType.fm6op] },

@@ -9750,9 +9750,8 @@ export class Synth {
             baseExpression = Config.drumsetBaseExpression;
             expressionReferencePitch = basePitch;
         } else if (instrument.type == InstrumentType.noise) {
-            basePitch = Config.chipNoises[instrument.chipNoise].basePitch;
             // dogebox2 code, makes basic noise affected by keys in pitch channels
-            // basePitch = isNoiseChannel ? Config.chipNoises[instrument.chipNoise].basePitch : basePitch + Config.chipNoises[instrument.chipNoise].basePitch - 12;
+            basePitch = isNoiseChannel ? Config.chipNoises[instrument.chipNoise].basePitch : basePitch + Config.chipNoises[instrument.chipNoise].basePitch - 12;
             // maybe also lower expression in pitch channels?
             baseExpression = Config.noiseBaseExpression;
             expressionReferencePitch = basePitch;

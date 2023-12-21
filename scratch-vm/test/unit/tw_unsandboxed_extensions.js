@@ -257,6 +257,7 @@ test('translate', async t => {
     t.equal(global.Scratch.translate('test1 {var}', {
         var: 'ok'
     }), 'test1 ok');
+    t.equal(global.Scratch.translate.language, 'en');
 
     global.Scratch.translate.setup({
         en: {
@@ -276,6 +277,7 @@ test('translate', async t => {
     t.equal(global.Scratch.translate('test1 {var}', {
         var: 'ok'
     }), 'test1 ok');
+    t.equal(global.Scratch.translate.language, 'en');
 
     await vm.setLocale('es');
     // do not call setup() again; real extensions will not do that.
@@ -287,6 +289,7 @@ test('translate', async t => {
     }, {
         var: 'test'
     }), 'ES Message 1: test');
+    t.equal(global.Scratch.translate.language, 'es');
 
     t.end();
 });

@@ -69,6 +69,7 @@ test('translate', t => {
     t.equal(global.Scratch.translate('test1 {VAR}', {
         VAR: '3'
     }), 'test1 3');
+    t.equal(global.Scratch.translate.language, 'en');
 
     const messages = {
         en: {
@@ -88,6 +89,7 @@ test('translate', t => {
     }, {
         var: 'ok'
     }), 'EN Message 1: ok');
+    t.equal(global.Scratch.translate.language, 'en');
 
     // But if there is a navigator object, it should use its language.
     global.navigator = {
@@ -103,6 +105,7 @@ test('translate', t => {
     }, {
         var: 'ok'
     }), 'ES Message 1: ok');
+    t.equal(global.Scratch.translate.language, 'es');
 
     t.end();
 });

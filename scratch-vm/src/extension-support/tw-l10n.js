@@ -41,6 +41,12 @@ const createTranslate = vm => {
         });
     };
 
+    Object.defineProperty(translate, 'language', {
+        configurable: true,
+        enumerable: true,
+        get: () => getLocale()
+    });
+
     translate.setup({});
 
     if (vm) {

@@ -4,8 +4,6 @@ const makeTestStorage = require('../fixtures/make-test-storage');
 const FakeRenderer = require('../fixtures/fake-renderer');
 const {test} = require('tap');
 
-/* global TextEncoder */
-
 test('importing SVG with stored rotation center', async t => {
     t.plan(3);
     const runtime = new Runtime();

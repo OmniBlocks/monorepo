@@ -3,6 +3,8 @@ const createScratchX = require('./tw-scratchx-compatibility-layer');
 const AsyncLimiter = require('../util/async-limiter');
 const createTranslate = require('./tw-l10n');
 
+/* eslint-disable require-await */
+
 /**
  * Parse a URL object or return null.
  * @param {string} url

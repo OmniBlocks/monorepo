@@ -119,7 +119,7 @@ class Blocks {
      * @returns {{success: boolean; value: any}|null} Cached success or error, or null if there is no cached value.
      */
     getCachedCompileResult (blockId) {
-        if (this._cache.compiledScripts.hasOwnProperty(blockId)) {
+        if (Object.prototype.hasOwnProperty.call(this._cache.compiledScripts, blockId)) {
             return this._cache.compiledScripts[blockId];
         }
         return null;
@@ -354,7 +354,7 @@ class Blocks {
             return;
         }
         for (const id in this._blocks) {
-            if (!this._blocks.hasOwnProperty(id)) continue;
+            if (!Object.prototype.hasOwnProperty.call(this._blocks, id)) continue;
             const block = this._blocks[id];
 
             if (block.opcode === 'procedures_prototype') {

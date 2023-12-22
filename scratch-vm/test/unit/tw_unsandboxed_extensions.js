@@ -40,7 +40,6 @@ global.document = {
 };
 
 // Mock various DOM APIs for fetching, window opening, redirecting, etc.
-/* globals Request */
 global.Request = class {
     constructor (url) {
         this.url = url;
@@ -53,7 +52,7 @@ global.window = {
     open: (url, target, features) => `[Window ${url} target=${target || ''} features=${features || ''}]`
 };
 
-tap.beforeEach(async () => {
+tap.beforeEach(() => {
     scriptCallbacks.clear();
     global.location = {
         href: 'https://example.com/'

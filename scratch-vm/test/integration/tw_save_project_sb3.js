@@ -6,8 +6,6 @@ const VirtualMachine = require('../../src/virtual-machine');
 const makeTestStorage = require('../fixtures/make-test-storage');
 const JSZip = require('jszip');
 
-/* globals Blob */
-
 const fixture = fs.readFileSync(pathUtil.join(__dirname, '..', 'fixtures', 'tw-save-project-sb3.sb3'));
 
 test('saveProjectSb3', async t => {

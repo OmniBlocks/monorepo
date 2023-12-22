@@ -20,14 +20,14 @@ global.Image = function () {
 };
 
 class FakeAudioEngine {
-    async decodeSoundPlayer () {
-        return {
+    decodeSoundPlayer () {
+        return Promise.resolve({
             id: 0,
             buffer: {
                 sampleRate: 1,
                 length: 1
             }
-        };
+        });
     }
 }
 

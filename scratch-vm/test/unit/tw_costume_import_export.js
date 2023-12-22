@@ -4,8 +4,6 @@ const {
 } = require('../../src/serialization/tw-costume-import-export');
 const {test} = require('tap');
 
-/* global TextEncoder */
-
 test('parseVectorMetadata', t => {
     /* eslint-disable max-len */
     t.same(

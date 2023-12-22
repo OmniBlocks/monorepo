@@ -1,6 +1,5 @@
 const {test} = require('tap');
 
-/* globals Request */
 global.Request = class {
     constructor (url) {
         this.url = url;

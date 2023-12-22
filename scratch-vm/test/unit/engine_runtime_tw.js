@@ -1,6 +1,7 @@
 const tap = require('tap');
 const Runtime = require('../../src/engine/runtime');
 const {Map} = require('immutable');
+const makeTestStorage = require('../fixtures/make-test-storage');
 
 const test = tap.test;
 
@@ -232,13 +233,13 @@ test('convertToPackagedRuntime', t => {
 test('convertToPackagedRuntime and attachStorage call order', t => {
     try {
         const rt1 = new Runtime();
-        rt1.attachStorage({});
+        rt1.attachStorage(makeTestStorage());
         rt1.convertToPackagedRuntime();
     } catch (e) {
         t.equal(e.message, 'convertToPackagedRuntime must be called before attachStorage');
     }
     const rt2 = new Runtime();
     rt2.convertToPackagedRuntime();
-    rt2.attachStorage({});
+    rt2.attachStorage(makeTestStorage());
     t.end();
 });

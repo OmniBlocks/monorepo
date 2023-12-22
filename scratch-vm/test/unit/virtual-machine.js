@@ -8,8 +8,6 @@ const Renderer = require('../fixtures/fake-renderer');
 const Runtime = require('../../src/engine/runtime');
 const RenderedTarget = require('../../src/sprites/rendered-target');
 
-tap.tearDown(() => process.nextTick(process.exit));
-
 const test = tap.test;
 
 test('deleteSound returns function after deleting or null if nothing was deleted', t => {
@@ -1018,6 +1016,7 @@ test('Starting the VM emits an event', t => {
     });
     vm.start();
     t.equal(started, true);
+    vm.quit();
     t.end();
 });
 
@@ -1055,6 +1054,19 @@ test('toJSON encodes Infinity/NaN as 0, not null', t => {
     t.equal(json.targets[0].variables.id1[1], 0);
     t.equal(json.targets[0].variables.id2[1], 0);
     t.equal(json.targets[0].variables.id3[1], 0);
+
+    t.end();
+});
+
+test('clearFlyoutBlocks removes all of the flyout blocks', t => {
+    const vm = new VirtualMachine();
+    const flyoutBlocks = vm.runtime.flyoutBlocks;
+
+    flyoutBlocks.createBlock(adapter(events.mockVariableBlock)[0]);
+    t.equal(Object.keys(flyoutBlocks._blocks).length, 1);
+
+    vm.clearFlyoutBlocks();
+    t.equal(Object.keys(flyoutBlocks._blocks).length, 0);
 
     t.end();
 });

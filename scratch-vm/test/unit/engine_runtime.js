@@ -6,8 +6,6 @@ const Runtime = require('../../src/engine/runtime');
 const MonitorRecord = require('../../src/engine/monitor-record');
 const {Map} = require('immutable');
 
-tap.tearDown(() => process.nextTick(process.exit));
-
 const test = tap.test;
 
 test('spec', t => {
@@ -193,6 +191,7 @@ test('Starting the runtime emits an event', t => {
     });
     rt.start();
     t.equal(started, true);
+    rt.quit();
     t.end();
 });
 
@@ -209,6 +208,7 @@ test('Runtime cannot be started while already running', t => {
     // Starting again should not emit another event
     rt.start();
     t.equal(started, false);
+    rt.quit();
     t.end();
 });
 
@@ -226,6 +226,7 @@ test('setCompatibilityMode restarts if it was already running', t => {
     // TW: We make an intentional API change here. Changing compatibility mode won't emit a RUNTIME_STARTED
     // if the runtime is already running.
     t.equal(started, false);
+    rt.quit();
     t.end();
 });
 

@@ -1885,7 +1885,9 @@ export class Instrument {
             }
         } else if (this.type == InstrumentType.chip) {
             instrumentObject["wave"] = Config.chipWaves[this.chipWave].name;
-            instrumentObject["unison"] = Config.unisons[this.unison].name;
+            // should this unison pushing code be turned into a function..?
+            instrumentObject["unison"] = this.unison == Config.unisons.length ? "custom" : Config.unisons[this.unison].name;   
+            // these don't need to be pushed if custom unisons aren't being used
             if (this.unison == Config.unisons.length) {
                 instrumentObject["unisonVoices"] = this.unisonVoices;
                 instrumentObject["unisonSpread"] = this.unisonSpread;
@@ -1906,7 +1908,7 @@ export class Instrument {
             instrumentObject["pulseWidth"] = this.pulseWidth;
             instrumentObject["decimalOffset"] = this.decimalOffset;
         } else if (this.type == InstrumentType.pickedString) {
-            instrumentObject["unison"] = Config.unisons[this.unison].name;
+            instrumentObject["unison"] = this.unison == Config.unisons.length ? "custom" : Config.unisons[this.unison].name;
             if (this.unison == Config.unisons.length) {
                 instrumentObject["unisonVoices"] = this.unisonVoices;
                 instrumentObject["unisonSpread"] = this.unisonSpread;
@@ -1916,7 +1918,7 @@ export class Instrument {
             }
             instrumentObject["stringSustain"] = Math.round(100 * this.stringSustain / (Config.stringSustainRange - 1));
         } else if (this.type == InstrumentType.harmonics) {
-            instrumentObject["unison"] = Config.unisons[this.unison].name;
+            instrumentObject["unison"] = this.unison == Config.unisons.length ? "custom" : Config.unisons[this.unison].name;
             if (this.unison == Config.unisons.length) {
                 instrumentObject["unisonVoices"] = this.unisonVoices;
                 instrumentObject["unisonSpread"] = this.unisonSpread;
@@ -1959,7 +1961,7 @@ export class Instrument {
             }
         } else if (this.type == InstrumentType.customChipWave) {
             instrumentObject["wave"] = Config.chipWaves[this.chipWave].name;
-            instrumentObject["unison"] = Config.unisons[this.unison].name;
+            instrumentObject["unison"] = this.unison == Config.unisons.length ? "custom" : Config.unisons[this.unison].name;
             if (this.unison == Config.unisons.length) {
                 instrumentObject["unisonVoices"] = this.unisonVoices;
                 instrumentObject["unisonSpread"] = this.unisonSpread;
@@ -2101,13 +2103,15 @@ export class Instrument {
             const legacyChorusNames: Dictionary<string> = { "union": "none", "fifths": "fifth", "octaves": "octave" };
             const unison: Unison | undefined = Config.unisons.dictionary[legacyChorusNames[unisonProperty]] || Config.unisons.dictionary[unisonProperty];
             if (unison != undefined) this.unison = unison.index;
-            //clamp these???
-            this.unisonVoices = (instrumentObject["unisonVoices"] == undefined) ? Config.unisons[this.unison].voices : instrumentObject["unisonVoices"];
-            this.unisonSpread = (instrumentObject["unisonSpread"] == undefined) ? Config.unisons[this.unison].spread : instrumentObject["unisonSpread"];
-            this.unisonOffset = (instrumentObject["unisonOffset"] == undefined) ? Config.unisons[this.unison].offset : instrumentObject["unisonOffset"];
-            this.unisonExpression = (instrumentObject["unisonExpression"] == undefined) ? Config.unisons[this.unison].expression : instrumentObject["unisonExpression"];
-            this.unisonSign = (instrumentObject["unisonSign"] == undefined) ? Config.unisons[this.unison].sign : instrumentObject["unisonSign"];
+            if (unisonProperty == "custom") this.unison = Config.unisons.length;6
         }
+        //clamp these???
+        this.unisonVoices = (instrumentObject["unisonVoices"] == undefined) ? Config.unisons[this.unison].voices : instrumentObject["unisonVoices"];
+        this.unisonSpread = (instrumentObject["unisonSpread"] == undefined) ? Config.unisons[this.unison].spread : instrumentObject["unisonSpread"];
+        this.unisonOffset = (instrumentObject["unisonOffset"] == undefined) ? Config.unisons[this.unison].offset : instrumentObject["unisonOffset"];
+        this.unisonExpression = (instrumentObject["unisonExpression"] == undefined) ? Config.unisons[this.unison].expression : instrumentObject["unisonExpression"];
+        this.unisonSign = (instrumentObject["unisonSign"] == undefined) ? Config.unisons[this.unison].sign : instrumentObject["unisonSign"];
+
         if (instrumentObject["chorus"] == "custom harmony") {
             // The original chorus setting had an option that now maps to two different settings. Override those if necessary.
             this.unison = Config.unisons.dictionary["hum"].index;
@@ -2246,6 +2250,8 @@ export class Instrument {
 
         if (this.type == InstrumentType.noise) {
             this.chipNoise = Config.chipNoises.findIndex(wave => wave.name == instrumentObject["wave"]);
+            if (instrumentObject["wave"] == "pink noise") this.chipNoise = Config.chipNoises.findIndex(wave => wave.name == "pink");
+            if (instrumentObject["wave"] == "brownian noise") this.chipNoise = Config.chipNoises.findIndex(wave => wave.name == "brownian");
             if (this.chipNoise == -1) this.chipNoise = 1;
         }
 

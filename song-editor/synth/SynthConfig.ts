@@ -1071,8 +1071,8 @@ export class Config {
 		{ name: "1-bit metallic", expression: 0.5, basePitch: 86.41, pitchFilterMult: 1024.0, isSoft: false, samples: null },
 		// ultrabox noises
 		{ name: "crackling", expression: 0.9, basePitch: 69, pitchFilterMult: 1024.0, isSoft: false, samples: null },
-		{ name: "pink noise", expression: 1.0, basePitch: 69, pitchFilterMult: 8.0, isSoft: true, samples: null },
-		{ name: "brownian noise", expression: 1.0, basePitch: 69, pitchFilterMult: 8.0, isSoft: true, samples: null },
+		{ name: "pink", expression: 1.0, basePitch: 69, pitchFilterMult: 8.0, isSoft: true, samples: null },
+		{ name: "brownian", expression: 1.0, basePitch: 69, pitchFilterMult: 8.0, isSoft: true, samples: null },
 		//{ name: "doom random", expression: 1.0, basePitch: 84, pitchFilterMult: 1024.0, isSoft: false, samples: null },
 	]);
 	
@@ -1819,7 +1819,7 @@ export function getDrumWave(index: number, inverseRealFourierTransform: Function
 					wave[i] = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
 					wave[i] *= 0.44;
 					b6 = white * 0.115926;
-					//https://noisehack.com/generate-noise-web-audio-api/ ?
+					// from https://github.com/zacharydenton/noise.js, MIT license soooo
                 }
             }
 			else if (index == 14) {
@@ -1830,7 +1830,7 @@ export function getDrumWave(index: number, inverseRealFourierTransform: Function
 					wave[i] = (lastOut + (0.02 * white)) / 1.02;
 					lastOut = wave[i];
 					wave[i] *= 14;
-					//^^^^
+					// this is also from noise.js
                 }
             }
 		//	else if (index == 15) {

@@ -23,8 +23,10 @@ npx terser \
 	--mangle \
 	--mangle-props regex="/^_.+/;"
 
-# Combine the html and js into a single file for the offline version
-sed \
-	-e '/INSERT_BEEPBOX_SOURCE_HERE/{r website/beepbox_editor.min.js' -e 'd' -e '}' \
-	website/jummbox_offline_template.html \
-	> website/jummbox_offline.html
+# Combine the html and js into a single file for the offline version (NO LONGER USED)
+# sed \
+	# -e '/INSERT_BEEPBOX_SOURCE_HERE/{r website/beepbox_editor.min.js' -e 'd' -e '}' \
+	# website/jummbox_offline_template.html \
+	# > website/jummbox_offline.html
+	
+

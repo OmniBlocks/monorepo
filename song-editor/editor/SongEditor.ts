@@ -912,7 +912,7 @@ export class SongEditor {
     private readonly _unisonSelect: HTMLSelectElement = buildOptions(select(), Config.unisons.map(unison => unison.name));
     private readonly _unisonSelectRow: HTMLElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("unison") }, "Unison:"), this._unisonDropdown, div({ class: "selectContainer", style: "width: 61.5%;" }, this._unisonSelect));
     
-    //consider adding a config value for the min/max values of these? eg. Config.unisonRange = 24
+    // consider adding a config value for the min/max values of these? eg. Config.unisonRange = 24
     private readonly _unisonVoicesInputBox: HTMLInputElement = input({ style: "width: 150%; height: 1.5em; font-size: 80%; margin-left: 0.4em; vertical-align: middle;", id: "unisonVoicesInputBox", type: "number", step: "1", min: 1, max: 2, value: 1 });
     private readonly _unisonVoicesRow: HTMLDivElement = div({ class: "selectRow" }, div({},
         span({ class: "tip", style: "height:1em; font-size: smaller;", onclick: () => this._openPrompt("unisonVoices") }, "Voices: "),

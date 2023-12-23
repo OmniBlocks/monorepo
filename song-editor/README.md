@@ -79,3 +79,24 @@ I'd like to note that UltraBox also has an indirect, optional dependency on
 [jsdelivr](https://www.jsdelivr.com/) for exporting .mp3 files. If the user
 attempts to export an .mp3 file, JummBox will direct the browser to download
 that dependency on demand.
+
+## App Version
+
+### Run without packaging (for debugging)
+If you'd like to run the app version without packaging, first compile ultrabox normally as explained above, and then run the following:
+```
+cd app
+npm install electron
+```
+
+and then put the required editor and player files in the "app" folder. To start the program, run:
+```
+npm run start
+```
+
+### Packaging (for distribution)
+In order to package the program, first install electron as explained above, and then run the following:
+```
+npm install electron-packager
+npm run package
+```

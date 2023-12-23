@@ -10,13 +10,15 @@
     justify-content: center;
     align-items: center;
 }
-[theme="dark"] .crash-wrapper {
-    background-color: $motion-primary-dark;
-}
 .body {
     width: 50%;
     color: white;
     text-align: center;
+}
+
+/* scratch-www was overriding the colors */
+.body p, .body h2 {
+    color: inherit;
 }
 
 .reloadButton {

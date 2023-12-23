@@ -107,7 +107,7 @@ const TitledHOC = function (WrappedComponent) {
 
     return injectIntl(connect(
         mapStateToProps,
-        mapDispatchToProps,
+        mapDispatchToProps
     )(TitledComponent));
 };
 

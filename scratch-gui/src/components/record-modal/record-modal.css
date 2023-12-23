@@ -50,7 +50,7 @@
 }
 
 .playing-text {
-    color: $motion-primary;
+    color: $looks-secondary;
 }
 
 .recording-text {
@@ -92,12 +92,12 @@
     border: 1px solid $ui-black-transparent;
     font-weight: 600;
     font-size: 0.85rem;
-    color: $motion-primary;
+    color: $looks-secondary;
 }
 
 .button-row button.ok-button {
-    background: $motion-primary;
-    border: $motion-primary;
+    background: $looks-secondary;
+    border: $looks-secondary;
     color: white;
 }
 
@@ -109,7 +109,8 @@
     text-align: center;
 }
 
-.record-button {
+/* Increase specificity to make sure this wins out over normalize.css */
+svg.record-button {
     overflow: visible;
 }
 

@@ -1,16 +1,16 @@
 const defaultsDeep = require('lodash.defaultsdeep');
-var path = require('path');
-var webpack = require('webpack');
+const path = require('path');
+const webpack = require('webpack');
 
 // Plugins
-var CopyWebpackPlugin = require('copy-webpack-plugin');
-var HtmlWebpackPlugin = require('html-webpack-plugin');
-var TWGenerateServiceWorkerPlugin = require('./src/playground/generate-service-worker-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const TWGenerateServiceWorkerPlugin = require('./src/playground/generate-service-worker-plugin');
 
 // PostCss
-var autoprefixer = require('autoprefixer');
-var postcssVars = require('postcss-simple-vars');
-var postcssImport = require('postcss-import');
+const autoprefixer = require('autoprefixer');
+const postcssVars = require('postcss-simple-vars');
+const postcssImport = require('postcss-import');
 
 const STATIC_PATH = process.env.STATIC_PATH || '/static';
 
@@ -102,6 +102,15 @@ const base = {
                     }
                 }
             }]
+        },
+        {
+            test: /\.hex$/,
+            use: [{
+                loader: 'url-loader',
+                options: {
+                    limit: 16 * 1024
+                }
+            }]
         }]
     },
     plugins: []
@@ -128,9 +137,10 @@ module.exports = [
         module: {
             rules: base.module.rules.concat([
                 {
-                    test: /\.(svg|png|wav|gif|jpg|mp3|ttf|otf)$/,
-                    loader: 'file-loader',
+                    test: /\.(svg|png|wav|mp3|gif|jpg|ttf|otf)$/,
+                    loader: 'url-loader',
                     options: {
+                        limit: 2048,
                         outputPath: 'static/assets/'
                     }
                 }
@@ -146,7 +156,7 @@ module.exports = [
         },
         plugins: base.plugins.concat([
             new webpack.DefinePlugin({
-                'process.env.NODE_ENV': '"' + process.env.NODE_ENV + '"',
+                'process.env.NODE_ENV': `"${process.env.NODE_ENV}"`,
                 'process.env.DEBUG': Boolean(process.env.DEBUG),
                 'process.env.ANNOUNCEMENT': JSON.stringify(process.env.ANNOUNCEMENT || ''),
                 'process.env.ENABLE_SERVICE_WORKER': JSON.stringify(process.env.ENABLE_SERVICE_WORKER || ''),
@@ -208,14 +218,6 @@ module.exports = [
             new CopyWebpackPlugin({
                 patterns: [
                     {
-                        from: 'node_modules/scratch-blocks/media',
-                        to: 'static/blocks-media'
-                    }
-                ]
-            }),
-            new CopyWebpackPlugin({
-                patterns: [
-                    {
                         from: 'extensions/**',
                         to: 'static',
                         context: 'src/examples'
@@ -247,9 +249,10 @@ module.exports = [
             module: {
                 rules: base.module.rules.concat([
                     {
-                        test: /\.(svg|png|wav|gif|jpg|mp3|ttf|otf)$/,
-                        loader: 'file-loader',
+                        test: /\.(svg|png|wav|mp3|gif|jpg|ttf|otf)$/,
+                        loader: 'url-loader',
                         options: {
+                            limit: 2048,
                             outputPath: 'static/assets/',
                             publicPath: `${STATIC_PATH}/assets/`
                         }
@@ -260,8 +263,9 @@ module.exports = [
                 new CopyWebpackPlugin({
                     patterns: [
                         {
-                            from: 'node_modules/scratch-blocks/media',
-                            to: 'static/blocks-media'
+                            from: 'extension-worker.{js,js.map}',
+                            context: 'node_modules/scratch-vm/dist/web',
+                            noErrorOnMissing: true
                         }
                     ]
                 }),

@@ -16,7 +16,7 @@
     border-color: $motion-primary;
 }
 .checkbox:focus, .checkbox:active {
-    box-shadow: 0 0 0 3px $motion-transparent;
+    box-shadow: 0 0 0 3px $looks-transparent;
 }
 .checkbox:checked {
     background-color: $motion-primary;

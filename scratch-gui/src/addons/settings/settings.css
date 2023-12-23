@@ -37,7 +37,7 @@ a[href] {
 }
 a:active, a:focus {
     outline: none;
-    box-shadow: 0 0 0 3px $motion-transparent;
+    box-shadow: 0 0 0 3px $looks-transparent;
 }
 
 .container {
@@ -104,7 +104,7 @@ a:active, a:focus {
     background: #151515;
 }
 .button:active, .button:focus-within {
-    box-shadow: 0 0 0 3px $motion-transparent;
+    box-shadow: 0 0 0 3px $looks-transparent;
 }
 
 .search-container {
@@ -115,7 +115,7 @@ a:active, a:focus {
     border-radius: 4px;
 }
 .search-container:focus-within {
-    box-shadow: 0 0 0 3px $motion-transparent;
+    box-shadow: 0 0 0 3px $looks-transparent;
 }
 .search-input {
     color: inherit;
@@ -171,7 +171,7 @@ a:active, a:focus {
     border-color: white;
 }
 .feedback-button-outer:active, .feedback-button-outer:focus-within {
-    box-shadow: 0 0 0 3px $motion-transparent;
+    box-shadow: 0 0 0 3px $looks-transparent;
 }
 .feedback-button-inner {
     text-decoration: none;
@@ -308,7 +308,7 @@ a:active, a:focus {
 }
 .reset-button:active, .reset-button:focus-within {
     outline: none;
-    box-shadow: 0 0 0 3px $motion-transparent;
+    box-shadow: 0 0 0 3px $looks-transparent;
 }
 .reset-button-image {
     padding: 1px 0;
@@ -356,7 +356,7 @@ a:active, a:focus {
 }
 .switch:active, .switch:focus-within {
     outline: none;
-    box-shadow: 0 0 0 3px $motion-transparent;
+    box-shadow: 0 0 0 3px $looks-transparent;
 }
 
 .tag-container {
@@ -487,7 +487,7 @@ a:active, a:focus {
 .setting input:focus, .setting input:active {
     outline: none;
     border-color: $motion-primary;
-    box-shadow: 0 0 0 3px $motion-transparent;
+    box-shadow: 0 0 0 3px $looks-transparent;
 }
 .setting input[type="checkbox"] {
     height: 20px;
@@ -579,7 +579,7 @@ a:active, a:focus {
 }
 .select-option:active, .select-option:focus-within {
     outline: none;
-    box-shadow: 0 0 0 3px $motion-transparent;
+    box-shadow: 0 0 0 3px $looks-transparent;
     z-index: 10;
 }
 

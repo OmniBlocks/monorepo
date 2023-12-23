@@ -122,7 +122,7 @@
     font-weight: bold;
 }
 .button:active, .button:focus-within {
-    box-shadow: 0 0 0 3px $motion-transparent;
+    box-shadow: 0 0 0 3px $looks-transparent;
 }
 
 .warning {

@@ -25,7 +25,7 @@
     user-select: none;
 
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    color: $text-primary-light;
+    color: $text-primary;
     overflow: hidden;
 }
 
@@ -67,14 +67,14 @@ $sides: 20rem;
 
     box-sizing: border-box;
     width: 100%;
-    background-color: $motion-primary;
-    
+    background-color: $looks-secondary;
+
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-size: 1rem;
     font-weight: normal;
 }
 [theme="dark"] .header {
-    background-color: $motion-primary-dark;
+    background-color: $motion-primary;
 }
 [theme="dark"] .full-screen .header {
     background-color: $motion-primary;

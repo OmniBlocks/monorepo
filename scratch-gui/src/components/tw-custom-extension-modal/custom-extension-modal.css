@@ -41,7 +41,7 @@
     border-color: $motion-primary;
 }
 .type-selector-button:active {
-    border-color: $motion-transparent;
+    border-color: $looks-transparent;
 }
 
 .url-input,

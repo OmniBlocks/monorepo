@@ -7,7 +7,13 @@ import costume1 from '!raw-loader!./dango.svg';
 import {TextEncoder} from '../tw-text-encoder';
 
 const defaultProject = translator => {
-    const encoder = new TextEncoder();
+    let _TextEncoder;
+    if (typeof TextEncoder === 'undefined') {
+        _TextEncoder = require('text-encoding').TextEncoder;
+    } else {
+        _TextEncoder = TextEncoder;
+    }
+    const encoder = new _TextEncoder();
 
     const projectJson = projectData(translator);
     return [{

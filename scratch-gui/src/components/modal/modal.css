@@ -73,12 +73,6 @@ $sides: 20rem;
     font-size: 1rem;
     font-weight: normal;
 }
-[theme="dark"] .header {
-    background-color: $motion-primary;
-}
-[theme="dark"] .full-screen .header {
-    background-color: $motion-primary;
-}
 
 .header-item {
     display: flex;

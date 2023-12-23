@@ -27,16 +27,10 @@
     border: 2px solid $looks-secondary;
     background: $ui-white;
 }
-[theme="dark"] .sprite-selector-item.is-selected {
-    background: $ui-primary;
-}
 
 .sprite-selector-item:hover {
     border: 2px solid $looks-secondary;
     background: $ui-white;
-}
-[theme="dark"] .sprite-selector-item:hover {
-    background: $ui-primary;
 }
 
 .sprite-selector-item:hover .sprite-image, .is-selected .sprite-image {

@@ -24,13 +24,10 @@
 
     /* enforce overflow + reset position of absolutely-positioned children */
     position: relative;
-
-    /* anything in the stage such as monitor scrollbars should always use light theme */
-    color-scheme: light;
 }
 
 .stage.full-screen {
-    /* tw: remove fullscreen border */
+    border: $stage-full-screen-border-width solid rgb(126, 133, 151);
 }
 
 .with-color-picker {
@@ -39,7 +36,7 @@
 }
 
 .color-picker-background {
-    position: fixed;
+    position: absolute;
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.55);
@@ -78,18 +75,13 @@ stage doesn't "spill" out from under its rounded corners. instead, shift these o
     left: 0;
     pointer-events: none;
 }
-.custom-overlays {
-    position: absolute;
-    top: 0;
-    left: 0;
-}
 
 .dragging-sprite {
     position: absolute;
     top: 0;
     left: 0;
     z-index: $z-index-dragging-sprite;
-    filter: drop-shadow(5px 5px 5px $ui-black-transparent-default);
+    filter: drop-shadow(5px 5px 5px $ui-black-transparent);
 }
 
 .stage-bottom-wrapper {

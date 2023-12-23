@@ -6,14 +6,13 @@
     position: absolute;
     background: $ui-primary;
     z-index: $z-index-monitor;
-    border: 1px solid $ui-black-transparent-default;
+    border: 1px solid $ui-black-transparent;
     border-radius: calc($space / 2);
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-size: 0.75rem;
     transition: box-shadow 0.2s;
     pointer-events: all;
     overflow: hidden;
-    color: #575e75; /* tw: explicitly set color to match Scratch */
 }
 
 .monitor:hover {
@@ -77,7 +76,7 @@
 
 .list-header {
     background: $ui-white;
-    border-bottom: 1px solid $ui-black-transparent-default;
+    border-bottom: 1px solid $ui-black-transparent;
     text-align: center;
     padding: 3px;
     font-size: 0.75rem;
@@ -92,7 +91,7 @@
     display: flex;
     flex-direction: column;
     overflow-x: hidden;
-    flex-grow: 1;
+    height: calc(100% - 44px);
 }
 
 .list-row {
@@ -116,7 +115,7 @@
     text-align: left;
     margin: 0 3px;
     border-radius: calc($space / 2);
-    border: 1px solid $ui-black-transparent-default;
+    border: 1px solid $ui-black-transparent;
     flex-grow: 1;
     height: 22px;
 }
@@ -129,8 +128,7 @@
     padding: 3px;
     font-size: 0.75rem;
     font-weight: bold;
-    border-top: 1px solid $ui-black-transparent-default;
-    color: $text-primary; /* tw: do not look different in dark mode */
+    color: $text-primary;
 }
 
 .list-empty {

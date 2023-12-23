@@ -25,10 +25,9 @@
 }
 
 .alert.success {
-    /* tw: hardcode these colors because we change extensions-* colors to be something that looks weird here */
-    background: hsla(163, 57%, 85%, 1);
-    border: 1px solid hsla(163, 85%, 30%, 1);
-    box-shadow: 0px 0px 0px 2px hsla(163, 57%, 85%, 1);
+    background: $extensions-light;
+    border: 1px solid $extensions-tertiary;
+    box-shadow: 0px 0px 0px 2px $extensions-light;
 }
 
 .alert-spinner {

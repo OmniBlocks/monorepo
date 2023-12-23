@@ -3,7 +3,6 @@ import React from 'react';
 import ReactModal from 'react-modal';
 import Box from '../box/box.jsx';
 import {defineMessages, injectIntl, intlShape, FormattedMessage} from 'react-intl';
-import {isRendererSupported, isNewFunctionSupported} from '../../lib/tw-environment-support-prober.js';
 
 import styles from './browser-modal.css';
 import unhappyBrowser from './unsupported-browser.svg';
@@ -13,20 +12,23 @@ const messages = defineMessages({
         id: 'gui.unsupportedBrowser.label',
         defaultMessage: 'Browser is not supported',
         description: ''
+    },
+    error: {
+        id: 'gui.unsupportedBrowser.errorLabel',
+        defaultMessage: 'An Error Occurred',
+        description: 'Heading shown when there is an unhandled exception in an unsupported browser'
     }
 });
 
-const noop = () => {};
-
 const BrowserModal = ({intl, ...props}) => {
-    const label = messages.label;
+    const label = props.error ? messages.error : messages.label;
     return (
         <ReactModal
             isOpen
             className={styles.modalContent}
             contentLabel={intl.formatMessage({...messages.label})}
             overlayClassName={styles.modalOverlay}
-            onRequestClose={noop}
+            onRequestClose={props.onBack}
         >
             <div dir={props.isRtl ? 'rtl' : 'ltr'} >
                 <Box className={styles.illustration}>
@@ -37,62 +39,56 @@ const BrowserModal = ({intl, ...props}) => {
                     <h2>
                         <FormattedMessage {...label} />
                     </h2>
+                    <p>
+                        { /* eslint-disable max-len */ }
+                        {
+                            props.error ? <FormattedMessage
+                                defaultMessage="We are very sorry, but it looks like you are using a browser version that Scratch does not support. We recommend updating to the latest version of a supported browser such as Google Chrome, Mozilla Firefox, Microsoft Edge, or Apple Safari. "
+                                description="Error message when the browser does not meet our minimum requirements"
+                                id="gui.unsupportedBrowser.notRecommended"
+                            /> : <FormattedMessage
+                                defaultMessage="We are very sorry, but Scratch does not support this browser. We recommend updating to the latest version of a supported browser such as Google Chrome, Mozilla Firefox, Microsoft Edge, or Apple Safari."
+                                description="Error message when the browser does not work at all (IE)"
+                                id="gui.unsupportedBrowser.description"
+                            />
+                        }
+                        { /* eslint-enable max-len */ }
+                    </p>
 
-                    {/* eslint-disable max-len */}
-                    {isNewFunctionSupported() ? null : (
-                        // This message should only be seen by website operators, so we don't need to translate it
-                        <p>
-                            {'Unable to compile JavaScript with new Function(). This is most likely caused by an overly-strict Content-Security-Policy. The CSP must include \'unsafe-eval\'.'}
-                        </p>
-                    )}
+                    <Box className={styles.buttonRow}>
+                        <button
+                            className={styles.backButton}
+                            onClick={props.onBack}
+                        >
+                            <FormattedMessage
+                                defaultMessage="Back"
+                                description="Button to go back in unsupported browser modal"
+                                id="gui.unsupportedBrowser.back"
+                            />
+                        </button>
 
-                    {!isRendererSupported() && (
-                        <React.Fragment>
-                            <p>
-                                <FormattedMessage
-                                    defaultMessage="Your browser {webGlLink} which is needed for this site to run. Try updating your browser and graphics drivers or restarting your computer."
-                                    description="WebGL missing message. {webGLLink} is a link with the text 'does not support WebGL' from Scratch's translations"
-                                    id="tw.webglModal.description"
-                                    values={{
-                                        webGlLink: (
-                                            <a href="https://get.webgl.org/">
-                                                <FormattedMessage
-                                                    defaultMessage="does not support WebGL"
-                                                    description="link part of your browser does not support WebGL message"
-                                                    id="gui.webglModal.webgllink"
-                                                />
-                                            </a>
-                                        )
-                                    }}
-                                />
-                            </p>
-                            <p>
-                                <FormattedMessage
-                                    defaultMessage="Make sure you're using a recent version of Google Chrome, Mozilla Firefox, Microsoft Edge, or Apple Safari."
-                                    description="A message that appears in the browser not supported modal"
-                                    id="tw.browserModal.desc"
-                                />
-                            </p>
-                            <p>
-                                <FormattedMessage
-                                    defaultMessage="On Apple devices, you must disable {lockdownMode}."
-                                    description="Part of the browser not supported message. Lockdown Mode refers to https://support.apple.com/en-us/HT212650"
-                                    id="tw.lockdownMode"
-                                    values={{
-                                        lockdownMode: (
-                                            <a href="https://support.apple.com/en-us/HT212650">
-                                                <FormattedMessage
-                                                    defaultMessage="Lockdown Mode"
-                                                    description="Links to an Apple support page about Lockdown Mode: https://support.apple.com/en-us/HT212650 Try to translate this the same as Apple."
-                                                    id="tw.lockdownMode2"
-                                                />
-                                            </a>
-                                        )
-                                    }}
-                                />
-                            </p>
-                        </React.Fragment>
-                    )}
+                    </Box>
+                    <div className={styles.faqLinkText}>
+                        <FormattedMessage
+                            defaultMessage="To learn more, go to the {previewFaqLink}."
+                            description="Invitation to try 3.0 preview"
+                            id="gui.unsupportedBrowser.previewfaq"
+                            values={{
+                                previewFaqLink: (
+                                    <a
+                                        className={styles.faqLink}
+                                        href="//scratch.mit.edu/3faq"
+                                    >
+                                        <FormattedMessage
+                                            defaultMessage="FAQ"
+                                            description="link to Scratch 3.0 FAQ page"
+                                            id="gui.unsupportedBrowser.previewfaqlinktext"
+                                        />
+                                    </a>
+                                )
+                            }}
+                        />
+                    </div>
                 </Box>
             </div>
         </ReactModal>
@@ -100,8 +96,14 @@ const BrowserModal = ({intl, ...props}) => {
 };
 
 BrowserModal.propTypes = {
+    error: PropTypes.bool,
     intl: intlShape.isRequired,
-    isRtl: PropTypes.bool
+    isRtl: PropTypes.bool,
+    onBack: PropTypes.func.isRequired
+};
+
+BrowserModal.defaultProps = {
+    error: false
 };
 
 const WrappedBrowserModal = injectIntl(BrowserModal);

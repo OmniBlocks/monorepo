@@ -30,9 +30,6 @@
     background-color: $looks-secondary;
     color: $ui-white;
 }
-[theme="dark"] .menu-bar {
-    background-color: $motion-primary;
-}
 
 .main-menu {
     display: flex;
@@ -105,9 +102,6 @@
 .feedback-link {
     color: $looks-secondary;
     text-decoration: none;
-}
-[theme="dark"] .feedback-link {
-    color: $motion-primary !important;
 }
 
 .feedback-button {

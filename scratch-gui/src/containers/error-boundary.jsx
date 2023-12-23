@@ -1,5 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import {connect} from 'react-redux';
+import BrowserModalComponent from '../components/browser-modal/browser-modal.jsx';
 import CrashMessageComponent from '../components/crash-message/crash-message.jsx';
 import log from '../lib/log.js';
 import {recommendedBrowser} from '../lib/supported-browser';
@@ -72,7 +74,15 @@ class ErrorBoundary extends React.Component {
 
 ErrorBoundary.propTypes = {
     action: PropTypes.string.isRequired, // Used for defining tracking action
-    children: PropTypes.node
+    children: PropTypes.node,
+    isRtl: PropTypes.bool
 };
 
-export default ErrorBoundary;
+const mapStateToProps = state => ({
+    isRtl: state.locales.isRtl
+});
+
+// no-op function to prevent dispatch prop being passed to component
+const mapDispatchToProps = () => ({});
+
+export default connect(mapStateToProps, mapDispatchToProps)(ErrorBoundary);

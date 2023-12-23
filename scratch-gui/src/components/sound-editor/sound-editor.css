@@ -102,9 +102,6 @@ $border-radius: 0.25rem;
     border: 1px solid $looks-secondary;
     z-index: 1;
 }
-[theme="dark"] .button {
-    background-color: $ui-primary;
-}
 
 .button > img {
     flex-grow: 1;
@@ -129,9 +126,6 @@ $border-radius: 0.25rem;
     cursor: pointer;
     padding: 0.75rem;
     user-select: none;
-}
-[theme="dark"] .round-button {
-    border-color: transparent;
 }
 
 .round-button > img {

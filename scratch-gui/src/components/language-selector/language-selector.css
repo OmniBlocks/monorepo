@@ -13,10 +13,6 @@
     color: $text-primary;
     background: $ui-white;
 }
-[theme="dark"] .language-select {
-    color: $ui-white;
-    background: $ui-primary;
-}
 
 [dir="ltr"] .language-select {
     right: 0;

@@ -9,10 +9,6 @@
     background: $ui-white;
     padding: 1.5rem 2.25rem;
 }
-[theme="dark"] .body {
-    color: $text-primary;
-    background: $ui-primary;
-}
 
 .body input[type="checkbox"],
 .body input[type="radio"] {
@@ -37,10 +33,6 @@
     height: 3rem;
     color: $text-primary-transparent;
     font-size: .875rem;
-}
-[theme="dark"] .variable-name-text-input {
-    background: $ui-secondary;
-    color: white;
 }
 
 .info-message {
@@ -94,14 +86,7 @@
     width: 100%;
     margin: 0 auto;
 }
-[theme="dark"] .cloud-option {
-    border-color: rgba(255, 255, 255, .25);
-}
 
 .cloud-option-text {
     opacity: .5;
-}
-
-.cancel-button {
-    color: black;
 }

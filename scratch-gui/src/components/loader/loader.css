@@ -16,9 +16,6 @@
     text-align: center;
     color: white;
 }
-[theme="dark"] .background {
-    background-color: $motion-primary;
-}
 
 .fullscreen {
     /* Break out of the layout using position: fixed to cover the whole screen */
@@ -182,20 +179,4 @@
 .message {
     height: 20px;
     margin: 5px 0;
-}
-
-.tw-progress-outer {
-    position: relative;
-    width: 250px;
-    height: 5px;
-    border: 1px solid white;
-    margin: auto;
-}
-.tw-progress-inner {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
-    width: 0;
-    background-color: white;
 }

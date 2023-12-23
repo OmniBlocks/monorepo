@@ -1,18 +1,17 @@
-$ui-primary: var(--ui-primary, hsla(215, 100%, 95%, 1)); /* #E5F0FF */
-$ui-secondary: var(--ui-secondary, hsla(215, 75%, 95%, 1)); /* #E9F1FC */
-$ui-tertiary: var(--ui-tertiary, hsla(215, 50%, 90%, 1)); /* #D9E3F2 */
+$ui-primary: hsla(215, 100%, 95%, 1); /* #E5F0FF */
+$ui-secondary: hsla(215, 75%, 95%, 1); /* #E9F1FC */
+$ui-tertiary: hsla(215, 50%, 90%, 1); /* #D9E3F2 */
 
-$ui-modal-overlay: var(--ui-modal-overlay, hsla(0, 100%, 65%, 0.9)); /* 90% transparent version of motion-primary */
+$ui-modal-overlay: hsla(215, 100%, 65%, 0.9); /* 90% transparent version of motion-primary */
 
 $ui-white: hsla(0, 100%, 100%, 1); /* #FFFFFF */
 $ui-white-dim: hsla(0, 100%, 100%, 0.75); /* 25% transparent version of ui-white */
 $ui-white-transparent: hsla(0, 100%, 100%, 0.25); /* 25% transparent version of ui-white */
 $ui-transparent: hsla(0, 100%, 100%, 0); /* 25% transparent version of ui-white */
 
-$ui-black-transparent-default: hsla(0, 0%, 0%, 0.15); /* 15% transparent version of black */
-$ui-black-transparent: var(--ui-black-transparent, $ui-black-transparent-default);
+$ui-black-transparent: hsla(0, 0%, 0%, 0.15); /* 15% transparent version of black */
 
-$text-primary: var(--text-primary, hsla(225, 15%, 40%, 1)); /* #575E75 */
+$text-primary: hsla(225, 15%, 40%, 1); /* #575E75 */
 $text-primary-transparent: hsla(225, 15%, 40%, 0.75);
 
 $motion-primary: hsla(215, 100%, 65%, 1); /* #4C97FF */
@@ -41,9 +40,9 @@ $error-primary: hsla(30, 100%, 55%, 1); /* #FF8C1A */
 $error-light: hsla(30, 100%, 70%, 1); /* #FFB366 */
 $error-transparent: hsla(30, 100%, 55%, 0.25); /* #FF8C1A */
 
-$extensions-primary: hsla(10, 85%, 65%, 1);
-$extensions-tertiary: hsla(10, 85%, 40%, 1);
-$extensions-transparent: hsla(10, 85%, 65%, 0.35); /* 35% transparent version of extensions-primary */
-$extensions-light: hsla(10, 57%, 85%, 1); /* opaque version of extensions-transparent, on white bg */
+$extensions-primary: hsla(163, 85%, 40%, 1); /* #0FBD8C */
+$extensions-tertiary: hsla(163, 85%, 30%, 1); /* #0B8E69 */
+$extensions-transparent: hsla(163, 85%, 40%, 0.35); /* 35% transparent version of extensions-primary */
+$extensions-light: hsla(163, 57%, 85%, 1); /* opaque version of extensions-transparent, on white bg */
 
-$drop-highlight: hsla(0, 100%, 77%, 1); /* lighter than motion-primary */
+$drop-highlight: hsla(215, 100%, 77%, 1); /* lighter than motion-primary */

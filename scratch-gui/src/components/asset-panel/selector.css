@@ -3,7 +3,6 @@
 
 .wrapper {
     width: 150px;
-    min-width: 150px; /* fixes width being ignored in the sound editor sometimes */
     position: relative;
     display: flex;
     flex-direction: column;
@@ -24,7 +23,6 @@
     color: $looks-secondary;
     text-align: center;
     background: none;
-    pointer-events: none;
 }
 
 $fade-out-distance: 100px;
@@ -40,9 +38,6 @@ $fade-out-distance: 100px;
     width: 100%;
     pointer-events: none;
 }
-[theme="dark"] .new-buttons:before {
-    background: linear-gradient(rgba(94, 96, 97, 0),rgb(59, 59, 59));
-}
 
 .new-buttons > button + button {
     margin-top: 0.75rem;
@@ -52,8 +47,7 @@ $fade-out-distance: 100px;
     /* Must have some height (recalculated by flex-grow) in order to scroll */
     height: 0;
     flex-grow: 1;
-    overflow-y: auto;
-    overflow-x: hidden;
+    overflow-y: scroll;
     display: flex;
     flex-direction: column;
 }
@@ -77,7 +71,6 @@ $fade-out-distance: 100px;
 @media only screen and (max-width: $full-size-paint) {
     .wrapper {
         width: 80px;
-        min-width: 80px;
     }
 
     .list-item {

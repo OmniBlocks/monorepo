@@ -5,14 +5,6 @@ const categorySeparator = '<sep gap="36"/>';
 
 const blockSeparator = '<sep gap="36"/>'; // At default scale, about 28px
 
-const translate = (id, english) => {
-    if (LazyScratchBlocks.isLoaded()) {
-        const ScratchBlocks = LazyScratchBlocks.get();
-        return ScratchBlocks.ScratchMsgs.translate(id, english);
-    }
-    return english;
-};
-
 /* eslint-disable no-unused-vars */
 const motion = function (isInitialSetup, isStage, targetId, colors) {
     const stageSelected = ScratchBlocks.ScratchMsgs.translate(
@@ -802,6 +794,13 @@ const makeToolboxXML = function (isInitialSetup, isStage = true, targetId, categ
     const variablesXML = moveCategory('data') || variables(isInitialSetup, isStage, targetId, colors.data);
     const myBlocksXML = moveCategory('procedures') || myBlocks(isInitialSetup, isStage, targetId, colors.more);
 
+    // Always display TurboWarp blocks as the first extension, if it exists,
+    // and also add an "is compiled?" block to the top.
+    let turbowarpXML = moveCategory('tw');
+    if (turbowarpXML && !turbowarpXML.includes(extraTurboWarpBlocks)) {
+        turbowarpXML = turbowarpXML.replace('<block', `${extraTurboWarpBlocks}<block`);
+    }
+
     const everything = [
         xmlOpen,
         motionXML, gap,
@@ -812,8 +811,12 @@ const makeToolboxXML = function (isInitialSetup, isStage = true, targetId, categ
         sensingXML, gap,
         operatorsXML, gap,
         variablesXML, gap,
-        myBlocksXML, gap
+        myBlocksXML
     ];
+
+    if (turbowarpXML) {
+        everything.push(gap, turbowarpXML);
+    }
 
     for (const extensionCategory of categoriesXML) {
         everything.push(gap, extensionCategory.xml);

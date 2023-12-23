@@ -103,8 +103,7 @@ Selector.propTypes = {
     isRtl: PropTypes.bool,
     items: PropTypes.arrayOf(PropTypes.shape({
         url: PropTypes.string,
-        // eslint-disable-next-line react/forbid-prop-types
-        name: PropTypes.any
+        name: PropTypes.string.isRequired
     })),
     onAddSortable: PropTypes.func,
     onDeleteClick: PropTypes.func,

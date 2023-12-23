@@ -14,9 +14,6 @@
 
     position: relative;
 }
-[theme="dark"] .filter {
-    background: $ui-primary;
-}
 
 .filter-icon {
     position: absolute;

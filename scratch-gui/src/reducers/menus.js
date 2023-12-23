@@ -7,7 +7,6 @@ const MENU_EDIT = 'editMenu';
 const MENU_FILE = 'fileMenu';
 const MENU_LANGUAGE = 'languageMenu';
 const MENU_LOGIN = 'loginMenu';
-const MENU_ERRORS = 'errorMenu';
 const MENU_MODE = 'modeMenu';
 const MENU_SETTINGS = 'settingsMenu';
 const MENU_THEME = 'themeMenu';
@@ -69,7 +68,6 @@ const initialState = {
     [MENU_FILE]: false,
     [MENU_LANGUAGE]: false,
     [MENU_LOGIN]: false,
-    [MENU_ERRORS]: false,
     [MENU_MODE]: false,
     [MENU_SETTINGS]: false,
     [MENU_THEME]: false
@@ -135,9 +133,6 @@ const languageMenuOpen = state => state.scratchGui.menus[MENU_LANGUAGE];
 const openLoginMenu = () => openMenu(MENU_LOGIN);
 const closeLoginMenu = () => closeMenu(MENU_LOGIN);
 const loginMenuOpen = state => state.scratchGui.menus[MENU_LOGIN];
-const openErrorsMenu = () => openMenu(MENU_ERRORS);
-const closeErrorsMenu = () => closeMenu(MENU_ERRORS);
-const errorsMenuOpen = state => state.scratchGui.menus[MENU_ERRORS];
 
 const openModeMenu = () => openMenu(MENU_MODE);
 const closeModeMenu = () => closeMenu(MENU_MODE);
@@ -172,9 +167,6 @@ export {
     openLoginMenu,
     closeLoginMenu,
     loginMenuOpen,
-    openErrorsMenu,
-    closeErrorsMenu,
-    errorsMenuOpen,
     openModeMenu,
     closeModeMenu,
     modeMenuOpen,

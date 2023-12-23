@@ -35,9 +35,6 @@ can set a width for example or what it should do in a flex box (eg. grow).
 .title-field:hover {
     background-color: hsla(0, 100%, 100%, 0.5);
 }
-[theme="dark"] .title-field:hover {
-    background-color: rgba(0, 0, 0, 0.5);
-}
 
 .title-field:focus {
     outline:none;
@@ -46,7 +43,4 @@ can set a width for example or what it should do in a flex box (eg. grow).
     box-shadow: 0 0 0 calc($space * .5) $ui-white-transparent;
     background-color: $ui-white;
     color: $text-primary;
-}
-[theme="dark"] .title-field:focus {
-    background-color: rgba(0, 0, 0, 0.3);
 }

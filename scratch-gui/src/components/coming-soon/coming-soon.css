@@ -12,7 +12,7 @@
     background-color: $data-primary !important;
     border: 1px solid $ui-black-transparent !important;
     border-radius: $form-radius !important;
-    box-shadow: 0 0 .5rem $ui-black-transparent-default !important;
+    box-shadow: 0 0 .5rem $ui-black-transparent !important;
     padding: .75rem 1rem !important;
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif !important;
     font-size: 1rem !important;

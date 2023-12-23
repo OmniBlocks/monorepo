@@ -113,7 +113,25 @@ const base = {
             }]
         }]
     },
-    plugins: []
+    plugins: [
+        new CopyWebpackPlugin({
+            patterns: [
+                {
+                    from: 'node_modules/scratch-blocks/media',
+                    to: 'static/blocks-media/default'
+                },
+                {
+                    from: 'node_modules/scratch-blocks/media',
+                    to: 'static/blocks-media/high-contrast'
+                },
+                {
+                    from: 'src/lib/themes/high-contrast/blocks-media',
+                    to: 'static/blocks-media/high-contrast',
+                    force: true
+                }
+            ]
+        })
+    ]
 };
 
 if (!process.env.CI) {

@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 import appTarget from '../app-target';
 import styles from './credits.css';
-import {getInitialDarkMode} from '../../lib/tw-theme-hoc.jsx';
 
 import UserData from './users';
 
@@ -94,7 +93,8 @@ const Credits = () => (
     </main>
 );
 
-document.body.setAttribute('theme', getInitialDarkMode() ? 'dark' : 'light');
+// merge-upstream TODO
+document.body.setAttribute('theme', 'light');
 
 ReactDOM.render((
     <Credits />

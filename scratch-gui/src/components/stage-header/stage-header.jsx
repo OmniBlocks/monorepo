@@ -1,3 +1,4 @@
+import classNames from 'classnames';
 import {defineMessages, injectIntl, intlShape} from 'react-intl';
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -74,38 +75,50 @@ const StageHeaderComponent = function (props) {
 
     let header = null;
 
-    if (isFullScreen) {
-        const stageDimensions = getStageDimensions(null, true);
-        const stageButton = showBranding ? (
-            <div className={styles.embedScratchLogo}>
-                <a
-                    href="https://scratch.mit.edu"
-                    rel="noopener noreferrer"
-                    target="_blank"
-                >
-                    <img
-                        alt="Scratch"
-                        src={scratchLogo}
-                    />
-                </a>
-            </div>
-        ) : (
-            <div className={styles.unselectWrapper}>
-                <Button
-                    className={styles.stageButton}
-                    onClick={onSetStageUnFull}
-                    onKeyPress={onKeyPress}
-                >
-                    <img
-                        alt={props.intl.formatMessage(messages.unFullStageSizeMessage)}
-                        className={styles.stageButtonIcon}
-                        draggable={false}
-                        src={unFullScreenIcon}
-                        title={props.intl.formatMessage(messages.fullscreenControl)}
-                    />
-                </Button>
-            </div>
-        );
+    if (isFullScreen || isEmbedded) {
+        const stageDimensions = getStageDimensions(null, customStageSize, true);
+        const settingsButton = isEmbedded && enableSettingsButton ? (
+            <Button
+                className={styles.stageButton}
+                onClick={onOpenSettings}
+            >
+                <img
+                    alt={props.intl.formatMessage(messages.openSettingsMessage)}
+                    className={styles.stageButtonIcon}
+                    draggable={false}
+                    src={settingsIcon}
+                    title={props.intl.formatMessage(messages.openSettingsMessage)}
+                />
+            </Button>
+        ) : null;
+        const fullscreenButton = isFullScreen ? (
+            <Button
+                className={styles.stageButton}
+                onClick={onSetStageUnFull}
+                onKeyPress={onKeyPress}
+            >
+                <img
+                    alt={props.intl.formatMessage(messages.unFullStageSizeMessage)}
+                    className={styles.stageButtonIcon}
+                    draggable={false}
+                    src={unFullScreenIcon}
+                    title={props.intl.formatMessage(messages.fullscreenControl)}
+                />
+            </Button>
+        ) : FullscreenAPI.available() ? (
+            <Button
+                className={styles.stageButton}
+                onClick={onSetStageFull}
+            >
+                <img
+                    alt={props.intl.formatMessage(messages.fullStageSizeMessage)}
+                    className={styles.stageButtonIcon}
+                    draggable={false}
+                    src={fullScreenIcon}
+                    title={props.intl.formatMessage(messages.fullscreenControl)}
+                />
+            </Button>
+        ) : null;
         header = (
             <Box
                 className={classNames(styles.stageHeaderWrapperOverlay, {

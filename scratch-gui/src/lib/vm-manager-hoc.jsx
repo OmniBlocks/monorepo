@@ -58,7 +58,7 @@ const vmManagerHOC = function (WrappedComponent) {
         }
         loadProject () {
             // tw: stop when loading new project
-            this.props.vm.stop();
+            this.props.vm.quit();
             return this.props.vm.loadProject(this.props.projectData)
                 .then(() => {
                     this.props.onLoadedProject(this.props.loadingState, this.props.canSave);

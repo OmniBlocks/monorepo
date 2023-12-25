@@ -104,7 +104,7 @@ const ProjectFetcherHOC = function (WrappedComponent) {
             // these will also happen later after the project is fetched, but fetching may take a while and
             // the project shouldn't be running while fetching the new project
             this.props.vm.clear();
-            this.props.vm.stop();
+            this.props.vm.quit();
 
             let assetPromise;
             // In case running in node...

@@ -8,7 +8,7 @@
 
 Install dependencies:
 
-```
+```sh
 npm ci
 ```
 
@@ -16,11 +16,11 @@ The playground to use for local testing is tests/vertical_playground.html.
 
 To build, run:
 
-```
+```sh
 npm run prepublish
 ```
 
-requires Python 2. scratch-gui development server must be restarted to update linked scratch-blocks.
+requires Python (2 or 3). scratch-gui development server must be restarted to update linked scratch-blocks.
 
 <!--
 #### Scratch Blocks is a library for building creative computing interfaces.

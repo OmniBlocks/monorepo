@@ -40,6 +40,7 @@ import {
     activateTab,
     SOUNDS_TAB_INDEX
 } from '../reducers/editor-tab';
+import AddonHooks from '../addons/hooks.js';
 
 // TW: Strings we add to scratch-blocks are localized here
 const messages = defineMessages({
@@ -86,7 +87,12 @@ class Blocks extends React.Component {
     constructor (props) {
         super(props);
         this.ScratchBlocks = VMScratchBlocks(props.vm, false);
+
         window.ScratchBlocks = this.ScratchBlocks;
+        AddonHooks.blockly = this.ScratchBlocks;
+        AddonHooks.blocklyCallbacks.forEach(i => i());
+        AddonHooks.blocklyCallbacks.length = [];
+
         bindAll(this, [
             'attachVM',
             'detachVM',
@@ -149,6 +155,7 @@ class Blocks extends React.Component {
             {rtl: this.props.isRtl, toolbox: this.props.toolboxXML, colours: getColorsForTheme(this.props.theme)}
         );
         this.workspace = this.ScratchBlocks.inject(this.blocks, workspaceConfig);
+        AddonHooks.blocklyWorkspace = this.workspace;
 
         // Register buttons under new callback keys for creating variables,
         // lists, and procedures from extensions.
@@ -268,6 +275,8 @@ class Blocks extends React.Component {
 
         // Clear the flyout blocks so that they can be recreated on mount.
         this.props.vm.clearFlyoutBlocks();
+
+        AddonHooks.blocklyWorkspace = null;
     }
     requestToolboxUpdate () {
         clearTimeout(this.toolboxUpdateTimeout);

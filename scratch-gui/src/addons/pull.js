@@ -329,6 +329,13 @@ const SKIP_MESSAGES = [
 ];
 
 const parseMessageDirectory = localeRoot => {
+    const unstructure = string => {
+        if (typeof string === 'object') {
+            return string.string;
+        }
+        return string;
+    };
+
     const settings = {};
     const runtime = {};
     const upstreamMessageIds = new Set();
@@ -344,7 +351,7 @@ const parseMessageDirectory = localeRoot => {
                     continue;
                 }
 
-                const value = parsed[id];
+                const value = unstructure(parsed[id]);
                 if (id.includes('/@')) {
                     settings[id] = value;
                 } else {

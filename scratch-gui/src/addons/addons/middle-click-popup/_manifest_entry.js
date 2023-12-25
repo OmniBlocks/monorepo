@@ -36,6 +36,7 @@ const manifest = {
   ],
   "settings": [
     {
+      "dynamic": true,
       "name": "Popup Block Size",
       "id": "popup_scale",
       "type": "integer",
@@ -44,6 +45,7 @@ const manifest = {
       "default": 48
     },
     {
+      "dynamic": true,
       "name": "Popup Width",
       "id": "popup_width",
       "type": "integer",
@@ -52,6 +54,7 @@ const manifest = {
       "default": 16
     },
     {
+      "dynamic": true,
       "name": "Popup Maximum Height",
       "id": "popup_max_height",
       "type": "integer",

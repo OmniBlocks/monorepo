@@ -1,26 +1,44 @@
-import cookie from 'cookie';
-
-import {DEFAULT_THEME, HIGH_CONTRAST_THEME} from '.';
+import {
+    TW_LIGHT_THEME,
+    TW_DARK_THEME,
+    SCRATCH_LIGHT_THEME,
+    SCRATCH_DARK_THEME,
+    HIGH_CONTRAST_THEME
+} from '.';
 
 const PREFERS_HIGH_CONTRAST_QUERY = '(prefers-contrast: more)';
-const COOKIE_KEY = 'scratchtheme';
+const PREFERS_DARK_QUERY = '(prefers-color-scheme: dark)';
+const STORAGE_KEY = 'tw:theme';
 
-// Dark mode isn't enabled yet
-const isValidTheme = theme => [DEFAULT_THEME, HIGH_CONTRAST_THEME].includes(theme);
+const isValidTheme = theme => [
+    TW_LIGHT_THEME,
+    TW_DARK_THEME,
+    SCRATCH_LIGHT_THEME,
+    SCRATCH_DARK_THEME,
+    HIGH_CONTRAST_THEME
+].includes(theme);
 
 const systemPreferencesTheme = () => {
-    if (window.matchMedia && window.matchMedia(PREFERS_HIGH_CONTRAST_QUERY).matches) return HIGH_CONTRAST_THEME;
-
-    return DEFAULT_THEME;
+    if (window.matchMedia) {
+        if (window.matchMedia(PREFERS_HIGH_CONTRAST_QUERY).matches) {
+            return HIGH_CONTRAST_THEME;
+        }
+        if (window.matchMedia(PREFERS_DARK_QUERY).matches) {
+            return TW_DARK_THEME;
+        }
+    }
+    return TW_LIGHT_THEME;
 };
 
 const detectTheme = () => {
-    const obj = cookie.parse(document.cookie) || {};
-    const themeCookie = obj.scratchtheme;
-
-    if (isValidTheme(themeCookie)) return themeCookie;
-
-    // No cookie set. Fall back to system preferences
+    try {
+        const local = localStorage.getItem(STORAGE_KEY);
+        if (isValidTheme(local)) {
+            return local;
+        }
+    } catch (e) {
+        // ignore
+    }
     return systemPreferencesTheme();
 };
 
@@ -28,15 +46,11 @@ const persistTheme = theme => {
     if (!isValidTheme(theme)) {
         throw new Error(`Invalid theme: ${theme}`);
     }
-
-    if (systemPreferencesTheme() === theme) {
-        // Clear the cookie to represent using the system preferences
-        document.cookie = `${COOKIE_KEY}=;path=/`;
-        return;
+    try {
+        localStorage.setItem(STORAGE_KEY, theme);
+    } catch (e) {
+        // ignore
     }
-
-    const expires = new Date(new Date().setYear(new Date().getFullYear() + 1)).toUTCString();
-    document.cookie = `${COOKIE_KEY}=${theme};expires=${expires};path=/`;
 };
 
 export {

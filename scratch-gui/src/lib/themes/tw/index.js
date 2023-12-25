@@ -1,4 +1,6 @@
 const lightGuiColors = {
+    'ui-modal-overlay': '#ff4c4ce6',
+
     'motion-primary': '#ff4c4c',
     'motion-tertiary': '#cc3333',
 

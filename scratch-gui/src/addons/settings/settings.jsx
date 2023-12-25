@@ -34,6 +34,8 @@ import expandImageBlack from './icons/expand.svg';
 import infoImage from './icons/info.svg';
 import TWFancyCheckbox from '../../components/tw-fancy-checkbox/checkbox.jsx';
 import styles from './settings.css';
+import {detectTheme} from '../../lib/themes/themePersistance.js';
+import {applyGuiColors} from '../../lib/themes/guiHelpers.js';
 import '../polyfill';
 import '../../lib/normalize.css';
 
@@ -56,10 +58,7 @@ if (locale !== 'en') {
 }
 
 document.title = `${settingsTranslations.title} - TurboWarp`;
-
-// merge-upstream TODO
-const theme = 'light';
-document.body.setAttribute('theme', theme);
+applyGuiColors(detectTheme());
 
 let _throttleTimeout;
 const postThrottledSettingsChange = store => {

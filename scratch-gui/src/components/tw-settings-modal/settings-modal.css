@@ -112,7 +112,7 @@
 .button {
     font-family: inherit;
     font-size: 14px;
-    background-color: $motion-primary;
+    background-color: $looks-secondary;
     color: white;
     border: none;
     padding: 0.5rem 1rem;

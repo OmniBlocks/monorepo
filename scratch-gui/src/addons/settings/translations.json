@@ -272,18 +272,18 @@
         "unsupported": "Keletas įskiepių yra nepalaikomi šioje naršyklėje:"
     },
     "nl": {
-        "addonFeedback": "Addonfeedback",
-        "confirmResetAll": "Weet je zeker dat je alle addonsinstellingen wilt resetten naar hun standaardinstellingen?",
+        "addonFeedback": "Feedback Geven",
+        "confirmResetAll": "Weet je zeker dat je alle addoninstellingen wilt resetten naar de standaardinstellingen?",
         "credits": "Dank aan:",
         "dirty": "Ververs tabbladen om instellingen toe te passen.",
         "dirtyButton": "Nu verversen",
-        "enableDangerous": "Deze addon is gevaarlijk en kan opzettelijk functies UITSCHAKELEN. De meeste gebruikers moeten deze addon NIET gebruiken. Weet je zeker dat je het wilt inschakelen?",
+        "enableDangerous": "Deze addon is gevaarlijk en kan opzettelijk functies uitschakelen. In de meeste gevallen moet je deze addon NIET gebruiken. Weet je zeker dat je het in wilt schakelen?",
         "export": "Instellingen exporteren",
         "groupDanger": "Gevaarlijk ({number})",
         "groupNew": "Nieuw ({number})",
-        "groupOthers": "Anderen ({number})",
+        "groupOthers": "Overig ({number})",
         "import": "Instellingen importeren",
-        "noCompiler": "Deze addon werkt alleen als de compiler is uitgeschakeld, dit kun je doen in Geavanceerd > Compiler Uitschakelen of door de \"Compiler uitschakelen in editor\"-addon.",
+        "noCompiler": "Deze addon werkt alleen als de compiler is uitgeschakeld, dit kun je doen in Geavanceerd > Compiler uitschakelen of met de \"Compiler uitschakelen in editor\"-addon.",
         "noResults": "Geen resultaten.",
         "presets": "Voorinstellingen",
         "reset": "Resetten",
@@ -294,7 +294,7 @@
         "tagNew": "Nieuw!",
         "tagRecommended": "Aanbevolen",
         "tagTheme": "Thema",
-        "title": "Addonsinstellingen",
+        "title": "Addoninstellingen",
         "unsupported": "Sommige addons zijn niet beschikbaar in deze browser:"
     },
     "pl": {

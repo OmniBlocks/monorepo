@@ -2,6 +2,7 @@
 export default {
   "de": () => require("../addons-l10n-settings/de.json"),
   "es": () => require("../addons-l10n-settings/es.json"),
+  "fi": () => require("../addons-l10n-settings/fi.json"),
   "fr": () => require("../addons-l10n-settings/fr.json"),
   "hu": () => require("../addons-l10n-settings/hu.json"),
   "it": () => require("../addons-l10n-settings/it.json"),

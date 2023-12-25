@@ -10,6 +10,9 @@ const manifest = {
     {
       "name": "OregSam",
       "link": "https://scratch.mit.edu/users/simiagain/"
+    },
+    {
+      "name": "DNin01"
     }
   ],
   "dynamicDisable": true,
@@ -25,7 +28,12 @@ const manifest = {
   ],
   "settings": [
     {
-      "dynamic": true,
+      "id": "projectpage",
+      "name": "Show on project page",
+      "default": false,
+      "type": "boolean"
+    },
+    {
       "id": "showicononly",
       "name": "Show icon only",
       "default": false,

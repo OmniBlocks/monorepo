@@ -48,7 +48,7 @@ const clone = obj => JSON.parse(JSON.stringify(obj));
 const repoPath = pathUtil.resolve(__dirname, 'ScratchAddons');
 if (!process.argv.includes('-')) {
     rimraf.sync(repoPath);
-    childProcess.execSync(`git clone --depth=1 --branch=tw https://github.com/TurboWarp/addons ${repoPath}`);
+    childProcess.execSync(`git clone --depth=1 --branch=merge-upstream https://github.com/TurboWarp/addons ${repoPath}`);
 }
 
 for (const folder of ['addons', 'addons-l10n', 'addons-l10n-settings', 'libraries']) {
@@ -140,12 +140,12 @@ const detectUnimplementedAPIs = (addonId, contents) => {
 
     if (contents.includes('addon.self.dir')) {
         // eslint-disable-next-line max-len
-        console.warn(`Warning: ${addonId} contains unwritten addon.self.dir. It or this script should be modified so that it will be rewritten.`);
+        console.warn(`Warning: ${addonId} contains un-rewritten addon.self.dir. It or this script should be modified so that it will be rewritten.`);
     }
 
     if (contents.includes('addon.self.lib')) {
         // eslint-disable-next-line max-len
-        console.warn(`Warning: ${addonId} contains unwritten addon.self.lib. It should use modern ES6 import statements.`);
+        console.warn(`Warning: ${addonId} contains un-rewritten addon.self.lib. It should use modern ES6 import statements.`);
     }
 };
 

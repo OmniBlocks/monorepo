@@ -14,7 +14,24 @@
     "editor-devtools/var-not-exist": "That variable does not exist...",
     "editor-devtools/variables": "variables",
     "find-bar/complex-broadcast": "(expression)",
+    "find-bar/event": "event {name}",
     "find-bar/find-placeholder": "Find (Ctrl+F)",
+    "find-bar/list-global": {
+        "string": "LIST {name}",
+        "developer_comment": "Uppercase 'LIST' refers to a global list."
+    },
+    "find-bar/list-local": {
+        "string": "list {name}",
+        "developer_comment": "Lowercase 'list' refers to a local list."
+    },
+    "find-bar/var-global": {
+        "string": "VAR {name}",
+        "developer_comment": "Uppercase 'VAR' refers to a global variable."
+    },
+    "find-bar/var-local": {
+        "string": "var {name}",
+        "developer_comment": "Lowercase 'var' refers to a local variable."
+    },
     "middle-click-popup/start-typing": "Start Typing...",
     "editor-searchable-dropdowns/createBroadcast": "Create message \"{name}\"",
     "editor-searchable-dropdowns/createGlobalList": "Create list \"{name}\" for all sprites",
@@ -73,6 +90,7 @@
     "debugger/unknown-sprite": "(unknown sprite)",
     "debugger/unpause": "Resume",
     "pause/pause": "Pause",
+    "pause/play": "Resume",
     "clones/clones": "clones: {cloneCount}",
     "color-picker/hex": "hex color",
     "remove-sprite-confirm/confirm": "Do you want to delete the sprite?",
@@ -138,7 +156,7 @@
     "gamepad/no-controllers": "No controllers detected. Try plugging one in and pressing a button on it.",
     "gamepad/reset": "Reset all controls to project defaults",
     "gamepad/settings": "Gamepad Settings",
-    "gamepad/store-in-project": "Store these settings in the project to override the default configuration (Experimental tool for project creators)",
+    "gamepad/store-in-project": "Store the mappings set above inside the project. After saving the project, these mappings will become the new default configuration.",
     "folders/add-to-folder": "add to folder: {folder}",
     "folders/closed-folder": "Folder",
     "folders/confirm-backpack-folder": "Save entire folder to backpack?",

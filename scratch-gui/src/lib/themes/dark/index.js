@@ -78,7 +78,12 @@ const blockColors = {
 
 const extensions = {};
 
+const guiColors = {
+
+};
+
 export {
     blockColors,
-    extensions
+    extensions,
+    guiColors
 };

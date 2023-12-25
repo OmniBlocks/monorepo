@@ -1,5 +1,5 @@
 import ScratchBlocks from 'scratch-blocks';
-import {defaultColors} from './themes';
+import {defaultBlockColors} from './themes';
 
 const categorySeparator = '<sep gap="36"/>';
 
@@ -765,7 +765,7 @@ const xmlClose = '</xml>';
  * @returns {string} - a ScratchBlocks-style XML document for the contents of the toolbox.
  */
 const makeToolboxXML = function (isInitialSetup, isStage = true, targetId, categoriesXML = [],
-    costumeName = '', backdropName = '', soundName = '', colors = defaultColors) {
+    costumeName = '', backdropName = '', soundName = '', colors = defaultBlockColors) {
     isStage = isInitialSetup || isStage;
     const gap = [categorySeparator];
 

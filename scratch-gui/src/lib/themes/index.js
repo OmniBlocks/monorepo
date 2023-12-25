@@ -2,14 +2,23 @@ import defaultsDeep from 'lodash.defaultsdeep';
 import {defineMessages} from 'react-intl';
 
 import {
+    blockColors as defaultBlockColors,
+    guiColors as defaultGuiColors
+} from './default';
+import {
+    lightGuiColors as twLightGuiColors,
+    darkBlockColors as twDarkBlockColors,
+    darkGuiColors as twDarkGuiColors
+} from './tw';
+import {
     blockColors as darkModeBlockColors,
+    guiColors as darkModeGuiColors,
     extensions as darkModeExtensions
 } from './dark';
 import {
     blockColors as highContrastBlockColors,
     extensions as highContrastExtensions
 } from './high-contrast';
-import {blockColors as defaultColors} from './default';
 
 import twLightIcon from './tw/light.svg';
 import twDarkIcon from './tw/dark.svg';
@@ -25,7 +34,7 @@ const HIGH_CONTRAST_THEME = 'high-contrast';
 
 const DEFAULT_THEME = SCRATCH_LIGHT_THEME;
 
-const mergeWithDefaults = colors => defaultsDeep({}, colors, defaultColors);
+const mergeWithDefaultBlocks = colors => defaultsDeep({}, colors, defaultBlockColors);
 
 const messages = defineMessages({
     [TW_LIGHT_THEME]: {
@@ -57,37 +66,47 @@ const messages = defineMessages({
 
 const themeMap = {
     [TW_LIGHT_THEME]: {
+        isDark: false,
         blocksMediaFolder: 'blocks-media/default',
-        colors: defaultColors,
+        colors: defaultBlockColors,
         extensions: {},
+        guiColors: defaultsDeep({}, twLightGuiColors, defaultGuiColors),
         label: messages[TW_LIGHT_THEME],
         icon: twLightIcon
     },
     [TW_DARK_THEME]: {
+        isDark: true,
         blocksMediaFolder: 'blocks-media/default',
-        colors: mergeWithDefaults(darkModeBlockColors),
+        colors: mergeWithDefaultBlocks(twDarkBlockColors),
         extensions: darkModeExtensions,
+        guiColors: defaultsDeep({}, twDarkGuiColors, darkModeGuiColors, defaultGuiColors),
         label: messages[TW_DARK_THEME],
         icon: twDarkIcon
     },
     [SCRATCH_LIGHT_THEME]: {
+        isDark: false,
         blocksMediaFolder: 'blocks-media/default',
-        colors: defaultColors,
+        colors: defaultBlockColors,
         extensions: {},
+        guiColors: defaultGuiColors,
         label: messages[SCRATCH_LIGHT_THEME],
         icon: scratchLightIcon
     },
     [SCRATCH_DARK_THEME]: {
+        isDark: true,
         blocksMediaFolder: 'blocks-media/default',
-        colors: mergeWithDefaults(darkModeBlockColors),
+        colors: mergeWithDefaultBlocks(darkModeBlockColors),
         extensions: darkModeExtensions,
+        guiColors: defaultsDeep({}, darkModeGuiColors, defaultGuiColors),
         label: messages[SCRATCH_DARK_THEME],
         icon: scratchDarkIcon
     },
     [HIGH_CONTRAST_THEME]: {
+        isDark: false,
         blocksMediaFolder: 'blocks-media/high-contrast',
-        colors: mergeWithDefaults(highContrastBlockColors),
+        colors: mergeWithDefaultBlocks(highContrastBlockColors),
         extensions: highContrastExtensions,
+        guiColors: defaultGuiColors,
         label: messages[HIGH_CONTRAST_THEME],
         icon: highContrastIcon
     }
@@ -110,7 +129,7 @@ export {
     SCRATCH_LIGHT_THEME,
     SCRATCH_DARK_THEME,
     HIGH_CONTRAST_THEME,
-    defaultColors,
+    defaultBlockColors,
     getColorsForTheme,
     themeMap
 };

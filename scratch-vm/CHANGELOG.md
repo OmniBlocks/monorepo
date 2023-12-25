@@ -1,3 +1,7 @@
+We don't use this file. Please see the git commit history.
+
+<!--
+
 # Changelog
 
 All notable changes to this project will be documented in this file. See
@@ -2613,3 +2617,5 @@ All notable changes to this project will be documented in this file. See
 ### BREAKING CHANGES
 
 * specially-named backdrops can now be navigated
+
+-->

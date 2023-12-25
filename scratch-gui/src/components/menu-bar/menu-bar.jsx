@@ -88,6 +88,7 @@ import dropdownCaret from './dropdown-caret.svg';
 import aboutIcon from './icon--about.svg';
 import fileIcon from './icon--file.svg';
 import editIcon from './icon--edit.svg';
+import addonsIcon from './addons.svg';
 
 import ninetiesLogo from './nineties_logo.svg';
 import catLogo from './cat_logo.svg';
@@ -743,7 +744,6 @@ class MenuBar extends React.Component {
                                     </MenuItem>
                                 </MenuSection>
                             </MenuBarMenu>
-
                         </div>
                         {this.props.isTotallyNormal && (
                             <div
@@ -790,6 +790,22 @@ class MenuBar extends React.Component {
                                         </MenuItem>
                                     </MenuSection>
                                 </MenuBarMenu>
+                            </div>
+                        )}
+
+                        {this.props.onClickAddonSettings && (
+                            <div
+                                className={classNames(styles.menuBarItem, styles.hoverable)}
+                                onMouseUp={this.props.onClickAddonSettings}
+                            >
+                                <img src={addonsIcon} />
+                                <span className={styles.collapsibleLabel}>
+                                    <FormattedMessage
+                                        defaultMessage="Addons"
+                                        description="Button to open addon settings"
+                                        id="tw.menuBar.addons"
+                                    />
+                                </span>
                             </div>
                         )}
                     </div>

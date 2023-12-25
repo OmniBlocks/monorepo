@@ -11,10 +11,6 @@
     max-height: calc(100vh - 250px);
     overflow-y: auto;
 }
-[theme="dark"] .body {
-    color: $text-primary;
-    background: $ui-primary;
-}
 
 /* For small screens, such as in the embed */
 @media (max-height: 600px) {
@@ -71,17 +67,22 @@
 }
 
 .help-icon {
+    position: relative;
     border: 0;
     background-color: transparent;
-    background-image: url("./help-black.svg");
     width: 20px;
     height: 20px;
     background-size: 100%;
     margin-left: 0.5rem;
     cursor: pointer;
 }
-[theme="dark"] .help-icon {
-    background-image: url("./help-white.svg");
+.help-icon img {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
 }
 
 .custom-stage-size > * {
@@ -130,7 +131,4 @@
     margin: 0.25rem 0;
     border-radius: 4px;
     background: rgb(233, 233, 53);
-}
-[theme="dark"] .warning {
-    background: rgb(114, 102, 0);
 }

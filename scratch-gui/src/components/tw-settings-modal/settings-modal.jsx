@@ -10,6 +10,7 @@ import Input from '../forms/input.jsx';
 import BufferedInputHOC from '../forms/buffered-input-hoc.jsx';
 import DocumentationLink from '../tw-documentation-link/documentation-link.jsx';
 import styles from './settings-modal.css';
+import helpIcon from './help-icon.svg';
 
 /* eslint-disable react/no-multi-comp */
 
@@ -76,7 +77,12 @@ class UnwrappedSetting extends React.Component {
                         className={styles.helpIcon}
                         onClick={this.handleClickHelp}
                         title={this.props.intl.formatMessage(messages.help)}
-                    />
+                    >
+                        <img
+                            src={helpIcon}
+                            draggable={false}
+                        />
+                    </button>
                 </div>
                 {this.state.helpVisible && (
                     <div className={styles.detail}>

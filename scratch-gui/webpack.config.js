@@ -159,7 +159,8 @@ module.exports = [
                     loader: 'url-loader',
                     options: {
                         limit: 2048,
-                        outputPath: 'static/assets/'
+                        outputPath: 'static/assets/',
+                        esModule: false
                     }
                 }
             ])
@@ -272,7 +273,8 @@ module.exports = [
                         options: {
                             limit: 2048,
                             outputPath: 'static/assets/',
-                            publicPath: `${STATIC_PATH}/assets/`
+                            publicPath: `${STATIC_PATH}/assets/`,
+                            esModule: false
                         }
                     }
                 ])

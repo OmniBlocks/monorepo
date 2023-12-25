@@ -33,6 +33,15 @@ const systemPreferencesTheme = () => {
 const detectTheme = () => {
     try {
         const local = localStorage.getItem(STORAGE_KEY);
+
+        // Migrate legacy preferences
+        if (local === 'dark') {
+            return TW_DARK_THEME;
+        }
+        if (local === 'light') {
+            return TW_LIGHT_THEME;
+        }
+
         if (isValidTheme(local)) {
             return local;
         }

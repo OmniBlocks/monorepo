@@ -8,6 +8,10 @@ const applyGuiColors = theme => {
     }
 
     document.documentElement.style.colorScheme = themeObject.isDark ? 'dark' : 'light';
+
+    window.Recolor = {
+        primary: themeObject.guiColors['looks-secondary']
+    };
 };
 
 export {

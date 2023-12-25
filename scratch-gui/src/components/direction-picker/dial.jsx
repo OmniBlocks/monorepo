@@ -5,8 +5,8 @@ import {getEventXY} from '../../lib/touch-utils';
 
 import styles from './dial.css';
 
-import dialFace from './icon--dial.svg';
-import dialHandle from './icon--handle.svg';
+import dialFace from '!../../lib/tw-recolor/build!./icon--dial.svg';
+import dialHandle from '!../../lib/tw-recolor/build!./icon--handle.svg';
 
 class Dial extends React.Component {
     constructor (props) {
@@ -113,7 +113,7 @@ class Dial extends React.Component {
                     <img
                         className={styles.dialFace}
                         draggable={false}
-                        src={dialFace}
+                        src={dialFace()}
                     />
                     <svg
                         className={styles.gauge}
@@ -129,7 +129,7 @@ class Dial extends React.Component {
                         className={styles.dialHandle}
                         draggable={false}
                         ref={this.handleRef}
-                        src={dialHandle}
+                        src={dialHandle()}
                         style={{
                             top: `${radius - (radius * Math.cos(direction * (Math.PI / 180)))}px`,
                             left: `${radius + (radius * Math.sin(direction * (Math.PI / 180)))}px`,

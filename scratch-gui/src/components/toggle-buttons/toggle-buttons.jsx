@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
+import TWRenderRecoloredImage from '../../lib/tw-recolor/render.jsx';
 import styles from './toggle-buttons.css';
 
 const ToggleButtons = ({buttons, className, disabled}) => (
@@ -24,7 +25,7 @@ const ToggleButtons = ({buttons, className, disabled}) => (
                 onClick={button.handleClick}
                 disabled={disabled}
             >
-                <img
+                <TWRenderRecoloredImage
                     src={button.icon}
                     aria-hidden="true"
                     className={button.iconClassName}
@@ -38,7 +39,7 @@ ToggleButtons.propTypes = {
     buttons: PropTypes.arrayOf(PropTypes.shape({
         title: PropTypes.string.isRequired,
         handleClick: PropTypes.func.isRequired,
-        icon: PropTypes.string.isRequired,
+        icon: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
         iconClassName: PropTypes.string,
         isSelected: PropTypes.bool
     })),

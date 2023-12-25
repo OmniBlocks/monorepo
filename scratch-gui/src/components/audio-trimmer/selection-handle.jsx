@@ -3,7 +3,8 @@ import React from 'react';
 import classNames from 'classnames';
 import Box from '../box/box.jsx';
 import styles from './audio-trimmer.css';
-import handleIcon from './icon--handle.svg';
+import TWRenderRecoloredImage from '../../lib/tw-recolor/render.jsx';
+import handleIcon from '!../../lib/tw-recolor/build!./icon--handle.svg';
 
 const SelectionHandle = props => (
     <Box
@@ -12,13 +13,13 @@ const SelectionHandle = props => (
         onTouchStart={props.onMouseDown}
     >
         <Box className={classNames(styles.trimHandle, styles.topTrimHandle)}>
-            <img
+            <TWRenderRecoloredImage
                 src={handleIcon}
                 draggable={false}
             />
         </Box>
         <Box className={classNames(styles.trimHandle, styles.bottomTrimHandle)}>
-            <img
+            <TWRenderRecoloredImage
                 src={handleIcon}
                 draggable={false}
             />

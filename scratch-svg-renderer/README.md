@@ -1,3 +1,6 @@
+Fork of scratch-svg-renderer used by TurboWarp.
+
+<!--
 # scratch-svg-renderer
 [![CircleCI](https://circleci.com/gh/LLK/scratch-svg-renderer/tree/develop.svg?style=shield&circle-token=239172a1b9275ee1e8f949489e6e36ea57b7fc86)](https://circleci.com/gh/LLK/scratch-svg-renderer?branch=develop)
 
@@ -77,3 +80,5 @@ npm install -g commitizen@latest cz-conventional-changelog@latest
 ```
 
 Now you're ready to make commits using `git cz`.
+
+-->

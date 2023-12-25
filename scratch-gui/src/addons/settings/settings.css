@@ -332,7 +332,7 @@ a:active, a:focus {
     transition-property: background;
 }
 .switch[state="on"] {
-    background: $motion-primary;
+    background: $looks-secondary;
 }
 .switch::before {
     content: "";
@@ -486,30 +486,13 @@ a:active, a:focus {
 }
 .setting input:focus, .setting input:active {
     outline: none;
-    border-color: $motion-primary;
+    border-color: $looks-secondary;
     box-shadow: 0 0 0 3px $looks-transparent;
 }
 .setting input[type="checkbox"] {
     height: 20px;
     width: 20px;
-    padding: 0;
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    background-color: white;
-    background-size: 20px 20px;
     background-position: center center;
-}
-.setting input[type="checkbox"]:checked {
-    border-color: $motion-primary;
-    background-color: $motion-primary;
-    background-image: url("./icons/check.svg");
-}
-.setting input[type="checkbox"]:hover:not(:focus) {
-    border-color: $motion-tertiary;
-}
-.setting input[type="checkbox"]:checked:hover {
-    border-color: $motion-tertiary;
 }
 .setting input[type="number"] {
     border-radius: 20px 0 0 20px;
@@ -575,7 +558,7 @@ a:active, a:focus {
 }
 .select-option.selected {
     color: white;
-    background: $motion-primary;
+    background: $looks-secondary;
 }
 .select-option:active, .select-option:focus-within {
     outline: none;

@@ -21,19 +21,19 @@ import Formats, {isBitmap, isVector} from '../../lib/format';
 import {hideLabel} from '../../lib/hide-label';
 import styles from './mode-tools.css';
 
-import copyIcon from './icons/copy.svg';
-import pasteIcon from './icons/paste.svg';
-import deleteIcon from './icons/delete.svg';
+import copyIcon from '!../../tw-recolor/build!./icons/copy.svg';
+import pasteIcon from '!../../tw-recolor/build!./icons/paste.svg';
+import deleteIcon from '!../../tw-recolor/build!./icons/delete.svg';
 
 import bitBrushIcon from '../bit-brush-mode/brush.svg';
 import bitEraserIcon from '../bit-eraser-mode/eraser.svg';
 import bitLineIcon from '../bit-line-mode/line.svg';
 import brushIcon from '../brush-mode/brush.svg';
-import curvedPointIcon from './icons/curved-point.svg';
+import curvedPointIcon from '!../../tw-recolor/build!./icons/curved-point.svg';
 import eraserIcon from '../eraser-mode/eraser.svg';
-import flipHorizontalIcon from './icons/flip-horizontal.svg';
-import flipVerticalIcon from './icons/flip-vertical.svg';
-import straightPointIcon from './icons/straight-point.svg';
+import flipHorizontalIcon from '!../../tw-recolor/build!./icons/flip-horizontal.svg';
+import flipVerticalIcon from '!../../tw-recolor/build!./icons/flip-vertical.svg';
+import straightPointIcon from '!../../tw-recolor/build!./icons/straight-point.svg';
 import bitOvalIcon from '../bit-oval-mode/oval.svg';
 import bitRectIcon from '../bit-rect-mode/rectangle.svg';
 import bitOvalOutlinedIcon from '../bit-oval-mode/oval-outlined.svg';

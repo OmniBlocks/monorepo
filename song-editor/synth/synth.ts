@@ -2103,7 +2103,7 @@ export class Instrument {
             const legacyChorusNames: Dictionary<string> = { "union": "none", "fifths": "fifth", "octaves": "octave" };
             const unison: Unison | undefined = Config.unisons.dictionary[legacyChorusNames[unisonProperty]] || Config.unisons.dictionary[unisonProperty];
             if (unison != undefined) this.unison = unison.index;
-            if (unisonProperty == "custom") this.unison = Config.unisons.length;6
+            if (unisonProperty == "custom") this.unison = Config.unisons.length;
         }
         //clamp these???
         this.unisonVoices = (instrumentObject["unisonVoices"] == undefined) ? Config.unisons[this.unison].voices : instrumentObject["unisonVoices"];

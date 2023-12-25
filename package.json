@@ -4,6 +4,7 @@
   "description": "SVG renderer for Scratch",
   "main": "./src/index.js",
   "scripts": {
+    "prepublishOnly": "npm run build",
     "build": "npm run clean && webpack --progress --colors --bail",
     "clean": "rimraf ./dist",
     "start": "webpack-dev-server",

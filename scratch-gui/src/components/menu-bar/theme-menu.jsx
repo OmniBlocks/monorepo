@@ -6,7 +6,14 @@ import {connect} from 'react-redux';
 
 import check from './check.svg';
 import {MenuItem, Submenu} from '../menu/menu.jsx';
-import {DEFAULT_THEME, HIGH_CONTRAST_THEME, themeMap} from '../../lib/themes';
+import {
+    TW_LIGHT_THEME,
+    TW_DARK_THEME,
+    SCRATCH_LIGHT_THEME,
+    SCRATCH_DARK_THEME,
+    HIGH_CONTRAST_THEME,
+    themeMap
+} from '../../lib/themes';
 import {persistTheme} from '../../lib/themes/themePersistance';
 import {openThemeMenu, themeMenuOpen} from '../../reducers/menus.js';
 import {setTheme} from '../../reducers/theme.js';
@@ -47,7 +54,13 @@ const ThemeMenu = ({
     onRequestOpen,
     theme
 }) => {
-    const enabledThemes = [DEFAULT_THEME, HIGH_CONTRAST_THEME];
+    const enabledThemes = [
+        TW_LIGHT_THEME,
+        TW_DARK_THEME,
+        SCRATCH_LIGHT_THEME,
+        SCRATCH_DARK_THEME,
+        HIGH_CONTRAST_THEME
+    ];
     const themeInfo = themeMap[theme];
 
     return (

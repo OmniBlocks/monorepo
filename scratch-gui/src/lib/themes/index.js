@@ -11,25 +11,42 @@ import {
 } from './high-contrast';
 import {blockColors as defaultColors} from './default';
 
-import defaultIcon from './default/icon.svg';
+import twLightIcon from './tw/light.svg';
+import twDarkIcon from './tw/dark.svg';
+import scratchLightIcon from './default/icon.svg';
+import scratchDarkIcon from './dark/icon.svg';
 import highContrastIcon from './high-contrast/icon.svg';
 
-const DEFAULT_THEME = 'default';
+const TW_LIGHT_THEME = 'tw-light';
+const TW_DARK_THEME = 'tw-dark';
+const SCRATCH_LIGHT_THEME = 'scratch-light';
+const SCRATCH_DARK_THEME = 'scratch-dark';
 const HIGH_CONTRAST_THEME = 'high-contrast';
-const DARK_THEME = 'dark';
+
+const DEFAULT_THEME = SCRATCH_LIGHT_THEME;
 
 const mergeWithDefaults = colors => defaultsDeep({}, colors, defaultColors);
 
 const messages = defineMessages({
-    [DEFAULT_THEME]: {
-        id: 'gui.theme.default',
-        defaultMessage: 'Original',
-        description: 'label for original theme'
+    [TW_LIGHT_THEME]: {
+        id: 'tw.theme.twLight',
+        defaultMessage: 'Light',
+        description: 'Name of our light mode'
     },
-    [DARK_THEME]: {
-        id: 'gui.theme.dark',
+    [TW_DARK_THEME]: {
+        id: 'tw.theme.twDark',
         defaultMessage: 'Dark',
-        description: 'label for dark mode theme'
+        description: 'Name of our dark mode'
+    },
+    [SCRATCH_LIGHT_THEME]: {
+        id: 'tw.theme.scratchLight',
+        defaultMessage: 'Scratch Light',
+        description: 'Name of the light mode used by Scratch'
+    },
+    [SCRATCH_DARK_THEME]: {
+        id: 'tw.theme.scratchDark',
+        defaultMessage: 'Scratch Dark',
+        description: 'Name of the alternative dark mode developed by Scratch but unused'
     },
     [HIGH_CONTRAST_THEME]: {
         id: 'gui.theme.highContrast',
@@ -39,18 +56,33 @@ const messages = defineMessages({
 });
 
 const themeMap = {
-    [DEFAULT_THEME]: {
+    [TW_LIGHT_THEME]: {
         blocksMediaFolder: 'blocks-media/default',
         colors: defaultColors,
         extensions: {},
-        label: messages[DEFAULT_THEME],
-        icon: defaultIcon
+        label: messages[TW_LIGHT_THEME],
+        icon: twLightIcon
     },
-    [DARK_THEME]: {
+    [TW_DARK_THEME]: {
         blocksMediaFolder: 'blocks-media/default',
         colors: mergeWithDefaults(darkModeBlockColors),
         extensions: darkModeExtensions,
-        label: messages[DARK_THEME]
+        label: messages[TW_DARK_THEME],
+        icon: twDarkIcon
+    },
+    [SCRATCH_LIGHT_THEME]: {
+        blocksMediaFolder: 'blocks-media/default',
+        colors: defaultColors,
+        extensions: {},
+        label: messages[SCRATCH_LIGHT_THEME],
+        icon: scratchLightIcon
+    },
+    [SCRATCH_DARK_THEME]: {
+        blocksMediaFolder: 'blocks-media/default',
+        colors: mergeWithDefaults(darkModeBlockColors),
+        extensions: darkModeExtensions,
+        label: messages[SCRATCH_DARK_THEME],
+        icon: scratchDarkIcon
     },
     [HIGH_CONTRAST_THEME]: {
         blocksMediaFolder: 'blocks-media/high-contrast',
@@ -73,7 +105,10 @@ const getColorsForTheme = theme => {
 
 export {
     DEFAULT_THEME,
-    DARK_THEME,
+    TW_LIGHT_THEME,
+    TW_DARK_THEME,
+    SCRATCH_LIGHT_THEME,
+    SCRATCH_DARK_THEME,
     HIGH_CONTRAST_THEME,
     defaultColors,
     getColorsForTheme,

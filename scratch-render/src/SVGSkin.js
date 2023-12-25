@@ -1,7 +1,7 @@
 const twgl = require('twgl.js');
 
 const Skin = require('./Skin');
-const {loadSvgString, serializeSvgToString} = require('scratch-svg-renderer');
+const {loadSvgString, serializeSvgToString} = require('@turbowarp/scratch-svg-renderer');
 const ShaderManager = require('./ShaderManager');
 
 /**

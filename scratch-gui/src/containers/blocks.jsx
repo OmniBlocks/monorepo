@@ -150,7 +150,6 @@ class Blocks extends React.Component {
         Msg.PROCEDURES_TO_STATEMENT = this.props.intl.formatMessage(messages.PROCEDURES_TO_STATEMENT);
         Msg.PROCEDURES_DOCS = this.props.intl.formatMessage(messages.PROCEDURES_DOCS);
 
-        console.log(getColorsForTheme(this.props.theme).gridColor);
         const workspaceConfig = defaultsDeep({},
             this.props.options,
             {

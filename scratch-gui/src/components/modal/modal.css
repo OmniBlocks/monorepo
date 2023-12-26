@@ -10,6 +10,7 @@
     bottom: 0;
     z-index: $z-index-modal;
     background-color: $ui-modal-overlay;
+    color: $ui-modal-foreground;
 }
 
 .modal-content * {
@@ -25,7 +26,6 @@
     user-select: none;
 
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    color: $text-primary;
     overflow: hidden;
 }
 
@@ -67,7 +67,8 @@ $sides: 20rem;
 
     box-sizing: border-box;
     width: 100%;
-    background-color: $looks-secondary;
+    background-color: $ui-modal-header-background;
+    color: $ui-modal-header-foreground;
 
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-size: 1rem;
@@ -79,7 +80,6 @@ $sides: 20rem;
     align-items: center;
     padding: 1rem;
     text-decoration: none;
-    color: $ui-white;
     user-select: none;
 }
 

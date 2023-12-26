@@ -106,6 +106,10 @@ const guiColors = {
     'ui-tertiary': 'hsla(215, 50%, 90%, 1)', /* #D9E3F2 */
 
     'ui-modal-overlay': 'hsla(215, 100%, 65%, 0.9)', /* 90% transparent version of motion-primary */
+    'ui-modal-background': 'hsla(0, 100%, 100%, 1)', /* #FFFFFF */
+    'ui-modal-foreground': 'hsla(225, 15%, 40%, 1)', /* #575E75 */
+    'ui-modal-header-background': 'hsla(260, 60%, 60%, 1)', /* #855CD6 */
+    'ui-modal-header-foreground': 'hsla(0, 100%, 100%, 1)', /* #FFFFFF */
 
     'ui-white': 'hsla(0, 100%, 100%, 1)', /* #FFFFFF */
     'ui-white-dim': 'hsla(0, 100%, 100%, 0.75)', /* 25% transparent version of ui-white */
@@ -148,7 +152,10 @@ const guiColors = {
     'extensions-transparent': 'hsla(163, 85%, 40%, 0.35)', /* 35% transparent version of extensions-primary */
     'extensions-light': 'hsla(163, 57%, 85%, 1)', /* opaque version of extensions-transparent, on white bg */
 
-    'drop-highlight': 'hsla(215, 100%, 77%, 1)' /* lighter than motion-primary */
+    'drop-highlight': 'hsla(215, 100%, 77%, 1)', /* lighter than motion-primary */
+
+    'menu-bar-background': 'hsla(260, 60%, 60%, 1)', /* #855CD6 */
+    'menu-bar-foreground': 'hsla(0, 100%, 100%, 1)' /* #FFFFFF */
 };
 
 export {

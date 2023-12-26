@@ -1,10 +1,12 @@
+import LazyScratchBlocks from './tw-lazy-scratch-blocks';
+
 /**
  * Connect scratch blocks with the vm
  * @param {VirtualMachine} vm - The scratch vm
  * @return {ScratchBlocks} ScratchBlocks connected with the vm
  */
 export default function (vm) {
-    const ScratchBlocks = require('scratch-blocks');
+    const ScratchBlocks = LazyScratchBlocks.get();
     const jsonForMenuBlock = function (name, menuOptionsFn, colors, start) {
         return {
             message0: '%1',

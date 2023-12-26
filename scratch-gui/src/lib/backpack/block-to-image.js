@@ -1,5 +1,5 @@
 import computedStyleToInlineStyle from 'computed-style-to-inline-style';
-import ScratchBlocks from 'scratch-blocks';
+import LazyScratchBlocks from '../tw-lazy-scratch-blocks';
 
 /**
  * Given a blockId, return a data-uri image that can be used to create a thumbnail.
@@ -8,6 +8,7 @@ import ScratchBlocks from 'scratch-blocks';
  */
 export default function (blockId) {
     // Not sure any better way to access the scratch-blocks workspace than this...
+    const ScratchBlocks = LazyScratchBlocks.get();
     const block = ScratchBlocks.getMainWorkspace().getBlockById(blockId);
     const blockSvg = block.getSvgRoot().cloneNode(true /* deep */);
 

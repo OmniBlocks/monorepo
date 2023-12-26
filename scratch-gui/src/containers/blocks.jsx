@@ -41,6 +41,7 @@ import {
     SOUNDS_TAB_INDEX
 } from '../reducers/editor-tab';
 import AddonHooks from '../addons/hooks.js';
+import LoadScratchBlocksHOC from '../lib/tw-load-scratch-blocks-hoc.jsx';
 
 // TW: Strings we add to scratch-blocks are localized here
 const messages = defineMessages({
@@ -807,5 +808,5 @@ export default injectIntl(errorBoundaryHOC('Blocks')(
     connect(
         mapStateToProps,
         mapDispatchToProps
-    )(Blocks)
+    )(LoadScratchBlocksHOC(Blocks))
 ));

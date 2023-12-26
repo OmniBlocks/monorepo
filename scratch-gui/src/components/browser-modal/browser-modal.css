@@ -48,35 +48,7 @@
     background: $ui-white;
     padding: 1.5rem 2.25rem;
     text-align: center;
-}
-
-/* Confirmation buttons at the bottom of the modal */
-.button-row {
-    margin: 1.5rem 0;
-    font-weight: bolder;
-    text-align: right;
     display: flex;
-    justify-content: center;
-}
-
-.button-row button {
-    border: 1px solid $looks-secondary;
-    border-radius: 0.25rem;
-    padding: 0.5rem 2rem;
-    background: $looks-secondary;
-    color: white;
-    font-weight: bold;
-    font-size: 0.875rem;
-    cursor: pointer;
-}
-
-.faq-link-text {
-    margin: 2rem 0 .5rem 0;
-    font-size: .875rem;
-    color: $text-primary;
-}
-
-.faq-link {
-    color: $looks-secondary;
-    text-decoration: none;
+    flex-direction: column;
+    gap: 0.25rem;
 }

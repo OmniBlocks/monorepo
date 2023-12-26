@@ -2,6 +2,11 @@
 @import "../../css/colors.css";
 @import "../../css/z-index.css";
 
+.stage-wrapper {
+    /* prevents loading screen from leaking out in player only mode */
+    position: relative;
+}
+
 .stage-wrapper * {
     box-sizing: border-box;
 }

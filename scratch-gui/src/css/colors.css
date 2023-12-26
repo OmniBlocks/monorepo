@@ -1,3 +1,5 @@
+/* overridden by src/lib/themes/guiHelpers.js */
+
 $ui-primary: var(--ui-primary);
 $ui-secondary: var(--ui-secondary);
 $ui-tertiary: var(--ui-tertiary);
@@ -53,3 +55,10 @@ $drop-highlight: var(--drop-highlight);
 
 $menu-bar-background: var(--menu-bar-background);
 $menu-bar-foreground: var(--menu-bar-foreground);
+
+$assets-background: var(--assets-background);
+
+$page-background: var(--page-background);
+$page-foreground: var(--page-foreground);
+
+$link-color: var(--link-color);

@@ -97,7 +97,23 @@ const blockColors = {
     numPadText: 'white', // Do not use hex here, it cannot be inlined with data-uri SVG
     valueReportBackground: '#FFFFFF',
     valueReportBorder: '#AAAAAA',
-    menuHover: 'rgba(0, 0, 0, 0.2)'
+    valueReportForeground: '#000000',
+    menuHover: 'rgba(0, 0, 0, 0.2)',
+    contextMenuBackground: '#ffffff',
+    contextMenuBorder: '#cccccc',
+    contextMenuForeground: '#000000',
+    contextMenuActiveBackground: '#d6e9f8',
+    contextMenuDisabledForeground: '#cccccc',
+    flyoutLabelColor: '#575E75',
+    checkboxInactiveBackground: '#ffffff',
+    checkboxInactiveBorder: '#c8c8c8',
+    checkboxActiveBackground: '#4C97FF',
+    checkboxActiveBorder: '#3373CC',
+    checkboxCheck: '#ffffff',
+    buttonBorder: '#c6c6c6',
+    buttonActiveBackground: '#ffffff',
+    buttonForeground: '#575E75',
+    gridColor: '#dddddd'
 };
 
 const guiColors = {
@@ -155,7 +171,14 @@ const guiColors = {
     'drop-highlight': 'hsla(215, 100%, 77%, 1)', /* lighter than motion-primary */
 
     'menu-bar-background': 'hsla(260, 60%, 60%, 1)', /* #855CD6 */
-    'menu-bar-foreground': 'hsla(0, 100%, 100%, 1)' /* #FFFFFF */
+    'menu-bar-foreground': '#ffffff',
+
+    'assets-background': '#ffffff',
+
+    'page-background': '#ffffff',
+    'page-foreground': '#000000',
+
+    'link-color': '#2255dd'
 };
 
 export {

@@ -17,22 +17,15 @@
 @import "../../css/colors.css";
 
 body {
-    background-color: white;
-    color: black;
+    background-color: $page-background;
+    color: $page-foreground;
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     margin: 0;
 }
-body[theme="dark"] {
-    background-color: #222222;
-    color: white;
-}
 
 a[href] {
-    color: #2a67eb;
+    color: $link-color;
     text-decoration: underline;
-}
-[theme="dark"] a[href] {
-    color: #6d9bff;
 }
 a:active, a:focus {
     outline: none;
@@ -58,11 +51,8 @@ a:active, a:focus {
 .header {
     position: relative;
     padding: 8px 20px;
-    background-color: #fcfcfc;
+    background-color: $ui-secondary;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-[theme="dark"] .header {
-    background-color: #222222;
 }
 @media (max-width: 700px) {
     .header {
@@ -77,9 +67,9 @@ a:active, a:focus {
 }
 
 .button {
-    color: #000;
-    background: #efefef;
-    border: 1px solid #acacac;
+    color: inherit;
+    background: $ui-secondary;
+    border: 1px solid $ui-black-transparent;
     padding: 8px 12px;
     border-radius: 4px;
     outline: none;
@@ -91,16 +81,8 @@ a:active, a:focus {
     display: flex;
     align-items: center;
 }
-[theme="dark"] .button {
-    color: #fff;
-    background: #222222;
-    border-color: #000;
-}
 .button:hover {
-    background: #aaaaaa;
-}
-[theme="dark"] .button:hover {
-    background: #151515;
+    background: $ui-tertiary;
 }
 .button:active, .button:focus-within {
     box-shadow: 0 0 0 3px $looks-transparent;
@@ -108,9 +90,8 @@ a:active, a:focus {
 
 .search-container {
     display: flex;
-    background-color: #f0f0f0;
-    color: #222;
-    border: 1px solid #cecece;
+    background-color: $ui-secondary;
+    border: 1px solid $ui-black-transparent;
     border-radius: 4px;
 }
 .search-container:focus-within {
@@ -141,19 +122,14 @@ a:active, a:focus {
     background-repeat: no-repeat;
     background-position: center;
 }
-[theme="dark"] .search-container {
-    color: white;
-    background-color: #111111;
-    border-color: #222222;
-}
 .search-input:not([value=""]) ~ .search-button {
     background-image: url("./icons/clear.svg") !important;
 }
 
 .feedback-button-outer {
-    background: #f0f0f0;
-    border: 1px solid #cecece;
-    color: #333 !important;
+    background: $ui-secondary;
+    border: 1px solid $ui-black-transparent;
+    color: inherit !important; /* override <a> colors */
     height: 36px;
     box-sizing: border-box;
     border-radius: 4px;
@@ -165,10 +141,6 @@ a:active, a:focus {
     align-items: center;
     text-decoration: none !important;
 }
-[theme="dark"] .feedback-button-outer {
-    background-color: white;
-    border-color: white;
-}
 .feedback-button-outer:active, .feedback-button-outer:focus-within {
     box-shadow: 0 0 0 3px $looks-transparent;
 }
@@ -176,14 +148,6 @@ a:active, a:focus {
     text-decoration: none;
     font-weight: bold;
     text-align: center;
-}
-
-[theme="dark"] .search-button,
-[theme="dark"] .addon-group-expand,
-[theme="dark"] .extension-image,
-[theme="dark"] .reset-button img,
-[theme="dark"] .reset-setting-button img {
-    filter: invert(100%);
 }
 
 .addons {
@@ -212,12 +176,9 @@ a:active, a:focus {
 .addon-group-name::after {
     margin-left: 16px;
     content: '';
-    border-top: 1px solid #cfcfcf;
+    border-top: 1px solid $ui-black-transparent;
     width: 100px;
     flex: 1;
-}
-[theme="dark"] .addon-group-name::after {
-    border-color: #333;
 }
 .addon-group-expand {
     width: 24px;
@@ -233,22 +194,15 @@ a:active, a:focus {
 }
 
 .addon {
-    background: #f7f7f7;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    border: 1px solid #cfcfcf;
+    box-shadow: 0 2px 5px $ui-black-transparent;
+    border: 1px solid $ui-black-transparent;
     border-radius: 5px;
     margin: 10px 0 10px 0;
     font-size: 14px;
+    /* TODO background */
 }
 .addon-dirty {
-    background: #ffeedf;
-}
-[theme="dark"] .addon {
-    background-color: #2a2a2a;
-    border-color: #333;
-}
-[theme="dark"] .addon-dirty {
-    background: rgb(39, 50, 53);
+    /* TODO background */
 }
 
 .addon-header {
@@ -281,8 +235,8 @@ a:active, a:focus {
 }
 
 .inline-description {
+    opacity: 0.7;
     margin-left: 10px;
-    color: gray;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -303,7 +257,7 @@ a:active, a:focus {
     background-color: transparent;
 }
 .reset-button:hover {
-    background: rgba(0, 0, 0, 0.05);
+    background: $ui-black-transparent;
 }
 .reset-button:active, .reset-button:focus-within {
     outline: none;
@@ -313,9 +267,6 @@ a:active, a:focus {
     padding: 1px 0;
     height: 16px;
     width: 16px;
-}
-[theme="dark"] .reset-button:hover {
-    background: rgba(255, 255, 255, 0.05);
 }
 
 .switch {
@@ -408,10 +359,6 @@ a:active, a:focus {
 .addon-details {
     padding: 0 20px;
     margin-bottom: 10px;
-    color: #111;
-}
-[theme="dark"] .addon-details {
-    color: #ddd;
 }
 
 .credit-container {
@@ -573,10 +520,7 @@ a:active, a:focus {
 }
 
 .footer {
-    color: #444;
-}
-[theme="dark"] .footer {
-    color: #aaa;
+    opacity: 0.8;
 }
 
 .unsupported-container {

@@ -150,10 +150,18 @@ class Blocks extends React.Component {
         Msg.PROCEDURES_TO_STATEMENT = this.props.intl.formatMessage(messages.PROCEDURES_TO_STATEMENT);
         Msg.PROCEDURES_DOCS = this.props.intl.formatMessage(messages.PROCEDURES_DOCS);
 
+        console.log(getColorsForTheme(this.props.theme).gridColor);
         const workspaceConfig = defaultsDeep({},
-            Blocks.defaultOptions,
             this.props.options,
-            {rtl: this.props.isRtl, toolbox: this.props.toolboxXML, colours: getColorsForTheme(this.props.theme)}
+            {
+                rtl: this.props.isRtl,
+                toolbox: this.props.toolboxXML,
+                colours: getColorsForTheme(this.props.theme),
+                grid: {
+                    colour: getColorsForTheme(this.props.theme).gridColor
+                }
+            },
+            Blocks.defaultOptions
         );
         this.workspace = this.ScratchBlocks.inject(this.blocks, workspaceConfig);
         AddonHooks.blocklyWorkspace = this.workspace;

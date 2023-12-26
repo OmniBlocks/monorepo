@@ -222,6 +222,7 @@ class Interface extends React.Component {
                         <WrappedMenuBar
                             canChangeLanguage
                             canManageFiles
+                            canChangeTheme
                             enableSeeInside
                             onClickAddonSettings={handleClickAddonSettings}
                             onClickTheme={onClickTheme}

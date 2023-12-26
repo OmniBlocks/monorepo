@@ -1,10 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {connect} from 'react-redux';
-import BrowserModalComponent from '../components/browser-modal/browser-modal.jsx';
 import CrashMessageComponent from '../components/crash-message/crash-message.jsx';
 import log from '../lib/log.js';
-import {recommendedBrowser} from '../lib/supported-browser';
 
 class ErrorBoundary extends React.Component {
     constructor (props) {
@@ -21,6 +18,7 @@ class ErrorBoundary extends React.Component {
      * @param {React.ErrorInfo} errorInfo - the React error info associated with the error.
      */
     componentDidCatch (error, errorInfo) {
+        // Error object may be undefined (IE?)
         error = error || {
             stack: 'Unknown stack',
             message: 'Unknown error'
@@ -53,20 +51,37 @@ class ErrorBoundary extends React.Component {
         window.location.replace(window.location.origin + window.location.pathname);
     }
 
+    formatErrorMessage () {
+        let message = '';
+
+        if (this.state.error) {
+            message += `${this.state.error}`;
+        } else {
+            message += 'Unknown error';
+        }
+
+        if (this.state.errorInfo) {
+            const firstCoupleLines = this.state
+                .errorInfo
+                .componentStack
+                .trim()
+                .split('\n')
+                .slice(0, 2)
+                .map(i => i.trim());
+            message += `\nComponent stack: ${firstCoupleLines.join(' ')} ...`;
+        }
+
+        return message;
+    }
+
     render () {
         if (this.state.error) {
-            if (recommendedBrowser()) {
-                return (
-                    <CrashMessageComponent
-                        onReload={this.handleReload}
-                    />
-                );
-            }
-            return (<BrowserModalComponent
-                error
-                isRtl={this.props.isRtl}
-                onBack={this.handleBack}
-            />);
+            return (
+                <CrashMessageComponent
+                    errorMessage={this.formatErrorMessage()}
+                    onReload={this.handleReload}
+                />
+            );
         }
         return this.props.children;
     }
@@ -74,15 +89,7 @@ class ErrorBoundary extends React.Component {
 
 ErrorBoundary.propTypes = {
     action: PropTypes.string.isRequired, // Used for defining tracking action
-    children: PropTypes.node,
-    isRtl: PropTypes.bool
+    children: PropTypes.node
 };
 
-const mapStateToProps = state => ({
-    isRtl: state.locales.isRtl
-});
-
-// no-op function to prevent dispatch prop being passed to component
-const mapDispatchToProps = () => ({});
-
-export default connect(mapStateToProps, mapDispatchToProps)(ErrorBoundary);
+export default ErrorBoundary;

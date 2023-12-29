@@ -79,7 +79,7 @@ const themeMap = {
         blocksMediaFolder: 'blocks-media/default',
         colors: mergeWithDefaultBlocks(twDarkBlockColors),
         extensions: darkModeExtensions,
-        guiColors: defaultsDeep({}, twDarkGuiColors, darkModeGuiColors, defaultGuiColors),
+        guiColors: defaultsDeep({}, twDarkGuiColors, darkModeGuiColors, twLightGuiColors, defaultGuiColors),
         label: messages[TW_DARK_THEME],
         icon: twDarkIcon
     },

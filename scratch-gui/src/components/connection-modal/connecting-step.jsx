@@ -19,10 +19,12 @@ const ConnectingStep = props => (
                     <img
                         className={styles.peripheralActivityIcon}
                         src={props.connectionIconURL}
+                        draggable={false}
                     />
                     <img
                         className={styles.bluetoothConnectingIcon}
                         src={bluetoothIcon}
+                        draggable={false}
                     />
                 </div>
             </Box>
@@ -54,6 +56,7 @@ const ConnectingStep = props => (
                     <img
                         className={styles.abortConnectingIcon}
                         src={closeIcon}
+                        draggable={false}
                     />
                 </button>
             </div>

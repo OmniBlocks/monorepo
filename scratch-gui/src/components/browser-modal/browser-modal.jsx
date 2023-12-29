@@ -30,7 +30,10 @@ const BrowserModal = ({intl, ...props}) => {
         >
             <div dir={props.isRtl ? 'rtl' : 'ltr'} >
                 <Box className={styles.illustration}>
-                    <img src={unhappyBrowser} />
+                    <img
+                        src={unhappyBrowser}
+                        draggable={false}
+                    />
                 </Box>
 
                 <Box className={styles.body}>

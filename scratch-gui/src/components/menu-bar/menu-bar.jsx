@@ -494,7 +494,10 @@ class MenuBar extends React.Component {
                                 })}
                                 onMouseUp={this.props.onClickFile}
                             >
-                                <img src={fileIcon} />
+                                <img
+                                    src={fileIcon}
+                                    draggable={false}
+                                />
                                 <span className={styles.collapsibleLabel}>
                                     <FormattedMessage
                                         defaultMessage="File"
@@ -502,7 +505,10 @@ class MenuBar extends React.Component {
                                         id="gui.menuBar.file"
                                     />
                                 </span>
-                                <img src={dropdownCaret} />
+                                <img
+                                    src={dropdownCaret}
+                                    draggable={false}
+                                />
                                 <MenuBarMenu
                                     className={classNames(styles.menuBarMenu)}
                                     open={this.props.fileMenuOpen}
@@ -637,7 +643,10 @@ class MenuBar extends React.Component {
                             })}
                             onMouseUp={this.props.onClickEdit}
                         >
-                            <img src={editIcon} />
+                            <img
+                                src={editIcon}
+                                draggable={false}
+                            />
                             <span className={styles.collapsibleLabel}>
                                 <FormattedMessage
                                     defaultMessage="Edit"
@@ -645,7 +654,10 @@ class MenuBar extends React.Component {
                                     id="gui.menuBar.edit"
                                 />
                             </span>
-                            <img src={dropdownCaret} />
+                            <img
+                                src={dropdownCaret}
+                                draggable={false}
+                            />
                             <MenuBarMenu
                                 className={classNames(styles.menuBarMenu)}
                                 open={this.props.editMenuOpen}
@@ -799,7 +811,10 @@ class MenuBar extends React.Component {
                                 className={classNames(styles.menuBarItem, styles.hoverable)}
                                 onMouseUp={this.props.onClickAddonSettings}
                             >
-                                <img src={addonsIcon} />
+                                <img
+                                    src={addonsIcon}
+                                    draggable={false}
+                                />
                                 <span className={styles.collapsibleLabel}>
                                     <FormattedMessage
                                         defaultMessage="Addons"

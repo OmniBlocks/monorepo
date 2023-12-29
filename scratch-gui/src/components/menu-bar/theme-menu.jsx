@@ -31,10 +31,12 @@ const ThemeMenuItem = props => {
                 <img
                     className={classNames(styles.check, {[styles.selected]: props.isSelected})}
                     src={check}
+                    draggable={false}
                 />
                 <img
                     className={styles.icon}
                     src={themeInfo.icon}
+                    draggable={false}
                 />
                 <FormattedMessage {...themeInfo.label} />
             </div>
@@ -72,6 +74,7 @@ const ThemeMenu = ({
                 <img
                     src={themeInfo.icon}
                     style={{width: 24}}
+                    draggable={false}
                 />
                 <span className={styles.submenuLabel}>
                     <FormattedMessage
@@ -83,6 +86,7 @@ const ThemeMenu = ({
                 <img
                     className={styles.expandCaret}
                     src={dropdownCaret}
+                    draggable={false}
                 />
             </div>
             <Submenu place={isRtl ? 'left' : 'right'}>

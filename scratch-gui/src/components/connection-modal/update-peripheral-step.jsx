@@ -82,6 +82,7 @@ class UpdatePeripheralStep extends React.Component {
                     <img
                         className={styles.helpStepImage}
                         src={this.props.connectionSmallIconURL}
+                        draggable={false}
                     />
                     {
                         // The instructions for getting the peripheral ready for the update process will vary
@@ -104,6 +105,7 @@ class UpdatePeripheralStep extends React.Component {
                     <img
                         className={styles.helpStepImage}
                         src={sendUpdateIcon}
+                        draggable={false}
                     />
                     <FormattedMessage
                         defaultMessage="Press &quot;Do Update&quot; and allow the update to complete."
@@ -212,6 +214,7 @@ class UpdatePeripheralStep extends React.Component {
                                 <img
                                     className={classNames(styles.buttonIconLeft, styles.buttonIconBack)}
                                     src={backIcon}
+                                    draggable={false}
                                 />
                                 <FormattedMessage
                                     defaultMessage="Go Back"
@@ -241,6 +244,7 @@ class UpdatePeripheralStep extends React.Component {
                                     <img
                                         className={styles.buttonIconRight}
                                         src={sendUpdateGlyph}
+                                        draggable={false}
                                     />
                                 </button>
                             }

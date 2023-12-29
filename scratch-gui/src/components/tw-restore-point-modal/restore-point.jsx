@@ -91,6 +91,7 @@ class RestorePoint extends React.Component {
                         <img
                             className={styles.thumbnailImage}
                             src={this.state.thumbnail}
+                            draggable={false}
                         />
                     ) : null}
                 </div>

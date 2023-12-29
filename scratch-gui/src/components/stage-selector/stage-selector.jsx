@@ -84,6 +84,7 @@ const StageSelector = props => {
                 <img
                     className={styles.costumeCanvas}
                     src={url}
+                    draggable={false}
                 />
             ) : null}
             <div className={styles.label}>

@@ -29,6 +29,7 @@ const ToggleButtons = ({buttons, className, disabled}) => (
                     src={button.icon}
                     aria-hidden="true"
                     className={button.iconClassName}
+                    draggable={false}
                 />
             </button>
         ))}

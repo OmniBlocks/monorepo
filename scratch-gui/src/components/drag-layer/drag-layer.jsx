@@ -14,6 +14,7 @@ const DragLayer = ({dragging, img, currentOffset}) => (dragging ? (
             <img
                 className={styles.image}
                 src={img}
+                draggable={false}
             />
         </div>
     </div>

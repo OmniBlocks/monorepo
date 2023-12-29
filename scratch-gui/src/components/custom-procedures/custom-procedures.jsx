@@ -39,6 +39,7 @@ const CustomProcedures = props => (
                     <img
                         className={styles.optionIcon}
                         src={textInputIcon}
+                        draggable={false}
                     />
                     <div className={styles.optionTitle}>
                         <FormattedMessage
@@ -64,6 +65,7 @@ const CustomProcedures = props => (
                     <img
                         className={styles.optionIcon}
                         src={booleanInputIcon}
+                        draggable={false}
                     />
                     <div className={styles.optionTitle}>
                         <FormattedMessage
@@ -89,6 +91,7 @@ const CustomProcedures = props => (
                     <img
                         className={styles.optionIcon}
                         src={labelIcon}
+                        draggable={false}
                     />
                     <div className={styles.optionTitle}>
                         <FormattedMessage

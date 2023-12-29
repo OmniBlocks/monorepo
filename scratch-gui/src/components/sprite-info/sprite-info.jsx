@@ -111,6 +111,7 @@ class SpriteInfo extends React.Component {
                                 aria-hidden="true"
                                 className={classNames(styles.xIcon, styles.icon)}
                                 src={xIcon}
+                                draggable={false}
                             />
                         </div> :
                         null
@@ -138,6 +139,7 @@ class SpriteInfo extends React.Component {
                                 aria-hidden="true"
                                 className={classNames(styles.yIcon, styles.icon)}
                                 src={yIcon}
+                                draggable={false}
                             />
                         </div> :
                         null

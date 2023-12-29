@@ -157,14 +157,17 @@ class LoaderComponent extends React.Component {
                         <img
                             className={styles.topBlock}
                             src={topBlock}
+                            draggable={false}
                         />
                         <img
                             className={styles.middleBlock}
                             src={middleBlock}
+                            draggable={false}
                         />
                         <img
                             className={styles.bottomBlock}
                             src={bottomBlock}
+                            draggable={false}
                         />
                     </div>
                     <div className={styles.title}>

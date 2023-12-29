@@ -48,6 +48,7 @@ class PrehistoricMode extends React.Component {
                         top: `${this.state.y - 220}px`
                     }}
                     src={torch}
+                    draggable={false}
                 />
             </div>
         );

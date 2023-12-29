@@ -46,6 +46,7 @@ const AlertComponent = ({
                     <img
                         className={styles.alertIcon}
                         src={iconURL}
+                        draggable={false}
                     />
                 )}
             </div>

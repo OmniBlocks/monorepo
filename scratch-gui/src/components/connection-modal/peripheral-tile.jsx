@@ -24,6 +24,7 @@ class PeripheralTile extends React.Component {
                     <img
                         className={styles.peripheralTileImage}
                         src={this.props.connectionSmallIconURL}
+                        draggable={false}
                     />
                     <Box className={styles.peripheralTileNameWrapper}>
                         <Box className={styles.peripheralTileNameLabel}>

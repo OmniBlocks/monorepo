@@ -26,6 +26,7 @@ const ScanningStep = props => {
                             <img
                                 className={classNames(styles.radarSmall, styles.radarSpin)}
                                 src={radarIcon}
+                                draggable={false}
                             />
                             <FormattedMessage
                                 defaultMessage="Looking for devices"
@@ -53,6 +54,7 @@ const ScanningStep = props => {
                     <img
                         className={styles.helpStepImage}
                         src={warningIcon}
+                        draggable={false}
                     />
                     <FormattedMessage
                         className={styles.helpStepText}
@@ -102,6 +104,7 @@ const ScanningStep = props => {
                     <img
                         className={styles.buttonIconRight}
                         src={refreshIcon}
+                        draggable={false}
                     />
                 </button>
                 {showUpdate && (
@@ -117,6 +120,7 @@ const ScanningStep = props => {
                         <img
                             className={styles.buttonIconRight}
                             src={enterUpdateIcon}
+                            draggable={false}
                         />
                     </button>
                 )}

@@ -24,6 +24,7 @@ const UnavailableStep = props => (
                         <img
                             className={styles.scratchLinkIcon}
                             src={scratchLinkIcon}
+                            draggable={false}
                         />
                     </div>
                     <div className={styles.helpStepText}>
@@ -42,6 +43,7 @@ const UnavailableStep = props => (
                         <img
                             className={styles.scratchLinkIcon}
                             src={bluetoothIcon}
+                            draggable={false}
                         />
                     </div>
                     <div className={styles.helpStepText}>
@@ -68,6 +70,7 @@ const UnavailableStep = props => (
                     <img
                         className={classNames(styles.buttonIconLeft, styles.buttonIconBack)}
                         src={backIcon}
+                        draggable={false}
                     />
                     <FormattedMessage
                         defaultMessage="Try again"
@@ -82,6 +85,7 @@ const UnavailableStep = props => (
                     <img
                         className={styles.buttonIconLeft}
                         src={helpIcon}
+                        draggable={false}
                     />
                     <FormattedMessage
                         defaultMessage="Help"

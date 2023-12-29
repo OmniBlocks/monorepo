@@ -39,10 +39,12 @@ const AutoScanningStep = props => {
                             <img
                                 className={styles.radarBig}
                                 src={radarIcon}
+                                draggable={false}
                             />
                             <img
                                 className={styles.bluetoothCenteredIcon}
                                 src={bluetoothIcon}
+                                draggable={false}
                             />
                         </React.Fragment>
                     )}
@@ -51,10 +53,12 @@ const AutoScanningStep = props => {
                             <img
                                 className={classNames(styles.radarBig, styles.radarSpin)}
                                 src={radarIcon}
+                                draggable={false}
                             />
                             <img
                                 className={styles.connectionTipIcon}
                                 src={props.connectionTipIconURL}
+                                draggable={false}
                             />
                         </React.Fragment>
                     )}
@@ -63,6 +67,7 @@ const AutoScanningStep = props => {
                             <img
                                 className={styles.helpStepImage}
                                 src={warningIcon}
+                                draggable={false}
                             />
                             <FormattedMessage
                                 className={styles.helpStepText}
@@ -138,6 +143,7 @@ const AutoScanningStep = props => {
                             <img
                                 className={styles.abortConnectingIcon}
                                 src={closeIcon}
+                                draggable={false}
                             />
                         </button>
                     </div>
@@ -150,6 +156,7 @@ const AutoScanningStep = props => {
                         <img
                             className={styles.buttonIconLeft}
                             src={backIcon}
+                            draggable={false}
                         />
                         <FormattedMessage
                             defaultMessage="Try again"
@@ -171,6 +178,7 @@ const AutoScanningStep = props => {
                         <img
                             className={styles.buttonIconRight}
                             src={enterUpdateIcon}
+                            draggable={false}
                         />
                     </button>
                 )}

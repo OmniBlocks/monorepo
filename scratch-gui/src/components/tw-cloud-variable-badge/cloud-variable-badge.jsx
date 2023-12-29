@@ -32,6 +32,7 @@ const CloudVariableBadge = props => {
                     alt=""
                     width={32}
                     height={32}
+                    draggable={false}
                 />
                 <FormattedMessage
                     // eslint-disable-next-line max-len

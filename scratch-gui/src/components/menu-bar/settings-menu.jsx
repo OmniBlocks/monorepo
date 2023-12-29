@@ -30,6 +30,7 @@ const SettingsMenu = ({
     >
         <img
             src={settingsIcon}
+            draggable={false}
         />
         <span className={styles.dropdownLabel}>
             <FormattedMessage
@@ -38,7 +39,10 @@ const SettingsMenu = ({
                 id="gui.menuBar.settings"
             />
         </span>
-        <img src={dropdownCaret} />
+        <img
+            src={dropdownCaret}
+            draggable={false}
+        />
         <MenuBarMenu
             className={menuBarStyles.menuBarMenu}
             open={settingsMenuOpen}

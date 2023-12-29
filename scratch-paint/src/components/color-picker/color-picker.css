@@ -7,6 +7,9 @@
 body :global(.Popover) {
     /* should be above menu bar */
     z-index: 500;
+
+    /* color-scheme: dark causes very strange issues */
+    color-scheme: light;
 }
 
 :global(.Popover-body) {

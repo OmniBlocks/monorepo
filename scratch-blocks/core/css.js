@@ -768,6 +768,7 @@ Blockly.Css.CONTENT = [
 
   '.blocklyZoom>image {',
     'opacity: 1;',
+    'filter: $colour_zoomIconFilter;',
   '}',
 
   /* Darken flyout scrollbars due to being on a grey background. */

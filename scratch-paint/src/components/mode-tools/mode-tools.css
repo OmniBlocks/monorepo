@@ -1,5 +1,6 @@
 @import "../../css/colors.css";
 @import "../../css/units.css";
+@import "../../css/filters.css";
 
 .mode-tools {
     display: flex;
@@ -11,6 +12,7 @@
     margin-right: calc(2 * $grid-unit);
     width: 2rem;
     height: 2rem;
+    filter: $filter-icon-gray;
 }
 
 [dir="ltr"] .mod-dashed-border {

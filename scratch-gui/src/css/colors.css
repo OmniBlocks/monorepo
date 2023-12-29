@@ -58,6 +58,8 @@ $menu-bar-foreground: var(--menu-bar-foreground);
 
 $assets-background: var(--assets-background);
 
+$input-background: var(--input-background);
+
 $page-background: var(--page-background);
 $page-foreground: var(--page-foreground);
 

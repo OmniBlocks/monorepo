@@ -9,6 +9,7 @@
     font-size: 0.625rem;
     font-weight: bold;
     color: $text-primary;
+    background-color: $input-background;
 
     border-width: 1px;
     border-style: solid;

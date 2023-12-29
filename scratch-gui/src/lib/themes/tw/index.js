@@ -60,10 +60,14 @@ const darkGuiColors = {
 
     'assets-background': '#111111',
 
+    'input-background': '#1e1e1e',
+
     'page-background': '#111111',
     'page-foreground': '#eeeeee',
 
-    'link-color': '#44aaff'
+    'link-color': '#44aaff',
+
+    'paint-popover-background': '#333333'
 };
 
 export {

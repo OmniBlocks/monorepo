@@ -175,10 +175,20 @@ const guiColors = {
 
     'assets-background': '#ffffff',
 
+    'input-background': '#ffffff',
+
     'page-background': '#ffffff',
     'page-foreground': '#000000',
 
-    'link-color': '#2255dd'
+    'link-color': '#2255dd',
+
+    'paint-ui-pane-border': 'var(--ui-black-transparent)',
+    'paint-text-primary': 'var(--text-primary)',
+    'paint-form-border': 'var(--ui-black-transparent)',
+    'paint-looks-secondary': 'var(--looks-secondary)',
+    'paint-looks-transparent': 'var(--looks-transparent)',
+    'paint-input-background': 'var(--input-background)',
+    'paint-popover-background': '#ffffff'
 };
 
 export {

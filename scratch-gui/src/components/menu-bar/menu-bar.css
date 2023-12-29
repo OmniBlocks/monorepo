@@ -99,7 +99,7 @@
 }
 
 .feedback-link {
-    color: $looks-secondary;
+    color: $menu-bar-background;
     text-decoration: none;
 }
 

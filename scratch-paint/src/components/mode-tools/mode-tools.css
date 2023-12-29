@@ -12,9 +12,6 @@
     width: 2rem;
     height: 2rem;
 }
-[theme="dark"] .mode-tools-icon {
-    filter: brightness(1.7);
-}
 
 [dir="ltr"] .mod-dashed-border {
     border-right: 1px dashed $ui-pane-border;

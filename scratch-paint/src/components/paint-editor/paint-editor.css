@@ -8,9 +8,6 @@
     flex-direction: column;
     padding: calc(3 * $grid-unit);
 }
-[theme="dark"] .editor-container {
-    color-scheme: dark;
-}
 
 .row {
     display: flex;
@@ -108,9 +105,6 @@ $border-radius: 0.25rem;
     height: 1.25rem;
     vertical-align: middle;
 }
-[theme="dark"] .button-group-button-icon {
-    filter: brightness(1.7);
-}
 
 .mod-mode-tools {
     margin-left: calc(2 * $grid-unit);
@@ -137,13 +131,10 @@ $border-radius: 0.25rem;
     width: 100%;
     flex-grow: 1;
     min-width: 402px; /* Leave room for the border */
-    border: 1px solid #e8edf1;
+    border: 1px solid $ui-pane-border;
     border-radius: .25rem;
     position: relative;
     overflow: visible;
-}
-[theme="dark"] .canvas-container {
-    border-color: $form-border;
 }
 
 .mode-selector {

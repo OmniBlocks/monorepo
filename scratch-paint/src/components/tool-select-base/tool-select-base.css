@@ -29,9 +29,6 @@ img.tool-select-icon {
     flex-grow: 1;
     vertical-align: middle;
 }
-[theme="dark"] img.tool-select-icon {
-    filter: brightness(1.7);
-}
 
 .mod-tool-select.is-selected .tool-select-icon {
     /* Make the tool icons white while selected by making them black and inverting */

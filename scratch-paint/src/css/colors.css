@@ -24,3 +24,5 @@ $data-primary: #FF8C1A;
 $form-border: var(--paint-form-border, #E9EEF2);
 
 $input-background: var(--paint-input-background, #FFFFFF);
+
+$popover-background: var(--paint-popover-background, #FFFFFF);

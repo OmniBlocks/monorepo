@@ -13,7 +13,7 @@ $library-header-height: 3.125rem;
 $library-filter-bar-height: 2.5rem;
 
 $stage-standard-border-width: 0.0625rem;
-$stage-full-screen-border-width: 0.1875rem;
+$stage-full-screen-border-width: 0.0625rem;
 $stage-full-screen-stage-padding: 0.1875rem;
 
 $form-radius: calc($space / 2);

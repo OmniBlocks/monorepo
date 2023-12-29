@@ -16,6 +16,11 @@ import {
 import {openUsernameModal} from '../reducers/modals';
 import {setUsernameInvalid, setCloudHost} from '../reducers/tw';
 
+/**
+ * TW: Our scratch-vm has an alternative fix to the cloud variable and video sensing privacy concerns.
+ */
+const DISABLE_WITH_VIDEO_SENSING = false;
+
 /*
  * Higher Order Component to manage the connection to the cloud server.
  * @param {React.Component} WrappedComponent component to manage VM events for
@@ -132,7 +137,7 @@ const cloudManagerHOC = function (WrappedComponent) {
         handleExtensionAdded (categoryInfo) {
             // Note that props.vm.extensionManager.isExtensionLoaded('videoSensing') is still false
             // at the point of this callback, so it is difficult to reuse the canModifyCloudData logic.
-            if (categoryInfo.id === 'videoSensing' && this.isConnected()) {
+            if (DISABLE_WITH_VIDEO_SENSING && categoryInfo.id === 'videoSensing' && this.isConnected()) {
                 this.disconnectFromCloud();
             }
         }

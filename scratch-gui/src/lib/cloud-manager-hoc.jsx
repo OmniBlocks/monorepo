@@ -67,6 +67,7 @@ const cloudManagerHOC = function (WrappedComponent) {
         }
         componentWillUnmount () {
             this.props.vm.off('HAS_CLOUD_DATA_UPDATE', this.handleCloudDataUpdate);
+            this.props.vm.off('EXTENSION_ADDED', this.handleExtensionAdded);
             this.disconnectFromCloud();
         }
         canUseCloud (props) {

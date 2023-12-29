@@ -13,6 +13,7 @@ const postcssVars = require('postcss-simple-vars');
 const postcssImport = require('postcss-import');
 
 const STATIC_PATH = process.env.STATIC_PATH || '/static';
+const {APP_NAME} = require('./src/lib/brand');
 
 let root = process.env.ROOT || '';
 if (root.length > 0 && !root.endsWith('/')) {
@@ -21,7 +22,8 @@ if (root.length > 0 && !root.endsWith('/')) {
 
 const htmlWebpackPluginCommon = {
     root: root,
-    meta: JSON.parse(process.env.EXTRA_META || '{}')
+    meta: JSON.parse(process.env.EXTRA_META || '{}'),
+    APP_NAME
 };
 
 const base = {
@@ -186,28 +188,28 @@ module.exports = [
                 chunks: ['editor'],
                 template: 'src/playground/index.ejs',
                 filename: 'editor.html',
-                title: 'TurboWarp - Run Scratch projects faster',
+                title: `${APP_NAME} - Run Scratch projects faster`,
                 ...htmlWebpackPluginCommon
             }),
             new HtmlWebpackPlugin({
                 chunks: ['player'],
                 template: 'src/playground/index.ejs',
                 filename: 'index.html',
-                title: 'TurboWarp - Run Scratch projects faster',
+                title: `${APP_NAME} - Run Scratch projects faster`,
                 ...htmlWebpackPluginCommon
             }),
             new HtmlWebpackPlugin({
                 chunks: ['fullscreen'],
                 template: 'src/playground/index.ejs',
                 filename: 'fullscreen.html',
-                title: 'TurboWarp - Run Scratch projects faster',
+                title: `${APP_NAME} - Run Scratch projects faster`,
                 ...htmlWebpackPluginCommon
             }),
             new HtmlWebpackPlugin({
                 chunks: ['embed'],
                 template: 'src/playground/index.ejs',
                 filename: 'embed.html',
-                title: 'Embedded Project - TurboWarp',
+                title: `Embedded Project - ${APP_NAME}`,
                 noTheme: true,
                 ...htmlWebpackPluginCommon
             }),
@@ -215,14 +217,14 @@ module.exports = [
                 chunks: ['addon-settings'],
                 template: 'src/playground/simple.ejs',
                 filename: 'addons.html',
-                title: 'Addon Settings - TurboWarp',
+                title: `Addon Settings - ${APP_NAME}`,
                 ...htmlWebpackPluginCommon
             }),
             new HtmlWebpackPlugin({
                 chunks: ['credits'],
                 template: 'src/playground/simple.ejs',
                 filename: 'credits.html',
-                title: 'TurboWarp Credits',
+                title: `${APP_NAME} Credits`,
                 noSplash: true,
                 ...htmlWebpackPluginCommon
             }),

@@ -10,10 +10,6 @@ body {
     padding: 0;
     background: white;
 }
-body[theme="dark"] {
-    background-color: #111;
-    color: #eee;
-}
 
 a {
     color: blue;

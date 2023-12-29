@@ -36,6 +36,7 @@ import TWFancyCheckbox from '../../components/tw-fancy-checkbox/checkbox.jsx';
 import styles from './settings.css';
 import {detectTheme} from '../../lib/themes/themePersistance.js';
 import {applyGuiColors} from '../../lib/themes/guiHelpers.js';
+import {APP_NAME} from '../../lib/brand.js';
 import '../polyfill';
 import '../../lib/normalize.css';
 
@@ -57,7 +58,7 @@ if (locale !== 'en') {
     }
 }
 
-document.title = `${settingsTranslations.title} - TurboWarp`;
+document.title = `${settingsTranslations.title} - ${APP_NAME}`;
 applyGuiColors(detectTheme());
 
 let _throttleTimeout;

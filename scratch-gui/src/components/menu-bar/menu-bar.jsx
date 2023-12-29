@@ -98,7 +98,8 @@ import oldtimeyLogo from './oldtimey-logo.svg';
 import sharedMessages from '../../lib/shared-messages';
 
 import SeeInsideButton from './tw-see-inside.jsx';
-import { notScratchDesktop } from '../../lib/isScratchDesktop.js';
+import {notScratchDesktop} from '../../lib/isScratchDesktop.js';
+import {APP_NAME} from '../../lib/brand.js';
 
 const ariaMessages = defineMessages({
     tutorials: {
@@ -898,9 +899,12 @@ class MenuBar extends React.Component {
                             {/* todo: icon */}
                             <Button className={styles.feedbackButton}>
                                 <FormattedMessage
-                                    defaultMessage="TurboWarp Feedback"
+                                    defaultMessage="{APP_NAME} Feedback"
                                     description="Button to give feedback in the menu bar"
                                     id="tw.feedbackButton"
+                                    values={{
+                                        APP_NAME
+                                    }}
                                 />
                             </Button>
                         </a>

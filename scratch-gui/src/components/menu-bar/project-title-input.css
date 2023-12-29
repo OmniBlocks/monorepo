@@ -20,7 +20,7 @@ can set a width for example or what it should do in a flex box (eg. grow).
 }
 
 .title-field {
-    color: $ui-white;
+    color: $menu-bar-foreground;
     font-weight: bold;
     font-size: .8rem;
 }
@@ -34,6 +34,7 @@ can set a width for example or what it should do in a flex box (eg. grow).
 
 .title-field:hover {
     background-color: hsla(0, 100%, 100%, 0.5);
+    border-color: $ui-tertiary;
 }
 
 .title-field:focus {

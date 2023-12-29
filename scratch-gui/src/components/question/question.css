@@ -1,9 +1,10 @@
 @import "../../css/units.css";
 @import "../../css/colors.css";
+@import "../../css/default-colors.css";
 
 .question-container {
     margin: $space;
-    border: 1px solid $ui-black-transparent;
+    border: 1px solid $ui-black-transparent-default;
     border-radius: $space;
     border-width: 2px;
     padding: 1rem;
@@ -49,6 +50,10 @@
 .question-input > input {
     width: 100%;
     font-weight: normal;
+
+    /* override dark mode */
+    background-color: $input-background-default;
+    color: $text-primary-default;
 }
 
 [dir="ltr"] .question-input > input {

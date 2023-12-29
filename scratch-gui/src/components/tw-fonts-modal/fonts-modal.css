@@ -7,7 +7,7 @@
 }
 
 .body {
-    background: $ui-white;
+    background: $ui-modal-background;
     padding: 1.5rem 2.25rem;
     max-height: calc(100vh - 150px);
     overflow: auto;
@@ -77,6 +77,8 @@
     padding: 0 1rem;
     height: 3rem;
     font: inherit;
+    color: $text-primary;
+    background-color: $input-background;
 }
 
 .font-dropdown-outer {

@@ -6,7 +6,7 @@
 }
 
 .body {
-    background: $ui-white;
+    background: $ui-modal-background;
     padding: 1.5rem 2.25rem;
 }
 
@@ -32,6 +32,7 @@
     padding: 0 1rem;
     height: 3rem;
     color: $text-primary-transparent;
+    background-color: $input-background;
     font-size: .875rem;
 }
 

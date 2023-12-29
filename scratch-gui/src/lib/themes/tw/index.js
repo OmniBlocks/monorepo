@@ -10,6 +10,8 @@ const lightGuiColors = {
     'looks-light-transparent': '#ff4d4d26',
     'looks-secondary-dark': 'hsla(0, 42%, 51%, 1)',
 
+    'drop-highlight': '#ff8c8c',
+
     'menu-bar-background': '#ff4c4c'
 };
 
@@ -38,7 +40,17 @@ const darkBlockColors = {
     gridColor: '#484848'
 };
 
-const darkGuiColors = {};
+const darkGuiColors = {
+    'motion-primary': '#ff4c4c',
+    'motion-tertiary': '#cc3333',
+
+    'looks-secondary': '#ff4c4c',
+    'looks-transparent': '#ff4d4d59',
+    'looks-light-transparent': '#ff4d4d26',
+    'looks-secondary-dark': 'hsla(0, 42%, 51%, 1)',
+
+    'drop-highlight': '#ff8c8c'
+};
 
 export {
     lightGuiColors,

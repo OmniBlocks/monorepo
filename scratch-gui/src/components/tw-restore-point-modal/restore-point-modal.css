@@ -6,7 +6,7 @@
 }
 
 .body {
-    background: $ui-white;
+    background: $ui-modal-background;
     padding: 1.5rem 2.25rem;
     max-height: calc(100vh - 150px);
     overflow: auto;
@@ -46,6 +46,7 @@
 .delete-all-button {
     margin-left: 1rem;
     background-color: $data-primary;
+    color: white;
     white-space: nowrap;
 }
 

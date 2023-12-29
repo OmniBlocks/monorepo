@@ -5,7 +5,7 @@
 }
 
 .body {
-    background: $ui-white;
+    background: $ui-modal-background;
     padding: 1.5rem 2.25rem;
     min-height: 150px;
     max-height: calc(100vh - 250px);

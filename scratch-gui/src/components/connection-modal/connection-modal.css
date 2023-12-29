@@ -11,7 +11,7 @@
 }
 
 .body {
-    background: $ui-white;
+    background: $ui-modal-background;
 }
 
 .label {
@@ -365,7 +365,7 @@
 }
 
 .bottom-area {
-    background-color: $ui-white;
+    background-color: $ui-modal-background;
     text-align: center;
     display: flex;
     flex-direction: column;

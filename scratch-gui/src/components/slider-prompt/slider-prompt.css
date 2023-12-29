@@ -6,7 +6,7 @@
 }
 
 .body {
-    background: $ui-white;
+    background: $ui-modal-background;
     padding: 1.5rem 2.25rem;
 }
 
@@ -24,6 +24,7 @@
     height: 3rem;
     color: $text-primary-transparent;
     font-size: .875rem;
+    background-color: $input-background;
 }
 
 .button-row {
@@ -35,6 +36,7 @@
     padding: 0.75rem 1rem;
     border-radius: 0.25rem;
     background: white;
+    color: black;
     border: 1px solid $ui-black-transparent;
     font-weight: 600;
     font-size: 0.85rem;

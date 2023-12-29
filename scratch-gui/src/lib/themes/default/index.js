@@ -177,6 +177,9 @@ const guiColors = {
 
     'input-background': '#ffffff',
 
+    'fullscreen-background': '#ffffff',
+    'fullscreen-accent': '#e8edf1',
+
     'page-background': '#ffffff',
     'page-foreground': '#000000',
 

@@ -8,7 +8,7 @@
 
 .stage-header-wrapper-overlay {
     position: fixed;
-    background-color: rgb(232, 237, 241);
+    background-color: $fullscreen-accent;
     top: 0;
     left: 0;
     right: 0;

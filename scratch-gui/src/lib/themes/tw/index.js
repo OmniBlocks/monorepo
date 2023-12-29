@@ -63,6 +63,9 @@ const darkGuiColors = {
 
     'input-background': '#1e1e1e',
 
+    'fullscreen-background': '#111111',
+    'fullscreen-accent': '#111111',
+
     'page-background': '#111111',
     'page-foreground': '#eeeeee',
 

@@ -60,6 +60,9 @@ $assets-background: var(--assets-background);
 
 $input-background: var(--input-background);
 
+$fullscreen-background: var(--fullscreen-background);
+$fullscreen-accent: var(--fullscreen-accent);
+
 $page-background: var(--page-background);
 $page-foreground: var(--page-foreground);
 

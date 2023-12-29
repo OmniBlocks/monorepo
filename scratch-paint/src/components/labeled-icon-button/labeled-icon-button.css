@@ -1,4 +1,5 @@
 @import "../../css/units.css";
+@import "../../css/filters.css";
 
 $border-radius: 0.25rem;
 
@@ -19,6 +20,10 @@ $border-radius: 0.25rem;
     height: 1.5rem;
     flex-grow: 1;
     vertical-align: middle;
+}
+
+.edit-field-icon.gray {
+    filter: $filter-icon-gray;
 }
 
 .edit-field-title {

@@ -352,7 +352,7 @@ class ColorPickerComponent extends React.Component {
                             onClick={this.props.onActivateEyeDropper}
                         >
                             <img
-                                className={styles.swatchIcon}
+                                className={classNames(styles.swatchIcon, styles.pickerIcon)}
                                 draggable={false}
                                 src={eyeDropperIcon}
                             />

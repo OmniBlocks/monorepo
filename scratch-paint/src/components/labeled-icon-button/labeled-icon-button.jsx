@@ -18,6 +18,7 @@ const LabeledIconButton = ({
     imgSrc,
     onClick,
     title,
+    gray,
     ...props
 }) => (
     <Button
@@ -27,7 +28,7 @@ const LabeledIconButton = ({
     >
         <TWRenderRecoloredImage
             alt={imgAlt || title}
-            className={styles.editFieldIcon}
+            className={classNames(styles.editFieldIcon, {[styles.gray]: gray})}
             draggable={false}
             src={imgSrc}
             title={title}
@@ -43,7 +44,8 @@ LabeledIconButton.propTypes = {
     imgAlt: PropTypes.string,
     imgSrc: PropTypes.oneOfType([PropTypes.func, PropTypes.string]),
     onClick: PropTypes.func.isRequired,
-    title: PropTypes.string.isRequired
+    title: PropTypes.string.isRequired,
+    gray: PropTypes.bool
 };
 
 export default LabeledIconButton;

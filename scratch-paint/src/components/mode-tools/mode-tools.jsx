@@ -269,6 +269,7 @@ const ModeToolsComponent = props => {
                         imgSrc={fillIcon}
                         title={props.intl.formatMessage(messages.filled)}
                         onClick={props.onFillShapes}
+                        gray
                     />
                 </InputGroup>
                 <InputGroup>
@@ -277,6 +278,7 @@ const ModeToolsComponent = props => {
                         imgSrc={outlineIcon}
                         title={props.intl.formatMessage(messages.outlined)}
                         onClick={props.onOutlineShapes}
+                        gray
                     />
                 </InputGroup>
                 {props.fillBitmapShapes ? null : (

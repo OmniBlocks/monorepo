@@ -1,6 +1,7 @@
 @import "../../css/colors";
 @import "../../css/units";
 @import "../../css/colors";
+@import "../../css/filters.css";
 
 /* Popover styles */
 /* body is for specificity to override some addons that set a lower z-index */
@@ -89,6 +90,10 @@ body :global(.Popover) {
 .swatch-icon {
     width: 1.5rem;
     height: 1.5rem;
+}
+
+.picker-icon {
+    filter: $filter-icon-gray;
 }
 
 .inactive-gradient {

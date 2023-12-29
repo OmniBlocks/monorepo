@@ -12,7 +12,7 @@
     height: 64px;
     border-radius: 50%;
     border: 6px solid;
-    border-color: $motion-primary transparent $motion-primary transparent;
+    border-color: $looks-secondary transparent $looks-secondary transparent;
     animation: spinner 1.2s linear infinite;
 }
 [theme="dark"] .spinner {

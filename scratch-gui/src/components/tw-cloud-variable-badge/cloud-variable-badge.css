@@ -38,6 +38,6 @@
     border-radius: 1rem;
 }
 .server.selected {
-    background-color: $motion-primary;
+    background-color: $looks-secondary;
     color: $ui-white;
 }

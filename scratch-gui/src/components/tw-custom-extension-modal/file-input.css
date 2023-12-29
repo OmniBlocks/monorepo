@@ -13,5 +13,5 @@
     width: 100%;
 }
 .container:focus-within {
-    border-color: $motion-primary;
+    border-color: $looks-secondary;
 }

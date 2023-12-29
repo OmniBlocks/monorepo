@@ -37,8 +37,8 @@
     border-radius: 0.5rem;
 }
 .open-button:hover {
-    color: $motion-primary;
-    border-color: $motion-primary;
+    color: $looks-secondary;
+    border-color: $looks-secondary;
 }
 .open-button-image {
     width: 64px;
@@ -103,7 +103,7 @@
     transition: .1s ease;
 }
 .font-dropdown-item:hover {
-    background-color: $motion-primary;
+    background-color: $looks-secondary;
     color: #ffffff;
 }
 
@@ -126,8 +126,8 @@
     padding: 0.75rem 1rem;
     border-radius: 0.25rem;
     border: 1px solid $ui-black-transparent;
-    background-color: $motion-primary;
-    color: $ui-white;
+    background-color: $looks-secondary;
+    color: white;
 }
 .button:disabled {
     opacity: 0.8;
@@ -156,10 +156,10 @@
     justify-content: center;
 }
 .fallback-button:hover {
-    color: $motion-primary;
+    color: $looks-secondary;
 }
 .fallback-container .fallback-button-selected {
-    background-color: $motion-primary;
+    background-color: $looks-secondary;
     color: white;
 }
 

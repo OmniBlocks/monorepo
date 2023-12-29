@@ -4,11 +4,14 @@ import PropTypes from 'prop-types';
 import appTarget from '../app-target';
 import styles from './credits.css';
 
-import UserData from './users';
 import {APP_NAME} from '../../lib/brand';
+import {applyGuiColors} from '../../lib/themes/guiHelpers';
+import {detectTheme} from '../../lib/themes/themePersistance';
+import UserData from './users';
 
 /* eslint-disable react/jsx-no-literals */
 
+applyGuiColors(detectTheme());
 document.documentElement.lang = 'en';
 
 const User = ({image, text, href}) => (
@@ -19,6 +22,7 @@ const User = ({image, text, href}) => (
         className={styles.user}
     >
         <img
+            loading="lazy"
             className={styles.userImage}
             src={image}
             width="60"
@@ -84,6 +88,10 @@ const Credits = () => (
         <section>
             <h2>Addons</h2>
             <UserList users={UserData.addonDevelopers} />
+        </section>
+        <section>
+            <h2>TurboWarp Extension Gallery</h2>
+            <UserList users={UserData.extensionDevelopers} />
         </section>
         <section>
             <h2>Translators</h2>

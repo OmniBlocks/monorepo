@@ -8,48 +8,51 @@ const DOMPurify = require('dompurify');
 
 const sanitizeSvg = {};
 
-DOMPurify.addHook(
-    'beforeSanitizeAttributes',
-    currentNode => {
-
-        if (currentNode && currentNode.href && currentNode.href.baseVal) {
-            const href = currentNode.href.baseVal.replace(/\s/g, '');
-            // "data:" and "#" are valid hrefs
-            if ((href.slice(0, 5) !== 'data:') && (href.slice(0, 1) !== '#')) {
-
-                if (currentNode.attributes.getNamedItem('xlink:href')) {
-                    currentNode.attributes.removeNamedItem('xlink:href');
-                    delete currentNode['xlink:href'];
+// addHook() is undefined when running in an unsupported environment (eg. Node)
+if (DOMPurify.isSupported) {
+    DOMPurify.addHook(
+        'beforeSanitizeAttributes',
+        currentNode => {
+    
+            if (currentNode && currentNode.href && currentNode.href.baseVal) {
+                const href = currentNode.href.baseVal.replace(/\s/g, '');
+                // "data:" and "#" are valid hrefs
+                if ((href.slice(0, 5) !== 'data:') && (href.slice(0, 1) !== '#')) {
+    
+                    if (currentNode.attributes.getNamedItem('xlink:href')) {
+                        currentNode.attributes.removeNamedItem('xlink:href');
+                        delete currentNode['xlink:href'];
+                    }
+                    if (currentNode.attributes.getNamedItem('href')) {
+                        currentNode.attributes.removeNamedItem('href');
+                        delete currentNode.href;
+                    }
                 }
-                if (currentNode.attributes.getNamedItem('href')) {
-                    currentNode.attributes.removeNamedItem('href');
-                    delete currentNode.href;
+            }
+            return currentNode;
+        }
+    );
+
+    DOMPurify.addHook(
+        'uponSanitizeElement',
+        (node, data) => {
+            if (data.tagName === 'style') {
+                const ast = parse(node.textContent);
+                let isModified = false;
+                // Remove any @import rules as it could leak HTTP requests
+                walk(ast, (astNode, item, list) => {
+                    if (astNode.type === 'Atrule' && astNode.name === 'import') {
+                        list.remove(item);
+                        isModified = true;
+                    }
+                });
+                if (isModified) {
+                    node.textContent = generate(ast);
                 }
             }
         }
-        return currentNode;
-    }
-);
-
-DOMPurify.addHook(
-    'uponSanitizeElement',
-    (node, data) => {
-        if (data.tagName === 'style') {
-            const ast = parse(node.textContent);
-            let isModified = false;
-            // Remove any @import rules as it could leak HTTP requests
-            walk(ast, (astNode, item, list) => {
-                if (astNode.type === 'Atrule' && astNode.name === 'import') {
-                    list.remove(item);
-                    isModified = true;
-                }
-            });
-            if (isModified) {
-                node.textContent = generate(ast);
-            }
-        }
-    }
-);
+    );
+}
 
 // Use JS implemented TextDecoder and TextEncoder if it is not provided by the
 // browser.

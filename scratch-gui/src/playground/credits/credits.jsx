@@ -111,9 +111,6 @@ const Credits = () => (
     </main>
 );
 
-// merge-upstream TODO
-document.body.setAttribute('theme', 'light');
-
 ReactDOM.render((
     <Credits />
 ), appTarget);

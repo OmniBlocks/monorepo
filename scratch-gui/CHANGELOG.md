@@ -1,3 +1,6 @@
+We don't use this file
+
+<!--
 # Changelog
 
 All notable changes to this project will be documented in this file. See
@@ -4960,3 +4963,4 @@ All notable changes to this project will be documented in this file. See
 * Revert "Adding constraint on min height for large stage" ([d2d15f6](https://github.com/LLK/scratch-gui/commit/d2d15f68d4dbd080ac9c28828c8546ef33b919e3))
 * Revert "Fix deleting costumes not updating the paint editor" ([c9119c5](https://github.com/LLK/scratch-gui/commit/c9119c5e14c6c4bc3050ce44c46d0fa918d8b76e))
 * Revert "Script libraries to process SVG costumes" ([74cba7b](https://github.com/LLK/scratch-gui/commit/74cba7bef421e14d6c10ddd9acd39f13531fea36))
+-->

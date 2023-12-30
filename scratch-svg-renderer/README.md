@@ -1,3 +1,6 @@
+Fork of scratch-svg-renderer used by TurboWarp.
+
+<!--
 # scratch-svg-renderer
 [![CircleCI](https://circleci.com/gh/LLK/scratch-svg-renderer/tree/develop.svg?style=shield&circle-token=239172a1b9275ee1e8f949489e6e36ea57b7fc86)](https://circleci.com/gh/LLK/scratch-svg-renderer?branch=develop)
 
@@ -60,3 +63,22 @@ To run scratch-svg-renderer locally as part of scratch-gui, for development:
 
 ## Donate
 We provide [Scratch](https://scratch.mit.edu) free of charge, and want to keep it that way! Please consider making a [donation](https://secure.donationpay.org/scratchfoundation/) to support our continued engineering, design, community, and resource development efforts. Donations of any size are appreciated. Thank you!
+
+## Committing
+
+This project uses [semantic release](https://github.com/semantic-release/semantic-release) to ensure version bumps
+follow semver so that projects depending on it don't break unexpectedly.
+
+In order to automatically determine version updates, semantic release expects commit messages to follow the
+[conventional-changelog](https://github.com/bcoe/conventional-changelog-standard/blob/master/convention.md)
+specification.
+
+You can use the [commitizen CLI](https://github.com/commitizen/cz-cli) to make commits formatted in this way:
+
+```bash
+npm install -g commitizen@latest cz-conventional-changelog@latest
+```
+
+Now you're ready to make commits using `git cz`.
+
+-->

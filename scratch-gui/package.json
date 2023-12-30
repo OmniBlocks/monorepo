@@ -34,6 +34,8 @@
   "dependencies": {
     "@microbit/microbit-universal-hex": "0.2.2",
     "@turbowarp/scratch-l10n": "^3.1000.20230326022803",
+    "@turbowarp/scratch-storage": "^0.0.0-development-202312242258-43d7b47",
+    "@turbowarp/scratch-svg-renderer": "^1.0.0-202312242305-12c360b",
     "arraybuffer-loader": "^1.0.6",
     "autoprefixer": "^9.0.1",
     "balance-text": "3.3.1",
@@ -90,8 +92,6 @@
     "scratch-paint": "git+https://github.com/TurboWarp/scratch-paint#develop",
     "scratch-render": "git+https://github.com/TurboWarp/scratch-render.git#develop",
     "scratch-render-fonts": "1.0.0-prerelease.20231017225105",
-    "scratch-storage": "git+https://github.com/TurboWarp/scratch-storage.git#develop",
-    "scratch-svg-renderer": "0.2.0",
     "scratch-vm": "git+https://github.com/TurboWarp/scratch-vm.git#develop",
     "startaudiocontext": "1.2.1",
     "style-loader": "^0.23.0",

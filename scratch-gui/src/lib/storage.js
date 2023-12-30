@@ -1,4 +1,4 @@
-import ScratchStorage from 'scratch-storage';
+import ScratchStorage from '@turbowarp/scratch-storage';
 
 import defaultProject from './default-project';
 

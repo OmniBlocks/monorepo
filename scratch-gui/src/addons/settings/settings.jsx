@@ -59,7 +59,8 @@ if (locale !== 'en') {
 }
 
 document.title = `${settingsTranslations.title} - ${APP_NAME}`;
-applyGuiColors(detectTheme());
+const theme = detectTheme();
+applyGuiColors(theme);
 
 let _throttleTimeout;
 const postThrottledSettingsChange = store => {

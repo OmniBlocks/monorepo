@@ -45,7 +45,8 @@ $fade-out-distance: 100px;
     /* Must have some height (recalculated by flex-grow) in order to scroll */
     height: 0;
     flex-grow: 1;
-    overflow-y: scroll;
+    overflow-y: auto;
+    overflow-x: hidden;
     display: flex;
     flex-direction: column;
 }

@@ -655,8 +655,12 @@ class Tab extends EventTargetShim {
         return getEditorMode();
     }
 
-    displayNoneWhileDisabled (el) {
+    displayNoneWhileDisabled (el, options) {
         el.classList.add(getDisplayNoneWhileDisabledClass(this._id));
+
+        if (options && options.display) {
+            el.style.display = options.display;
+        }
     }
 
     get direction () {

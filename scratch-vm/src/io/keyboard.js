@@ -171,7 +171,7 @@ class Keyboard {
             this._keysPressed.splice(index, 1);
         }
         // Fix for https://github.com/LLK/scratch-vm/issues/2271
-        if (data.hasOwnProperty('keyCode')) {
+        if (Object.prototype.hasOwnProperty.call(data, 'keyCode')) {
             const keyCode = data.keyCode;
             if (this._numeralKeyCodesToStringKey.has(keyCode)) {
                 const lastKeyOfSameCode = this._numeralKeyCodesToStringKey.get(keyCode);

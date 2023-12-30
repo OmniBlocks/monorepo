@@ -35,7 +35,7 @@ const runProject = async buffer => {
         }, 50);
     });
     vm.stopAll();
-    vm.stop();
+    vm.quit();
 };
 
 runProject(fs.readFileSync(file));

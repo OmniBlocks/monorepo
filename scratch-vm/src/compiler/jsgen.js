@@ -977,7 +977,7 @@ class JSGenerator {
             this.source += 'target.clearEffects();\n';
             break;
         case 'looks.changeEffect':
-            if (this.target.effects.hasOwnProperty(node.effect)) {
+            if (Object.prototype.hasOwnProperty.call(this.target.effects, node.effect)) {
                 this.source += `target.setEffect("${sanitize(node.effect)}", runtime.ext_scratch3_looks.clampEffect("${sanitize(node.effect)}", ${this.descendInput(node.value).asNumber()} + target.effects["${sanitize(node.effect)}"]));\n`;
             }
             break;
@@ -1010,7 +1010,7 @@ class JSGenerator {
             this.source += 'target.setCostume(target.currentCostume + 1);\n';
             break;
         case 'looks.setEffect':
-            if (this.target.effects.hasOwnProperty(node.effect)) {
+            if (Object.prototype.hasOwnProperty.call(this.target.effects, node.effect)) {
                 this.source += `target.setEffect("${sanitize(node.effect)}", runtime.ext_scratch3_looks.clampEffect("${sanitize(node.effect)}", ${this.descendInput(node.value).asNumber()}));\n`;
             }
             break;
@@ -1210,7 +1210,7 @@ class JSGenerator {
     }
 
     descendVariable (variable) {
-        if (this.variableInputs.hasOwnProperty(variable.id)) {
+        if (Object.prototype.hasOwnProperty.call(this.variableInputs, variable.id)) {
             return this.variableInputs[variable.id];
         }
         const input = new VariableInput(`${this.referenceVariable(variable)}.value`);
@@ -1233,7 +1233,7 @@ class JSGenerator {
     }
 
     evaluateOnce (source) {
-        if (this._setupVariables.hasOwnProperty(source)) {
+        if (Object.prototype.hasOwnProperty.call(this._setupVariables, source)) {
             return this._setupVariables[source];
         }
         const variable = this._setupVariablesPool.next();

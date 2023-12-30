@@ -99,8 +99,8 @@ class ExtensionManager {
         this.workerURLs = [];
 
         /**
-         * Map of loaded extension URLs/IDs to service names.
-         * @type {Map.<string, string>}
+         * Map of loaded extension URLs/IDs (equivalent for built-in extensions) to service name.
+         * @type {Map.<string,string>}
          * @private
          */
         this._loadedExtensions = new Map();
@@ -596,7 +596,7 @@ class ExtensionManager {
     getExtensionURLs () {
         const extensionURLs = {};
         for (const [extensionId, serviceName] of this._loadedExtensions.entries()) {
-            if (this.builtinExtensions.hasOwnProperty(extensionId)) {
+            if (Object.prototype.hasOwnProperty.call(this.builtinExtensions, extensionId)) {
                 continue;
             }
 

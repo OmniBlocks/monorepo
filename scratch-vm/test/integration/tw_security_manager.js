@@ -11,6 +11,7 @@ const FETCH_EXTENSION = 'https://extensions.turbowarp.org/fetch.js';
 const BITWISE_EXTENSION = 'https://extensions.turbowarp.org/bitwise.js';
 
 /* eslint-disable no-script-url */
+/* eslint-disable require-await */
 
 test('Deny both extensions', async t => {
     const vm = new VirtualMachine();

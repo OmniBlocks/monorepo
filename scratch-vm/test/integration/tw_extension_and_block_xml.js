@@ -274,7 +274,11 @@ test('XML escaped in Blocks.toXML()', async t => {
         // Check the string input
         const stringInputValue = block.children[0];
         t.equal(stringInputValue.name, 'value', 'string input is <value>');
-        t.equal(stringInputValue.attribs.name, 'string argument &lt;&gt;&amp;&quot;&apos;', 'escaped string input name');
+        t.equal(
+            stringInputValue.attribs.name,
+            'string argument &lt;&gt;&amp;&quot;&apos;',
+            'escaped string input name'
+        );
         t.equal(stringInputValue.children.length, 1, 'string input has 1 child');
 
         const stringInputShadow = stringInputValue.children[0];

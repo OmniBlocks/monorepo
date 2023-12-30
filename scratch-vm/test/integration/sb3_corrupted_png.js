@@ -73,14 +73,14 @@ const test = tap.test;
 
 test('load sb3 project with corrupted bitmap costume file', t => {
     t.equal(vm.runtime.targets.length, 2);
-    
+
     const stage = vm.runtime.targets[0];
     t.ok(stage.isStage);
 
     const greenGuySprite = vm.runtime.targets[1];
     t.equal(greenGuySprite.getName(), 'Green Guy');
     t.equal(greenGuySprite.getCostumes().length, 1);
-    
+
     const corruptedCostume = greenGuySprite.getCostumes()[0];
     t.equal(corruptedCostume.name, 'Green Guy');
     t.equal(corruptedCostume.assetId, defaultBitmapAssetId);
@@ -98,14 +98,14 @@ test('load and then save project with corrupted bitmap costume file', t => {
     const resavedProject = JSON.parse(vm.toJSON());
 
     t.equal(resavedProject.targets.length, 2);
-    
+
     const stage = resavedProject.targets[0];
     t.ok(stage.isStage);
 
     const greenGuySprite = resavedProject.targets[1];
     t.equal(greenGuySprite.name, 'Green Guy');
     t.equal(greenGuySprite.costumes.length, 1);
-    
+
     const corruptedCostume = greenGuySprite.costumes[0];
     t.equal(corruptedCostume.name, 'Green Guy');
     // Resaved project costume should have the metadata that corresponds to the original broken costume
@@ -124,5 +124,4 @@ test('serializeCostume saves orignal broken costume', t => {
     t.equal(costume.fileName, `${brokenCostumeMd5}.png`);
     t.equal(md5(costume.fileContent), brokenCostumeMd5);
     t.end();
-    process.nextTick(process.exit);
 });

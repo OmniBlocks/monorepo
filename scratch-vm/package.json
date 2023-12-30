@@ -55,7 +55,7 @@
     "worker-loader": "^1.1.1"
   },
   "peerDependencies": {
-    "scratch-svg-renderer": "^0.2.0-prerelease"
+    "@turbowarp/scratch-svg-renderer": "^1.0.0-202312300007-62fe825"
   },
   "devDependencies": {
     "@babel/core": "7.13.10",
@@ -83,7 +83,6 @@
     "scratch-render": "0.1.0-prerelease.20231220210403",
     "scratch-render-fonts": "1.0.0-prerelease.20231017225105",
     "scratch-storage": "2.3.1",
-    "scratch-svg-renderer": "0.2.0-prerelease.20210727023023",
     "script-loader": "0.7.2",
     "stats.js": "0.17.0",
     "tap": "16.2.0",

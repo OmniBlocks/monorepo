@@ -49,7 +49,7 @@ const Runtime = require('../engine/runtime');
 
 const ScratchRender = require('scratch-render');
 const AudioEngine = require('scratch-audio');
-const ScratchSVGRenderer = require('scratch-svg-renderer');
+const ScratchSVGRenderer = require('@turbowarp/scratch-svg-renderer');
 
 const Scratch = window.Scratch = window.Scratch || {};
 

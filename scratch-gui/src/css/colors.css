@@ -65,6 +65,8 @@ $fullscreen-accent: var(--fullscreen-accent);
 
 $popover-background: var(--popover-background);
 
+$shadow: var(--shadow);
+
 $badge-background: var(--badge-background);
 $badge-border: var(--badge-border);
 

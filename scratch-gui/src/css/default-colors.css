@@ -60,6 +60,8 @@ $input-background-default: var(--input-background-default);
 
 $popover-background-default: var(--popover-background-default);
 
+$shadow-default: var(--shadow-default);
+
 $badge-background-default: var(--badge-background-default);
 $badge-border-default: var(--badge-border-default);
 

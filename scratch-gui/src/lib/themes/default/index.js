@@ -180,6 +180,8 @@ const guiColors = {
 
     'popover-background': '#ffffff',
 
+    'shadow': 'hsla(0, 0%, 0%, 0.15)',
+
     'badge-background': '#dbebff',
     'badge-border': '#b9d6ff',
 

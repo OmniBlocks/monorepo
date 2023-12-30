@@ -80,14 +80,14 @@
 .font-dropdown-outer {
     position: absolute;
     z-index: $z-index-modal;
-    background-color: white;
+    background-color: $ui-white;
     color: $text-primary;
     border-radius: 0.25rem;
     overflow: auto;
     max-height: 300px;
     border: 1px solid $ui-black-transparent;
     box-sizing: border-box;
-    box-shadow: 0px 0px 8px 1px rgba(0, 0, 0, .3);
+    box-shadow: 0px 0px 8px 1px $shadow;
 }
 .font-dropdown-item {
     display: flex;

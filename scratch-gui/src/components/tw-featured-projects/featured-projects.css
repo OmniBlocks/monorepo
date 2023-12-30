@@ -1,3 +1,5 @@
+@import "../../css/colors.css";
+
 .container {
     margin-bottom: 8px;
 }
@@ -14,7 +16,6 @@
     cursor: pointer;
     user-select: none;
     opacity: 0.8;
-    color: #222;
 }
 
 .opener-container:hover {
@@ -22,10 +23,10 @@
 }
 
 .opener-content {
-    background-color: white;
+    background-color: $ui-modal-background;
     padding: 4px;
-    border: 1px solid black;
-    box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.25);
+    border: 1px solid $ui-black-transparent;
+    box-shadow: 0 0 8px 0 $shadow;
 }
 
 .projects {

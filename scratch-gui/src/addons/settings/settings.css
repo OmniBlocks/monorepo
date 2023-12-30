@@ -53,7 +53,7 @@ a:active, a:focus {
     position: relative;
     padding: 8px 20px;
     background-color: $ui-secondary;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 5px $shadow;
 }
 @media (max-width: 700px) {
     .header {
@@ -201,7 +201,7 @@ a:active, a:focus {
 }
 
 .addon {
-    box-shadow: 0 2px 5px $ui-black-transparent;
+    box-shadow: 0 2px 5px $shadow;
     border: 1px solid $ui-black-transparent;
     border-radius: 5px;
     margin: 10px 0 10px 0;
@@ -563,7 +563,7 @@ a:active, a:focus {
 .dirty-inner {
     padding: 8px;
     background: $ui-tertiary;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 5px $shadow;
     border-radius: 4px;
     pointer-events: auto;
     display: flex;

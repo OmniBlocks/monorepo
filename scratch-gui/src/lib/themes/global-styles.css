@@ -28,4 +28,6 @@
     --editorDarkMode-accent: $ui-modal-background;
     --editorDarkMode-categoryMenu-text: $text-primary;
     --editorDarkMode-accent-text: $text-primary;
+    --editorDarkMode-page: $ui-primary;
+    --editorDarkMode-highlightText: $looks-secondary;
 }

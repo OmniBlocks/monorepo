@@ -78,3 +78,8 @@
 [dir="rtl"] .stage-button-icon {
     transform: scaleX(-1);
 }
+
+.fullscreen-buttons-row {
+    /* relied on by addons */
+    display: flex;
+}

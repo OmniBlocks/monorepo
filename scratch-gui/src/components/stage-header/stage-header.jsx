@@ -78,46 +78,52 @@ const StageHeaderComponent = function (props) {
     if (isFullScreen || isEmbedded) {
         const stageDimensions = getStageDimensions(null, customStageSize, true);
         const settingsButton = isEmbedded && enableSettingsButton ? (
-            <Button
-                className={styles.stageButton}
-                onClick={onOpenSettings}
-            >
-                <img
-                    alt={props.intl.formatMessage(messages.openSettingsMessage)}
-                    className={styles.stageButtonIcon}
-                    draggable={false}
-                    src={settingsIcon}
-                    title={props.intl.formatMessage(messages.openSettingsMessage)}
-                />
-            </Button>
+            <div className={styles.unselectWrapper}>
+                <Button
+                    className={styles.stageButton}
+                    onClick={onOpenSettings}
+                >
+                    <img
+                        alt={props.intl.formatMessage(messages.openSettingsMessage)}
+                        className={styles.stageButtonIcon}
+                        draggable={false}
+                        src={settingsIcon}
+                        title={props.intl.formatMessage(messages.openSettingsMessage)}
+                    />
+                </Button>
+            </div>
         ) : null;
         const fullscreenButton = isFullScreen ? (
-            <Button
-                className={styles.stageButton}
-                onClick={onSetStageUnFull}
-                onKeyPress={onKeyPress}
-            >
-                <img
-                    alt={props.intl.formatMessage(messages.unFullStageSizeMessage)}
-                    className={styles.stageButtonIcon}
-                    draggable={false}
-                    src={unFullScreenIcon}
-                    title={props.intl.formatMessage(messages.fullscreenControl)}
-                />
-            </Button>
+            <div className={styles.unselectWrapper}>
+                <Button
+                    className={styles.stageButton}
+                    onClick={onSetStageUnFull}
+                    onKeyPress={onKeyPress}
+                >
+                    <img
+                        alt={props.intl.formatMessage(messages.unFullStageSizeMessage)}
+                        className={styles.stageButtonIcon}
+                        draggable={false}
+                        src={unFullScreenIcon}
+                        title={props.intl.formatMessage(messages.fullscreenControl)}
+                    />
+                </Button>
+            </div>
         ) : FullscreenAPI.available() ? (
-            <Button
-                className={styles.stageButton}
-                onClick={onSetStageFull}
-            >
-                <img
-                    alt={props.intl.formatMessage(messages.fullStageSizeMessage)}
-                    className={styles.stageButtonIcon}
-                    draggable={false}
-                    src={fullScreenIcon}
-                    title={props.intl.formatMessage(messages.fullscreenControl)}
-                />
-            </Button>
+            <div className={styles.unselectWrapper}>
+                <Button
+                    className={styles.stageButton}
+                    onClick={onSetStageFull}
+                >
+                    <img
+                        alt={props.intl.formatMessage(messages.fullStageSizeMessage)}
+                        className={styles.stageButtonIcon}
+                        draggable={false}
+                        src={fullScreenIcon}
+                        title={props.intl.formatMessage(messages.fullscreenControl)}
+                    />
+                </Button>
+            </div>
         ) : null;
         header = (
             <Box
@@ -130,7 +136,10 @@ const StageHeaderComponent = function (props) {
                     style={{width: stageDimensions.width}}
                 >
                     <Controls vm={vm} />
-                    <div className={styles.embedButtons}>
+                    <div
+                        className={styles.fullscreenButtonsRow}
+                        key="fullscreen" // addons require the HTML element to be not be re-used by in-editor buttons
+                    >
                         {settingsButton}
                         {fullscreenButton}
                     </div>
@@ -170,7 +179,10 @@ const StageHeaderComponent = function (props) {
                         vm={vm}
                         isSmall={stageSizeMode === STAGE_SIZE_MODES.small}
                     />
-                    <div className={styles.stageSizeRow}>
+                    <div
+                        className={styles.stageSizeRow}
+                        key="editor" // addons require the HTML element to be not be re-used by in-editor buttons
+                    >
                         {stageControls}
                         <div>
                             <Button

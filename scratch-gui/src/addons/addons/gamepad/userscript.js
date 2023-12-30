@@ -409,8 +409,7 @@ export default async function ({ addon, console, msg }) {
 
   while (true) {
     const target = await addon.tab.waitForElement(
-      // Full screen button
-      '[class^="stage-header_stage-size-row"] [class^="button_outlined-button"], [class*="stage-header_unselect-wrapper_"] > [class^="button_outlined-button"]',
+      '[class^="stage-header_stage-size-row"], [class^="stage-header_fullscreen-buttons-row_"]',
       {
         markAsSeen: true,
         reduxEvents: [

@@ -312,19 +312,11 @@ class Tab extends EventTargetShim {
                 ]
             },
             fullscreenStageHeader: {
+                // Upstream uses sa-spacer for this one, but we don't need to
                 // Fullscreen stage header only
-                element: () => q("[class^='stage-header_stage-menu-wrapper']"),
-                from: function () {
-                    let emptyDiv = this.element().querySelector('.sa-spacer');
-                    if (!emptyDiv) {
-                        emptyDiv = document.createElement('div');
-                        emptyDiv.style.marginLeft = 'auto';
-                        emptyDiv.className = 'sa-spacer';
-                        this.element().insertBefore(emptyDiv, this.element().lastChild);
-                    }
-                    return [emptyDiv];
-                },
-                until: () => [q("[class^='stage-header_stage-menu-wrapper']").lastChild]
+                element: () => q("[class^='stage-header_fullscreen-buttons-row_']"),
+                from: () => [],
+                until: () => [q("[class^='stage-header_fullscreen-buttons-row_']").lastChild]
             },
             afterGreenFlag: {
                 element: () => q("[class^='controls_controls-container']"),

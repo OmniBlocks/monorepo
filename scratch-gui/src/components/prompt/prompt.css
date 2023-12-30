@@ -81,7 +81,7 @@
 
 .cloud-option {
     display:flex;
-    border-top: 1px dashed hsla(0, 0%, 0%, .25);
+    border-top: 1px dashed $ui-black-transparent;
     overflow: visible;
     padding: 1rem 0;
     text-align: center;

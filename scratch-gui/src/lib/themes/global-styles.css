@@ -1,0 +1,20 @@
+@import "../../css/colors.css";
+
+/* This is for overriding some styles that don't really "belong" to any existing stylesheets */
+/* Try to use this sparingly, otherwise this will become unmaintainable again... */
+
+/* popover is used by gui and paint */
+/* some of these are duplicated over there too */
+:global(.Popover) {
+    color-scheme: light;
+}
+:global(.Popover-body) {
+    color: $text-primary;
+    background: $popover-background;
+    border: 1px solid $ui-black-transparent;
+    box-shadow: 0px 0px 8px 1px $ui-black-transparent;
+}
+:global(.Popover-tipShape) {
+    fill: $popover-background;
+    stroke: $ui-black-transparent;
+}

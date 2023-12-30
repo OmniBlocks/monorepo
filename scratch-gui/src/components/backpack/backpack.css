@@ -18,9 +18,6 @@
     cursor: pointer;
     user-select: none;
 }
-[theme="dark"] .backpack-header {
-    background: $ui-primary;
-}
 
 [dir="ltr"] .backpack-header {
     border-top-right-radius: $space;

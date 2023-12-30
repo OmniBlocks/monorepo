@@ -9,10 +9,6 @@
     background: $ui-white;
     padding: 1rem 1.5rem;
 }
-[theme="dark"] .body {
-    color: $text-primary;
-    background: $ui-primary;
-}
 
 .body p {
     margin: 8px 0;

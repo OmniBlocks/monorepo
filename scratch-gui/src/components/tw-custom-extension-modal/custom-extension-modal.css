@@ -9,10 +9,6 @@
     background: $ui-white;
     padding: 1.5rem 2.25rem;
 }
-[theme="dark"] .body {
-    color: $text-primary;
-    background: $ui-primary;
-}
 
 .body p,
 .unsandboxed-container,
@@ -51,11 +47,6 @@
     border-radius: 0.25rem;
     padding: 0.5rem;
     font-size: inherit;
-}
-[theme="dark"] .url-input,
-[theme="dark"] .text-code-input {
-    background: $ui-secondary;
-    color: white;
 }
 .url-input {
     height: 3rem;

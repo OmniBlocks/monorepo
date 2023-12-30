@@ -58,6 +58,11 @@ $assets-background-default: var(--assets-background-default);
 
 $input-background-default: var(--input-background-default);
 
+$popover-background-default: var(--popover-background-default);
+
+$badge-background-default: var(--badge-background-default);
+$badge-border-default: var(--badge-border-default);
+
 $fullscreen-background-default: var(--fullscreen-background-default);
 $fullscreen-accent-default: var(--fullscreen-accent-default);
 

@@ -30,18 +30,11 @@
     border-radius: 4px;
 }
 .setting.active {
-    background: #dbebff;
+    background: $badge-background;
 }
 .setting:hover,
 .setting:focus-within {
-    background: #cadef5;
-}
-[theme="dark"] .setting.active {
-    background: #16202c;
-}
-[theme="dark"] .setting:hover,
-[theme="dark"] .setting:focus-within {
-    background: #202f41;
+    background: $badge-border;
 }
 
 .label {

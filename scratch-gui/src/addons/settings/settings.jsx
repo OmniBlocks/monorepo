@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2021 Thomas Weber
+ * Copyright (C) 2021-2023 Thomas Weber
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as
@@ -735,12 +735,16 @@ class AddonGroup extends React.Component {
                         });
                     }}
                 >
-                    <img
-                        className={styles.addonGroupExpand}
-                        src={expandImageBlack}
-                        data-open={this.state.open}
-                        alt=""
-                    />
+                    <div
+                        className={styles.addonGroupExpandContainer}
+                    >
+                        <img
+                            className={styles.addonGroupExpandIcon}
+                            src={expandImageBlack}
+                            data-open={this.state.open}
+                            alt=""
+                        />
+                    </div>
                     {this.props.label.replace('{number}', this.props.addons.length)}
                 </button>
                 {this.state.open && (

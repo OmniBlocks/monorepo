@@ -177,6 +177,11 @@ const guiColors = {
 
     'input-background': '#ffffff',
 
+    'popover-background': '#ffffff',
+
+    'badge-background': '#dbebff',
+    'badge-border': '#b9d6ff',
+
     'fullscreen-background': '#ffffff',
     'fullscreen-accent': '#e8edf1',
 
@@ -185,13 +190,16 @@ const guiColors = {
 
     'link-color': '#2255dd',
 
+    'filter-icon-black': 'none',
+
     'paint-ui-pane-border': 'var(--ui-black-transparent)',
     'paint-text-primary': 'var(--text-primary)',
     'paint-form-border': 'var(--ui-black-transparent)',
     'paint-looks-secondary': 'var(--looks-secondary)',
     'paint-looks-transparent': 'var(--looks-transparent)',
     'paint-input-background': 'var(--input-background)',
-    'paint-popover-background': '#ffffff'
+    'paint-popover-background': '#ffffff',
+    'paint-filter-icon-gray': 'none'
 };
 
 export {

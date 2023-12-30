@@ -63,6 +63,11 @@ $input-background: var(--input-background);
 $fullscreen-background: var(--fullscreen-background);
 $fullscreen-accent: var(--fullscreen-accent);
 
+$popover-background: var(--popover-background);
+
+$badge-background: var(--badge-background);
+$badge-border: var(--badge-border);
+
 $page-background: var(--page-background);
 $page-foreground: var(--page-foreground);
 

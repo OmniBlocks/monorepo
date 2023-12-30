@@ -8,6 +8,7 @@ import ErrorBoundaryHOC from '../lib/error-boundary-hoc.jsx';
 import {openFontsModal} from '../reducers/modals';
 
 import {connect} from 'react-redux';
+import { isDark } from '../lib/themes/index.js';
 
 class PaintEditorWrapper extends React.Component {
     constructor (props) {
@@ -28,7 +29,7 @@ class PaintEditorWrapper extends React.Component {
         return this.props.imageId !== nextProps.imageId ||
             this.props.rtl !== nextProps.rtl ||
             this.props.name !== nextProps.name ||
-            this.props.isDark !== nextProps.isDark ||
+            this.props.theme !== nextProps.theme ||
             this.props.customStageSize !== nextProps.customStageSize ||
             this.state.fonts !== nextState.fonts;
     }
@@ -74,7 +75,7 @@ class PaintEditorWrapper extends React.Component {
                 onUpdateImage={this.handleUpdateImage}
                 onUpdateName={this.handleUpdateName}
                 fontInlineFn={inlineSvgFonts}
-                theme={this.props.isDark ? 'dark' : 'light'}
+                theme={isDark(this.props.theme) ? 'dark' : 'light'}
                 customFonts={this.state.fonts}
                 width={this.props.customStageSize.width}
                 height={this.props.customStageSize.height}
@@ -91,7 +92,7 @@ PaintEditorWrapper.propTypes = {
     onManageFonts: PropTypes.func.isRequired,
     imageFormat: PropTypes.string.isRequired,
     imageId: PropTypes.string.isRequired,
-    isDark: PropTypes.bool,
+    theme: PropTypes.bool,
     name: PropTypes.string,
     rotationCenterX: PropTypes.number,
     rotationCenterY: PropTypes.number,
@@ -116,6 +117,7 @@ const mapStateToProps = (state, {selectedCostumeIndex}) => {
         imageId: targetId && `${targetId}${costume.skinId}`,
         rtl: state.locales.isRtl,
         selectedCostumeIndex: index,
+        theme: state.scratchGui.theme.theme,
         vm: state.scratchGui.vm,
         zoomLevelId: targetId
     };

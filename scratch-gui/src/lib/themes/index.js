@@ -26,6 +26,8 @@ import scratchLightIcon from './default/icon.svg';
 import scratchDarkIcon from './dark/icon.svg';
 import highContrastIcon from './high-contrast/icon.svg';
 
+import './global-styles.css';
+
 const TW_LIGHT_THEME = 'tw-light';
 const TW_DARK_THEME = 'tw-dark';
 const SCRATCH_LIGHT_THEME = 'scratch-light';
@@ -122,6 +124,11 @@ const getColorsForTheme = theme => {
     return themeInfo.colors;
 };
 
+const isDark = theme => {
+    const themeinfo = themeMap[theme];
+    return themeinfo.isDark;
+};
+
 export {
     DEFAULT_THEME,
     TW_LIGHT_THEME,
@@ -131,5 +138,6 @@ export {
     HIGH_CONTRAST_THEME,
     defaultBlockColors,
     getColorsForTheme,
-    themeMap
+    themeMap,
+    isDark
 };

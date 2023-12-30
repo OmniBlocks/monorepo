@@ -1,5 +1,6 @@
 @import "../../css/units.css";
 @import "../../css/colors.css";
+@import "../../css/filters.css";
 
 .row {
     display: flex;
@@ -24,7 +25,7 @@
 .button > img {
     display: block;
     transition: transform 0.1s;
-    filter: grayscale(100%) opacity(.5);
+    filter: grayscale(100%);
 }
 
 .button:not(:last-child) {

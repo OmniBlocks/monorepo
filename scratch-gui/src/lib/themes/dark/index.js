@@ -101,6 +101,11 @@ const guiColors = {
 
     'input-background': '#1e1e1e',
 
+    'popover-background': '#333333',
+
+    'badge-background': '#16202c',
+    'badge-border': '#203652',
+
     'fullscreen-background': '#111111',
     'fullscreen-accent': '#111111',
 
@@ -109,7 +114,10 @@ const guiColors = {
 
     'link-color': '#44aaff',
 
-    'paint-popover-background': '#333333'
+    'filter-icon-black': 'invert(100%)',
+
+    'paint-popover-background': '#333333',
+    'paint-filter-icon-gray': 'brightness(1.7)'
 };
 
 export {

@@ -14,10 +14,6 @@
     flex-direction: column;
     gap: 1rem;
 }
-[theme="dark"] .body {
-    color: $text-primary;
-    background: $ui-primary;
-}
 
 .extra-container {
     display: flex;
@@ -115,9 +111,6 @@
     display: block;
     width: 75%;
     height: 75%;
-}
-[theme="dark"] .delete-button img {
-    filter: invert(100%);
 }
 .delete-button:hover {
     background-color: $ui-black-transparent;

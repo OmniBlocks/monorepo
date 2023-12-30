@@ -15,9 +15,6 @@
     border-color: $looks-secondary transparent $looks-secondary transparent;
     animation: spinner 1.2s linear infinite;
 }
-[theme="dark"] .spinner {
-    border-color: #fff transparent #fff transparent;
-}
 @keyframes spinner {
     0% {
         transform: rotate(0deg);

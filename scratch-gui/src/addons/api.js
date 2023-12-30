@@ -165,12 +165,13 @@ const contextMenuCallbacks = [];
 const CONTEXT_MENU_ORDER = ['editor-devtools', 'block-switching', 'blocks2image', 'swap-local-global'];
 let createdAnyBlockContextMenus = false;
 
-const updateSmallStageClass = () => {
+const updateClasses = () => {
     const state = reduxInstance.state;
     const isSmallStage = state.scratchGui.stageSize.stageSize === 'small';
     const isFullScreen = state.scratchGui.mode.isFullScreen;
     const isPlayerOnly = state.scratchGui.mode.isPlayerOnly;
     document.body.classList.toggle('sa-small-stage', isSmallStage && !isFullScreen && !isPlayerOnly);
+    document.body.classList.toggle('sa-body-editor', !isPlayerOnly || isFullScreen);
 };
 reduxInstance.addEventListener('statechanged', e => {
     if (
@@ -178,10 +179,10 @@ reduxInstance.addEventListener('statechanged', e => {
         e.detail.action.type === 'scratch-gui/mode/SET_FULL_SCREEN' ||
         e.detail.action.type === 'scratch-gui/mode/SET_PLAYER'
     ) {
-        updateSmallStageClass();
+        updateClasses();
     }
 });
-updateSmallStageClass();
+updateClasses();
 
 const getInternalKey = element => Object.keys(element).find(key => key.startsWith('__reactInternalInstance$'));
 

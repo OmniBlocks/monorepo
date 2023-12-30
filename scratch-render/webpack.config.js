@@ -86,7 +86,7 @@ module.exports = [
             '!ify-loader!grapheme-breaker': 'grapheme-breaker',
             '!ify-loader!linebreak': 'linebreak',
             'hull.js': true,
-            'scratch-svg-renderer': true,
+            '@turbowarp/scratch-svg-renderer': true,
             'twgl.js': true,
             'xml-escape': true
         }

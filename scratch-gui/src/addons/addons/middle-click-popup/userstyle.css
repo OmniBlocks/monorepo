@@ -7,20 +7,13 @@
 
   position: absolute;
   min-width: 100px;
-  background-color: white;
+  background-color: var(--ui-modal-background);
   border-radius: 4px;
   box-shadow:
     rgba(0, 0, 0, 0.3) 0 0 3px,
     rgba(0, 0, 0, 0.2) 0 3px 10px;
 
   z-index: 999;
-}
-[theme="dark"] input.s3devInp {
-  color: #eee;
-  background: #3333;
-}
-[theme="dark"] input.s3devInp:hover {
-  background: #333;
 }
 
 .sa-mcp-container {
@@ -30,7 +23,8 @@
   z-index: 100;
   position: absolute;
   box-shadow: 0px 0px 8px 1px rgba(0, 0, 0, 0.3);
-  background-color: white;
+  background-color: var(--ui-modal-background);
+  outline: 1px solid var(--ui-black-transparent);
   border: none;
   border-radius: 4px;
 }
@@ -103,9 +97,6 @@
   width: 100%;
   fill: transparent;
   cursor: grab;
-}
-[theme="dark"] #s3devFloatingBar {
-  background-color: #111;
 }
 
 .sa-mcp-preview-block {

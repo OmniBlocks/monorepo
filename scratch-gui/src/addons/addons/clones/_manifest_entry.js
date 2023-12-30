@@ -28,12 +28,14 @@ const manifest = {
   ],
   "settings": [
     {
+      "dynamic": true,
       "id": "projectpage",
       "name": "Show on project page",
       "default": false,
       "type": "boolean"
     },
     {
+      "dynamic": true,
       "id": "showicononly",
       "name": "Show icon only",
       "default": false,

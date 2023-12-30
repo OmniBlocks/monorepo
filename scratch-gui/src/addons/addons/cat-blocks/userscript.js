@@ -8,6 +8,8 @@ export default async function ({ addon, console }) {
 
   const shouldWatchMouseCursor = addon.settings.get("watch");
 
+  Blockly.BlockSvg.prototype.CAT_BLOCKS = true;
+
   Blockly.BlockSvg.START_HAT_HEIGHT = 31;
 
   Blockly.BlockSvg.START_HAT_PATH =

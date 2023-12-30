@@ -18,3 +18,14 @@
     fill: $popover-background;
     stroke: $ui-black-transparent;
 }
+
+/* ScratchAdddons editor-dark-mode compatibility */
+:root {
+    --editorDarkMode-primary: $looks-secondary;
+    --editorDarkMode-primary-transparent35: $looks-transparent;
+    --editorDarkMode-primary-variant: $looks-secondary-dark;
+    --editorDarkMode-border: $ui-black-transparent;
+    --editorDarkMode-accent: $ui-modal-background;
+    --editorDarkMode-categoryMenu-text: $text-primary;
+    --editorDarkMode-accent-text: $text-primary;
+}

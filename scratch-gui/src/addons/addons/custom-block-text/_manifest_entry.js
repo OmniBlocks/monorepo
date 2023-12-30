@@ -22,6 +22,7 @@ const manifest = {
   ],
   "settings": [
     {
+      "dynamic": true,
       "name": "Text size (%)",
       "id": "size",
       "type": "integer",
@@ -30,6 +31,7 @@ const manifest = {
       "default": 100
     },
     {
+      "dynamic": true,
       "name": "Bold text",
       "id": "bold",
       "type": "boolean",

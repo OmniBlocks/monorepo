@@ -36,8 +36,6 @@ export default async function ({ addon, console, msg }) {
   exSVG.setAttribute("xmlns:xlink", "http://www.w3.org/1999/xlink");
   exSVG.setAttribute("version", "1.1");
 
-  const enabledAddons = await addon.self.getEnabledAddons("codeEditor");
-
   addon.tab.createBlockContextMenu(
     (items) => {
       if (addon.self.disabled) return items;
@@ -159,7 +157,7 @@ export default async function ({ addon, console, msg }) {
     }
     if (dataShapes === "hat") {
       translateY = 16; // for Events
-      if (enabledAddons.includes("cat-blocks")) {
+      if (block.CAT_BLOCKS) {
         translateY += 16; // for cat ears
       }
     }

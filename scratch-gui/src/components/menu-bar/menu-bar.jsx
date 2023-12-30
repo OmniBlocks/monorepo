@@ -1090,7 +1090,10 @@ const mapDispatchToProps = dispatch => ({
     onRequestCloseAbout: () => dispatch(closeAboutMenu()),
     onClickRestorePoints: () => dispatch(openRestorePointModal()),
     onClickSettings: () => dispatch(openSettingsMenu()),
-    onClickSettingsModal: () => dispatch(openSettingsModal()),
+    onClickSettingsModal: () => {
+        dispatch(closeEditMenu());
+        dispatch(openSettingsModal());
+    },
     onRequestCloseSettings: () => dispatch(closeSettingsMenu()),
     onClickNew: needSave => dispatch(requestNewProject(needSave)),
     onClickRemix: () => dispatch(remixProject()),

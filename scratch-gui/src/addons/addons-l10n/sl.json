@@ -1,4 +1,7 @@
 {
+    "_general/blocks/anticlockwise": "v nasprotni smeri urnega kazalca",
+    "_general/blocks/clockwise": "v smeri urnega kazalca",
+    "_general/blocks/green-flag": "zastavico",
     "editor-devtools/clean-plus": "Počisti bloke +",
     "editor-devtools/copy-all": "Kopiraj vse",
     "editor-devtools/copy-block": "Kopiraj blok",

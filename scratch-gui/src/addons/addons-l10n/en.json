@@ -1,4 +1,7 @@
 {
+    "_general/blocks/anticlockwise": "anti-clockwise",
+    "_general/blocks/clockwise": "clockwise",
+    "_general/blocks/green-flag": "flag",
     "editor-devtools/clean-plus": "Clean up Blocks +",
     "editor-devtools/copy-all": "Copy All",
     "editor-devtools/copy-block": "Copy Block",

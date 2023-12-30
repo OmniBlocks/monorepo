@@ -1,4 +1,7 @@
 {
+    "_general/blocks/anticlockwise": "tegen de klok in",
+    "_general/blocks/clockwise": "met de klok mee",
+    "_general/blocks/green-flag": "vlag",
     "editor-devtools/clean-plus": "Blokken Opruimen +",
     "editor-devtools/copy-all": "Alles Kopiëren",
     "editor-devtools/copy-block": "Blok Kopiëren",

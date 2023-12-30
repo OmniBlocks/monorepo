@@ -309,6 +309,10 @@ const processAddon = (id, oldDirectory, newDirectory) => {
 };
 
 const SKIP_MESSAGES = [
+    '_general/meta/addonSettings',
+    '_general/meta/managedBySa',
+    '_locale',
+    '_locale_name',
     'debugger/@description',
     'debugger/@settings-name-log_max_list_length',
     'debugger/log-msg-list-append-too-long',
@@ -340,7 +344,7 @@ const parseMessageDirectory = localeRoot => {
     const runtime = {};
     const upstreamMessageIds = new Set();
 
-    for (const addon of addons) {
+    for (const addon of ['_general', ...addons]) {
         const path = pathUtil.join(localeRoot, `${addon}.json`);
         try {
             const contents = fs.readFileSync(path, 'utf-8');

@@ -725,7 +725,7 @@ class AddonRunner {
     }
 
     _msg (key, vars, handler) {
-        const namespacedKey = `${this.id}/${key}`;
+        const namespacedKey = key.startsWith('/') ? key.substring(1) : `${this.id}/${key}`;
         if (this.messageCache[namespacedKey]) {
             return this.messageCache[namespacedKey].format(vars);
         }

@@ -1,4 +1,7 @@
 {
+    "_general/blocks/anticlockwise": "antiorario",
+    "_general/blocks/clockwise": "orario",
+    "_general/blocks/green-flag": "bandiera",
     "editor-devtools/clean-plus": "Riordina i Blocchi (+)",
     "editor-devtools/copy-all": "Copia Tutti",
     "editor-devtools/copy-block": "Copia il Blocco",

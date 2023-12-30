@@ -1,4 +1,7 @@
 {
+    "_general/blocks/anticlockwise": "左回り",
+    "_general/blocks/clockwise": "右回り",
+    "_general/blocks/green-flag": "緑の旗",
     "editor-devtools/clean-plus": "きれいにする +",
     "editor-devtools/copy-all": "すべてコピー",
     "editor-devtools/copy-block": "ブロックをコピー",

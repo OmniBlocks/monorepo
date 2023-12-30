@@ -1,4 +1,7 @@
 {
+    "_general/blocks/anticlockwise": "saat yönünün tersine",
+    "_general/blocks/clockwise": "saat yönünde",
+    "_general/blocks/green-flag": "bayrak",
     "editor-devtools/clean-plus": "Blokları temizle +",
     "editor-devtools/copy-all": "Hepsini Kopyala",
     "editor-devtools/copy-block": "Bloğu Kopyala",

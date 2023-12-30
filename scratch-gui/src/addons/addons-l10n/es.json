@@ -1,4 +1,7 @@
 {
+    "_general/blocks/anticlockwise": "contrario a las agujas del reloj",
+    "_general/blocks/clockwise": "según las agujas del reloj",
+    "_general/blocks/green-flag": "bandera",
     "editor-devtools/clean-plus": "Ordenar Bloques +",
     "editor-devtools/copy-all": "Copiar Todos",
     "editor-devtools/copy-block": "Copiar Bloque",

@@ -1,4 +1,7 @@
 {
+    "_general/blocks/anticlockwise": "sens inverse des aiguilles d'une montre",
+    "_general/blocks/clockwise": "sens des aiguilles d'une montre",
+    "_general/blocks/green-flag": "drapeau",
     "editor-devtools/clean-plus": "Nettoyer les blocs +",
     "editor-devtools/copy-all": "Tout Copier",
     "editor-devtools/copy-block": "Copier Le Bloc",

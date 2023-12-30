@@ -113,6 +113,7 @@ const blockColors = {
     buttonBorder: '#c6c6c6',
     buttonActiveBackground: '#ffffff',
     buttonForeground: '#575E75',
+    zoomIconFilter: 'none',
     gridColor: '#dddddd'
 };
 

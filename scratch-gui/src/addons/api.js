@@ -594,7 +594,7 @@ class Tab extends EventTargetShim {
                         const itemElt = blocklyContextMenu.children[i];
                         itemElt.style.paddingTop = '2px';
                         itemElt.classList.add('sa-blockly-menu-item-border');
-                        itemElt.style.borderTop = '1px solid hsla(0, 0%, 0%, 0.15)';
+                        itemElt.style.borderTop = '1px solid var(--ui-black-transparent)';
                     }
                 });
             };

@@ -1,25 +1,31 @@
+@import "../../css/colors";
 @import "../../css/units";
 @import "../../css/colors";
+@import "../../css/filters.css";
 
 /* Popover styles */
 /* body is for specificity to override some addons that set a lower z-index */
 body :global(.Popover) {
     /* should be above menu bar */
     z-index: 500;
+
+    /* color-scheme: dark causes very strange issues */
+    color-scheme: light;
 }
 
 :global(.Popover-body) {
-    background: white;
-    border: 1px solid #ddd;
+    color: $text-primary;
+    background: $popover-background;
+    border: 1px solid $ui-pane-border;
     padding: 4px;
     border-radius: 4px;
     padding: 4px;
-    box-shadow: 0px 0px 8px 1px rgba(0, 0, 0, .3);
+    box-shadow: 0px 0px 8px 1px $ui-pane-border;
 }
 
 :global(.Popover-tipShape) {
-    fill: white;
-    stroke: #ddd;
+    fill: $popover-background;
+    stroke: $ui-pane-border;
 }
 
 .clickable {
@@ -35,11 +41,7 @@ body :global(.Popover) {
 .row-header {
     font-family: "Helvetica Neue", Helvetica, sans-serif;
     font-size: 0.65rem;
-    color: #575E75;
     margin: 8px 8px 0 8px;
-}
-[theme="dark"] .row-header {
-    color: #ccc;
 }
 
 .label-name {
@@ -47,11 +49,8 @@ body :global(.Popover) {
 }
 
 .divider {
-    border-top: 1px solid #ddd;
+    border-top: 1px solid $ui-pane-border;
     margin: 8px;
-}
-[theme="dark"] .divider {
-    border-color: #333;
 }
 
 .swap-button {
@@ -66,14 +65,11 @@ body :global(.Popover) {
 .swatch {
     width: 1.5rem;
     height: 1.5rem;
-    border: 1px solid #ddd;
+    border: 1px solid $ui-pane-border;
     border-radius: 4px;
     box-sizing: content-box;
     display: flex;
     align-items: center;
-}
-[theme="dark"] .swatch {
-    border-color: $form-border;
 }
 
 .large-swatch-icon {
@@ -87,13 +83,17 @@ body :global(.Popover) {
 }
 
 .active-swatch {
-    border: 1px solid #FF4C4C;
-    box-shadow: 0px 0px 0px 3px hsla(0, 100%, 65%, 0.2);
+    border: 1px solid $looks-secondary;
+    box-shadow: 0px 0px 0px 3px $looks-transparent;
 }
 
 .swatch-icon {
     width: 1.5rem;
     height: 1.5rem;
+}
+
+.picker-icon {
+    filter: $filter-icon-gray;
 }
 
 .inactive-gradient {

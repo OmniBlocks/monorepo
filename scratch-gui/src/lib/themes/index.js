@@ -74,7 +74,8 @@ const themeMap = {
         extensions: {},
         guiColors: defaultsDeep({}, twLightGuiColors, defaultGuiColors),
         label: messages[TW_LIGHT_THEME],
-        icon: twLightIcon
+        icon: twLightIcon,
+        useColorsForStage: true
     },
     [TW_DARK_THEME]: {
         isDark: true,
@@ -83,7 +84,8 @@ const themeMap = {
         extensions: darkModeExtensions,
         guiColors: defaultsDeep({}, twDarkGuiColors, darkModeGuiColors, defaultGuiColors),
         label: messages[TW_DARK_THEME],
-        icon: twDarkIcon
+        icon: twDarkIcon,
+        useColorsForStage: true
     },
     [SCRATCH_LIGHT_THEME]: {
         isDark: false,
@@ -92,7 +94,8 @@ const themeMap = {
         extensions: {},
         guiColors: defaultGuiColors,
         label: messages[SCRATCH_LIGHT_THEME],
-        icon: scratchLightIcon
+        icon: scratchLightIcon,
+        useColorsForStage: true
     },
     [SCRATCH_DARK_THEME]: {
         isDark: true,
@@ -101,7 +104,8 @@ const themeMap = {
         extensions: darkModeExtensions,
         guiColors: defaultsDeep({}, darkModeGuiColors, defaultGuiColors),
         label: messages[SCRATCH_DARK_THEME],
-        icon: scratchDarkIcon
+        icon: scratchDarkIcon,
+        useColorsForStage: false
     },
     [HIGH_CONTRAST_THEME]: {
         isDark: false,
@@ -110,7 +114,8 @@ const themeMap = {
         extensions: highContrastExtensions,
         guiColors: defaultGuiColors,
         label: messages[HIGH_CONTRAST_THEME],
-        icon: highContrastIcon
+        icon: highContrastIcon,
+        useColorsForStage: true
     }
 };
 
@@ -122,6 +127,14 @@ const getColorsForTheme = theme => {
     }
 
     return themeInfo.colors;
+};
+
+const getStageColorsForTheme = theme => {
+    const themeInfo = themeMap[theme];
+    if (themeInfo.useColorsForStage === false) {
+        return getColorsForTheme(DEFAULT_THEME);
+    }
+    return getColorsForTheme(theme);
 };
 
 const isDark = theme => {
@@ -138,6 +151,7 @@ export {
     HIGH_CONTRAST_THEME,
     defaultBlockColors,
     getColorsForTheme,
+    getStageColorsForTheme,
     themeMap,
     isDark
 };

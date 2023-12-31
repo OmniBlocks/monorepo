@@ -31,7 +31,7 @@ test('branchIconURI', t => {
     });
 
     const blocks = vm.runtime.getBlocksJSON();
-    t.equal(blocks[0].args2[0].src, './static/blocks-media/repeat.svg', 'default custom icon');
+    t.equal(blocks[0].args2[0].src, 'media://repeat.svg', 'default custom icon');
     t.equal(blocks[1].args2[0].src, 'data:whatever1', 'LOOP with custom icon');
     t.equal(blocks[2].args2[0].src, 'data:whatever2', 'CONDITIONAL with custom icon');
 

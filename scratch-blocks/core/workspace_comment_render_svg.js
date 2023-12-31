@@ -186,7 +186,6 @@ Blockly.WorkspaceCommentSvg.prototype.createEditor_ = function() {
   var textarea = document.createElementNS(Blockly.HTML_NS, 'textarea');
   textarea.className = 'scratchCommentTextarea scratchCommentText';
   textarea.setAttribute('dir', this.RTL ? 'RTL' : 'LTR');
-  textarea.setAttribute('maxlength', Blockly.WorkspaceComment.COMMENT_TEXT_LIMIT);
   textarea.setAttribute('placeholder', Blockly.Msg.WORKSPACE_COMMENT_DEFAULT_TEXT);
   body.appendChild(textarea);
   this.textarea_ = textarea;

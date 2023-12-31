@@ -67,3 +67,7 @@
   border-radius: 50%;
   background-color: #c234c2;
 }
+
+.sa-mute-project-icon {
+  display: none !important;
+}

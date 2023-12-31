@@ -281,9 +281,9 @@ a:active, a:focus {
     display: block;
     background: #333;
     width: 40px;
-    height: 20px;
-    border: none;
-    border-radius: 10px;
+    height: 22px;
+    border: 1px solid $ui-black-transparent;
+    border-radius: 12px;
     position: relative;
     cursor: pointer;
     transition: 0.25s ease;
@@ -296,18 +296,19 @@ a:active, a:focus {
     content: "";
     position: absolute;
     display: block;
-    width: 10px;
-    height: 10px;
+    width: 12px;
+    height: 12px;
     background: #fff;
-    border-radius: 5px;
-    top: 5px;
-    left: 5px;
+    border-radius: 6px;
+    top: 4px;
+    left: 4px;
     transition: 0.25s ease;
     transition-property: background, left;
 }
 .switch[state="on"]::before {
     background: #fff;
-    left: 25px;
+    left: auto;
+    right: 3px;
 }
 .switch:active, .switch:focus-within {
     outline: none;
@@ -455,6 +456,8 @@ a:active, a:focus {
 }
 
 .reset-setting-button {
+    background-color: $input-background;
+    border-left-width: 0;
     border-radius: 0 4px 4px 0px;
     box-sizing: border-box;
     height: 30px;
@@ -478,7 +481,7 @@ a:active, a:focus {
     margin: 0;
     background: transparent;
     border: none;
-    background: $ui-tertiary;
+    background: $ui-secondary;
     border: 1px solid $ui-black-transparent;
     border-right-width: 0;
     transition: 0.25s ease;

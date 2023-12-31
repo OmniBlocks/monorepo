@@ -497,6 +497,8 @@ class MenuBar extends React.Component {
                                 <img
                                     src={fileIcon}
                                     draggable={false}
+                                    width={20}
+                                    height={20}
                                 />
                                 <span className={styles.collapsibleLabel}>
                                     <FormattedMessage
@@ -508,6 +510,8 @@ class MenuBar extends React.Component {
                                 <img
                                     src={dropdownCaret}
                                     draggable={false}
+                                    width={8}
+                                    height={5}
                                 />
                                 <MenuBarMenu
                                     className={classNames(styles.menuBarMenu)}
@@ -646,6 +650,8 @@ class MenuBar extends React.Component {
                             <img
                                 src={editIcon}
                                 draggable={false}
+                                width={20}
+                                height={20}
                             />
                             <span className={styles.collapsibleLabel}>
                                 <FormattedMessage
@@ -657,6 +663,8 @@ class MenuBar extends React.Component {
                             <img
                                 src={dropdownCaret}
                                 draggable={false}
+                                width={8}
+                                height={5}
                             />
                             <MenuBarMenu
                                 className={classNames(styles.menuBarMenu)}
@@ -814,6 +822,8 @@ class MenuBar extends React.Component {
                                 <img
                                     src={addonsIcon}
                                     draggable={false}
+                                    width={20}
+                                    height={20}
                                 />
                                 <span className={styles.collapsibleLabel}>
                                     <FormattedMessage

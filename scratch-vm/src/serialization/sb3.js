@@ -95,6 +95,9 @@ const primitiveOpcodeInfoMap = {
     data_listcontents: [LIST_PRIMITIVE, 'LIST']
 };
 
+// We don't enforce this limit, but Scratch does, so we need to handle it for compatibility.
+const UPSTREAM_MAX_COMMENT_LENGTH = 8000;
+
 /**
  * Serializes primitives described above into a more compact format
  * @param {object} block the block to serialize
@@ -555,7 +558,16 @@ const serializeComments = function (comments) {
         serializedComment.width = comment.width;
         serializedComment.height = comment.height;
         serializedComment.minimized = comment.minimized;
-        serializedComment.text = comment.text;
+
+        if (comment.text.length > UPSTREAM_MAX_COMMENT_LENGTH) {
+            // Upstream's scratch-parser will refuse to load projects if the text is too long, so to maximize
+            // compatibility and minimize redundancy we'll store a truncated version in .text and the rest in
+            // another field
+            serializedComment.text = comment.text.substring(0, UPSTREAM_MAX_COMMENT_LENGTH);
+            serializedComment.extraText = comment.text.substring(UPSTREAM_MAX_COMMENT_LENGTH);
+        } else {
+            serializedComment.text = comment.text;
+        }
 
         obj[commentId] = serializedComment;
     }
@@ -1213,7 +1225,8 @@ const parseScratchObject = function (object, runtime, extensions, zip, assets) {
             const comment = object.comments[commentId];
             const newComment = new Comment(
                 commentId,
-                comment.text,
+                // text has a length limit, so anything extra got saved in extraText
+                comment.text + (typeof comment.extraText === 'string' ? comment.extraText : ''),
                 comment.x,
                 comment.y,
                 comment.width,

@@ -148,6 +148,13 @@ Blockly.FieldImage.prototype.setValue = function(src) {
   }
   this.src_ = src;
   if (this.imageElement_) {
+    // Extension blocks can't rely on having access to pathToMedia, so we allow this fake URL
+    // protocol instead.
+    var mediaPrefix = 'media://';
+    if (src.startsWith(mediaPrefix)) {
+      var pathToMedia = this.sourceBlock_.workspace.options.pathToMedia;
+      src = pathToMedia + src.substring(mediaPrefix.length);
+    }
     this.imageElement_.setAttributeNS('http://www.w3.org/1999/xlink',
         'xlink:href', src || '');
   }

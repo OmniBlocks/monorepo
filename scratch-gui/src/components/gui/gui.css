@@ -265,6 +265,7 @@ $fade-out-distance: 15px;
     width: 100%;
     height: 100%;
     cursor: pointer;
+    user-select: none;
 }
 
 .extension-button-icon {

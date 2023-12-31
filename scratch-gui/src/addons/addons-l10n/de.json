@@ -224,6 +224,8 @@
     "block-switching/sound_playuntildone": "spiele Klang ganz",
     "block-switching/sound_seteffectto": "setze Effekt auf",
     "block-switching/sound_setvolumeto": "setze Lautstärke auf",
+    "copy-reporter/copy-to-clipboard": "Kopieren",
+    "copy-reporter/copy-value": "Wert kopieren",
     "blocks2image/error_blocks_not_added": "Füge Blöcke zum Arbeitsbereich hinzu!",
     "blocks2image/export_all_to_PNG": "Alle als PNG exportieren",
     "blocks2image/export_all_to_SVG": "Alle als SVG exportieren",

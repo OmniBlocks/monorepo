@@ -201,6 +201,7 @@
     "custom-zoom/@settings-select-speed-long": "Lento",
     "custom-zoom/@settings-select-speed-none": "Imediato",
     "custom-zoom/@settings-select-speed-short": "Rápido",
+    "copy-reporter/@name": "Copiar valores reportados",
     "initialise-sprite-position/@name": "Posição padrão customizável para novos atores",
     "initialise-sprite-position/@settings-name-x": "Posição X",
     "initialise-sprite-position/@settings-name-y": "Posição Y",

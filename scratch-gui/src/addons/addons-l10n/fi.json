@@ -226,6 +226,8 @@
     "block-switching/sound_playuntildone": "soita loppuun",
     "block-switching/sound_seteffectto": "aseta tehosteeksi",
     "block-switching/sound_setvolumeto": "aseta äänenvoimakkuudeksi",
+    "copy-reporter/copy-to-clipboard": "Kopioi",
+    "copy-reporter/copy-value": "kopioi arvo",
     "blocks2image/error_blocks_not_added": "Lisää lohkoja työtilaan!",
     "blocks2image/export_all_to_PNG": "Lataa kaikki PNG-kuvana",
     "blocks2image/export_all_to_SVG": "Lataa kaikki SVG-tiedostona",

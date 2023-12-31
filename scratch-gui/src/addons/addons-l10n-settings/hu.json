@@ -231,6 +231,8 @@
     "custom-zoom/@settings-select-speed-long": "Lassú",
     "custom-zoom/@settings-select-speed-none": "Azonnali",
     "custom-zoom/@settings-select-speed-short": "Gyors",
+    "copy-reporter/@description": "Lehetőséget ad az értékblokkok felugró lufijainak és a változómonitorok értékeinek kimásolására (jobb egeres helyi menüből érhető el)",
+    "copy-reporter/@name": "Értékblokkok értékének másolása",
     "initialise-sprite-position/@name": "Személyre szabható pozíció az új szereplőknek",
     "initialise-sprite-position/@settings-name-x": "X pozíció",
     "initialise-sprite-position/@settings-name-y": "Y pozíció",

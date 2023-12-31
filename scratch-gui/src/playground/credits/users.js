@@ -125,6 +125,9 @@ const addonDevelopers = [
     {
         userID: '11677378',
         username: 'Mr_MPH'
+    },
+    {
+        username: 'TheKodeToad'
     }
 ].map(fromHardcoded);
 

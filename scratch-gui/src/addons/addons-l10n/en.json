@@ -239,6 +239,8 @@
     "block-switching/sound_playuntildone": "play until done",
     "block-switching/sound_seteffectto": "set effect",
     "block-switching/sound_setvolumeto": "set volume",
+    "copy-reporter/copy-to-clipboard": "Copy",
+    "copy-reporter/copy-value": "copy value",
     "blocks2image/error_blocks_not_added": "Add blocks to workspace!",
     "blocks2image/export_all_to_PNG": "Export all as PNG",
     "blocks2image/export_all_to_SVG": "Export all as SVG",

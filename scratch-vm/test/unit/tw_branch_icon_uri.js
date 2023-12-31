@@ -22,9 +22,15 @@ test('branchIconURI', t => {
                 },
                 {
                     blockType: BlockType.CONDITIONAL,
-                    opcode: 'block2',
+                    opcode: 'block3',
                     text: 'CONDITIONAL with custom icon',
                     branchIconURI: 'data:whatever2'
+                },
+                {
+                    blockType: BlockType.LOOP,
+                    opcode: 'block4',
+                    text: 'LOOP with no icon',
+                    branchIconURI: ''
                 }
             ]
         })
@@ -34,6 +40,7 @@ test('branchIconURI', t => {
     t.equal(blocks[0].args2[0].src, 'media://repeat.svg', 'default custom icon');
     t.equal(blocks[1].args2[0].src, 'data:whatever1', 'LOOP with custom icon');
     t.equal(blocks[2].args2[0].src, 'data:whatever2', 'CONDITIONAL with custom icon');
+    t.same(blocks[3].args2, null, 'LOOP with no icon');
 
     t.end();
 });

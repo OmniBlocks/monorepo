@@ -835,6 +835,9 @@ class MenuBar extends React.Component {
                             </div>
                         )}
                     </div>
+
+                    <Divider className={styles.divider} />
+
                     {this.props.canEditTitle ? (
                         <div className={classNames(styles.menuBarItem, styles.growable)}>
                             <MenuBarItemTooltip

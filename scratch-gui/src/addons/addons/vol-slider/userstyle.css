@@ -30,7 +30,10 @@
 
 .sa-small-stage .sa-vol-slider-input,
 .sa-small-stage .sa-vol-slider-icon:not([data-icon="mute"]) {
-  display: none;
+  display: none !important;
+}
+.sa-small-stage .sa-vol-slider {
+  width: 0;
 }
 
 .sa-vol-slider-input {

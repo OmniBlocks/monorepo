@@ -32,7 +32,8 @@
   display: none;
   position: absolute;
   z-index: 492;
-  background-color: white;
+  background-color: var(--ui-modal-background);
+  color: var(--ui-modal-foreground);
   width: 565px;
   height: 25rem;
 }
@@ -163,20 +164,18 @@
   box-sizing: border-box;
   display: flex;
   align-items: center;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+  border-bottom: 1px solid var(--ui-black-transparent);
   padding-left: 4px;
   font-family: monospace;
-  color: black;
 }
 .sa-debugger-log[data-type="warn"] {
-  border-color: hsl(50deg, 100%, 75%);
-  color: hsl(39deg 100% 18%);
-  background-color: hsl(50deg 100% 95%);
+  border-color: hsla(56deg, 100%, 69%, 0.5);
+  background-color: hsla(56deg, 100%, 69%, 0.3);
 }
 .sa-debugger-log[data-type="error"] {
-  border-color: hsl(0deg 100% 92%);
+  border-color: hsla(0deg, 100%, 69%, 0.5);
   color: red;
-  background-color: hsl(0deg 100% 95%);
+  background-color: hsla(0deg, 100%, 69%, 0.3);
 }
 
 .sa-debugger-log-repeats {
@@ -273,7 +272,7 @@
   display: block;
   text-align: center;
   height: 24px;
-  color: #2121bf;
+  color: var(--link-color);
 }
 .sa-debugger-compiler-warning[hidden] {
   display: none;

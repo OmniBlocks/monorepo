@@ -146,16 +146,6 @@
         }
     </style>
 </head>
-		<!--<script test="beepbox_editor.js" src="samples.js"></script>-->
-<!--<script test="beepbox_editor.js" src="samples2.js"></script>-->
-	<!--<script test="beepbox_editor.js" src="standarddrumsamples.js"></script>-->
- <!--<script test="beepbox_editor.js" src="drumsamples.js"></script>-->
-<!--<script test="beepbox_editor.js" src="samples3.js"></script>-->
-<!--<script test="beepbox_editor.js" src="plok_samples.js"></script>-->
-<!--<script test="beepbox_editor.js" src="kirby_samples.js"></script>-->
-<!--<script test="beepbox_editor.js" src="wario_samples.js"></script>-->
-	 <!--WIP, DO NOT USE-->
-	 <!--<center>THIS URL IS MEANT FOR TESTING THE CHANGES MADE IN ULTRABOX 2.0. THIS URL WILL BE DELETED WHEN ULTRABOX 2.0 RELEASES, AND ANY SONGS YOU MAKE HERE MAY BE UNRECOVERABLE. YOU'VE BEEN WARNED.</center>-->
 <body id="secondImage">
     <script>
         const image = localStorage.getItem('customTheme2');
@@ -184,7 +174,6 @@
                 It takes elements from most of the beepbox mods available and puts them in one convenient package.
             </p>
             <p>
-                 <!--(Everything below is, more or less, the usual beepbox description)-->
             </p>
             <!-- <p> -->
                 <!-- All song data is contained in the URL at the top of your browser. -->
@@ -296,7 +285,7 @@
 
     <!--
     Instead of loading js beepbox editor interface directly, test for browser support.
-    <script type="text/javascript" src="beepbox_editor.min.js"></script>
+    <script type="text/javascript" src="beepbox_app_editor.min.js"></script>
     -->
     <script type="text/javascript">
 
@@ -419,7 +408,7 @@
             // Go ahead and load js beepbox editor interface:
             var fileref = document.createElement("script");
             fileref.setAttribute("type", "text/javascript");
-            fileref.setAttribute("src", "beepbox_editor.min.js");
+            fileref.setAttribute("src", "beepbox_app_editor.min.js");
             document.head.appendChild(fileref);
         } else {
             document.getElementById("beepboxEditorContainer").innerHTML = "Sorry, UltraBox doesn't support your browser. Try a recent version of Chrome, Firefox, Edge, Safari, or Opera.";

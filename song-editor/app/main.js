@@ -1,12 +1,13 @@
 const { app, BrowserWindow, Menu } = require('electron/main');
 const { mainMenu } = require("./menu");
+const path = require('path');
 
 const createWindow = () => {
 	const win = new BrowserWindow({
 		width: 800,
 		height: 600,
 		// fullscreen: true,
-		icon: './icon.ico'
+		icon: path.join(__dirname, 'icon.png')
 		// autoHideMenuBar: true
 	})
 

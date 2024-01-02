@@ -11,9 +11,9 @@ const shuffle = list => {
 const fromHardcoded = ({userID = '0', username}) => {
     const result = {
         image: `https://trampoline.turbowarp.org/avatars/${userID}`,
-        text: name || username
+        text: username
     };
-    if (username) {
+    if (username && userID !== '0') {
         result.href = `https://scratch.mit.edu/users/${username}/`;
     }
     return result;

@@ -1,6 +1,7 @@
 @import "../../css/units.css";
 @import "../../css/colors.css";
 @import "../../css/z-index.css";
+@import "../../css/filters.css";
 
 .stage-header-wrapper {
     position: relative;
@@ -73,6 +74,7 @@
 .stage-button-icon {
     width: 100%;
     height: 100%;
+    filter: $filter-icon-gray;
 }
 
 [dir="rtl"] .stage-button-icon {

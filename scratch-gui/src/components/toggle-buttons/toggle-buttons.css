@@ -25,7 +25,7 @@
 .button > img {
     display: block;
     transition: transform 0.1s;
-    filter: grayscale(100%);
+    filter: $filter-icon-gray;
 }
 
 .button:not(:last-child) {

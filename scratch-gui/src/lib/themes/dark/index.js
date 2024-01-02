@@ -115,6 +115,8 @@ const guiColors = {
     'link-color': '#44aaff',
 
     'filter-icon-black': 'invert(100%)',
+    'filter-icon-gray': 'grayscale(100%) brightness(1.7)',
+    'filter-icon-white': 'brightness(0) invert(100%)',
 
     'paint-popover-background': '#333333',
     'paint-filter-icon-gray': 'brightness(1.7)'

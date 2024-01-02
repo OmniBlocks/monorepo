@@ -194,6 +194,8 @@ const guiColors = {
     'link-color': '#2255dd',
 
     'filter-icon-black': 'none',
+    'filter-icon-gray': 'grayscale(100%)',
+    'filter-icon-white': 'none',
 
     'paint-ui-pane-border': 'var(--ui-black-transparent)',
     'paint-text-primary': 'var(--text-primary)',

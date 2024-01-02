@@ -4,6 +4,12 @@
 .sa-onion-button:focus-within {
   background-color: var(--editorDarkMode-primary-transparent35, hsla(260, 60%, 60%, 0.35));
 }
+.sa-onion-image[data-image="toggle"] {
+  filter: var(--filter-icon-white);
+}
+.sa-onion-image[data-image="settings"] {
+  filter: var(--filter-icon-black);
+}
 .sa-onion-button[data-enabled="true"] .sa-onion-image {
   filter: brightness(0) invert(1);
 }

@@ -4980,7 +4980,6 @@ export class ColorConfig {
 			 "wackybox": `
 			
 			:root {
-				cursor: url('wackybox_cursor.png'), auto;
 				--page-margin: black;
 				--editor-background: black;
 				--hover-preview: white;
@@ -5101,45 +5100,9 @@ export class ColorConfig {
 					--disabled-note-secondary:  #666;
 				}
 
-.beepboxEditor {
-	cursor: url('wackybox_cursor.png'), auto !important;;
-}
-		
-.beepboxEditor .tip {
-	cursor: url('wackybox_cursor.png'), auto !important;;
-}
-
-.beepboxEditor .prompt label {
-	cursor: url('wackybox_cursor.png'), auto !important;;
-}
-
-.beepboxEditor .layout-option {
-	cursor: url('wackybox_cursor.png'), auto !important;;
-}
-
-.beepboxEditor select {
-	cursor: url('wackybox_cursor.png'), auto !important;;
-}
-
-.select2-selection__rendered {
-	cursor: url('wackybox_cursor.png'), auto !important;;
-}
-
-.select2-container--default .select2-results__group {
-    cursor: url('wackybox_cursor.png'), auto !important;;
-}
-
-.beepboxEditor button {
-	 cursor: url('wackybox_cursor.png'), auto !important;;
-}
-
-.beepboxEditor canvas {
-	cursor: url('wackybox_cursor.png'), auto !important;;
-}
-
-.beepboxEditor input {
-	cursor: url('wackybox_cursor.png'), auto !important;;
-}
+				* {
+					cursor: url("wackybox_cursor.png"), auto !important;
+				}
 
 			`,
 			 "microbox": `

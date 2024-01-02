@@ -9830,7 +9830,7 @@ export class Synth {
         }
         tone.expression = 0.0;
         tone.expressionDelta = 0.0;
-        for (let i: number = 0; i < Config.operatorCount; i++) {
+        for (let i: number = 0; i < (instrument.type == InstrumentType.fm6op ? 6 : Config.operatorCount); i++) {
             tone.operatorWaves[i] = Synth.getOperatorWave(instrument.operators[i].waveform, instrument.operators[i].pulseWidth);
         }
 

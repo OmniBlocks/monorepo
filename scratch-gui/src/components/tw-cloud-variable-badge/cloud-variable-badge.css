@@ -1,4 +1,5 @@
 @import "../../css/colors.css";
+@import "../../css/filters.css";
 
 .badge {
     padding: 0.5rem;
@@ -18,6 +19,10 @@
     font-weight: bold;
 }
 
+.cloud-icon {
+    filter: $filter-icon-gray;
+}
+
 .servers {
     display: flex;
     gap: 0.5rem;
@@ -32,5 +37,5 @@
 }
 .server.selected {
     background-color: $looks-secondary;
-    color: $ui-white;
+    color: white;
 }

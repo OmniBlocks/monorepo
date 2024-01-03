@@ -26,5 +26,8 @@ npx terser \
 # Combine the html and js into a single file for the offline version
 sed \
 	-e '/INSERT_BEEPBOX_SOURCE_HERE/{r website/beepbox_editor.min.js' -e 'd' -e '}' \
+	-e '/INSERT_JQUERY_MIN_JS_HERE/{r website/offline_deps/jquery-3.4.1.min.js' -e 'd' -e '}' \
+	-e '/INSERT_SELECT2_MIN_JS_HERE/{r website/offline_deps/select2.min.js' -e 'd' -e '}' \
+	-e '/INSERT_SELECT2_CSS_HERE/{r website/offline_deps/select2.min.css' -e 'd' -e '}' \
 	website/jummbox_offline_template.html \
 	> website/jummbox_offline.html

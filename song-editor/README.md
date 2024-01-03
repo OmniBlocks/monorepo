@@ -30,7 +30,11 @@ npm install
 npm run build
 ```
 
-A note for JummBox: You may also have to install these additional dependencies if they are not picked up automatically.
+JummBox makes a divergence from BeepBox that necessitates an additional dependency:
+rather than using the (rather poor) default HTML select implementation, the custom
+library [select2](https://select2.org) is employed. select2 has an explicit dependency
+on [jQuery](https://jquery.com) as well, so you may need to install the following
+additional dependencies if they are not picked up automatically.
 
 ```
 npm install select2

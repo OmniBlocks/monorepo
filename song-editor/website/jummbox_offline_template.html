@@ -3,11 +3,17 @@
 <head>
     <link rel='shortcut icon' type='image/x-icon' href='./favicon.ico' />
     <!-- CDN for jQuery and select2 -->
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js"
-            integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
-            crossorigin="anonymous"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.7/css/select2.min.css" rel="stylesheet" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.7/js/select2.min.js"></script>
+	<!--
+    <script src="offline_deps/jquery-3.4.1.min.js"></script>
+    <link href="offline_deps/select2.min.css" rel="stylesheet" />
+    <script src="offline_deps/select2.min.js"></script>
+	-->
+	<script>
+	/* INSERT_JQUERY_MIN_JS_HERE */
+	</script>
+	<script>
+	/* INSERT_SELECT2_MIN_JS_HERE */
+	</script>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>JummBox</title>
@@ -25,7 +31,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="32x32" href="/icon_32.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
-    <link href="https://fonts.googleapis.com/css?family=B612" rel="stylesheet" rel="stylesheet" media="none" onload="if (this.media != 'all') this.media='all';" /> <!-- this is a trick to load CSS asynchronously. -->
+    <link href="https://fonts.googleapis.com/css?family=B612" rel="stylesheet" media="none" onload="if (this.media != 'all') this.media='all';" /> <!-- this is a trick to load CSS asynchronously. -->
     <meta name="robots" content="noindex, nofollow" />
 	<style type="text/css">
 
@@ -149,6 +155,9 @@
                 align-items: center;
             }
         }
+		
+		/* INSERT_SELECT2_CSS_HERE */
+		
     </style>
 </head>
 
@@ -282,9 +291,6 @@
                     </p>
                     <p>
                         Neither Jummbus nor Jummbox assume responsibility for any copyrighted material played on JummBox. No songs are ever received, recorded, or distributed by JummBox's servers. All song data is contained in the URL after the hash (#) mark, and JummBox running inside your browser converts that data into sound waves.
-                    </p>
-                    <p id="offline-instructions">
-                        You can download <a download="jummbox_offline.html" href="jummbox_offline.html">an offline version of JummBox</a> to use when you don't have access to the internet. The features are otherwise the same.
                     </p>
                     <p>
                         You can download and use <a href="https://github.com/jummbus/jummbox">the source code</a> under the MIT license.

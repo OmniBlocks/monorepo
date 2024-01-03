@@ -33,7 +33,8 @@ export class ThemePrompt implements Prompt {
 		option({ value: "roe light" }, "Roe Light"),
 		option({ value: "energized" }, "Energized"),
 		option({ value: "neapolitan" }, "Neapolitan"),
-		option({ value: "mono" }, "Mono"),
+		option({ value: "poly" }, "Poly"),
+		option({ value: "blutonium" }, "Blutonium"),
 	);
 	private readonly _cancelButton: HTMLButtonElement = button({ class: "cancelButton" });
 	private readonly _okayButton: HTMLButtonElement = button({ class: "okayButton", style: "width:45%;" }, "Okay");
@@ -64,7 +65,7 @@ export class ThemePrompt implements Prompt {
 		if (this.lastTheme != null) {
 			ColorConfig.setTheme(this.lastTheme);
 		} else {
-			ColorConfig.setTheme("dark classic");
+			ColorConfig.setTheme("jummbox classic");
 		}
 		this._doc.undo();
 	}

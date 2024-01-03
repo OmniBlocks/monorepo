@@ -8,6 +8,7 @@ const RenderGUI = props => (
     <GUI
         cloudHost={cloudHost}
         canUseCloud
+        hasCloudPermission
         canSave={false}
         basePath={process.env.ROOT}
         canEditTitle

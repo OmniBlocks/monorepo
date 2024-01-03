@@ -2,7 +2,7 @@
 @import "../../css/units.css";
 
 .inline-message {
-    color: $ui-white;
+    color: $menu-bar-foreground;
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     display: flex;
     justify-content: flex-end;
@@ -15,7 +15,7 @@
 }
 
 .info {
-    color: $ui-white;
+    color: $menu-bar-foreground;
 }
 
 .warn {

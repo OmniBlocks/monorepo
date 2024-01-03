@@ -24,7 +24,6 @@ import log from './log';
 import storage from './storage';
 
 import VM from 'scratch-vm';
-import * as progressMonitor from '../components/loader/tw-progress-monitor';
 import {fetchProjectMeta} from './tw-project-meta-fetcher-hoc.jsx';
 
 // TW: Temporary hack for project tokens
@@ -115,7 +114,7 @@ const ProjectFetcherHOC = function (WrappedComponent) {
                 if (!projectUrl.startsWith('http:') && !projectUrl.startsWith('https:')) {
                     projectUrl = `https://${projectUrl}`;
                 }
-                assetPromise = progressMonitor.fetchWithProgress(projectUrl)
+                assetPromise = fetch(projectUrl)
                     .then(r => {
                         if (!r.ok) {
                             throw new Error(`Request returned status ${r.status}`);

@@ -1,5 +1,6 @@
 @import "../../css/colors.css";
 @import "../../css/z-index.css";
+@import "../../css/default-colors.css";
 
 .background {
     position: absolute;
@@ -167,16 +168,24 @@
     margin: 0.75rem 0;
 }
 
-.message-container-outer {
-    height: 30px;
-    overflow: hidden;
-}
-
-.message-container-inner {
-    transition: transform 0.5s;
-}
-
 .message {
     height: 20px;
     margin: 5px 0;
+}
+
+.bar-outer {
+    width: 250px;
+    height: 8px;
+    border-radius: 8px;
+    background-color: $ui-white-transparent-default;
+    overflow: hidden;
+    position: relative;
+}
+.bar-inner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 100%;
+    background-color: $ui-white-default;
 }

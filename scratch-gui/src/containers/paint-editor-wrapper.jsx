@@ -8,7 +8,7 @@ import ErrorBoundaryHOC from '../lib/error-boundary-hoc.jsx';
 import {openFontsModal} from '../reducers/modals';
 
 import {connect} from 'react-redux';
-import { isDark } from '../lib/themes/index.js';
+import {isDark} from '../lib/themes/index.js';
 
 class PaintEditorWrapper extends React.Component {
     constructor (props) {
@@ -16,7 +16,8 @@ class PaintEditorWrapper extends React.Component {
         bindAll(this, [
             'handleUpdateImage',
             'handleUpdateName',
-            'handleUpdateFonts'
+            'handleUpdateFonts',
+            'fontInlineFn'
         ]);
         this.state = {
             fonts: this.props.vm.runtime.fontManager.getFonts()
@@ -60,6 +61,9 @@ class PaintEditorWrapper extends React.Component {
                 2 /* bitmapResolution */);
         }
     }
+    fontInlineFn (svgString) {
+        return inlineSvgFonts(svgString, this.props.vm.renderer.customFonts);
+    }
     render () {
         if (!this.props.imageId) return null;
         const {
@@ -74,7 +78,7 @@ class PaintEditorWrapper extends React.Component {
                 image={vm.getCostume(selectedCostumeIndex)}
                 onUpdateImage={this.handleUpdateImage}
                 onUpdateName={this.handleUpdateName}
-                fontInlineFn={inlineSvgFonts}
+                fontInlineFn={this.fontInlineFn}
                 theme={isDark(this.props.theme) ? 'dark' : 'light'}
                 customFonts={this.state.fonts}
                 width={this.props.customStageSize.width}

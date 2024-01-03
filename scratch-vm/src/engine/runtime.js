@@ -518,6 +518,16 @@ class Runtime extends EventEmitter {
          * @type {Object.<string, object>}
          */
         this.extensionStorage = {};
+
+        /**
+         * Total number of scratch-storage load() requests since the runtime was created or cleared.
+         */
+        this.totalAssetRequests = 0;
+
+        /**
+         * Total number of finished or errored scratch-storage load() requests since the runtime was created or cleared.
+         */
+        this.finishedAssetRequests = 0;
     }
 
     /**
@@ -655,6 +665,14 @@ class Runtime extends EventEmitter {
      */
     static get AFTER_EXECUTE () {
         return 'AFTER_EXECUTE';
+    }
+
+    /**
+     * Event name for reporting asset download progress. Fired with finished, total
+     * @const {string}
+     */
+    static get ASSET_PROGRESS () {
+        return 'ASSET_PROGRESS';
     }
 
     /**
@@ -2256,6 +2274,8 @@ class Runtime extends EventEmitter {
         this.getNumberOfCloudVariables = newCloudDataManager.getNumberOfCloudVariables;
         this.addCloudVariable = this._initializeAddCloudVariable(newCloudDataManager);
         this.removeCloudVariable = this._initializeRemoveCloudVariable(newCloudDataManager);
+
+        this.resetProgress();
     }
 
     /**
@@ -3392,6 +3412,39 @@ class Runtime extends EventEmitter {
         }
         this.externalCommunicationMethods[method] = enabled;
         this.updatePrivacy();
+    }
+
+    emitAssetProgress () {
+        this.emit(Runtime.ASSET_PROGRESS, this.finishedAssetRequests, this.totalAssetRequests);
+    }
+
+    resetProgress () {
+        this.finishedAssetRequests = 0;
+        this.totalAssetRequests = 0;
+        this.emitAssetProgress();
+    }
+
+    /**
+     * Wrap an asset loading promise with progress support.
+     * @template T
+     * @param {Promise<T>} promise
+     * @returns {Promise<T>}
+     */
+    wrapAssetRequest (promise) {
+        this.totalAssetRequests++;
+        this.emitAssetProgress();
+
+        return promise
+            .then(result => {
+                this.finishedAssetRequests++;
+                this.emitAssetProgress();
+                return result;
+            })
+            .catch(error => {
+                this.finishedAssetRequests++;
+                this.emitAssetProgress();
+                throw error;
+            });
     }
 }
 

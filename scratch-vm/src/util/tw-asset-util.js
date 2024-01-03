@@ -9,7 +9,6 @@ class AssetUtil {
      * @returns {Promise<Storage.Asset>} scratch-storage asset object
      */
     static getByMd5ext (runtime, zip, assetType, md5ext) {
-        const storage = runtime.storage;
         const idParts = StringUtil.splitFirst(md5ext, '.');
         const md5 = idParts[0];
         const ext = idParts[1].toLowerCase();
@@ -26,17 +25,17 @@ class AssetUtil {
             }
 
             if (file) {
-                return file.async('uint8array').then(data => runtime.storage.createAsset(
+                return runtime.wrapAssetRequest(file.async('uint8array').then(data => runtime.storage.createAsset(
                     assetType,
                     ext,
                     data,
                     md5,
                     false
-                ));
+                )));
             }
         }
 
-        return storage.load(assetType, md5, ext);
+        return runtime.wrapAssetRequest(runtime.storage.load(assetType, md5, ext));
     }
 }
 

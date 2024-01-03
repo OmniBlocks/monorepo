@@ -53,7 +53,8 @@
   padding: 0 0.5rem;
 }
 
-[class*="menu-bar_menu-bar-button"] {
+[class*="menu-bar_menu-bar-button"],
+[class*="menu-bar_feedback-button_"] {
   height: 1.5rem;
   padding-left: 0.5rem;
   padding-right: 0.5rem;

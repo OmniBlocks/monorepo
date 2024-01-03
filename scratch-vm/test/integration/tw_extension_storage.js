@@ -5,6 +5,7 @@ const VirtualMachine = require('../../src/virtual-machine');
 const Sprite = require('../../src/sprites/sprite');
 const RenderedTarget = require('../../src/sprites/rendered-target');
 const sb3 = require('../../src/serialization/sb3');
+const Runtime = require('../../src/engine/runtime');
 
 test('serialize data', t => {
     const vm = new VirtualMachine();
@@ -166,4 +167,12 @@ test('deserialize project with no data', t => {
         t.same(vm.runtime.targets[0].extensionStorage, {}, 'deserialized target 0');
         t.end();
     });
+});
+
+test('dispose resets storage', t => {
+    const runtime = new Runtime();
+    runtime.extensionStorage.something = 3;
+    runtime.dispose();
+    t.same(runtime.extensionStorage, {});
+    t.end();
 });

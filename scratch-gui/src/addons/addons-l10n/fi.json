@@ -235,6 +235,7 @@
     "blocks2image/export_selected_to_SVG": "Lataa lohko SVG-tiedostona",
     "move-to-top-bottom/bottom": "siirry alas",
     "move-to-top-bottom/top": "siirry ylös",
+    "move-to-top-layer/move-to-front-layer": "mene etualalle",
     "rename-broadcasts/RENAME_BROADCAST": "Nimeä viesti uudelleen",
     "rename-broadcasts/RENAME_BROADCAST_MODAL_TITLE": "Nimeä viesti uudelleen",
     "rename-broadcasts/RENAME_BROADCAST_TITLE": "Nimeä kaikki \"{name}\"-viestit uudelleen:",

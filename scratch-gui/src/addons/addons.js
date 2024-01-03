@@ -60,6 +60,7 @@ const addons = [
     'no-script-bumping',
     'disable-stage-drag-select',
     'move-to-top-bottom',
+    'move-to-top-layer',
     'disable-paste-offset',
     'block-duplicate',
     'rename-broadcasts',
@@ -84,7 +85,8 @@ const newAddons = [
     'editor-square-inputs',
     'copy-reporter',
     'editor-number-arrow-keys',
-    'editor-compact'
+    'editor-compact',
+    'move-to-top-layer'
 ];
 
 // eslint-disable-next-line import/no-commonjs

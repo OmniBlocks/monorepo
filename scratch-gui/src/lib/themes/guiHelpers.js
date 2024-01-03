@@ -1,4 +1,5 @@
 import {DEFAULT_THEME, themeMap} from '.';
+import AddonHooks from '../../addons/hooks';
 
 const applyGuiColors = theme => {
     const doc = document.documentElement;
@@ -18,6 +19,8 @@ const applyGuiColors = theme => {
     window.Recolor = {
         primary: themeObject.guiColors['looks-secondary']
     };
+
+    AddonHooks.recolorCallbacks.forEach(i => i());
 };
 
 export {

@@ -40,7 +40,7 @@ export default async function ({ addon, console, msg }) {
   });
   hideStageButton.setAttribute("aria-label", msg("hide-stage"));
   hideStageButton.setAttribute("aria-pressed", false);
-  const hideStageIcon = Object.assign(document.createElement("img"), {
+  const hideStageIcon = Object.assign(addon.tab.recolorable(), {
     className: addon.tab.scratchClass("stage-header_stage-button-icon"),
     src: addon.self.getResource("/icon.svg") /* rewritten by pull.js */,
     draggable: false,

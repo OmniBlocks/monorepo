@@ -197,7 +197,7 @@ export default async function ({ addon, console, msg }) {
 
   const createHeaderTab = ({ text, icon }) => {
     const tab = document.createElement("li");
-    const imageElement = Object.assign(document.createElement("img"), {
+    const imageElement = Object.assign(addon.tab.recolorable(), {
       src: icon,
       draggable: false,
     });

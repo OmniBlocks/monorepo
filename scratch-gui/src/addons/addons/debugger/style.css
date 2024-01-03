@@ -215,7 +215,7 @@
 }
 .sa-debugger-log-link:hover {
   text-decoration: underline;
-  color: #855cd6;
+  color: var(--looks-secondary);
   opacity: 1;
 }
 .sa-debugger-log-link-unknown {

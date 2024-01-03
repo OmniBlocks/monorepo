@@ -49,7 +49,7 @@ export default async function ({ addon, console, msg }) {
   // Cannot use number due to conflict after leaving and re-entering editor
   varTab.id = "react-tabs-sa-variable-manager";
 
-  const varTabIcon = document.createElement("img");
+  const varTabIcon = addon.tab.recolorable();
   varTabIcon.draggable = false;
   varTabIcon.src = addon.self.getResource("/icon.svg") /* rewritten by pull.js */;
 

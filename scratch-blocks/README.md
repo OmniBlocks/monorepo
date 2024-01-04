@@ -6,7 +6,7 @@
 
 ## Local development
 
-Requires Node.js (`node`), Python (`python3`), and Java (`java`). It is known to work in these environments but should work in many others:
+Requires Node.js (16 or later), Python (2 or 3), and Java. It is known to work in these environments but should work in many others:
 
  - Windows 10, Python 3.12.1 (Microsoft Store), Node.js 20.10.0 (nodejs.org installer), Java 11 (Temurin-11.0.21+9)
  - macOS 14.2.1, Python 3.11.6 (Apple), Node.js 20.10.0 (installed manually), Java 21 (Temurin-21.0.1+12)

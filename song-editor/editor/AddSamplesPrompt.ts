@@ -229,7 +229,7 @@ export class AddSamplesPrompt {
             this._bulkAddTextarea.value
                 .replace(/\n/g, "|")
                 .split("|")
-                .map((x: string) => decodeURIComponent(x.trim()))
+                // .map((x: string) => decodeURIComponent(x.trim()))
                 .filter((x: string) => x !== ""),
             false
         );

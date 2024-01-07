@@ -1,6 +1,16 @@
 #!/bin/bash
 set -e
 
+
+# Copy SongEditor.ts into app_editor
+
+# Edit the relative URLs of SongEditor.ts
+
+# Copy AddSamplesPrompt.ts into app_editor
+
+# Insert and replace text into AddSamplesPrompt.ts
+
+
 # Compile editor/main.ts into build/editor/main.js and dependencies
 npx tsc -p tsconfig_app.json
 

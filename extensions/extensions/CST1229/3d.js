@@ -55,6 +55,7 @@
       //gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0,255,0,255]));
       this._texture = texture;
       this._rotationCenter = [240, 180];
+      this._size = [480, 360];
     }
     dispose() {
       if (this._texture) {
@@ -63,8 +64,12 @@
       }
       super.dispose();
     }
+    set size(value) {
+      this._size = value;
+      this._rotationCenter = [value[0] / 2, value[1] / 2];
+    }
     get size() {
-      return [480, 360];
+      return this._size;
     }
     getTexture(scale) {
       return this._texture || super.getTexture();
@@ -317,6 +322,34 @@
               },
             },
           },
+          {
+            opcode: "setCameraParam",
+            blockType: Scratch.BlockType.COMMAND,
+            text: "set camera [PARAM] to [VALUE]",
+            arguments: {
+              PARAM: {
+                type: Scratch.ArgumentType.STRING,
+                menu: "cameraParam",
+                defaultValue: "vertical FOV",
+              },
+              VALUE: {
+                type: Scratch.ArgumentType.NUMBER,
+                defaultValue: "50",
+              },
+            },
+          },
+          {
+            opcode: "getCameraParam",
+            blockType: Scratch.BlockType.REPORTER,
+            text: "camera [PARAM]",
+            arguments: {
+              PARAM: {
+                type: Scratch.ArgumentType.STRING,
+                menu: "cameraParam",
+                defaultValue: "vertical FOV",
+              },
+            },
+          },
         ],
         menus: {
           MODE_MENU: {
@@ -342,6 +375,10 @@
             acceptReporters: true,
             items: ["angle", "aim", "roll"],
           },
+          cameraParam: {
+            acceptReporters: true,
+            items: ["vertical FOV", "minimum render distance", "maximum render distance"],
+          }
         },
       };
     }
@@ -354,6 +391,8 @@
       this.camera = new THREE.PerspectiveCamera(60, 1, 0.1, 1000);
       this.camera.position.set(0, 0, 175);
       this.camera.lookAt(0, 0, 0);
+      this.camera.near = 0.5;
+      this.camera.far = 4800;
 
       this.renderer = new THREE.WebGLRenderer();
       this.renderer.setClearAlpha(0);
@@ -369,9 +408,13 @@
         this.threeSkinId
       );
 
+      this.stageSizeEvent = (() => {
+        this.updateScale();
+      }).bind(this);
+      Scratch.vm.on("STAGE_SIZE_CHANGED", this.stageSizeEvent);
+
       this.applyPatches();
       this.updateScale();
-
     }
 
     uninit() {
@@ -393,6 +436,10 @@
       if (this.threeDrawableId)
         Scratch.renderer._allDrawables[this.threeDrawableId].dispose();
       this.threeDrawableId = undefined;
+      if (this.stageSizeEvent)
+        Scratch.vm.off("STAGE_SIZE_CHANGED", this.stageSizeEvent);
+      this.stageSizeEvent = undefined;
+
       Scratch.vm.runtime.requestRedraw();
     }
 
@@ -400,6 +447,8 @@
     updateScale() {
       const w = Scratch.vm.runtime.stageWidth || 480;
       const h = Scratch.vm.runtime.stageHeight || 360;
+
+      Scratch.renderer._allSkins[this.threeSkinId].size = [w, h];
 
       this.camera.aspect = w / h;
       this.renderer.setSize(w, h);
@@ -898,6 +947,46 @@
         default:
           return 0;
       }
+    }
+
+    setCameraParam({PARAM, VALUE}) {
+      this.init();
+
+      PARAM = Scratch.Cast.toString(PARAM);
+      switch (PARAM) {
+        case "minimum render distance":
+          VALUE = Math.max(Scratch.Cast.toNumber(VALUE), 0.1);
+          this.camera.near = VALUE;
+          break;
+        case "maximum render distance":
+          VALUE = Math.min(Scratch.Cast.toNumber(VALUE), 4800000);
+          this.camera.far = VALUE;
+          break;
+        case "vertical FOV":
+          VALUE = Math.min(Math.max(Scratch.Cast.toNumber(VALUE), 0.001), 36000)
+          this.camera.fov = VALUE;
+          break;
+        default:
+          return;
+      }
+
+      this.camera.updateProjectionMatrix();
+      this.updateRenderer();
+    }
+    
+    getCameraParam({PARAM}) {
+      this.init();
+
+      PARAM = Scratch.Cast.toString(PARAM);
+      switch (PARAM) {
+        case "minimum render distance":
+          return this.camera.near;
+        case "maximum render distance":
+          return this.camera.far;
+        case "vertical FOV":
+          return this.camera.fov;
+      }
+      return "";
     }
   }
 

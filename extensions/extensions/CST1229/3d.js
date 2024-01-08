@@ -410,15 +410,7 @@
 
     // patches for stuff
     applyPatches() {
-      let drawable = null;
-      for (const dr of Scratch.renderer._allDrawables) {
-        if (dr) {
-          drawable = dr;
-          break;
-        }
-      }
-      if (!drawable) throw new Error("No drawables found");
-      const Drawable = drawable.constructor;
+      const Drawable = Scratch.renderer.exports.Drawable;
 
       Drawable.threed = this;
       patch(Drawable.prototype, {
@@ -434,6 +426,15 @@
             Drawable.threed.updateRenderer();
           }
           return og(position);
+        },
+        updateDirection(og, direction) {
+          if (this[IN_3D]) {
+            const o = this[OBJECT];
+            o._roll = THREE.MathUtils.degToRad(direction);
+            Drawable.threed.updateSpriteAngle(this);
+            Drawable.threed.updateRenderer();
+          }
+          return og(direction);
         },
         dispose(og) {
           if (this[OBJECT]) {
@@ -575,7 +576,7 @@
       this.updateMeshForDrawable(drawableID, type);
       if (!("_yaw" in dr)) dr._yaw = 0;
       if (!("_pitch" in dr)) dr._pitch = 0;
-      if (!("_roll" in dr)) dr._roll = 0;
+      if (!("_roll" in dr)) dr._roll = THREE.MathUtils.degToRad(90);
 
       this.scene.add(obj);
       this.updateRenderer();
@@ -671,16 +672,20 @@
       return dr[OBJECT].position.z;
     }
 
-    mod(n, modulus) {
-      let result = n % modulus;
-      // Scratch mod uses floored division instead of truncated division.
-      if (result / modulus < 0) result += modulus;
-      return result;
+    // scratch-vm function
+    wrapClamp(n, min, max) {
+      const range = (max - min) + 1;
+      return n - (Math.floor((n - min) / range) * range);
     }
 
     updateSpriteAngle(util) {
-      if (util.target.isStage) return;
-      const dr = Scratch.renderer._allDrawables[util.target.drawableID];
+      let dr;
+      if (util.target) {
+        if (util.target.isStage) return;
+        dr = Scratch.renderer._allDrawables[util.target.drawableID];
+      } else {
+        dr = util;
+      }
 
       if (!dr[IN_3D]) return;
       const obj = dr[OBJECT];
@@ -689,9 +694,9 @@
       obj.rotation.y = 0;
       obj.rotation.z = 0;
 
-      dr._yaw = this.mod(dr._yaw, 180);
-      dr._pitch = this.mod(dr._pitch, 180);
-      dr._roll = this.mod(dr._roll, 180);
+      dr._yaw = this.wrapClamp(dr._yaw, -179, 180);
+      dr._pitch = this.wrapClamp(dr._pitch, -179, 180);
+      dr._roll = this.wrapClamp(dr._roll, -179, 180);
 
       obj.rotation.y = dr._yaw;
       obj.rotateOnAxis(
@@ -700,7 +705,7 @@
       );
       obj.rotateOnAxis(
         new THREE.Vector3(0, 0, 1),
-        dr._roll
+        dr._roll - THREE.MathUtils.degToRad(90)
       );
     }
 
@@ -725,6 +730,8 @@
 
       if (!dr[IN_3D]) return;
 
+      if (!isFinite(DEGREES)) return;
+
       DEGREES = Scratch.Cast.toNumber(DEGREES) *
         ((DIRECTION === "left" || DIRECTION === "down" || DIRECTION === "ccw") ? -1 : 1);
 
@@ -739,7 +746,7 @@
           break;
         case "cw":
         case "ccw":
-          dr._roll += THREE.MathUtils.degToRad(DEGREES);
+          util.target.setDirection(util.target.direction + DEGREES);
           break;
       }
       this.updateSpriteAngle(util);
@@ -754,6 +761,8 @@
 
       DEGREES = Scratch.Cast.toNumber(DEGREES);
 
+      if (!isFinite(DEGREES)) return;
+
       switch (DIRECTION) {
         case "angle":
           dr._yaw = -THREE.MathUtils.degToRad(DEGREES);
@@ -762,7 +771,7 @@
           dr._pitch = THREE.MathUtils.degToRad(DEGREES);
           break;
         case "roll":
-          dr._roll = THREE.MathUtils.degToRad(DEGREES);
+          util.target.setDirection(DEGREES);
           break;
       }
       this.updateSpriteAngle(util);
@@ -789,7 +798,7 @@
     preUpdateCameraAngle() {
       if (!("_yaw" in this.camera)) this.camera._yaw = 0;
       if (!("_pitch" in this.camera)) this.camera._pitch = 0;
-      if (!("_roll" in this.camera)) this.camera._roll = 0;
+      if (!("_roll" in this.camera)) this.camera._roll = THREE.MathUtils.degToRad(90);
     }
 
     updateCameraAngle() {
@@ -797,9 +806,9 @@
       this.camera.rotation.y = 0;
       this.camera.rotation.z = 0;
 
-      this.camera._yaw = this.mod(this.camera._yaw, 180);
-      this.camera._pitch = this.mod(this.camera._pitch, 180);
-      this.camera._roll = this.mod(this.camera._roll, 180);
+      this.camera._yaw = this.wrapClamp(this.camera._yaw, -179, 180);
+      this.camera._pitch = this.wrapClamp(this.camera._pitch, -179, 180);
+      this.camera._roll = this.wrapClamp(this.camera._roll, -179, 180);
 
       this.camera.rotation.y = this.camera._yaw;
       this.camera.rotateOnAxis(
@@ -808,7 +817,7 @@
       );
       this.camera.rotateOnAxis(
         new THREE.Vector3(0, 0, 1),
-        this.camera._roll
+        this.camera._roll - THREE.MathUtils.degToRad(90)
       );
     }
 

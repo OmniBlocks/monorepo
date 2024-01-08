@@ -3372,13 +3372,13 @@ export class Song {
                 // JB before v5 had custom chip and mod before pickedString and supersaw were added. Index +2.
                 let instrumentType: number = validateRange(0, InstrumentType.length - 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                 if (fromJummBox && beforeFive) {
-                    if (instrumentType == InstrumentType.customChipWave || instrumentType == InstrumentType.mod) {
+                    if (instrumentType == InstrumentType.pickedString || instrumentType == InstrumentType.supersaw) {
                         instrumentType += 2;
                     }
                 }
                 // Similar story here, JB before v5 had custom chip and mod before supersaw was added. Index +1.
-                else if ( fromJummBox && beforeSix) {
-                    if (instrumentType == InstrumentType.customChipWave || instrumentType == InstrumentType.mod) {
+                else if (fromJummBox && beforeSix) {
+                    if (instrumentType == InstrumentType.supersaw || instrumentType == InstrumentType.customChipWave) {
                         instrumentType += 1;
                     }
                 }

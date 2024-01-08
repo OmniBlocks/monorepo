@@ -760,7 +760,10 @@
 
     set3DPos({X, Y, Z}, util) {
       if (util.target.isStage) return;
-
+      
+      X = Scratch.Cast.toNumber(X);
+      Y = Scratch.Cast.toNumber(Y);
+      util.target.setXY(X, Y);
       this.setZ({Z}, util);
     }
 

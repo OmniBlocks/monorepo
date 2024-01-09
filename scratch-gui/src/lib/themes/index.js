@@ -61,8 +61,11 @@ const BLOCKS_MAP = {
 class Theme {
     constructor (accent, gui, blocks) {
         // do not modify these directly
+        /** @readonly */
         this.accent = Object.keys(ACCENT_MAP).includes(accent) ? accent : ACCENT_DEFAULT;
+        /** @readonly */
         this.gui = Object.keys(GUI_MAP).includes(gui) ? gui : GUI_DEFAULT;
+        /** @readonly */
         this.blocks = Object.keys(BLOCKS_MAP).includes(blocks) ? blocks : BLOCKS_DEFAULT;
     }
 

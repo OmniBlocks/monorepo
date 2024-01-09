@@ -47,6 +47,8 @@ const onSystemPreferenceChange = onChange => {
  * @returns {Theme} the theme
  */
 const detectTheme = () => {
+    const systemPreferences = systemPreferencesTheme();
+
     try {
         const local = localStorage.getItem(STORAGE_KEY);
 
@@ -59,17 +61,17 @@ const detectTheme = () => {
         }
 
         const parsed = JSON.parse(local);
-        // Values are validated by Theme itself
+        // Any invalid values in storage will be handled by Theme itself
         return new Theme(
-            parsed.accent,
-            parsed.gui,
-            parsed.blocks
+            parsed.accent || systemPreferences.accent,
+            parsed.gui || systemPreferences.gui,
+            parsed.blocks || systemPreferences.blocks
         );
     } catch (e) {
         // ignore
     }
 
-    return systemPreferencesTheme();
+    return systemPreferences;
 };
 
 /**

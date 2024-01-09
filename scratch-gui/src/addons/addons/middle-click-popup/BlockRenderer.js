@@ -202,7 +202,11 @@ function createBlockContainer() {
  */
 function createBlockComponent(container, shape, categoryClass, fill, stroke, width) {
   if (width < shape.minWidth) width = shape.minWidth;
-  container.classList.add("sa-block-color", categoryClass);
+  try {
+    container.classList.add("sa-block-color", categoryClass);
+  } catch (e) {
+    // categoryClass contained illegal characters for a class name. this is normal for extensions; ignore it
+  }
   const background = container.children[0];
   let style = "";
   if (fill) style += `fill: var(${fill});`;

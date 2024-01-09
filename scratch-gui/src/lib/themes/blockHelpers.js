@@ -17,7 +17,6 @@ const getExtensionColors = theme => theme.getBlockColors().pen;
 
 const DEFAULT_EXTENSION_PRIMARY = '#0fbd8c';
 
-
 /**
  * Applies extension color theme to categories.
  * No changes are applied if called with the default theme, allowing extensions to provide their own colors.
@@ -43,9 +42,8 @@ const injectExtensionCategoryTheme = (dynamicBlockXML, theme) => {
         const usesCustomColors = primaryColor.toLowerCase() !== DEFAULT_EXTENSION_PRIMARY;
         if (usesCustomColors) {
             const converters = theme.getCustomExtensionColors();
-            const secondaryColor = dom.documentElement.getAttribute('secondaryColour');
             dom.documentElement.setAttribute('colour', converters.primary(primaryColor));
-            dom.documentElement.setAttribute('secondaryColour', converters.secondary(secondaryColor));
+            dom.documentElement.setAttribute('secondaryColour', converters.secondary(primaryColor));
         } else {
             dom.documentElement.setAttribute('colour', extensionColors.primary);
             // Note: the category's secondaryColour matches up with the blocks' tertiary color,
@@ -100,15 +98,14 @@ const injectExtensionBlockTheme = (blockInfoJson, theme) => {
     // Minor optimization -- don't do anything at all for the default theme.
     if (theme.blocks === BLOCKS_THREE) return blockInfoJson;
 
-    const usesCustomColors = blockInfoJson.colour.toLowerCase() !== DEFAULT_EXTENSION_PRIMARY;
+    const usesCustomColors = blockInfoJson.colour && blockInfoJson.colour.toLowerCase() !== DEFAULT_EXTENSION_PRIMARY;
     if (usesCustomColors) {
         const converters = theme.getCustomExtensionColors();
         return {
             ...blockInfoJson,
-            // Note that VM only gives us primary, secondary, tertiary
             colour: converters.primary(blockInfoJson.colour),
-            colourSecondary: converters.secondary(blockInfoJson.colourSecondary),
-            colourTertiary: converters.tertiary(blockInfoJson.colourTertiary),
+            colourSecondary: converters.secondary(blockInfoJson.colour),
+            colourTertiary: converters.tertiary(blockInfoJson.colour),
             colourQuaternary: converters.quaternary(blockInfoJson.colour)
         };
     }

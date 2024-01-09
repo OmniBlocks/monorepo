@@ -1,3 +1,5 @@
+import {hex2hsv, hsv2hex} from '../../tw-color-utils';
+
 const blockColors = {
     motion: {
         primary: '#0F1E33',
@@ -74,10 +76,14 @@ const blockColors = {
 const extensions = {};
 
 const customExtensionColors = {
-    primary: primary => primary,
-    secondary: secondary => secondary,
-    tertiary: tertiary => tertiary,
-    quaternary: tertiary => tertiary
+    primary: primary => {
+        const hsv = hex2hsv(primary);
+        hsv[2] = Math.max(hsv[2] - 70, 20);
+        return hsv2hex(hsv);
+    },
+    secondary: () => '#4C4C4C',
+    tertiary: primary => primary,
+    quaternary: primary => primary
 };
 
 export {

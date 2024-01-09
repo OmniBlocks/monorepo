@@ -204,7 +204,6 @@ class Interface extends React.Component {
             isLoading,
             isPlayerOnly,
             isRtl,
-            onClickTheme,
             projectId,
             /* eslint-enable no-unused-vars */
             ...props
@@ -226,7 +225,6 @@ class Interface extends React.Component {
                             canChangeTheme
                             enableSeeInside
                             onClickAddonSettings={handleClickAddonSettings}
-                            onClickTheme={onClickTheme}
                         />
                     </div>
                 ) : null}
@@ -240,7 +238,6 @@ class Interface extends React.Component {
                     {isHomepage && announcement ? <DOMElementRenderer domElement={announcement} /> : null}
                     <GUI
                         onClickAddonSettings={handleClickAddonSettings}
-                        onClickTheme={onClickTheme}
                         onUpdateProjectTitle={this.handleUpdateProjectTitle}
                         backpackVisible
                         backpackHost="_local_"
@@ -356,7 +353,6 @@ Interface.propTypes = {
     isLoading: PropTypes.bool,
     isPlayerOnly: PropTypes.bool,
     isRtl: PropTypes.bool,
-    onClickTheme: PropTypes.func,
     projectId: PropTypes.string
 };
 

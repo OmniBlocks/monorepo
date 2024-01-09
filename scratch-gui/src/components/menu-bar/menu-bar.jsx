@@ -1005,7 +1005,6 @@ MenuBar.propTypes = {
     ]),
     onClickAccount: PropTypes.func,
     onClickAddonSettings: PropTypes.func,
-    onClickTheme: PropTypes.func,
     onClickPackager: PropTypes.func,
     onClickRestorePoints: PropTypes.func,
     onClickEdit: PropTypes.func,

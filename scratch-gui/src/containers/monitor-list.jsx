@@ -51,7 +51,7 @@ MonitorList.propTypes = {
     intl: intlShape.isRequired,
     customStageSize: PropTypes.shape({
         width: PropTypes.number,
-        height: PropTypes.height
+        height: PropTypes.number
     }),
     monitorLayout: PropTypes.shape({
         monitors: PropTypes.object, // eslint-disable-line react/forbid-prop-types

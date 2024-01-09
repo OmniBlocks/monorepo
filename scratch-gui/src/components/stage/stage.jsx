@@ -151,7 +151,7 @@ StageComponent.propTypes = {
     canvas: PropTypes.instanceOf(Element).isRequired,
     customStageSize: PropTypes.shape({
         width: PropTypes.number,
-        height: PropTypes.height
+        height: PropTypes.number
     }),
     overlay: PropTypes.instanceOf(Element).isRequired,
     colorInfo: Loupe.propTypes.colorInfo,

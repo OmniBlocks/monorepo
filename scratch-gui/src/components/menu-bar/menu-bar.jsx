@@ -1169,7 +1169,10 @@ const mapDispatchToProps = dispatch => ({
         dispatch(openSettingsModal());
     },
     onRequestCloseSettings: () => dispatch(closeSettingsMenu()),
-    onClickNew: needSave => dispatch(requestNewProject(needSave)),
+    onClickNew: needSave => {
+        dispatch(requestNewProject(needSave));
+        dispatch(setFileHandle(null));
+    },
     onClickRemix: () => dispatch(remixProject()),
     onClickSave: () => dispatch(manualUpdateProject()),
     onClickSaveAsCopy: () => dispatch(saveProjectAsCopy()),

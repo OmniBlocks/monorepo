@@ -150,8 +150,9 @@ const detectUnimplementedAPIs = (addonId, contents) => {
 };
 
 const rewriteAssetImports = contents => {
-    // Reroute addon.self.dir concatenation to call runtime function.
-    // Parse things like:
+    // Rewrite addon.self.dir concatenation to call runtime function.
+
+    // Rewrite things like:
     // el.src = addon.self.dir + "/" + name + ".svg";
     //          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  match
     //                           ^^^^^^^^^^^^^^^^^^^  capture group 1
@@ -159,6 +160,15 @@ const rewriteAssetImports = contents => {
         /addon\.self\.(?:dir|lib) *\+ *([^;,\n]+)/g,
         (_fullText, name) => `addon.self.getResource(${name}) /* rewritten by pull.js */`
     );
+
+    // Rewrite things like:
+    // `${addon.self.dir}/${name}.svg`
+    //                   ^^^^^^^^^^^^  capture group 1
+    contents = contents.replace(
+        /`\${addon\.self\.(?:dir|lib)}([^`]+)`/g,
+        (_fullText, name) => `addon.self.getResource(\`${name}\`) /* rewritten by pull.js */`
+    );
+
     return contents;
 };
 

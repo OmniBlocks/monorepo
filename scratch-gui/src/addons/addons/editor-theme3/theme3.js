@@ -168,7 +168,7 @@ export default async function ({ addon, console, msg }) {
       colorOnBlack: false,
     }[textMode()];
   };
-  const iconPath = () => `${addon.self.dir}/icons/${useBlackIcons() ? "black_text" : "white_text"}`;
+  const iconPath = () => `/icons/${useBlackIcons() ? "black_text" : "white_text"}`;
 
   const makeDropdownArrow = (color) => {
     const arrow = Blockly.utils.createSvgElement("g");
@@ -283,14 +283,14 @@ export default async function ({ addon, console, msg }) {
       const iconsToReplace = ["music", "pen", "text2speech", "translate", "videoSensing"];
       const extensionId = this.sourceBlock_.type.split("_")[0];
       if (iconsToReplace.includes(extensionId)) {
-        if (extensionId === "translate" && !useBlackIcons()) src = `${iconPath()}/extensions/translate.png`;
-        else src = `${iconPath()}/extensions/${extensionId}.svg`;
+        if (extensionId === "translate" && !useBlackIcons()) src = addon.self.getResource(`${iconPath()}/extensions/translate.png`) /* rewritten by pull.js */;
+        else src = addon.self.getResource(`${iconPath()}/extensions/${extensionId}.svg`) /* rewritten by pull.js */;
       }
     } else {
       const iconsToReplace = ["repeat.svg", "rotate-left.svg", "rotate-right.svg"];
       const iconName = src.split("/")[src.split("/").length - 1];
       if (iconsToReplace.includes(iconName)) {
-        src = `${iconPath()}/${iconName}`;
+        src = addon.self.getResource(`${iconPath()}/${iconName}`) /* rewritten by pull.js */;
       }
     }
     return oldFieldImageSetValue.call(this, src);
@@ -355,7 +355,7 @@ export default async function ({ addon, console, msg }) {
     const group = oldFieldNoteAddOctaveButton.call(this, ...args);
     group
       .querySelector("image")
-      .setAttributeNS("http://www.w3.org/1999/xlink", "xlink:href", `${iconPath()}/arrow_button.svg`);
+      .setAttributeNS("http://www.w3.org/1999/xlink", "xlink:href", addon.self.getResource(`${iconPath()}/arrow_button.svg`) /* rewritten by pull.js */);
     return group;
   };
 

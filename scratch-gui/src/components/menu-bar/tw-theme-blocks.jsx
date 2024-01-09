@@ -14,6 +14,7 @@ import {persistTheme} from '../../lib/themes/themePersistance.js';
 import styles from './settings-menu.css';
 import threeIcon from './tw-blocks-three.svg';
 import highContrastIcon from './tw-blocks-high-contrast.svg';
+import darkIcon from './tw-blocks-dark.svg';
 
 const options = defineMessages({
     [BLOCKS_THREE]: {
@@ -27,15 +28,17 @@ const options = defineMessages({
         id: 'tw.blockColors.highContrast'
     },
     [BLOCKS_DARK]: {
-        defaultMessage: 'Dark REMOVE BEFORE MERGE',
-        description: 'Name of Scratch\'s experimental dark block colors',
+        defaultMessage: 'Dark',
+        description: 'Name of the dark block colors',
         id: 'tw.blockColors.dark'
     }
 });
 
 const ThemeIcon = props => (
     <img
-        src={props.id === BLOCKS_HIGH_CONTRAST ? highContrastIcon : threeIcon}
+        src={props.id === BLOCKS_HIGH_CONTRAST ? highContrastIcon :
+            props.id === BLOCKS_DARK ? darkIcon :
+                threeIcon}
         draggable={false}
         width={24}
     />

@@ -67,11 +67,6 @@ const blockColors = {
     },
     text: 'rgba(255, 255, 255, .7)',
     textFieldText: '#E5E5E5',
-    workspace: '#121212',
-    toolboxSelected: '#4C4C4C',
-    toolboxText: '#E5E5E5',
-    toolbox: '#121212',
-    flyout: '#121212',
     textField: '#4C4C4C',
     menuHover: 'rgba(255, 255, 255, 0.3)'
 };

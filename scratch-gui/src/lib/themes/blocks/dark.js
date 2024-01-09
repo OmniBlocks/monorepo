@@ -67,6 +67,12 @@ const blockColors = {
         tertiary: '#FF6680',
         quaternary: '#FF6680'
     },
+    addons: {
+        primary: '#0b3331',
+        secondary: '#4C4C4C',
+        tertiary: '#34e4d0',
+        quaternary: '#34e4d0'
+    },
     text: 'rgba(255, 255, 255, .7)',
     textFieldText: '#E5E5E5',
     textField: '#4C4C4C',

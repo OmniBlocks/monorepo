@@ -155,11 +155,6 @@ const fixDisplayName = displayName => displayName.replace(/([^\s])(%[nbs])/g, (_
 const compareArrays = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 
 let _firstAddBlockRan = false;
-const addonBlockColor = {
-    color: '#29beb8',
-    secondaryColor: '#3aa8a4',
-    tertiaryColor: '#3aa8a4'
-};
 
 const contextMenuCallbacks = [];
 const CONTEXT_MENU_ORDER = ['editor-devtools', 'block-switching', 'blocks2image', 'swap-local-global'];
@@ -504,9 +499,14 @@ class Tab extends EventTargetShim {
                     if (!this.isInsertionMarker() && this.type === 'procedures_call') {
                         const block = this.procCode_ && vm.runtime.getAddonBlock(this.procCode_);
                         if (block) {
-                            this.colour_ = addonBlockColor.color;
-                            this.colourSecondary_ = addonBlockColor.secondaryColor;
-                            this.colourTertiary_ = addonBlockColor.tertiaryColor;
+                            const theme = reduxInstance.state.scratchGui.theme.theme;
+                            const colors = theme.getBlockColors().addons;
+                            this.colour_ = colors.primary;
+                            this.colourSecondary_ = colors.secondary;
+                            this.colourTertiary_ = colors.tertiary;
+                            this.colourQuaternary_ = colors.quaternary;
+
+                            // do not show edit button
                             this.customContextMenu = null;
                         }
                     }

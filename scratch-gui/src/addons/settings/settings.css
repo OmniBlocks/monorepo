@@ -437,7 +437,8 @@ a:active, a:focus {
     width: 20px;
     background-position: center center;
 }
-.setting input[type="number"] {
+.setting input[type="number"],
+.setting input[type="text"] {
     border-radius: 20px 0 0 20px;
     font-size: 14px;
     width: 75px;

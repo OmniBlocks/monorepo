@@ -339,6 +339,7 @@ const ResetButton = ({
         <img
             src={undoImage}
             alt={settingsTranslations.reset}
+            draggable={false}
         />
     </button>
 );
@@ -381,15 +382,31 @@ const Setting = ({
                     />
                 </React.Fragment>
             )}
-            {setting.type === 'integer' && (
+            {(setting.type === 'integer' || setting.type === 'positive_integer') && (
                 <React.Fragment>
                     {label}
                     <TextInput
                         id={uniqueId}
                         type="number"
-                        min={setting.min}
+                        min={setting.type === 'positive_integer' ? '0' : setting.min}
                         max={setting.max}
                         step="1"
+                        value={value}
+                        onChange={newValue => SettingsStore.setAddonSetting(addonId, settingId, newValue)}
+                    />
+                    <ResetButton
+                        addonId={addonId}
+                        settingId={settingId}
+                        forTextInput
+                    />
+                </React.Fragment>
+            )}
+            {(setting.type === 'string' || setting.type === 'untranslated') && (
+                <React.Fragment>
+                    {label}
+                    <TextInput
+                        id={uniqueId}
+                        type="text"
                         value={value}
                         onChange={newValue => SettingsStore.setAddonSetting(addonId, settingId, newValue)}
                     />

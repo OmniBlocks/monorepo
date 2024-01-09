@@ -1,22 +1,46 @@
 import {Theme} from '.';
 
-const PREFERS_HIGH_CONTRAST_QUERY = '(prefers-contrast: more)';
-const PREFERS_DARK_QUERY = '(prefers-color-scheme: dark)';
+const matchMedia = query => (window.matchMedia ? window.matchMedia(query) : null);
+const PREFERS_HIGH_CONTRAST_QUERY = matchMedia('(prefers-contrast: more)');
+const PREFERS_DARK_QUERY = matchMedia('(prefers-color-scheme: dark)');
+
 const STORAGE_KEY = 'tw:theme';
 
 /**
  * @returns {Theme} detected theme
  */
 const systemPreferencesTheme = () => {
-    if (window.matchMedia) {
-        if (window.matchMedia(PREFERS_HIGH_CONTRAST_QUERY).matches) {
-            return Theme.highContrast;
-        }
-        if (window.matchMedia(PREFERS_DARK_QUERY).matches) {
-            return Theme.dark;
-        }
+    if (PREFERS_HIGH_CONTRAST_QUERY && PREFERS_HIGH_CONTRAST_QUERY.matches) {
+        return Theme.highContrast;
+    }
+    if (PREFERS_DARK_QUERY && PREFERS_DARK_QUERY.matches) {
+        return Theme.dark;
     }
     return Theme.light;
+};
+
+/**
+ * @param {function} onChange callback; no guarantees about arguments
+ * @returns {function} call to remove event listeners to prevent memory leak
+ */
+const onSystemPreferenceChange = onChange => {
+    if (
+        !PREFERS_HIGH_CONTRAST_QUERY ||
+        !PREFERS_DARK_QUERY ||
+        // Some old browsers don't support addEventListener on media queries
+        !PREFERS_HIGH_CONTRAST_QUERY.addEventListener ||
+        !PREFERS_DARK_QUERY.addEventListener
+    ) {
+        return () => {};
+    }
+
+    PREFERS_HIGH_CONTRAST_QUERY.addEventListener('change', onChange);
+    PREFERS_DARK_QUERY.addEventListener('change', onChange);
+
+    return () => {
+        PREFERS_HIGH_CONTRAST_QUERY.removeEventListener('change', onChange);
+        PREFERS_DARK_QUERY.removeEventListener('change', onChange);
+    };
 };
 
 /**
@@ -69,6 +93,7 @@ const persistTheme = theme => {
 };
 
 export {
+    onSystemPreferenceChange,
     detectTheme,
     persistTheme
 };

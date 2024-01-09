@@ -446,7 +446,7 @@ class Blocks extends React.Component {
                 targetCostumes[targetCostumes.length - 1].name,
                 stageCostumes[stageCostumes.length - 1].name,
                 targetSounds.length > 0 ? targetSounds[targetSounds.length - 1].name : '',
-                getColorsForTheme(this.props.theme)
+                this.props.theme.getBlockColors()
             );
         } catch {
             return null;
@@ -766,7 +766,7 @@ Blocks.defaultOptions = {
 Blocks.defaultProps = {
     isVisible: true,
     options: Blocks.defaultOptions,
-    theme: Theme.light()
+    theme: Theme.light
 };
 
 const mapStateToProps = state => ({

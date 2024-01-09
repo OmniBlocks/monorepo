@@ -7,7 +7,7 @@ import {connect} from 'react-redux';
 import check from './check.svg';
 import dropdownCaret from './dropdown-caret.svg';
 import {MenuItem, Submenu} from '../menu/menu.jsx';
-import {BLOCKS_HIGH_CONTRAST, BLOCKS_THREE, Theme} from '../../lib/themes/index.js';
+import {BLOCKS_DARK, BLOCKS_HIGH_CONTRAST, BLOCKS_THREE, Theme} from '../../lib/themes/index.js';
 import {openBlocksThemeMenu, blocksThemeMenuOpen, closeSettingsMenu} from '../../reducers/menus.js';
 import {setTheme} from '../../reducers/theme.js';
 import styles from './settings-menu.css';
@@ -24,6 +24,11 @@ const options = defineMessages({
         defaultMessage: 'High Contrast',
         description: 'Name of the high contrast block colors.',
         id: 'tw.blockColors.highContrast'
+    },
+    [BLOCKS_DARK]: {
+        defaultMessage: 'Dark REMOVE BEFORE MERGE',
+        description: 'Name of Scratch\'s experimental dark block colors',
+        id: 'tw.blockColors.dark'
     }
 });
 

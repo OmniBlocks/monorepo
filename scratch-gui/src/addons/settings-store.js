@@ -17,7 +17,6 @@
 import addons from './generated/addon-manifests';
 import upstreamMeta from './generated/upstream-meta.json';
 import EventTargetShim from './event-target';
-import {isDark} from '../lib/themes';
 
 const SETTINGS_KEY = 'tw:addons';
 const VERSION = 4;
@@ -366,7 +365,7 @@ class SettingsStore extends EventTargetShim {
         const result = {
             core: {
                 // Upstream property. We don't use this.
-                lightTheme: !isDark(theme),
+                lightTheme: !theme.isDark(),
                 // Doesn't matter what we set this to
                 version: `v1.0.0-tw-${upstreamMeta.commit}`
             },

@@ -1,5 +1,4 @@
 import defaultsDeep from 'lodash.defaultsdeep';
-import {defineMessages} from 'react-intl';
 
 import * as accentPurple from './accent/purple';
 import * as accentBlue from './accent/blue';
@@ -10,7 +9,7 @@ import * as guiDark from './gui/dark';
 
 import * as blocksThree from './blocks/three';
 import * as blocksHighContrast from './blocks/high-contrast';
-import * as blocksDark from './blocks/high-contrast';
+import * as blocksDark from './blocks/dark';
 
 const ACCENT_PURPLE = 'purple';
 const ACCENT_BLUE = 'blue';
@@ -39,39 +38,34 @@ const BLOCKS_MAP = {
     [BLOCKS_THREE]: {
         blocksMediaFolder: 'blocks-media/default',
         colors: blocksThree.blockColors,
-        extensions: blocksThree.extensions
+        extensions: blocksThree.extensions,
+        useForStage: true
     },
     [BLOCKS_HIGH_CONTRAST]: {
         blocksMediaFolder: 'blocks-media/high-contrast',
         colors: defaultsDeep({}, blocksHighContrast.blockColors, defaultBlockColors),
-        extensions: blocksHighContrast.extensions
+        extensions: blocksHighContrast.extensions,
+        useForStage: true
     },
     [BLOCKS_DARK]: {
         blocksMediaFolder: 'blocks-media/default',
         colors: defaultsDeep({}, blocksDark.blockColors, defaultBlockColors),
-        extensions: blocksDark.extensions
+        extensions: blocksDark.extensions,
+        useForStage: false
     }
 };
 
 class Theme {
     constructor (accent, gui, blocks) {
-        // do not modify directly
+        // do not modify these directly
         this.accent = Object.keys(ACCENT_MAP).includes(accent) ? accent : ACCENT_DEFAULT;
         this.gui = Object.keys(GUI_MAP).includes(gui) ? gui : GUI_DEFAULT;
         this.blocks = Object.keys(BLOCKS_MAP).includes(blocks) ? blocks : BLOCKS_DEFAULT;
     }
 
-    static light () {
-        return new Theme(ACCENT_DEFAULT, GUI_LIGHT, BLOCKS_DEFAULT);
-    }
-
-    static dark () {
-        return new Theme(ACCENT_DEFAULT, GUI_DARK, BLOCKS_DEFAULT);
-    }
-
-    static highContrast () {
-        return new Theme(ACCENT_DEFAULT, GUI_DEFAULT, BLOCKS_HIGH_CONTRAST);
-    }
+    static light = new Theme(ACCENT_DEFAULT, GUI_LIGHT, BLOCKS_DEFAULT);
+    static dark = new Theme(ACCENT_DEFAULT, GUI_DARK, BLOCKS_DEFAULT);
+    static highContrast = new Theme(ACCENT_DEFAULT, GUI_DEFAULT, BLOCKS_HIGH_CONTRAST);
 
     set (what, to) {
         if (what === 'accent') {
@@ -89,11 +83,20 @@ class Theme {
      * @returns {string} a string that uniquely identifies this theme. Intended to be used as a react key.
      */
     key () {
-        return JSON.stringify(this);
+        return `${this.accent}|${this.gui}|${this.blocks}`;
     }
     
     getBlocksMediaFolder () {
         return BLOCKS_MAP[this.blocks].blocksMediaFolder;
+    }
+
+    getGuiColors () {
+        return defaultsDeep(
+            {},
+            ACCENT_MAP[this.accent].guiColors,
+            GUI_MAP[this.gui].guiColors,
+            guiLight.guiColors
+        );
     }
 
     getBlockColors () {
@@ -105,13 +108,19 @@ class Theme {
         );
     }
 
-    getGuiColors () {
-        return defaultsDeep(
-            {},
-            ACCENT_MAP[this.accent].guiColors,
-            GUI_MAP[this.gui].guiColors,
-            guiLight.guiColors
-        );
+    getExtensions () {
+        return BLOCKS_MAP[this.blocks].extensions;
+    }
+
+    isDark () {
+        return this.getGuiColors()['color-scheme'] === 'dark';
+    }
+
+    getStageBlockColors () {
+        if (BLOCKS_MAP[this.blocks].useForStage) {
+            return this.getBlockColors();
+        }
+        return Theme.light.getBlockColors();
     }
 }
 

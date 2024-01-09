@@ -7,7 +7,7 @@ import AddonHooks from '../../addons/hooks';
 const applyGuiColors = theme => {
     const doc = document.documentElement;
 
-    const defaultColors = Theme.light().getGuiColors();
+    const defaultColors = Theme.light.getGuiColors();
     for (const [name, value] of Object.entries(defaultColors)) {
         doc.style.setProperty(`--${name}-default`, value);
     }
@@ -16,6 +16,8 @@ const applyGuiColors = theme => {
     for (const [name, value] of Object.entries(colors)) {
         doc.style.setProperty(`--${name}`, value);
     }
+
+    doc.style.colorScheme = colors['color-scheme'];
 
     // a horrible hack
     window.Recolor = {

@@ -10,7 +10,7 @@ import DefaultMonitor from './default-monitor.jsx';
 import LargeMonitor from './large-monitor.jsx';
 import SliderMonitor from '../../containers/slider-monitor.jsx';
 import ListMonitor from '../../containers/list-monitor.jsx';
-import {Theme, getStageColorsForTheme} from '../../lib/themes/index.js';
+import {Theme} from '../../lib/themes/index.js';
 
 import styles from './monitor.css';
 
@@ -33,7 +33,7 @@ const modes = {
 };
 
 const getCategoryColor = (theme, category) => {
-    const colors = getStageColorsForTheme(theme);
+    const colors = theme.getStageBlockColors();
     return {
         background: colors[categoryColorMap[category]].primary,
         text: colors.text

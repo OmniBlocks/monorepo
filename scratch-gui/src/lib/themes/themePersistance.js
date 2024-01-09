@@ -10,13 +10,13 @@ const STORAGE_KEY = 'tw:theme';
 const systemPreferencesTheme = () => {
     if (window.matchMedia) {
         if (window.matchMedia(PREFERS_HIGH_CONTRAST_QUERY).matches) {
-            return Theme.highContrast();
+            return Theme.highContrast;
         }
         if (window.matchMedia(PREFERS_DARK_QUERY).matches) {
-            return Theme.dark();
+            return Theme.dark;
         }
     }
-    return Theme.light();
+    return Theme.light;
 };
 
 /**
@@ -28,9 +28,10 @@ const detectTheme = () => {
 
         // Migrate legacy preferences
         if (local === 'dark') {
-            return Theme.dark();
+            return Theme.dark;
         }
         if (local === 'light') {
+            return Theme.light;
         }
 
         const parsed = JSON.parse(local);

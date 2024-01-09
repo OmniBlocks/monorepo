@@ -2,6 +2,7 @@ const ScratchCommon = require('./tw-extension-api-common');
 const createScratchX = require('./tw-scratchx-compatibility-layer');
 const AsyncLimiter = require('../util/async-limiter');
 const createTranslate = require('./tw-l10n');
+const staticFetch = require('../util/tw-static-fetch');
 
 /* eslint-disable require-await */
 
@@ -97,6 +98,12 @@ const setupUnsandboxedExtensionAPI = vm => new Promise(resolve => {
 
     Scratch.fetch = async (url, options) => {
         const actualURL = url instanceof Request ? url.url : url;
+
+        const staticFetchResult = staticFetch(url);
+        if (staticFetchResult) {
+            return staticFetchResult;
+        }
+
         if (!await Scratch.canFetch(actualURL)) {
             throw new Error(`Permission to fetch ${actualURL} rejected.`);
         }

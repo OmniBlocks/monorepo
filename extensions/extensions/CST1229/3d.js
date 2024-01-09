@@ -115,6 +115,10 @@
         id: "cst12293d",
         name: "3D",
 
+        color1: "#2a47e8",
+        color2: "#2439ad",
+        color3: "#1b2d94",
+
         blocks: [
           {
             opcode: "setMode",
@@ -760,7 +764,7 @@
 
     set3DPos({X, Y, Z}, util) {
       if (util.target.isStage) return;
-      
+
       X = Scratch.Cast.toNumber(X);
       Y = Scratch.Cast.toNumber(Y);
       util.target.setXY(X, Y);

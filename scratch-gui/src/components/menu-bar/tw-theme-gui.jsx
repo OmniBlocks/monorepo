@@ -7,19 +7,20 @@ import {MenuItem} from '../menu/menu.jsx';
 import {GUI_DARK, GUI_LIGHT, Theme} from '../../lib/themes/index.js';
 import {closeSettingsMenu} from '../../reducers/menus.js';
 import {setTheme} from '../../reducers/theme.js';
+import {persistTheme} from '../../lib/themes/themePersistance.js';
 import lightModeIcon from './tw-moon.svg';
 import darkModeIcon from './tw-moon.svg';
 import styles from './settings-menu.css';
 
 const GuiThemeMenu = ({
-    onToggleTheme,
+    onChangeTheme,
     theme
 }) => (
     <MenuItem>
         <div
             className={styles.option}
             // eslint-disable-next-line react/jsx-no-bind
-            onClick={() => onToggleTheme(theme)}
+            onClick={() => onChangeTheme(theme.set('gui', theme.gui === GUI_DARK ? GUI_LIGHT : GUI_DARK))}
         >
             <img
                 src={theme.gui === GUI_DARK ? darkModeIcon : lightModeIcon}
@@ -55,10 +56,10 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-    onToggleTheme: oldTheme => {
-        const newGui = oldTheme.gui === GUI_DARK ? GUI_LIGHT : GUI_DARK;
-        dispatch(setTheme(oldTheme.set('gui', newGui)));
+    onChangeTheme: theme => {
+        dispatch(setTheme(theme));
         dispatch(closeSettingsMenu());
+        persistTheme(theme);
     }
 });
 

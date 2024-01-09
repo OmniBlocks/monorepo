@@ -10,6 +10,7 @@ import {MenuItem, Submenu} from '../menu/menu.jsx';
 import {BLOCKS_DARK, BLOCKS_HIGH_CONTRAST, BLOCKS_THREE, Theme} from '../../lib/themes/index.js';
 import {openBlocksThemeMenu, blocksThemeMenuOpen, closeSettingsMenu} from '../../reducers/menus.js';
 import {setTheme} from '../../reducers/theme.js';
+import {persistTheme} from '../../lib/themes/themePersistance.js';
 import styles from './settings-menu.css';
 import threeIcon from './tw-blocks-three.svg';
 import highContrastIcon from './tw-blocks-high-contrast.svg';
@@ -70,41 +71,39 @@ const BlocksThemeMenu = ({
     onChangeTheme,
     onOpen,
     theme
-}) => {
-    return (
-        <MenuItem expanded={isOpen}>
-            <div
-                className={styles.option}
-                onClick={onOpen}
-            >
-                <ThemeIcon id={theme.blocks} />
-                <span className={styles.submenuLabel}>
-                    <FormattedMessage
-                        defaultMessage="Block Colors"
-                        description="Label for to choose what color blocks should be, eg. original or high contrast"
-                        id="tw.menuBar.blockColors"
-                    />
-                </span>
-                <img
-                    className={styles.expandCaret}
-                    src={dropdownCaret}
-                    draggable={false}
+}) => (
+    <MenuItem expanded={isOpen}>
+        <div
+            className={styles.option}
+            onClick={onOpen}
+        >
+            <ThemeIcon id={theme.blocks} />
+            <span className={styles.submenuLabel}>
+                <FormattedMessage
+                    defaultMessage="Block Colors"
+                    description="Label for to choose what color blocks should be, eg. original or high contrast"
+                    id="tw.menuBar.blockColors"
                 />
-            </div>
-            <Submenu place={isRtl ? 'left' : 'right'}>
-                {Object.keys(options).map(item => (
-                    <ThemeMenuItem
-                        key={item}
-                        id={item}
-                        isSelected={theme.blocks === item}
-                        // eslint-disable-next-line react/jsx-no-bind
-                        onClick={() => onChangeTheme(theme.set('blocks', item))}
-                    />
-                ))}
-            </Submenu>
-        </MenuItem>
-    );
-};
+            </span>
+            <img
+                className={styles.expandCaret}
+                src={dropdownCaret}
+                draggable={false}
+            />
+        </div>
+        <Submenu place={isRtl ? 'left' : 'right'}>
+            {Object.keys(options).map(item => (
+                <ThemeMenuItem
+                    key={item}
+                    id={item}
+                    isSelected={theme.blocks === item}
+                    // eslint-disable-next-line react/jsx-no-bind
+                    onClick={() => onChangeTheme(theme.set('blocks', item))}
+                />
+            ))}
+        </Submenu>
+    </MenuItem>
+);
 
 BlocksThemeMenu.propTypes = {
     isOpen: PropTypes.bool,
@@ -124,6 +123,7 @@ const mapDispatchToProps = dispatch => ({
     onChangeTheme: theme => {
         dispatch(setTheme(theme));
         dispatch(closeSettingsMenu());
+        persistTheme(theme);
     },
     onOpen: () => dispatch(openBlocksThemeMenu())
 });

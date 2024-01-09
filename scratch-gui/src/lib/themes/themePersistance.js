@@ -76,19 +76,31 @@ const detectTheme = () => {
  * @param {Theme} theme the theme
  */
 const persistTheme = theme => {
-    if (JSON.stringify(theme) === JSON.stringify(systemPreferencesTheme())) {
+    const systemPreferences = systemPreferencesTheme();
+    const nonDefaultSettings = {};
+
+    if (theme.accent !== systemPreferences.accent) {
+        nonDefaultSettings.accent = theme.accent;
+    }
+    if (theme.gui !== systemPreferences.gui) {
+        nonDefaultSettings.gui = theme.gui;
+    }
+    if (theme.blocks !== systemPreferences.blocks) {
+        nonDefaultSettings.blocks = theme.blocks;
+    }
+
+    if (Object.keys(nonDefaultSettings).length === 0) {
         try {
             localStorage.removeItem(STORAGE_KEY);
         } catch (e) {
             // ignore
         }
-        return;
-    }
-
-    try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(theme));
-    } catch (e) {
-        // ignore
+    } else {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(nonDefaultSettings));
+        } catch (e) {
+            // ignore
+        }
     }
 };
 

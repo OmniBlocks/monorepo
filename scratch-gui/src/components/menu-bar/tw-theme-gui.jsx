@@ -8,7 +8,7 @@ import {GUI_DARK, GUI_LIGHT, Theme} from '../../lib/themes/index.js';
 import {closeSettingsMenu} from '../../reducers/menus.js';
 import {setTheme} from '../../reducers/theme.js';
 import {persistTheme} from '../../lib/themes/themePersistance.js';
-import lightModeIcon from './tw-moon.svg';
+import lightModeIcon from './tw-sun.svg';
 import darkModeIcon from './tw-moon.svg';
 import styles from './settings-menu.css';
 

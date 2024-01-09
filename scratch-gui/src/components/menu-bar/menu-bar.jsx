@@ -519,14 +519,12 @@ class MenuBar extends React.Component {
                                     place={this.props.isRtl ? 'left' : 'right'}
                                     onRequestClose={this.props.onRequestCloseFile}
                                 >
-                                    <MenuSection>
-                                        <MenuItem
-                                            isRtl={this.props.isRtl}
-                                            onClick={this.handleClickNew}
-                                        >
-                                            {newProjectMessage}
-                                        </MenuItem>
-                                    </MenuSection>
+                                    <MenuItem
+                                        isRtl={this.props.isRtl}
+                                        onClick={this.handleClickNew}
+                                    >
+                                        {newProjectMessage}
+                                    </MenuItem>
                                     {this.props.onClickNewWindow && (
                                         <MenuItem
                                             isRtl={this.props.isRtl}

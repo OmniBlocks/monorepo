@@ -2287,7 +2287,7 @@ export class SongEditor {
                         if (tgtInstrumentTypes.includes(InstrumentType.pwm) || tgtInstrumentTypes.includes(InstrumentType.supersaw)) {
                             settingList.push("pulse width");
                         }
-                        if (tgtInstrumentTypes.includes(InstrumentType.pwm) || tgtInstrumentTypes.includes(InstrumentType.supersaw)) {
+                        if (tgtInstrumentTypes.includes(InstrumentType.supersaw)) {
                             settingList.push("dynamism");
                             settingList.push("spread");
                             settingList.push("saw shape");

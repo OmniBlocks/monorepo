@@ -146,12 +146,6 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 	border: 3px solid ${ColorConfig.editorBackground};
 }
 
-@-moz-document url-prefix() {
-	.muteButtonText {
-		transform: translate(3px, 1px) !important;
-	}
-}
-
 .beepboxEditor {
 	display: grid;
     grid-template-columns: minmax(0, 1fr) max-content;

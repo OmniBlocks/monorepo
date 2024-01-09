@@ -218,6 +218,9 @@ export class MuteEditor {
 			}
 			return;
 		}
+		if (this._channelDropDownOpen && this._channelNameDisplay.style.getPropertyValue("display") == "none" && this._channelNameInput.input.style.getPropertyValue("display") == "none") {
+			this._channelDropDownOpen = false;
+        }
 		let xPos: number = event.clientX - this._buttons[0].getBoundingClientRect().left;
 		if (xPos >= 21.0) {
 			if (!this._channelDropDownOpen) {

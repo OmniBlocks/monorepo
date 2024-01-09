@@ -119,9 +119,9 @@ const customExtensionColors = {
         return hsv2hex(hsv);
     },
     tertiary: tertiary => tertiary,
-    quaternary: tertiary => {
-        // VM does not provide reference quaternary so we derive from primary
-        const hsv = hex2hsv(tertiary);
+    quaternary: primary => {
+        // (note that VM does not have a quaternary color so we derive from primary)
+        const hsv = hex2hsv(primary);
         hsv[1] = Math.max(hsv[1] - 60, 0);
         hsv[2] = Math.min(hsv[2] + 20, 100);
         return hsv2hex(hsv);

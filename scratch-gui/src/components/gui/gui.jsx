@@ -366,7 +366,7 @@ const GUIComponent = props => {
                                 <TabPanel className={tabClassNames.tabPanel}>
                                     <Box className={styles.blocksWrapper}>
                                         <Blocks
-                                            key={`${blocksId}/${theme.key()}`}
+                                            key={`${blocksId}/${theme.id}`}
                                             canUseCloud={canUseCloud}
                                             grow={1}
                                             isVisible={blocksTabVisible}

@@ -58,9 +58,13 @@ const BLOCKS_MAP = {
     }
 };
 
+let themeObjectsCreated = 0;
+
 class Theme {
     constructor (accent, gui, blocks) {
         // do not modify these directly
+        /** @readonly */
+        this.id = ++themeObjectsCreated;
         /** @readonly */
         this.accent = Object.keys(ACCENT_MAP).includes(accent) ? accent : ACCENT_DEFAULT;
         /** @readonly */
@@ -84,13 +88,6 @@ class Theme {
         throw new Error(`Unknown theme property: ${what}`);
     }
 
-    /**
-     * @returns {string} a string that uniquely identifies this theme. Intended to be used as a react key.
-     */
-    key () {
-        return `${this.accent}|${this.gui}|${this.blocks}`;
-    }
-    
     getBlocksMediaFolder () {
         return BLOCKS_MAP[this.blocks].blocksMediaFolder;
     }

@@ -66,11 +66,11 @@ class Theme {
         /** @readonly */
         this.id = ++themeObjectsCreated;
         /** @readonly */
-        this.accent = Object.keys(ACCENT_MAP).includes(accent) ? accent : ACCENT_DEFAULT;
+        this.accent = Object.prototype.hasOwnProperty.call(ACCENT_MAP, accent) ? accent : ACCENT_DEFAULT;
         /** @readonly */
-        this.gui = Object.keys(GUI_MAP).includes(gui) ? gui : GUI_DEFAULT;
+        this.gui = Object.prototype.hasOwnProperty.call(GUI_MAP, gui) ? gui : GUI_DEFAULT;
         /** @readonly */
-        this.blocks = Object.keys(BLOCKS_MAP).includes(blocks) ? blocks : BLOCKS_DEFAULT;
+        this.blocks = Object.prototype.hasOwnProperty.call(BLOCKS_MAP, blocks) ? blocks : BLOCKS_DEFAULT;
     }
 
     static light = new Theme(ACCENT_DEFAULT, GUI_LIGHT, BLOCKS_DEFAULT);

@@ -1,5 +1,6 @@
 const guiColors = {
     'motion-primary': '#ff4c4c',
+    'motion-primary-transparent': '#ff4c4ce6',
     'motion-tertiary': '#cc3333',
 
     'looks-secondary': '#ff4c4c',

@@ -5,7 +5,7 @@ const guiColors = {
     'ui-secondary': 'hsla(215, 75%, 95%, 1)', /* #E9F1FC */
     'ui-tertiary': 'hsla(215, 50%, 90%, 1)', /* #D9E3F2 */
 
-    'ui-modal-overlay': 'hsla(215, 100%, 65%, 0.9)', /* 90% transparent version of motion-primary */
+    'ui-modal-overlay': 'var(--motion-primary-transparent)',
     'ui-modal-background': 'hsla(0, 100%, 100%, 1)', /* #FFFFFF */
     'ui-modal-foreground': 'hsla(225, 15%, 40%, 1)', /* #575E75 */
     'ui-modal-header-background': 'var(--looks-secondary)',
@@ -22,6 +22,7 @@ const guiColors = {
     'text-primary-transparent': 'hsla(225, 15%, 40%, 0.75)',
 
     'motion-primary': 'hsla(215, 100%, 65%, 1)', /* #4C97FF */
+    'motion-primary-transparent': 'hsla(215, 100%, 65%, 0.9)', /* 90% transparent version of motion-primary */
     'motion-tertiary': 'hsla(215, 60%, 50%, 1)', /* #3373CC */
 
     'looks-secondary': 'hsla(260, 60%, 60%, 1)', /* #855CD6 */

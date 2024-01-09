@@ -78,7 +78,15 @@ const blockColors = {
 
 const extensions = {};
 
+const customExtensionColors = {
+    primary: primary => primary,
+    secondary: secondary => secondary,
+    tertiary: tertiary => tertiary,
+    quaternary: tertiary => tertiary
+};
+
 export {
     blockColors,
-    extensions
+    extensions,
+    customExtensionColors
 };

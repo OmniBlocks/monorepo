@@ -1,4 +1,4 @@
-import {BLOCKS_HIGH_CONTRAST, Theme} from '.';
+import {BLOCKS_THREE} from '.';
 
 const getBlockIconURI = extensionIcons => {
     if (!extensionIcons) return null;
@@ -15,6 +15,9 @@ const getCategoryIconURI = extensionIcons => {
 // scratch-blocks colours has a pen property that scratch-gui uses for all extensions
 const getExtensionColors = theme => theme.getBlockColors().pen;
 
+const DEFAULT_EXTENSION_PRIMARY = '#0fbd8c';
+
+
 /**
  * Applies extension color theme to categories.
  * No changes are applied if called with the default theme, allowing extensions to provide their own colors.
@@ -25,7 +28,8 @@ const getExtensionColors = theme => theme.getBlockColors().pen;
  * @returns {Array.<object>} Dynamic block XML updated with colors.
  */
 const injectExtensionCategoryTheme = (dynamicBlockXML, theme) => {
-    if (theme.blocks !== BLOCKS_HIGH_CONTRAST) return dynamicBlockXML;
+    // Minor optimization -- don't do anything at all for the default theme.
+    if (theme.blocks === BLOCKS_THREE) return dynamicBlockXML;
 
     const extensionColors = getExtensionColors(theme);
     const extensionIcons = theme.getExtensions();
@@ -35,9 +39,19 @@ const injectExtensionCategoryTheme = (dynamicBlockXML, theme) => {
     return dynamicBlockXML.map(extension => {
         const dom = parser.parseFromString(extension.xml, 'text/xml');
 
-        dom.documentElement.setAttribute('colour', extensionColors.primary);
-        // Note: the category's secondaryColour matches up with the blocks' tertiary color, both used for border color.
-        dom.documentElement.setAttribute('secondaryColour', extensionColors.tertiary);
+        const primaryColor = dom.documentElement.getAttribute('colour');
+        const usesCustomColors = primaryColor.toLowerCase() !== DEFAULT_EXTENSION_PRIMARY;
+        if (usesCustomColors) {
+            const converters = theme.getCustomExtensionColors();
+            const secondaryColor = dom.documentElement.getAttribute('secondaryColour');
+            dom.documentElement.setAttribute('colour', converters.primary(primaryColor));
+            dom.documentElement.setAttribute('secondaryColour', converters.secondary(secondaryColor));
+        } else {
+            dom.documentElement.setAttribute('colour', extensionColors.primary);
+            // Note: the category's secondaryColour matches up with the blocks' tertiary color,
+            // both used for border color.
+            dom.documentElement.setAttribute('secondaryColour', extensionColors.tertiary);
+        }
 
         const categoryIconURI = getCategoryIconURI(extensionIcons[extension.id]);
         if (categoryIconURI) {
@@ -83,7 +97,21 @@ const injectBlockIcons = (blockInfoJson, theme) => {
  * @returns {object} Block info json with updated colors. The original blockInfoJson is not modified.
  */
 const injectExtensionBlockTheme = (blockInfoJson, theme) => {
-    if (theme.blocks !== BLOCKS_HIGH_CONTRAST) return blockInfoJson;
+    // Minor optimization -- don't do anything at all for the default theme.
+    if (theme.blocks === BLOCKS_THREE) return blockInfoJson;
+
+    const usesCustomColors = blockInfoJson.colour.toLowerCase() !== DEFAULT_EXTENSION_PRIMARY;
+    if (usesCustomColors) {
+        const converters = theme.getCustomExtensionColors();
+        return {
+            ...blockInfoJson,
+            // Note that VM only gives us primary, secondary, tertiary
+            colour: converters.primary(blockInfoJson.colour),
+            colourSecondary: converters.secondary(blockInfoJson.colourSecondary),
+            colourTertiary: converters.tertiary(blockInfoJson.colourTertiary),
+            colourQuaternary: converters.quaternary(blockInfoJson.colour)
+        };
+    }
 
     const extensionColors = getExtensionColors(theme);
 

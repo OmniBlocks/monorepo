@@ -39,18 +39,21 @@ const BLOCKS_MAP = {
         blocksMediaFolder: 'blocks-media/default',
         colors: blocksThree.blockColors,
         extensions: blocksThree.extensions,
+        customExtensionColors: {},
         useForStage: true
     },
     [BLOCKS_HIGH_CONTRAST]: {
         blocksMediaFolder: 'blocks-media/high-contrast',
         colors: defaultsDeep({}, blocksHighContrast.blockColors, defaultBlockColors),
         extensions: blocksHighContrast.extensions,
+        customExtensionColors: blocksHighContrast.customExtensionColors,
         useForStage: true
     },
     [BLOCKS_DARK]: {
         blocksMediaFolder: 'blocks-media/default',
         colors: defaultsDeep({}, blocksDark.blockColors, defaultBlockColors),
         extensions: blocksDark.extensions,
+        customExtensionColors: blocksDark.customExtensionColors,
         useForStage: false
     }
 };
@@ -74,9 +77,8 @@ class Theme {
             return new Theme(this.accent, to, this.blocks);
         } else if (what === 'blocks') {
             return new Theme(this.accent, this.gui, to);
-        } else {
-            throw new Error(`Unknown theme property: ${what}`);
         }
+        throw new Error(`Unknown theme property: ${what}`);
     }
 
     /**
@@ -121,6 +123,10 @@ class Theme {
             return this.getBlockColors();
         }
         return Theme.light.getBlockColors();
+    }
+
+    getCustomExtensionColors () {
+        return BLOCKS_MAP[this.blocks].customExtensionColors;
     }
 }
 

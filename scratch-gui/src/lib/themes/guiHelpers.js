@@ -1,5 +1,6 @@
 import {Theme} from '.';
 import AddonHooks from '../../addons/hooks';
+import './global-styles.css';
 
 /**
  * @param {Theme} theme the theme
@@ -16,8 +17,6 @@ const applyGuiColors = theme => {
     for (const [name, value] of Object.entries(colors)) {
         doc.style.setProperty(`--${name}`, value);
     }
-
-    doc.style.colorScheme = colors['color-scheme'];
 
     // a horrible hack
     window.Recolor = {

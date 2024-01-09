@@ -72,7 +72,10 @@ import {
     modeMenuOpen,
     settingsMenuOpen,
     openSettingsMenu,
-    closeSettingsMenu
+    closeSettingsMenu,
+    errorsMenuOpen,
+    openErrorsMenu,
+    closeErrorsMenu
 } from '../../reducers/menus';
 import {setFileHandle} from '../../reducers/tw.js';
 
@@ -89,6 +92,7 @@ import aboutIcon from './icon--about.svg';
 import fileIcon from './icon--file.svg';
 import editIcon from './icon--edit.svg';
 import addonsIcon from './addons.svg';
+import errorIcon from './tw-error.svg';
 
 import ninetiesLogo from './nineties_logo.svg';
 import catLogo from './cat_logo.svg';
@@ -188,10 +192,8 @@ AboutButton.propTypes = {
 const MenuItemLink = props => (
     <a
         href={props.href}
-        // _blank is safe because of noopener
-        // eslint-disable-next-line react/jsx-no-target-blank
+        rel="noreferrer"
         target="_blank"
-        rel="noopener"
         className={styles.menuItemLink}
     >
         <MenuItem>{props.children}</MenuItem>
@@ -479,6 +481,60 @@ class MenuBar extends React.Component {
             >
                 <div className={styles.mainMenu}>
                     <div className={styles.fileGroup}>
+                        {this.props.errors.length > 0 && <div>
+                            <div
+                                className={classNames(styles.menuBarItem, styles.hoverable, {
+                                    [styles.active]: this.props.errorsMenuOpen
+                                })}
+                                onMouseUp={this.props.onClickErrors}
+                            >
+                                <img
+                                    src={errorIcon}
+                                    draggable={false}
+                                    width={20}
+                                    height={20}
+                                />
+                                <img
+                                    src={dropdownCaret}
+                                    draggable={false}
+                                    width={8}
+                                    height={5}
+                                />
+                                <MenuBarMenu
+                                    className={classNames(styles.menuBarMenu)}
+                                    open={this.props.errorsMenuOpen}
+                                    place={this.props.isRtl ? 'left' : 'right'}
+                                    onRequestClose={this.props.onRequestCloseErrors}
+                                >
+                                    <MenuSection>
+                                        <MenuItemLink href="https://scratch.mit.edu/users/GarboMuffin/#comments">
+                                            <FormattedMessage
+                                                defaultMessage="Some scripts encountered errors."
+                                                description="Link in error menu"
+                                                id="tw.menuBar.reportError1"
+                                            />
+                                        </MenuItemLink>
+                                        <MenuItemLink href="https://scratch.mit.edu/users/GarboMuffin/#comments">
+                                            <FormattedMessage
+                                                defaultMessage="This is a bug. Please report it."
+                                                description="Link in error menu"
+                                                id="tw.menuBar.reportError2"
+                                            />
+                                        </MenuItemLink>
+                                    </MenuSection>
+                                    <MenuSection>
+                                        {this.props.errors.map(({id, sprite, error}) => (
+                                            <MenuItem key={id}>
+                                                {this.props.intl.formatMessage(twMessages.compileError, {
+                                                    sprite,
+                                                    error
+                                                })}
+                                            </MenuItem>
+                                        ))}
+                                    </MenuSection>
+                                </MenuBarMenu>
+                            </div>
+                        </div>}
                         {(this.props.canChangeTheme || this.props.canChangeLanguage) && (<SettingsMenu
                             canChangeLanguage={this.props.canChangeLanguage}
                             canChangeTheme={this.props.canChangeTheme}
@@ -746,6 +802,7 @@ class MenuBar extends React.Component {
                                             ) : (
                                                 <FormattedMessage
                                                     defaultMessage="Cloud Variables are not Available"
+                                                    // eslint-disable-next-line max-len
                                                     description="Menu bar item for when cloud variables are not available"
                                                     id="tw.menuBar.cloudUnavailable"
                                                 />
@@ -968,11 +1025,14 @@ MenuBar.propTypes = {
     canSave: PropTypes.bool,
     canShare: PropTypes.bool,
     className: PropTypes.string,
-    compileErrors: PropTypes.arrayOf(PropTypes.shape({
+    errors: PropTypes.arrayOf(PropTypes.shape({
         sprite: PropTypes.string,
         error: PropTypes.string,
         id: PropTypes.number
     })),
+    errorsMenuOpen: PropTypes.bool,
+    onClickErrors: PropTypes.func,
+    onRequestCloseErrors: PropTypes.func,
     confirmReadyToReplaceProject: PropTypes.func,
     currentLocale: PropTypes.string.isRequired,
     editMenuOpen: PropTypes.bool,
@@ -1060,6 +1120,8 @@ const mapStateToProps = (state, ownProps) => {
         currentLocale: state.locales.locale,
         fileMenuOpen: fileMenuOpen(state),
         editMenuOpen: editMenuOpen(state),
+        errors: state.scratchGui.tw.compileErrors,
+        errorsMenuOpen: errorsMenuOpen(state),
         isPlayerOnly: state.scratchGui.mode.isPlayerOnly,
         isRtl: state.locales.isRtl,
         isUpdating: getIsUpdating(loadingState),
@@ -1092,6 +1154,8 @@ const mapDispatchToProps = dispatch => ({
     onRequestCloseFile: () => dispatch(closeFileMenu()),
     onClickEdit: () => dispatch(openEditMenu()),
     onRequestCloseEdit: () => dispatch(closeEditMenu()),
+    onClickErrors: () => dispatch(openErrorsMenu()),
+    onRequestCloseErrors: () => dispatch(closeErrorsMenu()),
     onClickLogin: () => dispatch(openLoginMenu()),
     onRequestCloseLogin: () => dispatch(closeLoginMenu()),
     onClickMode: () => dispatch(openModeMenu()),

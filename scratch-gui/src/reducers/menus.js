@@ -11,6 +11,7 @@ const MENU_MODE = 'modeMenu';
 const MENU_SETTINGS = 'settingsMenu';
 const MENU_ACCENT = 'accentMenu';
 const MENU_BLOCKS_THEME = 'blocksThemeMenu';
+const MENU_ERRORS = 'errorsMenu';
 
 class Menu {
     constructor (id) {
@@ -49,6 +50,7 @@ class Menu {
 
 // Structure of nested menus, used for collapsing submenus logic.
 const rootMenu = new Menu('root')
+    .addChild(new Menu(MENU_ERRORS))
     .addChild(
         new Menu(MENU_SETTINGS)
             .addChild(new Menu(MENU_LANGUAGE))
@@ -73,7 +75,8 @@ const initialState = {
     [MENU_MODE]: false,
     [MENU_SETTINGS]: false,
     [MENU_ACCENT]: false,
-    [MENU_BLOCKS_THEME]: false
+    [MENU_BLOCKS_THEME]: false,
+    [MENU_ERRORS]: false
 };
 
 const reducer = function (state, action) {
@@ -153,6 +156,10 @@ const openBlocksThemeMenu = () => openMenu(MENU_BLOCKS_THEME);
 const closeBlocksThemeMenu = () => closeMenu(MENU_BLOCKS_THEME);
 const blocksThemeMenuOpen = state => state.scratchGui.menus[MENU_BLOCKS_THEME];
 
+const openErrorsMenu = () => openMenu(MENU_ERRORS);
+const closeErrorsMenu = () => closeMenu(MENU_ERRORS);
+const errorsMenuOpen = state => state.scratchGui.menus[MENU_ERRORS];
+
 export {
     reducer as default,
     initialState as menuInitialState,
@@ -185,5 +192,8 @@ export {
     accentMenuOpen,
     openBlocksThemeMenu,
     closeBlocksThemeMenu,
-    blocksThemeMenuOpen
+    blocksThemeMenuOpen,
+    openErrorsMenu,
+    closeErrorsMenu,
+    errorsMenuOpen
 };

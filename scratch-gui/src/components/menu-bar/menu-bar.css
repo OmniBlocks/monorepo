@@ -231,3 +231,8 @@
         margin-right: 0;
     }
 }
+
+.menu-item-link {
+    color: inherit;
+    text-decoration: none;
+}

@@ -9,7 +9,8 @@ const MENU_LANGUAGE = 'languageMenu';
 const MENU_LOGIN = 'loginMenu';
 const MENU_MODE = 'modeMenu';
 const MENU_SETTINGS = 'settingsMenu';
-const MENU_THEME = 'themeMenu';
+const MENU_ACCENT = 'accentMenu';
+const MENU_BLOCKS_THEME = 'blocksThemeMenu';
 
 class Menu {
     constructor (id) {
@@ -51,7 +52,8 @@ const rootMenu = new Menu('root')
     .addChild(
         new Menu(MENU_SETTINGS)
             .addChild(new Menu(MENU_LANGUAGE))
-            .addChild(new Menu(MENU_THEME))
+            .addChild(new Menu(MENU_ACCENT))
+            .addChild(new Menu(MENU_BLOCKS_THEME))
     )
     .addChild(new Menu(MENU_FILE))
     .addChild(new Menu(MENU_EDIT))
@@ -70,7 +72,8 @@ const initialState = {
     [MENU_LOGIN]: false,
     [MENU_MODE]: false,
     [MENU_SETTINGS]: false,
-    [MENU_THEME]: false
+    [MENU_ACCENT]: false,
+    [MENU_BLOCKS_THEME]: false
 };
 
 const reducer = function (state, action) {
@@ -142,9 +145,13 @@ const openSettingsMenu = () => openMenu(MENU_SETTINGS);
 const closeSettingsMenu = () => closeMenu(MENU_SETTINGS);
 const settingsMenuOpen = state => state.scratchGui.menus[MENU_SETTINGS];
 
-const openThemeMenu = () => openMenu(MENU_THEME);
-const closeThemeMenu = () => closeMenu(MENU_THEME);
-const themeMenuOpen = state => state.scratchGui.menus[MENU_THEME];
+const openAccentMenu = () => openMenu(MENU_ACCENT);
+const closeAccentMenu = () => closeMenu(MENU_ACCENT);
+const accentMenuOpen = state => state.scratchGui.menus[MENU_ACCENT];
+
+const openBlocksThemeMenu = () => openMenu(MENU_BLOCKS_THEME);
+const closeBlocksThemeMenu = () => closeMenu(MENU_BLOCKS_THEME);
+const blocksThemeMenuOpen = state => state.scratchGui.menus[MENU_BLOCKS_THEME];
 
 export {
     reducer as default,
@@ -173,7 +180,10 @@ export {
     openSettingsMenu,
     closeSettingsMenu,
     settingsMenuOpen,
-    openThemeMenu,
-    closeThemeMenu,
-    themeMenuOpen
+    openAccentMenu,
+    closeAccentMenu,
+    accentMenuOpen,
+    openBlocksThemeMenu,
+    closeBlocksThemeMenu,
+    blocksThemeMenuOpen
 };

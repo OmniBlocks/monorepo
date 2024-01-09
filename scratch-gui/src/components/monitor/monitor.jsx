@@ -10,7 +10,7 @@ import DefaultMonitor from './default-monitor.jsx';
 import LargeMonitor from './large-monitor.jsx';
 import SliderMonitor from '../../containers/slider-monitor.jsx';
 import ListMonitor from '../../containers/list-monitor.jsx';
-import {getStageColorsForTheme} from '../../lib/themes/index.js';
+import {Theme, getStageColorsForTheme} from '../../lib/themes/index.js';
 
 import styles from './monitor.css';
 
@@ -154,7 +154,7 @@ MonitorComponent.propTypes = {
     onSetModeToLarge: PropTypes.func,
     onSetModeToSlider: PropTypes.func,
     onSliderPromptOpen: PropTypes.func,
-    theme: PropTypes.string.isRequired
+    theme: PropTypes.instanceOf(Theme).isRequired
 };
 
 MonitorComponent.defaultProps = {

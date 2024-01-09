@@ -19,7 +19,7 @@ import {BLOCKS_DEFAULT_SCALE, STAGE_DISPLAY_SIZES} from '../lib/layout-constants
 import DropAreaHOC from '../lib/drop-area-hoc.jsx';
 import DragConstants from '../lib/drag-constants';
 import defineDynamicBlock from '../lib/define-dynamic-block';
-import {DEFAULT_THEME, getColorsForTheme, themeMap} from '../lib/themes';
+import {Theme} from '../lib/themes';
 import {injectExtensionBlockTheme, injectExtensionCategoryTheme} from '../lib/themes/blockHelpers';
 
 import {connect} from 'react-redux';
@@ -155,9 +155,9 @@ class Blocks extends React.Component {
             {
                 rtl: this.props.isRtl,
                 toolbox: this.props.toolboxXML,
-                colours: getColorsForTheme(this.props.theme),
+                colours: this.props.theme.getBlockColors(),
                 grid: {
-                    colour: getColorsForTheme(this.props.theme).gridColor
+                    colour: this.props.theme.getBlockColors().gridColor
                 }
             },
             Blocks.defaultOptions
@@ -736,7 +736,7 @@ Blocks.propTypes = {
         collapse: PropTypes.bool
     }),
     stageSize: PropTypes.oneOf(Object.keys(STAGE_DISPLAY_SIZES)).isRequired,
-    theme: PropTypes.oneOf(Object.keys(themeMap)),
+    theme: PropTypes.instanceOf(Theme),
     toolboxXML: PropTypes.string,
     updateMetrics: PropTypes.func,
     updateToolboxState: PropTypes.func,
@@ -766,7 +766,7 @@ Blocks.defaultOptions = {
 Blocks.defaultProps = {
     isVisible: true,
     options: Blocks.defaultOptions,
-    theme: DEFAULT_THEME
+    theme: Theme.light()
 };
 
 const mapStateToProps = state => ({

@@ -1,25 +1,26 @@
-import {DEFAULT_THEME, themeMap} from '.';
+import {Theme} from '.';
 import AddonHooks from '../../addons/hooks';
 
+/**
+ * @param {Theme} theme
+ */
 const applyGuiColors = theme => {
     const doc = document.documentElement;
 
-    const defaultThemeObject = themeMap[DEFAULT_THEME];
-    for (const [name, value] of Object.entries(defaultThemeObject.guiColors)) {
+    const defaultColors = Theme.light().getGuiColors();
+    for (const [name, value] of Object.entries(defaultColors)) {
         doc.style.setProperty(`--${name}-default`, value);
     }
 
-    const themeObject = themeMap[theme];
-    for (const [name, value] of Object.entries(themeObject.guiColors)) {
+    const colors = theme.getGuiColors();
+    for (const [name, value] of Object.entries(colors)) {
         doc.style.setProperty(`--${name}`, value);
     }
 
-    doc.style.colorScheme = themeObject.isDark ? 'dark' : 'light';
-
+    // a horrible hack
     window.Recolor = {
-        primary: themeObject.guiColors['looks-secondary']
+        primary: colors['looks-secondary']
     };
-
     AddonHooks.recolorCallbacks.forEach(i => i());
 };
 

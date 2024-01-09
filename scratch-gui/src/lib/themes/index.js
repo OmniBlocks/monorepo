@@ -1,157 +1,135 @@
 import defaultsDeep from 'lodash.defaultsdeep';
 import {defineMessages} from 'react-intl';
 
-import {
-    blockColors as defaultBlockColors,
-    guiColors as defaultGuiColors
-} from './default';
-import {
-    lightGuiColors as twLightGuiColors,
-    darkBlockColors as twDarkBlockColors,
-    darkGuiColors as twDarkGuiColors
-} from './tw';
-import {
-    blockColors as darkModeBlockColors,
-    guiColors as darkModeGuiColors,
-    extensions as darkModeExtensions
-} from './dark';
-import {
-    blockColors as highContrastBlockColors,
-    extensions as highContrastExtensions
-} from './high-contrast';
+import * as accentPurple from './accent/purple';
+import * as accentBlue from './accent/blue';
+import * as accentRed from './accent/red';
 
-import twLightIcon from './tw/light.svg';
-import twDarkIcon from './tw/dark.svg';
-import scratchLightIcon from './default/icon.svg';
-import scratchDarkIcon from './dark/icon.svg';
-import highContrastIcon from './high-contrast/icon.svg';
+import * as guiLight from './gui/light';
+import * as guiDark from './gui/dark';
 
-import './global-styles.css';
+import * as blocksThree from './blocks/three';
+import * as blocksHighContrast from './blocks/high-contrast';
+import * as blocksDark from './blocks/high-contrast';
 
-const TW_LIGHT_THEME = 'tw-light';
-const TW_DARK_THEME = 'tw-dark';
-const SCRATCH_LIGHT_THEME = 'scratch-light';
-const SCRATCH_DARK_THEME = 'scratch-dark';
-const HIGH_CONTRAST_THEME = 'high-contrast';
+const ACCENT_PURPLE = 'purple';
+const ACCENT_BLUE = 'blue';
+const ACCENT_RED = 'red';
+const ACCENT_MAP = {
+    [ACCENT_PURPLE]: accentPurple,
+    [ACCENT_BLUE]: accentBlue,
+    [ACCENT_RED]: accentRed
+};
+const ACCENT_DEFAULT = ACCENT_RED;
 
-const DEFAULT_THEME = SCRATCH_LIGHT_THEME;
+const GUI_LIGHT = 'light';
+const GUI_DARK = 'dark';
+const GUI_MAP = {
+    [GUI_LIGHT]: guiLight,
+    [GUI_DARK]: guiDark
+};
+const GUI_DEFAULT = GUI_LIGHT;
 
-const mergeWithDefaultBlocks = colors => defaultsDeep({}, colors, defaultBlockColors);
-
-const messages = defineMessages({
-    [TW_LIGHT_THEME]: {
-        id: 'tw.theme.twLight',
-        defaultMessage: 'Light',
-        description: 'Name of our light mode'
-    },
-    [TW_DARK_THEME]: {
-        id: 'tw.theme.twDark',
-        defaultMessage: 'Dark',
-        description: 'Name of our dark mode'
-    },
-    [SCRATCH_LIGHT_THEME]: {
-        id: 'tw.theme.scratchLight',
-        defaultMessage: 'Scratch Light',
-        description: 'Name of the light mode used by Scratch'
-    },
-    [SCRATCH_DARK_THEME]: {
-        id: 'tw.theme.scratchDark',
-        defaultMessage: 'Scratch Dark',
-        description: 'Name of the alternative dark mode developed by Scratch but unused'
-    },
-    [HIGH_CONTRAST_THEME]: {
-        id: 'gui.theme.highContrast',
-        defaultMessage: 'High Contrast',
-        description: 'label for high theme'
-    }
-});
-
-const themeMap = {
-    [TW_LIGHT_THEME]: {
-        isDark: false,
+const BLOCKS_THREE = 'three';
+const BLOCKS_DARK = 'dark';
+const BLOCKS_HIGH_CONTRAST = 'high-contrast';
+const BLOCKS_DEFAULT = BLOCKS_THREE;
+const defaultBlockColors = blocksThree.blockColors;
+const BLOCKS_MAP = {
+    [BLOCKS_THREE]: {
         blocksMediaFolder: 'blocks-media/default',
-        colors: defaultBlockColors,
-        extensions: {},
-        guiColors: defaultsDeep({}, twLightGuiColors, defaultGuiColors),
-        label: messages[TW_LIGHT_THEME],
-        icon: twLightIcon,
-        useColorsForStage: true
+        colors: blocksThree.blockColors,
+        extensions: blocksThree.extensions
     },
-    [TW_DARK_THEME]: {
-        isDark: true,
-        blocksMediaFolder: 'blocks-media/default',
-        colors: mergeWithDefaultBlocks(twDarkBlockColors),
-        extensions: darkModeExtensions,
-        guiColors: defaultsDeep({}, twDarkGuiColors, darkModeGuiColors, defaultGuiColors),
-        label: messages[TW_DARK_THEME],
-        icon: twDarkIcon,
-        useColorsForStage: true
-    },
-    [SCRATCH_LIGHT_THEME]: {
-        isDark: false,
-        blocksMediaFolder: 'blocks-media/default',
-        colors: defaultBlockColors,
-        extensions: {},
-        guiColors: defaultGuiColors,
-        label: messages[SCRATCH_LIGHT_THEME],
-        icon: scratchLightIcon,
-        useColorsForStage: true
-    },
-    [SCRATCH_DARK_THEME]: {
-        isDark: true,
-        blocksMediaFolder: 'blocks-media/default',
-        colors: mergeWithDefaultBlocks(darkModeBlockColors),
-        extensions: darkModeExtensions,
-        guiColors: defaultsDeep({}, darkModeGuiColors, defaultGuiColors),
-        label: messages[SCRATCH_DARK_THEME],
-        icon: scratchDarkIcon,
-        useColorsForStage: false
-    },
-    [HIGH_CONTRAST_THEME]: {
-        isDark: false,
+    [BLOCKS_HIGH_CONTRAST]: {
         blocksMediaFolder: 'blocks-media/high-contrast',
-        colors: mergeWithDefaultBlocks(highContrastBlockColors),
-        extensions: highContrastExtensions,
-        guiColors: defaultGuiColors,
-        label: messages[HIGH_CONTRAST_THEME],
-        icon: highContrastIcon,
-        useColorsForStage: true
+        colors: defaultsDeep({}, blocksHighContrast.blockColors, defaultBlockColors),
+        extensions: blocksHighContrast.extensions
+    },
+    [BLOCKS_DARK]: {
+        blocksMediaFolder: 'blocks-media/default',
+        colors: defaultsDeep({}, blocksDark.blockColors, defaultBlockColors),
+        extensions: blocksDark.extensions
     }
 };
 
-const getColorsForTheme = theme => {
-    const themeInfo = themeMap[theme];
-
-    if (!themeInfo) {
-        throw new Error(`Undefined theme ${theme}`);
+class Theme {
+    constructor (accent, gui, blocks) {
+        // do not modify directly
+        this.accent = Object.keys(ACCENT_MAP).includes(accent) ? accent : ACCENT_DEFAULT;
+        this.gui = Object.keys(GUI_MAP).includes(gui) ? gui : GUI_DEFAULT;
+        this.blocks = Object.keys(BLOCKS_MAP).includes(blocks) ? blocks : BLOCKS_DEFAULT;
     }
 
-    return themeInfo.colors;
-};
-
-const getStageColorsForTheme = theme => {
-    const themeInfo = themeMap[theme];
-    if (themeInfo.useColorsForStage === false) {
-        return getColorsForTheme(DEFAULT_THEME);
+    static light () {
+        return new Theme(ACCENT_DEFAULT, GUI_LIGHT, BLOCKS_DEFAULT);
     }
-    return getColorsForTheme(theme);
-};
 
-const isDark = theme => {
-    const themeinfo = themeMap[theme];
-    return themeinfo.isDark;
-};
+    static dark () {
+        return new Theme(ACCENT_DEFAULT, GUI_DARK, BLOCKS_DEFAULT);
+    }
+
+    static highContrast () {
+        return new Theme(ACCENT_DEFAULT, GUI_DEFAULT, BLOCKS_HIGH_CONTRAST);
+    }
+
+    set (what, to) {
+        if (what === 'accent') {
+            return new Theme(to, this.gui, this.blocks);
+        } else if (what === 'gui') {
+            return new Theme(this.accent, to, this.blocks);
+        } else if (what === 'blocks') {
+            return new Theme(this.accent, this.gui, to);
+        } else {
+            throw new Error(`Unknown theme property: ${what}`);
+        }
+    }
+
+    /**
+     * @returns {string} a string that uniquely identifies this theme. Intended to be used as a react key.
+     */
+    key () {
+        return JSON.stringify(this);
+    }
+    
+    getBlocksMediaFolder () {
+        return BLOCKS_MAP[this.blocks].blocksMediaFolder;
+    }
+
+    getBlockColors () {
+        return defaultsDeep(
+            {},
+            ACCENT_MAP[this.accent].blockColors,
+            GUI_MAP[this.gui].blockColors,
+            BLOCKS_MAP[this.blocks].colors
+        );
+    }
+
+    getGuiColors () {
+        return defaultsDeep(
+            {},
+            ACCENT_MAP[this.accent].guiColors,
+            GUI_MAP[this.gui].guiColors,
+            guiLight.guiColors
+        );
+    }
+}
 
 export {
-    DEFAULT_THEME,
-    TW_LIGHT_THEME,
-    TW_DARK_THEME,
-    SCRATCH_LIGHT_THEME,
-    SCRATCH_DARK_THEME,
-    HIGH_CONTRAST_THEME,
+    Theme,
     defaultBlockColors,
-    getColorsForTheme,
-    getStageColorsForTheme,
-    themeMap,
-    isDark
+
+    ACCENT_RED,
+    ACCENT_PURPLE,
+    ACCENT_BLUE,
+    ACCENT_MAP,
+
+    GUI_LIGHT,
+    GUI_DARK,
+    GUI_MAP,
+
+    BLOCKS_THREE,
+    BLOCKS_DARK,
+    BLOCKS_HIGH_CONTRAST,
+    BLOCKS_MAP
 };

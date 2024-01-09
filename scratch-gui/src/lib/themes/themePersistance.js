@@ -1,62 +1,67 @@
-import {
-    TW_LIGHT_THEME,
-    TW_DARK_THEME,
-    SCRATCH_LIGHT_THEME,
-    SCRATCH_DARK_THEME,
-    HIGH_CONTRAST_THEME
-} from '.';
+import {Theme} from '.';
 
 const PREFERS_HIGH_CONTRAST_QUERY = '(prefers-contrast: more)';
 const PREFERS_DARK_QUERY = '(prefers-color-scheme: dark)';
 const STORAGE_KEY = 'tw:theme';
 
-const isValidTheme = theme => [
-    TW_LIGHT_THEME,
-    TW_DARK_THEME,
-    SCRATCH_LIGHT_THEME,
-    SCRATCH_DARK_THEME,
-    HIGH_CONTRAST_THEME
-].includes(theme);
-
+/**
+ * @returns {Theme}
+ */
 const systemPreferencesTheme = () => {
     if (window.matchMedia) {
         if (window.matchMedia(PREFERS_HIGH_CONTRAST_QUERY).matches) {
-            return HIGH_CONTRAST_THEME;
+            return Theme.highContrast();
         }
         if (window.matchMedia(PREFERS_DARK_QUERY).matches) {
-            return TW_DARK_THEME;
+            return Theme.dark();
         }
     }
-    return TW_LIGHT_THEME;
+    return Theme.light();
 };
 
+/**
+ * @returns {Theme}
+ */
 const detectTheme = () => {
     try {
         const local = localStorage.getItem(STORAGE_KEY);
 
         // Migrate legacy preferences
         if (local === 'dark') {
-            return TW_DARK_THEME;
+            return Theme.dark();
         }
         if (local === 'light') {
-            return TW_LIGHT_THEME;
         }
 
-        if (isValidTheme(local)) {
-            return local;
-        }
+        const parsed = JSON.parse(local);
+        // Values are validated by Theme itself
+        return new Theme(
+            parsed.accent,
+            parsed.gui,
+            parsed.blocks
+        );
     } catch (e) {
         // ignore
     }
+
     return systemPreferencesTheme();
 };
 
+/**
+ * @param {Theme} theme
+ */
 const persistTheme = theme => {
-    if (!isValidTheme(theme)) {
-        throw new Error(`Invalid theme: ${theme}`);
+    if (JSON.stringify(theme) === JSON.stringify(systemPreferencesTheme())) {
+        try {
+            localStorage.removeItem(STORAGE_KEY);
+        } catch (e) {
+            // ignore
+        }
+        return;
     }
+
     try {
-        localStorage.setItem(STORAGE_KEY, theme);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(theme));
     } catch (e) {
         // ignore
     }

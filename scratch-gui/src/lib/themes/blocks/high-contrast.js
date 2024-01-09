@@ -1,8 +1,8 @@
-import musicIcon from './extensions/musicIcon.svg';
-import penIcon from './extensions/penIcon.svg';
-import text2speechIcon from './extensions/text2speechIcon.svg';
-import translateIcon from './extensions/translateIcon.svg';
-import videoSensingIcon from './extensions/videoSensingIcon.svg';
+import musicIcon from './high-contrast-media/extensions/musicIcon.svg';
+import penIcon from './high-contrast-media/extensions/penIcon.svg';
+import text2speechIcon from './high-contrast-media/extensions/text2speechIcon.svg';
+import translateIcon from './high-contrast-media/extensions/translateIcon.svg';
+import videoSensingIcon from './high-contrast-media/extensions/videoSensingIcon.svg';
 
 const blockColors = {
     motion: {

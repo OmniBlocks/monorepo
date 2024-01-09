@@ -39,7 +39,7 @@ import TWFontsModal from '../../containers/tw-fonts-modal.jsx';
 
 import layout, {STAGE_SIZE_MODES} from '../../lib/layout-constants';
 import {resolveStageSize} from '../../lib/screen-utils';
-import {themeMap} from '../../lib/themes';
+import {Theme} from '../../lib/themes';
 
 import {isRendererSupported, isBrowserSupported} from '../../lib/tw-environment-support-prober';
 
@@ -368,12 +368,12 @@ const GUIComponent = props => {
                                 <TabPanel className={tabClassNames.tabPanel}>
                                     <Box className={styles.blocksWrapper}>
                                         <Blocks
-                                            key={`${blocksId}/${theme}`}
+                                            key={`${blocksId}/${theme.key()}`}
                                             canUseCloud={canUseCloud}
                                             grow={1}
                                             isVisible={blocksTabVisible}
                                             options={{
-                                                media: `${basePath}static/${themeMap[theme].blocksMediaFolder}/`
+                                                media: `${basePath}static/${theme.getBlocksMediaFolder()}/`
                                             }}
                                             stageSize={stageSize}
                                             onOpenCustomExtensionModal={onOpenCustomExtensionModal}
@@ -510,7 +510,7 @@ GUIComponent.propTypes = {
     stageSizeMode: PropTypes.oneOf(Object.keys(STAGE_SIZE_MODES)),
     targetIsStage: PropTypes.bool,
     telemetryModalVisible: PropTypes.bool,
-    theme: PropTypes.string,
+    theme: PropTypes.instanceOf(Theme),
     tipsLibraryVisible: PropTypes.bool,
     usernameModalVisible: PropTypes.bool,
     settingsModalVisible: PropTypes.bool,

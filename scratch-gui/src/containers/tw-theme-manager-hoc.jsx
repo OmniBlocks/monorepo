@@ -2,9 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {applyGuiColors} from '../lib/themes/guiHelpers';
+import {Theme} from '../lib/themes';
 
-const TWThemeApplierHOC = function (WrappedComponent) {
-    class TWThemeApplierComponent extends React.Component {
+const TWThemeManagerHOC = function (WrappedComponent) {
+    class TWThemeManagerComponent extends React.Component {
         constructor (props) {
             super(props);
             applyGuiColors(props.reduxTheme);
@@ -26,8 +27,8 @@ const TWThemeApplierHOC = function (WrappedComponent) {
         }
     }
 
-    TWThemeApplierComponent.propTypes = {
-        reduxTheme: PropTypes.string
+    TWThemeManagerComponent.propTypes = {
+        reduxTheme: PropTypes.instanceOf(Theme)
     };
 
     const mapStateToProps = state => ({
@@ -39,7 +40,7 @@ const TWThemeApplierHOC = function (WrappedComponent) {
     return connect(
         mapStateToProps,
         mapDispatchToProps
-    )(TWThemeApplierComponent);
+    )(TWThemeManagerComponent);
 };
 
-export default TWThemeApplierHOC;
+export default TWThemeManagerHOC;

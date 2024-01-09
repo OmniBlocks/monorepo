@@ -9,7 +9,7 @@ import {addMonitorRect, getInitialPosition, resizeMonitorRect, removeMonitorRect
 import {getVariable, setVariableValue} from '../lib/variable-utils';
 import importCSV from '../lib/import-csv';
 import downloadBlob from '../lib/download-blob';
-import {DEFAULT_THEME} from '../lib/themes';
+import {DEFAULT_THEME, Theme} from '../lib/themes';
 import SliderPrompt from './slider-prompt.jsx';
 
 import {connect} from 'react-redux';
@@ -263,7 +263,7 @@ Monitor.propTypes = {
     resizeMonitorRect: PropTypes.func.isRequired,
     spriteName: PropTypes.string, // eslint-disable-line react/no-unused-prop-types
     targetId: PropTypes.string,
-    theme: PropTypes.string,
+    theme: PropTypes.instanceOf(Theme),
     toolboxXML: PropTypes.string, // eslint-disable-line react/no-unused-prop-types
     value: PropTypes.oneOfType([
         PropTypes.string,
@@ -279,7 +279,7 @@ Monitor.propTypes = {
     y: PropTypes.number
 };
 Monitor.defaultProps = {
-    theme: DEFAULT_THEME
+    theme: Theme.light()
 };
 const mapStateToProps = state => ({
     monitorLayout: state.scratchGui.monitorLayout,

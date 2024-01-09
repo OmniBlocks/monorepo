@@ -3,6 +3,10 @@
 /* This is for overriding some styles that don't really "belong" to any existing stylesheets */
 /* Try to use this sparingly, otherwise this will become unmaintainable again... */
 
+:global(:root) {
+    color-scheme: var(--color-scheme);
+}
+
 /* popover is used by gui and paint */
 /* some of these are duplicated over there too; !important makes sure these win */
 :global(.Popover) {

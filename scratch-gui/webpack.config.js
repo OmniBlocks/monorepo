@@ -127,7 +127,7 @@ const base = {
                     to: 'static/blocks-media/high-contrast'
                 },
                 {
-                    from: 'src/lib/themes/high-contrast/blocks-media',
+                    from: 'src/lib/themes/blocks/high-contrast-media/blocks-media',
                     to: 'static/blocks-media/high-contrast',
                     force: true
                 }

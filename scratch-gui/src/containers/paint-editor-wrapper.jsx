@@ -8,7 +8,7 @@ import ErrorBoundaryHOC from '../lib/error-boundary-hoc.jsx';
 import {openFontsModal} from '../reducers/modals';
 
 import {connect} from 'react-redux';
-import {isDark} from '../lib/themes/index.js';
+import {Theme} from '../lib/themes/index.js';
 
 class PaintEditorWrapper extends React.Component {
     constructor (props) {
@@ -96,7 +96,7 @@ PaintEditorWrapper.propTypes = {
     onManageFonts: PropTypes.func.isRequired,
     imageFormat: PropTypes.string.isRequired,
     imageId: PropTypes.string.isRequired,
-    theme: PropTypes.bool,
+    theme: PropTypes.instanceOf(Theme),
     name: PropTypes.string,
     rotationCenterX: PropTypes.number,
     rotationCenterY: PropTypes.number,

@@ -19,8 +19,10 @@ const TWThemeManagerHOC = function (WrappedComponent) {
         componentDidMount () {
             this.removeListeners = onSystemPreferenceChange(this.handleSystemThemeChange);
         }
-        componentDidUpdate () {
-            applyGuiColors(this.props.reduxTheme);
+        componentDidUpdate (prevProps) {
+            if (prevProps.reduxTheme !== this.props.reduxTheme) {
+                applyGuiColors(this.props.reduxTheme);
+            }
         }
         componentWillUnmount () {
             this.removeListeners();

@@ -60,8 +60,6 @@ const blockColors = {
     flyoutLabelColor: '#cccccc',
     checkboxInactiveBackground: '#222222',
     checkboxInactiveBorder: '#c8c8c8',
-    checkboxActiveBackground: '#ff4c4c',
-    checkboxActiveBorder: '#cc3333',
     buttonBorder: '#c6c6c6',
     buttonActiveBackground: '#222222',
     buttonForeground: '#cccccc',

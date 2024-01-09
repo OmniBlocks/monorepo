@@ -16,7 +16,10 @@ const guiColors = {
     'drop-highlight': '#ff8c8c'
 };
 
-const blockColors = {};
+const blockColors = {
+    checkboxActiveBackground: '#ff4c4c',
+    checkboxActiveBorder: '#cc3333'
+};
 
 export {
     guiColors,

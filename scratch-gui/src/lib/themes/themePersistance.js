@@ -5,7 +5,7 @@ const PREFERS_DARK_QUERY = '(prefers-color-scheme: dark)';
 const STORAGE_KEY = 'tw:theme';
 
 /**
- * @returns {Theme}
+ * @returns {Theme} detected theme
  */
 const systemPreferencesTheme = () => {
     if (window.matchMedia) {
@@ -20,7 +20,7 @@ const systemPreferencesTheme = () => {
 };
 
 /**
- * @returns {Theme}
+ * @returns {Theme} the theme
  */
 const detectTheme = () => {
     try {
@@ -49,7 +49,7 @@ const detectTheme = () => {
 };
 
 /**
- * @param {Theme} theme
+ * @param {Theme} theme the theme
  */
 const persistTheme = theme => {
     if (JSON.stringify(theme) === JSON.stringify(systemPreferencesTheme())) {

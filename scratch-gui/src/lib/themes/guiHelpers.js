@@ -2,7 +2,7 @@ import {Theme} from '.';
 import AddonHooks from '../../addons/hooks';
 
 /**
- * @param {Theme} theme
+ * @param {Theme} theme the theme
  */
 const applyGuiColors = theme => {
     const doc = document.documentElement;

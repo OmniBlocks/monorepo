@@ -621,7 +621,23 @@ class Blocks extends React.Component {
     handleDrop (dragInfo) {
         fetch(dragInfo.payload.bodyUrl)
             .then(response => response.json())
-            .then(blocks => this.props.vm.shareBlocksToTarget(blocks, this.props.vm.editingTarget.id))
+            .then(blocks => {
+                // based on https://github.com/ScratchAddons/ScratchAddons/pull/7028/files
+                const topBlock = blocks.find(block => block.topLevel);
+                if (topBlock) {
+                    const metrics = this.props.workspaceMetrics.targets[this.props.vm.editingTarget.id];
+                    if (metrics) {
+                        const {x, y} = dragInfo.currentOffset;
+                        const {left, right} = this.workspace.scrollbar.hScroll.outerSvg_.getBoundingClientRect();
+                        const {top} = this.workspace.scrollbar.vScroll.outerSvg_.getBoundingClientRect();
+                        topBlock.x = (
+                            this.props.isRtl ? metrics.scrollX - x + right : -metrics.scrollX + x - left
+                        ) / metrics.scale;
+                        topBlock.y = (-metrics.scrollY - top + y) / metrics.scale;
+                    }
+                }
+                return this.props.vm.shareBlocksToTarget(blocks, this.props.vm.editingTarget.id);
+            })
             .then(() => {
                 this.props.vm.refreshWorkspace();
                 this.updateToolbox(); // To show new variables/custom blocks

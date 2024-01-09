@@ -79,7 +79,7 @@ class PaintEditorWrapper extends React.Component {
                 onUpdateImage={this.handleUpdateImage}
                 onUpdateName={this.handleUpdateName}
                 fontInlineFn={this.fontInlineFn}
-                theme={isDark(this.props.theme) ? 'dark' : 'light'}
+                theme={this.props.theme.isDark() ? 'dark' : 'light'}
                 customFonts={this.state.fonts}
                 width={this.props.customStageSize.width}
                 height={this.props.customStageSize.height}

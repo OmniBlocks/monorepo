@@ -400,6 +400,7 @@ export default async function ({ addon, console, msg }) {
     let text;
     let category;
     let shape;
+    let color;
     if (
       block.opcode === "data_variable" ||
       block.opcode === "data_listcontents" ||
@@ -456,8 +457,7 @@ export default async function ({ addon, console, msg }) {
       if (!text) {
         return null;
       }
-      // jsonData.extensions is not guaranteed to exist
-      category = jsonData.extensions?.includes("scratch_extension") ? "pen" : jsonData.category;
+      category = jsonData.colour?.toLowerCase() === "#0fbd8c" ? "pen" : jsonData.category;
       const isStatement =
         (jsonData.extensions &&
           (jsonData.extensions.includes("shape_statement") ||
@@ -466,8 +466,10 @@ export default async function ({ addon, console, msg }) {
         "previousStatement" in jsonData ||
         "nextStatement" in jsonData;
       shape = isStatement ? "stacked" : "round";
+      color = jsonData.colour;
     }
-    if (!text || !category) {
+
+    if (!text) {
       return null;
     }
 
@@ -476,7 +478,25 @@ export default async function ({ addon, console, msg }) {
     element.textContent = text;
     element.dataset.shape = shape;
 
-    element.classList.add(`sa-block-color-${category}`);
+    const COLOR_CLASSES = [
+      'motion',
+      'looks',
+      'sound',
+      'events',
+      'control',
+      'sensing',
+      'operators',
+      'variables',
+      'lists',
+      'myBlocks',
+      'pen',
+      'addon-custom-block'
+    ];
+    if (COLOR_CLASSES.includes(category)) {
+      element.classList.add(`sa-block-color-${category}`);
+    } else if (color) {
+      element.style.setProperty('--sa-block-colored-background', color);
+    }
 
     return element;
   };

@@ -195,17 +195,16 @@ function createBlockContainer() {
  * Creates a block component from a container containing all its components.
  * @param {SVGElement} container The block container, created by {@link createBlockContainer}.
  * @param {object} shape An object containing information of the shape of the block to be created. From the {@link BlockShapes} object.
- * @param {string} categoryClass The category of the block, used for filling the background.
+ * @param {string|null} categoryClass The category of the block, used for filling the background.
  * @param {string} fill
  * @param {string} stroke
  * @param {number} width The width of the background of the block.
  */
 function createBlockComponent(container, shape, categoryClass, fill, stroke, width) {
   if (width < shape.minWidth) width = shape.minWidth;
-  try {
-    container.classList.add("sa-block-color", categoryClass);
-  } catch (e) {
-    // categoryClass contained illegal characters for a class name. this is normal for extensions; ignore it
+  container.classList.add("sa-block-color");
+  if (categoryClass) {
+    container.classList.add(categoryClass);
   }
   const background = container.children[0];
   let style = "";
@@ -258,7 +257,22 @@ function _renderBlock(block, container, parentCategory, isVertical) {
   const blockContainer = container.appendChild(createBlockContainer());
   const shape = getShapeInfo(block.typeInfo.shape, isVertical);
   const category = block.typeInfo.category;
-  const categoryClass = "sa-block-color-" + category.name;
+
+  const COLOR_CLASSES = [
+    'motion',
+    'looks',
+    'sound',
+    'events',
+    'control',
+    'sensing',
+    'operators',
+    'variables',
+    'lists',
+    'myBlocks',
+    'pen',
+    'addon-custom-block'
+  ];
+  const categoryClass = COLOR_CLASSES.includes(category.name) ? "sa-block-color-" + category.name : null;
 
   let xOffset = 0;
   let inputIdx = 0;

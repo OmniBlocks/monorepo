@@ -8,6 +8,7 @@ import AppStateHOC from '../lib/app-state-hoc.jsx';
 import TWEmbedFullScreenHOC from '../lib/tw-embed-fullscreen-hoc.jsx';
 import TWStateManagerHOC from '../lib/tw-state-manager-hoc.jsx';
 import runAddons from '../addons/entry';
+import {Theme} from '../lib/themes/index.js';
 
 import GUI from './render-gui.jsx';
 import appTarget from './app-target';
@@ -57,6 +58,7 @@ ReactDOM.render(<WrappedGUI
     onVmInit={onVmInit}
     onProjectLoaded={onProjectLoaded}
     routingStyle="none"
+    theme={Theme.light}
 />, appTarget);
 
 if (urlParams.has('addons')) {

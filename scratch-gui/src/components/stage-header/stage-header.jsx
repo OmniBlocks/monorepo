@@ -78,7 +78,7 @@ const StageHeaderComponent = function (props) {
     if (isFullScreen || isEmbedded) {
         const stageDimensions = getStageDimensions(null, customStageSize, true);
         const settingsButton = isEmbedded && enableSettingsButton ? (
-            <div className={styles.unselectWrapper}>
+            <div className={classNames(styles.settingsButton, styles.unselectWrapper)}>
                 <Button
                     className={styles.stageButton}
                     onClick={onOpenSettings}

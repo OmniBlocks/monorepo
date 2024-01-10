@@ -55,8 +55,9 @@ const TWThemeManagerHOC = function (WrappedComponent) {
         onChangeTheme: PropTypes.func
     };
 
-    const mapStateToProps = state => ({
-        reduxTheme: state.scratchGui.theme.theme
+    const mapStateToProps = (state, ownProps) => ({
+        // Allow embed page to override theme
+        reduxTheme: ownProps.theme || state.scratchGui.theme.theme
     });
 
     const mapDispatchToProps = dispatch => ({

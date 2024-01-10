@@ -33,3 +33,7 @@
     flex-direction: column;
     align-items: center;
 }
+
+.stage-wrapper.embedded {
+    background-color: transparent;
+}

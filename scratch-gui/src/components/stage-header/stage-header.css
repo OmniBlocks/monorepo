@@ -15,6 +15,9 @@
     right: 0;
     z-index: $z-index-stage-header;
 }
+.stage-header-wrapper-overlay.embedded {
+    background-color: transparent;
+}
 
 .stage-menu-wrapper {
     display: flex;
@@ -25,12 +28,6 @@
     height: $stage-menu-height;
     padding-top: $space;
     padding-bottom: $space;
-}
-
-.embed-scratch-logo img {
-    height:  1.6rem;
-    vertical-align: middle;
-    opacity: .6;
 }
 
 .stage-size-row {
@@ -47,11 +44,13 @@
     border-radius: $form-radius;
 }
 
-[dir="ltr"] .stage-size-toggle-group {
+[dir="ltr"] .stage-size-toggle-group,
+[dir="ltr"] .settings-button {
     margin-right: .2rem;
 }
 
-[dir="rtl"] .stage-size-toggle-group {
+[dir="rtl"] .stage-size-toggle-group,
+[dir="rtl"] .settings-button {
     margin-left: .2rem;
 }
 

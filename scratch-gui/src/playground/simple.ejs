@@ -5,18 +5,52 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><%= htmlWebpackPlugin.options.title %></title>
     <style>
-      body[splash-theme="dark"]:not(.tw-loaded) {
+      body[data-splash-theme="dark"] {
         background: #111;
+      }
+
+      noscript {
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
       }
     </style>
   </head>
   <body>
+    <noscript>
+      <h1>This page requires JavaScript</h1>
+    </noscript>
+
     <script>
       (function() {
-        try {var localTheme = localStorage.getItem('tw:theme');} catch (e) {}
-        if (localTheme ? localTheme === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches) document.body.setAttribute('splash-theme', 'dark');
+        var theme = '';
+
+        try {
+          var themeSetting = localStorage.getItem('tw:theme');
+        } catch (e) {
+          // ignore
+        }
+        if (themeSetting === 'light') {
+          theme = 'light';
+        } else if (themeSetting === 'dark') {
+          theme = 'dark';
+        } else if (themeSetting) {
+          try {
+            var parsed = JSON.parse(themeSetting);
+            if (parsed.gui === 'dark' || parsed.gui === 'light') {
+              theme = parsed.gui;
+            }
+          } catch (e) {
+            // ignore
+          }
+        }
+
+        if (!theme) {
+          theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+
+        document.body.setAttribute('data-splash-theme', theme);
       })();
     </script>
+
     <div id="app"></div>
   </body>
 </html>

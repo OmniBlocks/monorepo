@@ -207,10 +207,9 @@ module.exports = [
             }),
             new HtmlWebpackPlugin({
                 chunks: ['embed'],
-                template: 'src/playground/index.ejs',
+                template: 'src/playground/embed.ejs',
                 filename: 'embed.html',
                 title: `Embedded Project - ${APP_NAME}`,
-                noTheme: true,
                 ...htmlWebpackPluginCommon
             }),
             new HtmlWebpackPlugin({

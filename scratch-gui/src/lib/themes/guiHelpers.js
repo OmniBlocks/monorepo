@@ -8,19 +8,19 @@ import './global-styles.css';
 const applyGuiColors = theme => {
     const doc = document.documentElement;
 
-    const defaultColors = Theme.light.getGuiColors();
-    for (const [name, value] of Object.entries(defaultColors)) {
+    const defaultGuiColors = Theme.light.getGuiColors();
+    for (const [name, value] of Object.entries(defaultGuiColors)) {
         doc.style.setProperty(`--${name}-default`, value);
     }
 
-    const colors = theme.getGuiColors();
-    for (const [name, value] of Object.entries(colors)) {
+    const guiColors = theme.getGuiColors();
+    for (const [name, value] of Object.entries(guiColors)) {
         doc.style.setProperty(`--${name}`, value);
     }
 
-    // a horrible hack
+    // a horrible hack for icons...
     window.Recolor = {
-        primary: colors['looks-secondary']
+        primary: guiColors['looks-secondary']
     };
     AddonHooks.recolorCallbacks.forEach(i => i());
 };

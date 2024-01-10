@@ -84,6 +84,7 @@ const blockColors = {
     text: '#000000',
     textFieldText: '#000000', // Text inside of inputs e.g. 90 in [point in direction (90)]
     toolboxText: '#000000', // Toolbox text, color picker text (used to be #575E75)
+    blackText: '#000000',
     // The color that the category menu label (e.g. 'motion', 'looks', etc.) changes to on hover
     toolboxHover: '#3373CC',
     insertionMarker: '#000000',

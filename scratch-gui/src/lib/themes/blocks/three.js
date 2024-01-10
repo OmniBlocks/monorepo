@@ -79,6 +79,7 @@ const blockColors = {
     toolboxSelected: '#E9EEF2',
     toolboxText: '#575E75',
     toolbox: '#FFFFFF',
+    blackText: '#575E75',
     flyout: '#F9F9F9',
     scrollbar: '#CECDCE',
     scrollbarHover: '#CECDCE',

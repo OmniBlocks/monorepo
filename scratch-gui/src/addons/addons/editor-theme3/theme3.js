@@ -1,5 +1,5 @@
 // TW: This addon very heavily links against TurboWarp/scratch-gui internals and other changes
-// There is absolutely no hope that this will work run on a scratch.mit.edu environment
+// There is absolutely no hope that this will run on a scratch.mit.edu environment
 
 import { removeAlpha, multiply, brighten, alphaBlend, textColor } from "../../libraries/common/cs/text-color.esm.js";
 import { BLOCKS_CUSTOM, BLOCKS_MAP, defaultBlockColors } from "../../../lib/themes";
@@ -237,15 +237,15 @@ export default async function ({ addon, console, msg }) {
     }
   };
 
-  // TODO does this do anything
-  // const oldFieldTextInputInit = Blockly.FieldTextInput.prototype.init;
-  // Blockly.FieldTextInput.prototype.init = function () {
-  //   // Text inputs
-  //   oldFieldTextInputInit.call(this);
-  //   if (!addon.self.disabled && !this.sourceBlock_.isShadow()) {
-  //     this.box_.setAttribute("fill", fieldBackground(this));
-  //   }
-  // };
+  const oldFieldVariableGetterInit = Blockly.FieldVariableGetter.prototype.init;
+  Blockly.FieldVariableGetter.prototype.init = function () {
+    oldFieldVariableGetterInit.call(this);
+
+    // Fix color of variable reporters in colored modes
+    if (!addon.self.disabled) {
+      this.textElement_.style.fill = fieldTextColor(this);
+    }
+  };
 
   const oldFieldImageSetValue = Blockly.FieldImage.prototype.setValue;
   Blockly.FieldImage.prototype.setValue = function (src) {
@@ -293,6 +293,7 @@ export default async function ({ addon, console, msg }) {
         primaryColor = this.sourceBlock_.getColour();
       }
 
+      // Active hover color
       Blockly.DropDownDiv.DIV_.style.backgroundColor = removeAlpha(primaryColor);
       if (isColoredTextMode()) {
         Blockly.DropDownDiv.getContentDiv().style.setProperty("--editorTheme3-hoveredItem", fieldBackground(this));
@@ -301,87 +302,6 @@ export default async function ({ addon, console, msg }) {
       }
     }
   };
-
-  // TODO - does this do anything?
-  // const oldFieldVariableInit = Blockly.FieldVariable.prototype.init;
-  // Blockly.FieldVariable.prototype.init = function () {
-  //   oldFieldVariableInit.call(this);
-
-  //   if (!addon.self.disabled) {
-  //     // this.textElement_.style.setProperty("fill", fieldTextColor(this), "important");
-  //   }
-  // };
-
-  const oldFieldVariableGetterInit = Blockly.FieldVariableGetter.prototype.init;
-  Blockly.FieldVariableGetter.prototype.init = function () {
-    oldFieldVariableGetterInit.call(this);
-
-    // Fix color of variable reporters
-    if (!addon.self.disabled) {
-      this.textElement_.style.fill = fieldTextColor(this);
-    }
-  };
-
-  // TODO see if needed
-  // const oldFieldNoteAddOctaveButton = Blockly.FieldNote.prototype.addOctaveButton_;
-  // Blockly.FieldNote.prototype.addOctaveButton_ = function (...args) {
-  //   // Octave buttons in "play note" dropdown
-  //   const group = oldFieldNoteAddOctaveButton.call(this, ...args);
-  //   group
-  //     .querySelector("image")
-  //     .setAttributeNS("http://www.w3.org/1999/xlink", "xlink:href", addon.self.getResource(`${iconPath()}/arrow_button.svg`)
-  //   return group;
-  // };
-
-  // TODO see if needed
-  // Matrix inputs
-  // const oldFieldMatrixInit = Blockly.FieldMatrix.prototype.init;
-  // Blockly.FieldMatrix.prototype.init = function () {
-  //   oldFieldMatrixInit.call(this);
-  //   const arrowTransform = this.arrow_.getAttribute("transform");
-  //   this.arrow_.remove();
-  //   this.arrow_ = makeDropdownArrow(fieldTextColor(this));
-  //   this.arrow_.setAttribute("transform", arrowTransform);
-  //   this.arrow_.style.cursor = "default";
-  //   this.fieldGroup_.appendChild(this.arrow_);
-  // };
-  // const oldFieldMatrixShowEditor = Blockly.FieldMatrix.prototype.showEditor_;
-  // Blockly.FieldMatrix.prototype.showEditor_ = function () {
-  //   oldFieldMatrixShowEditor.call(this);
-  //   let primaryColor;
-  //   if (this.sourceBlock_.isShadow() && this.sourceBlock_.getParent())
-  //     primaryColor = this.sourceBlock_.getParent().getColour();
-  //   else primaryColor = this.sourceBlock_.getColour();
-  //   Blockly.DropDownDiv.DIV_.style.backgroundColor = removeAlpha(primaryColor);
-  // };
-  // const oldFieldMatrixUpdateMatrix = Blockly.FieldMatrix.prototype.updateMatrix_;
-  // Blockly.FieldMatrix.prototype.updateMatrix_ = function () {
-  //   oldFieldMatrixUpdateMatrix.call(this);
-  //   for (let i = 0; i < this.matrix_.length; i++) {
-  //     if (this.matrix_[i] !== "0") {
-  //       this.fillMatrixNode_(this.ledButtons_, i, uncoloredTextColor());
-  //       this.fillMatrixNode_(this.ledThumbNodes_, i, uncoloredTextColor());
-  //     }
-  //   }
-  // };
-  // const oldFieldMatrixCreateButton = Blockly.FieldMatrix.prototype.createButton_;
-  // Blockly.FieldMatrix.prototype.createButton_ = function (fill) {
-  //   if (fill === "#FFFFFF") fill = uncoloredTextColor();
-  //   return oldFieldMatrixCreateButton.call(this, fill);
-  // };
-
-  // TODO compat in main
-  //   for (const category of categories) {
-  //     // CSS variables are used for compatibility with other addons
-  //     const prefix = `--editorTheme3-${category.colorId}`;
-  //     for (const [name, value] of Object.entries({
-  //       primary: primaryColor(category),
-  //       secondary: secondaryColor(category),
-  //       tertiary: tertiaryColor(category),
-  //       field: fieldBackground(category),
-  //     })) {
-  //       document.documentElement.style.setProperty(`${prefix}-${name}`, value);
-  //     }
 
   const oldFieldVerticalSeparatorInit = Blockly.FieldVerticalSeparator.prototype.init;
   Blockly.FieldVerticalSeparator.prototype.init = function () {

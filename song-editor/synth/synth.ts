@@ -229,7 +229,7 @@ const enum SongTagCode {
 	preset              = CharCode.u, // added in BeepBox URL version 7
 	volume              = CharCode.v, // added in BeepBox URL version 2
 	wave                = CharCode.w, // added in BeepBox URL version 2
-	supersaw            = CharCode.x, // added in BeepBox URL version 9
+	supersaw            = CharCode.x, // added in BeepBox URL version 9 ([UB] was used for chip wave but is now DEPRECATED)
 	filterResonance     = CharCode.y, // added in BeepBox URL version 7, DEPRECATED, [UB] repurposed for chip wave loop controls
 	drumsetEnvelopes    = CharCode.z, // added in BeepBox URL version 7 for filter envelopes, still used for drumset envelopes
 	algorithm           = CharCode.A, // added in BeepBox URL version 6
@@ -4102,35 +4102,6 @@ export class Song {
 		 }
         	}
             } break;
-			case 120:
-						if (fromGoldBox && !beforeFour && beforeSix) {
-							const chipWaveForCompat = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
-							if ((chipWaveForCompat + 62) > 85) {
-								if (document.URL.substring(document.URL.length - 13).toLowerCase() != "legacysamples") {
-									if (!willLoadLegacySamplesForOldSongs) {
-										willLoadLegacySamplesForOldSongs = true;
-										Config.willReloadForCustomSamples = true;
-										EditorConfig.customSamples = ["legacySamples"];
-										loadBuiltInSamples(0);
-									}
-								}
-							}
-							
-							if ((chipWaveForCompat + 62) > 78) {
-								this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].chipWave = clamp(0, Config.chipWaves.length, chipWaveForCompat + 63);	
-							}
-							else if ((chipWaveForCompat + 62) > 67) {
-								this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].chipWave = clamp(0, Config.chipWaves.length, chipWaveForCompat + 61);	
-							}
-							else if ((chipWaveForCompat + 62) == 67) {
-								this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].chipWave = 40;	
-							}
-							else {
-								this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].chipWave = clamp(0, Config.chipWaves.length, chipWaveForCompat + 62);			
-							}							
-						}
-						//is it more useful to save base64 characters or url length?
-					break;
             case SongTagCode.eqFilter: {
                 if ((beforeNine && fromBeepBox) || (beforeFive && fromJummBox) || (beforeFour && fromGoldBox)) {
                     if (beforeSeven && fromBeepBox) {
@@ -4593,8 +4564,8 @@ export class Song {
                 }
                 const instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                 
-                //if (fromUltrabox) && !beforeFive && (instrument.unison == Config.unisons.length)  {
-                if (instrument.unison == Config.unisons.length) {
+                if ((fromUltraBox && !beforeFive) && (instrument.unison == Config.unisons.length))  {
+                // if (instrument.unison == Config.unisons.length) {
                     instrument.unisonVoices = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
 
                     const unisonSpreadNegative = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
@@ -4968,6 +4939,34 @@ export class Song {
                 }
             } break;
             case SongTagCode.supersaw: {
+                if (fromGoldBox && !beforeFour && beforeSix) {
+                    const chipWaveForCompat = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                    if ((chipWaveForCompat + 62) > 85) {
+                        if (document.URL.substring(document.URL.length - 13).toLowerCase() != "legacysamples") {
+                            if (!willLoadLegacySamplesForOldSongs) {
+                                willLoadLegacySamplesForOldSongs = true;
+                                Config.willReloadForCustomSamples = true;
+                                EditorConfig.customSamples = ["legacySamples"];
+                                loadBuiltInSamples(0);
+                            }
+                        }
+                    }
+                    
+                    if ((chipWaveForCompat + 62) > 78) {
+                        this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].chipWave = clamp(0, Config.chipWaves.length, chipWaveForCompat + 63);	
+                    }
+                    else if ((chipWaveForCompat + 62) > 67) {
+                        this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].chipWave = clamp(0, Config.chipWaves.length, chipWaveForCompat + 61);	
+                    }
+                    else if ((chipWaveForCompat + 62) == 67) {
+                        this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].chipWave = 40;	
+                    }
+                    else {
+                        this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].chipWave = clamp(0, Config.chipWaves.length, chipWaveForCompat + 62);			
+                    }							
+                }
+                //is it more useful to save base64 characters or url length?
+
 				const instrument: Instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
 				instrument.supersawDynamism = clamp(0, Config.supersawDynamismMax + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
 				instrument.supersawSpread = clamp(0, Config.supersawSpreadMax + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
@@ -5024,20 +5023,20 @@ export class Song {
                             if (beforeThree && fromGoldBox) {
 								const freqToGold3 = [4, 5, 6, 7, 8, 10, 12, 13, 14, 15, 16, 18, 20, 22, 24, 2, 1, 9, 17, 19, 21, 23, 0, 3];
                                
-								for (let o = 0; o < (instrument.type == 10 ? 6 : Config.operatorCount); o++) {
+								for (let o = 0; o < (instrument.type == InstrumentType.fm6op ? 6 : Config.operatorCount); o++) {
                                     instrument.operators[o].frequency = freqToGold3[clamp(0, freqToGold3.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)])];
                                 }
                             }
 							else if (!fromGoldBox && !fromUltraBox) {
 								const freqToUltraBox = [4, 5, 6, 7, 8, 10, 12, 13, 14, 15, 16, 18, 20, 23, 27, 2, 1, 9, 17, 19, 21, 23, 0, 3];
 								
-								for (let o = 0; o < (instrument.type == 10 ? 6 : Config.operatorCount); o++) {
+								for (let o = 0; o < (instrument.type == InstrumentType.fm6op ? 6 : Config.operatorCount); o++) {
                                     instrument.operators[o].frequency = freqToUltraBox[clamp(0, freqToUltraBox.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)])];
                                 }
 								
 							}
                             else {
-                                for (let o = 0; o < (instrument.type == 10 ? 6 : Config.operatorCount); o++) {
+                                for (let o = 0; o < (instrument.type == InstrumentType.fm6op ? 6 : Config.operatorCount); o++) {
                                     instrument.operators[o].frequency = clamp(0, Config.operatorFrequencies.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                                 }
                             }
@@ -11158,7 +11157,9 @@ export class Synth {
 
                 //console.log(synthSource.join("\n"));
 
-                Synth.fm6SynthFunctionCache[fingerprint] = new Function("synth", "bufferIndex", "roundedSamplesPerTick", "tone", "instrumentState", synthSource.join("\n"));
+                const wrappedFm6Synth: string = "return (synth, bufferIndex, roundedSamplesPerTick, tone, instrument) => {" + synthSource.join("\n") + "}";
+
+				Synth.fm6SynthFunctionCache[fingerprint] = new Function("Config", "Synth", wrappedFm6Synth)(Config, Synth);
             }
             return Synth.fm6SynthFunctionCache[fingerprint];
         }else{

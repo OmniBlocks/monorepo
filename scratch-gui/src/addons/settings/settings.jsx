@@ -478,14 +478,12 @@ const Notice = ({
         className={styles.notice}
         type={type}
     >
-        <div>
-            <img
-                className={styles.noticeIcon}
-                src={infoImage}
-                alt=""
-                draggable={false}
-            />
-        </div>
+        <img
+            className={styles.noticeIcon}
+            src={infoImage}
+            alt=""
+            draggable={false}
+        />
         <div>
             {text}
         </div>

@@ -392,6 +392,7 @@ a:active, a:focus {
     background: rgba(154, 212, 207, 0.7);
 }
 .notice-icon {
+    display: block;
     height: 16px;
     width: 16px;
     margin-right: 10px;

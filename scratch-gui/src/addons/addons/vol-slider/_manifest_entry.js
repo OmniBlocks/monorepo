@@ -10,6 +10,9 @@ const manifest = {
     },
     {
       "name": "GarboMuffin"
+    },
+    {
+      "name": "DNin01"
     }
   ],
   "userscripts": [
@@ -20,6 +23,14 @@ const manifest = {
   "userstyles": [
     {
       "url": "userstyle.css"
+    },
+    {
+      "url": "hover.css",
+      "if": {
+        "settings": {
+          "always": false
+        }
+      }
     }
   ],
   "settings": [
@@ -30,12 +41,17 @@ const manifest = {
       "min": 0,
       "max": 100,
       "default": 100
+    },
+    {
+      "name": "Always show slider",
+      "id": "always",
+      "type": "boolean",
+      "default": false
     }
   ],
   "dynamicDisable": true,
   "tags": [
-    "recommended",
-    "new"
+    "recommended"
   ]
 };
 export default manifest;

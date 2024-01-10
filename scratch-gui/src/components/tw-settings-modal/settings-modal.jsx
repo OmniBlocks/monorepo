@@ -10,6 +10,8 @@ import Input from '../forms/input.jsx';
 import BufferedInputHOC from '../forms/buffered-input-hoc.jsx';
 import DocumentationLink from '../tw-documentation-link/documentation-link.jsx';
 import styles from './settings-modal.css';
+import helpIcon from './help-icon.svg';
+import {APP_NAME} from '../../lib/brand.js';
 
 /* eslint-disable react/no-multi-comp */
 
@@ -76,7 +78,12 @@ class UnwrappedSetting extends React.Component {
                         className={styles.helpIcon}
                         onClick={this.handleClickHelp}
                         title={this.props.intl.formatMessage(messages.help)}
-                    />
+                    >
+                        <img
+                            src={helpIcon}
+                            draggable={false}
+                        />
+                    </button>
                 </div>
                 {this.state.helpVisible && (
                     <div className={styles.detail}>
@@ -306,9 +313,12 @@ const DisableCompiler = props => (
         help={
             <FormattedMessage
                 // eslint-disable-next-line max-len
-                defaultMessage="Disables the TurboWarp compiler. You may want to enable this while editing projects so that scripts update immediately. Otherwise, you should never enable this."
+                defaultMessage="Disables the {APP_NAME} compiler. You may want to enable this while editing projects so that scripts update immediately. Otherwise, you should never enable this."
                 description="Disable Compiler help"
                 id="tw.settingsModal.disableCompilerHelp"
+                values={{
+                    APP_NAME
+                }}
             />
         }
         slug="disable-compiler"

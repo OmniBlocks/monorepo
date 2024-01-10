@@ -37,8 +37,8 @@ class CustomProcedures extends React.Component {
             {rtl: this.props.isRtl}
         );
 
-        // @todo This is a hack to make there be no toolbox.
         const ScratchBlocks = LazyScratchBlocks.get();
+        // @todo This is a hack to make there be no toolbox.
         const oldDefaultToolbox = ScratchBlocks.Blocks.defaultToolbox;
         ScratchBlocks.Blocks.defaultToolbox = null;
         this.workspace = ScratchBlocks.inject(this.blocks, workspaceConfig);

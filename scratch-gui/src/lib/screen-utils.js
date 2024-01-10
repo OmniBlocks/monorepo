@@ -15,7 +15,7 @@ const STAGE_DIMENSION_DEFAULTS = {
     // referencing css/units.css,
     // spacingBorderAdjustment = 2 * $full-screen-top-bottom-margin +
     //   2 * $full-screen-border-width
-    fullScreenSpacingBorderAdjustment: 12,
+    fullScreenSpacingBorderAdjustment: 8,
     // referencing css/units.css,
     // menuHeightAdjustment = $stage-menu-height
     menuHeightAdjustment: 44

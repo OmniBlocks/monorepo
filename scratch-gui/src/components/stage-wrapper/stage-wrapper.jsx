@@ -28,6 +28,7 @@ const StageWrapperComponent = function (props) {
                 styles.stageWrapper,
                 {[styles.embedded]: isEmbedded},
                 {[styles.fullScreen]: isFullScreen},
+                {[styles.loading]: loading}
             )}
             dir={isRtl ? 'rtl' : 'ltr'}
         >

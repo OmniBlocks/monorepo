@@ -1,3 +1,5 @@
+@import "../css/colors.css";
+
 /* Base styles used by Scratch https://github.com/LLK/scratch-www/blob/develop/src/main.scss */
 h1,
 h2,
@@ -30,7 +32,7 @@ h4 {
     font-size: 1rem;
 }
 a {
-    color: #25d;
+    color: $link-color;
     cursor: pointer;
     text-decoration: underline;
 }
@@ -40,6 +42,7 @@ a {
     top: 0;
     left: 0;
     width: 100%;
+    background-color: $page-background;
 }
 
 .editor {
@@ -64,14 +67,11 @@ a {
 .footer {
     padding: 10px 0;
     margin-top: 10px;
-    border-top: 2px solid #ddd;
+    border-top: 2px solid $ui-black-transparent;
 }
 .footer a {
     font-weight: bold;
     text-decoration: none;
-}
-[theme="dark"] .footer {
-    border-color: #1a1a1a;
 }
 .footer-content {
     max-width: 600px;
@@ -97,16 +97,6 @@ a {
     margin-bottom: 10px;
 }
 
-[theme="dark"] .container {
-    background-color: #111;
-}
-[theme="dark"] .player-only {
-    color: #ddd;
-}
-[theme="dark"] a {
-    color: #4af;
-}
-
 .infobox {
     line-height: 1.5em;
     padding: 0.5rem;
@@ -114,10 +104,6 @@ a {
     border-radius: 0.5rem;
     border: 1px solid #b9d6ff;
     background-color: #dbebff;
-}
-[theme="dark"] .infobox {
-    border-color: #203652;
-    background-color: #16202c;
 }
 .infobox p {
     margin: 4px 0;
@@ -130,8 +116,4 @@ a {
 .unshared-update {
     border-color: #ffb9b9;
     background-color: #ffdbdb;
-}
-[theme="dark"] .unshared-update {
-    border-color: #6a2929;
-    background-color: #452222;
 }

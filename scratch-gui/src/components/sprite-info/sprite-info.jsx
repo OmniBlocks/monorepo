@@ -17,8 +17,9 @@ import styles from './sprite-info.css';
 
 import xIcon from './icon--x.svg';
 import yIcon from './icon--y.svg';
-import showIcon from './icon--show.svg';
-import hideIcon from './icon--hide.svg';
+import showIcon from '!../../lib/tw-recolor/build!./icon--show.svg';
+import hideIcon from '!../../lib/tw-recolor/build!./icon--hide.svg';
+import ToggleButtons from '../toggle-buttons/toggle-buttons.jsx';
 
 const BufferedInput = BufferedInputHOC(Input);
 
@@ -27,6 +28,16 @@ const messages = defineMessages({
         id: 'gui.SpriteInfo.spritePlaceholder',
         defaultMessage: 'Name',
         description: 'Placeholder text for sprite name'
+    },
+    showSpriteAction: {
+        id: 'gui.SpriteInfo.showSpriteAction',
+        defaultMessage: 'Show sprite',
+        description: 'Tooltip for show sprite button'
+    },
+    hideSpriteAction: {
+        id: 'gui.SpriteInfo.hideSpriteAction',
+        defaultMessage: 'Hide sprite',
+        description: 'Tooltip for hide sprite button'
     }
 });
 
@@ -100,6 +111,7 @@ class SpriteInfo extends React.Component {
                                 aria-hidden="true"
                                 className={classNames(styles.xIcon, styles.icon)}
                                 src={xIcon}
+                                draggable={false}
                             />
                         </div> :
                         null
@@ -127,6 +139,7 @@ class SpriteInfo extends React.Component {
                                 aria-hidden="true"
                                 className={classNames(styles.yIcon, styles.icon)}
                                 src={yIcon}
+                                draggable={false}
                             />
                         </div> :
                         null
@@ -185,46 +198,23 @@ class SpriteInfo extends React.Component {
                                 /> :
                                 null
                         }
-                        <div className={styles.radioWrapper}>
-                            <div
-                                className={classNames(
-                                    styles.radio,
-                                    styles.radioFirst,
-                                    styles.iconWrapper,
-                                    {
-                                        [styles.isActive]: this.props.visible && !this.props.disabled,
-                                        [styles.isDisabled]: this.props.disabled
-                                    }
-                                )}
-                                tabIndex="0"
-                                onClick={this.props.onClickVisible}
-                                onKeyPress={this.props.onPressVisible}
-                            >
-                                <img
-                                    className={styles.icon}
-                                    src={showIcon}
-                                />
-                            </div>
-                            <div
-                                className={classNames(
-                                    styles.radio,
-                                    styles.radioLast,
-                                    styles.iconWrapper,
-                                    {
-                                        [styles.isActive]: !this.props.visible && !this.props.disabled,
-                                        [styles.isDisabled]: this.props.disabled
-                                    }
-                                )}
-                                tabIndex="0"
-                                onClick={this.props.onClickNotVisible}
-                                onKeyPress={this.props.onPressNotVisible}
-                            >
-                                <img
-                                    className={styles.icon}
-                                    src={hideIcon}
-                                />
-                            </div>
-                        </div>
+                        <ToggleButtons
+                            buttons={[
+                                {
+                                    handleClick: this.props.onClickVisible,
+                                    icon: showIcon,
+                                    isSelected: this.props.visible && !this.props.disabled,
+                                    title: this.props.intl.formatMessage(messages.showSpriteAction)
+                                },
+                                {
+                                    handleClick: this.props.onClickNotVisible,
+                                    icon: hideIcon,
+                                    isSelected: !this.props.visible && !this.props.disabled,
+                                    title: this.props.intl.formatMessage(messages.hideSpriteAction)
+                                }
+                            ]}
+                            disabled={this.props.disabled}
+                        />
                     </div>
                     <div className={classNames(styles.group, styles.largerInput)}>
                         <Label
@@ -275,8 +265,6 @@ SpriteInfo.propTypes = {
     onChangeY: PropTypes.func,
     onClickNotVisible: PropTypes.func,
     onClickVisible: PropTypes.func,
-    onPressNotVisible: PropTypes.func,
-    onPressVisible: PropTypes.func,
     rotationStyle: PropTypes.string,
     size: PropTypes.oneOfType([
         PropTypes.string,

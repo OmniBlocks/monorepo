@@ -4,14 +4,17 @@ import React from 'react';
 import keyMirror from 'keymirror';
 import classNames from 'classnames';
 
+import BalancedFormattedMessage from '../../containers/balanced-formatted-message.jsx';
 import Box from '../box/box.jsx';
 import Dots from './dots.jsx';
 
 import closeIcon from '../close-button/icon--close.svg';
 
-import radarIcon from './icons/searching.png';
-import bluetoothIcon from './icons/bluetooth-white.svg';
 import backIcon from './icons/back.svg';
+import bluetoothIcon from './icons/bluetooth-white.svg';
+import enterUpdateIcon from './icons/enter-update.svg';
+import radarIcon from './icons/searching.png';
+import warningIcon from './icons/warning.svg';
 
 import styles from './connection-modal.css';
 
@@ -21,8 +24,13 @@ const PHASES = keyMirror({
     notfound: null
 });
 
-const AutoScanningStep = props => (
-    <Box className={styles.body}>
+const AutoScanningStep = props => {
+    // Offer to update both during scan and after a failed scan, as long there's an update function.
+    // It's possible the scan will find "some" device but not the desired device,
+    // so don't limit the update offer to just the PHASES.notfound case.
+    const showUpdate = !!(props.onUpdatePeripheral &&
+        (props.phase === PHASES.pressbutton || props.phase === PHASES.notfound));
+    return (<Box className={styles.body}>
         <Box className={styles.activityArea}>
             <div className={styles.activityAreaInfo}>
                 <div className={styles.centeredRow}>
@@ -31,10 +39,12 @@ const AutoScanningStep = props => (
                             <img
                                 className={styles.radarBig}
                                 src={radarIcon}
+                                draggable={false}
                             />
                             <img
                                 className={styles.bluetoothCenteredIcon}
                                 src={bluetoothIcon}
+                                draggable={false}
                             />
                         </React.Fragment>
                     )}
@@ -43,21 +53,29 @@ const AutoScanningStep = props => (
                             <img
                                 className={classNames(styles.radarBig, styles.radarSpin)}
                                 src={radarIcon}
+                                draggable={false}
                             />
                             <img
                                 className={styles.connectionTipIcon}
                                 src={props.connectionTipIconURL}
+                                draggable={false}
                             />
                         </React.Fragment>
                     )}
                     {props.phase === PHASES.notfound && (
-                        <Box className={styles.instructions}>
+                        <React.Fragment>
+                            <img
+                                className={styles.helpStepImage}
+                                src={warningIcon}
+                                draggable={false}
+                            />
                             <FormattedMessage
+                                className={styles.helpStepText}
                                 defaultMessage="No devices found"
                                 description="Text shown when no devices could be found"
                                 id="gui.connection.auto-scanning.noPeripheralsFound"
                             />
-                        </Box>
+                        </React.Fragment>
                     )}
                 </div>
             </div>
@@ -79,6 +97,15 @@ const AutoScanningStep = props => (
                     />
                 )}
             </Box>
+            {showUpdate && (
+                <Box className={classNames(styles.bottomAreaItem, styles.instructions)}>
+                    <BalancedFormattedMessage
+                        defaultMessage="If you don't see your device, you may need to update it to work with Scratch."
+                        description="Prompt for updating a peripheral device"
+                        id="gui.connection.auto-scanning.updatePeripheralPrompt"
+                    />
+                </Box>
+            )}
             <Dots
                 className={styles.bottomAreaItem}
                 counter={0}
@@ -116,6 +143,7 @@ const AutoScanningStep = props => (
                             <img
                                 className={styles.abortConnectingIcon}
                                 src={closeIcon}
+                                draggable={false}
                             />
                         </button>
                     </div>
@@ -128,6 +156,7 @@ const AutoScanningStep = props => (
                         <img
                             className={styles.buttonIconLeft}
                             src={backIcon}
+                            draggable={false}
                         />
                         <FormattedMessage
                             defaultMessage="Try again"
@@ -136,15 +165,33 @@ const AutoScanningStep = props => (
                         />
                     </button>
                 )}
+                {showUpdate && (
+                    <button
+                        className={classNames(styles.bottomAreaItem, styles.connectionButton)}
+                        onClick={props.onUpdatePeripheral}
+                    >
+                        <FormattedMessage
+                            defaultMessage="Update my Device"
+                            description="Button to enter the peripheral update mode"
+                            id="gui.connection.auto-scanning.updatePeripheralButton"
+                        />
+                        <img
+                            className={styles.buttonIconRight}
+                            src={enterUpdateIcon}
+                            draggable={false}
+                        />
+                    </button>
+                )}
             </Box>
         </Box>
-    </Box>
-);
+    </Box>);
+};
 
 AutoScanningStep.propTypes = {
     connectionTipIconURL: PropTypes.string,
     onRefresh: PropTypes.func,
     onStartScan: PropTypes.func,
+    onUpdatePeripheral: PropTypes.func,
     phase: PropTypes.oneOf(Object.keys(PHASES))
 };
 

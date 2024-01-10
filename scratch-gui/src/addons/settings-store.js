@@ -270,10 +270,12 @@ class SettingsStore extends EventTargetShim {
                 if (typeof value !== 'boolean') {
                     throw new Error('Setting value is invalid.');
                 }
-            } else if (settingObject.type === 'integer') {
+            } else if (settingObject.type === 'integer' || settingObject.type === 'positive_integer') {
                 if (typeof value !== 'number') {
                     throw new Error('Setting value is invalid.');
                 }
+            } else if (settingObject.type === 'string' || settingObject.type === 'untranslated') {
+                // always valid
             } else if (settingObject.type === 'color') {
                 if (typeof value !== 'string') {
                     throw new Error('Color value is not a string.');
@@ -365,7 +367,7 @@ class SettingsStore extends EventTargetShim {
         const result = {
             core: {
                 // Upstream property. We don't use this.
-                lightTheme: theme === 'light',
+                lightTheme: !theme.isDark(),
                 // Doesn't matter what we set this to
                 version: `v1.0.0-tw-${upstreamMeta.commit}`
             },

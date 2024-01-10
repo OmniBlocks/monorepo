@@ -60,6 +60,7 @@ class ComingSoonContent extends React.Component {
                         <img
                             className={styles.comingSoonImage}
                             src={images[imageNumber]}
+                            draggable={false}
                         />
                     )
                 }}

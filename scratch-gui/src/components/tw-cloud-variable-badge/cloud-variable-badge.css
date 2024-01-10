@@ -1,18 +1,15 @@
 @import "../../css/colors.css";
+@import "../../css/filters.css";
 
 .badge {
     padding: 0.5rem;
     margin: 5px 0 8px 0;
-    border: 1px solid #b9d6ff;
-    background-color: #dbebff;
+    border: 1px solid $badge-border;
+    background-color: $badge-background;
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
     border-radius: 0.5rem;
-}
-[theme="dark"] .badge {
-    border-color: #203652;
-    background-color: #16202c;
 }
 
 .title {
@@ -21,8 +18,9 @@
     gap: 0.5rem;
     font-weight: bold;
 }
-[theme="dark"] .cloud-icon {
-    filter: invert(100%);
+
+.cloud-icon {
+    filter: $filter-icon-gray;
 }
 
 .servers {
@@ -38,6 +36,6 @@
     border-radius: 1rem;
 }
 .server.selected {
-    background-color: $motion-primary;
-    color: $ui-white;
+    background-color: $looks-secondary;
+    color: white;
 }

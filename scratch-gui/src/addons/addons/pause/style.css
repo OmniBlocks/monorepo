@@ -9,5 +9,5 @@
 }
 
 .pause-btn:hover {
-  background-color: hsla(0, 100%, 65%, 0.15);
+  background-color: var(--looks-light-transparent);
 }

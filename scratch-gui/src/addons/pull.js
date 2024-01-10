@@ -140,18 +140,19 @@ const detectUnimplementedAPIs = (addonId, contents) => {
 
     if (contents.includes('addon.self.dir')) {
         // eslint-disable-next-line max-len
-        console.warn(`Warning: ${addonId} contains unwritten addon.self.dir. It or this script should be modified so that it will be rewritten.`);
+        console.warn(`Warning: ${addonId} contains un-rewritten addon.self.dir. It or this script should be modified so that it will be rewritten.`);
     }
 
     if (contents.includes('addon.self.lib')) {
         // eslint-disable-next-line max-len
-        console.warn(`Warning: ${addonId} contains unwritten addon.self.lib. It should use modern ES6 import statements.`);
+        console.warn(`Warning: ${addonId} contains un-rewritten addon.self.lib. It should use modern ES6 import statements.`);
     }
 };
 
 const rewriteAssetImports = contents => {
-    // Reroute addon.self.dir concatenation to call runtime function.
-    // Parse things like:
+    // Rewrite addon.self.dir concatenation to call runtime function.
+
+    // Rewrite things like:
     // el.src = addon.self.dir + "/" + name + ".svg";
     //          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  match
     //                           ^^^^^^^^^^^^^^^^^^^  capture group 1
@@ -159,6 +160,15 @@ const rewriteAssetImports = contents => {
         /addon\.self\.(?:dir|lib) *\+ *([^;,\n]+)/g,
         (_fullText, name) => `addon.self.getResource(${name}) /* rewritten by pull.js */`
     );
+
+    // Rewrite things like:
+    // `${addon.self.dir}/${name}.svg`
+    //                   ^^^^^^^^^^^^  capture group 1
+    contents = contents.replace(
+        /`\${addon\.self\.(?:dir|lib)}([^`]+)`/g,
+        (_fullText, name) => `addon.self.getResource(\`${name}\`) /* rewritten by pull.js */`
+    );
+
     return contents;
 };
 
@@ -179,6 +189,7 @@ const normalizeManifest = (id, manifest) => {
     delete manifest.libraries;
     delete manifest.injectAsStyleElt;
     delete manifest.updateUserstylesOnSettingsChange;
+    delete manifest.presetPreview;
 
     // All addons have dynamic enable
     delete manifest.dynamicEnable;
@@ -309,6 +320,10 @@ const processAddon = (id, oldDirectory, newDirectory) => {
 };
 
 const SKIP_MESSAGES = [
+    '_general/meta/addonSettings',
+    '_general/meta/managedBySa',
+    '_locale',
+    '_locale_name',
     'debugger/@description',
     'debugger/@settings-name-log_max_list_length',
     'debugger/log-msg-list-append-too-long',
@@ -325,15 +340,24 @@ const SKIP_MESSAGES = [
     'mediarecorder/added-by',
     'editor-theme3/@settings-name-sa-color',
     'editor-theme3/@settings-name-forums',
+    'editor-theme3/@info-disablesMenuBar',
+    'editor-theme3/@info-aboutHighContrast',
     'block-switching/@settings-name-sa'
 ];
 
 const parseMessageDirectory = localeRoot => {
+    const unstructure = string => {
+        if (typeof string === 'object') {
+            return string.string;
+        }
+        return string;
+    };
+
     const settings = {};
     const runtime = {};
     const upstreamMessageIds = new Set();
 
-    for (const addon of addons) {
+    for (const addon of ['_general', ...addons]) {
         const path = pathUtil.join(localeRoot, `${addon}.json`);
         try {
             const contents = fs.readFileSync(path, 'utf-8');
@@ -344,7 +368,7 @@ const parseMessageDirectory = localeRoot => {
                     continue;
                 }
 
-                const value = parsed[id];
+                const value = unstructure(parsed[id]);
                 if (id.includes('/@')) {
                     settings[id] = value;
                 } else {

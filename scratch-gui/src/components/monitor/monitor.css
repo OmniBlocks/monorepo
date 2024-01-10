@@ -1,10 +1,10 @@
 @import "../../css/units.css";
-@import "../../css/colors.css";
+@import "../../css/default-colors.css";
 @import "../../css/z-index.css";
 
 .monitor-container {
     position: absolute;
-    background: $ui-primary-light; /* tw: do not look different in dark mode */
+    background: $ui-primary-default;
     z-index: $z-index-monitor;
     border: 1px solid $ui-black-transparent-default;
     border-radius: calc($space / 2);
@@ -13,7 +13,6 @@
     transition: box-shadow 0.2s;
     pointer-events: all;
     overflow: hidden;
-    color: #575e75; /* tw: explicitly set color to match Scratch */
 }
 
 .monitor:hover {
@@ -43,7 +42,6 @@
     align-items: center;
     min-width: 40px;
     text-align: center;
-    color: white;
     margin: 0 5px;
     border-radius: calc($space / 2);
     padding: 0 2px;
@@ -56,7 +54,6 @@
     min-width: 3rem;
     padding: 0.1rem 0.25rem;
     text-align: center;
-    color: white;
     font-size: 1rem;
     white-space: pre-wrap;
     transform: translateZ(0); /* Fixes flickering in Safari */
@@ -78,18 +75,18 @@
 }
 
 .list-header {
-    background: $ui-white;
+    background: $ui-white-default;
     border-bottom: 1px solid $ui-black-transparent-default;
     text-align: center;
     padding: 3px;
     font-size: 0.75rem;
     font-weight: bold;
-    color: $text-primary-light; /* tw: do not look different in dark mode */
+    color: $text-primary-default;
     width: 100%;
 }
 
 .list-body {
-    background: $ui-primary-light; /* tw: do not look different in dark mode */
+    background: $ui-primary-default;
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -109,14 +106,13 @@
 
 .list-index {
     font-weight: bold;
-    color: $text-primary-light; /* tw: do not look different in dark mode */
+    color: $text-primary-default;
     margin: 0 3px;
 }
 
 .list-value {
     min-width: 40px;
     text-align: left;
-    color: white;
     margin: 0 3px;
     border-radius: calc($space / 2);
     border: 1px solid $ui-black-transparent-default;
@@ -125,7 +121,7 @@
 }
 
 .list-footer {
-    background: $ui-white;
+    background: $ui-white-default;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -133,7 +129,7 @@
     font-size: 0.75rem;
     font-weight: bold;
     border-top: 1px solid $ui-black-transparent-default;
-    color: $text-primary-light; /* tw: do not look different in dark mode */
+    color: $text-primary-default;
 }
 
 .list-empty {
@@ -163,7 +159,6 @@
     padding: 3px 5px;
     border: 0;
     background: none;
-    color: $ui-white;
     outline: none;
     font-size: 0.75rem;
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -176,7 +171,6 @@
     padding: 0;
     padding-right: 5px;
     cursor: pointer;
-    color: $ui-white;
 }
 
 .add-button {

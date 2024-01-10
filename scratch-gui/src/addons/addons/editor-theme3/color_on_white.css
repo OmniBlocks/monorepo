@@ -1,23 +1,16 @@
+/* block-palette-icons */
 .scratchCategoryItemBubble::after {
-  /* block-palette-icons */
   filter: brightness(0);
   opacity: 0.6;
 }
 
 .u-dropdown-searchbar,
 .u-dropdown-searchbar:focus,
-.blocklyDropDownDiv .goog-menuitem,
-.sa-contextmenu-colored .blocklyContextMenu .goog-menuitem .goog-menuitem-content {
+.blocklyDropDownDiv .goog-menuitem {
   color: #575e75;
 }
 .u-dropdown-searchbar:focus {
   background-color: var(--editorTheme3-hoveredItem);
-}
-
-.blocklyAngleDragHandle {
-  stroke: black;
-  stroke-opacity: 0.15;
-  paint-order: stroke fill;
 }
 
 .scratchCommentRect {

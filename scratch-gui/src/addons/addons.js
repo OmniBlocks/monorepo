@@ -26,10 +26,13 @@ const addons = [
     'default-costume-editor-color',
     'bitmap-copy',
     '2d-color-picker',
+    'paint-skew',
     'better-img-uploads',
     'pick-colors-from-stage',
     'custom-block-shape',
+    'editor-square-inputs',
     'zebra-striping',
+    'editor-compact',
     'editor-theme3',
     'custom-block-text',
     'editor-colored-context-menus',
@@ -44,6 +47,7 @@ const addons = [
     'block-switching',
     'load-extensions',
     'custom-zoom',
+    'copy-reporter',
     'initialise-sprite-position',
     'blocks2image',
     'remove-curved-stage-border',
@@ -56,6 +60,7 @@ const addons = [
     'no-script-bumping',
     'disable-stage-drag-select',
     'move-to-top-bottom',
+    'move-to-top-layer',
     'disable-paste-offset',
     'block-duplicate',
     'rename-broadcasts',
@@ -63,6 +68,7 @@ const addons = [
     'editor-comment-previews',
     'columns',
     'number-pad',
+    'editor-number-arrow-keys',
     'script-snap',
     'fullscreen',
     'hide-stage',
@@ -75,11 +81,12 @@ const addons = [
 ];
 
 const newAddons = [
-    'vol-slider',
-    'number-pad',
-    'rename-broadcasts',
-    'sprite-properties',
-    'paint-snap'
+    'paint-skew',
+    'editor-square-inputs',
+    'copy-reporter',
+    'editor-number-arrow-keys',
+    'editor-compact',
+    'move-to-top-layer'
 ];
 
 // eslint-disable-next-line import/no-commonjs

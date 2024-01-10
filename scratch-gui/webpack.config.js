@@ -1,18 +1,19 @@
 const defaultsDeep = require('lodash.defaultsdeep');
-var path = require('path');
-var webpack = require('webpack');
+const path = require('path');
+const webpack = require('webpack');
 
 // Plugins
-var CopyWebpackPlugin = require('copy-webpack-plugin');
-var HtmlWebpackPlugin = require('html-webpack-plugin');
-var TWGenerateServiceWorkerPlugin = require('./src/playground/generate-service-worker-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const TWGenerateServiceWorkerPlugin = require('./src/playground/generate-service-worker-plugin');
 
 // PostCss
-var autoprefixer = require('autoprefixer');
-var postcssVars = require('postcss-simple-vars');
-var postcssImport = require('postcss-import');
+const autoprefixer = require('autoprefixer');
+const postcssVars = require('postcss-simple-vars');
+const postcssImport = require('postcss-import');
 
 const STATIC_PATH = process.env.STATIC_PATH || '/static';
+const {APP_NAME} = require('./src/lib/brand');
 
 let root = process.env.ROOT || '';
 if (root.length > 0 && !root.endsWith('/')) {
@@ -21,7 +22,8 @@ if (root.length > 0 && !root.endsWith('/')) {
 
 const htmlWebpackPluginCommon = {
     root: root,
-    meta: JSON.parse(process.env.EXTRA_META || '{}')
+    meta: JSON.parse(process.env.EXTRA_META || '{}'),
+    APP_NAME
 };
 
 const base = {
@@ -102,9 +104,36 @@ const base = {
                     }
                 }
             }]
+        },
+        {
+            test: /\.hex$/,
+            use: [{
+                loader: 'url-loader',
+                options: {
+                    limit: 16 * 1024
+                }
+            }]
         }]
     },
-    plugins: []
+    plugins: [
+        new CopyWebpackPlugin({
+            patterns: [
+                {
+                    from: 'node_modules/scratch-blocks/media',
+                    to: 'static/blocks-media/default'
+                },
+                {
+                    from: 'node_modules/scratch-blocks/media',
+                    to: 'static/blocks-media/high-contrast'
+                },
+                {
+                    from: 'src/lib/themes/blocks/high-contrast-media/blocks-media',
+                    to: 'static/blocks-media/high-contrast',
+                    force: true
+                }
+            ]
+        })
+    ]
 };
 
 if (!process.env.CI) {
@@ -128,10 +157,12 @@ module.exports = [
         module: {
             rules: base.module.rules.concat([
                 {
-                    test: /\.(svg|png|wav|gif|jpg|mp3|ttf|otf)$/,
-                    loader: 'file-loader',
+                    test: /\.(svg|png|wav|mp3|gif|jpg|ttf|otf)$/,
+                    loader: 'url-loader',
                     options: {
-                        outputPath: 'static/assets/'
+                        limit: 2048,
+                        outputPath: 'static/assets/',
+                        esModule: false
                     }
                 }
             ])
@@ -146,7 +177,7 @@ module.exports = [
         },
         plugins: base.plugins.concat([
             new webpack.DefinePlugin({
-                'process.env.NODE_ENV': '"' + process.env.NODE_ENV + '"',
+                'process.env.NODE_ENV': `"${process.env.NODE_ENV}"`,
                 'process.env.DEBUG': Boolean(process.env.DEBUG),
                 'process.env.ANNOUNCEMENT': JSON.stringify(process.env.ANNOUNCEMENT || ''),
                 'process.env.ENABLE_SERVICE_WORKER': JSON.stringify(process.env.ENABLE_SERVICE_WORKER || ''),
@@ -157,43 +188,42 @@ module.exports = [
                 chunks: ['editor'],
                 template: 'src/playground/index.ejs',
                 filename: 'editor.html',
-                title: 'TurboWarp - Run Scratch projects faster',
+                title: `${APP_NAME} - Run Scratch projects faster`,
                 ...htmlWebpackPluginCommon
             }),
             new HtmlWebpackPlugin({
                 chunks: ['player'],
                 template: 'src/playground/index.ejs',
                 filename: 'index.html',
-                title: 'TurboWarp - Run Scratch projects faster',
+                title: `${APP_NAME} - Run Scratch projects faster`,
                 ...htmlWebpackPluginCommon
             }),
             new HtmlWebpackPlugin({
                 chunks: ['fullscreen'],
                 template: 'src/playground/index.ejs',
                 filename: 'fullscreen.html',
-                title: 'TurboWarp - Run Scratch projects faster',
+                title: `${APP_NAME} - Run Scratch projects faster`,
                 ...htmlWebpackPluginCommon
             }),
             new HtmlWebpackPlugin({
                 chunks: ['embed'],
-                template: 'src/playground/index.ejs',
+                template: 'src/playground/embed.ejs',
                 filename: 'embed.html',
-                title: 'Embedded Project - TurboWarp',
-                noTheme: true,
+                title: `Embedded Project - ${APP_NAME}`,
                 ...htmlWebpackPluginCommon
             }),
             new HtmlWebpackPlugin({
                 chunks: ['addon-settings'],
                 template: 'src/playground/simple.ejs',
                 filename: 'addons.html',
-                title: 'Addon Settings - TurboWarp',
+                title: `Addon Settings - ${APP_NAME}`,
                 ...htmlWebpackPluginCommon
             }),
             new HtmlWebpackPlugin({
                 chunks: ['credits'],
                 template: 'src/playground/simple.ejs',
                 filename: 'credits.html',
-                title: 'TurboWarp Credits',
+                title: `${APP_NAME} Credits`,
                 noSplash: true,
                 ...htmlWebpackPluginCommon
             }),
@@ -202,14 +232,6 @@ module.exports = [
                     {
                         from: 'static',
                         to: ''
-                    }
-                ]
-            }),
-            new CopyWebpackPlugin({
-                patterns: [
-                    {
-                        from: 'node_modules/scratch-blocks/media',
-                        to: 'static/blocks-media'
                     }
                 ]
             }),
@@ -247,11 +269,13 @@ module.exports = [
             module: {
                 rules: base.module.rules.concat([
                     {
-                        test: /\.(svg|png|wav|gif|jpg|mp3|ttf|otf)$/,
-                        loader: 'file-loader',
+                        test: /\.(svg|png|wav|mp3|gif|jpg|ttf|otf)$/,
+                        loader: 'url-loader',
                         options: {
+                            limit: 2048,
                             outputPath: 'static/assets/',
-                            publicPath: `${STATIC_PATH}/assets/`
+                            publicPath: `${STATIC_PATH}/assets/`,
+                            esModule: false
                         }
                     }
                 ])
@@ -260,8 +284,9 @@ module.exports = [
                 new CopyWebpackPlugin({
                     patterns: [
                         {
-                            from: 'node_modules/scratch-blocks/media',
-                            to: 'static/blocks-media'
+                            from: 'extension-worker.{js,js.map}',
+                            context: 'node_modules/scratch-vm/dist/web',
+                            noErrorOnMissing: true
                         }
                     ]
                 }),

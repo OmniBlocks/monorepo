@@ -22,7 +22,7 @@
     user-select: none;
     width: 500px;
 
-    color: $text-primary-light;
+    color: $text-primary;
     overflow: hidden;
 }
 
@@ -45,18 +45,10 @@
 }
 
 .body {
-    background: $ui-white;
+    background: $ui-modal-background;
     padding: 1.5rem 2.25rem;
     text-align: center;
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
-}
-[theme="dark"] .body {
-    color: $text-primary;
-    background: $ui-primary;
-}
-
-.body a {
-    color: $motion-primary !important;
 }

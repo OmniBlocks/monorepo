@@ -53,6 +53,7 @@ const AccountNavComponent = ({
                 <img
                     className={styles.dropdownCaretIcon}
                     src={dropdownCaret}
+                    draggable={false}
                 />
             </div>
         </div>

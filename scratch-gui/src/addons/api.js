@@ -29,6 +29,7 @@ import * as textColorHelpers from './libraries/common/cs/text-color.esm.js';
 import './polyfill';
 import * as conditionalStyles from './conditional-style';
 import getPrecedence from './addon-precedence';
+import reduxInstance from './redux';
 
 /* eslint-disable no-console */
 
@@ -106,60 +107,16 @@ const removeMutationObserverCallback = callback => {
     _mutationObserverCallbacks = _mutationObserverCallbacks.filter(i => i !== callback);
 };
 
-class Redux extends EventTargetShim {
-    constructor () {
-        super();
-        this._isInReducer = false;
-        this._initialized = false;
-        this._nextState = null;
-    }
-
-    initialize () {
-        if (!this._initialized) {
-            AddonHooks.appStateReducer = (action, prev, next) => {
-                this._isInReducer = true;
-                this._nextState = next;
-                this.dispatchEvent(new CustomEvent('statechanged', {
-                    detail: {
-                        action,
-                        prev,
-                        next
-                    }
-                }));
-                this._nextState = null;
-                this._isInReducer = false;
-            };
-
-            this._initialized = true;
-        }
-    }
-
-    dispatch (m) {
-        if (this._isInReducer) {
-            queueMicrotask(() => AddonHooks.appStateStore.dispatch(m));
-        } else {
-            AddonHooks.appStateStore.dispatch(m);
-        }
-    }
-
-    get state () {
-        if (this._nextState) return this._nextState;
-        return AddonHooks.appStateStore.getState();
-    }
-}
-
 const getEditorMode = () => {
     // eslint-disable-next-line no-use-before-define
-    const mode = tabReduxInstance.state.scratchGui.mode;
+    const mode = reduxInstance.state.scratchGui.mode;
     if (mode.isEmbedded) return 'embed';
     if (mode.isFullScreen) return 'fullscreen';
     if (mode.isPlayerOnly) return 'projectpage';
     return 'editor';
 };
 
-const tabReduxInstance = new Redux();
-const language = tabReduxInstance.state.locales.locale.split('-')[0];
-
+const language = reduxInstance.state.locales.locale.split('-')[0];
 const getTranslations = async () => {
     if (l10nEntries[language]) {
         const localeMessages = await l10nEntries[language]();
@@ -170,20 +127,20 @@ const addonMessagesPromise = getTranslations();
 
 const untilInEditor = () => {
     if (
-        !tabReduxInstance.state.scratchGui.mode.isPlayerOnly ||
-        tabReduxInstance.state.scratchGui.mode.isEmbedded
+        !reduxInstance.state.scratchGui.mode.isPlayerOnly ||
+        reduxInstance.state.scratchGui.mode.isEmbedded
     ) {
         return;
     }
     return new Promise(resolve => {
         const handler = () => {
-            if (!tabReduxInstance.state.scratchGui.mode.isPlayerOnly) {
+            if (!reduxInstance.state.scratchGui.mode.isPlayerOnly) {
                 resolve();
-                tabReduxInstance.removeEventListener('statechanged', handler);
+                reduxInstance.removeEventListener('statechanged', handler);
             }
         };
-        tabReduxInstance.initialize();
-        tabReduxInstance.addEventListener('statechanged', handler);
+        reduxInstance.initialize();
+        reduxInstance.addEventListener('statechanged', handler);
     });
 };
 
@@ -198,15 +155,29 @@ const fixDisplayName = displayName => displayName.replace(/([^\s])(%[nbs])/g, (_
 const compareArrays = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 
 let _firstAddBlockRan = false;
-const addonBlockColor = {
-    color: '#29beb8',
-    secondaryColor: '#3aa8a4',
-    tertiaryColor: '#3aa8a4'
-};
 
 const contextMenuCallbacks = [];
 const CONTEXT_MENU_ORDER = ['editor-devtools', 'block-switching', 'blocks2image', 'swap-local-global'];
 let createdAnyBlockContextMenus = false;
+
+const updateClasses = () => {
+    const state = reduxInstance.state;
+    const isSmallStage = state.scratchGui.stageSize.stageSize === 'small';
+    const isFullScreen = state.scratchGui.mode.isFullScreen;
+    const isPlayerOnly = state.scratchGui.mode.isPlayerOnly;
+    document.body.classList.toggle('sa-small-stage', isSmallStage && !isFullScreen && !isPlayerOnly);
+    document.body.classList.toggle('sa-body-editor', !isPlayerOnly || isFullScreen);
+};
+reduxInstance.addEventListener('statechanged', e => {
+    if (
+        e.detail.action.type === 'scratch-gui/StageSize/SET_STAGE_SIZE' ||
+        e.detail.action.type === 'scratch-gui/mode/SET_FULL_SCREEN' ||
+        e.detail.action.type === 'scratch-gui/mode/SET_PLAYER'
+    ) {
+        updateClasses();
+    }
+});
+updateClasses();
 
 const getInternalKey = element => Object.keys(element).find(key => key.startsWith('__reactInternalInstance$'));
 
@@ -218,7 +189,7 @@ class Tab extends EventTargetShim {
         // traps is public API
         this.traps = {
             get vm () {
-                return tabReduxInstance.state.scratchGui.vm;
+                return reduxInstance.state.scratchGui.vm;
             },
             getBlockly: () => {
                 if (AddonHooks.blockly) {
@@ -228,6 +199,7 @@ class Tab extends EventTargetShim {
                     AddonHooks.blocklyCallbacks.push(() => resolve(AddonHooks.blockly));
                 });
             },
+            getWorkspace: () => AddonHooks.blocklyWorkspace,
             getPaper: async () => {
                 const modeSelector = await this.waitForElement("[class*='paint-editor_mode-selector']", {
                     reduxCondition: state => (
@@ -263,7 +235,7 @@ class Tab extends EventTargetShim {
     }
 
     get redux () {
-        return tabReduxInstance;
+        return reduxInstance;
     }
 
     waitForElement (selector, {markAsSeen = false, condition, reduxCondition, reduxEvents} = {}) {
@@ -271,7 +243,7 @@ class Tab extends EventTargetShim {
         const evaluateCondition = () => {
             if (!externalEventSatisfied) return false;
             if (condition && !condition()) return false;
-            if (reduxCondition && !reduxCondition(tabReduxInstance.state)) return false;
+            if (reduxCondition && !reduxCondition(reduxInstance.state)) return false;
             return true;
         };
 
@@ -321,43 +293,41 @@ class Tab extends EventTargetShim {
     }
 
     appendToSharedSpace ({space, element, order, scope}) {
+        const q = document.querySelector.bind(document);
         const SHARED_SPACES = {
             stageHeader: {
-                element: () => document.querySelector("[class^='stage-header_stage-size-row']"),
+                // Non-fullscreen stage header only
+                element: () => q("[class^='stage-header_stage-size-row']"),
                 from: () => [],
                 until: () => [
-                    document.querySelector("[class^='stage-header_stage-size-toggle-group']"),
-                    document.querySelector("[class^='stage-header_stage-size-row']").lastChild
+                    // Small/big stage buttons (for editor mode)
+                    q("[class^='stage-header_stage-size-toggle-group']"),
+                    // Full screen icon (for player mode)
+                    q("[class^='stage-header_stage-size-row']").lastChild
                 ]
             },
             fullscreenStageHeader: {
-                element: () => document.querySelector("[class^='stage-header_stage-menu-wrapper']"),
-                from: function () {
-                    let emptyDiv = this.element().querySelector('.addon-spacer');
-                    if (!emptyDiv) {
-                        emptyDiv = document.createElement('div');
-                        emptyDiv.style.marginLeft = 'auto';
-                        emptyDiv.className = 'addon-spacer';
-                        this.element().insertBefore(emptyDiv, this.element().lastChild);
-                    }
-                    return [emptyDiv];
-                },
-                until: () => [document.querySelector("[class^='stage-header_stage-menu-wrapper']").lastChild]
+                // Upstream uses sa-spacer for this one, but we don't need to
+                // Fullscreen stage header only
+                element: () => q("[class^='stage-header_fullscreen-buttons-row_']"),
+                from: () => [],
+                until: () => [q("[class^='stage-header_fullscreen-buttons-row_']").lastChild]
             },
             afterGreenFlag: {
-                element: () => document.querySelector("[class^='controls_controls-container']"),
+                element: () => q("[class^='controls_controls-container']"),
                 from: () => [],
-                until: () => [document.querySelector("[class^='stop-all_stop-all']")]
+                until: () => [q("[class^='stop-all_stop-all']")]
             },
             afterStopButton: {
-                element: () => document.querySelector("[class^='controls_controls-container']"),
-                from: () => [document.querySelector("[class^='stop-all_stop-all']")],
+                element: () => q("[class^='controls_controls-container']"),
+                from: () => [q("[class^='stop-all_stop-all']")],
                 until: () => []
             },
             afterSoundTab: {
-                element: () => document.querySelector("[class^='react-tabs_react-tabs__tab-list']"),
-                from: () => [document.querySelector("[class^='react-tabs_react-tabs__tab-list']").children[2]],
-                until: () => [document.querySelector('.sa-find-bar')]
+                element: () => q("[class^='react-tabs_react-tabs__tab-list']"),
+                from: () => [q("[class^='react-tabs_react-tabs__tab-list']").children[2]],
+                // Element used in find-bar addon
+                until: () => [q('.sa-find-bar')]
             },
             assetContextMenuAfterExport: {
                 element: () => scope,
@@ -378,23 +348,43 @@ class Tab extends EventTargetShim {
                 ),
                 until: () => []
             },
+            monitor: {
+                element: () => scope,
+                from: () => {
+                    const endOfVanilla = [
+                        this.scratchMessage('gui.monitor.contextMenu.large'),
+                        this.scratchMessage('gui.monitor.contextMenu.slider'),
+                        this.scratchMessage('gui.monitor.contextMenu.sliderRange'),
+                        this.scratchMessage('gui.monitor.contextMenu.export')
+                    ];
+                    const potential = Array.prototype.filter.call(
+                        scope.children,
+                        c => endOfVanilla.includes(c.textContent)
+                    );
+                    return [potential[potential.length - 1]];
+                },
+                until: () => []
+            },
             paintEditorZoomControls: {
-                element: () => document.querySelector('.sa-paintEditorZoomControls-wrapper') || (() => {
-                    const wrapper = Object.assign(document.createElement('div'), {
-                        className: 'sa-paintEditorZoomControls-wrapper'
-                    });
-
-                    wrapper.style.display = 'flex';
-                    wrapper.style.flexDirection = 'row-reverse';
-                    wrapper.style.height = 'calc(1.95rem + 2px)';
-
-                    const zoomControls = document.querySelector("[class^='paint-editor_zoom-controls']");
-
-                    zoomControls.replaceWith(wrapper);
-                    wrapper.appendChild(zoomControls);
-
-                    return wrapper;
-                })(),
+                element: () => (
+                    q('.sa-paintEditorZoomControls-wrapper') ||
+                      (() => {
+                          const wrapper = Object.assign(document.createElement('div'), {
+                              className: 'sa-paintEditorZoomControls-wrapper'
+                          });
+          
+                          wrapper.style.display = 'flex';
+                          wrapper.style.flexDirection = 'row-reverse';
+                          wrapper.style.height = 'calc(1.95rem + 2px)';
+          
+                          const zoomControls = q("[class^='paint-editor_zoom-controls']");
+          
+                          zoomControls.replaceWith(wrapper);
+                          wrapper.appendChild(zoomControls);
+          
+                          return wrapper;
+                      })()
+                ),
                 from: () => [],
                 until: () => []
             }
@@ -509,9 +499,14 @@ class Tab extends EventTargetShim {
                     if (!this.isInsertionMarker() && this.type === 'procedures_call') {
                         const block = this.procCode_ && vm.runtime.getAddonBlock(this.procCode_);
                         if (block) {
-                            this.colour_ = addonBlockColor.color;
-                            this.colourSecondary_ = addonBlockColor.secondaryColor;
-                            this.colourTertiary_ = addonBlockColor.tertiaryColor;
+                            const theme = reduxInstance.state.scratchGui.theme.theme;
+                            const colors = theme.getBlockColors().addons;
+                            this.colour_ = colors.primary;
+                            this.colourSecondary_ = colors.secondary;
+                            this.colourTertiary_ = colors.tertiary;
+                            this.colourQuaternary_ = colors.quaternary;
+
+                            // do not show edit button
                             this.customContextMenu = null;
                         }
                     }
@@ -539,14 +534,6 @@ class Tab extends EventTargetShim {
     getCustomBlock (procedureCode) {
         const vm = this.traps.vm;
         return vm.getAddonBlock(procedureCode);
-    }
-
-    getCustomBlockColor () {
-        return addonBlockColor;
-    }
-
-    setCustomBlockColor (newColor) {
-        Object.assign(addonBlockColor, newColor);
     }
 
     createBlockContextMenu (callback, {workspace = false, blocks = false, flyout = false, comments = false} = {}) {
@@ -592,7 +579,7 @@ class Tab extends EventTargetShim {
                         const itemElt = blocklyContextMenu.children[i];
                         itemElt.style.paddingTop = '2px';
                         itemElt.classList.add('sa-blockly-menu-item-border');
-                        itemElt.style.borderTop = '1px solid hsla(0, 0%, 0%, 0.15)';
+                        itemElt.style.borderTop = '1px solid var(--ui-black-transparent)';
                     }
                 });
             };
@@ -617,7 +604,12 @@ class Tab extends EventTargetShim {
     }
 
     scratchMessage (id) {
-        return tabReduxInstance.state.locales.messages[id];
+        return reduxInstance.state.locales.messages[id];
+    }
+
+    scratchClassReady () {
+        // they are always ready
+        return Promise.resolve();
     }
 
     scratchClass (...args) {
@@ -647,8 +639,12 @@ class Tab extends EventTargetShim {
         return getEditorMode();
     }
 
-    displayNoneWhileDisabled (el) {
+    displayNoneWhileDisabled (el, options) {
         el.classList.add(getDisplayNoneWhileDisabledClass(this._id));
+
+        if (options && options.display) {
+            el.style.display = options.display;
+        }
     }
 
     get direction () {
@@ -665,6 +661,38 @@ class Tab extends EventTargetShim {
 
     prompt (...args) {
         return modal.prompt(this, ...args);
+    }
+
+    recolorable () {
+        // this is some pretty awful code that makes a *lot* of assumptions about how addons work
+
+        const image = document.createElement('img');
+
+        let svg = '';
+        const updateRealSrc = () => {
+            const newSrc = svg.replace(/#855cd6/gi, window.Recolor.primary);
+            const nativeSrcSetter = Object.getOwnPropertyDescriptor(window.HTMLImageElement.prototype, 'src').set;
+            nativeSrcSetter.call(image, `data:image/svg+xml;,${encodeURIComponent(newSrc)}`);
+        };
+
+        Object.defineProperty(image, 'src', {
+            get: () => {
+                // return the 'original' source, roughly
+                if (!svg) return '';
+                return `data:image/svg+xml;,${encodeURIComponent(svg)}`;
+            },
+            set: newSrc => {
+                // we assume it is a base64-encoded data: URI that is supported by atob()
+                const base64 = newSrc.split(';base64,')[1];
+                svg = atob(base64);
+                updateRealSrc();
+            }
+        });
+
+        // this leaks memory if an addon creates these disposably
+        AddonHooks.recolorCallbacks.push(updateRealSrc);
+
+        return image;
     }
 }
 
@@ -718,7 +746,7 @@ class AddonRunner {
     }
 
     _msg (key, vars, handler) {
-        const namespacedKey = `${this.id}/${key}`;
+        const namespacedKey = key.startsWith('/') ? key.substring(1) : `${this.id}/${key}`;
         if (this.messageCache[namespacedKey]) {
             return this.messageCache[namespacedKey].format(vars);
         }
@@ -920,32 +948,6 @@ AddonRunner.instances = [];
 const runAddon = addonId => {
     const runner = new AddonRunner(addonId);
     runner.run();
-};
-
-let oldMode = getEditorMode();
-const emitUrlChange = () => {
-    // In Scratch, URL changes usually mean someone went from editor to fullscreen or something like that.
-    // This is not the case in TW -- the URL can change for many other reasons that addons probably aren't prepared
-    // to handle.
-    const newMode = getEditorMode();
-    if (newMode !== oldMode) {
-        oldMode = newMode;
-        setTimeout(() => {
-            for (const addon of AddonRunner.instances) {
-                addon.publicAPI.addon.tab.dispatchEvent(new CustomEvent('urlChange'));
-            }
-        });
-    }
-};
-const originalReplaceState = history.replaceState;
-history.replaceState = function (...args) {
-    originalReplaceState.apply(this, args);
-    emitUrlChange();
-};
-const originalPushState = history.pushState;
-history.pushState = function (...args) {
-    originalPushState.apply(this, args);
-    emitUrlChange();
 };
 
 SettingsStore.addEventListener('addon-changed', e => {

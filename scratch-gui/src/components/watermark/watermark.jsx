@@ -7,6 +7,7 @@ const Watermark = props => (
     <img
         className={styles.spriteImage}
         src={props.costumeURL}
+        draggable={false}
     />
 );
 

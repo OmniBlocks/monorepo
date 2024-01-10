@@ -426,7 +426,7 @@ const loadRestorePoint = (vm, id) => openDB().then(db => new Promise((resolveTra
         };
     };
 
-    vm.stop();
+    vm.quit();
 
     loadMetadata();
 }));

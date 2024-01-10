@@ -12,6 +12,7 @@ const CrashMessage = props => (
             <img
                 className={styles.reloadIcon}
                 src={reloadIcon}
+                draggable={false}
             />
             <p className={styles.header}>
                 <FormattedMessage

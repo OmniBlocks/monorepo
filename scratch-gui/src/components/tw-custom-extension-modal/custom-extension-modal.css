@@ -9,10 +9,6 @@
     background: $ui-white;
     padding: 1.5rem 2.25rem;
 }
-[theme="dark"] .body {
-    color: $text-primary;
-    background: $ui-primary;
-}
 
 .body p,
 .unsandboxed-container,
@@ -38,10 +34,10 @@
     justify-content: center;
 }
 .type-selector-button[data-active="true"] {
-    border-color: $motion-primary;
+    border-color: $looks-secondary;
 }
 .type-selector-button:active {
-    border-color: $motion-transparent;
+    border-color: $looks-transparent;
 }
 
 .url-input,
@@ -51,11 +47,6 @@
     border-radius: 0.25rem;
     padding: 0.5rem;
     font-size: inherit;
-}
-[theme="dark"] .url-input,
-[theme="dark"] .text-code-input {
-    background: $ui-secondary;
-    color: white;
 }
 .url-input {
     height: 3rem;
@@ -105,8 +96,8 @@
     border: 1px solid $ui-black-transparent;
     font-weight: 600;
     font-size: 0.85rem;
-    color: $ui-white;
-    background: $motion-primary;
+    color: white;
+    background: $looks-secondary;
 }
 .load-button:disabled {
     opacity: 0.8;

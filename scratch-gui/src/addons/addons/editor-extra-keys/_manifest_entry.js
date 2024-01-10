@@ -3,9 +3,7 @@ const manifest = {
   "editorOnly": true,
   "name": "Extra key options",
   "description": "Adds more keys to the \"key () pressed?\" and \"when () key pressed\" block dropdowns, such as enter, dot, comma, and more. These keys will work even for users who do not have this addon.",
-  "tags": [
-    "beta"
-  ],
+  "tags": [],
   "credits": [
     {
       "name": "Tacodiva",

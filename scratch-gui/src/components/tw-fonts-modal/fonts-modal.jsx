@@ -30,7 +30,10 @@ const FontModal = props => (
                         className={styles.openButton}
                         onClick={props.onOpenSystemFonts}
                     >
-                        <img className={classNames(styles.openButtonImage, styles.systemImage)} />
+                        <img
+                            className={classNames(styles.openButtonImage, styles.systemImage)}
+                            draggable={false}
+                        />
                         <div className={styles.openButtonText}>
                             <div className={styles.openButtonTextMain}>
                                 <FormattedMessage
@@ -54,7 +57,10 @@ const FontModal = props => (
                         className={styles.openButton}
                         onClick={props.onOpenCustomFonts}
                     >
-                        <img className={classNames(styles.openButtonImage, styles.customImage)} />
+                        <img
+                            className={classNames(styles.openButtonImage, styles.customImage)}
+                            draggable={false}
+                        />
                         <div className={styles.openButtonText}>
                             <div className={styles.openButtonTextMain}>
                                 <FormattedMessage

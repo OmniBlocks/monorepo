@@ -11,6 +11,7 @@ import Filter from '../filter/filter.jsx';
 import TagButton from '../../containers/tag-button.jsx';
 import Spinner from '../spinner/spinner.jsx';
 import Separator from '../tw-extension-separator/separator.jsx';
+import {APP_NAME} from '../../lib/brand.js';
 
 import styles from './library.css';
 
@@ -221,7 +222,9 @@ class LibraryComponent extends React.Component {
                     if (typeof dataItem.name === 'string') {
                         search.push(dataItem.name);
                     } else {
-                        search.push(this.props.intl.formatMessage(dataItem.name.props));
+                        search.push(this.props.intl.formatMessage(dataItem.name.props, {
+                            APP_NAME
+                        }));
                     }
                 }
                 if (dataItem.description) {

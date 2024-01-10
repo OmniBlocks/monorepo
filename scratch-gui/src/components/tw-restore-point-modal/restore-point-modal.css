@@ -6,17 +6,13 @@
 }
 
 .body {
-    background: $ui-white;
+    background: $ui-modal-background;
     padding: 1.5rem 2.25rem;
     max-height: calc(100vh - 150px);
     overflow: auto;
     display: flex;
     flex-direction: column;
     gap: 1rem;
-}
-[theme="dark"] .body {
-    color: $text-primary;
-    background: $ui-primary;
 }
 
 .extra-container {
@@ -46,6 +42,7 @@
 .delete-all-button {
     margin-left: 1rem;
     background-color: $data-primary;
+    color: white;
     white-space: nowrap;
 }
 
@@ -71,7 +68,7 @@
     gap: 0.5rem;
 }
 .restore-point:hover {
-    border-color: $motion-primary;
+    border-color: $looks-secondary;
 }
 .restore-point-title {
     font-weight: bold;
@@ -114,9 +111,6 @@
     display: block;
     width: 75%;
     height: 75%;
-}
-[theme="dark"] .delete-button img {
-    filter: invert(100%);
 }
 .delete-button:hover {
     background-color: $ui-black-transparent;

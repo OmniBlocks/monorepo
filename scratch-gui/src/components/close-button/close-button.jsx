@@ -29,6 +29,7 @@ const CloseButton = props => (
             <img
                 className={styles.backIcon}
                 src={backIcon}
+                draggable={false}
             /> :
             <img
                 className={classNames(
@@ -41,6 +42,7 @@ const CloseButton = props => (
                     closeIcons[props.color] :
                     closeIcon
                 }
+                draggable={false}
             />
         }
     </div>

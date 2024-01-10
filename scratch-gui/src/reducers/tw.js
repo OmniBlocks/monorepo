@@ -99,7 +99,7 @@ const reducer = function (state, action) {
         return Object.assign({}, state, {
             compileErrors: [
                 action.error,
-                ...state.compileErrors.slice(0, 4)
+                ...state.compileErrors.slice(0, 7)
             ]
         });
     case CLEAR_COMPILE_ERRORS:

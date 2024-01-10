@@ -11,6 +11,7 @@ const TurboMode = ({isSmall}) => (
         <img
             className={styles.turboIcon}
             src={turboIcon}
+            draggable={false}
         />
         {!isSmall && (
             <div className={styles.turboLabel}>

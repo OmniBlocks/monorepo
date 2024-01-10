@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2021 Thomas Weber
+ * Copyright (C) 2021-2023 Thomas Weber
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as
@@ -15,29 +15,22 @@
  */
 
 @import "../../css/colors.css";
+@import "../../css/filters.css";
 
 body {
-    background-color: white;
-    color: black;
+    background-color: $page-background;
+    color: $page-foreground;
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     margin: 0;
 }
-body[theme="dark"] {
-    background-color: #222222;
-    color: white;
-    color-scheme: dark;
-}
 
 a[href] {
-    color: #2a67eb;
+    color: $link-color;
     text-decoration: underline;
-}
-[theme="dark"] a[href] {
-    color: #6d9bff;
 }
 a:active, a:focus {
     outline: none;
-    box-shadow: 0 0 0 3px $motion-transparent;
+    box-shadow: 0 0 0 3px $looks-transparent;
 }
 
 .container {
@@ -59,11 +52,8 @@ a:active, a:focus {
 .header {
     position: relative;
     padding: 8px 20px;
-    background-color: #fcfcfc;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-[theme="dark"] .header {
-    background-color: #222222;
+    background-color: $ui-secondary;
+    box-shadow: 0 2px 5px $shadow;
 }
 @media (max-width: 700px) {
     .header {
@@ -78,9 +68,9 @@ a:active, a:focus {
 }
 
 .button {
-    color: #000;
-    background: #efefef;
-    border: 1px solid #acacac;
+    color: inherit;
+    background: $ui-secondary;
+    border: 1px solid $ui-black-transparent;
     padding: 8px 12px;
     border-radius: 4px;
     outline: none;
@@ -92,30 +82,21 @@ a:active, a:focus {
     display: flex;
     align-items: center;
 }
-[theme="dark"] .button {
-    color: #fff;
-    background: #222222;
-    border-color: #000;
-}
 .button:hover {
-    background: #aaaaaa;
-}
-[theme="dark"] .button:hover {
-    background: #151515;
+    background: $ui-tertiary;
 }
 .button:active, .button:focus-within {
-    box-shadow: 0 0 0 3px $motion-transparent;
+    box-shadow: 0 0 0 3px $looks-transparent;
 }
 
 .search-container {
     display: flex;
-    background-color: #f0f0f0;
-    color: #222;
-    border: 1px solid #cecece;
+    background-color: $ui-secondary;
+    border: 1px solid $ui-black-transparent;
     border-radius: 4px;
 }
 .search-container:focus-within {
-    box-shadow: 0 0 0 3px $motion-transparent;
+    box-shadow: 0 0 0 3px $looks-transparent;
 }
 .search-input {
     color: inherit;
@@ -141,20 +122,16 @@ a:active, a:focus {
     background-image: url("./icons/search.svg");
     background-repeat: no-repeat;
     background-position: center;
-}
-[theme="dark"] .search-container {
-    color: white;
-    background-color: #111111;
-    border-color: #222222;
+    filter: $filter-icon-black;
 }
 .search-input:not([value=""]) ~ .search-button {
     background-image: url("./icons/clear.svg") !important;
 }
 
 .feedback-button-outer {
-    background: #f0f0f0;
-    border: 1px solid #cecece;
-    color: #333 !important;
+    background: $ui-secondary;
+    border: 1px solid $ui-black-transparent;
+    color: inherit !important; /* override <a> colors */
     height: 36px;
     box-sizing: border-box;
     border-radius: 4px;
@@ -166,25 +143,13 @@ a:active, a:focus {
     align-items: center;
     text-decoration: none !important;
 }
-[theme="dark"] .feedback-button-outer {
-    background-color: white;
-    border-color: white;
-}
 .feedback-button-outer:active, .feedback-button-outer:focus-within {
-    box-shadow: 0 0 0 3px $motion-transparent;
+    box-shadow: 0 0 0 3px $looks-transparent;
 }
 .feedback-button-inner {
     text-decoration: none;
     font-weight: bold;
     text-align: center;
-}
-
-[theme="dark"] .search-button,
-[theme="dark"] .addon-group-expand,
-[theme="dark"] .extension-image,
-[theme="dark"] .reset-button img,
-[theme="dark"] .reset-setting-button img {
-    filter: invert(100%);
 }
 
 .addons {
@@ -213,43 +178,37 @@ a:active, a:focus {
 .addon-group-name::after {
     margin-left: 16px;
     content: '';
-    border-top: 1px solid #cfcfcf;
+    border-top: 1px solid $ui-black-transparent;
     width: 100px;
     flex: 1;
 }
-[theme="dark"] .addon-group-name::after {
-    border-color: #333;
-}
-.addon-group-expand {
-    width: 24px;
-    height: 24px;
+.addon-group-expand-container {
     margin-right: 8px;
     border-radius: 5px;
+    width: 24px;
+    height: 24px;
 }
-.addon-group-expand[data-open="true"] {
+.addon-group-name:hover .addon-group-expand-container {
+    background: $ui-black-transparent;
+}
+.addon-group-expand-icon {
+    width: 100%;
+    height: 100%;
+    filter: $filter-icon-black;
+}
+.addon-group-expand-icon[data-open="true"] {
     transform: scaleY(-1);
-}
-.addon-group-name:hover .addon-group-expand {
-    background: #ccc;
 }
 
 .addon {
-    background: #f7f7f7;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    border: 1px solid #cfcfcf;
+    box-shadow: 0 2px 5px $shadow;
+    border: 1px solid $ui-black-transparent;
     border-radius: 5px;
     margin: 10px 0 10px 0;
     font-size: 14px;
 }
 .addon-dirty {
-    background: #ffeedf;
-}
-[theme="dark"] .addon {
-    background-color: #2a2a2a;
-    border-color: #333;
-}
-[theme="dark"] .addon-dirty {
-    background: rgb(39, 50, 53);
+    background-color: $ui-tertiary;
 }
 
 .addon-header {
@@ -263,6 +222,7 @@ a:active, a:focus {
     height: 16px;
     width: 16px;
     margin-right: 8px;
+    filter: $filter-icon-black;
 }
 
 .addon-title {
@@ -282,8 +242,8 @@ a:active, a:focus {
 }
 
 .inline-description {
+    opacity: 0.7;
     margin-left: 10px;
-    color: gray;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -304,59 +264,55 @@ a:active, a:focus {
     background-color: transparent;
 }
 .reset-button:hover {
-    background: rgba(0, 0, 0, 0.05);
+    background: $ui-black-transparent;
 }
 .reset-button:active, .reset-button:focus-within {
     outline: none;
-    box-shadow: 0 0 0 3px $motion-transparent;
+    box-shadow: 0 0 0 3px $looks-transparent;
 }
 .reset-button-image {
     padding: 1px 0;
     height: 16px;
     width: 16px;
-}
-[theme="dark"] .reset-button:hover {
-    background: rgba(255, 255, 255, 0.05);
+    filter: $filter-icon-black;
 }
 
 .switch {
     display: block;
-    background: #111;
+    background: #333;
     width: 40px;
-    height: 20px;
-    border: none;
-    border-radius: 10px;
+    height: 22px;
+    border: 1px solid $ui-black-transparent;
+    border-radius: 12px;
     position: relative;
     cursor: pointer;
     transition: 0.25s ease;
     transition-property: background;
 }
 .switch[state="on"] {
-    background: $motion-primary;
+    background: $looks-secondary;
 }
 .switch::before {
     content: "";
     position: absolute;
     display: block;
-    width: 10px;
-    height: 10px;
+    width: 12px;
+    height: 12px;
     background: #fff;
-    border-radius: 5px;
-    top: 5px;
-    left: 5px;
+    border-radius: 6px;
+    top: 4px;
+    left: 4px;
     transition: 0.25s ease;
     transition-property: background, left;
 }
-[theme="dark"] .switch::before {
-    background: #aaa;
-}
 .switch[state="on"]::before {
     background: #fff;
-    left: 25px;
+    left: auto;
+    right: 3px;
 }
 .switch:active, .switch:focus-within {
     outline: none;
-    box-shadow: 0 0 0 3px $motion-transparent;
+    box-shadow: 0 0 0 3px $looks-transparent;
 }
 
 .tag-container {
@@ -409,10 +365,6 @@ a:active, a:focus {
 .addon-details {
     padding: 0 20px;
     margin-bottom: 10px;
-    color: #111;
-}
-[theme="dark"] .addon-details {
-    color: #ddd;
 }
 
 .credit-container {
@@ -463,55 +415,30 @@ a:active, a:focus {
 .setting-label {
     font-weight: bold;
     text-transform: uppercase;
-    color: #555;
     font-size: 12px;
     margin-right: 10px;
-}
-[theme="dark"] .setting-label {
-    color: #aaa;
+    opacity: 0.8;
 }
 .setting input {
-    color: #000;
-    background: #efefef;
-    border: 1px solid #acacac;
+    background: $input-background;
+    border: 1px solid $ui-black-transparent;
     padding: 8px 12px;
     border-radius: 4px;
     transition: 0.25s ease;
     transition-property: background;
 }
-[theme="dark"] .setting input {
-    color: #fff;
-    background: #222222;
-    border: 1px solid #000;
-}
 .setting input:focus, .setting input:active {
     outline: none;
-    border-color: $motion-primary;
-    box-shadow: 0 0 0 3px $motion-transparent;
+    border-color: $looks-secondary;
+    box-shadow: 0 0 0 3px $looks-transparent;
 }
 .setting input[type="checkbox"] {
     height: 20px;
     width: 20px;
-    padding: 0;
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    background-color: white;
-    background-size: 20px 20px;
     background-position: center center;
 }
-.setting input[type="checkbox"]:checked {
-    border-color: $motion-primary;
-    background-color: $motion-primary;
-    background-image: url("./icons/check.svg");
-}
-.setting input[type="checkbox"]:hover:not(:focus) {
-    border-color: $motion-tertiary;
-}
-.setting input[type="checkbox"]:checked:hover {
-    border-color: $motion-tertiary;
-}
-.setting input[type="number"] {
+.setting input[type="number"],
+.setting input[type="text"] {
     border-radius: 20px 0 0 20px;
     font-size: 14px;
     width: 75px;
@@ -530,6 +457,8 @@ a:active, a:focus {
 }
 
 .reset-setting-button {
+    background-color: $input-background;
+    border-left-width: 0;
     border-radius: 0 4px 4px 0px;
     box-sizing: border-box;
     height: 30px;
@@ -537,6 +466,7 @@ a:active, a:focus {
 .reset-setting-button img {
     width: 20px;
     height: 20px;
+    filter: $filter-icon-black;
 }
 .reset-setting-button[data-for-text-input="true"] {
     height: 35px;
@@ -552,17 +482,11 @@ a:active, a:focus {
     margin: 0;
     background: transparent;
     border: none;
-    background: #f0f0f0;
-    color: #000;
-    border: 1px solid #aaa;
+    background: $ui-secondary;
+    border: 1px solid $ui-black-transparent;
     border-right-width: 0;
     transition: 0.25s ease;
     transition-property: color, background, border;
-}
-[theme="dark"] .select-option {
-    color: #fff;
-    background: #222222;
-    border-color: #000000;
 }
 .select-option:first-child {
     border-top-left-radius: 4px;
@@ -575,11 +499,11 @@ a:active, a:focus {
 }
 .select-option.selected {
     color: white;
-    background: $motion-primary;
+    background: $looks-secondary;
 }
 .select-option:active, .select-option:focus-within {
     outline: none;
-    box-shadow: 0 0 0 3px $motion-transparent;
+    box-shadow: 0 0 0 3px $looks-transparent;
     z-index: 10;
 }
 
@@ -591,10 +515,7 @@ a:active, a:focus {
 }
 
 .footer {
-    color: #444;
-}
-[theme="dark"] .footer {
-    color: #aaa;
+    opacity: 0.8;
 }
 
 .unsupported-container {
@@ -645,18 +566,13 @@ a:active, a:focus {
 }
 .dirty-inner {
     padding: 8px;
-    background: #ffeedf;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    border: 1px solid #cfcfcf;
+    background: $ui-tertiary;
+    box-shadow: 0 2px 5px $shadow;
     border-radius: 4px;
     pointer-events: auto;
     display: flex;
     align-items: center;
     text-align: center;
-}
-[theme="dark"] .dirty-inner {
-    background: rgb(39, 50, 53);
-    border-color: #222;
 }
 
 .dirty-button {

@@ -7,7 +7,6 @@ import LazyScratchBlocks from './tw-lazy-scratch-blocks';
  */
 export default function (vm) {
     const ScratchBlocks = LazyScratchBlocks.get();
-
     const jsonForMenuBlock = function (name, menuOptionsFn, colors, start) {
         return {
             message0: '%1',
@@ -25,6 +24,7 @@ export default function (vm) {
             colour: colors.secondary,
             colourSecondary: colors.secondary,
             colourTertiary: colors.tertiary,
+            colourQuaternary: colors.quaternary,
             outputShape: ScratchBlocks.OUTPUT_SHAPE_ROUND
         };
     };
@@ -44,6 +44,7 @@ export default function (vm) {
             colour: colors.primary,
             colourSecondary: colors.secondary,
             colourTertiary: colors.tertiary,
+            colourQuaternary: colors.quaternary,
             extensions: ['shape_hat']
         };
     };
@@ -70,6 +71,7 @@ export default function (vm) {
             colour: ScratchBlocks.Colours.sensing.primary,
             colourSecondary: ScratchBlocks.Colours.sensing.secondary,
             colourTertiary: ScratchBlocks.Colours.sensing.tertiary,
+            colourQuaternary: ScratchBlocks.Colours.sensing.quaternary,
             outputShape: ScratchBlocks.OUTPUT_SHAPE_ROUND
         };
     };
@@ -117,7 +119,7 @@ export default function (vm) {
     const spriteMenu = function () {
         const sprites = [];
         for (const targetId in vm.runtime.targets) {
-            if (!vm.runtime.targets.hasOwnProperty(targetId)) continue;
+            if (!Object.prototype.hasOwnProperty.call(vm.runtime.targets, targetId)) continue;
             if (vm.runtime.targets[targetId].isOriginal) {
                 if (!vm.runtime.targets[targetId].isStage) {
                     if (vm.runtime.targets[targetId] === vm.editingTarget) {

@@ -24,10 +24,13 @@ import _paint_snap from "../addons/paint-snap/_manifest_entry.js";
 import _default_costume_editor_color from "../addons/default-costume-editor-color/_manifest_entry.js";
 import _bitmap_copy from "../addons/bitmap-copy/_manifest_entry.js";
 import _2d_color_picker from "../addons/2d-color-picker/_manifest_entry.js";
+import _paint_skew from "../addons/paint-skew/_manifest_entry.js";
 import _better_img_uploads from "../addons/better-img-uploads/_manifest_entry.js";
 import _pick_colors_from_stage from "../addons/pick-colors-from-stage/_manifest_entry.js";
 import _custom_block_shape from "../addons/custom-block-shape/_manifest_entry.js";
+import _editor_square_inputs from "../addons/editor-square-inputs/_manifest_entry.js";
 import _zebra_striping from "../addons/zebra-striping/_manifest_entry.js";
+import _editor_compact from "../addons/editor-compact/_manifest_entry.js";
 import _editor_theme3 from "../addons/editor-theme3/_manifest_entry.js";
 import _custom_block_text from "../addons/custom-block-text/_manifest_entry.js";
 import _editor_colored_context_menus from "../addons/editor-colored-context-menus/_manifest_entry.js";
@@ -42,6 +45,7 @@ import _folders from "../addons/folders/_manifest_entry.js";
 import _block_switching from "../addons/block-switching/_manifest_entry.js";
 import _load_extensions from "../addons/load-extensions/_manifest_entry.js";
 import _custom_zoom from "../addons/custom-zoom/_manifest_entry.js";
+import _copy_reporter from "../addons/copy-reporter/_manifest_entry.js";
 import _initialise_sprite_position from "../addons/initialise-sprite-position/_manifest_entry.js";
 import _blocks2image from "../addons/blocks2image/_manifest_entry.js";
 import _remove_curved_stage_border from "../addons/remove-curved-stage-border/_manifest_entry.js";
@@ -54,6 +58,7 @@ import _hide_delete_button from "../addons/hide-delete-button/_manifest_entry.js
 import _no_script_bumping from "../addons/no-script-bumping/_manifest_entry.js";
 import _disable_stage_drag_select from "../addons/disable-stage-drag-select/_manifest_entry.js";
 import _move_to_top_bottom from "../addons/move-to-top-bottom/_manifest_entry.js";
+import _move_to_top_layer from "../addons/move-to-top-layer/_manifest_entry.js";
 import _disable_paste_offset from "../addons/disable-paste-offset/_manifest_entry.js";
 import _block_duplicate from "../addons/block-duplicate/_manifest_entry.js";
 import _rename_broadcasts from "../addons/rename-broadcasts/_manifest_entry.js";
@@ -61,6 +66,7 @@ import _swap_local_global from "../addons/swap-local-global/_manifest_entry.js";
 import _editor_comment_previews from "../addons/editor-comment-previews/_manifest_entry.js";
 import _columns from "../addons/columns/_manifest_entry.js";
 import _number_pad from "../addons/number-pad/_manifest_entry.js";
+import _editor_number_arrow_keys from "../addons/editor-number-arrow-keys/_manifest_entry.js";
 import _script_snap from "../addons/script-snap/_manifest_entry.js";
 import _fullscreen from "../addons/fullscreen/_manifest_entry.js";
 import _hide_stage from "../addons/hide-stage/_manifest_entry.js";
@@ -96,10 +102,13 @@ export default {
   "default-costume-editor-color": _default_costume_editor_color,
   "bitmap-copy": _bitmap_copy,
   "2d-color-picker": _2d_color_picker,
+  "paint-skew": _paint_skew,
   "better-img-uploads": _better_img_uploads,
   "pick-colors-from-stage": _pick_colors_from_stage,
   "custom-block-shape": _custom_block_shape,
+  "editor-square-inputs": _editor_square_inputs,
   "zebra-striping": _zebra_striping,
+  "editor-compact": _editor_compact,
   "editor-theme3": _editor_theme3,
   "custom-block-text": _custom_block_text,
   "editor-colored-context-menus": _editor_colored_context_menus,
@@ -114,6 +123,7 @@ export default {
   "block-switching": _block_switching,
   "load-extensions": _load_extensions,
   "custom-zoom": _custom_zoom,
+  "copy-reporter": _copy_reporter,
   "initialise-sprite-position": _initialise_sprite_position,
   "blocks2image": _blocks2image,
   "remove-curved-stage-border": _remove_curved_stage_border,
@@ -126,6 +136,7 @@ export default {
   "no-script-bumping": _no_script_bumping,
   "disable-stage-drag-select": _disable_stage_drag_select,
   "move-to-top-bottom": _move_to_top_bottom,
+  "move-to-top-layer": _move_to_top_layer,
   "disable-paste-offset": _disable_paste_offset,
   "block-duplicate": _block_duplicate,
   "rename-broadcasts": _rename_broadcasts,
@@ -133,6 +144,7 @@ export default {
   "editor-comment-previews": _editor_comment_previews,
   "columns": _columns,
   "number-pad": _number_pad,
+  "editor-number-arrow-keys": _editor_number_arrow_keys,
   "script-snap": _script_snap,
   "fullscreen": _fullscreen,
   "hide-stage": _hide_stage,

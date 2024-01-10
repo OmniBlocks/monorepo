@@ -1,10 +1,12 @@
-// This list is a subset of `addons` and defines the order by which addon CSS should
-// applied in. Items later in this list are given higher precedence. Addons not listed
-// here are implied to have the lowest possible precedence.
+// This list is a subset of all addon IDs to control the order of userstyles.
+// The last item in the list is given the highest precedence (last in the DOM).
+// If an addon isn't listed here, it's interpreted to have lowest precedence and
+// that its order with other unlisted addons does not matter.
 const addonPrecedence = [
     'columns',
     'editor-stage-left',
-    'editor-theme3'
+    'editor-theme3',
+    'hide-stage'
 ];
 
 /**

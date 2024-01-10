@@ -190,7 +190,7 @@ const SBFileUploaderHOC = function (WrappedComponent) {
                 const filename = this.fileToUpload && this.fileToUpload.name;
                 let loadingSuccess = false;
                 // tw: stop when loading new project
-                this.props.vm.stop();
+                this.props.vm.quit();
                 this.props.vm.loadProject(this.fileReader.result)
                     .then(() => {
                         if (filename) {
@@ -272,7 +272,10 @@ const SBFileUploaderHOC = function (WrappedComponent) {
         userOwnsProject: PropTypes.bool,
         vm: PropTypes.shape({
             loadProject: PropTypes.func,
-            stop: PropTypes.func
+            quit: PropTypes.func,
+            renderer: PropTypes.shape({
+                draw: PropTypes.func
+            })
         }),
         onSetFileHandle: PropTypes.func
     };

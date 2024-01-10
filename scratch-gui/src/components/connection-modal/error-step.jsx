@@ -18,6 +18,7 @@ const ErrorStep = props => (
                     <img
                         className={styles.peripheralActivityIcon}
                         src={props.connectionIconURL}
+                        draggable={false}
                     />
                 </div>
             </Box>
@@ -43,6 +44,7 @@ const ErrorStep = props => (
                     <img
                         className={classNames(styles.buttonIconLeft, styles.buttonIconBack)}
                         src={backIcon}
+                        draggable={false}
                     />
                     <FormattedMessage
                         defaultMessage="Try again"
@@ -57,6 +59,7 @@ const ErrorStep = props => (
                     <img
                         className={styles.buttonIconLeft}
                         src={helpIcon}
+                        draggable={false}
                     />
                     <FormattedMessage
                         defaultMessage="Help"

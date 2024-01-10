@@ -14,16 +14,13 @@
     padding: 1rem 1rem 0 1rem;
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     color: $text-primary;
-    background: white;
+    background: $ui-white;
     border-width: 2px;
     border-style: solid;
     border-color: $ui-black-transparent;
     border-radius: $space;
     text-align: center;
     cursor: pointer;
-}
-[theme="dark"] .library-item {
-    background: $ui-primary;
 }
 
 .library-item-extension {
@@ -32,7 +29,7 @@
 
 .library-item:hover {
     border-width: 2px;
-    border-color: $motion-primary;
+    border-color: $looks-secondary;
 }
 
 .hidden {

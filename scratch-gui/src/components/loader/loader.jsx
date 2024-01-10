@@ -1,5 +1,6 @@
 import React from 'react';
-import {defineMessages, FormattedMessage, intlShape, injectIntl} from 'react-intl';
+import {FormattedMessage, injectIntl, intlShape, defineMessages} from 'react-intl';
+import {connect} from 'react-redux';
 import classNames from 'classnames';
 import styles from './loader.css';
 import PropTypes from 'prop-types';
@@ -8,17 +9,6 @@ import bindAll from 'lodash.bindall';
 import topBlock from './top-block.svg';
 import middleBlock from './middle-block.svg';
 import bottomBlock from './bottom-block.svg';
-
-import * as progressMonitor from './tw-progress-monitor';
-import isScratchDesktop from '../../lib/isScratchDesktop';
-
-// tw:
-// we make some rather large changes here:
-//  - remove random message, replaced with message dependent on what is actually being loaded
-//  - add a progress bar
-//  - bring in intl so that we can translate everything
-// The way of doing this is extremely unusual and weird compared to how things are typically done for performance.
-// This is because react updates are too performance crippling to handle the progress bar rapidly updating.
 
 const mainMessages = {
     'gui.loader.headline': (
@@ -38,90 +28,76 @@ const mainMessages = {
 };
 
 const messages = defineMessages({
-    generic: {
-        defaultMessage: 'Loading project …',
-        description: 'Initial generic loading message',
-        id: 'tw.loader.generic'
-    },
     projectData: {
-        defaultMessage: 'Downloading project data …',
-        description: 'Appears when loading project data',
-        id: 'tw.loader.data'
+        defaultMessage: 'Loading project …',
+        description: 'Appears when loading project data, but not assets yet',
+        id: 'tw.loader.projectData'
     },
-    assetsKnown: {
+    assets: {
         defaultMessage: 'Downloading assets ({complete}/{total}) …',
-        description: 'Appears when loading project assets and amount of assets is known',
-        id: 'tw.loader.assets.known'
-    },
-    assetsUnknown: {
-        defaultMessage: 'Downloading assets …',
-        description: 'Appears when loading project assets but amount of assets is unknown',
-        id: 'tw.loader.assets.unknown'
+        description: 'Appears when loading project assets',
+        id: 'tw.loader.assets'
     }
 });
+
+// Because progress events are fired so often during the very performance-critical loading
+// process and React updates are very slow, we bypass React for updating the progress bar.
 
 class LoaderComponent extends React.Component {
     constructor (props) {
         super(props);
-        this._state = 0;
-        this.progress = 0;
-        this.complete = 0;
-        this.total = 0;
         bindAll(this, [
+            'handleAssetProgress',
+            'handleProjectLoaded',
             'barInnerRef',
-            'handleProgressChange',
             'messageRef'
         ]);
+        this.barInnerEl = null;
+        this.messageEl = null;
+        this.ignoreProgress = false;
     }
     componentDidMount () {
-        if (!isScratchDesktop()) {
-            progressMonitor.setProgressHandler(this.handleProgressChange);
-        }
-        this.updateMessage();
-    }
-    componentDidUpdate () {
-        this.update();
+        this.handleAssetProgress(
+            this.props.vm.runtime.finishedAssetRequests,
+            this.props.vm.runtime.totalAssetRequests
+        );
+        this.props.vm.on('ASSET_PROGRESS', this.handleAssetProgress);
+        this.props.vm.runtime.on('PROJECT_LOADED', this.handleProjectLoaded);
     }
     componentWillUnmount () {
-        progressMonitor.setProgressHandler(() => {});
+        this.props.vm.off('ASSET_PROGRESS', this.handleAssetProgress);
+        this.props.vm.runtime.off('PROJECT_LOADED', this.handleProjectLoaded);
     }
-    handleProgressChange (state, progress, complete, total) {
-        if (state !== this._state) {
-            this._state = state;
-            this.updateMessage();
+    handleAssetProgress (finished, total) {
+        if (this.ignoreProgress || !this.barInnerEl || !this.messageEl) {
+            return;
         }
-        this.progress = progress;
-        this.complete = complete;
-        this.total = total;
-        this.update();
-    }
-    update () {
-        if (this.barInner) {
-            this.barInner.style.width = `${this.progress * 100}%`;
-        }
-        if (this._state === 2) {
-            this.updateMessage();
-        }
-    }
-    updateMessage () {
-        if (this._state === 0) {
-            this.message.textContent = this.props.intl.formatMessage(messages.generic);
-        } else if (this._state === 1) {
-            this.message.textContent = this.props.intl.formatMessage(messages.projectData);
-        } else if (this.total > 0) {
-            this.message.textContent = this.props.intl.formatMessage(messages.assetsKnown, {
-                complete: this.complete,
-                total: this.total
-            });
+
+        if (total === 0) {
+            // Started loading a new project.
+            this.barInnerEl.style.width = '0';
+            this.messageEl.textContent = this.props.intl.formatMessage(messages.projectData);
         } else {
-            this.message.textContent = this.props.intl.formatMessage(messages.assetsUnknown);
+            this.barInnerEl.style.width = `${finished / total * 100}%`;
+            this.messageEl.textContent = this.props.intl.formatMessage(messages.assets, {
+                complete: finished,
+                total
+            });
         }
     }
-    barInnerRef (element) {
-        this.barInner = element;
+    handleProjectLoaded () {
+        if (this.ignoreProgress || !this.barInnerEl || !this.messageEl) {
+            return;
+        }
+
+        this.ignoreProgress = true;
+        this.props.vm.runtime.resetProgress();
     }
-    messageRef (element) {
-        this.message = element;
+    barInnerRef (barInner) {
+        this.barInnerEl = barInner;
+    }
+    messageRef (message) {
+        this.messageEl = message;
     }
     render () {
         return (
@@ -135,33 +111,35 @@ class LoaderComponent extends React.Component {
                         <img
                             className={styles.topBlock}
                             src={topBlock}
+                            draggable={false}
                         />
                         <img
                             className={styles.middleBlock}
                             src={middleBlock}
+                            draggable={false}
                         />
                         <img
                             className={styles.bottomBlock}
                             src={bottomBlock}
+                            draggable={false}
                         />
                     </div>
+
                     <div className={styles.title}>
                         {mainMessages[this.props.messageId]}
                     </div>
-                    <div className={styles.messageContainerOuter}>
+
+                    <div
+                        className={styles.message}
+                        ref={this.messageRef}
+                    />
+
+                    <div className={styles.barOuter}>
                         <div
-                            className={styles.messageContainerInner}
-                            ref={this.messageRef}
+                            className={styles.barInner}
+                            ref={this.barInnerRef}
                         />
                     </div>
-                    {!isScratchDesktop() && (
-                        <div className={styles.twProgressOuter}>
-                            <div
-                                className={styles.twProgressInner}
-                                ref={this.barInnerRef}
-                            />
-                        </div>
-                    )}
                 </div>
             </div>
         );
@@ -169,13 +147,33 @@ class LoaderComponent extends React.Component {
 }
 
 LoaderComponent.propTypes = {
+    intl: intlShape,
     isFullScreen: PropTypes.bool,
-    intl: intlShape.isRequired,
-    messageId: PropTypes.string
+    messageId: PropTypes.string,
+    vm: PropTypes.shape({
+        on: PropTypes.func,
+        off: PropTypes.func,
+        runtime: PropTypes.shape({
+            totalAssetRequests: PropTypes.number,
+            finishedAssetRequests: PropTypes.number,
+            resetProgress: PropTypes.func,
+            on: PropTypes.func,
+            off: PropTypes.func
+        })
+    })
 };
 LoaderComponent.defaultProps = {
     isFullScreen: false,
     messageId: 'gui.loader.headline'
 };
 
-export default injectIntl(LoaderComponent);
+const mapStateToProps = state => ({
+    vm: state.scratchGui.vm
+});
+
+const mapDispatchToProps = () => ({});
+
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(injectIntl(LoaderComponent));

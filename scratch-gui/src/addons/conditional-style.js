@@ -2,6 +2,7 @@
 // than those in <head> and above dark mode which is appended at the start of <body>
 const stylesheetContainer = document.createElement('div');
 stylesheetContainer.style.display = 'none';
+stylesheetContainer.className = 'addons-styles';
 document.body.appendChild(stylesheetContainer);
 
 /**

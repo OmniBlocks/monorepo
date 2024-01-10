@@ -12,6 +12,7 @@ const MicIndicatorComponent = props => (
         <img
             className={styles.micImg}
             src={micIcon}
+            draggable={false}
         />
     </div>
 );

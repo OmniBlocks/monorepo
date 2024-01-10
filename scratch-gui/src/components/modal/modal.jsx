@@ -59,6 +59,7 @@ const ModalComponent = props => (
                         <img
                             className={styles.headerImage}
                             src={props.headerImage}
+                            draggable={false}
                         />
                     ) : null}
                     {props.contentLabel}

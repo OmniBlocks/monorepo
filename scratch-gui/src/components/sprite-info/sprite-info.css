@@ -1,17 +1,15 @@
 @import "../../css/units.css";
 @import "../../css/colors.css";
+@import "../../css/filters.css";
 
 .sprite-info {
     padding: 0.75rem;
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    background-color: white;
+    background-color: $ui-white;
     color: $text-primary;
     border-top-left-radius: $space;
     border-top-right-radius: $space;
     border-bottom: 1px solid $ui-black-transparent;
-}
-[theme="dark"] .sprite-info {
-    background-color: $ui-primary;
 }
 
 .row {
@@ -48,70 +46,7 @@
     padding: 0.5rem;
     outline: none;
     user-select: none;
-}
-
-.icon {
-    width: 100%;
-    height: 100%;
-}
-
-/* @todo: refactor radio divs to input */
-.radio-wrapper {
-    white-space: nowrap; /* make sure visibilty buttons don't wrap */
-}
-
-.radio {
-    filter: saturate(0);
-    cursor: pointer;
-}
-.radio.is-active {
-    filter: none;
-}
-.radio.is-disabled {
-    cursor: default;
-}
-
-.radio-first {
-    border: 1px solid $ui-black-transparent;
-}
-
-[dir="ltr"] .radio-first {
-    border-top-left-radius: $form-radius;
-    border-bottom-left-radius: $form-radius;
-}
-
-[dir="rtl"] .radio-first {
-    border-top-right-radius: $form-radius;
-    border-bottom-right-radius: $form-radius;
-}
-
-.radio-first:focus {
-    border-color: $motion-primary;
-    box-shadow: inset 0 0 0 -2px $ui-black-transparent;
-}
-
-.radio-last {
-    border-bottom: 1px solid $ui-black-transparent;
-    border-top: 1px solid $ui-black-transparent;
-}
-
-[dir="ltr"] .radio-last {
-    border-right: 1px solid $ui-black-transparent;
-    border-left: 1px solid $ui-black-transparent;
-    border-top-right-radius: $form-radius;
-    border-bottom-right-radius: $form-radius;
-}
-
-[dir="rtl"] .radio-last {
-    border-left: 1px solid $ui-black-transparent;
-    border-right: 1px solid $ui-black-transparent;
-    border-top-left-radius: $form-radius;
-    border-bottom-left-radius: $form-radius;
-}
-
-.radio-last:focus {
-    border-color: $motion-primary;
-    box-shadow: inset 0 0 0 -2px $ui-black-transparent;
+    filter: $filter-icon-gray;
 }
 
 .icon {
@@ -129,8 +64,8 @@
 }
 
 .rotation-select:focus {
-    border-color: $motion-primary;
-    box-shadow: inset 0 0 0 1px $ui-black-transparent);
+    border-color: $looks-secondary;
+    box-shadow: inset 0 0 0 1px $ui-black-transparent;
 }
 
 .larger-input input {

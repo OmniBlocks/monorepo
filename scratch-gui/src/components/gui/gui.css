@@ -29,6 +29,7 @@
     /*
         Stop scrollbar popping in and out from scratch-blocks border issue
         https://github.com/LLK/scratch-gui/issues/318
+        TW: and also fix double horizontal scrollbar at some screen sizes in paint editor
     */
     overflow: hidden;
 }
@@ -67,6 +68,8 @@
     /* Overrides for react-tabs styling */
     margin: 0 !important;
     border-bottom: 0 !important;
+
+    color: $text-primary;
 }
 
 .tab {
@@ -89,9 +92,6 @@
 
     user-select: none;
     white-space: nowrap;
-}
-[theme="dark"] .tab {
-    color: $text-primary;
 }
 
 [dir="ltr"] .tab {
@@ -124,18 +124,12 @@
 .tab:hover {
   background-color: $ui-primary;
 }
-[theme="dark"] .tab:hover {
-    background-color: $ui-secondary;
-}
 
 .tab.is-selected {
     height: 90%;
-    color: $motion-primary;
+    color: $looks-secondary;
     background-color: $ui-white;
     z-index: 4; /* Make sure selected is always above */
-}
-[theme="dark"] .tab.is-selected {
-    background-color: $ui-secondary;
 }
 
 .tab img {
@@ -245,9 +239,9 @@
     left: 0;
     right: 0;
     z-index: $z-index-extension-button;
-    background: $motion-primary;
+    background: $looks-secondary;
 
-    border: 1px solid $motion-primary;
+    border: 1px solid $looks-secondary;
     box-sizing: content-box; /* To match scratch-block vertical toolbox borders */
 }
 
@@ -271,6 +265,7 @@ $fade-out-distance: 15px;
     width: 100%;
     height: 100%;
     cursor: pointer;
+    user-select: none;
 }
 
 .extension-button-icon {
@@ -327,13 +322,13 @@ $fade-out-distance: 15px;
     overflow: hidden;
 }
 
-/* tw: tw: when window is fullscreen, put a solid white background behind the stage */
+/* when in the browser's fullscreen mode, we need to put our own background to avoid just having black */
 .fullscreen-background {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    /* if the user-specified background color can't be understood by the browser, default to white */
+    /* overridden by JS; this will be used if the browser can't understand that color */
     background-color: white;
 }

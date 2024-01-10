@@ -27,11 +27,8 @@
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-size: $menu-bar-standard-font-size;
     font-weight: bold;
-    background-color: $motion-primary;
-    color: $ui-white;
-}
-[theme="dark"] .menu-bar {
-    background-color: $motion-primary-dark;
+    background-color: $menu-bar-background;
+    color: $menu-bar-foreground;
 }
 
 .main-menu {
@@ -42,7 +39,9 @@
     align-items: center;
     flex-grow: 1;
 }
-
+.inactive {
+    opacity: 0;
+}
 .scratch-logo {
     height:  1.6rem;
     vertical-align: middle;
@@ -52,26 +51,10 @@
     cursor: pointer;
 }
 
-.language-icon {
-    height:  1.5rem;
-    vertical-align: middle;
-}
-
-.language-caret {
-    margin: 0 .125rem;
-}
-
-.language-menu {
-    box-sizing: border-box;
-    display: inline-flex;
-    width: $language-selector-width;
-}
-
 .menu-bar-item {
     display: flex;
     padding: 0 0.25rem;
     text-decoration: none;
-    color: $ui-white;
     user-select: none;
     align-self: center;
     position: relative;
@@ -106,11 +89,8 @@
 }
 
 .file-group .menu-bar-item {
+    margin: 0 .25rem;
     padding: 0 0.75rem;
-}
-
-.menu-bar-item.language-menu {
-    padding: 0 0.5rem;
 }
 
 .menu-bar-menu {
@@ -119,15 +99,13 @@
 }
 
 .feedback-link {
-    color: $motion-primary !important;
+    color: $menu-bar-background;
     text-decoration: none;
-}
-[theme="dark"] .feedback-link {
-    color: $motion-primary-dark !important;
 }
 
 .feedback-button {
-    background-color: $ui-white;
+    background-color: white;
+    color: inherit;
     height: 34px;
 }
 
@@ -164,6 +142,7 @@
 }
 
 .account-info-group .menu-bar-item {
+    margin: 0 .25rem;
     padding: 0 0.75rem;
 }
 
@@ -173,7 +152,11 @@
 }
 
 .help-icon {
-    margin-right: 0.35rem;
+    margin: 0 .25rem 0 0;
+}
+
+[dir="rtl"] .help-icon {
+    margin: 0 0 0 .25rem;
 }
 
 .account-nav-menu, .mystuff-button {
@@ -231,8 +214,25 @@
     vertical-align: middle;
 }
 
-/* tw: styles to override <a> styles */
+.collapsible-label {
+    margin: 0 .5rem 0 .25rem;
+}
+
+[dir="rtl"] .collapsible-label {
+    margin: 0 0.25rem 0 0.5rem;
+}
+
+@media only screen and (max-width: 1024px) {
+    .tutorials-label, .collapsible-label {
+        display: none;
+    }
+
+    .help-icon {
+        margin-right: 0;
+    }
+}
+
 .menu-item-link {
-    color: $ui-white !important;
+    color: inherit;
     text-decoration: none;
 }

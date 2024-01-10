@@ -22,19 +22,16 @@ $header-height: calc($stage-menu-height - 2px);
     cursor: pointer;
     transition: all 0.25s ease;
 }
-[theme="dark"] .stage-selector {
-    background-color: $ui-secondary;
-}
 
 .stage-selector.is-selected {
     border-top-left-radius: .625rem;
     border-top-right-radius: .625rem;
-    border-color: $motion-primary;
-    box-shadow: 0px 0px 0px 4px $motion-transparent;
+    border-color: $looks-secondary;
+    box-shadow: 0px 0px 0px 4px $looks-transparent;
 }
 
 .stage-selector:hover {
-    border-color: $motion-primary;
+    border-color: $looks-secondary;
 }
 
 .header {
@@ -43,16 +40,13 @@ $header-height: calc($stage-menu-height - 2px);
     align-items: center;
     justify-content: center;
     height: $header-height;
-    background-color: white;
+    background-color: $ui-white;
     color: $text-primary;
     border-top-left-radius: $space;
     border-top-right-radius: $space;
     border-bottom: 1px solid $ui-black-transparent;
     width: 100%;
     transition: background-color 0.25s ease;
-}
-[theme="dark"] .header {
-    background-color: $ui-secondary;
 }
 
 .header-title {
@@ -66,7 +60,7 @@ $header-height: calc($stage-menu-height - 2px);
 }
 
 .stage-selector.is-selected .header {
-    background-color: $motion-primary;
+    background-color: $looks-secondary;
 }
 
 .stage-selector.is-selected .header-title {
@@ -95,7 +89,7 @@ $header-height: calc($stage-menu-height - 2px);
     user-select: none;
     border: 1px solid $ui-black-transparent;
     border-radius: .25rem;
-    box-shadow: inset 0 0 4px $ui-black-transparent-default;
+    box-shadow: inset 0 0 4px $shadow;
     max-width: 64px;
     max-height: 48px;
 }
@@ -105,7 +99,7 @@ $header-height: calc($stage-menu-height - 2px);
     bottom: 0.75rem;
 }
 
-.stage-selector.raised, .stage-selector.raised .header {
+.raised, .raised .header {
     background-color: $drop-highlight;
     transition: all 0.25s ease;
 }

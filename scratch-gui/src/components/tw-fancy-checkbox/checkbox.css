@@ -6,22 +6,19 @@
     height: 18px;
     border-radius: 4px;
     transition: .2s;
-    background-color: white;
+    background-color: $ui-white;
     transition-property: background-color;
     background-size: 100%;
-    border: 1px solid rgb(92, 92, 92);
+    border: 1px solid $ui-black-transparent;
     outline: none;
 }
 .checkbox:hover, .checkbox:focus, .checkbox:active, .checkbox:checked {
-    border-color: $motion-primary;
+    border-color: $looks-secondary;
 }
 .checkbox:focus, .checkbox:active {
-    box-shadow: 0 0 0 3px $motion-transparent;
+    box-shadow: 0 0 0 3px $looks-transparent;
 }
 .checkbox:checked {
-    background-color: $motion-primary;
+    background-color: $looks-secondary;
     background-image: url("./checkbox.svg");
-}
-[theme="dark"] .checkbox {
-    border-color: transparent;
 }

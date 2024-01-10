@@ -4,12 +4,13 @@ import Box from '../box/box.jsx';
 import Waveform from '../waveform/waveform.jsx';
 import Meter from '../meter/meter.jsx';
 import AudioTrimmer from '../../containers/audio-trimmer.jsx';
+import TWRenderRecoloredImage from '../../lib/tw-recolor/render.jsx';
 import {defineMessages, injectIntl, intlShape} from 'react-intl';
 
 import styles from './record-modal.css';
-import backIcon from './icon--back.svg';
-import stopIcon from './icon--stop-playback.svg';
-import playIcon from './icon--play.svg';
+import backIcon from '!../../lib/tw-recolor/build!./icon--back.svg';
+import stopIcon from '!../../lib/tw-recolor/build!./icon--stop-playback.svg';
+import playIcon from '!../../lib/tw-recolor/build!./icon--play.svg';
 
 const messages = defineMessages({
     stopMsg: {
@@ -71,7 +72,7 @@ const PlaybackStep = props => (
                 className={styles.mainButton}
                 onClick={props.playing ? props.onStopPlaying : props.onPlay}
             >
-                <img
+                <TWRenderRecoloredImage
                     draggable={false}
                     src={props.playing ? stopIcon : playIcon}
                 />
@@ -90,7 +91,7 @@ const PlaybackStep = props => (
                 className={styles.rerecordButton}
                 onClick={props.onBack}
             >
-                <img
+                <TWRenderRecoloredImage
                     draggable={false}
                     src={backIcon}
                 />

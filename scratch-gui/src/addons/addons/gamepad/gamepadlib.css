@@ -33,22 +33,11 @@
   padding: 0;
   margin: 0;
 }
-[theme="dark"] .gamepadlib-keyinput {
-  background-color: var(--ui-tertiary);
-  border-color: var(--ui-black-transparent);
-  color: var(--text-primary);
-}
 .gamepadlib-mapping[data-value="1"] .gamepadlib-keyinput {
   background: yellow;
 }
-[theme="dark"] .gamepadlib-mapping[data-value="1"] .gamepadlib-keyinput {
-  background: hsl(60, 100%, 20%)
-}
 .gamepadlib-keyinput[data-accepting-input="true"] {
   background: #d6fff9;
-}
-[theme="dark"] .gamepadlib-keyinput[data-accepting-input="true"] {
-  background: hsl(171, 100%, 20%);
 }
 .gamepadlib-keyinput[data-empty="true"]:not([data-accepting-input="true"]) {
   color: #aaa;
@@ -65,9 +54,6 @@
   height: 150px;
   border: 1px solid black;
   overflow: hidden;
-}
-[theme="dark"] .gamepadlib-axis-circle {
-  border-color: var(--ui-black-transparent);
 }
 .gamepadlib-axis-dot {
   position: absolute;

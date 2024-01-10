@@ -23,9 +23,7 @@ import {
 import log from './log';
 import storage from './storage';
 
-import {MISSING_PROJECT_ID} from './tw-missing-project';
 import VM from 'scratch-vm';
-import * as progressMonitor from '../components/loader/tw-progress-monitor';
 import {fetchProjectMeta} from './tw-project-meta-fetcher-hoc.jsx';
 
 // TW: Temporary hack for project tokens
@@ -105,7 +103,7 @@ const ProjectFetcherHOC = function (WrappedComponent) {
             // these will also happen later after the project is fetched, but fetching may take a while and
             // the project shouldn't be running while fetching the new project
             this.props.vm.clear();
-            this.props.vm.stop();
+            this.props.vm.quit();
 
             let assetPromise;
             // In case running in node...
@@ -116,7 +114,7 @@ const ProjectFetcherHOC = function (WrappedComponent) {
                 if (!projectUrl.startsWith('http:') && !projectUrl.startsWith('https:')) {
                     projectUrl = `https://${projectUrl}`;
                 }
-                assetPromise = progressMonitor.fetchWithProgress(projectUrl)
+                assetPromise = fetch(projectUrl)
                     .then(r => {
                         if (!r.ok) {
                             throw new Error(`Request returned status ${r.status}`);
@@ -134,18 +132,6 @@ const ProjectFetcherHOC = function (WrappedComponent) {
             }
 
             return assetPromise
-                .then(projectAsset => {
-                    // tw: If the project data appears to be HTML, then the result is probably an nginx 404 page,
-                    // and the "missing project" project should be loaded instead.
-                    // See: https://projects.scratch.mit.edu/9999999999999999999999
-                    if (projectAsset && projectAsset.data) {
-                        const firstChar = projectAsset.data[0];
-                        if (firstChar === '<' || firstChar === '<'.charCodeAt(0)) {
-                            return storage.load(storage.AssetType.Project, MISSING_PROJECT_ID, storage.DataFormat.JSON);
-                        }
-                    }
-                    return projectAsset;
-                })
                 .then(projectAsset => {
                     if (projectAsset) {
                         this.props.onFetchedProjectData(projectAsset.data, loadingState);

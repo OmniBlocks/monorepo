@@ -1,52 +1,76 @@
-$ui-primary: var(--ui-primary, hsla(215, 100%, 95%, 1)); /* #E5F0FF */
-$ui-secondary: var(--ui-secondary, hsla(215, 75%, 95%, 1)); /* #E9F1FC */
-$ui-tertiary: var(--ui-tertiary, hsla(215, 50%, 90%, 1)); /* #D9E3F2 */
+/* overridden by src/lib/themes/guiHelpers.js */
 
-$ui-modal-overlay: var(--ui-modal-overlay, hsla(0, 100%, 65%, 0.9)); /* 90% transparent version of motion-primary */
+$ui-primary: var(--ui-primary);
+$ui-secondary: var(--ui-secondary);
+$ui-tertiary: var(--ui-tertiary);
 
-$ui-white: hsla(0, 100%, 100%, 1); /* #FFFFFF */
-$ui-white-dim: hsla(0, 100%, 100%, 0.75); /* 25% transparent version of ui-white */
-$ui-white-transparent: hsla(0, 100%, 100%, 0.25); /* 25% transparent version of ui-white */
-$ui-transparent: hsla(0, 100%, 100%, 0); /* 25% transparent version of ui-white */
+$ui-modal-overlay: var(--ui-modal-overlay);
+$ui-modal-background: var(--ui-modal-background);
+$ui-modal-foreground: var(--ui-modal-foreground);
+$ui-modal-header-background: var(--ui-modal-header-background);
+$ui-modal-header-foreground: var(--ui-modal-header-foreground);
 
-$ui-black-transparent-default: hsla(0, 0%, 0%, 0.15); /* 15% transparent version of black */
-$ui-black-transparent: var(--ui-black-transparent, $ui-black-transparent-default);
+$ui-white: var(--ui-white);
+$ui-white-dim: var(--ui-white-dim);
+$ui-white-transparent: var(--ui-white-transparent);
+$ui-transparent: var(--ui-transparent);
 
-$text-primary: var(--text-primary, hsla(225, 15%, 40%, 1)); /* #575E75 */
-$text-primary-transparent: hsla(225, 15%, 40%, 0.75);
+$ui-black-transparent: var(--ui-black-transparent);
 
-$motion-primary: hsla(0, 100%, 65%, 1);
-$motion-tertiary: hsla(0, 60%, 50%, 1);
-$motion-transparent: hsla(0, 100%, 65%, 0.35); /* 35% transparent version of motion-primary */
-$motion-light-transparent: hsla(0, 100%, 65%, 0.15); /* 15% transparent version of motion-primary */
+$text-primary: var(--text-primary);
+$text-primary-transparent: var(--ui-text-primary-transparent);
 
-/* opt-in theme overrides */
-$motion-primary-dark: #333;
-$ui-primary-light: hsla(215, 100%, 95%, 1);
-$ui-secondary-light: hsla(215, 75%, 95%, 1);
-$ui-tertiary-light: hsla(215, 50%, 90%, 1);
-$text-primary-light: hsla(225, 15%, 40%, 1);
+$motion-primary: var(--motion-primary);
+$motion-tertiary: var(--motion-tertiary);
 
-$red-primary: hsla(20, 100%, 55%, 1); /* #FF661A */
-$red-tertiary: hsla(20, 100%, 45%, 1); /* #E64D00 */
+$looks-secondary: var(--looks-secondary);
+$looks-transparent: var(--looks-transparent);
+$looks-light-transparent: var(--looks-light-transparent);
+$looks-secondary-dark: var(--looks-secondary-dark);
 
-$sound-primary: hsla(300, 53%, 60%, 1); /* #CF63CF */
-$sound-tertiary: hsla(300, 48%, 50%, 1); /* #BD42BD */
+$red-primary: var(--red-primary);
+$red-tertiary: var(--red-tertiary);
 
-$control-primary: hsla(38, 100%, 55%, 1); /* #FFAB19 */
+$sound-primary: var(--sound-primary);
+$sound-tertiary: var(--sound-tertiary);
 
-$data-primary: hsla(30, 100%, 55%, 1); /* #FF8C1A */
+$control-primary: var(--control-primary);
 
-$pen-primary: hsla(163, 85%, 40%, 1); /* #0FBD8C */
-$pen-transparent: hsla(163, 85%, 40%, 0.25); /* #0FBD8C */
+$data-primary: var(--data-primary);
 
-$error-primary: hsla(30, 100%, 55%, 1); /* #FF8C1A */
-$error-light: hsla(30, 100%, 70%, 1); /* #FFB366 */
-$error-transparent: hsla(30, 100%, 55%, 0.25); /* #FF8C1A */
+$pen-primary: var(--pen-primary);
+$pen-transparent: var(--pen-transparent);
+$pen-tertiary: var(--pen-tertiary);
 
-$extensions-primary: hsla(10, 85%, 65%, 1);
-$extensions-tertiary: hsla(10, 85%, 40%, 1);
-$extensions-transparent: hsla(10, 85%, 65%, 0.35); /* 35% transparent version of extensions-primary */
-$extensions-light: hsla(10, 57%, 85%, 1); /* opaque version of extensions-transparent, on white bg */
+$error-primary: var(--error-primary);
+$error-light: var(--error-light);
+$error-transparent: var(--error-transparent);
 
-$drop-highlight: hsla(0, 100%, 77%, 1); /* lighter than motion-primary */
+$extensions-primary: var(--extensions-primary);
+$extensions-tertiary: var(--extensions-tertiary);
+$extensions-transparent: var(--extensions-transparent);
+$extensions-light: var(--extensions-light);
+
+$drop-highlight: var(--drop-highlight);
+
+$menu-bar-background: var(--menu-bar-background);
+$menu-bar-foreground: var(--menu-bar-foreground);
+
+$assets-background: var(--assets-background);
+
+$input-background: var(--input-background);
+
+$fullscreen-background: var(--fullscreen-background);
+$fullscreen-accent: var(--fullscreen-accent);
+
+$popover-background: var(--popover-background);
+
+$shadow: var(--shadow);
+
+$badge-background: var(--badge-background);
+$badge-border: var(--badge-border);
+
+$page-background: var(--page-background);
+$page-foreground: var(--page-foreground);
+
+$link-color: var(--link-color);

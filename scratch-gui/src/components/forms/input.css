@@ -9,6 +9,7 @@
     font-size: 0.625rem;
     font-weight: bold;
     color: $text-primary;
+    background-color: $input-background;
 
     border-width: 1px;
     border-style: solid;
@@ -30,23 +31,14 @@
     white-space: nowrap;
     min-width: 0;
 }
-[theme="dark"] .input-form {
-    background-color: $ui-secondary;
-}
 
 .input-form:hover {
-    border-color: $motion-primary;
-}
-[theme="dark"] .input-form:hover {
-    border-color: $motion-primary-dark;
+    border-color: $looks-secondary;
 }
 
 .input-form:focus {
-    border-color: $motion-primary;
-    box-shadow: 0 0 0 0.25rem $motion-transparent;
-}
-[theme="dark"] .input-form:focus {
-    border-color: $motion-primary-dark;
+    border-color: $looks-secondary;
+    box-shadow: 0 0 0 0.25rem $looks-transparent;
 }
 
 .input-small {

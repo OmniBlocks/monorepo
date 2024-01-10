@@ -16,6 +16,11 @@ import {
 import {openUsernameModal} from '../reducers/modals';
 import {setUsernameInvalid, setCloudHost} from '../reducers/tw';
 
+/**
+ * TW: Our scratch-vm has an alternative fix to the cloud variable and video sensing privacy concerns.
+ */
+const DISABLE_WITH_VIDEO_SENSING = false;
+
 /*
  * Higher Order Component to manage the connection to the cloud server.
  * @param {React.Component} WrappedComponent component to manage VM events for
@@ -28,11 +33,11 @@ const cloudManagerHOC = function (WrappedComponent) {
             this.cloudProvider = null;
             bindAll(this, [
                 'handleCloudDataUpdate',
-                'onInvalidUsername'
+                'handleExtensionAdded'
             ]);
 
             this.props.vm.on('HAS_CLOUD_DATA_UPDATE', this.handleCloudDataUpdate);
-            this.props.onSetReduxCloudHost(this.props.cloudHost);
+            this.props.vm.on('EXTENSION_ADDED', this.handleExtensionAdded);
         }
         componentDidMount () {
             if (this.shouldConnect(this.props)) {
@@ -67,6 +72,7 @@ const cloudManagerHOC = function (WrappedComponent) {
         }
         componentWillUnmount () {
             this.props.vm.off('HAS_CLOUD_DATA_UPDATE', this.handleCloudDataUpdate);
+            this.props.vm.off('EXTENSION_ADDED', this.handleExtensionAdded);
             this.disconnectFromCloud();
         }
         canUseCloud (props) {
@@ -128,8 +134,12 @@ const cloudManagerHOC = function (WrappedComponent) {
                 this.connectToCloud();
             }
         }
-        onInvalidUsername () {
-            this.props.onInvalidUsername();
+        handleExtensionAdded (categoryInfo) {
+            // Note that props.vm.extensionManager.isExtensionLoaded('videoSensing') is still false
+            // at the point of this callback, so it is difficult to reuse the canModifyCloudData logic.
+            if (DISABLE_WITH_VIDEO_SENSING && categoryInfo.id === 'videoSensing' && this.isConnected()) {
+                this.disconnectFromCloud();
+            }
         }
         render () {
             const {
@@ -184,9 +194,10 @@ const cloudManagerHOC = function (WrappedComponent) {
             reduxCloudHost: state.scratchGui.tw.cloudHost,
             isShowingWithId: getIsShowingWithId(loadingState),
             projectId: state.scratchGui.projectState.projectId,
-            hasCloudPermission: state.scratchGui.tw.cloud,
-            username: state.scratchGui.tw.username,
-            canModifyCloudData: (!state.scratchGui.mode.hasEverEnteredEditor || ownProps.canSave)
+            // if you're editing someone else's project, you can't modify cloud data
+            canModifyCloudData: (!state.scratchGui.mode.hasEverEnteredEditor || ownProps.canSave) &&
+                // possible security concern if the program attempts to encode webcam data over cloud variables
+                !ownProps.vm.extensionManager.isExtensionLoaded('videoSensing')
         };
     };
 

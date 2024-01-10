@@ -11,13 +11,10 @@
     background-color: $ui-white;
     border: 1px solid $ui-black-transparent;
     border-radius: calc($space / 2);
-    box-shadow: 0px 0px 5px 1px $ui-black-transparent-default;
+    box-shadow: 0px 0px 5px 1px $shadow;
     pointer-events: none;
     transition: opacity 0.2s ease;
     z-index: $z-index-context-menu;
-}
-[theme="dark"] .context-menu {
-    background-color: $ui-primary;
 }
 
 .menu-item {
@@ -28,15 +25,12 @@
 }
 
 .menu-item:hover {
-    background: $motion-primary;
+    background: $looks-secondary;
     color: white;
 }
 
 .menu-item-bordered {
     border-top: 1px solid $ui-black-transparent;
-}
-[theme="dark"] .menu-item-bordered {
-    border-color: $ui-tertiary;
 }
 
 .menu-item-danger:hover {

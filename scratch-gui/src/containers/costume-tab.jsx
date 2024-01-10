@@ -320,7 +320,6 @@ class CostumeTab extends React.Component {
                 {target.costumes ?
                     <PaintEditorWrapper
                         selectedCostumeIndex={this.state.selectedCostumeIndex}
-                        isDark={this.props.isDark}
                     /> :
                     null
                 }
@@ -333,7 +332,6 @@ CostumeTab.propTypes = {
     dispatchUpdateRestore: PropTypes.func,
     editingTarget: PropTypes.string,
     intl: intlShape,
-    isDark: PropTypes.bool,
     isRtl: PropTypes.bool,
     onActivateSoundsTab: PropTypes.func.isRequired,
     onCloseImporting: PropTypes.func.isRequired,

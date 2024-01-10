@@ -5,12 +5,8 @@
 }
 
 .body {
-    background: $ui-white;
+    background: $ui-modal-background;
     padding: 1.5rem 2.25rem;
-}
-[theme="dark"] .body {
-    color: $text-primary;
-    background: $ui-primary;
 }
 
 .body input[type="checkbox"],
@@ -27,10 +23,6 @@
     height: 3rem;
     color: $text-primary-transparent;
     font-size: .875rem;
-}
-[theme="dark"] .text-input {
-    background: $ui-secondary;
-    color: white;
 }
 
 .button-row {
@@ -58,8 +50,8 @@
 }
 
 .button-row button.ok-button {
-    background: $motion-primary;
-    border: $motion-primary;
+    background: $looks-secondary;
+    border: $looks-secondary;
     color: white;
 }
 .button-row button.cancel-button {

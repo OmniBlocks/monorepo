@@ -278,6 +278,7 @@ class Blocks extends React.Component {
     }
     componentWillUnmount () {
         this.detachVM();
+        this.unmounted = true;
         this.workspace.dispose();
         clearTimeout(this.toolboxUpdateTimeout);
 
@@ -296,6 +297,7 @@ class Blocks extends React.Component {
         this.ScratchBlocks.ScratchMsgs.setLocale(this.props.locale);
         this.props.vm.setLocale(this.props.locale, this.props.messages)
             .then(() => {
+                if (this.unmounted) return;
                 this.workspace.getFlyout().setRecyclingEnabled(false);
                 this.props.vm.refreshWorkspace();
                 this.requestToolboxUpdate();

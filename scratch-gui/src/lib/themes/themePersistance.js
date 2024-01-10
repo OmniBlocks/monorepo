@@ -1,4 +1,4 @@
-import {Theme} from '.';
+import {BLOCKS_CUSTOM, Theme} from '.';
 
 const matchMedia = query => (window.matchMedia ? window.matchMedia(query) : null);
 const PREFERS_HIGH_CONTRAST_QUERY = matchMedia('(prefers-contrast: more)');
@@ -87,7 +87,8 @@ const persistTheme = theme => {
     if (theme.gui !== systemPreferences.gui) {
         nonDefaultSettings.gui = theme.gui;
     }
-    if (theme.blocks !== systemPreferences.blocks) {
+    // custom blocks are managed by addon at runtime, don't save here
+    if (theme.blocks !== systemPreferences.blocks && theme.blocks !== BLOCKS_CUSTOM) {
         nonDefaultSettings.blocks = theme.blocks;
     }
 

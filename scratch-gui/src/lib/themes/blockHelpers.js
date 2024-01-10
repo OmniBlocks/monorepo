@@ -42,8 +42,8 @@ const injectExtensionCategoryTheme = (dynamicBlockXML, theme) => {
         const usesCustomColors = primaryColor.toLowerCase() !== DEFAULT_EXTENSION_PRIMARY;
         if (usesCustomColors) {
             const converters = theme.getCustomExtensionColors();
-            dom.documentElement.setAttribute('colour', converters.primary(primaryColor));
-            dom.documentElement.setAttribute('secondaryColour', converters.tertiary(primaryColor));
+            dom.documentElement.setAttribute('colour', converters.categoryIconBackground(primaryColor));
+            dom.documentElement.setAttribute('secondaryColour', converters.categoryIconBorder(primaryColor));
         } else {
             dom.documentElement.setAttribute('colour', extensionColors.primary);
             // Note: the category's secondaryColour matches up with the blocks' tertiary color,

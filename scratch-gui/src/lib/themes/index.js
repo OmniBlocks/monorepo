@@ -32,6 +32,7 @@ const GUI_DEFAULT = GUI_LIGHT;
 const BLOCKS_THREE = 'three';
 const BLOCKS_DARK = 'dark';
 const BLOCKS_HIGH_CONTRAST = 'high-contrast';
+const BLOCKS_CUSTOM = 'custom';
 const BLOCKS_DEFAULT = BLOCKS_THREE;
 const defaultBlockColors = blocksThree.blockColors;
 const BLOCKS_MAP = {
@@ -54,6 +55,14 @@ const BLOCKS_MAP = {
         colors: defaultsDeep({}, blocksDark.blockColors, defaultBlockColors),
         extensions: blocksDark.extensions,
         customExtensionColors: blocksDark.customExtensionColors,
+        useForStage: false
+    },
+    [BLOCKS_CUSTOM]: {
+        // to be filled by editor-theme3 addon
+        blocksMediaFolder: 'blocks-media/default',
+        colors: blocksThree.blockColors,
+        extensions: {},
+        customExtensionColors: {},
         useForStage: false
     }
 };
@@ -146,5 +155,6 @@ export {
     BLOCKS_THREE,
     BLOCKS_DARK,
     BLOCKS_HIGH_CONTRAST,
+    BLOCKS_CUSTOM,
     BLOCKS_MAP
 };

@@ -16,80 +16,7 @@ const manifest = {
       "name": "DNin01"
     }
   ],
-  "info": [
-    {
-      "id": "disablesMenuBar",
-      "type": "notice",
-      "text": "If you want to access Scratch's \"Color Mode\" menu, disable this feature."
-    },
-    {
-      "id": "aboutHighContrast",
-      "type": "info",
-      "text": "The new High Contrast block colors are available as a preset below."
-    }
-  ],
   "customCssVariables": [
-    {
-      "name": "inputColor-text",
-      "value": {
-        "type": "alphaThreshold",
-        "source": {
-          "type": "settingValue",
-          "settingId": "input-color"
-        },
-        "opaque": {
-          "type": "textColor",
-          "source": {
-            "type": "settingValue",
-            "settingId": "input-color"
-          }
-        },
-        "transparent": {
-          "type": "map",
-          "source": {
-            "type": "settingValue",
-            "settingId": "text"
-          },
-          "options": {
-            "white": "#ffffff",
-            "black": "#575e75",
-            "colorOnWhite": "#575e75",
-            "colorOnBlack": "#ffffff"
-          }
-        }
-      }
-    },
-    {
-      "name": "inputColor-blackText",
-      "value": {
-        "type": "alphaThreshold",
-        "source": {
-          "type": "settingValue",
-          "settingId": "input-color"
-        },
-        "opaque": {
-          "type": "textColor",
-          "black": "#000000",
-          "source": {
-            "type": "settingValue",
-            "settingId": "input-color"
-          }
-        },
-        "transparent": {
-          "type": "map",
-          "source": {
-            "type": "settingValue",
-            "settingId": "text"
-          },
-          "options": {
-            "white": "#ffffff",
-            "black": "#000000",
-            "colorOnWhite": "#000000",
-            "colorOnBlack": "#ffffff"
-          }
-        }
-      }
-    },
     {
       "name": "commentText",
       "value": {
@@ -248,14 +175,6 @@ const manifest = {
       "id": "Pen-color",
       "type": "color",
       "default": "#0FBD8C",
-      "allowTransparency": true
-    },
-    {
-      "dynamic": true,
-      "name": "TurboWarp",
-      "id": "tw-color",
-      "type": "color",
-      "default": "#ff4c4c",
       "allowTransparency": true
     },
     {
@@ -449,17 +368,6 @@ const manifest = {
         "text": "colorOnBlack"
       }
     }
-  ],
-  "presetPreview": {
-    "type": "palette",
-    "colors": [
-      "motion-color",
-      "looks-color",
-      "sounds-color",
-      "events-color",
-      "control-color",
-      "sensing-color"
-    ]
-  }
+  ]
 };
 export default manifest;

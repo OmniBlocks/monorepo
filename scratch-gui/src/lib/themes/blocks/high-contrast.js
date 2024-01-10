@@ -134,7 +134,9 @@ const customExtensionColors = {
         hsv[1] = Math.max(hsv[1] - 60, 0);
         hsv[2] = Math.min(hsv[2] + 20, 100);
         return hsv2hex(hsv);
-    }
+    },
+    categoryIconBackground: primary => customExtensionColors.primary(primary),
+    categoryIconBorder: primary => customExtensionColors.tertiary(primary)
 };
 
 export {

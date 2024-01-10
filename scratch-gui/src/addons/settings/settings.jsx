@@ -1031,6 +1031,11 @@ class AddonSettingsComponent extends React.Component {
     }
     searchRef (searchBar) {
         this.searchBar = searchBar;
+
+        // Only focus search bar if we have no initial search
+        if (searchBar && this.state.search === '') {
+            searchBar.focus();
+        }
     }
     handleKeyDown (e) {
         const key = e.key;
@@ -1067,7 +1072,6 @@ class AddonSettingsComponent extends React.Component {
                                 aria-label={settingsTranslations.search}
                                 ref={this.searchRef}
                                 spellCheck="false"
-                                autoFocus
                             />
                             <div
                                 className={styles.searchButton}

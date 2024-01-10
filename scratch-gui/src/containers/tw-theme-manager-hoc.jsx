@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import bindAll from 'lodash.bindall';
 import {applyGuiColors} from '../lib/themes/guiHelpers';
-import {Theme} from '../lib/themes';
+import {BLOCKS_CUSTOM, Theme} from '../lib/themes';
 import {detectTheme, onSystemPreferenceChange} from '../lib/themes/themePersistance';
 import {setTheme} from '../reducers/theme';
 
@@ -28,7 +28,11 @@ const TWThemeManagerHOC = function (WrappedComponent) {
             this.removeListeners();
         }
         handleSystemThemeChange () {
-            this.props.onChangeTheme(detectTheme());
+            let newTheme = detectTheme();
+            if (this.props.reduxTheme.blocks === BLOCKS_CUSTOM) {
+                newTheme = newTheme.set('blocks', BLOCKS_CUSTOM);
+            }
+            this.props.onChangeTheme(newTheme);
         }
         render () {
             const {

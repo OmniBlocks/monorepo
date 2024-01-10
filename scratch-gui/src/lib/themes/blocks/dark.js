@@ -89,7 +89,9 @@ const customExtensionColors = {
     },
     secondary: () => '#4C4C4C',
     tertiary: primary => primary,
-    quaternary: primary => primary
+    quaternary: primary => primary,
+    categoryIconBackground: primary => customExtensionColors.primary(primary),
+    categoryIconBorder: primary => customExtensionColors.tertiary(primary)
 };
 
 export {

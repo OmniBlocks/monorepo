@@ -77,3 +77,14 @@
     transform-origin: center;
     transform: scale(90%);
 }
+
+.disabled {
+    opacity: 0.5;
+}
+.disabled img {
+    filter: grayscale(100%);
+}
+
+.open-link {
+    margin-left: 0.5rem;
+}

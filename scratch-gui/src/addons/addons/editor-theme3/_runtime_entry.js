@@ -22,7 +22,6 @@ import _asset15 from "!url-loader!./icons/white_text/extensions/videoSensing.svg
 import _asset16 from "!url-loader!./icons/white_text/repeat.svg";
 import _asset17 from "!url-loader!./icons/white_text/rotate-left.svg";
 import _asset18 from "!url-loader!./icons/white_text/rotate-right.svg";
-import _asset19 from "!url-loader!./open-link.svg";
 export const resources = {
   "theme3.js": _js,
   "theme3.css": _css,
@@ -47,5 +46,4 @@ export const resources = {
   "icons/white_text/repeat.svg": _asset16,
   "icons/white_text/rotate-left.svg": _asset17,
   "icons/white_text/rotate-right.svg": _asset18,
-  "open-link.svg": _asset19,
 };

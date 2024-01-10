@@ -536,14 +536,6 @@ class Tab extends EventTargetShim {
         return vm.getAddonBlock(procedureCode);
     }
 
-    getCustomBlockColor () {
-        return addonBlockColor;
-    }
-
-    setCustomBlockColor (newColor) {
-        Object.assign(addonBlockColor, newColor);
-    }
-
     createBlockContextMenu (callback, {workspace = false, blocks = false, flyout = false, comments = false} = {}) {
         contextMenuCallbacks.push({addonId: this._id, callback, workspace, blocks, flyout, comments});
         contextMenuCallbacks.sort((b, a) => (

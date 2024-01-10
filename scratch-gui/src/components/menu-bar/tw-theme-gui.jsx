@@ -26,6 +26,7 @@ const GuiThemeMenu = ({
                 src={theme.gui === GUI_DARK ? darkModeIcon : lightModeIcon}
                 draggable={false}
                 width={24}
+                height={24}
             />
             <span className={styles.submenuLabel}>
                 {theme.gui === GUI_DARK ? (

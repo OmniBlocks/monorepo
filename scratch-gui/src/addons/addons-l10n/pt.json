@@ -39,7 +39,6 @@
     "mediarecorder/record-after-flag": "Só começar a gravar quando a bandeira verde for clicada",
     "mediarecorder/record-audio": "Incluir sons do projeto",
     "mediarecorder/record-audio-description": "Isso não inclui Texto-para-Fala",
-    "mediarecorder/record-description": "Grava o palco e o exporta como um arquivo WebM. Você pode salvá-lo ao seu computador quando a gravação terminar.\nNota: o painel das variáveis e das listas não serão visíveis na gravação.",
     "mediarecorder/record-duration": "Tempo de Gravação (em segundos)",
     "mediarecorder/record-mic": "Incluir sons do microfone",
     "mediarecorder/record-until-stop": "Parar de gravar quando o projeto for parado",

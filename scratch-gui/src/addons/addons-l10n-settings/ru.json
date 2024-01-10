@@ -139,8 +139,6 @@
     "editor-compact/@name": "Компактный редактор",
     "editor-compact/@settings-name-hideLabels": "Скрыть названия кнопок в редакторах костюмов и звуков",
     "editor-theme3/@description": "Отредактируйте цвета блоков для каждой категории в редакторе.",
-    "editor-theme3/@info-aboutHighContrast": "Новые высококонтрастные цвета блоков доступны в качестве предустановки ниже.",
-    "editor-theme3/@info-disablesMenuBar": "Если вы хотите получить доступ к меню \"Цветовой режим\" Scratch, отключите эту функцию.",
     "editor-theme3/@name": "Настраиваемые цвета блоков",
     "editor-theme3/@preset-description-black": "Делает фон блока чёрным, а границы/текст цветными",
     "editor-theme3/@preset-description-contrast": "Высококонтрастная блочная цветовая палитра Scratch'а 3.0",

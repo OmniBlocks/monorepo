@@ -40,7 +40,6 @@
     "mediarecorder/record-after-flag": "Begin niet met opnemen tot de Groene Vlag is geklikt",
     "mediarecorder/record-audio": "Projectgeluiden opnemen",
     "mediarecorder/record-audio-description": "Dit neemt Tekst-naar-Spraak niet op.",
-    "mediarecorder/record-description": "Neem het speelveld op als een WebM-bestand. Je kunt het opslaan op je computer nadat de opname klaar is.\nOpmerking: monitoren van variabelen en lijsten zijn niet zichtbaar.",
     "mediarecorder/record-duration": "Opnamelengte (in seconden)",
     "mediarecorder/record-mic": "Microfoon opnemen",
     "mediarecorder/record-until-stop": "Stop met opnemen nadat het project is gestopt",

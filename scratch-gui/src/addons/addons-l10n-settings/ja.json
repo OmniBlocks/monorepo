@@ -156,8 +156,6 @@
     "editor-compact/@name": "コンパクトエディター",
     "editor-compact/@settings-name-hideLabels": "コスチュームとサウンドエディターのボタンのラベルを隠す",
     "editor-theme3/@description": "ブロックの色をカテゴリーごとに変更する。",
-    "editor-theme3/@info-aboutHighContrast": "新しいハイコントラストブロック色は以下でプリセットとして利用できます。",
-    "editor-theme3/@info-disablesMenuBar": "Scratchの「カラーモード」メニューにアクセスしたい場合は、この機能は無効化してください。",
     "editor-theme3/@name": "ブロックの色をカスタマイズ",
     "editor-theme3/@preset-description-black": "ブロックの背景を黒く、枠線と文字を色付きにする",
     "editor-theme3/@preset-description-contrast": "Scratch 3.0のハイコントラストブロック色",

@@ -39,7 +39,6 @@
     "mediarecorder/record-after-flag": "초록 깃발을 클릭할 때까지 녹화를 시작하지 않습니다.",
     "mediarecorder/record-audio": "프로젝트 소리 포함",
     "mediarecorder/record-audio-description": "이것은 TTS가 포함되지 않습니다.",
-    "mediarecorder/record-description": "무대를 WebM 파일로 녹화합니다. 녹화가 끝나면 녹화본을 컴퓨터에 저장할 수 있습니다.\n참고: 변수와 리스트 모니터는 보이지 않습니다.",
     "mediarecorder/record-duration": "녹화 시간(초)",
     "mediarecorder/record-mic": "마이크를 통한 소리 포함",
     "mediarecorder/record-until-stop": "프로젝트가 멈췄을 때 녹화를 종료합니다.",

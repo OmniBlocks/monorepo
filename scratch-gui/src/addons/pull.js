@@ -340,6 +340,8 @@ const SKIP_MESSAGES = [
     'mediarecorder/added-by',
     'editor-theme3/@settings-name-sa-color',
     'editor-theme3/@settings-name-forums',
+    'editor-theme3/@info-disablesMenuBar',
+    'editor-theme3/@info-aboutHighContrast',
     'block-switching/@settings-name-sa'
 ];
 

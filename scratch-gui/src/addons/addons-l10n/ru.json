@@ -34,7 +34,6 @@
     "mediarecorder/record-after-flag": "Не начинать запись, пока не нажат зеленый флаг",
     "mediarecorder/record-audio": "Включить звуки проекта",
     "mediarecorder/record-audio-description": "Это не включает Text-to-Speech.",
-    "mediarecorder/record-description": "Записывает сцену в файл WebM. Вы можете сохранить его на свой компьютер после завершения записи.\nПримечание: переменные и списки не будут видны на записи.",
     "mediarecorder/record-duration": "Продолжительность записи (в секундах)",
     "mediarecorder/record-mic": "Включить звуки из микрофона",
     "mediarecorder/record-until-stop": "Остановить запись после остановки проекта",

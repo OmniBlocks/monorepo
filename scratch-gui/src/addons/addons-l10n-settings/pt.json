@@ -112,8 +112,6 @@
     "zebra-striping/@settings-select-shade-darker": "Escurecer",
     "zebra-striping/@settings-select-shade-lighter": "Clarear",
     "editor-theme3/@description": "Edite as cores dos blocos de cada categoria no editor.",
-    "editor-theme3/@info-aboutHighContrast": "As novas cores dos blocos em Alto Contraste estão disponíveis como pré-definições abaixo.",
-    "editor-theme3/@info-disablesMenuBar": "Se você deseja acessar o menu de \"Modo de Cor\" do Scratch, desative esta funcionalidade.",
     "editor-theme3/@name": "Cores de bloco customizadas",
     "editor-theme3/@preset-description-black": "Deixa os blocos pretos e as bordas/texto coloridos",
     "editor-theme3/@preset-description-contrast": "Paleta de cores dos blocos do Scratch 3.0 em alto contraste",

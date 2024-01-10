@@ -40,7 +40,6 @@
     "mediarecorder/record-after-flag": "Ne začni snemanja, dokler ne kliknem zelene zastavice",
     "mediarecorder/record-audio": "Vključi zvoke projekta",
     "mediarecorder/record-audio-description": "To ne vključuje razširitve Besedilo v govor.",
-    "mediarecorder/record-description": "Posnemite oder kot datoteko WebM. Lahko jo shranite na računalnik, ko je snemanje končano.\nSpremenljivke in seznami ne bodo vidni na posnetku.",
     "mediarecorder/record-duration": "Trajanje snemanja (v sekundah)",
     "mediarecorder/record-mic": "Vključi zvok mikrofona",
     "mediarecorder/record-until-stop": "Končaj snemanje, ko se projekt ustavi",

@@ -155,8 +155,6 @@
     "editor-compact/@name": "Editor compacto",
     "editor-compact/@settings-name-hideLabels": "Esconder etiquetas de botones en editores de disfraces y sonidos",
     "editor-theme3/@description": "Edite los colores para cada categoría de bloques del editor.",
-    "editor-theme3/@info-aboutHighContrast": "Los nuevos bloques de Alto Contraste están disponibles como un preset abajo.",
-    "editor-theme3/@info-disablesMenuBar": "Si quiere acceder al menú de \"Modo de Color\" de Scratch, deshabilite esta opción.",
     "editor-theme3/@name": "Colores de bloques personalizables",
     "editor-theme3/@preset-description-black": "Hace a los fondos de los bloques negros y a los bordes/textos de colores",
     "editor-theme3/@preset-description-contrast": "Paleta de colores de bloques de alto contraste de Scratch 3.0",

@@ -121,8 +121,6 @@
     "zebra-striping/@settings-select-shade-lighter": "Jaśniej",
     "editor-compact/@name": "Kompaktowy Edytor",
     "editor-theme3/@description": "Edytuj kolory bloków dla każdej kategorii w edytorze.",
-    "editor-theme3/@info-aboutHighContrast": "Nowe wysokokontrastowe bloki są dostępne jako preset poniżej.",
-    "editor-theme3/@info-disablesMenuBar": "Jeżeli chcesz uzyskać menu \"Tryb Kolorów\", wyłącz tą funkcję.",
     "editor-theme3/@name": "Niestandardowe kolory bloków",
     "editor-theme3/@preset-description-contrast": "Paleta kolorów bloków wysokiego kontrastu Scratch 3.0",
     "editor-theme3/@preset-description-dark": "Ciemne wersje domyślnych kolorów",

@@ -42,7 +42,6 @@
     "mediarecorder/record-after-flag": "Yeşil Bayrağa tıklanana kadar kayda başlama",
     "mediarecorder/record-audio": "Proje seslerini de kaydet",
     "mediarecorder/record-audio-description": "Bu, Metinden Sese tekniğini desteklemez.",
-    "mediarecorder/record-description": "Sahneyi bir WebM dosyası olarak kaydedin. Kayıt bittikten sonra bilgisayarınıza kaydedebilirsiniz.\nNot: değişken ve liste ekranları görünmeyecek.",
     "mediarecorder/record-duration": "Kayıt Süresi (saniye ile)",
     "mediarecorder/record-mic": "Mikrofondaki sesleri de kaydet",
     "mediarecorder/record-until-stop": "Proje durduğunda kaydı durdur",

@@ -11,7 +11,7 @@ const guiColors = {
     'ui-modal-header-background': '#333333',
     'ui-modal-header-foreground': '#ffffff',
 
-    'ui-white': '#1e1e1e',
+    'ui-white': '#111111',
 
     'ui-black-transparent': '#ffffff26',
 

@@ -1,5 +1,4 @@
 const path = require('path');
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 const base = {
     mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
@@ -29,14 +28,6 @@ const base = {
                 test: /\.(png|svg|wav)$/,
                 loader: 'arraybuffer-loader'
             }
-        ]
-    },
-    optimization: {
-        minimizer: [
-            new UglifyJsPlugin({
-                include: /\.min\.js$/,
-                sourceMap: true
-            })
         ]
     },
     plugins: []

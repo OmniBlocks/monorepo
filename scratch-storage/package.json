@@ -57,9 +57,13 @@
     "jest": "29.5.0",
     "json": "^9.0.4",
     "semantic-release": "^15.10.5",
-    "uglifyjs-webpack-plugin": "2.2.0",
     "webpack": "4.47.0",
     "webpack-cli": "3.1.2"
+  },
+  "overrides": {
+    "webpack@4.47.0": {
+      "terser-webpack-plugin": "^4.2.3"
+    }
   },
   "config": {
     "commitizen": {

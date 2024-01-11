@@ -125,6 +125,27 @@ const groupAddons = () => {
 };
 const groupedAddons = groupAddons();
 
+const getInitialSearch = () => {
+    const hash = location.hash.substring(1);
+    
+    // If the query is an addon ID, it's a better user experience to show the name of the addon
+    // in the search bar instead of a ID they won't understand.
+    if (Object.prototype.hasOwnProperty.call(importedAddons, hash)) {
+        const manifest = importedAddons[hash];
+        return addonTranslations[`${hash}/@name`] || manifest.name;
+    }
+
+    return hash;
+};
+
+const clearHash = () => {
+    // Don't want to insert unnecssary history entry
+    // location.hash = ''; leaves a # in the URL
+    if (location.hash !== '') {
+        history.replaceState(null, null, `${location.pathname}${location.search}`);
+    }
+};
+
 const CreditList = ({credits}) => (
     credits.map((author, index) => {
         const isLast = index === credits.length - 1;
@@ -897,7 +918,7 @@ class AddonSettingsComponent extends React.Component {
         this.state = {
             loading: false,
             dirty: false,
-            search: location.hash ? location.hash.substr(1) : '',
+            search: getInitialSearch(),
             extended: false,
             ...this.readFullAddonState()
         };
@@ -911,6 +932,11 @@ class AddonSettingsComponent extends React.Component {
     componentDidMount () {
         SettingsStore.addEventListener('setting-changed', this.handleSettingStoreChanged);
         document.body.addEventListener('keydown', this.handleKeyDown);
+    }
+    componentDidUpdate (prevProps, prevState) {
+        if (this.state.search !== prevState.search) {
+            clearHash();
+        }
     }
     componentWillUnmount () {
         SettingsStore.removeEventListener('setting-changed', this.handleSettingStoreChanged);

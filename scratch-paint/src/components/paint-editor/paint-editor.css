@@ -224,4 +224,5 @@ $border-radius: 0.25rem;
 
 .button-text {
     width: 100%; /* Fixes button text wrapping in Edge */
+    white-space: nowrap;
 }

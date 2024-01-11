@@ -48,11 +48,6 @@ const icons = {
     [BLOCKS_CUSTOM]: customIcon
 };
 
-const openAddonSettings = () => {
-    const path = process.env.ROUTING_STYLE === 'wildcard' ? 'addons' : 'addons.html';
-    window.open(`${process.env.ROOT}${path}#editor-theme3`);
-};
-
 const ThemeIcon = ({id}) => (
     <img
         src={icons[id]}
@@ -101,13 +96,14 @@ const BlocksThemeMenu = ({
     isOpen,
     isRtl,
     onChangeTheme,
-    onOpen,
+    onOpenCustomSettings,
+    onOpenMenu,
     theme
 }) => (
     <MenuItem expanded={isOpen}>
         <div
             className={styles.option}
-            onClick={onOpen}
+            onClick={onOpenMenu}
         >
             <ThemeIcon id={theme.blocks} />
             <span className={styles.submenuLabel}>
@@ -138,7 +134,7 @@ const BlocksThemeMenu = ({
                 <ThemeMenuItem
                     id={BLOCKS_CUSTOM}
                     isSelected
-                    onClick={openAddonSettings}
+                    onClick={onOpenCustomSettings}
                 />
             )}
         </Submenu>
@@ -149,7 +145,8 @@ BlocksThemeMenu.propTypes = {
     isOpen: PropTypes.bool,
     isRtl: PropTypes.bool,
     onChangeTheme: PropTypes.func,
-    onOpen: PropTypes.func,
+    onOpenCustomSettings: PropTypes.func,
+    onOpenMenu: PropTypes.func,
     theme: PropTypes.instanceOf(Theme)
 };
 
@@ -165,7 +162,7 @@ const mapDispatchToProps = dispatch => ({
         dispatch(closeSettingsMenu());
         persistTheme(theme);
     },
-    onOpen: () => dispatch(openBlocksThemeMenu())
+    onOpenMenu: () => dispatch(openBlocksThemeMenu())
 });
 
 export default connect(

@@ -539,6 +539,8 @@ class MenuBar extends React.Component {
                             canChangeLanguage={this.props.canChangeLanguage}
                             canChangeTheme={this.props.canChangeTheme}
                             isRtl={this.props.isRtl}
+                            // eslint-disable-next-line react/jsx-no-bind
+                            onOpenCustomSettings={this.props.onClickAddonSettings.bind(null, 'editor-theme3')}
                             onRequestClose={this.props.onRequestCloseSettings}
                             onRequestOpen={this.props.onClickSettings}
                             settingsMenuOpen={this.props.settingsMenuOpen}

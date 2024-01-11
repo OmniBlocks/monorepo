@@ -58,9 +58,11 @@ if (process.env.ANNOUNCEMENT) {
     announcement.innerHTML = process.env.ANNOUNCEMENT;
 }
 
-const handleClickAddonSettings = () => {
+const handleClickAddonSettings = addonId => {
+    // addonId might be a string of the addon to focus on, undefined, or an event (treat like undefined)
     const path = process.env.ROUTING_STYLE === 'wildcard' ? 'addons' : 'addons.html';
-    window.open(`${process.env.ROOT}${path}`);
+    const url = `${process.env.ROOT}${path}${typeof addonId === 'string' ? `#${addonId}` : ''}`;
+    window.open(url);
 };
 
 const messages = defineMessages({

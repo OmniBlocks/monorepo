@@ -23,6 +23,7 @@ const StageComponent = props => {
         isFullScreen,
         isPlayerOnly,
         isStarted,
+        isRtl,
         colorInfo,
         micIndicator,
         question,
@@ -37,7 +38,7 @@ const StageComponent = props => {
     const stageDimensions = getStageDimensions(stageSize, customStageSize, isFullScreen);
     const minWidth = getMinWidth(stageSize);
     const transformStyle = stageDimensions.width < minWidth && !isFullScreen ? {
-        transform: `translateX(${(minWidth - stageDimensions.width) / 2}px)`
+        transform: `translateX(${(minWidth - stageDimensions.width) / (isRtl ? -2 : 2)}px)`
     } : {};
 
     return (
@@ -159,6 +160,7 @@ StageComponent.propTypes = {
     isColorPicking: PropTypes.bool,
     isFullScreen: PropTypes.bool.isRequired,
     isPlayerOnly: PropTypes.bool,
+    isRtl: PropTypes.bool,
     isStarted: PropTypes.bool,
     micIndicator: PropTypes.bool,
     onDeactivateColorPicker: PropTypes.func,

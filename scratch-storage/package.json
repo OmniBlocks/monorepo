@@ -1,16 +1,17 @@
 {
-  "name": "scratch-storage",
+  "name": "@turbowarp/scratch-storage",
   "version": "0.0.0-development",
   "description": "Load and store project and asset files for Scratch 3.0",
   "license": "BSD-3-Clause",
-  "homepage": "https://github.com/LLK/scratch-storage#readme",
+  "homepage": "https://github.com/TurboWarp/scratch-storage#readme",
   "repository": {
     "type": "git",
-    "url": "https://github.com/LLK/scratch-storage.git"
+    "url": "https://github.com/TurboWarp/scratch-storage.git"
   },
   "main": "./dist/node/scratch-storage.js",
   "browser": "./dist/web/scratch-storage.js",
   "scripts": {
+    "prepublishOnly": "npm run build",
     "build": "webpack --progress --colors --bail",
     "coverage": "tap ./test/{unit,integration}/*.js --coverage --coverage-report=lcov",
     "commitmsg": "commitlint -e $GIT_PARAMS",
@@ -57,7 +58,7 @@
     "json": "^9.0.4",
     "semantic-release": "^15.10.5",
     "uglifyjs-webpack-plugin": "2.2.0",
-    "webpack": "4.46.0",
+    "webpack": "4.47.0",
     "webpack-cli": "3.1.2"
   },
   "config": {

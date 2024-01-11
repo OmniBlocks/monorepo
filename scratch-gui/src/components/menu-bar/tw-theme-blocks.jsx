@@ -35,8 +35,8 @@ const options = defineMessages({
         id: 'tw.blockColors.dark'
     },
     [BLOCKS_CUSTOM]: {
-        defaultMessage: 'See Addon Settings',
-        description: 'Name for block colors when they are being controlled by the custom block colors addon',
+        defaultMessage: 'Customize in Addon Settings',
+        description: 'Link in block color list to open addon settings for more customization',
         id: 'tw.blockColors.custom'
     }
 });
@@ -120,23 +120,20 @@ const BlocksThemeMenu = ({
             />
         </div>
         <Submenu place={isRtl ? 'left' : 'right'}>
-            {[BLOCKS_THREE, BLOCKS_HIGH_CONTRAST, BLOCKS_DARK].map(i => (
+            {[BLOCKS_THREE, BLOCKS_HIGH_CONTRAST, BLOCKS_DARK, BLOCKS_CUSTOM].map(i => (
                 <ThemeMenuItem
                     key={i}
                     id={i}
                     isSelected={theme.blocks === i}
                     // eslint-disable-next-line react/jsx-no-bind
-                    onClick={() => onChangeTheme(theme.set('blocks', i))}
-                    disabled={theme.blocks === BLOCKS_CUSTOM}
+                    onClick={
+                        i === BLOCKS_CUSTOM ?
+                            onOpenCustomSettings :
+                            () => onChangeTheme(theme.set('blocks', i))
+                    }
+                    disabled={i !== BLOCKS_CUSTOM && theme.blocks === BLOCKS_CUSTOM}
                 />
             ))}
-            {theme.blocks === BLOCKS_CUSTOM && (
-                <ThemeMenuItem
-                    id={BLOCKS_CUSTOM}
-                    isSelected
-                    onClick={onOpenCustomSettings}
-                />
-            )}
         </Submenu>
     </MenuItem>
 );

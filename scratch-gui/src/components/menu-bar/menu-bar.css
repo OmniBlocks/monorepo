@@ -215,11 +215,7 @@
 }
 
 .collapsible-label {
-    margin: 0 .5rem 0 .25rem;
-}
-
-[dir="rtl"] .collapsible-label {
-    margin: 0 0.25rem 0 0.5rem;
+    margin: 0 .25rem;
 }
 
 @media only screen and (max-width: 1024px) {

@@ -75,6 +75,9 @@ const guiColors = {
     'page-background': '#ffffff',
     'page-foreground': '#000000',
 
+    'project-title-inactive': 'var(--ui-white-transparent)',
+    'project-title-hover': '#ffffff7f',
+
     'link-color': '#2255dd',
 
     'filter-icon-black': 'none',

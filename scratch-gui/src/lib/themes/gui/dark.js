@@ -34,6 +34,9 @@ const guiColors = {
     'page-background': '#111111',
     'page-foreground': '#eeeeee',
 
+    'project-title-inactive': 'var(--ui-secondary)',
+    'project-title-hover': '#ffffff3f',
+
     'link-color': '#44aaff',
 
     'filter-icon-black': 'invert(100%)',

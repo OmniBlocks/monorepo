@@ -1,6 +1,7 @@
 @import "../../css/colors.css";
 @import "../../css/units.css";
 @import "../../css/z-index.css";
+@import "../../css/default-colors.css";
 
 /*
 If project-title-input.jsx is part of a menu bar say menu-bar.jsx, it can have additional css classes that
@@ -12,7 +13,7 @@ can set a width for example or what it should do in a flex box (eg. grow).
     border-radius: $form-radius;
     -webkit-border-radius: $form-radius;
     -moz-border-radius: $form-radius;
-    background-color: $ui-white-transparent;
+    background-color: $project-title-inactive;
     background-clip: padding-box;
     -webkit-background-clip: padding-box;
     height: auto;
@@ -33,15 +34,15 @@ can set a width for example or what it should do in a flex box (eg. grow).
 }
 
 .title-field:hover {
-    background-color: hsla(0, 100%, 100%, 0.5);
-    border-color: $ui-tertiary;
+    background-color: $project-title-hover;
+    border-color: $ui-black-transparent; /* dont use hover border from custom input */
 }
 
 .title-field:focus {
     outline:none;
     border: 1px solid $ui-transparent;
-    -webkit-box-shadow: 0 0 0 calc($space * .5) $ui-white-transparent;
-    box-shadow: 0 0 0 calc($space * .5) $ui-white-transparent;
+    -webkit-box-shadow: 0 0 0 calc($space * .5) $ui-white-transparent-default;
+    box-shadow: 0 0 0 calc($space * .5) $ui-white-transparent-default;
     background-color: $ui-white;
     color: $text-primary;
 }

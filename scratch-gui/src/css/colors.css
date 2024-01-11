@@ -73,4 +73,7 @@ $badge-border: var(--badge-border);
 $page-background: var(--page-background);
 $page-foreground: var(--page-foreground);
 
+$project-title-inactive: var(--project-title-inactive);
+$project-title-hover: var(--project-title-hover);
+
 $link-color: var(--link-color);

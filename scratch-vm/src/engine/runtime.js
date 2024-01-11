@@ -1349,7 +1349,7 @@ class Runtime extends EventEmitter {
         // the category block icon.
         const iconURI = blockInfo.blockIconURI || categoryInfo.blockIconURI;
 
-        // All extension blocks have are from_extension
+        // All extension blocks have from_extension
         blockJSON.extensions.push('from_extension');
 
         // Allow easily detecting which blocks use default colors

@@ -46,8 +46,6 @@ a {
 }
 
 .editor {
-    min-width: 1024px;
-    min-height: 640px;
     height: 100%;
 }
 .editor .center {

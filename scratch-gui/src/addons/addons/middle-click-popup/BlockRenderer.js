@@ -259,18 +259,19 @@ function _renderBlock(block, container, parentCategory, isVertical) {
   const category = block.typeInfo.category;
 
   const COLOR_CLASSES = [
-    'motion',
-    'looks',
-    'sound',
-    'events',
-    'control',
-    'sensing',
-    'operators',
-    'variables',
-    'lists',
-    'myBlocks',
-    'pen',
-    'addon-custom-block'
+    "motion",
+    "looks",
+    "sounds",
+    "events",
+    "control",
+    "sensing",
+    "operators",
+    "data",
+    "data-lists",
+    "list",
+    "more",
+    "pen",
+    "addon-custom-block"
   ];
   const categoryClass = COLOR_CLASSES.includes(category.name) ? "sa-block-color-" + category.name : null;
 

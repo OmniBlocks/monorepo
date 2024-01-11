@@ -8,6 +8,6 @@
 .sa-block-color {
   --sa-block-text: black;
   --sa-block-gray-text: black;
-  --sa-block-colored-text: var(--sa-block-background-tertiary);
+  --sa-block-colored-text: var(--sa-block-background-tertiary, black);
   --sa-block-text-on-bright-background: black;
 }

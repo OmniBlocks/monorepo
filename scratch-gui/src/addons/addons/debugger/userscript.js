@@ -457,7 +457,7 @@ export default async function ({ addon, console, msg }) {
       if (!text) {
         return null;
       }
-      category = jsonData.colour?.toLowerCase() === "#0fbd8c" ? "pen" : jsonData.category;
+      category = jsonData?.extensions.includes("default_extension_colors") ? "pen" : jsonData.category;
       const isStatement =
         (jsonData.extensions &&
           (jsonData.extensions.includes("shape_statement") ||
@@ -479,18 +479,19 @@ export default async function ({ addon, console, msg }) {
     element.dataset.shape = shape;
 
     const COLOR_CLASSES = [
-      'motion',
-      'looks',
-      'sound',
-      'events',
-      'control',
-      'sensing',
-      'operators',
-      'variables',
-      'lists',
-      'myBlocks',
-      'pen',
-      'addon-custom-block'
+      "motion",
+      "looks",
+      "sounds",
+      "events",
+      "control",
+      "sensing",
+      "operators",
+      "data",
+      "data-lists",
+      "list",
+      "more",
+      "pen",
+      "addon-custom-block"
     ];
     if (COLOR_CLASSES.includes(category)) {
       element.classList.add(`sa-block-color-${category}`);

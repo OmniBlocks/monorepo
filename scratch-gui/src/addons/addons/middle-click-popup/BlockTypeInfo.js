@@ -345,7 +345,7 @@ export class BlockTypeInfo {
     if (block.type === "procedures_call") {
       if (vm.getAddonBlock(block.getProcCode())) name = "addon-custom-block";
       else name = "more";
-    } else if (block.colour_.toLowerCase() === '#0fbd8c') name = "pen";
+    } else if (block.usesDefaultExtensionColors) name = "pen";
     else if (block.type === "sensing_of") name = "sensing";
     else if (block.type === "event_whenbackdropswitchesto") name = "events";
     else name = block.category_;

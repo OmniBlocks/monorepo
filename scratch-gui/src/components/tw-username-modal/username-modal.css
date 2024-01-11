@@ -23,6 +23,7 @@
     height: 3rem;
     color: $text-primary-transparent;
     font-size: .875rem;
+    background-color: $input-background;
 }
 
 .button-row {

@@ -1,3 +1,5 @@
+const {Headers, applyMetadata} = require('./scratchFetch');
+
 /**
  * Get and send assets with a worker that uses fetch.
  */
@@ -13,13 +15,13 @@ class PrivateFetchWorkerTool {
 
         /**
          * A possible error occurred standing up the worker.
-         * @type {!Error}
+         * @type {Error?}
          */
         this._supportError = null;
 
         /**
          * The worker that runs fetch and returns data for us.
-         * @type {!Worker}
+         * @type {Worker?}
          */
         this.worker = null;
 
@@ -34,9 +36,9 @@ class PrivateFetchWorkerTool {
                 // eslint-disable-next-line global-require
                 const FetchWorker = require('worker-loader?{"inline":true,"fallback":true}!./FetchWorkerTool.worker');
 
-                this.worker = new FetchWorker();
+                const worker = new FetchWorker();
 
-                this.worker.addEventListener('message', ({data}) => {
+                worker.addEventListener('message', ({data}) => {
                     if (data.support) {
                         this._workerSupport = data.support;
                         return;
@@ -52,6 +54,8 @@ class PrivateFetchWorkerTool {
                         }
                     }
                 });
+
+                this.worker = worker;
             }
         } catch (error) {
             this._supportError = error;
@@ -78,17 +82,27 @@ class PrivateFetchWorkerTool {
      * Request data from a server with a worker using fetch.
      * @param {{url:string}} reqConfig - Request configuration for data to get.
      * @param {{method:string}} options - Additional options to configure fetch.
-     * @returns {Promise.<Buffer>} Resolve to Buffer of data from server.
+     * @returns {Promise.<Buffer|Uint8Array|null>} Resolve to Buffer of data from server.
      */
     get ({url, ...options}) {
         return new Promise((resolve, reject) => {
             // TODO: Use a Scratch standard ID generator ...
             const id = Math.random().toString(16)
                 .substring(2);
+            const augmentedOptions = applyMetadata(
+                Object.assign({method: 'GET'}, options)
+            );
+            // the Fetch spec says options.headers could be:
+            // "A Headers object, an object literal, or an array of two-item arrays to set request's headers."
+            // structured clone (postMessage) doesn't support Headers objects
+            // so turn it into an array of two-item arrays to make it to the worker intact
+            if (augmentedOptions && augmentedOptions.headers instanceof Headers) {
+                augmentedOptions.headers = Array.from(augmentedOptions.headers.entries());
+            }
             this.worker.postMessage({
                 id,
                 url,
-                options: Object.assign({method: 'GET'}, options)
+                options: augmentedOptions
             });
             this.jobs[id] = {
                 id,
@@ -153,7 +167,7 @@ class PublicFetchWorkerTool {
     /**
      * Request data from a server with a worker that uses fetch.
      * @param {{url:string}} reqConfig - Request configuration for data to get.
-     * @returns {Promise.<Buffer>} Resolve to Buffer of data from server.
+     * @returns {Promise.<Buffer|Uint8Array|null>} Resolve to Buffer of data from server.
      */
     get (reqConfig) {
         return this.inner.get(reqConfig);

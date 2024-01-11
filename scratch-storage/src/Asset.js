@@ -58,7 +58,6 @@ const memoizedToString = (assetId, data) => {
                 // Encode the latest chunk so the we create one big output
                 // string instead of creating a big input string and then
                 // one big output string.
-                /* global btoa */
                 s += btoa(s_);
             }
             memoizedStrings[assetId] = s;

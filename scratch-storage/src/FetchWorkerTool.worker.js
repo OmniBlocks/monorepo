@@ -1,6 +1,6 @@
 /* eslint-env worker */
 
-const saferFetchAsArrayBuffer = require('./safer-fetch');
+const saferFetch = require('./safer-fetch');
 
 const complete = [];
 
@@ -34,18 +34,17 @@ const checkCompleted = () => {
  * @param {object} options.job A job id, url, and options descriptor to perform.
  */
 const onMessage = ({data: job}) => {
-    saferFetchAsArrayBuffer(job.url, job.options)
+    saferFetch(job.url, job.options)
+        .then(result => {
+            if (result.ok) return result.arrayBuffer();
+            if (result.status === 404) return null;
+            return Promise.reject(result.status);
+        })
         .then(buffer => complete.push({id: job.id, buffer}))
         .catch(error => complete.push({id: job.id, error: (error && error.message) || `Failed request: ${job.url}`}))
         .then(checkCompleted);
 };
 
-if (self.fetch) {
-    postMessage({support: {fetch: true}});
-    self.addEventListener('message', onMessage);
-} else {
-    postMessage({support: {fetch: false}});
-    self.addEventListener('message', ({data: job}) => {
-        postMessage([{id: job.id, error: 'fetch is unavailable'}]);
-    });
-}
+// crossFetch means "fetch" is now always supported
+postMessage({support: {fetch: true}});
+self.addEventListener('message', onMessage);

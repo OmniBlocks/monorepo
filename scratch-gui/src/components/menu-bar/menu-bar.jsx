@@ -1138,6 +1138,9 @@ const mapStateToProps = (state, ownProps) => {
     const loadingState = state.scratchGui.projectState.loadingState;
     const user = state.session && state.session.session && state.session.session.user;
     return {
+        authorUsername: state.scratchGui.tw.author.username,
+        authorThumbnailUrl: state.scratchGui.tw.author.thumbnail,
+        projectId: state.scratchGui.projectState.projectId,
         aboutMenuOpen: aboutMenuOpen(state),
         accountMenuOpen: accountMenuOpen(state),
         currentLocale: state.locales.locale,

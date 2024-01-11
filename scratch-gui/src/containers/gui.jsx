@@ -42,6 +42,7 @@ import GUIComponent from '../components/gui/gui.jsx';
 import {setIsScratchDesktop} from '../lib/isScratchDesktop.js';
 import TWFullScreenResizerHOC from '../lib/tw-fullscreen-resizer-hoc.jsx';
 import TWThemeManagerHOC from './tw-theme-manager-hoc.jsx';
+import TWProjectMetaFetcherHOC from '../lib/tw-project-meta-fetcher-hoc.jsx';
 
 const {RequestMetadata, setMetadata, unsetMetadata} = storage.scratchFetch;
 
@@ -204,6 +205,7 @@ const WrappedGui = compose(
     ErrorBoundaryHOC('Top Level App'),
     TWThemeManagerHOC, // componentDidUpdate() needs to run very early for icons to update immediately
     TWFullScreenResizerHOC,
+    TWProjectMetaFetcherHOC,
     FontLoaderHOC,
     // QueryParserHOC, // tw: HOC is unused
     ProjectFetcherHOC,

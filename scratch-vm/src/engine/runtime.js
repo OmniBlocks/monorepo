@@ -1327,7 +1327,7 @@ class Runtime extends EventEmitter {
             type: extendedOpcode,
             inputsInline: true,
             category: categoryInfo.name,
-            extensions: blockInfo.extensions ?? [],
+            extensions: [],
             colour: blockInfo.color1 ?? categoryInfo.color1,
             colourSecondary: blockInfo.color2 ?? categoryInfo.color2,
             colourTertiary: blockInfo.color3 ?? categoryInfo.color3
@@ -1349,10 +1349,21 @@ class Runtime extends EventEmitter {
         // the category block icon.
         const iconURI = blockInfo.blockIconURI || categoryInfo.blockIconURI;
 
+        // All extension blocks have are from_extension
+        blockJSON.extensions.push('from_extension');
+
+        // Allow easily detecting which blocks use default colors
+        if (
+            blockJSON.colour === defaultExtensionColors[0] &&
+            blockJSON.colourSecondary === defaultExtensionColors[1] &&
+            blockJSON.colourTertiary === defaultExtensionColors[2]
+        ) {
+            blockJSON.extensions.push('default_extension_colors');
+        }
+
         if (iconURI) {
-            if (!blockJSON.extensions.includes('scratch_extension')) {
-                blockJSON.extensions.push('scratch_extension');
-            }
+            // scratch_extension is a misleading name - this is for fixing the icon rendering
+            blockJSON.extensions.push('scratch_extension');
             blockJSON.message0 = '%1 %2';
             const iconJSON = {
                 type: 'field_image',
@@ -1464,6 +1475,14 @@ class Runtime extends EventEmitter {
         const mutation = blockInfo.isDynamic ? `<mutation blockInfo="${xmlEscape(JSON.stringify(blockInfo))}"/>` : '';
         const inputs = context.inputList.join('');
         const blockXML = `<block type="${xmlEscape(extendedOpcode)}">${mutation}${inputs}</block>`;
+
+        if (blockInfo.extensions) {
+            for (const extension of blockInfo.extensions) {
+                if (!blockJSON.extensions.includes(extension)) {
+                    blockJSON.extensions.push(extension);
+                }
+            }
+        }
 
         return {
             info: context.blockInfo,

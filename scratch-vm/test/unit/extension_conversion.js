@@ -144,7 +144,7 @@ const testReporter = function (t, reporter) {
     t.equal(reporter.json.output, 'String');
     t.notOk(Object.prototype.hasOwnProperty.call(reporter.json, 'previousStatement'));
     t.notOk(Object.prototype.hasOwnProperty.call(reporter.json, 'nextStatement'));
-    t.same(reporter.json.extensions, ['scratch_extension']);
+    t.same(reporter.json.extensions, ['from_extension', 'scratch_extension']);
     t.equal(reporter.json.message0, '%1 %2simple text'); // "%1 %2" from the block icon
     t.notOk(Object.prototype.hasOwnProperty.call(reporter.json, 'message1'));
     t.same(reporter.json.args0, [
@@ -172,7 +172,7 @@ const testInlineImage = function (t, inlineImage) {
     t.equal(inlineImage.json.output, 'String');
     t.notOk(Object.prototype.hasOwnProperty.call(inlineImage.json, 'previousStatement'));
     t.notOk(Object.prototype.hasOwnProperty.call(inlineImage.json, 'nextStatement'));
-    t.notOk(inlineImage.json.extensions && inlineImage.json.extensions.length); // OK if it's absent or empty
+    t.same(inlineImage.json.extensions, ['from_extension']);
     t.equal(inlineImage.json.message0, 'text and %1'); // block text followed by inline image
     t.notOk(Object.prototype.hasOwnProperty.call(inlineImage.json, 'message1'));
     t.same(inlineImage.json.args0, [
@@ -200,7 +200,7 @@ const testCommand = function (t, command) {
     t.equal(command.json.outputShape, ScratchBlocksConstants.OUTPUT_SHAPE_SQUARE);
     t.assert(Object.prototype.hasOwnProperty.call(command.json, 'previousStatement'));
     t.assert(Object.prototype.hasOwnProperty.call(command.json, 'nextStatement'));
-    t.notOk(command.json.extensions && command.json.extensions.length); // OK if it's absent or empty
+    t.same(command.json.extensions, ['from_extension']);
     t.equal(command.json.message0, 'text with %1 %2');
     t.notOk(Object.prototype.hasOwnProperty.call(command.json, 'message1'));
     t.strictSame(command.json.args0[0], {
@@ -220,7 +220,7 @@ const testConditional = function (t, conditional) {
     t.equal(conditional.json.outputShape, ScratchBlocksConstants.OUTPUT_SHAPE_SQUARE);
     t.ok(Object.prototype.hasOwnProperty.call(conditional.json, 'previousStatement'));
     t.ok(Object.prototype.hasOwnProperty.call(conditional.json, 'nextStatement'));
-    t.notOk(conditional.json.extensions && conditional.json.extensions.length); // OK if it's absent or empty
+    t.same(conditional.json.extensions, ['from_extension']);
     t.equal(conditional.json.message0, 'test if %1 is spiffy and if so then');
     t.equal(conditional.json.message1, '%1'); // placeholder for substack #1
     t.equal(conditional.json.message2, 'or elsewise');
@@ -250,7 +250,7 @@ const testLoop = function (t, loop) {
     t.equal(loop.json.outputShape, ScratchBlocksConstants.OUTPUT_SHAPE_SQUARE);
     t.ok(Object.prototype.hasOwnProperty.call(loop.json, 'previousStatement'));
     t.notOk(Object.prototype.hasOwnProperty.call(loop.json, 'nextStatement')); // isTerminal is set on this block
-    t.notOk(loop.json.extensions && loop.json.extensions.length); // OK if it's absent or empty
+    t.same(loop.json.extensions, ['from_extension']);
     t.equal(loop.json.message0, 'loopty %1 loops');
     t.equal(loop.json.message1, '%1'); // placeholder for substack
     t.equal(loop.json.message2, '%1'); // placeholder for loop arrow

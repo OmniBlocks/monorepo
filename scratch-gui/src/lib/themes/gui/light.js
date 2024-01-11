@@ -90,7 +90,7 @@ const guiColors = {
     'paint-looks-secondary': 'var(--looks-secondary)',
     'paint-looks-transparent': 'var(--looks-transparent)',
     'paint-input-background': 'var(--input-background)',
-    'paint-popover-background': '#ffffff',
+    'paint-popover-background': 'var(--popover-background)',
     'paint-filter-icon-gray': 'none'
 };
 

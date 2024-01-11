@@ -23,7 +23,7 @@ const guiColors = {
 
     'input-background': '#1e1e1e',
 
-    'popover-background': '#333333',
+    'popover-background': '#1e1e1e',
 
     'badge-background': '#16202c',
     'badge-border': '#203652',
@@ -43,7 +43,6 @@ const guiColors = {
     'filter-icon-gray': 'grayscale(100%) brightness(1.7)',
     'filter-icon-white': 'brightness(0) invert(100%)',
 
-    'paint-popover-background': '#333333',
     'paint-filter-icon-gray': 'brightness(1.7)'
 };
 

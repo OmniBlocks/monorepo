@@ -57,7 +57,14 @@ module.exports = [
         module: {
             rules: [{
                 options: {
-                    presets: [['env', {targets: {browsers: ['last 3 versions', 'Safari >= 8', 'iOS >= 8']}}]]
+                    presets: [['env', {targets: {browsers: [
+                        'chrome >= 70',
+                        'chromeandroid >= 70',
+                        'ios >= 12',
+                        'safari >= 12',
+                        'edge >= 18',
+                        'firefox >= 68'
+                    ]}}]]
                 }
             }]
         },

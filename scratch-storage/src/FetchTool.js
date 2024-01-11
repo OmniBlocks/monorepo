@@ -1,5 +1,6 @@
 const {scratchFetch} = require('./scratchFetch');
 const saferFetch = require('./safer-fetch');
+const isNullResponse = require('./isNullResponse');
 
 /**
  * @typedef {Request & {withCredentials: boolean}} ScratchSendRequest
@@ -27,7 +28,7 @@ class FetchTool {
         return saferFetch(url, Object.assign({method: 'GET'}, options))
             .then(result => {
                 if (result.ok) return result.arrayBuffer().then(b => new Uint8Array(b));
-                if (result.status === 404) return null;
+                if (isNullResponse(result)) return null;
                 return Promise.reject(result.status); // TODO: we should throw a proper error
             });
     }

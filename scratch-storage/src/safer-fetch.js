@@ -1,35 +1,31 @@
-/* eslint-env browser */
 /* eslint-disable no-use-before-define */
 
-// This throttles and retries fetch() to mitigate the effect of random network errors and
+const {scratchFetch} = require('./scratchFetch');
+
+// This throttles and retries scratchFetch() to mitigate the effect of random network errors and
 // random browser errors (especially in Chrome)
 
 let currentFetches = 0;
 const queue = [];
 
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+
 const startNextFetch = ([resolve, url, options]) => {
     let firstError;
     let failedAttempts = 0;
 
-    const attemptToFetch = () => fetch(url, options)
-        .then(result => {
-            // In a macOS WKWebView, requests from file: URLs to other file: URLs always have status: 0 and ok: false
-            // even though the requests were successful. If the requested file doesn't exist, fetch() rejects instead.
-            // We aren't aware of any other cases where fetch() can resolve with status 0, so this should be safe.
-            if (result.ok || result.status === 0) return result.arrayBuffer();
-            if (result.status === 404) return null;
-            return Promise.reject(result.status);
-        })
-        .then(buffer => {
-            currentFetches--;
-            checkStartNextFetch();
-            return buffer;
-        })
+    const done = result => {
+        currentFetches--;
+        checkStartNextFetch();
+        resolve(result);
+    };
+
+    const attemptToFetch = () => scratchFetch(url, options)
+        .then(done)
         .catch(error => {
-            if (error === 403) {
-                // Retrying this request will not help, so return an error now.
-                throw error;
-            }
+            // If fetch() errors, it means there was a network error of some sort.
+            // This is worth retrying, especially as some browser will randomly fail requests
+            // if we send too many at once (as we do).
 
             console.warn(`Attempt to fetch ${url} failed`, error);
             if (!firstError) {
@@ -38,16 +34,14 @@ const startNextFetch = ([resolve, url, options]) => {
 
             if (failedAttempts < 2) {
                 failedAttempts++;
-                return new Promise(cb => setTimeout(cb, (failedAttempts + Math.random() - 1) * 5000))
-                    .then(attemptToFetch);
+                sleep((failedAttempts + Math.random() - 1) * 5000).then(attemptToFetch);
+                return;
             }
 
-            currentFetches--;
-            checkStartNextFetch();
-            throw firstError;
+            done(Promise.reject(firstError));
         });
 
-    return resolve(attemptToFetch());
+    attemptToFetch();
 };
 
 const checkStartNextFetch = () => {
@@ -57,9 +51,9 @@ const checkStartNextFetch = () => {
     }
 };
 
-const saferFetchAsArrayBuffer = (url, options) => new Promise(resolve => {
+const saferFetch = (url, options) => new Promise(resolve => {
     queue.push([resolve, url, options]);
     checkStartNextFetch();
 });
 
-module.exports = saferFetchAsArrayBuffer;
+module.exports = saferFetch;

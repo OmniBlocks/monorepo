@@ -1,5 +1,6 @@
 /* eslint-env worker */
 
+const isNullResponse = require('./isNullResponse');
 const saferFetch = require('./safer-fetch');
 
 const complete = [];
@@ -37,7 +38,7 @@ const onMessage = ({data: job}) => {
     saferFetch(job.url, job.options)
         .then(result => {
             if (result.ok) return result.arrayBuffer();
-            if (result.status === 404) return null;
+            if (isNullResponse(result)) return null;
             return Promise.reject(result.status);
         })
         .then(buffer => complete.push({id: job.id, buffer}))

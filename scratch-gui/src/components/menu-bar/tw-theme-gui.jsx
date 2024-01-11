@@ -23,7 +23,7 @@ const GuiThemeMenu = ({
             onClick={() => onChangeTheme(theme.set('gui', theme.gui === GUI_DARK ? GUI_LIGHT : GUI_DARK))}
         >
             <img
-                src={theme.gui === GUI_DARK ? darkModeIcon : lightModeIcon}
+                src={theme.gui === GUI_DARK ? lightModeIcon : darkModeIcon}
                 draggable={false}
                 width={24}
                 height={24}
@@ -31,14 +31,14 @@ const GuiThemeMenu = ({
             <span className={styles.submenuLabel}>
                 {theme.gui === GUI_DARK ? (
                     <FormattedMessage
-                        defaultMessage="Dark Mode"
-                        description="The name of dark mode"
+                        defaultMessage="Switch To Light Mode"
+                        description="Menu item to change color scheme to light (it is currently dark)"
                         id="tw.darkMode"
                     />
                 ) : (
                     <FormattedMessage
-                        defaultMessage="Light Mode"
-                        description="The name of light mode"
+                        defaultMessage="Switch To Dark Mode"
+                        description="Menu item to change color scheme to dark (it is currently light)"
                         id="tw.lightMode"
                     />
                 )}

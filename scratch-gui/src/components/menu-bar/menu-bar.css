@@ -38,6 +38,7 @@
     flex-wrap: nowrap;
     align-items: center;
     flex-grow: 1;
+    gap: 0.5rem;
 }
 .inactive {
     opacity: 0;
@@ -53,7 +54,6 @@
 
 .menu-bar-item {
     display: flex;
-    padding: 0 0.25rem;
     text-decoration: none;
     user-select: none;
     align-self: center;
@@ -86,11 +86,11 @@
     display: flex;
     flex-direction: row;
     align-items: center;
+    gap: 0.5rem;
 }
 
 .file-group .menu-bar-item {
-    margin: 0 .25rem;
-    padding: 0 0.75rem;
+    padding: 0 0.5rem;
 }
 
 .menu-bar-menu {
@@ -110,7 +110,6 @@
 }
 
 .divider {
-    margin: 0 .5rem;
     height: 34px;
 }
 
@@ -218,7 +217,7 @@
     margin: 0 .25rem;
 }
 
-@media only screen and (max-width: 1024px) {
+@media only screen and (max-width: 1124px) {
     .tutorials-label, .collapsible-label {
         display: none;
     }

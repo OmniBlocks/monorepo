@@ -62,7 +62,7 @@
     max-height: calc(100dvh - 5rem);
 }
 
-@media only screen and (max-width: 1024px) {
+@media only screen and (max-width: 1124px) {
     .dropdown-label {
         display: none;
     }

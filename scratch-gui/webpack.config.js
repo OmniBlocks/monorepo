@@ -189,6 +189,7 @@ module.exports = [
                 template: 'src/playground/index.ejs',
                 filename: 'editor.html',
                 title: `${APP_NAME} - Run Scratch projects faster`,
+                isEditor: true,
                 ...htmlWebpackPluginCommon
             }),
             new HtmlWebpackPlugin({

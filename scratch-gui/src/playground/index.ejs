@@ -98,7 +98,12 @@
         var splash = document.getElementById('spash-waiting-for-js');
         splash.setAttribute('data-theme', theme);
         if (theme !== 'dark') {
-          splash.style.color = accent;
+          <% if (htmlWebpackPlugin.options.isEditor) { %>
+            splash.style.backgroundColor = accent;
+            splash.style.color = 'white';
+          <% } else { %>
+            splash.style.color = accent;
+          <% } %>
         }
         splash.hidden = false;
       })();

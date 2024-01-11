@@ -17,7 +17,7 @@ const base = {
                         '@babel/plugin-transform-runtime'
                     ],
                     presets: [
-                        ['@babel/preset-env', {targets: {browsers: ['last 3 versions', 'Safari >= 8', 'iOS >= 8']}}]
+                        ['@babel/preset-env']
                     ],
                     // Consider a file a "module" if import/export statements are present, or else consider it a
                     // "script". Fixes "Cannot assign to read only property 'exports'" when using

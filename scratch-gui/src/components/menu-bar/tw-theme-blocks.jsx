@@ -30,12 +30,12 @@ const options = defineMessages({
         id: 'tw.blockColors.highContrast'
     },
     [BLOCKS_DARK]: {
-        defaultMessage: 'Dark',
+        defaultMessage: 'Dark (Beta)',
         description: 'Name of the dark block colors',
         id: 'tw.blockColors.dark'
     },
     [BLOCKS_CUSTOM]: {
-        defaultMessage: 'Addon Settings',
+        defaultMessage: 'See Addon Settings',
         description: 'Name for block colors when they are being controlled by the custom block colors addon',
         id: 'tw.blockColors.custom'
     }

@@ -180,6 +180,7 @@
     background-color: $ui-white-transparent-default;
     overflow: hidden;
     position: relative;
+    margin: auto;
 }
 .bar-inner {
     position: absolute;

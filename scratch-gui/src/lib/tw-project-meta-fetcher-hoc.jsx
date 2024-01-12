@@ -49,14 +49,11 @@ const setIndexable = indexable => {
 
 const TWProjectMetaFetcherHOC = function (WrappedComponent) {
     class ProjectMetaFetcherComponent extends React.Component {
-        shouldComponentUpdate (nextProps) {
-            return this.props.projectId !== nextProps.projectId;
-        }
         componentDidUpdate () {
             // project title resetting is handled in titled-hoc.jsx
             this.props.onSetAuthor('', '');
             this.props.onSetDescription('', '');
-            const projectId = this.props.projectId;
+            const projectId = this.props.reduxProjectId;
             // Don't try to load metadata for empty projects.
             if (projectId === '0') {
                 return;
@@ -64,7 +61,7 @@ const TWProjectMetaFetcherHOC = function (WrappedComponent) {
             fetchProjectMeta(projectId)
                 .then(data => {
                     // If project ID changed, ignore the results.
-                    if (this.props.projectId !== projectId) {
+                    if (this.props.reduxProjectId !== projectId) {
                         return;
                     }
                     const title = data.title;
@@ -92,7 +89,7 @@ const TWProjectMetaFetcherHOC = function (WrappedComponent) {
         render () {
             const {
                 /* eslint-disable no-unused-vars */
-                projectId,
+                reduxProjectId,
                 onSetAuthor,
                 onSetDescription,
                 onSetProjectTitle,
@@ -107,13 +104,13 @@ const TWProjectMetaFetcherHOC = function (WrappedComponent) {
         }
     }
     ProjectMetaFetcherComponent.propTypes = {
-        projectId: PropTypes.string,
+        reduxProjectId: PropTypes.string,
         onSetAuthor: PropTypes.func,
         onSetDescription: PropTypes.func,
         onSetProjectTitle: PropTypes.func
     };
     const mapStateToProps = state => ({
-        projectId: state.scratchGui.projectState.projectId
+        reduxProjectId: state.scratchGui.projectState.projectId
     });
     const mapDispatchToProps = dispatch => ({
         onSetAuthor: (username, thumbnail) => dispatch(setAuthor({

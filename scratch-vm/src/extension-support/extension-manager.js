@@ -287,7 +287,7 @@ class ExtensionManager {
                     dispatch.call('runtime', '_refreshExtensionPrimitives', info);
                 })
                 .catch(e => {
-                    log.error(`Failed to refresh built-in extension primitives: ${e}`);
+                    log.error('Failed to refresh built-in extension primitives', e);
                 })
         );
         return Promise.all(allPromises);

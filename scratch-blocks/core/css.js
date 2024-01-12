@@ -994,7 +994,7 @@ Blockly.Css.CONTENT = [
   '.scratchColourPickerLabel {',
     'font-family: "Helvetica Neue", Helvetica, sans-serif;',
     'font-size: 0.65rem;',
-    'color: $colour_blackText;',
+    'color: $colour_valueReportForeground;',
     'margin: 8px;',
   '}',
 

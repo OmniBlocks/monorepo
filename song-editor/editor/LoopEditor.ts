@@ -20,13 +20,16 @@ export class LoopEditor {
 		private readonly _startMode:   number = 0;
 		private readonly _endMode:     number = 1;
 		private readonly _bothMode:    number = 2;
+		private _loopAtPoint: number = -1;
 		
 		private readonly _loop: SVGPathElement = SVG.path({fill: "none", stroke: ColorConfig.loopAccent, "stroke-width": 4});
+		private readonly _barLoop: SVGPathElement = SVG.path({fill: "none", stroke: ColorConfig.uiWidgetFocus, "stroke-width": 2});
 		private readonly _highlight: SVGPathElement = SVG.path({fill: ColorConfig.hoverPreview, "pointer-events": "none"});
 		
 	private readonly _svg: SVGSVGElement = SVG.svg({style: `touch-action: pan-y; position: absolute;`, height: this._editorHeight},
 		this._loop,
 		this._highlight,
+		this._barLoop
 	);
 		
 	public readonly container: HTMLElement = HTML.div({class: "loopEditor"}, this._svg);
@@ -46,6 +49,7 @@ export class LoopEditor {
 	private _renderedLoopStop: number = -1;
 	private _renderedBarCount: number = 0;
 	private _renderedBarWidth: number = -1;
+	private _renderedBarLoop: number = -1;
 		
 	constructor(private _doc: SongDocument) {
 		this._updateCursorStatus();
@@ -265,6 +269,11 @@ export class LoopEditor {
 	private _documentChanged = (): void => {
 		this._render();
 	}
+
+	public setLoopAt(bar: number): void {
+		this._loopAtPoint = bar;
+		this._render();
+    }
 		
 	private _render(): void {
 		this._barWidth = this._doc.getBarWidth();
@@ -292,6 +301,23 @@ export class LoopEditor {
 				`A ${radius - 2} ${radius - 2} ${0} ${0} ${1} ${loopStart + radius} ${2} ` +
 				`z`
 			);
+		}
+
+		const barLoopStart = (this._loopAtPoint + 0.5) * this._barWidth;
+		if (this._renderedBarLoop != barLoopStart) {
+			if (barLoopStart < 0) {
+				this._barLoop.setAttribute("d", "");
+			}
+			else {
+				this._barLoop.setAttribute("d",
+					`M ${barLoopStart} ${radius * 1.5} ` +
+					`L ${barLoopStart - radius} ${radius}` +
+					`L ${barLoopStart} ${radius * 0.5}` +
+					`L ${barLoopStart + radius} ${radius}` +
+					`z`
+				);
+			}
+			this._renderedBarLoop = barLoopStart;
 		}
 			
 		this._updatePreview();

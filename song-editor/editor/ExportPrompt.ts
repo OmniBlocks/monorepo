@@ -318,8 +318,9 @@ export class ExportPrompt implements Prompt {
         }
 
       
+        this.synth.initModFilters(this._doc.song);
         this.synth.computeLatestModValues();
-	      this.synth.warmUpSynthesizer(this._doc.song);
+	    this.synth.warmUpSynthesizer(this._doc.song);
 
         this.sampleFrames = this.synth.getTotalSamples(this._enableIntro.checked, this._enableOutro.checked, this.synth.loopRepeatCount);
         // Compute how many UI updates will need to run to determine how many 
@@ -614,7 +615,7 @@ export class ExportPrompt implements Prompt {
                                     if (ExportPrompt.midiChipInstruments.length > instrument.chipWave) {
                                         instrumentProgram = ExportPrompt.midiChipInstruments[instrument.chipWave];
                                     }
-                                } else if (instrument.type == InstrumentType.pwm || instrument.type == InstrumentType.fm || instrument.type == InstrumentType.fm6op || instrument.type == InstrumentType.harmonics) {
+                                } else if (instrument.type == InstrumentType.pwm || instrument.type == InstrumentType.fm || instrument.type == InstrumentType.fm6op || instrument.type == InstrumentType.harmonics || instrument.type == InstrumentType.supersaw) {
                                     instrumentProgram = 81; // sawtooth
                                 } else if (instrument.type == InstrumentType.pickedString) {
                                     instrumentProgram = 0x19; // steel guitar

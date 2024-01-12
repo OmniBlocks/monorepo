@@ -89,23 +89,6 @@
             color: var(--link-accent, #98f);
         }
 
-        .donation form {
-            display: inline;
-        }
-
-        .donation input[type="submit"] {
-            -webkit-appearance: none;
-            background: none;
-            border: none;
-            font-family: inherit;
-            font-size: inherit;
-            color: var(--link-accent, #98f);
-            text-decoration: underline;
-            cursor: pointer;
-            padding: 0;
-            margin: 0;
-        }
-
         /* wide screen */
 		@media (min-width: 711px) {
             html {
@@ -156,9 +139,10 @@
 
 <h2>Version 2.2</h2>
 	<h3> <ul>
-	<li>Ported over the latest jummbox update</li>
+	<li>Ported over the latest Jummbox update</li>
 		<ul>
-		<li></li>
+		<li>You can view the latest Jummbox patch notes <a href="https://jummb.us/patch_notes/2.6">here</a></li>
+		<li>Because of this, the "Beats per Bar" keybind has been moved to Shift+B</li>
 		</ul>
 	<li>Added custom unisons</li>
 		<ul>
@@ -170,16 +154,28 @@
 		</ul>
 	<li>"Unison" is now a valid envelope target in custom chip</li>
 	<li>The PWM Decimal Offset setting now exports in json</li>
-	<li>add info about the changes that came with nep's pull request lol</li>
-	<li>Fixed a bug involving FM voices in 6-op FM instruments</li>
+		<!-- <li>ALL PROMPTS will no longer close if you click off of it</li> -->
+	<li>URLs added via "Add multiple samples" are no longer erroneously percent-decoded</li>
+	<li>Fixed a bug involving modulated FM voices in 6-op FM instruments</li>
 	<li>Fixed a bug where UltraBox presets would reset the instrument volume to 0</li>
+	<li>Fixed a bug involving incorrect use of the theme cache</li>
+	<!-- <li>Fixed the decimal offset mods being incorrectly flipped</li>
+		<ul>
+		<li>The decimal offset slider will be removed and replaced with input box functionality in the future</li>
+		</ul> -->
+	<li>Fixed potential issues involving decimal offset and switching between instrument types:</li>
+		<ul>
+		<li>The decimal offset itself would not reset when switching</li>
+		<li>The decimal offset mod option wouldn't get removed when switching</li>
+		</ul>
 	<li>Renamed pink noise and brownian noise to pink and brownian respectively</li>
-	<li>Certain themes now loop like their channels as they did in their original mod</li>
+	<li>Certain themes now loop their channels like they did in their original mod</li>
 		<ul>
 		<li>The effected themes include: Modbox, Sandbox, Brucebox, Shitbox 1.0/3.0...</li>
 		<li>...Shitbox 2.0, Nerdbox, Dogebox, Todbox Dark Mode, Mainbox, and Wackybox</li>
 		</ul>
 	<li>Added the Dogebox2 theme and renamed the "Blubox 1.0" theme to "Blubox"</li>
+	<li>Updated the Midbox theme</li>
 	<!-- also changed some images (eg. icon_32 and icon_windows_150) but idk how to list here -->
 	<li>The 404 page no longer includes custom images and music</li>
 	</ul> </h3>

@@ -5049,13 +5049,14 @@ export class Song {
             } break;
             case SongTagCode.envelopes: {
                 const pregoldToEnvelope: number[] = [0, 1, 2, 4, 5, 6, 8, 9, 10, 12, 13, 14, 16, 17, 18, 19, 20, 21, 23, 24, 25, 27, 28, 29, 32, 33, 34, 31, 11];
+                const jummToUltraEnvelope: number[] = [0, 1, 2, 4, 5, 6, 8, 9, 10, 12, 13, 14, 16, 17, 18, 19, 20, 21, 23, 24, 25, 58, 59, 60];
                 const instrument: Instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                 if ((beforeNine && fromBeepBox) || (beforeFive && fromJummBox) || (beforeFour && fromGoldBox)) {
                     const legacySettings: LegacySettings = legacySettingsCache![instrumentChannelIterator][instrumentIndexIterator];
                     legacySettings.operatorEnvelopes = [];
                     for (let o: number = 0; o < (instrument.type == InstrumentType.fm6op ? 6 : Config.operatorCount); o++) {
                         let aa:number = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
-                        if ((beforeTwo && fromGoldBox) || (!fromGoldBox && !fromUltraBox)) aa = pregoldToEnvelope[aa];  
+                        if ((beforeTwo && fromGoldBox) || (!fromGoldBox && !fromUltraBox)) aa = pregoldToEnvelope[aa];
                         legacySettings.operatorEnvelopes[o] = Song._envelopeFromLegacyIndex(aa);
                     }
                     instrument.convertLegacySettings(legacySettings, forceSimpleFilter);
@@ -5074,7 +5075,8 @@ export class Song {
                             index = clamp(0, maxCount, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                         }
                         let aa:number = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
-                        if ((beforeTwo && fromGoldBox) || (!fromGoldBox && !fromUltraBox)) aa = pregoldToEnvelope[aa]; 
+                        if ((beforeTwo && fromGoldBox) || (fromBeepBox)) aa = pregoldToEnvelope[aa]; 
+                        if (fromJummBox && !beforeSix) aa = jummToUltraEnvelope[aa];
                         const envelope: number = clamp(0, Config.envelopes.length, aa);
                         instrument.addEnvelope(target, index, envelope);
                     }
@@ -8690,6 +8692,7 @@ export class Synth {
     public setModValue(volumeStart: number, volumeEnd: number, channelIndex: number, instrumentIndex: number, setting: number): number {
         let val: number = volumeStart + Config.modulators[setting].convertRealFactor;
         let nextVal: number = volumeEnd + Config.modulators[setting].convertRealFactor;
+        // should these be turned into a function?
         if (Config.modulators[setting].optionalModify == "invert-0to50") {
             val = 50 - val;
             nextVal = 50 - nextVal;
@@ -8698,7 +8701,6 @@ export class Synth {
             val = 99 - val;
             nextVal = 99 - nextVal;
         }
-        //should this be turned into a function?
         if (Config.modulators[setting].forSong) {
             if (this.modValues[setting] == null || this.modValues[setting] != val || this.nextModValues[setting] != nextVal) {
                 this.modValues[setting] = val;
@@ -10923,11 +10925,21 @@ export class Synth {
                 }
 
 				const shapeStart: number = useShapeStart * envelopeStarts[EnvelopeComputeIndex.supersawShape];
-				const shapeEnd:   number = useShapeEnd * envelopeEnds[  EnvelopeComputeIndex.supersawShape];
+				const shapeEnd:   number = useShapeEnd * envelopeEnds[EnvelopeComputeIndex.supersawShape];
 				tone.supersawShape = shapeStart;
 				tone.supersawShapeDelta = (shapeEnd - shapeStart) / roundedSamplesPerTick;
 
-				const basePulseWidth: number = getPulseWidthRatio(instrument.pulseWidth);
+                //decimal offset mods
+                let decimalOffsetModStart: number = instrument.decimalOffset;
+                if (this.isModActive(Config.modulators.dictionary["decimal offset"].index, channelIndex, tone.instrumentIndex)) {
+                    decimalOffsetModStart = this.getModValue(Config.modulators.dictionary["decimal offset"].index, channelIndex, tone.instrumentIndex, false);
+                }
+ 
+                const decimalOffsetStart: number = decimalOffsetModStart * envelopeStarts[EnvelopeComputeIndex.decimalOffset];
+                // ...is including tone.decimalOffset still necessary?
+                tone.decimalOffset = decimalOffsetStart;
+
+                const basePulseWidth: number = getPulseWidthRatio(instrument.pulseWidth);
 
                 // Check for PWM mods to this instrument
                 let pulseWidthModStart: number = basePulseWidth;
@@ -10937,8 +10949,10 @@ export class Synth {
                     pulseWidthModEnd = (this.getModValue(Config.modulators.dictionary["pulse width"].index, channelIndex, tone.instrumentIndex, true)) / (Config.pulseWidthRange * 2);
                 }
 
-                const pulseWidthStart: number = pulseWidthModStart * envelopeStarts[EnvelopeComputeIndex.pulseWidth];
-                const pulseWidthEnd: number = pulseWidthModEnd * envelopeEnds[EnvelopeComputeIndex.pulseWidth];
+                let pulseWidthStart: number = pulseWidthModStart * envelopeStarts[EnvelopeComputeIndex.pulseWidth];
+                let pulseWidthEnd: number = pulseWidthModEnd * envelopeEnds[EnvelopeComputeIndex.pulseWidth];
+                pulseWidthStart -= decimalOffsetStart / 10000;
+                pulseWidthEnd -= decimalOffsetStart / 10000;
 				const phaseDeltaStart: number = (tone.supersawPrevPhaseDelta != null) ? tone.supersawPrevPhaseDelta : startFreq * sampleTime;
 				const phaseDeltaEnd: number = startFreq * sampleTime * freqEndRatio;
 				tone.supersawPrevPhaseDelta = phaseDeltaEnd;

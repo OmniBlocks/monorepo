@@ -98,8 +98,7 @@ const injectExtensionBlockTheme = (blockInfoJson, theme) => {
     // Minor optimization -- don't do anything at all for the default theme.
     if (theme.blocks === BLOCKS_THREE) return blockInfoJson;
 
-    const usesCustomColors = blockInfoJson.colour && blockInfoJson.colour.toLowerCase() !== DEFAULT_EXTENSION_PRIMARY;
-    if (usesCustomColors) {
+    if (!blockInfoJson.extensions?.includes('default_extension_colors')) {
         const converters = theme.getCustomExtensionColors();
         return {
             ...blockInfoJson,

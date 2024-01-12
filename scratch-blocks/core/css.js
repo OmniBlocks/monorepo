@@ -986,7 +986,7 @@ Blockly.Css.CONTENT = [
     'border: none;',
     'width: 100%;',
     'text-align: center;',
-    'border-top: 1px solid #ddd;',
+    'border-top: 1px solid $colour_valueReportBorder;',
     'padding-top: 5px;',
     'cursor: pointer;',
   '}',

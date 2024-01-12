@@ -538,8 +538,13 @@ class Blocks extends React.Component {
                     // The factory should only know static info about the block: the category info and the opcode.
                     // Anything else will be picked up from the XML attached to the block instance.
                     const extendedOpcode = `${categoryInfo.id}_${blockInfo.info.opcode}`;
-                    const blockDefinition =
-                        defineDynamicBlock(this.ScratchBlocks, categoryInfo, blockInfo, extendedOpcode);
+                    const blockDefinition = defineDynamicBlock(
+                        this.ScratchBlocks,
+                        categoryInfo,
+                        blockInfo,
+                        extendedOpcode,
+                        this.props.theme
+                    );
                     this.ScratchBlocks.Blocks[extendedOpcode] = blockDefinition;
                 });
             }

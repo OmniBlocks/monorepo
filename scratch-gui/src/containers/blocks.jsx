@@ -42,6 +42,7 @@ import {
 } from '../reducers/editor-tab';
 import AddonHooks from '../addons/hooks.js';
 import LoadScratchBlocksHOC from '../lib/tw-load-scratch-blocks-hoc.jsx';
+import {findTopBlock} from '../lib/backpack/code-payload.js';
 
 // TW: Strings we add to scratch-blocks are localized here
 const messages = defineMessages({
@@ -628,9 +629,9 @@ class Blocks extends React.Component {
     handleDrop (dragInfo) {
         fetch(dragInfo.payload.bodyUrl)
             .then(response => response.json())
-            .then(blocks => {
-                // based on https://github.com/ScratchAddons/ScratchAddons/pull/7028/files
-                const topBlock = blocks.find(block => block.topLevel);
+            .then(payload => {
+                // based on https://github.com/ScratchAddons/ScratchAddons/pull/7028
+                const topBlock = findTopBlock(payload);
                 if (topBlock) {
                     const metrics = this.props.workspaceMetrics.targets[this.props.vm.editingTarget.id];
                     if (metrics) {
@@ -643,7 +644,7 @@ class Blocks extends React.Component {
                         topBlock.y = (-metrics.scrollY - top + y) / metrics.scale;
                     }
                 }
-                return this.props.vm.shareBlocksToTarget(blocks, this.props.vm.editingTarget.id);
+                return this.props.vm.shareBlocksToTarget(payload, this.props.vm.editingTarget.id);
             })
             .then(() => {
                 this.props.vm.refreshWorkspace();

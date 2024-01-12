@@ -20,4 +20,12 @@ const codePayload = ({blockObjects, topBlockId}) => {
         });
 };
 
-export default codePayload;
+const findTopBlock = payload => {
+    const blocks = payload.extensionURLs ? payload.blocks : payload;
+    return blocks.find(i => i.topLevel);
+};
+
+export {
+    codePayload as default,
+    findTopBlock
+};

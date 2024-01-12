@@ -24,6 +24,7 @@ import {fetchSprite, fetchCode} from '../lib/backpack-api';
 import randomizeSpritePosition from '../lib/randomize-sprite-position';
 import downloadBlob from '../lib/download-blob';
 import log from '../lib/log';
+import {findTopBlock} from '../lib/backpack/code-payload.js';
 
 class TargetPane extends React.Component {
     constructor (props) {
@@ -166,9 +167,9 @@ class TargetPane extends React.Component {
             this.props.onReceivedBlocks(true);
         }
     }
-    shareBlocks (blocks, targetId, optFromTargetId) {
+    shareBlocks (payload, targetId, optFromTargetId) {
         // Position the top-level block based on the scroll position.
-        const topBlock = blocks.find(block => block.topLevel);
+        const topBlock = findTopBlock(payload);
         if (topBlock) {
             let metrics;
             if (this.props.workspaceMetrics.targets[targetId]) {
@@ -196,7 +197,7 @@ class TargetPane extends React.Component {
             topBlock.y = posY / scale;
         }
 
-        return this.props.vm.shareBlocksToTarget(blocks, targetId, optFromTargetId);
+        return this.props.vm.shareBlocksToTarget(payload, targetId, optFromTargetId);
     }
     handleDrop (dragInfo) {
         const {sprite: targetId} = this.props.hoveredTarget;

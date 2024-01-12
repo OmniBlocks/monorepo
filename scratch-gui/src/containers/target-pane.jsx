@@ -14,7 +14,6 @@ import {showStandardAlert, closeAlertWithId} from '../reducers/alerts';
 import {setRestore} from '../reducers/restore-deletion';
 import DragConstants from '../lib/drag-constants';
 import TargetPaneComponent from '../components/target-pane/target-pane.jsx';
-import {BLOCKS_DEFAULT_SCALE} from '../lib/layout-constants';
 import {getSpriteLibrary} from '../lib/libraries/tw-async-libraries';
 import {handleFileUpload, spriteUpload} from '../lib/file-uploader.js';
 import sharedMessages from '../lib/shared-messages';
@@ -24,7 +23,7 @@ import {fetchSprite, fetchCode} from '../lib/backpack-api';
 import randomizeSpritePosition from '../lib/randomize-sprite-position';
 import downloadBlob from '../lib/download-blob';
 import log from '../lib/log';
-import {findTopBlock} from '../lib/backpack/code-payload.js';
+import {placeInViewport} from '../lib/backpack/code-payload.js';
 
 class TargetPane extends React.Component {
     constructor (props) {
@@ -169,35 +168,8 @@ class TargetPane extends React.Component {
     }
     shareBlocks (payload, targetId, optFromTargetId) {
         // Position the top-level block based on the scroll position.
-        const topBlock = findTopBlock(payload);
-        if (topBlock) {
-            let metrics;
-            if (this.props.workspaceMetrics.targets[targetId]) {
-                metrics = this.props.workspaceMetrics.targets[targetId];
-            } else {
-                metrics = {
-                    scrollX: 0,
-                    scrollY: 0,
-                    scale: BLOCKS_DEFAULT_SCALE
-                };
-            }
-
-            // Determine position of the top-level block based on the target's workspace metrics.
-            const {scrollX, scrollY, scale} = metrics;
-            const posY = -scrollY + 30;
-            let posX;
-            if (this.props.isRtl) {
-                posX = scrollX + 30;
-            } else {
-                posX = -scrollX + 30;
-            }
-
-            // Actually apply the position!
-            topBlock.x = posX / scale;
-            topBlock.y = posY / scale;
-        }
-
-        return this.props.vm.shareBlocksToTarget(payload, targetId, optFromTargetId);
+        const centered = placeInViewport(payload, this.props.workspaceMetrics.targets[targetId], this.props.isRtl);
+        return this.props.vm.shareBlocksToTarget(centered, targetId, optFromTargetId);
     }
     handleDrop (dragInfo) {
         const {sprite: targetId} = this.props.hoveredTarget;

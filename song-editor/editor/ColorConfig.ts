@@ -5573,7 +5573,7 @@ export class ColorConfig {
 				}
 			`,
 			"midbox":
-		`:root {
+			`:root {
 			--page-margin: #010a1e;
 			--editor-background: #010a1e;
 			--hover-preview: #dfe9fe;
@@ -5594,6 +5594,7 @@ export class ColorConfig {
 			--black-piano-key: #253353;
 			--oscilloscope-line-L: #72dcfc;
 			--oscilloscope-line-R: #304eff;
+			--mod-title: #1b2fff;
 			--use-color-formula: true;
 			--track-editor-bg-pitch: #183b65; 
 			--track-editor-bg-pitch-dim: #1f2c3d;
@@ -5612,81 +5613,82 @@ export class ColorConfig {
 			--mod-label-primary: #14383f;
 			--mod-label-secondary-text: #1d7080;
 			--mod-label-primary-text: #b7e9f2;
-			--pitch-secondary-channel-hue: 0;
-			--pitch-secondary-channel-hue-scale: 6.1;
-			--pitch-secondary-channel-sat: 83.3;
+			--pitch-secondary-channel-hue: 190;
+			--pitch-secondary-channel-hue-scale: 2.5;
+			--pitch-secondary-channel-sat: 80;
 			--pitch-secondary-channel-sat-scale: 0.1;
-			--pitch-secondary-channel-lum: 40;
+			--pitch-secondary-channel-lum: 50;
 			--pitch-secondary-channel-lum-scale: 0.05;
-			--pitch-primary-channel-hue: 0;
-			--pitch-primary-channel-hue-scale: 6.1;
+			--pitch-primary-channel-hue: 190;
+			--pitch-primary-channel-hue-scale: 2.5;
 			--pitch-primary-channel-sat: 100;
 			--pitch-primary-channel-sat-scale: 0.1;
-			--pitch-primary-channel-lum: 67.5;
+			--pitch-primary-channel-lum: 76.5;
 			--pitch-primary-channel-lum-scale: 0.05;
-			--pitch-secondary-note-hue: 0;
-			--pitch-secondary-note-hue-scale: 6.1;
-			--pitch-secondary-note-sat: 93.9;
+			--pitch-secondary-note-hue: 190;
+			--pitch-secondary-note-hue-scale: 2.5;
+			--pitch-secondary-note-sat: 90;
 			--pitch-secondary-note-sat-scale: 0.1;
-			--pitch-secondary-note-lum: 25;
+			--pitch-secondary-note-lum: 30;
 			--pitch-secondary-note-lum-scale: 0.05;
-			--pitch-primary-note-hue: 0;
-			--pitch-primary-note-hue-scale: 6.1;
+			--pitch-primary-note-hue: 190;
+			--pitch-primary-note-hue-scale: 2.5;
 			--pitch-primary-note-sat: 100;
 			--pitch-primary-note-sat-scale: 0.05;
-			--pitch-primary-note-lum: 85.6;
+			--pitch-primary-note-lum: 85;
 			--pitch-primary-note-lum-scale: 0.025;
-			--noise-secondary-channel-hue: 0;
-			--noise-secondary-channel-hue-scale: 2;
+			--noise-secondary-channel-hue: 200;
+			--noise-secondary-channel-hue-scale: 2.5;
 			--noise-secondary-channel-sat: 25;
 			--noise-secondary-channel-sat-scale: 0;
 			--noise-secondary-channel-lum: 42;
 			--noise-secondary-channel-lum-scale: 0;
-			--noise-primary-channel-hue: 0;
-			--noise-primary-channel-hue-scale: 2;
+			--noise-primary-channel-hue: 200;
+			--noise-primary-channel-hue-scale: 2.5;
 			--noise-primary-channel-sat: 33;
 			--noise-primary-channel-sat-scale: 0;
 			--noise-primary-channel-lum: 63.5;
 			--noise-primary-channel-lum-scale: 0;
-			--noise-secondary-note-hue: 0;
-			--noise-secondary-note-hue-scale: 2;
+			--noise-secondary-note-hue: 200;
+			--noise-secondary-note-hue-scale: 2.5;
 			--noise-secondary-note-sat: 33.5;
 			--noise-secondary-note-sat-scale: 0;
 			--noise-secondary-note-lum: 55;
 			--noise-secondary-note-lum-scale: 0;
-			--noise-primary-note-hue: 0;
-			--noise-primary-note-hue-scale: 2;
+			--noise-primary-note-hue: 200;
+			--noise-primary-note-hue-scale: 2.5;
 			--noise-primary-note-sat: 46.5;
 			--noise-primary-note-sat-scale: 0;
 			--noise-primary-note-lum: 74;
 			--noise-primary-note-lum-scale: 0;
-			--mod-secondary-channel-hue: 192;
+			--mod-secondary-channel-hue: 140;
 			--mod-secondary-channel-hue-scale: 1.5;
-			--mod-secondary-channel-sat: 88;
+			--mod-secondary-channel-sat: 90;
 			--mod-secondary-channel-sat-scale: 0;
-			--mod-secondary-channel-lum: 50;
+			--mod-secondary-channel-lum: 55;
 			--mod-secondary-channel-lum-scale: 0;
-			--mod-primary-channel-hue: 192;
+			--mod-primary-channel-hue: 140;
 			--mod-primary-channel-hue-scale: 1.5;
-			--mod-primary-channel-sat: 96;
+			--mod-primary-channel-sat: 100;
 			--mod-primary-channel-sat-scale: 0;
-			--mod-primary-channel-lum: 80;
+			--mod-primary-channel-lum: 85;
 			--mod-primary-channel-lum-scale: 0;
-			--mod-secondary-note-hue: 192;
+			--mod-secondary-note-hue: 140;
 			--mod-secondary-note-hue-scale: 1.5;
-			--mod-secondary-note-sat: 92;
+			--mod-secondary-note-sat: 95;
 			--mod-secondary-note-sat-scale: 0;
-			--mod-secondary-note-lum: 45;
+			--mod-secondary-note-lum: 50;
 			--mod-secondary-note-lum-scale: 0;
-			--mod-primary-note-hue: 192;
+			--mod-primary-note-hue: 140;
 			--mod-primary-note-hue-scale: 1.5;
-			--mod-primary-note-sat: 96;
+			--mod-primary-note-sat: 100;
 			--mod-primary-note-sat-scale: 0;
-			--mod-primary-note-lum: 85;
+			--mod-primary-note-lum: 90;
 			--mod-primary-note-lum-scale: 0;
 			--disabled-note-primary:    #53527b;
 			--disabled-note-secondary:  #1c1b30;
-		}`,
+		}
+						`,
 		"dogebox2": `
 			:root {
 				--page-margin: #000015;
@@ -6395,7 +6397,7 @@ export class ColorConfig {
 
 	public static getArbitaryChannelColor(type: string, channel: number): ChannelColors {
 
-        if (getComputedStyle(this._styleElement).getPropertyValue("--use-color-formula").trim() == "false") {
+        if (!this.usesColorFormula) {
             let base: ChannelColors;
             switch (type) {
                 case ("noise"): {
@@ -6427,133 +6429,60 @@ export class ColorConfig {
         }
         switch (type) {
             case ("noise"): {
-                const noiseSecondaryChannelHue: number = +getComputedStyle(this._styleElement).getPropertyValue("--noise-secondary-channel-hue");
-                const noiseSecondaryChannelHueScale: number = +getComputedStyle(this._styleElement).getPropertyValue("--noise-secondary-channel-hue-scale");
-                const noiseSecondaryChannelSat: number = +getComputedStyle(this._styleElement).getPropertyValue("--noise-secondary-channel-sat");
-                const noiseSecondaryChannelSatScale: number = +getComputedStyle(this._styleElement).getPropertyValue("--noise-secondary-channel-sat-scale");
-                const noiseSecondaryChannelLum: number = +getComputedStyle(this._styleElement).getPropertyValue("--noise-secondary-channel-lum");
-                const noiseSecondaryChannelLumScale: number = +getComputedStyle(this._styleElement).getPropertyValue("--noise-secondary-channel-lum-scale");
-                const noisePrimaryChannelHue: number = +getComputedStyle(this._styleElement).getPropertyValue("--noise-primary-channel-hue");
-                const noisePrimaryChannelHueScale: number = +getComputedStyle(this._styleElement).getPropertyValue("--noise-primary-channel-hue-scale");
-                const noisePrimaryChannelSat: number = +getComputedStyle(this._styleElement).getPropertyValue("--noise-primary-channel-sat");
-                const noisePrimaryChannelSatScale: number = +getComputedStyle(this._styleElement).getPropertyValue("--noise-primary-channel-sat-scale");
-                const noisePrimaryChannelLum: number = +getComputedStyle(this._styleElement).getPropertyValue("--noise-primary-channel-lum");
-                const noisePrimaryChannelLumScale: number = +getComputedStyle(this._styleElement).getPropertyValue("--noise-primary-channel-lum-scale");
-                const noiseSecondaryNoteHue: number = +getComputedStyle(this._styleElement).getPropertyValue("--noise-secondary-note-hue");
-                const noiseSecondaryNoteHueScale: number = +getComputedStyle(this._styleElement).getPropertyValue("--noise-secondary-note-hue-scale");
-                const noiseSecondaryNoteSat: number = +getComputedStyle(this._styleElement).getPropertyValue("--noise-secondary-note-sat");
-                const noiseSecondaryNoteSatScale: number = +getComputedStyle(this._styleElement).getPropertyValue("--noise-secondary-note-sat-scale");
-                const noiseSecondaryNoteLum: number = +getComputedStyle(this._styleElement).getPropertyValue("--noise-secondary-note-lum");
-                const noiseSecondaryNoteLumScale: number = +getComputedStyle(this._styleElement).getPropertyValue("--noise-secondary-note-lum-scale");
-                const noisePrimaryNoteHue: number = +getComputedStyle(this._styleElement).getPropertyValue("--noise-primary-note-hue");
-                const noisePrimaryNoteHueScale: number = +getComputedStyle(this._styleElement).getPropertyValue("--noise-primary-note-hue-scale");
-                const noisePrimaryNoteSat: number = +getComputedStyle(this._styleElement).getPropertyValue("--noise-primary-note-sat");
-                const noisePrimaryNoteSatScale: number = +getComputedStyle(this._styleElement).getPropertyValue("--noise-primary-note-sat-scale");
-                const noisePrimaryNoteLum: number = +getComputedStyle(this._styleElement).getPropertyValue("--noise-primary-note-lum");
-                const noisePrimaryNoteLumScale: number = +getComputedStyle(this._styleElement).getPropertyValue("--noise-primary-note-lum-scale");
+				// Noise formula
 
-                let newChannelSecondary: string = "hsl(" + ((+noiseSecondaryChannelHue + ((channel * +noiseSecondaryChannelHueScale) / Config.noiseChannelCountMax) * 256) % 256) + ","
-                    + (+noiseSecondaryChannelSat + channel * +noiseSecondaryChannelSatScale) + "%,"
-                    + (+noiseSecondaryChannelLum + channel * +noiseSecondaryChannelLumScale) + "%)";
-                let newChannelPrimary: string = "hsl(" + ((+noisePrimaryChannelHue + ((channel * +noisePrimaryChannelHueScale) / Config.noiseChannelCountMax) * 256) % 256) + ","
-                    + (+noisePrimaryChannelSat + channel * +noisePrimaryChannelSatScale) + "%,"
-                    + (+noisePrimaryChannelLum + channel * +noisePrimaryChannelLumScale) + "%)";
-                let newNoteSecondary: string = "hsl(" + ((+noiseSecondaryNoteHue + ((channel * +noiseSecondaryNoteHueScale) / Config.noiseChannelCountMax) * 256) % 256) + ","
-                    + (+noiseSecondaryNoteSat + channel * +noiseSecondaryNoteSatScale) + "%,"
-                    + (+noiseSecondaryNoteLum + channel * +noiseSecondaryNoteLumScale) + "%)";
-                let newNotePrimary: string = "hsl(" + ((+noisePrimaryNoteHue + ((channel * +noisePrimaryNoteHueScale) / Config.noiseChannelCountMax) * 256) % 256) + ","
-                    + (+noisePrimaryNoteSat + channel * +noisePrimaryNoteSatScale) + "%,"
-                    + (+noisePrimaryNoteLum + channel * +noisePrimaryNoteLumScale) + "%)";
+                let newChannelSecondary: string = "hsl(" + ((this.c_noiseSecondaryChannelHue + ((channel * this.c_noiseSecondaryChannelHueScale) / Config.noiseChannelCountMax) * 256) % 360) + ","
+                    + (this.c_noiseSecondaryChannelSat + channel * this.c_noiseSecondaryChannelSatScale) + "%,"
+                    + (this.c_noiseSecondaryChannelLum + channel * this.c_noiseSecondaryChannelLumScale) + "%)";
+                let newChannelPrimary: string = "hsl(" + ((this.c_noisePrimaryChannelHue + ((channel * this.c_noisePrimaryChannelHueScale) / Config.noiseChannelCountMax) * 256) % 360) + ","
+                    + (this.c_noisePrimaryChannelSat + channel * this.c_noisePrimaryChannelSatScale) + "%,"
+                    + (this.c_noisePrimaryChannelLum + channel * this.c_noisePrimaryChannelLumScale) + "%)";
+                let newNoteSecondary: string = "hsl(" + ((this.c_noiseSecondaryNoteHue + ((channel * this.c_noiseSecondaryNoteHueScale) / Config.noiseChannelCountMax) * 256) % 360) + ","
+                    + (this.c_noiseSecondaryNoteSat + channel * this.c_noiseSecondaryNoteSatScale) + "%,"
+                    + (this.c_noiseSecondaryNoteLum + channel * this.c_noiseSecondaryNoteLumScale) + "%)";
+                let newNotePrimary: string = "hsl(" + ((this.c_noisePrimaryNoteHue + ((channel * this.c_noisePrimaryNoteHueScale) / Config.noiseChannelCountMax) * 256) % 360) + ","
+                    + (this.c_noisePrimaryNoteSat + channel * this.c_noisePrimaryNoteSatScale) + "%,"
+                    + (this.c_noisePrimaryNoteLum + channel * this.c_noisePrimaryNoteLumScale) + "%)";
 
                 let newChannelColors = <ChannelColors>{ secondaryChannel: newChannelSecondary, primaryChannel: newChannelPrimary, secondaryNote: newNoteSecondary, primaryNote: newNotePrimary };
-                ColorConfig.colorLookup.set(channel, newChannelColors);
                 return newChannelColors;
             } case ("mod"): {
                 // Mod formula
-                const modSecondaryChannelHue: number = +getComputedStyle(this._styleElement).getPropertyValue("--mod-secondary-channel-hue");
-                const modSecondaryChannelHueScale: number = +getComputedStyle(this._styleElement).getPropertyValue("--mod-secondary-channel-hue-scale");
-                const modSecondaryChannelSat: number = +getComputedStyle(this._styleElement).getPropertyValue("--mod-secondary-channel-sat");
-                const modSecondaryChannelSatScale: number = +getComputedStyle(this._styleElement).getPropertyValue("--mod-secondary-channel-sat-scale");
-                const modSecondaryChannelLum: number = +getComputedStyle(this._styleElement).getPropertyValue("--mod-secondary-channel-lum");
-                const modSecondaryChannelLumScale: number = +getComputedStyle(this._styleElement).getPropertyValue("--mod-secondary-channel-lum-scale");
-                const modPrimaryChannelHue: number = +getComputedStyle(this._styleElement).getPropertyValue("--mod-primary-channel-hue");
-                const modPrimaryChannelHueScale: number = +getComputedStyle(this._styleElement).getPropertyValue("--mod-primary-channel-hue-scale");
-                const modPrimaryChannelSat: number = +getComputedStyle(this._styleElement).getPropertyValue("--mod-primary-channel-sat");
-                const modPrimaryChannelSatScale: number = +getComputedStyle(this._styleElement).getPropertyValue("--mod-primary-channel-sat-scale");
-                const modPrimaryChannelLum: number = +getComputedStyle(this._styleElement).getPropertyValue("--mod-primary-channel-lum");
-                const modPrimaryChannelLumScale: number = +getComputedStyle(this._styleElement).getPropertyValue("--mod-primary-channel-lum-scale");
-                const modSecondaryNoteHue: number = +getComputedStyle(this._styleElement).getPropertyValue("--mod-secondary-note-hue");
-                const modSecondaryNoteHueScale: number = +getComputedStyle(this._styleElement).getPropertyValue("--mod-secondary-note-hue-scale");
-                const modSecondaryNoteSat: number = +getComputedStyle(this._styleElement).getPropertyValue("--mod-secondary-note-sat");
-                const modSecondaryNoteSatScale: number = +getComputedStyle(this._styleElement).getPropertyValue("--mod-secondary-note-sat-scale");
-                const modSecondaryNoteLum: number = +getComputedStyle(this._styleElement).getPropertyValue("--mod-secondary-note-lum");
-                const modSecondaryNoteLumScale: number = +getComputedStyle(this._styleElement).getPropertyValue("--mod-secondary-note-lum-scale");
-                const modPrimaryNoteHue: number = +getComputedStyle(this._styleElement).getPropertyValue("--mod-primary-note-hue");
-                const modPrimaryNoteHueScale: number = +getComputedStyle(this._styleElement).getPropertyValue("--mod-primary-note-hue-scale");
-                const modPrimaryNoteSat: number = +getComputedStyle(this._styleElement).getPropertyValue("--mod-primary-note-sat");
-                const modPrimaryNoteSatScale: number = +getComputedStyle(this._styleElement).getPropertyValue("--mod-primary-note-sat-scale");
-                const modPrimaryNoteLum: number = +getComputedStyle(this._styleElement).getPropertyValue("--mod-primary-note-lum");
-                const modPrimaryNoteLumScale: number = +getComputedStyle(this._styleElement).getPropertyValue("--mod-primary-note-lum-scale");
 
-                let newChannelSecondary: string = "hsl(" + ((+modSecondaryChannelHue + ((channel * +modSecondaryChannelHueScale) / Config.modChannelCountMax) * 256) % 256) + ","
-                    + (+modSecondaryChannelSat + channel * +modSecondaryChannelSatScale) + "%,"
-                    + (+modSecondaryChannelLum + channel * +modSecondaryChannelLumScale) + "%)";
-                let newChannelPrimary: string = "hsl(" + ((+modPrimaryChannelHue + ((channel * +modPrimaryChannelHueScale) / Config.modChannelCountMax) * 256) % 256) + ","
-                    + (+modPrimaryChannelSat + channel * +modPrimaryChannelSatScale) + "%,"
-                    + (+modPrimaryChannelLum + channel * +modPrimaryChannelLumScale) + "%)";
-                let newNoteSecondary: string = "hsl(" + ((+modSecondaryNoteHue + ((channel * +modSecondaryNoteHueScale) / Config.modChannelCountMax) * 256) % 256) + ","
-                    + (+modSecondaryNoteSat + channel * +modSecondaryNoteSatScale) + "%,"
-                    + (+modSecondaryNoteLum + channel * +modSecondaryNoteLumScale) + "%)";
-                let newNotePrimary: string = "hsl(" + ((+modPrimaryNoteHue + ((channel * +modPrimaryNoteHueScale) / Config.modChannelCountMax) * 256) % 256) + ","
-                    + (+modPrimaryNoteSat + channel * +modPrimaryNoteSatScale) + "%,"
-                    + (+modPrimaryNoteLum + channel * +modPrimaryNoteLumScale) + "%)";
+                let newChannelSecondary: string = "hsl(" + ((this.c_modSecondaryChannelHue + ((channel * this.c_modSecondaryChannelHueScale) / Config.modChannelCountMax) * 256) % 360) + ","
+                    + (this.c_modSecondaryChannelSat + channel * this.c_modSecondaryChannelSatScale) + "%,"
+                    + (this.c_modSecondaryChannelLum + channel * this.c_modSecondaryChannelLumScale) + "%)";
+                let newChannelPrimary: string = "hsl(" + ((this.c_modPrimaryChannelHue + ((channel * this.c_modPrimaryChannelHueScale) / Config.modChannelCountMax) * 256) % 360) + ","
+                    + (this.c_modPrimaryChannelSat + channel * this.c_modPrimaryChannelSatScale) + "%,"
+                    + (this.c_modPrimaryChannelLum + channel * this.c_modPrimaryChannelLumScale) + "%)";
+                let newNoteSecondary: string = "hsl(" + ((this.c_modSecondaryNoteHue + ((channel * this.c_modSecondaryNoteHueScale) / Config.modChannelCountMax) * 256) % 360) + ","
+                    + (this.c_modSecondaryNoteSat + channel * this.c_modSecondaryNoteSatScale) + "%,"
+                    + (this.c_modSecondaryNoteLum + channel * this.c_modSecondaryNoteLumScale) + "%)";
+                let newNotePrimary: string = "hsl(" + ((this.c_modPrimaryNoteHue + ((channel * this.c_modPrimaryNoteHueScale) / Config.modChannelCountMax) * 256) % 360) + ","
+                    + (this.c_modPrimaryNoteSat + channel * this.c_modPrimaryNoteSatScale) + "%,"
+                    + (this.c_modPrimaryNoteLum + channel * this.c_modPrimaryNoteLumScale) + "%)";
 
                 let newChannelColors = <ChannelColors>{ secondaryChannel: newChannelSecondary, primaryChannel: newChannelPrimary, secondaryNote: newNoteSecondary, primaryNote: newNotePrimary };
-                ColorConfig.colorLookup.set(channel, newChannelColors);
                 return newChannelColors;
             }
             case ("pitch"):
             default: {
-                const pitchSecondaryChannelHue: number = +getComputedStyle(this._styleElement).getPropertyValue("--pitch-secondary-channel-hue");
-                const pitchSecondaryChannelHueScale: number = +getComputedStyle(this._styleElement).getPropertyValue("--pitch-secondary-channel-hue-scale");
-                const pitchSecondaryChannelSat: number = +getComputedStyle(this._styleElement).getPropertyValue("--pitch-secondary-channel-sat");
-                const pitchSecondaryChannelSatScale: number = +getComputedStyle(this._styleElement).getPropertyValue("--pitch-secondary-channel-sat-scale");
-                const pitchSecondaryChannelLum: number = +getComputedStyle(this._styleElement).getPropertyValue("--pitch-secondary-channel-lum");
-                const pitchSecondaryChannelLumScale: number = +getComputedStyle(this._styleElement).getPropertyValue("--pitch-secondary-channel-lum-scale");
-                const pitchPrimaryChannelHue: number = +getComputedStyle(this._styleElement).getPropertyValue("--pitch-primary-channel-hue");
-                const pitchPrimaryChannelHueScale: number = +getComputedStyle(this._styleElement).getPropertyValue("--pitch-primary-channel-hue-scale");
-                const pitchPrimaryChannelSat: number = +getComputedStyle(this._styleElement).getPropertyValue("--pitch-primary-channel-sat");
-                const pitchPrimaryChannelSatScale: number = +getComputedStyle(this._styleElement).getPropertyValue("--pitch-primary-channel-sat-scale");
-                const pitchPrimaryChannelLum: number = +getComputedStyle(this._styleElement).getPropertyValue("--pitch-primary-channel-lum");
-                const pitchPrimaryChannelLumScale: number = +getComputedStyle(this._styleElement).getPropertyValue("--pitch-primary-channel-lum-scale");
-                const pitchSecondaryNoteHue: number = +getComputedStyle(this._styleElement).getPropertyValue("--pitch-secondary-note-hue");
-                const pitchSecondaryNoteHueScale: number = +getComputedStyle(this._styleElement).getPropertyValue("--pitch-secondary-note-hue-scale");
-                const pitchSecondaryNoteSat: number = +getComputedStyle(this._styleElement).getPropertyValue("--pitch-secondary-note-sat");
-                const pitchSecondaryNoteSatScale: number = +getComputedStyle(this._styleElement).getPropertyValue("--pitch-secondary-note-sat-scale");
-                const pitchSecondaryNoteLum: number = +getComputedStyle(this._styleElement).getPropertyValue("--pitch-secondary-note-lum");
-                const pitchSecondaryNoteLumScale: number = +getComputedStyle(this._styleElement).getPropertyValue("--pitch-secondary-note-lum-scale");
-                const pitchPrimaryNoteHue: number = +getComputedStyle(this._styleElement).getPropertyValue("--pitch-primary-note-hue");
-                const pitchPrimaryNoteHueScale: number = +getComputedStyle(this._styleElement).getPropertyValue("--pitch-primary-note-hue-scale");
-                const pitchPrimaryNoteSat: number = +getComputedStyle(this._styleElement).getPropertyValue("--pitch-primary-note-sat");
-                const pitchPrimaryNoteSatScale: number = +getComputedStyle(this._styleElement).getPropertyValue("--pitch-primary-note-sat-scale");
-                const pitchPrimaryNoteLum: number = +getComputedStyle(this._styleElement).getPropertyValue("--pitch-primary-note-lum");
-                const pitchPrimaryNoteLumScale: number = +getComputedStyle(this._styleElement).getPropertyValue("--pitch-primary-note-lum-scale");
+				// Pitch formula
 
-                let newChannelSecondary: string = "hsl(" + ((+pitchSecondaryChannelHue + (channel * +pitchSecondaryChannelHueScale / Config.pitchChannelCountMax) * 256) % 256) + ","
-                    + (+pitchSecondaryChannelSat * (1 - (+pitchSecondaryChannelSatScale * Math.floor(channel / 7)))) + "%,"
-                    + (+pitchSecondaryChannelLum * (1 - (+pitchSecondaryChannelLumScale * Math.floor(channel / 7)))) + "%)";
-                let newChannelPrimary: string = "hsl(" + ((+pitchPrimaryChannelHue + (channel * +pitchPrimaryChannelHueScale / Config.pitchChannelCountMax) * 256) % 256) + ","
-                    + (+pitchPrimaryChannelSat * (1 - (+pitchPrimaryChannelSatScale * Math.floor(channel / 7)))) + "%,"
-                    + (+pitchPrimaryChannelLum * (1 - (+pitchPrimaryChannelLumScale * Math.floor(channel / 7)))) + "%)";
-                let newNoteSecondary: string = "hsl(" + ((+pitchSecondaryNoteHue + (channel * +pitchSecondaryNoteHueScale / Config.pitchChannelCountMax) * 256) % 256) + ","
-                    + (+pitchSecondaryNoteSat * (1 - (+pitchSecondaryNoteSatScale * Math.floor(channel / 7)))) + "%,"
-                    + (+pitchSecondaryNoteLum * (1 - (+pitchSecondaryNoteLumScale * Math.floor(channel / 7)))) + "%)";
-                let newNotePrimary: string = "hsl(" + ((+pitchPrimaryNoteHue + (channel * +pitchPrimaryNoteHueScale / Config.pitchChannelCountMax) * 256) % 256) + ","
-                    + (+pitchPrimaryNoteSat * (1 - (+pitchPrimaryNoteSatScale * Math.floor(channel / 7)))) + "%,"
-                    + (+pitchPrimaryNoteLum * (1 - (+pitchPrimaryNoteLumScale * Math.floor(channel / 7)))) + "%)";
+                let newChannelSecondary: string = "hsl(" + ((this.c_pitchSecondaryChannelHue + (channel * this.c_pitchSecondaryChannelHueScale / Config.pitchChannelCountMax) * 256) % 360) + ","
+                    + (this.c_pitchSecondaryChannelSat * (1 - (this.c_pitchSecondaryChannelSatScale * Math.floor(channel / 7)))) + "%,"
+                    + (this.c_pitchSecondaryChannelLum * (1 - (this.c_pitchSecondaryChannelLumScale * Math.floor(channel / 7)))) + "%)";
+                let newChannelPrimary: string = "hsl(" + ((this.c_pitchPrimaryChannelHue + (channel * this.c_pitchPrimaryChannelHueScale / Config.pitchChannelCountMax) * 256) % 360) + ","
+                    + (this.c_pitchPrimaryChannelSat * (1 - (this.c_pitchPrimaryChannelSatScale * Math.floor(channel / 7)))) + "%,"
+                    + (this.c_pitchPrimaryChannelLum * (1 - (this.c_pitchPrimaryChannelLumScale * Math.floor(channel / 7)))) + "%)";
+                let newNoteSecondary: string = "hsl(" + ((this.c_pitchSecondaryNoteHue + (channel * this.c_pitchSecondaryNoteHueScale / Config.pitchChannelCountMax) * 256) % 360) + ","
+                    + (this.c_pitchSecondaryNoteSat * (1 - (this.c_pitchSecondaryNoteSatScale * Math.floor(channel / 7)))) + "%,"
+                    + (this.c_pitchSecondaryNoteLum * (1 - (this.c_pitchSecondaryNoteLumScale * Math.floor(channel / 7)))) + "%)";
+                let newNotePrimary: string = "hsl(" + ((this.c_pitchPrimaryNoteHue + (channel * this.c_pitchPrimaryNoteHueScale / Config.pitchChannelCountMax) * 256) % 360) + ","
+                    + (this.c_pitchPrimaryNoteSat * (1 - (this.c_pitchPrimaryNoteSatScale * Math.floor(channel / 7)))) + "%,"
+                    + (this.c_pitchPrimaryNoteLum * (1 - (this.c_pitchPrimaryNoteLumScale * Math.floor(channel / 7)))) + "%)";
 
                 let newChannelColors = <ChannelColors>{ secondaryChannel: newChannelSecondary, primaryChannel: newChannelPrimary, secondaryNote: newNoteSecondary, primaryNote: newNotePrimary };
-                ColorConfig.colorLookup.set(channel, newChannelColors);
                 return newChannelColors;
             }
         }

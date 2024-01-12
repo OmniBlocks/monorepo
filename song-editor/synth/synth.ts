@@ -3994,7 +3994,7 @@ export class Song {
                 // Similar story here, JB before v5 had custom chip and mod before supersaw was added. Index +1.
                 else if ((fromJummBox && beforeSix) || (fromUltraBox && beforeFive) ) {
                     if (instrumentType == InstrumentType.supersaw || instrumentType == InstrumentType.customChipWave || instrumentType == InstrumentType.mod) {
-                        instrumentType += 2;
+                        instrumentType += 1;
                     }
                 }
                 instrument.setTypeAndReset(instrumentType, instrumentChannelIterator >= this.pitchChannelCount && instrumentChannelIterator < this.pitchChannelCount + this.noiseChannelCount, instrumentChannelIterator >= this.pitchChannelCount + this.noiseChannelCount);
@@ -4940,6 +4940,7 @@ export class Song {
             } break;
             case SongTagCode.supersaw: {
                 if (fromGoldBox && !beforeFour && beforeSix) {
+                    //is it more useful to save base64 characters or url length?
                     const chipWaveForCompat = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                     if ((chipWaveForCompat + 62) > 85) {
                         if (document.URL.substring(document.URL.length - 13).toLowerCase() != "legacysamples") {
@@ -4964,13 +4965,12 @@ export class Song {
                     else {
                         this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].chipWave = clamp(0, Config.chipWaves.length, chipWaveForCompat + 62);			
                     }							
+                } else {
+                    const instrument: Instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
+                    instrument.supersawDynamism = clamp(0, Config.supersawDynamismMax + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                    instrument.supersawSpread = clamp(0, Config.supersawSpreadMax + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                    instrument.supersawShape = clamp(0, Config.supersawShapeMax + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                 }
-                //is it more useful to save base64 characters or url length?
-
-				const instrument: Instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
-				instrument.supersawDynamism = clamp(0, Config.supersawDynamismMax + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
-				instrument.supersawSpread = clamp(0, Config.supersawSpreadMax + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
-				instrument.supersawShape = clamp(0, Config.supersawShapeMax + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
 			} break;
             case SongTagCode.feedbackType: {
                 const instrument: Instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];

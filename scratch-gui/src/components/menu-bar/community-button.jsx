@@ -18,6 +18,8 @@ const CommunityButton = ({
         )}
         iconClassName={styles.communityButtonIcon}
         iconSrc={communityIcon}
+        iconWidth={20}
+        iconHeight={20}
         onClick={onClick}
     >
         <FormattedMessage

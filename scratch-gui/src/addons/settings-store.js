@@ -119,7 +119,7 @@ class SettingsStore extends EventTargetShim {
                 if (result && typeof result === 'object') {
                     result = migrateSettings(result);
                     for (const key of Object.keys(result)) {
-                        if (base.hasOwnProperty(key)) {
+                        if (Object.prototype.hasOwnProperty.call(base, key)) {
                             const value = result[key];
                             if (value && typeof value === 'object') {
                                 base[key] = value;
@@ -198,7 +198,7 @@ class SettingsStore extends EventTargetShim {
             return false;
         }
         const storage = this.getAddonStorage(addonId);
-        if (storage.hasOwnProperty('enabled')) {
+        if (Object.prototype.hasOwnProperty.call(storage, 'enabled')) {
             return storage.enabled;
         }
         return !!manifest.enabledByDefault;
@@ -211,7 +211,7 @@ class SettingsStore extends EventTargetShim {
         if (!settingObject) {
             throw new Error(`Unknown setting: ${settingId}`);
         }
-        if (storage.hasOwnProperty(settingId)) {
+        if (Object.prototype.hasOwnProperty.call(storage, settingId)) {
             return storage[settingId];
         }
         return settingObject.default;
@@ -391,7 +391,7 @@ class SettingsStore extends EventTargetShim {
 
     import (data) {
         for (const [addonId, value] of Object.entries(data.addons)) {
-            if (!addons.hasOwnProperty(addonId)) {
+            if (!Object.prototype.hasOwnProperty.call(addons, addonId)) {
                 continue;
             }
             const {enabled, settings} = value;

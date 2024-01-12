@@ -937,9 +937,9 @@ class MenuBar extends React.Component {
                             username={this.props.authorUsername}
                         />
                     ) : null)}
-                    <div className={classNames(styles.menuBarItem)}>
-                        {this.props.canShare ? (
-                            (this.props.isShowingProject || this.props.isUpdating) && (
+                    {this.props.canShare ? (
+                        (this.props.isShowingProject || this.props.isUpdating) && (
+                            <div className={classNames(styles.menuBarItem)}>
                                 <ProjectWatcher onDoneUpdating={this.props.onSeeCommunity}>
                                     {
                                         waitForUpdate => (
@@ -955,16 +955,20 @@ class MenuBar extends React.Component {
                                         )
                                     }
                                 </ProjectWatcher>
-                            )
-                        ) : (
-                            this.props.showComingSoon ? (
-                                <MenuBarItemTooltip id="share-button">
-                                    <ShareButton className={styles.menuBarButton} />
-                                </MenuBarItemTooltip>
-                            ) : []
-                        )}
-                        {this.props.canRemix ? remixButton : []}
-                    </div>
+                            </div>
+                        )
+                    ) : this.props.showComingSoon ? (
+                        <div className={classNames(styles.menuBarItem)}>
+                            <MenuBarItemTooltip id="share-button">
+                                <ShareButton className={styles.menuBarButton} />
+                            </MenuBarItemTooltip>
+                        </div>
+                    ) : null}
+                    {this.props.canRemix && (
+                        <div className={classNames(styles.menuBarItem)}>
+                            {remixButton}
+                        </div>
+                    )}
                     <div className={classNames(styles.menuBarItem, styles.communityButtonWrapper)}>
                         {this.props.enableCommunity ? (
                             (this.props.isShowingProject || this.props.isUpdating) && (

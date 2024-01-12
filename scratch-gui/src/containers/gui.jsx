@@ -205,7 +205,6 @@ const WrappedGui = compose(
     ErrorBoundaryHOC('Top Level App'),
     TWThemeManagerHOC, // componentDidUpdate() needs to run very early for icons to update immediately
     TWFullScreenResizerHOC,
-    TWProjectMetaFetcherHOC,
     FontLoaderHOC,
     // QueryParserHOC, // tw: HOC is unused
     ProjectFetcherHOC,
@@ -215,6 +214,7 @@ const WrappedGui = compose(
     vmManagerHOC,
     SBFileUploaderHOC,
     cloudManagerHOC,
+    TWProjectMetaFetcherHOC,
     systemPreferencesHOC
 )(ConnectedGUI);
 

@@ -28,7 +28,7 @@ class LanguageMenu extends React.PureComponent {
     componentDidUpdate (prevProps) {
         // If the submenu has been toggled open, try scrolling the selected option into view.
         if (!prevProps.menuOpen && this.props.menuOpen && this.selectedRef) {
-            this.selectedRef.scrollIntoView({block: 'center'});
+            this.scrollSelectedIntoView();
         }
     }
 
@@ -39,8 +39,23 @@ class LanguageMenu extends React.PureComponent {
     handleMouseOver () {
         // If we are using hover rather than clicks for submenus, scroll the selected option into view
         if (!this.props.menuOpen && this.selectedRef) {
-            this.selectedRef.scrollIntoView({block: 'center'});
+            this.scrollSelectedIntoView();
         }
+    }
+
+    scrollSelectedIntoView () {
+        // the native scrollIntoView() scrolls the entire page when used outside the editor,
+        // so we do this manually instead.
+        // selectedRef is the checkmark <img>, its parent is a <div> from <MenuItem>, then a <div> from <SubMenu>
+
+        const menuItem = this.selectedRef.parentNode;
+        const scrollContainer = menuItem.parentNode;
+
+        const itemHeight = menuItem.offsetHeight;
+        const selectedItemPosition = menuItem.offsetTop;
+        const visibleHeight = scrollContainer.offsetHeight;
+
+        scrollContainer.scrollTop = selectedItemPosition - (visibleHeight / 2) + (itemHeight / 2);
     }
 
     render () {

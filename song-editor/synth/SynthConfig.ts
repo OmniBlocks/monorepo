@@ -1342,10 +1342,11 @@ export class Config {
         { name: "rise 1", type: EnvelopeType.rise, speed: 32.0 },
         { name: "rise 2", type: EnvelopeType.rise, speed: 8.0 },
         { name: "rise 3", type: EnvelopeType.rise, speed: 2.0 },
-	    		{ name: "flute 1", type: 9, speed: 16.0 },
+	    		//modbox
+        { name: "flute 1", type: 9, speed: 16.0 },
 		{ name: "flute 2", type: 9, speed: 8.0 },
 		{ name: "flute 3", type: 9, speed: 4.0 },
-		//modbox
+        // sandbox
 		{ name: "tripolo1", type: 6, speed: 9.0 },
         { name: "tripolo2", type: 6, speed: 6.0 },
         { name: "tripolo3", type: 6, speed: 3.0 },
@@ -1358,11 +1359,11 @@ export class Config {
         { name: "pentolo4", type: 7, speed: 10.0 },
         { name: "pentolo5", type: 7, speed: 5.0 },
         { name: "pentolo6", type: 7, speed: 2.5 },	
-		//sandbox
+        // todbox
 	    { name: "flutter 1", type: 6, speed: 14.0 },
         { name: "flutter 2", type: 7, speed: 11.0 },
         { name: "water-y flutter", type: 6, speed: 9.0 },
-	    //todbox
+	    // new jummbox
         { name: "blip 1", type: EnvelopeType.blip, speed: 6.0 },
         { name: "blip 2", type: EnvelopeType.blip, speed: 16.0 },
         { name: "blip 3", type: EnvelopeType.blip, speed: 32.0 },

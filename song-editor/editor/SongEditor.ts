@@ -808,6 +808,7 @@ export class SongEditor {
         option({ value: "displayVolumeBar" }, "Show Playback Volume"),
         option({ value: "showOscilloscope" }, "Show Oscilloscope"),
         option({ value: "showSampleLoadingStatus" }, "Show Sample Loading Status"),
+        option({ value: "closePromptByClickoff" }, "Close Prompts on Click Off"),
         option({ value: "layout" }, "Set Layout..."),
         option({ value: "colorTheme" }, "Set Theme..."),
 	    option({ value: "customTheme" }, "Custom Theme..."),
@@ -1646,11 +1647,12 @@ export class SongEditor {
         this._aliasingBox.addEventListener("input", () => { this._doc.record(new ChangeAliasing(this._doc, this._aliasingBox.checked)) });
         this._discreteEnvelopeBox.addEventListener("input", () => { this._doc.record(new ChangeDiscreteEnvelope(this._doc, this._discreteEnvelopeBox.checked)) });
 
-        // TODO: make this configurable via preferences
         this._promptContainer.addEventListener("click", (event) => {
-            if (this.prompt != null && this.prompt.gotMouseUp === true) return;
-            if (event.target == this._promptContainer) {
-                this._doc.undo();
+            if (this._doc.prefs.closePromptByClickoff === true) {
+                if (this.prompt != null && this.prompt.gotMouseUp === true) return;
+                if (event.target == this._promptContainer) {
+                    this._doc.undo();
+                }
             }
         });
 
@@ -2157,6 +2159,7 @@ export class SongEditor {
             (prefs.displayVolumeBar ? "✓ " : "　") + "Show Playback Volume",
             (prefs.showOscilloscope ? "✓ " : "　") + "Show Oscilloscope",
             (prefs.showSampleLoadingStatus ? "✓ " : "　") + "Show Sample Loading Status",
+            (prefs.closePromptByClickoff ? "✓ " : "　") + "Close Prompts on Click Off",
             "　Set Layout...",
             "　Set Theme...",
 	        "　Custom Theme...",
@@ -4918,9 +4921,9 @@ export class SongEditor {
             case "colorTheme":
                 this._openPrompt("theme");
                 break;
-	case "customTheme":
-		this._openPrompt("custom");
-		break;
+            case "customTheme":
+                this._openPrompt("custom");
+                break;
             case "recordingSetup":
                 this._openPrompt("recordingSetup");
                 break;
@@ -4929,6 +4932,9 @@ export class SongEditor {
                 break;
             case "showSampleLoadingStatus":
                 this._doc.prefs.showSampleLoadingStatus = !this._doc.prefs.showSampleLoadingStatus;
+                break;
+            case "closePromptByClickoff":
+                this._doc.prefs.closePromptByClickoff = !this._doc.prefs.closePromptByClickoff;
                 break;
         }
         this._optionsMenu.selectedIndex = 0;

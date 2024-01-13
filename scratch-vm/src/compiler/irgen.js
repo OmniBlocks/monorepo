@@ -1414,12 +1414,14 @@ class ScriptTreeGenerator {
 
         const blockInfo = this.getBlockInfo(block.opcode);
         const blockType = (blockInfo && blockInfo.info && blockInfo.info.blockType) || BlockType.COMMAND;
-        const substacks = [];
+        const substacks = {};
         if (blockType === BlockType.CONDITIONAL || blockType === BlockType.LOOP) {
-            const branchCount = blockInfo.info.branchCount;
-            for (let i = 0; i < branchCount; i++) {
-                const inputName = i === 0 ? 'SUBSTACK' : `SUBSTACK${i + 1}`;
-                substacks.push(this.descendSubstack(block, inputName));
+            for (const inputName in block.inputs) {
+                if (!inputName.startsWith('SUBSTACK')) continue;
+                const branchNum = inputName === 'SUBSTACK' ? 1 : +inputName.substring('SUBSTACK'.length);
+                if (!isNaN(branchNum)) {
+                    substacks[branchNum] = this.descendSubstack(block, inputName);
+                }
             }
         }
 

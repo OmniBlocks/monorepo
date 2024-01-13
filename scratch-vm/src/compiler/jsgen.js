@@ -773,9 +773,9 @@ class JSGenerator {
                 this.source += `const ${branchVariable} = createBranchInfo(${blockType === BlockType.LOOP});\n`;
                 this.source += `while (${branchVariable}.branch = +(${this.generateCompatibilityLayerCall(node, false, branchVariable)})) {\n`;
                 this.source += `switch (${branchVariable}.branch) {\n`;
-                for (let i = 0; i < node.substacks.length; i++) {
-                    this.source += `case ${i + 1}: {\n`;
-                    this.descendStack(node.substacks[i], new Frame(false));
+                for (const index in node.substacks) {
+                    this.source += `case ${+index}: {\n`;
+                    this.descendStack(node.substacks[index], new Frame(false));
                     this.source += `break;\n`;
                     this.source += `}\n`; // close case
                 }

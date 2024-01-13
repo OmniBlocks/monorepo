@@ -15,7 +15,7 @@
     font-size: 0.75rem;
     font-weight: bold;
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    color: $text-primary;
+    color: $text-primary-default;
     padding-bottom: $space;
 }
 
@@ -54,6 +54,7 @@
     /* override dark mode */
     background-color: $input-background-default;
     color: $text-primary-default;
+    border-color: $ui-black-transparent-default;
 }
 
 [dir="ltr"] .question-input > input {

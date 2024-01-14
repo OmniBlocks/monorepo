@@ -2338,6 +2338,20 @@ class RenderWebGL extends EventEmitter {
             this._customFontStyles.remove();
             this._customFontStyles = null;
         }
+
+        // Even when a font is from a data: URI, some browsers won't actually prepare it for
+        // rendering until it is used at least once, causing the fallback font to be used the
+        // first time. We want to avoid that, so we'll ask the browser to load them right away.
+        if (
+            typeof document === 'object' &&
+            typeof document.fonts === 'object' &&
+            typeof document.fonts.load === 'function'
+        ) {
+            const families = Object.keys(customFonts);
+            for (const family of families) {
+                document.fonts.load(`12px ${family}`);
+            }
+        }
     }
 }
 

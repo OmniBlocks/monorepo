@@ -97,7 +97,6 @@ module.exports = [
     // For use as a library
     defaultsDeep({}, base, {
         externals: {
-            'minilog': 'minilog',
             'prop-types': 'prop-types',
             'react': 'react',
             'react-dom': 'react-dom',

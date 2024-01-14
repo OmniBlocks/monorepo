@@ -157,7 +157,7 @@ for (const Extension of [TestExtensionUsingReturn, TestExtensionUsingStartBranch
                     if (text === 'OK!') {
                         okayCount++;
                     } else if (text === 'end') {
-                        vm.stop();
+                        vm.quit();
                         t.equal(okayCount, 5);
                         t.end();
                     } else {
@@ -184,7 +184,7 @@ for (const Extension of [TestExtensionUsingReturn, TestExtensionUsingStartBranch
 
             vm.loadProject(fs.readFileSync(path.join(__dirname, '../fixtures/tw-loop.sb3'))).then(() => {
                 vm.runtime.on('SAY', (target, type, text) => {
-                    vm.stop();
+                    vm.quit();
                     t.equal(text, 'a 3 b 12 c 48 frames 64');
                     t.end();
                 });

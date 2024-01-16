@@ -56,6 +56,8 @@ class FontDropdown extends React.Component {
                 return '한국어';
             case Fonts.JAPANESE:
                 return '日本語';
+            case Fonts.SCRATCH:
+                return 'Branches';
             default:
                 return font;
             }

@@ -42,6 +42,7 @@
     "mediarecorder/record-after-flag": "Aufnahme erst starten, wenn die Grüne Flagge angeklickt wird",
     "mediarecorder/record-audio": "Projektklänge einschließen",
     "mediarecorder/record-audio-description": "Dies schließt Text zu Sprache nicht ein.",
+    "mediarecorder/record-description": "Nimmt die Bühne als Datei im Format {extension} auf. Du kannst die Aufnahme am Ende auf deinem Computer speichern.\nHinweis: Variablen- und Listenanzeigen werden nicht sichtbar sein.",
     "mediarecorder/record-duration": "Aufnahmedauer (in Sekunden)",
     "mediarecorder/record-mic": "Mikrofonklänge einschließen",
     "mediarecorder/record-until-stop": "Aufnahme anhalten, wenn das Projekt gestoppt wird",

@@ -6,6 +6,7 @@ const addons = [
     'find-bar',
     'middle-click-popup',
     'jump-to-def',
+    'reorder-custom-inputs',
     'editor-searchable-dropdowns',
     'data-category-tweaks-v2',
     'block-palette-icons',
@@ -86,7 +87,8 @@ const newAddons = [
     'copy-reporter',
     'editor-number-arrow-keys',
     'editor-compact',
-    'move-to-top-layer'
+    'move-to-top-layer',
+    'reorder-custom-inputs'
 ];
 
 // eslint-disable-next-line import/no-commonjs

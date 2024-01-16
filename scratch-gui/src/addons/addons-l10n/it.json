@@ -40,6 +40,7 @@
     "mediarecorder/record-after-flag": "Non avviare la registrazione finché non viene cliccata la bandiera verde",
     "mediarecorder/record-audio": "Includi suoni del progetto",
     "mediarecorder/record-audio-description": "Questo non include l'estensione Da Testo A Voce",
+    "mediarecorder/record-description": "Registra lo stage come file {extension}. Quando la registrazione termina puoi salvarla sul tuo computer.\nNota: i monitor delle variabili e delle liste non saranno visibili.",
     "mediarecorder/record-duration": "Durata Registrazione (in secondi)",
     "mediarecorder/record-mic": "Includi i suoni del microfono",
     "mediarecorder/record-until-stop": "Arresta la registrazione quando il progetto viene fermato",

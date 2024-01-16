@@ -722,6 +722,7 @@ Blockly.Css.CONTENT = [
     'color: $colour_textFieldText;',
     'background-color: $colour_textField;',
     'font-weight: 500;',
+    'color-scheme: light;',
   '}',
 
   '.blocklyMainBackground {',

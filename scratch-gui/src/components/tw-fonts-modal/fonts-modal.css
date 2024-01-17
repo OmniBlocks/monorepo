@@ -1,5 +1,6 @@
 @import "../../css/colors.css";
 @import "../../css/z-index.css";
+@import "../../css/filters.css";
 
 .modal-content {
     max-width: 550px;
@@ -211,4 +212,5 @@
     display: block;
     width: 100%;
     height: 100%;
+    filter: $filter-icon-black;
 }

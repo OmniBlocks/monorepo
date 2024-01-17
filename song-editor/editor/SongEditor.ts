@@ -788,7 +788,7 @@ export class SongEditor {
         option({ value: "transposeDown" }, "Move Notes Down (- or ⇧-)"),
         option({ value: "moveNotesSideways" }, "Move All Notes Sideways... (W)"),
 	option({ value: "generateEuclideanRhythm" }, "Generate Euclidean Rhythm... (E)"),
-        option({ value: "beatsPerBar" }, "Change Beats Per Bar... (B)"),
+        option({ value: "beatsPerBar" }, "Change Beats Per Bar... (⇧B)"),
         option({ value: "barCount" }, "Change Song Length... (L)"),
         option({ value: "channelSettings" }, "Channel Settings... (Q)"),
         option({ value: "limiterSettings" }, "Limiter Settings... (⇧L)"),

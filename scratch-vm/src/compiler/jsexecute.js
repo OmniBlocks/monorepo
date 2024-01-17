@@ -109,6 +109,11 @@ const waitPromise = function*(promise) {
     const thread = globalState.thread;
     let returnValue;
 
+    // enter STATUS_PROMISE_WAIT and yield
+    // this will stop script execution until the promise handlers reset the thread status
+    // because promise handlers might execute immediately, configure thread.status here
+    thread.status = 1; // STATUS_PROMISE_WAIT
+
     promise
         .then(value => {
             returnValue = value;
@@ -119,9 +124,6 @@ const waitPromise = function*(promise) {
             globalState.log.warn('Promise rejected in compiled script:', error);
         });
 
-    // enter STATUS_PROMISE_WAIT and yield
-    // this will stop script execution until the promise handlers reset the thread status
-    thread.status = 1; // STATUS_PROMISE_WAIT
     yield;
 
     return returnValue;

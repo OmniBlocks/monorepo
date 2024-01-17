@@ -16,14 +16,11 @@
 
 import './import-first';
 
-import ReactDOM from 'react-dom';
 import React from 'react';
-import {setAppElement} from 'react-modal';
 
 import Interface from './render-interface.jsx';
-import appTarget from './app-target';
+import render from './app-target.js';
 
-setAppElement(appTarget);
-ReactDOM.render(<Interface
+render(<Interface
     isPlayerOnly
-/>, appTarget);
+/>);

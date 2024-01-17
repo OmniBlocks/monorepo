@@ -24,6 +24,10 @@
     display: flex;
     flex-direction: column;
 }
+.font-context-menu {
+    display: grid;
+    grid-template-columns: auto auto auto;
+}
 
 .mod-unselect {
     user-select: none;

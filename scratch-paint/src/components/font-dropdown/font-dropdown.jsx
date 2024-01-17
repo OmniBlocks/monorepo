@@ -29,7 +29,7 @@ const ModeToolsComponent = props => (
         className={classNames(styles.modUnselect, styles.fontDropdown)}
         enterExitTransitionDurationMs={60}
         popoverContent={
-            <InputGroup className={styles.modContextMenu}>
+            <InputGroup className={styles.fontContextMenu}>
                 <Button
                     className={classNames(styles.modMenuItem)}
                     onClick={props.onChoose}

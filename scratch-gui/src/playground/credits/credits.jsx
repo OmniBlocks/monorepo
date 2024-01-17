@@ -1,7 +1,6 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
-import appTarget from '../app-target';
+import render from '../app-target';
 import styles from './credits.css';
 
 import {APP_NAME} from '../../lib/brand';
@@ -111,6 +110,4 @@ const Credits = () => (
     </main>
 );
 
-ReactDOM.render((
-    <Credits />
-), appTarget);
+render(<Credits />);

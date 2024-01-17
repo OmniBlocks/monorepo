@@ -97,7 +97,9 @@ function buildPresetOptions(isNoise: boolean, idSet: string): HTMLSelectElement 
         menu.appendChild(option({ value: InstrumentType.noise }, EditorConfig.valueToPreset(InstrumentType.noise)!.name));
     }
 
+    // TODO - When you port over the Dogebox2 import/export buttons be sure to uncomment these
     const randomGroup: HTMLElement = optgroup({ label: "Randomize ▾" });
+    // const randomGroup: HTMLElement = optgroup({ label: "▾ Randomize" });
     randomGroup.appendChild(option({ value: "randomPreset" }, "Random Preset"));
     randomGroup.appendChild(option({ value: "randomGenerated" }, "Random Generated"));
     menu.appendChild(randomGroup);
@@ -108,6 +110,7 @@ function buildPresetOptions(isNoise: boolean, idSet: string): HTMLSelectElement 
     for (let categoryIndex: number = 1; categoryIndex < EditorConfig.presetCategories.length; categoryIndex++) {
         const category: PresetCategory = EditorConfig.presetCategories[categoryIndex];
         const group: HTMLElement = optgroup({ label: category.name + " ▾" });
+        // const group: HTMLElement = optgroup({ label: "▾ " + category.name });
         let foundAny: boolean = false;
         for (let presetIndex: number = 0; presetIndex < category.presets.length; presetIndex++) {
             const preset: Preset = category.presets[presetIndex];

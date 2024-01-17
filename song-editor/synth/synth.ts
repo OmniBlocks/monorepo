@@ -3608,7 +3608,10 @@ export class Song {
         let fromBeepBox: boolean;
         let fromJummBox: boolean;
         let fromGoldBox: boolean;
-	let fromUltraBox: boolean;
+	    let fromUltraBox: boolean;
+        // let fromMidbox: boolean;
+        // let fromDogebox2: boolean;
+        // let fromAbyssBox: boolean;
 
         // Detect variant here. If version doesn't match known variant, assume it is a vanilla string which does not report variant.
         if (variantTest == 0x6A) { //"j"
@@ -3992,7 +3995,7 @@ export class Song {
                     }
                 }
                 // Similar story here, JB before v5 had custom chip and mod before supersaw was added. Index +1.
-                else if ((fromJummBox && beforeSix) || (fromUltraBox && beforeFive) ) {
+                else if ((fromJummBox && beforeSix) || (fromGoldBox && !beforeFour) || (fromUltraBox && beforeFive) ) {
                     if (instrumentType == InstrumentType.supersaw || instrumentType == InstrumentType.customChipWave || instrumentType == InstrumentType.mod) {
                         instrumentType += 1;
                     }

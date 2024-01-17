@@ -36,7 +36,10 @@ export class ThemePrompt implements Prompt {
 			option({ value: "neapolitan" }, "Neapolitan"),
 			option({ value: "poly" }, "Poly"),
 			option({ value: "blutonium" }, "Blutonium"),
+			// TODO - remove slushie and put it on the custom theme sheet
 			option({ value: "slushie" }, "Slushie"),
+			// colorblind-friendly themes, by nep and choptop. in most circumstances I wouldn't add ultrabox-unique themes because of the custom theme sheet, but
+			// the azur lane theme is here because nep wanted it...
 			option({ value: "azur lane" }, "Azur Lane"),
 			option({ value: "modbox classic" }, "Modbox"),
 			option({ value: "sandbox classic" }, "Sandbox"),
@@ -59,6 +62,7 @@ export class ThemePrompt implements Prompt {
 			option({ value: "foxbox" }, "FoxBox"),
 			option({ value: "midbox" }, "Midbox"),
 			option({ value: "dogebox2" }, "Dogebox2"),
+			option({ value: "nepbox" }, "Nepbox"),
 			option({ value: "custom" }, "Custom")
 	);
 	private readonly _cancelButton: HTMLButtonElement = button({ class: "cancelButton" });

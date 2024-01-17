@@ -118,8 +118,7 @@ const waitPromise = function*(promise) {
         .then(value => {
             returnValue = value;
             thread.status = 0; // STATUS_RUNNING
-        })
-        .catch(error => {
+        }, error => {
             thread.status = 0; // STATUS_RUNNING
             globalState.log.warn('Promise rejected in compiled script:', error);
         });

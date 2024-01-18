@@ -721,7 +721,7 @@
       if (util.target.isStage) return 0;
 
       const dr = Scratch.renderer._allDrawables[util.target.drawableID];
-      if (!dr[IN_3D]) return 0;
+      if (!dr[OBJECT]) return 0;
       return dr[OBJECT].position.z;
     }
 

@@ -8031,7 +8031,6 @@ export class Synth {
         this.isPlayingSong = true;
         this.synthesize(dummyArray, dummyArray, 1, true);
         this.isPlayingSong = false;
-		//BUGFIX FROM JUMMBOX
     }
 
     public computeLatestModValues(): void {
@@ -8893,8 +8892,7 @@ export class Synth {
         this.part = 0;
         this.tick = 0;
         this.tickSampleCountdown = samplesPerTick;
-	    			this.isAtStartOfTick = true;
-			//BUGFIX FROM JUMMBOX
+	    this.isAtStartOfTick = true;
 
         if (this.loopRepeatCount != 0 && this.bar == this.song.loopStart + this.song.loopLength) {
             this.bar = this.song.loopStart;
@@ -8996,7 +8994,6 @@ export class Synth {
         let limit: number = +this.limit;
 	    			let skippedBars = [];
         let firstSkippedBufferIndex = -1;
-		//BUGFIX FROM JUMMBOX
 
         let bufferIndex: number = 0;
         while (bufferIndex < outputBufferLength && !ended) {
@@ -9075,11 +9072,9 @@ export class Synth {
                 }
                 if (!barVisited)
                     skippedBars.push(this.bar);
-				//BUGFIX FROM JUMMBOX
                 this.wantToSkip = false;
                 this.skipBar();
-		    					continue;
-					//BUGFIX FROM JUMMBOX
+		    	continue;
             }
 
             for (let channelIndex: number = 0; channelIndex < song.pitchChannelCount + song.noiseChannelCount; channelIndex++) {
@@ -11527,7 +11522,6 @@ export class Synth {
         const volumeScale = instrumentState.volumeScale;
 
         const waveLength = (aliases && instrumentState.type == 8) ? wave.length : wave.length - 1;
-			//BUGFIX FROM JUMMBOX
 
         const unisonSign: number = tone.specialIntervalExpressionMult * instrumentState.unisonSign;
         if (instrumentState.unisonVoices == 1 && !instrumentState.chord!.customInterval) tone.phases[1] = tone.phases[0];
@@ -11594,7 +11588,6 @@ export class Synth {
             }
 
             const sample: number = applyFilters(inputSample * volumeScale, initialFilterInput1, initialFilterInput2, filterCount, filters);
-		//BUGFIX FROM JUMMBOX
             initialFilterInput2 = initialFilterInput1;
             initialFilterInput1 = inputSample * volumeScale;
 
@@ -11602,7 +11595,6 @@ export class Synth {
             phaseDeltaB *= phaseDeltaScaleB;
 
             const output: number = sample * expression;
-		//BUGFIX FROM JUMMBOX
             expression += expressionDelta;
 
             data[sampleIndex] += output;

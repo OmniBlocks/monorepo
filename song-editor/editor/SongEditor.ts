@@ -787,12 +787,12 @@ export class SongEditor {
         option({ value: "transposeUp" }, "Move Notes Up (+ or ⇧+)"),
         option({ value: "transposeDown" }, "Move Notes Down (- or ⇧-)"),
         option({ value: "moveNotesSideways" }, "Move All Notes Sideways... (W)"),
-	option({ value: "generateEuclideanRhythm" }, "Generate Euclidean Rhythm... (E)"),
+	    option({ value: "generateEuclideanRhythm" }, "Generate Euclidean Rhythm... (E)"),
         option({ value: "beatsPerBar" }, "Change Beats Per Bar... (⇧B)"),
         option({ value: "barCount" }, "Change Song Length... (L)"),
         option({ value: "channelSettings" }, "Channel Settings... (Q)"),
         option({ value: "limiterSettings" }, "Limiter Settings... (⇧L)"),
-	option({ value: "addExternal" }, "Add Custom Samples... (⇧Q)"),
+	    option({ value: "addExternal" }, "Add Custom Samples... (⇧Q)"),
     );
     private readonly _optionsMenu: HTMLSelectElement = select({ style: "width: 100%;" },
         option({ selected: true, disabled: true, hidden: false }, "Preferences"), // todo: "hidden" should be true but looks wrong on mac chrome, adds checkmark next to first visible option even though it's not selected. :(
@@ -811,6 +811,7 @@ export class SongEditor {
         option({ value: "displayVolumeBar" }, "Show Playback Volume"),
         option({ value: "showOscilloscope" }, "Show Oscilloscope"),
         option({ value: "showSampleLoadingStatus" }, "Show Sample Loading Status"),
+        option({ value: "showDescription" }, "Show Description"),
         option({ value: "closePromptByClickoff" }, "Close Prompts on Click Off"),
         option({ value: "layout" }, "Set Layout..."),
         option({ value: "colorTheme" }, "Set Theme..."),
@@ -2113,6 +2114,9 @@ export class SongEditor {
         this._globalOscscopeContainer.style.display = this._doc.prefs.showOscilloscope ? "" : "none";
         this._doc.synth.oscEnabled = this._doc.prefs.showOscilloscope;
         this._sampleLoadingStatusContainer.style.display = this._doc.prefs.showSampleLoadingStatus ? "" : "none";
+        // assuming text-content always exists isn't the greatest...
+        // if (document.getElementById('text-content'))
+        document.getElementById('text-content')!.style.display = this._doc.prefs.showDescription ? "" : "none";
 
         if (this._doc.getFullScreen()) {
             const semitoneHeight: number = this._patternEditorRow.clientHeight / this._doc.getVisiblePitchCount();
@@ -2162,6 +2166,7 @@ export class SongEditor {
             (prefs.displayVolumeBar ? "✓ " : "　") + "Show Playback Volume",
             (prefs.showOscilloscope ? "✓ " : "　") + "Show Oscilloscope",
             (prefs.showSampleLoadingStatus ? "✓ " : "　") + "Show Sample Loading Status",
+            (prefs.showDescription ? "✓ " : "　") + "Show Description",
             (prefs.closePromptByClickoff ? "✓ " : "　") + "Close Prompts on Click Off",
             "　Set Layout...",
             "　Set Theme...",
@@ -4932,6 +4937,9 @@ export class SongEditor {
                 break;
             case "showOscilloscope":
                 this._doc.prefs.showOscilloscope = !this._doc.prefs.showOscilloscope;
+                break;
+            case "showDescription":
+                this._doc.prefs.showDescription = !this._doc.prefs.showDescription;
                 break;
             case "showSampleLoadingStatus":
                 this._doc.prefs.showSampleLoadingStatus = !this._doc.prefs.showSampleLoadingStatus;

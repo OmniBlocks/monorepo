@@ -591,7 +591,7 @@ export class ChangeRandomGeneratedInstrument extends Change {
 
         const isNoise: boolean = doc.song.getChannelIsNoise(doc.channel);
         const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
-        instrument.effects &= 1 << EffectType.panning; // disable all existing effects except panning.
+        instrument.effects = 1 << EffectType.panning; // disable all existing effects except panning, which should always be on.
         instrument.aliases = false;
         instrument.envelopeCount = 0;
 

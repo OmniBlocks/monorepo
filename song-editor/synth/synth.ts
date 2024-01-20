@@ -6878,7 +6878,7 @@ class EnvelopeComputer {
                 this._noteSizeFinal = Config.noteSizeMax;
             }
         }
-        const tickTimeEnd: number = tickTimeStart + 1.0;
+        const tickTimeEnd: number = tickTimeStart + timeScale;
         const tickTimeEndReal: number = tickTimeStartReal + 1.0;
         const noteSecondsStart: number = this.noteSecondsEnd;
         const noteSecondsEnd: number = noteSecondsStart + secondsPerTick;
@@ -7419,10 +7419,6 @@ class InstrumentState {
 
         this.volumeScale = 1.0;
         this.aliases = false;
-        this.vibratoTime = 0.0;
-        this.nextVibratoTime = 0.0;
-        this.arpTime = 0.0;
-        this.envelopeTime = 0.0;
 
         this.awake = false;
         this.flushingDelayLines = false;
@@ -7433,6 +7429,11 @@ class InstrumentState {
 
     public resetAllEffects(): void {
         this.deactivate();
+        // LFOs are reset here rather than in deactivate() for periodic oscillation that stays "on the beat". Resetting in deactivate() will cause it to reset with each note.
+        this.vibratoTime = 0;
+        this.nextVibratoTime = 0;
+        this.arpTime = 0;
+        this.envelopeTime = 0;
 
         if (this.chorusDelayLineDirty) {
             for (let i: number = 0; i < this.chorusDelayLineL!.length; i++) this.chorusDelayLineL![i] = 0.0;
@@ -10314,7 +10315,13 @@ export class Synth {
         const envelopeComputer: EnvelopeComputer = tone.envelopeComputer;
         let useEnvelopeSpeed: number = Config.arpSpeedScale[instrument.envelopeSpeed];
         if (this.isModActive(Config.modulators.dictionary["envelope speed"].index, channelIndex, tone.instrumentIndex)) {
-            useEnvelopeSpeed = Math.max(0, this.getModValue(Config.modulators.dictionary["envelope speed"].index, channelIndex, tone.instrumentIndex, false));
+            useEnvelopeSpeed = Math.max(0, Math.min(Config.arpSpeedScale.length - 1, this.getModValue(Config.modulators.dictionary["envelope speed"].index, channelIndex, tone.instrumentIndex, false)));
+            if (Number.isInteger(useEnvelopeSpeed)) {
+                useEnvelopeSpeed = Config.arpSpeedScale[useEnvelopeSpeed];
+            } else {
+                // Linear interpolate envelope values
+                useEnvelopeSpeed = (1 - (useEnvelopeSpeed % 1)) * Config.arpSpeedScale[Math.floor(useEnvelopeSpeed)] + (useEnvelopeSpeed % 1) * Config.arpSpeedScale[Math.ceil(useEnvelopeSpeed)];
+            }
         }
         envelopeComputer.computeEnvelopes(instrument, currentPart, instrumentState.envelopeTime, Config.ticksPerPart * partTimeStart, samplesPerTick / this.samplesPerSecond, tone, useEnvelopeSpeed);
         const envelopeStarts: number[] = tone.envelopeComputer.envelopeStarts;

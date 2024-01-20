@@ -2114,9 +2114,8 @@ export class SongEditor {
         this._globalOscscopeContainer.style.display = this._doc.prefs.showOscilloscope ? "" : "none";
         this._doc.synth.oscEnabled = this._doc.prefs.showOscilloscope;
         this._sampleLoadingStatusContainer.style.display = this._doc.prefs.showSampleLoadingStatus ? "" : "none";
-        // assuming text-content always exists isn't the greatest...
-        // if (document.getElementById('text-content'))
-        document.getElementById('text-content')!.style.display = this._doc.prefs.showDescription ? "" : "none";
+        if (document.getElementById('text-content'))
+            document.getElementById('text-content')!.style.display = this._doc.prefs.showDescription ? "" : "none";
 
         if (this._doc.getFullScreen()) {
             const semitoneHeight: number = this._patternEditorRow.clientHeight / this._doc.getVisiblePitchCount();

@@ -2825,6 +2825,17 @@ export class ChangePasteInstrument extends ChangeGroup {
     }
 }
 
+export class ChangeAppendInstrument extends ChangeGroup {
+    constructor(doc: SongDocument, channel: Channel, instrument: any) {
+        super();
+        let newInstrument: Instrument = new Instrument(instrument["isDrum"], instrument["isMod"])
+        newInstrument.fromJsonObject(instrument, instrument["isDrum"], instrument["isMod"], false, false);
+        channel.instruments.push(newInstrument);
+        this._didSomething();
+        doc.notifier.changed();
+    }
+}
+
 export class ChangeSetPatternInstruments extends Change {
     constructor(doc: SongDocument, channelIndex: number, instruments: number[], pattern: Pattern) {
         super();

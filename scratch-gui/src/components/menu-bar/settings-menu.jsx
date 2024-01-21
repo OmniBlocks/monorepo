@@ -6,6 +6,7 @@ import {FormattedMessage} from 'react-intl';
 import LanguageMenu from './language-menu.jsx';
 import MenuBarMenu from './menu-bar-menu.jsx';
 import {MenuSection} from '../menu/menu.jsx';
+import MenuLabel from './tw-menu-label.jsx';
 import TWAccentThemeMenu from './tw-theme-accent.jsx';
 import TWGuiThemeMenu from './tw-theme-gui.jsx';
 import TWBlocksThemeMenu from './tw-theme-blocks.jsx';
@@ -25,11 +26,10 @@ const SettingsMenu = ({
     onRequestOpen,
     settingsMenuOpen
 }) => (
-    <div
-        className={classNames(menuBarStyles.menuBarItem, menuBarStyles.hoverable, menuBarStyles.themeMenu, {
-            [menuBarStyles.active]: settingsMenuOpen
-        })}
-        onMouseUp={onRequestOpen}
+    <MenuLabel
+        open={settingsMenuOpen}
+        onOpen={onRequestOpen}
+        onClose={onRequestClose}
     >
         <img
             src={settingsIcon}
@@ -54,7 +54,6 @@ const SettingsMenu = ({
             className={menuBarStyles.menuBarMenu}
             open={settingsMenuOpen}
             place={isRtl ? 'left' : 'right'}
-            onRequestClose={onRequestClose}
         >
             <MenuSection>
                 {canChangeLanguage && <LanguageMenu onRequestCloseSettings={onRequestClose} />}
@@ -69,7 +68,7 @@ const SettingsMenu = ({
                 )}
             </MenuSection>
         </MenuBarMenu>
-    </div>
+    </MenuLabel>
 );
 
 SettingsMenu.propTypes = {

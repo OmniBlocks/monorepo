@@ -18,6 +18,7 @@ import Divider from '../divider/divider.jsx';
 import SaveStatus from './save-status.jsx';
 import ProjectWatcher from '../../containers/project-watcher.jsx';
 import MenuBarMenu from './menu-bar-menu.jsx';
+import MenuLabel from './tw-menu-label.jsx';
 import {MenuItem, MenuSection} from '../menu/menu.jsx';
 import ProjectTitleInput from './project-title-input.jsx';
 import AuthorInfo from './author-info.jsx';
@@ -391,11 +392,10 @@ class MenuBar extends React.Component {
         // each item must have a 'title' FormattedMessage and a 'handleClick' function
         // generate a menu with items for each object in the array
         return (
-            <div
-                className={classNames(styles.menuBarItem, styles.hoverable, {
-                    [styles.active]: this.props.aboutMenuOpen
-                })}
-                onMouseUp={this.props.onRequestOpenAbout}
+            <MenuLabel
+                open={this.props.aboutMenuOpen}
+                onOpen={this.props.onRequestOpenAbout}
+                onClose={this.props.onRequestCloseAbout}
             >
                 <img
                     className={styles.aboutIcon}
@@ -406,7 +406,6 @@ class MenuBar extends React.Component {
                     className={classNames(styles.menuBarMenu)}
                     open={this.props.aboutMenuOpen}
                     place={this.props.isRtl ? 'right' : 'left'}
-                    onRequestClose={this.props.onRequestCloseAbout}
                 >
                     {
                         onClickAbout.map(itemProps => (
@@ -420,7 +419,7 @@ class MenuBar extends React.Component {
                         ))
                     }
                 </MenuBarMenu>
-            </div>
+            </MenuLabel>
         );
     }
     wrapAboutMenuCallback (callback) {
@@ -483,11 +482,10 @@ class MenuBar extends React.Component {
                 <div className={styles.mainMenu}>
                     <div className={styles.fileGroup}>
                         {this.props.errors.length > 0 && <div>
-                            <div
-                                className={classNames(styles.menuBarItem, styles.hoverable, {
-                                    [styles.active]: this.props.errorsMenuOpen
-                                })}
-                                onMouseUp={this.props.onClickErrors}
+                            <MenuLabel
+                                open={this.props.errorsMenuOpen}
+                                onOpen={this.props.onClickErrors}
+                                onClose={this.props.onRequestCloseErrors}
                             >
                                 <img
                                     src={errorIcon}
@@ -505,7 +503,6 @@ class MenuBar extends React.Component {
                                     className={classNames(styles.menuBarMenu)}
                                     open={this.props.errorsMenuOpen}
                                     place={this.props.isRtl ? 'left' : 'right'}
-                                    onRequestClose={this.props.onRequestCloseErrors}
                                 >
                                     <MenuSection>
                                         <MenuItemLink href="https://scratch.mit.edu/users/GarboMuffin/#comments">
@@ -534,7 +531,7 @@ class MenuBar extends React.Component {
                                         ))}
                                     </MenuSection>
                                 </MenuBarMenu>
-                            </div>
+                            </MenuLabel>
                         </div>}
                         {(this.props.canChangeTheme || this.props.canChangeLanguage) && (<SettingsMenu
                             canChangeLanguage={this.props.canChangeLanguage}
@@ -547,11 +544,10 @@ class MenuBar extends React.Component {
                             settingsMenuOpen={this.props.settingsMenuOpen}
                         />)}
                         {(this.props.canManageFiles) && (
-                            <div
-                                className={classNames(styles.menuBarItem, styles.hoverable, {
-                                    [styles.active]: this.props.fileMenuOpen
-                                })}
-                                onMouseUp={this.props.onClickFile}
+                            <MenuLabel
+                                open={this.props.fileMenuOpen}
+                                onOpen={this.props.onClickFile}
+                                onClose={this.props.onRequestCloseFile}
                             >
                                 <img
                                     src={fileIcon}
@@ -576,7 +572,6 @@ class MenuBar extends React.Component {
                                     className={classNames(styles.menuBarMenu)}
                                     open={this.props.fileMenuOpen}
                                     place={this.props.isRtl ? 'left' : 'right'}
-                                    onRequestClose={this.props.onRequestCloseFile}
                                 >
                                     <MenuItem
                                         isRtl={this.props.isRtl}
@@ -696,13 +691,12 @@ class MenuBar extends React.Component {
                                         </MenuItem>
                                     </MenuSection>
                                 </MenuBarMenu>
-                            </div>
+                            </MenuLabel>
                         )}
-                        <div
-                            className={classNames(styles.menuBarItem, styles.hoverable, {
-                                [styles.active]: this.props.editMenuOpen
-                            })}
-                            onMouseUp={this.props.onClickEdit}
+                        <MenuLabel
+                            open={this.props.editMenuOpen}
+                            onOpen={this.props.onClickEdit}
+                            onClose={this.props.onRequestCloseEdit}
                         >
                             <img
                                 src={editIcon}
@@ -727,7 +721,6 @@ class MenuBar extends React.Component {
                                 className={classNames(styles.menuBarMenu)}
                                 open={this.props.editMenuOpen}
                                 place={this.props.isRtl ? 'left' : 'right'}
-                                onRequestClose={this.props.onRequestCloseEdit}
                             >
                                 {this.props.isPlayerOnly ? null : (
                                     <DeletionRestorer>{(handleRestore, {restorable, deletedItem}) => (
@@ -823,26 +816,22 @@ class MenuBar extends React.Component {
                                     </MenuItem>
                                 </MenuSection>
                             </MenuBarMenu>
-                        </div>
+                        </MenuLabel>
                         {this.props.isTotallyNormal && (
-                            <div
-                                className={classNames(styles.menuBarItem, styles.hoverable, {
-                                    [styles.active]: this.props.modeMenuOpen
-                                })}
-                                onMouseUp={this.props.onClickMode}
+                            <MenuLabel
+                                open={this.props.modeMenuOpen}
+                                onOpen={this.props.onClickMode}
+                                onClose={this.props.onRequestCloseMode}
                             >
-                                <div className={classNames(styles.editMenu)}>
-                                    <FormattedMessage
-                                        defaultMessage="Mode"
-                                        description="Mode menu item in the menu bar"
-                                        id="gui.menuBar.modeMenu"
-                                    />
-                                </div>
+                                <FormattedMessage
+                                    defaultMessage="Mode"
+                                    description="Mode menu item in the menu bar"
+                                    id="gui.menuBar.modeMenu"
+                                />
                                 <MenuBarMenu
                                     className={classNames(styles.menuBarMenu)}
                                     open={this.props.modeMenuOpen}
                                     place={this.props.isRtl ? 'left' : 'right'}
-                                    onRequestClose={this.props.onRequestCloseMode}
                                 >
                                     <MenuSection>
                                         <MenuItem onClick={this.handleSetMode('NOW')}>
@@ -869,13 +858,13 @@ class MenuBar extends React.Component {
                                         </MenuItem>
                                     </MenuSection>
                                 </MenuBarMenu>
-                            </div>
+                            </MenuLabel>
                         )}
 
                         {this.props.onClickAddonSettings && (
                             <div
                                 className={classNames(styles.menuBarItem, styles.hoverable)}
-                                onMouseUp={this.props.onClickAddonSettings}
+                                onClick={this.props.onClickAddonSettings}
                             >
                                 <img
                                     src={addonsIcon}
@@ -895,7 +884,7 @@ class MenuBar extends React.Component {
                         {this.props.onClickSettingsModal && (
                             <div
                                 className={classNames(styles.menuBarItem, styles.hoverable)}
-                                onMouseUp={this.props.onClickSettingsModal}
+                                onClick={this.props.onClickSettingsModal}
                             >
                                 <img
                                     src={advancedIcon}

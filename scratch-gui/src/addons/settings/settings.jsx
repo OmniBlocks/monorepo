@@ -37,7 +37,6 @@ import styles from './settings.css';
 import {detectTheme} from '../../lib/themes/themePersistance.js';
 import {applyGuiColors} from '../../lib/themes/guiHelpers.js';
 import {APP_NAME} from '../../lib/brand.js';
-import '../polyfill';
 import '../../lib/normalize.css';
 
 /* eslint-disable no-alert */

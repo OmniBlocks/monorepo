@@ -7,8 +7,8 @@ const getMoveTool = (tool) => {
   return tool.boundingBoxTool._modeMap.MOVE;
 };
 
-export const updateSelectTool = (paper, tool) => {
-  const lib = loadModules(paper);
+export const updateSelectTool = (paper, tool, vm) => {
+  const lib = loadModules(paper, vm);
   const {
     math: { checkPointsClose, snapDeltaToAngle },
     view: { getActionBounds, CENTER },

@@ -8,8 +8,8 @@ const getScaleTool = (tool) => {
   return tool.boundingBoxTool._modeMap.SCALE;
 };
 
-export const updateScaleTool = (paper, tool) => {
-  const lib = loadModules(paper);
+export const updateScaleTool = (paper, tool, vm) => {
+  const lib = loadModules(paper, vm);
   const {
     view: { getActionBounds },
     layer: { getLayer },

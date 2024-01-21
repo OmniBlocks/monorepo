@@ -166,7 +166,9 @@ class StageSelector extends React.Component {
     render () {
         const componentProps = omit(this.props, [
             'asset', 'dispatchSetHoveredSprite', 'id', 'intl',
-            'onActivateTab', 'onSelect', 'onShowImporting', 'onCloseImporting']);
+            'onActivateTab', 'onSelect', 'onShowImporting', 'onCloseImporting',
+            'isRtl', 'workspaceMetrics'
+        ]);
         return (
             <DroppableThrottledStage
                 componentRef={this.setRef}

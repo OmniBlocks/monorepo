@@ -103,7 +103,7 @@ Selector.propTypes = {
     isRtl: PropTypes.bool,
     items: PropTypes.arrayOf(PropTypes.shape({
         url: PropTypes.string,
-        name: PropTypes.string.isRequired
+        name: PropTypes.any // modified by folders addon
     })),
     onAddSortable: PropTypes.func,
     onDeleteClick: PropTypes.func,

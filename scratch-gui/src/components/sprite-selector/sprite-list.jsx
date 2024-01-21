@@ -121,7 +121,7 @@ SpriteList.propTypes = {
             rotationCenterX: PropTypes.number.isRequired,
             rotationCenterY: PropTypes.number.isRequired
         }),
-        name: PropTypes.string.isRequired,
+        name: PropTypes.any, // modified by folders addon
         order: PropTypes.number.isRequired
     })),
     onAddSortable: PropTypes.func,

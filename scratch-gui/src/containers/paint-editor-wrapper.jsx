@@ -90,7 +90,7 @@ class PaintEditorWrapper extends React.Component {
 
 PaintEditorWrapper.propTypes = {
     customStageSize: PropTypes.shape({
-        width: PropTypes.width,
+        width: PropTypes.number,
         height: PropTypes.number
     }),
     onManageFonts: PropTypes.func.isRequired,

@@ -52,8 +52,8 @@ ButtonComponent.propTypes = {
     disabled: PropTypes.bool,
     iconClassName: PropTypes.string,
     iconSrc: PropTypes.string,
-    iconHeight: PropTypes.string,
-    iconWidth: PropTypes.string,
+    iconHeight: PropTypes.number,
+    iconWidth: PropTypes.number,
     onClick: PropTypes.func
 };
 

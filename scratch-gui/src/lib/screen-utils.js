@@ -69,6 +69,11 @@ const getStageDimensions = (stageSize, customStageSize, isFullScreen) => {
         }
 
         stageDimensions.scale = stageDimensions.width / stageDimensions.widthDefault;
+    } else if (stageSize === STAGE_DISPLAY_SIZES.small) {
+        // Small stage mode uses a fixed width
+        stageDimensions.width = STAGE_DISPLAY_SCALES[stageSize] * 480;
+        stageDimensions.scale = stageDimensions.width / stageDimensions.widthDefault;
+        stageDimensions.height = stageDimensions.scale * stageDimensions.heightDefault;
     } else {
         stageDimensions.scale = STAGE_DISPLAY_SCALES[stageSize];
         stageDimensions.height = stageDimensions.scale * stageDimensions.heightDefault;

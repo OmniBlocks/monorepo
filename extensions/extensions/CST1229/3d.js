@@ -160,7 +160,6 @@
             blockType: Scratch.BlockType.REPORTER,
             text: "z position",
           },
-          "---",
           {
             opcode: "set3DPos",
             blockType: Scratch.BlockType.COMMAND,
@@ -199,6 +198,7 @@
               },
             },
           },
+          "---",
           {
             opcode: "set3DDir",
             blockType: Scratch.BlockType.COMMAND,
@@ -207,7 +207,7 @@
               DIRECTION: {
                 type: Scratch.ArgumentType.STRING,
                 menu: "direction",
-                defaultValue: "angle",
+                defaultValue: "y",
               },
               DEGREES: {
                 type: Scratch.ArgumentType.NUMBER,
@@ -234,12 +234,12 @@
           {
             opcode: "direction3D",
             blockType: Scratch.BlockType.REPORTER,
-            text: "my [DIRECTION]",
+            text: "direction around [DIRECTION]",
             arguments: {
               DIRECTION: {
                 type: Scratch.ArgumentType.MENU,
                 menu: "direction",
-                defaultValue: "angle",
+                defaultValue: "y",
               },
             },
           },
@@ -282,6 +282,7 @@
               },
             },
           },
+          "---",
           {
             opcode: "setCamDir",
             blockType: Scratch.BlockType.COMMAND,
@@ -290,7 +291,7 @@
               DIRECTION: {
                 type: Scratch.ArgumentType.STRING,
                 menu: "direction",
-                defaultValue: "angle",
+                defaultValue: "y",
               },
               DEGREES: {
                 type: Scratch.ArgumentType.NUMBER,
@@ -317,15 +318,16 @@
           {
             opcode: "camDir",
             blockType: Scratch.BlockType.REPORTER,
-            text: "camera [DIRECTION]",
+            text: "camera direction around [DIRECTION]",
             arguments: {
               DIRECTION: {
                 type: Scratch.ArgumentType.MENU,
                 menu: "direction",
-                defaultValue: "angle",
+                defaultValue: "y",
               },
             },
           },
+          "---",
           {
             opcode: "setCameraParam",
             blockType: Scratch.BlockType.COMMAND,
@@ -358,7 +360,7 @@
         menus: {
           MODE_MENU: {
             acceptReporters: true,
-            items: ["disabled", "flat", "sprite"],
+            items: ["disabled", "flat", "sprite", "cube", "sphere",],
           },
           turnDirection: {
             acceptReporters: false,
@@ -377,7 +379,11 @@
           },
           direction: {
             acceptReporters: true,
-            items: ["angle", "aim", "roll"],
+            items: [
+              {value: "y", text: "y (yaw)"},
+              {value: "x", text: "x (pitch)"},
+              {value: "z", text: "z (roll)"},
+            ],
           },
           cameraParam: {
             acceptReporters: true,
@@ -393,7 +399,7 @@
       // create everything
       this.scene = new THREE.Scene();
       this.camera = new THREE.PerspectiveCamera(60, 1, 0.1, 1000);
-      this.camera.position.set(0, 0, 175);
+      this.camera.position.set(0, 0, 200);
       this.camera.lookAt(0, 0, 0);
       this.camera.near = 0.5;
       this.camera.far = 4800;
@@ -482,8 +488,7 @@
         },
         updateDirection(og, direction) {
           if (this[IN_3D]) {
-            const o = this[OBJECT];
-            o._roll = THREE.MathUtils.degToRad(direction);
+            this._roll = THREE.MathUtils.degToRad(direction);
             Drawable.threed.updateSpriteAngle(this);
             Drawable.threed.updateRenderer();
           }
@@ -658,8 +663,20 @@
         }
       } else {
         obj.material = new THREE.MeshBasicMaterial();
-        obj.material.side = THREE.DoubleSide;
-        obj.geometry = new THREE.PlaneGeometry(dr.skin.size[0], dr.skin.size[1]);
+        switch (type) {
+          case "flat":
+            obj.geometry = new THREE.PlaneGeometry(dr.skin.size[0], dr.skin.size[1]);
+            obj.material.side = THREE.DoubleSide;
+            break;
+          case "cube":
+            obj.geometry = new THREE.BoxGeometry(dr.skin.size[0], dr.skin.size[1], dr.skin.size[0]);
+            obj.material.side = THREE.FrontSide;
+            break;
+          case "sphere":
+            obj.geometry = new THREE.SphereGeometry(Math.max(dr.skin.size[0], dr.skin.size[1]) / 2, 24, 12);
+            obj.material.side = THREE.FrontSide;
+            break;
+        }
         obj.material.map = texture;
       }
       obj.material.transparent = true;
@@ -685,10 +702,15 @@
       if (util.target.isStage) return;
 
       this.init();
-      this.disable3DForDrawable(util.target.drawableID);
       switch (MODE) {
+        case "disabled":
+          this.disable3DForDrawable(util.target.drawableID);
+          break;
         case "flat":
         case "sprite":
+        case "cube":
+        case "sphere":
+          this.disable3DForDrawable(util.target.drawableID);
           this.enable3DForDrawable(util.target.drawableID, MODE);
           break;
       }
@@ -733,7 +755,7 @@
 
     updateSpriteAngle(util) {
       let dr;
-      if (util.target) {
+      if (util?.target) {
         if (util.target.isStage) return;
         dr = Scratch.renderer._allDrawables[util.target.drawableID];
       } else {
@@ -820,13 +842,13 @@
       if (!isFinite(DEGREES)) return;
 
       switch (DIRECTION) {
-        case "angle":
+        case "y":
           dr._yaw = -THREE.MathUtils.degToRad(DEGREES);
           break;
-        case "aim":
+        case "x":
           dr._pitch = THREE.MathUtils.degToRad(DEGREES);
           break;
-        case "roll":
+        case "z":
           util.target.setDirection(DEGREES);
           break;
       }
@@ -840,11 +862,11 @@
       if (!dr[IN_3D]) return 0;
 
       switch (DIRECTION) {
-        case "angle":
+        case "y":
           return -THREE.MathUtils.radToDeg(dr._yaw);
-        case "aim":
+        case "x":
           return THREE.MathUtils.radToDeg(dr._pitch);
-        case "roll":
+        case "z":
           return THREE.MathUtils.radToDeg(dr._roll);
         default:
           return 0;
@@ -927,13 +949,13 @@
 
       this.preUpdateCameraAngle();
       switch (DIRECTION) {
-        case "angle":
+        case "y":
           this.camera._yaw = -THREE.MathUtils.degToRad(DEGREES);
           break;
-        case "aim":
+        case "x":
           this.camera._pitch = THREE.MathUtils.degToRad(DEGREES);
           break;
-        case "roll":
+        case "z":
           this.camera._roll = THREE.MathUtils.degToRad(DEGREES);
           break;
       }
@@ -945,11 +967,11 @@
       this.init();
 
       switch (DIRECTION) {
-        case "angle":
+        case "y":
           return -THREE.MathUtils.radToDeg(this.camera._yaw);
-        case "aim":
+        case "x":
           return THREE.MathUtils.radToDeg(this.camera._pitch);
-        case "roll":
+        case "z":
           return THREE.MathUtils.radToDeg(this.camera._roll);
         default:
           return 0;

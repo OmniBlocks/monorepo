@@ -92,7 +92,6 @@
     "scratch-blocks": "github:TurboWarp/scratch-blocks#develop-builds",
     "scratch-paint": "github:TurboWarp/scratch-paint#develop",
     "scratch-render": "github:TurboWarp/scratch-render#develop",
-    "scratch-render-fonts": "1.0.0-prerelease.20231017225105",
     "scratch-vm": "github:TurboWarp/scratch-vm#develop",
     "style-loader": "^0.23.0",
     "text-encoding": "0.7.0",

@@ -9,6 +9,8 @@ import { ChannelSettingsPrompt } from "./ChannelSettingsPrompt";
 import { ColorConfig, ChannelColors } from "./ColorConfig";
 import { CustomChipPrompt } from "./CustomChipPrompt";
 import { CustomFilterPrompt } from "./CustomFilterPrompt";
+import { InstrumentExportPrompt } from "./InstrumentExportPrompt";
+import { InstrumentImportPrompt } from "./InstrumentImportPrompt";
 import { EditorConfig, isMobile, prettyNumber, Preset, PresetCategory } from "./EditorConfig";
 import { EuclideanRhythmPrompt } from "./EuclidgenRhythmPrompt";
 import { ExportPrompt } from "./ExportPrompt";
@@ -1066,6 +1068,21 @@ export class SongEditor {
         ]),
     ]);
 
+    private readonly _instrumentExportButton: HTMLButtonElement = button({ style: "max-width:86px; width: 86px;", class: "exportInstrumentButton" }, [
+        "Export",
+        // Export icon:
+        SVG.svg({ style: "flex-shrink: 0; position: absolute; left: 0; top: 50%; margin-top: -1em; pointer-events: none;", width: "2em", height: "2em", viewBox: "0 -960 960 960" }, [
+            SVG.path({ d: "M200-120v-40h560v40H200Zm279.231-150.769L254.615-568.462h130.769V-840h188.462v271.538h130.77L479.231-270.769Zm0-65.385 142.923-191.538h-88.308V-800H425.385v272.308h-88.308l142.154 191.538ZM480-527.692Z", fill: "currentColor" }),
+        ]),
+    ]);
+    private readonly _instrumentImportButton: HTMLButtonElement = button({ style: "max-width:86px;", class: "importInstrumentButton" }, [
+        "Import",
+        // Import icon:
+        SVG.svg({ style: "flex-shrink: 0; position: absolute; left: 0; top: 50%; margin-top: -1em; pointer-events: none;", width: "2em", height: "2em", viewBox: "0 -960 960 960" }, [
+            SVG.path({ d: "M200-120v-40h560v40H200Zm185.384-150.769v-271.539H254.615L480-840l224.616 297.692h-130.77v271.539H385.384Zm40.001-40h108.461v-272.308h88.308L480-774.615 337.077-583.077h88.308v272.308ZM480-583.077Z", fill: "currentColor"}),
+        ]),
+    ]);
+
     public readonly _globalOscscope: oscilascopeCanvas = new oscilascopeCanvas(canvas({ width: 144, height: 32, style: `border: 2px solid ${ColorConfig.uiWidgetBackground}; position: static;`, id: "oscilascopeAll" }), 1);
     private readonly _globalOscscopeContainer: HTMLDivElement = div({ style: "height: 38px; margin-left: auto; margin-right: auto;" },
         this._globalOscscope.canvas
@@ -1166,6 +1183,12 @@ export class SongEditor {
         div({ class: "selectRow" },
             this._instrumentCopyButton,
             this._instrumentPasteButton,
+        ),
+    );
+    private readonly _instrumentExportGroup: HTMLDivElement = div({ class: "editor-controls" },
+        div({ class: "selectRow" },
+            this._instrumentExportButton,
+            this._instrumentImportButton,
         ),
     );
     private readonly _instrumentSettingsTextRow: HTMLDivElement = div({ id: "instrumentSettingsText", style: `padding: 3px 0; max-width: 15em; text-align: center; color: ${ColorConfig.secondaryText};` },
@@ -1631,6 +1654,8 @@ export class SongEditor {
         this.mainLayer.addEventListener("focusin", this._onFocusIn);
         this._instrumentCopyButton.addEventListener("click", this._copyInstrument.bind(this));
         this._instrumentPasteButton.addEventListener("click", this._pasteInstrument.bind(this));
+        this._instrumentExportButton.addEventListener("click", this._exportInstruments.bind(this));
+        this._instrumentImportButton.addEventListener("click", this._importInstruments.bind(this));
 
         sampleLoadEvents.addEventListener("sampleloaded", this._updateSampleLoadingBar.bind(this));
 
@@ -2028,6 +2053,12 @@ export class SongEditor {
                 case "recordingSetup":
                     this.prompt = new RecordingSetupPrompt(this._doc);
                     break;
+                case "exportInstrument":
+                    this.prompt = new InstrumentExportPrompt(this._doc);//, this);
+                    break;
+                case "importInstrument":
+                    this.prompt = new InstrumentImportPrompt(this._doc);//, this);
+                    break;
                 case "stringSustain":
 					this.prompt = new SustainPrompt(this._doc);
 					break;
@@ -2234,6 +2265,7 @@ export class SongEditor {
             this._instrumentVolumeSliderRow.style.display = "";
             this._instrumentTypeSelectRow.style.setProperty("display", "");
             this._instrumentSettingsGroup.appendChild(this._instrumentCopyGroup);
+            this._instrumentSettingsGroup.appendChild(this._instrumentExportGroup);
             this._instrumentSettingsGroup.insertBefore(this._instrumentsButtonRow, this._instrumentSettingsGroup.firstChild);
             this._instrumentSettingsGroup.insertBefore(this._instrumentSettingsTextRow, this._instrumentSettingsGroup.firstChild);
 
@@ -2736,6 +2768,7 @@ export class SongEditor {
             $("#pitchPresetSelect").parent().hide();
             $("#drumPresetSelect").parent().hide();
             this._modulatorGroup.appendChild(this._instrumentCopyGroup);
+            this._modulatorGroup.appendChild(this._instrumentExportGroup);
 
             this._modulatorGroup.insertBefore(this._instrumentsButtonRow, this._modulatorGroup.firstChild);
             this._modulatorGroup.insertBefore(this._instrumentSettingsTextRow, this._modulatorGroup.firstChild);
@@ -4477,6 +4510,14 @@ export class SongEditor {
         this.refocusStage();
     }
 
+    private _exportInstruments = (): void => {
+        this._openPrompt("exportInstrument");
+    }
+
+    private _importInstruments = (): void => {
+        this._openPrompt("importInstrument");
+    };
+    
     private _switchEQFilterType(toSimple: boolean) {
         const channel: Channel = this._doc.song.channels[this._doc.channel];
         const instrument: Instrument = channel.instruments[this._doc.getCurrentInstrument()];

@@ -9,11 +9,13 @@
 /editor/*.js
 /player/*.js
 /synth/*.js
-/app_editor/*.js
+/app/*.js
+/app_editor/*.ts
+!/app_editor/OfflineAddSamplesPrompt.ts
 /editor/*.js.map
 /player/*.js.map
 /synth/*.js.map
-/app_editor/*.js.map
+/app/*.js.map
 /**/*.ts.bak
 /**/*.html.bak
 /build

@@ -2,13 +2,11 @@
 set -e
 
 
-# Copy SongEditor.ts into app_editor
+# Copy all typescript files of /editor to /app_editor
+cp editor/*.ts app_editor/
 
-# Edit the relative URLs of SongEditor.ts
-
-# Copy AddSamplesPrompt.ts into app_editor
-
-# Insert and replace text into AddSamplesPrompt.ts
+# Copy contents of OfflineAddSamplesPrompt.ts into AddSamplesPrompt.ts
+cp app_editor/OfflineAddSamplesPrompt.ts app_editor/AddSamplesPrompt.ts
 
 
 # Compile editor/main.ts into build/editor/main.js and dependencies

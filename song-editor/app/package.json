@@ -8,11 +8,11 @@
     "package": "electron-packager . --all",
     "package-host": "electron-packager ."
   },
-  "icon":  "path.join(__dirname, 'icon.ico')",
+  "icon": "path.join(__dirname, 'icon.ico')",
   "author": " ",
   "license": "MIT",
   "devDependencies": {
-    "electron": "^28.0.0",
+    "electron": "^28.1.4",
     "electron-packager": "^17.1.2"
   }
 }

@@ -2,6 +2,8 @@
 .DS_Store
 .vs
 /node_modules
+/app/node_modules
+/app/UltraBox Offline*
 /website/**/beepbox*.js
 /website/**/beepbox*.js.map
 /website/beepbox_offline.html

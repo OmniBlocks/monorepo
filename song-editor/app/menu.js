@@ -1,4 +1,5 @@
 const { Menu, BrowserWindow } = require('electron/main');
+// currently unused
 
 // use this for the mac only stuff in the future
 // const usingMac = process.platform === 'darwin'

@@ -656,7 +656,7 @@ export class AddSamplesPrompt {
             const canMoveDown: boolean = this._entries.length >= 2 && entryIndex < this._entries.length - 1;
             const entry: SampleEntry = this._entries[entryIndex];
             const optionsVisible: boolean = Boolean(this._entryOptionsDisplayStates[entryIndex]);
-            const urlInput: HTMLInputElement = input({ style: "flex-grow: 1; margin-left: 1em; width: 100%;", value: entry.url });
+            const urlInput: HTMLInputElement = input({ type: "file", style: "flex-grow: 1; margin-left: 1em; width: 100%;", value: entry.url });
             const sampleRateStepper: HTMLInputElement = input({ style: "flex-grow: 1; margin-left: 1em; width: 100%;", type: "number", value: "" + entry.sampleRate, min: "8000", max: "96000", step: "1" });
             const rootKeyStepper: HTMLInputElement = input({ style: "flex-grow: 1; margin-left: 1em; width: 100%;", type: "number", value: "" + entry.rootKey, min: "0", max: Config.maxPitch + Config.pitchesPerOctave, step: "1" });
             const rootKeyDisplay: HTMLSpanElement = span({ class: "add-sample-prompt-root-key-display", style: "margin-left: 0.4em; width: 3em; text-align: left; text-overflow: ellipsis; overflow: hidden; flex-shrink: 0;" }, `(${this._noteNameFromPitchNumber(entry.rootKey)})`);

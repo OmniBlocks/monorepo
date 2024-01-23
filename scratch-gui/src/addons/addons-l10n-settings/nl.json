@@ -20,6 +20,8 @@
     "jump-to-def/@description": "Spring naar een definitie van een eigen blok met de scrolwielknop of Shift+Klik op het blok.",
     "jump-to-def/@info-developer-tools": "Deze addon maakte voorheen deel uit van de \"ontwikkelaarstools\"-addon maar is nu hierheen verhuisd.",
     "jump-to-def/@name": "Springen naar definitie van eigen blok",
+    "reorder-custom-inputs/@description": "Voegt knoppen toe waarmee je ingangen van aangepaste blokken kan herschikken.",
+    "reorder-custom-inputs/@name": "Herschikbare ingangen van aangepaste blokken",
     "editor-searchable-dropdowns/@description": "Geeft je de mogelijkheid om de opties van dropdowns van blokken te zoeken met een zoekbalk.",
     "editor-searchable-dropdowns/@name": "Zoekbalk in dropdowns van blokken",
     "data-category-tweaks-v2/@description": "Maakt aanpassingen aan de Gegevens (\"Variabelen\")-blokcategorie.",

@@ -20,6 +20,8 @@
     "jump-to-def/@description": "Ermöglicht das Springen zur Definition eines benutzerdefinierten Blocks durch Klicken mit der mittleren oder rechten Maustaste mit gedrückter Umschalttaste.",
     "jump-to-def/@info-developer-tools": "Dieses Addon gehörte früher zum \"Entwicklertools\"-Addon, aber es wurde hierher verschoben.",
     "jump-to-def/@name": "Zu Blockdefinition springen",
+    "reorder-custom-inputs/@description": "Fügt Schaltflächen hinzu, mit denen Eingabefelder in benutzerdefinierten Blöcken verschoben werden können.",
+    "reorder-custom-inputs/@name": "Umsortierbare Parameter von benutzerdefinierten Blöcken",
     "editor-searchable-dropdowns/@description": "Ermögiicht das Filtern von Optionen in Block-Dropdowns.",
     "editor-searchable-dropdowns/@name": "Dropdown-Menü-Suche",
     "data-category-tweaks-v2/@description": "Bietet Optimierungen für die Kategorie Daten (\"Variablen\") im Editor.",

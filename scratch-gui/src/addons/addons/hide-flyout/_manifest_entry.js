@@ -109,6 +109,12 @@ const manifest = {
         }
       ],
       "default": "default"
+    },
+    {
+      "name": "Open by default",
+      "id": "lockLoad",
+      "type": "boolean",
+      "default": false
     }
   ],
   "tags": [

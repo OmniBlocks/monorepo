@@ -20,6 +20,8 @@
     "jump-to-def/@description": "Ti permette di andare alla definizione di un blocco personalizzato usando il pulsante centrale del mouse oppure cliccando il blocco mentre si preme Shift.",
     "jump-to-def/@info-developer-tools": "Questo addon faceva parte in precedenza dell'addon  \"strumenti per sviluppatori\" ma è stato spostato qui.",
     "jump-to-def/@name": "Vai alla definizione del blocco personalizzato",
+    "reorder-custom-inputs/@description": "Aggiunge dei pulsanti per poter spostare gli argomenti dei blocchi personalizzati.",
+    "reorder-custom-inputs/@name": "Argomenti mobili per i blocchi personalizzati",
     "editor-searchable-dropdowns/@description": "Permette di ricercare tra le opzioni nei menu degli argomenti dei blocchi",
     "editor-searchable-dropdowns/@name": "Ricerca nei menu dei blocchi",
     "data-category-tweaks-v2/@description": "Modifica nell'editor la categoria \"Variabili\".",

@@ -9,7 +9,7 @@ import {addMonitorRect, getInitialPosition, resizeMonitorRect, removeMonitorRect
 import {getVariable, setVariableValue} from '../lib/variable-utils';
 import importCSV from '../lib/import-csv';
 import downloadBlob from '../lib/download-blob';
-import {DEFAULT_THEME, Theme} from '../lib/themes';
+import {Theme} from '../lib/themes';
 import SliderPrompt from './slider-prompt.jsx';
 
 import {connect} from 'react-redux';

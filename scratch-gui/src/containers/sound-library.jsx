@@ -77,7 +77,7 @@ class SoundLibrary extends React.PureComponent {
         } else {
             this.setState({
                 data: getSoundLibraryThumbnailData(soundLibrary, this.props.isRtl)
-            })
+            });
         }
 
         this.audioEngine = new AudioEngine();

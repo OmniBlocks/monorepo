@@ -6,6 +6,8 @@ import bindAll from 'lodash.bindall';
 import SecurityManagerModal from '../components/tw-security-manager-modal/security-manager-modal.jsx';
 import SecurityModals from '../lib/tw-security-manager-constants';
 
+/* eslint-disable require-atomic-updates */
+
 /**
  * Set of extension URLs that the user has manually trusted to load unsandboxed.
  */

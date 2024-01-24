@@ -66,6 +66,7 @@ const fetchLibrary = async () => {
                         href={credit.link}
                         target="_blank"
                         rel="noreferrer"
+                        key={credit.name}
                     >
                         {credit.name}
                     </a>

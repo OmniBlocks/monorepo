@@ -41,7 +41,10 @@ const TitledHOC = function (WrappedComponent) {
             if (this.props.reduxProjectTitle !== prevProps.reduxProjectTitle &&
                 this.props.reduxProjectTitle !== this.props.projectTitle) {
                 const defaultProjectTitle = this.props.intl.formatMessage(messages.defaultProjectTitle);
-                this.props.onUpdateProjectTitle(this.props.reduxProjectTitle, this.props.reduxProjectTitle === defaultProjectTitle);
+                this.props.onUpdateProjectTitle(
+                    this.props.reduxProjectTitle,
+                    this.props.reduxProjectTitle === defaultProjectTitle
+                );
             }
         }
         handleReceivedProjectTitle (requestedTitle) {

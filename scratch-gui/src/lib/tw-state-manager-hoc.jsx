@@ -263,7 +263,7 @@ const createRouter = (style, callbacks) => {
         style = 'hash';
     }
 
-    if (routers.hasOwnProperty(style)) {
+    if (Object.prototype.hasOwnProperty.call(routers, style)) {
         return new routers[style](callbacks);
     }
 

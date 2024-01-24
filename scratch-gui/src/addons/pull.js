@@ -111,7 +111,7 @@ const includeImportedLibraries = contents => {
     // import RateLimiter from "../../libraries/rate-limiter.js";
     const matches = matchAll(
         contents,
-        /import +(?:{.*}|.*) +from +["']\.\.\/\.\.\/libraries\/([\w\d_\/-]+(?:\.esm)?\.js)["'];/g
+        /import +(?:{.*}|.*) +from +["']\.\.\/\.\.\/libraries\/([\w\d_/-]+(?:\.esm)?\.js)["'];/g
     );
     for (const match of matches) {
         const libraryFile = match[1];

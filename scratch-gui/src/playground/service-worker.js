@@ -1,4 +1,5 @@
 // These will be replaced at build-time by generate-service-worker-plugin.js
+/* globals __HTML_ASSETS__, __LAZY_ASSETS__, __LAZY_ASSETS_NAME__ */
 const HTML_ASSETS = __HTML_ASSETS__;
 const LAZY_ASSETS = __LAZY_ASSETS__;
 const LAZY_ASSETS_NAME = __LAZY_ASSETS_NAME__;

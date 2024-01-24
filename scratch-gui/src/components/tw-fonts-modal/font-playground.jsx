@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styles from './fonts-modal.css';
 import bindAll from 'lodash.bindall';
-import classNames from 'classnames';
 
 // TODO: is this something to localize?
 const QUICK_BROWN_FOX = 'The quick brown fox jumps over the lazy dog.';

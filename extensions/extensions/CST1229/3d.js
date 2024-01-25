@@ -423,6 +423,8 @@
       }).bind(this);
       Scratch.vm.on("STAGE_SIZE_CHANGED", this.stageSizeEvent);
 
+      this.stampRenderTarget = new THREE.WebGLRenderTarget();
+
       this.applyPatches();
       this.updateScale();
     }
@@ -449,6 +451,9 @@
       if (this.stageSizeEvent)
         Scratch.vm.off("STAGE_SIZE_CHANGED", this.stageSizeEvent);
       this.stageSizeEvent = undefined;
+      if (this.stampRenderTarget)
+        this.stampRenderTarget.dispose();
+      this.stampRenderTarget = undefined;
 
       Scratch.vm.runtime.requestRedraw();
     }
@@ -462,6 +467,7 @@
 
       this.camera.aspect = w / h;
       this.renderer.setSize(w, h);
+      this.stampRenderTarget.setSize(w, h);
       this.camera.updateProjectionMatrix();
 
       this.updateRenderer();
@@ -526,6 +532,28 @@
           }
           return og();
         },
+
+        penStamp(og, penSkinID, stampID) {
+          const dr = this._allDrawables[stampID];
+          if (!dr) return;
+          if (dr[IN_3D]) {
+            // Draw the sprite to the 3D drawable then stamp it
+            const threed = Drawable.threed;
+            const threeDrawable = this._allDrawables[threed.threeDrawableId];
+            threed.renderer.setRenderTarget(threed.stampRenderTarget);
+
+            threed.renderer.render(dr[OBJECT], threed.camera);
+
+            const oldTexture = threeDrawable._texture;
+            threeDrawable._texture = threed.stampRenderTarget.texture;
+            og(penSkinID, threed.threeDrawableId);
+            threeDrawable._texture = oldTexture;
+
+            threed.renderer.setRenderTarget(null);
+            return;
+          }
+          return og(penSkinID, stampID);
+        }
       });
     }
 
@@ -644,7 +672,7 @@
       this.updateMeshForDrawable(drawableID, type);
       if (!("_yaw" in dr)) dr._yaw = 0;
       if (!("_pitch" in dr)) dr._pitch = 0;
-      if (!("_roll" in dr)) dr._roll = THREE.MathUtils.degToRad(90);
+      if (!("_roll" in dr)) dr._roll = 0;
 
       this.scene.add(obj);
       this.updateRenderer();
@@ -892,7 +920,7 @@
     preUpdateCameraAngle() {
       if (!("_yaw" in this.camera)) this.camera._yaw = 0;
       if (!("_pitch" in this.camera)) this.camera._pitch = 0;
-      if (!("_roll" in this.camera)) this.camera._roll = THREE.MathUtils.degToRad(90);
+      if (!("_roll" in this.camera)) this.camera._roll = 0;
     }
 
     updateCameraAngle() {

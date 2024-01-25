@@ -790,7 +790,7 @@
       );
       obj.rotateOnAxis(
         new THREE.Vector3(0, 0, 1),
-        dr._roll - THREE.MathUtils.degToRad(90)
+        THREE.MathUtils.degToRad(90) - dr._roll
       );
     }
 
@@ -862,7 +862,7 @@
           break;
         case "z":
         case "roll":
-          util.target.setDirection(DEGREES);
+          util.target.setDirection(DEGREES + 90);
           break;
       }
       this.updateSpriteAngle(util);
@@ -883,7 +883,7 @@
           return THREE.MathUtils.radToDeg(dr._pitch);
         case "z":
         case "roll":
-          return THREE.MathUtils.radToDeg(dr._roll);
+          return THREE.MathUtils.radToDeg(dr._roll) - 90;
         default:
           return 0;
       }
@@ -911,7 +911,7 @@
       );
       this.camera.rotateOnAxis(
         new THREE.Vector3(0, 0, 1),
-        this.camera._roll - THREE.MathUtils.degToRad(90)
+        this.camera._roll
       );
     }
 
@@ -985,6 +985,7 @@
     camDir({ DIRECTION }, util) {
       this.init();
 
+      this.preUpdateCameraAngle();
       switch (DIRECTION) {
         case "y":
         case "angle":

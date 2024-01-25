@@ -853,7 +853,7 @@
 
       switch (DIRECTION) {
         case "y":
-        case "angle":
+        case "angle": // Old versions of the extension used angle/aim/roll instead of rotation around Y/X/Z
           dr._yaw = -THREE.MathUtils.degToRad(DEGREES);
           break;
         case "x":

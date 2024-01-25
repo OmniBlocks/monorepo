@@ -477,6 +477,16 @@
           if (this[IN_3D]) return false;
           return og();
         },
+        updateVisible(og, value) {
+          if (this[IN_3D]) {
+            const o = this[OBJECT];
+            if (o.visible !== value) {
+              o.visible = value;
+              Drawable.threed.updateRenderer();
+            }
+          }
+          return og(value);
+        },
         updatePosition(og, position) {
           if (this[IN_3D]) {
             const o = this[OBJECT];
@@ -843,12 +853,15 @@
 
       switch (DIRECTION) {
         case "y":
+        case "angle":
           dr._yaw = -THREE.MathUtils.degToRad(DEGREES);
           break;
         case "x":
+        case "aim":
           dr._pitch = THREE.MathUtils.degToRad(DEGREES);
           break;
         case "z":
+        case "roll":
           util.target.setDirection(DEGREES);
           break;
       }
@@ -863,10 +876,13 @@
 
       switch (DIRECTION) {
         case "y":
+        case "angle":
           return -THREE.MathUtils.radToDeg(dr._yaw);
         case "x":
+        case "aim":
           return THREE.MathUtils.radToDeg(dr._pitch);
         case "z":
+        case "roll":
           return THREE.MathUtils.radToDeg(dr._roll);
         default:
           return 0;
@@ -950,12 +966,15 @@
       this.preUpdateCameraAngle();
       switch (DIRECTION) {
         case "y":
+        case "angle":
           this.camera._yaw = -THREE.MathUtils.degToRad(DEGREES);
           break;
         case "x":
+        case "aim":
           this.camera._pitch = THREE.MathUtils.degToRad(DEGREES);
           break;
         case "z":
+        case "roll":
           this.camera._roll = THREE.MathUtils.degToRad(DEGREES);
           break;
       }
@@ -968,10 +987,13 @@
 
       switch (DIRECTION) {
         case "y":
+        case "angle":
           return -THREE.MathUtils.radToDeg(this.camera._yaw);
         case "x":
+        case "aim":
           return THREE.MathUtils.radToDeg(this.camera._pitch);
         case "z":
+        case "roll":
           return THREE.MathUtils.radToDeg(this.camera._roll);
         default:
           return 0;

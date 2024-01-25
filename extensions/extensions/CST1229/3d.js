@@ -612,7 +612,7 @@
         canvas.height = 1;
         return canvas;
       }
-      
+
       switch (skin.constructor) {
         case Scratch.renderer.exports.BitmapSkin: {
           if (skin._textureSize[0] < 1 || skin._textureSize[1] < 1)
@@ -764,6 +764,15 @@
         case "sphere":
           this.disable3DForDrawable(util.target.drawableID);
           this.enable3DForDrawable(util.target.drawableID, MODE);
+          if (util.target.renderer) {
+            // Update properties
+            const target = util.target;
+            const renderer = target.renderer;
+            const {direction, scale} = target._getRenderedDirectionAndScale();
+            renderer.updateDrawablePosition(target.drawableID, [target.x, target.y]);
+            renderer.updateDrawableDirectionScale(target.drawableID, direction, scale);
+            renderer.updateDrawableVisible(target.drawableID, target.visible);
+          }
           break;
       }
     }

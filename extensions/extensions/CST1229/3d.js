@@ -606,8 +606,17 @@
     }
 
     getCanvasFromSkin(skin) {
+      const emptyCanvas = () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = 1;
+        canvas.height = 1;
+        return canvas;
+      }
+      
       switch (skin.constructor) {
         case Scratch.renderer.exports.BitmapSkin: {
+          if (skin._textureSize[0] < 1 || skin._textureSize[1] < 1)
+            return emptyCanvas();
           return this.getCanvasFromTexture(
             Scratch.renderer.gl,
             skin.getTexture(),
@@ -626,11 +635,16 @@
           const mipLevel = Math.max(Math.ceil(Math.log2(requestedScale)) + INDEX_OFFSET, 0);
           const mipScale = Math.pow(2, mipLevel - INDEX_OFFSET);
 
+          const sizeX = Math.ceil(skin._size[0] * mipScale);
+          const sizeY = Math.ceil(skin._size[1] * mipScale)
+          if (sizeX < 1 || sizeY < 1)
+            return emptyCanvas();
+
           return this.getCanvasFromTexture(
             Scratch.renderer.gl,
             skin.getTexture([textureScale, textureScale]),
-            Math.ceil(skin._size[0] * mipScale),
-            Math.ceil(skin._size[1] * mipScale)
+            sizeX,
+            sizeY
           );
         }
         default:

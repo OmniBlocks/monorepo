@@ -6,6 +6,8 @@
 /* global THREE */
 // @ts-nocheck
 
+// Special thanks to Drago NrxThulitech Cuven for finding lots of bugs
+
 (function (Scratch) {
   "use strict";
 
@@ -539,17 +541,12 @@
           if (dr[IN_3D]) {
             // Draw the sprite to the 3D drawable then stamp it
             const threed = Drawable.threed;
-            const threeDrawable = this._allDrawables[threed.threeDrawableId];
-            threed.renderer.setRenderTarget(threed.stampRenderTarget);
-
             threed.renderer.render(dr[OBJECT], threed.camera);
-
-            const oldTexture = threeDrawable._texture;
-            threeDrawable._texture = threed.stampRenderTarget.texture;
+            this._allSkins[threed.threeSkinId].setContent(
+              threed.renderer.domElement
+            );
             og(penSkinID, threed.threeDrawableId);
-            threeDrawable._texture = oldTexture;
-
-            threed.renderer.setRenderTarget(null);
+            threed.updateRenderer();
             return;
           }
           return og(penSkinID, stampID);

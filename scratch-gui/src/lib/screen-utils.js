@@ -1,4 +1,9 @@
-import {STAGE_DISPLAY_SCALES, STAGE_SIZE_MODES, STAGE_DISPLAY_SIZES} from '../lib/layout-constants';
+import {
+    STAGE_DISPLAY_SCALE_METADATA,
+    STAGE_SIZE_MODES,
+    STAGE_DISPLAY_SIZES,
+    FIXED_WIDTH
+} from '../lib/layout-constants';
 
 const maxScaleParam = typeof URLSearchParams !== 'undefined' && new URLSearchParams(location.search).get('scale');
 
@@ -24,17 +29,14 @@ const STAGE_DIMENSION_DEFAULTS = {
 /**
  * Resolve the current GUI and browser state to an actual stage size enum value.
  * @param {STAGE_SIZE_MODES} stageSizeMode - the state of the stage size toggle button.
- * @param {boolean} isFullSize - true if the window is large enough for the large stage at its full size.
+ * @param {boolean} isUnconstrained - true if the window is large enough for the full stage at its full size.
  * @return {STAGE_DISPLAY_SIZES} - the stage size enum value we should use in this situation.
  */
-const resolveStageSize = (stageSizeMode, isFullSize) => {
-    if (stageSizeMode === STAGE_SIZE_MODES.small) {
-        return STAGE_DISPLAY_SIZES.small;
+const resolveStageSize = (stageSizeMode, isUnconstrained) => {
+    if (stageSizeMode === STAGE_SIZE_MODES.full && !isUnconstrained) {
+        return STAGE_DISPLAY_SIZES.constrained;
     }
-    if (isFullSize) {
-        return STAGE_DISPLAY_SIZES.large;
-    }
-    return STAGE_DISPLAY_SIZES.largeConstrained;
+    return stageSizeMode;
 };
 
 /**
@@ -69,15 +71,19 @@ const getStageDimensions = (stageSize, customStageSize, isFullScreen) => {
         }
 
         stageDimensions.scale = stageDimensions.width / stageDimensions.widthDefault;
-    } else if (stageSize === STAGE_DISPLAY_SIZES.small) {
-        // Small stage mode uses a fixed width
-        stageDimensions.width = STAGE_DISPLAY_SCALES[stageSize] * 480;
-        stageDimensions.scale = stageDimensions.width / stageDimensions.widthDefault;
-        stageDimensions.height = stageDimensions.scale * stageDimensions.heightDefault;
     } else {
-        stageDimensions.scale = STAGE_DISPLAY_SCALES[stageSize];
-        stageDimensions.height = stageDimensions.scale * stageDimensions.heightDefault;
-        stageDimensions.width = stageDimensions.scale * stageDimensions.widthDefault;
+        const metadata = STAGE_DISPLAY_SCALE_METADATA[stageSize];
+        if (metadata.width) {
+            // Uses a fixed width.
+            stageDimensions.width = metadata.width;
+            stageDimensions.scale = stageDimensions.width / stageDimensions.widthDefault;
+            stageDimensions.height = stageDimensions.scale * stageDimensions.heightDefault;
+        } else {
+            // Uses a width relative to the current size.
+            stageDimensions.scale = metadata.scale;
+            stageDimensions.height = stageDimensions.scale * stageDimensions.heightDefault;
+            stageDimensions.width = stageDimensions.scale * stageDimensions.widthDefault;
+        }
     }
 
     // Round off dimensions to prevent resampling/blurriness
@@ -87,7 +93,17 @@ const getStageDimensions = (stageSize, customStageSize, isFullScreen) => {
     return stageDimensions;
 };
 
-const getMinWidth = stageSize => STAGE_DISPLAY_SCALES[stageSize] * 480;
+/**
+ * @param {STAGE_DISPLAY_SIZES} stageSize - the current fully-resolved stage size.
+ * @returns {number} Minimum width to display the stage area of the screen at. May be wider than the stage's actual size
+ */
+const getMinWidth = stageSize => {
+    const metadata = STAGE_DISPLAY_SCALE_METADATA[stageSize];
+    if (metadata.width) {
+        return metadata.width;
+    }
+    return FIXED_WIDTH * metadata.scale;
+};
 
 /**
  * Take a pair of sizes for the stage (a target height and width and a default height and width),

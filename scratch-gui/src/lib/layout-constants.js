@@ -6,14 +6,19 @@ import keyMirror from 'keymirror';
  */
 const STAGE_SIZE_MODES = keyMirror({
     /**
-     * The "large stage" button is pressed; the user would like a large stage.
+     * Display the stage at a large (but fixed) width.
      */
     large: null,
 
     /**
-     * The "small stage" button is pressed; the user would like a small stage.
+     * Display the stage at a small (but fixed) width.
      */
-    small: null
+    small: null,
+
+    /**
+     * Display the stage at its full size.
+     */
+    full: null
 });
 
 /**
@@ -21,38 +26,45 @@ const STAGE_SIZE_MODES = keyMirror({
  * @enum {string}
  */
 const STAGE_DISPLAY_SIZES = keyMirror({
-    /**
-     * Large stage with wide browser
-     */
     large: null,
 
-    /**
-     * Large stage with narrow browser
-     */
-    largeConstrained: null,
+    small: null,
 
-    /**
-     * Small stage (ignores browser width)
-     */
-    small: null
+    constrained: null,
+
+    full: null
 });
 
 // zoom level to start with
 const BLOCKS_DEFAULT_SCALE = 0.675;
 
-const STAGE_DISPLAY_SCALES = {};
-STAGE_DISPLAY_SCALES[STAGE_DISPLAY_SIZES.large] = 1; // large mode, wide browser (standard)
-STAGE_DISPLAY_SCALES[STAGE_DISPLAY_SIZES.largeConstrained] = 0.85; // large mode but narrow browser
-STAGE_DISPLAY_SCALES[STAGE_DISPLAY_SIZES.small] = 0.5; // small mode, regardless of browser size
+const FIXED_WIDTH = 480;
 
-export default {
-    fullSizeMinWidth: 1096,
-    referenceWidth: 480
+/**
+ * Minimum amount of screen width (excluding the width used by the stage itself) to display constrained.
+ */
+const MINIMUM_NON_STAGE_WIDTH = 1096 - FIXED_WIDTH;
+
+const STAGE_DISPLAY_SCALE_METADATA = {
+    [STAGE_DISPLAY_SIZES.large]: {
+        width: FIXED_WIDTH
+    },
+    [STAGE_DISPLAY_SIZES.small]: {
+        width: FIXED_WIDTH * 0.5
+    },
+    [STAGE_DISPLAY_SIZES.constrained]: {
+        scale: 0.85
+    },
+    [STAGE_DISPLAY_SIZES.full]: {
+        scale: 1
+    }
 };
 
 export {
     BLOCKS_DEFAULT_SCALE,
-    STAGE_DISPLAY_SCALES,
+    STAGE_DISPLAY_SCALE_METADATA,
     STAGE_DISPLAY_SIZES,
-    STAGE_SIZE_MODES
+    STAGE_SIZE_MODES,
+    FIXED_WIDTH,
+    MINIMUM_NON_STAGE_WIDTH
 };

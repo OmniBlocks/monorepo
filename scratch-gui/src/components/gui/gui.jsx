@@ -36,7 +36,7 @@ import TWCustomExtensionModal from '../../containers/tw-custom-extension-modal.j
 import TWRestorePointManager from '../../containers/tw-restore-point-manager.jsx';
 import TWFontsModal from '../../containers/tw-fonts-modal.jsx';
 
-import layout, {STAGE_SIZE_MODES} from '../../lib/layout-constants';
+import {STAGE_SIZE_MODES, FIXED_WIDTH, MINIMUM_NON_STAGE_WIDTH} from '../../lib/layout-constants';
 import {resolveStageSize} from '../../lib/screen-utils';
 import {Theme} from '../../lib/themes';
 
@@ -167,9 +167,9 @@ const GUIComponent = props => {
         tabSelected: classNames(tabStyles.reactTabsTabSelected, styles.isSelected)
     };
 
-    const minWidth = layout.fullSizeMinWidth + Math.max(0, customStageSize.width - layout.referenceWidth);
-    return (<MediaQuery minWidth={minWidth}>{isFullSize => {
-        const stageSize = resolveStageSize(stageSizeMode, isFullSize);
+    const unconstrainedWidth = MINIMUM_NON_STAGE_WIDTH + FIXED_WIDTH + Math.max(0, customStageSize.width - FIXED_WIDTH);
+    return (<MediaQuery minWidth={unconstrainedWidth}>{isUnconstrained => {
+        const stageSize = resolveStageSize(stageSizeMode, isUnconstrained);
 
         const alwaysEnabledModals = (
             <React.Fragment>
@@ -201,7 +201,7 @@ const GUIComponent = props => {
                     isRendererSupported={isRendererSupported()}
                     isRtl={isRtl}
                     loading={loading}
-                    stageSize={STAGE_SIZE_MODES.large}
+                    stageSize={STAGE_SIZE_MODES.full}
                     vm={vm}
                 >
                     {alertsVisible ? (

@@ -519,6 +519,7 @@
             if (this[OBJECT].material.map) this[OBJECT].material.map.dispose();
             this[OBJECT].geometry.dispose();
             this[OBJECT] = null;
+            Drawable.threed.updateRenderer();
           }
           return og();
         },

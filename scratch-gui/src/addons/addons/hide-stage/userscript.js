@@ -3,6 +3,7 @@ export default async function ({ addon, console, msg }) {
   let bodyWrapper;
   let smallStageButton;
   let largeStageButton;
+  let fullStageButton;
 
   function hideStage() {
     stageHidden = true;
@@ -11,8 +12,9 @@ export default async function ({ addon, console, msg }) {
     // Inner class is applied to body wrapper so that it won't affect the project page.
     bodyWrapper.classList.add("sa-stage-hidden");
     hideStageButton.setAttribute("aria-pressed", true);
-    smallStageButton.setAttribute("aria-pressed", false);
-    largeStageButton.setAttribute("aria-pressed", false);
+    if (smallStageButton) smallStageButton.setAttribute("aria-pressed", false);
+    if (largeStageButton) largeStageButton.setAttribute("aria-pressed", false);
+    if (fullStageButton) fullStageButton.setAttribute("aria-pressed", false);
     window.dispatchEvent(new Event("resize")); // resizes the code area and paint editor canvas
   }
 
@@ -26,9 +28,10 @@ export default async function ({ addon, console, msg }) {
       const clickedButton = e.target.closest("button");
       if (clickedButton) clickedButton.setAttribute("aria-pressed", true);
     } else if (addon.tab.redux.state) {
-      if (addon.tab.redux.state.scratchGui.stageSize.stageSize === "small")
-        smallStageButton.setAttribute("aria-pressed", true);
-      else largeStageButton.setAttribute("aria-pressed", true);
+      const selectedStageSize = addon.tab.redux.state.scratchGui.stageSize.stageSize;
+      if (smallStageButton) smallStageButton.setAttribute("aria-pressed", selectedStageSize === "small");
+      if (largeStageButton) largeStageButton.setAttribute("aria-pressed", selectedStageSize === "large");
+      if (fullStageButton) fullStageButton.setAttribute("aria-pressed", selectedStageSize === "full");
     }
     window.dispatchEvent(new Event("resize")); // resizes the code area and paint editor canvas
   }
@@ -69,12 +72,18 @@ export default async function ({ addon, console, msg }) {
       }
     );
     bodyWrapper = document.querySelector("[class*='gui_body-wrapper_']");
-    smallStageButton = stageControls.firstChild;
-    largeStageButton = stageControls.lastChild;
+
+    const stageButtons = Array.from(stageControls.querySelectorAll("button"));
+    smallStageButton = stageButtons[0];
+    largeStageButton = stageButtons.length === 3 ? stageButtons[1] : null;
+    fullStageButton = stageButtons[stageButtons.length - 1];
+
     if (!addon.self.disabled) stageControls.insertBefore(hideStageButton, smallStageButton);
     if (stageHidden) hideStage();
     else unhideStage();
-    smallStageButton.addEventListener("click", unhideStage);
-    largeStageButton.addEventListener("click", unhideStage);
+
+    if (smallStageButton) smallStageButton.addEventListener("click", unhideStage);
+    if (largeStageButton) largeStageButton.addEventListener("click", unhideStage);
+    if (fullStageButton) fullStageButton.addEventListener("click", unhideStage);
   }
 }

@@ -77,7 +77,7 @@ export function loadModules(paper, vm) {
     if (isBitmap) {
       return ART_BOARD_BOUNDS;
     }
-    return paper.view.bounds.unite(ART_BOARD_BOUNDS).intersect(MAX_WORKSPACE_BOUNDS);
+    return paper.view.bounds.unite(ART_BOARD_BOUNDS);
   };
 
   const setDefaultGuideStyle = function (item) {

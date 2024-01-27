@@ -4,7 +4,14 @@
 @import "../../css/filters.css";
 
 .stage-header-wrapper {
-    position: relative;
+    position: absolute;
+    top: 0;
+}
+[dir="ltr"] .stage-header-wrapper {
+    right: 0;
+}
+[dir="rtl"] .stage-header-wrapper {
+    left: 0;
 }
 
 .stage-header-wrapper-overlay {

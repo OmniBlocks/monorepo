@@ -10,7 +10,7 @@ import Button from '../button/button.jsx';
 import ToggleButtons from '../toggle-buttons/toggle-buttons.jsx';
 import Controls from '../../containers/controls.jsx';
 import {getStageDimensions} from '../../lib/screen-utils';
-import {STAGE_SIZE_MODES} from '../../lib/layout-constants';
+import {STAGE_DISPLAY_SIZES, STAGE_SIZE_MODES} from '../../lib/layout-constants';
 
 import fullScreenIcon from './icon--fullscreen.svg';
 import unFullScreenIcon from './icon--unfullscreen.svg';
@@ -77,14 +77,16 @@ const StageHeaderComponent = function (props) {
         onSetStageFull,
         onOpenSettings,
         isEmbedded,
+        stageSize,
         stageSizeMode,
         vm
     } = props;
 
     let header = null;
 
+    const stageDimensions = getStageDimensions(stageSize, customStageSize, isFullScreen || isEmbedded);
+
     if (isFullScreen || isEmbedded) {
-        const stageDimensions = getStageDimensions(null, customStageSize, true);
         const settingsButton = isEmbedded && enableSettingsButton ? (
             <div className={classNames(styles.settingsButton, styles.unselectWrapper)}>
                 <Button
@@ -190,7 +192,11 @@ const StageHeaderComponent = function (props) {
                 </div>
             );
         header = (
-            <Box className={styles.stageHeaderWrapper}>
+            <Box
+                className={styles.stageHeaderWrapper}
+                // + 2 px because the stage will have 2 pixels of border around it
+                style={{minWidth: `${stageDimensions.width + 2}px`}}
+            >
                 <Box className={styles.stageMenuWrapper}>
                     <Controls
                         vm={vm}
@@ -246,6 +252,7 @@ StageHeaderComponent.propTypes = {
     onSetStageFull: PropTypes.func.isRequired,
     onOpenSettings: PropTypes.func.isRequired,
     isEmbedded: PropTypes.bool.isRequired,
+    stageSize: PropTypes.oneOf(Object.keys(STAGE_DISPLAY_SIZES)),
     stageSizeMode: PropTypes.oneOf(Object.keys(STAGE_SIZE_MODES)),
     vm: PropTypes.instanceOf(VM).isRequired
 };

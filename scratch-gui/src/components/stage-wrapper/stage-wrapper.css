@@ -2,8 +2,7 @@
 @import "../../css/colors.css";
 @import "../../css/z-index.css";
 
-.stage-wrapper.loading {
-    /* prevent loading screen from covering entire page when not in editor */
+.stage-wrapper {
     position: relative;
 }
 
@@ -14,6 +13,10 @@
 .stage-canvas-wrapper {
     /* Hides negative space between edge of rounded corners + container, when selected */
     user-select: none;
+}
+
+.offset-controls .stage-canvas-wrapper {
+    padding-top: 44px;
 }
 
 .stage-wrapper.full-screen {

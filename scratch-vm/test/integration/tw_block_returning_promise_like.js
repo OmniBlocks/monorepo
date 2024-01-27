@@ -21,13 +21,13 @@ class TestExtension {
         };
     }
     test () {
-        // returns a PromiseLike that calls handler immediately.
+        // returns a PromiseLike that calls handler immediately instead of in next microtask.
         const promise = {
             then (callbackFn) {
                 callbackFn();
                 return promise;
             }
-            // intentionally omit catch() as that is not part of PromiseLike
+            // intentionally omit catch() as that is not part of PromiseLike, so it should not be used
         };
         return promise;
     }
@@ -44,6 +44,10 @@ for (const compilerEnabled of [false, true]) {
             enabled: compilerEnabled
         });
         t.equal(vm.runtime.compilerOptions.enabled, compilerEnabled, 'sanity check');
+
+        vm.runtime.on('COMPILE_ERROR', () => {
+            t.fail('Compile error');
+        });
 
         vm.loadProject(fixture).then(() => {
             let ended = 0;

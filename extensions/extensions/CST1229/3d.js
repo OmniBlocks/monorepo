@@ -828,9 +828,11 @@
       obj.rotation.y = 0;
       obj.rotation.z = 0;
 
-      dr._yaw = this.wrapClamp(dr._yaw, -179, 180);
-      dr._pitch = this.wrapClamp(dr._pitch, -179, 180);
-      dr._roll = this.wrapClamp(dr._roll, -179, 180);
+      const WRAP_MIN = THREE.MathUtils.degToRad(-179);
+      const WRAP_MAX = THREE.MathUtils.degToRad(180);
+      dr._yaw = this.wrapClamp(dr._yaw, WRAP_MIN, WRAP_MAX);
+      dr._pitch = this.wrapClamp(dr._pitch, WRAP_MIN, WRAP_MAX);
+      dr._roll = this.wrapClamp(dr._roll, WRAP_MIN, WRAP_MAX);
 
       obj.rotation.y = dr._yaw;
       obj.rotateOnAxis(
@@ -949,9 +951,11 @@
       this.camera.rotation.y = 0;
       this.camera.rotation.z = 0;
 
-      this.camera._yaw = this.wrapClamp(this.camera._yaw, -179, 180);
-      this.camera._pitch = this.wrapClamp(this.camera._pitch, -179, 180);
-      this.camera._roll = this.wrapClamp(this.camera._roll, -179, 180);
+      const WRAP_MIN = THREE.MathUtils.degToRad(-179);
+      const WRAP_MAX = THREE.MathUtils.degToRad(180);
+      this.camera._yaw = this.wrapClamp(this.camera._yaw, WRAP_MIN, WRAP_MAX);
+      this.camera._pitch = this.wrapClamp(this.camera._pitch, WRAP_MIN, WRAP_MAX);
+      this.camera._roll = this.wrapClamp(this.camera._roll, WRAP_MIN, WRAP_MAX);
 
       this.camera.rotation.y = this.camera._yaw;
       this.camera.rotateOnAxis(

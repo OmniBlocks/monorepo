@@ -512,6 +512,16 @@
           }
           return og(direction);
         },
+        updateScale(og, scale) {
+          if (this[IN_3D]) {
+            const obj = this[OBJECT];
+            obj.scale.x = (obj._sizeX ?? 100) / 100 * scale[0];
+            obj.scale.y = (obj._sizeY ?? 100) / 100 * scale[1];
+            obj.scale.z = (obj._sizeZ ?? 100) / 100 * scale[0];
+            Drawable.threed.updateRenderer();
+          }
+          return og(og, scale);
+        },
         dispose(og) {
           if (this[OBJECT]) {
             this[OBJECT].removeFromParent();
@@ -536,6 +546,22 @@
           return og();
         },
 
+        isTouchingDrawables(og, drawableID, candidateIDs = this._drawList) {
+          const dr = this._allDrawables[drawableID];
+
+          if (dr[IN_3D]) {
+            // 3D sprites can't collide with 2D
+            const candidates = candidateIDs.filter(id => this._allDrawables[id][IN_3D]);
+            for (const candidate of candidates) {
+              if (Drawable.threed.touching3D(dr[OBJECT], this._allDrawables[candidate][OBJECT]))
+                return true;
+            }
+            return false;
+          }
+
+          return og(drawableID, candidateIDs.filter(id => !(this._allDrawables[id][IN_3D])));
+        },
+
         penStamp(og, penSkinID, stampID) {
           const dr = this._allDrawables[stampID];
           if (!dr) return;
@@ -551,7 +577,7 @@
             return;
           }
           return og(penSkinID, stampID);
-        }
+        },
       });
     }
 
@@ -573,7 +599,59 @@
       );
     }
 
-    // DRAWABLE STUFF //
+
+    /// MISC OBJECT UTILS ////
+
+    objectShape(obj) {
+      let shape = null;
+      if (obj.geometry) {
+        if (obj.geometry instanceof THREE.SphereGeometry) {
+          obj.geometry.computeBoundingSphere();
+          shape = obj.geometry.boundingSphere;
+        } else {
+          obj.geometry.computeBoundingBox();
+          shape = obj.geometry.boundingBox;
+        }
+      } else if (obj instanceof THREE.SPRITE) {
+        const sx = obj.scale.x / 2;
+        const sy = obj.scale.y / 2;
+
+        shape = new THREE.Box3(
+          new THREE.Vector3(-sx, -sy, -sx),
+          new THREE.Vector3(sx, sy, -sx),
+        );
+      }
+      return shape;
+    }
+
+    objectShapeTransformed(obj) {
+      const shape = this.objectShape(obj);
+      if (!shape) return null;
+      const worldPos = obj.getWorldPosition(new THREE.Vector3());
+      if (shape instanceof THREE.Box3) {
+        shape.min.multiply(obj.scale);
+        shape.min.add(worldPos);
+        shape.max.multiply(obj.scale);
+        shape.max.add(worldPos);
+      } else if (shape instanceof THREE.Sphere) {
+        shape.radius *= Math.max(obj.scale.x, obj.scale.y, obj.scale.z);
+        shape.center.add(worldPos);
+      }
+      return shape;
+    }
+
+    touching3D(objA, objB) {
+      const shapeA = this.objectShapeTransformed(objA);
+      const shapeB = this.objectShapeTransformed(objB);
+      if (!shapeA || !shapeB) return false;
+      const nameB = (shapeB instanceof THREE.Sphere) ? "Sphere" : "Box";
+      const func = shapeA["intersects" + nameB];
+      if (!func) return false;
+      return func.call(shapeA, shapeB);
+    }
+
+
+    /// DRAWABLE STUFF ///
 
     // thanks stackoverflow
     // https://stackoverflow.com/a/18804083
@@ -704,12 +782,14 @@
         });
         try {
           const size = this.getSizeFromSkin(dr.skin);
-          obj.scale.x = size[0];
-          obj.scale.y = size[1];
+          obj._sizeX = size[0];
+          obj._sizeY = size[1];
+          obj._sizeZ = size[0];
         } catch (e) {
           console.error(e);
-          obj.scale.x = 0;
-          obj.scale.y = 0;
+          obj._sizeX = 0;
+          obj._sizeY = 0;
+          obj._sizeZ = 0;
         }
       } else {
         obj.material = new THREE.MeshBasicMaterial();
@@ -727,8 +807,12 @@
             obj.material.side = THREE.FrontSide;
             break;
         }
+        obj._sizeX = 1;
+        obj._sizeY = 1;
+        obj._sizeZ = 1;
         obj.material.map = texture;
       }
+      dr.updateScale(dr.scale);
       obj.material.transparent = true;
     }
 
@@ -746,7 +830,8 @@
       this.updateRenderer();
     }
 
-    // BLOCKS //
+
+    /// BLOCKS ///
 
     setMode({ MODE }, util) {
       if (util.target.isStage) return;

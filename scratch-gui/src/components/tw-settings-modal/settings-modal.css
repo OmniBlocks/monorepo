@@ -1,5 +1,6 @@
 @import "../../css/colors.css";
 @import "../../css/filters.css";
+@import "../../css/default-colors.css";
 
 .modal-content {
     max-width: 750px;
@@ -126,4 +127,5 @@
     margin: 0.25rem 0;
     border-radius: 4px;
     background: rgb(233, 233, 53);
+    color: $text-primary-default;
 }

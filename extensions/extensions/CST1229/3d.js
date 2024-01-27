@@ -496,8 +496,8 @@
         updatePosition(og, position) {
           if (this[IN_3D]) {
             const o = this[OBJECT];
-            o.translateX(position[0] - o.position.x);
-            o.translateY(position[1] - o.position.y);
+            o.position.setX(position[0]);
+            o.position.setY(position[1]);
             Drawable.threed.updateRenderer();
           }
           return og(position);
@@ -783,9 +783,7 @@
       const dr = Scratch.renderer._allDrawables[util.target.drawableID];
       if (!dr[IN_3D]) return;
 
-      const z = Scratch.Cast.toNumber(Z);
-      const oldZ = dr[OBJECT].getWorldPosition(new THREE.Vector3()).z;
-      dr[OBJECT].translateZ(z - oldZ);
+      dr[OBJECT].position.setZ(Scratch.Cast.toNumber(Z));
       this.updateRenderer();
     }
 

@@ -175,7 +175,7 @@ const getActionBounds = isBitmap => {
     if (isBitmap) {
         return ART_BOARD_BOUNDS;
     }
-    return paper.view.bounds.unite(ART_BOARD_BOUNDS).intersect(MAX_WORKSPACE_BOUNDS);
+    return paper.view.bounds.unite(ART_BOARD_BOUNDS);
 };
 
 const zoomToFit = isBitmap => {

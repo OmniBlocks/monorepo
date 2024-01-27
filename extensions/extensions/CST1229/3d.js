@@ -803,10 +803,17 @@
       return dr[OBJECT].position.z;
     }
 
-    // scratch-vm function
+    mod(n, modulus) {
+      let result = n % modulus;
+      // Scratch mod uses floored division instead of truncated division.
+      if (result / modulus < 0) result += modulus;
+      return result;
+    }
+
     wrapClamp(n, min, max) {
-      const range = (max - min) + 1;
-      return n - (Math.floor((n - min) / range) * range);
+      const offset = n - min;
+      const range = max - min;
+      return min + this.mod(offset, range);
     }
 
     updateSpriteAngle(util) {
@@ -825,7 +832,7 @@
       obj.rotation.y = 0;
       obj.rotation.z = 0;
 
-      const WRAP_MIN = THREE.MathUtils.degToRad(-179);
+      const WRAP_MIN = THREE.MathUtils.degToRad(-180);
       const WRAP_MAX = THREE.MathUtils.degToRad(180);
       dr._yaw = this.wrapClamp(dr._yaw, WRAP_MIN, WRAP_MAX);
       dr._pitch = this.wrapClamp(dr._pitch, WRAP_MIN, WRAP_MAX);
@@ -948,7 +955,7 @@
       this.camera.rotation.y = 0;
       this.camera.rotation.z = 0;
 
-      const WRAP_MIN = THREE.MathUtils.degToRad(-179);
+      const WRAP_MIN = THREE.MathUtils.degToRad(-180);
       const WRAP_MAX = THREE.MathUtils.degToRad(180);
       this.camera._yaw = this.wrapClamp(this.camera._yaw, WRAP_MIN, WRAP_MAX);
       this.camera._pitch = this.wrapClamp(this.camera._pitch, WRAP_MIN, WRAP_MAX);

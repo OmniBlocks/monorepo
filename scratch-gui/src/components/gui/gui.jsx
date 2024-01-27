@@ -36,7 +36,7 @@ import TWCustomExtensionModal from '../../containers/tw-custom-extension-modal.j
 import TWRestorePointManager from '../../containers/tw-restore-point-manager.jsx';
 import TWFontsModal from '../../containers/tw-fonts-modal.jsx';
 
-import {STAGE_SIZE_MODES, FIXED_WIDTH, MINIMUM_NON_STAGE_WIDTH} from '../../lib/layout-constants';
+import {STAGE_SIZE_MODES, FIXED_WIDTH, UNCONSTRAINED_NON_STAGE_WIDTH} from '../../lib/layout-constants';
 import {resolveStageSize} from '../../lib/screen-utils';
 import {Theme} from '../../lib/themes';
 
@@ -167,7 +167,11 @@ const GUIComponent = props => {
         tabSelected: classNames(tabStyles.reactTabsTabSelected, styles.isSelected)
     };
 
-    const unconstrainedWidth = MINIMUM_NON_STAGE_WIDTH + FIXED_WIDTH + Math.max(0, customStageSize.width - FIXED_WIDTH);
+    const unconstrainedWidth = (
+        UNCONSTRAINED_NON_STAGE_WIDTH +
+        FIXED_WIDTH +
+        Math.max(0, customStageSize.width - FIXED_WIDTH)
+    );
     return (<MediaQuery minWidth={unconstrainedWidth}>{isUnconstrained => {
         const stageSize = resolveStageSize(stageSizeMode, isUnconstrained);
 
@@ -214,6 +218,10 @@ const GUIComponent = props => {
             <Box
                 className={styles.pageWrapper}
                 dir={isRtl ? 'rtl' : 'ltr'}
+                style={{
+                    minWidth: 1024 + Math.max(0, customStageSize.width - 480),
+                    minHeight: 640 + Math.max(0, customStageSize.height - 360)
+                }}
                 {...componentProps}
             >
                 {alwaysEnabledModals}

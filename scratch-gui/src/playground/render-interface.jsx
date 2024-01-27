@@ -218,10 +218,6 @@ class Interface extends React.Component {
                     [styles.playerOnly]: isHomepage,
                     [styles.editor]: isEditor
                 })}
-                style={{
-                    minWidth: isEditor ? 1024 + Math.max(0, this.props.customStageSize.width - 480) : '',
-                    minHeight: isEditor ? 640 + Math.max(0, this.props.customStageSize.height - 360) : ''
-                }}
             >
                 {isHomepage ? (
                     <div className={styles.menu}>
@@ -237,7 +233,7 @@ class Interface extends React.Component {
                 <div
                     className={styles.center}
                     style={isPlayerOnly ? ({
-                        // add a couple pixels to account for border (TODO: remove weird hack)
+                        // + 2 accounts for 1px border on each side of the stage
                         width: `${Math.max(480, props.customStageSize.width) + 2}px`
                     }) : null}
                 >

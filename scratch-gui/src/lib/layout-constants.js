@@ -43,7 +43,7 @@ const FIXED_WIDTH = 480;
 /**
  * Minimum amount of screen width (excluding the width used by the stage itself) to display constrained.
  */
-const MINIMUM_NON_STAGE_WIDTH = 1096 - FIXED_WIDTH;
+const UNCONSTRAINED_NON_STAGE_WIDTH = 1096 - FIXED_WIDTH;
 
 const STAGE_DISPLAY_SCALE_METADATA = {
     [STAGE_DISPLAY_SIZES.large]: {
@@ -66,5 +66,5 @@ export {
     STAGE_DISPLAY_SIZES,
     STAGE_SIZE_MODES,
     FIXED_WIDTH,
-    MINIMUM_NON_STAGE_WIDTH
+    UNCONSTRAINED_NON_STAGE_WIDTH
 };

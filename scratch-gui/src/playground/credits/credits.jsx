@@ -85,12 +85,20 @@ const Credits = () => (
             </p>
         </section>
         <section>
+            <h2>Contributors</h2>
+            <UserList users={UserData.contributors} />
+        </section>
+        <section>
             <h2>Addons</h2>
             <UserList users={UserData.addonDevelopers} />
         </section>
         <section>
             <h2>TurboWarp Extension Gallery</h2>
             <UserList users={UserData.extensionDevelopers} />
+        </section>
+        <section>
+            <h2>Documentation</h2>
+            <UserList users={UserData.docs} />
         </section>
         <section>
             <h2>Translators</h2>

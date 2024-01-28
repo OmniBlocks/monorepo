@@ -158,6 +158,7 @@
     "editor-compact/@info-hide-icons-update": "Gezinme çubuğu ikonlarını gizlemek için, \"Özelleştirilebilir gezinme çubuğu\" eklentisini kullanın.",
     "editor-compact/@name": "Kompakt düzenleyici",
     "editor-compact/@settings-name-hideLabels": "Kostüm ve ses düzenleyicide buton etiketlerini gizle",
+    "custom-menu-bar/@name": "Özelleştirilebilir gezinme çubuğu",
     "editor-theme3/@description": "Düzenleyicide her bir kategori için blok renklerini düzenleyin.",
     "editor-theme3/@name": "Özelleştirilebilir blok renkleri",
     "editor-theme3/@preset-description-black": "Blok arka planlarını siyah yapar ve kenarlıkları/metni renkli hale getirir",

@@ -34,6 +34,7 @@ const addons = [
     'editor-square-inputs',
     'zebra-striping',
     'editor-compact',
+    'custom-menu-bar',
     'editor-theme3',
     'custom-block-text',
     'editor-colored-context-menus',
@@ -87,6 +88,7 @@ const newAddons = [
     'copy-reporter',
     'editor-number-arrow-keys',
     'editor-compact',
+    'custom-menu-bar',
     'move-to-top-layer',
     'reorder-custom-inputs'
 ];

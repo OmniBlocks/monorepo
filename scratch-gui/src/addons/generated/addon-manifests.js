@@ -32,6 +32,7 @@ import _custom_block_shape from "../addons/custom-block-shape/_manifest_entry.js
 import _editor_square_inputs from "../addons/editor-square-inputs/_manifest_entry.js";
 import _zebra_striping from "../addons/zebra-striping/_manifest_entry.js";
 import _editor_compact from "../addons/editor-compact/_manifest_entry.js";
+import _custom_menu_bar from "../addons/custom-menu-bar/_manifest_entry.js";
 import _editor_theme3 from "../addons/editor-theme3/_manifest_entry.js";
 import _custom_block_text from "../addons/custom-block-text/_manifest_entry.js";
 import _editor_colored_context_menus from "../addons/editor-colored-context-menus/_manifest_entry.js";
@@ -111,6 +112,7 @@ export default {
   "editor-square-inputs": _editor_square_inputs,
   "zebra-striping": _zebra_striping,
   "editor-compact": _editor_compact,
+  "custom-menu-bar": _custom_menu_bar,
   "editor-theme3": _editor_theme3,
   "custom-block-text": _custom_block_text,
   "editor-colored-context-menus": _editor_colored_context_menus,

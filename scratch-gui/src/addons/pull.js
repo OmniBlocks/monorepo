@@ -209,10 +209,13 @@ const normalizeManifest = (id, manifest) => {
     }
 
     if (manifest.credits) {
-        for (const {link} of manifest.credits) {
-            if (link && !link.startsWith('https://scratch.mit.edu/')) {
-                console.warn(`Warning: ${id} contains unsafe credit link: ${link}`);
+        for (const user of manifest.credits) {
+            if (user.link && !user.link.startsWith('https://scratch.mit.edu/')) {
+                console.warn(`Warning: ${id} contains unsafe credit link: ${user.link}`);
             }
+
+            delete user.note;
+            delete user.id;
         }
     }
 };
@@ -342,7 +345,13 @@ const SKIP_MESSAGES = [
     'editor-theme3/@settings-name-forums',
     'editor-theme3/@info-disablesMenuBar',
     'editor-theme3/@info-aboutHighContrast',
-    'block-switching/@settings-name-sa'
+    'block-switching/@settings-name-sa',
+    'custom-menu-bar/@credits-dropdown',
+    'custom-menu-bar/@credits-tutorials-button',
+    'custom-menu-bar/@info-tutorials-button-update',
+    'custom-menu-bar/@settings-name-compact-username',
+    'custom-menu-bar/@settings-name-hide-tutorials-button',
+    'custom-menu-bar/@settings-name-my-stuff'
 ];
 
 const parseMessageDirectory = localeRoot => {

@@ -20,8 +20,8 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 
 /* Note: "#" symbols need to be encoded as "%23" in SVG data urls, otherwise they are interpreted as fragment identifiers! */
 :root {
-	--internal-button-size: var(--button-size, 26px);
-	--internal-settings-area-width: var(--settings-area-width, 192px);
+	--button-size: 26px;
+	--settings-area-width: 192px;
 	--internal-play-symbol: var(--play-symbol, url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="-13 -13 26 26"><path d="M -5 -8 L -5 8 L 8 0 z" fill="gray"/></svg>'));
 	--internal-pause-symbol: var(--pause-symbol, url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="-13 -13 26 26"><rect x="-5" y="-7" width="4" height="14" fill="gray"/><rect x="3" y="-7" width="4" height="14" fill="gray"/></svg>'));
 	--internal-record-symbol: var(--record-symbol, url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="-13 -13 26 26"><circle cx="0" cy="0" r="6" fill="gray"/></svg>'));
@@ -314,8 +314,8 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 
 .beepboxEditor .volume-speaker {
 	flex-shrink: 0;
-	width: var(--internal-button-size);
-	height: var(--internal-button-size);
+	width: var(--button-size);
+	height: var(--button-size);
 	background: ${ColorConfig.secondaryText};
 	-webkit-mask-image: var(--internal-volume-symbol);
 	-webkit-mask-repeat: no-repeat;
@@ -404,8 +404,8 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 	top: 50%;
 	transform: translateY(-50%);
 	pointer-events: none;
-	width: var(--internal-button-size);
-	height: var(--internal-button-size);
+	width: var(--button-size);
+	height: var(--button-size);
 	background: currentColor;
 	-webkit-mask-image: var(--internal-customize-dial-symbol);
 	-webkit-mask-repeat: no-repeat;
@@ -431,8 +431,8 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 	top: 50%;
 	transform: translateY(-50%);
 	pointer-events: none;
-	width: var(--internal-button-size);
-	height: var(--internal-button-size);
+	width: var(--button-size);
+	height: var(--button-size);
 	background: currentColor;
 	-webkit-mask-image: var(--internal-instrument-copy-symbol);
 	-webkit-mask-repeat: no-repeat;
@@ -454,8 +454,8 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 	top: 50%;
 	transform: translateY(-50%);
 	pointer-events: none;
-	width: var(--internal-button-size);
-	height: var(--internal-button-size);
+	width: var(--button-size);
+	height: var(--button-size);
 	background: currentColor;
 	-webkit-mask-image: var(--internal-instrument-paste-symbol);
 	-webkit-mask-repeat: no-repeat;
@@ -477,13 +477,13 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 }
 
 .beepboxEditor .add-envelope {
-	width: var(--internal-button-size);
+	width: var(--button-size);
 }
 .beepboxEditor .add-envelope::before {
 	content: "";
 	position: absolute;
-	width: var(--internal-button-size);
-	height: var(--internal-button-size);
+	width: var(--button-size);
+	height: var(--button-size);
 	left: 0;
 	top: 0;
 	pointer-events: none;
@@ -500,14 +500,14 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 }
 
 .beepboxEditor .effects-menu {
-	width: var(--internal-button-size);
+	width: var(--button-size);
 	position: relative;
 }
 .beepboxEditor .effects-menu::before {
 	content: "";
 	position: absolute;
-	width: var(--internal-button-size);
-	height: var(--internal-button-size);
+	width: var(--button-size);
+	height: var(--button-size);
 	left: 0;
 	top: 0;
 	pointer-events: none;
@@ -521,7 +521,7 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 }
 
 .beepboxEditor .zoomInButton, .beepboxEditor .zoomOutButton {
-	width: var(--internal-button-size);
+	width: var(--button-size);
 	position: absolute;
 	right: 10px;
 }
@@ -534,8 +534,8 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 .beepboxEditor .zoomInButton::before {
 	content: "";
 	position: absolute;
-	width: var(--internal-button-size);
-	height: var(--internal-button-size);
+	width: var(--button-size);
+	height: var(--button-size);
 	left: 0;
 	top: 0;
 	pointer-events: none;
@@ -550,8 +550,8 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 .beepboxEditor .zoomOutButton::before {
 	content: "";
 	position: absolute;
-	width: var(--internal-button-size);
-	height: var(--internal-button-size);
+	width: var(--button-size);
+	height: var(--button-size);
 	left: 0;
 	top: 0;
 	pointer-events: none;
@@ -565,15 +565,15 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 }
 
 .beepboxEditor .delete-envelope {
-	width: var(--internal-button-size);
+	width: var(--button-size);
 	flex-shrink: 0;
 	flex-grow: 0;
 }
 .beepboxEditor .delete-envelope::before {
 	content: "";
 	position: absolute;
-	width: var(--internal-button-size);
-	height: var(--internal-button-size);
+	width: var(--button-size);
+	height: var(--button-size);
 	left: 0;
 	top: 0;
 	pointer-events: none;
@@ -597,8 +597,8 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 	top: 50%;
 	transform: translateY(-50%);
 	pointer-events: none;
-	width: var(--internal-button-size);
-	height: var(--internal-button-size);
+	width: var(--button-size);
+	height: var(--button-size);
 	background: currentColor;
 	-webkit-mask-image: var(--internal-file-page-symbol);
 	-webkit-mask-repeat: no-repeat;
@@ -616,8 +616,8 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 	top: 50%;
 	transform: translateY(-50%);
 	pointer-events: none;
-	width: var(--internal-button-size);
-	height: var(--internal-button-size);
+	width: var(--button-size);
+	height: var(--button-size);
 	background: currentColor;
 	-webkit-mask-image: var(--internal-edit-pencil-symbol);
 	-webkit-mask-repeat: no-repeat;
@@ -635,8 +635,8 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 	top: 50%;
 	transform: translateY(-50%);
 	pointer-events: none;
-	width: var(--internal-button-size);
-	height: var(--internal-button-size);
+	width: var(--button-size);
+	height: var(--button-size);
 	background: currentColor;
 	-webkit-mask-image: var(--internal-preferences-gear-symbol);
 	-webkit-mask-repeat: no-repeat;
@@ -789,7 +789,7 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 	transform: translateY(-50%);
 	pointer-events: none;
 	width: 14px;
-	height: var(--internal-button-size);
+	height: var(--button-size);
 	background: currentColor;
 	-webkit-mask-image: var(--internal-select-arrows-symbol);
 	-webkit-mask-repeat: no-repeat;
@@ -806,8 +806,8 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 	top: 50%;
 	transform: translateY(-50%);
 	pointer-events: none;
-	width: var(--internal-button-size);
-	height: var(--internal-button-size);
+	width: var(--button-size);
+	height: var(--button-size);
 	background: currentColor;
 	-webkit-mask-image: var(--internal-menu-down-symbol);
 	-webkit-mask-repeat: no-repeat;
@@ -820,7 +820,7 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 	margin: 0;
 	padding: 0 4px;
 	display: block;
-	height: var(--internal-button-size);
+	height: var(--button-size);
 	border: none;
 	border-radius: 5px;
 	background: ${ColorConfig.uiWidgetBackground};
@@ -849,7 +849,7 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 }
 @media (min-width: 711px) {
 	.select2 {
-	  width: calc(var(--internal-settings-area-width)) * 0.625) !important;
+	  width: calc(var(--settings-area-width)) * 0.625) !important;
 	}
 }
 
@@ -949,7 +949,7 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 }
 
 .beepboxEditor .menu select {
-	padding: 0 var(--internal-button-size);
+	padding: 0 var(--button-size);
 }
 .beepboxEditor select:focus {
 	background: ${ColorConfig.uiWidgetFocus};
@@ -971,7 +971,7 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 .beepboxEditor button {
 	margin: 0;
 	position: relative;
-	height: var(--internal-button-size);
+	height: var(--button-size);
 	border: none;
 	border-radius: 5px;
 	background: ${ColorConfig.uiWidgetBackground};
@@ -988,7 +988,7 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 
 .beepboxEditor button.cancelButton {
 	float: right;
-	width: var(--internal-button-size);
+	width: var(--button-size);
 	position: absolute;
 	top: 8px;
 	right: 8px;
@@ -1009,8 +1009,8 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 	top: 50%;
 	transform: translateY(-50%);
 	pointer-events: none;
-	width: var(--internal-button-size);
-	height: var(--internal-button-size);
+	width: var(--button-size);
+	height: var(--button-size);
 	background: currentColor;
 	-webkit-mask-image: var(--internal-play-symbol);
 	-webkit-mask-repeat: no-repeat;
@@ -1027,8 +1027,8 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 	top: 50%;
 	transform: translateY(-50%);
 	pointer-events: none;
-	width: var(--internal-button-size);
-	height: var(--internal-button-size);
+	width: var(--button-size);
+	height: var(--button-size);
 	background: currentColor;
 	-webkit-mask-image: var(--internal-pause-symbol);
 	-webkit-mask-repeat: no-repeat;
@@ -1045,8 +1045,8 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 	top: 50%;
 	transform: translateY(-50%);
 	pointer-events: none;
-	width: var(--internal-button-size);
-	height: var(--internal-button-size);
+	width: var(--button-size);
+	height: var(--button-size);
 	background: currentColor;
 	-webkit-mask-image: var(--internal-record-symbol);
 	-webkit-mask-repeat: no-repeat;
@@ -1063,8 +1063,8 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 	top: 50%;
 	transform: translateY(-50%);
 	pointer-events: none;
-	width: var(--internal-button-size);
-	height: var(--internal-button-size);
+	width: var(--button-size);
+	height: var(--button-size);
 	background: currentColor;
 	-webkit-mask-image: var(--internal-stop-symbol);
 	-webkit-mask-repeat: no-repeat;
@@ -1082,8 +1082,8 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 	top: 50%;
 	transform: translate(-50%, -50%);
 	pointer-events: none;
-	width: var(--internal-button-size);
-	height: var(--internal-button-size);
+	width: var(--button-size);
+	height: var(--button-size);
 	background: currentColor;
 	-webkit-mask-image: var(--internal-prev-bar-symbol);
 	-webkit-mask-repeat: no-repeat;
@@ -1101,8 +1101,8 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 	top: 50%;
 	transform: translate(-50%, -50%);
 	pointer-events: none;
-	width: var(--internal-button-size);
-	height: var(--internal-button-size);
+	width: var(--button-size);
+	height: var(--button-size);
 	background: currentColor;
 	-webkit-mask-image: var(--internal-next-bar-symbol);
 	-webkit-mask-repeat: no-repeat;
@@ -1113,7 +1113,7 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 }
 
 .beepboxEditor button.playButton, .beepboxEditor button.pauseButton, .beepboxEditor button.recordButton, .beepboxEditor button.stopButton, .beepboxEditor button.okayButton, .beepboxEditor button.exportButton {
-	padding-left: var(--internal-button-size);
+	padding-left: var(--button-size);
 }
 .beepboxEditor button.playButton, .beepboxEditor button.pauseButton, .beepboxEditor button.recordButton {
 	grid-column-start: 1;
@@ -1155,8 +1155,8 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 .beepboxEditor button.cancelButton::before {
 	content: "";
 	position: absolute;
-	width: var(--internal-button-size);
-	height: var(--internal-button-size);
+	width: var(--button-size);
+	height: var(--button-size);
 	left: 0;
 	top: 0;
 	pointer-events: none;
@@ -1172,8 +1172,8 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 .beepboxEditor button.okayButton::before {
 	content: "";
 	position: absolute;
-	width: var(--internal-button-size);
-	height: var(--internal-button-size);
+	width: var(--button-size);
+	height: var(--button-size);
 	left: 0;
 	top: 0;
 	pointer-events: none;
@@ -1189,8 +1189,8 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 .beepboxEditor button.exportButton::before {
 	content: "";
 	position: absolute;
-	width: var(--internal-button-size);
-	height: var(--internal-button-size);
+	width: var(--button-size);
+	height: var(--button-size);
 	left: 0;
 	top: 0;
 	pointer-events: none;
@@ -1220,7 +1220,7 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 }
 
 .beepboxEditor .instrument-bar .remove-instrument, .beepboxEditor .instrument-bar .add-instrument {
-	max-width: var(--internal-button-size);
+	max-width: var(--button-size);
 }
 
 .beepboxEditor .instrument-bar > :not(:first-child) {
@@ -1259,7 +1259,7 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 	content: "";
 	position: absolute;
 	width: 100%;
-	height: var(--internal-button-size);
+	height: var(--button-size);
 	left: 0;
 	top: 0;
 	pointer-events: none;
@@ -1284,7 +1284,7 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 	content: "";
 	position: absolute;
 	width: 100%;
-	height: var(--internal-button-size);
+	height: var(--button-size);
 	left: 0;
 	top: 0;
 	pointer-events: none;
@@ -1367,7 +1367,7 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 
 .beepboxEditor .selectRow, .beepboxEditor .instrumentCopyPasteRow {
 	margin: 2px 0;
-	height: var(--internal-button-size);
+	height: var(--button-size);
 	display: flex;
 	flex-direction: row;
 	align-items: center;
@@ -1387,7 +1387,7 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 	margin: 2px 0;
 }
 .beepboxEditor .menu-area > button {
-	padding: 0 var(--internal-button-size);
+	padding: 0 var(--button-size);
 	white-space: nowrap;
 }
 
@@ -1461,7 +1461,7 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 	-webkit-appearance: none;
 	color: inherit;
 	width: 100%;
-	height: var(--internal-button-size);
+	height: var(--button-size);
 	font-size: inherit;
 	margin: 0;
 	cursor: pointer;
@@ -1516,7 +1516,7 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 		border-radius: var(--mod-border-radius);
 }
 .beepboxEditor input[type=range]::-webkit-slider-thumb {
-	height: var(--internal-button-size);
+	height: var(--button-size);
 	width: 6px;
 	border-radius: 3px;
 	background: currentColor;
@@ -1537,7 +1537,7 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 	background: ${ColorConfig.uiWidgetFocus};
 }
 .beepboxEditor input[type=range]::-moz-range-thumb {
-	height: var(--internal-button-size);
+	height: var(--button-size);
 	width: 6px;
 	border-radius: 3px;
 	border: none;
@@ -1555,7 +1555,7 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 	background: ${ColorConfig.uiWidgetFocus};
 }
 .beepboxEditor input[type=range]::-ms-thumb {
-	height: var(--internal-button-size);
+	height: var(--button-size);
 	width: 6px;
 	border-radius: 3px;
 	background: currentColor;
@@ -1601,7 +1601,7 @@ li.select2-results__option[role=group] > strong:hover {
 		align-items: center;
 	}
 	.beepboxEditor .settings-area {
-		width: var(--internal-settings-area-width);
+		width: var(--settings-area-width);
 	}
 }
 

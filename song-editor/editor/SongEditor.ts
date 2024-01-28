@@ -2180,24 +2180,29 @@ export class SongEditor {
         }
         this._patternEditor.render();
 
+        // make the names of these two variables as short as possible for readability
+        // also, these two variables are used for the effects tab as well, should they be renamed?
+        // the theme variables are named "icon" to prevent people getting confused and thinking they're svg
+        const textOnIcon: string = ColorConfig.getComputed("--text-enabled-icon") !== "" ? ColorConfig.getComputed("--text-enabled-icon") : "✓ ";
+        const textOffIcon: string = ColorConfig.getComputed("--text-disabled-icon") !== "" ? ColorConfig.getComputed("--text-disabled-icon") : "　";
         const optionCommands: ReadonlyArray<string> = [
-            (prefs.autoPlay ? "✓ " : "　") + "Auto Play on Load",
-            (prefs.autoFollow ? "✓ " : "　") + "Auto Follow Playhead",
-            (prefs.enableNotePreview ? "✓ " : "　") + "Hear Added Notes",
-            (prefs.showLetters ? "✓ " : "　") + "Show Piano Keys",
-            (prefs.showFifth ? "✓ " : "　") + 'Highlight "Fifth" Note',
-            (prefs.notesOutsideScale ? "✓ " : "　") + "Place Notes Out of Scale",
-            (prefs.defaultScale == this._doc.song.scale ? "✓ " : "　") + "Set Current Scale as Default",
-            (prefs.showChannels ? "✓ " : "　") + "Show All Channels",
-            (prefs.showScrollBar ? "✓ " : "　") + "Show Octave Scroll Bar",
-            (prefs.alwaysFineNoteVol ? "✓ " : "　") + "Always Fine Note Volume",
-            (prefs.enableChannelMuting ? "✓ " : "　") + "Enable Channel Muting",
-            (prefs.displayBrowserUrl ? "✓ " : "　") + "Show Song Data in URL",
-            (prefs.displayVolumeBar ? "✓ " : "　") + "Show Playback Volume",
-            (prefs.showOscilloscope ? "✓ " : "　") + "Show Oscilloscope",
-            (prefs.showSampleLoadingStatus ? "✓ " : "　") + "Show Sample Loading Status",
-            (prefs.showDescription ? "✓ " : "　") + "Show Description",
-            (prefs.closePromptByClickoff ? "✓ " : "　") + "Close Prompts on Click Off",
+            (prefs.autoPlay ? textOnIcon : textOffIcon) + "Auto Play on Load",
+            (prefs.autoFollow ? textOnIcon : textOffIcon) + "Auto Follow Playhead",
+            (prefs.enableNotePreview ? textOnIcon : textOffIcon) + "Hear Added Notes",
+            (prefs.showLetters ? textOnIcon : textOffIcon) + "Show Piano Keys",
+            (prefs.showFifth ? textOnIcon : textOffIcon) + 'Highlight "Fifth" Note',
+            (prefs.notesOutsideScale ? textOnIcon : textOffIcon) + "Place Notes Out of Scale",
+            (prefs.defaultScale == this._doc.song.scale ? textOnIcon : textOffIcon) + "Set Current Scale as Default",
+            (prefs.showChannels ? textOnIcon : textOffIcon) + "Show All Channels",
+            (prefs.showScrollBar ? textOnIcon : textOffIcon) + "Show Octave Scroll Bar",
+            (prefs.alwaysFineNoteVol ? textOnIcon : textOffIcon) + "Always Fine Note Volume",
+            (prefs.enableChannelMuting ? textOnIcon : textOffIcon) + "Enable Channel Muting",
+            (prefs.displayBrowserUrl ? textOnIcon : textOffIcon) + "Show Song Data in URL",
+            (prefs.displayVolumeBar ? textOnIcon : textOffIcon) + "Show Playback Volume",
+            (prefs.showOscilloscope ? textOnIcon : textOffIcon) + "Show Oscilloscope",
+            (prefs.showSampleLoadingStatus ? textOnIcon : textOffIcon) + "Show Sample Loading Status",
+            (prefs.showDescription ? textOnIcon : textOffIcon) + "Show Description",
+            (prefs.closePromptByClickoff ? textOnIcon : textOffIcon) + "Close Prompts on Click Off",
             "　Set Layout...",
             "　Set Theme...",
 	        "　Custom Theme...",
@@ -2222,7 +2227,7 @@ export class SongEditor {
         for (let i: number = 0; i < Config.effectOrder.length; i++) {
             let effectFlag: number = Config.effectOrder[i];
             const selected: boolean = ((instrument.effects & (1 << effectFlag)) != 0);
-            const label: string = (selected ? "✓ " : "　") + Config.effectNames[effectFlag];
+            const label: string = (selected ? textOnIcon : textOffIcon ) + Config.effectNames[effectFlag];
             const option: HTMLOptionElement = <HTMLOptionElement>this._effectsSelect.children[i + 1];
             if (option.textContent != label) option.textContent = label;
         }

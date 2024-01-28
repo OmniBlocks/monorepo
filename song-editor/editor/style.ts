@@ -20,23 +20,23 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 
 /* Note: "#" symbols need to be encoded as "%23" in SVG data urls, otherwise they are interpreted as fragment identifiers! */
 :root {
-	--button-size: 26px;
-	--settings-area-width: 192px;
-	--play-symbol: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="-13 -13 26 26"><path d="M -5 -8 L -5 8 L 8 0 z" fill="gray"/></svg>');
-	--pause-symbol: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="-13 -13 26 26"><rect x="-5" y="-7" width="4" height="14" fill="gray"/><rect x="3" y="-7" width="4" height="14" fill="gray"/></svg>');
-	--record-symbol: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="-13 -13 26 26"><circle cx="0" cy="0" r="6" fill="gray"/></svg>');
-	--stop-symbol: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="-13 -13 26 26"><rect x="-6" y="-6" width="12" height="12" fill="gray"/></svg>');
-	--prev-bar-symbol: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="-13 -13 26 26"><rect x="-6" y="-6" width="2" height="12" fill="gray"/><path d="M 6 -6 L 6 6 L -3 0 z" fill="gray"/></svg>');
-	--next-bar-symbol: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="-13 -13 26 26"><rect x="4" y="-6" width="2" height="12" fill="gray"/><path d="M -6 -6 L -6 6 L 3 0 z" fill="gray"/></svg>');
-	--volume-symbol: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 26 26"><path d="M 4 16 L 4 10 L 8 10 L 13 5 L 13 21 L 8 16 z M 15 11 L 16 10 A 7.2 7.2 0 0 1 16 16 L 15 15 A 5.8 5.8 0 0 0 15 12 z M 18 8 L 19 7 A 11.5 11.5 0 0 1 19 19 L 18 18 A 10.1 10.1 0 0 0 18 8 z" fill="gray"/></svg>');
-	--unmuted-symbol: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="3 3 20 20"><path d="M 4 16 L 4 10 L 8 10 L 13 5 L 13 21 L 8 16 z M 15 11 L 16 10 A 7.2 7.2 0 0 1 16 16 L 15 15 A 5.8 5.8 0 0 0 15 12 z M 18 8 L 19 7 A 11.5 11.5 0 0 1 19 19 L 18 18 A 10.1 10.1 0 0 0 18 8 z" fill="gray"/></svg>');
-	--muted-symbol: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="3 3 20 20"><path d="M 4 16 L 4 10 L 8 10 L 13 5 L 13 21 L 8 16 z" fill="gray"/></svg>');
-	--menu-down-symbol: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="-13 -13 26 26"><path d="M -4 -2 L 4 -2 L 0 3 z" fill="gray"/></svg>');
-	--select-arrows-symbol: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="-13 -13 26 26"><path d="M -4 -3 L 4 -3 L 0 -8 z M -4 3 L 4 3 L 0 8 z" fill="gray"/></svg>');
-	--file-page-symbol: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="-5 -21 26 26"><path d="M 2 0 L 2 -16 L 10 -16 L 14 -12 L 14 0 z M 3 -1 L 13 -1 L 13 -11 L 9 -11 L 9 -15 L 3 -15 z" fill="gray"/></svg>');
-	--edit-pencil-symbol: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="-5 -21 26 26"><path d="M 0 0 L 1 -4 L 4 -1 z M 2 -5 L 10 -13 L 13 -10 L 5 -2 zM 11 -14 L 13 -16 L 14 -16 L 16 -14 L 16 -13 L 14 -11 z" fill="gray"/></svg>');
-	--preferences-gear-symbol: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="-13 -13 26 26"><path d="M 5.78 -1.6 L 7.93 -0.94 L 7.93 0.94 L 5.78 1.6 L 4.85 3.53 L 5.68 5.61 L 4.21 6.78 L 2.36 5.52 L 0.27 5.99 L -0.85 7.94 L -2.68 7.52 L -2.84 5.28 L -4.52 3.95 L -6.73 4.28 L -7.55 2.59 L -5.9 1.07 L -5.9 -1.07 L -7.55 -2.59 L -6.73 -4.28 L -4.52 -3.95 L -2.84 -5.28 L -2.68 -7.52 L -0.85 -7.94 L 0.27 -5.99 L 2.36 -5.52 L 4.21 -6.78 L 5.68 -5.61 L 4.85 -3.53 M 2.92 0.67 L 2.92 -0.67 L 2.35 -1.87 L 1.3 -2.7 L 0 -3 L -1.3 -2.7 L -2.35 -1.87 L -2.92 -0.67 L -2.92 0.67 L -2.35 1.87 L -1.3 2.7 L -0 3 L 1.3 2.7 L 2.35 1.87 z" fill="gray"/></svg>');
-	--customize-dial-symbol: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="-13 -13 26 26"> \
+	--internal-button-size: var(--button-size, 26px);
+	--internal-settings-area-width: var(--settings-area-width, 192px);
+	--internal-play-symbol: var(--play-symbol, url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="-13 -13 26 26"><path d="M -5 -8 L -5 8 L 8 0 z" fill="gray"/></svg>'));
+	--internal-pause-symbol: var(--pause-symbol, url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="-13 -13 26 26"><rect x="-5" y="-7" width="4" height="14" fill="gray"/><rect x="3" y="-7" width="4" height="14" fill="gray"/></svg>'));
+	--internal-record-symbol: var(--record-symbol, url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="-13 -13 26 26"><circle cx="0" cy="0" r="6" fill="gray"/></svg>'));
+	--internal-stop-symbol: var(--stop-symbol, url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="-13 -13 26 26"><rect x="-6" y="-6" width="12" height="12" fill="gray"/></svg>'));
+	--internal-prev-bar-symbol: var(--prev-bar-symbol, url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="-13 -13 26 26"><rect x="-6" y="-6" width="2" height="12" fill="gray"/><path d="M 6 -6 L 6 6 L -3 0 z" fill="gray"/></svg>'));
+	--internal-next-bar-symbol: var(--next-bar-symbol, url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="-13 -13 26 26"><rect x="4" y="-6" width="2" height="12" fill="gray"/><path d="M -6 -6 L -6 6 L 3 0 z" fill="gray"/></svg>'));
+	--internal-volume-symbol: var(--volume-symbol, url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 26 26"><path d="M 4 16 L 4 10 L 8 10 L 13 5 L 13 21 L 8 16 z M 15 11 L 16 10 A 7.2 7.2 0 0 1 16 16 L 15 15 A 5.8 5.8 0 0 0 15 12 z M 18 8 L 19 7 A 11.5 11.5 0 0 1 19 19 L 18 18 A 10.1 10.1 0 0 0 18 8 z" fill="gray"/></svg>'));
+	--internal-unmuted-symbol: var(--unmuted-symbol, url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="3 3 20 20"><path d="M 4 16 L 4 10 L 8 10 L 13 5 L 13 21 L 8 16 z M 15 11 L 16 10 A 7.2 7.2 0 0 1 16 16 L 15 15 A 5.8 5.8 0 0 0 15 12 z M 18 8 L 19 7 A 11.5 11.5 0 0 1 19 19 L 18 18 A 10.1 10.1 0 0 0 18 8 z" fill="gray"/></svg>'));
+	--internal-muted-symbol: var(--muted-symbol, url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="3 3 20 20"><path d="M 4 16 L 4 10 L 8 10 L 13 5 L 13 21 L 8 16 z" fill="gray"/></svg>'));
+	--internal-menu-down-symbol: var(--menu-down-symbol, url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="-13 -13 26 26"><path d="M -4 -2 L 4 -2 L 0 3 z" fill="gray"/></svg>'));
+	--internal-select-arrows-symbol: var(--select-arrows-symbol, url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="-13 -13 26 26"><path d="M -4 -3 L 4 -3 L 0 -8 z M -4 3 L 4 3 L 0 8 z" fill="gray"/></svg>'));
+	--internal-file-page-symbol: var(--file-page-symbol, url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="-5 -21 26 26"><path d="M 2 0 L 2 -16 L 10 -16 L 14 -12 L 14 0 z M 3 -1 L 13 -1 L 13 -11 L 9 -11 L 9 -15 L 3 -15 z" fill="gray"/></svg>'));
+	--internal-edit-pencil-symbol: var(--edit-pencil-symbol, url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="-5 -21 26 26"><path d="M 0 0 L 1 -4 L 4 -1 z M 2 -5 L 10 -13 L 13 -10 L 5 -2 zM 11 -14 L 13 -16 L 14 -16 L 16 -14 L 16 -13 L 14 -11 z" fill="gray"/></svg>'));
+	--internal-preferences-gear-symbol: var(--preferences-gear-symbol, url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="-13 -13 26 26"><path d="M 5.78 -1.6 L 7.93 -0.94 L 7.93 0.94 L 5.78 1.6 L 4.85 3.53 L 5.68 5.61 L 4.21 6.78 L 2.36 5.52 L 0.27 5.99 L -0.85 7.94 L -2.68 7.52 L -2.84 5.28 L -4.52 3.95 L -6.73 4.28 L -7.55 2.59 L -5.9 1.07 L -5.9 -1.07 L -7.55 -2.59 L -6.73 -4.28 L -4.52 -3.95 L -2.84 -5.28 L -2.68 -7.52 L -0.85 -7.94 L 0.27 -5.99 L 2.36 -5.52 L 4.21 -6.78 L 5.68 -5.61 L 4.85 -3.53 M 2.92 0.67 L 2.92 -0.67 L 2.35 -1.87 L 1.3 -2.7 L 0 -3 L -1.3 -2.7 L -2.35 -1.87 L -2.92 -0.67 L -2.92 0.67 L -2.35 1.87 L -1.3 2.7 L -0 3 L 1.3 2.7 L 2.35 1.87 z" fill="gray"/></svg>'));
+	--internal-customize-dial-symbol: var(--customize-dial-symbol, url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="-13 -13 26 26"> \
 			<g transform="translate(0,1)" fill="gray"> \
 				<circle cx="0" cy="0" r="6.5" stroke="gray" stroke-width="1" fill="none"/> \
 				<rect x="-1" y="-5" width="2" height="4" transform="rotate(30)"/> \
@@ -50,16 +50,16 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 				<circle cx="9" cy="0" r="0.75"/> \
 				<circle cx="7.79" cy="4.5" r="0.75"/> \
 			</g> \
-		</svg>');
-	--instrument-copy-symbol: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="-5 -21 26 26"><path d="M 0 -15 L 1 -15 L 1 0 L 13 0 L 13 1 L 0 1 L 0 -15 z M 2 -1 L 2 -17 L 10 -17 L 14 -13 L 14 -1 z M 3 -2 L 13 -2 L 13 -12 L 9 -12 L 9 -16 L 3 -16 z" fill="currentColor"></path></svg>');
-	--instrument-paste-symbol: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 26 26"><path d="M 8 18 L 6 18 L 6 5 L 17 5 L 17 7 M 9 8 L 16 8 L 20 12 L 20 22 L 9 22 z" stroke="currentColor" fill="none"></path><path d="M 9 3 L 14 3 L 14 6 L 9 6 L 9 3 z M 16 8 L 20 12 L 16 12 L 16 8 z" fill="currentColor"></path></svg>');
-	--export-symbol: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="-13 -13 26 26"><path fill="gray" d="M -8 3 L -8 8 L 8 8 L 8 3 L 6 3 L 6 6 L -6 6 L -6 3 z M 0 2 L -4 -2 L -1 -2 L -1 -8 L 1 -8 L 1 -2 L 4 -2 z"/></svg>');
-	--close-symbol: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="-13 -13 26 26"><path fill="gray" d="M -7.07 -5.66 L -5.66 -7.07 L 0 -1.4 L 5.66 -7.07 L 7.07 -5.66 L 1.4 0 L 7.07 5.66 L 5.66 7.07 L 0 1.4 L -5.66 7.07 L -7.07 5.66 L -1.4 0 z"/></svg>');
-	--add-symbol: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="-13 -13 26 26"><path fill="gray" d="M -8 -1 L -1 -1 L -1 -8  L 1 -8 L 1 -1 L 8 -1 L 8 1 L 1 1 L 1 8 L -1 8 L -1 1 L -8 1 z"/></svg>');
-	--zoom-in-symbol: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="-10 -10 20 20"><circle cx="-1" cy="-1" r="6" stroke-width="2" stroke="gray" fill="none"></circle><path stroke="gray" stroke-width="2" d="M 3 3 L 7 7 M -1 -4 L -1 2 M -4 -1 L 2 -1" fill="none"></path></svg>');
-	--zoom-out-symbol: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="-10 -10 20 20"><circle cx="-1" cy="-1" r="6" stroke-width="2" stroke="gray" fill="none"></circle><path stroke="gray" stroke-width="2" d="M 3 3 L 7 7 M -4 -1 L 2 -1" fill="none"></path></svg>');
-	--checkmark-symbol: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="-13 -13 26 26"><path fill="gray" d="M -9 -2 L -8 -3 L -3 2 L 9 -8 L 10 -7 L -3 8 z"/></svg>');
-	--drum-symbol: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="40" viewBox="0 0 32 40"> \
+		</svg>'));
+	--internal-instrument-copy-symbol: var(--instrument-copy-symbol, url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="-5 -21 26 26"><path d="M 0 -15 L 1 -15 L 1 0 L 13 0 L 13 1 L 0 1 L 0 -15 z M 2 -1 L 2 -17 L 10 -17 L 14 -13 L 14 -1 z M 3 -2 L 13 -2 L 13 -12 L 9 -12 L 9 -16 L 3 -16 z" fill="currentColor"></path></svg>'));
+	--internal-instrument-paste-symbol: var(--instrument-paste-symbol, url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 26 26"><path d="M 8 18 L 6 18 L 6 5 L 17 5 L 17 7 M 9 8 L 16 8 L 20 12 L 20 22 L 9 22 z" stroke="currentColor" fill="none"></path><path d="M 9 3 L 14 3 L 14 6 L 9 6 L 9 3 z M 16 8 L 20 12 L 16 12 L 16 8 z" fill="currentColor"></path></svg>'));
+	--internal-export-symbol: var(--export-symbol, url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="-13 -13 26 26"><path fill="gray" d="M -8 3 L -8 8 L 8 8 L 8 3 L 6 3 L 6 6 L -6 6 L -6 3 z M 0 2 L -4 -2 L -1 -2 L -1 -8 L 1 -8 L 1 -2 L 4 -2 z"/></svg>'));
+	--internal-close-symbol: var(--close-symbol, url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="-13 -13 26 26"><path fill="gray" d="M -7.07 -5.66 L -5.66 -7.07 L 0 -1.4 L 5.66 -7.07 L 7.07 -5.66 L 1.4 0 L 7.07 5.66 L 5.66 7.07 L 0 1.4 L -5.66 7.07 L -7.07 5.66 L -1.4 0 z"/></svg>'));
+	--internal-add-symbol: var(--add-symbol, url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="-13 -13 26 26"><path fill="gray" d="M -8 -1 L -1 -1 L -1 -8  L 1 -8 L 1 -1 L 8 -1 L 8 1 L 1 1 L 1 8 L -1 8 L -1 1 L -8 1 z"/></svg>'));
+	--internal-zoom-in-symbol: var(--zoom-in-symbol, url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="-10 -10 20 20"><circle cx="-1" cy="-1" r="6" stroke-width="2" stroke="gray" fill="none"></circle><path stroke="gray" stroke-width="2" d="M 3 3 L 7 7 M -1 -4 L -1 2 M -4 -1 L 2 -1" fill="none"></path></svg>'));
+	--internal-zoom-out-symbol: var(--zoom-out-symbol, url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="-10 -10 20 20"><circle cx="-1" cy="-1" r="6" stroke-width="2" stroke="gray" fill="none"></circle><path stroke="gray" stroke-width="2" d="M 3 3 L 7 7 M -4 -1 L 2 -1" fill="none"></path></svg>'));
+	--internal-checkmark-symbol: var(--checkmark-symbol, url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="-13 -13 26 26"><path fill="gray" d="M -9 -2 L -8 -3 L -3 2 L 9 -8 L 10 -7 L -3 8 z"/></svg>'));
+	--internal-drum-symbol: var(--drum-symbol, url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="40" viewBox="0 0 32 40"> \
 			<defs> \
 				<linearGradient id="gold1" x1="0%" y1="0%" x2="100%" y2="0%"> \
 					<stop offset="0%" stop-color="%237e3302"/> \
@@ -106,8 +106,8 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 			<rect x="0" y="14" width="32" height="2" fill="url(%23gold1)"/> \
 			<ellipse cx="16" cy="14" rx="16" ry="14" fill="url(%23gold2)"/> \
 			<ellipse cx="16" cy="14" rx="15" ry="13" fill="url(%23membrane)"/> \
-		</svg>');
-	--piano-key-symbol: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="15" preserveAspectRatio="none" viewBox="0 -1 32 15"> \
+		</svg>'));
+	--internal-piano-key-symbol: var(--piano-key-symbol, url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="15" preserveAspectRatio="none" viewBox="0 -1 32 15"> \
 			<defs> \
 				<linearGradient id="shadow" x1="0%" y1="0%" x2="100%" y2="0%"> \
 					<stop offset="0%" stop-color="rgba(0,0,0,0.5)"/> \
@@ -117,8 +117,8 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 			<rect x="-1" y="1" width="31" height="1" rx="0.6" fill="rgba(255,255,255,0.4)"/> \
 			<path d="M -1 11 L 30 11 L 30 2 L 33 -1 L 33 14 L -1 14 z" fill="rgba(0,0,0,0.7)"/> \
 			<rect x="-1" y="-1" width="19" height="15" fill="url(%23shadow)"/> \
-		</svg>');
-  --mod-key-symbol: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="80" preserveAspectRatio="none" viewBox="0 -1 32 80"> \
+		</svg>'));
+  --internal-mod-key-symbol: var(--mod-key-symbol, url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="80" preserveAspectRatio="none" viewBox="0 -1 32 80"> \
 			<defs> \
 				<linearGradient id="shadow" x1="0%" y1="0%" x2="100%" y2="0%"> \
 					<stop offset="0%" stop-color="rgba(0,0,0,0.4)"/> \
@@ -128,7 +128,7 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 			<rect x="-1" y="1" width="31" height="1" rx="0.6" fill="rgba(255,255,255,0.2)"/> \
 			<path d="M -1 76 L 30 76 L 30 1 L 33 -1 L 33 80 L -1 80 z" fill="rgba(0,0,0,0.7)"/> \
 			<rect x="-1" y="-1" width="19" height="80" fill="url(%23shadow)"/> \
-		</svg>');
+		</svg>'));
 }
 
 
@@ -314,13 +314,13 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 
 .beepboxEditor .volume-speaker {
 	flex-shrink: 0;
-	width: var(--button-size);
-	height: var(--button-size);
+	width: var(--internal-button-size);
+	height: var(--internal-button-size);
 	background: ${ColorConfig.secondaryText};
-	-webkit-mask-image: var(--volume-symbol);
+	-webkit-mask-image: var(--internal-volume-symbol);
 	-webkit-mask-repeat: no-repeat;
 	-webkit-mask-position: center;
-	mask-image: var(--volume-symbol);
+	mask-image: var(--internal-volume-symbol);
 	mask-repeat: no-repeat;
 	mask-position: center;
 }
@@ -328,7 +328,7 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 .beepboxEditor .drum-button {
 	flex: 1;
 	background-color: transparent;
-	background-image: var(--drum-symbol);
+	background-image: var(--internal-drum-symbol);
 	background-repeat: no-repeat;
 	background-position: center;
 }
@@ -347,7 +347,7 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 	width: 100%;
 	height: 100%;
 	pointer-events: none;
-	background-image: var(--mod-key-symbol);
+	background-image: var(--internal-mod-key-symbol);
 	background-repeat: no-repeat;
 	background-position: center;
 	background-size: 100% 102%;
@@ -367,7 +367,7 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 	width: 100%;
 	height: 100%;
 	pointer-events: none;
-	background-image: var(--piano-key-symbol);
+	background-image: var(--internal-piano-key-symbol);
 	background-repeat: no-repeat;
 	background-position: center;
 	background-size: 100% 115.38%;
@@ -404,13 +404,13 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 	top: 50%;
 	transform: translateY(-50%);
 	pointer-events: none;
-	width: var(--button-size);
-	height: var(--button-size);
+	width: var(--internal-button-size);
+	height: var(--internal-button-size);
 	background: currentColor;
-	-webkit-mask-image: var(--customize-dial-symbol);
+	-webkit-mask-image: var(--internal-customize-dial-symbol);
 	-webkit-mask-repeat: no-repeat;
 	-webkit-mask-position: center;
-	mask-image: var(--customize-dial-symbol);
+	mask-image: var(--internal-customize-dial-symbol);
 	mask-repeat: no-repeat;
 	mask-position: center;
 }
@@ -431,13 +431,13 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 	top: 50%;
 	transform: translateY(-50%);
 	pointer-events: none;
-	width: var(--button-size);
-	height: var(--button-size);
+	width: var(--internal-button-size);
+	height: var(--internal-button-size);
 	background: currentColor;
-	-webkit-mask-image: var(--instrument-copy-symbol);
+	-webkit-mask-image: var(--internal-instrument-copy-symbol);
 	-webkit-mask-repeat: no-repeat;
 	-webkit-mask-position: center;
-	mask-image: var(--instrument-copy-symbol);
+	mask-image: var(--internal-instrument-copy-symbol);
 	mask-repeat: no-repeat;
 	mask-position: center;
 }
@@ -454,13 +454,13 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 	top: 50%;
 	transform: translateY(-50%);
 	pointer-events: none;
-	width: var(--button-size);
-	height: var(--button-size);
+	width: var(--internal-button-size);
+	height: var(--internal-button-size);
 	background: currentColor;
-	-webkit-mask-image: var(--instrument-paste-symbol);
+	-webkit-mask-image: var(--internal-instrument-paste-symbol);
 	-webkit-mask-repeat: no-repeat;
 	-webkit-mask-position: center;
-	mask-image: var(--instrument-paste-symbol);
+	mask-image: var(--internal-instrument-paste-symbol);
 	mask-repeat: no-repeat;
 	mask-position: center;
 }
@@ -477,21 +477,21 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 }
 
 .beepboxEditor .add-envelope {
-	width: var(--button-size);
+	width: var(--internal-button-size);
 }
 .beepboxEditor .add-envelope::before {
 	content: "";
 	position: absolute;
-	width: var(--button-size);
-	height: var(--button-size);
+	width: var(--internal-button-size);
+	height: var(--internal-button-size);
 	left: 0;
 	top: 0;
 	pointer-events: none;
 	background: currentColor;
-	mask-image: var(--add-symbol);
+	mask-image: var(--internal-add-symbol);
 	mask-repeat: no-repeat;
 	mask-position: center;
-	-webkit-mask-image: var(--add-symbol);
+	-webkit-mask-image: var(--internal-add-symbol);
 	-webkit-mask-repeat: no-repeat;
 	-webkit-mask-position: center;
 }
@@ -500,28 +500,28 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 }
 
 .beepboxEditor .effects-menu {
-	width: var(--button-size);
+	width: var(--internal-button-size);
 	position: relative;
 }
 .beepboxEditor .effects-menu::before {
 	content: "";
 	position: absolute;
-	width: var(--button-size);
-	height: var(--button-size);
+	width: var(--internal-button-size);
+	height: var(--internal-button-size);
 	left: 0;
 	top: 0;
 	pointer-events: none;
 	background: currentColor;
-	mask-image: var(--menu-down-symbol);
+	mask-image: var(--internal-menu-down-symbol);
 	mask-repeat: no-repeat;
 	mask-position: center;
-	-webkit-mask-image: var(--menu-down-symbol);
+	-webkit-mask-image: var(--internal-menu-down-symbol);
 	-webkit-mask-repeat: no-repeat;
 	-webkit-mask-position: center;
 }
 
 .beepboxEditor .zoomInButton, .beepboxEditor .zoomOutButton {
-	width: var(--button-size);
+	width: var(--internal-button-size);
 	position: absolute;
 	right: 10px;
 }
@@ -534,54 +534,54 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 .beepboxEditor .zoomInButton::before {
 	content: "";
 	position: absolute;
-	width: var(--button-size);
-	height: var(--button-size);
+	width: var(--internal-button-size);
+	height: var(--internal-button-size);
 	left: 0;
 	top: 0;
 	pointer-events: none;
 	background: currentColor;
-	mask-image: var(--zoom-in-symbol);
+	mask-image: var(--internal-zoom-in-symbol);
 	mask-repeat: no-repeat;
 	mask-position: center;
-	-webkit-mask-image: var(--zoom-in-symbol);
+	-webkit-mask-image: var(--imternal-zoom-in-symbol);
 	-webkit-mask-repeat: no-repeat;
 	-webkit-mask-position: center;
 }
 .beepboxEditor .zoomOutButton::before {
 	content: "";
 	position: absolute;
-	width: var(--button-size);
-	height: var(--button-size);
+	width: var(--internal-button-size);
+	height: var(--internal-button-size);
 	left: 0;
 	top: 0;
 	pointer-events: none;
 	background: currentColor;
-	mask-image: var(--zoom-out-symbol);
+	mask-image: var(--internal-zoom-out-symbol);
 	mask-repeat: no-repeat;
 	mask-position: center;
-	-webkit-mask-image: var(--zoom-out-symbol);
+	-webkit-mask-image: var(--internal-zoom-out-symbol);
 	-webkit-mask-repeat: no-repeat;
 	-webkit-mask-position: center;
 }
 
 .beepboxEditor .delete-envelope {
-	width: var(--button-size);
+	width: var(--internal-button-size);
 	flex-shrink: 0;
 	flex-grow: 0;
 }
 .beepboxEditor .delete-envelope::before {
 	content: "";
 	position: absolute;
-	width: var(--button-size);
-	height: var(--button-size);
+	width: var(--internal-button-size);
+	height: var(--internal-button-size);
 	left: 0;
 	top: 0;
 	pointer-events: none;
 	background: currentColor;
-	mask-image: var(--close-symbol);
+	mask-image: var(--internal-close-symbol);
 	mask-repeat: no-repeat;
 	mask-position: center;
-	-webkit-mask-image: var(--close-symbol);
+	-webkit-mask-image: var(--internal-close-symbol);
 	-webkit-mask-repeat: no-repeat;
 	-webkit-mask-position: center;
 }
@@ -597,13 +597,13 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 	top: 50%;
 	transform: translateY(-50%);
 	pointer-events: none;
-	width: var(--button-size);
-	height: var(--button-size);
+	width: var(--internal-button-size);
+	height: var(--internal-button-size);
 	background: currentColor;
-	-webkit-mask-image: var(--file-page-symbol);
+	-webkit-mask-image: var(--internal-file-page-symbol);
 	-webkit-mask-repeat: no-repeat;
 	-webkit-mask-position: center;
-	mask-image: var(--file-page-symbol);
+	mask-image: var(--internal-file-page-symbol);
 	mask-repeat: no-repeat;
 	mask-position: center;
 }
@@ -616,13 +616,13 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 	top: 50%;
 	transform: translateY(-50%);
 	pointer-events: none;
-	width: var(--button-size);
-	height: var(--button-size);
+	width: var(--internal-button-size);
+	height: var(--internal-button-size);
 	background: currentColor;
-	-webkit-mask-image: var(--edit-pencil-symbol);
+	-webkit-mask-image: var(--internal-edit-pencil-symbol);
 	-webkit-mask-repeat: no-repeat;
 	-webkit-mask-position: center;
-	mask-image: var(--edit-pencil-symbol);
+	mask-image: var(--internal-edit-pencil-symbol);
 	mask-repeat: no-repeat;
 	mask-position: center;
 }
@@ -635,13 +635,13 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 	top: 50%;
 	transform: translateY(-50%);
 	pointer-events: none;
-	width: var(--button-size);
-	height: var(--button-size);
+	width: var(--internal-button-size);
+	height: var(--internal-button-size);
 	background: currentColor;
-	-webkit-mask-image: var(--preferences-gear-symbol);
+	-webkit-mask-image: var(--internal-preferences-gear-symbol);
 	-webkit-mask-repeat: no-repeat;
 	-webkit-mask-position: center;
-	mask-image: var(--preferences-gear-symbol);
+	mask-image: var(--internal-preferences-gear-symbol);
 	mask-repeat: no-repeat;
 	mask-position: center;
 }
@@ -666,26 +666,26 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 	height: 100%;
 	display: inline-block;
   background: var(--mute-button-normal);
-	-webkit-mask-image: var(--unmuted-symbol);
+	-webkit-mask-image: var(--internal-unmuted-symbol);
 	-webkit-mask-repeat: no-repeat;
 	-webkit-mask-position: center;
 	-webkit-mask-size: cover;
   mask-repeat: no-repeat;
 	mask-position: center;
 	mask-size: cover;
-  mask-image: var(--unmuted-symbol);
+  mask-image: var(--internal-unmuted-symbol);
 }
 
 .beepboxEditor .mute-button.muted::before {
   background: var(--ui-widget-background);
-	-webkit-mask-image: var(--muted-symbol);
-  mask-image: var(--muted-symbol);
+	-webkit-mask-image: var(--internal-muted-symbol);
+  mask-image: var(--internal-muted-symbol);
 }
 
 .beepboxEditor .mute-button.modMute.muted::before {
   background: var(--ui-widget-background);
-	-webkit-mask-image: var(--muted-symbol);
-  mask-image: var(--muted-symbol);
+	-webkit-mask-image: var(--internal-muted-symbol);
+  mask-image: var(--internal-muted-symbol);
 }
 
 .beepboxEditor .mute-button.modMute::before {
@@ -789,12 +789,12 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 	transform: translateY(-50%);
 	pointer-events: none;
 	width: 14px;
-	height: var(--button-size);
+	height: var(--internal-button-size);
 	background: currentColor;
-	-webkit-mask-image: var(--select-arrows-symbol);
+	-webkit-mask-image: var(--internal-select-arrows-symbol);
 	-webkit-mask-repeat: no-repeat;
 	-webkit-mask-position: center;
-	mask-image: var(--select-arrows-symbol);
+	mask-image: var(--internal-select-arrows-symbol);
 	mask-repeat: no-repeat;
 	mask-position: center;
 }
@@ -806,13 +806,13 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 	top: 50%;
 	transform: translateY(-50%);
 	pointer-events: none;
-	width: var(--button-size);
-	height: var(--button-size);
+	width: var(--internal-button-size);
+	height: var(--internal-button-size);
 	background: currentColor;
-	-webkit-mask-image: var(--menu-down-symbol);
+	-webkit-mask-image: var(--internal-menu-down-symbol);
 	-webkit-mask-repeat: no-repeat;
 	-webkit-mask-position: center;
-	mask-image: var(--menu-down-symbol);
+	mask-image: var(--internal-menu-down-symbol);
 	mask-repeat: no-repeat;
 	mask-position: center;
 }
@@ -820,7 +820,7 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 	margin: 0;
 	padding: 0 4px;
 	display: block;
-	height: var(--button-size);
+	height: var(--internal-button-size);
 	border: none;
 	border-radius: 5px;
 	background: ${ColorConfig.uiWidgetBackground};
@@ -849,7 +849,7 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 }
 @media (min-width: 711px) {
 	.select2 {
-	  width: calc(var(--settings-area-width) * 0.625) !important;
+	  width: calc(var(--internal-settings-area-width)) * 0.625) !important;
 	}
 }
 
@@ -949,7 +949,7 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 }
 
 .beepboxEditor .menu select {
-	padding: 0 var(--button-size);
+	padding: 0 var(--internal-button-size);
 }
 .beepboxEditor select:focus {
 	background: ${ColorConfig.uiWidgetFocus};
@@ -971,7 +971,7 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 .beepboxEditor button {
 	margin: 0;
 	position: relative;
-	height: var(--button-size);
+	height: var(--internal-button-size);
 	border: none;
 	border-radius: 5px;
 	background: ${ColorConfig.uiWidgetBackground};
@@ -988,7 +988,7 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 
 .beepboxEditor button.cancelButton {
 	float: right;
-	width: var(--button-size);
+	width: var(--internal-button-size);
 	position: absolute;
 	top: 8px;
 	right: 8px;
@@ -1009,13 +1009,13 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 	top: 50%;
 	transform: translateY(-50%);
 	pointer-events: none;
-	width: var(--button-size);
-	height: var(--button-size);
+	width: var(--internal-button-size);
+	height: var(--internal-button-size);
 	background: currentColor;
-	-webkit-mask-image: var(--play-symbol);
+	-webkit-mask-image: var(--internal-play-symbol);
 	-webkit-mask-repeat: no-repeat;
 	-webkit-mask-position: center;
-	mask-image: var(--play-symbol);
+	mask-image: var(--internal-play-symbol);
 	mask-repeat: no-repeat;
 	mask-position: center;
 }
@@ -1027,13 +1027,13 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 	top: 50%;
 	transform: translateY(-50%);
 	pointer-events: none;
-	width: var(--button-size);
-	height: var(--button-size);
+	width: var(--internal-button-size);
+	height: var(--internal-button-size);
 	background: currentColor;
-	-webkit-mask-image: var(--pause-symbol);
+	-webkit-mask-image: var(--internal-pause-symbol);
 	-webkit-mask-repeat: no-repeat;
 	-webkit-mask-position: center;
-	mask-image: var(--pause-symbol);
+	mask-image: var(--internal-pause-symbol);
 	mask-repeat: no-repeat;
 	mask-position: center;
 }
@@ -1045,13 +1045,13 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 	top: 50%;
 	transform: translateY(-50%);
 	pointer-events: none;
-	width: var(--button-size);
-	height: var(--button-size);
+	width: var(--internal-button-size);
+	height: var(--internal-button-size);
 	background: currentColor;
-	-webkit-mask-image: var(--record-symbol);
+	-webkit-mask-image: var(--internal-record-symbol);
 	-webkit-mask-repeat: no-repeat;
 	-webkit-mask-position: center;
-	mask-image: var(--record-symbol);
+	mask-image: var(--internal-record-symbol);
 	mask-repeat: no-repeat;
 	mask-position: center;
 }
@@ -1063,13 +1063,13 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 	top: 50%;
 	transform: translateY(-50%);
 	pointer-events: none;
-	width: var(--button-size);
-	height: var(--button-size);
+	width: var(--internal-button-size);
+	height: var(--internal-button-size);
 	background: currentColor;
-	-webkit-mask-image: var(--stop-symbol);
+	-webkit-mask-image: var(--internal-stop-symbol);
 	-webkit-mask-repeat: no-repeat;
 	-webkit-mask-position: center;
-	mask-image: var(--stop-symbol);
+	mask-image: var(--internal-stop-symbol);
 	mask-repeat: no-repeat;
 	mask-position: center;
 }
@@ -1082,13 +1082,13 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 	top: 50%;
 	transform: translate(-50%, -50%);
 	pointer-events: none;
-	width: var(--button-size);
-	height: var(--button-size);
+	width: var(--internal-button-size);
+	height: var(--internal-button-size);
 	background: currentColor;
-	-webkit-mask-image: var(--prev-bar-symbol);
+	-webkit-mask-image: var(--internal-prev-bar-symbol);
 	-webkit-mask-repeat: no-repeat;
 	-webkit-mask-position: center;
-	mask-image: var(--prev-bar-symbol);
+	mask-image: var(--internal-prev-bar-symbol);
 	mask-repeat: no-repeat;
 	mask-position: center;
 }
@@ -1101,19 +1101,19 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 	top: 50%;
 	transform: translate(-50%, -50%);
 	pointer-events: none;
-	width: var(--button-size);
-	height: var(--button-size);
+	width: var(--internal-button-size);
+	height: var(--internal-button-size);
 	background: currentColor;
-	-webkit-mask-image: var(--next-bar-symbol);
+	-webkit-mask-image: var(--internal-next-bar-symbol);
 	-webkit-mask-repeat: no-repeat;
 	-webkit-mask-position: center;
-	mask-image: var(--next-bar-symbol);
+	mask-image: var(--internal-next-bar-symbol);
 	mask-repeat: no-repeat;
 	mask-position: center;
 }
 
 .beepboxEditor button.playButton, .beepboxEditor button.pauseButton, .beepboxEditor button.recordButton, .beepboxEditor button.stopButton, .beepboxEditor button.okayButton, .beepboxEditor button.exportButton {
-	padding-left: var(--button-size);
+	padding-left: var(--internal-button-size);
 }
 .beepboxEditor button.playButton, .beepboxEditor button.pauseButton, .beepboxEditor button.recordButton {
 	grid-column-start: 1;
@@ -1155,16 +1155,16 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 .beepboxEditor button.cancelButton::before {
 	content: "";
 	position: absolute;
-	width: var(--button-size);
-	height: var(--button-size);
+	width: var(--internal-button-size);
+	height: var(--internal-button-size);
 	left: 0;
 	top: 0;
 	pointer-events: none;
 	background: currentColor;
-	mask-image: var(--close-symbol);
+	mask-image: var(--internal-close-symbol);
 	mask-repeat: no-repeat;
 	mask-position: center;
-	-webkit-mask-image: var(--close-symbol);
+	-webkit-mask-image: var(--internal-close-symbol);
 	-webkit-mask-repeat: no-repeat;
 	-webkit-mask-position: center;
 }
@@ -1172,16 +1172,16 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 .beepboxEditor button.okayButton::before {
 	content: "";
 	position: absolute;
-	width: var(--button-size);
-	height: var(--button-size);
+	width: var(--internal-button-size);
+	height: var(--internal-button-size);
 	left: 0;
 	top: 0;
 	pointer-events: none;
 	background: currentColor;
-	-webkit-mask-image: var(--checkmark-symbol);
+	-webkit-mask-image: var(--internal-checkmark-symbol);
 	-webkit-mask-repeat: no-repeat;
 	-webkit-mask-position: center;
-	mask-image: var(--checkmark-symbol);
+	mask-image: var(--internal-checkmark-symbol);
 	mask-repeat: no-repeat;
 	mask-position: center;
 }
@@ -1189,16 +1189,16 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 .beepboxEditor button.exportButton::before {
 	content: "";
 	position: absolute;
-	width: var(--button-size);
-	height: var(--button-size);
+	width: var(--internal-button-size);
+	height: var(--internal-button-size);
 	left: 0;
 	top: 0;
 	pointer-events: none;
 	background: currentColor;
-	mask-image: var(--export-symbol);
+	mask-image: var(--internal-export-symbol);
 	mask-repeat: no-repeat;
 	mask-position: center;
-	-webkit-mask-image: var(--export-symbol);
+	-webkit-mask-image: var(--internal-export-symbol);
 	-webkit-mask-repeat: no-repeat;
 	-webkit-mask-position: center;
 }
@@ -1220,7 +1220,7 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 }
 
 .beepboxEditor .instrument-bar .remove-instrument, .beepboxEditor .instrument-bar .add-instrument {
-	max-width: var(--button-size);
+	max-width: var(--internal-button-size);
 }
 
 .beepboxEditor .instrument-bar > :not(:first-child) {
@@ -1259,15 +1259,15 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 	content: "";
 	position: absolute;
 	width: 100%;
-	height: var(--button-size);
+	height: var(--internal-button-size);
 	left: 0;
 	top: 0;
 	pointer-events: none;
 	background: currentColor;
-	mask-image: var(--close-symbol);
+	mask-image: var(--internal-close-symbol);
 	mask-repeat: no-repeat;
 	mask-position: center;
-	-webkit-mask-image: var(--close-symbol);
+	-webkit-mask-image: var(--internal-close-symbol);
 	-webkit-mask-repeat: no-repeat;
 	-webkit-mask-position: center;
 }
@@ -1284,15 +1284,15 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 	content: "";
 	position: absolute;
 	width: 100%;
-	height: var(--button-size);
+	height: var(--internal-button-size);
 	left: 0;
 	top: 0;
 	pointer-events: none;
 	background: currentColor;
-	mask-image: var(--add-symbol);
+	mask-image: var(--internal-add-symbol);
 	mask-repeat: no-repeat;
 	mask-position: center;
-	-webkit-mask-image: var(--add-symbol);
+	-webkit-mask-image: var(--internal-add-symbol);
 	-webkit-mask-repeat: no-repeat;
 	-webkit-mask-position: center;
 }
@@ -1367,7 +1367,7 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 
 .beepboxEditor .selectRow, .beepboxEditor .instrumentCopyPasteRow {
 	margin: 2px 0;
-	height: var(--button-size);
+	height: var(--internal-button-size);
 	display: flex;
 	flex-direction: row;
 	align-items: center;
@@ -1387,7 +1387,7 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 	margin: 2px 0;
 }
 .beepboxEditor .menu-area > button {
-	padding: 0 var(--button-size);
+	padding: 0 var(--internal-button-size);
 	white-space: nowrap;
 }
 
@@ -1461,7 +1461,7 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 	-webkit-appearance: none;
 	color: inherit;
 	width: 100%;
-	height: var(--button-size);
+	height: var(--internal-button-size);
 	font-size: inherit;
 	margin: 0;
 	cursor: pointer;
@@ -1516,7 +1516,7 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 		border-radius: var(--mod-border-radius);
 }
 .beepboxEditor input[type=range]::-webkit-slider-thumb {
-	height: var(--button-size);
+	height: var(--internal-button-size);
 	width: 6px;
 	border-radius: 3px;
 	background: currentColor;
@@ -1537,7 +1537,7 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 	background: ${ColorConfig.uiWidgetFocus};
 }
 .beepboxEditor input[type=range]::-moz-range-thumb {
-	height: var(--button-size);
+	height: var(--internal-button-size);
 	width: 6px;
 	border-radius: 3px;
 	border: none;
@@ -1555,7 +1555,7 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 	background: ${ColorConfig.uiWidgetFocus};
 }
 .beepboxEditor input[type=range]::-ms-thumb {
-	height: var(--button-size);
+	height: var(--internal-button-size);
 	width: 6px;
 	border-radius: 3px;
 	background: currentColor;
@@ -1601,7 +1601,7 @@ li.select2-results__option[role=group] > strong:hover {
 		align-items: center;
 	}
 	.beepboxEditor .settings-area {
-		width: var(--settings-area-width);
+		width: var(--internal-settings-area-width);
 	}
 }
 

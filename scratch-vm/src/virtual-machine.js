@@ -220,7 +220,17 @@ class VirtualMachine extends EventEmitter {
         this.exports = {
             Sprite,
             RenderedTarget,
-            JSZip
+            JSZip,
+
+            i_will_not_ask_for_help_when_these_break: () => {
+                console.warn('You are using unsupported APIs. WHEN your code breaks, do not expect help.');
+                return ({
+                    JSGenerator: require('./compiler/jsgen.js'),
+                    IRGenerator: require('./compiler/irgen.js').IRGenerator,
+                    ScriptTreeGenerator: require('./compiler/irgen.js').ScriptTreeGenerator,
+                    Thread: require('./engine/thread.js')
+                });
+            }
         };
     }
 

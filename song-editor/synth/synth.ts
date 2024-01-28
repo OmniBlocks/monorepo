@@ -10176,7 +10176,8 @@ export class Synth {
 
         if ((tone.atNoteStart && !transition.isSeamless && !tone.forceContinueAtStart) || tone.freshlyAllocated) {
             tone.reset();
-						 // advloop addition
+			    // advloop addition
+            if (instrument.type == InstrumentType.chip && instrument.isUsingAdvancedLoopControls) {
                 const chipWaveLength = Config.rawRawChipWaves[instrument.chipWave].samples.length - 1;
                 const firstOffset = instrument.chipWaveStartOffset / chipWaveLength;
                 // const lastOffset = (chipWaveLength - 0.01) / chipWaveLength;
@@ -10191,7 +10192,7 @@ export class Synth {
                     tone.chipWavePrevWaves[i] = 0;
                     tone.chipWaveCompletionsLastWave[i] = 0;
                 }
-                // console.log(tone.directions);
+            }
                 // advloop addition
         }
         tone.freshlyAllocated = false;

@@ -427,6 +427,8 @@
 
       this.stampRenderTarget = new THREE.WebGLRenderTarget();
 
+      this.raycaster = new THREE.Raycaster();
+
       this.applyPatches();
       this.updateScale();
     }
@@ -578,6 +580,34 @@
           }
           return og(penSkinID, stampID);
         },
+
+        pick(og, centerX, centerY, touchWidth, touchHeight, candidateIDs) {
+          const pick2d = og(centerX, centerY, touchWidth, touchHeight, candidateIDs);
+          if (pick2d !== -1) return pick2d;
+          
+          const threed = Drawable.threed;
+          if (!threed.raycaster) return false;
+
+          const bounds = this.clientSpaceToScratchBounds(centerX, centerY, touchWidth, touchHeight);
+          if (bounds.left === -Infinity || bounds.bottom === -Infinity) {
+              return false;
+          }
+
+          const candidates =
+            (candidateIDs || this._drawList).map(id => this._allDrawables[id]).filter(dr => dr[IN_3D]);
+          if (candidates.length <= 0) return -1;
+
+          const scratchCenterX = (bounds.left + bounds.right) / 2;
+          const scratchCenterY = (bounds.top + bounds.bottom) / 2;
+
+          threed.raycaster.setFromCamera(new THREE.Vector2(scratchCenterX, scratchCenterY), threed.camera);
+
+          const object = threed.raycaster.intersectObjects(threed.scene, true)[0]?.object;
+          if (!object) return -1;
+          const drawable = candidates.find(c => (c[IN_3D] && c[OBJECT] === object));
+          if (!drawable) return -1;
+          return drawable._id;
+        }
       });
     }
 

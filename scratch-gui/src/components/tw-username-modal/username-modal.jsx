@@ -65,7 +65,7 @@ const UsernameModalComponent = props => (
                     onChange={props.onChange}
                     onFocus={props.onFocus}
                     onKeyPress={props.onKeyPress}
-                    pattern="^[a-zA-Z0-9_-]*$"
+                    pattern="[a-zA-Z0-9_\-]*"
                     maxLength="20"
                     spellCheck="false"
                 />

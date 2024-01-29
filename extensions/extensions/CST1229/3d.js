@@ -39,6 +39,7 @@
   const IN_3D = "threed.in3d";
   const OBJECT = "threed.object";
   const THREED_DIRTY = "threed.dirty";
+  const SIDE_MODE = "threed.sidemode";
 
 	const PATCHES_ID = "__patches_cst12293d";
 	const patch = (obj, functions) => {
@@ -289,6 +290,19 @@
           },
           "---",
           {
+            opcode: "setSideMode",
+            blockType: Scratch.BlockType.COMMAND,
+            text: "set shown face to [SIDE]",
+            arguments: {
+              SIDE: {
+                type: Scratch.ArgumentType.STRING,
+                menu: "side",
+                defaultValue: "both",
+              },
+            },
+          },
+          "---",
+          {
             opcode: "setCam",
             blockType: Scratch.BlockType.COMMAND,
             text: "move camera to x: [X] y: [Y] z: [Z]",
@@ -458,7 +472,11 @@
           cameraParam: {
             acceptReporters: true,
             items: ["vertical FOV", "minimum render distance", "maximum render distance"],
-          }
+          },
+          side: {
+            acceptReporters: true,
+            items: ["both", "front", "back"]
+          },
         },
       };
     }
@@ -612,6 +630,14 @@ If I ever decide to release this extension on the gallery, this will be replaced
           }
           return og();
         },
+        _skinWasAltered(og) {
+          og();
+          if (this[IN_3D]) {
+            console.log("altered");
+            Drawable.threed.updateDrawableSkin(this);
+            Drawable.threed.updateRenderer();
+          }
+        }
       });
 
       Scratch.renderer.threed = this;
@@ -723,6 +749,22 @@ If I ever decide to release this extension on the gallery, this will be replaced
           return extracted;
         },
       });
+      patch(Scratch.renderer.exports.Skin, {
+        dispose(og) {
+          if (this._3dCachedTexture) this._3dCachedTexture.dispose();
+          og();
+        },
+        _setTexture(og, textureData) {
+          if (this._3dCachedTexture) {
+            this._3dCachedTexture.dispose();
+            this._3dCachedTexture = null;
+            const returnValue = og(textureData);
+            Drawable.threed.getThreeTextureFromSkin(this);
+            return returnValue;
+          }
+          return og(textureData);
+        },
+      });
     }
 
     updateRenderer() {
@@ -743,8 +785,20 @@ If I ever decide to release this extension on the gallery, this will be replaced
       );
     }
 
+    updateDrawableSkin(drawable) {
+      if (drawable[OBJECT] && drawable[OBJECT].material) {
+        drawable[OBJECT].material.map = this.getThreeTextureFromSkin(drawable.skin);
+      }
+    }
+
 
     /// MISC OBJECT UTILS ////
+
+    getThreeTextureFromSkin(skin) {
+      if (skin._3dCachedTexture) return skin._3dCachedTexture;
+      skin._3dCachedTexture = new THREE.CanvasTexture(this.getCanvasFromSkin(skin));
+      return skin._3dCachedTexture;
+    }
 
     objectShape(obj) {
       let shape = null;
@@ -800,8 +854,6 @@ If I ever decide to release this extension on the gallery, this will be replaced
     // thanks stackoverflow
     // https://stackoverflow.com/a/18804083
     getCanvasFromTexture(gl, texture, width, height) {
-      if (texture._3dCachedCanvas) return texture._3dCachedCanvas;
-
       const framebuffer = gl.createFramebuffer();
       gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
       gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
@@ -821,7 +873,6 @@ If I ever decide to release this extension on the gallery, this will be replaced
 
       context.putImageData(imageData, 0, 0);
 
-      texture._3dCachedCanvas = canvas;
       return canvas;
     }
 
@@ -896,6 +947,8 @@ If I ever decide to release this extension on the gallery, this will be replaced
 
       dr[IN_3D] = true;
 
+      if (!(SIDE_MODE in dr)) dr[SIDE_MODE] = THREE.DoubleSide;
+
       let obj;
       if (type === "sprite") {
         obj = new THREE.Sprite();
@@ -917,11 +970,12 @@ If I ever decide to release this extension on the gallery, this will be replaced
       if (!dr[IN_3D]) return;
       const obj = dr[OBJECT];
 
-      const texture = new THREE.CanvasTexture(this.getCanvasFromSkin(dr.skin));
+      const texture = this.getThreeTextureFromSkin(dr.skin);
       if (obj.isSprite) {
+        if (obj.material) obj.material.dispose();
         obj.material = new THREE.SpriteMaterial({
           map: texture,
-          side: THREE.DoubleSide,
+          side: dr[SIDE_MODE],
           transparent: true
         });
         try {
@@ -940,15 +994,15 @@ If I ever decide to release this extension on the gallery, this will be replaced
         switch (type) {
           case "flat":
             obj.geometry = new THREE.PlaneGeometry(dr.skin.size[0], dr.skin.size[1]);
-            obj.material.side = THREE.DoubleSide;
+            obj.material.side = dr[SIDE_MODE];
             break;
           case "cube":
             obj.geometry = new THREE.BoxGeometry(dr.skin.size[0], dr.skin.size[1], dr.skin.size[0]);
-            obj.material.side = THREE.FrontSide;
+            obj.material.side = dr[SIDE_MODE];
             break;
           case "sphere":
             obj.geometry = new THREE.SphereGeometry(Math.max(dr.skin.size[0], dr.skin.size[1]) / 2, 24, 12);
-            obj.material.side = THREE.FrontSide;
+            obj.material.side = dr[SIDE_MODE];
             break;
         }
         obj._sizeX = 1;
@@ -1184,6 +1238,25 @@ If I ever decide to release this extension on the gallery, this will be replaced
           return THREE.MathUtils.radToDeg(dr._roll) - 90;
         default:
           return 0;
+      }
+    }
+
+    setSideMode({SIDE}, util) {
+      if (util.target.isStage) return;
+      const dr = Scratch.renderer._allDrawables[util.target.drawableID];
+
+      this.init();
+
+      const sides = Object.assign(Object.create(null), {
+        front: THREE.FrontSide,
+        back: THREE.BackSide,
+        both: THREE.DoubleSide
+      });
+      if (!(SIDE in sides)) return;
+      dr[SIDE_MODE] = sides[SIDE];
+      if (dr[OBJECT] && dr[OBJECT].material) {
+        dr[OBJECT].material.side = sides[SIDE];
+        this.updateRenderer();
       }
     }
 

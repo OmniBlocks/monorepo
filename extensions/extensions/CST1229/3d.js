@@ -10,7 +10,6 @@
 
 /*
   TODO:
-  - partial mouse picking support (also touching mouse pointer)
   - bugs
 
   - materials/textures
@@ -660,17 +659,54 @@
             (candidateIDs || this._drawList).map(id => this._allDrawables[id]).filter(dr => dr[IN_3D]);
           if (candidates.length <= 0) return -1;
 
-          const scratchCenterX = (bounds.left + bounds.right) / 2;
-          const scratchCenterY = (bounds.top + bounds.bottom) / 2;
-
+          const scratchCenterX = (bounds.left + bounds.right) / this._gl.canvas.clientWidth;
+          const scratchCenterY = (bounds.top + bounds.bottom) / this._gl.canvas.clientHeight;
           threed.raycaster.setFromCamera(new THREE.Vector2(scratchCenterX, scratchCenterY), threed.camera);
 
-          const object = threed.raycaster.intersectObjects(threed.scene, true)[0]?.object;
+          const object = threed.raycaster.intersectObject(threed.scene, true)[0]?.object;
           if (!object) return -1;
           const drawable = candidates.find(c => (c[IN_3D] && c[OBJECT] === object));
           if (!drawable) return -1;
           return drawable._id;
-        }
+        },
+        drawableTouching(og, drawableID, centerX, centerY, touchWidth, touchHeight) {
+          const drawable = this._allDrawables[drawableID];
+          if (!drawable) {
+              return false;
+          }
+          if (!drawable[IN_3D]) {
+            return og(drawableID, centerX, centerY, touchWidth, touchHeight);
+          }
+  
+          const threed = Drawable.threed;
+          if (!threed.raycaster) return false;
+  
+          const bounds = this.clientSpaceToScratchBounds(centerX, centerY, touchWidth, touchHeight);
+          const scratchCenterX = (bounds.left + bounds.right) / this._gl.canvas.clientWidth;
+          const scratchCenterY = (bounds.top + bounds.bottom) / this._gl.canvas.clientHeight;
+          threed.raycaster.setFromCamera(new THREE.Vector2(scratchCenterX, scratchCenterY), threed.camera);
+  
+          const intersect = (threed.raycaster.intersectObject(threed.scene, true));
+          const object = intersect[0]?.object;
+          return object === drawable[OBJECT];
+        },
+        extractDrawableScreenSpace(og, drawableID) {
+          const drawable = this._allDrawables[drawableID];
+          if (!drawable)
+            throw new Error(`Could not extract drawable with ID ${drawableID}; it does not exist`);
+          if (!drawable[IN_3D])
+            return og(drawableID);
+
+          // Draw the sprite to the 3D drawable then extract it
+          const threed = Drawable.threed;
+          threed.renderer.render(drawable[OBJECT], threed.camera);
+          this._allSkins[threed.threeSkinId].setContent(
+            threed.renderer.domElement
+          );
+          const extracted = og(threed.threeDrawableId);
+          threed.updateRenderer();
+          return extracted;
+        },
       });
     }
 
@@ -680,7 +716,7 @@
       Scratch.vm.runtime.requestRedraw();
     }
 
-    // pushes the current 3d render state into the drawable
+    // pushes the current 3ds render state into the drawable
     doUpdateRenderer() {
       this.init();
       this.renderer.render(this.scene, this.camera);

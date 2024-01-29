@@ -238,7 +238,7 @@
           {
             opcode: "moveSteps",
             blockType: Scratch.BlockType.COMMAND,
-            text: "move [STEPS] steps",
+            text: "move [STEPS] steps in 3D",
             arguments: {
               STEPS: {
                 type: Scratch.ArgumentType.NUMBER,
@@ -1163,7 +1163,7 @@ If I ever decide to release this extension on the gallery, this will be replaced
           .multiplyScalar(-Scratch.Cast.toNumber(STEPS));
       
       util.target.setXY(util.target.x + add.x, util.target.y + add.y);
-      this.changeZ({Z: add.y}, util);
+      this.changeZ({Z: add.z}, util);
       
       this.updateRenderer();
     }

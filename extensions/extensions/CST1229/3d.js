@@ -17,6 +17,11 @@
     - "set material [0] color to ()"?
     - built-in shape materials would be in docs because docs will exist (they are essential)
 
+  - 3d stamping
+    - "3d stamp named []" block that copies the current 3d objects
+    - "delete 3d stamp []"
+    - "erase all 3d stamps"
+  
   - model support???
     - probably just a "set 3d mode to obj [URL/text] []" block
     - "set 3d mode to gltf [URL/text] []" block that also auto-sets materials
@@ -28,9 +33,6 @@
     - light color/intensity blocks
     - glow?
     - world light blocks (direction/disable/flat/color/intensity)
-  
-  -
-  -
 */
 
 (function (Scratch) {
@@ -1156,11 +1158,13 @@ If I ever decide to release this extension on the gallery, this will be replaced
       const dr = Scratch.renderer._allDrawables[util.target.drawableID];
       if (!dr[IN_3D]) return;
       
-      dr[OBJECT].position.add(
-        new THREE.Vector3(0, 0, 1)
+      const add = new THREE.Vector3(0, 0, 1)
           .applyQuaternion(dr[OBJECT].quaternion)
-          .multiplyScalar(-Scratch.Cast.toNumber(STEPS))
-      );
+          .multiplyScalar(-Scratch.Cast.toNumber(STEPS));
+      
+      util.target.setXY(util.target.x + add.x, util.target.y + add.y);
+      this.changeZ({Z: add.y}, util);
+      
       this.updateRenderer();
     }
 

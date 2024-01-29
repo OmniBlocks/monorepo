@@ -148,6 +148,12 @@
 
         blocks: [
           {
+            blockType: Scratch.BlockType.BUTTON,
+            text: "Open Documentation",
+            func: "viewDocs",
+          },
+          "---",
+          {
             opcode: "setMode",
             blockType: Scratch.BlockType.COMMAND,
             text: "set 3D mode to [MODE]",
@@ -455,6 +461,15 @@
           }
         },
       };
+    }
+
+    viewDocs() {
+      alert(`This extension also makes many other vanilla blocks (e.g most of Motion) work with 3D sprites, try them out!
+Default camera position: x0, y0, z200.
+Default camera parameters: vertical FOV 60, min render distance 0.5, max render distance 4800.
+
+More things will be added here as things that need explaining are added.
+If I ever decide to release this extension on the gallery, this will be replaced with an actual docs page.`);
     }
 
     init() {

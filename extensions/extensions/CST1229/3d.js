@@ -8,6 +8,32 @@
 
 // Special thanks to Drago NrxThulitech Cuven for finding lots of bugs
 
+/*
+  TODO:
+  - partial mouse picking support (also touching mouse pointer)
+  - bugs
+
+  - materials/textures
+    - "set material [0] texture to [current costume]"
+    - "set material [0] color to ()"?
+    - built-in shape materials would be in docs because docs will exist (they are essential)
+
+  - model support???
+    - probably just a "set 3d mode to obj [URL/text] []" block
+    - "set 3d mode to gltf [URL/text] []" block that also auto-sets materials
+    - collision support unlikely (if it did happen it would probably be very laggy)
+  
+  - lighting
+    - could be in the set 3d mode block, as in "set 3d mode to (point/spotlight)"
+    - spotlights point in the direction the sprite is pointing
+    - light color/intensity blocks
+    - glow?
+    - world light blocks (direction/disable/flat/color/intensity)
+  
+  -
+  -
+*/
+
 (function (Scratch) {
   "use strict";
 
@@ -202,6 +228,17 @@
           },
           "---",
           {
+            opcode: "moveSteps",
+            blockType: Scratch.BlockType.COMMAND,
+            text: "move [STEPS] steps",
+            arguments: {
+              STEPS: {
+                type: Scratch.ArgumentType.NUMBER,
+                defaultValue: "10",
+              },
+            },
+          },
+          {
             opcode: "set3DDir",
             blockType: Scratch.BlockType.COMMAND,
             text: "point in [DIRECTION] [DEGREES]",
@@ -284,7 +321,33 @@
               },
             },
           },
+          {
+            opcode: "camX",
+            blockType: Scratch.BlockType.REPORTER,
+            text: "camera x",
+          },
+          {
+            opcode: "camY",
+            blockType: Scratch.BlockType.REPORTER,
+            text: "camera y",
+          },
+          {
+            opcode: "camZ",
+            blockType: Scratch.BlockType.REPORTER,
+            text: "camera z",
+          },
           "---",
+          {
+            opcode: "moveCamSteps",
+            blockType: Scratch.BlockType.COMMAND,
+            text: "move camera [STEPS] steps",
+            arguments: {
+              STEPS: {
+                type: Scratch.ArgumentType.NUMBER,
+                defaultValue: "10",
+              },
+            },
+          },
           {
             opcode: "setCamDir",
             blockType: Scratch.BlockType.COMMAND,
@@ -500,8 +563,8 @@
         updatePosition(og, position) {
           if (this[IN_3D]) {
             const o = this[OBJECT];
-            o.position.setX(position[0]);
-            o.position.setY(position[1]);
+            o.position.x = position[0];
+            o.position.y = position[1];
             Drawable.threed.updateRenderer();
           }
           return og(position);
@@ -896,7 +959,7 @@
       const dr = Scratch.renderer._allDrawables[util.target.drawableID];
       if (!dr[IN_3D]) return;
 
-      dr[OBJECT].position.setZ(Scratch.Cast.toNumber(Z));
+      dr[OBJECT].position.z = Scratch.Cast.toNumber(Z);
       this.updateRenderer();
     }
 
@@ -983,6 +1046,19 @@
       this.changeZ({Z}, util);
     }
     
+    moveSteps({STEPS}, util) {
+      if (util.target.isStage) return;
+      const dr = Scratch.renderer._allDrawables[util.target.drawableID];
+      if (!dr[IN_3D]) return;
+      
+      dr[OBJECT].position.add(
+        new THREE.Vector3(0, 0, 1)
+          .applyQuaternion(dr[OBJECT].quaternion)
+          .multiplyScalar(-Scratch.Cast.toNumber(STEPS))
+      );
+      this.updateRenderer();
+    }
+
     rotate3D({DIRECTION, DEGREES}, util) {
       if (util.target.isStage) return;
       const dr = Scratch.renderer._allDrawables[util.target.drawableID];
@@ -1107,6 +1183,30 @@
       pos.set(pos.x + x, pos.y + y, pos.z + z);
       this.updateRenderer();
     }
+    camX(args, util) {
+      this.init();
+      return this.camera.position.x;
+    }
+    camY(args, util) {
+      this.init();
+      return this.camera.position.y;
+    }
+    camZ(args, util) {
+      this.init();
+      return this.camera.position.z;
+    }
+
+    moveCamSteps({STEPS}, util) {
+      this.init();
+      
+      this.camera.position.add(
+        new THREE.Vector3(0, 0, 1)
+          .applyQuaternion(this.camera.quaternion)
+          .multiplyScalar(-Scratch.Cast.toNumber(STEPS))
+      );
+      this.updateRenderer();
+    }
+
     rotateCam({ DIRECTION, DEGREES }) {
       this.init();
 

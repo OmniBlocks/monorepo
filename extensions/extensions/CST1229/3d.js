@@ -42,6 +42,7 @@
   const OBJECT = "threed.object";
   const THREED_DIRTY = "threed.dirty";
   const SIDE_MODE = "threed.sidemode";
+  const Z_POS = "threed.zpos";
 
 	const PATCHES_ID = "__patches_cst12293d";
 	const patch = (obj, functions) => {
@@ -446,7 +447,14 @@
         menus: {
           MODE_MENU: {
             acceptReporters: true,
-            items: ["disabled", "flat", "sprite", "cube", "sphere",],
+            items: [
+              "disabled",
+              "flat",
+              "sprite",
+              "cube",
+              "sphere",
+              "low-poly sphere",
+            ],
           },
           turnDirection: {
             acceptReporters: false,
@@ -995,17 +1003,18 @@ If I ever decide to release this extension on the gallery, this will be replaced
         switch (type) {
           case "flat":
             obj.geometry = new THREE.PlaneGeometry(dr.skin.size[0], dr.skin.size[1]);
-            obj.material.side = dr[SIDE_MODE];
             break;
           case "cube":
             obj.geometry = new THREE.BoxGeometry(dr.skin.size[0], dr.skin.size[1], dr.skin.size[0]);
-            obj.material.side = dr[SIDE_MODE];
             break;
           case "sphere":
             obj.geometry = new THREE.SphereGeometry(Math.max(dr.skin.size[0], dr.skin.size[1]) / 2, 24, 12);
-            obj.material.side = dr[SIDE_MODE];
+            break;
+          case "low-poly sphere":
+            obj.geometry = new THREE.SphereGeometry(Math.max(dr.skin.size[0], dr.skin.size[1]) / 2, 8, 6);
             break;
         }
+        obj.material.side = dr[SIDE_MODE];
         obj._sizeX = 1;
         obj._sizeY = 1;
         obj._sizeZ = 1;
@@ -1020,6 +1029,8 @@ If I ever decide to release this extension on the gallery, this will be replaced
       if (!dr[IN_3D]) return;
 
       dr[IN_3D] = false;
+
+      dr[Z_POS] = dr[OBJECT].position.z;
 
       dr[OBJECT].removeFromParent();
       dr[OBJECT].material.dispose();
@@ -1044,16 +1055,20 @@ If I ever decide to release this extension on the gallery, this will be replaced
         case "sprite":
         case "cube":
         case "sphere":
+        case "low-poly sphere":
           this.disable3DForDrawable(util.target.drawableID);
           this.enable3DForDrawable(util.target.drawableID, MODE);
           if (util.target.renderer) {
             // Update properties
             const target = util.target;
-            const renderer = target.renderer;
             const {direction, scale} = target._getRenderedDirectionAndScale();
-            renderer.updateDrawablePosition(target.drawableID, [target.x, target.y]);
-            renderer.updateDrawableDirectionScale(target.drawableID, direction, scale);
-            renderer.updateDrawableVisible(target.drawableID, target.visible);
+            const dr = target.renderer._allDrawables[target.drawableID];
+            dr.updatePosition([target.x, target.y]);
+            dr.updateDirection(direction);
+            dr.updateScale(scale);
+            dr.updateVisible(target.visible);
+            if (dr[OBJECT]) dr[OBJECT].position.z = dr[Z_POS];
+            this.updateSpriteAngle({target});
           }
           break;
       }

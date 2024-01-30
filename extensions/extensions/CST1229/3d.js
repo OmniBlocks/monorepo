@@ -1076,7 +1076,7 @@ If I ever decide to release this extension on the gallery, this will be replaced
       if (!dr[IN_3D]) return;
 
       const z = Scratch.Cast.toNumber(Z);
-      dr[OBJECT].translateZ(z);
+      dr[OBJECT].position.z += z;
       this.updateRenderer();
     }
 
@@ -1126,7 +1126,7 @@ If I ever decide to release this extension on the gallery, this will be replaced
       obj.rotation.y = dr._yaw;
       obj.rotateOnAxis(
         new THREE.Vector3(1, 0, 0),
-        -dr._pitch
+        dr._pitch
       );
       obj.rotateOnAxis(
         new THREE.Vector3(0, 0, 1),

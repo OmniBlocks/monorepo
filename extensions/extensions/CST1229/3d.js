@@ -619,7 +619,7 @@ If I ever decide to release this extension on the gallery, this will be replaced
             obj.scale.z = (obj._sizeZ ?? 100) / 100 * scale[0];
             Drawable.threed.updateRenderer();
           }
-          return og(og, scale);
+          return og(scale);
         },
         dispose(og) {
           if (this[OBJECT]) {
@@ -635,7 +635,6 @@ If I ever decide to release this extension on the gallery, this will be replaced
         _skinWasAltered(og) {
           og();
           if (this[IN_3D]) {
-            console.log("altered");
             Drawable.threed.updateDrawableSkin(this);
             Drawable.threed.updateRenderer();
           }

@@ -1030,7 +1030,6 @@ If I ever decide to release this extension on the gallery, this will be replaced
         obj._sizeY = 1;
         obj._sizeZ = 1;
       }
-      obj.material.side = dr[SIDE_MODE];
 
       if (obj?.material?.map) obj?.material?.map?.dispose();
       const texture = this.getThreeTextureFromSkin(dr.skin);
@@ -1049,6 +1048,8 @@ If I ever decide to release this extension on the gallery, this will be replaced
       if (!(SIDE_MODE in dr)) dr[SIDE_MODE] = THREE.DoubleSide;
       if (!(TEX_FILTER in dr)) dr[TEX_FILTER] = THREE.LinearMipmapLinearFilter;
 
+      obj.material.side = dr[SIDE_MODE];
+      
       const texture = obj.material.map;
       texture.minFilter = dr[TEX_FILTER];
       texture.magFilter = dr[TEX_FILTER];

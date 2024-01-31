@@ -7,7 +7,7 @@ import { HTML } from "imperative-html/dist/esm/elements-strict";
 import { Channel, Instrument } from "../synth/synth";
 import { ChangePasteInstrument, ChangeAppendInstrument, ChangeViewInstrument } from "./changes";
 
-const {button, div, h2, input, select, option } = HTML;
+const {button, div, h2, input, select, option, code } = HTML;
 
 export class InstrumentImportPrompt implements Prompt {
 		private readonly _cancelButton: HTMLButtonElement = button({class: "cancelButton"});
@@ -20,6 +20,13 @@ export class InstrumentImportPrompt implements Prompt {
 
 		public readonly container: HTMLDivElement = div({ class: "prompt noSelection", style: "width: 300px;" },
 		    h2("Import Instrument(s)"),
+			div({ style: "text-align: left;" },
+			"You must enable either ",
+			code("Simultaneous instruments per channel"),
+			" or ",
+			code("Different instruments per pattern"),
+			" to change the import strategy.",
+			),
             div({style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;"},
 				div({class: "selectContainer", style: "width: 100%;"}, this._importStrategySelect),
 			),

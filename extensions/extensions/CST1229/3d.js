@@ -42,6 +42,7 @@
   const OBJECT = "threed.object";
   const THREED_DIRTY = "threed.dirty";
   const SIDE_MODE = "threed.sidemode";
+  const TEX_FILTER = "threed.texfilter";
   const Z_POS = "threed.zpos";
 
 	const PATCHES_ID = "__patches_cst12293d";
@@ -293,9 +294,21 @@
           },
           "---",
           {
+            opcode: "setTexFilter",
+            blockType: Scratch.BlockType.COMMAND,
+            text: "set texture filter to [FILTER]",
+            arguments: {
+              FILTER: {
+                type: Scratch.ArgumentType.STRING,
+                menu: "texFilter",
+                defaultValue: "nearest",
+              },
+            },
+          },
+          {
             opcode: "setSideMode",
             blockType: Scratch.BlockType.COMMAND,
-            text: "set shown face to [SIDE]",
+            text: "set shown faces to [SIDE]",
             arguments: {
               SIDE: {
                 type: Scratch.ArgumentType.STRING,
@@ -486,6 +499,10 @@
           side: {
             acceptReporters: true,
             items: ["both", "front", "back"]
+          },
+          texFilter: {
+            acceptReporters: true,
+            items: ["nearest", "linear", ""]
           },
         },
       };
@@ -956,8 +973,6 @@ If I ever decide to release this extension on the gallery, this will be replaced
 
       dr[IN_3D] = true;
 
-      if (!(SIDE_MODE in dr)) dr[SIDE_MODE] = THREE.DoubleSide;
-
       let obj;
       if (type === "sprite") {
         obj = new THREE.Sprite();
@@ -966,9 +981,11 @@ If I ever decide to release this extension on the gallery, this will be replaced
       }
       dr[OBJECT] = obj;
       this.updateMeshForDrawable(drawableID, type);
+
       if (!("_yaw" in dr)) dr._yaw = 0;
       if (!("_pitch" in dr)) dr._pitch = 0;
       if (!("_roll" in dr)) dr._roll = 0;
+      if (!(Z_POS in dr)) dr[Z_POS] = 0;
 
       this.scene.add(obj);
       this.updateRenderer();
@@ -979,14 +996,9 @@ If I ever decide to release this extension on the gallery, this will be replaced
       if (!dr[IN_3D]) return;
       const obj = dr[OBJECT];
 
-      const texture = this.getThreeTextureFromSkin(dr.skin);
       if (obj.isSprite) {
         if (obj.material) obj.material.dispose();
-        obj.material = new THREE.SpriteMaterial({
-          map: texture,
-          side: dr[SIDE_MODE],
-          transparent: true
-        });
+        obj.material = new THREE.SpriteMaterial();
         try {
           const size = this.getSizeFromSkin(dr.skin);
           obj._sizeX = size[0];
@@ -1014,13 +1026,35 @@ If I ever decide to release this extension on the gallery, this will be replaced
             obj.geometry = new THREE.SphereGeometry(Math.max(dr.skin.size[0], dr.skin.size[1]) / 2, 8, 6);
             break;
         }
-        obj.material.side = dr[SIDE_MODE];
         obj._sizeX = 1;
         obj._sizeY = 1;
         obj._sizeZ = 1;
-        obj.material.map = texture;
       }
+      obj.material.side = dr[SIDE_MODE];
+
+      if (obj?.material?.map) obj?.material?.map?.dispose();
+      const texture = this.getThreeTextureFromSkin(dr.skin);
+      obj.material.map = texture;
+
+      this.updateMaterialForDrawable(drawableID);
+
       dr.updateScale(dr.scale);
+    }
+
+    updateMaterialForDrawable(drawableID) {
+      const dr = Scratch.renderer._allDrawables[drawableID];
+      if (!dr[IN_3D]) return;
+      const obj = dr[OBJECT];
+
+      if (!(SIDE_MODE in dr)) dr[SIDE_MODE] = THREE.DoubleSide;
+      if (!(TEX_FILTER in dr)) dr[TEX_FILTER] = THREE.LinearMipmapLinearFilter;
+
+      const texture = obj.material.map;
+      texture.minFilter = dr[TEX_FILTER];
+      texture.magFilter = dr[TEX_FILTER];
+      if (texture.magFilter === THREE.LinearMipmapLinearFilter)
+        texture.magFilter = THREE.LinearFilter;
+
       obj.material.transparent = true;
     }
 
@@ -1060,18 +1094,23 @@ If I ever decide to release this extension on the gallery, this will be replaced
           this.enable3DForDrawable(util.target.drawableID, MODE);
           if (util.target.renderer) {
             // Update properties
-            const target = util.target;
-            const {direction, scale} = target._getRenderedDirectionAndScale();
-            const dr = target.renderer._allDrawables[target.drawableID];
-            dr.updatePosition([target.x, target.y]);
-            dr.updateDirection(direction);
-            dr.updateScale(scale);
-            dr.updateVisible(target.visible);
-            if (dr[OBJECT]) dr[OBJECT].position.z = dr[Z_POS];
-            this.updateSpriteAngle({target});
+            this.refreshThreeDrawable(util.target);
           }
           break;
       }
+    }
+
+    refreshThreeDrawable(target) {
+      const {direction, scale} = target._getRenderedDirectionAndScale();
+      const dr = target.renderer._allDrawables[target.drawableID];
+      dr.updatePosition([target.x, target.y]);
+      dr.updateDirection(direction);
+      dr.updateScale(scale);
+      dr.updateVisible(target.visible);
+      if (dr[OBJECT]) {
+        dr[OBJECT].position.z = dr[Z_POS];
+      }
+      this.updateSpriteAngle({target});
     }
 
     setZ({ Z }, util) {
@@ -1274,6 +1313,29 @@ If I ever decide to release this extension on the gallery, this will be replaced
       dr[SIDE_MODE] = sides[SIDE];
       if (dr[OBJECT] && dr[OBJECT].material) {
         dr[OBJECT].material.side = sides[SIDE];
+        this.updateRenderer();
+      }
+    }
+
+    setTexFilter({FILTER}, util) {
+      if (util.target.isStage) return;
+      const dr = Scratch.renderer._allDrawables[util.target.drawableID];
+
+      this.init();
+
+      const filters = Object.assign(Object.create(null), {
+        nearest: THREE.NearestFilter,
+        linear: THREE.LinearMipmapLinearFilter,
+      });
+      if (!(FILTER in filters)) return;
+      dr[TEX_FILTER] = filters[FILTER];
+      if (dr[OBJECT] && dr[OBJECT].material?.map) {
+        // i think for some reason you need to create a new texture
+        const cloned = dr[OBJECT].material.map.clone();
+        dr[OBJECT].material.map.dispose();
+        dr[OBJECT].material.map = cloned;
+        cloned.needsUpdate = true;
+        this.updateMaterialForDrawable(util.target.drawableID)
         this.updateRenderer();
       }
     }

@@ -543,7 +543,7 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 	mask-image: var(--internal-zoom-in-symbol);
 	mask-repeat: no-repeat;
 	mask-position: center;
-	-webkit-mask-image: var(--imternal-zoom-in-symbol);
+	-webkit-mask-image: var(--internal-zoom-in-symbol);
 	-webkit-mask-repeat: no-repeat;
 	-webkit-mask-position: center;
 }

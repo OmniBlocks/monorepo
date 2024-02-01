@@ -69,7 +69,7 @@ export class InstrumentImportPrompt implements Prompt {
 					console.log("Processing file:", fileParsed)
 					if (fileParsed.constructor.name == "Array") {
 						if ((this._doc.song.patternInstruments||this._doc.song.layeredInstruments)==false) {
-							alert("Instrument file contains multiple instruments! Please turn on either" + code("Simultaneous instruments per channel") + " or " + code("Different instruments per pattern"));
+							alert("Instrument file contains multiple instruments! Please turn on either Simultaneous instruments per channel or Different instruments per pattern!");
 							return;
 						}
 						this._import_multiple(fileParsed);

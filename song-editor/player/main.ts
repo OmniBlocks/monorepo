@@ -449,12 +449,29 @@ function setSynthVolume(): void {
 }
 
 function renderPlayhead(): void {
+	const noteFlashElements: NodeListOf<SVGPathElement> = timeline.querySelectorAll('.note-flash-player');
 	if (synth.song != null) {
 		let pos: number = synth.playhead / synth.song.barCount;
 		playhead.style.left = (timelineWidth * pos) + "px";
 			
 		const boundingRect: ClientRect = visualizationContainer.getBoundingClientRect();
 		visualizationContainer.scrollLeft = pos * (timelineWidth - boundingRect.width);
+
+		const playheadBar: number = Math.floor(synth.playhead);
+		const modPlayhead: number = synth.playhead - playheadBar;
+
+		for (var i = 0; i < noteFlashElements.length; i++) {
+			var element: SVGPathElement = noteFlashElements[i];
+			const noteStart: number = Number(element.getAttribute("note-start"))/(synth.song.beatsPerBar * Config.partsPerBeat)
+			const noteEnd: number = Number(element.getAttribute("note-end"))/(synth.song.beatsPerBar * Config.partsPerBeat)
+			const noteBar: number = Number(element.getAttribute("note-bar"))
+			if ((modPlayhead>=noteStart)&&getLocalStorage("notesFlashWhenPlayed")&&(noteBar==Math.floor(synth.playhead))) {
+				const dist = noteEnd-noteStart
+				element.style.opacity = String((1-(((modPlayhead-noteStart)-(dist/2))/(dist/2))))
+			} else {
+				element.style.opacity = "0"
+			}
+		}
 	}
 }
 
@@ -502,7 +519,15 @@ function renderTimeline(): void {
 	for (let octave: number = 0; octave <= windowOctaves; octave++) {
 			timeline.appendChild(rect({x: 0, y: octave * 12 * wavePitchHeight, width: timelineWidth, height: wavePitchHeight + 1, fill: ColorConfig.tonic, opacity: 0.75}));
 	}
-		
+
+	// note flash colors
+	let noteFlashColor: string = "#ffffff";
+	let noteFlashColorSecondary: string = "#ffffff77";
+	if (getLocalStorage("notesFlashWhenPlayed")) {
+		noteFlashColor = ColorConfig.getComputed("--note-flash") !== "" ? "var(--note-flash)" : "#ffffff";
+		noteFlashColorSecondary = ColorConfig.getComputed("--note-flash-secondary") !== "" ? "var(--note-flash-secondary)" : "#ffffff77";
+	}
+
 	for (let channel: number = synth.song.channels.length - 1 - synth.song.modChannelCount; channel >= 0; channel--) {
 
 		const isNoise: boolean = synth.song.getChannelIsNoise(channel);
@@ -526,6 +551,21 @@ function renderTimeline(): void {
 						const noteElement: SVGPathElement = path({d: d, fill: ColorConfig.getChannelColor(synth.song, channel).primaryChannel});
 					if (isNoise) noteElement.style.opacity = String(0.6);
 					timeline.appendChild(noteElement);
+
+					if (getLocalStorage("notesFlashWhenPlayed")) {
+						const dflash: string = drawNote(pitch, note.start, note.pins, (pitchHeight + 1) / 2, offsetX, offsetY, partWidth, pitchHeight);
+						// const noteFlashColorSecondary = ColorConfig.getComputed("--note-flash-secondary") !== "" ? "var(--note-flash-secondary)" : "#ffffff77";
+						// const noteFlashColor = ColorConfig.getComputed("--note-flash") !== "" ? "var(--note-flash)" : "#ffffff77";
+						const noteFlashElement: SVGPathElement = path({d: dflash, fill: (isNoise ? noteFlashColorSecondary : noteFlashColor)});
+						noteFlashElement.classList.add('note-flash-player');
+						noteFlashElement.style.opacity = "0";
+						noteFlashElement.setAttribute('note-start', String(note.start));
+						noteFlashElement.setAttribute('note-end', String(
+							note.end
+							));
+						noteFlashElement.setAttribute('note-bar', String(bar));
+						timeline.appendChild(noteFlashElement);
+					}
 				}
 			}
 		}

@@ -19,6 +19,18 @@ const BLOCK_COLOR_NAMES = [
 ];
 
 /**
+ * @param {string} css CSS color or var(--...)
+ * @returns {string} evaluated CSS
+ */
+const evaluateCSS = css => {
+    const variableMatch = css.match(/^var\(([\w-]+)\)$/);
+    if (variableMatch) {
+        return document.documentElement.style.getPropertyValue(variableMatch[1]);
+    }
+    return css;
+};
+
+/**
  * @param {Theme} theme the theme
  */
 const applyGuiColors = theme => {
@@ -44,6 +56,16 @@ const applyGuiColors = theme => {
         doc.style.setProperty(`--editorTheme3-${color}-tertiary`, blockColors[color].tertiary);
         doc.style.setProperty(`--editorTheme3-${color}-field-background`, blockColors[color].quaternary);
     }
+
+    // Some browsers will color their interfaces to match theme-color, so if we make it the same color as our
+    // menu bar, it'll look pretty cool.
+    let metaThemeColor = document.head.querySelector('meta[name=theme-color]');
+    if (!metaThemeColor) {
+        metaThemeColor = document.createElement('meta');
+        metaThemeColor.setAttribute('name', 'theme-color');
+        document.head.appendChild(metaThemeColor);
+    }
+    metaThemeColor.setAttribute('content', evaluateCSS(guiColors['menu-bar-background']));
 
     // a horrible hack for icons...
     window.Recolor = {

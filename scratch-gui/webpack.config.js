@@ -5,7 +5,6 @@ const webpack = require('webpack');
 // Plugins
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const TWGenerateServiceWorkerPlugin = require('./src/playground/generate-service-worker-plugin');
 
 // PostCss
 const autoprefixer = require('autoprefixer');
@@ -244,8 +243,7 @@ module.exports = [
                         context: 'src/examples'
                     }
                 ]
-            }),
-            new TWGenerateServiceWorkerPlugin()
+            })
         ])
     })
 ].concat(

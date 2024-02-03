@@ -52,6 +52,9 @@ global.window = {
     open: (url, target, features) => `[Window ${url} target=${target || ''} features=${features || ''}]`
 };
 
+// Remove navigator object from Node 21 and later
+delete global.navigator;
+
 tap.beforeEach(() => {
     scriptCallbacks.clear();
     global.location = {

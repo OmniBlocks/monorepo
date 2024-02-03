@@ -6,9 +6,12 @@ global.fetch = () => Promise.reject(new Error('Simulated network error'));
 
 const Scratch3TranslateBlocks = require('../../src/extensions/scratch3_translate/index');
 
-global.navigator = {
-    language: 'en'
-};
+// Node 21 and later defines a navigator object, but we want to override that for the test
+Object.defineProperty(global, 'navigator', {
+    value: {
+        language: 'en-US'
+    }
+});
 
 // Translate tries to access AbortController from window, but does not require it to exist.
 global.window = {};

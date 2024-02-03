@@ -9,6 +9,9 @@ global.fetch = (url, options = {}) => (
     Promise.resolve(`[Response ${url instanceof Request ? url.url : url} options=${JSON.stringify(options)}]`)
 );
 
+// Remove navigator object from Node 21 and later
+delete global.navigator;
+
 // Need to trick the extension API to think it's running in a worker
 // It will not actually use this object ever.
 global.self = {};

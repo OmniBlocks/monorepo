@@ -41,7 +41,6 @@
     "debugger/@settings-name-log_failed_clone_creation": "Loguj, kiedy limit klonów jest osiągnięty",
     "debugger/@settings-name-log_greenflag": "Loguj kiedy kliknięto w Zieloną Flagę",
     "pause/@name": "Przycisk zatrzymania",
-    "pause/@update": "Teraz istnieje nowy skrót klawiszowy, pozwalający zatrzymać projekt.",
     "mute-project/@description": "Kliknij na zieloną flagę trzymając Ctr, aby wyciszyć lub od-ciszyć projekt.",
     "mute-project/@info-macOS": "W systemie macOS, użyj klawiszu Cmd zamiast Ctrl.",
     "mute-project/@name": "Wycisz odtwarzacz projektu",

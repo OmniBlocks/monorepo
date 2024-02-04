@@ -378,6 +378,12 @@ const parseMessageDirectory = localeRoot => {
                     continue;
                 }
 
+                // Messages ending with /@update are temporary notices describing what's new.
+                // We don't show them.
+                if (id.endsWith('/@update')) {
+                    continue;
+                }
+
                 const value = unstructure(parsed[id]);
                 if (id.includes('/@')) {
                     settings[id] = value;

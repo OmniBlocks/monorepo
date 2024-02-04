@@ -30,7 +30,6 @@
     "hide-flyout/@settings-select-toggle-category": "Clicar em uma categoria",
     "hide-flyout/@settings-select-toggle-cathover": "Passar o mouse em uma categoria",
     "hide-flyout/@settings-select-toggle-hover": "Passar o mouse na área da paleta",
-    "hide-flyout/@update": "Este addon foi revisado e diversos bugs foram corrigidos.",
     "mediarecorder/@description": "Adiciona um botão \"começar a gravar\" à barra superior do editor que te deixa gravar o palco do projeto.",
     "mediarecorder/@name": "Gravador de vídeo do projeto",
     "drag-drop/@description": "Te deixa arrastar imagens e sons do seu computador até a lista de atores, fantasias ou sons. Você também pode arrastar arquivos de texto até listas ou a entrada de resposta do bloco \"pergunte e espere\".",

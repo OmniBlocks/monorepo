@@ -3,7 +3,7 @@ const manifest = {
   "editorOnly": true,
   "noTranslations": true,
   "name": "Rearrangeable custom block inputs",
-  "description": "Adds buttons for rearranging custom block inputs.",
+  "description": "Allows rearranging custom block parameters on the \"Make a block\" screen.",
   "credits": [
     {
       "name": "Chrome_Cat",

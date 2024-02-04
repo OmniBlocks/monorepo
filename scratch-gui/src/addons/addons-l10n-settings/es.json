@@ -40,7 +40,6 @@
     "hide-flyout/@settings-select-toggle-category": "Click en categoría",
     "hide-flyout/@settings-select-toggle-cathover": "Cursor sobre categoría",
     "hide-flyout/@settings-select-toggle-hover": "Cursor sobre área de paleta",
-    "hide-flyout/@update": "Este addon fue revisado y se arreglaron muchos errores.",
     "mediarecorder/@description": "Agrega un botón \"empezar grabación\" al menú del editor que le permite grabar el escenario del proyecto.",
     "mediarecorder/@name": "Grabador de video de proyectos",
     "mediarecorder/@update": "El tiempo máximo de grabación se ha aumentado a 10 minutos (600 segundos).",

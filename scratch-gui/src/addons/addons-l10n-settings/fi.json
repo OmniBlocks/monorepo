@@ -41,7 +41,6 @@
     "hide-flyout/@settings-select-toggle-category": "Luokkaa napautetaan",
     "hide-flyout/@settings-select-toggle-cathover": "Hiirtä pidetään luokan päällä",
     "hide-flyout/@settings-select-toggle-hover": "Hiirtä pidetään palettialueella",
-    "hide-flyout/@update": "Tämä lisäosa on tarkistettu ja monet bugit korjattu.",
     "mediarecorder/@description": "Lisää editorin valikkoriville \"aloita nauhoitus\" -painikkeen, jolla voit nauhoittaa projektin esiintymislavan.",
     "mediarecorder/@name": "Videonauhuri projekteissa",
     "mediarecorder/@update": "Enimmäistallennusaikaa on pidennetty 10 minuuttiin (600 sekuntiin).",

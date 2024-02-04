@@ -41,7 +41,6 @@
     "hide-flyout/@settings-select-toggle-category": "カテゴリー・クリック",
     "hide-flyout/@settings-select-toggle-cathover": "カテゴリーのホバー",
     "hide-flyout/@settings-select-toggle-hover": "パレット部分のホバー",
-    "hide-flyout/@update": "アドオンが見直され、多くのバグが修正されました。",
     "mediarecorder/@description": "ステージを録画するボタンをエディターのメニューバーに追加する。",
     "mediarecorder/@name": "ステージを録画",
     "mediarecorder/@update": "録画時間の上限が10分 (600秒) に増加しました。",

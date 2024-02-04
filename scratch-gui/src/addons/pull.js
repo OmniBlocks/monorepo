@@ -345,6 +345,7 @@ const SKIP_MESSAGES = [
     'editor-theme3/@settings-name-forums',
     'editor-theme3/@info-disablesMenuBar',
     'editor-theme3/@info-aboutHighContrast',
+    'editor-theme3/@settings-name-monitors',
     'block-switching/@settings-name-sa',
     'custom-menu-bar/@credits-dropdown',
     'custom-menu-bar/@credits-tutorials-button',

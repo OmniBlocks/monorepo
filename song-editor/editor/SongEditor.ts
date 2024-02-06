@@ -338,7 +338,7 @@ export class SongEditor {
     private readonly _patternEditorNext: PatternEditor = new PatternEditor(this._doc, false, 1);
     private readonly _trackEditor: TrackEditor = new TrackEditor(this._doc, this);
     private readonly _muteEditor: MuteEditor = new MuteEditor(this._doc, this);
-    private readonly _loopEditor: LoopEditor = new LoopEditor(this._doc);
+    private readonly _loopEditor: LoopEditor = new LoopEditor(this._doc, this._trackEditor);
     private readonly _piano: Piano = new Piano(this._doc);
     private readonly _octaveScrollBar: OctaveScrollBar = new OctaveScrollBar(this._doc, this._piano);
     private readonly _playButton: HTMLButtonElement = button({ class: "playButton", type: "button", title: "Play (Space)" }, span("Play"));
@@ -2755,7 +2755,8 @@ export class SongEditor {
     }
 
     private _onTrackAreaScroll = (event: Event): void => {
-		this._doc.barScrollPos = (this._trackAndMuteContainer.scrollLeft / this._doc.getBarWidth());
+        this._doc.barScrollPos = (this._trackAndMuteContainer.scrollLeft / this._doc.getBarWidth());
+        this._doc.channelScrollPos = (this._trackAndMuteContainer.scrollTop / ChannelRow.patternHeight);
 		//this._doc.notifier.changed();
 	}
 
@@ -2953,8 +2954,11 @@ export class SongEditor {
                     if (this._trackEditor.movePlayheadToMouse() || this._patternEditor.movePlayheadToMouse()) {
                         if (!this._doc.synth.playing) this._doc.performance.play();
                     }
-                    this._doc.synth.loopBar = -1;
-                    this._loopEditor.setLoopAt(this._doc.synth.loopBar);
+                    if (Math.floor(this._doc.synth.playhead) < this._doc.synth.loopBarStart || Math.floor(this._doc.synth.playhead) > this._doc.synth.loopBarEnd) {
+                        this._doc.synth.loopBarStart = -1;
+                        this._doc.synth.loopBarEnd = -1;
+                        this._loopEditor.setLoopAt(this._doc.synth.loopBarStart, this._doc.synth.loopBarEnd);
+                    }
                 } else {
                     this.togglePlay();
                 }
@@ -2965,8 +2969,9 @@ export class SongEditor {
                 if (canPlayNotes) break;
                 if (event.ctrlKey || event.metaKey) {
                     this._toggleRecord();
-                    this._doc.synth.loopBar = -1;
-                    this._loopEditor.setLoopAt(this._doc.synth.loopBar);
+                    this._doc.synth.loopBarStart = -1;
+                    this._doc.synth.loopBarEnd = -1;
+                    this._loopEditor.setLoopAt(this._doc.synth.loopBarStart, this._doc.synth.loopBarEnd);
 
                     event.preventDefault();
                     this.refocusStage();
@@ -2990,8 +2995,13 @@ export class SongEditor {
                 if (canPlayNotes) break;
 
                 if (needControlForShortcuts == (event.ctrlKey || event.metaKey)) {
-                    if (this._doc.synth.loopBar != this._doc.bar) {
-                        this._doc.synth.loopBar = this._doc.bar;
+                    const leftSel = Math.min(this._doc.selection.boxSelectionX0, this._doc.selection.boxSelectionX1);
+                    const rightSel = Math.max(this._doc.selection.boxSelectionX0, this._doc.selection.boxSelectionX1);
+                    if ((leftSel < this._doc.synth.loopBarStart || this._doc.synth.loopBarStart == -1)
+                        || (rightSel > this._doc.synth.loopBarEnd || this._doc.synth.loopBarEnd == -1)
+                    ) {
+                        this._doc.synth.loopBarStart = leftSel;
+                        this._doc.synth.loopBarEnd = rightSel;
 
                         if (!this._doc.synth.playing) {
                             this._doc.synth.snapToBar();
@@ -2999,11 +3009,12 @@ export class SongEditor {
                         }
                     }
                     else {
-                        this._doc.synth.loopBar = -1;
+                        this._doc.synth.loopBarStart = -1;
+                        this._doc.synth.loopBarEnd = -1;
                     }
 
                     // Pressed while viewing a different bar than the current synth playhead.
-                    if (this._doc.bar != Math.floor(this._doc.synth.playhead) && this._doc.synth.loopBar != -1) {
+                    if (this._doc.bar != Math.floor(this._doc.synth.playhead) && this._doc.synth.loopBarStart != -1) {
 
                         this._doc.synth.goToBar(this._doc.bar);
                         this._doc.synth.snapToBar();
@@ -3015,7 +3026,7 @@ export class SongEditor {
 
                     }
 
-                    this._loopEditor.setLoopAt(this._doc.synth.loopBar);
+                    this._loopEditor.setLoopAt(this._doc.synth.loopBarStart, this._doc.synth.loopBarEnd);
 
 
                     event.preventDefault();
@@ -3033,8 +3044,9 @@ export class SongEditor {
                 event.preventDefault();
                 break;
             case 13: // enter/return
-                this._doc.synth.loopBar = -1;
-                this._loopEditor.setLoopAt(this._doc.synth.loopBar);
+                this._doc.synth.loopBarStart = -1;
+                this._doc.synth.loopBarEnd = -1;
+                this._loopEditor.setLoopAt(this._doc.synth.loopBarStart, this._doc.synth.loopBarEnd);
 
                 if (event.ctrlKey || event.metaKey) {
                     this._doc.selection.insertChannel();
@@ -3044,8 +3056,9 @@ export class SongEditor {
                 event.preventDefault();
                 break;
             case 8: // backspace/delete
-                this._doc.synth.loopBar = -1;
-                this._loopEditor.setLoopAt(this._doc.synth.loopBar);
+                this._doc.synth.loopBarStart = -1;
+                this._doc.synth.loopBarEnd = -1;
+                this._loopEditor.setLoopAt(this._doc.synth.loopBarStart, this._doc.synth.loopBarEnd);
 
                 if (event.ctrlKey || event.metaKey) {
                     this._doc.selection.deleteChannel();
@@ -3082,8 +3095,9 @@ export class SongEditor {
                 if (canPlayNotes) break;
                 if (needControlForShortcuts == (event.ctrlKey || event.metaKey)) {
 
-                    this._doc.synth.loopBar = -1;
-                    this._loopEditor.setLoopAt(this._doc.synth.loopBar);
+                    this._doc.synth.loopBarStart = -1;
+                    this._doc.synth.loopBarEnd = -1;
+                    this._loopEditor.setLoopAt(this._doc.synth.loopBarStart, this._doc.synth.loopBarEnd);
 
                     this._doc.synth.snapToStart();
                     this._doc.synth.initModFilters(this._doc.song);
@@ -3099,15 +3113,17 @@ export class SongEditor {
 
                 if (needControlForShortcuts == (event.ctrlKey || event.metaKey)) {
 
-                    if (this._doc.synth.loopBar != this._doc.bar) {
-                        this._doc.synth.loopBar = -1;
-                        this._loopEditor.setLoopAt(this._doc.synth.loopBar);
-                    }
-
                     this._doc.synth.goToBar(this._doc.bar);
                     this._doc.synth.snapToBar();
                     this._doc.synth.initModFilters(this._doc.song);
                     this._doc.synth.computeLatestModValues();
+
+                    if (Math.floor(this._doc.synth.playhead) < this._doc.synth.loopBarStart || Math.floor(this._doc.synth.playhead) > this._doc.synth.loopBarEnd) {
+                        this._doc.synth.loopBarStart = -1;
+                        this._doc.synth.loopBarEnd = -1;
+                        this._loopEditor.setLoopAt(this._doc.synth.loopBarStart, this._doc.synth.loopBarEnd);
+                    }
+
                     if (this._doc.prefs.autoFollow) {
                         this._doc.selection.setChannelBar(this._doc.channel, Math.floor(this._doc.synth.playhead));
                     }
@@ -3317,12 +3333,15 @@ export class SongEditor {
             case 219: // left brace
                 if (canPlayNotes) break;
                 if (needControlForShortcuts == (event.ctrlKey || event.metaKey)) {
-                    this._doc.synth.loopBar = -1;
-                    this._loopEditor.setLoopAt(this._doc.synth.loopBar);
-
                     this._doc.synth.goToPrevBar();
                     this._doc.synth.initModFilters(this._doc.song);
                     this._doc.synth.computeLatestModValues();
+                    if (Math.floor(this._doc.synth.playhead) < this._doc.synth.loopBarStart || Math.floor(this._doc.synth.playhead) > this._doc.synth.loopBarEnd) {
+                        this._doc.synth.loopBarStart = -1;
+                        this._doc.synth.loopBarEnd = -1;
+                        this._loopEditor.setLoopAt(this._doc.synth.loopBarStart, this._doc.synth.loopBarEnd);
+                    }
+
                     if (this._doc.prefs.autoFollow) {
                         this._doc.selection.setChannelBar(this._doc.channel, Math.floor(this._doc.synth.playhead));
                     }
@@ -3332,12 +3351,15 @@ export class SongEditor {
             case 221: // right brace
                 if (canPlayNotes) break;
                 if (needControlForShortcuts == (event.ctrlKey || event.metaKey)) {
-                    this._doc.synth.loopBar = -1;
-                    this._loopEditor.setLoopAt(this._doc.synth.loopBar);
-
                     this._doc.synth.goToNextBar();
                     this._doc.synth.initModFilters(this._doc.song);
                     this._doc.synth.computeLatestModValues();
+                    if (Math.floor(this._doc.synth.playhead) < this._doc.synth.loopBarStart || Math.floor(this._doc.synth.playhead) > this._doc.synth.loopBarEnd) {
+                        this._doc.synth.loopBarStart = -1;
+                        this._doc.synth.loopBarEnd = -1;
+                        this._loopEditor.setLoopAt(this._doc.synth.loopBarStart, this._doc.synth.loopBarEnd);
+                    }
+
                     if (this._doc.prefs.autoFollow) {
                         this._doc.selection.setChannelBar(this._doc.channel, Math.floor(this._doc.synth.playhead));
                     }
@@ -3523,16 +3545,22 @@ export class SongEditor {
     }
 
     private _whenPrevBarPressed = (): void => {
-        this._doc.synth.loopBar = -1;
-        this._loopEditor.setLoopAt(this._doc.synth.loopBar);
         this._doc.synth.goToPrevBar();
+        if (Math.floor(this._doc.synth.playhead) < this._doc.synth.loopBarStart || Math.floor(this._doc.synth.playhead) > this._doc.synth.loopBarEnd) {
+            this._doc.synth.loopBarStart = -1;
+            this._doc.synth.loopBarEnd = -1;
+            this._loopEditor.setLoopAt(this._doc.synth.loopBarStart, this._doc.synth.loopBarEnd);
+        }
         this._barScrollBar.animatePlayhead();
     }
 
     private _whenNextBarPressed = (): void => {
-        this._doc.synth.loopBar = -1;
-        this._loopEditor.setLoopAt(this._doc.synth.loopBar);
         this._doc.synth.goToNextBar();
+        if (Math.floor(this._doc.synth.playhead) < this._doc.synth.loopBarStart || Math.floor(this._doc.synth.playhead) > this._doc.synth.loopBarEnd) {
+            this._doc.synth.loopBarStart = -1;
+            this._doc.synth.loopBarEnd = -1;
+            this._loopEditor.setLoopAt(this._doc.synth.loopBarStart, this._doc.synth.loopBarEnd);
+        }
         this._barScrollBar.animatePlayhead();
     }
 

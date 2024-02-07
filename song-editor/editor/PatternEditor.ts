@@ -827,7 +827,7 @@ export class PatternEditor {
             if (toApply) applyValues.push(this._doc.prefs.volume - modulator.convertRealFactor);
         }
         // Also for song volume, when holding the slider at a single value.
-        else if (this._doc.continuingModRecordingChange != null && this._doc.continuingModRecordingChange.storedSlider == null) {
+        else if (this._doc.continuingModRecordingChange != null && this._doc.continuingModRecordingChange.storedChange == null && this._doc.continuingModRecordingChange.storedSlider == null) {
             var modulator = Config.modulators.dictionary["song volume"];
             applyToMods.push(modulator.index);
             if (toApply) applyValues.push(this._doc.continuingModRecordingChange.storedValues![0]);

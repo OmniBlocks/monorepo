@@ -20,10 +20,13 @@ class Base64Util {
 
     /**
      * Convert a Uint8Array to a base64 encoded string.
-     * @param {Uint8Array} array - the array to convert.
+     * @param {Uint8Array|Array<number>} array - the array to convert.
      * @return {string} - the base64 encoded string.
      */
     static uint8ArrayToBase64 (array) {
+        if (Array.isArray(array)) {
+            array = new Uint8Array(array);
+        }
         let binary = '';
         const len = array.byteLength;
         for (let i = 0; i < len; i++) {

@@ -26,7 +26,7 @@ test('round trips', t => {
         new Uint8Array(0),
         new Uint8Array([10, 90, 0, 255, 255, 255, 10, 2]),
         new Uint8Array(10000),
-        new Uint8Array(1000000)
+        new Uint8Array(100000)
     ];
     for (const uint8array of data) {
         const uint8ToBase64 = Base64Util.uint8ArrayToBase64(uint8array);

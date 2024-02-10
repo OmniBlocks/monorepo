@@ -298,6 +298,16 @@ class Scratch3PenBlocks {
             }),
             blockIconURI: blockIconURI,
             blocks: [
+                // tw: additional message when on the stage for clarity
+                {
+                    blockType: BlockType.LABEL,
+                    text: formatMessage({
+                        id: 'tw.pen.stageSelected',
+                        default: 'Stage selected: less pen blocks',
+                        description: 'Label that appears in the Pen category when the stage is selected'
+                    }),
+                    filter: [TargetType.STAGE]
+                },
                 {
                     opcode: 'clear',
                     blockType: BlockType.COMMAND,

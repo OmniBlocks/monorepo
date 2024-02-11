@@ -96,7 +96,7 @@ const DirectionPicker = props => (
                 disabled={props.disabled}
                 label={directionLabel}
                 tabIndex="0"
-                type="text"
+                type="number"
                 value={props.disabled ? '' : props.direction}
                 onFocus={props.onOpenPopover}
                 onSubmit={props.onChangeDirection}

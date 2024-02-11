@@ -122,7 +122,7 @@ class SpriteInfo extends React.Component {
                         disabled={this.props.disabled}
                         placeholder="x"
                         tabIndex="0"
-                        type="text"
+                        type="number"
                         value={this.props.disabled ? '' : Math.round(this.props.x)}
                         onSubmit={this.props.onChangeX}
                     />
@@ -150,7 +150,7 @@ class SpriteInfo extends React.Component {
                         disabled={this.props.disabled}
                         placeholder="y"
                         tabIndex="0"
-                        type="text"
+                        type="number"
                         value={this.props.disabled ? '' : Math.round(this.props.y)}
                         onSubmit={this.props.onChangeY}
                     />
@@ -227,7 +227,7 @@ class SpriteInfo extends React.Component {
                                 disabled={this.props.disabled}
                                 label={sizeLabel}
                                 tabIndex="0"
-                                type="text"
+                                type="number"
                                 value={this.props.disabled ? '' : Math.round(this.props.size)}
                                 onSubmit={this.props.onChangeSize}
                             />

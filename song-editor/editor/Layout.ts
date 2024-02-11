@@ -448,9 +448,9 @@ export class Layout {
 				}
 			}
 		`,
-			"focus": `\
+			"focused long": `\
 
-			/* focus layout */
+			/* focused long layout */
 			@media (min-width: 711px) {
 				#beepboxEditorContainer {
 					max-width: initial;

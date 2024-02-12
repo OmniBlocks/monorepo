@@ -24,11 +24,8 @@ class Base64Util {
      * @return {string} - the base64 encoded string.
      */
     static uint8ArrayToBase64 (array) {
-        if (Array.isArray(array)) {
-            array = new Uint8Array(array);
-        }
         let binary = '';
-        const len = array.byteLength;
+        const len = array.length;
         for (let i = 0; i < len; i++) {
             binary += String.fromCharCode(array[i]);
         }

@@ -768,6 +768,7 @@ export class SongEditor {
         option({ value: "copyUrl" }, "⎘ Copy Song URL"),
         option({ value: "shareUrl" }, "⤳ Share Song URL"),
         option({ value: "shortenUrl" }, "… Shorten Song URL"),
+        // option({ value: "customUrlShortener" }, " Customize Url Shortener"),
         option({ value: "viewPlayer" }, "▶ View in Song Player"),
         option({ value: "copyEmbed" }, "⎘ Copy HTML Embed Code"),
         option({ value: "songRecovery" }, "⚠ Recover Recent Song..."),
@@ -800,18 +801,20 @@ export class SongEditor {
         option({ selected: true, disabled: true, hidden: false }, "Preferences"), // todo: "hidden" should be true but looks wrong on mac chrome, adds checkmark next to first visible option even though it's not selected. :(
         option({ value: "autoPlay" }, "Auto Play on Load"),
         option({ value: "autoFollow" }, "Auto Follow Playhead"),
-        option({ value: "enableNotePreview" }, "Hear of Added Notes"),
-        option({ value: "showLetters" }, "Show Piano Keys"),
-        option({ value: "showFifth" }, 'Highlight "Fifth" Note'),
+        option({ value: "enableNotePreview" }, "Hear Added Notes"),
         option({ value: "notesOutsideScale" }, "Place Notes Out of Scale"),
         option({ value: "setDefaultScale" }, "Set Current Scale as Default"),
         option({ value: "alwaysFineNoteVol" }, "Always Fine Note Volume"),
-        option({ value: "notesFlashWhenPlayed" }, "Notes Flash When Played"),
+        option({ value: "enableChannelMuting" }, "Enable Channel Muting"),
+        option({ value: "instrumentCopyPaste" }, "Enable Copy/Paste Buttons"),
+        option({ value: "instrumentImportExport" }, "Enable Import/Export Buttons"),
+        option({ value: "displayBrowserUrl" }, "Enable Song Data in URL"),
         option({ value: "closePromptByClickoff" }, "Close Prompts on Click Off"),
+        option({ value: "showFifth" }, 'Highlight "Fifth" Note'),
+        option({ value: "notesFlashWhenPlayed" }, "Notes Flash When Played"),
         option({ value: "showChannels" }, "Show All Channels"),
         option({ value: "showScrollBar" }, "Show Octave Scroll Bar"),
-        option({ value: "enableChannelMuting" }, "Enable Channel Muting"),
-        option({ value: "displayBrowserUrl" }, "Show Song Data in URL"),
+        option({ value: "showLetters" }, "Show Piano Keys"),
         option({ value: "displayVolumeBar" }, "Show Playback Volume"),
         option({ value: "showOscilloscope" }, "Show Oscilloscope"),
         option({ value: "showSampleLoadingStatus" }, "Show Sample Loading Status"),
@@ -1205,6 +1208,9 @@ export class SongEditor {
     private readonly _instrumentSettingsGroup: HTMLDivElement = div({ class: "editor-controls" },
         this._instrumentSettingsTextRow,
         this._instrumentsButtonRow,
+        // these could've been put into _instrumentSettingsGroup as well but I decided not to
+        // this._instrumentCopyGroup,
+        // this._instrumentExportGroup,
         this._instrumentTypeSelectRow,
         this._instrumentVolumeSliderRow,
         //this._customizeInstrumentButton,
@@ -2146,6 +2152,8 @@ export class SongEditor {
         this._globalOscscopeContainer.style.display = this._doc.prefs.showOscilloscope ? "" : "none";
         this._doc.synth.oscEnabled = this._doc.prefs.showOscilloscope;
         this._sampleLoadingStatusContainer.style.display = this._doc.prefs.showSampleLoadingStatus ? "" : "none";
+        this._instrumentCopyGroup.style.display = this._doc.prefs.instrumentCopyPaste ? "" : "none";
+        this._instrumentExportGroup.style.display = this._doc.prefs.instrumentImportExport ? "" : "none";
         if (document.getElementById('text-content'))
             document.getElementById('text-content')!.style.display = this._doc.prefs.showDescription ? "" : "none";
 
@@ -2190,17 +2198,19 @@ export class SongEditor {
             (prefs.autoPlay ? textOnIcon : textOffIcon) + "Auto Play on Load",
             (prefs.autoFollow ? textOnIcon : textOffIcon) + "Auto Follow Playhead",
             (prefs.enableNotePreview ? textOnIcon : textOffIcon) + "Hear Added Notes",
-            (prefs.showLetters ? textOnIcon : textOffIcon) + "Show Piano Keys",
-            (prefs.showFifth ? textOnIcon : textOffIcon) + 'Highlight "Fifth" Note',
             (prefs.notesOutsideScale ? textOnIcon : textOffIcon) + "Place Notes Out of Scale",
             (prefs.defaultScale == this._doc.song.scale ? textOnIcon : textOffIcon) + "Set Current Scale as Default",
             (prefs.alwaysFineNoteVol ? textOnIcon : textOffIcon) + "Always Fine Note Volume",
-            (prefs.notesFlashWhenPlayed ? textOnIcon : textOffIcon) + "Notes Flash When Played",
+            (prefs.enableChannelMuting ? textOnIcon : textOffIcon) + "Enable Channel Muting",
+            (prefs.instrumentCopyPaste ? textOnIcon : textOffIcon) + "Enable Copy/Paste Buttons",
+            (prefs.instrumentImportExport ? textOnIcon : textOffIcon) + "Enable Import/Export Buttons",
+            (prefs.displayBrowserUrl ? textOnIcon : textOffIcon) + "Enable Song Data in URL",
             (prefs.closePromptByClickoff ? textOnIcon : textOffIcon) + "Close Prompts on Click Off",
+            (prefs.showFifth ? textOnIcon : textOffIcon) + 'Highlight "Fifth" Note',
+            (prefs.notesFlashWhenPlayed ? textOnIcon : textOffIcon) + "Notes Flash When Played",
             (prefs.showChannels ? textOnIcon : textOffIcon) + "Show All Channels",
             (prefs.showScrollBar ? textOnIcon : textOffIcon) + "Show Octave Scroll Bar",
-            (prefs.enableChannelMuting ? textOnIcon : textOffIcon) + "Enable Channel Muting",
-            (prefs.displayBrowserUrl ? textOnIcon : textOffIcon) + "Show Song Data in URL",
+            (prefs.showLetters ? textOnIcon : textOffIcon) + "Show Piano Keys",
             (prefs.displayVolumeBar ? textOnIcon : textOffIcon) + "Show Playback Volume",
             (prefs.showOscilloscope ? textOnIcon : textOffIcon) + "Show Oscilloscope",
             (prefs.showSampleLoadingStatus ? textOnIcon : textOffIcon) + "Show Sample Loading Status",
@@ -2271,8 +2281,8 @@ export class SongEditor {
             this._detuneSliderRow.style.display = "";
             this._instrumentVolumeSliderRow.style.display = "";
             this._instrumentTypeSelectRow.style.setProperty("display", "");
-            this._instrumentSettingsGroup.appendChild(this._instrumentCopyGroup);
-            this._instrumentSettingsGroup.appendChild(this._instrumentExportGroup);
+            this._instrumentSettingsGroup.insertBefore(this._instrumentExportGroup, this._instrumentSettingsGroup.firstChild);
+            this._instrumentSettingsGroup.insertBefore(this._instrumentCopyGroup, this._instrumentSettingsGroup.firstChild);
             this._instrumentSettingsGroup.insertBefore(this._instrumentsButtonRow, this._instrumentSettingsGroup.firstChild);
             this._instrumentSettingsGroup.insertBefore(this._instrumentSettingsTextRow, this._instrumentSettingsGroup.firstChild);
 
@@ -2774,8 +2784,8 @@ export class SongEditor {
             this._drumPresetSelect.style.display = "none";
             $("#pitchPresetSelect").parent().hide();
             $("#drumPresetSelect").parent().hide();
-            this._modulatorGroup.appendChild(this._instrumentCopyGroup);
-            this._modulatorGroup.appendChild(this._instrumentExportGroup);
+            this._modulatorGroup.insertBefore(this._instrumentExportGroup, this._modulatorGroup.firstChild);
+            this._modulatorGroup.insertBefore(this._instrumentCopyGroup, this._modulatorGroup.firstChild);
 
             this._modulatorGroup.insertBefore(this._instrumentsButtonRow, this._modulatorGroup.firstChild);
             this._modulatorGroup.insertBefore(this._instrumentSettingsTextRow, this._modulatorGroup.firstChild);
@@ -5054,6 +5064,12 @@ export class SongEditor {
                 break;
             case "closePromptByClickoff":
                 this._doc.prefs.closePromptByClickoff = !this._doc.prefs.closePromptByClickoff;
+                break;
+            case "instrumentCopyPaste":
+                this._doc.prefs.instrumentCopyPaste = !this._doc.prefs.instrumentCopyPaste;
+                break;
+            case "instrumentImportExport":
+                this._doc.prefs.instrumentImportExport = !this._doc.prefs.instrumentImportExport;
                 break;
         }
         this._optionsMenu.selectedIndex = 0;

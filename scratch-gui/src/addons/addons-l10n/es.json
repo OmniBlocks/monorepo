@@ -39,6 +39,7 @@
     "mediarecorder/record-after-flag": "No empezar grabación hasta que haga click en la Bandera Verde",
     "mediarecorder/record-audio": "Incluir sonidos del proyecto",
     "mediarecorder/record-audio-description": "Esto no incluye Text-to-Speech.",
+    "mediarecorder/record-description": "Grabe el escenario como un archivo {extension}. Puede guardarlo en su computadora luego de que la grabación haya finalizado.\nNota: los monitores de variables y listas no serán visibles.",
     "mediarecorder/record-duration": "Duración (en segundos)",
     "mediarecorder/record-mic": "Incluir sonidos del micrófono",
     "mediarecorder/record-until-stop": "Parar grabación luego de que el proyecto se detenga",

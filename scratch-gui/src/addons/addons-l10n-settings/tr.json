@@ -387,6 +387,7 @@
     "fullscreen/@name": "Geliştirilmiş tam ekran",
     "fullscreen/@settings-name-browserFullscreen": "Tam ekran proje oynatıcısını, tam ekran tarayıcı modunda aç",
     "fullscreen/@settings-name-hideToolbar": "Tam ekrandayken araç çubuğunu gizle",
+    "fullscreen/@settings-name-hoverToolbar": "Üzerine gelindiğinde araç çubuğunu göster",
     "hide-stage/@description": "Sahne alanını ve kukla bölmesini gizleyen \"küçük sahne\" ve \"büyük sahne\" düğmelerinin yanına bir düğme daha ekleyerek kod alanını çok daha büyük hâle getirir.",
     "hide-stage/@name": "Sahneyi ve kukla bölmesini gizle",
     "editor-stepping/@description": "Projede çalışmakta olan bloklara renkli bir vurgu ekler.",

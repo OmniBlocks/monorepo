@@ -29,6 +29,17 @@ const manifest = {
       "id": "hideToolbar",
       "type": "boolean",
       "default": false
+    },
+    {
+      "name": "Show toolbar when hovered",
+      "id": "hoverToolbar",
+      "type": "boolean",
+      "default": true,
+      "if": {
+        "settings": {
+          "hideToolbar": true
+        }
+      }
     }
   ],
   "dynamicDisable": true,

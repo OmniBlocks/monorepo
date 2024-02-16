@@ -386,6 +386,7 @@
     "fullscreen/@name": "Verbesserter Vollbildmodus",
     "fullscreen/@settings-name-browserFullscreen": "Projektplayer im Vollbildmodus des Browsers öffnen",
     "fullscreen/@settings-name-hideToolbar": "Titelleiste im Vollbild ausblenden",
+    "fullscreen/@settings-name-hoverToolbar": "Symbolleiste anzeigen, wenn die Maus sich darüber befindet",
     "hide-stage/@description": "Fügt einen Knopf neben dem \"Kleine Bühne\"-Knopf hinzu, der die Bühne und die Figurenleiste vollständig ausblendet und damit den Codebereich viel größer macht.",
     "hide-stage/@name": "Bühne und Figurenleiste ausblenden",
     "editor-stepping/@description": "Fügt eine farbige Markierung zu den Blöcken, die gerade in einem Projekt ausgeführt werden, hinzu.",

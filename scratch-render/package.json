@@ -46,7 +46,7 @@
     "webpack-dev-server": "3.11.2"
   },
   "dependencies": {
-    "@turbowarp/nanolog": "^0.1.0",
+    "@turbowarp/nanolog": "^0.2.0",
     "@turbowarp/scratch-svg-renderer": "^1.0.0-202312242305-12c360b",
     "grapheme-breaker": "0.3.2",
     "hull.js": "0.2.10",

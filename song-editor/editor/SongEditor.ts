@@ -810,6 +810,8 @@ export class SongEditor {
         option({ value: "instrumentImportExport" }, "Enable Import/Export Buttons"),
         option({ value: "displayBrowserUrl" }, "Enable Song Data in URL"),
         option({ value: "closePromptByClickoff" }, "Close Prompts on Click Off"),
+        option({ value: "recordingSetup" }, "Note Recording..."),
+        optgroup({ label: "Appearance" },
         option({ value: "showFifth" }, 'Highlight "Fifth" Note'),
         option({ value: "notesFlashWhenPlayed" }, "Notes Flash When Played"),
         option({ value: "showChannels" }, "Show All Channels"),
@@ -822,7 +824,7 @@ export class SongEditor {
         option({ value: "layout" }, "Set Layout..."),
         option({ value: "colorTheme" }, "Set Theme..."),
 	    option({ value: "customTheme" }, "Custom Theme..."),
-        option({ value: "recordingSetup" }, "Note Recording..."),
+        ),
     );
     private readonly _scaleSelect: HTMLSelectElement = buildOptions(select(), Config.scales.map(scale => scale.name));
     private readonly _keySelect: HTMLSelectElement = buildOptions(select(), Config.keys.map(key => key.name).reverse());
@@ -2206,6 +2208,8 @@ export class SongEditor {
             (prefs.instrumentImportExport ? textOnIcon : textOffIcon) + "Enable Import/Export Buttons",
             (prefs.displayBrowserUrl ? textOnIcon : textOffIcon) + "Enable Song Data in URL",
             (prefs.closePromptByClickoff ? textOnIcon : textOffIcon) + "Close Prompts on Click Off",
+            "　Note Recording...",
+            "Appearance",
             (prefs.showFifth ? textOnIcon : textOffIcon) + 'Highlight "Fifth" Note',
             (prefs.notesFlashWhenPlayed ? textOnIcon : textOffIcon) + "Notes Flash When Played",
             (prefs.showChannels ? textOnIcon : textOffIcon) + "Show All Channels",
@@ -2218,11 +2222,24 @@ export class SongEditor {
             "　Set Layout...",
             "　Set Theme...",
 	        "　Custom Theme...",
-            "　Note Recording...",
         ];
-        for (let i: number = 0; i < optionCommands.length; i++) {
-            const option: HTMLOptionElement = <HTMLOptionElement>this._optionsMenu.children[i + 1];
-            if (option.textContent != optionCommands[i]) option.textContent = optionCommands[i];
+        // todo: automatically get dropdown location instead of putting in number manually
+        for (let i: number = 0; i < 13; i++) {
+            if(i == 12) {
+                // Appearance dropdown
+                const optionGroup: HTMLOptGroupElement = <HTMLOptGroupElement>this._optionsMenu.children[i + 1];
+
+                // how do you get the length of an optgroup?
+                for (let i: number = 0; i < 12; i++) {
+                    const option: HTMLOptionElement = <HTMLOptionElement>optionGroup.children[i];
+                    console.log(option);
+                    if (option.textContent != optionCommands[i + 13]) option.textContent = optionCommands[i + 13];
+                }
+            } else {
+                // Preferences before Appearance dropdown
+                const option: HTMLOptionElement = <HTMLOptionElement>this._optionsMenu.children[i + 1];
+                if (option.textContent != optionCommands[i]) option.textContent = optionCommands[i];
+            }
         }
 
         const channel: Channel = this._doc.song.channels[this._doc.channel];

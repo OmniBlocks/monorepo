@@ -46,6 +46,10 @@
   const Z_POS = "threed.zpos";
   const THREED_SKIN = "threed.skin";
 
+  if (!Scratch.extensions.unsandboxed) {
+    throw new Error("3D must be run unsandboxed");
+  }
+
 	const PATCHES_ID = "__patches_cst12293d";
 	const patch = (obj, functions) => {
 		if (obj[PATCHES_ID]) return;

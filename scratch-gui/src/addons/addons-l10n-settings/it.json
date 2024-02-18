@@ -48,6 +48,7 @@
     "drag-drop/@description": "TI permette di trascinare immagini e suoni da una cartella nella lista degli sprite o dei costumi/suoni. Puoi anche trascinare file di testo su una lista o nella casella dei blocchi \"chiedi e attendi\".",
     "drag-drop/@name": "Trascinamento file",
     "drag-drop/@settings-name-use-hd-upload": "Usa importazione di immagini HD",
+    "debugger/@description": "Agggiunge all’editor una nuova finestra \"debugger\". Permette di registrare nella scheda “Log” del debugger le azioni dei blocchi \"log\", \"avviso\" e \"errore\". Il blocco \"breakpoint\" sospende l’esecuzione del progetto eseguito. Tutti gli script in esecuzione possono essere visti nella scheda \"Thread\" del debugger e quando il progetto è in pausa comparirà il pulsante \"Passo\" che permette di eseguire il blocco successivo. Un grafo dei frame per secondo e del numero dei blochi può essere visualizzato nella scheda \"Prestazioni\".",
     "debugger/@settings-name-fancy_graphs": "Grafici animati (può influenzare le prestazioni)",
     "debugger/@settings-name-log_broadcasts": "Registra nei log l'invio di messaggi",
     "debugger/@settings-name-log_clear_greenflag": "Svuota i log quando si clicca la bandiera verde",

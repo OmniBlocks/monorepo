@@ -48,6 +48,7 @@
     "drag-drop/@description": "Voit raahata kuvia ja ääniä tiedostonhallintaohjelmastasi hahmoruutuun tai asuste-/ääniluetteloon. Voit myös raahata tekstitiedostoja listoihin tai \"kysy ja odota\" -lohkon vastauskenttiin.",
     "drag-drop/@name": "Tiedoston raahaaminen ja pudottaminen",
     "drag-drop/@settings-name-use-hd-upload": "Käytä HD-latauksia",
+    "debugger/@description": "Lisää uuden \"virheenkorjaus\"-ikkunan editoriin. Virheenkorjausikkunan \"Lokimerkinnät\"-välilehdelle voi kirjata merkintöjä \"kirjaa lokimerkintä\"-, \"kirjaa varoitus\"- ja \"kirjaa virhe\" -lohkoilla. \"Pysäytyspiste\"-lohko keskeyttää projektin, kun sitä suoritetaan. Kaikkia käynnissä olevia lohkopinoja voidaan tarkastella virheenkorjauksen \"Säikeet\"-välilehdellä, ja kun projekti on keskeytetty, \"Vaihe\"-painiketta voidaan käyttää seuraavan lohkon suorittamiseen. Kaavio kuvataajuudesta ja kloonien lukumäärästä löytyy \"Suorituskyky\"-välilehdellä.",
     "debugger/@name": "Virheenkorjaus",
     "debugger/@settings-name-fancy_graphs": "Animoidut grafiikat (saattaa vaikuttaa suorituskykyyn)",
     "debugger/@settings-name-log_broadcasts": "Kirjaa viestien lähettäminen",

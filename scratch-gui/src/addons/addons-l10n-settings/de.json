@@ -48,6 +48,7 @@
     "drag-drop/@description": "Lässt dich BIlder und Klänge vom Dateimanager zur Figuren-, Kostüm- und Klangliste ziehen. Du kannst auch Textdateien in Listen oder \"frage und warte\"-Felder ziehen.",
     "drag-drop/@name": "Drag and Drop-Unterstützung für Dateien",
     "drag-drop/@settings-name-use-hd-upload": "HD-Upload verwenden",
+    "debugger/@description": "Fügt ein neues \"Debugger\"-Fenster im Editor hinzu. Erlaubt das loggen in den \"Logs\"-Tab des Debugger-Fenster mit den Blöcken \"loggen\", \"warnen\" und \"Fehler\". Der \"Unterbrechen\"-Block wird das Projekt pausieren. Alle aktuell ausgeführten Blockreihen können im \"Threads\"-Tab des Debuggerfensters angezeigt werden und wenn das Projekt pausiert ist kann der \"Schritt\"-Knopf verwendet werden, um einen Block nach dem anderen auszuführen. Ein Graph der Bildwiederholrate und der Klonanzahl kann im \"Leistung\"-Tab angezeigt werden.",
     "debugger/@settings-name-fancy_graphs": "Animierte Graphen (könnte die Leistung beeinträchtigen)",
     "debugger/@settings-name-log_broadcasts": "Nachrichten loggen",
     "debugger/@settings-name-log_clear_greenflag": "Logs beim Klicken auf die grüne Flagge löschen",

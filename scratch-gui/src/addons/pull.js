@@ -328,7 +328,6 @@ const SKIP_MESSAGES = [
     '_general/meta/managedBySa',
     '_locale',
     '_locale_name',
-    'debugger/@description',
     'debugger/@settings-name-log_max_list_length',
     'debugger/log-msg-list-append-too-long',
     'debugger/log-msg-list-insert-too-long',

@@ -48,6 +48,7 @@
     "drag-drop/@description": "Omogoči vlečenje slik in zvokov iz vašega upravitelja datotek v seznam figur, videzov ali zvokov. Lahko povlečete tudi besedilne datoteke v sezname ali v polje, ki ga prikaže blok \"vprašaj in počakaj\".",
     "drag-drop/@name": "Vlečenje datotek v urejevalnik",
     "drag-drop/@settings-name-use-hd-upload": "Uporabi HD nalaganje slik",
+    "debugger/@description": "Doda novo okno \"razhroščevanje\" v urejevalnik. Omogoča zapisovanje podatkov na zavihek \"Zapiski\" z bloki \"zapiši\", \"opozorilo\" in \"napaka\". Blok \"breakpoint\" začasno ustavi projekt. Vsa delujoča zaporedja blokov so vidna na zavihku \"Niti\", in ko je projekt zaustavljen, lahko z gumbom \"Korak\" izvedete naslednji blok. Grafa sličic na sekundo in števila dvojnikov figur sta na zavihku \"Učinkovitost\".",
     "debugger/@name": "Orodje za razhroščevanje",
     "debugger/@settings-name-fancy_graphs": "Animacije grafov (lahko vplivajo na hitrost)",
     "debugger/@settings-name-log_broadcasts": "Zapiši objave",

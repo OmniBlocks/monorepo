@@ -109,9 +109,10 @@ const includeImportedLibraries = contents => {
     // Parse things like:
     // import { normalizeHex, getHexRegex } from "../../libraries/normalize-color.js";
     // import RateLimiter from "../../libraries/rate-limiter.js";
+    // import "../../libraries/thirdparty/cs/chart.min.js";
     const matches = matchAll(
         contents,
-        /import +(?:{.*}|.*) +from +["']\.\.\/\.\.\/libraries\/([\w\d_/-]+(?:\.esm)?\.js)["'];/g
+        /import +(?:(?:{.*}|.*) +from +)?["']\.\.\/\.\.\/libraries\/([\w\d_./-]+(?:\.esm)?\.js)["'];/g
     );
     for (const match of matches) {
         const libraryFile = match[1];
@@ -334,11 +335,6 @@ const SKIP_MESSAGES = [
     'debugger/@settings-name-log_invalid_cloud_data',
     'debugger/log-cloud-data-nan',
     'debugger/log-cloud-data-too-long',
-    'debugger/tab-performance',
-    'debugger/performance-framerate-title',
-    'debugger/performance-framerate-graph-tooltip',
-    'debugger/performance-clonecount-title',
-    'debugger/performance-clonecount-graph-tooltip',
     'editor-devtools/extension-description-not-for-addon',
     'mediarecorder/added-by',
     'editor-theme3/@settings-name-sa-color',

@@ -519,7 +519,8 @@ export default async function ({ addon, console, msg }) {
   };
   logsTab = await createLogsTab(api);
   const threadsTab = await createThreadsTab(api);
-  const allTabs = [logsTab, threadsTab];
+  const performanceTab = await createPerformanceTab(api);
+  const allTabs = [logsTab, threadsTab, performanceTab];
 
   for (const message of messagesLoggedBeforeLogsTabLoaded) {
     logsTab.addLog(...message);

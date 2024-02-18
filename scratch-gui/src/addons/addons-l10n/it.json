@@ -68,6 +68,8 @@
     "debugger/log-msg-flag-clicked": "Bandiera verde cliccata.",
     "debugger/no-logs": "Non ci sono log da mostrare.",
     "debugger/no-threads-running": "Nessun thread in esecuzione.",
+    "debugger/performance-clonecount-graph-tooltip": "Cloni: {clones}",
+    "debugger/performance-clonecount-title": "Cloni",
     "debugger/step": "Passi",
     "debugger/step-desc": "Esegue un blocco.",
     "debugger/tab-logs": "Log",

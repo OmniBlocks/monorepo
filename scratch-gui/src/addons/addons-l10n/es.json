@@ -68,6 +68,7 @@
     "debugger/no-threads-running": "No hay hilos ejecutándose.",
     "debugger/step": "Paso",
     "debugger/step-desc": "Ejecuta un bloque.",
+    "debugger/tab-performance": "Rendimiento",
     "debugger/tab-threads": "Hilos",
     "debugger/thread": "Hilo {id}",
     "debugger/unknown-sprite": "(objeto desconocido)",

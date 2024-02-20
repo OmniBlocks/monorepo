@@ -2232,7 +2232,6 @@ export class SongEditor {
                 // how do you get the length of an optgroup?
                 for (let i: number = 0; i < 12; i++) {
                     const option: HTMLOptionElement = <HTMLOptionElement>optionGroup.children[i];
-                    console.log(option);
                     if (option.textContent != optionCommands[i + 13]) option.textContent = optionCommands[i + 13];
                 }
             } else {

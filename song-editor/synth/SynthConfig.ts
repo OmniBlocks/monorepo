@@ -833,6 +833,8 @@ export class Config {
 
     public static willReloadForCustomSamples: boolean = false;
 
+    public static jsonFormat: string = "UltraBox";
+
     public static readonly scales: DictionaryArray<Scale> = toNameMap([
 
 		//   C     Db      D     Eb      E      F     F#      G     Ab      A     Bb      B      C

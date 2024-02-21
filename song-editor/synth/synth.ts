@@ -2024,10 +2024,12 @@ export class Instrument {
     }
 
 
-    public fromJsonObject(instrumentObject: any, isNoiseChannel: boolean, isModChannel: boolean, useSlowerRhythm: boolean, useFastTwoNoteArp: boolean, legacyGlobalReverb: number = 0): void {
+    public fromJsonObject(instrumentObject: any, isNoiseChannel: boolean, isModChannel: boolean, useSlowerRhythm: boolean, useFastTwoNoteArp: boolean, legacyGlobalReverb: number = 0, jsonFormat: string = Config.jsonFormat): void {
         if (instrumentObject == undefined) instrumentObject = {};
 
         let type: InstrumentType = Config.instrumentTypeNames.indexOf(instrumentObject["type"]);
+        // SynthBox support
+        if ((jsonFormat == "SynthBox") && (instrumentObject["type"] == "FM")) type = Config.instrumentTypeNames.indexOf("FM6op");
         if (<any>type == -1) type = isModChannel ? InstrumentType.mod : (isNoiseChannel ? InstrumentType.noise : InstrumentType.chip);
         this.setTypeAndReset(type, isNoiseChannel, isModChannel);
 
@@ -2038,7 +2040,35 @@ export class Instrument {
         }
 
         if (instrumentObject["volume"] != undefined) {
-            this.volume = clamp(-Config.volumeRange / 2, (Config.volumeRange / 2) + 1, instrumentObject["volume"] | 0);
+            if (jsonFormat == "JummBox" || jsonFormat == "SynthBox" || jsonFormat == "UltraBox") {
+                this.volume = clamp(-Config.volumeRange / 2, (Config.volumeRange / 2) + 1, instrumentObject["volume"] | 0);
+            } else {
+                // beepbox equation
+                // this.volume = clamp(0, Config.volumeRange, Math.round(5 - (instrumentObject["volume"] | 0) / 20));
+
+                // reverse-engineering the beepbox equation so it works correctly is really annoying, so for now we'll convert numbers manually
+                let potentialJsonVolume: number = (instrumentObject["volume"] | 0);
+
+                // this is really abysmal coding honestly
+                if (potentialJsonVolume < -20) {
+                    // (numbers here are chosen arbitrarily based off of listening)
+                    this.volume = -25;
+                } else if ((potentialJsonVolume > -21) && (potentialJsonVolume < 0)) {
+                    this.volume = -15;
+                } else if ((potentialJsonVolume > -1) && (potentialJsonVolume < 20)) {
+                    this.volume = -12;
+                } else if ((potentialJsonVolume > 19) && (potentialJsonVolume < 40)) {
+                    this.volume = -7;
+                } else if ((potentialJsonVolume > 39) && (potentialJsonVolume < 60)) {
+                    this.volume = -4;
+                } else if ((potentialJsonVolume > 59) && (potentialJsonVolume < 80)) {
+                    this.volume = -1;
+                } else if ((potentialJsonVolume > 79) && (potentialJsonVolume < 100)) {
+                    this.volume = 3;
+                } else if (potentialJsonVolume > 99) {
+                    this.volume = 7;
+                }
+            }
         } else {
             this.volume = 0;
         }
@@ -2143,6 +2173,9 @@ export class Instrument {
             const unison: Unison | undefined = Config.unisons.dictionary[legacyChorusNames[unisonProperty]] || Config.unisons.dictionary[unisonProperty];
             if (unison != undefined) this.unison = unison.index;
             if (unisonProperty == "custom") this.unison = Config.unisons.length;
+            // todbox support
+            // technically the voiced unison isn't exactly the same as the error unison, really this should be using custom unison instead but whatever
+            if (unisonProperty == "error") this.unison = Config.unisons.dictionary["voiced"].index;
         }
         //clamp these???
         this.unisonVoices = (instrumentObject["unisonVoices"] == undefined) ? Config.unisons[this.unison].voices : instrumentObject["unisonVoices"];
@@ -2163,6 +2196,23 @@ export class Instrument {
 
         if (instrumentObject["pitchShiftSemitones"] != undefined) {
             this.pitchShift = clamp(0, Config.pitchShiftRange, Math.round(+instrumentObject["pitchShiftSemitones"]));
+        }
+        // modbox pitch shift, known in that mod as "octave offset"
+        if (instrumentObject["octoff"] != undefined) {
+            let potentialPitchShift: string = instrumentObject["octoff"];
+            this.effects = (this.effects | (1 << EffectType.pitchShift));
+            
+            if ((potentialPitchShift == "+1 (octave)") || (potentialPitchShift == "+2 (2 octaves)")) {
+                this.pitchShift = 24;
+            } else if ((potentialPitchShift == "+1/2 (fifth)") || (potentialPitchShift == "+1 1/2 (octave and fifth)")) {
+                this.pitchShift = 18;
+            } else if ((potentialPitchShift == "-1 (octave)") || (potentialPitchShift == "-2 (2 octaves)")) {
+                this.pitchShift = 0;
+            } else if ((potentialPitchShift == "-1/2 (fifth)") || (potentialPitchShift == "-1 1/2 (octave and fifth)")) {
+                this.pitchShift = 6;
+            } else {
+                this.pitchShift = 12;
+            }
         }
         if (instrumentObject["detuneCents"] != undefined) {
             this.detune = clamp(Config.detuneMin, Config.detuneMax + 1, Math.round(Synth.centsToDetune(+instrumentObject["detuneCents"])));
@@ -2495,7 +2545,14 @@ export class Instrument {
                 this.aliases = instrumentObject["aliases"];
             }
             else {
-                this.aliases = false;
+                // modbox had no anti-aliasing, so enable it for everything if that mode is selected
+                if (jsonFormat == "ModBox") {
+                    this.effects = (this.effects | (1 << EffectType.distortion));
+                    this.aliases = true;
+                    this.distortion = 0;
+                } else {
+                    this.aliases = false;
+                }
             }
 
             if (instrumentObject["noteFilterType"] != undefined) {
@@ -2723,7 +2780,7 @@ export class Channel {
 }
 
 export class Song {
-    private static readonly _format: string = "UltraBox";
+    private static readonly _format: string = Config.jsonFormat;
     private static readonly _oldestBeepboxVersion: number = 2;
     private static readonly _latestBeepboxVersion: number = 9;
     private static readonly _oldestJummBoxVersion: number = 1;
@@ -3587,7 +3644,7 @@ export class Song {
         return Config.envelopes[clamp(0, Config.envelopes.length, legacyIndex)];
     }
 
-    public fromBase64String(compressed: string): void {
+    public fromBase64String(compressed: string, jsonFormat: string = "auto"): void {
         if (compressed == null || compressed == "") {
             Song._clearSamples();
 
@@ -3601,7 +3658,7 @@ export class Song {
         if (compressed.charCodeAt(charIndex) == CharCode.HASH) charIndex++;
         // if it starts with curly brace, treat it as JSON.
         if (compressed.charCodeAt(charIndex) == CharCode.LEFT_CURLY_BRACE) {
-            this.fromJsonObject(JSON.parse(charIndex == 0 ? compressed : compressed.substring(charIndex)));
+            this.fromJsonObject(JSON.parse(charIndex == 0 ? compressed : compressed.substring(charIndex)), jsonFormat);
             return;
         }
 
@@ -5987,24 +6044,17 @@ export class Song {
         return result;
     }
 
-    public fromJsonObject(jsonObject: any): void {
+    public fromJsonObject(jsonObject: any, jsonFormat: string = "auto"): void {
         this.initToDefault(true);
         if (!jsonObject) return;
 
         //const version: number = jsonObject["version"] | 0;
         //if (version > Song._latestVersion) return; // Go ahead and try to parse something from the future I guess? JSON is pretty easy-going!
+        const format: string = jsonFormat == "auto" ? jsonObject["format"] : jsonFormat;
 
         if (jsonObject["name"] != undefined) {
             this.title = jsonObject["name"];
         }
-
-	    			// if (jsonObject["customSamples"] != undefined && EditorConfig.customSamples == undefined) {
-                // EditorConfig.customSamples = atob(jsonObject["customSamples"]);
-				// console.log(EditorConfig.customSamples);
-				// location.reload(); 
-            // }
-			//jsonmark
-			//this doesn't work
 
         if (jsonObject["customSamples"] != undefined) {
             const customSamples: string[] = jsonObject["customSamples"];
@@ -6528,7 +6578,7 @@ export class Song {
                         if (i >= this.getMaxInstrumentsPerChannel()) break;
                         const instrument: Instrument = new Instrument(isNoiseChannel, isModChannel);
                         channel.instruments[i] = instrument;
-                        instrument.fromJsonObject(instrumentObjects[i], isNoiseChannel, isModChannel, false, false, legacyGlobalReverb);
+                        instrument.fromJsonObject(instrumentObjects[i], isNoiseChannel, isModChannel, false, false, legacyGlobalReverb, format);
                     }
 
                 }

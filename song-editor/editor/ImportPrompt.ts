@@ -11,11 +11,23 @@ import { removeDuplicatePatterns, ChangeSong, ChangeReplacePatterns } from "./ch
 import { AnalogousDrum, analogousDrumMap, MidiChunkType, MidiFileFormat, MidiEventType, MidiControlEventMessage, MidiMetaEventMessage, MidiRegisteredParameterNumberMSB, MidiRegisteredParameterNumberLSB, midiVolumeToVolumeMult, midiExpressionToVolumeMult } from "./Midi";
 import { ArrayBufferReader } from "./ArrayBufferReader";
 
-	const {button, p, div, h2, input} = HTML;
+	const {button, p, div, h2, input, select, option} = HTML;
 
 export class ImportPrompt implements Prompt {
 		private readonly _fileInput: HTMLInputElement = input({type: "file", accept: ".json,application/json,.mid,.midi,audio/midi,audio/x-midi"});
 		private readonly _cancelButton: HTMLButtonElement = button({class: "cancelButton"});
+		private readonly _modeImportSelect: HTMLSelectElement = select({style: "width: 100%;"},
+			option({value: "auto"}, "Auto-detect mode (for json)"),
+			option({value: "BeepBox"}, "BeepBox"),
+			// TODO: Add Detune (Song Detune), Filter (EQ/Envelopes), and Effect (Vibrato) support
+			option({value: "ModBox"}, "ModBox"),
+			// TODO: Fix tempo modulation
+			option({value: "JummBox"}, "JummBox"),
+			option({value: "SynthBox"}, "SynthBox"),
+			// The ThurmBox mode is currently unused...
+			// option({value: "ThurmBox"}, "ThurmBox"),
+			option({value: "UltraBox"}, "UltraBox"),
+		);
 		
 		public readonly container: HTMLDivElement = div({class: "prompt noSelection", style: "width: 300px;"},
 		h2("Import"),
@@ -25,6 +37,8 @@ export class ImportPrompt implements Prompt {
 			p({style: "text-align: left; margin: 0.5em 0;"},
 			"BeepBox can also (crudely) import .mid files. There are many tools available for creating .mid files. Shorter and simpler songs are more likely to work well.",
 		),
+		// div({class: "selectContainer", style: "width: 100%;"}, "Import Mode (for json): ", this._modeImportSelect),
+		this._modeImportSelect,
 		this._fileInput,
 		this._cancelButton,
 	);
@@ -56,7 +70,7 @@ export class ImportPrompt implements Prompt {
 			reader.addEventListener("load", (event: Event): void => {
 				this._doc.prompt = null;
 				this._doc.goBackToStart();
-				this._doc.record(new ChangeSong(this._doc, <string>reader.result), true, true);
+				this._doc.record(new ChangeSong(this._doc, <string>reader.result, this._modeImportSelect.value), true, true);
 			});
 			reader.readAsText(file);
 		} else if (extension == "midi" || extension == "mid") {

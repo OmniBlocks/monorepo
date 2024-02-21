@@ -1707,7 +1707,7 @@ export class Instrument {
         let noCarriersControlledByNoteSize: boolean = true;
         let allCarriersControlledByNoteSize: boolean = true;
         let noteSizeControlsSomethingElse: boolean = (legacyFilterEnv.type == EnvelopeType.noteSize) || (legacyPulseEnv.type == EnvelopeType.noteSize);
-        if (this.type == InstrumentType.fm) {
+        if (this.type == InstrumentType.fm || this.type == InstrumentType.fm6op) {
             noteSizeControlsSomethingElse = noteSizeControlsSomethingElse || (legacyFeedbackEnv.type == EnvelopeType.noteSize);
             for (let i: number = 0; i < legacyOperatorEnvelopes.length; i++) {
                 if (i < carrierCount) {
@@ -1724,7 +1724,7 @@ export class Instrument {
 
         this.envelopeCount = 0;
 
-        if (this.type == InstrumentType.fm) {
+        if (this.type == InstrumentType.fm || this.type == InstrumentType.fm6op) {
             if (allCarriersControlledByNoteSize && noteSizeControlsSomethingElse) {
                 this.addEnvelope(Config.instrumentAutomationTargets.dictionary["noteVolume"].index, 0, Config.envelopes.dictionary["note size"].index);
             } else if (noCarriersControlledByNoteSize && !noteSizeControlsSomethingElse) {
@@ -2043,31 +2043,7 @@ export class Instrument {
             if (jsonFormat == "JummBox" || jsonFormat == "SynthBox" || jsonFormat == "UltraBox") {
                 this.volume = clamp(-Config.volumeRange / 2, (Config.volumeRange / 2) + 1, instrumentObject["volume"] | 0);
             } else {
-                // beepbox equation
-                // this.volume = clamp(0, Config.volumeRange, Math.round(5 - (instrumentObject["volume"] | 0) / 20));
-
-                // reverse-engineering the beepbox equation so it works correctly is really annoying, so for now we'll convert numbers manually
-                let potentialJsonVolume: number = (instrumentObject["volume"] | 0);
-
-                // this is really abysmal coding honestly
-                if (potentialJsonVolume < -20) {
-                    // (numbers here are chosen arbitrarily based off of listening)
-                    this.volume = -25;
-                } else if ((potentialJsonVolume > -21) && (potentialJsonVolume < 0)) {
-                    this.volume = -15;
-                } else if ((potentialJsonVolume > -1) && (potentialJsonVolume < 20)) {
-                    this.volume = -12;
-                } else if ((potentialJsonVolume > 19) && (potentialJsonVolume < 40)) {
-                    this.volume = -7;
-                } else if ((potentialJsonVolume > 39) && (potentialJsonVolume < 60)) {
-                    this.volume = -4;
-                } else if ((potentialJsonVolume > 59) && (potentialJsonVolume < 80)) {
-                    this.volume = -1;
-                } else if ((potentialJsonVolume > 79) && (potentialJsonVolume < 100)) {
-                    this.volume = 3;
-                } else if (potentialJsonVolume > 99) {
-                    this.volume = 7;
-                }
+                this.volume = Math.round(-clamp(0, 8, Math.round(5 - (instrumentObject["volume"] | 0) / 20)) * 25.0 / 7.0)
             }
         } else {
             this.volume = 0;
@@ -2431,11 +2407,49 @@ export class Instrument {
                     this.customAlgorithm.fromPreset(this.algorithm6Op);
                 }
                 this.feedbackType6Op = Config.feedbacks6Op.findIndex(feedback6Op => feedback6Op.name == instrumentObject["feedbackType"]);
-                if (this.feedbackType6Op == -1) this.feedbackType6Op = 1;
-                if(this.feedbackType6Op == 0) {
-                    this.customFeedbackType.set(instrumentObject["customFeedback"]["mods"]);
-                }else{
-                    this.customFeedbackType.fromPreset(this.feedbackType6Op)
+                // SynthBox feedback support
+                if ((this.feedbackType6Op == -1) && (jsonFormat == "SynthBox")) {
+                    this.feedbackType6Op = Config.algorithms6Op.findIndex(feedbackType6Op => feedbackType6Op.name == "Custom");
+                    
+                    // These are all of the SynthBox feedback presets that aren't present in Gold/UltraBox
+                    let synthboxLegacyFeedbacks: DictionaryArray<any> = toNameMap([
+                        { name: "2⟲ 3⟲", indices: [[], [2], [3], [], [], []] },
+                        { name: "4⟲ 5⟲", indices: [[], [], [], [4], [5], []] },
+                        { name: "5⟲ 6⟲", indices: [[], [], [], [], [5], [6]] },
+                        { name: "1⟲ 6⟲", indices: [[1], [], [], [], [], [6]] },
+                        { name: "1⟲ 3⟲", indices: [[1], [], [3], [], [], []] },
+                        { name: "1⟲ 4⟲", indices: [[1], [], [], [4], [], []] },
+                        { name: "1⟲ 5⟲", indices: [[1], [], [], [], [5], []] },
+                        { name: "4⟲ 6⟲", indices: [[], [], [], [4], [], [6]] },
+                        { name: "2⟲ 6⟲", indices: [[], [2], [], [], [], [6]] },
+                        { name: "3⟲ 6⟲", indices: [[], [], [3], [], [], [6]] },
+                        { name: "4⟲ 5⟲ 6⟲", indices: [[], [], [], [4], [5], [6]] },
+                        { name: "1⟲ 3⟲ 6⟲", indices: [[1], [], [3], [], [], [6]] },
+                        { name: "2→5", indices: [[], [], [], [], [2], []] },
+                        { name: "2→6", indices: [[], [], [], [], [], [2]] },
+                        { name: "3→5", indices: [[], [], [], [], [3], []] },
+                        { name: "3→6", indices: [[], [], [], [], [], [3]] },
+                        { name: "4→6", indices: [[], [], [], [], [], [4]] },
+                        { name: "5→6", indices: [[], [], [], [], [], [5]] },
+                        { name: "1→3→4", indices: [[], [], [1], [], [3], []] },
+                        { name: "2→5→6", indices: [[], [], [], [], [2], [5]] },
+                        { name: "2→4→6", indices: [[], [], [], [2], [], [4]] },
+                        { name: "4→5→6", indices: [[], [], [], [], [4], [5]] },
+                        { name: "3→4→5→6", indices: [[], [], [], [3], [4], [5]] },
+                        { name: "2→3→4→5→6", indices: [[], [1], [2], [3], [4], [5]] },
+                        { name: "1→2→3→4→5→6", indices: [[], [1], [2], [3], [4], [5]] },
+                    ]);
+
+                    let synthboxFeedbackType = synthboxLegacyFeedbacks[synthboxLegacyFeedbacks.findIndex(feedback => feedback.name == instrumentObject["feedbackType"])].indices;
+                    
+                    this.customFeedbackType.set(synthboxFeedbackType);
+                } else {
+                    if (this.feedbackType6Op == -1) this.feedbackType6Op = 1;
+                    if (this.feedbackType6Op == 0) {
+                        this.customFeedbackType.set(instrumentObject["customFeedback"]["mods"]);
+                    } else {
+                        this.customFeedbackType.fromPreset(this.feedbackType6Op)
+                    }
                 }
             }
             if (instrumentObject["feedbackAmplitude"] != undefined) {
@@ -2611,7 +2625,7 @@ export class Instrument {
                 legacySettings.feedbackEnvelope = getEnvelope(instrumentObject["feedbackEnvelope"]);
                 if (Array.isArray(instrumentObject["operators"])) {
                     legacySettings.operatorEnvelopes = [];
-                    for (let j: number = 0; j < Config.operatorCount; j++) {
+                    for (let j: number = 0; j < Config.operatorCount + (this.type == InstrumentType.fm6op?2:0); j++) {
                         let envelope: Envelope | undefined;
                         if (instrumentObject["operators"][j] != undefined) {
                             envelope = getEnvelope(instrumentObject["operators"][j]["envelope"]);

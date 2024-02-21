@@ -3489,12 +3489,12 @@ export function setDefaultInstruments(song: Song): void {
 }
 
 export class ChangeSong extends ChangeGroup {
-    constructor(doc: SongDocument, newHash: string) {
+    constructor(doc: SongDocument, newHash: string, jsonFormat: string = "auto") {
         super();
         let pitchChannelCount = doc.song.pitchChannelCount;
         let noiseChannelCount = doc.song.noiseChannelCount;
         let modChannelCount = doc.song.modChannelCount;
-        doc.song.fromBase64String(newHash);
+        doc.song.fromBase64String(newHash, jsonFormat);
         if (pitchChannelCount != doc.song.pitchChannelCount || noiseChannelCount != doc.song.noiseChannelCount || modChannelCount != doc.song.modChannelCount) {
             ColorConfig.resetColors();
         }

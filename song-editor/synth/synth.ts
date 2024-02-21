@@ -1707,7 +1707,7 @@ export class Instrument {
         let noCarriersControlledByNoteSize: boolean = true;
         let allCarriersControlledByNoteSize: boolean = true;
         let noteSizeControlsSomethingElse: boolean = (legacyFilterEnv.type == EnvelopeType.noteSize) || (legacyPulseEnv.type == EnvelopeType.noteSize);
-        if (this.type == InstrumentType.fm) {
+        if (this.type == InstrumentType.fm || this.type == InstrumentType.fm6op) {
             noteSizeControlsSomethingElse = noteSizeControlsSomethingElse || (legacyFeedbackEnv.type == EnvelopeType.noteSize);
             for (let i: number = 0; i < legacyOperatorEnvelopes.length; i++) {
                 if (i < carrierCount) {
@@ -1724,7 +1724,7 @@ export class Instrument {
 
         this.envelopeCount = 0;
 
-        if (this.type == InstrumentType.fm) {
+        if (this.type == InstrumentType.fm || this.type == InstrumentType.fm6op) {
             if (allCarriersControlledByNoteSize && noteSizeControlsSomethingElse) {
                 this.addEnvelope(Config.instrumentAutomationTargets.dictionary["noteVolume"].index, 0, Config.envelopes.dictionary["note size"].index);
             } else if (noCarriersControlledByNoteSize && !noteSizeControlsSomethingElse) {
@@ -2024,10 +2024,12 @@ export class Instrument {
     }
 
 
-    public fromJsonObject(instrumentObject: any, isNoiseChannel: boolean, isModChannel: boolean, useSlowerRhythm: boolean, useFastTwoNoteArp: boolean, legacyGlobalReverb: number = 0): void {
+    public fromJsonObject(instrumentObject: any, isNoiseChannel: boolean, isModChannel: boolean, useSlowerRhythm: boolean, useFastTwoNoteArp: boolean, legacyGlobalReverb: number = 0, jsonFormat: string = Config.jsonFormat): void {
         if (instrumentObject == undefined) instrumentObject = {};
 
         let type: InstrumentType = Config.instrumentTypeNames.indexOf(instrumentObject["type"]);
+        // SynthBox support
+        if ((jsonFormat == "SynthBox") && (instrumentObject["type"] == "FM")) type = Config.instrumentTypeNames.indexOf("FM6op");
         if (<any>type == -1) type = isModChannel ? InstrumentType.mod : (isNoiseChannel ? InstrumentType.noise : InstrumentType.chip);
         this.setTypeAndReset(type, isNoiseChannel, isModChannel);
 
@@ -2038,7 +2040,11 @@ export class Instrument {
         }
 
         if (instrumentObject["volume"] != undefined) {
-            this.volume = clamp(-Config.volumeRange / 2, (Config.volumeRange / 2) + 1, instrumentObject["volume"] | 0);
+            if (jsonFormat == "JummBox" || jsonFormat == "SynthBox" || jsonFormat == "UltraBox") {
+                this.volume = clamp(-Config.volumeRange / 2, (Config.volumeRange / 2) + 1, instrumentObject["volume"] | 0);
+            } else {
+                this.volume = Math.round(-clamp(0, 8, Math.round(5 - (instrumentObject["volume"] | 0) / 20)) * 25.0 / 7.0)
+            }
         } else {
             this.volume = 0;
         }
@@ -2143,6 +2149,9 @@ export class Instrument {
             const unison: Unison | undefined = Config.unisons.dictionary[legacyChorusNames[unisonProperty]] || Config.unisons.dictionary[unisonProperty];
             if (unison != undefined) this.unison = unison.index;
             if (unisonProperty == "custom") this.unison = Config.unisons.length;
+            // todbox support
+            // technically the voiced unison isn't exactly the same as the error unison, really this should be using custom unison instead but whatever
+            if (unisonProperty == "error") this.unison = Config.unisons.dictionary["voiced"].index;
         }
         //clamp these???
         this.unisonVoices = (instrumentObject["unisonVoices"] == undefined) ? Config.unisons[this.unison].voices : instrumentObject["unisonVoices"];
@@ -2163,6 +2172,23 @@ export class Instrument {
 
         if (instrumentObject["pitchShiftSemitones"] != undefined) {
             this.pitchShift = clamp(0, Config.pitchShiftRange, Math.round(+instrumentObject["pitchShiftSemitones"]));
+        }
+        // modbox pitch shift, known in that mod as "octave offset"
+        if (instrumentObject["octoff"] != undefined) {
+            let potentialPitchShift: string = instrumentObject["octoff"];
+            this.effects = (this.effects | (1 << EffectType.pitchShift));
+            
+            if ((potentialPitchShift == "+1 (octave)") || (potentialPitchShift == "+2 (2 octaves)")) {
+                this.pitchShift = 24;
+            } else if ((potentialPitchShift == "+1/2 (fifth)") || (potentialPitchShift == "+1 1/2 (octave and fifth)")) {
+                this.pitchShift = 18;
+            } else if ((potentialPitchShift == "-1 (octave)") || (potentialPitchShift == "-2 (2 octaves)")) {
+                this.pitchShift = 0;
+            } else if ((potentialPitchShift == "-1/2 (fifth)") || (potentialPitchShift == "-1 1/2 (octave and fifth)")) {
+                this.pitchShift = 6;
+            } else {
+                this.pitchShift = 12;
+            }
         }
         if (instrumentObject["detuneCents"] != undefined) {
             this.detune = clamp(Config.detuneMin, Config.detuneMax + 1, Math.round(Synth.centsToDetune(+instrumentObject["detuneCents"])));
@@ -2381,11 +2407,49 @@ export class Instrument {
                     this.customAlgorithm.fromPreset(this.algorithm6Op);
                 }
                 this.feedbackType6Op = Config.feedbacks6Op.findIndex(feedback6Op => feedback6Op.name == instrumentObject["feedbackType"]);
-                if (this.feedbackType6Op == -1) this.feedbackType6Op = 1;
-                if(this.feedbackType6Op == 0) {
-                    this.customFeedbackType.set(instrumentObject["customFeedback"]["mods"]);
-                }else{
-                    this.customFeedbackType.fromPreset(this.feedbackType6Op)
+                // SynthBox feedback support
+                if ((this.feedbackType6Op == -1) && (jsonFormat == "SynthBox")) {
+                    this.feedbackType6Op = Config.algorithms6Op.findIndex(feedbackType6Op => feedbackType6Op.name == "Custom");
+                    
+                    // These are all of the SynthBox feedback presets that aren't present in Gold/UltraBox
+                    let synthboxLegacyFeedbacks: DictionaryArray<any> = toNameMap([
+                        { name: "2⟲ 3⟲", indices: [[], [2], [3], [], [], []] },
+                        { name: "4⟲ 5⟲", indices: [[], [], [], [4], [5], []] },
+                        { name: "5⟲ 6⟲", indices: [[], [], [], [], [5], [6]] },
+                        { name: "1⟲ 6⟲", indices: [[1], [], [], [], [], [6]] },
+                        { name: "1⟲ 3⟲", indices: [[1], [], [3], [], [], []] },
+                        { name: "1⟲ 4⟲", indices: [[1], [], [], [4], [], []] },
+                        { name: "1⟲ 5⟲", indices: [[1], [], [], [], [5], []] },
+                        { name: "4⟲ 6⟲", indices: [[], [], [], [4], [], [6]] },
+                        { name: "2⟲ 6⟲", indices: [[], [2], [], [], [], [6]] },
+                        { name: "3⟲ 6⟲", indices: [[], [], [3], [], [], [6]] },
+                        { name: "4⟲ 5⟲ 6⟲", indices: [[], [], [], [4], [5], [6]] },
+                        { name: "1⟲ 3⟲ 6⟲", indices: [[1], [], [3], [], [], [6]] },
+                        { name: "2→5", indices: [[], [], [], [], [2], []] },
+                        { name: "2→6", indices: [[], [], [], [], [], [2]] },
+                        { name: "3→5", indices: [[], [], [], [], [3], []] },
+                        { name: "3→6", indices: [[], [], [], [], [], [3]] },
+                        { name: "4→6", indices: [[], [], [], [], [], [4]] },
+                        { name: "5→6", indices: [[], [], [], [], [], [5]] },
+                        { name: "1→3→4", indices: [[], [], [1], [], [3], []] },
+                        { name: "2→5→6", indices: [[], [], [], [], [2], [5]] },
+                        { name: "2→4→6", indices: [[], [], [], [2], [], [4]] },
+                        { name: "4→5→6", indices: [[], [], [], [], [4], [5]] },
+                        { name: "3→4→5→6", indices: [[], [], [], [3], [4], [5]] },
+                        { name: "2→3→4→5→6", indices: [[], [1], [2], [3], [4], [5]] },
+                        { name: "1→2→3→4→5→6", indices: [[], [1], [2], [3], [4], [5]] },
+                    ]);
+
+                    let synthboxFeedbackType = synthboxLegacyFeedbacks[synthboxLegacyFeedbacks.findIndex(feedback => feedback.name == instrumentObject["feedbackType"])].indices;
+                    
+                    this.customFeedbackType.set(synthboxFeedbackType);
+                } else {
+                    if (this.feedbackType6Op == -1) this.feedbackType6Op = 1;
+                    if (this.feedbackType6Op == 0) {
+                        this.customFeedbackType.set(instrumentObject["customFeedback"]["mods"]);
+                    } else {
+                        this.customFeedbackType.fromPreset(this.feedbackType6Op)
+                    }
                 }
             }
             if (instrumentObject["feedbackAmplitude"] != undefined) {
@@ -2495,7 +2559,14 @@ export class Instrument {
                 this.aliases = instrumentObject["aliases"];
             }
             else {
-                this.aliases = false;
+                // modbox had no anti-aliasing, so enable it for everything if that mode is selected
+                if (jsonFormat == "ModBox") {
+                    this.effects = (this.effects | (1 << EffectType.distortion));
+                    this.aliases = true;
+                    this.distortion = 0;
+                } else {
+                    this.aliases = false;
+                }
             }
 
             if (instrumentObject["noteFilterType"] != undefined) {
@@ -2554,7 +2625,7 @@ export class Instrument {
                 legacySettings.feedbackEnvelope = getEnvelope(instrumentObject["feedbackEnvelope"]);
                 if (Array.isArray(instrumentObject["operators"])) {
                     legacySettings.operatorEnvelopes = [];
-                    for (let j: number = 0; j < Config.operatorCount; j++) {
+                    for (let j: number = 0; j < Config.operatorCount + (this.type == InstrumentType.fm6op?2:0); j++) {
                         let envelope: Envelope | undefined;
                         if (instrumentObject["operators"][j] != undefined) {
                             envelope = getEnvelope(instrumentObject["operators"][j]["envelope"]);
@@ -2723,7 +2794,7 @@ export class Channel {
 }
 
 export class Song {
-    private static readonly _format: string = "UltraBox";
+    private static readonly _format: string = Config.jsonFormat;
     private static readonly _oldestBeepboxVersion: number = 2;
     private static readonly _latestBeepboxVersion: number = 9;
     private static readonly _oldestJummBoxVersion: number = 1;
@@ -3587,7 +3658,7 @@ export class Song {
         return Config.envelopes[clamp(0, Config.envelopes.length, legacyIndex)];
     }
 
-    public fromBase64String(compressed: string): void {
+    public fromBase64String(compressed: string, jsonFormat: string = "auto"): void {
         if (compressed == null || compressed == "") {
             Song._clearSamples();
 
@@ -3601,7 +3672,7 @@ export class Song {
         if (compressed.charCodeAt(charIndex) == CharCode.HASH) charIndex++;
         // if it starts with curly brace, treat it as JSON.
         if (compressed.charCodeAt(charIndex) == CharCode.LEFT_CURLY_BRACE) {
-            this.fromJsonObject(JSON.parse(charIndex == 0 ? compressed : compressed.substring(charIndex)));
+            this.fromJsonObject(JSON.parse(charIndex == 0 ? compressed : compressed.substring(charIndex)), jsonFormat);
             return;
         }
 
@@ -5987,24 +6058,17 @@ export class Song {
         return result;
     }
 
-    public fromJsonObject(jsonObject: any): void {
+    public fromJsonObject(jsonObject: any, jsonFormat: string = "auto"): void {
         this.initToDefault(true);
         if (!jsonObject) return;
 
         //const version: number = jsonObject["version"] | 0;
         //if (version > Song._latestVersion) return; // Go ahead and try to parse something from the future I guess? JSON is pretty easy-going!
+        const format: string = jsonFormat == "auto" ? jsonObject["format"] : jsonFormat;
 
         if (jsonObject["name"] != undefined) {
             this.title = jsonObject["name"];
         }
-
-	    			// if (jsonObject["customSamples"] != undefined && EditorConfig.customSamples == undefined) {
-                // EditorConfig.customSamples = atob(jsonObject["customSamples"]);
-				// console.log(EditorConfig.customSamples);
-				// location.reload(); 
-            // }
-			//jsonmark
-			//this doesn't work
 
         if (jsonObject["customSamples"] != undefined) {
             const customSamples: string[] = jsonObject["customSamples"];
@@ -6528,7 +6592,7 @@ export class Song {
                         if (i >= this.getMaxInstrumentsPerChannel()) break;
                         const instrument: Instrument = new Instrument(isNoiseChannel, isModChannel);
                         channel.instruments[i] = instrument;
-                        instrument.fromJsonObject(instrumentObjects[i], isNoiseChannel, isModChannel, false, false, legacyGlobalReverb);
+                        instrument.fromJsonObject(instrumentObjects[i], isNoiseChannel, isModChannel, false, false, legacyGlobalReverb, format);
                     }
 
                 }

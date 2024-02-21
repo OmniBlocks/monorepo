@@ -2145,13 +2145,10 @@ export class Instrument {
         this.unison = Config.unisons.dictionary["none"].index; // default value.
         const unisonProperty: any = instrumentObject["unison"] || instrumentObject["interval"] || instrumentObject["chorus"]; // The unison property has gone by various names in the past.
         if (unisonProperty != undefined) {
-            const legacyChorusNames: Dictionary<string> = { "union": "none", "fifths": "fifth", "octaves": "octave" };
+            const legacyChorusNames: Dictionary<string> = { "union": "none", "fifths": "fifth", "octaves": "octave", "error": "voiced" };
             const unison: Unison | undefined = Config.unisons.dictionary[legacyChorusNames[unisonProperty]] || Config.unisons.dictionary[unisonProperty];
             if (unison != undefined) this.unison = unison.index;
             if (unisonProperty == "custom") this.unison = Config.unisons.length;
-            // todbox support
-            // technically the voiced unison isn't exactly the same as the error unison, really this should be using custom unison instead but whatever
-            if (unisonProperty == "error") this.unison = Config.unisons.dictionary["voiced"].index;
         }
         //clamp these???
         this.unisonVoices = (instrumentObject["unisonVoices"] == undefined) ? Config.unisons[this.unison].voices : instrumentObject["unisonVoices"];

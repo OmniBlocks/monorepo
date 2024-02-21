@@ -48,7 +48,7 @@ export class ExportPrompt implements Prompt {
     private totalChunks: number;
     private currentChunk: number;
     private outputStarted: boolean = false;
-    private readonly _fileName: HTMLInputElement = input({ type: "text", style: "width: 10em;", value: "BeepBox-Song", maxlength: 250, "autofocus": "autofocus" });
+    private readonly _fileName: HTMLInputElement = input({ type: "text", style: "width: 10em;", value: Config.jsonFormat + "-Song", maxlength: 250, "autofocus": "autofocus" });
     private readonly _computedSamplesLabel: HTMLDivElement = div({ style: "width: 10em;" }, new Text("0:00"));
     private readonly _enableIntro: HTMLInputElement = input({ type: "checkbox" });
     private readonly _loopDropDown: HTMLInputElement = input({ style: "width: 2em;", type: "number", min: "1", max: "4", step: "1" });

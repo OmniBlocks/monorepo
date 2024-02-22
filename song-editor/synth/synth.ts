@@ -2043,7 +2043,7 @@ export class Instrument {
             if (jsonFormat == "JummBox" || jsonFormat == "SynthBox" || jsonFormat == "UltraBox") {
                 this.volume = clamp(-Config.volumeRange / 2, (Config.volumeRange / 2) + 1, instrumentObject["volume"] | 0);
             } else {
-                this.volume = Math.round(-clamp(0, 8, Math.round(5 - (instrumentObject["volume"] | 0) / 20)) * 25.0 / 7.0)
+                this.volume = Math.round(-clamp(0, 8, Math.round(5 - (instrumentObject["volume"] | 0) / 20)) * 25.0 / 7.0);
             }
         } else {
             this.volume = 0;

@@ -816,6 +816,7 @@ export class SongEditor {
         optgroup({ label: "Appearance" },
         option({ value: "showFifth" }, 'Highlight "Fifth" Note'),
         option({ value: "notesFlashWhenPlayed" }, "Notes Flash When Played"),
+        option({ value: "instrumentButtonsAtTop" }, "Instrument Buttons at Top"),
         option({ value: "showChannels" }, "Show All Channels"),
         option({ value: "showScrollBar" }, "Show Octave Scroll Bar"),
         option({ value: "showLetters" }, "Show Piano Keys"),
@@ -2215,6 +2216,7 @@ export class SongEditor {
             "Appearance",
             (prefs.showFifth ? textOnIcon : textOffIcon) + 'Highlight "Fifth" Note',
             (prefs.notesFlashWhenPlayed ? textOnIcon : textOffIcon) + "Notes Flash When Played",
+            (prefs.instrumentButtonsAtTop ? textOnIcon : textOffIcon) + "Instrument Buttons at Top",
             (prefs.showChannels ? textOnIcon : textOffIcon) + "Show All Channels",
             (prefs.showScrollBar ? textOnIcon : textOffIcon) + "Show Octave Scroll Bar",
             (prefs.showLetters ? textOnIcon : textOffIcon) + "Show Piano Keys",
@@ -2239,7 +2241,7 @@ export class SongEditor {
         const appearanceOptionGroup: HTMLOptGroupElement = <HTMLOptGroupElement>this._optionsMenu.children[2];
 
         // how do you get the length of an optgroup?
-        for (let i: number = 0; i < 12; i++) {
+        for (let i: number = 0; i < 13; i++) {
             const option: HTMLOptionElement = <HTMLOptionElement>appearanceOptionGroup.children[i];
             if (option.textContent != optionCommands[i + 14]) option.textContent = optionCommands[i + 14];
         }
@@ -2300,8 +2302,13 @@ export class SongEditor {
             this._detuneSliderRow.style.display = "";
             this._instrumentVolumeSliderRow.style.display = "";
             this._instrumentTypeSelectRow.style.setProperty("display", "");
-            this._instrumentSettingsGroup.insertBefore(this._instrumentExportGroup, this._instrumentSettingsGroup.firstChild);
-            this._instrumentSettingsGroup.insertBefore(this._instrumentCopyGroup, this._instrumentSettingsGroup.firstChild);
+            if (prefs.instrumentButtonsAtTop) {
+                this._instrumentSettingsGroup.insertBefore(this._instrumentExportGroup, this._instrumentSettingsGroup.firstChild);
+                this._instrumentSettingsGroup.insertBefore(this._instrumentCopyGroup, this._instrumentSettingsGroup.firstChild);
+            } else {
+                this._instrumentSettingsGroup.appendChild(this._instrumentCopyGroup);
+                this._instrumentSettingsGroup.appendChild(this._instrumentExportGroup);
+            }
             this._instrumentSettingsGroup.insertBefore(this._instrumentsButtonRow, this._instrumentSettingsGroup.firstChild);
             this._instrumentSettingsGroup.insertBefore(this._instrumentSettingsTextRow, this._instrumentSettingsGroup.firstChild);
 
@@ -2803,8 +2810,13 @@ export class SongEditor {
             this._drumPresetSelect.style.display = "none";
             $("#pitchPresetSelect").parent().hide();
             $("#drumPresetSelect").parent().hide();
-            this._modulatorGroup.insertBefore(this._instrumentExportGroup, this._modulatorGroup.firstChild);
-            this._modulatorGroup.insertBefore(this._instrumentCopyGroup, this._modulatorGroup.firstChild);
+            if (prefs.instrumentButtonsAtTop) {
+                this._modulatorGroup.insertBefore(this._instrumentExportGroup, this._modulatorGroup.firstChild);
+                this._modulatorGroup.insertBefore(this._instrumentCopyGroup, this._modulatorGroup.firstChild);
+            } else {
+                this._modulatorGroup.appendChild(this._instrumentCopyGroup);
+                this._modulatorGroup.appendChild(this._instrumentExportGroup);
+            }
 
             this._modulatorGroup.insertBefore(this._instrumentsButtonRow, this._modulatorGroup.firstChild);
             this._modulatorGroup.insertBefore(this._instrumentSettingsTextRow, this._modulatorGroup.firstChild);
@@ -5089,6 +5101,9 @@ export class SongEditor {
                 break;
             case "instrumentImportExport":
                 this._doc.prefs.instrumentImportExport = !this._doc.prefs.instrumentImportExport;
+                break;
+            case "instrumentButtonsAtTop":
+                this._doc.prefs.instrumentButtonsAtTop = !this._doc.prefs.instrumentButtonsAtTop;
                 break;
         }
         this._optionsMenu.selectedIndex = 0;

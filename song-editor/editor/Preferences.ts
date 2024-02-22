@@ -57,7 +57,7 @@ export class Preferences {
 		this.showScrollBar = window.localStorage.getItem("showScrollBar") == "true";
 		this.alwaysFineNoteVol = window.localStorage.getItem("alwaysFineNoteVol") == "true";
 		this.displayVolumeBar = window.localStorage.getItem("displayVolumeBar") == "true";
-		this.instrumentCopyPaste = window.localStorage.getItem("instrumentCopyPaste") != "false";
+		this.instrumentCopyPaste = window.localStorage.getItem("instrumentCopyPaste") == "true";
 		this.instrumentImportExport = window.localStorage.getItem("instrumentImportExport") == "true";
 		this.instrumentButtonsAtTop = window.localStorage.getItem("instrumentButtonsAtTop") != "false";
 		this.enableChannelMuting = window.localStorage.getItem("enableChannelMuting") == "true";

@@ -799,6 +799,7 @@ export class SongEditor {
     );
     private readonly _optionsMenu: HTMLSelectElement = select({ style: "width: 100%;" },
         option({ selected: true, disabled: true, hidden: false }, "Preferences"), // todo: "hidden" should be true but looks wrong on mac chrome, adds checkmark next to first visible option even though it's not selected. :(
+        optgroup({ label: "Technical" },
         option({ value: "autoPlay" }, "Auto Play on Load"),
         option({ value: "autoFollow" }, "Auto Follow Playhead"),
         option({ value: "enableNotePreview" }, "Hear Added Notes"),
@@ -811,6 +812,7 @@ export class SongEditor {
         option({ value: "displayBrowserUrl" }, "Enable Song Data in URL"),
         option({ value: "closePromptByClickoff" }, "Close Prompts on Click Off"),
         option({ value: "recordingSetup" }, "Note Recording..."),
+        ),
         optgroup({ label: "Appearance" },
         option({ value: "showFifth" }, 'Highlight "Fifth" Note'),
         option({ value: "notesFlashWhenPlayed" }, "Notes Flash When Played"),
@@ -2197,6 +2199,7 @@ export class SongEditor {
         const textOnIcon: string = ColorConfig.getComputed("--text-enabled-icon") !== "" ? ColorConfig.getComputed("--text-enabled-icon") : "✓ ";
         const textOffIcon: string = ColorConfig.getComputed("--text-disabled-icon") !== "" ? ColorConfig.getComputed("--text-disabled-icon") : "　";
         const optionCommands: ReadonlyArray<string> = [
+            "Technical",
             (prefs.autoPlay ? textOnIcon : textOffIcon) + "Auto Play on Load",
             (prefs.autoFollow ? textOnIcon : textOffIcon) + "Auto Follow Playhead",
             (prefs.enableNotePreview ? textOnIcon : textOffIcon) + "Hear Added Notes",
@@ -2223,22 +2226,22 @@ export class SongEditor {
             "　Set Theme...",
 	        "　Custom Theme...",
         ];
-        // todo: automatically get dropdown location instead of putting in number manually
-        for (let i: number = 0; i < 13; i++) {
-            if(i == 12) {
-                // Appearance dropdown
-                const optionGroup: HTMLOptGroupElement = <HTMLOptGroupElement>this._optionsMenu.children[i + 1];
+        // Technical dropdown
+        const technicalOptionGroup: HTMLOptGroupElement = <HTMLOptGroupElement>this._optionsMenu.children[1];
 
-                // how do you get the length of an optgroup?
-                for (let i: number = 0; i < 12; i++) {
-                    const option: HTMLOptionElement = <HTMLOptionElement>optionGroup.children[i];
-                    if (option.textContent != optionCommands[i + 13]) option.textContent = optionCommands[i + 13];
-                }
-            } else {
-                // Preferences before Appearance dropdown
-                const option: HTMLOptionElement = <HTMLOptionElement>this._optionsMenu.children[i + 1];
-                if (option.textContent != optionCommands[i]) option.textContent = optionCommands[i];
-            }
+        // how do you get the length of an optgroup?
+        for (let i: number = 0; i < 12; i++) {
+            const option: HTMLOptionElement = <HTMLOptionElement>technicalOptionGroup.children[i];
+            if (option.textContent != optionCommands[i + 1]) option.textContent = optionCommands[i + 1];
+        }
+
+        // Appearance dropdown
+        const appearanceOptionGroup: HTMLOptGroupElement = <HTMLOptGroupElement>this._optionsMenu.children[2];
+
+        // how do you get the length of an optgroup?
+        for (let i: number = 0; i < 12; i++) {
+            const option: HTMLOptionElement = <HTMLOptionElement>appearanceOptionGroup.children[i];
+            if (option.textContent != optionCommands[i + 14]) option.textContent = optionCommands[i + 14];
         }
 
         const channel: Channel = this._doc.song.channels[this._doc.channel];

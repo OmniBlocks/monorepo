@@ -3964,16 +3964,16 @@ export class SongEditor {
                 }
                 break;
             case 69: // e (+shift: eq filter settings)
+                if (canPlayNotes) break;
                 if (event.shiftKey) {
                     const instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
                     if (!instrument.eqFilterType && this._doc.channel < this._doc.song.pitchChannelCount + this._doc.song.noiseChannelCount)
                         this._openPrompt("customEQFilterSettings");
-                }
-			else if (needControlForShortcuts == (event.ctrlKey || event.metaKey)) {
-				this._openPrompt("generateEuclideanRhythm");
-				break;
-				//EUCLEDIAN RHYTHM SHORTCUT (E)
-			}
+                } else if (needControlForShortcuts == (event.ctrlKey || event.metaKey)) {
+                    this._openPrompt("generateEuclideanRhythm");
+                    break;
+                    //EUCLEDIAN RHYTHM SHORTCUT (E)
+			    }
                 break;
             case 70: // f
                 if (canPlayNotes) break;

@@ -8,7 +8,7 @@ import { PatternEditor } from "./PatternEditor";
 // import { ColorConfig } from "./ColorConfig";
 
 //namespace beepbox {
-const { button, div, h2, input, p} = HTML;
+const { button, div, h2, input, p, a} = HTML;
 let doReload = false;
 export class CustomPrompt implements Prompt {
 	private readonly _fileInput: HTMLInputElement = input({ type: "file", accept: ".png,.jpg,.jpeg", text: "choose editor background image"});
@@ -139,6 +139,10 @@ export class CustomPrompt implements Prompt {
 		p({ style: "text-align: left; margin: 0.5em 0;" },
 			"The first image will become the editor background, and the second image will be tiled across the webpage.",
 		),
+		div({ style: "text-align: left; margin-top: 0.5em; margin-bottom: 0.5em;" },
+            "Want to get custom themes? ",
+			a({ target: "_blank", href: "https://docs.google.com/spreadsheets/d/1dGjEcLgJrPwzBExPmwA9pbE_KVQ3jNrnTBrd46d2IKo/edit" }, "Click here to go to the Custom Theme Sheet!"),
+        ),
 		div(),
 		p({ style: "text-align: left; margin: 0;" },
 			"Editor Background Image:",

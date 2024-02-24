@@ -129,6 +129,7 @@ class TWSecurityManagerComponent extends React.Component {
             type: null,
             data: null,
             callback: null,
+            persistedUnsandboxed: false,
             modalCount: 0
         };
     }
@@ -235,12 +236,15 @@ class TWSecurityManagerComponent extends React.Component {
         if (url.startsWith('data:')) {
             const allowed = await showModal(SecurityModals.LoadExtension, {
                 url,
-                unsandboxed: false,
+                unsandboxed: this.state.persistedUnsandboxed,
                 onChangeUnsandboxed: this.handleChangeUnsandboxed.bind(this)
             });
             if (this.state.data.unsandboxed) {
                 manuallyTrustExtension(url);
             }
+            this.setState({
+                persistedUnsandboxed: this.state.data.unsandboxed
+            });
             return allowed;
         }
         return showModal(SecurityModals.LoadExtension, {

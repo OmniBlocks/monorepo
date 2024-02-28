@@ -1,6 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/neutralinojs/neutralinojs/main/schemas/neutralino.config.schema.json",
-  "applicationId": "js.ultrabox.sample",
+  "applicationId": "ultrabox.offline",
   "version": "2.2.4",
   "defaultMode": "window",
   "port": 52961,

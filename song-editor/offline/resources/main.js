@@ -18,7 +18,7 @@ function onTrayMenuItemClicked(event) {
     switch(event.detail.id) {
         case "VERSION":
             Neutralino.os.showMessageBox("Version information",
-                `Neutralinojs server: v${NL_VERSION} | Neutralinojs client: v${NL_CVERSION}`);
+                `UltraBox: v${NL_APPVERSION} | Neutralinojs server: v${NL_VERSION} | Neutralinojs client: v${NL_CVERSION}`);
             break;
         case "QUIT":
             Neutralino.app.exit();
@@ -27,7 +27,10 @@ function onTrayMenuItemClicked(event) {
 }
 
 function onWindowClose() {
-    Neutralino.app.exit();
+    let text = "Are you sure you want to leave without saving?\nAll unsaved data will be lost.";
+    if (confirm(text) == true) {
+        Neutralino.app.exit();
+    }
 }
 
 Neutralino.init();

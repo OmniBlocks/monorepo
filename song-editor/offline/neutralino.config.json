@@ -3,7 +3,7 @@
   "applicationId": "js.ultrabox.sample",
   "version": "2.2.4",
   "defaultMode": "window",
-  "port": 0,
+  "port": 52961,
   "documentRoot": "/resources/",
   "url": "/",
   "enableServer": true,

@@ -54,7 +54,7 @@ export class Preferences {
 		this.notesOutsideScale = window.localStorage.getItem("notesOutsideScale") == "true";
 		this.showLetters = window.localStorage.getItem("showLetters") == "true";
 		this.showChannels = window.localStorage.getItem("showChannels") == "true";
-		this.showScrollBar = window.localStorage.getItem("showScrollBar") != "false;
+		this.showScrollBar = window.localStorage.getItem("showScrollBar") != "false";
 		this.alwaysFineNoteVol = window.localStorage.getItem("alwaysFineNoteVol") == "true";
 		this.displayVolumeBar = window.localStorage.getItem("displayVolumeBar") == "true";
 		this.instrumentCopyPaste = window.localStorage.getItem("instrumentCopyPaste") != "false";

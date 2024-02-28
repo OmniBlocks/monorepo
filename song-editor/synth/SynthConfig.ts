@@ -336,6 +336,7 @@ export function startLoadingSample(url: string, chipWaveIndex: number, presetSet
     const chipWave = Config.chipWaves[chipWaveIndex];
     const rawChipWave = Config.rawChipWaves[chipWaveIndex];
     const rawRawChipWave = Config.rawRawChipWaves[chipWaveIndex];
+    if (url.slice(0, 5) === "file:") url = window.location.href.split("#")[0] + url.slice(5);
     fetch(url).then((response) => {
 	if (!response.ok) {
 	    // @TODO: Be specific with the error handling.

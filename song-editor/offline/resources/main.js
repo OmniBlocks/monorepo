@@ -27,7 +27,7 @@ function onTrayMenuItemClicked(event) {
 }
 
 function onWindowClose() {
-    let text = "Are you sure you want to leave without saving?\nAll unsaved data will be lost.";
+    let text = "Are you sure you want to exit?\nAll unsaved data will be lost.";
     if (confirm(text) == true) {
         Neutralino.app.exit();
     }

@@ -44,7 +44,6 @@
   const SIDE_MODE = "threed.sidemode";
   const TEX_FILTER = "threed.texfilter";
   const Z_POS = "threed.zpos";
-  const THREED_SKIN = "threed.skin";
 
   if (!Scratch.extensions.unsandboxed) {
     throw new Error("3D must be run unsandboxed");
@@ -470,7 +469,6 @@
               "flat",
               "sprite",
               "cube",
-              // "multi-textured cube",
               "sphere",
               "low-poly sphere",
             ],
@@ -656,16 +654,24 @@ If I ever decide to release this extension on the gallery, this will be replaced
           if (this[OBJECT]) {
             this[OBJECT].removeFromParent();
             this[OBJECT].material.dispose();
+            if (this[OBJECT].material.map) this[OBJECT].material.map.dispose();
             this[OBJECT].geometry.dispose();
             this[OBJECT] = null;
             Drawable.threed.updateRenderer();
           }
           return og();
         },
+        _skinWasAltered(og) {
+          og();
+          if (this[IN_3D]) {
+            Drawable.threed.updateDrawableSkin(this);
+            Drawable.threed.updateRenderer();
+          }
+        }
       });
 
       Scratch.renderer.threed = this;
-      patch(Scratch.renderer.constructor.prototype, {
+      patch(Scratch.renderer, {
         draw(og) {
           if (this[THREED_DIRTY]) {
             // Do a 3D redraw
@@ -773,18 +779,20 @@ If I ever decide to release this extension on the gallery, this will be replaced
           return extracted;
         },
       });
-      patch(Scratch.renderer.exports.Skin.prototype, {
+      patch(Scratch.renderer.exports.Skin, {
         dispose(og) {
           if (this._3dCachedTexture) this._3dCachedTexture.dispose();
           og();
         },
-        emitWasAltered(og) {
-          og();
+        _setTexture(og, textureData) {
           if (this._3dCachedTexture) {
             this._3dCachedTexture.dispose();
             this._3dCachedTexture = null;
+            const returnValue = og(textureData);
             Drawable.threed.getThreeTextureFromSkin(this);
+            return returnValue;
           }
+          return og(textureData);
         },
       });
     }
@@ -992,9 +1000,8 @@ If I ever decide to release this extension on the gallery, this will be replaced
       if (!dr[IN_3D]) return;
       const obj = dr[OBJECT];
 
-      if (obj?.material) obj.material.dispose();
-
       if (obj.isSprite) {
+        if (obj.material) obj.material.dispose();
         obj.material = new THREE.SpriteMaterial();
         try {
           const size = this.getSizeFromSkin(dr.skin);
@@ -1014,7 +1021,6 @@ If I ever decide to release this extension on the gallery, this will be replaced
             obj.geometry = new THREE.PlaneGeometry(dr.skin.size[0], dr.skin.size[1]);
             break;
           case "cube":
-          case "multi-textured cube":
             obj.geometry = new THREE.BoxGeometry(dr.skin.size[0], dr.skin.size[1], dr.skin.size[0]);
             break;
           case "sphere":
@@ -1029,7 +1035,7 @@ If I ever decide to release this extension on the gallery, this will be replaced
         obj._sizeZ = 1;
       }
 
-      dr[THREED_SKIN] = dr.skin;
+      if (obj?.material?.map) obj?.material?.map?.dispose();
       const texture = this.getThreeTextureFromSkin(dr.skin);
       obj.material.map = texture;
       obj.material.alphaTest = 0.01;
@@ -1068,6 +1074,7 @@ If I ever decide to release this extension on the gallery, this will be replaced
 
       dr[OBJECT].removeFromParent();
       dr[OBJECT].material.dispose();
+      if (dr[OBJECT].material.map) dr[OBJECT].material.map.dispose();
       dr[OBJECT].geometry.dispose();
       dr[OBJECT] = null;
       this.updateRenderer();
@@ -1087,7 +1094,6 @@ If I ever decide to release this extension on the gallery, this will be replaced
         case "flat":
         case "sprite":
         case "cube":
-        case "multi-textured cube":
         case "sphere":
         case "low-poly sphere":
           this.disable3DForDrawable(util.target.drawableID);
@@ -1099,6 +1105,7 @@ If I ever decide to release this extension on the gallery, this will be replaced
           break;
       }
     }
+
     refreshThreeDrawable(target) {
       const {direction, scale} = target._getRenderedDirectionAndScale();
       const dr = target.renderer._allDrawables[target.drawableID];
@@ -1330,8 +1337,11 @@ If I ever decide to release this extension on the gallery, this will be replaced
       dr[TEX_FILTER] = filters[FILTER];
       if (dr[OBJECT] && dr[OBJECT].material?.map) {
         // i think for some reason you need to create a new texture
-        dr.skin.emitWasAltered();
-        this.updateMaterialForDrawable(util.target.drawableID);
+        const cloned = dr[OBJECT].material.map.clone();
+        dr[OBJECT].material.map.dispose();
+        dr[OBJECT].material.map = cloned;
+        cloned.needsUpdate = true;
+        this.updateMaterialForDrawable(util.target.drawableID)
         this.updateRenderer();
       }
     }

@@ -470,7 +470,7 @@
               "flat",
               "sprite",
               "cube",
-              "multi-textured cube",
+              // "multi-textured cube",
               "sphere",
               "low-poly sphere",
             ],
@@ -1032,6 +1032,7 @@ If I ever decide to release this extension on the gallery, this will be replaced
       dr[THREED_SKIN] = dr.skin;
       const texture = this.getThreeTextureFromSkin(dr.skin);
       obj.material.map = texture;
+      obj.material.alphaTest = 0.01;
 
       this.updateMaterialForDrawable(drawableID);
 

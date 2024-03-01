@@ -44,7 +44,7 @@ cp website/nintaribox_samples.js offline/resources/player
 
 cd offline
 
-cp neutralino.config.json dist/UltraBox\ Offline/
+# cp neutralino.config.json dist/UltraBox\ Offline/
 
 # --release will zip releases together in one file
 neu build --release

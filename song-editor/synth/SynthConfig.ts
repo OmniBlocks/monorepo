@@ -336,9 +336,8 @@ export function startLoadingSample(url: string, chipWaveIndex: number, presetSet
     const chipWave = Config.chipWaves[chipWaveIndex];
     const rawChipWave = Config.rawChipWaves[chipWaveIndex];
     const rawRawChipWave = Config.rawRawChipWaves[chipWaveIndex];
-    // window.location.href.split("#")[0] was used before, but that resulted in https instead of http
-    // TODO: Support for dfferent ports?
-    if (url.slice(0, 5) === "file:") url = "http://localhost:52961/" + url.slice(5); // UB Offline local sample uploading
+    // UB Offline local sample uploading (theoretically could have other uses as well)
+    if (url.slice(0, 5) === "file:") url = "http://" + window.location.host + "/" + url.slice(5);
     fetch(url).then((response) => {
 	if (!response.ok) {
 	    // @TODO: Be specific with the error handling.

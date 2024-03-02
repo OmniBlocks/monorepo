@@ -5783,6 +5783,639 @@ export class ColorConfig {
 				--note-flash: #ffffff;
 				--note-flash-secondary: #ffffff77;
 				}`,
+				"AbyssBox Classic": `
+				:root {		
+				--page-margin: #1e0915; 		
+				--editor-background: #1e0915; 		
+				--hover-preview: white; 		
+				--playhead: rgba(255, 255, 255, 0.9); 		
+				--primary-text: white; 		
+				--secondary-text: #ffcedd; 		
+				--inverted-text: black;	 		
+				--text-selection: rgba(119,68,255,0.99); 		
+				--box-selection-fill: #1e0915; 		
+				--loop-accent: #873a51; 		
+				--link-accent: #df88ff; 		
+				--ui-widget-background: #581b3e; 		
+				--ui-widget-focus: #762b4c; 		
+				--pitch-background: #381d24; 		
+				--tonic: #873a51; 		
+				--fifth-note: #75001e; 		
+				--white-piano-key: #cca5c7; 		
+				--black-piano-key: #402f2f;
+				--white-piano-key-text: #131200;		
+				--black-piano-key-text: #fff;		 		
+				--use-color-formula: true; 		
+				--track-editor-bg-pitch: #571c40; 		
+				--track-editor-bg-pitch-dim: #290d0d; 		
+				--track-editor-bg-noise: #571131; 		
+				--track-editor-bg-noise-dim: #330a28; 		
+				--track-editor-bg-mod: #54083c; 		
+				--track-editor-bg-mod-dim: #360426; 		
+				--multiplicative-mod-slider: #9f6082; 		
+				--overwriting-mod-slider: #9e3470; 		
+				--indicator-primary: #b3498f; 		
+				--indicator-secondary: #541d40; 		
+				--select2-opt-group: #4f191e; 		
+				--input-box-outline: #18041a; 		
+				--mute-button-normal: #dd5d94;	 		
+				--mute-button-mod: #ba364c; 		
+				--mod-label-primary: #541625; 		
+				--mod-label-secondary-text: rgb(120, 87, 86); 
+				--mod-label-primary-text: gray; 
+			
+				--pitch-secondary-channel-hue: -80; 		
+				--pitch-secondary-channel-hue-scale 0; 		
+				--pitch-secondary-channel-sat: 43; 		
+				--pitch-secondary-channel-sat-scale: 0.1; 		
+				--pitch-secondary-channel-lum: 40; 		
+				--pitch-secondary-channel-lum-scale: 0.05; 
+			
+				--pitch-primary-channel-hue: -53; 		
+				--pitch-primary-channel-hue-scale: 6.1; 		
+				--pitch-primary-channel-sat: 75; 		
+				--pitch-primary-channel-sat-scale: 0.1; 		
+				--pitch-primary-channel-lum: 67.5; 		
+				--pitch-primary-channel-lum-scale: 0.05; 	
+		
+				--pitch-secondary-note-hue: -34; 		
+				--pitch-secondary-note-hue-scale: 6.1; 		
+				--pitch-secondary-note-sat: 93.9; 		
+				--pitch-secondary-note-sat-scale: 0.1; 		
+				--pitch-secondary-note-lum: 25; 		
+				--pitch-secondary-note-lum-scale: 0.05; 
+			
+				--pitch-primary-note-hue: -53; 		
+				--pitch-primary-note-hue-scale: 6.1; 		
+				--pitch-primary-note-sat: 100; 		
+				--pitch-primary-note-sat-scale: 0.05; 		
+				--pitch-primary-note-lum: 85.6; 		
+				--pitch-primary-note-lum-scale: 0.025; 
+			
+				--noise-secondary-channel-hue: 0; 		
+				--noise-secondary-channel-hue-scale: 2; 		
+				--noise-secondary-channel-sat: 65; 		
+				--noise-secondary-channel-sat-scale: 0; 		
+				--noise-secondary-channel-lum: 42; 		
+				--noise-secondary-channel-lum-scale: 0; 
+			
+				--noise-primary-channel-hue: 0; 		
+				--noise-primary-channel-hue-scale: 1; 		
+				--noise-primary-channel-sat: 100; 		
+				--noise-primary-channel-sat-scale: 1; 		
+				--noise-primary-channel-lum: 63.5; 		
+				--noise-primary-channel-lum-scale: 0; 
+			
+				--noise-secondary-note-hue: 24; 		
+				--noise-secondary-note-hue-scale: 2; 		
+				--noise-secondary-note-sat: 100; 		
+				--noise-secondary-note-sat-scale: 0; 		
+				--noise-secondary-note-lum: 35; 		
+				--noise-secondary-note-lum-scale: 0; 	
+		
+				--noise-primary-note-hue: 24; 		
+				--noise-primary-note-hue-scale: 2; 		
+				--noise-primary-note-sat: 100; 		
+				--noise-primary-note-sat-scale: 1; 		
+				--noise-primary-note-lum: 60; 		
+				--noise-primary-note-lum-scale: 1; 	
+		
+				--mod-secondary-channel-hue: 55; 		
+				--mod-secondary-channel-hue-scale: 1.5; 		
+				--mod-secondary-channel-sat: 100; 		
+				--mod-secondary-channel-sat-scale: 0; 		
+				--mod-secondary-channel-lum: 20; 		
+				--mod-secondary-channel-lum-scale: 0; 
+			
+				--mod-primary-channel-hue: 55; 		
+				--mod-primary-channel-hue-scale: 1.5; 		
+				--mod-primary-channel-sat: 96; 		
+				--mod-primary-channel-sat-scale: 0; 		
+				--mod-primary-channel-lum: 50; 		
+				--mod-primary-channel-lum-scale: 0; 
+			
+				--mod-secondary-note-hue: 55; 		
+				--mod-secondary-note-hue-scale: 1.5; 		
+				--mod-secondary-note-sat: 92; 		
+				--mod-secondary-note-sat-scale: 0; 		
+				--mod-secondary-note-lum: 45; 		
+				--mod-secondary-note-lum-scale: 0; 
+			
+				--mod-primary-note-hue: 55; 		
+				--mod-primary-note-hue-scale: 1.5; 		
+				--mod-primary-note-sat: 96; 		
+				--mod-primary-note-sat-scale: 0; 		
+				--mod-primary-note-lum: 85; 		
+				--mod-primary-note-lum-scale: 0; 	
+	
+				--note-flash: #ffffff;
+				--note-flash-secondary: #ffffff77;
+					}
+			* {
+			cursor: url("abyssbox_cursor.png"), auto;
+			--file-page-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-file.png");
+			--edit-pencil-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-edit.png");
+			--preferences-gear-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-preferences.png");
+			--instrument-copy-symbol: url("https://choptop84.github.io/abyssbox-app/icon-copy.png");
+			--instrument-paste-symbol: url("https://choptop84.github.io/abyssbox-app/icon-paste.png");
+			--play-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-play.png");
+			--pause-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-pause.png");
+			--record-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-record.png");
+			--stop-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-stop.png");
+			--prev-bar-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-prev.png");
+			--next-bar-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-next.png");
+			--muted-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-speakerMuted.png");
+			--unmuted-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-speaker.png");
+			--volume-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-speaker.png");
+			--zoom-in-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-zoomIn.png");
+			--zoom-out-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-zoomOut.png");
+			--export-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-export.png");
+			}
+			
+				@font-face {
+			   font-family: "AbyssType";
+			   src:
+				url("abysstype.otf") format("opentype") tech(color-COLRv1),
+				}
+	
+				/* sets background image */
+				body {
+				background-image: url("https://choptop84.github.io/abyssbox-source/website/stripesbg.gif") !important;
+				background-position: center;
+				background-repeat: repeat;
+	
+				image-rendering: -moz-crisp-edges !important;         /* Firefox */
+				image-rendering: -webkit-optimize-contrast !important; /* Webkit (Chrome/Safari) */
+				image-rendering: -o-crisp-edges !important;            /* Opera */
+				image-rendering: pixelated !important;                 /* Future browsers */
+				image-rendering: optimizeSpeed !important;             /* IE */
+					}
+	
+				/*#Hotdog {
+					content: url("https://choptop84.github.io/choptop84s-image-repository/abclassic_hotdog.png");
+				} */
+	
+				#text-content {
+						border-image-source: url("https://choptop84.github.io/abyssbox-app/abyssbox_border.png");
+						border-image-slice: 4 fill; 
+					   border-image-width: 8px; 
+					border-image-repeat: stretch; 
+						padding: 12px; 
+	
+						image-rendering: -moz-crisp-edges !important;         /* Firefox */
+						image-rendering: -webkit-optimize-contrast !important; /* Webkit (Chrome/Safari) */
+						image-rendering: -o-crisp-edges !important;            /* Opera */
+						image-rendering: pixelated !important;                 /* Future browsers */
+						image-rendering: optimizeSpeed !important;             /* IE */
+					}
+				#beepboxEditorContainer {
+						border-image-source: url("https://choptop84.github.io/abyssbox-app/abyssbox_border.png");
+						border-image-slice: 4 fill; 
+					   border-image-width: 8px; 
+					border-image-repeat: stretch;
+						padding: 12px;
+	
+						image-rendering: -moz-crisp-edges !important;         /* Firefox */
+						image-rendering: -webkit-optimize-contrast !important; /* Webkit (Chrome/Safari) */
+						image-rendering: -o-crisp-edges !important;            /* Opera */
+						image-rendering: pixelated !important;                 /* Future browsers */
+						image-rendering: optimizeSpeed !important;             /* IE */ 
+					}
+				.beepboxEditor button,
+				button.playButton,
+				button.pauseButton, 
+				button.recordButton, 
+				button.stopButton,
+				button.nextBarButton, 
+				button.prevBarButton, 
+				button.copyButton, 
+				button.pasteButton, 
+				button.exportInstrumentButton, 
+				button.importInstrumentButton, 
+				.beepboxEditor select, 
+				.beepboxEditor .select2-selection__rendered {
+						border-image-source: url("https://choptop84.github.io/abyssbox-app/abyssbox_border.png") !important;
+						border-image-slice: 4 fill !important; 
+					   border-image-width: 4px !important; 
+					border-image-repeat: stretch !important;
+						padding: 4px !important; 
+	
+						image-rendering: -moz-crisp-edges !important;         /* Firefox */
+						image-rendering: -webkit-optimize-contrast !important; /* Webkit (Chrome/Safari) */
+						image-rendering: -o-crisp-edges !important;            /* Opera */
+						image-rendering: pixelated !important;                 /* Future browsers */
+						image-rendering: optimizeSpeed !important;             /* IE */
+	
+						cursor: url("https://choptop84.github.io/abyssbox-app/abyssbox_cursor_hand.png"), pointer !important;
+					}
+	
+				div.selectRow button:not(.copyButton,.pasteButton,.exportInstrumentButton,.importInstrumentButton) {
+					--ui-widget-background: #1e0915 !important;
+					border-image-source:none !important;
+				}
+	
+					select.trackSelectBox {
+						border-image: none !important;
+					}
+					
+				@font-face {
+			   font-family: "AbyssType_small";
+			   src:
+				url("abysstype_small.otf") format("opentype") tech(color-COLRv1),
+				}
+	
+				html {
+					font-family: 'AbyssType';
+				}
+	
+				div.channelBoxLabel {
+					font-family: 'AbyssType_small' !important;
+				}
+	
+				.beepboxEditor input[type="range"]::-webkit-slider-thumb
+				{
+					cursor: url("https://choptop84.github.io/abyssbox-app/abyssbox_cursor_hand.png"), pointer !important;
+				}
+				 
+				.beepboxEditor input[type="range"]::-webkit-slider-runnable-track
+				{
+					cursor: url("https://choptop84.github.io/abyssbox-app/abyssbox_cursor_hand.png"), pointer !important;
+				}
+				 
+				.beepboxEditor input[type="range"]:focus::-webkit-slider-runnable-track
+				{
+					cursor: url("https://choptop84.github.io/abyssbox-app/abyssbox_cursor_hand.png"), pointer !important;
+				}
+				 
+				.beepboxEditor input[type="range"]::-ms-thumb
+				{
+					cursor: url("https://choptop84.github.io/abyssbox-app/abyssbox_cursor_hand.png"), pointer !important;
+				}
+				 
+				.beepboxEditor input[type="range"]::-ms-track
+				{
+					cursor: url("https://choptop84.github.io/abyssbox-app/abyssbox_cursor_hand.png"), pointer !important;
+				}
+				 
+				.beepboxEditor input[type="range"]:focus::-ms-track
+				{
+					cursor: url("https://choptop84.github.io/abyssbox-app/abyssbox_cursor_hand.png"), pointer !important;
+				}
+				 
+				.beepboxEditor input[type="range"]::-moz-range-thumb
+				{
+					cursor: url("https://choptop84.github.io/abyssbox-app/abyssbox_cursor_hand.png"), pointer !important;
+				}
+				 
+				.beepboxEditor input[type="range"]::-moz-range-track
+				{
+					cursor: url("https://choptop84.github.io/abyssbox-app/abyssbox_cursor_hand.png"), pointer !important;
+				}
+				 
+				.beepboxEditor input[type="range"]:focus::-moz-range-track
+				{
+					cursor: url("https://choptop84.github.io/abyssbox-app/abyssbox_cursor_hand.png"), pointer !important;
+				}
+				 
+				.beepboxEditor input[type="text"],
+				.beepboxEditor input[type="number"]
+				{
+					cursor: url("https://choptop84.github.io/abyssbox-app/abyssbox_cursor_hand.png"), pointer !important;
+				}
+				 
+				.beepboxEditor input[type="checkbox"]
+				{
+					cursor: url("https://choptop84.github.io/abyssbox-app/abyssbox_cursor_hand.png"), pointer !important;
+				}
+				 
+				.beepboxEditor input[type="checkbox"]:checked
+				{
+					cursor: url("https://choptop84.github.io/abyssbox-app/abyssbox_cursor_hand.png"), pointer !important;
+				}
+				 
+				.beepboxEditor input[type="checkbox"]:checked:after
+				{
+					cursor: url("https://choptop84.github.io/abyssbox-app/abyssbox_cursor_hand.png"), pointer !important;
+				}
+	
+				div.selectRow span {
+					cursor: url("https://choptop84.github.io/abyssbox-app/abyssbox_cursor_hand.png"), pointer !important;
+				}
+	
+				`,
+		"AbyssBox Light": `
+				:root { 		
+				--page-margin: #e0adbc; 		
+				--editor-background: #e0adbc; 		
+				--hover-preview: white; 		
+				--playhead: rgba(255, 255, 255, 0.9); 		
+				--primary-text: #f5f0f1; 		
+				--secondary-text: #eddadf; 		
+				--inverted-text:  #e8bcc9;	 		
+				--text-selection: rgba(119,68,255,0.99); 		
+				--box-selection-fill: #bf2c5d; 		
+				--loop-accent: #8c346a; 		
+				--link-accent: #8c346a; 		
+				--ui-widget-background: #f5e9f0;		
+				--ui-widget-focus: #8c346a; 		
+				--pitch-background: #eddadf; 		
+				--tonic: #f5f0f1; 		
+				--fifth-note: #ffb5c9; 		
+				--white-piano-key: #cca5c7; 		
+				--black-piano-key: #402f2f;
+				--white-piano-key-text: #131200;		
+				--black-piano-key-text: #fff;	 		
+				--use-color-formula: true; 		
+				--track-editor-bg-pitch: #decad8; 		
+				--track-editor-bg-pitch-dim: #bfb0bb; 		
+				--track-editor-bg-noise: #d6a3ca; 		
+				--track-editor-bg-noise-dim: #b389a9; 		
+				--track-editor-bg-mod: #b0649e; 		
+				--track-editor-bg-mod-dim: #915683; 		
+				--multiplicative-mod-slider: #9f6082; 		
+				--overwriting-mod-slider: #9e3470; 		
+				--indicator-primary: #b3498f; 		
+				--indicator-secondary: #541d40; 		
+				--select2-opt-group: #4f191e; 		
+				--input-box-outline: #18041a; 		
+				--mute-button-normal: #dd5d94;	 		
+				--mute-button-mod: #ba364c; 		
+				--mod-label-primary: #541625; 		
+				--mod-label-secondary-text: rgb(120, 87, 86); 
+				--mod-label-primary-text: gray; 
+			
+				--pitch-secondary-channel-hue: -80; 		
+				--pitch-secondary-channel-hue-scale 0; 		
+				--pitch-secondary-channel-sat: 255; 		
+				--pitch-secondary-channel-sat-scale: 0.1; 		
+				--pitch-secondary-channel-lum: 30; 		
+				--pitch-secondary-channel-lum-scale: 0.05; 
+			
+				--pitch-primary-channel-hue: -53; 		
+				--pitch-primary-channel-hue-scale: 6.1; 		
+				--pitch-primary-channel-sat: 255; 		
+				--pitch-primary-channel-sat-scale: 0.1; 		
+				--pitch-primary-channel-lum: 60; 		
+				--pitch-primary-channel-lum-scale: 0.05; 	
+		
+				--pitch-secondary-note-hue: -34; 		
+				--pitch-secondary-note-hue-scale: 6.1; 		
+				--pitch-secondary-note-sat: 255; 		
+				--pitch-secondary-note-sat-scale: 0.1; 		
+				--pitch-secondary-note-lum: 30; 		
+				--pitch-secondary-note-lum-scale: 0.05; 
+			
+				--pitch-primary-note-hue: -53; 		
+				--pitch-primary-note-hue-scale: 6.1; 		
+				--pitch-primary-note-sat: 255; 		
+				--pitch-primary-note-sat-scale: 0.05; 		
+				--pitch-primary-note-lum: 60; 		
+				--pitch-primary-note-lum-scale: 0.025; 
+			
+				--noise-secondary-channel-hue: 0; 		
+				--noise-secondary-channel-hue-scale: 2; 		
+				--noise-secondary-channel-sat: 255; 		
+				--noise-secondary-channel-sat-scale: 0; 		
+				--noise-secondary-channel-lum: 30; 		
+				--noise-secondary-channel-lum-scale: 0; 
+			
+				--noise-primary-channel-hue: 0; 		
+				--noise-primary-channel-hue-scale: 1; 		
+				--noise-primary-channel-sat: 255; 		
+				--noise-primary-channel-sat-scale: 1; 		
+				--noise-primary-channel-lum: 60; 		
+				--noise-primary-channel-lum-scale: 0; 
+			
+				--noise-secondary-note-hue: 24; 		
+				--noise-secondary-note-hue-scale: 2; 		
+				--noise-secondary-note-sat: 255; 		
+				--noise-secondary-note-sat-scale: 0; 		
+				--noise-secondary-note-lum: 30; 		
+				--noise-secondary-note-lum-scale: 0; 	
+		
+				--noise-primary-note-hue: 24; 		
+				--noise-primary-note-hue-scale: 2; 		
+				--noise-primary-note-sat: 255; 		
+				--noise-primary-note-sat-scale: 1; 		
+				--noise-primary-note-lum: 60; 		
+				--noise-primary-note-lum-scale: 1; 	
+		
+				--mod-secondary-channel-hue: 55; 		
+				--mod-secondary-channel-hue-scale: 1.5; 		
+				--mod-secondary-channel-sat: 255; 		
+				--mod-secondary-channel-sat-scale: 0; 		
+				--mod-secondary-channel-lum: 30; 		
+				--mod-secondary-channel-lum-scale: 0; 
+			
+				--mod-primary-channel-hue: 55; 		
+				--mod-primary-channel-hue-scale: 1.5; 		
+				--mod-primary-channel-sat: 255; 		
+				--mod-primary-channel-sat-scale: 0; 		
+				--mod-primary-channel-lum: 60; 		
+				--mod-primary-channel-lum-scale: 0; 
+			
+				--mod-secondary-note-hue: 55; 		
+				--mod-secondary-note-hue-scale: 1.5; 		
+				--mod-secondary-note-sat: 255; 		
+				--mod-secondary-note-sat-scale: 0; 		
+				--mod-secondary-note-lum: 30; 		
+				--mod-secondary-note-lum-scale: 0; 
+			
+				--mod-primary-note-hue: 55; 		
+				--mod-primary-note-hue-scale: 1.5; 		
+				--mod-primary-note-sat: 255; 		
+				--mod-primary-note-sat-scale: 0; 		
+				--mod-primary-note-lum: 60; 		
+				--mod-primary-note-lum-scale: 0; 	
+				--note-flash: #ffffff;
+				--note-flash-secondary: #ffffff77;
+					}
+					/* sets background image */
+					body {
+					background-image: url("https://choptop84.github.io/abyssbox-source/website/stripesbg_light.gif") !important;
+					background-position: center;
+					background-repeat: repeat;
+		
+					image-rendering: -moz-crisp-edges !important;         /* Firefox */
+					image-rendering: -webkit-optimize-contrast !important; /* Webkit (Chrome/Safari) */
+					image-rendering: -o-crisp-edges !important;            /* Opera */
+					image-rendering: pixelated !important;                 /* Future browsers */
+					image-rendering: optimizeSpeed !important;             /* IE */
+						}		
+				#text-content {
+						border-image-source: url("https://choptop84.github.io/abyssbox-source/website/abyssbox_border_light.png");
+						border-image-slice: 4 fill; 
+					   border-image-width: 8px; 
+					border-image-repeat: stretch; 
+						padding: 12px; 
+	
+						image-rendering: -moz-crisp-edges !important;         /* Firefox */
+						image-rendering: -webkit-optimize-contrast !important; /* Webkit (Chrome/Safari) */
+						image-rendering: -o-crisp-edges !important;            /* Opera */
+						image-rendering: pixelated !important;                 /* Future browsers */
+						image-rendering: optimizeSpeed !important;             /* IE */
+					}
+				#beepboxEditorContainer {
+						border-image-source: url("https://choptop84.github.io/abyssbox-source/website/abyssbox_border_light.png");
+						border-image-slice: 4 fill; 
+					   border-image-width: 8px; 
+					border-image-repeat: stretch;
+						padding: 12px;
+	
+						image-rendering: -moz-crisp-edges !important;         /* Firefox */
+						image-rendering: -webkit-optimize-contrast !important; /* Webkit (Chrome/Safari) */
+						image-rendering: -o-crisp-edges !important;            /* Opera */
+						image-rendering: pixelated !important;                 /* Future browsers */
+						image-rendering: optimizeSpeed !important;             /* IE */ 
+					}
+					.beepboxEditor button,
+					button.playButton,
+					button.pauseButton, 
+					button.recordButton, 
+					button.stopButton,
+					button.nextBarButton, 
+					button.prevBarButton, 
+					button.copyButton, 
+					button.pasteButton, 
+					button.exportInstrumentButton, 
+					button.importInstrumentButton, 
+					.beepboxEditor select, 
+					.beepboxEditor .select2-selection__rendered {
+							border-image-source: url("https://choptop84.github.io/abyssbox-app/abyssbox_border_light.png") !important;
+							border-image-slice: 4 fill !important; 
+						   border-image-width: 4px !important; 
+						border-image-repeat: stretch !important;
+							padding: 4px !important; 
+		
+							image-rendering: -moz-crisp-edges !important;         /* Firefox */
+							image-rendering: -webkit-optimize-contrast !important; /* Webkit (Chrome/Safari) */
+							image-rendering: -o-crisp-edges !important;            /* Opera */
+							image-rendering: pixelated !important;                 /* Future browsers */
+							image-rendering: optimizeSpeed !important;             /* IE */
+		
+							cursor: url("https://choptop84.github.io/abyssbox-app/abyssbox_cursor_hand.png"), pointer !important;
+						}
+		
+					div.selectRow button:not(.copyButton,.pasteButton,.exportInstrumentButton,.importInstrumentButton) {
+						--ui-widget-background: var(--editor-background) !important;
+						border-image-source:none !important;
+					}
+	
+					select.trackSelectBox {
+						border-image: none !important;
+					}
+	
+			/* sets cursor */ 
+			* {
+			cursor: url("abyssbox_cursor.png"), auto !important;
+			--file-page-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-file.png");
+			--edit-pencil-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-edit.png");
+			--preferences-gear-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-preferences.png");
+			--instrument-copy-symbol: url("https://choptop84.github.io/abyssbox-app/icon-copy.png");
+			--instrument-paste-symbol: url("https://choptop84.github.io/abyssbox-app/icon-paste.png");
+			--play-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-play.png");
+			--pause-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-pause.png");
+			--record-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-record.png");
+			--stop-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-stop.png");
+			--prev-bar-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-prev.png");
+			--next-bar-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-next.png");
+			--muted-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-speakerMuted.png");
+			--unmuted-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-speaker.png");
+			--volume-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-speaker.png");
+			--zoom-in-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-zoomIn.png");
+			--zoom-out-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-zoomOut.png");
+			--export-symbol: url("https://choptop84.github.io/choptop84s-image-repository/icon-export.png");
+			}
+				@font-face {
+			   font-family: "AbyssType";
+			   src:
+				url("abysstype.otf") format("opentype") tech(color-COLRv1),
+				}
+	
+				@font-face {
+			   font-family: "AbyssType_small";
+			   src:
+				url("abysstype_small.otf") format("opentype") tech(color-COLRv1),
+				}
+	
+				html {
+				font-family: 'AbyssType';
+				}
+				div.channelBoxLabel {
+					font-family: 'AbyssType_small' !important;
+				}
+	
+				.beepboxEditor input[type="range"]::-webkit-slider-thumb
+				{
+					cursor: url("https://choptop84.github.io/abyssbox-app/abyssbox_cursor_hand.png"), pointer !important;
+				}
+				 
+				.beepboxEditor input[type="range"]::-webkit-slider-runnable-track
+				{
+					cursor: url("https://choptop84.github.io/abyssbox-app/abyssbox_cursor_hand.png"), pointer !important;
+				}
+				 
+				.beepboxEditor input[type="range"]:focus::-webkit-slider-runnable-track
+				{
+					cursor: url("https://choptop84.github.io/abyssbox-app/abyssbox_cursor_hand.png"), pointer !important;
+				}
+				 
+				.beepboxEditor input[type="range"]::-ms-thumb
+				{
+					cursor: url("https://choptop84.github.io/abyssbox-app/abyssbox_cursor_hand.png"), pointer !important;
+				}
+				 
+				.beepboxEditor input[type="range"]::-ms-track
+				{
+					cursor: url("https://choptop84.github.io/abyssbox-app/abyssbox_cursor_hand.png"), pointer !important;
+				}
+				 
+				.beepboxEditor input[type="range"]:focus::-ms-track
+				{
+					cursor: url("https://choptop84.github.io/abyssbox-app/abyssbox_cursor_hand.png"), pointer !important;
+				}
+				 
+				.beepboxEditor input[type="range"]::-moz-range-thumb
+				{
+					cursor: url("https://choptop84.github.io/abyssbox-app/abyssbox_cursor_hand.png"), pointer !important;
+				}
+				 
+				.beepboxEditor input[type="range"]::-moz-range-track
+				{
+					cursor: url("https://choptop84.github.io/abyssbox-app/abyssbox_cursor_hand.png"), pointer !important;
+				}
+				 
+				.beepboxEditor input[type="range"]:focus::-moz-range-track
+				{
+					cursor: url("https://choptop84.github.io/abyssbox-app/abyssbox_cursor_hand.png"), pointer !important;
+				}
+				 
+				.beepboxEditor input[type="text"],
+				.beepboxEditor input[type="number"]
+				{
+					cursor: url("https://choptop84.github.io/abyssbox-app/abyssbox_cursor_hand.png"), pointer !important;
+				}
+				 
+				.beepboxEditor input[type="checkbox"]
+				{
+					cursor: url("https://choptop84.github.io/abyssbox-app/abyssbox_cursor_hand.png"), pointer !important;
+				}
+				 
+				.beepboxEditor input[type="checkbox"]:checked
+				{
+					cursor: url("https://choptop84.github.io/abyssbox-app/abyssbox_cursor_hand.png"), pointer !important;
+				}
+				 
+				.beepboxEditor input[type="checkbox"]:checked:after
+				{
+					cursor: url("https://choptop84.github.io/abyssbox-app/abyssbox_cursor_hand.png"), pointer !important;
+				}
+	
+				div.selectRow span {
+					cursor: url("https://choptop84.github.io/abyssbox-app/abyssbox_cursor_hand.png"), pointer !important;
+				}
+	
+				`,
 		"azur lane":`
 		:root {
 			--page-margin: #19337e;

@@ -22,9 +22,7 @@ const manifest = {
       "text": "The text labels may be automatically replaced by icons on smaller windows."
     }
   ],
-  "tags": [
-    "new"
-  ],
+  "tags": [],
   "settings": [
     {
       "dynamic": true,

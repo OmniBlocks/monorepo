@@ -69,6 +69,7 @@ import _editor_comment_previews from "../addons/editor-comment-previews/_manifes
 import _columns from "../addons/columns/_manifest_entry.js";
 import _number_pad from "../addons/number-pad/_manifest_entry.js";
 import _editor_number_arrow_keys from "../addons/editor-number-arrow-keys/_manifest_entry.js";
+import _expanded_backpack from "../addons/expanded-backpack/_manifest_entry.js";
 import _script_snap from "../addons/script-snap/_manifest_entry.js";
 import _fullscreen from "../addons/fullscreen/_manifest_entry.js";
 import _hide_stage from "../addons/hide-stage/_manifest_entry.js";
@@ -149,6 +150,7 @@ export default {
   "columns": _columns,
   "number-pad": _number_pad,
   "editor-number-arrow-keys": _editor_number_arrow_keys,
+  "expanded-backpack": _expanded_backpack,
   "script-snap": _script_snap,
   "fullscreen": _fullscreen,
   "hide-stage": _hide_stage,

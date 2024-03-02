@@ -6,8 +6,7 @@ const manifest = {
   "description": "Decreases the size of buttons, input fields, the menu bar, and other elements in the editor, making more space for components such as the code area, the costume editor, and costume previews, as was the case in Scratch 2.0.",
   "tags": [
     "theme",
-    "beta",
-    "new"
+    "beta"
   ],
   "credits": [
     {

@@ -8,9 +8,7 @@ const manifest = {
       "name": "TheKodeToad"
     }
   ],
-  "tags": [
-    "new"
-  ],
+  "tags": [],
   "userscripts": [
     {
       "url": "userscript.js"

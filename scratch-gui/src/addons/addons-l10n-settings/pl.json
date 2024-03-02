@@ -303,6 +303,7 @@
     "editor-number-arrow-keys/@settings-select-alt-none": "Brak",
     "editor-number-arrow-keys/@settings-select-regular-none": "Nic",
     "editor-number-arrow-keys/@settings-select-shift-none": "Nic",
+    "expanded-backpack/@settings-name-rows": "Liczba pokazanych wierszy",
     "script-snap/@description": "Po przesunięciu kodu, zostanie on \"przyczepiony\" do kropek tła w edytorze.",
     "script-snap/@name": "Przyczep fragmenty kodu do wirtualnej siatki",
     "script-snap/@preset-name-default": "Domyślny",

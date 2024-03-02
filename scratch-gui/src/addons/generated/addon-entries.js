@@ -70,6 +70,7 @@ export default {
   "columns": () => import(/* webpackChunkName: "addon-entry-columns" */ "../addons/columns/_runtime_entry.js"),
   "number-pad": () => import(/* webpackChunkName: "addon-entry-number-pad" */ "../addons/number-pad/_runtime_entry.js"),
   "editor-number-arrow-keys": () => import(/* webpackChunkName: "addon-entry-editor-number-arrow-keys" */ "../addons/editor-number-arrow-keys/_runtime_entry.js"),
+  "expanded-backpack": () => import(/* webpackChunkName: "addon-entry-expanded-backpack" */ "../addons/expanded-backpack/_runtime_entry.js"),
   "script-snap": () => import(/* webpackChunkName: "addon-entry-script-snap" */ "../addons/script-snap/_runtime_entry.js"),
   "fullscreen": () => import(/* webpackChunkName: "addon-entry-fullscreen" */ "../addons/fullscreen/_runtime_entry.js"),
   "hide-stage": () => import(/* webpackChunkName: "addon-entry-hide-stage" */ "../addons/hide-stage/_runtime_entry.js"),

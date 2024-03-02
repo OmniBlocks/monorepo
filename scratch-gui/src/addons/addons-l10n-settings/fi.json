@@ -147,8 +147,6 @@
     "custom-block-shape/@settings-name-cornerSize": "Reunojen koko (0-300%)",
     "custom-block-shape/@settings-name-notchSize": "Lovien koko (0-150%)",
     "custom-block-shape/@settings-name-paddingSize": "Täytön koko (50-200%)",
-    "editor-square-inputs/@description": "Tekee lohkojen tekstikentistä ja värinvalitsimista neliön muotoisia pyöreiden sijaan, kuten Scratch 2.0:ssa.",
-    "editor-square-inputs/@name": "Lohkojen neliskanttiset tekstikentät",
     "editor-square-inputs/@settings-name-color": "Värinvalitsimet",
     "editor-square-inputs/@settings-name-text": "Tekstikentät",
     "zebra-striping/@description": "Saa saman kategorian lohkot vuorottelemaan vaaleampien ja tummempien sävyjen välillä, kun ne asetetaan sisäkkäin. Toiminto tunnetaan myös seeprakuviona.",

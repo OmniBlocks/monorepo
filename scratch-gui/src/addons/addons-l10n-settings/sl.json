@@ -146,8 +146,6 @@
     "custom-block-shape/@settings-name-cornerSize": "Zaobljenost robov (0-300%)",
     "custom-block-shape/@settings-name-notchSize": "Višina zareze (0-150%)",
     "custom-block-shape/@settings-name-paddingSize": "Velikost praznega prostora (50-200%)",
-    "editor-square-inputs/@description": "Okrogla polja za vnos besedila in izbiro barv na blokih naredi pravokotna, kot v Scratchu 2.0.",
-    "editor-square-inputs/@name": "Kvadratna polja za vnos besedila v bloke",
     "editor-square-inputs/@settings-name-color": "Polja za izbiro barve",
     "editor-square-inputs/@settings-name-text": "Polja za vnos besedila",
     "zebra-striping/@description": "Bloke iste kategorije pobarva izmenično s svetlejšimi in temnejšimi odtenki, kadar so postavljeni drug v drugega. To se imenuje tudi zebrine proge.",

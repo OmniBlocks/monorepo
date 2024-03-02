@@ -147,8 +147,6 @@
     "custom-block-shape/@settings-name-cornerSize": "Köşe boyutu (%0-300)",
     "custom-block-shape/@settings-name-notchSize": "Çentik yüksekliği (%0-150)",
     "custom-block-shape/@settings-name-paddingSize": "Dolgu boyutu (%50-200)",
-    "editor-square-inputs/@description": "Bloklardaki metin ve renk girişlerini dairesel yapmak yerine dikdörtgensel yapar. Tıpkı Scratch 2.0'da olduğu gibi.",
-    "editor-square-inputs/@name": "Kare blok metin girişleri",
     "editor-square-inputs/@settings-name-color": "Renk girişleri",
     "editor-square-inputs/@settings-name-text": "Metin girişleri",
     "zebra-striping/@description": "Aynı tür blokların, birbiri içine yerleştirildiğinde açık ve koyu tonlar arasında geçiş yapmasını sağlar. Bu aynı zamanda zebra çizgileri olarak da bilinir.",

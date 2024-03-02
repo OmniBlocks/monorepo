@@ -142,8 +142,6 @@
     "custom-block-shape/@settings-name-cornerSize": "Taille des coins (0-300%)",
     "custom-block-shape/@settings-name-notchSize": "Hauteur de l'entaille (0-150%)",
     "custom-block-shape/@settings-name-paddingSize": "Taille de la marge (50-200%)",
-    "editor-square-inputs/@description": "Rendre les entrées de blocs de texte et de couleur rectangulaires au lieu de carrées comme dans Scratch 2.0.",
-    "editor-square-inputs/@name": "Entrées de blocs de texte carrées",
     "editor-square-inputs/@settings-name-color": "Entrées de couleurs",
     "editor-square-inputs/@settings-name-text": "Entrées de textes",
     "zebra-striping/@description": "Fait alterner les blocs de la même catégorie entre des nuances plus claires et plus foncées lorsqu'ils sont imbriqués les uns dans les autres. Ceci est également connu sous le nom de \"rayures zébrées\" (\"zebra striping\" en Anglais).",

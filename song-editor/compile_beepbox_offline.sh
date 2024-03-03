@@ -48,3 +48,14 @@ cd offline
 
 # --release will zip releases together in one file
 neu build --release
+
+
+# Copy files for auto-updating (not used, resources.neu is uploaded to a different repository manually)
+
+# cd ../
+
+# cp offline/dist/UltraBox\ Offline/resources.neu offline/
+
+# cd offline
+
+# ren "resources.neu" "update_res.neu"

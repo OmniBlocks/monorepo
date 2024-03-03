@@ -14,9 +14,15 @@
     <meta name="msapplication-TileColor" content="#dba600" />
     <meta name="msapplication-config" content="/browserconfig.xml" />
     <meta name="format-detection" content="telephone=no" />
-    <!-- <link rel="manifest" href="/manifest.webmanifest" /> -->
-    <link href="https://fonts.googleapis.com/css?family=B612" rel="stylesheet" media="none" onload="if (this.media != 'all') this.media='all';" /> <!-- this is a trick to load CSS asynchronously. -->
     <style type="text/css">
+
+        @font-face {
+            font-family: 'B612';
+            font-style: normal;
+            font-weight: 400;
+            src: url(3JnySDDxiSz36j6yGQ.woff2) format('woff2');
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+        }
 
         html {
             background: var(--page-margin, black);
@@ -164,6 +170,10 @@
                 You can load samples by dropping them into the <code>samples</code> folder, and then inputting eg. <code>file:samples/sample1.wav</code>
                 <br>You can also load samples from websites if you're connected to the internet.
             </p>
+
+            <p id="autoupdater">
+                Click <button onclick="enableAutoUpdater()">here</button> to re-enable the auto-updater.
+            </p>
     </div>
 
     <script src="/neutralino.js"></script>
@@ -261,12 +271,15 @@
             }
         }
 
-        if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|android|ipad|playbook|silk/i.test(navigator.userAgent)) {
-            document.getElementById("introduction").innerHTML = "UltraBox is an online tool for sketching and sharing chiptune melodies. Make sure that your volume is turned up, then press the play button!";
-            document.getElementById("keyboard-instructions").style.display = "none";
-            document.getElementById("mobile-instructions").style.display = "";
-            document.getElementById("bar-editing").innerHTML = "Tap the boxes to move to a different part of the song, or tap on the currently selected box to swap which pattern is played during that part of the song.";
-			//document.getElementById("offline-instructions").innerHTML = 'You can use BeepBox when your device is offline if you put a shortcut to BeepBox on your home screen. <ul><li>Chrome: find the "Add to Home Screen" option in the ⋮ menu.</li><li>Firefox: find the "Add Page Shortcut" option in the ⋮ menu.</li><li>Safari: find the "Add to Home Screen" option in the bookmark menu.</li></ul>';
+        if (window.localStorage.getItem("ignoreAutoUpdate") == "true") {
+            document.getElementById("autoupdater").style.display = "inline";  
+        } else {
+            document.getElementById("autoupdater").style.display = "none";
+        }
+
+        function enableAutoUpdater() {
+            window.localStorage.setItem("ignoreAutoUpdate", "false");
+            location.reload();
         }
     </script>
 </body>

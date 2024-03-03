@@ -5661,9 +5661,11 @@ export class ColorConfig {
 			--mod-primary-note-lum-scale: 0;
 			--disabled-note-primary:    #53527b;
 			--disabled-note-secondary:  #1c1b30;
-			// Don't know when, but some time in the future make sure to add the new 
-			// fonts and make the piano keys change color depending on their type.
-			// (E.g. White piano keys still have white text making them hard to read.)
+			/* 
+			Don't know when, but some time in the future make sure to add the new 
+			fonts and make the piano keys change color depending on their type.
+			(E.g. White piano keys still have white text making them hard to read.)
+			*/
 		}
 						`,
 		"dogebox2": `

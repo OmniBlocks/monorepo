@@ -2466,8 +2466,8 @@ export class Instrument {
                 if (operatorObject["amplitude"] != undefined) {
                     operator.amplitude = clamp(0, Config.operatorAmplitudeMax + 1, operatorObject["amplitude"] | 0);
                 } 
-                // @Mid - These are just here so I can import FM things smoothly.
-                // I'd assume this works right?
+                /* @Mid - Was here to support some FM frequencies but those can be managed further down the line of development.
+                //        Not even sure if it's right.
                 else if (operatorObject["amplitude"] == "0.125×") operator.amplitude = Config.operatorFrequencies.findIndex(freq => freq.name == "0.12×")
                 else if (operatorObject["amplitude"] == "0.50×" || "~0.50×") operator.amplitude = Config.operatorFrequencies.findIndex(freq => freq.name == "0.5×")
                 else if (operatorObject["amplitude"] == "~0.75×") operator.amplitude = Config.operatorFrequencies.findIndex(freq => freq.name == "0.75×") 
@@ -2475,7 +2475,8 @@ export class Instrument {
                 else if (operatorObject["amplitude"] == "24×" || "32×" || "~32×") operator.amplitude = Config.operatorFrequencies.findIndex(freq => freq.name == "25×") 
                 else if (operatorObject["amplitude"] == "48×") operator.amplitude = Config.operatorFrequencies.findIndex(freq => freq.name == "50×") 
                 else if (operatorObject["amplitude"] == "64×") operator.amplitude = Config.operatorFrequencies.findIndex(freq => freq.name == "75×") 
-                else if (operatorObject["amplitude"] == "128×") operator.amplitude = Config.operatorFrequencies.findIndex(freq => freq.name == "100×") 
+                else if (operatorObject["amplitude"] == "128×") operator.amplitude = Config.operatorFrequencies.findIndex(freq => freq.name == "100×")
+                */
                 else {
                     operator.amplitude = 0;
                 }

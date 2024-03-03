@@ -861,16 +861,16 @@ export class Config {
         { name: "Octatonic", realName: "octatonic", flags: [true, false, true, true, false, true, true, false, true, true, false, true] }, // Octatonic
         { name: "Hexatonic", realName: "hexatonic", flags: [true, false, false, true, true, false, false, true, true, false, false, true] }, // Hexatonic
         { name: "No Dabbing", realName: "no dabbing", flags:[true, true, false, true, true, true, true, true, true, false, true, false] },
-	//modbox
-	{ name: "Jacked Toad", realName: "jacked toad", flags: [true, false, true, true, false, true, true, true, true, false, true, true] },
-	{ name: "Dumb", realName: "Originally named, currently named, and will always be named 'dumb.'", flags: [true, false, false, false, false, true, true, true, true, false, false, true] },
+	    //Modbox
+	    { name: "Jacked Toad", realName: "jacked toad", flags: [true, false, true, true, false, true, true, true, true, false, true, true] },
+	    { name: "Dumb", realName: "Originally named, currently named, and will always be named 'dumb.'", flags: [true, false, false, false, false, true, true, true, true, false, false, true] },
         { name: "Test Scale", realName: "**t", flags: [true, true, false, false, false, true, true, false, false, true, true, false] },
-	// todbox
-	{ name: "die", realName: "death", flags: [true, false, false, false, false, false, false, false, true, false, false, false] },
-	//wackybox
-        // { name: "Rythmic", realName: "Pretty straightforward.", flags: [true, false, false, false, false, false, false, false, false, false, false, false] },
-        //todbox
-	{ name: "Custom", realName: "custom", flags: [true, false, true, true, false, false, false, true, true, false, true, true] }, // Custom? considering allowing this one to be be completely configurable
+	    //Todbox
+	    { name: "die", realName: "death", flags: [true, false, false, false, false, false, false, false, true, false, false, false] },
+	    //Wackybox
+    //  { name: "Rythmic", realName: "Pretty straightforward.", flags: [true, false, false, false, false, false, false, false, false, false, false, false] },
+        //Rodbox
+	    { name: "Custom", realName: "custom", flags: [true, false, true, true, false, false, false, true, true, false, true, true] }, // Custom? considering allowing this one to be be completely configurable
 	]);
 	public static readonly keys: DictionaryArray<Key> = toNameMap([
 		{ name: "C", isWhiteKey: true, basePitch: 12 }, // C0 has index 12 on the MIDI scale. C7 is 96, and C9 is 120. C10 is barely in the audible range.
@@ -885,14 +885,15 @@ export class Config {
 		{ name: "A", isWhiteKey: true, basePitch: 21 },
 		{ name: "A♯", isWhiteKey: false, basePitch: 22 },
         { name: "B", isWhiteKey: true, basePitch: 23 },
-				// { name: "C+", isWhiteKey: false, basePitch: 24 },
-		//taken from todbox, called "B#" for some reason lol
-		// { name: "G- (actually F#-)", isWhiteKey: false, basePitch: 6 },
-        // { name: "C-", isWhiteKey: true, basePitch: 0 },
-	    //brucebox
-		//g- isn't actually g-???
-		// { name: "oh no (F-)", isWhiteKey: true, basePitch: 5 },
-		//shitbox
+	/*  { name: "C+", isWhiteKey: false, basePitch: 24 },
+		//Raken from todbox, called "B#" for some reason lol
+	    { name: "G- (actually F#-)", isWhiteKey: false, basePitch: 6 },
+        { name: "C-", isWhiteKey: true, basePitch: 0 },
+	    //Brucebox
+		//G- isn't actually G-???
+	    { name: "oh no (F-)", isWhiteKey: true, basePitch: 5 },
+		//Shitbox
+    */
 	]);
 	public static readonly blackKeyNameParents: ReadonlyArray<number> = [-1, 1, -1, 1, -1, 1, -1, -1, 1, -1, 1, -1];
 	public static readonly tempoMin: number = 1;
@@ -1064,7 +1065,7 @@ export class Config {
 	{ name: "ultrabox shortened od guitar", expression: 0.5, samples: centerAndNormalizeWave([-0.82785,-0.67621,-0.40268,-0.43817,-0.45468,-0.22531,-0.18329,0.24750,0.71246,0.52155,0.56082,0.48395,0.33990,0.46957,0.27744,0.42313,0.47104,0.18796,0.12930,-0.13901,-0.07431,-0.16348,-0.74857,-0.73206,-0.35181,-0.26227,-0.41882,-0.27786,-0.19806,-0.19867,0.18643,0.24808,0.08847,-0.06964,0.06912,0.20474,-0.05304,0.29416,0.31967,0.14243,0.27521,-0.23932,-0.14752,0.12360,-0.26123,-0.26111,0.06616,0.26520,0.08090,0.15240,0.16254,-0.12061,0.04562,0.00131,0.04050,0.08182,-0.21729,-0.17041,-0.16312,-0.08563,0.06390,0.05099,0.05627,0.02728,0.00726,-0.13028,-0.05673,-0.14969,-0.17645,0.35492,0.16766,-0.00897,0.24326,-0.00461,-0.04456,0.01776,-0.04950,-0.01221,0.02039,0.07684,0.13397,0.39850,0.35962,0.13754,0.42310,0.27161,-0.17609,0.03659,0.10635,-0.21909,-0.22046,-0.20258,-0.40973,-0.40280,-0.40521,-0.66284]) },
 	//based off an old mp3 in #modded-beepbox where someone tried to shorten the overdrive guitar into the size of other chip waves 
 	//search "normie alert" in beepcord
-    // Midbox
+    /* Midbox. To be ported in the future.
     { name: "midbox heavy saw", expression: 0.5, samples: centerWave([1.0, -1.0, 2.0, -1.0, 0.0, 3.0, 1.0, -1.0, 2.0, -1.0, 0.0, 0.0])},
     { name: "midbox bass-y", expression: 0.3, samples: centerWave([1.0, -5.0, 4.0, -3.0,  7.0, -2.0, 3.0, -3.0, 6.0])},
     { name: "midbox strange", expression: 0.175, samples: centerWave([1.0, 11.0, 1.0, -11.0, -1.0, -11.0, 4.0, -6.0, 9.0, -1.0, -7.0, 11.0, 2.0, -5.0, 9.0, 9.0, -10.0])},
@@ -1073,6 +1074,7 @@ export class Config {
     { name: "midbox secant",  expression: 0.1, samples: centerWave([23, 18, 13, 10, 8, 6, 5, 4, 3, 2, 2, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 2, 2, 3, 4, 5, 6, 8, 10, 13, 18, 23, -23, -18, -14, -10, -8, -6, -5, -4, -3, -2, -2, -1, -1, -1, 0, 0, 0, 0, -1, -1, -1, -2, -2, -3, -4, -5, -6, -8, -10, -14, -18, -23])},
     { name: "midbox glitch 2", expression: 0.075, samples: centerWave([0, 24, 0, 24, 0, 24, 0, 24, 0, -24, 0, -24, 0, -24, 0, -24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -24, 0, -24, 0, -24, 0, -24, 0, 24, 0, 24, 0, 24, 0, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])},
     { name: "midbox accurate trapezoid", expression: 0.1, samples: centerWave([1, 4, 7, 10, 13, 16, 19, 22, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 22, 19, 16, 13, 10, 7, 4, 1, -1, -4, -7, -10, -13, -16, -19, -22, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -22, -19, -16, -13, -10, -7, -4, -1])}
+    */
 ]); 
 	public static chipWaves: DictionaryArray<ChipWave> = rawChipToIntegrated(Config.rawChipWaves);
 	public static rawRawChipWaves: DictionaryArray<ChipWave> = Config.rawChipWaves;
@@ -1100,13 +1102,14 @@ export class Config {
 		{ name: "pink", expression: 1.0, basePitch: 69, pitchFilterMult: 8.0, isSoft: true, samples: null },
 		{ name: "brownian", expression: 1.0, basePitch: 69, pitchFilterMult: 8.0, isSoft: true, samples: null },
 		//{ name: "doom random", expression: 1.0, basePitch: 84, pitchFilterMult: 1024.0, isSoft: false, samples: null },
-        // These ones are from multiple old mods: Zefbox, Sandbox, and Modbox.
+        /* These ones are from multiple old mods: Zefbox, Sandbox, and Modbox. To be ported in the future.
         { name: "retro clang", expression: 1.0, basePitch: 69, pitchFilterMult: 1024.0, isSoft: false, samples: null },
         { name: "chime", expression: 2, basePitch: 69, pitchFilterMult: 1.0, isSoft: true, samples: null },
         { name: "harsh", expression: 10, basePitch: 69, pitchFilterMult: 1.0, isSoft: true, samples: null },
         { name: "trill", expression: 1.0, basePitch: 69, pitchFilterMult: 1024.0, isSoft: true, samples: null },
         { name: "detuned periodic", expression: 0.3, basePitch: 69, pitchFilterMult: 1024.0, isSoft: false, samples: null },
         { name: "snare", expression: 1.0, basePitch: 69, pitchFilterMult: 1024.0, isSoft: false, samples: null },
+        */
 	]);
 	
     public static readonly filterFreqStep: number = 1.0 / 4.0;
@@ -1556,7 +1559,9 @@ export class Config {
 		{ name: "ramp", samples: generateSawWave(true) },
 		{ name: "trapezoid", samples: generateTrapezoidWave(2) },
 	    { name: "rounded", samples: generateRoundedSineWave() },
-        { name: "secant", samples: generateSecantWave() },
+        // Midbox. To be ported in the future.
+        //{ name: "secant", samples: generateSecantWave() },
+        // Other.
 		//{ name: "white noise", samples: generateWhiteNoiseFmWave() },
 		//{ name: "1-bit white noise", samples: generateOneBitWhiteNoiseFmWave() },
     ]);
@@ -1882,7 +1887,9 @@ export function getDrumWave(index: number, inverseRealFourierTransform: Function
 				wave[i] *= 14;
 				// this is also from noise.js
             }
-        } else if (index == 15) {
+        }
+        // Underneath lies those noise types. May need to change the numbers when porting in case of new noise types.
+        /* else if (index == 15) {
             // The "retro clang" noise type from Zefbox.
             let drumBuffer: number = 1;
             for (let i: number = 0; i < 32768; i++) {
@@ -1956,7 +1963,7 @@ export function getDrumWave(index: number, inverseRealFourierTransform: Function
 					//this sucks
 					//also the randomized starting point code I spent 5 minutes on does nothing (auditorily)
         //        }
-            //}
+            //}*/
 		
 		else {
 			throw new Error("Unrecognized drum index: " + index);
@@ -2065,6 +2072,7 @@ function generateSawWave(inverse: boolean = false): Float32Array {
         return wave;
 	}
 
+    /* Midbox Secant FM Wave
     function generateSecantWave() {
         const wave: Float32Array = new Float32Array(Config.sineWaveLength + 1);
         for (let i = 0; i < Config.sineWaveLength + 1; i++) {
@@ -2072,6 +2080,7 @@ function generateSawWave(inverse: boolean = false): Float32Array {
         }
         return wave;
     }
+    */
 
 export function getArpeggioPitchIndex(pitchCount: number, useFastTwoNoteArp: boolean, arpeggio: number): number {
     let arpeggioPattern: ReadonlyArray<number> = Config.arpeggioPatterns[pitchCount - 1];

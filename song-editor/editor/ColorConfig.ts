@@ -5191,8 +5191,8 @@ export class ColorConfig {
 			 "wackybox": `
 			
 			:root {
-				--page-margin: black;
-				--editor-background: black;
+				--page-margin: #050000;
+				--editor-background: #050000;
 				--hover-preview: white;
 				--playhead: white;
 				--primary-text: white;
@@ -5312,7 +5312,7 @@ export class ColorConfig {
 				}
 
 				* {
-					cursor: url("wackybox_cursor.png"), auto !important;
+					cursor: url("theme-resources/wackybox_cursor.png"), auto !important;
 				}
 
 			`,
@@ -5912,35 +5912,35 @@ export class ColorConfig {
 				--note-flash-secondary: #ffffff77;
 					}
 			* {
-			cursor: url("abyssbox_cursor.png"), auto;
-			--file-page-symbol: url("icon-file.png");
-			--edit-pencil-symbol: url("icon-edit.png");
-			--preferences-gear-symbol: url("icon-preferences.png");
-			--instrument-copy-symbol: url("icon-copy.png");
-			--instrument-paste-symbol: url("icon-paste.png");
-			--play-symbol: url("icon-play.png");
-			--pause-symbol: url("icon-pause.png");
-			--record-symbol: url("icon-record.png");
-			--stop-symbol: url("icon-stop.png");
-			--prev-bar-symbol: url("icon-prev.png");
-			--next-bar-symbol: url("icon-next.png");
-			--muted-symbol: url("icon-speakerMuted.png");
-			--unmuted-symbol: url("icon-speaker.png");
-			--volume-symbol: url("icon-speaker.png");
-			--zoom-in-symbol: url("icon-zoomIn.png");
-			--zoom-out-symbol: url("icon-zoomOut.png");
-			--export-symbol: url("icon-export.png");
+			cursor: url("theme-resources/abyssbox_cursor.png"), auto;
+			/*	--internal-file-page-symbol: url("theme-resources/icon-file.png");
+			--internal-edit-pencil-symbol: url("theme-resources/icon-edit.png");
+			--internal-preferences-gear-symbol: url("theme-resources/icon-preferences.png");
+			--instrument-copy-symbol: url("theme-resources/icon-copy.png");
+			--instrument-paste-symbol: url("theme-resources/icon-paste.png");
+			--internal-play-symbol: url("theme-resources/icon-play.png");
+			--internal-pause-symbol: url("theme-resources/icon-pause.png");
+			--internal-record-symbol: url("theme-resources/icon-record.png");
+			--internal-stop-symbol: url("theme-resources/icon-stop.png");
+			--internal-prev-bar-symbol: url("theme-resources/icon-prev.png");
+			--internal-next-bar-symbol: url("theme-resources/icon-next.png");
+			--internal-muted-symbol: url("theme-resources/icon-speakerMuted.png");
+			--internal-unmuted-symbol: url("theme-resources/icon-speaker.png");
+			--internal-volume-symbol: url("theme-resources/icon-speaker.png");
+			--internal-zoom-in-symbol: url("theme-resources/icon-zoomIn.png");
+			--internal-zoom-out-symbol: url("theme-resources/icon-zoomOut.png");
+			--internal-export-symbol: url("theme-resources/icon-export.png"); */
 			}
 			
 				@font-face {
 			   font-family: "AbyssType";
 			   src:
-				url("abysstype.otf") format("opentype") tech(color-COLRv1),
+				url("theme-resources/abysstype.otf") format("opentype") tech(color-COLRv1),
 				}
 	
 				/* sets background image */
 				body {
-				background-image: url("https://choptop84.github.io/abyssbox-source/website/stripesbg.gif") !important;
+				background-image: url("theme-resources/stripesbg.gif") !important;
 				background-position: center;
 				background-repeat: repeat;
 	
@@ -5951,12 +5951,8 @@ export class ColorConfig {
 				image-rendering: optimizeSpeed !important;             /* IE */
 					}
 	
-				/*#Hotdog {
-					content: url("abclassic_hotdog.png");
-				} */
-	
 				#text-content {
-						border-image-source: url("abyssbox_border.png");
+						border-image-source: url("theme-resources/abyssbox_border.png");
 						border-image-slice: 4 fill; 
 					   border-image-width: 8px; 
 					border-image-repeat: stretch; 
@@ -5969,7 +5965,7 @@ export class ColorConfig {
 						image-rendering: optimizeSpeed !important;             /* IE */
 					}
 				#beepboxEditorContainer {
-						border-image-source: url("abyssbox_border.png");
+						border-image-source: url("theme-resources/abyssbox_border.png");
 						border-image-slice: 4 fill; 
 					   border-image-width: 8px; 
 					border-image-repeat: stretch;
@@ -5994,7 +5990,7 @@ export class ColorConfig {
 				button.importInstrumentButton, 
 				.beepboxEditor select, 
 				.beepboxEditor .select2-selection__rendered {
-						border-image-source: url("abyssbox_border.png") !important;
+						border-image-source: url("theme-resources/abyssbox_border.png") !important;
 						border-image-slice: 4 fill !important; 
 					   border-image-width: 4px !important; 
 					border-image-repeat: stretch !important;
@@ -6006,7 +6002,7 @@ export class ColorConfig {
 						image-rendering: pixelated !important;                 /* Future browsers */
 						image-rendering: optimizeSpeed !important;             /* IE */
 	
-						cursor: url("abyssbox_cursor_hand.png"), pointer !important;
+						cursor: url("theme-resources/abyssbox_cursor_hand.png"), pointer !important;
 					}
 	
 				div.selectRow button:not(.copyButton,.pasteButton,.exportInstrumentButton,.importInstrumentButton) {
@@ -6021,7 +6017,7 @@ export class ColorConfig {
 				@font-face {
 			   font-family: "AbyssType_small";
 			   src:
-				url("abysstype_small.otf") format("opentype") tech(color-COLRv1),
+				url("theme-resources/abysstype_small.otf") format("opentype") tech(color-COLRv1),
 				}
 	
 				html {
@@ -6034,72 +6030,72 @@ export class ColorConfig {
 	
 				.beepboxEditor input[type="range"]::-webkit-slider-thumb
 				{
-					cursor: url("abyssbox_cursor_hand.png"), pointer !important;
+					cursor: url("theme-resources/abyssbox_cursor_hand.png"), pointer !important;
 				}
 				 
 				.beepboxEditor input[type="range"]::-webkit-slider-runnable-track
 				{
-					cursor: url("abyssbox_cursor_hand.png"), pointer !important;
+					cursor: url("theme-resources/abyssbox_cursor_hand.png"), pointer !important;
 				}
 				 
 				.beepboxEditor input[type="range"]:focus::-webkit-slider-runnable-track
 				{
-					cursor: url("abyssbox_cursor_hand.png"), pointer !important;
+					cursor: url("theme-resources/abyssbox_cursor_hand.png"), pointer !important;
 				}
 				 
 				.beepboxEditor input[type="range"]::-ms-thumb
 				{
-					cursor: url("abyssbox_cursor_hand.png"), pointer !important;
+					cursor: url("theme-resources/abyssbox_cursor_hand.png"), pointer !important;
 				}
 				 
 				.beepboxEditor input[type="range"]::-ms-track
 				{
-					cursor: url("abyssbox_cursor_hand.png"), pointer !important;
+					cursor: url("theme-resources/abyssbox_cursor_hand.png"), pointer !important;
 				}
 				 
 				.beepboxEditor input[type="range"]:focus::-ms-track
 				{
-					cursor: url("abyssbox_cursor_hand.png"), pointer !important;
+					cursor: url("theme-resources/abyssbox_cursor_hand.png"), pointer !important;
 				}
 				 
 				.beepboxEditor input[type="range"]::-moz-range-thumb
 				{
-					cursor: url("abyssbox_cursor_hand.png"), pointer !important;
+					cursor: url("theme-resources/abyssbox_cursor_hand.png"), pointer !important;
 				}
 				 
 				.beepboxEditor input[type="range"]::-moz-range-track
 				{
-					cursor: url("abyssbox_cursor_hand.png"), pointer !important;
+					cursor: url("theme-resources/abyssbox_cursor_hand.png"), pointer !important;
 				}
 				 
 				.beepboxEditor input[type="range"]:focus::-moz-range-track
 				{
-					cursor: url("abyssbox_cursor_hand.png"), pointer !important;
+					cursor: url("theme-resources/abyssbox_cursor_hand.png"), pointer !important;
 				}
 				 
 				.beepboxEditor input[type="text"],
 				.beepboxEditor input[type="number"]
 				{
-					cursor: url("abyssbox_cursor_hand.png"), pointer !important;
+					cursor: url("theme-resources/abyssbox_cursor_hand.png"), pointer !important;
 				}
 				 
 				.beepboxEditor input[type="checkbox"]
 				{
-					cursor: url("abyssbox_cursor_hand.png"), pointer !important;
+					cursor: url("theme-resources/abyssbox_cursor_hand.png"), pointer !important;
 				}
 				 
 				.beepboxEditor input[type="checkbox"]:checked
 				{
-					cursor: url("abyssbox_cursor_hand.png"), pointer !important;
+					cursor: url("theme-resources/abyssbox_cursor_hand.png"), pointer !important;
 				}
 				 
 				.beepboxEditor input[type="checkbox"]:checked:after
 				{
-					cursor: url("abyssbox_cursor_hand.png"), pointer !important;
+					cursor: url("theme-resources/abyssbox_cursor_hand.png"), pointer !important;
 				}
 	
 				div.selectRow span {
-					cursor: url("abyssbox_cursor_hand.png"), pointer !important;
+					cursor: url("theme-resources/abyssbox_cursor_hand.png"), pointer !important;
 				}
 	
 				`,
@@ -6232,7 +6228,7 @@ export class ColorConfig {
 					}
 					/* sets background image */
 					body {
-					background-image: url("https://choptop84.github.io/abyssbox-source/website/stripesbg_light.gif") !important;
+					background-image: url("theme-resources/stripesbg_light.gif") !important;
 					background-position: center;
 					background-repeat: repeat;
 		
@@ -6243,7 +6239,7 @@ export class ColorConfig {
 					image-rendering: optimizeSpeed !important;             /* IE */
 						}		
 				#text-content {
-						border-image-source: url("https://choptop84.github.io/abyssbox-source/website/abyssbox_border_light.png");
+						border-image-source: url("theme-resources/abyssbox_border_light.png");
 						border-image-slice: 4 fill; 
 					   border-image-width: 8px; 
 					border-image-repeat: stretch; 
@@ -6256,7 +6252,7 @@ export class ColorConfig {
 						image-rendering: optimizeSpeed !important;             /* IE */
 					}
 				#beepboxEditorContainer {
-						border-image-source: url("https://choptop84.github.io/abyssbox-source/website/abyssbox_border_light.png");
+						border-image-source: url("theme-resources/abyssbox_border_light.png");
 						border-image-slice: 4 fill; 
 					   border-image-width: 8px; 
 					border-image-repeat: stretch;
@@ -6281,7 +6277,7 @@ export class ColorConfig {
 					button.importInstrumentButton, 
 					.beepboxEditor select, 
 					.beepboxEditor .select2-selection__rendered {
-							border-image-source: url("abyssbox_border_light.png") !important;
+							border-image-source: url("theme-resources/abyssbox_border_light.png") !important;
 							border-image-slice: 4 fill !important; 
 						   border-image-width: 4px !important; 
 						border-image-repeat: stretch !important;
@@ -6293,7 +6289,7 @@ export class ColorConfig {
 							image-rendering: pixelated !important;                 /* Future browsers */
 							image-rendering: optimizeSpeed !important;             /* IE */
 		
-							cursor: url("abyssbox_cursor_hand.png"), pointer !important;
+							cursor: url("theme-resources/abyssbox_cursor_hand.png"), pointer !important;
 						}
 		
 					div.selectRow button:not(.copyButton,.pasteButton,.exportInstrumentButton,.importInstrumentButton) {
@@ -6307,35 +6303,35 @@ export class ColorConfig {
 	
 			/* sets cursor */ 
 			* {
-			cursor: url("abyssbox_cursor.png"), auto !important;
-			--file-page-symbol: url("icon-file.png");
-			--edit-pencil-symbol: url("icon-edit.png");
-			--preferences-gear-symbol: url("icon-preferences.png");
-			--instrument-copy-symbol: url("icon-copy.png");
-			--instrument-paste-symbol: url("icon-paste.png");
-			--play-symbol: url("icon-play.png");
-			--pause-symbol: url("icon-pause.png");
-			--record-symbol: url("icon-record.png");
-			--stop-symbol: url("icon-stop.png");
-			--prev-bar-symbol: url("icon-prev.png");
-			--next-bar-symbol: url("icon-next.png");
-			--muted-symbol: url("icon-speakerMuted.png");
-			--unmuted-symbol: url("icon-speaker.png");
-			--volume-symbol: url("icon-speaker.png");
-			--zoom-in-symbol: url("icon-zoomIn.png");
-			--zoom-out-symbol: url("icon-zoomOut.png");
-			--export-symbol: url("icon-export.png");
+			cursor: url("theme-resources/abyssbox_cursor.png"), auto !important;
+		/*	--internal-file-page-symbol: url("theme-resources/icon-file.png");
+			--internal-edit-pencil-symbol: url("theme-resources/icon-edit.png");
+			--internal-preferences-gear-symbol: url("theme-resources/icon-preferences.png");
+			--instrument-copy-symbol: url("theme-resources/icon-copy.png");
+			--instrument-paste-symbol: url("theme-resources/icon-paste.png");
+			--internal-play-symbol: url("theme-resources/icon-play.png");
+			--internal-pause-symbol: url("theme-resources/icon-pause.png");
+			--internal-record-symbol: url("theme-resources/icon-record.png");
+			--internal-stop-symbol: url("theme-resources/icon-stop.png");
+			--internal-prev-bar-symbol: url("theme-resources/icon-prev.png");
+			--internal-next-bar-symbol: url("theme-resources/icon-next.png");
+			--internal-muted-symbol: url("theme-resources/icon-speakerMuted.png");
+			--internal-unmuted-symbol: url("theme-resources/icon-speaker.png");
+			--internal-volume-symbol: url("theme-resources/icon-speaker.png");
+			--internal-zoom-in-symbol: url("theme-resources/icon-zoomIn.png");
+			--internal-zoom-out-symbol: url("theme-resources/icon-zoomOut.png");
+			--internal-export-symbol: url("theme-resources/icon-export.png"); */
 			}
 				@font-face {
 			   font-family: "AbyssType";
 			   src:
-				url("abysstype.otf") format("opentype") tech(color-COLRv1),
+				url("theme-resources/abysstype.otf") format("opentype") tech(color-COLRv1),
 				}
 	
 				@font-face {
 			   font-family: "AbyssType_small";
 			   src:
-				url("abysstype_small.otf") format("opentype") tech(color-COLRv1),
+				url("theme-resources/abysstype_small.otf") format("opentype") tech(color-COLRv1),
 				}
 	
 				html {
@@ -6347,72 +6343,72 @@ export class ColorConfig {
 	
 				.beepboxEditor input[type="range"]::-webkit-slider-thumb
 				{
-					cursor: url("abyssbox_cursor_hand.png"), pointer !important;
+					cursor: url("theme-resources/abyssbox_cursor_hand.png"), pointer !important;
 				}
 				 
 				.beepboxEditor input[type="range"]::-webkit-slider-runnable-track
 				{
-					cursor: url("abyssbox_cursor_hand.png"), pointer !important;
+					cursor: url("theme-resources/abyssbox_cursor_hand.png"), pointer !important;
 				}
 				 
 				.beepboxEditor input[type="range"]:focus::-webkit-slider-runnable-track
 				{
-					cursor: url("abyssbox_cursor_hand.png"), pointer !important;
+					cursor: url("theme-resources/abyssbox_cursor_hand.png"), pointer !important;
 				}
 				 
 				.beepboxEditor input[type="range"]::-ms-thumb
 				{
-					cursor: url("abyssbox_cursor_hand.png"), pointer !important;
+					cursor: url("theme-resources/abyssbox_cursor_hand.png"), pointer !important;
 				}
 				 
 				.beepboxEditor input[type="range"]::-ms-track
 				{
-					cursor: url("abyssbox_cursor_hand.png"), pointer !important;
+					cursor: url("theme-resources/abyssbox_cursor_hand.png"), pointer !important;
 				}
 				 
 				.beepboxEditor input[type="range"]:focus::-ms-track
 				{
-					cursor: url("abyssbox_cursor_hand.png"), pointer !important;
+					cursor: url("theme-resources/abyssbox_cursor_hand.png"), pointer !important;
 				}
 				 
 				.beepboxEditor input[type="range"]::-moz-range-thumb
 				{
-					cursor: url("abyssbox_cursor_hand.png"), pointer !important;
+					cursor: url("theme-resources/abyssbox_cursor_hand.png"), pointer !important;
 				}
 				 
 				.beepboxEditor input[type="range"]::-moz-range-track
 				{
-					cursor: url("abyssbox_cursor_hand.png"), pointer !important;
+					cursor: url("theme-resources/abyssbox_cursor_hand.png"), pointer !important;
 				}
 				 
 				.beepboxEditor input[type="range"]:focus::-moz-range-track
 				{
-					cursor: url("abyssbox_cursor_hand.png"), pointer !important;
+					cursor: url("theme-resources/abyssbox_cursor_hand.png"), pointer !important;
 				}
 				 
 				.beepboxEditor input[type="text"],
 				.beepboxEditor input[type="number"]
 				{
-					cursor: url("abyssbox_cursor_hand.png"), pointer !important;
+					cursor: url("theme-resources/abyssbox_cursor_hand.png"), pointer !important;
 				}
 				 
 				.beepboxEditor input[type="checkbox"]
 				{
-					cursor: url("abyssbox_cursor_hand.png"), pointer !important;
+					cursor: url("theme-resources/abyssbox_cursor_hand.png"), pointer !important;
 				}
 				 
 				.beepboxEditor input[type="checkbox"]:checked
 				{
-					cursor: url("abyssbox_cursor_hand.png"), pointer !important;
+					cursor: url("theme-resources/abyssbox_cursor_hand.png"), pointer !important;
 				}
 				 
 				.beepboxEditor input[type="checkbox"]:checked:after
 				{
-					cursor: url("abyssbox_cursor_hand.png"), pointer !important;
+					cursor: url("theme-resources/abyssbox_cursor_hand.png"), pointer !important;
 				}
 	
 				div.selectRow span {
-					cursor: url("abyssbox_cursor_hand.png"), pointer !important;
+					cursor: url("theme-resources/abyssbox_cursor_hand.png"), pointer !important;
 				}
 	
 				`,
@@ -6539,18 +6535,18 @@ export class ColorConfig {
 		}
 		.instructions-column > section:first-of-type > p:first-of-type:after {
 		display: block;
-		content: url("UltraboxAzurLaneThemeStarterSquad.png");
+		content: url("theme-resources/UltraboxAzurLaneThemeStarterSquad.png");
 		width: 100%;
 		text-align: center;
 		margin-top: 25px;
 		}
 		/* sets cursor */
 		* {
-		cursor: url("UltraBoxAzurLaneThemeMouse.png"), auto !important;
+		cursor: url("theme-resources/UltraBoxAzurLaneThemeMouse.png"), auto !important;
 		}
 		/* sets background image */
 		body {
-		background-image: url("UltraBoxAzurLaneThemeMemoryTaskBackground.png") !important;
+		background-image: url("theme-resources/UltraBoxAzurLaneThemeMemoryTaskBackground.png") !important;
 		background-size: cover;
 		background-position: center;
 		background-repeat: no-repeat;
@@ -6564,7 +6560,7 @@ export class ColorConfig {
 		}
 		#text-content > section > h1 {
 		margin: auto;
-		content: url("UltraBoxALThemeLogo.png");
+		content: url("theme-resources/UltraBoxALThemeLogo.png");
 		}
 	}`,
 			  "custom": `${localStorage.getItem("customColors") || `:root {

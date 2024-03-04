@@ -27,6 +27,7 @@
 !/offline/resources/neutralino.d.ts
 !/offline/resources/jquery-3.4.1.min.js
 !/offline/resources/select2.min.js
+/offline/resources/theme_resources/
 
 /offline/resources/player/*
 !/offline/resources/player/index.html

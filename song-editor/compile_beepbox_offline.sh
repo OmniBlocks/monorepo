@@ -22,11 +22,7 @@ cp website/nintaribox_samples.js offline/resources/
 # cp website/404.html offline/resources/
 # cp website/credits.html offline/resources/
 
-cp website/UltraBoxALThemeLogo.png offline/resources/
-cp website/UltraBoxAzurLaneThemeMemoryTaskBackground.png offline/resources/
-cp website/UltraBoxAzurLaneThemeMouse.png offline/resources/
-cp website/UltraboxAzurLaneThemeStarterSquad.png offline/resources/
-cp website/wackybox_cursor.png offline/resources/
+cp website/theme_resources/ offline/resources/ -r
 
 
 cp website/player/beepbox_player.min.js offline/resources/player

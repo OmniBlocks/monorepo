@@ -3839,10 +3839,10 @@ export class ColorConfig {
 			:root {
 				font: 20px/2 monospace;
 				--page-margin: #252525;
-				--editor-background: black;
+				--editor-background: #252525;
 				--hover-preview: white;
 				--playhead: white;
-				--primary-text: white;
+				--primary-text: #C8C8C8;
 				--secondary-text: #999;
 				--inverted-text: black;
 				--text-selection: rgba(119,68,255,0.99);
@@ -3956,6 +3956,10 @@ export class ColorConfig {
 					--mod-label-primary-text:   black;
 					--disabled-note-primary:    #999;
 					--disabled-note-secondary:  #666;
+				}
+
+				input {
+					background: black;
 				}
 
 				.beepboxEditor {

@@ -3590,7 +3590,7 @@ export class ColorConfig {
 		:root {
 				font: 16px/2 cursive;
 				--page-margin: #4667CE;
-				--editor-background: black;
+				--editor-background: #4667CE;
 				--hover-preview: white;
 				--playhead: white;
 				--primary-text: white;
@@ -3611,9 +3611,9 @@ export class ColorConfig {
 				--black-piano-key-text: #fff;
 					--use-color-formula: false;
 					--track-editor-bg-pitch: #444;
-					--track-editor-bg-pitch-dim: #333;
+					--track-editor-bg-pitch-dim: #444;
 					--track-editor-bg-noise: #444;
-					--track-editor-bg-noise-dim: #333;
+					--track-editor-bg-noise-dim: #444;
 					--track-editor-bg-mod: #234;
 					--track-editor-bg-mod-dim: #123;
 					--multiplicative-mod-slider: #456;
@@ -3709,6 +3709,23 @@ export class ColorConfig {
 					--disabled-note-primary:    #999;
 					--disabled-note-secondary:  #666;
 				}
+
+				span input, 
+				div.harmonics svg,
+				div.spectrum svg,
+				div.filterEditor svg,
+				div.fadeInOut svg,
+				div.loopEditor svg,
+				svg#firstImage,
+				div.trackContainer div.noSelection
+				{
+					background: black !important;
+				}
+
+				#text-content > section > h1 {
+					color: white;
+					}
+
 			`,
 			 "shitbox 2.0": `
 			:root {

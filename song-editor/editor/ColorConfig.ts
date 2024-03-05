@@ -3860,9 +3860,9 @@ export class ColorConfig {
 				--black-piano-key-text: #fff;
 					--use-color-formula: false;
 					--track-editor-bg-pitch: #444;
-					--track-editor-bg-pitch-dim: #333;
+					--track-editor-bg-pitch-dim: #444;
 					--track-editor-bg-noise: #444;
-					--track-editor-bg-noise-dim: #333;
+					--track-editor-bg-noise-dim: #444;
 					--track-editor-bg-mod: #234;
 					--track-editor-bg-mod-dim: #123;
 					--multiplicative-mod-slider: #456;
@@ -3962,8 +3962,25 @@ export class ColorConfig {
 					width: 8px !important;
 				  }
 
+				button.playButton {
+					width: 80px;
+				}
+				button.prevBarButton {
+					width: 40px;
+					left:-5px;
+				}
+				button.nextBarButton {
+					width: 40px;
+				}
+
 				span input, 
-				div.harmonics svg{
+				div.harmonics svg,
+				div.spectrum svg,
+				div.filterEditor svg,
+				div.fadeInOut svg,
+				div.loopEditor svg,
+				svg#firstImage 
+				{
 					background: black !important;
 				}
 
@@ -3973,6 +3990,7 @@ export class ColorConfig {
 
 				#text-content {
 					font-size: 32px;
+					line-height: 40px;
 				}
 
 				#text-content > section > h1 {

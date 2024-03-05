@@ -3848,7 +3848,7 @@ export class ColorConfig {
 				--text-selection: rgba(119,68,255,0.99);
 				--box-selection-fill: rgba(255,255,255,0.2);
 				--loop-accent: #74f;
-				--link-accent: #98f;
+				--link-accent: #945800;
 				--ui-widget-background: #444;
 				--ui-widget-focus: #777;
 				--pitch-background: #444;
@@ -3958,14 +3958,27 @@ export class ColorConfig {
 					--disabled-note-secondary:  #666;
 				}
 
-				input {
-					background: black;
+				.beepboxEditor input[type="range"]::-moz-range-thumb {
+					width: 8px !important;
+				  }
+
+				span input, 
+				div.harmonics svg{
+					background: black !important;
 				}
 
 				.beepboxEditor {
 					line-height: 1.25;
 				}
-			
+
+				#text-content {
+					font-size: 32px;
+				}
+
+				#text-content > section > h1 {
+					color: #C8C8C8;
+					}
+
 			`,
 			"nerdbox": `
 			:root {

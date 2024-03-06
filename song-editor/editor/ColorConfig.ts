@@ -3598,7 +3598,7 @@ export class ColorConfig {
 				--inverted-text: black;
 				--text-selection: rgba(119,68,255,0.99);
 				--box-selection-fill: rgba(255,255,255,0.2);
-				--loop-accent: #9900cc;
+				--loop-accent: #74f;
 				--link-accent: #98f;
 				--ui-widget-background: #444;
 				--ui-widget-focus: #777;
@@ -3722,9 +3722,13 @@ export class ColorConfig {
 					background: black !important;
 				}
 
+				input, textarea {
+					background-color: black !important;
+				}
+
 				#text-content > section > h1 {
 					color: white;
-					}
+				}
 
 			`,
 			 "shitbox 2.0": `

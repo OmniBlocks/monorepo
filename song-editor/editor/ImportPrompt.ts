@@ -20,21 +20,9 @@ export class ImportPrompt implements Prompt {
 			option({value: "auto"}, "Auto-detect mode (for json)"),
 			option({value: "BeepBox"}, "BeepBox"),
 			option({value: "ModBox"}, "ModBox"),
-	//  Would it be worth it?
-		//  option({value: "SandBox"}, "SandBox"),
 			option({value: "JummBox"}, "JummBox"),
 			option({value: "SynthBox"}, "SynthBox"),
-	//  @Mid - Of course I'd do this.
-		//  option({value: "MidBox"}, "Midbox"),
-	//  If/When it is possible...
-		//  option({value: "DogeBox2"}, "Dogebox2"),
-	//  For when it is ready.
-		//  option({value: "GoldBox"}, "GoldBox"),
 			option({value: "UltraBox"}, "UltraBox"),
-	//  For when it adds new features.
-		//  option({value: "AbyssBox"}, "AbyssBox"),
-	//  Commented out for now. Wait for more use.
-		//  option({value: "UNBox"}, "UNBox"),
 		);
 		
 		public readonly container: HTMLDivElement = div({class: "prompt noSelection", style: "width: 300px;"},

@@ -861,16 +861,16 @@ export class Config {
         { name: "Octatonic", realName: "octatonic", flags: [true, false, true, true, false, true, true, false, true, true, false, true] }, // Octatonic
         { name: "Hexatonic", realName: "hexatonic", flags: [true, false, false, true, true, false, false, true, true, false, false, true] }, // Hexatonic
         { name: "No Dabbing", realName: "no dabbing", flags:[true, true, false, true, true, true, true, true, true, false, true, false] },
-	    //Modbox
-	    { name: "Jacked Toad", realName: "jacked toad", flags: [true, false, true, true, false, true, true, true, true, false, true, true] },
-	    { name: "Dumb", realName: "Originally named, currently named, and will always be named 'dumb.'", flags: [true, false, false, false, false, true, true, true, true, false, false, true] },
+	//modbox
+	{ name: "Jacked Toad", realName: "jacked toad", flags: [true, false, true, true, false, true, true, true, true, false, true, true] },
+	{ name: "Dumb", realName: "Originally named, currently named, and will always be named 'dumb.'", flags: [true, false, false, false, false, true, true, true, true, false, false, true] },
         { name: "Test Scale", realName: "**t", flags: [true, true, false, false, false, true, true, false, false, true, true, false] },
-	    //Todbox
-	    { name: "die", realName: "death", flags: [true, false, false, false, false, false, false, false, true, false, false, false] },
-	    //Wackybox
-    //  { name: "Rythmic", realName: "Pretty straightforward.", flags: [true, false, false, false, false, false, false, false, false, false, false, false] },
-        //Rodbox
-	    { name: "Custom", realName: "custom", flags: [true, false, true, true, false, false, false, true, true, false, true, true] }, // Custom? considering allowing this one to be be completely configurable
+	// todbox
+	{ name: "die", realName: "death", flags: [true, false, false, false, false, false, false, false, true, false, false, false] },
+	//wackybox
+        // { name: "Rythmic", realName: "Pretty straightforward.", flags: [true, false, false, false, false, false, false, false, false, false, false, false] },
+        //todbox
+	{ name: "Custom", realName: "custom", flags: [true, false, true, true, false, false, false, true, true, false, true, true] }, // Custom? considering allowing this one to be be completely configurable
 	]);
 	public static readonly keys: DictionaryArray<Key> = toNameMap([
 		{ name: "C", isWhiteKey: true, basePitch: 12 }, // C0 has index 12 on the MIDI scale. C7 is 96, and C9 is 120. C10 is barely in the audible range.
@@ -885,15 +885,14 @@ export class Config {
 		{ name: "A", isWhiteKey: true, basePitch: 21 },
 		{ name: "A♯", isWhiteKey: false, basePitch: 22 },
         { name: "B", isWhiteKey: true, basePitch: 23 },
-	/*  { name: "C+", isWhiteKey: false, basePitch: 24 },
-		//Raken from todbox, called "B#" for some reason lol
-	    { name: "G- (actually F#-)", isWhiteKey: false, basePitch: 6 },
-        { name: "C-", isWhiteKey: true, basePitch: 0 },
-	    //Brucebox
-		//G- isn't actually G-???
-	    { name: "oh no (F-)", isWhiteKey: true, basePitch: 5 },
-		//Shitbox
-    */
+				// { name: "C+", isWhiteKey: false, basePitch: 24 },
+		//taken from todbox, called "B#" for some reason lol
+		// { name: "G- (actually F#-)", isWhiteKey: false, basePitch: 6 },
+        // { name: "C-", isWhiteKey: true, basePitch: 0 },
+	    //brucebox
+		//g- isn't actually g-???
+		// { name: "oh no (F-)", isWhiteKey: true, basePitch: 5 },
+		//shitbox
 	]);
 	public static readonly blackKeyNameParents: ReadonlyArray<number> = [-1, 1, -1, 1, -1, 1, -1, -1, 1, -1, 1, -1];
 	public static readonly tempoMin: number = 1;
@@ -1065,16 +1064,6 @@ export class Config {
 	{ name: "ultrabox shortened od guitar", expression: 0.5, samples: centerAndNormalizeWave([-0.82785,-0.67621,-0.40268,-0.43817,-0.45468,-0.22531,-0.18329,0.24750,0.71246,0.52155,0.56082,0.48395,0.33990,0.46957,0.27744,0.42313,0.47104,0.18796,0.12930,-0.13901,-0.07431,-0.16348,-0.74857,-0.73206,-0.35181,-0.26227,-0.41882,-0.27786,-0.19806,-0.19867,0.18643,0.24808,0.08847,-0.06964,0.06912,0.20474,-0.05304,0.29416,0.31967,0.14243,0.27521,-0.23932,-0.14752,0.12360,-0.26123,-0.26111,0.06616,0.26520,0.08090,0.15240,0.16254,-0.12061,0.04562,0.00131,0.04050,0.08182,-0.21729,-0.17041,-0.16312,-0.08563,0.06390,0.05099,0.05627,0.02728,0.00726,-0.13028,-0.05673,-0.14969,-0.17645,0.35492,0.16766,-0.00897,0.24326,-0.00461,-0.04456,0.01776,-0.04950,-0.01221,0.02039,0.07684,0.13397,0.39850,0.35962,0.13754,0.42310,0.27161,-0.17609,0.03659,0.10635,-0.21909,-0.22046,-0.20258,-0.40973,-0.40280,-0.40521,-0.66284]) },
 	//based off an old mp3 in #modded-beepbox where someone tried to shorten the overdrive guitar into the size of other chip waves 
 	//search "normie alert" in beepcord
-    /* Midbox. To be ported in the future.
-    { name: "midbox heavy saw", expression: 0.5, samples: centerWave([1.0, -1.0, 2.0, -1.0, 0.0, 3.0, 1.0, -1.0, 2.0, -1.0, 0.0, 0.0])},
-    { name: "midbox bass-y", expression: 0.3, samples: centerWave([1.0, -5.0, 4.0, -3.0,  7.0, -2.0, 3.0, -3.0, 6.0])},
-    { name: "midbox strange", expression: 0.175, samples: centerWave([1.0, 11.0, 1.0, -11.0, -1.0, -11.0, 4.0, -6.0, 9.0, -1.0, -7.0, 11.0, 2.0, -5.0, 9.0, 9.0, -10.0])},
-    { name: "midbox accurate sine", expression: 0.1, samples: centerWave([2, 7, 11, 14, 16, 18, 19, 20, 21, 22, 22, 23, 23, 23, 24, 24, 24, 24, 23, 23, 23, 22, 22, 21, 20, 19, 18, 16, 14, 11, 7, 2, -2, -7, -11, -14, -16, -18, -19, -20, -21, -22, -22, -23, -23, -23, -24, -24, -24, -24, -23, -23, -23, -22, -22, -21, -20, -19, -18, -16, -14, -11, -7, -2])},
-    { name: "midbox accurate triangle", expression: 0.1, samples: centerWave([1, 2, 4, 5, 7, 8, 10, 11, 13, 14, 16, 17, 19, 20, 22, 23, 23, 22, 20, 19, 17, 16, 14, 13, 11, 10, 8, 7, 5, 4, 2, 1, -1, -2, -4, -5, -7,-8, -10, -11, -13, -14, -16, -17, -19, -20, -22, -23, -23, -22, -20, -19, -17, -16, -14, -13, -11, -10, -8, -7, -5, -4, -2, -1])},
-    { name: "midbox secant",  expression: 0.1, samples: centerWave([23, 18, 13, 10, 8, 6, 5, 4, 3, 2, 2, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 2, 2, 3, 4, 5, 6, 8, 10, 13, 18, 23, -23, -18, -14, -10, -8, -6, -5, -4, -3, -2, -2, -1, -1, -1, 0, 0, 0, 0, -1, -1, -1, -2, -2, -3, -4, -5, -6, -8, -10, -14, -18, -23])},
-    { name: "midbox glitch 2", expression: 0.075, samples: centerWave([0, 24, 0, 24, 0, 24, 0, 24, 0, -24, 0, -24, 0, -24, 0, -24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -24, 0, -24, 0, -24, 0, -24, 0, 24, 0, 24, 0, 24, 0, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])},
-    { name: "midbox accurate trapezoid", expression: 0.1, samples: centerWave([1, 4, 7, 10, 13, 16, 19, 22, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 22, 19, 16, 13, 10, 7, 4, 1, -1, -4, -7, -10, -13, -16, -19, -22, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -24, -22, -19, -16, -13, -10, -7, -4, -1])}
-    */
 ]); 
 	public static chipWaves: DictionaryArray<ChipWave> = rawChipToIntegrated(Config.rawChipWaves);
 	public static rawRawChipWaves: DictionaryArray<ChipWave> = Config.rawChipWaves;
@@ -1102,14 +1091,6 @@ export class Config {
 		{ name: "pink", expression: 1.0, basePitch: 69, pitchFilterMult: 8.0, isSoft: true, samples: null },
 		{ name: "brownian", expression: 1.0, basePitch: 69, pitchFilterMult: 8.0, isSoft: true, samples: null },
 		//{ name: "doom random", expression: 1.0, basePitch: 84, pitchFilterMult: 1024.0, isSoft: false, samples: null },
-        /* These ones are from multiple old mods: Zefbox, Sandbox, and Modbox. To be ported in the future.
-        { name: "retro clang", expression: 1.0, basePitch: 69, pitchFilterMult: 1024.0, isSoft: false, samples: null },
-        { name: "chime", expression: 2, basePitch: 69, pitchFilterMult: 1.0, isSoft: true, samples: null },
-        { name: "harsh", expression: 10, basePitch: 69, pitchFilterMult: 1.0, isSoft: true, samples: null },
-        { name: "trill", expression: 1.0, basePitch: 69, pitchFilterMult: 1024.0, isSoft: true, samples: null },
-        { name: "detuned periodic", expression: 0.3, basePitch: 69, pitchFilterMult: 1024.0, isSoft: false, samples: null },
-        { name: "snare", expression: 1.0, basePitch: 69, pitchFilterMult: 1024.0, isSoft: false, samples: null },
-        */
 	]);
 	
     public static readonly filterFreqStep: number = 1.0 / 4.0;
@@ -1559,9 +1540,6 @@ export class Config {
 		{ name: "ramp", samples: generateSawWave(true) },
 		{ name: "trapezoid", samples: generateTrapezoidWave(2) },
 	    { name: "rounded", samples: generateRoundedSineWave() },
-        // Midbox. To be ported in the future.
-        //{ name: "secant", samples: generateSecantWave() },
-        // Other.
 		//{ name: "white noise", samples: generateWhiteNoiseFmWave() },
 		//{ name: "1-bit white noise", samples: generateOneBitWhiteNoiseFmWave() },
     ]);
@@ -1841,116 +1819,59 @@ export function getDrumWave(index: number, inverseRealFourierTransform: Function
                 }
                 drumBuffer = newBuffer;
             }
-		} else if (index == 10) {
-            for (let i = 0; i < Config.chipNoiseLength; i++) {
-                wave[i] = Math.round(Math.random());
-            }
-        } else if (index == 11) {
-            var drumBuffer = 1;
-            for (var i = 0; i < 32768; i++) {
-                wave[i] = Math.round((drumBuffer & 1));
-                var newBuffer = drumBuffer >> 1;
-                if (((drumBuffer + newBuffer) & 1) == 1) {
-                    newBuffer -= 10 << 2;
+		}
+					else if (index == 10) {
+                for (let i = 0; i < Config.chipNoiseLength; i++) {
+                    wave[i] = Math.round(Math.random());
                 }
-                drumBuffer = newBuffer;
             }
-        } else if (index == 12) {
-            for (let i = 0; i < Config.chipNoiseLength; i++) {
-                var ultraboxnewchipnoiserand = Math.random();
-				wave[i] = Math.pow(ultraboxnewchipnoiserand, Math.clz32(ultraboxnewchipnoiserand));
+			 else if (index == 11) {
+                var drumBuffer = 1;
+                for (var i = 0; i < 32768; i++) {
+                    wave[i] = Math.round((drumBuffer & 1));
+                    var newBuffer = drumBuffer >> 1;
+                    if (((drumBuffer + newBuffer) & 1) == 1) {
+                        newBuffer -= 10 << 2;
+                    }
+                    drumBuffer = newBuffer;
+                }
             }
-        } else if (index == 13) {
-			var b0 = 0, b1 = 0, b2 = 0, b3, b4, b5, b6;
-			b0 = b1 = b2 = b3 = b4 = b5 = b6 = 0.0;
+			else if (index == 12) {
+                for (let i = 0; i < Config.chipNoiseLength; i++) {
+                   var ultraboxnewchipnoiserand = Math.random();
+				   wave[i] = Math.pow(ultraboxnewchipnoiserand, Math.clz32(ultraboxnewchipnoiserand));
+                }
+            }
+			else if (index == 13) {
+				var b0 = 0, b1 = 0, b2 = 0, b3, b4, b5, b6;
+				b0 = b1 = b2 = b3 = b4 = b5 = b6 = 0.0;
 				
-			for (let i = 0; i < Config.chipNoiseLength; i++) {
-				var white = Math.random() * 2 - 1;
-				b0 = 0.99886 * b0 + white * 0.0555179;
-				b1 = 0.99332 * b1 + white * 0.0750759;
-				b2 = 0.96900 * b2 + white * 0.1538520;
-				b3 = 0.86650 * b3 + white * 0.3104856;
-				b4 = 0.55000 * b4 + white * 0.5329522;
-				b5 = -0.7616 * b5 - white * 0.0168980;
-				wave[i] = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
-				wave[i] *= 0.44;
-				b6 = white * 0.115926;
-				// from https://github.com/zacharydenton/noise.js, MIT license soooo
+				for (let i = 0; i < Config.chipNoiseLength; i++) {
+					var white = Math.random() * 2 - 1;
+					b0 = 0.99886 * b0 + white * 0.0555179;
+					b1 = 0.99332 * b1 + white * 0.0750759;
+					b2 = 0.96900 * b2 + white * 0.1538520;
+					b3 = 0.86650 * b3 + white * 0.3104856;
+					b4 = 0.55000 * b4 + white * 0.5329522;
+					b5 = -0.7616 * b5 - white * 0.0168980;
+					wave[i] = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
+					wave[i] *= 0.44;
+					b6 = white * 0.115926;
+					// from https://github.com/zacharydenton/noise.js, MIT license soooo
+                }
             }
-        } else if (index == 14) {
-			var lastOut = 0.0;
+			else if (index == 14) {
+				var lastOut = 0.0;
 				
-            for (let i = 0; i < Config.chipNoiseLength; i++) {
-				var white = Math.random() * 2 - 1;
-				wave[i] = (lastOut + (0.02 * white)) / 1.02;
-				lastOut = wave[i];
-				wave[i] *= 14;
-				// this is also from noise.js
-            }
-        }
-        // Underneath lies those noise types. May need to change the numbers when porting in case of new noise types.
-        /* else if (index == 15) {
-            // The "retro clang" noise type from Zefbox.
-            let drumBuffer: number = 1;
-            for (let i: number = 0; i < 32768; i++) {
-                wave[i] = (drumBuffer & 1) * 2.0 - 3.0;
-                let newBuffer: number = drumBuffer >> 1;
-                if (((drumBuffer + newBuffer) & 1) == 1) {
-                     newBuffer += 3 << 14;
+                for (let i = 0; i < Config.chipNoiseLength; i++) {
+					var white = Math.random() * 2 - 1;
+					wave[i] = (lastOut + (0.02 * white)) / 1.02;
+					lastOut = wave[i];
+					wave[i] *= 14;
+					// this is also from noise.js
                 }
-                drumBuffer = newBuffer;
             }
-        } else if (index == 16) {
-            // The "chime" noise type from Zefbox.
-            let drumBuffer: number = 1;
-            for (let i: number = 0; i < 32768; i++) {
-                wave[i] = (drumBuffer & 1) * 2.0 - 1.0;
-                let newBuffer: number = drumBuffer >> 1;
-                if (((drumBuffer + newBuffer) & 1) == 1) {
-                    newBuffer += 2 << 50;
-                }
-                drumBuffer = newBuffer;
-            }
-        } else if (index == 17) {
-            // The "harsh" noise type from Zefbox.
-            let drumBuffer: number = 1;
-            for (let i: number = 0; i < 32768; i++) {
-                wave[i] = (drumBuffer & 1) * 4.0 / 11;
-                let newBuffer: number = drumBuffer >> 1;
-                if (((drumBuffer + newBuffer) & 1) == 1) {
-                    newBuffer += 15 << 2;
-                }
-                drumBuffer = newBuffer;
-            } 
-        } else if (index == 18) {
-            // The "trill" noise type from Zefbox.
-            let drumBuffer: number = 1;
-            for (let i: number = 0; i < 32768; i++) {
-                wave[i] = (drumBuffer & 1) / 4.0 * Math.random();
-                let newBuffer: number = drumBuffer >> 2;
-                if (((drumBuffer + newBuffer) & 1) == 1) {
-                    newBuffer -= 4 << 2;
-                }
-                drumBuffer = newBuffer;
-            }
-        } else if (index == 19) {
-            // The "detuned periodic" noise type from Modbox.
-            let drumBuffer: number = 1;
-            for (let i: number = 0; i < 32767; i++) {
-                wave[i] = (drumBuffer & 1) * 2.0 - 1.0;
-                let newBuffer: number = drumBuffer >> 2;
-                if (((drumBuffer + newBuffer) & 1) == 1) {
-                    newBuffer += 4 << 14;
-                }
-                drumBuffer = newBuffer;
-            }
-        } else if (index == 20) {
-            // The "snare" noise type from Modbox.
-            for (let i: number = 0; i < 32768; i++) {
-                wave[i] = Math.random() * 2.0 - 1.0;
-            }
-        }
-		//	else if (index == 21) {
+		//	else if (index == 15) {
 		//		const doomRandArray = [0, 8, 109, 220, 222, 241, 149, 107, 75, 248, 254, 140, 16, 66 , 74, 21, 211, 47, 80, 242, 154, 27, 205, 128, 161, 89, 77, 36 , 95, 110, 85, 48, 212, 140, 211, 249, 22, 79, 200, 50, 28, 188 , 52, 140, 202, 120, 68, 145, 62, 70, 184, 190, 91, 197, 152, 224 , 149, 104, 25, 178, 252, 182, 202, 182, 141, 197, 4, 81, 181, 242 , 145, 42, 39, 227, 156, 198, 225, 193, 219, 93, 122, 175, 249, 0 , 175, 143, 70, 239, 46, 246, 163, 53, 163, 109, 168, 135, 2, 235 , 25, 92, 20, 145, 138, 77, 69, 166, 78, 176, 173, 212, 166, 113 , 94, 161, 41, 50, 239, 49, 111, 164, 70, 60, 2, 37, 171, 75 , 136, 156, 11, 56, 42, 146, 138, 229, 73, 146, 77, 61, 98, 196 , 135, 106, 63, 197, 195, 86, 96, 203, 113, 101, 170, 247, 181, 113 , 80, 250, 108, 7, 255, 237, 129, 226, 79, 107, 112, 166, 103, 241 , 24, 223, 239, 120, 198, 58, 60, 82, 128, 3, 184, 66, 143, 224 , 145, 224, 81, 206, 163, 45, 63, 90, 168, 114, 59, 33, 159, 95 , 28, 139, 123, 98, 125, 196, 15, 70, 194, 253, 54, 14, 109, 226 , 71, 17, 161, 93, 186, 87, 244, 138, 20, 52, 123, 251, 26, 36 , 17, 46, 52, 231, 232, 76, 31, 221, 84, 37, 216, 165, 212, 106 , 197, 242, 98, 43, 39, 175, 254, 145, 190, 84, 118, 222, 187, 136 , 120, 163, 236, 249];
 		//		const randomSeed = Math.floor(Math.random() * 256);
 		//		var amountOfLoops = 0;
@@ -1963,7 +1884,7 @@ export function getDrumWave(index: number, inverseRealFourierTransform: Function
 					//this sucks
 					//also the randomized starting point code I spent 5 minutes on does nothing (auditorily)
         //        }
-            //}*/
+            //}
 		
 		else {
 			throw new Error("Unrecognized drum index: " + index);
@@ -2071,16 +1992,6 @@ function generateSawWave(inverse: boolean = false): Float32Array {
         }
         return wave;
 	}
-
-    /* Midbox Secant FM Wave
-    function generateSecantWave() {
-        const wave: Float32Array = new Float32Array(Config.sineWaveLength + 1);
-        for (let i = 0; i < Config.sineWaveLength + 1; i++) {
-            wave[i] = 1 - (Math.sin((i / Config.sineWaveLength) * Math.PI * 2.0) % 2 + 2) % 2;
-        }
-        return wave;
-    }
-    */
 
 export function getArpeggioPitchIndex(pitchCount: number, useFastTwoNoteArp: boolean, arpeggio: number): number {
     let arpeggioPattern: ReadonlyArray<number> = Config.arpeggioPatterns[pitchCount - 1];

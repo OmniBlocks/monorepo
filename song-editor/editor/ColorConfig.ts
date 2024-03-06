@@ -3590,7 +3590,7 @@ export class ColorConfig {
 		:root {
 				font: 16px/2 cursive;
 				--page-margin: #4667CE;
-				--editor-background: black;
+				--editor-background: #4667CE;
 				--hover-preview: white;
 				--playhead: white;
 				--primary-text: white;
@@ -3598,7 +3598,7 @@ export class ColorConfig {
 				--inverted-text: black;
 				--text-selection: rgba(119,68,255,0.99);
 				--box-selection-fill: rgba(255,255,255,0.2);
-				--loop-accent: #9900cc;
+				--loop-accent: #74f;
 				--link-accent: #98f;
 				--ui-widget-background: #444;
 				--ui-widget-focus: #777;
@@ -3611,9 +3611,9 @@ export class ColorConfig {
 				--black-piano-key-text: #fff;
 					--use-color-formula: false;
 					--track-editor-bg-pitch: #444;
-					--track-editor-bg-pitch-dim: #333;
+					--track-editor-bg-pitch-dim: #444;
 					--track-editor-bg-noise: #444;
-					--track-editor-bg-noise-dim: #333;
+					--track-editor-bg-noise-dim: #444;
 					--track-editor-bg-mod: #234;
 					--track-editor-bg-mod-dim: #123;
 					--multiplicative-mod-slider: #456;
@@ -3709,6 +3709,27 @@ export class ColorConfig {
 					--disabled-note-primary:    #999;
 					--disabled-note-secondary:  #666;
 				}
+
+				span input, 
+				div.harmonics svg,
+				div.spectrum svg,
+				div.filterEditor svg,
+				div.fadeInOut svg,
+				div.loopEditor svg,
+				svg#firstImage,
+				div.trackContainer div.noSelection
+				{
+					background: black !important;
+				}
+
+				input, textarea {
+					background-color: black !important;
+				}
+
+				#text-content > section > h1 {
+					color: white;
+				}
+
 			`,
 			 "shitbox 2.0": `
 			:root {
@@ -3839,16 +3860,16 @@ export class ColorConfig {
 			:root {
 				font: 20px/2 monospace;
 				--page-margin: #252525;
-				--editor-background: black;
+				--editor-background: #252525;
 				--hover-preview: white;
 				--playhead: white;
-				--primary-text: white;
+				--primary-text: #C8C8C8;
 				--secondary-text: #999;
 				--inverted-text: black;
 				--text-selection: rgba(119,68,255,0.99);
 				--box-selection-fill: rgba(255,255,255,0.2);
 				--loop-accent: #74f;
-				--link-accent: #98f;
+				--link-accent: #945800;
 				--ui-widget-background: #444;
 				--ui-widget-focus: #777;
 				--pitch-background: #444;
@@ -3860,9 +3881,9 @@ export class ColorConfig {
 				--black-piano-key-text: #fff;
 					--use-color-formula: false;
 					--track-editor-bg-pitch: #444;
-					--track-editor-bg-pitch-dim: #333;
+					--track-editor-bg-pitch-dim: #444;
 					--track-editor-bg-noise: #444;
-					--track-editor-bg-noise-dim: #333;
+					--track-editor-bg-noise-dim: #444;
 					--track-editor-bg-mod: #234;
 					--track-editor-bg-mod-dim: #123;
 					--multiplicative-mod-slider: #456;
@@ -3958,10 +3979,45 @@ export class ColorConfig {
 					--disabled-note-secondary:  #666;
 				}
 
+				.beepboxEditor input[type="range"]::-moz-range-thumb {
+					width: 8px !important;
+				  }
+
+				button.playButton {
+					width: 80px;
+				}
+				button.prevBarButton {
+					width: 40px;
+					left:-5px;
+				}
+				button.nextBarButton {
+					width: 40px;
+				}
+
+				span input, 
+				div.harmonics svg,
+				div.spectrum svg,
+				div.filterEditor svg,
+				div.fadeInOut svg,
+				div.loopEditor svg,
+				svg#firstImage 
+				{
+					background: black !important;
+				}
+
 				.beepboxEditor {
 					line-height: 1.25;
 				}
-			
+
+				#text-content {
+					font-size: 32px;
+					line-height: 40px;
+				}
+
+				#text-content > section > h1 {
+					color: #C8C8C8;
+					}
+
 			`,
 			"nerdbox": `
 			:root {

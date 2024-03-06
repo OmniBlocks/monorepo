@@ -19,6 +19,8 @@ cp website/wario_samples.js offline/resources/
 cp website/mario_paintbox_samples.js offline/resources/
 cp website/nintaribox_samples.js offline/resources/
 
+cp website/hotdog.png offline/resources/
+
 # cp website/404.html offline/resources/
 # cp website/credits.html offline/resources/
 

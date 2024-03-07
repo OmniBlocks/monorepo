@@ -27,7 +27,8 @@ can set a width for example or what it should do in a flex box (eg. grow).
 }
 
 .title-field::placeholder {
-    color: $ui-white;
+    color: $menu-bar-foreground;
+    opacity: 0.8;
     font-weight: normal;
     font-size: .8rem;
     font-style: italic;

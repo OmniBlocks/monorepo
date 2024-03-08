@@ -3,7 +3,11 @@ import React from 'react';
 import ReactModal from 'react-modal';
 import Box from '../box/box.jsx';
 import {defineMessages, injectIntl, intlShape, FormattedMessage} from 'react-intl';
-import {isRendererSupported, isNewFunctionSupported} from '../../lib/tw-environment-support-prober.js';
+import {
+    isRendererSupported,
+    isNewFunctionSupported,
+    findIncompatibleUserscripts
+} from '../../lib/tw-environment-support-prober.js';
 
 import styles from './browser-modal.css';
 import unhappyBrowser from './unsupported-browser.svg';
@@ -20,6 +24,7 @@ const noop = () => {};
 
 const BrowserModal = ({intl, ...props}) => {
     const label = messages.label;
+    const incompatibleUserscripts = findIncompatibleUserscripts();
     return (
         <ReactModal
             isOpen
@@ -47,6 +52,16 @@ const BrowserModal = ({intl, ...props}) => {
                         <p>
                             {'Unable to compile JavaScript with new Function(). This is most likely caused by an overly-strict Content-Security-Policy. The CSP must include \'unsafe-eval\'.'}
                         </p>
+                    )}
+
+                    {incompatibleUserscripts.length > 0 && (
+                        <React.Fragment>
+                            {incompatibleUserscripts.map((message, index) => (
+                                <p key={index}>
+                                    {message}
+                                </p>
+                            ))}
+                        </React.Fragment>
                     )}
 
                     {!isRendererSupported() && (

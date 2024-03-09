@@ -20,6 +20,15 @@ const manifest = {
       "url": "arrows.css"
     }
   ],
+  "settings": [
+    {
+      "dynamic": true,
+      "name": "Insert new inputs after selected input",
+      "id": "InsertInputsAfter",
+      "type": "boolean",
+      "default": false
+    }
+  ],
   "tags": [
     "recommended"
   ],

@@ -2,6 +2,9 @@
 .scratchCategoryItemBubble::after {
   filter: brightness(0);
 }
+.blocklyNumPadButton {
+  color: black;
+}
 
 /* Compatibility */
 

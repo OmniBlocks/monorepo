@@ -8,6 +8,8 @@
     justify-content: flex-end;
     align-items: center;
     font-size: .8125rem;
+    padding: 0 0.5rem;
+    user-select: none;
 }
 
 .success {

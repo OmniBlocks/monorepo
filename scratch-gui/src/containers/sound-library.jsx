@@ -4,6 +4,7 @@ import React from 'react';
 import {defineMessages, injectIntl, intlShape} from 'react-intl';
 import VM from 'scratch-vm';
 import AudioEngine from 'scratch-audio';
+import SharedAudioContext from '../lib/audio/shared-audio-context';
 
 import LibraryComponent from '../components/library/library.jsx';
 
@@ -80,7 +81,7 @@ class SoundLibrary extends React.PureComponent {
             });
         }
 
-        this.audioEngine = new AudioEngine();
+        this.audioEngine = new AudioEngine(new SharedAudioContext());
         this.playingSoundPromise = null;
     }
     componentWillUnmount () {

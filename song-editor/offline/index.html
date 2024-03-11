@@ -167,7 +167,7 @@
 
             <p id="introduction">
                 This is the offline version of UltraBox.<br>
-                You can load samples by dropping them into the <code>samples</code> folder, and then inputting eg. <code>file-samples/sample1.wav</code>
+                You can load samples by dropping them into the <code>samples</code> folder, and then inputting eg. <code>file:samples/sample1.wav</code>
                 <br>You can also load samples from websites if you're connected to the internet.
             </p>
     </div>
@@ -175,6 +175,13 @@
     <script src="beepbox_editor.min.js"></script>
 
     <script type="text/javascript">
+        // (ignore the comments below)
+        // get local directory (if things are changed to where this is needed immediately, loading of beepbox_editor.min.js will have to be delayed)
+        // var localDirectoryURL;
+        //getDirname().then((response) => {
+        //    localDirectoryURL = response;
+        //}); 
+        
         // Randomize display of header
         // 1-in-23
         //I should rework this sometime (maybe add the midbox tips thingy?)

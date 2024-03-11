@@ -5717,7 +5717,11 @@ export class Song {
 
     private static _isProperUrl(string: string): boolean {
         try { 
-            return Boolean(string); 
+            if (OFFLINE) {
+                return Boolean(string); 
+            } else {
+                return Boolean(new URL(string)); 
+            }
         }
         catch(x){ 
             return false; 
@@ -5797,9 +5801,13 @@ export class Song {
             }
         }
 
-        let parsedUrl: string | null = null;
+        let parsedUrl: URL | string | null = null;
         if (Song._isProperUrl(urlSliced)) {
-            parsedUrl = urlSliced;
+            if (OFFLINE) {
+                parsedUrl = urlSliced;
+            } else {
+                parsedUrl = new URL(urlSliced);
+            }
         }
         else {
             alert(url + " is not a valid url");
@@ -5811,13 +5819,21 @@ export class Song {
                 if (url.indexOf("@") != -1) {
                     //urlSliced = url.slice(url.indexOf("@"), url.indexOf("@"));
                     urlSliced = url.replaceAll("@", "")
-                    parsedUrl = urlSliced;
+                    if (OFFLINE) {
+                        parsedUrl = urlSliced;
+                    } else {
+                        parsedUrl = new URL(urlSliced);
+                    }
                     isCustomPercussive = true;	
                 }	
 
                 function sliceForSampleRate() {
                     urlSliced = url.slice(0, url.indexOf(","));
-                    parsedUrl = urlSliced;
+                    if (OFFLINE) {
+                        parsedUrl = urlSliced;
+                    } else {
+                        parsedUrl = new URL(urlSliced);
+                    }
                     customSampleRate = clamp(8000, 96000 + 1, parseFloatWithDefault(url.slice(url.indexOf(",") + 1), 44100));
                     //should this be parseFloat or parseInt?
                     //ig floats let you do decimals and such, but idk where that would be useful
@@ -5825,7 +5841,11 @@ export class Song {
 
                 function sliceForRootKey() {
                     urlSliced = url.slice(0, url.indexOf("!"));
-                    parsedUrl = urlSliced;
+                    if (OFFLINE) {
+                        parsedUrl = urlSliced;
+                    } else {
+                        parsedUrl = new URL(urlSliced);
+                    }
                     customRootKey = parseFloatWithDefault(url.slice(url.indexOf("!") + 1), 60);
                 }
 
@@ -5876,7 +5896,14 @@ export class Song {
             // @TODO: If for whatever inexplicable reason someone
             // uses an url like `https://example.com`, this will
             // result in an empty name here.
-            const name: string = decodeURIComponent(parsedUrl.replace(/^([^\/]*\/)+/, ""));
+            let name: string;
+            if (OFFLINE) {
+                //@ts-ignore
+                name = decodeURIComponent(parsedUrl.replace(/^([^\/]*\/)+/, ""));
+            } else {
+                //@ts-ignore
+                name = decodeURIComponent(parsedUrl.pathname.replace(/^([^\/]*\/)+/, ""));
+            }
             // @TODO: What to do about samples with the same name?
             // The problem with using the url is that the name is
             // user-facing and long names break assumptions of the

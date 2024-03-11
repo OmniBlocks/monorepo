@@ -5717,7 +5717,7 @@ export class Song {
 
     private static _isProperUrl(string: string): boolean {
         try { 
-            return Boolean(new URL(string)); 
+            return Boolean(string); 
         }
         catch(x){ 
             return false; 
@@ -5797,9 +5797,9 @@ export class Song {
             }
         }
 
-        let parsedUrl: URL | null = null;
+        let parsedUrl: string | null = null;
         if (Song._isProperUrl(urlSliced)) {
-            parsedUrl = new URL(urlSliced);
+            parsedUrl = urlSliced;
         }
         else {
             alert(url + " is not a valid url");
@@ -5811,13 +5811,13 @@ export class Song {
                 if (url.indexOf("@") != -1) {
                     //urlSliced = url.slice(url.indexOf("@"), url.indexOf("@"));
                     urlSliced = url.replaceAll("@", "")
-                    parsedUrl = new URL(urlSliced);
+                    parsedUrl = urlSliced;
                     isCustomPercussive = true;	
                 }	
 
                 function sliceForSampleRate() {
                     urlSliced = url.slice(0, url.indexOf(","));
-                    parsedUrl = new URL(urlSliced);
+                    parsedUrl = urlSliced;
                     customSampleRate = clamp(8000, 96000 + 1, parseFloatWithDefault(url.slice(url.indexOf(",") + 1), 44100));
                     //should this be parseFloat or parseInt?
                     //ig floats let you do decimals and such, but idk where that would be useful
@@ -5825,7 +5825,7 @@ export class Song {
 
                 function sliceForRootKey() {
                     urlSliced = url.slice(0, url.indexOf("!"));
-                    parsedUrl = new URL(urlSliced);
+                    parsedUrl = urlSliced;
                     customRootKey = parseFloatWithDefault(url.slice(url.indexOf("!") + 1), 60);
                 }
 
@@ -5876,7 +5876,7 @@ export class Song {
             // @TODO: If for whatever inexplicable reason someone
             // uses an url like `https://example.com`, this will
             // result in an empty name here.
-            const name: string = decodeURIComponent(parsedUrl.pathname.replace(/^([^\/]*\/)+/, ""));
+            const name: string = decodeURIComponent(parsedUrl.replace(/^([^\/]*\/)+/, ""));
             // @TODO: What to do about samples with the same name?
             // The problem with using the url is that the name is
             // user-facing and long names break assumptions of the

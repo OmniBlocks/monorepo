@@ -2,6 +2,7 @@
 .DS_Store
 .vs
 /node_modules
+offline/node_modules
 /website/**/beepbox*.js
 /website/**/beepbox*.js.map
 /website/beepbox_offline.html
@@ -16,31 +17,18 @@
 /**/*.html.bak
 /build
 
-# Offline resources
-/offline/resources/*.js
-/offline/resources/*.min.js
-/offline/resources/*.html
-/offline/resources/*.png
-/offline/resources/theme_resources/
-
-!/offline/resources/icons
-!/offline/resources/index.html
-!/offline/resources/main.js
-!/offline/resources/neutralino.d.ts
-!/offline/resources/jquery-3.4.1.min.js
-!/offline/resources/select2.min.js
-
-/offline/resources/player/*
-!/offline/resources/player/index.html
-
-/offline/resources/samples/*
-
-/offline/.tmp
-
-# Neutralinojs binaries and builds
-/offline/bin
-/offline/dist
-
-# Neutralinojs related files
-.storage
-*.log
+/offline/*.js
+/offline/*.png
+!/offline/index.html
+!/offline/main.js
+!/offline/jquery-3.4.1.min.js
+!/offline/select2.min.js
+!/offline/select2.min.css
+!/offline/icon.png
+!/offline/icon.ico
+!/offline/*.json
+!/offline/*.woff2
+/offline/theme_resources/*
+/offline/player/*
+!/offline/player/index.html
+/offline/ultrabox.offline*

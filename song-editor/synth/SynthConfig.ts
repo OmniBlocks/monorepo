@@ -336,8 +336,8 @@ export function startLoadingSample(url: string, chipWaveIndex: number, presetSet
     const chipWave = Config.chipWaves[chipWaveIndex];
     const rawChipWave = Config.rawChipWaves[chipWaveIndex];
     const rawRawChipWave = Config.rawRawChipWaves[chipWaveIndex];
-    // UB Offline local sample uploading (theoretically could have other uses as well)
-    if (url.slice(0, 5) === "file:") url = "http://" + window.location.host + "/" + url.slice(5);
+    // should this use path.join() instead?
+    // if (url.slice(0, 5) === "file:") url = String(__dirname) + url.slice(5);
     fetch(url).then((response) => {
 	if (!response.ok) {
 	    // @TODO: Be specific with the error handling.

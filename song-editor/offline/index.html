@@ -170,17 +170,18 @@
                 You can load samples by dropping them into the <code>samples</code> folder, and then inputting eg. <code>file:samples/sample1.wav</code>
                 <br>You can also load samples from websites if you're connected to the internet.
             </p>
-
-            <p id="autoupdater">
-                Click <button onclick="enableAutoUpdater()">here</button> to re-enable the auto-updater.
-            </p>
     </div>
 
-    <script src="/neutralino.js"></script>
-    <script src="/main.js"></script>
     <script src="beepbox_editor.min.js"></script>
 
     <script type="text/javascript">
+        // (ignore the comments below)
+        // get local directory (if things are changed to where this is needed immediately, loading of beepbox_editor.min.js will have to be delayed)
+        // var localDirectoryURL;
+        //getDirname().then((response) => {
+        //    localDirectoryURL = response;
+        //}); 
+        
         // Randomize display of header
         // 1-in-23
         //I should rework this sometime (maybe add the midbox tips thingy?)
@@ -269,17 +270,6 @@
                     document.getElementById("goldboxPlant").innerHTML = "  🍟";
                     break;
             }
-        }
-
-        if (window.localStorage.getItem("ignoreAutoUpdate") == "true") {
-            document.getElementById("autoupdater").style.display = "inline";  
-        } else {
-            document.getElementById("autoupdater").style.display = "none";
-        }
-
-        function enableAutoUpdater() {
-            window.localStorage.setItem("ignoreAutoUpdate", "false");
-            location.reload();
         }
     </script>
 </body>

@@ -336,8 +336,18 @@ export function startLoadingSample(url: string, chipWaveIndex: number, presetSet
     const chipWave = Config.chipWaves[chipWaveIndex];
     const rawChipWave = Config.rawChipWaves[chipWaveIndex];
     const rawRawChipWave = Config.rawRawChipWaves[chipWaveIndex];
-    // UB Offline local sample uploading (theoretically could have other uses as well)
-    if (url.slice(0, 5) === "file:") url = "http://" + window.location.host + "/" + url.slice(5);
+    if (OFFLINE) {
+        if (url.slice(0, 5) === "file:") {
+            let localDirectoryURL;
+            //@ts-ignore
+            getDirname().then((response) => {
+                localDirectoryURL = response;
+            //@ts-ignore
+            }).then(pathJoin(localDirectoryURL, url.slice(5)).then((response) => {
+                url = response;
+            }));
+        }
+    }
     fetch(url).then((response) => {
 	if (!response.ok) {
 	    // @TODO: Be specific with the error handling.
@@ -393,6 +403,7 @@ export function getLocalStorageItem<T>(key: string, defaultValue: T): T | string
 // @HACK: This just assumes these exist, regardless of whether they actually do
 // or not.
 declare global {
+    const OFFLINE: boolean; // for UB offline
     const kicksample: number[];
     const snaresample: number[];
     const pianosample: number[];

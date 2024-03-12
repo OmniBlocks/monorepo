@@ -42,7 +42,6 @@ additional dependencies if they are not picked up automatically.
 npm install select2
 npm install @types/select2
 npm install @types/jquery
-npm install @neutralinojs/neu
 ```
 
 ## Code
@@ -97,5 +96,12 @@ npm run build-offline
 After building, you can then enter the following to run it for testing purposes:
 ```
 cd offline
-npx @neutralinojs/neu run
+npm run start
 ```
+
+And to package, run (do ```npm run package-host``` for your host platform; you may need to run git bash as an administrator for non-host platforms):
+```
+cd offline
+npm run package
+```
+<!-- also something about installing electron and electron-packager as well -->

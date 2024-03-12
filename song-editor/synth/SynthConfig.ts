@@ -323,7 +323,7 @@ export class SampleLoadEvents extends EventTarget {
 
 export const sampleLoadEvents: SampleLoadEvents = new SampleLoadEvents();
 
-export function startLoadingSample(url: string, chipWaveIndex: number, presetSettings: Dictionary<any>, rawLoopOptions: any, customSampleRate: number): void {
+export async function startLoadingSample(url: string, chipWaveIndex: number, presetSettings: Dictionary<any>, rawLoopOptions: any, customSampleRate: number): Promise<void> {
     // @TODO: Make parts of the code that expect everything to already be
     // in memory work correctly.
     // It would be easy to only instantiate `SongEditor` and company after
@@ -338,14 +338,9 @@ export function startLoadingSample(url: string, chipWaveIndex: number, presetSet
     const rawRawChipWave = Config.rawRawChipWaves[chipWaveIndex];
     if (OFFLINE) {
         if (url.slice(0, 5) === "file:") {
-            let localDirectoryURL;
-            //@ts-ignore
-            getDirname().then((response) => {
-                localDirectoryURL = response;
-            //@ts-ignore
-            }).then(pathJoin(localDirectoryURL, url.slice(5)).then((response) => {
-                url = response;
-            }));
+            const dirname = await getDirname();
+            const joined = await pathJoin(dirname, url.slice(5));
+            url = joined;
         }
     }
     fetch(url).then((response) => {
@@ -404,6 +399,8 @@ export function getLocalStorageItem<T>(key: string, defaultValue: T): T | string
 // or not.
 declare global {
     const OFFLINE: boolean; // for UB offline
+    const getDirname: () => Promise<string>; // for UB offline
+    const pathJoin: (...parts: string[]) => Promise<string>; // for UB offline
     const kicksample: number[];
     const snaresample: number[];
     const pianosample: number[];

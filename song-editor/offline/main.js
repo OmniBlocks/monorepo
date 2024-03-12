@@ -17,8 +17,8 @@ const createWindow = () => {
 	win.loadFile('index.html');
 	win.removeMenu();
 	win.maximize();
-	// Uncommenting the line below opens the dev tools
-	// win.webContents.openDevTools();
+	// The line below opens the dev tools
+	if (!app.isPackaged) win.webContents.openDevTools();
 }
 
 // Menu.setApplicationMenu(mainMenu);
@@ -39,5 +39,6 @@ app.on('window-all-closed', () => {
 	}
 })
 
-ipcMain.handle("getDirname", () => path.dirname(process.execPath));
-ipcMain.handle("pathJoin", () => path.join());
+// ipcMain.handle("getDirname", () => path.dirname(process.execPath));
+ipcMain.handle("getDirname", () => app.isPackaged ? path.dirname(process.execPath) : app.getAppPath());
+ipcMain.handle("pathJoin", (event, ...args) => path.join(...args));

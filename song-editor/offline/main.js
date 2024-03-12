@@ -18,7 +18,7 @@ const createWindow = () => {
 	win.removeMenu();
 	win.maximize();
 	// Uncommenting the line below opens the dev tools
-	win.webContents.openDevTools();
+	// win.webContents.openDevTools();
 }
 
 // Menu.setApplicationMenu(mainMenu);
@@ -39,5 +39,5 @@ app.on('window-all-closed', () => {
 	}
 })
 
-ipcMain.handle("getDirname", () => __dirname);
+ipcMain.handle("getDirname", () => path.dirname(process.execPath));
 ipcMain.handle("pathJoin", () => path.join());

@@ -32,5 +32,4 @@ offline/node_modules
 /offline/theme_resources/*
 /offline/player/*
 !/offline/player/index.html
-/offline/samples/*
-/offline/ultrabox.offline*
+/offline/UltraBox Offline*

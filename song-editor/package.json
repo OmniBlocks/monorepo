@@ -31,6 +31,8 @@
 	"dependencies": {
 		"@types/jquery": "^3.5.5",
 		"@types/select2": "^4.0.53",
+		"electron": "^29.1.1",
+		"electron-packager": "^17.1.2",
 		"imperative-html": "^0.1.0",
 		"select2": "^4.0.13"
 	}

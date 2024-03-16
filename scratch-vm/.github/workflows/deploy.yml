@@ -29,6 +29,9 @@ jobs:
         run: npm run build
       - name: Build docs
         run: npm run docs
+        # We expect to see syntax errors from the old jsdoc cli not understanding some of our syntax
+        # It will still generate what it can, so it's safe to ignore the error
+        continue-on-error: true
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:

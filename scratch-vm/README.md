@@ -26,11 +26,9 @@ This section was too out of date to be useful. We hope to re-add it as some poin
 
 ## License
 
-This program is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License version 3 as published by the Free Software Foundation. See [COPYING](COPYING) and [COPYING.LESSER](COPYING.LESSER) for details.
+This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
-This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
-
-This program is based on [scratchfoundation/scratch-vm](https://github.com/scratchfoundation/scratch-vm), which we use under this license:
+This program is based on [scratchfoundation/scratch-vm](https://github.com/scratchfoundation/scratch-vm), which is under this license:
 
 ```
 Copyright (c) 2016, Massachusetts Institute of Technology

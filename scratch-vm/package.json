@@ -3,7 +3,7 @@
   "version": "2.1.46",
   "description": "Virtual Machine for Scratch 3.0",
   "author": "Massachusetts Institute of Technology",
-  "license": "LGPL-3.0-only",
+  "license": "MPL-2.0",
   "homepage": "https://github.com/scratchfoundation/scratch-vm#readme",
   "repository": {
     "type": "git",

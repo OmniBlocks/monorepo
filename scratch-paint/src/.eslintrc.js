@@ -14,7 +14,12 @@ module.exports = {
         'import/no-mutable-exports': 'error',
         'import/no-commonjs': 'error',
         'import/no-amd': 'error',
-        'import/no-nodejs-modules': 'error'
+        'import/no-nodejs-modules': 'error',
+
+        // TW: ignore errors importing things from custom webpack loaders
+        'import/no-unresolved': ['error', {
+            ignore: ['^!']
+        }]
     },
     settings: {
         react: {

@@ -642,3 +642,64 @@ test('if', () => {
         }
     })).toBe(false);
 });
+
+test('Settings migration 4 -> 5', () => {
+    const store = new SettingStore();
+
+    // implied default settings
+    global.localStorage.getItem = () => JSON.stringify({
+        _: 4
+    });
+    store.readLocalStorage();
+    expect(store.getAddonSetting('fullscreen', 'toolbar')).toBe('show');
+
+    // also implied default settings
+    global.localStorage.getItem = () => JSON.stringify({
+        _: 4,
+        fullscreen: {}
+    });
+    store.readLocalStorage();
+    expect(store.getAddonSetting('fullscreen', 'toolbar')).toBe('show');
+
+    // explicit default settings
+    global.localStorage.getItem = () => JSON.stringify({
+        '_': 4,
+        'fullscreen': {
+            hideToolbar: false
+        }
+    });
+    store.readLocalStorage();
+    expect(store.getAddonSetting('fullscreen', 'toolbar')).toBe('show');
+
+    // explicit hide, implied default hover setting
+    global.localStorage.getItem = () => JSON.stringify({
+        '_': 4,
+        'fullscreen': {
+            hideToolbar: true
+        }
+    });
+    store.readLocalStorage();
+    expect(store.getAddonSetting('fullscreen', 'toolbar')).toBe('hover');
+
+    // explicit hide and default hover
+    global.localStorage.getItem = () => JSON.stringify({
+        '_': 4,
+        'fullscreen': {
+            hideToolbar: true,
+            hoverToolbar: true
+        }
+    });
+    store.readLocalStorage();
+    expect(store.getAddonSetting('fullscreen', 'toolbar')).toBe('hover');
+
+    // explicit hide, no hover
+    global.localStorage.getItem = () => JSON.stringify({
+        '_': 4,
+        'fullscreen': {
+            hideToolbar: true,
+            hoverToolbar: false
+        }
+    });
+    store.readLocalStorage();
+    expect(store.getAddonSetting('fullscreen', 'toolbar')).toBe('hide');
+});

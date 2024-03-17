@@ -19,7 +19,7 @@ import upstreamMeta from './generated/upstream-meta.json';
 import EventTargetShim from './event-target';
 
 const SETTINGS_KEY = 'tw:addons';
-const VERSION = 4;
+const VERSION = 5;
 
 const migrateSettings = settings => {
     const oldVersion = settings._;
@@ -74,6 +74,21 @@ const migrateSettings = settings => {
             settings['middle-click-popup'] = {
                 enabled: false
             };
+        }
+    }
+
+    // Migrate 4 -> 5
+    // fullscreen's hideToolbar and hoverToolbar settings were merged into one toolbar setting
+    if (oldVersion < 5) {
+        const fullscreen = settings.fullscreen;
+        // hideToolbar was false by default
+        // hoverToolbar was true by default
+        if (fullscreen && fullscreen.hideToolbar) {
+            if (fullscreen.hoverToolbar === false) {
+                fullscreen.toolbar = 'hide';
+            } else {
+                fullscreen.toolbar = 'hover';
+            }
         }
     }
 

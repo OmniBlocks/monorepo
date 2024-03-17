@@ -82,7 +82,7 @@ const parseMetadata = obj => {
 
     obj.title = typeof obj.title === 'string' ? obj.title : '?';
     obj.created = typeof obj.created === 'number' ? obj.created : 0;
-    obj.type = [TYPE_AUTOMATIC, TYPE_MANUAL].includes(obj.type) ? obj.type : 1;
+    obj.type = [TYPE_AUTOMATIC, TYPE_MANUAL].includes(obj.type) ? obj.type : TYPE_MANUAL;
 
     obj.thumbnailSize = typeof obj.thumbnailSize === 'number' ? obj.thumbnailSize : 0;
     obj.projectSize = typeof obj.projectSize === 'number' ? obj.projectSize : 0;

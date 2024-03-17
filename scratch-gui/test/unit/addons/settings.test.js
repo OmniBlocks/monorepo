@@ -17,6 +17,14 @@ beforeEach(() => {
     global.localStorage = new LocalStorageShim();
 });
 
+const lightTheme = {
+    isDark: () => false
+};
+
+const darkTheme = {
+    isDark: () => true
+};
+
 test('enabled, event', () => {
     const store = new SettingStore();
     const fn = jest.fn();
@@ -211,11 +219,11 @@ test('apply preset', () => {
     const store = new SettingStore();
     const fn = jest.fn();
     store.addEventListener('setting-changed', fn);
-    store.setAddonSetting('editor-theme3', 'tw-color', '#abcdef');
+    store.setAddonSetting('editor-theme3', 'motion-color', '#abcdef');
     store.applyAddonPreset('editor-theme3', 'original');
     expect(fn.mock.calls.length).toBeGreaterThan(5);
     expect(store.getAddonSetting('editor-theme3', 'motion-color')).toBe('#4a6cd4');
-    expect(store.getAddonSetting('editor-theme3', 'tw-color')).toBe('#ff4c4c');
+    // TODO: test that settings not specified in the preset don't change
 });
 
 test('unknown preset throws', () => {
@@ -229,23 +237,23 @@ test('unknown preset throws', () => {
 
 test('export core', () => {
     const store = new SettingStore();
-    const exported = store.export({theme: 'light'});
+    const exported = store.export({theme: lightTheme});
     expect(exported.core.version).toMatch(/tw/);
     expect(exported.core.lightTheme).toBe(true);
-    const dark = store.export({theme: 'dark'});
+    const dark = store.export({theme: darkTheme});
     expect(dark.core.lightTheme).toBe(false);
 });
 
 test('export settings', () => {
     const store = new SettingStore();
-    let exported = store.export({theme: 'light'});
+    let exported = store.export({theme: lightTheme});
     expect(exported.addons['remove-sprite-confirm'].enabled).toBe(false);
     expect(exported.addons['remove-sprite-confirm'].settings).toEqual({});
     expect(exported.addons['onion-skinning'].enabled).toBe(true);
     expect(exported.addons['onion-skinning'].settings.default).toEqual(false);
     store.setAddonEnabled('remove-sprite-confirm', true);
     store.setAddonSetting('onion-skinning', 'default', true);
-    exported = store.export({theme: 'light'});
+    exported = store.export({theme: lightTheme});
     expect(exported.addons['remove-sprite-confirm'].enabled).toBe(true);
     expect(exported.addons['remove-sprite-confirm'].settings).toEqual({});
     expect(exported.addons['onion-skinning'].enabled).toBe(true);
@@ -254,9 +262,9 @@ test('export settings', () => {
 
 test('export theme', () => {
     const store = new SettingStore();
-    const exported = store.export({theme: 'light'});
+    const exported = store.export({theme: lightTheme});
     expect(exported.core.lightTheme).toBe(true);
-    const exported2 = store.export({theme: 'dark'});
+    const exported2 = store.export({theme: darkTheme});
     expect(exported2.core.lightTheme).toBe(false);
 });
 
@@ -268,7 +276,7 @@ test('import, event', () => {
     newStore.setAddonSetting('onion-skinning', 'next', 10);
     const fn = jest.fn();
     newStore.addEventListener('setting-changed', fn);
-    newStore.import(store.export({theme: 'light'}));
+    newStore.import(store.export({theme: lightTheme}));
     expect(newStore.getAddonEnabled('onion-skinning')).toBe(false);
     expect(newStore.getAddonSetting('onion-skinning', 'next')).toBe(5);
     expect(fn).toHaveBeenCalledTimes(2);
@@ -283,10 +291,10 @@ test('import, event', () => {
 test('export is identical after import', () => {
     const store = new SettingStore();
     const fn = jest.fn();
-    const exported = store.export({theme: 'light'});
+    const exported = store.export({theme: lightTheme});
     store.import(exported);
     expect(fn).toHaveBeenCalledTimes(0);
-    expect(store.export({theme: 'light'})).toEqual(exported);
+    expect(store.export({theme: lightTheme})).toEqual(exported);
 });
 
 test('import format', () => {

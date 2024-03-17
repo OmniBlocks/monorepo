@@ -465,7 +465,9 @@ class SettingsStore extends EventTargetShim {
         if (condition.settings) {
             // settings is an AND
             for (const [settingName, expectedValue] of Object.entries(condition.settings)) {
-                if (this.getAddonSetting(addonId, settingName) !== expectedValue) {
+                // expectedValue can be a string or an array of possible options
+                const expectedValues = Array.isArray(expectedValue) ? expectedValue : [expectedValue];
+                if (!expectedValues.includes(this.getAddonSetting(addonId, settingName))) {
                     return false;
                 }
             }

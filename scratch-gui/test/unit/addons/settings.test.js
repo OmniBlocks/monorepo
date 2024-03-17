@@ -587,6 +587,37 @@ test('if', () => {
     })).toBe(false);
 
     expect(store.evaluateCondition('editor-theme3', {
+        settings: {
+            'looks-color': ['#FFFFFF']
+        }
+    })).toBe(true);
+    expect(store.evaluateCondition('editor-theme3', {
+        settings: {
+            'looks-color': ['#FFFFFE', '#FFFFFF']
+        }
+    })).toBe(true);
+    expect(store.evaluateCondition('editor-theme3', {
+        settings: {
+            'looks-color': ['#FFFFFF', '#FFFFFE']
+        }
+    })).toBe(true);
+    expect(store.evaluateCondition('editor-theme3', {
+        settings: {
+            'looks-color': ['#FFFFFE']
+        }
+    })).toBe(false);
+    expect(store.evaluateCondition('editor-theme3', {
+        settings: {
+            'looks-color': ['#FFFFFE', '#FFFFFD']
+        }
+    })).toBe(false);
+    expect(store.evaluateCondition('editor-theme3', {
+        settings: {
+            'looks-color': []
+        }
+    })).toBe(false);
+
+    expect(store.evaluateCondition('editor-theme3', {
         addonEnabled: ['editor-devtools'],
         settings: {
             'motion-color': '#000000'

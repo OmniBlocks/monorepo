@@ -14,7 +14,22 @@ const startNextFetch = ([resolve, url, options]) => {
     let firstError;
     let failedAttempts = 0;
 
+    /**
+     * @param {Response} result From fetch()
+     */
     const done = result => {
+        // In macOS WKWebView, requests to file:// URLs return status: 0 and ok: false when they succeed, so we'll
+        // mess with the object so everyone that uses this realizes it succeeded.
+        // If the requests failed (because the file didn't exist) then fetch() rejects instead.
+        if (result.status === 0) {
+            Object.defineProperty(result, 'ok', {
+                value: true
+            });
+            Object.defineProperty(result, 'status', {
+                value: 200
+            });
+        }
+
         currentFetches--;
         checkStartNextFetch();
         resolve(result);

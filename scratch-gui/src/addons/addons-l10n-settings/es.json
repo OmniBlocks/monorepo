@@ -147,6 +147,7 @@
     "custom-block-shape/@settings-name-notchSize": "Altura de muesca (0-150%)",
     "custom-block-shape/@settings-name-paddingSize": "Tamaño de relleno/padding (50-200%)",
     "editor-square-inputs/@settings-name-color": "Entradas de color",
+    "editor-square-inputs/@settings-name-number": "Entradas numéricas",
     "editor-square-inputs/@settings-name-text": "Entradas de texto",
     "zebra-striping/@description": "Alterna entre tonos más claros y más oscuros a los bloques de la misma categoría anidados entre sí. Esto también es conocido como \"zebra striping\".",
     "zebra-striping/@name": "Alternar colores de bloques anidados",

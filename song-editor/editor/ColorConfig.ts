@@ -6024,9 +6024,10 @@ export class ColorConfig {
 				#beepboxEditorContainer {
 						border-image-source: url("theme_resources/abyssbox_border.png");
 						border-image-slice: 4 fill; 
-					   border-image-width: 8px; 
-					border-image-repeat: stretch;
+					   	border-image-width: 8px; 
+						border-image-repeat: stretch;
 						padding: 12px;
+						padding-top: 0px;
 	
 						image-rendering: -moz-crisp-edges !important;         /* Firefox */
 						image-rendering: -webkit-optimize-contrast !important; /* Webkit (Chrome/Safari) */
@@ -6157,20 +6158,20 @@ export class ColorConfig {
 	
 				`,
 		"AbyssBox Light": `
-				:root { 		
+			:root { 		
 				--page-margin: #e0adbc; 		
 				--editor-background: #e0adbc; 		
 				--hover-preview: white; 		
 				--playhead: rgba(255, 255, 255, 0.9); 		
-				--primary-text: #f5f0f1; 		
-				--secondary-text: #eddadf; 		
+				--primary-text: #6110d9; 		
+				--secondary-text: #cc1338;	
 				--inverted-text:  #e8bcc9;	 		
 				--text-selection: rgba(119,68,255,0.99); 		
 				--box-selection-fill: #bf2c5d; 		
 				--loop-accent: #8c346a; 		
 				--link-accent: #8c346a; 		
 				--ui-widget-background: #f5e9f0;		
-				--ui-widget-focus: #8c346a; 		
+				--ui-widget-focus: #f5e9f0; 		
 				--pitch-background: #eddadf; 		
 				--tonic: #f5f0f1; 		
 				--fifth-note: #ffb5c9; 		
@@ -6179,12 +6180,12 @@ export class ColorConfig {
 				--white-piano-key-text: #131200;		
 				--black-piano-key-text: #fff;	 		
 				--use-color-formula: true; 		
-				--track-editor-bg-pitch: #decad8; 		
-				--track-editor-bg-pitch-dim: #bfb0bb; 		
-				--track-editor-bg-noise: #d6a3ca; 		
-				--track-editor-bg-noise-dim: #b389a9; 		
-				--track-editor-bg-mod: #b0649e; 		
-				--track-editor-bg-mod-dim: #915683; 		
+				--track-editor-bg-pitch: #edbecc; 		
+				--track-editor-bg-pitch-dim: #e0adbc; 		
+				--track-editor-bg-noise: #edbecc; 		
+				--track-editor-bg-noise-dim: #e0adbc; 		
+				--track-editor-bg-mod: #edbecc; 		
+				--track-editor-bg-mod-dim: #e0adbc; 		
 				--multiplicative-mod-slider: #9f6082; 		
 				--overwriting-mod-slider: #9e3470; 		
 				--indicator-primary: #b3498f; 		
@@ -6195,7 +6196,8 @@ export class ColorConfig {
 				--mute-button-mod: #ba364c; 		
 				--mod-label-primary: #541625; 		
 				--mod-label-secondary-text: rgb(120, 87, 86); 
-				--mod-label-primary-text: gray; 
+				--mod-label-primary-text: gray;
+				--mod-title: #cc1338; 
 			
 				--pitch-secondary-channel-hue: -80; 		
 				--pitch-secondary-channel-hue-scale 0; 		
@@ -6301,7 +6303,7 @@ export class ColorConfig {
 				--zoom-in-symbol: url("theme_resources/icon-zoomIn.png");
 				--zoom-out-symbol: url("theme_resources/icon-zoomOut.png");
 				--export-symbol: url("theme_resources/icon-export.png");
-					}
+			}
 					/* sets background image */
 					body {
 					background-image: url("theme_resources/stripesbg_light.gif") !important;

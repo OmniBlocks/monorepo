@@ -57,8 +57,6 @@ import { ShortenerConfigPrompt } from "./ShortenerConfigPrompt";
 
 const { button, div, input, select, span, optgroup, option, canvas } = HTML;
 
-const beepboxEditorContainer: HTMLElement = document.getElementById("beepboxEditorContainer")!;
-
 function buildOptions(menu: HTMLSelectElement, items: ReadonlyArray<string | number>): HTMLSelectElement {
     for (let index: number = 0; index < items.length; index++) {
         menu.appendChild(option({ value: index }, items[index]));
@@ -2083,7 +2081,7 @@ export class SongEditor {
                     this.prompt = new EuclideanRhythmPrompt(this._doc);
                     break;
                 case "custom":
-                    this.prompt = new CustomPrompt(this._doc, this._patternEditor, this._trackArea, beepboxEditorContainer);
+                    this.prompt = new CustomPrompt(this._doc, this._patternEditor, this._trackArea, document.getElementById("beepboxEditorContainer")!);
                     break;
                 case "visualLoopControls":
                     this.prompt = new VisualLoopControlsPrompt(this._doc, this);
@@ -2174,6 +2172,8 @@ export class SongEditor {
             const maxBeatWidth: number = this._patternEditorRow.clientWidth / (this._doc.song.beatsPerBar + 2);
             const beatWidth: number = Math.max(minBeatWidth, Math.min(maxBeatWidth, targetBeatWidth));
             const patternEditorWidth: number = beatWidth * this._doc.song.beatsPerBar;
+
+            const beepboxEditorContainer: HTMLElement = document.getElementById("beepboxEditorContainer")!;
 
             if (this._doc.prefs.showDescription == false) {
                 beepboxEditorContainer.style.paddingBottom = "0";

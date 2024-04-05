@@ -6027,7 +6027,6 @@ export class ColorConfig {
 					   	border-image-width: 8px; 
 						border-image-repeat: stretch;
 						padding: 12px;
-						padding-top: 0px;
 	
 						image-rendering: -moz-crisp-edges !important;         /* Firefox */
 						image-rendering: -webkit-optimize-contrast !important; /* Webkit (Chrome/Safari) */

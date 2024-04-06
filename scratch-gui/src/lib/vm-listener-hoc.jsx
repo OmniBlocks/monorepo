@@ -121,6 +121,7 @@ const vmListenerHOC = function (WrappedComponent) {
             this.props.vm.off('COMPILE_ERROR', this.handleCompileError);
             this.props.vm.off('RUNTIME_STARTED', this.props.onClearCompileErrors);
             this.props.vm.off('STAGE_SIZE_CHANGED', this.props.onStageSizeChanged);
+            this.props.vm.off('CREATE_UNSANDBOXED_EXTENSION_API', this.handleCreateUnsandboxedExtensionAPI);
         }
         handleCloudDataUpdate (hasCloudVariables) {
             if (this.props.hasCloudVariables !== hasCloudVariables) {

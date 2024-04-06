@@ -417,3 +417,13 @@ test('canEmbed', async t => {
     
     t.end();
 });
+
+test('CREATE_UNSANDBOXED_EXTENSION_API', t => {
+    const vm = new VirtualMachine();
+    vm.on('CREATE_UNSANDBOXED_EXTENSION_API', api => {
+        api.extraStuff = 'aaaa';
+    });
+    UnsandboxedExtensionRunner.setupUnsandboxedExtensionAPI(vm);
+    t.equal(global.Scratch.extraStuff, 'aaaa');
+    t.end();
+});

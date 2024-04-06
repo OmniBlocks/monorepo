@@ -131,6 +131,8 @@ const setupUnsandboxedExtensionAPI = vm => new Promise(resolve => {
 
     global.Scratch = Scratch;
     global.ScratchExtensions = createScratchX(Scratch);
+
+    vm.emit('CREATE_UNSANDBOXED_EXTENSION_API', Scratch);
 });
 
 /**

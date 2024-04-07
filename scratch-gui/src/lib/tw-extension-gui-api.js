@@ -18,8 +18,8 @@ const implementGuiAPI = Scratch => {
         getBlockly: () => new Promise(resolve => LazyScratchBlocks.onLoaded(resolve)),
 
         /**
-         * Get the internal ScratchBlocks object as soon as possible. This lets you access it before
-         * the user enters the editor.
+         * Get the internal ScratchBlocks object as soon as possible. This lets you access it even
+         * if the user never enters the editor.
          *
          * This method is VERY SLOW and will cause A LOT OF CPU AND NETWORK ACTIVITY because it
          * downloads and evaluates all of scratch-blocks, a multi-megabyte JavaScript bundle.

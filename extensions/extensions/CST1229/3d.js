@@ -2,6 +2,7 @@
 // ID: cst12293d
 // Description: Move your sprites into the third dimension.
 // By: CST1229 <https://scratch.mit.edu/users/CST1229/>
+// License: MPL-2.0
 
 /* global THREE */
 // @ts-nocheck
@@ -467,6 +468,7 @@
             items: [
               "disabled",
               "flat",
+              "flat triangle",
               "sprite",
               "cube",
               "sphere",
@@ -1020,6 +1022,26 @@ If I ever decide to release this extension on the gallery, this will be replaced
           case "flat":
             obj.geometry = new THREE.PlaneGeometry(dr.skin.size[0], dr.skin.size[1]);
             break;
+          case "flat triangle": {
+              const geometry = new THREE.BufferGeometry();
+              const w = dr.skin.size[0] / 2;
+              const h = dr.skin.size[1] / 2;
+
+              const vertices = new Float32Array([
+                -w, -h, 0.0,
+                w, -h, 0.0,
+                -w, h, 0.0,
+              ]);
+              const uvs = new Float32Array([
+                0, 0,
+                1, 0,
+                0, 1
+              ]);
+              geometry.setIndex([0, 1, 2]);
+              geometry.setAttribute("position", new THREE.BufferAttribute(vertices, 3));
+              geometry.setAttribute("uv", new THREE.BufferAttribute(uvs, 2));
+              obj.geometry = geometry;
+          } break;
           case "cube":
             obj.geometry = new THREE.BoxGeometry(dr.skin.size[0], dr.skin.size[1], dr.skin.size[0]);
             break;
@@ -1092,6 +1114,7 @@ If I ever decide to release this extension on the gallery, this will be replaced
           this.disable3DForDrawable(util.target.drawableID);
           break;
         case "flat":
+        case "flat triangle":
         case "sprite":
         case "cube":
         case "sphere":

@@ -22,7 +22,7 @@ import {
     setHasCloudVariables
 } from '../reducers/tw';
 import {setCustomStageSize} from '../reducers/custom-stage-size';
-import AddonHooks from '../addons/hooks';
+import implementGuiAPI from './tw-extension-gui-api';
 
 let compileErrorCounter = 0;
 
@@ -41,8 +41,7 @@ const vmListenerHOC = function (WrappedComponent) {
                 'handleProjectChanged',
                 'handleTargetsUpdate',
                 'handleCloudDataUpdate',
-                'handleCompileError',
-                'handleCreateUnsandboxedExtensionAPI'
+                'handleCompileError'
             ]);
             // We have to start listening to the vm here rather than in
             // componentDidMount because the HOC mounts the wrapped component,
@@ -73,7 +72,7 @@ const vmListenerHOC = function (WrappedComponent) {
             this.props.vm.on('COMPILE_ERROR', this.handleCompileError);
             this.props.vm.on('RUNTIME_STARTED', this.props.onClearCompileErrors);
             this.props.vm.on('STAGE_SIZE_CHANGED', this.props.onStageSizeChanged);
-            this.props.vm.on('CREATE_UNSANDBOXED_EXTENSION_API', this.handleCreateUnsandboxedExtensionAPI);
+            this.props.vm.on('CREATE_UNSANDBOXED_EXTENSION_API', implementGuiAPI);
         }
         componentDidMount () {
             if (this.props.attachKeyboardEvents) {
@@ -121,7 +120,7 @@ const vmListenerHOC = function (WrappedComponent) {
             this.props.vm.off('COMPILE_ERROR', this.handleCompileError);
             this.props.vm.off('RUNTIME_STARTED', this.props.onClearCompileErrors);
             this.props.vm.off('STAGE_SIZE_CHANGED', this.props.onStageSizeChanged);
-            this.props.vm.off('CREATE_UNSANDBOXED_EXTENSION_API', this.handleCreateUnsandboxedExtensionAPI);
+            this.props.vm.off('CREATE_UNSANDBOXED_EXTENSION_API', implementGuiAPI);
         }
         handleCloudDataUpdate (hasCloudVariables) {
             if (this.props.hasCloudVariables !== hasCloudVariables) {
@@ -145,18 +144,6 @@ const vmListenerHOC = function (WrappedComponent) {
                 error: errorMessage,
                 id: compileErrorCounter++
             });
-        }
-        handleCreateUnsandboxedExtensionAPI (Scratch) {
-            Scratch.gui = {
-                getBlockly: () => {
-                    if (AddonHooks.blockly) {
-                        return Promise.resolve(AddonHooks.blockly);
-                    }
-                    return new Promise(resolve => {
-                        AddonHooks.blocklyCallbacks.push(() => resolve(AddonHooks.blockly));
-                    });
-                }
-            };
         }
         handleProjectChanged () {
             if (this.props.shouldUpdateProjectChanged && !this.props.projectChanged) {

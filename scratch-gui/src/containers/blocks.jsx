@@ -90,11 +90,7 @@ class Blocks extends React.Component {
     constructor (props) {
         super(props);
         this.ScratchBlocks = VMScratchBlocks(props.vm, false);
-
         window.ScratchBlocks = this.ScratchBlocks;
-        AddonHooks.blockly = this.ScratchBlocks;
-        AddonHooks.blocklyCallbacks.forEach(i => i());
-        AddonHooks.blocklyCallbacks.length = [];
 
         bindAll(this, [
             'attachVM',

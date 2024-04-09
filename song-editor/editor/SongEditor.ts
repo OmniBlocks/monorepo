@@ -1848,6 +1848,11 @@ export class SongEditor {
                 function updateModSlider(editor: SongEditor, slider: Slider, setting: number, channel: number, instrument: number): boolean {
                     if (editor._doc.synth.isModActive(setting, channel, instrument)) {
                         let currentVal: number = (editor._doc.synth.getModValue(setting, channel, instrument, false) - Config.modulators[setting].convertRealFactor) / Config.modulators[setting].maxRawVol;
+
+                        if (Config.modulators[setting].flipValue == true) {
+                            currentVal = 1 - currentVal;
+                        }
+
                         if (currentVal != editor._modSliderValues[setting]) {
                             editor._modSliderValues[setting] = currentVal;
                             slider.container.style.setProperty("--mod-position", (currentVal * 96.0 + 2.0) + "%");
@@ -2244,8 +2249,7 @@ export class SongEditor {
         // Technical dropdown
         const technicalOptionGroup: HTMLOptGroupElement = <HTMLOptGroupElement>this._optionsMenu.children[1];
 
-        // how do you get the length of an optgroup?
-        for (let i: number = 0; i < 12; i++) {
+        for (let i: number = 0; i < technicalOptionGroup.children.length; i++) {
             const option: HTMLOptionElement = <HTMLOptionElement>technicalOptionGroup.children[i];
             if (option.textContent != optionCommands[i + 1]) option.textContent = optionCommands[i + 1];
         }
@@ -2253,10 +2257,9 @@ export class SongEditor {
         // Appearance dropdown
         const appearanceOptionGroup: HTMLOptGroupElement = <HTMLOptGroupElement>this._optionsMenu.children[2];
 
-        // how do you get the length of an optgroup?
-        for (let i: number = 0; i < 13; i++) {
+        for (let i: number = 0; i < appearanceOptionGroup.children.length; i++) {
             const option: HTMLOptionElement = <HTMLOptionElement>appearanceOptionGroup.children[i];
-            if (option.textContent != optionCommands[i + 14]) option.textContent = optionCommands[i + 14];
+            if (option.textContent != optionCommands[i + technicalOptionGroup.children.length + 2]) option.textContent = optionCommands[i + technicalOptionGroup.children.length + 2];
         }
 
         const channel: Channel = this._doc.song.channels[this._doc.channel];

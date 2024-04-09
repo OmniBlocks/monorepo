@@ -526,7 +526,6 @@ export class TipPrompt implements Prompt {
 				message = div(
 					h2("Unison Spread"),
 					p("This setting controls the distance between the two voices, in semitones. A small amount of spread causes the voice's waves to shift in and out from each other, causing a shimmering effect. Larger spread will cause the voices to act like separate notes."),
-					p("This setting will only work correctly with two voices."),
 				);
 			} break;
 			case "unisonOffset": {

@@ -1849,7 +1849,7 @@ export class SongEditor {
                     if (editor._doc.synth.isModActive(setting, channel, instrument)) {
                         let currentVal: number = (editor._doc.synth.getModValue(setting, channel, instrument, false) - Config.modulators[setting].convertRealFactor) / Config.modulators[setting].maxRawVol;
 
-                        if (Config.modulators[setting].flipValue == true) {
+                        if (Config.modulators[setting].invertSliderIndicator == true) {
                             currentVal = 1 - currentVal;
                         }
 

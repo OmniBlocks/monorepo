@@ -1460,6 +1460,16 @@ export class Config {
     public static readonly detuneMin: number = 0;
     public static readonly songDetuneMin: number = 0;
     public static readonly songDetuneMax: number = 500;
+    public static readonly unisonVoicesMin: number = 1;
+    public static readonly unisonVoicesMax: number = 2;
+    public static readonly unisonSpreadMin: number = -96;
+    public static readonly unisonSpreadMax: number = 96; 
+    public static readonly unisonOffsetMin: number = -96;
+    public static readonly unisonOffsetMax: number = 96; 
+    public static readonly unisonExpressionMin: number = -2;
+    public static readonly unisonExpressionMax: number = 2; 
+    public static readonly unisonSignMin: number = -2;
+    public static readonly unisonSignMax: number = 2; 
     public static readonly sineWaveLength: number = 1 << 8; // 256
     public static readonly sineWaveMask: number = Config.sineWaveLength - 1;
     public static readonly sineWave: Float32Array = generateSineWave();

@@ -5622,6 +5622,8 @@ export class ColorConfig {
 			--fifth-note: #3e2fb5;
 			--white-piano-key: #ebf3f4;
 			--black-piano-key: #253353;
+			--white-piano-key-text: black;
+			--black-piano-key-text: white;
 			--oscilloscope-line-L: #72dcfc;
 			--oscilloscope-line-R: #304eff;
 			--mod-title: #1b2fff;
@@ -5718,7 +5720,7 @@ export class ColorConfig {
 			--disabled-note-primary:    #53527b;
 			--disabled-note-secondary:  #1c1b30;
 		}
-						`,
+		`,
 		"dogebox2": `
 			:root {
 				--page-margin: #000015;

@@ -536,7 +536,7 @@ export class TipPrompt implements Prompt {
 			} break;
 			case "unisonExpression": {
 				message = div(
-					h2("Unison Expression"),
+					h2("Unison Volume"),
 					p("This setting controls the unison volume. Use this if the unison makes your instrument too loud in comparison to other instruments."),
 				);
 			} break;

@@ -11,7 +11,8 @@ const implementGuiAPI = Scratch => {
          * available if, for example, the user never enters the editor.
          *
          * ScratchBlocks becoming available does not necessarily mean the user is in the editor due
-         * to getBlocklyEagerly() also existing.
+         * to getBlocklyEagerly() also existing. It also does not necessarily mean a workspace
+         * has been created yet.
          *
          * @returns {Promise<any>} Promise that may eventually resolve to ScratchBlocks
          */

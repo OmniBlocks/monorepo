@@ -1,4 +1,5 @@
 import Renderer from 'scratch-render';
+import log from './log';
 
 let cachedRendererSupport = null;
 export const isRendererSupported = () => {
@@ -40,6 +41,15 @@ export const findIncompatibleUserscripts = () => {
     // Reported upstream in https://github.com/Rilshrink/WebGLRipper/issues/21
     if (typeof window.WEBGLRipperSettings === 'object' && window.WEBGLRipperSettings.isDoShaderCalc) {
         errors.push('"WebGLRipper"\'s "Shader Calc" option breaks our WebGL renderer. Please disable it, uninstall it, or turn off "Shader Calc". See https://github.com/Rilshrink/WebGLRipper/issues/21.');
+    }
+
+    // For debugging incompatibilities, allow ignoring the errors with an undocumented URL parameter.
+    if (errors.length > 0) {
+        const params = new URLSearchParams(location.search);
+        if (params.get('ignore_unsupported_userscripts') === 'i_will_not_ask_for_help_if_something_breaks') {
+            log.error('Ignoring unsupported userscripts', errors);
+            return [];
+        }
     }
 
     /* eslint-enable max-len */

@@ -384,6 +384,10 @@ export class ColorConfig {
 				.select2-selection__rendered {
 					box-shadow: inset 0 0 0 1px var(--secondary-text);
 				}
+
+				.promptContainerBG::before {
+					box-shadow: inset 0 0 2000px rgba(255, 255, 255, .5);
+				}	
 		`,
         "jummbox classic": `
 				:root {
@@ -976,6 +980,10 @@ export class ColorConfig {
 
 				.beepboxEditor .piano-button::before {
 					display: none;
+				}
+
+				.promptContainerBG::before {
+					box-shadow: inset 0 0 2000px rgba(255, 255, 255, .5);
 				}
 			`,
         "amoled dark": `
@@ -2634,6 +2642,9 @@ export class ColorConfig {
 			--mod-label-primary-text: black;
 			--disabled-note-primary: #616161;
 			--disabled-note-secondary: #474747;
+		}
+		.promptContainerBG::before {
+			box-shadow: inset 0 0 2000px rgba(255, 255, 255, .5);
 		}`,
         "energized": `
 		:root {
@@ -6623,6 +6634,9 @@ export class ColorConfig {
 		#text-content > section > h1 {
 		margin: auto;
 		content: url("theme_resources/AzurLaneThemeLogo.png");
+		}
+		.promptContainerBG::before {
+			box-shadow: inset 0 0 2000px rgba(255, 255, 255, .5);
 		}
 	}`,
 			  "custom": `${localStorage.getItem("customColors") || `:root {

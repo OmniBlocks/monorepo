@@ -41,6 +41,7 @@ export class Preferences {
 	public showSampleLoadingStatus: boolean;
 	public showDescription: boolean;
 	public closePromptByClickoff: boolean;
+	public frostedGlassBackground: boolean;
 	
 	constructor() {
 		this.reload();
@@ -74,6 +75,7 @@ export class Preferences {
 		this.showSampleLoadingStatus = window.localStorage.getItem("showSampleLoadingStatus") != "false";
 		this.showDescription = window.localStorage.getItem("showDescription") != "false";
 		this.closePromptByClickoff = window.localStorage.getItem("closePromptByClickoff") == "true";
+		this.frostedGlassBackground = window.localStorage.getItem("frostedGlassBackground") == "true";
 		this.keyboardLayout = window.localStorage.getItem("keyboardLayout") || "wickiHayden";
 		this.bassOffset = (+(<any>window.localStorage.getItem("bassOffset"))) || 0;
 		this.layout = window.localStorage.getItem("layout") || "small";
@@ -93,6 +95,7 @@ export class Preferences {
 			if (window.localStorage.getItem("fullScreen") == "true") this.layout = "long";
 			window.localStorage.removeItem("fullScreen");
 		}
+		
 	}
 	
 	public save(): void {
@@ -124,6 +127,7 @@ export class Preferences {
 		window.localStorage.setItem("showSampleLoadingStatus", this.showSampleLoadingStatus ? "true" : "false");
 		window.localStorage.setItem("showDescription", this.showDescription ? "true" : "false");
 		window.localStorage.setItem("closePromptByClickoff", this.closePromptByClickoff ? "true" : "false");
+		window.localStorage.setItem("frostedGlassBackground", this.frostedGlassBackground ? "true" : "false");
 		window.localStorage.setItem("keyboardLayout", this.keyboardLayout);
 		window.localStorage.setItem("bassOffset", String(this.bassOffset));
 		window.localStorage.setItem("layout", this.layout);
@@ -132,5 +136,6 @@ export class Preferences {
                 window.localStorage.setItem("customTheme2", this.customTheme2!);
 		window.localStorage.setItem("volume", String(this.volume));
 		window.localStorage.setItem("visibleOctaves", String(this.visibleOctaves));
+		
 	}
 }

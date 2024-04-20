@@ -101,8 +101,9 @@ const CustomExtensionModal = props => (
                     </p>
                     <FileInput
                         accept=".js"
-                        onChange={props.onChangeFile}
-                        file={props.file}
+                        onChange={props.onChangeFiles}
+                        files={props.files}
+                        multiple
                     />
                 </React.Fragment>
             ) : (
@@ -134,7 +135,7 @@ const CustomExtensionModal = props => (
                             onChange={props.onChangeUnsandboxed}
                         />
                         <FormattedMessage
-                            defaultMessage="Run extension without sandbox"
+                            defaultMessage="Run without sandbox"
                             description="Message that appears in custom extension prompt"
                             id="tw.customExtensionModal.unsandboxed"
                         />
@@ -205,8 +206,8 @@ CustomExtensionModal.propTypes = {
     onSwitchToFile: PropTypes.func.isRequired,
     onSwitchToURL: PropTypes.func.isRequired,
     onSwitchToText: PropTypes.func.isRequired,
-    file: PropTypes.instanceOf(File),
-    onChangeFile: PropTypes.func.isRequired,
+    files: PropTypes.instanceOf(FileList),
+    onChangeFiles: PropTypes.func.isRequired,
     onDragOver: PropTypes.func.isRequired,
     onDragLeave: PropTypes.func.isRequired,
     onDrop: PropTypes.func.isRequired,

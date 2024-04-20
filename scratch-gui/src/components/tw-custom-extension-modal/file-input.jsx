@@ -12,36 +12,45 @@ class FileInput extends React.Component {
             'handleClick'
         ]);
         this.state = {
-            file: props.file
+            files: props.files
         };
     }
+
     handleChange (e) {
-        const file = e.target.files[0];
-        this.props.onChange(file);
+        if (e.target.files.length) {
+            this.props.onChange(e.target.files);
+        } else {
+            this.props.onChange(null);
+        }
     }
+
     handleClick () {
         const input = document.createElement('input');
         input.type = 'file';
         input.accept = this.props.accept;
+        input.multiple = !!this.props.multiple;
         input.addEventListener('change', this.handleChange);
         document.body.appendChild(input);
         input.click();
         input.remove();
     }
+
     render () {
         return (
             <button
                 className={styles.container}
                 onClick={this.handleClick}
             >
-                {this.props.file ? (
+                {this.props.files ? (
                     <FormattedMessage
-                        defaultMessage="Selected: {name}"
+                        defaultMessage="Selected: {names}"
                         // eslint-disable-next-line max-len
-                        description="Appears in a file selector when a file is selected. {name} could be a string like 'fetch.js'"
+                        description="Appears in a file selector when a file is selected. {names} could be a string like 'fetch.js, network.js'"
                         id="tw.fileInput.selected"
                         values={{
-                            name: this.props.file.name
+                            names: Array.from(this.props.files)
+                                .map(i => i.name)
+                                .join(', ')
                         }}
                     />
                 ) : (
@@ -57,8 +66,9 @@ class FileInput extends React.Component {
 }
 
 FileInput.propTypes = {
-    file: PropTypes.instanceOf(File),
+    files: PropTypes.instanceOf(FileList),
     accept: PropTypes.string,
+    multiple: PropTypes.bool,
     onChange: PropTypes.func
 };
 

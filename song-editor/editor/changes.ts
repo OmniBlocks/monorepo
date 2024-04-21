@@ -1443,7 +1443,7 @@ export class ChangeRandomGeneratedInstrument extends Change {
 					instrument.feedbackAmplitude = (Math.pow(Math.random(), 3) * Config.operatorAmplitudeMax) | 0;
                     if (instrument.envelopeCount < Config.maxEnvelopeCount && Math.random() < 0.4) {
                         instrument.addEnvelope(Config.instrumentAutomationTargets.dictionary["feedbackAmplitude"].index, 0, Config.envelopes.dictionary[selectWeightedRandom([
-                        { item: "steady", weight: 4 },
+                        { item: "none", weight: 4 },
                         { item: "punch", weight: 2 },
                         { item: "flare -1", weight: 1 },
                         { item: "flare 1", weight: 2 },

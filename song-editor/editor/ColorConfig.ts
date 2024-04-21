@@ -3977,6 +3977,7 @@ export class ColorConfig {
 					--mod-label-primary-text:   black;
 					--disabled-note-primary:    #999;
 					--disabled-note-secondary:  #666;
+					--text-disabled-icon: ✗ ;
 				}
 
 				.beepboxEditor input[type="range"]::-moz-range-thumb {

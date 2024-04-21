@@ -3,7 +3,6 @@
 .vs
 /node_modules
 offline/node_modules
-/website/**/beepbox*.js
 /website/**/beepbox*.js.map
 /website/beepbox_offline.html
 /website/jummbox_offline.html

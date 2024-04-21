@@ -50,9 +50,9 @@ const CustomExtensionModal = props => (
                     tabIndex={0}
                 >
                     <FormattedMessage
-                        defaultMessage="File"
+                        defaultMessage="Files"
                         // eslint-disable-next-line max-len
-                        description="Button to choose to load an extension from a local file. Not much space, so keep this short."
+                        description="Button to choose to load an extension from one or more local files. Not much space, so keep this short."
                         id="tw.customExtensionModal.file"
                     />
                 </div>
@@ -94,8 +94,8 @@ const CustomExtensionModal = props => (
                 <React.Fragment key={props.type}>
                     <p>
                         <FormattedMessage
-                            defaultMessage="Select the extension's JavaScript file:"
-                            description="Label that appears when loading a custom extension from a file"
+                            defaultMessage="Select or drop extension JavaScript files:"
+                            description="Label that appears when loading a custom extension from one or more files"
                             id="tw.customExtensionModal.promptFile"
                         />
                     </p>
@@ -103,7 +103,6 @@ const CustomExtensionModal = props => (
                         accept=".js"
                         onChange={props.onChangeFiles}
                         files={props.files}
-                        multiple
                     />
                 </React.Fragment>
             ) : (

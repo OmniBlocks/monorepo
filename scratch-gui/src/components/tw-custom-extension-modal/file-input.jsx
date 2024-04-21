@@ -28,7 +28,7 @@ class FileInput extends React.Component {
         const input = document.createElement('input');
         input.type = 'file';
         input.accept = this.props.accept;
-        input.multiple = !!this.props.multiple;
+        input.multiple = true;
         input.addEventListener('change', this.handleChange);
         document.body.appendChild(input);
         input.click();
@@ -55,7 +55,7 @@ class FileInput extends React.Component {
                     />
                 ) : (
                     <FormattedMessage
-                        defaultMessage="No file selected."
+                        defaultMessage="No files selected."
                         description="Appears in a file selector when no file is selected."
                         id="tw.fileInput.none"
                     />
@@ -68,7 +68,6 @@ class FileInput extends React.Component {
 FileInput.propTypes = {
     files: PropTypes.instanceOf(FileList),
     accept: PropTypes.string,
-    multiple: PropTypes.bool,
     onChange: PropTypes.func
 };
 

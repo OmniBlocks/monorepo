@@ -1360,7 +1360,6 @@ export class SongEditor {
         this._trackArea,
         this._settingsArea,
         this._promptContainer,
-        
     );
 
     private _wasPlaying: boolean = false;

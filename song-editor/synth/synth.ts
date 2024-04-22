@@ -7175,8 +7175,6 @@ class EnvelopeComputer {
         if (tone) {
             pitch = tone.pitches[0 /*arpeggiates ? 0 : ((i < tone.pitchCount) ? i : ((associatedCarrierIndex < tone.pitchCount) ? associatedCarrierIndex : 0))*/];
         }
-        // console.log(basePitch + pitch);
-        // console.log(Instrument.frequencyFromPitch(basePitch + pitch));
         switch (envelope.type) {
             case EnvelopeType.none: return 1.0;
             case EnvelopeType.noteSize: return Synth.noteSizeToVolumeMult(noteSize);
@@ -7886,8 +7884,8 @@ class InstrumentState {
         let maxEchoMult = 0.0;
         let averageEchoDelaySeconds: number = 0.0;
         if (usesEcho) {
-            //const echoSustainEnvelopeStart: number = envelopeStarts[InstrumentAutomationIndex.echoSustain];
-            //const echoSustainEnvelopeEnd:   number = envelopeEnds[  InstrumentAutomationIndex.echoSustain];
+            const echoSustainEnvelopeStart: number = envelopeStarts[EnvelopeComputeIndex.echoSustain];
+            const echoSustainEnvelopeEnd:   number = envelopeEnds[  EnvelopeComputeIndex.echoSustain];
             let useEchoSustainStart: number = instrument.echoSustain;
             let useEchoSustainEnd: number = instrument.echoSustain;
             // Check for echo mods
@@ -7895,8 +7893,8 @@ class InstrumentState {
                 useEchoSustainStart = Math.max( 0.0, synth.getModValue(Config.modulators.dictionary["echo"].index, channelIndex, instrumentIndex, false) );
                 useEchoSustainEnd = Math.max( 0.0, synth.getModValue(Config.modulators.dictionary["echo"].index, channelIndex, instrumentIndex, true) );
             }
-            const echoMultStart: number = Math.min(1.0, Math.pow(/*echoSustainEnvelopeStart **/ useEchoSustainStart / Config.echoSustainRange, 1.1)) * 0.9;
-            const echoMultEnd: number = Math.min(1.0, Math.pow(/*echoSustainEnvelopeEnd   **/ useEchoSustainEnd / Config.echoSustainRange, 1.1)) * 0.9;
+            const echoMultStart: number = Math.min(1.0, Math.pow(echoSustainEnvelopeStart * useEchoSustainStart / Config.echoSustainRange, 1.1)) * 0.9;
+            const echoMultEnd: number = Math.min(1.0, Math.pow(echoSustainEnvelopeEnd   * useEchoSustainEnd / Config.echoSustainRange, 1.1)) * 0.9;
             this.echoMult = echoMultStart;
             this.echoMultDelta = Math.max(0.0, (echoMultEnd - echoMultStart) / roundedSamplesPerTick);
             maxEchoMult = Math.max(echoMultStart, echoMultEnd);
@@ -7904,8 +7902,8 @@ class InstrumentState {
             // TODO: After computing a tick's settings once for multiple run lengths (which is
             // good for audio worklet threads), compute the echo delay envelopes at tick (or
             // part) boundaries to interpolate between two delay taps.
-            //const echoDelayEnvelopeStart:   number = envelopeStarts[InstrumentAutomationIndex.echoDelay];
-            //const echoDelayEnvelopeEnd:     number = envelopeEnds[  InstrumentAutomationIndex.echoDelay];
+            //const echoDelayEnvelopeStart: number = envelopeStarts[EnvelopeComputeIndex.echoDelay];
+            //const echoDelayEnvelopeEnd: number = envelopeEnds[EnvelopeComputeIndex.echoDelay];
             let useEchoDelayStart: number = instrument.echoDelay;
             let useEchoDelayEnd: number = instrument.echoDelay;
             let ignoreTicks: boolean = false;
@@ -7939,8 +7937,8 @@ class InstrumentState {
 
         let maxReverbMult = 0.0;
         if (usesReverb) {
-            //const reverbEnvelopeStart: number = envelopeStarts[InstrumentAutomationIndex.reverb];
-            //const reverbEnvelopeEnd:   number = envelopeEnds[  InstrumentAutomationIndex.reverb];
+            const reverbEnvelopeStart: number = envelopeStarts[EnvelopeComputeIndex.reverb];
+            const reverbEnvelopeEnd: number = envelopeEnds[EnvelopeComputeIndex.reverb];
 
             let useReverbStart: number = instrument.reverb;
             let useReverbEnd: number = instrument.reverb;
@@ -7956,8 +7954,8 @@ class InstrumentState {
                 useReverbEnd *= (synth.getModValue(Config.modulators.dictionary["song reverb"].index, undefined, undefined, true) - Config.modulators.dictionary["song reverb"].convertRealFactor) / Config.reverbRange;
             }
 
-            const reverbStart: number = Math.min(1.0, Math.pow(/*reverbEnvelopeStart **/ useReverbStart / Config.reverbRange, 0.667)) * 0.425;
-            const reverbEnd: number = Math.min(1.0, Math.pow(/*reverbEnvelopeEnd   **/ useReverbEnd / Config.reverbRange, 0.667)) * 0.425;
+            const reverbStart: number = Math.min(1.0, Math.pow(reverbEnvelopeStart * useReverbStart / Config.reverbRange, 0.667)) * 0.425;
+            const reverbEnd: number = Math.min(1.0, Math.pow(reverbEnvelopeEnd   * useReverbEnd / Config.reverbRange, 0.667)) * 0.425;
 
             this.reverbMult = reverbStart;
             this.reverbMultDelta = (reverbEnd - reverbStart) / roundedSamplesPerTick;

@@ -128,6 +128,8 @@ export const enum EnvelopeComputeIndex {
     supersawShape,
     panning,
     chorus,
+    echoSustain,
+    reverb,
     //Add more here
 
     length,
@@ -1518,6 +1520,8 @@ export class Config {
         { name: "supersawShape", computeIndex: EnvelopeComputeIndex.supersawShape, displayName: "saw↔pulse",        /*perNote:  true,*/ interleave: false, isFilter: false, /*range: Config.supersawShapeMax + 1,    */    maxCount: 1, effect: null, compatibleInstruments: [InstrumentType.supersaw] },    
         { name: "panning", computeIndex: EnvelopeComputeIndex.panning, displayName: "panning",  /*perNote:  false,*/                  interleave: false, isFilter: false, /*range: Config.chorusRange,    */  maxCount: 1, effect: EffectType.panning, compatibleInstruments: null },
         { name: "chorus", computeIndex: EnvelopeComputeIndex.chorus, displayName: "chorus", /*perNote:  false,*/                      interleave: false, isFilter: false, /*range: Config.chorusRange,    */  maxCount: 1, effect: EffectType.chorus, compatibleInstruments: null },
+        { name: "echoSustain", computeIndex: EnvelopeComputeIndex.echoSustain, displayName: "echo", /*perNote:  false,*/              interleave: false, isFilter: false,  /*range: Config.chorusRange,    */  maxCount: 1, effect: EffectType.echo, compatibleInstruments: null },
+        { name: "reverb", computeIndex: EnvelopeComputeIndex.reverb, displayName: "reverb", /*perNote:  false,*/              interleave: false, isFilter: false,  /*range: Config.chorusRange,    */  maxCount: 1, effect: EffectType.reverb, compatibleInstruments: null }
         // Controlling filter gain is less obvious and intuitive than controlling filter freq, so to avoid confusion I've disabled it for now...
         //{name: "noteFilterGain",         computeIndex:       EnvelopeComputeIndex.noteFilterGain0,        displayName: "n. filter # vol",  /*perNote:  true,*/ interleave: false, isFilter:  true, range: Config.filterGainRange,             maxCount: Config.filterMaxPoints, effect: EffectType.noteFilter, compatibleInstruments: null},
         /*

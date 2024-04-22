@@ -1009,6 +1009,8 @@ var beepbox = (function (exports) {
         { name: "supersawShape", computeIndex: 40, displayName: "saw↔pulse", interleave: false, isFilter: false, maxCount: 1, effect: null, compatibleInstruments: [8] },
         { name: "panning", computeIndex: 41, displayName: "panning", interleave: false, isFilter: false, maxCount: 1, effect: 2, compatibleInstruments: null },
         { name: "chorus", computeIndex: 42, displayName: "chorus", interleave: false, isFilter: false, maxCount: 1, effect: 1, compatibleInstruments: null },
+        { name: "echoSustain", computeIndex: 43, displayName: "echo", interleave: false, isFilter: false, maxCount: 1, effect: 6, compatibleInstruments: null },
+        { name: "reverb", computeIndex: 44, displayName: "reverb", interleave: false, isFilter: false, maxCount: 1, effect: 0, compatibleInstruments: null }
     ]);
     Config.operatorWaves = toNameMap([
         { name: "sine", samples: Config.sineWave },
@@ -15946,7 +15948,7 @@ var beepbox = (function (exports) {
             this._modifiedEnvelopeIndices = [];
             this._modifiedEnvelopeCount = 0;
             this.lowpassCutoffDecayVolumeCompensation = 1.0;
-            const length = 43;
+            const length = 45;
             for (let i = 0; i < length; i++) {
                 this.envelopeStarts[i] = 1.0;
                 this.envelopeEnds[i] = 1.0;
@@ -16744,14 +16746,16 @@ var beepbox = (function (exports) {
             let maxEchoMult = 0.0;
             let averageEchoDelaySeconds = 0.0;
             if (usesEcho) {
+                const echoSustainEnvelopeStart = envelopeStarts[43];
+                const echoSustainEnvelopeEnd = envelopeEnds[43];
                 let useEchoSustainStart = instrument.echoSustain;
                 let useEchoSustainEnd = instrument.echoSustain;
                 if (synth.isModActive(Config.modulators.dictionary["echo"].index, channelIndex, instrumentIndex)) {
                     useEchoSustainStart = Math.max(0.0, synth.getModValue(Config.modulators.dictionary["echo"].index, channelIndex, instrumentIndex, false));
                     useEchoSustainEnd = Math.max(0.0, synth.getModValue(Config.modulators.dictionary["echo"].index, channelIndex, instrumentIndex, true));
                 }
-                const echoMultStart = Math.min(1.0, Math.pow(useEchoSustainStart / Config.echoSustainRange, 1.1)) * 0.9;
-                const echoMultEnd = Math.min(1.0, Math.pow(useEchoSustainEnd / Config.echoSustainRange, 1.1)) * 0.9;
+                const echoMultStart = Math.min(1.0, Math.pow(echoSustainEnvelopeStart * useEchoSustainStart / Config.echoSustainRange, 1.1)) * 0.9;
+                const echoMultEnd = Math.min(1.0, Math.pow(echoSustainEnvelopeEnd * useEchoSustainEnd / Config.echoSustainRange, 1.1)) * 0.9;
                 this.echoMult = echoMultStart;
                 this.echoMultDelta = Math.max(0.0, (echoMultEnd - echoMultStart) / roundedSamplesPerTick);
                 maxEchoMult = Math.max(echoMultStart, echoMultEnd);
@@ -16783,6 +16787,8 @@ var beepbox = (function (exports) {
             }
             let maxReverbMult = 0.0;
             if (usesReverb) {
+                const reverbEnvelopeStart = envelopeStarts[44];
+                const reverbEnvelopeEnd = envelopeEnds[44];
                 let useReverbStart = instrument.reverb;
                 let useReverbEnd = instrument.reverb;
                 if (synth.isModActive(Config.modulators.dictionary["reverb"].index, channelIndex, instrumentIndex)) {
@@ -16793,8 +16799,8 @@ var beepbox = (function (exports) {
                     useReverbStart *= (synth.getModValue(Config.modulators.dictionary["song reverb"].index, undefined, undefined, false) - Config.modulators.dictionary["song reverb"].convertRealFactor) / Config.reverbRange;
                     useReverbEnd *= (synth.getModValue(Config.modulators.dictionary["song reverb"].index, undefined, undefined, true) - Config.modulators.dictionary["song reverb"].convertRealFactor) / Config.reverbRange;
                 }
-                const reverbStart = Math.min(1.0, Math.pow(useReverbStart / Config.reverbRange, 0.667)) * 0.425;
-                const reverbEnd = Math.min(1.0, Math.pow(useReverbEnd / Config.reverbRange, 0.667)) * 0.425;
+                const reverbStart = Math.min(1.0, Math.pow(reverbEnvelopeStart * useReverbStart / Config.reverbRange, 0.667)) * 0.425;
+                const reverbEnd = Math.min(1.0, Math.pow(reverbEnvelopeEnd * useReverbEnd / Config.reverbRange, 0.667)) * 0.425;
                 this.reverbMult = reverbStart;
                 this.reverbMultDelta = (reverbEnd - reverbStart) / roundedSamplesPerTick;
                 maxReverbMult = Math.max(reverbStart, reverbEnd);

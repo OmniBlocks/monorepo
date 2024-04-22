@@ -7804,8 +7804,8 @@ class InstrumentState {
         let delayInputMultEnd: number = 1.0;
 
         if (usesPanning) {
-            //const panEnvelopeStart: number = envelopeStarts[InstrumentAutomationIndex.panning] * 2.0 - 1.0;
-            //const panEnvelopeEnd:   number = envelopeEnds[  InstrumentAutomationIndex.panning] * 2.0 - 1.0;
+            const panEnvelopeStart: number = envelopeStarts[EnvelopeComputeIndex.panning] * 2.0 - 1.0;
+            const panEnvelopeEnd: number = envelopeEnds[EnvelopeComputeIndex.panning] * 2.0 - 1.0;
 
             let usePanStart: number = instrument.pan;
             let usePanEnd: number = instrument.pan;
@@ -7815,8 +7815,8 @@ class InstrumentState {
                 usePanEnd = synth.getModValue(Config.modulators.dictionary["pan"].index, channelIndex, instrumentIndex, true);
             }
 
-            let panStart: number = Math.max(-1.0, Math.min(1.0, (usePanStart - Config.panCenter) / Config.panCenter /** panEnvelopeStart*/));
-            let panEnd: number = Math.max(-1.0, Math.min(1.0, (usePanEnd - Config.panCenter) / Config.panCenter /** panEnvelopeEnd  */));
+            let panStart: number = Math.max(-1.0, Math.min(1.0, (usePanStart - Config.panCenter) / Config.panCenter * panEnvelopeStart));
+            let panEnd: number = Math.max(-1.0, Math.min(1.0, (usePanEnd - Config.panCenter) / Config.panCenter * panEnvelopeEnd));
 
             const volumeStartL: number = Math.cos((1 + panStart) * Math.PI * 0.25) * 1.414;
             const volumeStartR: number = Math.cos((1 - panStart) * Math.PI * 0.25) * 1.414;

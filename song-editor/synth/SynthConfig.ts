@@ -44,8 +44,9 @@ export const enum SustainType {
 }
 
 export const enum EnvelopeType {
-	noteSize,
     none,
+    noteSize,
+    pitch,
 	punch,
 	flare,
 	twang,
@@ -1298,6 +1299,7 @@ export class Config {
     public static readonly envelopes: DictionaryArray<Envelope> = toNameMap([
         { name: "none", type: EnvelopeType.none, speed: 0.0 },
         { name: "note size", type: EnvelopeType.noteSize, speed: 0.0 },
+        { name: "pitch", type: EnvelopeType.pitch, speed: 0.0 },
         { name: "punch", type: EnvelopeType.punch, speed: 0.0 },
         { name: "flare -1", type: EnvelopeType.flare, speed: 128.0 },
         { name: "flare 1", type: EnvelopeType.flare, speed: 32.0 },

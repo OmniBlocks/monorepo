@@ -2822,9 +2822,9 @@ export class ChangeOperatorPulseWidth extends Change {
         super();
         const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
         instrument.operators[operatorIndex].pulseWidth = newValue;
-        instrument.preset = instrument.type;
         doc.notifier.changed();
         if (oldValue != newValue) {
+            instrument.preset = instrument.type;
             this._didSomething();
         }
     }

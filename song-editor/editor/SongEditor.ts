@@ -4601,6 +4601,7 @@ export class SongEditor {
         const instrument: Instrument = channel.instruments[this._doc.getCurrentInstrument()];
         const instrumentCopy: any = instrument.toJsonObject();
         instrumentCopy["isDrum"] = this._doc.song.getChannelIsNoise(this._doc.channel);
+        instrumentCopy["isMod"] = this._doc.song.getChannelIsMod(this._doc.channel);
         window.localStorage.setItem("instrumentCopy", JSON.stringify(instrumentCopy));
         this.refocusStage();
     }
@@ -4609,7 +4610,7 @@ export class SongEditor {
         const channel: Channel = this._doc.song.channels[this._doc.channel];
         const instrument: Instrument = channel.instruments[this._doc.getCurrentInstrument()];
         const instrumentCopy: any = JSON.parse(String(window.localStorage.getItem("instrumentCopy")));
-        if (instrumentCopy != null && instrumentCopy["isDrum"] == this._doc.song.getChannelIsNoise(this._doc.channel)) {
+        if (instrumentCopy != null && instrumentCopy["isDrum"] == this._doc.song.getChannelIsNoise(this._doc.channel) && instrumentCopy["isMod"] == this._doc.song.getChannelIsMod(this._doc.channel)) {
             this._doc.record(new ChangePasteInstrument(this._doc, instrument, instrumentCopy));
         }
         this.refocusStage();

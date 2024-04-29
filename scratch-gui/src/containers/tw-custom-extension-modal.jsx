@@ -174,12 +174,12 @@ class CustomExtensionModal extends React.Component {
     }
 
     handleDrop (e) {
-        const file = e.dataTransfer.files[0];
-        if (file) {
+        const files = e.dataTransfer.files;
+        if (files.length) {
             e.preventDefault();
             this.setState({
                 type: 'file',
-                file
+                files
             });
         }
     }

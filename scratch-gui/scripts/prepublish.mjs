@@ -6,6 +6,7 @@
 
 import fs from 'fs';
 import path from 'path';
+import nodeCrypto from 'crypto';
 
 import crossFetch from 'cross-fetch';
 import yauzl from 'yauzl';
@@ -82,10 +83,9 @@ const downloadMicrobitHex = async () => {
     console.info(`Downloading ${url}`);
     const response = await crossFetch(url);
     const zipBuffer = Buffer.from(await response.arrayBuffer());
-    const sha256Digest = new Uint8Array(await crypto.subtle.digest('SHA-256', zipBuffer));
-    const sha256Hex = Array.from(sha256Digest).map(i => i.toString(16).padStart(2, '0')).join('');
-    if (sha256Hex !== expectedSHA256) {
-        throw new Error(`microbit hex has SHA-256 ${sha256Hex} but expected ${expectedSHA256}`);
+    const sha256 = nodeCrypto.createHash('sha-256').update(zipBuffer).digest('hex');
+    if (sha256 !== expectedSHA256) {
+        throw new Error(`microbit hex has SHA-256 ${sha256} but expected ${expectedSHA256}`);
     }
     const relativeHexDir = path.join('static', 'microbit');
     const hexFileName = await extractFirstMatchingFile(

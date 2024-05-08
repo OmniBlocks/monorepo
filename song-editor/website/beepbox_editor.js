@@ -1516,8 +1516,8 @@ var beepbox = (function (exports) {
             return (_a = EditorConfig.presetCategories[0].presets.dictionary) === null || _a === void 0 ? void 0 : _a[TypePresets === null || TypePresets === void 0 ? void 0 : TypePresets[instrument]];
         }
     }
-    EditorConfig.version = "2.2.6";
-    EditorConfig.versionDisplayName = "UltraBox " + EditorConfig.version;
+    EditorConfig.version = "1.0";
+    EditorConfig.versionDisplayName = "Slarmoo's Box " + EditorConfig.version;
     EditorConfig.releaseNotesURL = "./patch_notes.html";
     EditorConfig.isOnMac = /^Mac/i.test(navigator.platform) || /Mac OS X/i.test(navigator.userAgent) || /^(iPhone|iPad|iPod)/i.test(navigator.platform) || /(iPhone|iPad|iPod)/i.test(navigator.userAgent);
     EditorConfig.ctrlSymbol = EditorConfig.isOnMac ? "⌘" : "Ctrl+";
@@ -9924,6 +9924,31 @@ var beepbox = (function (exports) {
 	visibility: hidden;
 }
 
+.beepboxEditor .envelope-settings {
+	width: var(--button-size);
+	flex-shrink: 0;
+	flex-grow: 0;
+}
+.beepboxEditor .envelope-settings::before {
+	content: "";
+	position: absolute;
+	width: var(--button-size);
+	height: var(--button-size);
+	left: 0;
+	top: 0;
+	pointer-events: none;
+	background: currentColor;
+	mask-image: var(--internal-add-symbol);
+	mask-repeat: no-repeat;
+	mask-position: center;
+	-webkit-mask-image: var(--internal-add-symbol);
+	-webkit-mask-repeat: no-repeat;
+	-webkit-mask-position: center;
+}
+.beepboxEditor .envelope-settings:disabled {
+	visibility: hidden;
+}
+
 .beepboxEditor .menu.file::before {
 	content: "";
 	flex-shrink: 0;
@@ -12674,6 +12699,8 @@ li.select2-results__option[role=group] > strong:hover {
             this.fadeIn = 0;
             this.fadeOut = Config.fadeOutNeutral;
             this.envelopeCount = 0;
+            this.pitchEnvelopeStart = 0;
+            this.pitchEnvelopeEnd = 96;
             this.transition = Config.transitions.dictionary["normal"].index;
             this.pitchShift = 0;
             this.detune = 0;
@@ -12733,6 +12760,7 @@ li.select2-results__option[role=group] > strong:hover {
             this.modulators = [];
             this.modFilterTypes = [];
             this.invalidModulators = [];
+            this.isNoiseInstrument = false;
             if (isModChannel) {
                 for (let mod = 0; mod < Config.modCount; mod++) {
                     this.modChannels.push(-2);
@@ -12764,6 +12792,7 @@ li.select2-results__option[role=group] > strong:hover {
                 this.customChipWaveIntegral[i] = cumulative;
             }
             this.customChipWaveIntegral[64] = 0.0;
+            this.isNoiseInstrument = isNoiseChannel;
         }
         setTypeAndReset(type, isNoiseChannel, isModChannel) {
             if (isModChannel)
@@ -12809,6 +12838,12 @@ li.select2-results__option[role=group] > strong:hover {
             this.fadeOut = Config.fadeOutNeutral;
             this.transition = Config.transitions.dictionary["normal"].index;
             this.envelopeCount = 0;
+            this.pitchEnvelopeStart = 0;
+            this.pitchEnvelopeEnd = 96;
+            if (isNoiseChannel) {
+                this.pitchEnvelopeStart = 0;
+                this.pitchEnvelopeEnd = 11;
+            }
             switch (type) {
                 case 0:
                     this.chipWave = 2;
@@ -14099,7 +14134,7 @@ li.select2-results__option[role=group] > strong:hover {
             this.octave = 0;
             this.loopStart = 0;
             this.loopLength = 4;
-            this.tempo = 120;
+            this.tempo = 150;
             this.reverb = 0;
             this.beatsPerBar = 8;
             this.barCount = 16;
@@ -14149,7 +14184,7 @@ li.select2-results__option[role=group] > strong:hover {
             let bits;
             let buffer = [];
             buffer.push(Song._variant);
-            buffer.push(base64IntToCharCode[Song._latestUltraBoxVersion]);
+            buffer.push(base64IntToCharCode[Song._latestSlarmoosBoxVersion]);
             buffer.push(78);
             var encodedSongTitle = encodeURIComponent(this.title);
             buffer.push(base64IntToCharCode[encodedSongTitle.length >> 6], base64IntToCharCode[encodedSongTitle.length & 0x3f]);
@@ -14507,6 +14542,8 @@ li.select2-results__option[role=group] > strong:hover {
                         }
                         buffer.push(base64IntToCharCode[instrument.envelopes[envelopeIndex].envelope]);
                     }
+                    buffer.push(base64IntToCharCode[instrument.pitchEnvelopeStart >> 6], base64IntToCharCode[instrument.pitchEnvelopeStart & 0x3f]);
+                    buffer.push(base64IntToCharCode[instrument.pitchEnvelopeEnd >> 6], base64IntToCharCode[instrument.pitchEnvelopeEnd & 0x3f]);
                 }
             }
             buffer.push(98);
@@ -14743,43 +14780,37 @@ li.select2-results__option[role=group] > strong:hover {
                 return;
             }
             const variantTest = compressed.charCodeAt(charIndex);
-            let fromBeepBox;
-            let fromJummBox;
-            let fromGoldBox;
-            let fromUltraBox;
+            let fromBeepBox = false;
+            let fromJummBox = false;
+            let fromGoldBox = false;
+            let fromUltraBox = false;
+            let fromSlarmoosBox = false;
             if (variantTest == 0x6A) {
-                fromBeepBox = false;
                 fromJummBox = true;
-                fromGoldBox = false;
-                fromUltraBox = false;
                 charIndex++;
             }
             else if (variantTest == 0x67) {
-                fromBeepBox = false;
-                fromJummBox = false;
                 fromGoldBox = true;
-                fromUltraBox = false;
                 charIndex++;
             }
             else if (variantTest == 0x75) {
-                fromBeepBox = false;
-                fromJummBox = false;
-                fromGoldBox = false;
                 fromUltraBox = true;
                 charIndex++;
             }
             else if (variantTest == 0x64) {
-                fromBeepBox = false;
                 fromJummBox = true;
-                fromGoldBox = false;
-                fromUltraBox = false;
+                charIndex++;
+            }
+            else if (variantTest == 0x60) {
+                fromUltraBox = true;
+                charIndex++;
+            }
+            else if (variantTest == 0x73) {
+                fromSlarmoosBox = true;
                 charIndex++;
             }
             else {
                 fromBeepBox = true;
-                fromJummBox = false;
-                fromGoldBox = false;
-                fromUltraBox = false;
             }
             const version = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
             if (fromBeepBox && (version == -1 || version > Song._latestBeepboxVersion || version < Song._oldestBeepboxVersion))
@@ -14789,6 +14820,8 @@ li.select2-results__option[role=group] > strong:hover {
             if (fromGoldBox && (version == -1 || version > Song._latestGoldBoxVersion || version < Song._oldestGoldBoxVersion))
                 return;
             if (fromUltraBox && (version == -1 || version > Song._latestUltraBoxVersion || version < Song._oldestUltraBoxVersion))
+                return;
+            if (fromSlarmoosBox && (version == -1 || version > Song._latestSlarmoosBoxVersion || version < Song._oldestSlarmoosBoxVersion))
                 return;
             const beforeTwo = version < 2;
             const beforeThree = version < 3;
@@ -14801,7 +14834,7 @@ li.select2-results__option[role=group] > strong:hover {
             this.initToDefault((fromBeepBox && beforeNine) || ((fromJummBox && beforeFive) || (beforeFour && fromGoldBox)));
             const forceSimpleFilter = (fromBeepBox && beforeNine || fromJummBox && beforeFive);
             let willLoadLegacySamplesForOldSongs = false;
-            if (fromUltraBox || fromGoldBox) {
+            if (fromSlarmoosBox || fromUltraBox || fromGoldBox) {
                 compressed = compressed.replaceAll("%7C", "|");
                 var compressed_array = compressed.split("|");
                 compressed = compressed_array.shift();
@@ -15087,7 +15120,7 @@ li.select2-results__option[role=group] > strong:hover {
                         break;
                     case 114:
                         {
-                            if (!fromUltraBox) {
+                            if (!fromUltraBox && !fromSlarmoosBox) {
                                 let newRhythm = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                                 this.rhythm = clamp(0, Config.rhythms.length, newRhythm + 2);
                                 if (fromJummBox && beforeThree || fromBeepBox) {
@@ -15229,7 +15262,7 @@ li.select2-results__option[role=group] > strong:hover {
                                     this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].chipNoise = clamp(0, Config.chipNoises.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                                 }
                                 else {
-                                    if (fromUltraBox) {
+                                    if (fromSlarmoosBox || fromUltraBox) {
                                         const chipWaveReal = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                                         const chipWaveCounter = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                                         if (chipWaveCounter == 3) {
@@ -15311,7 +15344,7 @@ li.select2-results__option[role=group] > strong:hover {
                                 let typeCheck = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                                 if (fromBeepBox || typeCheck == 0) {
                                     instrument.eqFilterType = false;
-                                    if (fromJummBox || fromGoldBox || fromUltraBox)
+                                    if (fromJummBox || fromGoldBox || fromUltraBox || fromSlarmoosBox)
                                         typeCheck = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                                     const originalControlPointCount = typeCheck;
                                     instrument.eqFilter.controlPointCount = clamp(0, Config.filterMaxPoints + 1, originalControlPointCount);
@@ -15328,7 +15361,7 @@ li.select2-results__option[role=group] > strong:hover {
                                         charIndex += 3;
                                     }
                                     instrument.eqSubFilters[0] = instrument.eqFilter;
-                                    if ((fromJummBox && !beforeFive) || (fromGoldBox && !beforeFour) || fromUltraBox) {
+                                    if ((fromJummBox && !beforeFive) || (fromGoldBox && !beforeFour) || fromUltraBox || fromSlarmoosBox) {
                                         let usingSubFilterBitfield = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) | (base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                                         for (let j = 0; j < Config.filterMorphCount - 1; j++) {
                                             if (usingSubFilterBitfield & (1 << j)) {
@@ -15362,8 +15395,8 @@ li.select2-results__option[role=group] > strong:hover {
                         break;
                     case 121:
                         {
-                            if (fromUltraBox) {
-                                if (beforeThree) {
+                            if (fromSlarmoosBox || fromUltraBox) {
+                                if (beforeThree && fromUltraBox) {
                                     const sampleLoopInfoEncodedLength = decode32BitNumber(compressed, charIndex);
                                     charIndex += 6;
                                     const sampleLoopInfoEncoded = compressed.slice(charIndex, charIndex + sampleLoopInfoEncodedLength);
@@ -15432,7 +15465,7 @@ li.select2-results__option[role=group] > strong:hover {
                                 if (instrument.type == 4) {
                                     for (let i = 0; i < Config.drumCount; i++) {
                                         let aa = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
-                                        if ((beforeTwo && fromGoldBox) || (!fromGoldBox && !fromUltraBox))
+                                        if ((beforeTwo && fromGoldBox) || (!fromGoldBox && !fromUltraBox && !fromSlarmoosBox))
                                             aa = pregoldToEnvelope[aa];
                                         instrument.drumsetEnvelopes[i] = Song._envelopeFromLegacyIndex(aa).index;
                                     }
@@ -15440,7 +15473,7 @@ li.select2-results__option[role=group] > strong:hover {
                                 else {
                                     const legacySettings = legacySettingsCache[instrumentChannelIterator][instrumentIndexIterator];
                                     let aa = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
-                                    if ((beforeTwo && fromGoldBox) || (!fromGoldBox && !fromUltraBox))
+                                    if ((beforeTwo && fromGoldBox) || (!fromGoldBox && !fromUltraBox && !fromSlarmoosBox))
                                         aa = pregoldToEnvelope[aa];
                                     legacySettings.filterEnvelope = Song._envelopeFromLegacyIndex(aa);
                                     instrument.convertLegacySettings(legacySettings, forceSimpleFilter);
@@ -15449,7 +15482,7 @@ li.select2-results__option[role=group] > strong:hover {
                             else {
                                 for (let i = 0; i < Config.drumCount; i++) {
                                     let aa = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
-                                    if ((beforeTwo && fromGoldBox) || (!fromGoldBox && !fromUltraBox))
+                                    if ((beforeTwo && fromGoldBox) || (!fromGoldBox && !fromUltraBox && !fromSlarmoosBox))
                                         aa = pregoldToEnvelope[aa];
                                     instrument.drumsetEnvelopes[i] = clamp(0, Config.envelopes.length, aa);
                                 }
@@ -15472,7 +15505,7 @@ li.select2-results__option[role=group] > strong:hover {
                                 legacySettings.pulseEnvelope = Song._envelopeFromLegacyIndex(aa);
                                 instrument.convertLegacySettings(legacySettings, forceSimpleFilter);
                             }
-                            if (fromUltraBox && !beforeFour) {
+                            if ((fromUltraBox && !beforeFour) || fromSlarmoosBox) {
                                 instrument.decimalOffset = clamp(0, 99 + 1, (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) + base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                             }
                         }
@@ -15523,7 +15556,7 @@ li.select2-results__option[role=group] > strong:hover {
                                         }
                                     }
                                 }
-                                else if ((beforeFour && !fromGoldBox && !fromUltraBox) || fromBeepBox) {
+                                else if ((beforeFour && !fromGoldBox && !fromUltraBox && !fromSlarmoosBox) || fromBeepBox) {
                                     const settings = legacySettings[clamp(0, legacySettings.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)])];
                                     const instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                                     instrument.fadeIn = Synth.secondsToFadeInSetting(settings.fadeInSeconds);
@@ -15552,7 +15585,7 @@ li.select2-results__option[role=group] > strong:hover {
                                 const instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                                 instrument.fadeIn = clamp(0, Config.fadeInRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                                 instrument.fadeOut = clamp(0, Config.fadeOutTicks.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
-                                if (fromJummBox || fromGoldBox || fromUltraBox)
+                                if (fromJummBox || fromGoldBox || fromUltraBox || fromSlarmoosBox)
                                     instrument.clicklessTransition = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] ? true : false;
                             }
                         }
@@ -15701,7 +15734,7 @@ li.select2-results__option[role=group] > strong:hover {
                             else {
                                 this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].unison = clamp(0, Config.unisons.length + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                                 const instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
-                                if ((fromUltraBox && !beforeFive) && (instrument.unison == Config.unisons.length)) {
+                                if (((fromUltraBox && !beforeFive) || fromSlarmoosBox) && (instrument.unison == Config.unisons.length)) {
                                     instrument.unisonVoices = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                                     const unisonSpreadNegative = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                                     const unisonSpread = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] + ((base64CharCodeToInt[compressed.charCodeAt(charIndex++)] + (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] * 63)) * 63);
@@ -15776,7 +15809,7 @@ li.select2-results__option[role=group] > strong:hover {
                                     let typeCheck = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                                     if (fromBeepBox || typeCheck == 0) {
                                         instrument.noteFilterType = false;
-                                        if (fromJummBox || fromGoldBox || fromUltraBox)
+                                        if (fromJummBox || fromGoldBox || fromUltraBox || fromSlarmoosBox)
                                             typeCheck = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                                         instrument.noteFilter.controlPointCount = clamp(0, Config.filterMaxPoints + 1, typeCheck);
                                         for (let i = instrument.noteFilter.controlPoints.length; i < instrument.noteFilter.controlPointCount; i++) {
@@ -15792,7 +15825,7 @@ li.select2-results__option[role=group] > strong:hover {
                                             charIndex += 3;
                                         }
                                         instrument.noteSubFilters[0] = instrument.noteFilter;
-                                        if ((fromJummBox && !beforeFive) || (fromGoldBox) || (fromUltraBox)) {
+                                        if ((fromJummBox && !beforeFive) || (fromGoldBox) || (fromUltraBox) || (fromSlarmoosBox)) {
                                             let usingSubFilterBitfield = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) | (base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                                             for (let j = 0; j < Config.filterMorphCount - 1; j++) {
                                                 if (usingSubFilterBitfield & (1 << j)) {
@@ -15828,7 +15861,7 @@ li.select2-results__option[role=group] > strong:hover {
                                 }
                                 if (effectsIncludeChord(instrument.effects)) {
                                     instrument.chord = clamp(0, Config.chords.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
-                                    if (instrument.chord == Config.chords.dictionary["arpeggio"].index && (fromJummBox || fromGoldBox || fromUltraBox)) {
+                                    if (instrument.chord == Config.chords.dictionary["arpeggio"].index && (fromJummBox || fromGoldBox || fromUltraBox || fromSlarmoosBox)) {
                                         instrument.arpeggioSpeed = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                                         instrument.fastTwoNoteArp = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)]) ? true : false;
                                     }
@@ -15847,7 +15880,7 @@ li.select2-results__option[role=group] > strong:hover {
                                 }
                                 if (effectsIncludeVibrato(instrument.effects)) {
                                     instrument.vibrato = clamp(0, Config.vibratos.length + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
-                                    if (instrument.vibrato == Config.vibratos.length && (fromJummBox || fromGoldBox || fromUltraBox)) {
+                                    if (instrument.vibrato == Config.vibratos.length && (fromJummBox || fromGoldBox || fromUltraBox || fromSlarmoosBox)) {
                                         instrument.vibratoDepth = clamp(0, Config.modulators.dictionary["vibrato depth"].maxRawVol + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]) / 25;
                                         instrument.vibratoSpeed = clamp(0, Config.modulators.dictionary["vibrato speed"].maxRawVol + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                                         instrument.vibratoDelay = clamp(0, Config.modulators.dictionary["vibrato delay"].maxRawVol + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
@@ -15862,7 +15895,7 @@ li.select2-results__option[role=group] > strong:hover {
                                 }
                                 if (effectsIncludeDistortion(instrument.effects)) {
                                     instrument.distortion = clamp(0, Config.distortionRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
-                                    if ((fromJummBox && !beforeFive) || fromGoldBox || fromUltraBox)
+                                    if ((fromJummBox && !beforeFive) || fromGoldBox || fromUltraBox || fromSlarmoosBox)
                                         instrument.aliases = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] ? true : false;
                                 }
                                 if (effectsIncludeBitcrusher(instrument.effects)) {
@@ -15876,7 +15909,7 @@ li.select2-results__option[role=group] > strong:hover {
                                     else {
                                         instrument.pan = clamp(0, Config.panMax + 1, (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) + base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                                     }
-                                    if ((fromJummBox && !beforeTwo) || fromGoldBox || fromUltraBox)
+                                    if ((fromJummBox && !beforeTwo) || fromGoldBox || fromUltraBox || fromSlarmoosBox)
                                         instrument.panDelay = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                                 }
                                 if (effectsIncludeChorus(instrument.effects)) {
@@ -15940,7 +15973,7 @@ li.select2-results__option[role=group] > strong:hover {
                             else if ((fromJummBox && beforeFive) || (beforeFour && fromGoldBox)) {
                                 const instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                                 instrument.pan = clamp(0, Config.panMax + 1, (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) + base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
-                                if (fromJummBox && !beforeThree || fromGoldBox || fromUltraBox) {
+                                if (fromJummBox && !beforeThree || fromGoldBox || fromUltraBox || fromSlarmoosBox) {
                                     instrument.panDelay = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                                 }
                             }
@@ -16000,7 +16033,7 @@ li.select2-results__option[role=group] > strong:hover {
                         {
                             for (let channel = 0; channel < this.getChannelCount(); channel++) {
                                 var channelNameLength;
-                                if (beforeFour && !fromGoldBox && !fromUltraBox)
+                                if (beforeFour && !fromGoldBox && !fromUltraBox && !fromSlarmoosBox)
                                     channelNameLength = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                                 else
                                     channelNameLength = ((base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) + base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
@@ -16125,7 +16158,7 @@ li.select2-results__option[role=group] > strong:hover {
                                 const instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                                 const legacySettings = legacySettingsCache[instrumentChannelIterator][instrumentIndexIterator];
                                 let aa = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
-                                if ((beforeTwo && fromGoldBox) || (!fromGoldBox && !fromUltraBox))
+                                if ((beforeTwo && fromGoldBox) || (!fromGoldBox && !fromUltraBox && !fromSlarmoosBox))
                                     aa = pregoldToEnvelope[aa];
                                 legacySettings.feedbackEnvelope = Song._envelopeFromLegacyIndex(base64CharCodeToInt[aa]);
                                 instrument.convertLegacySettings(legacySettings, forceSimpleFilter);
@@ -16141,7 +16174,7 @@ li.select2-results__option[role=group] > strong:hover {
                                     instrument.operators[o].frequency = freqToGold3[clamp(0, freqToGold3.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)])];
                                 }
                             }
-                            else if (!fromGoldBox && !fromUltraBox) {
+                            else if (!fromGoldBox && !fromUltraBox && !fromSlarmoosBox) {
                                 const freqToUltraBox = [4, 5, 6, 7, 8, 10, 12, 13, 14, 15, 16, 18, 20, 23, 27, 2, 1, 9, 17, 19, 21, 23, 0, 3];
                                 for (let o = 0; o < (instrument.type == 11 ? 6 : Config.operatorCount); o++) {
                                     instrument.operators[o].frequency = freqToUltraBox[clamp(0, freqToUltraBox.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)])];
@@ -16182,7 +16215,7 @@ li.select2-results__option[role=group] > strong:hover {
                             }
                             else {
                                 const envelopeCount = clamp(0, Config.maxEnvelopeCount + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
-                                if ((fromJummBox && !beforeSix) || (fromUltraBox && !beforeFive)) {
+                                if ((fromJummBox && !beforeSix) || (fromUltraBox && !beforeFive) || (fromSlarmoosBox)) {
                                     instrument.envelopeSpeed = clamp(0, Config.modulators.dictionary["envelope speed"].maxRawVol + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                                     instrument.discreteEnvelope = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)]) ? true : false;
                                 }
@@ -16200,6 +16233,12 @@ li.select2-results__option[role=group] > strong:hover {
                                         aa = jummToUltraEnvelope[aa];
                                     const envelope = clamp(0, Config.envelopes.length, aa);
                                     instrument.addEnvelope(target, index, envelope);
+                                }
+                                if (fromSlarmoosBox) {
+                                    let pitchEnvelopeCompact = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                                    instrument.pitchEnvelopeStart = pitchEnvelopeCompact * 63 + base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                                    pitchEnvelopeCompact = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                                    instrument.pitchEnvelopeEnd = pitchEnvelopeCompact * 63 + base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                                 }
                             }
                         }
@@ -16290,7 +16329,7 @@ li.select2-results__option[role=group] > strong:hover {
                                 }
                             }
                             else {
-                                if (fromUltraBox) {
+                                if (fromUltraBox || fromSlarmoosBox) {
                                     const instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                                     instrument.decimalOffset = clamp(0, 50 + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                                 }
@@ -16651,7 +16690,7 @@ li.select2-results__option[role=group] > strong:hover {
                                                     note.continuesLastPattern = (bits.read(1) == 1);
                                                 }
                                                 else {
-                                                    if ((beforeFour && !fromUltraBox) || fromBeepBox) {
+                                                    if ((beforeFour && !fromUltraBox && !fromSlarmoosBox) || fromBeepBox) {
                                                         note.continuesLastPattern = false;
                                                     }
                                                     else {
@@ -17040,7 +17079,7 @@ li.select2-results__option[role=group] > strong:hover {
             const result = {
                 "name": this.title,
                 "format": Song._format,
-                "version": Song._latestUltraBoxVersion,
+                "version": Song._latestSlarmoosBoxVersion,
                 "scale": Config.scales[this.scale].name,
                 "customScale": this.scaleCustom,
                 "key": Config.keys[this.key].name,
@@ -17625,7 +17664,9 @@ li.select2-results__option[role=group] > strong:hover {
     Song._latestGoldBoxVersion = 4;
     Song._oldestUltraBoxVersion = 1;
     Song._latestUltraBoxVersion = 5;
-    Song._variant = 0x75;
+    Song._oldestSlarmoosBoxVersion = 1;
+    Song._latestSlarmoosBoxVersion = 1;
+    Song._variant = 0x73;
     class PickedString {
         constructor() {
             this.delayLine = null;
@@ -17946,24 +17987,24 @@ li.select2-results__option[role=group] > strong:hover {
                 }
                 if (automationTarget.computeIndex != null) {
                     const computeIndex = automationTarget.computeIndex + targetIndex;
-                    let envelopeStart = EnvelopeComputer.computeEnvelope(envelope, noteSecondsStart, beatTimeStart, noteSizeStart, null, tone);
+                    let envelopeStart = EnvelopeComputer.computeEnvelope(envelope, noteSecondsStart, beatTimeStart, noteSizeStart, null, tone, instrument);
                     if (prevSlideStart) {
-                        const other = EnvelopeComputer.computeEnvelope(envelope, prevNoteSecondsStart, beatTimeStart, prevNoteSize, null, tone);
+                        const other = EnvelopeComputer.computeEnvelope(envelope, prevNoteSecondsStart, beatTimeStart, prevNoteSize, null, tone, instrument);
                         envelopeStart += (other - envelopeStart) * prevSlideRatioStart;
                     }
                     if (nextSlideStart) {
-                        const other = EnvelopeComputer.computeEnvelope(envelope, 0.0, beatTimeStart, nextNoteSize, null, tone);
+                        const other = EnvelopeComputer.computeEnvelope(envelope, 0.0, beatTimeStart, nextNoteSize, null, tone, instrument);
                         envelopeStart += (other - envelopeStart) * nextSlideRatioStart;
                     }
                     let envelopeEnd = envelopeStart;
                     if (instrument.discreteEnvelope == false) {
-                        envelopeEnd = EnvelopeComputer.computeEnvelope(envelope, noteSecondsEnd, beatTimeEnd, noteSizeEnd, null, tone);
+                        envelopeEnd = EnvelopeComputer.computeEnvelope(envelope, noteSecondsEnd, beatTimeEnd, noteSizeEnd, null, tone, instrument);
                         if (prevSlideEnd) {
-                            const other = EnvelopeComputer.computeEnvelope(envelope, prevNoteSecondsEnd, beatTimeEnd, prevNoteSize, null, tone);
+                            const other = EnvelopeComputer.computeEnvelope(envelope, prevNoteSecondsEnd, beatTimeEnd, prevNoteSize, null, tone, instrument);
                             envelopeEnd += (other - envelopeEnd) * prevSlideRatioEnd;
                         }
                         if (nextSlideEnd) {
-                            const other = EnvelopeComputer.computeEnvelope(envelope, 0.0, beatTimeEnd, nextNoteSize, null, tone);
+                            const other = EnvelopeComputer.computeEnvelope(envelope, 0.0, beatTimeEnd, nextNoteSize, null, tone, instrument);
                             envelopeEnd += (other - envelopeEnd) * nextSlideRatioEnd;
                         }
                     }
@@ -18008,19 +18049,36 @@ li.select2-results__option[role=group] > strong:hover {
             }
             this._modifiedEnvelopeCount = 0;
         }
-        static computeEnvelope(envelope, time, beats, noteSize, song, tone) {
-            let basePitch = 0;
-            if (song) {
-                basePitch = Config.keys[song.key].basePitch + (Config.pitchesPerOctave * song.octave);
-            }
-            let pitch = 0;
-            if (tone) {
-                pitch = tone.pitches[0];
-            }
+        static computeEnvelope(envelope, time, beats, noteSize, song, tone, instrument) {
             switch (envelope.type) {
                 case 0: return 1.0;
                 case 1: return Synth.noteSizeToVolumeMult(noteSize);
-                case 2: return (basePitch + pitch) / 96;
+                case 2:
+                    let basePitch = 0;
+                    let startNote = 0;
+                    let endNote = 96;
+                    let pitch = 0;
+                    if (instrument.isNoiseInstrument) {
+                        endNote = 11;
+                    }
+                    startNote = instrument.pitchEnvelopeStart;
+                    endNote = instrument.pitchEnvelopeEnd;
+                    if (song) {
+                        basePitch = Config.keys[song.key].basePitch + (Config.pitchesPerOctave * song.octave);
+                    }
+                    if (tone) {
+                        pitch = tone.pitches[0];
+                    }
+                    const range = endNote - startNote + 1;
+                    if (basePitch + pitch <= startNote) {
+                        return 0;
+                    }
+                    else if (basePitch + pitch >= endNote) {
+                        return 1;
+                    }
+                    else {
+                        return (basePitch + pitch - startNote) / range;
+                    }
                 case 5: return 1.0 / (1.0 + time * envelope.speed);
                 case 6: return 1.0 - 1.0 / (1.0 + time * envelope.speed);
                 case 7: return 0.5 - Math.cos(beats * 2.0 * Math.PI * envelope.speed) * 0.5;
@@ -21056,24 +21114,24 @@ li.select2-results__option[role=group] > strong:hover {
             if (instrument.type == 4) {
                 const drumsetFilterEnvelope = instrument.getDrumsetEnvelope(tone.drumsetPitch);
                 noteFilterExpression *= EnvelopeComputer.getLowpassCutoffDecayVolumeCompensation(drumsetFilterEnvelope);
-                let drumsetFilterEnvelopeStart = EnvelopeComputer.computeEnvelope(drumsetFilterEnvelope, envelopeComputer.noteSecondsStart, beatsPerPart * partTimeStart, envelopeComputer.noteSizeStart, song, tone);
+                let drumsetFilterEnvelopeStart = EnvelopeComputer.computeEnvelope(drumsetFilterEnvelope, envelopeComputer.noteSecondsStart, beatsPerPart * partTimeStart, envelopeComputer.noteSizeStart, song, tone, instrument);
                 if (envelopeComputer.prevSlideStart) {
-                    const other = EnvelopeComputer.computeEnvelope(drumsetFilterEnvelope, envelopeComputer.prevNoteSecondsStart, beatsPerPart * partTimeStart, envelopeComputer.prevNoteSize, song, tone);
+                    const other = EnvelopeComputer.computeEnvelope(drumsetFilterEnvelope, envelopeComputer.prevNoteSecondsStart, beatsPerPart * partTimeStart, envelopeComputer.prevNoteSize, song, tone, instrument);
                     drumsetFilterEnvelopeStart += (other - drumsetFilterEnvelopeStart) * envelopeComputer.prevSlideRatioStart;
                 }
                 if (envelopeComputer.nextSlideStart) {
-                    const other = EnvelopeComputer.computeEnvelope(drumsetFilterEnvelope, 0.0, beatsPerPart * partTimeStart, envelopeComputer.nextNoteSize, song, tone);
+                    const other = EnvelopeComputer.computeEnvelope(drumsetFilterEnvelope, 0.0, beatsPerPart * partTimeStart, envelopeComputer.nextNoteSize, song, tone, instrument);
                     drumsetFilterEnvelopeStart += (other - drumsetFilterEnvelopeStart) * envelopeComputer.nextSlideRatioStart;
                 }
                 let drumsetFilterEnvelopeEnd = drumsetFilterEnvelopeStart;
                 if (instrument.discreteEnvelope == false) {
-                    drumsetFilterEnvelopeEnd = EnvelopeComputer.computeEnvelope(drumsetFilterEnvelope, envelopeComputer.noteSecondsEnd, beatsPerPart * partTimeEnd, envelopeComputer.noteSizeEnd, song, tone);
+                    drumsetFilterEnvelopeEnd = EnvelopeComputer.computeEnvelope(drumsetFilterEnvelope, envelopeComputer.noteSecondsEnd, beatsPerPart * partTimeEnd, envelopeComputer.noteSizeEnd, song, tone, instrument);
                     if (envelopeComputer.prevSlideEnd) {
-                        const other = EnvelopeComputer.computeEnvelope(drumsetFilterEnvelope, envelopeComputer.prevNoteSecondsEnd, beatsPerPart * partTimeEnd, envelopeComputer.prevNoteSize, song, tone);
+                        const other = EnvelopeComputer.computeEnvelope(drumsetFilterEnvelope, envelopeComputer.prevNoteSecondsEnd, beatsPerPart * partTimeEnd, envelopeComputer.prevNoteSize, song, tone, instrument);
                         drumsetFilterEnvelopeEnd += (other - drumsetFilterEnvelopeEnd) * envelopeComputer.prevSlideRatioEnd;
                     }
                     if (envelopeComputer.nextSlideEnd) {
-                        const other = EnvelopeComputer.computeEnvelope(drumsetFilterEnvelope, 0.0, beatsPerPart * partTimeEnd, envelopeComputer.nextNoteSize, song, tone);
+                        const other = EnvelopeComputer.computeEnvelope(drumsetFilterEnvelope, 0.0, beatsPerPart * partTimeEnd, envelopeComputer.nextNoteSize, song, tone, instrument);
                         drumsetFilterEnvelopeEnd += (other - drumsetFilterEnvelopeEnd) * envelopeComputer.nextSlideRatioEnd;
                     }
                 }
@@ -24245,6 +24303,8 @@ li.select2-results__option[role=group] > strong:hover {
                     if (instrument.pitchShift != Config.pitchShiftCenter) {
                         instrument.effects |= 1 << 7;
                         instrument.addEnvelope(Config.instrumentAutomationTargets.dictionary["pitchShift"].index, 0, Config.envelopes.dictionary[selectWeightedRandom([
+                            { item: "noteSize", weight: 2 },
+                            { item: "pitch", weight: 2 },
                             { item: "flare 1", weight: 2 },
                             { item: "flare 2", weight: 1 },
                             { item: "flare 3", weight: 1 },
@@ -24276,6 +24336,8 @@ li.select2-results__option[role=group] > strong:hover {
                         new PotentialFilterPoint(1.0, 0, midFreq, maxFreq, 8000.0, -1),
                     ]);
                     instrument.addEnvelope(Config.instrumentAutomationTargets.dictionary["noteFilterAllFreqs"].index, 0, Config.envelopes.dictionary[selectWeightedRandom([
+                        { item: "noteSize", weight: 2 },
+                        { item: "pitch", weight: 2 },
                         { item: "punch", weight: 4 },
                         { item: "flare 1", weight: 2 },
                         { item: "flare 2", weight: 2 },
@@ -24352,6 +24414,8 @@ li.select2-results__option[role=group] > strong:hover {
                     ])].index;
                     if (instrument.unison != Config.unisons.dictionary["none"].index && Math.random() > 0.4)
                         instrument.addEnvelope(Config.instrumentAutomationTargets.dictionary["unison"].index, 0, Config.envelopes.dictionary[selectWeightedRandom([
+                            { item: "noteSize", weight: 2 },
+                            { item: "pitch", weight: 2 },
                             { item: "twang -1", weight: 3 },
                             { item: "twang 1", weight: 3 },
                             { item: "twang 2", weight: 2 },
@@ -24515,6 +24579,8 @@ li.select2-results__option[role=group] > strong:hover {
                     if (instrument.pitchShift != Config.pitchShiftCenter) {
                         instrument.effects |= 1 << 7;
                         instrument.addEnvelope(Config.instrumentAutomationTargets.dictionary["pitchShift"].index, 0, Config.envelopes.dictionary[selectWeightedRandom([
+                            { item: "noteSize", weight: 2 },
+                            { item: "pitch", weight: 2 },
                             { item: "flare 1", weight: 2 },
                             { item: "flare 2", weight: 1 },
                             { item: "flare 3", weight: 1 },
@@ -24557,6 +24623,8 @@ li.select2-results__option[role=group] > strong:hover {
                         new PotentialFilterPoint(1.0, 0, midFreq, maxFreq, 8000.0, -1),
                     ]);
                     instrument.addEnvelope(Config.instrumentAutomationTargets.dictionary["noteFilterAllFreqs"].index, 0, Config.envelopes.dictionary[selectWeightedRandom([
+                        { item: "noteSize", weight: 2 },
+                        { item: "pitch", weight: 2 },
                         { item: "punch", weight: 6 },
                         { item: "flare -1", weight: 1 },
                         { item: "flare 1", weight: 2 },
@@ -24651,6 +24719,8 @@ li.select2-results__option[role=group] > strong:hover {
                             instrument.decimalOffset = 0;
                             if (Math.random() < 0.6) {
                                 instrument.addEnvelope(Config.instrumentAutomationTargets.dictionary["pulseWidth"].index, 0, Config.envelopes.dictionary[selectWeightedRandom([
+                                    { item: "noteSize", weight: 2 },
+                                    { item: "pitch", weight: 2 },
                                     { item: "punch", weight: 6 },
                                     { item: "flare -1", weight: 1 },
                                     { item: "flare 1", weight: 2 },
@@ -25993,6 +26063,32 @@ li.select2-results__option[role=group] > strong:hover {
             this._instrument.fadeOut = this._oldFadeOut;
             this._instrument.preset = this._instrumentPrevPreset;
             this._doc.notifier.changed();
+        }
+    }
+    class ChangeEnvelopePitchStart extends Change {
+        constructor(doc, startNote) {
+            super();
+            const instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+            const oldStartNote = instrument.pitchEnvelopeStart;
+            if (oldStartNote != startNote) {
+                instrument.pitchEnvelopeStart = startNote;
+                instrument.preset = instrument.type;
+                doc.notifier.changed();
+                this._didSomething();
+            }
+        }
+    }
+    class ChangeEnvelopePitchEnd extends Change {
+        constructor(doc, endNote) {
+            super();
+            const instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+            const oldEndNote = instrument.pitchEnvelopeEnd;
+            if (oldEndNote != endNote) {
+                instrument.pitchEnvelopeEnd = endNote;
+                instrument.preset = instrument.type;
+                doc.notifier.changed();
+                this._didSomething();
+            }
         }
     }
     class ChangeAlgorithm extends Change {
@@ -27937,15 +28033,15 @@ li.select2-results__option[role=group] > strong:hover {
         }
     }
 
-    const { button: button$o, div: div$o, span: span$6, h2: h2$n, input: input$h, br: br$4, select: select$d, option: option$d } = HTML;
+    const { button: button$p, div: div$p, span: span$7, h2: h2$o, input: input$i, br: br$4, select: select$d, option: option$d } = HTML;
     class BeatsPerBarPrompt {
         constructor(_doc) {
             this._doc = _doc;
-            this._beatsStepper = input$h({ style: "width: 3em; margin-left: 1em;", type: "number", step: "1" });
+            this._beatsStepper = input$i({ style: "width: 3em; margin-left: 1em;", type: "number", step: "1" });
             this._conversionStrategySelect = select$d({ style: "width: 100%;" }, option$d({ value: "splice" }, "Splice beats at end of bars."), option$d({ value: "stretch" }, "Stretch notes to fit in bars."), option$d({ value: "overflow" }, "Overflow notes across bars."));
-            this._cancelButton = button$o({ class: "cancelButton" });
-            this._okayButton = button$o({ class: "okayButton", style: "width:45%;" }, "Okay");
-            this.container = div$o({ class: "prompt noSelection", style: "width: 250px;" }, h2$n("Beats Per Bar"), div$o({ style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;" }, div$o({ style: "text-align: right;" }, "Beats per bar:", br$4(), span$6({ style: "font-size: smaller; color: ${ColorConfig.secondaryText};" }, "(Multiples of 3 or 4 are recommended)")), this._beatsStepper), div$o({ style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;" }, div$o({ class: "selectContainer", style: "width: 100%;" }, this._conversionStrategySelect)), div$o({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between;" }, this._okayButton), this._cancelButton);
+            this._cancelButton = button$p({ class: "cancelButton" });
+            this._okayButton = button$p({ class: "okayButton", style: "width:45%;" }, "Okay");
+            this.container = div$p({ class: "prompt noSelection", style: "width: 250px;" }, h2$o("Beats Per Bar"), div$p({ style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;" }, div$p({ style: "text-align: right;" }, "Beats per bar:", br$4(), span$7({ style: "font-size: smaller; color: ${ColorConfig.secondaryText};" }, "(Multiples of 3 or 4 are recommended)")), this._beatsStepper), div$p({ style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;" }, div$p({ class: "selectContainer", style: "width: 100%;" }, this._conversionStrategySelect)), div$p({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between;" }, this._okayButton), this._cancelButton);
             this._close = () => {
                 this._doc.undo();
             };
@@ -27998,19 +28094,19 @@ li.select2-results__option[role=group] > strong:hover {
         }
     }
 
-    const { button: button$n, div: div$n, label: label$3, br: br$3, h2: h2$m, input: input$g } = HTML;
+    const { button: button$o, div: div$o, label: label$3, br: br$3, h2: h2$n, input: input$h } = HTML;
     class ChannelSettingsPrompt {
         constructor(_doc) {
             this._doc = _doc;
-            this._patternsStepper = input$g({ style: "width: 3em; margin-left: 1em;", type: "number", step: "1" });
-            this._pitchChannelStepper = input$g({ style: "width: 3em; margin-left: 1em;", type: "number", step: "1" });
-            this._drumChannelStepper = input$g({ style: "width: 3em; margin-left: 1em;", type: "number", step: "1" });
-            this._modChannelStepper = input$g({ style: "width: 3em; margin-left: 1em;", type: "number", step: "1" });
-            this._layeredInstrumentsBox = input$g({ style: "width: 3em; margin-left: 1em;", type: "checkbox" });
-            this._patternInstrumentsBox = input$g({ style: "width: 3em; margin-left: 1em;", type: "checkbox" });
-            this._cancelButton = button$n({ class: "cancelButton" });
-            this._okayButton = button$n({ class: "okayButton", style: "width:45%;" }, "Okay");
-            this.container = div$n({ class: "prompt noSelection", style: "width: 250px; text-align: right;" }, h2$m("Channel Settings"), label$3({ style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;" }, "Pitch channels:", this._pitchChannelStepper), label$3({ style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;" }, "Drum channels:", this._drumChannelStepper), div$n({ style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;" }, "Mod channels:", this._modChannelStepper), label$3({ style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;" }, "Available patterns per channel:", this._patternsStepper), label$3({ style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;" }, "Simultaneous instruments", br$3(), "per channel:", this._layeredInstrumentsBox), label$3({ style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;" }, "Different instruments", br$3(), "per pattern:", this._patternInstrumentsBox), div$n({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between;" }, this._okayButton), this._cancelButton);
+            this._patternsStepper = input$h({ style: "width: 3em; margin-left: 1em;", type: "number", step: "1" });
+            this._pitchChannelStepper = input$h({ style: "width: 3em; margin-left: 1em;", type: "number", step: "1" });
+            this._drumChannelStepper = input$h({ style: "width: 3em; margin-left: 1em;", type: "number", step: "1" });
+            this._modChannelStepper = input$h({ style: "width: 3em; margin-left: 1em;", type: "number", step: "1" });
+            this._layeredInstrumentsBox = input$h({ style: "width: 3em; margin-left: 1em;", type: "checkbox" });
+            this._patternInstrumentsBox = input$h({ style: "width: 3em; margin-left: 1em;", type: "checkbox" });
+            this._cancelButton = button$o({ class: "cancelButton" });
+            this._okayButton = button$o({ class: "okayButton", style: "width:45%;" }, "Okay");
+            this.container = div$o({ class: "prompt noSelection", style: "width: 250px; text-align: right;" }, h2$n("Channel Settings"), label$3({ style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;" }, "Pitch channels:", this._pitchChannelStepper), label$3({ style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;" }, "Drum channels:", this._drumChannelStepper), div$o({ style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;" }, "Mod channels:", this._modChannelStepper), label$3({ style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;" }, "Available patterns per channel:", this._patternsStepper), label$3({ style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;" }, "Simultaneous instruments", br$3(), "per channel:", this._layeredInstrumentsBox), label$3({ style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;" }, "Different instruments", br$3(), "per pattern:", this._patternInstrumentsBox), div$o({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between;" }, this._okayButton), this._cancelButton);
             this._close = () => {
                 this._doc.undo();
             };
@@ -28085,7 +28181,7 @@ li.select2-results__option[role=group] > strong:hover {
         }
     }
 
-    const { button: button$m, div: div$m, h2: h2$l } = HTML;
+    const { button: button$n, div: div$n, h2: h2$m } = HTML;
     class CustomChipPromptCanvas {
         constructor(doc) {
             this._mouseX = 0;
@@ -28278,24 +28374,24 @@ li.select2-results__option[role=group] > strong:hover {
             this._doc = _doc;
             this._songEditor = _songEditor;
             this.customChipCanvas = new CustomChipPromptCanvas(this._doc);
-            this._playButton = button$m({ style: "width: 55%;", type: "button" });
-            this._cancelButton = button$m({ class: "cancelButton" });
-            this._okayButton = button$m({ class: "okayButton", style: "width:45%;" }, "Okay");
-            this.copyButton = button$m({ style: "width:86px; margin-right: 5px;", class: "copyButton" }, [
+            this._playButton = button$n({ style: "width: 55%;", type: "button" });
+            this._cancelButton = button$n({ class: "cancelButton" });
+            this._okayButton = button$n({ class: "okayButton", style: "width:45%;" }, "Okay");
+            this.copyButton = button$n({ style: "width:86px; margin-right: 5px;", class: "copyButton" }, [
                 "Copy",
                 SVG.svg({ style: "flex-shrink: 0; position: absolute; left: 0; top: 50%; margin-top: -1em; pointer-events: none;", width: "2em", height: "2em", viewBox: "-5 -21 26 26" }, [
                     SVG.path({ d: "M 0 -15 L 1 -15 L 1 0 L 13 0 L 13 1 L 0 1 L 0 -15 z M 2 -1 L 2 -17 L 10 -17 L 14 -13 L 14 -1 z M 3 -2 L 13 -2 L 13 -12 L 9 -12 L 9 -16 L 3 -16 z", fill: "currentColor" }),
                 ]),
             ]);
-            this.pasteButton = button$m({ style: "width:86px;", class: "pasteButton" }, [
+            this.pasteButton = button$n({ style: "width:86px;", class: "pasteButton" }, [
                 "Paste",
                 SVG.svg({ style: "flex-shrink: 0; position: absolute; left: 0; top: 50%; margin-top: -1em; pointer-events: none;", width: "2em", height: "2em", viewBox: "0 0 26 26" }, [
                     SVG.path({ d: "M 8 18 L 6 18 L 6 5 L 17 5 L 17 7 M 9 8 L 16 8 L 20 12 L 20 22 L 9 22 z", stroke: "currentColor", fill: "none" }),
                     SVG.path({ d: "M 9 3 L 14 3 L 14 6 L 9 6 L 9 3 z M 16 8 L 20 12 L 16 12 L 16 8 z", fill: "currentColor", }),
                 ]),
             ]);
-            this.copyPasteContainer = div$m({ style: "width: 185px;" }, this.copyButton, this.pasteButton);
-            this.container = div$m({ class: "prompt noSelection", style: "width: 600px;" }, h2$l("Edit Custom Chip Instrument"), div$m({ style: "display: flex; width: 55%; align-self: center; flex-direction: row; align-items: center; justify-content: center;" }, this._playButton), div$m({ style: "display: flex; flex-direction: row; align-items: center; justify-content: center;" }, this.customChipCanvas.container), div$m({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between;" }, this._okayButton, this.copyPasteContainer), this._cancelButton);
+            this.copyPasteContainer = div$n({ style: "width: 185px;" }, this.copyButton, this.pasteButton);
+            this.container = div$n({ class: "prompt noSelection", style: "width: 600px;" }, h2$m("Edit Custom Chip Instrument"), div$n({ style: "display: flex; width: 55%; align-self: center; flex-direction: row; align-items: center; justify-content: center;" }, this._playButton), div$n({ style: "display: flex; flex-direction: row; align-items: center; justify-content: center;" }, this.customChipCanvas.container), div$n({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between;" }, this._okayButton, this.copyPasteContainer), this._cancelButton);
             this._togglePlay = () => {
                 this._songEditor.togglePlay();
                 this.updatePlayButton();
@@ -28972,7 +29068,7 @@ li.select2-results__option[role=group] > strong:hover {
         }
     }
 
-    const { button: button$l, div: div$l, h2: h2$k, p: p$7 } = HTML;
+    const { button: button$m, div: div$m, h2: h2$l, p: p$8 } = HTML;
     class CustomFilterPrompt {
         constructor(_doc, _songEditor, _useNoteFilter) {
             this._doc = _doc;
@@ -28981,29 +29077,29 @@ li.select2-results__option[role=group] > strong:hover {
             this.filterData = new FilterSettings;
             this.startingFilterData = new FilterSettings;
             this._subfilterIndex = 0;
-            this._playButton = button$l({ style: "width: 55%;", type: "button" });
+            this._playButton = button$m({ style: "width: 55%;", type: "button" });
             this._filterButtons = [];
-            this._filterButtonContainer = div$l({ class: "instrument-bar", style: "justify-content: center;" });
-            this._cancelButton = button$l({ class: "cancelButton" });
-            this._okayButton = button$l({ class: "okayButton", style: "width:45%;" }, "Okay");
-            this._filterContainer = div$l({ style: "width: 100%; display: flex; flex-direction: row; align-items: center; justify-content: center;" });
-            this._editorTitle = div$l({}, h2$k("Edit Filter"));
-            this._filterCopyButton = button$l({ style: "width:86px; margin-right: 5px;", class: "copyButton" }, [
+            this._filterButtonContainer = div$m({ class: "instrument-bar", style: "justify-content: center;" });
+            this._cancelButton = button$m({ class: "cancelButton" });
+            this._okayButton = button$m({ class: "okayButton", style: "width:45%;" }, "Okay");
+            this._filterContainer = div$m({ style: "width: 100%; display: flex; flex-direction: row; align-items: center; justify-content: center;" });
+            this._editorTitle = div$m({}, h2$l("Edit Filter"));
+            this._filterCopyButton = button$m({ style: "width:86px; margin-right: 5px;", class: "copyButton" }, [
                 "Copy",
                 SVG.svg({ style: "flex-shrink: 0; position: absolute; left: 0; top: 50%; margin-top: -1em; pointer-events: none;", width: "2em", height: "2em", viewBox: "-5 -21 26 26" }, [
                     SVG.path({ d: "M 0 -15 L 1 -15 L 1 0 L 13 0 L 13 1 L 0 1 L 0 -15 z M 2 -1 L 2 -17 L 10 -17 L 14 -13 L 14 -1 z M 3 -2 L 13 -2 L 13 -12 L 9 -12 L 9 -16 L 3 -16 z", fill: "currentColor" }),
                 ]),
             ]);
-            this._filterPasteButton = button$l({ style: "width:86px;", class: "pasteButton" }, [
+            this._filterPasteButton = button$m({ style: "width:86px;", class: "pasteButton" }, [
                 "Paste",
                 SVG.svg({ style: "flex-shrink: 0; position: absolute; left: 0; top: 50%; margin-top: -1em; pointer-events: none;", width: "2em", height: "2em", viewBox: "0 0 26 26" }, [
                     SVG.path({ d: "M 8 18 L 6 18 L 6 5 L 17 5 L 17 7 M 9 8 L 16 8 L 20 12 L 20 22 L 9 22 z", stroke: "currentColor", fill: "none" }),
                     SVG.path({ d: "M 9 3 L 14 3 L 14 6 L 9 6 L 9 3 z M 16 8 L 20 12 L 16 12 L 16 8 z", fill: "currentColor", }),
                 ]),
             ]);
-            this._filterCopyPasteContainer = div$l({ style: "width: 185px;" }, this._filterCopyButton, this._filterPasteButton);
-            this._filterCoordinateText = div$l({ style: "text-align: left; margin-bottom: 0px; font-size: x-small; height: 1.3em; color: " + ColorConfig.secondaryText + ";" }, p$7(""));
-            this.container = div$l({ class: "prompt noSelection", style: "width: 600px;" }, this._editorTitle, div$l({ style: "display: flex; width: 55%; align-self: center; flex-direction: row; align-items: center; justify-content: center;" }, this._playButton), this._filterButtonContainer, this._filterContainer, div$l({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between;" }, this._okayButton, this._filterCopyPasteContainer), this._cancelButton);
+            this._filterCopyPasteContainer = div$m({ style: "width: 185px;" }, this._filterCopyButton, this._filterPasteButton);
+            this._filterCoordinateText = div$m({ style: "text-align: left; margin-bottom: 0px; font-size: x-small; height: 1.3em; color: " + ColorConfig.secondaryText + ";" }, p$8(""));
+            this.container = div$m({ class: "prompt noSelection", style: "width: 600px;" }, this._editorTitle, div$m({ style: "display: flex; width: 55%; align-self: center; flex-direction: row; align-items: center; justify-content: center;" }, this._playButton), this._filterButtonContainer, this._filterContainer, div$m({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between;" }, this._okayButton, this._filterCopyPasteContainer), this._cancelButton);
             this._setSubfilter = (index, useHistory = true, doSwap = true) => {
                 this._filterButtons[this._subfilterIndex].classList.remove("selected-instrument");
                 if (doSwap)
@@ -29105,12 +29201,12 @@ li.select2-results__option[role=group] > strong:hover {
             this.filterEditor.container.insertBefore(this._filterCoordinateText, this.filterEditor.container.firstChild);
             this.filterEditor.coordText = this._filterCoordinateText;
             this._editorTitle.children[0].innerHTML = (_useNoteFilter) ? "Edit Note Filter" : "Edit EQ Filter";
-            let newButton = button$l({ class: "no-underline", style: "max-width: 5em;" }, "Main");
+            let newButton = button$m({ class: "no-underline", style: "max-width: 5em;" }, "Main");
             this._filterButtonContainer.appendChild(newButton);
             this._filterButtons.push(newButton);
             newButton.addEventListener("click", () => { this._setSubfilter(0); });
             for (let i = 1; i < Config.filterMorphCount; i++) {
-                let newSubButton = button$l({ class: "no-underline", style: "max-width: 2em;" }, "" + i);
+                let newSubButton = button$m({ class: "no-underline", style: "max-width: 2em;" }, "" + i);
                 this._filterButtons.push(newSubButton);
                 this._filterButtonContainer.appendChild(newSubButton);
                 newSubButton.addEventListener("click", () => { this._setSubfilter(i); });
@@ -29143,16 +29239,16 @@ li.select2-results__option[role=group] > strong:hover {
         }
     }
 
-    const { button: button$k, div: div$k, h2: h2$j, input: input$f, label: label$2, br: br$2 } = HTML;
+    const { button: button$l, div: div$l, h2: h2$k, input: input$g, label: label$2, br: br$2 } = HTML;
     class InstrumentExportPrompt {
         constructor(_doc) {
             this._doc = _doc;
-            this._cancelButton = button$k({ class: "cancelButton" });
-            this._exportButton = button$k({ class: "exportButton", style: "width:45%;" }, "Export");
-            this._exportMultipleBox = input$f({ style: "width: 3em; margin-left: 1em;", type: "checkbox" });
+            this._cancelButton = button$l({ class: "cancelButton" });
+            this._exportButton = button$l({ class: "exportButton", style: "width:45%;" }, "Export");
+            this._exportMultipleBox = input$g({ style: "width: 3em; margin-left: 1em;", type: "checkbox" });
             this._channelName = this._doc.song.channels[this._doc.channel].name == "" ? Config.jsonFormat + "-Instrument" : this._doc.song.channels[this._doc.channel].name;
-            this._fileName = input$f({ type: "text", style: "width: 10em;", value: this._channelName, maxlength: 250, "autofocus": "autofocus" });
-            this.container = div$k({ class: "prompt noSelection", style: "width: 200px;" }, h2$j("Export Instruments Options"), div$k({ style: "display: flex; flex-direction: row; align-items: center; justify-content: space-between;" }, "File name:", this._fileName), label$2({ style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;" }, "Export all instruments", br$2(), "in channel:", this._exportMultipleBox), div$k({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between;" }, this._exportButton), this._cancelButton);
+            this._fileName = input$g({ type: "text", style: "width: 10em;", value: this._channelName, maxlength: 250, "autofocus": "autofocus" });
+            this.container = div$l({ class: "prompt noSelection", style: "width: 200px;" }, h2$k("Export Instruments Options"), div$l({ style: "display: flex; flex-direction: row; align-items: center; justify-content: space-between;" }, "File name:", this._fileName), label$2({ style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;" }, "Export all instruments", br$2(), "in channel:", this._exportMultipleBox), div$l({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between;" }, this._exportButton), this._cancelButton);
             this._close = () => {
                 this._doc.undo();
             };
@@ -29219,15 +29315,15 @@ li.select2-results__option[role=group] > strong:hover {
         }
     }
 
-    const { button: button$j, div: div$j, h2: h2$i, input: input$e, select: select$c, option: option$c, code: code$1 } = HTML;
+    const { button: button$k, div: div$k, h2: h2$j, input: input$f, select: select$c, option: option$c, code: code$1 } = HTML;
     class InstrumentImportPrompt {
         constructor(_doc) {
             this._doc = _doc;
-            this._cancelButton = button$j({ class: "cancelButton" });
+            this._cancelButton = button$k({ class: "cancelButton" });
             this._importStrategySelect = select$c({ style: "width: 100%;" }, option$c({ value: "append" }, "Append instruments to the end of the list."), option$c({ value: "replace" }, "Replace only the selected instrument."), option$c({ value: "all" }, "Replace all instruments in the channel."));
-            this._fileInput = input$e({ type: "file", accept: ".json,application/json" });
-            this._strategyInfoText = div$j({ style: "text-align: left;" }, "You must enable either ", code$1("Simultaneous instruments per channel"), " or ", code$1("Different instruments per pattern"), " to change the import strategy.");
-            this.container = div$j({ class: "prompt noSelection", style: "width: 300px;" }, h2$i("Import Instrument(s)"), this._strategyInfoText, div$j({ style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;" }, div$j({ class: "selectContainer", style: "width: 100%;" }, this._importStrategySelect)), this._fileInput, this._cancelButton);
+            this._fileInput = input$f({ type: "file", accept: ".json,application/json" });
+            this._strategyInfoText = div$k({ style: "text-align: left;" }, "You must enable either ", code$1("Simultaneous instruments per channel"), " or ", code$1("Different instruments per pattern"), " to change the import strategy.");
+            this.container = div$k({ class: "prompt noSelection", style: "width: 300px;" }, h2$j("Import Instrument(s)"), this._strategyInfoText, div$k({ style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;" }, div$k({ class: "selectContainer", style: "width: 100%;" }, this._importStrategySelect)), this._fileInput, this._cancelButton);
             this._whenFileSelected = () => {
                 const file = this._fileInput.files[0];
                 if (!file)
@@ -29365,6 +29461,136 @@ li.select2-results__option[role=group] > strong:hover {
             }
             this._fileInput.addEventListener("change", this._whenFileSelected);
             this._cancelButton.addEventListener("click", this._close);
+        }
+    }
+
+    const { span: span$6 } = HTML;
+    class InputBox {
+        constructor(input, _doc, _getChange) {
+            this.input = input;
+            this._doc = _doc;
+            this._getChange = _getChange;
+            this._change = null;
+            this._value = "";
+            this._oldValue = "";
+            this._whenInput = () => {
+                const continuingProspectiveChange = this._doc.lastChangeWas(this._change);
+                if (!continuingProspectiveChange)
+                    this._oldValue = this._value;
+                this._change = this._getChange(this._oldValue, this.input.value);
+                this._doc.setProspectiveChange(this._change);
+            };
+            this._whenChange = () => {
+                this._doc.record(this._change);
+                this._change = null;
+            };
+            input.addEventListener("input", this._whenInput);
+            input.addEventListener("change", this._whenChange);
+        }
+        updateValue(value) {
+            this._value = value;
+            this.input.value = String(value);
+        }
+    }
+    class Slider {
+        constructor(input, _doc, _getChange, midTick) {
+            this.input = input;
+            this._doc = _doc;
+            this._getChange = _getChange;
+            this._change = null;
+            this._value = 0;
+            this._oldValue = 0;
+            this._whenInput = () => {
+                const continuingProspectiveChange = this._doc.lastChangeWas(this._change);
+                if (!continuingProspectiveChange)
+                    this._oldValue = this._value;
+                if (this._getChange != null) {
+                    this._change = this._getChange(this._oldValue, parseInt(this.input.value));
+                    this._doc.setProspectiveChange(this._change);
+                }
+            };
+            this._whenChange = () => {
+                if (this._getChange != null) {
+                    this._doc.record(this._change);
+                    this._change = null;
+                }
+            };
+            this.container = (midTick) ? span$6({ class: "midTick", style: "position: sticky; width: 61.5%;" }, input) : span$6({ style: "position: sticky;" }, input);
+            input.addEventListener("input", this._whenInput);
+            input.addEventListener("change", this._whenChange);
+        }
+        updateValue(value) {
+            this._value = value;
+            this.input.value = String(value);
+        }
+        getValueBeforeProspectiveChange() {
+            return this._oldValue;
+        }
+    }
+
+    const { button: button$j, div: div$j, h2: h2$i, input: input$e, span: span$5, p: p$7 } = HTML;
+    class EnvelopePitchPrompt {
+        constructor(_doc) {
+            this._doc = _doc;
+            this.instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
+            this._startNote = new Slider(input$e({ value: this.instrument.pitchEnvelopeStart, style: "width: 3em; margin-left: 1em;", type: "range", min: "0", max: this.instrument.isNoiseInstrument ? 11 : 96, step: "1" }), this._doc, null, false);
+            this._startNoteBox = input$e({ value: this.instrument.pitchEnvelopeStart, style: "width: 4em; font-size: 80%; ", id: "startNoteBox", type: "number", step: "1", min: "0", max: this.instrument.isNoiseInstrument ? 11 : 96 });
+            this._endNote = new Slider(input$e({ value: this.instrument.pitchEnvelopeEnd, style: "width: 3em; margin-left: 1em;", type: "range", min: "0", max: this.instrument.isNoiseInstrument ? 11 : 96, step: "1" }), this._doc, null, false);
+            this._endNoteBox = input$e({ value: this.instrument.pitchEnvelopeEnd, style: "width: 4em; font-size: 80%; ", id: "endNoteBox", type: "number", step: "1", min: "0", max: this.instrument.isNoiseInstrument ? 11 : 96 });
+            this._cancelButton = button$j({ class: "cancelButton" });
+            this._okayButton = button$j({ class: "okayButton", style: "width:45%;" }, "Okay");
+            this.container = div$j({ class: "prompt noSelection", style: "width: 250px;" });
+            this._matchStartSliderToBox = () => {
+                this._startNote.updateValue(parseInt(this._startNoteBox.value));
+            };
+            this._matchStartBoxToSlider = () => {
+                this._startNoteBox.value = this._startNote.input.value;
+            };
+            this._matchEndSliderToBox = () => {
+                this._endNote.updateValue(parseInt(this._endNoteBox.value));
+            };
+            this._matchEndBoxToSlider = () => {
+                this._endNoteBox.value = this._endNote.input.value;
+            };
+            this._close = () => {
+                this._doc.undo();
+            };
+            this.cleanUp = () => {
+                this._okayButton.removeEventListener("click", this._saveChanges);
+                this._cancelButton.removeEventListener("click", this._close);
+                this.container.removeEventListener("keydown", this.whenKeyPressed);
+            };
+            this.whenKeyPressed = (event) => {
+                if (event.target.tagName != "BUTTON" && event.keyCode == 13) {
+                    this._saveChanges();
+                }
+            };
+            this._saveChanges = () => {
+                const group = new ChangeGroup();
+                group.append(new ChangeEnvelopePitchStart(this._doc, parseInt(this._startNoteBox.value)));
+                group.append(new ChangeEnvelopePitchEnd(this._doc, parseInt(this._endNoteBox.value)));
+                this._doc.prompt = null;
+                this._doc.record(group, true);
+            };
+            let pitchEnvelopeEditorWrapper = div$j({});
+            let startNoteWrapper = div$j({});
+            let endNoteWrapper = div$j({});
+            startNoteWrapper.appendChild(span$5("Start note: "));
+            startNoteWrapper.appendChild(this._startNoteBox);
+            startNoteWrapper.appendChild(this._startNote.container);
+            endNoteWrapper.appendChild(span$5("End note: "));
+            endNoteWrapper.appendChild(this._endNoteBox);
+            endNoteWrapper.appendChild(this._endNote.container);
+            pitchEnvelopeEditorWrapper.appendChild(startNoteWrapper);
+            pitchEnvelopeEditorWrapper.appendChild(endNoteWrapper);
+            this._okayButton.addEventListener("click", this._saveChanges);
+            this._cancelButton.addEventListener("click", this._close);
+            this.container = div$j({ class: "prompt noSelection", style: "width: 350px" }, h2$i("Pitch Envelope Boundaries"), p$7("Here you can adjust the start and end of where the pitch envelope affects. Everything below start envelope will be 0, everything above end envelope will be 1, and everything inbetween will scale based on pitch"), div$j({ style: "display: flex; flex-direction: row; align-items: center; justify-content: flex-end;" }, pitchEnvelopeEditorWrapper), div$j({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between;" }, this._okayButton), this._cancelButton);
+            this.container.addEventListener("keydown", this.whenKeyPressed);
+            this._startNoteBox.addEventListener("input", this._matchStartSliderToBox);
+            this._startNote.input.addEventListener("input", this._matchStartBoxToSlider);
+            this._endNoteBox.addEventListener("input", this._matchEndSliderToBox);
+            this._endNote.input.addEventListener("input", this._matchEndBoxToSlider);
         }
     }
 
@@ -32042,70 +32268,6 @@ You should be redirected to the song at:<br /><br />
         }
     }
 
-    const { span: span$5 } = HTML;
-    class InputBox {
-        constructor(input, _doc, _getChange) {
-            this.input = input;
-            this._doc = _doc;
-            this._getChange = _getChange;
-            this._change = null;
-            this._value = "";
-            this._oldValue = "";
-            this._whenInput = () => {
-                const continuingProspectiveChange = this._doc.lastChangeWas(this._change);
-                if (!continuingProspectiveChange)
-                    this._oldValue = this._value;
-                this._change = this._getChange(this._oldValue, this.input.value);
-                this._doc.setProspectiveChange(this._change);
-            };
-            this._whenChange = () => {
-                this._doc.record(this._change);
-                this._change = null;
-            };
-            input.addEventListener("input", this._whenInput);
-            input.addEventListener("change", this._whenChange);
-        }
-        updateValue(value) {
-            this._value = value;
-            this.input.value = String(value);
-        }
-    }
-    class Slider {
-        constructor(input, _doc, _getChange, midTick) {
-            this.input = input;
-            this._doc = _doc;
-            this._getChange = _getChange;
-            this._change = null;
-            this._value = 0;
-            this._oldValue = 0;
-            this._whenInput = () => {
-                const continuingProspectiveChange = this._doc.lastChangeWas(this._change);
-                if (!continuingProspectiveChange)
-                    this._oldValue = this._value;
-                if (this._getChange != null) {
-                    this._change = this._getChange(this._oldValue, parseInt(this.input.value));
-                    this._doc.setProspectiveChange(this._change);
-                }
-            };
-            this._whenChange = () => {
-                if (this._getChange != null) {
-                    this._doc.record(this._change);
-                    this._change = null;
-                }
-            };
-            this.container = (midTick) ? span$5({ class: "midTick", style: "position: sticky; width: 61.5%;" }, input) : span$5({ style: "position: sticky;" }, input);
-            input.addEventListener("input", this._whenInput);
-            input.addEventListener("change", this._whenChange);
-        }
-        updateValue(value) {
-            this._value = value;
-            this.input.value = String(value);
-        }
-        getValueBeforeProspectiveChange() {
-            return this._oldValue;
-        }
-    }
-
     class ArrayBufferReader {
         constructor(data) {
             this._readIndex = 0;
@@ -33184,13 +33346,15 @@ You should be redirected to the song at:<br /><br />
     }
 
     class EnvelopeEditor {
-        constructor(_doc) {
+        constructor(_doc, _envelopePrompt) {
             this._doc = _doc;
+            this._envelopePrompt = _envelopePrompt;
             this.container = HTML.div({ class: "envelopeEditor" });
             this._rows = [];
             this._targetSelects = [];
             this._envelopeSelects = [];
             this._deleteButtons = [];
+            this._extraSettingsButtons = [];
             this._renderedEnvelopeCount = 0;
             this._renderedEqFilterCount = -1;
             this._renderedNoteFilterCount = -1;
@@ -33206,6 +33370,7 @@ You should be redirected to the song at:<br /><br />
                 }
                 else if (envelopeSelectIndex != -1) {
                     this._doc.record(new ChangeSetEnvelopeType(this._doc, envelopeSelectIndex, this._envelopeSelects[envelopeSelectIndex].selectedIndex));
+                    this._extraSettingsButtons[envelopeSelectIndex].style.display = this._envelopeSelects[envelopeSelectIndex].selectedIndex == 2 ? "inline" : "none";
                 }
             };
             this._onClick = (event) => {
@@ -33214,8 +33379,15 @@ You should be redirected to the song at:<br /><br />
                     this._doc.record(new ChangeRemoveEnvelope(this._doc, index));
                 }
             };
+            this._openPitchPrompt = (event) => {
+                const index = this._extraSettingsButtons.indexOf(event.target);
+                if (index != -1) {
+                    this._envelopePrompt("envelopePitch");
+                }
+            };
             this.container.addEventListener("change", this._onChange);
             this.container.addEventListener("click", this._onClick);
+            this.container.addEventListener("click", this._openPitchPrompt);
         }
         _makeOption(target, index) {
             let displayName = Config.instrumentAutomationTargets[target].displayName;
@@ -33238,6 +33410,12 @@ You should be redirected to the song at:<br /><br />
                 option.hidden = !instrument.supportsEnvelopeTarget(target, index);
             }
         }
+        rerenderExtraSettings() {
+            const instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
+            for (let i = 0; i < instrument.envelopeCount; i++) {
+                this._extraSettingsButtons[i].style.display = instrument.envelopes[i].envelope == 2 ? "inline" : "none";
+            }
+        }
         render() {
             const instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
             for (let envelopeIndex = this._rows.length; envelopeIndex < instrument.envelopeCount; envelopeIndex++) {
@@ -33257,11 +33435,15 @@ You should be redirected to the song at:<br /><br />
                 for (let envelope = 0; envelope < Config.envelopes.length; envelope++) {
                     envelopeSelect.appendChild(HTML.option({ value: envelope }, Config.envelopes[envelope].name));
                 }
-                const deleteButton = HTML.button({ type: "button", class: "delete-envelope" });
-                const row = HTML.div({ class: "envelope-row" }, HTML.div({ class: "selectContainer", style: "width: 0; flex: 1;" }, targetSelect), HTML.div({ class: "selectContainer", style: "width: 0; flex: 0.7;" }, envelopeSelect), deleteButton);
+                const extraSettingsButton = HTML.button({ type: "button", class: "envelope-settings", onclick: "" });
+                const deleteButton = HTML.button({ type: "button", class: "delete-envelope", style: "flex: 0.2" });
+                extraSettingsButton.style.display = instrument.envelopes[envelopeIndex].envelope == 2 ? "inline" : "none";
+                console.log(instrument.envelopes[envelopeIndex].envelope, 2, extraSettingsButton.style.display, extraSettingsButton.style);
+                const row = HTML.div({ class: "envelope-row" }, HTML.div({ class: "selectContainer", style: "width: 0; flex: 1;" }, targetSelect), extraSettingsButton, HTML.div({ class: "selectContainer", style: "width: 0; flex: 0.85" }, envelopeSelect), deleteButton);
                 this.container.appendChild(row);
                 this._rows[envelopeIndex] = row;
                 this._targetSelects[envelopeIndex] = targetSelect;
+                this._extraSettingsButtons[envelopeIndex] = extraSettingsButton;
                 this._envelopeSelects[envelopeIndex] = envelopeSelect;
                 this._deleteButtons[envelopeIndex] = deleteButton;
             }
@@ -41624,7 +41806,7 @@ You should be redirected to the song at:<br /><br />
             this._spectrumRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("spectrum") }, "Spectrum:"), this._spectrumEditor.container);
             this._harmonicsEditor = new HarmonicsEditor(this._doc);
             this._harmonicsRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("harmonics") }, "Harmonics:"), this._harmonicsEditor.container);
-            this._envelopeEditor = new EnvelopeEditor(this._doc);
+            this._envelopeEditor = new EnvelopeEditor(this._doc, (name) => this._openPrompt(name));
             this._discreteEnvelopeBox = input({ type: "checkbox", style: "width: 1em; padding: 0; margin-right: 4em;" });
             this._discreteEnvelopeRow = div({ class: "selectRow dropFader" }, span({ class: "tip", style: "margin-left:4px;", onclick: () => this._openPrompt("discreteEnvelope") }, "‣ Discrete:"), this._discreteEnvelopeBox);
             this._envelopeSpeedDisplay = span({ style: `color: ${ColorConfig.secondaryText}; font-size: smaller; text-overflow: clip;` }, "x1");
@@ -43530,6 +43712,7 @@ You should be redirected to the song at:<br /><br />
                         else {
                             this._doc.selection.setChannelBar((this._doc.channel - 1 + this._doc.song.getChannelCount()) % this._doc.song.getChannelCount(), this._doc.bar);
                             this._doc.selection.resetBoxSelection();
+                            this._envelopeEditor.rerenderExtraSettings();
                         }
                         event.preventDefault();
                         break;
@@ -43545,6 +43728,7 @@ You should be redirected to the song at:<br /><br />
                         else {
                             this._doc.selection.setChannelBar((this._doc.channel + 1) % this._doc.song.getChannelCount(), this._doc.bar);
                             this._doc.selection.resetBoxSelection();
+                            this._envelopeEditor.rerenderExtraSettings();
                         }
                         event.preventDefault();
                         break;
@@ -44791,6 +44975,9 @@ You should be redirected to the song at:<br /><br />
                         break;
                     case "configureShortener":
                         this.prompt = new ShortenerConfigPrompt(this._doc);
+                        break;
+                    case "envelopePitch":
+                        this.prompt = new EnvelopePitchPrompt(this._doc);
                         break;
                     default:
                         this.prompt = new TipPrompt(this._doc, promptName);

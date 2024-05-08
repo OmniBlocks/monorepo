@@ -1,5 +1,5 @@
 
-const cacheName = "UltraBox";
+const cacheName = "Slarmoo's Box";
 
 self.addEventListener("install", function(event) {
 	event.waitUntil(

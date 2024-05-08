@@ -1,10 +1,10 @@
 // Copyright (c) 2012-2022 John Nesky and contributing authors, distributed under the MIT license, see accompanying the LICENSE.md file.
 
-import {InstrumentType, Config} from "../synth/SynthConfig";
+import {InstrumentType, Config, /*EnvelopeComputeIndex,*/ EnvelopeType} from "../synth/SynthConfig";
 import {Instrument} from "../synth/synth";
 import {SongDocument} from "./SongDocument";
 import {ChangeSetEnvelopeTarget, ChangeSetEnvelopeType, ChangeRemoveEnvelope} from "./changes";
-import {HTML} from "imperative-html/dist/esm/elements-strict";
+import { HTML } from "imperative-html/dist/esm/elements-strict";
 
 export class EnvelopeEditor {
 	public readonly container: HTMLElement = HTML.div({class: "envelopeEditor"});
@@ -13,15 +13,17 @@ export class EnvelopeEditor {
 	private readonly _targetSelects: HTMLSelectElement[] = [];
 	private readonly _envelopeSelects: HTMLSelectElement[] = [];
 	private readonly _deleteButtons: HTMLButtonElement[] = [];
+	private readonly _extraSettingsButtons: (HTMLButtonElement)[] = [];
 	private _renderedEnvelopeCount: number = 0;
 	private _renderedEqFilterCount: number = -1;
 	private _renderedNoteFilterCount: number = -1;
 	private _renderedInstrumentType: InstrumentType;
 	private _renderedEffects: number = 0;
 	
-	constructor(private _doc: SongDocument) {
+	constructor(private _doc: SongDocument, private _envelopePrompt: Function) {
 		this.container.addEventListener("change", this._onChange);
 		this.container.addEventListener("click", this._onClick);
+		this.container.addEventListener("click", this._openPitchPrompt);
 	}
 	
 	private _onChange = (event: Event): void => {
@@ -33,7 +35,9 @@ export class EnvelopeEditor {
 			const index: number = (combinedValue / Config.instrumentAutomationTargets.length) >>> 0;
 			this._doc.record(new ChangeSetEnvelopeTarget(this._doc, targetSelectIndex, target, index));
 		} else if (envelopeSelectIndex != -1) {
-			this._doc.record(new ChangeSetEnvelopeType(this._doc, envelopeSelectIndex, this._envelopeSelects[envelopeSelectIndex].selectedIndex));
+			this._doc.record(new ChangeSetEnvelopeType(this._doc, envelopeSelectIndex, this._envelopeSelects[envelopeSelectIndex].selectedIndex));		
+			
+			this._extraSettingsButtons[envelopeSelectIndex].style.display = this._envelopeSelects[envelopeSelectIndex].selectedIndex == EnvelopeType.pitch ? "inline" : "none";
 		}
 	}
 	
@@ -43,6 +47,13 @@ export class EnvelopeEditor {
 			this._doc.record(new ChangeRemoveEnvelope(this._doc, index));
 		}
 	}
+
+	private _openPitchPrompt = (event: MouseEvent): void => {
+		const index: number = this._extraSettingsButtons.indexOf(<any>event.target);
+		if (index != -1) {
+			this._envelopePrompt("envelopePitch");
+		}
+	 };
 	
 	private _makeOption(target: number, index: number): HTMLOptionElement {
 		let displayName = Config.instrumentAutomationTargets[target].displayName;
@@ -65,6 +76,14 @@ export class EnvelopeEditor {
 			option.hidden = !instrument.supportsEnvelopeTarget(target, index);
 		}
 	}
+
+	public rerenderExtraSettings() {
+		const instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
+		for (let i = 0; i < instrument.envelopeCount; i++) {
+			this._extraSettingsButtons[i].style.display = instrument.envelopes[i].envelope == EnvelopeType.pitch ? "inline" : "none";
+
+		}
+	}
 	
 	public render(): void {
 		const instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
@@ -84,20 +103,26 @@ export class EnvelopeEditor {
 			
 			const envelopeSelect: HTMLSelectElement = HTML.select();
 			for (let envelope: number = 0; envelope < Config.envelopes.length; envelope++) {
-				envelopeSelect.appendChild(HTML.option({value: envelope}, Config.envelopes[envelope].name));
+				envelopeSelect.appendChild(HTML.option({ value: envelope }, Config.envelopes[envelope].name));
 			} 
-			
-			const deleteButton: HTMLButtonElement = HTML.button({type: "button", class: "delete-envelope"});
-			
+
+			const extraSettingsButton: HTMLButtonElement = HTML.button({ type: "button", class: "envelope-settings", onclick: "" });
+			const deleteButton: HTMLButtonElement = HTML.button({ type: "button", class: "delete-envelope", style: "flex: 0.2" });
+			extraSettingsButton.style.display = instrument.envelopes[envelopeIndex].envelope == EnvelopeType.pitch ? "inline" : "none";
+			console.log(instrument.envelopes[envelopeIndex].envelope, EnvelopeType.pitch, extraSettingsButton.style.display, extraSettingsButton.style);
+
+
 			const row: HTMLDivElement = HTML.div({class: "envelope-row"},
-				HTML.div({class: "selectContainer", style: "width: 0; flex: 1;"}, targetSelect),
-				HTML.div({class: "selectContainer", style: "width: 0; flex: 0.7;"}, envelopeSelect),
+				HTML.div({ class: "selectContainer", style: "width: 0; flex: 1;" }, targetSelect),
+				extraSettingsButton,
+				HTML.div({ class: "selectContainer", style: "width: 0; flex: 0.85" }, envelopeSelect),
 				deleteButton,
 			);
 			
 			this.container.appendChild(row);
 			this._rows[envelopeIndex] = row;
 			this._targetSelects[envelopeIndex] = targetSelect;
+			this._extraSettingsButtons[envelopeIndex] = extraSettingsButton;
 			this._envelopeSelects[envelopeIndex] = envelopeSelect;
 			this._deleteButtons[envelopeIndex] = deleteButton;
 		}

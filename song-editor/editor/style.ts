@@ -589,6 +589,31 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 	visibility: hidden;
 }
 
+.beepboxEditor .envelope-settings {
+	width: var(--button-size);
+	flex-shrink: 0;
+	flex-grow: 0;
+}
+.beepboxEditor .envelope-settings::before {
+	content: "";
+	position: absolute;
+	width: var(--button-size);
+	height: var(--button-size);
+	left: 0;
+	top: 0;
+	pointer-events: none;
+	background: currentColor;
+	mask-image: var(--internal-add-symbol);
+	mask-repeat: no-repeat;
+	mask-position: center;
+	-webkit-mask-image: var(--internal-add-symbol);
+	-webkit-mask-repeat: no-repeat;
+	-webkit-mask-position: center;
+}
+.beepboxEditor .envelope-settings:disabled {
+	visibility: hidden;
+}
+
 .beepboxEditor .menu.file::before {
 	content: "";
 	flex-shrink: 0;

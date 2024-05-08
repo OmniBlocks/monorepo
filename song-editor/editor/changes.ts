@@ -816,6 +816,8 @@ export class ChangeRandomGeneratedInstrument extends Change {
                 if (instrument.pitchShift != Config.pitchShiftCenter) {
                     instrument.effects |= 1 << EffectType.pitchShift;
                     instrument.addEnvelope(Config.instrumentAutomationTargets.dictionary["pitchShift"].index, 0, Config.envelopes.dictionary[selectWeightedRandom([
+                        { item: "noteSize", weight: 2 },
+                        { item: "pitch", weight: 2 },
                         { item: "flare 1", weight: 2 },
                         { item: "flare 2", weight: 1 },
                         { item: "flare 3", weight: 1 },
@@ -847,7 +849,9 @@ export class ChangeRandomGeneratedInstrument extends Change {
                     new PotentialFilterPoint(1.0, FilterType.lowPass, midFreq, maxFreq, 8000.0, -1),
                 ]);
                 instrument.addEnvelope(Config.instrumentAutomationTargets.dictionary["noteFilterAllFreqs"].index, 0, Config.envelopes.dictionary[selectWeightedRandom([
-				{ item: "punch", weight: 4 },
+                { item: "noteSize", weight: 2 },
+                { item: "pitch", weight: 2 },
+                { item: "punch", weight: 4 },
 				{ item: "flare 1", weight: 2 },
 				{ item: "flare 2", weight: 2 },
 				{ item: "flare 3", weight: 2 },
@@ -927,6 +931,8 @@ export class ChangeRandomGeneratedInstrument extends Change {
 
                 if (instrument.unison != Config.unisons.dictionary["none"].index && Math.random() > 0.4)
                 instrument.addEnvelope(Config.instrumentAutomationTargets.dictionary["unison"].index, 0, Config.envelopes.dictionary[selectWeightedRandom([
+                    { item: "noteSize", weight: 2 },
+                    { item: "pitch", weight: 2 },
                     { item: "twang -1", weight: 3 },
                     { item: "twang 1", weight: 3 },
                     { item: "twang 2", weight: 2 },
@@ -1097,6 +1103,8 @@ export class ChangeRandomGeneratedInstrument extends Change {
                 if (instrument.pitchShift != Config.pitchShiftCenter) {
                     instrument.effects |= 1 << EffectType.pitchShift;
                     instrument.addEnvelope(Config.instrumentAutomationTargets.dictionary["pitchShift"].index, 0, Config.envelopes.dictionary[selectWeightedRandom([
+                        { item: "noteSize", weight: 2 },
+                        { item: "pitch", weight: 2 },
                         { item: "flare 1", weight: 2 },
                         { item: "flare 2", weight: 1 },
                         { item: "flare 3", weight: 1 },
@@ -1138,6 +1146,8 @@ export class ChangeRandomGeneratedInstrument extends Change {
                     new PotentialFilterPoint(1.0, FilterType.lowPass, midFreq, maxFreq, 8000.0, -1),
                 ]);
                 instrument.addEnvelope(Config.instrumentAutomationTargets.dictionary["noteFilterAllFreqs"].index, 0, Config.envelopes.dictionary[selectWeightedRandom([
+                { item: "noteSize", weight: 2 },
+                { item: "pitch", weight: 2 },
                 { item: "punch", weight: 6 },
                 { item: "flare -1", weight: 1 },
 				{ item: "flare 1", weight: 2 },
@@ -1231,6 +1241,8 @@ export class ChangeRandomGeneratedInstrument extends Change {
 
                     if (Math.random() < 0.6) {
                         instrument.addEnvelope(Config.instrumentAutomationTargets.dictionary["pulseWidth"].index, 0, Config.envelopes.dictionary[selectWeightedRandom([
+                        { item: "noteSize", weight: 2 },
+                        { item: "pitch", weight: 2 },
                         { item: "punch", weight: 6 },
                         { item: "flare -1", weight: 1 },
                         { item: "flare 1", weight: 2 },
@@ -2737,6 +2749,34 @@ export class ChangeFadeInOut extends UndoableChange {
         this._instrument.fadeOut = this._oldFadeOut;
         this._instrument.preset = this._instrumentPrevPreset;
         this._doc.notifier.changed();
+    }
+}
+
+export class ChangeEnvelopePitchStart extends Change {
+    constructor(doc: SongDocument, startNote: number) {
+        super();
+        const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+        const oldStartNote: number = instrument.pitchEnvelopeStart;
+        if (oldStartNote != startNote) {
+            instrument.pitchEnvelopeStart = startNote;
+            instrument.preset = instrument.type;
+            doc.notifier.changed();
+            this._didSomething();
+        }
+    }
+}
+
+export class ChangeEnvelopePitchEnd extends Change {
+    constructor(doc: SongDocument, endNote: number) {
+        super();
+        const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+        const oldEndNote: number = instrument.pitchEnvelopeEnd;
+        if (oldEndNote != endNote) {
+            instrument.pitchEnvelopeEnd = endNote;
+            instrument.preset = instrument.type;
+            doc.notifier.changed();
+            this._didSomething();
+        }
     }
 }
 

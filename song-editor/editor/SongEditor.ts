@@ -12,6 +12,7 @@ import { CustomFilterPrompt } from "./CustomFilterPrompt";
 import { InstrumentExportPrompt } from "./InstrumentExportPrompt";
 import { InstrumentImportPrompt } from "./InstrumentImportPrompt";
 import { EditorConfig, isMobile, prettyNumber, Preset, PresetCategory } from "./EditorConfig";
+import { EnvelopePitchPrompt } from "./EnvelopePitchPrompt";
 import { EuclideanRhythmPrompt } from "./EuclidgenRhythmPrompt";
 import { ExportPrompt } from "./ExportPrompt";
 import "./Layout"; // Imported here for the sake of ensuring this code is transpiled early.
@@ -1029,7 +1030,8 @@ export class SongEditor {
     private readonly _harmonicsEditor: HarmonicsEditor = new HarmonicsEditor(this._doc);
     private readonly _harmonicsRow: HTMLElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("harmonics") }, "Harmonics:"), this._harmonicsEditor.container);
     
-    private readonly _envelopeEditor: EnvelopeEditor = new EnvelopeEditor(this._doc);
+    //SongEditor.ts
+    private readonly _envelopeEditor: EnvelopeEditor = new EnvelopeEditor(this._doc, (name: string) => this._openPrompt(name));
     private readonly _discreteEnvelopeBox: HTMLInputElement = input({ type: "checkbox", style: "width: 1em; padding: 0; margin-right: 4em;" });
     private readonly _discreteEnvelopeRow: HTMLElement = div({ class: "selectRow dropFader" }, span({ class: "tip", style: "margin-left:4px;", onclick: () => this._openPrompt("discreteEnvelope") }, "‣ Discrete:"), this._discreteEnvelopeBox);
     private readonly _envelopeSpeedDisplay: HTMLSpanElement = span({ style: `color: ${ColorConfig.secondaryText}; font-size: smaller; text-overflow: clip;` }, "x1");
@@ -2093,6 +2095,9 @@ export class SongEditor {
                     break;
                 case "configureShortener":
                     this.prompt = new ShortenerConfigPrompt(this._doc);
+                    break;
+                case "envelopePitch":
+                    this.prompt = new EnvelopePitchPrompt(this._doc);
                     break;
                 default:
                     this.prompt = new TipPrompt(this._doc, promptName);
@@ -4297,6 +4302,8 @@ export class SongEditor {
                 } else {
                     this._doc.selection.setChannelBar((this._doc.channel - 1 + this._doc.song.getChannelCount()) % this._doc.song.getChannelCount(), this._doc.bar);
                     this._doc.selection.resetBoxSelection();
+                    //envelopes aren't rerendering when channels are changed so...
+                    this._envelopeEditor.rerenderExtraSettings();
                 }
                 event.preventDefault();
                 break;
@@ -4310,6 +4317,7 @@ export class SongEditor {
                 } else {
                     this._doc.selection.setChannelBar((this._doc.channel + 1) % this._doc.song.getChannelCount(), this._doc.bar);
                     this._doc.selection.resetBoxSelection();
+                    this._envelopeEditor.rerenderExtraSettings();
                 }
                 event.preventDefault();
                 break;

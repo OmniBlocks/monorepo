@@ -559,15 +559,6 @@ class ExtensionManager {
                                     return result;
                                 }
                                 return `${result}`;
-                            })
-                            // When an error happens, instead of returning undefined, we'll return a stringified
-                            // version of the error so that it can be debugged.
-                            .catch(err => {
-                                // We want the full error including stack to be printed but the log helper
-                                // messes with that.
-                                // eslint-disable-next-line no-console
-                                console.error('Custom extension block error', err);
-                                return `${err}`;
                             });
                 }
 

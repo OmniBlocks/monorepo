@@ -818,6 +818,7 @@ export class SongEditor {
         option({ value: "showFifth" }, 'Highlight "Fifth" Note'),
         option({ value: "notesFlashWhenPlayed" }, "Notes Flash When Played"),
         option({ value: "instrumentButtonsAtTop" }, "Instrument Buttons at Top"),
+        option({ value: "frostedGlassBackground" }, "Frosted Glass Prompt Backdrop"),
         option({ value: "showChannels" }, "Show All Channels"),
         option({ value: "showScrollBar" }, "Show Octave Scroll Bar"),
         option({ value: "showLetters" }, "Show Piano Keys"),
@@ -1230,6 +1231,7 @@ export class SongEditor {
         SVG.path({ d: "M150 65 c0 -8 -7 -15 -15 -15 -8 0 -15 -4 -15 -10 0 -14 23 -13 38 2 15 15 16 38 2 38 -5 0 -10 -7 -10 -15z" })]);
 
     private readonly _promptContainer: HTMLDivElement = div({ class: "promptContainer", style: "display: none;" });
+    private readonly _promptContainerBG: HTMLDivElement = div({ class: "promptContainerBG", style: "display: none; height: 100%; width: 100%; position: fixed; z-index: 99; overflow-x: hidden; pointer-events: none;" });
     private readonly _zoomInButton: HTMLButtonElement = button({ class: "zoomInButton", type: "button", title: "Zoom In" });
     private readonly _zoomOutButton: HTMLButtonElement = button({ class: "zoomOutButton", type: "button", title: "Zoom Out" });
     private readonly _patternEditorRow: HTMLDivElement = div({ style: "flex: 1; height: 100%; display: flex; overflow: hidden; justify-content: center;" },
@@ -2015,6 +2017,7 @@ export class SongEditor {
                 this._doc.performance.play();
             }
             this._wasPlaying = false;
+            this._promptContainerBG.style.display = "none";
             this._promptContainer.style.display = "none";
             this._promptContainer.removeChild(this.prompt.container);
             this.prompt.cleanUp();
@@ -2110,7 +2113,19 @@ export class SongEditor {
                     this._doc.performance.pause();
                 }
                 this._promptContainer.style.display = "";
+                if (this._doc.prefs.frostedGlassBackground == true) {
+                    this._promptContainerBG.style.display = ""; 
+                    this._promptContainerBG.style.backgroundColor = "rgba(0,0,0, 0)"; 
+                    this._promptContainerBG.style.backdropFilter = "brightness(0.9) blur(14px)"; 
+                    this._promptContainerBG.style.opacity = "1"; 
+                } else {
+                    this._promptContainerBG.style.display = ""; 
+                    this._promptContainerBG.style.backgroundColor = "var(--editor-background)"; 
+                    this._promptContainerBG.style.backdropFilter = ""; 
+                    this._promptContainerBG.style.opacity = "0.5"; 
+                }
                 this._promptContainer.appendChild(this.prompt.container);
+                document.body.appendChild(this._promptContainerBG);
             }
         }
     }
@@ -2237,6 +2252,7 @@ export class SongEditor {
             (prefs.showFifth ? textOnIcon : textOffIcon) + 'Highlight "Fifth" Note',
             (prefs.notesFlashWhenPlayed ? textOnIcon : textOffIcon) + "Notes Flash When Played",
             (prefs.instrumentButtonsAtTop ? textOnIcon : textOffIcon) + "Instrument Buttons at Top",
+            (prefs.frostedGlassBackground ? textOnIcon : textOffIcon) + "Frosted Glass Prompt Backdrop",
             (prefs.showChannels ? textOnIcon : textOffIcon) + "Show All Channels",
             (prefs.showScrollBar ? textOnIcon : textOffIcon) + "Show Octave Scroll Bar",
             (prefs.showLetters ? textOnIcon : textOffIcon) + "Show Piano Keys",
@@ -4594,6 +4610,7 @@ export class SongEditor {
         const instrument: Instrument = channel.instruments[this._doc.getCurrentInstrument()];
         const instrumentCopy: any = instrument.toJsonObject();
         instrumentCopy["isDrum"] = this._doc.song.getChannelIsNoise(this._doc.channel);
+        instrumentCopy["isMod"] = this._doc.song.getChannelIsMod(this._doc.channel);
         window.localStorage.setItem("instrumentCopy", JSON.stringify(instrumentCopy));
         this.refocusStage();
     }
@@ -4602,7 +4619,7 @@ export class SongEditor {
         const channel: Channel = this._doc.song.channels[this._doc.channel];
         const instrument: Instrument = channel.instruments[this._doc.getCurrentInstrument()];
         const instrumentCopy: any = JSON.parse(String(window.localStorage.getItem("instrumentCopy")));
-        if (instrumentCopy != null && instrumentCopy["isDrum"] == this._doc.song.getChannelIsNoise(this._doc.channel)) {
+        if (instrumentCopy != null && instrumentCopy["isDrum"] == this._doc.song.getChannelIsNoise(this._doc.channel) && instrumentCopy["isMod"] == this._doc.song.getChannelIsMod(this._doc.channel)) {
             this._doc.record(new ChangePasteInstrument(this._doc, instrument, instrumentCopy));
         }
         this.refocusStage();
@@ -5135,6 +5152,9 @@ export class SongEditor {
                 break;
             case "instrumentButtonsAtTop":
                 this._doc.prefs.instrumentButtonsAtTop = !this._doc.prefs.instrumentButtonsAtTop;
+                break;
+            case "frostedGlassBackground":
+                this._doc.prefs.frostedGlassBackground = !this._doc.prefs.frostedGlassBackground;
                 break;
         }
         this._optionsMenu.selectedIndex = 0;

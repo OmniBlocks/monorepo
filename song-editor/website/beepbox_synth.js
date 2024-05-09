@@ -1000,7 +1000,7 @@ var beepbox = (function (exports) {
         { name: "feedbackAmplitude", computeIndex: 17, displayName: "fm feedback", interleave: false, isFilter: false, maxCount: 1, effect: null, compatibleInstruments: [1, 11] },
         { name: "pitchShift", computeIndex: 18, displayName: "pitch shift", interleave: false, isFilter: false, maxCount: 1, effect: 7, compatibleInstruments: null },
         { name: "detune", computeIndex: 19, displayName: "detune", interleave: false, isFilter: false, maxCount: 1, effect: 8, compatibleInstruments: null },
-        { name: "vibratoDepth", computeIndex: 20, displayName: "vibrato range", interleave: false, isFilter: false, maxCount: 1, effect: 9, compatibleInstruments: null },
+        { name: "vibratoDepth", computeIndex: 20, displayName: "vibrato depth", interleave: false, isFilter: false, maxCount: 1, effect: 9, compatibleInstruments: null },
         { name: "noteFilterAllFreqs", computeIndex: 1, displayName: "n. filter freqs", interleave: false, isFilter: true, maxCount: 1, effect: 5, compatibleInstruments: null },
         { name: "noteFilterFreq", computeIndex: 21, displayName: "n. filter # freq", interleave: false, isFilter: true, maxCount: Config.filterMaxPoints, effect: 5, compatibleInstruments: null },
         { name: "decimalOffset", computeIndex: 37, displayName: "decimal offset", interleave: false, isFilter: false, maxCount: 1, effect: null, compatibleInstruments: [6, 8] },
@@ -1008,9 +1008,12 @@ var beepbox = (function (exports) {
         { name: "supersawSpread", computeIndex: 39, displayName: "spread", interleave: false, isFilter: false, maxCount: 1, effect: null, compatibleInstruments: [8] },
         { name: "supersawShape", computeIndex: 40, displayName: "saw↔pulse", interleave: false, isFilter: false, maxCount: 1, effect: null, compatibleInstruments: [8] },
         { name: "panning", computeIndex: 41, displayName: "panning", interleave: false, isFilter: false, maxCount: 1, effect: 2, compatibleInstruments: null },
-        { name: "chorus", computeIndex: 42, displayName: "chorus", interleave: false, isFilter: false, maxCount: 1, effect: 1, compatibleInstruments: null },
-        { name: "echoSustain", computeIndex: 43, displayName: "echo", interleave: false, isFilter: false, maxCount: 1, effect: 6, compatibleInstruments: null },
-        { name: "reverb", computeIndex: 44, displayName: "reverb", interleave: false, isFilter: false, maxCount: 1, effect: 0, compatibleInstruments: null }
+        { name: "distortion", computeIndex: 42, displayName: "distortion", interleave: false, isFilter: false, maxCount: 1, effect: 3, compatibleInstruments: null },
+        { name: "bitcrusherQuantization", computeIndex: 43, displayName: "bitcrush", interleave: false, isFilter: false, maxCount: 1, effect: 4, compatibleInstruments: null },
+        { name: "bitcrusherFrequency", computeIndex: 44, displayName: "freq crush", interleave: false, isFilter: false, maxCount: 1, effect: 4, compatibleInstruments: null },
+        { name: "chorus", computeIndex: 45, displayName: "chorus", interleave: false, isFilter: false, maxCount: 1, effect: 1, compatibleInstruments: null },
+        { name: "echoSustain", computeIndex: 46, displayName: "echo", interleave: false, isFilter: false, maxCount: 1, effect: 6, compatibleInstruments: null },
+        { name: "reverb", computeIndex: 47, displayName: "reverb", interleave: false, isFilter: false, maxCount: 1, effect: 0, compatibleInstruments: null }
     ]);
     Config.operatorWaves = toNameMap([
         { name: "sine", samples: Config.sineWave },
@@ -3261,6 +3264,7 @@ var beepbox = (function (exports) {
             this.envelopeCount = 0;
             this.pitchEnvelopeStart = 0;
             this.pitchEnvelopeEnd = 96;
+            this.pitchEnvelopeInverse = false;
             this.transition = Config.transitions.dictionary["normal"].index;
             this.pitchShift = 0;
             this.detune = 0;
@@ -3400,6 +3404,7 @@ var beepbox = (function (exports) {
             this.envelopeCount = 0;
             this.pitchEnvelopeStart = 0;
             this.pitchEnvelopeEnd = 96;
+            this.pitchEnvelopeInverse = false;
             if (isNoiseChannel) {
                 this.pitchEnvelopeStart = 0;
                 this.pitchEnvelopeEnd = 11;
@@ -5104,6 +5109,8 @@ var beepbox = (function (exports) {
                     }
                     buffer.push(base64IntToCharCode[instrument.pitchEnvelopeStart >> 6], base64IntToCharCode[instrument.pitchEnvelopeStart & 0x3f]);
                     buffer.push(base64IntToCharCode[instrument.pitchEnvelopeEnd >> 6], base64IntToCharCode[instrument.pitchEnvelopeEnd & 0x3f]);
+                    const inverse = instrument.pitchEnvelopeInverse ? 1 : 0;
+                    buffer.push(base64IntToCharCode[inverse]);
                 }
             }
             buffer.push(98);
@@ -6799,6 +6806,7 @@ var beepbox = (function (exports) {
                                     instrument.pitchEnvelopeStart = pitchEnvelopeCompact * 63 + base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                                     pitchEnvelopeCompact = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                                     instrument.pitchEnvelopeEnd = pitchEnvelopeCompact * 63 + base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                                    instrument.pitchEnvelopeInverse = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] === 1 ? true : false;
                                 }
                             }
                         }
@@ -8426,7 +8434,7 @@ var beepbox = (function (exports) {
             this._modifiedEnvelopeIndices = [];
             this._modifiedEnvelopeCount = 0;
             this.lowpassCutoffDecayVolumeCompensation = 1.0;
-            const length = 45;
+            const length = 48;
             for (let i = 0; i < length; i++) {
                 this.envelopeStarts[i] = 1.0;
                 this.envelopeEnds[i] = 1.0;
@@ -8618,11 +8626,13 @@ var beepbox = (function (exports) {
                     let startNote = 0;
                     let endNote = 96;
                     let pitch = 0;
+                    let inverse = false;
                     if (instrument.isNoiseInstrument) {
                         endNote = 11;
                     }
                     startNote = instrument.pitchEnvelopeStart;
                     endNote = instrument.pitchEnvelopeEnd;
+                    inverse = instrument.pitchEnvelopeInverse;
                     if (song) {
                         basePitch = Config.keys[song.key].basePitch + (Config.pitchesPerOctave * song.octave);
                     }
@@ -8630,14 +8640,27 @@ var beepbox = (function (exports) {
                         pitch = tone.pitches[0];
                     }
                     const range = endNote - startNote + 1;
-                    if (basePitch + pitch <= startNote) {
-                        return 0;
-                    }
-                    else if (basePitch + pitch >= endNote) {
-                        return 1;
+                    if (inverse) {
+                        if (basePitch + pitch <= startNote) {
+                            return 1;
+                        }
+                        else if (basePitch + pitch >= endNote) {
+                            return 0;
+                        }
+                        else {
+                            return 1 - (basePitch + pitch - startNote) / range;
+                        }
                     }
                     else {
-                        return (basePitch + pitch - startNote) / range;
+                        if (basePitch + pitch <= startNote) {
+                            return 0;
+                        }
+                        else if (basePitch + pitch >= endNote) {
+                            return 1;
+                        }
+                        else {
+                            return (basePitch + pitch - startNote) / range;
+                        }
                     }
                 case 5: return 1.0 / (1.0 + time * envelope.speed);
                 case 6: return 1.0 - 1.0 / (1.0 + time * envelope.speed);
@@ -9060,8 +9083,8 @@ var beepbox = (function (exports) {
                     useDistortionStart = synth.getModValue(Config.modulators.dictionary["distortion"].index, channelIndex, instrumentIndex, false);
                     useDistortionEnd = synth.getModValue(Config.modulators.dictionary["distortion"].index, channelIndex, instrumentIndex, true);
                 }
-                const distortionSliderStart = Math.min(1.0, useDistortionStart / (Config.distortionRange - 1));
-                const distortionSliderEnd = Math.min(1.0, useDistortionEnd / (Config.distortionRange - 1));
+                const distortionSliderStart = Math.min(1.0, envelopeStarts[42] * useDistortionStart / (Config.distortionRange - 1));
+                const distortionSliderEnd = Math.min(1.0, envelopeEnds[42] * useDistortionEnd / (Config.distortionRange - 1));
                 const distortionStart = Math.pow(1.0 - 0.895 * (Math.pow(20.0, distortionSliderStart) - 1.0) / 19.0, 2.0);
                 const distortionEnd = Math.pow(1.0 - 0.895 * (Math.pow(20.0, distortionSliderEnd) - 1.0) / 19.0, 2.0);
                 const distortionDriveStart = (1.0 + 2.0 * distortionSliderStart) / Config.distortionBaseVolume;
@@ -9072,14 +9095,14 @@ var beepbox = (function (exports) {
                 this.distortionDriveDelta = (distortionDriveEnd - distortionDriveStart) / roundedSamplesPerTick;
             }
             if (usesBitcrusher) {
-                let freqSettingStart = instrument.bitcrusherFreq;
-                let freqSettingEnd = instrument.bitcrusherFreq;
+                let freqSettingStart = instrument.bitcrusherFreq * Math.sqrt(envelopeStarts[44]);
+                let freqSettingEnd = instrument.bitcrusherFreq * Math.sqrt(envelopeEnds[44]);
                 if (synth.isModActive(Config.modulators.dictionary["freq crush"].index, channelIndex, instrumentIndex)) {
                     freqSettingStart = synth.getModValue(Config.modulators.dictionary["freq crush"].index, channelIndex, instrumentIndex, false);
                     freqSettingEnd = synth.getModValue(Config.modulators.dictionary["freq crush"].index, channelIndex, instrumentIndex, true);
                 }
-                let quantizationSettingStart = instrument.bitcrusherQuantization;
-                let quantizationSettingEnd = instrument.bitcrusherQuantization;
+                let quantizationSettingStart = instrument.bitcrusherQuantization * Math.sqrt(envelopeStarts[43]);
+                let quantizationSettingEnd = instrument.bitcrusherQuantization * Math.sqrt(envelopeEnds[43]);
                 if (synth.isModActive(Config.modulators.dictionary["bit crush"].index, channelIndex, instrumentIndex)) {
                     quantizationSettingStart = synth.getModValue(Config.modulators.dictionary["bit crush"].index, channelIndex, instrumentIndex, false);
                     quantizationSettingEnd = synth.getModValue(Config.modulators.dictionary["bit crush"].index, channelIndex, instrumentIndex, true);
@@ -9219,8 +9242,8 @@ var beepbox = (function (exports) {
                 this.panningOffsetDeltaR = (delayEndR - delayStartR) / roundedSamplesPerTick;
             }
             if (usesChorus) {
-                const chorusEnvelopeStart = envelopeStarts[42];
-                const chorusEnvelopeEnd = envelopeEnds[42];
+                const chorusEnvelopeStart = envelopeStarts[45];
+                const chorusEnvelopeEnd = envelopeEnds[45];
                 let useChorusStart = instrument.chorus;
                 let useChorusEnd = instrument.chorus;
                 if (synth.isModActive(Config.modulators.dictionary["chorus"].index, channelIndex, instrumentIndex)) {
@@ -9241,8 +9264,8 @@ var beepbox = (function (exports) {
             let maxEchoMult = 0.0;
             let averageEchoDelaySeconds = 0.0;
             if (usesEcho) {
-                const echoSustainEnvelopeStart = envelopeStarts[43];
-                const echoSustainEnvelopeEnd = envelopeEnds[43];
+                const echoSustainEnvelopeStart = envelopeStarts[46];
+                const echoSustainEnvelopeEnd = envelopeEnds[46];
                 let useEchoSustainStart = instrument.echoSustain;
                 let useEchoSustainEnd = instrument.echoSustain;
                 if (synth.isModActive(Config.modulators.dictionary["echo"].index, channelIndex, instrumentIndex)) {
@@ -9282,8 +9305,8 @@ var beepbox = (function (exports) {
             }
             let maxReverbMult = 0.0;
             if (usesReverb) {
-                const reverbEnvelopeStart = envelopeStarts[44];
-                const reverbEnvelopeEnd = envelopeEnds[44];
+                const reverbEnvelopeStart = envelopeStarts[47];
+                const reverbEnvelopeEnd = envelopeEnds[47];
                 let useReverbStart = instrument.reverb;
                 let useReverbEnd = instrument.reverb;
                 if (synth.isModActive(Config.modulators.dictionary["reverb"].index, channelIndex, instrumentIndex)) {

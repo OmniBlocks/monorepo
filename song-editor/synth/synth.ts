@@ -1391,6 +1391,7 @@ export class Instrument {
     //I'll make then individual-envelope based later (probably means a list)
     public pitchEnvelopeStart: number = 0;
     public pitchEnvelopeEnd: number = 96;
+    public pitchEnvelopeInverse: boolean = false;
     public transition: number = Config.transitions.dictionary["normal"].index;
     public pitchShift: number = 0;
     public detune: number = 0;
@@ -1564,6 +1565,7 @@ export class Instrument {
         this.envelopeCount = 0;
         this.pitchEnvelopeStart = 0;
         this.pitchEnvelopeEnd = 96;
+        this.pitchEnvelopeInverse = false;
         //noise channels have a shorter range
         if (isNoiseChannel) {
             this.pitchEnvelopeStart = 0;
@@ -3438,6 +3440,8 @@ export class Song {
                 }
                 buffer.push(base64IntToCharCode[instrument.pitchEnvelopeStart >> 6], base64IntToCharCode[instrument.pitchEnvelopeStart & 0x3f]);
                 buffer.push(base64IntToCharCode[instrument.pitchEnvelopeEnd >> 6], base64IntToCharCode[instrument.pitchEnvelopeEnd & 0x3f]);
+                const inverse = instrument.pitchEnvelopeInverse ? 1 : 0;
+                buffer.push(base64IntToCharCode[inverse]);
             }
         }
 
@@ -5216,6 +5220,7 @@ export class Song {
                         instrument.pitchEnvelopeStart = pitchEnvelopeCompact * 63 + base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                         pitchEnvelopeCompact = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                         instrument.pitchEnvelopeEnd = pitchEnvelopeCompact * 63 + base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                        instrument.pitchEnvelopeInverse = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] === 1 ? true : false;
                     }
                 }
             } break;
@@ -7201,6 +7206,7 @@ class EnvelopeComputer {
                 let startNote: number = 0;
                 let endNote: number = 96;
                 let pitch: number = 0;
+                let inverse: boolean = false;
 
                 if (instrument.isNoiseInstrument) {
                     endNote = 11;
@@ -7208,6 +7214,7 @@ class EnvelopeComputer {
 
                 startNote = instrument.pitchEnvelopeStart;
                 endNote = instrument.pitchEnvelopeEnd;
+                inverse = instrument.pitchEnvelopeInverse;
 
                 if (song) {
                     basePitch = Config.keys[song!.key].basePitch + (Config.pitchesPerOctave * song!.octave);
@@ -7216,12 +7223,22 @@ class EnvelopeComputer {
                     pitch = tone.pitches[0 /*arpeggiates ? 0 : ((i < tone.pitchCount) ? i : ((associatedCarrierIndex < tone.pitchCount) ? associatedCarrierIndex : 0))*/];
                 }
                 const range = endNote - startNote + 1;
-                if (basePitch + pitch <= startNote) {
-                    return 0;
-                } else if (basePitch + pitch >= endNote) {
-                    return 1;
+                if (inverse) {
+                    if (basePitch + pitch <= startNote) {
+                        return 1;
+                    } else if (basePitch + pitch >= endNote) {
+                        return 0;
+                    } else {
+                        return 1-(basePitch + pitch - startNote) / range;
+                    }
                 } else {
-                    return (basePitch + pitch - startNote) / range;
+                    if (basePitch + pitch <= startNote) {
+                        return 0;
+                    } else if (basePitch + pitch >= endNote) {
+                        return 1;
+                    } else {
+                        return (basePitch + pitch - startNote) / range;
+                    }
                 }
             case EnvelopeType.twang: return 1.0 / (1.0 + time * envelope.speed);
             case EnvelopeType.swell: return 1.0 - 1.0 / (1.0 + time * envelope.speed);

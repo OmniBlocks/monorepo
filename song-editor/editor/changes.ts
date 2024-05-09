@@ -2780,6 +2780,20 @@ export class ChangeEnvelopePitchEnd extends Change {
     }
 }
 
+export class ChangeEnvelopeInverse extends Change {
+    constructor(doc: SongDocument, value: boolean) {
+        super();
+        const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+        const oldValue: boolean = instrument.pitchEnvelopeInverse;
+        if (oldValue != value) {
+            instrument.pitchEnvelopeInverse = value;
+            instrument.preset = instrument.type;
+            doc.notifier.changed();
+            this._didSomething();
+        }
+    }
+}
+
 export class ChangeAlgorithm extends Change {
     constructor(doc: SongDocument, newValue: number) {
         super();

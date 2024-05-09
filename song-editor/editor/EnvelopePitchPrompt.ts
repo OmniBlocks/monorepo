@@ -6,7 +6,7 @@ import { HTML } from "imperative-html/dist/esm/elements-strict";
 import { SongDocument } from "./SongDocument";
 import { Prompt } from "./Prompt";
 import { ChangeGroup } from "./Change";
-import { ChangeEnvelopePitchStart, ChangeEnvelopePitchEnd } from "./changes";
+import { ChangeEnvelopePitchStart, ChangeEnvelopePitchEnd, ChangeEnvelopeInverse } from "./changes";
 import { Slider } from "./HTMLWrapper";
 import { Instrument } from "../synth/synth";
 
@@ -21,6 +21,7 @@ export class EnvelopePitchPrompt implements Prompt {
     private readonly _endNote: Slider = new Slider(input({ value: this.instrument.pitchEnvelopeEnd, style: "width: 3em; margin-left: 1em;", type: "range", min: "0", max: this.instrument.isNoiseInstrument ? 11 : 96, step: "1" }), this._doc, null, false);
     private readonly _endNoteBox: HTMLInputElement = input({ value: this.instrument.pitchEnvelopeEnd, style: "width: 4em; font-size: 80%; ", id: "endNoteBox", type: "number", step: "1", min: "0", max: this.instrument.isNoiseInstrument ? 11 : 96 });
 
+    private readonly _invertBox: HTMLInputElement = input({ "checked": this.instrument.pitchEnvelopeInverse, type: "checkbox", style: "width: 1em; padding: 0; margin-right: 4em;", id:"invertBox" })
     
     private readonly _cancelButton: HTMLButtonElement = button({ class: "cancelButton" });
     private readonly _okayButton: HTMLButtonElement = button({ class: "okayButton", style: "width:45%;" }, "Okay");  
@@ -34,14 +35,18 @@ export class EnvelopePitchPrompt implements Prompt {
         let pitchEnvelopeEditorWrapper: HTMLDivElement = div({});
         let startNoteWrapper: HTMLDivElement = div({});
         let endNoteWrapper: HTMLDivElement = div({});
+        let pitchInvertWrapper: HTMLDivElement = div({});
         startNoteWrapper.appendChild(span("Start note: "));
         startNoteWrapper.appendChild(this._startNoteBox);
         startNoteWrapper.appendChild(this._startNote.container);
         endNoteWrapper.appendChild(span("End note: "));
         endNoteWrapper.appendChild(this._endNoteBox);
         endNoteWrapper.appendChild(this._endNote.container);
+        pitchInvertWrapper.appendChild(span("Invert direction: "));
+        pitchInvertWrapper.appendChild(this._invertBox);
         pitchEnvelopeEditorWrapper.appendChild(startNoteWrapper);
         pitchEnvelopeEditorWrapper.appendChild(endNoteWrapper);
+        pitchEnvelopeEditorWrapper.appendChild(pitchInvertWrapper);
 
         //Save and close buttons receive their onCLick functionality
         this._okayButton.addEventListener("click", this._saveChanges);
@@ -50,7 +55,9 @@ export class EnvelopePitchPrompt implements Prompt {
         //The main prompt container
         this.container = div({ class: "prompt noSelection", style: "width: 350px" },
             h2("Pitch Envelope Boundaries"),
-            p("Here you can adjust the start and end of where the pitch envelope affects. Everything below start envelope will be 0, everything above end envelope will be 1, and everything inbetween will scale based on pitch"),
+            p("Here you can adjust the start and end of where the pitch envelope affects. Everything below start envelope will be 0, everything above end envelope will be 1, and everything inbetween will scale based on pitch."),
+            p("Additionally, you can decide to invert which direction increases the value. So instead of a higher pitch leading to a higher value, a lower pitch can lead to a higher value."),
+
             div({ style: "display: flex; flex-direction: row; align-items: center; justify-content: flex-end;" },
                 pitchEnvelopeEditorWrapper,
             ),
@@ -106,6 +113,7 @@ export class EnvelopePitchPrompt implements Prompt {
         const group: ChangeGroup = new ChangeGroup();
         group.append(new ChangeEnvelopePitchStart(this._doc, parseInt(this._startNoteBox.value)));
         group.append(new ChangeEnvelopePitchEnd(this._doc, parseInt(this._endNoteBox.value)));
+        group.append(new ChangeEnvelopeInverse(this._doc, this._invertBox.checked));
         this._doc.prompt = null;
         this._doc.record(group, true);
     }

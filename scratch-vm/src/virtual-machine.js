@@ -228,7 +228,8 @@ class VirtualMachine extends EventEmitter {
                     JSGenerator: require('./compiler/jsgen.js'),
                     IRGenerator: require('./compiler/irgen.js').IRGenerator,
                     ScriptTreeGenerator: require('./compiler/irgen.js').ScriptTreeGenerator,
-                    Thread: require('./engine/thread.js')
+                    Thread: require('./engine/thread.js'),
+                    execute: require('./engine/execute.js')
                 });
             }
         };

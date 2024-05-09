@@ -33438,7 +33438,6 @@ You should be redirected to the song at:<br /><br />
                 const extraSettingsButton = HTML.button({ type: "button", class: "envelope-settings", onclick: "" });
                 const deleteButton = HTML.button({ type: "button", class: "delete-envelope", style: "flex: 0.2" });
                 extraSettingsButton.style.display = instrument.envelopes[envelopeIndex].envelope == 2 ? "inline" : "none";
-                console.log(instrument.envelopes[envelopeIndex].envelope, 2, extraSettingsButton.style.display, extraSettingsButton.style);
                 const row = HTML.div({ class: "envelope-row" }, HTML.div({ class: "selectContainer", style: "width: 0; flex: 1;" }, targetSelect), extraSettingsButton, HTML.div({ class: "selectContainer", style: "width: 0; flex: 0.85" }, envelopeSelect), deleteButton);
                 this.container.appendChild(row);
                 this._rows[envelopeIndex] = row;
@@ -42518,6 +42517,7 @@ You should be redirected to the song at:<br /><br />
                     else
                         this._envelopeDropdownGroup.style.display = "none";
                     this._envelopeEditor.render();
+                    this._envelopeEditor.rerenderExtraSettings();
                     for (let chordIndex = 0; chordIndex < Config.chords.length; chordIndex++) {
                         let hidden = (!Config.instrumentTypeHasSpecialInterval[instrument.type] && Config.chords[chordIndex].customInterval);
                         const option = this._chordSelect.children[chordIndex];

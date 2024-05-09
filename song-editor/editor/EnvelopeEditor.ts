@@ -109,8 +109,6 @@ export class EnvelopeEditor {
 			const extraSettingsButton: HTMLButtonElement = HTML.button({ type: "button", class: "envelope-settings", onclick: "" });
 			const deleteButton: HTMLButtonElement = HTML.button({ type: "button", class: "delete-envelope", style: "flex: 0.2" });
 			extraSettingsButton.style.display = instrument.envelopes[envelopeIndex].envelope == EnvelopeType.pitch ? "inline" : "none";
-			console.log(instrument.envelopes[envelopeIndex].envelope, EnvelopeType.pitch, extraSettingsButton.style.display, extraSettingsButton.style);
-
 
 			const row: HTMLDivElement = HTML.div({class: "envelope-row"},
 				HTML.div({ class: "selectContainer", style: "width: 0; flex: 1;" }, targetSelect),

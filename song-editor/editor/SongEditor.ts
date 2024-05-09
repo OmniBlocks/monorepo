@@ -2765,6 +2765,7 @@ export class SongEditor {
                 this._envelopeDropdownGroup.style.display = "none";
 
             this._envelopeEditor.render();
+            this._envelopeEditor.rerenderExtraSettings();
 
             for (let chordIndex: number = 0; chordIndex < Config.chords.length; chordIndex++) {
                 let hidden: boolean = (!Config.instrumentTypeHasSpecialInterval[instrument.type] && Config.chords[chordIndex].customInterval);

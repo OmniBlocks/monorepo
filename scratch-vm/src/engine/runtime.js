@@ -22,6 +22,7 @@ const xmlEscape = require('../util/xml-escape');
 const ScratchLinkWebSocket = require('../util/scratch-link-websocket');
 const FontManager = require('./tw-font-manager');
 const fetchWithTimeout = require('../util/fetch-with-timeout');
+const platform = require('./tw-platform.js');
 
 // Virtual I/O devices.
 const Clock = require('../io/clock');
@@ -438,6 +439,11 @@ class Runtime extends EventEmitter {
          * @type {?string}
          */
         this.origin = null;
+
+        /**
+         * Metadata about the platform this VM is part of.
+         */
+        this.platform = Object.assign({}, platform);
 
         this._initScratchLink();
 
@@ -910,6 +916,13 @@ class Runtime extends EventEmitter {
      */
     static get BLOCKS_NEED_UPDATE () {
         return 'BLOCKS_NEED_UPDATE';
+    }
+
+    /**
+     * Event name when platform name inside a project does not match the runtime.
+     */
+    static get PLATFORM_MISMATCH () {
+        return 'PLATFORM_MISMATCH';
     }
 
     /**

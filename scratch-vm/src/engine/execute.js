@@ -112,6 +112,35 @@ const handleReport = function (resolvedValue, sequencer, thread, blockCached, la
     }
 };
 
+const handlePromiseResolution = (resolvedValue, sequencer, thread, blockCached, lastOperation) => {
+    handleReport(resolvedValue, sequencer, thread, blockCached, lastOperation);
+    // If it's a command block or a top level reporter in a stackClick.
+    // TW: Don't mangle the stack when we just finished executing a hat block.
+    // Hat block is always the top and first block of the script. There are no loops to find.
+    if (lastOperation && (!blockCached._isHat || thread.stackClick)) {
+        let stackFrame;
+        let nextBlockId;
+        do {
+            // In the case that the promise is the last block in the current thread stack
+            // We need to pop out repeatedly until we find the next block.
+            const popped = thread.popStack();
+            if (popped === null) {
+                return;
+            }
+            nextBlockId = thread.target.blocks.getNextBlock(popped);
+            if (nextBlockId !== null) {
+                // A next block exists so break out this loop
+                break;
+            }
+            // Investigate the next block and if not in a loop,
+            // then repeat and pop the next item off the stack frame
+            stackFrame = thread.peekStackFrame();
+        } while (stackFrame !== null && !stackFrame.isLoop);
+
+        thread.pushStack(nextBlockId);
+    }
+};
+
 const handlePromise = (primitiveReportedValue, sequencer, thread, blockCached, lastOperation) => {
     if (thread.status === Thread.STATUS_RUNNING) {
         // Primitive returned a promise; automatically yield thread.
@@ -119,38 +148,11 @@ const handlePromise = (primitiveReportedValue, sequencer, thread, blockCached, l
     }
     // Promise handlers
     primitiveReportedValue.then(resolvedValue => {
-        handleReport(resolvedValue, sequencer, thread, blockCached, lastOperation);
-        // If it's a command block or a top level reporter in a stackClick.
-        // TW: Don't mangle the stack when we just finished executing a hat block.
-        // Hat block is always the top and first block of the script. There are no loops to find.
-        if (lastOperation && (!blockCached._isHat || thread.stackClick)) {
-            let stackFrame;
-            let nextBlockId;
-            do {
-                // In the case that the promise is the last block in the current thread stack
-                // We need to pop out repeatedly until we find the next block.
-                const popped = thread.popStack();
-                if (popped === null) {
-                    return;
-                }
-                nextBlockId = thread.target.blocks.getNextBlock(popped);
-                if (nextBlockId !== null) {
-                    // A next block exists so break out this loop
-                    break;
-                }
-                // Investigate the next block and if not in a loop,
-                // then repeat and pop the next item off the stack frame
-                stackFrame = thread.peekStackFrame();
-            } while (stackFrame !== null && !stackFrame.isLoop);
-
-            thread.pushStack(nextBlockId);
-        }
+        handlePromiseResolution(resolvedValue, sequencer, thread, blockCached, lastOperation);
     }, rejectionReason => {
         // Promise rejected: the primitive had some error.
-        // Log it and proceed.
         log.warn('Primitive rejected promise: ', rejectionReason);
-        thread.status = Thread.STATUS_RUNNING;
-        thread.popStack();
+        handlePromiseResolution(`${rejectionReason}`, sequencer, thread, blockCached, lastOperation);
     });
 };
 

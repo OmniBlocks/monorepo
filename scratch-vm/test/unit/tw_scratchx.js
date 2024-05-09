@@ -74,7 +74,7 @@ test('complex extension', async t => {
         return 'This value should be ignored.';
     };
 
-    const touching = sprite => sprite === 'Sprite9';
+    const touching = (sprite, bool) => sprite === 'Sprite9' && bool === true;
 
     const converted = convert(
         'My Extension',
@@ -87,7 +87,7 @@ test('complex extension', async t => {
                 ['r', 'multiply %n by %n and append %s', 'multiplyAndAppend'],
                 ['R', 'repeat %m.myMenu %n', 'repeat', ''],
                 ['-'],
-                ['b', 'touching %s', 'touching', 'Sprite1']
+                ['b', 'touching %s %b', 'touching', 'Sprite1', 'ignored']
             ],
             menus: {
                 myMenu: ['abc', 'def', 123, true, false],
@@ -178,12 +178,15 @@ test('complex extension', async t => {
         '---',
         {
             opcode: 'touching',
-            text: 'touching [0]',
+            text: 'touching [0] [1]',
             blockType: 'Boolean',
             arguments: [
                 {
                     type: 'string',
                     defaultValue: 'Sprite1'
+                },
+                {
+                    type: 'Boolean'
                 }
             ]
         }
@@ -232,11 +235,17 @@ test('complex extension', async t => {
     }), 'scratchxscratchxscratchx');
 
     t.equal(converted.touching({
-        0: 'Sprite1'
+        0: 'Sprite1',
+        1: true
     }), false);
     t.equal(converted.touching({
-        0: 'Sprite9'
+        0: 'Sprite9',
+        1: true
     }), true);
+    t.equal(converted.touching({
+        0: 'Sprite9',
+        1: false
+    }), false);
 
     t.end();
 });

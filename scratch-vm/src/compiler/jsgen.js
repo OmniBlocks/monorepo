@@ -1431,6 +1431,26 @@ class JSGenerator {
     }
 }
 
+// For extensions.
+JSGenerator.unstable_exports = {
+    TYPE_NUMBER,
+    TYPE_STRING,
+    TYPE_BOOLEAN,
+    TYPE_UNKNOWN,
+    TYPE_NUMBER_NAN,
+    factoryNameVariablePool,
+    functionNameVariablePool,
+    generatorNameVariablePool,
+    VariablePool,
+    PEN_EXT,
+    PEN_STATE,
+    TypedInput,
+    ConstantInput,
+    VariableInput,
+    Frame,
+    sanitize
+};
+
 // Test hook used by automated snapshot testing.
 JSGenerator.testingApparatus = null;
 

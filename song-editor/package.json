@@ -33,7 +33,7 @@
 		"@types/select2": "^4.0.63",
 		"electron": "^29.1.1",
 		"electron-packager": "^17.1.2",
-		"imperative-html": "^0.1.0",
+		"imperative-html": "^0.1.1",
 		"select2": "^4.0.13"
 	}
 }

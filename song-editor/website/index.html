@@ -151,7 +151,6 @@
     <script>
         const image = localStorage.getItem('customTheme2');
         const el  = document.getElementById('secondImage');
-        // console.log(image, el);
         if (image != null && image !== "null" && image !== "undefined") {
             el.style.backgroundImage="url(" + image + ")";
             el.style.backgroundRepeat= "repeat";
@@ -172,7 +171,7 @@
             </h1>
             
             <p id="introduction">
-                Slarmoo's Box is a mod of Ultrabox developed by Slarmoo which aims to add new features. <br>
+                Slarmoo's Box is a mod of Ultrabox developed by Slarmoo adding several new features such as new envelope types. <br>
                 UltraBox is a mod first envisioned by Neptendo that was made possible by Main, with help from contributing community members.<br>
                 It takes elements from most of the beepbox mods available (see <a href="./credits.html">credits</a>) and puts them in one convenient package.
             </p>
@@ -243,6 +242,7 @@
 							<li><b>F/H</b>: move to First or Highlighted pattern </li>
 							<li><b>Shift & Drag</b>: select part of a pattern</li>
                             <li><b>Enter</b>: add a new bar after currently selected one</li>
+                            <li><b>Shift Enter</b>: add a new bar before currently selected one</li>
                             <li><b>Backspace</b>: delete currently selected bar</li>
                             <li><b>Ctrl Enter</b>: add channel</li>
                             <li><b>Ctrl Backspace</b>: delete currently selected channel</li>
@@ -306,7 +306,7 @@
                         You can download <a download="ultrabox-offline.html" href="ultrabox-offline.html">an offline version of UltraBox</a> to use when you don't have access to the internet. The features are missing Slarmoo's Box's, but are otherwise the same.
                     </p>
                     <p>
-                        You can download and use <a href="https://github.com/ultraabox/ultrabox_typescript" target="_blank">the source code</a> under the MIT license.
+                        You can download and use <a href="https://github.com/slarmoo/slarmoosbox" target="_blank">the source code</a> under the MIT license.
                         The original BeepBox source code by John Nesky can be found <a href="https://github.com/johnnesky/beepbox" target="_blank">here</a>.
                     </p>
                     <p>

@@ -46,7 +46,6 @@ export const enum SustainType {
 export const enum EnvelopeType {
     none,
     noteSize,
-    pitch,
 	punch,
 	flare,
 	twang,
@@ -58,7 +57,8 @@ export const enum EnvelopeType {
     hard,
     linear,
     rise,
-    blip
+    blip,
+    pitch,
 }
 
 export const enum InstrumentType {
@@ -120,7 +120,7 @@ export const enum EnvelopeComputeIndex {
     pitchShift,
     detune,
     vibratoDepth,
-    //vibratoSpeed, doesn't follow normal envelope pattern; computed in an entirely different place. 
+    //vibratoSpeed, doesn't follow normal envelope pattern; will figure out. 
     noteFilterFreq0, noteFilterFreq1, noteFilterFreq2, noteFilterFreq3, noteFilterFreq4, noteFilterFreq5, noteFilterFreq6, noteFilterFreq7,
     noteFilterGain0, noteFilterGain1, noteFilterGain2, noteFilterGain3, noteFilterGain4, noteFilterGain5, noteFilterGain6, noteFilterGain7,
     decimalOffset,
@@ -1305,7 +1305,6 @@ export class Config {
     public static readonly envelopes: DictionaryArray<Envelope> = toNameMap([
         { name: "none", type: EnvelopeType.none, speed: 0.0 },
         { name: "note size", type: EnvelopeType.noteSize, speed: 0.0 },
-        { name: "pitch", type: EnvelopeType.pitch, speed: 0.0 },
         { name: "punch", type: EnvelopeType.punch, speed: 0.0 },
         { name: "flare -1", type: EnvelopeType.flare, speed: 128.0 },
         { name: "flare 1", type: EnvelopeType.flare, speed: 32.0 },
@@ -1369,6 +1368,8 @@ export class Config {
         { name: "blip 1", type: EnvelopeType.blip, speed: 6.0 },
         { name: "blip 2", type: EnvelopeType.blip, speed: 16.0 },
         { name: "blip 3", type: EnvelopeType.blip, speed: 32.0 },
+        // Slarmoo's box
+        { name: "pitch", type: EnvelopeType.pitch, speed: 0.0 },
     ]);
 	public static readonly feedbacks: DictionaryArray<Feedback> = toNameMap([
 		{ name: "1⟲", indices: [[1], [], [], []] },

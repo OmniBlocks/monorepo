@@ -7201,45 +7201,6 @@ class EnvelopeComputer {
         switch (envelope.type) {
             case EnvelopeType.none: return 1.0;
             case EnvelopeType.noteSize: return Synth.noteSizeToVolumeMult(noteSize);
-            case EnvelopeType.pitch:
-                let basePitch: number = 0;
-                let startNote: number = 0;
-                let endNote: number = 96;
-                let pitch: number = 0;
-                let inverse: boolean = false;
-
-                if (instrument.isNoiseInstrument) {
-                    endNote = 11;
-                }
-
-                startNote = instrument.pitchEnvelopeStart;
-                endNote = instrument.pitchEnvelopeEnd;
-                inverse = instrument.pitchEnvelopeInverse;
-
-                if (song) {
-                    basePitch = Config.keys[song!.key].basePitch + (Config.pitchesPerOctave * song!.octave);
-                }
-                if (tone) {
-                    pitch = tone.pitches[0 /*arpeggiates ? 0 : ((i < tone.pitchCount) ? i : ((associatedCarrierIndex < tone.pitchCount) ? associatedCarrierIndex : 0))*/];
-                }
-                const range = endNote - startNote + 1;
-                if (inverse) {
-                    if (basePitch + pitch <= startNote) {
-                        return 1;
-                    } else if (basePitch + pitch >= endNote) {
-                        return 0;
-                    } else {
-                        return 1-(basePitch + pitch - startNote) / range;
-                    }
-                } else {
-                    if (basePitch + pitch <= startNote) {
-                        return 0;
-                    } else if (basePitch + pitch >= endNote) {
-                        return 1;
-                    } else {
-                        return (basePitch + pitch - startNote) / range;
-                    }
-                }
             case EnvelopeType.twang: return 1.0 / (1.0 + time * envelope.speed);
             case EnvelopeType.swell: return 1.0 - 1.0 / (1.0 + time * envelope.speed);
             case EnvelopeType.tremolo: return 0.5 - Math.cos(beats * 2.0 * Math.PI * envelope.speed) * 0.5;
@@ -7263,6 +7224,45 @@ class EnvelopeComputer {
                 lin = lin < 1.0 ? lin : 1.0;
                 return lin;
             }
+            case EnvelopeType.pitch:
+                let basePitch: number = 0;
+                let startNote: number = 0;
+                let endNote: number = 96;
+                let pitch: number = 0;
+                let inverse: boolean = false;
+
+                if (instrument.isNoiseInstrument) {
+                    endNote = 11;
+                }
+
+                startNote = instrument.pitchEnvelopeStart;
+                endNote = instrument.pitchEnvelopeEnd;
+                inverse = instrument.pitchEnvelopeInverse;
+
+                if (song) {
+                    basePitch = Config.keys[song!.key].basePitch + (Config.pitchesPerOctave * song!.octave);
+                }
+                if (tone) {
+                    pitch = tone.pitches[0];
+                }
+                const range = endNote - startNote + 1;
+                if (inverse) {
+                    if (basePitch + pitch <= startNote) {
+                        return 1;
+                    } else if (basePitch + pitch >= endNote) {
+                        return 0;
+                    } else {
+                        return 1 - (basePitch + pitch - startNote) / range;
+                    }
+                } else {
+                    if (basePitch + pitch <= startNote) {
+                        return 0;
+                    } else if (basePitch + pitch >= endNote) {
+                        return 1;
+                    } else {
+                        return (basePitch + pitch - startNote) / range;
+                    }
+                }
             default: throw new Error("Unrecognized operator envelope type.");
         }
 

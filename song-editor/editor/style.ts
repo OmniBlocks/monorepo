@@ -132,6 +132,10 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 }
 
 
+html {
+	scrollbar-color: var(--scrollbar-color, var(--ui-widget-background)) var(--scrollbar-background, var(--editor-background));
+}
+
 .obtrusive-scrollbars, .obtrusive-scrollbars * {
 	scrollbar-width: thin;
 	scrollbar-color: ${ColorConfig.uiWidgetBackground} ${ColorConfig.editorBackground};
@@ -221,6 +225,7 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
     -ms-transition: opacity 0.5s ease-in;
     transition: opacity 0.5s ease-in;
     transition-delay: 0.45s;
+	scrollbar-width: none;
 }
 
 .trackAndMuteContainer {

@@ -1,6 +1,6 @@
 // Copyright (c) 2012-2022 John Nesky and contributing authors, distributed under the MIT license, see accompanying the LICENSE.md file.
 
-import {InstrumentType, Config, /*EnvelopeComputeIndex,*/ EnvelopeType} from "../synth/SynthConfig";
+import {InstrumentType, Config} from "../synth/SynthConfig";
 import {Instrument} from "../synth/synth";
 import {SongDocument} from "./SongDocument";
 import {ChangeSetEnvelopeTarget, ChangeSetEnvelopeType, ChangeRemoveEnvelope} from "./changes";
@@ -27,17 +27,17 @@ export class EnvelopeEditor {
 	}
 	
 	private _onChange = (event: Event): void => {
-		const targetSelectIndex: number = this._targetSelects.indexOf(<any> event.target);
-		const envelopeSelectIndex: number = this._envelopeSelects.indexOf(<any> event.target);
+		const targetSelectIndex: number = this._targetSelects.indexOf(<any>event.target);
+		const envelopeSelectIndex: number = this._envelopeSelects.indexOf(<any>event.target);
 		if (targetSelectIndex != -1) {
 			const combinedValue: number = parseInt(this._targetSelects[targetSelectIndex].value);
 			const target: number = combinedValue % Config.instrumentAutomationTargets.length;
 			const index: number = (combinedValue / Config.instrumentAutomationTargets.length) >>> 0;
 			this._doc.record(new ChangeSetEnvelopeTarget(this._doc, targetSelectIndex, target, index));
 		} else if (envelopeSelectIndex != -1) {
-			this._doc.record(new ChangeSetEnvelopeType(this._doc, envelopeSelectIndex, this._envelopeSelects[envelopeSelectIndex].selectedIndex));		
+			this._doc.record(new ChangeSetEnvelopeType(this._doc, envelopeSelectIndex, this._envelopeSelects[envelopeSelectIndex].selectedIndex));
 			
-			this._extraSettingsButtons[envelopeSelectIndex].style.display = this._envelopeSelects[envelopeSelectIndex].selectedIndex == EnvelopeType.pitch ? "inline" : "none";
+			this._extraSettingsButtons[envelopeSelectIndex].style.display = Config.envelopes[this._envelopeSelects[envelopeSelectIndex].selectedIndex].name == "pitch" ? "inline" : "none";
 		}
 	}
 	
@@ -80,8 +80,7 @@ export class EnvelopeEditor {
 	public rerenderExtraSettings() {
 		const instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
 		for (let i = 0; i < instrument.envelopeCount; i++) {
-			this._extraSettingsButtons[i].style.display = instrument.envelopes[i].envelope == EnvelopeType.pitch ? "inline" : "none";
-
+			this._extraSettingsButtons[i].style.display = Config.envelopes[instrument.envelopes[i].envelope].name =="pitch" ? "inline" : "none";
 		}
 	}
 	
@@ -108,7 +107,7 @@ export class EnvelopeEditor {
 
 			const extraSettingsButton: HTMLButtonElement = HTML.button({ type: "button", class: "envelope-settings", onclick: "" });
 			const deleteButton: HTMLButtonElement = HTML.button({ type: "button", class: "delete-envelope", style: "flex: 0.2" });
-			extraSettingsButton.style.display = instrument.envelopes[envelopeIndex].envelope == EnvelopeType.pitch ? "inline" : "none";
+			extraSettingsButton.style.display = Config.envelopes[instrument.envelopes[envelopeIndex].envelope].name == "pitch" ? "inline" : "none";
 
 			const row: HTMLDivElement = HTML.div({class: "envelope-row"},
 				HTML.div({ class: "selectContainer", style: "width: 0; flex: 1;" }, targetSelect),

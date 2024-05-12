@@ -1802,7 +1802,10 @@ export class Instrument {
             "eqSimpleCut": this.eqFilterSimpleCut,
             "eqSimplePeak": this.eqFilterSimplePeak,
             "envelopeSpeed": this.envelopeSpeed,
-            "discreteEnvelope": this.discreteEnvelope
+            "discreteEnvelope": this.discreteEnvelope,
+            "pitchEnvelopeStart": this.pitchEnvelopeStart,
+            "pitchEnvelopeEnd": this.pitchEnvelopeEnd,
+            "pitchEnvelopeInverse": this.pitchEnvelopeInverse
         };
 
         if (this.preset != this.type) {
@@ -2069,6 +2072,7 @@ export class Instrument {
             this.volume = 0;
         }
 
+        //These can probably be condensed with ternary operators
         if (instrumentObject["envelopeSpeed"] != undefined) {
             this.envelopeSpeed = clamp(0, Config.modulators.dictionary["envelope speed"].maxRawVol + 1, instrumentObject["envelopeSpeed"] | 0);
         } else {
@@ -2080,6 +2084,27 @@ export class Instrument {
         }
         else {
             this.discreteEnvelope = false;
+        }
+
+        if (instrumentObject["pitchEnvelopeStart"] != undefined) {
+            this.pitchEnvelopeStart = instrumentObject["pitchEnvelopeStart"];
+        }
+        else {
+            this.pitchEnvelopeStart = 0;
+        }
+
+        if (instrumentObject["pitchEnvelopeEnd"] != undefined) {
+            this.pitchEnvelopeEnd = instrumentObject["pitchEnvelopeEnd"];
+        }
+        else {
+            this.pitchEnvelopeEnd = isNoiseChannel ? 11 : 96;
+        }
+
+        if (instrumentObject["pitchEnvelopeInverse"] != undefined) {
+            this.pitchEnvelopeInverse = instrumentObject["pitchEnvelopeInverse"];
+        }
+        else {
+            this.pitchEnvelopeInverse = false;
         }
 
         if (Array.isArray(instrumentObject["effects"])) {
@@ -5210,6 +5235,7 @@ export class Song {
                         let aa:number = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                         if ((beforeTwo && fromGoldBox) || (fromBeepBox)) aa = pregoldToEnvelope[aa]; 
                         if (fromJummBox) aa = jummToUltraEnvelope[aa];
+                        if (!fromSlarmoosBox && aa>=2) aa++ ; //I don't really want to hard code this, but I don't see another way at the moment
                         const envelope: number = clamp(0, Config.envelopes.length, aa);
                         instrument.addEnvelope(target, index, envelope);
                     }
@@ -7201,29 +7227,6 @@ class EnvelopeComputer {
         switch (envelope.type) {
             case EnvelopeType.none: return 1.0;
             case EnvelopeType.noteSize: return Synth.noteSizeToVolumeMult(noteSize);
-            case EnvelopeType.twang: return 1.0 / (1.0 + time * envelope.speed);
-            case EnvelopeType.swell: return 1.0 - 1.0 / (1.0 + time * envelope.speed);
-            case EnvelopeType.tremolo: return 0.5 - Math.cos(beats * 2.0 * Math.PI * envelope.speed) * 0.5;
-            case EnvelopeType.tremolo2: return 0.75 - Math.cos(beats * 2.0 * Math.PI * envelope.speed) * 0.25;
-            case EnvelopeType.punch: return Math.max(1.0, 2.0 - time * 10.0);
-            case EnvelopeType.flare: const attack: number = 0.25 / Math.sqrt(envelope.speed); return time < attack ? time / attack : 1.0 / (1.0 + (time - attack) * envelope.speed);
-            case EnvelopeType.decay: return Math.pow(2, -envelope.speed * time);
-            case EnvelopeType.blip: return 1.0 * +(time < (0.25 / Math.sqrt(envelope.speed)));
-            case EnvelopeType.wibble:
-                let temp = 0.5 - Math.cos(beats * envelope.speed) * 0.5;
-                temp = 1.0 / (1.0 + time * (envelope.speed - (temp / (1.5 / envelope.speed))));
-                temp = temp > 0.0 ? temp : 0.0;
-                return temp;
-            case EnvelopeType.linear: {
-                let lin = (1.0 - (time / (16 / envelope.speed)));
-                lin = lin > 0.0 ? lin : 0.0;
-                return lin;
-            }
-            case EnvelopeType.rise: {
-                let lin = (time / (16 / envelope.speed));
-                lin = lin < 1.0 ? lin : 1.0;
-                return lin;
-            }
             case EnvelopeType.pitch:
                 let basePitch: number = 0;
                 let startNote: number = 0;
@@ -7263,6 +7266,29 @@ class EnvelopeComputer {
                         return (basePitch + pitch - startNote) / range;
                     }
                 }
+            case EnvelopeType.twang: return 1.0 / (1.0 + time * envelope.speed);
+            case EnvelopeType.swell: return 1.0 - 1.0 / (1.0 + time * envelope.speed);
+            case EnvelopeType.tremolo: return 0.5 - Math.cos(beats * 2.0 * Math.PI * envelope.speed) * 0.5;
+            case EnvelopeType.tremolo2: return 0.75 - Math.cos(beats * 2.0 * Math.PI * envelope.speed) * 0.25;
+            case EnvelopeType.punch: return Math.max(1.0, 2.0 - time * 10.0);
+            case EnvelopeType.flare: const attack: number = 0.25 / Math.sqrt(envelope.speed); return time < attack ? time / attack : 1.0 / (1.0 + (time - attack) * envelope.speed);
+            case EnvelopeType.decay: return Math.pow(2, -envelope.speed * time);
+            case EnvelopeType.blip: return 1.0 * +(time < (0.25 / Math.sqrt(envelope.speed)));
+            case EnvelopeType.wibble:
+                let temp = 0.5 - Math.cos(beats * envelope.speed) * 0.5;
+                temp = 1.0 / (1.0 + time * (envelope.speed - (temp / (1.5 / envelope.speed))));
+                temp = temp > 0.0 ? temp : 0.0;
+                return temp;
+            case EnvelopeType.linear: {
+                let lin = (1.0 - (time / (16 / envelope.speed)));
+                lin = lin > 0.0 ? lin : 0.0;
+                return lin;
+            }
+            case EnvelopeType.rise: {
+                let lin = (time / (16 / envelope.speed));
+                lin = lin < 1.0 ? lin : 1.0;
+                return lin;
+            }
             default: throw new Error("Unrecognized operator envelope type.");
         }
 

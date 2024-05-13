@@ -8679,7 +8679,8 @@ var beepbox = (function (exports) {
                         basePitch = Config.keys[song.key].basePitch + (Config.pitchesPerOctave * song.octave);
                     }
                     if (tone) {
-                        pitch = tone.pitches[0];
+                        console.log(instrument.chord);
+                        pitch = tone.pitches[instrument.chord];
                     }
                     const range = endNote - startNote + 1;
                     if (inverse) {

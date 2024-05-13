@@ -21,7 +21,7 @@ export class EnvelopePitchPrompt implements Prompt {
     private readonly _endNote: Slider = new Slider(input({ value: this.instrument.pitchEnvelopeEnd, style: "width: 3em; margin-left: 1em;", type: "range", min: "0", max: this.instrument.isNoiseInstrument ? 11 : 96, step: "1" }), this._doc, null, false);
     private readonly _endNoteBox: HTMLInputElement = input({ value: this.instrument.pitchEnvelopeEnd, style: "width: 4em; font-size: 80%; ", id: "endNoteBox", type: "number", step: "1", min: "0", max: this.instrument.isNoiseInstrument ? 11 : 96 });
 
-    private readonly _invertBox: HTMLInputElement = input({ "checked": this.instrument.pitchEnvelopeInverse, type: "checkbox", style: "width: 1em; padding: 0; margin-right: 4em;", id:"invertBox" })
+    private readonly _invertBox: HTMLInputElement = input({ "checked": this.instrument.pitchEnvelopeInverse, type: "checkbox", style: "width: 1em; padding: 0.5em; margin-right: 4em;", id:"invertBox" })
     
     private readonly _cancelButton: HTMLButtonElement = button({ class: "cancelButton" });
     private readonly _okayButton: HTMLButtonElement = button({ class: "okayButton", style: "width:45%;" }, "Okay");  

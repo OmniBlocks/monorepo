@@ -7246,8 +7246,7 @@ class EnvelopeComputer {
                     basePitch = Config.keys[song!.key].basePitch + (Config.pitchesPerOctave * song!.octave);
                 }
                 if (tone) {
-                    //const arpeggio: number = Math.floor(instrumentState.arpTime / Config.ticksPerArpeggio);
-                    pitch = tone.pitches[/*instrument.getChord().arpeggiates ? getArpeggioPitchIndex(tone.pitchCount, instrument.fastTwoNoteArp, arpeggio) : */0];
+                    pitch = tone.pitches[0];
                 }
                 const range = endNote - startNote + 1;
                 if (inverse) {

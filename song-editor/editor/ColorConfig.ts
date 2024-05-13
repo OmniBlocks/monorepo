@@ -7147,7 +7147,6 @@ export class ColorConfig {
                     + (this.c_noisePrimaryNoteLum + channel * this.c_noisePrimaryNoteLumScale) + "%)";
 
                 let newChannelColors = <ChannelColors>{ secondaryChannel: newChannelSecondary, primaryChannel: newChannelPrimary, secondaryNote: newNoteSecondary, primaryNote: newNotePrimary };
-				ColorConfig.colorLookup.set(channel, newChannelColors);
                 return newChannelColors;
             } case ("mod"): {
                 // Mod formula

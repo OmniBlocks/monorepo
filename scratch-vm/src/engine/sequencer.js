@@ -128,9 +128,6 @@ class Sequencer {
                     }
                     this.stepThread(activeThread);
                     activeThread.warpTimer = null;
-                    if (activeThread.isKilled) {
-                        i--; // if the thread is removed from the list (killed), do not increase index
-                    }
                 }
                 if (activeThread.status === Thread.STATUS_RUNNING) {
                     numActiveThreads++;

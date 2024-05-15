@@ -237,6 +237,9 @@ class Sequencer {
             } else if (thread.status === Thread.STATUS_YIELD_TICK) {
                 // stepThreads will reset the thread to Thread.STATUS_RUNNING
                 return;
+            } else if (thread.status === Thread.STATUS_DONE) {
+                // Nothing more to execute.
+                return;
             }
             // If no control flow has happened, switch to next block.
             if (thread.peekStack() === currentBlockId && !thread.peekStackFrame().waitingReporter) {

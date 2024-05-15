@@ -163,7 +163,7 @@ const executeInCompatibilityLayer = function*(inputs, blockFunction, isWarp, use
         return returnValue;
     }
 
-    if (thread.status === 1 /* STATUS_PROMISE_WAIT */) {
+    if (thread.status === 1 /* STATUS_PROMISE_WAIT */ || thread.status === 4 /* STATUS_DONE */) {
         // Something external is forcing us to stop
         yield;
         // Make up a return value because whatever is forcing us to stop can't specify one
@@ -190,13 +190,11 @@ const executeInCompatibilityLayer = function*(inputs, blockFunction, isWarp, use
             return returnValue;
         }
 
-        if (thread.status === 1 /* STATUS_PROMISE_WAIT */) {
+        if (thread.status === 1 /* STATUS_PROMISE_WAIT */ || thread.status === 4 /* STATUS_DONE */) {
             yield;
             return finish('');
         }
     }
-
-    // todo: do we have to do anything extra if status is STATUS_DONE?
 
     return finish(returnValue);
 }`;

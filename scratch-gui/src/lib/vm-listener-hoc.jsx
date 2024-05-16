@@ -227,6 +227,7 @@ const vmListenerHOC = function (WrappedComponent) {
                 onFramerateChanged,
                 onInterpolationChanged,
                 onCompilerOptionsChanged,
+                onPlatformMismatch,
                 onRuntimeOptionsChanged,
                 onStageSizeChanged,
                 onCompileError,

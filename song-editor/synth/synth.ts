@@ -2685,31 +2685,32 @@ export class Instrument {
                     if (this.envelopeCount >= Config.maxEnvelopeCount) break;
                     const tempEnvelope: EnvelopeSettings = new EnvelopeSettings();
                     tempEnvelope.fromJsonObject(envelopeArray[i]);
-                    this.addEnvelope(tempEnvelope.target, tempEnvelope.index, tempEnvelope.envelope);
-
+                    //figure out pitch envelope stuff. I should make this more elegant in the future...
+                    let pitchEnvelopeStart: number;
                     if (instrumentObject["pitchEnvelopeStart"] != undefined) {
-                        this.pitchEnvelopeStart[i] = instrumentObject["pitchEnvelopeStart"];
+                        pitchEnvelopeStart = instrumentObject["pitchEnvelopeStart"];
                     } else if (instrumentObject["pitchEnvelopeStart" + i] != undefined) {
-                        this.pitchEnvelopeStart[i] = instrumentObject["pitchEnvelopeStart" + i];
+                        pitchEnvelopeStart = instrumentObject["pitchEnvelopeStart" + i];
                     } else {
-                        this.pitchEnvelopeStart[i] = 0;
+                        pitchEnvelopeStart = 0;
                     }
-
+                    let pitchEnvelopeEnd: number;
                     if (instrumentObject["pitchEnvelopeEnd"] != undefined) {
-                        this.pitchEnvelopeEnd[i] = instrumentObject["pitchEnvelopeEnd"];
+                        pitchEnvelopeEnd = instrumentObject["pitchEnvelopeEnd"];
                     } else if (instrumentObject["pitchEnvelopeEnd" + i] != undefined) {
-                        this.pitchEnvelopeEnd[i] = instrumentObject["pitchEnvelopeEnd" + i];
+                        pitchEnvelopeEnd = instrumentObject["pitchEnvelopeEnd" + i];
                     } else {
-                        this.pitchEnvelopeEnd[i] = isNoiseChannel ? 11 : 96;
+                        pitchEnvelopeEnd = isNoiseChannel ? 11 : 96;
                     }
-
+                    let pitchEnvelopeInverse: boolean;
                     if (instrumentObject["pitchEnvelopeInverse"] != undefined) {
-                        this.pitchEnvelopeInverse[i] = instrumentObject["pitchEnvelopeInverse"];
+                        pitchEnvelopeInverse = instrumentObject["pitchEnvelopeInverse"];
                     } else if (instrumentObject["pitchEnvelopeInverse" + i] != undefined) {
-                        this.pitchEnvelopeInverse[i] = instrumentObject["pitchEnvelopeInverse" + i];
+                        pitchEnvelopeInverse = instrumentObject["pitchEnvelopeInverse" + i];
                     } else {
-                        this.pitchEnvelopeInverse[i] = false;
+                        pitchEnvelopeInverse = false;
                     }
+                    this.addEnvelope(tempEnvelope.target, tempEnvelope.index, tempEnvelope.envelope, pitchEnvelopeStart, pitchEnvelopeEnd, pitchEnvelopeInverse);
                 }
             }
         }
@@ -2757,7 +2758,8 @@ export class Instrument {
         return 440.0 * Math.pow(2.0, (pitch - 69.0) / 12.0);
     }
 
-    public addEnvelope(target: number, index: number, envelope: number): void {
+    public addEnvelope(target: number, index: number, envelope: number, start: number = 0, end: number = -1, inverse: boolean = false): void {
+        end = end != -1 ? end : this.isNoiseInstrument ? 11 : 96; //find default if none is given
         let makeEmpty: boolean = false;
         if (!this.supportsEnvelopeTarget(target, index)) makeEmpty = true;
         if (this.envelopeCount >= Config.maxEnvelopeCount) throw new Error();
@@ -2767,8 +2769,9 @@ export class Instrument {
         envelopeSettings.index = makeEmpty ? 0 : index;
         envelopeSettings.envelope = envelope;
         this.envelopeCount++;
-        //this.pitchEnvelopeStart[envelopeSettings.index] = 0;
-        //this.pitchEnvelopeEnd[envelopeSettings.index] = this.isNoiseInstrument ? 11 : 96;
+        this.pitchEnvelopeStart[envelopeSettings.index] = start;
+        this.pitchEnvelopeEnd[envelopeSettings.index] = end;
+        this.pitchEnvelopeInverse[envelopeSettings.index] = inverse;
     }
 
     public supportsEnvelopeTarget(target: number, index: number): boolean {
@@ -5265,6 +5268,7 @@ export class Song {
                             instrument.pitchEnvelopeEnd[i] = instrumentPitchEnvelopeEnd;
                             instrument.pitchEnvelopeInverse[i] = instrumentPitchEnvelopeInverse;
                         }
+                        
                     }
                     //Pitch Envelope Start and End
                     //note for self: move into loop when it isn't instrument based

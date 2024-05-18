@@ -1031,7 +1031,7 @@ export class SongEditor {
     private readonly _harmonicsRow: HTMLElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("harmonics") }, "Harmonics:"), this._harmonicsEditor.container);
 
     //SongEditor.ts
-    private readonly _envelopeEditor: EnvelopeEditor = new EnvelopeEditor(this._doc, (id: number) => this._toggleDropdownMenu(id), (name: string) => this._openPrompt(name));
+    private readonly _envelopeEditor: EnvelopeEditor = new EnvelopeEditor(this._doc, (id: number, submenu: number, subtype: string) => this._toggleDropdownMenu(id, submenu, subtype), (name: string) => this._openPrompt(name));
     private readonly _discreteEnvelopeBox: HTMLInputElement = input({ type: "checkbox", style: "width: 1em; padding: 0; margin-right: 4em;" });
     private readonly _discreteEnvelopeRow: HTMLElement = div({ class: "selectRow dropFader" }, span({ class: "tip", style: "margin-left:4px;", onclick: () => this._openPrompt("discreteEnvelope") }, "‣ Discrete:"), this._discreteEnvelopeBox);
     private readonly _envelopeSpeedDisplay: HTMLSpanElement = span({ style: `color: ${ColorConfig.secondaryText}; font-size: smaller; text-overflow: clip;` }, "x1");
@@ -1755,6 +1755,7 @@ export class SongEditor {
                 target = this._vibratoDropdown;
                 this._openVibratoDropdown = this._openVibratoDropdown ? false : true;
                 group = this._vibratoDropdownGroup;
+                console.log("why am I here");
                 break;
             case DropdownID.Pan:
                 target = this._panDropdown;
@@ -1789,10 +1790,13 @@ export class SongEditor {
             case DropdownID.EnvelopeSettings:
                 target = this._envelopeEditor._extraSettingsDropdowns[submenu];
                 this._envelopeEditor._openExtraSettingsDropdowns[submenu] = this._envelopeEditor._openExtraSettingsDropdowns[submenu] ? false : true;
+                console.log(subtype);
                 if (subtype == "pitch") {
                     group = this._envelopeEditor._extraPitchSettingsDropdownGroups[submenu];
+                    console.log("pitch");
                 } else if (subtype == "noteSize") {
                     group = this._envelopeEditor._extraNoteSizeSettingsDropdownGroups[submenu];
+                    console.log("notesize");
                 }
                 break;
         }
@@ -1802,11 +1806,14 @@ export class SongEditor {
             target.textContent = "▲";
             if (dropdown == DropdownID.EnvelopeSettings) {
                 group.style.display = "flex";
+                console.log("EnvelopeSettings");
             } else if (group != this._chordDropdownGroup) {
                 group.style.display = "";
+                console.log("not arpeggio");
             } // Only show arpeggio dropdown if chord arpeggiates
             else if (instrument.chord == Config.chords.dictionary["arpeggio"].index) {
                 group.style.display = "";
+                console.log("arpeggio");
             }
 
             for (let i: number = 0; i < group.children.length; i++) {
@@ -3285,18 +3292,19 @@ export class SongEditor {
                 }
 
                 //Hide instrument select if channel is "none" or "song"
+                //Hopefully the !. don't ruin something...
                 if (instrument.modChannels[mod] < 0) {
                     ((this._modInstrumentBoxes[mod].parentElement) as HTMLDivElement).style.display = "none";
-                    $("#modInstrumentText" + mod).get(0).style.display = "none";
-                    $("#modChannelText" + mod).get(0).innerText = "Channel:";
+                    $("#modInstrumentText" + mod).get(0)!.style.display = "none";
+                    $("#modChannelText" + mod).get(0)!.innerText = "Channel:";
 
                     //Hide setting select if channel is "none"
                     if (instrument.modChannels[mod] == -2) {
-                        $("#modSettingText" + mod).get(0).style.display = "none";
+                        $("#modSettingText" + mod).get(0)!.style.display = "none";
                         ((this._modSetBoxes[mod].parentElement) as HTMLDivElement).style.display = "none";
                     }
                     else {
-                        $("#modSettingText" + mod).get(0).style.display = "";
+                        $("#modSettingText" + mod).get(0)!.style.display = "";
                         ((this._modSetBoxes[mod].parentElement) as HTMLDivElement).style.display = "";
                     }
 
@@ -3306,9 +3314,9 @@ export class SongEditor {
                 }
                 else {
                     ((this._modInstrumentBoxes[mod].parentElement) as HTMLDivElement).style.display = (channel.instruments.length > 1) ? "" : "none";
-                    $("#modInstrumentText" + mod).get(0).style.display = (channel.instruments.length > 1) ? "" : "none";
-                    $("#modChannelText" + mod).get(0).innerText = (channel.instruments.length > 1) ? "Ch:" : "Channel:";
-                    $("#modSettingText" + mod).get(0).style.display = "";
+                    $("#modInstrumentText" + mod).get(0)!.style.display = (channel.instruments.length > 1) ? "" : "none";
+                    $("#modChannelText" + mod).get(0)!.innerText = (channel.instruments.length > 1) ? "Ch:" : "Channel:";
+                    $("#modSettingText" + mod).get(0)!.style.display = "";
                     ((this._modSetBoxes[mod].parentElement) as HTMLDivElement).style.display = "";
 
                     this._modTargetIndicators[mod].style.setProperty("fill", ColorConfig.indicatorPrimary);
@@ -3317,8 +3325,8 @@ export class SongEditor {
 
                 let filterType: string = Config.modulators[instrument.modulators[mod]].name;
                 if (filterType == "eq filter" || filterType == "note filter") {
-                    $("#modFilterText" + mod).get(0).style.display = "";
-                    $("#modSettingText" + mod).get(0).style.setProperty("margin-bottom", "2px");
+                    $("#modFilterText" + mod).get(0)!.style.display = "";
+                    $("#modSettingText" + mod).get(0)!.style.setProperty("margin-bottom", "2px");
 
                     let useInstrument: number = instrument.modInstruments[mod];
                     let modChannel: Channel = this._doc.song.channels[Math.max(0, instrument.modChannels[mod])];
@@ -3382,8 +3390,8 @@ export class SongEditor {
 
 
                 } else {
-                    $("#modFilterText" + mod).get(0).style.display = "none";
-                    $("#modSettingText" + mod).get(0).style.setProperty("margin-bottom", "0.9em");
+                    $("#modFilterText" + mod).get(0)!.style.display = "none";
+                    $("#modSettingText" + mod).get(0)!.style.setProperty("margin-bottom", "0.9em");
 
                 }
             }

@@ -116,7 +116,7 @@ export class EnvelopeEditor {
 	public rerenderExtraSettings() {
 		const instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
 		for (let i = 0; i < instrument.envelopeCount; i++) {
-			this._extraPitchSettingsDropdownGroups[i].style.display = "none";
+			//this._extraPitchSettingsDropdownGroups[i].style.display = "none";
 			if (Config.envelopes[instrument.envelopes[i].envelope].name == "pitch") {
 				this._extraSettingsDropdowns[i].style.display = "inline";
 				if (this._extraSettingsDropdowns[i].textContent == "▼") {
@@ -169,7 +169,7 @@ export class EnvelopeEditor {
 
 			const extraPitchSettingsDropdownGroup: HTMLDivElement = HTML.div({ class: "editor-controls", style: "flex-direction:column; align-items:center;" }, startNoteWrapper, endNoteWrapper, pitchInvertWrapper);
 			extraPitchSettingsDropdownGroup.style.display = "none";
-			const extraSettingsDropdown: HTMLButtonElement = HTML.button({ style: "margin-left:0em; margin-right: 0.3em; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: () => this._extraSettingsDropdown(DropdownID.EnvelopeSettings, envelopeIndex) }, "▼");
+			const extraSettingsDropdown: HTMLButtonElement = HTML.button({ style: "margin-left:0em; margin-right: 0.3em; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: () => this._extraSettingsDropdown(DropdownID.EnvelopeSettings, envelopeIndex, "pitch") }, "▼");
 			extraSettingsDropdown.style.display = Config.envelopes[instrument.envelopes[envelopeIndex].envelope].name == "pitch" ? "inline" : "none";
 
 

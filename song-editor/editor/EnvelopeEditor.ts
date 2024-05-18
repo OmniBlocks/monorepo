@@ -116,7 +116,6 @@ export class EnvelopeEditor {
 	public rerenderExtraSettings() {
 		const instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
 		for (let i = 0; i < instrument.envelopeCount; i++) {
-			//this._extraPitchSettingsDropdownGroups[i].style.display = "none";
 			if (Config.envelopes[instrument.envelopes[i].envelope].name == "pitch") {
 				this._extraSettingsDropdowns[i].style.display = "inline";
 				if (this._extraSettingsDropdowns[i].textContent == "▼") {

@@ -1242,7 +1242,7 @@ export class ChangeRandomGeneratedInstrument extends Change {
                     if (Math.random() < 0.6) {
                         instrument.addEnvelope(Config.instrumentAutomationTargets.dictionary["pulseWidth"].index, 0, Config.envelopes.dictionary[selectWeightedRandom([
                             { item: "noteSize", weight: 2 },
-                            { item: "pitch", weight: 2 },
+                            { item: "pitch", weight: 1 },
                             { item: "punch", weight: 6 },
                             { item: "flare -1", weight: 1 },
                             { item: "flare 1", weight: 2 },
@@ -1388,6 +1388,7 @@ export class ChangeRandomGeneratedInstrument extends Change {
                         if (instrument.envelopeCount < Config.maxEnvelopeCount && Math.random() < 0.4) {
                             instrument.addEnvelope(Config.instrumentAutomationTargets.dictionary["operatorAmplitude"].index, i, Config.envelopes.dictionary[selectWeightedRandom([
                                 { item: "punch", weight: 2 },
+                                { item: "pitch", weight: 1 },
                                 { item: "flare -1", weight: 1 },
                                 { item: "flare 1", weight: 2 },
                                 { item: "flare 2", weight: 2 },
@@ -1457,6 +1458,7 @@ export class ChangeRandomGeneratedInstrument extends Change {
                         instrument.addEnvelope(Config.instrumentAutomationTargets.dictionary["feedbackAmplitude"].index, 0, Config.envelopes.dictionary[selectWeightedRandom([
                             { item: "none", weight: 4 },
                             { item: "punch", weight: 2 },
+                            { item: "pitch", weight: 1 },
                             { item: "flare -1", weight: 1 },
                             { item: "flare 1", weight: 2 },
                             { item: "flare 2", weight: 2 },
@@ -2781,15 +2783,25 @@ export class ChangeEnvelopePitchEnd extends Change {
 }
 
 export class ChangeEnvelopeInverse extends Change {
-    constructor(doc: SongDocument, value: boolean, index: number) {
+    constructor(doc: SongDocument, value: boolean, index: number, type: string) {
         super();
         const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
-        const oldValue: boolean = instrument.pitchEnvelopeInverse[index];
-        if (oldValue != value) {
-            instrument.pitchEnvelopeInverse[index] = value;
-            instrument.preset = instrument.type;
-            doc.notifier.changed();
-            this._didSomething();
+        if (type == "pitch") {
+            const oldValue: boolean = instrument.pitchEnvelopeInverse[index];
+            if (oldValue != value) {
+                instrument.pitchEnvelopeInverse[index] = value;
+                instrument.preset = instrument.type;
+                doc.notifier.changed();
+                this._didSomething();
+            }
+        } else if (type == "noteSize") {
+            const oldValue: boolean = instrument.noteSizeEnvelopeInverse[index];
+            if (oldValue != value) {
+                instrument.noteSizeEnvelopeInverse[index] = value;
+                instrument.preset = instrument.type;
+                doc.notifier.changed();
+                this._didSomething();
+            }
         }
     }
 }

@@ -1755,7 +1755,6 @@ export class SongEditor {
                 target = this._vibratoDropdown;
                 this._openVibratoDropdown = this._openVibratoDropdown ? false : true;
                 group = this._vibratoDropdownGroup;
-                console.log("why am I here");
                 break;
             case DropdownID.Pan:
                 target = this._panDropdown;
@@ -1790,13 +1789,10 @@ export class SongEditor {
             case DropdownID.EnvelopeSettings:
                 target = this._envelopeEditor._extraSettingsDropdowns[submenu];
                 this._envelopeEditor._openExtraSettingsDropdowns[submenu] = this._envelopeEditor._openExtraSettingsDropdowns[submenu] ? false : true;
-                console.log(subtype);
                 if (subtype == "pitch") {
                     group = this._envelopeEditor._extraPitchSettingsDropdownGroups[submenu];
-                    console.log("pitch");
-                } else if (subtype == "noteSize") {
+                } else if (subtype == "note size") {
                     group = this._envelopeEditor._extraNoteSizeSettingsDropdownGroups[submenu];
-                    console.log("notesize");
                 }
                 break;
         }
@@ -1806,14 +1802,11 @@ export class SongEditor {
             target.textContent = "▲";
             if (dropdown == DropdownID.EnvelopeSettings) {
                 group.style.display = "flex";
-                console.log("EnvelopeSettings");
             } else if (group != this._chordDropdownGroup) {
                 group.style.display = "";
-                console.log("not arpeggio");
             } // Only show arpeggio dropdown if chord arpeggiates
             else if (instrument.chord == Config.chords.dictionary["arpeggio"].index) {
                 group.style.display = "";
-                console.log("arpeggio");
             }
 
             for (let i: number = 0; i < group.children.length; i++) {
@@ -3802,6 +3795,8 @@ export class SongEditor {
             || document.activeElement == this._unisonOffsetInputBox
             || document.activeElement == this._unisonExpressionInputBox
             || document.activeElement == this._unisonSignInputBox
+            || this._envelopeEditor._pitchStartBoxes.find((element) => element == document.activeElement)
+            || this._envelopeEditor._pitchEndBoxes.find((element) => element == document.activeElement)
 
         ) {
             // Enter/esc returns focus to form

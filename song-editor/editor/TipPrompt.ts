@@ -368,7 +368,7 @@ export class TipPrompt implements Prompt {
 				message = div(
 					h2("Envelopes"),
 					p("Envelopes are a way to dynamically adjust various other settings over time, usually based on how long the note lasts. Press the + button to add an envelope, then use the menus below to select which setting to control and the curve of the envelope. Try different combinations to see how they sound!"),
-					p("Most envelope curves restart from the beginning every time a new note plays. The \"note size\" option is based on the note width as drawn in the pattern editor."),
+					p("Most envelope curves restart from the beginning every time a new note plays. The \"note size\" option is based on the note width as drawn in the pattern editor while the \"pitch\" option is based on the pitch of the note played."),
 					p("Envelope curves move in the range from 0 to 1 (or vice versa), where 0 means as quiet as possible and 1 is the same as the corresponding position selected in the instrument settings above. If multiple envelopes are targetting the same setting, they are multiplied before applying to the setting."),
 				);
 			} break;
@@ -549,13 +549,20 @@ export class TipPrompt implements Prompt {
 			case "pitchRange": {
 				message = div(
 					h2("Pitch Envelope Start and End"),
-					p("This setting is a volume multiplier applied to the second voice. This setting will only work correctly with two voices."),
+					p("These two settings will adjust where the start and end of the pitch envelope affects. Everything below start envelope will be 0, everything above end envelope will be 1, and everything inbetween will scale linearly based on pitch (the opposite is true if inverted)."),
+					p("This will NOT work properly if pitch start is greater than pitch end"),
 				);
 			} break;
 			case "pitchInvert": {
 				message = div(
 					h2("Pitch Envelope Inversion"),
-					p("This setting is a volume multiplier applied to the second voice. This setting will only work correctly with two voices."),
+					p("This setting will invert which direction increases the value. So instead of a higher pitch leading to a higher value, a lower pitch can lead to a higher value."),
+				);
+			} break;
+			case "noteSizeInvert": {
+				message = div(
+					h2("Note Size Envelope Inversion"),
+					p("This settings will invert whether a greater note size increases or decreases the value. This can be great if you want one effect to fade in as another fades out"),
 				);
 			} break;
 

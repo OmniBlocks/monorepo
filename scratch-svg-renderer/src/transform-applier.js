@@ -487,6 +487,39 @@ const _parseUrl = (value, windowRef) => {
     return res;
 };
 
+const pathBBoxCache = Object.create(null);
+
+/**
+ * @param {SVGPathElement} element The SVG <path> element
+ * @param {Window} windowRef Window object
+ * @returns {DOMRect} Bounding box
+ */
+const getPathBBox = (element, windowRef) => {
+    const d = element.attributes.d.value;
+    if (Object.prototype.hasOwnProperty.call(pathBBoxCache, d)) {
+        return pathBBoxCache[d];
+    }
+
+    const doc = windowRef.document;
+    const svgSpot = doc.createElement('span');
+    try {
+        doc.body.appendChild(svgSpot);
+        /** @type {SVGSVGElement} */
+        const svg = doc.createElementNS(SvgElement.svg, 'svg');
+        /** @type {SVGPathElement} */
+        const path = doc.createElementNS(SvgElement.svg, 'path');
+        path.setAttribute('d', d);
+        svg.appendChild(path);
+        svgSpot.appendChild(svg);
+        const bbox = svg.getBBox();
+        pathBBoxCache[d] = bbox;
+        return bbox;
+    } finally {
+        // Always destroy the element, even if, for example, getBBox throws.
+        doc.body.removeChild(svgSpot);
+    }
+};
+
 /**
  * Scratch 2.0 displays stroke widths in a "normalized" way, that is,
  * if a shape with a stroke width has a transform applied, it will be
@@ -559,27 +592,8 @@ const transformStrokeWidths = function (svgTag, windowRef, bboxForTesting) {
             const strokeGradientId = _parseUrl(stroke, windowRef);
 
             if (fillGradientId || strokeGradientId) {
-                const doc = windowRef.document;
                 // Need path bounds to transform gradient
-                const svgSpot = doc.createElement('span');
-                let bbox;
-                if (bboxForTesting) {
-                    bbox = bboxForTesting;
-                } else {
-                    try {
-                        doc.body.appendChild(svgSpot);
-                        const svg = SvgElement.set(doc.createElementNS(SvgElement.svg, 'svg'));
-                        const path = SvgElement.set(doc.createElementNS(SvgElement.svg, 'path'));
-                        path.setAttribute('d', element.attributes.d.value);
-                        svg.appendChild(path);
-                        svgSpot.appendChild(svg);
-                        // Take the bounding box.
-                        bbox = svg.getBBox();
-                    } finally {
-                        // Always destroy the element, even if, for example, getBBox throws.
-                        doc.body.removeChild(svgSpot);
-                    }
-                }
+                const bbox = bboxForTesting || getPathBBox(element, windowRef);
 
                 if (fillGradientId) {
                     const newFillRef = _createGradient(fillGradientId, svgTag, bbox, matrix);

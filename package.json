@@ -13,7 +13,7 @@
     "test:unit": "tap ./test/*.js",
     "watch": "webpack --progress --colors --watch"
   },
-  "license": "BSD-3-Clause",
+  "license": "MPL-2.0",
   "homepage": "https://github.com/TurboWarp/scratch-svg-renderer#readme",
   "repository": {
     "type": "git",

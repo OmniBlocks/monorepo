@@ -3460,24 +3460,26 @@ class Runtime extends EventEmitter {
     /**
      * Wrap an asset loading promise with progress support.
      * @template T
-     * @param {Promise<T>} promise
+     * @param {() => Promise<T>} callback
      * @returns {Promise<T>}
      */
-    wrapAssetRequest (promise) {
+    wrapAssetRequest (callback) {
         this.totalAssetRequests++;
         this.emitAssetProgress();
 
-        return promise
-            .then(result => {
-                this.finishedAssetRequests++;
-                this.emitAssetProgress();
-                return result;
-            })
-            .catch(error => {
-                this.finishedAssetRequests++;
-                this.emitAssetProgress();
-                throw error;
-            });
+        const onSuccess = result => {
+            this.finishedAssetRequests++;
+            this.emitAssetProgress();
+            return result;
+        };
+
+        const onError = error => {
+            this.finishedAssetRequests++;
+            this.emitAssetProgress();
+            throw error;
+        };
+
+        return callback().then(onSuccess, onError);
     }
 }
 

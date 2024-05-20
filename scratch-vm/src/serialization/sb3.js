@@ -1115,7 +1115,7 @@ const parseScratchAssets = function (object, runtime, zip) {
         // we're always loading the 'sb3' representation of the costume
         // any translation that needs to happen will happen in the process
         // of building up the costume object into an sb3 format
-        return runtime.wrapAssetRequest(deserializeCostume(costume, runtime, zip)
+        return runtime.wrapAssetRequest(() => deserializeCostume(costume, runtime, zip)
             .then(() => loadCostume(costumeMd5Ext, costume, runtime)));
         // Only attempt to load the costume after the deserialization
         // process has been completed
@@ -1140,7 +1140,7 @@ const parseScratchAssets = function (object, runtime, zip) {
         // we're always loading the 'sb3' representation of the costume
         // any translation that needs to happen will happen in the process
         // of building up the costume object into an sb3 format
-        return runtime.wrapAssetRequest(deserializeSound(sound, runtime, zip)
+        return runtime.wrapAssetRequest(() => deserializeSound(sound, runtime, zip)
             .then(() => loadSound(sound, runtime, assets.soundBank)));
         // Only attempt to load the sound after the deserialization
         // process has been completed.

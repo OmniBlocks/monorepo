@@ -69,13 +69,13 @@ test('wrapAssetRequest', t => {
     });
 
     Promise.all([
-        runtime.wrapAssetRequest(Promise.resolve(1)),
-        runtime.wrapAssetRequest(Promise.resolve(2))
+        runtime.wrapAssetRequest(() => Promise.resolve(1)),
+        runtime.wrapAssetRequest(() => Promise.resolve(2))
     ]).then(results => {
         t.same(results, [1, 2]);
 
         // eslint-disable-next-line prefer-promise-reject-errors
-        runtime.wrapAssetRequest(Promise.reject(3)).catch(error => {
+        runtime.wrapAssetRequest(() => Promise.reject(3)).catch(error => {
             t.equal(error, 3);
             t.same(log, [
                 [0, 1],

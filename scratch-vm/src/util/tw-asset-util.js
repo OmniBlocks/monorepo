@@ -25,7 +25,7 @@ class AssetUtil {
             }
 
             if (file) {
-                return runtime.wrapAssetRequest(file.async('uint8array').then(data => runtime.storage.createAsset(
+                return runtime.wrapAssetRequest(() => file.async('uint8array').then(data => runtime.storage.createAsset(
                     assetType,
                     ext,
                     data,
@@ -35,7 +35,7 @@ class AssetUtil {
             }
         }
 
-        return runtime.wrapAssetRequest(runtime.storage.load(assetType, md5, ext));
+        return runtime.wrapAssetRequest(() => runtime.storage.load(assetType, md5, ext));
     }
 }
 

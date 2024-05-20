@@ -487,7 +487,14 @@ const _parseUrl = (value, windowRef) => {
     return res;
 };
 
+/** @type {Record<string, DOMRect>} */
 const pathBBoxCache = Object.create(null);
+/** @type {HTMLElement} */
+let svgSpotOuter = null;
+/** @type {SVGSVGElement} */
+let svgSpotSVG = null;
+/** @type {SVGPathElement} */
+let svgSpotPath = null;
 
 /**
  * @param {SVGPathElement} element The SVG <path> element
@@ -500,24 +507,33 @@ const getPathBBox = (element, windowRef) => {
         return pathBBoxCache[d];
     }
 
-    const doc = windowRef.document;
-    const svgSpot = doc.createElement('span');
-    try {
-        doc.body.appendChild(svgSpot);
-        /** @type {SVGSVGElement} */
-        const svg = doc.createElementNS(SvgElement.svg, 'svg');
-        /** @type {SVGPathElement} */
-        const path = doc.createElementNS(SvgElement.svg, 'path');
-        path.setAttribute('d', d);
-        svg.appendChild(path);
-        svgSpot.appendChild(svg);
-        const bbox = svg.getBBox();
-        pathBBoxCache[d] = bbox;
-        return bbox;
-    } finally {
-        // Always destroy the element, even if, for example, getBBox throws.
-        doc.body.removeChild(svgSpot);
+    // Re-use the elements when we can. Repeatededly appending and removing elements
+    // can cause performance problems with browser extensions that heavily use
+    // MutationObserver.
+    if (!svgSpotOuter) {
+        const doc = windowRef.document;
+        svgSpotOuter = doc.createElement('span');
+        svgSpotSVG = doc.createElementNS(SvgElement.svg, 'svg');
+        svgSpotPath = doc.createElementNS(SvgElement.svg, 'path');
+
+        // Our test element needs to be in the document and not display: none
+        // when we call getBBox().
+        svgSpotOuter.className = 'scratch-svg-renderer-bbox';
+        svgSpotOuter.style.visibility = 'hidden';
+        svgSpotOuter.style.position = 'absolute';
+        svgSpotOuter.style.top = '-10000px';
+        svgSpotOuter.style.left = '-10000px';
+        svgSpotOuter.ariaHidden = true;
+
+        svgSpotSVG.appendChild(svgSpotPath);
+        svgSpotOuter.appendChild(svgSpotSVG);
+        document.body.appendChild(svgSpotOuter);
     }
+
+    svgSpotPath.setAttribute('d', d);
+    const bbox = svgSpotSVG.getBBox();
+    pathBBoxCache[d] = bbox;
+    return bbox;
 };
 
 /**

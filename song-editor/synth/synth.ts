@@ -1,6 +1,6 @@
 // Copyright (c) 2012-2022 John Nesky and contributing authors, distributed under the MIT license, see accompanying the LICENSE.md file.
 
-import { startLoadingSample, sampleLoadingState, SampleLoadingState, sampleLoadEvents, SampleLoadedEvent, SampleLoadingStatus, loadBuiltInSamples, Dictionary, DictionaryArray, toNameMap, FilterType, SustainType, EnvelopeType, InstrumentType, EffectType, EnvelopeComputeIndex, Transition, Unison, Chord, Vibrato, Envelope, AutomationTarget, Config, getDrumWave, drawNoiseSpectrum, getArpeggioPitchIndex, performIntegralOld, getPulseWidthRatio, effectsIncludeTransition, effectsIncludeChord, effectsIncludePitchShift, effectsIncludeDetune, effectsIncludeVibrato, effectsIncludeNoteFilter, effectsIncludeDistortion, effectsIncludeBitcrusher, effectsIncludePanning, effectsIncludeChorus, effectsIncludeEcho, effectsIncludeReverb, OperatorWave } from "./SynthConfig";
+import { startLoadingSample, sampleLoadingState, SampleLoadingState, sampleLoadEvents, SampleLoadedEvent, SampleLoadingStatus, loadBuiltInSamples, Dictionary, DictionaryArray, toNameMap, FilterType, SustainType, EnvelopeType, InstrumentType, EffectType, EnvelopeComputeIndex, Transition, Unison, Chord, Vibrato, Envelope, AutomationTarget, Config, getDrumWave, drawNoiseSpectrum, getArpeggioPitchIndex, performIntegralOld, getPulseWidthRatio, effectsIncludeTransition, effectsIncludeChord, effectsIncludePitchShift, effectsIncludeDetune, effectsIncludeVibrato, effectsIncludeNoteFilter, effectsIncludeDistortion, effectsIncludeBitcrusher, effectsIncludePanning, effectsIncludeChorus, effectsIncludeEcho, effectsIncludeReverb, OperatorWave, AdditiveWaveTypes } from "./SynthConfig";
 import { Preset, EditorConfig } from "../editor/EditorConfig";
 import { scaleElementsByFactor, inverseRealFourierTransform } from "./FFT";
 import { Deque } from "./Deque";
@@ -257,7 +257,7 @@ const enum SongTagCode {
 	feedbackEnvelope    = CharCode.V, // added in BeepBox URL version 6, DEPRECATED
 	pulseWidth          = CharCode.W, // added in BeepBox URL version 7
 	aliases             = CharCode.X, // added in JummBox URL version 4 for aliases, DEPRECATED, [UB] repurposed for PWM decimal offset (DEPRECATED as well)
-//	                    = CharCode.Y,
+	additive            = CharCode.Y, // added in Slarmoo's box URL version 2
 //	                    = CharCode.Z,
 //	                    = CharCode.NUM_0,
 //	                    = CharCode.NUM_1,
@@ -956,6 +956,169 @@ class HarmonicsWaveState {
     }
 }
 
+class AdditiveWave {
+    public additives: number[] = [];
+    public hash: number = -1;
+    public waveTypes: number[] = [];
+
+    constructor() {
+        this.reset();
+    }
+
+    public reset(): void {
+        for (let i: number = 0; i < Config.additiveControlPoints; i++) {
+            this.additives[i] = 0;
+            this.waveTypes[i] = AdditiveWaveTypes.sine;
+        }
+        this.markCustomWaveDirty();
+    }
+
+    public markCustomWaveDirty(): void {
+        const hashMult: number = Synth.fittingPowerOfTwo(Config.additiveMax + 2) - 1;
+        let hash: number = 0;
+        for (const point of this.additives) hash = ((hash * hashMult) + point) >>> 0;
+        this.hash = hash;
+    }
+}
+
+class AdditiveWaveState {
+    public wave: Float32Array | null = null;
+    private _hash: number = -1;
+
+    public getCustomWave(settings: AdditiveWave): Float32Array {
+        if (this._hash == settings.hash) return this.wave!;
+        this._hash = settings.hash;
+
+        const additiveRendered: number = Config.additiveRendered;
+
+        const waveLength: number = Config.additiveWavelength;
+        const retroWave: Float32Array = getDrumWave(0, null, null);
+
+        if (this.wave == null || this.wave.length != waveLength + 1) {
+            this.wave = new Float32Array(waveLength + 1);
+        }
+        const wave: Float32Array = this.wave;
+
+        for (let i: number = 0; i < waveLength; i++) {
+            wave[i] = 0;
+        }
+
+        const overallSlope: number = -0.25;
+        let combinedControlPointAmplitude: number = 1;
+        //find waveType mode - There's probably a better way to do this...
+        const waveTypes: number[] = settings.waveTypes.slice();
+        const modeMap: Dictionary<number> = {sine: 0, square: 0, triangle: 0, sawtooth: 0, ramp: 0, trapezoid: 0, other: 0};
+        for (let i = 0; i < waveTypes.length; i++) {
+            if (waveTypes[i] == AdditiveWaveTypes.sine) {
+                modeMap["sine"]++;
+            } else if (waveTypes[i] == AdditiveWaveTypes.square) {
+                modeMap["square"]++;
+            } else if (waveTypes[i] == AdditiveWaveTypes.triangle) {
+                modeMap["triangle"]++;
+            } else if (waveTypes[i] == AdditiveWaveTypes.sawtooth) {
+                modeMap["sawtooth"]++;
+            } else if (waveTypes[i] == AdditiveWaveTypes.ramp) {
+                modeMap["ramp"]++;
+            } else if (waveTypes[i] == AdditiveWaveTypes.trapezoid) {
+                modeMap["trapezoid"]++;
+            } else {
+                modeMap["other"]++;
+            }
+        }
+        let mode = 0;
+        let modeWaveType = AdditiveWaveTypes.sine;
+        if (modeMap["sine"] > mode) { //not >= because we want to defer to simpler waves if possible
+            modeWaveType = AdditiveWaveTypes.sine;
+        } else if (modeMap["square"] > mode) {
+            modeWaveType = AdditiveWaveTypes.square;
+        } else if (modeMap["triangle"] > mode) {
+            modeWaveType = AdditiveWaveTypes.triangle;
+        } else if (modeMap["sawtooth"] > mode) {
+            modeWaveType = AdditiveWaveTypes.sawtooth;
+        } else if (modeMap["ramp"] > mode) {
+            modeWaveType = AdditiveWaveTypes.ramp;
+        } else if (modeMap["trapezoid"] > mode) {
+            modeWaveType = AdditiveWaveTypes.trapezoid;
+        } else if (modeMap["other"] > mode) {
+            modeWaveType = AdditiveWaveTypes.sine; //default to sine if unrecognized
+        } 
+
+
+        let edited: boolean[] = [];
+        for (let additiveIndex: number = 0; additiveIndex < additiveRendered; additiveIndex++) {
+            if (!edited[additiveIndex]) {
+                edited[additiveIndex] = false;
+            }
+            const additiveFreq: number = additiveIndex + 1;
+            const waveType: number = additiveIndex < Config.additiveControlPoints ? settings.waveTypes[additiveIndex] : modeWaveType; //set waveType to either its index or the modeWaveType
+            let controlValue: number = additiveIndex < Config.additiveControlPoints ? settings.additives[additiveIndex] : settings.additives[Config.additiveControlPoints - 1];
+            if (additiveIndex >= Config.additiveControlPoints) {
+                controlValue *= 1 - (additiveIndex - Config.additiveControlPoints) / (additiveRendered - Config.additiveControlPoints);
+            }
+            const normalizedValue: number = controlValue / Config.additiveMax;
+            let amplitude: number = Math.pow(2, controlValue - Config.additiveMax + 1) * Math.sqrt(normalizedValue);
+            if (additiveIndex < Config.additiveControlPoints) {
+                combinedControlPointAmplitude += amplitude;
+            }
+            amplitude *= Math.pow(additiveFreq, overallSlope);
+
+            // Multiply all the sine wave amplitudes by 1 or -1 based on the LFSR
+            // retro wave (effectively random) to avoid egregiously tall spikes.
+            amplitude *= retroWave[additiveIndex + 589];
+
+            const waves = this.waveExpressions(waveType, additiveIndex);
+            for (let j = 0; j < waves.length; j++) {
+                if (!edited[additiveIndex]) {
+                    wave[waveLength - additiveFreq] = amplitude;
+                    edited[additiveIndex] = true;
+                } else {
+                    wave[waveLength - additiveFreq] += amplitude * waves[j];
+                }
+            }
+        }
+
+        inverseRealFourierTransform(wave, waveLength);
+
+        // Limit the maximum wave amplitude.
+        const mult: number = 1 / Math.pow(combinedControlPointAmplitude, 0.7);
+        for (let i: number = 0; i < wave.length; i++) wave[i] *= mult;
+
+        performIntegralOld(wave);
+
+        // The first sample should be zero, and we'll duplicate it at the end for easier interpolation.
+        wave[waveLength] = wave[0];
+
+        return wave;
+    }
+
+    private waveExpressions(waveType: number, index: number = 0): number[] {
+        switch (waveType) {
+            case AdditiveWaveTypes.sine:
+                return [1];
+            case AdditiveWaveTypes.square:
+                if (index % 2 == 0) {
+                    return [0, 4, 0, 4 / 3, 0, 4 / 5, 0, 4 / 7, 0, 4 / 9, 0, 4 / 11, 0, 4 / 13, 0, 4 / 15];
+                } else {
+                    return [4, 0, 4 / 3, 0, 4 / 5, 0, 4 / 7, 0, 4 / 9, 0, 4 / 11, 0, 4 / 13, 0, 4 / 15];
+                }
+            case AdditiveWaveTypes.triangle:
+                if (index % 2 == 0) {
+                    return [0, 5 / 2, 0, 5 / 18, 0, 1/10, 0, 5/98, 0, 5/162, 0, 5/242];
+                } else {
+                    return [5 / 2, 0, 5 / 18, 0, 1 / 10, 0, 5 / 98, 0, 5 / 162, 0, 5 / 242];
+                }
+            case AdditiveWaveTypes.sawtooth:
+                return [2, 1, 2 / 3, 1 / 2, 2 / 5, 1 / 3, 2 / 7, 1 / 4];
+            case AdditiveWaveTypes.ramp:
+                return [-2, -1, -2 / 3, -1 / 2, -2 / 5, -1 / 3, -2 / 7, -1 / 4];
+            case AdditiveWaveTypes.trapezoid:
+                return [1]; //not entirely sure how to implement this yet...
+        } 
+        return [1];
+    }
+
+}
+
 export class FilterControlPoint {
     public freq: number = 0;
     public gain: number = Config.filterGainCenter;
@@ -1447,6 +1610,7 @@ export class Instrument {
     public readonly operators: Operator[] = [];
     public readonly spectrumWave: SpectrumWave;
     public readonly harmonicsWave: HarmonicsWave = new HarmonicsWave();
+    public readonly additiveWave: AdditiveWave = new AdditiveWave();
     public readonly drumsetEnvelopes: number[] = [];
     public readonly drumsetSpectrumWaves: SpectrumWave[] = [];
     public modChannels: number[] = [];
@@ -1661,6 +1825,10 @@ export class Instrument {
             case InstrumentType.pickedString:
                 this.chord = Config.chords.dictionary["strum"].index;
                 this.harmonicsWave.reset();
+                break;
+            case InstrumentType.additive:
+                this.chord = Config.chords.dictionary["simultaneous"].index;
+                this.additiveWave.reset();
                 break;
             case InstrumentType.mod:
                 this.transition = 0;
@@ -1893,6 +2061,15 @@ export class Instrument {
             instrumentObject["harmonics"] = [];
             for (let i: number = 0; i < Config.harmonicsControlPoints; i++) {
                 instrumentObject["harmonics"][i] = Math.round(100 * this.harmonicsWave.harmonics[i] / Config.harmonicsMax);
+            }
+        }
+
+        if (this.type == InstrumentType.additive || this.type == InstrumentType.pickedString) {
+            instrumentObject["additive"] = [];
+            instrumentObject["additiveWaves"] = [];
+            for (let i: number = 0; i < Config.additiveControlPoints; i++) {
+                instrumentObject["additive"][i] = Math.round(100 * this.additiveWave.additives[i] / Config.additiveMax);
+                instrumentObject["additiveWaves"][i] = this.additiveWave.waveTypes[i];
             }
         }
 
@@ -2332,6 +2509,19 @@ export class Instrument {
             this.harmonicsWave.markCustomWaveDirty();
         } else {
             this.harmonicsWave.reset();
+        }
+
+        if (instrumentObject["additives"] != undefined) {
+            for (let i: number = 0; i < Config.additiveControlPoints; i++) {
+                this.additiveWave.additives[i] = Math.max(0, Math.min(Config.additiveMax, Math.round(Config.additiveMax * (+instrumentObject["additive"][i]) / 100)));
+                if (instrumentObject["additiveWaves"][i] != undefined) {
+                    this.additiveWave.waveTypes[i] = instrumentObject["additiveWaves"][i];
+                } else {
+                    this.additiveWave.waveTypes[i] = AdditiveWaveTypes.sine;
+                }
+            }
+        } else {
+            this.additiveWave.reset();
         }
 
         if (instrumentObject["spectrum"] != undefined) {
@@ -3298,6 +3488,18 @@ export class Song {
                         harmonicsBits.write(Config.harmonicsControlPointBits, instrument.harmonicsWave.harmonics[i]);
                     }
                     harmonicsBits.encodeBase64(buffer);
+                }
+
+                if (instrument.type == InstrumentType.additive) {
+                    buffer.push(SongTagCode.additive);
+                    const additiveBits: BitFieldWriter = new BitFieldWriter();
+                    const waveTypes: BitFieldWriter = new BitFieldWriter();
+                    for (let i: number = 0; i < Config.additiveControlPointBits; i++) {
+                        additiveBits.write(Config.additiveControlPointBits, instrument.additiveWave.additives[i]);
+                        waveTypes.write(3, instrument.additiveWave.waveTypes[i]);
+                    }
+                    additiveBits.encodeBase64(buffer);
+                    waveTypes.encodeBase64(buffer);
                 }
 
                 if (instrument.type == InstrumentType.chip) {
@@ -5342,13 +5544,29 @@ export class Song {
             } break;
             case SongTagCode.harmonics: {
                 const instrument: Instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
-                const byteCount: number = Math.ceil(Config.harmonicsControlPoints * Config.harmonicsControlPointBits / 6)
+                const byteCount: number = Math.ceil(Config.harmonicsControlPoints * Config.harmonicsControlPointBits / 6);
                 const bits: BitFieldReader = new BitFieldReader(compressed, charIndex, charIndex + byteCount);
                 for (let i: number = 0; i < Config.harmonicsControlPoints; i++) {
                     instrument.harmonicsWave.harmonics[i] = bits.read(Config.harmonicsControlPointBits);
                 }
                 instrument.harmonicsWave.markCustomWaveDirty();
                 charIndex += byteCount;
+            } break;
+            case SongTagCode.additive: {
+                const instrument: Instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
+                const byteCount: number = Math.ceil(Config.additiveControlPoints * Config.additiveControlPointBits / 6);
+                const bits: BitFieldReader = new BitFieldReader(compressed, charIndex, charIndex + byteCount);
+                for (let i: number = 0; i < Config.additiveControlPoints; i++) {
+                    instrument.additiveWave.additives[i] = bits.read(Config.additiveControlPointBits);
+                }
+                instrument.additiveWave.markCustomWaveDirty();
+                //now for waveTypes
+                charIndex += byteCount;
+                const wavesByteCount: number = Math.ceil(Config.additiveControlPoints * 3 / 6);
+                const wavesBits: BitFieldReader = new BitFieldReader(compressed, charIndex, charIndex + wavesByteCount);
+                for (let i: number = 0; i < Config.additiveControlPoints; i++) {
+                    instrument.additiveWave.waveTypes[i] = wavesBits.read(3);
+                }
             } break;
             case SongTagCode.aliases: {
                 if ((fromJummBox && beforeFive) || (fromGoldBox && beforeFour)) {
@@ -7311,7 +7529,7 @@ class EnvelopeComputer {
                         return (basePitch + pitch - startNote) / range;
                     }
                 }
-            case EnvelopeType.twang: return 1.0 / (1.0 + time * envelope.speed);
+            case EnvelopeType.twang: return 1.0 / (1.0 + time * envelope.speed /*  * localEnvelopeSpeed */);
             case EnvelopeType.swell: return 1.0 - 1.0 / (1.0 + time * envelope.speed);
             case EnvelopeType.tremolo: return 0.5 - Math.cos(beats * 2.0 * Math.PI * envelope.speed) * 0.5;
             case EnvelopeType.tremolo2: return 0.75 - Math.cos(beats * 2.0 * Math.PI * envelope.speed) * 0.25;
@@ -7603,6 +7821,7 @@ class InstrumentState {
 
     public readonly spectrumWave: SpectrumWaveState = new SpectrumWaveState();
     public readonly harmonicsWave: HarmonicsWaveState = new HarmonicsWaveState();
+    public readonly additiveWave: AdditiveWaveState = new AdditiveWaveState();
     public readonly drumsetSpectrumWaves: SpectrumWaveState[] = [];
 
     constructor() {
@@ -8242,6 +8461,8 @@ class InstrumentState {
                 this.drumsetSpectrumWaves[i].getCustomWave(instrument.drumsetSpectrumWaves[i], InstrumentState._drumsetIndexToSpectrumOctave(i));
             }
             this.wave = null;
+        } else if (instrument.type == InstrumentType.additive) {
+            this.wave = this.additiveWave.getCustomWave(instrument.additiveWave);
         } else {
             this.wave = null;
         }
@@ -10464,6 +10685,8 @@ export class Synth {
             baseExpression = Config.chipBaseExpression;
         } else if (instrument.type == InstrumentType.harmonics) {
             baseExpression = Config.harmonicsBaseExpression;
+        } else if (instrument.type == InstrumentType.additive) {
+            baseExpression = Config.additiveBaseExpression;
         } else if (instrument.type == InstrumentType.pwm) {
             baseExpression = Config.pwmBaseExpression;
         } else if (instrument.type == InstrumentType.supersaw) {
@@ -11422,6 +11645,8 @@ export class Synth {
             return Synth.chipSynth;
         } else if (instrument.type == InstrumentType.harmonics) {
             return Synth.harmonicsSynth;
+        } else if (instrument.type == InstrumentType.additive) {
+            return Synth.additiveSynth;
         } else if (instrument.type == InstrumentType.pwm) {
             return Synth.pulseWidthSynth;
         } else if (instrument.type == InstrumentType.supersaw) {
@@ -12159,6 +12384,66 @@ export class Synth {
         }
 
         pickedStringFunction(synth, bufferIndex, roundedSamplesPerTick, tone, instrumentState);
+    }
+
+    private static additiveSynth(synth: Synth, bufferIndex: number, roundedSamplesPerTick: number, tone: Tone, instrumentState: InstrumentState): void {
+        //Essentially identical to harmonics, just without unison (for now)
+        const data: Float32Array = synth.tempMonoInstrumentSampleBuffer!;
+        const wave: Float32Array = instrumentState.wave!;
+        const waveLength: number = wave.length - 1; // The first sample is duplicated at the end, don't double-count it.
+
+        if (!instrumentState.chord!.customInterval) tone.phases[1] = tone.phases[0];
+        let phaseDeltaA: number = tone.phaseDeltas[0] * waveLength;
+        const phaseDeltaScaleA: number = +tone.phaseDeltaScales[0];
+        let expression: number = +tone.expression;
+        const expressionDelta: number = +tone.expressionDelta;
+        let phaseA: number = (tone.phases[0] % 1) * waveLength;
+
+        const filters: DynamicBiquadFilter[] = tone.noteFilters;
+        const filterCount: number = tone.noteFilterCount | 0;
+        let initialFilterInput1: number = +tone.initialNoteFilterInput1;
+        let initialFilterInput2: number = +tone.initialNoteFilterInput2;
+        const applyFilters: Function = Synth.applyFilters;
+
+        const phaseAInt: number = phaseA | 0;
+        const indexA: number = phaseAInt % waveLength;
+        const phaseRatioA: number = phaseA - phaseAInt;
+        let prevWaveIntegralA: number = +wave[indexA];
+        prevWaveIntegralA += (wave[indexA + 1] - prevWaveIntegralA) * phaseRatioA;
+
+        const stopIndex: number = bufferIndex + roundedSamplesPerTick;
+        for (let sampleIndex: number = bufferIndex; sampleIndex < stopIndex; sampleIndex++) {
+
+            phaseA += phaseDeltaA;
+
+            const phaseAInt: number = phaseA | 0;
+            const indexA: number = phaseAInt % waveLength;
+            let nextWaveIntegralA: number = wave[indexA];
+            const phaseRatioA: number = phaseA - phaseAInt;
+            nextWaveIntegralA += (wave[indexA + 1] - nextWaveIntegralA) * phaseRatioA;
+            const waveA: number = (nextWaveIntegralA - prevWaveIntegralA) / phaseDeltaA;
+            prevWaveIntegralA = nextWaveIntegralA;
+
+            const inputSample: number = waveA;
+            const sample: number = applyFilters(inputSample, initialFilterInput1, initialFilterInput2, filterCount, filters);
+            initialFilterInput2 = initialFilterInput1;
+            initialFilterInput1 = inputSample;
+
+            phaseDeltaA *= phaseDeltaScaleA;
+
+            const output: number = sample * expression;
+            expression += expressionDelta;
+
+            data[sampleIndex] += output;
+        }
+
+        tone.phases[0] = phaseA / waveLength;
+        tone.phaseDeltas[0] = phaseDeltaA / waveLength;
+        tone.expression = expression;
+
+        synth.sanitizeFilters(filters);
+        tone.initialNoteFilterInput1 = initialFilterInput1;
+        tone.initialNoteFilterInput2 = initialFilterInput2;
     }
 
     private static effectsSynth(synth: Synth, outputDataL: Float32Array, outputDataR: Float32Array, bufferIndex: number, runLength: number, instrumentState: InstrumentState): void {

@@ -31,7 +31,7 @@ var beepbox = (function (exports) {
             step((generator = generator.apply(thisArg, _arguments || [])).next());
         });
     };
-    const TypePresets = ["chip", "FM", "noise", "spectrum", "drumset", "harmonics", "pulse width", "picked string", "supersaw", "chip (custom)", "mod", "FM (6-op)"];
+    const TypePresets = ["chip", "FM", "noise", "spectrum", "drumset", "harmonics", "pulse width", "picked string", "supersaw", "chip (custom)", "mod", "FM (6-op)", "additive"];
     class SampleLoadingState {
         constructor() {
             this.statusTable = {};
@@ -497,7 +497,7 @@ var beepbox = (function (exports) {
         { name: "÷12 (twelfth notes)", stepsPerBeat: 12, roundUpThresholds: null },
         { name: "freehand", stepsPerBeat: 24, roundUpThresholds: null },
     ]);
-    Config.instrumentTypeNames = ["chip", "FM", "noise", "spectrum", "drumset", "harmonics", "PWM", "Picked String", "supersaw", "custom chip", "mod", "FM6op"];
+    Config.instrumentTypeNames = ["chip", "FM", "noise", "spectrum", "drumset", "harmonics", "PWM", "Picked String", "supersaw", "custom chip", "mod", "FM6op", "additive"];
     Config.instrumentTypeHasSpecialInterval = [true, true, false, false, false, true, false, false, false, false, false];
     Config.chipBaseExpression = 0.03375;
     Config.fmBaseExpression = 0.03;
@@ -508,6 +508,7 @@ var beepbox = (function (exports) {
     Config.pwmBaseExpression = 0.04725;
     Config.supersawBaseExpression = 0.061425;
     Config.pickedStringBaseExpression = 0.025;
+    Config.additiveBaseExpression = 0.025;
     Config.distortionBaseVolume = 0.011;
     Config.bitcrusherBaseVolume = 0.010;
     Config.rawChipWaves = toNameMap([
@@ -935,6 +936,11 @@ var beepbox = (function (exports) {
     Config.harmonicsControlPointBits = 3;
     Config.harmonicsMax = (1 << Config.harmonicsControlPointBits) - 1;
     Config.harmonicsWavelength = 1 << 11;
+    Config.additiveControlPoints = 28;
+    Config.additiveRendered = 64;
+    Config.additiveControlPointBits = 3;
+    Config.additiveMax = (1 << Config.additiveControlPointBits) - 1;
+    Config.additiveWavelength = 1 << 11;
     Config.pulseWidthRange = 50;
     Config.pulseWidthStepPower = 0.5;
     Config.supersawVoiceCount = 7;
@@ -10459,6 +10465,7 @@ var beepbox = (function (exports) {
             const harmonicsRendered = (instrumentType == 7) ? Config.harmonicsRenderedForPickedString : Config.harmonicsRendered;
             const waveLength = Config.harmonicsWavelength;
             const retroWave = getDrumWave(0, null, null);
+            console.log(retroWave);
             if (this.wave == null || this.wave.length != waveLength + 1) {
                 this.wave = new Float32Array(waveLength + 1);
             }
@@ -10490,6 +10497,162 @@ var beepbox = (function (exports) {
             performIntegralOld(wave);
             wave[waveLength] = wave[0];
             return wave;
+        }
+    }
+    class AdditiveWave {
+        constructor() {
+            this.additives = [];
+            this.hash = -1;
+            this.waveTypes = [];
+            this.reset();
+        }
+        reset() {
+            for (let i = 0; i < Config.additiveControlPoints; i++) {
+                this.additives[i] = 0;
+                this.waveTypes[i] = 0;
+            }
+            this.markCustomWaveDirty();
+        }
+        markCustomWaveDirty() {
+            const hashMult = Synth.fittingPowerOfTwo(Config.additiveMax + 2) - 1;
+            let hash = 0;
+            for (const point of this.additives)
+                hash = ((hash * hashMult) + point) >>> 0;
+            this.hash = hash;
+        }
+    }
+    class AdditiveWaveState {
+        constructor() {
+            this.wave = null;
+            this._hash = -1;
+        }
+        getCustomWave(settings) {
+            if (this._hash == settings.hash)
+                return this.wave;
+            this._hash = settings.hash;
+            const additiveRendered = Config.additiveRendered;
+            const waveLength = Config.additiveWavelength;
+            const retroWave = getDrumWave(0, null, null);
+            if (this.wave == null || this.wave.length != waveLength + 1) {
+                this.wave = new Float32Array(waveLength + 1);
+            }
+            const wave = this.wave;
+            for (let i = 0; i < waveLength; i++) {
+                wave[i] = 0;
+            }
+            const overallSlope = -0.25;
+            let combinedControlPointAmplitude = 1;
+            const waveTypes = settings.waveTypes.slice();
+            const modeMap = { sine: 0, square: 0, triangle: 0, sawtooth: 0, ramp: 0, trapezoid: 0, other: 0 };
+            for (let i = 0; i < waveTypes.length; i++) {
+                if (waveTypes[i] == 0) {
+                    modeMap["sine"]++;
+                }
+                else if (waveTypes[i] == 1) {
+                    modeMap["square"]++;
+                }
+                else if (waveTypes[i] == 2) {
+                    modeMap["triangle"]++;
+                }
+                else if (waveTypes[i] == 3) {
+                    modeMap["sawtooth"]++;
+                }
+                else if (waveTypes[i] == 4) {
+                    modeMap["ramp"]++;
+                }
+                else if (waveTypes[i] == 5) {
+                    modeMap["trapezoid"]++;
+                }
+                else {
+                    modeMap["other"]++;
+                }
+            }
+            let mode = 0;
+            let modeWaveType = 0;
+            if (modeMap["sine"] > mode) {
+                modeWaveType = 0;
+            }
+            else if (modeMap["square"] > mode) {
+                modeWaveType = 1;
+            }
+            else if (modeMap["triangle"] > mode) {
+                modeWaveType = 2;
+            }
+            else if (modeMap["sawtooth"] > mode) {
+                modeWaveType = 3;
+            }
+            else if (modeMap["ramp"] > mode) {
+                modeWaveType = 4;
+            }
+            else if (modeMap["trapezoid"] > mode) {
+                modeWaveType = 5;
+            }
+            else if (modeMap["other"] > mode) {
+                modeWaveType = 0;
+            }
+            let edited = [];
+            for (let additiveIndex = 0; additiveIndex < additiveRendered; additiveIndex++) {
+                if (!edited[additiveIndex]) {
+                    edited[additiveIndex] = false;
+                }
+                const additiveFreq = additiveIndex + 1;
+                const waveType = additiveIndex < Config.additiveControlPoints ? settings.waveTypes[additiveIndex] : modeWaveType;
+                let controlValue = additiveIndex < Config.additiveControlPoints ? settings.additives[additiveIndex] : settings.additives[Config.additiveControlPoints - 1];
+                if (additiveIndex >= Config.additiveControlPoints) {
+                    controlValue *= 1 - (additiveIndex - Config.additiveControlPoints) / (additiveRendered - Config.additiveControlPoints);
+                }
+                const normalizedValue = controlValue / Config.additiveMax;
+                let amplitude = Math.pow(2, controlValue - Config.additiveMax + 1) * Math.sqrt(normalizedValue);
+                if (additiveIndex < Config.additiveControlPoints) {
+                    combinedControlPointAmplitude += amplitude;
+                }
+                amplitude *= Math.pow(additiveFreq, overallSlope);
+                amplitude *= retroWave[additiveIndex + 589];
+                const waves = this.waveExpressions(waveType, additiveIndex);
+                for (let j = 0; j < waves.length; j++) {
+                    if (!edited[additiveIndex]) {
+                        wave[waveLength - additiveFreq] = amplitude;
+                        edited[additiveIndex] = true;
+                    }
+                    else {
+                        wave[waveLength - additiveFreq] += amplitude * waves[j];
+                    }
+                }
+            }
+            inverseRealFourierTransform(wave, waveLength);
+            const mult = 1 / Math.pow(combinedControlPointAmplitude, 0.7);
+            for (let i = 0; i < wave.length; i++)
+                wave[i] *= mult;
+            performIntegralOld(wave);
+            wave[waveLength] = wave[0];
+            return wave;
+        }
+        waveExpressions(waveType, index = 0) {
+            switch (waveType) {
+                case 0:
+                    return [1];
+                case 1:
+                    if (index % 2 == 0) {
+                        return [0, 4, 0, 4 / 3, 0, 4 / 5, 0, 4 / 7, 0, 4 / 9, 0, 4 / 11, 0, 4 / 13, 0, 4 / 15];
+                    }
+                    else {
+                        return [4, 0, 4 / 3, 0, 4 / 5, 0, 4 / 7, 0, 4 / 9, 0, 4 / 11, 0, 4 / 13, 0, 4 / 15];
+                    }
+                case 2:
+                    if (index % 2 == 0) {
+                        return [0, 5 / 2, 0, 5 / 18, 0, 1 / 10, 0, 5 / 98, 0, 5 / 162, 0, 5 / 242];
+                    }
+                    else {
+                        return [5 / 2, 0, 5 / 18, 0, 1 / 10, 0, 5 / 98, 0, 5 / 162, 0, 5 / 242];
+                    }
+                case 3:
+                    return [2, 1, 2 / 3, 1 / 2, 2 / 5, 1 / 3, 2 / 7, 1 / 4];
+                case 4:
+                    return [-2, -1, -2 / 3, -1 / 2, -2 / 5, -1 / 3, -2 / 7, -1 / 4];
+                case 5:
+                    return [1];
+            }
+            return [1];
         }
     }
     class FilterControlPoint {
@@ -10895,6 +11058,7 @@ var beepbox = (function (exports) {
             this.customChipWaveIntegral = new Float32Array(65);
             this.operators = [];
             this.harmonicsWave = new HarmonicsWave();
+            this.additiveWave = new AdditiveWave();
             this.drumsetEnvelopes = [];
             this.drumsetSpectrumWaves = [];
             this.modChannels = [];
@@ -11069,6 +11233,10 @@ var beepbox = (function (exports) {
                 case 7:
                     this.chord = Config.chords.dictionary["strum"].index;
                     this.harmonicsWave.reset();
+                    break;
+                case 12:
+                    this.chord = Config.chords.dictionary["simultaneous"].index;
+                    this.additiveWave.reset();
                     break;
                 case 10:
                     this.transition = 0;
@@ -11287,6 +11455,14 @@ var beepbox = (function (exports) {
                 instrumentObject["harmonics"] = [];
                 for (let i = 0; i < Config.harmonicsControlPoints; i++) {
                     instrumentObject["harmonics"][i] = Math.round(100 * this.harmonicsWave.harmonics[i] / Config.harmonicsMax);
+                }
+            }
+            if (this.type == 12 || this.type == 7) {
+                instrumentObject["additive"] = [];
+                instrumentObject["additiveWaves"] = [];
+                for (let i = 0; i < Config.additiveControlPoints; i++) {
+                    instrumentObject["additive"][i] = Math.round(100 * this.additiveWave.additives[i] / Config.additiveMax);
+                    instrumentObject["additiveWaves"][i] = this.additiveWave.waveTypes[i];
                 }
             }
             if (this.type == 2) {
@@ -11704,6 +11880,20 @@ var beepbox = (function (exports) {
             }
             else {
                 this.harmonicsWave.reset();
+            }
+            if (instrumentObject["additives"] != undefined) {
+                for (let i = 0; i < Config.additiveControlPoints; i++) {
+                    this.additiveWave.additives[i] = Math.max(0, Math.min(Config.additiveMax, Math.round(Config.additiveMax * (+instrumentObject["additive"][i]) / 100)));
+                    if (instrumentObject["additiveWaves"][i] != undefined) {
+                        this.additiveWave.waveTypes[i] = instrumentObject["additiveWaves"][i];
+                    }
+                    else {
+                        this.additiveWave.waveTypes[i] = 0;
+                    }
+                }
+            }
+            else {
+                this.additiveWave.reset();
             }
             if (instrumentObject["spectrum"] != undefined) {
                 for (let i = 0; i < Config.spectrumControlPoints; i++) {
@@ -12554,6 +12744,17 @@ var beepbox = (function (exports) {
                         }
                         harmonicsBits.encodeBase64(buffer);
                     }
+                    if (instrument.type == 12) {
+                        buffer.push(89);
+                        const additiveBits = new BitFieldWriter();
+                        const waveTypes = new BitFieldWriter();
+                        for (let i = 0; i < Config.additiveControlPointBits; i++) {
+                            additiveBits.write(Config.additiveControlPointBits, instrument.additiveWave.additives[i]);
+                            waveTypes.write(3, instrument.additiveWave.waveTypes[i]);
+                        }
+                        additiveBits.encodeBase64(buffer);
+                        waveTypes.encodeBase64(buffer);
+                    }
                     if (instrument.type == 0) {
                         if (instrument.chipWave > 186) {
                             buffer.push(119, base64IntToCharCode[instrument.chipWave - 186]);
@@ -13359,7 +13560,7 @@ var beepbox = (function (exports) {
                             }
                             validateRange(0, this.channels.length - 1, instrumentChannelIterator);
                             const instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
-                            let instrumentType = validateRange(0, 12 - 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                            let instrumentType = validateRange(0, 13 - 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                             if ((fromJummBox && beforeFive) || (beforeFour && fromGoldBox)) {
                                 if (instrumentType == 7 || instrumentType == 8) {
                                     instrumentType += 2;
@@ -14525,6 +14726,23 @@ var beepbox = (function (exports) {
                             }
                             instrument.harmonicsWave.markCustomWaveDirty();
                             charIndex += byteCount;
+                        }
+                        break;
+                    case 89:
+                        {
+                            const instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
+                            const byteCount = Math.ceil(Config.additiveControlPoints * Config.additiveControlPointBits / 6);
+                            const bits = new BitFieldReader(compressed, charIndex, charIndex + byteCount);
+                            for (let i = 0; i < Config.additiveControlPoints; i++) {
+                                instrument.additiveWave.additives[i] = bits.read(Config.additiveControlPointBits);
+                            }
+                            instrument.additiveWave.markCustomWaveDirty();
+                            charIndex += byteCount;
+                            const wavesByteCount = Math.ceil(Config.additiveControlPoints * 3 / 6);
+                            const wavesBits = new BitFieldReader(compressed, charIndex, charIndex + wavesByteCount);
+                            for (let i = 0; i < Config.additiveControlPoints; i++) {
+                                instrument.additiveWave.waveTypes[i] = wavesBits.read(3);
+                            }
                         }
                         break;
                     case 88:
@@ -16581,6 +16799,7 @@ var beepbox = (function (exports) {
             this.reverbShelfPrevInput3 = 0.0;
             this.spectrumWave = new SpectrumWaveState();
             this.harmonicsWave = new HarmonicsWaveState();
+            this.additiveWave = new AdditiveWaveState();
             this.drumsetSpectrumWaves = [];
             this.envelopeComputer = new EnvelopeComputer();
             for (let i = 0; i < Config.drumCount; i++) {
@@ -17117,6 +17336,9 @@ var beepbox = (function (exports) {
                     this.drumsetSpectrumWaves[i].getCustomWave(instrument.drumsetSpectrumWaves[i], InstrumentState._drumsetIndexToSpectrumOctave(i));
                 }
                 this.wave = null;
+            }
+            else if (instrument.type == 12) {
+                this.wave = this.additiveWave.getCustomWave(instrument.additiveWave);
             }
             else {
                 this.wave = null;
@@ -19034,6 +19256,9 @@ var beepbox = (function (exports) {
             else if (instrument.type == 5) {
                 baseExpression = Config.harmonicsBaseExpression;
             }
+            else if (instrument.type == 12) {
+                baseExpression = Config.additiveBaseExpression;
+            }
             else if (instrument.type == 6) {
                 baseExpression = Config.pwmBaseExpression;
             }
@@ -19816,6 +20041,9 @@ var beepbox = (function (exports) {
             else if (instrument.type == 5) {
                 return Synth.harmonicsSynth;
             }
+            else if (instrument.type == 12) {
+                return Synth.additiveSynth;
+            }
             else if (instrument.type == 6) {
                 return Synth.pulseWidthSynth;
             }
@@ -20498,6 +20726,53 @@ var beepbox = (function (exports) {
                 Synth.pickedStringFunctionCache[voiceCount] = pickedStringFunction;
             }
             pickedStringFunction(synth, bufferIndex, roundedSamplesPerTick, tone, instrumentState);
+        }
+        static additiveSynth(synth, bufferIndex, roundedSamplesPerTick, tone, instrumentState) {
+            const data = synth.tempMonoInstrumentSampleBuffer;
+            const wave = instrumentState.wave;
+            const waveLength = wave.length - 1;
+            if (!instrumentState.chord.customInterval)
+                tone.phases[1] = tone.phases[0];
+            let phaseDeltaA = tone.phaseDeltas[0] * waveLength;
+            const phaseDeltaScaleA = +tone.phaseDeltaScales[0];
+            let expression = +tone.expression;
+            const expressionDelta = +tone.expressionDelta;
+            let phaseA = (tone.phases[0] % 1) * waveLength;
+            const filters = tone.noteFilters;
+            const filterCount = tone.noteFilterCount | 0;
+            let initialFilterInput1 = +tone.initialNoteFilterInput1;
+            let initialFilterInput2 = +tone.initialNoteFilterInput2;
+            const applyFilters = Synth.applyFilters;
+            const phaseAInt = phaseA | 0;
+            const indexA = phaseAInt % waveLength;
+            const phaseRatioA = phaseA - phaseAInt;
+            let prevWaveIntegralA = +wave[indexA];
+            prevWaveIntegralA += (wave[indexA + 1] - prevWaveIntegralA) * phaseRatioA;
+            const stopIndex = bufferIndex + roundedSamplesPerTick;
+            for (let sampleIndex = bufferIndex; sampleIndex < stopIndex; sampleIndex++) {
+                phaseA += phaseDeltaA;
+                const phaseAInt = phaseA | 0;
+                const indexA = phaseAInt % waveLength;
+                let nextWaveIntegralA = wave[indexA];
+                const phaseRatioA = phaseA - phaseAInt;
+                nextWaveIntegralA += (wave[indexA + 1] - nextWaveIntegralA) * phaseRatioA;
+                const waveA = (nextWaveIntegralA - prevWaveIntegralA) / phaseDeltaA;
+                prevWaveIntegralA = nextWaveIntegralA;
+                const inputSample = waveA;
+                const sample = applyFilters(inputSample, initialFilterInput1, initialFilterInput2, filterCount, filters);
+                initialFilterInput2 = initialFilterInput1;
+                initialFilterInput1 = inputSample;
+                phaseDeltaA *= phaseDeltaScaleA;
+                const output = sample * expression;
+                expression += expressionDelta;
+                data[sampleIndex] += output;
+            }
+            tone.phases[0] = phaseA / waveLength;
+            tone.phaseDeltas[0] = phaseDeltaA / waveLength;
+            tone.expression = expression;
+            synth.sanitizeFilters(filters);
+            tone.initialNoteFilterInput1 = initialFilterInput1;
+            tone.initialNoteFilterInput2 = initialFilterInput2;
         }
         static effectsSynth(synth, outputDataL, outputDataR, bufferIndex, runLength, instrumentState) {
             const usesDistortion = effectsIncludeDistortion(instrumentState.effects);

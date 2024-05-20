@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const {test} = require('tap');
-const JSZip = require('jszip');
+const JSZip = require('@turbowarp/jszip');
 const VM = require('../../src/virtual-machine');
 const makeTestStorage = require('../fixtures/make-test-storage');
 

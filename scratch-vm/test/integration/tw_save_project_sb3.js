@@ -4,7 +4,7 @@ const fs = require('fs');
 const pathUtil = require('path');
 const VirtualMachine = require('../../src/virtual-machine');
 const makeTestStorage = require('../fixtures/make-test-storage');
-const JSZip = require('jszip');
+const JSZip = require('@turbowarp/jszip');
 
 const fixture = fs.readFileSync(pathUtil.join(__dirname, '..', 'fixtures', 'tw-save-project-sb3.sb3'));
 

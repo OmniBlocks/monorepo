@@ -70,7 +70,6 @@ module.exports = [
             'format-message': true,
             'htmlparser2': true,
             'immutable': true,
-            'jszip': true,
             'scratch-parser': true,
             'socket.io-client': true,
             'text-encoding': true

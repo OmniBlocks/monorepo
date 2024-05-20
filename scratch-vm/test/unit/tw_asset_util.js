@@ -1,5 +1,5 @@
 const {test} = require('tap');
-const JSZip = require('jszip');
+const JSZip = require('@turbowarp/jszip');
 const makeTestStorage = require('../fixtures/make-test-storage');
 const AssetUtil = require('../../src/util/tw-asset-util');
 const Runtime = require('../../src/engine/runtime');

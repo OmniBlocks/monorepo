@@ -5,7 +5,7 @@ if (typeof TextEncoder === 'undefined') {
     _TextEncoder = TextEncoder;
 }
 const EventEmitter = require('events');
-const JSZip = require('jszip');
+const JSZip = require('@turbowarp/jszip');
 
 const Buffer = require('buffer').Buffer;
 const centralDispatch = require('./dispatch/central-dispatch');

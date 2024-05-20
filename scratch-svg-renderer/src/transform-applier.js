@@ -6,6 +6,10 @@ const log = require('./util/log');
  * @fileOverview Apply transforms to match stroke width appearance in 2.0 and 3.0
  */
 
+const roundTo4Places = function (num) {
+    return Math.round(num * 1e4) / 1e4;
+};
+
 // Adapted from paper.js's Path.applyTransform
 const _parseTransform = function (domElement) {
     let matrix = Matrix.identity();
@@ -155,10 +159,6 @@ const _transformPath = function (pathString, transform) {
 
     const getPoint = function (index) {
         return {x: getCoord(index, 'x'), y: getCoord(index + 1, 'y')};
-    };
-
-    const roundTo4Places = function (num) {
-        return Math.round(num * 1e4) / 1e4;
     };
 
     // Returns the transformed point as a string
@@ -453,18 +453,18 @@ const _createGradient = function (gradientId, svgTag, bbox, matrix) {
 
     // Put values back into svg
     if (radial) {
-        newGradient.setAttribute('cx', Number(origin.x.toFixed(4)));
-        newGradient.setAttribute('cy', Number(origin.y.toFixed(4)));
-        newGradient.setAttribute('r', Number(radius.toFixed(4)));
+        newGradient.setAttribute('cx', roundTo4Places(origin.x));
+        newGradient.setAttribute('cy', roundTo4Places(origin.y));
+        newGradient.setAttribute('r', roundTo4Places(radius));
         if (focal) {
-            newGradient.setAttribute('fx', Number(focal.x.toFixed(4)));
-            newGradient.setAttribute('fy', Number(focal.y.toFixed(4)));
+            newGradient.setAttribute('fx', roundTo4Places(focal.x));
+            newGradient.setAttribute('fy', roundTo4Places(focal.y));
         }
     } else {
-        newGradient.setAttribute('x1', Number(origin.x.toFixed(4)));
-        newGradient.setAttribute('y1', Number(origin.y.toFixed(4)));
-        newGradient.setAttribute('x2', Number(destination.x.toFixed(4)));
-        newGradient.setAttribute('y2', Number(destination.y.toFixed(4)));
+        newGradient.setAttribute('x1', roundTo4Places(origin.x));
+        newGradient.setAttribute('y1', roundTo4Places(origin.y));
+        newGradient.setAttribute('x2', roundTo4Places(destination.x));
+        newGradient.setAttribute('y2', roundTo4Places(destination.y));
     }
     newGradient.setAttribute('gradientUnits', 'userSpaceOnUse');
     defs.appendChild(newGradient);

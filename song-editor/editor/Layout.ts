@@ -68,7 +68,7 @@ export class Layout {
 					height: 2em;
 				}
 				.beepboxEditor .operatorRow {
-					heiht: 2em;
+					height: 2em;
 				}
 				.beepboxEditor .trackAndMuteContainer {
 					max-height: 446px;
@@ -79,7 +79,6 @@ export class Layout {
 				}
 				.beepboxEditor .trackAndMuteContainer {
 					scrollbar-width: auto;
-					scrollbar-color: ${ColorConfig.uiWidgetBackground} ${ColorConfig.editorBackground};
 				}
 				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar {
 					width: 20px;
@@ -177,7 +176,6 @@ export class Layout {
 				}
 				.beepboxEditor .trackAndMuteContainer {
 					scrollbar-width: auto;
-					scrollbar-color: ${ColorConfig.uiWidgetBackground} ${ColorConfig.editorBackground};
 				}
 				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar {
 					width: 20px;
@@ -339,7 +337,7 @@ export class Layout {
 					height: 2em;
 				}
 				.beepboxEditor .operatorRow {
-					heiht: 2em;
+					height: 2em;
 				}
 				.beepboxEditor .trackAndMuteContainer {
 					max-height: 446px;
@@ -350,7 +348,6 @@ export class Layout {
 				}
 				.beepboxEditor .trackAndMuteContainer {
 					scrollbar-width: auto;
-					scrollbar-color: ${ColorConfig.uiWidgetBackground} ${ColorConfig.editorBackground};
 				}
 				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar {
 					width: 20px;
@@ -424,7 +421,7 @@ export class Layout {
 					height: 2em;
 				}
 				.beepboxEditor .operatorRow {
-					heiht: 2em;
+					height: 2em;
 				}
 				.beepboxEditor .trackAndMuteContainer {
 					max-height: 446px;
@@ -435,7 +432,6 @@ export class Layout {
 				}
 				.beepboxEditor .trackAndMuteContainer {
 					scrollbar-width: auto;
-					scrollbar-color: ${ColorConfig.uiWidgetBackground} ${ColorConfig.editorBackground};
 				}
 				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar {
 					width: 20px;
@@ -514,7 +510,7 @@ export class Layout {
 					height: 2em;
 				}
 				.beepboxEditor .operatorRow {
-					heiht: 2em;
+					height: 2em;
 				}
 				.beepboxEditor .trackAndMuteContainer {
 					max-height: 446px;
@@ -525,7 +521,6 @@ export class Layout {
 				}
 				.beepboxEditor .trackAndMuteContainer {
 					scrollbar-width: auto;
-					scrollbar-color: ${ColorConfig.uiWidgetBackground} ${ColorConfig.editorBackground};
 				}
 				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar {
 					width: 20px;

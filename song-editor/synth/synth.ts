@@ -956,7 +956,7 @@ class HarmonicsWaveState {
     }
 }
 
-class AdditiveWave {
+export class AdditiveWave {
     public additives: number[] = [];
     public hash: number = -1;
     public waveTypes: number[] = [];
@@ -1066,13 +1066,13 @@ class AdditiveWaveState {
             // retro wave (effectively random) to avoid egregiously tall spikes.
             amplitude *= retroWave[additiveIndex + 589];
 
-            const waves = this.waveExpressions(waveType, additiveIndex);
-            for (let j = 0; j < waves.length; j++) {
+            const sineWaves = this.waveExpressions(waveType, additiveIndex);
+            for (let j = 0; j < sineWaves.length; j++) {
                 if (!edited[additiveIndex]) {
                     wave[waveLength - additiveFreq] = amplitude;
                     edited[additiveIndex] = true;
                 } else {
-                    wave[waveLength - additiveFreq] += amplitude * waves[j];
+                    wave[waveLength - additiveFreq] += amplitude * sineWaves[j];
                 }
             }
         }
@@ -3493,58 +3493,58 @@ export class Song {
                 if (instrument.type == InstrumentType.additive) {
                     buffer.push(SongTagCode.additive);
                     const additiveBits: BitFieldWriter = new BitFieldWriter();
-                    const waveTypes: BitFieldWriter = new BitFieldWriter();
                     for (let i: number = 0; i < Config.additiveControlPointBits; i++) {
                         additiveBits.write(Config.additiveControlPointBits, instrument.additiveWave.additives[i]);
-                        waveTypes.write(3, instrument.additiveWave.waveTypes[i]);
                     }
                     additiveBits.encodeBase64(buffer);
-                    waveTypes.encodeBase64(buffer);
+                    for (let i: number = 0; i < Config.additiveControlPoints; i++) {
+                        buffer.push(base64IntToCharCode[instrument.additiveWave.waveTypes[i]]);
+                    }
                 }
 
                 if (instrument.type == InstrumentType.chip) {
-                   						if (instrument.chipWave > 186) {
-							buffer.push(119, base64IntToCharCode[instrument.chipWave - 186]);	
-							buffer.push(base64IntToCharCode[3]);	
-						}
-						else if (instrument.chipWave > 124) {
-							buffer.push(119, base64IntToCharCode[instrument.chipWave - 124]);	
-							buffer.push(base64IntToCharCode[2]);	
-						}
-						else if (instrument.chipWave > 62) {
-							buffer.push(119, base64IntToCharCode[instrument.chipWave - 62]);	
-							buffer.push(base64IntToCharCode[1]);	
-						}
-						else {
-							buffer.push(119, base64IntToCharCode[instrument.chipWave]);	
-							buffer.push(base64IntToCharCode[0]);	
-						}
-						buffer.push(104, base64IntToCharCode[instrument.unison]);
-                        if (instrument.unison == Config.unisons.length) encodeUnisonSettings(buffer, instrument.unisonVoices, instrument.unisonSpread, instrument.unisonOffset, instrument.unisonExpression, instrument.unisonSign);
+                    if (instrument.chipWave > 186) {
+                        buffer.push(119, base64IntToCharCode[instrument.chipWave - 186]);
+                        buffer.push(base64IntToCharCode[3]);
+                    }
+                    else if (instrument.chipWave > 124) {
+                        buffer.push(119, base64IntToCharCode[instrument.chipWave - 124]);
+                        buffer.push(base64IntToCharCode[2]);
+                    }
+                    else if (instrument.chipWave > 62) {
+                        buffer.push(119, base64IntToCharCode[instrument.chipWave - 62]);
+                        buffer.push(base64IntToCharCode[1]);
+                    }
+                    else {
+                        buffer.push(119, base64IntToCharCode[instrument.chipWave]);
+                        buffer.push(base64IntToCharCode[0]);
+                    }
+                    buffer.push(104, base64IntToCharCode[instrument.unison]);
+                    if (instrument.unison == Config.unisons.length) encodeUnisonSettings(buffer, instrument.unisonVoices, instrument.unisonSpread, instrument.unisonOffset, instrument.unisonExpression, instrument.unisonSign);
 
-						// Repurposed for chip wave loop controls.
-						buffer.push(SongTagCode.filterResonance);
-						// The encoding here is as follows:
-						// 0b11111_1
-						//         ^-- isUsingAdvancedLoopControls
-						//   ^^^^^---- chipWaveLoopMode
-						// This essentially allocates 32 different loop modes,
-						// which should be plenty.
-						const encodedLoopMode: number = (
-							(clamp(0, 31 + 1, instrument.chipWaveLoopMode) << 1)
-							| (instrument.isUsingAdvancedLoopControls ? 1 : 0)
-						);
-						buffer.push(base64IntToCharCode[encodedLoopMode]);
-						// The same encoding above is used here, but with the release mode
-						// (which isn't implemented currently), and the backwards toggle.
-						const encodedReleaseMode: number = (
-							(clamp(0, 31 + 1, 0) << 1)
-							| (instrument.chipWavePlayBackwards ? 1 : 0)
-						);
-						buffer.push(base64IntToCharCode[encodedReleaseMode]);
-						encode32BitNumber(buffer, instrument.chipWaveLoopStart);
-						encode32BitNumber(buffer, instrument.chipWaveLoopEnd);
-						encode32BitNumber(buffer, instrument.chipWaveStartOffset);
+                    // Repurposed for chip wave loop controls.
+                    buffer.push(SongTagCode.filterResonance);
+                    // The encoding here is as follows:
+                    // 0b11111_1
+                    //         ^-- isUsingAdvancedLoopControls
+                    //   ^^^^^---- chipWaveLoopMode
+                    // This essentially allocates 32 different loop modes,
+                    // which should be plenty.
+                    const encodedLoopMode: number = (
+                        (clamp(0, 31 + 1, instrument.chipWaveLoopMode) << 1)
+                        | (instrument.isUsingAdvancedLoopControls ? 1 : 0)
+                    );
+                    buffer.push(base64IntToCharCode[encodedLoopMode]);
+                    // The same encoding above is used here, but with the release mode
+                    // (which isn't implemented currently), and the backwards toggle.
+                    const encodedReleaseMode: number = (
+                        (clamp(0, 31 + 1, 0) << 1)
+                        | (instrument.chipWavePlayBackwards ? 1 : 0)
+                    );
+                    buffer.push(base64IntToCharCode[encodedReleaseMode]);
+                    encode32BitNumber(buffer, instrument.chipWaveLoopStart);
+                    encode32BitNumber(buffer, instrument.chipWaveLoopEnd);
+                    encode32BitNumber(buffer, instrument.chipWaveStartOffset);
 
                 } else if (instrument.type == InstrumentType.fm || instrument.type == InstrumentType.fm6op) {
                     if (instrument.type == InstrumentType.fm) {
@@ -3578,7 +3578,7 @@ export class Song {
                     buffer.push(SongTagCode.feedbackAmplitude, base64IntToCharCode[instrument.feedbackAmplitude]);
 
                     buffer.push(SongTagCode.operatorFrequencies);
-                    for (let o: number = 0; o < (instrument.type == InstrumentType.fm6op?6:Config.operatorCount); o++) {
+                    for (let o: number = 0; o < (instrument.type == InstrumentType.fm6op ? 6 : Config.operatorCount); o++) {
                         buffer.push(base64IntToCharCode[instrument.operators[o].frequency]);
                     }
                     buffer.push(SongTagCode.operatorAmplitudes);
@@ -3595,23 +3595,23 @@ export class Song {
                     }
                 } else if (instrument.type == InstrumentType.customChipWave) {
                     if (instrument.chipWave > 186) {
-							buffer.push(119, base64IntToCharCode[instrument.chipWave - 186]);	
-							buffer.push(base64IntToCharCode[3]);	
-						}
-						else if (instrument.chipWave > 124) {
-							buffer.push(119, base64IntToCharCode[instrument.chipWave - 124]);	
-							buffer.push(base64IntToCharCode[2]);	
-						}
-						else if (instrument.chipWave > 62) {
-							buffer.push(119, base64IntToCharCode[instrument.chipWave - 62]);	
-							buffer.push(base64IntToCharCode[1]);	
-						}
-						else {
-							buffer.push(119, base64IntToCharCode[instrument.chipWave]);	
-							buffer.push(base64IntToCharCode[0]);	
-						}
-						buffer.push(104, base64IntToCharCode[instrument.unison]);
-                        if (instrument.unison == Config.unisons.length) encodeUnisonSettings(buffer, instrument.unisonVoices, instrument.unisonSpread, instrument.unisonOffset, instrument.unisonExpression, instrument.unisonSign);
+                        buffer.push(119, base64IntToCharCode[instrument.chipWave - 186]);
+                        buffer.push(base64IntToCharCode[3]);
+                    }
+                    else if (instrument.chipWave > 124) {
+                        buffer.push(119, base64IntToCharCode[instrument.chipWave - 124]);
+                        buffer.push(base64IntToCharCode[2]);
+                    }
+                    else if (instrument.chipWave > 62) {
+                        buffer.push(119, base64IntToCharCode[instrument.chipWave - 62]);
+                        buffer.push(base64IntToCharCode[1]);
+                    }
+                    else {
+                        buffer.push(119, base64IntToCharCode[instrument.chipWave]);
+                        buffer.push(base64IntToCharCode[0]);
+                    }
+                    buffer.push(104, base64IntToCharCode[instrument.unison]);
+                    if (instrument.unison == Config.unisons.length) encodeUnisonSettings(buffer, instrument.unisonVoices, instrument.unisonSpread, instrument.unisonOffset, instrument.unisonExpression, instrument.unisonSign);
                     buffer.push(SongTagCode.customChipWave);
                     // Push custom wave values
                     for (let j: number = 0; j < 64; j++) {
@@ -3653,18 +3653,20 @@ export class Song {
                     buffer.push(SongTagCode.unison, base64IntToCharCode[instrument.unison]);
                     if (instrument.unison == Config.unisons.length) encodeUnisonSettings(buffer, instrument.unisonVoices, instrument.unisonSpread, instrument.unisonOffset, instrument.unisonExpression, instrument.unisonSign);
                 } else if (instrument.type == InstrumentType.supersaw) {
-					buffer.push(SongTagCode.supersaw, base64IntToCharCode[instrument.supersawDynamism], base64IntToCharCode[instrument.supersawSpread], base64IntToCharCode[instrument.supersawShape]);
-					buffer.push(SongTagCode.pulseWidth, base64IntToCharCode[instrument.pulseWidth]);
+                    buffer.push(SongTagCode.supersaw, base64IntToCharCode[instrument.supersawDynamism], base64IntToCharCode[instrument.supersawSpread], base64IntToCharCode[instrument.supersawShape]);
+                    buffer.push(SongTagCode.pulseWidth, base64IntToCharCode[instrument.pulseWidth]);
                     buffer.push(base64IntToCharCode[instrument.decimalOffset >> 6], base64IntToCharCode[instrument.decimalOffset & 0x3f]);
-				} else if (instrument.type == InstrumentType.pickedString) {
+                } else if (instrument.type == InstrumentType.pickedString) {
                     if (Config.stringSustainRange > 0x20 || SustainType.length > 2) {
-						throw new Error("Not enough bits to represent sustain value and type in same base64 character.");
-					}
+                        throw new Error("Not enough bits to represent sustain value and type in same base64 character.");
+                    }
                     buffer.push(SongTagCode.unison, base64IntToCharCode[instrument.unison]);
                     if (instrument.unison == Config.unisons.length) encodeUnisonSettings(buffer, instrument.unisonVoices, instrument.unisonSpread, instrument.unisonOffset, instrument.unisonExpression, instrument.unisonSign);
                     buffer.push(SongTagCode.stringSustain, base64IntToCharCode[instrument.stringSustain | (instrument.stringSustainType << 5)]);
                 } else if (instrument.type == InstrumentType.mod) {
                     // Handled down below. Could be moved, but meh.
+                } else if (instrument.type == InstrumentType.additive) { 
+                    //Handled above
                 } else {
                     throw new Error("Unknown instrument type.");
                 }
@@ -4401,6 +4403,8 @@ export class Song {
                         this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].preset = InstrumentType.fm6op;
                         this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].type = InstrumentType.fm6op;
                     }
+                } else if (!fromSlarmoosBox ||(fromSlarmoosBox && beforeTwo)) {
+                    
                 }
                 // BeepBox directly tweaked "grand piano", but JB kept it the same. The most up to date version is now "grand piano 3"
                 if (fromBeepBox && presetValue == EditorConfig.nameToPresetValue("grand piano 1") ) {
@@ -5560,12 +5564,10 @@ export class Song {
                     instrument.additiveWave.additives[i] = bits.read(Config.additiveControlPointBits);
                 }
                 instrument.additiveWave.markCustomWaveDirty();
-                //now for waveTypes
                 charIndex += byteCount;
-                const wavesByteCount: number = Math.ceil(Config.additiveControlPoints * 3 / 6);
-                const wavesBits: BitFieldReader = new BitFieldReader(compressed, charIndex, charIndex + wavesByteCount);
+
                 for (let i: number = 0; i < Config.additiveControlPoints; i++) {
-                    instrument.additiveWave.waveTypes[i] = wavesBits.read(3);
+                    instrument.additiveWave.waveTypes[i] = compressed.charCodeAt(charIndex++);
                 }
             } break;
             case SongTagCode.aliases: {

@@ -9081,6 +9081,7 @@ var beepbox = (function (exports) {
                 { name: TypePresets[8], customType: 8 },
                 { name: TypePresets[9], customType: 9 },
                 { name: TypePresets[11], customType: 11 },
+                { name: TypePresets[12], customType: 12 },
             ])
         },
         {
@@ -10465,7 +10466,6 @@ var beepbox = (function (exports) {
             const harmonicsRendered = (instrumentType == 7) ? Config.harmonicsRenderedForPickedString : Config.harmonicsRendered;
             const waveLength = Config.harmonicsWavelength;
             const retroWave = getDrumWave(0, null, null);
-            console.log(retroWave);
             if (this.wave == null || this.wave.length != waveLength + 1) {
                 this.wave = new Float32Array(waveLength + 1);
             }
@@ -10608,14 +10608,14 @@ var beepbox = (function (exports) {
                 }
                 amplitude *= Math.pow(additiveFreq, overallSlope);
                 amplitude *= retroWave[additiveIndex + 589];
-                const waves = this.waveExpressions(waveType, additiveIndex);
-                for (let j = 0; j < waves.length; j++) {
+                const sineWaves = this.waveExpressions(waveType, additiveIndex);
+                for (let j = 0; j < sineWaves.length; j++) {
                     if (!edited[additiveIndex]) {
                         wave[waveLength - additiveFreq] = amplitude;
                         edited[additiveIndex] = true;
                     }
                     else {
-                        wave[waveLength - additiveFreq] += amplitude * waves[j];
+                        wave[waveLength - additiveFreq] += amplitude * sineWaves[j];
                     }
                 }
             }
@@ -12747,13 +12747,13 @@ var beepbox = (function (exports) {
                     if (instrument.type == 12) {
                         buffer.push(89);
                         const additiveBits = new BitFieldWriter();
-                        const waveTypes = new BitFieldWriter();
                         for (let i = 0; i < Config.additiveControlPointBits; i++) {
                             additiveBits.write(Config.additiveControlPointBits, instrument.additiveWave.additives[i]);
-                            waveTypes.write(3, instrument.additiveWave.waveTypes[i]);
                         }
                         additiveBits.encodeBase64(buffer);
-                        waveTypes.encodeBase64(buffer);
+                        for (let i = 0; i < Config.additiveControlPoints; i++) {
+                            buffer.push(base64IntToCharCode[instrument.additiveWave.waveTypes[i]]);
+                        }
                     }
                     if (instrument.type == 0) {
                         if (instrument.chipWave > 186) {
@@ -12916,6 +12916,7 @@ var beepbox = (function (exports) {
                         buffer.push(73, base64IntToCharCode[instrument.stringSustain | (instrument.stringSustainType << 5)]);
                     }
                     else if (instrument.type == 10) ;
+                    else if (instrument.type == 12) ;
                     else {
                         throw new Error("Unknown instrument type.");
                     }
@@ -13610,6 +13611,7 @@ var beepbox = (function (exports) {
                                     this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].type = 11;
                                 }
                             }
+                            else ;
                             if (fromBeepBox && presetValue == EditorConfig.nameToPresetValue("grand piano 1")) {
                                 this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].preset = EditorConfig.nameToPresetValue("grand piano 3");
                             }
@@ -14738,10 +14740,8 @@ var beepbox = (function (exports) {
                             }
                             instrument.additiveWave.markCustomWaveDirty();
                             charIndex += byteCount;
-                            const wavesByteCount = Math.ceil(Config.additiveControlPoints * 3 / 6);
-                            const wavesBits = new BitFieldReader(compressed, charIndex, charIndex + wavesByteCount);
                             for (let i = 0; i < Config.additiveControlPoints; i++) {
-                                instrument.additiveWave.waveTypes[i] = wavesBits.read(3);
+                                instrument.additiveWave.waveTypes[i] = compressed.charCodeAt(charIndex++);
                             }
                         }
                         break;

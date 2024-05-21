@@ -19,6 +19,7 @@ import { Instrument, Channel, Synth } from "../synth/synth";
 import { HTML, SVG } from "imperative-html/dist/esm/elements-strict";
 import { Preferences } from "./Preferences";
 import { HarmonicsEditor } from "./HarmonicsEditor";
+import { AdditiveEditor, AdditiveEditorPrompt } from "./AdditiveEditor"
 import { InputBox, Slider } from "./HTMLWrapper";
 import { ImportPrompt } from "./ImportPrompt";
 import { ChannelRow } from "./ChannelRow";
@@ -95,6 +96,7 @@ function buildPresetOptions(isNoise: boolean, idSet: string): HTMLSelectElement 
         menu.appendChild(option({ value: InstrumentType.fm6op }, EditorConfig.instrumentToPreset(InstrumentType.fm6op)!.name));
         menu.appendChild(option({ value: InstrumentType.harmonics }, EditorConfig.valueToPreset(InstrumentType.harmonics)!.name));
         menu.appendChild(option({ value: InstrumentType.pickedString }, EditorConfig.valueToPreset(InstrumentType.pickedString)!.name));
+        menu.appendChild(option({ value: InstrumentType.additive }, EditorConfig.valueToPreset(InstrumentType.additive)!.name));
         menu.appendChild(option({ value: InstrumentType.spectrum }, EditorConfig.valueToPreset(InstrumentType.spectrum)!.name));
         menu.appendChild(option({ value: InstrumentType.noise }, EditorConfig.valueToPreset(InstrumentType.noise)!.name));
     }
@@ -1029,6 +1031,10 @@ export class SongEditor {
     private readonly _spectrumRow: HTMLElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("spectrum") }, "Spectrum:"), this._spectrumEditor.container);
     private readonly _harmonicsEditor: HarmonicsEditor = new HarmonicsEditor(this._doc);
     private readonly _harmonicsRow: HTMLElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("harmonics") }, "Harmonics:"), this._harmonicsEditor.container);
+    private readonly _additiveEditor: AdditiveEditor = new AdditiveEditor(this._doc);
+    private readonly _additiveZoom: HTMLButtonElement = button({ style: "margin-left:0em; padding-left:0.2em; height:1.5em; max-width: 12px;", onclick: () => this._openPrompt("additiveSettings") }, "+");
+    private readonly _additiveRow: HTMLElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("additive") }, "Additive:"), this._additiveZoom, this._additiveEditor.container);
+
 
     //SongEditor.ts
     private readonly _envelopeEditor: EnvelopeEditor = new EnvelopeEditor(this._doc, (id: number, submenu: number, subtype: string) => this._toggleDropdownMenu(id, submenu, subtype), (name: string) => this._openPrompt(name));
@@ -1145,6 +1151,7 @@ export class SongEditor {
         this._feedbackRow2,
         this._spectrumRow,
         this._harmonicsRow,
+        this._additiveRow,
         this._drumsetGroup,
         this._supersawDynamismRow,
         this._supersawSpreadRow,
@@ -1657,6 +1664,7 @@ export class SongEditor {
         this._eqFilterEditor.container.addEventListener("mousedown", this.refocusStage);
         this._noteFilterEditor.container.addEventListener("mousedown", this.refocusStage);
         this._harmonicsEditor.container.addEventListener("mousedown", this.refocusStage);
+        this._additiveEditor.container.addEventListener("mousedown", this.refocusStage);
         this._tempoStepper.addEventListener("keydown", this._tempoStepperCaptureNumberKeys, false);
         this._addEnvelopeButton.addEventListener("click", this._addNewEnvelope);
         this._patternArea.addEventListener("contextmenu", this._disableCtrlContextMenu);
@@ -2110,6 +2118,9 @@ export class SongEditor {
                 case "configureShortener":
                     this.prompt = new ShortenerConfigPrompt(this._doc);
                     break;
+                case "additiveSettings":
+                    this.prompt = new AdditiveEditorPrompt(this._doc, this);
+                    break
                 default:
                     this.prompt = new TipPrompt(this._doc, promptName);
                     break;
@@ -2447,6 +2458,21 @@ export class SongEditor {
                 this._stringSustainLabel.textContent = Config.enableAcousticSustain ? "Sustain (" + Config.sustainTypeNames[instrument.stringSustainType].substring(0, 1).toUpperCase() + "):" : "Sustain:";
             } else {
                 this._stringSustainRow.style.display = "none";
+            }
+            if (instrument.type == InstrumentType.additive) {
+                this._chipWaveSelectRow.style.display = "none";
+                // advloop addition
+                this._useChipWaveAdvancedLoopControlsRow.style.display = "none";
+                this._chipWaveLoopModeSelectRow.style.display = "none";
+                this._chipWaveLoopStartRow.style.display = "none";
+                this._chipWaveLoopEndRow.style.display = "none";
+                this._chipWaveStartOffsetRow.style.display = "none";
+                this._chipWavePlayBackwardsRow.style.display = "none";
+                // advloop addition
+                this._additiveRow.style.display = "";
+                this._additiveEditor.render();
+            } else {
+                this._additiveRow.style.display = "none";
             }
             if (instrument.type == InstrumentType.drumset) {
                 this._drumsetGroup.style.display = "";
@@ -2882,6 +2908,7 @@ export class SongEditor {
             // advloop addition
             this._spectrumRow.style.display = "none";
             this._harmonicsRow.style.display = "none";
+            this._additiveRow.style.display = "none";
             this._transitionRow.style.display = "none";
             this._chordSelectRow.style.display = "none";
             this._chordDropdownGroup.style.display = "none";

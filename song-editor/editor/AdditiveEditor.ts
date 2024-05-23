@@ -36,6 +36,10 @@ export class AdditiveEditor {
     private _renderedPath: String = "";
     private _renderedFifths: boolean = true;
 
+    private _instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
+    private _initial: AdditiveWave = this._instrument.additiveWave;
+    private _current: AdditiveWave = this._initial;
+
     constructor(private _doc: SongDocument) {
         for (let i: number = 1; i <= Config.additiveControlPoints; i = i * 2) {
             this._octaves.appendChild(SVG.rect({ fill: ColorConfig.tonic, x: (i - 0.5) * (this._editorWidth - 8) / (Config.additiveControlPoints - 1) - 1, y: 0, width: 2, height: this._editorHeight }));
@@ -129,7 +133,6 @@ export class AdditiveEditor {
 
     private _updateAdditive(freq: number, amp: number) {
         const instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
-        const additiveWave: AdditiveWave = instrument.additiveWave;
 
         if (freq != this._freqPrev) {
             const slope: number = (amp - this._ampPrev) / (freq - this._freqPrev);
@@ -138,16 +141,16 @@ export class AdditiveEditor {
             const upperFreq: number = Math.floor(Math.max(this._freqPrev, freq));
             for (let i: number = lowerFreq; i <= upperFreq; i++) {
                 if (i < 0 || i >= Config.additiveControlPoints) continue;
-                additiveWave.additives[i] = Math.max(0, Math.min(Config.additiveMax, Math.round(i * slope + offset)));
+                this._current.additives[i] = Math.max(0, Math.min(Config.additiveMax, Math.round(i * slope + offset)));
             }
         }
 
-        additiveWave.additives[Math.max(0, Math.min(Config.additiveControlPoints - 1, Math.round(freq)))] = Math.max(0, Math.min(Config.additiveMax, Math.round(amp)));
+        this._current.additives[Math.max(0, Math.min(Config.additiveControlPoints - 1, Math.round(freq)))] = Math.max(0, Math.min(Config.additiveMax, Math.round(amp)));
 
         this._freqPrev = freq;
         this._ampPrev = amp;
 
-        this._change = new ChangeAdditive(this._doc, instrument, additiveWave);
+        this._change = new ChangeAdditive(this._doc, instrument, this._current);
     }
 
     private _whenCursorReleased = (event: Event): void => {
@@ -156,6 +159,23 @@ export class AdditiveEditor {
             this._change = null;
         }
         this._mouseDown = false;
+    }
+
+    public saveSettings() {
+        const instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
+        this._doc.record(new ChangeAdditive(this._doc, instrument, this._current));
+    }
+
+    public resetToInitial() {
+        const instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
+        this._doc.record(new ChangeAdditive(this._doc, instrument, this._initial));
+    }
+
+    public rerenderWave() {
+        this._instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
+        this._initial = this._instrument.additiveWave;
+        this._current = this._initial;
+        this.render();
     }
 
     public render(): void {
@@ -239,6 +259,9 @@ export class AdditiveEditorPrompt implements Prompt {
         // this.copyButton.addEventListener("click", this._copySettings);
         // this.pasteButton.addEventListener("click", this._pasteSettings);
         this._playButton.addEventListener("click", this._togglePlay);
+        this.additiveEditor.container.addEventListener("mousemove", () => this.additiveEditor.render());
+        this.container.addEventListener("mousemove", () => this.additiveEditor.render());
+        this.container.addEventListener("mousedown", () => this.additiveEditor.render());
         this.updatePlayButton();
 
         setTimeout(() => this._playButton.focus());
@@ -267,14 +290,14 @@ export class AdditiveEditorPrompt implements Prompt {
 
     private _close = (): void => {
         this._doc.prompt = null;
-        this._doc.undo();
+        this.additiveEditor.resetToInitial();
     }
 
     public cleanUp = (): void => {
         this._okayButton.removeEventListener("click", this._saveChanges);
         this._cancelButton.removeEventListener("click", this._close);
         this.container.removeEventListener("keydown", this.whenKeyPressed);
-
+        this.additiveEditor.container.removeEventListener("mousemove", () => this.additiveEditor.render());
         this._playButton.removeEventListener("click", this._togglePlay);
     }
 
@@ -321,10 +344,7 @@ export class AdditiveEditorPrompt implements Prompt {
 
     private _saveChanges = (): void => {
         this._doc.prompt = null;
-
         // Save again just in case
-        if (this.additiveEditor._change) {
-            this._doc.record(this.additiveEditor._change);
-        }
+        this.additiveEditor.saveSettings();
     }
 }

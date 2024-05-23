@@ -2956,8 +2956,11 @@ var beepbox = (function (exports) {
         reset() {
             for (let i = 0; i < Config.additiveControlPoints; i++) {
                 this.additives[i] = 0;
-                this.waveTypes[i] = 0;
+                this.waveTypes[i] = 1;
             }
+            this.additives[0] = Config.harmonicsMax;
+            this.additives[3] = Config.harmonicsMax;
+            this.additives[6] = Config.harmonicsMax;
             this.markCustomWaveDirty();
         }
         markCustomWaveDirty() {
@@ -2979,127 +2982,50 @@ var beepbox = (function (exports) {
             this._hash = settings.hash;
             const additiveRendered = Config.additiveRendered;
             const waveLength = Config.additiveWavelength;
-            const retroWave = getDrumWave(0, null, null);
             if (this.wave == null || this.wave.length != waveLength + 1) {
                 this.wave = new Float32Array(waveLength + 1);
             }
             const wave = this.wave;
             for (let i = 0; i < waveLength; i++) {
-                wave[i] = 0;
+                wave[i] = this.waveExpressions(settings.waveTypes[0], i, 1);
             }
             const overallSlope = -0.25;
             let combinedControlPointAmplitude = 1;
-            const waveTypes = settings.waveTypes.slice();
-            const modeMap = { sine: 0, square: 0, triangle: 0, sawtooth: 0, ramp: 0, trapezoid: 0, other: 0 };
-            for (let i = 0; i < waveTypes.length; i++) {
-                if (waveTypes[i] == 0) {
-                    modeMap["sine"]++;
-                }
-                else if (waveTypes[i] == 1) {
-                    modeMap["square"]++;
-                }
-                else if (waveTypes[i] == 2) {
-                    modeMap["triangle"]++;
-                }
-                else if (waveTypes[i] == 3) {
-                    modeMap["sawtooth"]++;
-                }
-                else if (waveTypes[i] == 4) {
-                    modeMap["ramp"]++;
-                }
-                else if (waveTypes[i] == 5) {
-                    modeMap["trapezoid"]++;
-                }
-                else {
-                    modeMap["other"]++;
+            for (let additiveIndex = 1; additiveIndex < additiveRendered; additiveIndex++) {
+                const additiveFreq = additiveIndex++;
+                for (let i = 0; i < waveLength; i++) {
+                    let additiveHarmonic = this.waveExpressions(settings.waveTypes[additiveIndex], i, additiveFreq);
+                    additiveHarmonic *= Math.pow(additiveFreq, overallSlope);
+                    wave[i] += additiveHarmonic;
                 }
             }
-            let mode = 0;
-            let modeWaveType = 0;
-            if (modeMap["sine"] > mode) {
-                modeWaveType = 0;
-            }
-            else if (modeMap["square"] > mode) {
-                modeWaveType = 1;
-            }
-            else if (modeMap["triangle"] > mode) {
-                modeWaveType = 2;
-            }
-            else if (modeMap["sawtooth"] > mode) {
-                modeWaveType = 3;
-            }
-            else if (modeMap["ramp"] > mode) {
-                modeWaveType = 4;
-            }
-            else if (modeMap["trapezoid"] > mode) {
-                modeWaveType = 5;
-            }
-            else if (modeMap["other"] > mode) {
-                modeWaveType = 0;
-            }
-            let edited = [];
-            for (let additiveIndex = 0; additiveIndex < additiveRendered; additiveIndex++) {
-                if (!edited[additiveIndex]) {
-                    edited[additiveIndex] = false;
-                }
-                const additiveFreq = additiveIndex + 1;
-                const waveType = additiveIndex < Config.additiveControlPoints ? settings.waveTypes[additiveIndex] : modeWaveType;
-                let controlValue = additiveIndex < Config.additiveControlPoints ? settings.additives[additiveIndex] : settings.additives[Config.additiveControlPoints - 1];
-                if (additiveIndex >= Config.additiveControlPoints) {
-                    controlValue *= 1 - (additiveIndex - Config.additiveControlPoints) / (additiveRendered - Config.additiveControlPoints);
-                }
-                const normalizedValue = controlValue / Config.additiveMax;
-                let amplitude = Math.pow(2, controlValue - Config.additiveMax + 1) * Math.sqrt(normalizedValue);
-                if (additiveIndex < Config.additiveControlPoints) {
-                    combinedControlPointAmplitude += amplitude;
-                }
-                amplitude *= Math.pow(additiveFreq, overallSlope);
-                amplitude *= retroWave[additiveIndex + 589];
-                const sineWaves = this.waveExpressions(waveType, additiveIndex);
-                for (let j = 0; j < sineWaves.length; j++) {
-                    if (!edited[additiveIndex]) {
-                        wave[waveLength - additiveFreq] = amplitude;
-                        edited[additiveIndex] = true;
-                    }
-                    else {
-                        wave[waveLength - additiveFreq] += amplitude * sineWaves[j];
-                    }
-                }
-            }
-            inverseRealFourierTransform(wave, waveLength);
             const mult = 1 / Math.pow(combinedControlPointAmplitude, 0.7);
             for (let i = 0; i < wave.length; i++)
                 wave[i] *= mult;
-            performIntegralOld(wave);
             wave[waveLength] = wave[0];
             return wave;
         }
-        waveExpressions(waveType, index = 0) {
+        waveExpressions(waveType, time, harmonic) {
+            const multiple = 64;
             switch (waveType) {
                 case 0:
-                    return [1];
+                    console.log("sine");
+                    return (Math.sin(time * harmonic * Math.PI / multiple)) / harmonic;
                 case 1:
-                    if (index % 2 == 0) {
-                        return [0, 4, 0, 4 / 3, 0, 4 / 5, 0, 4 / 7, 0, 4 / 9, 0, 4 / 11, 0, 4 / 13, 0, 4 / 15];
-                    }
-                    else {
-                        return [4, 0, 4 / 3, 0, 4 / 5, 0, 4 / 7, 0, 4 / 9, 0, 4 / 11, 0, 4 / 13, 0, 4 / 15];
-                    }
+                    console.log("square");
+                    return (2 * (Math.floor(time * harmonic / multiple - 1) % 2) - 1) / harmonic;
                 case 2:
-                    if (index % 2 == 0) {
-                        return [0, 5 / 2, 0, 5 / 18, 0, 1 / 10, 0, 5 / 98, 0, 5 / 162, 0, 5 / 242];
-                    }
-                    else {
-                        return [5 / 2, 0, 5 / 18, 0, 1 / 10, 0, 5 / 98, 0, 5 / 162, 0, 5 / 242];
-                    }
+                    return (2 * (Math.abs(((time * harmonic / multiple / 2 + 1 / 2) % 1)) * 2 - 1) - 1) / harmonic;
                 case 3:
-                    return [2, 1, 2 / 3, 1 / 2, 2 / 5, 1 / 3, 2 / 7, 1 / 4];
+                    return (2 * Math.abs((time * harmonic / multiple / 2 + 1 / 2) % 1) - 1) / harmonic;
                 case 4:
-                    return [-2, -1, -2 / 3, -1 / 2, -2 / 5, -1 / 3, -2 / 7, -1 / 4];
+                    return (-2 * Math.abs((time * harmonic / multiple / 2 + 1 / 2) % 1) + 1) / harmonic;
                 case 5:
-                    return [1];
+                    return this.waveExpressions(2, time, harmonic) + this.waveExpressions(2, (time + 1 / 2), harmonic);
+                default:
+                    console.log("default");
+                    return (Math.sin(time * harmonic * Math.PI / multiple)) / harmonic;
             }
-            return [1];
         }
     }
     class FilterControlPoint {
@@ -3904,7 +3830,7 @@ var beepbox = (function (exports) {
                     instrumentObject["harmonics"][i] = Math.round(100 * this.harmonicsWave.harmonics[i] / Config.harmonicsMax);
                 }
             }
-            if (this.type == 12 || this.type == 7) {
+            if (this.type == 12) {
                 instrumentObject["additive"] = [];
                 instrumentObject["additiveWaves"] = [];
                 for (let i = 0; i < Config.additiveControlPoints; i++) {
@@ -5194,7 +5120,7 @@ var beepbox = (function (exports) {
                     if (instrument.type == 12) {
                         buffer.push(89);
                         const additiveBits = new BitFieldWriter();
-                        for (let i = 0; i < Config.additiveControlPointBits; i++) {
+                        for (let i = 0; i < Config.additiveControlPoints; i++) {
                             additiveBits.write(Config.additiveControlPointBits, instrument.additiveWave.additives[i]);
                         }
                         additiveBits.encodeBase64(buffer);
@@ -6058,7 +5984,12 @@ var beepbox = (function (exports) {
                                     this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].type = 11;
                                 }
                             }
-                            else ;
+                            else if (!fromSlarmoosBox || (fromSlarmoosBox && beforeTwo)) {
+                                if (this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].preset == 10) {
+                                    this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].preset = 12;
+                                    this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].type = 12;
+                                }
+                            }
                             if (fromBeepBox && presetValue == EditorConfig.nameToPresetValue("grand piano 1")) {
                                 this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].preset = EditorConfig.nameToPresetValue("grand piano 3");
                             }

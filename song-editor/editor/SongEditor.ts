@@ -96,7 +96,7 @@ function buildPresetOptions(isNoise: boolean, idSet: string): HTMLSelectElement 
         menu.appendChild(option({ value: InstrumentType.fm6op }, EditorConfig.instrumentToPreset(InstrumentType.fm6op)!.name));
         menu.appendChild(option({ value: InstrumentType.harmonics }, EditorConfig.valueToPreset(InstrumentType.harmonics)!.name));
         menu.appendChild(option({ value: InstrumentType.pickedString }, EditorConfig.valueToPreset(InstrumentType.pickedString)!.name));
-        menu.appendChild(option({ value: InstrumentType.additive }, EditorConfig.valueToPreset(InstrumentType.additive)!.name));
+        menu.appendChild(option({ value: InstrumentType.additive }, EditorConfig.instrumentToPreset(InstrumentType.additive)!.name)); //needs to be instrumentToPreset instead of valueToPreset to account for mod type
         menu.appendChild(option({ value: InstrumentType.spectrum }, EditorConfig.valueToPreset(InstrumentType.spectrum)!.name));
         menu.appendChild(option({ value: InstrumentType.noise }, EditorConfig.valueToPreset(InstrumentType.noise)!.name));
     }
@@ -2149,6 +2149,7 @@ export class SongEditor {
         }
     }
 
+
     public refocusStage = (): void => {
         this.mainLayer.focus({ preventScroll: true });
     }
@@ -2816,6 +2817,7 @@ export class SongEditor {
 
             this._envelopeEditor.render();
             this._envelopeEditor.rerenderExtraSettings();
+            this._additiveEditor.rerenderWave();
 
             for (let chordIndex: number = 0; chordIndex < Config.chords.length; chordIndex++) {
                 let hidden: boolean = (!Config.instrumentTypeHasSpecialInterval[instrument.type] && Config.chords[chordIndex].customInterval);
@@ -4357,6 +4359,8 @@ export class SongEditor {
                     this._doc.selection.resetBoxSelection();
                     //envelopes aren't rerendering when channels are changed so...
                     this._envelopeEditor.rerenderExtraSettings();
+                    this._additiveEditor.rerenderWave();
+
                 }
                 event.preventDefault();
                 break;
@@ -4371,6 +4375,8 @@ export class SongEditor {
                     this._doc.selection.setChannelBar((this._doc.channel + 1) % this._doc.song.getChannelCount(), this._doc.bar);
                     this._doc.selection.resetBoxSelection();
                     this._envelopeEditor.rerenderExtraSettings();
+                    this._additiveEditor.rerenderWave();
+
                 }
                 event.preventDefault();
                 break;

@@ -19,7 +19,7 @@ yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, "v", nu
 retire(); return;
 }; })
 
-// Sprite1 return stops the script immediately
+// Sprite1 Wreturn stops the script immediately
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
 const b0 = stage.variables["PsAI*C{QHI3*4?O8p#TM"];
 const b1 = runtime.getOpcodeFunction("looks_say");

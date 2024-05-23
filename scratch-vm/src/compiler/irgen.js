@@ -87,6 +87,7 @@ class ScriptTreeGenerator {
     setProcedureVariant (procedureVariant) {
         const procedureCode = parseProcedureCode(procedureVariant);
 
+        this.script.procedureVariant = procedureVariant;
         this.script.procedureCode = procedureCode;
         this.script.isProcedure = true;
         this.script.yields = false;

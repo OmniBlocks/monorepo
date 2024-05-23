@@ -11,7 +11,7 @@ yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, "s", nu
 retire(); return;
 }; })
 
-// Sprite1 run without screen refresh
+// Sprite1 Wrun without screen refresh
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
 const b0 = stage.variables["F?*}X,`9XBpN_[piGRrz"];
 const b1 = runtime.getOpcodeFunction("looks_say");

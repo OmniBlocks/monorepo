@@ -12,7 +12,7 @@ yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, "$R-1lb
 retire(); return;
 }; })
 
-// Sprite1 number or text %s %s
+// Sprite1 Znumber or text %s %s
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
 const b0 = runtime.getOpcodeFunction("looks_say");
 return function* genXYZ_number_or_text__ (p0,p1) {
@@ -22,7 +22,7 @@ yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b0, false, false, "HH`yR
 return "";
 }; })
 
-// Sprite1 boolean %b %b
+// Sprite1 Zboolean %b %b
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
 const b0 = runtime.getOpcodeFunction("looks_say");
 return function* genXYZ_boolean__ (p0,p1) {

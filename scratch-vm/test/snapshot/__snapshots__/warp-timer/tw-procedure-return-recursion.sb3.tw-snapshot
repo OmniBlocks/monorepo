@@ -30,7 +30,7 @@ yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, "av", n
 retire(); return;
 }; })
 
-// Sprite1 non warp recursion should yield %s
+// Sprite1 Znon warp recursion should yield %s
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
 return function* genXYZ_non_warp_recursion_s (p0) {
 if (compareGreaterThan(p0, 0)) {
@@ -39,7 +39,7 @@ return (yield* yieldThenCallGenerator(thread.procedures["Znon warp recursion sho
 return "";
 }; })
 
-// Sprite1 warp recursion should not yield %s
+// Sprite1 Wwarp recursion should not yield %s
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
 return function funXYZ_warp_recursion_shoul (p0) {
 if (compareGreaterThan(p0, 0)) {
@@ -48,7 +48,7 @@ return thread.procedures["Wwarp recursion should not yield %s"](((+p0 || 0) - 1)
 return "";
 }; })
 
-// Sprite1 fib %s
+// Sprite1 Zfib %s
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
 return function* genXYZ_fib_ (p0) {
 if (compareLessThan(p0, 2)) {
@@ -59,7 +59,7 @@ return ((+(yield* yieldThenCallGenerator(thread.procedures["Zfib %s"], ((+p0 || 
 return "";
 }; })
 
-// Sprite1 recursing yields between each %s
+// Sprite1 Zrecursing yields between each %s
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
 const b0 = stage.variables["Go=PJS7BFXYo_qi2S:kQ"];
 const b1 = stage.variables["`jEk@4|i[#Fk?(8x)AV.-my variable"];
@@ -83,7 +83,7 @@ yield* executeInCompatibilityLayer({"MESSAGE":("fail recursing between calls yie
 return "";
 }; })
 
-// Sprite1 recursing arguments eval order %s %s %s %s
+// Sprite1 Zrecursing arguments eval order %s %s %s %s
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
 const b0 = stage.variables["4HH82mPlVMOONdl(Ot*7"];
 const b1 = stage.variables["Go=PJS7BFXYo_qi2S:kQ"];

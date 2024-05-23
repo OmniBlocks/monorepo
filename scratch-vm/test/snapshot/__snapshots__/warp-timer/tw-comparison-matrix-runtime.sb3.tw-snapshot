@@ -11,7 +11,7 @@ yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, "aZ", n
 retire(); return;
 }; })
 
-// Sprite1 run test
+// Sprite1 Wrun test
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
 const b0 = stage.variables["mfV;yS}9e:%h5UZ)QyiY"];
 const b1 = stage.variables["`jEk@4|i[#Fk?(8x)AV.-my variable"];
@@ -48,7 +48,7 @@ if (isStuck()) yield;
 return "";
 }; })
 
-// Sprite1 setup values
+// Sprite1 Wsetup values
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
 const b0 = stage.variables["n^wm8jw#b24sggt.S^tD"];
 return function funXYZ_setup_values () {

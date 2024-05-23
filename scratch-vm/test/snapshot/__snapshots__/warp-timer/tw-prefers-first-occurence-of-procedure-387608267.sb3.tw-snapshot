@@ -11,7 +11,7 @@ yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, "Q^(MKg
 retire(); return;
 }; })
 
-// Player Set Costume
+// Player ZSet Costume
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
 const b0 = runtime.getOpcodeFunction("looks_say");
 return function* genXYZ_Set_Costume () {

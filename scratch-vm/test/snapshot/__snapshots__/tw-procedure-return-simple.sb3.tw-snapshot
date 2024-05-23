@@ -27,14 +27,14 @@ yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, "`", nu
 retire(); return;
 }; })
 
-// Sprite1 simplest
+// Sprite1 Zsimplest
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
 return function funXYZ_simplest () {
 return "It works!";
 return "";
 }; })
 
-// Sprite1 nesting 1
+// Sprite1 Znesting 1
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
 return function funXYZ_nesting_1 () {
 thread.procedures["Znesting 2"]();
@@ -42,14 +42,14 @@ return (("" + thread.procedures["Znesting 3 %s %s"](6,7)) + ("" + thread.procedu
 return "";
 }; })
 
-// Sprite1 warp fib %s
+// Sprite1 Wwarp fib %s
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
 return function funXYZ_warp_fib_ (p0) {
 return thread.procedures["Wfib %s"](p0);
 return "";
 }; })
 
-// Sprite1 factorial %s
+// Sprite1 Wfactorial %s
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
 return function funXYZ_factorial_ (p0) {
 if (compareGreaterThan(p0, 1)) {
@@ -59,7 +59,7 @@ return 1;
 return "";
 }; })
 
-// Sprite1 no shadowing 1 %s %s
+// Sprite1 Zno shadowing 1 %s %s
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
 const b0 = runtime.getOpcodeFunction("looks_say");
 const b1 = stage.variables["`jEk@4|i[#Fk?(8x)AV.-my variable"];
@@ -78,21 +78,21 @@ yield* executeInCompatibilityLayer({"MESSAGE":"pass shadow check 3",}, b0, false
 return "";
 }; })
 
-// Sprite1 nesting 2
+// Sprite1 Znesting 2
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
 return function funXYZ_nesting_2 () {
 return "discard nesting 2";
 return "";
 }; })
 
-// Sprite1 nesting 3 %s %s
+// Sprite1 Znesting 3 %s %s
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
 return function funXYZ_nesting_3__ (p0,p1) {
 return ((+p0 || 0) * (+p1 || 0));
 return "";
 }; })
 
-// Sprite1 fib %s
+// Sprite1 Wfib %s
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
 return function funXYZ_fib_ (p0) {
 if (compareLessThan(p0, 2)) {
@@ -103,7 +103,7 @@ return ((+thread.procedures["Wfib %s"](((+p0 || 0) - 1)) || 0) + (+thread.proced
 return "";
 }; })
 
-// Sprite1 no shadowing 2 %s %s
+// Sprite1 Zno shadowing 2 %s %s
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
 return function funXYZ_no_shadowing_2__ (p0,p1) {
 return "discard shadow 2";

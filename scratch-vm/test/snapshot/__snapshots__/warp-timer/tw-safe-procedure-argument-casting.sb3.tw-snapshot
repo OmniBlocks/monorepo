@@ -18,7 +18,7 @@ yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, "$R-1lb
 retire(); return;
 }; })
 
-// Sprite1 switch %s
+// Sprite1 Zswitch %s
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
 return function funXYZ_switch_ (p0) {
 runtime.ext_scratch3_looks._setCostume(target, p0);

@@ -11,14 +11,14 @@ yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, "g", nu
 retire(); return;
 }; })
 
-// Sprite1 foo %s
+// Sprite1 Zfoo %s
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
 return function funXYZ_foo_ (p0) {
 return "";
 return "";
 }; })
 
-// Sprite1 no op
+// Sprite1 Zno op
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
 return function funXYZ_no_op () {
 return "";

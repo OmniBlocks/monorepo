@@ -96,7 +96,7 @@ const generateActualSnapshot = async testCase => {
     JSGenerator.testingApparatus = {
         report: (jsgen, factorySource) => {
             const targetName = jsgen.target.getName();
-            const scriptName = jsgen.script.procedureCode || 'script';
+            const scriptName = jsgen.script.procedureVariant || 'script';
             const js = normalizeJS(factorySource);
             generatedJS.push(`// ${targetName} ${scriptName}\n${js}`);
         }

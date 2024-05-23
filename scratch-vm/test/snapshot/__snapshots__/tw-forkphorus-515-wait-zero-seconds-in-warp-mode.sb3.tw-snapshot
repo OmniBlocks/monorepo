@@ -21,7 +21,7 @@ retire(); return;
 retire(); return;
 }; })
 
-// Sprite1 no refresh
+// Sprite1 Wno refresh
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
 const b0 = runtime.getOpcodeFunction("music_restForBeats");
 const b1 = runtime.getOpcodeFunction("music_playDrumForBeats");
@@ -41,14 +41,14 @@ runtime.ext_scratch3_motion._moveSteps(0, target);
 return "";
 }; })
 
-// Sprite1 runs below with no refresh
+// Sprite1 Wruns below with no refresh
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
 return function* genXYZ_runs_below_with_no_r () {
 yield* thread.procedures["Whas refresh"]();
 return "";
 }; })
 
-// Sprite1 has refresh
+// Sprite1 Whas refresh
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
 const b0 = runtime.getOpcodeFunction("music_restForBeats");
 const b1 = runtime.getOpcodeFunction("music_playDrumForBeats");

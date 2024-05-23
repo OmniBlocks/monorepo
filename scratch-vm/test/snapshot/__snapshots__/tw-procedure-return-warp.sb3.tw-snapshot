@@ -32,7 +32,7 @@ yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, "N", nu
 retire(); return;
 }; })
 
-// Sprite1 non warp
+// Sprite1 Znon warp
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
 const b0 = stage.variables["Go=PJS7BFXYo_qi2S:kQ"];
 const b1 = runtime.getOpcodeFunction("looks_say");
@@ -73,7 +73,7 @@ yield* executeInCompatibilityLayer({"MESSAGE":"pass non warp 2",}, b1, false, fa
 return "";
 }; })
 
-// Sprite1 verify runs warp %s
+// Sprite1 Wverify runs warp %s
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
 const b0 = stage.variables["Go=PJS7BFXYo_qi2S:kQ"];
 const b1 = runtime.getOpcodeFunction("looks_say");
@@ -95,7 +95,7 @@ return ("warp: " + ("" + p0));
 return "";
 }; })
 
-// Sprite1 verify runs non warp %s
+// Sprite1 Zverify runs non warp %s
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
 const b0 = stage.variables["Go=PJS7BFXYo_qi2S:kQ"];
 const b1 = runtime.getOpcodeFunction("looks_say");

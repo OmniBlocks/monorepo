@@ -16,7 +16,7 @@ yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, ",vD-ZG
 retire(); return;
 }; })
 
-// Sprite1 do something
+// Sprite1 Zdo something
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
 const b0 = stage.variables["`jEk@4|i[#Fk?(8x)AV.-my variable"];
 return function funXYZ_do_something () {

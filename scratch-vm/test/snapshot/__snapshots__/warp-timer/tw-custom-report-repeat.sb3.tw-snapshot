@@ -19,7 +19,7 @@ yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, "l", nu
 retire(); return;
 }; })
 
-// Sprite1 block name
+// Sprite1 Zblock name
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
 return function funXYZ_block_name () {
 return 40;

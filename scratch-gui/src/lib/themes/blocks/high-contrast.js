@@ -112,28 +112,30 @@ const extensions = {
     }
 };
 
+const clamp = (value, lower, upper) => Math.max(lower, Math.min(upper, value));
+
 const customExtensionColors = {
     primary: primary => {
         const hsv = hex2hsv(primary);
-        hsv[1] = Math.max(hsv[1] - 20, 0);
-        hsv[2] = Math.min(hsv[2] + 20, 100);
+        hsv[1] = clamp(hsv[1] - 20, 0, 50);
+        hsv[2] = clamp(hsv[2] + 20, 80, 100);
         return hsv2hex(hsv);
     },
     secondary: primary => {
         const hsv = hex2hsv(primary);
-        hsv[1] = Math.max(hsv[1] - 40, 0);
-        hsv[2] = Math.min(hsv[2] + 20, 100);
+        hsv[1] = clamp(hsv[1] - 40, 0, 50);
+        hsv[2] = clamp(hsv[2] + 20, 80, 100);
         return hsv2hex(hsv);
     },
     tertiary: primary => {
         const hsv = hex2hsv(primary);
-        hsv[2] = Math.max(hsv[2] - 20, 20);
+        hsv[2] = clamp(hsv[2] - 20, 0, 100);
         return hsv2hex(hsv);
     },
     quaternary: primary => {
         const hsv = hex2hsv(primary);
-        hsv[1] = Math.max(hsv[1] - 60, 0);
-        hsv[2] = Math.min(hsv[2] + 20, 100);
+        hsv[1] = clamp(hsv[1] - 60, 0, 100);
+        hsv[2] = clamp(hsv[2] + 20, 90, 100);
         return hsv2hex(hsv);
     },
     categoryIconBackground: primary => customExtensionColors.primary(primary),

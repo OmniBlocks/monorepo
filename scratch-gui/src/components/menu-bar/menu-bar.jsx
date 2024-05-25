@@ -537,6 +537,7 @@ class MenuBar extends React.Component {
                             canChangeLanguage={this.props.canChangeLanguage}
                             canChangeTheme={this.props.canChangeTheme}
                             isRtl={this.props.isRtl}
+                            onClickDesktopSettings={this.props.onClickDesktopSettings}
                             // eslint-disable-next-line react/jsx-no-bind
                             onOpenCustomSettings={this.props.onClickAddonSettings.bind(null, 'editor-theme3')}
                             onRequestClose={this.props.onRequestCloseSettings}
@@ -1079,6 +1080,7 @@ MenuBar.propTypes = {
     ]),
     onClickAccount: PropTypes.func,
     onClickAddonSettings: PropTypes.func,
+    onClickDesktopSettings: PropTypes.func,
     onClickPackager: PropTypes.func,
     onClickRestorePoints: PropTypes.func,
     onClickEdit: PropTypes.func,

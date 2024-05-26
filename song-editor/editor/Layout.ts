@@ -67,9 +67,6 @@ export class Layout {
 				.beepboxEditor.selectRow {
 					height: 2em;
 				}
-				.beepboxEditor .operatorRow {
-					height: 2em;
-				}
 				.beepboxEditor .trackAndMuteContainer {
 					max-height: 446px;
 				}
@@ -336,9 +333,6 @@ export class Layout {
 				.beepboxEditor.selectRow {
 					height: 2em;
 				}
-				.beepboxEditor .operatorRow {
-					height: 2em;
-				}
 				.beepboxEditor .trackAndMuteContainer {
 					max-height: 446px;
 				}
@@ -418,9 +412,6 @@ export class Layout {
 					display: none;
 				}
 				.beepboxEditor.selectRow {
-					height: 2em;
-				}
-				.beepboxEditor .operatorRow {
 					height: 2em;
 				}
 				.beepboxEditor .trackAndMuteContainer {
@@ -507,9 +498,6 @@ export class Layout {
 					display: none;
 				}
 				.beepboxEditor.selectRow {
-					height: 2em;
-				}
-				.beepboxEditor .operatorRow {
 					height: 2em;
 				}
 				.beepboxEditor .trackAndMuteContainer {

@@ -1,11 +1,13 @@
 {
 	"name": "UltraBox",
-	"version": "2.2.4",
+	"version": "2.2.8",
 	"description": "UltraBox is a mod of BeepBox that aims to combine every other beepmod into one.",
 	"author": "Main",
 	"contributors": [
 		"Neputendo",
-		"LeoV"
+		"LeoV",
+		"Mid",
+		"Choptop84"
 	],
 	"license": "MIT",
 	"homepage": "https://ultraabox.github.io",

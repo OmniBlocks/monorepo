@@ -2011,6 +2011,7 @@ export class Instrument {
                             this.drumsetSpectrumWaves[j].spectrum[i] = Math.max(0, Math.min(Config.spectrumMax, Math.round(Config.spectrumMax * (+drum["spectrum"][i]) / 100)));
                         }
                     }
+                    this.drumsetSpectrumWaves[j].markCustomWaveDirty();
                 }
             }
         }
@@ -2510,7 +2511,7 @@ export class Song {
         this.patternInstruments = false;
 
         this.title = "Unnamed";
-        document.title = EditorConfig.versionDisplayName;
+        document.title = this.title + " - " + EditorConfig.versionDisplayName;
 
         if (andResetChannels) {
             this.pitchChannelCount = 3;

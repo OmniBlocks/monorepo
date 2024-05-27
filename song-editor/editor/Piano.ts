@@ -435,15 +435,15 @@ export class Piano {
 						}
 						break;
 					case 2:
-						channelVal = instrument.modChannels[Config.modCount - j - 1] + 1 - this._doc.song.pitchChannelCount;
-						instrumentsLength = this._doc.song.channels[channelVal - 1].instruments.length;
+						const absoluteChannelVal: number = instrument.modChannels[Config.modCount - j - 1];
+						const relativeChannelVal: number = absoluteChannelVal - this._doc.song.pitchChannelCount;
 
-						if (this._doc.song.channels[channelVal - 1].name == "") {
+						if (this._doc.song.channels[absoluteChannelVal].name == "") {
 
 							if (instrumentsLength > 1) {
 
-								if (channelVal >= 10 || instrumentVal >= 10) {
-									firstRow = "N" + channelVal;
+								if ((relativeChannelVal + 1) >= 10 || instrumentVal >= 10) {
+									firstRow = "N" + (relativeChannelVal + 1);
 									if (instrumentVal - 1 == instrumentsLength) {
 										firstRow += " All";
 									}
@@ -455,7 +455,7 @@ export class Piano {
 									}
 								}
 								else {
-									firstRow = "Noise" + channelVal;
+									firstRow = "Noise" + (relativeChannelVal + 1);
 									if (instrumentVal - 1 == instrumentsLength) {
 										firstRow += " All";
 									}
@@ -468,7 +468,7 @@ export class Piano {
 								}
 							}
 							else {
-								firstRow = "Noise " + channelVal;
+								firstRow = "Noise " + (relativeChannelVal + 1);
 							}
 						} else {
 
@@ -482,10 +482,10 @@ export class Piano {
 								} else {
 									insText = " I" + instrumentVal;
 								}
-								firstRow = "N" + channelVal + " " + this._doc.song.channels[channelVal - 1].name + insText;
+								firstRow = "N" + (relativeChannelVal + 1) + " " + this._doc.song.channels[absoluteChannelVal].name + insText;
 							}
 							else {
-								firstRow = "N" + channelVal + " " + this._doc.song.channels[channelVal - 1].name;
+								firstRow = "N" + (relativeChannelVal + 1) + " " + this._doc.song.channels[absoluteChannelVal].name;
 							}
 
 						}

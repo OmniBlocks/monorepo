@@ -66,9 +66,6 @@ export class Layout {
 				.beepboxEditor.selectRow {
 					height: 2em;
 				}
-				.beepboxEditor .operatorRow {
-					heiht: 2em;
-				}
 				.beepboxEditor .trackAndMuteContainer {
 					max-height: 446px;
 				}

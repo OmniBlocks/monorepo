@@ -2783,25 +2783,15 @@ export class ChangeEnvelopePitchEnd extends Change {
 }
 
 export class ChangeEnvelopeInverse extends Change {
-    constructor(doc: SongDocument, value: boolean, index: number, type: string) {
+    constructor(doc: SongDocument, value: boolean, index: number) {
         super();
         const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
-        if (type == "pitch") {
-            const oldValue: boolean = instrument.pitchEnvelopeInverse[index];
-            if (oldValue != value) {
-                instrument.pitchEnvelopeInverse[index] = value;
-                instrument.preset = instrument.type;
-                doc.notifier.changed();
-                this._didSomething();
-            }
-        } else if (type == "noteSize") {
-            const oldValue: boolean = instrument.noteSizeEnvelopeInverse[index];
-            if (oldValue != value) {
-                instrument.noteSizeEnvelopeInverse[index] = value;
-                instrument.preset = instrument.type;
-                doc.notifier.changed();
-                this._didSomething();
-            }
+        const oldValue: boolean = instrument.envelopeInverse[index];
+        if (oldValue != value) {
+            instrument.envelopeInverse[index] = value;
+            instrument.preset = instrument.type;
+            doc.notifier.changed();
+            this._didSomething();
         }
     }
 }

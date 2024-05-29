@@ -831,16 +831,16 @@ var beepbox = (function (exports) {
         { name: "wibble 1", type: 10, speed: 24.0 },
         { name: "wibble 2", type: 10, speed: 12.0 },
         { name: "wibble 3", type: 10, speed: 4.0 },
-        { name: "linear decay-2", type: 12, speed: 256.0 },
-        { name: "linear decay-1", type: 12, speed: 128.0 },
-        { name: "linear decay 1", type: 12, speed: 32.0 },
-        { name: "linear decay 2", type: 12, speed: 8.0 },
-        { name: "linear decay 3", type: 12, speed: 2.0 },
-        { name: "linear rise -2", type: 13, speed: 256.0 },
-        { name: "linear rise -1", type: 13, speed: 128.0 },
-        { name: "linear rise 1", type: 13, speed: 32.0 },
-        { name: "linear rise 2", type: 13, speed: 8.0 },
-        { name: "linear rise 3", type: 13, speed: 2.0 },
+        { name: "linear-2", type: 12, speed: 256.0 },
+        { name: "linear-1", type: 12, speed: 128.0 },
+        { name: "linear 1", type: 12, speed: 32.0 },
+        { name: "linear 2", type: 12, speed: 8.0 },
+        { name: "linear 3", type: 12, speed: 2.0 },
+        { name: "rise -2", type: 13, speed: 256.0 },
+        { name: "rise -1", type: 13, speed: 128.0 },
+        { name: "rise 1", type: 13, speed: 32.0 },
+        { name: "rise 2", type: 13, speed: 8.0 },
+        { name: "rise 3", type: 13, speed: 2.0 },
         { name: "flute 1", type: 9, speed: 16.0 },
         { name: "flute 2", type: 9, speed: 8.0 },
         { name: "flute 3", type: 9, speed: 4.0 },
@@ -4951,6 +4951,118 @@ var beepbox = (function (exports) {
 			--mod-primary-note-sat: 100;
 			--mod-primary-note-sat-scale: 0;
 			--mod-primary-note-lum: 910;
+			--mod-primary-note-lum-scale: 0;
+			--disabled-note-primary: #c6c6c6;
+			--disabled-note-secondary: #8c8c8c;
+		}`,
+        "greyscale": `:root {
+			--page-margin: #000;
+			--editor-background: #000;
+			--hover-preview: #808080;
+			--playhead: #808080;
+			--primary-text: white;
+			--secondary-text: #cccccc;
+			--inverted-text: black;
+			--text-selection: #696969;
+			--box-selection-fill: #cccccc40;
+			--loop-accent: #808080;
+			--link-accent: white;
+			--ui-widget-background: #232323;
+			--ui-widget-focus: #303030;
+			--pitch-background: #1a1a1a;
+			--tonic: #262626;
+			--fifth-note: #0d0d0d;
+			--white-piano-key: #808080;
+			--black-piano-key: #232323;
+			--use-color-formula: true;
+			--track-editor-bg-pitch: #262626;
+			--track-editor-bg-pitch-dim: #1a1a1a;
+			--track-editor-bg-noise: #262626;
+			--track-editor-bg-noise-dim: #1a1a1a;
+			--track-editor-bg-mod: #262626;
+			--track-editor-bg-mod-dim: #1a1a1a;
+			--multiplicative-mod-slider: #808080;
+			--overwriting-mod-slider: #808080;
+			--indicator-primary: #808080;
+			--indicator-secondary: #333333;
+			--select2-opt-group: #232323;
+			--input-box-outline: #222;
+			--mute-button-normal: #808080;
+			--mute-button-mod: #808080;
+			--mod-label-primary: #232323;
+			--mod-label-secondary-text: #696969;
+			--mod-label-primary-text: #cdcdcd;
+			--pitch-secondary-channel-hue: 0;
+			--pitch-secondary-channel-hue-scale: 25;
+			--pitch-secondary-channel-sat: 10;
+			--pitch-secondary-channel-sat-scale: 0.1;
+			--pitch-secondary-channel-lum: 70;
+			--pitch-secondary-channel-lum-scale: 0;
+			--pitch-primary-channel-hue: 0;
+			--pitch-primary-channel-hue-scale: 25;
+			--pitch-primary-channel-sat: 50;
+			--pitch-primary-channel-sat-scale: 0.1;
+			--pitch-primary-channel-lum: 95;
+			--pitch-primary-channel-lum-scale: 0;
+			--pitch-secondary-note-hue: 0;
+			--pitch-secondary-note-hue-scale: 25;
+			--pitch-secondary-note-sat: 10;
+			--pitch-secondary-note-sat-scale: 0.1;
+			--pitch-secondary-note-lum: 70;
+			--pitch-secondary-note-lum-scale: 0;
+			--pitch-primary-note-hue: 0;
+			--pitch-primary-note-hue-scale: 25;
+			--pitch-primary-note-sat: 50;
+			--pitch-primary-note-sat-scale: 0.1;
+			--pitch-primary-note-lum: 95;
+			--pitch-primary-note-lum-scale: 0;
+			--noise-secondary-channel-hue: 125;
+			--noise-secondary-channel-hue-scale: 50;
+			--noise-secondary-channel-sat: 10;
+			--noise-secondary-channel-sat-scale: 0.1;
+			--noise-secondary-channel-lum: 70;
+			--noise-secondary-channel-lum-scale: 0;
+			--noise-primary-channel-hue: 125;
+			--noise-primary-channel-hue-scale: 50;
+			--noise-primary-channel-sat: 50;
+			--noise-primary-channel-sat-scale: 0.1;
+			--noise-primary-channel-lum: 95;
+			--noise-primary-channel-lum-scale: 0;
+			--noise-secondary-note-hue: 125;
+			--noise-secondary-note-hue-scale: 50;
+			--noise-secondary-note-sat: 10;
+			--noise-secondary-note-sat-scale: 0.1;
+			--noise-secondary-note-lum: 70;
+			--noise-secondary-note-lum-scale: 0;
+			--noise-primary-note-hue: 125;
+			--noise-primary-note-hue-scale: 50;
+			--noise-primary-note-sat: 50;
+			--noise-primary-note-sat-scale: 0.1;
+			--noise-primary-note-lum: 95;
+			--noise-primary-note-lum-scale: 0;
+			--mod-secondary-channel-hue: 255;
+			--mod-secondary-channel-hue-scale: 75;
+			--mod-secondary-channel-sat: 10;
+			--mod-secondary-channel-sat-scale: 0;
+			--mod-secondary-channel-lum: 70;
+			--mod-secondary-channel-lum-scale: 0;
+			--mod-primary-channel-hue: 255;
+			--mod-primary-channel-hue-scale: 75;
+			--mod-primary-channel-sat: 50;
+			--mod-primary-channel-sat-scale: 0;
+			--mod-primary-channel-lum: 95;
+			--mod-primary-channel-lum-scale: 0;
+			--mod-secondary-note-hue: 255;
+			--mod-secondary-note-hue-scale: 75;
+			--mod-secondary-note-sat: 10;
+			--mod-secondary-note-sat-scale: 0;
+			--mod-secondary-note-lum: 70;
+			--mod-secondary-note-lum-scale: 0;
+			--mod-primary-note-hue: 255;
+			--mod-primary-note-hue-scale: 75;
+			--mod-primary-note-sat: 50;
+			--mod-primary-note-sat-scale: 0;
+			--mod-primary-note-lum: 95;
 			--mod-primary-note-lum-scale: 0;
 			--disabled-note-primary: #c6c6c6;
 			--disabled-note-secondary: #8c8c8c;
@@ -10465,7 +10577,6 @@ var beepbox = (function (exports) {
             const harmonicsRendered = (instrumentType == 7) ? Config.harmonicsRenderedForPickedString : Config.harmonicsRendered;
             const waveLength = Config.harmonicsWavelength;
             const retroWave = getDrumWave(0, null, null);
-            console.log(retroWave);
             if (this.wave == null || this.wave.length != waveLength + 1) {
                 this.wave = new Float32Array(waveLength + 1);
             }
@@ -11004,8 +11115,7 @@ var beepbox = (function (exports) {
             this.envelopeCount = 0;
             this.pitchEnvelopeStart = [];
             this.pitchEnvelopeEnd = [];
-            this.pitchEnvelopeInverse = [];
-            this.noteSizeEnvelopeInverse = [];
+            this.envelopeInverse = [];
             this.transition = Config.transitions.dictionary["normal"].index;
             this.pitchShift = 0;
             this.detune = 0;
@@ -11146,8 +11256,7 @@ var beepbox = (function (exports) {
             this.envelopeCount = 0;
             this.pitchEnvelopeStart = [];
             this.pitchEnvelopeEnd = [];
-            this.pitchEnvelopeInverse = [];
-            this.noteSizeEnvelopeInverse = [];
+            this.envelopeInverse = [];
             switch (type) {
                 case 0:
                     this.chipWave = 2;
@@ -11609,8 +11718,7 @@ var beepbox = (function (exports) {
                 envelopes.push(this.envelopes[i].toJsonObject());
                 instrumentObject["pitchEnvelopeStart" + i] = this.pitchEnvelopeStart[i];
                 instrumentObject["pitchEnvelopeEnd" + i] = this.pitchEnvelopeEnd[i];
-                instrumentObject["pitchEnvelopeInverse" + i] = this.pitchEnvelopeInverse[i];
-                instrumentObject["noteSizeEnvelopeInverse" + i] = this.noteSizeEnvelopeInverse[i];
+                instrumentObject["envelopeInverse" + i] = this.envelopeInverse[i];
             }
             instrumentObject["envelopes"] = envelopes;
             return instrumentObject;
@@ -12256,24 +12364,17 @@ var beepbox = (function (exports) {
                         else {
                             pitchEnvelopeEnd = isNoiseChannel ? 11 : 96;
                         }
-                        let pitchEnvelopeInverse;
-                        if (instrumentObject["pitchEnvelopeInverse"] != undefined) {
-                            pitchEnvelopeInverse = instrumentObject["pitchEnvelopeInverse"];
+                        let envelopeInverse;
+                        if (instrumentObject["envelopeInverse" + i] != undefined) {
+                            envelopeInverse = instrumentObject["envelopeInverse" + i];
                         }
-                        else if (instrumentObject["pitchEnvelopeInverse" + i] != undefined) {
-                            pitchEnvelopeInverse = instrumentObject["pitchEnvelopeInverse" + i];
-                        }
-                        else {
-                            pitchEnvelopeInverse = false;
-                        }
-                        let noteSizeEnvelopeInverse;
-                        if (instrumentObject["noteSizeEnvelopeInverse" + i] != undefined) {
-                            noteSizeEnvelopeInverse = instrumentObject["noteSizeEnvelopeInverse" + i];
+                        else if (instrumentObject["pitchEnvelopeInverse"] != undefined) {
+                            envelopeInverse = instrumentObject["pitchEnvelopeInverse"];
                         }
                         else {
-                            noteSizeEnvelopeInverse = false;
+                            envelopeInverse = false;
                         }
-                        this.addEnvelope(tempEnvelope.target, tempEnvelope.index, tempEnvelope.envelope, pitchEnvelopeStart, pitchEnvelopeEnd, pitchEnvelopeInverse, noteSizeEnvelopeInverse);
+                        this.addEnvelope(tempEnvelope.target, tempEnvelope.index, tempEnvelope.envelope, pitchEnvelopeStart, pitchEnvelopeEnd, envelopeInverse);
                     }
                 }
             }
@@ -12317,7 +12418,7 @@ var beepbox = (function (exports) {
         static frequencyFromPitch(pitch) {
             return 440.0 * Math.pow(2.0, (pitch - 69.0) / 12.0);
         }
-        addEnvelope(target, index, envelope, start = 0, end = -1, pitchInverse = false, noteSizeInverse = false) {
+        addEnvelope(target, index, envelope, start = 0, end = -1, inverse = false) {
             end = end != -1 ? end : this.isNoiseInstrument ? 11 : 96;
             let makeEmpty = false;
             if (!this.supportsEnvelopeTarget(target, index))
@@ -12333,8 +12434,7 @@ var beepbox = (function (exports) {
             this.envelopeCount++;
             this.pitchEnvelopeStart[envelopeSettings.index] = start;
             this.pitchEnvelopeEnd[envelopeSettings.index] = end;
-            this.pitchEnvelopeInverse[envelopeSettings.index] = pitchInverse;
-            this.noteSizeEnvelopeInverse[envelopeSettings.index] = noteSizeInverse;
+            this.envelopeInverse[envelopeSettings.index] = inverse;
         }
         supportsEnvelopeTarget(target, index) {
             const automationTarget = Config.instrumentAutomationTargets[target];
@@ -12744,17 +12844,6 @@ var beepbox = (function (exports) {
                         }
                         harmonicsBits.encodeBase64(buffer);
                     }
-                    if (instrument.type == 12) {
-                        buffer.push(89);
-                        const additiveBits = new BitFieldWriter();
-                        const waveTypes = new BitFieldWriter();
-                        for (let i = 0; i < Config.additiveControlPointBits; i++) {
-                            additiveBits.write(Config.additiveControlPointBits, instrument.additiveWave.additives[i]);
-                            waveTypes.write(3, instrument.additiveWave.waveTypes[i]);
-                        }
-                        additiveBits.encodeBase64(buffer);
-                        waveTypes.encodeBase64(buffer);
-                    }
                     if (instrument.type == 0) {
                         if (instrument.chipWave > 186) {
                             buffer.push(119, base64IntToCharCode[instrument.chipWave - 186]);
@@ -12930,8 +13019,7 @@ var beepbox = (function (exports) {
                         buffer.push(base64IntToCharCode[instrument.envelopes[envelopeIndex].envelope]);
                         buffer.push(base64IntToCharCode[instrument.pitchEnvelopeStart[envelopeIndex] >> 6], base64IntToCharCode[instrument.pitchEnvelopeStart[envelopeIndex] & 0x3f]);
                         buffer.push(base64IntToCharCode[instrument.pitchEnvelopeEnd[envelopeIndex] >> 6], base64IntToCharCode[instrument.pitchEnvelopeEnd[envelopeIndex] & 0x3f]);
-                        let inverse = (instrument.pitchEnvelopeInverse[envelopeIndex] ? 1 : 0) + (instrument.noteSizeEnvelopeInverse[envelopeIndex] ? 2 : 0);
-                        buffer.push(base64IntToCharCode[inverse]);
+                        buffer.push(base64IntToCharCode[(+instrument.envelopeInverse[envelopeIndex])] ? base64IntToCharCode[(+instrument.envelopeInverse[envelopeIndex])] : base64IntToCharCode[0]);
                     }
                 }
             }
@@ -13889,7 +13977,7 @@ var beepbox = (function (exports) {
                                 const pregoldToEnvelope = [0, 1, 2, 4, 5, 6, 8, 9, 10, 12, 13, 14, 16, 17, 18, 19, 20, 21, 23, 24, 25, 27, 28, 29, 32, 33, 34, 31, 11];
                                 const legacySettings = legacySettingsCache[instrumentChannelIterator][instrumentIndexIterator];
                                 let aa = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
-                                if ((beforeTwo && fromGoldBox) || (!fromGoldBox && !fromUltraBox))
+                                if ((beforeTwo && fromGoldBox) || (!fromGoldBox && !fromUltraBox && !fromSlarmoosBox))
                                     aa = pregoldToEnvelope[aa];
                                 legacySettings.pulseEnvelope = Song._envelopeFromLegacyIndex(aa);
                                 instrument.convertLegacySettings(legacySettings, forceSimpleFilter);
@@ -14608,16 +14696,6 @@ var beepbox = (function (exports) {
                                     instrument.envelopeSpeed = clamp(0, Config.modulators.dictionary["envelope speed"].maxRawVol + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                                     instrument.discreteEnvelope = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)]) ? true : false;
                                 }
-                                let instrumentPitchEnvelopeStart = 0;
-                                let instrumentPitchEnvelopeEnd = 96;
-                                let instrumentPitchEnvelopeInverse = false;
-                                if (fromSlarmoosBox && beforeTwo) {
-                                    let pitchEnvelopeCompact = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
-                                    instrumentPitchEnvelopeStart = pitchEnvelopeCompact * 63 + base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
-                                    pitchEnvelopeCompact = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
-                                    instrumentPitchEnvelopeEnd = pitchEnvelopeCompact * 63 + base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
-                                    instrumentPitchEnvelopeInverse = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] === 1 ? true : false;
-                                }
                                 for (let i = 0; i < envelopeCount; i++) {
                                     const target = clamp(0, Config.instrumentAutomationTargets.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                                     let index = 0;
@@ -14639,15 +14717,22 @@ var beepbox = (function (exports) {
                                         instrument.pitchEnvelopeStart[i] = pitchEnvelopeCompact * 63 + base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                                         pitchEnvelopeCompact = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                                         instrument.pitchEnvelopeEnd[i] = pitchEnvelopeCompact * 63 + base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
-                                        const inverse = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
-                                        instrument.pitchEnvelopeInverse[i] = inverse % 2 === 1 ? true : false;
-                                        instrument.noteSizeEnvelopeInverse[i] = Math.floor(inverse / 2) == 1 ? true : false;
+                                        instrument.envelopeInverse[i] = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] == 1 ? true : false;
                                     }
-                                    else if (fromSlarmoosBox && beforeTwo) {
+                                }
+                                let instrumentPitchEnvelopeStart = 0;
+                                let instrumentPitchEnvelopeEnd = 96;
+                                let instrumentEnvelopeInverse = false;
+                                if (fromSlarmoosBox && beforeTwo) {
+                                    let pitchEnvelopeCompact = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                                    instrumentPitchEnvelopeStart = pitchEnvelopeCompact * 63 + base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                                    pitchEnvelopeCompact = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                                    instrumentPitchEnvelopeEnd = pitchEnvelopeCompact * 63 + base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                                    instrumentEnvelopeInverse = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] === 1 ? true : false;
+                                    for (let i = 0; i < envelopeCount; i++) {
                                         instrument.pitchEnvelopeStart[i] = instrumentPitchEnvelopeStart;
                                         instrument.pitchEnvelopeEnd[i] = instrumentPitchEnvelopeEnd;
-                                        instrument.pitchEnvelopeInverse[i] = instrumentPitchEnvelopeInverse;
-                                        instrument.noteSizeEnvelopeInverse[i] = false;
+                                        instrument.envelopeInverse[i] = instrumentEnvelopeInverse;
                                     }
                                 }
                             }
@@ -14726,23 +14811,6 @@ var beepbox = (function (exports) {
                             }
                             instrument.harmonicsWave.markCustomWaveDirty();
                             charIndex += byteCount;
-                        }
-                        break;
-                    case 89:
-                        {
-                            const instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
-                            const byteCount = Math.ceil(Config.additiveControlPoints * Config.additiveControlPointBits / 6);
-                            const bits = new BitFieldReader(compressed, charIndex, charIndex + byteCount);
-                            for (let i = 0; i < Config.additiveControlPoints; i++) {
-                                instrument.additiveWave.additives[i] = bits.read(Config.additiveControlPointBits);
-                            }
-                            instrument.additiveWave.markCustomWaveDirty();
-                            charIndex += byteCount;
-                            const wavesByteCount = Math.ceil(Config.additiveControlPoints * 3 / 6);
-                            const wavesBits = new BitFieldReader(compressed, charIndex, charIndex + wavesByteCount);
-                            for (let i = 0; i < Config.additiveControlPoints; i++) {
-                                instrument.additiveWave.waveTypes[i] = wavesBits.read(3);
-                            }
                         }
                         break;
                     case 88:
@@ -16480,8 +16548,8 @@ var beepbox = (function (exports) {
             switch (envelope.type) {
                 case 0: return 1.0;
                 case 1:
-                    if (instrument.noteSizeEnvelopeInverse[index]) {
-                        return 1 - Synth.noteSizeToVolumeMult(noteSize);
+                    if (instrument.envelopeInverse[index]) {
+                        return 1.0 - Synth.noteSizeToVolumeMult(noteSize);
                     }
                     else {
                         return Synth.noteSizeToVolumeMult(noteSize);
@@ -16498,7 +16566,7 @@ var beepbox = (function (exports) {
                     if (index !== -2) {
                         startNote = instrument.pitchEnvelopeStart[index];
                         endNote = instrument.pitchEnvelopeEnd[index];
-                        inverse = instrument.pitchEnvelopeInverse[index];
+                        inverse = instrument.envelopeInverse[index];
                     }
                     if (song) {
                         basePitch = Config.keys[song.key].basePitch + (Config.pitchesPerOctave * song.octave);
@@ -16533,30 +16601,93 @@ var beepbox = (function (exports) {
                             return (basePitch + pitch - startNote) / range;
                         }
                     }
-                case 5: return 1.0 / (1.0 + time * envelope.speed);
-                case 6: return 1.0 - 1.0 / (1.0 + time * envelope.speed);
-                case 7: return 0.5 - Math.cos(beats * 2.0 * Math.PI * envelope.speed) * 0.5;
-                case 8: return 0.75 - Math.cos(beats * 2.0 * Math.PI * envelope.speed) * 0.25;
-                case 3: return Math.max(1.0, 2.0 - time * 10.0);
+                case 5:
+                    if (instrument.envelopeInverse[index]) {
+                        return 1.0 - (1.0 / (1.0 + time * envelope.speed));
+                    }
+                    else {
+                        return 1.0 / (1.0 + time * envelope.speed);
+                    }
+                case 6:
+                    if (instrument.envelopeInverse[index]) {
+                        return 1.0 / (1.0 + time * envelope.speed);
+                    }
+                    else {
+                        return 1.0 - 1.0 / (1.0 + time * envelope.speed);
+                    }
+                case 7:
+                    if (instrument.envelopeInverse[index]) {
+                        return 0.5 + Math.cos(beats * 2.0 * Math.PI * envelope.speed) * 0.5;
+                    }
+                    else {
+                        return 0.5 - Math.cos(beats * 2.0 * Math.PI * envelope.speed) * 0.5;
+                    }
+                case 8:
+                    if (instrument.envelopeInverse[index]) {
+                        return 0.25 + Math.cos(beats * 2.0 * Math.PI * envelope.speed) * 0.25;
+                    }
+                    else {
+                        return 0.75 - Math.cos(beats * 2.0 * Math.PI * envelope.speed) * 0.25;
+                    }
+                case 3:
+                    if (instrument.envelopeInverse[index]) {
+                        return 2.0 - Math.max(1.0, 2.0 - time * 10.0);
+                    }
+                    else {
+                        return Math.max(1.0, 2.0 - time * 10.0);
+                    }
                 case 4:
-                    const attack = 0.25 / Math.sqrt(envelope.speed);
-                    return time < attack ? time / attack : 1.0 / (1.0 + (time - attack) * envelope.speed);
-                case 9: return Math.pow(2, -envelope.speed * time);
-                case 14: return 1.0 * +(time < (0.25 / Math.sqrt(envelope.speed)));
+                    if (instrument.envelopeInverse[index]) {
+                        const attack = 0.25 / Math.sqrt(envelope.speed);
+                        return 1.0 - (time < attack ? time / attack : 1.0 / (1.0 + (time - attack) * envelope.speed));
+                    }
+                    else {
+                        const attack = 0.25 / Math.sqrt(envelope.speed);
+                        return time < attack ? time / attack : 1.0 / (1.0 + (time - attack) * envelope.speed);
+                    }
+                case 9:
+                    if (instrument.envelopeInverse[index]) {
+                        return 1.0 - Math.pow(2, -envelope.speed * time);
+                    }
+                    else {
+                        return Math.pow(2, -envelope.speed * time);
+                    }
+                case 14:
+                    if (instrument.envelopeInverse[index]) {
+                        return 1.0 - +(time < (0.25 / Math.sqrt(envelope.speed)));
+                    }
+                    else {
+                        return 1.0 * +(time < (0.25 / Math.sqrt(envelope.speed)));
+                    }
                 case 10:
                     let temp = 0.5 - Math.cos(beats * envelope.speed) * 0.5;
                     temp = 1.0 / (1.0 + time * (envelope.speed - (temp / (1.5 / envelope.speed))));
                     temp = temp > 0.0 ? temp : 0.0;
-                    return temp;
+                    if (instrument.envelopeInverse[index]) {
+                        return 1.0 - temp;
+                    }
+                    else {
+                        return temp;
+                    }
                 case 12: {
                     let lin = (1.0 - (time / (16 / envelope.speed)));
                     lin = lin > 0.0 ? lin : 0.0;
-                    return lin;
+                    if (instrument.envelopeInverse[index]) {
+                        return 1.0 - lin;
+                    }
+                    else {
+                        return lin;
+                    }
                 }
                 case 13: {
                     let lin = (time / (16 / envelope.speed));
                     lin = lin < 1.0 ? lin : 1.0;
-                    return lin;
+                    if (instrument.envelopeInverse[index]) {
+                        return 1.0 - lin;
+                    }
+                    else {
+                        return lin;
+                    }
                 }
                 default: throw new Error("Unrecognized operator envelope type.");
             }

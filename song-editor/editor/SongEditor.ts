@@ -1789,11 +1789,7 @@ export class SongEditor {
             case DropdownID.EnvelopeSettings:
                 target = this._envelopeEditor._extraSettingsDropdowns[submenu];
                 this._envelopeEditor._openExtraSettingsDropdowns[submenu] = this._envelopeEditor._openExtraSettingsDropdowns[submenu] ? false : true;
-                if (subtype == "pitch") {
-                    group = this._envelopeEditor._extraPitchSettingsDropdownGroups[submenu];
-                } else if (subtype == "note size") {
-                    group = this._envelopeEditor._extraNoteSizeSettingsDropdownGroups[submenu];
-                }
+                group = this._envelopeEditor._extraSettingsDropdownGroups[submenu];
                 break;
         }
 
@@ -1802,6 +1798,11 @@ export class SongEditor {
             target.textContent = "▲";
             if (dropdown == DropdownID.EnvelopeSettings) {
                 group.style.display = "flex";
+                if (subtype == "pitch") { 
+                    this._envelopeEditor._extraPitchSettingsGroups[submenu].style.display = "flex";
+                } else {
+                    this._envelopeEditor._extraPitchSettingsGroups[submenu].style.display = "none";
+                }
             } else if (group != this._chordDropdownGroup) {
                 group.style.display = "";
             } // Only show arpeggio dropdown if chord arpeggiates
@@ -1826,6 +1827,9 @@ export class SongEditor {
             }
             target.textContent = "▼";
             group.style.display = "none";
+            if (subtype == "pitch") {
+                this._envelopeEditor._extraPitchSettingsGroups[submenu].style.display = "none";
+            }
         }
     }
 
@@ -3975,6 +3979,11 @@ export class SongEditor {
 
                 if (event.ctrlKey || event.metaKey) {
                     this._doc.selection.insertChannel();
+                } else if (event.shiftKey) {
+                    const width = this._doc.selection.boxSelectionWidth
+                    this._doc.selection.boxSelectionX0 -= width;
+                    this._doc.selection.boxSelectionX1 -= width;
+                    this._doc.selection.insertBars();
                 } else {
                     this._doc.selection.insertBars();
                 }

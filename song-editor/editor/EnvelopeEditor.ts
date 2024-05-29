@@ -3,9 +3,8 @@
 import { InstrumentType, Config } from "../synth/SynthConfig";
 import { Instrument } from "../synth/synth";
 import { SongDocument } from "./SongDocument";
-import { ChangeSetEnvelopeTarget, ChangeSetEnvelopeType, ChangeRemoveEnvelope } from "./changes";
+import { ChangeSetEnvelopeTarget, ChangeSetEnvelopeType, ChangeRemoveEnvelope, ChangeEnvelopePitchStart, ChangeEnvelopePitchEnd, ChangeEnvelopeInverse } from "./changes";
 import { HTML } from "imperative-html/dist/esm/elements-strict";
-import { ChangeEnvelopePitchStart, ChangeEnvelopePitchEnd, ChangeEnvelopeInverse } from "./changes";
 import { DropdownID } from "../synth/SynthConfig";
 
 export class EnvelopeEditor {
@@ -16,15 +15,14 @@ export class EnvelopeEditor {
 	private readonly _envelopeSelects: HTMLSelectElement[] = [];
 	private readonly _deleteButtons: HTMLButtonElement[] = [];
 	public readonly _extraSettingsDropdowns: HTMLButtonElement[] = []; //need to be accessed in SongEditor to function
-	public readonly _extraPitchSettingsDropdownGroups: HTMLDivElement[] = [];
-	public readonly _extraNoteSizeSettingsDropdownGroups: HTMLDivElement[] = [];
+	public readonly _extraPitchSettingsGroups: HTMLDivElement[] = [];
+	public readonly _extraSettingsDropdownGroups: HTMLDivElement[] = [];
 	public readonly _openExtraSettingsDropdowns: Boolean[] = [];
 	private readonly _pitchStartSliders: HTMLInputElement[] = [];
 	public readonly _pitchStartBoxes: HTMLInputElement[] = [];
 	private readonly _pitchEndSliders: HTMLInputElement[] = [];
 	public readonly _pitchEndBoxes: HTMLInputElement[] = [];
-	private readonly _pitchInverters: HTMLInputElement[] = [];
-	private readonly _noteSizeInverters: HTMLInputElement[] = [];
+	private readonly _inverters: HTMLInputElement[] = [];
 	private _renderedEnvelopeCount: number = 0;
 	private _renderedEqFilterCount: number = -1;
 	private _renderedNoteFilterCount: number = -1;
@@ -40,8 +38,7 @@ export class EnvelopeEditor {
 	private _onChange = (event: Event): void => {
 		const targetSelectIndex: number = this._targetSelects.indexOf(<any>event.target);
 		const envelopeSelectIndex: number = this._envelopeSelects.indexOf(<any>event.target);
-		const pitchInverterIndex: number = this._pitchInverters.indexOf(<any>event.target);
-		const noteSizeInverterIndex: number = this._noteSizeInverters.indexOf(<any>event.target);
+		const inverterIndex: number = this._inverters.indexOf(<any>event.target);
 		if (targetSelectIndex != -1) {
 			const combinedValue: number = parseInt(this._targetSelects[targetSelectIndex].value);
 			const target: number = combinedValue % Config.instrumentAutomationTargets.length;
@@ -51,11 +48,9 @@ export class EnvelopeEditor {
 			this._doc.record(new ChangeSetEnvelopeType(this._doc, envelopeSelectIndex, this._envelopeSelects[envelopeSelectIndex].selectedIndex));
 
 			this._extraSettingsDropdowns[envelopeSelectIndex].style.display = Config.envelopes[this._envelopeSelects[envelopeSelectIndex].selectedIndex].name == "pitch" ? "inline" : "none";
-			this._extraPitchSettingsDropdownGroups[envelopeSelectIndex].style.display = Config.envelopes[this._envelopeSelects[envelopeSelectIndex].selectedIndex].name == "pitch" ? "" : "none";
-		} else if (pitchInverterIndex != -1) {
-			this._doc.record(new ChangeEnvelopeInverse(this._doc, this._pitchInverters[pitchInverterIndex].checked, pitchInverterIndex, "pitch"));
-		} else if (noteSizeInverterIndex != -1) {
-			this._doc.record(new ChangeEnvelopeInverse(this._doc, this._noteSizeInverters[noteSizeInverterIndex].checked, noteSizeInverterIndex, "noteSize"));
+			this._extraPitchSettingsGroups[envelopeSelectIndex].style.display = Config.envelopes[this._envelopeSelects[envelopeSelectIndex].selectedIndex].name == "pitch" ? "" : "none";
+		} else if (inverterIndex != -1) {
+			this._doc.record(new ChangeEnvelopeInverse(this._doc, this._inverters[inverterIndex].checked, inverterIndex));
 		}
 	}
 
@@ -63,6 +58,7 @@ export class EnvelopeEditor {
 		const index: number = this._deleteButtons.indexOf(<any>event.target);
 		if (index != -1) {
 			this._doc.record(new ChangeRemoveEnvelope(this._doc, index));
+			this._extraSettingsDropdownGroups[index].style.display = "none";
 		}
 	}
 
@@ -106,19 +102,36 @@ export class EnvelopeEditor {
 
 	public rerenderExtraSettings() {
 		const instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
-		for (let i = 0; i < instrument.envelopeCount; i++) {
-			if (Config.envelopes[instrument.envelopes[i].envelope].name == "pitch") {
-				this._extraSettingsDropdowns[i].style.display = "inline";
-				if (this._extraSettingsDropdowns[i].textContent == "▲") {
-					this._extraPitchSettingsDropdownGroups[i].style.display = "flex";
+		for (let i = 0; i < Config.maxEnvelopeCount; i++) {
+			if (i >= instrument.envelopeCount) {
+				if (this._extraSettingsDropdowns[i]) { //make sure is not null so that we don't get an error
+					this._extraSettingsDropdowns[i].style.display = "none";
 				}
-			} else if (Config.envelopes[instrument.envelopes[i].envelope].name == "note size") {
-				this._extraSettingsDropdowns[i].style.display = "inline";
-				if (this._extraSettingsDropdowns[i].textContent == "▲") {
-					this._extraNoteSizeSettingsDropdownGroups[i].style.display = "flex";
+				if (this._extraSettingsDropdownGroups[i]) {
+					this._extraSettingsDropdownGroups[i].style.display = "none";
 				}
+				if (this._extraPitchSettingsGroups[i]) {
+					this._extraPitchSettingsGroups[i].style.display = "none";
+				}
+			} else if (this._extraSettingsDropdowns[i].textContent == "▲") {
+				this._extraSettingsDropdownGroups[i].style.display = "flex";
+				this._extraSettingsDropdowns[i].style.display = "inline";
+				if (Config.envelopes[instrument.envelopes[i].envelope].name == "pitch") {
+					this._extraPitchSettingsGroups[i].style.display = "flex";
+					this._pitchStartBoxes[i].value = instrument.pitchEnvelopeStart[i].toString();
+					this._pitchEndBoxes[i].value = instrument.pitchEnvelopeEnd[i].toString();
+				} else {
+					this._extraPitchSettingsGroups[i].style.display = "none";
+				}
+				this._inverters[i].checked = instrument.envelopeInverse[i];
+			} else if (this._extraSettingsDropdowns[i].textContent == "▼") {
+				this._extraSettingsDropdownGroups[i].style.display = "none";
+				this._extraPitchSettingsGroups[i].style.display = "none";
+				this._extraSettingsDropdowns[i].style.display = "inline";
 			} else {
 				this._extraSettingsDropdowns[i].style.display = "none";
+				this._extraSettingsDropdownGroups[i].style.display = "none";
+				this._extraPitchSettingsGroups[i].style.display = "none";
 			}
 		}
 	}
@@ -147,55 +160,54 @@ export class EnvelopeEditor {
 			const deleteButton: HTMLButtonElement = HTML.button({ type: "button", class: "delete-envelope", style: "flex: 0.2" });
 
 			//Create HTML structure for the dropdowns
-			const startNoteSlider: HTMLInputElement = HTML.input({ value: instrument.pitchEnvelopeStart[envelopeIndex], style: "width: 9em; margin-left: 1em;", type: "range", min: "0", max: instrument.isNoiseInstrument ? 11 : 96, step: "1" });
-			const startNoteBox: HTMLInputElement = HTML.input({ value: instrument.pitchEnvelopeStart[envelopeIndex], style: "width: 4em; font-size: 80%; ", id: "startNoteBox", type: "number", step: "1", min: "0", max: instrument.isNoiseInstrument ? 11 : 96 });
+			const startNoteSlider: HTMLInputElement = HTML.input({ value: instrument.pitchEnvelopeStart[envelopeIndex] ? instrument.pitchEnvelopeStart[envelopeIndex] : 0, style: "width: 9em; margin-left: 1em;", type: "range", min: "0", max: instrument.isNoiseInstrument ? 11 : 96, step: "1" });
+			const startNoteBox: HTMLInputElement = HTML.input({ value: instrument.pitchEnvelopeStart[envelopeIndex] ? instrument.pitchEnvelopeStart[envelopeIndex] : 0, style: "width: 4em; font-size: 80%; ", id: "startNoteBox", type: "number", step: "1", min: "0", max: instrument.isNoiseInstrument ? 11 : 96 });
 
-			const endNoteSlider: HTMLInputElement = HTML.input({ value: instrument.pitchEnvelopeEnd[envelopeIndex], style: "width: 9em; margin-left: 1em;", type: "range", min: "0", max: instrument.isNoiseInstrument ? 11 : 96, step: "1" });
-			const endNoteBox: HTMLInputElement = HTML.input({ value: instrument.pitchEnvelopeEnd[envelopeIndex], style: "width: 4em; font-size: 80%; ", id: "endNoteBox", type: "number", step: "1", min: "0", max: instrument.isNoiseInstrument ? 11 : 96 });
+			const endNoteSlider: HTMLInputElement = HTML.input({ value: instrument.pitchEnvelopeEnd[envelopeIndex] ? instrument.pitchEnvelopeEnd[envelopeIndex] : instrument.isNoiseInstrument ? 11 : 96, style: "width: 9em; margin-left: 1em;", type: "range", min: "0", max: instrument.isNoiseInstrument ? 11 : 96, step: "1" });
+			const endNoteBox: HTMLInputElement = HTML.input({ value: instrument.pitchEnvelopeEnd[envelopeIndex] ? instrument.pitchEnvelopeEnd[envelopeIndex] : instrument.isNoiseInstrument ? 11 : 96, style: "width: 4em; font-size: 80%; ", id: "endNoteBox", type: "number", step: "1", min: "0", max: instrument.isNoiseInstrument ? 11 : 96 });
 
-			const invertBox: HTMLInputElement = HTML.input({ "checked": instrument.pitchEnvelopeInverse[envelopeIndex], type: "checkbox", style: "width: 1em; padding: 0.5em; margin-left: 4em;", id: "invertBox" })
+			const invertBox: HTMLInputElement = HTML.input({ "checked": instrument.envelopeInverse[envelopeIndex], type: "checkbox", style: "width: 1em; padding: 0.5em; margin-left: 4em;", id: "invertBox" });
 
 			const startBoxWrapper: HTMLDivElement = HTML.div({ style: "flex: 1; display: flex; flex-direction: column; align-items: center" }, HTML.span({ class: "tip", style: `flex:1; height:1em; font-size: smaller;`, onclick: () => this._openPrompt("pitchRange") }, "Start: "), startNoteBox);
 			const endBoxWrapper: HTMLDivElement = HTML.div({ style: "flex: 1; display: flex; flex-direction: column; align-items: center" }, HTML.span({ class: "tip", style: `flex:1; height:1em; font-size: smaller;`, onclick: () => this._openPrompt("pitchRange") }, "End: "), endNoteBox);
 
 			const startNoteWrapper: HTMLDivElement = HTML.div({ style: "margin-top: 3px; flex:1; display:flex; flex-direction: row; align-items:center; justify-content:right;" }, startBoxWrapper, startNoteSlider);
 			const endNoteWrapper: HTMLDivElement = HTML.div({ style: "margin-top: 3px; flex:1; display:flex; flex-direction: row; align-items:center; justify-content:right;" }, endBoxWrapper, endNoteSlider);
-			const pitchInvertWrapper: HTMLDivElement = HTML.div({ style: "margin: 0.5em; align-items:center; justify-content:right;" }, HTML.span({ class: "tip", onclick: () => this._openPrompt("pitchInvert") }, "Invert: "), invertBox);
+			const invertWrapper: HTMLDivElement = HTML.div({ style: "margin: 0.5em; align-items:center; justify-content:right;" }, HTML.span({ class: "tip", onclick: () => this._openPrompt("pitchInvert") }, "Invert: "), invertBox);
 
-			const extraPitchSettingsDropdownGroup: HTMLDivElement = HTML.div({ class: "editor-controls", style: "flex-direction:column; align-items:center;" }, startNoteWrapper, endNoteWrapper, pitchInvertWrapper);
-			extraPitchSettingsDropdownGroup.style.display = "none";
+			const extraPitchSettingsGroup: HTMLDivElement = HTML.div({ class: "editor-controls", style: "flex-direction:column; align-items:center;" }, startNoteWrapper, endNoteWrapper);
+			extraPitchSettingsGroup.style.display = "none";
 			const extraSettingsDropdown: HTMLButtonElement = HTML.button({ style: "margin-left:0em; margin-right: 0.3em; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: () => this._extraSettingsDropdown(DropdownID.EnvelopeSettings, envelopeIndex, Config.envelopes[instrument.envelopes[envelopeIndex].envelope].name) }, "▼");
-			extraSettingsDropdown.style.display = Config.envelopes[instrument.envelopes[envelopeIndex].envelope].name == ("pitch" || "note size") ? "inline" : "none";
+			extraSettingsDropdown.style.display = "inline";
 
-			const noteSizeInvertBox: HTMLInputElement = HTML.input({ "checked": instrument.noteSizeEnvelopeInverse[envelopeIndex], type: "checkbox", style: "width: 1em; padding: 0.5em; margin-left: 4em;", id: "invertBox" });
-			const extraNoteSizeSettingsDropdownGroup: HTMLDivElement = HTML.div({ class: "editor-controls", style: "flex-direction:row; align-items:center;" }, HTML.span({ class: "tip", onclick: () => this._openPrompt("noteSizeInvert") }, "Invert: "), noteSizeInvertBox);
-			extraNoteSizeSettingsDropdownGroup.style.display = "none";
+			//const extraNoteSizeSettingsDropdownGroup: HTMLDivElement = HTML.div({ class: "editor-controls", style: "flex-direction:row; align-items:center;" }, HTML.span({ class: "tip", onclick: () => this._openPrompt("noteSizeInvert") }, "Invert: "), noteSizeInvertBox);
+			//extraNoteSizeSettingsDropdownGroup.style.display = "none";
+
+			const extraSettingsDropdownGroup: HTMLDivElement = HTML.div({ class: "editor-controls", style: "flex-direction:column; align-items:center;" }, extraPitchSettingsGroup, invertWrapper);
+			extraSettingsDropdownGroup.style.display = "none";
 
 
 			const row: HTMLDivElement = HTML.div({ class: "envelope-row" },
 				extraSettingsDropdown,
 				HTML.div({ class: "selectContainer", style: "width: 0; flex: 1;" }, targetSelect),
-				//extraSettingsButton,
 				HTML.div({ class: "selectContainer", style: "width: 0; flex: 0.85" }, envelopeSelect),
 				deleteButton,
 			);
 
 			this.container.appendChild(row);
-			this.container.appendChild(extraPitchSettingsDropdownGroup);
-			this.container.appendChild(extraNoteSizeSettingsDropdownGroup);
+			this.container.appendChild(extraSettingsDropdownGroup);
 			this._rows[envelopeIndex] = row;
 			this._targetSelects[envelopeIndex] = targetSelect;
 			this._envelopeSelects[envelopeIndex] = envelopeSelect;
 			this._deleteButtons[envelopeIndex] = deleteButton;
 			this._extraSettingsDropdowns[envelopeIndex] = extraSettingsDropdown;
-			this._extraPitchSettingsDropdownGroups[envelopeIndex] = extraPitchSettingsDropdownGroup;
-			this._extraNoteSizeSettingsDropdownGroups[envelopeIndex] = extraNoteSizeSettingsDropdownGroup;
+			this._extraSettingsDropdownGroups[envelopeIndex] = extraSettingsDropdownGroup;
+			this._extraPitchSettingsGroups[envelopeIndex] = extraPitchSettingsGroup;
 			this._pitchStartSliders[envelopeIndex] = startNoteSlider;
 			this._pitchStartBoxes[envelopeIndex] = startNoteBox;
 			this._pitchEndSliders[envelopeIndex] = endNoteSlider;
 			this._pitchEndBoxes[envelopeIndex] = endNoteBox;
-			this._pitchInverters[envelopeIndex] = invertBox;
-			this._noteSizeInverters[envelopeIndex] = noteSizeInvertBox;
+			this._inverters[envelopeIndex] = invertBox;
 		}
 
 		for (let envelopeIndex: number = this._renderedEnvelopeCount; envelopeIndex < instrument.envelopeCount; envelopeIndex++) {

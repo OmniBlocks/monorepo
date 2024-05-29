@@ -277,7 +277,7 @@ export class FilterEditor {
             }
         }
 
-        if (this._dragChange != null && (this._doc.lastChangeWas(this._dragChange) || this._writingMods )) {
+        if (this._dragChange != null && (this._doc.lastChangeWas(this._dragChange) || this._writingMods)) {
             this._dragChange.undo();
         } else {
             this._mouseDown = false;
@@ -359,7 +359,7 @@ export class FilterEditor {
         }
 
         if (this.container.offsetParent == null) return;
-        if (this._mouseDown && (this._doc.lastChangeWas(this._dragChange) || this._writingMods ) && this._dragChange != null) {
+        if (this._mouseDown && (this._doc.lastChangeWas(this._dragChange) || this._writingMods) && this._dragChange != null) {
             if (!this._addingPoint && !this._mouseDragging && !this._touchMode) {
                 if (this._selectedIndex < this._useFilterSettings.controlPointCount && this._selectedIndex != -1) {
                     const point: FilterControlPoint = this._useFilterSettings.controlPoints[this._selectedIndex];
@@ -373,7 +373,7 @@ export class FilterEditor {
             }
             this._updatePath();
             if (this._larger) {
-                this.selfUndoSettings.length = this.selfUndoHistoryPos+1;
+                this.selfUndoSettings.length = this.selfUndoHistoryPos + 1;
                 this.selfUndoSettings.push(JSON.stringify(this._filterSettings.toJsonObject()));
                 this.selfUndoHistoryPos++;
             }
@@ -534,7 +534,7 @@ export class FilterEditor {
                 let jumpIndex = +str.substring(3, str.indexOf("|"));
                 this.swapToSubfilter(this._subfilterIndex, jumpIndex);
                 return jumpIndex;
-            // Jumping to FIRST state of this subfilter
+                // Jumping to FIRST state of this subfilter
             } else if (this.selfUndoSettings[this.selfUndoHistoryPos].startsWith("jmp")) {
                 let savedFilter: FilterSettings = new FilterSettings();
                 let str: String = this.selfUndoSettings[this.selfUndoHistoryPos];
@@ -551,7 +551,7 @@ export class FilterEditor {
 
     // Returns the subfilter index to swap to, if any
     public redo(): number {
-        if (this.selfUndoHistoryPos < this.selfUndoSettings.length-1) {
+        if (this.selfUndoHistoryPos < this.selfUndoSettings.length - 1) {
             this.selfUndoHistoryPos++;
             // Check if next index in undo queue is a command to jump to a new filter index
             if (this.selfUndoSettings[this.selfUndoHistoryPos].startsWith("jmp")) {
@@ -629,7 +629,7 @@ export class FilterEditor {
         this._writingMods = forceModRender && this._mouseDown;
         const instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
         const filterSettings: FilterSettings = this._useNoteFilter ? instrument.noteFilter : instrument.eqFilter;
-        let displayMods: boolean = (activeMods && !this._larger && (forceModRender || (!this._mouseOver && !this._mouseDragging && !this._mouseDown) ) && this._doc.synth.playing)
+        let displayMods: boolean = (activeMods && !this._larger && (forceModRender || (!this._mouseOver && !this._mouseDragging && !this._mouseDown)) && this._doc.synth.playing)
         if (displayMods)
             this._controlPointPath.style.setProperty("fill", `${ColorConfig.overwritingModSlider}`);
         else if (!this._larger)
@@ -644,7 +644,7 @@ export class FilterEditor {
         // If modulators are active, show synth's current filter point settings instead of real points.
         // Will auto update, but if the user is writing directly to mod values then the writing point will be
         // forcibly maintained at the cursor position.
-        if ( displayMods ) {
+        if (displayMods) {
             this._useFilterSettings = this._getTargetFilterSettings(instrument);
 
             if (this._writingMods)

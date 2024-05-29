@@ -1,7 +1,7 @@
 //A simple events system for effectively direct links without actualy linking files or references
-class EventManager { 
-    private activeEvents:string[] = [];
-    private listeners:any = {};
+class EventManager {
+    private activeEvents: string[] = [];
+    private listeners: any = {};
 
     constructor() {
         this.activeEvents = [];
@@ -15,12 +15,12 @@ class EventManager {
         }
         this.activeEvents.push(eventType);
         for (let i: number = 0; i < this.listeners[eventType].length; i++) {
-            this.listeners[eventType][i](eventData,extraEventData)
+            this.listeners[eventType][i](eventData, extraEventData)
         }
         this.activeEvents.pop();
     }
 
-    public listen(eventType:string,callback:Function): void {
+    public listen(eventType: string, callback: Function): void {
         if (this.listeners[eventType] == undefined) {
             this.listeners[eventType] = []
         }
@@ -40,8 +40,8 @@ class EventManager {
         if (this.listeners[eventType] == undefined) {
             return;
         }
-        this.listeners[eventType]=[];
+        this.listeners[eventType] = [];
     }
 }
 
-export const events:EventManager = new EventManager()
+export const events: EventManager = new EventManager()

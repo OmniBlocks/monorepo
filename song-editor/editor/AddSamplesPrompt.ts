@@ -72,9 +72,9 @@ export class AddSamplesPrompt {
         ),
         div({ style: `margin-top: 0.5em; margin-bottom: 0.5em; color: ${ColorConfig.secondaryText};` },
             "(Technically, the web server behind the URL needs to support ",
-              a({ href: "https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS", target: "_blank", }, "CORS"),
-              ", but you don't need to know about that: ",
-              " the sample just won't load if that's not the case)",
+            a({ href: "https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS", target: "_blank", }, "CORS"),
+            ", but you don't need to know about that: ",
+            " the sample just won't load if that's not the case)",
         ),
         div({ style: "margin-top: 0.5em; margin-bottom: 0.5em;" },
             details(

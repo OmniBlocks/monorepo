@@ -8,13 +8,13 @@ import { Config } from "../synth/SynthConfig";
 const { button, div, p, h2, h3 } = HTML;
 
 export class TipPrompt implements Prompt {
-		private readonly _closeButton: HTMLButtonElement = button({class: "cancelButton"});
-		
+	private readonly _closeButton: HTMLButtonElement = button({ class: "cancelButton" });
+
 	public readonly container: HTMLDivElement;
-		
+
 	constructor(private _doc: SongDocument, type: string) {
 		let message: HTMLDivElement;
-			
+
 		switch (type) {
 			case "scale": {
 				message = div(
@@ -442,7 +442,7 @@ export class TipPrompt implements Prompt {
 					h2("Clickless Transition"),
 					p("Sometimes, seamless and other transition types can make audible 'clicks' when changing between notes. Ticking this option will cause those clicks to be silenced as much as possible."),
 				);
-            } break;
+			} break;
 			case "aliases": {
 				message = div(
 					h2("Aliasing"),
@@ -450,13 +450,13 @@ export class TipPrompt implements Prompt {
 					p("When this setting is ticked that technique is disabled, so you may hear strange audio artifacts especially at high pitches and when bending notes. However, this can lend a grungy sound to an instrument that could be desirable."),
 				);
 			} break;
-            case "operatorWaveform": {
-                message = div(
-                    h2("Operator Waveform"),
-                    p('This setting controls the what kind of sound wave an individual FM wave uses.'),
-                    p('By defualt the FM synth uses sinewaves.'),
-                );
-            } break;
+			case "operatorWaveform": {
+				message = div(
+					h2("Operator Waveform"),
+					p('This setting controls the what kind of sound wave an individual FM wave uses.'),
+					p('By defualt the FM synth uses sinewaves.'),
+				);
+			} break;
 			case "filterType": {
 				message = div(
 					h2("Filter Type"),
@@ -481,35 +481,35 @@ export class TipPrompt implements Prompt {
 				);
 			} break;
 			case "loopControls":
-			{
-				message = div(h2("Loop Controls"), p("This enables the use of parameters that control how a chip wave should repeat."));
-			}
-			break;
-				case "loopMode":
-			{
-				message = div(h2("Loop Mode"), p("This sets the way the chip wave loops when its ends are reached."), p("The \"Loop\" mode is the default: when the end of the loop is reached, it will jump back to the starting point of the loop."), p("The \"Ping-Pong\" mode starts playing the chip wave backwards when the end of the loop is reached. Once it reaches the start of the loop, it will start playing forwards again, endlessly going back and forth."), p("The \"Play Once\" mode stops the chip wave once the end is reached (or the start of the loop, if it's playing backwards)."), p("The \"Play Loop Once\" mode stops the chip wave once the end of the loop is reached (or the start of the loop, if it's playing backwards)."));
-			}
-			break;
+				{
+					message = div(h2("Loop Controls"), p("This enables the use of parameters that control how a chip wave should repeat."));
+				}
+				break;
+			case "loopMode":
+				{
+					message = div(h2("Loop Mode"), p("This sets the way the chip wave loops when its ends are reached."), p("The \"Loop\" mode is the default: when the end of the loop is reached, it will jump back to the starting point of the loop."), p("The \"Ping-Pong\" mode starts playing the chip wave backwards when the end of the loop is reached. Once it reaches the start of the loop, it will start playing forwards again, endlessly going back and forth."), p("The \"Play Once\" mode stops the chip wave once the end is reached (or the start of the loop, if it's playing backwards)."), p("The \"Play Loop Once\" mode stops the chip wave once the end of the loop is reached (or the start of the loop, if it's playing backwards)."));
+				}
+				break;
 			case "loopStart":
-			{
-				message = div(h2("Loop Start Point"), p("This specifies where the loop region of the chip wave starts. It's measured in \"samples\", or rather, it refers to a point on a waveform."), p("Be careful with tiny loop sizes (especially combined with high pitches), they may re-introduce aliasing even if the \"Aliasing\" checkbox is unchecked."));
-			}
-			break;
+				{
+					message = div(h2("Loop Start Point"), p("This specifies where the loop region of the chip wave starts. It's measured in \"samples\", or rather, it refers to a point on a waveform."), p("Be careful with tiny loop sizes (especially combined with high pitches), they may re-introduce aliasing even if the \"Aliasing\" checkbox is unchecked."));
+				}
+				break;
 			case "loopEnd":
-			{
-				message = div(h2("Loop End Point"), p("This specifies where the loop region of the chip wave ends. It's measured in \"samples\", or rather, it refers to a point on a waveform."), p("The button next to the input box sets this to end of the chip wave."), p("Be careful with tiny loop sizes (especially combined with high pitches), they may re-introduce aliasing even if the \"Aliasing\" checkbox is unchecked."));
-			}
-			break;
-				case "offset":
-			{
-				message = div(h2("Offset"), p("This specifies where the chip wave should start playing from. You can use this to chop up a large sample, to say, turn a drum loop into a drum kit! It's measured in \"samples\", or rather, it refers to a point on a waveform."));
-			}
-			break;
-				case "backwards":
-			{
-				message = div(h2("Backwards"), p("When set, the chip wave will start playing backwards. After checking this, you may want to adjust the offset to start from a different point that makes sense for this mode."));
-			}
-			break;
+				{
+					message = div(h2("Loop End Point"), p("This specifies where the loop region of the chip wave ends. It's measured in \"samples\", or rather, it refers to a point on a waveform."), p("The button next to the input box sets this to end of the chip wave."), p("Be careful with tiny loop sizes (especially combined with high pitches), they may re-introduce aliasing even if the \"Aliasing\" checkbox is unchecked."));
+				}
+				break;
+			case "offset":
+				{
+					message = div(h2("Offset"), p("This specifies where the chip wave should start playing from. You can use this to chop up a large sample, to say, turn a drum loop into a drum kit! It's measured in \"samples\", or rather, it refers to a point on a waveform."));
+				}
+				break;
+			case "backwards":
+				{
+					message = div(h2("Backwards"), p("When set, the chip wave will start playing backwards. After checking this, you may want to adjust the offset to start from a different point that makes sense for this mode."));
+				}
+				break;
 			case "decimalOffset": {
 				message = div(
 					h2("Decimal Offset"),
@@ -546,6 +546,18 @@ export class TipPrompt implements Prompt {
 					p("This setting is a volume multiplier applied to the second voice. This setting will only work correctly with two voices."),
 				);
 			} break;
+			case "pitchRange": {
+				message = div(
+					h2("Pitch Envelope Start and End"),
+					p("This setting is a volume multiplier applied to the second voice. This setting will only work correctly with two voices."),
+				);
+			} break;
+			case "pitchInvert": {
+				message = div(
+					h2("Pitch Envelope Inversion"),
+					p("This setting is a volume multiplier applied to the second voice. This setting will only work correctly with two voices."),
+				);
+			} break;
 
 			default:
 				// Check for modSetinfo#
@@ -563,7 +575,7 @@ export class TipPrompt implements Prompt {
 						));
 					}
 					// Last element for mod settings is just some miscellaneous data for nerds like me.
-					pList[pList.length-1].style.setProperty("color", "var(--secondary-text)");
+					pList[pList.length - 1].style.setProperty("color", "var(--secondary-text)");
 					message = div(
 						h2(Config.modulators[modulator].promptName),
 						pList,
@@ -574,22 +586,22 @@ export class TipPrompt implements Prompt {
 					throw new Error("Unhandled TipPrompt type: " + type);
 				}
 		}
-		
-		this.container = div({class: "prompt", style: "width: 300px;"},
+
+		this.container = div({ class: "prompt", style: "width: 300px;" },
 			message,
 			this._closeButton,
 		);
-			
-			setTimeout(()=>this._closeButton.focus());
-			
+
+		setTimeout(() => this._closeButton.focus());
+
 		this._closeButton.addEventListener("click", this._close);
 	}
-		
-		private _close = (): void => { 
+
+	private _close = (): void => {
 		this._doc.undo();
 	}
-		
-		public cleanUp = (): void => { 
+
+	public cleanUp = (): void => {
 		this._closeButton.removeEventListener("click", this._close);
 	}
 }

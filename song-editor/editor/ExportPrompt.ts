@@ -56,14 +56,14 @@ export class ExportPrompt implements Prompt {
     private readonly _formatSelect: HTMLSelectElement = select({ style: "width: 100%;" },
         option({ value: "wav" }, "Export to .wav file."),
         option({ value: "mp3" }, "Export to .mp3 file."),
-	//option({ value: "ogg" }, "Export to .ogg file."),
+        //option({ value: "ogg" }, "Export to .ogg file."),
         option({ value: "midi" }, "Export to .mid file."),
         option({ value: "json" }, "Export to .json file."),
         option({ value: "html" }, "Export to .html file."),
     );
     private readonly _removeWhitespace: HTMLInputElement = input({ type: "checkbox" });
     private readonly _removeWhitespaceDiv: HTMLDivElement = div({ style: "vertical-align: middle; align-items: center; justify-content: space-between;" },
-    "Remove Whitespace: ", this._removeWhitespace);
+        "Remove Whitespace: ", this._removeWhitespace);
     private readonly _cancelButton: HTMLButtonElement = button({ class: "cancelButton" });
     private readonly _exportButton: HTMLButtonElement = button({ class: "exportButton", style: "width:45%;" }, "Export");
     private readonly _outputProgressBar: HTMLDivElement = div({ style: `width: 0%; background: ${ColorConfig.loopAccent}; height: 100%; position: absolute; z-index: 2;` });
@@ -160,7 +160,7 @@ export class ExportPrompt implements Prompt {
         this._enableOutro.addEventListener("click", () => { (this._computedSamplesLabel.firstChild as Text).textContent = this.samplesToTime(this._doc.synth.getTotalSamples(this._enableIntro.checked, this._enableOutro.checked, +this._loopDropDown.value - 1)); });
         this._enableIntro.addEventListener("click", () => { (this._computedSamplesLabel.firstChild as Text).textContent = this.samplesToTime(this._doc.synth.getTotalSamples(this._enableIntro.checked, this._enableOutro.checked, +this._loopDropDown.value - 1)); });
         this._loopDropDown.addEventListener("change", () => { (this._computedSamplesLabel.firstChild as Text).textContent = this.samplesToTime(this._doc.synth.getTotalSamples(this._enableIntro.checked, this._enableOutro.checked, +this._loopDropDown.value - 1)); });
-        this._formatSelect.addEventListener("change", () => { if (this._formatSelect.value == "json") { this._removeWhitespaceDiv.style.display = "block"; } else {  this._removeWhitespaceDiv.style.display = "none"; } });
+        this._formatSelect.addEventListener("change", () => { if (this._formatSelect.value == "json") { this._removeWhitespaceDiv.style.display = "block"; } else { this._removeWhitespaceDiv.style.display = "none"; } });
         this.container.addEventListener("keydown", this._whenKeyPressed);
 
         this._fileName.value = _doc.song.title;
@@ -334,10 +334,10 @@ export class ExportPrompt implements Prompt {
             }
         }
 
-      
+
         this.synth.initModFilters(this._doc.song);
         this.synth.computeLatestModValues();
-	    this.synth.warmUpSynthesizer(this._doc.song);
+        this.synth.warmUpSynthesizer(this._doc.song);
 
         this.sampleFrames = this.synth.getTotalSamples(this._enableIntro.checked, this._enableOutro.checked, this.synth.loopRepeatCount);
         // Compute how many UI updates will need to run to determine how many 
@@ -550,7 +550,7 @@ export class ExportPrompt implements Prompt {
                 writer.writeUint8(2); // denominator exponent in 2^E. 2^2 = 4, and we will always use "quarter" notes.
                 writer.writeUint8(24); // MIDI Clocks per metronome tick (should match beats), standard is 24
                 writer.writeUint8(8); // number of 1/32 notes per 24 MIDI Clocks, standard is 8, meaning 24 clocks per "quarter" note.
-				let tempScale = song.scale == Config.scales.dictionary["Custom"].index ? song.scaleCustom : Config.scales[song.scale].flags;
+                let tempScale = song.scale == Config.scales.dictionary["Custom"].index ? song.scaleCustom : Config.scales[song.scale].flags;
                 const isMinor: boolean = tempScale[3] && !tempScale[4];
                 const key: number = song.key; // C=0, C#=1, counting up to B=11
                 let numSharps: number = key; // For even key values in major scale, number of sharps/flats is same...
@@ -833,69 +833,69 @@ export class ExportPrompt implements Prompt {
                                 pinInterval = nextPinInterval;
                             }
 
-							const noteEndTime: number = barStartTime + note.end * midiTicksPerPart;
-							
-							// End all tones.
-							for (let toneIndex: number = 0; toneIndex < toneCount; toneIndex++) {
-								// TODO: If the note at the start of the next pattern has
-								// continuesLastPattern and has the same chord, it ought to extend
-								// this previous note.
-								writeEventTime(noteEndTime);
-								writer.writeUint8(MidiEventType.noteOff | midiChannel);
-								writer.writeMidi7Bits(prevPitches[toneIndex]); // pitch
-								writer.writeMidi7Bits(velocity); // velocity
-							}
-							
-							shouldResetExpressionAndPitchBend = true;
-						}
-					} else {
-						if (shouldResetExpressionAndPitchBend) {
-							shouldResetExpressionAndPitchBend = false;
-							
-							if (prevExpression != defaultMidiExpression) {
-								prevExpression = defaultMidiExpression;
-								// Reset expression
-								writeEventTime(barStartTime);
-								writeControlEvent(MidiControlEventMessage.expressionMSB, prevExpression);
-							}
-						
-							if (prevPitchBend != defaultMidiPitchBend) {
-								// Reset pitch bend
-								prevPitchBend = defaultMidiPitchBend;
-								writeEventTime(barStartTime);
-								writer.writeUint8(MidiEventType.pitchBend | midiChannel);
-								writer.writeMidi7Bits(prevPitchBend & 0x7f); // least significant bits
-								writer.writeMidi7Bits((prevPitchBend >> 7) & 0x7f); // most significant bits
-							}
-						}
-					}
-					
-					barStartTime += midiTicksPerBar;
-				}
-			}
-			
-			writeEventTime(barStartTime);
-			writer.writeUint8(MidiEventType.meta);
-			writer.writeMidi7Bits(MidiMetaEventMessage.endOfTrack);
-			writer.writeMidiVariableLength(0x00);
-			
-			// Finally, write the length of the track in bytes at the front of the track.
-			writer.rewriteUint32(trackStartIndex, writer.getWriteIndex() - trackStartIndex - 4);
-		}
-		
-		const blob: Blob = new Blob([writer.toCompactArrayBuffer()], {type: "audio/midi"});
-		save(blob, this._fileName.value.trim() + ".mid");
-		
-		this._close();
-	}
-	
-	private _exportToJson(): void {
-		const jsonObject: Object = this._doc.song.toJsonObject(this._enableIntro.checked, Number(this._loopDropDown.value), this._enableOutro.checked);
+                            const noteEndTime: number = barStartTime + note.end * midiTicksPerPart;
+
+                            // End all tones.
+                            for (let toneIndex: number = 0; toneIndex < toneCount; toneIndex++) {
+                                // TODO: If the note at the start of the next pattern has
+                                // continuesLastPattern and has the same chord, it ought to extend
+                                // this previous note.
+                                writeEventTime(noteEndTime);
+                                writer.writeUint8(MidiEventType.noteOff | midiChannel);
+                                writer.writeMidi7Bits(prevPitches[toneIndex]); // pitch
+                                writer.writeMidi7Bits(velocity); // velocity
+                            }
+
+                            shouldResetExpressionAndPitchBend = true;
+                        }
+                    } else {
+                        if (shouldResetExpressionAndPitchBend) {
+                            shouldResetExpressionAndPitchBend = false;
+
+                            if (prevExpression != defaultMidiExpression) {
+                                prevExpression = defaultMidiExpression;
+                                // Reset expression
+                                writeEventTime(barStartTime);
+                                writeControlEvent(MidiControlEventMessage.expressionMSB, prevExpression);
+                            }
+
+                            if (prevPitchBend != defaultMidiPitchBend) {
+                                // Reset pitch bend
+                                prevPitchBend = defaultMidiPitchBend;
+                                writeEventTime(barStartTime);
+                                writer.writeUint8(MidiEventType.pitchBend | midiChannel);
+                                writer.writeMidi7Bits(prevPitchBend & 0x7f); // least significant bits
+                                writer.writeMidi7Bits((prevPitchBend >> 7) & 0x7f); // most significant bits
+                            }
+                        }
+                    }
+
+                    barStartTime += midiTicksPerBar;
+                }
+            }
+
+            writeEventTime(barStartTime);
+            writer.writeUint8(MidiEventType.meta);
+            writer.writeMidi7Bits(MidiMetaEventMessage.endOfTrack);
+            writer.writeMidiVariableLength(0x00);
+
+            // Finally, write the length of the track in bytes at the front of the track.
+            writer.rewriteUint32(trackStartIndex, writer.getWriteIndex() - trackStartIndex - 4);
+        }
+
+        const blob: Blob = new Blob([writer.toCompactArrayBuffer()], { type: "audio/midi" });
+        save(blob, this._fileName.value.trim() + ".mid");
+
+        this._close();
+    }
+
+    private _exportToJson(): void {
+        const jsonObject: Object = this._doc.song.toJsonObject(this._enableIntro.checked, Number(this._loopDropDown.value), this._enableOutro.checked);
         let whiteSpaceParam: string | undefined = this._removeWhitespace.checked ? undefined : '\t';
-		const jsonString: string = JSON.stringify(jsonObject, null, whiteSpaceParam);
-		const blob: Blob = new Blob([jsonString], {type: "application/json"});
-		save(blob, this._fileName.value.trim() + ".json");
-		this._close();
+        const jsonString: string = JSON.stringify(jsonObject, null, whiteSpaceParam);
+        const blob: Blob = new Blob([jsonString], { type: "application/json" });
+        save(blob, this._fileName.value.trim() + ".json");
+        this._close();
     }
 
     private _exportToHtml(): void {

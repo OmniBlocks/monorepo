@@ -64,7 +64,7 @@ export class CustomScalePrompt implements Prompt {
             this._saveChanges();
         }
     }
-    
+
 
     private _saveChanges = (): void => {
         for (var i = 1; i < this._scaleFlags.length; i++) {

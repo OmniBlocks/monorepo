@@ -198,7 +198,7 @@ class VisualLoopControlsHandle {
         this._handleDragOffset = null;
         this._whenMouseUpHappens();
     }
-    
+
     public cleanUp = (): void => {
         window.removeEventListener("mousemove", this._whenMouseMoves);
         this.canvas!.removeEventListener("mousedown", this._whenMouseIsDown);

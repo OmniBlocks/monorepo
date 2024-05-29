@@ -1,17 +1,17 @@
 // Copyright (c) 2012-2022 John Nesky and contributing authors, distributed under the MIT license, see accompanying the LICENSE.md file.
 
 import { getLocalStorageItem } from "../synth/SynthConfig";
-import {ColorConfig} from "./ColorConfig";
-import {HTML} from "imperative-html/dist/esm/elements-strict";
+import { ColorConfig } from "./ColorConfig";
+import { HTML } from "imperative-html/dist/esm/elements-strict";
 
 
 // Determine if the user's browser/OS adds scrollbars that occupy space.
 // See: https://www.filamentgroup.com/lab/scrollbars/
 const scrollBarTest: HTMLDivElement = document.body.appendChild(HTML.div({ style: "width:30px; height:30px; overflow: auto;" },
-	HTML.div({ style: "width:100%;height:40px" }),
+    HTML.div({ style: "width:100%;height:40px" }),
 ));
 if ((<any>scrollBarTest).firstChild.clientWidth < 30) {
-	document.documentElement.classList.add("obtrusive-scrollbars");
+    document.documentElement.classList.add("obtrusive-scrollbars");
 }
 document.body.removeChild(scrollBarTest);
 

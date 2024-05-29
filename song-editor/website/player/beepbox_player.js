@@ -8052,6 +8052,11 @@ var beepbox = (function (exports) {
 				--note-flash: #ffffff;
 				--note-flash-secondary: #ffffff77;
 				
+				--oscilloscope-line-R: var(--ui-widget-background);
+				--oscilloscope-line-L: var(--secondary-text);
+				--text-spacing-icon: > ;
+				--scrollbar-color: #bf2c5d;
+				
 				--file-page-symbol: url("theme_resources/icon-file.png");
 				--edit-pencil-symbol: url("theme_resources/icon-edit.png");
 				--preferences-gear-symbol: url("theme_resources/icon-preferences.png");
@@ -8369,6 +8374,11 @@ var beepbox = (function (exports) {
 
 				--note-flash: #ffffff;
 				--note-flash-secondary: #ffffff77;
+
+				--oscilloscope-line-R: var(--ui-widget-background);
+				--oscilloscope-line-L: var(--secondary-text);
+				--text-spacing-icon: > ;
+				--scrollbar-color: #bf2c5d;
 
 				--file-page-symbol: url("theme_resources/icon-file.png");
 				--edit-pencil-symbol: url("theme_resources/icon-edit.png");
@@ -11576,11 +11586,27 @@ var beepbox = (function (exports) {
             }
             if (this.type == 2) {
                 instrumentObject["wave"] = Config.chipNoises[this.chipNoise].name;
+                instrumentObject["unison"] = this.unison == Config.unisons.length ? "custom" : Config.unisons[this.unison].name;
+                if (this.unison == Config.unisons.length) {
+                    instrumentObject["unisonVoices"] = this.unisonVoices;
+                    instrumentObject["unisonSpread"] = this.unisonSpread;
+                    instrumentObject["unisonOffset"] = this.unisonOffset;
+                    instrumentObject["unisonExpression"] = this.unisonExpression;
+                    instrumentObject["unisonSign"] = this.unisonSign;
+                }
             }
             else if (this.type == 3) {
                 instrumentObject["spectrum"] = [];
                 for (let i = 0; i < Config.spectrumControlPoints; i++) {
                     instrumentObject["spectrum"][i] = Math.round(100 * this.spectrumWave.spectrum[i] / Config.spectrumMax);
+                }
+                instrumentObject["unison"] = this.unison == Config.unisons.length ? "custom" : Config.unisons[this.unison].name;
+                if (this.unison == Config.unisons.length) {
+                    instrumentObject["unisonVoices"] = this.unisonVoices;
+                    instrumentObject["unisonSpread"] = this.unisonSpread;
+                    instrumentObject["unisonOffset"] = this.unisonOffset;
+                    instrumentObject["unisonExpression"] = this.unisonExpression;
+                    instrumentObject["unisonSign"] = this.unisonSign;
                 }
             }
             else if (this.type == 4) {
@@ -11616,6 +11642,14 @@ var beepbox = (function (exports) {
             else if (this.type == 6) {
                 instrumentObject["pulseWidth"] = this.pulseWidth;
                 instrumentObject["decimalOffset"] = this.decimalOffset;
+                instrumentObject["unison"] = this.unison == Config.unisons.length ? "custom" : Config.unisons[this.unison].name;
+                if (this.unison == Config.unisons.length) {
+                    instrumentObject["unisonVoices"] = this.unisonVoices;
+                    instrumentObject["unisonSpread"] = this.unisonSpread;
+                    instrumentObject["unisonOffset"] = this.unisonOffset;
+                    instrumentObject["unisonExpression"] = this.unisonExpression;
+                    instrumentObject["unisonSign"] = this.unisonSign;
+                }
             }
             else if (this.type == 8) {
                 instrumentObject["pulseWidth"] = this.pulseWidth;
@@ -11867,7 +11901,7 @@ var beepbox = (function (exports) {
                 else if ((potentialPitchShift == "+1/2 (fifth)") || (potentialPitchShift == "+1 1/2 (octave and fifth)")) {
                     this.pitchShift = 18;
                 }
-                else if ((potentialPitchShift == "-1 (octave)") || (potentialPitchShift == "-2 (2 octaves)")) {
+                else if ((potentialPitchShift == "-1 (octave)") || (potentialPitchShift == "-2 (2 octaves")) {
                     this.pitchShift = 0;
                 }
                 else if ((potentialPitchShift == "-1/2 (fifth)") || (potentialPitchShift == "-1 1/2 (octave and fifth)")) {
@@ -12047,6 +12081,9 @@ var beepbox = (function (exports) {
                         if (drum["spectrum"] != undefined) {
                             for (let i = 0; i < Config.spectrumControlPoints; i++) {
                                 this.drumsetSpectrumWaves[j].spectrum[i] = Math.max(0, Math.min(Config.spectrumMax, Math.round(Config.spectrumMax * (+drum["spectrum"][i]) / 100)));
+                            }
+                            for (let i = 0; i < Config.drumCount; i++) {
+                                this.drumsetSpectrumWaves[i].markCustomWaveDirty();
                             }
                         }
                     }

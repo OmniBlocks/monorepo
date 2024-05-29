@@ -8420,6 +8420,11 @@ var beepbox = (function (exports) {
 				--note-flash: #ffffff;
 				--note-flash-secondary: #ffffff77;
 				
+				--oscilloscope-line-R: var(--ui-widget-background);
+				--oscilloscope-line-L: var(--secondary-text);
+				--text-spacing-icon: > ;
+				--scrollbar-color: #bf2c5d;
+				
 				--file-page-symbol: url("theme_resources/icon-file.png");
 				--edit-pencil-symbol: url("theme_resources/icon-edit.png");
 				--preferences-gear-symbol: url("theme_resources/icon-preferences.png");
@@ -8737,6 +8742,11 @@ var beepbox = (function (exports) {
 
 				--note-flash: #ffffff;
 				--note-flash-secondary: #ffffff77;
+
+				--oscilloscope-line-R: var(--ui-widget-background);
+				--oscilloscope-line-L: var(--secondary-text);
+				--text-spacing-icon: > ;
+				--scrollbar-color: #bf2c5d;
 
 				--file-page-symbol: url("theme_resources/icon-file.png");
 				--edit-pencil-symbol: url("theme_resources/icon-edit.png");
@@ -9627,9 +9637,12 @@ var beepbox = (function (exports) {
 }
 
 
+html {
+	scrollbar-color: var(--scrollbar-color, ${ColorConfig.uiWidgetBackground}) var(--scrollbar-background, ${ColorConfig.editorBackground});
+}
+
 .obtrusive-scrollbars, .obtrusive-scrollbars * {
 	scrollbar-width: thin;
-	scrollbar-color: ${ColorConfig.uiWidgetBackground} ${ColorConfig.editorBackground};
 }
 .obtrusive-scrollbars::-webkit-scrollbar, .obtrusive-scrollbars *::-webkit-scrollbar {
 	width: 12px;
@@ -9716,6 +9729,7 @@ var beepbox = (function (exports) {
     -ms-transition: opacity 0.5s ease-in;
     transition: opacity 0.5s ease-in;
     transition-delay: 0.45s;
+	scrollbar-width: none;
 }
 
 .trackAndMuteContainer {
@@ -13466,11 +13480,27 @@ li.select2-results__option[role=group] > strong:hover {
             }
             if (this.type == 2) {
                 instrumentObject["wave"] = Config.chipNoises[this.chipNoise].name;
+                instrumentObject["unison"] = this.unison == Config.unisons.length ? "custom" : Config.unisons[this.unison].name;
+                if (this.unison == Config.unisons.length) {
+                    instrumentObject["unisonVoices"] = this.unisonVoices;
+                    instrumentObject["unisonSpread"] = this.unisonSpread;
+                    instrumentObject["unisonOffset"] = this.unisonOffset;
+                    instrumentObject["unisonExpression"] = this.unisonExpression;
+                    instrumentObject["unisonSign"] = this.unisonSign;
+                }
             }
             else if (this.type == 3) {
                 instrumentObject["spectrum"] = [];
                 for (let i = 0; i < Config.spectrumControlPoints; i++) {
                     instrumentObject["spectrum"][i] = Math.round(100 * this.spectrumWave.spectrum[i] / Config.spectrumMax);
+                }
+                instrumentObject["unison"] = this.unison == Config.unisons.length ? "custom" : Config.unisons[this.unison].name;
+                if (this.unison == Config.unisons.length) {
+                    instrumentObject["unisonVoices"] = this.unisonVoices;
+                    instrumentObject["unisonSpread"] = this.unisonSpread;
+                    instrumentObject["unisonOffset"] = this.unisonOffset;
+                    instrumentObject["unisonExpression"] = this.unisonExpression;
+                    instrumentObject["unisonSign"] = this.unisonSign;
                 }
             }
             else if (this.type == 4) {
@@ -13506,6 +13536,14 @@ li.select2-results__option[role=group] > strong:hover {
             else if (this.type == 6) {
                 instrumentObject["pulseWidth"] = this.pulseWidth;
                 instrumentObject["decimalOffset"] = this.decimalOffset;
+                instrumentObject["unison"] = this.unison == Config.unisons.length ? "custom" : Config.unisons[this.unison].name;
+                if (this.unison == Config.unisons.length) {
+                    instrumentObject["unisonVoices"] = this.unisonVoices;
+                    instrumentObject["unisonSpread"] = this.unisonSpread;
+                    instrumentObject["unisonOffset"] = this.unisonOffset;
+                    instrumentObject["unisonExpression"] = this.unisonExpression;
+                    instrumentObject["unisonSign"] = this.unisonSign;
+                }
             }
             else if (this.type == 8) {
                 instrumentObject["pulseWidth"] = this.pulseWidth;
@@ -13757,7 +13795,7 @@ li.select2-results__option[role=group] > strong:hover {
                 else if ((potentialPitchShift == "+1/2 (fifth)") || (potentialPitchShift == "+1 1/2 (octave and fifth)")) {
                     this.pitchShift = 18;
                 }
-                else if ((potentialPitchShift == "-1 (octave)") || (potentialPitchShift == "-2 (2 octaves)")) {
+                else if ((potentialPitchShift == "-1 (octave)") || (potentialPitchShift == "-2 (2 octaves")) {
                     this.pitchShift = 0;
                 }
                 else if ((potentialPitchShift == "-1/2 (fifth)") || (potentialPitchShift == "-1 1/2 (octave and fifth)")) {
@@ -13937,6 +13975,9 @@ li.select2-results__option[role=group] > strong:hover {
                         if (drum["spectrum"] != undefined) {
                             for (let i = 0; i < Config.spectrumControlPoints; i++) {
                                 this.drumsetSpectrumWaves[j].spectrum[i] = Math.max(0, Math.min(Config.spectrumMax, Math.round(Config.spectrumMax * (+drum["spectrum"][i]) / 100)));
+                            }
+                            for (let i = 0; i < Config.drumCount; i++) {
+                                this.drumsetSpectrumWaves[i].markCustomWaveDirty();
                             }
                         }
                     }
@@ -32043,9 +32084,6 @@ You should be redirected to the song at:<br /><br />
 				.beepboxEditor.selectRow {
 					height: 2em;
 				}
-				.beepboxEditor .operatorRow {
-					heiht: 2em;
-				}
 				.beepboxEditor .trackAndMuteContainer {
 					max-height: 446px;
 				}
@@ -32055,7 +32093,6 @@ You should be redirected to the song at:<br /><br />
 				}
 				.beepboxEditor .trackAndMuteContainer {
 					scrollbar-width: auto;
-					scrollbar-color: ${ColorConfig.uiWidgetBackground} ${ColorConfig.editorBackground};
 				}
 				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar {
 					width: 20px;
@@ -32153,7 +32190,6 @@ You should be redirected to the song at:<br /><br />
 				}
 				.beepboxEditor .trackAndMuteContainer {
 					scrollbar-width: auto;
-					scrollbar-color: ${ColorConfig.uiWidgetBackground} ${ColorConfig.editorBackground};
 				}
 				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar {
 					width: 20px;
@@ -32314,9 +32350,6 @@ You should be redirected to the song at:<br /><br />
 				.beepboxEditor.selectRow {
 					height: 2em;
 				}
-				.beepboxEditor .operatorRow {
-					heiht: 2em;
-				}
 				.beepboxEditor .trackAndMuteContainer {
 					max-height: 446px;
 				}
@@ -32326,7 +32359,6 @@ You should be redirected to the song at:<br /><br />
 				}
 				.beepboxEditor .trackAndMuteContainer {
 					scrollbar-width: auto;
-					scrollbar-color: ${ColorConfig.uiWidgetBackground} ${ColorConfig.editorBackground};
 				}
 				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar {
 					width: 20px;
@@ -32399,9 +32431,6 @@ You should be redirected to the song at:<br /><br />
 				.beepboxEditor.selectRow {
 					height: 2em;
 				}
-				.beepboxEditor .operatorRow {
-					heiht: 2em;
-				}
 				.beepboxEditor .trackAndMuteContainer {
 					max-height: 446px;
 				}
@@ -32411,7 +32440,6 @@ You should be redirected to the song at:<br /><br />
 				}
 				.beepboxEditor .trackAndMuteContainer {
 					scrollbar-width: auto;
-					scrollbar-color: ${ColorConfig.uiWidgetBackground} ${ColorConfig.editorBackground};
 				}
 				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar {
 					width: 20px;
@@ -32489,9 +32517,6 @@ You should be redirected to the song at:<br /><br />
 				.beepboxEditor.selectRow {
 					height: 2em;
 				}
-				.beepboxEditor .operatorRow {
-					heiht: 2em;
-				}
 				.beepboxEditor .trackAndMuteContainer {
 					max-height: 446px;
 				}
@@ -32501,7 +32526,6 @@ You should be redirected to the song at:<br /><br />
 				}
 				.beepboxEditor .trackAndMuteContainer {
 					scrollbar-width: auto;
-					scrollbar-color: ${ColorConfig.uiWidgetBackground} ${ColorConfig.editorBackground};
 				}
 				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar {
 					width: 20px;
@@ -42607,6 +42631,7 @@ You should be redirected to the song at:<br /><br />
                 this._patternEditor.render();
                 const textOnIcon = ColorConfig.getComputed("--text-enabled-icon") !== "" ? ColorConfig.getComputed("--text-enabled-icon") : "✓ ";
                 const textOffIcon = ColorConfig.getComputed("--text-disabled-icon") !== "" ? ColorConfig.getComputed("--text-disabled-icon") : "　";
+                const textSpacingIcon = ColorConfig.getComputed("--text-spacing-icon") !== "" ? ColorConfig.getComputed("--text-spacing-icon") : "　";
                 const optionCommands = [
                     "Technical",
                     (prefs.autoPlay ? textOnIcon : textOffIcon) + "Auto Play on Load",
@@ -42620,8 +42645,8 @@ You should be redirected to the song at:<br /><br />
                     (prefs.instrumentImportExport ? textOnIcon : textOffIcon) + "Enable Import/Export Buttons",
                     (prefs.displayBrowserUrl ? textOnIcon : textOffIcon) + "Enable Song Data in URL",
                     (prefs.closePromptByClickoff ? textOnIcon : textOffIcon) + "Close Prompts on Click Off",
-                    "　Note Recording...",
-                    "Appearance",
+                    textSpacingIcon + "Note Recording...",
+                    textSpacingIcon + "Appearance",
                     (prefs.showFifth ? textOnIcon : textOffIcon) + 'Highlight "Fifth" Note',
                     (prefs.notesFlashWhenPlayed ? textOnIcon : textOffIcon) + "Notes Flash When Played",
                     (prefs.instrumentButtonsAtTop ? textOnIcon : textOffIcon) + "Instrument Buttons at Top",
@@ -42633,9 +42658,9 @@ You should be redirected to the song at:<br /><br />
                     (prefs.showOscilloscope ? textOnIcon : textOffIcon) + "Show Oscilloscope",
                     (prefs.showSampleLoadingStatus ? textOnIcon : textOffIcon) + "Show Sample Loading Status",
                     (prefs.showDescription ? textOnIcon : textOffIcon) + "Show Description",
-                    "　Set Layout...",
-                    "　Set Theme...",
-                    "　Custom Theme...",
+                    textSpacingIcon + "Set Layout...",
+                    textSpacingIcon + "Set Theme...",
+                    textSpacingIcon + "Custom Theme...",
                 ];
                 const technicalOptionGroup = this._optionsMenu.children[1];
                 for (let i = 0; i < technicalOptionGroup.children.length; i++) {
@@ -43961,7 +43986,7 @@ You should be redirected to the song at:<br /><br />
                         this._doc.synth.loopBarStart = -1;
                         this._doc.synth.loopBarEnd = -1;
                         this._loopEditor.setLoopAt(this._doc.synth.loopBarStart, this._doc.synth.loopBarEnd);
-                        if (event.ctrlKey || event.metaKey) {
+                        if ((event.ctrlKey || event.metaKey) && !event.shiftKey) {
                             this._doc.selection.insertChannel();
                         }
                         else if (event.shiftKey) {
@@ -44023,7 +44048,20 @@ You should be redirected to the song at:<br /><br />
                     case 70:
                         if (canPlayNotes)
                             break;
-                        if (needControlForShortcuts == (event.ctrlKey || event.metaKey)) {
+                        if (event.shiftKey) {
+                            this._doc.synth.loopBarStart = -1;
+                            this._doc.synth.loopBarEnd = -1;
+                            this._loopEditor.setLoopAt(this._doc.synth.loopBarStart, this._doc.synth.loopBarEnd);
+                            this._doc.synth.goToBar(this._doc.song.loopStart);
+                            this._doc.synth.snapToBar();
+                            this._doc.synth.initModFilters(this._doc.song);
+                            this._doc.synth.computeLatestModValues();
+                            if (this._doc.prefs.autoFollow) {
+                                this._doc.selection.setChannelBar(this._doc.channel, Math.floor(this._doc.synth.playhead));
+                            }
+                            event.preventDefault();
+                        }
+                        else if (needControlForShortcuts == (event.ctrlKey || event.metaKey)) {
                             this._doc.synth.loopBarStart = -1;
                             this._doc.synth.loopBarEnd = -1;
                             this._loopEditor.setLoopAt(this._doc.synth.loopBarStart, this._doc.synth.loopBarEnd);

@@ -220,7 +220,6 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
     -ms-transition: opacity 0.5s ease-in;
     transition: opacity 0.5s ease-in;
     transition-delay: 0.45s;
-	scrollbar-width: none;
 }
 
 .trackAndMuteContainer {

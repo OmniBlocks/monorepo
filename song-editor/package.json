@@ -1,16 +1,17 @@
 {
-	"name": "UltraBox",
-	"version": "2.2.8",
-	"description": "UltraBox is a mod of BeepBox that aims to combine every other beepmod into one.",
-	"author": "Main",
+	"name": "slarmoosbox",
+	"version": "1.0.1",
+	"description": "Slarmoo's Box is a mod of Ultrabox that aims to advance Beepbox's capabilities.",
+	"author": "Slarmoo",
 	"contributors": [
+		"Main",
 		"Neputendo",
 		"LeoV",
 		"Mid",
 		"Choptop84"
 	],
 	"license": "MIT",
-	"homepage": "https://ultraabox.github.io",
+	"homepage": "https://slarmoo.github.io/slarmoosbox/website/",
 	"type": "module",
 	"scripts": {
 		"build": "npm run build-synth && npm run build-player && npm run build-editor",
@@ -21,7 +22,7 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/ultraabox/ultrabox_typescript.git"
+		"url": "git+https://github.com/slarmoo/slarmoosbox.git"
 	},
 	"devDependencies": {
 		"@rollup/plugin-node-resolve": "^15.1.0",

@@ -855,24 +855,24 @@ var beepbox = (function (exports) {
         { name: "rise 1", type: 13, speed: 32.0 },
         { name: "rise 2", type: 13, speed: 8.0 },
         { name: "rise 3", type: 13, speed: 2.0 },
-        { name: "flute 1", type: 9, speed: 16.0 },
-        { name: "flute 2", type: 9, speed: 8.0 },
-        { name: "flute 3", type: 9, speed: 4.0 },
-        { name: "tripolo1", type: 6, speed: 9.0 },
-        { name: "tripolo2", type: 6, speed: 6.0 },
-        { name: "tripolo3", type: 6, speed: 3.0 },
-        { name: "tripolo4", type: 7, speed: 9.0 },
-        { name: "tripolo5", type: 7, speed: 6.0 },
-        { name: "tripolo6", type: 7, speed: 3.0 },
-        { name: "pentolo1", type: 6, speed: 10.0 },
-        { name: "pentolo2", type: 6, speed: 5.0 },
-        { name: "pentolo3", type: 6, speed: 2.5 },
-        { name: "pentolo4", type: 7, speed: 10.0 },
-        { name: "pentolo5", type: 7, speed: 5.0 },
-        { name: "pentolo6", type: 7, speed: 2.5 },
-        { name: "flutter 1", type: 6, speed: 14.0 },
-        { name: "flutter 2", type: 7, speed: 11.0 },
-        { name: "water-y flutter", type: 6, speed: 9.0 },
+        { name: "flute 1", type: 10, speed: 16.0 },
+        { name: "flute 2", type: 10, speed: 8.0 },
+        { name: "flute 3", type: 10, speed: 4.0 },
+        { name: "tripolo1", type: 7, speed: 9.0 },
+        { name: "tripolo2", type: 7, speed: 6.0 },
+        { name: "tripolo3", type: 7, speed: 3.0 },
+        { name: "tripolo4", type: 8, speed: 9.0 },
+        { name: "tripolo5", type: 8, speed: 6.0 },
+        { name: "tripolo6", type: 8, speed: 3.0 },
+        { name: "pentolo1", type: 7, speed: 10.0 },
+        { name: "pentolo2", type: 7, speed: 5.0 },
+        { name: "pentolo3", type: 7, speed: 2.5 },
+        { name: "pentolo4", type: 8, speed: 10.0 },
+        { name: "pentolo5", type: 8, speed: 5.0 },
+        { name: "pentolo6", type: 8, speed: 2.5 },
+        { name: "flutter 1", type: 7, speed: 14.0 },
+        { name: "flutter 2", type: 8, speed: 11.0 },
+        { name: "water-y flutter", type: 7, speed: 9.0 },
         { name: "blip 1", type: 14, speed: 6.0 },
         { name: "blip 2", type: 14, speed: 16.0 },
         { name: "blip 3", type: 14, speed: 32.0 },
@@ -28582,9 +28582,11 @@ li.select2-results__option[role=group] > strong:hover {
                 instrument.envelopes[i].target = instrument.envelopes[i + 1].target;
                 instrument.envelopes[i].index = instrument.envelopes[i + 1].index;
                 instrument.envelopes[i].envelope = instrument.envelopes[i + 1].envelope;
-                instrument.pitchEnvelopeStart[i] = instrument.pitchEnvelopeStart[i + 1];
-                instrument.pitchEnvelopeEnd[i] = instrument.pitchEnvelopeEnd[i + 1];
-                instrument.envelopeInverse[i] = instrument.envelopeInverse[i + 1];
+                if (i < instrument.envelopeCount - 1) {
+                    instrument.pitchEnvelopeStart[i] = instrument.pitchEnvelopeStart[i + 1];
+                    instrument.pitchEnvelopeEnd[i] = instrument.pitchEnvelopeEnd[i + 1];
+                    instrument.envelopeInverse[i] = instrument.envelopeInverse[i + 1];
+                }
             }
             instrument.preset = instrument.type;
             doc.notifier.changed();
@@ -45363,6 +45365,7 @@ You should be redirected to the song at:<br /><br />
                     else {
                         this._envelopeEditor._extraPitchSettingsGroups[submenu].style.display = "none";
                     }
+                    this._envelopeEditor.rerenderExtraSettings();
                 }
                 else if (group != this._chordDropdownGroup) {
                     group.style.display = "";

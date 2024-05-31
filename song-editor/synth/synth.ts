@@ -2916,7 +2916,7 @@ export class Instrument {
                     let envelopeInverse: boolean;
                     if (instrumentObject["envelopeInverse" + i] != undefined && instrumentObject["envelopeInverse" + i] != null) {
                         envelopeInverse = instrumentObject["envelopeInverse" + i];
-                    } else if (instrumentObject["pitchEnvelopeInverse"] != undefined && instrumentObject["pitchEnvelopeInverse"] != null) { //depracated, but we'll assign it to general envelope inverses
+                    } else if (instrumentObject["pitchEnvelopeInverse"] != undefined && instrumentObject["pitchEnvelopeInverse"] != null && Config.envelopes[tempEnvelope.envelope].name == "pitch") { //assign only if a pitch envelope
                         envelopeInverse = instrumentObject["pitchEnvelopeInverse"];
                     } else {
                         envelopeInverse = false;

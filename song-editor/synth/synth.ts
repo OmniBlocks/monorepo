@@ -5456,7 +5456,6 @@ export class Song {
                         instrument.envelopeSpeed = clamp(0, Config.modulators.dictionary["envelope speed"].maxRawVol + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                         instrument.discreteEnvelope = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)]) ? true : false;
                     }
-                    let env: number = 0;
                     for (let i: number = 0; i < envelopeCount; i++) {
                         const target: number = clamp(0, Config.instrumentAutomationTargets.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                         let index: number = 0;
@@ -5469,7 +5468,6 @@ export class Song {
                         if (fromJummBox) aa = jummToUltraEnvelope[aa];
                         if (!fromSlarmoosBox && aa >= 2) aa++; //2 for pitch
                         const envelope: number = clamp(0, Config.envelopes.length, aa);
-                        env = envelope; // a little hacky, but it's okay
                         instrument.addEnvelope(target, index, envelope);
                         if (fromSlarmoosBox && !beforeTwo) {
                             let pitchEnvelopeCompact: number = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
@@ -5491,7 +5489,7 @@ export class Song {
                         for (let i: number = 0; i < envelopeCount; i++) {
                             instrument.pitchEnvelopeStart[i] = instrumentPitchEnvelopeStart;
                             instrument.pitchEnvelopeEnd[i] = instrumentPitchEnvelopeEnd;
-                            instrument.envelopeInverse[i] = Config.envelopes[env].name == "pitch" ? instrumentEnvelopeInverse : false;
+                            instrument.envelopeInverse[i] = Config.envelopes[instrument.envelopes[i].envelope].name == "pitch" ? instrumentEnvelopeInverse : false;
                         }
                     }
                 }

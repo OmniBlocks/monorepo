@@ -1803,6 +1803,7 @@ export class SongEditor {
                 } else {
                     this._envelopeEditor._extraPitchSettingsGroups[submenu].style.display = "none";
                 }
+                this._envelopeEditor.rerenderExtraSettings();
             } else if (group != this._chordDropdownGroup) {
                 group.style.display = "";
             } // Only show arpeggio dropdown if chord arpeggiates

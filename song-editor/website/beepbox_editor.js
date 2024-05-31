@@ -16627,6 +16627,7 @@ li.select2-results__option[role=group] > strong:hover {
                                     instrument.envelopeSpeed = clamp(0, Config.modulators.dictionary["envelope speed"].maxRawVol + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                                     instrument.discreteEnvelope = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)]) ? true : false;
                                 }
+                                let env = 0;
                                 for (let i = 0; i < envelopeCount; i++) {
                                     const target = clamp(0, Config.instrumentAutomationTargets.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                                     let index = 0;
@@ -16642,6 +16643,7 @@ li.select2-results__option[role=group] > strong:hover {
                                     if (!fromSlarmoosBox && aa >= 2)
                                         aa++;
                                     const envelope = clamp(0, Config.envelopes.length, aa);
+                                    env = envelope;
                                     instrument.addEnvelope(target, index, envelope);
                                     if (fromSlarmoosBox && !beforeTwo) {
                                         let pitchEnvelopeCompact = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
@@ -16663,7 +16665,7 @@ li.select2-results__option[role=group] > strong:hover {
                                     for (let i = 0; i < envelopeCount; i++) {
                                         instrument.pitchEnvelopeStart[i] = instrumentPitchEnvelopeStart;
                                         instrument.pitchEnvelopeEnd[i] = instrumentPitchEnvelopeEnd;
-                                        instrument.envelopeInverse[i] = instrumentEnvelopeInverse;
+                                        instrument.envelopeInverse[i] = Config.envelopes[env].name == "pitch" ? instrumentEnvelopeInverse : false;
                                     }
                                 }
                             }

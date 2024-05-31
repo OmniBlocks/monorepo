@@ -2921,9 +2921,6 @@ export class Instrument {
                     } else {
                         envelopeInverse = false;
                     }
-                    // console.log("pitchEnvelopeStart = ", pitchEnvelopeStart);
-                    // console.log("pitchEnvelopeEnd = ", pitchEnvelopeEnd);
-                    // console.log("envelopeInverse = ", envelopeInverse);
                     this.addEnvelope(tempEnvelope.target, tempEnvelope.index, tempEnvelope.envelope, pitchEnvelopeStart, pitchEnvelopeEnd, envelopeInverse);
                 }
             }
@@ -2983,7 +2980,6 @@ export class Instrument {
         envelopeSettings.index = makeEmpty ? 0 : index;
         envelopeSettings.envelope = envelope;
         this.envelopeCount++;
-        console.log("envelopeCount: ", this.envelopeCount, "pitchEnvelopeStart: ", this.pitchEnvelopeStart,"start: ", start);
         this.pitchEnvelopeStart[this.envelopeCount - 1] = start;
         this.pitchEnvelopeEnd[this.envelopeCount - 1] = end;
         this.envelopeInverse[this.envelopeCount - 1] = inverse;

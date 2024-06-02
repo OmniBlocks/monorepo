@@ -18479,7 +18479,7 @@ li.select2-results__option[role=group] > strong:hover {
             switch (envelope.type) {
                 case 0: return 1.0;
                 case 1:
-                    if (instrument.envelopeInverse[index]) {
+                    if (index <= instrument.envelopeCount && instrument.envelopeInverse[index]) {
                         return 1.0 - Synth.noteSizeToVolumeMult(noteSize);
                     }
                     else {
@@ -18493,7 +18493,7 @@ li.select2-results__option[role=group] > strong:hover {
                     if (instrument.isNoiseInstrument) {
                         endNote = 11;
                     }
-                    if (index !== -2) {
+                    if (index <= instrument.envelopeCount && index !== -2) {
                         startNote = instrument.pitchEnvelopeStart[index];
                         endNote = instrument.pitchEnvelopeEnd[index];
                         inverse = instrument.envelopeInverse[index];
@@ -18529,42 +18529,42 @@ li.select2-results__option[role=group] > strong:hover {
                         }
                     }
                 case 5:
-                    if (instrument.envelopeInverse[index]) {
+                    if (index <= instrument.envelopeCount && instrument.envelopeInverse[index]) {
                         return 1.0 - (1.0 / (1.0 + time * envelope.speed));
                     }
                     else {
                         return 1.0 / (1.0 + time * envelope.speed);
                     }
                 case 6:
-                    if (instrument.envelopeInverse[index]) {
+                    if (index <= instrument.envelopeCount && instrument.envelopeInverse[index]) {
                         return 1.0 / (1.0 + time * envelope.speed);
                     }
                     else {
                         return 1.0 - 1.0 / (1.0 + time * envelope.speed);
                     }
                 case 7:
-                    if (instrument.envelopeInverse[index]) {
+                    if (index <= instrument.envelopeCount && instrument.envelopeInverse[index]) {
                         return 0.5 + Math.cos(beats * 2.0 * Math.PI * envelope.speed) * 0.5;
                     }
                     else {
                         return 0.5 - Math.cos(beats * 2.0 * Math.PI * envelope.speed) * 0.5;
                     }
                 case 8:
-                    if (instrument.envelopeInverse[index]) {
+                    if (index <= instrument.envelopeCount && instrument.envelopeInverse[index]) {
                         return 0.25 + Math.cos(beats * 2.0 * Math.PI * envelope.speed) * 0.25;
                     }
                     else {
                         return 0.75 - Math.cos(beats * 2.0 * Math.PI * envelope.speed) * 0.25;
                     }
                 case 3:
-                    if (instrument.envelopeInverse[index]) {
+                    if (index <= instrument.envelopeCount && instrument.envelopeInverse[index]) {
                         return 2.0 - Math.max(1.0, 2.0 - time * 10.0);
                     }
                     else {
                         return Math.max(1.0, 2.0 - time * 10.0);
                     }
                 case 4:
-                    if (instrument.envelopeInverse[index]) {
+                    if (index <= instrument.envelopeCount && instrument.envelopeInverse[index]) {
                         const attack = 0.25 / Math.sqrt(envelope.speed);
                         return 1.0 - (time < attack ? time / attack : 1.0 / (1.0 + (time - attack) * envelope.speed));
                     }
@@ -18573,14 +18573,14 @@ li.select2-results__option[role=group] > strong:hover {
                         return time < attack ? time / attack : 1.0 / (1.0 + (time - attack) * envelope.speed);
                     }
                 case 9:
-                    if (instrument.envelopeInverse[index]) {
+                    if (index <= instrument.envelopeCount && instrument.envelopeInverse[index]) {
                         return 1.0 - Math.pow(2, -envelope.speed * time);
                     }
                     else {
                         return Math.pow(2, -envelope.speed * time);
                     }
                 case 14:
-                    if (instrument.envelopeInverse[index]) {
+                    if (index <= instrument.envelopeCount && instrument.envelopeInverse[index]) {
                         return 1.0 - +(time < (0.25 / Math.sqrt(envelope.speed)));
                     }
                     else {
@@ -18590,7 +18590,7 @@ li.select2-results__option[role=group] > strong:hover {
                     let temp = 0.5 - Math.cos(beats * envelope.speed) * 0.5;
                     temp = 1.0 / (1.0 + time * (envelope.speed - (temp / (1.5 / envelope.speed))));
                     temp = temp > 0.0 ? temp : 0.0;
-                    if (instrument.envelopeInverse[index]) {
+                    if (index <= instrument.envelopeCount && instrument.envelopeInverse[index]) {
                         return 1.0 - temp;
                     }
                     else {
@@ -18599,7 +18599,7 @@ li.select2-results__option[role=group] > strong:hover {
                 case 12: {
                     let lin = (1.0 - (time / (16 / envelope.speed)));
                     lin = lin > 0.0 ? lin : 0.0;
-                    if (instrument.envelopeInverse[index]) {
+                    if (index <= instrument.envelopeCount && instrument.envelopeInverse[index]) {
                         return 1.0 - lin;
                     }
                     else {
@@ -18609,7 +18609,7 @@ li.select2-results__option[role=group] > strong:hover {
                 case 13: {
                     let lin = (time / (16 / envelope.speed));
                     lin = lin < 1.0 ? lin : 1.0;
-                    if (instrument.envelopeInverse[index]) {
+                    if (index <= instrument.envelopeCount && instrument.envelopeInverse[index]) {
                         return 1.0 - lin;
                     }
                     else {
@@ -28582,11 +28582,9 @@ li.select2-results__option[role=group] > strong:hover {
                 instrument.envelopes[i].target = instrument.envelopes[i + 1].target;
                 instrument.envelopes[i].index = instrument.envelopes[i + 1].index;
                 instrument.envelopes[i].envelope = instrument.envelopes[i + 1].envelope;
-                if (i < instrument.envelopeCount - 1) {
-                    instrument.pitchEnvelopeStart[i] = instrument.pitchEnvelopeStart[i + 1];
-                    instrument.pitchEnvelopeEnd[i] = instrument.pitchEnvelopeEnd[i + 1];
-                    instrument.envelopeInverse[i] = instrument.envelopeInverse[i + 1];
-                }
+                instrument.pitchEnvelopeStart[i] = instrument.pitchEnvelopeStart[i + 1];
+                instrument.pitchEnvelopeEnd[i] = instrument.pitchEnvelopeEnd[i + 1];
+                instrument.envelopeInverse[i] = instrument.envelopeInverse[i + 1];
             }
             instrument.preset = instrument.type;
             doc.notifier.changed();

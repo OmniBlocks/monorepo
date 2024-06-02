@@ -8910,7 +8910,7 @@ var beepbox = (function (exports) {
             switch (envelope.type) {
                 case 0: return 1.0;
                 case 1:
-                    if (instrument.envelopeInverse[index]) {
+                    if (index <= instrument.envelopeCount && instrument.envelopeInverse[index]) {
                         return 1.0 - Synth.noteSizeToVolumeMult(noteSize);
                     }
                     else {
@@ -8924,7 +8924,7 @@ var beepbox = (function (exports) {
                     if (instrument.isNoiseInstrument) {
                         endNote = 11;
                     }
-                    if (index !== -2) {
+                    if (index <= instrument.envelopeCount && index !== -2) {
                         startNote = instrument.pitchEnvelopeStart[index];
                         endNote = instrument.pitchEnvelopeEnd[index];
                         inverse = instrument.envelopeInverse[index];
@@ -8960,42 +8960,42 @@ var beepbox = (function (exports) {
                         }
                     }
                 case 5:
-                    if (instrument.envelopeInverse[index]) {
+                    if (index <= instrument.envelopeCount && instrument.envelopeInverse[index]) {
                         return 1.0 - (1.0 / (1.0 + time * envelope.speed));
                     }
                     else {
                         return 1.0 / (1.0 + time * envelope.speed);
                     }
                 case 6:
-                    if (instrument.envelopeInverse[index]) {
+                    if (index <= instrument.envelopeCount && instrument.envelopeInverse[index]) {
                         return 1.0 / (1.0 + time * envelope.speed);
                     }
                     else {
                         return 1.0 - 1.0 / (1.0 + time * envelope.speed);
                     }
                 case 7:
-                    if (instrument.envelopeInverse[index]) {
+                    if (index <= instrument.envelopeCount && instrument.envelopeInverse[index]) {
                         return 0.5 + Math.cos(beats * 2.0 * Math.PI * envelope.speed) * 0.5;
                     }
                     else {
                         return 0.5 - Math.cos(beats * 2.0 * Math.PI * envelope.speed) * 0.5;
                     }
                 case 8:
-                    if (instrument.envelopeInverse[index]) {
+                    if (index <= instrument.envelopeCount && instrument.envelopeInverse[index]) {
                         return 0.25 + Math.cos(beats * 2.0 * Math.PI * envelope.speed) * 0.25;
                     }
                     else {
                         return 0.75 - Math.cos(beats * 2.0 * Math.PI * envelope.speed) * 0.25;
                     }
                 case 3:
-                    if (instrument.envelopeInverse[index]) {
+                    if (index <= instrument.envelopeCount && instrument.envelopeInverse[index]) {
                         return 2.0 - Math.max(1.0, 2.0 - time * 10.0);
                     }
                     else {
                         return Math.max(1.0, 2.0 - time * 10.0);
                     }
                 case 4:
-                    if (instrument.envelopeInverse[index]) {
+                    if (index <= instrument.envelopeCount && instrument.envelopeInverse[index]) {
                         const attack = 0.25 / Math.sqrt(envelope.speed);
                         return 1.0 - (time < attack ? time / attack : 1.0 / (1.0 + (time - attack) * envelope.speed));
                     }
@@ -9004,14 +9004,14 @@ var beepbox = (function (exports) {
                         return time < attack ? time / attack : 1.0 / (1.0 + (time - attack) * envelope.speed);
                     }
                 case 9:
-                    if (instrument.envelopeInverse[index]) {
+                    if (index <= instrument.envelopeCount && instrument.envelopeInverse[index]) {
                         return 1.0 - Math.pow(2, -envelope.speed * time);
                     }
                     else {
                         return Math.pow(2, -envelope.speed * time);
                     }
                 case 14:
-                    if (instrument.envelopeInverse[index]) {
+                    if (index <= instrument.envelopeCount && instrument.envelopeInverse[index]) {
                         return 1.0 - +(time < (0.25 / Math.sqrt(envelope.speed)));
                     }
                     else {
@@ -9021,7 +9021,7 @@ var beepbox = (function (exports) {
                     let temp = 0.5 - Math.cos(beats * envelope.speed) * 0.5;
                     temp = 1.0 / (1.0 + time * (envelope.speed - (temp / (1.5 / envelope.speed))));
                     temp = temp > 0.0 ? temp : 0.0;
-                    if (instrument.envelopeInverse[index]) {
+                    if (index <= instrument.envelopeCount && instrument.envelopeInverse[index]) {
                         return 1.0 - temp;
                     }
                     else {
@@ -9030,7 +9030,7 @@ var beepbox = (function (exports) {
                 case 12: {
                     let lin = (1.0 - (time / (16 / envelope.speed)));
                     lin = lin > 0.0 ? lin : 0.0;
-                    if (instrument.envelopeInverse[index]) {
+                    if (index <= instrument.envelopeCount && instrument.envelopeInverse[index]) {
                         return 1.0 - lin;
                     }
                     else {
@@ -9040,7 +9040,7 @@ var beepbox = (function (exports) {
                 case 13: {
                     let lin = (time / (16 / envelope.speed));
                     lin = lin < 1.0 ? lin : 1.0;
-                    if (instrument.envelopeInverse[index]) {
+                    if (index <= instrument.envelopeCount && instrument.envelopeInverse[index]) {
                         return 1.0 - lin;
                     }
                     else {

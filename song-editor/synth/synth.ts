@@ -7487,7 +7487,7 @@ class EnvelopeComputer {
         switch (envelope.type) {
             case EnvelopeType.none: return 1.0;
             case EnvelopeType.noteSize:
-                if (instrument.envelopeInverse[index]) {
+                if (index <= instrument.envelopeCount && instrument.envelopeInverse[index]) {
                     return 1.0 - Synth.noteSizeToVolumeMult(noteSize);
                 } else {
                     return Synth.noteSizeToVolumeMult(noteSize);
@@ -7502,7 +7502,7 @@ class EnvelopeComputer {
                     endNote = 11;
                 }
             
-                if (index !== -2) {
+                if (index <= instrument.envelopeCount && index !== -2) {
                     startNote = instrument.pitchEnvelopeStart[index];
                     endNote = instrument.pitchEnvelopeEnd[index];
                     inverse = instrument.envelopeInverse[index];
@@ -7533,49 +7533,49 @@ class EnvelopeComputer {
                     }
                 }
             case EnvelopeType.twang:
-                if (instrument.envelopeInverse[index]) {
+                if (index <= instrument.envelopeCount && instrument.envelopeInverse[index]) {
                     return 1.0 - (1.0 / (1.0 + time * envelope.speed /*  * localEnvelopeSpeed */));
                 } else {
                     return 1.0 / (1.0 + time * envelope.speed /*  * localEnvelopeSpeed */);
                 }
             case EnvelopeType.swell: 
-                if (instrument.envelopeInverse[index]) {
+                if (index <= instrument.envelopeCount && instrument.envelopeInverse[index]) {
                     return 1.0 / (1.0 + time * envelope.speed); //swell is twang's inverse... I wonder if it would be worth it to just merge the two :/
                 } else {
                     return 1.0 - 1.0 / (1.0 + time * envelope.speed);
                 }
             case EnvelopeType.tremolo: 
-                if (instrument.envelopeInverse[index]) {
+                if (index <= instrument.envelopeCount && instrument.envelopeInverse[index]) {
                     return 0.5 + Math.cos(beats * 2.0 * Math.PI * envelope.speed) * 0.5;
                 } else {
                     return 0.5 - Math.cos(beats * 2.0 * Math.PI * envelope.speed) * 0.5;
                 }
             case EnvelopeType.tremolo2: 
-                if (instrument.envelopeInverse[index]) {
+                if (index <= instrument.envelopeCount && instrument.envelopeInverse[index]) {
                     return 0.25 + Math.cos(beats * 2.0 * Math.PI * envelope.speed) * 0.25; //inverse works strangely with tremolo2, but I think it's worth keeping it in and saying it's a feature :p
                 } else {
                     return 0.75 - Math.cos(beats * 2.0 * Math.PI * envelope.speed) * 0.25;
                 }
             case EnvelopeType.punch: 
-                if (instrument.envelopeInverse[index]) {
+                if (index <= instrument.envelopeCount && instrument.envelopeInverse[index]) {
                     return 2.0 - Math.max(1.0, 2.0 - time * 10.0); //punch special case: 2- instead of 1-
                 } else {
                     return Math.max(1.0, 2.0 - time * 10.0);
                 }
             case EnvelopeType.flare: 
-                if (instrument.envelopeInverse[index]) {
+                if (index <= instrument.envelopeCount && instrument.envelopeInverse[index]) {
                     const attack: number = 0.25 / Math.sqrt(envelope.speed); return 1.0 - (time < attack ? time / attack : 1.0 / (1.0 + (time - attack) * envelope.speed));
                 } else {
                     const attack: number = 0.25 / Math.sqrt(envelope.speed); return time < attack ? time / attack : 1.0 / (1.0 + (time - attack) * envelope.speed);
                 }
             case EnvelopeType.decay: 
-                if (instrument.envelopeInverse[index]) {
+                if (index <= instrument.envelopeCount && instrument.envelopeInverse[index]) {
                     return 1.0 - Math.pow(2, -envelope.speed * time);
                 } else {
                     return Math.pow(2, -envelope.speed * time);
                 }
             case EnvelopeType.blip: 
-                if (instrument.envelopeInverse[index]) {
+                if (index <= instrument.envelopeCount && instrument.envelopeInverse[index]) {
                     return 1.0 - +(time < (0.25 / Math.sqrt(envelope.speed)));
                 } else {
                     return 1.0 * +(time < (0.25 / Math.sqrt(envelope.speed)));
@@ -7584,7 +7584,7 @@ class EnvelopeComputer {
                 let temp = 0.5 - Math.cos(beats * envelope.speed) * 0.5;
                 temp = 1.0 / (1.0 + time * (envelope.speed - (temp / (1.5 / envelope.speed))));
                 temp = temp > 0.0 ? temp : 0.0;
-                if (instrument.envelopeInverse[index]) {
+                if (index <= instrument.envelopeCount && instrument.envelopeInverse[index]) {
                     return 1.0 - temp;
                 } else {
                     return temp;
@@ -7592,7 +7592,7 @@ class EnvelopeComputer {
             case EnvelopeType.linear: {
                 let lin = (1.0 - (time / (16 / envelope.speed)));
                 lin = lin > 0.0 ? lin : 0.0;
-                if (instrument.envelopeInverse[index]) { //another case where linear's inverse is rise. Do I merge them?
+                if (index <= instrument.envelopeCount && instrument.envelopeInverse[index]) { //another case where linear's inverse is rise. Do I merge them?
                     return 1.0 - lin;
                 } else {
                     return lin;
@@ -7601,7 +7601,7 @@ class EnvelopeComputer {
             case EnvelopeType.rise: {
                 let lin = (time / (16 / envelope.speed));
                 lin = lin < 1.0 ? lin : 1.0;
-                if (instrument.envelopeInverse[index]) {
+                if (index <= instrument.envelopeCount && instrument.envelopeInverse[index]) {
                     return 1.0 - lin;
                 } else {
                     return lin;

@@ -192,6 +192,6 @@
 }
 
 .pride-month {
-    width: 250px;
+    max-width: 350px;
     margin-top: 0.75rem;
 }

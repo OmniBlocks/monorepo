@@ -19,8 +19,7 @@
         text-align: center;
         font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
       }
-      .splash-screen[hidden],
-      .tw-loaded .splash-screen {
+      .splash-screen[hidden] {
         display: none;
       }
       .splash-spinner:after {
@@ -59,8 +58,18 @@
         <b>Did you know?</b> The first Pride march was held on June 28, 1970, one year after the Stonewall riots.
       </div>
     </div>
+
     <script>
-      document.getElementById("splash-need-js").hidden = false;
+      (function() {
+        'use strict';
+
+        var splash = document.getElementById('splash-need-js');
+        splash.hidden = false;
+
+        window.SplashEnd = () => {
+          splash.hidden = true;
+        };
+      }());
     </script>
 
     <div id="app"></div>

@@ -3901,7 +3901,7 @@ var beepbox = (function (exports) {
                     instrumentObject["harmonics"][i] = Math.round(100 * this.harmonicsWave.harmonics[i] / Config.harmonicsMax);
                 }
             }
-            if (this.type == 12 || this.type == 7) {
+            if (this.type == 12) {
                 instrumentObject["additive"] = [];
                 instrumentObject["additiveWaves"] = [];
                 for (let i = 0; i < Config.additiveControlPoints; i++) {

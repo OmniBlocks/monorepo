@@ -2060,7 +2060,7 @@ export class Instrument {
             }
         }
 
-        if (this.type == InstrumentType.additive || this.type == InstrumentType.pickedString) {
+        if (this.type == InstrumentType.additive) {
             instrumentObject["additive"] = [];
             instrumentObject["additiveWaves"] = [];
             for (let i: number = 0; i < Config.additiveControlPoints; i++) {

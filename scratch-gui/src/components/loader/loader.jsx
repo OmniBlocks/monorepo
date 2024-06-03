@@ -155,7 +155,7 @@ class LoaderComponent extends React.Component {
                         >
                             <b>{'Did you know?'}</b>
                             {' '}
-                            {'The first Pride march was held on June 28, 1970, one year after the Stonewall riots.'}
+                            {'The pride flag was created by an artist named Gilbert Baker in 1978.'}
                         </div>
                     )}
                 </div>

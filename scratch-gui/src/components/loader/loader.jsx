@@ -155,7 +155,7 @@ class LoaderComponent extends React.Component {
                         >
                             <b>{'Did you know?'}</b>
                             {' '}
-                            {'The pride flag was created by an artist named Gilbert Baker in 1978.'}
+                            {'The pride flag was created by Gilbert Baker and other activists in 1978.'}
                         </div>
                     )}
                 </div>

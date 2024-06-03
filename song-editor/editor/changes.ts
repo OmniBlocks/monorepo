@@ -1293,6 +1293,7 @@ export class ChangeChannelCount extends Change {
                                 const presetValue: number = pickRandomPresetValue(isNoise);
                                 const preset: Preset = EditorConfig.valueToPreset(presetValue)!;
                                 instrument.fromJsonObject(preset.settings, isNoise, isMod, doc.song.rhythm == 0 || doc.song.rhythm == 2, doc.song.rhythm >= 2);
+                                instrument.effects |= (1 << EffectType.panning); // Panning is enabled by default in JB.
                                 instrument.preset = presetValue;
                             }
                             newChannels[channelIndex].instruments[j] = instrument;
@@ -2254,6 +2255,7 @@ export class ChangeAddChannelInstrument extends Change {
         const preset: Preset = EditorConfig.valueToPreset(presetValue)!;
         const instrument: Instrument = new Instrument(isNoise, isMod);
         instrument.fromJsonObject(preset.settings, isNoise, isMod, false, false, 1);
+        instrument.effects |= (1 << EffectType.panning); // Panning is enabled by default in JB.
         instrument.preset = presetValue;
         instrument.volume = 0;
         channel.instruments.push(instrument);
@@ -3165,6 +3167,7 @@ export function setDefaultInstruments(song: Song): void {
             const presetValue: number = (channelIndex == song.pitchChannelCount) ? EditorConfig.nameToPresetValue(Math.random() > 0.5 ? "chip noise" : "standard drumset")! : pickRandomPresetValue(isNoise);
             const preset: Preset = EditorConfig.valueToPreset(presetValue)!;
             instrument.fromJsonObject(preset.settings, isNoise, isMod, song.rhythm == 0 || song.rhythm == 2, song.rhythm >= 2, 1);
+            instrument.effects |= (1 << EffectType.panning); // Panning enabled by default in JB.
             instrument.preset = presetValue;
         }
     }

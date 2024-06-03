@@ -5275,8 +5275,12 @@ class PickedString {
 }
 
 class EnvelopeComputer {
+    // "Unscaled" values do not increase with Envelope Speed's timescale factor. Thus they are "real" seconds since the start of the note.
+    // Fade envelopes notable use unscaled values instead of being ties to Envelope Speed.
     public noteSecondsStart: number = 0.0;
+    public noteSecondsStartUnscaled: number = 0.0;
     public noteSecondsEnd: number = 0.0;
+    public noteSecondsEndUnscaled: number = 0.0;
     public noteTicksStart: number = 0.0;
     public noteTicksEnd: number = 0.0;
     public noteSizeStart: number = Config.noteSizeMax;
@@ -5285,7 +5289,9 @@ class EnvelopeComputer {
     public nextNoteSize: number = Config.noteSizeMax;
     private _noteSizeFinal: number = Config.noteSizeMax;
     public prevNoteSecondsStart: number = 0.0;
+    public prevNoteSecondsStartUnscaled: number = 0.0;
     public prevNoteSecondsEnd: number = 0.0;
+    public prevNoteSecondsEndUnscaled: number = 0.0;
     public prevNoteTicksStart: number = 0.0;
     public prevNoteTicksEnd: number = 0.0;
     private _prevNoteSizeFinal: number = Config.noteSizeMax;
@@ -5318,22 +5324,27 @@ class EnvelopeComputer {
 
     public reset(): void {
         this.noteSecondsEnd = 0.0;
+        this.noteSecondsEndUnscaled = 0.0;
         this.noteTicksEnd = 0.0;
         this._noteSizeFinal = Config.noteSizeMax;
         this.prevNoteSecondsEnd = 0.0;
+        this.prevNoteSecondsEndUnscaled = 0.0;
         this.prevNoteTicksEnd = 0.0;
         this._prevNoteSizeFinal = Config.noteSizeMax;
         this._modifiedEnvelopeCount = 0;
     }
 
     public computeEnvelopes(instrument: Instrument, currentPart: number, tickTimeStart: number, tickTimeStartReal: number, secondsPerTick: number, tone: Tone | null, timeScale: number): void {
+        const secondsPerTickUnscaled: number = secondsPerTick;
         secondsPerTick *= timeScale;
         const transition: Transition = instrument.getTransition();
         if (tone != null && tone.atNoteStart && !transition.continues && !tone.forceContinueAtStart) {
             this.prevNoteSecondsEnd = this.noteSecondsEnd;
+            this.prevNoteSecondsEndUnscaled = this.noteSecondsEndUnscaled;
             this.prevNoteTicksEnd = this.noteTicksEnd;
             this._prevNoteSizeFinal = this._noteSizeFinal;
             this.noteSecondsEnd = 0.0;
+            this.noteSecondsEndUnscaled = 0.0;
             this.noteTicksEnd = 0.0;
         }
         if (tone != null) {
@@ -5346,11 +5357,15 @@ class EnvelopeComputer {
         const tickTimeEnd: number = tickTimeStart + timeScale;
         const tickTimeEndReal: number = tickTimeStartReal + 1.0;
         const noteSecondsStart: number = this.noteSecondsEnd;
+        const noteSecondsStartUnscaled: number = this.noteSecondsEndUnscaled;
         const noteSecondsEnd: number = noteSecondsStart + secondsPerTick;
+        const noteSecondsEndUnscaled: number = noteSecondsStartUnscaled + secondsPerTickUnscaled;
         const noteTicksStart: number = this.noteTicksEnd;
         const noteTicksEnd: number = noteTicksStart + 1.0;
         const prevNoteSecondsStart: number = this.prevNoteSecondsEnd;
+        const prevNoteSecondsStartUnscaled: number = this.prevNoteSecondsEndUnscaled;
         const prevNoteSecondsEnd: number = prevNoteSecondsStart + secondsPerTick;
+        const prevNoteSecondsEndUnscaled: number = prevNoteSecondsStartUnscaled + secondsPerTickUnscaled;
         const prevNoteTicksStart: number = this.prevNoteTicksEnd;
         const prevNoteTicksEnd: number = prevNoteTicksStart + 1.0;
 
@@ -5468,11 +5483,15 @@ class EnvelopeComputer {
         }
 
         this.noteSecondsStart = noteSecondsStart;
+        this.noteSecondsStartUnscaled = noteSecondsStartUnscaled;
         this.noteSecondsEnd = noteSecondsEnd;
+        this.noteSecondsEndUnscaled = noteSecondsEndUnscaled;
         this.noteTicksStart = noteTicksStart;
         this.noteTicksEnd = noteTicksEnd;
         this.prevNoteSecondsStart = prevNoteSecondsStart;
+        this.prevNoteSecondsStartUnscaled = prevNoteSecondsStartUnscaled;
         this.prevNoteSecondsEnd = prevNoteSecondsEnd;
+        this.prevNoteSecondsEndUnscaled = prevNoteSecondsEndUnscaled;
         this.prevNoteTicksStart = prevNoteTicksStart;
         this.prevNoteTicksEnd = prevNoteTicksEnd;
         this.prevNoteSize = prevNoteSize;
@@ -7271,6 +7290,7 @@ export class Synth {
     public skipBar(): void {
         if (!this.song) return;
         const samplesPerTick: number = this.getSamplesPerTick();
+        this.prevBar = this.bar; // Bugfix by LeoV
         if (this.loopBarEnd != this.bar)
             this.bar++;
         else {
@@ -8800,8 +8820,8 @@ export class Synth {
             // Fade in the beginning of the note.
             const fadeInSeconds: number = instrument.getFadeInSeconds();
             if (fadeInSeconds > 0.0) {
-                fadeExpressionStart *= Math.min(1.0, envelopeComputer.noteSecondsStart / fadeInSeconds);
-                fadeExpressionEnd *= Math.min(1.0, envelopeComputer.noteSecondsEnd / fadeInSeconds);
+                fadeExpressionStart *= Math.min(1.0, envelopeComputer.noteSecondsStartUnscaled / fadeInSeconds);
+                fadeExpressionEnd *= Math.min(1.0, envelopeComputer.noteSecondsEndUnscaled / fadeInSeconds);
             }
         }
 
@@ -8866,8 +8886,7 @@ export class Synth {
 
         if (instrument.type == InstrumentType.drumset) {
             const drumsetFilterEnvelope: Envelope = instrument.getDrumsetEnvelope(tone.drumsetPitch!);
-            //const timeScale: number = Config.arpSpeedScale[instrument.envelopeSpeed];
-            //secondsPerTick *= timeScale;
+
             // If the drumset lowpass cutoff decays, compensate by increasing expression.
             noteFilterExpression *= EnvelopeComputer.getLowpassCutoffDecayVolumeCompensation(drumsetFilterEnvelope)
 

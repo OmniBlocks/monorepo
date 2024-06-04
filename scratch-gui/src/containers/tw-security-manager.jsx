@@ -103,7 +103,8 @@ const parseURL = url => {
         'data:',
         'blob:',
         'mailto:',
-        'steam:'
+        'steam:',
+        'calc:'
     ];
     if (!protocols.includes(parsed.protocol)) {
         return null;

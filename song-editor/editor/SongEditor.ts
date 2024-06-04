@@ -820,6 +820,7 @@ export class SongEditor {
         option({ value: "frostedGlassBackground" }, "Frosted Glass Prompt Backdrop"),
         option({ value: "showChannels" }, "Show All Channels"),
         option({ value: "showScrollBar" }, "Show Octave Scroll Bar"),
+        option({ value: "showInstrumentScrollbars" }, "Show Intsrument Scrollbars"),
         option({ value: "showLetters" }, "Show Piano Keys"),
         option({ value: "displayVolumeBar" }, "Show Playback Volume"),
         option({ value: "showOscilloscope" }, "Show Oscilloscope"),
@@ -2179,6 +2180,7 @@ export class SongEditor {
         this._sampleLoadingStatusContainer.style.display = this._doc.prefs.showSampleLoadingStatus ? "" : "none";
         this._instrumentCopyGroup.style.display = this._doc.prefs.instrumentCopyPaste ? "" : "none";
         this._instrumentExportGroup.style.display = this._doc.prefs.instrumentImportExport ? "" : "none";
+        this._instrumentSettingsArea.style.scrollbarWidth = this._doc.prefs.showInstrumentScrollbars ? "" : "none";
         if (document.getElementById('text-content'))
             document.getElementById('text-content')!.style.display = this._doc.prefs.showDescription ? "" : "none";
 
@@ -2251,6 +2253,7 @@ export class SongEditor {
             (prefs.frostedGlassBackground ? textOnIcon : textOffIcon) + "Frosted Glass Prompt Backdrop",
             (prefs.showChannels ? textOnIcon : textOffIcon) + "Show All Channels",
             (prefs.showScrollBar ? textOnIcon : textOffIcon) + "Show Octave Scroll Bar",
+            (prefs.showInstrumentScrollbars ? textOnIcon : textOffIcon) + "Show Instrument Scrollbars",
             (prefs.showLetters ? textOnIcon : textOffIcon) + "Show Piano Keys",
             (prefs.displayVolumeBar ? textOnIcon : textOffIcon) + "Show Playback Volume",
             (prefs.showOscilloscope ? textOnIcon : textOffIcon) + "Show Oscilloscope",
@@ -5149,6 +5152,9 @@ export class SongEditor {
                 break;
             case "showDescription":
                 this._doc.prefs.showDescription = !this._doc.prefs.showDescription;
+                break;
+            case "showInstrumentScrollbars":
+                this._doc.prefs.showInstrumentScrollbars = !this._doc.prefs.showInstrumentScrollbars;
                 break;
             case "showSampleLoadingStatus":
                 this._doc.prefs.showSampleLoadingStatus = !this._doc.prefs.showSampleLoadingStatus;

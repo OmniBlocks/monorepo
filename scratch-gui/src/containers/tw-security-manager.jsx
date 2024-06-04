@@ -94,7 +94,17 @@ const parseURL = url => {
     } catch (e) {
         return null;
     }
-    const protocols = ['http:', 'https:', 'ws:', 'wss:', 'data:', 'blob:'];
+    const protocols = [
+        // The important one we want to exclude is javascript:
+        'http:',
+        'https:',
+        'ws:',
+        'wss:',
+        'data:',
+        'blob:',
+        'mailto:',
+        'steam:'
+    ];
     if (!protocols.includes(parsed.protocol)) {
         return null;
     }

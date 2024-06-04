@@ -39,6 +39,7 @@ export class ThemePrompt implements Prompt {
 		option({ value: "blutonium" }, "Blutonium"),
 		// colorblind-friendly themes, by nep and choptop. in most circumstances I wouldn't add ultrabox-unique themes because of the custom theme sheet, but
 		// the azur lane theme is here because nep wanted it...
+		option({ value: "slarmoosbox" }, "Slarmoo's Box"),
 		option({ value: "azur lane" }, "Azur Lane"),
 		option({ value: "modbox classic" }, "Modbox"),
 		option({ value: "sandbox classic" }, "Sandbox"),
@@ -96,7 +97,7 @@ export class ThemePrompt implements Prompt {
 		if (this.lastTheme != null) {
 			ColorConfig.setTheme(this.lastTheme);
 		} else {
-			ColorConfig.setTheme("dark classic");
+			ColorConfig.setTheme("slarmoosbox");
 		}
 		this._doc.undo();
 	}

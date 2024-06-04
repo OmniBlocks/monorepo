@@ -1525,7 +1525,7 @@ var beepbox = (function (exports) {
             return (_a = EditorConfig.presetCategories[0].presets.dictionary) === null || _a === void 0 ? void 0 : _a[TypePresets === null || TypePresets === void 0 ? void 0 : TypePresets[instrument]];
         }
     }
-    EditorConfig.version = "1.0";
+    EditorConfig.version = "1.1";
     EditorConfig.versionDisplayName = "Slarmoo's Box " + EditorConfig.version;
     EditorConfig.releaseNotesURL = "./patch_notes.html";
     EditorConfig.isOnMac = /^Mac/i.test(navigator.platform) || /Mac OS X/i.test(navigator.userAgent) || /^(iPhone|iPad|iPod)/i.test(navigator.platform) || /(iPhone|iPad|iPod)/i.test(navigator.userAgent);
@@ -2248,7 +2248,7 @@ var beepbox = (function (exports) {
         static setTheme(name) {
             let theme = this.themes[name];
             if (theme == undefined)
-                theme = this.themes["dark classic"];
+                theme = this.themes["slarmoosbox"];
             this._styleElement.textContent = theme;
             const themeColor = document.querySelector("meta[name='theme-color']");
             if (themeColor != null) {
@@ -8935,6 +8935,123 @@ var beepbox = (function (exports) {
 				}
 	
 				`,
+        "slarmoosbox": `
+			:root {
+				--page-margin: #14052a;
+				--editor-background: #14052a;
+				--hover-preview: white;
+				--playhead: rgba(255, 255, 255, 0.9);
+				--primary-text: #71eef5;
+				--secondary-text: #3abbc2;
+				--inverted-text: #13696e;
+				--box-selection-fill: #36c72c;
+				--loop-accent: #71eef5;
+				--link-accent: white;
+				--ui-widget-background: #183d15;
+				--ui-widget-focus: #247d1d;
+				--pitch-background: #2e0e61;
+				--tonic: #247d1d;
+				--fifth-note: #3abbc2;
+				--white-piano-key: #ffffff;
+				--black-piano-key: #061705;
+				--white-piano-key-text: #061705;
+				--black-piano-key-text: #fff;
+				--use-color-formula: true;
+				--track-editor-bg-pitch: #09383b;
+				--track-editor-bg-pitch-dim: #14052a;
+				--track-editor-bg-noise: #40400b;
+				--track-editor-bg-noise-dim: #14052a;
+				--track-editor-bg-mod: #0a2c08;
+				--track-editor-bg-mod-dim: #14052a;
+				--multiplicative-mod-slider: #3abbc2;
+				--overwriting-mod-slider: #71eef5;
+				--indicator-primary: #a773f5;
+				--indicator-secondary: #4c1c99;
+				--select2-opt-group: #183d15;
+				--input-box-outline: #18041a;
+				--mute-button-normal: #36c72c;
+				--mute-button-mod: #a773f5;
+				--mod-label-primary: #a773f5;
+				--mod-label-secondary-text: #6b29cf;
+				--mod-label-primary-text: #14052a;
+				--mod-title: #2e0e61;
+				--pitch-secondary-channel-hue: 100;
+				--pitch-secondary-channel-hue-scale: 6.1;
+				--pitch-secondary-channel-sat: 100.0;
+				--pitch-secondary-channel-sat-scale: 0.15;
+				--pitch-secondary-channel-lum: 60.0;
+				--pitch-secondary-channel-lum-scale: 0.05;
+				--pitch-primary-channel-hue: 100;
+				--pitch-primary-channel-hue-scale: 6.1;
+				--pitch-primary-channel-sat: 100;
+				--pitch-primary-channel-sat-scale: 0.15;
+				--pitch-primary-channel-lum: 75.0;
+				--pitch-primary-channel-lum-scale: 0.05;
+				--pitch-secondary-note-hue: 100;
+				--pitch-secondary-note-hue-scale: 6.1;
+				--pitch-secondary-note-sat: 95.0;
+				--pitch-secondary-note-sat-scale: 0.15;
+				--pitch-secondary-note-lum: 40;
+				--pitch-secondary-note-lum-scale: 0.05;
+				--pitch-primary-note-hue: 100;
+				--pitch-primary-note-hue-scale: 6.1;
+				--pitch-primary-note-sat: 100;
+				--pitch-primary-note-sat-scale: 0.15;
+				--pitch-primary-note-lum: 85.6;
+				--pitch-primary-note-lum-scale: 0.025;
+				--noise-secondary-channel-hue: 65;
+				--noise-secondary-channel-hue-scale: 2;
+				--noise-secondary-channel-sat: 55;
+				--noise-secondary-channel-sat-scale: 0;
+				--noise-secondary-channel-lum: 42;
+				--noise-secondary-channel-lum-scale: 0;
+				--noise-primary-channel-hue: 65;
+				--noise-primary-channel-hue-scale: 2;
+				--noise-primary-channel-sat: 66;
+				--noise-primary-channel-sat-scale: 0;
+				--noise-primary-channel-lum: 63.5;
+				--noise-primary-channel-lum-scale: 0;
+				--noise-secondary-note-hue: 65;
+				--noise-secondary-note-hue-scale: 2;
+				--noise-secondary-note-sat: 66;
+				--noise-secondary-note-sat-scale: 0;
+				--noise-secondary-note-lum: 55;
+				--noise-secondary-note-lum-scale: 0;
+				--noise-primary-note-hue: 65;
+				--noise-primary-note-hue-scale: 2;
+				--noise-primary-note-sat: 70;
+				--noise-primary-note-sat-scale: 0;
+				--noise-primary-note-lum: 74;
+				--noise-primary-note-lum-scale: 0;
+				--mod-secondary-channel-hue: 192;
+				--mod-secondary-channel-hue-scale: 1.5;
+				--mod-secondary-channel-sat: 88;
+				--mod-secondary-channel-sat-scale: 0;
+				--mod-secondary-channel-lum: 50;
+				--mod-secondary-channel-lum-scale: 0;
+				--mod-primary-channel-hue: 192;
+				--mod-primary-channel-hue-scale: 1.5;
+				--mod-primary-channel-sat: 96;
+				--mod-primary-channel-sat-scale: 0;
+				--mod-primary-channel-lum: 80;
+				--mod-primary-channel-lum-scale: 0;
+				--mod-secondary-note-hue: 192;
+				--mod-secondary-note-hue-scale: 1.5;
+				--mod-secondary-note-sat: 92;
+				--mod-secondary-note-sat-scale: 0;
+				--mod-secondary-note-lum: 45;
+				--mod-secondary-note-lum-scale: 0;
+				--mod-primary-note-hue: 192;
+				--mod-primary-note-hue-scale: 1.5;
+				--mod-primary-note-sat: 96;
+				--mod-primary-note-sat-scale: 0;
+				--mod-primary-note-lum: 85;
+				--mod-primary-note-lum-scale: 0;
+				--note-flash: #ffffff;
+				--note-flash-secondary: #ffffff77;
+				--oscilloscope-line-R: white;
+				--oscilloscope-line-L: var(--secondary-text);
+				}`,
         "azur lane": `
 		:root {
 			--page-margin: #19337e;
@@ -9729,7 +9846,6 @@ html {
     -ms-transition: opacity 0.5s ease-in;
     transition: opacity 0.5s ease-in;
     transition-delay: 0.45s;
-	scrollbar-width: none;
 }
 
 .trackAndMuteContainer {
@@ -13976,10 +14092,8 @@ li.select2-results__option[role=group] > strong:hover {
                             for (let i = 0; i < Config.spectrumControlPoints; i++) {
                                 this.drumsetSpectrumWaves[j].spectrum[i] = Math.max(0, Math.min(Config.spectrumMax, Math.round(Config.spectrumMax * (+drum["spectrum"][i]) / 100)));
                             }
-                            for (let i = 0; i < Config.drumCount; i++) {
-                                this.drumsetSpectrumWaves[i].markCustomWaveDirty();
-                            }
                         }
+                        this.drumsetSpectrumWaves[j].markCustomWaveDirty();
                     }
                 }
             }
@@ -18266,7 +18380,9 @@ li.select2-results__option[role=group] > strong:hover {
     class EnvelopeComputer {
         constructor() {
             this.noteSecondsStart = 0.0;
+            this.noteSecondsStartUnscaled = 0.0;
             this.noteSecondsEnd = 0.0;
+            this.noteSecondsEndUnscaled = 0.0;
             this.noteTicksStart = 0.0;
             this.noteTicksEnd = 0.0;
             this.noteSizeStart = Config.noteSizeMax;
@@ -18275,7 +18391,9 @@ li.select2-results__option[role=group] > strong:hover {
             this.nextNoteSize = Config.noteSizeMax;
             this._noteSizeFinal = Config.noteSizeMax;
             this.prevNoteSecondsStart = 0.0;
+            this.prevNoteSecondsStartUnscaled = 0.0;
             this.prevNoteSecondsEnd = 0.0;
+            this.prevNoteSecondsEndUnscaled = 0.0;
             this.prevNoteTicksStart = 0.0;
             this.prevNoteTicksEnd = 0.0;
             this._prevNoteSizeFinal = Config.noteSizeMax;
@@ -18301,21 +18419,26 @@ li.select2-results__option[role=group] > strong:hover {
         }
         reset() {
             this.noteSecondsEnd = 0.0;
+            this.noteSecondsEndUnscaled = 0.0;
             this.noteTicksEnd = 0.0;
             this._noteSizeFinal = Config.noteSizeMax;
             this.prevNoteSecondsEnd = 0.0;
+            this.prevNoteSecondsEndUnscaled = 0.0;
             this.prevNoteTicksEnd = 0.0;
             this._prevNoteSizeFinal = Config.noteSizeMax;
             this._modifiedEnvelopeCount = 0;
         }
         computeEnvelopes(instrument, currentPart, tickTimeStart, tickTimeStartReal, secondsPerTick, tone, timeScale, song) {
+            const secondsPerTickUnscaled = secondsPerTick;
             secondsPerTick *= timeScale;
             const transition = instrument.getTransition();
             if (tone != null && tone.atNoteStart && !transition.continues && !tone.forceContinueAtStart) {
                 this.prevNoteSecondsEnd = this.noteSecondsEnd;
+                this.prevNoteSecondsEndUnscaled = this.noteSecondsEndUnscaled;
                 this.prevNoteTicksEnd = this.noteTicksEnd;
                 this._prevNoteSizeFinal = this._noteSizeFinal;
                 this.noteSecondsEnd = 0.0;
+                this.noteSecondsEndUnscaled = 0.0;
                 this.noteTicksEnd = 0.0;
             }
             if (tone != null) {
@@ -18329,11 +18452,15 @@ li.select2-results__option[role=group] > strong:hover {
             const tickTimeEnd = tickTimeStart + timeScale;
             const tickTimeEndReal = tickTimeStartReal + 1.0;
             const noteSecondsStart = this.noteSecondsEnd;
+            const noteSecondsStartUnscaled = this.noteSecondsEndUnscaled;
             const noteSecondsEnd = noteSecondsStart + secondsPerTick;
+            const noteSecondsEndUnscaled = noteSecondsStartUnscaled + secondsPerTickUnscaled;
             const noteTicksStart = this.noteTicksEnd;
             const noteTicksEnd = noteTicksStart + 1.0;
             const prevNoteSecondsStart = this.prevNoteSecondsEnd;
+            const prevNoteSecondsStartUnscaled = this.prevNoteSecondsEndUnscaled;
             const prevNoteSecondsEnd = prevNoteSecondsStart + secondsPerTick;
+            const prevNoteSecondsEndUnscaled = prevNoteSecondsStartUnscaled + secondsPerTickUnscaled;
             const prevNoteTicksStart = this.prevNoteTicksEnd;
             const prevNoteTicksEnd = prevNoteTicksStart + 1.0;
             const beatsPerTick = 1.0 / (Config.ticksPerPart * Config.partsPerBeat);
@@ -18446,11 +18573,15 @@ li.select2-results__option[role=group] > strong:hover {
                 }
             }
             this.noteSecondsStart = noteSecondsStart;
+            this.noteSecondsStartUnscaled = noteSecondsStartUnscaled;
             this.noteSecondsEnd = noteSecondsEnd;
+            this.noteSecondsEndUnscaled = noteSecondsEndUnscaled;
             this.noteTicksStart = noteTicksStart;
             this.noteTicksEnd = noteTicksEnd;
             this.prevNoteSecondsStart = prevNoteSecondsStart;
+            this.prevNoteSecondsStartUnscaled = prevNoteSecondsStartUnscaled;
             this.prevNoteSecondsEnd = prevNoteSecondsEnd;
+            this.prevNoteSecondsEndUnscaled = prevNoteSecondsEndUnscaled;
             this.prevNoteTicksStart = prevNoteTicksStart;
             this.prevNoteTicksEnd = prevNoteTicksEnd;
             this.prevNoteSize = prevNoteSize;
@@ -20235,6 +20366,7 @@ li.select2-results__option[role=group] > strong:hover {
             if (!this.song)
                 return;
             const samplesPerTick = this.getSamplesPerTick();
+            this.prevBar = this.bar;
             if (this.loopBarEnd != this.bar)
                 this.bar++;
             else {
@@ -21578,8 +21710,8 @@ li.select2-results__option[role=group] > strong:hover {
             if ((!transition.isSeamless && !tone.forceContinueAtStart) || tone.prevNote == null) {
                 const fadeInSeconds = instrument.getFadeInSeconds();
                 if (fadeInSeconds > 0.0) {
-                    fadeExpressionStart *= Math.min(1.0, envelopeComputer.noteSecondsStart / fadeInSeconds);
-                    fadeExpressionEnd *= Math.min(1.0, envelopeComputer.noteSecondsEnd / fadeInSeconds);
+                    fadeExpressionStart *= Math.min(1.0, envelopeComputer.noteSecondsStartUnscaled / fadeInSeconds);
+                    fadeExpressionEnd *= Math.min(1.0, envelopeComputer.noteSecondsEndUnscaled / fadeInSeconds);
                 }
             }
             if (instrument.type == 4 && tone.drumsetPitch == null) {
@@ -28262,23 +28394,11 @@ li.select2-results__option[role=group] > strong:hover {
                         continue;
                     if (reusablePatterns[String(currentPatternIndex)] == undefined) {
                         let isUsedElsewhere = false;
-                        if (replaceUnused) {
-                            for (let bar2 = 0; bar2 < doc.song.barCount; bar2++) {
-                                if (bar2 < barStart || bar2 >= barStart + barWidth) {
-                                    if (doc.song.channels[channelIndex].bars[bar2] == currentPatternIndex) {
-                                        isUsedElsewhere = true;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                        else {
-                            for (let bar2 = 0; bar2 < doc.song.barCount; bar2++) {
-                                if (bar2 < barStart || bar2 >= barStart + barWidth) {
-                                    if (doc.song.channels[channelIndex].bars[bar2] == currentPatternIndex) {
-                                        isUsedElsewhere = true;
-                                        break;
-                                    }
+                        for (let bar2 = 0; bar2 < doc.song.barCount; bar2++) {
+                            if (bar2 < barStart || bar2 >= barStart + barWidth) {
+                                if (doc.song.channels[channelIndex].bars[bar2] == currentPatternIndex) {
+                                    isUsedElsewhere = true;
+                                    break;
                                 }
                             }
                         }
@@ -37050,8 +37170,12 @@ You should be redirected to the song at:<br /><br />
                                     }
                                     else {
                                         instrument.modChannels[mod] = this._doc.channel;
-                                        if (this._doc.song.channels[this._doc.channel].instruments.length > 1)
-                                            instrument.modInstruments[mod] = this._doc.song.channels[this._doc.channel].instruments.length + 1;
+                                        if (this._doc.song.channels[this._doc.channel].instruments.length > 1) {
+                                            if (!this.controlMode || !this.shiftMode)
+                                                instrument.modInstruments[mod] = this._doc.song.channels[this._doc.channel].instruments.length + 1;
+                                            else
+                                                instrument.modInstruments[mod] = this._doc.getCurrentInstrument();
+                                        }
                                         else
                                             instrument.modInstruments[mod] = 0;
                                         if (applyToFilterTargets.length > applyIndex) {
@@ -39339,7 +39463,7 @@ You should be redirected to the song at:<br /><br />
     class ThemePrompt {
         constructor(_doc) {
             this._doc = _doc;
-            this._themeSelect = select$4({ style: "width: 100%;" }, option$4({ value: "dark classic" }, "BeepBox Dark"), option$4({ value: "light classic" }, "BeepBox Light"), option$4({ value: "dark competition" }, "BeepBox Competition Dark"), option$4({ value: "jummbox classic" }, "JummBox Dark"), option$4({ value: "jummbox light" }, "Gold Light"), option$4({ value: "forest" }, "Forest"), option$4({ value: "canyon" }, "Canyon"), option$4({ value: "midnight" }, "Midnight"), option$4({ value: "beachcombing" }, "Beachcombing"), option$4({ value: "violet verdant" }, "Violet Verdant"), option$4({ value: "sunset" }, "Sunset"), option$4({ value: "autumn" }, "Autumn"), option$4({ value: "fruit" }, "Shadowfruit"), option$4({ value: "toxic" }, "Toxic"), option$4({ value: "roe" }, "Roe"), option$4({ value: "moonlight" }, "Moonlight"), option$4({ value: "portal" }, "Portal"), option$4({ value: "fusion" }, "Fusion"), option$4({ value: "inverse" }, "Inverse"), option$4({ value: "nebula" }, "Nebula"), option$4({ value: "roe light" }, "Roe Light"), option$4({ value: "amoled dark" }, "High Contrast Dark"), option$4({ value: "energized" }, "Energized"), option$4({ value: "neapolitan" }, "Neapolitan"), option$4({ value: "poly" }, "Poly"), option$4({ value: "greyscale" }, "Greyscale"), option$4({ value: "blutonium" }, "Blutonium"), option$4({ value: "azur lane" }, "Azur Lane"), option$4({ value: "modbox classic" }, "Modbox"), option$4({ value: "sandbox classic" }, "Sandbox"), option$4({ value: "harrybox" }, "Haileybox"), option$4({ value: "brucebox" }, "Brucebox"), option$4({ value: "shitbox 3.0" }, "Shitbox 1.0/3.0"), option$4({ value: "shitbox 2.0" }, "Shitbox 2.0"), option$4({ value: "nerdbox" }, "NerdBox"), option$4({ value: "zefbox" }, "Zefbox"), option$4({ value: "cardboardbox classic" }, "Cardboardbox"), option$4({ value: "blubox classic" }, "Blubox"), option$4({ value: "dogebox classic" }, "Dogebox"), option$4({ value: "wackybox" }, "Wackybox"), option$4({ value: "todbox dark mode" }, "Todbox Dark Mode"), option$4({ value: "mainbox 1.0" }, "Mainbox"), option$4({ value: "microbox" }, "MicroBox"), option$4({ value: "paandorasbox" }, "PaandorasBox"), option$4({ value: "foxbox" }, "FoxBox"), option$4({ value: "midbox" }, "Midbox"), option$4({ value: "dogebox2" }, "Dogebox2"), option$4({ value: "AbyssBox Classic" }, "AbyssBox Classic"), option$4({ value: "AbyssBox Light" }, "AbyssBox Light"), option$4({ value: "nepbox" }, "Nepbox"), option$4({ value: "slarmoosbox" }, "Slarmoo's Box"), option$4({ value: "custom" }, "Custom"));
+            this._themeSelect = select$4({ style: "width: 100%;" }, option$4({ value: "dark classic" }, "BeepBox Dark"), option$4({ value: "light classic" }, "BeepBox Light"), option$4({ value: "dark competition" }, "BeepBox Competition Dark"), option$4({ value: "jummbox classic" }, "JummBox Dark"), option$4({ value: "jummbox light" }, "Gold Light"), option$4({ value: "forest" }, "Forest"), option$4({ value: "canyon" }, "Canyon"), option$4({ value: "midnight" }, "Midnight"), option$4({ value: "beachcombing" }, "Beachcombing"), option$4({ value: "violet verdant" }, "Violet Verdant"), option$4({ value: "sunset" }, "Sunset"), option$4({ value: "autumn" }, "Autumn"), option$4({ value: "fruit" }, "Shadowfruit"), option$4({ value: "toxic" }, "Toxic"), option$4({ value: "roe" }, "Roe"), option$4({ value: "moonlight" }, "Moonlight"), option$4({ value: "portal" }, "Portal"), option$4({ value: "fusion" }, "Fusion"), option$4({ value: "inverse" }, "Inverse"), option$4({ value: "nebula" }, "Nebula"), option$4({ value: "roe light" }, "Roe Light"), option$4({ value: "amoled dark" }, "High Contrast Dark"), option$4({ value: "energized" }, "Energized"), option$4({ value: "neapolitan" }, "Neapolitan"), option$4({ value: "poly" }, "Poly"), option$4({ value: "greyscale" }, "Greyscale"), option$4({ value: "blutonium" }, "Blutonium"), option$4({ value: "slarmoosbox" }, "Slarmoo's Box"), option$4({ value: "azur lane" }, "Azur Lane"), option$4({ value: "modbox classic" }, "Modbox"), option$4({ value: "sandbox classic" }, "Sandbox"), option$4({ value: "harrybox" }, "Haileybox"), option$4({ value: "brucebox" }, "Brucebox"), option$4({ value: "shitbox 3.0" }, "Shitbox 1.0/3.0"), option$4({ value: "shitbox 2.0" }, "Shitbox 2.0"), option$4({ value: "nerdbox" }, "NerdBox"), option$4({ value: "zefbox" }, "Zefbox"), option$4({ value: "cardboardbox classic" }, "Cardboardbox"), option$4({ value: "blubox classic" }, "Blubox"), option$4({ value: "dogebox classic" }, "Dogebox"), option$4({ value: "wackybox" }, "Wackybox"), option$4({ value: "todbox dark mode" }, "Todbox Dark Mode"), option$4({ value: "mainbox 1.0" }, "Mainbox"), option$4({ value: "microbox" }, "MicroBox"), option$4({ value: "paandorasbox" }, "PaandorasBox"), option$4({ value: "foxbox" }, "FoxBox"), option$4({ value: "midbox" }, "Midbox"), option$4({ value: "dogebox2" }, "Dogebox2"), option$4({ value: "AbyssBox Classic" }, "AbyssBox Classic"), option$4({ value: "AbyssBox Light" }, "AbyssBox Light"), option$4({ value: "nepbox" }, "Nepbox"), option$4({ value: "slarmoosbox" }, "Slarmoo's Box"), option$4({ value: "custom" }, "Custom"));
             this._cancelButton = button$6({ class: "cancelButton" });
             this._okayButton = button$6({ class: "okayButton", style: "width:45%;" }, "Okay");
             this.container = div$6({ class: "prompt noSelection", style: "width: 220px;" }, h2$5("Set Theme"), div$6({ style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;" }, div$6({ class: "selectContainer", style: "width: 100%;" }, this._themeSelect)), div$6({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between;" }, this._okayButton), this._cancelButton);
@@ -39349,7 +39473,7 @@ You should be redirected to the song at:<br /><br />
                     ColorConfig.setTheme(this.lastTheme);
                 }
                 else {
-                    ColorConfig.setTheme("dark classic");
+                    ColorConfig.setTheme("slarmoosbox");
                 }
                 this._doc.undo();
             };
@@ -42271,7 +42395,7 @@ You should be redirected to the song at:<br /><br />
             this._volumeBarBox = div({ class: "playback-volume-bar", style: "height: 12px; align-self: center;" }, this._volumeBarContainer);
             this._fileMenu = select({ style: "width: 100%;" }, option({ selected: true, disabled: true, hidden: false }, "File"), option({ value: "new" }, "+ New Blank Song (⇧`)"), option({ value: "import" }, "↑ Import Song... (" + EditorConfig.ctrlSymbol + "O)"), option({ value: "export" }, "↓ Export Song... (" + EditorConfig.ctrlSymbol + "S)"), option({ value: "copyUrl" }, "⎘ Copy Song URL"), option({ value: "shareUrl" }, "⤳ Share Song URL"), option({ value: "configureShortener" }, "🛠 Customize Url Shortener..."), option({ value: "shortenUrl" }, "… Shorten Song URL"), option({ value: "viewPlayer" }, "▶ View in Song Player (⇧P)"), option({ value: "copyEmbed" }, "⎘ Copy HTML Embed Code"), option({ value: "songRecovery" }, "⚠ Recover Recent Song... (`)"));
             this._editMenu = select({ style: "width: 100%;" }, option({ selected: true, disabled: true, hidden: false }, "Edit"), option({ value: "undo" }, "Undo (Z)"), option({ value: "redo" }, "Redo (Y)"), option({ value: "copy" }, "Copy Pattern (C)"), option({ value: "pasteNotes" }, "Paste Pattern Notes (V)"), option({ value: "pasteNumbers" }, "Paste Pattern Numbers (" + EditorConfig.ctrlSymbol + "⇧V)"), option({ value: "insertBars" }, "Insert Bar (⏎)"), option({ value: "deleteBars" }, "Delete Selected Bars (⌫)"), option({ value: "insertChannel" }, "Insert Channel (" + EditorConfig.ctrlSymbol + "⏎)"), option({ value: "deleteChannel" }, "Delete Selected Channels (" + EditorConfig.ctrlSymbol + "⌫)"), option({ value: "selectChannel" }, "Select Channel (⇧A)"), option({ value: "selectAll" }, "Select All (A)"), option({ value: "duplicatePatterns" }, "Duplicate Reused Patterns (D)"), option({ value: "transposeUp" }, "Move Notes Up (+ or ⇧+)"), option({ value: "transposeDown" }, "Move Notes Down (- or ⇧-)"), option({ value: "moveNotesSideways" }, "Move All Notes Sideways... (W)"), option({ value: "generateEuclideanRhythm" }, "Generate Euclidean Rhythm... (E)"), option({ value: "beatsPerBar" }, "Change Beats Per Bar... (⇧B)"), option({ value: "barCount" }, "Change Song Length... (L)"), option({ value: "channelSettings" }, "Channel Settings... (Q)"), option({ value: "limiterSettings" }, "Limiter Settings... (⇧L)"), option({ value: "addExternal" }, "Add Custom Samples... (⇧Q)"));
-            this._optionsMenu = select({ style: "width: 100%;" }, option({ selected: true, disabled: true, hidden: false }, "Preferences"), optgroup({ label: "Technical" }, option({ value: "autoPlay" }, "Auto Play on Load"), option({ value: "autoFollow" }, "Auto Follow Playhead"), option({ value: "enableNotePreview" }, "Hear Added Notes"), option({ value: "notesOutsideScale" }, "Place Notes Out of Scale"), option({ value: "setDefaultScale" }, "Set Current Scale as Default"), option({ value: "alwaysFineNoteVol" }, "Always Fine Note Volume"), option({ value: "enableChannelMuting" }, "Enable Channel Muting"), option({ value: "instrumentCopyPaste" }, "Enable Copy/Paste Buttons"), option({ value: "instrumentImportExport" }, "Enable Import/Export Buttons"), option({ value: "displayBrowserUrl" }, "Enable Song Data in URL"), option({ value: "closePromptByClickoff" }, "Close Prompts on Click Off"), option({ value: "recordingSetup" }, "Note Recording...")), optgroup({ label: "Appearance" }, option({ value: "showFifth" }, 'Highlight "Fifth" Note'), option({ value: "notesFlashWhenPlayed" }, "Notes Flash When Played"), option({ value: "instrumentButtonsAtTop" }, "Instrument Buttons at Top"), option({ value: "frostedGlassBackground" }, "Frosted Glass Prompt Backdrop"), option({ value: "showChannels" }, "Show All Channels"), option({ value: "showScrollBar" }, "Show Octave Scroll Bar"), option({ value: "showLetters" }, "Show Piano Keys"), option({ value: "displayVolumeBar" }, "Show Playback Volume"), option({ value: "showOscilloscope" }, "Show Oscilloscope"), option({ value: "showSampleLoadingStatus" }, "Show Sample Loading Status"), option({ value: "showDescription" }, "Show Description"), option({ value: "layout" }, "Set Layout..."), option({ value: "colorTheme" }, "Set Theme..."), option({ value: "customTheme" }, "Custom Theme...")));
+            this._optionsMenu = select({ style: "width: 100%;" }, option({ selected: true, disabled: true, hidden: false }, "Preferences"), optgroup({ label: "Technical" }, option({ value: "autoPlay" }, "Auto Play on Load"), option({ value: "autoFollow" }, "Auto Follow Playhead"), option({ value: "enableNotePreview" }, "Hear Added Notes"), option({ value: "notesOutsideScale" }, "Place Notes Out of Scale"), option({ value: "setDefaultScale" }, "Set Current Scale as Default"), option({ value: "alwaysFineNoteVol" }, "Always Fine Note Volume"), option({ value: "enableChannelMuting" }, "Enable Channel Muting"), option({ value: "instrumentCopyPaste" }, "Enable Copy/Paste Buttons"), option({ value: "instrumentImportExport" }, "Enable Import/Export Buttons"), option({ value: "displayBrowserUrl" }, "Enable Song Data in URL"), option({ value: "closePromptByClickoff" }, "Close Prompts on Click Off"), option({ value: "recordingSetup" }, "Note Recording...")), optgroup({ label: "Appearance" }, option({ value: "showFifth" }, 'Highlight "Fifth" Note'), option({ value: "notesFlashWhenPlayed" }, "Notes Flash When Played"), option({ value: "instrumentButtonsAtTop" }, "Instrument Buttons at Top"), option({ value: "frostedGlassBackground" }, "Frosted Glass Prompt Backdrop"), option({ value: "showChannels" }, "Show All Channels"), option({ value: "showScrollBar" }, "Show Octave Scroll Bar"), option({ value: "showInstrumentScrollbars" }, "Show Intsrument Scrollbars"), option({ value: "showLetters" }, "Show Piano Keys"), option({ value: "displayVolumeBar" }, "Show Playback Volume"), option({ value: "showOscilloscope" }, "Show Oscilloscope"), option({ value: "showSampleLoadingStatus" }, "Show Sample Loading Status"), option({ value: "showDescription" }, "Show Description"), option({ value: "layout" }, "Set Layout..."), option({ value: "colorTheme" }, "Set Theme..."), option({ value: "customTheme" }, "Custom Theme...")));
             this._scaleSelect = buildOptions(select(), Config.scales.map(scale => scale.name));
             this._keySelect = buildOptions(select(), Config.keys.map(key => key.name).reverse());
             this._octaveStepper = input({ style: "width: 59.5%;", type: "number", min: Config.octaveMin, max: Config.octaveMax, value: "0" });
@@ -42599,6 +42723,7 @@ You should be redirected to the song at:<br /><br />
                 this._sampleLoadingStatusContainer.style.display = this._doc.prefs.showSampleLoadingStatus ? "" : "none";
                 this._instrumentCopyGroup.style.display = this._doc.prefs.instrumentCopyPaste ? "" : "none";
                 this._instrumentExportGroup.style.display = this._doc.prefs.instrumentImportExport ? "" : "none";
+                this._instrumentSettingsArea.style.scrollbarWidth = this._doc.prefs.showInstrumentScrollbars ? "" : "none";
                 if (document.getElementById('text-content'))
                     document.getElementById('text-content').style.display = this._doc.prefs.showDescription ? "" : "none";
                 if (this._doc.getFullScreen()) {
@@ -42665,6 +42790,7 @@ You should be redirected to the song at:<br /><br />
                     (prefs.frostedGlassBackground ? textOnIcon : textOffIcon) + "Frosted Glass Prompt Backdrop",
                     (prefs.showChannels ? textOnIcon : textOffIcon) + "Show All Channels",
                     (prefs.showScrollBar ? textOnIcon : textOffIcon) + "Show Octave Scroll Bar",
+                    (prefs.showInstrumentScrollbars ? textOnIcon : textOffIcon) + "Show Instrument Scrollbars",
                     (prefs.showLetters ? textOnIcon : textOffIcon) + "Show Piano Keys",
                     (prefs.displayVolumeBar ? textOnIcon : textOffIcon) + "Show Playback Volume",
                     (prefs.showOscilloscope ? textOnIcon : textOffIcon) + "Show Oscilloscope",
@@ -45014,6 +45140,9 @@ You should be redirected to the song at:<br /><br />
                     case "showDescription":
                         this._doc.prefs.showDescription = !this._doc.prefs.showDescription;
                         break;
+                    case "showInstrumentScrollbars":
+                        this._doc.prefs.showInstrumentScrollbars = !this._doc.prefs.showInstrumentScrollbars;
+                        break;
                     case "showSampleLoadingStatus":
                         this._doc.prefs.showSampleLoadingStatus = !this._doc.prefs.showSampleLoadingStatus;
                         break;
@@ -47206,6 +47335,7 @@ You should be redirected to the song at:<br /><br />
             this.showOscilloscope = window.localStorage.getItem("showOscilloscope") != "false";
             this.showSampleLoadingStatus = window.localStorage.getItem("showSampleLoadingStatus") != "false";
             this.showDescription = window.localStorage.getItem("showDescription") != "false";
+            this.showInstrumentScrollbars = window.localStorage.getItem("showInstrumentScrollbars") == "true";
             this.closePromptByClickoff = window.localStorage.getItem("closePromptByClickoff") == "true";
             this.frostedGlassBackground = window.localStorage.getItem("frostedGlassBackground") == "true";
             this.keyboardLayout = window.localStorage.getItem("keyboardLayout") || "wickiHayden";
@@ -47254,6 +47384,7 @@ You should be redirected to the song at:<br /><br />
             window.localStorage.setItem("showOscilloscope", this.showOscilloscope ? "true" : "false");
             window.localStorage.setItem("showSampleLoadingStatus", this.showSampleLoadingStatus ? "true" : "false");
             window.localStorage.setItem("showDescription", this.showDescription ? "true" : "false");
+            window.localStorage.setItem("showInstrumentScrollbars", this.showInstrumentScrollbars ? "true" : "false");
             window.localStorage.setItem("closePromptByClickoff", this.closePromptByClickoff ? "true" : "false");
             window.localStorage.setItem("frostedGlassBackground", this.frostedGlassBackground ? "true" : "false");
             window.localStorage.setItem("keyboardLayout", this.keyboardLayout);
@@ -47362,7 +47493,7 @@ You should be redirected to the song at:<br /><br />
                 this._sequenceNumber = state.sequenceNumber;
                 this.prompt = state.prompt;
                 try {
-                    new ChangeSong(this, window.location.hash);
+                    new ChangeSong(this, this._getHash());
                 }
                 catch (error) {
                     errorAlert(error);

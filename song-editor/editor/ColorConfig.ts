@@ -6609,6 +6609,123 @@ export class ColorConfig {
 				}
 	
 				`,
+		"slarmoosbox": `
+			:root {
+				--page-margin: #14052a;
+				--editor-background: #14052a;
+				--hover-preview: white;
+				--playhead: rgba(255, 255, 255, 0.9);
+				--primary-text: #71eef5;
+				--secondary-text: #3abbc2;
+				--inverted-text: #13696e;
+				--box-selection-fill: #36c72c;
+				--loop-accent: #71eef5;
+				--link-accent: white;
+				--ui-widget-background: #183d15;
+				--ui-widget-focus: #247d1d;
+				--pitch-background: #2e0e61;
+				--tonic: #247d1d;
+				--fifth-note: #3abbc2;
+				--white-piano-key: #ffffff;
+				--black-piano-key: #061705;
+				--white-piano-key-text: #061705;
+				--black-piano-key-text: #fff;
+				--use-color-formula: true;
+				--track-editor-bg-pitch: #09383b;
+				--track-editor-bg-pitch-dim: #14052a;
+				--track-editor-bg-noise: #40400b;
+				--track-editor-bg-noise-dim: #14052a;
+				--track-editor-bg-mod: #0a2c08;
+				--track-editor-bg-mod-dim: #14052a;
+				--multiplicative-mod-slider: #3abbc2;
+				--overwriting-mod-slider: #71eef5;
+				--indicator-primary: #a773f5;
+				--indicator-secondary: #4c1c99;
+				--select2-opt-group: #183d15;
+				--input-box-outline: #18041a;
+				--mute-button-normal: #36c72c;
+				--mute-button-mod: #a773f5;
+				--mod-label-primary: #a773f5;
+				--mod-label-secondary-text: #6b29cf;
+				--mod-label-primary-text: #14052a;
+				--mod-title: #2e0e61;
+				--pitch-secondary-channel-hue: 100;
+				--pitch-secondary-channel-hue-scale: 6.1;
+				--pitch-secondary-channel-sat: 100.0;
+				--pitch-secondary-channel-sat-scale: 0.15;
+				--pitch-secondary-channel-lum: 60.0;
+				--pitch-secondary-channel-lum-scale: 0.05;
+				--pitch-primary-channel-hue: 100;
+				--pitch-primary-channel-hue-scale: 6.1;
+				--pitch-primary-channel-sat: 100;
+				--pitch-primary-channel-sat-scale: 0.15;
+				--pitch-primary-channel-lum: 75.0;
+				--pitch-primary-channel-lum-scale: 0.05;
+				--pitch-secondary-note-hue: 100;
+				--pitch-secondary-note-hue-scale: 6.1;
+				--pitch-secondary-note-sat: 95.0;
+				--pitch-secondary-note-sat-scale: 0.15;
+				--pitch-secondary-note-lum: 40;
+				--pitch-secondary-note-lum-scale: 0.05;
+				--pitch-primary-note-hue: 100;
+				--pitch-primary-note-hue-scale: 6.1;
+				--pitch-primary-note-sat: 100;
+				--pitch-primary-note-sat-scale: 0.15;
+				--pitch-primary-note-lum: 85.6;
+				--pitch-primary-note-lum-scale: 0.025;
+				--noise-secondary-channel-hue: 65;
+				--noise-secondary-channel-hue-scale: 2;
+				--noise-secondary-channel-sat: 55;
+				--noise-secondary-channel-sat-scale: 0;
+				--noise-secondary-channel-lum: 42;
+				--noise-secondary-channel-lum-scale: 0;
+				--noise-primary-channel-hue: 65;
+				--noise-primary-channel-hue-scale: 2;
+				--noise-primary-channel-sat: 66;
+				--noise-primary-channel-sat-scale: 0;
+				--noise-primary-channel-lum: 63.5;
+				--noise-primary-channel-lum-scale: 0;
+				--noise-secondary-note-hue: 65;
+				--noise-secondary-note-hue-scale: 2;
+				--noise-secondary-note-sat: 66;
+				--noise-secondary-note-sat-scale: 0;
+				--noise-secondary-note-lum: 55;
+				--noise-secondary-note-lum-scale: 0;
+				--noise-primary-note-hue: 65;
+				--noise-primary-note-hue-scale: 2;
+				--noise-primary-note-sat: 70;
+				--noise-primary-note-sat-scale: 0;
+				--noise-primary-note-lum: 74;
+				--noise-primary-note-lum-scale: 0;
+				--mod-secondary-channel-hue: 192;
+				--mod-secondary-channel-hue-scale: 1.5;
+				--mod-secondary-channel-sat: 88;
+				--mod-secondary-channel-sat-scale: 0;
+				--mod-secondary-channel-lum: 50;
+				--mod-secondary-channel-lum-scale: 0;
+				--mod-primary-channel-hue: 192;
+				--mod-primary-channel-hue-scale: 1.5;
+				--mod-primary-channel-sat: 96;
+				--mod-primary-channel-sat-scale: 0;
+				--mod-primary-channel-lum: 80;
+				--mod-primary-channel-lum-scale: 0;
+				--mod-secondary-note-hue: 192;
+				--mod-secondary-note-hue-scale: 1.5;
+				--mod-secondary-note-sat: 92;
+				--mod-secondary-note-sat-scale: 0;
+				--mod-secondary-note-lum: 45;
+				--mod-secondary-note-lum-scale: 0;
+				--mod-primary-note-hue: 192;
+				--mod-primary-note-hue-scale: 1.5;
+				--mod-primary-note-sat: 96;
+				--mod-primary-note-sat-scale: 0;
+				--mod-primary-note-lum: 85;
+				--mod-primary-note-lum-scale: 0;
+				--note-flash: #ffffff;
+				--note-flash-secondary: #ffffff77;
+				--oscilloscope-line-R: white;
+				--oscilloscope-line-L: var(--secondary-text);
+				}`,
         "azur lane": `
 		:root {
 			--page-margin: #19337e;
@@ -7416,7 +7533,7 @@ export class ColorConfig {
 
     public static setTheme(name: string): void {
         let theme: string = this.themes[name];
-        if (theme == undefined) theme = this.themes["dark classic"];
+        if (theme == undefined) theme = this.themes["slarmoosbox"];
         this._styleElement.textContent = theme;
 
         const themeColor = <HTMLMetaElement>document.querySelector("meta[name='theme-color']");

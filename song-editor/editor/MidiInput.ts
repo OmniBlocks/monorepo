@@ -5,9 +5,9 @@ import { SongDocument } from "./SongDocument";
 import { AnalogousDrum, analogousDrumMap, MidiEventType } from "./Midi";
 
 declare global {
-    interface Navigator {
-        requestMIDIAccess?(): Promise<any>;
-    }
+	interface Navigator {
+		requestMIDIAccess(): Promise<any>;
+	}
 }
 
 interface MIDIInput extends EventTarget {

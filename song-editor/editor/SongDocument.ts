@@ -180,97 +180,97 @@ export class SongDocument {
         this._lastSequenceNumber = state.sequenceNumber;
     }
 
-    public hasRedoHistory(): boolean {
-        return this._lastSequenceNumber > this._sequenceNumber;
-    }
-
-    private _forward(): void {
-        if (this.prefs.displayBrowserUrl) {
-            window.history.forward();
-        } else {
-            let currentIndex: number = Number(window.sessionStorage.getItem("currentUndoIndex"));
-            let newestIndex: number = Number(window.sessionStorage.getItem("newestUndoIndex"));
-            if (currentIndex != newestIndex) {
-                currentIndex = (currentIndex + 1) % SongDocument._maximumUndoHistory;
-                window.sessionStorage.setItem("currentUndoIndex", String(currentIndex));
-                setTimeout(this._whenHistoryStateChanged);
-            }
-        }
-    }
-
-    private _back(): void {
-        if (this.prefs.displayBrowserUrl) {
-            window.history.back();
-        } else {
-            let currentIndex: number = Number(window.sessionStorage.getItem("currentUndoIndex"));
-            let oldestIndex: number = Number(window.sessionStorage.getItem("oldestUndoIndex"));
-            if (currentIndex != oldestIndex) {
-                currentIndex = (currentIndex + SongDocument._maximumUndoHistory - 1) % SongDocument._maximumUndoHistory;
-                window.sessionStorage.setItem("currentUndoIndex", String(currentIndex));
-                setTimeout(this._whenHistoryStateChanged);
-            }
-        }
-    }
-
-    private _whenHistoryStateChanged = (): void => {
-        if (this.synth.recording) {
-            // Changes to the song while it's recording to could mess up the recording so just abort the recording.
-            this.performance.abortRecording();
-        }
-
-        if (window.history.state == null && window.location.hash != "") {
-            // The user changed the hash directly.
-            this._sequenceNumber++;
-            this._resetSongRecoveryUid();
-            const state: HistoryState = { canUndo: true, sequenceNumber: this._sequenceNumber, bar: this.bar, channel: this.channel, instrument: this.viewedInstrument[this.channel], recoveryUid: this._recoveryUid, prompt: null, selection: this.selection.toJSON() };
-            try {
-                new ChangeSong(this, this._getHash());
-            } catch (error) {
-                errorAlert(error);
-            }
-            this.prompt = state.prompt;
-            if (this.prefs.displayBrowserUrl) {
-                this._replaceState(state, this.song.toBase64String());
-            } else {
-                this._pushState(state, this.song.toBase64String());
-            }
-            this.forgetLastChange();
-            this.notifier.notifyWatchers();
-            // Stop playing, and go to start when pasting new song in.
-            this.synth.pause();
-            this.synth.goToBar(0);
-            return;
-        }
-
-        const state: HistoryState | null = this._getHistoryState();
-        if (state == null) throw new Error("History state is null.");
-
-        // Abort if we've already handled the current state. 
-        if (state.sequenceNumber == this._sequenceNumber) return;
-
-        this.bar = state.bar;
-        this.channel = state.channel;
-        this.viewedInstrument[this.channel] = state.instrument;
-        this._sequenceNumber = state.sequenceNumber;
-        this.prompt = state.prompt;
-        try {
-            new ChangeSong(this, window.location.hash);
-        } catch (error) {
-            errorAlert(error);
-        }
-
-        this._recoveryUid = state.recoveryUid;
-        this.selection.fromJSON(state.selection);
-
-        //this.barScrollPos = Math.min(this.bar, Math.max(this.bar - (this.trackVisibleBars - 1), this.barScrollPos));
-
-        this.forgetLastChange();
-        this.notifier.notifyWatchers();
-    }
-
-    private _cleanDocument = (): void => {
-        this.notifier.notifyWatchers();
-    }
+	public hasRedoHistory(): boolean {
+		return this._lastSequenceNumber > this._sequenceNumber;
+	}	
+		
+	private _forward(): void {
+		if (this.prefs.displayBrowserUrl) {
+			window.history.forward();
+		} else {
+			let currentIndex: number = Number(window.sessionStorage.getItem("currentUndoIndex"));
+			let newestIndex: number = Number(window.sessionStorage.getItem("newestUndoIndex"));
+			if (currentIndex != newestIndex) {
+				currentIndex = (currentIndex + 1) % SongDocument._maximumUndoHistory;
+				window.sessionStorage.setItem("currentUndoIndex", String(currentIndex));
+				setTimeout(this._whenHistoryStateChanged);
+			}
+		}
+	}
+		
+	private _back(): void {
+		if (this.prefs.displayBrowserUrl) {
+			window.history.back();
+		} else {
+			let currentIndex: number = Number(window.sessionStorage.getItem("currentUndoIndex"));
+			let oldestIndex: number = Number(window.sessionStorage.getItem("oldestUndoIndex"));
+			if (currentIndex != oldestIndex) {
+				currentIndex = (currentIndex + SongDocument._maximumUndoHistory - 1) % SongDocument._maximumUndoHistory;
+				window.sessionStorage.setItem("currentUndoIndex", String(currentIndex));
+				setTimeout(this._whenHistoryStateChanged);
+			}
+		}
+	}
+		
+	private _whenHistoryStateChanged = (): void => {
+		if (this.synth.recording) {
+			// Changes to the song while it's recording to could mess up the recording so just abort the recording.
+			this.performance.abortRecording();
+		}
+		
+		if (window.history.state == null && window.location.hash != "") {
+			// The user changed the hash directly.
+			this._sequenceNumber++;
+			this._resetSongRecoveryUid();
+			const state: HistoryState = {canUndo: true, sequenceNumber: this._sequenceNumber, bar: this.bar, channel: this.channel, instrument: this.viewedInstrument[this.channel], recoveryUid: this._recoveryUid, prompt: null, selection: this.selection.toJSON()};
+			try {
+				new ChangeSong(this, this._getHash());
+			} catch (error) {
+				errorAlert(error);
+			}
+			this.prompt = state.prompt;
+			if (this.prefs.displayBrowserUrl) {
+				this._replaceState(state, this.song.toBase64String());
+			} else {
+				this._pushState(state, this.song.toBase64String());
+			}
+			this.forgetLastChange();
+			this.notifier.notifyWatchers();
+			// Stop playing, and go to start when pasting new song in.
+			this.synth.pause();
+			this.synth.goToBar(0);
+			return;
+		}
+			
+		const state: HistoryState | null = this._getHistoryState();
+		if (state == null) throw new Error("History state is null.");
+			
+		// Abort if we've already handled the current state. 
+		if (state.sequenceNumber == this._sequenceNumber) return;
+			
+		this.bar = state.bar;
+		this.channel = state.channel;
+		this.viewedInstrument[this.channel] = state.instrument;
+		this._sequenceNumber = state.sequenceNumber;
+		this.prompt = state.prompt;
+		try {
+			new ChangeSong(this, this._getHash());
+		} catch (error) {
+			errorAlert(error);
+		}
+			
+		this._recoveryUid = state.recoveryUid;
+		this.selection.fromJSON(state.selection);
+			
+		//this.barScrollPos = Math.min(this.bar, Math.max(this.bar - (this.trackVisibleBars - 1), this.barScrollPos));
+			
+		this.forgetLastChange();
+		this.notifier.notifyWatchers();
+	}
+		
+	private _cleanDocument = (): void => {
+		this.notifier.notifyWatchers();
+	}
 
     private _cleanDocumentIfNotRecordingMods = (): void => {
         if (!this.recordingModulators)

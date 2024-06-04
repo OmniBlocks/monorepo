@@ -4543,7 +4543,7 @@ export class ChangeHoldingModRecording extends Change {
 }
 
 export class ChangeDuplicateSelectedReusedPatterns extends ChangeGroup {
-    constructor(doc: SongDocument, barStart: number, barWidth: number, channelStart: number, channelHeight: number) {
+    constructor(doc: SongDocument, barStart: number, barWidth: number, channelStart: number, channelHeight: number, replaceUnused: boolean) {
         super();
         for (let channelIndex: number = channelStart; channelIndex < channelStart + channelHeight; channelIndex++) {
             const reusablePatterns: Dictionary<number> = {};
@@ -4551,17 +4551,27 @@ export class ChangeDuplicateSelectedReusedPatterns extends ChangeGroup {
             for (let bar: number = barStart; bar < barStart + barWidth; bar++) {
                 const currentPatternIndex: number = doc.song.channels[channelIndex].bars[bar];
                 if (currentPatternIndex == 0) continue;
-
                 if (reusablePatterns[String(currentPatternIndex)] == undefined) {
                     let isUsedElsewhere = false;
-                    for (let bar2: number = 0; bar2 < doc.song.barCount; bar2++) {
-                        if (bar2 < barStart || bar2 >= barStart + barWidth) {
-                            if (doc.song.channels[channelIndex].bars[bar2] == currentPatternIndex) {
-                                isUsedElsewhere = true;
-                                break;
+                    // if (replaceUnused) {
+                    //     for (let bar2: number = 0; bar2 < doc.song.barCount; bar2++) {
+                    //         if (bar2 < barStart || bar2 >= barStart + barWidth) {
+                    //             if (doc.song.channels[channelIndex].bars[bar2] == currentPatternIndex) {
+                    //                 isUsedElsewhere = true;
+                    //                 break;
+                    //             }
+                    //         }
+                    //     }
+                    // } else {
+                        for (let bar2: number = 0; bar2 < doc.song.barCount; bar2++) {
+                            if (bar2 < barStart || bar2 >= barStart + barWidth) {
+                                if (doc.song.channels[channelIndex].bars[bar2] == currentPatternIndex) {
+                                    isUsedElsewhere = true;
+                                    break;
+                                }
                             }
                         }
-                    }
+                    // }
                     if (isUsedElsewhere) {
                         // Need to duplicate the pattern.
                         const copiedPattern: Pattern = doc.song.getPattern(channelIndex, bar)!;

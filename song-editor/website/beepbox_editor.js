@@ -28252,7 +28252,7 @@ li.select2-results__option[role=group] > strong:hover {
         }
     }
     class ChangeDuplicateSelectedReusedPatterns extends ChangeGroup {
-        constructor(doc, barStart, barWidth, channelStart, channelHeight) {
+        constructor(doc, barStart, barWidth, channelStart, channelHeight, replaceUnused) {
             super();
             for (let channelIndex = channelStart; channelIndex < channelStart + channelHeight; channelIndex++) {
                 const reusablePatterns = {};
@@ -28262,11 +28262,23 @@ li.select2-results__option[role=group] > strong:hover {
                         continue;
                     if (reusablePatterns[String(currentPatternIndex)] == undefined) {
                         let isUsedElsewhere = false;
-                        for (let bar2 = 0; bar2 < doc.song.barCount; bar2++) {
-                            if (bar2 < barStart || bar2 >= barStart + barWidth) {
-                                if (doc.song.channels[channelIndex].bars[bar2] == currentPatternIndex) {
-                                    isUsedElsewhere = true;
-                                    break;
+                        if (replaceUnused) {
+                            for (let bar2 = 0; bar2 < doc.song.barCount; bar2++) {
+                                if (bar2 < barStart || bar2 >= barStart + barWidth) {
+                                    if (doc.song.channels[channelIndex].bars[bar2] == currentPatternIndex) {
+                                        isUsedElsewhere = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        else {
+                            for (let bar2 = 0; bar2 < doc.song.barCount; bar2++) {
+                                if (bar2 < barStart || bar2 >= barStart + barWidth) {
+                                    if (doc.song.channels[channelIndex].bars[bar2] == currentPatternIndex) {
+                                        isUsedElsewhere = true;
+                                        break;
+                                    }
                                 }
                             }
                         }
@@ -36977,7 +36989,7 @@ You should be redirected to the song at:<br /><br />
                         useModIndex = rtn[1];
                         if (useInstrumentIndex != -1) {
                             sequence.append(new ChangeEnsurePatternExists(this._doc, channelIndex, currentBar));
-                            new ChangeDuplicateSelectedReusedPatterns(this._doc, currentBar, 1, channelIndex, 1);
+                            new ChangeDuplicateSelectedReusedPatterns(this._doc, currentBar, 1, channelIndex, 1, false);
                             pattern = this._doc.song.getPattern(channelIndex, currentBar);
                             pattern.instruments[0] = useInstrumentIndex;
                             changedPatterns = true;
@@ -36992,7 +37004,7 @@ You should be redirected to the song at:<br /><br />
                         useInstrumentIndex = rtn[0];
                         useModIndex = rtn[1];
                         if (useInstrumentIndex != -1) {
-                            new ChangeDuplicateSelectedReusedPatterns(this._doc, currentBar, 1, channelIndex, 1);
+                            new ChangeDuplicateSelectedReusedPatterns(this._doc, currentBar, 1, channelIndex, 1, false);
                             pattern = this._doc.song.getPattern(channelIndex, currentBar);
                             changedPatterns = true;
                         }
@@ -44028,7 +44040,7 @@ You should be redirected to the song at:<br /><br />
                         if (canPlayNotes)
                             break;
                         if (needControlForShortcuts == (event.ctrlKey || event.metaKey)) {
-                            this._doc.selection.duplicatePatterns();
+                            this._doc.selection.duplicatePatterns(event.shiftKey ? false : true);
                             event.preventDefault();
                         }
                         break;
@@ -44912,7 +44924,7 @@ You should be redirected to the song at:<br /><br />
                         this._doc.selection.selectChannel();
                         break;
                     case "duplicatePatterns":
-                        this._doc.selection.duplicatePatterns();
+                        this._doc.selection.duplicatePatterns(false);
                         break;
                     case "barCount":
                         this._openPrompt("barCount");
@@ -46542,7 +46554,7 @@ You should be redirected to the song at:<br /><br />
             const group = new ChangeGroup();
             if (this._doc.selection.patternSelectionActive) {
                 if (this.boxSelectionActive) {
-                    group.append(new ChangeDuplicateSelectedReusedPatterns(this._doc, this.boxSelectionBar, this.boxSelectionWidth, this.boxSelectionChannel, this.boxSelectionHeight));
+                    group.append(new ChangeDuplicateSelectedReusedPatterns(this._doc, this.boxSelectionBar, this.boxSelectionWidth, this.boxSelectionChannel, this.boxSelectionHeight, false));
                 }
                 for (const channelIndex of this._eachSelectedChannel()) {
                     for (const pattern of this._eachSelectedPattern(channelIndex)) {
@@ -46772,7 +46784,7 @@ You should be redirected to the song at:<br /><br />
                 else if (this.patternSelectionActive) {
                     const reusablePatterns = {};
                     const usedPatterns = {};
-                    group.append(new ChangeDuplicateSelectedReusedPatterns(this._doc, this.boxSelectionBar, pasteWidth, this.boxSelectionChannel, pasteHeight));
+                    group.append(new ChangeDuplicateSelectedReusedPatterns(this._doc, this.boxSelectionBar, pasteWidth, this.boxSelectionChannel, pasteHeight, false));
                     for (let pasteBar = 0; pasteBar < pasteWidth; pasteBar++) {
                         const bar = this.boxSelectionBar + pasteBar;
                         const copiedPatternIndex = copiedBars[pasteBar % copiedBars.length] >>> 0;
@@ -46934,8 +46946,8 @@ You should be redirected to the song at:<br /><br />
             }
             this.selectionUpdated();
         }
-        duplicatePatterns() {
-            this._doc.record(new ChangeDuplicateSelectedReusedPatterns(this._doc, this.boxSelectionBar, this.boxSelectionWidth, this.boxSelectionChannel, this.boxSelectionHeight));
+        duplicatePatterns(replaceUnused) {
+            this._doc.record(new ChangeDuplicateSelectedReusedPatterns(this._doc, this.boxSelectionBar, this.boxSelectionWidth, this.boxSelectionChannel, this.boxSelectionHeight, replaceUnused));
         }
         muteChannels(allChannels) {
             if (allChannels) {
@@ -47019,7 +47031,7 @@ You should be redirected to the song at:<br /><br />
         forceRhythm() {
             const group = new ChangeGroup();
             if (this.boxSelectionActive) {
-                group.append(new ChangeDuplicateSelectedReusedPatterns(this._doc, this.boxSelectionBar, this.boxSelectionWidth, this.boxSelectionChannel, this.boxSelectionHeight));
+                group.append(new ChangeDuplicateSelectedReusedPatterns(this._doc, this.boxSelectionBar, this.boxSelectionWidth, this.boxSelectionChannel, this.boxSelectionHeight, false));
             }
             for (const channelIndex of this._eachSelectedChannel()) {
                 for (const pattern of this._eachSelectedPattern(channelIndex)) {
@@ -47031,7 +47043,7 @@ You should be redirected to the song at:<br /><br />
         forceScale() {
             const group = new ChangeGroup();
             if (this.boxSelectionActive) {
-                group.append(new ChangeDuplicateSelectedReusedPatterns(this._doc, this.boxSelectionBar, this.boxSelectionWidth, this.boxSelectionChannel, this.boxSelectionHeight));
+                group.append(new ChangeDuplicateSelectedReusedPatterns(this._doc, this.boxSelectionBar, this.boxSelectionWidth, this.boxSelectionChannel, this.boxSelectionHeight, false));
             }
             const scaleFlags = [true, false, false, false, false, false, false, false, false, false, false, false];
             for (const channelIndex of this._eachSelectedChannel()) {
@@ -47061,7 +47073,7 @@ You should be redirected to the song at:<br /><br />
             const canReplaceLastChange = this._doc.lastChangeWas(this._changeTranspose);
             this._changeTranspose = new ChangeGroup();
             if (this.boxSelectionActive) {
-                this._changeTranspose.append(new ChangeDuplicateSelectedReusedPatterns(this._doc, this.boxSelectionBar, this.boxSelectionWidth, this.boxSelectionChannel, this.boxSelectionHeight));
+                this._changeTranspose.append(new ChangeDuplicateSelectedReusedPatterns(this._doc, this.boxSelectionBar, this.boxSelectionWidth, this.boxSelectionChannel, this.boxSelectionHeight, false));
             }
             for (const channelIndex of this._eachSelectedChannel()) {
                 if (channelIndex >= this._doc.song.pitchChannelCount + this._doc.song.noiseChannelCount)
@@ -47123,7 +47135,7 @@ You should be redirected to the song at:<br /><br />
                             instruments[0] = 0;
                     }
                     if (this.boxSelectionActive) {
-                        this._changeInstrument.append(new ChangeDuplicateSelectedReusedPatterns(this._doc, this.boxSelectionBar, this.boxSelectionWidth, this.boxSelectionChannel, this.boxSelectionHeight));
+                        this._changeInstrument.append(new ChangeDuplicateSelectedReusedPatterns(this._doc, this.boxSelectionBar, this.boxSelectionWidth, this.boxSelectionChannel, this.boxSelectionHeight, false));
                     }
                     for (const channelIndex of this._eachSelectedChannel()) {
                         for (const pattern of this._eachSelectedPattern(channelIndex)) {
@@ -47140,7 +47152,7 @@ You should be redirected to the song at:<br /><br />
                 this._changeInstrument.append(new ChangeViewInstrument(this._doc, instrument));
                 if (!(this._doc.song.layeredInstruments && this._doc.channel < this._doc.song.pitchChannelCount + this._doc.song.noiseChannelCount) && this._doc.song.patternInstruments) {
                     if (this.boxSelectionActive) {
-                        this._changeInstrument.append(new ChangeDuplicateSelectedReusedPatterns(this._doc, this.boxSelectionBar, this.boxSelectionWidth, this.boxSelectionChannel, this.boxSelectionHeight));
+                        this._changeInstrument.append(new ChangeDuplicateSelectedReusedPatterns(this._doc, this.boxSelectionBar, this.boxSelectionWidth, this.boxSelectionChannel, this.boxSelectionHeight, false));
                     }
                     const instruments = [instrument];
                     for (const channelIndex of this._eachSelectedChannel()) {

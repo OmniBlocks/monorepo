@@ -4016,7 +4016,9 @@ export class SongEditor {
             case 68: // d
                 if (canPlayNotes) break;
                 if (needControlForShortcuts == (event.ctrlKey || event.metaKey)) {
-                    this._doc.selection.duplicatePatterns();
+                    //shift d replaces old d functionality, while d will duplicate replacing an unused pattern
+                    //This is for consistency with n (n uses ctrl instead of shift, but this will have to do for now)
+                    this._doc.selection.duplicatePatterns(event.shiftKey ? false : true); 
                     event.preventDefault();
                 }
                 break;
@@ -5082,7 +5084,7 @@ export class SongEditor {
                 this._doc.selection.selectChannel();
                 break;
             case "duplicatePatterns":
-                this._doc.selection.duplicatePatterns();
+                this._doc.selection.duplicatePatterns(false);
                 break;
             case "barCount":
                 this._openPrompt("barCount");

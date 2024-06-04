@@ -219,7 +219,7 @@ export class Selection {
         if (this._doc.selection.patternSelectionActive) {
 
             if (this.boxSelectionActive) {
-                group.append(new ChangeDuplicateSelectedReusedPatterns(this._doc, this.boxSelectionBar, this.boxSelectionWidth, this.boxSelectionChannel, this.boxSelectionHeight));
+                group.append(new ChangeDuplicateSelectedReusedPatterns(this._doc, this.boxSelectionBar, this.boxSelectionWidth, this.boxSelectionChannel, this.boxSelectionHeight, false));
             }
 
             for (const channelIndex of this._eachSelectedChannel()) {
@@ -476,7 +476,7 @@ export class Selection {
                 const reusablePatterns: Dictionary<number> = {};
                 const usedPatterns: Dictionary<boolean> = {};
 
-                group.append(new ChangeDuplicateSelectedReusedPatterns(this._doc, this.boxSelectionBar, pasteWidth, this.boxSelectionChannel, pasteHeight));
+                group.append(new ChangeDuplicateSelectedReusedPatterns(this._doc, this.boxSelectionBar, pasteWidth, this.boxSelectionChannel, pasteHeight, false));
 
                 for (let pasteBar: number = 0; pasteBar < pasteWidth; pasteBar++) {
                     const bar: number = this.boxSelectionBar + pasteBar;
@@ -655,8 +655,8 @@ export class Selection {
         this.selectionUpdated();
     }
 
-    public duplicatePatterns(): void {
-        this._doc.record(new ChangeDuplicateSelectedReusedPatterns(this._doc, this.boxSelectionBar, this.boxSelectionWidth, this.boxSelectionChannel, this.boxSelectionHeight));
+    public duplicatePatterns(replaceUnused: boolean): void {
+        this._doc.record(new ChangeDuplicateSelectedReusedPatterns(this._doc, this.boxSelectionBar, this.boxSelectionWidth, this.boxSelectionChannel, this.boxSelectionHeight, replaceUnused));
     }
 
     public muteChannels(allChannels: boolean): void {
@@ -757,7 +757,7 @@ export class Selection {
         const group: ChangeGroup = new ChangeGroup();
 
         if (this.boxSelectionActive) {
-            group.append(new ChangeDuplicateSelectedReusedPatterns(this._doc, this.boxSelectionBar, this.boxSelectionWidth, this.boxSelectionChannel, this.boxSelectionHeight));
+            group.append(new ChangeDuplicateSelectedReusedPatterns(this._doc, this.boxSelectionBar, this.boxSelectionWidth, this.boxSelectionChannel, this.boxSelectionHeight, false));
         }
 
         for (const channelIndex of this._eachSelectedChannel()) {
@@ -773,7 +773,7 @@ export class Selection {
         const group: ChangeGroup = new ChangeGroup();
 
         if (this.boxSelectionActive) {
-            group.append(new ChangeDuplicateSelectedReusedPatterns(this._doc, this.boxSelectionBar, this.boxSelectionWidth, this.boxSelectionChannel, this.boxSelectionHeight));
+            group.append(new ChangeDuplicateSelectedReusedPatterns(this._doc, this.boxSelectionBar, this.boxSelectionWidth, this.boxSelectionChannel, this.boxSelectionHeight, false));
         }
 
         const scaleFlags: boolean[] = [true, false, false, false, false, false, false, false, false, false, false, false];
@@ -808,7 +808,7 @@ export class Selection {
         this._changeTranspose = new ChangeGroup();
 
         if (this.boxSelectionActive) {
-            this._changeTranspose.append(new ChangeDuplicateSelectedReusedPatterns(this._doc, this.boxSelectionBar, this.boxSelectionWidth, this.boxSelectionChannel, this.boxSelectionHeight));
+            this._changeTranspose.append(new ChangeDuplicateSelectedReusedPatterns(this._doc, this.boxSelectionBar, this.boxSelectionWidth, this.boxSelectionChannel, this.boxSelectionHeight, false));
         }
 
         for (const channelIndex of this._eachSelectedChannel()) {
@@ -876,7 +876,7 @@ export class Selection {
                 }
 
                 if (this.boxSelectionActive) {
-                    this._changeInstrument.append(new ChangeDuplicateSelectedReusedPatterns(this._doc, this.boxSelectionBar, this.boxSelectionWidth, this.boxSelectionChannel, this.boxSelectionHeight));
+                    this._changeInstrument.append(new ChangeDuplicateSelectedReusedPatterns(this._doc, this.boxSelectionBar, this.boxSelectionWidth, this.boxSelectionChannel, this.boxSelectionHeight, false));
                 }
                 for (const channelIndex of this._eachSelectedChannel()) {
                     for (const pattern of this._eachSelectedPattern(channelIndex)) {
@@ -893,7 +893,7 @@ export class Selection {
 
             if (!(this._doc.song.layeredInstruments && this._doc.channel < this._doc.song.pitchChannelCount + this._doc.song.noiseChannelCount) && this._doc.song.patternInstruments) {
                 if (this.boxSelectionActive) {
-                    this._changeInstrument.append(new ChangeDuplicateSelectedReusedPatterns(this._doc, this.boxSelectionBar, this.boxSelectionWidth, this.boxSelectionChannel, this.boxSelectionHeight));
+                    this._changeInstrument.append(new ChangeDuplicateSelectedReusedPatterns(this._doc, this.boxSelectionBar, this.boxSelectionWidth, this.boxSelectionChannel, this.boxSelectionHeight, false));
                 }
                 const instruments: number[] = [instrument];
                 for (const channelIndex of this._eachSelectedChannel()) {

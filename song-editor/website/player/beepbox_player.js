@@ -22781,7 +22781,44 @@ var beepbox = (function (exports) {
                 renderPlayhead();
                 event.preventDefault();
                 break;
+            case 69:
+            case 80:
+                hashUpdatedExternally();
+                location.href = "../index.html#" + synth.song.toBase64String();
+                event.preventDefault();
+                break;
+            case 90:
+            case 187:
+            case 61:
+            case 171:
+            case 189:
+            case 173:
+                onToggleZoom();
+                break;
+            case 76:
+                onToggleLoop();
+                break;
+            case 83:
+                if (event.ctrlKey) {
+                    shortenUrl();
+                    event.preventDefault();
+                }
+                else {
+                    onShareClicked();
+                }
+                break;
+            case 67:
+                onCopyClicked();
+                break;
         }
+    }
+    function shortenUrl() {
+        hashUpdatedExternally();
+        let shortenerStrategy = "https://tinyurl.com/api-create.php?url=";
+        const localShortenerStrategy = window.localStorage.getItem("shortenerStrategySelect");
+        if (localShortenerStrategy == "isgd")
+            shortenerStrategy = "https://is.gd/create.php?format=simple&url=";
+        window.open(shortenerStrategy + encodeURIComponent(new URL("#" + synth.song.toBase64String(), location.href).href));
     }
     function onCopyClicked() {
         let nav;

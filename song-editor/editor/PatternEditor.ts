@@ -1260,7 +1260,7 @@ export class PatternEditor {
                     // Found it in this channel, but the pattern doesn't exist. So, add a new pattern and swap to that instrument.
                     if (useInstrumentIndex != -1) {
                         sequence.append(new ChangeEnsurePatternExists(this._doc, channelIndex, currentBar));
-                        new ChangeDuplicateSelectedReusedPatterns(this._doc, currentBar, 1, channelIndex, 1);
+                        new ChangeDuplicateSelectedReusedPatterns(this._doc, currentBar, 1, channelIndex, 1, false);
 
                         pattern = this._doc.song.getPattern(channelIndex, currentBar)!;
 
@@ -1279,7 +1279,7 @@ export class PatternEditor {
                     useModIndex = rtn[1];
 
                     if (useInstrumentIndex != -1) {
-                        new ChangeDuplicateSelectedReusedPatterns(this._doc, currentBar, 1, channelIndex, 1);
+                        new ChangeDuplicateSelectedReusedPatterns(this._doc, currentBar, 1, channelIndex, 1, false);
                         pattern = this._doc.song.getPattern(channelIndex, currentBar);
 
                         changedPatterns = true;

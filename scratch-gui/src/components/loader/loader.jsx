@@ -155,7 +155,7 @@ class LoaderComponent extends React.Component {
                         >
                             <b>{'Did you know?'}</b>
                             {' '}
-                            {'The first version of the modern pride flag had 8 colors, later reduced to 6.'}
+                            {'Gender and sexuality exist on spectrums.'}
                         </div>
                     )}
                 </div>

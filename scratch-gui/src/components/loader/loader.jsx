@@ -155,7 +155,7 @@ class LoaderComponent extends React.Component {
                         >
                             <b>{'Did you know?'}</b>
                             {' '}
-                            {'Gender and sexuality exist on spectrums.'}
+                            {'Brighton is the unofficial gay capital of the UK.'}
                         </div>
                     )}
                 </div>

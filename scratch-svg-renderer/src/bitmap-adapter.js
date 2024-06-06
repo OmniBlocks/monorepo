@@ -123,13 +123,8 @@ class BitmapAdapter {
             image.src = dataURI;
             image.onload = () => {
                 const newSize = this.getResizedWidthHeight(image.width, image.height);
-                if (newSize.width === image.width && newSize.height === image.height) {
-                    // No change
-                    resolve(this.convertDataURIToBinary(dataURI));
-                } else {
-                    const resizedDataURI = this.resize(image, newSize.width, newSize.height).toDataURL();
-                    resolve(this.convertDataURIToBinary(resizedDataURI));
-                }
+                const resizedDataURI = this.resize(image, newSize.width, newSize.height).toDataURL();
+                resolve(this.convertDataURIToBinary(resizedDataURI));
             };
             image.onerror = () => {
                 // TODO: reject with an Error (breaking API change!)

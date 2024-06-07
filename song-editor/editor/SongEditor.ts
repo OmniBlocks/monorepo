@@ -4004,6 +4004,12 @@ export class SongEditor {
 
                 if (event.ctrlKey || event.metaKey) {
                     this._doc.selection.insertChannel();
+                } else if (event.shiftKey) {
+                    const width = this._doc.selection.boxSelectionWidth
+                    this._doc.selection.boxSelectionX0 -= width;
+                    this._doc.selection.boxSelectionX1 -= width;
+                    this._doc.bar -= width;
+                    this._doc.selection.insertBars();
                 } else {
                     this._doc.selection.insertBars();
                 }

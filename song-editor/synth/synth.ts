@@ -968,7 +968,7 @@ export class AdditiveWave {
     public reset(): void {
         for (let i: number = 0; i < Config.additiveControlPoints; i++) {
             this.additives[i] = 0;
-            this.waveTypes[i] = AdditiveWaveTypes.square;
+            this.waveTypes[i] = AdditiveWaveTypes.triangle;
         }
         this.additives[0] = Config.harmonicsMax;
         this.additives[3] = Config.harmonicsMax;
@@ -1011,7 +1011,7 @@ class AdditiveWaveState {
         for (let additiveIndex = 1; additiveIndex < additiveRendered; additiveIndex++) {
             const additiveFreq = additiveIndex++;
             for (let i: number = 0; i < waveLength; i++) {
-                let additiveHarmonic = this.waveExpressions(settings.waveTypes[additiveIndex], i, additiveFreq);
+                let additiveHarmonic = this.waveExpressions(settings.waveTypes[additiveIndex], i/waveLength, additiveFreq);
                 additiveHarmonic *= Math.pow(additiveFreq, overallSlope);
                 wave[i] += additiveHarmonic;
             }
@@ -1021,6 +1021,8 @@ class AdditiveWaveState {
         const mult: number = 1 / Math.pow(combinedControlPointAmplitude, 0.7);
         for (let i: number = 0; i < wave.length; i++) wave[i] *= mult;
 
+        performIntegralOld(wave);
+
         // The first sample should be zero, and we'll duplicate it at the end for easier interpolation.
         wave[waveLength] = wave[0];
 
@@ -1028,25 +1030,21 @@ class AdditiveWaveState {
     }
 
     private waveExpressions(waveType: number, time: number, harmonic: number): number {
-        const multiple = 64;
         switch (waveType) {
             case AdditiveWaveTypes.sine:
-                console.log("sine");
-                return (Math.sin(time * harmonic * Math.PI / multiple)) / harmonic;
+                return (Math.sin(time * harmonic * Math.PI * 2)) / harmonic;
             case AdditiveWaveTypes.square:
-                console.log("square");
-                return (2 * (Math.floor(time * harmonic / multiple - 1) % 2) - 1) / harmonic;
+                return (2 * (Math.floor((time * harmonic - 1) % 2+2)%2) - 1) / harmonic;
             case AdditiveWaveTypes.triangle:
-                return (2 * (Math.abs(((time * harmonic / multiple / 2 + 1 / 2) % 1)) * 2 - 1) - 1)/harmonic;
+                return (2 * (Math.abs(((time * harmonic / 2 + 1 / 2) % 1+1)%1) * 2 - 1) - 1)/harmonic;
             case AdditiveWaveTypes.sawtooth:
-                return (2 * Math.abs((time * harmonic / multiple / 2 + 1 / 2) % 1) - 1)/harmonic;
+                return (2 * Math.abs(((time * harmonic / 2 + 1 / 2) % 1+1)%1) - 1)/harmonic;
             case AdditiveWaveTypes.ramp:
-                return (-2 * Math.abs((time * harmonic / multiple / 2 + 1 / 2) % 1) + 1)/harmonic;
+                return (-2 * Math.abs(((time * harmonic / 2 + 1 / 2) % 1 +1)%1) + 1)/harmonic;
             case AdditiveWaveTypes.trapezoid:
                 return this.waveExpressions(AdditiveWaveTypes.triangle, time, harmonic) + this.waveExpressions(AdditiveWaveTypes.triangle, (time + 1 / 2), harmonic);
             default:
-                console.log("default");
-                return (Math.sin(time * harmonic * Math.PI / multiple)) / harmonic; //default to sine
+                return (Math.sin(time * harmonic * Math.PI * 2)) / harmonic; //default to sine
         } 
     }
 
@@ -5503,7 +5501,7 @@ export class Song {
                 charIndex += byteCount;
 
                 for (let i: number = 0; i < Config.additiveControlPoints; i++) {
-                    instrument.additiveWave.waveTypes[i] = compressed.charCodeAt(charIndex++);
+                    instrument.additiveWave.waveTypes[i] = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                 }
             } break;
             case SongTagCode.aliases: {
@@ -7213,8 +7211,8 @@ class EnvelopeComputer {
     public nextSlideRatioStart: number = 0.0;
     public nextSlideRatioEnd: number = 0.0;
 
-    public  envelopeStarts: number[] = [];
-    public  envelopeEnds: number[] = [];
+    public readonly envelopeStarts: number[] = [];
+    public readonly envelopeEnds: number[] = [];
     private readonly _modifiedEnvelopeIndices: number[] = [];
     private _modifiedEnvelopeCount: number = 0;
     public lowpassCutoffDecayVolumeCompensation: number = 1.0;

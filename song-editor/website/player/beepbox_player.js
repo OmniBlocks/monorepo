@@ -10509,7 +10509,7 @@ var beepbox = (function (exports) {
         reset() {
             for (let i = 0; i < Config.additiveControlPoints; i++) {
                 this.additives[i] = 0;
-                this.waveTypes[i] = 1;
+                this.waveTypes[i] = 2;
             }
             this.additives[0] = Config.harmonicsMax;
             this.additives[3] = Config.harmonicsMax;
@@ -10547,7 +10547,7 @@ var beepbox = (function (exports) {
             for (let additiveIndex = 1; additiveIndex < additiveRendered; additiveIndex++) {
                 const additiveFreq = additiveIndex++;
                 for (let i = 0; i < waveLength; i++) {
-                    let additiveHarmonic = this.waveExpressions(settings.waveTypes[additiveIndex], i, additiveFreq);
+                    let additiveHarmonic = this.waveExpressions(settings.waveTypes[additiveIndex], i / waveLength, additiveFreq);
                     additiveHarmonic *= Math.pow(additiveFreq, overallSlope);
                     wave[i] += additiveHarmonic;
                 }
@@ -10555,29 +10555,26 @@ var beepbox = (function (exports) {
             const mult = 1 / Math.pow(combinedControlPointAmplitude, 0.7);
             for (let i = 0; i < wave.length; i++)
                 wave[i] *= mult;
+            performIntegralOld(wave);
             wave[waveLength] = wave[0];
             return wave;
         }
         waveExpressions(waveType, time, harmonic) {
-            const multiple = 64;
             switch (waveType) {
                 case 0:
-                    console.log("sine");
-                    return (Math.sin(time * harmonic * Math.PI / multiple)) / harmonic;
+                    return (Math.sin(time * harmonic * Math.PI * 2)) / harmonic;
                 case 1:
-                    console.log("square");
-                    return (2 * (Math.floor(time * harmonic / multiple - 1) % 2) - 1) / harmonic;
+                    return (2 * (Math.floor((time * harmonic - 1) % 2 + 2) % 2) - 1) / harmonic;
                 case 2:
-                    return (2 * (Math.abs(((time * harmonic / multiple / 2 + 1 / 2) % 1)) * 2 - 1) - 1) / harmonic;
+                    return (2 * (Math.abs(((time * harmonic / 2 + 1 / 2) % 1 + 1) % 1) * 2 - 1) - 1) / harmonic;
                 case 3:
-                    return (2 * Math.abs((time * harmonic / multiple / 2 + 1 / 2) % 1) - 1) / harmonic;
+                    return (2 * Math.abs(((time * harmonic / 2 + 1 / 2) % 1 + 1) % 1) - 1) / harmonic;
                 case 4:
-                    return (-2 * Math.abs((time * harmonic / multiple / 2 + 1 / 2) % 1) + 1) / harmonic;
+                    return (-2 * Math.abs(((time * harmonic / 2 + 1 / 2) % 1 + 1) % 1) + 1) / harmonic;
                 case 5:
                     return this.waveExpressions(2, time, harmonic) + this.waveExpressions(2, (time + 1 / 2), harmonic);
                 default:
-                    console.log("default");
-                    return (Math.sin(time * harmonic * Math.PI / multiple)) / harmonic;
+                    return (Math.sin(time * harmonic * Math.PI * 2)) / harmonic;
             }
         }
     }
@@ -14672,7 +14669,7 @@ var beepbox = (function (exports) {
                             instrument.additiveWave.markCustomWaveDirty();
                             charIndex += byteCount;
                             for (let i = 0; i < Config.additiveControlPoints; i++) {
-                                instrument.additiveWave.waveTypes[i] = compressed.charCodeAt(charIndex++);
+                                instrument.additiveWave.waveTypes[i] = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                             }
                         }
                         break;

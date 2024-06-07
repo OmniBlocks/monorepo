@@ -2796,25 +2796,15 @@ export class ChangeEnvelopePitchEnd extends Change {
 }
 
 export class ChangeEnvelopeInverse extends Change {
-    constructor(doc: SongDocument, value: boolean, index: number, type: string) {
+    constructor(doc: SongDocument, value: boolean, index: number) {
         super();
         const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
-        if (type == "pitch") {
-            const oldValue: boolean = instrument.pitchEnvelopeInverse[index];
-            if (oldValue != value) {
-                instrument.pitchEnvelopeInverse[index] = value;
-                instrument.preset = instrument.type;
-                doc.notifier.changed();
-                this._didSomething();
-            }
-        } else if (type == "noteSize") {
-            const oldValue: boolean = instrument.noteSizeEnvelopeInverse[index];
-            if (oldValue != value) {
-                instrument.noteSizeEnvelopeInverse[index] = value;
-                instrument.preset = instrument.type;
-                doc.notifier.changed();
-                this._didSomething();
-            }
+        const oldValue: boolean = instrument.envelopeInverse[index];
+        if (oldValue != value) {
+            instrument.envelopeInverse[index] = value;
+            instrument.preset = instrument.type;
+            doc.notifier.changed();
+            this._didSomething();
         }
     }
 }
@@ -4566,7 +4556,7 @@ export class ChangeHoldingModRecording extends Change {
 }
 
 export class ChangeDuplicateSelectedReusedPatterns extends ChangeGroup {
-    constructor(doc: SongDocument, barStart: number, barWidth: number, channelStart: number, channelHeight: number) {
+    constructor(doc: SongDocument, barStart: number, barWidth: number, channelStart: number, channelHeight: number, replaceUnused: boolean) {
         super();
         for (let channelIndex: number = channelStart; channelIndex < channelStart + channelHeight; channelIndex++) {
             const reusablePatterns: Dictionary<number> = {};
@@ -4574,17 +4564,27 @@ export class ChangeDuplicateSelectedReusedPatterns extends ChangeGroup {
             for (let bar: number = barStart; bar < barStart + barWidth; bar++) {
                 const currentPatternIndex: number = doc.song.channels[channelIndex].bars[bar];
                 if (currentPatternIndex == 0) continue;
-
                 if (reusablePatterns[String(currentPatternIndex)] == undefined) {
                     let isUsedElsewhere = false;
-                    for (let bar2: number = 0; bar2 < doc.song.barCount; bar2++) {
-                        if (bar2 < barStart || bar2 >= barStart + barWidth) {
-                            if (doc.song.channels[channelIndex].bars[bar2] == currentPatternIndex) {
-                                isUsedElsewhere = true;
-                                break;
+                    // if (replaceUnused) {
+                    //     for (let bar2: number = 0; bar2 < doc.song.barCount; bar2++) {
+                    //         if (bar2 < barStart || bar2 >= barStart + barWidth) {
+                    //             if (doc.song.channels[channelIndex].bars[bar2] == currentPatternIndex) {
+                    //                 isUsedElsewhere = true;
+                    //                 break;
+                    //             }
+                    //         }
+                    //     }
+                    // } else {
+                        for (let bar2: number = 0; bar2 < doc.song.barCount; bar2++) {
+                            if (bar2 < barStart || bar2 >= barStart + barWidth) {
+                                if (doc.song.channels[channelIndex].bars[bar2] == currentPatternIndex) {
+                                    isUsedElsewhere = true;
+                                    break;
+                                }
                             }
                         }
-                    }
+                    // }
                     if (isUsedElsewhere) {
                         // Need to duplicate the pattern.
                         const copiedPattern: Pattern = doc.song.getPattern(channelIndex, bar)!;
@@ -4923,6 +4923,9 @@ export class ChangeRemoveEnvelope extends Change {
             instrument.envelopes[i].target = instrument.envelopes[i + 1].target;
             instrument.envelopes[i].index = instrument.envelopes[i + 1].index;
             instrument.envelopes[i].envelope = instrument.envelopes[i + 1].envelope;
+            instrument.pitchEnvelopeStart[i] = instrument.pitchEnvelopeStart[i + 1];
+            instrument.pitchEnvelopeEnd[i] = instrument.pitchEnvelopeEnd[i + 1];
+            instrument.envelopeInverse[i] = instrument.envelopeInverse[i + 1];
         }
         // TODO: Shift any envelopes that were targeting other envelope indices after the removed one.
         instrument.preset = instrument.type;

@@ -816,20 +816,21 @@ export class SongEditor {
             option({ value: "recordingSetup" }, "Note Recording..."),
         ),
         optgroup({ label: "Appearance" },
-            option({ value: "showFifth" }, 'Highlight "Fifth" Note'),
-            option({ value: "notesFlashWhenPlayed" }, "Notes Flash When Played"),
-            option({ value: "instrumentButtonsAtTop" }, "Instrument Buttons at Top"),
-            option({ value: "frostedGlassBackground" }, "Frosted Glass Prompt Backdrop"),
-            option({ value: "showChannels" }, "Show All Channels"),
-            option({ value: "showScrollBar" }, "Show Octave Scroll Bar"),
-            option({ value: "showLetters" }, "Show Piano Keys"),
-            option({ value: "displayVolumeBar" }, "Show Playback Volume"),
-            option({ value: "showOscilloscope" }, "Show Oscilloscope"),
-            option({ value: "showSampleLoadingStatus" }, "Show Sample Loading Status"),
-            option({ value: "showDescription" }, "Show Description"),
-            option({ value: "layout" }, "Set Layout..."),
-            option({ value: "colorTheme" }, "Set Theme..."),
-            option({ value: "customTheme" }, "Custom Theme..."),
+        option({ value: "showFifth" }, 'Highlight "Fifth" Note'),
+        option({ value: "notesFlashWhenPlayed" }, "Notes Flash When Played"),
+        option({ value: "instrumentButtonsAtTop" }, "Instrument Buttons at Top"),
+        option({ value: "frostedGlassBackground" }, "Frosted Glass Prompt Backdrop"),
+        option({ value: "showChannels" }, "Show All Channels"),
+        option({ value: "showScrollBar" }, "Show Octave Scroll Bar"),
+        option({ value: "showInstrumentScrollbars" }, "Show Intsrument Scrollbars"),
+        option({ value: "showLetters" }, "Show Piano Keys"),
+        option({ value: "displayVolumeBar" }, "Show Playback Volume"),
+        option({ value: "showOscilloscope" }, "Show Oscilloscope"),
+        option({ value: "showSampleLoadingStatus" }, "Show Sample Loading Status"),
+        option({ value: "showDescription" }, "Show Description"),
+        option({ value: "layout" }, "Set Layout..."),
+        option({ value: "colorTheme" }, "Set Theme..."),
+	    option({ value: "customTheme" }, "Custom Theme..."),
         ),
     );
     private readonly _scaleSelect: HTMLSelectElement = buildOptions(select(), Config.scales.map(scale => scale.name));
@@ -1797,11 +1798,7 @@ export class SongEditor {
             case DropdownID.EnvelopeSettings:
                 target = this._envelopeEditor._extraSettingsDropdowns[submenu];
                 this._envelopeEditor._openExtraSettingsDropdowns[submenu] = this._envelopeEditor._openExtraSettingsDropdowns[submenu] ? false : true;
-                if (subtype == "pitch") {
-                    group = this._envelopeEditor._extraPitchSettingsDropdownGroups[submenu];
-                } else if (subtype == "note size") {
-                    group = this._envelopeEditor._extraNoteSizeSettingsDropdownGroups[submenu];
-                }
+                group = this._envelopeEditor._extraSettingsDropdownGroups[submenu];
                 break;
         }
 
@@ -1810,6 +1807,12 @@ export class SongEditor {
             target.textContent = "▲";
             if (dropdown == DropdownID.EnvelopeSettings) {
                 group.style.display = "flex";
+                if (subtype == "pitch") { 
+                    this._envelopeEditor._extraPitchSettingsGroups[submenu].style.display = "flex";
+                } else {
+                    this._envelopeEditor._extraPitchSettingsGroups[submenu].style.display = "none";
+                }
+                this._envelopeEditor.rerenderExtraSettings();
             } else if (group != this._chordDropdownGroup) {
                 group.style.display = "";
             } // Only show arpeggio dropdown if chord arpeggiates
@@ -1834,6 +1837,9 @@ export class SongEditor {
             }
             target.textContent = "▼";
             group.style.display = "none";
+            if (subtype == "pitch") {
+                this._envelopeEditor._extraPitchSettingsGroups[submenu].style.display = "none";
+            }
         }
     }
 
@@ -2204,6 +2210,7 @@ export class SongEditor {
         this._sampleLoadingStatusContainer.style.display = this._doc.prefs.showSampleLoadingStatus ? "" : "none";
         this._instrumentCopyGroup.style.display = this._doc.prefs.instrumentCopyPaste ? "" : "none";
         this._instrumentExportGroup.style.display = this._doc.prefs.instrumentImportExport ? "" : "none";
+        this._instrumentSettingsArea.style.scrollbarWidth = this._doc.prefs.showInstrumentScrollbars ? "" : "none";
         if (document.getElementById('text-content'))
             document.getElementById('text-content')!.style.display = this._doc.prefs.showDescription ? "" : "none";
 
@@ -2254,6 +2261,7 @@ export class SongEditor {
         // the theme variables are named "icon" to prevent people getting confused and thinking they're svg
         const textOnIcon: string = ColorConfig.getComputed("--text-enabled-icon") !== "" ? ColorConfig.getComputed("--text-enabled-icon") : "✓ ";
         const textOffIcon: string = ColorConfig.getComputed("--text-disabled-icon") !== "" ? ColorConfig.getComputed("--text-disabled-icon") : "　";
+        const textSpacingIcon: string = ColorConfig.getComputed("--text-spacing-icon") !== "" ? ColorConfig.getComputed("--text-spacing-icon") : "　";
         const optionCommands: ReadonlyArray<string> = [
             "Technical",
             (prefs.autoPlay ? textOnIcon : textOffIcon) + "Auto Play on Load",
@@ -2267,22 +2275,23 @@ export class SongEditor {
             (prefs.instrumentImportExport ? textOnIcon : textOffIcon) + "Enable Import/Export Buttons",
             (prefs.displayBrowserUrl ? textOnIcon : textOffIcon) + "Enable Song Data in URL",
             (prefs.closePromptByClickoff ? textOnIcon : textOffIcon) + "Close Prompts on Click Off",
-            "　Note Recording...",
-            "Appearance",
+            textSpacingIcon + "Note Recording...",
+            textSpacingIcon + "Appearance",
             (prefs.showFifth ? textOnIcon : textOffIcon) + 'Highlight "Fifth" Note',
             (prefs.notesFlashWhenPlayed ? textOnIcon : textOffIcon) + "Notes Flash When Played",
             (prefs.instrumentButtonsAtTop ? textOnIcon : textOffIcon) + "Instrument Buttons at Top",
             (prefs.frostedGlassBackground ? textOnIcon : textOffIcon) + "Frosted Glass Prompt Backdrop",
             (prefs.showChannels ? textOnIcon : textOffIcon) + "Show All Channels",
             (prefs.showScrollBar ? textOnIcon : textOffIcon) + "Show Octave Scroll Bar",
+            (prefs.showInstrumentScrollbars ? textOnIcon : textOffIcon) + "Show Instrument Scrollbars",
             (prefs.showLetters ? textOnIcon : textOffIcon) + "Show Piano Keys",
             (prefs.displayVolumeBar ? textOnIcon : textOffIcon) + "Show Playback Volume",
             (prefs.showOscilloscope ? textOnIcon : textOffIcon) + "Show Oscilloscope",
             (prefs.showSampleLoadingStatus ? textOnIcon : textOffIcon) + "Show Sample Loading Status",
             (prefs.showDescription ? textOnIcon : textOffIcon) + "Show Description",
-            "　Set Layout...",
-            "　Set Theme...",
-            "　Custom Theme...",
+            textSpacingIcon + "Set Layout...",
+            textSpacingIcon + "Set Theme...",
+	        textSpacingIcon + "Custom Theme...",
         ];
         // Technical dropdown
         const technicalOptionGroup: HTMLOptGroupElement = <HTMLOptGroupElement>this._optionsMenu.children[1];
@@ -4002,13 +4011,12 @@ export class SongEditor {
                 this._doc.synth.loopBarEnd = -1;
                 this._loopEditor.setLoopAt(this._doc.synth.loopBarStart, this._doc.synth.loopBarEnd);
 
-                if (event.ctrlKey || event.metaKey) {
+                if ((event.ctrlKey || event.metaKey) && !event.shiftKey) {
                     this._doc.selection.insertChannel();
                 } else if (event.shiftKey) {
                     const width = this._doc.selection.boxSelectionWidth
                     this._doc.selection.boxSelectionX0 -= width;
                     this._doc.selection.boxSelectionX1 -= width;
-                    this._doc.bar -= width;
                     this._doc.selection.insertBars();
                 } else {
                     this._doc.selection.insertBars();
@@ -4040,7 +4048,9 @@ export class SongEditor {
             case 68: // d
                 if (canPlayNotes) break;
                 if (needControlForShortcuts == (event.ctrlKey || event.metaKey)) {
-                    this._doc.selection.duplicatePatterns();
+                    //shift d replaces old d functionality, while d will duplicate replacing an unused pattern
+                    //This is for consistency with n (n uses ctrl instead of shift, but this will have to do for now)
+                    this._doc.selection.duplicatePatterns(event.shiftKey ? false : true); 
                     event.preventDefault();
                 }
                 break;
@@ -4051,14 +4061,28 @@ export class SongEditor {
                     if (!instrument.eqFilterType && this._doc.channel < this._doc.song.pitchChannelCount + this._doc.song.noiseChannelCount)
                         this._openPrompt("customEQFilterSettings");
                 } else if (needControlForShortcuts == (event.ctrlKey || event.metaKey)) {
+                    // EUCLEDIAN RHYTHM SHORTCUT (E)
                     this._openPrompt("generateEuclideanRhythm");
                     break;
-                    //EUCLEDIAN RHYTHM SHORTCUT (E)
-                }
+			    }
                 break;
             case 70: // f
                 if (canPlayNotes) break;
-                if (needControlForShortcuts == (event.ctrlKey || event.metaKey)) {
+                if (event.shiftKey) { // if shift+f, move to start of loop bar instead 
+                    
+                    this._doc.synth.loopBarStart = -1;
+                    this._doc.synth.loopBarEnd = -1;
+                    this._loopEditor.setLoopAt(this._doc.synth.loopBarStart, this._doc.synth.loopBarEnd);
+
+                    this._doc.synth.goToBar(this._doc.song.loopStart);
+                    this._doc.synth.snapToBar();
+                    this._doc.synth.initModFilters(this._doc.song);
+                    this._doc.synth.computeLatestModValues();
+                    if (this._doc.prefs.autoFollow) {
+                        this._doc.selection.setChannelBar(this._doc.channel, Math.floor(this._doc.synth.playhead));
+                    }
+                    event.preventDefault();
+                } else if (needControlForShortcuts == (event.ctrlKey || event.metaKey)) {
 
                     this._doc.synth.loopBarStart = -1;
                     this._doc.synth.loopBarEnd = -1;
@@ -5096,7 +5120,7 @@ export class SongEditor {
                 this._doc.selection.selectChannel();
                 break;
             case "duplicatePatterns":
-                this._doc.selection.duplicatePatterns();
+                this._doc.selection.duplicatePatterns(false);
                 break;
             case "barCount":
                 this._openPrompt("barCount");
@@ -5185,6 +5209,9 @@ export class SongEditor {
                 break;
             case "showDescription":
                 this._doc.prefs.showDescription = !this._doc.prefs.showDescription;
+                break;
+            case "showInstrumentScrollbars":
+                this._doc.prefs.showInstrumentScrollbars = !this._doc.prefs.showInstrumentScrollbars;
                 break;
             case "showSampleLoadingStatus":
                 this._doc.prefs.showSampleLoadingStatus = !this._doc.prefs.showSampleLoadingStatus;

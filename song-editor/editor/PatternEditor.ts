@@ -1260,7 +1260,7 @@ export class PatternEditor {
                     // Found it in this channel, but the pattern doesn't exist. So, add a new pattern and swap to that instrument.
                     if (useInstrumentIndex != -1) {
                         sequence.append(new ChangeEnsurePatternExists(this._doc, channelIndex, currentBar));
-                        new ChangeDuplicateSelectedReusedPatterns(this._doc, currentBar, 1, channelIndex, 1);
+                        new ChangeDuplicateSelectedReusedPatterns(this._doc, currentBar, 1, channelIndex, 1, false);
 
                         pattern = this._doc.song.getPattern(channelIndex, currentBar)!;
 
@@ -1279,7 +1279,7 @@ export class PatternEditor {
                     useModIndex = rtn[1];
 
                     if (useInstrumentIndex != -1) {
-                        new ChangeDuplicateSelectedReusedPatterns(this._doc, currentBar, 1, channelIndex, 1);
+                        new ChangeDuplicateSelectedReusedPatterns(this._doc, currentBar, 1, channelIndex, 1, false);
                         pattern = this._doc.song.getPattern(channelIndex, currentBar);
 
                         changedPatterns = true;
@@ -1340,9 +1340,15 @@ export class PatternEditor {
                                 }
                                 else {
                                     instrument.modChannels[mod] = this._doc.channel;
-                                    // Set these new ones to "active" modulation for the most flexibility, if there's more one instrument in the channel.
-                                    if (this._doc.song.channels[this._doc.channel].instruments.length > 1)
-                                        instrument.modInstruments[mod] = this._doc.song.channels[this._doc.channel].instruments.length + 1;
+                                    
+                                    if (this._doc.song.channels[this._doc.channel].instruments.length > 1) {
+                                        // Ctrl key or Shift key: set the new mod target to "active" modulation for the most flexibility, if there's more than one instrument in the channel.
+                                        if (!this.controlMode || !this.shiftMode)
+                                            instrument.modInstruments[mod] = this._doc.song.channels[this._doc.channel].instruments.length + 1;
+                                        // Control+Shift key: Set the new mod target to the currently viewed instrument only.
+                                        else
+                                            instrument.modInstruments[mod] = this._doc.getCurrentInstrument();
+                                    }
                                     else
                                         instrument.modInstruments[mod] = 0;
 

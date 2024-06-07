@@ -132,9 +132,12 @@ document.head.appendChild(HTML.style({ type: "text/css" }, `
 }
 
 
+html {
+	scrollbar-color: var(--scrollbar-color, ${ColorConfig.uiWidgetBackground}) var(--scrollbar-background, ${ColorConfig.editorBackground});
+}
+
 .obtrusive-scrollbars, .obtrusive-scrollbars * {
 	scrollbar-width: thin;
-	scrollbar-color: ${ColorConfig.uiWidgetBackground} ${ColorConfig.editorBackground};
 }
 .obtrusive-scrollbars::-webkit-scrollbar, .obtrusive-scrollbars *::-webkit-scrollbar {
 	width: 12px;

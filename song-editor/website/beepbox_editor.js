@@ -26299,11 +26299,12 @@ li.select2-results__option[role=group] > strong:hover {
     class ChangeAdditive extends Change {
         constructor(doc, instrument, additiveWave) {
             super();
+            for (let i = 0; i < additiveWave.waveTypes.length; i++) {
+                instrument.additiveWave.waveTypes[i] = additiveWave.waveTypes[i];
+                instrument.additiveWave.additives[i] = additiveWave.additives[i];
+            }
             additiveWave.markCustomWaveDirty();
             instrument.preset = instrument.type;
-            for (let i = 0; i < additiveWave.waveTypes.length; i++) {
-                additiveWave.waveTypes[i] = additiveWave.waveTypes[i];
-            }
             doc.notifier.changed();
             this._didSomething();
         }
@@ -32666,6 +32667,8 @@ You should be redirected to the song at:<br /><br />
             this._change = null;
             this._renderedPath = "";
             this._renderedFifths = true;
+            this.instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
+            this._initial = this.instrument.harmonicsWave;
             this._whenMousePressed = (event) => {
                 event.preventDefault();
                 this._mouseDown = true;
@@ -32777,6 +32780,27 @@ You should be redirected to the song at:<br /><br />
                 this._doc.setProspectiveChange(this._change);
             }
         }
+        getHarmonicsWave() {
+            const instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
+            return instrument.harmonicsWave;
+        }
+        setHarmonicsWave(harmonics) {
+            const instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
+            for (let i = 0; i < Config.harmonicsControlPoints; i++) {
+                instrument.harmonicsWave.harmonics[i] = harmonics[i];
+            }
+            this._doc.record(new ChangeHarmonics(this._doc, instrument, instrument.harmonicsWave));
+            this.render();
+        }
+        saveSettings() {
+            const instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
+            this._doc.record(new ChangeHarmonics(this._doc, instrument, instrument.harmonicsWave));
+        }
+        resetToInitial() {
+            const instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
+            this.setHarmonicsWave(this._initial.harmonics);
+            this._doc.record(new ChangeHarmonics(this._doc, instrument, this._initial));
+        }
         render() {
             const instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
             const harmonicsWave = instrument.harmonicsWave;
@@ -32805,6 +32829,99 @@ You should be redirected to the song at:<br /><br />
             if (this._renderedFifths != this._doc.prefs.showFifth) {
                 this._renderedFifths = this._doc.prefs.showFifth;
                 this._fifths.style.display = this._doc.prefs.showFifth ? "" : "none";
+            }
+        }
+    }
+    class HarmonicsEditorPrompt {
+        constructor(_doc, _songEditor) {
+            this._doc = _doc;
+            this._songEditor = _songEditor;
+            this.harmonicsEditor = new HarmonicsEditor(this._doc);
+            this._playButton = HTML.button({ style: "width: 55%;", type: "button" });
+            this._cancelButton = HTML.button({ class: "cancelButton" });
+            this._okayButton = HTML.button({ class: "okayButton", style: "width:45%;" }, "Okay");
+            this.copyButton = HTML.button({ style: "width:86px; margin-right: 5px;", class: "copyButton" }, [
+                "Copy",
+                SVG.svg({ style: "flex-shrink: 0; position: absolute; left: 0; top: 50%; margin-top: -1em; pointer-events: none;", width: "2em", height: "2em", viewBox: "-5 -21 26 26" }, [
+                    SVG.path({ d: "M 0 -15 L 1 -15 L 1 0 L 13 0 L 13 1 L 0 1 L 0 -15 z M 2 -1 L 2 -17 L 10 -17 L 14 -13 L 14 -1 z M 3 -2 L 13 -2 L 13 -12 L 9 -12 L 9 -16 L 3 -16 z", fill: "currentColor" }),
+                ]),
+            ]);
+            this.pasteButton = HTML.button({ style: "width:86px;", class: "pasteButton" }, [
+                "Paste",
+                SVG.svg({ style: "flex-shrink: 0; position: absolute; left: 0; top: 50%; margin-top: -1em; pointer-events: none;", width: "2em", height: "2em", viewBox: "0 0 26 26" }, [
+                    SVG.path({ d: "M 8 18 L 6 18 L 6 5 L 17 5 L 17 7 M 9 8 L 16 8 L 20 12 L 20 22 L 9 22 z", stroke: "currentColor", fill: "none" }),
+                    SVG.path({ d: "M 9 3 L 14 3 L 14 6 L 9 6 L 9 3 z M 16 8 L 20 12 L 16 12 L 16 8 z", fill: "currentColor", }),
+                ]),
+            ]);
+            this.copyPasteContainer = HTML.div({ style: "width: 185px;" }, this.copyButton, this.pasteButton);
+            this.container = HTML.div({ class: "prompt noSelection", style: "width: 500px;" }, HTML.h2("Edit Harmonics Instrument"), HTML.div({ style: "display: flex; width: 55%; align-self: center; flex-direction: row; align-items: center; justify-content: center;" }, this._playButton), HTML.div({ style: "display: flex; flex-direction: row; align-items: center; justify-content: center;" }, this.harmonicsEditor.container), HTML.div({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between;" }, this._okayButton, this.copyPasteContainer), this._cancelButton);
+            this._togglePlay = () => {
+                this._songEditor.togglePlay();
+                this.updatePlayButton();
+            };
+            this._close = () => {
+                this._doc.prompt = null;
+                this.harmonicsEditor.resetToInitial();
+            };
+            this.cleanUp = () => {
+                this._okayButton.removeEventListener("click", this._saveChanges);
+                this._cancelButton.removeEventListener("click", this._close);
+                this.container.removeEventListener("keydown", this.whenKeyPressed);
+                this.harmonicsEditor.container.removeEventListener("mousemove", () => this.harmonicsEditor.render());
+                this._playButton.removeEventListener("click", this._togglePlay);
+            };
+            this._copySettings = () => {
+                const harmonicsCopy = this.harmonicsEditor.getHarmonicsWave();
+                window.localStorage.setItem("harmonicsCopy", JSON.stringify(harmonicsCopy.harmonics));
+            };
+            this._pasteSettings = () => {
+                const storedHarmonicsWave = JSON.parse(String(window.localStorage.getItem("harmonicsCopy")));
+                this.harmonicsEditor.setHarmonicsWave(storedHarmonicsWave);
+            };
+            this.whenKeyPressed = (event) => {
+                if (event.target.tagName != "BUTTON" && event.keyCode == 13) {
+                    this._saveChanges();
+                }
+                else if (event.keyCode == 32) {
+                    this._togglePlay();
+                    event.preventDefault();
+                }
+                else if (event.keyCode == 219) {
+                    this._doc.synth.goToPrevBar();
+                }
+                else if (event.keyCode == 221) {
+                    this._doc.synth.goToNextBar();
+                }
+            };
+            this._saveChanges = () => {
+                this._doc.prompt = null;
+                this.harmonicsEditor.saveSettings();
+            };
+            this._okayButton.addEventListener("click", this._saveChanges);
+            this._cancelButton.addEventListener("click", this._close);
+            this.container.addEventListener("keydown", this.whenKeyPressed);
+            this.copyButton.addEventListener("click", this._copySettings);
+            this.pasteButton.addEventListener("click", this._pasteSettings);
+            this._playButton.addEventListener("click", this._togglePlay);
+            this.harmonicsEditor.container.addEventListener("mousemove", () => this.harmonicsEditor.render());
+            this.container.addEventListener("mousemove", () => this.harmonicsEditor.render());
+            this.container.addEventListener("mousedown", () => this.harmonicsEditor.render());
+            this.updatePlayButton();
+            setTimeout(() => this._playButton.focus());
+            this.harmonicsEditor.render();
+        }
+        updatePlayButton() {
+            if (this._doc.synth.playing) {
+                this._playButton.classList.remove("playButton");
+                this._playButton.classList.add("pauseButton");
+                this._playButton.title = "Pause (Space)";
+                this._playButton.innerText = "Pause";
+            }
+            else {
+                this._playButton.classList.remove("pauseButton");
+                this._playButton.classList.add("playButton");
+                this._playButton.title = "Play (Space)";
+                this._playButton.innerText = "Play";
             }
         }
     }
@@ -32945,6 +33062,15 @@ You should be redirected to the song at:<br /><br />
             this._ampPrev = amp;
             this._change = new ChangeAdditive(this._doc, instrument, this._current);
         }
+        getAddditiveWave() {
+            return this._current;
+        }
+        setAdditiveWave(additive) {
+            const instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
+            this._current = additive;
+            this._doc.record(new ChangeAdditive(this._doc, instrument, this._current));
+            this.render();
+        }
         saveSettings() {
             const instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
             this._doc.record(new ChangeAdditive(this._doc, instrument, this._current));
@@ -32998,7 +33124,21 @@ You should be redirected to the song at:<br /><br />
             this._playButton = HTML.button({ style: "width: 55%;", type: "button" });
             this._cancelButton = HTML.button({ class: "cancelButton" });
             this._okayButton = HTML.button({ class: "okayButton", style: "width:45%;" }, "Okay");
-            this.container = HTML.div({ class: "prompt noSelection", style: "width: 600px;" }, HTML.h2("Edit Additive Instrument"), HTML.div({ style: "display: flex; width: 55%; align-self: center; flex-direction: row; align-items: center; justify-content: center;" }, this._playButton), HTML.div({ style: "display: flex; flex-direction: row; align-items: center; justify-content: center;" }, this.additiveEditor.container), HTML.div({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between;" }, this._okayButton), this._cancelButton);
+            this.copyButton = HTML.button({ style: "width:86px; margin-right: 5px;", class: "copyButton" }, [
+                "Copy",
+                SVG.svg({ style: "flex-shrink: 0; position: absolute; left: 0; top: 50%; margin-top: -1em; pointer-events: none;", width: "2em", height: "2em", viewBox: "-5 -21 26 26" }, [
+                    SVG.path({ d: "M 0 -15 L 1 -15 L 1 0 L 13 0 L 13 1 L 0 1 L 0 -15 z M 2 -1 L 2 -17 L 10 -17 L 14 -13 L 14 -1 z M 3 -2 L 13 -2 L 13 -12 L 9 -12 L 9 -16 L 3 -16 z", fill: "currentColor" }),
+                ]),
+            ]);
+            this.pasteButton = HTML.button({ style: "width:86px;", class: "pasteButton" }, [
+                "Paste",
+                SVG.svg({ style: "flex-shrink: 0; position: absolute; left: 0; top: 50%; margin-top: -1em; pointer-events: none;", width: "2em", height: "2em", viewBox: "0 0 26 26" }, [
+                    SVG.path({ d: "M 8 18 L 6 18 L 6 5 L 17 5 L 17 7 M 9 8 L 16 8 L 20 12 L 20 22 L 9 22 z", stroke: "currentColor", fill: "none" }),
+                    SVG.path({ d: "M 9 3 L 14 3 L 14 6 L 9 6 L 9 3 z M 16 8 L 20 12 L 16 12 L 16 8 z", fill: "currentColor", }),
+                ]),
+            ]);
+            this.copyPasteContainer = HTML.div({ style: "width: 185px;" }, this.copyButton, this.pasteButton);
+            this.container = HTML.div({ class: "prompt noSelection", style: "width: 800px; height: 500px" }, HTML.h2("Edit Additive Instrument"), HTML.div({ style: "display: flex; width: 55%; align-self: center; flex-direction: row; align-items: center; justify-content: center;" }, this._playButton), HTML.div({ style: "display: flex; flex-direction: row; align-items: center; justify-content: center; height: 80%" }, this.additiveEditor.container), HTML.div({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between;" }, this._okayButton, this.copyPasteContainer), this._cancelButton);
             this._togglePlay = () => {
                 this._songEditor.togglePlay();
                 this.updatePlayButton();
@@ -33013,6 +33153,22 @@ You should be redirected to the song at:<br /><br />
                 this.container.removeEventListener("keydown", this.whenKeyPressed);
                 this.additiveEditor.container.removeEventListener("mousemove", () => this.additiveEditor.render());
                 this._playButton.removeEventListener("click", this._togglePlay);
+            };
+            this._copySettings = () => {
+                const additiveCopy = this.additiveEditor.getAddditiveWave();
+                window.localStorage.setItem("additiveCopy", JSON.stringify({
+                    "additives": additiveCopy.additives,
+                    "waveTypes": additiveCopy.waveTypes
+                }));
+            };
+            this._pasteSettings = () => {
+                const storedAdditiveWave = JSON.parse(String(window.localStorage.getItem("additiveCopy")));
+                const parsedAdditive = new AdditiveWave;
+                for (let i = 0; i < Config.additiveControlPoints; i++) {
+                    parsedAdditive.additives[i] = storedAdditiveWave["additives"][i];
+                    parsedAdditive.waveTypes[i] = storedAdditiveWave["waveTypes"][i];
+                }
+                this.additiveEditor.setAdditiveWave(parsedAdditive);
             };
             this.whenKeyPressed = (event) => {
                 if (event.target.tagName != "BUTTON" && event.keyCode == 13) {
@@ -33036,6 +33192,8 @@ You should be redirected to the song at:<br /><br />
             this._okayButton.addEventListener("click", this._saveChanges);
             this._cancelButton.addEventListener("click", this._close);
             this.container.addEventListener("keydown", this.whenKeyPressed);
+            this.copyButton.addEventListener("click", this._copySettings);
+            this.pasteButton.addEventListener("click", this._pasteSettings);
             this._playButton.addEventListener("click", this._togglePlay);
             this.additiveEditor.container.addEventListener("mousemove", () => this.additiveEditor.render());
             this.container.addEventListener("mousemove", () => this.additiveEditor.render());
@@ -42055,7 +42213,7 @@ You should be redirected to the song at:<br /><br />
         return menu;
     }
     function buildPresetOptions(isNoise, idSet) {
-        const menu = select({ id: idSet });
+        const menu = select({ id: idSet, class: "presetSelect" });
         if (isNoise) {
             menu.appendChild(option({ value: 2 }, EditorConfig.valueToPreset(2).name));
             menu.appendChild(option({ value: 3 }, EditorConfig.valueToPreset(3).name));
@@ -42777,10 +42935,11 @@ You should be redirected to the song at:<br /><br />
             this._spectrumEditor = new SpectrumEditor(this._doc, null);
             this._spectrumRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("spectrum") }, "Spectrum:"), this._spectrumEditor.container);
             this._harmonicsEditor = new HarmonicsEditor(this._doc);
-            this._harmonicsRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("harmonics") }, "Harmonics:"), this._harmonicsEditor.container);
+            this._harmonicsZoom = button({ style: "margin-left:0em; padding-left:0.2em; height:1.5em; max-width: 12px;", onclick: () => this._openPrompt("harmonicsSettings") }, "+");
+            this._harmonicsRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("harmonics"), style: "font-size: smaller" }, "Harmonics:"), this._harmonicsZoom, this._harmonicsEditor.container);
             this._additiveEditor = new AdditiveEditor(this._doc);
             this._additiveZoom = button({ style: "margin-left:0em; padding-left:0.2em; height:1.5em; max-width: 12px;", onclick: () => this._openPrompt("additiveSettings") }, "+");
-            this._additiveRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("additive") }, "Additive:"), this._additiveZoom, this._additiveEditor.container);
+            this._additiveRow = div({ class: "selectRow" }, span({ class: "tip ", onclick: () => this._openPrompt("additive"), style: "font-size: smaller" }, "Additive:"), this._additiveZoom, this._additiveEditor.container);
             this._envelopeEditor = new EnvelopeEditor(this._doc, (id, submenu, subtype) => this._toggleDropdownMenu(id, submenu, subtype), (name) => this._openPrompt(name));
             this._discreteEnvelopeBox = input({ type: "checkbox", style: "width: 1em; padding: 0; margin-right: 4em;" });
             this._discreteEnvelopeRow = div({ class: "selectRow dropFader" }, span({ class: "tip", style: "margin-left:4px;", onclick: () => this._openPrompt("discreteEnvelope") }, "‣ Discrete:"), this._discreteEnvelopeBox);
@@ -42839,7 +42998,7 @@ You should be redirected to the song at:<br /><br />
             this._instrumentCopyGroup = div({ class: "editor-controls" }, div({ class: "selectRow" }, this._instrumentCopyButton, this._instrumentPasteButton));
             this._instrumentExportGroup = div({ class: "editor-controls" }, div({ class: "selectRow" }, this._instrumentExportButton, this._instrumentImportButton));
             this._instrumentSettingsTextRow = div({ id: "instrumentSettingsText", style: `padding: 3px 0; max-width: 15em; text-align: center; color: ${ColorConfig.secondaryText};` }, "Instrument Settings");
-            this._instrumentTypeSelectRow = div({ class: "selectRow", id: "typeSelectRow" }, span({ class: "tip", onclick: () => this._openPrompt("instrumentType") }, "Type:"), div(div({ class: "pitchSelect" }, this._pitchedPresetSelect), div({ class: "drumSelect" }, this._drumPresetSelect)));
+            this._instrumentTypeSelectRow = div({ class: "selectRow", id: "typeSelectRow" }, span({ class: "tip", onclick: () => this._openPrompt("instrumentType") }, "Type:"), div({ style: "display:contents" }, div({ class: "pitchSelect", style: "display:contents" }, this._pitchedPresetSelect), div({ class: "drumSelect", style: "display:contents" }, this._drumPresetSelect)));
             this._instrumentSettingsGroup = div({ class: "editor-controls" }, this._instrumentSettingsTextRow, this._instrumentsButtonRow, this._instrumentTypeSelectRow, this._instrumentVolumeSliderRow, this._customInstrumentSettingsGroup);
             this._usedPatternIndicator = SVG.path({ d: "M -6 -6 H 6 V 6 H -6 V -6 M -2 -3 L -2 -3 L -1 -4 H 1 V 4 H -1 V -1.2 L -1.2 -1 H -2 V -3 z", fill: ColorConfig.indicatorSecondary, "fill-rule": "evenodd" });
             this._usedInstrumentIndicator = SVG.path({ d: "M -6 -0.8 H -3.8 V -6 H 0.8 V 4.4 H 2.2 V -0.8 H 6 V 0.8 H 3.8 V 6 H -0.8 V -4.4 H -2.2 V 0.8 H -6 z", fill: ColorConfig.indicatorSecondary });
@@ -45451,6 +45610,8 @@ You should be redirected to the song at:<br /><br />
             if (!("share" in navigator)) {
                 this._fileMenu.removeChild(this._fileMenu.querySelector("[value='shareUrl']"));
             }
+            this._pitchedPresetSelect.style.width = "4em";
+            this._drumPresetSelect.style.width = "4em";
             this._scaleSelect.appendChild(optgroup({ label: "Edit" }, option({ value: "forceScale" }, "Snap Notes To Scale"), option({ value: "customize" }, "Edit Custom Scale")));
             this._keySelect.appendChild(optgroup({ label: "Edit" }, option({ value: "detectKey" }, "Detect Key")));
             this._rhythmSelect.appendChild(optgroup({ label: "Edit" }, option({ value: "forceRhythm" }, "Snap Notes To Rhythm")));
@@ -46025,6 +46186,9 @@ You should be redirected to the song at:<br /><br />
                         break;
                     case "additiveSettings":
                         this.prompt = new AdditiveEditorPrompt(this._doc, this);
+                        break;
+                    case "harmonicsSettings":
+                        this.prompt = new HarmonicsEditorPrompt(this._doc, this);
                         break;
                     default:
                         this.prompt = new TipPrompt(this._doc, promptName);

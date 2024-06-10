@@ -18,7 +18,7 @@ import "./Layout"; // Imported here for the sake of ensuring this code is transp
 import { Instrument, Channel, Synth } from "../synth/synth";
 import { HTML, SVG } from "imperative-html/dist/esm/elements-strict";
 import { Preferences } from "./Preferences";
-import { HarmonicsEditor } from "./HarmonicsEditor";
+import { HarmonicsEditor, HarmonicsEditorPrompt } from "./HarmonicsEditor";
 import { AdditiveEditor, AdditiveEditorPrompt } from "./AdditiveEditor"
 import { InputBox, Slider } from "./HTMLWrapper";
 import { ImportPrompt } from "./ImportPrompt";
@@ -78,7 +78,7 @@ function buildHeaderedOptions(header: string, menu: HTMLSelectElement, items: Re
 }
 
 function buildPresetOptions(isNoise: boolean, idSet: string): HTMLSelectElement {
-    const menu: HTMLSelectElement = select({ id: idSet });
+    const menu: HTMLSelectElement = select({ id: idSet, class: "presetSelect"});
 
 
     // Show the "spectrum" custom type in both pitched and noise channels.
@@ -1031,10 +1031,11 @@ export class SongEditor {
     private readonly _spectrumEditor: SpectrumEditor = new SpectrumEditor(this._doc, null);
     private readonly _spectrumRow: HTMLElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("spectrum") }, "Spectrum:"), this._spectrumEditor.container);
     private readonly _harmonicsEditor: HarmonicsEditor = new HarmonicsEditor(this._doc);
-    private readonly _harmonicsRow: HTMLElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("harmonics") }, "Harmonics:"), this._harmonicsEditor.container);
+    private readonly _harmonicsZoom: HTMLButtonElement = button({ style: "margin-left:0em; padding-left:0.2em; height:1.5em; max-width: 12px;", onclick: () => this._openPrompt("harmonicsSettings") }, "+");
+    private readonly _harmonicsRow: HTMLElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("harmonics"), style: "font-size: smaller"}, "Harmonics:"), this._harmonicsZoom, this._harmonicsEditor.container);
     private readonly _additiveEditor: AdditiveEditor = new AdditiveEditor(this._doc);
     private readonly _additiveZoom: HTMLButtonElement = button({ style: "margin-left:0em; padding-left:0.2em; height:1.5em; max-width: 12px;", onclick: () => this._openPrompt("additiveSettings") }, "+");
-    private readonly _additiveRow: HTMLElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("additive") }, "Additive:"), this._additiveZoom, this._additiveEditor.container);
+    private readonly _additiveRow: HTMLElement = div({ class: "selectRow" }, span({ class: "tip ", onclick: () => this._openPrompt("additive"), style: "font-size: smaller" }, "Additive:"), this._additiveZoom, this._additiveEditor.container);
 
 
     //SongEditor.ts
@@ -1212,9 +1213,9 @@ export class SongEditor {
     );
     private readonly _instrumentTypeSelectRow: HTMLDivElement = div({ class: "selectRow", id: "typeSelectRow" },
         span({ class: "tip", onclick: () => this._openPrompt("instrumentType") }, "Type:"),
-        div(
-            div({ class: "pitchSelect" }, this._pitchedPresetSelect),
-            div({ class: "drumSelect" }, this._drumPresetSelect)
+        div({ style: "display:contents"}, 
+            div({ class: "pitchSelect", style: "display:contents" }, this._pitchedPresetSelect),
+            div({ class: "drumSelect", style: "display:contents" }, this._drumPresetSelect)
         ),
     );
     private readonly _instrumentSettingsGroup: HTMLDivElement = div({ class: "editor-controls" },
@@ -1425,6 +1426,8 @@ export class SongEditor {
         if (!("share" in navigator)) {
             this._fileMenu.removeChild(this._fileMenu.querySelector("[value='shareUrl']")!);
         }
+        this._pitchedPresetSelect.style.width = "4em";
+        this._drumPresetSelect.style.width = "4em";
 
         this._scaleSelect.appendChild(optgroup({ label: "Edit" },
             option({ value: "forceScale" }, "Snap Notes To Scale"),
@@ -2126,6 +2129,9 @@ export class SongEditor {
                     break;
                 case "additiveSettings":
                     this.prompt = new AdditiveEditorPrompt(this._doc, this);
+                    break
+                case "harmonicsSettings":
+                    this.prompt = new HarmonicsEditorPrompt(this._doc, this);
                     break
                 default:
                     this.prompt = new TipPrompt(this._doc, promptName);

@@ -2262,11 +2262,12 @@ export class ChangeHarmonics extends Change {
 export class ChangeAdditive extends Change {
     constructor(doc: SongDocument, instrument: Instrument, additiveWave: AdditiveWave) {
         super();
+        for (let i: number = 0; i < additiveWave.waveTypes.length; i++) {
+            instrument.additiveWave.waveTypes[i] = additiveWave.waveTypes[i];
+            instrument.additiveWave.additives[i] = additiveWave.additives[i];
+        }
         additiveWave.markCustomWaveDirty();
         instrument.preset = instrument.type;
-        for (let i: number = 0; i < additiveWave.waveTypes.length; i++) {
-            additiveWave.waveTypes[i] = additiveWave.waveTypes[i];
-        }
         doc.notifier.changed();
         this._didSomething();
     }

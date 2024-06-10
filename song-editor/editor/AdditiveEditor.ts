@@ -153,6 +153,17 @@ export class AdditiveEditor {
         this._change = new ChangeAdditive(this._doc, instrument, this._current);
     }
 
+    public getAddditiveWave(): AdditiveWave {
+        return this._current;
+    }
+
+    public setAdditiveWave(additive: AdditiveWave) {
+        const instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
+        this._current = additive;
+        this._doc.record(new ChangeAdditive(this._doc, instrument, this._current));
+        this.render();
+    }
+
     private _whenCursorReleased = (event: Event): void => {
         if (this._mouseDown) {
             this._doc.record(this._change!);
@@ -214,40 +225,40 @@ export class AdditiveEditor {
 
 export class AdditiveEditorPrompt implements Prompt {
 
-    public additiveEditor: AdditiveEditor = new AdditiveEditor(this._doc);
+    public readonly additiveEditor: AdditiveEditor = new AdditiveEditor(this._doc);
 
     public readonly _playButton: HTMLButtonElement = HTML.button({ style: "width: 55%;", type: "button" });
 
     private readonly _cancelButton: HTMLButtonElement = HTML.button({ class: "cancelButton" });
     private readonly _okayButton: HTMLButtonElement = HTML.button({ class: "okayButton", style: "width:45%;" }, "Okay");
 
-    // private readonly copyButton: HTMLButtonElement = HTML.button({ style: "width:86px; margin-right: 5px;", class: "copyButton" }, [
-    //     "Copy",
-    //     // Copy icon:
-    //     SVG.svg({ style: "flex-shrink: 0; position: absolute; left: 0; top: 50%; margin-top: -1em; pointer-events: none;", width: "2em", height: "2em", viewBox: "-5 -21 26 26" }, [
-    //         SVG.path({ d: "M 0 -15 L 1 -15 L 1 0 L 13 0 L 13 1 L 0 1 L 0 -15 z M 2 -1 L 2 -17 L 10 -17 L 14 -13 L 14 -1 z M 3 -2 L 13 -2 L 13 -12 L 9 -12 L 9 -16 L 3 -16 z", fill: "currentColor" }),
-    //     ]),
-    // ]);
-    // private readonly pasteButton: HTMLButtonElement = HTML.button({ style: "width:86px;", class: "pasteButton" }, [
-    //     "Paste",
-    //     // Paste icon:
-    //     SVG.svg({ style: "flex-shrink: 0; position: absolute; left: 0; top: 50%; margin-top: -1em; pointer-events: none;", width: "2em", height: "2em", viewBox: "0 0 26 26" }, [
-    //         SVG.path({ d: "M 8 18 L 6 18 L 6 5 L 17 5 L 17 7 M 9 8 L 16 8 L 20 12 L 20 22 L 9 22 z", stroke: "currentColor", fill: "none" }),
-    //         SVG.path({ d: "M 9 3 L 14 3 L 14 6 L 9 6 L 9 3 z M 16 8 L 20 12 L 16 12 L 16 8 z", fill: "currentColor", }),
-    //     ]),
-    // ]);
-    // private readonly copyPasteContainer: HTMLDivElement = HTML.div({ style: "width: 185px;" }, this.copyButton, this.pasteButton);
-    public readonly container: HTMLDivElement = HTML.div({ class: "prompt noSelection", style: "width: 600px;" },
+    private readonly copyButton: HTMLButtonElement = HTML.button({ style: "width:86px; margin-right: 5px;", class: "copyButton" }, [
+        "Copy",
+        // Copy icon:
+        SVG.svg({ style: "flex-shrink: 0; position: absolute; left: 0; top: 50%; margin-top: -1em; pointer-events: none;", width: "2em", height: "2em", viewBox: "-5 -21 26 26" }, [
+            SVG.path({ d: "M 0 -15 L 1 -15 L 1 0 L 13 0 L 13 1 L 0 1 L 0 -15 z M 2 -1 L 2 -17 L 10 -17 L 14 -13 L 14 -1 z M 3 -2 L 13 -2 L 13 -12 L 9 -12 L 9 -16 L 3 -16 z", fill: "currentColor" }),
+        ]),
+    ]);
+    private readonly pasteButton: HTMLButtonElement = HTML.button({ style: "width:86px;", class: "pasteButton" }, [
+        "Paste",
+        // Paste icon:
+        SVG.svg({ style: "flex-shrink: 0; position: absolute; left: 0; top: 50%; margin-top: -1em; pointer-events: none;", width: "2em", height: "2em", viewBox: "0 0 26 26" }, [
+            SVG.path({ d: "M 8 18 L 6 18 L 6 5 L 17 5 L 17 7 M 9 8 L 16 8 L 20 12 L 20 22 L 9 22 z", stroke: "currentColor", fill: "none" }),
+            SVG.path({ d: "M 9 3 L 14 3 L 14 6 L 9 6 L 9 3 z M 16 8 L 20 12 L 16 12 L 16 8 z", fill: "currentColor", }),
+        ]),
+    ]);
+    private readonly copyPasteContainer: HTMLDivElement = HTML.div({ style: "width: 185px;" }, this.copyButton, this.pasteButton);
+    public readonly container: HTMLDivElement = HTML.div({ class: "prompt noSelection", style: "width: 800px; height: 500px" },
         HTML.h2("Edit Additive Instrument"),
         HTML.div({ style: "display: flex; width: 55%; align-self: center; flex-direction: row; align-items: center; justify-content: center;" },
             this._playButton,
         ),
-        HTML.div({ style: "display: flex; flex-direction: row; align-items: center; justify-content: center;" },
+        HTML.div({ style: "display: flex; flex-direction: row; align-items: center; justify-content: center; height: 80%" },
             this.additiveEditor.container,
         ),
         HTML.div({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between;" },
             this._okayButton,
-            //this.copyPasteContainer,
+            this.copyPasteContainer,
         ),
         this._cancelButton,
     );
@@ -256,8 +267,8 @@ export class AdditiveEditorPrompt implements Prompt {
         this._okayButton.addEventListener("click", this._saveChanges);
         this._cancelButton.addEventListener("click", this._close);
         this.container.addEventListener("keydown", this.whenKeyPressed);
-        // this.copyButton.addEventListener("click", this._copySettings);
-        // this.pasteButton.addEventListener("click", this._pasteSettings);
+        this.copyButton.addEventListener("click", this._copySettings);
+        this.pasteButton.addEventListener("click", this._pasteSettings);
         this._playButton.addEventListener("click", this._togglePlay);
         this.additiveEditor.container.addEventListener("mousemove", () => this.additiveEditor.render());
         this.container.addEventListener("mousemove", () => this.additiveEditor.render());
@@ -301,22 +312,23 @@ export class AdditiveEditorPrompt implements Prompt {
         this._playButton.removeEventListener("click", this._togglePlay);
     }
 
-    // private _copySettings = (): void => {
-    //     const additiveCopy: Float32Array = this.additiveEditor.chipData;
-    //     window.localStorage.setItem("additiveCopy", JSON.stringify(Array.from(additiveCopy)));
-    // }
+    private _copySettings = (): void => {
+        const additiveCopy: AdditiveWave = this.additiveEditor.getAddditiveWave();
+        window.localStorage.setItem("additiveCopy", JSON.stringify({
+            "additives": additiveCopy.additives,
+            "waveTypes": additiveCopy.waveTypes
+        }));
+    }
 
-    // private _pasteSettings = (): void => {
-    //     const storedChipWave: any = JSON.parse(String(window.localStorage.getItem("additiveCopy")));
-    //     for (let i: number = 0; i < 64; i++) {
-    //         this.additiveEditor.chipData[i] = storedChipWave[i];
-    //     }
-    //     this.additiveEditor._storeChange();
-    //     const instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
-    //     const additiveWave: AdditiveWave = instrument.additiveWave; 
-
-    //     new ChangeAdditive(this._doc, instrument, additiveWave);
-    // }
+    private _pasteSettings = (): void => {
+        const storedAdditiveWave: any = JSON.parse(String(window.localStorage.getItem("additiveCopy")));
+        const parsedAdditive: AdditiveWave = new AdditiveWave;
+        for (let i: number = 0; i < Config.additiveControlPoints; i++) {
+            parsedAdditive.additives[i] = storedAdditiveWave["additives"][i];
+            parsedAdditive.waveTypes[i] = storedAdditiveWave["waveTypes"][i];
+        }
+        this.additiveEditor.setAdditiveWave(parsedAdditive);
+    }
 
     public whenKeyPressed = (event: KeyboardEvent): void => {
         if ((<Element>event.target).tagName != "BUTTON" && event.keyCode == 13) { // Enter key

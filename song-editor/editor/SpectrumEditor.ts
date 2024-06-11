@@ -7,6 +7,8 @@ import { HTML, SVG } from "imperative-html/dist/esm/elements-strict";
 import { ColorConfig } from "./ColorConfig";
 import { ChangeSpectrum } from "./changes";
 import { prettyNumber } from "./EditorConfig";
+import { Prompt } from "./Prompt";
+import { SongEditor } from "./SongEditor";
 
 export class SpectrumEditor {
     private readonly _editorWidth: number = 120;
@@ -34,6 +36,8 @@ export class SpectrumEditor {
     private _change: ChangeSpectrum | null = null;
     private _renderedPath: String = "";
     private _renderedFifths: boolean = true;
+    private instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
+    private readonly _initial: SpectrumWave = this.instrument.spectrumWave;
 
     constructor(private _doc: SongDocument, private _spectrumIndex: number | null) {
         for (let i: number = 0; i < Config.spectrumControlPoints; i += Config.spectrumControlPointsPerOctave) {
@@ -148,6 +152,31 @@ export class SpectrumEditor {
         this._mouseDown = false;
     }
 
+    public getSpectrumWave(): SpectrumWave {
+        const instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
+        return instrument.spectrumWave;
+    }
+
+    public setSpectrumWave(spectrum: number[]) {
+        const instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
+        for (let i = 0; i < Config.spectrumControlPoints; i++) {
+            instrument.spectrumWave.spectrum[i] = spectrum[i];
+        }
+        this._doc.record(new ChangeSpectrum(this._doc, instrument, instrument.spectrumWave));
+        this.render();
+    }
+
+    public saveSettings() {
+        const instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
+        this._doc.record(new ChangeSpectrum(this._doc, instrument, instrument.spectrumWave));
+    }
+
+    public resetToInitial() {
+        const instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
+        this.setSpectrumWave(this._initial.spectrum);
+        this._doc.record(new ChangeSpectrum(this._doc, instrument, this._initial));
+    }
+
     public render(): void {
         const instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
         const spectrumWave: SpectrumWave = (this._spectrumIndex == null) ? instrument.spectrumWave : instrument.drumsetSpectrumWaves[this._spectrumIndex];
@@ -185,5 +214,135 @@ export class SpectrumEditor {
             this._renderedFifths = this._doc.prefs.showFifth;
             this._fifths.style.display = this._doc.prefs.showFifth ? "" : "none";
         }
+    }
+}
+
+export class SpectrumEditorPrompt implements Prompt {
+
+    public readonly spectrumEditor: SpectrumEditor = new SpectrumEditor(this._doc, null);
+
+    public readonly _playButton: HTMLButtonElement = HTML.button({ style: "width: 55%;", type: "button" });
+
+    private readonly _cancelButton: HTMLButtonElement = HTML.button({ class: "cancelButton" });
+    private readonly _okayButton: HTMLButtonElement = HTML.button({ class: "okayButton", style: "width:45%;" }, "Okay");
+
+    private readonly copyButton: HTMLButtonElement = HTML.button({ style: "width:86px; margin-right: 5px;", class: "copyButton" }, [
+        "Copy",
+        // Copy icon:
+        SVG.svg({ style: "flex-shrink: 0; position: absolute; left: 0; top: 50%; margin-top: -1em; pointer-events: none;", width: "2em", height: "2em", viewBox: "-5 -21 26 26" }, [
+            SVG.path({ d: "M 0 -15 L 1 -15 L 1 0 L 13 0 L 13 1 L 0 1 L 0 -15 z M 2 -1 L 2 -17 L 10 -17 L 14 -13 L 14 -1 z M 3 -2 L 13 -2 L 13 -12 L 9 -12 L 9 -16 L 3 -16 z", fill: "currentColor" }),
+        ]),
+    ]);
+    private readonly pasteButton: HTMLButtonElement = HTML.button({ style: "width:86px;", class: "pasteButton" }, [
+        "Paste",
+        // Paste icon:
+        SVG.svg({ style: "flex-shrink: 0; position: absolute; left: 0; top: 50%; margin-top: -1em; pointer-events: none;", width: "2em", height: "2em", viewBox: "0 0 26 26" }, [
+            SVG.path({ d: "M 8 18 L 6 18 L 6 5 L 17 5 L 17 7 M 9 8 L 16 8 L 20 12 L 20 22 L 9 22 z", stroke: "currentColor", fill: "none" }),
+            SVG.path({ d: "M 9 3 L 14 3 L 14 6 L 9 6 L 9 3 z M 16 8 L 20 12 L 16 12 L 16 8 z", fill: "currentColor", }),
+        ]),
+    ]);
+    private readonly copyPasteContainer: HTMLDivElement = HTML.div({ style: "width: 185px;" }, this.copyButton, this.pasteButton);
+    public readonly container: HTMLDivElement = HTML.div({ class: "prompt noSelection", style: "width: 500px;"},
+        HTML.h2("Edit Spectrum Instrument"),
+        HTML.div({ style: "display: flex; width: 55%; align-self: center; flex-direction: row; align-items: center; justify-content: center;" },
+            this._playButton,
+        ),
+        HTML.div({ style: "display: flex; flex-direction: row; align-items: center; justify-content: center; height: 80%" },
+            this.spectrumEditor.container,
+        ),
+        HTML.div({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between;" },
+            this._okayButton,
+            this.copyPasteContainer,
+        ),
+        this._cancelButton,
+    );
+
+    constructor(private _doc: SongDocument, private _songEditor: SongEditor) {
+        this._okayButton.addEventListener("click", this._saveChanges);
+        this._cancelButton.addEventListener("click", this._close);
+        this.container.addEventListener("keydown", this.whenKeyPressed);
+        this.copyButton.addEventListener("click", this._copySettings);
+        this.pasteButton.addEventListener("click", this._pasteSettings);
+        this._playButton.addEventListener("click", this._togglePlay);
+        this.spectrumEditor.container.addEventListener("mousemove", () => this.spectrumEditor.render());
+        this.container.addEventListener("mousemove", () => this.spectrumEditor.render());
+        this.container.addEventListener("mousedown", () => this.spectrumEditor.render());
+        this.updatePlayButton();
+
+        setTimeout(() => this._playButton.focus());
+
+        this.spectrumEditor.render();
+    }
+
+    private _togglePlay = (): void => {
+        this._songEditor.togglePlay();
+        this.updatePlayButton();
+    }
+
+    public updatePlayButton(): void {
+        if (this._doc.synth.playing) {
+            this._playButton.classList.remove("playButton");
+            this._playButton.classList.add("pauseButton");
+            this._playButton.title = "Pause (Space)";
+            this._playButton.innerText = "Pause";
+        } else {
+            this._playButton.classList.remove("pauseButton");
+            this._playButton.classList.add("playButton");
+            this._playButton.title = "Play (Space)";
+            this._playButton.innerText = "Play";
+        }
+    }
+
+    private _close = (): void => {
+        this._doc.prompt = null;
+        this.spectrumEditor.resetToInitial();
+    }
+
+    public cleanUp = (): void => {
+        this._okayButton.removeEventListener("click", this._saveChanges);
+        this._cancelButton.removeEventListener("click", this._close);
+        this.container.removeEventListener("keydown", this.whenKeyPressed);
+        this.spectrumEditor.container.removeEventListener("mousemove", () => this.spectrumEditor.render());
+        this._playButton.removeEventListener("click", this._togglePlay);
+    }
+
+    private _copySettings = (): void => {
+        const spectrumCopy: SpectrumWave = this.spectrumEditor.getSpectrumWave();
+        window.localStorage.setItem("spectrumCopy", JSON.stringify(spectrumCopy.spectrum));
+    }
+
+    private _pasteSettings = (): void => {
+        const storedSpectrumWave: any = JSON.parse(String(window.localStorage.getItem("spectrumCopy")));
+        this.spectrumEditor.setSpectrumWave(storedSpectrumWave);
+    }
+
+    public whenKeyPressed = (event: KeyboardEvent): void => {
+        if ((<Element>event.target).tagName != "BUTTON" && event.keyCode == 13) { // Enter key
+            this._saveChanges();
+        }
+        else if (event.keyCode == 32) {
+            this._togglePlay();
+            event.preventDefault();
+        }
+        // else if (event.keyCode == 90) { // z
+        //     this.additiveEditor.undo();
+        //     event.stopPropagation();
+        // }
+        // else if (event.keyCode == 89) { // y
+        //     this.additiveEditor.redo();
+        //     event.stopPropagation();
+        // }
+        else if (event.keyCode == 219) { // [
+            this._doc.synth.goToPrevBar();
+        }
+        else if (event.keyCode == 221) { // ]
+            this._doc.synth.goToNextBar();
+        }
+    }
+
+    private _saveChanges = (): void => {
+        this._doc.prompt = null;
+        // Save again just in case
+        this.spectrumEditor.saveSettings();
     }
 }

@@ -1,6 +1,6 @@
 // Copyright (c) 2012-2022 John Nesky and contributing authors, distributed under the MIT license, see accompanying the LICENSE.md file.
 
-import { Config } from "../synth/SynthConfig";
+import { Config, AdditiveWaveTypes } from "../synth/SynthConfig";
 import { AdditiveWave, Instrument } from "../synth/synth";
 import { SongDocument } from "./SongDocument";
 import { HTML, SVG } from "imperative-html/dist/esm/elements-strict";
@@ -18,6 +18,8 @@ export class AdditiveEditor {
     private readonly _curve: SVGPathElement = SVG.path({ fill: "none", stroke: "currentColor", "stroke-width": 2, "pointer-events": "none" });
     private readonly _lastControlPoints: SVGRectElement[] = [];
     private readonly _lastControlPointContainer: SVGSVGElement = SVG.svg({ "pointer-events": "none" });
+    private readonly _waveTypeButtons: HTMLButtonElement[] = [];
+    public readonly waveTypeButtonContainer: HTMLDivElement = HTML.div({ style: "display: flex; flex-direction: row; align-items: center; justify-content: center; margin-left: 0px; margin-right: 8px" });
     private readonly _svg: SVGSVGElement = SVG.svg({ style: "background-color: ${ColorConfig.editorBackground}; touch-action: none; cursor: crosshair;", width: "100%", height: "100%", viewBox: "0 0 " + this._editorWidth + " " + this._editorHeight, preserveAspectRatio: "none" },
         this._octaves,
         this._fifths,
@@ -52,6 +54,13 @@ export class AdditiveEditor {
             this._lastControlPoints.push(rect);
             this._lastControlPointContainer.appendChild(rect);
         }
+        for (let i: number = 0; i < Config.additiveControlPoints; i++) {
+            const waveTypeButton: HTMLButtonElement = HTML.button({ style: `width:21.7px;margin:3px;margin-left: ${i == Config.additiveControlPoints-1 ? 19.4: 3}px;` }, this._getShape(this._current.waveTypes[i], i));
+            this._waveTypeButtons.push(waveTypeButton);
+            this.waveTypeButtonContainer.appendChild(waveTypeButton);
+            const index = i;
+            waveTypeButton.addEventListener("click", () => this._buttonPressed(index));
+        }
 
         this.container.addEventListener("mousedown", this._whenMousePressed);
         document.addEventListener("mousemove", this._whenMouseMoved);
@@ -61,6 +70,54 @@ export class AdditiveEditor {
         this.container.addEventListener("touchmove", this._whenTouchMoved);
         this.container.addEventListener("touchend", this._whenCursorReleased);
         this.container.addEventListener("touchcancel", this._whenCursorReleased);
+    }
+
+    private _buttonPressed(buttonIndex: number) {
+        if (this._waveTypeButtons[buttonIndex]) {
+            if (this._current.waveTypes[buttonIndex] < AdditiveWaveTypes.length-1) {
+                this._current.waveTypes[buttonIndex]++;
+            } else {
+                this._current.waveTypes[buttonIndex] = 0
+            };
+            const existingChild = document.getElementById("SVGshape"+buttonIndex);
+            if (existingChild) {
+                existingChild.remove();
+                this._waveTypeButtons[buttonIndex].appendChild(this._getShape(this._current.waveTypes[buttonIndex], buttonIndex));
+            }
+            const instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
+            this._doc.record(new ChangeAdditive(this._doc, instrument, this._current));
+        }
+    }
+
+    private _getShape(shape: number, index: number): SVGSVGElement {
+        switch (shape) {
+            case AdditiveWaveTypes.sine:
+                return SVG.svg({ id: "SVGshape" + index, style: "flex-shrink: 0; position: absolute; left: 0; top: 0; pointer-events: none; margin:1px;", width: "20px", height: "20px", viewBox: "0 0 26 26" }, [
+                    SVG.path({ d: "M 2 12 C 12 0, 13 23, 23 13", strokeWidth: "3", stroke: "currentColor", fill: "none" }),
+                ])
+            case AdditiveWaveTypes.square:
+                return SVG.svg({ id: "SVGshape" + index, style: "flex-shrink: 0; position: absolute; left: 0; top: 0; pointer-events: none; margin:1px;", width: "20px", height: "20px", viewBox: "0 0 26 26" }, [
+                    SVG.path({ d: "M 2 2 L 2 23 L 23 23 L 23 2 L 2 2 z", strokeWidth: "3", stroke: "currentColor", fill: "none" }),
+                ])
+            case AdditiveWaveTypes.triangle:
+                return SVG.svg({ id: "SVGshape" + index, style: "flex-shrink: 0; position: absolute; left: 0; top: 0; pointer-events: none; margin:1px;", width: "20px", height: "20px", viewBox: "0 0 26 26" }, [
+                    SVG.path({ d: "M 2 23 L 12 2 L 23 23 L 2 23 z", strokeWidth: "3", stroke: "currentColor", fill: "none" }),
+                ])
+            case AdditiveWaveTypes.sawtooth:
+                return SVG.svg({ id: "SVGshape" + index, style: "flex-shrink: 0; position: absolute; left: 0; top: 0; pointer-events: none; margin:1px;", width: "20px", height: "20px", viewBox: "0 0 26 26" }, [
+                    SVG.path({ d: "M 3 3 L 3 24 L 13 24 L 3 3 z M 14 24 L 14 3 L 24 24 L 14 24 z", strokeWidth: "3", stroke: "currentColor", fill: "none" }),
+                ])
+            case AdditiveWaveTypes.ramp:
+                return SVG.svg({ id: "SVGshape" + index, style: "flex-shrink: 0; position: absolute; left: 0; top: 0; pointer-events: none; margin:1px;", width: "20px", height: "20px", viewBox: "0 0 26 26" }, [
+                    SVG.path({ d: "M 12 3 L 2 24 L 12 24 L 12 3 z M 13 24 L 23 3 L 23 24 L 13 24 z", strokeWidth: "3", stroke: "currentColor", fill: "none" }),
+                ])
+            case AdditiveWaveTypes.trapezoid:
+                return SVG.svg({ id: "SVGshape" + index, style: "flex-shrink: 0; position: absolute; left: 0; top: 0; pointer-events: none; margin:1px;", width: "20px", height: "20px", viewBox: "0 0 26 26" }, [
+                    SVG.path({ d: "M 2 23 L 23 23 L 17 2 L 8 2 L 2 23 z", strokeWidth: "3", stroke: "currentColor", fill: "none" }),
+                ])
+            default:
+                return this._getShape(AdditiveWaveTypes.sine, index);
+        }
     }
 
     private _xToFreq(x: number): number {
@@ -162,6 +219,15 @@ export class AdditiveEditor {
         this._current = additive;
         this._doc.record(new ChangeAdditive(this._doc, instrument, this._current));
         this.render();
+        for (let i: number = 0; i < Config.additiveControlPoints; i++) {
+            if (this._waveTypeButtons[i]) {
+                const existingChild = document.getElementById("SVGshape" + i);
+                if (existingChild) {
+                    existingChild.remove();
+                }
+                this._waveTypeButtons[i].appendChild(this._getShape(this._current.waveTypes[i], i));
+            }
+        }
     }
 
     private _whenCursorReleased = (event: Event): void => {
@@ -253,8 +319,9 @@ export class AdditiveEditorPrompt implements Prompt {
         HTML.div({ style: "display: flex; width: 55%; align-self: center; flex-direction: row; align-items: center; justify-content: center;" },
             this._playButton,
         ),
-        HTML.div({ style: "display: flex; flex-direction: row; align-items: center; justify-content: center; height: 80%" },
+        HTML.div({ style: "display: flex; flex-direction: column; align-items: center; justify-content: center; height: 80%" },
             this.additiveEditor.container,
+            this.additiveEditor.waveTypeButtonContainer,
         ),
         HTML.div({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between;" },
             this._okayButton,

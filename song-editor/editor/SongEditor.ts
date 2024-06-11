@@ -43,7 +43,7 @@ import { SongDurationPrompt } from "./SongDurationPrompt";
 import { SustainPrompt } from "./SustainPrompt";
 import { SongRecoveryPrompt } from "./SongRecoveryPrompt";
 import { RecordingSetupPrompt } from "./RecordingSetupPrompt";
-import { SpectrumEditor } from "./SpectrumEditor";
+import { SpectrumEditor, SpectrumEditorPrompt } from "./SpectrumEditor";
 import { CustomPrompt } from "./CustomPrompt";
 import { ThemePrompt } from "./ThemePrompt";
 import { TipPrompt } from "./TipPrompt";
@@ -1029,7 +1029,8 @@ export class SongEditor {
     private readonly _feedbackTypeSelect: HTMLSelectElement = buildOptions(select(), Config.feedbacks.map(feedback => feedback.name));
     private readonly _feedbackRow1: HTMLDivElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("feedbackType") }, "Feedback:"), div({ class: "selectContainer" }, this._feedbackTypeSelect));
     private readonly _spectrumEditor: SpectrumEditor = new SpectrumEditor(this._doc, null);
-    private readonly _spectrumRow: HTMLElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("spectrum") }, "Spectrum:"), this._spectrumEditor.container);
+    private readonly _spectrumZoom: HTMLButtonElement = button({ style: "margin-left:0em; padding-left:0.2em; height:1.5em; max-width: 12px;", onclick: () => this._openPrompt("spectrumSettings") }, "+");
+    private readonly _spectrumRow: HTMLElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("spectrum"), style: "font-size: smaller" }, "Spectrum:"), this._spectrumZoom, this._spectrumEditor.container);
     private readonly _harmonicsEditor: HarmonicsEditor = new HarmonicsEditor(this._doc);
     private readonly _harmonicsZoom: HTMLButtonElement = button({ style: "margin-left:0em; padding-left:0.2em; height:1.5em; max-width: 12px;", onclick: () => this._openPrompt("harmonicsSettings") }, "+");
     private readonly _harmonicsRow: HTMLElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("harmonics"), style: "font-size: smaller"}, "Harmonics:"), this._harmonicsZoom, this._harmonicsEditor.container);
@@ -2129,10 +2130,13 @@ export class SongEditor {
                     break;
                 case "additiveSettings":
                     this.prompt = new AdditiveEditorPrompt(this._doc, this);
-                    break
+                    break;
                 case "harmonicsSettings":
                     this.prompt = new HarmonicsEditorPrompt(this._doc, this);
-                    break
+                    break;
+                case "spectrumSettings":
+                    this.prompt = new SpectrumEditorPrompt(this._doc, this);
+                    break;
                 default:
                     this.prompt = new TipPrompt(this._doc, promptName);
                     break;

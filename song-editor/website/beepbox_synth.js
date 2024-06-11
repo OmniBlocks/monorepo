@@ -2987,14 +2987,14 @@ var beepbox = (function (exports) {
             }
             const wave = this.wave;
             for (let i = 0; i < waveLength; i++) {
-                wave[i] = this.waveExpressions(settings.waveTypes[0], i, 1);
+                wave[i] = 1;
             }
             const overallSlope = -0.25;
             let combinedControlPointAmplitude = 1;
             for (let additiveIndex = 1; additiveIndex < additiveRendered; additiveIndex++) {
-                const additiveFreq = additiveIndex++;
+                const additiveFreq = additiveIndex + 1;
                 for (let i = 0; i < waveLength; i++) {
-                    let additiveHarmonic = this.waveExpressions(settings.waveTypes[additiveIndex], i / waveLength, additiveFreq);
+                    let additiveHarmonic = this.waveExpressions(settings.waveTypes[additiveIndex], i / waveLength, additiveFreq) * (settings.additives[additiveIndex] != undefined ? settings.additives[additiveIndex] / Config.additiveMax : 1);
                     additiveHarmonic *= Math.pow(additiveFreq, overallSlope);
                     wave[i] += additiveHarmonic;
                 }

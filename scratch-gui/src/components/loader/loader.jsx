@@ -153,8 +153,7 @@ class LoaderComponent extends React.Component {
                             className={styles.prideMonth}
                             lang="en"
                         >
-                            <b>{'Pride Month Fun Fact: '}</b>
-                            {'The non-binary flag has yellow, white, purple, and black stripes.'}
+                            {'Lynn Conway (1938-2024) was a transgender computer scientist who revolutionized the design of complex integrated circuits, such as CPUs.'}
                         </div>
                     )}
                 </div>

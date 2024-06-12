@@ -153,7 +153,8 @@ class LoaderComponent extends React.Component {
                             className={styles.prideMonth}
                             lang="en"
                         >
-                            {'Lynn Conway (1938-2024) was a transgender computer scientist who revolutionized the design of complex integrated circuits, such as CPUs.'}
+                            <b>{'Pride Month Fun Fact:'}</b>{' '}
+                            {'The Turing Award, known as the "Nobel Prize of Computing", is named after Alan Turing, who was a gay computer scientist.'}
                         </div>
                     )}
                 </div>

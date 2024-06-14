@@ -2,7 +2,6 @@
 @import "../../css/units.css";
 
 .author-info {
-    color: $menu-bar-foreground;
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     display: flex;
     justify-content: flex-start;
@@ -42,7 +41,7 @@
 
 .link {
     text-decoration: none;
-    color: $ui-white !important;
+    color: $menu-bar-foreground !important;
 }
 .link:hover {
     text-decoration: underline;

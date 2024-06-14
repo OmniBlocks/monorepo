@@ -36,6 +36,7 @@ const SpriteSelectorItem = props => (
                     <img
                         className={styles.spriteImage}
                         draggable={false}
+                        loading="lazy"
                         src={props.costumeURL}
                     />
                 </div>

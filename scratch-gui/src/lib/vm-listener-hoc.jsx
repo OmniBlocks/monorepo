@@ -134,15 +134,11 @@ const vmListenerHOC = function (WrappedComponent) {
         // tw: handling for compile errors
         handleCompileError (target, error) {
             const errorMessage = `${error}`;
-            // Ignore certain types of known errors
-            // TODO: fix the root cause of all of these
-            if (errorMessage.includes('edge-activated hat')) {
-                return;
-            }
             // Ignore intentonal errors
             if (errorMessage.includes('Script explicitly disables compilation')) {
                 return;
             }
+
             this.props.onCompileError({
                 sprite: target.getName(),
                 error: errorMessage,

@@ -14,7 +14,7 @@ import log from '../lib/log';
 /* eslint-disable no-alert */
 
 const SAVE_DELAY = 250;
-const MINIMUM_SAVE_TIME = 750;
+const MINIMUM_SAVE_TIME = 1000;
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -45,6 +45,7 @@ class TWRestorePointManager extends React.Component {
     constructor (props) {
         super(props);
         bindAll(this, [
+            'handleProjectChanged',
             'handleClickCreate',
             'handleClickDelete',
             'handleClickDeleteAll',
@@ -56,18 +57,21 @@ class TWRestorePointManager extends React.Component {
             totalSize: 0,
             restorePoints: [],
             error: null,
-            wasChanged: props.projectChanged,
             interval: RestorePointAPI.readInterval()
         };
         this.timeout = null;
     }
 
     componentDidMount () {
-        if (this.state.wasChanged) {
+        // This helps reduce problems when people constantly enter and leave the editor which
+        // causes this component to re-mount. Still not perfect though, ideally we would
+        // compensate for time already passed.
+        if (this.props.projectChanged) {
             this.queueRestorePoint();
         }
 
         RestorePointAPI.deleteLegacyRestorePoint();
+        this.props.vm.on('PROJECT_CHANGED', this.handleProjectChanged);
     }
 
     componentWillReceiveProps (nextProps) {
@@ -78,30 +82,17 @@ class TWRestorePointManager extends React.Component {
                 restorePoints: []
             });
         }
-
-        if (nextProps.projectChanged && !this.props.projectChanged && !this.state.wasChanged) {
-            this.setState({
-                wasChanged: true
-            });
-        }
-
-        if (!nextProps.isShowingProject && this.props.isShowingProject) {
-            this.setState({
-                wasChanged: false
-            });
-        }
-    }
-
-    componentDidUpdate (prevProps, prevState) {
-        if (this.state.wasChanged && !prevState.wasChanged) {
-            this.queueRestorePoint();
-        } else if (!this.state.wasChanged && prevState.wasChanged) {
-            this.cancelQueuedRestorePoint();
-        }
     }
 
     componentWillUnmount () {
         this.cancelQueuedRestorePoint();
+        this.props.vm.off('PROJECT_CHANGED', this.handleProjectChanged);
+    }
+
+    handleProjectChanged () {
+        if (!this.timeout) {
+            this.queueRestorePoint();
+        }
     }
 
     handleClickCreate () {
@@ -187,7 +178,7 @@ class TWRestorePointManager extends React.Component {
         this.setState({
             interval
         }, () => {
-            if (this.state.wasChanged) {
+            if (this.timeout) {
                 this.cancelQueuedRestorePoint();
                 this.queueRestorePoint();
             }
@@ -201,7 +192,6 @@ class TWRestorePointManager extends React.Component {
         this.timeout = setTimeout(() => {
             this.createRestorePoint(RestorePointAPI.TYPE_AUTOMATIC).then(() => {
                 this.timeout = null;
-                this.queueRestorePoint();
             });
         }, this.state.interval);
     }

@@ -215,6 +215,7 @@ class Thread {
          */
         this.procedures = null;
         this.executableHat = false;
+        this.compatibilityStackFrame = null;
     }
 
     /**

@@ -3,12 +3,11 @@ const BlockUtility = require('../engine/block-utility');
 class CompatibilityLayerBlockUtility extends BlockUtility {
     constructor () {
         super();
-        this._stackFrame = {};
         this._startedBranch = null;
     }
 
     get stackFrame () {
-        return this._stackFrame;
+        return this.thread.compatibilityStackFrame;
     }
 
     startBranch (branchNumber, isLoop) {
@@ -33,9 +32,9 @@ class CompatibilityLayerBlockUtility extends BlockUtility {
     init (thread, fakeBlockId, stackFrame) {
         this.thread = thread;
         this.sequencer = thread.target.runtime.sequencer;
-        this._stackFrame = stackFrame;
         this._startedBranch = null;
         thread.stack[0] = fakeBlockId;
+        thread.compatibilityStackFrame = stackFrame;
     }
 }
 

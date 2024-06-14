@@ -70,6 +70,9 @@ const compensateForTimePassedWhilePaused = (thread, pauseState) => {
   if (thread.timer) {
     thread.timer.startTime += vm.runtime.currentMSecs - pauseState.time;
   }
+  if (thread.compatibilityStackFrame && thread.compatibilityStackFrame.timer) {
+    thread.compatibilityStackFrame.timer.startTime += vm.runtime.currentMSecs - pauseState.time;
+  }
   const stackFrame = thread.peekStackFrame();
   if (stackFrame && stackFrame.executionContext && stackFrame.executionContext.timer) {
     stackFrame.executionContext.timer.startTime += vm.runtime.currentMSecs - pauseState.time;

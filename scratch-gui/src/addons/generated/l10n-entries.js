@@ -15,5 +15,6 @@ export default {
   "ru": () => import(/* webpackChunkName: "addon-l10n-ru" */ "../addons-l10n/ru.json"),
   "sl": () => import(/* webpackChunkName: "addon-l10n-sl" */ "../addons-l10n/sl.json"),
   "tr": () => import(/* webpackChunkName: "addon-l10n-tr" */ "../addons-l10n/tr.json"),
+  "zh-cn": () => import(/* webpackChunkName: "addon-l10n-zh-cn" */ "../addons-l10n/zh-cn.json"),
   "zh-tw": () => import(/* webpackChunkName: "addon-l10n-zh-tw" */ "../addons-l10n/zh-tw.json"),
 };

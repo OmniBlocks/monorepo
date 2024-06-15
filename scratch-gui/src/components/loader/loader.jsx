@@ -154,7 +154,7 @@ class LoaderComponent extends React.Component {
                             lang="en"
                         >
                             <b>{'Pride Month Fun Fact:'}</b>{' '}
-                            {'Tim Cook, current CEO of Apple, was the first Fortune 500 CEO to come out as gay.'}
+                            {'Sophie Wilson is a transgender computer scientist who co-designed the ARM instruction set used by many phones and computers.'}
                         </div>
                     )}
                 </div>

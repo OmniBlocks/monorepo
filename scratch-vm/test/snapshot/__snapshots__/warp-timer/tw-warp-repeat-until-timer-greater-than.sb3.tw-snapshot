@@ -11,14 +11,14 @@ yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, "s", nu
 retire(); return;
 }; })
 
-// Sprite1 Wrun without screen refresh
+// Sprite1 script
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
 const b0 = stage.variables["F?*}X,`9XBpN_[piGRrz"];
 const b1 = runtime.getOpcodeFunction("looks_say");
 return function* genXYZ_run_without_screen_r () {
-b0.value = (((daysSince2000() * 86400) || 0) + 3);
+b0.value = ((daysSince2000() * 86400) + 3);
 runtime.ioDevices.clock.resetProjectTimer();
-while (!((runtime.ioDevices.clock.projectTimer() > 0.1) || compareGreaterThan((daysSince2000() * 86400), b0.value))) {
+while (!((runtime.ioDevices.clock.projectTimer() > 0.1) || ((daysSince2000() * 86400) > b0.value))) {
 if (isStuck()) yield;
 }
 if (compareLessThan((daysSince2000() * 86400), b0.value)) {

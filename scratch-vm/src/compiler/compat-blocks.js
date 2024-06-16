@@ -1,3 +1,5 @@
+// @ts-check
+
 /**
  * @fileoverview List of blocks to be supported in the compiler compatibility layer.
  * This is only for native blocks. Extensions should not be listed here.

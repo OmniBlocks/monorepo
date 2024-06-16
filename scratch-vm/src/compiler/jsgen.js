@@ -1,13 +1,12 @@
+// @ts-check
+
 const log = require('../util/log');
-const Cast = require('../util/cast');
 const BlockType = require('../extension-support/block-type');
 const VariablePool = require('./variable-pool');
 const jsexecute = require('./jsexecute');
 const environment = require('./environment');
-
-// Imported for JSDoc types, not to actually use
-// eslint-disable-next-line no-unused-vars
-const {IntermediateScript, IntermediateRepresentation} = require('./intermediate');
+const {StackOpcode, InputOpcode, InputType} = require('./enums.js');
+const {IntermediateStackBlock, IntermediateInput, IntermediateStack, IntermediateScript, IntermediateRepresentation} = require('./intermediate');
 
 /**
  * @fileoverview Convert intermediate representations to JavaScript functions.
@@ -23,12 +22,6 @@ const sanitize = string => {
     }
     return JSON.stringify(string).slice(1, -1);
 };
-
-const TYPE_NUMBER = 1;
-const TYPE_STRING = 2;
-const TYPE_BOOLEAN = 3;
-const TYPE_UNKNOWN = 4;
-const TYPE_NUMBER_NAN = 5;
 
 // Pen-related constants
 const PEN_EXT = 'runtime.ext_pen';
@@ -49,281 +42,20 @@ const functionNameVariablePool = new VariablePool('fun');
  */
 const generatorNameVariablePool = new VariablePool('gen');
 
-/**
- * @typedef Input
- * @property {() => string} asNumber
- * @property {() => string} asNumberOrNaN
- * @property {() => string} asString
- * @property {() => string} asBoolean
- * @property {() => string} asColor
- * @property {() => string} asUnknown
- * @property {() => string} asSafe
- * @property {() => boolean} isAlwaysNumber
- * @property {() => boolean} isAlwaysNumberOrNaN
- * @property {() => boolean} isNeverNumber
- */
-
-/**
- * @implements {Input}
- */
-class TypedInput {
-    constructor (source, type) {
-        // for debugging
-        if (typeof type !== 'number') throw new Error('type is invalid');
-        this.source = source;
-        this.type = type;
-    }
-
-    asNumber () {
-        if (this.type === TYPE_NUMBER) return this.source;
-        if (this.type === TYPE_NUMBER_NAN) return `(${this.source} || 0)`;
-        return `(+${this.source} || 0)`;
-    }
-
-    asNumberOrNaN () {
-        if (this.type === TYPE_NUMBER || this.type === TYPE_NUMBER_NAN) return this.source;
-        return `(+${this.source})`;
-    }
-
-    asString () {
-        if (this.type === TYPE_STRING) return this.source;
-        return `("" + ${this.source})`;
-    }
-
-    asBoolean () {
-        if (this.type === TYPE_BOOLEAN) return this.source;
-        return `toBoolean(${this.source})`;
-    }
-
-    asColor () {
-        return this.asUnknown();
-    }
-
-    asUnknown () {
-        return this.source;
-    }
-
-    asSafe () {
-        return this.asUnknown();
-    }
-
-    isAlwaysNumber () {
-        return this.type === TYPE_NUMBER;
-    }
-
-    isAlwaysNumberOrNaN () {
-        return this.type === TYPE_NUMBER || this.type === TYPE_NUMBER_NAN;
-    }
-
-    isNeverNumber () {
-        return false;
-    }
-}
-
-/**
- * @implements {Input}
- */
-class ConstantInput {
-    constructor (constantValue, safe) {
-        this.constantValue = constantValue;
-        this.safe = safe;
-    }
-
-    asNumber () {
-        // Compute at compilation time
-        const numberValue = +this.constantValue;
-        if (numberValue) {
-            // It's important that we use the number's stringified value and not the constant value
-            // Using the constant value allows numbers such as "010" to be interpreted as 8 (or SyntaxError in strict mode) instead of 10.
-            return numberValue.toString();
-        }
-        // numberValue is one of 0, -0, or NaN
-        if (Object.is(numberValue, -0)) {
-            return '-0';
-        }
-        return '0';
-    }
-
-    asNumberOrNaN () {
-        return this.asNumber();
-    }
-
-    asString () {
-        return `"${sanitize('' + this.constantValue)}"`;
-    }
-
-    asBoolean () {
-        // Compute at compilation time
-        return Cast.toBoolean(this.constantValue).toString();
-    }
-
-    asColor () {
-        // Attempt to parse hex code at compilation time
-        if (/^#[0-9a-f]{6,8}$/i.test(this.constantValue)) {
-            const hex = this.constantValue.substr(1);
-            return Number.parseInt(hex, 16).toString();
-        }
-        return this.asUnknown();
-    }
-
-    asUnknown () {
-        // Attempt to convert strings to numbers if it is unlikely to break things
-        if (typeof this.constantValue === 'number') {
-            // todo: handle NaN?
-            return this.constantValue;
-        }
-        const numberValue = +this.constantValue;
-        if (numberValue.toString() === this.constantValue) {
-            return this.constantValue;
-        }
-        return this.asString();
-    }
-
-    asSafe () {
-        if (this.safe) {
-            return this.asUnknown();
-        }
-        return this.asString();
-    }
-
-    isAlwaysNumber () {
-        const value = +this.constantValue;
-        if (Number.isNaN(value)) {
-            return false;
-        }
-        // Empty strings evaluate to 0 but should not be considered a number.
-        if (value === 0) {
-            return this.constantValue.toString().trim() !== '';
+const isSafeInputForEqualsOptimization = (input, other) => {
+    // Only optimize constants
+    if (input.opcode !== InputOpcode.CONSTANT) return false;
+    // Only optimize when the constant can always be thought of as a number
+    if (input.isAlwaysType(InputType.NUMBER) || input.isAlwaysType(InputType.STRING_NUM)) {
+        if (other.isSometimesType(InputType.STRING_NAN) || other.isSometimesType(InputType.BOOLEAN_INTERPRETABLE)) {
+            // Never optimize 0 if the other input can be '' or a boolean.
+            // eg. if '< 0 = "" >' was optimized it would turn into `0 === +""`,
+            //  which would be true even though Scratch would return false.
+            return (+input.inputs.value) !== 0;
         }
         return true;
     }
-
-    isAlwaysNumberOrNaN () {
-        return this.isAlwaysNumber();
-    }
-
-    isNeverNumber () {
-        return Number.isNaN(+this.constantValue);
-    }
-}
-
-/**
- * @implements {Input}
- */
-class VariableInput {
-    constructor (source) {
-        this.source = source;
-        this.type = TYPE_UNKNOWN;
-        /**
-         * The value this variable was most recently set to, if any.
-         * @type {Input}
-         * @private
-         */
-        this._value = null;
-    }
-
-    /**
-     * @param {Input} input The input this variable was most recently set to.
-     */
-    setInput (input) {
-        if (input instanceof VariableInput) {
-            // When being set to another variable, extract the value it was set to.
-            // Otherwise, you may end up with infinite recursion in analysis methods when a variable is set to itself.
-            if (input._value) {
-                input = input._value;
-            } else {
-                this.type = TYPE_UNKNOWN;
-                this._value = null;
-                return;
-            }
-        }
-        this._value = input;
-        if (input instanceof TypedInput) {
-            this.type = input.type;
-        } else {
-            this.type = TYPE_UNKNOWN;
-        }
-    }
-
-    asNumber () {
-        if (this.type === TYPE_NUMBER) return this.source;
-        if (this.type === TYPE_NUMBER_NAN) return `(${this.source} || 0)`;
-        return `(+${this.source} || 0)`;
-    }
-
-    asNumberOrNaN () {
-        if (this.type === TYPE_NUMBER || this.type === TYPE_NUMBER_NAN) return this.source;
-        return `(+${this.source})`;
-    }
-
-    asString () {
-        if (this.type === TYPE_STRING) return this.source;
-        return `("" + ${this.source})`;
-    }
-
-    asBoolean () {
-        if (this.type === TYPE_BOOLEAN) return this.source;
-        return `toBoolean(${this.source})`;
-    }
-
-    asColor () {
-        return this.asUnknown();
-    }
-
-    asUnknown () {
-        return this.source;
-    }
-
-    asSafe () {
-        return this.asUnknown();
-    }
-
-    isAlwaysNumber () {
-        if (this._value) {
-            return this._value.isAlwaysNumber();
-        }
-        return false;
-    }
-
-    isAlwaysNumberOrNaN () {
-        if (this._value) {
-            return this._value.isAlwaysNumberOrNaN();
-        }
-        return false;
-    }
-
-    isNeverNumber () {
-        if (this._value) {
-            return this._value.isNeverNumber();
-        }
-        return false;
-    }
-}
-
-const getNamesOfCostumesAndSounds = runtime => {
-    const result = new Set();
-    for (const target of runtime.targets) {
-        if (target.isOriginal) {
-            const sprite = target.sprite;
-            for (const costume of sprite.costumes) {
-                result.add(costume.name);
-            }
-            for (const sound of sprite.sounds) {
-                result.add(sound.name);
-            }
-        }
-    }
-    return result;
-};
-
-const isSafeConstantForEqualsOptimization = input => {
-    const numberValue = +input.constantValue;
-    // Do not optimize 0
-    if (!numberValue) {
-        return false;
-    }
-    // Do not optimize numbers when the original form does not match
-    return numberValue.toString() === input.constantValue.toString();
+    return false;
 };
 
 /**
@@ -350,18 +82,13 @@ class JSGenerator {
     /**
      * @param {IntermediateScript} script
      * @param {IntermediateRepresentation} ir
-     * @param {Target} target
+     * @param {import("../sprites/rendered-target")} target
      */
     constructor (script, ir, target) {
         this.script = script;
         this.ir = ir;
         this.target = target;
         this.source = '';
-
-        /**
-         * @type {Object.<string, VariableInput>}
-         */
-        this.variableInputs = {};
 
         this.isWarp = script.isWarp;
         this.isProcedure = script.isProcedure;
@@ -375,11 +102,9 @@ class JSGenerator {
 
         /**
          * The current Frame.
-         * @type {Frame}
+         * @type {Frame?}
          */
         this.currentFrame = null;
-
-        this.namesOfCostumesAndSounds = getNamesOfCostumesAndSounds(target.runtime);
 
         this.localVariables = new VariablePool('a');
         this._setupVariablesPool = new VariablePool('b');
@@ -425,222 +150,230 @@ class JSGenerator {
     }
 
     /**
-     * @param {object} node Input node to compile.
-     * @returns {Input} Compiled input.
+     * @param {IntermediateInput} block Input node to compile.
+     * @returns {string} Compiled input.
      */
-    descendInput (node) {
-        switch (node.kind) {
-        case 'addons.call':
-            return new TypedInput(`(${this.descendAddonCall(node)})`, TYPE_UNKNOWN);
+    descendInput (block) {
+        const node = block.inputs;
+        switch (block.opcode) {
+        case InputOpcode.NOP:
+            return `""`;
 
-        case 'args.boolean':
-            return new TypedInput(`toBoolean(p${node.index})`, TYPE_BOOLEAN);
-        case 'args.stringNumber':
-            return new TypedInput(`p${node.index}`, TYPE_UNKNOWN);
+        case InputOpcode.PROCEDURE_ARG_BOOLEAN:
+            return `toBoolean(p${node.index})`;
+        case InputOpcode.PROCEDURE_ARG_STRING_NUMBER:
+            return `p${node.index}`;
 
-        case 'compat':
+        case InputOpcode.ADDON_CALL:
+            return `(${this.descendAddonCall(node)})`;
+
+        case InputOpcode.CAST_BOOLEAN:
+            return `toBoolean(${this.descendInput(node.target)})`;
+        case InputOpcode.CAST_NUMBER:
+            if (node.target.isAlwaysType(InputType.BOOLEAN_INTERPRETABLE)) {
+                return `(+${this.descendInput(node.target.toType(InputType.BOOLEAN))})`;
+            }
+            if (node.target.isAlwaysType(InputType.NUMBER_OR_NAN)) {
+                return `(${this.descendInput(node.target)} || 0)`;
+            }
+            return `(+${this.descendInput(node.target)} || 0)`;
+        case InputOpcode.CAST_NUMBER_OR_NAN:
+            return `(+${this.descendInput(node.target)})`;
+        case InputOpcode.CAST_NUMBER_INDEX:
+            return `(${this.descendInput(node.target.toType(InputType.NUMBER_OR_NAN))} | 0)`;
+        case InputOpcode.CAST_STRING:
+            return `("" + ${this.descendInput(node.target)})`;
+
+        case InputOpcode.COMPATIBILITY_LAYER:
             // Compatibility layer inputs never use flags.
-            return new TypedInput(`(${this.generateCompatibilityLayerCall(node, false)})`, TYPE_UNKNOWN);
+            return `(${this.generateCompatibilityLayerCall(node, false)})`;
 
-        case 'constant':
-            return this.safeConstantInput(node.value);
+        case InputOpcode.CONSTANT:
+            if (block.isAlwaysType(InputType.NUMBER)) {
+                if (typeof node.value !== 'number') throw new Error(`JS: '${block.type}' type constant had ${typeof node.value} type value. Expected number.`);
+                if (Object.is(node.value, -0)) return '-0';
+                return node.value.toString();
+            } else if (block.isAlwaysType(InputType.BOOLEAN)) {
+                if (typeof node.value !== 'boolean') throw new Error(`JS: '${block.type}' type constant had ${typeof node.value} type value. Expected boolean.`);
+                return node.value.toString();
+            } else if (block.isSometimesType(InputType.STRING)) {
+                return `"${sanitize(node.value.toString())}"`;
+            } throw new Error(`JS: Unknown constant input type '${block.type}'.`);
 
-        case 'counter.get':
-            return new TypedInput('runtime.ext_scratch3_control._counter', TYPE_NUMBER);
+        case InputOpcode.SENSING_KEY_DOWN:
+            return `runtime.ioDevices.keyboard.getKeyIsDown(${this.descendInput(node.key)})`;
 
-        case 'keyboard.pressed':
-            return new TypedInput(`runtime.ioDevices.keyboard.getKeyIsDown(${this.descendInput(node.key).asSafe()})`, TYPE_BOOLEAN);
-
-        case 'list.contains':
-            return new TypedInput(`listContains(${this.referenceVariable(node.list)}, ${this.descendInput(node.item).asUnknown()})`, TYPE_BOOLEAN);
-        case 'list.contents':
-            return new TypedInput(`listContents(${this.referenceVariable(node.list)})`, TYPE_STRING);
-        case 'list.get': {
-            const index = this.descendInput(node.index);
+        case InputOpcode.LIST_CONTAINS:
+            return `listContains(${this.referenceVariable(node.list)}, ${this.descendInput(node.item)})`;
+        case InputOpcode.LIST_CONTENTS:
+            return `listContents(${this.referenceVariable(node.list)})`;
+        case InputOpcode.LIST_GET: {
             if (environment.supportsNullishCoalescing) {
-                if (index.isAlwaysNumberOrNaN()) {
-                    return new TypedInput(`(${this.referenceVariable(node.list)}.value[(${index.asNumber()} | 0) - 1] ?? "")`, TYPE_UNKNOWN);
+                if (node.index.isAlwaysType(InputType.NUMBER_INTERPRETABLE | InputType.NUMBER_NAN)) {
+                    return `(${this.referenceVariable(node.list)}.value[${this.descendInput(node.index.toType(InputType.NUMBER_INDEX))} - 1] ?? "")`;
                 }
-                if (index instanceof ConstantInput && index.constantValue === 'last') {
-                    return new TypedInput(`(${this.referenceVariable(node.list)}.value[${this.referenceVariable(node.list)}.value.length - 1] ?? "")`, TYPE_UNKNOWN);
+                if (node.index.isConstant('last')) {
+                    return `(${this.referenceVariable(node.list)}.value[${this.referenceVariable(node.list)}.value.length - 1] ?? "")`;
                 }
             }
-            return new TypedInput(`listGet(${this.referenceVariable(node.list)}.value, ${index.asUnknown()})`, TYPE_UNKNOWN);
+            return `listGet(${this.referenceVariable(node.list)}.value, ${this.descendInput(node.index)})`;
         }
-        case 'list.indexOf':
-            return new TypedInput(`listIndexOf(${this.referenceVariable(node.list)}, ${this.descendInput(node.item).asUnknown()})`, TYPE_NUMBER);
-        case 'list.length':
-            return new TypedInput(`${this.referenceVariable(node.list)}.value.length`, TYPE_NUMBER);
+        case InputOpcode.LIST_INDEX_OF:
+            return `listIndexOf(${this.referenceVariable(node.list)}, ${this.descendInput(node.item)})`;
+        case InputOpcode.LIST_LENGTH:
+            return `${this.referenceVariable(node.list)}.value.length`;
 
-        case 'looks.size':
-            return new TypedInput('Math.round(target.size)', TYPE_NUMBER);
-        case 'looks.backdropName':
-            return new TypedInput('stage.getCostumes()[stage.currentCostume].name', TYPE_STRING);
-        case 'looks.backdropNumber':
-            return new TypedInput('(stage.currentCostume + 1)', TYPE_NUMBER);
-        case 'looks.costumeName':
-            return new TypedInput('target.getCostumes()[target.currentCostume].name', TYPE_STRING);
-        case 'looks.costumeNumber':
-            return new TypedInput('(target.currentCostume + 1)', TYPE_NUMBER);
+        case InputOpcode.LOOKS_SIZE_GET:
+            return 'Math.round(target.size)';
+        case InputOpcode.LOOKS_BACKDROP_NAME:
+            return 'stage.getCostumes()[stage.currentCostume].name';
+        case InputOpcode.LOOKS_BACKDROP_NUMBER:
+            return '(stage.currentCostume + 1)';
+        case InputOpcode.LOOKS_COSTUME_NAME:
+            return 'target.getCostumes()[target.currentCostume].name';
+        case InputOpcode.LOOKS_COSTUME_NUMBER:
+            return '(target.currentCostume + 1)';
 
-        case 'motion.direction':
-            return new TypedInput('target.direction', TYPE_NUMBER);
-        case 'motion.x':
-            return new TypedInput('limitPrecision(target.x)', TYPE_NUMBER);
-        case 'motion.y':
-            return new TypedInput('limitPrecision(target.y)', TYPE_NUMBER);
+        case InputOpcode.MOTION_DIRECTION_GET:
+            return 'target.direction';
+        case InputOpcode.MOTION_X_GET:
+            return 'limitPrecision(target.x)';
+        case InputOpcode.MOTION_Y_GET:
+            return 'limitPrecision(target.y)';
 
-        case 'mouse.down':
-            return new TypedInput('runtime.ioDevices.mouse.getIsDown()', TYPE_BOOLEAN);
-        case 'mouse.x':
-            return new TypedInput('runtime.ioDevices.mouse.getScratchX()', TYPE_NUMBER);
-        case 'mouse.y':
-            return new TypedInput('runtime.ioDevices.mouse.getScratchY()', TYPE_NUMBER);
+        case InputOpcode.SENSING_MOUSE_DOWN:
+            return 'runtime.ioDevices.mouse.getIsDown()';
+        case InputOpcode.SENSING_MOUSE_X:
+            return 'runtime.ioDevices.mouse.getScratchX()';
+        case InputOpcode.SENSING_MOUSE_Y:
+            return 'runtime.ioDevices.mouse.getScratchY()';
 
-        case 'noop':
-            return new TypedInput('""', TYPE_STRING);
+        case InputOpcode.OP_ABS:
+            return `Math.abs(${this.descendInput(node.value)})`;
+        case InputOpcode.OP_ACOS:
+            return `((Math.acos(${this.descendInput(node.value)}) * 180) / Math.PI)`;
+        case InputOpcode.OP_ADD:
+            return `(${this.descendInput(node.left)} + ${this.descendInput(node.right)})`;
+        case InputOpcode.OP_AND:
+            return `(${this.descendInput(node.left)} && ${this.descendInput(node.right)})`;
+        case InputOpcode.OP_ASIN:
+            return `((Math.asin(${this.descendInput(node.value)}) * 180) / Math.PI)`;
+        case InputOpcode.OP_ATAN:
+            return `((Math.atan(${this.descendInput(node.value)}) * 180) / Math.PI)`;
+        case InputOpcode.OP_CEILING:
+            return `Math.ceil(${this.descendInput(node.value)})`;
+        case InputOpcode.OP_CONTAINS:
+            return `(${this.descendInput(node.string)}.toLowerCase().indexOf(${this.descendInput(node.contains)}.toLowerCase()) !== -1)`;
+        case InputOpcode.OP_COS:
+            return `(Math.round(Math.cos((Math.PI * ${this.descendInput(node.value)}) / 180) * 1e10) / 1e10)`;
+        case InputOpcode.OP_DIVIDE:
+            return `(${this.descendInput(node.left)} / ${this.descendInput(node.right)})`;
+        case InputOpcode.OP_EQUALS: {
+            const left = node.left;
+            const right = node.right;
 
-        case 'op.abs':
-            return new TypedInput(`Math.abs(${this.descendInput(node.value).asNumber()})`, TYPE_NUMBER);
-        case 'op.acos':
-            // Needs to be marked as NaN because Math.acos(1.0001) === NaN
-            return new TypedInput(`((Math.acos(${this.descendInput(node.value).asNumber()}) * 180) / Math.PI)`, TYPE_NUMBER_NAN);
-        case 'op.add':
-            // Needs to be marked as NaN because Infinity + -Infinity === NaN
-            return new TypedInput(`(${this.descendInput(node.left).asNumber()} + ${this.descendInput(node.right).asNumber()})`, TYPE_NUMBER_NAN);
-        case 'op.and':
-            return new TypedInput(`(${this.descendInput(node.left).asBoolean()} && ${this.descendInput(node.right).asBoolean()})`, TYPE_BOOLEAN);
-        case 'op.asin':
-            // Needs to be marked as NaN because Math.asin(1.0001) === NaN
-            return new TypedInput(`((Math.asin(${this.descendInput(node.value).asNumber()}) * 180) / Math.PI)`, TYPE_NUMBER_NAN);
-        case 'op.atan':
-            return new TypedInput(`((Math.atan(${this.descendInput(node.value).asNumber()}) * 180) / Math.PI)`, TYPE_NUMBER);
-        case 'op.ceiling':
-            return new TypedInput(`Math.ceil(${this.descendInput(node.value).asNumber()})`, TYPE_NUMBER);
-        case 'op.contains':
-            return new TypedInput(`(${this.descendInput(node.string).asString()}.toLowerCase().indexOf(${this.descendInput(node.contains).asString()}.toLowerCase()) !== -1)`, TYPE_BOOLEAN);
-        case 'op.cos':
-            return new TypedInput(`(Math.round(Math.cos((Math.PI * ${this.descendInput(node.value).asNumber()}) / 180) * 1e10) / 1e10)`, TYPE_NUMBER_NAN);
-        case 'op.divide':
-            // Needs to be marked as NaN because 0 / 0 === NaN
-            return new TypedInput(`(${this.descendInput(node.left).asNumber()} / ${this.descendInput(node.right).asNumber()})`, TYPE_NUMBER_NAN);
-        case 'op.equals': {
-            const left = this.descendInput(node.left);
-            const right = this.descendInput(node.right);
-            // When both operands are known to never be numbers, only use string comparison to avoid all number parsing.
-            if (left.isNeverNumber() || right.isNeverNumber()) {
-                return new TypedInput(`(${left.asString()}.toLowerCase() === ${right.asString()}.toLowerCase())`, TYPE_BOOLEAN);
-            }
-            const leftAlwaysNumber = left.isAlwaysNumber();
-            const rightAlwaysNumber = right.isAlwaysNumber();
             // When both operands are known to be numbers, we can use ===
-            if (leftAlwaysNumber && rightAlwaysNumber) {
-                return new TypedInput(`(${left.asNumber()} === ${right.asNumber()})`, TYPE_BOOLEAN);
+            if (left.isAlwaysType(InputType.NUMBER_INTERPRETABLE) && right.isAlwaysType(InputType.NUMBER_INTERPRETABLE)) {
+                return `(${this.descendInput(left.toType(InputType.NUMBER))} === ${this.descendInput(right.toType(InputType.NUMBER))})`;
             }
             // In certain conditions, we can use === when one of the operands is known to be a safe number.
-            if (leftAlwaysNumber && left instanceof ConstantInput && isSafeConstantForEqualsOptimization(left)) {
-                return new TypedInput(`(${left.asNumber()} === ${right.asNumber()})`, TYPE_BOOLEAN);
+            if (isSafeInputForEqualsOptimization(left, right) || isSafeInputForEqualsOptimization(right, left)) {
+                return `(${this.descendInput(left.toType(InputType.NUMBER))} === ${this.descendInput(right.toType(InputType.NUMBER))})`;
             }
-            if (rightAlwaysNumber && right instanceof ConstantInput && isSafeConstantForEqualsOptimization(right)) {
-                return new TypedInput(`(${left.asNumber()} === ${right.asNumber()})`, TYPE_BOOLEAN);
+            // When either operand is known to never be a number, only use string comparison to avoid all number parsing.
+            if (!left.isSometimesType(InputType.NUMBER_INTERPRETABLE) || !right.isSometimesType(InputType.NUMBER_INTERPRETABLE)) {
+                return `(${this.descendInput(left.toType(InputType.STRING))}.toLowerCase() === ${this.descendInput(right.toType(InputType.STRING))}.toLowerCase())`;
             }
             // No compile-time optimizations possible - use fallback method.
-            return new TypedInput(`compareEqual(${left.asUnknown()}, ${right.asUnknown()})`, TYPE_BOOLEAN);
+            return `compareEqual(${this.descendInput(left)}, ${this.descendInput(right)})`;
         }
-        case 'op.e^':
-            return new TypedInput(`Math.exp(${this.descendInput(node.value).asNumber()})`, TYPE_NUMBER);
-        case 'op.floor':
-            return new TypedInput(`Math.floor(${this.descendInput(node.value).asNumber()})`, TYPE_NUMBER);
-        case 'op.greater': {
-            const left = this.descendInput(node.left);
-            const right = this.descendInput(node.right);
+        case InputOpcode.OP_POW_E:
+            return `Math.exp(${this.descendInput(node.value)})`;
+        case InputOpcode.OP_FLOOR:
+            return `Math.floor(${this.descendInput(node.value)})`;
+        case InputOpcode.OP_GREATER: {
+            const left = node.left;
+            const right = node.right;
             // When the left operand is a number and the right operand is a number or NaN, we can use >
-            if (left.isAlwaysNumber() && right.isAlwaysNumberOrNaN()) {
-                return new TypedInput(`(${left.asNumber()} > ${right.asNumberOrNaN()})`, TYPE_BOOLEAN);
+            if (left.isAlwaysType(InputType.NUMBER_INTERPRETABLE) && right.isAlwaysType(InputType.NUMBER_INTERPRETABLE | InputType.NUMBER_NAN)) {
+                return `(${this.descendInput(left.toType(InputType.NUMBER))} > ${this.descendInput(right.toType(InputType.NUMBER_OR_NAN))})`;
             }
             // When the left operand is a number or NaN and the right operand is a number, we can negate <=
-            if (left.isAlwaysNumberOrNaN() && right.isAlwaysNumber()) {
-                return new TypedInput(`!(${left.asNumberOrNaN()} <= ${right.asNumber()})`, TYPE_BOOLEAN);
+            if (left.isAlwaysType(InputType.NUMBER_INTERPRETABLE | InputType.NUMBER_NAN) && right.isAlwaysType(InputType.NUMBER_INTERPRETABLE)) {
+                return `!(${this.descendInput(left.toType(InputType.NUMBER_OR_NAN))} <= ${this.descendInput(right.toType(InputType.NUMBER))})`;
             }
             // When either operand is known to never be a number, avoid all number parsing.
-            if (left.isNeverNumber() || right.isNeverNumber()) {
-                return new TypedInput(`(${left.asString()}.toLowerCase() > ${right.asString()}.toLowerCase())`, TYPE_BOOLEAN);
+            if (!left.isSometimesType(InputType.NUMBER_INTERPRETABLE) || !right.isSometimesType(InputType.NUMBER_INTERPRETABLE)) {
+                return `(${this.descendInput(left.toType(InputType.STRING))}.toLowerCase() > ${this.descendInput(right.toType(InputType.STRING))}.toLowerCase())`;
             }
             // No compile-time optimizations possible - use fallback method.
-            return new TypedInput(`compareGreaterThan(${left.asUnknown()}, ${right.asUnknown()})`, TYPE_BOOLEAN);
+            return `compareGreaterThan(${this.descendInput(left)}, ${this.descendInput(right)})`;
         }
-        case 'op.join':
-            return new TypedInput(`(${this.descendInput(node.left).asString()} + ${this.descendInput(node.right).asString()})`, TYPE_STRING);
-        case 'op.length':
-            return new TypedInput(`${this.descendInput(node.string).asString()}.length`, TYPE_NUMBER);
-        case 'op.less': {
-            const left = this.descendInput(node.left);
-            const right = this.descendInput(node.right);
+        case InputOpcode.OP_JOIN:
+            return `(${this.descendInput(node.left)} + ${this.descendInput(node.right)})`;
+        case InputOpcode.OP_LENGTH:
+            return `${this.descendInput(node.string)}.length`;
+        case InputOpcode.OP_LESS: {
+            const left = node.left;
+            const right = node.right;
             // When the left operand is a number or NaN and the right operand is a number, we can use <
-            if (left.isAlwaysNumberOrNaN() && right.isAlwaysNumber()) {
-                return new TypedInput(`(${left.asNumberOrNaN()} < ${right.asNumber()})`, TYPE_BOOLEAN);
+            if (left.isAlwaysType(InputType.NUMBER_INTERPRETABLE | InputType.NUMBER_NAN) && right.isAlwaysType(InputType.NUMBER_INTERPRETABLE)) {
+                return `(${this.descendInput(left.toType(InputType.NUMBER_OR_NAN))} < ${this.descendInput(right.toType(InputType.NUMBER))})`;
             }
             // When the left operand is a number and the right operand is a number or NaN, we can negate >=
-            if (left.isAlwaysNumber() && right.isAlwaysNumberOrNaN()) {
-                return new TypedInput(`!(${left.asNumber()} >= ${right.asNumberOrNaN()})`, TYPE_BOOLEAN);
+            if (left.isAlwaysType(InputType.NUMBER_INTERPRETABLE) && right.isAlwaysType(InputType.NUMBER_INTERPRETABLE | InputType.NUMBER_NAN)) {
+                return `!(${this.descendInput(left.toType(InputType.NUMBER))} >= ${this.descendInput(right.toType(InputType.NUMBER_OR_NAN))})`;
             }
             // When either operand is known to never be a number, avoid all number parsing.
-            if (left.isNeverNumber() || right.isNeverNumber()) {
-                return new TypedInput(`(${left.asString()}.toLowerCase() < ${right.asString()}.toLowerCase())`, TYPE_BOOLEAN);
+            if (!left.isSometimesType(InputType.NUMBER_INTERPRETABLE) || !right.isSometimesType(InputType.NUMBER_INTERPRETABLE)) {
+                return `(${this.descendInput(left.toType(InputType.STRING))}.toLowerCase() < ${this.descendInput(right.toType(InputType.STRING))}.toLowerCase())`;
             }
             // No compile-time optimizations possible - use fallback method.
-            return new TypedInput(`compareLessThan(${left.asUnknown()}, ${right.asUnknown()})`, TYPE_BOOLEAN);
+            return `compareLessThan(${this.descendInput(left)}, ${this.descendInput(right)})`;
         }
-        case 'op.letterOf':
-            return new TypedInput(`((${this.descendInput(node.string).asString()})[(${this.descendInput(node.letter).asNumber()} | 0) - 1] || "")`, TYPE_STRING);
-        case 'op.ln':
-            // Needs to be marked as NaN because Math.log(-1) == NaN
-            return new TypedInput(`Math.log(${this.descendInput(node.value).asNumber()})`, TYPE_NUMBER_NAN);
-        case 'op.log':
-            // Needs to be marked as NaN because Math.log(-1) == NaN
-            return new TypedInput(`(Math.log(${this.descendInput(node.value).asNumber()}) / Math.LN10)`, TYPE_NUMBER_NAN);
-        case 'op.mod':
+        case InputOpcode.OP_LETTER_OF:
+            return `((${this.descendInput(node.string)})[${this.descendInput(node.letter)} - 1] || "")`;
+        case InputOpcode.OP_LOG_E:
+            return `Math.log(${this.descendInput(node.value)})`;
+        case InputOpcode.OP_LOG_10:
+            return `(Math.log(${this.descendInput(node.value)}) / Math.LN10)`;
+        case InputOpcode.OP_MOD:
             this.descendedIntoModulo = true;
-            // Needs to be marked as NaN because mod(0, 0) (and others) == NaN
-            return new TypedInput(`mod(${this.descendInput(node.left).asNumber()}, ${this.descendInput(node.right).asNumber()})`, TYPE_NUMBER_NAN);
-        case 'op.multiply':
-            // Needs to be marked as NaN because Infinity * 0 === NaN
-            return new TypedInput(`(${this.descendInput(node.left).asNumber()} * ${this.descendInput(node.right).asNumber()})`, TYPE_NUMBER_NAN);
-        case 'op.not':
-            return new TypedInput(`!${this.descendInput(node.operand).asBoolean()}`, TYPE_BOOLEAN);
-        case 'op.or':
-            return new TypedInput(`(${this.descendInput(node.left).asBoolean()} || ${this.descendInput(node.right).asBoolean()})`, TYPE_BOOLEAN);
-        case 'op.random':
+            return `mod(${this.descendInput(node.left)}, ${this.descendInput(node.right)})`;
+        case InputOpcode.OP_MULTIPLY:
+            return `(${this.descendInput(node.left)} * ${this.descendInput(node.right)})`;
+        case InputOpcode.OP_NOT:
+            return `!${this.descendInput(node.operand)}`;
+        case InputOpcode.OP_OR:
+            return `(${this.descendInput(node.left)} || ${this.descendInput(node.right)})`;
+        case InputOpcode.OP_RANDOM:
             if (node.useInts) {
-                // Both inputs are ints, so we know neither are NaN
-                return new TypedInput(`randomInt(${this.descendInput(node.low).asNumber()}, ${this.descendInput(node.high).asNumber()})`, TYPE_NUMBER);
+                return `randomInt(${this.descendInput(node.low)}, ${this.descendInput(node.high)})`;
             }
             if (node.useFloats) {
-                return new TypedInput(`randomFloat(${this.descendInput(node.low).asNumber()}, ${this.descendInput(node.high).asNumber()})`, TYPE_NUMBER_NAN);
+                return `randomFloat(${this.descendInput(node.low)}, ${this.descendInput(node.high)})`;
             }
-            return new TypedInput(`runtime.ext_scratch3_operators._random(${this.descendInput(node.low).asUnknown()}, ${this.descendInput(node.high).asUnknown()})`, TYPE_NUMBER_NAN);
-        case 'op.round':
-            return new TypedInput(`Math.round(${this.descendInput(node.value).asNumber()})`, TYPE_NUMBER);
-        case 'op.sin':
-            return new TypedInput(`(Math.round(Math.sin((Math.PI * ${this.descendInput(node.value).asNumber()}) / 180) * 1e10) / 1e10)`, TYPE_NUMBER_NAN);
-        case 'op.sqrt':
-            // Needs to be marked as NaN because Math.sqrt(-1) === NaN
-            return new TypedInput(`Math.sqrt(${this.descendInput(node.value).asNumber()})`, TYPE_NUMBER_NAN);
-        case 'op.subtract':
-            // Needs to be marked as NaN because Infinity - Infinity === NaN
-            return new TypedInput(`(${this.descendInput(node.left).asNumber()} - ${this.descendInput(node.right).asNumber()})`, TYPE_NUMBER_NAN);
-        case 'op.tan':
-            return new TypedInput(`tan(${this.descendInput(node.value).asNumber()})`, TYPE_NUMBER_NAN);
-        case 'op.10^':
-            return new TypedInput(`(10 ** ${this.descendInput(node.value).asNumber()})`, TYPE_NUMBER);
+            return `runtime.ext_scratch3_operators._random(${this.descendInput(node.low)}, ${this.descendInput(node.high)})`;
+        case InputOpcode.OP_ROUND:
+            return `Math.round(${this.descendInput(node.value)})`;
+        case InputOpcode.OP_SIN:
+            return `(Math.round(Math.sin((Math.PI * ${this.descendInput(node.value)}) / 180) * 1e10) / 1e10)`;
+        case InputOpcode.OP_SQRT:
+            return `Math.sqrt(${this.descendInput(node.value)})`;
+        case InputOpcode.OP_SUBTRACT:
+            return `(${this.descendInput(node.left)} - ${this.descendInput(node.right)})`;
+        case InputOpcode.OP_TAN:
+            return `tan(${this.descendInput(node.value)})`;
+        case InputOpcode.OP_POW_10:
+            return `(10 ** ${this.descendInput(node.value)})`;
 
-        case 'procedures.call': {
+        case InputOpcode.PROCEDURE_CALL: {
             const procedureCode = node.code;
             const procedureVariant = node.variant;
             const procedureData = this.ir.procedures[procedureVariant];
             if (procedureData.stack === null) {
                 // TODO still need to evaluate arguments for side effects
-                return new TypedInput('""', TYPE_STRING);
+                return '""';
             }
 
             // Recursion makes this complicated because:
@@ -650,7 +383,7 @@ class JSGenerator {
             const procedureReference = `thread.procedures["${sanitize(procedureVariant)}"]`;
             const args = [];
             for (const input of node.arguments) {
-                args.push(this.descendInput(input).asSafe());
+                args.push(this.descendInput(input));
             }
             const joinedArgs = args.join(',');
 
@@ -658,109 +391,105 @@ class JSGenerator {
             const yieldForHat = this.isInHat;
             if (yieldForRecursion || yieldForHat) {
                 const runtimeFunction = procedureData.yields ? 'yieldThenCallGenerator' : 'yieldThenCall';
-                return new TypedInput(`(yield* ${runtimeFunction}(${procedureReference}, ${joinedArgs}))`, TYPE_UNKNOWN);
+                return `(yield* ${runtimeFunction}(${procedureReference}, ${joinedArgs}))`;
             }
             if (procedureData.yields) {
-                return new TypedInput(`(yield* ${procedureReference}(${joinedArgs}))`, TYPE_UNKNOWN);
+                return `(yield* ${procedureReference}(${joinedArgs}))`;
             }
-            return new TypedInput(`${procedureReference}(${joinedArgs})`, TYPE_UNKNOWN);
+            return `${procedureReference}(${joinedArgs})`;
         }
 
-        case 'sensing.answer':
-            return new TypedInput(`runtime.ext_scratch3_sensing._answer`, TYPE_STRING);
-        case 'sensing.colorTouchingColor':
-            return new TypedInput(`target.colorIsTouchingColor(colorToList(${this.descendInput(node.target).asColor()}), colorToList(${this.descendInput(node.mask).asColor()}))`, TYPE_BOOLEAN);
-        case 'sensing.date':
-            return new TypedInput(`(new Date().getDate())`, TYPE_NUMBER);
-        case 'sensing.dayofweek':
-            return new TypedInput(`(new Date().getDay() + 1)`, TYPE_NUMBER);
-        case 'sensing.daysSince2000':
-            return new TypedInput('daysSince2000()', TYPE_NUMBER);
-        case 'sensing.distance':
+        case InputOpcode.SENSING_ANSWER:
+            return `runtime.ext_scratch3_sensing._answer`;
+        case InputOpcode.SENSING_COLOR_TOUCHING_COLOR:
+            return `target.colorIsTouchingColor(colorToList(${this.descendInput(node.target)}), colorToList(${this.descendInput(node.mask)}))`;
+        case InputOpcode.SENSING_TIME_DATE:
+            return `(new Date().getDate())`;
+        case InputOpcode.SENSING_TIME_WEEKDAY:
+            return `(new Date().getDay() + 1)`;
+        case InputOpcode.SENSING_TIME_DAYS_SINCE_2000:
+            return 'daysSince2000()';
+        case InputOpcode.SENSING_DISTANCE:
             // TODO: on stages, this can be computed at compile time
-            return new TypedInput(`distance(${this.descendInput(node.target).asString()})`, TYPE_NUMBER);
-        case 'sensing.hour':
-            return new TypedInput(`(new Date().getHours())`, TYPE_NUMBER);
-        case 'sensing.minute':
-            return new TypedInput(`(new Date().getMinutes())`, TYPE_NUMBER);
-        case 'sensing.month':
-            return new TypedInput(`(new Date().getMonth() + 1)`, TYPE_NUMBER);
-        case 'sensing.of': {
-            const object = this.descendInput(node.object).asString();
-            const property = node.property;
-            if (node.object.kind === 'constant') {
-                const isStage = node.object.value === '_stage_';
-                // Note that if target isn't a stage, we can't assume it exists
-                const objectReference = isStage ? 'stage' : this.evaluateOnce(`runtime.getSpriteTargetByName(${object})`);
-                if (property === 'volume') {
-                    return new TypedInput(`(${objectReference} ? ${objectReference}.volume : 0)`, TYPE_NUMBER);
-                }
-                if (isStage) {
-                    switch (property) {
-                    case 'background #':
-                        // fallthrough for scratch 1.0 compatibility
-                    case 'backdrop #':
-                        return new TypedInput(`(${objectReference}.currentCostume + 1)`, TYPE_NUMBER);
-                    case 'backdrop name':
-                        return new TypedInput(`${objectReference}.getCostumes()[${objectReference}.currentCostume].name`, TYPE_STRING);
-                    }
-                } else {
-                    switch (property) {
-                    case 'x position':
-                        return new TypedInput(`(${objectReference} ? ${objectReference}.x : 0)`, TYPE_NUMBER);
-                    case 'y position':
-                        return new TypedInput(`(${objectReference} ? ${objectReference}.y : 0)`, TYPE_NUMBER);
-                    case 'direction':
-                        return new TypedInput(`(${objectReference} ? ${objectReference}.direction : 0)`, TYPE_NUMBER);
-                    case 'costume #':
-                        return new TypedInput(`(${objectReference} ? ${objectReference}.currentCostume + 1 : 0)`, TYPE_NUMBER);
-                    case 'costume name':
-                        return new TypedInput(`(${objectReference} ? ${objectReference}.getCostumes()[${objectReference}.currentCostume].name : 0)`, TYPE_UNKNOWN);
-                    case 'size':
-                        return new TypedInput(`(${objectReference} ? ${objectReference}.size : 0)`, TYPE_NUMBER);
-                    }
-                }
-                const variableReference = this.evaluateOnce(`${objectReference} && ${objectReference}.lookupVariableByNameAndType("${sanitize(property)}", "", true)`);
-                return new TypedInput(`(${variableReference} ? ${variableReference}.value : 0)`, TYPE_UNKNOWN);
-            }
-            return new TypedInput(`runtime.ext_scratch3_sensing.getAttributeOf({OBJECT: ${object}, PROPERTY: "${sanitize(property)}" })`, TYPE_UNKNOWN);
-        }
-        case 'sensing.second':
-            return new TypedInput(`(new Date().getSeconds())`, TYPE_NUMBER);
-        case 'sensing.touching':
-            return new TypedInput(`target.isTouchingObject(${this.descendInput(node.object).asUnknown()})`, TYPE_BOOLEAN);
-        case 'sensing.touchingColor':
-            return new TypedInput(`target.isTouchingColor(colorToList(${this.descendInput(node.color).asColor()}))`, TYPE_BOOLEAN);
-        case 'sensing.username':
-            return new TypedInput('runtime.ioDevices.userData.getUsername()', TYPE_STRING);
-        case 'sensing.year':
-            return new TypedInput(`(new Date().getFullYear())`, TYPE_NUMBER);
+            return `distance(${this.descendInput(node.target)})`;
+        case InputOpcode.SENSING_TIME_HOUR:
+            return `(new Date().getHours())`;
+        case InputOpcode.SENSING_TIME_MINUTE:
+            return `(new Date().getMinutes())`;
+        case InputOpcode.SENSING_TIME_MONTH:
+            return `(new Date().getMonth() + 1)`;
+        case InputOpcode.SENSING_OF:
+            return `runtime.ext_scratch3_sensing.getAttributeOf({OBJECT: ${this.descendInput(node.object)}, PROPERTY: "${sanitize(node.property)}" })`;
+        case InputOpcode.SENSING_OF_VOLUME: {
+            const targetRef = this.descendTargetReference(node.object);
+            return `(${targetRef} ? ${targetRef}.volume : 0)`;
+        } case InputOpcode.SENSING_OF_BACKDROP_NUMBER:
+            return `(stage.currentCostume + 1)`;
+        case InputOpcode.SENSING_OF_BACKDROP_NAME:
+            return `stage.getCostumes()[stage.currentCostume].name`;
+        case InputOpcode.SENSING_OF_POS_X: {
+            const targetRef = this.descendTargetReference(node.object);
+            return `(${targetRef} ? ${targetRef}.x : 0)`;
+        } case InputOpcode.SENSING_OF_POS_Y: {
+            const targetRef = this.descendTargetReference(node.object);
+            return `(${targetRef} ? ${targetRef}.y : 0)`;
+        } case InputOpcode.SENSING_OF_DIRECTION: {
+            const targetRef = this.descendTargetReference(node.object);
+            return `(${targetRef} ? ${targetRef}.direction : 0)`;
+        } case InputOpcode.SENSING_OF_COSTUME_NUMBER: {
+            const targetRef = this.descendTargetReference(node.object);
+            return `(${targetRef} ? ${targetRef}.currentCostume + 1 : 0)`;
+        } case InputOpcode.SENSING_OF_COSTUME_NAME: {
+            const targetRef = this.descendTargetReference(node.object);
+            return `(${targetRef} ? ${targetRef}.getCostumes()[${targetRef}.currentCostume].name : 0)`;
+        } case InputOpcode.SENSING_OF_SIZE: {
+            const targetRef = this.descendTargetReference(node.object);
+            return `(${targetRef} ? ${targetRef}.size : 0)`;
+        } case InputOpcode.SENSING_OF_VAR: {
+            const targetRef = this.descendTargetReference(node.object);
+            const varRef = this.evaluateOnce(`${targetRef} && ${targetRef}.lookupVariableByNameAndType("${sanitize(node.property)}", "", true)`);
+            return `(${varRef} ? ${varRef}.value : 0)`;
+        } case InputOpcode.SENSING_TIME_SECOND:
+            return `(new Date().getSeconds())`;
+        case InputOpcode.SENSING_TOUCHING_OBJECT:
+            return `target.isTouchingObject(${this.descendInput(node.object)})`;
+        case InputOpcode.SENSING_TOUCHING_COLOR:
+            return `target.isTouchingColor(colorToList(${this.descendInput(node.color)}))`;
+        case InputOpcode.SENSING_USERNAME:
+            return 'runtime.ioDevices.userData.getUsername()';
+        case InputOpcode.SENSING_TIME_YEAR:
+            return `(new Date().getFullYear())`;
 
-        case 'timer.get':
-            return new TypedInput('runtime.ioDevices.clock.projectTimer()', TYPE_NUMBER);
+        case InputOpcode.SENSING_TIMER_GET:
+            return 'runtime.ioDevices.clock.projectTimer()';
 
-        case 'tw.lastKeyPressed':
-            return new TypedInput('runtime.ioDevices.keyboard.getLastKeyPressed()', TYPE_STRING);
+        case InputOpcode.CONTROL_COUNTER:
+            return 'runtime.ext_scratch3_control._counter';
 
-        case 'var.get':
-            return this.descendVariable(node.variable);
+        case InputOpcode.TW_KEY_LAST_PRESSED:
+            return 'runtime.ioDevices.keyboard.getLastKeyPressed()';
+
+        case InputOpcode.VAR_GET:
+            return `${this.referenceVariable(node.variable)}.value`;
 
         default:
-            log.warn(`JS: Unknown input: ${node.kind}`, node);
-            throw new Error(`JS: Unknown input: ${node.kind}`);
+            log.warn(`JS: Unknown input: ${block.opcode}`, node);
+            throw new Error(`JS: Unknown input: ${block.opcode}`);
         }
     }
 
     /**
-     * @param {*} node Stacked node to compile.
+     * @param {IntermediateStackBlock} block Stacked block to compile.
      */
-    descendStackedBlock (node) {
-        switch (node.kind) {
-        case 'addons.call':
+    descendStackedBlock (block) {
+        const node = block.inputs;
+        switch (block.opcode) {
+        case StackOpcode.ADDON_CALL: {
             this.source += `${this.descendAddonCall(node)};\n`;
             break;
+        }
 
-        case 'compat': {
+        case StackOpcode.COMPATIBILITY_LAYER: {
             // If the last command in a loop returns a promise, immediately continue to the next iteration.
             // If you don't do this, the loop effectively yields twice per iteration and will run at half-speed.
             const isLastInLoop = this.isLastBlockInLoop();
@@ -773,9 +502,9 @@ class JSGenerator {
                 this.source += `const ${branchVariable} = createBranchInfo(${blockType === BlockType.LOOP});\n`;
                 this.source += `while (${branchVariable}.branch = +(${this.generateCompatibilityLayerCall(node, false, branchVariable)})) {\n`;
                 this.source += `switch (${branchVariable}.branch) {\n`;
-                for (const index in node.substacks) {
-                    this.source += `case ${+index}: {\n`;
-                    this.descendStack(node.substacks[index], new Frame(false));
+                for (let i = 0; i < node.substacks.length; i++) {
+                    this.source += `case ${i + 1}: {\n`;
+                    this.descendStack(node.substacks[i], new Frame(false));
                     this.source += `break;\n`;
                     this.source += `}\n`; // close case
                 }
@@ -793,102 +522,12 @@ class JSGenerator {
             break;
         }
 
-        case 'control.createClone':
-            this.source += `runtime.ext_scratch3_control._createClone(${this.descendInput(node.target).asString()}, target);\n`;
-            break;
-        case 'control.deleteClone':
-            this.source += 'if (!target.isOriginal) {\n';
-            this.source += '  runtime.disposeTarget(target);\n';
-            this.source += '  runtime.stopForTarget(target);\n';
-            this.retire();
-            this.source += '}\n';
-            break;
-        case 'control.for': {
-            this.resetVariableInputs();
-            const index = this.localVariables.next();
-            this.source += `var ${index} = 0; `;
-            this.source += `while (${index} < ${this.descendInput(node.count).asNumber()}) { `;
-            this.source += `${index}++; `;
-            this.source += `${this.referenceVariable(node.variable)}.value = ${index};\n`;
-            this.descendStack(node.do, new Frame(true));
-            this.yieldLoop();
-            this.source += '}\n';
-            break;
-        }
-        case 'control.if':
-            this.source += `if (${this.descendInput(node.condition).asBoolean()}) {\n`;
-            this.descendStack(node.whenTrue, new Frame(false));
-            // only add the else branch if it won't be empty
-            // this makes scripts have a bit less useless noise in them
-            if (node.whenFalse.length) {
-                this.source += `} else {\n`;
-                this.descendStack(node.whenFalse, new Frame(false));
-            }
-            this.source += `}\n`;
-            break;
-        case 'control.repeat': {
-            const i = this.localVariables.next();
-            this.source += `for (var ${i} = ${this.descendInput(node.times).asNumber()}; ${i} >= 0.5; ${i}--) {\n`;
-            this.descendStack(node.do, new Frame(true));
-            this.yieldLoop();
-            this.source += `}\n`;
-            break;
-        }
-        case 'control.stopAll':
-            this.source += 'runtime.stopAll();\n';
-            this.retire();
-            break;
-        case 'control.stopOthers':
-            this.source += 'runtime.stopForTarget(target, thread);\n';
-            break;
-        case 'control.stopScript':
-            this.stopScript();
-            break;
-        case 'control.wait': {
-            const duration = this.localVariables.next();
-            this.source += `thread.timer = timer();\n`;
-            this.source += `var ${duration} = Math.max(0, 1000 * ${this.descendInput(node.seconds).asNumber()});\n`;
-            this.requestRedraw();
-            // always yield at least once, even on 0 second durations
-            this.yieldNotWarp();
-            this.source += `while (thread.timer.timeElapsed() < ${duration}) {\n`;
-            this.yieldStuckOrNotWarp();
-            this.source += '}\n';
-            this.source += 'thread.timer = null;\n';
-            break;
-        }
-        case 'control.waitUntil': {
-            this.resetVariableInputs();
-            this.source += `while (!${this.descendInput(node.condition).asBoolean()}) {\n`;
-            this.yieldStuckOrNotWarp();
-            this.source += `}\n`;
-            break;
-        }
-        case 'control.while':
-            this.resetVariableInputs();
-            this.source += `while (${this.descendInput(node.condition).asBoolean()}) {\n`;
-            this.descendStack(node.do, new Frame(true));
-            if (node.warpTimer) {
-                this.yieldStuckOrNotWarp();
-            } else {
-                this.yieldLoop();
-            }
-            this.source += `}\n`;
-            break;
-
-        case 'counter.clear':
-            this.source += 'runtime.ext_scratch3_control._counter = 0;\n';
-            break;
-        case 'counter.increment':
-            this.source += 'runtime.ext_scratch3_control._counter++;\n';
-            break;
-
-        case 'hat.edge':
+        case StackOpcode.HAT_EDGE:
             this.isInHat = true;
             this.source += '{\n';
             // For exact Scratch parity, evaluate the input before checking old edge state.
             // Can matter if the input is not instantly evaluated.
-            this.source += `const resolvedValue = ${this.descendInput(node.condition).asBoolean()};\n`;
+            this.source += `const resolvedValue = ${this.descendInput(node.condition)};\n`;
             this.source += `const id = "${sanitize(node.id)}";\n`;
             this.source += 'const hasOldEdgeValue = target.hasEdgeActivatedValue(id);\n';
             this.source += `const oldEdgeValue = target.updateEdgeActivatedValue(id, resolvedValue);\n`;
@@ -900,209 +539,290 @@ class JSGenerator {
             this.source += '}\n';
             this.isInHat = false;
             break;
-        case 'hat.predicate':
+
+        case StackOpcode.HAT_PREDICATE:
             this.isInHat = true;
-            this.source += `if (!${this.descendInput(node.condition).asBoolean()}) {\n`;
+            this.source += `if (!${this.descendInput(node.condition)}) {\n`;
             this.retire();
             this.source += '}\n';
             this.source += 'yield;\n';
             this.isInHat = false;
             break;
 
-        case 'event.broadcast':
-            this.source += `startHats("event_whenbroadcastreceived", { BROADCAST_OPTION: ${this.descendInput(node.broadcast).asString()} });\n`;
-            this.resetVariableInputs();
+        case StackOpcode.CONTROL_CLONE_CREATE:
+            this.source += `runtime.ext_scratch3_control._createClone(${this.descendInput(node.target)}, target);\n`;
             break;
-        case 'event.broadcastAndWait':
-            this.source += `yield* waitThreads(startHats("event_whenbroadcastreceived", { BROADCAST_OPTION: ${this.descendInput(node.broadcast).asString()} }));\n`;
+        case StackOpcode.CONTROL_CLONE_DELETE:
+            this.source += 'if (!target.isOriginal) {\n';
+            this.source += '  runtime.disposeTarget(target);\n';
+            this.source += '  runtime.stopForTarget(target);\n';
+            this.retire();
+            this.source += '}\n';
+            break;
+        case StackOpcode.CONTROL_FOR:
+            const index = this.localVariables.next();
+            this.source += `var ${index} = 0; `;
+            this.source += `while (${index} < ${this.descendInput(node.count)}) { `;
+            this.source += `${index}++; `;
+            this.source += `${this.referenceVariable(node.variable)}.value = ${index};\n`;
+            this.descendStack(node.do, new Frame(true));
+            this.yieldLoop();
+            this.source += '}\n';
+            break;
+        case StackOpcode.CONTROL_IF_ELSE:
+            this.source += `if (${this.descendInput(node.condition)}) {\n`;
+            this.descendStack(node.whenTrue, new Frame(false));
+            // only add the else branch if it won't be empty
+            // this makes scripts have a bit less useless noise in them
+            if (node.whenFalse.blocks.length) {
+                this.source += `} else {\n`;
+                this.descendStack(node.whenFalse, new Frame(false));
+            }
+            this.source += `}\n`;
+            break;
+        case StackOpcode.CONTROL_REPEAT: {
+            const i = this.localVariables.next();
+            this.source += `for (var ${i} = ${this.descendInput(node.times)}; ${i} >= 0.5; ${i}--) {\n`;
+            this.descendStack(node.do, new Frame(true));
+            this.yieldLoop();
+            this.source += `}\n`;
+            break;
+        }
+        case StackOpcode.CONTROL_STOP_ALL:
+            this.source += 'runtime.stopAll();\n';
+            this.retire();
+            break;
+        case StackOpcode.CONTROL_STOP_OTHERS:
+            this.source += 'runtime.stopForTarget(target, thread);\n';
+            break;
+        case StackOpcode.CONTROL_STOP_SCRIPT:
+            this.stopScript();
+            break;
+        case StackOpcode.CONTROL_WAIT: {
+            const duration = this.localVariables.next();
+            this.source += `thread.timer = timer();\n`;
+            this.source += `var ${duration} = Math.max(0, 1000 * ${this.descendInput(node.seconds)});\n`;
+            this.requestRedraw();
+            // always yield at least once, even on 0 second durations
+            this.yieldNotWarp();
+            this.source += `while (thread.timer.timeElapsed() < ${duration}) {\n`;
+            this.yieldStuckOrNotWarp();
+            this.source += '}\n';
+            this.source += 'thread.timer = null;\n';
+            break;
+        }
+        case StackOpcode.CONTROL_WAIT_UNTIL: {
+            this.source += `while (!${this.descendInput(node.condition)}) {\n`;
+            this.yieldStuckOrNotWarp();
+            this.source += `}\n`;
+            break;
+        }
+        case StackOpcode.CONTROL_WHILE:
+            this.source += `while (${this.descendInput(node.condition)}) {\n`;
+            this.descendStack(node.do, new Frame(true));
+            if (node.warpTimer) {
+                this.yieldStuckOrNotWarp();
+            } else {
+                this.yieldLoop();
+            }
+            this.source += `}\n`;
+            break;
+        case StackOpcode.CONTROL_CLEAR_COUNTER:
+            this.source += 'runtime.ext_scratch3_control._counter = 0;\n';
+            break;
+        case StackOpcode.CONTORL_INCR_COUNTER:
+            this.source += 'runtime.ext_scratch3_control._counter++;\n';
+            break;
+
+        case StackOpcode.EVENT_BROADCAST:
+            this.source += `startHats("event_whenbroadcastreceived", { BROADCAST_OPTION: ${this.descendInput(node.broadcast)} });\n`;
+            break;
+        case StackOpcode.EVENT_BROADCAST_AND_WAIT:
+            this.source += `yield* waitThreads(startHats("event_whenbroadcastreceived", { BROADCAST_OPTION: ${this.descendInput(node.broadcast)} }));\n`;
             this.yielded();
             break;
 
-        case 'list.add': {
+        case StackOpcode.LIST_ADD: {
             const list = this.referenceVariable(node.list);
-            this.source += `${list}.value.push(${this.descendInput(node.item).asSafe()});\n`;
+            this.source += `${list}.value.push(${this.descendInput(node.item)});\n`;
             this.source += `${list}._monitorUpToDate = false;\n`;
             break;
         }
-        case 'list.delete': {
+        case StackOpcode.LIST_DELETE: {
             const list = this.referenceVariable(node.list);
-            const index = this.descendInput(node.index);
-            if (index instanceof ConstantInput) {
-                if (index.constantValue === 'last') {
-                    this.source += `${list}.value.pop();\n`;
-                    this.source += `${list}._monitorUpToDate = false;\n`;
-                    break;
-                }
-                if (+index.constantValue === 1) {
-                    this.source += `${list}.value.shift();\n`;
-                    this.source += `${list}._monitorUpToDate = false;\n`;
-                    break;
-                }
-                // do not need a special case for all as that is handled in IR generation (list.deleteAll)
-            }
-            this.source += `listDelete(${list}, ${index.asUnknown()});\n`;
-            break;
-        }
-        case 'list.deleteAll':
-            this.source += `${this.referenceVariable(node.list)}.value = [];\n`;
-            break;
-        case 'list.hide':
-            this.source += `runtime.monitorBlocks.changeBlock({ id: "${sanitize(node.list.id)}", element: "checkbox", value: false }, runtime);\n`;
-            break;
-        case 'list.insert': {
-            const list = this.referenceVariable(node.list);
-            const index = this.descendInput(node.index);
-            const item = this.descendInput(node.item);
-            if (index instanceof ConstantInput && +index.constantValue === 1) {
-                this.source += `${list}.value.unshift(${item.asSafe()});\n`;
+            if (node.index.isConstant('last')) {
+                this.source += `${list}.value.pop();\n`;
                 this.source += `${list}._monitorUpToDate = false;\n`;
                 break;
             }
-            this.source += `listInsert(${list}, ${index.asUnknown()}, ${item.asSafe()});\n`;
+            if (node.index.isConstant(1)) {
+                this.source += `${list}.value.shift();\n`;
+                this.source += `${list}._monitorUpToDate = false;\n`;
+                break;
+            }
+            // do not need a special case for all as that is handled in IR generation (list.deleteAll)
+            this.source += `listDelete(${list}, ${this.descendInput(node.index)});\n`;
             break;
         }
-        case 'list.replace':
-            this.source += `listReplace(${this.referenceVariable(node.list)}, ${this.descendInput(node.index).asUnknown()}, ${this.descendInput(node.item).asSafe()});\n`;
+        case StackOpcode.LIST_DELETE_ALL:
+            this.source += `${this.referenceVariable(node.list)}.value = [];\n`;
             break;
-        case 'list.show':
+        case StackOpcode.LIST_HIDE:
+            this.source += `runtime.monitorBlocks.changeBlock({ id: "${sanitize(node.list.id)}", element: "checkbox", value: false }, runtime);\n`;
+            break;
+        case StackOpcode.LIST_INSERT: {
+            const list = this.referenceVariable(node.list);
+            const item = this.descendInput(node.item);
+            if (node.index.isConstant(1)) {
+                this.source += `${list}.value.unshift(${item});\n`;
+                this.source += `${list}._monitorUpToDate = false;\n`;
+                break;
+            }
+            this.source += `listInsert(${list}, ${this.descendInput(node.index)}, ${item});\n`;
+            break;
+        }
+        case StackOpcode.LIST_REPLACE:
+            this.source += `listReplace(${this.referenceVariable(node.list)}, ${this.descendInput(node.index)}, ${this.descendInput(node.item)});\n`;
+            break;
+        case StackOpcode.LIST_SHOW:
             this.source += `runtime.monitorBlocks.changeBlock({ id: "${sanitize(node.list.id)}", element: "checkbox", value: true }, runtime);\n`;
             break;
 
-        case 'looks.backwardLayers':
+        case StackOpcode.LOOKS_LAYER_BACKWARD:
             if (!this.target.isStage) {
-                this.source += `target.goBackwardLayers(${this.descendInput(node.layers).asNumber()});\n`;
+                this.source += `target.goBackwardLayers(${this.descendInput(node.layers)});\n`;
             }
             break;
-        case 'looks.clearEffects':
+        case StackOpcode.LOOKS_EFFECT_CLEAR:
             this.source += 'target.clearEffects();\n';
             break;
-        case 'looks.changeEffect':
-            if (Object.prototype.hasOwnProperty.call(this.target.effects, node.effect)) {
-                this.source += `target.setEffect("${sanitize(node.effect)}", runtime.ext_scratch3_looks.clampEffect("${sanitize(node.effect)}", ${this.descendInput(node.value).asNumber()} + target.effects["${sanitize(node.effect)}"]));\n`;
+        case StackOpcode.LOOKS_EFFECT_CHANGE:
+            if (this.target.effects.hasOwnProperty(node.effect)) {
+                this.source += `target.setEffect("${sanitize(node.effect)}", runtime.ext_scratch3_looks.clampEffect("${sanitize(node.effect)}", ${this.descendInput(node.value)} + target.effects["${sanitize(node.effect)}"]));\n`;
             }
             break;
-        case 'looks.changeSize':
-            this.source += `target.setSize(target.size + ${this.descendInput(node.size).asNumber()});\n`;
+        case StackOpcode.LOOKS_SIZE_CHANGE:
+            this.source += `target.setSize(target.size + ${this.descendInput(node.size)});\n`;
             break;
-        case 'looks.forwardLayers':
+        case StackOpcode.LOOKS_LAYER_FORWARD:
             if (!this.target.isStage) {
-                this.source += `target.goForwardLayers(${this.descendInput(node.layers).asNumber()});\n`;
+                this.source += `target.goForwardLayers(${this.descendInput(node.layers)});\n`;
             }
             break;
-        case 'looks.goToBack':
+        case StackOpcode.LOOKS_LAYER_BACK:
             if (!this.target.isStage) {
                 this.source += 'target.goToBack();\n';
             }
             break;
-        case 'looks.goToFront':
+        case StackOpcode.LOOKS_LAYER_FRONT:
             if (!this.target.isStage) {
                 this.source += 'target.goToFront();\n';
             }
             break;
-        case 'looks.hide':
+        case StackOpcode.LOOKS_HIDE:
             this.source += 'target.setVisible(false);\n';
             this.source += 'runtime.ext_scratch3_looks._renderBubble(target);\n';
             break;
-        case 'looks.nextBackdrop':
+        case StackOpcode.LOOKS_BACKDROP_NEXT:
             this.source += 'runtime.ext_scratch3_looks._setBackdrop(stage, stage.currentCostume + 1, true);\n';
             break;
-        case 'looks.nextCostume':
+        case StackOpcode.LOOKS_COSTUME_NEXT:
             this.source += 'target.setCostume(target.currentCostume + 1);\n';
             break;
-        case 'looks.setEffect':
-            if (Object.prototype.hasOwnProperty.call(this.target.effects, node.effect)) {
-                this.source += `target.setEffect("${sanitize(node.effect)}", runtime.ext_scratch3_looks.clampEffect("${sanitize(node.effect)}", ${this.descendInput(node.value).asNumber()}));\n`;
+        case StackOpcode.LOOKS_EFFECT_SET:
+            if (this.target.effects.hasOwnProperty(node.effect)) {
+                this.source += `target.setEffect("${sanitize(node.effect)}", runtime.ext_scratch3_looks.clampEffect("${sanitize(node.effect)}", ${this.descendInput(node.value)}));\n`;
             }
             break;
-        case 'looks.setSize':
-            this.source += `target.setSize(${this.descendInput(node.size).asNumber()});\n`;
+        case StackOpcode.LOOKS_SIZE_SET:
+            this.source += `target.setSize(${this.descendInput(node.size)});\n`;
             break;
-        case 'looks.show':
+        case StackOpcode.LOOKS_SHOW:
             this.source += 'target.setVisible(true);\n';
             this.source += 'runtime.ext_scratch3_looks._renderBubble(target);\n';
             break;
-        case 'looks.switchBackdrop':
-            this.source += `runtime.ext_scratch3_looks._setBackdrop(stage, ${this.descendInput(node.backdrop).asSafe()});\n`;
+        case StackOpcode.LOOKS_BACKDROP_SET:
+            this.source += `runtime.ext_scratch3_looks._setBackdrop(stage, ${this.descendInput(node.backdrop)});\n`;
             break;
-        case 'looks.switchCostume':
-            this.source += `runtime.ext_scratch3_looks._setCostume(target, ${this.descendInput(node.costume).asSafe()});\n`;
+        case StackOpcode.LOOKS_COSTUME_SET:
+            this.source += `runtime.ext_scratch3_looks._setCostume(target, ${this.descendInput(node.costume)});\n`;
             break;
 
-        case 'motion.changeX':
-            this.source += `target.setXY(target.x + ${this.descendInput(node.dx).asNumber()}, target.y);\n`;
+        case StackOpcode.MOTION_X_CHANGE:
+            this.source += `target.setXY(target.x + ${this.descendInput(node.dx)}, target.y);\n`;
             break;
-        case 'motion.changeY':
-            this.source += `target.setXY(target.x, target.y + ${this.descendInput(node.dy).asNumber()});\n`;
+        case StackOpcode.MOTION_Y_CHANGE:
+            this.source += `target.setXY(target.x, target.y + ${this.descendInput(node.dy)});\n`;
             break;
-        case 'motion.ifOnEdgeBounce':
+        case StackOpcode.MOTION_IF_ON_EDGE_BOUNCE:
             this.source += `runtime.ext_scratch3_motion._ifOnEdgeBounce(target);\n`;
             break;
-        case 'motion.setDirection':
-            this.source += `target.setDirection(${this.descendInput(node.direction).asNumber()});\n`;
+        case StackOpcode.MOTION_DIRECTION_SET:
+            this.source += `target.setDirection(${this.descendInput(node.direction)});\n`;
             break;
-        case 'motion.setRotationStyle':
+        case StackOpcode.MOTION_ROTATION_STYLE_SET:
             this.source += `target.setRotationStyle("${sanitize(node.style)}");\n`;
             break;
-        case 'motion.setX': // fallthrough
-        case 'motion.setY': // fallthrough
-        case 'motion.setXY': {
+        case StackOpcode.MOTION_X_SET: // fallthrough
+        case StackOpcode.MOTION_Y_SET: // fallthrough
+        case StackOpcode.MOTION_XY_SET: {
             this.descendedIntoModulo = false;
-            const x = 'x' in node ? this.descendInput(node.x).asNumber() : 'target.x';
-            const y = 'y' in node ? this.descendInput(node.y).asNumber() : 'target.y';
+            const x = 'x' in node ? this.descendInput(node.x) : 'target.x';
+            const y = 'y' in node ? this.descendInput(node.y) : 'target.y';
             this.source += `target.setXY(${x}, ${y});\n`;
             if (this.descendedIntoModulo) {
                 this.source += `if (target.interpolationData) target.interpolationData = null;\n`;
             }
             break;
         }
-        case 'motion.step':
-            this.source += `runtime.ext_scratch3_motion._moveSteps(${this.descendInput(node.steps).asNumber()}, target);\n`;
+        case StackOpcode.MOTION_STEP:
+            this.source += `runtime.ext_scratch3_motion._moveSteps(${this.descendInput(node.steps)}, target);\n`;
             break;
 
-        case 'noop':
+        case StackOpcode.NOP:
             break;
 
-        case 'pen.clear':
+        case StackOpcode.PEN_CLEAR:
             this.source += `${PEN_EXT}.clear();\n`;
             break;
-        case 'pen.down':
+        case StackOpcode.PEN_DOWN:
             this.source += `${PEN_EXT}._penDown(target);\n`;
             break;
-        case 'pen.changeParam':
-            this.source += `${PEN_EXT}._setOrChangeColorParam(${this.descendInput(node.param).asString()}, ${this.descendInput(node.value).asNumber()}, ${PEN_STATE}, true);\n`;
+        case StackOpcode.PEN_COLOR_PARAM_CHANGE:
+            this.source += `${PEN_EXT}._setOrChangeColorParam(${this.descendInput(node.param)}, ${this.descendInput(node.value)}, ${PEN_STATE}, true);\n`;
             break;
-        case 'pen.changeSize':
-            this.source += `${PEN_EXT}._changePenSizeBy(${this.descendInput(node.size).asNumber()}, target);\n`;
+        case StackOpcode.PEN_SIZE_CHANGE:
+            this.source += `${PEN_EXT}._changePenSizeBy(${this.descendInput(node.size)}, target);\n`;
             break;
-        case 'pen.legacyChangeHue':
-            this.source += `${PEN_EXT}._changePenHueBy(${this.descendInput(node.hue).asNumber()}, target);\n`;
+        case StackOpcode.PEN_COLOR_HUE_CHANGE_LEGACY:
+            this.source += `${PEN_EXT}._changePenHueBy(${this.descendInput(node.hue)}, target);\n`;
             break;
-        case 'pen.legacyChangeShade':
-            this.source += `${PEN_EXT}._changePenShadeBy(${this.descendInput(node.shade).asNumber()}, target);\n`;
+        case StackOpcode.PEN_COLOR_SHADE_CHANGE_LEGACY:
+            this.source += `${PEN_EXT}._changePenShadeBy(${this.descendInput(node.shade)}, target);\n`;
             break;
-        case 'pen.legacySetHue':
-            this.source += `${PEN_EXT}._setPenHueToNumber(${this.descendInput(node.hue).asNumber()}, target);\n`;
+        case StackOpcode.PEN_COLOR_HUE_SET_LEGACY:
+            this.source += `${PEN_EXT}._setPenHueToNumber(${this.descendInput(node.hue)}, target);\n`;
             break;
-        case 'pen.legacySetShade':
-            this.source += `${PEN_EXT}._setPenShadeToNumber(${this.descendInput(node.shade).asNumber()}, target);\n`;
+        case StackOpcode.PEN_COLOR_SHADE_SET_LEGACY:
+            this.source += `${PEN_EXT}._setPenShadeToNumber(${this.descendInput(node.shade)}, target);\n`;
             break;
-        case 'pen.setColor':
-            this.source += `${PEN_EXT}._setPenColorToColor(${this.descendInput(node.color).asColor()}, target);\n`;
+        case StackOpcode.PEN_COLOR_SET:
+            this.source += `${PEN_EXT}._setPenColorToColor(${this.descendInput(node.color)}, target);\n`;
             break;
-        case 'pen.setParam':
-            this.source += `${PEN_EXT}._setOrChangeColorParam(${this.descendInput(node.param).asString()}, ${this.descendInput(node.value).asNumber()}, ${PEN_STATE}, false);\n`;
+        case StackOpcode.PEN_COLOR_PARAM_SET:
+            this.source += `${PEN_EXT}._setOrChangeColorParam(${this.descendInput(node.param)}, ${this.descendInput(node.value)}, ${PEN_STATE}, false);\n`;
             break;
-        case 'pen.setSize':
-            this.source += `${PEN_EXT}._setPenSizeTo(${this.descendInput(node.size).asNumber()}, target);\n`;
+        case StackOpcode.PEN_SIZE_SET:
+            this.source += `${PEN_EXT}._setPenSizeTo(${this.descendInput(node.size)}, target);\n`;
             break;
-        case 'pen.stamp':
+        case StackOpcode.PEN_STAMP:
             this.source += `${PEN_EXT}._stamp(target);\n`;
             break;
-        case 'pen.up':
+        case StackOpcode.PEN_UP:
             this.source += `${PEN_EXT}._penUp(target);\n`;
             break;
 
-        case 'procedures.call': {
+        case StackOpcode.PROCEDURE_CALL: {
             const procedureCode = node.code;
             const procedureVariant = node.variant;
             const procedureData = this.ir.procedures[procedureVariant];
@@ -1110,121 +830,118 @@ class JSGenerator {
                 // TODO still need to evaluate arguments
                 break;
             }
-
             const yieldForRecursion = !this.isWarp && procedureCode === this.script.procedureCode;
             if (yieldForRecursion) {
+                // Direct yields.
                 this.yieldNotWarp();
             }
-
             if (procedureData.yields) {
                 this.source += 'yield* ';
+                if (!this.script.yields) {
+                    throw new Error('Script uses yielding procedure but is not marked as yielding.');
+                }
             }
             this.source += `thread.procedures["${sanitize(procedureVariant)}"](`;
             const args = [];
             for (const input of node.arguments) {
-                args.push(this.descendInput(input).asSafe());
+                args.push(this.descendInput(input));
             }
             this.source += args.join(',');
-            this.source += ');\n';
-
-            this.resetVariableInputs();
+            this.source += `);\n`;
             break;
         }
-        case 'procedures.return':
-            this.stopScriptAndReturn(this.descendInput(node.value).asSafe());
+        case StackOpcode.PROCEDURE_RETURN:
+            this.stopScriptAndReturn(this.descendInput(node.value));
             break;
 
-        case 'timer.reset':
+        case StackOpcode.SENSING_TIMER_RESET:
             this.source += 'runtime.ioDevices.clock.resetProjectTimer();\n';
             break;
 
-        case 'tw.debugger':
+        case StackOpcode.DEBUGGER:
             this.source += 'debugger;\n';
             break;
 
-        case 'var.hide':
+        case StackOpcode.VAR_HIDE:
             this.source += `runtime.monitorBlocks.changeBlock({ id: "${sanitize(node.variable.id)}", element: "checkbox", value: false }, runtime);\n`;
             break;
-        case 'var.set': {
-            const variable = this.descendVariable(node.variable);
-            const value = this.descendInput(node.value);
-            variable.setInput(value);
-            this.source += `${variable.source} = ${value.asSafe()};\n`;
+        case StackOpcode.VAR_SET: {
+            const varReference = this.referenceVariable(node.variable);
+            this.source += `${varReference}.value = ${this.descendInput(node.value)};\n`;
             if (node.variable.isCloud) {
-                this.source += `runtime.ioDevices.cloud.requestUpdateVariable("${sanitize(node.variable.name)}", ${variable.source});\n`;
+                this.source += `runtime.ioDevices.cloud.requestUpdateVariable("${sanitize(node.variable.name)}", ${varReference}.value);\n`;
             }
             break;
         }
-        case 'var.show':
+        case StackOpcode.VAR_SHOW:
             this.source += `runtime.monitorBlocks.changeBlock({ id: "${sanitize(node.variable.id)}", element: "checkbox", value: true }, runtime);\n`;
             break;
 
-        case 'visualReport': {
+        case StackOpcode.VISUAL_REPORT: {
             const value = this.localVariables.next();
-            this.source += `const ${value} = ${this.descendInput(node.input).asUnknown()};`;
+            this.source += `const ${value} = ${this.descendInput(node.input)};`;
             // blocks like legacy no-ops can return a literal `undefined`
             this.source += `if (${value} !== undefined) runtime.visualReport("${sanitize(this.script.topBlockId)}", ${value});\n`;
             break;
         }
 
         default:
-            log.warn(`JS: Unknown stacked block: ${node.kind}`, node);
-            throw new Error(`JS: Unknown stacked block: ${node.kind}`);
+            log.warn(`JS: Unknown stacked block: ${block.opcode}`, node);
+            throw new Error(`JS: Unknown stacked block: ${block.opcode}`);
         }
     }
 
     /**
+     * Compiles a reference to a target.
+     * @param {IntermediateInput} input The target reference. Must be a string.
+     * @returns {string} The compiled target reference
+     */
+    descendTargetReference (input) {
+        if (!input.isAlwaysType(InputType.STRING)) {
+            throw new Error(`JS: Object references must be strings!`);
+        }
+        if (input.isConstant('_stage_')) return 'stage';
+        return this.evaluateOnce(`runtime.getSpriteTargetByName(${this.descendInput(input)})`);
+    }
+
+    /**
      * Compile a Record of input objects into a safe JS string.
-     * @param {Record<string, unknown>} inputs
+     * @param {Record<string, IntermediateInput>} inputs
      * @returns {string}
      */
     descendInputRecord (inputs) {
         let result = '{';
         for (const name of Object.keys(inputs)) {
             const node = inputs[name];
-            result += `"${sanitize(name)}":${this.descendInput(node).asSafe()},`;
+            result += `"${sanitize(name)}":${this.descendInput(node)},`;
         }
         result += '}';
         return result;
     }
 
-    resetVariableInputs () {
-        this.variableInputs = {};
-    }
-
-    descendStack (nodes, frame) {
+    /**
+     * @param {IntermediateStack} stack
+     * @param {Frame} frame
+     */
+    descendStack (stack, frame) {
         // Entering a stack -- all bets are off.
         // TODO: allow if/else to inherit values
-        this.resetVariableInputs();
         this.pushFrame(frame);
 
-        for (let i = 0; i < nodes.length; i++) {
-            frame.isLastBlock = i === nodes.length - 1;
-            this.descendStackedBlock(nodes[i]);
+        for (let i = 0; i < stack.blocks.length; i++) {
+            frame.isLastBlock = i === stack.blocks.length - 1;
+            this.descendStackedBlock(stack.blocks[i]);
         }
 
         // Leaving a stack -- any assumptions made in the current stack do not apply outside of it
         // TODO: in if/else this might create an extra unused object
-        this.resetVariableInputs();
         this.popFrame();
     }
 
-    descendVariable (variable) {
-        if (Object.prototype.hasOwnProperty.call(this.variableInputs, variable.id)) {
-            return this.variableInputs[variable.id];
-        }
-        const input = new VariableInput(`${this.referenceVariable(variable)}.value`);
-        this.variableInputs[variable.id] = input;
-        return input;
-    }
-
-    referenceVariable (variable) {
-        if (variable.scope === 'target') {
-            return this.evaluateOnce(`target.variables["${sanitize(variable.id)}"]`);
-        }
-        return this.evaluateOnce(`stage.variables["${sanitize(variable.id)}"]`);
-    }
-
+    /**
+     * @param {*} node
+     * @returns {string}
+     */
     descendAddonCall (node) {
         const inputs = this.descendInputRecord(node.arguments);
         const blockFunction = `runtime.getAddonBlock("${sanitize(node.code)}").callback`;
@@ -1232,8 +949,23 @@ class JSGenerator {
         return `yield* executeInCompatibilityLayer(${inputs}, ${blockFunction}, ${this.isWarp}, false, ${blockId})`;
     }
 
+    /**
+     * @param {*} variable
+     * @returns {string}
+     */
+    referenceVariable (variable) {
+        if (variable.scope === 'target') {
+            return this.evaluateOnce(`target.variables["${sanitize(variable.id)}"]`);
+        }
+        return this.evaluateOnce(`stage.variables["${sanitize(variable.id)}"]`);
+    }
+
+    /**
+     * @param {string} source
+     * @returns {string}
+     */
     evaluateOnce (source) {
-        if (Object.prototype.hasOwnProperty.call(this._setupVariables, source)) {
+        if (this._setupVariables.hasOwnProperty(source)) {
             return this._setupVariables[source];
         }
         const variable = this._setupVariablesPool.next();
@@ -1249,25 +981,6 @@ class JSGenerator {
             this.source += 'retire(); yield;\n';
         } else {
             this.source += 'retire(); return;\n';
-        }
-    }
-
-    stopScript () {
-        if (this.isProcedure) {
-            this.source += 'return "";\n';
-        } else {
-            this.retire();
-        }
-    }
-
-    /**
-     * @param {string} valueJS JS code of value to return.
-     */
-    stopScriptAndReturn (valueJS) {
-        if (this.isProcedure) {
-            this.source += `return ${valueJS};\n`;
-        } else {
-            this.retire();
         }
     }
 
@@ -1306,7 +1019,6 @@ class JSGenerator {
             throw new Error('Script yielded but is not marked as yielding.');
         }
         // Control may have been yielded to another script -- all bets are off.
-        this.resetVariableInputs();
     }
 
     /**
@@ -1316,14 +1028,9 @@ class JSGenerator {
         this.source += 'runtime.requestRedraw();\n';
     }
 
-    safeConstantInput (value) {
-        const unsafe = typeof value === 'string' && this.namesOfCostumesAndSounds.has(value);
-        return new ConstantInput(value, !unsafe);
-    }
-
     /**
      * Generate a call into the compatibility layer.
-     * @param {*} node The "compat" kind node to generate from.
+     * @param {*} node The node of the block to generate from.
      * @param {boolean} setFlags Whether flags should be set describing how this function was processed.
      * @param {string|null} [frameName] Name of the stack frame variable, if any
      * @returns {string} The JS of the call.
@@ -1335,7 +1042,7 @@ class JSGenerator {
 
         for (const inputName of Object.keys(node.inputs)) {
             const input = node.inputs[inputName];
-            const compiledInput = this.descendInput(input).asSafe();
+            const compiledInput = this.descendInput(input);
             result += `"${sanitize(inputName)}":${compiledInput},`;
         }
         for (const fieldName of Object.keys(node.fields)) {
@@ -1362,6 +1069,25 @@ class JSGenerator {
             name += `_${simplifiedProcedureCode}`;
         }
         return name;
+    }
+
+    stopScript () {
+        if (this.isProcedure) {
+            this.source += 'return "";\n';
+        } else {
+            this.retire();
+        }
+    }
+
+    /**
+     * @param {string} valueJS JS code of value to return.
+     */
+    stopScriptAndReturn (valueJS) {
+        if (this.isProcedure) {
+            this.source += `return ${valueJS};\n`;
+        } else {
+            this.retire();
+        }
     }
 
     /**
@@ -1430,26 +1156,6 @@ class JSGenerator {
         return fn;
     }
 }
-
-// For extensions.
-JSGenerator.unstable_exports = {
-    TYPE_NUMBER,
-    TYPE_STRING,
-    TYPE_BOOLEAN,
-    TYPE_UNKNOWN,
-    TYPE_NUMBER_NAN,
-    factoryNameVariablePool,
-    functionNameVariablePool,
-    generatorNameVariablePool,
-    VariablePool,
-    PEN_EXT,
-    PEN_STATE,
-    TypedInput,
-    ConstantInput,
-    VariableInput,
-    Frame,
-    sanitize
-};
 
 // Test hook used by automated snapshot testing.
 JSGenerator.testingApparatus = null;

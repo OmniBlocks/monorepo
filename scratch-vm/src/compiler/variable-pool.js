@@ -1,3 +1,5 @@
+// @ts-check
+
 class VariablePool {
     /**
      * @param {string} prefix The prefix at the start of the variable name.

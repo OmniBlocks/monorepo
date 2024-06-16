@@ -39,14 +39,14 @@ yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, "P", nu
 retire(); return;
 }; })
 
-// Sprite1 Zinvalid params - reporter
+// Sprite1 script
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
 return function funXYZ_invalid_params___rep () {
 return 0;
 return "";
 }; })
 
-// Sprite1 Zinvalid params - boolean
+// Sprite1 script
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
 return function funXYZ_invalid_params___boo () {
 return 0;

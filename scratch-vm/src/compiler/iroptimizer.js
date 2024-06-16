@@ -138,14 +138,14 @@ class IROptimizer {
             return state.getVariableType(inputs.variable);
 
         case InputOpcode.ADDON_CALL:
-
+            break;
 
         case InputOpcode.CAST_NUMBER: {
             const innerType = inputs.target.type;
             if (innerType & InputType.NUMBER) return innerType;
             return InputType.NUMBER;
         } case InputOpcode.CAST_NUMBER_OR_NAN: {
-            const innerType = inputs.target;
+            const innerType = inputs.target.type;
             if (innerType & InputType.NUMBER_OR_NAN) return innerType;
             return InputType.NUMBER_OR_NAN;
         }
@@ -548,9 +548,9 @@ class IROptimizer {
         }
         case StackOpcode.COMPATIBILITY_LAYER: {
             this.analyzeInputs(inputs.inputs, state);
-            for (const substack of inputs.substacks) {
+            for (const substackName in inputs.substacks) {
                 const newState = state.clone();
-                modified = this.analyzeStack(substack, newState) || modified;
+                modified = this.analyzeStack(inputs.substacks[substackName], newState) || modified;
                 modified = state.or(newState) || modified;
             }
             break;

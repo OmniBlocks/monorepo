@@ -1788,9 +1788,9 @@ export class SongEditor {
                 group = this._unisonDropdownGroup;
                 break;
             case DropdownID.EnvelopeSettings:
-                target = this._envelopeEditor._extraSettingsDropdowns[submenu];
-                this._envelopeEditor._openExtraSettingsDropdowns[submenu] = this._envelopeEditor._openExtraSettingsDropdowns[submenu] ? false : true;
-                group = this._envelopeEditor._extraSettingsDropdownGroups[submenu];
+                target = this._envelopeEditor.extraSettingsDropdowns[submenu];
+                this._envelopeEditor.openExtraSettingsDropdowns[submenu] = this._envelopeEditor.openExtraSettingsDropdowns[submenu] ? false : true;
+                group = this._envelopeEditor.extraSettingsDropdownGroups[submenu];
                 break;
         }
 
@@ -1800,9 +1800,9 @@ export class SongEditor {
             if (dropdown == DropdownID.EnvelopeSettings) {
                 group.style.display = "flex";
                 if (subtype == "pitch") { 
-                    this._envelopeEditor._extraPitchSettingsGroups[submenu].style.display = "flex";
+                    this._envelopeEditor.extraPitchSettingsGroups[submenu].style.display = "flex";
                 } else {
-                    this._envelopeEditor._extraPitchSettingsGroups[submenu].style.display = "none";
+                    this._envelopeEditor.extraPitchSettingsGroups[submenu].style.display = "none";
                 }
                 this._envelopeEditor.rerenderExtraSettings();
             } else if (group != this._chordDropdownGroup) {
@@ -1830,7 +1830,7 @@ export class SongEditor {
             target.textContent = "▼";
             group.style.display = "none";
             if (subtype == "pitch") {
-                this._envelopeEditor._extraPitchSettingsGroups[submenu].style.display = "none";
+                this._envelopeEditor.extraPitchSettingsGroups[submenu].style.display = "none";
             }
         }
     }
@@ -3804,8 +3804,8 @@ export class SongEditor {
             || document.activeElement == this._unisonOffsetInputBox
             || document.activeElement == this._unisonExpressionInputBox
             || document.activeElement == this._unisonSignInputBox
-            || this._envelopeEditor._pitchStartBoxes.find((element) => element == document.activeElement)
-            || this._envelopeEditor._pitchEndBoxes.find((element) => element == document.activeElement)
+            || this._envelopeEditor.pitchStartBoxes.find((element) => element == document.activeElement)
+            || this._envelopeEditor.pitchEndBoxes.find((element) => element == document.activeElement)
 
         ) {
             // Enter/esc returns focus to form

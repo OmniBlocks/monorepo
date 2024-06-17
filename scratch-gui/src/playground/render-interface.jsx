@@ -98,11 +98,34 @@ const Footer = () => (
             <div className={styles.footerText}>
                 <FormattedMessage
                     // eslint-disable-next-line max-len
-                    defaultMessage="TurboWarp is not affiliated with Scratch, the Scratch Team, or the Scratch Foundation."
+                    defaultMessage="{APP_NAME} is not affiliated with Scratch, the Scratch Team, or the Scratch Foundation."
                     description="Disclaimer that TurboWarp is not connected to Scratch"
                     id="tw.footer.disclaimer"
+                    values={{
+                        APP_NAME
+                    }}
                 />
             </div>
+
+            <div className={styles.footerText}>
+                <FormattedMessage
+                    defaultMessage="Scratch is a project of the Scratch Foundation. It is available for free at {scratchDotOrg}."
+                    description="A disclaimer that Scratch requires when referring to Scratch. {scratchDotOrg} is a link with text 'https://scratch.org/'"
+                    id="tw.footer.scratchDisclaimer"
+                    values={{
+                        scratchDotOrg: (
+                            <a
+                                href="https://scratch.org/"
+                                target="_blank"
+                                rel="noreferrer"
+                            >
+                                {'https://scratch.org/'}
+                            </a>
+                        )
+                    }}
+                />
+            </div>
+
             <div className={styles.footerColumns}>
                 <div className={styles.footerSection}>
                     <a href="credits.html">

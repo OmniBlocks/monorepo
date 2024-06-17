@@ -170,18 +170,18 @@ class IntermediateInput {
                 break;
             case InputOpcode.CAST_NUMBER:
             case InputOpcode.CAST_NUMBER_INDEX:
-            case InputOpcode.CAST_NUMBER_OR_NAN:
+            case InputOpcode.CAST_NUMBER_OR_NAN: {
                 if (this.isAlwaysType(InputType.BOOLEAN_INTERPRETABLE)) {
                     this.type = InputType.NUMBER;
                     this.inputs.value = +Cast.toBoolean(this.inputs.value);
                 }
-                var numberValue = +this.inputs.value;
+                let numberValue = +this.inputs.value;
                 if (numberValue) {
                     this.inputs.value = numberValue;
+                } else /* numberValue is one of 0, -0, or NaN */ if (Object.is(numberValue, -0)) {
+                    this.inputs.value = -0;
                 } else {
-                    // numberValue is one of 0, -0, or NaN
-                    if (Object.is(numberValue, -0)) this.inputs.value = -0;
-                    else this.inputs.value = 0; // Convert NaN to 0
+                    this.inputs.value = 0; // Convert NaN to 0
                 }
                 if (castOpcode === InputOpcode.CAST_NUMBER_INDEX) {
                     // Round numberValue to an integer
@@ -189,6 +189,7 @@ class IntermediateInput {
                 }
                 this.type = IntermediateInput.getNumberInputType(this.inputs.value);
                 break;
+            }
             case InputOpcode.CAST_STRING:
                 this.inputs.value += '';
                 this.type = InputType.STRING;

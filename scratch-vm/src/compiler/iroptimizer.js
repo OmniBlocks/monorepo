@@ -1,7 +1,17 @@
 // @ts-check
 
-const {IntermediateStack, IntermediateInput, IntermediateScript, IntermediateRepresentation, IntermediateStackBlock} = require('./intermediate');
 const {StackOpcode, InputOpcode, InputType} = require('./enums.js');
+
+// These imports are used by jsdoc comments but eslint doesn't know that
+/* eslint-disable no-unused-vars */
+const {
+    IntermediateStack,
+    IntermediateInput,
+    IntermediateScript,
+    IntermediateRepresentation,
+    IntermediateStackBlock
+} = require('./intermediate');
+/* eslint-enable no-unused-vars */
 
 class TypeState {
     constructor () {
@@ -156,41 +166,41 @@ class IROptimizer {
 
             let resultType = 0;
 
-            function canBeNaN () {
+            const canBeNaN = function () {
                 // Infinity + (-Infinity) = NaN
                 if ((leftType & InputType.NUMBER_POS_INF) && (rightType & InputType.NUMBER_NEG_INF)) return true;
                 // (-Infinity) + Infinity = NaN
                 if ((leftType & InputType.NUMBER_NEG_INF) && (rightType & InputType.NUMBER_POS_INF)) return true;
-            }
+            };
             if (canBeNaN()) resultType |= InputType.NUMBER_NAN;
 
-            function canBeFractional () {
+            const canBeFractional = function () {
                 // For the plus operation to return a non-whole number one of it's
                 //  inputs has to be a non-whole number
                 if (leftType & InputType.NUMBER_FRACT) return true;
                 if (rightType & InputType.NUMBER_FRACT) return true;
-            }
+            };
             const canBeFract = canBeFractional();
 
-            function canBePos () {
+            const canBePos = function () {
                 if (leftType & InputType.NUMBER_POS) return true; // POS + ANY ~= POS
                 if (rightType & InputType.NUMBER_POS) return true; // ANY + POS ~= POS
-            }
+            };
             if (canBePos()) {
                 resultType |= InputType.NUMBER_POS_INT | InputType.NUMBER_POS_INF;
                 if (canBeFract) resultType |= InputType.NUMBER_POS_FRACT;
             }
 
-            function canBeNeg () {
+            const canBeNeg = function () {
                 if (leftType & InputType.NUMBER_NEG) return true; // NEG + ANY ~= NEG
                 if (rightType & InputType.NUMBER_NEG) return true; // ANY + NEG ~= NEG
-            }
+            };
             if (canBeNeg()) {
                 resultType |= InputType.NUMBER_NEG_INT | InputType.NUMBER_NEG_INF;
                 if (canBeFract) resultType |= InputType.NUMBER_NEG_FRACT;
             }
 
-            function canBeZero () {
+            const canBeZero = function () {
                 // POS_REAL + NEG_REAL ~= 0
                 if ((leftType & InputType.NUMBER_POS_REAL) && (rightType & InputType.NUMBER_NEG_REAL)) return true;
                 // NEG_REAL + POS_REAL ~= 0
@@ -201,13 +211,13 @@ class IROptimizer {
                 if ((leftType & InputType.NUMBER_ZERO) && (rightType & InputType.NUMBER_NEG_ZERO)) return true;
                 // -0 + 0 = 0
                 if ((leftType & InputType.NUMBER_NEG_ZERO) && (rightType & InputType.NUMBER_ZERO)) return true;
-            }
+            };
             if (canBeZero()) resultType |= InputType.NUMBER_ZERO;
 
-            function canBeNegZero () {
+            const canBeNegZero = function () {
                 // -0 + -0 = -0
                 if ((leftType & InputType.NUMBER_NEG_ZERO) && (rightType & InputType.NUMBER_NEG_ZERO)) return true;
-            }
+            };
             if (canBeNegZero()) resultType |= InputType.NUMBER_NEG_ZERO;
 
             return resultType;
@@ -219,41 +229,41 @@ class IROptimizer {
 
             let resultType = 0;
 
-            function canBeNaN () {
+            const canBeNaN = function () {
                 // Infinity - Infinity = NaN
                 if ((leftType & InputType.NUMBER_POS_INF) && (rightType & InputType.NUMBER_POS_INF)) return true;
                 // (-Infinity) - (-Infinity) = NaN
                 if ((leftType & InputType.NUMBER_NEG_INF) && (rightType & InputType.NUMBER_NEG_INF)) return true;
-            }
+            };
             if (canBeNaN()) resultType |= InputType.NUMBER_NAN;
 
-            function canBeFractional () {
+            const canBeFractional = function () {
                 // For the subtract operation to return a non-whole number one of it's
                 //  inputs has to be a non-whole number
                 if (leftType & InputType.NUMBER_FRACT) return true;
                 if (rightType & InputType.NUMBER_FRACT) return true;
-            }
+            };
             const canBeFract = canBeFractional();
 
-            function canBePos () {
+            const canBePos = function () {
                 if (leftType & InputType.NUMBER_POS) return true; // POS - ANY ~= POS
                 if (rightType & InputType.NUMBER_NEG) return true; // ANY - NEG ~= POS
-            }
+            };
             if (canBePos()) {
                 resultType |= InputType.NUMBER_POS_INT | InputType.NUMBER_POS_INF;
                 if (canBeFract) resultType |= InputType.NUMBER_POS_FRACT;
             }
 
-            function canBeNeg () {
+            const canBeNeg = function () {
                 if (leftType & InputType.NUMBER_NEG) return true; // NEG - ANY ~= NEG
                 if (rightType & InputType.NUMBER_POS) return true; // ANY - POS ~= NEG
-            }
+            };
             if (canBeNeg()) {
                 resultType |= InputType.NUMBER_NEG_INT | InputType.NUMBER_NEG_INF;
                 if (canBeFract) resultType |= InputType.NUMBER_NEG_FRACT;
             }
 
-            function canBeZero () {
+            const canBeZero = function () {
                 // POS_REAL - POS_REAL ~= 0
                 if ((leftType & InputType.NUMBER_POS_REAL) && (rightType & InputType.NUMBER_POS_REAL)) return true;
                 // NEG_REAL - NEG_REAL ~= 0
@@ -264,13 +274,13 @@ class IROptimizer {
                 if ((leftType & InputType.NUMBER_ZERO) && (rightType & InputType.NUMBER_NEG_ZERO)) return true;
                 // (-0) - (-0) = 0
                 if ((leftType & InputType.NUMBER_NEG_ZERO) && (rightType & InputType.NUMBER_NEG_ZERO)) return true;
-            }
+            };
             if (canBeZero()) resultType |= InputType.NUMBER_ZERO;
 
-            function canBeNegZero () {
+            const canBeNegZero = function () {
                 // (-0) - 0 = -0
                 if ((leftType & InputType.NUMBER_NEG_ZERO) && (rightType & InputType.NUMBER_ZERO)) return true;
-            }
+            };
             if (canBeNegZero()) resultType |= InputType.NUMBER_NEG_ZERO;
 
             return resultType;
@@ -282,45 +292,45 @@ class IROptimizer {
 
             let resultType = 0;
 
-            function canBeNaN () {
+            const canBeNaN = function () {
                 // (-)Infinity * 0 = NaN
                 if ((leftType & InputType.NUMBER_INF) && (rightType & InputType.NUMBER_ANY_ZERO)) return true;
                 // 0 * (-)Infinity = NaN
                 if ((leftType & InputType.NUMBER_ANY_ZERO) && (rightType & InputType.NUMBER_INF)) return true;
-            }
+            };
             if (canBeNaN()) resultType |= InputType.NUMBER_NAN;
 
-            function canBeFractional () {
+            const canBeFractional = function () {
                 // For the subtract operation to return a non-whole number one of it's
                 //  inputs has to be a non-whole number
                 if (leftType & InputType.NUMBER_FRACT) return true;
                 if (rightType & InputType.NUMBER_FRACT) return true;
-            }
+            };
             const canBeFract = canBeFractional();
 
-            function canBePos () {
+            const canBePos = function () {
                 // POS * POS = POS
                 if ((leftType & InputType.NUMBER_POS) && (rightType & InputType.NUMBER_POS)) return true;
                 // NEG * NEG = POS
                 if ((leftType & InputType.NUMBER_NEG) && (rightType & InputType.NUMBER_NEG)) return true;
-            }
+            };
             if (canBePos()) {
                 resultType |= InputType.NUMBER_POS_INT | InputType.NUMBER_POS_INF;
                 if (canBeFract) resultType |= InputType.NUMBER_POS_FRACT;
             }
 
-            function canBeNeg () {
+            const canBeNeg = function () {
                 // POS * NEG = NEG
                 if ((leftType & InputType.NUMBER_POS) && (rightType & InputType.NUMBER_NEG)) return true;
                 // NEG * POS = NEG
                 if ((leftType & InputType.NUMBER_NEG) && (rightType & InputType.NUMBER_POS)) return true;
-            }
+            };
             if (canBeNeg()) {
                 resultType |= InputType.NUMBER_NEG_INT | InputType.NUMBER_NEG_INF;
                 if (canBeFract) resultType |= InputType.NUMBER_NEG_FRACT;
             }
 
-            function canBeZero () {
+            const canBeZero = function () {
                 // 0 * 0 = 0
                 if ((leftType & InputType.NUMBER_ZERO) && (rightType & InputType.NUMBER_ZERO)) return true;
                 // -0 * -0 = 0
@@ -335,10 +345,10 @@ class IROptimizer {
                 if ((leftType & InputType.NUMBER_NEG_REAL) && (rightType & InputType.NUMBER_NEG_ZERO)) return true;
                 // Rounding errors like 1e-323 * 0.1 = 0
                 if ((leftType & InputType.NUMBER_FRACT) && (rightType & InputType.NUMBER_FRACT)) return true;
-            }
+            };
             if (canBeZero()) resultType |= InputType.NUMBER_ZERO;
 
-            function canBeNegZero () {
+            const canBeNegZero = function () {
                 // 0 * -0 = 0
                 if ((leftType & InputType.NUMBER_ZERO) && (rightType & InputType.NUMBER_NEG_ZERO)) return true;
                 // -0 * 0 = 0
@@ -355,7 +365,7 @@ class IROptimizer {
                 if ((leftType & InputType.NUMBER_NEG_REAL) && (rightType & InputType.NUMBER_POS_REAL)) return true;
                 // Rounding errors like 1e-323 / -10 = -0
                 if ((leftType & InputType.NUMBER_POS_REAL) && (rightType & InputType.NUMBER_NEG_REAL)) return true;
-            }
+            };
             if (canBeNegZero()) resultType |= InputType.NUMBER_NEG_ZERO;
 
             return resultType;
@@ -367,25 +377,25 @@ class IROptimizer {
 
             let resultType = 0;
 
-            function canBeNaN () {
+            const canBeNaN = function () {
                 // REAL / 0 = NaN
                 if ((leftType & InputType.NUMBER_REAL) && (rightType & InputType.NUMBER_ZERO)) return true;
                 // (-)Infinity / (-)Infinity = NaN
                 if ((leftType & InputType.NUMBER_INF) && (rightType & InputType.NUMBER_INF)) return true;
                 // (-)0 / NaN = NaN
                 if ((leftType & InputType.NUMBER_ANY_ZERO) && (rightType & InputType.NUMBER_NAN)) return true;
-            }
+            };
             if (canBeNaN()) resultType |= InputType.NUMBER_NAN;
 
-            function canBePos () {
+            const canBePos = function () {
                 // POS / POS = POS
                 if ((leftType & InputType.NUMBER_POS) && (rightType & InputType.NUMBER_POS)) return true;
                 // NEG / NEG = POS
                 if ((leftType & InputType.NUMBER_NEG) && (rightType & InputType.NUMBER_NEG)) return true;
-            }
+            };
             if (canBePos()) resultType |= InputType.NUMBER_POS;
 
-            function canBeNegInfinity () {
+            const canBeNegInfinity = function () {
                 // -Infinity / 0 = -Infinity
                 if ((leftType & InputType.NUMBER_NEG_INF) && (rightType & InputType.NUMBER_ZERO)) return true;
                 // Infinity / -0 = -Infinity
@@ -394,28 +404,28 @@ class IROptimizer {
                 if ((leftType & InputType.NUMBER_NEG_REAL) && (rightType & InputType.NUMBER_NAN)) return true;
                 // NEG_REAL / NUMBER_OR_NAN ~= -Infinity
                 if ((leftType & InputType.NUMBER_NEG_REAL) && (rightType & InputType.NUMBER_OR_NAN)) return true;
-            }
+            };
             if (canBeNegInfinity()) resultType |= InputType.NUMBER_NEG_INF;
 
-            function canBeInfinity () {
+            const canBeInfinity = function () {
                 // Infinity / 0 = Infinity
                 if ((leftType & InputType.NUMBER_POS_INF) && (rightType & InputType.NUMBER_ZERO)) return true;
                 // -Infinity / -0 = Infinity
                 if ((leftType & InputType.NUMBER_NEG_INF) && (rightType & InputType.NUMBER_NEG_ZERO)) return true;
                 // POS_REAL / NUMBER_OR_NAN ~= Infinity
                 if ((leftType & InputType.NUMBER_POS_REAL) && (rightType & InputType.NUMBER_OR_NAN)) return true;
-            }
+            };
             if (canBeInfinity()) resultType |= InputType.NUMBER_POS_INF;
 
-            function canBeNeg () {
+            const canBeNeg = function () {
                 // POS / NEG = NEG
                 if ((leftType & InputType.NUMBER_POS) && (rightType & InputType.NUMBER_NEG)) return true;
                 // NEG / POS = NEG
                 if ((leftType & InputType.NUMBER_NEG) && (rightType & InputType.NUMBER_POS)) return true;
-            }
+            };
             if (canBeNeg()) resultType |= InputType.NUMBER_NEG;
 
-            function canBeZero () {
+            const canBeZero = function () {
                 // 0 / POS = 0
                 if ((leftType & InputType.NUMBER_ZERO) && (rightType & InputType.NUMBER_POS)) return true;
                 // -0 / NEG = 0
@@ -428,10 +438,10 @@ class IROptimizer {
                 if ((leftType & InputType.NUMBER_POS) && (rightType & InputType.NUMBER_POS_INF)) return true;
                 // NUMBER_NEG / -Infinity = 0
                 if ((leftType & InputType.NUMBER_NEG) && (rightType & InputType.NUMBER_NEG_INF)) return true;
-            }
+            };
             if (canBeZero()) resultType |= InputType.NUMBER_ZERO;
 
-            function canBeNegZero () {
+            const canBeNegZero = function () {
                 // -0 / POS = -0
                 if ((leftType & InputType.NUMBER_NEG_ZERO) && (rightType & InputType.NUMBER_POS)) return true;
                 // 0 / NEG = -0
@@ -444,7 +454,7 @@ class IROptimizer {
                 if ((leftType & InputType.NUMBER_POS) && (rightType & InputType.NUMBER_NEG_INF)) return true;
                 // NUMBER_NEG / Infinity = -0
                 if ((leftType & InputType.NUMBER_NEG) && (rightType & InputType.NUMBER_POS_INF)) return true;
-            }
+            };
             if (canBeNegZero()) resultType |= InputType.NUMBER_NEG_ZERO;
 
             return resultType;
@@ -472,7 +482,7 @@ class IROptimizer {
         case InputOpcode.ADDON_CALL:
             modified = state.clear() || modified;
             break;
-        case InputOpcode.PROCEDURE_CALL:
+        case InputOpcode.PROCEDURE_CALL: {
             modified = this.analyzeInputs(inputs.inputs, state) || modified;
             const script = this.ir.procedures[inputs.variant];
 
@@ -482,6 +492,7 @@ class IROptimizer {
                 modified = state.after(script.cachedAnalysisEndState) || modified;
             }
             break;
+        }
         }
 
         return modified;
@@ -556,8 +567,6 @@ class IROptimizer {
             break;
         }
         }
-
-        // if (stackBlock.ignoreState) return false;
 
         return modified;
     }

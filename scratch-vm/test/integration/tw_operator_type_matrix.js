@@ -179,12 +179,13 @@ test('operator type matrix', async t => {
 
         t.ok(
             irOperator.isSometimesType(expectedType),
-            `${operator.opcode}${JSON.stringify(operator.fields)}[${inputs.map(str)}] outputted value ${str(reportedValue)} is of the expected type ${irOperator.type}.`
+            `${operator.opcode}${JSON.stringify(operator.fields)}[${inputs.map(str)}] ` +
+            `outputted value ${str(reportedValue)} is of the expected type ${irOperator.type}.`
         );
     };
 
     for (const operator of OPERATORS) {
-        if (operator.inputNames.length == 2) {
+        if (operator.inputNames.length === 2) {
             for (const left of VALUES) {
                 for (const right of VALUES) {
                     await testOperator(operator, [left, right]);

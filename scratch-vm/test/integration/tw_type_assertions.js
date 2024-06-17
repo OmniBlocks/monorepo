@@ -78,20 +78,24 @@ test('type assertions', async t => {
 
     const thread = vm.runtime.startHats('event_whenflagclicked')[0];
 
-    function* enumerateAssertions (blocks, region) {
+    const enumerateAssertions = function* (blocks, region) {
         for (const block of blocks) {
             if (block.opcode === StackOpcode.COMPATIBILITY_LAYER) {
                 switch (block.inputs.opcode) {
                 case 'typeassert_assert':
                     yield {block, region};
                     break;
-                case 'typeassert_region':
+                case 'typeassert_region': {
                     const newRegionNameInput = block.inputs.inputs.NAME;
                     if (newRegionNameInput.opcode !== InputOpcode.CONSTANT) {
                         throw new Error('Region block inputs must be a constant.');
                     }
-                    yield* enumerateAssertions(block.inputs.substacks["1"].blocks, (region ? `${region}, ` : '') + newRegionNameInput.inputs.value);
+                    yield* enumerateAssertions(
+                        block.inputs.substacks['1'].blocks,
+                        (region ? `${region}, ` : '') + newRegionNameInput.inputs.value
+                    );
                     break;
+                }
                 }
             } else {
                 for (const inputName in block.inputs) {
@@ -102,15 +106,12 @@ test('type assertions', async t => {
                 }
             }
         }
-    }
+    };
 
     const irGenerator = new IRGenerator(thread);
     const ir = irGenerator.generate();
 
-    runTests('run tests with yields', false);
-    runTests('run tests without yields', true);
-
-    function runTests (proccode, ignoreYields) {
+    const runTests = function (proccode, ignoreYields) {
 
         const assertions = [...enumerateAssertions(ir.getProcedure(proccode).stack.blocks)];
 
@@ -156,8 +157,9 @@ test('type assertions', async t => {
 
             let message;
 
-            if (valueInput.opcode == InputOpcode.VAR_GET) {
-                message = `(${region}) assert variable '${valueInput.inputs.variable.name}' (type ${valueInput.type}) is ${adverb} ${noun}`;
+            if (valueInput.opcode === InputOpcode.VAR_GET) {
+                message = `(${region}) assert variable '${valueInput.inputs.variable.name}' ` +
+                `(type ${valueInput.type}) is ${adverb} ${noun}`;
             } else {
                 message = `(${region}) assert ${valueInput.opcode} (type ${valueInput.type}) is ${adverb} ${noun}`;
             }
@@ -178,7 +180,10 @@ test('type assertions', async t => {
             default: throw new Error(`$Invalid adverb menu option ${adverb}`);
             }
         }
-    }
+    };
+
+    runTests('run tests with yields', false);
+    runTests('run tests without yields', true);
 
     t.end();
 });

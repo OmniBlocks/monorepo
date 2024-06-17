@@ -6,7 +6,17 @@ const VariablePool = require('./variable-pool');
 const jsexecute = require('./jsexecute');
 const environment = require('./environment');
 const {StackOpcode, InputOpcode, InputType} = require('./enums.js');
-const {IntermediateStackBlock, IntermediateInput, IntermediateStack, IntermediateScript, IntermediateRepresentation} = require('./intermediate');
+
+// These imports are used by jsdoc comments but eslint doesn't know that
+/* eslint-disable no-unused-vars */
+const {
+    IntermediateStackBlock,
+    IntermediateInput,
+    IntermediateStack,
+    IntermediateScript,
+    IntermediateRepresentation
+} = require('./intermediate');
+/* eslint-enable no-unused-vars */
 
 /**
  * @fileoverview Convert intermediate representations to JavaScript functions.
@@ -559,7 +569,7 @@ class JSGenerator {
             this.retire();
             this.source += '}\n';
             break;
-        case StackOpcode.CONTROL_FOR:
+        case StackOpcode.CONTROL_FOR: {
             const index = this.localVariables.next();
             this.source += `var ${index} = 0; `;
             this.source += `while (${index} < ${this.descendInput(node.count)}) { `;
@@ -569,6 +579,7 @@ class JSGenerator {
             this.yieldLoop();
             this.source += '}\n';
             break;
+        }
         case StackOpcode.CONTROL_IF_ELSE:
             this.source += `if (${this.descendInput(node.condition)}) {\n`;
             this.descendStack(node.whenTrue, new Frame(false));
@@ -697,7 +708,7 @@ class JSGenerator {
             this.source += 'target.clearEffects();\n';
             break;
         case StackOpcode.LOOKS_EFFECT_CHANGE:
-            if (this.target.effects.hasOwnProperty(node.effect)) {
+            if (Object.prototype.hasOwnProperty.call(this.target.effects, node.effect)) {
                 this.source += `target.setEffect("${sanitize(node.effect)}", runtime.ext_scratch3_looks.clampEffect("${sanitize(node.effect)}", ${this.descendInput(node.value)} + target.effects["${sanitize(node.effect)}"]));\n`;
             }
             break;
@@ -730,7 +741,7 @@ class JSGenerator {
             this.source += 'target.setCostume(target.currentCostume + 1);\n';
             break;
         case StackOpcode.LOOKS_EFFECT_SET:
-            if (this.target.effects.hasOwnProperty(node.effect)) {
+            if (Object.prototype.hasOwnProperty.call(this.target.effects, node.effect)) {
                 this.source += `target.setEffect("${sanitize(node.effect)}", runtime.ext_scratch3_looks.clampEffect("${sanitize(node.effect)}", ${this.descendInput(node.value)}));\n`;
             }
             break;
@@ -965,7 +976,7 @@ class JSGenerator {
      * @returns {string}
      */
     evaluateOnce (source) {
-        if (this._setupVariables.hasOwnProperty(source)) {
+        if (Object.prototype.hasOwnProperty.call(this._setupVariables, source)) {
             return this._setupVariables[source];
         }
         const variable = this._setupVariablesPool.next();

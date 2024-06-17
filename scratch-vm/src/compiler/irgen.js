@@ -5,13 +5,21 @@ const StringUtil = require('../util/string-util');
 const BlockType = require('../extension-support/block-type');
 const Variable = require('../engine/variable');
 const log = require('../util/log');
-const {IntermediateStackBlock, IntermediateInput, IntermediateStack, IntermediateScript, IntermediateRepresentation} = require('./intermediate');
 const compatBlocks = require('./compat-blocks');
 const {StackOpcode, InputOpcode, InputType} = require('./enums.js');
+const {
+    IntermediateStackBlock,
+    IntermediateInput,
+    IntermediateStack,
+    IntermediateScript,
+    IntermediateRepresentation
+} = require('./intermediate');
 
 /**
  * @fileoverview Generate intermediate representations from Scratch blocks.
  */
+
+/* eslint-disable max-len */
 
 const SCALAR_TYPE = '';
 const LIST_TYPE = 'list';
@@ -138,7 +146,7 @@ class ScriptTreeGenerator {
     }
 
     createConstantInput (constant, preserveStrings = false) {
-        if (constant == null) throw new Error('IR: Constant cannot have a null value.');
+        if (constant === null) throw new Error('IR: Constant cannot have a null value.');
 
         constant += '';
         const numConstant = +constant;
@@ -358,7 +366,7 @@ class ScriptTreeGenerator {
             case 'log': return new IntermediateInput(InputOpcode.OP_LOG_10, InputType.NUMBER_OR_NAN, {value});
             case 'e ^': return new IntermediateInput(InputOpcode.OP_POW_E, InputType.NUMBER, {value});
             case '10 ^': return new IntermediateInput(InputOpcode.OP_POW_10, InputType.NUMBER, {value});
-            default: this.createConstantInput(0);
+            default: return this.createConstantInput(0);
             }
         }
         case 'operator_mod':
@@ -490,7 +498,7 @@ class ScriptTreeGenerator {
             return new IntermediateInput(InputOpcode.SENSING_MOUSE_X, InputType.NUMBER);
         case 'sensing_mousey':
             return new IntermediateInput(InputOpcode.SENSING_MOUSE_Y, InputType.NUMBER);
-        case 'sensing_of':
+        case 'sensing_of': {
             const property = block.fields.PROPERTY.value;
             const object = this.descendInputOfBlock(block, 'OBJECT').toType(InputType.STRING);
 
@@ -528,6 +536,7 @@ class ScriptTreeGenerator {
             }
 
             return new IntermediateInput(InputOpcode.SENSING_OF_VAR, InputType.ANY, {object, property});
+        }
         case 'sensing_timer':
             this.usesTimer = true;
             return new IntermediateInput(InputOpcode.SENSING_TIMER_GET, InputType.NUMBER_POS_REAL | InputType.NUMBER_ZERO);
@@ -1111,7 +1120,7 @@ class ScriptTreeGenerator {
         const variable = block.fields[fieldName];
         const id = variable.id;
 
-        if (this.variableCache.hasOwnProperty(id)) {
+        if (Object.prototype.hasOwnProperty.call(this.variableCache, id)) {
             return this.variableCache[id];
         }
 
@@ -1132,20 +1141,20 @@ class ScriptTreeGenerator {
         const stage = this.stage;
 
         // Look for by ID in target...
-        if (target.variables.hasOwnProperty(id)) {
+        if (Object.prototype.hasOwnProperty.call(target.variables, id)) {
             return createVariableData('target', target.variables[id]);
         }
 
         // Look for by ID in stage...
         if (!target.isStage) {
-            if (stage && stage.variables.hasOwnProperty(id)) {
+            if (stage && Object.prototype.hasOwnProperty.call(stage.variables, id)) {
                 return createVariableData('stage', stage.variables[id]);
             }
         }
 
         // Look for by name and type in target...
         for (const varId in target.variables) {
-            if (target.variables.hasOwnProperty(varId)) {
+            if (Object.prototype.hasOwnProperty.call(target.variables, varId)) {
                 const currVar = target.variables[varId];
                 if (currVar.name === name && currVar.type === type) {
                     return createVariableData('target', currVar);
@@ -1156,7 +1165,7 @@ class ScriptTreeGenerator {
         // Look for by name and type in stage...
         if (!target.isStage && stage) {
             for (const varId in stage.variables) {
-                if (stage.variables.hasOwnProperty(varId)) {
+                if (Object.prototype.hasOwnProperty.call(stage.variables, varId)) {
                     const currVar = stage.variables[varId];
                     if (currVar.name === name && currVar.type === type) {
                         return createVariableData('stage', currVar);
@@ -1174,7 +1183,7 @@ class ScriptTreeGenerator {
             // This is necessary because the script cache is shared between clones.
             // sprite.clones has all instances of this sprite including the original and all clones
             for (const clone of target.sprite.clones) {
-                if (!clone.variables.hasOwnProperty(id)) {
+                if (!Object.prototype.hasOwnProperty.call(clone.variables, id)) {
                     clone.variables[id] = new Variable(id, name, type, false);
                 }
             }
@@ -1395,7 +1404,7 @@ class IRGenerator {
 
     addProcedureDependencies (dependencies) {
         for (const procedureVariant of dependencies) {
-            if (this.procedures.hasOwnProperty(procedureVariant)) {
+            if (Object.prototype.hasOwnProperty.call(this.procedures, procedureVariant)) {
                 continue;
             }
             if (this.compilingProcedures.has(procedureVariant)) {

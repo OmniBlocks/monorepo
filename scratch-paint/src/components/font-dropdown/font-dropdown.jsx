@@ -93,10 +93,10 @@ const ModeToolsComponent = props => (
                 <Button
                     className={classNames(styles.modMenuItem)}
                     onClick={props.onChoose}
-                    onMouseOver={props.onHoverScratch}
+                    onMouseOver={props.onHoverMopedLike}
                 >
                     <DisplayFont
-                        font={Fonts.SCRATCH}
+                        font={Fonts.MOPED_LIKE}
                         getFontName={props.getFontName}
                     />
                 </Button>
@@ -191,7 +191,7 @@ ModeToolsComponent.propTypes = {
     onHoverKorean: PropTypes.func,
     onHoverMarker: PropTypes.func,
     onHoverPixel: PropTypes.func,
-    onHoverScratch: PropTypes.func,
+    onHoverMopedLike: PropTypes.func,
     onHoverSansSerif: PropTypes.func,
     onHoverSerif: PropTypes.func,
     onOpenDropdown: PropTypes.func

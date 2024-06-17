@@ -22,7 +22,7 @@ class FontDropdown extends React.Component {
             'handleChangeFontMarker',
             'handleChangeFontCurly',
             'handleChangeFontPixel',
-            'handleChangeFontScratch',
+            'handleChangeFontMopedLike',
             'handleChangeFontChinese',
             'handleChangeFontJapanese',
             'handleChangeFontKorean',
@@ -42,6 +42,8 @@ class FontDropdown extends React.Component {
                 return '한국어';
             case Fonts.JAPANESE:
                 return '日本語';
+            case Fonts.MOPED_LIKE:
+                return 'Mopeds';
             default:
                 return font;
             }
@@ -92,9 +94,9 @@ class FontDropdown extends React.Component {
             this.props.changeFont(Fonts.PIXEL);
         }
     }
-    handleChangeFontScratch () {
+    handleChangeFontMopedLike () {
         if (this.dropDown.isOpen()) {
-            this.props.changeFont(Fonts.SCRATCH);
+            this.props.changeFont(Fonts.MOPED_LIKE);
         }
     }
     handleChangeFontChinese () {
@@ -161,7 +163,7 @@ class FontDropdown extends React.Component {
                 onHoverKorean={this.handleChangeFontKorean}
                 onHoverMarker={this.handleChangeFontMarker}
                 onHoverPixel={this.handleChangeFontPixel}
-                onHoverScratch={this.handleChangeFontScratch}
+                onHoverMopedLike={this.handleChangeFontMopedLike}
                 onHoverSansSerif={this.handleChangeFontSansSerif}
                 onHoverSerif={this.handleChangeFontSerif}
                 onOpenDropdown={this.handleOpenDropdown}

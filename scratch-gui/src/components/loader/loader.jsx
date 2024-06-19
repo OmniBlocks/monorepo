@@ -154,7 +154,7 @@ class LoaderComponent extends React.Component {
                             lang="en"
                         >
                             <b>{'Pride Month Fun Fact:'}</b>{' '}
-                            {'Sophie Wilson is a transgender computer scientist who co-designed the ARM instruction set used by many phones and computers.'}
+                            {'Audrey Tang is a transgender free software developer and Taiwan\'s first Minister of Digital Affairs.'}
                         </div>
                     )}
                 </div>

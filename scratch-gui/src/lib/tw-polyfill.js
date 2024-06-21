@@ -31,6 +31,12 @@ if (!Array.prototype.flat) {
     };
 }
 
+if (!Array.prototype.flatMap) {
+    Array.prototype.flatMap = function (...args) {
+        return this.map(...args).flat();
+    };
+}
+
 if (typeof queueMicrotask !== 'function') {
     window.queueMicrotask = callback => {
         Promise.resolve().then(callback);

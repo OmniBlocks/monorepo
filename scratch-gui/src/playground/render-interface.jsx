@@ -51,13 +51,6 @@ if (window.parent !== window) {
     throw new Error('Invalid embed');
 }
 
-let announcement = null;
-if (process.env.ANNOUNCEMENT) {
-    announcement = document.createElement('p');
-    // This is safe because process.env.ANNOUNCEMENT is set at build time.
-    announcement.innerHTML = process.env.ANNOUNCEMENT;
-}
-
 const handleClickAddonSettings = addonId => {
     // addonId might be a string of the addon to focus on, undefined, or an event (treat like undefined)
     const path = process.env.ROUTING_STYLE === 'wildcard' ? 'addons' : 'addons.html';
@@ -260,7 +253,6 @@ class Interface extends React.Component {
                         width: `${Math.max(480, props.customStageSize.width) + 2}px`
                     }) : null}
                 >
-                    {isHomepage && announcement ? <DOMElementRenderer domElement={announcement} /> : null}
                     <GUI
                         onClickAddonSettings={handleClickAddonSettings}
                         onUpdateProjectTitle={this.handleUpdateProjectTitle}

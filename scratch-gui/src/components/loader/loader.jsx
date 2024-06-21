@@ -154,7 +154,8 @@ class LoaderComponent extends React.Component {
                             lang="en"
                         >
                             <b>{'Pride Month Fun Fact:'}</b>{' '}
-                            {'Audrey Tang is a transgender free software developer and was Taiwan\'s first Minister of Digital Affairs.'}
+                            {/* eslint-disable-next-line max-len */}
+                            {'Celeste is a game about Madeline, a transgender woman trying to climb a mountain to challenge her anxiety 🍓'}
                         </div>
                     )}
                 </div>

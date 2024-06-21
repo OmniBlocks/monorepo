@@ -251,7 +251,7 @@
         "confirmResetAll": "정말로 애드온 설정을 기본값으로 초기화하시겠습니까?",
         "credits": "도움을 준 사람들 :",
         "dirty": "설정을 적용하려면 탭을 새로고침해야 합니다.",
-        "dirtyButton": "즉시 재시작",
+        "dirtyButton": "지금 재시작하기",
         "enableDangerous": "이 애드온은 위험하며 의도적으로 몇몇 기능을 비활성화할 수도 있습니다. 대부분의 사용자들은 이 애드온을 활성화 해서는 안됩니다. 정말로 활성화 하시겠습니까?",
         "export": "설정 내보내기",
         "groupDanger": "위험한 기능 ({number})",
@@ -501,7 +501,7 @@
     "sv": {
         "addonFeedback": "Tilläggsrespons",
         "confirmResetAll": "Är du säker på att du vill återställa alla tilläggsinställningar till standardvärdena?",
-        "credits": "kreditera:",
+        "credits": "Krediter:",
         "dirty": "Ladda om flikarna för att tillämpa ändringar",
         "dirtyButton": "Ladda om nu",
         "enableDangerous": "Detta tillägget är farligt och kommer att STÄNGA AV funktioner. De flesta användarna ska INTE aktivera detta tillägg. Är du säker att aktivera det?",

@@ -41,15 +41,12 @@ import {isBrowserSupported} from '../lib/tw-environment-support-prober';
 import AddonChannels from '../addons/channels';
 import {loadServiceWorker} from './load-service-worker';
 import runAddons from '../addons/entry';
+import InvalidEmbed from '../components/tw-invalid-embed/invalid-embed.jsx';
 import {APP_NAME} from '../lib/brand.js';
 
 import styles from './interface.css';
 
-if (window.parent !== window) {
-    // eslint-disable-next-line no-alert
-    alert(`This page contains an invalid ${APP_NAME} embed. Please read https://docs.turbowarp.org/embedding for instructions to create a working embed.`);
-    throw new Error('Invalid embed');
-}
+const isInvalidEmbed = window.parent !== window;
 
 const handleClickAddonSettings = addonId => {
     // addonId might be a string of the addon to focus on, undefined, or an event (treat like undefined)
@@ -213,6 +210,10 @@ class Interface extends React.Component {
         }
     }
     render () {
+        if (isInvalidEmbed) {
+            return <InvalidEmbed />;
+        }
+
         const {
             /* eslint-disable no-unused-vars */
             intl,

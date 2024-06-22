@@ -115,9 +115,20 @@ const getEditorMode = () => {
     return 'editor';
 };
 
-const language = reduxInstance.state.locales.locale.split('-')[0];
+/**
+ * @returns {string} Locale code
+ */
+const getLocale = () => {
+    const locale = reduxInstance.state.locales.locale;
+    if (Object.prototype.hasOwnProperty.call(l10nEntries, locale)) {
+        return locale;
+    }
+    return locale.split('-')[0];
+};
+const language = getLocale();
+
 const getTranslations = async () => {
-    if (l10nEntries[language]) {
+    if (Object.prototype.hasOwnProperty.call(l10nEntries, language)) {
         const localeMessages = await l10nEntries[language]();
         Object.assign(addonMessages, localeMessages);
     }

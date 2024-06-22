@@ -235,6 +235,7 @@ class Interface extends React.Component {
                     [styles.playerOnly]: isHomepage,
                     [styles.editor]: isEditor
                 })}
+                dir={isRtl ? 'rtl' : 'ltr'}
             >
                 {isHomepage ? (
                     <div className={styles.menu}>

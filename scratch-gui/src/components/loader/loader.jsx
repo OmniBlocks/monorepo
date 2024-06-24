@@ -155,7 +155,7 @@ class LoaderComponent extends React.Component {
                         >
                             <b>{'Pride Month Fun Fact:'}</b>{' '}
                             {/* eslint-disable-next-line max-len */}
-                            {'Celeste is a game about Madeline, a transgender woman trying to climb a mountain to challenge her anxiety 🍓'}
+                            {'Significant parts of TurboWarp were created by transgender people.'}
                         </div>
                     )}
                 </div>

@@ -17,8 +17,6 @@ class TypeState {
     constructor () {
         /** @type {Object.<string, InputType | 0>}*/
         this.variables = {};
-        /** @type {InputType | 0} */
-        this.defaultType = 0;
     }
 
     /**
@@ -33,7 +31,6 @@ class TypeState {
             }
         }
         this.variables = {};
-        this.defaultType = InputType.ANY;
         return modified;
     }
 
@@ -46,7 +43,6 @@ class TypeState {
         for (const varId in this.variables) {
             clone.variables[varId] = this.variables[varId];
         }
-        clone.defaultType = this.defaultType;
         return clone;
     }
 
@@ -84,8 +80,8 @@ class TypeState {
      */
     or (other) {
         return this.mutate(other, varId => {
-            const thisType = this.variables[varId] ?? this.defaultType;
-            const otherType = other.variables[varId] ?? other.defaultType;
+            const thisType = this.variables[varId] ?? InputType.ANY;
+            const otherType = other.variables[varId] ?? InputType.ANY;
             return thisType | otherType;
         });
     }
@@ -96,9 +92,9 @@ class TypeState {
      */
     after (other) {
         return this.mutate(other, varId => {
-            const otherType = other.variables[varId] ?? other.defaultType;
+            const otherType = other.variables[varId];
             if (otherType !== 0) return otherType;
-            return this.variables[varId] ?? this.defaultType;
+            return this.variables[varId] ?? InputType.ANY;
         });
     }
 
@@ -108,7 +104,7 @@ class TypeState {
      * @returns {boolean}
      */
     setVariableType (variable, type) {
-        if (this.getVariableType(variable) === type) return false;
+        if (this.variables[variable.id] === type) return false;
         this.variables[variable.id] = type;
         return true;
     }
@@ -119,7 +115,7 @@ class TypeState {
      * @returns {InputType}
      */
     getVariableType (variable) {
-        return this.variables[variable.id] ?? (this.defaultType === 0 ? InputType.ANY : this.defaultType);
+        return this.variables[variable.id] ?? InputType.ANY;
     }
 }
 
@@ -528,7 +524,7 @@ class IROptimizer {
             state = state.clone();
         }
 
-        modified = modified || this.analyzeInputs(inputs, state);
+        modified = this.analyzeInputs(inputs, state) || modified;
 
         switch (stackBlock.opcode) {
         case StackOpcode.VAR_SET:

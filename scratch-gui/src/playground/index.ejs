@@ -73,10 +73,6 @@
       .splash-reset:disabled {
         opacity: 0.8;
       }
-
-      .splash-pride-month {
-        max-width: 350px;
-      }
     </style>
   </head>
   <body>
@@ -91,11 +87,6 @@
 
     <div class="splash-screen spash-waiting-for-js" hidden>
       <div class="splash-spinner"></div>
-
-      <div class="splash-pride-month" lang="en">
-        <b>Pride Month Fun Fact:</b>
-        Significant parts of TurboWarp were created by transgender people.
-      </div>
 
       <div class="splash-error-title" hidden>Something went wrong. <a href="https://scratch.mit.edu/users/GarboMuffin/#comments" target="_blank" rel="noreferrer">Please report</a> with the information below.</div>
       <div class="splash-errors" hidden></div>
@@ -153,13 +144,11 @@
         var splashErrorTitle = document.querySelector('.splash-error-title');
         var splashError = document.querySelector('.splash-errors');
         var splashReset = document.querySelector('.splash-reset');
-        var splashPrideMonth = document.querySelector('.splash-pride-month');
 
         var totalErrors = 0;
         window.onerror = function (event, source, line, col, err) {
           if (++totalErrors > 5) return; // dont bother logging more
           splashErrorTitle.hidden = splashError.hidden = splashReset.hidden = false;
-          splashPrideMonth.hidden = true;
           var el = document.createElement('div');
           el.textContent = 'Error (splash) in ' + source + ' (' + line + ':' + col + '): ' + err;
           splashError.appendChild(el);

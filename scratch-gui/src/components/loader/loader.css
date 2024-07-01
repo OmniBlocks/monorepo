@@ -28,7 +28,7 @@
 .block-animation {
     width: 125px;
     height: 150px;
-    margin: 10px auto 0px;
+    margin: 50px auto 0px;
 }
 
 .block-animation img {
@@ -189,9 +189,4 @@
     width: 0;
     height: 100%;
     background-color: $ui-white-default;
-}
-
-.pride-month {
-    max-width: 350px;
-    margin-top: 0.75rem;
 }

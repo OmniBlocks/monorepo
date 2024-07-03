@@ -154,6 +154,9 @@ class IntermediateInput {
         case InputType.STRING:
             castOpcode = InputOpcode.CAST_STRING;
             break;
+        case InputType.COLOR:
+            castOpcode = InputOpcode.CAST_COLOR;
+            break;
         default:
             log.warn(`Cannot cast to type: ${targetType}`, this);
             throw new Error(`Cannot cast to type: ${targetType}`);
@@ -175,7 +178,7 @@ class IntermediateInput {
                     this.type = InputType.NUMBER;
                     this.inputs.value = +Cast.toBoolean(this.inputs.value);
                 }
-                let numberValue = +this.inputs.value;
+                const numberValue = +this.inputs.value;
                 if (numberValue) {
                     this.inputs.value = numberValue;
                 } else /* numberValue is one of 0, -0, or NaN */ if (Object.is(numberValue, -0)) {
@@ -185,7 +188,7 @@ class IntermediateInput {
                 }
                 if (castOpcode === InputOpcode.CAST_NUMBER_INDEX) {
                     // Round numberValue to an integer
-                    numberValue |= 0;
+                    this.inputs.value |= 0;
                 }
                 this.type = IntermediateInput.getNumberInputType(this.inputs.value);
                 break;
@@ -193,6 +196,10 @@ class IntermediateInput {
             case InputOpcode.CAST_STRING:
                 this.inputs.value += '';
                 this.type = InputType.STRING;
+                break;
+            case InputOpcode.CAST_COLOR:
+                this.inputs.value = Cast.toRgbColorList(this.inputs.value);
+                this.type = InputType.COLOR;
                 break;
             }
             return this;

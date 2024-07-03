@@ -193,6 +193,8 @@ class JSGenerator {
             return `(${this.descendInput(node.target.toType(InputType.NUMBER_OR_NAN))} | 0)`;
         case InputOpcode.CAST_STRING:
             return `("" + ${this.descendInput(node.target)})`;
+        case InputOpcode.CAST_COLOR:
+            return `colorToList(${this.descendInput(node.target)})`;
 
         case InputOpcode.COMPATIBILITY_LAYER:
             // Compatibility layer inputs never use flags.
@@ -206,6 +208,15 @@ class JSGenerator {
             } else if (block.isAlwaysType(InputType.BOOLEAN)) {
                 if (typeof node.value !== 'boolean') throw new Error(`JS: '${block.type}' type constant had ${typeof node.value} type value. Expected boolean.`);
                 return node.value.toString();
+            } else if (block.isAlwaysType(InputType.COLOR)) {
+                if (!Array.isArray(node.value)) throw new Error(`JS: '${block.type}' type constant was not an array.`);
+                if (node.value.length !== 3) throw new Error(`JS: '${block.type}' type constant had an array of length '${node.value.length}'. Expected 3.`);
+                for (let i = 0; i < 3; i++) {
+                    if (typeof node.value[i] !== 'number') {
+                        throw new Error(`JS: '${block.type}' type constant element ${i} had a value of type '${node.value[i]}'. Expected number.`);
+                    }
+                }
+                return `[${node.value[0]},${node.value[1]},${node.value[2]}]`;
             } else if (block.isSometimesType(InputType.STRING)) {
                 return `"${sanitize(node.value.toString())}"`;
             } throw new Error(`JS: Unknown constant input type '${block.type}'.`);
@@ -412,7 +423,7 @@ class JSGenerator {
         case InputOpcode.SENSING_ANSWER:
             return `runtime.ext_scratch3_sensing._answer`;
         case InputOpcode.SENSING_COLOR_TOUCHING_COLOR:
-            return `target.colorIsTouchingColor(colorToList(${this.descendInput(node.target)}), colorToList(${this.descendInput(node.mask)}))`;
+            return `target.colorIsTouchingColor(${this.descendInput(node.target)}, ${this.descendInput(node.mask)})`;
         case InputOpcode.SENSING_TIME_DATE:
             return `(new Date().getDate())`;
         case InputOpcode.SENSING_TIME_WEEKDAY:
@@ -464,7 +475,7 @@ class JSGenerator {
         case InputOpcode.SENSING_TOUCHING_OBJECT:
             return `target.isTouchingObject(${this.descendInput(node.object)})`;
         case InputOpcode.SENSING_TOUCHING_COLOR:
-            return `target.isTouchingColor(colorToList(${this.descendInput(node.color)}))`;
+            return `target.isTouchingColor(${this.descendInput(node.color)})`;
         case InputOpcode.SENSING_USERNAME:
             return 'runtime.ioDevices.userData.getUsername()';
         case InputOpcode.SENSING_TIME_YEAR:

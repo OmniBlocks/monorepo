@@ -84,8 +84,11 @@ const InputType = {
     /** Any input that can be interperated as a boolean. Equal to BOOLEAN | STRING_BOOLEAN */
     BOOLEAN_INTERPRETABLE: 0x1800,
 
-    /** Any type. Equal to NUMBER_OR_NAN | STRING | BOOLEAN */
-    ANY: 0x1FFF
+    /** Any value type (a type a scratch variable can hold). Equal to NUMBER_OR_NAN | STRING | BOOLEAN */
+    ANY: 0x1FFF,
+
+    /** An array of values in the form [R, G, B] */
+    COLOR: 0x2000
 };
 
 /**
@@ -195,6 +198,7 @@ const InputOpcode = {
     CAST_NUMBER_OR_NAN: 'cast.toNumberOrNaN',
     CAST_STRING: 'cast.toString',
     CAST_BOOLEAN: 'cast.toBoolean',
+    CAST_COLOR: 'cast.toColor',
 
     COMPATIBILITY_LAYER: 'compat',
 

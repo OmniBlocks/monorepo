@@ -468,8 +468,8 @@ class ScriptTreeGenerator {
 
         case 'sensing_coloristouchingcolor':
             return new IntermediateInput(InputOpcode.SENSING_COLOR_TOUCHING_COLOR, InputType.BOOLEAN, {
-                target: this.descendInputOfBlock(block, 'COLOR2'),
-                mask: this.descendInputOfBlock(block, 'COLOR')
+                target: this.descendInputOfBlock(block, 'COLOR2').toType(InputType.COLOR),
+                mask: this.descendInputOfBlock(block, 'COLOR').toType(InputType.COLOR)
             });
         case 'sensing_current':
             switch (block.fields.CURRENTMENU.value.toLowerCase()) {
@@ -542,7 +542,7 @@ class ScriptTreeGenerator {
             return new IntermediateInput(InputOpcode.SENSING_TIMER_GET, InputType.NUMBER_POS_REAL | InputType.NUMBER_ZERO);
         case 'sensing_touchingcolor':
             return new IntermediateInput(InputOpcode.SENSING_TOUCHING_COLOR, InputType.BOOLEAN, {
-                color: this.descendInputOfBlock(block, 'COLOR').toType(InputType.NUMBER)
+                color: this.descendInputOfBlock(block, 'COLOR').toType(InputType.COLOR)
             });
         case 'sensing_touchingobject':
             return new IntermediateInput(InputOpcode.SENSING_TOUCHING_OBJECT, InputType.BOOLEAN, {

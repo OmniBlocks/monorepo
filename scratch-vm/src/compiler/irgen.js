@@ -582,7 +582,7 @@ class ScriptTreeGenerator {
             const inputs = Object.keys(block.inputs);
             const fields = Object.keys(block.fields);
             if (inputs.length === 0 && fields.length === 1) {
-                return this.createConstantInput(block.fields[fields[0]].value);
+                return this.createConstantInput(block.fields[fields[0]].value, preserveStrings);
             }
 
             log.warn(`IR: Unknown input: ${block.opcode}`, block);

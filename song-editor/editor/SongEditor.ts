@@ -3860,7 +3860,7 @@ export class SongEditor {
                     this.refocusStage();
                 } else if (canPlayNotes) break;
                 if (needControlForShortcuts == (event.ctrlKey || event.metaKey) && event.shiftKey) {
-                    location.href = "player/index.html#song=" + this._doc.song.toBase64String();
+                    location.href = "player/" + (OFFLINE ? "index.html" : "") + "#song=" + this._doc.song.toBase64String();
                     event.preventDefault();
                 }
                 break;
@@ -5009,7 +5009,7 @@ export class SongEditor {
                 this._openPrompt("configureShortener");
                 break;
             case "viewPlayer":
-                location.href = "player/index.html#song=" + this._doc.song.toBase64String();
+                location.href = "player/" + (OFFLINE ? "index.html" : "") + "#song=" + this._doc.song.toBase64String();
                 break;
             case "copyEmbed":
                 this._copyTextToClipboard(`<iframe width="384" height="60" style="border: none;" src="${new URL("player/#song=" + this._doc.song.toBase64String(), location.href).href}"></iframe>`);

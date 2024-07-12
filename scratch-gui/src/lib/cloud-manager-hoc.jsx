@@ -116,7 +116,7 @@ const cloudManagerHOC = function (WrappedComponent) {
                 this.props.vm,
                 this.props.username,
                 this.props.projectId);
-            this.cloudProvider.onInvalidUsername = this.onInvalidUsername;
+            this.cloudProvider.onInvalidUsername = this.props.onInvalidUsername;
             this.props.vm.setCloudProvider(this.cloudProvider);
         }
         disconnectFromCloud () {

@@ -696,9 +696,11 @@ function onKeyPressed(event: KeyboardEvent): void {
 			break;
 		case 69: // e
 		case 80: // p
-			hashUpdatedExternally();
-			location.href = "../index.html#" + synth.song!.toBase64String();
-			event.preventDefault();
+			if (event.shiftKey) {
+				hashUpdatedExternally();
+				location.href = "../index.html#" + synth.song!.toBase64String();
+				event.preventDefault();
+			}
 			break;
 		case 90: // z
 		case 187: // +
@@ -715,9 +717,7 @@ function onKeyPressed(event: KeyboardEvent): void {
 			if (event.ctrlKey) {
 				shortenUrl();
 				event.preventDefault();
-			} else {
-				onShareClicked();
-			}
+			} 
 			break;
 		case 67: // c
 			onCopyClicked();

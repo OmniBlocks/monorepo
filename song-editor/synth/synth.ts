@@ -1458,8 +1458,12 @@ export class EnvelopeSettings {
     public target: number = 0;
     public index: number = 0;
     public envelope: number = 0;
+    //slarmoo's box
+    public pitchEnvelopeStart: number;
+    public pitchEnvelopeEnd: number;
+    public inverse: boolean;
 
-    constructor() {
+    constructor(public isNoiseEnvelope: boolean) {
         this.reset();
     }
 
@@ -1467,12 +1471,19 @@ export class EnvelopeSettings {
         this.target = 0;
         this.index = 0;
         this.envelope = 0;
+        this.pitchEnvelopeStart = 0;
+        this.pitchEnvelopeEnd = this.isNoiseEnvelope ? Config.drumCount-1 : Config.maxPitch;
+        this.inverse = false;
+        this.isNoiseEnvelope = false;
     }
 
     public toJsonObject(): Object {
         const envelopeObject: any = {
             "target": Config.instrumentAutomationTargets[this.target].name,
             "envelope": Config.envelopes[this.envelope].name,
+            "pitchEnvelopeStart": this.pitchEnvelopeStart,
+            "pitchEnvelopeEnd": this.pitchEnvelopeEnd,
+            "inverse": this.inverse,
         };
         if (Config.instrumentAutomationTargets[this.target].maxCount > 1) {
             envelopeObject["index"] = this.index;
@@ -1496,8 +1507,24 @@ export class EnvelopeSettings {
         } else {
             this.index = 0;
         }
+
+        if (envelopeObject["pitchEnvelopeStart"] != undefined) {
+            this.pitchEnvelopeStart = clamp(0, this.isNoiseEnvelope ? Config.drumCount : Config.maxPitch + 1, envelopeObject["pitchEnvelopeStart"]);
+        } else {
+            this.pitchEnvelopeStart = 0;
+        }
+
+        if (envelopeObject["pitchEnvelopeEnd"] != undefined) {
+            this.pitchEnvelopeEnd = clamp(0, this.isNoiseEnvelope ? Config.drumCount : Config.maxPitch + 1, envelopeObject["pitchEnvelopeEnd"]);
+        } else {
+            this.pitchEnvelopeEnd = 0;
+        }
+
+        this.inverse = Boolean(envelopeObject["inverse"]);
     }
 }
+
+
 
 // Settings that were available to old versions of BeepBox but are no longer available in the
 // current version that need to be reinterpreted as a group to determine the best way to
@@ -1550,10 +1577,6 @@ export class Instrument {
     public fadeIn: number = 0;
     public fadeOut: number = Config.fadeOutNeutral;
     public envelopeCount: number = 0;
-    //for pitch envelope start notes and end notes
-    public pitchEnvelopeStart: number[] = [];
-    public pitchEnvelopeEnd: number[] = [];
-    public envelopeInverse: boolean[] = [];
     public transition: number = Config.transitions.dictionary["normal"].index;
     public pitchShift: number = 0;
     public detune: number = 0;
@@ -1726,9 +1749,6 @@ export class Instrument {
         this.fadeOut = Config.fadeOutNeutral;
         this.transition = Config.transitions.dictionary["normal"].index;
         this.envelopeCount = 0;
-        this.pitchEnvelopeStart = [];
-        this.pitchEnvelopeEnd = [];
-        this.envelopeInverse = [];
         switch (type) {
             case InstrumentType.chip:
                 this.chipWave = 2;
@@ -2232,10 +2252,6 @@ export class Instrument {
         const envelopes: any[] = [];
         for (let i = 0; i < this.envelopeCount; i++) {
             envelopes.push(this.envelopes[i].toJsonObject());
-
-            instrumentObject["pitchEnvelopeStart" + i] = this.pitchEnvelopeStart[i] ? this.pitchEnvelopeStart[i] : 0;
-            instrumentObject["pitchEnvelopeEnd" + i] = this.pitchEnvelopeEnd[i] ? this.pitchEnvelopeEnd[i] : this.isNoiseInstrument ? Config.drumCount-1 : Config.maxPitch;
-            instrumentObject["envelopeInverse" + i] = this.envelopeInverse[i] ? this.envelopeInverse[i] : false;
         }
         instrumentObject["envelopes"] = envelopes;
 
@@ -2892,16 +2908,16 @@ export class Instrument {
                 const envelopeArray: any[] = instrumentObject["envelopes"];
                 for (let i = 0; i < envelopeArray.length; i++) {
                     if (this.envelopeCount >= Config.maxEnvelopeCount) break;
-                    const tempEnvelope: EnvelopeSettings = new EnvelopeSettings();
+                    const tempEnvelope: EnvelopeSettings = new EnvelopeSettings(this.isNoiseInstrument);
                     tempEnvelope.fromJsonObject(envelopeArray[i]);
-                    //figure out pitch envelope stuff. I should make this more elegant in the future...
+                    //old pitch envelope detection
                     let pitchEnvelopeStart: number;
                     if (instrumentObject["pitchEnvelopeStart"] != undefined && instrumentObject["pitchEnvelopeStart"] != null) { //make sure is not null bc for some reason it can be
                         pitchEnvelopeStart = instrumentObject["pitchEnvelopeStart"];
                     } else if (instrumentObject["pitchEnvelopeStart" + i] != undefined && instrumentObject["pitchEnvelopeStart" + i] != undefined) {
                         pitchEnvelopeStart = instrumentObject["pitchEnvelopeStart" + i];
                     } else {
-                        pitchEnvelopeStart = 0;
+                        pitchEnvelopeStart = tempEnvelope.pitchEnvelopeStart;
                     }
                     let pitchEnvelopeEnd: number;
                     if (instrumentObject["pitchEnvelopeEnd"] != undefined && instrumentObject["pitchEnvelopeEnd"] != null) {
@@ -2909,7 +2925,7 @@ export class Instrument {
                     } else if (instrumentObject["pitchEnvelopeEnd" + i] != undefined && instrumentObject["pitchEnvelopeEnd" + i] != null) {
                         pitchEnvelopeEnd = instrumentObject["pitchEnvelopeEnd" + i];
                     } else {
-                        pitchEnvelopeEnd = isNoiseChannel ? Config.drumCount-1 : Config.maxPitch;
+                        pitchEnvelopeEnd = tempEnvelope.pitchEnvelopeEnd;
                     }
                     let envelopeInverse: boolean;
                     if (instrumentObject["envelopeInverse" + i] != undefined && instrumentObject["envelopeInverse" + i] != null) {
@@ -2917,7 +2933,7 @@ export class Instrument {
                     } else if (instrumentObject["pitchEnvelopeInverse"] != undefined && instrumentObject["pitchEnvelopeInverse"] != null && Config.envelopes[tempEnvelope.envelope].name == "pitch") { //assign only if a pitch envelope
                         envelopeInverse = instrumentObject["pitchEnvelopeInverse"];
                     } else {
-                        envelopeInverse = false;
+                        envelopeInverse = tempEnvelope.inverse;
                     }
                     this.addEnvelope(tempEnvelope.target, tempEnvelope.index, tempEnvelope.envelope, pitchEnvelopeStart, pitchEnvelopeEnd, envelopeInverse);
                 }
@@ -2972,15 +2988,15 @@ export class Instrument {
         let makeEmpty: boolean = false;
         if (!this.supportsEnvelopeTarget(target, index)) makeEmpty = true;
         if (this.envelopeCount >= Config.maxEnvelopeCount) throw new Error();
-        while (this.envelopes.length <= this.envelopeCount) this.envelopes[this.envelopes.length] = new EnvelopeSettings();
+        while (this.envelopes.length <= this.envelopeCount) this.envelopes[this.envelopes.length] = new EnvelopeSettings(this.isNoiseInstrument);
         const envelopeSettings: EnvelopeSettings = this.envelopes[this.envelopeCount];
         envelopeSettings.target = makeEmpty ? Config.instrumentAutomationTargets.dictionary["none"].index : target;
         envelopeSettings.index = makeEmpty ? 0 : index;
         envelopeSettings.envelope = envelope;
+        envelopeSettings.pitchEnvelopeStart = start;
+        envelopeSettings.pitchEnvelopeEnd = end;
+        envelopeSettings.inverse = inverse;
         this.envelopeCount++;
-        this.pitchEnvelopeStart[this.envelopeCount - 1] = start;
-        this.pitchEnvelopeEnd[this.envelopeCount - 1] = end;
-        this.envelopeInverse[this.envelopeCount - 1] = inverse;
     }
 
     public supportsEnvelopeTarget(target: number, index: number): boolean {
@@ -3067,7 +3083,7 @@ export class Song {
     private static readonly _oldestUltraBoxVersion: number = 1;
     private static readonly _latestUltraBoxVersion: number = 5;
     private static readonly _oldestSlarmoosBoxVersion: number = 1;
-    private static readonly _latestSlarmoosBoxVersion: number = 2;
+    private static readonly _latestSlarmoosBoxVersion: number = 3;
     // One-character variant detection at the start of URL to distinguish variants such as JummBox, Or Goldbox. "j" and "g" respectively
 	//also "u" is ultrabox lol
     private static readonly _variant = 0x73; //"s" ~ slarmoo's box
@@ -3692,9 +3708,18 @@ export class Song {
                         buffer.push(base64IntToCharCode[instrument.envelopes[envelopeIndex].index]);
                     }
                     buffer.push(base64IntToCharCode[instrument.envelopes[envelopeIndex].envelope]);
-                    buffer.push(base64IntToCharCode[instrument.pitchEnvelopeStart[envelopeIndex] >> 6], base64IntToCharCode[instrument.pitchEnvelopeStart[envelopeIndex] & 0x3f]);
-                    buffer.push(base64IntToCharCode[instrument.pitchEnvelopeEnd[envelopeIndex] >> 6], base64IntToCharCode[instrument.pitchEnvelopeEnd[envelopeIndex] & 0x3f]);
-                    buffer.push(base64IntToCharCode[(+instrument.envelopeInverse[envelopeIndex])] ? base64IntToCharCode[(+instrument.envelopeInverse[envelopeIndex])] : base64IntToCharCode[0]);
+                    //run pitch envelope handling
+                    if (instrument.envelopes[envelopeIndex].envelope == Config.envelopes.dictionary["pitch"].index) {
+                        if (instrument.isNoiseInstrument) {
+                            buffer.push(base64IntToCharCode[instrument.envelopes[envelopeIndex].pitchEnvelopeStart >> 6], base64IntToCharCode[instrument.envelopes[envelopeIndex].pitchEnvelopeStart & 0x3f]);
+                            buffer.push(base64IntToCharCode[instrument.envelopes[envelopeIndex].pitchEnvelopeEnd >> 6], base64IntToCharCode[instrument.envelopes[envelopeIndex].pitchEnvelopeEnd & 0x3f]);
+                        } else {
+                            buffer.push(base64IntToCharCode[instrument.envelopes[envelopeIndex].pitchEnvelopeStart]);
+                            buffer.push(base64IntToCharCode[instrument.envelopes[envelopeIndex].pitchEnvelopeEnd]);
+                        }
+                    }
+                        //inverse
+                    buffer.push(base64IntToCharCode[(+instrument.envelopes[envelopeIndex].inverse)] ? base64IntToCharCode[(+instrument.envelopes[envelopeIndex].inverse)] : base64IntToCharCode[0]);
                 }
             }
         }
@@ -5466,15 +5491,34 @@ export class Song {
                         if (fromJummBox) aa = jummToUltraEnvelope[aa];
                         if (!fromSlarmoosBox && aa >= 2) aa++; //2 for pitch
                         const envelope: number = clamp(0, Config.envelopes.length, aa);
-                        instrument.addEnvelope(target, index, envelope);
-                        if (fromSlarmoosBox && !beforeTwo) {
+                        let pitchEnvelopeStart: number = 0;
+                        let pitchEnvelopeEnd: number = Config.maxPitch;
+                        let envelopeInverse: boolean = false;
+                        if (fromSlarmoosBox && !beforeThree) {
+                            if (envelope == Config.envelopes.dictionary["pitch"].index) {
+                                if (instrument.isNoiseInstrument) {
+                                    let pitchEnvelopeCompact: number = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                                    pitchEnvelopeStart = pitchEnvelopeCompact * 64 + base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                                    pitchEnvelopeCompact = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                                    pitchEnvelopeEnd = pitchEnvelopeCompact * 64 + base64CharCodeToInt[compressed.charCodeAt(charIndex++)];    
+                                } else {
+                                    pitchEnvelopeStart = base64IntToCharCode[instrument.envelopes[i].pitchEnvelopeStart];
+                                    pitchEnvelopeEnd = base64IntToCharCode[instrument.envelopes[i].pitchEnvelopeEnd];
+                                }
+                            }
+                        }
+                        instrument.addEnvelope(target, index, envelope, pitchEnvelopeStart, pitchEnvelopeEnd);
+                        if (fromSlarmoosBox && beforeThree) {
                             let pitchEnvelopeCompact: number = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
-                            instrument.pitchEnvelopeStart[i] = pitchEnvelopeCompact * 64 + base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                            instrument.envelopes[i].pitchEnvelopeStart = pitchEnvelopeCompact * 64 + base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                             pitchEnvelopeCompact = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
-                            instrument.pitchEnvelopeEnd[i] = pitchEnvelopeCompact * 64 + base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
-                            instrument.envelopeInverse[i] = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] == 1 ? true : false;
+                            instrument.envelopes[i].pitchEnvelopeEnd = pitchEnvelopeCompact * 64 + base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                        }
+                        if (fromSlarmoosBox && !beforeTwo) {
+                            instrument.envelopes[i].inverse = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] == 1 ? true : false;
                         }
                     }
+
                     let instrumentPitchEnvelopeStart: number = 0;
                     let instrumentPitchEnvelopeEnd: number = Config.maxPitch;
                     let instrumentEnvelopeInverse: boolean = false;
@@ -5485,11 +5529,12 @@ export class Song {
                         instrumentPitchEnvelopeEnd = pitchEnvelopeCompact * 64 + base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                         instrumentEnvelopeInverse = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] === 1 ? true : false;
                         for (let i: number = 0; i < envelopeCount; i++) {
-                            instrument.pitchEnvelopeStart[i] = instrumentPitchEnvelopeStart;
-                            instrument.pitchEnvelopeEnd[i] = instrumentPitchEnvelopeEnd;
-                            instrument.envelopeInverse[i] = Config.envelopes[instrument.envelopes[i].envelope].name == "pitch" ? instrumentEnvelopeInverse : false;
+                            instrument.envelopes[envelopeCount].pitchEnvelopeStart = instrumentPitchEnvelopeStart;
+                            instrument.envelopes[envelopeCount].pitchEnvelopeEnd = instrumentPitchEnvelopeEnd;
+                            instrument.envelopes[envelopeCount].inverse = Config.envelopes[instrument.envelopes[i].envelope].name == "pitch" ? instrumentEnvelopeInverse : false;
                         }
                     }
+                    
                 }
             } break;
             case SongTagCode.operatorWaves: {
@@ -7932,7 +7977,7 @@ class InstrumentState {
                 this.echoDelayLineL = new Float32Array(safeEchoDelayBufferSize);
                 this.echoDelayLineR = new Float32Array(safeEchoDelayBufferSize);
             } else if (this.echoDelayLineL.length < safeEchoDelayBufferSize || this.echoDelayLineR.length < safeEchoDelayBufferSize) {
-                // The echo delay length may change whlie the song is playing if tempo changes,
+                // The echo delay length may change while the song is playing if tempo changes,
                 // so buffers may need to be reallocated, but we don't want to lose any echoes
                 // so we need to copy the contents of the old buffer to the new one.
                 const newDelayLineL: Float32Array = new Float32Array(safeEchoDelayBufferSize);

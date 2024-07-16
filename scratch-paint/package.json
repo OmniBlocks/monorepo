@@ -23,8 +23,8 @@
     "url": "https://github.com/LLK/scratch-paint.git"
   },
   "dependencies": {
-    "@scratch/paper": "0.11.20221201200345",
     "@turbowarp/nanolog": "^0.2.0",
+    "@turbowarp/paper": "^0.12.202407161743",
     "classnames": "2.2.5",
     "keymirror": "0.1.1",
     "lodash.bindall": "4.4.0",

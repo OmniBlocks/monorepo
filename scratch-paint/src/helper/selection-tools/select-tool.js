@@ -5,7 +5,7 @@ import {selectRootItem} from '../selection';
 import BoundingBoxTool from './bounding-box-tool';
 import NudgeTool from './nudge-tool';
 import SelectionBoxTool from './selection-box-tool';
-import paper from '@scratch/paper';
+import paper from '@turbowarp/paper';
 
 /**
  * paper.Tool that handles select mode. This is made up of 2 subtools.

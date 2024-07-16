@@ -1,4 +1,4 @@
-import paper from '@scratch/paper';
+import paper from '@turbowarp/paper';
 import Modes from '../../lib/modes';
 import {styleShape} from '../../helper/style-path';
 import {commitRectToBitmap} from '../bitmap';

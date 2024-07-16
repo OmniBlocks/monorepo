@@ -1,4 +1,4 @@
-import paper from '@scratch/paper';
+import paper from '@turbowarp/paper';
 
 /**
  * Tool to handle rotation when dragging the rotation handle in the bounding box tool.

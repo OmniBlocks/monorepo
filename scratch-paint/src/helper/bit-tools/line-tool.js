@@ -1,4 +1,4 @@
-import paper from '@scratch/paper';
+import paper from '@turbowarp/paper';
 import {getRaster, createCanvas, getGuideLayer} from '../layer';
 import {createMaskingCanvas, forEachLinePoint, getBrushMark} from '../bitmap';
 import {ART_BOARD_WIDTH, ART_BOARD_HEIGHT} from '../view';

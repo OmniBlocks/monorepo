@@ -565,6 +565,13 @@ export class TipPrompt implements Prompt {
 					p("This settings will invert whether a greater note size increases or decreases the value. This can be great if you want one effect to fade in as another fades out"),
 				);
 			} break;
+			case "additive": {
+				message = div(
+					h2("Additive Instrument"),
+					p("The \"Additive\" instrument type works very similar to harmonics, but instead of working with just sine waves, you can combine many different types of waves"),
+					p("These waves are: sines, squares, triangles, sawtooths, and ramps (a sawtooth wave flipped over the y-axis). All of these are technically sine approximations of each waveform, but they function effectively the same"),
+				);
+			} break;
 
 			default:
 				// Check for modSetinfo#

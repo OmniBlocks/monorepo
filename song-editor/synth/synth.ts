@@ -956,7 +956,7 @@ class HarmonicsWaveState {
     }
 }
 
-class AdditiveWave {
+export class AdditiveWave {
     public additives: number[] = [];
     public hash: number = -1;
     public waveTypes: number[] = [];
@@ -968,8 +968,11 @@ class AdditiveWave {
     public reset(): void {
         for (let i: number = 0; i < Config.additiveControlPoints; i++) {
             this.additives[i] = 0;
-            this.waveTypes[i] = AdditiveWaveTypes.sine;
+            this.waveTypes[i] = AdditiveWaveTypes.triangle;
         }
+        this.additives[0] = Config.harmonicsMax;
+        this.additives[3] = Config.harmonicsMax;
+        this.additives[6] = Config.harmonicsMax;
         this.markCustomWaveDirty();
     }
 
@@ -992,7 +995,6 @@ class AdditiveWaveState {
         const additiveRendered: number = Config.additiveRendered;
 
         const waveLength: number = Config.additiveWavelength;
-        const retroWave: Float32Array = getDrumWave(0, null, null);
 
         if (this.wave == null || this.wave.length != waveLength + 1) {
             this.wave = new Float32Array(waveLength + 1);
@@ -1000,84 +1002,20 @@ class AdditiveWaveState {
         const wave: Float32Array = this.wave;
 
         for (let i: number = 0; i < waveLength; i++) {
-            wave[i] = 0;
+            wave[i] = 1;
         }
 
         const overallSlope: number = -0.25;
         let combinedControlPointAmplitude: number = 1;
-        //find waveType mode - There's probably a better way to do this...
-        const waveTypes: number[] = settings.waveTypes.slice();
-        const modeMap: Dictionary<number> = {sine: 0, square: 0, triangle: 0, sawtooth: 0, ramp: 0, trapezoid: 0, other: 0};
-        for (let i = 0; i < waveTypes.length; i++) {
-            if (waveTypes[i] == AdditiveWaveTypes.sine) {
-                modeMap["sine"]++;
-            } else if (waveTypes[i] == AdditiveWaveTypes.square) {
-                modeMap["square"]++;
-            } else if (waveTypes[i] == AdditiveWaveTypes.triangle) {
-                modeMap["triangle"]++;
-            } else if (waveTypes[i] == AdditiveWaveTypes.sawtooth) {
-                modeMap["sawtooth"]++;
-            } else if (waveTypes[i] == AdditiveWaveTypes.ramp) {
-                modeMap["ramp"]++;
-            } else if (waveTypes[i] == AdditiveWaveTypes.trapezoid) {
-                modeMap["trapezoid"]++;
-            } else {
-                modeMap["other"]++;
+        
+        for (let additiveIndex = 1; additiveIndex < additiveRendered; additiveIndex++) {
+            const additiveFreq = additiveIndex+1;
+            for (let i: number = 0; i < waveLength; i++) {
+                let additiveHarmonic = this.waveExpressions(settings.waveTypes[additiveIndex], i / waveLength, additiveFreq) * (settings.additives[additiveIndex]!=undefined ? settings.additives[additiveIndex] / Config.additiveMax : 1);
+                additiveHarmonic *= Math.pow(additiveFreq, overallSlope);
+                wave[i] += additiveHarmonic;
             }
         }
-        let mode = 0;
-        let modeWaveType = AdditiveWaveTypes.sine;
-        if (modeMap["sine"] > mode) { //not >= because we want to defer to simpler waves if possible
-            modeWaveType = AdditiveWaveTypes.sine;
-        } else if (modeMap["square"] > mode) {
-            modeWaveType = AdditiveWaveTypes.square;
-        } else if (modeMap["triangle"] > mode) {
-            modeWaveType = AdditiveWaveTypes.triangle;
-        } else if (modeMap["sawtooth"] > mode) {
-            modeWaveType = AdditiveWaveTypes.sawtooth;
-        } else if (modeMap["ramp"] > mode) {
-            modeWaveType = AdditiveWaveTypes.ramp;
-        } else if (modeMap["trapezoid"] > mode) {
-            modeWaveType = AdditiveWaveTypes.trapezoid;
-        } else if (modeMap["other"] > mode) {
-            modeWaveType = AdditiveWaveTypes.sine; //default to sine if unrecognized
-        } 
-
-
-        let edited: boolean[] = [];
-        for (let additiveIndex: number = 0; additiveIndex < additiveRendered; additiveIndex++) {
-            if (!edited[additiveIndex]) {
-                edited[additiveIndex] = false;
-            }
-            const additiveFreq: number = additiveIndex + 1;
-            const waveType: number = additiveIndex < Config.additiveControlPoints ? settings.waveTypes[additiveIndex] : modeWaveType; //set waveType to either its index or the modeWaveType
-            let controlValue: number = additiveIndex < Config.additiveControlPoints ? settings.additives[additiveIndex] : settings.additives[Config.additiveControlPoints - 1];
-            if (additiveIndex >= Config.additiveControlPoints) {
-                controlValue *= 1 - (additiveIndex - Config.additiveControlPoints) / (additiveRendered - Config.additiveControlPoints);
-            }
-            const normalizedValue: number = controlValue / Config.additiveMax;
-            let amplitude: number = Math.pow(2, controlValue - Config.additiveMax + 1) * Math.sqrt(normalizedValue);
-            if (additiveIndex < Config.additiveControlPoints) {
-                combinedControlPointAmplitude += amplitude;
-            }
-            amplitude *= Math.pow(additiveFreq, overallSlope);
-
-            // Multiply all the sine wave amplitudes by 1 or -1 based on the LFSR
-            // retro wave (effectively random) to avoid egregiously tall spikes.
-            amplitude *= retroWave[additiveIndex + 589];
-
-            const waves = this.waveExpressions(waveType, additiveIndex);
-            for (let j = 0; j < waves.length; j++) {
-                if (!edited[additiveIndex]) {
-                    wave[waveLength - additiveFreq] = amplitude;
-                    edited[additiveIndex] = true;
-                } else {
-                    wave[waveLength - additiveFreq] += amplitude * waves[j];
-                }
-            }
-        }
-
-        inverseRealFourierTransform(wave, waveLength);
 
         // Limit the maximum wave amplitude.
         const mult: number = 1 / Math.pow(combinedControlPointAmplitude, 0.7);
@@ -1091,30 +1029,23 @@ class AdditiveWaveState {
         return wave;
     }
 
-    private waveExpressions(waveType: number, index: number = 0): number[] {
+    private waveExpressions(waveType: number, time: number, harmonic: number): number {
         switch (waveType) {
             case AdditiveWaveTypes.sine:
-                return [1];
+                return (Math.sin(time * harmonic * Math.PI * 2)) / harmonic;
             case AdditiveWaveTypes.square:
-                if (index % 2 == 0) {
-                    return [0, 4, 0, 4 / 3, 0, 4 / 5, 0, 4 / 7, 0, 4 / 9, 0, 4 / 11, 0, 4 / 13, 0, 4 / 15];
-                } else {
-                    return [4, 0, 4 / 3, 0, 4 / 5, 0, 4 / 7, 0, 4 / 9, 0, 4 / 11, 0, 4 / 13, 0, 4 / 15];
-                }
+                return (2 * (Math.floor((time * harmonic - 1) % 2+2)%2) - 1) / harmonic;
             case AdditiveWaveTypes.triangle:
-                if (index % 2 == 0) {
-                    return [0, 5 / 2, 0, 5 / 18, 0, 1/10, 0, 5/98, 0, 5/162, 0, 5/242];
-                } else {
-                    return [5 / 2, 0, 5 / 18, 0, 1 / 10, 0, 5 / 98, 0, 5 / 162, 0, 5 / 242];
-                }
+                return (2 * (Math.abs(((time * harmonic / 2 + 1 / 2) % 1+1)%1) * 2 - 1) - 1)/harmonic;
             case AdditiveWaveTypes.sawtooth:
-                return [2, 1, 2 / 3, 1 / 2, 2 / 5, 1 / 3, 2 / 7, 1 / 4];
+                return (2 * Math.abs(((time * harmonic / 2 + 1 / 2) % 1+1)%1) - 1)/harmonic;
             case AdditiveWaveTypes.ramp:
-                return [-2, -1, -2 / 3, -1 / 2, -2 / 5, -1 / 3, -2 / 7, -1 / 4];
+                return (-2 * Math.abs(((time * harmonic / 2 + 1 / 2) % 1 +1)%1) + 1)/harmonic;
             case AdditiveWaveTypes.trapezoid:
-                return [1]; //not entirely sure how to implement this yet...
+                return this.waveExpressions(AdditiveWaveTypes.triangle, time, harmonic) + this.waveExpressions(AdditiveWaveTypes.triangle, (time + 1 / 2), harmonic);
+            default:
+                return (Math.sin(time * harmonic * Math.PI * 2)) / harmonic; //default to sine
         } 
-        return [1];
     }
 
 }
@@ -3519,61 +3450,61 @@ export class Song {
                     harmonicsBits.encodeBase64(buffer);
                 }
 
-                // if (instrument.type == InstrumentType.additive) {
-                //     buffer.push(SongTagCode.additive);
-                //     const additiveBits: BitFieldWriter = new BitFieldWriter();
-                //     const waveTypes: BitFieldWriter = new BitFieldWriter();
-                //     for (let i: number = 0; i < Config.additiveControlPointBits; i++) {
-                //         additiveBits.write(Config.additiveControlPointBits, instrument.additiveWave.additives[i]);
-                //         waveTypes.write(3, instrument.additiveWave.waveTypes[i]);
-                //     }
-                //     additiveBits.encodeBase64(buffer);
-                //     waveTypes.encodeBase64(buffer);
-                // }
+                if (instrument.type == InstrumentType.additive) {
+                    buffer.push(SongTagCode.additive);
+                    const additiveBits: BitFieldWriter = new BitFieldWriter();
+                    for (let i: number = 0; i < Config.additiveControlPoints; i++) {
+                        additiveBits.write(Config.additiveControlPointBits, instrument.additiveWave.additives[i]);
+                    }
+                    additiveBits.encodeBase64(buffer);
+                    for (let i: number = 0; i < Config.additiveControlPoints; i++) {
+                        buffer.push(base64IntToCharCode[instrument.additiveWave.waveTypes[i]]);
+                    }
+                }
 
                 if (instrument.type == InstrumentType.chip) {
-                   						if (instrument.chipWave > 186) {
-							buffer.push(119, base64IntToCharCode[instrument.chipWave - 186]);	
-							buffer.push(base64IntToCharCode[3]);	
-						}
-						else if (instrument.chipWave > 124) {
-							buffer.push(119, base64IntToCharCode[instrument.chipWave - 124]);	
-							buffer.push(base64IntToCharCode[2]);	
-						}
-						else if (instrument.chipWave > 62) {
-							buffer.push(119, base64IntToCharCode[instrument.chipWave - 62]);	
-							buffer.push(base64IntToCharCode[1]);	
-						}
-						else {
-							buffer.push(119, base64IntToCharCode[instrument.chipWave]);	
-							buffer.push(base64IntToCharCode[0]);	
-						}
-						buffer.push(104, base64IntToCharCode[instrument.unison]);
-                        if (instrument.unison == Config.unisons.length) encodeUnisonSettings(buffer, instrument.unisonVoices, instrument.unisonSpread, instrument.unisonOffset, instrument.unisonExpression, instrument.unisonSign);
+                    if (instrument.chipWave > 186) {
+                        buffer.push(119, base64IntToCharCode[instrument.chipWave - 186]);
+                        buffer.push(base64IntToCharCode[3]);
+                    }
+                    else if (instrument.chipWave > 124) {
+                        buffer.push(119, base64IntToCharCode[instrument.chipWave - 124]);
+                        buffer.push(base64IntToCharCode[2]);
+                    }
+                    else if (instrument.chipWave > 62) {
+                        buffer.push(119, base64IntToCharCode[instrument.chipWave - 62]);
+                        buffer.push(base64IntToCharCode[1]);
+                    }
+                    else {
+                        buffer.push(119, base64IntToCharCode[instrument.chipWave]);
+                        buffer.push(base64IntToCharCode[0]);
+                    }
+                    buffer.push(104, base64IntToCharCode[instrument.unison]);
+                    if (instrument.unison == Config.unisons.length) encodeUnisonSettings(buffer, instrument.unisonVoices, instrument.unisonSpread, instrument.unisonOffset, instrument.unisonExpression, instrument.unisonSign);
 
-						// Repurposed for chip wave loop controls.
-						buffer.push(SongTagCode.filterResonance);
-						// The encoding here is as follows:
-						// 0b11111_1
-						//         ^-- isUsingAdvancedLoopControls
-						//   ^^^^^---- chipWaveLoopMode
-						// This essentially allocates 32 different loop modes,
-						// which should be plenty.
-						const encodedLoopMode: number = (
-							(clamp(0, 31 + 1, instrument.chipWaveLoopMode) << 1)
-							| (instrument.isUsingAdvancedLoopControls ? 1 : 0)
-						);
-						buffer.push(base64IntToCharCode[encodedLoopMode]);
-						// The same encoding above is used here, but with the release mode
-						// (which isn't implemented currently), and the backwards toggle.
-						const encodedReleaseMode: number = (
-							(clamp(0, 31 + 1, 0) << 1)
-							| (instrument.chipWavePlayBackwards ? 1 : 0)
-						);
-						buffer.push(base64IntToCharCode[encodedReleaseMode]);
-						encode32BitNumber(buffer, instrument.chipWaveLoopStart);
-						encode32BitNumber(buffer, instrument.chipWaveLoopEnd);
-						encode32BitNumber(buffer, instrument.chipWaveStartOffset);
+                    // Repurposed for chip wave loop controls.
+                    buffer.push(SongTagCode.filterResonance);
+                    // The encoding here is as follows:
+                    // 0b11111_1
+                    //         ^-- isUsingAdvancedLoopControls
+                    //   ^^^^^---- chipWaveLoopMode
+                    // This essentially allocates 32 different loop modes,
+                    // which should be plenty.
+                    const encodedLoopMode: number = (
+                        (clamp(0, 31 + 1, instrument.chipWaveLoopMode) << 1)
+                        | (instrument.isUsingAdvancedLoopControls ? 1 : 0)
+                    );
+                    buffer.push(base64IntToCharCode[encodedLoopMode]);
+                    // The same encoding above is used here, but with the release mode
+                    // (which isn't implemented currently), and the backwards toggle.
+                    const encodedReleaseMode: number = (
+                        (clamp(0, 31 + 1, 0) << 1)
+                        | (instrument.chipWavePlayBackwards ? 1 : 0)
+                    );
+                    buffer.push(base64IntToCharCode[encodedReleaseMode]);
+                    encode32BitNumber(buffer, instrument.chipWaveLoopStart);
+                    encode32BitNumber(buffer, instrument.chipWaveLoopEnd);
+                    encode32BitNumber(buffer, instrument.chipWaveStartOffset);
 
                 } else if (instrument.type == InstrumentType.fm || instrument.type == InstrumentType.fm6op) {
                     if (instrument.type == InstrumentType.fm) {
@@ -3607,7 +3538,7 @@ export class Song {
                     buffer.push(SongTagCode.feedbackAmplitude, base64IntToCharCode[instrument.feedbackAmplitude]);
 
                     buffer.push(SongTagCode.operatorFrequencies);
-                    for (let o: number = 0; o < (instrument.type == InstrumentType.fm6op?6:Config.operatorCount); o++) {
+                    for (let o: number = 0; o < (instrument.type == InstrumentType.fm6op ? 6 : Config.operatorCount); o++) {
                         buffer.push(base64IntToCharCode[instrument.operators[o].frequency]);
                     }
                     buffer.push(SongTagCode.operatorAmplitudes);
@@ -3624,23 +3555,23 @@ export class Song {
                     }
                 } else if (instrument.type == InstrumentType.customChipWave) {
                     if (instrument.chipWave > 186) {
-							buffer.push(119, base64IntToCharCode[instrument.chipWave - 186]);	
-							buffer.push(base64IntToCharCode[3]);	
-						}
-						else if (instrument.chipWave > 124) {
-							buffer.push(119, base64IntToCharCode[instrument.chipWave - 124]);	
-							buffer.push(base64IntToCharCode[2]);	
-						}
-						else if (instrument.chipWave > 62) {
-							buffer.push(119, base64IntToCharCode[instrument.chipWave - 62]);	
-							buffer.push(base64IntToCharCode[1]);	
-						}
-						else {
-							buffer.push(119, base64IntToCharCode[instrument.chipWave]);	
-							buffer.push(base64IntToCharCode[0]);	
-						}
-						buffer.push(104, base64IntToCharCode[instrument.unison]);
-                        if (instrument.unison == Config.unisons.length) encodeUnisonSettings(buffer, instrument.unisonVoices, instrument.unisonSpread, instrument.unisonOffset, instrument.unisonExpression, instrument.unisonSign);
+                        buffer.push(119, base64IntToCharCode[instrument.chipWave - 186]);
+                        buffer.push(base64IntToCharCode[3]);
+                    }
+                    else if (instrument.chipWave > 124) {
+                        buffer.push(119, base64IntToCharCode[instrument.chipWave - 124]);
+                        buffer.push(base64IntToCharCode[2]);
+                    }
+                    else if (instrument.chipWave > 62) {
+                        buffer.push(119, base64IntToCharCode[instrument.chipWave - 62]);
+                        buffer.push(base64IntToCharCode[1]);
+                    }
+                    else {
+                        buffer.push(119, base64IntToCharCode[instrument.chipWave]);
+                        buffer.push(base64IntToCharCode[0]);
+                    }
+                    buffer.push(104, base64IntToCharCode[instrument.unison]);
+                    if (instrument.unison == Config.unisons.length) encodeUnisonSettings(buffer, instrument.unisonVoices, instrument.unisonSpread, instrument.unisonOffset, instrument.unisonExpression, instrument.unisonSign);
                     buffer.push(SongTagCode.customChipWave);
                     // Push custom wave values
                     for (let j: number = 0; j < 64; j++) {
@@ -3682,18 +3613,20 @@ export class Song {
                     buffer.push(SongTagCode.unison, base64IntToCharCode[instrument.unison]);
                     if (instrument.unison == Config.unisons.length) encodeUnisonSettings(buffer, instrument.unisonVoices, instrument.unisonSpread, instrument.unisonOffset, instrument.unisonExpression, instrument.unisonSign);
                 } else if (instrument.type == InstrumentType.supersaw) {
-					buffer.push(SongTagCode.supersaw, base64IntToCharCode[instrument.supersawDynamism], base64IntToCharCode[instrument.supersawSpread], base64IntToCharCode[instrument.supersawShape]);
-					buffer.push(SongTagCode.pulseWidth, base64IntToCharCode[instrument.pulseWidth]);
+                    buffer.push(SongTagCode.supersaw, base64IntToCharCode[instrument.supersawDynamism], base64IntToCharCode[instrument.supersawSpread], base64IntToCharCode[instrument.supersawShape]);
+                    buffer.push(SongTagCode.pulseWidth, base64IntToCharCode[instrument.pulseWidth]);
                     buffer.push(base64IntToCharCode[instrument.decimalOffset >> 6], base64IntToCharCode[instrument.decimalOffset & 0x3f]);
-				} else if (instrument.type == InstrumentType.pickedString) {
+                } else if (instrument.type == InstrumentType.pickedString) {
                     if (Config.stringSustainRange > 0x20 || SustainType.length > 2) {
-						throw new Error("Not enough bits to represent sustain value and type in same base64 character.");
-					}
+                        throw new Error("Not enough bits to represent sustain value and type in same base64 character.");
+                    }
                     buffer.push(SongTagCode.unison, base64IntToCharCode[instrument.unison]);
                     if (instrument.unison == Config.unisons.length) encodeUnisonSettings(buffer, instrument.unisonVoices, instrument.unisonSpread, instrument.unisonOffset, instrument.unisonExpression, instrument.unisonSign);
                     buffer.push(SongTagCode.stringSustain, base64IntToCharCode[instrument.stringSustain | (instrument.stringSustainType << 5)]);
                 } else if (instrument.type == InstrumentType.mod) {
                     // Handled down below. Could be moved, but meh.
+                } else if (instrument.type == InstrumentType.additive) { 
+                    //Handled above
                 } else {
                     throw new Error("Unknown instrument type.");
                 }
@@ -4436,6 +4369,11 @@ export class Song {
                     if (this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].preset == InstrumentType.mod ) {
                         this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].preset = InstrumentType.fm6op;
                         this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].type = InstrumentType.fm6op;
+                    }
+                } else if (!fromSlarmoosBox ||(fromSlarmoosBox && beforeTwo)) {
+                    if (this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].preset == InstrumentType.mod) {
+                        this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].preset = InstrumentType.additive;
+                        this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].type = InstrumentType.additive;
                     }
                 }
                 // BeepBox directly tweaked "grand piano", but JB kept it the same. The most up to date version is now "grand piano 3"
@@ -5603,22 +5541,20 @@ export class Song {
                 instrument.harmonicsWave.markCustomWaveDirty();
                 charIndex += byteCount;
             } break;
-            // case SongTagCode.additive: {
-            //     const instrument: Instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
-            //     const byteCount: number = Math.ceil(Config.additiveControlPoints * Config.additiveControlPointBits / 6);
-            //     const bits: BitFieldReader = new BitFieldReader(compressed, charIndex, charIndex + byteCount);
-            //     for (let i: number = 0; i < Config.additiveControlPoints; i++) {
-            //         instrument.additiveWave.additives[i] = bits.read(Config.additiveControlPointBits);
-            //     }
-            //     instrument.additiveWave.markCustomWaveDirty();
-            //     //now for waveTypes
-            //     charIndex += byteCount;
-            //     const wavesByteCount: number = Math.ceil(Config.additiveControlPoints * 3 / 6);
-            //     const wavesBits: BitFieldReader = new BitFieldReader(compressed, charIndex, charIndex + wavesByteCount);
-            //     for (let i: number = 0; i < Config.additiveControlPoints; i++) {
-            //         instrument.additiveWave.waveTypes[i] = wavesBits.read(3);
-            //     }
-            // } break;
+            case SongTagCode.additive: {
+                const instrument: Instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
+                const byteCount: number = Math.ceil(Config.additiveControlPoints * Config.additiveControlPointBits / 6);
+                const bits: BitFieldReader = new BitFieldReader(compressed, charIndex, charIndex + byteCount);
+                for (let i: number = 0; i < Config.additiveControlPoints; i++) {
+                    instrument.additiveWave.additives[i] = bits.read(Config.additiveControlPointBits);
+                }
+                instrument.additiveWave.markCustomWaveDirty();
+                charIndex += byteCount;
+
+                for (let i: number = 0; i < Config.additiveControlPoints; i++) {
+                    instrument.additiveWave.waveTypes[i] = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                }
+            } break;
             case SongTagCode.aliases: {
                 if ((fromJummBox && beforeFive) || (fromGoldBox && beforeFour)) {
                     const instrument: Instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
@@ -7332,8 +7268,8 @@ class EnvelopeComputer {
     public nextSlideRatioStart: number = 0.0;
     public nextSlideRatioEnd: number = 0.0;
 
-    public  envelopeStarts: number[] = [];
-    public  envelopeEnds: number[] = [];
+    public readonly envelopeStarts: number[] = [];
+    public readonly envelopeEnds: number[] = [];
     private readonly _modifiedEnvelopeIndices: number[] = [];
     private _modifiedEnvelopeCount: number = 0;
     public lowpassCutoffDecayVolumeCompensation: number = 1.0;
@@ -7361,7 +7297,7 @@ class EnvelopeComputer {
         this._modifiedEnvelopeCount = 0;
     }
 
-    public computeEnvelopes(instrument: Instrument, currentPart: number, tickTimeStart: number, tickTimeStartReal: number, secondsPerTick: number, tone: Tone | null, timeScale: number, song: Song | null, instrumentState: InstrumentState): void {
+    public computeEnvelopes(instrument: Instrument, currentPart: number, tickTimeStart: number, tickTimeStartReal: number, secondsPerTick: number, tone: Tone | null, timeScale: number, instrumentState: InstrumentState, song: Song | null): void {
         const secondsPerTickUnscaled: number = secondsPerTick;
         secondsPerTick *= timeScale;
         const transition: Transition = instrument.getTransition();
@@ -7472,26 +7408,27 @@ class EnvelopeComputer {
                 envelope = Config.envelopes[envelopeSettings.envelope];
                 if (envelope.type == EnvelopeType.noteSize) usedNoteSize = true;
             }
+            const pitch: number = this.computePitchEnvelope(instrument, envelopeIndex, tone, instrumentState);
             if (/*automationTarget.perNote == this._perNote &&*/ automationTarget.computeIndex != null) {
                 const computeIndex: number = automationTarget.computeIndex + targetIndex;
-                let envelopeStart: number = EnvelopeComputer.computeEnvelope(envelope, noteSecondsStart, beatTimeStart, noteSizeStart, tone, instrument, envelopeIndex, instrumentState);
+                let envelopeStart: number = EnvelopeComputer.computeEnvelope(envelope, noteSecondsStart, beatTimeStart, noteSizeStart, pitch, instrument, envelopeIndex, instrumentState);
                 if (prevSlideStart) {
-                    const other: number = EnvelopeComputer.computeEnvelope(envelope, prevNoteSecondsStart, beatTimeStart, prevNoteSize, tone, instrument, envelopeIndex, instrumentState);
+                    const other: number = EnvelopeComputer.computeEnvelope(envelope, prevNoteSecondsStart, beatTimeStart, prevNoteSize, pitch, instrument, envelopeIndex, instrumentState);
                     envelopeStart += (other - envelopeStart) * prevSlideRatioStart;
                 }
                 if (nextSlideStart) {
-                    const other: number = EnvelopeComputer.computeEnvelope(envelope, 0.0, beatTimeStart, nextNoteSize, tone, instrument, envelopeIndex, instrumentState);
+                    const other: number = EnvelopeComputer.computeEnvelope(envelope, 0.0, beatTimeStart, nextNoteSize, pitch, instrument, envelopeIndex, instrumentState);
                     envelopeStart += (other - envelopeStart) * nextSlideRatioStart;
                 }
                 let envelopeEnd: number = envelopeStart;
                 if (instrument.discreteEnvelope == false) {
-                    envelopeEnd = EnvelopeComputer.computeEnvelope(envelope, noteSecondsEnd, beatTimeEnd, noteSizeEnd, tone, instrument, envelopeIndex, instrumentState);
+                    envelopeEnd = EnvelopeComputer.computeEnvelope(envelope, noteSecondsEnd, beatTimeEnd, noteSizeEnd, pitch, instrument, envelopeIndex, instrumentState);
                     if (prevSlideEnd) {
-                        const other: number = EnvelopeComputer.computeEnvelope(envelope, prevNoteSecondsEnd, beatTimeEnd, prevNoteSize, tone, instrument, envelopeIndex, instrumentState);
+                        const other: number = EnvelopeComputer.computeEnvelope(envelope, prevNoteSecondsEnd, beatTimeEnd, prevNoteSize, pitch, instrument, envelopeIndex, instrumentState);
                         envelopeEnd += (other - envelopeEnd) * prevSlideRatioEnd;
                     }
                     if (nextSlideEnd) {
-                        const other: number = EnvelopeComputer.computeEnvelope(envelope, 0.0, beatTimeEnd, nextNoteSize, tone, instrument, envelopeIndex, instrumentState);
+                        const other: number = EnvelopeComputer.computeEnvelope(envelope, 0.0, beatTimeEnd, nextNoteSize, pitch, instrument, envelopeIndex, instrumentState);
                         envelopeEnd += (other - envelopeEnd) * nextSlideRatioEnd;
                     }
                 }
@@ -7545,7 +7482,7 @@ class EnvelopeComputer {
         this._modifiedEnvelopeCount = 0;
     }
 
-    public static computeEnvelope(envelope: Envelope, time: number, beats: number, noteSize: number, tone: Tone | null, instrument: Instrument, index: number, instrumentState: InstrumentState): number {
+    public static computeEnvelope(envelope: Envelope, time: number, beats: number, noteSize: number, pitch: number, instrument: Instrument, index: number): number {
         switch (envelope.type) {
             case EnvelopeType.none: return 1.0;
             case EnvelopeType.noteSize:
@@ -7555,49 +7492,7 @@ class EnvelopeComputer {
                     return Synth.noteSizeToVolumeMult(noteSize);
                 }
             case EnvelopeType.pitch:
-                let startNote: number = 0;
-                let endNote: number = Config.maxPitch;
-                let pitch: number = 0;
-                let inverse: boolean = false;
-
-                if (instrument.isNoiseInstrument) {
-                    endNote = Config.drumCount-1;
-                }
-            
-                if (index < instrument.envelopeCount && index !== -2) {
-                    startNote = instrument.pitchEnvelopeStart[index];
-                    endNote = instrument.pitchEnvelopeEnd[index];
-                    inverse = instrument.envelopeInverse[index];
-                }
-                if (tone) {
-                    const chord = instrument.getChord()
-                    const arpeggiates = chord.arpeggiates;
-                    const arpeggio: number = Math.floor(instrumentState.arpTime / Config.ticksPerArpeggio); //calculate arpeggiation
-                    const tonePitch = tone.pitches[arpeggiates ? getArpeggioPitchIndex(tone.pitchCount, instrument.fastTwoNoteArp, arpeggio) : 0]
-                    pitch = tone.lastInterval != tonePitch ? tonePitch + tone.lastInterval : tonePitch; //account for pitch bends
-                }
-                if (startNote > endNote) { //Reset if values are improper
-                    startNote = 0;
-                    endNote = instrument.isNoiseInstrument ? Config.drumCount - 1 : Config.maxPitch;
-                }
-                const range = endNote - startNote + 1;
-                if (inverse) {
-                    if (pitch <= startNote) {
-                        return 1;
-                    } else if (pitch >= endNote) {
-                        return 0;
-                    } else {
-                        return 1 - (pitch - startNote) / range;
-                    }
-                } else {
-                    if (pitch <= startNote) {
-                        return 0;
-                    } else if (pitch >= endNote) {
-                        return 1;
-                    } else {
-                        return (pitch - startNote) / range;
-                    }
-                }
+                return pitch;
             case EnvelopeType.twang:
                 if (index < instrument.envelopeCount && instrument.envelopeInverse[index]) {
                     return 1.0 - (1.0 / (1.0 + time * envelope.speed /*  * localEnvelopeSpeed */));
@@ -7676,6 +7571,52 @@ class EnvelopeComputer {
             default: throw new Error("Unrecognized operator envelope type.");
         }
 
+    }
+
+    public computePitchEnvelope(instrument: Instrument, index: number, tone: Tone | null, instrumentState: InstrumentState): number {
+        let startNote: number = 0;
+        let endNote: number = Config.maxPitch;
+        let pitch: number = 0;
+        let inverse: boolean = false;
+
+        if (instrument.isNoiseInstrument) {
+            endNote = Config.drumCount - 1;
+        }
+
+        if (index < instrument.envelopeCount && index !== -2) {
+            startNote = instrument.pitchEnvelopeStart[index];
+            endNote = instrument.pitchEnvelopeEnd[index];
+            inverse = instrument.envelopeInverse[index];
+        }
+        if (tone) {
+            const chord = instrument.getChord()
+            const arpeggiates = chord.arpeggiates;
+            const arpeggio: number = Math.floor(instrumentState.arpTime / Config.ticksPerArpeggio); //calculate arpeggiation
+            const tonePitch = tone.pitches[arpeggiates ? getArpeggioPitchIndex(tone.pitchCount, instrument.fastTwoNoteArp, arpeggio) : 0]
+            pitch = tone.lastInterval != tonePitch ? tonePitch + tone.lastInterval : tonePitch; //account for pitch bends
+        }
+        if (startNote > endNote) { //Reset if values are improper
+            startNote = 0;
+            endNote = instrument.isNoiseInstrument ? Config.drumCount - 1 : Config.maxPitch;
+        }
+        const range = endNote - startNote + 1;
+        if (inverse) {
+            if (pitch <= startNote) {
+                return 1;
+            } else if (pitch >= endNote) {
+                return 0;
+            } else {
+                return 1 - (pitch - startNote) / range;
+            }
+        } else {
+            if (pitch <= startNote) {
+                return 0;
+            } else if (pitch >= endNote) {
+                return 1;
+            } else {
+                return (pitch - startNote) / range;
+            }
+        }
     }
 
     public static getLowpassCutoffDecayVolumeCompensation(envelope: Envelope): number {
@@ -8100,7 +8041,7 @@ class InstrumentState {
                 useEnvelopeSpeed = (1 - (useEnvelopeSpeed % 1)) * Config.arpSpeedScale[Math.floor(useEnvelopeSpeed)] + (useEnvelopeSpeed % 1) * Config.arpSpeedScale[Math.ceil(useEnvelopeSpeed)];
             }
         }
-        this.envelopeComputer.computeEnvelopes(instrument, currentPart, this.envelopeTime, tickTimeStart, secondsPerTick, tone, useEnvelopeSpeed, synth.song, this);
+        this.envelopeComputer.computeEnvelopes(instrument, currentPart, this.envelopeTime, tickTimeStart, secondsPerTick, tone, useEnvelopeSpeed, this, synth.song);
         const envelopeStarts: number[] = this.envelopeComputer.envelopeStarts;
         const envelopeEnds: number[] = this.envelopeComputer.envelopeEnds;
 
@@ -10975,7 +10916,7 @@ export class Synth {
                 useEnvelopeSpeed = (1 - (useEnvelopeSpeed % 1)) * Config.arpSpeedScale[Math.floor(useEnvelopeSpeed)] + (useEnvelopeSpeed % 1) * Config.arpSpeedScale[Math.ceil(useEnvelopeSpeed)];
             }
         }
-        envelopeComputer.computeEnvelopes(instrument, currentPart, instrumentState.envelopeTime, Config.ticksPerPart * partTimeStart, samplesPerTick / this.samplesPerSecond, tone, useEnvelopeSpeed, this.song, instrumentState);
+        envelopeComputer.computeEnvelopes(instrument, currentPart, instrumentState.envelopeTime, Config.ticksPerPart * partTimeStart, samplesPerTick / this.samplesPerSecond, tone, useEnvelopeSpeed, instrumentState, this.song);
         const envelopeStarts: number[] = tone.envelopeComputer.envelopeStarts;
         const envelopeEnds: number[] = tone.envelopeComputer.envelopeEnds;
         instrument.noteFilter = tmpNoteFilter;
@@ -11173,32 +11114,33 @@ export class Synth {
             const drumsetFilterEnvelope: Envelope = instrument.getDrumsetEnvelope(tone.drumsetPitch!);
 
             // If the drumset lowpass cutoff decays, compensate by increasing expression.
-            noteFilterExpression *= EnvelopeComputer.getLowpassCutoffDecayVolumeCompensation(drumsetFilterEnvelope)
+            noteFilterExpression *= EnvelopeComputer.getLowpassCutoffDecayVolumeCompensation(drumsetFilterEnvelope);
+            const pitch = envelopeComputer.computePitchEnvelope(instrument, -2, tone, instrumentState);
 
             // Drumset filters use the same envelope timing as the rest of the envelopes, but do not include support for slide transitions.
-            let drumsetFilterEnvelopeStart: number = EnvelopeComputer.computeEnvelope(drumsetFilterEnvelope, envelopeComputer.noteSecondsStart, beatsPerPart * partTimeStart, envelopeComputer.noteSizeStart, tone, instrument, -2, instrumentState); //doesn't have pitchStart, pitchEnd, or pitchInvert
+            let drumsetFilterEnvelopeStart: number = EnvelopeComputer.computeEnvelope(drumsetFilterEnvelope, envelopeComputer.noteSecondsStart, beatsPerPart * partTimeStart, envelopeComputer.noteSizeStart, pitch, instrument, -2, instrumentState); //doesn't have pitchStart, pitchEnd, or pitchInvert
 
             // Apply slide interpolation to drumset envelope.
             if (envelopeComputer.prevSlideStart) {
-                const other: number = EnvelopeComputer.computeEnvelope(drumsetFilterEnvelope, envelopeComputer.prevNoteSecondsStart, beatsPerPart * partTimeStart, envelopeComputer.prevNoteSize, tone, instrument, -2, instrumentState);
+                const other: number = EnvelopeComputer.computeEnvelope(drumsetFilterEnvelope, envelopeComputer.prevNoteSecondsStart, beatsPerPart * partTimeStart, envelopeComputer.prevNoteSize, pitch, instrument, -2, instrumentState);
                 drumsetFilterEnvelopeStart += (other - drumsetFilterEnvelopeStart) * envelopeComputer.prevSlideRatioStart;
             }
             if (envelopeComputer.nextSlideStart) {
-                const other: number = EnvelopeComputer.computeEnvelope(drumsetFilterEnvelope, 0.0, beatsPerPart * partTimeStart, envelopeComputer.nextNoteSize, tone, instrument, -2, instrumentState);
+                const other: number = EnvelopeComputer.computeEnvelope(drumsetFilterEnvelope, 0.0, beatsPerPart * partTimeStart, envelopeComputer.nextNoteSize, pitch, instrument, -2, instrumentState);
                 drumsetFilterEnvelopeStart += (other - drumsetFilterEnvelopeStart) * envelopeComputer.nextSlideRatioStart;
             }
             
             let drumsetFilterEnvelopeEnd: number = drumsetFilterEnvelopeStart;
 
             if ( instrument.discreteEnvelope == false ) {
-                drumsetFilterEnvelopeEnd = EnvelopeComputer.computeEnvelope(drumsetFilterEnvelope, envelopeComputer.noteSecondsEnd, beatsPerPart * partTimeEnd, envelopeComputer.noteSizeEnd, tone, instrument, -2, instrumentState);
+                drumsetFilterEnvelopeEnd = EnvelopeComputer.computeEnvelope(drumsetFilterEnvelope, envelopeComputer.noteSecondsEnd, beatsPerPart * partTimeEnd, envelopeComputer.noteSizeEnd, pitch, instrument, -2, instrumentState);
 
                 if (envelopeComputer.prevSlideEnd) {
-                    const other: number = EnvelopeComputer.computeEnvelope(drumsetFilterEnvelope, envelopeComputer.prevNoteSecondsEnd, beatsPerPart * partTimeEnd, envelopeComputer.prevNoteSize, tone, instrument, -2, instrumentState);
+                    const other: number = EnvelopeComputer.computeEnvelope(drumsetFilterEnvelope, envelopeComputer.prevNoteSecondsEnd, beatsPerPart * partTimeEnd, envelopeComputer.prevNoteSize, pitch, instrument, -2, instrumentState);
                     drumsetFilterEnvelopeEnd += (other - drumsetFilterEnvelopeEnd) * envelopeComputer.prevSlideRatioEnd;
                 }
                 if (envelopeComputer.nextSlideEnd) {
-                    const other: number = EnvelopeComputer.computeEnvelope(drumsetFilterEnvelope, 0.0, beatsPerPart * partTimeEnd, envelopeComputer.nextNoteSize, tone, instrument, -2, instrumentState);
+                    const other: number = EnvelopeComputer.computeEnvelope(drumsetFilterEnvelope, 0.0, beatsPerPart * partTimeEnd, envelopeComputer.nextNoteSize, pitch, instrument, -2, instrumentState);
                     drumsetFilterEnvelopeEnd += (other - drumsetFilterEnvelopeEnd) * envelopeComputer.nextSlideRatioEnd;
                 }
             }

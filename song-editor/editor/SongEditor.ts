@@ -18,7 +18,8 @@ import "./Layout"; // Imported here for the sake of ensuring this code is transp
 import { Instrument, Channel, Synth } from "../synth/synth";
 import { HTML, SVG } from "imperative-html/dist/esm/elements-strict";
 import { Preferences } from "./Preferences";
-import { HarmonicsEditor } from "./HarmonicsEditor";
+import { HarmonicsEditor, HarmonicsEditorPrompt } from "./HarmonicsEditor";
+import { AdditiveEditor, AdditiveEditorPrompt } from "./AdditiveEditor"
 import { InputBox, Slider } from "./HTMLWrapper";
 import { ImportPrompt } from "./ImportPrompt";
 import { ChannelRow } from "./ChannelRow";
@@ -42,7 +43,7 @@ import { SongDurationPrompt } from "./SongDurationPrompt";
 import { SustainPrompt } from "./SustainPrompt";
 import { SongRecoveryPrompt } from "./SongRecoveryPrompt";
 import { RecordingSetupPrompt } from "./RecordingSetupPrompt";
-import { SpectrumEditor } from "./SpectrumEditor";
+import { SpectrumEditor, SpectrumEditorPrompt } from "./SpectrumEditor";
 import { CustomPrompt } from "./CustomPrompt";
 import { ThemePrompt } from "./ThemePrompt";
 import { TipPrompt } from "./TipPrompt";
@@ -77,7 +78,7 @@ function buildHeaderedOptions(header: string, menu: HTMLSelectElement, items: Re
 }
 
 function buildPresetOptions(isNoise: boolean, idSet: string): HTMLSelectElement {
-    const menu: HTMLSelectElement = select({ id: idSet });
+    const menu: HTMLSelectElement = select({ id: idSet, class: "presetSelect"});
 
 
     // Show the "spectrum" custom type in both pitched and noise channels.
@@ -95,6 +96,7 @@ function buildPresetOptions(isNoise: boolean, idSet: string): HTMLSelectElement 
         menu.appendChild(option({ value: InstrumentType.fm6op }, EditorConfig.instrumentToPreset(InstrumentType.fm6op)!.name));
         menu.appendChild(option({ value: InstrumentType.harmonics }, EditorConfig.valueToPreset(InstrumentType.harmonics)!.name));
         menu.appendChild(option({ value: InstrumentType.pickedString }, EditorConfig.valueToPreset(InstrumentType.pickedString)!.name));
+        menu.appendChild(option({ value: InstrumentType.additive }, EditorConfig.instrumentToPreset(InstrumentType.additive)!.name)); //needs to be instrumentToPreset instead of valueToPreset to account for mod type
         menu.appendChild(option({ value: InstrumentType.spectrum }, EditorConfig.valueToPreset(InstrumentType.spectrum)!.name));
         menu.appendChild(option({ value: InstrumentType.noise }, EditorConfig.valueToPreset(InstrumentType.noise)!.name));
     }
@@ -1027,9 +1029,15 @@ export class SongEditor {
     private readonly _feedbackTypeSelect: HTMLSelectElement = buildOptions(select(), Config.feedbacks.map(feedback => feedback.name));
     private readonly _feedbackRow1: HTMLDivElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("feedbackType") }, "Feedback:"), div({ class: "selectContainer" }, this._feedbackTypeSelect));
     private readonly _spectrumEditor: SpectrumEditor = new SpectrumEditor(this._doc, null);
-    private readonly _spectrumRow: HTMLElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("spectrum") }, "Spectrum:"), this._spectrumEditor.container);
+    private readonly _spectrumZoom: HTMLButtonElement = button({ style: "margin-left:0em; padding-left:0.2em; height:1.5em; max-width: 12px;", onclick: () => this._openPrompt("spectrumSettings") }, "+");
+    private readonly _spectrumRow: HTMLElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("spectrum"), style: "font-size: smaller" }, "Spectrum:"), this._spectrumZoom, this._spectrumEditor.container);
     private readonly _harmonicsEditor: HarmonicsEditor = new HarmonicsEditor(this._doc);
-    private readonly _harmonicsRow: HTMLElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("harmonics") }, "Harmonics:"), this._harmonicsEditor.container);
+    private readonly _harmonicsZoom: HTMLButtonElement = button({ style: "margin-left:0em; padding-left:0.2em; height:1.5em; max-width: 12px;", onclick: () => this._openPrompt("harmonicsSettings") }, "+");
+    private readonly _harmonicsRow: HTMLElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("harmonics"), style: "font-size: smaller"}, "Harmonics:"), this._harmonicsZoom, this._harmonicsEditor.container);
+    private readonly _additiveEditor: AdditiveEditor = new AdditiveEditor(this._doc);
+    private readonly _additiveZoom: HTMLButtonElement = button({ style: "margin-left:0em; padding-left:0.2em; height:1.5em; max-width: 12px;", onclick: () => this._openPrompt("additiveSettings") }, "+");
+    private readonly _additiveRow: HTMLElement = div({ class: "selectRow" }, span({ class: "tip ", onclick: () => this._openPrompt("additive"), style: "font-size: smaller" }, "Additive:"), this._additiveZoom, this._additiveEditor.container);
+
 
     //SongEditor.ts
     private readonly _envelopeEditor: EnvelopeEditor = new EnvelopeEditor(this._doc, (id: number, submenu: number, subtype: string) => this._toggleDropdownMenu(id, submenu, subtype), (name: string) => this._openPrompt(name));
@@ -1146,6 +1154,7 @@ export class SongEditor {
         this._feedbackRow2,
         this._spectrumRow,
         this._harmonicsRow,
+        this._additiveRow,
         this._drumsetGroup,
         this._supersawDynamismRow,
         this._supersawSpreadRow,
@@ -1205,9 +1214,9 @@ export class SongEditor {
     );
     private readonly _instrumentTypeSelectRow: HTMLDivElement = div({ class: "selectRow", id: "typeSelectRow" },
         span({ class: "tip", onclick: () => this._openPrompt("instrumentType") }, "Type:"),
-        div(
-            div({ class: "pitchSelect" }, this._pitchedPresetSelect),
-            div({ class: "drumSelect" }, this._drumPresetSelect)
+        div({ style: "display:contents"}, 
+            div({ class: "pitchSelect", style: "display:contents" }, this._pitchedPresetSelect),
+            div({ class: "drumSelect", style: "display:contents" }, this._drumPresetSelect)
         ),
     );
     private readonly _instrumentSettingsGroup: HTMLDivElement = div({ class: "editor-controls" },
@@ -1418,6 +1427,8 @@ export class SongEditor {
         if (!("share" in navigator)) {
             this._fileMenu.removeChild(this._fileMenu.querySelector("[value='shareUrl']")!);
         }
+        this._pitchedPresetSelect.style.width = "4em";
+        this._drumPresetSelect.style.width = "4em";
 
         this._scaleSelect.appendChild(optgroup({ label: "Edit" },
             option({ value: "forceScale" }, "Snap Notes To Scale"),
@@ -1658,6 +1669,7 @@ export class SongEditor {
         this._eqFilterEditor.container.addEventListener("mousedown", this.refocusStage);
         this._noteFilterEditor.container.addEventListener("mousedown", this.refocusStage);
         this._harmonicsEditor.container.addEventListener("mousedown", this.refocusStage);
+        this._additiveEditor.container.addEventListener("mousedown", this.refocusStage);
         this._tempoStepper.addEventListener("keydown", this._tempoStepperCaptureNumberKeys, false);
         this._addEnvelopeButton.addEventListener("click", this._addNewEnvelope);
         this._patternArea.addEventListener("contextmenu", this._disableCtrlContextMenu);
@@ -2116,6 +2128,15 @@ export class SongEditor {
                 case "configureShortener":
                     this.prompt = new ShortenerConfigPrompt(this._doc);
                     break;
+                case "additiveSettings":
+                    this.prompt = new AdditiveEditorPrompt(this._doc, this);
+                    break;
+                case "harmonicsSettings":
+                    this.prompt = new HarmonicsEditorPrompt(this._doc, this);
+                    break;
+                case "spectrumSettings":
+                    this.prompt = new SpectrumEditorPrompt(this._doc, this);
+                    break;
                 default:
                     this.prompt = new TipPrompt(this._doc, promptName);
                     break;
@@ -2143,6 +2164,7 @@ export class SongEditor {
             }
         }
     }
+
 
     public refocusStage = (): void => {
         this.mainLayer.focus({ preventScroll: true });
@@ -2456,6 +2478,21 @@ export class SongEditor {
                 this._stringSustainLabel.textContent = Config.enableAcousticSustain ? "Sustain (" + Config.sustainTypeNames[instrument.stringSustainType].substring(0, 1).toUpperCase() + "):" : "Sustain:";
             } else {
                 this._stringSustainRow.style.display = "none";
+            }
+            if (instrument.type == InstrumentType.additive) {
+                this._chipWaveSelectRow.style.display = "none";
+                // advloop addition
+                this._useChipWaveAdvancedLoopControlsRow.style.display = "none";
+                this._chipWaveLoopModeSelectRow.style.display = "none";
+                this._chipWaveLoopStartRow.style.display = "none";
+                this._chipWaveLoopEndRow.style.display = "none";
+                this._chipWaveStartOffsetRow.style.display = "none";
+                this._chipWavePlayBackwardsRow.style.display = "none";
+                // advloop addition
+                this._additiveRow.style.display = "";
+                this._additiveEditor.render();
+            } else {
+                this._additiveRow.style.display = "none";
             }
             if (instrument.type == InstrumentType.drumset) {
                 this._drumsetGroup.style.display = "";
@@ -2799,6 +2836,7 @@ export class SongEditor {
 
             this._envelopeEditor.render();
             this._envelopeEditor.rerenderExtraSettings();
+            this._additiveEditor.rerenderWave();
 
             for (let chordIndex: number = 0; chordIndex < Config.chords.length; chordIndex++) {
                 let hidden: boolean = (!Config.instrumentTypeHasSpecialInterval[instrument.type] && Config.chords[chordIndex].customInterval);
@@ -2891,6 +2929,7 @@ export class SongEditor {
             // advloop addition
             this._spectrumRow.style.display = "none";
             this._harmonicsRow.style.display = "none";
+            this._additiveRow.style.display = "none";
             this._transitionRow.style.display = "none";
             this._chordSelectRow.style.display = "none";
             this._chordDropdownGroup.style.display = "none";
@@ -4360,6 +4399,8 @@ export class SongEditor {
                     this._doc.selection.resetBoxSelection();
                     //envelopes aren't rerendering when channels are changed so...
                     this._envelopeEditor.rerenderExtraSettings();
+                    this._additiveEditor.rerenderWave();
+
                 }
                 event.preventDefault();
                 break;
@@ -4374,6 +4415,8 @@ export class SongEditor {
                     this._doc.selection.setChannelBar((this._doc.channel + 1) % this._doc.song.getChannelCount(), this._doc.bar);
                     this._doc.selection.resetBoxSelection();
                     this._envelopeEditor.rerenderExtraSettings();
+                    this._additiveEditor.rerenderWave();
+
                 }
                 event.preventDefault();
                 break;

@@ -1545,6 +1545,7 @@ var beepbox = (function (exports) {
                 { name: TypePresets[8], customType: 8 },
                 { name: TypePresets[9], customType: 9 },
                 { name: TypePresets[11], customType: 11 },
+                { name: TypePresets[12], customType: 12 },
             ])
         },
         {
@@ -12647,8 +12648,11 @@ li.select2-results__option[role=group] > strong:hover {
         reset() {
             for (let i = 0; i < Config.additiveControlPoints; i++) {
                 this.additives[i] = 0;
-                this.waveTypes[i] = 0;
+                this.waveTypes[i] = 2;
             }
+            this.additives[0] = Config.harmonicsMax;
+            this.additives[3] = Config.harmonicsMax;
+            this.additives[6] = Config.harmonicsMax;
             this.markCustomWaveDirty();
         }
         markCustomWaveDirty() {
@@ -12670,94 +12674,23 @@ li.select2-results__option[role=group] > strong:hover {
             this._hash = settings.hash;
             const additiveRendered = Config.additiveRendered;
             const waveLength = Config.additiveWavelength;
-            const retroWave = getDrumWave(0, null, null);
             if (this.wave == null || this.wave.length != waveLength + 1) {
                 this.wave = new Float32Array(waveLength + 1);
             }
             const wave = this.wave;
             for (let i = 0; i < waveLength; i++) {
-                wave[i] = 0;
+                wave[i] = 1;
             }
             const overallSlope = -0.25;
             let combinedControlPointAmplitude = 1;
-            const waveTypes = settings.waveTypes.slice();
-            const modeMap = { sine: 0, square: 0, triangle: 0, sawtooth: 0, ramp: 0, trapezoid: 0, other: 0 };
-            for (let i = 0; i < waveTypes.length; i++) {
-                if (waveTypes[i] == 0) {
-                    modeMap["sine"]++;
-                }
-                else if (waveTypes[i] == 1) {
-                    modeMap["square"]++;
-                }
-                else if (waveTypes[i] == 2) {
-                    modeMap["triangle"]++;
-                }
-                else if (waveTypes[i] == 3) {
-                    modeMap["sawtooth"]++;
-                }
-                else if (waveTypes[i] == 4) {
-                    modeMap["ramp"]++;
-                }
-                else if (waveTypes[i] == 5) {
-                    modeMap["trapezoid"]++;
-                }
-                else {
-                    modeMap["other"]++;
-                }
-            }
-            let mode = 0;
-            let modeWaveType = 0;
-            if (modeMap["sine"] > mode) {
-                modeWaveType = 0;
-            }
-            else if (modeMap["square"] > mode) {
-                modeWaveType = 1;
-            }
-            else if (modeMap["triangle"] > mode) {
-                modeWaveType = 2;
-            }
-            else if (modeMap["sawtooth"] > mode) {
-                modeWaveType = 3;
-            }
-            else if (modeMap["ramp"] > mode) {
-                modeWaveType = 4;
-            }
-            else if (modeMap["trapezoid"] > mode) {
-                modeWaveType = 5;
-            }
-            else if (modeMap["other"] > mode) {
-                modeWaveType = 0;
-            }
-            let edited = [];
-            for (let additiveIndex = 0; additiveIndex < additiveRendered; additiveIndex++) {
-                if (!edited[additiveIndex]) {
-                    edited[additiveIndex] = false;
-                }
+            for (let additiveIndex = 1; additiveIndex < additiveRendered; additiveIndex++) {
                 const additiveFreq = additiveIndex + 1;
-                const waveType = additiveIndex < Config.additiveControlPoints ? settings.waveTypes[additiveIndex] : modeWaveType;
-                let controlValue = additiveIndex < Config.additiveControlPoints ? settings.additives[additiveIndex] : settings.additives[Config.additiveControlPoints - 1];
-                if (additiveIndex >= Config.additiveControlPoints) {
-                    controlValue *= 1 - (additiveIndex - Config.additiveControlPoints) / (additiveRendered - Config.additiveControlPoints);
-                }
-                const normalizedValue = controlValue / Config.additiveMax;
-                let amplitude = Math.pow(2, controlValue - Config.additiveMax + 1) * Math.sqrt(normalizedValue);
-                if (additiveIndex < Config.additiveControlPoints) {
-                    combinedControlPointAmplitude += amplitude;
-                }
-                amplitude *= Math.pow(additiveFreq, overallSlope);
-                amplitude *= retroWave[additiveIndex + 589];
-                const waves = this.waveExpressions(waveType, additiveIndex);
-                for (let j = 0; j < waves.length; j++) {
-                    if (!edited[additiveIndex]) {
-                        wave[waveLength - additiveFreq] = amplitude;
-                        edited[additiveIndex] = true;
-                    }
-                    else {
-                        wave[waveLength - additiveFreq] += amplitude * waves[j];
-                    }
+                for (let i = 0; i < waveLength; i++) {
+                    let additiveHarmonic = this.waveExpressions(settings.waveTypes[additiveIndex], i / waveLength, additiveFreq) * (settings.additives[additiveIndex] != undefined ? settings.additives[additiveIndex] / Config.additiveMax : 1);
+                    additiveHarmonic *= Math.pow(additiveFreq, overallSlope);
+                    wave[i] += additiveHarmonic;
                 }
             }
-            inverseRealFourierTransform(wave, waveLength);
             const mult = 1 / Math.pow(combinedControlPointAmplitude, 0.7);
             for (let i = 0; i < wave.length; i++)
                 wave[i] *= mult;
@@ -12765,32 +12698,23 @@ li.select2-results__option[role=group] > strong:hover {
             wave[waveLength] = wave[0];
             return wave;
         }
-        waveExpressions(waveType, index = 0) {
+        waveExpressions(waveType, time, harmonic) {
             switch (waveType) {
                 case 0:
-                    return [1];
+                    return (Math.sin(time * harmonic * Math.PI * 2)) / harmonic;
                 case 1:
-                    if (index % 2 == 0) {
-                        return [0, 4, 0, 4 / 3, 0, 4 / 5, 0, 4 / 7, 0, 4 / 9, 0, 4 / 11, 0, 4 / 13, 0, 4 / 15];
-                    }
-                    else {
-                        return [4, 0, 4 / 3, 0, 4 / 5, 0, 4 / 7, 0, 4 / 9, 0, 4 / 11, 0, 4 / 13, 0, 4 / 15];
-                    }
+                    return (2 * (Math.floor((time * harmonic - 1) % 2 + 2) % 2) - 1) / harmonic;
                 case 2:
-                    if (index % 2 == 0) {
-                        return [0, 5 / 2, 0, 5 / 18, 0, 1 / 10, 0, 5 / 98, 0, 5 / 162, 0, 5 / 242];
-                    }
-                    else {
-                        return [5 / 2, 0, 5 / 18, 0, 1 / 10, 0, 5 / 98, 0, 5 / 162, 0, 5 / 242];
-                    }
+                    return (2 * (Math.abs(((time * harmonic / 2 + 1 / 2) % 1 + 1) % 1) * 2 - 1) - 1) / harmonic;
                 case 3:
-                    return [2, 1, 2 / 3, 1 / 2, 2 / 5, 1 / 3, 2 / 7, 1 / 4];
+                    return (2 * Math.abs(((time * harmonic / 2 + 1 / 2) % 1 + 1) % 1) - 1) / harmonic;
                 case 4:
-                    return [-2, -1, -2 / 3, -1 / 2, -2 / 5, -1 / 3, -2 / 7, -1 / 4];
+                    return (-2 * Math.abs(((time * harmonic / 2 + 1 / 2) % 1 + 1) % 1) + 1) / harmonic;
                 case 5:
-                    return [1];
+                    return this.waveExpressions(2, time, harmonic) + this.waveExpressions(2, (time + 1 / 2), harmonic);
+                default:
+                    return (Math.sin(time * harmonic * Math.PI * 2)) / harmonic;
             }
-            return [1];
         }
     }
     class FilterControlPoint {
@@ -14896,6 +14820,17 @@ li.select2-results__option[role=group] > strong:hover {
                         }
                         harmonicsBits.encodeBase64(buffer);
                     }
+                    if (instrument.type == 12) {
+                        buffer.push(89);
+                        const additiveBits = new BitFieldWriter();
+                        for (let i = 0; i < Config.additiveControlPoints; i++) {
+                            additiveBits.write(Config.additiveControlPointBits, instrument.additiveWave.additives[i]);
+                        }
+                        additiveBits.encodeBase64(buffer);
+                        for (let i = 0; i < Config.additiveControlPoints; i++) {
+                            buffer.push(base64IntToCharCode[instrument.additiveWave.waveTypes[i]]);
+                        }
+                    }
                     if (instrument.type == 0) {
                         if (instrument.chipWave > 186) {
                             buffer.push(119, base64IntToCharCode[instrument.chipWave - 186]);
@@ -15057,6 +14992,7 @@ li.select2-results__option[role=group] > strong:hover {
                         buffer.push(73, base64IntToCharCode[instrument.stringSustain | (instrument.stringSustainType << 5)]);
                     }
                     else if (instrument.type == 10) ;
+                    else if (instrument.type == 12) ;
                     else {
                         throw new Error("Unknown instrument type.");
                     }
@@ -15748,6 +15684,12 @@ li.select2-results__option[role=group] > strong:hover {
                                 if (this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].preset == 10) {
                                     this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].preset = 11;
                                     this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].type = 11;
+                                }
+                            }
+                            else if (!fromSlarmoosBox || (fromSlarmoosBox && beforeTwo)) {
+                                if (this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].preset == 10) {
+                                    this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].preset = 12;
+                                    this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].type = 12;
                                 }
                             }
                             if (fromBeepBox && presetValue == EditorConfig.nameToPresetValue("grand piano 1")) {
@@ -16863,6 +16805,21 @@ li.select2-results__option[role=group] > strong:hover {
                             }
                             instrument.harmonicsWave.markCustomWaveDirty();
                             charIndex += byteCount;
+                        }
+                        break;
+                    case 89:
+                        {
+                            const instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
+                            const byteCount = Math.ceil(Config.additiveControlPoints * Config.additiveControlPointBits / 6);
+                            const bits = new BitFieldReader(compressed, charIndex, charIndex + byteCount);
+                            for (let i = 0; i < Config.additiveControlPoints; i++) {
+                                instrument.additiveWave.additives[i] = bits.read(Config.additiveControlPointBits);
+                            }
+                            instrument.additiveWave.markCustomWaveDirty();
+                            charIndex += byteCount;
+                            for (let i = 0; i < Config.additiveControlPoints; i++) {
+                                instrument.additiveWave.waveTypes[i] = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                            }
                         }
                         break;
                     case 88:
@@ -26352,6 +26309,19 @@ li.select2-results__option[role=group] > strong:hover {
             this._didSomething();
         }
     }
+    class ChangeAdditive extends Change {
+        constructor(doc, instrument, additiveWave) {
+            super();
+            for (let i = 0; i < additiveWave.waveTypes.length; i++) {
+                instrument.additiveWave.waveTypes[i] = additiveWave.waveTypes[i];
+                instrument.additiveWave.additives[i] = additiveWave.additives[i];
+            }
+            additiveWave.markCustomWaveDirty();
+            instrument.preset = instrument.type;
+            doc.notifier.changed();
+            this._didSomething();
+        }
+    }
     class ChangeDrumsetEnvelope extends Change {
         constructor(doc, drumIndex, newValue) {
             super();
@@ -32710,6 +32680,8 @@ You should be redirected to the song at:<br /><br />
             this._change = null;
             this._renderedPath = "";
             this._renderedFifths = true;
+            this.instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
+            this._initial = this.instrument.harmonicsWave;
             this._whenMousePressed = (event) => {
                 event.preventDefault();
                 this._mouseDown = true;
@@ -32821,6 +32793,27 @@ You should be redirected to the song at:<br /><br />
                 this._doc.setProspectiveChange(this._change);
             }
         }
+        getHarmonicsWave() {
+            const instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
+            return instrument.harmonicsWave;
+        }
+        setHarmonicsWave(harmonics) {
+            const instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
+            for (let i = 0; i < Config.harmonicsControlPoints; i++) {
+                instrument.harmonicsWave.harmonics[i] = harmonics[i];
+            }
+            this._doc.record(new ChangeHarmonics(this._doc, instrument, instrument.harmonicsWave));
+            this.render();
+        }
+        saveSettings() {
+            const instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
+            this._doc.record(new ChangeHarmonics(this._doc, instrument, instrument.harmonicsWave));
+        }
+        resetToInitial() {
+            const instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
+            this.setHarmonicsWave(this._initial.harmonics);
+            this._doc.record(new ChangeHarmonics(this._doc, instrument, this._initial));
+        }
         render() {
             const instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
             const harmonicsWave = instrument.harmonicsWave;
@@ -32849,6 +32842,456 @@ You should be redirected to the song at:<br /><br />
             if (this._renderedFifths != this._doc.prefs.showFifth) {
                 this._renderedFifths = this._doc.prefs.showFifth;
                 this._fifths.style.display = this._doc.prefs.showFifth ? "" : "none";
+            }
+        }
+    }
+    class HarmonicsEditorPrompt {
+        constructor(_doc, _songEditor) {
+            this._doc = _doc;
+            this._songEditor = _songEditor;
+            this.harmonicsEditor = new HarmonicsEditor(this._doc);
+            this._playButton = HTML.button({ style: "width: 55%;", type: "button" });
+            this._cancelButton = HTML.button({ class: "cancelButton" });
+            this._okayButton = HTML.button({ class: "okayButton", style: "width:45%;" }, "Okay");
+            this.copyButton = HTML.button({ style: "width:86px; margin-right: 5px;", class: "copyButton" }, [
+                "Copy",
+                SVG.svg({ style: "flex-shrink: 0; position: absolute; left: 0; top: 50%; margin-top: -1em; pointer-events: none;", width: "2em", height: "2em", viewBox: "-5 -21 26 26" }, [
+                    SVG.path({ d: "M 0 -15 L 1 -15 L 1 0 L 13 0 L 13 1 L 0 1 L 0 -15 z M 2 -1 L 2 -17 L 10 -17 L 14 -13 L 14 -1 z M 3 -2 L 13 -2 L 13 -12 L 9 -12 L 9 -16 L 3 -16 z", fill: "currentColor" }),
+                ]),
+            ]);
+            this.pasteButton = HTML.button({ style: "width:86px;", class: "pasteButton" }, [
+                "Paste",
+                SVG.svg({ style: "flex-shrink: 0; position: absolute; left: 0; top: 50%; margin-top: -1em; pointer-events: none;", width: "2em", height: "2em", viewBox: "0 0 26 26" }, [
+                    SVG.path({ d: "M 8 18 L 6 18 L 6 5 L 17 5 L 17 7 M 9 8 L 16 8 L 20 12 L 20 22 L 9 22 z", stroke: "currentColor", fill: "none" }),
+                    SVG.path({ d: "M 9 3 L 14 3 L 14 6 L 9 6 L 9 3 z M 16 8 L 20 12 L 16 12 L 16 8 z", fill: "currentColor", }),
+                ]),
+            ]);
+            this.copyPasteContainer = HTML.div({ style: "width: 185px;" }, this.copyButton, this.pasteButton);
+            this.container = HTML.div({ class: "prompt noSelection", style: "width: 500px;" }, HTML.h2("Edit Harmonics Instrument"), HTML.div({ style: "display: flex; width: 55%; align-self: center; flex-direction: row; align-items: center; justify-content: center;" }, this._playButton), HTML.div({ style: "display: flex; flex-direction: row; align-items: center; justify-content: center;" }, this.harmonicsEditor.container), HTML.div({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between;" }, this._okayButton, this.copyPasteContainer), this._cancelButton);
+            this._togglePlay = () => {
+                this._songEditor.togglePlay();
+                this.updatePlayButton();
+            };
+            this._close = () => {
+                this._doc.prompt = null;
+                this.harmonicsEditor.resetToInitial();
+            };
+            this.cleanUp = () => {
+                this._okayButton.removeEventListener("click", this._saveChanges);
+                this._cancelButton.removeEventListener("click", this._close);
+                this.container.removeEventListener("keydown", this.whenKeyPressed);
+                this.harmonicsEditor.container.removeEventListener("mousemove", () => this.harmonicsEditor.render());
+                this._playButton.removeEventListener("click", this._togglePlay);
+            };
+            this._copySettings = () => {
+                const harmonicsCopy = this.harmonicsEditor.getHarmonicsWave();
+                window.localStorage.setItem("harmonicsCopy", JSON.stringify(harmonicsCopy.harmonics));
+            };
+            this._pasteSettings = () => {
+                const storedHarmonicsWave = JSON.parse(String(window.localStorage.getItem("harmonicsCopy")));
+                this.harmonicsEditor.setHarmonicsWave(storedHarmonicsWave);
+            };
+            this.whenKeyPressed = (event) => {
+                if (event.target.tagName != "BUTTON" && event.keyCode == 13) {
+                    this._saveChanges();
+                }
+                else if (event.keyCode == 32) {
+                    this._togglePlay();
+                    event.preventDefault();
+                }
+                else if (event.keyCode == 219) {
+                    this._doc.synth.goToPrevBar();
+                }
+                else if (event.keyCode == 221) {
+                    this._doc.synth.goToNextBar();
+                }
+            };
+            this._saveChanges = () => {
+                this._doc.prompt = null;
+                this.harmonicsEditor.saveSettings();
+            };
+            this._okayButton.addEventListener("click", this._saveChanges);
+            this._cancelButton.addEventListener("click", this._close);
+            this.container.addEventListener("keydown", this.whenKeyPressed);
+            this.copyButton.addEventListener("click", this._copySettings);
+            this.pasteButton.addEventListener("click", this._pasteSettings);
+            this._playButton.addEventListener("click", this._togglePlay);
+            this.harmonicsEditor.container.addEventListener("mousemove", () => this.harmonicsEditor.render());
+            this.container.addEventListener("mousemove", () => this.harmonicsEditor.render());
+            this.container.addEventListener("mousedown", () => this.harmonicsEditor.render());
+            this.updatePlayButton();
+            setTimeout(() => this._playButton.focus());
+            this.harmonicsEditor.render();
+        }
+        updatePlayButton() {
+            if (this._doc.synth.playing) {
+                this._playButton.classList.remove("playButton");
+                this._playButton.classList.add("pauseButton");
+                this._playButton.title = "Pause (Space)";
+                this._playButton.innerText = "Pause";
+            }
+            else {
+                this._playButton.classList.remove("pauseButton");
+                this._playButton.classList.add("playButton");
+                this._playButton.title = "Play (Space)";
+                this._playButton.innerText = "Play";
+            }
+        }
+    }
+
+    class AdditiveEditor {
+        constructor(_doc) {
+            this._doc = _doc;
+            this._editorWidth = 120;
+            this._editorHeight = 26;
+            this._octaves = SVG.svg({ "pointer-events": "none" });
+            this._fifths = SVG.svg({ "pointer-events": "none" });
+            this._curve = SVG.path({ fill: "none", stroke: "currentColor", "stroke-width": 2, "pointer-events": "none" });
+            this._lastControlPoints = [];
+            this._lastControlPointContainer = SVG.svg({ "pointer-events": "none" });
+            this._waveTypeButtons = [];
+            this.waveTypeButtonContainer = HTML.div({ style: "display: flex; flex-direction: row; align-items: center; justify-content: center; margin-left: 0px; margin-right: 8px" });
+            this._svg = SVG.svg({ style: "background-color: ${ColorConfig.editorBackground}; touch-action: none; cursor: crosshair;", width: "100%", height: "100%", viewBox: "0 0 " + this._editorWidth + " " + this._editorHeight, preserveAspectRatio: "none" }, this._octaves, this._fifths, this._curve, this._lastControlPointContainer);
+            this.container = HTML.div({ class: "additive", style: "height: 100%;" }, this._svg);
+            this._mouseX = 0;
+            this._mouseY = 0;
+            this._freqPrev = 0;
+            this._ampPrev = 0;
+            this._mouseDown = false;
+            this._change = null;
+            this._renderedPath = "";
+            this._renderedFifths = true;
+            this._instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
+            this._initial = this._instrument.additiveWave;
+            this._current = this._initial;
+            this._whenMousePressed = (event) => {
+                event.preventDefault();
+                this._mouseDown = true;
+                const boundingRect = this._svg.getBoundingClientRect();
+                this._mouseX = ((event.clientX || event.pageX) - boundingRect.left) * this._editorWidth / (boundingRect.right - boundingRect.left);
+                this._mouseY = ((event.clientY || event.pageY) - boundingRect.top) * this._editorHeight / (boundingRect.bottom - boundingRect.top);
+                if (isNaN(this._mouseX))
+                    this._mouseX = 0;
+                if (isNaN(this._mouseY))
+                    this._mouseY = 0;
+                this._freqPrev = this._xToFreq(this._mouseX);
+                this._ampPrev = this._yToAmp(this._mouseY);
+                this._whenCursorMoved();
+            };
+            this._whenTouchPressed = (event) => {
+                event.preventDefault();
+                this._mouseDown = true;
+                const boundingRect = this._svg.getBoundingClientRect();
+                this._mouseX = (event.touches[0].clientX - boundingRect.left) * this._editorWidth / (boundingRect.right - boundingRect.left);
+                this._mouseY = (event.touches[0].clientY - boundingRect.top) * this._editorHeight / (boundingRect.bottom - boundingRect.top);
+                if (isNaN(this._mouseX))
+                    this._mouseX = 0;
+                if (isNaN(this._mouseY))
+                    this._mouseY = 0;
+                this._freqPrev = this._xToFreq(this._mouseX);
+                this._ampPrev = this._yToAmp(this._mouseY);
+                this._whenCursorMoved();
+            };
+            this._whenMouseMoved = (event) => {
+                if (this.container.offsetParent == null)
+                    return;
+                const boundingRect = this._svg.getBoundingClientRect();
+                this._mouseX = ((event.clientX || event.pageX) - boundingRect.left) * this._editorWidth / (boundingRect.right - boundingRect.left);
+                this._mouseY = ((event.clientY || event.pageY) - boundingRect.top) * this._editorHeight / (boundingRect.bottom - boundingRect.top);
+                if (isNaN(this._mouseX))
+                    this._mouseX = 0;
+                if (isNaN(this._mouseY))
+                    this._mouseY = 0;
+                this._whenCursorMoved();
+            };
+            this._whenTouchMoved = (event) => {
+                if (this.container.offsetParent == null)
+                    return;
+                if (!this._mouseDown)
+                    return;
+                event.preventDefault();
+                const boundingRect = this._svg.getBoundingClientRect();
+                this._mouseX = (event.touches[0].clientX - boundingRect.left) * this._editorWidth / (boundingRect.right - boundingRect.left);
+                this._mouseY = (event.touches[0].clientY - boundingRect.top) * this._editorHeight / (boundingRect.bottom - boundingRect.top);
+                if (isNaN(this._mouseX))
+                    this._mouseX = 0;
+                if (isNaN(this._mouseY))
+                    this._mouseY = 0;
+                this._whenCursorMoved();
+            };
+            this._whenCursorReleased = (event) => {
+                if (this._mouseDown) {
+                    this._doc.record(this._change);
+                    this._change = null;
+                }
+                this._mouseDown = false;
+            };
+            for (let i = 1; i <= Config.additiveControlPoints; i = i * 2) {
+                this._octaves.appendChild(SVG.rect({ fill: ColorConfig.tonic, x: (i - 0.5) * (this._editorWidth - 8) / (Config.additiveControlPoints - 1) - 1, y: 0, width: 2, height: this._editorHeight }));
+            }
+            for (let i = 3; i <= Config.additiveControlPoints; i = i * 2) {
+                this._fifths.appendChild(SVG.rect({ fill: ColorConfig.fifthNote, x: (i - 0.5) * (this._editorWidth - 8) / (Config.additiveControlPoints - 1) - 1, y: 0, width: 2, height: this._editorHeight }));
+            }
+            for (let i = 0; i < 4; i++) {
+                const rect = SVG.rect({ fill: "currentColor", x: (this._editorWidth - i * 2 - 1), y: 0, width: 1, height: this._editorHeight });
+                this._lastControlPoints.push(rect);
+                this._lastControlPointContainer.appendChild(rect);
+            }
+            for (let i = 0; i < Config.additiveControlPoints; i++) {
+                const waveTypeButton = HTML.button({ style: `width:21.7px;margin:3px;margin-left: ${i == Config.additiveControlPoints - 1 ? 19.4 : 3}px;` }, this._getShape(this._current.waveTypes[i], i));
+                this._waveTypeButtons.push(waveTypeButton);
+                this.waveTypeButtonContainer.appendChild(waveTypeButton);
+                const index = i;
+                waveTypeButton.addEventListener("click", () => this._buttonPressed(index));
+            }
+            this.container.addEventListener("mousedown", this._whenMousePressed);
+            document.addEventListener("mousemove", this._whenMouseMoved);
+            document.addEventListener("mouseup", this._whenCursorReleased);
+            this.container.addEventListener("touchstart", this._whenTouchPressed);
+            this.container.addEventListener("touchmove", this._whenTouchMoved);
+            this.container.addEventListener("touchend", this._whenCursorReleased);
+            this.container.addEventListener("touchcancel", this._whenCursorReleased);
+        }
+        _buttonPressed(buttonIndex) {
+            if (this._waveTypeButtons[buttonIndex]) {
+                if (this._current.waveTypes[buttonIndex] < 6 - 1) {
+                    this._current.waveTypes[buttonIndex]++;
+                }
+                else {
+                    this._current.waveTypes[buttonIndex] = 0;
+                }
+                const existingChild = document.getElementById("SVGshape" + buttonIndex);
+                if (existingChild) {
+                    existingChild.remove();
+                    this._waveTypeButtons[buttonIndex].appendChild(this._getShape(this._current.waveTypes[buttonIndex], buttonIndex));
+                }
+                const instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
+                this._doc.record(new ChangeAdditive(this._doc, instrument, this._current));
+            }
+        }
+        _getShape(shape, index) {
+            switch (shape) {
+                case 0:
+                    return SVG.svg({ id: "SVGshape" + index, style: "flex-shrink: 0; position: absolute; left: 0; top: 0; pointer-events: none; margin:1px;", width: "20px", height: "20px", viewBox: "0 0 26 26" }, [
+                        SVG.path({ d: "M 2 12 C 12 0, 13 23, 23 13", strokeWidth: "3", stroke: "currentColor", fill: "none" }),
+                    ]);
+                case 1:
+                    return SVG.svg({ id: "SVGshape" + index, style: "flex-shrink: 0; position: absolute; left: 0; top: 0; pointer-events: none; margin:1px;", width: "20px", height: "20px", viewBox: "0 0 26 26" }, [
+                        SVG.path({ d: "M 2 2 L 2 23 L 23 23 L 23 2 L 2 2 z", strokeWidth: "3", stroke: "currentColor", fill: "none" }),
+                    ]);
+                case 2:
+                    return SVG.svg({ id: "SVGshape" + index, style: "flex-shrink: 0; position: absolute; left: 0; top: 0; pointer-events: none; margin:1px;", width: "20px", height: "20px", viewBox: "0 0 26 26" }, [
+                        SVG.path({ d: "M 2 23 L 12 2 L 23 23 L 2 23 z", strokeWidth: "3", stroke: "currentColor", fill: "none" }),
+                    ]);
+                case 3:
+                    return SVG.svg({ id: "SVGshape" + index, style: "flex-shrink: 0; position: absolute; left: 0; top: 0; pointer-events: none; margin:1px;", width: "20px", height: "20px", viewBox: "0 0 26 26" }, [
+                        SVG.path({ d: "M 3 3 L 3 24 L 13 24 L 3 3 z M 14 24 L 14 3 L 24 24 L 14 24 z", strokeWidth: "3", stroke: "currentColor", fill: "none" }),
+                    ]);
+                case 4:
+                    return SVG.svg({ id: "SVGshape" + index, style: "flex-shrink: 0; position: absolute; left: 0; top: 0; pointer-events: none; margin:1px;", width: "20px", height: "20px", viewBox: "0 0 26 26" }, [
+                        SVG.path({ d: "M 12 3 L 2 24 L 12 24 L 12 3 z M 13 24 L 23 3 L 23 24 L 13 24 z", strokeWidth: "3", stroke: "currentColor", fill: "none" }),
+                    ]);
+                case 5:
+                    return SVG.svg({ id: "SVGshape" + index, style: "flex-shrink: 0; position: absolute; left: 0; top: 0; pointer-events: none; margin:1px;", width: "20px", height: "20px", viewBox: "0 0 26 26" }, [
+                        SVG.path({ d: "M 2 23 L 23 23 L 17 2 L 8 2 L 2 23 z", strokeWidth: "3", stroke: "currentColor", fill: "none" }),
+                    ]);
+                default:
+                    return this._getShape(0, index);
+            }
+        }
+        _xToFreq(x) {
+            return (Config.additiveControlPoints - 1) * x / (this._editorWidth - 8) - 0.5;
+        }
+        _yToAmp(y) {
+            return Config.additiveMax * (1 - y / this._editorHeight);
+        }
+        _whenCursorMoved() {
+            if (this._mouseDown) {
+                const freq = this._xToFreq(this._mouseX);
+                const amp = this._yToAmp(this._mouseY);
+                this._updateAdditive(freq, amp);
+                this._doc.setProspectiveChange(this._change);
+            }
+        }
+        _updateAdditive(freq, amp) {
+            const instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
+            if (freq != this._freqPrev) {
+                const slope = (amp - this._ampPrev) / (freq - this._freqPrev);
+                const offset = this._ampPrev - this._freqPrev * slope;
+                const lowerFreq = Math.ceil(Math.min(this._freqPrev, freq));
+                const upperFreq = Math.floor(Math.max(this._freqPrev, freq));
+                for (let i = lowerFreq; i <= upperFreq; i++) {
+                    if (i < 0 || i >= Config.additiveControlPoints)
+                        continue;
+                    this._current.additives[i] = Math.max(0, Math.min(Config.additiveMax, Math.round(i * slope + offset)));
+                }
+            }
+            this._current.additives[Math.max(0, Math.min(Config.additiveControlPoints - 1, Math.round(freq)))] = Math.max(0, Math.min(Config.additiveMax, Math.round(amp)));
+            this._freqPrev = freq;
+            this._ampPrev = amp;
+            this._change = new ChangeAdditive(this._doc, instrument, this._current);
+        }
+        getAddditiveWave() {
+            return this._current;
+        }
+        setAdditiveWave(additive) {
+            const instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
+            this._current = additive;
+            this._doc.record(new ChangeAdditive(this._doc, instrument, this._current));
+            this.render();
+            for (let i = 0; i < Config.additiveControlPoints; i++) {
+                if (this._waveTypeButtons[i]) {
+                    const existingChild = document.getElementById("SVGshape" + i);
+                    if (existingChild) {
+                        existingChild.remove();
+                    }
+                    this._waveTypeButtons[i].appendChild(this._getShape(this._current.waveTypes[i], i));
+                }
+            }
+        }
+        saveSettings() {
+            const instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
+            this._doc.record(new ChangeAdditive(this._doc, instrument, this._current));
+        }
+        resetToInitial() {
+            const instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
+            this._doc.record(new ChangeAdditive(this._doc, instrument, this._initial));
+        }
+        rerenderWave() {
+            this._instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
+            this._initial = this._instrument.additiveWave;
+            this._current = this._initial;
+            this.render();
+        }
+        render() {
+            const instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
+            const additiveWave = instrument.additiveWave;
+            const controlPointToHeight = (point) => {
+                return (1 - (point / Config.additiveMax)) * this._editorHeight;
+            };
+            let bottom = prettyNumber(this._editorHeight);
+            let path = "";
+            for (let i = 0; i < Config.additiveControlPoints - 1; i++) {
+                if (additiveWave.additives[i] == 0)
+                    continue;
+                let xPos = prettyNumber((i + 0.5) * (this._editorWidth - 8) / (Config.additiveControlPoints - 1));
+                path += "M " + xPos + " " + bottom + " ";
+                path += "L " + xPos + " " + prettyNumber(controlPointToHeight(additiveWave.additives[i])) + " ";
+            }
+            const lastHeight = controlPointToHeight(additiveWave.additives[Config.additiveControlPoints - 1]);
+            for (let i = 0; i < 4; i++) {
+                const rect = this._lastControlPoints[i];
+                rect.setAttribute("y", prettyNumber(lastHeight));
+                rect.setAttribute("height", prettyNumber(this._editorHeight - lastHeight));
+            }
+            if (this._renderedPath != path) {
+                this._renderedPath = path;
+                this._curve.setAttribute("d", path);
+            }
+            if (this._renderedFifths != this._doc.prefs.showFifth) {
+                this._renderedFifths = this._doc.prefs.showFifth;
+                this._fifths.style.display = this._doc.prefs.showFifth ? "" : "none";
+            }
+        }
+    }
+    class AdditiveEditorPrompt {
+        constructor(_doc, _songEditor) {
+            this._doc = _doc;
+            this._songEditor = _songEditor;
+            this.additiveEditor = new AdditiveEditor(this._doc);
+            this._playButton = HTML.button({ style: "width: 55%;", type: "button" });
+            this._cancelButton = HTML.button({ class: "cancelButton" });
+            this._okayButton = HTML.button({ class: "okayButton", style: "width:45%;" }, "Okay");
+            this.copyButton = HTML.button({ style: "width:86px; margin-right: 5px;", class: "copyButton" }, [
+                "Copy",
+                SVG.svg({ style: "flex-shrink: 0; position: absolute; left: 0; top: 50%; margin-top: -1em; pointer-events: none;", width: "2em", height: "2em", viewBox: "-5 -21 26 26" }, [
+                    SVG.path({ d: "M 0 -15 L 1 -15 L 1 0 L 13 0 L 13 1 L 0 1 L 0 -15 z M 2 -1 L 2 -17 L 10 -17 L 14 -13 L 14 -1 z M 3 -2 L 13 -2 L 13 -12 L 9 -12 L 9 -16 L 3 -16 z", fill: "currentColor" }),
+                ]),
+            ]);
+            this.pasteButton = HTML.button({ style: "width:86px;", class: "pasteButton" }, [
+                "Paste",
+                SVG.svg({ style: "flex-shrink: 0; position: absolute; left: 0; top: 50%; margin-top: -1em; pointer-events: none;", width: "2em", height: "2em", viewBox: "0 0 26 26" }, [
+                    SVG.path({ d: "M 8 18 L 6 18 L 6 5 L 17 5 L 17 7 M 9 8 L 16 8 L 20 12 L 20 22 L 9 22 z", stroke: "currentColor", fill: "none" }),
+                    SVG.path({ d: "M 9 3 L 14 3 L 14 6 L 9 6 L 9 3 z M 16 8 L 20 12 L 16 12 L 16 8 z", fill: "currentColor", }),
+                ]),
+            ]);
+            this.copyPasteContainer = HTML.div({ style: "width: 185px;" }, this.copyButton, this.pasteButton);
+            this.container = HTML.div({ class: "prompt noSelection", style: "width: 800px; height: 500px" }, HTML.h2("Edit Additive Instrument"), HTML.div({ style: "display: flex; width: 55%; align-self: center; flex-direction: row; align-items: center; justify-content: center;" }, this._playButton), HTML.div({ style: "display: flex; flex-direction: column; align-items: center; justify-content: center; height: 80%" }, this.additiveEditor.container, this.additiveEditor.waveTypeButtonContainer), HTML.div({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between;" }, this._okayButton, this.copyPasteContainer), this._cancelButton);
+            this._togglePlay = () => {
+                this._songEditor.togglePlay();
+                this.updatePlayButton();
+            };
+            this._close = () => {
+                this._doc.prompt = null;
+                this.additiveEditor.resetToInitial();
+            };
+            this.cleanUp = () => {
+                this._okayButton.removeEventListener("click", this._saveChanges);
+                this._cancelButton.removeEventListener("click", this._close);
+                this.container.removeEventListener("keydown", this.whenKeyPressed);
+                this.additiveEditor.container.removeEventListener("mousemove", () => this.additiveEditor.render());
+                this._playButton.removeEventListener("click", this._togglePlay);
+            };
+            this._copySettings = () => {
+                const additiveCopy = this.additiveEditor.getAddditiveWave();
+                window.localStorage.setItem("additiveCopy", JSON.stringify({
+                    "additives": additiveCopy.additives,
+                    "waveTypes": additiveCopy.waveTypes
+                }));
+            };
+            this._pasteSettings = () => {
+                const storedAdditiveWave = JSON.parse(String(window.localStorage.getItem("additiveCopy")));
+                const parsedAdditive = new AdditiveWave;
+                for (let i = 0; i < Config.additiveControlPoints; i++) {
+                    parsedAdditive.additives[i] = storedAdditiveWave["additives"][i];
+                    parsedAdditive.waveTypes[i] = storedAdditiveWave["waveTypes"][i];
+                }
+                this.additiveEditor.setAdditiveWave(parsedAdditive);
+            };
+            this.whenKeyPressed = (event) => {
+                if (event.target.tagName != "BUTTON" && event.keyCode == 13) {
+                    this._saveChanges();
+                }
+                else if (event.keyCode == 32) {
+                    this._togglePlay();
+                    event.preventDefault();
+                }
+                else if (event.keyCode == 219) {
+                    this._doc.synth.goToPrevBar();
+                }
+                else if (event.keyCode == 221) {
+                    this._doc.synth.goToNextBar();
+                }
+            };
+            this._saveChanges = () => {
+                this._doc.prompt = null;
+                this.additiveEditor.saveSettings();
+            };
+            this._okayButton.addEventListener("click", this._saveChanges);
+            this._cancelButton.addEventListener("click", this._close);
+            this.container.addEventListener("keydown", this.whenKeyPressed);
+            this.copyButton.addEventListener("click", this._copySettings);
+            this.pasteButton.addEventListener("click", this._pasteSettings);
+            this._playButton.addEventListener("click", this._togglePlay);
+            this.additiveEditor.container.addEventListener("mousemove", () => this.additiveEditor.render());
+            this.container.addEventListener("mousemove", () => this.additiveEditor.render());
+            this.container.addEventListener("mousedown", () => this.additiveEditor.render());
+            this.updatePlayButton();
+            setTimeout(() => this._playButton.focus());
+            this.additiveEditor.render();
+        }
+        updatePlayButton() {
+            if (this._doc.synth.playing) {
+                this._playButton.classList.remove("playButton");
+                this._playButton.classList.add("pauseButton");
+                this._playButton.title = "Pause (Space)";
+                this._playButton.innerText = "Pause";
+            }
+            else {
+                this._playButton.classList.remove("pauseButton");
+                this._playButton.classList.add("playButton");
+                this._playButton.title = "Play (Space)";
+                this._playButton.innerText = "Play";
             }
         }
     }
@@ -39164,6 +39607,8 @@ You should be redirected to the song at:<br /><br />
             this._change = null;
             this._renderedPath = "";
             this._renderedFifths = true;
+            this.instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
+            this._initial = this.instrument.spectrumWave;
             this._whenMousePressed = (event) => {
                 event.preventDefault();
                 this._mouseDown = true;
@@ -39270,6 +39715,27 @@ You should be redirected to the song at:<br /><br />
                 this._doc.setProspectiveChange(this._change);
             }
         }
+        getSpectrumWave() {
+            const instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
+            return instrument.spectrumWave;
+        }
+        setSpectrumWave(spectrum) {
+            const instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
+            for (let i = 0; i < Config.spectrumControlPoints; i++) {
+                instrument.spectrumWave.spectrum[i] = spectrum[i];
+            }
+            this._doc.record(new ChangeSpectrum(this._doc, instrument, instrument.spectrumWave));
+            this.render();
+        }
+        saveSettings() {
+            const instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
+            this._doc.record(new ChangeSpectrum(this._doc, instrument, instrument.spectrumWave));
+        }
+        resetToInitial() {
+            const instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
+            this.setSpectrumWave(this._initial.spectrum);
+            this._doc.record(new ChangeSpectrum(this._doc, instrument, this._initial));
+        }
         render() {
             const instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
             const spectrumWave = (this._spectrumIndex == null) ? instrument.spectrumWave : instrument.drumsetSpectrumWaves[this._spectrumIndex];
@@ -39303,6 +39769,99 @@ You should be redirected to the song at:<br /><br />
             if (this._renderedFifths != this._doc.prefs.showFifth) {
                 this._renderedFifths = this._doc.prefs.showFifth;
                 this._fifths.style.display = this._doc.prefs.showFifth ? "" : "none";
+            }
+        }
+    }
+    class SpectrumEditorPrompt {
+        constructor(_doc, _songEditor) {
+            this._doc = _doc;
+            this._songEditor = _songEditor;
+            this.spectrumEditor = new SpectrumEditor(this._doc, null);
+            this._playButton = HTML.button({ style: "width: 55%;", type: "button" });
+            this._cancelButton = HTML.button({ class: "cancelButton" });
+            this._okayButton = HTML.button({ class: "okayButton", style: "width:45%;" }, "Okay");
+            this.copyButton = HTML.button({ style: "width:86px; margin-right: 5px;", class: "copyButton" }, [
+                "Copy",
+                SVG.svg({ style: "flex-shrink: 0; position: absolute; left: 0; top: 50%; margin-top: -1em; pointer-events: none;", width: "2em", height: "2em", viewBox: "-5 -21 26 26" }, [
+                    SVG.path({ d: "M 0 -15 L 1 -15 L 1 0 L 13 0 L 13 1 L 0 1 L 0 -15 z M 2 -1 L 2 -17 L 10 -17 L 14 -13 L 14 -1 z M 3 -2 L 13 -2 L 13 -12 L 9 -12 L 9 -16 L 3 -16 z", fill: "currentColor" }),
+                ]),
+            ]);
+            this.pasteButton = HTML.button({ style: "width:86px;", class: "pasteButton" }, [
+                "Paste",
+                SVG.svg({ style: "flex-shrink: 0; position: absolute; left: 0; top: 50%; margin-top: -1em; pointer-events: none;", width: "2em", height: "2em", viewBox: "0 0 26 26" }, [
+                    SVG.path({ d: "M 8 18 L 6 18 L 6 5 L 17 5 L 17 7 M 9 8 L 16 8 L 20 12 L 20 22 L 9 22 z", stroke: "currentColor", fill: "none" }),
+                    SVG.path({ d: "M 9 3 L 14 3 L 14 6 L 9 6 L 9 3 z M 16 8 L 20 12 L 16 12 L 16 8 z", fill: "currentColor", }),
+                ]),
+            ]);
+            this.copyPasteContainer = HTML.div({ style: "width: 185px;" }, this.copyButton, this.pasteButton);
+            this.container = HTML.div({ class: "prompt noSelection", style: "width: 500px;" }, HTML.h2("Edit Spectrum Instrument"), HTML.div({ style: "display: flex; width: 55%; align-self: center; flex-direction: row; align-items: center; justify-content: center;" }, this._playButton), HTML.div({ style: "display: flex; flex-direction: row; align-items: center; justify-content: center; height: 80%" }, this.spectrumEditor.container), HTML.div({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between;" }, this._okayButton, this.copyPasteContainer), this._cancelButton);
+            this._togglePlay = () => {
+                this._songEditor.togglePlay();
+                this.updatePlayButton();
+            };
+            this._close = () => {
+                this._doc.prompt = null;
+                this.spectrumEditor.resetToInitial();
+            };
+            this.cleanUp = () => {
+                this._okayButton.removeEventListener("click", this._saveChanges);
+                this._cancelButton.removeEventListener("click", this._close);
+                this.container.removeEventListener("keydown", this.whenKeyPressed);
+                this.spectrumEditor.container.removeEventListener("mousemove", () => this.spectrumEditor.render());
+                this._playButton.removeEventListener("click", this._togglePlay);
+            };
+            this._copySettings = () => {
+                const spectrumCopy = this.spectrumEditor.getSpectrumWave();
+                window.localStorage.setItem("spectrumCopy", JSON.stringify(spectrumCopy.spectrum));
+            };
+            this._pasteSettings = () => {
+                const storedSpectrumWave = JSON.parse(String(window.localStorage.getItem("spectrumCopy")));
+                this.spectrumEditor.setSpectrumWave(storedSpectrumWave);
+            };
+            this.whenKeyPressed = (event) => {
+                if (event.target.tagName != "BUTTON" && event.keyCode == 13) {
+                    this._saveChanges();
+                }
+                else if (event.keyCode == 32) {
+                    this._togglePlay();
+                    event.preventDefault();
+                }
+                else if (event.keyCode == 219) {
+                    this._doc.synth.goToPrevBar();
+                }
+                else if (event.keyCode == 221) {
+                    this._doc.synth.goToNextBar();
+                }
+            };
+            this._saveChanges = () => {
+                this._doc.prompt = null;
+                this.spectrumEditor.saveSettings();
+            };
+            this._okayButton.addEventListener("click", this._saveChanges);
+            this._cancelButton.addEventListener("click", this._close);
+            this.container.addEventListener("keydown", this.whenKeyPressed);
+            this.copyButton.addEventListener("click", this._copySettings);
+            this.pasteButton.addEventListener("click", this._pasteSettings);
+            this._playButton.addEventListener("click", this._togglePlay);
+            this.spectrumEditor.container.addEventListener("mousemove", () => this.spectrumEditor.render());
+            this.container.addEventListener("mousemove", () => this.spectrumEditor.render());
+            this.container.addEventListener("mousedown", () => this.spectrumEditor.render());
+            this.updatePlayButton();
+            setTimeout(() => this._playButton.focus());
+            this.spectrumEditor.render();
+        }
+        updatePlayButton() {
+            if (this._doc.synth.playing) {
+                this._playButton.classList.remove("playButton");
+                this._playButton.classList.add("pauseButton");
+                this._playButton.title = "Pause (Space)";
+                this._playButton.innerText = "Pause";
+            }
+            else {
+                this._playButton.classList.remove("pauseButton");
+                this._playButton.classList.add("playButton");
+                this._playButton.title = "Play (Space)";
+                this._playButton.innerText = "Play";
             }
         }
     }
@@ -39973,6 +40532,11 @@ You should be redirected to the song at:<br /><br />
                 case "noteSizeInvert":
                     {
                         message = div$5(h2$4("Note Size Envelope Inversion"), p("This settings will invert whether a greater note size increases or decreases the value. This can be great if you want one effect to fade in as another fades out"));
+                    }
+                    break;
+                case "additive":
+                    {
+                        message = div$5(h2$4("Additive Instrument"), p("The \"Additive\" instrument type works very similar to harmonics, but instead of working with just sine waves, you can combine many different types of waves"), p("These waves are: sines, squares, triangles, sawtooths, and ramps (a sawtooth wave flipped over the y-axis). All of these are technically sine approximations of each waveform, but they function effectively the same"));
                     }
                     break;
                 default:
@@ -41885,7 +42449,7 @@ You should be redirected to the song at:<br /><br />
         return menu;
     }
     function buildPresetOptions(isNoise, idSet) {
-        const menu = select({ id: idSet });
+        const menu = select({ id: idSet, class: "presetSelect" });
         if (isNoise) {
             menu.appendChild(option({ value: 2 }, EditorConfig.valueToPreset(2).name));
             menu.appendChild(option({ value: 3 }, EditorConfig.valueToPreset(3).name));
@@ -41900,6 +42464,7 @@ You should be redirected to the song at:<br /><br />
             menu.appendChild(option({ value: 11 }, EditorConfig.instrumentToPreset(11).name));
             menu.appendChild(option({ value: 5 }, EditorConfig.valueToPreset(5).name));
             menu.appendChild(option({ value: 7 }, EditorConfig.valueToPreset(7).name));
+            menu.appendChild(option({ value: 12 }, EditorConfig.instrumentToPreset(12).name));
             menu.appendChild(option({ value: 3 }, EditorConfig.valueToPreset(3).name));
             menu.appendChild(option({ value: 2 }, EditorConfig.valueToPreset(2).name));
         }
@@ -42604,9 +43169,14 @@ You should be redirected to the song at:<br /><br />
             this._feedbackTypeSelect = buildOptions(select(), Config.feedbacks.map(feedback => feedback.name));
             this._feedbackRow1 = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("feedbackType") }, "Feedback:"), div({ class: "selectContainer" }, this._feedbackTypeSelect));
             this._spectrumEditor = new SpectrumEditor(this._doc, null);
-            this._spectrumRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("spectrum") }, "Spectrum:"), this._spectrumEditor.container);
+            this._spectrumZoom = button({ style: "margin-left:0em; padding-left:0.2em; height:1.5em; max-width: 12px;", onclick: () => this._openPrompt("spectrumSettings") }, "+");
+            this._spectrumRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("spectrum"), style: "font-size: smaller" }, "Spectrum:"), this._spectrumZoom, this._spectrumEditor.container);
             this._harmonicsEditor = new HarmonicsEditor(this._doc);
-            this._harmonicsRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("harmonics") }, "Harmonics:"), this._harmonicsEditor.container);
+            this._harmonicsZoom = button({ style: "margin-left:0em; padding-left:0.2em; height:1.5em; max-width: 12px;", onclick: () => this._openPrompt("harmonicsSettings") }, "+");
+            this._harmonicsRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("harmonics"), style: "font-size: smaller" }, "Harmonics:"), this._harmonicsZoom, this._harmonicsEditor.container);
+            this._additiveEditor = new AdditiveEditor(this._doc);
+            this._additiveZoom = button({ style: "margin-left:0em; padding-left:0.2em; height:1.5em; max-width: 12px;", onclick: () => this._openPrompt("additiveSettings") }, "+");
+            this._additiveRow = div({ class: "selectRow" }, span({ class: "tip ", onclick: () => this._openPrompt("additive"), style: "font-size: smaller" }, "Additive:"), this._additiveZoom, this._additiveEditor.container);
             this._envelopeEditor = new EnvelopeEditor(this._doc, (id, submenu, subtype) => this._toggleDropdownMenu(id, submenu, subtype), (name) => this._openPrompt(name));
             this._discreteEnvelopeBox = input({ type: "checkbox", style: "width: 1em; padding: 0; margin-right: 4em;" });
             this._discreteEnvelopeRow = div({ class: "selectRow dropFader" }, span({ class: "tip", style: "margin-left:4px;", onclick: () => this._openPrompt("discreteEnvelope") }, "‣ Discrete:"), this._discreteEnvelopeBox);
@@ -42661,11 +43231,11 @@ You should be redirected to the song at:<br /><br />
             this._feedbackAmplitudeSlider = new Slider(input({ type: "range", min: "0", max: Config.operatorAmplitudeMax, value: "0", step: "1", title: "Feedback Amplitude" }), this._doc, (oldValue, newValue) => new ChangeFeedbackAmplitude(this._doc, oldValue, newValue), false);
             this._feedbackRow2 = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("feedbackVolume") }, "Fdback Vol:"), this._feedbackAmplitudeSlider.container);
             this._addEnvelopeButton = button({ type: "button", class: "add-envelope" });
-            this._customInstrumentSettingsGroup = div({ class: "editor-controls" }, this._panSliderRow, this._panDropdownGroup, this._chipWaveSelectRow, this._chipNoiseSelectRow, this._useChipWaveAdvancedLoopControlsRow, this._chipWaveLoopModeSelectRow, this._chipWaveLoopStartRow, this._chipWaveLoopEndRow, this._chipWaveStartOffsetRow, this._chipWavePlayBackwardsRow, this._customWaveDraw, this._eqFilterTypeRow, this._eqFilterRow, this._eqFilterSimpleCutRow, this._eqFilterSimplePeakRow, this._fadeInOutRow, this._algorithmSelectRow, this._algorithm6OpSelectRow, this._phaseModGroup, this._feedbackRow1, this._feedback6OpRow1, this._feedbackRow2, this._spectrumRow, this._harmonicsRow, this._drumsetGroup, this._supersawDynamismRow, this._supersawSpreadRow, this._supersawShapeRow, this._pulseWidthRow, this._pulseWidthDropdownGroup, this._stringSustainRow, this._unisonSelectRow, this._unisonDropdownGroup, div({ style: `padding: 2px 0; margin-left: 2em; display: flex; align-items: center;` }, span({ style: `flex-grow: 1; text-align: center;` }, span({ class: "tip", onclick: () => this._openPrompt("effects") }, "Effects")), div({ class: "effects-menu" }, this._effectsSelect)), this._transitionRow, this._transitionDropdownGroup, this._chordSelectRow, this._chordDropdownGroup, this._pitchShiftRow, this._detuneSliderRow, this._vibratoSelectRow, this._vibratoDropdownGroup, this._noteFilterTypeRow, this._noteFilterRow, this._noteFilterSimpleCutRow, this._noteFilterSimplePeakRow, this._distortionRow, this._aliasingRow, this._bitcrusherQuantizationRow, this._bitcrusherFreqRow, this._chorusRow, this._echoSustainRow, this._echoDelayRow, this._reverbRow, div({ style: `padding: 2px 0; margin-left: 2em; display: flex; align-items: center;` }, span({ style: `flex-grow: 1; text-align: center;` }, span({ class: "tip", onclick: () => this._openPrompt("envelopes") }, "Envelopes")), this._envelopeDropdown, this._addEnvelopeButton), this._envelopeDropdownGroup, this._envelopeEditor.container);
+            this._customInstrumentSettingsGroup = div({ class: "editor-controls" }, this._panSliderRow, this._panDropdownGroup, this._chipWaveSelectRow, this._chipNoiseSelectRow, this._useChipWaveAdvancedLoopControlsRow, this._chipWaveLoopModeSelectRow, this._chipWaveLoopStartRow, this._chipWaveLoopEndRow, this._chipWaveStartOffsetRow, this._chipWavePlayBackwardsRow, this._customWaveDraw, this._eqFilterTypeRow, this._eqFilterRow, this._eqFilterSimpleCutRow, this._eqFilterSimplePeakRow, this._fadeInOutRow, this._algorithmSelectRow, this._algorithm6OpSelectRow, this._phaseModGroup, this._feedbackRow1, this._feedback6OpRow1, this._feedbackRow2, this._spectrumRow, this._harmonicsRow, this._additiveRow, this._drumsetGroup, this._supersawDynamismRow, this._supersawSpreadRow, this._supersawShapeRow, this._pulseWidthRow, this._pulseWidthDropdownGroup, this._stringSustainRow, this._unisonSelectRow, this._unisonDropdownGroup, div({ style: `padding: 2px 0; margin-left: 2em; display: flex; align-items: center;` }, span({ style: `flex-grow: 1; text-align: center;` }, span({ class: "tip", onclick: () => this._openPrompt("effects") }, "Effects")), div({ class: "effects-menu" }, this._effectsSelect)), this._transitionRow, this._transitionDropdownGroup, this._chordSelectRow, this._chordDropdownGroup, this._pitchShiftRow, this._detuneSliderRow, this._vibratoSelectRow, this._vibratoDropdownGroup, this._noteFilterTypeRow, this._noteFilterRow, this._noteFilterSimpleCutRow, this._noteFilterSimplePeakRow, this._distortionRow, this._aliasingRow, this._bitcrusherQuantizationRow, this._bitcrusherFreqRow, this._chorusRow, this._echoSustainRow, this._echoDelayRow, this._reverbRow, div({ style: `padding: 2px 0; margin-left: 2em; display: flex; align-items: center;` }, span({ style: `flex-grow: 1; text-align: center;` }, span({ class: "tip", onclick: () => this._openPrompt("envelopes") }, "Envelopes")), this._envelopeDropdown, this._addEnvelopeButton), this._envelopeDropdownGroup, this._envelopeEditor.container);
             this._instrumentCopyGroup = div({ class: "editor-controls" }, div({ class: "selectRow" }, this._instrumentCopyButton, this._instrumentPasteButton));
             this._instrumentExportGroup = div({ class: "editor-controls" }, div({ class: "selectRow" }, this._instrumentExportButton, this._instrumentImportButton));
             this._instrumentSettingsTextRow = div({ id: "instrumentSettingsText", style: `padding: 3px 0; max-width: 15em; text-align: center; color: ${ColorConfig.secondaryText};` }, "Instrument Settings");
-            this._instrumentTypeSelectRow = div({ class: "selectRow", id: "typeSelectRow" }, span({ class: "tip", onclick: () => this._openPrompt("instrumentType") }, "Type:"), div(div({ class: "pitchSelect" }, this._pitchedPresetSelect), div({ class: "drumSelect" }, this._drumPresetSelect)));
+            this._instrumentTypeSelectRow = div({ class: "selectRow", id: "typeSelectRow" }, span({ class: "tip", onclick: () => this._openPrompt("instrumentType") }, "Type:"), div({ style: "display:contents" }, div({ class: "pitchSelect", style: "display:contents" }, this._pitchedPresetSelect), div({ class: "drumSelect", style: "display:contents" }, this._drumPresetSelect)));
             this._instrumentSettingsGroup = div({ class: "editor-controls" }, this._instrumentSettingsTextRow, this._instrumentsButtonRow, this._instrumentTypeSelectRow, this._instrumentVolumeSliderRow, this._customInstrumentSettingsGroup);
             this._usedPatternIndicator = SVG.path({ d: "M -6 -6 H 6 V 6 H -6 V -6 M -2 -3 L -2 -3 L -1 -4 H 1 V 4 H -1 V -1.2 L -1.2 -1 H -2 V -3 z", fill: ColorConfig.indicatorSecondary, "fill-rule": "evenodd" });
             this._usedInstrumentIndicator = SVG.path({ d: "M -6 -0.8 H -3.8 V -6 H 0.8 V 4.4 H 2.2 V -0.8 H 6 V 0.8 H 3.8 V 6 H -0.8 V -4.4 H -2.2 V 0.8 H -6 z", fill: ColorConfig.indicatorSecondary });
@@ -43007,6 +43577,20 @@ You should be redirected to the song at:<br /><br />
                     else {
                         this._stringSustainRow.style.display = "none";
                     }
+                    if (instrument.type == 12) {
+                        this._chipWaveSelectRow.style.display = "none";
+                        this._useChipWaveAdvancedLoopControlsRow.style.display = "none";
+                        this._chipWaveLoopModeSelectRow.style.display = "none";
+                        this._chipWaveLoopStartRow.style.display = "none";
+                        this._chipWaveLoopEndRow.style.display = "none";
+                        this._chipWaveStartOffsetRow.style.display = "none";
+                        this._chipWavePlayBackwardsRow.style.display = "none";
+                        this._additiveRow.style.display = "";
+                        this._additiveEditor.render();
+                    }
+                    else {
+                        this._additiveRow.style.display = "none";
+                    }
                     if (instrument.type == 4) {
                         this._drumsetGroup.style.display = "";
                         this._chipWaveSelectRow.style.display = "none";
@@ -43325,6 +43909,7 @@ You should be redirected to the song at:<br /><br />
                         this._envelopeDropdownGroup.style.display = "none";
                     this._envelopeEditor.render();
                     this._envelopeEditor.rerenderExtraSettings();
+                    this._additiveEditor.rerenderWave();
                     for (let chordIndex = 0; chordIndex < Config.chords.length; chordIndex++) {
                         let hidden = (!Config.instrumentTypeHasSpecialInterval[instrument.type] && Config.chords[chordIndex].customInterval);
                         const option = this._chordSelect.children[chordIndex];
@@ -43407,6 +43992,7 @@ You should be redirected to the song at:<br /><br />
                     this._chipWavePlayBackwardsRow.style.display = "none";
                     this._spectrumRow.style.display = "none";
                     this._harmonicsRow.style.display = "none";
+                    this._additiveRow.style.display = "none";
                     this._transitionRow.style.display = "none";
                     this._chordSelectRow.style.display = "none";
                     this._chordDropdownGroup.style.display = "none";
@@ -44541,6 +45127,7 @@ You should be redirected to the song at:<br /><br />
                             this._doc.selection.setChannelBar((this._doc.channel - 1 + this._doc.song.getChannelCount()) % this._doc.song.getChannelCount(), this._doc.bar);
                             this._doc.selection.resetBoxSelection();
                             this._envelopeEditor.rerenderExtraSettings();
+                            this._additiveEditor.rerenderWave();
                         }
                         event.preventDefault();
                         break;
@@ -44557,6 +45144,7 @@ You should be redirected to the song at:<br /><br />
                             this._doc.selection.setChannelBar((this._doc.channel + 1) % this._doc.song.getChannelCount(), this._doc.bar);
                             this._doc.selection.resetBoxSelection();
                             this._envelopeEditor.rerenderExtraSettings();
+                            this._additiveEditor.rerenderWave();
                         }
                         event.preventDefault();
                         break;
@@ -45259,6 +45847,8 @@ You should be redirected to the song at:<br /><br />
             if (!("share" in navigator)) {
                 this._fileMenu.removeChild(this._fileMenu.querySelector("[value='shareUrl']"));
             }
+            this._pitchedPresetSelect.style.width = "4em";
+            this._drumPresetSelect.style.width = "4em";
             this._scaleSelect.appendChild(optgroup({ label: "Edit" }, option({ value: "forceScale" }, "Snap Notes To Scale"), option({ value: "customize" }, "Edit Custom Scale")));
             this._keySelect.appendChild(optgroup({ label: "Edit" }, option({ value: "detectKey" }, "Detect Key")));
             this._rhythmSelect.appendChild(optgroup({ label: "Edit" }, option({ value: "forceRhythm" }, "Snap Notes To Rhythm")));
@@ -45432,6 +46022,7 @@ You should be redirected to the song at:<br /><br />
             this._eqFilterEditor.container.addEventListener("mousedown", this.refocusStage);
             this._noteFilterEditor.container.addEventListener("mousedown", this.refocusStage);
             this._harmonicsEditor.container.addEventListener("mousedown", this.refocusStage);
+            this._additiveEditor.container.addEventListener("mousedown", this.refocusStage);
             this._tempoStepper.addEventListener("keydown", this._tempoStepperCaptureNumberKeys, false);
             this._addEnvelopeButton.addEventListener("click", this._addNewEnvelope);
             this._patternArea.addEventListener("contextmenu", this._disableCtrlContextMenu);
@@ -45829,6 +46420,15 @@ You should be redirected to the song at:<br /><br />
                         break;
                     case "configureShortener":
                         this.prompt = new ShortenerConfigPrompt(this._doc);
+                        break;
+                    case "additiveSettings":
+                        this.prompt = new AdditiveEditorPrompt(this._doc, this);
+                        break;
+                    case "harmonicsSettings":
+                        this.prompt = new HarmonicsEditorPrompt(this._doc, this);
+                        break;
+                    case "spectrumSettings":
+                        this.prompt = new SpectrumEditorPrompt(this._doc, this);
                         break;
                     default:
                         this.prompt = new TipPrompt(this._doc, promptName);

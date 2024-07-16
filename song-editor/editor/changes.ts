@@ -1,7 +1,7 @@
 // Copyright (c) 2012-2022 John Nesky and contributing authors, distributed under the MIT license, see accompanying the LICENSE.md file.
 
 import { Algorithm, Dictionary, FilterType, SustainType, InstrumentType, EffectType, AutomationTarget, Config, effectsIncludeDistortion } from "../synth/SynthConfig";
-import { NotePin, Note, makeNotePin, Pattern, FilterSettings, FilterControlPoint, SpectrumWave, HarmonicsWave, Instrument, Channel, Song, Synth, clamp } from "../synth/synth";
+import { NotePin, Note, makeNotePin, Pattern, FilterSettings, FilterControlPoint, SpectrumWave, HarmonicsWave, AdditiveWave, Instrument, Channel, Song, Synth, clamp } from "../synth/synth";
 import { Preset, PresetCategory, EditorConfig } from "./EditorConfig";
 import { Change, ChangeGroup, ChangeSequence, UndoableChange } from "./Change";
 import { SongDocument } from "./SongDocument";
@@ -2253,6 +2253,20 @@ export class ChangeHarmonics extends Change {
     constructor(doc: SongDocument, instrument: Instrument, harmonicsWave: HarmonicsWave) {
         super();
         harmonicsWave.markCustomWaveDirty();
+        instrument.preset = instrument.type;
+        doc.notifier.changed();
+        this._didSomething();
+    }
+}
+
+export class ChangeAdditive extends Change {
+    constructor(doc: SongDocument, instrument: Instrument, additiveWave: AdditiveWave) {
+        super();
+        for (let i: number = 0; i < additiveWave.waveTypes.length; i++) {
+            instrument.additiveWave.waveTypes[i] = additiveWave.waveTypes[i];
+            instrument.additiveWave.additives[i] = additiveWave.additives[i];
+        }
+        additiveWave.markCustomWaveDirty();
         instrument.preset = instrument.type;
         doc.notifier.changed();
         this._didSomething();

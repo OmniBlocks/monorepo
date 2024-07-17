@@ -17,6 +17,43 @@ const removeWidthAndHeight100Percent = svgTag => {
 };
 
 /**
+ * The paper.js used by vanilla doesn't handle rounded <rect> properly when they have only rx/ry
+ * set instead of both. While this is fixed in our paper.js fork, to ensure the project looks
+ * correct if someone imports the project into vanilla, we'll add the missing attribute.
+ * Upstream bug: https://github.com/paperjs/paper.js/issues/1863
+ * @param {SVGSVGElement} svgTag <svg> element, modified in-place.
+ * @returns {boolean} True if a change was made.
+ */
+const workaroundPaperRoundedRectangleBug = svgTag => {
+    let changed = false;
+
+    /**
+     * @param {SVGElement} element SVG element, modified in-place.
+     */
+    const recurse = element => {
+        if (element.tagName === 'rect') {
+            if (element.hasAttribute('rx') && !element.hasAttribute('ry')) {
+                changed = true;
+                element.setAttribute('ry', element.getAttribute('rx'));
+            } else if (element.hasAttribute('ry') && !element.hasAttribute('rx')) {
+                changed = true;
+                element.setAttribute('rx', element.getAttribute('ry'));
+            }
+        }
+
+        const childNodes = element.childNodes;
+        if (childNodes) {
+            for (let i = 0; i < childNodes.length; i++) {
+                recurse(childNodes[i]);
+            }
+        }
+    };
+
+    recurse(svgTag);
+    return changed;
+};
+
+/**
  * Applies fixes to an SVG to improve how it will behave in vanilla Scratch.
  * Unlike the regular loadSvgString(), this should be called once when the SVG
  * is first imported instead of each time the SVG loads.
@@ -31,6 +68,7 @@ const fixForVanilla = rawData => {
     let changed = false;
     // To avoid short-circuiting, call the function on the left side of the ||
     changed = removeWidthAndHeight100Percent(svgTag) || changed;
+    changed = workaroundPaperRoundedRectangleBug(svgTag) || changed;
 
     if (changed) {
         const svgText = new XMLSerializer().serializeToString(svgDom);

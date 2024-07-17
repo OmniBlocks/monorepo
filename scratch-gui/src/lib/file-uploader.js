@@ -1,9 +1,9 @@
-import {BitmapAdapter, sanitizeSvg} from '@turbowarp/scratch-svg-renderer';
+import {BitmapAdapter, sanitizeSvg, fixForVanilla} from '@turbowarp/scratch-svg-renderer';
 import randomizeSpritePosition from './randomize-sprite-position.js';
 import bmpConverter from './bmp-converter';
 import gifDecoder from './gif-decoder';
-import fixSVG from './tw-svg-fixer';
 import convertAudioToWav from './tw-convert-audio-wav.js';
+import log from './log.js';
 
 /**
  * Extract the file name given a string of the form fileName + ext
@@ -105,12 +105,18 @@ const costumeUpload = function (fileData, fileType, vm, handleCostume, handleErr
     let assetType = null;
     switch (fileType) {
     case 'image/svg+xml': {
+        // fix any vanilla compatibility issues in the SVG first
+        try {
+            fileData = fixForVanilla(fileData);
+        } catch (e) {
+            log.error('fixForVanilla error', e);
+        }
+
         // run svg bytes through scratch-svg-renderer's sanitization code
         fileData = sanitizeSvg.sanitizeByteStream(fileData);
 
         costumeFormat = storage.DataFormat.SVG;
         assetType = storage.AssetType.ImageVector;
-        fileData = fixSVG(fileData);
         break;
     }
     case 'image/jpeg': {

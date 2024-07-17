@@ -6,6 +6,7 @@ const sanitizeSvg = require('./sanitize-svg');
 const serializeSvgToString = require('./serialize-svg-to-string');
 const SvgElement = require('./svg-element');
 const convertFonts = require('./font-converter');
+const fixForVanilla = require('./tw-fix-for-vanilla');
 // /**
 //  * Export for NPM & Node.js
 //  * @type {RenderWebGL}
@@ -18,5 +19,6 @@ module.exports = {
     sanitizeSvg: sanitizeSvg,
     serializeSvgToString: serializeSvgToString,
     SvgElement: SvgElement,
-    SVGRenderer: SVGRenderer
+    SVGRenderer: SVGRenderer,
+    fixForVanilla: fixForVanilla
 };

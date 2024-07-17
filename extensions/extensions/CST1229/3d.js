@@ -1,6 +1,6 @@
-// Name: 3D
+// Name: CST 3D
 // ID: cst12293d
-// Description: Move your sprites into the third dimension.
+// Description: Bring your sprites into the third dimension.
 // By: CST1229 <https://scratch.mit.edu/users/CST1229/>
 // License: MPL-2.0
 
@@ -12,6 +12,11 @@
 /*
   TODO:
   - bugs
+  
+  - model support???
+    - "load (OBJ/MTL/GLTF) (text/data: URL) [] into model []"
+    - "set 3d mode to model []"
+    - collision support unlikely (if it did happen it would probably be very laggy)
 
   - materials/textures
     - "set material [0] texture to [current costume]"
@@ -19,14 +24,11 @@
     - built-in shape materials would be in docs because docs will exist (they are essential)
 
   - 3d stamping
-    - "3d stamp named []" block that copies the current 3d objects
+    - "3d stamp named []" block that copies the current 3d object
+    - "duplicate 3d stamp [] as []"
+    - "move 3d stamp [] to myself"
     - "delete 3d stamp []"
     - "erase all 3d stamps"
-  
-  - model support???
-    - probably just a "set 3d mode to obj [URL/text] []" block
-    - "set 3d mode to gltf [URL/text] []" block that also auto-sets materials
-    - collision support unlikely (if it did happen it would probably be very laggy)
   
   - lighting
     - could be in the set 3d mode block, as in "set 3d mode to (point/spotlight)"
@@ -79,6 +81,7 @@
 
   const Skin = Scratch.renderer.exports.Skin;
 
+  // this class was originally made by Vadik1
   class SimpleSkin extends Skin {
     constructor(id, renderer) {
       super(id, renderer);
@@ -138,19 +141,27 @@
 
   /* eslint-enable */
 
+  const extId = "cst12293d";
+
   class ThreeD {
     constructor() {
       window.threed = this;
 
+      this.hideVanillaBlocks = !!Scratch.vm.runtime.extensionStorage[extId]?.hideVanillaBlocks;
       Scratch.vm.runtime.on("PROJECT_LOADED", () => {
         this.uninit();
+        const oldHideVanillaBlocks = this.hideVanillaBlocks;
+        this.hideVanillaBlocks = !!Scratch.vm.runtime.extensionStorage[extId]?.hideVanillaBlocks;
+        if (oldHideVanillaBlocks != this.hideVanillaBlocks) {
+          Scratch.vm.extensionManager.refreshBlocks();
+        }
       });
     }
 
     getInfo() {
       return {
-        id: "cst12293d",
-        name: "3D",
+        id: extId,
+        name: "CST 3D",
 
         color1: "#2a47e8",
         color2: "#2439ad",
@@ -161,6 +172,11 @@
             blockType: Scratch.BlockType.BUTTON,
             text: "Open Documentation",
             func: "viewDocs",
+          },
+          {
+            blockType: Scratch.BlockType.BUTTON,
+            text: this.hideVanillaBlocks ? "Show Vanilla Blocks" : "Hide Vanilla Blocks",
+            func: "toggleVanillaBlocks",
           },
           "---",
           {
@@ -176,6 +192,22 @@
             },
           },
           "---",
+          this.vanillaBlock(`
+            <block type="motion_setx">
+                <value name="X">
+                    <shadow id="setx" type="math_number">
+                        <field name="NUM">0</field>
+                    </shadow>
+                </value>
+            </block>
+            <block type="motion_sety">
+                <value name="Y">
+                    <shadow id="sety" type="math_number">
+                        <field name="NUM">0</field>
+                    </shadow>
+                </value>
+            </block>
+          `),
           {
             opcode: "setZ",
             blockType: Scratch.BlockType.COMMAND,
@@ -187,6 +219,22 @@
               },
             },
           },
+          this.vanillaBlock(`
+            <block type="motion_changexby">
+                <value name="DX">
+                    <shadow type="math_number">
+                        <field name="NUM">0</field>
+                    </shadow>
+                </value>
+            </block>
+            <block type="motion_changeyby">
+                <value name="DY">
+                    <shadow type="math_number">
+                        <field name="NUM">0</field>
+                    </shadow>
+                </value>
+            </block>
+          `),
           {
             opcode: "changeZ",
             blockType: Scratch.BlockType.COMMAND,
@@ -198,6 +246,10 @@
               },
             },
           },
+          this.vanillaBlock(`
+            <block type="motion_xposition"></block>
+            <block type="motion_yposition"></block>
+          `),
           {
             opcode: "getZ",
             blockType: Scratch.BlockType.REPORTER,
@@ -297,6 +349,13 @@
               },
             },
           },
+          this.vanillaBlock(`
+            <block type="sensing_touchingobject">
+                <value name="TOUCHINGOBJECTMENU">
+                    <shadow type="sensing_touchingobjectmenu"/>
+                </value>
+            </block>
+          `),
           "---",
           {
             opcode: "setTexFilter",
@@ -523,6 +582,23 @@ More things will be added here as things that need explaining are added.
 If I ever decide to release this extension on the gallery, this will be replaced with an actual docs page.`);
     }
 
+    toggleVanillaBlocks() {
+      this.hideVanillaBlocks = !this.hideVanillaBlocks;
+      if (!Scratch.vm.runtime.extensionStorage[extId]) {
+        Scratch.vm.runtime.extensionStorage[extId] = {};
+      }
+      Scratch.vm.runtime.extensionStorage[extId].hideVanillaBlocks = this.hideVanillaBlocks;
+      Scratch.vm.extensionManager.refreshBlocks();
+    }
+
+    vanillaBlock(xml) {
+      return {
+        blockType: Scratch.BlockType.XML,
+        xml,
+        hideFromPalette: this.hideVanillaBlocks
+      };
+    }
+
     init() {
       if (this.scene) return;
 
@@ -543,6 +619,7 @@ If I ever decide to release this extension on the gallery, this will be replaced
         Scratch.renderer
       );
       this.threeDrawableId = Scratch.renderer.createDrawable("pen");
+      Scratch.renderer._allDrawables[this.threeDrawableId].customDrawableName = "CST 3D Layer"
       Scratch.renderer.updateDrawableSkinId(
         this.threeDrawableId,
         this.threeSkinId

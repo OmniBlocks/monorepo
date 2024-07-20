@@ -36,13 +36,6 @@ export const findIncompatibleUserscripts = () => {
         errors.push('You are using an old version of the "Chibi" userscript that has known project corruption bugs. Please disable it, uninstall it, or update to version 4.');
     }
 
-    // WebGLRipper Shader Calc breaks WebGL program linking
-    // Reported to us in https://github.com/TurboWarp/scratch-gui/issues/920
-    // Reported upstream in https://github.com/Rilshrink/WebGLRipper/issues/21
-    if (typeof window.WEBGLRipperSettings === 'object' && window.WEBGLRipperSettings.isDoShaderCalc) {
-        errors.push('"WebGLRipper"\'s "Shader Calc" option breaks our WebGL renderer. Please disable it, uninstall it, or turn off "Shader Calc". See https://github.com/Rilshrink/WebGLRipper/issues/21.');
-    }
-
     // For debugging incompatibilities, allow ignoring the errors with an undocumented URL parameter.
     if (errors.length > 0) {
         const params = new URLSearchParams(location.search);

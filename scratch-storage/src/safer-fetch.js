@@ -11,7 +11,6 @@ const queue = [];
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 const startNextFetch = ([resolve, url, options]) => {
-    let firstError;
     let failedAttempts = 0;
 
     /**
@@ -43,9 +42,6 @@ const startNextFetch = ([resolve, url, options]) => {
             // if we send too many at once (as we do).
 
             console.warn(`Attempt to fetch ${url} failed`, error);
-            if (!firstError) {
-                firstError = error;
-            }
 
             if (failedAttempts < 2) {
                 failedAttempts++;
@@ -53,7 +49,9 @@ const startNextFetch = ([resolve, url, options]) => {
                 return;
             }
 
-            done(Promise.reject(firstError));
+            // The fetch() error is usually very generic, so we'll add enough information
+            // to possibly be useful.
+            done(Promise.reject(new Error(`Storage request ${url} failed: ${error}`)));
         });
 
     attemptToFetch();

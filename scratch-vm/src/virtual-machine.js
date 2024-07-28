@@ -228,11 +228,11 @@ class VirtualMachine extends EventEmitter {
                     JSGenerator: require('./compiler/jsgen.js'),
                     IRGenerator: require('./compiler/irgen.js').IRGenerator,
                     ScriptTreeGenerator: require('./compiler/irgen.js').ScriptTreeGenerator,
-                    IntermediateStackBlock: require("./compiler/intermediate.js").IntermediateStackBlock,
-                    IntermediateInput: require("./compiler/intermediate.js").IntermediateInput,
-                    IntermediateStack: require("./compiler/intermediate.js").IntermediateStack,
-                    IntermediateScript: require("./compiler/intermediate.js").IntermediateScript,
-                    IntermediateRepresentation: require("./compiler/intermediate.js").IntermediateRepresentation,
+                    IntermediateStackBlock: require('./compiler/intermediate.js').IntermediateStackBlock,
+                    IntermediateInput: require('./compiler/intermediate.js').IntermediateInput,
+                    IntermediateStack: require('./compiler/intermediate.js').IntermediateStack,
+                    IntermediateScript: require('./compiler/intermediate.js').IntermediateScript,
+                    IntermediateRepresentation: require('./compiler/intermediate.js').IntermediateRepresentation,
                     Thread: require('./engine/thread.js'),
                     execute: require('./engine/execute.js')
                 });

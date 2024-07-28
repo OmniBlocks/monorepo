@@ -1,7 +1,7 @@
 const {test} = require('tap');
 const VM = require('../../src/virtual-machine');
 const {BlockType, ArgumentType} = require('../../src/extension-support/tw-extension-api-common');
-const IRGenerator = require('../../src/compiler/irgen');
+const {IRGenerator} = require('../../src/compiler/irgen');
 const {IROptimizer} = require('../../src/compiler/iroptimizer');
 const {IntermediateInput} = require('../../src/compiler/intermediate');
 const nanolog = require('@turbowarp/nanolog');

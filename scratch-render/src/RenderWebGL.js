@@ -3,6 +3,7 @@ const EventEmitter = require('events');
 const hull = require('hull.js');
 const twgl = require('twgl.js');
 
+const SVGRenderer = require('@turbowarp/scratch-svg-renderer');
 const Skin = require('./Skin');
 const BitmapSkin = require('./BitmapSkin');
 const Drawable = require('./Drawable');
@@ -308,6 +309,7 @@ class RenderWebGL extends EventEmitter {
          */
         this.exports = {
             twgl,
+            SVGRenderer,
             Drawable,
             Skin,
             BitmapSkin,

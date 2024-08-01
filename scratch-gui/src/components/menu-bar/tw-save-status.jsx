@@ -11,34 +11,39 @@ import styles from './save-status.css';
 const TWSaveStatus = ({
     alertsList,
     fileHandle,
-    projectChanged
+    projectChanged,
+    showSaveFilePicker
 }) => (
     filterInlineAlerts(alertsList).length > 0 ? (
         <InlineMessages />
     ) : projectChanged && (
-        <SB3Downloader>{(_className, _downloadProjectCallback, {smartSave}) => (
-            <div
-                onClick={smartSave}
-                className={styles.saveNow}
-            >
-                {fileHandle ? (
-                    <FormattedMessage
-                        defaultMessage="Save as {file}"
-                        description="Menu bar item to save project to an existing file on the user's computer"
-                        id="tw.menuBar.saveAs"
-                        values={{
-                            file: fileHandle.name
-                        }}
-                    />
-                ) : (
-                    <FormattedMessage
-                        defaultMessage="Save to your computer"
-                        description="Menu bar item for downloading a project to your computer"
-                        id="gui.menuBar.downloadToComputer"
-                    />
-                )}
-            </div>
-        )}</SB3Downloader>
+        <SB3Downloader
+            showSaveFilePicker={showSaveFilePicker}
+        >
+            {(_className, _downloadProjectCallback, {smartSave}) => (
+                <div
+                    onClick={smartSave}
+                    className={styles.saveNow}
+                >
+                    {fileHandle ? (
+                        <FormattedMessage
+                            defaultMessage="Save as {file}"
+                            description="Menu bar item to save project to an existing file on the user's computer"
+                            id="tw.menuBar.saveAs"
+                            values={{
+                                file: fileHandle.name
+                            }}
+                        />
+                    ) : (
+                        <FormattedMessage
+                            defaultMessage="Save to your computer"
+                            description="Menu bar item for downloading a project to your computer"
+                            id="gui.menuBar.downloadToComputer"
+                        />
+                    )}
+                </div>
+            )}
+        </SB3Downloader>
     ));
 
 TWSaveStatus.propTypes = {
@@ -46,7 +51,8 @@ TWSaveStatus.propTypes = {
     fileHandle: PropTypes.shape({
         name: PropTypes.string
     }),
-    projectChanged: PropTypes.bool
+    projectChanged: PropTypes.bool,
+    showSaveFilePicker: PropTypes.func
 };
 
 const mapStateToProps = state => ({

@@ -31,14 +31,20 @@ const MenuBarHOC = function (WrappedComponent) {
                 /* eslint-enable no-unused-vars */
                 ...props
             } = this.props;
-            return (<SB3Downloader>{(_className, _downloadProject, extended) => (
-                <WrappedComponent
-                    confirmReadyToReplaceProject={this.confirmReadyToReplaceProject}
-                    shouldSaveBeforeTransition={this.shouldSaveBeforeTransition}
-                    handleSaveProject={extended.smartSave}
-                    {...props}
-                />
-            )}</SB3Downloader>);
+            return (
+                <SB3Downloader
+                    showSaveFilePicker={this.props.showSaveFilePicker}
+                >
+                    {(_className, _downloadProject, extended) => (
+                        <WrappedComponent
+                            confirmReadyToReplaceProject={this.confirmReadyToReplaceProject}
+                            shouldSaveBeforeTransition={this.shouldSaveBeforeTransition}
+                            handleSaveProject={extended.smartSave}
+                            {...props}
+                        />
+                    )}
+                </SB3Downloader>
+            );
         }
     }
 
@@ -46,7 +52,8 @@ const MenuBarHOC = function (WrappedComponent) {
         canCreateNew: PropTypes.bool,
         canSave: PropTypes.bool,
         confirmWithMessage: PropTypes.func,
-        projectChanged: PropTypes.bool
+        projectChanged: PropTypes.bool,
+        showSaveFilePicker: PropTypes.func
     };
     MenuBarContainer.defaultProps = {
         // default to using standard js confirm

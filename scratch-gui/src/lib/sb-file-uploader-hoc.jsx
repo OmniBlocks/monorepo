@@ -5,7 +5,6 @@ import {intlShape, injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import log from '../lib/log';
 import sharedMessages from './shared-messages';
-import FileSystemAPI from './tw-filesystem-api';
 import {setFileHandle, setProjectError} from '../reducers/tw';
 
 import {
@@ -74,10 +73,20 @@ const SBFileUploaderHOC = function (WrappedComponent) {
             this.fileReader = new FileReader();
             this.fileReader.onload = this.onload;
             // tw: Use FS API when available
-            if (FileSystemAPI.available()) {
+            if (this.props.showOpenFilePicker) {
                 (async () => {
                     try {
-                        const handle = await FileSystemAPI.showOpenFilePicker();
+                        const [handle] = await this.props.showOpenFilePicker({
+                            multiple: false,
+                            types: [
+                                {
+                                    description: 'Scratch Project',
+                                    accept: {
+                                        'application/x.scratch.sb3': ['.sb', '.sb2', '.sb3']
+                                    }
+                                }
+                            ]
+                        });
                         const file = await handle.getFile();
                         this.handleChange({
                             target: {
@@ -261,6 +270,7 @@ const SBFileUploaderHOC = function (WrappedComponent) {
         onSetProjectTitle: PropTypes.func,
         projectChanged: PropTypes.bool,
         requestProjectUpload: PropTypes.func,
+        showOpenFilePicker: PropTypes.func,
         userOwnsProject: PropTypes.bool,
         vm: PropTypes.shape({
             loadProject: PropTypes.func,
@@ -270,6 +280,9 @@ const SBFileUploaderHOC = function (WrappedComponent) {
             })
         }),
         onSetFileHandle: PropTypes.func
+    };
+    SBFileUploaderComponent.defaultProps = {
+        showOpenFilePicker: typeof showOpenFilePicker === 'function' ? window.showOpenFilePicker.bind(window) : null
     };
     const mapStateToProps = (state, ownProps) => {
         const loadingState = state.scratchGui.projectState.loadingState;

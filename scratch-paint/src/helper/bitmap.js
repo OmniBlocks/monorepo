@@ -476,7 +476,7 @@ const convertToBitmap = function (clearSelectedItems, onUpdateImage, optFontInli
         }
         for (let i = paper.project.activeLayer.children.length - 1; i >= 0; i--) {
             const item = paper.project.activeLayer.children[i];
-            if (item.clipMask === false) {
+            if (item.clipMask === false || !item.guide) {
                 item.remove();
             } else {
                 // Resize mask for bitmap bounds
@@ -506,7 +506,7 @@ const convertToBitmap = function (clearSelectedItems, onUpdateImage, optFontInli
 const convertToVector = function (clearSelectedItems, onUpdateImage) {
     clearSelection(clearSelectedItems);
     for (const item of paper.project.activeLayer.children) {
-        if (item.clipMask === true) {
+        if (item.clipMask === true && item.guide) {
             // Resize mask for vector bounds
             item.size.height = MAX_WORKSPACE_BOUNDS.height;
             item.size.width = MAX_WORKSPACE_BOUNDS.width;

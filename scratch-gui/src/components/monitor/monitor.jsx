@@ -53,6 +53,9 @@ const MonitorComponent = props => (
             defaultClassNameDragging={styles.dragging}
             disabled={!props.draggable}
             onStop={props.onDragEnd}
+
+            // https://github.com/TurboWarp/scratch-gui/issues/950
+            enableUserSelectHack={false}
         >
             <Box
                 className={styles.monitorContainer}

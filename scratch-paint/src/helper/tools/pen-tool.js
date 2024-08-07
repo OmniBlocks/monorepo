@@ -1,5 +1,5 @@
 import paper from '@scratch/paper';
-import {stylePath} from '../style-path';
+import {styleShape} from '../style-path';
 import {endPointHit, touching} from '../snapping';
 import {drawHitPoint, removeHitPoint} from '../guides';
 
@@ -57,12 +57,17 @@ class PenTool extends paper.Tool {
     handleMouseDown (event) {
         if (event.event.button > 0) return; // only first mouse button
         this.subpath = new paper.Path({insert: false});
+        this.subpath.strokeCap = 'round';
 
         // If you click near a point, continue that line instead of making a new line
         this.hitResult = endPointHit(event.point, PenTool.SNAP_TOLERANCE);
         if (this.hitResult) {
             this.path = this.hitResult.path;
-            stylePath(this.path, this.colorState.strokeColor, this.colorState.strokeWidth);
+            styleShape(this.path, {
+                fillColor: null,
+                strokeColor: this.colorState.strokeColor,
+                strokeWidth: this.colorState.strokeWidth
+            });
             if (this.hitResult.isFirst) {
                 this.path.reverse();
             }
@@ -74,7 +79,12 @@ class PenTool extends paper.Tool {
         // If not near other path, start a new path
         if (!this.path) {
             this.path = new paper.Path();
-            stylePath(this.path, this.colorState.strokeColor, this.colorState.strokeWidth);
+            styleShape(this.path, {
+                fillColor: null,
+                strokeColor: this.colorState.strokeColor,
+                strokeWidth: this.colorState.strokeWidth
+            });
+            this.path.strokeCap = 'round';
             this.path.add(event.point);
             this.subpath.add(event.point);
             paper.view.draw();

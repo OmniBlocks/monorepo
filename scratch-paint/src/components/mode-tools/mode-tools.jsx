@@ -1,3 +1,4 @@
+/* eslint-disable no-case-declarations */
 import classNames from 'classnames';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
@@ -351,7 +352,42 @@ const ModeToolsComponent = props => {
             </div>
         );
     }
-    case Modes.RESHAPE:
+    case Modes.RESHAPE: 
+        const lineJoinReshape = (
+            <InputGroup className={classNames(styles.modDashedBorder, styles.modLabeledIconHeight)}>
+                <LabeledIconButton
+                    disabled={props.hasSelectedMiterLineJoin}
+                    hideLabel={hideLabel(props.intl.locale)}
+                    imgSrc={miterLineJoin}
+                    title={'Spiked'}
+                    onClick={props.onMiterLineJoin}
+                />
+                <LabeledIconButton
+                    disabled={props.hasSelectedRoundLineJoin}
+                    hideLabel={hideLabel(props.intl.locale)}
+                    imgSrc={roundLineJoin}
+                    title={'Rounded'}
+                    onClick={props.onRoundLineJoin}
+                />
+                <LabeledIconButton
+                    disabled={props.hasSelectedBevelLineJoin}
+                    hideLabel={hideLabel(props.intl.locale)}
+                    imgSrc={bevelLineJoin}
+                    title={'Beveled'}
+                    onClick={props.onBevelLineJoin}
+                />
+            </InputGroup>
+        );
+        const deleteSelectedNodes = (
+            <InputGroup className={classNames(styles.modLabeledIconHeight)}>
+                <LabeledIconButton
+                    hideLabel={hideLabel(props.intl.locale)}
+                    imgSrc={deleteIcon}
+                    title={props.intl.formatMessage(messages.delete)}
+                    onClick={props.onDelete}
+                />
+            </InputGroup>
+        );
         return (
             <div className={classNames(props.className, styles.modeTools)}>
                 <InputGroup className={classNames(styles.modDashedBorder, styles.modLabeledIconHeight)}>
@@ -386,37 +422,26 @@ const ModeToolsComponent = props => {
                         onClick={props.onSquareEnds}
                     />
                 </InputGroup>
-                <InputGroup className={classNames(styles.modDashedBorder, styles.modLabeledIconHeight)}>
-                    <LabeledIconButton
-                        disabled={props.hasSelectedMiterLineJoin}
-                        hideLabel={hideLabel(props.intl.locale)}
-                        imgSrc={miterLineJoin}
-                        title={'Spiked'}
-                        onClick={props.onMiterLineJoin}
-                    />
-                    <LabeledIconButton
-                        disabled={props.hasSelectedRoundLineJoin}
-                        hideLabel={hideLabel(props.intl.locale)}
-                        imgSrc={roundLineJoin}
-                        title={'Rounded'}
-                        onClick={props.onRoundLineJoin}
-                    />
-                    <LabeledIconButton
-                        disabled={props.hasSelectedBevelLineJoin}
-                        hideLabel={hideLabel(props.intl.locale)}
-                        imgSrc={bevelLineJoin}
-                        title={'Beveled'}
-                        onClick={props.onBevelLineJoin}
-                    />
-                </InputGroup>
-                <InputGroup className={classNames(styles.modLabeledIconHeight)}>
-                    <LabeledIconButton
-                        hideLabel={hideLabel(props.intl.locale)}
-                        imgSrc={deleteIcon}
-                        title={props.intl.formatMessage(messages.delete)}
-                        onClick={props.onDelete}
-                    />
-                </InputGroup>
+                <MediaQuery maxWidth={layout.fullSizeEditorMinWidthExtraToolsCollapsed - 1}>
+                    <InputGroup className={classNames(styles.modDashedBorder, styles.modLabeledIconHeight)}>
+                        <Dropdown
+                            className={styles.modUnselect}
+                            enterExitTransitionDurationMs={20}
+                            popoverContent={
+                                <InputGroup
+                                    className={styles.modContextMenu}
+                                    rtl={props.rtl}
+                                >
+                                    {lineJoinReshape}
+                                    {deleteSelectedNodes}
+                                </InputGroup>
+                            }
+                            tipSize={.01}
+                        >
+                            More
+                        </Dropdown>
+                    </InputGroup>
+                </MediaQuery>
             </div>
         );
     case Modes.BIT_SELECT:

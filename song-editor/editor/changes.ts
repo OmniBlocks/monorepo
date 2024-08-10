@@ -2768,48 +2768,6 @@ export class ChangeFadeInOut extends UndoableChange {
     }
 }
 
-export class ChangeEnvelopePitchStart extends Change {
-    constructor(doc: SongDocument, startNote: number, index: number) {
-        super();
-        const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
-        const oldStartNote: number = instrument.pitchEnvelopeStart[index];
-        if (oldStartNote != startNote) {
-            instrument.pitchEnvelopeStart[index] = startNote;
-            instrument.preset = instrument.type;
-            doc.notifier.changed();
-            this._didSomething();
-        }
-    }
-}
-
-export class ChangeEnvelopePitchEnd extends Change {
-    constructor(doc: SongDocument, endNote: number, index: number) {
-        super();
-        const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
-        const oldEndNote: number = instrument.pitchEnvelopeEnd[index];
-        if (oldEndNote != endNote) {
-            instrument.pitchEnvelopeEnd[index] = endNote;
-            instrument.preset = instrument.type;
-            doc.notifier.changed();
-            this._didSomething();
-        }
-    }
-}
-
-export class ChangeEnvelopeInverse extends Change {
-    constructor(doc: SongDocument, value: boolean, index: number) {
-        super();
-        const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
-        const oldValue: boolean = instrument.envelopeInverse[index];
-        if (oldValue != value) {
-            instrument.envelopeInverse[index] = value;
-            instrument.preset = instrument.type;
-            doc.notifier.changed();
-            this._didSomething();
-        }
-    }
-}
-
 export class ChangeAlgorithm extends Change {
     constructor(doc: SongDocument, newValue: number) {
         super();
@@ -4908,7 +4866,7 @@ export class ChangeAddEnvelope extends Change {
     constructor(doc: SongDocument) {
         super();
         const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
-        instrument.addEnvelope(0, 0, 0);
+        instrument.addEnvelope(0, 0, 0, 0, instrument.isNoiseInstrument ? 11 : 96, false, 1, 0);
         instrument.preset = instrument.type;
         doc.notifier.changed();
         this._didSomething();
@@ -4924,9 +4882,11 @@ export class ChangeRemoveEnvelope extends Change {
             instrument.envelopes[i].target = instrument.envelopes[i + 1].target;
             instrument.envelopes[i].index = instrument.envelopes[i + 1].index;
             instrument.envelopes[i].envelope = instrument.envelopes[i + 1].envelope;
-            instrument.pitchEnvelopeStart[i] = instrument.pitchEnvelopeStart[i + 1];
-            instrument.pitchEnvelopeEnd[i] = instrument.pitchEnvelopeEnd[i + 1];
-            instrument.envelopeInverse[i] = instrument.envelopeInverse[i + 1];
+            instrument.envelopes[i].pitchEnvelopeStart = instrument.envelopes[i + 1].pitchEnvelopeStart;
+            instrument.envelopes[i].pitchEnvelopeEnd = instrument.envelopes[i + 1].pitchEnvelopeEnd;
+            instrument.envelopes[i].inverse = instrument.envelopes[i + 1].inverse;
+            instrument.envelopes[i].perEnvelopeSpeed = instrument.envelopes[i + 1].perEnvelopeSpeed;
+            instrument.envelopes[i].perEnvelopeLowerBound = instrument.envelopes[i + 1].perEnvelopeLowerBound;
         }
         // TODO: Shift any envelopes that were targeting other envelope indices after the removed one.
         instrument.preset = instrument.type;
@@ -4959,6 +4919,64 @@ export class ChangeSetEnvelopeType extends Change {
         if (oldValue != newValue) {
             instrument.envelopes[envelopeIndex].envelope = newValue;
             instrument.preset = instrument.type;
+            doc.notifier.changed();
+            this._didSomething();
+        }
+    }
+}
+
+export class ChangeEnvelopePitchStart extends Change {
+    constructor(doc: SongDocument, startNote: number, index: number) {
+        super();
+        const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+        const oldStartNote: number = instrument.envelopes[index].pitchEnvelopeStart;
+        if (oldStartNote != startNote) {
+            instrument.envelopes[index].pitchEnvelopeStart = startNote;
+            instrument.preset = instrument.type;
+            doc.notifier.changed();
+            this._didSomething();
+        }
+    }
+}
+
+export class ChangeEnvelopePitchEnd extends Change {
+    constructor(doc: SongDocument, endNote: number, index: number) {
+        super();
+        const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+        const oldEndNote: number = instrument.envelopes[index].pitchEnvelopeEnd;
+        if (oldEndNote != endNote) {
+            instrument.envelopes[index].pitchEnvelopeEnd = endNote;
+            instrument.preset = instrument.type;
+            doc.notifier.changed();
+            this._didSomething();
+        }
+    }
+}
+
+export class ChangeEnvelopeInverse extends Change {
+    constructor(doc: SongDocument, value: boolean, index: number) {
+        super();
+        const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+        const oldValue: boolean = instrument.envelopes[index].inverse;
+        if (oldValue != value) {
+            instrument.envelopes[index].inverse = value;
+            instrument.preset = instrument.type;
+            doc.notifier.changed();
+            this._didSomething();
+        }
+    }
+}
+
+export class ChangePerEnvelopeSpeed extends Change {
+    constructor(doc: SongDocument, speed: number, index: number) {
+        super();
+        const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+        const oldSpeed: number = instrument.envelopes[index].perEnvelopeSpeed;
+        console.log("oldSpeed: ", oldSpeed);
+        if (oldSpeed != speed) {
+            instrument.envelopes[index].perEnvelopeSpeed = speed;
+            instrument.preset = instrument.type;
+            console.log("here: ", speed);
             doc.notifier.changed();
             this._didSomething();
         }

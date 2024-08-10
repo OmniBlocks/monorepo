@@ -39,6 +39,9 @@ export class SpectrumEditor {
     private instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
     private readonly _initial: SpectrumWave = this.instrument.spectrumWave;
 
+    private _undoHistoryState: number = 0;
+    private _changeQueue: number[][] = [];
+
     constructor(private _doc: SongDocument, private _spectrumIndex: number | null) {
         for (let i: number = 0; i < Config.spectrumControlPoints; i += Config.spectrumControlPointsPerOctave) {
             this._octaves.appendChild(SVG.rect({ fill: ColorConfig.tonic, x: (i + 1) * this._editorWidth / (Config.spectrumControlPoints + 2) - 1, y: 0, width: 2, height: this._editorHeight }));
@@ -46,6 +49,8 @@ export class SpectrumEditor {
         for (let i: number = 4; i <= Config.spectrumControlPoints; i += Config.spectrumControlPointsPerOctave) {
             this._fifths.appendChild(SVG.rect({ fill: ColorConfig.fifthNote, x: (i + 1) * this._editorWidth / (Config.spectrumControlPoints + 2) - 1, y: 0, width: 2, height: this._editorHeight }));
         }
+
+        this.storeChange();
 
         this.container.addEventListener("mousedown", this._whenMousePressed);
         document.addEventListener("mousemove", this._whenMouseMoved);
@@ -55,6 +60,55 @@ export class SpectrumEditor {
         this.container.addEventListener("touchmove", this._whenTouchMoved);
         this.container.addEventListener("touchend", this._whenCursorReleased);
         this.container.addEventListener("touchcancel", this._whenCursorReleased);
+    }
+
+    public storeChange = (): void => {
+        // Check if change is unique compared to the current history state
+        var sameCheck = true;
+        if (this._changeQueue.length > 0) {
+            for (var i = 0; i < Config.spectrumControlPoints; i++) {
+                if (this._changeQueue[this._undoHistoryState][i] != this.instrument.spectrumWave.spectrum[i]) {
+                    sameCheck = false; i = Config.spectrumControlPoints;
+                }
+            }
+        }
+
+        if (sameCheck == false || this._changeQueue.length == 0) {
+
+            // Create new branch in history, removing all after this in time
+            this._changeQueue.splice(0, this._undoHistoryState);
+
+            this._undoHistoryState = 0;
+
+            this._changeQueue.unshift(this.instrument.spectrumWave.spectrum.slice());
+
+            // 32 undo max
+            if (this._changeQueue.length > 32) {
+                this._changeQueue.pop();
+            }
+
+        }
+
+    }
+
+    public undo = (): void => {
+        // Go backward, if there is a change to go back to
+        if (this._undoHistoryState < this._changeQueue.length - 1) {
+            this._undoHistoryState++;
+            const spectrum: number[] = this._changeQueue[this._undoHistoryState].slice();
+            this.setSpectrumWave(spectrum);
+        }
+
+    }
+
+    public redo = (): void => {
+        // Go forward, if there is a change to go to
+        if (this._undoHistoryState > 0) {
+            this._undoHistoryState--;
+            const spectrum: number[] = this._changeQueue[this._undoHistoryState].slice();
+            this.setSpectrumWave(spectrum);
+        }
+
     }
 
     private _xToFreq(x: number): number {
@@ -147,6 +201,7 @@ export class SpectrumEditor {
     private _whenCursorReleased = (event: Event): void => {
         if (this._mouseDown) {
             this._doc.record(this._change!);
+            this.storeChange();
             this._change = null;
         }
         this._mouseDown = false;
@@ -324,14 +379,14 @@ export class SpectrumEditorPrompt implements Prompt {
             this._togglePlay();
             event.preventDefault();
         }
-        // else if (event.keyCode == 90) { // z
-        //     this.additiveEditor.undo();
-        //     event.stopPropagation();
-        // }
-        // else if (event.keyCode == 89) { // y
-        //     this.additiveEditor.redo();
-        //     event.stopPropagation();
-        // }
+        else if (event.keyCode == 90) { // z
+            this.spectrumEditor.undo();
+            event.stopPropagation();
+        }
+        else if (event.keyCode == 89) { // y
+            this.spectrumEditor.redo();
+            event.stopPropagation();
+        }
         else if (event.keyCode == 219) { // [
             this._doc.synth.goToPrevBar();
         }

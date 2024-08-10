@@ -1503,6 +1503,79 @@ export class Config {
     public static readonly sineWaveMask: number = Config.sineWaveLength - 1;
     public static readonly sineWave: Float32Array = generateSineWave();
 
+    // public static readonly perEnvelopeSpeedMin: number = 0;
+    // public static readonly perEnvelopeSpeedMax: number = 16;
+    public static readonly perEnvelopeSpeedIndices: number[] = [0, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.1, 0.2, 0.25, 0.3, 0.3333, 0.4, 0.5, 0.6, 0.6667, 0.7, 0.75, 0.8, 0.9, 1, 1.25, 1.3333, 1.5, 1.6667, 1.75, 2, 2.25, 2.5, 2.75, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 24, 32, 48, 64, 128, 256];
+    public static readonly perEnvelopeSpeedToIndices: Dictionary<number> = {
+        0: 0,
+        0.01: 1,
+        0.02: 2,
+        0.03: 3,
+        0.04: 4,
+        0.05: 5,
+        0.06: 6,
+        0.07: 7,
+        0.08: 8,
+        0.09: 9,
+        0.1: 10,
+        0.2: 11,
+        0.25: 12,
+        0.3: 13,
+        0.3333: 14,
+        0.4: 15,
+        0.5: 16,
+        0.6: 17,
+        0.6667: 18,
+        0.7: 19,
+        0.75: 20,
+        0.8: 21,
+        0.9: 22,
+        1: 23,
+        1.25: 24,
+        1.3333: 25,
+        1.5: 26,
+        1.6667: 27,
+        1.75: 28,
+        2: 29,
+        2.25: 30,
+        2.5: 31,
+        2.75: 32,
+        3: 33,
+        3.5: 34,
+        4: 35,
+        4.5: 36,
+        5: 37,
+        5.5: 38,
+        6: 39,
+        6.5: 40,
+        7: 41,
+        7.5: 42,
+        8: 43,
+        8.5: 44,
+        9: 45,
+        9.5: 46,
+        10: 47,
+        11: 48,
+        12: 49,
+        13: 50,
+        14: 51,
+        15: 52,
+        16: 53,
+        17: 54,
+        18: 55,
+        19: 56,
+        20: 57,
+        24: 58,
+        32: 59,
+        48: 60,
+        64: 61,
+        128: 62,
+        256: 63,
+    }
+
+    public static readonly perEnvelopeBoundMin: number = 0;
+    public static readonly perEnvelopeBoundMax: number = 1;
+
     // Picked strings have an all-pass filter with a corner frequency based on the tone fundamental frequency, in order to add a slight inharmonicity. (Which is important for distortion.)
     public static readonly pickedStringDispersionCenterFreq: number = 6000.0; // The tone fundamental freq is pulled toward this freq for computing the all-pass corner freq.
     public static readonly pickedStringDispersionFreqScale: number = 0.3; // The tone fundamental freq freq moves this much toward the center freq for computing the all-pass corner freq.
@@ -1519,7 +1592,7 @@ export class Config {
     public static readonly bitcrusherOctaveStep: number = 0.5;
     public static readonly bitcrusherQuantizationRange: number = 8;
 
-    public static readonly maxEnvelopeCount: number = 12;
+    public static readonly maxEnvelopeCount: number = 16;
     public static readonly defaultAutomationRange: number = 13;
     public static readonly instrumentAutomationTargets: DictionaryArray<AutomationTarget> = toNameMap([
         { name: "none", computeIndex: null, displayName: "none",             /*perNote: false,*/ interleave: false, isFilter: false, /*range: 0,                              */    maxCount: 1, effect: null, compatibleInstruments: null },

@@ -96,7 +96,7 @@ function buildPresetOptions(isNoise: boolean, idSet: string): HTMLSelectElement 
         menu.appendChild(option({ value: InstrumentType.fm6op }, EditorConfig.instrumentToPreset(InstrumentType.fm6op)!.name));
         menu.appendChild(option({ value: InstrumentType.harmonics }, EditorConfig.valueToPreset(InstrumentType.harmonics)!.name));
         menu.appendChild(option({ value: InstrumentType.pickedString }, EditorConfig.valueToPreset(InstrumentType.pickedString)!.name));
-        menu.appendChild(option({ value: InstrumentType.additive }, EditorConfig.instrumentToPreset(InstrumentType.additive)!.name)); //needs to be instrumentToPreset instead of valueToPreset to account for mod type
+        //menu.appendChild(option({ value: InstrumentType.additive }, EditorConfig.instrumentToPreset(InstrumentType.additive)!.name)); //needs to be instrumentToPreset instead of valueToPreset to account for mod type
         menu.appendChild(option({ value: InstrumentType.spectrum }, EditorConfig.valueToPreset(InstrumentType.spectrum)!.name));
         menu.appendChild(option({ value: InstrumentType.noise }, EditorConfig.valueToPreset(InstrumentType.noise)!.name));
     }

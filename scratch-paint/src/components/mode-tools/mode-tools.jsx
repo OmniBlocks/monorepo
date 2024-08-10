@@ -422,6 +422,10 @@ const ModeToolsComponent = props => {
                         onClick={props.onSquareEnds}
                     />
                 </InputGroup>
+                <MediaQuery minWidth={layout.fullSizeEditorMinWidthExtraToolsCollapsed}>
+                    {lineJoinReshape}
+                    {deleteSelectedNodes}
+                </MediaQuery>
                 <MediaQuery maxWidth={layout.fullSizeEditorMinWidthExtraToolsCollapsed - 1}>
                     <InputGroup className={classNames(styles.modDashedBorder, styles.modLabeledIconHeight)}>
                         <Dropdown

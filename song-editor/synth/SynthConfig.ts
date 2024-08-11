@@ -922,7 +922,6 @@ export class Config {
 	public static readonly barCountMax: number = 1024;
     public static readonly instrumentCountMin: number = 1;
     public static readonly layeredInstrumentCountMax: number = 10;
-	//this still hasn't been properly tested...
     public static readonly patternInstrumentCountMax: number = 10;
 	public static readonly partsPerBeat: number = 24;
 	public static readonly ticksPerPart: number = 2;

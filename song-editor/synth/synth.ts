@@ -535,7 +535,9 @@ export class Pattern {
         return patternObject;
     }
 
-    public fromJsonObject(patternObject: any, song: Song, channel: Channel, importedPartsPerBeat: number, isNoiseChannel: boolean, isModChannel: boolean): void {
+    public fromJsonObject(patternObject: any, song: Song, channel: Channel, importedPartsPerBeat: number, isNoiseChannel: boolean, isModChannel: boolean, jsonFormat: string = "auto"): void {
+        const format: string = jsonFormat.toLowerCase();
+
         if (song.patternInstruments) {
             if (Array.isArray(patternObject["instruments"])) {
                 const instruments: any[] = patternObject["instruments"];
@@ -577,15 +579,16 @@ export class Pattern {
 
                 //let noteClock: number = tickClock;
                 let startInterval: number = 0;
+
+                let instrument: Instrument = channel.instruments[this.instruments[0]];
+                let mod: number = Math.max(0, Config.modCount - note.pitches[0] - 1);
+
                 for (let k: number = 0; k < noteObject["points"].length; k++) {
                     const pointObject: any = noteObject["points"][k];
                     if (pointObject == undefined || pointObject["tick"] == undefined) continue;
                     const interval: number = (pointObject["pitchBend"] == undefined) ? 0 : (pointObject["pitchBend"] | 0);
 
                     const time: number = Math.round((+pointObject["tick"]) * Config.partsPerBeat / importedPartsPerBeat);
-
-                    let instrument: Instrument = channel.instruments[this.instruments[0]];
-                    let mod: number = Math.max(0, Config.modCount - note.pitches[0] - 1);
 
                     // Only one instrument per pattern allowed in mod channels.
                     let volumeCap: number = song.getVolumeCapForSetting(isModChannel, instrument.modulators[mod], instrument.modFilterTypes[mod]);
@@ -651,6 +654,15 @@ export class Pattern {
                     note.continuesLastPattern = (noteObject["continuesLastPattern"] === true);
                 } else {
                     note.continuesLastPattern = false;
+                }
+
+                if (format != "ultrabox" && instrument.modulators[mod] == Config.modulators.dictionary["tempo"].index) {
+                    for (const pin of note.pins) {
+                        const oldMin: number = 30;
+                        const newMin: number = 1;
+                        const old: number = pin.size + oldMin;
+                        pin.size = old - newMin; // convertRealFactor will add back newMin as necessary
+                    }
                 }
 
                 this.notes.push(note);
@@ -2252,7 +2264,7 @@ export class Instrument {
             this.pan = clamp(0, Config.panMax + 1, Math.round(Config.panCenter + (instrumentObject["pan"] | 0) * Config.panCenter / 100));
         } else if (instrumentObject["ipan"] != undefined) {
             // support for modbox fixed
-            this.pan = clamp(0, Config.panMax + 1, Config.panCenter + (instrumentObject["ipan"] * 100));
+            this.pan = clamp(0, Config.panMax + 1, Config.panCenter + (instrumentObject["ipan"] * -50));
         } else {
             this.pan = Config.panCenter;
         }
@@ -4088,7 +4100,6 @@ export class Song {
 		} else {
 			this.rhythm = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
 		}
-		//rhythm fixes
             } break;
             case SongTagCode.channelOctave: {
                 if (beforeThree && fromBeepBox) {
@@ -5381,6 +5392,10 @@ export class Song {
                 let songReverbInstrument: number = -1;
                 let songReverbIndex: number = -1;
 
+                // @TODO: Include GoldBox here.
+                const shouldCorrectTempoMods: boolean = fromJummBox;
+                const jummboxTempoMin: number = 30;
+
                 while (true) {
                     const channel: Channel = this.channels[channelIndex];
                     const isNoiseChannel: boolean = this.getChannelIsNoise(channelIndex);
@@ -5670,7 +5685,13 @@ export class Song {
                                 }
                                 note.pitches.length = pitchCount;
                                 pitchBends.unshift(note.pitches[0]); // TODO: Use Deque?
+                                const noteIsForTempoMod: boolean = isModChannel && channel.instruments[newPattern.instruments[0]].modulators[Config.modCount - 1 - note.pitches[0]] === Config.modulators.dictionary["tempo"].index;
+                                let tempoOffset: number = 0;
+                                if (shouldCorrectTempoMods && noteIsForTempoMod) {
+                                    tempoOffset = jummboxTempoMin - Config.tempoMin; // convertRealFactor will add back Config.tempoMin as necessary
+                                }
                                 if (isModChannel) {
+                                    note.pins[0].size += tempoOffset;
                                     note.pins[0].size *= detuneScaleNotes[newPattern.instruments[0]][note.pitches[0]];
                                 }
                                 let pinCount: number = 1;
@@ -5680,7 +5701,7 @@ export class Song {
                                     const interval: number = pitchBends[0] - note.pitches[0];
                                     if (note.pins.length <= pinCount) {
                                         if (isModChannel) {
-                                            note.pins[pinCount++] = makeNotePin(interval, pinObj.time, pinObj.size * detuneScaleNotes[newPattern.instruments[0]][note.pitches[0]]);
+                                            note.pins[pinCount++] = makeNotePin(interval, pinObj.time, pinObj.size * detuneScaleNotes[newPattern.instruments[0]][note.pitches[0]] + tempoOffset);
                                         } else {
                                             note.pins[pinCount++] = makeNotePin(interval, pinObj.time, pinObj.size);
                                         }
@@ -5689,7 +5710,7 @@ export class Song {
                                         pin.interval = interval;
                                         pin.time = pinObj.time;
                                         if (isModChannel) {
-                                            pin.size = pinObj.size * detuneScaleNotes[newPattern.instruments[0]][note.pitches[0]];
+                                            pin.size = pinObj.size * detuneScaleNotes[newPattern.instruments[0]][note.pitches[0]] + tempoOffset;
                                         } else {
                                             pin.size = pinObj.size;
                                         }
@@ -6714,7 +6735,7 @@ export class Song {
                     if (channelObject["patterns"]) patternObject = channelObject["patterns"][i];
                     if (patternObject == undefined) continue;
 
-                    pattern.fromJsonObject(patternObject, this, channel, importedPartsPerBeat, isNoiseChannel, isModChannel);
+                    pattern.fromJsonObject(patternObject, this, channel, importedPartsPerBeat, isNoiseChannel, isModChannel, jsonFormat);
                 }
                 channel.patterns.length = this.patternsPerChannel;
 

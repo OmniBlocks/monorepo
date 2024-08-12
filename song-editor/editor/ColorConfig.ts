@@ -5495,10 +5495,6 @@ export class ColorConfig {
 				* {
 					cursor: url("theme_resources/wackybox_cursor.png"), auto !important;
 				}
-				#Hotdog {
-					display: inline !important;
-					content: url("theme_resources/hotdog.png") !important;
-				}
 
 			`,
         "microbox": `
@@ -6124,10 +6120,6 @@ export class ColorConfig {
 			* {
 			cursor: url("theme_resources/abyssbox_cursor.png"), auto;
 			}
-			#Hotdog {
-				display: inline !important;
-				content: url("theme_resources/hotdog.png") !important;
-			}
 			
 				@font-face {
 			   font-family: "AbyssType";
@@ -6527,10 +6519,6 @@ export class ColorConfig {
 			* {
 			cursor: url("theme_resources/abyssbox_cursor.png"), auto !important;
 			}
-			#Hotdog {
-				display: inline !important;
-				content: url("theme_resources/hotdog.png") !important;
-			}
 				@font-face {
 			   font-family: "AbyssType";
 			   src:
@@ -6856,9 +6844,6 @@ export class ColorConfig {
 		  --disabled-note-secondary: #000;
 			}
 		/* replaces hotdog (in a hacky way) with an image of the girls using the same scratch sprites from the 404 page*/
-		#Hotdog {
-		display: none;
-		}
 		.instructions-column > section:first-of-type > p:first-of-type:after {
 		display: block;
 		content: url("theme_resources/AzurLaneThemeStarterSquad.png");

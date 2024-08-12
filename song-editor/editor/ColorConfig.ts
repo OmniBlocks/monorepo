@@ -5526,8 +5526,8 @@ export class ColorConfig {
 					--track-editor-bg-mod-dim: #000000;
 					--multiplicative-mod-slider: #FFC800;
 					--overwriting-mod-slider: #00ffc0;
-					--indicator-primary: #333333;
-					--indicator-secondary: #00ffc0;
+					--indicator-primary: #00ffc0;
+					--indicator-secondary: #333333;
 					--select2-opt-group: #2B2B2B;
 					--input-box-outline: #69BFC6;
 					--mute-button-normal: #00ffc0;
@@ -6844,9 +6844,6 @@ export class ColorConfig {
 		  --disabled-note-secondary: #000;
 			}
 		/* replaces hotdog (in a hacky way) with an image of the girls using the same scratch sprites from the 404 page*/
-		#Hotdog {
-		display: none;
-		}
 		.instructions-column > section:first-of-type > p:first-of-type:after {
 		display: block;
 		content: url("theme_resources/AzurLaneThemeStarterSquad.png");

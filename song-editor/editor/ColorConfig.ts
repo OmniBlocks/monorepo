@@ -5495,6 +5495,10 @@ export class ColorConfig {
 				* {
 					cursor: url("theme_resources/wackybox_cursor.png"), auto !important;
 				}
+				#Hotdog {
+					display: inline !important;
+					content: url("theme_resources/hotdog.png") !important;
+				}
 
 			`,
         "microbox": `
@@ -5526,8 +5530,8 @@ export class ColorConfig {
 					--track-editor-bg-mod-dim: #000000;
 					--multiplicative-mod-slider: #FFC800;
 					--overwriting-mod-slider: #00ffc0;
-					--indicator-primary: #333333;
-					--indicator-secondary: #00ffc0;
+					--indicator-primary: #00ffc0;
+					--indicator-secondary: #333333;
 					--select2-opt-group: #2B2B2B;
 					--input-box-outline: #69BFC6;
 					--mute-button-normal: #00ffc0;
@@ -6120,6 +6124,10 @@ export class ColorConfig {
 			* {
 			cursor: url("theme_resources/abyssbox_cursor.png"), auto;
 			}
+			#Hotdog {
+				display: inline !important;
+				content: url("theme_resources/hotdog.png") !important;
+			}
 			
 				@font-face {
 			   font-family: "AbyssType";
@@ -6518,6 +6526,10 @@ export class ColorConfig {
 			/* sets cursor */ 
 			* {
 			cursor: url("theme_resources/abyssbox_cursor.png"), auto !important;
+			}
+			#Hotdog {
+				display: inline !important;
+				content: url("theme_resources/hotdog.png") !important;
 			}
 				@font-face {
 			   font-family: "AbyssType";

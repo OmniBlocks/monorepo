@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel='shortcut icon' type='image/x-icon' href='../favicon.ico' /> 
+    <link rel='shortcut icon' type='image/x-icon' href='./favicon.ico' /> 
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Slarmoo's Box Patch Notes</title>
-    <meta name="application-name" content="Slarmoo's Box" />
-    <meta name="apple-mobile-web-app-title" content="Slarmoo's Box">
-	<meta name="description" content="Slarmoo's Box is a mod of Ultrabox that aims to advance Beepbox's capabilities." />
+    <title>UltraBox Patch Notes</title>
+    <meta name="application-name" content="UltraBox" />
+    <meta name="apple-mobile-web-app-title" content="UltraBox">
+	<meta name="description" content="UltraBox is a mod of BeepBox that aims to combine every other beepmod into one." />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -93,79 +93,440 @@
 <font color="#9c64f7">Patch Notes (in reverse chronological order);</font>
 </h1>
 
-<h2>Version 1.1.1 (Pitch Envelope Minor Update / fixes)</h2>
-<h3>
-    <ul>
-        <li> Pitch envelopes are now properly affected by / calculating arpeggiation and pitch bends </li>
-        <li> Added the dogebox note display for pitch range</li>
-        <li> Added 7 new presets, including 3 new noise presets </li>
-        <li> Fixed some Slarmoo's Box presets </li>
-        <li> Fixed an issue when switching between noise and pitch channels in regards to pitch envelope ranges </li>
-        <li> Standardized some Slarmoo's Box code </li>
-        <li> Resized pitch range sliders to be consistent with the rest of the ui </li>
-    </ul>
-</h3>
-<p>6/17/2024</p>
-
-<h2>Version 1.1 (Keyboard Shortcuts)</h2>
-    <h3><ul>
-        <li> Added a new theme (Slarmoo's Box) </li>
-        <li> Added 6 new keyboard shortcuts to the song player: </li>
-        <ul>
-            <li> <b>L</b>: toggle loop </li>
-            <li> <b>Z/+/-</b>: toggle zoom </li>
-            <li> <b>E/P</b>: return to editor </li>
-            <li> <b>Ctrl S</b>: shorten song player link </li>
-            <li> <b>S</b>: share </li>
-            <li> <b>C</b>: copy link </li>
-        </ul>
-        <li> Updated keyboard shortcut list at the bottom of the page </li>
-        <li> Updated to Ultrabox 2.2.9 </li>
-        <li> Donation form re-added </li>
-    </ul></h3>
-    <p>6/4/2024</p>
-
-<h2>Version 1.0.1 (Patch)</h2>
-    <h3><ul>
-        <li> Did a purge of every mention of Ultrabox where needed </li>
-        <li> Fixed a bug with removing envelopes and the new envelope settings </li>
-        <li> Fixed json importing, exporting, and instrument copy and paste in terms of the new envelope settings</li>
-        <li> Fixed a bug where the pitch envelope's end would slowly decrement </li>
-        <li> Pitch envelopes no longer consider song octave or key </li>
-        <li> Fixed a few instances where the envelope extra settings dropdowns would not work properly </li>
-        <li> Fixed an issue where if pitch envelope inverse was checked in 0.9 it would invert every envelope in 1.0 </li>
-    </ul></h3>
-    <p>5/30/2024</p>
-
-<h2>Version 1.0 (Official Release)</h2>
-    <h3> <ul>
-        <li> Added 3 new presets: Slarmoo's Pulse, spectral cry, and walrus wuh</li>
-        <li> Balanced Slarmoo's box preset volumes </li>
-        <li> Pitch envelope starts, ends, and inverses are now per envelope instead of per instrument </li>
-        <li> All envelope curves can now be inverted similarly to pitch </li>
-        <li> <b>Shift + Enter</b> is now working properly </li>
-        <li> Replaced some stray Ultraboxes in the tip prompts</li>
-        <li> Fixed some incorrect information present in the instrument type prompt </li>
-        <li> Re-added the "Mono" theme, now renamed to "Greyscale" </li>
-        <li> Renamed previous update to 0.9 </li>
-        <li> Updated to Ultrabox 2.2.8 </li>
-    </ul> </h3>
-    <p>5/29/2024</p>
-
-<h2>Version 0.9 (built on Ultrabox 2.2.7)</h2>
+<h2>Version 2.2.10</h2>
 	<h3> <ul>
-	<li> Added more envelope options! These include: </li>
-    <ul>
-        <li> Reverb, panning, chorus, echo, bitcrush, frequency crush, and distorion can now be changed with envelopes </li>
-        <li> A pitch envelope type! This is similar to note size, but for the pitch instead. <br>You can also edit the start,
-            end, and direction with the + sign </li>
-    </ul>
-    <li> 15 new presets found under the "Slarmoo's Box" tab </li>
-	<li> New web icon </li>
-	<li> "Ultrabox" replaced with "Slarmoo's Box" in almost every instance where needed </li>
-	<li> More keyboard shortcuts added to shortcut list </li>
-	<li> Hotdog removed </li>
+	<li>Several changes to import modes:</li>
+		<ul>
+		<li>Improved the Auto-Detect, Modbox, and Synthbox import modes</li>
+		<li>Added the Paandorasbox and Goldbox import modes</li>
+		<li>Fixed incorrect tempo modulation when importing from a non-UB mod</li>
+		</ul>
+	<li>The Shift+P keybind can now be used in the song player</li>
+	<!-- <li>Going to the song player and back no longer adds "index.html" so the song URL (only when not in the offline version)</li> -->
+	<li>Fixed the song recovery in the offline mode</li>
+	<li>Improved the unison dropdown's spacing</li>
+	<li>Fixed incorrect pattern indicator colors in the MicroBox theme</li>
+		<ul>
+		<li>This is inaccurate to the original mod</li>
+		</ul>
+	<li>Relegated the hotdog to the Wackybox/Abyssbox themes</li>
+	<li>Renamed the ÷8 and ÷12 rhythms to "32nd notes" and "doudectuplets" respectively</li>
 	</ul> </h3>
-	<p>5/13/2024</p>  
+	<p>8/11/2024</p>
+
+<h2>Version 2.2.9</h2>
+	<h3> <ul>
+	<li>Added a preference for instrument scrollbars instead of outright removing them</li>
+	<li>Actually ported the Jummbox bugfix for song data not saving properly</li>
+	<li>Ported the <a href="https://github.com/jummbus/jummbox/commit/b0efe3b47392f19b2b9ac2c78d0b90f4e32e24d3#diff-4325f2ebdd213554faab7f9ddf2349a1c845d9d8e05f11eddb35c61f5150f1bf">latest bugfixes</a> from Jummbox</li>
+	<li>Removed excessive code for the bugfix regarding drumset spectrums from 2.2.8</li>
+	</ul> </h3>
+	<p>6/3/2024</p>
+
+<h2>Version 2.2.8</h2>
+	<h3> <ul>
+	<li>Ported Unbox's Shift+F keybind and Voxbox's Shift+Enter keybind</li>
+		<ul>
+		<li>The former moves the playhead to the start of the loop bar instead of the start of the song</li>
+		<li>...and the latter enters a bar behind the selection instead of ahead</li>
+		</ul>
+	<li>Added the <code>--text-spacing-icon </code> and <code>--scrollbar-color</code> theme variables</li>
+		<ul>
+		<li>Because of this, scrollbars will look different on Firefox</li>
+		</ul>
+	<li>Updated the Abyssbox Light and Abyssbox Dark themes</li>
+	<li>Removed scrollbars from the instrument settings</li>
+	<li>Fixed unisons not saving in .jsons when using PWM, Harmonics, or Spectrum</li>
+	<li>Fixed synth weirdness related to drumset spectrums not being reset</li>
+	<li>Fixed the importing of Modbox's "-2 octaves" offset setting</li>
+	</ul> </h3>
+	<p>5/25/2024</p>
+
+<h2>Version 2.2.7</h2>
+	<h3> <ul>
+	<!-- <li>UB is now a Jummbox fork instead of a GoldBox fork!</li> -->
+	<li>Ported the "Frosted Glass" backdrop from Abyssbox!</li>
+	<li>Made changes to shift+r-ing Custom Chip, Drumsets, and envelopes</li>
+	<li>Changed some unison tip prompt text</li>
+	<li>Fixed mod channels being copy-pasteable into pitch channels, causing errors</li>
+	<li>Fixed unison not being a possible envelope option in PWM, Harmonics, and Spectrum</li>
+	<li>Fixed a bug where the pulse width input box couldn't be clicked</li>
+	</ul> </h3>
+	<p>4/28/2024</p>
+
+<h2>Version 2.2.6</h2>
+	<h3> <ul>
+	<li>Added an option to remove whitespace on .json export</li>
+	<li>Fixed Noise and Spectrum instrument types having a 'flam' with 1 unison voice</li>
+	<li>Fixed weird buzzing involving unison spread when using a unison with 1 voice</li>
+	<li>Fixed the slider visual on decimal offset mods being flipped</li>
+	<!-- <li>Made some internal code cleaner: this will only help developers and will make no difference to the user (the thing involving optgroups)</li> -->
+	</ul> </h3>
+	<p>4/8/2024</p>
+
+<h2>Version 2.2.5</h2>
+	<h3> <ul>
+	<li>Added Unisons to the PWM, Spectrum, and Noise instrument types</li>
+	<li>Added the Shortener Config Prompt</li>
+	<ul>
+		<li>This currently only supports <a href="https://tinyurl.com">tinyurl.com</a> and <a href="https://is.gd">is.gd</a>...</li>
+	</ul>
+	<li>Adjusted padding of Abyssbox themes and certain layouts</li>
+	<li>Updated the Abyssbox Light theme</li>
+	<li>Allowed .gif uploading in custom themes</li>
+	<li>Fixed weird behavior involving decimal offset modulators</li>
+	<li>Fixed the song player not working on the offline version</li>
+	<li>Fixed a bug where 6-op envelopes would show up in 4-op instruments</li>
+	<!-- <li>Also fixed an inherited bug from GB involving channel counts in (non-beepbox and non-jummbox) songs with version 1</li> -->
+	<li>Fixed several bugs involving upconverted BeepBox songs</li>
+	</ul> </h3>
+	<p>4/5/2024</p>
+
+<h2>Version 2.2.4</h2>
+	<h3> <ul>
+	<li>UltraBox now has an offline version!</li>
+	<ul>
+		<li>You can download it <a href="https://github.com/ultraabox/ultrabox_typescript/releases">here</a></li>
+		<li>Both local and online sample importing are supported</li>
+	</ul>
+	<li>Made some changes to the default preferences</li>
+	<li>Certain options in the "File" menu now list keybinds</li>
+	<li>Added Copy/Paste buttons to the custom chip prompt</li>
+	<li>Added more unisons to the randomization pool</li>
+	<li>Imported midis now default to the "Free" scale and the "÷8" rhythm</li>
+	<li>Rewrote text in the Custom Theme prompt and embed thingy</li>
+	<li>Added text to the custom scale prompt</li>
+	<!-- <li>updated the embed description text thing a second time</li> -->
+	<li>Added the Abyssbox Dark and Light themes</li>
+	<li>Adjusted the Brucebox and Shitbox 1.0/3.0 themes to be more accurate</li>
+	<li>Fixed the "E" keybind still activating with caps lock</li>
+	<li>Fixed a bug involving exporting songs with broken presets to midi</li>
+	<li>Fixed the piano key labels being broken in certain scenarios</li>
+	<li>Fixed the player favicon not loading correctly</li>
+	</ul> </h3>
+	<p>3/11/2024</p>
+
+<!-- <li>Added three colorblind-friendly themes</li>
+		<ul>
+		<li>The colorblind themes were made and suggested by Nep and Choptop, neither of whom are colorblind...</li>
+		<li>...so if you're  and have feedback to give on those three themes, that would be much appreciated!</li>
+		</ul>  -->
+
+<h2>Version 2.2.3</h2>
+	<h3> <ul>
+	<li>Added the supersaw lead preset and reordered the FM sine preset</li>
+	<li>Added the Abyssbox Focus layout (now called "Focused Long")</li>
+	<li>Panning is now enabled by default again</li>
+	<li>Reworked the Preference menu!</li>
+	<ul>
+		<li>There's now "Appearence" and "Technical" categories for ease of use</li>
+		<li>The Instrument Copy/Paste and Import/Export buttons are now disabled by default</li>
+		<li>Added three new preferences for controlling the Instrument buttons</li>
+	</ul>
+	<li>Added "Import Modes" for better mod support when importing .jsons!</li>
+	<ul>
+		<li>Added support for instrument volumes from Beepbox-based mods</li>
+		<li>Added support for Modbox's pitch shift and (lack of) anti-aliasing</li>
+		<li>Added support for Synthbox FM</li>
+		<li>Added support for Todbox's error unison</li>
+	</ul>
+	<li>Ported the latest Jummbox bugfixes:</li>
+	<ul>
+		<li><a href="https://github.com/jummbus/jummbox/commit/d180b96ebef2289d669334d9b921acf2f0237ccd">https://github.com/jummbus/jummbox/commit/d180b96ebef2289d669334d9b921acf2f0237ccd</a></li>
+		<li><a href="https://github.com/jummbus/jummbox/commit/9df59e639c5f8b72eadb2c986d2c32c753bac90a">https://github.com/jummbus/jummbox/commit/9df59e639c5f8b72eadb2c986d2c32c753bac90a</a></li>
+		<li>Also fixed a css error involving long instrument names</li>
+	</ul>
+	<li>The text in the instrument import prompt now hides itself when not relevant</li>
+	<li>Tweaked the Shitbox 1.0/3.0 and Shitbox 2.0 themes</li>
+	<!-- <li>updated the embed description text thing</li> -->
+	<li>Removed the frivolous 2_3 folder</li>
+	</ul> </h3>
+	<p>2/21/2024</p>
+
+<h2>Version 2.2.2</h2>
+	<h3> <ul>
+	<li>Removed a bunch of non-beep/jumm/goldbox presets in favor of the new instrument import/export buttons!</li>
+		<ul>
+		<li>You can find a sheet for sharing instruments <a href="https://docs.google.com/spreadsheets/d/1Ed87kC7BnCpSra1F1CtRWrRDXH6yyjEo-qO2lBmg75I/edit?usp=sharing">here</a> (this includes the removed presets)</li>
+		<li>Currently, this feature does not work with custom samples</a></li>
+		<!-- <li>These buttons are from Dogebox2 - </li> -->
+		</ul>
+	<li>Ported over two layouts from Abyssbox:</li>
+		<ul>
+		<li>Wide Long, which is a combination between Wide and Long</li>
+		<li>and Flipped Long, which flips the instruments settings to the left side of the screen</li>
+		</ul>
+	<li>Added a preference for the dogebox2 note flashing!</li>
+	<li>Fixed bugs arising from the following:</li>
+		<ul>
+		<li>Using samples with ampersands (&) in the player</li>
+		<li>Loading a song with custom samples and then making a new blank song</li>
+		</ul>
+	<!-- <li>Added a new Custom Theme Prompt maker thingy!!!!</li> -->
+	<li>Most icons can now be modified with custom themes</li>
+	<li>Updated the Nepbox theme to be more accurate</li>
+	</ul> </h3>
+	<p>2/2/2024</p>
+
+<h2>Version 2.2.1</h2>
+<!-- I have no idea how to order the changes in this version...-->
+<!-- I was going to port over the --plant-color and --mute-button-drum variables from Midbox... but I don't think they need to exist lol -->
+	<h3> <ul>
+	<li>Added two new preferences:</li>
+		<ul>
+		<li>One which controls whether or not prompts close when clicking off</li>
+		<li>and one which controls whether or not the description is shown</li>
+		</ul>
+	<li>Added a new variable to themes to control if and how the channel color looping is cut off when using the color formula</li>
+		<ul>
+		<li>Use this to recreate pre-v6 Jummbox themes!</li>
+		</ul>
+	<li>Added the Nepbox theme</li>
+	<li>Updated the default Custom theme</li>
+	<li>Made some changes to the goldboxPlants</li>
+	<li>Fixed song corruption from old UB/goldbox songs</li>
+	<li>Fixed the track editor not having a background color</li>
+	<li>Fixed text saying the "Beats per Bar" keybind was B when it's now Shift+B</li>
+	<li>Ported over the latest Jummbox bugfixes</li>
+	</ul> </h3>
+	<p>1/20/2024</p>
+
+<h2>Version 2.2.0</h2>
+	<h3> <ul>
+	<li>Ported over the latest Jummbox update</li>
+		<ul>
+		<li>You can view the latest Jummbox patch notes <a href="https://jummb.us/patch_notes/2.6">here</a></li>
+		<li>Because of this, the "Beats per Bar" keybind has been moved to Shift+B</li>
+		</ul>
+	<li>Added custom unisons</li>
+		<ul>
+		<li>Due to community request, all of the old unisons will remain</li>
+		</ul>
+	<li>The "Basic Noise" instrument type can now be used in pitch channels</li>
+		<ul>
+		<li>Because of this, the custom instrument section has been reworked</li>
+		</ul>
+	<li>"Unison" is now a valid envelope target in custom chip</li>
+	<li>The PWM Decimal Offset setting now exports in json</li>
+	<li>URLs added via "Add multiple samples" are no longer erroneously percent-decoded</li>
+	<li>Fixed a bug involving modulated FM voices in 6-op FM instruments</li>
+	<li>Fixed a bug where UltraBox presets would reset the instrument volume to 0</li>
+	<li>Fixed a bug involving incorrect use of the theme cache</li>
+	<li>Fixed potential issues involving decimal offset and switching between instrument types:</li>
+		<ul>
+		<li>The decimal offset itself would not reset when switching</li>
+		<li>The decimal offset mod option wouldn't get removed when switching</li>
+		</ul>
+	<li>Renamed pink noise and brownian noise to pink and brownian respectively</li>
+	<li>Certain themes now loop their channels like they did in their original mod</li>
+		<ul>
+		<li>The effected themes include: Modbox, Sandbox, Brucebox, Shitbox 1.0/3.0...</li>
+		<li>...Shitbox 2.0, Nerdbox, Dogebox, Todbox Dark Mode, Mainbox, and Wackybox</li>
+		</ul>
+	<li>Added the Dogebox2 theme and renamed the "Blubox 1.0" theme to "Blubox"</li>
+	<li>Updated the Midbox theme</li>
+	<!-- also changed some images (eg. icon_32 and icon_windows_150) but idk how to list here -->
+	<li>The 404 page no longer includes custom images and music</li>
+	</ul> </h3>
+	<p>1/11/2024</p>
+
+<h2>Version 2.1.2</h2>
+	<h3>
+	<ul>
+	<li>Added the decimal offset slider</li>
+		<ul>
+		<li>You can use this for creating pulse width values like 12.5% or 6.25%</li>
+		</ul>
+	<li>Added four shortcuts </li>
+		<ul>
+		<li>` - open song recovery prompt</li>
+		<li>Shift+` - create blank new song</li>
+		<li>Shift+P - open in song player</li>
+		<li>X - copy and then cut pattern (like in modbox)</li>
+		</ul>
+	<li>Removed all of the themes that don't come from other beepmods</li>
+		<ul>
+		<li>These can now be found on <a href="https://docs.google.com/spreadsheets/d/1dGjEcLgJrPwzBExPmwA9pbE_KVQ3jNrnTBrd46d2IKo/edit#gid=1467448411&fvid=1621178910">Mel's theme sheet</a></li>
+		<li>You can use them by importing them as a custom theme</li>
+		</ul>
+	<li>The oscilloscope and mod title colors can be customized in themes</li>
+		<ul>
+		<li>-oscilloscope-line-L/R and --mod-title respectively </li>
+		</ul>
+	<li>Fixed the 6op feedback names</li>
+	<li>The index.html has been edited: it now includes a link to the Beepbox Discord!</li>
+	<li>Made some changes to the credits</li>
+		<ul>
+		<li>Ultrabox now has <a href="./archives/">archives</a> of a few defunct beepmods</li>
+		</ul>
+	<li>Edited the sample instructions prompt (it now suggests using catbox instead of discord)</li>
+	</ul>
+	</h3>
+	<p>11/24/2023</p>
+
+<h2>Version 2.1.1</h2>
+	<h3>
+	<ul>
+	<li>Added the Paandorasbox, Midbox, and Azur Lane theme</li>
+		<ul>
+		<li>Thanks to becuzwhynot and LeoV for helping Nep make her idea a reality!</li>
+		</ul>
+	<li>Tweaked the Mainbox Reimagined and Neapolitan themes</li>
+	<li>Added several new "plants"</li>
+	<li>Changed several mentions of Jummbox and GoldBox to properly refer to UltraBox</li>
+	</h3>
+	<p>10/9/2023</p>
+
+	<h2>Version 2.1.0</h2>
+	<h3>
+	<ul>
+	<li>Various quality of life changes were made to the UI:</li>
+		<ul>
+		<li>Added new prompt when adding samples</li>
+		<li>Added loop controls prompt, to visually set the loop region or start offset</li>
+		<li>Added loading bar and loading status prompt for custom samples</li>
+		<li>Custom sample presets now appear at the top of the instrument list</li>
+		<li>Added a reset button for custom themes</li>
+		<li>Added the ability to show/hide the oscilloscope and the sample loading bar</li>
+		</ul>
+	<li>Added loop control options for custom sample presets</li>
+	<li>Added a new loop mode ("Play Loop Once")</li>
+	<li>Changed the offset to not be flipped anymore when playing samples backwards</li>
+	<li>Added nintaribox and paintbox samples</li>
+	<ul>
+	<li>Use <code>nintariboxSamples</code> and <code>marioPaintboxSamples</code> respectively as URLs in the "Add Samples" prompt to load them</li>
+	</ul>
+	<li>Various custom sample-related bugfixes:</li>
+		<ul>
+		<li>Fixed custom samples not saving in json</li>
+		<li>Fixed ping-pong loop mode not inverting the sample when going backwards while anti-aliased</li>
+		<li>Fixed clicking when playing samples that end with non-zero values once</li>
+		<li>Fixed ping-pong loop mode getting stuck when changing to another loop mode during playback</li>
+		<li>Legacy samples no longer load in when they aren't needed</li>
+			<ul>
+			<li>This should improve load times</li>
+			</ul>
+		</ul>
+	<li>And finally, various misc additions:</li>
+		<ul>
+		<li>Added MicroBox theme and made changes to the Wackybox theme</li>
+		<li>Fixed nes white and nes ping presets (again)</li>
+		<li>Renamed the Blackbox presets for consistency</li>
+		<li>Added song octave option</li>
+		<ul>
+			<li>The <code>"C+"</code>, <code>"G- (actually F#-)"</code>, <code>"C-"</code>, and <code>"oh no (F-)"</code> keys were obsoleted with this addition, so they have been removed, and will be converted to the right key and octave settings on load</li>
+		</ul>
+			</ul>
+	</ul> </h3>
+	<p>8/24/2023</p>
+	
+	<h2>Version 2.0.2</h2>
+	<h3>
+<ul>
+	<li>Slightly increased the custom sample volume</li>
+	<li>Decreased clicking on looped custom samples</li>
+</ul> </h3>
+	<p>7/29/2023</p>
+	
+	<h2>Version 2.0.1</h2>
+	<h3>
+<ul>
+	<li>Renamed "twelveth notes" to "twelfth notes"</li>
+	<li>Fixed euclidean rhythm generator prompt showing up in live play mode</li>
+	<li>Removed the twitter column</li>
+</ul> </h3>
+	<p>7/28/2023</p>
+	
+	<h2>Version 2.0.0</h2>
+	<h3>
+<ul>
+	<li>Added custom sampling, chip wave looping, and a sample extractor (thank LeoV for all of these features!)</li>
+	<ul>
+	<li>Custom sampling</li>
+	<ul>
+	<li>Samples are loaded by typing a url into the custom sample prompt, which can be found by scrolling to the bottom of the edit tab</li>
+	<li>The old built-in samples can be added by typing "legacySamples" into the custom sample prompt</li>
+	</ul>
+	<li>Chip wave looping</li>
+	<ul>
+	<li>Chip wave looping can be enabling by clicking on the "Loop Controls" box</li>
+	</ul>
+	<li>Soundfont sample extractor</li>
+	<ul>
+	<li>You can extract samples from soundfonts with this tool</li>
+	<li>There are instructions on the page itself on how, so I won't repeat it here</li>
+	<li><a href="./sample_extractor.html">https://ultraabox.github.io/sample_extractor</a></li>
+	</ul>
+	</ul>
+	<li>Added todbox 1/3 and 1/5 wave, and removed the zefbox squaretooth wave</li>
+	<ul>
+	<li>Old songs using the zefbox squaretooth wave will automatically switch to the modbox squaretooth wave</li>
+	</ul>
+	<li>Added pink and brownian noise types</li>
+	<li>Added some presets from blackbox, also added "obama why" as a preset (beepcord inside joke)</li>
+	<li>Renamed all of the rhythms, and removed the song corrupter rhythm</li>
+	<li>Fixed fm frequencies not porting over correctly</li>
+	<li>Improved/fixed the beachcoming theme (thanks Mel!) and the terminal theme</li>
+	<li>UltraBox now has a new logo, made by pixelzwithaz!</li>
+</ul> </h3>
+	<p>7/28/2023</p>
+	<h2>Version 1.2.1</h2>
+	<h3>
+<ul>
+	<li>Added LeoV's euclidean rhythm generator</li>
+	<li>Fixed a bug relating to autoplay on load</li>
+</ul> </h3>
+	<p>6/30/2023</p>
+	
+	<h2>Version 1.2.0</h2>
+	<h3>
+<ul>
+	<li>Added WeebBox custom themes/images feature</li>
+	<li>Dynamic tempo now works when importing midis (thanks LeoV!)</li>
+	<li>Added super saw 2 preset</li>
+	<li>Fixed nes ping preset (for real this time)</li>
+	<li>Fixed custom chip sometimes being way too low pitch</li>
+	<li>Added two batches of bugfixes (ported from jummbox):</li>
+	<ul>
+		<li><a href="https://github.com/AurySystem/goldbox/commit/44e7bdb472d3dfcdc333755132edd07dca7b6e0a">https://github.com/AurySystem/goldbox/commit/44e7bdb472d3dfcdc333755132edd07dca7b6e0a</a></li>
+		<li><a href="https://github.com/AurySystem/goldbox/commit/dd05827f7802b56829b4b7da9d73603a804d72d8">https://github.com/AurySystem/goldbox/commit/dd05827f7802b56829b4b7da9d73603a804d72d8</a></li>
+	</ul>
+</ul> </h3>
+	<p>6/28/2023</p>
+	<h2>Version 1.1.3</h2>
+	<h3>
+<ul>
+  <li>Improved json importing from other mods (ex. importing a json with a wave named viola will now set it to modbox viola)</li>
+  <li>Made pitch and drum channel notes copy-pasteable to each other (thanks LeoV!)</li>
+  <li>Fixed a bug relating to exporting .mid files while using advanced fm</li>
+	<li>Fixed the ultrabox nes white and nes ping presets</li>
+	<li>Updated the brucebox and shitbox 3.0 themes</li>
+	<li>Added the wackybox, terminal, and upside-down beepbox themes</li>
+</ul>  
+	</h3>
+	<p>06/17/2023</p>
+	<!--changed the rhythm names because people hated them	-->
+	<h2>Version 1.1.2</h2>
+	<h3><ul>
+  <li>Fixed a small inconsistency with the song player relating to fm</li>
+  <li>Improved the dogebox theme, and removed the ultrabox foggy and 69420 themes</li>
+	</ul></h3>
+	<p>06/11/2023</p>
+	<h2>Version 1.1.1</h2>
+	<h3><ul><li>Improved the Mainbox and Todbox Dark Mode themes</li>
+		<li>Removed the unneccessary standarddrumsamples.js and plok_samples.js files, which should slightly improved load times</li>
+		<li>Basically just an extension of the last update</li>
+	</ul></h3>
+	<p>06/08/2023</p>	
+<h2>Version 1.1</h2>
+	<h3><ul><li>Added the slushie, 69420, nerdbox, zefbox, and foxbox themes, and fixed the cardboardbox theme</li>
+		<li>Don't ask why I changed the version to 1.1 when it should have been 1.0.1, idk why</li>
+	</ul></h3>
+	<p>06/08/2023</p>
+<!--a few bug patch updates happened between version 1.0 and 1.1 but they aren't very important	-->
+<h2>Version 1.0</h2>
+	<h3><ul><li>First release</li></ul></h3>
+	<p>06/04/2023</p>
+  
 </body>
 </html>

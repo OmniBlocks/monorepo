@@ -493,8 +493,8 @@ var beepbox = (function (exports) {
         { name: "÷3 (triplets)", stepsPerBeat: 3, roundUpThresholds: [5, 12, 18] },
         { name: "÷4 (standard)", stepsPerBeat: 4, roundUpThresholds: [3, 9, 17, 21] },
         { name: "÷6 (sextuplets)", stepsPerBeat: 6, roundUpThresholds: null },
-        { name: "÷8 (eighth notes)", stepsPerBeat: 8, roundUpThresholds: null },
-        { name: "÷12 (twelfth notes)", stepsPerBeat: 12, roundUpThresholds: null },
+        { name: "÷8 (32nd notes)", stepsPerBeat: 8, roundUpThresholds: null },
+        { name: "÷12 (doudectuplets)", stepsPerBeat: 12, roundUpThresholds: null },
         { name: "freehand", stepsPerBeat: 24, roundUpThresholds: null },
     ]);
     Config.instrumentTypeNames = ["chip", "FM", "noise", "spectrum", "drumset", "harmonics", "PWM", "Picked String", "supersaw", "custom chip", "mod", "FM6op", "additive"];
@@ -993,7 +993,7 @@ var beepbox = (function (exports) {
     Config.bitcrusherFreqRange = 14;
     Config.bitcrusherOctaveStep = 0.5;
     Config.bitcrusherQuantizationRange = 8;
-    Config.maxEnvelopeCount = 12;
+    Config.maxEnvelopeCount = 16;
     Config.defaultAutomationRange = 13;
     Config.instrumentAutomationTargets = toNameMap([
         { name: "none", computeIndex: null, displayName: "none", interleave: false, isFilter: false, maxCount: 1, effect: null, compatibleInstruments: null },
@@ -7485,8 +7485,8 @@ var beepbox = (function (exports) {
 					--track-editor-bg-mod-dim: #000000;
 					--multiplicative-mod-slider: #FFC800;
 					--overwriting-mod-slider: #00ffc0;
-					--indicator-primary: #333333;
-					--indicator-secondary: #00ffc0;
+					--indicator-primary: #00ffc0;
+					--indicator-secondary: #333333;
 					--select2-opt-group: #2B2B2B;
 					--input-box-outline: #69BFC6;
 					--mute-button-normal: #00ffc0;
@@ -8802,9 +8802,6 @@ var beepbox = (function (exports) {
 		  --disabled-note-secondary: #000;
 			}
 		/* replaces hotdog (in a hacky way) with an image of the girls using the same scratch sprites from the 404 page*/
-		#Hotdog {
-		display: none;
-		}
 		.instructions-column > section:first-of-type > p:first-of-type:after {
 		display: block;
 		content: url("theme_resources/AzurLaneThemeStarterSquad.png");
@@ -9300,7 +9297,7 @@ var beepbox = (function (exports) {
             return (_a = EditorConfig.presetCategories[0].presets.dictionary) === null || _a === void 0 ? void 0 : _a[TypePresets === null || TypePresets === void 0 ? void 0 : TypePresets[instrument]];
         }
     }
-    EditorConfig.version = "1.1.1";
+    EditorConfig.version = "1.1.2";
     EditorConfig.versionDisplayName = "Slarmoo's Box " + EditorConfig.version;
     EditorConfig.releaseNotesURL = "./patch_notes.html";
     EditorConfig.isOnMac = /^Mac/i.test(navigator.platform) || /Mac OS X/i.test(navigator.userAgent) || /^(iPhone|iPad|iPod)/i.test(navigator.platform) || /(iPhone|iPad|iPod)/i.test(navigator.userAgent);
@@ -10379,7 +10376,8 @@ var beepbox = (function (exports) {
             }
             return patternObject;
         }
-        fromJsonObject(patternObject, song, channel, importedPartsPerBeat, isNoiseChannel, isModChannel) {
+        fromJsonObject(patternObject, song, channel, importedPartsPerBeat, isNoiseChannel, isModChannel, jsonFormat = "auto") {
+            const format = jsonFormat.toLowerCase();
             if (song.patternInstruments) {
                 if (Array.isArray(patternObject["instruments"])) {
                     const instruments = patternObject["instruments"];
@@ -10417,14 +10415,14 @@ var beepbox = (function (exports) {
                     if (note.pitches.length < 1)
                         continue;
                     let startInterval = 0;
+                    let instrument = channel.instruments[this.instruments[0]];
+                    let mod = Math.max(0, Config.modCount - note.pitches[0] - 1);
                     for (let k = 0; k < noteObject["points"].length; k++) {
                         const pointObject = noteObject["points"][k];
                         if (pointObject == undefined || pointObject["tick"] == undefined)
                             continue;
                         const interval = (pointObject["pitchBend"] == undefined) ? 0 : (pointObject["pitchBend"] | 0);
                         const time = Math.round((+pointObject["tick"]) * Config.partsPerBeat / importedPartsPerBeat);
-                        let instrument = channel.instruments[this.instruments[0]];
-                        let mod = Math.max(0, Config.modCount - note.pitches[0] - 1);
                         let volumeCap = song.getVolumeCapForSetting(isModChannel, instrument.modulators[mod], instrument.modFilterTypes[mod]);
                         let size;
                         if (pointObject["volume"] == undefined) {
@@ -10484,6 +10482,14 @@ var beepbox = (function (exports) {
                     }
                     else {
                         note.continuesLastPattern = false;
+                    }
+                    if (format != "ultrabox" && instrument.modulators[mod] == Config.modulators.dictionary["tempo"].index) {
+                        for (const pin of note.pins) {
+                            const oldMin = 30;
+                            const newMin = 1;
+                            const old = pin.size + oldMin;
+                            pin.size = old - newMin;
+                        }
                     }
                     this.notes.push(note);
                 }
@@ -11884,8 +11890,9 @@ var beepbox = (function (exports) {
         fromJsonObject(instrumentObject, isNoiseChannel, isModChannel, useSlowerRhythm, useFastTwoNoteArp, legacyGlobalReverb = 0, jsonFormat = Config.jsonFormat) {
             if (instrumentObject == undefined)
                 instrumentObject = {};
+            const format = jsonFormat.toLowerCase();
             let type = Config.instrumentTypeNames.indexOf(instrumentObject["type"]);
-            if ((jsonFormat == "SynthBox") && (instrumentObject["type"] == "FM"))
+            if ((format == "synthbox") && (instrumentObject["type"] == "FM"))
                 type = Config.instrumentTypeNames.indexOf("FM6op");
             if (type == -1)
                 type = isModChannel ? 10 : (isNoiseChannel ? 2 : 0);
@@ -11895,7 +11902,7 @@ var beepbox = (function (exports) {
                 this.preset = instrumentObject["preset"] >>> 0;
             }
             if (instrumentObject["volume"] != undefined) {
-                if (jsonFormat == "JummBox" || jsonFormat == "Midbox" || jsonFormat == "SynthBox" || jsonFormat == "UltraBox") {
+                if (format == "jummbox" || format == "midbox" || format == "synthbox" || format == "goldbox" || format == "paandorasbox" || format == "ultrabox") {
                     this.volume = clamp(-Config.volumeRange / 2, (Config.volumeRange / 2) + 1, instrumentObject["volume"] | 0);
                 }
                 else {
@@ -12065,12 +12072,15 @@ var beepbox = (function (exports) {
             }
             if (instrumentObject["pan"] != undefined) {
                 this.pan = clamp(0, Config.panMax + 1, Math.round(Config.panCenter + (instrumentObject["pan"] | 0) * Config.panCenter / 100));
-                if (this.pan != Config.panCenter) {
-                    this.effects = (this.effects | (1 << 2));
-                }
+            }
+            else if (instrumentObject["ipan"] != undefined) {
+                this.pan = clamp(0, Config.panMax + 1, Config.panCenter + (instrumentObject["ipan"] * -50));
             }
             else {
                 this.pan = Config.panCenter;
+            }
+            if (this.pan != Config.panCenter) {
+                this.effects = (this.effects | (1 << 2));
             }
             if (instrumentObject["panDelay"] != undefined) {
                 this.panDelay = (instrumentObject["panDelay"] | 0);
@@ -12261,10 +12271,10 @@ var beepbox = (function (exports) {
                         this.customAlgorithm.fromPreset(this.algorithm6Op);
                     }
                     this.feedbackType6Op = Config.feedbacks6Op.findIndex(feedback6Op => feedback6Op.name == instrumentObject["feedbackType"]);
-                    if ((this.feedbackType6Op == -1) && (jsonFormat == "SynthBox")) {
-                        this.feedbackType6Op = Config.algorithms6Op.findIndex(feedbackType6Op => feedbackType6Op.name == "Custom");
+                    if (this.feedbackType6Op == -1) {
                         let synthboxLegacyFeedbacks = toNameMap([
                             { name: "2⟲ 3⟲", indices: [[], [2], [3], [], [], []] },
+                            { name: "3⟲ 4⟲", indices: [[], [], [3], [4], [], []] },
                             { name: "4⟲ 5⟲", indices: [[], [], [], [4], [5], []] },
                             { name: "5⟲ 6⟲", indices: [[], [], [], [], [5], [6]] },
                             { name: "1⟲ 6⟲", indices: [[1], [], [], [], [], [6]] },
@@ -12291,17 +12301,19 @@ var beepbox = (function (exports) {
                             { name: "1→2→3→4→5→6", indices: [[], [1], [2], [3], [4], [5]] },
                         ]);
                         let synthboxFeedbackType = synthboxLegacyFeedbacks[synthboxLegacyFeedbacks.findIndex(feedback => feedback.name == instrumentObject["feedbackType"])].indices;
-                        this.customFeedbackType.set(synthboxFeedbackType);
-                    }
-                    else {
-                        if (this.feedbackType6Op == -1)
-                            this.feedbackType6Op = 1;
-                        if (this.feedbackType6Op == 0) {
-                            this.customFeedbackType.set(instrumentObject["customFeedback"]["mods"]);
+                        if (synthboxFeedbackType != undefined) {
+                            this.feedbackType6Op = 0;
+                            this.customFeedbackType.set(synthboxFeedbackType);
                         }
                         else {
-                            this.customFeedbackType.fromPreset(this.feedbackType6Op);
+                            this.feedbackType6Op = 1;
                         }
+                    }
+                    if ((this.feedbackType6Op == 0) && (instrumentObject["customFeedback"] != undefined)) {
+                        this.customFeedbackType.set(instrumentObject["customFeedback"]["mods"]);
+                    }
+                    else {
+                        this.customFeedbackType.fromPreset(this.feedbackType6Op);
                     }
                 }
                 if (instrumentObject["feedbackAmplitude"] != undefined) {
@@ -12327,6 +12339,10 @@ var beepbox = (function (exports) {
                         operator.amplitude = 0;
                     }
                     if (operatorObject["waveform"] != undefined) {
+                        if (format == "goldbox" && j > 3) {
+                            operator.waveform = 0;
+                            continue;
+                        }
                         operator.waveform = Config.operatorWaves.findIndex(wave => wave.name == operatorObject["waveform"]);
                         if (operator.waveform == -1) {
                             if (operatorObject["waveform"] == "square") {
@@ -12403,7 +12419,7 @@ var beepbox = (function (exports) {
                     this.aliases = instrumentObject["aliases"];
                 }
                 else {
-                    if (jsonFormat == "ModBox") {
+                    if (format == "modbox") {
                         this.effects = (this.effects | (1 << 3));
                         this.aliases = true;
                         this.distortion = 0;
@@ -15058,6 +15074,8 @@ var beepbox = (function (exports) {
                             let songReverbChannel = -1;
                             let songReverbInstrument = -1;
                             let songReverbIndex = -1;
+                            const shouldCorrectTempoMods = fromJummBox;
+                            const jummboxTempoMin = 30;
                             while (true) {
                                 const channel = this.channels[channelIndex];
                                 const isNoiseChannel = this.getChannelIsNoise(channelIndex);
@@ -15310,7 +15328,13 @@ var beepbox = (function (exports) {
                                             }
                                             note.pitches.length = pitchCount;
                                             pitchBends.unshift(note.pitches[0]);
+                                            const noteIsForTempoMod = isModChannel && channel.instruments[newPattern.instruments[0]].modulators[Config.modCount - 1 - note.pitches[0]] === Config.modulators.dictionary["tempo"].index;
+                                            let tempoOffset = 0;
+                                            if (shouldCorrectTempoMods && noteIsForTempoMod) {
+                                                tempoOffset = jummboxTempoMin - Config.tempoMin;
+                                            }
                                             if (isModChannel) {
+                                                note.pins[0].size += tempoOffset;
                                                 note.pins[0].size *= detuneScaleNotes[newPattern.instruments[0]][note.pitches[0]];
                                             }
                                             let pinCount = 1;
@@ -15320,7 +15344,7 @@ var beepbox = (function (exports) {
                                                 const interval = pitchBends[0] - note.pitches[0];
                                                 if (note.pins.length <= pinCount) {
                                                     if (isModChannel) {
-                                                        note.pins[pinCount++] = makeNotePin(interval, pinObj.time, pinObj.size * detuneScaleNotes[newPattern.instruments[0]][note.pitches[0]]);
+                                                        note.pins[pinCount++] = makeNotePin(interval, pinObj.time, pinObj.size * detuneScaleNotes[newPattern.instruments[0]][note.pitches[0]] + tempoOffset);
                                                     }
                                                     else {
                                                         note.pins[pinCount++] = makeNotePin(interval, pinObj.time, pinObj.size);
@@ -15331,7 +15355,7 @@ var beepbox = (function (exports) {
                                                     pin.interval = interval;
                                                     pin.time = pinObj.time;
                                                     if (isModChannel) {
-                                                        pin.size = pinObj.size * detuneScaleNotes[newPattern.instruments[0]][note.pitches[0]];
+                                                        pin.size = pinObj.size * detuneScaleNotes[newPattern.instruments[0]][note.pitches[0]] + tempoOffset;
                                                     }
                                                     else {
                                                         pin.size = pinObj.size;
@@ -15764,7 +15788,17 @@ var beepbox = (function (exports) {
             this.initToDefault(true);
             if (!jsonObject)
                 return;
-            const format = jsonFormat == "auto" ? jsonObject["format"] : jsonFormat;
+            if (jsonFormat == "auto") {
+                if (jsonObject["format"] == "BeepBox") {
+                    if (jsonObject["riff"] != undefined) {
+                        jsonFormat = "modbox";
+                    }
+                    if (jsonObject["masterGain"] != undefined) {
+                        jsonFormat = "jummbox";
+                    }
+                }
+            }
+            const format = (jsonFormat == "auto" ? jsonObject["format"] : jsonFormat).toLowerCase();
             if (jsonObject["name"] != undefined) {
                 this.title = jsonObject["name"];
             }
@@ -16024,7 +16058,7 @@ var beepbox = (function (exports) {
                                     instrumentObject["wave"] = names[oldNames.findIndex(x => x === waveName)];
                                 }
                                 else if (veryOldNames.includes(waveName)) {
-                                    if (waveName === "trumpet" || waveName === "flute") ;
+                                    if ((waveName === "trumpet" || waveName === "flute") && (format != "paandorasbox")) ;
                                     else {
                                         shouldLoadLegacySamples = true;
                                         instrumentObject["wave"] = names[veryOldNames.findIndex(x => x === waveName)];
@@ -16258,7 +16292,7 @@ var beepbox = (function (exports) {
                             patternObject = channelObject["patterns"][i];
                         if (patternObject == undefined)
                             continue;
-                        pattern.fromJsonObject(patternObject, this, channel, importedPartsPerBeat, isNoiseChannel, isModChannel);
+                        pattern.fromJsonObject(patternObject, this, channel, importedPartsPerBeat, isNoiseChannel, isModChannel, jsonFormat);
                     }
                     channel.patterns.length = this.patternsPerChannel;
                     for (let i = 0; i < this.barCount; i++) {
@@ -22578,7 +22612,7 @@ var beepbox = (function (exports) {
         synth.setSong(songString);
         synth.snapToStart();
         const updatedSongString = synth.song.toBase64String();
-        editLink.href = "../index.html#" + updatedSongString;
+        editLink.href = "../" + (OFFLINE ? "index.html" : "") + "#" + updatedSongString;
     }
     function hashUpdatedExternally() {
         let myHash = location.hash;
@@ -22929,9 +22963,11 @@ var beepbox = (function (exports) {
                 break;
             case 69:
             case 80:
-                hashUpdatedExternally();
-                location.href = "../index.html#" + synth.song.toBase64String();
-                event.preventDefault();
+                if (event.shiftKey) {
+                    hashUpdatedExternally();
+                    location.href = "../" + (OFFLINE ? "index.html" : "") + "#" + synth.song.toBase64String();
+                    event.preventDefault();
+                }
                 break;
             case 90:
             case 187:
@@ -22948,9 +22984,6 @@ var beepbox = (function (exports) {
                 if (event.ctrlKey) {
                     shortenUrl();
                     event.preventDefault();
-                }
-                else {
-                    onShareClicked();
                 }
                 break;
             case 67:

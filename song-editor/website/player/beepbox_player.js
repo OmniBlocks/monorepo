@@ -16859,6 +16859,54 @@ var beepbox = (function (exports) {
                 default: throw new Error("Unrecognized operator envelope type.");
             }
         }
+        computePitchEnvelope(instrument, index, tone, instrumentState) {
+            let startNote = 0;
+            let endNote = Config.maxPitch;
+            let pitch = 0;
+            let inverse = false;
+            if (instrument.isNoiseInstrument) {
+                endNote = Config.drumCount - 1;
+            }
+            if (index < instrument.envelopeCount && index !== -2) {
+                startNote = instrument.pitchEnvelopeStart[index];
+                endNote = instrument.pitchEnvelopeEnd[index];
+                inverse = instrument.envelopeInverse[index];
+            }
+            if (tone) {
+                const chord = instrument.getChord();
+                const arpeggiates = chord.arpeggiates;
+                const arpeggio = Math.floor(instrumentState.arpTime / Config.ticksPerArpeggio);
+                const tonePitch = tone.pitches[arpeggiates ? getArpeggioPitchIndex(tone.pitchCount, instrument.fastTwoNoteArp, arpeggio) : 0];
+                pitch = tone.lastInterval != tonePitch ? tonePitch + tone.lastInterval : tonePitch;
+            }
+            if (startNote > endNote) {
+                startNote = 0;
+                endNote = instrument.isNoiseInstrument ? Config.drumCount - 1 : Config.maxPitch;
+            }
+            const range = endNote - startNote + 1;
+            if (inverse) {
+                if (pitch <= startNote) {
+                    return 1;
+                }
+                else if (pitch >= endNote) {
+                    return 0;
+                }
+                else {
+                    return 1 - (pitch - startNote) / range;
+                }
+            }
+            else {
+                if (pitch <= startNote) {
+                    return 0;
+                }
+                else if (pitch >= endNote) {
+                    return 1;
+                }
+                else {
+                    return (pitch - startNote) / range;
+                }
+            }
+        }
         static getLowpassCutoffDecayVolumeCompensation(envelope) {
             if (envelope.type == 9)
                 return 1.25 + 0.025 * envelope.speed;

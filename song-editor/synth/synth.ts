@@ -7409,7 +7409,7 @@ class EnvelopeComputer {
                 envelope = Config.envelopes[envelopeSettings.envelope];
                 if (envelope.type == EnvelopeType.noteSize) usedNoteSize = true;
             }
-            const pitch: number = this.computePitchEnvelope(instrument, envelopeIndex, tone, instrumentState);
+            //const pitch: number = this.computePitchEnvelope(instrument, envelopeIndex, tone, instrumentState);
             if (/*automationTarget.perNote == this._perNote &&*/ automationTarget.computeIndex != null) {
                 const computeIndex: number = automationTarget.computeIndex + targetIndex;
                 let envelopeStart: number = EnvelopeComputer.computeEnvelope(envelope, noteSecondsStart, beatTimeStart, noteSizeStart, tone, instrument, envelopeIndex, instrumentState);
@@ -11158,7 +11158,7 @@ export class Synth {
 
             // If the drumset lowpass cutoff decays, compensate by increasing expression.
             noteFilterExpression *= EnvelopeComputer.getLowpassCutoffDecayVolumeCompensation(drumsetFilterEnvelope);
-            const pitch = envelopeComputer.computePitchEnvelope(instrument, -2, tone, instrumentState);
+            //const pitch = envelopeComputer.computePitchEnvelope(instrument, -2, tone, instrumentState);
 
             // Drumset filters use the same envelope timing as the rest of the envelopes, but do not include support for slide transitions.
             let drumsetFilterEnvelopeStart: number = EnvelopeComputer.computeEnvelope(drumsetFilterEnvelope, envelopeComputer.noteSecondsStart, beatsPerPart * partTimeStart, envelopeComputer.noteSizeStart, tone, instrument, -2, instrumentState); //doesn't have pitchStart, pitchEnd, or pitchInvert

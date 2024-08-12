@@ -18752,6 +18752,54 @@ li.select2-results__option[role=group] > strong:hover {
                 default: throw new Error("Unrecognized operator envelope type.");
             }
         }
+        computePitchEnvelope(instrument, index, tone, instrumentState) {
+            let startNote = 0;
+            let endNote = Config.maxPitch;
+            let pitch = 0;
+            let inverse = false;
+            if (instrument.isNoiseInstrument) {
+                endNote = Config.drumCount - 1;
+            }
+            if (index < instrument.envelopeCount && index !== -2) {
+                startNote = instrument.pitchEnvelopeStart[index];
+                endNote = instrument.pitchEnvelopeEnd[index];
+                inverse = instrument.envelopeInverse[index];
+            }
+            if (tone) {
+                const chord = instrument.getChord();
+                const arpeggiates = chord.arpeggiates;
+                const arpeggio = Math.floor(instrumentState.arpTime / Config.ticksPerArpeggio);
+                const tonePitch = tone.pitches[arpeggiates ? getArpeggioPitchIndex(tone.pitchCount, instrument.fastTwoNoteArp, arpeggio) : 0];
+                pitch = tone.lastInterval != tonePitch ? tonePitch + tone.lastInterval : tonePitch;
+            }
+            if (startNote > endNote) {
+                startNote = 0;
+                endNote = instrument.isNoiseInstrument ? Config.drumCount - 1 : Config.maxPitch;
+            }
+            const range = endNote - startNote + 1;
+            if (inverse) {
+                if (pitch <= startNote) {
+                    return 1;
+                }
+                else if (pitch >= endNote) {
+                    return 0;
+                }
+                else {
+                    return 1 - (pitch - startNote) / range;
+                }
+            }
+            else {
+                if (pitch <= startNote) {
+                    return 0;
+                }
+                else if (pitch >= endNote) {
+                    return 1;
+                }
+                else {
+                    return (pitch - startNote) / range;
+                }
+            }
+        }
         static getLowpassCutoffDecayVolumeCompensation(envelope) {
             if (envelope.type == 9)
                 return 1.25 + 0.025 * envelope.speed;
@@ -33106,27 +33154,27 @@ You should be redirected to the song at:<br /><br />
         _getShape(shape, index) {
             switch (shape) {
                 case 0:
-                    return SVG.svg({ id: "SVGshape" + index, style: "flex-shrink: 0; position: absolute; left: 0; top: 0; pointer-events: none; margin:0px;", width: "15px", height: "15px", viewBox: "0 0 26 26" }, [
+                    return SVG.svg({ id: "SVGshape" + index, style: "flex-shrink: 0; position: absolute; left: 0; top: 0; pointer-events: none; margin:0.3px;", width: "15px", height: "15px", viewBox: "0 0 26 26" }, [
                         SVG.path({ d: "M 2 12 C 12 0, 13 23, 23 13", strokeWidth: "3", stroke: "currentColor", fill: "none" }),
                     ]);
                 case 1:
-                    return SVG.svg({ id: "SVGshape" + index, style: "flex-shrink: 0; position: absolute; left: 0; top: 0; pointer-events: none; margin:0px;", width: "15px", height: "15px", viewBox: "0 0 26 26" }, [
+                    return SVG.svg({ id: "SVGshape" + index, style: "flex-shrink: 0; position: absolute; left: 0; top: 0; pointer-events: none; margin:0.3px;", width: "15px", height: "15px", viewBox: "0 0 26 26" }, [
                         SVG.path({ d: "M 2 2 L 2 23 L 23 23 L 23 2 L 2 2 z", strokeWidth: "3", stroke: "currentColor", fill: "none" }),
                     ]);
                 case 2:
-                    return SVG.svg({ id: "SVGshape" + index, style: "flex-shrink: 0; position: absolute; left: 0; top: 0; pointer-events: none; margin:0px;", width: "15px", height: "15px", viewBox: "0 0 26 26" }, [
+                    return SVG.svg({ id: "SVGshape" + index, style: "flex-shrink: 0; position: absolute; left: 0; top: 0; pointer-events: none; margin:0.3px;", width: "15px", height: "15px", viewBox: "0 0 26 26" }, [
                         SVG.path({ d: "M 2 23 L 12 2 L 23 23 L 2 23 z", strokeWidth: "3", stroke: "currentColor", fill: "none" }),
                     ]);
                 case 3:
-                    return SVG.svg({ id: "SVGshape" + index, style: "flex-shrink: 0; position: absolute; left: 0; top: 0; pointer-events: none; margin:1px;", width: "15px", height: "15px", viewBox: "0 0 26 26" }, [
+                    return SVG.svg({ id: "SVGshape" + index, style: "flex-shrink: 0; position: absolute; left: 0; top: 0; pointer-events: none; margin:0.7px;", width: "15px", height: "15px", viewBox: "0 0 26 26" }, [
                         SVG.path({ d: "M 3 3 L 3 24 L 13 24 L 3 3 z M 14 24 L 14 3 L 24 24 L 14 24 z", strokeWidth: "3", stroke: "currentColor", fill: "none" }),
                     ]);
                 case 4:
-                    return SVG.svg({ id: "SVGshape" + index, style: "flex-shrink: 0; position: absolute; left: 0; top: 0; pointer-events: none; margin:1px;", width: "15px", height: "15px", viewBox: "0 0 26 26" }, [
+                    return SVG.svg({ id: "SVGshape" + index, style: "flex-shrink: 0; position: absolute; left: 0; top: 0; pointer-events: none; margin:0.7px;", width: "15px", height: "15px", viewBox: "0 0 26 26" }, [
                         SVG.path({ d: "M 12 3 L 2 24 L 12 24 L 12 3 z M 13 24 L 23 3 L 23 24 L 13 24 z", strokeWidth: "3", stroke: "currentColor", fill: "none" }),
                     ]);
                 case 5:
-                    return SVG.svg({ id: "SVGshape" + index, style: "flex-shrink: 0; position: absolute; left: 0; top: 0; pointer-events: none; margin:1px;", width: "15px", height: "15px", viewBox: "0 0 26 26" }, [
+                    return SVG.svg({ id: "SVGshape" + index, style: "flex-shrink: 0; position: absolute; left: 0; top: 0; pointer-events: none; margin:0.7px;", width: "15px", height: "15px", viewBox: "0 0 26 26" }, [
                         SVG.path({ d: "M 2 23 L 23 23 L 17 2 L 8 2 L 2 23 z", strokeWidth: "3", stroke: "currentColor", fill: "none" }),
                     ]);
                 default:

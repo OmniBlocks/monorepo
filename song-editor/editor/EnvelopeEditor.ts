@@ -14,14 +14,14 @@ export class EnvelopeEditor {
 	private readonly _targetSelects: HTMLSelectElement[] = [];
 	private readonly _envelopeSelects: HTMLSelectElement[] = [];
 	private readonly _deleteButtons: HTMLButtonElement[] = [];
-	public readonly _extraSettingsDropdowns: HTMLButtonElement[] = []; //need to be accessed in SongEditor to function
-	public readonly _extraPitchSettingsGroups: HTMLDivElement[] = [];
-	public readonly _extraSettingsDropdownGroups: HTMLDivElement[] = [];
-	public readonly _openExtraSettingsDropdowns: Boolean[] = [];
+	public readonly extraSettingsDropdowns: HTMLButtonElement[] = []; //need to be accessed in SongEditor to function
+	public readonly extraPitchSettingsGroups: HTMLDivElement[] = [];
+	public readonly extraSettingsDropdownGroups: HTMLDivElement[] = [];
+	public readonly openExtraSettingsDropdowns: Boolean[] = [];
 	private readonly _pitchStartSliders: HTMLInputElement[] = [];
-	public readonly _pitchStartBoxes: HTMLInputElement[] = [];
+	public readonly pitchStartBoxes: HTMLInputElement[] = [];
 	private readonly _pitchEndSliders: HTMLInputElement[] = [];
-	public readonly _pitchEndBoxes: HTMLInputElement[] = [];
+	public readonly pitchEndBoxes: HTMLInputElement[] = [];
 	private readonly _inverters: HTMLInputElement[] = [];
 	private _renderedEnvelopeCount: number = 0;
 	private _renderedEqFilterCount: number = -1;
@@ -47,8 +47,8 @@ export class EnvelopeEditor {
 		} else if (envelopeSelectIndex != -1) {
 			this._doc.record(new ChangeSetEnvelopeType(this._doc, envelopeSelectIndex, this._envelopeSelects[envelopeSelectIndex].selectedIndex));
 
-			this._extraSettingsDropdowns[envelopeSelectIndex].style.display = Config.envelopes[this._envelopeSelects[envelopeSelectIndex].selectedIndex].name == "pitch" ? "inline" : "none";
-			this._extraPitchSettingsGroups[envelopeSelectIndex].style.display = Config.envelopes[this._envelopeSelects[envelopeSelectIndex].selectedIndex].name == "pitch" ? "" : "none";
+			this.extraSettingsDropdowns[envelopeSelectIndex].style.display = Config.envelopes[this._envelopeSelects[envelopeSelectIndex].selectedIndex].name == "pitch" ? "inline" : "none";
+			this.extraPitchSettingsGroups[envelopeSelectIndex].style.display = Config.envelopes[this._envelopeSelects[envelopeSelectIndex].selectedIndex].name == "pitch" ? "" : "none";
 		} else if (inverterIndex != -1) {
 			this._doc.record(new ChangeEnvelopeInverse(this._doc, this._inverters[inverterIndex].checked, inverterIndex));
 		}
@@ -58,19 +58,19 @@ export class EnvelopeEditor {
 		const index: number = this._deleteButtons.indexOf(<any>event.target);
 		if (index != -1) {
 			this._doc.record(new ChangeRemoveEnvelope(this._doc, index));
-			this._extraSettingsDropdownGroups[index].style.display = "none";
+			this.extraSettingsDropdownGroups[index].style.display = "none";
 		}
 	}
 
 	private _onInput = (event: Event): void => {
-		const startBoxIndex: number = this._pitchStartBoxes.indexOf(<any>event.target);
-		const endBoxIndex: number = this._pitchEndBoxes.indexOf(<any>event.target);
+		const startBoxIndex: number = this.pitchStartBoxes.indexOf(<any>event.target);
+		const endBoxIndex: number = this.pitchEndBoxes.indexOf(<any>event.target);
 		const startSliderIndex: number = this._pitchStartSliders.indexOf(<any>event.target);
 		const endSliderIndex: number = this._pitchEndSliders.indexOf(<any>event.target);
 		if (startBoxIndex != -1) {
-			this._doc.record(new ChangeEnvelopePitchStart(this._doc, parseInt(this._pitchStartBoxes[startBoxIndex].value), startBoxIndex));
+			this._doc.record(new ChangeEnvelopePitchStart(this._doc, parseInt(this.pitchStartBoxes[startBoxIndex].value), startBoxIndex));
 		} else if (endBoxIndex != -1) {
-			this._doc.record(new ChangeEnvelopePitchEnd(this._doc, parseInt(this._pitchEndBoxes[endBoxIndex].value), endBoxIndex));
+			this._doc.record(new ChangeEnvelopePitchEnd(this._doc, parseInt(this.pitchEndBoxes[endBoxIndex].value), endBoxIndex));
 		} else if (startSliderIndex != -1) {
 			this._doc.record(new ChangeEnvelopePitchStart(this._doc, parseInt(this._pitchStartSliders[startSliderIndex].value), startSliderIndex));
 		} else if (endSliderIndex != -1) {
@@ -104,34 +104,34 @@ export class EnvelopeEditor {
 		const instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
 		for (let i = 0; i < Config.maxEnvelopeCount; i++) {
 			if (i >= instrument.envelopeCount) {
-				if (this._extraSettingsDropdowns[i]) { //make sure is not null so that we don't get an error
-					this._extraSettingsDropdowns[i].style.display = "none";
+				if (this.extraSettingsDropdowns[i]) { //make sure is not null so that we don't get an error
+					this.extraSettingsDropdowns[i].style.display = "none";
 				}
-				if (this._extraSettingsDropdownGroups[i]) {
-					this._extraSettingsDropdownGroups[i].style.display = "none";
+				if (this.extraSettingsDropdownGroups[i]) {
+					this.extraSettingsDropdownGroups[i].style.display = "none";
 				}
-				if (this._extraPitchSettingsGroups[i]) {
-					this._extraPitchSettingsGroups[i].style.display = "none";
+				if (this.extraPitchSettingsGroups[i]) {
+					this.extraPitchSettingsGroups[i].style.display = "none";
 				}
-			} else if (this._extraSettingsDropdowns[i].textContent == "▲") {
-				this._extraSettingsDropdownGroups[i].style.display = "flex";
-				this._extraSettingsDropdowns[i].style.display = "inline";
+			} else if (this.extraSettingsDropdowns[i].textContent == "▲") {
+				this.extraSettingsDropdownGroups[i].style.display = "flex";
+				this.extraSettingsDropdowns[i].style.display = "inline";
 				if (Config.envelopes[instrument.envelopes[i].envelope].name == "pitch") {
-					this._extraPitchSettingsGroups[i].style.display = "flex";
-					this._pitchStartBoxes[i].value = instrument.pitchEnvelopeStart[i].toString();
-					this._pitchEndBoxes[i].value = instrument.pitchEnvelopeEnd[i].toString();
+					this.extraPitchSettingsGroups[i].style.display = "flex";
+					this.pitchStartBoxes[i].value = instrument.pitchEnvelopeStart[i].toString();
+					this.pitchEndBoxes[i].value = instrument.pitchEnvelopeEnd[i].toString();
 				} else {
-					this._extraPitchSettingsGroups[i].style.display = "none";
+					this.extraPitchSettingsGroups[i].style.display = "none";
 				}
 				this._inverters[i].checked = instrument.envelopeInverse[i];
-			} else if (this._extraSettingsDropdowns[i].textContent == "▼") {
-				this._extraSettingsDropdownGroups[i].style.display = "none";
-				this._extraPitchSettingsGroups[i].style.display = "none";
-				this._extraSettingsDropdowns[i].style.display = "inline";
+			} else if (this.extraSettingsDropdowns[i].textContent == "▼") {
+				this.extraSettingsDropdownGroups[i].style.display = "none";
+				this.extraPitchSettingsGroups[i].style.display = "none";
+				this.extraSettingsDropdowns[i].style.display = "inline";
 			} else {
-				this._extraSettingsDropdowns[i].style.display = "none";
-				this._extraSettingsDropdownGroups[i].style.display = "none";
-				this._extraPitchSettingsGroups[i].style.display = "none";
+				this.extraSettingsDropdowns[i].style.display = "none";
+				this.extraSettingsDropdownGroups[i].style.display = "none";
+				this.extraPitchSettingsGroups[i].style.display = "none";
 			}
 		}
 	}
@@ -197,13 +197,13 @@ export class EnvelopeEditor {
 			this._targetSelects[envelopeIndex] = targetSelect;
 			this._envelopeSelects[envelopeIndex] = envelopeSelect;
 			this._deleteButtons[envelopeIndex] = deleteButton;
-			this._extraSettingsDropdowns[envelopeIndex] = extraSettingsDropdown;
-			this._extraSettingsDropdownGroups[envelopeIndex] = extraSettingsDropdownGroup;
-			this._extraPitchSettingsGroups[envelopeIndex] = extraPitchSettingsGroup;
+			this.extraSettingsDropdowns[envelopeIndex] = extraSettingsDropdown;
+			this.extraSettingsDropdownGroups[envelopeIndex] = extraSettingsDropdownGroup;
+			this.extraPitchSettingsGroups[envelopeIndex] = extraPitchSettingsGroup;
 			this._pitchStartSliders[envelopeIndex] = startNoteSlider;
-			this._pitchStartBoxes[envelopeIndex] = startNoteBox;
+			this.pitchStartBoxes[envelopeIndex] = startNoteBox;
 			this._pitchEndSliders[envelopeIndex] = endNoteSlider;
-			this._pitchEndBoxes[envelopeIndex] = endNoteBox;
+			this.pitchEndBoxes[envelopeIndex] = endNoteBox;
 			this._inverters[envelopeIndex] = invertBox;
 		}
 
@@ -234,8 +234,8 @@ export class EnvelopeEditor {
 		for (let envelopeIndex: number = 0; envelopeIndex < instrument.envelopeCount; envelopeIndex++) {
 			this._targetSelects[envelopeIndex].value = String(instrument.envelopes[envelopeIndex].target + instrument.envelopes[envelopeIndex].index * Config.instrumentAutomationTargets.length);
 			this._envelopeSelects[envelopeIndex].selectedIndex = instrument.envelopes[envelopeIndex].envelope;
-			this._pitchStartBoxes[envelopeIndex].value = String(instrument.pitchEnvelopeStart[envelopeIndex]);
-			this._pitchEndBoxes[envelopeIndex].value = String(instrument.pitchEnvelopeEnd[envelopeIndex]);
+			this.pitchStartBoxes[envelopeIndex].value = String(instrument.pitchEnvelopeStart[envelopeIndex]);
+			this.pitchEndBoxes[envelopeIndex].value = String(instrument.pitchEnvelopeEnd[envelopeIndex]);
 			this._pitchStartSliders[envelopeIndex].value = String(instrument.pitchEnvelopeStart[envelopeIndex]);
 			this._pitchEndSliders[envelopeIndex].value = String(instrument.pitchEnvelopeEnd[envelopeIndex]);
 			this._inverters[envelopeIndex].checked = instrument.envelopeInverse[envelopeIndex];

@@ -55,7 +55,7 @@ export class AdditiveEditor {
             this._lastControlPointContainer.appendChild(rect);
         }
         for (let i: number = 0; i < Config.additiveControlPoints; i++) {
-            const waveTypeButton: HTMLButtonElement = HTML.button({ style: `width:21.7px;margin:3px;margin-left: ${i == Config.additiveControlPoints-1 ? 19.4: 3}px;` }, this._getShape(this._current.waveTypes[i], i));
+            const waveTypeButton: HTMLButtonElement = HTML.button({ style: `height:16.79px;width:16.79px;margin:2px;margin-left: ${i == Config.additiveControlPoints-1 ? 13: 2}px;` }, this._getShape(this._current.waveTypes[i], i));
             this._waveTypeButtons.push(waveTypeButton);
             this.waveTypeButtonContainer.appendChild(waveTypeButton);
             const index = i;
@@ -92,27 +92,27 @@ export class AdditiveEditor {
     private _getShape(shape: number, index: number): SVGSVGElement {
         switch (shape) {
             case AdditiveWaveTypes.sine:
-                return SVG.svg({ id: "SVGshape" + index, style: "flex-shrink: 0; position: absolute; left: 0; top: 0; pointer-events: none; margin:1px;", width: "20px", height: "20px", viewBox: "0 0 26 26" }, [
+                return SVG.svg({ id: "SVGshape" + index, style: "flex-shrink: 0; position: absolute; left: 0; top: 0; pointer-events: none; margin:0.3px;", width: "15px", height: "15px", viewBox: "0 0 26 26" }, [
                     SVG.path({ d: "M 2 12 C 12 0, 13 23, 23 13", strokeWidth: "3", stroke: "currentColor", fill: "none" }),
                 ])
             case AdditiveWaveTypes.square:
-                return SVG.svg({ id: "SVGshape" + index, style: "flex-shrink: 0; position: absolute; left: 0; top: 0; pointer-events: none; margin:1px;", width: "20px", height: "20px", viewBox: "0 0 26 26" }, [
+                return SVG.svg({ id: "SVGshape" + index, style: "flex-shrink: 0; position: absolute; left: 0; top: 0; pointer-events: none; margin:0.3px;", width: "15px", height: "15px", viewBox: "0 0 26 26" }, [
                     SVG.path({ d: "M 2 2 L 2 23 L 23 23 L 23 2 L 2 2 z", strokeWidth: "3", stroke: "currentColor", fill: "none" }),
                 ])
             case AdditiveWaveTypes.triangle:
-                return SVG.svg({ id: "SVGshape" + index, style: "flex-shrink: 0; position: absolute; left: 0; top: 0; pointer-events: none; margin:1px;", width: "20px", height: "20px", viewBox: "0 0 26 26" }, [
+                return SVG.svg({ id: "SVGshape" + index, style: "flex-shrink: 0; position: absolute; left: 0; top: 0; pointer-events: none; margin:0.3px;", width: "15px", height: "15px", viewBox: "0 0 26 26" }, [
                     SVG.path({ d: "M 2 23 L 12 2 L 23 23 L 2 23 z", strokeWidth: "3", stroke: "currentColor", fill: "none" }),
                 ])
             case AdditiveWaveTypes.sawtooth:
-                return SVG.svg({ id: "SVGshape" + index, style: "flex-shrink: 0; position: absolute; left: 0; top: 0; pointer-events: none; margin:1px;", width: "20px", height: "20px", viewBox: "0 0 26 26" }, [
+                return SVG.svg({ id: "SVGshape" + index, style: "flex-shrink: 0; position: absolute; left: 0; top: 0; pointer-events: none; margin:0.7px;", width: "15px", height: "15px", viewBox: "0 0 26 26" }, [
                     SVG.path({ d: "M 3 3 L 3 24 L 13 24 L 3 3 z M 14 24 L 14 3 L 24 24 L 14 24 z", strokeWidth: "3", stroke: "currentColor", fill: "none" }),
                 ])
             case AdditiveWaveTypes.ramp:
-                return SVG.svg({ id: "SVGshape" + index, style: "flex-shrink: 0; position: absolute; left: 0; top: 0; pointer-events: none; margin:1px;", width: "20px", height: "20px", viewBox: "0 0 26 26" }, [
+                return SVG.svg({ id: "SVGshape" + index, style: "flex-shrink: 0; position: absolute; left: 0; top: 0; pointer-events: none; margin:0.7px;", width: "15px", height: "15px", viewBox: "0 0 26 26" }, [
                     SVG.path({ d: "M 12 3 L 2 24 L 12 24 L 12 3 z M 13 24 L 23 3 L 23 24 L 13 24 z", strokeWidth: "3", stroke: "currentColor", fill: "none" }),
                 ])
             case AdditiveWaveTypes.trapezoid:
-                return SVG.svg({ id: "SVGshape" + index, style: "flex-shrink: 0; position: absolute; left: 0; top: 0; pointer-events: none; margin:1px;", width: "20px", height: "20px", viewBox: "0 0 26 26" }, [
+                return SVG.svg({ id: "SVGshape" + index, style: "flex-shrink: 0; position: absolute; left: 0; top: 0; pointer-events: none; margin:0.7px;", width: "15px", height: "15px", viewBox: "0 0 26 26" }, [
                     SVG.path({ d: "M 2 23 L 23 23 L 17 2 L 8 2 L 2 23 z", strokeWidth: "3", stroke: "currentColor", fill: "none" }),
                 ])
             default:
@@ -314,7 +314,7 @@ export class AdditiveEditorPrompt implements Prompt {
         ]),
     ]);
     private readonly copyPasteContainer: HTMLDivElement = HTML.div({ style: "width: 185px;" }, this.copyButton, this.pasteButton);
-    public readonly container: HTMLDivElement = HTML.div({ class: "prompt noSelection", style: "width: 800px; height: 500px" },
+    public readonly container: HTMLDivElement = HTML.div({ class: "prompt noSelection", style: "width: 600px; height: 450px" },
         HTML.h2("Edit Additive Instrument"),
         HTML.div({ style: "display: flex; width: 55%; align-self: center; flex-direction: row; align-items: center; justify-content: center;" },
             this._playButton,

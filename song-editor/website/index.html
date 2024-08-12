@@ -345,8 +345,8 @@
         // Randomize display of header
         // 1-in-23
         //I should rework this sometime (maybe add the midbox tips thingy?)
-        if (Math.floor(Math.random() * 8) == 0) {
-            switch (Math.floor(Math.random() * 22)) {
+        if (Math.floor(Math.random() * 4) == 0) { //doubled chance for it to pop up
+            switch (Math.floor(Math.random() * 23)) {
                 // jummbox/goldbox plants
                 case 0:
                     document.getElementById("goldboxPlant").innerHTML = "  🍂";
@@ -397,7 +397,7 @@
                     break;
                 // I believe this is from paandorasbox (might have also been present in familiarbox???? maybe not though...)
                 case 14:
-                    document.getElementById("goldboxPlant").innerHTML = "  :wackybox:";
+                    document.getElementById("goldboxPlant").innerHTML = "   not :wackybox:"; //changed to not wackybox, because it isn't :p
                     break;
                 // plant suggested by mel, in reference to the "(don't eat) thegubbys" meme
 			    case 15:
@@ -414,20 +414,20 @@
                     document.getElementById("goldboxPlant").innerHTML = "  💫";
                     break;
                 case 19:
-                    document.getElementById("goldboxPlant").innerHTML = "  👽";
+                    document.getElementById("goldboxPlant").innerHTML = "  ✨"; //changed alien to sparkle
                     break;
-                // dogebox2 plants 
+                // replaced dogebox food with Slarmoo's Box nature
                 case 20:
-                    document.getElementById("goldboxPlant").innerHTML = "  🍕";
+                    document.getElementById("goldboxPlant").innerHTML = "  🌈";
                     break;
                 case 21:
-                    document.getElementById("goldboxPlant").innerHTML = "  🌭";
+                    document.getElementById("goldboxPlant").innerHTML = "  🌧️";
                     break;
                 case 22:
-                    document.getElementById("goldboxPlant").innerHTML = "  🍔";
+                    document.getElementById("goldboxPlant").innerHTML = "  🪨";
                     break;
                 case 23:
-                    document.getElementById("goldboxPlant").innerHTML = "  🍟";
+                    document.getElementById("goldboxPlant").innerHTML = "  🐍"; //Hm, I wonder what this is a reference to...
                     break;
             }
         }

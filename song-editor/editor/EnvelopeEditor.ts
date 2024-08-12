@@ -1,11 +1,11 @@
 // Copyright (c) 2012-2022 John Nesky and contributing authors, distributed under the MIT license, see accompanying the LICENSE.md file.
 
-import { InstrumentType, Config } from "../synth/SynthConfig";
+import { InstrumentType, Config, DropdownID } from "../synth/SynthConfig";
 import { Instrument } from "../synth/synth";
 import { SongDocument } from "./SongDocument";
 import { ChangeSetEnvelopeTarget, ChangeSetEnvelopeType, ChangeRemoveEnvelope, ChangeEnvelopePitchStart, ChangeEnvelopePitchEnd, ChangeEnvelopeInverse, ChangePerEnvelopeSpeed } from "./changes";
 import { HTML } from "imperative-html/dist/esm/elements-strict";
-import { DropdownID } from "../synth/SynthConfig";
+import { Change } from "./Change";
 
 export class EnvelopeEditor {
 	public readonly container: HTMLElement = HTML.div({ class: "envelopeEditor" });
@@ -39,6 +39,8 @@ export class EnvelopeEditor {
 	private _renderedInstrumentType: InstrumentType;
 	private _renderedEffects: number = 0;
 
+	private _lastChange: Change | null = null;
+
 	constructor(private _doc: SongDocument, private _extraSettingsDropdown: Function, private _openPrompt: Function) {
 		this.container.addEventListener("change", this._onChange);
 		this.container.addEventListener("click", this._onClick);
@@ -49,6 +51,11 @@ export class EnvelopeEditor {
 		const targetSelectIndex: number = this._targetSelects.indexOf(<any>event.target);
 		const envelopeSelectIndex: number = this._envelopeSelects.indexOf(<any>event.target);
 		const inverterIndex: number = this._inverters.indexOf(<any>event.target);
+		const startBoxIndex: number = this.pitchStartBoxes.indexOf(<any>event.target);
+		const endBoxIndex: number = this.pitchEndBoxes.indexOf(<any>event.target);
+		const startSliderIndex: number = this._pitchStartSliders.indexOf(<any>event.target);
+		const endSliderIndex: number = this._pitchEndSliders.indexOf(<any>event.target);
+		const speedSliderIndex: number = this._perEnvelopeSpeedSliders.indexOf(<any>event.target);
 		if (targetSelectIndex != -1) {
 			const combinedValue: number = parseInt(this._targetSelects[targetSelectIndex].value);
 			const target: number = combinedValue % Config.instrumentAutomationTargets.length;
@@ -61,6 +68,31 @@ export class EnvelopeEditor {
 			this.extraPitchSettingsGroups[envelopeSelectIndex].style.display = Config.envelopes[this._envelopeSelects[envelopeSelectIndex].selectedIndex].name == "pitch" ? "" : "none";
 		} else if (inverterIndex != -1) {
 			this._doc.record(new ChangeEnvelopeInverse(this._doc, this._inverters[inverterIndex].checked, inverterIndex));
+		} else if (startBoxIndex != -1) {
+			if (this._lastChange != null) {
+				this._doc.record(this._lastChange);
+				this._lastChange = null;
+			}
+		} else if (endBoxIndex != -1) {
+			if (this._lastChange != null) {
+				this._doc.record(this._lastChange);
+				this._lastChange = null;
+			}
+		} else if (startSliderIndex != -1) {
+			if (this._lastChange != null) {
+				this._doc.record(this._lastChange);
+				this._lastChange = null;
+			}
+		} else if (endSliderIndex != -1) {
+			if (this._lastChange != null) {
+				this._doc.record(this._lastChange);
+				this._lastChange = null;
+			}
+		} else if (speedSliderIndex != -1) {
+			if (this._lastChange != null) {
+				this._doc.record(this._lastChange);
+				this._lastChange = null;
+			}
 		}
 	}
 
@@ -79,17 +111,15 @@ export class EnvelopeEditor {
 		const endSliderIndex: number = this._pitchEndSliders.indexOf(<any>event.target);
 		const speedSliderIndex: number = this._perEnvelopeSpeedSliders.indexOf(<any>event.target);
 		if (startBoxIndex != -1) {
-			this._doc.record(new ChangeEnvelopePitchStart(this._doc, parseInt(this.pitchStartBoxes[startBoxIndex].value), startBoxIndex));
+			this._lastChange = new ChangeEnvelopePitchStart(this._doc, parseInt(this.pitchStartBoxes[startBoxIndex].value), startBoxIndex);
 		} else if (endBoxIndex != -1) {
-			this._doc.record(new ChangeEnvelopePitchEnd(this._doc, parseInt(this.pitchEndBoxes[endBoxIndex].value), endBoxIndex));
+			this._lastChange = new ChangeEnvelopePitchEnd(this._doc, parseInt(this.pitchEndBoxes[endBoxIndex].value), endBoxIndex);
 		} else if (startSliderIndex != -1) {
-			this._doc.record(new ChangeEnvelopePitchStart(this._doc, parseInt(this._pitchStartSliders[startSliderIndex].value), startSliderIndex));
+			this._lastChange = new ChangeEnvelopePitchStart(this._doc, parseInt(this._pitchStartSliders[startSliderIndex].value), startSliderIndex);
 		} else if (endSliderIndex != -1) {
-			this._doc.record(new ChangeEnvelopePitchEnd(this._doc, parseInt(this._pitchEndSliders[endSliderIndex].value), endSliderIndex));
+			this._lastChange = new ChangeEnvelopePitchEnd(this._doc, parseInt(this._pitchEndSliders[endSliderIndex].value), endSliderIndex);
 		} else if (speedSliderIndex != -1) {
-			//this.rerenderExtraSettings();
-			console.log(speedSliderIndex, this._pitchEndSliders[speedSliderIndex].value, this.convertIndexSpeed(parseFloat(this._pitchEndSliders[speedSliderIndex].value), "speed"), Config.perEnvelopeSpeedIndices.length);
-			this._doc.record(new ChangePerEnvelopeSpeed(this._doc, this.convertIndexSpeed(parseFloat(this._pitchEndSliders[speedSliderIndex].value), "speed"), speedSliderIndex));
+			this._lastChange = new ChangePerEnvelopeSpeed(this._doc, this.convertIndexSpeed(parseFloat(this._perEnvelopeSpeedSliders[speedSliderIndex].value), "speed"), speedSliderIndex);
 		}
 	}
 
@@ -166,11 +196,11 @@ export class EnvelopeEditor {
 					this.pitchEndBoxes[i].max = (instrument.isNoiseInstrument ? Config.drumCount - 1 : Config.maxPitch).toString();
 					if (instrument.isNoiseInstrument && parseInt(this.pitchStartBoxes[i].value) > Config.drumCount - 1) {
 						this.pitchStartBoxes[i].value = (Config.drumCount - 1).toString(); //reset if somehow greater than it should be
-						this._doc.record(new ChangeEnvelopePitchStart(this._doc, parseInt(this.pitchStartBoxes[i].value), i));
+						//this._doc.record(new ChangeEnvelopePitchStart(this._doc, parseInt(this.pitchStartBoxes[i].value), i));
 					}
 					if (instrument.isNoiseInstrument && parseInt(this.pitchEndBoxes[i].value) > Config.drumCount - 1) {
 						this.pitchEndBoxes[i].value = (Config.drumCount - 1).toString();
-						this._doc.record(new ChangeEnvelopePitchEnd(this._doc, parseInt(this.pitchEndBoxes[i].value), i));
+						//this._doc.record(new ChangeEnvelopePitchEnd(this._doc, parseInt(this.pitchEndBoxes[i].value), i));
 					}
 					//update note displays
 					this._startNoteDisplays[i].textContent = "Start " + this._pitchToNote(parseInt(this.pitchStartBoxes[i].value), instrument.isNoiseInstrument) + ": ";
@@ -185,8 +215,6 @@ export class EnvelopeEditor {
 						//perEnvelopeSpeed
 						this.perEnvelopeSpeedGroups[i].style.display = "flex"
 						this._perEnvelopeSpeedSliders[i].value = this.convertIndexSpeed(instrument.envelopes[i].perEnvelopeSpeed, "index").toString();
-						this._doc.record(new ChangePerEnvelopeSpeed(this._doc, this.convertIndexSpeed(parseFloat(this._pitchEndSliders[i].value), "speed"), i));
-						console.log("help: ", this._perEnvelopeSpeedSliders[i].value, instrument.envelopes[i].perEnvelopeSpeed, this.convertIndexSpeed(instrument.envelopes[i].perEnvelopeSpeed, "index"));
 					}
 				}
 				this._inverters[i].checked = instrument.envelopes[i].inverse;

@@ -381,8 +381,15 @@ export class TipPrompt implements Prompt {
 			case "envelopeSpeed": {
 				message = div(
 					h2("Envelope Speed"),
-					p("This setting controls the speed of ALL envelopes for the instrument. Each envelope 'plays' at a certain speed, and this slider can scale it to play faster or slower. Use this to fine-tune your tremolo or how fast something decays to get just the right effect."),
+					p("This setting controls the speed of ALL envelopes for the instrument. Each envelope 'plays' at a certain speed, and this slider can scale it to play faster or slower. You can use this to fine-tune your tremolo or how fast something decays to get just the right effect."),
 					p("Note that, while this setting is limited in the sense that it controls all envelopes at once, you can still achieve a variety of outcomes by trying combinations of modes of each envelope type, which typically differ only in speed."),
+				);
+			} break;
+			case "perEnvelopeSpeed": {
+				message = div(
+					h2("Individual Envelope Speed"),
+					p("This setting is applied per envelope rather than all of them simultaneously, unlike the envelope speed in the top dropdown."),
+					p("This controls the speed of this envelope as a multiplier. You can use the slider to quickly adjust speeds and the input box for finer speed amounts.")
 				);
 			} break;
 			case "usedInstrument": {

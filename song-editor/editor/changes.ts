@@ -4972,11 +4972,9 @@ export class ChangePerEnvelopeSpeed extends Change {
         super();
         const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
         const oldSpeed: number = instrument.envelopes[index].perEnvelopeSpeed;
-        console.log("oldSpeed: ", oldSpeed);
         if (oldSpeed != speed) {
             instrument.envelopes[index].perEnvelopeSpeed = speed;
             instrument.preset = instrument.type;
-            console.log("here: ", speed);
             doc.notifier.changed();
             this._didSomething();
         }

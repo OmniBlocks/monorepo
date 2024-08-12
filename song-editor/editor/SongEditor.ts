@@ -1813,8 +1813,14 @@ export class SongEditor {
                 group.style.display = "flex";
                 if (subtype == "pitch") { 
                     this._envelopeEditor.extraPitchSettingsGroups[submenu].style.display = "flex";
+                    this._envelopeEditor.perEnvelopeSpeedGroups[submenu].style.display = "none";
                 } else {
                     this._envelopeEditor.extraPitchSettingsGroups[submenu].style.display = "none";
+                    if (subtype == "notesize") {
+                        this._envelopeEditor.perEnvelopeSpeedGroups[submenu].style.display = "none";
+                    } else {
+                        this._envelopeEditor.perEnvelopeSpeedGroups[submenu].style.display = "flex";
+                    }
                 }
                 this._envelopeEditor.rerenderExtraSettings();
             } else if (group != this._chordDropdownGroup) {

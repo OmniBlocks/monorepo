@@ -944,7 +944,6 @@ export class Config {
 	public static readonly barCountMax: number = 1024;
     public static readonly instrumentCountMin: number = 1;
     public static readonly layeredInstrumentCountMax: number = 10;
-	//this still hasn't been properly tested...
     public static readonly patternInstrumentCountMax: number = 10;
 	public static readonly partsPerBeat: number = 24;
 	public static readonly ticksPerPart: number = 2;
@@ -956,8 +955,8 @@ export class Config {
 		{ name: "÷3 (triplets)", stepsPerBeat: 3, /*ticksPerArpeggio: 4, arpeggioPatterns: [[0], [0, 0, 1, 1], [0, 1, 2, 1], [0, 1, 2, 3]]*/ roundUpThresholds: [/*0*/ 5, /*8*/ 12, /*16*/ 18 /*24*/] },
 		{ name: "÷4 (standard)", stepsPerBeat: 4, /*ticksPerArpeggio: 3, arpeggioPatterns: [[0], [0, 0, 1, 1], [0, 1, 2, 1], [0, 1, 2, 3]]*/ roundUpThresholds: [/*0*/ 3, /*6*/ 9, /*12*/ 17, /*18*/ 21 /*24*/] },
 		{ name: "÷6 (sextuplets)", stepsPerBeat: 6, /*ticksPerArpeggio: 4, arpeggioPatterns: [[0], [0, 1], [0, 1, 2, 1], [0, 1, 2, 3]]*/ roundUpThresholds: null },
-		{ name: "÷8 (eighth notes)", stepsPerBeat: 8, /*ticksPerArpeggio: 3, arpeggioPatterns: [[0], [0, 1], [0, 1, 2, 1], [0, 1, 2, 3]]*/ roundUpThresholds: null },
-		{ name: "÷12 (twelfth notes)", stepsPerBeat: 12, /*ticksPerArpeggio: 3, arpeggioPatterns: [[0], [0, 1], [0, 1, 2, 1]]*/ roundUpThresholds: null },
+		{ name: "÷8 (32nd notes)", stepsPerBeat: 8, /*ticksPerArpeggio: 3, arpeggioPatterns: [[0], [0, 1], [0, 1, 2, 1], [0, 1, 2, 3]]*/ roundUpThresholds: null },
+		{ name: "÷12 (doudectuplets)", stepsPerBeat: 12, /*ticksPerArpeggio: 3, arpeggioPatterns: [[0], [0, 1], [0, 1, 2, 1]]*/ roundUpThresholds: null },
 		{ name: "freehand", stepsPerBeat: 24, /*ticksPerArpeggio: 3, arpeggioPatterns: [[0], [0, 1], [0, 1, 2, 1], [0, 1, 2, 3]]*/ roundUpThresholds: null },
 	]);
 
@@ -972,7 +971,7 @@ export class Config {
     public static readonly pwmBaseExpression: number = 0.04725; // It's actually closer to half of this, the synthesized pulse amplitude range is only .5 to -.5, but also note that the fundamental sine partial amplitude of a square wave is 4/π times the measured square wave amplitude.
     public static readonly supersawBaseExpression:  number = 0.061425; // It's actually closer to half of this, the synthesized sawtooth amplitude range is only .5 to -.5.
     public static readonly pickedStringBaseExpression: number = 0.025; // Same as harmonics.
-    public static readonly additiveBaseExpression: number = 0.025; //For now. We'll see how is goes
+    public static readonly additiveBaseExpression: number = 0.012; //For now. We'll see how is goes
     public static readonly distortionBaseVolume: number = 0.011; // Distortion is not affected by pitchDamping, which otherwise approximately halves expression for notes around the middle of the range.
     public static readonly bitcrusherBaseVolume: number = 0.010; // Also not affected by pitchDamping, used when bit crushing is maxed out (aka "1-bit" output).
 	public static rawChipWaves: DictionaryArray<ChipWave> = toNameMap([
@@ -1519,7 +1518,7 @@ export class Config {
     public static readonly bitcrusherOctaveStep: number = 0.5;
     public static readonly bitcrusherQuantizationRange: number = 8;
 
-    public static readonly maxEnvelopeCount: number = 12;
+    public static readonly maxEnvelopeCount: number = 16;
     public static readonly defaultAutomationRange: number = 13;
     public static readonly instrumentAutomationTargets: DictionaryArray<AutomationTarget> = toNameMap([
         { name: "none", computeIndex: null, displayName: "none",             /*perNote: false,*/ interleave: false, isFilter: false, /*range: 0,                              */    maxCount: 1, effect: null, compatibleInstruments: null },

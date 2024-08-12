@@ -1,9 +1,10 @@
 {
 	"name": "slarmoosbox",
-	"version": "1.1",
+	"version": "1.1.2",
 	"description": "Slarmoo's Box is a mod of Ultrabox that aims to advance Beepbox's capabilities.",
 	"author": "Slarmoo",
 	"contributors": [
+		"Slarmoo",
 		"Main",
 		"Neputendo",
 		"LeoV",

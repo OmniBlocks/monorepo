@@ -111,7 +111,11 @@ const ProjectFetcherHOC = function (WrappedComponent) {
                 null :
                 new URLSearchParams(location.search).get('project_url');
             if (projectUrl) {
-                if (!projectUrl.startsWith('http:') && !projectUrl.startsWith('https:')) {
+                if (
+                    !projectUrl.startsWith('http:') &&
+                    !projectUrl.startsWith('https:') &&
+                    !projectUrl.startsWith('data:')
+                ) {
                     projectUrl = `https://${projectUrl}`;
                 }
                 assetPromise = fetch(projectUrl)

@@ -24,14 +24,9 @@ const DefaultPenAttributes = {
     diameter: 1
 };
 
-/**
- * Reused memory location for storing a premultiplied pen color.
- * @type {FloatArray}
- */
-const __premultipliedColor = [0, 0, 0, 0];
-
-const PEN_BUFFER_SIZE_LARGER = 65520;
-const PEN_BUFFER_SIZE_SMALLER = 32760;
+const PEN_ATTRIBUTE_BUFFER_SIZE = 163800;
+const PEN_ATTRIBUTE_STRIDE = 10;
+const PEN_ATTRIBUTE_STRIDE_BYTES = PEN_ATTRIBUTE_STRIDE * 4;
 
 class PenSkin extends Skin {
     /**
@@ -71,66 +66,89 @@ class PenSkin extends Skin {
             exit: () => this._exitUsePenBuffer()
         };
 
+        /** @type {WebGLRenderingContext} */
+        const gl = this._renderer.gl;
+
         // tw: renderQuality attribute
         this.renderQuality = 1;
 
         // tw: keep track of native size
         this._nativeSize = renderer.getNativeSize();
 
-        // tw: create the extra data structures needed to buffer pen
-        this._resetAttributeIndexes();
-        this.a_lineColor = new Float32Array(PEN_BUFFER_SIZE_LARGER);
-        this.a_lineThicknessAndLength = new Float32Array(PEN_BUFFER_SIZE_SMALLER);
-        this.a_penPoints = new Float32Array(PEN_BUFFER_SIZE_LARGER);
-        this.a_position = new Float32Array(PEN_BUFFER_SIZE_SMALLER);
-        for (let i = 0; i < this.a_position.length; i += 12) {
-            this.a_position[i + 0] = 1;
-            this.a_position[i + 1] = 0;
-            this.a_position[i + 2] = 0;
-            this.a_position[i + 3] = 0;
-            this.a_position[i + 4] = 1;
-            this.a_position[i + 5] = 1;
-            this.a_position[i + 6] = 1;
-            this.a_position[i + 7] = 1;
-            this.a_position[i + 8] = 0;
-            this.a_position[i + 9] = 0;
-            this.a_position[i + 10] = 0;
-            this.a_position[i + 11] = 1;
-        }
-        /** @type {twgl.BufferInfo} */
-        this._lineBufferInfo = twgl.createBufferInfoFromArrays(this._renderer.gl, {
-            a_position: {
-                numComponents: 2,
-                data: this.a_position
-            },
-            a_lineColor: {
-                numComponents: 4,
-                drawType: this._renderer.gl.STREAM_DRAW,
-                data: this.a_lineColor
-            },
-            a_lineThicknessAndLength: {
-                numComponents: 2,
-                drawType: this._renderer.gl.STREAM_DRAW,
-                data: this.a_lineThicknessAndLength
-            },
-            a_penPoints: {
-                numComponents: 4,
-                drawType: this._renderer.gl.STREAM_DRAW,
-                data: this.a_penPoints
-            }
-        });
-
         const NO_EFFECTS = 0;
         /** @type {twgl.ProgramInfo} */
         this._lineShader = this._renderer._shaderManager.getShader(ShaderManager.DRAW_MODE.line, NO_EFFECTS);
 
-        // tw: draw region used to preserve texture when resizing
+        // Draw region used to preserve texture when resizing
         this._drawTextureShader = this._renderer._shaderManager.getShader(ShaderManager.DRAW_MODE.default, NO_EFFECTS);
         /** @type {object} */
         this._drawTextureRegionId = {
             enter: () => this._enterDrawTexture(),
             exit: () => this._exitDrawTexture()
         };
+
+        this.a_position_glbuffer = gl.createBuffer();
+        this.a_position_loc = gl.getAttribLocation(this._lineShader.program, 'a_position');
+
+        this.a_lineColor_loc = gl.getAttribLocation(this._lineShader.program, 'a_lineColor');
+        this.a_lineThicknessAndLength_loc = gl.getAttribLocation(this._lineShader.program, 'a_lineThicknessAndLength');
+        this.a_penPoints_loc = gl.getAttribLocation(this._lineShader.program, 'a_penPoints');
+
+        this.attribute_glbuffer = gl.createBuffer();
+        this.attribute_index = 0;
+        this.attribute_data = new Float32Array(PEN_ATTRIBUTE_BUFFER_SIZE);
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.attribute_glbuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, this.attribute_data.length * 4, gl.STREAM_DRAW);
+
+        if (gl.drawArraysInstanced) {
+            // WebGL2 has native instanced rendering
+            this.instancedRendering = true;
+            this.glDrawArraysInstanced = gl.drawArraysInstanced.bind(gl);
+            this.glVertexAttribDivisor = gl.vertexAttribDivisor.bind(gl);
+        } else {
+            // WebGL1 may have instanced rendering through the ANGLE_instanced_arrays extension
+            const instancedArraysExtension = gl.getExtension('ANGLE_instanced_arrays');
+            if (instancedArraysExtension) {
+                this.instancedRendering = true;
+                this.glDrawArraysInstanced = instancedArraysExtension.drawArraysInstancedANGLE.bind(
+                    instancedArraysExtension
+                );
+                this.glVertexAttribDivisor = instancedArraysExtension.vertexAttribDivisorANGLE.bind(
+                    instancedArraysExtension
+                );
+            } else {
+                // Inefficient but still supported
+                this.instancedRendering = false;
+            }
+        }
+
+        if (this.instancedRendering) {
+            gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_glbuffer);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+                1, 0,
+                0, 0,
+                1, 1,
+                0, 1
+            ]), gl.STATIC_DRAW);
+        } else {
+            const positionBuffer = new Float32Array(PEN_ATTRIBUTE_BUFFER_SIZE / PEN_ATTRIBUTE_STRIDE * 2);
+            for (let i = 0; i < positionBuffer.length; i += 12) {
+                positionBuffer[i + 0] = 1;
+                positionBuffer[i + 1] = 0;
+                positionBuffer[i + 2] = 0;
+                positionBuffer[i + 3] = 0;
+                positionBuffer[i + 4] = 1;
+                positionBuffer[i + 5] = 1;
+                positionBuffer[i + 6] = 1;
+                positionBuffer[i + 7] = 1;
+                positionBuffer[i + 8] = 0;
+                positionBuffer[i + 9] = 0;
+                positionBuffer[i + 10] = 0;
+                positionBuffer[i + 11] = 1;
+            }
+            gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_glbuffer);
+            gl.bufferData(gl.ARRAY_BUFFER, positionBuffer, gl.STATIC_DRAW);
+        }
 
         this.onNativeSizeChanged = this.onNativeSizeChanged.bind(this);
         this._renderer.on(RenderConstants.Events.NativeSizeChanged, this.onNativeSizeChanged);
@@ -222,8 +240,6 @@ class PenSkin extends Skin {
      * Prepare to draw lines in the _lineOnBufferDrawRegionId region.
      */
     _enterDrawLineOnBuffer () {
-        // tw: reset attributes when starting pen drawing
-        this._resetAttributeIndexes();
         const gl = this._renderer.gl;
 
         twgl.bindFramebufferInfo(gl, this._framebuffer);
@@ -232,7 +248,6 @@ class PenSkin extends Skin {
 
         const currentShader = this._lineShader;
         gl.useProgram(currentShader.program);
-        twgl.setBuffersAndAttributes(gl, currentShader, this._lineBufferInfo);
 
         const uniforms = {
             u_skin: this._texture,
@@ -240,6 +255,12 @@ class PenSkin extends Skin {
         };
 
         twgl.setUniforms(currentShader, uniforms);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_glbuffer);
+        gl.enableVertexAttribArray(this.a_position_loc);
+        gl.vertexAttribPointer(this.a_position_loc, 2, gl.FLOAT, false, 2 * 4, 0);
+
+        this.attribute_index = 0;
     }
 
     /**
@@ -247,7 +268,7 @@ class PenSkin extends Skin {
      */
     _exitDrawLineOnBuffer () {
         // tw: flush when exiting pen rendering
-        if (this.a_lineColorIndex) {
+        if (this.attribute_index) {
             this._flushLines();
         }
 
@@ -326,19 +347,15 @@ class PenSkin extends Skin {
     _drawLineOnBuffer (penAttributes, x0, y0, x1, y1) {
         this._renderer.enterDrawRegion(this._lineOnBufferDrawRegionId);
 
-        // tw: flush if this line would overflow buffers
-        // For some reason, looking up the size of a_lineColor with .length is very slow in some browsers.
-        // We see measurable performance improvements by comparing to a constant instead.
-        if (this.a_lineColorIndex + 24 > PEN_BUFFER_SIZE_LARGER) {
+        const iters = this.instancedRendering ? 1 : 6;
+
+        // For some reason, looking up the size of a buffer through .length can be slow,
+        // so use a constant instead.
+        if (this.attribute_index + (PEN_ATTRIBUTE_STRIDE * iters) > PEN_ATTRIBUTE_BUFFER_SIZE) {
             this._flushLines();
         }
 
-        // Premultiply pen color by pen transparency
         const penColor = penAttributes.color4f || DefaultPenAttributes.color4f;
-        __premultipliedColor[0] = penColor[0] * penColor[3];
-        __premultipliedColor[1] = penColor[1] * penColor[3];
-        __premultipliedColor[2] = penColor[2] * penColor[3];
-        __premultipliedColor[3] = penColor[3];
 
         // tw: apply renderQuality
         x0 *= this.renderQuality;
@@ -357,92 +374,82 @@ class PenSkin extends Skin {
 
         // tw: apply renderQuality
         const lineThickness = (penAttributes.diameter || DefaultPenAttributes.diameter) * this.renderQuality;
-        // tw: write pen draws to buffers where they will be flushed later
-        for (let i = 0; i < 6; i++) {
-            this.a_lineColor[this.a_lineColorIndex] = __premultipliedColor[0];
-            this.a_lineColorIndex++;
-            this.a_lineColor[this.a_lineColorIndex] = __premultipliedColor[1];
-            this.a_lineColorIndex++;
-            this.a_lineColor[this.a_lineColorIndex] = __premultipliedColor[2];
-            this.a_lineColorIndex++;
-            this.a_lineColor[this.a_lineColorIndex] = __premultipliedColor[3];
-            this.a_lineColorIndex++;
 
-            this.a_lineThicknessAndLength[this.a_lineThicknessAndLengthIndex] = lineThickness;
-            this.a_lineThicknessAndLengthIndex++;
+        for (let i = 0; i < iters; i++) {
+            // Pen color sent to the GPU is pre-multiplied by transparency
+            this.attribute_data[this.attribute_index] = penColor[0] * penColor[3];
+            this.attribute_index++;
+            this.attribute_data[this.attribute_index] = penColor[1] * penColor[3];
+            this.attribute_index++;
+            this.attribute_data[this.attribute_index] = penColor[2] * penColor[3];
+            this.attribute_index++;
+            this.attribute_data[this.attribute_index] = penColor[3];
+            this.attribute_index++;
 
-            this.a_lineThicknessAndLength[this.a_lineThicknessAndLengthIndex] = lineLength;
-            this.a_lineThicknessAndLengthIndex++;
+            this.attribute_data[this.attribute_index] = lineThickness;
+            this.attribute_index++;
 
-            this.a_penPoints[this.a_penPointsIndex] = x0;
-            this.a_penPointsIndex++;
-            this.a_penPoints[this.a_penPointsIndex] = -y0;
-            this.a_penPointsIndex++;
-            this.a_penPoints[this.a_penPointsIndex] = lineDiffX;
-            this.a_penPointsIndex++;
-            this.a_penPoints[this.a_penPointsIndex] = -lineDiffY;
-            this.a_penPointsIndex++;
+            this.attribute_data[this.attribute_index] = lineLength;
+            this.attribute_index++;
+
+            this.attribute_data[this.attribute_index] = x0;
+            this.attribute_index++;
+            this.attribute_data[this.attribute_index] = -y0;
+            this.attribute_index++;
+            this.attribute_data[this.attribute_index] = lineDiffX;
+            this.attribute_index++;
+            this.attribute_data[this.attribute_index] = -lineDiffY;
+            this.attribute_index++;
         }
     }
 
-    // tw: resets indexes in the pen drawing buffers
-    _resetAttributeIndexes () {
-        this.a_lineColorIndex = 0;
-        this.a_lineThicknessAndLengthIndex = 0;
-        this.a_penPointsIndex = 0;
-    }
-
-    // tw: flushes buffered pen lines to the GPU
     _flushLines () {
+        /** @type {WebGLRenderingContext} */
         const gl = this._renderer.gl;
 
-        const currentShader = this._lineShader;
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.attribute_glbuffer);
+        gl.bufferSubData(gl.ARRAY_BUFFER, 0, new Float32Array(this.attribute_data.buffer, 0, this.attribute_index));
 
-        // If only a small amount of data needs to be uploaded, only upload part of the data.
-        // todo: need to see if this helps and fine tune this number
-        if (this.a_lineColorIndex < 1000) {
-            twgl.setAttribInfoBufferFromArray(
-                gl,
-                this._lineBufferInfo.attribs.a_lineColor,
-                new Float32Array(this.a_lineColor.buffer, 0, this.a_lineColorIndex),
-                0
+        gl.enableVertexAttribArray(this.a_lineColor_loc);
+        gl.vertexAttribPointer(
+            this.a_lineColor_loc,
+            4, gl.FLOAT, false,
+            PEN_ATTRIBUTE_STRIDE_BYTES, 0
+        );
+
+        gl.enableVertexAttribArray(this.a_lineThicknessAndLength_loc);
+        gl.vertexAttribPointer(
+            this.a_lineThicknessAndLength_loc,
+            2, gl.FLOAT, false,
+            PEN_ATTRIBUTE_STRIDE_BYTES, 4 * 4
+        );
+
+        gl.enableVertexAttribArray(this.a_penPoints_loc);
+        gl.vertexAttribPointer(
+            this.a_penPoints_loc,
+            4, gl.FLOAT, false,
+            PEN_ATTRIBUTE_STRIDE_BYTES, 6 * 4
+        );
+
+        if (this.instancedRendering) {
+            this.glVertexAttribDivisor(this.a_lineColor_loc, 1);
+            this.glVertexAttribDivisor(this.a_lineThicknessAndLength_loc, 1);
+            this.glVertexAttribDivisor(this.a_penPoints_loc, 1);
+
+            this.glDrawArraysInstanced(
+                gl.TRIANGLE_STRIP,
+                0, 4,
+                this.attribute_index / PEN_ATTRIBUTE_STRIDE
             );
-            twgl.setAttribInfoBufferFromArray(
-                gl,
-                this._lineBufferInfo.attribs.a_penPoints,
-                new Float32Array(this.a_penPoints.buffer, 0, this.a_penPointsIndex),
-                0
-            );
-            twgl.setAttribInfoBufferFromArray(
-                gl,
-                this._lineBufferInfo.attribs.a_lineThicknessAndLength,
-                new Float32Array(this.a_lineThicknessAndLength.buffer, 0, this.a_lineThicknessAndLengthIndex),
-                0
-            );
+
+            this.glVertexAttribDivisor(this.a_lineColor_loc, 0);
+            this.glVertexAttribDivisor(this.a_lineThicknessAndLength_loc, 0);
+            this.glVertexAttribDivisor(this.a_penPoints_loc, 0);
         } else {
-            twgl.setAttribInfoBufferFromArray(
-                gl,
-                this._lineBufferInfo.attribs.a_lineColor,
-                this.a_lineColor
-            );
-            twgl.setAttribInfoBufferFromArray(
-                gl,
-                this._lineBufferInfo.attribs.a_penPoints,
-                this.a_penPoints
-            );
-            twgl.setAttribInfoBufferFromArray(
-                gl,
-                this._lineBufferInfo.attribs.a_lineThicknessAndLength,
-                this.a_lineThicknessAndLength
-            );
+            gl.drawArrays(gl.TRIANGLES, 0, this.attribute_index / PEN_ATTRIBUTE_STRIDE);
         }
-        // todo: if we skip twgl and do all this buffer stuff ourselves, we can skip some unneeded gl calls
-        twgl.setBuffersAndAttributes(gl, currentShader, this._lineBufferInfo);
 
-        twgl.drawBufferInfo(gl, this._lineBufferInfo, gl.TRIANGLES, this.a_lineThicknessAndLengthIndex / 2);
-
-        this._resetAttributeIndexes();
-
+        this.attribute_index = 0;
         this._silhouetteDirty = true;
     }
 

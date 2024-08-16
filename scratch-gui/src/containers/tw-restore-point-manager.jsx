@@ -66,7 +66,7 @@ class TWRestorePointManager extends React.Component {
         // This helps reduce problems when people constantly enter and leave the editor which
         // causes this component to re-mount. Still not perfect though, ideally we would
         // compensate for time already passed.
-        if (this.props.projectChanged) {
+        if (this.props.projectChanged && this.props.hasEverEnteredEditor) {
             this.queueRestorePoint();
         }
 
@@ -90,7 +90,7 @@ class TWRestorePointManager extends React.Component {
     }
 
     handleProjectChanged () {
-        if (!this.timeout) {
+        if (this.props.hasEverEnteredEditor && !this.timeout) {
             this.queueRestorePoint();
         }
     }
@@ -298,7 +298,10 @@ TWRestorePointManager.propTypes = {
     loadingState: PropTypes.oneOf(LoadingStates).isRequired,
     isShowingProject: PropTypes.bool.isRequired,
     isModalVisible: PropTypes.bool.isRequired,
+    hasEverEnteredEditor: PropTypes.bool.isRequired,
     vm: PropTypes.shape({
+        on: PropTypes.func.isRequired,
+        off: PropTypes.func.isRequired,
         loadProject: PropTypes.func.isRequired,
         stop: PropTypes.func.isRequired,
         renderer: PropTypes.shape({
@@ -313,6 +316,7 @@ const mapStateToProps = state => ({
     loadingState: state.scratchGui.projectState.loadingState,
     isShowingProject: getIsShowingProject(state.scratchGui.projectState.loadingState),
     isModalVisible: state.scratchGui.modals.restorePointModal,
+    hasEverEnteredEditor: state.scratchGui.mode.hasEverEnteredEditor,
     vm: state.scratchGui.vm
 });
 

@@ -227,7 +227,6 @@ module.exports = [
                 template: 'src/playground/simple.ejs',
                 filename: 'credits.html',
                 title: `${APP_NAME} Credits`,
-                noSplash: true,
                 ...htmlWebpackPluginCommon
             }),
             new CopyWebpackPlugin({

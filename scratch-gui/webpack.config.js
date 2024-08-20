@@ -25,8 +25,8 @@ const htmlWebpackPluginCommon = {
     APP_NAME
 };
 
-// Change this number to bypass all old HTTP caches
-const CACHE_EPOCH = 2;
+// When this changes, the path for all JS files will change, bypassing any HTTP caches
+const CACHE_EPOCH = 'gleba';
 
 const base = {
     mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
@@ -50,8 +50,8 @@ const base = {
     },
     output: {
         library: 'GUI',
-        filename: process.env.NODE_ENV === 'production' ? `js-${CACHE_EPOCH}/[name].[contenthash].js` : 'js/[name].js',
-        chunkFilename: process.env.NODE_ENV === 'production' ? `js-${CACHE_EPOCH}/[name].[contenthash].js` : 'js/[name].js',
+        filename: process.env.NODE_ENV === 'production' ? `js/${CACHE_EPOCH}/[name].[contenthash].js` : 'js/[name].js',
+        chunkFilename: process.env.NODE_ENV === 'production' ? `js/${CACHE_EPOCH}/[name].[contenthash].js` : 'js/[name].js',
         publicPath: root
     },
     resolve: {

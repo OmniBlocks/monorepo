@@ -6654,31 +6654,31 @@ export class ColorConfig {
 			}`}`,
     };
 
-    public static readonly pageMargin: string = "var(--page-margin)";
-    public static readonly editorBackground: string = "var(--editor-background)";
-    public static readonly hoverPreview: string = "var(--hover-preview)";
-    public static readonly playhead: string = "var(--playhead)";
-    public static readonly primaryText: string = "var(--primary-text)";
-    public static readonly secondaryText: string = "var(--secondary-text)";
-    public static readonly invertedText: string = "var(--inverted-text)";
-    public static readonly textSelection: string = "var(--text-selection)";
-    public static readonly boxSelectionFill: string = "var(--box-selection-fill)";
-    public static readonly loopAccent: string = "var(--loop-accent)";
-    public static readonly linkAccent: string = "var(--link-accent)";
-    public static readonly uiWidgetBackground: string = "var(--ui-widget-background)";
-    public static readonly uiWidgetFocus: string = "var(--ui-widget-focus)";
-    public static readonly pitchBackground: string = "var(--pitch-background)";
-    public static readonly tonic: string = "var(--tonic)";
-    public static readonly fifthNote: string = "var(--fifth-note)";
-    public static readonly whitePianoKey: string = "var(--white-piano-key)";
-    public static readonly blackPianoKey: string = "var(--black-piano-key)";
-    public static readonly whitePianoKeyText: string = "var(--white-piano-key-text)";
-    public static readonly blackPianoKeyText: string = "var(--black-piano-key-text)";
-	// public static readonly oscilloscopeLineL: string = "var(--oscilloscope-line-L)";
-	// public static readonly oscilloscopeLineR: string = "var(--oscilloscope-line-R)";
+    public static readonly pageMargin: string = "var(--page-margin, black)";
+    public static readonly editorBackground: string = "var(--editor-background, black)";
+    public static readonly hoverPreview: string = "var(--hover-preview, white)";
+    public static readonly playhead: string = "var(--playhead, white)";
+    public static readonly primaryText: string = "var(--primary-text, white)";
+    public static readonly secondaryText: string = "var(--secondary-text, #999)";
+    public static readonly invertedText: string = "var(--inverted-text, black)";
+    public static readonly textSelection: string = "var(--text-selection, rgba(119,68,255,0.99))";
+    public static readonly boxSelectionFill: string = "var(--box-selection-fill, rgba(255,255,255,0.2))";
+    public static readonly loopAccent: string = "var(--loop-accent, #74f)";
+    public static readonly linkAccent: string = "var(--link-accent, #98f)";
+    public static readonly uiWidgetBackground: string = "var(--ui-widget-background, #444)";
+    public static readonly uiWidgetFocus: string = "var(--ui-widget-focus, #777)";
+    public static readonly pitchBackground: string = "var(--pitch-background, #444)";
+    public static readonly tonic: string = "var(--tonic, #864)";
+    public static readonly fifthNote: string = "var(--fifth-note, #468)";
+    public static readonly whitePianoKey: string = "var(--white-piano-key, #bbb)";
+    public static readonly blackPianoKey: string = "var(--black-piano-key, #444)";
+    public static readonly whitePianoKeyText: string = "var(--white-piano-key-text, #131200)";
+    public static readonly blackPianoKeyText: string = "var(--black-piano-key-text, #fff)";
+	//public static readonly oscilloscopeLineL: string = "var(--oscilloscope-line-L, var(--primary-text, white))";
+	//public static readonly oscilloscopeLineR: string = "var(--oscilloscope-line-R, var(--text-selection, rgba(119,68,255,0.99)))";
 	// modTitle can stay uncommented until it's used somwhere that's not index.html
 	// public static readonly modTitle: string = "var(--mod-title)";
-    public static readonly useColorFormula: string = "var(--use-color-formula)";
+    public static readonly useColorFormula: string = "var(--use-color-formula, false)";
 	// public static readonly pitchLimit: string = "var(--pitch-channel-limit)";
 	// public static readonly noiseLimit: string = "var(--noise-channel-limit)";
 	// public static readonly modLimit: string = "var(--mod-channel-limit)";
@@ -6861,124 +6861,124 @@ export class ColorConfig {
     public static readonly pitchChannels: DictionaryArray<ChannelColors> = toNameMap([
         {
             name: "pitch1", // cyan
-            secondaryChannel: "var(--pitch1-secondary-channel)",
-            primaryChannel: "var(--pitch1-primary-channel)",
-            secondaryNote: "var(--pitch1-secondary-note)",
-            primaryNote: "var(--pitch1-primary-note)",
+            secondaryChannel: "var(--pitch1-secondary-channel, #0099A1)",
+            primaryChannel: "var(--pitch1-primary-channel, #25F3FF)",
+            secondaryNote: "var(--pitch1-secondary-note, #00BDC7)",
+            primaryNote: "var(--pitch1-primary-note, #92F9FF)",
         }, {
             name: "pitch2", // yellow
-            secondaryChannel: "var(--pitch2-secondary-channel)",
-            primaryChannel: "var(--pitch2-primary-channel)",
-            secondaryNote: "var(--pitch2-secondary-note)",
-            primaryNote: "var(--pitch2-primary-note)",
+            secondaryChannel: "var(--pitch2-secondary-channel, #A1A100)",
+            primaryChannel: "var(--pitch2-primary-channel, #FFFF25)",
+            secondaryNote: "var(--pitch2-secondary-note, #C7C700)",
+            primaryNote: "var(--pitch2-primary-note, #FFFF92)",
         }, {
             name: "pitch3", // orange
-            secondaryChannel: "var(--pitch3-secondary-channel)",
-            primaryChannel: "var(--pitch3-primary-channel)",
-            secondaryNote: "var(--pitch3-secondary-note)",
-            primaryNote: "var(--pitch3-primary-note)",
+            secondaryChannel: "var(--pitch3-secondary-channel, #C75000)",
+            primaryChannel: "var(--pitch3-primary-channel, #FF9752)",
+            secondaryNote: "var(--pitch3-secondary-note, #FF771C)",
+            primaryNote: "var(--pitch3-primary-note, #FFCDAB)",
         }, {
             name: "pitch4", // green
-            secondaryChannel: "var(--pitch4-secondary-channel)",
-            primaryChannel: "var(--pitch4-primary-channel)",
-            secondaryNote: "var(--pitch4-secondary-note)",
-            primaryNote: "var(--pitch4-primary-note)",
+            secondaryChannel: "var(--pitch4-secondary-channel, #00A100)",
+            primaryChannel: "var(--pitch4-primary-channel, #50FF50)",
+            secondaryNote: "var(--pitch4-secondary-note, #00C700)",
+            primaryNote: "var(--pitch4-primary-note, #A0FFA0)",
         }, {
             name: "pitch5", // magenta
-            secondaryChannel: "var(--pitch5-secondary-channel)",
-            primaryChannel: "var(--pitch5-primary-channel)",
-            secondaryNote: "var(--pitch5-secondary-note)",
-            primaryNote: "var(--pitch5-primary-note)",
+            secondaryChannel: "var(--pitch5-secondary-channel, #D020D0)",
+            primaryChannel: "var(--pitch5-primary-channel, #FF90FF)",
+            secondaryNote: "var(--pitch5-secondary-note, #E040E0)",
+            primaryNote: "var(--pitch5-primary-note, #FFC0FF)",
         }, {
             name: "pitch6", // blue
-            secondaryChannel: "var(--pitch6-secondary-channel)",
-            primaryChannel: "var(--pitch6-primary-channel)",
-            secondaryNote: "var(--pitch6-secondary-note)",
-            primaryNote: "var(--pitch6-primary-note)",
+            secondaryChannel: "var(--pitch6-secondary-channel, #7777B0)",
+            primaryChannel: "var(--pitch6-primary-channel, #A0A0FF)",
+            secondaryNote: "var(--pitch6-secondary-note, #8888D0)",
+            primaryNote: "var(--pitch6-primary-note, #D0D0FF)",
         }, {
             name: "pitch7", // olive
-            secondaryChannel: "var(--pitch7-secondary-channel)",
-            primaryChannel: "var(--pitch7-primary-channel)",
-            secondaryNote: "var(--pitch7-secondary-note)",
-            primaryNote: "var(--pitch7-primary-note)",
+            secondaryChannel: "var(--pitch7-secondary-channel, #8AA100)",
+            primaryChannel: "var(--pitch7-primary-channel, #DEFF25)",
+            secondaryNote: "var(--pitch7-secondary-note, #AAC700)",
+            primaryNote: "var(--pitch7-primary-note, #E6FF92)",
         }, {
             name: "pitch8", // red
-            secondaryChannel: "var(--pitch8-secondary-channel)",
-            primaryChannel: "var(--pitch8-primary-channel)",
-            secondaryNote: "var(--pitch8-secondary-note)",
-            primaryNote: "var(--pitch8-primary-note)",
+            secondaryChannel: "var(--pitch8-secondary-channel, #DF0019)",
+            primaryChannel: "var(--pitch8-primary-channel, #FF98A4)",
+            secondaryNote: "var(--pitch8-secondary-note, #FF4E63)",
+            primaryNote: "var(--pitch8-primary-note, #FFB2BB)",
         }, {
             name: "pitch9", // teal
-            secondaryChannel: "var(--pitch9-secondary-channel)",
-            primaryChannel: "var(--pitch9-primary-channel)",
-            secondaryNote: "var(--pitch9-secondary-note)",
-            primaryNote: "var(--pitch9-primary-note)",
+            secondaryChannel: "var(--pitch9-secondary-channel, #00A170)",
+            primaryChannel: "var(--pitch9-primary-channel, #50FFC9)",
+            secondaryNote: "var(--pitch9-secondary-note, #00C78A)",
+            primaryNote: "var(--pitch9-primary-note, #83FFD9)",
         }, {
             name: "pitch10", // purple
-            secondaryChannel: "var(--pitch10-secondary-channel)",
-            primaryChannel: "var(--pitch10-primary-channel)",
-            secondaryNote: "var(--pitch10-secondary-note)",
-            primaryNote: "var(--pitch10-primary-note)",
+            secondaryChannel: "var(--pitch10-secondary-channel, #A11FFF)",
+            primaryChannel: "var(--pitch10-primary-channel, #CE8BFF)",
+            secondaryNote: "var(--pitch10-secondary-note, #B757FF)",
+            primaryNote: "var(--pitch10-primary-note, #DFACFF)",
         },
     ]);
     public static readonly noiseChannels: DictionaryArray<ChannelColors> = toNameMap([
         {
             name: "noise1", // gray
-            secondaryChannel: "var(--noise1-secondary-channel)",
-            primaryChannel: "var(--noise1-primary-channel)",
-            secondaryNote: "var(--noise1-secondary-note)",
-            primaryNote: "var(--noise1-primary-note)",
+            secondaryChannel: "var(--noise1-secondary-channel, #6F6F6F)",
+            primaryChannel: "var(--noise1-primary-channel, #AAAAAA)",
+            secondaryNote: "var(--noise1-secondary-note, #A7A7A7)",
+            primaryNote: "var(--noise1-primary-note, #E0E0E0)",
         }, {
             name: "noise2", // brown
-            secondaryChannel: "var(--noise2-secondary-channel)",
-            primaryChannel: "var(--noise2-primary-channel)",
-            secondaryNote: "var(--noise2-secondary-note)",
-            primaryNote: "var(--noise2-primary-note)",
+            secondaryChannel: "var(--noise2-secondary-channel, #996633)",
+            primaryChannel: "var(--noise2-primary-channel, #DDAA77)",
+            secondaryNote: "var(--noise2-secondary-note, #CC9966)",
+            primaryNote: "var(--noise2-primary-note, #F0D0BB)",
         }, {
             name: "noise3", // azure
-            secondaryChannel: "var(--noise3-secondary-channel)",
-            primaryChannel: "var(--noise3-primary-channel)",
-            secondaryNote: "var(--noise3-secondary-note)",
-            primaryNote: "var(--noise3-primary-note)",
+            secondaryChannel: "var(--noise3-secondary-channel, #4A6D8F)",
+            primaryChannel: "var(--noise3-primary-channel, #77AADD)",
+            secondaryNote: "var(--noise3-secondary-note, #6F9FCF)",
+            primaryNote: "var(--noise3-primary-note, #BBD7FF)",
         }, {
             name: "noise4", // purple
-            secondaryChannel: "var(--noise4-secondary-channel)",
-            primaryChannel: "var(--noise4-primary-channel)",
-            secondaryNote: "var(--noise4-secondary-note)",
-            primaryNote: "var(--noise4-primary-note)",
+            secondaryChannel: "var(--noise4-secondary-channel, #7A4F9A)",
+            primaryChannel: "var(--noise4-primary-channel, #AF82D2)",
+            secondaryNote: "var(--noise4-secondary-note, #9E71C1)",
+            primaryNote: "var(--noise4-primary-note, #D4C1EA)",
         }, {
             name: "noise5", // sage
-            secondaryChannel: "var(--noise5-secondary-channel)",
-            primaryChannel: "var(--noise5-primary-channel)",
-            secondaryNote: "var(--noise5-secondary-note)",
-            primaryNote: "var(--noise5-primary-note)",
+            secondaryChannel: "var(--noise5-secondary-channel, #607837)",
+            primaryChannel: "var(--noise5-primary-channel, #A2BB77)",
+            secondaryNote: "var(--noise5-secondary-note, #91AA66)",
+            primaryNote: "var(--noise5-primary-note, #C5E2B2)",
         },
     ]);
     public static readonly modChannels: DictionaryArray<ChannelColors> = toNameMap([
         {
             name: "mod1",
-            secondaryChannel: "var(--mod1-secondary-channel)",
-            primaryChannel: "var(--mod1-primary-channel)",
-            secondaryNote: "var(--mod1-secondary-note)",
-            primaryNote: "var(--mod1-primary-note)",
+            secondaryChannel: "var(--mod1-secondary-channel, #339955)",
+            primaryChannel: "var(--mod1-primary-channel, #77fc55)",
+            secondaryNote: "var(--mod1-secondary-note, #77ff8a)",
+            primaryNote: "var(--mod1-primary-note, #cdffee)",
         }, {
             name: "mod2",
-            secondaryChannel: "var(--mod2-secondary-channel)",
-            primaryChannel: "var(--mod2-primary-channel)",
-            secondaryNote: "var(--mod2-secondary-note)",
-            primaryNote: "var(--mod2-primary-note)",
+            secondaryChannel: "var(--mod2-secondary-channel, #993355)",
+            primaryChannel: "var(--mod2-primary-channel, #f04960)",
+            secondaryNote: "var(--mod2-secondary-note, #f057a0)",
+            primaryNote: "var(--mod2-primary-note, #ffb8de)",
         }, {
             name: "mod3",
-            secondaryChannel: "var(--mod3-secondary-channel)",
-            primaryChannel: "var(--mod3-primary-channel)",
-            secondaryNote: "var(--mod3-secondary-note)",
-            primaryNote: "var(--mod3-primary-note)",
+            secondaryChannel: "var(--mod3-secondary-channel, #553399)",
+            primaryChannel: "var(--mod3-primary-channel, #8855fc)",
+            secondaryNote: "var(--mod3-secondary-note, #aa64ff)",
+            primaryNote: "var(--mod3-primary-note, #f8ddff)",
         }, {
             name: "mod4",
-            secondaryChannel: "var(--mod4-secondary-channel)",
-            primaryChannel: "var(--mod4-primary-channel)",
-            secondaryNote: "var(--mod4-secondary-note)",
-            primaryNote: "var(--mod4-primary-note)",
+            secondaryChannel: "var(--mod4-secondary-channel, #a86436)",
+            primaryChannel: "var(--mod4-primary-channel, #c8a825)",
+            secondaryNote: "var(--mod4-secondary-note, #e8ba46)",
+            primaryNote: "var(--mod4-primary-note, #fff6d3)",
         },
     ]);
 

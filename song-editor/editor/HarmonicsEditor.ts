@@ -41,7 +41,7 @@ export class HarmonicsEditor {
     private _undoHistoryState: number = 0;
     private _changeQueue: number[][] = [];
 
-    constructor(private _doc: SongDocument) {
+    constructor(private _doc: SongDocument, private _isPrompt: boolean = false) {
         for (let i: number = 1; i <= Config.harmonicsControlPoints; i = i * 2) {
             this._octaves.appendChild(SVG.rect({ fill: ColorConfig.tonic, x: (i - 0.5) * (this._editorWidth - 8) / (Config.harmonicsControlPoints - 1) - 1, y: 0, width: 2, height: this._editorHeight }));
         }
@@ -204,7 +204,9 @@ export class HarmonicsEditor {
 
     private _whenCursorReleased = (event: Event): void => {
         if (this._mouseDown) {
-            this._doc.record(this._change!);
+            if (!this._isPrompt) {
+                this._doc.record(this._change!);
+            }
             this.storeChange();
             this._change = null;
         }
@@ -225,9 +227,9 @@ export class HarmonicsEditor {
         this.render();
     }
 
-    public saveSettings() {
+    public saveSettings(): ChangeHarmonics {
         const instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
-        this._doc.record(new ChangeHarmonics(this._doc, instrument, instrument.harmonicsWave));
+        return new ChangeHarmonics(this._doc, instrument, instrument.harmonicsWave);
     }
 
     public resetToInitial() {
@@ -272,7 +274,7 @@ export class HarmonicsEditor {
 
 export class HarmonicsEditorPrompt implements Prompt {
 
-    public readonly harmonicsEditor: HarmonicsEditor = new HarmonicsEditor(this._doc);
+    public readonly harmonicsEditor: HarmonicsEditor = new HarmonicsEditor(this._doc, true);
 
     public readonly _playButton: HTMLButtonElement = HTML.button({ style: "width: 55%;", type: "button" });
 
@@ -348,7 +350,7 @@ export class HarmonicsEditorPrompt implements Prompt {
 
     private _close = (): void => {
         this._doc.prompt = null;
-        this.harmonicsEditor.resetToInitial();
+        this._doc.undo();
     }
 
     public cleanUp = (): void => {
@@ -396,7 +398,7 @@ export class HarmonicsEditorPrompt implements Prompt {
 
     private _saveChanges = (): void => {
         this._doc.prompt = null;
-        //save again just in case
-        this.harmonicsEditor.saveSettings();
+        this._doc.record(this.harmonicsEditor.saveSettings(), true);
+        this._doc.prompt = null;
     }
 }

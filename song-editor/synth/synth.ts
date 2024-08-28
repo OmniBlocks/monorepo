@@ -1490,7 +1490,7 @@ export class EnvelopeSettings {
         if (envelopeObject["perEnvelopeUpperBound"] != undefined) {
             this.perEnvelopeUpperBound = clamp(Config.perEnvelopeBoundMin, Config.perEnvelopeBoundMax, envelopeObject["perEnvelopeUpperBound"]);
         } else {
-            this.perEnvelopeUpperBound = 0;
+            this.perEnvelopeUpperBound = 1;
         }
     }
 }
@@ -5512,8 +5512,8 @@ export class Song {
                                     pitchEnvelopeCompact = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                                     pitchEnvelopeEnd = pitchEnvelopeCompact * 64 + base64CharCodeToInt[compressed.charCodeAt(charIndex++)];    
                                 } else {
-                                    pitchEnvelopeStart = base64IntToCharCode[compressed.charCodeAt(charIndex++)];
-                                    pitchEnvelopeEnd = base64IntToCharCode[compressed.charCodeAt(charIndex++)];
+                                    pitchEnvelopeStart = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                                    pitchEnvelopeEnd = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                                 }
                             }
                             envelopeInverse = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] == 1 ? true : false;
@@ -7731,13 +7731,13 @@ class EnvelopeComputer {
             envelopeLowerBound = instrument.envelopes[index].perEnvelopeLowerBound;
             envelopeUpperBound = instrument.envelopes[index].perEnvelopeUpperBound;
         }
-        if (tone) {
+        if (tone && tone.pitchCount >= 1) {
             const chord = instrument.getChord()
             const arpeggiates = chord.arpeggiates;
             const arpeggio: number = Math.floor(instrumentState.arpTime / Config.ticksPerArpeggio); //calculate arpeggiation
             const tonePitch = tone.pitches[arpeggiates ? getArpeggioPitchIndex(tone.pitchCount, instrument.fastTwoNoteArp, arpeggio) : 0]
             pitch = tone.lastInterval != tonePitch ? tonePitch + tone.lastInterval : tonePitch; //account for pitch bends
-        }
+        } 
         if (startNote > endNote) { //Reset if values are improper
             startNote = 0;
             endNote = instrument.isNoiseInstrument ? Config.drumCount - 1 : Config.maxPitch;

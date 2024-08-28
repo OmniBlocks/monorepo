@@ -9388,7 +9388,7 @@ var beepbox = (function (exports) {
         }
     }
     EditorConfig.version = "1.2";
-    EditorConfig.versionDisplayName = "Slarmoo's Box " + EditorConfig.version;
+    EditorConfig.versionDisplayName = "UltraBox " + EditorConfig.version;
     EditorConfig.releaseNotesURL = "./patch_notes.html";
     EditorConfig.isOnMac = /^Mac/i.test(navigator.platform) || /Mac OS X/i.test(navigator.userAgent) || /^(iPhone|iPad|iPod)/i.test(navigator.platform) || /(iPhone|iPad|iPod)/i.test(navigator.userAgent);
     EditorConfig.ctrlSymbol = EditorConfig.isOnMac ? "⌘" : "Ctrl+";
@@ -11296,7 +11296,7 @@ var beepbox = (function (exports) {
                 this.perEnvelopeUpperBound = clamp(Config.perEnvelopeBoundMin, Config.perEnvelopeBoundMax, envelopeObject["perEnvelopeUpperBound"]);
             }
             else {
-                this.perEnvelopeUpperBound = 0;
+                this.perEnvelopeUpperBound = 1;
             }
         }
     }
@@ -15006,8 +15006,8 @@ var beepbox = (function (exports) {
                                                 pitchEnvelopeEnd = pitchEnvelopeCompact * 64 + base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                                             }
                                             else {
-                                                pitchEnvelopeStart = base64IntToCharCode[compressed.charCodeAt(charIndex++)];
-                                                pitchEnvelopeEnd = base64IntToCharCode[compressed.charCodeAt(charIndex++)];
+                                                pitchEnvelopeStart = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                                                pitchEnvelopeEnd = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                                             }
                                         }
                                         envelopeInverse = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] == 1 ? true : false;
@@ -16438,7 +16438,7 @@ var beepbox = (function (exports) {
                             patternObject = channelObject["patterns"][i];
                         if (patternObject == undefined)
                             continue;
-                        pattern.fromJsonObject(patternObject, this, channel, importedPartsPerBeat, isNoiseChannel, isModChannel, jsonFormat);
+                        pattern.fromJsonObject(patternObject, this, channel, importedPartsPerBeat, isNoiseChannel, isModChannel, format);
                     }
                     channel.patterns.length = this.patternsPerChannel;
                     for (let i = 0; i < this.barCount; i++) {
@@ -17059,7 +17059,7 @@ var beepbox = (function (exports) {
                 envelopeLowerBound = instrument.envelopes[index].perEnvelopeLowerBound;
                 envelopeUpperBound = instrument.envelopes[index].perEnvelopeUpperBound;
             }
-            if (tone) {
+            if (tone && tone.pitchCount >= 1) {
                 const chord = instrument.getChord();
                 const arpeggiates = chord.arpeggiates;
                 const arpeggio = Math.floor(instrumentState.arpTime / Config.ticksPerArpeggio);

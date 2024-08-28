@@ -1616,7 +1616,7 @@ var beepbox = (function (exports) {
         }
     }
     EditorConfig.version = "1.2";
-    EditorConfig.versionDisplayName = "Slarmoo's Box " + EditorConfig.version;
+    EditorConfig.versionDisplayName = "UltraBox " + EditorConfig.version;
     EditorConfig.releaseNotesURL = "./patch_notes.html";
     EditorConfig.isOnMac = /^Mac/i.test(navigator.platform) || /Mac OS X/i.test(navigator.userAgent) || /^(iPhone|iPad|iPod)/i.test(navigator.platform) || /(iPhone|iPad|iPod)/i.test(navigator.userAgent);
     EditorConfig.ctrlSymbol = EditorConfig.isOnMac ? "⌘" : "Ctrl+";
@@ -13189,7 +13189,7 @@ li.select2-results__option[role=group] > strong:hover {
                 this.perEnvelopeUpperBound = clamp(Config.perEnvelopeBoundMin, Config.perEnvelopeBoundMax, envelopeObject["perEnvelopeUpperBound"]);
             }
             else {
-                this.perEnvelopeUpperBound = 0;
+                this.perEnvelopeUpperBound = 1;
             }
         }
     }
@@ -16899,8 +16899,8 @@ li.select2-results__option[role=group] > strong:hover {
                                                 pitchEnvelopeEnd = pitchEnvelopeCompact * 64 + base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                                             }
                                             else {
-                                                pitchEnvelopeStart = base64IntToCharCode[compressed.charCodeAt(charIndex++)];
-                                                pitchEnvelopeEnd = base64IntToCharCode[compressed.charCodeAt(charIndex++)];
+                                                pitchEnvelopeStart = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                                                pitchEnvelopeEnd = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                                             }
                                         }
                                         envelopeInverse = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] == 1 ? true : false;
@@ -18331,7 +18331,7 @@ li.select2-results__option[role=group] > strong:hover {
                             patternObject = channelObject["patterns"][i];
                         if (patternObject == undefined)
                             continue;
-                        pattern.fromJsonObject(patternObject, this, channel, importedPartsPerBeat, isNoiseChannel, isModChannel, jsonFormat);
+                        pattern.fromJsonObject(patternObject, this, channel, importedPartsPerBeat, isNoiseChannel, isModChannel, format);
                     }
                     channel.patterns.length = this.patternsPerChannel;
                     for (let i = 0; i < this.barCount; i++) {
@@ -18952,7 +18952,7 @@ li.select2-results__option[role=group] > strong:hover {
                 envelopeLowerBound = instrument.envelopes[index].perEnvelopeLowerBound;
                 envelopeUpperBound = instrument.envelopes[index].perEnvelopeUpperBound;
             }
-            if (tone) {
+            if (tone && tone.pitchCount >= 1) {
                 const chord = instrument.getChord();
                 const arpeggiates = chord.arpeggiates;
                 const arpeggio = Math.floor(instrumentState.arpTime / Config.ticksPerArpeggio);
@@ -33023,8 +33023,9 @@ You should be redirected to the song at:<br /><br />
     Layout._styleElement = document.head.appendChild(HTML.style({ type: "text/css" }));
 
     class HarmonicsEditor {
-        constructor(_doc) {
+        constructor(_doc, _isPrompt = false) {
             this._doc = _doc;
+            this._isPrompt = _isPrompt;
             this._editorWidth = 120;
             this._editorHeight = 26;
             this._octaves = SVG.svg({ "pointer-events": "none" });
@@ -33136,7 +33137,9 @@ You should be redirected to the song at:<br /><br />
             };
             this._whenCursorReleased = (event) => {
                 if (this._mouseDown) {
-                    this._doc.record(this._change);
+                    if (!this._isPrompt) {
+                        this._doc.record(this._change);
+                    }
                     this.storeChange();
                     this._change = null;
                 }
@@ -33206,7 +33209,7 @@ You should be redirected to the song at:<br /><br />
         }
         saveSettings() {
             const instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
-            this._doc.record(new ChangeHarmonics(this._doc, instrument, instrument.harmonicsWave));
+            return new ChangeHarmonics(this._doc, instrument, instrument.harmonicsWave);
         }
         resetToInitial() {
             const instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
@@ -33248,7 +33251,7 @@ You should be redirected to the song at:<br /><br />
         constructor(_doc, _songEditor) {
             this._doc = _doc;
             this._songEditor = _songEditor;
-            this.harmonicsEditor = new HarmonicsEditor(this._doc);
+            this.harmonicsEditor = new HarmonicsEditor(this._doc, true);
             this._playButton = HTML.button({ style: "width: 55%;", type: "button" });
             this._cancelButton = HTML.button({ class: "cancelButton" });
             this._okayButton = HTML.button({ class: "okayButton", style: "width:45%;" }, "Okay");
@@ -33273,7 +33276,7 @@ You should be redirected to the song at:<br /><br />
             };
             this._close = () => {
                 this._doc.prompt = null;
-                this.harmonicsEditor.resetToInitial();
+                this._doc.undo();
             };
             this.cleanUp = () => {
                 this._okayButton.removeEventListener("click", this._saveChanges);
@@ -33316,7 +33319,8 @@ You should be redirected to the song at:<br /><br />
             };
             this._saveChanges = () => {
                 this._doc.prompt = null;
-                this.harmonicsEditor.saveSettings();
+                this._doc.record(this.harmonicsEditor.saveSettings(), true);
+                this._doc.prompt = null;
             };
             this._okayButton.addEventListener("click", this._saveChanges);
             this._cancelButton.addEventListener("click", this._close);
@@ -40140,9 +40144,10 @@ You should be redirected to the song at:<br /><br />
     }
 
     class SpectrumEditor {
-        constructor(_doc, _spectrumIndex) {
+        constructor(_doc, _spectrumIndex, _isPrompt = false) {
             this._doc = _doc;
             this._spectrumIndex = _spectrumIndex;
+            this._isPrompt = _isPrompt;
             this._editorWidth = 120;
             this._editorHeight = 26;
             this._fill = SVG.path({ fill: ColorConfig.uiWidgetBackground, "pointer-events": "none" });
@@ -40161,7 +40166,7 @@ You should be redirected to the song at:<br /><br />
             this._renderedPath = "";
             this._renderedFifths = true;
             this.instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
-            this._initial = this._spectrumIndex == null ? this.instrument.spectrumWave : this.instrument.drumsetSpectrumWaves[this._spectrumIndex];
+            this._initial = new SpectrumWave(this._spectrumIndex != null);
             this._undoHistoryState = 0;
             this._changeQueue = [];
             this.storeChange = () => {
@@ -40254,13 +40259,15 @@ You should be redirected to the song at:<br /><br />
             };
             this._whenCursorReleased = (event) => {
                 if (this._mouseDown) {
-                    this._doc.record(this._change);
+                    if (!this._isPrompt) {
+                        this._doc.record(this._change);
+                    }
                     this.storeChange();
                     this._change = null;
                 }
                 this._mouseDown = false;
             };
-            this._initial = this._spectrumIndex == null ? this.instrument.spectrumWave : this.instrument.drumsetSpectrumWaves[this._spectrumIndex];
+            this._initial.spectrum = this._spectrumIndex == null ? this.instrument.spectrumWave.spectrum.slice() : this.instrument.drumsetSpectrumWaves[this._spectrumIndex].spectrum.slice();
             for (let i = 0; i < Config.spectrumControlPoints; i += Config.spectrumControlPointsPerOctave) {
                 this._octaves.appendChild(SVG.rect({ fill: ColorConfig.tonic, x: (i + 1) * this._editorWidth / (Config.spectrumControlPoints + 2) - 1, y: 0, width: 2, height: this._editorHeight }));
             }
@@ -40315,38 +40322,40 @@ You should be redirected to the song at:<br /><br />
                 return instrument.drumsetSpectrumWaves[this._spectrumIndex];
             }
         }
-        setSpectrumWave(spectrum) {
+        setSpectrumWave(spectrum, saveHistory = true) {
             const instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
             if (this._spectrumIndex == null) {
                 for (let i = 0; i < Config.spectrumControlPoints; i++) {
                     instrument.spectrumWave.spectrum[i] = spectrum[i];
                 }
-                this._doc.record(new ChangeSpectrum(this._doc, instrument, instrument.spectrumWave));
+                const spectrumChange = new ChangeSpectrum(this._doc, instrument, instrument.spectrumWave);
+                if (saveHistory) {
+                    this._doc.record(spectrumChange);
+                }
             }
             else {
                 for (let i = 0; i < Config.spectrumControlPoints; i++) {
                     instrument.drumsetSpectrumWaves[this._spectrumIndex].spectrum[i] = spectrum[i];
                 }
-                this._doc.record(new ChangeSpectrum(this._doc, instrument, instrument.drumsetSpectrumWaves[this._spectrumIndex]));
+                const spectrumChange = new ChangeSpectrum(this._doc, instrument, instrument.drumsetSpectrumWaves[this._spectrumIndex]);
+                if (saveHistory) {
+                    this._doc.record(spectrumChange);
+                }
             }
             this.render();
         }
         saveSettings() {
             const instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
             if (this._spectrumIndex == null) {
-                this._doc.record(new ChangeSpectrum(this._doc, instrument, instrument.spectrumWave));
+                return new ChangeSpectrum(this._doc, instrument, instrument.spectrumWave);
             }
             else {
-                this._doc.record(new ChangeSpectrum(this._doc, instrument, instrument.drumsetSpectrumWaves[this._spectrumIndex]));
+                return new ChangeSpectrum(this._doc, instrument, instrument.drumsetSpectrumWaves[this._spectrumIndex]);
             }
         }
         resetToInitial() {
-            console.log(this._initial);
             this._changeQueue = [];
             this._undoHistoryState = 0;
-            const instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
-            this.setSpectrumWave(this._initial.spectrum);
-            this._doc.record(new ChangeSpectrum(this._doc, instrument, this._initial));
         }
         render() {
             const instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
@@ -40389,7 +40398,7 @@ You should be redirected to the song at:<br /><br />
             this._doc = _doc;
             this._songEditor = _songEditor;
             this._isDrumset = _isDrumset;
-            this.spectrumEditor = new SpectrumEditor(this._doc, null);
+            this.spectrumEditor = new SpectrumEditor(this._doc, null, true);
             this.spectrumEditors = [];
             this._drumsetSpectrumIndex = 0;
             this._playButton = HTML.button({ style: "width: 55%;", type: "button" });
@@ -40426,9 +40435,8 @@ You should be redirected to the song at:<br /><br />
                 for (let i = 0; i < this.spectrumEditors.length; i++) {
                     this.spectrumEditors[i].resetToInitial();
                 }
-                console.log("_close()");
-                this._doc.undo();
                 this._doc.prompt = null;
+                this._doc.undo();
             };
             this.cleanUp = () => {
                 this._okayButton.removeEventListener("click", this._saveChanges);
@@ -40474,10 +40482,12 @@ You should be redirected to the song at:<br /><br />
                 }
             };
             this._saveChanges = () => {
-                this._doc.prompt = null;
+                const group = new ChangeGroup();
                 for (let i = 0; i < this.spectrumEditors.length; i++) {
-                    this.spectrumEditors[i].saveSettings();
+                    group.append(this.spectrumEditors[i].saveSettings());
                 }
+                this._doc.record(group, true);
+                this._doc.prompt = null;
             };
             this._okayButton.addEventListener("click", this._saveChanges);
             this._cancelButton.addEventListener("click", this._close);
@@ -40491,7 +40501,7 @@ You should be redirected to the song at:<br /><br />
             this.updatePlayButton();
             if (this._isDrumset) {
                 for (let i = 0; i < Config.drumCount; i++) {
-                    this.spectrumEditors[i] = new SpectrumEditor(this._doc, i);
+                    this.spectrumEditors[i] = new SpectrumEditor(this._doc, i, true);
                 }
                 this.spectrumEditor = this.spectrumEditors[this._drumsetSpectrumIndex];
                 let colors = ColorConfig.getChannelColor(this._doc.song, this._doc.channel);

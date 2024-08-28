@@ -9,6 +9,7 @@ import { ChangeSpectrum } from "./changes";
 import { prettyNumber } from "./EditorConfig";
 import { Prompt } from "./Prompt";
 import { SongEditor } from "./SongEditor";
+import { ChangeGroup } from "./Change";
 
 export class SpectrumEditor {
     private readonly _editorWidth: number = 120;
@@ -37,13 +38,13 @@ export class SpectrumEditor {
     private _renderedPath: String = "";
     private _renderedFifths: boolean = true;
     private instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
-    private _initial: SpectrumWave = this._spectrumIndex == null ? this.instrument.spectrumWave : this.instrument.drumsetSpectrumWaves[this._spectrumIndex];
+    private _initial: SpectrumWave = new SpectrumWave(this._spectrumIndex != null); 
 
     private _undoHistoryState: number = 0;
     private _changeQueue: number[][] = [];
 
-    constructor(private _doc: SongDocument, private _spectrumIndex: number | null) {
-        this._initial = this._spectrumIndex == null ? this.instrument.spectrumWave : this.instrument.drumsetSpectrumWaves[this._spectrumIndex];
+    constructor(private _doc: SongDocument, private _spectrumIndex: number | null, private _isPrompt: boolean = false) {
+        this._initial.spectrum = this._spectrumIndex == null ? this.instrument.spectrumWave.spectrum.slice() : this.instrument.drumsetSpectrumWaves[this._spectrumIndex].spectrum.slice();
         for (let i: number = 0; i < Config.spectrumControlPoints; i += Config.spectrumControlPointsPerOctave) {
             this._octaves.appendChild(SVG.rect({ fill: ColorConfig.tonic, x: (i + 1) * this._editorWidth / (Config.spectrumControlPoints + 2) - 1, y: 0, width: 2, height: this._editorHeight }));
         }
@@ -201,7 +202,9 @@ export class SpectrumEditor {
 
     private _whenCursorReleased = (event: Event): void => {
         if (this._mouseDown) {
-            this._doc.record(this._change!);
+            if (!this._isPrompt) {
+                this._doc.record(this._change!);
+            }
             this.storeChange();
             this._change = null;
         }
@@ -217,38 +220,41 @@ export class SpectrumEditor {
         }
     }
 
-    public setSpectrumWave(spectrum: number[]) {
+    public setSpectrumWave(spectrum: number[], saveHistory: boolean = true) {
         const instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
         if (this._spectrumIndex == null) {
             for (let i = 0; i < Config.spectrumControlPoints; i++) {
                 instrument.spectrumWave.spectrum[i] = spectrum[i];
             }
-            this._doc.record(new ChangeSpectrum(this._doc, instrument, instrument.spectrumWave));
+            const spectrumChange: ChangeSpectrum = new ChangeSpectrum(this._doc, instrument, instrument.spectrumWave);
+            if (saveHistory) {
+                this._doc.record(spectrumChange);
+            } 
         } else {
             for (let i = 0; i < Config.spectrumControlPoints; i++) {
                 instrument.drumsetSpectrumWaves[this._spectrumIndex].spectrum[i] = spectrum[i];
             }
-            this._doc.record(new ChangeSpectrum(this._doc, instrument, instrument.drumsetSpectrumWaves[this._spectrumIndex]));
+            const spectrumChange: ChangeSpectrum = new ChangeSpectrum(this._doc, instrument, instrument.drumsetSpectrumWaves[this._spectrumIndex]);
+            if (saveHistory) {
+                this._doc.record(spectrumChange);
+            } 
         }
         this.render();
     }
 
-    public saveSettings() {
+    public saveSettings(): ChangeSpectrum {
         const instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
         if (this._spectrumIndex == null) {
-            this._doc.record(new ChangeSpectrum(this._doc, instrument, instrument.spectrumWave));
+            return new ChangeSpectrum(this._doc, instrument, instrument.spectrumWave);
         } else {
-            this._doc.record(new ChangeSpectrum(this._doc, instrument, instrument.drumsetSpectrumWaves[this._spectrumIndex]));
+            return new ChangeSpectrum(this._doc, instrument, instrument.drumsetSpectrumWaves[this._spectrumIndex]);
         }
     }
 
     public resetToInitial() {
-        console.log(this._initial);
         this._changeQueue = [];
         this._undoHistoryState = 0;
-        const instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
-        this.setSpectrumWave(this._initial.spectrum);
-        this._doc.record(new ChangeSpectrum(this._doc, instrument, this._initial));
+        //this.setSpectrumWave(this._initial.spectrum, false);
     }
 
     public render(): void {
@@ -293,7 +299,7 @@ export class SpectrumEditor {
 
 export class SpectrumEditorPrompt implements Prompt {
 
-    public spectrumEditor: SpectrumEditor = new SpectrumEditor(this._doc, null);
+    public spectrumEditor: SpectrumEditor = new SpectrumEditor(this._doc, null, true);
 
     private readonly spectrumEditors: SpectrumEditor[] = [];
 
@@ -352,7 +358,7 @@ export class SpectrumEditorPrompt implements Prompt {
         this.updatePlayButton();
         if (this._isDrumset) {
             for (let i = 0; i < Config.drumCount; i++) {
-                this.spectrumEditors[i] = new SpectrumEditor(this._doc, i);
+                this.spectrumEditors[i] = new SpectrumEditor(this._doc, i, true);
             }
             this.spectrumEditor = this.spectrumEditors[this._drumsetSpectrumIndex];
             let colors = ColorConfig.getChannelColor(this._doc.song, this._doc.channel);
@@ -412,9 +418,8 @@ export class SpectrumEditorPrompt implements Prompt {
         for (let i = 0; i < this.spectrumEditors.length; i++) {
             this.spectrumEditors[i].resetToInitial();
         }
-        console.log("_close()");
-        this._doc.undo();
         this._doc.prompt = null;
+        this._doc.undo();
     }
 
     public cleanUp = (): void => {
@@ -465,10 +470,12 @@ export class SpectrumEditorPrompt implements Prompt {
     }
 
     private _saveChanges = (): void => {
-        this._doc.prompt = null;
         // Save again just in case
+        const group: ChangeGroup = new ChangeGroup();
         for (let i = 0; i < this.spectrumEditors.length; i++) {
-            this.spectrumEditors[i].saveSettings();
+            group.append(this.spectrumEditors[i].saveSettings());
         }
+        this._doc.record(group, true);
+        this._doc.prompt = null;
     }
 }

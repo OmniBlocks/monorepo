@@ -37,12 +37,13 @@ export class SpectrumEditor {
     private _renderedPath: String = "";
     private _renderedFifths: boolean = true;
     private instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
-    private readonly _initial: SpectrumWave = this.instrument.spectrumWave;
+    private _initial: SpectrumWave = this._spectrumIndex == null ? this.instrument.spectrumWave : this.instrument.drumsetSpectrumWaves[this._spectrumIndex];
 
     private _undoHistoryState: number = 0;
     private _changeQueue: number[][] = [];
 
     constructor(private _doc: SongDocument, private _spectrumIndex: number | null) {
+        this._initial = this._spectrumIndex == null ? this.instrument.spectrumWave : this.instrument.drumsetSpectrumWaves[this._spectrumIndex];
         for (let i: number = 0; i < Config.spectrumControlPoints; i += Config.spectrumControlPointsPerOctave) {
             this._octaves.appendChild(SVG.rect({ fill: ColorConfig.tonic, x: (i + 1) * this._editorWidth / (Config.spectrumControlPoints + 2) - 1, y: 0, width: 2, height: this._editorHeight }));
         }
@@ -209,24 +210,42 @@ export class SpectrumEditor {
 
     public getSpectrumWave(): SpectrumWave {
         const instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
-        return instrument.spectrumWave;
+        if (this._spectrumIndex == null) {
+            return instrument.spectrumWave;
+        } else {
+            return instrument.drumsetSpectrumWaves[this._spectrumIndex];
+        }
     }
 
     public setSpectrumWave(spectrum: number[]) {
         const instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
-        for (let i = 0; i < Config.spectrumControlPoints; i++) {
-            instrument.spectrumWave.spectrum[i] = spectrum[i];
+        if (this._spectrumIndex == null) {
+            for (let i = 0; i < Config.spectrumControlPoints; i++) {
+                instrument.spectrumWave.spectrum[i] = spectrum[i];
+            }
+            this._doc.record(new ChangeSpectrum(this._doc, instrument, instrument.spectrumWave));
+        } else {
+            for (let i = 0; i < Config.spectrumControlPoints; i++) {
+                instrument.drumsetSpectrumWaves[this._spectrumIndex].spectrum[i] = spectrum[i];
+            }
+            this._doc.record(new ChangeSpectrum(this._doc, instrument, instrument.drumsetSpectrumWaves[this._spectrumIndex]));
         }
-        this._doc.record(new ChangeSpectrum(this._doc, instrument, instrument.spectrumWave));
         this.render();
     }
 
     public saveSettings() {
         const instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
-        this._doc.record(new ChangeSpectrum(this._doc, instrument, instrument.spectrumWave));
+        if (this._spectrumIndex == null) {
+            this._doc.record(new ChangeSpectrum(this._doc, instrument, instrument.spectrumWave));
+        } else {
+            this._doc.record(new ChangeSpectrum(this._doc, instrument, instrument.drumsetSpectrumWaves[this._spectrumIndex]));
+        }
     }
 
     public resetToInitial() {
+        console.log(this._initial);
+        this._changeQueue = [];
+        this._undoHistoryState = 0;
         const instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
         this.setSpectrumWave(this._initial.spectrum);
         this._doc.record(new ChangeSpectrum(this._doc, instrument, this._initial));
@@ -274,9 +293,16 @@ export class SpectrumEditor {
 
 export class SpectrumEditorPrompt implements Prompt {
 
-    public readonly spectrumEditor: SpectrumEditor = new SpectrumEditor(this._doc, null);
+    public spectrumEditor: SpectrumEditor = new SpectrumEditor(this._doc, null);
+
+    private readonly spectrumEditors: SpectrumEditor[] = [];
+
+    private _drumsetSpectrumIndex: number = 0;
 
     public readonly _playButton: HTMLButtonElement = HTML.button({ style: "width: 55%;", type: "button" });
+
+    public readonly _drumsetButtons: HTMLButtonElement[] = [];
+    public readonly _drumsetButtonContainer: HTMLDivElement = HTML.div({ class: "instrument-bar", style: "justify-content: center;" });
 
     private readonly _cancelButton: HTMLButtonElement = HTML.button({ class: "cancelButton" });
     private readonly _okayButton: HTMLButtonElement = HTML.button({ class: "okayButton", style: "width:45%;" }, "Okay");
@@ -302,6 +328,7 @@ export class SpectrumEditorPrompt implements Prompt {
         HTML.div({ style: "display: flex; width: 55%; align-self: center; flex-direction: row; align-items: center; justify-content: center;" },
             this._playButton,
         ),
+        this._drumsetButtonContainer,
         HTML.div({ style: "display: flex; flex-direction: row; align-items: center; justify-content: center; height: 80%" },
             this.spectrumEditor.container,
         ),
@@ -312,7 +339,7 @@ export class SpectrumEditorPrompt implements Prompt {
         this._cancelButton,
     );
 
-    constructor(private _doc: SongDocument, private _songEditor: SongEditor) {
+    constructor(private _doc: SongDocument, private _songEditor: SongEditor, private _isDrumset: boolean) {
         this._okayButton.addEventListener("click", this._saveChanges);
         this._cancelButton.addEventListener("click", this._close);
         this.container.addEventListener("keydown", this.whenKeyPressed);
@@ -323,10 +350,43 @@ export class SpectrumEditorPrompt implements Prompt {
         this.container.addEventListener("mousemove", () => this.spectrumEditor.render());
         this.container.addEventListener("mousedown", () => this.spectrumEditor.render());
         this.updatePlayButton();
+        if (this._isDrumset) {
+            for (let i = 0; i < Config.drumCount; i++) {
+                this.spectrumEditors[i] = new SpectrumEditor(this._doc, i);
+            }
+            this.spectrumEditor = this.spectrumEditors[this._drumsetSpectrumIndex];
+            let colors = ColorConfig.getChannelColor(this._doc.song, this._doc.channel);
+            for (let i: number = 0; i < Config.drumCount; i++) {
+                let newSubButton: HTMLButtonElement = HTML.button({ class: "no-underline", style: "max-width: 2em;" }, "" + i);
+                this._drumsetButtons.push(newSubButton);
+                this._drumsetButtonContainer.appendChild(newSubButton);
+                newSubButton.addEventListener("click", () => { this._setDrumSpectrum(i); });
+            }
+            this._drumsetButtons[Config.drumCount - 1].classList.add("last-button");
+            this._drumsetButtons[0].classList.add("selected-instrument");
+
+            this._drumsetButtonContainer.style.setProperty("--text-color-lit", colors.primaryNote);
+            this._drumsetButtonContainer.style.setProperty("--text-color-dim", colors.secondaryNote);
+            this._drumsetButtonContainer.style.setProperty("--background-color-lit", colors.primaryChannel);
+            this._drumsetButtonContainer.style.setProperty("--background-color-dim", colors.secondaryChannel);
+            this._drumsetButtonContainer.style.display = "";
+        } else {
+            this._drumsetButtonContainer.style.display = "none";
+            this.spectrumEditors[0] = this.spectrumEditor;
+        }
 
         setTimeout(() => this._playButton.focus());
 
         this.spectrumEditor.render();
+    }
+
+    private _setDrumSpectrum = (index: number/*, useHistory: boolean = true, doSwap: boolean = true*/): void => {
+        this._drumsetButtons[this._drumsetSpectrumIndex].classList.remove("selected-instrument");
+        //if (doSwap) this.swapDrumsetSpectrums(this._drumsetSpectrumIndex, index, useHistory);
+
+        this._drumsetSpectrumIndex = index;
+        this._drumsetButtons[index].classList.add("selected-instrument");
+        this.spectrumEditor = this.spectrumEditors[this._drumsetSpectrumIndex];
     }
 
     private _togglePlay = (): void => {
@@ -349,8 +409,12 @@ export class SpectrumEditorPrompt implements Prompt {
     }
 
     private _close = (): void => {
+        for (let i = 0; i < this.spectrumEditors.length; i++) {
+            this.spectrumEditors[i].resetToInitial();
+        }
+        console.log("_close()");
+        this._doc.undo();
         this._doc.prompt = null;
-        this.spectrumEditor.resetToInitial();
     }
 
     public cleanUp = (): void => {
@@ -393,11 +457,18 @@ export class SpectrumEditorPrompt implements Prompt {
         else if (event.keyCode == 221) { // ]
             this._doc.synth.goToNextBar();
         }
+        else if (event.keyCode >= 48 && event.keyCode <= 57) { // 0-9
+            if (event.shiftKey && this._isDrumset) {
+                this._setDrumSpectrum(event.keyCode - 48);
+            }
+        }
     }
 
     private _saveChanges = (): void => {
         this._doc.prompt = null;
         // Save again just in case
-        this.spectrumEditor.saveSettings();
+        for (let i = 0; i < this.spectrumEditors.length; i++) {
+            this.spectrumEditors[i].saveSettings();
+        }
     }
 }

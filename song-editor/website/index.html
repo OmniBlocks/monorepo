@@ -14,14 +14,15 @@
     <meta name="application-name" content="Slarmoo's Box" />
     <meta name="apple-mobile-web-app-title" content="Slarmoo's Box">
     <meta name="description" content="Slarmoo's Box is a mod of Ultrabox that aims to advance Beepbox's capabilities." />
-    <meta name="keywords" content="chiptune, instrumental, music, song, melody, composition, tool, free, online, square wave, NES, NSF, slarmoosbox, ultrabox, beepbox, jummbox, pandorasbox, modbox, sandbox, goldbox, wackybox, todbox" />
+    <meta name="keywords" content="chiptune, instrumental, music, song, melody, composition, tool, free, online, square wave, NES, NSF, slarmoosbox, ultrabox, beepbox, jummbox, pandorasbox, modbox, sandbox, goldbox, wackybox, todbox, slarmoo, slarmoos" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="theme-color" content="#444" />
+    <meta name="theme-color" content="#247d1d" />
     <meta name="msapplication-TileColor" content="#dba600" />
     <meta name="msapplication-config" content="/browserconfig.xml" />
     <meta name="format-detection" content="telephone=no" />
+    <meta property="og:image" content="https://slarmoo.github.io/slarmoosbox/icon_32.png">
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="32x32" href="/icon_32.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
@@ -345,7 +346,7 @@
         // Randomize display of header
         // 1-in-23
         //I should rework this sometime (maybe add the midbox tips thingy?)
-        if (Math.floor(Math.random() * 8) == 0) {
+        if (Math.floor(Math.random() * 3) == 0) { //more than doubled chance for a plant to show up
             switch (Math.floor(Math.random() * 22)) {
                 // jummbox/goldbox plants
                 case 0:
@@ -397,7 +398,7 @@
                     break;
                 // I believe this is from paandorasbox (might have also been present in familiarbox???? maybe not though...)
                 case 14:
-                    document.getElementById("goldboxPlant").innerHTML = "  :wackybox:";
+                    document.getElementById("goldboxPlant").innerHTML = "   not :wackybox:"; //changed to not wackybox, because it isn't :p
                     break;
                 // plant suggested by mel, in reference to the "(don't eat) thegubbys" meme
 			    case 15:
@@ -414,20 +415,20 @@
                     document.getElementById("goldboxPlant").innerHTML = "  💫";
                     break;
                 case 19:
-                    document.getElementById("goldboxPlant").innerHTML = "  👽";
+                    document.getElementById("goldboxPlant").innerHTML = "  ✨"; //changed alien to sparkle
                     break;
-                // dogebox2 plants 
+                // replaced dogebox food with Slarmoo's Box nature
                 case 20:
-                    document.getElementById("goldboxPlant").innerHTML = "  🍕";
+                    document.getElementById("goldboxPlant").innerHTML = "  🌈";
                     break;
                 case 21:
-                    document.getElementById("goldboxPlant").innerHTML = "  🌭";
+                    document.getElementById("goldboxPlant").innerHTML = "  🌧️";
                     break;
                 case 22:
-                    document.getElementById("goldboxPlant").innerHTML = "  🍔";
+                    document.getElementById("goldboxPlant").innerHTML = "  🪨";
                     break;
                 case 23:
-                    document.getElementById("goldboxPlant").innerHTML = "  🍟";
+                    document.getElementById("goldboxPlant").innerHTML = "  🐍"; //Hm, I wonder what this is a reference to...
                     break;
             }
         }

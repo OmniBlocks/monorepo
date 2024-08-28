@@ -830,7 +830,7 @@ export class ChangeRandomGeneratedInstrument extends Change {
                         { item: "decay 1", weight: 4 },
                         { item: "decay 2", weight: 2 },
                         { item: "decay 3", weight: 1 },
-                    ])].index);
+                    ])].index, false);
                 }
             }
             if (Math.random() < 0.1) {
@@ -877,7 +877,7 @@ export class ChangeRandomGeneratedInstrument extends Change {
                     { item: "linear 2", weight: 2 },
                     { item: "linear 3", weight: 2 },
                     { item: "linear-1", weight: 1 },
-                ])].index);
+                ])].index, false);
             }
             if (Math.random() < 0.1) {
                 instrument.effects |= 1 << EffectType.distortion;
@@ -951,7 +951,7 @@ export class ChangeRandomGeneratedInstrument extends Change {
                         { item: "linear 3", weight: 1 },
                         { item: "rise 1", weight: 1 },
                         { item: "rise 2", weight: 1 },
-                    ])].index);
+                    ])].index, false);
             }
 
             function normalize(harmonics: number[]): void {
@@ -1116,7 +1116,7 @@ export class ChangeRandomGeneratedInstrument extends Change {
                         { item: "decay 3", weight: 1 },
                         { item: "linear 1", weight: 1 },
                         { item: "linear 2", weight: 1 },
-                    ])].index);
+                    ])].index, false);
                 }
             }
             if (Math.random() < 0.25) {
@@ -1186,7 +1186,7 @@ export class ChangeRandomGeneratedInstrument extends Change {
                     { item: "rise 1", weight: 3 },
                     { item: "rise 2", weight: 2 },
                     { item: "rise 3", weight: 1 },
-                ])].index);
+                ])].index, false);
             }
             if (Math.random() < 0.1) {
                 instrument.effects |= 1 << EffectType.bitcrusher;
@@ -1281,7 +1281,7 @@ export class ChangeRandomGeneratedInstrument extends Change {
                             { item: "rise 1", weight: 3 },
                             { item: "rise 2", weight: 2 },
                             { item: "rise 3", weight: 1 },
-                        ])].index);
+                        ])].index, false);
                     }
                 } break;
                 case InstrumentType.pickedString:
@@ -1426,7 +1426,7 @@ export class ChangeRandomGeneratedInstrument extends Change {
                                 { item: "rise 1", weight: 2 },
                                 { item: "rise 2", weight: 2 },
                                 { item: "rise 3", weight: 1 },
-                            ])].index);
+                            ])].index, false);
                         }
                         instrument.operators[i].waveform = Config.operatorWaves.dictionary[selectWeightedRandom([
                             { item: "sine", weight: 10 },
@@ -1496,7 +1496,7 @@ export class ChangeRandomGeneratedInstrument extends Change {
                             { item: "rise 1", weight: 2 },
                             { item: "rise 2", weight: 2 },
                             { item: "rise 3", weight: 1 },
-                        ])].index);
+                        ])].index, false);
                     }
                 } break;
                 case InstrumentType.customChipWave: {
@@ -4866,7 +4866,7 @@ export class ChangeAddEnvelope extends Change {
     constructor(doc: SongDocument) {
         super();
         const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
-        instrument.addEnvelope(0, 0, 0, 0, instrument.isNoiseInstrument ? 11 : 96, false, 1, 0);
+        instrument.addEnvelope(0, 0, 0, true, 0, instrument.isNoiseInstrument ? Config.drumCount : Config.maxPitch, false, 1, 0);
         instrument.preset = instrument.type;
         doc.notifier.changed();
         this._didSomething();
@@ -4918,6 +4918,7 @@ export class ChangeSetEnvelopeType extends Change {
         const oldValue: number = instrument.envelopes[envelopeIndex].envelope;
         if (oldValue != newValue) {
             instrument.envelopes[envelopeIndex].envelope = newValue;
+            console.log("changing!");
             instrument.preset = instrument.type;
             doc.notifier.changed();
             this._didSomething();
@@ -4974,6 +4975,34 @@ export class ChangePerEnvelopeSpeed extends Change {
         const oldSpeed: number = instrument.envelopes[index].perEnvelopeSpeed;
         if (oldSpeed != speed) {
             instrument.envelopes[index].perEnvelopeSpeed = speed;
+            instrument.preset = instrument.type;
+            doc.notifier.changed();
+            this._didSomething();
+        }
+    }
+}
+
+export class ChangeEnvelopeLowerBound extends Change {
+    constructor(doc: SongDocument, bound: number, index: number) {
+        super();
+        const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+        const oldBound: number = instrument.envelopes[index].perEnvelopeLowerBound;
+        if(oldBound != bound) {
+            instrument.envelopes[index].perEnvelopeLowerBound = bound;
+            instrument.preset = instrument.type;
+            doc.notifier.changed();
+            this._didSomething();
+        }
+    }
+}
+
+export class ChangeEnvelopeUpperBound extends Change {
+    constructor(doc: SongDocument, bound: number, index: number) {
+        super();
+        const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+        const oldBound: number = instrument.envelopes[index].perEnvelopeUpperBound;
+        if (oldBound != bound) {
+            instrument.envelopes[index].perEnvelopeUpperBound = bound;
             instrument.preset = instrument.type;
             doc.notifier.changed();
             this._didSomething();

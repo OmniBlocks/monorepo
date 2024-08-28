@@ -1966,6 +1966,7 @@ export function getDrumWave(index: number, inverseRealFourierTransform: Function
             }
         }
         else if (index == 13) {
+            // https://noisehack.com/generate-noise-web-audio-api/
             var b0 = 0, b1 = 0, b2 = 0, b3, b4, b5, b6;
             b0 = b1 = b2 = b3 = b4 = b5 = b6 = 0.0;
             
@@ -1980,7 +1981,6 @@ export function getDrumWave(index: number, inverseRealFourierTransform: Function
                 wave[i] = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
                 wave[i] *= 0.44;
                 b6 = white * 0.115926;
-                // from https://github.com/zacharydenton/noise.js, MIT license soooo
             }
         }
         else if (index == 14) {
@@ -1991,7 +1991,6 @@ export function getDrumWave(index: number, inverseRealFourierTransform: Function
                 wave[i] = (lastOut + (0.02 * white)) / 1.02;
                 lastOut = wave[i];
                 wave[i] *= 14;
-                // this is also from noise.js
             }
         }
 		

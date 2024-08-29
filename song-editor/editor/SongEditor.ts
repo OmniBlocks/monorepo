@@ -1394,7 +1394,7 @@ export class SongEditor {
     private readonly _operatorWaveformPulsewidthSliders: Slider[] = [];
     private readonly _operatorDropdownRows: HTMLElement[] = []
     private readonly _operatorDropdownGroups: HTMLDivElement[] = [];
-    private readonly _drumsetSpectrumEditors: SpectrumEditor[] = [];
+    readonly _drumsetSpectrumEditors: SpectrumEditor[] = [];
     private readonly _drumsetEnvelopeSelects: HTMLSelectElement[] = [];
     private _showModSliders: boolean[] = [];
     private _newShowModSliders: boolean[] = [];

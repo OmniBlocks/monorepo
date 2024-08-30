@@ -230,7 +230,7 @@ export class EnvelopeEditor {
 				if (this.extraPitchSettingsGroups[i]) {
 					this.perEnvelopeSpeedGroups[i].style.display = "none";
 				}
-			} else if (this.openExtraSettingsDropdowns) {
+			} else if (this.openExtraSettingsDropdowns[i]) {
 				this.extraSettingsDropdownGroups[i].style.display = "flex";
 				this.extraSettingsDropdowns[i].style.display = "inline";
 				if (Config.newEnvelopes[instrument.envelopes[i].envelope].name == "pitch") {
@@ -269,7 +269,7 @@ export class EnvelopeEditor {
 				this.perEnvelopeUpperBoundBoxes[i].value = instrument.envelopes[i].perEnvelopeUpperBound.toString();
 				this._perEnvelopeLowerBoundSliders[i].value = instrument.envelopes[i].perEnvelopeLowerBound.toString();
 				this._perEnvelopeUpperBoundSliders[i].value = instrument.envelopes[i].perEnvelopeUpperBound.toString();
-			} else if (this.openExtraSettingsDropdowns != null || this.openExtraSettingsDropdowns != undefined) {
+			} else if (this.openExtraSettingsDropdowns[i] == false) {
 				this.extraSettingsDropdownGroups[i].style.display = "none";
 				this.extraPitchSettingsGroups[i].style.display = "none";
 				this.extraSettingsDropdowns[i].style.display = "inline";
@@ -442,6 +442,7 @@ export class EnvelopeEditor {
 			this.perEnvelopeUpperBoundBoxes[envelopeIndex].value = String(instrument.envelopes[envelopeIndex].perEnvelopeUpperBound);
 			this._perEnvelopeLowerBoundSliders[envelopeIndex].value = String(instrument.envelopes[envelopeIndex].perEnvelopeLowerBound);
 			this._perEnvelopeUpperBoundSliders[envelopeIndex].value = String(instrument.envelopes[envelopeIndex].perEnvelopeUpperBound);
+			this.openExtraSettingsDropdowns[envelopeIndex] = this.openExtraSettingsDropdowns[envelopeIndex] ? true : false
 		}
 
 		this._renderedEnvelopeCount = instrument.envelopeCount;

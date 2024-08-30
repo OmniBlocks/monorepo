@@ -17050,22 +17050,12 @@ var beepbox = (function (exports) {
             let endNote = Config.maxPitch;
             let pitch = 0;
             let inverse = false;
-<<<<<<< HEAD
-=======
             let envelopeLowerBound = 0;
             let envelopeUpperBound = 1;
->>>>>>> 39d6a279f21c1ac3dfef5c572dce46ea9628adbc
             if (instrument.isNoiseInstrument) {
                 endNote = Config.drumCount - 1;
             }
             if (index < instrument.envelopeCount && index !== -2) {
-<<<<<<< HEAD
-                startNote = instrument.pitchEnvelopeStart[index];
-                endNote = instrument.pitchEnvelopeEnd[index];
-                inverse = instrument.envelopeInverse[index];
-            }
-            if (tone) {
-=======
                 startNote = instrument.envelopes[index].pitchEnvelopeStart;
                 endNote = instrument.envelopes[index].pitchEnvelopeEnd;
                 inverse = instrument.envelopes[index].inverse;
@@ -17073,7 +17063,6 @@ var beepbox = (function (exports) {
                 envelopeUpperBound = instrument.envelopes[index].perEnvelopeUpperBound;
             }
             if (tone && tone.pitchCount >= 1) {
->>>>>>> 39d6a279f21c1ac3dfef5c572dce46ea9628adbc
                 const chord = instrument.getChord();
                 const arpeggiates = chord.arpeggiates;
                 const arpeggio = Math.floor(instrumentState.arpTime / Config.ticksPerArpeggio);
@@ -17085,17 +17074,6 @@ var beepbox = (function (exports) {
                 endNote = instrument.isNoiseInstrument ? Config.drumCount - 1 : Config.maxPitch;
             }
             const range = endNote - startNote + 1;
-<<<<<<< HEAD
-            if (inverse) {
-                if (pitch <= startNote) {
-                    return 1;
-                }
-                else if (pitch >= endNote) {
-                    return 0;
-                }
-                else {
-                    return 1 - (pitch - startNote) / range;
-=======
             if (!inverse) {
                 if (pitch <= startNote) {
                     return envelopeLowerBound;
@@ -17105,24 +17083,10 @@ var beepbox = (function (exports) {
                 }
                 else {
                     return (pitch - startNote) * (envelopeUpperBound - envelopeLowerBound) / range + envelopeLowerBound;
->>>>>>> 39d6a279f21c1ac3dfef5c572dce46ea9628adbc
                 }
             }
             else {
                 if (pitch <= startNote) {
-<<<<<<< HEAD
-                    return 0;
-                }
-                else if (pitch >= endNote) {
-                    return 1;
-                }
-                else {
-                    return (pitch - startNote) / range;
-                }
-            }
-        }
-        static getLowpassCutoffDecayVolumeCompensation(envelope) {
-=======
                     return envelopeUpperBound;
                 }
                 else if (pitch >= endNote) {
@@ -17134,7 +17098,6 @@ var beepbox = (function (exports) {
             }
         }
         static getLowpassCutoffDecayVolumeCompensation(envelope, perEnvelopeSpeed = 1) {
->>>>>>> 39d6a279f21c1ac3dfef5c572dce46ea9628adbc
             if (envelope.type == 9)
                 return 1.25 + 0.025 * perEnvelopeSpeed;
             if (envelope.type == 5)

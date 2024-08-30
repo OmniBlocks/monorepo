@@ -7701,9 +7701,9 @@ class EnvelopeComputer {
             }
             case EnvelopeType.fall: {
                 if (inverse) {
-                    return Math.min(Math.max(perEnvelopeLowerBound, perEnvelopeUpperBound - boundAdjust * Math.sqrt(1.0 - envelopeSpeed * time / 2)), perEnvelopeUpperBound);
+                    return Math.min(Math.max(perEnvelopeLowerBound, perEnvelopeUpperBound - boundAdjust * Math.sqrt(Math.max(1.0 - envelopeSpeed * time / 2, 0))), perEnvelopeUpperBound);
                 } else {
-                    return Math.max(perEnvelopeLowerBound, boundAdjust * Math.sqrt(1.0- envelopeSpeed * time/2) + perEnvelopeLowerBound);
+                    return Math.max(perEnvelopeLowerBound, boundAdjust * Math.sqrt(Math.max(1.0- envelopeSpeed * time/2, 0)) + perEnvelopeLowerBound);
                 }
             }
             default: throw new Error("Unrecognized operator envelope type.");
@@ -11335,8 +11335,6 @@ export class Synth {
 
         if (instrument.type == InstrumentType.drumset) {
             const drumsetEnvelopeComputer: EnvelopeComputer = tone.envelopeComputer;
-            drumsetEnvelopeComputer.computeEnvelopes(instrument, currentPart, instrumentState.envelopeTime, Config.ticksPerPart * partTimeStart, samplesPerTick / this.samplesPerSecond, tone, envelopeSpeeds, instrumentState, this.song);
-
 
             const drumsetFilterEnvelope: Envelope = instrument.getDrumsetEnvelope(tone.drumsetPitch!);
 

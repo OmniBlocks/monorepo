@@ -1384,9 +1384,9 @@ export class Config {
         { name: "blip 2", type: EnvelopeType.blip, speed: 16.0 },
         { name: "blip 3", type: EnvelopeType.blip, speed: 32.0 },
         // Slarmoo's Box
-        { name: "fall 1", type: EnvelopeType.fall, speed: 2.0 },
+        { name: "fall 1", type: EnvelopeType.fall, speed: 8.0 },
         { name: "fall 2", type: EnvelopeType.fall, speed: 4.0 },
-        { name: "fall 3", type: EnvelopeType.fall, speed: 8.0 },
+        { name: "fall 3", type: EnvelopeType.fall, speed: 2.0 },
     ]);
 
     public static readonly newEnvelopes: DictionaryArray<Envelope> = toNameMap([

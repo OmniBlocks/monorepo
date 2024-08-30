@@ -361,11 +361,10 @@ export class SpectrumEditorPrompt implements Prompt {
             for (let i: number = Config.drumCount-1; i >= 0 ; i--) {
                 this.spectrumEditors[i] = new SpectrumEditor(this._doc, Config.drumCount - 1 - i, true);
                 this.spectrumEditors[i].setSpectrumWave(this._songEditor._drumsetSpectrumEditors[Config.drumCount - 1-i].getSpectrumWave().spectrum);
-                console.log("here", i, this.spectrumEditors[i].getSpectrumWave());
             }
             let colors = ColorConfig.getChannelColor(this._doc.song, this._doc.channel);
             for (let i: number = 0; i < Config.drumCount ; i++) {
-                let newSpectrumButton: HTMLButtonElement = HTML.button({ class: "no-underline", style: "max-width: 2em;" }, "" + (i));
+                let newSpectrumButton: HTMLButtonElement = HTML.button({ class: "no-underline", style: "max-width: 2em;" }, "" + (i+1));
                 this._drumsetButtons.push(newSpectrumButton);
                 this._drumsetButtonContainer.appendChild(newSpectrumButton);
                 newSpectrumButton.addEventListener("click", () => { this._setDrumSpectrum(i); });
@@ -469,9 +468,22 @@ export class SpectrumEditorPrompt implements Prompt {
         else if (event.keyCode == 221) { // ]
             this._doc.synth.goToNextBar();
         }
-        else if (event.keyCode >= 48 && event.keyCode <= 57) { // 0-9
+        else if (event.keyCode >= 49 && event.keyCode <= 57) { // 1-9
             if (event.shiftKey && this._isDrumset) {
-                this._setDrumSpectrum(event.keyCode - 48);
+                console.log(event.keyCode);
+                this._setDrumSpectrum(event.keyCode - 49);
+            }
+        } else if (event.keyCode == 48) { // 0
+            if (event.shiftKey && this._isDrumset) {
+                this._setDrumSpectrum(9);
+            }
+        } else if (event.keyCode == 189 || event.keyCode == 173) { //-
+            if (event.shiftKey && this._isDrumset) {
+                this._setDrumSpectrum(10);
+            }
+        } else if (event.keyCode == 187 || event.keyCode == 61 || event.keyCode == 171) { //+
+            if (event.shiftKey && this._isDrumset) {
+                this._setDrumSpectrum(11);
             }
         }
     }

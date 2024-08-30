@@ -68,17 +68,14 @@ export class EnvelopeEditor {
 		const upperBoundBoxIndex: number = this.perEnvelopeUpperBoundBoxes.indexOf(<any>event.target);
 		const lowerBoundSliderIndex: number = this._perEnvelopeLowerBoundSliders.indexOf(<any>event.target);
 		const upperBoundSliderIndex: number = this._perEnvelopeUpperBoundSliders.indexOf(<any>event.target);
-		console.log("something is achanging...");
 		if (targetSelectIndex != -1) {
 			const combinedValue: number = parseInt(this._targetSelects[targetSelectIndex].value);
 			const target: number = combinedValue % Config.instrumentAutomationTargets.length;
 			const index: number = (combinedValue / Config.instrumentAutomationTargets.length) >>> 0;
 			this._doc.record(new ChangeSetEnvelopeTarget(this._doc, targetSelectIndex, target, index));
 		} else if (envelopeSelectIndex != -1) {
-			console.log(("here2?"));
 			const envelopeIndex: number = this._envelopeSelects.indexOf(<any>event.target);
 
-			console.log("help1", this._envelopeSelects[envelopeIndex].selectedIndex, Config.newEnvelopes[this._envelopeSelects[envelopeIndex].selectedIndex]);
 			this._doc.record(new ChangeSetEnvelopeType(this._doc, envelopeIndex, this._envelopeSelects[envelopeIndex].selectedIndex));
 
 			//hide different envelope groups based on envelope type
@@ -300,12 +297,10 @@ export class EnvelopeEditor {
 	// public whenSetEnvelopePreset = (event: Event): void => {
 	// 	const envelopeIndex: number = this._envelopeSelects.indexOf(<any>event.target);
 
-	// 	console.log("help1", this._envelopeSelects[envelopeIndex].selectedIndex, this.envelopesScrambled[this._envelopeSelects[envelopeIndex].selectedIndex]);
 	// 	this._doc.record(new ChangeSetEnvelopeType(this._doc, envelopeIndex, this.envelopesScrambled[this._envelopeSelects[envelopeIndex].selectedIndex]));
 
 	// 	//set the speed slider to the right speed
 	// 	const instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
-	// 	console.log("help2", instrument.envelopes[envelopeIndex].envelope, Config.envelopes[instrument.envelopes[envelopeIndex].envelope], this.convertIndexSpeed(Config.envelopes[instrument.envelopes[envelopeIndex].envelope].speed, "index").toString());
 	// 	this._perEnvelopeSpeedSliders[envelopeIndex].value = this.convertIndexSpeed(Config.envelopes[instrument.envelopes[envelopeIndex].envelope].speed, "index").toString();
 	// 	//speed = to index
 	// 	this._perEnvelopeSpeedDisplays[envelopeIndex].textContent = "Spd: x" + prettyNumber(this.convertIndexSpeed(parseFloat(this._perEnvelopeSpeedSliders[envelopeIndex].value), "speed"));
@@ -369,8 +364,8 @@ export class EnvelopeEditor {
 			const startBoxWrapper: HTMLDivElement = HTML.div({ style: "flex: 1; display: flex; flex-direction: column; align-items: center;" }, startNoteDisplay, startNoteBox);
 			const endBoxWrapper: HTMLDivElement = HTML.div({ style: "flex: 1; display: flex; flex-direction: column; align-items: center;" }, endNoteDisplay, endNoteBox);
 
-			const lowerBoundBoxWrapper: HTMLDivElement = HTML.div({ style: "flex: 1; display: flex; flex-direction: column; align-items: center;" }, HTML.span({ class: "tip", style: `width:68px; flex:1; height:1em; font-size: smaller;`, onclick: () => this._openPrompt("envelopeRange") }, "Upr bnd: "), lowerBoundBox);
-			const upperBoundBoxWrapper: HTMLDivElement = HTML.div({ style: "flex: 1; display: flex; flex-direction: column; align-items: center;" }, HTML.span({ class: "tip", style: `width:68px; flex:1; height:1em; font-size: smaller;`, onclick: () => this._openPrompt("envelopeRange") }, "Lwr bnd: "), upperBoundBox);
+			const lowerBoundBoxWrapper: HTMLDivElement = HTML.div({ style: "flex: 1; display: flex; flex-direction: column; align-items: center;" }, HTML.span({ class: "tip", style: `width:68px; flex:1; height:1em; font-size: smaller;`, onclick: () => this._openPrompt("envelopeRange") }, "Lwr bnd: "), lowerBoundBox);
+			const upperBoundBoxWrapper: HTMLDivElement = HTML.div({ style: "flex: 1; display: flex; flex-direction: column; align-items: center;" }, HTML.span({ class: "tip", style: `width:68px; flex:1; height:1em; font-size: smaller;`, onclick: () => this._openPrompt("envelopeRange") }, "Upr bnd: "), upperBoundBox);
 
 			const startNoteWrapper: HTMLDivElement = HTML.div({ style: "margin-top: 3px; flex:1; display:flex; flex-direction: row; align-items:center; justify-content:right;" }, startBoxWrapper, startNoteSlider);
 			const endNoteWrapper: HTMLDivElement = HTML.div({ style: "margin-top: 3px; flex:1; display:flex; flex-direction: row; align-items:center; justify-content:right;" }, endBoxWrapper, endNoteSlider);

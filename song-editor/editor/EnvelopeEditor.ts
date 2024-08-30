@@ -294,22 +294,6 @@ export class EnvelopeEditor {
 		//lots of defaults just in case...
 	}
 
-	// public whenSetEnvelopePreset = (event: Event): void => {
-	// 	const envelopeIndex: number = this._envelopeSelects.indexOf(<any>event.target);
-
-	// 	this._doc.record(new ChangeSetEnvelopeType(this._doc, envelopeIndex, this.envelopesScrambled[this._envelopeSelects[envelopeIndex].selectedIndex]));
-
-	// 	//set the speed slider to the right speed
-	// 	const instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
-	// 	this._perEnvelopeSpeedSliders[envelopeIndex].value = this.convertIndexSpeed(Config.envelopes[instrument.envelopes[envelopeIndex].envelope].speed, "index").toString();
-	// 	//speed = to index
-	// 	this._perEnvelopeSpeedDisplays[envelopeIndex].textContent = "Spd: x" + prettyNumber(this.convertIndexSpeed(parseFloat(this._perEnvelopeSpeedSliders[envelopeIndex].value), "speed"));
-
-	// 	this.perEnvelopeSpeedGroups[envelopeIndex].style.display = Config.envelopes[this._envelopeSelects[envelopeIndex].selectedIndex].name == "pitch" || Config.envelopes[this._envelopeSelects[envelopeIndex].selectedIndex].name == "note size" || Config.envelopes[this._envelopeSelects[envelopeIndex].selectedIndex].name == "none" ? "inline" : "none";
-	// 	this.extraPitchSettingsGroups[envelopeIndex].style.display = Config.envelopes[this._envelopeSelects[envelopeIndex].selectedIndex].name == "pitch" ? "" : "none";
-	// 	this.render();
-	// }
-
 	public render(): void {
 		const instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
 
@@ -374,7 +358,7 @@ export class EnvelopeEditor {
 			const lowerBoundWrapper: HTMLDivElement = HTML.div({ style: "margin-top: 3px; flex:1; display:flex; flex-direction: row; align-items:center; justify-content:right;" }, lowerBoundBoxWrapper, lowerBoundSlider);
 			const upperBoundWrapper: HTMLDivElement = HTML.div({ style: "margin-top: 3px; flex:1; display:flex; flex-direction: row; align-items:center; justify-content:right;" }, upperBoundBoxWrapper, upperBoundSlider);
 
-			const perEnvelopeSpeedSlider: HTMLInputElement = HTML.input({ style: "margin: 0; width: 124px", type: "range", min: 0, max: Config.perEnvelopeSpeedIndices.length - 1, value: this.convertIndexSpeed(instrument.envelopes[envelopeIndex].perEnvelopeSpeed, "index"), step: "1" });
+			const perEnvelopeSpeedSlider: HTMLInputElement = HTML.input({ style: "margin: 0; width: 113px", type: "range", min: 0, max: Config.perEnvelopeSpeedIndices.length - 1, value: this.convertIndexSpeed(instrument.envelopes[envelopeIndex].perEnvelopeSpeed, "index"), step: "1" });
 			const perEnvelopeSpeedDisplay: HTMLSpanElement = HTML.span({ class: "tip", style: `width:68px; flex:1; height:1em; font-size: smaller; margin-left: 10px;`, onclick: () => this._openPrompt("perEnvelopeSpeed") }, "Spd: x" + prettyNumber(this.convertIndexSpeed(parseFloat(perEnvelopeSpeedSlider.value), "speed")));
 			const perEnvelopeSpeedWrapper: HTMLDivElement = HTML.div({ style: "margin-top: 3px; flex:1; display:flex; flex-direction: row; align-items:center; justify-content:right;" }, perEnvelopeSpeedDisplay, perEnvelopeSpeedSlider);
 

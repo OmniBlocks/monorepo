@@ -29,8 +29,9 @@ editor.mainLayer.getElementsByClassName("trackAndMuteContainer")[0].className +=
 editor.mainLayer.getElementsByClassName("barScrollBar")[0].className += " load";
 
 // Give select2 class to these
-$('#pitchPresetSelect').select2({ dropdownAutoWidth: true });
-$('#drumPresetSelect').select2({ dropdownAutoWidth: true });
+$('#pitchPresetSelect').select2({ dropdownAutoWidth: false });
+$('#drumPresetSelect').select2({ dropdownAutoWidth: false });
+// $('#envelopeSelect').select2({ dropdownAutoWidth: true });
 
 // Onclick event to expand/collapse optgroups
 $("body").on('click', '.select2-container--open .select2-results__group', function () {
@@ -79,6 +80,27 @@ $("#drumPresetSelect").on('select2:open', function () {
     }, 0);
 });
 
+//Open event to collapse all optgroups by default
+// $("#envelopeSelect").on('select2:open', function () {
+//     $('.select2-dropdown--below').css('opacity', 0);
+//     $('.select2-dropdown').css('opacity', 1);
+//     $('#envelopeSelect')
+//     setTimeout(() => {
+//         let groups = $('.select2-container--open .select2-results__group');
+//         let options = $('.select2-container--open .select2-results__option');
+
+//         $.each(groups, (index, v) => {
+//             $(v).siblings().hide();
+//             $(v)[0].setAttribute("style", "color: " + ColorConfig.getChannelColor(doc.song, doc.channel).primaryNote + ";");
+//         })
+//         $.each(options, (index, v) => {
+//             $(v)[0].setAttribute("style", "color: " + ColorConfig.getChannelColor(doc.song, doc.channel).primaryNote + ";");
+//         })
+
+//         $('.select2-dropdown--below').css('opacity', 1);
+//     }, 0);
+// });
+
 // Select2 events
 // The latter is to ensure select2 doesn't keep focus after the select2 is closed without making a selection.
 $('#pitchPresetSelect').on("change", editor._whenSetPitchedPreset);
@@ -87,7 +109,15 @@ $('#pitchPresetSelect').on("select2:close", editor._refocus);
 $('#drumPresetSelect').on("change", editor._whenSetDrumPreset);
 $('#drumPresetSelect').on("select2:close", editor._refocus);
 
+// $('#envelopeSelect').on("change", (change: Event) => { editor.envelopeEditor.whenSetEnvelopePreset(change); console.log("here4???") });
+// $('#envelopeSelect').on("select2:close", editor._refocus);
 
+// $('#envelopeSelect').each((index, v) => {
+//     $(v)[0].setAttribute("style", "width: 68.6667px")
+//     if ($(v)[0].firstChild) {
+//         $(v)[0].firstChild!.removeChild((v).getElementsByClassName("select2-selection__arrow")[0]);
+//     }
+// });
 editor.mainLayer.focus();
 
 // don't autoplay on mobile devices, wait for input.

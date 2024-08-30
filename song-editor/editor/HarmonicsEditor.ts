@@ -38,7 +38,10 @@ export class HarmonicsEditor {
     private instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
     private readonly _initial: HarmonicsWave = this.instrument.harmonicsWave;
 
-    constructor(private _doc: SongDocument) {
+    private _undoHistoryState: number = 0;
+    private _changeQueue: number[][] = [];
+
+    constructor(private _doc: SongDocument, private _isPrompt: boolean = false) {
         for (let i: number = 1; i <= Config.harmonicsControlPoints; i = i * 2) {
             this._octaves.appendChild(SVG.rect({ fill: ColorConfig.tonic, x: (i - 0.5) * (this._editorWidth - 8) / (Config.harmonicsControlPoints - 1) - 1, y: 0, width: 2, height: this._editorHeight }));
         }
@@ -51,6 +54,8 @@ export class HarmonicsEditor {
             this._lastControlPointContainer.appendChild(rect);
         }
 
+        this.storeChange();
+
         this.container.addEventListener("mousedown", this._whenMousePressed);
         document.addEventListener("mousemove", this._whenMouseMoved);
         document.addEventListener("mouseup", this._whenCursorReleased);
@@ -59,6 +64,55 @@ export class HarmonicsEditor {
         this.container.addEventListener("touchmove", this._whenTouchMoved);
         this.container.addEventListener("touchend", this._whenCursorReleased);
         this.container.addEventListener("touchcancel", this._whenCursorReleased);
+    }
+
+    public storeChange = (): void => {
+        // Check if change is unique compared to the current history state
+        var sameCheck = true;
+        if (this._changeQueue.length > 0) {
+            for (var i = 0; i < Config.harmonicsControlPoints; i++) {
+                if (this._changeQueue[this._undoHistoryState][i] != this.instrument.harmonicsWave.harmonics[i]) {
+                    sameCheck = false; i = Config.harmonicsControlPoints;
+                }
+            }
+        }
+
+        if (sameCheck == false || this._changeQueue.length == 0) {
+
+            // Create new branch in history, removing all after this in time
+            this._changeQueue.splice(0, this._undoHistoryState);
+
+            this._undoHistoryState = 0;
+
+            this._changeQueue.unshift(this.instrument.harmonicsWave.harmonics.slice());
+
+            // 32 undo max
+            if (this._changeQueue.length > 32) {
+                this._changeQueue.pop();
+            }
+
+        }
+
+    }
+
+    public undo = (): void => {
+        // Go backward, if there is a change to go back to
+        if (this._undoHistoryState < this._changeQueue.length - 1) {
+            this._undoHistoryState++;
+            const harmonics: number[] = this._changeQueue[this._undoHistoryState].slice();
+            this.setHarmonicsWave(harmonics);
+        }
+
+    }
+
+    public redo = (): void => {
+        // Go forward, if there is a change to go to
+        if (this._undoHistoryState > 0) {
+            this._undoHistoryState--;
+            const harmonics: number[] = this._changeQueue[this._undoHistoryState].slice();
+            this.setHarmonicsWave(harmonics);
+        }
+
     }
 
     private _xToFreq(x: number): number {
@@ -150,7 +204,10 @@ export class HarmonicsEditor {
 
     private _whenCursorReleased = (event: Event): void => {
         if (this._mouseDown) {
-            this._doc.record(this._change!);
+            if (!this._isPrompt) {
+                this._doc.record(this._change!);
+            }
+            this.storeChange();
             this._change = null;
         }
         this._mouseDown = false;
@@ -170,9 +227,9 @@ export class HarmonicsEditor {
         this.render();
     }
 
-    public saveSettings() {
+    public saveSettings(): ChangeHarmonics {
         const instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
-        this._doc.record(new ChangeHarmonics(this._doc, instrument, instrument.harmonicsWave));
+        return new ChangeHarmonics(this._doc, instrument, instrument.harmonicsWave);
     }
 
     public resetToInitial() {
@@ -217,7 +274,7 @@ export class HarmonicsEditor {
 
 export class HarmonicsEditorPrompt implements Prompt {
 
-    public readonly harmonicsEditor: HarmonicsEditor = new HarmonicsEditor(this._doc);
+    public readonly harmonicsEditor: HarmonicsEditor = new HarmonicsEditor(this._doc, true);
 
     public readonly _playButton: HTMLButtonElement = HTML.button({ style: "width: 55%;", type: "button" });
 
@@ -293,7 +350,7 @@ export class HarmonicsEditorPrompt implements Prompt {
 
     private _close = (): void => {
         this._doc.prompt = null;
-        this.harmonicsEditor.resetToInitial();
+        this._doc.undo();
     }
 
     public cleanUp = (): void => {
@@ -312,6 +369,7 @@ export class HarmonicsEditorPrompt implements Prompt {
     private _pasteSettings = (): void => {
         const storedHarmonicsWave: any = JSON.parse(String(window.localStorage.getItem("harmonicsCopy")));
         this.harmonicsEditor.setHarmonicsWave(storedHarmonicsWave);
+        this.harmonicsEditor.storeChange();
     }
 
     public whenKeyPressed = (event: KeyboardEvent): void => {
@@ -322,14 +380,14 @@ export class HarmonicsEditorPrompt implements Prompt {
             this._togglePlay();
             event.preventDefault();
         }
-        // else if (event.keyCode == 90) { // z
-        //     this.additiveEditor.undo();
-        //     event.stopPropagation();
-        // }
-        // else if (event.keyCode == 89) { // y
-        //     this.additiveEditor.redo();
-        //     event.stopPropagation();
-        // }
+        else if (event.keyCode == 90) { // z
+            this.harmonicsEditor.undo();
+            event.stopPropagation();
+        }
+        else if (event.keyCode == 89) { // y
+            this.harmonicsEditor.redo();
+            event.stopPropagation();
+        }
         else if (event.keyCode == 219) { // [
             this._doc.synth.goToPrevBar();
         }
@@ -340,7 +398,7 @@ export class HarmonicsEditorPrompt implements Prompt {
 
     private _saveChanges = (): void => {
         this._doc.prompt = null;
-        //save again just in case
-        this.harmonicsEditor.saveSettings();
+        this._doc.record(this.harmonicsEditor.saveSettings(), true);
+        this._doc.prompt = null;
     }
 }

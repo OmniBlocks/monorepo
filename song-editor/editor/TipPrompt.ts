@@ -381,8 +381,17 @@ export class TipPrompt implements Prompt {
 			case "envelopeSpeed": {
 				message = div(
 					h2("Envelope Speed"),
-					p("This setting controls the speed of ALL envelopes for the instrument. Each envelope 'plays' at a certain speed, and this slider can scale it to play faster or slower. Use this to fine-tune your tremolo or how fast something decays to get just the right effect."),
+					p("This setting controls the speed of ALL envelopes for the instrument. Each envelope 'plays' at a certain speed, and this slider can scale it to play faster or slower. You can use this to fine-tune your tremolo or how fast something decays to get just the right effect."),
 					p("Note that, while this setting is limited in the sense that it controls all envelopes at once, you can still achieve a variety of outcomes by trying combinations of modes of each envelope type, which typically differ only in speed."),
+				);
+			} break;
+			case "perEnvelopeSpeed": {
+				message = div(
+					h2("Individual Envelope Speed"),
+					p("This setting is applied per envelope rather than all of them simultaneously, unlike the envelope speed in the top dropdown."),
+					p("This controls the speed of this envelope as a multiplier of the global envelope speed and the envelope curve"),
+					p("The speed of an envelope changes how fast its runs. In BeepBox, this is equivalent to the numbers beside each envelope type's name."),
+					p("This setting will not appear for note size or pitch envelopes"),
 				);
 			} break;
 			case "usedInstrument": {
@@ -550,27 +559,28 @@ export class TipPrompt implements Prompt {
 				message = div(
 					h2("Pitch Envelope Start and End"),
 					p("These two settings will adjust where the start and end of the pitch envelope affects. Everything below start envelope will be 0, everything above end envelope will be 1, and everything inbetween will scale linearly based on pitch (the opposite is true if inverted)."),
-					p("This will NOT work properly if pitch start is greater than pitch end"),
+					p("This will NOT work properly if pitch start is greater than pitch end."),
 				);
 			} break;
-			case "pitchInvert": {
+			case "envelopeInvert": {
 				message = div(
-					h2("Pitch Envelope Inversion"),
-					p("This setting will invert which direction increases the value. So instead of a higher pitch leading to a higher value, a lower pitch can lead to a higher value."),
-				);
-			} break;
-			case "noteSizeInvert": {
-				message = div(
-					h2("Note Size Envelope Inversion"),
-					p("This settings will invert whether a greater note size increases or decreases the value. This can be great if you want one effect to fade in as another fades out"),
+					h2("Envelope Inversion"),
+					p("This setting will invert the envelope curve. So instead of, for example, lower pitches leading to a smaller output, lower pitches can lead to a greater output."),
 				);
 			} break;
 			case "additive": {
 				message = div(
 					h2("Additive Instrument"),
-					p("The \"Additive\" instrument type works very similar to harmonics, but instead of working with just sine waves, you can combine many different types of waves"),
-					p("These waves are: sines, squares, triangles, sawtooths, and ramps (a sawtooth wave flipped over the y-axis). All of these are technically sine approximations of each waveform, but they function effectively the same"),
+					p("The \"Additive\" instrument type works very similar to harmonics, but instead of working with just sine waves, you can combine many different types of waves."),
+					p("These waves are: sines, squares, triangles, sawtooths, and ramps (a sawtooth wave flipped over the y-axis). All of these are technically sine approximations of each waveform, but they function effectively the same."),
 				);
+			} break;
+			case "envelopeRange": {
+				message = div(
+					h2("Envelope Bounds"),
+					p("These two settings stretch or shrink the envelope vertically, allowing for different ranges of affect."),
+					p("This will NOT work properly if lower bound is greater than upper bound."),
+				)
 			} break;
 
 			default:

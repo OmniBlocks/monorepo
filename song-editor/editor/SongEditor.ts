@@ -96,7 +96,7 @@ function buildPresetOptions(isNoise: boolean, idSet: string): HTMLSelectElement 
         menu.appendChild(option({ value: InstrumentType.fm6op }, EditorConfig.instrumentToPreset(InstrumentType.fm6op)!.name));
         menu.appendChild(option({ value: InstrumentType.harmonics }, EditorConfig.valueToPreset(InstrumentType.harmonics)!.name));
         menu.appendChild(option({ value: InstrumentType.pickedString }, EditorConfig.valueToPreset(InstrumentType.pickedString)!.name));
-        menu.appendChild(option({ value: InstrumentType.additive }, EditorConfig.instrumentToPreset(InstrumentType.additive)!.name)); //needs to be instrumentToPreset instead of valueToPreset to account for mod type
+        //menu.appendChild(option({ value: InstrumentType.additive }, EditorConfig.instrumentToPreset(InstrumentType.additive)!.name)); //needs to be instrumentToPreset instead of valueToPreset to account for mod type
         menu.appendChild(option({ value: InstrumentType.spectrum }, EditorConfig.valueToPreset(InstrumentType.spectrum)!.name));
         menu.appendChild(option({ value: InstrumentType.noise }, EditorConfig.valueToPreset(InstrumentType.noise)!.name));
     }
@@ -1040,7 +1040,7 @@ export class SongEditor {
 
 
     //SongEditor.ts
-    private readonly _envelopeEditor: EnvelopeEditor = new EnvelopeEditor(this._doc, (id: number, submenu: number, subtype: string) => this._toggleDropdownMenu(id, submenu, subtype), (name: string) => this._openPrompt(name));
+    readonly envelopeEditor: EnvelopeEditor = new EnvelopeEditor(this._doc, (id: number, submenu: number, subtype: string) => this._toggleDropdownMenu(id, submenu, subtype), (name: string) => this._openPrompt(name));
     private readonly _discreteEnvelopeBox: HTMLInputElement = input({ type: "checkbox", style: "width: 1em; padding: 0; margin-right: 4em;" });
     private readonly _discreteEnvelopeRow: HTMLElement = div({ class: "selectRow dropFader" }, span({ class: "tip", style: "margin-left:4px;", onclick: () => this._openPrompt("discreteEnvelope") }, "‣ Discrete:"), this._discreteEnvelopeBox);
     private readonly _envelopeSpeedDisplay: HTMLSpanElement = span({ style: `color: ${ColorConfig.secondaryText}; font-size: smaller; text-overflow: clip;` }, "x1");
@@ -1050,6 +1050,7 @@ export class SongEditor {
     private readonly _envelopeDropdown: HTMLButtonElement = button({ style: "margin-left:0em; margin-right: 1em; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: () => this._toggleDropdownMenu(DropdownID.Envelope) }, "▼");
 
     private readonly _drumsetGroup: HTMLElement = div({ class: "editor-controls" });
+    private readonly _drumsetZoom: HTMLButtonElement = button({ style: "margin-left:0em; padding-left:0.3em; margin-right:0.5em; height:1.5em; max-width: 16px;", onclick: () => this._openPrompt("drumsetSettings") }, "+");
     private readonly _modulatorGroup: HTMLElement = div({ class: "editor-controls" });
     private readonly _modNameRows: HTMLElement[];
     private readonly _modChannelBoxes: HTMLSelectElement[];
@@ -1195,7 +1196,7 @@ export class SongEditor {
             this._addEnvelopeButton,
         ),
         this._envelopeDropdownGroup,
-        this._envelopeEditor.container,
+        this.envelopeEditor.container,
     );
     private readonly _instrumentCopyGroup: HTMLDivElement = div({ class: "editor-controls" },
         div({ class: "selectRow" },
@@ -1393,7 +1394,7 @@ export class SongEditor {
     private readonly _operatorWaveformPulsewidthSliders: Slider[] = [];
     private readonly _operatorDropdownRows: HTMLElement[] = []
     private readonly _operatorDropdownGroups: HTMLDivElement[] = [];
-    private readonly _drumsetSpectrumEditors: SpectrumEditor[] = [];
+    readonly _drumsetSpectrumEditors: SpectrumEditor[] = [];
     private readonly _drumsetEnvelopeSelects: HTMLSelectElement[] = [];
     private _showModSliders: boolean[] = [];
     private _newShowModSliders: boolean[] = [];
@@ -1499,6 +1500,7 @@ export class SongEditor {
             div({ class: "selectRow" },
                 span({ class: "tip", onclick: () => this._openPrompt("drumsetEnvelope") }, "Envelope:"),
                 span({ class: "tip", onclick: () => this._openPrompt("drumsetSpectrum") }, "Spectrum:"),
+                this._drumsetZoom,
             ),
         );
         for (let i: number = Config.drumCount - 1; i >= 0; i--) {
@@ -1800,9 +1802,9 @@ export class SongEditor {
                 group = this._unisonDropdownGroup;
                 break;
             case DropdownID.EnvelopeSettings:
-                target = this._envelopeEditor.extraSettingsDropdowns[submenu];
-                this._envelopeEditor.openExtraSettingsDropdowns[submenu] = this._envelopeEditor.openExtraSettingsDropdowns[submenu] ? false : true;
-                group = this._envelopeEditor.extraSettingsDropdownGroups[submenu];
+                target = this.envelopeEditor.extraSettingsDropdowns[submenu];
+                this.envelopeEditor.openExtraSettingsDropdowns[submenu] = this.envelopeEditor.openExtraSettingsDropdowns[submenu] ? false : true;
+                group = this.envelopeEditor.extraSettingsDropdownGroups[submenu];
                 break;
         }
 
@@ -1812,11 +1814,17 @@ export class SongEditor {
             if (dropdown == DropdownID.EnvelopeSettings) {
                 group.style.display = "flex";
                 if (subtype == "pitch") { 
-                    this._envelopeEditor.extraPitchSettingsGroups[submenu].style.display = "flex";
+                    this.envelopeEditor.extraPitchSettingsGroups[submenu].style.display = "flex";
+                    this.envelopeEditor.perEnvelopeSpeedGroups[submenu].style.display = "none";
                 } else {
-                    this._envelopeEditor.extraPitchSettingsGroups[submenu].style.display = "none";
+                    this.envelopeEditor.extraPitchSettingsGroups[submenu].style.display = "none";
+                    if (subtype == "notesize" || subtype == "none") {
+                        this.envelopeEditor.perEnvelopeSpeedGroups[submenu].style.display = "none";
+                    } else {
+                        this.envelopeEditor.perEnvelopeSpeedGroups[submenu].style.display = "flex";
+                    }
                 }
-                this._envelopeEditor.rerenderExtraSettings();
+                this.envelopeEditor.rerenderExtraSettings();
             } else if (group != this._chordDropdownGroup) {
                 group.style.display = "";
             } // Only show arpeggio dropdown if chord arpeggiates
@@ -1841,9 +1849,8 @@ export class SongEditor {
             }
             target.textContent = "▼";
             group.style.display = "none";
-            if (subtype == "pitch") {
-                this._envelopeEditor.extraPitchSettingsGroups[submenu].style.display = "none";
-            }
+            this.envelopeEditor.extraPitchSettingsGroups[submenu].style.display = "none";
+            this.envelopeEditor.perEnvelopeSpeedGroups[submenu].style.display = "none";
         }
     }
 
@@ -2135,7 +2142,10 @@ export class SongEditor {
                     this.prompt = new HarmonicsEditorPrompt(this._doc, this);
                     break;
                 case "spectrumSettings":
-                    this.prompt = new SpectrumEditorPrompt(this._doc, this);
+                    this.prompt = new SpectrumEditorPrompt(this._doc, this, false);
+                    break;
+                case "drumsetSettings":
+                    this.prompt = new SpectrumEditorPrompt(this._doc, this, true);
                     break;
                 default:
                     this.prompt = new TipPrompt(this._doc, promptName);
@@ -2834,8 +2844,8 @@ export class SongEditor {
             else
                 this._envelopeDropdownGroup.style.display = "none";
 
-            this._envelopeEditor.render();
-            this._envelopeEditor.rerenderExtraSettings();
+            this.envelopeEditor.render();
+            this.envelopeEditor.rerenderExtraSettings();
             this._additiveEditor.rerenderWave();
 
             for (let chordIndex: number = 0; chordIndex < Config.chords.length; chordIndex++) {
@@ -3843,8 +3853,10 @@ export class SongEditor {
             || document.activeElement == this._unisonOffsetInputBox
             || document.activeElement == this._unisonExpressionInputBox
             || document.activeElement == this._unisonSignInputBox
-            || this._envelopeEditor.pitchStartBoxes.find((element) => element == document.activeElement)
-            || this._envelopeEditor.pitchEndBoxes.find((element) => element == document.activeElement)
+            || this.envelopeEditor.pitchStartBoxes.find((element) => element == document.activeElement)
+            || this.envelopeEditor.pitchEndBoxes.find((element) => element == document.activeElement)
+            || this.envelopeEditor.perEnvelopeLowerBoundBoxes.find((element) => element == document.activeElement)
+            || this.envelopeEditor.perEnvelopeUpperBoundBoxes.find((element) => element == document.activeElement)
 
         ) {
             // Enter/esc returns focus to form
@@ -4398,7 +4410,7 @@ export class SongEditor {
                     this._doc.selection.setChannelBar((this._doc.channel - 1 + this._doc.song.getChannelCount()) % this._doc.song.getChannelCount(), this._doc.bar);
                     this._doc.selection.resetBoxSelection();
                     //envelopes aren't rerendering when channels are changed so...
-                    this._envelopeEditor.rerenderExtraSettings();
+                    this.envelopeEditor.rerenderExtraSettings();
                     this._additiveEditor.rerenderWave();
 
                 }
@@ -4414,7 +4426,7 @@ export class SongEditor {
                 } else {
                     this._doc.selection.setChannelBar((this._doc.channel + 1) % this._doc.song.getChannelCount(), this._doc.bar);
                     this._doc.selection.resetBoxSelection();
-                    this._envelopeEditor.rerenderExtraSettings();
+                    this.envelopeEditor.rerenderExtraSettings();
                     this._additiveEditor.rerenderWave();
 
                 }

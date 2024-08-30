@@ -23,10 +23,10 @@
 </head>
 <body>
     <script>
-        window.location.href = "./website/" + removeURL(window.location.href);
-
+        window.location.href = "../website/" + removeURL(window.location.href);
+        console.log("here!");
         function removeURL(string) {
-                return string.replace(/https?:\/\/[\w\.\:\/]*/, ""); // remove first instance of url
+                return string.replace(/https?:\/\/[\w\.\:\/]*#song=/, "#"); // remove first instance of url
         }
     </script>
 </body>

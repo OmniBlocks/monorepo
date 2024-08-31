@@ -18869,10 +18869,10 @@ li.select2-results__option[role=group] > strong:hover {
                     }
                 case 3:
                     if (inverse) {
-                        return Math.max(0, 2.0 - Math.max(1.0 - perEnvelopeLowerBound, 1.0 - perEnvelopeUpperBound - time * 10.0));
+                        return Math.max(0, perEnvelopeUpperBound + 1.0 - Math.max(1.0 - perEnvelopeLowerBound, 1.0 - perEnvelopeUpperBound - unspedTime * 10.0));
                     }
                     else {
-                        return Math.max(1.0 + perEnvelopeLowerBound, 1.0 + perEnvelopeUpperBound - time * 10.0);
+                        return Math.max(1.0 + perEnvelopeLowerBound, 1.0 + perEnvelopeUpperBound - unspedTime * 10.0);
                     }
                 case 4:
                     const attack = 0.25 / Math.sqrt(envelopeSpeed * perEnvelopeSpeed);

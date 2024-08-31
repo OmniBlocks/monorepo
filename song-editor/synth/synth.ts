@@ -7650,9 +7650,9 @@ class EnvelopeComputer {
                 }
             case EnvelopeType.punch: 
                 if (inverse) {
-                    return Math.max(0, 2.0 - Math.max(1.0 - perEnvelopeLowerBound, 1.0 - perEnvelopeUpperBound - time * 10.0)); //punch special case: 2- instead of 1-
+                    return Math.max(0, perEnvelopeUpperBound+1.0 - Math.max(1.0 - perEnvelopeLowerBound, 1.0 - perEnvelopeUpperBound - unspedTime * 10.0)); //punch special case: 2- instead of 1-
                 } else {
-                    return Math.max(1.0+perEnvelopeLowerBound, 1.0+perEnvelopeUpperBound - time * 10.0);
+                    return Math.max(1.0+perEnvelopeLowerBound, 1.0+perEnvelopeUpperBound - unspedTime * 10.0);
                 }
             case EnvelopeType.flare: 
                 const attack: number = 0.25 / Math.sqrt(envelopeSpeed * perEnvelopeSpeed); //flare and blip need to be handled a little differently with envelope speeds. I have to use the old system

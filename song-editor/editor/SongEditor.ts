@@ -1813,17 +1813,17 @@ export class SongEditor {
             target.textContent = "▲";
             if (dropdown == DropdownID.EnvelopeSettings) {
                 group.style.display = "flex";
-                if (subtype == "pitch") { 
-                    this.envelopeEditor.extraPitchSettingsGroups[submenu].style.display = "flex";
-                    this.envelopeEditor.perEnvelopeSpeedGroups[submenu].style.display = "none";
-                } else {
-                    this.envelopeEditor.extraPitchSettingsGroups[submenu].style.display = "none";
-                    if (subtype == "notesize" || subtype == "none") {
-                        this.envelopeEditor.perEnvelopeSpeedGroups[submenu].style.display = "none";
-                    } else {
-                        this.envelopeEditor.perEnvelopeSpeedGroups[submenu].style.display = "flex";
-                    }
-                }
+                // if (subtype == "pitch") { 
+                //     this.envelopeEditor.extraPitchSettingsGroups[submenu].style.display = "flex";
+                //     this.envelopeEditor.perEnvelopeSpeedGroups[submenu].style.display = "none";
+                // } else {
+                //     this.envelopeEditor.extraPitchSettingsGroups[submenu].style.display = "none";
+                //     if (subtype == "notesize" || subtype == "none" || subtype == "punch") {
+                //         this.envelopeEditor.perEnvelopeSpeedGroups[submenu].style.display = "none";
+                //     } else {
+                //         this.envelopeEditor.perEnvelopeSpeedGroups[submenu].style.display = "flex";
+                //     }
+                // }
                 this.envelopeEditor.rerenderExtraSettings();
             } else if (group != this._chordDropdownGroup) {
                 group.style.display = "";
@@ -1849,8 +1849,6 @@ export class SongEditor {
             }
             target.textContent = "▼";
             group.style.display = "none";
-            this.envelopeEditor.extraPitchSettingsGroups[submenu].style.display = "none";
-            this.envelopeEditor.perEnvelopeSpeedGroups[submenu].style.display = "none";
         }
     }
 

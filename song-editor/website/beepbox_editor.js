@@ -35223,9 +35223,9 @@ You should be redirected to the song at:<br /><br />
         convertIndexSpeed(value, convertTo) {
             switch (convertTo) {
                 case "index":
-                    return Config.perEnvelopeSpeedToIndices[value] ? Config.perEnvelopeSpeedToIndices[value] : 23;
+                    return Config.perEnvelopeSpeedToIndices[value] != null ? Config.perEnvelopeSpeedToIndices[value] : 23;
                 case "speed":
-                    return Config.perEnvelopeSpeedIndices[value] ? Config.perEnvelopeSpeedIndices[value] : 1;
+                    return Config.perEnvelopeSpeedIndices[value] != null ? Config.perEnvelopeSpeedIndices[value] : 1;
             }
             return 0;
         }

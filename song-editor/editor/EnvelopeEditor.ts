@@ -286,9 +286,9 @@ export class EnvelopeEditor {
 	private convertIndexSpeed(value: number, convertTo: string): number {
 		switch (convertTo) {
 			case "index":
-				return Config.perEnvelopeSpeedToIndices[value] ? Config.perEnvelopeSpeedToIndices[value] : 23;
+				return Config.perEnvelopeSpeedToIndices[value] != null ? Config.perEnvelopeSpeedToIndices[value] : 23;
 			case "speed":
-				return Config.perEnvelopeSpeedIndices[value] ? Config.perEnvelopeSpeedIndices[value] : 1;
+				return Config.perEnvelopeSpeedIndices[value] != null ? Config.perEnvelopeSpeedIndices[value] : 1;
 		} 
 		return 0;
 		//lots of defaults just in case...

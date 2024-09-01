@@ -1451,14 +1451,11 @@ export class EnvelopeSettings {
         if (target == null) target = Config.instrumentAutomationTargets.dictionary["noteVolume"];
         this.target = target.index;
 
-        console.log("1", envelopeObject["envelope"]);
         let envelope: Envelope = format == "slarmoosbox" ? Config.newEnvelopes.dictionary[envelopeObject["envelope"]] : Config.newEnvelopes[Config.envelopes.dictionary[envelopeObject["envelope"]].type];
-        console.log("2", envelope);
         if (envelope == undefined) {
             envelope = Config.newEnvelopes[Config.envelopes.dictionary[envelopeObject["envelope"]].type];
         } 
         if (envelope == null) envelope = Config.envelopes.dictionary["none"];
-        console.log("3", envelope);
         this.envelope = envelope.index;
 
         if (envelopeObject["index"] != undefined) {

@@ -470,7 +470,6 @@ export class SpectrumEditorPrompt implements Prompt {
         }
         else if (event.keyCode >= 49 && event.keyCode <= 57) { // 1-9
             if (event.shiftKey && this._isDrumset) {
-                console.log(event.keyCode);
                 this._setDrumSpectrum(event.keyCode - 49);
             }
         } else if (event.keyCode == 48) { // 0

@@ -10089,6 +10089,7 @@ export class Synth {
                                 instrumentState.arpTime += (1 - (useArpeggioSpeed % 1)) * Config.arpSpeedScale[Math.floor(useArpeggioSpeed)] + (useArpeggioSpeed % 1) * Config.arpSpeedScale[Math.ceil(useArpeggioSpeed)];
                             }
                         }
+                        envelopeComputer.clearEnvelopes();
 
                     }
                 }

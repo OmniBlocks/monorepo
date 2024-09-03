@@ -1615,7 +1615,7 @@ var beepbox = (function (exports) {
             return (_a = EditorConfig.presetCategories[0].presets.dictionary) === null || _a === void 0 ? void 0 : _a[TypePresets === null || TypePresets === void 0 ? void 0 : TypePresets[instrument]];
         }
     }
-    EditorConfig.version = "1.2.1";
+    EditorConfig.version = "1.2.2";
     EditorConfig.versionDisplayName = "Slarmoo's Box " + EditorConfig.version;
     EditorConfig.releaseNotesURL = "./patch_notes.html";
     EditorConfig.isOnMac = /^Mac/i.test(navigator.platform) || /Mac OS X/i.test(navigator.userAgent) || /^(iPhone|iPad|iPod)/i.test(navigator.platform) || /(iPhone|iPad|iPod)/i.test(navigator.userAgent);
@@ -18789,7 +18789,6 @@ li.select2-results__option[role=group] > strong:hover {
                     this.envelopeStarts[computeIndex] *= envelopeStart;
                     this.envelopeEnds[computeIndex] *= envelopeEnd;
                     this._modifiedEnvelopeIndices[this._modifiedEnvelopeCount++] = computeIndex;
-                    console.log(this._modifiedEnvelopeIndices);
                     if (automationTarget.isFilter) {
                         const filterSettings = (instrument.tmpNoteFilterStart != null) ? instrument.tmpNoteFilterStart : instrument.noteFilter;
                         if (filterSettings.controlPointCount > targetIndex && filterSettings.controlPoints[targetIndex].type == 0) {

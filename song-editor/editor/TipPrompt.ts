@@ -391,7 +391,8 @@ export class TipPrompt implements Prompt {
 					p("This setting is applied per envelope rather than all of them simultaneously, unlike the envelope speed in the top dropdown."),
 					p("This controls the speed of this envelope as a multiplier of the global envelope speed and the envelope curve"),
 					p("The speed of an envelope changes how fast its runs. In BeepBox, this is equivalent to the numbers beside each envelope type's name."),
-					p("This setting will not appear for note size or pitch envelopes"),
+					p("You can see an equivalence chart on the ", HTML.a({ href: "./faq.html", target: "_blank" }, "FAQ"), " page"),
+					p("This setting will not appear for note size, pitch, punch, or none envelopes"),
 				);
 			} break;
 			case "usedInstrument": {

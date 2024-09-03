@@ -885,9 +885,7 @@ export class ChangeRandomGeneratedInstrument extends Change {
                     { item: "fall 1", weight: 2 },
                     { item: "fall 2", weight: 2 },
                     { item: "fall 3", weight: 1 },
-                ])].index, false, selectWeightedRandom([{ item: 0, weight: 8 }, { item: 3, weight: 2 }, { item: 6, weight: 1 }]),
-                    selectWeightedRandom([{ item: 12, weight: 8 }, { item: 9, weight: 2 }, { item: 6, weight: 1 }]),
-                    selectWeightedRandom([{ item: false, weight: 3 }, { item: true, weight: 1 }]));
+                ])].index, false);
             }
             if (Math.random() < 0.1) {
                 instrument.effects |= 1 << EffectType.distortion;
@@ -1638,8 +1636,20 @@ export class ChangeRandomGeneratedInstrument extends Change {
                 default: throw new Error("Unhandled pitched instrument type in random generator.");
             }
         }
+        
         doc.notifier.changed();
         this._didSomething();
+
+        // doc.synth.pause();
+        // doc.synth.play();
+
+        // const instrumentState = doc.synth.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+        // instrumentState.resetAllEffects(); //reset instrumentState
+        // instrumentState.allocateNecessaryBuffers(doc.synth, instrument, doc.synth.getSamplesPerTick());
+        // instrumentState.updateWaves(instrument, doc.synth.samplesPerSecond);
+        // instrumentState.compute(doc.synth, instrument, doc.synth.getSamplesPerTick(), Math.ceil(doc.synth.getSamplesPerTick()), null, doc.channel, doc.getCurrentInstrument());
+        // console.log(doc.channel, doc.getCurrentInstrument(), doc.synth.channels[doc.channel].instruments[doc.getCurrentInstrument()]);
+
     }
 }
 

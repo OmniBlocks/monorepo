@@ -1485,13 +1485,13 @@ export class EnvelopeSettings {
         }
 
         if (envelopeObject["perEnvelopeLowerBound"] != undefined) {
-            this.perEnvelopeLowerBound = clamp(Config.perEnvelopeBoundMin, Config.perEnvelopeBoundMax, envelopeObject["perEnvelopeLowerBound"]);
+            this.perEnvelopeLowerBound = envelopeObject["perEnvelopeLowerBound"];
         } else {
             this.perEnvelopeLowerBound = 0;
         }
 
         if (envelopeObject["perEnvelopeUpperBound"] != undefined) {
-            this.perEnvelopeUpperBound = clamp(Config.perEnvelopeBoundMin, Config.perEnvelopeBoundMax, envelopeObject["perEnvelopeUpperBound"]);
+            this.perEnvelopeUpperBound = envelopeObject["perEnvelopeUpperBound"];
         } else {
             this.perEnvelopeUpperBound = 1;
         }

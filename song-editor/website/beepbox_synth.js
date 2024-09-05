@@ -1598,7 +1598,7 @@ var beepbox = (function (exports) {
             return (_a = EditorConfig.presetCategories[0].presets.dictionary) === null || _a === void 0 ? void 0 : _a[TypePresets === null || TypePresets === void 0 ? void 0 : TypePresets[instrument]];
         }
     }
-    EditorConfig.version = "1.2.2";
+    EditorConfig.version = "1.2.3";
     EditorConfig.versionDisplayName = "Slarmoo's Box " + EditorConfig.version;
     EditorConfig.releaseNotesURL = "./patch_notes.html";
     EditorConfig.isOnMac = /^Mac/i.test(navigator.platform) || /Mac OS X/i.test(navigator.userAgent) || /^(iPhone|iPad|iPod)/i.test(navigator.platform) || /(iPhone|iPad|iPod)/i.test(navigator.userAgent);
@@ -3501,13 +3501,13 @@ var beepbox = (function (exports) {
                 this.perEnvelopeSpeed = Config.envelopes.dictionary[envelopeObject["envelope"]].speed;
             }
             if (envelopeObject["perEnvelopeLowerBound"] != undefined) {
-                this.perEnvelopeLowerBound = clamp(Config.perEnvelopeBoundMin, Config.perEnvelopeBoundMax, envelopeObject["perEnvelopeLowerBound"]);
+                this.perEnvelopeLowerBound = envelopeObject["perEnvelopeLowerBound"];
             }
             else {
                 this.perEnvelopeLowerBound = 0;
             }
             if (envelopeObject["perEnvelopeUpperBound"] != undefined) {
-                this.perEnvelopeUpperBound = clamp(Config.perEnvelopeBoundMin, Config.perEnvelopeBoundMax, envelopeObject["perEnvelopeUpperBound"]);
+                this.perEnvelopeUpperBound = envelopeObject["perEnvelopeUpperBound"];
             }
             else {
                 this.perEnvelopeUpperBound = 1;

@@ -12,7 +12,7 @@ export class oscilascopeCanvas {
                 ctx.fillStyle = ColorConfig.getComputed("--editor-background");
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-                ctx.fillStyle = ColorConfig.getComputed("--oscilloscope-line-L") !== "" ? ColorConfig.getComputed("--oscilloscope-line-L") : ColorConfig.getComputed("--primary-text");
+                ctx.fillStyle = ColorConfig.getComputed("--oscilloscope-line-L");
                 for (let i: number = directlinkL.length - 1; i >= directlinkL.length - 1 - (canvas.width/scale); i--) {
                     let x = i - (directlinkL.length - 1) + (canvas.width/scale);
                     let yl = (directlinkL[i] * (canvas.height/scale / 2) + (canvas.height/scale / 2));
@@ -20,7 +20,7 @@ export class oscilascopeCanvas {
                     ctx.fillRect((x - 1)*scale, (yl - 1)*scale, 1*scale, 1.5*scale);
                     if (x == 0) break;
                 }
-                ctx.fillStyle = ColorConfig.getComputed("--oscilloscope-line-R") !== "" ? ColorConfig.getComputed("--oscilloscope-line-R") : ColorConfig.getComputed("--text-selection"); //less ctx style calls = less expensive??? also avoiding uncached colors
+                ctx.fillStyle = ColorConfig.getComputed("--oscilloscope-line-R"); //less ctx style calls = less expensive??? also avoiding uncached colors
                 for (let i: number = directlinkR.length - 1; i >= directlinkR.length - 1 - (canvas.width/scale); i--) {
                     let x = i - (directlinkR.length - 1) + (canvas.width/scale);
                     let yr = (directlinkR[i] * (canvas.height/scale / 2) + (canvas.height/scale / 2));

@@ -2180,7 +2180,7 @@ export class SongEditor {
         this._sampleLoadingStatusContainer.style.display = this._doc.prefs.showSampleLoadingStatus ? "" : "none";
         this._instrumentCopyGroup.style.display = this._doc.prefs.instrumentCopyPaste ? "" : "none";
         this._instrumentExportGroup.style.display = this._doc.prefs.instrumentImportExport ? "" : "none";
-        this._instrumentSettingsArea.style.setProperty("scrollbar-width", this._doc.prefs.showInstrumentScrollbars ? "" : "none", "");
+        this._instrumentSettingsArea.style.scrollbarWidth = this._doc.prefs.showInstrumentScrollbars ? "" : "none";
         if (document.getElementById('text-content'))
             document.getElementById('text-content')!.style.display = this._doc.prefs.showDescription ? "" : "none";
 
@@ -2229,9 +2229,9 @@ export class SongEditor {
         // make the names of these two variables as short as possible for readability
         // also, these two variables are used for the effects tab as well, should they be renamed?
         // the theme variables are named "icon" to prevent people getting confused and thinking they're svg
-        const textOnIcon: string = ColorConfig.getComputed("--text-enabled-icon") !== "" ? ColorConfig.getComputed("--text-enabled-icon") : "✓ ";
-        const textOffIcon: string = ColorConfig.getComputed("--text-disabled-icon") !== "" ? ColorConfig.getComputed("--text-disabled-icon") : "　";
-        const textSpacingIcon: string = ColorConfig.getComputed("--text-spacing-icon") !== "" ? ColorConfig.getComputed("--text-spacing-icon") : "　";
+        const textOnIcon: string = ColorConfig.getComputed("--text-enabled-icon");
+        const textOffIcon: string = ColorConfig.getComputed("--text-disabled-icon");
+        const textSpacingIcon: string = ColorConfig.getComputed("--text-spacing-icon");
         const optionCommands: ReadonlyArray<string> = [
             "Technical",
             (prefs.autoPlay ? textOnIcon : textOffIcon) + "Auto Play on Load",

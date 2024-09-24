@@ -68,7 +68,22 @@ class ShaderManager {
         const fsFullText = definesText + require('raw-loader!./shaders/sprite.frag');
         /* eslint-enable global-require */
 
-        return twgl.createProgramInfo(this._gl, [vsFullText, fsFullText]);
+        let errorMessage = null;
+        const onError = (newError) => {
+            // twgl won't log the error when we provide a custom error callback, so log it ourselves
+            console.error(newError);
+
+            // For the error that we throw, just include the actual error from WebGL, not all the fancy
+            // extras that twgl adds to the error messages.
+            const match = newError.match(/\*\*\* Error compiling shader: ([\s\S]+)/);
+            errorMessage = match ? match[1].trim() : newError;
+        };
+
+        const program = twgl.createProgramInfo(this._gl, [vsFullText, fsFullText], null, null, onError);
+        if (!program) {
+            throw new Error(`Failed to compile shader (mode ${drawMode}, effects ${effectBits}): ${errorMessage}`);
+        }
+        return program;
     }
 }
 

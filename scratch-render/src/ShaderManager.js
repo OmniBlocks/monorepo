@@ -69,7 +69,7 @@ class ShaderManager {
         /* eslint-enable global-require */
 
         let errorMessage = null;
-        const onError = (newError) => {
+        const onError = newError => {
             // twgl won't log the error when we provide a custom error callback, so log it ourselves
             console.error(newError);
 

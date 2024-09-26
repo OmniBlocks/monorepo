@@ -171,6 +171,7 @@ test('setStageSize preserves monitor position relative to center of stage', t =>
 });
 
 test('setStageSize argument range', t => {
+    t.plan(6);
     const rt = new Runtime();
 
     rt.once('STAGE_SIZE_CHANGED', (width, height) => {
@@ -191,6 +192,15 @@ test('setStageSize argument range', t => {
     });
     rt.setStageSize(99.3, 10000);
 
+    t.end();
+});
+
+test('STAGE_SIZE_CHANGED does not fire if no change', t => {
+    const rt = new Runtime();
+    rt.on('STAGE_SIZE_CHANGED', () => {
+        t.fail('STAGE_SIZE_CHANGED emitted');
+    });
+    rt.setStageSize(rt.stageWidth, rt.stageHeight);
     t.end();
 });
 

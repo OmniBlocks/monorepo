@@ -284,8 +284,7 @@ const InputOpcode = {
     SENSING_USERNAME: 'sensing.username',
 
     PROCEDURE_CALL: 'procedures.call',
-    PROCEDURE_ARG_STRING_NUMBER: 'args.stringNumber',
-    PROCEDURE_ARG_BOOLEAN: 'args.boolean',
+    PROCEDURE_ARGUMENT: 'procedures.argument',
 
     CONTROL_COUNTER: 'control.counter',
 

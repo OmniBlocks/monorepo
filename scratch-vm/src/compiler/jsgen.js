@@ -169,9 +169,7 @@ class JSGenerator {
         case InputOpcode.NOP:
             return `""`;
 
-        case InputOpcode.PROCEDURE_ARG_BOOLEAN:
-            return `toBoolean(p${node.index})`;
-        case InputOpcode.PROCEDURE_ARG_STRING_NUMBER:
+        case InputOpcode.PROCEDURE_ARGUMENT:
             return `p${node.index}`;
 
         case InputOpcode.ADDON_CALL:
@@ -419,7 +417,6 @@ class JSGenerator {
             }
             return `${procedureReference}(${joinedArgs})`;
         }
-
         case InputOpcode.SENSING_ANSWER:
             return `runtime.ext_scratch3_sensing._answer`;
         case InputOpcode.SENSING_COLOR_TOUCHING_COLOR:

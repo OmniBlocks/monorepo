@@ -228,7 +228,7 @@ class ScriptTreeGenerator {
             if (index === -1) {
                 return this.createConstantInput(0);
             }
-            return new IntermediateInput(InputOpcode.PROCEDURE_ARG_STRING_NUMBER, InputType.ANY, {index});
+            return new IntermediateInput(InputOpcode.PROCEDURE_ARGUMENT, InputType.ANY, {index});
         }
         case 'argument_reporter_boolean': {
             // see argument_reporter_string_number above
@@ -240,7 +240,7 @@ class ScriptTreeGenerator {
                 }
                 return this.createConstantInput(0);
             }
-            return new IntermediateInput(InputOpcode.PROCEDURE_ARG_BOOLEAN, InputType.BOOLEAN, {index});
+            return new IntermediateInput(InputOpcode.PROCEDURE_ARGUMENT, InputType.ANY, {index});
         }
 
         case 'data_variable':

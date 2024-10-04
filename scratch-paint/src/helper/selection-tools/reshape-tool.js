@@ -328,6 +328,18 @@ class ReshapeTool extends paper.Tool {
             translation = new paper.Point(-nudgeAmount, 0);
         } else if (event.key === 'right') {
             translation = new paper.Point(nudgeAmount, 0);
+        } else if (event.key == 'i' || event.key == 'o') {
+            
+            const segments = getSelectedSegments();
+            for (const seg of segments) {
+                let parent = seg.path;
+                let p = seg.point;
+                if (event.key == 'o') {
+                    seg.point = p.add(parent.getNormalAt(parent.getOffsetOf(p)));
+                } else {
+                    seg.point = p.subtract(parent.getNormalAt(parent.getOffsetOf(p)));
+                }
+            }
         }
 
         if (translation) {

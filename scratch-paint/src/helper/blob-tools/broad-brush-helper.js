@@ -114,7 +114,7 @@ class BroadBrushHelper {
         this.finalPath.insert(0, event.point.subtract(step));
 
         if (this.finalPath.segments.length > this.smoothed + (this.smoothingThreshold * 2)) {
-            this.simplify(1);
+            this.simplify(10 / options.segSize);
         }
 
         this.lastVec = event.delta;

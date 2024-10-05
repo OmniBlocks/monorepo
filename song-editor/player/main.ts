@@ -150,7 +150,7 @@ import { HTML, SVG } from "imperative-html/dist/esm/elements-strict";
 	}
 `));
 const colorTheme: string | null = getLocalStorage("colorTheme");
-ColorConfig.setTheme(colorTheme === null ? "dark classic" : colorTheme);
+ColorConfig.setTheme(colorTheme === null ? "slarmoosbox" : colorTheme);
 
 let prevHash: string | null = null;
 let id: string = ((Math.random() * 0xffffffff) >>> 0).toString(16);

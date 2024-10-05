@@ -583,6 +583,12 @@ export class TipPrompt implements Prompt {
 					p("This will NOT work properly if lower bound is greater than upper bound."),
 				)
 			} break;
+			case "modEnvelope": {
+				message = div(
+					h2("Envelope Target"),
+					p("This setting specifies which envelope of the specified instrument you would like to change."),
+				);
+			} break;
 
 			default:
 				// Check for modSetinfo#

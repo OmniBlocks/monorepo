@@ -838,6 +838,8 @@ export class SongEditor {
     private readonly _octaveStepper: HTMLInputElement = input({ style: "width: 59.5%;", type: "number", min: Config.octaveMin, max: Config.octaveMax, value: "0" });
     private readonly _tempoSlider: Slider = new Slider(input({ style: "margin: 0; vertical-align: middle;", type: "range", min: "1", max: "500", value: "160", step: "1" }), this._doc, (oldValue: number, newValue: number) => new ChangeTempo(this._doc, oldValue, newValue), false);
     private readonly _tempoStepper: HTMLInputElement = input({ style: "width: 4em; font-size: 80%; margin-left: 0.4em; vertical-align: middle;", type: "number", step: "1" });
+    private readonly _songEqFilterEditor: FilterEditor = new FilterEditor(this._doc, false, false, true);
+    private readonly _songEqFilterZoom: HTMLButtonElement = button({ style: "margin-left:0em; padding-left:0.2em; height:1.5em; max-width: 12px;", onclick: () => this._openPrompt("customSongEQFilterSettings") }, "+");
     private readonly _chorusSlider: Slider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.chorusRange - 1, value: "0", step: "1" }), this._doc, (oldValue: number, newValue: number) => new ChangeChorus(this._doc, oldValue, newValue), false);
     private readonly _chorusRow: HTMLDivElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("chorus") }, "Chorus:"), this._chorusSlider.container);
     private readonly _reverbSlider: Slider = new Slider(input({ style: "margin: 0; position: sticky,", type: "range", min: "0", max: Config.reverbRange - 1, value: "0", step: "1" }), this._doc, (oldValue: number, newValue: number) => new ChangeReverb(this._doc, oldValue, newValue), false);
@@ -1336,6 +1338,11 @@ export class SongEditor {
                 span({ class: "tip", onclick: () => this._openPrompt("rhythm") }, "Rhythm: "),
                 div({ class: "selectContainer" }, this._rhythmSelect),
             ),
+            div({ class: "selectRow" },
+                span({ class: "tip", onclick: () => this._openPrompt("songeq") }, span("Song EQ:")),
+                this._songEqFilterZoom,
+                this._songEqFilterEditor.container,
+            ),
             this._sampleLoadingStatusContainer,
         ),
     );
@@ -1681,6 +1688,7 @@ export class SongEditor {
         this._spectrumEditor.container.addEventListener("mousedown", this.refocusStage);
         this._eqFilterEditor.container.addEventListener("mousedown", this.refocusStage);
         this._noteFilterEditor.container.addEventListener("mousedown", this.refocusStage);
+        this._songEqFilterEditor.container.addEventListener("mousedown", this.refocusStage);
         this._harmonicsEditor.container.addEventListener("mousedown", this.refocusStage);
         this._additiveEditor.container.addEventListener("mousedown", this.refocusStage);
         this._tempoStepper.addEventListener("keydown", this._tempoStepperCaptureNumberKeys, false);
@@ -2108,6 +2116,9 @@ export class SongEditor {
                 case "customNoteFilterSettings":
                     this.prompt = new CustomFilterPrompt(this._doc, this, true);
                     break;
+                case "customSongEQFilterSettings":
+                    this.prompt = new CustomFilterPrompt(this._doc, this, false, true);
+                    break;
                 case "theme":
                     this.prompt = new ThemePrompt(this._doc);
                     break;
@@ -2364,6 +2375,7 @@ export class SongEditor {
         this._tempoSlider.updateValue(Math.max(0, Math.round(this._doc.song.tempo)));
         this._tempoStepper.value = Math.round(this._doc.song.tempo).toString();
         this._songTitleInputBox.updateValue(this._doc.song.title);
+        this._songEqFilterEditor.render();
 
         this._eqFilterTypeRow.style.setProperty("--text-color-lit", colors.primaryNote);
         this._eqFilterTypeRow.style.setProperty("--text-color-dim", colors.secondaryNote);
@@ -3081,6 +3093,7 @@ export class SongEditor {
                         settingList.push("song reverb");
                         settingList.push("next bar");
                         settingList.push("song detune");
+                        settingList.push("song eq");
                     }
                     // Populate mod setting options for instrument scope.
                     else {
@@ -3387,6 +3400,8 @@ export class SongEditor {
                 }
 
                 let filterType: string = Config.modulators[instrument.modulators[mod]].name;
+                let useSongEq: boolean = filterType == "song eq";
+                if (useSongEq) filterType = "eq filter";
                 if (filterType == "eq filter" || filterType == "note filter") {
                     $("#modFilterText" + mod).get(0)!.style.display = "";
                     $("#modEnvelopeText" + mod).get(0)!.style.display = "none";
@@ -3417,11 +3432,22 @@ export class SongEditor {
                         ? channel.instruments[useInstrument].getLargestControlPointCount(false)
                         : channel.instruments[useInstrument].getLargestControlPointCount(true);
 
-                    const isSimple: boolean = (filterType == "eq filter" ? channel.instruments[useInstrument].eqFilterType : channel.instruments[useInstrument].noteFilterType);
+                    const isSimple: boolean = useSongEq ? false : (filterType == "eq filter" ? channel.instruments[useInstrument].eqFilterType : channel.instruments[useInstrument].noteFilterType);
                     if (isSimple)
                         dotCount = 0;
-
-                    if (isSimple || this._modFilterBoxes[mod].children.length != 1 + dotCount * 2) {
+                    if (useSongEq) {
+                        dotCount = this._doc.song.eqFilter.controlPointCount;
+                        if(this._modFilterBoxes[mod].children.length != 1 + dotCount * 2) {
+                            while (this._modFilterBoxes[mod].firstChild) this._modFilterBoxes[mod].remove(0);
+                            const dotList: string[] = [];
+                            dotList.push("morph");
+                            for (let i: number = 0; i < dotCount; i++) {
+                                dotList.push("dot " + (i + 1) + " x");
+                                dotList.push("dot " + (i + 1) + " y");
+                            }
+                            buildOptions(this._modFilterBoxes[mod], dotList);
+                        }
+                    } else if (isSimple || this._modFilterBoxes[mod].children.length != 1 + dotCount * 2) {
                         while (this._modFilterBoxes[mod].firstChild) this._modFilterBoxes[mod].remove(0);
                         const dotList: string[] = [];
                         if (!isSimple)
@@ -4681,6 +4707,9 @@ export class SongEditor {
         }
         if (this._doc.synth.isFilterModActive(true, this._doc.channel, this._doc.getCurrentInstrument())) {
             this._noteFilterEditor.render(true, this._ctrlHeld || this._shiftHeld);
+        }
+        if (this._doc.synth.isFilterModActive(false, 0, 0, true)) {
+            this._songEqFilterEditor.render(true, this._ctrlHeld || this._shiftHeld);
         }
 
 

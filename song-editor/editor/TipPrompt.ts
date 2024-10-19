@@ -561,6 +561,7 @@ export class TipPrompt implements Prompt {
 					h2("Pitch Envelope Start and End"),
 					p("These two settings will adjust where the start and end of the pitch envelope affects. Everything below start envelope will be 0, everything above end envelope will be 1, and everything inbetween will scale linearly based on pitch (the opposite is true if inverted)."),
 					p("This will NOT work properly if pitch start is greater than pitch end."),
+					p("These values are different than the MIDI numbers. These correspond to how many paino keys from the bottom of the song player a specific pitch is"),
 				);
 			} break;
 			case "envelopeInvert": {
@@ -588,6 +589,27 @@ export class TipPrompt implements Prompt {
 					h2("Envelope Target"),
 					p("This setting specifies which envelope of the specified instrument you would like to change."),
 				);
+			} break;
+			case "randomSteps": {
+				message = div(
+					h2("Random Envelope Steps"),
+					p("This setting changes how many \"steps\", or different possible values can be outputted. For example, a step size of 2 will output either 0 or 1, and a step size of 3 either 0, 0.5, or 1. Every step is equidistant from each other"),
+				);
+			} break;
+			case "randomSeed": {
+				message = div(
+					h2("Random Envelope Seed"),
+					p("There are 64 seeds, or pseudorandom patterns that you can choose from when enveloping a setting."),
+					p("The same seed will output the same value per tick if the other envelope settings are also the same, meaning that if two different songs use the same seed for their envelope they will have the same \"randomization\"."),
+				);
+			} break;
+			case "songeq": {
+				message = div(
+					h2("Song Eq Filter"),
+					p("Filters are a way of emphasizing or diminishing different parts of a sound. Musical notes have a fundamental (base) frequency, but the sound of a musical note also has parts at higher frequencies and filters can adjust the volume of each of these parts based on their frequency."),
+					p("Click in the filter editor to insert, delete, or drag a filter control point. The horizontal position of the point determines which frequencies it affects, and the vertical position determines how the volume is affected at that frequency."),
+					p("Insert a new point on the left side of the filter editor to add a \"high-pass\" filter point, which additionally reduces the volume of lower frequencies, or insert a new point on the right side to add a \"low-pass\" filter point which reduces the volume of higher frequencies."),
+					p("The Song Eq Filter applies to all instruments. This can be handy for getting the sound of a certain genre or fading in and out in combination with modulation"),				);
 			} break;
 
 			default:

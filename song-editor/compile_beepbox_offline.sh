@@ -33,7 +33,6 @@ npx rollup build/player/main.js \
 	--format iife \
 	--output.name beepbox \
 	--context exports \
-	--plugin rollup-plugin-sourcemaps \
 	--plugin @rollup/plugin-node-resolve
 
 # Minify offline/player/beepbox_player.min.js into offline/player/beepbox_player.min.js

@@ -171,6 +171,7 @@ export class HarmonicsEditor {
         if (isNaN(this._mouseX)) this._mouseX = 0;
         if (isNaN(this._mouseY)) this._mouseY = 0;
         this._whenCursorMoved();
+        this.render();
     }
 
     private _whenCursorMoved(): void {
@@ -320,6 +321,7 @@ export class HarmonicsEditorPrompt implements Prompt {
         this.pasteButton.addEventListener("click", this._pasteSettings);
         this._playButton.addEventListener("click", this._togglePlay);
         this.harmonicsEditor.container.addEventListener("mousemove", () => this.harmonicsEditor.render());
+        this.harmonicsEditor.container.addEventListener("mousedown", () => this.harmonicsEditor.render());
         this.container.addEventListener("mousemove", () => this.harmonicsEditor.render());
         this.container.addEventListener("mousedown", () => this.harmonicsEditor.render());
         this.updatePlayButton();

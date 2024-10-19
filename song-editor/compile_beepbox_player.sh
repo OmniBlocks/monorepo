@@ -11,7 +11,6 @@ npx rollup build/player/main.js \
 	--output.name beepbox \
 	--context exports \
 	--sourcemap \
-	--plugin rollup-plugin-sourcemaps \
 	--plugin @rollup/plugin-node-resolve
 
 # Minify website/player/beepbox_player.js into website/player/beepbox_player.min.js

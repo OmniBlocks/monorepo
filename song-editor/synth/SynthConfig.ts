@@ -46,7 +46,8 @@ export const enum SustainType {
 export const enum EnvelopeType {
     none,
     noteSize,
-    pitch,
+    pitch, //slarmoo's box 0.9
+    pseudorandom, //slarmoo's box 1.3
 	punch,
 	flare,
 	twang,
@@ -59,7 +60,7 @@ export const enum EnvelopeType {
     linear,
     rise,
     blip,
-    fall,
+    fall, //slarmoo's box 1.2
     //add new envelope types here
 }
 
@@ -143,7 +144,7 @@ export const enum EnvelopeComputeIndex {
     length,
 }
 
-export const enum AdditiveWaveTypes {
+export const enum BaseWaveTypes {
     sine,
     square,
     triangle,
@@ -1393,6 +1394,7 @@ export class Config {
         { name: "none", type: EnvelopeType.none, speed: 0.0 },
         { name: "note size", type: EnvelopeType.noteSize, speed: 0.0 },
         { name: "pitch", type: EnvelopeType.pitch, speed: 0.0 }, 
+        { name: "random", type: EnvelopeType.pseudorandom, speed: 4.0 }, //Slarmoo's box
         { name: "punch", type: EnvelopeType.punch, speed: 0.0 },
         { name: "flare", type: EnvelopeType.flare, speed: 32.0 },
         { name: "twang", type: EnvelopeType.twang, speed: 32.0 },
@@ -1779,7 +1781,13 @@ export class Config {
             promptName: "Supersaw Shape", promptDesc: ["This setting controls the supersaw shape of your instrument, just like the Saw↔Pulse slider.", "As the slider's name implies, this effect will give you a sawtooth wave at $LO, and a full pulse width wave at $HI. Values in between will be a blend of the two.", "[OVERWRITING] [$LO - $HI] [%]"] },
         { name: "individual envelope speed", pianoName: "IndvEnvSpd", maxRawVol: 63, newNoteVol: 23, forSong: false, convertRealFactor: 0, associatedEffect: EffectType.length,
             promptName: "Individual Envelope Speed", promptDesc: ["This setting controls how fast the specified envelope of the instrument will play.", "At $LO, your the envelope will be frozen, and at values near there they will change very slowly. At 23, the envelope will work as usual, performing at normal speed. This increases up to $HI, where the envelope will change very quickly. The speeds are given below:",
-                "[0-4]: x0, x0.01, x0.02, x0.03, x0.04,", "[5-9]: x0.05, x0.06, x0.07, x0.08, x0.09,", "[10-14]: x0.1, x0.2, x0.25, x0.3, x0.33,", "[15-19]: x0.4, x0.5, x0.6, x0.6667, x0.7,", "[20-24]: x0.75, x0.8, x0.9, x1, x1.25,", "[25-29]: x1.3333, x1.5, x1.6667, x1.75, x2,", "[30-34]: x2.25, x2.5, x2.75, x3, x3.5,", "[35-39]: x4, x4.5, x5, x5.5, x6,", "[40-44]: x6.5, x7, x7.5, x8, x8.5,", "[45-49]: x9, x9.5, x10, x11, x12", "[50-54]: x13, x14, x15, x16, x17", "[55-59]: x18, x19, x20, x24, x32", "[60-63]: x40, x64, x128, x256", "[OVERWRITING] [$LO - $HI]"] },
+                "[0-4]: x0, x0.01, x0.02, x0.03, x0.04,", "[5-9]: x0.05, x0.06, x0.07, x0.08, x0.09,", "[10-14]: x0.1, x0.2, x0.25, x0.3, x0.33,", "[15-19]: x0.4, x0.5, x0.6, x0.6667, x0.7,", "[20-24]: x0.75, x0.8, x0.9, x1, x1.25,", "[25-29]: x1.3333, x1.5, x1.6667, x1.75, x2,", "[30-34]: x2.25, x2.5, x2.75, x3, x3.5,", "[35-39]: x4, x4.5, x5, x5.5, x6,", "[40-44]: x6.5, x7, x7.5, x8, x8.5,", "[45-49]: x9, x9.5, x10, x11, x12", "[50-54]: x13, x14, x15, x16, x17", "[55-59]: x18, x19, x20, x24, x32", "[60-63]: x40, x64, x128, x256", "[OVERWRITING] [$LO - $HI]"]},
+        { name: "individual envelope lower bound", pianoName: "IndvEnvLow", maxRawVol: 20, newNoteVol: 0, forSong: false, convertRealFactor: 0, associatedEffect: EffectType.length,
+            promptName: "Individual Envelope Lower Bound", promptDesc: ["This setting controlsthe envelope lower bound", "At $LO, your the envelope will output an upper envelope bound to 0, and at $HI your envelope will output an upper envelope bound to 2.", "This settings will not work if your lower envelope bound is higher than your upper envelope bound", ]},
+        { name: "individual envelope upper bound", pianoName: "IndvEnvUp", maxRawVol: 20, newNoteVol: 10, forSong: false, convertRealFactor: 0, associatedEffect: EffectType.length,
+            promptName: "Individual Envelope Upper Bound", promptDesc: ["This setting controlsthe envelope lower bound", "At $LO, your the envelope will output a 0 to lower envelope bound, and at $HI your envelope will output a 2 to lower envelope bound.", "This settings will not work if your lower envelope bound is higher than your upper envelope bound", ]},
+        { name: "song eq", pianoName: "Song EQ", maxRawVol: 10, newNoteVol: 0, forSong: true, convertRealFactor: 0, associatedEffect: EffectType.length,
+            promptName: "Song EQ Filter", promptDesc: ["This setting overwrites every instrument's eq filter. You can do this in a few separate ways, similar to the per instrument eq filter modulator.", "When the option 'morph' is selected, your modulator values will indicate a sub-filter index of your EQ filter to 'morph' to over time. For example, a change from 0 to 1 means your main filter (default) will morph to sub-filter 1 over the specified duration. You can shape the main filter and sub-filters in the large filter editor ('+' button). If your two filters' number, type, and order of filter dots all match up, the morph will happen smoothly and you'll be able to hear them changing. If they do not match up, the filters will simply jump between each other.", "Note that filters will morph based on endpoints in the pattern editor. So, if you specify a morph from sub-filter 1 to 4 but do not specifically drag in new endpoints for 2 and 3, it will morph directly between 1 and 4 without going through the others.", "If you target Dot X or Dot Y, you can finely tune the coordinates of a single dot for your filter. The number of available dots to choose is dependent on your main filter's dot count.", "[OVERWRITING] [$LO - $HI]"]},
         ]);
 }
 

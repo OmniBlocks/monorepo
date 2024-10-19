@@ -746,7 +746,13 @@ export class PatternEditor {
                     }
                     // Song wide application
                     else if (instrument.modulators[mod] == applyToMod && Config.modulators[instrument.modulators[mod]].forSong && (instrument.modChannels[mod] == -1)) {
-                        return [instrumentIndex, mod];
+                        // // check song eq? 
+                        // if (modFilterIndex != undefined && (applyToMod == Config.modulators.dictionary["song eq"].index)) {
+                        //     if (instrument.modFilterTypes[mod] == modFilterIndex)
+                        //         return [instrumentIndex, mod];
+                        // }
+                        // else
+                            return [instrumentIndex, mod];
                     }
                 }
             }

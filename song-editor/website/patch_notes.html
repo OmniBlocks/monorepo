@@ -13,8 +13,8 @@
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="theme-color" content="#444" />
-    <meta name="msapplication-TileColor" content="#dba600" />
+    <meta name="theme-color" content="#247d1d" />
+    <meta name="msapplication-TileColor" content="#247d1d" />
     <meta name="msapplication-config" content="/browserconfig.xml" />
     <meta name="format-detection" content="telephone=no" />
     <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png" />
@@ -95,13 +95,21 @@
         <font color="#9c64f7">Patch Notes (in reverse chronological order);</font>
     </h1>
 
-<h2>Version 1.2.4 (Envelope Modulation)</h2>
+<h2>Version 1.3 (Random Envelope and Envelope Modulation)</h2>
 <h3>
     <ul>
+        <li> Added a new random envelope type! This one will output a random value based on the seed and time in the song </li>
+        <li> Individual envelope speed and bounds can now be modulated </li>
+        <li> Added song eq, which can be modulated </li>
+        <li> Replaced the tremolo and tremolo2 envelopes with LFO, which allows for multiple different shapes in addition to the legacy sine wave </li>
         <li> Songs will start with a mod channel by default </li>
         <li> Pitch shift can now be added in the mod channel dropdown </li>
+        <li> Adding a mod channel now puts it in the correct place </li>
+        <li> Updated the pitch bounds tip prompt </li>
         <li> Envelope bounds are now clamped </li>
-        <li> The Song Player uses the Slarmoo's Box theme as its default </li>
+        <li> Switching instruments while the synth is playing will no longer cause the instrument to break </li>
+        <li> The Song Player now uses the Slarmoo's Box theme as its default </li>
+        <li> Linking the Song Player in discord will now use the correct color </li>
     </ul>
 </h3>
 <p>10/x/2024</p>

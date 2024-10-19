@@ -169,6 +169,7 @@ export class SpectrumEditor {
         if (isNaN(this._mouseX)) this._mouseX = 0;
         if (isNaN(this._mouseY)) this._mouseY = 0;
         this._whenCursorMoved();
+        this.render();
     }
 
     private _whenCursorMoved(): void {
@@ -244,7 +245,7 @@ export class SpectrumEditor {
 
     public saveSettings(): ChangeSpectrum {
         const instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
-        if (this._spectrumIndex == null) {
+        if (this._spectrumIndex == null || this._spectrumIndex == undefined) {
             return new ChangeSpectrum(this._doc, instrument, instrument.spectrumWave);
         } else {
             return new ChangeSpectrum(this._doc, instrument, instrument.drumsetSpectrumWaves[this._spectrumIndex]);
@@ -355,7 +356,12 @@ export class SpectrumEditorPrompt implements Prompt {
         //this.spectrumEditor.container.addEventListener("mousemove", () => this.spectrumEditor.render());
         this.container.addEventListener("mousemove", () => {
             this.spectrumEditor.render(); this.spectrumEditors[this._drumsetSpectrumIndex].setSpectrumWave(this.spectrumEditor.getSpectrumWave().spectrum);
-         });
+        });
+        this.container.addEventListener("mousedown", this.spectrumEditor.render);
+        this.spectrumEditor.container.addEventListener("mousemove", () => {
+            this.spectrumEditor.render(); this.spectrumEditors[this._drumsetSpectrumIndex].setSpectrumWave(this.spectrumEditor.getSpectrumWave().spectrum);
+        });
+        this.spectrumEditor.container.addEventListener("mousedown", this.spectrumEditor.render);
         this.updatePlayButton();
         if (this._isDrumset) {
             for (let i: number = Config.drumCount-1; i >= 0 ; i--) {

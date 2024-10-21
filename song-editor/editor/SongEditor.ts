@@ -2298,9 +2298,9 @@ export class SongEditor {
         // make the names of these two variables as short as possible for readability
         // also, these two variables are used for the effects tab as well, should they be renamed?
         // the theme variables are named "icon" to prevent people getting confused and thinking they're svg
-        const textOnIcon: string = ColorConfig.getComputed("--text-enabled-icon") !== "" ? ColorConfig.getComputed("--text-enabled-icon") : "✓ ";
-        const textOffIcon: string = ColorConfig.getComputed("--text-disabled-icon") !== "" ? ColorConfig.getComputed("--text-disabled-icon") : "　";
-        const textSpacingIcon: string = ColorConfig.getComputed("--text-spacing-icon") !== "" ? ColorConfig.getComputed("--text-spacing-icon") : "　";
+        const textOnIcon: string = ColorConfig.getComputed("--text-enabled-icon");
+        const textOffIcon: string = ColorConfig.getComputed("--text-disabled-icon");
+        const textSpacingIcon: string = ColorConfig.getComputed("--text-spacing-icon");
         const optionCommands: ReadonlyArray<string> = [
             "Technical",
             (prefs.autoPlay ? textOnIcon : textOffIcon) + "Auto Play on Load",

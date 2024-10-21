@@ -328,8 +328,7 @@ export class PatternEditor {
                     this.modDragValueLabel.style.setProperty("top", "" + this._modDragValueLabelTop + "px");
                     this.modDragValueLabel.textContent = "" + presValue;
 
-                }
-                else {
+                } else {
                     this.modDragValueLabel.style.setProperty("display", "none");
                     this.modDragValueLabel.style.setProperty("pointer-events", "none");
                     this.modDragValueLabel.setAttribute("contenteditable", "false");

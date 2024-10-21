@@ -3204,7 +3204,7 @@ export class Song {
 
             if (cap != undefined) {
                 // For filters, cap is dependent on which filter setting is targeted
-                if (modulator.name == "eq filter" || modulator.name == "note filter" || modulator.name || "song filter") {
+                if (modulator.name == "eq filter" || modulator.name == "note filter" || modulator.name == "song eq") {
                     // type 0: number of filter morphs
                     // type 1/odd: number of filter x positions
                     // type 2/even: number of filter y positions
@@ -3230,7 +3230,7 @@ export class Song {
             if (cap != undefined) {
 
                 // For filters, cap is dependent on which filter setting is targeted
-                if (filterType != undefined && (Config.modulators[modSetting].name == "eq filter" || Config.modulators[modSetting].name == "note filter")) {
+                if (filterType != undefined && (Config.modulators[modSetting].name == "eq filter" || Config.modulators[modSetting].name == "note filter" || Config.modulators[modSetting].name == "song eq")) {
                     // type 0: number of filter morphs
                     // type 1/odd: number of filter x positions
                     // type 2/even: number of filter y positions
@@ -8982,6 +8982,8 @@ export class Synth {
 
     public initModFilters(song: Song | null): void {
         if (song != null) {
+            song.tmpEqFilterStart = song.eqFilter;
+            song.tmpEqFilterEnd = null;
             for (let channelIndex: number = 0; channelIndex < song.getChannelCount(); channelIndex++) {
                 for (let instrumentIndex: number = 0; instrumentIndex < song.channels[channelIndex].instruments.length; instrumentIndex++) {
                     const instrument: Instrument = song.channels[channelIndex].instruments[instrumentIndex];
@@ -9104,8 +9106,7 @@ export class Synth {
                                             this.setModValue(latestPinValues[mod], latestPinValues[mod], instrument.modChannels[mod], instrument.modInstruments[mod], instrument.modulators[mod]);
                                             latestModTimes[instrument.modulators[mod]] = currentBar * Config.partsPerBeat * this.song.beatsPerBar + latestPinParts[mod];
                                         }
-                                    }
-                                    else {
+                                    } else {
                                         // Generate list of used instruments
                                         let usedInstruments: number[] = [];
                                         // All
@@ -9113,8 +9114,7 @@ export class Synth {
                                             for (let i: number = 0; i < this.song.channels[instrument.modChannels[mod]].instruments.length; i++) {
                                                 usedInstruments.push(i);
                                             }
-                                        }
-                                        // Active
+                                        } // Active
                                         else if (instrument.modInstruments[mod] > this.song.channels[instrument.modChannels[mod]].instruments.length) {
                                             const tgtPattern: Pattern | null = this.song.getPattern(instrument.modChannels[mod], currentBar);
                                             if (tgtPattern != null)
@@ -9127,7 +9127,7 @@ export class Synth {
                                             // Special indices for mod filter targets, since they control multiple things.
                                             const eqFilterParam: boolean = instrument.modulators[mod] == Config.modulators.dictionary["eq filter"].index;
                                             const noteFilterParam: boolean = instrument.modulators[mod] == Config.modulators.dictionary["note filter"].index;
-                                            const songFilterParam: boolean = instrument.modulators[mod] == Config.modulators.dictionary["note filter"].index;
+                                            const songFilterParam: boolean = instrument.modulators[mod] == Config.modulators.dictionary["song eq"].index;
                                             let modulatorAdjust: number = instrument.modulators[mod];
                                             if (eqFilterParam || songFilterParam) {
                                                 modulatorAdjust = Config.modulators.length + (instrument.modFilterTypes[mod] | 0);
@@ -10029,8 +10029,7 @@ export class Synth {
             
                             this.songEqFilterCount = 1;
                         eqFilterVolume = Math.min(3.0, eqFilterVolume);
-                    }
-                else {
+                    } else {
                         const eqFilterSettings: FilterSettings = (this.song.tmpEqFilterStart != null) ? this.song.tmpEqFilterStart : this.song.eqFilter;
                         //const eqAllFreqsEnvelopeStart: number = envelopeStarts[InstrumentAutomationIndex.eqFilterAllFreqs];
                             //const eqAllFreqsEnvelopeEnd:   number = envelopeEnds[  InstrumentAutomationIndex.eqFilterAllFreqs];
@@ -10501,7 +10500,6 @@ export class Synth {
                     }
                 }
 
-                //line 10000 :sob:
                 // Update next-used filters after each run
                 for (let channel: number = 0; channel < this.song.pitchChannelCount + this.song.noiseChannelCount; channel++) {
                     for (let instrumentIdx: number = 0; instrumentIdx < this.song.channels[channel].instruments.length; instrumentIdx++) {
@@ -10517,6 +10515,11 @@ export class Synth {
                             instrument.tmpNoteFilterStart = instrument.noteFilter;
                         }
                     }
+                }
+                if (song.tmpEqFilterEnd != null) {
+                    song.tmpEqFilterStart = song.tmpEqFilterEnd;
+                } else {
+                    song.tmpEqFilterStart = song.eqFilter;
                 }
 
                 this.tick++;
@@ -11731,8 +11734,7 @@ export class Synth {
                 noteFilterExpression *= startPoint!.getVolumeCompensationMult();
 
                 tone.noteFilterCount = 1;
-            }
-            else {
+            } else {
                 const noteFilterSettings: FilterSettings = (instrument.tmpNoteFilterStart != null) ? instrument.tmpNoteFilterStart : instrument.noteFilter;
 
                 for (let i: number = 0; i < noteFilterSettings.controlPointCount; i++) {
@@ -14241,8 +14243,7 @@ export class Synth {
                 if (Config.modulators[instrument.modulators[mod]].forSong) {
                     if (synth.heldMods[i].setting == setting)
                         synth.setModValue(synth.heldMods[i].volume, synth.heldMods[i].volume, instrument.modChannels[mod], usedInstruments[instrumentIndex], setting);
-                }
-                else if (synth.heldMods[i].channelIndex == instrument.modChannels[mod] && synth.heldMods[i].instrumentIndex == usedInstruments[instrumentIndex] && synth.heldMods[i].setting == setting) {
+                } else if (synth.heldMods[i].channelIndex == instrument.modChannels[mod] && synth.heldMods[i].instrumentIndex == usedInstruments[instrumentIndex] && synth.heldMods[i].setting == setting) {
                     synth.setModValue(synth.heldMods[i].volume, synth.heldMods[i].volume, instrument.modChannels[mod], usedInstruments[instrumentIndex], setting);
                 }
             }

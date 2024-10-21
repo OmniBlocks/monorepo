@@ -1888,8 +1888,7 @@ export class SongEditor {
                     }
                 }
             }
-        }
-        else {
+        } else {
 
             let instrument: number = this._doc.getCurrentInstrument();
             const anyModActive: boolean = this._doc.synth.isAnyModActive(this._doc.channel, instrument);
@@ -2375,7 +2374,11 @@ export class SongEditor {
         this._tempoSlider.updateValue(Math.max(0, Math.round(this._doc.song.tempo)));
         this._tempoStepper.value = Math.round(this._doc.song.tempo).toString();
         this._songTitleInputBox.updateValue(this._doc.song.title);
-        this._songEqFilterEditor.render();
+        if (this._doc.synth.isFilterModActive(false, 0, 0, true)) {
+            this._songEqFilterEditor.render(true, this._ctrlHeld || this._shiftHeld);
+        } else {
+            this._songEqFilterEditor.render();
+        }
 
         this._eqFilterTypeRow.style.setProperty("--text-color-lit", colors.primaryNote);
         this._eqFilterTypeRow.style.setProperty("--text-color-dim", colors.secondaryNote);
@@ -2922,8 +2925,7 @@ export class SongEditor {
             }
 
             this._renderInstrumentBar(channel, instrumentIndex, colors);
-        }
-        // Options for mod channel
+        } // Options for mod channel
         else {
             this._usageCheck(this._doc.channel, instrumentIndex);
 
@@ -3378,8 +3380,7 @@ export class SongEditor {
                     if (instrument.modChannels[mod] == -2) {
                         $("#modSettingText" + mod).get(0)!.style.display = "none";
                         ((this._modSetBoxes[mod].parentElement) as HTMLDivElement).style.display = "none";
-                    }
-                    else {
+                    } else {
                         $("#modSettingText" + mod).get(0)!.style.display = "";
                         ((this._modSetBoxes[mod].parentElement) as HTMLDivElement).style.display = "";
                     }
@@ -3387,8 +3388,7 @@ export class SongEditor {
                     this._modTargetIndicators[mod].style.setProperty("fill", ColorConfig.uiWidgetFocus);
                     this._modTargetIndicators[mod].classList.remove("modTarget");
 
-                }
-                else {
+                } else {
                     ((this._modInstrumentBoxes[mod].parentElement) as HTMLDivElement).style.display = (channel.instruments.length > 1) ? "" : "none";
                     $("#modInstrumentText" + mod).get(0)!.style.display = (channel.instruments.length > 1) ? "" : "none";
                     $("#modChannelText" + mod).get(0)!.innerText = (channel.instruments.length > 1) ? "Ch:" : "Channel:";

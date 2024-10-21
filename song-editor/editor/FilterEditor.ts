@@ -282,24 +282,22 @@ export class FilterEditor {
                     const newPoint: FilterControlPoint | null = this._useFilterSettings.controlPoints[this._selectedIndex];
 
                     if (newPoint == null || newPoint.type != data.point.type) {
-                                this._dragChange = null;
-                                this._writingMods = false;
-                                this._mouseDown = false;
-                            }
-                    else {
-                                newPoint.freq = data.freq;
-                                newPoint.gain = data.gain;
-                            }
+                        this._dragChange = null;
+                        this._writingMods = false;
+                        this._mouseDown = false;
+                    } else {
+                        newPoint.freq = data.freq;
+                        newPoint.gain = data.gain;
+                    }
                 } else if (this._forSong && this._dragChange instanceof ChangeSequence && this._dragChange.checkFirst() instanceof ChangeSongFilterMovePoint) {
-                            const data: FilterMoveData = ((this._dragChange as ChangeSequence).checkFirst() as ChangeSongFilterMovePoint).getMoveData(true);
-                            const newPoint: FilterControlPoint | null = this._useFilterSettings.controlPoints[this._selectedIndex];
+                    const data: FilterMoveData = ((this._dragChange as ChangeSequence).checkFirst() as ChangeSongFilterMovePoint).getMoveData(true);
+                    const newPoint: FilterControlPoint | null = this._useFilterSettings.controlPoints[this._selectedIndex];
 
                     if (newPoint == null || newPoint.type != data.point.type) {
                         this._dragChange = null;
                         this._writingMods = false;
                         this._mouseDown = false;
-                    }
-                    else {
+                    } else {
                         newPoint.freq = data.freq;
                         newPoint.gain = data.gain;
                     }

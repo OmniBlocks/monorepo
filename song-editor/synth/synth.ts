@@ -1420,7 +1420,7 @@ export class Instrument {
     public chord: number = 1;
     public volume: number = 0;
     public pan: number = Config.panCenter;
-    public panDelay: number = 10;
+    public panDelay: number = 0;
     public arpeggioSpeed: number = 12;
     public fastTwoNoteArp: boolean = false;
     public legacyTieOver: boolean = false;
@@ -1547,7 +1547,7 @@ export class Instrument {
         this.bitcrusherFreq = Math.floor((Config.bitcrusherFreqRange - 1) * 0.5)
         this.bitcrusherQuantization = Math.floor((Config.bitcrusherQuantizationRange - 1) * 0.5);
         this.pan = Config.panCenter;
-        this.panDelay = 10;
+        this.panDelay = 0;
         this.pitchShift = Config.pitchShiftCenter;
         this.detune = Config.detuneCenter;
         this.vibrato = 0;
@@ -2277,7 +2277,7 @@ export class Instrument {
         if (instrumentObject["panDelay"] != undefined) {
             this.panDelay = (instrumentObject["panDelay"] | 0);
         } else {
-            this.panDelay = 10;
+            this.panDelay = 0;
         }
 
         if (instrumentObject["detune"] != undefined) {
@@ -2528,6 +2528,8 @@ export class Instrument {
                         if (operatorObject["waveform"] == "square") {
                             operator.waveform = Config.operatorWaves.dictionary["pulse width"].index;
                             operator.pulseWidth = 5;
+                        } else if (operatorObject["waveform"] == "rounded") {
+                            operator.waveform = Config.operatorWaves.dictionary["quasi-sine"].index;
                         } else {
                             operator.waveform = 0;
                         }
@@ -3020,7 +3022,7 @@ export class Song {
         this.beatsPerBar = 8;
         this.barCount = 16;
         this.patternsPerChannel = 8;
-        this.rhythm = 3;
+        this.rhythm = 1;
         this.layeredInstruments = false;
         this.patternInstruments = false;
 
@@ -9168,7 +9170,7 @@ export class Synth {
 
             if (this.oscEnabled) {
                 if (this.oscRefreshEventTimer <= 0) {
-                    events.raise("oscillascopeUpdate", outputDataL, outputDataR);
+                    events.raise("oscilloscopeUpdate", outputDataL, outputDataR);
                     this.oscRefreshEventTimer = 2;
                 } else {
                     this.oscRefreshEventTimer--;

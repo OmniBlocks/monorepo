@@ -14,6 +14,7 @@ export interface ChannelColors extends BeepBoxOption {
 export class ColorConfig {
     public static colorLookup: Map<number, ChannelColors> = new Map<number, ChannelColors>();
 	public static usesColorFormula: boolean = false;
+	public static readonly defaultTheme: string = "ultrabox dark";
     public static readonly themes: { [name: string]: string } = {
 	"dark classic": ``,
         "dark competition": `
@@ -2746,6 +2747,173 @@ export class ColorConfig {
 			--disabled-note-primary: #c9c9c9;
 			--disabled-note-secondary: #616161;
 	}`,
+"slushie": `
+	:root {
+		--page-margin: #040814;
+		--editor-background: #040814;
+		--hover-preview: #c6f7ff;
+		--primary-text: #d3f3ff;
+		--secondary-text: #6f72b5;
+		--inverted-text: black;
+		--box-selection-fill: rgb(43 70 171 / 62%);
+		--loop-accent: #573ebb;
+		--ui-widget-background: #2e2f44;
+		--ui-widget-focus: #2b2c46;
+		--pitch-background: #353654;
+		--tonic: #716fe3;
+		--fifth-note: #76469b;
+		--white-piano-key: #abbce3;
+		--black-piano-key: #2f235e;
+		--track-editor-bg-pitch: #3a3b5c;
+		--track-editor-bg-pitch-dim: #1f2036;
+		--track-editor-bg-noise: #3c3554;
+		--track-editor-bg-noise-dim: #1e1834;
+		--track-editor-bg-mod: #30335e;
+		--track-editor-bg-mod-dim: #161938;
+		--multiplicative-mod-slider: #e29cff;
+		--overwriting-mod-slider: #495789;
+		--indicator-primary: #e1a6ff;
+		--indicator-secondary: #415187;
+		--select2-opt-group: #22223a;
+		--input-box-outline: #2d2648;
+		--mute-button-normal: #7aceff;
+		--pitch1-secondary-channel: #5f3ea5;
+		--pitch1-primary-channel: #c1a4ff;
+		--pitch1-secondary-note: #794fd3;
+		--pitch1-primary-note: #d8c6ff;
+		--pitch2-secondary-channel: #4f44bf;
+		--pitch2-primary-channel: #9287ff;
+		--pitch2-secondary-note: #5e51d9;
+		--pitch2-primary-note: #b6afff;
+		--pitch3-secondary-channel: #374eb9;
+		--pitch3-primary-channel: #8097ff;
+		--pitch3-secondary-note: #445cc9;
+		--pitch3-primary-note: #a0b2ff;
+		--pitch4-secondary-channel: #2867cf;
+		--pitch4-primary-channel: #6fa5ff;
+		--pitch4-secondary-note: #2e6ed7;
+		--pitch4-primary-note: #a6c7ff;
+		--pitch5-secondary-channel: #3175a7;
+		--pitch5-primary-channel: #7ec9ff;
+		--pitch5-secondary-note: #367eb3;
+		--pitch5-primary-note: #9fd7ff;
+		--pitch6-secondary-channel: #3993a9;
+		--pitch6-primary-channel: #8ce9ff;
+		--pitch6-secondary-note: #386da3;
+		--pitch6-primary-note: #9eecff;
+		--pitch7-secondary-channel: #369d8a;
+		--pitch7-primary-channel: #8bfce7;
+		--pitch7-secondary-note: #1c93a7;
+		--pitch7-primary-note: #abffef;
+		--pitch8-secondary-channel: #00A170;
+		--pitch8-primary-channel: #50FFC9;
+		--pitch8-secondary-note: #00C78A;
+		--pitch8-primary-note: #83FFD9;
+		--pitch9-secondary-channel: #49b374;
+		--pitch9-primary-channel: #8affa9;
+		--pitch9-secondary-note: #26815f;
+		--pitch9-primary-note: #c8ffde;
+		--pitch10-secondary-channel: #58a747;
+		--pitch10-primary-channel: #bbffaa;
+		--pitch10-secondary-note: #1d7c48;
+		--pitch10-primary-note: #c7ffbc;
+		--noise1-secondary-channel: #42829b;
+		--noise1-primary-channel: #97d3fc;
+		--noise1-secondary-note: #3f53b3;
+		--noise1-primary-note: #97d3fc;
+		--noise2-secondary-channel: #6354bb;
+		--noise2-primary-channel: #9a89ff;
+		--noise2-secondary-note: #5f4dcd;
+		--noise2-primary-note: #c6bcff;
+		--noise3-secondary-channel: #704a95;
+		--noise3-primary-channel: #c285ff;
+		--noise3-secondary-note: #ad5aff;
+		--noise3-primary-note: #d3a6ff;
+		--noise4-secondary-channel: #a53c65;
+		--noise4-primary-channel: #f794bb;
+		--noise4-secondary-note: #cb5080;
+		--noise4-primary-note: #f794bb;
+		--noise5-secondary-channel: #9b2d2d;
+		--noise5-primary-channel: #ff7676;
+		--noise5-secondary-note: #cb4444;
+		--noise5-primary-note: #ff9999;
+		--mod1-secondary-channel: #b7613c;
+		--mod1-primary-channel: #ff9f76;
+		--mod1-secondary-note: #e77e52;
+		--mod1-primary-note: #ffb99b;
+		--mod2-secondary-channel: #916d34;
+		--mod2-primary-channel: #fece80;
+		--mod2-secondary-note: #c58b35;
+		--mod2-primary-note: #ffdda5;
+		--mod3-secondary-channel: #83761a;
+		--mod3-primary-channel: #fdf68c;
+		--mod3-secondary-note: #c18e00;
+		--mod3-primary-note: #fdf68c;
+		--mod4-secondary-channel: #a86436;
+		--mod4-primary-channel: #c8a825;
+		--mod4-secondary-note: #e8ba46;
+		--mod4-primary-note: #c8a825;
+		--mod-label-primary: #37325e;
+		--mod-label-secondary-text: #6e8aa7;
+		--mod-label-primary-text: #c1ffff;
+}`,
+"ultrabox dark": `
+:root {
+/*--mod-title: #CCCCCC;*/
+--loop-accent: #CCCCCC;
+--playhead: #CCCCCC;
+/*--primary-text: #CCCCCC;
+--hover-preview: #CCCCCC;*/
+--link-accent: #FF8EC5;
+--indicator-primary: #FF8EC5;
+/*--indicator-primary: #CCCCCC;*/
+/*--indicator-secondary: #E856B2;*/
+--white-piano-key: #CCCCCC;
+/*--black-piano-key: #444;*/
+--text-selection: #932253;
+--oscilloscope-line-L: #CCCCCC;
+--oscilloscope-line-R: #932253;
+--pitch-channel-limit: 8;
+--pitch1-secondary-channel: #A83030;
+--pitch1-primary-channel:   #FF7C7C;
+--pitch1-secondary-note:    #B51532;
+--pitch1-primary-note:      #FFA3A3;
+
+--pitch2-secondary-channel: #C75000;
+--pitch2-primary-channel:   #FF9752;
+--pitch2-secondary-note:    #FF771C;
+--pitch2-primary-note:      #FFCDAB;
+
+--pitch3-secondary-channel: #A1A100;
+--pitch3-primary-channel: #FFFF25;
+--pitch3-secondary-note: #C7C700;
+--pitch3-primary-note: #FFFF92;
+
+--pitch4-secondary-channel: #139620;
+--pitch4-primary-channel:   #25ff3a;
+--pitch4-secondary-note:    #139620;
+--pitch4-primary-note:      #25ff3a;
+
+--pitch5-secondary-channel: #0099A1;
+--pitch5-primary-channel:   #25F3FF;
+--pitch5-secondary-note:    #00BDC7;
+--pitch5-primary-note:      #92F9FF;
+
+--pitch6-secondary-channel: #58599E;
+--pitch6-primary-channel:   #5EA3FF;
+--pitch6-secondary-note:    #183AC7;
+--pitch6-primary-note:      #9EC8FF;
+
+--pitch7-secondary-channel: #6038a5;
+--pitch7-primary-channel:   #C760FF;
+--pitch7-secondary-note:    #5433A0;
+--pitch7-primary-note:      #D99EFF;
+
+--pitch8-secondary-channel: #932253;
+--pitch8-primary-channel:   #FF60A5;
+--pitch8-secondary-note:    #8E1C4E;
+--pitch8-primary-note:      #FF8EC5;
+}`,
 		"modbox classic": `
 			:root {
 				--loop-accent: #9900cc;
@@ -3121,6 +3289,10 @@ export class ColorConfig {
 				--noise1-secondary-channel: #991010;
 				}
 
+				.trackContainer .noSelection {
+				background: black !important;
+				}
+
 				span input, 
 				div.harmonics svg,
 				div.spectrum svg,
@@ -3256,6 +3428,10 @@ export class ColorConfig {
 					width: 40px;
 				}
 
+				.trackContainer .noSelection {
+				background: black !important;
+				}
+
 				span input, 
 				div.harmonics svg,
 				div.spectrum svg,
@@ -3279,7 +3455,6 @@ export class ColorConfig {
 				#text-content > section > h1 {
 					color: #C8C8C8;
 					}
-
 			`,
 			"nerdbox": `
 			:root {
@@ -5449,6 +5624,10 @@ export class ColorConfig {
 	public static c_noisePrimaryNoteLum: number = 0;
 	public static c_noisePrimaryNoteLumScale: number = 0;
 
+	public static c_pitchChannelCountOverride: number = 40;
+	public static c_noiseChannelCountOverride: number = 16;
+	public static c_modChannelCountOverride: number = 12;
+
 	public static c_invertedText: string = "";
 	public static c_trackEditorBgNoiseDim: string = "";
 	public static c_trackEditorBgNoise: string = "";
@@ -5618,16 +5797,16 @@ export class ColorConfig {
             case ("noise"): {
 				// Noise formula
 
-                let newChannelSecondary: string = "hsl(" + ((this.c_noiseSecondaryChannelHue + ((channel * this.c_noiseSecondaryChannelHueScale) / Config.noiseChannelCountMax) * 256) % colorFormulaNoiseLimit) + ","
+                let newChannelSecondary: string = "hsl(" + ((this.c_noiseSecondaryChannelHue + ((channel * this.c_noiseSecondaryChannelHueScale) / this.c_noiseChannelCountOverride) * 256) % colorFormulaNoiseLimit) + ","
                     + (this.c_noiseSecondaryChannelSat + channel * this.c_noiseSecondaryChannelSatScale) + "%,"
                     + (this.c_noiseSecondaryChannelLum + channel * this.c_noiseSecondaryChannelLumScale) + "%)";
-                let newChannelPrimary: string = "hsl(" + ((this.c_noisePrimaryChannelHue + ((channel * this.c_noisePrimaryChannelHueScale) / Config.noiseChannelCountMax) * 256) % colorFormulaNoiseLimit) + ","
+                let newChannelPrimary: string = "hsl(" + ((this.c_noisePrimaryChannelHue + ((channel * this.c_noisePrimaryChannelHueScale) / this.c_noiseChannelCountOverride) * 256) % colorFormulaNoiseLimit) + ","
                     + (this.c_noisePrimaryChannelSat + channel * this.c_noisePrimaryChannelSatScale) + "%,"
                     + (this.c_noisePrimaryChannelLum + channel * this.c_noisePrimaryChannelLumScale) + "%)";
-                let newNoteSecondary: string = "hsl(" + ((this.c_noiseSecondaryNoteHue + ((channel * this.c_noiseSecondaryNoteHueScale) / Config.noiseChannelCountMax) * 256) % colorFormulaNoiseLimit) + ","
+                let newNoteSecondary: string = "hsl(" + ((this.c_noiseSecondaryNoteHue + ((channel * this.c_noiseSecondaryNoteHueScale) / this.c_noiseChannelCountOverride) * 256) % colorFormulaNoiseLimit) + ","
                     + (this.c_noiseSecondaryNoteSat + channel * this.c_noiseSecondaryNoteSatScale) + "%,"
                     + (this.c_noiseSecondaryNoteLum + channel * this.c_noiseSecondaryNoteLumScale) + "%)";
-                let newNotePrimary: string = "hsl(" + ((this.c_noisePrimaryNoteHue + ((channel * this.c_noisePrimaryNoteHueScale) / Config.noiseChannelCountMax) * 256) % colorFormulaNoiseLimit) + ","
+                let newNotePrimary: string = "hsl(" + ((this.c_noisePrimaryNoteHue + ((channel * this.c_noisePrimaryNoteHueScale) / this.c_noiseChannelCountOverride) * 256) % colorFormulaNoiseLimit) + ","
                     + (this.c_noisePrimaryNoteSat + channel * this.c_noisePrimaryNoteSatScale) + "%,"
                     + (this.c_noisePrimaryNoteLum + channel * this.c_noisePrimaryNoteLumScale) + "%)";
 
@@ -5636,16 +5815,16 @@ export class ColorConfig {
             } case ("mod"): {
                 // Mod formula
 
-                let newChannelSecondary: string = "hsl(" + ((this.c_modSecondaryChannelHue + ((channel * this.c_modSecondaryChannelHueScale) / Config.modChannelCountMax) * 256) % colorFormulaModLimit) + ","
+                let newChannelSecondary: string = "hsl(" + ((this.c_modSecondaryChannelHue + ((channel * this.c_modSecondaryChannelHueScale) / this.c_modChannelCountOverride) * 256) % colorFormulaModLimit) + ","
                     + (this.c_modSecondaryChannelSat + channel * this.c_modSecondaryChannelSatScale) + "%,"
                     + (this.c_modSecondaryChannelLum + channel * this.c_modSecondaryChannelLumScale) + "%)";
-                let newChannelPrimary: string = "hsl(" + ((this.c_modPrimaryChannelHue + ((channel * this.c_modPrimaryChannelHueScale) / Config.modChannelCountMax) * 256) % colorFormulaModLimit) + ","
+                let newChannelPrimary: string = "hsl(" + ((this.c_modPrimaryChannelHue + ((channel * this.c_modPrimaryChannelHueScale) / this.c_modChannelCountOverride) * 256) % colorFormulaModLimit) + ","
                     + (this.c_modPrimaryChannelSat + channel * this.c_modPrimaryChannelSatScale) + "%,"
                     + (this.c_modPrimaryChannelLum + channel * this.c_modPrimaryChannelLumScale) + "%)";
-                let newNoteSecondary: string = "hsl(" + ((this.c_modSecondaryNoteHue + ((channel * this.c_modSecondaryNoteHueScale) / Config.modChannelCountMax) * 256) % colorFormulaModLimit) + ","
+                let newNoteSecondary: string = "hsl(" + ((this.c_modSecondaryNoteHue + ((channel * this.c_modSecondaryNoteHueScale) / this.c_modChannelCountOverride) * 256) % colorFormulaModLimit) + ","
                     + (this.c_modSecondaryNoteSat + channel * this.c_modSecondaryNoteSatScale) + "%,"
                     + (this.c_modSecondaryNoteLum + channel * this.c_modSecondaryNoteLumScale) + "%)";
-                let newNotePrimary: string = "hsl(" + ((this.c_modPrimaryNoteHue + ((channel * this.c_modPrimaryNoteHueScale) / Config.modChannelCountMax) * 256) % colorFormulaModLimit) + ","
+                let newNotePrimary: string = "hsl(" + ((this.c_modPrimaryNoteHue + ((channel * this.c_modPrimaryNoteHueScale) / this.c_modChannelCountOverride) * 256) % colorFormulaModLimit) + ","
                     + (this.c_modPrimaryNoteSat + channel * this.c_modPrimaryNoteSatScale) + "%,"
                     + (this.c_modPrimaryNoteLum + channel * this.c_modPrimaryNoteLumScale) + "%)";
 
@@ -5656,16 +5835,16 @@ export class ColorConfig {
             default: {
 				// Pitch formula
 
-                let newChannelSecondary: string = "hsl(" + ((this.c_pitchSecondaryChannelHue + (channel * this.c_pitchSecondaryChannelHueScale / Config.pitchChannelCountMax) * 256) % colorFormulaPitchLimit) + ","
+                let newChannelSecondary: string = "hsl(" + ((this.c_pitchSecondaryChannelHue + (channel * this.c_pitchSecondaryChannelHueScale / this.c_pitchChannelCountOverride) * 256) % colorFormulaPitchLimit) + ","
                     + (this.c_pitchSecondaryChannelSat * (1 - (this.c_pitchSecondaryChannelSatScale * Math.floor(channel / 7)))) + "%,"
                     + (this.c_pitchSecondaryChannelLum * (1 - (this.c_pitchSecondaryChannelLumScale * Math.floor(channel / 7)))) + "%)";
-                let newChannelPrimary: string = "hsl(" + ((this.c_pitchPrimaryChannelHue + (channel * this.c_pitchPrimaryChannelHueScale / Config.pitchChannelCountMax) * 256) % colorFormulaPitchLimit) + ","
+                let newChannelPrimary: string = "hsl(" + ((this.c_pitchPrimaryChannelHue + (channel * this.c_pitchPrimaryChannelHueScale / this.c_pitchChannelCountOverride) * 256) % colorFormulaPitchLimit) + ","
                     + (this.c_pitchPrimaryChannelSat * (1 - (this.c_pitchPrimaryChannelSatScale * Math.floor(channel / 7)))) + "%,"
                     + (this.c_pitchPrimaryChannelLum * (1 - (this.c_pitchPrimaryChannelLumScale * Math.floor(channel / 7)))) + "%)";
-                let newNoteSecondary: string = "hsl(" + ((this.c_pitchSecondaryNoteHue + (channel * this.c_pitchSecondaryNoteHueScale / Config.pitchChannelCountMax) * 256) % colorFormulaPitchLimit) + ","
+                let newNoteSecondary: string = "hsl(" + ((this.c_pitchSecondaryNoteHue + (channel * this.c_pitchSecondaryNoteHueScale / this.c_pitchChannelCountOverride) * 256) % colorFormulaPitchLimit) + ","
                     + (this.c_pitchSecondaryNoteSat * (1 - (this.c_pitchSecondaryNoteSatScale * Math.floor(channel / 7)))) + "%,"
                     + (this.c_pitchSecondaryNoteLum * (1 - (this.c_pitchSecondaryNoteLumScale * Math.floor(channel / 7)))) + "%)";
-                let newNotePrimary: string = "hsl(" + ((this.c_pitchPrimaryNoteHue + (channel * this.c_pitchPrimaryNoteHueScale / Config.pitchChannelCountMax) * 256) % colorFormulaPitchLimit) + ","
+                let newNotePrimary: string = "hsl(" + ((this.c_pitchPrimaryNoteHue + (channel * this.c_pitchPrimaryNoteHueScale / this.c_pitchChannelCountOverride) * 256) % colorFormulaPitchLimit) + ","
                     + (this.c_pitchPrimaryNoteSat * (1 - (this.c_pitchPrimaryNoteSatScale * Math.floor(channel / 7)))) + "%,"
                     + (this.c_pitchPrimaryNoteLum * (1 - (this.c_pitchPrimaryNoteLumScale * Math.floor(channel / 7)))) + "%)";
 
@@ -5716,16 +5895,16 @@ export class ColorConfig {
                 if (channel < song.pitchChannelCount) {
                     // Pitch formula
 
-				let newChannelSecondary: string = "hsl(" + ((this.c_pitchSecondaryChannelHue + (channel * this.c_pitchSecondaryChannelHueScale / Config.pitchChannelCountMax) * 256) % colorFormulaPitchLimit) + ","
+				let newChannelSecondary: string = "hsl(" + ((this.c_pitchSecondaryChannelHue + (channel * this.c_pitchSecondaryChannelHueScale / this.c_pitchChannelCountOverride) * 256) % colorFormulaPitchLimit) + ","
 					+ (this.c_pitchSecondaryChannelSat * (1 - (this.c_pitchSecondaryChannelSatScale * Math.floor(channel / 9)))) + "%,"
 					+ (this.c_pitchSecondaryChannelLum * (1 - (this.c_pitchSecondaryChannelLumScale * Math.floor(channel / 9)))) + "%)";
-				let newChannelPrimary: string = "hsl(" + ((this.c_pitchPrimaryChannelHue + (channel * this.c_pitchPrimaryChannelHueScale / Config.pitchChannelCountMax) * 256) % colorFormulaPitchLimit) + ","
+				let newChannelPrimary: string = "hsl(" + ((this.c_pitchPrimaryChannelHue + (channel * this.c_pitchPrimaryChannelHueScale / this.c_pitchChannelCountOverride) * 256) % colorFormulaPitchLimit) + ","
 					+ (this.c_pitchPrimaryChannelSat * (1 - (this.c_pitchPrimaryChannelSatScale * Math.floor(channel / 9)))) + "%,"
 					+ (this.c_pitchPrimaryChannelLum * (1 - (this.c_pitchPrimaryChannelLumScale * Math.floor(channel / 9)))) + "%)";
-				let newNoteSecondary: string = "hsl(" + ((this.c_pitchSecondaryNoteHue + (channel * this.c_pitchSecondaryNoteHueScale / Config.pitchChannelCountMax) * 256) % colorFormulaPitchLimit) + ","
+				let newNoteSecondary: string = "hsl(" + ((this.c_pitchSecondaryNoteHue + (channel * this.c_pitchSecondaryNoteHueScale / this.c_pitchChannelCountOverride) * 256) % colorFormulaPitchLimit) + ","
 					+ (this.c_pitchSecondaryNoteSat * (1 - (this.c_pitchSecondaryNoteSatScale * Math.floor(channel / 9)))) + "%,"
 					+ (this.c_pitchSecondaryNoteLum * (1 - (this.c_pitchSecondaryNoteLumScale * Math.floor(channel / 9)))) + "%)";
-				let newNotePrimary: string = "hsl(" + ((this.c_pitchPrimaryNoteHue + (channel * this.c_pitchPrimaryNoteHueScale / Config.pitchChannelCountMax) * 256) % colorFormulaPitchLimit) + ","
+				let newNotePrimary: string = "hsl(" + ((this.c_pitchPrimaryNoteHue + (channel * this.c_pitchPrimaryNoteHueScale / this.c_pitchChannelCountOverride) * 256) % colorFormulaPitchLimit) + ","
 					+ (this.c_pitchPrimaryNoteSat * (1 - (this.c_pitchPrimaryNoteSatScale * Math.floor(channel / 9)))) + "%,"
 					+ (this.c_pitchPrimaryNoteLum * (1 - (this.c_pitchPrimaryNoteLumScale * Math.floor(channel / 9)))) + "%)";
 
@@ -5737,16 +5916,16 @@ export class ColorConfig {
                 else if (channel < song.pitchChannelCount + song.noiseChannelCount) {
                     // Noise formula
 					
-				let newChannelSecondary: string = "hsl(" + ((this.c_noiseSecondaryChannelHue + (((channel - song.pitchChannelCount) * this.c_noiseSecondaryChannelHueScale) / Config.noiseChannelCountMax) * 256) % colorFormulaNoiseLimit) + ","
+				let newChannelSecondary: string = "hsl(" + ((this.c_noiseSecondaryChannelHue + (((channel - song.pitchChannelCount) * this.c_noiseSecondaryChannelHueScale) / this.c_noiseChannelCountOverride) * 256) % colorFormulaNoiseLimit) + ","
 					+ (this.c_noiseSecondaryChannelSat + channel * this.c_noiseSecondaryChannelSatScale) + "%,"
 					+ (this.c_noiseSecondaryChannelLum + channel * this.c_noiseSecondaryChannelLumScale) + "%)";
-				let newChannelPrimary: string = "hsl(" + ((this.c_noisePrimaryChannelHue + (((channel - song.pitchChannelCount) * this.c_noisePrimaryChannelHueScale) / Config.noiseChannelCountMax) * 256) % colorFormulaNoiseLimit) + ","
+				let newChannelPrimary: string = "hsl(" + ((this.c_noisePrimaryChannelHue + (((channel - song.pitchChannelCount) * this.c_noisePrimaryChannelHueScale) / this.c_noiseChannelCountOverride) * 256) % colorFormulaNoiseLimit) + ","
 					+ (this.c_noisePrimaryChannelSat + channel * this.c_noisePrimaryChannelSatScale) + "%,"
 					+ (this.c_noisePrimaryChannelLum + channel * this.c_noisePrimaryChannelLumScale) + "%)";
-				let newNoteSecondary: string = "hsl(" + ((this.c_noiseSecondaryNoteHue + (((channel - song.pitchChannelCount) * this.c_noiseSecondaryNoteHueScale) / Config.noiseChannelCountMax) * 256) % colorFormulaNoiseLimit) + ","
+				let newNoteSecondary: string = "hsl(" + ((this.c_noiseSecondaryNoteHue + (((channel - song.pitchChannelCount) * this.c_noiseSecondaryNoteHueScale) / this.c_noiseChannelCountOverride) * 256) % colorFormulaNoiseLimit) + ","
 					+ (this.c_noiseSecondaryNoteSat + channel * this.c_noiseSecondaryNoteSatScale) + "%,"
 					+ (this.c_noiseSecondaryNoteLum + channel * this.c_noiseSecondaryNoteLumScale) + "%)";
-				let newNotePrimary: string = "hsl(" + ((this.c_noisePrimaryNoteHue + (((channel - song.pitchChannelCount) * this.c_noisePrimaryNoteHueScale) / Config.noiseChannelCountMax) * 256) % colorFormulaNoiseLimit) + ","
+				let newNotePrimary: string = "hsl(" + ((this.c_noisePrimaryNoteHue + (((channel - song.pitchChannelCount) * this.c_noisePrimaryNoteHueScale) / this.c_noiseChannelCountOverride) * 256) % colorFormulaNoiseLimit) + ","
 					+ (this.c_noisePrimaryNoteSat + channel * this.c_noisePrimaryNoteSatScale) + "%,"
 					+ (this.c_noisePrimaryNoteLum + channel * this.c_noisePrimaryNoteLumScale) + "%)";
 
@@ -5757,16 +5936,16 @@ export class ColorConfig {
                 else {
                     // Mod formula
 
-					let newChannelSecondary: string = "hsl(" + ((this.c_modSecondaryChannelHue + (((channel - song.pitchChannelCount - song.noiseChannelCount) * this.c_modSecondaryChannelHueScale) / Config.modChannelCountMax) * 256) % colorFormulaModLimit) + ","
+					let newChannelSecondary: string = "hsl(" + ((this.c_modSecondaryChannelHue + (((channel - song.pitchChannelCount - song.noiseChannelCount) * this.c_modSecondaryChannelHueScale) / this.c_modChannelCountOverride) * 256) % colorFormulaModLimit) + ","
 						+ (this.c_modSecondaryChannelSat + channel * this.c_modSecondaryChannelSatScale) + "%,"
 						+ (this.c_modSecondaryChannelLum + channel * this.c_modSecondaryChannelLumScale) + "%)";
-					let newChannelPrimary: string = "hsl(" + ((this.c_modPrimaryChannelHue + (((channel - song.pitchChannelCount - song.noiseChannelCount) * this.c_modPrimaryChannelHueScale) / Config.modChannelCountMax) * 256) % colorFormulaModLimit) + ","
+					let newChannelPrimary: string = "hsl(" + ((this.c_modPrimaryChannelHue + (((channel - song.pitchChannelCount - song.noiseChannelCount) * this.c_modPrimaryChannelHueScale) / this.c_modChannelCountOverride) * 256) % colorFormulaModLimit) + ","
 						+ (this.c_modPrimaryChannelSat + channel * this.c_modPrimaryChannelSatScale) + "%,"
 						+ (this.c_modPrimaryChannelLum + channel * this.c_modPrimaryChannelLumScale) + "%)";
-					let newNoteSecondary: string = "hsl(" + ((this.c_modSecondaryNoteHue + (((channel - song.pitchChannelCount - song.noiseChannelCount) * this.c_modSecondaryNoteHueScale) / Config.modChannelCountMax) * 256) % colorFormulaModLimit) + ","
+					let newNoteSecondary: string = "hsl(" + ((this.c_modSecondaryNoteHue + (((channel - song.pitchChannelCount - song.noiseChannelCount) * this.c_modSecondaryNoteHueScale) / this.c_modChannelCountOverride) * 256) % colorFormulaModLimit) + ","
 						+ (this.c_modSecondaryNoteSat + channel * this.c_modSecondaryNoteSatScale) + "%,"
 						+ (this.c_modSecondaryNoteLum + channel * this.c_modSecondaryNoteLumScale) + "%)";
-					let newNotePrimary: string = "hsl(" + ((this.c_modPrimaryNoteHue + (((channel - song.pitchChannelCount - song.noiseChannelCount) * this.c_modPrimaryNoteHueScale) / Config.modChannelCountMax) * 256) % colorFormulaModLimit) + ","
+					let newNotePrimary: string = "hsl(" + ((this.c_modPrimaryNoteHue + (((channel - song.pitchChannelCount - song.noiseChannelCount) * this.c_modPrimaryNoteHueScale) / this.c_modChannelCountOverride) * 256) % colorFormulaModLimit) + ","
 						+ (this.c_modPrimaryNoteSat + channel * this.c_modPrimaryNoteSatScale) + "%,"
 						+ (this.c_modPrimaryNoteLum + channel * this.c_modPrimaryNoteLumScale) + "%)";
 
@@ -5782,7 +5961,7 @@ export class ColorConfig {
 
     public static setTheme(name: string): void {
 		let theme: string = this.themes[name];
-		if (theme == undefined) theme = this.themes["dark classic"];
+		if (theme == undefined) theme = ColorConfig.defaultTheme;
 		this._styleElement.textContent = theme;
 
 		// for getComputed
@@ -5795,12 +5974,9 @@ export class ColorConfig {
 		if (getComputedStyle(this._styleElement).getPropertyValue("--text-spacing-icon") == "") valuesToAdd += "--text-spacing-icon:　;";
 		if (getComputedStyle(this._styleElement).getPropertyValue("--note-flash") == "") valuesToAdd += "--note-flash:#ffffff;";
 		if (getComputedStyle(this._styleElement).getPropertyValue("--note-flash-secondary") == "") valuesToAdd += "--note-flash-secondary:#ffffff77;";
-		// if (getComputedStyle(this._styleElement).getPropertyValue("--pitch-channel-limit") == "") valuesToAdd += "--pitch-channel-limit:" + Config.pitchChannelCountMax + ";";
-		// if (getComputedStyle(this._styleElement).getPropertyValue("--noise-channel-limit") == "") valuesToAdd += "--noise-channel-limit:" + Config.noiseChannelCountMax + ";";
-		// if (getComputedStyle(this._styleElement).getPropertyValue("--mod-channel-limit") == "") valuesToAdd += "--mod-channel-limit:" + Config.modChannelCountMax + ";";
-		if (getComputedStyle(this._styleElement).getPropertyValue("--pitch-channel-limit") == "") valuesToAdd += "--pitch-channel-limit:10;";
-		if (getComputedStyle(this._styleElement).getPropertyValue("--noise-channel-limit") == "") valuesToAdd += "--noise-channel-limit:5;";
-		if (getComputedStyle(this._styleElement).getPropertyValue("--mod-channel-limit") == "") valuesToAdd += "--mod-channel-limit:4;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--pitch-channel-limit") == "") valuesToAdd += "--pitch-channel-limit:" + Config.pitchChannelCountMax + ";";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--noise-channel-limit") == "") valuesToAdd += "--noise-channel-limit:" + Config.noiseChannelCountMax + ";";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--mod-channel-limit") == "") valuesToAdd += "--mod-channel-limit:" + Config.modChannelCountMax + ";";
 		if (getComputedStyle(this._styleElement).getPropertyValue("--formula-pitch-channel-limit") == "") valuesToAdd += "--formula-pitch-channel-limit:360;";
 		if (getComputedStyle(this._styleElement).getPropertyValue("--formula-noise-channel-limit") == "") valuesToAdd += "--formula-noise-channel-limit:360;";
 		if (getComputedStyle(this._styleElement).getPropertyValue("--formula-mod-channel-limit") == "") valuesToAdd += "--formula-mod-channel-limit:360;";
@@ -5992,6 +6168,9 @@ export class ColorConfig {
 			this.c_modPrimaryNoteLum = +getComputedStyle(this._styleElement).getPropertyValue("--mod-primary-note-lum");
 			this.c_modPrimaryNoteLumScale = +getComputedStyle(this._styleElement).getPropertyValue("--mod-primary-note-lum-scale");
 
+			if (getComputedStyle(this._styleElement).getPropertyValue("--formula-pitch-channel-count-override") != "") this.c_pitchChannelCountOverride = +getComputedStyle(this._styleElement).getPropertyValue("--formula-pitch-channel-count-override");
+			if (getComputedStyle(this._styleElement).getPropertyValue("--formula-noise-channel-count-override") != "") this.c_noiseChannelCountOverride = +getComputedStyle(this._styleElement).getPropertyValue("--formula-noise-channel-count-override");
+			if (getComputedStyle(this._styleElement).getPropertyValue("--formula-mod-channel-count-override") != "") this.c_modChannelCountOverride = +getComputedStyle(this._styleElement).getPropertyValue("--formula-mod-channel-count-override");
         }
 
     }

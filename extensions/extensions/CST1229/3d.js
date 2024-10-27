@@ -1169,9 +1169,9 @@ If I ever decide to release this extension on the gallery, this will be replaced
       dr[OBJECT] = obj;
       this.updateMeshForDrawable(drawableID, type);
 
-      if (!("_yaw" in dr)) dr[YAW] = 0;
-      if (!("_pitch" in dr)) dr[PITCH] = 0;
-      if (!("_roll" in dr)) dr[ROLL] = 0;
+      if (!(YAW in dr)) dr[YAW] = 0;
+      if (!(PITCH in dr)) dr[PITCH] = 0;
+      if (!(ROLL in dr)) dr[ROLL] = 0;
       if (!(Z_POS in dr)) dr[Z_POS] = 0;
 
       this.scene.add(obj);
@@ -1631,9 +1631,9 @@ If I ever decide to release this extension on the gallery, this will be replaced
     }
 
     preUpdateCameraAngle() {
-      if (!("_yaw" in this.camera)) this.camera[YAW] = 0;
-      if (!("_pitch" in this.camera)) this.camera[PITCH] = 0;
-      if (!("_roll" in this.camera)) this.camera[ROLL] = 0;
+      if (!(YAW in this.camera)) this.camera[YAW] = 0;
+      if (!(PITCH in this.camera)) this.camera[PITCH] = 0;
+      if (!(ROLL in this.camera)) this.camera[ROLL] = 0;
     }
 
     updateCameraAngle() {

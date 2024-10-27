@@ -1033,20 +1033,11 @@ If I ever decide to release this extension on the gallery, this will be replaced
     getSprites() {
       let spriteNames = [];
       const targets = runtime.targets;
-      const myself = runtime.getEditingTarget().sprite.name;
       for (let index = 1; index < targets.length; index++) {
         const curTarget = targets[index].sprite;
-        let display = curTarget.name;
-        if (myself === curTarget.name) {
-          continue;
-          /*display = Scratch.translate({
-            default: "myself",
-            description: "Item in a dropdown that refers to the current sprite",
-          });*/
-        }
         if (targets[index].isOriginal) {
           const jsonOBJ = {
-            text: display,
+            text: curTarget.name,
             value: curTarget.name,
           };
           spriteNames.push(jsonOBJ);
@@ -1548,6 +1539,7 @@ If I ever decide to release this extension on the gallery, this will be replaced
       if (!targetObj) return;
       const dr = renderer._allDrawables[util.target.drawableID];
       const targetDr = renderer._allDrawables[targetObj.drawableID];
+      if (dr === targetDr) return;
 
       dr[ATTACHED_TO] = targetDr;
       this.updateAttachment(dr);
@@ -1568,6 +1560,7 @@ If I ever decide to release this extension on the gallery, this will be replaced
         }
       }
       if (targetDr === undefined) return;
+      if (dr === targetDr) return;
       dr[ATTACHED_TO] = targetDr;
       this.updateAttachment(dr);
     }

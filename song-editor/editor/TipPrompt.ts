@@ -611,6 +611,13 @@ export class TipPrompt implements Prompt {
 					p("Insert a new point on the left side of the filter editor to add a \"high-pass\" filter point, which additionally reduces the volume of lower frequencies, or insert a new point on the right side to add a \"low-pass\" filter point which reduces the volume of higher frequencies."),
 					p("The Song Eq Filter applies to all instruments. This can be handy for getting the sound of a certain genre or fading in and out in combination with modulation"),				);
 			} break;
+			case "envelopeWaveform": {
+				message = div(
+					h2("Envelope Waveform"),
+					p("LFO envelopes can output a variety of different waveforms, from old tremolo's sine to more complex ones."),
+					p("These waves are: sines, squares, triangles, and sawtooths."),
+				);
+			} break;
 
 			default:
 				// Check for modSetinfo#

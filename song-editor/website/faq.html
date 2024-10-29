@@ -40,6 +40,9 @@
             flex-direction: column;
             align-items: center;
             align-content: center;
+            width: 100%;
+            margin-left: 3vw;
+            margin-right: 30vw;
         }
 
         h1 {
@@ -108,7 +111,7 @@
             }
         }
     </style>
-    </body>
+<body>
     <h1>
         <font color="#9c64f7"> Frequently Asked Questions </font>
     </h1>
@@ -120,27 +123,33 @@
             New envelopeable effects: reverb, chorus, bitcrush, frequency crush, panning, distortion, and arpeggio speed
         </li>
         <li>
-            Two new envelope types:
+            Three new envelope types:
         </li>
         <ul>
             <li>
                 Pitch: track what your notes do based on the pitch (also called keytracking in other daws). This envelope has an adjustable pitch range setting
             </li>
             <li>
+                Random: Uses a pseudorandom hashing function to output a "random" value based on the step size and seed. Each time your song is played the envelope will output the same value
+            </li>
+            <li>
                 Fall: Similar to twang, except instead of decreasing quickly to slowly, fall decreases slowly to quickly
             </li>
         </ul>
         <li>
-            Individual envelope speeds, bounds, and inversions
+            Individual envelope speeds (with modulation support), bounds, and inversions
         </li>
         <li> 
             Increased max envelope count to 16 (from ultrabox's 12)
         </li>
         <li>
+            New Song EQ filter, along with modulation support
+        </li>
+        <li>
             A better spectrum and harmonics editor (zoom, copy and paste)
         </li>
         <li>
-            Several new keybinds in the Song player (shorten link, toggle loop, toggle zoom, and copy link)
+            Several new keybinds in the Song player (shorten link, toggle loop, toggle zoom, and copy link) and 2 new keybinds for opening and closing several dropdowns at once (envelopes and fm dropdowns)
         </li>
         <li>
             Two new themes: Greyscale and Slarmoo's Box
@@ -485,7 +494,18 @@
             </tr>
         </tbody>
     </table>
-
-    </body>
+    <h2> What can I do with Pitch Envelopes? </h2>
+    <span> Slarmoo's Box's unique pitch envelopes has a variety of unique uses. </span>
+    <span> You can: </span>
+    <ul>
+        <li>Set it to target pitch shift or detune (or custom unisons) to get anything from subtle pitch stretching to microtonality </li>
+        <li>Target note volume to have upper notes map quieter than lower notes or vice versa for help mixing</li>
+        <li>Target note volume to fade from one instrument to another (or suddenly change, which may be useful for multisampling)</li>
+        <li>Target pulse width, fm volume sliders, or other effects to have dynamic arpeggios</li>
+        <li>Target panning to have different notes be panned different directions</li>
+        <li>Have different pitches of a drumset or other instrument have different effect amounts</li>
+        <li>And many more techniques that you can discover on your own!</li>
+    </ul>
+</body>
 
 </html>

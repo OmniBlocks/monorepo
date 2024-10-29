@@ -84,7 +84,7 @@ export class CustomFilterPrompt implements Prompt {
         this.filterEditor.container.insertBefore(this._filterCoordinateText, this.filterEditor.container.firstChild);
         this.filterEditor.coordText = this._filterCoordinateText;
 
-        this._editorTitle.children[0].innerHTML = (_useNoteFilter) ? "Edit Note Filter" : "Edit EQ Filter";
+        this._editorTitle.children[0].innerHTML = forSong ? "Edit Song EQ Filter" : (_useNoteFilter) ? "Edit Note Filter" : "Edit EQ Filter";
 
         let newButton: HTMLButtonElement = button({ class: "no-underline", style: "max-width: 5em;" }, "Main");
         this._filterButtonContainer.appendChild(newButton);

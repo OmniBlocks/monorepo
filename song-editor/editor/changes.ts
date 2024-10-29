@@ -5296,3 +5296,20 @@ export class PasteEnvelope extends Change {
         this._didSomething();
     }
 }
+
+export class ChangeSetEnvelopeWaveform extends Change {
+    constructor(doc: SongDocument, waveform: any, index: number) {
+        super();
+        const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+        const oldWaveform: number = instrument.envelopes[index].waveform;
+        waveform = parseInt(waveform + ""); //make sure waveform isn't a string
+        if (oldWaveform != waveform) {
+            instrument.envelopes[index].waveform = waveform;
+        }
+
+
+        instrument.preset = instrument.type;
+        doc.notifier.changed();
+        this._didSomething();
+    }
+}

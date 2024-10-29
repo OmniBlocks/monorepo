@@ -3323,8 +3323,8 @@ export class SongEditor {
                         }
                         if (anyInstrumentEchoes) {
                             settingList.push("echo");
-                            // Disabled currently!
-                            //settingList.push("echo delay");
+                            // Enabled Slarmoo's Box 1.3
+                            settingList.push("echo delay");
                         }
                         if (!allInstrumentEchoes) {
                             unusedSettingList.push("+ echo");
@@ -4169,11 +4169,21 @@ export class SongEditor {
                     const instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
                     if (!instrument.eqFilterType && this._doc.channel < this._doc.song.pitchChannelCount + this._doc.song.noiseChannelCount)
                         this._openPrompt("customEQFilterSettings");
+                } else if (event.altKey) {
+                    //open / close all envelope dropdowns
+                    const instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
+                    const isAllOpen: boolean = this.envelopeEditor.openExtraSettingsDropdowns.every((x) => { return x == true })
+                    for (let i = 0; i < instrument.envelopeCount; i++) {
+                        if (isAllOpen) this.envelopeEditor.openExtraSettingsDropdowns[i] = false;
+                        else this.envelopeEditor.openExtraSettingsDropdowns[i] = true;
+                    }
+                    this.envelopeEditor.rerenderExtraSettings();
+                    event.preventDefault();
                 } else if (needControlForShortcuts == (event.ctrlKey || event.metaKey)) {
                     // EUCLEDIAN RHYTHM SHORTCUT (E)
                     this._openPrompt("generateEuclideanRhythm");
                     break;
-			    }
+                } 
                 break;
             case 70: // f
                 if (canPlayNotes) break;
@@ -4191,6 +4201,15 @@ export class SongEditor {
                         this._doc.selection.setChannelBar(this._doc.channel, Math.floor(this._doc.synth.playhead));
                     }
                     event.preventDefault();
+                } else if (event.altKey) {
+                    //open / close all fm dropdowns
+                    const instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
+                    const isAllOpen: boolean = this._openOperatorDropdowns.every((x) => { return x == true })
+                    for (let i = 0; i < (instrument.type == InstrumentType.fm ? 4 : 6); i++) {
+                        if (this._openOperatorDropdowns[i] == false && !isAllOpen || isAllOpen)
+                            this._toggleDropdownMenu(DropdownID.FM, i);
+                    }
+                    event.preventDefault();
                 } else if (needControlForShortcuts == (event.ctrlKey || event.metaKey)) {
 
                     this._doc.synth.loopBarStart = -1;
@@ -4204,7 +4223,7 @@ export class SongEditor {
                         this._doc.selection.setChannelBar(this._doc.channel, Math.floor(this._doc.synth.playhead));
                     }
                     event.preventDefault();
-                }
+                } 
                 break;
             case 72: // h
                 if (canPlayNotes) break;
@@ -4359,21 +4378,47 @@ export class SongEditor {
                 break;
             case 83: // s
                 if (canPlayNotes) break;
-                if (event.ctrlKey || event.metaKey) {
+                if (event.shiftKey && event.ctrlKey && event.altKey) {
+                    // Ctrl Alt Shift S: Slarmooify - set all prefs to my preferred ones lol
+                    this._doc.prefs.autoPlay = false;
+                    this._doc.prefs.autoFollow = true;
+                    this._doc.prefs.enableNotePreview = true;
+                    this._doc.prefs.showFifth = true;
+                    this._doc.prefs.notesOutsideScale = false;
+                    this._doc.prefs.defaultScale = 0;
+                    this._doc.prefs.showLetters = true;
+                    this._doc.prefs.showChannels = true;
+                    this._doc.prefs.showScrollBar = true;
+                    this._doc.prefs.alwaysFineNoteVol = false;
+                    this._doc.prefs.enableChannelMuting = true;
+                    this._doc.prefs.displayBrowserUrl = true;
+                    this._doc.prefs.displayVolumeBar = true;
+                    this._doc.prefs.layout = "tall";
+                    this._doc.prefs.visibleOctaves = 5;
+                    this._doc.prefs.closePromptByClickoff = false;
+                    this._doc.prefs.colorTheme = "slarmoosbox";
+                    this._doc.prefs.frostedGlassBackground = false;
+                    this._doc.prefs.instrumentButtonsAtTop = true;
+                    this._doc.prefs.instrumentCopyPaste = true;
+                    this._doc.prefs.instrumentImportExport = true;
+                    this._doc.prefs.notesFlashWhenPlayed = true;
+                    this._doc.prefs.showOscilloscope = true;
+                    this._doc.prefs.save();
+                    event.preventDefault();
+                    location.reload();
+                } else if (event.ctrlKey || event.metaKey) {
                     this._openPrompt("export");
                     event.preventDefault();
-                } else {
-                    if (this._doc.prefs.enableChannelMuting) {
-                        // JummBox deviation: I like shift+s as just another mute toggle personally.
-                        // Easier to reach than M and the shift+s invert functionality I am overwriting could be 
-                        // obtained with M anyway. Useability-wise you very often want to 'add' channels on to a solo as you work.
-                        if (event.shiftKey) {
-                            this._doc.selection.muteChannels(false);
-                        } else {
-                            this._doc.selection.soloChannels(false);
-                        }
-                        event.preventDefault();
+                } else if (this._doc.prefs.enableChannelMuting) {
+                    // JummBox deviation: I like shift+s as just another mute toggle personally.
+                    // Easier to reach than M and the shift+s invert functionality I am overwriting could be 
+                    // obtained with M anyway. Useability-wise you very often want to 'add' channels on to a solo as you work.
+                    if (event.shiftKey) {
+                        this._doc.selection.muteChannels(false);
+                    } else {
+                        this._doc.selection.soloChannels(false);
                     }
+                    event.preventDefault();
                 }
                 break;
             case 79: // o

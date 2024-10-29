@@ -488,8 +488,8 @@ var beepbox = (function (exports) {
     Config.ticksPerArpeggio = 3;
     Config.arpeggioPatterns = [[0], [0, 1], [0, 1, 2, 1], [0, 1, 2, 3], [0, 1, 2, 3, 4], [0, 1, 2, 3, 4, 5], [0, 1, 2, 3, 4, 5, 6], [0, 1, 2, 3, 4, 5, 6, 7]];
     Config.rhythms = toNameMap([
-        { name: "÷1 (whole notes)", stepsPerBeat: 1, roundUpThresholds: [3] },
-        { name: "÷2 (half notes)", stepsPerBeat: 2, roundUpThresholds: [3, 9] },
+        { name: "÷1 (quarter notes)", stepsPerBeat: 1, roundUpThresholds: [3] },
+        { name: "÷2 (eighth notes)", stepsPerBeat: 2, roundUpThresholds: [3, 9] },
         { name: "÷3 (triplets)", stepsPerBeat: 3, roundUpThresholds: [5, 12, 18] },
         { name: "÷4 (standard)", stepsPerBeat: 4, roundUpThresholds: [3, 9, 17, 21] },
         { name: "÷6 (sextuplets)", stepsPerBeat: 6, roundUpThresholds: null },
@@ -875,8 +875,7 @@ var beepbox = (function (exports) {
         { name: "flare", type: 5, speed: 32.0 },
         { name: "twang", type: 6, speed: 32.0 },
         { name: "swell", type: 7, speed: 32.0 },
-        { name: "tremolo", type: 8, speed: 4.0 },
-        { name: "tremolo2", type: 9, speed: 4.0 },
+        { name: "lfo", type: 8, speed: 4.0 },
         { name: "decay", type: 10, speed: 10.0 },
         { name: "wibble", type: 11, speed: 24.0 },
         { name: "linear", type: 12, speed: 32.0 },
@@ -971,9 +970,9 @@ var beepbox = (function (exports) {
     Config.pitchChannelCountMin = 1;
     Config.pitchChannelCountMax = 60;
     Config.noiseChannelCountMin = 0;
-    Config.noiseChannelCountMax = 32;
+    Config.noiseChannelCountMax = 60;
     Config.modChannelCountMin = 0;
-    Config.modChannelCountMax = 24;
+    Config.modChannelCountMax = 60;
     Config.noiseInterval = 6;
     Config.pitchesPerOctave = 12;
     Config.drumCount = 12;
@@ -1230,10 +1229,6 @@ var beepbox = (function (exports) {
         { name: "individual envelope speed", pianoName: "IndvEnvSpd", maxRawVol: 63, newNoteVol: 23, forSong: false, convertRealFactor: 0, associatedEffect: 12,
             promptName: "Individual Envelope Speed", promptDesc: ["This setting controls how fast the specified envelope of the instrument will play.", "At $LO, your the envelope will be frozen, and at values near there they will change very slowly. At 23, the envelope will work as usual, performing at normal speed. This increases up to $HI, where the envelope will change very quickly. The speeds are given below:",
                 "[0-4]: x0, x0.01, x0.02, x0.03, x0.04,", "[5-9]: x0.05, x0.06, x0.07, x0.08, x0.09,", "[10-14]: x0.1, x0.2, x0.25, x0.3, x0.33,", "[15-19]: x0.4, x0.5, x0.6, x0.6667, x0.7,", "[20-24]: x0.75, x0.8, x0.9, x1, x1.25,", "[25-29]: x1.3333, x1.5, x1.6667, x1.75, x2,", "[30-34]: x2.25, x2.5, x2.75, x3, x3.5,", "[35-39]: x4, x4.5, x5, x5.5, x6,", "[40-44]: x6.5, x7, x7.5, x8, x8.5,", "[45-49]: x9, x9.5, x10, x11, x12", "[50-54]: x13, x14, x15, x16, x17", "[55-59]: x18, x19, x20, x24, x32", "[60-63]: x40, x64, x128, x256", "[OVERWRITING] [$LO - $HI]"] },
-        { name: "individual envelope lower bound", pianoName: "IndvEnvLow", maxRawVol: 20, newNoteVol: 0, forSong: false, convertRealFactor: 0, associatedEffect: 12,
-            promptName: "Individual Envelope Lower Bound", promptDesc: ["This setting controlsthe envelope lower bound", "At $LO, your the envelope will output an upper envelope bound to 0, and at $HI your envelope will output an upper envelope bound to 2.", "This settings will not work if your lower envelope bound is higher than your upper envelope bound",] },
-        { name: "individual envelope upper bound", pianoName: "IndvEnvUp", maxRawVol: 20, newNoteVol: 10, forSong: false, convertRealFactor: 0, associatedEffect: 12,
-            promptName: "Individual Envelope Upper Bound", promptDesc: ["This setting controlsthe envelope lower bound", "At $LO, your the envelope will output a 0 to lower envelope bound, and at $HI your envelope will output a 2 to lower envelope bound.", "This settings will not work if your lower envelope bound is higher than your upper envelope bound",] },
         { name: "song eq", pianoName: "Song EQ", maxRawVol: 10, newNoteVol: 0, forSong: true, convertRealFactor: 0, associatedEffect: 12,
             promptName: "Song EQ Filter", promptDesc: ["This setting overwrites every instrument's eq filter. You can do this in a few separate ways, similar to the per instrument eq filter modulator.", "When the option 'morph' is selected, your modulator values will indicate a sub-filter index of your EQ filter to 'morph' to over time. For example, a change from 0 to 1 means your main filter (default) will morph to sub-filter 1 over the specified duration. You can shape the main filter and sub-filters in the large filter editor ('+' button). If your two filters' number, type, and order of filter dots all match up, the morph will happen smoothly and you'll be able to hear them changing. If they do not match up, the filters will simply jump between each other.", "Note that filters will morph based on endpoints in the pattern editor. So, if you specify a morph from sub-filter 1 to 4 but do not specifically drag in new endpoints for 2 and 3, it will morph directly between 1 and 4 without going through the others.", "If you target Dot X or Dot Y, you can finely tune the coordinates of a single dot for your filter. The number of available dots to choose is dependent on your main filter's dot count.", "[OVERWRITING] [$LO - $HI]"] },
     ]);
@@ -1608,7 +1603,7 @@ var beepbox = (function (exports) {
             return (_a = EditorConfig.presetCategories[0].presets.dictionary) === null || _a === void 0 ? void 0 : _a[TypePresets === null || TypePresets === void 0 ? void 0 : TypePresets[instrument]];
         }
     }
-    EditorConfig.version = "1.2.3";
+    EditorConfig.version = "1.3";
     EditorConfig.versionDisplayName = "Slarmoo's Box " + EditorConfig.version;
     EditorConfig.releaseNotesURL = "./patch_notes.html";
     EditorConfig.isOnMac = /^Mac/i.test(navigator.platform) || /Mac OS X/i.test(navigator.userAgent) || /^(iPhone|iPad|iPod)/i.test(navigator.platform) || /(iPhone|iPad|iPod)/i.test(navigator.userAgent);
@@ -3309,10 +3304,6 @@ var beepbox = (function (exports) {
                     return (2 * (Math.abs(((time * harmonic / 2 + 1 / 2) % 1 + 1) % 1) * 2 - 1) - 1) / harmonic;
                 case 3:
                     return (2 * Math.abs(((time * harmonic / 2 + 1 / 2) % 1 + 1) % 1) - 1) / harmonic;
-                case 4:
-                    return (-2 * Math.abs(((time * harmonic / 2 + 1 / 2) % 1 + 1) % 1) + 1) / harmonic;
-                case 5:
-                    return this.waveExpressions(2, time, harmonic) + this.waveExpressions(2, (time + 1 / 2), harmonic);
                 default:
                     return (Math.sin(time * harmonic * Math.PI * 2)) / harmonic;
             }
@@ -5078,9 +5069,9 @@ var beepbox = (function (exports) {
         static frequencyFromPitch(pitch) {
             return 440.0 * Math.pow(2.0, (pitch - 69.0) / 12.0);
         }
-        addEnvelope(target, index, envelope, newEnvelope, start = 0, end = -1, inverse = false, perEnvelopeSpeed = -1, perEnvelopeLowerBound = 0, perEnvelopeUpperBound = 1, steps = 2, seed = 2, waveform = 0) {
+        addEnvelope(target, index, envelope, newEnvelopes, start = 0, end = -1, inverse = false, perEnvelopeSpeed = -1, perEnvelopeLowerBound = 0, perEnvelopeUpperBound = 1, steps = 2, seed = 2, waveform = 0) {
             end = end != -1 ? end : this.isNoiseInstrument ? Config.drumCount - 1 : Config.maxPitch;
-            perEnvelopeSpeed = perEnvelopeSpeed != -1 ? perEnvelopeSpeed : newEnvelope ? 1 : Config.envelopes[envelope].speed;
+            perEnvelopeSpeed = perEnvelopeSpeed != -1 ? perEnvelopeSpeed : newEnvelopes ? 1 : Config.envelopes[envelope].speed;
             let makeEmpty = false;
             if (!this.supportsEnvelopeTarget(target, index))
                 makeEmpty = true;
@@ -5091,7 +5082,7 @@ var beepbox = (function (exports) {
             const envelopeSettings = this.envelopes[this.envelopeCount];
             envelopeSettings.target = makeEmpty ? Config.instrumentAutomationTargets.dictionary["none"].index : target;
             envelopeSettings.index = makeEmpty ? 0 : index;
-            if (!newEnvelope) {
+            if (!newEnvelopes) {
                 envelopeSettings.envelope = Config.envelopes[envelope].type;
             }
             else {
@@ -5750,7 +5741,7 @@ var beepbox = (function (exports) {
                             buffer.push(base64IntToCharCode[instrument.envelopes[envelopeIndex].steps]);
                             buffer.push(base64IntToCharCode[instrument.envelopes[envelopeIndex].seed]);
                         }
-                        else if (Config.newEnvelopes[instrument.envelopes[envelopeIndex].envelope].name == "tremolo") {
+                        else if (Config.newEnvelopes[instrument.envelopes[envelopeIndex].envelope].name == "lfo") {
                             buffer.push(base64IntToCharCode[instrument.envelopes[envelopeIndex].waveform]);
                         }
                         buffer.push(base64IntToCharCode[(+instrument.envelopes[envelopeIndex].inverse)] ? base64IntToCharCode[(+instrument.envelopes[envelopeIndex].inverse)] : base64IntToCharCode[0]);
@@ -7467,6 +7458,7 @@ var beepbox = (function (exports) {
                         {
                             const pregoldToEnvelope = [0, 1, 2, 4, 5, 6, 8, 9, 10, 12, 13, 14, 16, 17, 18, 19, 20, 21, 23, 24, 25, 27, 28, 29, 32, 33, 34, 31, 11];
                             const jummToUltraEnvelope = [0, 1, 2, 4, 5, 6, 8, 9, 10, 12, 13, 14, 16, 17, 18, 19, 20, 21, 23, 24, 25, 58, 59, 60];
+                            const slarURL3toURL4Envelope = [0, 1, 2, 3, 4, 5, 6, 7, 8, 8, 9, 10, 11, 12, 13, 14];
                             const instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                             if ((beforeNine && fromBeepBox) || (beforeFive && fromJummBox) || (beforeFour && fromGoldBox)) {
                                 const legacySettings = legacySettingsCache[instrumentChannelIterator][instrumentIndexIterator];
@@ -7501,20 +7493,33 @@ var beepbox = (function (exports) {
                                         aa = jummToUltraEnvelope[aa];
                                     if (!fromSlarmoosBox && aa >= 2)
                                         aa++;
-                                    if ((!fromSlarmoosBox || beforeFour) && aa >= 3)
+                                    let updatedEnvelopes = false;
+                                    let perEnvelopeSpeed = 1;
+                                    if (!fromSlarmoosBox || beforeThree) {
+                                        updatedEnvelopes = true;
+                                        perEnvelopeSpeed = Config.envelopes[aa].speed;
+                                        aa = Config.envelopes[aa].type;
+                                    }
+                                    else if (beforeFour && aa >= 3)
                                         aa++;
-                                    const envelope = clamp(0, ((fromSlarmoosBox && !beforeThree) ? Config.newEnvelopes.length : Config.envelopes.length), aa);
+                                    let isTremolo2 = false;
+                                    if ((fromSlarmoosBox && !beforeThree && beforeFour) || updatedEnvelopes) {
+                                        if (aa == 9)
+                                            isTremolo2 = true;
+                                        aa = slarURL3toURL4Envelope[aa];
+                                    }
+                                    const envelope = clamp(0, ((fromSlarmoosBox && !beforeThree || updatedEnvelopes) ? Config.newEnvelopes.length : Config.envelopes.length), aa);
                                     let pitchEnvelopeStart = 0;
                                     let pitchEnvelopeEnd = Config.maxPitch;
                                     let envelopeInverse = false;
-                                    let perEnvelopeSpeed = (fromSlarmoosBox && !beforeThree) ? Config.newEnvelopes[envelope].speed : Config.envelopes[envelope].speed;
+                                    perEnvelopeSpeed = (fromSlarmoosBox && !beforeThree) ? Config.newEnvelopes[envelope].speed : perEnvelopeSpeed;
                                     let perEnvelopeLowerBound = 0;
                                     let perEnvelopeUpperBound = 1;
                                     let steps = 2;
                                     let seed = 2;
                                     let waveform = 0;
                                     if (fromSlarmoosBox && !beforeFour) {
-                                        if (Config.newEnvelopes[envelope].name == "tremolo") {
+                                        if (Config.newEnvelopes[envelope].name == "lfo") {
                                             waveform = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                                         }
                                         else if (Config.newEnvelopes[envelope].name == "random") {
@@ -7542,7 +7547,20 @@ var beepbox = (function (exports) {
                                         perEnvelopeLowerBound = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] / 10;
                                         perEnvelopeUpperBound = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] / 10;
                                     }
-                                    instrument.addEnvelope(target, index, envelope, (fromSlarmoosBox && !beforeThree), pitchEnvelopeStart, pitchEnvelopeEnd, envelopeInverse, perEnvelopeSpeed, perEnvelopeLowerBound, perEnvelopeUpperBound, steps, seed, waveform);
+                                    if (!fromSlarmoosBox || beforeFour) {
+                                        if (isTremolo2) {
+                                            waveform = 0;
+                                            if (envelopeInverse) {
+                                                perEnvelopeUpperBound = Math.floor((perEnvelopeUpperBound / 2) * 10) / 10;
+                                                perEnvelopeLowerBound = Math.floor((perEnvelopeLowerBound / 2) * 10) / 10;
+                                            }
+                                            else {
+                                                perEnvelopeUpperBound = Math.floor((0.5 + (perEnvelopeUpperBound - perEnvelopeLowerBound) / 2) * 10) / 10;
+                                                perEnvelopeLowerBound = 0.5;
+                                            }
+                                        }
+                                    }
+                                    instrument.addEnvelope(target, index, envelope, true, pitchEnvelopeStart, pitchEnvelopeEnd, envelopeInverse, perEnvelopeSpeed, perEnvelopeLowerBound, perEnvelopeUpperBound, steps, seed, waveform);
                                     if (fromSlarmoosBox && beforeThree && !beforeTwo) {
                                         let pitchEnvelopeCompact = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                                         instrument.envelopes[i].pitchEnvelopeStart = pitchEnvelopeCompact * 64 + base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
@@ -9397,8 +9415,9 @@ var beepbox = (function (exports) {
                     perEnvelopeSpeed = instrument.envelopes[envelopeIndex].perEnvelopeSpeed;
                     globalEnvelopeSpeed = Math.pow(instrument.envelopeSpeed, 2) / 144;
                     envelopeSpeed = perEnvelopeSpeed == 0 || globalEnvelopeSpeed == 0 ? perEnvelopeSpeed + globalEnvelopeSpeed : perEnvelopeSpeed * globalEnvelopeSpeed;
-                    perEnvelopeLowerBound = instrument.envelopes[envelopeIndex].perEnvelopeLowerBound;
-                    perEnvelopeUpperBound = instrument.envelopes[envelopeIndex].perEnvelopeUpperBound;
+                    const boundsCorrect = instrument.envelopes[envelopeIndex].perEnvelopeLowerBound <= instrument.envelopes[envelopeIndex].perEnvelopeUpperBound;
+                    perEnvelopeLowerBound = boundsCorrect ? instrument.envelopes[envelopeIndex].perEnvelopeLowerBound : 0;
+                    perEnvelopeUpperBound = boundsCorrect ? instrument.envelopes[envelopeIndex].perEnvelopeUpperBound : 1;
                     timeSinceStart = synth.computeTicksSinceStart();
                     steps = instrument.envelopes[envelopeIndex].steps;
                     seed = instrument.envelopes[envelopeIndex].seed;
@@ -9530,6 +9549,7 @@ var beepbox = (function (exports) {
                 case 8:
                     switch (waveform) {
                         case 0:
+                            console.log("sine");
                             if (inverse) {
                                 return (perEnvelopeUpperBound / 2) + boundAdjust * Math.cos(beats * 2.0 * Math.PI * envelopeSpeed) * 0.5 + (perEnvelopeLowerBound / 2);
                             }
@@ -9537,6 +9557,7 @@ var beepbox = (function (exports) {
                                 return (perEnvelopeUpperBound / 2) - boundAdjust * Math.cos(beats * 2.0 * Math.PI * envelopeSpeed) * 0.5 + (perEnvelopeLowerBound / 2);
                             }
                         case 1:
+                            console.log("square");
                             if (inverse) {
                                 return (Math.cos(beats * 2.0 * Math.PI * envelopeSpeed) < 0) ? perEnvelopeUpperBound : perEnvelopeLowerBound;
                             }
@@ -9544,13 +9565,22 @@ var beepbox = (function (exports) {
                                 return (Math.cos(beats * 2.0 * Math.PI * envelopeSpeed) < 0) ? perEnvelopeLowerBound : perEnvelopeUpperBound;
                             }
                         case 2:
+                            console.log("triangle");
                             if (inverse) {
                                 return (perEnvelopeUpperBound / 2) - (boundAdjust / Math.PI) * Math.asin(Math.sin((Math.PI / 2) + beats * Math.PI * 2.0 * envelopeSpeed)) + (perEnvelopeLowerBound / 2);
                             }
                             else {
                                 return (perEnvelopeUpperBound / 2) + (boundAdjust / Math.PI) * Math.asin(Math.sin((Math.PI / 2) + beats * Math.PI * 2.0 * envelopeSpeed)) + (perEnvelopeLowerBound / 2);
                             }
-                        default: throw new Error("Unrecognized operator envelope waveform type.");
+                        case 3:
+                            console.log("sawtooth");
+                            if (inverse) {
+                                return perEnvelopeUpperBound - (beats * envelopeSpeed) % 1 * boundAdjust;
+                            }
+                            else {
+                                return (beats * envelopeSpeed) % 1 * boundAdjust + perEnvelopeLowerBound;
+                            }
+                        default: throw new Error("Unrecognized operator envelope waveform type: " + waveform);
                     }
                 case 9:
                     if (inverse) {

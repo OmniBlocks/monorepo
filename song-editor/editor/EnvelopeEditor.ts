@@ -1,9 +1,9 @@
 // Copyright (c) 2012-2022 John Nesky and contributing authors, distributed under the MIT license, see accompanying the LICENSE.md file.
 
-import { InstrumentType, Config, DropdownID } from "../synth/SynthConfig";
+import { InstrumentType, Config, DropdownID, BaseWaveTypes } from "../synth/SynthConfig";
 import { Instrument } from "../synth/synth";
 import { SongDocument } from "./SongDocument";
-import { ChangeSetEnvelopeTarget, ChangeSetEnvelopeType, ChangeRemoveEnvelope, ChangeEnvelopePitchStart, ChangeEnvelopePitchEnd, ChangeEnvelopeInverse, ChangePerEnvelopeSpeed, ChangeEnvelopeLowerBound, ChangeEnvelopeUpperBound, ChangeRandomEnvelopeSteps, ChangeRandomEnvelopeSeed, PasteEnvelope } from "./changes";
+import { ChangeSetEnvelopeTarget, ChangeSetEnvelopeType, ChangeRemoveEnvelope, ChangeEnvelopePitchStart, ChangeEnvelopePitchEnd, ChangeEnvelopeInverse, ChangePerEnvelopeSpeed, ChangeEnvelopeLowerBound, ChangeEnvelopeUpperBound, ChangeRandomEnvelopeSteps, ChangeRandomEnvelopeSeed, PasteEnvelope, ChangeSetEnvelopeWaveform } from "./changes";
 import { HTML, SVG } from "imperative-html/dist/esm/elements-strict";
 import { Change } from "./Change";
 import { prettyNumber } from "./EditorConfig";
@@ -19,6 +19,8 @@ export class EnvelopeEditor {
 	public readonly extraSettingsDropdowns: HTMLButtonElement[] = []; //need to be accessed in SongEditor to function
 	public readonly extraPitchSettingsGroups: HTMLDivElement[] = [];
 	public readonly extraSettingsDropdownGroups: HTMLDivElement[] = [];
+	public readonly extraRandomSettingsGroups: HTMLDivElement[] = [];
+	public readonly extraLFODropdownGroups: HTMLDivElement[] = [];
 	public readonly openExtraSettingsDropdowns: Boolean[] = [];
 	public readonly perEnvelopeSpeedGroups: HTMLElement[] = [];
 
@@ -45,10 +47,11 @@ export class EnvelopeEditor {
 	public readonly randomSeedBoxes: HTMLInputElement[] = [];
 	private readonly _randomStepsSliders: HTMLInputElement[] = [];
 	private readonly _randomSeedSliders: HTMLInputElement[] = [];
-	public readonly extraRandomSettingsGroups: HTMLDivElement[] = [];
 	//envelope copy and paste
 	private readonly _envelopeCopyButtons: HTMLButtonElement[] = [];
 	private readonly _envelopePasteButtons: HTMLButtonElement[] = [];
+	//lfo
+	private readonly _waveformSelects: HTMLSelectElement[] = [];
 
 
 	private _renderedEnvelopeCount: number = 0;
@@ -82,6 +85,7 @@ export class EnvelopeEditor {
 		const randomSeedBoxIndex: number = this.randomSeedBoxes.indexOf(<any>event.target);
 		const randomStepsSliderIndex: number = this._randomStepsSliders.indexOf(<any>event.target);
 		const randomSeedSliderIndex: number = this._randomSeedSliders.indexOf(<any>event.target);
+		const waveformSelectIndex: number = this._waveformSelects.indexOf(<any>event.target);
 		if (targetSelectIndex != -1) {
 			const combinedValue: number = parseInt(this._targetSelects[targetSelectIndex].value);
 			const target: number = combinedValue % Config.instrumentAutomationTargets.length;
@@ -93,9 +97,10 @@ export class EnvelopeEditor {
 			this._doc.record(new ChangeSetEnvelopeType(this._doc, envelopeIndex, this._envelopeSelects[envelopeIndex].selectedIndex));
 
 			//hide different envelope groups based on envelope type
-			this.perEnvelopeSpeedGroups[envelopeIndex].style.display = Config.newEnvelopes[this._envelopeSelects[envelopeIndex].selectedIndex].name == "pitch" || Config.newEnvelopes[this._envelopeSelects[envelopeIndex].selectedIndex].name == "note size" || Config.newEnvelopes[this._envelopeSelects[envelopeIndex].selectedIndex].name == "punch" || Config.newEnvelopes[this._envelopeSelects[envelopeIndex].selectedIndex].name == "none" ? "inline" : "none";
-			this.extraPitchSettingsGroups[envelopeIndex].style.display = Config.newEnvelopes[this._envelopeSelects[envelopeIndex].selectedIndex].name == "pitch" ? "" : "none";
+			this.rerenderExtraSettings(envelopeSelectIndex);
 			this.render();
+		} else if (waveformSelectIndex != -1) {
+			this._doc.record(new ChangeSetEnvelopeWaveform(this._doc, this._waveformSelects[waveformSelectIndex].value, waveformSelectIndex));
 		} else if (inverterIndex != -1) {
 			this._doc.record(new ChangeEnvelopeInverse(this._doc, this._inverters[inverterIndex].checked, inverterIndex));
 		} else if (startBoxIndex != -1) {
@@ -268,9 +273,9 @@ export class EnvelopeEditor {
 		return "[" + text + Math.floor((value + Config.pitchesPerOctave) / 12 + this._doc.song.octave - 1) + "]";
 	}
 
-	public rerenderExtraSettings() { //probably not the best solution, but very reliable and easy
+	public rerenderExtraSettings(index: number = 0) { //probably not the best solution, but very reliable and easy
 		const instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
-		for (let i = 0; i < Config.maxEnvelopeCount; i++) {
+		for (let i = index; i < Config.maxEnvelopeCount; i++) {
 			if (i >= instrument.envelopeCount) {
 				if (this.extraSettingsDropdowns[i]) { //make sure is not null so that we don't get an error
 					this.extraSettingsDropdowns[i].style.display = "none";
@@ -305,9 +310,10 @@ export class EnvelopeEditor {
 					//update note displays
 					this._startNoteDisplays[i].textContent = "Start " + this._pitchToNote(parseInt(this.pitchStartBoxes[i].value), instrument.isNoiseInstrument) + ": ";
 					this._endNoteDisplays[i].textContent = "End " + this._pitchToNote(parseInt(this.pitchEndBoxes[i].value), instrument.isNoiseInstrument) + ": ";
-					//hide perEnvelopeSpeed and random
+					//hide perEnvelopeSpeed, random, and lfo
 					this.perEnvelopeSpeedGroups[i].style.display = "none";
 					this.extraRandomSettingsGroups[i].style.display = "none";
+					this.extraLFODropdownGroups[i].style.display = "none";
 				} else if (Config.newEnvelopes[instrument.envelopes[i].envelope].name == "random") {
 					
 					//update values
@@ -324,10 +330,27 @@ export class EnvelopeEditor {
 					this.extraSettingsDropdowns[i].style.display = "inline";
 					this.extraPitchSettingsGroups[i].style.display = "none";
 					this.extraRandomSettingsGroups[i].style.display = "";
+					this.extraLFODropdownGroups[i].style.display = "none";
+
+				} else if (Config.newEnvelopes[instrument.envelopes[i].envelope].name == "lfo") {
+
+					//update values
+					this._waveformSelects[i].value = instrument.envelopes[i].waveform.toString();
+					this._perEnvelopeSpeedSliders[i].value = this.convertIndexSpeed(instrument.envelopes[i].perEnvelopeSpeed, "index").toString();
+					this._perEnvelopeSpeedDisplays[i].textContent = "Spd: x" + prettyNumber(this.convertIndexSpeed(parseFloat(this._perEnvelopeSpeedSliders[i].value), "speed"));
+
+					//hide other dropdown groups, show lfo settings and speed
+					this.extraLFODropdownGroups[i].style.display = "";
+					this.perEnvelopeSpeedGroups[i].style.display = "flex"
+					this.extraSettingsDropdownGroups[i].style.display = "flex";
+					this.extraSettingsDropdowns[i].style.display = "inline";
+					this.extraPitchSettingsGroups[i].style.display = "none";
+					this.extraRandomSettingsGroups[i].style.display = "none";
 
 				} else {
 					this.extraPitchSettingsGroups[i].style.display = "none";
 					this.extraRandomSettingsGroups[i].style.display = "none";
+					this.extraLFODropdownGroups[i].style.display = "none";
 					if (Config.newEnvelopes[instrument.envelopes[i].envelope].name == "note size" || Config.newEnvelopes[instrument.envelopes[i].envelope].name == "punch" || Config.newEnvelopes[instrument.envelopes[i].envelope].name == "none") {
 						this.perEnvelopeSpeedGroups[i].style.display = "none"
 					} else {
@@ -447,6 +470,11 @@ export class EnvelopeEditor {
 			const perEnvelopeSpeedDisplay: HTMLSpanElement = HTML.span({ class: "tip", style: `width:58px; flex:1; height:1em; font-size: smaller; margin-left: 10px;`, onclick: () => this._openPrompt("perEnvelopeSpeed") }, "Spd: x" + prettyNumber(this.convertIndexSpeed(parseFloat(perEnvelopeSpeedSlider.value), "speed")));
 			const perEnvelopeSpeedWrapper: HTMLDivElement = HTML.div({ style: "margin-top: 3px; flex:1; display:flex; flex-direction: row; align-items:center; justify-content:right;" }, perEnvelopeSpeedDisplay, perEnvelopeSpeedSlider);
 
+			const waveformSelect: HTMLSelectElement = HTML.select();
+			const wavenames: string[] = ["sine", "square", "triangle", "sawtooth", "ramp", "trapezoid"]
+			for (let waveform: number = 0; waveform < BaseWaveTypes.length; waveform++) {
+				waveformSelect.appendChild(HTML.option({ value: waveform }, wavenames[waveform]));
+			}
 
 			const perEnvelopeSpeedGroup: HTMLDivElement = HTML.div({ class: "editor-controls", style: "flex-direction:column; align-items:center;" }, perEnvelopeSpeedWrapper);
 			
@@ -477,7 +505,10 @@ export class EnvelopeEditor {
 			const extraRandomSettingsGroup: HTMLDivElement = HTML.div({ class: "editor-controls", style: "flex-direction:column; align-items:center;" }, randomStepsWrapper, randomSeedWrapper);
 			extraRandomSettingsGroup.style.display = "none";
 
-			const extraSettingsDropdownGroup: HTMLDivElement = HTML.div({ class: "editor-controls", style: "flex-direction:column; align-items:center;" }, perEnvelopeSpeedGroup, extraPitchSettingsGroup, extraRandomSettingsGroup, lowerBoundWrapper, upperBoundWrapper, invertWrapper, copyPasteContainer);
+			const extraLFOSettingsGroup: HTMLDivElement = HTML.div({ class: "editor-controls", style: "margin-top: 3px; flex:1; display:flex; flex-direction: row; align-items:center; justify-content:right;" }, HTML.span({ class: "tip", onclick: () => this._openPrompt("envelopeWaveform") }, "Waveform: "), waveformSelect);
+			extraLFOSettingsGroup.style.display = "none";
+
+			const extraSettingsDropdownGroup: HTMLDivElement = HTML.div({ class: "editor-controls", style: "flex-direction:column; align-items:center;" }, perEnvelopeSpeedGroup, extraPitchSettingsGroup, extraRandomSettingsGroup, extraLFOSettingsGroup, lowerBoundWrapper, upperBoundWrapper, invertWrapper, copyPasteContainer);
 			extraSettingsDropdownGroup.style.display = "none";
 
 
@@ -518,6 +549,8 @@ export class EnvelopeEditor {
 			this.extraRandomSettingsGroups[envelopeIndex] = extraRandomSettingsGroup;
 			this._envelopeCopyButtons[envelopeIndex] = envelopeCopyButton;
 			this._envelopePasteButtons[envelopeIndex] = envelopePasteButton;
+			this._waveformSelects[envelopeIndex] = waveformSelect;
+			this.extraLFODropdownGroups[envelopeIndex] = extraLFOSettingsGroup;
 		}
 
 		for (let envelopeIndex: number = this._renderedEnvelopeCount; envelopeIndex < instrument.envelopeCount; envelopeIndex++) {

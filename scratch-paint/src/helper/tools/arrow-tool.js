@@ -260,18 +260,19 @@ class ArrowTool extends paper.Tool {
         this.tri = new paper.Path(constructArrowPath(event.modifiers.control, pathOptions.width, pathOptions.length, pathOptions.head.width, pathOptions.head.length));
         // console.log(pathOptions.angle, this.tri)
         // console.log(pathOptions.angle)
-        this.tri.rotate(pathOptions.angle, event.downPoint);
         // this.tri.scale(tri.size.width / 100, tri.size.height / 100, event.downPoint);
 
         // create new position
         if ((!this.arrowPathLocked) && this.arrowPathLockedState) {
             this.tri.position = event.downPoint;
 
-            const dimensions = event.point.subtract(event.downPoint);
+            const dimensions = new paper.Point(event.point.getDistance(event.downPoint),0);
             this.tri.position = event.downPoint.add(dimensions.multiply(0.5));
         } else if (this.arrowPathLocked) {
             this.tri.position = this.arrowPathLockedState;
         }
+
+        this.tri.rotate(pathOptions.angle, event.downPoint);
 
         // add guide text
         // remove first

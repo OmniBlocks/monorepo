@@ -71,7 +71,7 @@ class SegmentBrushHelper {
         this.finalPath = newPath;
     }
 
-    onSegmentMouseUp (event) {
+    onSegmentMouseUp (event, options) {
         if (event.event.button > 0) return; // only first mouse button
 
         // TODO: This smoothing tends to cut off large portions of the path! Would like to eventually
@@ -81,7 +81,7 @@ class SegmentBrushHelper {
         // paths tends to cut off the path.
         if (this.finalPath.segments && this.finalPath.segments.length > 4) {
             this.finalPath.closed = false;
-            this.finalPath.simplify(2);
+            this.finalPath.simplify(10 / options.segSize);
             this.finalPath.closed = true;
             // Merge again with the first point, since it gets distorted when we unclose the path.
             const temp = this.finalPath.unite(this.firstCircle);

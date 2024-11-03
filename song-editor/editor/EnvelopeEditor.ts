@@ -47,6 +47,8 @@ export class EnvelopeEditor {
 	public readonly randomSeedBoxes: HTMLInputElement[] = [];
 	private readonly _randomStepsSliders: HTMLInputElement[] = [];
 	private readonly _randomSeedSliders: HTMLInputElement[] = [];
+	private readonly _randomEnvelopeTypeSelects: HTMLSelectElement[] = [];
+	private readonly _randomStepsWrappers: HTMLDivElement[] = [];
 	//envelope copy and paste
 	private readonly _envelopeCopyButtons: HTMLButtonElement[] = [];
 	private readonly _envelopePasteButtons: HTMLButtonElement[] = [];
@@ -86,6 +88,7 @@ export class EnvelopeEditor {
 		const randomStepsSliderIndex: number = this._randomStepsSliders.indexOf(<any>event.target);
 		const randomSeedSliderIndex: number = this._randomSeedSliders.indexOf(<any>event.target);
 		const waveformSelectIndex: number = this._waveformSelects.indexOf(<any>event.target);
+		const randomTypeSelectIndex: number = this._randomEnvelopeTypeSelects.indexOf(<any>event.target);
 		if (targetSelectIndex != -1) {
 			const combinedValue: number = parseInt(this._targetSelects[targetSelectIndex].value);
 			const target: number = combinedValue % Config.instrumentAutomationTargets.length;
@@ -101,6 +104,8 @@ export class EnvelopeEditor {
 			this.render();
 		} else if (waveformSelectIndex != -1) {
 			this._doc.record(new ChangeSetEnvelopeWaveform(this._doc, this._waveformSelects[waveformSelectIndex].value, waveformSelectIndex));
+		} else if (randomTypeSelectIndex != -1) {
+			this._doc.record(new ChangeSetEnvelopeWaveform(this._doc, this._randomEnvelopeTypeSelects[randomTypeSelectIndex].value, randomTypeSelectIndex));
 		} else if (inverterIndex != -1) {
 			this._doc.record(new ChangeEnvelopeInverse(this._doc, this._inverters[inverterIndex].checked, inverterIndex));
 		} else if (startBoxIndex != -1) {
@@ -323,9 +328,11 @@ export class EnvelopeEditor {
 					this._randomSeedSliders[i].value = instrument.envelopes[i].seed.toString();
 					this._perEnvelopeSpeedSliders[i].value = this.convertIndexSpeed(instrument.envelopes[i].perEnvelopeSpeed, "index").toString();
 					this._perEnvelopeSpeedDisplays[i].textContent = "Spd: x" + prettyNumber(this.convertIndexSpeed(parseFloat(this._perEnvelopeSpeedSliders[i].value), "speed"));
+					// this._randomEnvelopeTypeSelects[i] = instrument.envelopes[i].waveform;
+					this._randomStepsWrappers[i].style.display = instrument.envelopes[i].waveform == Config.randomEnvelopeTypes.indexOf("time") ? "" : "none";
 					
 					//hide other dropdown groups, show perEnvelopeSpeed
-					this.perEnvelopeSpeedGroups[i].style.display = ""
+					this.perEnvelopeSpeedGroups[i].style.display = instrument.envelopes[i].waveform == Config.randomEnvelopeTypes.indexOf("time") ? "" : "none";
 					this.extraSettingsDropdownGroups[i].style.display = "flex";
 					this.extraSettingsDropdowns[i].style.display = "inline";
 					this.extraPitchSettingsGroups[i].style.display = "none";
@@ -466,11 +473,18 @@ export class EnvelopeEditor {
 			const randomStepsWrapper: HTMLDivElement = HTML.div({ style: "margin-top: 3px; flex:1; display:flex; flex-direction: row; align-items:center; justify-content:right;" }, randomStepsBoxWrapper, randomStepsSlider);
 			const randomSeedWrapper: HTMLDivElement = HTML.div({ style: "margin-top: 3px; flex:1; display:flex; flex-direction: row; align-items:center; justify-content:right;" }, randomSeedBoxWrapper, randomSeedSlider);
 
+			const randomTypeSelect: HTMLSelectElement = HTML.select({ style: "width: 117px;" });
+			for (let waveform: number = 0; waveform < Config.randomEnvelopeTypes.length; waveform++) {
+				randomTypeSelect.appendChild(HTML.option({ value: waveform }, Config.randomEnvelopeTypes[waveform]));
+			}
+			const randomTypeSelectWrapper: HTMLDivElement = HTML.div({ class: "editor-controls", style: "margin-top: 3px; flex:1; display:flex; flex-direction: row; align-items:center; justify-content:right;" }, HTML.span({ style: "font-size: smaller; margin-right: 35px;", class: "tip", onclick: () => this._openPrompt("randomEnvelopeType") }, "Type: "), randomTypeSelect);
+
+
 			const perEnvelopeSpeedSlider: HTMLInputElement = HTML.input({ style: "margin: 0; width: 113px", type: "range", min: 0, max: Config.perEnvelopeSpeedIndices.length - 1, value: this.convertIndexSpeed(instrument.envelopes[envelopeIndex].perEnvelopeSpeed, "index"), step: "1" });
 			const perEnvelopeSpeedDisplay: HTMLSpanElement = HTML.span({ class: "tip", style: `width:58px; flex:1; height:1em; font-size: smaller; margin-left: 10px;`, onclick: () => this._openPrompt("perEnvelopeSpeed") }, "Spd: x" + prettyNumber(this.convertIndexSpeed(parseFloat(perEnvelopeSpeedSlider.value), "speed")));
 			const perEnvelopeSpeedWrapper: HTMLDivElement = HTML.div({ style: "margin-top: 3px; flex:1; display:flex; flex-direction: row; align-items:center; justify-content:right;" }, perEnvelopeSpeedDisplay, perEnvelopeSpeedSlider);
 
-			const waveformSelect: HTMLSelectElement = HTML.select();
+			const waveformSelect: HTMLSelectElement = HTML.select({ style: "width: 117px;" });
 			const wavenames: string[] = ["sine", "square", "triangle", "sawtooth", "ramp", "trapezoid"]
 			for (let waveform: number = 0; waveform < BaseWaveTypes.length; waveform++) {
 				waveformSelect.appendChild(HTML.option({ value: waveform }, wavenames[waveform]));
@@ -478,17 +492,17 @@ export class EnvelopeEditor {
 
 			const perEnvelopeSpeedGroup: HTMLDivElement = HTML.div({ class: "editor-controls", style: "flex-direction:column; align-items:center;" }, perEnvelopeSpeedWrapper);
 			
-			const envelopeCopyButton: HTMLButtonElement = HTML.button({ style: "max-width:86px; width: 86px;", class: "copyButton", title: "Copy Envelope" }, [
+			const envelopeCopyButton: HTMLButtonElement = HTML.button({ style: "max-width:86px; width: 86px; height: 26px", class: "copyButton", title: "Copy Envelope" }, [
 				"Copy",
 				// Copy icon:
-				SVG.svg({ style: "flex-shrink: 0; position: absolute; left: 0; top: 50%; margin-top: -1em; pointer-events: none;", width: "2em", height: "2em", viewBox: "-5 -21 26 26" }, [
+				SVG.svg({ style: "flex-shrink: 0; position: absolute; left: 0; top: 50%; margin-top: -1em; pointer-events: none;", width: "26px", height: "26px", viewBox: "-5 -21 26 26" }, [
 					SVG.path({ d: "M 0 -15 L 1 -15 L 1 0 L 13 0 L 13 1 L 0 1 L 0 -15 z M 2 -1 L 2 -17 L 10 -17 L 14 -13 L 14 -1 z M 3 -2 L 13 -2 L 13 -12 L 9 -12 L 9 -16 L 3 -16 z", fill: "currentColor" }),
 				]),
 			]);
-			const envelopePasteButton: HTMLButtonElement = HTML.button({ style: "margin-left:10px; max-width:86px; width: 86px;", class: "pasteButton", title: "Paste Envelope" }, [
+			const envelopePasteButton: HTMLButtonElement = HTML.button({ style: "margin-left:10px; max-width:86px; width: 86px; height: 26px", class: "pasteButton", title: "Paste Envelope" }, [
 					"Paste",
 					// Paste icon:
-					SVG.svg({ style: "flex-shrink: 0; position: absolute; left: 0; top: 50%; margin-top: -1em; pointer-events: none;", width: "2em", height: "2em", viewBox: "0 0 26 26" }, [
+				SVG.svg({ style: "flex-shrink: 0; position: absolute; left: 0; top: 50%; margin-top: -1em; pointer-events: none;", width: "26px", height: "26px", viewBox: "0 0 26 26" }, [
 						SVG.path({ d: "M 8 18 L 6 18 L 6 5 L 17 5 L 17 7 M 9 8 L 16 8 L 20 12 L 20 22 L 9 22 z", stroke: "currentColor", fill: "none" }),
 						SVG.path({ d: "M 9 3 L 14 3 L 14 6 L 9 6 L 9 3 z M 16 8 L 20 12 L 16 12 L 16 8 z", fill: "currentColor", }),
 					]),
@@ -502,10 +516,12 @@ export class EnvelopeEditor {
 			const extraSettingsDropdown: HTMLButtonElement = HTML.button({ style: "margin-left:0em; margin-right: 0.3em; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: () => { const instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()]; this._extraSettingsDropdown(DropdownID.EnvelopeSettings, envelopeIndex, Config.newEnvelopes[instrument.envelopes[envelopeIndex].envelope].name); } }, "▼");
 			extraSettingsDropdown.style.display = "inline";
 
-			const extraRandomSettingsGroup: HTMLDivElement = HTML.div({ class: "editor-controls", style: "flex-direction:column; align-items:center;" }, randomStepsWrapper, randomSeedWrapper);
+			const extraRandomSettingsGroup: HTMLDivElement = instrument.envelopes[envelopeIndex].waveform == Config.randomEnvelopeTypes.indexOf("time")
+				? HTML.div({ class: "editor-controls", style: "flex-direction:column; align-items:center;" }, randomTypeSelectWrapper, randomStepsWrapper, randomSeedWrapper)
+				: HTML.div({ class: "editor-controls", style: "flex-direction:column; align-items:center;" }, randomTypeSelectWrapper, randomSeedWrapper);
 			extraRandomSettingsGroup.style.display = "none";
 
-			const extraLFOSettingsGroup: HTMLDivElement = HTML.div({ class: "editor-controls", style: "margin-top: 3px; flex:1; display:flex; flex-direction: row; align-items:center; justify-content:right;" }, HTML.span({ class: "tip", onclick: () => this._openPrompt("envelopeWaveform") }, "Waveform: "), waveformSelect);
+			const extraLFOSettingsGroup: HTMLDivElement = HTML.div({ class: "editor-controls", style: "margin-top: 3px; flex:1; display:flex; flex-direction: row; align-items:center; justify-content:right;" }, HTML.span({ style: "font-size: smaller; margin-right: 10px;", class: "tip", onclick: () => this._openPrompt("lfoEnvelopeWaveform") }, "Waveform: "), waveformSelect);
 			extraLFOSettingsGroup.style.display = "none";
 
 			const extraSettingsDropdownGroup: HTMLDivElement = HTML.div({ class: "editor-controls", style: "flex-direction:column; align-items:center;" }, perEnvelopeSpeedGroup, extraPitchSettingsGroup, extraRandomSettingsGroup, extraLFOSettingsGroup, lowerBoundWrapper, upperBoundWrapper, invertWrapper, copyPasteContainer);
@@ -546,6 +562,8 @@ export class EnvelopeEditor {
 			this.randomSeedBoxes[envelopeIndex] = randomSeedBox;
 			this._randomStepsSliders[envelopeIndex] = randomStepsSlider;
 			this._randomSeedSliders[envelopeIndex] = randomSeedSlider;
+			this._randomStepsWrappers[envelopeIndex] = randomStepsWrapper;
+			this._randomEnvelopeTypeSelects[envelopeIndex] = randomTypeSelect;
 			this.extraRandomSettingsGroups[envelopeIndex] = extraRandomSettingsGroup;
 			this._envelopeCopyButtons[envelopeIndex] = envelopeCopyButton;
 			this._envelopePasteButtons[envelopeIndex] = envelopePasteButton;

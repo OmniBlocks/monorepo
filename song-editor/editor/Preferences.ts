@@ -10,7 +10,7 @@ export class Preferences {
 	public autoPlay: boolean;
 	public autoFollow: boolean;
 	public enableNotePreview: boolean;
-	public showFifth: boolean;
+	public showFifth: boolean = true;
 	public notesOutsideScale: boolean;
 	public defaultScale: number;
 	public showLetters: boolean;

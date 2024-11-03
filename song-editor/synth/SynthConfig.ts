@@ -52,7 +52,7 @@ export const enum EnvelopeType {
 	flare,
 	twang,
 	swell,
-	tremolo,
+	lfo, //renamed from tremolo in slarmoo's box 1.3
     tremolo2, //deprecated as of slarmoo's box 1.3; Kept for updating integrity and drumsets
     decay,
     wibble,
@@ -1335,10 +1335,10 @@ export class Config {
         { name: "swell 1", type: EnvelopeType.swell, speed: 32.0 },
         { name: "swell 2", type: EnvelopeType.swell, speed: 8.0 },
         { name: "swell 3", type: EnvelopeType.swell, speed: 2.0 },
-        { name: "tremolo0", type: EnvelopeType.tremolo, speed: 8.0 },
-        { name: "tremolo1", type: EnvelopeType.tremolo, speed: 4.0 },
-        { name: "tremolo2", type: EnvelopeType.tremolo, speed: 2.0 },
-        { name: "tremolo3", type: EnvelopeType.tremolo, speed: 1.0 },
+        { name: "tremolo0", type: EnvelopeType.lfo, speed: 8.0 },
+        { name: "tremolo1", type: EnvelopeType.lfo, speed: 4.0 },
+        { name: "tremolo2", type: EnvelopeType.lfo, speed: 2.0 },
+        { name: "tremolo3", type: EnvelopeType.lfo, speed: 1.0 },
         { name: "tremolo4", type: EnvelopeType.tremolo2, speed: 4.0 },
         { name: "tremolo5", type: EnvelopeType.tremolo2, speed: 2.0 },
         { name: "tremolo6", type: EnvelopeType.tremolo2, speed: 1.0 },
@@ -1346,7 +1346,7 @@ export class Config {
         { name: "decay 1", type: EnvelopeType.decay, speed: 10.0 },
         { name: "decay 2", type: EnvelopeType.decay, speed: 7.0 },
         { name: "decay 3", type: EnvelopeType.decay, speed: 4.0 },
-        { name: "wibble-1", type: EnvelopeType.wibble, speed: 96.0 },
+        { name: "wibble-1", type: EnvelopeType.wibble, speed: 128.0 }, //Changed speed from 96 to 128. I forgot to include a 96 earlier, and now it's too late to add one, so we have this now. Hopefully no one notices
         { name: "wibble 1", type: EnvelopeType.wibble, speed: 24.0 },
         { name: "wibble 2", type: EnvelopeType.wibble, speed: 12.0 },
         { name: "wibble 3", type: EnvelopeType.wibble, speed: 4.0 },
@@ -1365,22 +1365,22 @@ export class Config {
         { name: "flute 2", type: EnvelopeType.wibble, speed: 8.0 },
         { name: "flute 3", type: EnvelopeType.wibble, speed: 4.0 },
         // sandbox
-        { name: "tripolo1", type: EnvelopeType.tremolo, speed: 9.0 },
-        { name: "tripolo2", type: EnvelopeType.tremolo, speed: 6.0 },
-        { name: "tripolo3", type: EnvelopeType.tremolo, speed: 3.0 },
+        { name: "tripolo1", type: EnvelopeType.lfo, speed: 9.0 },
+        { name: "tripolo2", type: EnvelopeType.lfo, speed: 6.0 },
+        { name: "tripolo3", type: EnvelopeType.lfo, speed: 3.0 },
         { name: "tripolo4", type: EnvelopeType.tremolo2, speed: 9.0 },
         { name: "tripolo5", type: EnvelopeType.tremolo2, speed: 6.0 },
         { name: "tripolo6", type: EnvelopeType.tremolo2, speed: 3.0 },
-        { name: "pentolo1", type: EnvelopeType.tremolo, speed: 10.0 },
-        { name: "pentolo2", type: EnvelopeType.tremolo, speed: 5.0 },
-        { name: "pentolo3", type: EnvelopeType.tremolo, speed: 2.5 },
+        { name: "pentolo1", type: EnvelopeType.lfo, speed: 10.0 },
+        { name: "pentolo2", type: EnvelopeType.lfo, speed: 5.0 },
+        { name: "pentolo3", type: EnvelopeType.lfo, speed: 2.5 },
         { name: "pentolo4", type: EnvelopeType.tremolo2, speed: 10.0 },
         { name: "pentolo5", type: EnvelopeType.tremolo2, speed: 5.0 },
         { name: "pentolo6", type: EnvelopeType.tremolo2, speed: 2.5 },
         // todbox
-        { name: "flutter 1", type: EnvelopeType.tremolo, speed: 14.0 },
+        { name: "flutter 1", type: EnvelopeType.lfo, speed: 14.0 },
         { name: "flutter 2", type: EnvelopeType.tremolo2, speed: 11.0 },
-        { name: "water-y flutter", type: EnvelopeType.tremolo, speed: 9.0 },
+        { name: "water-y flutter", type: EnvelopeType.lfo, speed: 9.0 },
         // new jummbox
         { name: "blip 1", type: EnvelopeType.blip, speed: 6.0 },
         { name: "blip 2", type: EnvelopeType.blip, speed: 16.0 },
@@ -1400,7 +1400,7 @@ export class Config {
         { name: "flare", type: EnvelopeType.flare, speed: 32.0 },
         { name: "twang", type: EnvelopeType.twang, speed: 32.0 },
         { name: "swell", type: EnvelopeType.swell, speed: 32.0 },
-        { name: "lfo", type: EnvelopeType.tremolo, speed: 4.0 },
+        { name: "lfo", type: EnvelopeType.lfo, speed: 4.0 }, //replaced tremolo and tremolo2
         // { name: "tremolo2", type: EnvelopeType.tremolo2, speed: 4.0 }, //removed Slarmoo's Box 1.3
         { name: "decay", type: EnvelopeType.decay, speed: 10.0 },
         { name: "wibble", type: EnvelopeType.wibble, speed: 24.0 },
@@ -1603,6 +1603,7 @@ export class Config {
 
     public static readonly perEnvelopeBoundMin: number = 0;
     public static readonly perEnvelopeBoundMax: number = 2;
+    public static readonly randomEnvelopeTypes: string[] = ["time", "pitch"];
 
     // Picked strings have an all-pass filter with a corner frequency based on the tone fundamental frequency, in order to add a slight inharmonicity. (Which is important for distortion.)
     public static readonly pickedStringDispersionCenterFreq: number = 6000.0; // The tone fundamental freq is pulled toward this freq for computing the all-pass corner freq.

@@ -368,7 +368,7 @@ export class TipPrompt implements Prompt {
 				message = div(
 					h2("Envelopes"),
 					p("Envelopes are a way to dynamically adjust various other settings over time, usually based on how long the note lasts. Press the + button to add an envelope, then use the menus below to select which setting to control and the curve of the envelope. Try different combinations to see how they sound!"),
-					p("Most envelope curves restart from the beginning every time a new note plays. The \"note size\" option is based on the note width as drawn in the pattern editor while the \"pitch\" option is based on the pitch of the note played."),
+					p("Most envelope curves restart from the beginning every time a new note plays. The \"note size\" option is based on the note width as drawn in the pattern editor while the \"pitch\" option is based on the pitch of the note played. The \"random\" envelope type deterministally produces a random result based on either the time or pitch of a note."),
 					p("Envelope curves move in the range from 0 to 1 (or vice versa), where 0 means as quiet as possible and 1 is the same as the corresponding position selected in the instrument settings above. If multiple envelopes are targetting the same setting, they are multiplied before applying to the setting."),
 				);
 			} break;
@@ -600,7 +600,7 @@ export class TipPrompt implements Prompt {
 				message = div(
 					h2("Random Envelope Seed"),
 					p("There are 64 seeds, or pseudorandom patterns that you can choose from when enveloping a setting."),
-					p("The same seed will output the same value per tick if the other envelope settings are also the same, meaning that if two different songs use the same seed for their envelope they will have the same \"randomization\"."),
+					p("The same seed will output the same value per tick or pitch if the other envelope settings are also the same, meaning that if two different songs use the same seed for their envelope they will have the same \"randomization\"."),
 				);
 			} break;
 			case "songeq": {
@@ -611,11 +611,17 @@ export class TipPrompt implements Prompt {
 					p("Insert a new point on the left side of the filter editor to add a \"high-pass\" filter point, which additionally reduces the volume of lower frequencies, or insert a new point on the right side to add a \"low-pass\" filter point which reduces the volume of higher frequencies."),
 					p("The Song Eq Filter applies to all instruments. This can be handy for getting the sound of a certain genre or fading in and out in combination with modulation"),				);
 			} break;
-			case "envelopeWaveform": {
+			case "lfoEnvelopeWaveform": {
 				message = div(
-					h2("Envelope Waveform"),
+					h2("LFO Envelope Waveform"),
 					p("LFO envelopes can output a variety of different waveforms, from old tremolo's sine to more complex ones."),
 					p("These waves are: sines, squares, triangles, and sawtooths."),
+				);
+			} break;
+			case "randomEnvelopeType": {
+				message = div(
+					h2("Random Envelope Type"),
+					p("Random Envelopes can switch between being determined by the time in the song or the pitch of the note."),
 				);
 			} break;
 

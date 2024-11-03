@@ -163,7 +163,7 @@ FontName.propTypes = {
     onChange: PropTypes.func.isRequired,
     fontManager: PropTypes.shape({
         getUnusedSystemFont: PropTypes.func.isRequired,
-        getUnusedCustomFont: PropTypes.func.isRequired,
+        getUnusedCustomFont: PropTypes.func.isRequired
     }).isRequired,
     isCustom: PropTypes.bool.isRequired
 };

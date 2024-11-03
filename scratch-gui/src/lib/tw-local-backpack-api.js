@@ -94,7 +94,7 @@ const getBackpackContents = async ({
     return new Promise((resolve, reject) => {
         const transaction = db.transaction(STORE_NAME, 'readonly');
         transaction.onerror = event => {
-            reject(new Error(`Transaction error: ${event.target.error}`));
+            reject(new Error(`Getting contents: ${event.target.error}`));
         };
         const store = transaction.objectStore(STORE_NAME);
         const items = [];
@@ -133,7 +133,7 @@ const saveBackpackObject = async ({
     return new Promise((resolve, reject) => {
         const transaction = db.transaction(STORE_NAME, 'readwrite');
         transaction.onerror = event => {
-            reject(new Error(`Transaction error: ${event.target.error}`));
+            reject(new Error(`Sving object: ${event.target.error}`));
         };
         const store = transaction.objectStore(STORE_NAME);
         const bodyData = base64ToArrayBuffer(body);
@@ -162,7 +162,7 @@ const deleteBackpackObject = async ({
     return new Promise((resolve, reject) => {
         const transaction = db.transaction(STORE_NAME, 'readwrite');
         transaction.onerror = event => {
-            reject(new Error(`Transaction error: ${event.target.error}`));
+            reject(new Error(`Deleting object: ${event.target.error}`));
         };
         const store = transaction.objectStore(STORE_NAME);
         // Convert string IDs to number IDs
@@ -182,7 +182,7 @@ const updateBackpackObject = async ({
     return new Promise((resolve, reject) => {
         const transaction = db.transaction(STORE_NAME, 'readwrite');
         transaction.onerror = event => {
-            reject(new Error(`Transaction error: ${event.target.error}`));
+            reject(new Error(`Updating object: ${event.target.error}`));
         };
         const store = transaction.objectStore(STORE_NAME);
         const getRequest = store.get(id);

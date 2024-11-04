@@ -36,6 +36,7 @@ export class ThemePrompt implements Prompt {
 			option({ value: "neapolitan" }, "Neapolitan"),
 			option({ value: "poly" }, "Poly"),
 			option({ value: "blutonium" }, "Blutonium"),
+			option({value: "greyscale"}, "Greyscale"),
 			// the azur lane theme is here because nep wanted it...
 			option({ value: "azur lane" }, "Azur Lane"),
 			option({ value: "modbox classic" }, "Modbox"),

@@ -7771,6 +7771,9 @@ class EnvelopeComputer {
                 timeSinceStart = synth.computeTicksSinceStart();
                 steps = instrument.envelopes[envelopeIndex].steps;
                 seed = instrument.envelopes[envelopeIndex].seed;
+                if (instrument.envelopes[envelopeIndex].waveform >= (envelope.name == "lfo" ? BaseWaveTypes.length : Config.randomEnvelopeTypes.length)) {
+                    instrument.envelopes[envelopeIndex].waveform = 0; //make sure that waveform is a proper index
+                }
                 waveform = instrument.envelopes[envelopeIndex].waveform;
 
                 if (!timeScale[envelopeIndex]) timeScale[envelopeIndex] = 0;

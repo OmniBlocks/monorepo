@@ -2,7 +2,7 @@ import bindAll from 'lodash.bindall';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {connect} from 'react-redux';
-import paper from '@scratch/paper';
+import paper from '@turbowarp/paper';
 import Formats from '../lib/format';
 import log from '../log/log';
 

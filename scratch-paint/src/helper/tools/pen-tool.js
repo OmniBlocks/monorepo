@@ -1,4 +1,4 @@
-import paper from '@scratch/paper';
+import paper from '@turbowarp/paper';
 import {styleShape} from '../style-path';
 import {endPointHit, touching} from '../snapping';
 import {drawHitPoint, removeHitPoint} from '../guides';

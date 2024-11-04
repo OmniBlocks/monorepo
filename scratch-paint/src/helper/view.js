@@ -1,4 +1,4 @@
-import paper from '@scratch/paper';
+import paper from '@turbowarp/paper';
 import {CROSSHAIR_SIZE, getBackgroundGuideLayer, getDragCrosshairLayer, getRaster} from './layer';
 import {getAllRootItems, getSelectedRootItems} from './selection';
 import {getHitBounds} from './bitmap';

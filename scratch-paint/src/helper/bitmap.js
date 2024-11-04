@@ -1,4 +1,4 @@
-import paper from '@scratch/paper';
+import paper from '@turbowarp/paper';
 import {createCanvas, clearRaster, getRaster, hideGuideLayers, showGuideLayers} from './layer';
 import {getGuideColor} from './guides';
 import {clearSelection} from './selection';

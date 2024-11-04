@@ -1,4 +1,4 @@
-import paper from '@scratch/paper';
+import paper from '@turbowarp/paper';
 import {floodFill, floodFillAll, getHitBounds} from '../bitmap';
 import {createGradientObject} from '../style-path';
 import {createCanvas, getRaster} from '../layer';

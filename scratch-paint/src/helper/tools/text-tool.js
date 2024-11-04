@@ -1,4 +1,4 @@
-import paper from '@scratch/paper';
+import paper from '@turbowarp/paper';
 import Modes from '../../lib/modes';
 import {clearSelection, getSelectedLeafItems} from '../selection';
 import BoundingBoxTool from '../selection-tools/bounding-box-tool';

@@ -272,7 +272,9 @@ class ArrowTool extends paper.Tool {
             this.tri.position = this.arrowPathLockedState;
         }
 
-        this.tri.rotate(pathOptions.angle, event.downPoint);
+        if (this.canModifyState) {
+            this.tri.rotate(pathOptions.angle, event.downPoint);
+        }
 
         // add guide text
         // remove first

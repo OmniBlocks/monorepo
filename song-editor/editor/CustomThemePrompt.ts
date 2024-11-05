@@ -10,7 +10,7 @@ import { PatternEditor } from "./PatternEditor";
 //namespace beepbox {
 const { button, div, h2, input, p, a } = HTML;
 let doReload = false;
-export class CustomPrompt implements Prompt {
+export class CustomThemePrompt implements Prompt {
 	private readonly _fileInput: HTMLInputElement = input({ type: "file", accept: "image/*", text: "choose editor background image"});
 	private readonly _fileInput2: HTMLInputElement = input({ type: "file", accept: "image/*", text: "choose website background image" });
 	private readonly _colorInput: HTMLInputElement = input({ type: "text", value: localStorage.getItem("customColors") || `:root {  }`});

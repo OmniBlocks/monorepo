@@ -9789,6 +9789,8 @@ export class Synth {
             for (let channelIndex: number = 0; channelIndex < this.song.pitchChannelCount + this.song.noiseChannelCount; channelIndex++) {
                 this.modInsValues[channelIndex] = [];
                 this.nextModInsValues[channelIndex] = [];
+                this.song.tmpEqFilterStart = null;
+                this.song.tmpEqFilterEnd = null;
             }
         }
     }

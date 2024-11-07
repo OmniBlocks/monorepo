@@ -502,13 +502,11 @@ var beepbox = (function (exports) {
     Config.ticksPerArpeggio = 3;
     Config.arpeggioPatterns = [[0], [0, 1], [0, 1, 2, 1], [0, 1, 2, 3], [0, 1, 2, 3, 4], [0, 1, 2, 3, 4, 5], [0, 1, 2, 3, 4, 5, 6], [0, 1, 2, 3, 4, 5, 6, 7]];
     Config.rhythms = toNameMap([
-        { name: "÷1 (quarter notes)", stepsPerBeat: 1, roundUpThresholds: [3] },
-        { name: "÷2 (eighth notes)", stepsPerBeat: 2, roundUpThresholds: [3, 9] },
         { name: "÷3 (triplets)", stepsPerBeat: 3, roundUpThresholds: [5, 12, 18] },
         { name: "÷4 (standard)", stepsPerBeat: 4, roundUpThresholds: [3, 9, 17, 21] },
-        { name: "÷6 (sextuplets)", stepsPerBeat: 6, roundUpThresholds: null },
-        { name: "÷8 (32nd notes)", stepsPerBeat: 8, roundUpThresholds: null },
-        { name: "÷12 (doudectuplets)", stepsPerBeat: 12, roundUpThresholds: null },
+        { name: "÷6", stepsPerBeat: 6, roundUpThresholds: null },
+        { name: "÷8", stepsPerBeat: 8, roundUpThresholds: null },
+        { name: "÷12", stepsPerBeat: 12, roundUpThresholds: null },
         { name: "freehand", stepsPerBeat: 24, roundUpThresholds: null },
     ]);
     Config.instrumentTypeNames = ["chip", "FM", "noise", "spectrum", "drumset", "harmonics", "PWM", "Picked String", "supersaw", "custom chip", "mod", "FM6op", "additive"];
@@ -811,7 +809,9 @@ var beepbox = (function (exports) {
         { name: "25×", mult: 25.0, hzOffset: 0.0, amplitudeSign: 1.0 },
         { name: "50×", mult: 50.0, hzOffset: 0.0, amplitudeSign: 1.0 },
         { name: "75×", mult: 75.0, hzOffset: 0.0, amplitudeSign: 1.0 },
-        { name: "100×", mult: 100.0, hzOffset: 0.0, amplitudeSign: 1.0 }
+        { name: "100×", mult: 100.0, hzOffset: 0.0, amplitudeSign: 1.0 },
+        { name: "128x", mult: 128.0, hzOffset: 0.0, amplitudeSign: 1.0 },
+        { name: "256x", mult: 250.0, hzOffset: 0.0, amplitudeSign: 1.0 },
     ]);
     Config.envelopes = toNameMap([
         { name: "none", type: 0, speed: 0.0 },
@@ -1133,7 +1133,7 @@ var beepbox = (function (exports) {
         { name: "sawtooth", samples: generateSawWave() },
         { name: "ramp", samples: generateSawWave(true) },
         { name: "trapezoid", samples: generateTrapezoidWave(2) },
-        { name: "rounded", samples: generateRoundedSineWave() },
+        { name: "quasi-sine", samples: generateQuasiSineWave() },
     ]);
     Config.pwmOperatorWaves = toNameMap([
         { name: "1%", samples: generateSquareWave(0.01) },
@@ -1500,7 +1500,7 @@ var beepbox = (function (exports) {
         }
         return wave;
     }
-    function generateRoundedSineWave() {
+    function generateQuasiSineWave() {
         const wave = new Float32Array(Config.sineWaveLength + 1);
         for (let i = 0; i < Config.sineWaveLength + 1; i++) {
             wave[i] = Math.round(Math.sin(i * Math.PI * 2.0 / Config.sineWaveLength));
@@ -2220,32 +2220,32 @@ var beepbox = (function (exports) {
             let colorFormulaModLimit = +ColorConfig.getComputed("--formula-mod-channel-limit");
             switch (type) {
                 case ("noise"): {
-                    let newChannelSecondary = "hsl(" + ((this.c_noiseSecondaryChannelHue + ((channel * this.c_noiseSecondaryChannelHueScale) / Config.noiseChannelCountMax) * 256) % colorFormulaNoiseLimit) + ","
+                    let newChannelSecondary = "hsl(" + ((this.c_noiseSecondaryChannelHue + ((channel * this.c_noiseSecondaryChannelHueScale) / this.c_noiseChannelCountOverride) * 256) % colorFormulaNoiseLimit) + ","
                         + (this.c_noiseSecondaryChannelSat + channel * this.c_noiseSecondaryChannelSatScale) + "%,"
                         + (this.c_noiseSecondaryChannelLum + channel * this.c_noiseSecondaryChannelLumScale) + "%)";
-                    let newChannelPrimary = "hsl(" + ((this.c_noisePrimaryChannelHue + ((channel * this.c_noisePrimaryChannelHueScale) / Config.noiseChannelCountMax) * 256) % colorFormulaNoiseLimit) + ","
+                    let newChannelPrimary = "hsl(" + ((this.c_noisePrimaryChannelHue + ((channel * this.c_noisePrimaryChannelHueScale) / this.c_noiseChannelCountOverride) * 256) % colorFormulaNoiseLimit) + ","
                         + (this.c_noisePrimaryChannelSat + channel * this.c_noisePrimaryChannelSatScale) + "%,"
                         + (this.c_noisePrimaryChannelLum + channel * this.c_noisePrimaryChannelLumScale) + "%)";
-                    let newNoteSecondary = "hsl(" + ((this.c_noiseSecondaryNoteHue + ((channel * this.c_noiseSecondaryNoteHueScale) / Config.noiseChannelCountMax) * 256) % colorFormulaNoiseLimit) + ","
+                    let newNoteSecondary = "hsl(" + ((this.c_noiseSecondaryNoteHue + ((channel * this.c_noiseSecondaryNoteHueScale) / this.c_noiseChannelCountOverride) * 256) % colorFormulaNoiseLimit) + ","
                         + (this.c_noiseSecondaryNoteSat + channel * this.c_noiseSecondaryNoteSatScale) + "%,"
                         + (this.c_noiseSecondaryNoteLum + channel * this.c_noiseSecondaryNoteLumScale) + "%)";
-                    let newNotePrimary = "hsl(" + ((this.c_noisePrimaryNoteHue + ((channel * this.c_noisePrimaryNoteHueScale) / Config.noiseChannelCountMax) * 256) % colorFormulaNoiseLimit) + ","
+                    let newNotePrimary = "hsl(" + ((this.c_noisePrimaryNoteHue + ((channel * this.c_noisePrimaryNoteHueScale) / this.c_noiseChannelCountOverride) * 256) % colorFormulaNoiseLimit) + ","
                         + (this.c_noisePrimaryNoteSat + channel * this.c_noisePrimaryNoteSatScale) + "%,"
                         + (this.c_noisePrimaryNoteLum + channel * this.c_noisePrimaryNoteLumScale) + "%)";
                     let newChannelColors = { secondaryChannel: newChannelSecondary, primaryChannel: newChannelPrimary, secondaryNote: newNoteSecondary, primaryNote: newNotePrimary };
                     return newChannelColors;
                 }
                 case ("mod"): {
-                    let newChannelSecondary = "hsl(" + ((this.c_modSecondaryChannelHue + ((channel * this.c_modSecondaryChannelHueScale) / Config.modChannelCountMax) * 256) % colorFormulaModLimit) + ","
+                    let newChannelSecondary = "hsl(" + ((this.c_modSecondaryChannelHue + ((channel * this.c_modSecondaryChannelHueScale) / this.c_modChannelCountOverride) * 256) % colorFormulaModLimit) + ","
                         + (this.c_modSecondaryChannelSat + channel * this.c_modSecondaryChannelSatScale) + "%,"
                         + (this.c_modSecondaryChannelLum + channel * this.c_modSecondaryChannelLumScale) + "%)";
-                    let newChannelPrimary = "hsl(" + ((this.c_modPrimaryChannelHue + ((channel * this.c_modPrimaryChannelHueScale) / Config.modChannelCountMax) * 256) % colorFormulaModLimit) + ","
+                    let newChannelPrimary = "hsl(" + ((this.c_modPrimaryChannelHue + ((channel * this.c_modPrimaryChannelHueScale) / this.c_modChannelCountOverride) * 256) % colorFormulaModLimit) + ","
                         + (this.c_modPrimaryChannelSat + channel * this.c_modPrimaryChannelSatScale) + "%,"
                         + (this.c_modPrimaryChannelLum + channel * this.c_modPrimaryChannelLumScale) + "%)";
-                    let newNoteSecondary = "hsl(" + ((this.c_modSecondaryNoteHue + ((channel * this.c_modSecondaryNoteHueScale) / Config.modChannelCountMax) * 256) % colorFormulaModLimit) + ","
+                    let newNoteSecondary = "hsl(" + ((this.c_modSecondaryNoteHue + ((channel * this.c_modSecondaryNoteHueScale) / this.c_modChannelCountOverride) * 256) % colorFormulaModLimit) + ","
                         + (this.c_modSecondaryNoteSat + channel * this.c_modSecondaryNoteSatScale) + "%,"
                         + (this.c_modSecondaryNoteLum + channel * this.c_modSecondaryNoteLumScale) + "%)";
-                    let newNotePrimary = "hsl(" + ((this.c_modPrimaryNoteHue + ((channel * this.c_modPrimaryNoteHueScale) / Config.modChannelCountMax) * 256) % colorFormulaModLimit) + ","
+                    let newNotePrimary = "hsl(" + ((this.c_modPrimaryNoteHue + ((channel * this.c_modPrimaryNoteHueScale) / this.c_modChannelCountOverride) * 256) % colorFormulaModLimit) + ","
                         + (this.c_modPrimaryNoteSat + channel * this.c_modPrimaryNoteSatScale) + "%,"
                         + (this.c_modPrimaryNoteLum + channel * this.c_modPrimaryNoteLumScale) + "%)";
                     let newChannelColors = { secondaryChannel: newChannelSecondary, primaryChannel: newChannelPrimary, secondaryNote: newNoteSecondary, primaryNote: newNotePrimary };
@@ -2253,16 +2253,16 @@ var beepbox = (function (exports) {
                 }
                 case ("pitch"):
                 default: {
-                    let newChannelSecondary = "hsl(" + ((this.c_pitchSecondaryChannelHue + (channel * this.c_pitchSecondaryChannelHueScale / Config.pitchChannelCountMax) * 256) % colorFormulaPitchLimit) + ","
+                    let newChannelSecondary = "hsl(" + ((this.c_pitchSecondaryChannelHue + (channel * this.c_pitchSecondaryChannelHueScale / this.c_pitchChannelCountOverride) * 256) % colorFormulaPitchLimit) + ","
                         + (this.c_pitchSecondaryChannelSat * (1 - (this.c_pitchSecondaryChannelSatScale * Math.floor(channel / 7)))) + "%,"
                         + (this.c_pitchSecondaryChannelLum * (1 - (this.c_pitchSecondaryChannelLumScale * Math.floor(channel / 7)))) + "%)";
-                    let newChannelPrimary = "hsl(" + ((this.c_pitchPrimaryChannelHue + (channel * this.c_pitchPrimaryChannelHueScale / Config.pitchChannelCountMax) * 256) % colorFormulaPitchLimit) + ","
+                    let newChannelPrimary = "hsl(" + ((this.c_pitchPrimaryChannelHue + (channel * this.c_pitchPrimaryChannelHueScale / this.c_pitchChannelCountOverride) * 256) % colorFormulaPitchLimit) + ","
                         + (this.c_pitchPrimaryChannelSat * (1 - (this.c_pitchPrimaryChannelSatScale * Math.floor(channel / 7)))) + "%,"
                         + (this.c_pitchPrimaryChannelLum * (1 - (this.c_pitchPrimaryChannelLumScale * Math.floor(channel / 7)))) + "%)";
-                    let newNoteSecondary = "hsl(" + ((this.c_pitchSecondaryNoteHue + (channel * this.c_pitchSecondaryNoteHueScale / Config.pitchChannelCountMax) * 256) % colorFormulaPitchLimit) + ","
+                    let newNoteSecondary = "hsl(" + ((this.c_pitchSecondaryNoteHue + (channel * this.c_pitchSecondaryNoteHueScale / this.c_pitchChannelCountOverride) * 256) % colorFormulaPitchLimit) + ","
                         + (this.c_pitchSecondaryNoteSat * (1 - (this.c_pitchSecondaryNoteSatScale * Math.floor(channel / 7)))) + "%,"
                         + (this.c_pitchSecondaryNoteLum * (1 - (this.c_pitchSecondaryNoteLumScale * Math.floor(channel / 7)))) + "%)";
-                    let newNotePrimary = "hsl(" + ((this.c_pitchPrimaryNoteHue + (channel * this.c_pitchPrimaryNoteHueScale / Config.pitchChannelCountMax) * 256) % colorFormulaPitchLimit) + ","
+                    let newNotePrimary = "hsl(" + ((this.c_pitchPrimaryNoteHue + (channel * this.c_pitchPrimaryNoteHueScale / this.c_pitchChannelCountOverride) * 256) % colorFormulaPitchLimit) + ","
                         + (this.c_pitchPrimaryNoteSat * (1 - (this.c_pitchPrimaryNoteSatScale * Math.floor(channel / 7)))) + "%,"
                         + (this.c_pitchPrimaryNoteLum * (1 - (this.c_pitchPrimaryNoteLumScale * Math.floor(channel / 7)))) + "%)";
                     let newChannelColors = { secondaryChannel: newChannelSecondary, primaryChannel: newChannelPrimary, secondaryNote: newNoteSecondary, primaryNote: newNotePrimary };
@@ -2306,16 +2306,16 @@ var beepbox = (function (exports) {
                     let colorFormulaNoiseLimit = +ColorConfig.getComputed("--formula-noise-channel-limit");
                     let colorFormulaModLimit = +ColorConfig.getComputed("--formula-mod-channel-limit");
                     if (channel < song.pitchChannelCount) {
-                        let newChannelSecondary = "hsl(" + ((this.c_pitchSecondaryChannelHue + (channel * this.c_pitchSecondaryChannelHueScale / Config.pitchChannelCountMax) * 256) % colorFormulaPitchLimit) + ","
+                        let newChannelSecondary = "hsl(" + ((this.c_pitchSecondaryChannelHue + (channel * this.c_pitchSecondaryChannelHueScale / this.c_pitchChannelCountOverride) * 256) % colorFormulaPitchLimit) + ","
                             + (this.c_pitchSecondaryChannelSat * (1 - (this.c_pitchSecondaryChannelSatScale * Math.floor(channel / 9)))) + "%,"
                             + (this.c_pitchSecondaryChannelLum * (1 - (this.c_pitchSecondaryChannelLumScale * Math.floor(channel / 9)))) + "%)";
-                        let newChannelPrimary = "hsl(" + ((this.c_pitchPrimaryChannelHue + (channel * this.c_pitchPrimaryChannelHueScale / Config.pitchChannelCountMax) * 256) % colorFormulaPitchLimit) + ","
+                        let newChannelPrimary = "hsl(" + ((this.c_pitchPrimaryChannelHue + (channel * this.c_pitchPrimaryChannelHueScale / this.c_pitchChannelCountOverride) * 256) % colorFormulaPitchLimit) + ","
                             + (this.c_pitchPrimaryChannelSat * (1 - (this.c_pitchPrimaryChannelSatScale * Math.floor(channel / 9)))) + "%,"
                             + (this.c_pitchPrimaryChannelLum * (1 - (this.c_pitchPrimaryChannelLumScale * Math.floor(channel / 9)))) + "%)";
-                        let newNoteSecondary = "hsl(" + ((this.c_pitchSecondaryNoteHue + (channel * this.c_pitchSecondaryNoteHueScale / Config.pitchChannelCountMax) * 256) % colorFormulaPitchLimit) + ","
+                        let newNoteSecondary = "hsl(" + ((this.c_pitchSecondaryNoteHue + (channel * this.c_pitchSecondaryNoteHueScale / this.c_pitchChannelCountOverride) * 256) % colorFormulaPitchLimit) + ","
                             + (this.c_pitchSecondaryNoteSat * (1 - (this.c_pitchSecondaryNoteSatScale * Math.floor(channel / 9)))) + "%,"
                             + (this.c_pitchSecondaryNoteLum * (1 - (this.c_pitchSecondaryNoteLumScale * Math.floor(channel / 9)))) + "%)";
-                        let newNotePrimary = "hsl(" + ((this.c_pitchPrimaryNoteHue + (channel * this.c_pitchPrimaryNoteHueScale / Config.pitchChannelCountMax) * 256) % colorFormulaPitchLimit) + ","
+                        let newNotePrimary = "hsl(" + ((this.c_pitchPrimaryNoteHue + (channel * this.c_pitchPrimaryNoteHueScale / this.c_pitchChannelCountOverride) * 256) % colorFormulaPitchLimit) + ","
                             + (this.c_pitchPrimaryNoteSat * (1 - (this.c_pitchPrimaryNoteSatScale * Math.floor(channel / 9)))) + "%,"
                             + (this.c_pitchPrimaryNoteLum * (1 - (this.c_pitchPrimaryNoteLumScale * Math.floor(channel / 9)))) + "%)";
                         let newChannelColors = { secondaryChannel: newChannelSecondary, primaryChannel: newChannelPrimary, secondaryNote: newNoteSecondary, primaryNote: newNotePrimary };
@@ -2323,16 +2323,16 @@ var beepbox = (function (exports) {
                         return newChannelColors;
                     }
                     else if (channel < song.pitchChannelCount + song.noiseChannelCount) {
-                        let newChannelSecondary = "hsl(" + ((this.c_noiseSecondaryChannelHue + (((channel - song.pitchChannelCount) * this.c_noiseSecondaryChannelHueScale) / Config.noiseChannelCountMax) * 256) % colorFormulaNoiseLimit) + ","
+                        let newChannelSecondary = "hsl(" + ((this.c_noiseSecondaryChannelHue + (((channel - song.pitchChannelCount) * this.c_noiseSecondaryChannelHueScale) / this.c_noiseChannelCountOverride) * 256) % colorFormulaNoiseLimit) + ","
                             + (this.c_noiseSecondaryChannelSat + channel * this.c_noiseSecondaryChannelSatScale) + "%,"
                             + (this.c_noiseSecondaryChannelLum + channel * this.c_noiseSecondaryChannelLumScale) + "%)";
-                        let newChannelPrimary = "hsl(" + ((this.c_noisePrimaryChannelHue + (((channel - song.pitchChannelCount) * this.c_noisePrimaryChannelHueScale) / Config.noiseChannelCountMax) * 256) % colorFormulaNoiseLimit) + ","
+                        let newChannelPrimary = "hsl(" + ((this.c_noisePrimaryChannelHue + (((channel - song.pitchChannelCount) * this.c_noisePrimaryChannelHueScale) / this.c_noiseChannelCountOverride) * 256) % colorFormulaNoiseLimit) + ","
                             + (this.c_noisePrimaryChannelSat + channel * this.c_noisePrimaryChannelSatScale) + "%,"
                             + (this.c_noisePrimaryChannelLum + channel * this.c_noisePrimaryChannelLumScale) + "%)";
-                        let newNoteSecondary = "hsl(" + ((this.c_noiseSecondaryNoteHue + (((channel - song.pitchChannelCount) * this.c_noiseSecondaryNoteHueScale) / Config.noiseChannelCountMax) * 256) % colorFormulaNoiseLimit) + ","
+                        let newNoteSecondary = "hsl(" + ((this.c_noiseSecondaryNoteHue + (((channel - song.pitchChannelCount) * this.c_noiseSecondaryNoteHueScale) / this.c_noiseChannelCountOverride) * 256) % colorFormulaNoiseLimit) + ","
                             + (this.c_noiseSecondaryNoteSat + channel * this.c_noiseSecondaryNoteSatScale) + "%,"
                             + (this.c_noiseSecondaryNoteLum + channel * this.c_noiseSecondaryNoteLumScale) + "%)";
-                        let newNotePrimary = "hsl(" + ((this.c_noisePrimaryNoteHue + (((channel - song.pitchChannelCount) * this.c_noisePrimaryNoteHueScale) / Config.noiseChannelCountMax) * 256) % colorFormulaNoiseLimit) + ","
+                        let newNotePrimary = "hsl(" + ((this.c_noisePrimaryNoteHue + (((channel - song.pitchChannelCount) * this.c_noisePrimaryNoteHueScale) / this.c_noiseChannelCountOverride) * 256) % colorFormulaNoiseLimit) + ","
                             + (this.c_noisePrimaryNoteSat + channel * this.c_noisePrimaryNoteSatScale) + "%,"
                             + (this.c_noisePrimaryNoteLum + channel * this.c_noisePrimaryNoteLumScale) + "%)";
                         let newChannelColors = { secondaryChannel: newChannelSecondary, primaryChannel: newChannelPrimary, secondaryNote: newNoteSecondary, primaryNote: newNotePrimary };
@@ -2340,16 +2340,16 @@ var beepbox = (function (exports) {
                         return newChannelColors;
                     }
                     else {
-                        let newChannelSecondary = "hsl(" + ((this.c_modSecondaryChannelHue + (((channel - song.pitchChannelCount - song.noiseChannelCount) * this.c_modSecondaryChannelHueScale) / Config.modChannelCountMax) * 256) % colorFormulaModLimit) + ","
+                        let newChannelSecondary = "hsl(" + ((this.c_modSecondaryChannelHue + (((channel - song.pitchChannelCount - song.noiseChannelCount) * this.c_modSecondaryChannelHueScale) / this.c_modChannelCountOverride) * 256) % colorFormulaModLimit) + ","
                             + (this.c_modSecondaryChannelSat + channel * this.c_modSecondaryChannelSatScale) + "%,"
                             + (this.c_modSecondaryChannelLum + channel * this.c_modSecondaryChannelLumScale) + "%)";
-                        let newChannelPrimary = "hsl(" + ((this.c_modPrimaryChannelHue + (((channel - song.pitchChannelCount - song.noiseChannelCount) * this.c_modPrimaryChannelHueScale) / Config.modChannelCountMax) * 256) % colorFormulaModLimit) + ","
+                        let newChannelPrimary = "hsl(" + ((this.c_modPrimaryChannelHue + (((channel - song.pitchChannelCount - song.noiseChannelCount) * this.c_modPrimaryChannelHueScale) / this.c_modChannelCountOverride) * 256) % colorFormulaModLimit) + ","
                             + (this.c_modPrimaryChannelSat + channel * this.c_modPrimaryChannelSatScale) + "%,"
                             + (this.c_modPrimaryChannelLum + channel * this.c_modPrimaryChannelLumScale) + "%)";
-                        let newNoteSecondary = "hsl(" + ((this.c_modSecondaryNoteHue + (((channel - song.pitchChannelCount - song.noiseChannelCount) * this.c_modSecondaryNoteHueScale) / Config.modChannelCountMax) * 256) % colorFormulaModLimit) + ","
+                        let newNoteSecondary = "hsl(" + ((this.c_modSecondaryNoteHue + (((channel - song.pitchChannelCount - song.noiseChannelCount) * this.c_modSecondaryNoteHueScale) / this.c_modChannelCountOverride) * 256) % colorFormulaModLimit) + ","
                             + (this.c_modSecondaryNoteSat + channel * this.c_modSecondaryNoteSatScale) + "%,"
                             + (this.c_modSecondaryNoteLum + channel * this.c_modSecondaryNoteLumScale) + "%)";
-                        let newNotePrimary = "hsl(" + ((this.c_modPrimaryNoteHue + (((channel - song.pitchChannelCount - song.noiseChannelCount) * this.c_modPrimaryNoteHueScale) / Config.modChannelCountMax) * 256) % colorFormulaModLimit) + ","
+                        let newNotePrimary = "hsl(" + ((this.c_modPrimaryNoteHue + (((channel - song.pitchChannelCount - song.noiseChannelCount) * this.c_modPrimaryNoteHueScale) / this.c_modChannelCountOverride) * 256) % colorFormulaModLimit) + ","
                             + (this.c_modPrimaryNoteSat + channel * this.c_modPrimaryNoteSatScale) + "%,"
                             + (this.c_modPrimaryNoteLum + channel * this.c_modPrimaryNoteLumScale) + "%)";
                         let newChannelColors = { secondaryChannel: newChannelSecondary, primaryChannel: newChannelPrimary, secondaryNote: newNoteSecondary, primaryNote: newNotePrimary };
@@ -2362,7 +2362,7 @@ var beepbox = (function (exports) {
         static setTheme(name) {
             let theme = this.themes[name];
             if (theme == undefined)
-                theme = this.themes["slarmoosbox"];
+                theme = ColorConfig.defaultTheme;
             this._styleElement.textContent = theme;
             let valuesToAdd = ":root{";
             if (getComputedStyle(this._styleElement).getPropertyValue("--oscilloscope-line-L") == "")
@@ -2380,11 +2380,11 @@ var beepbox = (function (exports) {
             if (getComputedStyle(this._styleElement).getPropertyValue("--note-flash-secondary") == "")
                 valuesToAdd += "--note-flash-secondary:#ffffff77;";
             if (getComputedStyle(this._styleElement).getPropertyValue("--pitch-channel-limit") == "")
-                valuesToAdd += "--pitch-channel-limit:10;";
+                valuesToAdd += "--pitch-channel-limit:" + Config.pitchChannelCountMax + ";";
             if (getComputedStyle(this._styleElement).getPropertyValue("--noise-channel-limit") == "")
-                valuesToAdd += "--noise-channel-limit:5;";
+                valuesToAdd += "--noise-channel-limit:" + Config.noiseChannelCountMax + ";";
             if (getComputedStyle(this._styleElement).getPropertyValue("--mod-channel-limit") == "")
-                valuesToAdd += "--mod-channel-limit:4;";
+                valuesToAdd += "--mod-channel-limit:" + Config.modChannelCountMax + ";";
             if (getComputedStyle(this._styleElement).getPropertyValue("--formula-pitch-channel-limit") == "")
                 valuesToAdd += "--formula-pitch-channel-limit:360;";
             if (getComputedStyle(this._styleElement).getPropertyValue("--formula-noise-channel-limit") == "")
@@ -2655,6 +2655,12 @@ var beepbox = (function (exports) {
                 this.c_modPrimaryNoteSatScale = +getComputedStyle(this._styleElement).getPropertyValue("--mod-primary-note-sat-scale");
                 this.c_modPrimaryNoteLum = +getComputedStyle(this._styleElement).getPropertyValue("--mod-primary-note-lum");
                 this.c_modPrimaryNoteLumScale = +getComputedStyle(this._styleElement).getPropertyValue("--mod-primary-note-lum-scale");
+                if (getComputedStyle(this._styleElement).getPropertyValue("--formula-pitch-channel-count-override") != "")
+                    this.c_pitchChannelCountOverride = +getComputedStyle(this._styleElement).getPropertyValue("--formula-pitch-channel-count-override");
+                if (getComputedStyle(this._styleElement).getPropertyValue("--formula-noise-channel-count-override") != "")
+                    this.c_noiseChannelCountOverride = +getComputedStyle(this._styleElement).getPropertyValue("--formula-noise-channel-count-override");
+                if (getComputedStyle(this._styleElement).getPropertyValue("--formula-mod-channel-count-override") != "")
+                    this.c_modChannelCountOverride = +getComputedStyle(this._styleElement).getPropertyValue("--formula-mod-channel-count-override");
             }
         }
         static getComputed(name) {
@@ -2663,6 +2669,7 @@ var beepbox = (function (exports) {
     }
     ColorConfig.colorLookup = new Map();
     ColorConfig.usesColorFormula = false;
+    ColorConfig.defaultTheme = "slarmoosbox";
     ColorConfig.themes = {
         "dark classic": ``,
         "dark competition": `
@@ -5505,6 +5512,173 @@ var beepbox = (function (exports) {
 			--disabled-note-primary: #c9c9c9;
 			--disabled-note-secondary: #616161;
 	}`,
+        "slushie": `
+	:root {
+		--page-margin: #040814;
+		--editor-background: #040814;
+		--hover-preview: #c6f7ff;
+		--primary-text: #d3f3ff;
+		--secondary-text: #6f72b5;
+		--inverted-text: black;
+		--box-selection-fill: rgb(43 70 171 / 62%);
+		--loop-accent: #573ebb;
+		--ui-widget-background: #2e2f44;
+		--ui-widget-focus: #2b2c46;
+		--pitch-background: #353654;
+		--tonic: #716fe3;
+		--fifth-note: #76469b;
+		--white-piano-key: #abbce3;
+		--black-piano-key: #2f235e;
+		--track-editor-bg-pitch: #3a3b5c;
+		--track-editor-bg-pitch-dim: #1f2036;
+		--track-editor-bg-noise: #3c3554;
+		--track-editor-bg-noise-dim: #1e1834;
+		--track-editor-bg-mod: #30335e;
+		--track-editor-bg-mod-dim: #161938;
+		--multiplicative-mod-slider: #e29cff;
+		--overwriting-mod-slider: #495789;
+		--indicator-primary: #e1a6ff;
+		--indicator-secondary: #415187;
+		--select2-opt-group: #22223a;
+		--input-box-outline: #2d2648;
+		--mute-button-normal: #7aceff;
+		--pitch1-secondary-channel: #5f3ea5;
+		--pitch1-primary-channel: #c1a4ff;
+		--pitch1-secondary-note: #794fd3;
+		--pitch1-primary-note: #d8c6ff;
+		--pitch2-secondary-channel: #4f44bf;
+		--pitch2-primary-channel: #9287ff;
+		--pitch2-secondary-note: #5e51d9;
+		--pitch2-primary-note: #b6afff;
+		--pitch3-secondary-channel: #374eb9;
+		--pitch3-primary-channel: #8097ff;
+		--pitch3-secondary-note: #445cc9;
+		--pitch3-primary-note: #a0b2ff;
+		--pitch4-secondary-channel: #2867cf;
+		--pitch4-primary-channel: #6fa5ff;
+		--pitch4-secondary-note: #2e6ed7;
+		--pitch4-primary-note: #a6c7ff;
+		--pitch5-secondary-channel: #3175a7;
+		--pitch5-primary-channel: #7ec9ff;
+		--pitch5-secondary-note: #367eb3;
+		--pitch5-primary-note: #9fd7ff;
+		--pitch6-secondary-channel: #3993a9;
+		--pitch6-primary-channel: #8ce9ff;
+		--pitch6-secondary-note: #386da3;
+		--pitch6-primary-note: #9eecff;
+		--pitch7-secondary-channel: #369d8a;
+		--pitch7-primary-channel: #8bfce7;
+		--pitch7-secondary-note: #1c93a7;
+		--pitch7-primary-note: #abffef;
+		--pitch8-secondary-channel: #00A170;
+		--pitch8-primary-channel: #50FFC9;
+		--pitch8-secondary-note: #00C78A;
+		--pitch8-primary-note: #83FFD9;
+		--pitch9-secondary-channel: #49b374;
+		--pitch9-primary-channel: #8affa9;
+		--pitch9-secondary-note: #26815f;
+		--pitch9-primary-note: #c8ffde;
+		--pitch10-secondary-channel: #58a747;
+		--pitch10-primary-channel: #bbffaa;
+		--pitch10-secondary-note: #1d7c48;
+		--pitch10-primary-note: #c7ffbc;
+		--noise1-secondary-channel: #42829b;
+		--noise1-primary-channel: #97d3fc;
+		--noise1-secondary-note: #3f53b3;
+		--noise1-primary-note: #97d3fc;
+		--noise2-secondary-channel: #6354bb;
+		--noise2-primary-channel: #9a89ff;
+		--noise2-secondary-note: #5f4dcd;
+		--noise2-primary-note: #c6bcff;
+		--noise3-secondary-channel: #704a95;
+		--noise3-primary-channel: #c285ff;
+		--noise3-secondary-note: #ad5aff;
+		--noise3-primary-note: #d3a6ff;
+		--noise4-secondary-channel: #a53c65;
+		--noise4-primary-channel: #f794bb;
+		--noise4-secondary-note: #cb5080;
+		--noise4-primary-note: #f794bb;
+		--noise5-secondary-channel: #9b2d2d;
+		--noise5-primary-channel: #ff7676;
+		--noise5-secondary-note: #cb4444;
+		--noise5-primary-note: #ff9999;
+		--mod1-secondary-channel: #b7613c;
+		--mod1-primary-channel: #ff9f76;
+		--mod1-secondary-note: #e77e52;
+		--mod1-primary-note: #ffb99b;
+		--mod2-secondary-channel: #916d34;
+		--mod2-primary-channel: #fece80;
+		--mod2-secondary-note: #c58b35;
+		--mod2-primary-note: #ffdda5;
+		--mod3-secondary-channel: #83761a;
+		--mod3-primary-channel: #fdf68c;
+		--mod3-secondary-note: #c18e00;
+		--mod3-primary-note: #fdf68c;
+		--mod4-secondary-channel: #a86436;
+		--mod4-primary-channel: #c8a825;
+		--mod4-secondary-note: #e8ba46;
+		--mod4-primary-note: #c8a825;
+		--mod-label-primary: #37325e;
+		--mod-label-secondary-text: #6e8aa7;
+		--mod-label-primary-text: #c1ffff;
+}`,
+        "ultrabox dark": `
+:root {
+/*--mod-title: #CCCCCC;*/
+--loop-accent: #CCCCCC;
+--playhead: #CCCCCC;
+/*--primary-text: #CCCCCC;
+--hover-preview: #CCCCCC;*/
+--link-accent: #FF8EC5;
+--indicator-primary: #FF8EC5;
+/*--indicator-primary: #CCCCCC;*/
+/*--indicator-secondary: #E856B2;*/
+--white-piano-key: #CCCCCC;
+/*--black-piano-key: #444;*/
+--text-selection: #932253;
+--oscilloscope-line-L: #CCCCCC;
+--oscilloscope-line-R: #932253;
+--pitch-channel-limit: 8;
+--pitch1-secondary-channel: #A83030;
+--pitch1-primary-channel:   #FF7C7C;
+--pitch1-secondary-note:    #B51532;
+--pitch1-primary-note:      #FFA3A3;
+
+--pitch2-secondary-channel: #C75000;
+--pitch2-primary-channel:   #FF9752;
+--pitch2-secondary-note:    #FF771C;
+--pitch2-primary-note:      #FFCDAB;
+
+--pitch3-secondary-channel: #A1A100;
+--pitch3-primary-channel: #FFFF25;
+--pitch3-secondary-note: #C7C700;
+--pitch3-primary-note: #FFFF92;
+
+--pitch4-secondary-channel: #139620;
+--pitch4-primary-channel:   #25ff3a;
+--pitch4-secondary-note:    #139620;
+--pitch4-primary-note:      #25ff3a;
+
+--pitch5-secondary-channel: #0099A1;
+--pitch5-primary-channel:   #25F3FF;
+--pitch5-secondary-note:    #00BDC7;
+--pitch5-primary-note:      #92F9FF;
+
+--pitch6-secondary-channel: #58599E;
+--pitch6-primary-channel:   #5EA3FF;
+--pitch6-secondary-note:    #183AC7;
+--pitch6-primary-note:      #9EC8FF;
+
+--pitch7-secondary-channel: #6038a5;
+--pitch7-primary-channel:   #C760FF;
+--pitch7-secondary-note:    #5433A0;
+--pitch7-primary-note:      #D99EFF;
+
+--pitch8-secondary-channel: #932253;
+--pitch8-primary-channel:   #FF60A5;
+--pitch8-secondary-note:    #8E1C4E;
+--pitch8-primary-note:      #FF8EC5;
+}`,
         "modbox classic": `
 			:root {
 				--loop-accent: #9900cc;
@@ -5880,6 +6054,10 @@ var beepbox = (function (exports) {
 				--noise1-secondary-channel: #991010;
 				}
 
+				.trackContainer .noSelection {
+				background: black !important;
+				}
+
 				span input, 
 				div.harmonics svg,
 				div.spectrum svg,
@@ -6015,6 +6193,10 @@ var beepbox = (function (exports) {
 					width: 40px;
 				}
 
+				.trackContainer .noSelection {
+				background: black !important;
+				}
+
 				span input, 
 				div.harmonics svg,
 				div.spectrum svg,
@@ -6038,7 +6220,6 @@ var beepbox = (function (exports) {
 				#text-content > section > h1 {
 					color: #C8C8C8;
 					}
-
 			`,
         "nerdbox": `
 			:root {
@@ -8299,6 +8480,9 @@ var beepbox = (function (exports) {
     ColorConfig.c_noisePrimaryNoteSatScale = 0;
     ColorConfig.c_noisePrimaryNoteLum = 0;
     ColorConfig.c_noisePrimaryNoteLumScale = 0;
+    ColorConfig.c_pitchChannelCountOverride = 40;
+    ColorConfig.c_noiseChannelCountOverride = 16;
+    ColorConfig.c_modChannelCountOverride = 12;
     ColorConfig.c_invertedText = "";
     ColorConfig.c_trackEditorBgNoiseDim = "";
     ColorConfig.c_trackEditorBgNoise = "";
@@ -11994,18 +12178,25 @@ li.select2-results__option[role=group] > strong:hover {
             const envelopeObject = {
                 "target": Config.instrumentAutomationTargets[this.target].name,
                 "envelope": Config.newEnvelopes[this.envelope].name,
-                "pitchEnvelopeStart": this.pitchEnvelopeStart,
-                "pitchEnvelopeEnd": this.pitchEnvelopeEnd,
                 "inverse": this.inverse,
                 "perEnvelopeSpeed": this.perEnvelopeSpeed,
                 "perEnvelopeLowerBound": this.perEnvelopeLowerBound,
                 "perEnvelopeUpperBound": this.perEnvelopeUpperBound,
-                "steps": this.steps,
-                "seed": this.seed,
-                "waveform": this.waveform,
             };
             if (Config.instrumentAutomationTargets[this.target].maxCount > 1) {
                 envelopeObject["index"] = this.index;
+            }
+            if (Config.newEnvelopes[this.envelope].name == "pitch") {
+                envelopeObject["pitchEnvelopeStart"] = this.pitchEnvelopeStart;
+                envelopeObject["pitchEnvelopeEnd"] = this.pitchEnvelopeEnd;
+            }
+            else if (Config.newEnvelopes[this.envelope].name == "random") {
+                envelopeObject["steps"] = this.steps;
+                envelopeObject["seed"] = this.seed;
+                envelopeObject["waveform"] = this.waveform;
+            }
+            else if (Config.newEnvelopes[this.envelope].name == "lfo") {
+                envelopeObject["waveform"] = this.waveform;
             }
             return envelopeObject;
         }
@@ -12171,7 +12362,7 @@ li.select2-results__option[role=group] > strong:hover {
             this.chord = 1;
             this.volume = 0;
             this.pan = Config.panCenter;
-            this.panDelay = 10;
+            this.panDelay = 0;
             this.arpeggioSpeed = 12;
             this.fastTwoNoteArp = false;
             this.legacyTieOver = false;
@@ -12272,7 +12463,7 @@ li.select2-results__option[role=group] > strong:hover {
             this.bitcrusherFreq = Math.floor((Config.bitcrusherFreqRange - 1) * 0.5);
             this.bitcrusherQuantization = Math.floor((Config.bitcrusherQuantizationRange - 1) * 0.5);
             this.pan = Config.panCenter;
-            this.panDelay = 10;
+            this.panDelay = 0;
             this.pitchShift = Config.pitchShiftCenter;
             this.detune = Config.detuneCenter;
             this.vibrato = 0;
@@ -12974,7 +13165,7 @@ li.select2-results__option[role=group] > strong:hover {
                 this.panDelay = (instrumentObject["panDelay"] | 0);
             }
             else {
-                this.panDelay = 10;
+                this.panDelay = 0;
             }
             if (instrumentObject["detune"] != undefined) {
                 this.detune = clamp(Config.detuneMin, Config.detuneMax + 1, (instrumentObject["detune"] | 0));
@@ -13242,6 +13433,9 @@ li.select2-results__option[role=group] > strong:hover {
                             if (operatorObject["waveform"] == "square") {
                                 operator.waveform = Config.operatorWaves.dictionary["pulse width"].index;
                                 operator.pulseWidth = 5;
+                            }
+                            else if (operatorObject["waveform"] == "rounded") {
+                                operator.waveform = Config.operatorWaves.dictionary["quasi-sine"].index;
                             }
                             else {
                                 operator.waveform = 0;
@@ -14754,15 +14948,19 @@ li.select2-results__option[role=group] > strong:hover {
                         {
                             if (!fromUltraBox && !fromSlarmoosBox) {
                                 let newRhythm = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
-                                this.rhythm = clamp(0, Config.rhythms.length, newRhythm + 2);
+                                this.rhythm = clamp(0, Config.rhythms.length, newRhythm);
                                 if (fromJummBox && beforeThree || fromBeepBox) {
-                                    if (this.rhythm == Config.rhythms.dictionary["÷3 (triplets)"].index || this.rhythm == Config.rhythms.dictionary["÷6 (sextuplets)"].index) {
+                                    if (this.rhythm == Config.rhythms.dictionary["÷3 (triplets)"].index || this.rhythm == Config.rhythms.dictionary["÷6"].index) {
                                         useSlowerArpSpeed = true;
                                     }
-                                    if (this.rhythm >= Config.rhythms.dictionary["÷6 (sextuplets)"].index) {
+                                    if (this.rhythm >= Config.rhythms.dictionary["÷6"].index) {
                                         useFastTwoNoteArp = true;
                                     }
                                 }
+                            }
+                            else if (!(fromSlarmoosBox && !beforeFour) || !(fromUltraBox && !beforeSix)) {
+                                const rhythmMap = [1, 1, 0, 1, 2, 3, 4, 5];
+                                this.rhythm = rhythmMap[base64CharCodeToInt[compressed.charCodeAt(charIndex++)]];
                             }
                             else {
                                 this.rhythm = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
@@ -19563,7 +19761,7 @@ li.select2-results__option[role=group] > strong:hover {
                     this.synthesize(outputDataL, outputDataR, outputBuffer.length, this.isPlayingSong);
                     if (this.oscEnabled) {
                         if (this.oscRefreshEventTimer <= 0) {
-                            events.raise("oscillascopeUpdate", outputDataL, outputDataR);
+                            events.raise("oscilloscopeUpdate", outputDataL, outputDataR);
                             this.oscRefreshEventTimer = 2;
                         }
                         else {
@@ -31509,7 +31707,7 @@ li.select2-results__option[role=group] > strong:hover {
             this._enableOutro = input$c({ type: "checkbox" });
             this._formatSelect = select$b({ style: "width: 100%;" }, option$b({ value: "wav" }, "Export to .wav file."), option$b({ value: "mp3" }, "Export to .mp3 file."), option$b({ value: "midi" }, "Export to .mid file."), option$b({ value: "json" }, "Export to .json file."), option$b({ value: "html" }, "Export to .html file."));
             this._removeWhitespace = input$c({ type: "checkbox" });
-            this._removeWhitespaceDiv = div$h({ style: "vertical-align: middle; align-items: center; justify-content: space-between;" }, "Remove Whitespace: ", this._removeWhitespace);
+            this._removeWhitespaceDiv = div$h({ style: "vertical-align: middle; align-items: center; justify-content: space-between; margin-bottom: 14px;" }, "Remove Whitespace: ", this._removeWhitespace);
             this._cancelButton = button$h({ class: "cancelButton" });
             this._exportButton = button$h({ class: "exportButton", style: "width:45%;" }, "Export");
             this._outputProgressBar = div$h({ style: `width: 0%; background: ${ColorConfig.loopAccent}; height: 100%; position: absolute; z-index: 2;` });
@@ -40452,7 +40650,7 @@ You should be redirected to the song at:<br /><br />
 
     const { button: button$7, div: div$7, h2: h2$6, input: input$4, p: p$1, a: a$1 } = HTML;
     let doReload = false;
-    class CustomPrompt {
+    class CustomThemePrompt {
         constructor(_doc, _pattern, _pattern2, _pattern3) {
             this._doc = _doc;
             this._pattern = _pattern;
@@ -40542,11 +40740,11 @@ You should be redirected to the song at:<br /><br />
         }
     }
 
-    const { button: button$6, div: div$6, h2: h2$5, select: select$4, option: option$4 } = HTML;
+    const { button: button$6, div: div$6, h2: h2$5, select: select$4, option: option$4, optgroup: optgroup$1 } = HTML;
     class ThemePrompt {
         constructor(_doc) {
             this._doc = _doc;
-            this._themeSelect = select$4({ style: "width: 100%;" }, option$4({ value: "dark classic" }, "BeepBox Dark"), option$4({ value: "light classic" }, "BeepBox Light"), option$4({ value: "dark competition" }, "BeepBox Competition Dark"), option$4({ value: "jummbox classic" }, "JummBox Dark"), option$4({ value: "jummbox light" }, "Gold Light"), option$4({ value: "forest" }, "Forest"), option$4({ value: "canyon" }, "Canyon"), option$4({ value: "midnight" }, "Midnight"), option$4({ value: "beachcombing" }, "Beachcombing"), option$4({ value: "violet verdant" }, "Violet Verdant"), option$4({ value: "sunset" }, "Sunset"), option$4({ value: "autumn" }, "Autumn"), option$4({ value: "fruit" }, "Shadowfruit"), option$4({ value: "toxic" }, "Toxic"), option$4({ value: "roe" }, "Roe"), option$4({ value: "moonlight" }, "Moonlight"), option$4({ value: "portal" }, "Portal"), option$4({ value: "fusion" }, "Fusion"), option$4({ value: "inverse" }, "Inverse"), option$4({ value: "nebula" }, "Nebula"), option$4({ value: "roe light" }, "Roe Light"), option$4({ value: "amoled dark" }, "High Contrast Dark"), option$4({ value: "energized" }, "Energized"), option$4({ value: "neapolitan" }, "Neapolitan"), option$4({ value: "poly" }, "Poly"), option$4({ value: "blutonium" }, "Blutonium"), option$4({ value: "greyscale" }, "Greyscale"), option$4({ value: "azur lane" }, "Azur Lane"), option$4({ value: "modbox classic" }, "Modbox"), option$4({ value: "sandbox classic" }, "Sandbox"), option$4({ value: "harrybox" }, "Haileybox"), option$4({ value: "brucebox" }, "Brucebox"), option$4({ value: "shitbox 3.0" }, "Shitbox 1.0/3.0"), option$4({ value: "shitbox 2.0" }, "Shitbox 2.0"), option$4({ value: "nerdbox" }, "NerdBox"), option$4({ value: "zefbox" }, "Zefbox"), option$4({ value: "cardboardbox classic" }, "Cardboardbox"), option$4({ value: "blubox classic" }, "Blubox"), option$4({ value: "dogebox classic" }, "Dogebox"), option$4({ value: "wackybox" }, "Wackybox"), option$4({ value: "todbox dark mode" }, "Todbox Dark Mode"), option$4({ value: "mainbox 1.0" }, "Mainbox"), option$4({ value: "microbox" }, "MicroBox"), option$4({ value: "paandorasbox" }, "PaandorasBox"), option$4({ value: "foxbox" }, "FoxBox"), option$4({ value: "midbox" }, "Midbox"), option$4({ value: "dogebox2" }, "Dogebox2"), option$4({ value: "abyssbox classic" }, "AbyssBox Classic"), option$4({ value: "abyssbox light" }, "AbyssBox Light"), option$4({ value: "nepbox" }, "Nepbox"), option$4({ value: "slarmoosbox" }, "Slarmoo's Box"), option$4({ value: "custom" }, "Custom"));
+            this._themeSelect = select$4({ style: "width: 100%;" }, optgroup$1({ label: "Default Themes" }, option$4({ value: "ultrabox dark" }, "UltraBox"), option$4({ value: "forest" }, "Forest"), option$4({ value: "canyon" }, "Canyon"), option$4({ value: "midnight" }, "Midnight"), option$4({ value: "beachcombing" }, "Beachcombing"), option$4({ value: "violet verdant" }, "Violet Verdant"), option$4({ value: "sunset" }, "Sunset"), option$4({ value: "autumn" }, "Autumn"), option$4({ value: "fruit" }, "Shadowfruit"), option$4({ value: "toxic" }, "Toxic"), option$4({ value: "roe" }, "Roe"), option$4({ value: "moonlight" }, "Moonlight"), option$4({ value: "portal" }, "Portal"), option$4({ value: "fusion" }, "Fusion"), option$4({ value: "inverse" }, "Inverse"), option$4({ value: "nebula" }, "Nebula"), option$4({ value: "roe light" }, "Roe Light"), option$4({ value: "amoled dark" }, "High Contrast Dark"), option$4({ value: "energized" }, "Energized"), option$4({ value: "neapolitan" }, "Neapolitan"), option$4({ value: "poly" }, "Poly"), option$4({ value: "blutonium" }, "Blutonium"), option$4({ value: "greyscale" }, "Greyscale"), option$4({ value: "slushie" }, "Slushie")), optgroup$1({ label: "Mod Themes" }, option$4({ value: "dark classic" }, "BeepBox Dark"), option$4({ value: "light classic" }, "BeepBox Light"), option$4({ value: "dark competition" }, "BeepBox Competition Dark"), option$4({ value: "jummbox classic" }, "JummBox Dark"), option$4({ value: "modbox classic" }, "Modbox"), option$4({ value: "sandbox classic" }, "Sandbox"), option$4({ value: "harrybox" }, "Haileybox"), option$4({ value: "brucebox" }, "Brucebox"), option$4({ value: "shitbox 3.0" }, "Shitbox 1.0/3.0"), option$4({ value: "shitbox 2.0" }, "Shitbox 2.0"), option$4({ value: "nerdbox" }, "NerdBox"), option$4({ value: "zefbox" }, "Zefbox"), option$4({ value: "cardboardbox classic" }, "Cardboardbox"), option$4({ value: "blubox classic" }, "Blubox"), option$4({ value: "dogebox classic" }, "Dogebox"), option$4({ value: "wackybox" }, "Wackybox"), option$4({ value: "todbox dark mode" }, "Todbox Dark Mode"), option$4({ value: "mainbox 1.0" }, "Mainbox"), option$4({ value: "microbox" }, "MicroBox"), option$4({ value: "paandorasbox" }, "PaandorasBox"), option$4({ value: "foxbox" }, "FoxBox"), option$4({ value: "midbox" }, "Midbox"), option$4({ value: "dogebox2" }, "Dogebox2"), option$4({ value: "abyssbox classic" }, "AbyssBox Classic"), option$4({ value: "abyssbox light" }, "AbyssBox Light"), option$4({ value: "nepbox" }, "Nepbox"), option$4({ value: "slarmoosbox" }, "Slarmoo's Box")), optgroup$1({ label: "Misc" }, option$4({ value: "azur lane" }, "Azur Lane"), option$4({ value: "custom" }, "Custom")));
             this._cancelButton = button$6({ class: "cancelButton" });
             this._okayButton = button$6({ class: "okayButton", style: "width:45%;" }, "Okay");
             this.container = div$6({ class: "prompt noSelection", style: "width: 220px;" }, h2$5("Set Theme"), div$6({ style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;" }, div$6({ class: "selectContainer", style: "width: 100%;" }, this._themeSelect)), div$6({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between;" }, this._okayButton), this._cancelButton);
@@ -40556,7 +40754,7 @@ You should be redirected to the song at:<br /><br />
                     ColorConfig.setTheme(this.lastTheme);
                 }
                 else {
-                    ColorConfig.setTheme("slarmoosbox");
+                    ColorConfig.setTheme(ColorConfig.defaultTheme);
                 }
                 this._doc.undo();
             };
@@ -41430,7 +41628,7 @@ You should be redirected to the song at:<br /><br />
         }
     }
 
-    class oscilascopeCanvas {
+    class oscilloscopeCanvas {
         constructor(canvas, scale = 1) {
             this.canvas = canvas;
             this.scale = scale;
@@ -41457,7 +41655,7 @@ You should be redirected to the song at:<br /><br />
                     }
                 }
             };
-            events.listen("oscillascopeUpdate", this._EventUpdateCanvas);
+            events.listen("oscilloscopeUpdate", this._EventUpdateCanvas);
         }
     }
 
@@ -43695,7 +43893,7 @@ You should be redirected to the song at:<br /><br />
             this._modulatorGroup = div({ class: "editor-controls" });
             this._feedback6OpTypeSelect = buildOptions(select(), Config.feedbacks6Op.map(feedback => feedback.name));
             this._feedback6OpRow1 = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("feedbackType") }, "Feedback:"), div({ class: "selectContainer" }, this._feedback6OpTypeSelect));
-            this._algorithmCanvasSwitch = button({ style: "margin-left:0em; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: (e) => this._toggleAlgorithmCanvas(e) }, "F");
+            this._algorithmCanvasSwitch = button({ style: "margin-left:0em; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: (e) => this._toggleAlgorithmCanvas(e) }, "A");
             this._customAlgorithmCanvas = new CustomAlgorythmCanvas(canvas({ width: 144, height: 144, style: "border:2px solid " + ColorConfig.uiWidgetBackground, id: "customAlgorithmCanvas" }), this._doc, (newArray, carry, mode) => new ChangeCustomAlgorythmorFeedback(this._doc, newArray, carry, mode));
             this._algorithm6OpSelect = buildOptions(select(), Config.algorithms6Op.map(algorithm => algorithm.name));
             this._algorithm6OpSelectRow = div(div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("algorithm") }, "Algorithm: "), div({ class: "selectContainer" }, this._algorithm6OpSelect)), div({ style: "height:144px; display:flex; flex-direction: row; align-items:center; justify-content:center;" }, div({ style: "display:block; width:10px; margin-right: 0.2em" }, this._algorithmCanvasSwitch), div({ style: "width:144px; height:144px;" }, this._customAlgorithmCanvas.canvas)));
@@ -43724,7 +43922,7 @@ You should be redirected to the song at:<br /><br />
                     SVG.path({ d: "M200-120v-40h560v40H200Zm185.384-150.769v-271.539H254.615L480-840l224.616 297.692h-130.77v271.539H385.384Zm40.001-40h108.461v-272.308h88.308L480-774.615 337.077-583.077h88.308v272.308ZM480-583.077Z", fill: "currentColor" }),
                 ]),
             ]);
-            this._globalOscscope = new oscilascopeCanvas(canvas({ width: 144, height: 32, style: `border: 2px solid ${ColorConfig.uiWidgetBackground}; position: static;`, id: "oscilascopeAll" }), 1);
+            this._globalOscscope = new oscilloscopeCanvas(canvas({ width: 144, height: 32, style: `border: 2px solid ${ColorConfig.uiWidgetBackground}; position: static;`, id: "oscilloscopeAll" }), 1);
             this._globalOscscopeContainer = div({ style: "height: 38px; margin-left: auto; margin-right: auto;" }, this._globalOscscope.canvas);
             this._customWaveDrawCanvas = new CustomChipCanvas(canvas({ width: 128, height: 52, style: "border:2px solid " + ColorConfig.uiWidgetBackground, id: "customWaveDrawCanvas" }), this._doc, (newArray) => new ChangeCustomWave(this._doc, newArray));
             this._customWavePresetDrop = buildHeaderedOptions("Load Preset", select({ style: "width: 50%; height:1.5em; text-align: center; text-align-last: center;" }), Config.chipWaves.map(wave => wave.name));
@@ -45433,8 +45631,13 @@ You should be redirected to the song at:<br /><br />
                         }
                         else if (event.altKey) {
                             const instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
-                            const isAllOpen = this._openOperatorDropdowns.every((x) => { return x == true; });
-                            for (let i = 0; i < (instrument.type == 1 ? 4 : 6); i++) {
+                            const operatorCount = instrument.type == 1 ? 4 : 6;
+                            let isAllOpen = true;
+                            for (let i = 0; i < operatorCount; i++) {
+                                if (!this._openOperatorDropdowns[i])
+                                    isAllOpen = false;
+                            }
+                            for (let i = 0; i < operatorCount; i++) {
                                 if (this._openOperatorDropdowns[i] == false && !isAllOpen || isAllOpen)
                                     this._toggleDropdownMenu(4, i);
                             }
@@ -46404,7 +46607,7 @@ You should be redirected to the song at:<br /><br />
                         this._openPrompt("theme");
                         break;
                     case "customTheme":
-                        this._openPrompt("custom");
+                        this._openPrompt("customTheme");
                         break;
                     case "recordingSetup":
                         this._openPrompt("recordingSetup");
@@ -46721,12 +46924,12 @@ You should be redirected to the song at:<br /><br />
         _toggleAlgorithmCanvas(e) {
             if (this._customAlgorithmCanvas.mode != "feedback") {
                 this._customAlgorithmCanvas.mode = "feedback";
-                e.target.textContent = "A";
+                e.target.textContent = "F";
                 this._algorithmCanvasSwitch.value = "feedback";
             }
             else {
                 this._customAlgorithmCanvas.mode = "algorithm";
-                e.target.textContent = "F";
+                e.target.textContent = "A";
             }
             this._customAlgorithmCanvas.redrawCanvas();
         }
@@ -47044,8 +47247,8 @@ You should be redirected to the song at:<br /><br />
                     case "generateEuclideanRhythm":
                         this.prompt = new EuclideanRhythmPrompt(this._doc);
                         break;
-                    case "custom":
-                        this.prompt = new CustomPrompt(this._doc, this._patternEditor, this._trackArea, document.getElementById("beepboxEditorContainer"));
+                    case "customTheme":
+                        this.prompt = new CustomThemePrompt(this._doc, this._patternEditor, this._trackArea, document.getElementById("beepboxEditorContainer"));
                         break;
                     case "visualLoopControls":
                         this.prompt = new VisualLoopControlsPrompt(this._doc, this);
@@ -48638,7 +48841,7 @@ You should be redirected to the song at:<br /><br />
             this.keyboardLayout = window.localStorage.getItem("keyboardLayout") || "wickiHayden";
             this.bassOffset = (+window.localStorage.getItem("bassOffset")) || 0;
             this.layout = window.localStorage.getItem("layout") || "small";
-            this.colorTheme = window.localStorage.getItem("colorTheme") || "slarmoosbox";
+            this.colorTheme = window.localStorage.getItem("colorTheme") || ColorConfig.defaultTheme;
             this.customTheme = window.localStorage.getItem("customTheme");
             this.customTheme2 = window.localStorage.getItem("customTheme2");
             this.visibleOctaves = (window.localStorage.getItem("visibleOctaves") >>> 0) || Preferences.defaultVisibleOctaves;

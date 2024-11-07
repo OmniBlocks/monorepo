@@ -957,7 +957,8 @@ export class Config {
 		{ name: "÷3 (triplets)", stepsPerBeat: 3, /*ticksPerArpeggio: 4, arpeggioPatterns: [[0], [0, 0, 1, 1], [0, 1, 2, 1], [0, 1, 2, 3]]*/ roundUpThresholds: [/*0*/ 5, /*8*/ 12, /*16*/ 18 /*24*/] },
 		{ name: "÷4 (standard)", stepsPerBeat: 4, /*ticksPerArpeggio: 3, arpeggioPatterns: [[0], [0, 0, 1, 1], [0, 1, 2, 1], [0, 1, 2, 3]]*/ roundUpThresholds: [/*0*/ 3, /*6*/ 9, /*12*/ 17, /*18*/ 21 /*24*/] },
 		{ name: "÷6", stepsPerBeat: 6, /*ticksPerArpeggio: 4, arpeggioPatterns: [[0], [0, 1], [0, 1, 2, 1], [0, 1, 2, 3]]*/ roundUpThresholds: null },
-		{ name: "÷8", stepsPerBeat: 8, /*ticksPerArpeggio: 3, arpeggioPatterns: [[0], [0, 1], [0, 1, 2, 1], [0, 1, 2, 3]]*/ roundUpThresholds: null },
+        { name: "÷8", stepsPerBeat: 8, /*ticksPerArpeggio: 3, arpeggioPatterns: [[0], [0, 1], [0, 1, 2, 1], [0, 1, 2, 3]]*/ roundUpThresholds: null },
+        { name: "÷12", stepsPerBeat: 12, roundUpThresholds: null },
 		{ name: "freehand", stepsPerBeat: 24, /*ticksPerArpeggio: 3, arpeggioPatterns: [[0], [0, 1], [0, 1, 2, 1], [0, 1, 2, 3]]*/ roundUpThresholds: null },
 	]);
 
@@ -1310,8 +1311,11 @@ export class Config {
         { name: "25×", mult: 25.0, hzOffset: 0.0, amplitudeSign: 1.0 },
         { name: "50×", mult: 50.0, hzOffset: 0.0, amplitudeSign: 1.0 },
         { name: "75×", mult: 75.0, hzOffset: 0.0, amplitudeSign: 1.0 },
-        { name: "100×", mult: 100.0, hzOffset: 0.0, amplitudeSign: 1.0 }
+        { name: "100×", mult: 100.0, hzOffset: 0.0, amplitudeSign: 1.0 },
         //50 and 100 are from dogebox
+        //128 and 256 from slarmoo's box
+        { name: "128x", mult: 128.0, hzOffset: 0.0, amplitudeSign: 1.0 },
+        { name: "256x", mult: 250.0, hzOffset: 0.0, amplitudeSign: 1.0},
     ]);
 
     //still used for drumsets

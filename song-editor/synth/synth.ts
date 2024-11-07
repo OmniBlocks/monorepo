@@ -1443,18 +1443,23 @@ export class EnvelopeSettings {
         const envelopeObject: any = {
             "target": Config.instrumentAutomationTargets[this.target].name,
             "envelope": Config.newEnvelopes[this.envelope].name,
-            "pitchEnvelopeStart": this.pitchEnvelopeStart,
-            "pitchEnvelopeEnd": this.pitchEnvelopeEnd,
             "inverse": this.inverse,
             "perEnvelopeSpeed": this.perEnvelopeSpeed,
             "perEnvelopeLowerBound": this.perEnvelopeLowerBound,
             "perEnvelopeUpperBound": this.perEnvelopeUpperBound,
-            "steps": this.steps,
-            "seed": this.seed,
-            "waveform": this.waveform,
         };
         if (Config.instrumentAutomationTargets[this.target].maxCount > 1) {
             envelopeObject["index"] = this.index;
+        }
+        if (Config.newEnvelopes[this.envelope].name == "pitch") {
+            envelopeObject["pitchEnvelopeStart"] = this.pitchEnvelopeStart;
+            envelopeObject["pitchEnvelopeEnd"] = this.pitchEnvelopeEnd;
+        } else if (Config.newEnvelopes[this.envelope].name == "random") {
+            envelopeObject["steps"] = this.steps;
+            envelopeObject["seed"] = this.seed;
+            envelopeObject["waveform"] = this.waveform;
+        } else if (Config.newEnvelopes[this.envelope].name == "lfo") {
+            envelopeObject["waveform"] = this.waveform;
         }
         return envelopeObject;
     }
@@ -3337,7 +3342,7 @@ export class Song {
         this.beatsPerBar = 8;
         this.barCount = 16;
         this.patternsPerChannel = 8;
-        this.rhythm = 1;
+        this.rhythm = 3; //default rhythm now 8
         this.layeredInstruments = false;
         this.patternInstruments = false;
         this.eqFilter.reset();
@@ -4476,24 +4481,26 @@ export class Song {
             } break;
             case SongTagCode.rhythm: {
                 if (!fromUltraBox && !fromSlarmoosBox) {
-			let newRhythm = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];	
-			this.rhythm = clamp(0, Config.rhythms.length, newRhythm + 2);
-			if (fromJummBox && beforeThree || fromBeepBox) {
-				if (this.rhythm == Config.rhythms.dictionary["÷3 (triplets)"].index || this.rhythm == Config.rhythms.dictionary["÷6 (sextuplets)"].index) {
-					useSlowerArpSpeed = true;
-				}
-				if (this.rhythm >= Config.rhythms.dictionary["÷6 (sextuplets)"].index) {
-					// @TODO: This assumes that 6 and 8 are in that order, but
-					// if someone reorders Config.rhythms that may not be true,
-					// so this check probably should instead look for those
-					// specific rhythms.
-					useFastTwoNoteArp = true;
-				}
-			}
-			
-		} else {
-			this.rhythm = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
-		}
+                    let newRhythm = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                    this.rhythm = clamp(0, Config.rhythms.length, newRhythm);
+                    if (fromJummBox && beforeThree || fromBeepBox) {
+                        if (this.rhythm == Config.rhythms.dictionary["÷3 (triplets)"].index || this.rhythm == Config.rhythms.dictionary["÷6"].index) {
+                            useSlowerArpSpeed = true;
+                        }
+                        if (this.rhythm >= Config.rhythms.dictionary["÷6"].index) {
+                            // @TODO: This assumes that 6 and 8 are in that order, but
+                            // if someone reorders Config.rhythms that may not be true,
+                            // so this check probably should instead look for those
+                            // specific rhythms.
+                            useFastTwoNoteArp = true;
+                        }
+                    }
+                } else if (!(fromSlarmoosBox && !beforeFour) || !(fromUltraBox && !beforeSix)) {
+                    const rhythmMap = [1, 1, 0, 1, 2, 3, 4, 5];
+                    this.rhythm = rhythmMap[base64CharCodeToInt[compressed.charCodeAt(charIndex++)]];
+                } else {
+                    this.rhythm = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                }
             } break;
             case SongTagCode.channelOctave: {
                 if (beforeThree && fromBeepBox) {

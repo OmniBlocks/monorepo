@@ -43,7 +43,7 @@ import { SongDurationPrompt } from "./SongDurationPrompt";
 import { SustainPrompt } from "./SustainPrompt";
 import { SongRecoveryPrompt } from "./SongRecoveryPrompt";
 import { RecordingSetupPrompt } from "./RecordingSetupPrompt";
-import { SpectrumEditor } from "./SpectrumEditor";
+import { SpectrumEditor, SpectrumEditorPrompt } from "./SpectrumEditor";
 import { CustomThemePrompt } from "./CustomThemePrompt";
 import { ThemePrompt } from "./ThemePrompt";
 import { TipPrompt } from "./TipPrompt";
@@ -4204,8 +4204,12 @@ export class SongEditor {
                 } else if (event.altKey) {
                     //open / close all fm dropdowns
                     const instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
-                    const isAllOpen: boolean = this._openOperatorDropdowns.every((x) => { return x == true })
-                    for (let i = 0; i < (instrument.type == InstrumentType.fm ? 4 : 6); i++) {
+                    const operatorCount: number = instrument.type == InstrumentType.fm ? 4 : 6;
+                    let isAllOpen: boolean = true;
+                    for (let i = 0; i < operatorCount; i++) {
+                        if (!this._openOperatorDropdowns[i]) isAllOpen = false;
+                    }
+                    for (let i = 0; i < operatorCount; i++) {
                         if (this._openOperatorDropdowns[i] == false && !isAllOpen || isAllOpen)
                             this._toggleDropdownMenu(DropdownID.FM, i);
                     }

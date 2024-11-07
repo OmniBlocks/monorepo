@@ -488,13 +488,11 @@ var beepbox = (function (exports) {
     Config.ticksPerArpeggio = 3;
     Config.arpeggioPatterns = [[0], [0, 1], [0, 1, 2, 1], [0, 1, 2, 3], [0, 1, 2, 3, 4], [0, 1, 2, 3, 4, 5], [0, 1, 2, 3, 4, 5, 6], [0, 1, 2, 3, 4, 5, 6, 7]];
     Config.rhythms = toNameMap([
-        { name: "÷1 (quarter notes)", stepsPerBeat: 1, roundUpThresholds: [3] },
-        { name: "÷2 (eighth notes)", stepsPerBeat: 2, roundUpThresholds: [3, 9] },
         { name: "÷3 (triplets)", stepsPerBeat: 3, roundUpThresholds: [5, 12, 18] },
         { name: "÷4 (standard)", stepsPerBeat: 4, roundUpThresholds: [3, 9, 17, 21] },
-        { name: "÷6 (sextuplets)", stepsPerBeat: 6, roundUpThresholds: null },
-        { name: "÷8 (32nd notes)", stepsPerBeat: 8, roundUpThresholds: null },
-        { name: "÷12 (doudectuplets)", stepsPerBeat: 12, roundUpThresholds: null },
+        { name: "÷6", stepsPerBeat: 6, roundUpThresholds: null },
+        { name: "÷8", stepsPerBeat: 8, roundUpThresholds: null },
+        { name: "÷12", stepsPerBeat: 12, roundUpThresholds: null },
         { name: "freehand", stepsPerBeat: 24, roundUpThresholds: null },
     ]);
     Config.instrumentTypeNames = ["chip", "FM", "noise", "spectrum", "drumset", "harmonics", "PWM", "Picked String", "supersaw", "custom chip", "mod", "FM6op", "additive"];
@@ -797,7 +795,9 @@ var beepbox = (function (exports) {
         { name: "25×", mult: 25.0, hzOffset: 0.0, amplitudeSign: 1.0 },
         { name: "50×", mult: 50.0, hzOffset: 0.0, amplitudeSign: 1.0 },
         { name: "75×", mult: 75.0, hzOffset: 0.0, amplitudeSign: 1.0 },
-        { name: "100×", mult: 100.0, hzOffset: 0.0, amplitudeSign: 1.0 }
+        { name: "100×", mult: 100.0, hzOffset: 0.0, amplitudeSign: 1.0 },
+        { name: "128x", mult: 128.0, hzOffset: 0.0, amplitudeSign: 1.0 },
+        { name: "256x", mult: 250.0, hzOffset: 0.0, amplitudeSign: 1.0 },
     ]);
     Config.envelopes = toNameMap([
         { name: "none", type: 0, speed: 0.0 },
@@ -1119,7 +1119,7 @@ var beepbox = (function (exports) {
         { name: "sawtooth", samples: generateSawWave() },
         { name: "ramp", samples: generateSawWave(true) },
         { name: "trapezoid", samples: generateTrapezoidWave(2) },
-        { name: "rounded", samples: generateRoundedSineWave() },
+        { name: "quasi-sine", samples: generateQuasiSineWave() },
     ]);
     Config.pwmOperatorWaves = toNameMap([
         { name: "1%", samples: generateSquareWave(0.01) },
@@ -1486,7 +1486,7 @@ var beepbox = (function (exports) {
         }
         return wave;
     }
-    function generateRoundedSineWave() {
+    function generateQuasiSineWave() {
         const wave = new Float32Array(Config.sineWaveLength + 1);
         for (let i = 0; i < Config.sineWaveLength + 1; i++) {
             wave[i] = Math.round(Math.sin(i * Math.PI * 2.0 / Config.sineWaveLength));
@@ -3637,18 +3637,25 @@ var beepbox = (function (exports) {
             const envelopeObject = {
                 "target": Config.instrumentAutomationTargets[this.target].name,
                 "envelope": Config.newEnvelopes[this.envelope].name,
-                "pitchEnvelopeStart": this.pitchEnvelopeStart,
-                "pitchEnvelopeEnd": this.pitchEnvelopeEnd,
                 "inverse": this.inverse,
                 "perEnvelopeSpeed": this.perEnvelopeSpeed,
                 "perEnvelopeLowerBound": this.perEnvelopeLowerBound,
                 "perEnvelopeUpperBound": this.perEnvelopeUpperBound,
-                "steps": this.steps,
-                "seed": this.seed,
-                "waveform": this.waveform,
             };
             if (Config.instrumentAutomationTargets[this.target].maxCount > 1) {
                 envelopeObject["index"] = this.index;
+            }
+            if (Config.newEnvelopes[this.envelope].name == "pitch") {
+                envelopeObject["pitchEnvelopeStart"] = this.pitchEnvelopeStart;
+                envelopeObject["pitchEnvelopeEnd"] = this.pitchEnvelopeEnd;
+            }
+            else if (Config.newEnvelopes[this.envelope].name == "random") {
+                envelopeObject["steps"] = this.steps;
+                envelopeObject["seed"] = this.seed;
+                envelopeObject["waveform"] = this.waveform;
+            }
+            else if (Config.newEnvelopes[this.envelope].name == "lfo") {
+                envelopeObject["waveform"] = this.waveform;
             }
             return envelopeObject;
         }
@@ -3814,7 +3821,7 @@ var beepbox = (function (exports) {
             this.chord = 1;
             this.volume = 0;
             this.pan = Config.panCenter;
-            this.panDelay = 10;
+            this.panDelay = 0;
             this.arpeggioSpeed = 12;
             this.fastTwoNoteArp = false;
             this.legacyTieOver = false;
@@ -3915,7 +3922,7 @@ var beepbox = (function (exports) {
             this.bitcrusherFreq = Math.floor((Config.bitcrusherFreqRange - 1) * 0.5);
             this.bitcrusherQuantization = Math.floor((Config.bitcrusherQuantizationRange - 1) * 0.5);
             this.pan = Config.panCenter;
-            this.panDelay = 10;
+            this.panDelay = 0;
             this.pitchShift = Config.pitchShiftCenter;
             this.detune = Config.detuneCenter;
             this.vibrato = 0;
@@ -4617,7 +4624,7 @@ var beepbox = (function (exports) {
                 this.panDelay = (instrumentObject["panDelay"] | 0);
             }
             else {
-                this.panDelay = 10;
+                this.panDelay = 0;
             }
             if (instrumentObject["detune"] != undefined) {
                 this.detune = clamp(Config.detuneMin, Config.detuneMax + 1, (instrumentObject["detune"] | 0));
@@ -4885,6 +4892,9 @@ var beepbox = (function (exports) {
                             if (operatorObject["waveform"] == "square") {
                                 operator.waveform = Config.operatorWaves.dictionary["pulse width"].index;
                                 operator.pulseWidth = 5;
+                            }
+                            else if (operatorObject["waveform"] == "rounded") {
+                                operator.waveform = Config.operatorWaves.dictionary["quasi-sine"].index;
                             }
                             else {
                                 operator.waveform = 0;
@@ -6397,15 +6407,19 @@ var beepbox = (function (exports) {
                         {
                             if (!fromUltraBox && !fromSlarmoosBox) {
                                 let newRhythm = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
-                                this.rhythm = clamp(0, Config.rhythms.length, newRhythm + 2);
+                                this.rhythm = clamp(0, Config.rhythms.length, newRhythm);
                                 if (fromJummBox && beforeThree || fromBeepBox) {
-                                    if (this.rhythm == Config.rhythms.dictionary["÷3 (triplets)"].index || this.rhythm == Config.rhythms.dictionary["÷6 (sextuplets)"].index) {
+                                    if (this.rhythm == Config.rhythms.dictionary["÷3 (triplets)"].index || this.rhythm == Config.rhythms.dictionary["÷6"].index) {
                                         useSlowerArpSpeed = true;
                                     }
-                                    if (this.rhythm >= Config.rhythms.dictionary["÷6 (sextuplets)"].index) {
+                                    if (this.rhythm >= Config.rhythms.dictionary["÷6"].index) {
                                         useFastTwoNoteArp = true;
                                     }
                                 }
+                            }
+                            else if (!(fromSlarmoosBox && !beforeFour) || !(fromUltraBox && !beforeSix)) {
+                                const rhythmMap = [1, 1, 0, 1, 2, 3, 4, 5];
+                                this.rhythm = rhythmMap[base64CharCodeToInt[compressed.charCodeAt(charIndex++)]];
                             }
                             else {
                                 this.rhythm = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
@@ -11206,7 +11220,7 @@ var beepbox = (function (exports) {
                     this.synthesize(outputDataL, outputDataR, outputBuffer.length, this.isPlayingSong);
                     if (this.oscEnabled) {
                         if (this.oscRefreshEventTimer <= 0) {
-                            events.raise("oscillascopeUpdate", outputDataL, outputDataR);
+                            events.raise("oscilloscopeUpdate", outputDataL, outputDataR);
                             this.oscRefreshEventTimer = 2;
                         }
                         else {

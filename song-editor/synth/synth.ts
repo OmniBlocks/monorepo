@@ -656,7 +656,7 @@ export class Pattern {
                     note.continuesLastPattern = false;
                 }
 
-                if (format != "ultrabox" && instrument.modulators[mod] == Config.modulators.dictionary["tempo"].index) {
+                if ((format != "ultrabox" && format != "slarmoosbox") && instrument.modulators[mod] == Config.modulators.dictionary["tempo"].index) {
                     for (const pin of note.pins) {
                         const oldMin: number = 30;
                         const newMin: number = 1;
@@ -1498,13 +1498,13 @@ export class EnvelopeSettings {
         }
 
         if (envelopeObject["perEnvelopeLowerBound"] != undefined) {
-            this.perEnvelopeLowerBound = clamp(Config.perEnvelopeBoundMin, Config.perEnvelopeBoundMax, envelopeObject["perEnvelopeLowerBound"]);
+            this.perEnvelopeLowerBound = envelopeObject["perEnvelopeLowerBound"];
         } else {
             this.perEnvelopeLowerBound = 0;
         }
 
         if (envelopeObject["perEnvelopeUpperBound"] != undefined) {
-            this.perEnvelopeUpperBound = clamp(Config.perEnvelopeBoundMin, Config.perEnvelopeBoundMax, envelopeObject["perEnvelopeUpperBound"]);
+            this.perEnvelopeUpperBound = envelopeObject["perEnvelopeUpperBound"];
         } else {
             this.perEnvelopeUpperBound = 1;
         }
@@ -2938,7 +2938,7 @@ export class Instrument {
                     } else {
                         envelopeInverse = tempEnvelope.inverse;
                     }
-                    this.addEnvelope(tempEnvelope.target, tempEnvelope.index, tempEnvelope.envelope, (format == "slarmoosbox"), pitchEnvelopeStart, pitchEnvelopeEnd, envelopeInverse, tempEnvelope.perEnvelopeSpeed, tempEnvelope.perEnvelopeLowerBound, tempEnvelope.perEnvelopeUpperBound);
+                    this.addEnvelope(tempEnvelope.target, tempEnvelope.index, tempEnvelope.envelope, true, pitchEnvelopeStart, pitchEnvelopeEnd, envelopeInverse, tempEnvelope.perEnvelopeSpeed, tempEnvelope.perEnvelopeLowerBound, tempEnvelope.perEnvelopeUpperBound);
                 }
             }
         }
@@ -2988,7 +2988,7 @@ export class Instrument {
 
     public addEnvelope(target: number, index: number, envelope: number, newEnvelope: boolean, start: number = 0, end: number = -1, inverse: boolean = false, perEnvelopeSpeed: number = -1, perEnvelopeLowerBound: number = 0, perEnvelopeUpperBound: number = 1): void {
         end = end != -1 ? end : this.isNoiseInstrument ? Config.drumCount - 1 : Config.maxPitch; //find default if none is given
-        perEnvelopeSpeed = perEnvelopeSpeed != -1 ? perEnvelopeSpeed : Config.envelopes[envelope].speed; //find default if none is given
+        perEnvelopeSpeed = perEnvelopeSpeed != -1 ? perEnvelopeSpeed : newEnvelope ? 1 : Config.envelopes[envelope].speed; //find default if none is given
         let makeEmpty: boolean = false;
         if (!this.supportsEnvelopeTarget(target, index)) makeEmpty = true;
         if (this.envelopeCount >= Config.maxEnvelopeCount) throw new Error();
@@ -7545,12 +7545,13 @@ class EnvelopeComputer {
                 if (!timeScale[envelopeIndex]) timeScale[envelopeIndex] = 0;
 
                 const secondsPerTickScaled: number = secondsPerTick * timeScale[envelopeIndex];
-                tickTimeEnd[envelopeIndex] = tickTimeStart[envelopeIndex] + timeScale[envelopeIndex];
+                if (!tickTimeStart[envelopeIndex]) tickTimeStart[envelopeIndex] = 0; //prevents tremolos from causing a NaN width error
+                tickTimeEnd[envelopeIndex] = tickTimeStart[envelopeIndex] ? tickTimeStart[envelopeIndex] + timeScale[envelopeIndex] : timeScale[envelopeIndex];
                 noteSecondsStart[envelopeIndex] = this.noteSecondsEnd[envelopeIndex];
                 prevNoteSecondsStart[envelopeIndex] = this.prevNoteSecondsEnd[envelopeIndex];
                 noteSecondsEnd[envelopeIndex] = noteSecondsStart[envelopeIndex] + secondsPerTickScaled;
                 prevNoteSecondsEnd[envelopeIndex] = prevNoteSecondsStart[envelopeIndex] + secondsPerTickScaled;
-                beatTimeStart[envelopeIndex] = beatsPerTick * tickTimeStart[envelopeIndex];
+                beatTimeStart[envelopeIndex] = beatsPerTick * tickTimeStart[envelopeIndex] ? beatsPerTick * tickTimeStart[envelopeIndex] : 0;
                 beatTimeEnd[envelopeIndex] = beatsPerTick * tickTimeEnd[envelopeIndex] ? beatsPerTick * tickTimeEnd[envelopeIndex] : 0;
 
                 if (envelope.type == EnvelopeType.noteSize) usedNoteSize = true;
@@ -8828,6 +8829,7 @@ export class Synth {
         this.isPlayingSong = false;
     }
 
+
     public computeLatestModValues(): void {
 
         if (this.song != null && this.song.modChannelCount > 0) {
@@ -9115,7 +9117,7 @@ export class Synth {
     private static readonly effectsFunctionCache: Function[] = Array(1 << 7).fill(undefined); // keep in sync with the number of post-process effects.
     private static readonly pickedStringFunctionCache: Function[] = Array(3).fill(undefined); // keep in sync with the number of unison voices.
 
-    private readonly channels: ChannelState[] = [];
+    public readonly channels: ChannelState[] = [];
     private readonly tonePool: Deque<Tone> = new Deque<Tone>();
     private readonly tempMatchedPitchTones: Array<Tone | null> = Array(Config.maxChordSize).fill(null);
 
@@ -10100,6 +10102,7 @@ export class Synth {
                                 instrumentState.arpTime += (1 - (useArpeggioSpeed % 1)) * Config.arpSpeedScale[Math.floor(useArpeggioSpeed)] + (useArpeggioSpeed % 1) * Config.arpSpeedScale[Math.ceil(useArpeggioSpeed)];
                             }
                         }
+                        envelopeComputer.clearEnvelopes();
 
                     }
                 }
@@ -14046,7 +14049,7 @@ export class Synth {
         }
     }
 
-    private getSamplesPerTick(): number {
+    public getSamplesPerTick(): number {
         if (this.song == null) return 0;
         let beatsPerMinute: number = this.song.getBeatsPerMinute();
         if (this.isModActive(Config.modulators.dictionary["tempo"].index)) {

@@ -42,7 +42,10 @@ export class AdditiveEditor {
     private _initial: AdditiveWave = this._instrument.additiveWave;
     private _current: AdditiveWave = this._initial;
 
-    constructor(private _doc: SongDocument) {
+    private _undoHistoryState: number = 0;
+    private _changeQueue: AdditiveWave[] = [];
+
+    constructor(private _doc: SongDocument, private _isPrompt: boolean) {
         for (let i: number = 1; i <= Config.additiveControlPoints; i = i * 2) {
             this._octaves.appendChild(SVG.rect({ fill: ColorConfig.tonic, x: (i - 0.5) * (this._editorWidth - 8) / (Config.additiveControlPoints - 1) - 1, y: 0, width: 2, height: this._editorHeight }));
         }
@@ -70,6 +73,7 @@ export class AdditiveEditor {
         this.container.addEventListener("touchmove", this._whenTouchMoved);
         this.container.addEventListener("touchend", this._whenCursorReleased);
         this.container.addEventListener("touchcancel", this._whenCursorReleased);
+        this.storeChange();
     }
 
     private _buttonPressed(buttonIndex: number) {
@@ -85,7 +89,8 @@ export class AdditiveEditor {
                 this._waveTypeButtons[buttonIndex].appendChild(this._getShape(this._current.waveTypes[buttonIndex], buttonIndex));
             }
             const instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
-            this._doc.record(new ChangeAdditive(this._doc, instrument, this._current));
+            new ChangeAdditive(this._doc, instrument, this._current);
+            this.storeChange();
         }
     }
 
@@ -126,6 +131,64 @@ export class AdditiveEditor {
 
     private _yToAmp(y: number): number {
         return Config.additiveMax * (1 - y / this._editorHeight);
+    }
+
+    public storeChange = (): void => {
+        // Check if change is unique compared to the current history state
+        var sameCheck = true;
+        if (this._changeQueue.length > 0) {
+            for (var i = 0; i < Config.additiveControlPoints; i++) {
+                if (this._changeQueue[this._undoHistoryState].additives[i] != this._instrument.additiveWave.additives[i] && 
+                    this._changeQueue[this._undoHistoryState].waveTypes[i] != this._instrument.additiveWave.waveTypes[i]
+                ) {
+                    sameCheck = false; i = Config.additiveControlPoints;
+                }
+            }
+        }
+
+        if (sameCheck == false || this._changeQueue.length == 0) {
+
+            // Create new branch in history, removing all after this in time
+            this._changeQueue.splice(0, this._undoHistoryState);
+
+            this._undoHistoryState = 0;
+            
+            const additive: AdditiveWave = new AdditiveWave();
+            additive.additives = this._instrument.additiveWave.additives.slice()
+            additive.waveTypes = this._instrument.additiveWave.waveTypes.slice()
+            this._changeQueue.unshift(additive);
+
+            // 32 undo max
+            if (this._changeQueue.length > 32) {
+                this._changeQueue.pop();
+            }
+
+        }
+
+    }
+
+    public undo = (): void => {
+        // Go backward, if there is a change to go back to
+        if (this._undoHistoryState < this._changeQueue.length - 1) {
+            this._undoHistoryState++;
+            const additive: AdditiveWave = new AdditiveWave();
+            additive.additives = this._changeQueue[this._undoHistoryState].additives.slice()
+            additive.waveTypes = this._changeQueue[this._undoHistoryState].waveTypes.slice()
+            this.setAdditiveWave(additive);
+        }
+
+    }
+
+    public redo = (): void => {
+        // Go forward, if there is a change to go to
+        if (this._undoHistoryState > 0) {
+            this._undoHistoryState--;
+            const additive: AdditiveWave = new AdditiveWave();
+            additive.additives = this._changeQueue[this._undoHistoryState].additives.slice()
+            additive.waveTypes = this._changeQueue[this._undoHistoryState].waveTypes.slice()
+            this.setAdditiveWave(additive);
+        }
+
     }
 
     private _whenMousePressed = (event: MouseEvent): void => {
@@ -214,38 +277,49 @@ export class AdditiveEditor {
         return this._current;
     }
 
-    public setAdditiveWave(additive: AdditiveWave) {
+    public setAdditiveWave(additive: AdditiveWave, saveHistory: boolean = false) {
         const instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
         this._current = additive;
-        this._doc.record(new ChangeAdditive(this._doc, instrument, this._current));
+        const additiveChange = new ChangeAdditive(this._doc, instrument, this._current);
         this.render();
-        for (let i: number = 0; i < Config.additiveControlPoints; i++) {
-            if (this._waveTypeButtons[i]) {
-                const existingChild = document.getElementById("SVGshape" + i);
-                if (existingChild) {
-                    existingChild.remove();
+        if (!this._isPrompt || saveHistory) {
+            this._doc.record(additiveChange);
+        }
+        if (this._isPrompt) {
+            for (let i: number = 0; i < Config.additiveControlPoints; i++) {
+                if (this._waveTypeButtons[i]) {
+                    const existingChild = document.getElementById("SVGshape" + i);
+                    if (existingChild) {
+                        existingChild.remove();
+                    }
+                    this._waveTypeButtons[i].appendChild(this._getShape(this._current.waveTypes[i], i));
                 }
-                this._waveTypeButtons[i].appendChild(this._getShape(this._current.waveTypes[i], i));
             }
         }
     }
 
     private _whenCursorReleased = (event: Event): void => {
         if (this._mouseDown) {
-            this._doc.record(this._change!);
+            if (!this._isPrompt) {
+                this._doc.record(this._change!);
+            }
             this._change = null;
+            this.storeChange();
         }
         this._mouseDown = false;
     }
 
     public saveSettings() {
         const instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
-        this._doc.record(new ChangeAdditive(this._doc, instrument, this._current));
+        return new ChangeAdditive(this._doc, instrument, this._current);
     }
 
     public resetToInitial() {
-        const instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
-        this._doc.record(new ChangeAdditive(this._doc, instrument, this._initial));
+        //const instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
+        //this.setAdditiveWave(this._initial, true);
+        //this._doc.record(new ChangeAdditive(this._doc, instrument, this._initial));
+        this._changeQueue = [];
+        this._undoHistoryState = 0;
     }
 
     public rerenderWave() {
@@ -291,7 +365,7 @@ export class AdditiveEditor {
 
 export class AdditiveEditorPrompt implements Prompt {
 
-    public readonly additiveEditor: AdditiveEditor = new AdditiveEditor(this._doc);
+    public readonly additiveEditor: AdditiveEditor = new AdditiveEditor(this._doc, true);
 
     public readonly _playButton: HTMLButtonElement = HTML.button({ style: "width: 55%;", type: "button" });
 
@@ -368,7 +442,7 @@ export class AdditiveEditorPrompt implements Prompt {
 
     private _close = (): void => {
         this._doc.prompt = null;
-        this.additiveEditor.resetToInitial();
+        this._doc.undo();
     }
 
     public cleanUp = (): void => {
@@ -395,6 +469,7 @@ export class AdditiveEditorPrompt implements Prompt {
             parsedAdditive.waveTypes[i] = storedAdditiveWave["waveTypes"][i];
         }
         this.additiveEditor.setAdditiveWave(parsedAdditive);
+        this.additiveEditor.storeChange();
     }
 
     public whenKeyPressed = (event: KeyboardEvent): void => {
@@ -405,14 +480,14 @@ export class AdditiveEditorPrompt implements Prompt {
             this._togglePlay();
             event.preventDefault();
         }
-        // else if (event.keyCode == 90) { // z
-        //     this.additiveEditor.undo();
-        //     event.stopPropagation();
-        // }
-        // else if (event.keyCode == 89) { // y
-        //     this.additiveEditor.redo();
-        //     event.stopPropagation();
-        // }
+        else if (event.keyCode == 90) { // z
+            this.additiveEditor.undo();
+            event.stopPropagation();
+        }
+        else if (event.keyCode == 89) { // y
+            this.additiveEditor.redo();
+            event.stopPropagation();
+        }
         else if (event.keyCode == 219) { // [
             this._doc.synth.goToPrevBar();
         }
@@ -423,7 +498,7 @@ export class AdditiveEditorPrompt implements Prompt {
 
     private _saveChanges = (): void => {
         this._doc.prompt = null;
-        // Save again just in case
-        this.additiveEditor.saveSettings();
+        this._doc.record(this.additiveEditor.saveSettings(), true);
+        this._doc.prompt = null;
     }
 }

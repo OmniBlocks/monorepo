@@ -96,7 +96,7 @@ function buildPresetOptions(isNoise: boolean, idSet: string): HTMLSelectElement 
         menu.appendChild(option({ value: InstrumentType.fm6op }, EditorConfig.instrumentToPreset(InstrumentType.fm6op)!.name));
         menu.appendChild(option({ value: InstrumentType.harmonics }, EditorConfig.valueToPreset(InstrumentType.harmonics)!.name));
         menu.appendChild(option({ value: InstrumentType.pickedString }, EditorConfig.valueToPreset(InstrumentType.pickedString)!.name));
-        //menu.appendChild(option({ value: InstrumentType.additive }, EditorConfig.instrumentToPreset(InstrumentType.additive)!.name)); //needs to be instrumentToPreset instead of valueToPreset to account for mod type
+        menu.appendChild(option({ value: InstrumentType.additive }, EditorConfig.instrumentToPreset(InstrumentType.additive)!.name)); //needs to be instrumentToPreset instead of valueToPreset to account for mod type
         menu.appendChild(option({ value: InstrumentType.spectrum }, EditorConfig.valueToPreset(InstrumentType.spectrum)!.name));
         menu.appendChild(option({ value: InstrumentType.noise }, EditorConfig.valueToPreset(InstrumentType.noise)!.name));
     }
@@ -1034,7 +1034,7 @@ export class SongEditor {
     private readonly _harmonicsEditor: HarmonicsEditor = new HarmonicsEditor(this._doc);
     private readonly _harmonicsZoom: HTMLButtonElement = button({ style: "margin-left:0em; padding-left:0.2em; height:1.5em; max-width: 12px;", onclick: () => this._openPrompt("harmonicsSettings") }, "+");
     private readonly _harmonicsRow: HTMLElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("harmonics"), style: "font-size: smaller"}, "Harmonics:"), this._harmonicsZoom, this._harmonicsEditor.container);
-    private readonly _additiveEditor: AdditiveEditor = new AdditiveEditor(this._doc);
+    private readonly _additiveEditor: AdditiveEditor = new AdditiveEditor(this._doc, false);
     private readonly _additiveZoom: HTMLButtonElement = button({ style: "margin-left:0em; padding-left:0.2em; height:1.5em; max-width: 12px;", onclick: () => this._openPrompt("additiveSettings") }, "+");
     private readonly _additiveRow: HTMLElement = div({ class: "selectRow" }, span({ class: "tip ", onclick: () => this._openPrompt("additive"), style: "font-size: smaller" }, "Additive:"), this._additiveZoom, this._additiveEditor.container);
 
@@ -1813,17 +1813,17 @@ export class SongEditor {
             target.textContent = "▲";
             if (dropdown == DropdownID.EnvelopeSettings) {
                 group.style.display = "flex";
-                if (subtype == "pitch") { 
-                    this.envelopeEditor.extraPitchSettingsGroups[submenu].style.display = "flex";
-                    this.envelopeEditor.perEnvelopeSpeedGroups[submenu].style.display = "none";
-                } else {
-                    this.envelopeEditor.extraPitchSettingsGroups[submenu].style.display = "none";
-                    if (subtype == "notesize" || subtype == "none") {
-                        this.envelopeEditor.perEnvelopeSpeedGroups[submenu].style.display = "none";
-                    } else {
-                        this.envelopeEditor.perEnvelopeSpeedGroups[submenu].style.display = "flex";
-                    }
-                }
+                // if (subtype == "pitch") { 
+                //     this.envelopeEditor.extraPitchSettingsGroups[submenu].style.display = "flex";
+                //     this.envelopeEditor.perEnvelopeSpeedGroups[submenu].style.display = "none";
+                // } else {
+                //     this.envelopeEditor.extraPitchSettingsGroups[submenu].style.display = "none";
+                //     if (subtype == "notesize" || subtype == "none" || subtype == "punch") {
+                //         this.envelopeEditor.perEnvelopeSpeedGroups[submenu].style.display = "none";
+                //     } else {
+                //         this.envelopeEditor.perEnvelopeSpeedGroups[submenu].style.display = "flex";
+                //     }
+                // }
                 this.envelopeEditor.rerenderExtraSettings();
             } else if (group != this._chordDropdownGroup) {
                 group.style.display = "";
@@ -1849,8 +1849,6 @@ export class SongEditor {
             }
             target.textContent = "▼";
             group.style.display = "none";
-            this.envelopeEditor.extraPitchSettingsGroups[submenu].style.display = "none";
-            this.envelopeEditor.perEnvelopeSpeedGroups[submenu].style.display = "none";
         }
     }
 

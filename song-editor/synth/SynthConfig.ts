@@ -974,7 +974,7 @@ export class Config {
     public static readonly pwmBaseExpression: number = 0.04725; // It's actually closer to half of this, the synthesized pulse amplitude range is only .5 to -.5, but also note that the fundamental sine partial amplitude of a square wave is 4/π times the measured square wave amplitude.
     public static readonly supersawBaseExpression: number = 0.061425; // It's actually closer to half of this, the synthesized sawtooth amplitude range is only .5 to -.5.
     public static readonly pickedStringBaseExpression: number = 0.025; // Same as harmonics.
-    public static readonly additiveBaseExpression: number = 0.012; //For now. We'll see how is goes
+    public static readonly additiveBaseExpression: number = 0.045; //For now. We'll see how is goes
     public static readonly distortionBaseVolume: number = 0.011; // Distortion is not affected by pitchDamping, which otherwise approximately halves expression for notes around the middle of the range.
     public static readonly bitcrusherBaseVolume: number = 0.010; // Also not affected by pitchDamping, used when bit crushing is maxed out (aka "1-bit" output).
     public static rawChipWaves: DictionaryArray<ChipWave> = toNameMap([

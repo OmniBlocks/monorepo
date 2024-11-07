@@ -3257,7 +3257,7 @@ var beepbox = (function (exports) {
         reset() {
             for (let i = 0; i < Config.additiveControlPoints; i++) {
                 this.additives[i] = 0;
-                this.waveTypes[i] = 0;
+                this.waveTypes[i] = 2;
             }
             this.additives[0] = Config.additiveMax;
             this.additives[3] = Config.additiveMax;

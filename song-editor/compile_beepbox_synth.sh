@@ -11,7 +11,6 @@ npx rollup build/synth/synth.js \
 	--output.name beepbox \
 	--context exports \
 	--sourcemap \
-	--plugin rollup-plugin-sourcemaps \
 	--plugin @rollup/plugin-node-resolve
 
 # Minify website/beepbox_synth.js into website/beepbox_synth.min.js

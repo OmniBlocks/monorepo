@@ -13,8 +13,8 @@
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="theme-color" content="#444" />
-    <meta name="msapplication-TileColor" content="#dba600" />
+    <meta name="theme-color" content="#247d1d" />
+    <meta name="msapplication-TileColor" content="#247d1d" />
     <meta name="msapplication-config" content="/browserconfig.xml" />
     <meta name="format-detection" content="telephone=no" />
     <meta property="og:image" content="https://slarmoo.github.io/slarmoosbox/website/icon_shadow_192.png">
@@ -40,6 +40,9 @@
             flex-direction: column;
             align-items: center;
             align-content: center;
+            width: 100%;
+            margin-left: 3vw;
+            margin-right: 30vw;
         }
 
         h1 {
@@ -108,7 +111,7 @@
             }
         }
     </style>
-    </body>
+<body>
     <h1>
         <font color="#9c64f7"> Frequently Asked Questions </font>
     </h1>
@@ -120,27 +123,39 @@
             New envelopeable effects: reverb, chorus, bitcrush, frequency crush, panning, distortion, and arpeggio speed
         </li>
         <li>
-            Two new envelope types:
+            Five new envelope types:
         </li>
         <ul>
             <li>
-                Pitch: track what your notes do based on the pitch (also called keytracking in other daws). This envelope has an adjustable pitch range setting
+                Pitch: Tracks what your notes do based on the pitch (also called keytracking in other daws). This envelope has an adjustable pitch range setting
+            </li>
+            <li>
+                Random: Uses a pseudorandom hashing function to output a "random" value based on the step size and seed. Each time your song is played the envelope will output the same value
             </li>
             <li>
                 Fall: Similar to twang, except instead of decreasing quickly to slowly, fall decreases slowly to quickly
             </li>
+            <li>
+                Random: Produces a random value based on either the time or the pitch. This envelope has an adjustable seed (and steps for time) setting
+            </li>
+            <li>
+                LFO: Modulates a value based on a waveform. This envelope type replaced the old tremolo envelope
+            </li>
         </ul>
         <li>
-            Individual envelope speeds, bounds, and inversions
+            Individual envelope speeds (with modulation support), bounds, and inversions
         </li>
         <li> 
             Increased max envelope count to 16 (from ultrabox's 12)
         </li>
         <li>
+            New Song EQ filter, along with modulation support
+        </li>
+        <li>
             A better spectrum and harmonics editor (zoom, copy and paste)
         </li>
         <li>
-            Several new keybinds in the Song player (shorten link, toggle loop, toggle zoom, and copy link)
+            Several new keybinds in the Song player (shorten link, toggle loop, toggle zoom, and copy link) and 2 new keybinds for opening and closing several dropdowns at once (envelopes and fm dropdowns)
         </li>
         <li>
             Two new themes: Greyscale and Slarmoo's Box
@@ -240,37 +255,37 @@
             </tr>
             <tr>
                 <th>tremolo0</th>
-                <th>tremolo</th>
+                <th>sine LFO</th>
                 <th>8</th>
             </tr>
             <tr>
                 <th>tremolo1</th>
-                <th>tremolo</th>
+                <th>sine LFO</th>
                 <th>4</th>
             </tr>
             <tr>
                 <th>tremolo2</th>
-                <th>tremolo</th>
+                <th>sine LFO</th>
                 <th>2</th>
             </tr>
             <tr>
                 <th>tremolo3</th>
-                <th>tremolo</th>
+                <th>sine LFO</th>
                 <th>1</th>
             </tr>
             <tr>
                 <th>tremolo4</th>
-                <th>tremolo2</th>
+                <th>sine LFO*</th>
                 <th>4</th>
             </tr>
             <tr>
                 <th>tremolo5</th>
-                <th>tremolo2</th>
+                <th>sine LFO*</th>
                 <th>2</th>
             </tr>
             <tr>
                 <th>tremolo6</th>
-                <th>tremolo2</th>
+                <th>sine LFO*</th>
                 <th>1</th>
             </tr>
             <tr>
@@ -380,77 +395,77 @@
             </tr>
             <tr>
                 <th>tripolo1</th>
-                <th>tremolo</th>
+                <th>sine LFO</th>
                 <th>9</th>
             </tr>
             <tr>
                 <th>tripolo2</th>
-                <th>tremolo</th>
+                <th>sine LFO</th>
                 <th>6</th>
             </tr>
             <tr>
                 <th>tripolo3</th>
-                <th>tremolo</th>
+                <th>sine LFO</th>
                 <th>3</th>
             </tr>
             <tr>
                 <th>tripolo4</th>
-                <th>tremolo2</th>
+                <th>sine LFO*</th>
                 <th>9</th>
             </tr>
             <tr>
                 <th>tripolo5</th>
-                <th>tremolo2</th>
+                <th>sine LFO*</th>
                 <th>6</th>
             </tr>
             <tr>
                 <th>tripolo6</th>
-                <th>tremolo2</th>
+                <th>sine LFO*</th>
                 <th>3</th>
             </tr>
             <tr>
                 <th>pentolo1</th>
-                <th>tremolo</th>
+                <th>sine LFO</th>
                 <th>10</th>
             </tr>
             <tr>
                 <th>pentolo2</th>
-                <th>tremolo</th>
+                <th>sine LFO</th>
                 <th>5</th>
             </tr>
             <tr>
                 <th>pentolo3</th>
-                <th>tremolo</th>
+                <th>sine LFO</th>
                 <th>2.5</th>
             </tr>
             <tr>
                 <th>pentolo4</th>
-                <th>tremolo2</th>
+                <th>sine LFO*</th>
                 <th>10</th>
             </tr>
             <tr>
                 <th>pentolo5</th>
-                <th>tremolo2</th>
+                <th>sine LFO*</th>
                 <th>5</th>
             </tr>
             <tr>
                 <th>pentolo6</th>
-                <th>tremolo2</th>
+                <th>sine LFO*</th>
                 <th>2.5</th>
             </tr>
             <tr>
                 <th>flutter 1</th>
-                <th>tremolo</th>
+                <th>sine LFO</th>
                 <th>14</th>
             </tr>
             <tr>
                 <th>flutter 2</th>
-                <th>tremolo2</th>
+                <th>sine LFO*</th>
                 <th>11</th>
             </tr>
             <tr>
                 <th>water-y flutter</th>
-                <th>tremolo</th>
+                <th>sine LFO</th>
                 <th>9</th>
             </tr>
             <tr>
@@ -485,7 +500,19 @@
             </tr>
         </tbody>
     </table>
-
-    </body>
+    <p>* lower bound should be set to 0.5 for these envelopes</p>
+    <h2> What can I do with Pitch Envelopes? </h2>
+    <span> Slarmoo's Box's unique pitch envelopes has a variety of unique uses. </span>
+    <span> You can: </span>
+    <ul>
+        <li>Set it to target pitch shift or detune (or custom unisons) to get anything from subtle pitch stretching to microtonality </li>
+        <li>Target note volume to have upper notes map quieter than lower notes or vice versa for help mixing</li>
+        <li>Target note volume to fade from one instrument to another (or suddenly change, which may be useful for multisampling)</li>
+        <li>Target pulse width, fm volume sliders, or other effects to have dynamic arpeggios</li>
+        <li>Target panning to have different notes be panned different directions</li>
+        <li>Have different pitches of a drumset or other instrument have different effect amounts</li>
+        <li>And many more techniques that you can discover on your own!</li>
+    </ul>
+</body>
 
 </html>

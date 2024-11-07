@@ -46,20 +46,21 @@ export const enum SustainType {
 export const enum EnvelopeType {
     none,
     noteSize,
-    pitch,
+    pitch, //slarmoo's box 0.9
+    pseudorandom, //slarmoo's box 1.3
 	punch,
 	flare,
 	twang,
 	swell,
-	tremolo,
-	tremolo2,
+	lfo, //renamed from tremolo in slarmoo's box 1.3
+    tremolo2, //deprecated as of slarmoo's box 1.3; Kept for updating integrity and drumsets
     decay,
     wibble,
     //hard, hoping nothing goes wrong by removing this
     linear,
     rise,
     blip,
-    fall,
+    fall, //slarmoo's box 1.2
     //add new envelope types here
 }
 
@@ -143,13 +144,13 @@ export const enum EnvelopeComputeIndex {
     length,
 }
 
-export const enum AdditiveWaveTypes {
+export const enum BaseWaveTypes {
     sine,
     square,
     triangle,
     sawtooth,
-    ramp,
-    trapezoid,
+    // ramp,
+    // trapezoid,
     length,
 }
 
@@ -948,20 +949,18 @@ export class Config {
     public static readonly instrumentCountMin: number = 1;
     public static readonly layeredInstrumentCountMax: number = 10;
     public static readonly patternInstrumentCountMax: number = 10;
-    public static readonly partsPerBeat: number = 24;
-    public static readonly ticksPerPart: number = 2;
-    public static readonly ticksPerArpeggio: number = 3;
-    public static readonly arpeggioPatterns: ReadonlyArray<ReadonlyArray<number>> = [[0], [0, 1], [0, 1, 2, 1], [0, 1, 2, 3], [0, 1, 2, 3, 4], [0, 1, 2, 3, 4, 5], [0, 1, 2, 3, 4, 5, 6], [0, 1, 2, 3, 4, 5, 6, 7]];
-    public static readonly rhythms: DictionaryArray<Rhythm> = toNameMap([
-        { name: "÷1 (whole notes)", stepsPerBeat: 1, /*ticksPerArpeggio: 6, arpeggioPatterns: [[0], [0, 0, 1, 1], [0, 1, 2, 1]],*/ roundUpThresholds: [3] },
-        { name: "÷2 (half notes)", stepsPerBeat: 2, /*ticksPerArpeggio: 5, arpeggioPatterns: [[0], [0, 0, 1, 1], [0, 1, 2, 1]],*/ roundUpThresholds: [3, 9] },
-        { name: "÷3 (triplets)", stepsPerBeat: 3, /*ticksPerArpeggio: 4, arpeggioPatterns: [[0], [0, 0, 1, 1], [0, 1, 2, 1], [0, 1, 2, 3]]*/ roundUpThresholds: [/*0*/ 5, /*8*/ 12, /*16*/ 18 /*24*/] },
-        { name: "÷4 (standard)", stepsPerBeat: 4, /*ticksPerArpeggio: 3, arpeggioPatterns: [[0], [0, 0, 1, 1], [0, 1, 2, 1], [0, 1, 2, 3]]*/ roundUpThresholds: [/*0*/ 3, /*6*/ 9, /*12*/ 17, /*18*/ 21 /*24*/] },
-        { name: "÷6 (sextuplets)", stepsPerBeat: 6, /*ticksPerArpeggio: 4, arpeggioPatterns: [[0], [0, 1], [0, 1, 2, 1], [0, 1, 2, 3]]*/ roundUpThresholds: null },
-        { name: "÷8 (32nd notes)", stepsPerBeat: 8, /*ticksPerArpeggio: 3, arpeggioPatterns: [[0], [0, 1], [0, 1, 2, 1], [0, 1, 2, 3]]*/ roundUpThresholds: null },
-        { name: "÷12 (doudectuplets)", stepsPerBeat: 12, /*ticksPerArpeggio: 3, arpeggioPatterns: [[0], [0, 1], [0, 1, 2, 1]]*/ roundUpThresholds: null },
-        { name: "freehand", stepsPerBeat: 24, /*ticksPerArpeggio: 3, arpeggioPatterns: [[0], [0, 1], [0, 1, 2, 1], [0, 1, 2, 3]]*/ roundUpThresholds: null },
-    ]);
+	public static readonly partsPerBeat: number = 24;
+	public static readonly ticksPerPart: number = 2;
+	public static readonly ticksPerArpeggio: number = 3;
+	public static readonly arpeggioPatterns: ReadonlyArray<ReadonlyArray<number>> = [[0], [0, 1], [0, 1, 2, 1], [0, 1, 2, 3], [0, 1, 2, 3, 4], [0, 1, 2, 3, 4, 5], [0, 1, 2, 3, 4, 5, 6], [0, 1, 2, 3, 4, 5, 6, 7] ];
+	public static readonly rhythms: DictionaryArray<Rhythm> = toNameMap([
+		{ name: "÷3 (triplets)", stepsPerBeat: 3, /*ticksPerArpeggio: 4, arpeggioPatterns: [[0], [0, 0, 1, 1], [0, 1, 2, 1], [0, 1, 2, 3]]*/ roundUpThresholds: [/*0*/ 5, /*8*/ 12, /*16*/ 18 /*24*/] },
+		{ name: "÷4 (standard)", stepsPerBeat: 4, /*ticksPerArpeggio: 3, arpeggioPatterns: [[0], [0, 0, 1, 1], [0, 1, 2, 1], [0, 1, 2, 3]]*/ roundUpThresholds: [/*0*/ 3, /*6*/ 9, /*12*/ 17, /*18*/ 21 /*24*/] },
+		{ name: "÷6", stepsPerBeat: 6, /*ticksPerArpeggio: 4, arpeggioPatterns: [[0], [0, 1], [0, 1, 2, 1], [0, 1, 2, 3]]*/ roundUpThresholds: null },
+        { name: "÷8", stepsPerBeat: 8, /*ticksPerArpeggio: 3, arpeggioPatterns: [[0], [0, 1], [0, 1, 2, 1], [0, 1, 2, 3]]*/ roundUpThresholds: null },
+        { name: "÷12", stepsPerBeat: 12, roundUpThresholds: null },
+		{ name: "freehand", stepsPerBeat: 24, /*ticksPerArpeggio: 3, arpeggioPatterns: [[0], [0, 1], [0, 1, 2, 1], [0, 1, 2, 3]]*/ roundUpThresholds: null },
+	]);
 
     public static readonly instrumentTypeNames: ReadonlyArray<string> = ["chip", "FM", "noise", "spectrum", "drumset", "harmonics", "PWM", "Picked String", "supersaw", "custom chip", "mod", "FM6op", "additive"];
     public static readonly instrumentTypeHasSpecialInterval: ReadonlyArray<boolean> = [true, true, false, false, false, true, false, false, false, false, false];
@@ -1312,10 +1311,14 @@ export class Config {
         { name: "25×", mult: 25.0, hzOffset: 0.0, amplitudeSign: 1.0 },
         { name: "50×", mult: 50.0, hzOffset: 0.0, amplitudeSign: 1.0 },
         { name: "75×", mult: 75.0, hzOffset: 0.0, amplitudeSign: 1.0 },
-        { name: "100×", mult: 100.0, hzOffset: 0.0, amplitudeSign: 1.0 }
+        { name: "100×", mult: 100.0, hzOffset: 0.0, amplitudeSign: 1.0 },
         //50 and 100 are from dogebox
+        //128 and 256 from slarmoo's box
+        { name: "128x", mult: 128.0, hzOffset: 0.0, amplitudeSign: 1.0 },
+        { name: "256x", mult: 250.0, hzOffset: 0.0, amplitudeSign: 1.0},
     ]);
 
+    //still used for drumsets
     public static readonly envelopes: DictionaryArray<Envelope> = toNameMap([
         { name: "none", type: EnvelopeType.none, speed: 0.0 },
         { name: "note size", type: EnvelopeType.noteSize, speed: 0.0 },
@@ -1333,10 +1336,10 @@ export class Config {
         { name: "swell 1", type: EnvelopeType.swell, speed: 32.0 },
         { name: "swell 2", type: EnvelopeType.swell, speed: 8.0 },
         { name: "swell 3", type: EnvelopeType.swell, speed: 2.0 },
-        { name: "tremolo0", type: EnvelopeType.tremolo, speed: 8.0 },
-        { name: "tremolo1", type: EnvelopeType.tremolo, speed: 4.0 },
-        { name: "tremolo2", type: EnvelopeType.tremolo, speed: 2.0 },
-        { name: "tremolo3", type: EnvelopeType.tremolo, speed: 1.0 },
+        { name: "tremolo0", type: EnvelopeType.lfo, speed: 8.0 },
+        { name: "tremolo1", type: EnvelopeType.lfo, speed: 4.0 },
+        { name: "tremolo2", type: EnvelopeType.lfo, speed: 2.0 },
+        { name: "tremolo3", type: EnvelopeType.lfo, speed: 1.0 },
         { name: "tremolo4", type: EnvelopeType.tremolo2, speed: 4.0 },
         { name: "tremolo5", type: EnvelopeType.tremolo2, speed: 2.0 },
         { name: "tremolo6", type: EnvelopeType.tremolo2, speed: 1.0 },
@@ -1344,7 +1347,7 @@ export class Config {
         { name: "decay 1", type: EnvelopeType.decay, speed: 10.0 },
         { name: "decay 2", type: EnvelopeType.decay, speed: 7.0 },
         { name: "decay 3", type: EnvelopeType.decay, speed: 4.0 },
-        { name: "wibble-1", type: EnvelopeType.wibble, speed: 96.0 },
+        { name: "wibble-1", type: EnvelopeType.wibble, speed: 128.0 }, //Changed speed from 96 to 128. I forgot to include a 96 earlier, and now it's too late to add one, so we have this now. Hopefully no one notices
         { name: "wibble 1", type: EnvelopeType.wibble, speed: 24.0 },
         { name: "wibble 2", type: EnvelopeType.wibble, speed: 12.0 },
         { name: "wibble 3", type: EnvelopeType.wibble, speed: 4.0 },
@@ -1363,22 +1366,22 @@ export class Config {
         { name: "flute 2", type: EnvelopeType.wibble, speed: 8.0 },
         { name: "flute 3", type: EnvelopeType.wibble, speed: 4.0 },
         // sandbox
-        { name: "tripolo1", type: EnvelopeType.tremolo, speed: 9.0 },
-        { name: "tripolo2", type: EnvelopeType.tremolo, speed: 6.0 },
-        { name: "tripolo3", type: EnvelopeType.tremolo, speed: 3.0 },
+        { name: "tripolo1", type: EnvelopeType.lfo, speed: 9.0 },
+        { name: "tripolo2", type: EnvelopeType.lfo, speed: 6.0 },
+        { name: "tripolo3", type: EnvelopeType.lfo, speed: 3.0 },
         { name: "tripolo4", type: EnvelopeType.tremolo2, speed: 9.0 },
         { name: "tripolo5", type: EnvelopeType.tremolo2, speed: 6.0 },
         { name: "tripolo6", type: EnvelopeType.tremolo2, speed: 3.0 },
-        { name: "pentolo1", type: EnvelopeType.tremolo, speed: 10.0 },
-        { name: "pentolo2", type: EnvelopeType.tremolo, speed: 5.0 },
-        { name: "pentolo3", type: EnvelopeType.tremolo, speed: 2.5 },
+        { name: "pentolo1", type: EnvelopeType.lfo, speed: 10.0 },
+        { name: "pentolo2", type: EnvelopeType.lfo, speed: 5.0 },
+        { name: "pentolo3", type: EnvelopeType.lfo, speed: 2.5 },
         { name: "pentolo4", type: EnvelopeType.tremolo2, speed: 10.0 },
         { name: "pentolo5", type: EnvelopeType.tremolo2, speed: 5.0 },
         { name: "pentolo6", type: EnvelopeType.tremolo2, speed: 2.5 },
         // todbox
-        { name: "flutter 1", type: EnvelopeType.tremolo, speed: 14.0 },
+        { name: "flutter 1", type: EnvelopeType.lfo, speed: 14.0 },
         { name: "flutter 2", type: EnvelopeType.tremolo2, speed: 11.0 },
-        { name: "water-y flutter", type: EnvelopeType.tremolo, speed: 9.0 },
+        { name: "water-y flutter", type: EnvelopeType.lfo, speed: 9.0 },
         // new jummbox
         { name: "blip 1", type: EnvelopeType.blip, speed: 6.0 },
         { name: "blip 2", type: EnvelopeType.blip, speed: 16.0 },
@@ -1393,19 +1396,22 @@ export class Config {
         { name: "none", type: EnvelopeType.none, speed: 0.0 },
         { name: "note size", type: EnvelopeType.noteSize, speed: 0.0 },
         { name: "pitch", type: EnvelopeType.pitch, speed: 0.0 }, 
+        { name: "random", type: EnvelopeType.pseudorandom, speed: 4.0 }, //Slarmoo's box 1.3
         { name: "punch", type: EnvelopeType.punch, speed: 0.0 },
         { name: "flare", type: EnvelopeType.flare, speed: 32.0 },
         { name: "twang", type: EnvelopeType.twang, speed: 32.0 },
         { name: "swell", type: EnvelopeType.swell, speed: 32.0 },
-        { name: "tremolo", type: EnvelopeType.tremolo, speed: 4.0 },
-        { name: "tremolo2", type: EnvelopeType.tremolo2, speed: 4.0 },
+        { name: "lfo", type: EnvelopeType.lfo, speed: 4.0 }, //replaced tremolo and tremolo2
+        // { name: "tremolo2", type: EnvelopeType.tremolo2, speed: 4.0 }, //removed Slarmoo's Box 1.3
         { name: "decay", type: EnvelopeType.decay, speed: 10.0 },
         { name: "wibble", type: EnvelopeType.wibble, speed: 24.0 },
         { name: "linear", type: EnvelopeType.linear, speed: 32.0 },
         { name: "rise", type: EnvelopeType.rise, speed: 32.0 },
         { name: "blip", type: EnvelopeType.blip, speed: 6.0 },
-        { name: "fall", type: EnvelopeType.fall, speed: 2.0 },
+        { name: "fall", type: EnvelopeType.fall, speed: 2.0 }, 
     ])
+
+
 
 	public static readonly feedbacks: DictionaryArray<Feedback> = toNameMap([
 		{ name: "1⟲", indices: [[1], [], [], []] },
@@ -1496,9 +1502,9 @@ export class Config {
     public static readonly pitchChannelCountMin: number = 1;
     public static readonly pitchChannelCountMax: number = 60;
     public static readonly noiseChannelCountMin: number = 0;
-    public static readonly noiseChannelCountMax: number = 32;
+    public static readonly noiseChannelCountMax: number = 60;
     public static readonly modChannelCountMin: number = 0;
-    public static readonly modChannelCountMax: number = 24;
+    public static readonly modChannelCountMax: number = 60;
     public static readonly noiseInterval: number = 6;
     public static readonly pitchesPerOctave: number = 12; // TODO: Use this for converting pitch to frequency.
     public static readonly drumCount: number = 12;
@@ -1598,6 +1604,7 @@ export class Config {
 
     public static readonly perEnvelopeBoundMin: number = 0;
     public static readonly perEnvelopeBoundMax: number = 2;
+    public static readonly randomEnvelopeTypes: string[] = ["time", "pitch"];
 
     // Picked strings have an all-pass filter with a corner frequency based on the tone fundamental frequency, in order to add a slight inharmonicity. (Which is important for distortion.)
     public static readonly pickedStringDispersionCenterFreq: number = 6000.0; // The tone fundamental freq is pulled toward this freq for computing the all-pass corner freq.
@@ -1662,7 +1669,7 @@ export class Config {
 		{ name: "sawtooth", samples: generateSawWave() },
 		{ name: "ramp", samples: generateSawWave(true) },
 		{ name: "trapezoid", samples: generateTrapezoidWave(2) },
-	    { name: "rounded", samples: generateRoundedSineWave() },
+	    { name: "quasi-sine", samples: generateQuasiSineWave() },
 		//{ name: "white noise", samples: generateWhiteNoiseFmWave() },
 		//{ name: "1-bit white noise", samples: generateOneBitWhiteNoiseFmWave() },
     ]);
@@ -1712,7 +1719,7 @@ export class Config {
             promptName: "FM Slider 3", promptDesc: ["This setting affects the strength of the third FM slider, just like the corresponding slider on your instrument.", "It works in a multiplicative way, so at $HI your slider will sound the same is its default value, and at $LO it will sound like it has been moved all the way to the left.", "For the full range of control with this mod, move your underlying slider all the way to the right.", "[MULTIPLICATIVE] [$LO - $HI] [%]" ] },
         { name: "fm slider 4", pianoName: "FM 4", maxRawVol: 15, newNoteVol: 15, forSong: false, convertRealFactor: 0, associatedEffect: EffectType.length,
             promptName: "FM Slider 4", promptDesc: ["This setting affects the strength of the fourth FM slider, just like the corresponding slider on your instrument.", "It works in a multiplicative way, so at $HI your slider will sound the same is its default value, and at $LO it will sound like it has been moved all the way to the left.", "For the full range of control with this mod, move your underlying slider all the way to the right.", "[MULTIPLICATIVE] [$LO - $HI] [%]"] },
-        { name: "fm feedback", pianoName: "FM Feedback", maxRawVol: 15, newNoteVol: 15, forSong: false, convertRealFactor: 0, associatedEffect: EffectType.length,
+        { name: "fm feedback", pianoName: "FM Feedbck", maxRawVol: 15, newNoteVol: 15, forSong: false, convertRealFactor: 0, associatedEffect: EffectType.length,
             promptName: "FM Feedback", promptDesc: ["This setting affects the strength of the FM feedback slider, just like the corresponding slider on your instrument.", "It works in a multiplicative way, so at $HI your slider will sound the same is its default value, and at $LO it will sound like it has been moved all the way to the left.", "For the full range of control with this mod, move your underlying slider all the way to the right.", "[MULTIPLICATIVE] [$LO - $HI] [%]"] },
         { name: "pulse width", pianoName: "Pulse Width", maxRawVol: Config.pulseWidthRange, newNoteVol: Config.pulseWidthRange, forSong: false, convertRealFactor: 0, associatedEffect: EffectType.length,
             promptName: "Pulse Width", promptDesc: ["This setting controls the width of this instrument's pulse wave, just like the pulse width slider.", "At $HI, your instrument will sound like a pure square wave (on 50% of the time). It will gradually sound narrower down to $LO, where it will be inaudible (as it is on 0% of the time).", "Changing pulse width randomly between a few values is a common strategy in chiptune music to lend some personality to a lead instrument.", "[OVERWRITING] [$LO - $HI] [%Duty]"] },
@@ -1777,6 +1784,16 @@ export class Config {
             promptName: "Supersaw Spread", promptDesc: ["This setting controls the supersaw spread of your instrument, just like the spread slider.", "At $LO, all the pulses in your supersaw will be at the same frequency. Increasing this value raises the frequency spread of the contributing waves, up to a dissonant spread at the max value, $HI.", "[OVERWRITING] [$LO - $HI]"] },
         { name: "saw shape", pianoName: "Saw Shape", maxRawVol: Config.supersawShapeMax, newNoteVol: 0, forSong: false, convertRealFactor: 0, associatedEffect: EffectType.length,
             promptName: "Supersaw Shape", promptDesc: ["This setting controls the supersaw shape of your instrument, just like the Saw↔Pulse slider.", "As the slider's name implies, this effect will give you a sawtooth wave at $LO, and a full pulse width wave at $HI. Values in between will be a blend of the two.", "[OVERWRITING] [$LO - $HI] [%]"] },
+        { name: "individual envelope speed", pianoName: "IndvEnvSpd", maxRawVol: 63, newNoteVol: 23, forSong: false, convertRealFactor: 0, associatedEffect: EffectType.length,
+            promptName: "Individual Envelope Speed", promptDesc: ["This setting controls how fast the specified envelope of the instrument will play.", "At $LO, your the envelope will be frozen, and at values near there they will change very slowly. At 23, the envelope will work as usual, performing at normal speed. This increases up to $HI, where the envelope will change very quickly. The speeds are given below:",
+                "[0-4]: x0, x0.01, x0.02, x0.03, x0.04,", "[5-9]: x0.05, x0.06, x0.07, x0.08, x0.09,", "[10-14]: x0.1, x0.2, x0.25, x0.3, x0.33,", "[15-19]: x0.4, x0.5, x0.6, x0.6667, x0.7,", "[20-24]: x0.75, x0.8, x0.9, x1, x1.25,", "[25-29]: x1.3333, x1.5, x1.6667, x1.75, x2,", "[30-34]: x2.25, x2.5, x2.75, x3, x3.5,", "[35-39]: x4, x4.5, x5, x5.5, x6,", "[40-44]: x6.5, x7, x7.5, x8, x8.5,", "[45-49]: x9, x9.5, x10, x11, x12", "[50-54]: x13, x14, x15, x16, x17", "[55-59]: x18, x19, x20, x24, x32", "[60-63]: x40, x64, x128, x256", "[OVERWRITING] [$LO - $HI]"]},
+        // Envelope bound modulation not added in yet
+        // { name: "individual envelope lower bound", pianoName: "IndvEnvLow", maxRawVol: 20, newNoteVol: 0, forSong: false, convertRealFactor: 0, associatedEffect: EffectType.length,
+        //     promptName: "Individual Envelope Lower Bound", promptDesc: ["This setting controlsthe envelope lower bound", "At $LO, your the envelope will output an upper envelope bound to 0, and at $HI your envelope will output an upper envelope bound to 2.", "This settings will not work if your lower envelope bound is higher than your upper envelope bound", ]},
+        // { name: "individual envelope upper bound", pianoName: "IndvEnvUp", maxRawVol: 20, newNoteVol: 10, forSong: false, convertRealFactor: 0, associatedEffect: EffectType.length,
+        //     promptName: "Individual Envelope Upper Bound", promptDesc: ["This setting controlsthe envelope lower bound", "At $LO, your the envelope will output a 0 to lower envelope bound, and at $HI your envelope will output a 2 to lower envelope bound.", "This settings will not work if your lower envelope bound is higher than your upper envelope bound", ]},
+        { name: "song eq", pianoName: "Song EQ", maxRawVol: 10, newNoteVol: 0, forSong: true, convertRealFactor: 0, associatedEffect: EffectType.length,
+            promptName: "Song EQ Filter", promptDesc: ["This setting overwrites every instrument's eq filter. You can do this in a few separate ways, similar to the per instrument eq filter modulator.", "When the option 'morph' is selected, your modulator values will indicate a sub-filter index of your EQ filter to 'morph' to over time. For example, a change from 0 to 1 means your main filter (default) will morph to sub-filter 1 over the specified duration. You can shape the main filter and sub-filters in the large filter editor ('+' button). If your two filters' number, type, and order of filter dots all match up, the morph will happen smoothly and you'll be able to hear them changing. If they do not match up, the filters will simply jump between each other.", "Note that filters will morph based on endpoints in the pattern editor. So, if you specify a morph from sub-filter 1 to 4 but do not specifically drag in new endpoints for 2 and 3, it will morph directly between 1 and 4 without going through the others.", "If you target Dot X or Dot Y, you can finely tune the coordinates of a single dot for your filter. The number of available dots to choose is dependent on your main filter's dot count.", "[OVERWRITING] [$LO - $HI]"]},
         ]);
 }
 
@@ -2093,7 +2110,7 @@ function generateSawWave(inverse: boolean = false): Float32Array {
         // }
         // return wave;
     // }
-	function generateRoundedSineWave() {
+	function generateQuasiSineWave() {
         const wave = new Float32Array(Config.sineWaveLength + 1);
         for (let i = 0; i < Config.sineWaveLength + 1; i++) {
             wave[i] = Math.round(Math.sin(i * Math.PI * 2.0 / Config.sineWaveLength));

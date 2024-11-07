@@ -44,13 +44,13 @@ import { SustainPrompt } from "./SustainPrompt";
 import { SongRecoveryPrompt } from "./SongRecoveryPrompt";
 import { RecordingSetupPrompt } from "./RecordingSetupPrompt";
 import { SpectrumEditor, SpectrumEditorPrompt } from "./SpectrumEditor";
-import { CustomPrompt } from "./CustomPrompt";
+import { CustomThemePrompt } from "./CustomThemePrompt";
 import { ThemePrompt } from "./ThemePrompt";
 import { TipPrompt } from "./TipPrompt";
 import { ChangeTempo, ChangeKeyOctave, ChangeChorus, ChangeEchoDelay, ChangeEchoSustain, ChangeReverb, ChangeVolume, ChangePan, ChangePatternSelection, ChangePatternsPerChannel, ChangePatternNumbers, ChangeSupersawDynamism, ChangeSupersawSpread, ChangeSupersawShape, ChangePulseWidth, ChangeFeedbackAmplitude, ChangeOperatorAmplitude, ChangeOperatorFrequency, ChangeDrumsetEnvelope, ChangePasteInstrument, ChangePreset, pickRandomPresetValue, ChangeRandomGeneratedInstrument, ChangeEQFilterType, ChangeNoteFilterType, ChangeEQFilterSimpleCut, ChangeEQFilterSimplePeak, ChangeNoteFilterSimpleCut, ChangeNoteFilterSimplePeak, ChangeScale, ChangeDetectKey, ChangeKey, ChangeRhythm, ChangeFeedbackType, ChangeAlgorithm, ChangeChipWave, ChangeNoiseWave, ChangeTransition, ChangeToggleEffects, ChangeVibrato, ChangeUnison, ChangeChord, ChangeSong, ChangePitchShift, ChangeDetune, ChangeDistortion, ChangeStringSustain, ChangeBitcrusherFreq, ChangeBitcrusherQuantization, ChangeAddEnvelope, ChangeEnvelopeSpeed, ChangeDiscreteEnvelope, ChangeAddChannelInstrument, ChangeRemoveChannelInstrument, ChangeCustomWave, ChangeOperatorWaveform, ChangeOperatorPulseWidth, ChangeSongTitle, ChangeVibratoDepth, ChangeVibratoSpeed, ChangeVibratoDelay, ChangeVibratoType, ChangePanDelay, ChangeArpeggioSpeed, ChangeFastTwoNoteArp, ChangeClicklessTransition, ChangeAliasing, ChangeSetPatternInstruments, ChangeHoldingModRecording, ChangeChipWavePlayBackwards, ChangeChipWaveStartOffset, ChangeChipWaveLoopEnd, ChangeChipWaveLoopStart, ChangeChipWaveLoopMode, ChangeChipWaveUseAdvancedLoopControls, ChangeDecimalOffset, ChangeUnisonVoices, ChangeUnisonSpread, ChangeUnisonOffset, ChangeUnisonExpression, ChangeUnisonSign, Change6OpFeedbackType, Change6OpAlgorithm, ChangeCustomAlgorythmorFeedback } from "./changes";
 
 import { TrackEditor } from "./TrackEditor";
-import { oscilascopeCanvas } from "../global/Oscilascope";
+import { oscilloscopeCanvas } from "../global/Oscilloscope";
 import { VisualLoopControlsPrompt } from "./VisualLoopControlsPrompt";
 import { SampleLoadingStatusPrompt } from "./SampleLoadingStatusPrompt";
 import { AddSamplesPrompt } from "./AddSamplesPrompt";
@@ -838,6 +838,8 @@ export class SongEditor {
     private readonly _octaveStepper: HTMLInputElement = input({ style: "width: 59.5%;", type: "number", min: Config.octaveMin, max: Config.octaveMax, value: "0" });
     private readonly _tempoSlider: Slider = new Slider(input({ style: "margin: 0; vertical-align: middle;", type: "range", min: "1", max: "500", value: "160", step: "1" }), this._doc, (oldValue: number, newValue: number) => new ChangeTempo(this._doc, oldValue, newValue), false);
     private readonly _tempoStepper: HTMLInputElement = input({ style: "width: 4em; font-size: 80%; margin-left: 0.4em; vertical-align: middle;", type: "number", step: "1" });
+    private readonly _songEqFilterEditor: FilterEditor = new FilterEditor(this._doc, false, false, true);
+    private readonly _songEqFilterZoom: HTMLButtonElement = button({ style: "margin-left:0em; padding-left:0.2em; height:1.5em; max-width: 12px;", onclick: () => this._openPrompt("customSongEQFilterSettings") }, "+");
     private readonly _chorusSlider: Slider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.chorusRange - 1, value: "0", step: "1" }), this._doc, (oldValue: number, newValue: number) => new ChangeChorus(this._doc, oldValue, newValue), false);
     private readonly _chorusRow: HTMLDivElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("chorus") }, "Chorus:"), this._chorusSlider.container);
     private readonly _reverbSlider: Slider = new Slider(input({ style: "margin: 0; position: sticky,", type: "range", min: "0", max: Config.reverbRange - 1, value: "0", step: "1" }), this._doc, (oldValue: number, newValue: number) => new ChangeReverb(this._doc, oldValue, newValue), false);
@@ -1059,12 +1061,14 @@ export class SongEditor {
     private readonly _modSetBoxes: HTMLSelectElement[];
     private readonly _modFilterRows: HTMLElement[];
     private readonly _modFilterBoxes: HTMLSelectElement[];
+    private readonly _modEnvelopeRows: HTMLElement[];
+    private readonly _modEnvelopeBoxes: HTMLSelectElement[];
     private readonly _modTargetIndicators: SVGElement[];
 
     private readonly _feedback6OpTypeSelect: HTMLSelectElement = buildOptions(select(), Config.feedbacks6Op.map(feedback => feedback.name));
     private readonly _feedback6OpRow1: HTMLDivElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("feedbackType") }, "Feedback:"), div({ class: "selectContainer" }, this._feedback6OpTypeSelect));
 
-    private readonly _algorithmCanvasSwitch: HTMLButtonElement = button({ style: "margin-left:0em; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: (e: Event) => this._toggleAlgorithmCanvas(e) }, "F");
+    private readonly _algorithmCanvasSwitch: HTMLButtonElement = button({ style: "margin-left:0em; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: (e:Event) => this._toggleAlgorithmCanvas(e) }, "A");
     private readonly _customAlgorithmCanvas: CustomAlgorythmCanvas = new CustomAlgorythmCanvas(canvas({ width: 144, height: 144, style: "border:2px solid " + ColorConfig.uiWidgetBackground, id: "customAlgorithmCanvas" }), this._doc, (newArray: number[][], carry: number, mode: string) => new ChangeCustomAlgorythmorFeedback(this._doc, newArray, carry, mode));
     private readonly _algorithm6OpSelect: HTMLSelectElement = buildOptions(select(), Config.algorithms6Op.map(algorithm => algorithm.name));
     private readonly _algorithm6OpSelectRow: HTMLDivElement = div(div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("algorithm") }, "Algorithm: "), div({ class: "selectContainer" }, this._algorithm6OpSelect))
@@ -1101,7 +1105,7 @@ export class SongEditor {
         ]),
     ]);
 
-    public readonly _globalOscscope: oscilascopeCanvas = new oscilascopeCanvas(canvas({ width: 144, height: 32, style: `border: 2px solid ${ColorConfig.uiWidgetBackground}; position: static;`, id: "oscilascopeAll" }), 1);
+    public readonly _globalOscscope: oscilloscopeCanvas = new oscilloscopeCanvas(canvas({ width: 144, height: 32, style: `border: 2px solid ${ColorConfig.uiWidgetBackground}; position: static;`, id: "oscilloscopeAll" }), 1);
     private readonly _globalOscscopeContainer: HTMLDivElement = div({ style: "height: 38px; margin-left: auto; margin-right: auto;" },
         this._globalOscscope.canvas
     );
@@ -1334,6 +1338,11 @@ export class SongEditor {
                 span({ class: "tip", onclick: () => this._openPrompt("rhythm") }, "Rhythm: "),
                 div({ class: "selectContainer" }, this._rhythmSelect),
             ),
+            div({ class: "selectRow" },
+                span({ class: "tip", onclick: () => this._openPrompt("songeq") }, span("Song EQ:")),
+                this._songEqFilterZoom,
+                this._songEqFilterEditor.container,
+            ),
             this._sampleLoadingStatusContainer,
         ),
     );
@@ -1529,6 +1538,8 @@ export class SongEditor {
         this._modSetBoxes = [];
         this._modFilterRows = [];
         this._modFilterBoxes = [];
+        this._modEnvelopeRows = [];
+        this._modEnvelopeBoxes = [];
         this._modTargetIndicators = [];
         for (let mod: number = 0; mod < Config.modCount; mod++) {
 
@@ -1544,8 +1555,11 @@ export class SongEditor {
 
             let modSetBox: HTMLSelectElement = select();
             let modFilterBox: HTMLSelectElement = select();
+            let modEnvelopeBox: HTMLSelectElement = select();
             let modSetRow: HTMLDivElement = div({ class: "selectRow", id: "modSettingText" + mod, style: "margin-bottom: 0.9em; color: currentColor;" }, span({ class: "tip", onclick: () => this._openPrompt("modSet") }, "Setting: "), span({ class: "tip", style: "font-size:x-small;", onclick: () => this._openPrompt("modSetInfo" + mod) }, "?"), div({ class: "selectContainer" }, modSetBox));
             let modFilterRow: HTMLDivElement = div({ class: "selectRow", id: "modFilterText" + mod, style: "margin-bottom: 0.9em; color: currentColor;" }, span({ class: "tip", onclick: () => this._openPrompt("modFilter" + mod) }, "Target: "), div({ class: "selectContainer" }, modFilterBox));
+            let modEnvelopeRow: HTMLDivElement = div({ class: "selectRow", id: "modEnvelopeText" + mod, style: "margin-bottom: 0.9em; color: currentColor;" }, span({ class: "tip", onclick: () => this._openPrompt("modEnvelope") }, "Envelope: "), div({ class: "selectContainer" }, modEnvelopeBox));
+
 
             // @jummbus: I could template this up above and simply create from the template, especially since I also reuse it in song settings, but unsure how to do that with imperative-html :P
             let modTarget: SVGElement = SVG.svg({ style: "transform: translate(0px, 1px);", width: "1.5em", height: "1em", viewBox: "0 0 200 200" }, [
@@ -1562,12 +1576,15 @@ export class SongEditor {
             this._modSetBoxes.push(modSetBox);
             this._modFilterRows.push(modFilterRow);
             this._modFilterBoxes.push(modFilterBox);
+            this._modEnvelopeRows.push(modEnvelopeRow);
+            this._modEnvelopeBoxes.push(modEnvelopeBox);
             this._modTargetIndicators.push(modTarget);
 
             this._modulatorGroup.appendChild(div({ style: "margin: 3px 0; font-weight: bold; margin-bottom: 0.7em; text-align: center; color: " + ColorConfig.secondaryText + "; background: " + ColorConfig.uiWidgetBackground + ";" }, ["Modulator " + (mod + 1), modTarget]));
             this._modulatorGroup.appendChild(modNameRow);
             this._modulatorGroup.appendChild(modSetRow);
             this._modulatorGroup.appendChild(modFilterRow);
+            this._modulatorGroup.appendChild(modEnvelopeRow);
 
         }
 
@@ -1660,6 +1677,7 @@ export class SongEditor {
             this._modInstrumentBoxes[mod].addEventListener("change", function () { thisRef._whenSetModInstrument(mod); });
             this._modSetBoxes[mod].addEventListener("change", function () { thisRef._whenSetModSetting(mod); });
             this._modFilterBoxes[mod].addEventListener("change", function () { thisRef._whenSetModFilter(mod); });
+            this._modEnvelopeBoxes[mod].addEventListener("change", function () { thisRef._whenSetModEnvelope(mod); })
             this._modTargetIndicators[mod].addEventListener("click", function () { thisRef._whenClickModTarget(mod); });
         }
 
@@ -1670,6 +1688,7 @@ export class SongEditor {
         this._spectrumEditor.container.addEventListener("mousedown", this.refocusStage);
         this._eqFilterEditor.container.addEventListener("mousedown", this.refocusStage);
         this._noteFilterEditor.container.addEventListener("mousedown", this.refocusStage);
+        this._songEqFilterEditor.container.addEventListener("mousedown", this.refocusStage);
         this._harmonicsEditor.container.addEventListener("mousedown", this.refocusStage);
         this._additiveEditor.container.addEventListener("mousedown", this.refocusStage);
         this._tempoStepper.addEventListener("keydown", this._tempoStepperCaptureNumberKeys, false);
@@ -1748,11 +1767,11 @@ export class SongEditor {
     private _toggleAlgorithmCanvas(e: Event): void {
         if (this._customAlgorithmCanvas.mode != "feedback") {
             this._customAlgorithmCanvas.mode = "feedback";
-            (e.target as Element).textContent = "A";
+            (e.target as Element).textContent = "F";
             this._algorithmCanvasSwitch.value = "feedback";
         } else {
             this._customAlgorithmCanvas.mode = "algorithm";
-            (e.target as Element).textContent = "F";
+            (e.target as Element).textContent = "A";
         }
         this._customAlgorithmCanvas.redrawCanvas();
     }
@@ -1869,8 +1888,7 @@ export class SongEditor {
                     }
                 }
             }
-        }
-        else {
+        } else {
 
             let instrument: number = this._doc.getCurrentInstrument();
             const anyModActive: boolean = this._doc.synth.isAnyModActive(this._doc.channel, instrument);
@@ -2047,7 +2065,7 @@ export class SongEditor {
         this._currentPromptName = promptName;
 
         if (this.prompt) {
-            if (this._wasPlaying && !(this.prompt instanceof TipPrompt || this.prompt instanceof LimiterPrompt || this.prompt instanceof CustomScalePrompt || this.prompt instanceof CustomChipPrompt || this.prompt instanceof CustomFilterPrompt || this.prompt instanceof VisualLoopControlsPrompt || this.prompt instanceof SustainPrompt)) {
+            if (this._wasPlaying && !(this.prompt instanceof TipPrompt || this.prompt instanceof LimiterPrompt || this.prompt instanceof CustomScalePrompt || this.prompt instanceof CustomChipPrompt || this.prompt instanceof CustomFilterPrompt || this.prompt instanceof VisualLoopControlsPrompt || this.prompt instanceof SustainPrompt || this.prompt instanceof HarmonicsEditorPrompt || this.prompt instanceof SpectrumEditorPrompt || this.prompt instanceof AdditiveEditorPrompt)) {
                 this._doc.performance.play();
             }
             this._wasPlaying = false;
@@ -2097,6 +2115,9 @@ export class SongEditor {
                 case "customNoteFilterSettings":
                     this.prompt = new CustomFilterPrompt(this._doc, this, true);
                     break;
+                case "customSongEQFilterSettings":
+                    this.prompt = new CustomFilterPrompt(this._doc, this, false, true);
+                    break;
                 case "theme":
                     this.prompt = new ThemePrompt(this._doc);
                     break;
@@ -2121,8 +2142,8 @@ export class SongEditor {
                 case "generateEuclideanRhythm":
                     this.prompt = new EuclideanRhythmPrompt(this._doc);
                     break;
-                case "custom":
-                    this.prompt = new CustomPrompt(this._doc, this._patternEditor, this._trackArea, document.getElementById("beepboxEditorContainer")!);
+                case "customTheme":
+                    this.prompt = new CustomThemePrompt(this._doc, this._patternEditor, this._trackArea, document.getElementById("beepboxEditorContainer")!);
                     break;
                 case "visualLoopControls":
                     this.prompt = new VisualLoopControlsPrompt(this._doc, this);
@@ -2151,7 +2172,7 @@ export class SongEditor {
             }
 
             if (this.prompt) {
-                if (!(this.prompt instanceof TipPrompt || this.prompt instanceof LimiterPrompt || this.prompt instanceof CustomChipPrompt || this.prompt instanceof CustomFilterPrompt || this.prompt instanceof VisualLoopControlsPrompt || this.prompt instanceof SustainPrompt)) {
+                if (!(this.prompt instanceof TipPrompt || this.prompt instanceof LimiterPrompt || this.prompt instanceof CustomChipPrompt || this.prompt instanceof CustomFilterPrompt || this.prompt instanceof VisualLoopControlsPrompt || this.prompt instanceof SustainPrompt || this.prompt instanceof HarmonicsEditorPrompt || this.prompt instanceof SpectrumEditorPrompt || this.prompt instanceof AdditiveEditorPrompt)) {
                     this._wasPlaying = this._doc.synth.playing;
                     this._doc.performance.pause();
                 }
@@ -2277,9 +2298,9 @@ export class SongEditor {
         // make the names of these two variables as short as possible for readability
         // also, these two variables are used for the effects tab as well, should they be renamed?
         // the theme variables are named "icon" to prevent people getting confused and thinking they're svg
-        const textOnIcon: string = ColorConfig.getComputed("--text-enabled-icon") !== "" ? ColorConfig.getComputed("--text-enabled-icon") : "✓ ";
-        const textOffIcon: string = ColorConfig.getComputed("--text-disabled-icon") !== "" ? ColorConfig.getComputed("--text-disabled-icon") : "　";
-        const textSpacingIcon: string = ColorConfig.getComputed("--text-spacing-icon") !== "" ? ColorConfig.getComputed("--text-spacing-icon") : "　";
+        const textOnIcon: string = ColorConfig.getComputed("--text-enabled-icon");
+        const textOffIcon: string = ColorConfig.getComputed("--text-disabled-icon");
+        const textSpacingIcon: string = ColorConfig.getComputed("--text-spacing-icon");
         const optionCommands: ReadonlyArray<string> = [
             "Technical",
             (prefs.autoPlay ? textOnIcon : textOffIcon) + "Auto Play on Load",
@@ -2353,6 +2374,11 @@ export class SongEditor {
         this._tempoSlider.updateValue(Math.max(0, Math.round(this._doc.song.tempo)));
         this._tempoStepper.value = Math.round(this._doc.song.tempo).toString();
         this._songTitleInputBox.updateValue(this._doc.song.title);
+        if (this._doc.synth.isFilterModActive(false, 0, 0, true)) {
+            this._songEqFilterEditor.render(true, this._ctrlHeld || this._shiftHeld);
+        } else {
+            this._songEqFilterEditor.render();
+        }
 
         this._eqFilterTypeRow.style.setProperty("--text-color-lit", colors.primaryNote);
         this._eqFilterTypeRow.style.setProperty("--text-color-dim", colors.secondaryNote);
@@ -2899,8 +2925,7 @@ export class SongEditor {
             }
 
             this._renderInstrumentBar(channel, instrumentIndex, colors);
-        }
-        // Options for mod channel
+        } // Options for mod channel
         else {
             this._usageCheck(this._doc.channel, instrumentIndex);
 
@@ -3070,6 +3095,7 @@ export class SongEditor {
                         settingList.push("song reverb");
                         settingList.push("next bar");
                         settingList.push("song detune");
+                        settingList.push("song eq");
                     }
                     // Populate mod setting options for instrument scope.
                     else {
@@ -3128,6 +3154,8 @@ export class SongEditor {
                             }
                             if (effectsIncludePitchShift(channel.instruments[instrumentIndex].effects)) {
                                 anyInstrumentPitchShifts = true;
+                            } else {
+                                allInstrumentPitchShifts = false;
                             }
                             if (effectsIncludeDetune(channel.instruments[instrumentIndex].effects)) {
                                 anyInstrumentDetunes = true;
@@ -3295,8 +3323,8 @@ export class SongEditor {
                         }
                         if (anyInstrumentEchoes) {
                             settingList.push("echo");
-                            // Disabled currently!
-                            //settingList.push("echo delay");
+                            // Enabled Slarmoo's Box 1.3
+                            settingList.push("echo delay");
                         }
                         if (!allInstrumentEchoes) {
                             unusedSettingList.push("+ echo");
@@ -3311,6 +3339,7 @@ export class SongEditor {
 
                         if (anyInstrumentHasEnvelopes) {
                             settingList.push("envelope speed");
+                            settingList.push("individual envelope speed");
                         }
 
                     }
@@ -3351,8 +3380,7 @@ export class SongEditor {
                     if (instrument.modChannels[mod] == -2) {
                         $("#modSettingText" + mod).get(0)!.style.display = "none";
                         ((this._modSetBoxes[mod].parentElement) as HTMLDivElement).style.display = "none";
-                    }
-                    else {
+                    } else {
                         $("#modSettingText" + mod).get(0)!.style.display = "";
                         ((this._modSetBoxes[mod].parentElement) as HTMLDivElement).style.display = "";
                     }
@@ -3360,8 +3388,7 @@ export class SongEditor {
                     this._modTargetIndicators[mod].style.setProperty("fill", ColorConfig.uiWidgetFocus);
                     this._modTargetIndicators[mod].classList.remove("modTarget");
 
-                }
-                else {
+                } else {
                     ((this._modInstrumentBoxes[mod].parentElement) as HTMLDivElement).style.display = (channel.instruments.length > 1) ? "" : "none";
                     $("#modInstrumentText" + mod).get(0)!.style.display = (channel.instruments.length > 1) ? "" : "none";
                     $("#modChannelText" + mod).get(0)!.innerText = (channel.instruments.length > 1) ? "Ch:" : "Channel:";
@@ -3373,8 +3400,11 @@ export class SongEditor {
                 }
 
                 let filterType: string = Config.modulators[instrument.modulators[mod]].name;
+                let useSongEq: boolean = filterType == "song eq";
+                if (useSongEq) filterType = "eq filter";
                 if (filterType == "eq filter" || filterType == "note filter") {
                     $("#modFilterText" + mod).get(0)!.style.display = "";
+                    $("#modEnvelopeText" + mod).get(0)!.style.display = "none";
                     $("#modSettingText" + mod).get(0)!.style.setProperty("margin-bottom", "2px");
 
                     let useInstrument: number = instrument.modInstruments[mod];
@@ -3402,11 +3432,22 @@ export class SongEditor {
                         ? channel.instruments[useInstrument].getLargestControlPointCount(false)
                         : channel.instruments[useInstrument].getLargestControlPointCount(true);
 
-                    const isSimple: boolean = (filterType == "eq filter" ? channel.instruments[useInstrument].eqFilterType : channel.instruments[useInstrument].noteFilterType);
+                    const isSimple: boolean = useSongEq ? false : (filterType == "eq filter" ? channel.instruments[useInstrument].eqFilterType : channel.instruments[useInstrument].noteFilterType);
                     if (isSimple)
                         dotCount = 0;
-
-                    if (isSimple || this._modFilterBoxes[mod].children.length != 1 + dotCount * 2) {
+                    if (useSongEq) {
+                        dotCount = this._doc.song.eqFilter.controlPointCount;
+                        if(this._modFilterBoxes[mod].children.length != 1 + dotCount * 2) {
+                            while (this._modFilterBoxes[mod].firstChild) this._modFilterBoxes[mod].remove(0);
+                            const dotList: string[] = [];
+                            dotList.push("morph");
+                            for (let i: number = 0; i < dotCount; i++) {
+                                dotList.push("dot " + (i + 1) + " x");
+                                dotList.push("dot " + (i + 1) + " y");
+                            }
+                            buildOptions(this._modFilterBoxes[mod], dotList);
+                        }
+                    } else if (isSimple || this._modFilterBoxes[mod].children.length != 1 + dotCount * 2) {
                         while (this._modFilterBoxes[mod].firstChild) this._modFilterBoxes[mod].remove(0);
                         const dotList: string[] = [];
                         if (!isSimple)
@@ -3441,6 +3482,54 @@ export class SongEditor {
                 } else {
                     $("#modFilterText" + mod).get(0)!.style.display = "none";
                     $("#modSettingText" + mod).get(0)!.style.setProperty("margin-bottom", "0.9em");
+
+
+                }
+
+                let envelopes: string = Config.modulators[instrument.modulators[mod]].name;
+                if (envelopes == "individual envelope speed") {
+                    $("#modEnvelopeText" + mod).get(0)!.style.display = "";
+                    $("#modFilterText" + mod).get(0)!.style.display = "none";
+                    $("#modSettingText" + mod).get(0)!.style.setProperty("margin-bottom", "2px");
+
+                    let modChannel: Channel = this._doc.song.channels[Math.max(0, instrument.modChannels[mod])];
+                    let envCount: number = -1;
+                    // Use greatest envelope count among all instruments if setting is 'all' or 'active'. If it won't have an effect on one, no worry.
+                    for (let i: number = 0; i < modChannel.instruments.length; i++) {
+                        if (modChannel.instruments[i].envelopeCount > envCount) {
+                            envCount = modChannel.instruments[i].envelopeCount;
+                        }
+                    }
+
+                    // Build options for modulator envelopes (make sure it has the right number of envelopes).
+                    while (this._modEnvelopeBoxes[mod].firstChild) this._modEnvelopeBoxes[mod].remove(0);
+                    const envelopeList: string[] = [];
+                    for (let i: number = 0; i < envCount; i++) {
+                        envelopeList.push("envelope " + (i + 1) + " speed");
+                    }
+                    buildOptions(this._modEnvelopeBoxes[mod], envelopeList);
+
+                    if (instrument.modEnvelopeNumbers[mod] >= this._modEnvelopeBoxes[mod].length) {
+                        this._modEnvelopeBoxes[mod].classList.add("invalidSetting");
+                        instrument.invalidModulators[mod] = true;
+                        let useName: string = "envelope " + (instrument.modEnvelopeNumbers[mod]) + " speed"
+                        this._modEnvelopeBoxes[mod].insertBefore(option({ value: useName, style: "color: red;" }, useName), this._modEnvelopeBoxes[mod].children[0]);
+                        this._modEnvelopeBoxes[mod].selectedIndex = 0;
+
+                    }
+                    else {
+                        this._modEnvelopeBoxes[mod].classList.remove("invalidSetting");
+                        instrument.invalidModulators[mod] = false;
+                        this._modEnvelopeBoxes[mod].selectedIndex = instrument.modEnvelopeNumbers[mod];
+                    }
+
+
+
+                } else {
+                    $("#modEnvelopeText" + mod).get(0)!.style.display = "none";
+                    if (!(filterType == "eq filter" || filterType == "note filter")) {
+                        $("#modSettingText" + mod).get(0)!.style.setProperty("margin-bottom", "0.9em");
+                    }
 
                 }
             }
@@ -4080,11 +4169,21 @@ export class SongEditor {
                     const instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
                     if (!instrument.eqFilterType && this._doc.channel < this._doc.song.pitchChannelCount + this._doc.song.noiseChannelCount)
                         this._openPrompt("customEQFilterSettings");
+                } else if (event.altKey) {
+                    //open / close all envelope dropdowns
+                    const instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
+                    const isAllOpen: boolean = this.envelopeEditor.openExtraSettingsDropdowns.every((x) => { return x == true })
+                    for (let i = 0; i < instrument.envelopeCount; i++) {
+                        if (isAllOpen) this.envelopeEditor.openExtraSettingsDropdowns[i] = false;
+                        else this.envelopeEditor.openExtraSettingsDropdowns[i] = true;
+                    }
+                    this.envelopeEditor.rerenderExtraSettings();
+                    event.preventDefault();
                 } else if (needControlForShortcuts == (event.ctrlKey || event.metaKey)) {
                     // EUCLEDIAN RHYTHM SHORTCUT (E)
                     this._openPrompt("generateEuclideanRhythm");
                     break;
-			    }
+                } 
                 break;
             case 70: // f
                 if (canPlayNotes) break;
@@ -4102,6 +4201,19 @@ export class SongEditor {
                         this._doc.selection.setChannelBar(this._doc.channel, Math.floor(this._doc.synth.playhead));
                     }
                     event.preventDefault();
+                } else if (event.altKey) {
+                    //open / close all fm dropdowns
+                    const instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
+                    const operatorCount: number = instrument.type == InstrumentType.fm ? 4 : 6;
+                    let isAllOpen: boolean = true;
+                    for (let i = 0; i < operatorCount; i++) {
+                        if (!this._openOperatorDropdowns[i]) isAllOpen = false;
+                    }
+                    for (let i = 0; i < operatorCount; i++) {
+                        if (this._openOperatorDropdowns[i] == false && !isAllOpen || isAllOpen)
+                            this._toggleDropdownMenu(DropdownID.FM, i);
+                    }
+                    event.preventDefault();
                 } else if (needControlForShortcuts == (event.ctrlKey || event.metaKey)) {
 
                     this._doc.synth.loopBarStart = -1;
@@ -4115,7 +4227,7 @@ export class SongEditor {
                         this._doc.selection.setChannelBar(this._doc.channel, Math.floor(this._doc.synth.playhead));
                     }
                     event.preventDefault();
-                }
+                } 
                 break;
             case 72: // h
                 if (canPlayNotes) break;
@@ -4270,21 +4382,47 @@ export class SongEditor {
                 break;
             case 83: // s
                 if (canPlayNotes) break;
-                if (event.ctrlKey || event.metaKey) {
+                if (event.shiftKey && event.ctrlKey && event.altKey) {
+                    // Ctrl Alt Shift S: Slarmooify - set all prefs to my preferred ones lol
+                    this._doc.prefs.autoPlay = false;
+                    this._doc.prefs.autoFollow = true;
+                    this._doc.prefs.enableNotePreview = true;
+                    this._doc.prefs.showFifth = true;
+                    this._doc.prefs.notesOutsideScale = false;
+                    this._doc.prefs.defaultScale = 0;
+                    this._doc.prefs.showLetters = true;
+                    this._doc.prefs.showChannels = true;
+                    this._doc.prefs.showScrollBar = true;
+                    this._doc.prefs.alwaysFineNoteVol = false;
+                    this._doc.prefs.enableChannelMuting = true;
+                    this._doc.prefs.displayBrowserUrl = true;
+                    this._doc.prefs.displayVolumeBar = true;
+                    this._doc.prefs.layout = "tall";
+                    this._doc.prefs.visibleOctaves = 5;
+                    this._doc.prefs.closePromptByClickoff = false;
+                    this._doc.prefs.colorTheme = "slarmoosbox";
+                    this._doc.prefs.frostedGlassBackground = false;
+                    this._doc.prefs.instrumentButtonsAtTop = true;
+                    this._doc.prefs.instrumentCopyPaste = true;
+                    this._doc.prefs.instrumentImportExport = true;
+                    this._doc.prefs.notesFlashWhenPlayed = true;
+                    this._doc.prefs.showOscilloscope = true;
+                    this._doc.prefs.save();
+                    event.preventDefault();
+                    location.reload();
+                } else if (event.ctrlKey || event.metaKey) {
                     this._openPrompt("export");
                     event.preventDefault();
-                } else {
-                    if (this._doc.prefs.enableChannelMuting) {
-                        // JummBox deviation: I like shift+s as just another mute toggle personally.
-                        // Easier to reach than M and the shift+s invert functionality I am overwriting could be 
-                        // obtained with M anyway. Useability-wise you very often want to 'add' channels on to a solo as you work.
-                        if (event.shiftKey) {
-                            this._doc.selection.muteChannels(false);
-                        } else {
-                            this._doc.selection.soloChannels(false);
-                        }
-                        event.preventDefault();
+                } else if (this._doc.prefs.enableChannelMuting) {
+                    // JummBox deviation: I like shift+s as just another mute toggle personally.
+                    // Easier to reach than M and the shift+s invert functionality I am overwriting could be 
+                    // obtained with M anyway. Useability-wise you very often want to 'add' channels on to a solo as you work.
+                    if (event.shiftKey) {
+                        this._doc.selection.muteChannels(false);
+                    } else {
+                        this._doc.selection.soloChannels(false);
                     }
+                    event.preventDefault();
                 }
                 break;
             case 79: // o
@@ -4618,6 +4756,9 @@ export class SongEditor {
         }
         if (this._doc.synth.isFilterModActive(true, this._doc.channel, this._doc.getCurrentInstrument())) {
             this._noteFilterEditor.render(true, this._ctrlHeld || this._shiftHeld);
+        }
+        if (this._doc.synth.isFilterModActive(false, 0, 0, true)) {
+            this._songEqFilterEditor.render(true, this._ctrlHeld || this._shiftHeld);
         }
 
 
@@ -4957,6 +5098,10 @@ export class SongEditor {
         this._doc.selection.setModFilter(mod, this._modFilterBoxes[mod].selectedIndex);
     }
 
+    private _whenSetModEnvelope = (mod: number): void => {
+        this._doc.selection.setModEnvelope(mod, this._modEnvelopeBoxes[mod].selectedIndex);
+    }
+
     private _whenSetChipWave = (): void => {
         this._doc.record(new ChangeChipWave(this._doc, this._chipWaveSelect.selectedIndex));
     }
@@ -5219,7 +5364,7 @@ export class SongEditor {
                 this._openPrompt("theme");
                 break;
             case "customTheme":
-                this._openPrompt("custom");
+                this._openPrompt("customTheme");
                 break;
             case "recordingSetup":
                 this._openPrompt("recordingSetup");

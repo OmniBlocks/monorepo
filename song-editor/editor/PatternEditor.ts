@@ -328,8 +328,7 @@ export class PatternEditor {
                     this.modDragValueLabel.style.setProperty("top", "" + this._modDragValueLabelTop + "px");
                     this.modDragValueLabel.textContent = "" + presValue;
 
-                }
-                else {
+                } else {
                     this.modDragValueLabel.style.setProperty("display", "none");
                     this.modDragValueLabel.style.setProperty("pointer-events", "none");
                     this.modDragValueLabel.setAttribute("contenteditable", "false");
@@ -746,7 +745,13 @@ export class PatternEditor {
                     }
                     // Song wide application
                     else if (instrument.modulators[mod] == applyToMod && Config.modulators[instrument.modulators[mod]].forSong && (instrument.modChannels[mod] == -1)) {
-                        return [instrumentIndex, mod];
+                        // // check song eq? 
+                        // if (modFilterIndex != undefined && (applyToMod == Config.modulators.dictionary["song eq"].index)) {
+                        //     if (instrument.modFilterTypes[mod] == modFilterIndex)
+                        //         return [instrumentIndex, mod];
+                        // }
+                        // else
+                            return [instrumentIndex, mod];
                     }
                 }
             }
@@ -2428,7 +2433,7 @@ export class PatternEditor {
         if (this._doc.prefs.showChannels) {
             if (!this._doc.song.getChannelIsMod(this._doc.channel)) {
                 let noteFlashColor: string = "#ffffff77";
-                if (this._doc.prefs.notesFlashWhenPlayed) noteFlashColor = ColorConfig.getComputed("--note-flash-secondary") !== "" ? "var(--note-flash-secondary)" : "#ffffff77";
+                    if (this._doc.prefs.notesFlashWhenPlayed) noteFlashColor = ColorConfig.getComputed("--note-flash-secondary");
                 for (let channel: number = this._doc.song.pitchChannelCount + this._doc.song.noiseChannelCount - 1; channel >= 0; channel--) {
                     if (channel == this._doc.channel) continue;
                     if (this._doc.song.getChannelIsNoise(channel) != this._doc.song.getChannelIsNoise(this._doc.channel)) continue;
@@ -2471,7 +2476,7 @@ export class PatternEditor {
             const transition: Transition = instrument.getTransition();
             const displayNumberedChords: boolean = chord.customInterval || chord.arpeggiates || chord.strumParts > 0 || transition.slides;
             let noteFlashColor: string = "#ffffff";
-            if (this._doc.prefs.notesFlashWhenPlayed) noteFlashColor = ColorConfig.getComputed("--note-flash") !== "" ? "var(--note-flash)" : "#ffffff";
+                if (this._doc.prefs.notesFlashWhenPlayed) noteFlashColor = ColorConfig.getComputed("--note-flash");
             for (const note of this._pattern.notes) {
                 let disabled: boolean = false;
                 if (this._doc.song.getChannelIsMod(this._doc.channel)) {

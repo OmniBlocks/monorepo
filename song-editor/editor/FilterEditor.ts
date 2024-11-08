@@ -704,7 +704,7 @@ export class FilterEditor {
         this._writingMods = forceModRender && this._mouseDown;
         const instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
         const filterSettings: FilterSettings = this._forSong ? this._doc.song.eqFilter : (this._useNoteFilter ? instrument.noteFilter : instrument.eqFilter);
-        let displayMods: boolean = (activeMods && !this._larger && (forceModRender || (!this._mouseOver && !this._mouseDragging && !this._mouseDown)) && this._doc.synth.playing)
+        let displayMods: boolean = (activeMods && !this._larger && (forceModRender || (!this._mouseOver && !this._mouseDragging && !this._mouseDown)) && this._doc.synth.playing);
         if (displayMods)
             this._controlPointPath.style.setProperty("fill", `${ColorConfig.overwritingModSlider}`);
         else if (!this._larger)
@@ -724,8 +724,7 @@ export class FilterEditor {
 
             if (this._writingMods)
                 this._whenCursorMoved();
-        }
-        else {
+        } else {
             this._useFilterSettings = filterSettings;
         }
 

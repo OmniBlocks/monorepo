@@ -294,6 +294,9 @@ export class EnvelopeEditor {
 				if (this.extraPitchSettingsGroups[i]) {
 					this.perEnvelopeSpeedGroups[i].style.display = "none";
 				}
+				if (this.extraLFODropdownGroups[i]) {
+					this.extraLFODropdownGroups[i].style.display = "none";
+				}
 			} else if (this.openExtraSettingsDropdowns[i]) {
 				this.extraSettingsDropdownGroups[i].style.display = "flex";
 				this.extraSettingsDropdowns[i].style.display = "inline";
@@ -328,8 +331,9 @@ export class EnvelopeEditor {
 					this._randomSeedSliders[i].value = instrument.envelopes[i].seed.toString();
 					this._perEnvelopeSpeedSliders[i].value = this.convertIndexSpeed(instrument.envelopes[i].perEnvelopeSpeed, "index").toString();
 					this._perEnvelopeSpeedDisplays[i].textContent = "Spd: x" + prettyNumber(this.convertIndexSpeed(parseFloat(this._perEnvelopeSpeedSliders[i].value), "speed"));
-					// this._randomEnvelopeTypeSelects[i] = instrument.envelopes[i].waveform;
+					if (instrument.envelopes[i].waveform > Config.randomEnvelopeTypes.length) instrument.envelopes[i].waveform = 0;
 					this._randomStepsWrappers[i].style.display = instrument.envelopes[i].waveform == Config.randomEnvelopeTypes.indexOf("time") ? "flex" : "none";
+					this._randomEnvelopeTypeSelects[i].selectedIndex = instrument.envelopes[i].waveform;
 					
 					//hide other dropdown groups, show perEnvelopeSpeed
 					this.perEnvelopeSpeedGroups[i].style.display = instrument.envelopes[i].waveform == Config.randomEnvelopeTypes.indexOf("time") ? "" : "none";
@@ -378,10 +382,24 @@ export class EnvelopeEditor {
 				this.extraSettingsDropdowns[i].style.display = "inline";
 				this.perEnvelopeSpeedGroups[i].style.display = "none";
 			} else {
-				this.extraSettingsDropdowns[i].style.display = "none";
-				this.extraSettingsDropdownGroups[i].style.display = "none";
-				this.extraPitchSettingsGroups[i].style.display = "none";
-				this.perEnvelopeSpeedGroups[i].style.display = "none";
+				if (this.extraSettingsDropdowns[i]) { //make sure is not null so that we don't get an error
+					this.extraSettingsDropdowns[i].style.display = "none";
+				}
+				if (this.extraSettingsDropdownGroups[i]) {
+					this.extraSettingsDropdownGroups[i].style.display = "none";
+				}
+				if (this.extraPitchSettingsGroups[i]) {
+					this.extraPitchSettingsGroups[i].style.display = "none";
+				}
+				if (this.extraPitchSettingsGroups[i]) {
+					this.perEnvelopeSpeedGroups[i].style.display = "none";
+				}
+				if (this.extraLFODropdownGroups[i]) {
+					this.extraLFODropdownGroups[i].style.display = "none";
+				}
+				if (this.extraRandomSettingsGroups[i]) {
+					this.extraRandomSettingsGroups[i].style.display = "none";
+				}
 			}
 		}
 	}
@@ -492,15 +510,15 @@ export class EnvelopeEditor {
 
 			const perEnvelopeSpeedGroup: HTMLDivElement = HTML.div({ class: "editor-controls", style: "flex-direction:column; align-items:center;" }, perEnvelopeSpeedWrapper);
 			
-			const envelopeCopyButton: HTMLButtonElement = HTML.button({ style: "max-width:86px; width: 86px; height: 26px", class: "copyButton", title: "Copy Envelope" }, [
-				"Copy",
+			const envelopeCopyButton: HTMLButtonElement = HTML.button({ style: "margin-left:0px; max-width:86px; width: 86px; height: 26px; padding-left: 22px", class: "copyButton", title: "Copy Envelope" }, [
+				"Copy Env",
 				// Copy icon:
 				SVG.svg({ style: "flex-shrink: 0; position: absolute; left: 0; top: 50%; margin-top: -1em; pointer-events: none;", width: "26px", height: "26px", viewBox: "-5 -21 26 26" }, [
 					SVG.path({ d: "M 0 -15 L 1 -15 L 1 0 L 13 0 L 13 1 L 0 1 L 0 -15 z M 2 -1 L 2 -17 L 10 -17 L 14 -13 L 14 -1 z M 3 -2 L 13 -2 L 13 -12 L 9 -12 L 9 -16 L 3 -16 z", fill: "currentColor" }),
 				]),
 			]);
-			const envelopePasteButton: HTMLButtonElement = HTML.button({ style: "margin-left:10px; max-width:86px; width: 86px; height: 26px", class: "pasteButton", title: "Paste Envelope" }, [
-					"Paste",
+			const envelopePasteButton: HTMLButtonElement = HTML.button({ style: "margin-left:2px; max-width:89px; width: 89px; height: 26px; padding-left: 22px", class: "pasteButton", title: "Paste Envelope" }, [
+					"Paste Env",
 					// Paste icon:
 				SVG.svg({ style: "flex-shrink: 0; position: absolute; left: 0; top: 50%; margin-top: -1em; pointer-events: none;", width: "26px", height: "26px", viewBox: "0 0 26 26" }, [
 						SVG.path({ d: "M 8 18 L 6 18 L 6 5 L 17 5 L 17 7 M 9 8 L 16 8 L 20 12 L 20 22 L 9 22 z", stroke: "currentColor", fill: "none" }),

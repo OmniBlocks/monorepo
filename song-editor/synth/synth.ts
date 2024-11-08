@@ -3070,7 +3070,7 @@ export class Instrument {
         envelopeSettings.target = makeEmpty ? Config.instrumentAutomationTargets.dictionary["none"].index : target;
         envelopeSettings.index = makeEmpty ? 0 : index;
         if (!newEnvelopes) {
-            envelopeSettings.envelope = Config.envelopes[envelope].type;
+            envelopeSettings.envelope = clamp(0, Config.newEnvelopes.length, Config.envelopes[envelope].type);
         } else {
             envelopeSettings.envelope = envelope;
         }
@@ -7153,7 +7153,7 @@ export class Song {
             importedPartsPerBeat = (jsonObject["ticksPerBeat"] | 0) || 4;
             this.rhythm = Config.rhythms.findIndex(rhythm => rhythm.stepsPerBeat == importedPartsPerBeat);
             if (this.rhythm == -1) {
-                this.rhythm = 1;
+                this.rhythm = 3; //default rhythm
             }
         }
 
@@ -7799,7 +7799,7 @@ class EnvelopeComputer {
 
                 if (envelope.type == EnvelopeType.noteSize) usedNoteSize = true;
             }
-            const defaultPitch: number = this.getPitchValue(instrument, tone, instrumentState);
+            const defaultPitch: number = this.getPitchValue(instrument, tone, instrumentState, false);
             const pitch: number = this.computePitchEnvelope(instrument, envelopeIndex, defaultPitch);
             if (automationTarget.computeIndex != null) {
                 const computeIndex: number = automationTarget.computeIndex + targetIndex;
@@ -7897,6 +7897,7 @@ class EnvelopeComputer {
                 switch (waveform) {
                     case Config.randomEnvelopeTypes.indexOf("time"):
                         const step: number = steps;
+                        if (step <= 1) return 1;
                         const timeHash: number = xxHash32((perEnvelopeSpeed == 0 ? 0 : Math.floor((timeSinceStart * perEnvelopeSpeed) / (256))) + "", seed);
                         if (inverse) {
                             return perEnvelopeUpperBound - boundAdjust * (step / (step - 1)) * Math.floor(timeHash * step / (hashMax + 1)) / step;
@@ -8022,13 +8023,17 @@ class EnvelopeComputer {
 
     }
 
-    public getPitchValue(instrument: Instrument, tone: Tone | null, instrumentState: InstrumentState): number {
+    public getPitchValue(instrument: Instrument, tone: Tone | null, instrumentState: InstrumentState, calculateBends: boolean = true): number {
         if (tone && tone.pitchCount >= 1) {
             const chord = instrument.getChord()
             const arpeggiates = chord.arpeggiates;
             const arpeggio: number = Math.floor(instrumentState.arpTime / Config.ticksPerArpeggio); //calculate arpeggiation
             const tonePitch = tone.pitches[arpeggiates ? getArpeggioPitchIndex(tone.pitchCount, instrument.fastTwoNoteArp, arpeggio) : 0]
-            return tone.lastInterval != tonePitch ? tonePitch + tone.lastInterval : tonePitch; //account for pitch bends
+            if (calculateBends) {
+                return tone.lastInterval != tonePitch ? tonePitch + tone.lastInterval : tonePitch; //account for pitch bends
+            } else {
+                return tonePitch;
+            }
         } 
         return 0;
     }
@@ -9789,17 +9794,18 @@ export class Synth {
         if (!this.isPlayingSong) return;
         this.isPlayingSong = false;
         this.isRecording = false;
+        this.preferLowerLatency = false;
         this.modValues = [];
         this.nextModValues = [];
         this.heldMods = [];
         if (this.song != null) {
             this.song.inVolumeCap = 0.0;
             this.song.outVolumeCap = 0.0;
+            this.song.tmpEqFilterStart = null;
+            this.song.tmpEqFilterEnd = null;
             for (let channelIndex: number = 0; channelIndex < this.song.pitchChannelCount + this.song.noiseChannelCount; channelIndex++) {
                 this.modInsValues[channelIndex] = [];
                 this.nextModInsValues[channelIndex] = [];
-                this.song.tmpEqFilterStart = null;
-                this.song.tmpEqFilterEnd = null;
             }
         }
     }

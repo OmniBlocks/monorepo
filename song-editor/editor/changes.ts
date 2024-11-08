@@ -1445,7 +1445,7 @@ export class ChangeRandomGeneratedInstrument extends Change {
                             { item: "sawtooth", weight: 3 },
                             { item: "ramp", weight: 3 },
                             { item: "trapezoid", weight: 4 },
-                            { item: "rounded", weight: 2 },
+                            { item: "quasi-sine", weight: 2 },
                         ])].index;
                         if (instrument.operators[i].waveform == 2/*"pulse width"*/) {
                             instrument.operators[i].pulseWidth = selectWeightedRandom([
@@ -5129,7 +5129,9 @@ export class ChangeRemoveEnvelope extends Change {
             instrument.envelopes[i].perEnvelopeSpeed = instrument.envelopes[i + 1].perEnvelopeSpeed;
             instrument.envelopes[i].perEnvelopeLowerBound = instrument.envelopes[i + 1].perEnvelopeLowerBound;
             instrument.envelopes[i].perEnvelopeUpperBound = instrument.envelopes[i + 1].perEnvelopeUpperBound;
-
+            instrument.envelopes[i].steps = instrument.envelopes[i + 1].steps;
+            instrument.envelopes[i].seed = instrument.envelopes[i + 1].seed;
+            instrument.envelopes[i].waveform = instrument.envelopes[i + 1].waveform;
         }
         // TODO: Shift any envelopes that were targeting other envelope indices after the removed one.
         instrument.preset = instrument.type;

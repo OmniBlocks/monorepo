@@ -792,7 +792,7 @@ export class SongEditor {
         option({ value: "transposeUp" }, "Move Notes Up (+ or ⇧+)"),
         option({ value: "transposeDown" }, "Move Notes Down (- or ⇧-)"),
         option({ value: "moveNotesSideways" }, "Move All Notes Sideways... (W)"),
-        option({ value: "generateEuclideanRhythm" }, "Generate Euclidean Rhythm... (E)"),
+        option({ value: "generateEuclideanRhythm" }, "Generate Euclidean Rhythm... (" + EditorConfig.ctrlSymbol + "E)"),
         option({ value: "beatsPerBar" }, "Change Beats Per Bar... (⇧B)"),
         option({ value: "barCount" }, "Change Song Length... (L)"),
         option({ value: "channelSettings" }, "Channel Settings... (Q)"),
@@ -933,7 +933,7 @@ export class SongEditor {
     private readonly _supersawSpreadSlider: Slider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.supersawSpreadMax, value: "0", step: "1" }), this._doc, (oldValue: number, newValue: number) => new ChangeSupersawSpread(this._doc, oldValue, newValue), false);
     private readonly _supersawSpreadRow: HTMLDivElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("supersawSpread") }, "Spread:"), this._supersawSpreadSlider.container);
     private readonly _supersawShapeSlider: Slider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.supersawShapeMax, value: "0", step: "1" }), this._doc, (oldValue: number, newValue: number) => new ChangeSupersawShape(this._doc, oldValue, newValue), false);
-    private readonly _supersawShapeRow: HTMLDivElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("supersawShape"), style: "overflow: clip;" }, "Saw↔Pulse:"), this._supersawShapeSlider.container);
+    private readonly _supersawShapeRow: HTMLDivElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("supersawShape"), style: "overflow: clip;" }, "Saw/Pulse:"), this._supersawShapeSlider.container);
 
     private readonly _pulseWidthSlider: Slider = new Slider(input({ style: "margin: 0;", type: "range", min: "1", max: Config.pulseWidthRange, value: "1", step: "1" }), this._doc, (oldValue: number, newValue: number) => new ChangePulseWidth(this._doc, oldValue, newValue), false);
     private readonly _pulseWidthDropdown: HTMLButtonElement = button({ style: "margin-left:53px; position: absolute; margin-top: 15px; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: () => this._toggleDropdownMenu(DropdownID.PulseWidth) }, "▼");
@@ -1034,8 +1034,8 @@ export class SongEditor {
     private readonly _spectrumZoom: HTMLButtonElement = button({ style: "margin-left:0em; padding-left:0.2em; height:1.5em; max-width: 12px;", onclick: () => this._openPrompt("spectrumSettings") }, "+");
     private readonly _spectrumRow: HTMLElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("spectrum"), style: "font-size: smaller" }, "Spectrum:"), this._spectrumZoom, this._spectrumEditor.container);
     private readonly _harmonicsEditor: HarmonicsEditor = new HarmonicsEditor(this._doc);
-    private readonly _harmonicsZoom: HTMLButtonElement = button({ style: "margin-left:0em; padding-left:0.2em; height:1.5em; max-width: 12px;", onclick: () => this._openPrompt("harmonicsSettings") }, "+");
-    private readonly _harmonicsRow: HTMLElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("harmonics"), style: "font-size: smaller"}, "Harmonics:"), this._harmonicsZoom, this._harmonicsEditor.container);
+    private readonly _harmonicsZoom: HTMLButtonElement = button({ style: "margin-left:4px; margin-right:4px; padding-left:0.2em; height:1.5em; max-width: 12px;", onclick: () => this._openPrompt("harmonicsSettings") }, "+");
+    private readonly _harmonicsRow: HTMLElement = div({ class: "selectRow", style: "max-width: 166px;"}, span({ class: "tip", onclick: () => this._openPrompt("harmonics"), style: "font-size: smaller"}, "Harmonics:"), this._harmonicsZoom, this._harmonicsEditor.container);
     private readonly _additiveEditor: AdditiveEditor = new AdditiveEditor(this._doc);
     private readonly _additiveZoom: HTMLButtonElement = button({ style: "margin-left:0em; padding-left:0.2em; height:1.5em; max-width: 12px;", onclick: () => this._openPrompt("additiveSettings") }, "+");
     private readonly _additiveRow: HTMLElement = div({ class: "selectRow" }, span({ class: "tip ", onclick: () => this._openPrompt("additive"), style: "font-size: smaller" }, "Additive:"), this._additiveZoom, this._additiveEditor.container);
@@ -2492,7 +2492,7 @@ export class SongEditor {
                 this._chipWaveStartOffsetRow.style.display = "none";
                 this._chipWavePlayBackwardsRow.style.display = "none";
                 // advloop addition
-                this._harmonicsRow.style.display = "";
+                this._harmonicsRow.style.display = "flex";
                 this._harmonicsEditor.render();
             } else {
                 this._harmonicsRow.style.display = "none";
@@ -3567,9 +3567,13 @@ export class SongEditor {
 
         if (this._doc.synth.isFilterModActive(false, this._doc.channel, this._doc.getCurrentInstrument())) {
             this._eqFilterEditor.render(true, this._ctrlHeld || this._shiftHeld);
-        }
-        else {
+        } else {
             this._eqFilterEditor.render();
+        }
+        if (this._doc.synth.isFilterModActive(false, 0, 0, true)) {
+            this._songEqFilterEditor.render(true, this._ctrlHeld || this._shiftHeld);
+        } else {
+            this._songEqFilterEditor.render();
         }
         this._instrumentVolumeSlider.updateValue(instrument.volume);
         this._detuneSlider.updateValue(instrument.detune - Config.detuneCenter);
@@ -4179,11 +4183,14 @@ export class SongEditor {
                     }
                     this.envelopeEditor.rerenderExtraSettings();
                     event.preventDefault();
-                } else if (needControlForShortcuts == (event.ctrlKey || event.metaKey)) {
+                } else if (event.ctrlKey) {
                     // EUCLEDIAN RHYTHM SHORTCUT (E)
                     this._openPrompt("generateEuclideanRhythm");
+                    event.preventDefault();
                     break;
-                } 
+                } else if (needControlForShortcuts == (event.ctrlKey || event.metaKey)) {
+                    this._openPrompt("customSongEQFilterSettings");
+                }
                 break;
             case 70: // f
                 if (canPlayNotes) break;

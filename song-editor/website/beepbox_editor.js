@@ -45034,7 +45034,6 @@ You should be redirected to the song at:<br /><br />
                                 }
                                 if (anyInstrumentEchoes) {
                                     settingList.push("echo");
-                                    settingList.push("echo delay");
                                 }
                                 if (!allInstrumentEchoes) {
                                     unusedSettingList.push("+ echo");
@@ -47056,6 +47055,7 @@ You should be redirected to the song at:<br /><br />
         _modSliderUpdate() {
             if (!this._doc.synth.playing) {
                 this._hasActiveModSliders = false;
+                this._songEqFilterEditor.render();
                 for (let setting = 0; setting < Config.modulators.length; setting++) {
                     if (this._showModSliders[setting] == true) {
                         this._showModSliders[setting] = false;

@@ -1084,7 +1084,6 @@ var beepbox = (function (exports) {
     };
     Config.perEnvelopeBoundMin = 0;
     Config.perEnvelopeBoundMax = 2;
-    Config.randomEnvelopeTypes = ["time", "pitch"];
     Config.pickedStringDispersionCenterFreq = 6000.0;
     Config.pickedStringDispersionFreqScale = 0.3;
     Config.pickedStringDispersionFreqMult = 4.0;
@@ -18041,7 +18040,7 @@ li.select2-results__option[role=group] > strong:hover {
                     timeSinceStart = synth.computeTicksSinceStart();
                     steps = instrument.envelopes[envelopeIndex].steps;
                     seed = instrument.envelopes[envelopeIndex].seed;
-                    if (instrument.envelopes[envelopeIndex].waveform >= (envelope.name == "lfo" ? 4 : Config.randomEnvelopeTypes.length)) {
+                    if (instrument.envelopes[envelopeIndex].waveform >= (envelope.name == "lfo" ? 4 : 2)) {
                         instrument.envelopes[envelopeIndex].waveform = 0;
                     }
                     waveform = instrument.envelopes[envelopeIndex].waveform;
@@ -18149,7 +18148,7 @@ li.select2-results__option[role=group] > strong:hover {
                 case 3:
                     const hashMax = 0xffffffff;
                     switch (waveform) {
-                        case Config.randomEnvelopeTypes.indexOf("time"):
+                        case 0:
                             const step = steps;
                             if (step <= 1)
                                 return 1;
@@ -18160,7 +18159,7 @@ li.select2-results__option[role=group] > strong:hover {
                             else {
                                 return boundAdjust * (step / (step - 1)) * Math.floor(timeHash * (step) / (hashMax + 1)) / step + perEnvelopeLowerBound;
                             }
-                        case Config.randomEnvelopeTypes.indexOf("pitch"):
+                        case 1:
                             const pitchHash = xxHash32(defaultPitch + "", seed);
                             if (inverse) {
                                 return perEnvelopeUpperBound - boundAdjust * pitchHash / (hashMax + 1);
@@ -35122,11 +35121,11 @@ You should be redirected to the song at:<br /><br />
                         this._randomSeedSliders[i].value = instrument.envelopes[i].seed.toString();
                         this._perEnvelopeSpeedSliders[i].value = this.convertIndexSpeed(instrument.envelopes[i].perEnvelopeSpeed, "index").toString();
                         this._perEnvelopeSpeedDisplays[i].textContent = "Spd: x" + prettyNumber(this.convertIndexSpeed(parseFloat(this._perEnvelopeSpeedSliders[i].value), "speed"));
-                        if (instrument.envelopes[i].waveform > Config.randomEnvelopeTypes.length)
+                        if (instrument.envelopes[i].waveform > 2)
                             instrument.envelopes[i].waveform = 0;
-                        this._randomStepsWrappers[i].style.display = instrument.envelopes[i].waveform == Config.randomEnvelopeTypes.indexOf("time") ? "flex" : "none";
+                        this._randomStepsWrappers[i].style.display = instrument.envelopes[i].waveform == 0 ? "flex" : "none";
                         this._randomEnvelopeTypeSelects[i].selectedIndex = instrument.envelopes[i].waveform;
-                        this.perEnvelopeSpeedGroups[i].style.display = instrument.envelopes[i].waveform == Config.randomEnvelopeTypes.indexOf("time") ? "" : "none";
+                        this.perEnvelopeSpeedGroups[i].style.display = instrument.envelopes[i].waveform == 0 ? "" : "none";
                         this.extraSettingsDropdownGroups[i].style.display = "flex";
                         this.extraSettingsDropdowns[i].style.display = "inline";
                         this.extraPitchSettingsGroups[i].style.display = "none";
@@ -35249,8 +35248,9 @@ You should be redirected to the song at:<br /><br />
                 const randomStepsWrapper = HTML.div({ style: "margin-top: 3px; flex:1; display:flex; flex-direction: row; align-items:center; justify-content:right;" }, randomStepsBoxWrapper, randomStepsSlider);
                 const randomSeedWrapper = HTML.div({ style: "margin-top: 3px; flex:1; display:flex; flex-direction: row; align-items:center; justify-content:right;" }, randomSeedBoxWrapper, randomSeedSlider);
                 const randomTypeSelect = HTML.select({ style: "width: 117px;" });
-                for (let waveform = 0; waveform < Config.randomEnvelopeTypes.length; waveform++) {
-                    randomTypeSelect.appendChild(HTML.option({ value: waveform }, Config.randomEnvelopeTypes[waveform]));
+                const randomNames = ["time", "pitch"];
+                for (let waveform = 0; waveform < 2; waveform++) {
+                    randomTypeSelect.appendChild(HTML.option({ value: waveform }, randomNames[waveform]));
                 }
                 const randomTypeSelectWrapper = HTML.div({ class: "editor-controls", style: "margin-top: 3px; flex:1; display:flex; flex-direction: row; align-items:center; justify-content:right;" }, HTML.span({ style: "font-size: smaller; margin-right: 35px;", class: "tip", onclick: () => this._openPrompt("randomEnvelopeType") }, "Type: "), randomTypeSelect);
                 const perEnvelopeSpeedSlider = HTML.input({ style: "margin: 0; width: 113px", type: "range", min: 0, max: Config.perEnvelopeSpeedIndices.length - 1, value: this.convertIndexSpeed(instrument.envelopes[envelopeIndex].perEnvelopeSpeed, "index"), step: "1" });

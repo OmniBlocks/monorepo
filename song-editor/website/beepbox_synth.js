@@ -1070,7 +1070,6 @@ var beepbox = (function (exports) {
     };
     Config.perEnvelopeBoundMin = 0;
     Config.perEnvelopeBoundMax = 2;
-    Config.randomEnvelopeTypes = ["time", "pitch"];
     Config.pickedStringDispersionCenterFreq = 6000.0;
     Config.pickedStringDispersionFreqScale = 0.3;
     Config.pickedStringDispersionFreqMult = 4.0;
@@ -9500,7 +9499,7 @@ var beepbox = (function (exports) {
                     timeSinceStart = synth.computeTicksSinceStart();
                     steps = instrument.envelopes[envelopeIndex].steps;
                     seed = instrument.envelopes[envelopeIndex].seed;
-                    if (instrument.envelopes[envelopeIndex].waveform >= (envelope.name == "lfo" ? 4 : Config.randomEnvelopeTypes.length)) {
+                    if (instrument.envelopes[envelopeIndex].waveform >= (envelope.name == "lfo" ? 4 : 2)) {
                         instrument.envelopes[envelopeIndex].waveform = 0;
                     }
                     waveform = instrument.envelopes[envelopeIndex].waveform;
@@ -9608,7 +9607,7 @@ var beepbox = (function (exports) {
                 case 3:
                     const hashMax = 0xffffffff;
                     switch (waveform) {
-                        case Config.randomEnvelopeTypes.indexOf("time"):
+                        case 0:
                             const step = steps;
                             if (step <= 1)
                                 return 1;
@@ -9619,7 +9618,7 @@ var beepbox = (function (exports) {
                             else {
                                 return boundAdjust * (step / (step - 1)) * Math.floor(timeHash * (step) / (hashMax + 1)) / step + perEnvelopeLowerBound;
                             }
-                        case Config.randomEnvelopeTypes.indexOf("pitch"):
+                        case 1:
                             const pitchHash = xxHash32(defaultPitch + "", seed);
                             if (inverse) {
                                 return perEnvelopeUpperBound - boundAdjust * pitchHash / (hashMax + 1);

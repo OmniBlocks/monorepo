@@ -1,6 +1,6 @@
 // Copyright (c) 2012-2022 John Nesky and contributing authors, distributed under the MIT license, see accompanying the LICENSE.md file.
 
-import { startLoadingSample, sampleLoadingState, SampleLoadingState, sampleLoadEvents, SampleLoadedEvent, SampleLoadingStatus, loadBuiltInSamples, Dictionary, DictionaryArray, toNameMap, FilterType, SustainType, EnvelopeType, InstrumentType, EffectType, EnvelopeComputeIndex, Transition, Unison, Chord, Vibrato, Envelope, AutomationTarget, Config, getDrumWave, drawNoiseSpectrum, getArpeggioPitchIndex, performIntegralOld, getPulseWidthRatio, effectsIncludeTransition, effectsIncludeChord, effectsIncludePitchShift, effectsIncludeDetune, effectsIncludeVibrato, effectsIncludeNoteFilter, effectsIncludeDistortion, effectsIncludeBitcrusher, effectsIncludePanning, effectsIncludeChorus, effectsIncludeEcho, effectsIncludeReverb, OperatorWave, BaseWaveTypes } from "./SynthConfig";
+import { startLoadingSample, sampleLoadingState, SampleLoadingState, sampleLoadEvents, SampleLoadedEvent, SampleLoadingStatus, loadBuiltInSamples, Dictionary, DictionaryArray, toNameMap, FilterType, SustainType, EnvelopeType, InstrumentType, EffectType, EnvelopeComputeIndex, Transition, Unison, Chord, Vibrato, Envelope, AutomationTarget, Config, getDrumWave, drawNoiseSpectrum, getArpeggioPitchIndex, performIntegralOld, getPulseWidthRatio, effectsIncludeTransition, effectsIncludeChord, effectsIncludePitchShift, effectsIncludeDetune, effectsIncludeVibrato, effectsIncludeNoteFilter, effectsIncludeDistortion, effectsIncludeBitcrusher, effectsIncludePanning, effectsIncludeChorus, effectsIncludeEcho, effectsIncludeReverb, OperatorWave, BaseWaveTypes, RandomEnvelopeTypes } from "./SynthConfig";
 import { Preset, EditorConfig } from "../editor/EditorConfig";
 import { scaleElementsByFactor, inverseRealFourierTransform } from "./FFT";
 import { Deque } from "./Deque";
@@ -7780,7 +7780,7 @@ class EnvelopeComputer {
                 timeSinceStart = synth.computeTicksSinceStart();
                 steps = instrument.envelopes[envelopeIndex].steps;
                 seed = instrument.envelopes[envelopeIndex].seed;
-                if (instrument.envelopes[envelopeIndex].waveform >= (envelope.name == "lfo" ? BaseWaveTypes.length : Config.randomEnvelopeTypes.length)) {
+                if (instrument.envelopes[envelopeIndex].waveform >= (envelope.name == "lfo" ? BaseWaveTypes.length : RandomEnvelopeTypes.length)) {
                     instrument.envelopes[envelopeIndex].waveform = 0; //make sure that waveform is a proper index
                 }
                 waveform = instrument.envelopes[envelopeIndex].waveform;
@@ -7895,7 +7895,7 @@ class EnvelopeComputer {
                 //we can use either the time passed from the beginning of our song or the pitch of the note for what we hash
                 const hashMax: number = 0xffffffff;
                 switch (waveform) {
-                    case Config.randomEnvelopeTypes.indexOf("time"):
+                    case RandomEnvelopeTypes.time:
                         const step: number = steps;
                         if (step <= 1) return 1;
                         const timeHash: number = xxHash32((perEnvelopeSpeed == 0 ? 0 : Math.floor((timeSinceStart * perEnvelopeSpeed) / (256))) + "", seed);
@@ -7904,7 +7904,7 @@ class EnvelopeComputer {
                         } else {
                             return boundAdjust * (step / (step - 1)) * Math.floor(timeHash * (step) / (hashMax + 1)) / step + perEnvelopeLowerBound;
                         }
-                    case Config.randomEnvelopeTypes.indexOf("pitch"):
+                    case RandomEnvelopeTypes.pitch:
                         const pitchHash: number = xxHash32(defaultPitch + "", seed);
                         if (inverse) {
                             return perEnvelopeUpperBound - boundAdjust * pitchHash / (hashMax + 1);

@@ -1875,6 +1875,7 @@ export class SongEditor {
 
         if (!this._doc.synth.playing) {
             this._hasActiveModSliders = false;
+            this._songEqFilterEditor.render();
 
             for (let setting: number = 0; setting < Config.modulators.length; setting++) {
                 if (this._showModSliders[setting] == true) {
@@ -3323,8 +3324,8 @@ export class SongEditor {
                         }
                         if (anyInstrumentEchoes) {
                             settingList.push("echo");
-                            // Enabled Slarmoo's Box 1.3
-                            settingList.push("echo delay");
+                            // Still need to look into this...
+                            //settingList.push("echo delay");
                         }
                         if (!allInstrumentEchoes) {
                             unusedSettingList.push("+ echo");

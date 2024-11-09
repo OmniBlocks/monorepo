@@ -154,6 +154,13 @@ export const enum BaseWaveTypes {
     length,
 }
 
+export const enum RandomEnvelopeTypes {
+    time,
+    pitch,
+    // note,
+    length,
+}
+
 /*
 export const enum InstrumentAutomationIndex {
     mixVolume,
@@ -1604,7 +1611,7 @@ export class Config {
 
     public static readonly perEnvelopeBoundMin: number = 0;
     public static readonly perEnvelopeBoundMax: number = 2;
-    public static readonly randomEnvelopeTypes: string[] = ["time", "pitch"];
+    //public static readonly randomEnvelopeTypes: string[] = ["time", "pitch"];
 
     // Picked strings have an all-pass filter with a corner frequency based on the tone fundamental frequency, in order to add a slight inharmonicity. (Which is important for distortion.)
     public static readonly pickedStringDispersionCenterFreq: number = 6000.0; // The tone fundamental freq is pulled toward this freq for computing the all-pass corner freq.

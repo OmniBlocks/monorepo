@@ -1604,7 +1604,7 @@ var beepbox = (function (exports) {
         }
     }
     EditorConfig.version = "1.3";
-    EditorConfig.versionDisplayName = "Slarmoo's Box " + EditorConfig.version;
+    EditorConfig.versionDisplayName = "Slarmoo's Box Testing " + EditorConfig.version;
     EditorConfig.releaseNotesURL = "./patch_notes.html";
     EditorConfig.isOnMac = /^Mac/i.test(navigator.platform) || /Mac OS X/i.test(navigator.userAgent) || /^(iPhone|iPad|iPod)/i.test(navigator.platform) || /(iPhone|iPad|iPod)/i.test(navigator.userAgent);
     EditorConfig.ctrlSymbol = EditorConfig.isOnMac ? "⌘" : "Ctrl+";

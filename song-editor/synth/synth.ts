@@ -3342,7 +3342,7 @@ export class Song {
         this.beatsPerBar = 8;
         this.barCount = 16;
         this.patternsPerChannel = 8;
-        this.rhythm = 3; //default rhythm now 8
+        this.rhythm = 1; 
         this.layeredInstruments = false;
         this.patternInstruments = false;
         this.eqFilter.reset();
@@ -7153,7 +7153,7 @@ export class Song {
             importedPartsPerBeat = (jsonObject["ticksPerBeat"] | 0) || 4;
             this.rhythm = Config.rhythms.findIndex(rhythm => rhythm.stepsPerBeat == importedPartsPerBeat);
             if (this.rhythm == -1) {
-                this.rhythm = 3; //default rhythm
+                this.rhythm = 1; //default rhythm
             }
         }
 
@@ -8025,7 +8025,7 @@ class EnvelopeComputer {
 
     public getPitchValue(instrument: Instrument, tone: Tone | null, instrumentState: InstrumentState, calculateBends: boolean = true): number {
         if (tone && tone.pitchCount >= 1) {
-            const chord = instrument.getChord()
+            const chord = instrument.getChord();
             const arpeggiates = chord.arpeggiates;
             const arpeggio: number = Math.floor(instrumentState.arpTime / Config.ticksPerArpeggio); //calculate arpeggiation
             const tonePitch = tone.pitches[arpeggiates ? getArpeggioPitchIndex(tone.pitchCount, instrument.fastTwoNoteArp, arpeggio) : 0]

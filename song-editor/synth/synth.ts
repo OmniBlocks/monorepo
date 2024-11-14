@@ -4495,7 +4495,7 @@ export class Song {
                             useFastTwoNoteArp = true;
                         }
                     }
-                } else if (!(fromSlarmoosBox && !beforeFour) || !(fromUltraBox && !beforeSix)) {
+                } else if ((fromSlarmoosBox && beforeFour) || (fromUltraBox && beforeSix)) {
                     const rhythmMap = [1, 1, 0, 1, 2, 3, 4, 5];
                     this.rhythm = rhythmMap[base64CharCodeToInt[compressed.charCodeAt(charIndex++)]];
                 } else {

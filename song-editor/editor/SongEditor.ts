@@ -4948,6 +4948,7 @@ export class SongEditor {
             this._doc.notifier.changed();
         } else {
             this._doc.record(new ChangeRhythm(this._doc, this._rhythmSelect.selectedIndex));
+            console.log("here!");
         }
     }
 

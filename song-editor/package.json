@@ -24,8 +24,8 @@
 		"build-offline-html": "bash ./compile_beepbox_offline_html.sh",
 		"deploy-files": "bash ./deploy_files.sh",
 		"start": "electron ./to_deploy",
-		"package": "electron-packager ./to_deploy --all --asar --overwrite && npm run build-offline_html",
-		"package-host": "electron-packager ./to_deploy UltraBox --asar --overwrite && npm run build-offline_html"
+		"package": "electron-packager ./to_deploy --platform=darwin,linux,win32 --arch=ia32,x64 --asar --overwrite && npm run build-offline-html",
+		"package-host": "electron-packager ./to_deploy UltraBox --asar --overwrite && npm run build-offline-html"
 	},
 	"repository": {
 		"type": "git",

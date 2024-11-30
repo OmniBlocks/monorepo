@@ -3,8 +3,6 @@ set -e
 
 npm run deploy-files
 
-mkdir to_deploy/samples -p
-
 # Compile editor/main.ts into build/editor/main.js and dependencies
 npx tsc
 

@@ -1580,7 +1580,7 @@ export class ChangeRandomGeneratedInstrument extends Change {
                     instrument.customChipWave = randomGeneratedArray;
                     instrument.customChipWaveIntegral = randomGeneratedArrayIntegral;
                 } break;
-                // case InstrumentType.noise: {
+               // case InstrumentType.noise: {
                 //     instrument.chipNoise = selectWeightedRandom([
                 //         { item: 0, weight: 1 }, // retro
                 //         { item: 1, weight: 1 }, // white

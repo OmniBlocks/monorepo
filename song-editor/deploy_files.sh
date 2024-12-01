@@ -3,7 +3,8 @@ mkdir to_deploy/player -p
 mkdir to_deploy/theme_resources -p
 
 cp website/beepbox_editor.min.js to_deploy/
-cp website/service_worker.js to_deploy/
+# TODO: see if something can be done about the bugs the service worker causes
+# cp website/service_worker.js to_deploy/
 
 cp website/drumsamples.js to_deploy/
 cp website/kirby_samples.js to_deploy/

@@ -14,5 +14,5 @@ sed \
 	-e '/INSERT_WARIOSAMPLES_SCRIPT_HERE/{r website/wario_samples.js' -e 'd' -e '}' \
 	-e '/INSERT_MARIOPAINTBOXSAMPLES_SCRIPT_HERE/{r website/mario_paintbox_samples.js' -e 'd' -e '}' \
 	-e '/INSERT_NINTARIBOXSAMPLES_SCRIPT_HERE/{r website/nintaribox_samples.js' -e 'd' -e '}' \
-	website/ultrabox_offline_template.html \
-	> to_deploy/ultrabox_offline_HTML.html
+	website/slarmoosbox_offline_template.html \
+	> to_deploy/slarmoosbox_offline_HTML.html

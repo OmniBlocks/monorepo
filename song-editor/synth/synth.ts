@@ -1,6 +1,6 @@
 // Copyright (c) 2012-2022 John Nesky and contributing authors, distributed under the MIT license, see accompanying the LICENSE.md file.
 
-import { startLoadingSample, sampleLoadingState, SampleLoadingState, sampleLoadEvents, SampleLoadedEvent, SampleLoadingStatus, loadBuiltInSamples, Dictionary, DictionaryArray, toNameMap, FilterType, SustainType, EnvelopeType, InstrumentType, EffectType, EnvelopeComputeIndex, Transition, Unison, Chord, Vibrato, Envelope, AutomationTarget, Config, getDrumWave, drawNoiseSpectrum, getArpeggioPitchIndex, performIntegralOld, getPulseWidthRatio, effectsIncludeTransition, effectsIncludeChord, effectsIncludePitchShift, effectsIncludeDetune, effectsIncludeVibrato, effectsIncludeNoteFilter, effectsIncludeDistortion, effectsIncludeBitcrusher, effectsIncludePanning, effectsIncludeChorus, effectsIncludeEcho, effectsIncludeReverb, OperatorWave, BaseWaveTypes, RandomEnvelopeTypes } from "./SynthConfig";
+import { startLoadingSample, sampleLoadingState, SampleLoadingState, sampleLoadEvents, SampleLoadedEvent, SampleLoadingStatus, loadBuiltInSamples, Dictionary, DictionaryArray, toNameMap, FilterType, SustainType, EnvelopeType, InstrumentType, EffectType, EnvelopeComputeIndex, Transition, Unison, Chord, Vibrato, Envelope, AutomationTarget, Config, getDrumWave, drawNoiseSpectrum, getArpeggioPitchIndex, performIntegralOld, getPulseWidthRatio, effectsIncludeTransition, effectsIncludeChord, effectsIncludePitchShift, effectsIncludeDetune, effectsIncludeVibrato, effectsIncludeNoteFilter, effectsIncludeDistortion, effectsIncludeBitcrusher, effectsIncludePanning, effectsIncludeChorus, effectsIncludeEcho, effectsIncludeReverb, OperatorWave, BaseWaveTypes, RandomEnvelopeTypes, /*effectsIncludeNoteRange, */effectsIncludeCorruption } from "./SynthConfig";
 import { Preset, EditorConfig } from "../editor/EditorConfig";
 import { scaleElementsByFactor, inverseRealFourierTransform } from "./FFT";
 import { Deque } from "./Deque";
@@ -1662,7 +1662,9 @@ export class Instrument {
 	public supersawSpread: number = Math.ceil(Config.supersawSpreadMax / 2.0);
 	public supersawShape: number = 0;
 	public stringSustain: number = 10;
-	public stringSustainType: SustainType = SustainType.acoustic;
+    public stringSustainType: SustainType = SustainType.acoustic;
+    public corruption: number = 0;
+    public corruptionType: number = 0;
     public distortion: number = 0;
     public bitcrusherFreq: number = 0;
     public bitcrusherQuantization: number = 0;
@@ -1781,6 +1783,8 @@ export class Instrument {
         this.noteFilterType = false;
         this.noteFilterSimpleCut = Config.filterSimpleCutRange - 1;
         this.noteFilterSimplePeak = 0;
+        this.corruption = 0;
+        this.corruptionType = 0;
         this.distortion = Math.floor((Config.distortionRange - 1) * 0.75);
         this.bitcrusherFreq = Math.floor((Config.bitcrusherFreqRange - 1) * 0.5)
         this.bitcrusherQuantization = Math.floor((Config.bitcrusherQuantizationRange - 1) * 0.5);
@@ -2099,6 +2103,10 @@ export class Instrument {
                 if (this.noteSubFilters[i] != null)
                     instrumentObject["noteSubFilters" + i] = this.noteSubFilters[i]!.toJsonObject();
             }
+        }
+        if (effectsIncludeCorruption(this.effects)) {
+            instrumentObject["corruption"] = this.corruption; 
+            instrumentObject["corruptionType"] = this.corruptionType;
         }
         if (effectsIncludeDistortion(this.effects)) {
             instrumentObject["distortion"] = Math.round(100 * this.distortion / (Config.distortionRange - 1));
@@ -2536,6 +2544,11 @@ export class Instrument {
         }
         else if (instrumentObject["detuneCents"] == undefined) {
             this.detune = Config.detuneCenter;
+        }
+
+        if (instrumentObject["corruption"] != undefined) {
+            this.corruption = instrumentObject["corruption"];
+            this.corruptionType = instrumentObject["corruptionType"];
         }
 
         if (instrumentObject["distortion"] != undefined) {
@@ -3170,7 +3183,7 @@ export class Song {
     private static readonly _oldestUltraBoxVersion: number = 1;
     private static readonly _latestUltraBoxVersion: number = 5;
     private static readonly _oldestSlarmoosBoxVersion: number = 1;
-    private static readonly _latestSlarmoosBoxVersion: number = 4;
+    private static readonly _latestSlarmoosBoxVersion: number = 5;
     // One-character variant detection at the start of URL to distinguish variants such as JummBox, Or Goldbox. "j" and "g" respectively
 	//also "u" is ultrabox lol
     private static readonly _variant = 0x73; //"s" ~ slarmoo's box
@@ -3544,8 +3557,8 @@ export class Song {
                     }
                 }
 
-                // The list of enabled effects is represented as a 12-bit bitfield using two six-bit characters.
-                buffer.push(SongTagCode.effects, base64IntToCharCode[instrument.effects >> 6], base64IntToCharCode[instrument.effects & 63]);
+                // The list of enabled effects is represented as a 14-bit bitfield using two six-bit characters.
+                buffer.push(SongTagCode.effects, base64IntToCharCode[(instrument.effects >> 12) & 63], base64IntToCharCode[(instrument.effects >> 6) & 63], base64IntToCharCode[instrument.effects & 63]);
                 if (effectsIncludeNoteFilter(instrument.effects)) {
                     buffer.push(base64IntToCharCode[+instrument.noteFilterType]);
                     if (instrument.noteFilterType) {
@@ -3632,6 +3645,13 @@ export class Song {
                 }
                 if (effectsIncludeReverb(instrument.effects)) {
                     buffer.push(base64IntToCharCode[instrument.reverb]);
+                }
+                // if (effectsIncludeNoteRange(instrument.effects)) {
+                //     buffer.push(base64IntToCharCode[instrument.noteRange]);
+                // }
+                if (effectsIncludeCorruption(instrument.effects)) {
+                    buffer.push(base64IntToCharCode[instrument.corruption]);
+                    buffer.push(base64IntToCharCode[instrument.corruptionType]);
                 }
 
                 if (instrument.type != InstrumentType.drumset) {
@@ -5254,9 +5274,13 @@ export class Song {
                     const legacySettings: LegacySettings = legacySettingsCache![instrumentChannelIterator][instrumentIndexIterator];
                     instrument.convertLegacySettings(legacySettings, forceSimpleFilter);
                 } else {
-                    // BeepBox currently uses two base64 characters at 6 bits each for a bitfield representing all the enabled effects.
-                    if (EffectType.length > 12) throw new Error();
-                    instrument.effects = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) | (base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                    // BeepBox currently uses three base64 characters at 6 bits each for a bitfield representing all the enabled effects.
+                    if (EffectType.length > 14) throw new Error();
+                    if (fromSlarmoosBox && !beforeFive) {
+                        instrument.effects = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 12) | (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) | (base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                    } else {
+                        instrument.effects = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) | (base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                    }
 
                     if (effectsIncludeNoteFilter(instrument.effects)) {
                         let typeCheck: number = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
@@ -5394,6 +5418,10 @@ export class Song {
                         } else {
                             instrument.reverb = clamp(0, Config.reverbRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                         }
+                    }
+                    if (effectsIncludeCorruption(instrument.effects)) {
+                        instrument.corruption = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                        instrument.corruptionType = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                     }
                 }
                 // Clamp the range.
@@ -8301,6 +8329,10 @@ class InstrumentState {
     public delayInputMult: number = 0.0;
     public delayInputMultDelta: number = 0.0;
 
+    public corruption: number = 0.0;
+    public corruptionType: number = 0;
+    public corruptionAmount: number = 0.0;
+
     public distortion: number = 0.0;
     public distortionDelta: number = 0.0;
     public distortionDrive: number = 0.0;
@@ -8556,12 +8588,20 @@ class InstrumentState {
         const envelopeStarts: number[] = this.envelopeComputer.envelopeStarts;
         const envelopeEnds: number[] = this.envelopeComputer.envelopeEnds;
 
+        const usesCorruption: boolean = effectsIncludeCorruption(this.effects);
         const usesDistortion: boolean = effectsIncludeDistortion(this.effects);
         const usesBitcrusher: boolean = effectsIncludeBitcrusher(this.effects);
         const usesPanning: boolean = effectsIncludePanning(this.effects);
         const usesChorus: boolean = effectsIncludeChorus(this.effects);
         const usesEcho: boolean = effectsIncludeEcho(this.effects);
         const usesReverb: boolean = effectsIncludeReverb(this.effects);
+
+        if (usesCorruption) {
+            this.corruptionAmount = instrument.corruption;
+            this.corruptionType = instrument.corruptionType;
+            this.corruption = synth.computeTicksSinceStart()
+            // todo: corruption mods and envelopes
+        }
 
         if (usesDistortion) {
             let useDistortionStart: number = instrument.distortion;
@@ -13263,6 +13303,7 @@ export class Synth {
         const usesChorus: boolean = effectsIncludeChorus(instrumentState.effects);
         const usesEcho: boolean = effectsIncludeEcho(instrumentState.effects);
         const usesReverb: boolean = effectsIncludeReverb(instrumentState.effects);
+        const usesCorruption: boolean = effectsIncludeCorruption(instrumentState.effects);
         let signature: number = 0; if (usesDistortion) signature = signature | 1;
         signature = signature << 1; if (usesBitcrusher) signature = signature | 1;
         signature = signature << 1; if (usesEqFilter) signature = signature | 1;
@@ -13270,6 +13311,7 @@ export class Synth {
         signature = signature << 1; if (usesChorus) signature = signature | 1;
         signature = signature << 1; if (usesEcho) signature = signature | 1;
         signature = signature << 1; if (usesReverb) signature = signature | 1;
+        signature = signature << 1; if (usesCorruption) signature = signature | 1;
 
         let effectsFunction: Function = Synth.effectsFunctionCache[signature];
         if (effectsFunction == undefined) {
@@ -13288,6 +13330,14 @@ export class Synth {
 				
 				let delayInputMult = +instrumentState.delayInputMult;
 				const delayInputMultDelta = +instrumentState.delayInputMultDelta;`
+            }
+
+            if (usesCorruption) {
+                effectsSource += `
+                
+                let corruption = instrumentState.corruption;
+                let corruptionAmount = instrumentState.corruptionAmount+1;
+                const corruptionType = instrumentState.corruptionType;`
             }
 
             if (usesDistortion) {
@@ -13479,6 +13529,13 @@ export class Synth {
 				for (let sampleIndex = bufferIndex; sampleIndex < stopIndex; sampleIndex++) {
 					let sample = tempMonoInstrumentSampleBuffer[sampleIndex];
 					tempMonoInstrumentSampleBuffer[sampleIndex] = 0.0;`
+            
+            if (usesCorruption) {
+                effectsSource += `
+                
+                const corruptChance = (Math.floor(((corruption%corruptionAmount)+1)/corruptionAmount)-0.5)*2;
+                sample *= corruptChance;`
+            }
 
             if (usesDistortion) {
                 effectsSource += `
@@ -13705,6 +13762,12 @@ export class Synth {
                 effectsSource += `
 				
 				instrumentState.delayInputMult = delayInputMult;`
+            }
+
+            if (usesCorruption) {
+                effectsSource += `
+                
+                instrumentState.corruption = corruption+1;`
             }
 
             if (usesDistortion) {

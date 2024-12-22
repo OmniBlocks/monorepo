@@ -152,6 +152,15 @@ class SecurityManager {
     canEmbed (documentURL) {
         return Promise.resolve(true);
     }
+
+    /**
+     * Determine whether an extension is allowed to download a file with a given name.
+     * @param {string} filename The name of the file
+     * @returns {Promise<boolean>|boolean}
+     */
+    canDownload (filename) {
+        return Promise.resolve(true);
+    }
 }
 
 module.exports = SecurityManager;

@@ -141,3 +141,8 @@ test('canEmbed', async t => {
     t.equal(await global.Scratch.canEmbed('https://example.com/'), false);
     t.end();
 });
+
+test('canDownload', async t => {
+    t.equal(await global.Scratch.canDownload('test.sb3'), false);
+    t.end();
+});

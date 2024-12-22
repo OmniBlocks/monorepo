@@ -96,6 +96,8 @@ const setupUnsandboxedExtensionAPI = vm => new Promise(resolve => {
         return vm.securityManager.canEmbed(parsed.href);
     };
 
+    Scratch.canDownload = async name => vm.securityManager.canDownload(name);
+
     Scratch.fetch = async (url, options) => {
         const actualURL = url instanceof Request ? url.url : url;
 

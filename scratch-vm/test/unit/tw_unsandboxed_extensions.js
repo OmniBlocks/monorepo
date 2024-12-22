@@ -418,6 +418,17 @@ test('canEmbed', async t => {
     t.end();
 });
 
+test('canDownload', async t => {
+    const vm = new VirtualMachine();
+    UnsandboxedExtensionRunner.setupUnsandboxedExtensionAPI(vm);
+
+    vm.securityManager.canDownload = name => name === 'safe.txt';
+    t.ok(await global.Scratch.canDownload('safe.txt'));
+    t.notOk(await global.Scratch.canDownload('unsafe.txt'));
+
+    t.end();
+});
+
 test('CREATE_UNSANDBOXED_EXTENSION_API', t => {
     const vm = new VirtualMachine();
     vm.on('CREATE_UNSANDBOXED_EXTENSION_API', api => {

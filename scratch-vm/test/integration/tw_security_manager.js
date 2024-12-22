@@ -266,3 +266,23 @@ test('canEmbed', async t => {
 
     t.end();
 });
+
+test('canDownload', async t => {
+    const vm = new VirtualMachine();
+    setupUnsandboxedExtensionAPI(vm);
+
+    const calledWithNames = [];
+    vm.securityManager.canDownload = async name => {
+        calledWithNames.push(name);
+        return name.includes('safe');
+    };
+
+    t.equal(await global.Scratch.canDownload('safe.html'), true);
+    t.equal(await global.Scratch.canDownload('dangerous.html'), false);
+    t.same(calledWithNames, [
+        'safe.html',
+        'dangerous.html'
+    ]);
+
+    t.end();
+});

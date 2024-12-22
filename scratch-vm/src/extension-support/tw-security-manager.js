@@ -154,11 +154,12 @@ class SecurityManager {
     }
 
     /**
-     * Determine whether an extension is allowed to download a file with a given name.
-     * @param {string} filename The name of the file
+     * Determine whether an extension is allowed to download a URL with a given name.
+     * @param {string} resourceURL The URL to download
+     * @param {string} name The name of the file
      * @returns {Promise<boolean>|boolean}
      */
-    canDownload (filename) {
+    canDownload (resourceURL, name) {
         return Promise.resolve(true);
     }
 }

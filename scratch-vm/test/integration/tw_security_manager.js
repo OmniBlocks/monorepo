@@ -271,17 +271,21 @@ test('canDownload', async t => {
     const vm = new VirtualMachine();
     setupUnsandboxedExtensionAPI(vm);
 
-    const calledWithNames = [];
-    vm.securityManager.canDownload = async name => {
-        calledWithNames.push(name);
+    const calledWithArguments = [];
+    vm.securityManager.canDownload = async (url, name) => {
+        calledWithArguments.push([url, name]);
         return name.includes('safe');
     };
 
-    t.equal(await global.Scratch.canDownload('safe.html'), true);
-    t.equal(await global.Scratch.canDownload('dangerous.html'), false);
-    t.same(calledWithNames, [
-        'safe.html',
-        'dangerous.html'
+    t.equal(await global.Scratch.canDownload('http://example.com/', 'safe.html'), true);
+    t.equal(await global.Scratch.canDownload('http://example.com/', 'dangerous.html'), false);
+
+    // should not even call security manager
+    t.equal(await global.Scratch.canDownload('javascript:alert(1)', 'safe.html'), false);
+
+    t.same(calledWithArguments, [
+        ['http://example.com/', 'safe.html'],
+        ['http://example.com/', 'dangerous.html']
     ]);
 
     t.end();

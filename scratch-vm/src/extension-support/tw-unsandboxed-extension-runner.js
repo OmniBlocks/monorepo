@@ -140,6 +140,18 @@ const setupUnsandboxedExtensionAPI = vm => new Promise(resolve => {
         location.href = url;
     };
 
+    Scratch.download = async (url, name) => {
+        if (!await Scratch.canDownload(url, name)) {
+            throw new Error(`Permission to download ${name} rejected.`);
+        }
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = name;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+    };
+
     Scratch.translate = createTranslate(vm);
 
     global.Scratch = Scratch;

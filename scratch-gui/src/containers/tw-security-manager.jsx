@@ -83,29 +83,38 @@ const isAlwaysTrustedForFetching = parsed => (
     parsed.origin === 'https://scratchdb.lefty.one'
 );
 
+const FETCHABLE_PROTOCOLS = [
+    'http:',
+    'https:',
+    'data:',
+    'blob:',
+    'ws:',
+    'wss:'
+];
+
+const VISITABLE_PROTOCOLS = [
+    // The important one we want to exclude is javascript:
+    'http:',
+    'https:',
+    'data:',
+    'blob:',
+    'mailto:',
+    'steam:',
+    'calculator:'
+];
+
 /**
  * @param {string} url Original URL string
+ * @param {string[]} protocols List of allowed protocols
  * @returns {URL|null} A URL object if it is valid and of a known protocol, otherwise null.
  */
-const parseURL = url => {
+const parseURL = (url, protocols) => {
     let parsed;
     try {
         parsed = new URL(url);
     } catch (e) {
         return null;
     }
-    const protocols = [
-        // The important one we want to exclude is javascript:
-        'http:',
-        'https:',
-        'ws:',
-        'wss:',
-        'data:',
-        'blob:',
-        'mailto:',
-        'steam:',
-        'calculator:'
-    ];
     if (!protocols.includes(parsed.protocol)) {
         return null;
     }
@@ -274,7 +283,7 @@ class TWSecurityManagerComponent extends React.Component {
      * @returns {Promise<boolean>} True if the resource is allowed to be fetched
      */
     async canFetch (url) {
-        const parsed = parseURL(url);
+        const parsed = parseURL(url, FETCHABLE_PROTOCOLS);
         if (!parsed) {
             return false;
         }
@@ -282,14 +291,15 @@ class TWSecurityManagerComponent extends React.Component {
             return true;
         }
         const {showModal, releaseLock} = await this.acquireModalLock();
-        if (fetchOriginsTrustedByUser.has(origin)) {
+        const origin = (parsed.protocol === 'http:' || parsed.protocol === 'https:') ? parsed.origin : null;
+        if (origin && fetchOriginsTrustedByUser.has(origin)) {
             releaseLock();
             return true;
         }
         const allowed = await showModal(SecurityModals.Fetch, {
             url
         });
-        if (allowed) {
+        if (origin && allowed) {
             fetchOriginsTrustedByUser.add(origin);
         }
         return allowed;
@@ -300,7 +310,7 @@ class TWSecurityManagerComponent extends React.Component {
      * @returns {Promise<boolean>} True if the website can be opened
      */
     async canOpenWindow (url) {
-        const parsed = parseURL(url);
+        const parsed = parseURL(url, VISITABLE_PROTOCOLS);
         if (!parsed) {
             return false;
         }
@@ -315,7 +325,7 @@ class TWSecurityManagerComponent extends React.Component {
      * @returns {Promise<boolean>} True if the website can be redirected to
      */
     async canRedirect (url) {
-        const parsed = parseURL(url);
+        const parsed = parseURL(url, VISITABLE_PROTOCOLS);
         if (!parsed) {
             return false;
         }
@@ -385,7 +395,7 @@ class TWSecurityManagerComponent extends React.Component {
      * @returns {Promise<boolean>} True if embed is allowed.
      */
     async canEmbed (url) {
-        const parsed = parseURL(url);
+        const parsed = parseURL(url, FETCHABLE_PROTOCOLS);
         if (!parsed) {
             return false;
         }

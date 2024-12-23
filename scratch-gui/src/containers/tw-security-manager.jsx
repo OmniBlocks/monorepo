@@ -138,7 +138,8 @@ const SECURITY_MANAGER_METHODS = [
     'canReadClipboard',
     'canNotify',
     'canGeolocate',
-    'canEmbed'
+    'canEmbed',
+    'canDownload'
 ];
 
 class TWSecurityManagerComponent extends React.Component {
@@ -410,6 +411,23 @@ class TWSecurityManagerComponent extends React.Component {
             embedOriginsTrustedByUser.add(origin);
         }
         return allowed;
+    }
+
+    /**
+     * @param {string} url URL to download
+     * @param {string} name Name to download as
+     * @returns {Promise<boolean>} True if allowed
+     */
+    async canDownload (url, name) {
+        const parsed = parseURL(url, FETCHABLE_PROTOCOLS);
+        if (!parsed) {
+            return false;
+        }
+        const {showModal} = await this.acquireModalLock();
+        return showModal(SecurityModals.Download, {
+            url,
+            name
+        });
     }
 
     render () {

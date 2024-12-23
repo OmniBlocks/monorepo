@@ -1004,16 +1004,7 @@ If I ever decide to release this extension on the gallery, this will be replaced
     objectShapeTransformed(obj) {
       const shape = this.objectShape(obj);
       if (!shape) return null;
-      const worldPos = obj.getWorldPosition(new THREE.Vector3());
-      if (shape instanceof THREE.Box3) {
-        shape.min.multiply(obj.scale);
-        shape.min.add(worldPos);
-        shape.max.multiply(obj.scale);
-        shape.max.add(worldPos);
-      } else if (shape instanceof THREE.Sphere) {
-        shape.radius *= Math.max(obj.scale.x, obj.scale.y, obj.scale.z);
-        shape.center.add(worldPos);
-      }
+      shape.applyMatrix4(obj.matrixWorld);
       return shape;
     }
 

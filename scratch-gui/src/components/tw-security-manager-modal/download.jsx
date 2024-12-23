@@ -23,6 +23,7 @@ const DEFINITELY_EXECUTABLE = [
     'appx',
     'appxbundle',
     'reg',
+    'iso',
 
     // Mac executable formats
     'dmg',
@@ -31,6 +32,12 @@ const DEFINITELY_EXECUTABLE = [
     // Unix executable formats
     'so',
     'a',
+    'run',
+    'appimage',
+    'deb',
+    'rpm',
+    'snap',
+    'flatpakref',
 
     // Cross-platform executable formats
     'jar',
@@ -42,15 +49,33 @@ const DEFINITELY_EXECUTABLE = [
     // Shortcuts
     'url',
     'webloc',
+    'inetloc',
     'lnk',
 
     // Windows scripting languages
     'bat',
+    'cmd',
     'ps1',
+    'psm1',
+    'asp',
     'vbs',
     'vbe',
     'wsf',
     'wsc',
+    'ahk',
+
+    // Microsoft Office macros
+    'docm',
+    'dotm',
+    'xlm',
+    'xlsm',
+    'xltm',
+    'xla',
+    'xlam',
+    'pptm',
+    'potm',
+    'ppsm',
+    'sldm',
 
     // Unix scripting languages
     'sh',

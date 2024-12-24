@@ -1004,8 +1004,8 @@ If I ever decide to release this extension on the gallery, this will be replaced
     objectShapeTransformed(obj) {
       const shape = this.objectShape(obj);
       if (!shape) return null;
-      shape.applyMatrix4(obj.matrixWorld);
-      return shape;
+      obj.updateMatrixWorld();
+      return shape.applyMatrix4(obj.matrixWorld);
     }
 
     touching3D(objA, objB) {

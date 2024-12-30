@@ -124,13 +124,13 @@ export const enum EnvelopeComputeIndex {
     pitchShift,
     detune,
     vibratoDepth,
-    //vibratoSpeed, doesn't follow normal envelope pattern; will figure out. 
+    //vibratoSpeed, doesn't follow normal envelope pattern; will figure out. //if you fix this you need to update the url
     noteFilterFreq0, noteFilterFreq1, noteFilterFreq2, noteFilterFreq3, noteFilterFreq4, noteFilterFreq5, noteFilterFreq6, noteFilterFreq7,
     noteFilterGain0, noteFilterGain1, noteFilterGain2, noteFilterGain3, noteFilterGain4, noteFilterGain5, noteFilterGain6, noteFilterGain7,
-    decimalOffset,
-    supersawDynamism,
-	supersawSpread,
-    supersawShape,
+    decimalOffset, //if updating url, move this to under pulse width
+    supersawDynamism, //and move these to be by the rest of the instrument type settings
+	supersawSpread, //^
+    supersawShape, //^
     panning,
     distortion,
     bitcrusherQuantization,
@@ -157,7 +157,8 @@ export const enum BaseWaveTypes {
 export const enum RandomEnvelopeTypes {
     time,
     pitch,
-    // note,
+    note,
+    timeSmooth,
     length,
 }
 
@@ -167,14 +168,7 @@ export const enum InstrumentAutomationIndex {
     eqFilterAllFreqs,
     eqFilterFreq0, eqFilterFreq1, eqFilterFreq2, eqFilterFreq3, eqFilterFreq4, eqFilterFreq5, eqFilterFreq6, eqFilterFreq7,
     eqFilterGain0, eqFilterGain1, eqFilterGain2, eqFilterGain3, eqFilterGain4, eqFilterGain5, eqFilterGain6, eqFilterGain7,
-    distortion,
-    bitcrusherQuantization,
-    bitcrusherFrequency,
-    panning,
-    chorus,
-    echoSustain,
     //echoDelay, // Wait until tick settings can be computed once for multiple run lengths.
-    reverb,
     length,
 }
 */
@@ -1610,7 +1604,8 @@ export class Config {
 
     public static readonly perEnvelopeBoundMin: number = 0;
     public static readonly perEnvelopeBoundMax: number = 2;
-    //public static readonly randomEnvelopeTypes: string[] = ["time", "pitch"];
+    public static readonly randomEnvelopeSeedMax: number = 64; //if you increase this you'll need to update the url to support it
+    public static readonly randomEnvelopeStepsMax: number = 24;
 
     // Picked strings have an all-pass filter with a corner frequency based on the tone fundamental frequency, in order to add a slight inharmonicity. (Which is important for distortion.)
     public static readonly pickedStringDispersionCenterFreq: number = 6000.0; // The tone fundamental freq is pulled toward this freq for computing the all-pass corner freq.

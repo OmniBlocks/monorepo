@@ -1034,8 +1034,8 @@ export class SongEditor {
     private readonly _spectrumZoom: HTMLButtonElement = button({ style: "margin-left:0em; padding-left:0.2em; height:1.5em; max-width: 12px;", onclick: () => this._openPrompt("spectrumSettings") }, "+");
     private readonly _spectrumRow: HTMLElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("spectrum"), style: "font-size: smaller" }, "Spectrum:"), this._spectrumZoom, this._spectrumEditor.container);
     private readonly _harmonicsEditor: HarmonicsEditor = new HarmonicsEditor(this._doc);
-    private readonly _harmonicsZoom: HTMLButtonElement = button({ style: "margin-left:4px; margin-right:4px; padding-left:0.2em; height:1.5em; max-width: 12px;", onclick: () => this._openPrompt("harmonicsSettings") }, "+");
-    private readonly _harmonicsRow: HTMLElement = div({ class: "selectRow", style: "max-width: 166px;"}, span({ class: "tip", onclick: () => this._openPrompt("harmonics"), style: "font-size: smaller"}, "Harmonics:"), this._harmonicsZoom, this._harmonicsEditor.container);
+    private readonly _harmonicsZoom: HTMLButtonElement = button({ style: "padding-left:0.2em; height:1.5em; max-width: 12px;", onclick: () => this._openPrompt("harmonicsSettings") }, "+");
+    private readonly _harmonicsRow: HTMLElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("harmonics"), style: "font-size: smaller"}, "Harmonics:"), this._harmonicsZoom, this._harmonicsEditor.container);
     private readonly _additiveEditor: AdditiveEditor = new AdditiveEditor(this._doc);
     private readonly _additiveZoom: HTMLButtonElement = button({ style: "margin-left:0em; padding-left:0.2em; height:1.5em; max-width: 12px;", onclick: () => this._openPrompt("additiveSettings") }, "+");
     private readonly _additiveRow: HTMLElement = div({ class: "selectRow" }, span({ class: "tip ", onclick: () => this._openPrompt("additive"), style: "font-size: smaller" }, "Additive:"), this._additiveZoom, this._additiveEditor.container);

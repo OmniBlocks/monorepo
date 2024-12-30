@@ -300,6 +300,8 @@ export class EnvelopeEditor {
 			} else if (this.openExtraSettingsDropdowns[i]) {
 				this.extraSettingsDropdownGroups[i].style.display = "flex";
 				this.extraSettingsDropdowns[i].style.display = "inline";
+
+
 				if (Config.newEnvelopes[instrument.envelopes[i].envelope].name == "pitch") {
 					this.extraPitchSettingsGroups[i].style.display = "flex";
 					this.pitchStartBoxes[i].value = instrument.envelopes[i].pitchEnvelopeStart.toString();
@@ -322,6 +324,8 @@ export class EnvelopeEditor {
 					this.perEnvelopeSpeedGroups[i].style.display = "none";
 					this.extraRandomSettingsGroups[i].style.display = "none";
 					this.extraLFODropdownGroups[i].style.display = "none";
+
+
 				} else if (Config.newEnvelopes[instrument.envelopes[i].envelope].name == "random") {
 					
 					//update values
@@ -336,12 +340,14 @@ export class EnvelopeEditor {
 					this._randomEnvelopeTypeSelects[i].selectedIndex = instrument.envelopes[i].waveform;
 					
 					//hide other dropdown groups, show perEnvelopeSpeed
-					this.perEnvelopeSpeedGroups[i].style.display = instrument.envelopes[i].waveform == RandomEnvelopeTypes.time ? "" : "none";
+					const isRandomTime: boolean = instrument.envelopes[i].waveform == RandomEnvelopeTypes.time || instrument.envelopes[i].waveform == RandomEnvelopeTypes.timeSmooth;
+					this.perEnvelopeSpeedGroups[i].style.display = isRandomTime ? "" : "none";
 					this.extraSettingsDropdownGroups[i].style.display = "flex";
 					this.extraSettingsDropdowns[i].style.display = "inline";
 					this.extraPitchSettingsGroups[i].style.display = "none";
 					this.extraRandomSettingsGroups[i].style.display = "";
 					this.extraLFODropdownGroups[i].style.display = "none";
+
 
 				} else if (Config.newEnvelopes[instrument.envelopes[i].envelope].name == "lfo") {
 
@@ -357,6 +363,7 @@ export class EnvelopeEditor {
 					this.extraSettingsDropdowns[i].style.display = "inline";
 					this.extraPitchSettingsGroups[i].style.display = "none";
 					this.extraRandomSettingsGroups[i].style.display = "none";
+
 
 				} else {
 					this.extraPitchSettingsGroups[i].style.display = "none";
@@ -451,11 +458,11 @@ export class EnvelopeEditor {
 			const deleteButton: HTMLButtonElement = HTML.button({ type: "button", class: "delete-envelope", style: "flex: 0.2" });
 
 			//Create HTML structure for the dropdowns
-			const startNoteSlider: HTMLInputElement = HTML.input({ value: instrument.envelopes[envelopeIndex].pitchEnvelopeStart ? instrument.envelopes[envelopeIndex].pitchEnvelopeStart : 0, style: "width: 113px; margin-left: 0px;", type: "range", min: "0", max: instrument.isNoiseInstrument ? Config.drumCount-1 : Config.maxPitch, step: "1" });
-			const startNoteBox: HTMLInputElement = HTML.input({ value: instrument.envelopes[envelopeIndex].pitchEnvelopeStart ? instrument.envelopes[envelopeIndex].pitchEnvelopeStart : 0, style: "width: 4em; font-size: 80%; ", id: "startNoteBox", type: "number", step: "1", min: "0", max: instrument.isNoiseInstrument ? Config.drumCount - 1 : Config.maxPitch });
+			const pitchStartNoteSlider: HTMLInputElement = HTML.input({ value: instrument.envelopes[envelopeIndex].pitchEnvelopeStart ? instrument.envelopes[envelopeIndex].pitchEnvelopeStart : 0, style: "width: 113px; margin-left: 0px;", type: "range", min: "0", max: instrument.isNoiseInstrument ? Config.drumCount-1 : Config.maxPitch, step: "1" });
+			const pitchStartNoteBox: HTMLInputElement = HTML.input({ value: instrument.envelopes[envelopeIndex].pitchEnvelopeStart ? instrument.envelopes[envelopeIndex].pitchEnvelopeStart : 0, style: "width: 4em; font-size: 80%; ", id: "startNoteBox", type: "number", step: "1", min: "0", max: instrument.isNoiseInstrument ? Config.drumCount - 1 : Config.maxPitch });
 
-			const endNoteSlider: HTMLInputElement = HTML.input({ value: instrument.envelopes[envelopeIndex].pitchEnvelopeEnd ? instrument.envelopes[envelopeIndex].pitchEnvelopeEnd : instrument.isNoiseInstrument ? Config.drumCount-1 : Config.maxPitch, style: "width: 113px; margin-left: 0px;", type: "range", min: "0", max: instrument.isNoiseInstrument ? Config.drumCount-1 : Config.maxPitch, step: "1" });
-			const endNoteBox: HTMLInputElement = HTML.input({ value: instrument.envelopes[envelopeIndex].pitchEnvelopeEnd ? instrument.envelopes[envelopeIndex].pitchEnvelopeEnd : instrument.isNoiseInstrument ? Config.drumCount-1 : Config.maxPitch, style: "width: 4em; font-size: 80%; ", id: "endNoteBox", type: "number", step: "1", min: "0", max: instrument.isNoiseInstrument ? Config.drumCount - 1 : Config.maxPitch });
+			const pitchEndNoteSlider: HTMLInputElement = HTML.input({ value: instrument.envelopes[envelopeIndex].pitchEnvelopeEnd ? instrument.envelopes[envelopeIndex].pitchEnvelopeEnd : instrument.isNoiseInstrument ? Config.drumCount-1 : Config.maxPitch, style: "width: 113px; margin-left: 0px;", type: "range", min: "0", max: instrument.isNoiseInstrument ? Config.drumCount-1 : Config.maxPitch, step: "1" });
+			const pitchEndNoteBox: HTMLInputElement = HTML.input({ value: instrument.envelopes[envelopeIndex].pitchEnvelopeEnd ? instrument.envelopes[envelopeIndex].pitchEnvelopeEnd : instrument.isNoiseInstrument ? Config.drumCount-1 : Config.maxPitch, style: "width: 4em; font-size: 80%; ", id: "endNoteBox", type: "number", step: "1", min: "0", max: instrument.isNoiseInstrument ? Config.drumCount - 1 : Config.maxPitch });
 
 			const invertBox: HTMLInputElement = HTML.input({ "checked": instrument.envelopes[envelopeIndex].inverse, type: "checkbox", style: "width: 1em; padding: 0.5em; margin-left: 4em;", id: "invertBox" });
 
@@ -464,15 +471,15 @@ export class EnvelopeEditor {
 			const lowerBoundSlider: HTMLInputElement = HTML.input({ value: instrument.envelopes[envelopeIndex].perEnvelopeLowerBound, type: "range", min: Config.perEnvelopeBoundMin, max: Config.perEnvelopeBoundMax, step: 0.1, style: "width: 113px; margin-left: 0px;" });
 			const upperBoundSlider: HTMLInputElement = HTML.input({ value: instrument.envelopes[envelopeIndex].perEnvelopeUpperBound, type: "range", min: Config.perEnvelopeBoundMin, max: Config.perEnvelopeBoundMax, step: 0.1, style: "width: 113px; margin-left: 0px;" });
 
-			const randomStepsBox: HTMLInputElement = HTML.input({ value: instrument.envelopes[envelopeIndex].steps, type: "number", min: 1, max: 16, step: 1, style: "width: 4em; font-size: 80%; " });
-			const randomSeedBox: HTMLInputElement = HTML.input({ value: instrument.envelopes[envelopeIndex].seed, type: "number", min: 1, max: 64, step: 1, style: "width: 4em; font-size: 80%; " });
-			const randomStepsSlider: HTMLInputElement = HTML.input({ value: instrument.envelopes[envelopeIndex].steps, type: "range", min: 1, max: 16, step: 1, style: "width: 113px; margin-left: 0px;" });
-			const randomSeedSlider: HTMLInputElement = HTML.input({ value: instrument.envelopes[envelopeIndex].seed, type: "range", min: 1, max: 64, step: 1, style: "width: 113px; margin-left: 0px;" });
+			const randomStepsBox: HTMLInputElement = HTML.input({ value: instrument.envelopes[envelopeIndex].steps, type: "number", min: 1, max: Config.randomEnvelopeStepsMax, step: 1, style: "width: 4em; font-size: 80%; " });
+			const randomSeedBox: HTMLInputElement = HTML.input({ value: instrument.envelopes[envelopeIndex].seed, type: "number", min: 1, max: Config.randomEnvelopeSeedMax, step: 1, style: "width: 4em; font-size: 80%; " });
+			const randomStepsSlider: HTMLInputElement = HTML.input({ value: instrument.envelopes[envelopeIndex].steps, type: "range", min: 1, max: Config.randomEnvelopeStepsMax, step: 1, style: "width: 113px; margin-left: 0px;" });
+			const randomSeedSlider: HTMLInputElement = HTML.input({ value: instrument.envelopes[envelopeIndex].seed, type: "range", min: 1, max: Config.randomEnvelopeSeedMax, step: 1, style: "width: 113px; margin-left: 0px;" });
 
-			const startNoteDisplay: HTMLSpanElement = HTML.span({ class: "tip", style: `width:68px; flex:1; height:1em; font-size: smaller;`, onclick: () => this._openPrompt("pitchRange") }, "Start " + this._pitchToNote(parseInt(startNoteBox.value), instrument.isNoiseInstrument) + ": ");
-			const endNoteDisplay: HTMLSpanElement = HTML.span({ class: "tip", style: `width:68px; flex:1; height:1em; font-size: smaller;`, onclick: () => this._openPrompt("pitchRange") }, "End " + this._pitchToNote(parseInt(endNoteBox.value), instrument.isNoiseInstrument) + ": ");
-			const startBoxWrapper: HTMLDivElement = HTML.div({ style: "flex: 1; display: flex; flex-direction: column; align-items: center;" }, startNoteDisplay, startNoteBox);
-			const endBoxWrapper: HTMLDivElement = HTML.div({ style: "flex: 1; display: flex; flex-direction: column; align-items: center;" }, endNoteDisplay, endNoteBox);
+			const pitchStartNoteDisplay: HTMLSpanElement = HTML.span({ class: "tip", style: `width:68px; flex:1; height:1em; font-size: smaller;`, onclick: () => this._openPrompt("pitchRange") }, "Start " + this._pitchToNote(parseInt(pitchStartNoteBox.value), instrument.isNoiseInstrument) + ": ");
+			const pitchEndNoteDisplay: HTMLSpanElement = HTML.span({ class: "tip", style: `width:68px; flex:1; height:1em; font-size: smaller;`, onclick: () => this._openPrompt("pitchRange") }, "End " + this._pitchToNote(parseInt(pitchEndNoteBox.value), instrument.isNoiseInstrument) + ": ");
+			const pitchStartBoxWrapper: HTMLDivElement = HTML.div({ style: "flex: 1; display: flex; flex-direction: column; align-items: center;" }, pitchStartNoteDisplay, pitchStartNoteBox);
+			const pitchEndBoxWrapper: HTMLDivElement = HTML.div({ style: "flex: 1; display: flex; flex-direction: column; align-items: center;" }, pitchEndNoteDisplay, pitchEndNoteBox);
 
 			const lowerBoundBoxWrapper: HTMLDivElement = HTML.div({ style: "flex: 1; display: flex; flex-direction: column; align-items: center;" }, HTML.span({ class: "tip", style: `width:68px; flex:1; height:1em; font-size: smaller;`, onclick: () => this._openPrompt("envelopeRange") }, "Lwr bnd: "), lowerBoundBox);
 			const upperBoundBoxWrapper: HTMLDivElement = HTML.div({ style: "flex: 1; display: flex; flex-direction: column; align-items: center;" }, HTML.span({ class: "tip", style: `width:68px; flex:1; height:1em; font-size: smaller;`, onclick: () => this._openPrompt("envelopeRange") }, "Upr bnd: "), upperBoundBox);
@@ -481,8 +488,8 @@ export class EnvelopeEditor {
 			const randomSeedBoxWrapper: HTMLDivElement = HTML.div({ style: "flex: 1; display: flex; flex-direction: column; align-items: center;" }, HTML.span({ class: "tip", style: `width:68px; flex:1; height:1em; font-size: smaller;`, onclick: () => this._openPrompt("randomSeed") }, "Seed: "), randomSeedBox);
 
 
-			const startNoteWrapper: HTMLDivElement = HTML.div({ style: "margin-top: 3px; flex:1; display:flex; flex-direction: row; align-items:center; justify-content:right;" }, startBoxWrapper, startNoteSlider);
-			const endNoteWrapper: HTMLDivElement = HTML.div({ style: "margin-top: 3px; flex:1; display:flex; flex-direction: row; align-items:center; justify-content:right;" }, endBoxWrapper, endNoteSlider);
+			const pitchStartNoteWrapper: HTMLDivElement = HTML.div({ style: "margin-top: 3px; flex:1; display:flex; flex-direction: row; align-items:center; justify-content:right;" }, pitchStartBoxWrapper, pitchStartNoteSlider);
+			const pitchEndNoteWrapper: HTMLDivElement = HTML.div({ style: "margin-top: 3px; flex:1; display:flex; flex-direction: row; align-items:center; justify-content:right;" }, pitchEndBoxWrapper, pitchEndNoteSlider);
 			const invertWrapper: HTMLDivElement = HTML.div({ style: "margin: 0.5em; align-items:center; justify-content:right;" }, HTML.span({ class: "tip", onclick: () => this._openPrompt("envelopeInvert") }, "Invert: "), invertBox);
 			
 			const lowerBoundWrapper: HTMLDivElement = HTML.div({ style: "margin-top: 3px; flex:1; display:flex; flex-direction: row; align-items:center; justify-content:right;" }, lowerBoundBoxWrapper, lowerBoundSlider);
@@ -492,7 +499,7 @@ export class EnvelopeEditor {
 			const randomSeedWrapper: HTMLDivElement = HTML.div({ style: "margin-top: 3px; flex:1; display:flex; flex-direction: row; align-items:center; justify-content:right;" }, randomSeedBoxWrapper, randomSeedSlider);
 
 			const randomTypeSelect: HTMLSelectElement = HTML.select({ style: "width: 117px;" });
-			const randomNames: string[] = ["time", "pitch"];
+			const randomNames: string[] = ["time", "pitch", "note", "time smooth"];
 			for (let waveform: number = 0; waveform < RandomEnvelopeTypes.length; waveform++) {
 				randomTypeSelect.appendChild(HTML.option({ value: waveform }, randomNames[waveform]));
 			}
@@ -529,7 +536,7 @@ export class EnvelopeEditor {
 			
 			const copyPasteContainer: HTMLDivElement = HTML.div({ class: "editor-controls", style: "margin: 0.5em; display: flex; flex-direction:row; align-items:center;" }, envelopeCopyButton, envelopePasteButton);
 			
-			const extraPitchSettingsGroup: HTMLDivElement = HTML.div({ class: "editor-controls", style: "flex-direction:column; align-items:center;" }, startNoteWrapper, endNoteWrapper);
+			const extraPitchSettingsGroup: HTMLDivElement = HTML.div({ class: "editor-controls", style: "flex-direction:column; align-items:center;" }, pitchStartNoteWrapper, pitchEndNoteWrapper);
 			extraPitchSettingsGroup.style.display = "none";
 			
 			const extraSettingsDropdown: HTMLButtonElement = HTML.button({ style: "margin-left:0em; margin-right: 0.3em; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: () => { const instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()]; this._extraSettingsDropdown(DropdownID.EnvelopeSettings, envelopeIndex, Config.newEnvelopes[instrument.envelopes[envelopeIndex].envelope].name); } }, "▼");
@@ -558,34 +565,41 @@ export class EnvelopeEditor {
 			this._targetSelects[envelopeIndex] = targetSelect;
 			this._envelopeSelects[envelopeIndex] = envelopeSelect;
 			this._deleteButtons[envelopeIndex] = deleteButton;
+
 			this.extraSettingsDropdowns[envelopeIndex] = extraSettingsDropdown;
 			this.extraSettingsDropdownGroups[envelopeIndex] = extraSettingsDropdownGroup;
-			this.extraPitchSettingsGroups[envelopeIndex] = extraPitchSettingsGroup;
-			this._pitchStartSliders[envelopeIndex] = startNoteSlider;
-			this.pitchStartBoxes[envelopeIndex] = startNoteBox;
-			this._pitchEndSliders[envelopeIndex] = endNoteSlider;
-			this.pitchEndBoxes[envelopeIndex] = endNoteBox;
 			this._inverters[envelopeIndex] = invertBox;
-			this._startNoteDisplays[envelopeIndex] = startNoteDisplay;
-			this._endNoteDisplays[envelopeIndex] = endNoteDisplay;
-			this._perEnvelopeSpeedDisplays[envelopeIndex] = perEnvelopeSpeedDisplay;
-			this._perEnvelopeSpeedSliders[envelopeIndex] = perEnvelopeSpeedSlider;
-			this.perEnvelopeSpeedGroups[envelopeIndex] = perEnvelopeSpeedGroup;
 			this.perEnvelopeLowerBoundBoxes[envelopeIndex] = lowerBoundBox;
 			this.perEnvelopeUpperBoundBoxes[envelopeIndex] = upperBoundBox;
 			this._perEnvelopeLowerBoundSliders[envelopeIndex] = lowerBoundSlider;
 			this._perEnvelopeUpperBoundSliders[envelopeIndex] = upperBoundSlider;
+
+			this._perEnvelopeSpeedDisplays[envelopeIndex] = perEnvelopeSpeedDisplay;
+			this._perEnvelopeSpeedSliders[envelopeIndex] = perEnvelopeSpeedSlider;
+			this.perEnvelopeSpeedGroups[envelopeIndex] = perEnvelopeSpeedGroup;
+			
+
+			this.extraPitchSettingsGroups[envelopeIndex] = extraPitchSettingsGroup;
+			this._pitchStartSliders[envelopeIndex] = pitchStartNoteSlider;
+			this.pitchStartBoxes[envelopeIndex] = pitchStartNoteBox;
+			this._pitchEndSliders[envelopeIndex] = pitchEndNoteSlider;
+			this.pitchEndBoxes[envelopeIndex] = pitchEndNoteBox;
+			this._startNoteDisplays[envelopeIndex] = pitchStartNoteDisplay;
+			this._endNoteDisplays[envelopeIndex] = pitchEndNoteDisplay;
+
+			this.extraRandomSettingsGroups[envelopeIndex] = extraRandomSettingsGroup;
 			this.randomStepsBoxes[envelopeIndex] = randomStepsBox;
 			this.randomSeedBoxes[envelopeIndex] = randomSeedBox;
 			this._randomStepsSliders[envelopeIndex] = randomStepsSlider;
 			this._randomSeedSliders[envelopeIndex] = randomSeedSlider;
 			this._randomStepsWrappers[envelopeIndex] = randomStepsWrapper;
 			this._randomEnvelopeTypeSelects[envelopeIndex] = randomTypeSelect;
-			this.extraRandomSettingsGroups[envelopeIndex] = extraRandomSettingsGroup;
+
+			this.extraLFODropdownGroups[envelopeIndex] = extraLFOSettingsGroup;
+			this._waveformSelects[envelopeIndex] = waveformSelect;
+
 			this._envelopeCopyButtons[envelopeIndex] = envelopeCopyButton;
 			this._envelopePasteButtons[envelopeIndex] = envelopePasteButton;
-			this._waveformSelects[envelopeIndex] = waveformSelect;
-			this.extraLFODropdownGroups[envelopeIndex] = extraLFOSettingsGroup;
 		}
 
 		for (let envelopeIndex: number = this._renderedEnvelopeCount; envelopeIndex < instrument.envelopeCount; envelopeIndex++) {

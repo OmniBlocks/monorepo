@@ -1534,13 +1534,13 @@ export class EnvelopeSettings {
         }
 
         if (envelopeObject["perEnvelopeLowerBound"] != undefined) {
-            this.perEnvelopeLowerBound = envelopeObject["perEnvelopeLowerBound"];
+            this.perEnvelopeLowerBound = clamp(Config.perEnvelopeBoundMin, Config.perEnvelopeBoundMax + 1, envelopeObject["perEnvelopeLowerBound"]);
         } else {
             this.perEnvelopeLowerBound = 0;
         }
 
         if (envelopeObject["perEnvelopeUpperBound"] != undefined) {
-            this.perEnvelopeUpperBound = envelopeObject["perEnvelopeUpperBound"];
+            this.perEnvelopeUpperBound = clamp(Config.perEnvelopeBoundMin, Config.perEnvelopeBoundMax + 1, envelopeObject["perEnvelopeUpperBound"]);
         } else {
             this.perEnvelopeUpperBound = 1;
         }
@@ -1557,13 +1557,13 @@ export class EnvelopeSettings {
         }
 
         if (envelopeObject["steps"] != undefined) {
-            this.steps = envelopeObject["steps"];
+            this.steps = clamp(1, Config.randomEnvelopeStepsMax + 1, envelopeObject["steps"]);
         } else {
             this.steps = 2;
         }
 
         if (envelopeObject["seed"] != undefined) {
-            this.seed = envelopeObject["seed"];
+            this.seed = clamp(1, Config.randomEnvelopeSeedMax + 1, envelopeObject["seed"]);
         } else {
             this.seed = 2;
         }
@@ -5716,9 +5716,9 @@ export class Song {
                             if (Config.newEnvelopes[envelope].name == "lfo") { 
                                 waveform = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                             } else if (Config.newEnvelopes[envelope].name == "random") {
-                                steps = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
-                                seed = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
-                                waveform = base64CharCodeToInt[compressed.charCodeAt(charIndex++)]; //we use waveform for the random type
+                                steps = clamp(1, Config.randomEnvelopeStepsMax + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                                seed = clamp(1, Config.randomEnvelopeSeedMax + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                                waveform = base64CharCodeToInt[compressed.charCodeAt(charIndex++)]; //we use waveform for the random type as well
                             }
                         } 
                         if (fromSlarmoosBox && !beforeThree) {
@@ -5740,7 +5740,7 @@ export class Song {
                             perEnvelopeLowerBound = base64CharCodeToInt[compressed.charCodeAt(charIndex++)]/10;
                             perEnvelopeUpperBound = base64CharCodeToInt[compressed.charCodeAt(charIndex++)]/10;
                         }
-                        if (!fromSlarmoosBox || beforeFour) {
+                        if (!fromSlarmoosBox || beforeFour) { //update tremolo2
                             if (isTremolo2) {
                                 waveform = BaseWaveTypes.sine;
                                 if (envelopeInverse) {
@@ -7911,6 +7911,24 @@ class EnvelopeComputer {
                         } else {
                             return boundAdjust * pitchHash / (hashMax + 1) + perEnvelopeLowerBound;
                         }
+                    // case RandomEnvelopeTypes.note:
+                    //     const step: number = steps;
+                    //     if (step <= 1) return 1;
+                    //     const timeHash: number = xxHash32((perEnvelopeSpeed == 0 ? 0 : Math.floor((timeSinceStart * perEnvelopeSpeed) / (256))) + "", seed);
+                    //     if (inverse) {
+                    //         return perEnvelopeUpperBound - boundAdjust * (step / (step - 1)) * Math.floor(timeHash * step / (hashMax + 1)) / step;
+                    //     } else {
+                    //         return boundAdjust * (step / (step - 1)) * Math.floor(timeHash * (step) / (hashMax + 1)) / step + perEnvelopeLowerBound;
+                    //     }
+                    // case RandomEnvelopeTypes.timeSmooth:
+                    //     const step: number = steps;
+                    //     if (step <= 1) return 1;
+                    //     const timeHash: number = xxHash32((perEnvelopeSpeed == 0 ? 0 : Math.floor((timeSinceStart * perEnvelopeSpeed) / (256))) + "", seed);
+                    //     if (inverse) {
+                    //         return perEnvelopeUpperBound - boundAdjust * (step / (step - 1)) * Math.floor(timeHash * step / (hashMax + 1)) / step;
+                    //     } else {
+                    //         return boundAdjust * (step / (step - 1)) * Math.floor(timeHash * (step) / (hashMax + 1)) / step + perEnvelopeLowerBound;
+                    //     }
                     default: throw new Error("Unrecognized operator envelope waveform type: " + waveform);
                 }
             case EnvelopeType.twang:

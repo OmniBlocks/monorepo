@@ -24,8 +24,11 @@ const DEFINITELY_EXECUTABLE = [
     'appxbundle',
     'reg',
     'iso',
+    'drv',
+    'sys',
 
     // Mac executable formats
+    'app',
     'dmg',
     'pkg',
 
@@ -60,6 +63,7 @@ const DEFINITELY_EXECUTABLE = [
     'asp',
     'vbs',
     'vbe',
+    'ws',
     'wsf',
     'wsc',
     'ahk',
@@ -80,7 +84,7 @@ const DEFINITELY_EXECUTABLE = [
     // Unix scripting languages
     'sh',
 
-    // Common languages with interpreters that could be executed by double clicking on the file
+    // Common cross-platform languages with interpreters that could be executed by double clicking on the file
     'js',
     'py'
 ];

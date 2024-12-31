@@ -621,7 +621,7 @@ export class TipPrompt implements Prompt {
 			case "randomEnvelopeType": {
 				message = div(
 					h2("Random Envelope Type"),
-					p("Random Envelopes can switch between being determined by the time in the song or the pitch of the note."),
+					p("Random Envelopes can switch between being determined by the time in the song, the pitch of the note, or per note trigger."),
 				);
 			} break;
 

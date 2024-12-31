@@ -329,6 +329,7 @@ export class EnvelopeEditor {
 				} else if (Config.newEnvelopes[instrument.envelopes[i].envelope].name == "random") {
 					
 					//update values
+					const isRandomTime: boolean = instrument.envelopes[i].waveform == RandomEnvelopeTypes.time || instrument.envelopes[i].waveform == RandomEnvelopeTypes.timeSmooth;
 					this.randomStepsBoxes[i].value = instrument.envelopes[i].steps.toString();
 					this.randomSeedBoxes[i].value = instrument.envelopes[i].seed.toString();
 					this._randomStepsSliders[i].value = instrument.envelopes[i].steps.toString();
@@ -336,11 +337,10 @@ export class EnvelopeEditor {
 					this._perEnvelopeSpeedSliders[i].value = this.convertIndexSpeed(instrument.envelopes[i].perEnvelopeSpeed, "index").toString();
 					this._perEnvelopeSpeedDisplays[i].textContent = "Spd: x" + prettyNumber(this.convertIndexSpeed(parseFloat(this._perEnvelopeSpeedSliders[i].value), "speed"));
 					if (instrument.envelopes[i].waveform > RandomEnvelopeTypes.length) instrument.envelopes[i].waveform = 0;
-					this._randomStepsWrappers[i].style.display = instrument.envelopes[i].waveform == RandomEnvelopeTypes.time ? "flex" : "none";
+					this._randomStepsWrappers[i].style.display = instrument.envelopes[i].waveform == RandomEnvelopeTypes.time || instrument.envelopes[i].waveform == RandomEnvelopeTypes.note ? "flex" : "none";
 					this._randomEnvelopeTypeSelects[i].selectedIndex = instrument.envelopes[i].waveform;
 					
 					//hide other dropdown groups, show perEnvelopeSpeed
-					const isRandomTime: boolean = instrument.envelopes[i].waveform == RandomEnvelopeTypes.time || instrument.envelopes[i].waveform == RandomEnvelopeTypes.timeSmooth;
 					this.perEnvelopeSpeedGroups[i].style.display = isRandomTime ? "" : "none";
 					this.extraSettingsDropdownGroups[i].style.display = "flex";
 					this.extraSettingsDropdowns[i].style.display = "inline";

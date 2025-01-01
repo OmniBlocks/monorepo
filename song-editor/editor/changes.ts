@@ -1059,8 +1059,6 @@ export class ChangeRandomGeneratedInstrument extends Change {
                     // { item: "custom", weight: 10 },
                 ])].index;
                 /* randomly generated unisons don't work correctly - instead of trying to fix them, just ignore it
-                   it's likely that for randomly generated custom unisons, they'd need to be heavily biased/follow
-                   algorithms to sound somewhat useful on most cases, otherwise its useless to include.
 
                 if (instrument.unison == Config.unisons.length) {
                     instrument.unisonVoices = 2;

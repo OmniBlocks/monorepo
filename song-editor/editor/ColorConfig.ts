@@ -2891,8 +2891,8 @@ export class ColorConfig {
 
 --pitch4-secondary-channel: #139620;
 --pitch4-primary-channel:   #25ff3a;
---pitch4-secondary-note:    #139620;
---pitch4-primary-note:      #25ff3a;
+--pitch4-secondary-note:    #21FF33;
+--pitch4-primary-note:      #C0FFB5;
 
 --pitch5-secondary-channel: #0099A1;
 --pitch5-primary-channel:   #25F3FF;
@@ -5204,7 +5204,7 @@ export class ColorConfig {
 			--mod-label-primary: #a773e5;
 			--mod-label-secondary-text: #6b29bf;
 			--mod-label-primary-text: #14051a;
-			--mod-title: #2e0e51;
+			--mod-title: #247d1d;
 			--pitch-secondary-channel-hue: 100;
 			--pitch-secondary-channel-hue-scale: 6.1;
 			--pitch-secondary-channel-sat: 100.0;

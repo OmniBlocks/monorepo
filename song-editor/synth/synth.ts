@@ -4087,10 +4087,10 @@ export class Song {
 			let newRhythm = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];	
 			this.rhythm = clamp(0, Config.rhythms.length, newRhythm + 2);
 			if (fromJummBox && beforeThree || fromBeepBox) {
-				if (this.rhythm == Config.rhythms.dictionary["÷3 (triplets)"].index || this.rhythm == Config.rhythms.dictionary["÷6 (sextuplets)"].index) {
+				if (this.rhythm == Config.rhythms.dictionary["÷3 (triplets)"].index || this.rhythm == Config.rhythms.dictionary["÷6"].index) {
 					useSlowerArpSpeed = true;
 				}
-				if (this.rhythm >= Config.rhythms.dictionary["÷6 (sextuplets)"].index) {
+				if (this.rhythm >= Config.rhythms.dictionary["÷6"].index) {
 					// @TODO: This assumes that 6 and 8 are in that order, but
 					// if someone reorders Config.rhythms that may not be true,
 					// so this check probably should instead look for those

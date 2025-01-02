@@ -5222,7 +5222,7 @@ export class ChangeRandomEnvelopeSteps extends Change {
         const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
         const oldSteps: number = instrument.envelopes[index].steps;
         if (oldSteps != steps) {
-            steps = steps > 64 ? 64 : steps < 1 ? 2 : Math.round(steps) != steps ? 2 : steps;
+            steps = steps > Config.randomEnvelopeStepsMax ? Config.randomEnvelopeStepsMax : steps < 1 ? 2 : Math.floor(steps);
             instrument.envelopes[index].steps = steps;
             instrument.preset = instrument.type;
             doc.notifier.changed();
@@ -5237,9 +5237,9 @@ export class ChangeRandomEnvelopeSeed extends Change {
         const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
         const oldSeed: number = instrument.envelopes[index].seed;
         if (oldSeed != seed) {
-            seed = seed > 64 ? 64 : seed < 1 ? 2 : Math.round(seed) != seed ? 2 : seed;
+            seed = seed > Config.randomEnvelopeSeedMax ? Config.randomEnvelopeSeedMax : seed < 1 ? 2 : Math.floor(seed);
             instrument.envelopes[index].seed = seed;
-            instrument.preset = instrument.type;
+            //changing the seed does not change the preset
             doc.notifier.changed();
             this._didSomething();
         }

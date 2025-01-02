@@ -255,7 +255,6 @@ export class SpectrumEditor {
     public resetToInitial() {
         this._changeQueue = [];
         this._undoHistoryState = 0;
-        //this.setSpectrumWave(this._initial.spectrum, false);
     }
 
     public render(): void {
@@ -353,7 +352,6 @@ export class SpectrumEditorPrompt implements Prompt {
         this.copyButton.addEventListener("click", this._copySettings);
         this.pasteButton.addEventListener("click", this._pasteSettings);
         this._playButton.addEventListener("click", this._togglePlay);
-        //this.spectrumEditor.container.addEventListener("mousemove", () => this.spectrumEditor.render());
         this.container.addEventListener("mousemove", () => {
             this.spectrumEditor.render(); this.spectrumEditors[this._drumsetSpectrumIndex].setSpectrumWave(this.spectrumEditor.getSpectrumWave().spectrum);
         });
@@ -395,14 +393,12 @@ export class SpectrumEditorPrompt implements Prompt {
             this.spectrumEditor.render();
     }
 
-    private _setDrumSpectrum = (index: number/*, useHistory: boolean = true, doSwap: boolean = true*/): void => {
+    private _setDrumSpectrum = (index: number): void => {
         this._drumsetButtons[this._drumsetSpectrumIndex] .classList.remove("selected-instrument");
-        //if (doSwap) this.swapDrumsetSpectrums(this._drumsetSpectrumIndex, index, useHistory);
         this.spectrumEditors[this._drumsetSpectrumIndex].setSpectrumWave(this.spectrumEditor.getSpectrumWave().spectrum);
 
         this._drumsetSpectrumIndex = index;
         this._drumsetButtons[index].classList.add("selected-instrument");
-        //this.spectrumEditor = new SpectrumEditor(this._doc, this._drumsetSpectrumIndex, true);
         this.spectrumEditor.setSpectrumWave(this.spectrumEditors[this._drumsetSpectrumIndex].getSpectrumWave().spectrum);
         this.spectrumEditor.render();
     }
@@ -427,9 +423,6 @@ export class SpectrumEditorPrompt implements Prompt {
     }
 
     private _close = (): void => {
-        // for (let i = 0; i < this.spectrumEditors.length; i++) {
-        //     this.spectrumEditors[i].resetToInitial();
-        // }
         this._doc.prompt = null;
         this._doc.undo();
     }

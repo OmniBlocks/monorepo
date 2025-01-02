@@ -7710,8 +7710,7 @@ class EnvelopeComputer {
             const startPin: NotePin = tone.note.pins[endPinIndex - 1];
             const endPin: NotePin = tone.note.pins[endPinIndex];
             const startPinTick = (tone.note.start + startPin.time) * Config.ticksPerPart;
-            //unsure about including slide transitions here..
-            if (this.startPinTickAbsolute == null  || !(transition.continues || transition.slides)) this.startPinTickAbsolute = startPinTick + synth.computeTicksSinceStart(true); //for random per note
+            if (this.startPinTickAbsolute == null || (!(transition.continues || transition.slides)) && tone.passedEndOfNote) this.startPinTickAbsolute = startPinTick + synth.computeTicksSinceStart(true); //for random per note
             const endPinTick: number = (tone.note.start + endPin.time) * Config.ticksPerPart;
             const ratioStart: number = (tickTimeStartReal - startPinTick) / (endPinTick - startPinTick);
             const ratioEnd: number = (tickTimeEndReal - startPinTick) / (endPinTick - startPinTick);
@@ -7919,6 +7918,7 @@ class EnvelopeComputer {
                             return boundAdjust * pitchHash / (hashMax + 1) + perEnvelopeLowerBound;
                         }
                     case RandomEnvelopeTypes.note:
+                        if (step <= 1) return 1;
                         const noteHash: number = xxHash32(notePinStart + "", seed);
                         if (inverse) {
                             return perEnvelopeUpperBound - boundAdjust * (step / (step - 1)) * Math.floor(noteHash * step / (hashMax + 1)) / step;
@@ -7926,7 +7926,6 @@ class EnvelopeComputer {
                             return boundAdjust * (step / (step - 1)) * Math.floor(noteHash * (step) / (hashMax + 1)) / step + perEnvelopeLowerBound;
                         }
                     case RandomEnvelopeTypes.timeSmooth:
-                        if (step <= 1) return 1;
                         const timeHashA: number = xxHash32((perEnvelopeSpeed == 0 ? 0 : Math.floor((timeSinceStart * perEnvelopeSpeed) / (256))) + "", seed);
                         const timeHashB: number = xxHash32((perEnvelopeSpeed == 0 ? 0 : Math.floor((timeSinceStart * perEnvelopeSpeed + 256) / (256))) + "", seed);
                         const weightedAverage: number = timeHashA * (1 - ((timeSinceStart * perEnvelopeSpeed) / (256)) % 1) + timeHashB * (((timeSinceStart * perEnvelopeSpeed) / (256)) % 1);

@@ -16087,7 +16087,7 @@ var beepbox = (function (exports) {
                 const startPin = tone.note.pins[endPinIndex - 1];
                 const endPin = tone.note.pins[endPinIndex];
                 const startPinTick = (tone.note.start + startPin.time) * Config.ticksPerPart;
-                if (this.startPinTickAbsolute == null || !(transition.continues || transition.slides))
+                if (this.startPinTickAbsolute == null || (!(transition.continues || transition.slides)) && tone.passedEndOfNote)
                     this.startPinTickAbsolute = startPinTick + synth.computeTicksSinceStart(true);
                 const endPinTick = (tone.note.start + endPin.time) * Config.ticksPerPart;
                 const ratioStart = (tickTimeStartReal - startPinTick) / (endPinTick - startPinTick);
@@ -16290,6 +16290,8 @@ var beepbox = (function (exports) {
                                 return boundAdjust * pitchHash / (hashMax + 1) + perEnvelopeLowerBound;
                             }
                         case 2:
+                            if (step <= 1)
+                                return 1;
                             const noteHash = xxHash32(notePinStart + "", seed);
                             if (inverse) {
                                 return perEnvelopeUpperBound - boundAdjust * (step / (step - 1)) * Math.floor(noteHash * step / (hashMax + 1)) / step;
@@ -16298,8 +16300,6 @@ var beepbox = (function (exports) {
                                 return boundAdjust * (step / (step - 1)) * Math.floor(noteHash * (step) / (hashMax + 1)) / step + perEnvelopeLowerBound;
                             }
                         case 3:
-                            if (step <= 1)
-                                return 1;
                             const timeHashA = xxHash32((perEnvelopeSpeed == 0 ? 0 : Math.floor((timeSinceStart * perEnvelopeSpeed) / (256))) + "", seed);
                             const timeHashB = xxHash32((perEnvelopeSpeed == 0 ? 0 : Math.floor((timeSinceStart * perEnvelopeSpeed + 256) / (256))) + "", seed);
                             const weightedAverage = timeHashA * (1 - ((timeSinceStart * perEnvelopeSpeed) / (256)) % 1) + timeHashB * (((timeSinceStart * perEnvelopeSpeed) / (256)) % 1);

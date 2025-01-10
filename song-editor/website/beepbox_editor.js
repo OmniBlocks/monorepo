@@ -18075,7 +18075,7 @@ li.select2-results__option[role=group] > strong:hover {
                         usedNoteSize = true;
                 }
                 const defaultPitch = this.getPitchValue(instrument, tone, instrumentState, false);
-                const pitch = this.computePitchEnvelope(instrument, envelopeIndex, defaultPitch);
+                const pitch = this.computePitchEnvelope(instrument, envelopeIndex, this.getPitchValue(instrument, tone, instrumentState, true));
                 if (automationTarget.computeIndex != null) {
                     const computeIndex = automationTarget.computeIndex + targetIndex;
                     let envelopeStart = EnvelopeComputer.computeEnvelope(envelope, envelopeSpeed, noteSecondsStartUnscaled, noteSecondsStart[envelopeIndex], beatTimeStart[envelopeIndex], timeSinceStart, noteSizeStart, pitch, inverse, perEnvelopeLowerBound, perEnvelopeUpperBound, false, steps, seed, waveform, defaultPitch, startPinTickAbsolute);

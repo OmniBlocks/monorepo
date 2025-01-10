@@ -7806,7 +7806,7 @@ class EnvelopeComputer {
                 if (envelope.type == EnvelopeType.noteSize) usedNoteSize = true;
             }
             const defaultPitch: number = this.getPitchValue(instrument, tone, instrumentState, false);
-            const pitch: number = this.computePitchEnvelope(instrument, envelopeIndex, defaultPitch);
+            const pitch: number = this.computePitchEnvelope(instrument, envelopeIndex, this.getPitchValue(instrument, tone, instrumentState, true));
             if (automationTarget.computeIndex != null) {
                 const computeIndex: number = automationTarget.computeIndex + targetIndex;
                 let envelopeStart: number = EnvelopeComputer.computeEnvelope(envelope, envelopeSpeed, noteSecondsStartUnscaled, noteSecondsStart[envelopeIndex], beatTimeStart[envelopeIndex], timeSinceStart, noteSizeStart, pitch, inverse, perEnvelopeLowerBound, perEnvelopeUpperBound, false, steps, seed, waveform, defaultPitch, startPinTickAbsolute);

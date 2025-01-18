@@ -1621,7 +1621,7 @@ var beepbox = (function (exports) {
             return (_a = EditorConfig.presetCategories[0].presets.dictionary) === null || _a === void 0 ? void 0 : _a[TypePresets === null || TypePresets === void 0 ? void 0 : TypePresets[instrument]];
         }
     }
-    EditorConfig.version = "1.3.6";
+    EditorConfig.version = "1.3.7";
     EditorConfig.versionDisplayName = "Slarmoo's Box " + EditorConfig.version;
     EditorConfig.releaseNotesURL = "./patch_notes.html";
     EditorConfig.isOnMac = /^Mac/i.test(navigator.platform) || /Mac OS X/i.test(navigator.userAgent) || /^(iPhone|iPad|iPod)/i.test(navigator.platform) || /(iPhone|iPad|iPod)/i.test(navigator.userAgent);
@@ -8267,13 +8267,14 @@ var beepbox = (function (exports) {
 		  --disabled-note-primary: #3a3a3a;
 		  --disabled-note-secondary: #000;
 			}
-		/* replaces hotdog (in a hacky way) with an image of the girls using the same scratch sprites from the 404 page*/
-		.instructions-column > section:first-of-type > p:first-of-type:after {
-		display: block;
-		content: url("theme_resources/AzurLaneThemeStarterSquad.png");
-		width: 100%;
-		text-align: center;
-		margin-top: 25px;
+		/* replaces hotdog with an image of the girls using the same scratch sprites from the 404 page*/
+		#Hotdog {
+			display: inline !important;
+			content: url("theme_resources/AzurLaneThemeStarterSquad.png") !important;
+			width: 75%;
+			height: 75%;
+			text-align: center;
+			margin-top: 25px;
 		}
 		/* sets cursor */
 		* {
@@ -14965,12 +14966,12 @@ li.select2-results__option[role=group] > strong:hover {
                                     }
                                 }
                             }
-                            else if ((fromSlarmoosBox && beforeFour) || (fromUltraBox && beforeSix)) {
+                            else if ((fromSlarmoosBox && beforeFour) || (fromUltraBox && beforeFive)) {
                                 const rhythmMap = [1, 1, 0, 1, 2, 3, 4, 5];
-                                this.rhythm = rhythmMap[base64CharCodeToInt[compressed.charCodeAt(charIndex++)]];
+                                this.rhythm = clamp(0, Config.rhythms.length, rhythmMap[base64CharCodeToInt[compressed.charCodeAt(charIndex++)]]);
                             }
                             else {
-                                this.rhythm = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                                this.rhythm = clamp(0, Config.rhythms.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                             }
                         }
                         break;
@@ -16146,25 +16147,25 @@ li.select2-results__option[role=group] > strong:hover {
                                     let waveform = 0;
                                     if (fromSlarmoosBox && !beforeFour) {
                                         if (Config.newEnvelopes[envelope].name == "lfo") {
-                                            waveform = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                                            waveform = clamp(0, 4, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                                         }
                                         else if (Config.newEnvelopes[envelope].name == "random") {
                                             steps = clamp(1, Config.randomEnvelopeStepsMax + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                                             seed = clamp(1, Config.randomEnvelopeSeedMax + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
-                                            waveform = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                                            waveform = clamp(0, 4, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                                         }
                                     }
                                     if (fromSlarmoosBox && !beforeThree) {
                                         if (Config.newEnvelopes[envelope].name == "pitch") {
                                             if (!instrument.isNoiseInstrument) {
                                                 let pitchEnvelopeCompact = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
-                                                pitchEnvelopeStart = pitchEnvelopeCompact * 64 + base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                                                pitchEnvelopeStart = clamp(0, Config.maxPitch, pitchEnvelopeCompact * 64 + base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                                                 pitchEnvelopeCompact = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
-                                                pitchEnvelopeEnd = pitchEnvelopeCompact * 64 + base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                                                pitchEnvelopeEnd = clamp(0, Config.maxPitch, pitchEnvelopeCompact * 64 + base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                                             }
                                             else {
-                                                pitchEnvelopeStart = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
-                                                pitchEnvelopeEnd = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                                                pitchEnvelopeStart = clamp(0, Config.drumCount - 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                                                pitchEnvelopeEnd = clamp(0, Config.drumCount - 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                                             }
                                         }
                                         envelopeInverse = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] == 1 ? true : false;
@@ -39263,7 +39264,6 @@ You should be redirected to the song at:<br /><br />
                         let colorSecondary = (disabled ? ColorConfig.disabledNoteSecondary : ColorConfig.getChannelColor(this._doc.song, this._doc.channel).secondaryNote);
                         notePath.setAttribute("fill", colorSecondary);
                         notePath.setAttribute("pointer-events", "none");
-                        notePath.setAttribute("class", "note-secondary");
                         this._drawNote(notePath, pitch, note.start, note.pins, (this._pitchHeight - this._pitchBorder) / 2 + 1, false, this._octaveOffset);
                         this._svgNoteContainer.appendChild(notePath);
                         notePath = SVG.path();
@@ -39271,7 +39271,6 @@ You should be redirected to the song at:<br /><br />
                         notePath.setAttribute("pointer-events", "none");
                         this._drawNote(notePath, pitch, note.start, note.pins, (this._pitchHeight - this._pitchBorder) / 2 + 1, true, this._octaveOffset);
                         this._svgNoteContainer.appendChild(notePath);
-                        notePath.setAttribute("class", "note-primary");
                         if (this._doc.prefs.notesFlashWhenPlayed && !disabled) {
                             notePath = SVG.path();
                             notePath.setAttribute("fill", noteFlashColor);
@@ -40692,7 +40691,123 @@ You should be redirected to the song at:<br /><br />
             this._pattern3 = _pattern3;
             this._fileInput = input$4({ type: "file", accept: "image/*", text: "choose editor background image" });
             this._fileInput2 = input$4({ type: "file", accept: "image/*", text: "choose website background image" });
-            this._colorInput = input$4({ type: "text", value: localStorage.getItem("customColors") || `:root {  }` });
+            this._colorInput = input$4({ type: "text", value: localStorage.getItem("customColors") || `:root {
+	--page-margin: black;
+	--editor-background: black;
+	--hover-preview: white;
+	--playhead: white;
+	--primary-text: white;
+	--secondary-text: #999;
+	--inverted-text: black;
+	--text-selection: rgba(119,68,255,0.99);
+	--box-selection-fill: rgba(255,255,255,0.2);
+	--loop-accent: #74f;
+	--link-accent: #98f;
+	--ui-widget-background: #444;
+	--ui-widget-focus: #777;
+	--pitch-background: #444;
+	--tonic: #864;
+	--fifth-note: #468;
+	--white-piano-key: #bbb;
+	--black-piano-key: #444;
+	--white-piano-key-text: #131200;
+	--black-piano-key-text: #fff;
+	--use-color-formula: false;
+	--track-editor-bg-pitch: #444;
+	--track-editor-bg-pitch-dim: #333;
+	--track-editor-bg-noise: #444;
+	--track-editor-bg-noise-dim: #333;
+	--track-editor-bg-mod: #234;
+	--track-editor-bg-mod-dim: #123;
+	--multiplicative-mod-slider: #456;
+	--overwriting-mod-slider: #654;
+	--indicator-primary: #74f;
+	--indicator-secondary: #444;
+	--select2-opt-group: #585858;
+	--input-box-outline: #333;
+	--mute-button-normal: #ffa033;
+	--mute-button-mod: #9a6bff;
+	--pitch1-secondary-channel: #0099A1;
+	--pitch1-primary-channel:   #25F3FF;
+	--pitch1-secondary-note:    #00BDC7;
+	--pitch1-primary-note:      #92F9FF;
+	--pitch2-secondary-channel: #A1A100;
+	--pitch2-primary-channel:   #FFFF25;
+	--pitch2-secondary-note:    #C7C700;
+	--pitch2-primary-note:      #FFFF92;
+	--pitch3-secondary-channel: #C75000;
+	--pitch3-primary-channel:   #FF9752;
+	--pitch3-secondary-note:    #FF771C;
+	--pitch3-primary-note:      #FFCDAB;
+	--pitch4-secondary-channel: #00A100;
+	--pitch4-primary-channel:   #50FF50;
+	--pitch4-secondary-note:    #00C700;
+	--pitch4-primary-note:      #A0FFA0;
+	--pitch5-secondary-channel: #D020D0;
+	--pitch5-primary-channel:   #FF90FF;
+	--pitch5-secondary-note:    #E040E0;
+	--pitch5-primary-note:      #FFC0FF;
+	--pitch6-secondary-channel: #7777B0;
+	--pitch6-primary-channel:   #A0A0FF;
+	--pitch6-secondary-note:    #8888D0;
+	--pitch6-primary-note:      #D0D0FF;
+	--pitch7-secondary-channel: #8AA100;
+	--pitch7-primary-channel:   #DEFF25;
+	--pitch7-secondary-note:    #AAC700;
+	--pitch7-primary-note:      #E6FF92;
+	--pitch8-secondary-channel: #DF0019;
+	--pitch8-primary-channel:   #FF98A4;
+	--pitch8-secondary-note:    #FF4E63;
+	--pitch8-primary-note:      #FFB2BB;
+	--pitch9-secondary-channel: #00A170;
+	--pitch9-primary-channel:   #50FFC9;
+	--pitch9-secondary-note:    #00C78A;
+	--pitch9-primary-note:      #83FFD9;
+	--pitch10-secondary-channel:#A11FFF;
+	--pitch10-primary-channel:  #CE8BFF;
+	--pitch10-secondary-note:   #B757FF;
+	--pitch10-primary-note:     #DFACFF;
+	--noise1-secondary-channel: #6F6F6F;
+	--noise1-primary-channel:   #AAAAAA;
+	--noise1-secondary-note:    #A7A7A7;
+	--noise1-primary-note:      #E0E0E0;
+	--noise2-secondary-channel: #996633;
+	--noise2-primary-channel:   #DDAA77;
+	--noise2-secondary-note:    #CC9966;
+	--noise2-primary-note:      #F0D0BB;
+	--noise3-secondary-channel: #4A6D8F;
+	--noise3-primary-channel:   #77AADD;
+	--noise3-secondary-note:    #6F9FCF;
+	--noise3-primary-note:      #BBD7FF;
+	--noise4-secondary-channel: #7A4F9A;
+	--noise4-primary-channel:   #AF82D2;
+	--noise4-secondary-note:    #9E71C1;
+	--noise4-primary-note:      #D4C1EA;
+	--noise5-secondary-channel: #607837;
+	--noise5-primary-channel:   #A2BB77;
+	--noise5-secondary-note:    #91AA66;
+	--noise5-primary-note:      #C5E2B2;
+	--mod1-secondary-channel:   #339955;
+	--mod1-primary-channel:     #77fc55;
+	--mod1-secondary-note:      #77ff8a;
+	--mod1-primary-note:        #cdffee;
+	--mod2-secondary-channel:   #993355;
+	--mod2-primary-channel:     #f04960;
+	--mod2-secondary-note:      #f057a0;
+	--mod2-primary-note:        #ffb8de;
+	--mod3-secondary-channel:   #553399;
+	--mod3-primary-channel:     #8855fc;
+	--mod3-secondary-note:      #aa64ff;
+	--mod3-primary-note:	    #f8ddff;
+	--mod4-secondary-channel:   #a86436;
+	--mod4-primary-channel:     #c8a825;
+	--mod4-secondary-note:      #e8ba46;
+	--mod4-primary-note:        #fff6d3;
+	--mod-label-primary:        #999;
+	--mod-label-secondary-text: #333;
+	--mod-label-primary-text:   black;
+	--disabled-note-primary:    #999;
+	--disabled-note-secondary:  #666; }` });
             this._cancelButton = button$7({ class: "cancelButton" });
             this._okayButton = button$7({ class: "okayButton", style: "width:45%;" }, "Okay");
             this._resetButton = button$7({ style: "height: auto; min-height: var(--button-size);" }, "Reset to defaults");
@@ -40778,7 +40893,7 @@ You should be redirected to the song at:<br /><br />
     class ThemePrompt {
         constructor(_doc) {
             this._doc = _doc;
-            this._themeSelect = select$4({ style: "width: 100%;" }, optgroup$1({ label: "Default Themes" }, option$4({ value: "slarmoosbox" }, "Slarmoo's Box"), option$4({ value: "ultrabox dark" }, "UltraBox"), option$4({ value: "forest" }, "Forest"), option$4({ value: "canyon" }, "Canyon"), option$4({ value: "midnight" }, "Midnight"), option$4({ value: "beachcombing" }, "Beachcombing"), option$4({ value: "violet verdant" }, "Violet Verdant"), option$4({ value: "sunset" }, "Sunset"), option$4({ value: "autumn" }, "Autumn"), option$4({ value: "fruit" }, "Shadowfruit"), option$4({ value: "toxic" }, "Toxic"), option$4({ value: "roe" }, "Roe"), option$4({ value: "moonlight" }, "Moonlight"), option$4({ value: "portal" }, "Portal"), option$4({ value: "fusion" }, "Fusion"), option$4({ value: "inverse" }, "Inverse"), option$4({ value: "nebula" }, "Nebula"), option$4({ value: "roe light" }, "Roe Light"), option$4({ value: "amoled dark" }, "High Contrast Dark"), option$4({ value: "energized" }, "Energized"), option$4({ value: "neapolitan" }, "Neapolitan"), option$4({ value: "poly" }, "Poly"), option$4({ value: "blutonium" }, "Blutonium"), option$4({ value: "greyscale" }, "Greyscale"), option$4({ value: "slushie" }, "Slushie")), optgroup$1({ label: "Mod Themes" }, option$4({ value: "dark classic" }, "BeepBox Dark"), option$4({ value: "light classic" }, "BeepBox Light"), option$4({ value: "dark competition" }, "BeepBox Competition Dark"), option$4({ value: "jummbox classic" }, "JummBox Dark"), option$4({ value: "modbox classic" }, "Modbox"), option$4({ value: "sandbox classic" }, "Sandbox"), option$4({ value: "harrybox" }, "Haileybox"), option$4({ value: "brucebox" }, "Brucebox"), option$4({ value: "shitbox 3.0" }, "Shitbox 1.0/3.0"), option$4({ value: "shitbox 2.0" }, "Shitbox 2.0"), option$4({ value: "nerdbox" }, "NerdBox"), option$4({ value: "zefbox" }, "Zefbox"), option$4({ value: "cardboardbox classic" }, "Cardboardbox"), option$4({ value: "blubox classic" }, "Blubox"), option$4({ value: "dogebox classic" }, "Dogebox"), option$4({ value: "wackybox" }, "Wackybox"), option$4({ value: "todbox dark mode" }, "Todbox Dark Mode"), option$4({ value: "mainbox 1.0" }, "Mainbox"), option$4({ value: "microbox" }, "MicroBox"), option$4({ value: "paandorasbox" }, "PaandorasBox"), option$4({ value: "foxbox" }, "FoxBox"), option$4({ value: "midbox" }, "Midbox"), option$4({ value: "dogebox2" }, "Dogebox2"), option$4({ value: "abyssbox classic" }, "AbyssBox Classic"), option$4({ value: "abyssbox light" }, "AbyssBox Light"), option$4({ value: "nepbox" }, "Nepbox")), optgroup$1({ label: "Misc" }, option$4({ value: "azur lane" }, "Azur Lane"), option$4({ value: "custom" }, "Custom")));
+            this._themeSelect = select$4({ style: "width: 100%;" }, optgroup$1({ label: "Default Themes" }, option$4({ value: "slarmoosbox" }, "Slarmoo's Box"), option$4({ value: "forest" }, "Forest"), option$4({ value: "canyon" }, "Canyon"), option$4({ value: "midnight" }, "Midnight"), option$4({ value: "beachcombing" }, "Beachcombing"), option$4({ value: "violet verdant" }, "Violet Verdant"), option$4({ value: "sunset" }, "Sunset"), option$4({ value: "autumn" }, "Autumn"), option$4({ value: "fruit" }, "Shadowfruit"), option$4({ value: "toxic" }, "Toxic"), option$4({ value: "roe" }, "Roe"), option$4({ value: "moonlight" }, "Moonlight"), option$4({ value: "portal" }, "Portal"), option$4({ value: "fusion" }, "Fusion"), option$4({ value: "inverse" }, "Inverse"), option$4({ value: "nebula" }, "Nebula"), option$4({ value: "roe light" }, "Roe Light"), option$4({ value: "amoled dark" }, "High Contrast Dark"), option$4({ value: "energized" }, "Energized"), option$4({ value: "neapolitan" }, "Neapolitan"), option$4({ value: "poly" }, "Poly"), option$4({ value: "blutonium" }, "Blutonium"), option$4({ value: "greyscale" }, "Greyscale"), option$4({ value: "slushie" }, "Slushie")), optgroup$1({ label: "Mod Themes" }, option$4({ value: "dark classic" }, "BeepBox Dark"), option$4({ value: "light classic" }, "BeepBox Light"), option$4({ value: "dark competition" }, "BeepBox Competition Dark"), option$4({ value: "jummbox classic" }, "JummBox Dark"), option$4({ value: "modbox classic" }, "Modbox"), option$4({ value: "sandbox classic" }, "Sandbox"), option$4({ value: "harrybox" }, "Haileybox"), option$4({ value: "brucebox" }, "Brucebox"), option$4({ value: "shitbox 3.0" }, "Shitbox 1.0/3.0"), option$4({ value: "shitbox 2.0" }, "Shitbox 2.0"), option$4({ value: "nerdbox" }, "NerdBox"), option$4({ value: "zefbox" }, "Zefbox"), option$4({ value: "cardboardbox classic" }, "Cardboardbox"), option$4({ value: "blubox classic" }, "Blubox"), option$4({ value: "dogebox classic" }, "Dogebox"), option$4({ value: "wackybox" }, "Wackybox"), option$4({ value: "todbox dark mode" }, "Todbox Dark Mode"), option$4({ value: "mainbox 1.0" }, "Mainbox"), option$4({ value: "microbox" }, "MicroBox"), option$4({ value: "paandorasbox" }, "PaandorasBox"), option$4({ value: "foxbox" }, "FoxBox"), option$4({ value: "midbox" }, "Midbox"), option$4({ value: "dogebox2" }, "Dogebox2"), option$4({ value: "abyssbox classic" }, "AbyssBox Classic"), option$4({ value: "abyssbox light" }, "AbyssBox Light"), option$4({ value: "nepbox" }, "Nepbox"), option$4({ value: "ultrabox dark" }, "UltraBox")), optgroup$1({ label: "Misc" }, option$4({ value: "azur lane" }, "Azur Lane"), option$4({ value: "custom" }, "Custom")));
             this._cancelButton = button$6({ class: "cancelButton" });
             this._okayButton = button$6({ class: "okayButton", style: "width:45%;" }, "Okay");
             this.container = div$6({ class: "prompt noSelection", style: "width: 220px;" }, h2$5("Set Theme"), div$6({ style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;" }, div$6({ class: "selectContainer", style: "width: 100%;" }, this._themeSelect)), div$6({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between;" }, this._okayButton), this._cancelButton);
@@ -41643,8 +41758,8 @@ You should be redirected to the song at:<br /><br />
             const editorHeight = this._doc.song.getChannelCount() * ChannelRow.patternHeight;
             if (this._renderedEditorHeight != editorHeight) {
                 this._renderedEditorHeight = editorHeight;
-                this._svg.setAttribute("height", "" + editorHeight + Config.barEditorHeight);
-                this._playhead.setAttribute("height", "" + editorHeight + Config.barEditorHeight);
+                this._svg.setAttribute("height", "" + (editorHeight + Config.barEditorHeight));
+                this._playhead.setAttribute("height", "" + (editorHeight + Config.barEditorHeight));
                 this.container.style.height = (editorHeight + Config.barEditorHeight) + "px";
             }
             this._select.style.display = this._touchMode ? "" : "none";

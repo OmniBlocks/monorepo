@@ -1229,17 +1229,19 @@ class ScriptTreeGenerator {
         const variable = block.fields[fieldName];
         const id = variable.id;
 
-        if (Object.prototype.hasOwnProperty.call(this.variableCache, id)) {
+        if (id && Object.prototype.hasOwnProperty.call(this.variableCache, id)) {
             return this.variableCache[id];
         }
 
         const data = this._descendVariable(id, variable.value, type);
-        this.variableCache[id] = data;
+        // If variable ID was null, this might do some unnecessary updates, but that is a rare
+        // edge case and it won't have any adverse effects anyways.
+        this.variableCache[data.id] = data;
         return data;
     }
 
     /**
-     * @param {string} id The ID of the variable.
+     * @param {string|null} id The ID of the variable.
      * @param {string} name The name of the variable.
      * @param {''|'list'} type The variable type.
      * @private

@@ -46,6 +46,7 @@
 		"@types/select2": "^4.0.63",
 		"electron": "^29.1.1",
 		"electron-packager": "^17.1.2",
+		"express": "^4.21.2",
 		"imperative-html": "^0.1.1",
 		"js-xxhash": "^4.0.0",
 		"select2": "^4.0.13"

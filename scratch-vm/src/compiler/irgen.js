@@ -19,17 +19,12 @@ const LIST_TYPE = 'list';
  */
 
 /**
- * Create a variable codegen object.
- * @param {'target'|'stage'} scope The scope of this variable -- which object owns it.
- * @param {import('../engine/variable.js')} varObj The Scratch Variable
- * @returns {*} A variable codegen object.
+ * @typedef DescendedVariable
+ * @property {'target'|'stage'} scope
+ * @property {string} id
+ * @property {string} name
+ * @property {boolean} isCloud
  */
-const createVariableData = (scope, varObj) => ({
-    scope,
-    id: varObj.id,
-    name: varObj.name,
-    isCloud: varObj.isCloud
-});
 
 /**
  * @param {string} code
@@ -1245,7 +1240,7 @@ class ScriptTreeGenerator {
      * @param {string} name The name of the variable.
      * @param {''|'list'} type The variable type.
      * @private
-     * @returns {*} A parsed variable object.
+     * @returns {DescendedVariable} A parsed variable object.
      */
     _descendVariable (id, name, type) {
         const target = this.target;
@@ -1253,13 +1248,25 @@ class ScriptTreeGenerator {
 
         // Look for by ID in target...
         if (Object.prototype.hasOwnProperty.call(target.variables, id)) {
-            return createVariableData('target', target.variables[id]);
+            const currVar = target.variables[id];
+            return {
+                scope: 'target',
+                id: currVar.id,
+                name: currVar.name,
+                isCloud: currVar.isCloud
+            };
         }
 
         // Look for by ID in stage...
         if (!target.isStage) {
             if (stage && Object.prototype.hasOwnProperty.call(stage.variables, id)) {
-                return createVariableData('stage', stage.variables[id]);
+                const currVar = stage.variables[id];
+                return {
+                    scope: 'stage',
+                    id: currVar.id,
+                    name: currVar.name,
+                    isCloud: currVar.isCloud
+                };
             }
         }
 
@@ -1268,7 +1275,12 @@ class ScriptTreeGenerator {
             if (Object.prototype.hasOwnProperty.call(target.variables, varId)) {
                 const currVar = target.variables[varId];
                 if (currVar.name === name && currVar.type === type) {
-                    return createVariableData('target', currVar);
+                    return {
+                        scope: 'target',
+                        id: currVar.id,
+                        name: currVar.name,
+                        isCloud: currVar.isCloud
+                    };
                 }
             }
         }
@@ -1279,7 +1291,12 @@ class ScriptTreeGenerator {
                 if (Object.prototype.hasOwnProperty.call(stage.variables, varId)) {
                     const currVar = stage.variables[varId];
                     if (currVar.name === name && currVar.type === type) {
-                        return createVariableData('stage', currVar);
+                        return {
+                            scope: 'stage',
+                            id: currVar.id,
+                            name: currVar.name,
+                            isCloud: currVar.isCloud
+                        };
                     }
                 }
             }
@@ -1287,6 +1304,9 @@ class ScriptTreeGenerator {
 
         // Create it locally...
         const newVariable = new Variable(id, name, type, false);
+
+        // Intentionally not using newVariable.id so that this matches vanilla Scratch quirks regarding
+        // handling of null variable IDs.
         target.variables[id] = newVariable;
 
         if (target.sprite) {
@@ -1300,7 +1320,14 @@ class ScriptTreeGenerator {
             }
         }
 
-        return createVariableData('target', newVariable);
+        return {
+            scope: 'target',
+            // If the given ID was null, this won't match the .id property of the Variable object.
+            // This is intentional to match vanilla Scratch quirks.
+            id,
+            name: newVariable.name,
+            isCloud: newVariable.isCloud
+        };
     }
 
     descendProcedure (block) {

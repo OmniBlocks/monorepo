@@ -4495,11 +4495,11 @@ export class Song {
                             useFastTwoNoteArp = true;
                         }
                     }
-                } else if ((fromSlarmoosBox && beforeFour) || (fromUltraBox && beforeSix)) {
+                } else if ((fromSlarmoosBox && beforeFour) || (fromUltraBox && beforeFive)) {
                     const rhythmMap = [1, 1, 0, 1, 2, 3, 4, 5];
-                    this.rhythm = rhythmMap[base64CharCodeToInt[compressed.charCodeAt(charIndex++)]];
+                    this.rhythm = clamp(0, Config.rhythms.length, rhythmMap[base64CharCodeToInt[compressed.charCodeAt(charIndex++)]]);
                 } else {
-                    this.rhythm = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                    this.rhythm = clamp(0, Config.rhythms.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                 }
             } break;
             case SongTagCode.channelOctave: {

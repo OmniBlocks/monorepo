@@ -5612,13 +5612,14 @@ export class ColorConfig {
 		  --disabled-note-primary: #3a3a3a;
 		  --disabled-note-secondary: #000;
 			}
-		/* replaces hotdog (in a hacky way) with an image of the girls using the same scratch sprites from the 404 page*/
-		.instructions-column > section:first-of-type > p:first-of-type:after {
-		display: block;
-		content: url("theme_resources/AzurLaneThemeStarterSquad.png");
-		width: 100%;
-		text-align: center;
-		margin-top: 25px;
+		/* replaces hotdog with an image of the girls using the same scratch sprites from the 404 page*/
+		#Hotdog {
+			display: inline !important;
+			content: url("theme_resources/AzurLaneThemeStarterSquad.png") !important;
+			width: 75%;
+			height: 75%;
+			text-align: center;
+			margin-top: 25px;
 		}
 		/* sets cursor */
 		* {

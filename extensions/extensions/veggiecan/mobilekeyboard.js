@@ -19,8 +19,10 @@
   class MobileKeyboard {
     constructor() {
       this.keyboardOpen = false;
-      this.waitCallback = null;
+      /** @type {Array<() => void>} */
+      this.waitCallbacks = [];
       this.defaultValue = "";
+      this.typedText = "";
       this.inputElement = null;
     }
 
@@ -34,6 +36,10 @@
         blockIconURI: blockicon,
         name: Scratch.translate("Mobile Keyboard"),
         blocks: [
+          {
+            blockType: Scratch.BlockType.LABEL,
+            text: Scratch.translate("Currently only works on Android"),
+          },
           {
             opcode: "showKeyboardBlock",
             blockType: Scratch.BlockType.COMMAND,
@@ -207,10 +213,10 @@
           input.parentNode.removeChild(input);
         }
 
-        if (this.waitCallback) {
-          this.waitCallback();
-          this.waitCallback = null;
+        for (const callback of this.waitCallbacks) {
+          callback();
         }
+        this.waitCallbacks.length = 0;
       };
 
       input.addEventListener("input", () => {
@@ -236,7 +242,7 @@
 
     showKeyboardAndWaitBlock(args) {
       return new Promise((resolve) => {
-        this.waitCallback = resolve;
+        this.waitCallbacks.push(() => resolve());
         this.showKeyboard(args.TYPE);
       });
     }

@@ -1,7 +1,9 @@
 // Name: Text
 // ID: strings
 // Description: Manipulate characters and text.
-// Original: CST1229 <https://scratch.mit.edu/users/CST1229/>
+// By: CST1229 <https://scratch.mit.edu/users/CST1229/>
+// By: BludIsAnLemon <https://scratch.mit.edu/users/BludIsAnLemon/>
+// By: Man-o-Valor <https://scratch.mit.edu/users/man-o-valor/>
 // License: MIT AND MPL-2.0
 
 (function (Scratch) {
@@ -13,6 +15,9 @@
     MIXEDCASE: "mixedcase",
     TITLECASE: "titlecase",
     EXACTTITLECASE: "exacttitlecase",
+    RANDOMCASE: "randomcase",
+    SENTENCECASE: "sentencecase",
+    CAMELCASE: "camelcase",
   };
 
   let splitCache;
@@ -39,6 +44,14 @@
         },
         {
           text: Scratch.translate({
+            default: "Sentence case",
+            description:
+              "Starts words after ., !, and ? with captialized letters",
+          }),
+          value: CaseParam.SENTENCECASE,
+        },
+        {
+          text: Scratch.translate({
             default: "Title Case",
             description:
               "If your language has Title Case, style it accordingly. 'Abc' is title case and exactly title case but 'ABC' is only title case.",
@@ -60,6 +73,22 @@
               "If your language has mixed case, style it accordingly",
           }),
           value: CaseParam.MIXEDCASE,
+        },
+        {
+          text: Scratch.translate({
+            default: "RAndoMCaSe",
+            description:
+              "If your language has randomcase, style it accordingly",
+          }),
+          value: CaseParam.RANDOMCASE,
+        },
+        {
+          text: Scratch.translate({
+            default: "camelCase",
+            description:
+              "Removes all spaces and capitalizes all words after the first",
+          }),
+          value: CaseParam.CAMELCASE,
         },
       ];
     }
@@ -372,11 +401,94 @@
               },
             },
           },
+
+          "---",
+          {
+            opcode: "posWith",
+            blockType: Scratch.BlockType.BOOLEAN,
+            text: Scratch.translate("[STRING] [POSITION]s with [SUBSTRING]?"),
+            arguments: {
+              STRING: {
+                type: Scratch.ArgumentType.STRING,
+                defaultValue: "turbowarp",
+              },
+              POSITION: {
+                type: Scratch.ArgumentType.STRING,
+                menu: "positions",
+              },
+              SUBSTRING: {
+                type: Scratch.ArgumentType.STRING,
+                defaultValue: "turbo",
+              },
+            },
+          },
+
+          "---",
+
+          {
+            opcode: "reverse",
+            blockType: Scratch.BlockType.REPORTER,
+            text: Scratch.translate("reverse text [STRING]"),
+            arguments: {
+              STRING: {
+                type: Scratch.ArgumentType.STRING,
+                defaultValue: Scratch.translate("apple"),
+              },
+            },
+          },
+
+          "---",
+
+          {
+            opcode: "trim",
+            blockType: Scratch.BlockType.REPORTER,
+            text: Scratch.translate("trim whitespace [STRING] from [METHOD]"),
+            arguments: {
+              STRING: {
+                type: Scratch.ArgumentType.STRING,
+                defaultValue: `    ${Scratch.translate("apple")}    `,
+              },
+              METHOD: {
+                type: Scratch.ArgumentType.STRING,
+                menu: "trimMethod",
+              },
+            },
+          },
         ],
         menus: {
           textCase: {
             acceptReporters: true,
             items: this._initCaseMenu(),
+          },
+          positions: {
+            acceptReporters: true,
+            items: [
+              {
+                text: Scratch.translate("start"),
+                value: "starts",
+              },
+              {
+                text: Scratch.translate("end"),
+                value: "ends",
+              },
+            ],
+          },
+          trimMethod: {
+            acceptReporters: true,
+            items: [
+              {
+                text: Scratch.translate("both sides"),
+                value: "both",
+              },
+              {
+                text: Scratch.translate("the end"),
+                value: "end",
+              },
+              {
+                text: Scratch.translate("the start"),
+                value: "start",
+              },
+            ],
           },
         },
       };
@@ -574,6 +686,12 @@
               word[0].toUpperCase() + word.substring(1).toLowerCase();
             return word === titleCased;
           });
+        case CaseParam.CAMELCASE:
+          return /^[^A-Z\s][^\s]*$/.test(string);
+        case CaseParam.RANDOMCASE:
+          return true;
+        case CaseParam.SENTENCECASE:
+          return /^[A-Z][^?.!]*(?:[?.!]\s+[A-Z][^?.!]*)*$/.test(string);
         default:
           return false;
       }
@@ -582,6 +700,8 @@
     toCase(args, util) {
       const string = args.STRING.toString();
       const textCase = args.TEXTCASE.toString();
+      let workingText = "";
+      let sentenceCapitalFlag = false;
       switch (textCase) {
         case CaseParam.LOWERCASE:
           return string.toLowerCase();
@@ -609,8 +729,66 @@
               return word[0].toUpperCase() + word.substring(1).toLowerCase();
             })
             .join("");
+        case CaseParam.SENTENCECASE:
+          for (let i = 0; i < string.length; i++) {
+            if (
+              /^\s*$/.test(string[i - 1] ?? " ") &&
+              !sentenceCapitalFlag &&
+              string[i].toUpperCase() != string[i].toLowerCase()
+            ) {
+              workingText += string[i].toUpperCase();
+              sentenceCapitalFlag = true;
+            } else {
+              if (string[i] == "." || string[i] == "!" || string[i] == "?") {
+                sentenceCapitalFlag = false;
+              }
+              workingText += string[i].toLowerCase();
+            }
+          }
+          return workingText;
+        case CaseParam.RANDOMCASE:
+          for (let i = 0; i < string.length; i++) {
+            if (Math.random() > 0.5) {
+              workingText += string[i].toUpperCase();
+            } else {
+              workingText += string[i].toLowerCase();
+            }
+          }
+          return workingText;
+        case CaseParam.CAMELCASE:
+          for (let i = 0; i < string.length; i++) {
+            if (/^\s*$/.test(string[i - 1] ?? "x")) {
+              workingText += string[i].toUpperCase();
+            } else {
+              workingText += string[i].toLowerCase();
+            }
+          }
+          return workingText.replace(/\s/g, "");
         default:
           return string;
+      }
+    }
+    posWith(args) {
+      const STRING = args.STRING.toString();
+      const SUBSTRING = args.SUBSTRING.toString();
+      if (args.POSITION.toString() === "starts") {
+        return STRING.startsWith(SUBSTRING);
+      }
+      return STRING.endsWith(SUBSTRING);
+    }
+    reverse(args) {
+      return Array.from(args.STRING.toString()).reverse().join("");
+    }
+    trim(args) {
+      const STRING = args.STRING.toString();
+      switch (args.METHOD.toString()) {
+        case "start":
+          return STRING.trimStart();
+        case "end":
+          return STRING.trimEnd();
+        case "both":
+        default:
+          return STRING.trim();
       }
     }
   }

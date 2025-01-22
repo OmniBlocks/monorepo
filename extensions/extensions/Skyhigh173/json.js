@@ -1,7 +1,7 @@
 // Name: JSON
 // ID: skyhigh173JSON
 // Description: Handle JSON strings and arrays.
-// By: Skyhigh173
+// By: Skyhigh173 <https://scratch.mit.edu/users/Skyhigh173/>
 // License: MIT
 
 (function (Scratch) {
@@ -24,6 +24,7 @@
     getInfo() {
       return {
         id: "skyhigh173JSON",
+        // eslint-disable-next-line extension/should-translate
         name: "JSON",
         color1: "#3271D0",
         blocks: [

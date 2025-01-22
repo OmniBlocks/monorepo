@@ -156,10 +156,12 @@
       runtime[extId] = this;
       this.THREE = THREE;
 
+      // @ts-ignore
       this.hideVanillaBlocks = !!runtime.extensionStorage?.[extId]?.hideVanillaBlocks;
       runtime.on("PROJECT_LOADED", () => {
         this.uninit();
         const oldHideVanillaBlocks = this.hideVanillaBlocks;
+        // @ts-ignore
         this.hideVanillaBlocks = !!runtime.extensionStorage?.[extId]?.hideVanillaBlocks;
         if (oldHideVanillaBlocks != this.hideVanillaBlocks) {
           vm.extensionManager.refreshBlocks();
@@ -170,7 +172,7 @@
     getInfo() {
       return {
         id: extId,
-        name: "CST 3D",
+        name: Scratch.translate("CST 3D"),
 
         color1: "#2a47e8",
         color2: "#2439ad",
@@ -179,19 +181,19 @@
         blocks: [
           {
             blockType: Scratch.BlockType.BUTTON,
-            text: "Open Documentation",
+            text: Scratch.translate("Open Documentation"),
             func: "viewDocs",
           },
           {
             blockType: Scratch.BlockType.BUTTON,
-            text: this.hideVanillaBlocks ? "Show Vanilla Blocks" : "Hide Vanilla Blocks",
+            text: this.hideVanillaBlocks ? Scratch.translate("Show Vanilla Blocks") : Scratch.translate("Hide Vanilla Blocks"),
             func: "toggleVanillaBlocks",
           },
           "---",
           {
             opcode: "setMode",
             blockType: Scratch.BlockType.COMMAND,
-            text: "set 3D mode to [MODE]",
+            text: Scratch.translate("set 3D mode to [MODE]"),
             arguments: {
               MODE: {
                 type: Scratch.ArgumentType.STRING,
@@ -220,7 +222,7 @@
           {
             opcode: "setZ",
             blockType: Scratch.BlockType.COMMAND,
-            text: "set z to [Z]",
+            text: Scratch.translate("set z to [Z]"),
             arguments: {
               Z: {
                 type: Scratch.ArgumentType.NUMBER,
@@ -247,7 +249,7 @@
           {
             opcode: "changeZ",
             blockType: Scratch.BlockType.COMMAND,
-            text: "change z by [Z]",
+            text: Scratch.translate("change z by [Z]"),
             arguments: {
               Z: {
                 type: Scratch.ArgumentType.NUMBER,
@@ -262,12 +264,12 @@
           {
             opcode: "getZ",
             blockType: Scratch.BlockType.REPORTER,
-            text: "z position",
+            text: Scratch.translate("z position"),
           },
           {
             opcode: "set3DPos",
             blockType: Scratch.BlockType.COMMAND,
-            text: "go to x: [X] y: [Y] z: [Z]",
+            text: Scratch.translate("go to x: [X] y: [Y] z: [Z]"),
             arguments: {
               X: {
                 type: Scratch.ArgumentType.NUMBER,
@@ -286,7 +288,7 @@
           {
             opcode: "change3DPos",
             blockType: Scratch.BlockType.COMMAND,
-            text: "change position by x: [X] y: [Y] z: [Z]",
+            text: Scratch.translate("change position by x: [X] y: [Y] z: [Z]"),
             arguments: {
               X: {
                 type: Scratch.ArgumentType.NUMBER,
@@ -306,7 +308,7 @@
           {
             opcode: "moveSteps",
             blockType: Scratch.BlockType.COMMAND,
-            text: "move [STEPS] steps in 3D",
+            text: Scratch.translate("move [STEPS] steps in 3D"),
             arguments: {
               STEPS: {
                 type: Scratch.ArgumentType.NUMBER,
@@ -317,7 +319,7 @@
           {
             opcode: "set3DDir",
             blockType: Scratch.BlockType.COMMAND,
-            text: "point in [DIRECTION] [DEGREES]",
+            text: Scratch.translate("point in [DIRECTION] [DEGREES]"),
             arguments: {
               DIRECTION: {
                 type: Scratch.ArgumentType.STRING,
@@ -333,7 +335,7 @@
           {
             opcode: "rotate3D",
             blockType: Scratch.BlockType.COMMAND,
-            text: "turn [DIRECTION] [DEGREES] degrees",
+            text: Scratch.translate("turn [DIRECTION] [DEGREES] degrees"),
             arguments: {
               DIRECTION: {
                 type: Scratch.ArgumentType.STRING,
@@ -349,7 +351,7 @@
           {
             opcode: "direction3D",
             blockType: Scratch.BlockType.REPORTER,
-            text: "direction around [DIRECTION]",
+            text: Scratch.translate("direction around [DIRECTION]"),
             arguments: {
               DIRECTION: {
                 type: Scratch.ArgumentType.STRING,
@@ -369,7 +371,7 @@
           {
             opcode: "setTexFilter",
             blockType: Scratch.BlockType.COMMAND,
-            text: "set texture filter to [FILTER]",
+            text: Scratch.translate("set texture filter to [FILTER]"),
             arguments: {
               FILTER: {
                 type: Scratch.ArgumentType.STRING,
@@ -381,7 +383,7 @@
           {
             opcode: "setSideMode",
             blockType: Scratch.BlockType.COMMAND,
-            text: "set shown faces to [SIDE]",
+            text: Scratch.translate("set shown faces to [SIDE]"),
             arguments: {
               SIDE: {
                 type: Scratch.ArgumentType.STRING,
@@ -394,7 +396,7 @@
           {
             opcode: "attach",
             blockType: Scratch.BlockType.COMMAND,
-            text: "attach myself to [TARGET]",
+            text: Scratch.translate("attach myself to [TARGET]"),
             arguments: {
               TARGET: {
                 type: Scratch.ArgumentType.STRING,
@@ -405,7 +407,7 @@
           {
             opcode: "attachVar",
             blockType: Scratch.BlockType.COMMAND,
-            text: "attach myself to sprite with variable [VARIABLE] set to [VALUE]",
+            text: Scratch.translate("attach myself to sprite with variable [VARIABLE] set to [VALUE]"),
             arguments: {
               TARGET: {
                 type: Scratch.ArgumentType.STRING,
@@ -424,19 +426,19 @@
           {
             opcode: "detach",
             blockType: Scratch.BlockType.COMMAND,
-            text: "detach myself",
+            text: Scratch.translate("detach myself"),
             arguments: {},
           },
           {
             opcode: "attachedSprite",
             blockType: Scratch.BlockType.REPORTER,
-            text: "sprite I'm attached to",
+            text: Scratch.translate("sprite I'm attached to"),
             arguments: {},
           },
           {
             opcode: "attachedSpriteVar",
             blockType: Scratch.BlockType.REPORTER,
-            text: "variable [VARIABLE] of sprite I'm attached to",
+            text: Scratch.translate("variable [VARIABLE] of sprite I'm attached to"),
             arguments: {
               VARIABLE: {
                 type: Scratch.ArgumentType.STRING,
@@ -448,7 +450,7 @@
           {
             opcode: "setCam",
             blockType: Scratch.BlockType.COMMAND,
-            text: "move camera to x: [X] y: [Y] z: [Z]",
+            text: Scratch.translate("move camera to x: [X] y: [Y] z: [Z]"),
             arguments: {
               X: {
                 type: Scratch.ArgumentType.NUMBER,
@@ -467,7 +469,7 @@
           {
             opcode: "changeCam",
             blockType: Scratch.BlockType.COMMAND,
-            text: "change camera by x: [X] y: [Y] z: [Z]",
+            text: Scratch.translate("change camera by x: [X] y: [Y] z: [Z]"),
             arguments: {
               X: {
                 type: Scratch.ArgumentType.NUMBER,
@@ -486,23 +488,23 @@
           {
             opcode: "camX",
             blockType: Scratch.BlockType.REPORTER,
-            text: "camera x",
+            text: Scratch.translate("camera x"),
           },
           {
             opcode: "camY",
             blockType: Scratch.BlockType.REPORTER,
-            text: "camera y",
+            text: Scratch.translate("camera y"),
           },
           {
             opcode: "camZ",
             blockType: Scratch.BlockType.REPORTER,
-            text: "camera z",
+            text: Scratch.translate("camera z"),
           },
           "---",
           {
             opcode: "moveCamSteps",
             blockType: Scratch.BlockType.COMMAND,
-            text: "move camera [STEPS] steps",
+            text: Scratch.translate("move camera [STEPS] steps"),
             arguments: {
               STEPS: {
                 type: Scratch.ArgumentType.NUMBER,
@@ -513,7 +515,7 @@
           {
             opcode: "setCamDir",
             blockType: Scratch.BlockType.COMMAND,
-            text: "point camera in [DIRECTION] [DEGREES]",
+            text: Scratch.translate("point camera in [DIRECTION] [DEGREES]"),
             arguments: {
               DIRECTION: {
                 type: Scratch.ArgumentType.STRING,
@@ -529,7 +531,7 @@
           {
             opcode: "rotateCam",
             blockType: Scratch.BlockType.COMMAND,
-            text: "turn camera [DIRECTION] [DEGREES] degrees",
+            text: Scratch.translate("turn camera [DIRECTION] [DEGREES] degrees"),
             arguments: {
               DIRECTION: {
                 type: Scratch.ArgumentType.STRING,
@@ -545,7 +547,7 @@
           {
             opcode: "camDir",
             blockType: Scratch.BlockType.REPORTER,
-            text: "camera direction around [DIRECTION]",
+            text: Scratch.translate("camera direction around [DIRECTION]"),
             arguments: {
               DIRECTION: {
                 type: Scratch.ArgumentType.STRING,
@@ -558,7 +560,7 @@
           {
             opcode: "setCameraParam",
             blockType: Scratch.BlockType.COMMAND,
-            text: "set camera [PARAM] to [VALUE]",
+            text: Scratch.translate("set camera [PARAM] to [VALUE]"),
             arguments: {
               PARAM: {
                 type: Scratch.ArgumentType.STRING,
@@ -574,7 +576,7 @@
           {
             opcode: "getCameraParam",
             blockType: Scratch.BlockType.REPORTER,
-            text: "camera [PARAM]",
+            text: Scratch.translate("camera [PARAM]"),
             arguments: {
               PARAM: {
                 type: Scratch.ArgumentType.STRING,
@@ -603,11 +605,11 @@
               "left", "right",
               "up", "down",
               {
-                text: "⟲",
+                text: Scratch.translate("⟲"),
                 value: "ccw"
               },
               {
-                text: "⟳",
+                text: Scratch.translate("⟳"),
                 value: "cw"
               }
             ],
@@ -615,9 +617,9 @@
           direction: {
             acceptReporters: true,
             items: [
-              {value: "y", text: "y (yaw)"},
-              {value: "x", text: "x (pitch)"},
-              {value: "z", text: "z (roll)"},
+              {value: "y", text: Scratch.translate("y (yaw)")},
+              {value: "x", text: Scratch.translate("x (pitch)")},
+              {value: "z", text: Scratch.translate("z (roll)")},
             ],
           },
           cameraParam: {
@@ -657,6 +659,7 @@ If I ever decide to release this extension on the gallery, this will be replaced
       if (!runtime.extensionStorage[extId]) {
         runtime.extensionStorage[extId] = {};
       }
+      // @ts-ignore
       runtime.extensionStorage[extId].hideVanillaBlocks = this.hideVanillaBlocks;
     }
 
@@ -745,8 +748,7 @@ If I ever decide to release this extension on the gallery, this will be replaced
       const w = runtime.stageWidth || 480;
       const h = runtime.stageHeight || 360;
 
-      this.threeSkin[0] = w;
-      this.threeSkin[1] = h;
+      this.threeSkin.size = [w, h];
 
       this.camera.aspect = w / h;
       this.renderer.setSize(w, h);

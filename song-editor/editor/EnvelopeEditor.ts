@@ -356,6 +356,13 @@ export class EnvelopeEditor {
 					this._perEnvelopeSpeedSliders[i].value = this.convertIndexSpeed(instrument.envelopes[i].perEnvelopeSpeed, "index").toString();
 					this._perEnvelopeSpeedDisplays[i].textContent = "Spd: x" + prettyNumber(this.convertIndexSpeed(parseFloat(this._perEnvelopeSpeedSliders[i].value), "speed"));
 
+					//show / hide steps based on waveform
+					if (instrument.envelopes[i].waveform == BaseWaveTypes.steppedSaw || instrument.envelopes[i].waveform == BaseWaveTypes.steppedTri) {
+						this._randomStepsWrappers[i].style.display = "flex";
+					} else {
+						this._randomStepsWrappers[i].style.display = "none";
+					}
+
 					//hide other dropdown groups, show lfo settings and speed
 					this.extraLFODropdownGroups[i].style.display = "";
 					this.perEnvelopeSpeedGroups[i].style.display = "flex"
@@ -491,24 +498,26 @@ export class EnvelopeEditor {
 			const randomStepsWrapper: HTMLDivElement = HTML.div({ style: "margin-top: 3px; flex:1; display:flex; flex-direction: row; align-items:center; justify-content:right;" }, randomStepsBoxWrapper, randomStepsSlider);
 			const randomSeedWrapper: HTMLDivElement = HTML.div({ style: "margin-top: 3px; flex:1; display:flex; flex-direction: row; align-items:center; justify-content:right;" }, randomSeedBoxWrapper, randomSeedSlider);
 
-			const randomTypeSelect: HTMLSelectElement = HTML.select({ style: "width: 117px;" });
+			const randomTypeSelect: HTMLSelectElement = HTML.select({ style: "width: 115px;" });
 			const randomNames: string[] = ["time", "pitch", "note", "time smooth"];
 			for (let waveform: number = 0; waveform < RandomEnvelopeTypes.length; waveform++) {
 				randomTypeSelect.appendChild(HTML.option({ value: waveform }, randomNames[waveform]));
 			}
-			const randomTypeSelectWrapper: HTMLDivElement = HTML.div({ class: "editor-controls", style: "margin-top: 3px; flex:1; display:flex; flex-direction: row; align-items:center; justify-content:right;" }, HTML.span({ style: "font-size: smaller; margin-right: 35px;", class: "tip", onclick: () => this._openPrompt("randomEnvelopeType") }, "Type: "), randomTypeSelect);
+			const randomTypeSelectWrapper: HTMLDivElement = HTML.div({ class: "editor-controls selectContainer", style: "margin-top: 3px; flex:1; display:flex; flex-direction: row; align-items:center; justify-content:right;" }, HTML.span({ style: "font-size: smaller; margin-right: 35px;", class: "tip", onclick: () => this._openPrompt("randomEnvelopeType") }, "Type: "), randomTypeSelect);
 			
 			const extraRandomSettingsGroup: HTMLDivElement = HTML.div({ class: "editor-controls", style: "flex-direction:column; align-items:center;" }, randomTypeSelectWrapper, randomStepsWrapper, randomSeedWrapper);
 			extraRandomSettingsGroup.style.display = "none";
 
 			//lfo settings
-			const waveformSelect: HTMLSelectElement = HTML.select({ style: "width: 117px;" });
-			const wavenames: string[] = ["sine", "square", "triangle", "sawtooth", "ramp", "trapezoid"]
+			const waveformSelect: HTMLSelectElement = HTML.select({ style: "width: 115px;"});
+			const wavenames: string[] = ["sine", "square", "triangle", "sawtooth", "trapezoid", "stepped saw", "stepped tri"];
 			for (let waveform: number = 0; waveform < BaseWaveTypes.length; waveform++) {
 				waveformSelect.appendChild(HTML.option({ value: waveform }, wavenames[waveform]));
 			}
 
-			const extraLFOSettingsGroup: HTMLDivElement = HTML.div({ class: "editor-controls", style: "margin-top: 3px; flex:1; display:flex; flex-direction: row; align-items:center; justify-content:right;" }, HTML.span({ style: "font-size: smaller; margin-right: 10px;", class: "tip", onclick: () => this._openPrompt("lfoEnvelopeWaveform") }, "Waveform: "), waveformSelect);
+			
+			const waveformWrapper: HTMLDivElement = HTML.div({ class: "editor-controls selectContainer", style: "margin-top: 3px; flex:1; display:flex; flex-direction: row; align-items:center; justify-content:right;" }, HTML.span({ style: "font-size: smaller; margin-right: 10px;", class: "tip", onclick: () => this._openPrompt("lfoEnvelopeWaveform") }, "Waveform: "), waveformSelect);
+			const extraLFOSettingsGroup: HTMLDivElement = HTML.div({ class: "editor-controls", style: "margin-top: 3px; flex:1; display:flex; flex-direction: column; align-items:center; justify-content:right;" }, waveformWrapper, randomStepsWrapper);
 			extraLFOSettingsGroup.style.display = "none";
 
 			//speed settings

@@ -149,8 +149,10 @@ export const enum BaseWaveTypes {
     square,
     triangle,
     sawtooth,
+    trapezoid,
+    steppedSaw,
+    steppedTri,
     // ramp,
-    // trapezoid,
     length,
 }
 
@@ -1322,7 +1324,7 @@ export class Config {
     public static readonly envelopes: DictionaryArray<Envelope> = toNameMap([
         { name: "none", type: EnvelopeType.none, speed: 0.0 },
         { name: "note size", type: EnvelopeType.noteSize, speed: 0.0 },
-        { name: "pitch", type: EnvelopeType.pitch, speed: 0.0 }, // Slarmoo's box
+        { name: "pitch", type: EnvelopeType.pitch, speed: 0.0 }, // Slarmoo's box (fairly useless on drumsets)
         { name: "punch", type: EnvelopeType.punch, speed: 0.0 },
         { name: "flare -1", type: EnvelopeType.flare, speed: 128.0 },
         { name: "flare 1", type: EnvelopeType.flare, speed: 32.0 },
@@ -1395,7 +1397,7 @@ export class Config {
     public static readonly newEnvelopes: DictionaryArray<Envelope> = toNameMap([
         { name: "none", type: EnvelopeType.none, speed: 0.0 },
         { name: "note size", type: EnvelopeType.noteSize, speed: 0.0 },
-        { name: "pitch", type: EnvelopeType.pitch, speed: 0.0 }, 
+        { name: "pitch", type: EnvelopeType.pitch, speed: 0.0 },
         { name: "random", type: EnvelopeType.pseudorandom, speed: 4.0 }, //Slarmoo's box 1.3
         { name: "punch", type: EnvelopeType.punch, speed: 0.0 },
         { name: "flare", type: EnvelopeType.flare, speed: 32.0 },
@@ -1408,8 +1410,8 @@ export class Config {
         { name: "linear", type: EnvelopeType.linear, speed: 32.0 },
         { name: "rise", type: EnvelopeType.rise, speed: 32.0 },
         { name: "blip", type: EnvelopeType.blip, speed: 6.0 },
-        { name: "fall", type: EnvelopeType.fall, speed: 2.0 }, 
-    ])
+        { name: "fall", type: EnvelopeType.fall, speed: 2.0 },
+    ]);
 
 
 
@@ -1535,7 +1537,7 @@ export class Config {
     public static readonly sineWave: Float32Array = generateSineWave();
 
     public static readonly perEnvelopeSpeedIndices: number[] = [0, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.1, 0.2, 0.25, 0.3, 0.3333, 0.4, 0.5, 0.6, 0.6667, 0.7, 0.75, 0.8, 0.9, 1, 1.25, 1.3333, 1.5, 1.6667, 1.75, 2, 2.25, 2.5, 2.75, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 24, 32, 40, 64, 128, 256];
-    public static readonly perEnvelopeSpeedToIndices: Dictionary<number> = {
+    public static readonly perEnvelopeSpeedToIndices: Dictionary<number> = { //used to convert speeds back into indices
         0: 0,
         0.01: 1,
         0.02: 2,
@@ -1602,10 +1604,10 @@ export class Config {
         256: 63,
     }
 
-    public static readonly perEnvelopeBoundMin: number = 0;
-    public static readonly perEnvelopeBoundMax: number = 2;
+    public static readonly perEnvelopeBoundMin: number = 0; //probably should leave at 0. Negative envelopes are problematic right now
+    public static readonly perEnvelopeBoundMax: number = 2; //max of 6.3 unless you update url
     public static readonly randomEnvelopeSeedMax: number = 64; //if you increase this you'll need to update the url to support it
-    public static readonly randomEnvelopeStepsMax: number = 24;
+    public static readonly randomEnvelopeStepsMax: number = 24; 
 
     // Picked strings have an all-pass filter with a corner frequency based on the tone fundamental frequency, in order to add a slight inharmonicity. (Which is important for distortion.)
     public static readonly pickedStringDispersionCenterFreq: number = 6000.0; // The tone fundamental freq is pulled toward this freq for computing the all-pass corner freq.

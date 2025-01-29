@@ -615,7 +615,7 @@ export class TipPrompt implements Prompt {
 				message = div(
 					h2("LFO Envelope Waveform"),
 					p("LFO envelopes can output a variety of different waveforms, from old tremolo's sine to more complex ones."),
-					p("These waves are: sines, squares, triangles, and sawtooths."),
+					p("These waves are: sines, squares, triangles, sawtooths, trapezoids, and stepped variants of triangles and sawtooths."),
 				);
 			} break;
 			case "randomEnvelopeType": {

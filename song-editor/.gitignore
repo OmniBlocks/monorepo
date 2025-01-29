@@ -23,4 +23,4 @@ offline/node_modules
 /to_deploy/
 #for deployment
 deployFiles.sh
-pm2handler.js
+pm2handler.cjs

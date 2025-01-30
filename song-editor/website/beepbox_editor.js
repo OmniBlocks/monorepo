@@ -34863,6 +34863,9 @@ You should be redirected to the song at:<br /><br />
             this._envelopeCopyButtons = [];
             this._envelopePasteButtons = [];
             this._waveformSelects = [];
+            this.LFOStepsBoxes = [];
+            this._LFOStepsSliders = [];
+            this._LFOStepsWrappers = [];
             this._renderedEnvelopeCount = 0;
             this._renderedEqFilterCount = -1;
             this._renderedNoteFilterCount = -1;
@@ -34887,6 +34890,8 @@ You should be redirected to the song at:<br /><br />
                 const randomSeedSliderIndex = this._randomSeedSliders.indexOf(event.target);
                 const waveformSelectIndex = this._waveformSelects.indexOf(event.target);
                 const randomTypeSelectIndex = this._randomEnvelopeTypeSelects.indexOf(event.target);
+                const LFOStepsBoxIndex = this.LFOStepsBoxes.indexOf(event.target);
+                const LFOStepsSliderIndex = this._LFOStepsSliders.indexOf(event.target);
                 if (targetSelectIndex != -1) {
                     const combinedValue = parseInt(this._targetSelects[targetSelectIndex].value);
                     const target = combinedValue % Config.instrumentAutomationTargets.length;
@@ -34986,6 +34991,18 @@ You should be redirected to the song at:<br /><br />
                         this._lastChange = null;
                     }
                 }
+                else if (LFOStepsBoxIndex != -1) {
+                    if (this._lastChange != null) {
+                        this._doc.record(this._lastChange);
+                        this._lastChange = null;
+                    }
+                }
+                else if (LFOStepsSliderIndex != -1) {
+                    if (this._lastChange != null) {
+                        this._doc.record(this._lastChange);
+                        this._lastChange = null;
+                    }
+                }
             };
             this._onClick = (event) => {
                 const deleteButtonIndex = this._deleteButtons.indexOf(event.target);
@@ -35018,6 +35035,8 @@ You should be redirected to the song at:<br /><br />
                 const randomSeedBoxIndex = this.randomSeedBoxes.indexOf(event.target);
                 const randomStepsSliderIndex = this._randomStepsSliders.indexOf(event.target);
                 const randomSeedSliderIndex = this._randomSeedSliders.indexOf(event.target);
+                const LFOStepsBoxIndex = this.LFOStepsBoxes.indexOf(event.target);
+                const LFOStepsSliderIndex = this._LFOStepsSliders.indexOf(event.target);
                 if (startBoxIndex != -1) {
                     this._lastChange = new ChangeEnvelopePitchStart(this._doc, parseInt(this.pitchStartBoxes[startBoxIndex].value), startBoxIndex);
                 }
@@ -35056,6 +35075,12 @@ You should be redirected to the song at:<br /><br />
                 }
                 else if (randomSeedSliderIndex != -1) {
                     this._lastChange = new ChangeRandomEnvelopeSeed(this._doc, parseFloat(this._randomSeedSliders[randomSeedSliderIndex].value), randomSeedSliderIndex);
+                }
+                else if (LFOStepsBoxIndex != -1) {
+                    this._lastChange = new ChangeRandomEnvelopeSteps(this._doc, parseFloat(this.LFOStepsBoxes[LFOStepsBoxIndex].value), LFOStepsBoxIndex);
+                }
+                else if (LFOStepsSliderIndex != -1) {
+                    this._lastChange = new ChangeRandomEnvelopeSteps(this._doc, parseFloat(this._LFOStepsSliders[LFOStepsSliderIndex].value), LFOStepsSliderIndex);
                 }
             };
             this.container.addEventListener("change", this._onChange);
@@ -35172,10 +35197,10 @@ You should be redirected to the song at:<br /><br />
                         this._perEnvelopeSpeedSliders[i].value = this.convertIndexSpeed(instrument.envelopes[i].perEnvelopeSpeed, "index").toString();
                         this._perEnvelopeSpeedDisplays[i].textContent = "Spd: x" + prettyNumber(this.convertIndexSpeed(parseFloat(this._perEnvelopeSpeedSliders[i].value), "speed"));
                         if (instrument.envelopes[i].waveform == 5 || instrument.envelopes[i].waveform == 6) {
-                            this._randomStepsWrappers[i].style.display = "flex";
+                            this._LFOStepsWrappers[i].style.display = "flex";
                         }
                         else {
-                            this._randomStepsWrappers[i].style.display = "none";
+                            this._LFOStepsWrappers[i].style.display = "none";
                         }
                         this.extraLFODropdownGroups[i].style.display = "";
                         this.perEnvelopeSpeedGroups[i].style.display = "flex";
@@ -35289,12 +35314,16 @@ You should be redirected to the song at:<br /><br />
                 const extraRandomSettingsGroup = HTML.div({ class: "editor-controls", style: "flex-direction:column; align-items:center;" }, randomTypeSelectWrapper, randomStepsWrapper, randomSeedWrapper);
                 extraRandomSettingsGroup.style.display = "none";
                 const waveformSelect = HTML.select({ style: "width: 115px;" });
+                const LFOStepsBox = HTML.input({ value: instrument.envelopes[envelopeIndex].steps, type: "number", min: 1, max: Config.randomEnvelopeStepsMax, step: 1, style: "width: 4em; font-size: 80%; " });
+                const LFOStepsSlider = HTML.input({ value: instrument.envelopes[envelopeIndex].steps, type: "range", min: 1, max: Config.randomEnvelopeStepsMax, step: 1, style: "width: 113px; margin-left: 0px;" });
+                const LFOStepsBoxWrapper = HTML.div({ style: "flex: 1; display: flex; flex-direction: column; align-items: center;" }, HTML.span({ class: "tip", style: `width:68px; flex:1; height:1em; font-size: smaller;`, onclick: () => this._openPrompt("randomSteps") }, "Steps: "), LFOStepsBox);
+                const LFOStepsWrapper = HTML.div({ style: "margin-top: 3px; flex:1; display:flex; flex-direction: row; align-items:center; justify-content:right;" }, LFOStepsBoxWrapper, LFOStepsSlider);
                 const wavenames = ["sine", "square", "triangle", "sawtooth", "trapezoid", "stepped saw", "stepped tri"];
                 for (let waveform = 0; waveform < 7; waveform++) {
                     waveformSelect.appendChild(HTML.option({ value: waveform }, wavenames[waveform]));
                 }
                 const waveformWrapper = HTML.div({ class: "editor-controls selectContainer", style: "margin-top: 3px; flex:1; display:flex; flex-direction: row; align-items:center; justify-content:right;" }, HTML.span({ style: "font-size: smaller; margin-right: 10px;", class: "tip", onclick: () => this._openPrompt("lfoEnvelopeWaveform") }, "Waveform: "), waveformSelect);
-                const extraLFOSettingsGroup = HTML.div({ class: "editor-controls", style: "margin-top: 3px; flex:1; display:flex; flex-direction: column; align-items:center; justify-content:right;" }, waveformWrapper, randomStepsWrapper);
+                const extraLFOSettingsGroup = HTML.div({ class: "editor-controls", style: "margin-top: 3px; flex:1; display:flex; flex-direction: column; align-items:center; justify-content:right;" }, waveformWrapper, LFOStepsWrapper);
                 extraLFOSettingsGroup.style.display = "none";
                 const perEnvelopeSpeedSlider = HTML.input({ style: "margin: 0; width: 113px", type: "range", min: 0, max: Config.perEnvelopeSpeedIndices.length - 1, value: this.convertIndexSpeed(instrument.envelopes[envelopeIndex].perEnvelopeSpeed, "index"), step: "1" });
                 const perEnvelopeSpeedDisplay = HTML.span({ class: "tip", style: `width:58px; flex:1; height:1em; font-size: smaller; margin-left: 10px;`, onclick: () => this._openPrompt("perEnvelopeSpeed") }, "Spd: x" + prettyNumber(this.convertIndexSpeed(parseFloat(perEnvelopeSpeedSlider.value), "speed")));
@@ -35361,6 +35390,9 @@ You should be redirected to the song at:<br /><br />
                 this._randomEnvelopeTypeSelects[envelopeIndex] = randomTypeSelect;
                 this.extraLFODropdownGroups[envelopeIndex] = extraLFOSettingsGroup;
                 this._waveformSelects[envelopeIndex] = waveformSelect;
+                this.LFOStepsBoxes[envelopeIndex] = LFOStepsBox;
+                this._LFOStepsSliders[envelopeIndex] = LFOStepsSlider;
+                this._LFOStepsWrappers[envelopeIndex] = LFOStepsWrapper;
                 this._envelopeCopyButtons[envelopeIndex] = envelopeCopyButton;
                 this._envelopePasteButtons[envelopeIndex] = envelopePasteButton;
             }
@@ -35399,6 +35431,8 @@ You should be redirected to the song at:<br /><br />
                 this.randomSeedBoxes[envelopeIndex].value = String(instrument.envelopes[envelopeIndex].seed);
                 this._randomStepsSliders[envelopeIndex].value = String(instrument.envelopes[envelopeIndex].steps);
                 this._randomSeedSliders[envelopeIndex].value = String(instrument.envelopes[envelopeIndex].seed);
+                this.LFOStepsBoxes[envelopeIndex].value = String(instrument.envelopes[envelopeIndex].steps);
+                this._LFOStepsSliders[envelopeIndex].value = String(instrument.envelopes[envelopeIndex].steps);
                 this.openExtraSettingsDropdowns[envelopeIndex] = this.openExtraSettingsDropdowns[envelopeIndex] ? true : false;
             }
             this._renderedEnvelopeCount = instrument.envelopeCount;

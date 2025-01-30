@@ -1606,7 +1606,7 @@ export class Config {
 
     public static readonly perEnvelopeBoundMin: number = 0; //probably should leave at 0. Negative envelopes are problematic right now
     public static readonly perEnvelopeBoundMax: number = 2; //max of 6.3 unless you update url
-    public static readonly randomEnvelopeSeedMax: number = 64; //if you increase this you'll need to update the url to support it
+    public static readonly randomEnvelopeSeedMax: number = 63; //if you increase this you'll need to update the url to support it
     public static readonly randomEnvelopeStepsMax: number = 24; 
 
     // Picked strings have an all-pass filter with a corner frequency based on the tone fundamental frequency, in order to add a slight inharmonicity. (Which is important for distortion.)

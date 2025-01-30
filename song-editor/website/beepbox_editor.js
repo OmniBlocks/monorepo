@@ -1083,7 +1083,7 @@ var beepbox = (function (exports) {
     };
     Config.perEnvelopeBoundMin = 0;
     Config.perEnvelopeBoundMax = 2;
-    Config.randomEnvelopeSeedMax = 64;
+    Config.randomEnvelopeSeedMax = 63;
     Config.randomEnvelopeStepsMax = 24;
     Config.pickedStringDispersionCenterFreq = 6000.0;
     Config.pickedStringDispersionFreqScale = 0.3;

@@ -36,6 +36,13 @@ class CanvasMeasurementProvider {
         }
         return this._cache[text];
     }
+
+    /**
+     * Resets the internal cache. Call after the canvas's font changes.
+     */
+    clearCache () {
+        this._cache = {};
+    }
 }
 
 module.exports = CanvasMeasurementProvider;

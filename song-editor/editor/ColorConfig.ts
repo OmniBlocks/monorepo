@@ -3004,8 +3004,8 @@ export class ColorConfig {
 
 --pitch4-secondary-channel: #139620;
 --pitch4-primary-channel:   #25ff3a;
---pitch4-secondary-note:    #139620;
---pitch4-primary-note:      #25ff3a;
+--pitch4-secondary-note:    #21FF33;
+--pitch4-primary-note:      #C0FFB5;
 
 --pitch5-secondary-channel: #0099A1;
 --pitch5-primary-channel:   #25F3FF;
@@ -3026,6 +3026,9 @@ export class ColorConfig {
 --pitch8-primary-channel:   #FF60A5;
 --pitch8-secondary-note:    #8E1C4E;
 --pitch8-primary-note:      #FF8EC5;
+
+/*--track-editor-bg-mod: #632D45;
+--track-editor-bg-mod-dim: #3F1D2C;*/
 }`,
 		"modbox classic": `
 			:root {
@@ -5387,42 +5390,42 @@ export class ColorConfig {
 				`,
 	"slarmoosbox": `
 		:root {
-			--page-margin: #14052a;
-			--editor-background: #14052a;
+			--page-margin: #14051a;
+			--editor-background: #14051a;
 			--playhead: rgba(255, 255, 255, 0.9);
-			--primary-text: #71eef5;
-			--secondary-text: #3abbc2;
-			--inverted-text: #13696e;
-			--box-selection-fill: #36c72c;
-			--loop-accent: #71eef5;
+			--primary-text: #71eee5;
+			--secondary-text: #3abbb2;
+			--inverted-text: #13695e;
+			--box-selection-fill: #36c71c;
+			--loop-accent: #36c71c;
 			--link-accent: white;
-			--ui-widget-background: #183d15;
-			--ui-widget-focus: #247d1d;
-			--pitch-background: #2e0e61;
-			--tonic: #247d1d;
-			--fifth-note: #3abbc2;
+			--ui-widget-background: #183d05;
+			--ui-widget-focus: #247d0d;
+			--pitch-background: #2e0e51;
+			--tonic: #247d0d;
+			--fifth-note: #3abbb2;
 			--white-piano-key: #ffffff;
 			--black-piano-key: #061705;
 			--white-piano-key-text: #061705;
 			--use-color-formula: true;
-			--track-editor-bg-pitch: #09383b;
-			--track-editor-bg-pitch-dim: #14052a;
+			--track-editor-bg-pitch: #09382b;
+			--track-editor-bg-pitch-dim: #14051a;
 			--track-editor-bg-noise: #40400b;
-			--track-editor-bg-noise-dim: #14052a;
+			--track-editor-bg-noise-dim: #14051a;
 			--track-editor-bg-mod: #0a2c08;
-			--track-editor-bg-mod-dim: #14052a;
-			--multiplicative-mod-slider: #3abbc2;
-			--overwriting-mod-slider: #71eef5;
-			--indicator-primary: #a773f5;
-			--indicator-secondary: #4c1c99;
-			--select2-opt-group: #183d15;
-			--input-box-outline: #18041a;
-			--mute-button-normal: #36c72c;
-			--mute-button-mod: #a773f5;
-			--mod-label-primary: #a773f5;
-			--mod-label-secondary-text: #6b29cf;
-			--mod-label-primary-text: #14052a;
-			--mod-title: #2e0e61;
+			--track-editor-bg-mod-dim: #14051a;
+			--multiplicative-mod-slider: #3abb22;
+			--overwriting-mod-slider: #71eee5;
+			--indicator-primary: #a773e5;
+			--indicator-secondary: #4c1c89;
+			--select2-opt-group: #183d05;
+			--input-box-outline: #18040a;
+			--mute-button-normal: #36c71c;
+			--mute-button-mod: #a773e5;
+			--mod-label-primary: #a773e5;
+			--mod-label-secondary-text: #6b29bf;
+			--mod-label-primary-text: #14051a;
+			--mod-title: #247d1d;
 			--pitch-secondary-channel-hue: 100;
 			--pitch-secondary-channel-hue-scale: 6.1;
 			--pitch-secondary-channel-sat: 100.0;
@@ -5609,13 +5612,14 @@ export class ColorConfig {
 		  --disabled-note-primary: #3a3a3a;
 		  --disabled-note-secondary: #000;
 			}
-		/* replaces hotdog (in a hacky way) with an image of the girls using the same scratch sprites from the 404 page*/
-		.instructions-column > section:first-of-type > p:first-of-type:after {
-		display: block;
-		content: url("theme_resources/AzurLaneThemeStarterSquad.png");
-		width: 100%;
-		text-align: center;
-		margin-top: 25px;
+		/* replaces hotdog with an image of the girls using the same scratch sprites from the 404 page*/
+		#Hotdog {
+			display: inline !important;
+			content: url("theme_resources/AzurLaneThemeStarterSquad.png") !important;
+			width: 75%;
+			height: 75%;
+			text-align: center;
+			margin-top: 25px;
 		}
 		/* sets cursor */
 		* {
@@ -6201,6 +6205,8 @@ export class ColorConfig {
 		if (getComputedStyle(this._styleElement).getPropertyValue("--editor-background") == "") valuesToAdd += "--editor-background:black;";
 		if (getComputedStyle(this._styleElement).getPropertyValue("--ui-widget-background") == "") valuesToAdd += "--ui-widget-background:#444;";
 		if (getComputedStyle(this._styleElement).getPropertyValue("--loop-accent") == "") valuesToAdd += "--loop-accent:#74f;";
+		// if (getComputedStyle(this._styleElement).getPropertyValue("--link-accent") == "") valuesToAdd += "--link-accent:#9c64f7;";
+		// if (getComputedStyle(this._styleElement).getPropertyValue("--mod-title") == "") valuesToAdd += "--mod-title:var(--link-accent);";
 		if (getComputedStyle(this._styleElement).getPropertyValue("--box-selection-fill") == "") valuesToAdd += "--box-selection-fill:rgba(255,255,255,0.2);";
 		if (getComputedStyle(this._styleElement).getPropertyValue("--primary-text") == "") valuesToAdd += "--primary-text:white;";
 		if (getComputedStyle(this._styleElement).getPropertyValue("--inverted-text") == "") valuesToAdd += "--inverted-text:black;";
@@ -6210,6 +6216,8 @@ export class ColorConfig {
 		if (getComputedStyle(this._styleElement).getPropertyValue("--track-editor-bg-noise-dim") == "") valuesToAdd += "--track-editor-bg-noise-dim:#333;";
 		if (getComputedStyle(this._styleElement).getPropertyValue("--track-editor-bg-mod") == "") valuesToAdd += "--track-editor-bg-mod:#234;";
 		if (getComputedStyle(this._styleElement).getPropertyValue("--track-editor-bg-mod-dim") == "") valuesToAdd += "--track-editor-bg-mod-dim:#123;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--mute-button-normal") == "") valuesToAdd += "--mute-button-normal:#ffa033;";
+		if (getComputedStyle(this._styleElement).getPropertyValue("--mute-button-mod") == "") valuesToAdd += "--mute-button-mod:#9a6bff;";
 
 		if (getComputedStyle(this._styleElement).getPropertyValue("--pitch1-secondary-channel") == "") valuesToAdd += "--pitch1-secondary-channel:#0099A1;";
 		if (getComputedStyle(this._styleElement).getPropertyValue("--pitch1-primary-channel") == "") valuesToAdd += "--pitch1-primary-channel:#25F3FF;";

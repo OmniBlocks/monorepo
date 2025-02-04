@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-    <link rel='shortcut icon' type='image/x-icon' href='../favicon.ico' />
+    <link rel='shortcut icon' type='image/x-icon' href='./favicon.ico' />
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Slarmoo's Box Patch Notes</title>
@@ -17,8 +17,9 @@
     <meta name="msapplication-TileColor" content="#247d1d" />
     <meta name="msapplication-config" content="/browserconfig.xml" />
     <meta name="format-detection" content="telephone=no" />
-    <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png" />
-    <link rel="icon" type="image/png" sizes="32x32" href="../icon_32.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png" />
+    <meta property="og:image" content="https://slarmoo.github.io/slarmoosbox/website/icon_shadow_192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="./icon_32.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <link href="https://fonts.googleapis.com/css?family=B612" rel="stylesheet" media="none"
         onload="if (this.media != 'all') this.media='all';" /> <!-- this is a trick to load CSS asynchronously. -->
@@ -55,6 +56,7 @@
             margin-top: 0.5em;
             margin-bottom: 0.5em;
             -webkit-text-stroke-width: 0;
+			/* color: #FF8EC5; */
         }
 
         h3 {
@@ -67,33 +69,100 @@
         a {
             color: var(--link-accent, #98f);
         }
-
-        /* wide screen */
-        @media (min-width: 711px) {
-            html {
-                width: 100%;
-            }
-
-            body {
-                width: 100%;
-            }
-        }
-
-        /* narrow screen */
-        @media (max-width: 710px) {
-            body {
-                width: 100%;
-            }
-
-            p {
-                margin: 1em 0.5em;
-            }
-        }
     </style>
     </body>
     <h1>
-        <font color="#9c64f7">Patch Notes (in reverse chronological order);</font>
+        <font color="#247d1d">Patch Notes (in reverse chronological order);</font>
     </h1>
+
+<h2>Version 1.3.8 (new lfo waveforms)</h2>
+<h3>
+    <ul>
+        <li> Added the trapezoid, stepped saw, and stepped triangle waveforms to lfo </li>
+        <li> Pitch envelopes now save their max value correctly </li>
+        <li> Filter mods now allow you to type in values greater than 10 </li>
+        <li> Added the arrows to the random and lfo waveform select </li>
+    </ul>
+</h3>
+<p>1/29/2025 🐍</p>
+
+<h2>Version 1.3.7 (patch)</h2>
+<h3>
+    <ul>
+        <li> Ported Ultrabox 2.2.14 </li>
+        <li> Fixed wording and typos in the description, faq, and patch notes </li>
+        <li> Moved the Ultrabox theme into the mod themes category </li>
+        <li> Fixed the shaker preset from causing song corruptions </li>
+        <li> Prevented lfo/random/pitch envelopes from causing song corruptions </li>
+    </ul>
+</h3>
+<p>1/18/2025</p>
+
+<h2>Version 1.3.6 (patch)</h2>
+<h3>
+    <ul>
+        <li> Fixed pitch envelopes and slides </li>
+        <li> Fixed wording and typos in the description, faq, and patch notes </li>
+    </ul>
+</h3>
+<p>1/9/2025</p>
+
+<h2>Version 1.3.5 (better random envelopes)</h2>
+<h3>
+    <ul>
+        <li> Added two new types to random envelopes (per note and time smooth) </li>
+        <li> Increased the max step amount for random envelopes to 24 </li>
+        <li> Corrected some preset errors </li>
+        <li> Recentered the harmonics editor </li>
+        <li> Ported Ultrabox 2.2.13 </li>
+        <ul>
+            <li>Posts with the #beepbox tag and a valid mod link show up on the new bluesky feed</li>
+            <li>The FAQ now links to the <a href="https://discord.gg/Tc997TstJb">BeepBox Modding server</a></li>
+        </ul>
+    </ul>
+</h3>
+<p>1/2/2025</p>
+
+<h2>Version 1.3.4 (patch)</h2>
+<h3>
+    <ul>
+        <li> Oops some sample files were missing for the song player.. That's been fixed </li>
+    </ul>
+</h3>
+<p>12/14/2024</p>
+
+<h2>Version 1.3.3 (updated faq)</h2>
+<h3>
+    <ul>
+        <li> Ported Ultrabox 2.2.12 </li>
+        <li> Updated the faq </li>
+        <li> Mushroom Drum removed because it was a duplicate preset </li>
+        <li> Compiled the offline version </li>
+    </ul>
+</h3>
+<p>12/1/2024</p>
+
+<h2>Version 1.3.2 (Even better randomization)</h2>
+<h3>
+    <ul>
+        <li> Adjusted random instruments again </li>
+        <li> Undoing no longer changes rhythm </li>
+        <li> Mild adjustments to the Slarmoo's Box theme </li>
+        <li> Mild adjustments to the distant sorrow preset </li>
+    </ul>
+</h3>
+<p>11/13/2024</p>
+
+<h2>Version 1.3.1 (Better random envelopes)</h2>
+<h3>
+    <ul>
+        <li> Random instrument envelopes now utilize the new envelope settings </li>
+        <li> The default rhythm has been reverted to ÷4</li>
+        <li> Beepbox Theme channel mute buttons show up now </li>
+        <li> Added 1 new preset </li>
+    </ul>
+</h3>
+<p>11/10/2024</p>
 
 <h2>Version 1.3 (Random Envelope, LFO, Envelope Modulation, and Song EQ)</h2>
 <h3>

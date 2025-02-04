@@ -321,7 +321,7 @@ export class PatternEditor {
                     this._modDragNote = this._cursor.curNote;
                     this._modDragPin = this._cursor.curNote.pins[pinIdx];
                     this._modDragLowerBound = Config.modulators[setting].convertRealFactor;
-                    this._modDragUpperBound = Config.modulators[setting].convertRealFactor + Config.modulators[setting].maxRawVol;
+                    this._modDragUpperBound = Config.modulators[setting].convertRealFactor + this._doc.song.getVolumeCapForSetting(true, setting, this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument(this._barOffset)].modFilterTypes[mod]);
                     this._modDragSetting = setting;
 
                     this.modDragValueLabel.style.setProperty("left", "" + this._modDragValueLabelLeft + "px");
@@ -2492,7 +2492,6 @@ export class PatternEditor {
                     let colorSecondary: string = (disabled ? ColorConfig.disabledNoteSecondary : ColorConfig.getChannelColor(this._doc.song, this._doc.channel).secondaryNote);
                     notePath.setAttribute("fill", colorSecondary);
                     notePath.setAttribute("pointer-events", "none");
-                    notePath.setAttribute("class", "note-secondary"); // for theming
                     this._drawNote(notePath, pitch, note.start, note.pins, (this._pitchHeight - this._pitchBorder) / 2 + 1, false, this._octaveOffset);
                     this._svgNoteContainer.appendChild(notePath);
                     notePath = SVG.path();
@@ -2500,7 +2499,6 @@ export class PatternEditor {
                     notePath.setAttribute("pointer-events", "none");
                     this._drawNote(notePath, pitch, note.start, note.pins, (this._pitchHeight - this._pitchBorder) / 2 + 1, true, this._octaveOffset);
                     this._svgNoteContainer.appendChild(notePath);
-                    notePath.setAttribute("class", "note-primary"); // for theming
 
                     if (this._doc.prefs.notesFlashWhenPlayed && !disabled) {
                         notePath = SVG.path();

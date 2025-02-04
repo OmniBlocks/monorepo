@@ -124,13 +124,13 @@ export const enum EnvelopeComputeIndex {
     pitchShift,
     detune,
     vibratoDepth,
-    //vibratoSpeed, doesn't follow normal envelope pattern; will figure out. 
+    //vibratoSpeed, doesn't follow normal envelope pattern; will figure out. //if you fix this you need to update the url
     noteFilterFreq0, noteFilterFreq1, noteFilterFreq2, noteFilterFreq3, noteFilterFreq4, noteFilterFreq5, noteFilterFreq6, noteFilterFreq7,
     noteFilterGain0, noteFilterGain1, noteFilterGain2, noteFilterGain3, noteFilterGain4, noteFilterGain5, noteFilterGain6, noteFilterGain7,
-    decimalOffset,
-    supersawDynamism,
-	supersawSpread,
-    supersawShape,
+    decimalOffset, //if updating url, move this to under pulse width
+    supersawDynamism, //and move these to be by the rest of the instrument type settings
+	supersawSpread, //^
+    supersawShape, //^
     panning,
     distortion,
     bitcrusherQuantization,
@@ -149,15 +149,18 @@ export const enum BaseWaveTypes {
     square,
     triangle,
     sawtooth,
+    trapezoid,
+    steppedSaw,
+    steppedTri,
     // ramp,
-    // trapezoid,
     length,
 }
 
 export const enum RandomEnvelopeTypes {
     time,
     pitch,
-    // note,
+    note,
+    timeSmooth,
     length,
 }
 
@@ -167,14 +170,7 @@ export const enum InstrumentAutomationIndex {
     eqFilterAllFreqs,
     eqFilterFreq0, eqFilterFreq1, eqFilterFreq2, eqFilterFreq3, eqFilterFreq4, eqFilterFreq5, eqFilterFreq6, eqFilterFreq7,
     eqFilterGain0, eqFilterGain1, eqFilterGain2, eqFilterGain3, eqFilterGain4, eqFilterGain5, eqFilterGain6, eqFilterGain7,
-    distortion,
-    bitcrusherQuantization,
-    bitcrusherFrequency,
-    panning,
-    chorus,
-    echoSustain,
     //echoDelay, // Wait until tick settings can be computed once for multiple run lengths.
-    reverb,
     length,
 }
 */
@@ -895,6 +891,7 @@ export class Config {
         { name: "Harmonic Major", realName: "harmonic major", flags: [true, false, true, false, true, true, false, true, true, false, false, true] }, // Harmonic Major
         { name: "Harmonic Minor", realName: "harmonic minor", flags: [true, false, true, true, false, true, false, true, true, false, false, true] }, // Harmonic Minor
         { name: "Melodic Minor", realName: "melodic minor", flags: [true, false, true, true, false, true, false, true, false, true, false, true] }, // Melodic Minor
+        { name: "Blues Major", realName: "blues major", flags: [true, false, true, true, true,false, false, true, false, true, false, false] }, // Blues Major
         { name: "Blues", realName: "blues", flags: [true, false, false, true, false, true, true, true, false, false, true, false] }, // Blues
         { name: "Altered", realName: "altered", flags: [true, true, false, true, true, false, true, false, true, false, true, false] }, // Altered
         { name: "Major Pentatonic", realName: "major pentatonic", flags: [true, false, true, false, true, false, false, true, false, true, false, false] }, // Major Pentatonic
@@ -902,14 +899,12 @@ export class Config {
         { name: "Whole Tone", realName: "whole tone", flags: [true, false, true, false, true, false, true, false, true, false, true, false] }, // Whole Tone
         { name: "Octatonic", realName: "octatonic", flags: [true, false, true, true, false, true, true, false, true, true, false, true] }, // Octatonic
         { name: "Hexatonic", realName: "hexatonic", flags: [true, false, false, true, true, false, false, true, true, false, false, true] }, // Hexatonic
+        // TODO: remove these with 2.3
         // modbox
-        { name: "No Dabbing", realName: "no dabbing", flags: [true, true, false, true, true, true, true, true, true, false, true, false] },
+        { name: "No Dabbing (MB)", realName: "no dabbing", flags:[true, true, false, true, true, true, true, true, true, false, true, false] },
         // todbox
-        { name: "Jacked Toad", realName: "jacked toad", flags: [true, false, true, true, false, true, true, true, true, false, true, true] },
-        { name: "Dumb", realName: "Originally named, currently named, and will always be named 'dumb.'", flags: [true, false, false, false, false, true, true, true, true, false, false, true] },
-        { name: "Test Scale", realName: "**t", flags: [true, true, false, false, false, true, true, false, false, true, true, false] },
-        // wackybox
-        { name: "die", realName: "death", flags: [true, false, false, false, false, false, false, false, true, false, false, false] },
+        { name: "Jacked Toad (TB)", realName: "jacked toad", flags: [true, false, true, true, false, true, true, true, true, false, true, true] },
+        { name: "Test Scale (TB)", realName: "**t", flags: [true, true, false, false, false, true, true, false, false, true, true, false] },
         { name: "Custom", realName: "custom", flags: [true, false, true, true, false, false, false, true, true, false, true, true] }, // Custom? considering allowing this one to be be completely configurable
     ]);
     public static readonly keys: DictionaryArray<Key> = toNameMap([
@@ -964,8 +959,8 @@ export class Config {
 		{ name: "÷3 (triplets)", stepsPerBeat: 3, /*ticksPerArpeggio: 4, arpeggioPatterns: [[0], [0, 0, 1, 1], [0, 1, 2, 1], [0, 1, 2, 3]]*/ roundUpThresholds: [/*0*/ 5, /*8*/ 12, /*16*/ 18 /*24*/] },
 		{ name: "÷4 (standard)", stepsPerBeat: 4, /*ticksPerArpeggio: 3, arpeggioPatterns: [[0], [0, 0, 1, 1], [0, 1, 2, 1], [0, 1, 2, 3]]*/ roundUpThresholds: [/*0*/ 3, /*6*/ 9, /*12*/ 17, /*18*/ 21 /*24*/] },
 		{ name: "÷6", stepsPerBeat: 6, /*ticksPerArpeggio: 4, arpeggioPatterns: [[0], [0, 1], [0, 1, 2, 1], [0, 1, 2, 3]]*/ roundUpThresholds: null },
-        { name: "÷8", stepsPerBeat: 8, /*ticksPerArpeggio: 3, arpeggioPatterns: [[0], [0, 1], [0, 1, 2, 1], [0, 1, 2, 3]]*/ roundUpThresholds: null },
-        { name: "÷12", stepsPerBeat: 12, roundUpThresholds: null },
+		{ name: "÷8", stepsPerBeat: 8, /*ticksPerArpeggio: 3, arpeggioPatterns: [[0], [0, 1], [0, 1, 2, 1], [0, 1, 2, 3]]*/ roundUpThresholds: null },
+        { name: "÷12", stepsPerBeat: 12, /*ticksPerArpeggio: 3, arpeggioPatterns: [[0], [0, 1], [0, 1, 2, 1]]*/ roundUpThresholds: null },
 		{ name: "freehand", stepsPerBeat: 24, /*ticksPerArpeggio: 3, arpeggioPatterns: [[0], [0, 1], [0, 1, 2, 1], [0, 1, 2, 3]]*/ roundUpThresholds: null },
 	]);
 
@@ -1329,7 +1324,7 @@ export class Config {
     public static readonly envelopes: DictionaryArray<Envelope> = toNameMap([
         { name: "none", type: EnvelopeType.none, speed: 0.0 },
         { name: "note size", type: EnvelopeType.noteSize, speed: 0.0 },
-        { name: "pitch", type: EnvelopeType.pitch, speed: 0.0 }, // Slarmoo's box
+        { name: "pitch", type: EnvelopeType.pitch, speed: 0.0 }, // Slarmoo's box (fairly useless on drumsets)
         { name: "punch", type: EnvelopeType.punch, speed: 0.0 },
         { name: "flare -1", type: EnvelopeType.flare, speed: 128.0 },
         { name: "flare 1", type: EnvelopeType.flare, speed: 32.0 },
@@ -1402,7 +1397,7 @@ export class Config {
     public static readonly newEnvelopes: DictionaryArray<Envelope> = toNameMap([
         { name: "none", type: EnvelopeType.none, speed: 0.0 },
         { name: "note size", type: EnvelopeType.noteSize, speed: 0.0 },
-        { name: "pitch", type: EnvelopeType.pitch, speed: 0.0 }, 
+        { name: "pitch", type: EnvelopeType.pitch, speed: 0.0 },
         { name: "random", type: EnvelopeType.pseudorandom, speed: 4.0 }, //Slarmoo's box 1.3
         { name: "punch", type: EnvelopeType.punch, speed: 0.0 },
         { name: "flare", type: EnvelopeType.flare, speed: 32.0 },
@@ -1415,8 +1410,8 @@ export class Config {
         { name: "linear", type: EnvelopeType.linear, speed: 32.0 },
         { name: "rise", type: EnvelopeType.rise, speed: 32.0 },
         { name: "blip", type: EnvelopeType.blip, speed: 6.0 },
-        { name: "fall", type: EnvelopeType.fall, speed: 2.0 }, 
-    ])
+        { name: "fall", type: EnvelopeType.fall, speed: 2.0 },
+    ]);
 
 
 
@@ -1542,7 +1537,7 @@ export class Config {
     public static readonly sineWave: Float32Array = generateSineWave();
 
     public static readonly perEnvelopeSpeedIndices: number[] = [0, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.1, 0.2, 0.25, 0.3, 0.3333, 0.4, 0.5, 0.6, 0.6667, 0.7, 0.75, 0.8, 0.9, 1, 1.25, 1.3333, 1.5, 1.6667, 1.75, 2, 2.25, 2.5, 2.75, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 24, 32, 40, 64, 128, 256];
-    public static readonly perEnvelopeSpeedToIndices: Dictionary<number> = {
+    public static readonly perEnvelopeSpeedToIndices: Dictionary<number> = { //used to convert speeds back into indices
         0: 0,
         0.01: 1,
         0.02: 2,
@@ -1609,9 +1604,10 @@ export class Config {
         256: 63,
     }
 
-    public static readonly perEnvelopeBoundMin: number = 0;
-    public static readonly perEnvelopeBoundMax: number = 2;
-    //public static readonly randomEnvelopeTypes: string[] = ["time", "pitch"];
+    public static readonly perEnvelopeBoundMin: number = 0; //probably should leave at 0. Negative envelopes are problematic right now
+    public static readonly perEnvelopeBoundMax: number = 2; //max of 6.3 unless you update url
+    public static readonly randomEnvelopeSeedMax: number = 63; //if you increase this you'll need to update the url to support it
+    public static readonly randomEnvelopeStepsMax: number = 24; 
 
     // Picked strings have an all-pass filter with a corner frequency based on the tone fundamental frequency, in order to add a slight inharmonicity. (Which is important for distortion.)
     public static readonly pickedStringDispersionCenterFreq: number = 6000.0; // The tone fundamental freq is pulled toward this freq for computing the all-pass corner freq.

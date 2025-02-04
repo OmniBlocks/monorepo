@@ -14,122 +14,121 @@ import { ArrayBufferReader } from "./ArrayBufferReader";
 const { button, p, div, h2, input, select, option } = HTML;
 
 export class ImportPrompt implements Prompt {
-		private readonly _fileInput: HTMLInputElement = input({type: "file", accept: ".json,application/json,.mid,.midi,audio/midi,audio/x-midi"});
-		private readonly _cancelButton: HTMLButtonElement = button({class: "cancelButton"});
-		private readonly _modeImportSelect: HTMLSelectElement = select({style: "width: 100%;"},
-			option({value: "auto"}, "Auto-detect mode (for json)"),
-			option({value: "BeepBox"}, "BeepBox"),
-			option({value: "ModBox"}, "ModBox"),
-			option({value: "JummBox"}, "JummBox"),
-			option({value: "SynthBox"}, "SynthBox"),
-			option({value: "GoldBox"}, "GoldBox"),
-			option({value: "PaandorasBox"}, "PaandorasBox"),
-			// Currently this option is unnecessary (UB is handled the same as JB) but we're keeping it in case there's any future conflicts
-			// There's also the situation where someone will see the "GoldBox" or "PaandorasBox" options and think they have to use one of those two
-            option({ value: "UltraBox" }, "UltraBox"),
-            option({ value: "slarmoosbox" }, "Slarmoo's Box")
-		);
-		
-		public readonly container: HTMLDivElement = div({class: "prompt noSelection", style: "width: 300px;"},
-		h2("Import"),
-			p({style: "text-align: left; margin: 0.5em 0;"},
-			"BeepBox songs can be exported and re-imported as .json files. You could also use other means to make .json files for BeepBox as long as they follow the same structure.",
-		),
-			p({style: "text-align: left; margin: 0.5em 0;"},
-			"BeepBox can also (crudely) import .mid files. There are many tools available for creating .mid files. Shorter and simpler songs are more likely to work well.",
-		),
-		this._modeImportSelect,
-		this._fileInput,
-		this._cancelButton,
-	);
-		
-	constructor(private _doc: SongDocument) {
-		this._fileInput.select();
-			setTimeout(()=>this._fileInput.focus());
-			
-		this._fileInput.addEventListener("change", this._whenFileSelected);
-		this._cancelButton.addEventListener("click", this._close);
-	}
-		
-		private _close = (): void => { 
-		this._doc.undo();
-	}
-		
-		public cleanUp = (): void => { 
-		this._fileInput.removeEventListener("change", this._whenFileSelected);
-		this._cancelButton.removeEventListener("click", this._close);
-	}
-		
-	private _whenFileSelected = (): void => {
-		const file: File = this._fileInput.files![0];
-		if (!file) return;
-			
-		const extension: string = file.name.slice((file.name.lastIndexOf(".") - 1 >>> 0) + 2).toLowerCase();
-		if (extension == "json") {
-			const reader: FileReader = new FileReader();
-			reader.addEventListener("load", (event: Event): void => {
-				this._doc.prompt = null;
-				this._doc.goBackToStart();
-				this._doc.record(new ChangeSong(this._doc, <string>reader.result, this._modeImportSelect.value), true, true);
-			});
-			reader.readAsText(file);
-		} else if (extension == "midi" || extension == "mid") {
-			const reader: FileReader = new FileReader();
-			reader.addEventListener("load", (event: Event): void => {
-				this._doc.prompt = null;
-				this._doc.goBackToStart();
-				this._parseMidiFile(<ArrayBuffer>reader.result);
-			});
-			reader.readAsArrayBuffer(file);
-		} else {
-			console.error("Unrecognized file extension.");
-			this._close();
-		}
-	}
-		
-	private _parseMidiFile(buffer: ArrayBuffer): void {
-			
-		// First, split the file into separate buffer readers for each chunk. There should be one header chunk and one or more track chunks.
-		const reader = new ArrayBufferReader(new DataView(buffer));
-		let headerReader: ArrayBufferReader | null = null;
-		interface Track {
-			reader: ArrayBufferReader;
-			nextEventMidiTick: number;
-			ended: boolean;
-			runningStatus: number;
-		}
-		const tracks: Track[] = [];
-			while(reader.hasMore()) {
-			const chunkType: number = reader.readUint32();
-			const chunkLength: number = reader.readUint32();
-			if (chunkType == MidiChunkType.header) {
-				if (headerReader == null) {
-					headerReader = reader.getReaderForNextBytes(chunkLength);
-				} else {
-					console.error("This MIDI file has more than one header chunk.");
-				}
-			} else if (chunkType == MidiChunkType.track) {
-				const trackReader: ArrayBufferReader = reader.getReaderForNextBytes(chunkLength);
-				if (trackReader.hasMore()) {
-					tracks.push({
-						reader: trackReader,
-						nextEventMidiTick: trackReader.readMidiVariableLength(),
-						ended: false,
-						runningStatus: -1,
-					});
-				}
-			} else {
-				// Unknown chunk type. Skip it.
-				reader.skipBytes(chunkLength);
-			}
-		}
-			
-		if (headerReader == null) {
-			console.error("No header chunk found in this MIDI file.");
-			this._close();
-			return;
-		}
-		const fileFormat: number = headerReader.readUint16();
+    private readonly _fileInput: HTMLInputElement = input({ type: "file", accept: ".json,application/json,.mid,.midi,audio/midi,audio/x-midi" });
+    private readonly _cancelButton: HTMLButtonElement = button({ class: "cancelButton" });
+    private readonly _modeImportSelect: HTMLSelectElement = select({ style: "width: 100%;" },
+        option({ value: "auto" }, "Auto-detect mode (for json)"),
+        option({ value: "BeepBox" }, "BeepBox"),
+        option({ value: "ModBox" }, "ModBox"),
+        option({ value: "JummBox" }, "JummBox"),
+        option({ value: "SynthBox" }, "SynthBox"),
+        option({ value: "GoldBox" }, "GoldBox"),
+        option({ value: "PaandorasBox" }, "PaandorasBox"),
+        // Currently this option is unnecessary (UB is handled the same as JB) but we're keeping it in case there's any future conflicts
+        // There's also the situation where someone will see the "GoldBox" or "PaandorasBox" options and think they have to use one of those two
+        option({ value: "UltraBox" }, "UltraBox"),
+    );
+
+    public readonly container: HTMLDivElement = div({ class: "prompt noSelection", style: "width: 300px;" },
+        h2("Import"),
+        p({ style: "text-align: left; margin: 0.5em 0;" },
+            "BeepBox songs can be exported and re-imported as .json files. You could also use other means to make .json files for BeepBox as long as they follow the same structure.",
+        ),
+        p({ style: "text-align: left; margin: 0.5em 0;" },
+            "BeepBox can also (crudely) import .mid files. There are many tools available for creating .mid files. Shorter and simpler songs are more likely to work well.",
+        ),
+        this._modeImportSelect,
+        this._fileInput,
+        this._cancelButton,
+    );
+
+    constructor(private _doc: SongDocument) {
+        this._fileInput.select();
+        setTimeout(() => this._fileInput.focus());
+
+        this._fileInput.addEventListener("change", this._whenFileSelected);
+        this._cancelButton.addEventListener("click", this._close);
+    }
+
+    private _close = (): void => {
+        this._doc.undo();
+    }
+
+    public cleanUp = (): void => {
+        this._fileInput.removeEventListener("change", this._whenFileSelected);
+        this._cancelButton.removeEventListener("click", this._close);
+    }
+
+    private _whenFileSelected = (): void => {
+        const file: File = this._fileInput.files![0];
+        if (!file) return;
+
+        const extension: string = file.name.slice((file.name.lastIndexOf(".") - 1 >>> 0) + 2).toLowerCase();
+        if (extension == "json") {
+            const reader: FileReader = new FileReader();
+            reader.addEventListener("load", (event: Event): void => {
+                this._doc.prompt = null;
+                this._doc.goBackToStart();
+                this._doc.record(new ChangeSong(this._doc, <string>reader.result, this._modeImportSelect.value), true, true);
+            });
+            reader.readAsText(file);
+        } else if (extension == "midi" || extension == "mid") {
+            const reader: FileReader = new FileReader();
+            reader.addEventListener("load", (event: Event): void => {
+                this._doc.prompt = null;
+                this._doc.goBackToStart();
+                this._parseMidiFile(<ArrayBuffer>reader.result);
+            });
+            reader.readAsArrayBuffer(file);
+        } else {
+            console.error("Unrecognized file extension.");
+            this._close();
+        }
+    }
+
+    private _parseMidiFile(buffer: ArrayBuffer): void {
+
+        // First, split the file into separate buffer readers for each chunk. There should be one header chunk and one or more track chunks.
+        const reader = new ArrayBufferReader(new DataView(buffer));
+        let headerReader: ArrayBufferReader | null = null;
+        interface Track {
+            reader: ArrayBufferReader;
+            nextEventMidiTick: number;
+            ended: boolean;
+            runningStatus: number;
+        }
+        const tracks: Track[] = [];
+        while (reader.hasMore()) {
+            const chunkType: number = reader.readUint32();
+            const chunkLength: number = reader.readUint32();
+            if (chunkType == MidiChunkType.header) {
+                if (headerReader == null) {
+                    headerReader = reader.getReaderForNextBytes(chunkLength);
+                } else {
+                    console.error("This MIDI file has more than one header chunk.");
+                }
+            } else if (chunkType == MidiChunkType.track) {
+                const trackReader: ArrayBufferReader = reader.getReaderForNextBytes(chunkLength);
+                if (trackReader.hasMore()) {
+                    tracks.push({
+                        reader: trackReader,
+                        nextEventMidiTick: trackReader.readMidiVariableLength(),
+                        ended: false,
+                        runningStatus: -1,
+                    });
+                }
+            } else {
+                // Unknown chunk type. Skip it.
+                reader.skipBytes(chunkLength);
+            }
+        }
+
+        if (headerReader == null) {
+            console.error("No header chunk found in this MIDI file.");
+            this._close();
+            return;
+        }
+        const fileFormat: number = headerReader.readUint16();
 		/*const trackCount: number =*/ headerReader.readUint16();
         const midiTicksPerBeat: number = headerReader.readUint16();
 
@@ -946,7 +945,7 @@ export class ImportPrompt implements Prompt {
                 song.beatsPerBar = beatsPerBar;
                 song.key = key;
                 song.scale = 0;
-                song.rhythm = 5;
+                song.rhythm = 2;
                 song.layeredInstruments = false;
                 song.patternInstruments = pitchChannels.some(channel => channel.instruments.length > 1) || noiseChannels.some(channel => channel.instruments.length > 1);
 

@@ -46,6 +46,7 @@
   const SIDE_MODE = "threed.sidemode";
   const TEX_FILTER = "threed.texfilter";
   const Z_POS = "threed.zpos";
+  const Z_STRETCH = "threed.zstretch";
   const YAW = "threed.yaw";
   const PITCH = "threed.pitch";
   const ROLL = "threed.roll";
@@ -367,6 +368,23 @@
                 </value>
             </block>
           `),
+          "---",
+          {
+            opcode: "setZStretch",
+            blockType: Scratch.BlockType.COMMAND,
+            text: Scratch.translate("set stretch z to [STRETCH]"),
+            arguments: {
+              STRETCH: {
+                type: Scratch.ArgumentType.NUMBER,
+                defaultValue: "100",
+              },
+            },
+          },
+          {
+            opcode: "getZStretch",
+            blockType: Scratch.BlockType.REPORTER,
+            text: Scratch.translate("stretch z"),
+          },
           "---",
           {
             opcode: "setTexFilter",
@@ -800,7 +818,7 @@ If I ever decide to release this extension on the gallery, this will be replaced
             const obj = this[OBJECT];
             obj.scale.x = (obj._sizeX ?? 100) / 100 * scale[0];
             obj.scale.y = (obj._sizeY ?? 100) / 100 * scale[1];
-            obj.scale.z = (obj._sizeZ ?? 100) / 100 * scale[0];
+            obj.scale.z = (obj._sizeZ ?? 100) / 100 * (this[Z_STRETCH] ?? scale[0]);
             threed.updateRenderer();
           }
           return og(scale);
@@ -996,8 +1014,8 @@ If I ever decide to release this extension on the gallery, this will be replaced
         const sy = obj.scale.y / 2;
 
         shape = new THREE.Box3(
-          new THREE.Vector3(-sx, -sy, -sx),
-          new THREE.Vector3(sx, sy, -sx),
+          new THREE.Vector3(-sx, -sy, 0.5),
+          new THREE.Vector3(sx, sy, 0.5),
         );
       }
       return shape;
@@ -1261,6 +1279,7 @@ If I ever decide to release this extension on the gallery, this will be replaced
       dr[IN_3D] = false;
 
       dr[Z_POS] = dr[OBJECT].position.z;
+      delete dr[Z_STRETCH];
 
       dr[OBJECT].removeFromParent();
       dr[OBJECT].material.dispose();
@@ -1337,6 +1356,29 @@ If I ever decide to release this extension on the gallery, this will be replaced
       const dr = renderer._allDrawables[util.target.drawableID];
       if (!dr[OBJECT]) return 0;
       return dr[OBJECT].position.z;
+    }
+
+    setZStretch({ STRETCH }, util) {
+      if (util.target.isStage) return;
+
+      const dr = renderer._allDrawables[util.target.drawableID];
+      if (!dr[IN_3D]) return;
+
+      // empty strings and invalid numbers should use the horizontal scale
+      if (isNaN(STRETCH) || (typeof STRETCH === "string" && !STRETCH.trim()))
+        delete dr[Z_STRETCH];
+      else
+        dr[Z_STRETCH] = +STRETCH;
+      // @ts-expect-error wrong type
+      dr.updateScale(dr.scale);
+      this.updateRenderer();
+    }
+
+    getZStretch(_args, util) {
+      if (util.target.isStage) return "";
+
+      const dr = renderer._allDrawables[util.target.drawableID];
+      return dr[Z_STRETCH] ?? "";
     }
 
     mod(n, modulus) {

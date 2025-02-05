@@ -121,6 +121,7 @@ class TextBubbleSkin extends Skin {
      */
     setStyle (newStyle) {
         this._style = Object.assign({}, this._style, newStyle);
+        this.measurementProvider.clearCache();
         this._restyleCanvas();
         this._textDirty = true;
         this._textureDirty = true;
@@ -131,7 +132,6 @@ class TextBubbleSkin extends Skin {
      * Re-style the canvas after resizing it. This is necessary to ensure proper text measurement.
      */
     _restyleCanvas () {
-        this.measurementProvider.clearCache();
         this._canvas.getContext('2d').font = `${this._style.fontSize}px ${this._style.font}, sans-serif`;
     }
 
@@ -178,6 +178,7 @@ class TextBubbleSkin extends Skin {
         // Resize the canvas to the correct screen-space size
         this._canvas.width = Math.ceil(this._size[0] * scale);
         this._canvas.height = Math.ceil(this._size[1] * scale);
+        this._restyleCanvas();
 
         // Reset the transform before clearing to ensure 100% clearage
         ctx.setTransform(1, 0, 0, 1, 0, 0);

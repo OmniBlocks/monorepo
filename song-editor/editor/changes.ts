@@ -3,7 +3,7 @@
 import { Algorithm, Dictionary, FilterType, SustainType, InstrumentType, EffectType, AutomationTarget, Config, effectsIncludeDistortion, BaseWaveTypes, RandomEnvelopeTypes } from "../synth/SynthConfig";
 import { NotePin, Note, makeNotePin, Pattern, FilterSettings, FilterControlPoint, SpectrumWave, HarmonicsWave, AdditiveWave, Instrument, Channel, Song, Synth, clamp } from "../synth/synth";
 import { Preset, PresetCategory, EditorConfig } from "./EditorConfig";
-import { Change, ChangeGroup, ChangeSequence, UndoableChange } from "./Change";
+import { Change, ChangeGroup, ChangeSequence, IndexableChange, UndoableChange } from "./Change";
 import { SongDocument } from "./SongDocument";
 import { ColorConfig } from "./ColorConfig";
 import { Slider } from "./HTMLWrapper";
@@ -5172,11 +5172,11 @@ export class ChangeEnvelopeInverse extends Change {
     }
 }
 
-export class ChangePerEnvelopeSpeed extends Change {
-    constructor(doc: SongDocument, speed: number, index: number) {
-        super();
+export class ChangePerEnvelopeSpeed extends IndexableChange {
+    constructor(doc: SongDocument, oldSpeed: number, speed: number, index: number) {
+        super(index);
         const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
-        const oldSpeed: number = instrument.envelopes[index].perEnvelopeSpeed;
+        // const oldSpeed: number = instrument.envelopes[index].perEnvelopeSpeed;
         if (oldSpeed != speed) {
             instrument.envelopes[index].perEnvelopeSpeed = speed;
             instrument.preset = instrument.type;

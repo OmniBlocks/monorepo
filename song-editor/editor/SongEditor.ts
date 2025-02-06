@@ -1036,7 +1036,7 @@ export class SongEditor {
     private readonly _harmonicsEditor: HarmonicsEditor = new HarmonicsEditor(this._doc);
     private readonly _harmonicsZoom: HTMLButtonElement = button({ style: "padding-left:0.2em; height:1.5em; max-width: 12px;", onclick: () => this._openPrompt("harmonicsSettings") }, "+");
     private readonly _harmonicsRow: HTMLElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("harmonics"), style: "font-size: smaller"}, "Harmonics:"), this._harmonicsZoom, this._harmonicsEditor.container);
-    private readonly _additiveEditor: AdditiveEditor = new AdditiveEditor(this._doc);
+    private readonly _additiveEditor: AdditiveEditor = new AdditiveEditor(this._doc, false);
     private readonly _additiveZoom: HTMLButtonElement = button({ style: "margin-left:0em; padding-left:0.2em; height:1.5em; max-width: 12px;", onclick: () => this._openPrompt("additiveSettings") }, "+");
     private readonly _additiveRow: HTMLElement = div({ class: "selectRow" }, span({ class: "tip ", onclick: () => this._openPrompt("additive"), style: "font-size: smaller" }, "Additive:"), this._additiveZoom, this._additiveEditor.container);
 
@@ -1405,9 +1405,9 @@ export class SongEditor {
     private readonly _operatorDropdownGroups: HTMLDivElement[] = [];
     readonly _drumsetSpectrumEditors: SpectrumEditor[] = [];
     private readonly _drumsetEnvelopeSelects: HTMLSelectElement[] = [];
-    private _showModSliders: boolean[] = [];
-    private _newShowModSliders: boolean[] = [];
-    private _modSliderValues: number[] = [];
+    private _showModSliders: boolean[][] = [];
+    private _newShowModSliders: boolean[][] = [];
+    private _modSliderValues: number[][] = [];
     private _hasActiveModSliders: boolean = false;
 
     private _openPanDropdown: boolean = false;
@@ -1457,8 +1457,14 @@ export class SongEditor {
 
         this._unisonSelect.appendChild(option({ hidden: true, value: Config.unisons.length }, "custom"));
 
-        this._showModSliders = new Array<boolean>(Config.modulators.length);
-        this._modSliderValues = new Array<number>(Config.modulators.length);
+        this._showModSliders = new Array<boolean[]>(Config.modulators.length);
+        this._modSliderValues = new Array<number[]>(Config.modulators.length);
+        //set default values
+        for (let i = 0; i < Config.modulators.length; i++) {
+            this._newShowModSliders[i] = [];
+            this._showModSliders[i] = [];
+            this._modSliderValues[i] = [];
+        }
 
         this._phaseModGroup.appendChild(div({ class: "selectRow", style: `color: ${ColorConfig.secondaryText}; height: 1em; margin-top: 0.5em;` },
             div({ style: "margin-right: .1em; visibility: hidden;" }, 1 + "."),
@@ -1878,14 +1884,16 @@ export class SongEditor {
             this._songEqFilterEditor.render();
 
             for (let setting: number = 0; setting < Config.modulators.length; setting++) {
-                if (this._showModSliders[setting] == true) {
-                    this._showModSliders[setting] = false;
-                    this._newShowModSliders[setting] = false;
-                    let slider: Slider | null = this.getSliderForModSetting(setting);
+                for (let index: number = 0; index <= Config.modulators[setting].maxIndex; index++) {
+                    if (this._showModSliders[setting][index] == true) {
+                        this._showModSliders[setting][index] = false;
+                        this._newShowModSliders[setting][index] = false;
+                        let slider: Slider | null = this.getSliderForModSetting(setting, index);
+                        
+                        if (slider != null) {
+                            slider.container.classList.remove("modSlider");
 
-                    if (slider != null) {
-                        slider.container.classList.remove("modSlider");
-
+                        }
                     }
                 }
             }
@@ -1901,30 +1909,37 @@ export class SongEditor {
 
                 function updateModSlider(editor: SongEditor, slider: Slider, setting: number, channel: number, instrument: number): boolean {
                     if (editor._doc.synth.isModActive(setting, channel, instrument)) {
-                        let currentVal: number = (editor._doc.synth.getModValue(setting, channel, instrument, false) - Config.modulators[setting].convertRealFactor) / Config.modulators[setting].maxRawVol;
+                        for (let index: number = 0; index <= Config.modulators[setting].maxIndex; index++) {
+                            let currentVal: number = (editor._doc.synth.getModValue(setting, channel, instrument, false) - Config.modulators[setting].convertRealFactor) / Config.modulators[setting].maxRawVol;
 
-                        if (Config.modulators[setting].invertSliderIndicator == true) {
-                            currentVal = 1 - currentVal;
-                        }
+                            if (Config.modulators[setting].invertSliderIndicator == true) {
+                                currentVal = 1 - currentVal;
+                            }
 
-                        if (currentVal != editor._modSliderValues[setting]) {
-                            editor._modSliderValues[setting] = currentVal;
-                            slider.container.style.setProperty("--mod-position", (currentVal * 96.0 + 2.0) + "%");
+                            if (currentVal != editor._modSliderValues[setting][index]) {
+                                editor._modSliderValues[setting][index] = currentVal;
+                                slider.container.style.setProperty("--mod-position", (currentVal * 96.0 + 2.0) + "%");
+                            }
+                            return true;
                         }
-                        return true;
                     }
                     return false;
                 }
 
                 // Set mod sliders to present values
                 for (let setting: number = 0; setting < Config.modulators.length; setting++) {
-                    // Set to last value
-                    this._newShowModSliders[setting] = this._showModSliders[setting];
+                    for (let index: number = 0; index <= Config.modulators[setting].maxIndex; index++) {
+                        // Set to last value
+                        this._newShowModSliders[setting][index] = Boolean(this._showModSliders[setting][index]);
 
-                    // Check for newer value
-                    let slider: Slider | null = this.getSliderForModSetting(setting);
-                    if (slider != null) {
-                        this._newShowModSliders[setting] = updateModSlider(this, slider, setting, this._doc.channel, instrument);
+                        // Check for newer value
+                   
+                        let slider: Slider | null = this.getSliderForModSetting(setting, index);
+
+                        if (slider != null) {
+                            this._newShowModSliders[setting][index] = updateModSlider(this, slider, setting, this._doc.channel, instrument);
+
+                        }
                     }
                 }
 
@@ -1932,7 +1947,9 @@ export class SongEditor {
             else if (this._hasActiveModSliders) {
                 // Zero out show-mod-slider settings (since none are active) to kill active mod slider flag
                 for (let setting: number = 0; setting < Config.modulators.length; setting++) {
-                    this._newShowModSliders[setting] = false;
+                    for (let index: number = 0; index <= Config.modulators[setting].maxIndex; index++) {
+                        this._newShowModSliders[setting][index] = false;
+                    }
                 }
             }
 
@@ -1942,24 +1959,29 @@ export class SongEditor {
                 let anySliderActive: boolean = false;
 
                 for (let setting: number = 0; setting < Config.modulators.length; setting++) {
-                    if (this._newShowModSliders[setting] != this._showModSliders[setting]) {
-                        this._showModSliders[setting] = this._newShowModSliders[setting];
-                        let slider: Slider | null = this.getSliderForModSetting(setting);
+                    for (let index: number = 0; index <= Config.modulators[setting].maxIndex; index++) {
+                        if (this._newShowModSliders[setting][index] != this._showModSliders[setting][index]) {
+                            this._showModSliders[setting][index] = this._newShowModSliders[setting][index];
+                            for (let index: number = 0; index <= Config.modulators[setting].maxIndex; index++) {
+                                let slider: Slider | null = this.getSliderForModSetting(setting, index);
 
-                        if (slider != null) {
+                                if (slider != null) {
 
-                            if (this._showModSliders[setting] == true) {
-                                slider.container.classList.add("modSlider");
+                                    if (this._showModSliders[setting][index] == true) {
+                                        slider.container.classList.add("modSlider");
+                                    }
+                                    else {
+                                        slider.container.classList.remove("modSlider");
+                                    }
+
+                                }
                             }
-                            else {
-                                slider.container.classList.remove("modSlider");
-                            }
-
+                        
                         }
-                    }
 
-                    if (this._newShowModSliders[setting] == true)
-                        anySliderActive = true;
+                        if (this._newShowModSliders[setting][index] == true)
+                            anySliderActive = true;
+                    }
                 }
 
                 this._hasActiveModSliders = anySliderActive;
@@ -1970,7 +1992,8 @@ export class SongEditor {
 
     }
 
-    public getSliderForModSetting(setting: number): Slider | null {
+    public getSliderForModSetting(setting: number, index?: number): Slider | null {
+        index = index == undefined ? 0 : index;
         switch (setting) {
             case Config.modulators.dictionary["pan"].index:
                 return this._panSlider;
@@ -1997,7 +2020,7 @@ export class SongEditor {
             case Config.modulators.dictionary["note volume"].index:
                 // So, this should technically not affect this slider, but it will look better as legacy songs used this mod as 'volume'.
                 // In the case that mix volume is used as well, they'd fight for the display, so just don't use this.
-                if (!this._showModSliders[Config.modulators.dictionary["mix volume"].index])
+                if (!this._showModSliders[Config.modulators.dictionary["mix volume"].index][index])
                     return this._instrumentVolumeSlider;
                 return null;
             case Config.modulators.dictionary["mix volume"].index:
@@ -2050,6 +2073,8 @@ export class SongEditor {
                 return this._supersawSpreadSlider;
             case Config.modulators.dictionary["saw shape"].index:
                 return this._supersawShapeSlider;
+            case Config.modulators.dictionary["individual envelope speed"].index:
+                return this.envelopeEditor.perEnvelopeSpeedSliders[index];
             default:
                 return null;
         }
@@ -4948,7 +4973,6 @@ export class SongEditor {
             this._doc.notifier.changed();
         } else {
             this._doc.record(new ChangeRhythm(this._doc, this._rhythmSelect.selectedIndex));
-            console.log("here!");
         }
     }
 

@@ -1342,6 +1342,8 @@ class JSGenerator {
         const opcodeFunction = this.evaluateOnce(`runtime.getOpcodeFunction("${sanitize(opcode)}")`);
         result += `}, ${opcodeFunction}, ${this.isWarp}, ${setFlags}, "${sanitize(node.id)}", ${frameName})`;
 
+        this.yielded();
+
         return result;
     }
 

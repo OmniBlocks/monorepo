@@ -559,9 +559,16 @@ export class TipPrompt implements Prompt {
 			case "pitchRange": {
 				message = div(
 					h2("Pitch Envelope Start and End"),
-					p("These two settings will adjust where the start and end of the pitch envelope affects. Everything below start envelope will be 0, everything above end envelope will be 1, and everything inbetween will scale linearly based on pitch (the opposite is true if inverted)."),
+					p("These two settings will adjust where the start and end of the pitch envelope affects. Everything below start envelope will be the value of the lower bound, everything above end envelope will be upper bound, and everything inbetween will scale linearly based on pitch (the opposite is true if inverted)."),
 					p("This will NOT work properly if pitch start is greater than pitch end."),
 					p("These values are different than the MIDI numbers. These correspond to how many paino keys from the bottom of the song player a specific pitch is"),
+				);
+			} break;
+			case "noteSizeRange": {
+				message = div(
+					h2("Note Size Envelope Start and End"),
+					p("These two settings work vert similarly to the pitch range bounds, except for note size envelopes instead. Everything below start envelope will be the value of the lower bound, everything above end envelope will be upper bound, and everything inbetween will scale linearly based on note size (the opposite is true if inverted)."),
+					p("This will NOT work properly if note size start is greater than note size end."),
 				);
 			} break;
 			case "envelopeInvert": {

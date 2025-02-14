@@ -1,6 +1,6 @@
 // Copyright (c) 2012-2022 John Nesky and contributing authors, distributed under the MIT license, see accompanying the LICENSE.md file.
 
-import { Algorithm, Dictionary, FilterType, SustainType, InstrumentType, EffectType, AutomationTarget, Config, effectsIncludeDistortion, BaseWaveTypes, RandomEnvelopeTypes } from "../synth/SynthConfig";
+import { Algorithm, Dictionary, FilterType, SustainType, InstrumentType, EffectType, AutomationTarget, Config, effectsIncludeDistortion, LFOEnvelopeTypes, RandomEnvelopeTypes } from "../synth/SynthConfig";
 import { NotePin, Note, makeNotePin, Pattern, FilterSettings, FilterControlPoint, SpectrumWave, HarmonicsWave, AdditiveWave, Instrument, Channel, Song, Synth, clamp } from "../synth/synth";
 import { Preset, PresetCategory, EditorConfig } from "./EditorConfig";
 import { Change, ChangeGroup, ChangeSequence, IndexableChange, UndoableChange } from "./Change";
@@ -1115,7 +1115,7 @@ export class ChangeRandomGeneratedInstrument extends Change {
                         { item: "rise", weight: 8 },
                         { item: "fall", weight: 2 },
                     ])].index, true, 0, -1, selectWeightedRandom([{ item: false, weight: 8 }, { item: true, weight: 1 }]), Config.perEnvelopeSpeedIndices[selectCurvedDistribution(1, 63, 45, 20)], envelopeLowerBound, envelopeUpperBound, selectCurvedDistribution(2, 16, 2, 6), selectCurvedDistribution(1, 64, 32, 31),
-                        selectWeightedRandom([{ item: BaseWaveTypes.sine, weight: 2 }, { item: BaseWaveTypes.triangle, weight: 5 }]));
+                        selectWeightedRandom([{ item: LFOEnvelopeTypes.sine, weight: 2 }, { item: LFOEnvelopeTypes.triangle, weight: 5 }]));
                 }
             }
             if (effectsIncludeDistortion(instrument.effects) && Math.random() < 0.8) {
@@ -1150,7 +1150,7 @@ export class ChangeRandomGeneratedInstrument extends Change {
                     { item: "rise", weight: 8},
                     { item: "fall", weight: 2 },
                 ])].index, true, 0, -1, selectWeightedRandom([{ item: false, weight: 8 }, { item: true, weight: 1 }]), Config.perEnvelopeSpeedIndices[selectCurvedDistribution(1, 63, 30, 30)], envelopeLowerBound, envelopeUpperBound, 2, 2,
-                    selectWeightedRandom([{ item: BaseWaveTypes.sine, weight: 8 }, { item: BaseWaveTypes.triangle, weight: 4 }, { item: BaseWaveTypes.sawtooth, weight: 2 }, {item: BaseWaveTypes.square, weight: 1}]));
+                    selectWeightedRandom([{ item: LFOEnvelopeTypes.sine, weight: 8 }, { item: LFOEnvelopeTypes.triangle, weight: 4 }, { item: LFOEnvelopeTypes.sawtooth, weight: 2 }, { item: LFOEnvelopeTypes.square, weight: 1}]));
             }
             if (Math.random() < 0.1) {
                 instrument.effects |= 1 << EffectType.bitcrusher;
@@ -1178,7 +1178,7 @@ export class ChangeRandomGeneratedInstrument extends Change {
                         { item: "blip", weight: 12 },
                         { item: "fall", weight: 2 },
                     ])].index, true, 0, -1, selectWeightedRandom([{ item: false, weight: 8 }, { item: true, weight: 1 }]), Config.perEnvelopeSpeedIndices[selectCurvedDistribution(1, 63, 20, 34)], envelopeLowerBound, envelopeUpperBound, selectCurvedDistribution(2, 16, 2, 6), selectCurvedDistribution(1, 64, 32, 31),
-                        selectWeightedRandom([{ item: BaseWaveTypes.sine, weight: 3 }, { item: BaseWaveTypes.triangle, weight: 1 }]));
+                        selectWeightedRandom([{ item: LFOEnvelopeTypes.sine, weight: 3 }, { item: LFOEnvelopeTypes.triangle, weight: 1 }]));
                 }
                 if (Math.random() < 0.5) {
                     instrument.addEnvelope(Config.instrumentAutomationTargets.dictionary["bitcrusherQuantization"].index, 0, Config.newEnvelopes.dictionary[selectWeightedRandom([
@@ -1196,7 +1196,7 @@ export class ChangeRandomGeneratedInstrument extends Change {
                         { item: "blip", weight: 12 },
                         { item: "fall", weight: 2 },
                     ])].index, true, 0, -1, selectWeightedRandom([{ item: false, weight: 8 }, { item: true, weight: 1 }]), Config.perEnvelopeSpeedIndices[selectCurvedDistribution(1, 63, 20, 34)], envelopeLowerBound, envelopeUpperBound, selectCurvedDistribution(2, 16, 2, 6), selectCurvedDistribution(1, 64, 32, 31),
-                        selectWeightedRandom([{ item: BaseWaveTypes.sine, weight: 3 }, { item: BaseWaveTypes.triangle, weight: 1 }]));
+                        selectWeightedRandom([{ item: LFOEnvelopeTypes.sine, weight: 3 }, { item: LFOEnvelopeTypes.triangle, weight: 1 }]));
                 } else if (type == InstrumentType.spectrum) {
                     instrument.addEnvelope(Config.instrumentAutomationTargets.dictionary["noteVolume"].index, 0, Config.newEnvelopes.dictionary["note size"].index, true);
                     instrument.addEnvelope(Config.instrumentAutomationTargets.dictionary["bitcrusherQuantization"].index, 0, Config.newEnvelopes.dictionary["note size"].index, true);
@@ -1227,7 +1227,7 @@ export class ChangeRandomGeneratedInstrument extends Change {
                         { item: "rise", weight: 8 },
                         { item: "fall", weight: 2 },
                     ])].index, true, 0, -1, selectWeightedRandom([{ item: false, weight: 8 }, { item: true, weight: 1 }]), Config.perEnvelopeSpeedIndices[selectCurvedDistribution(1, 63, 45, 20)], envelopeLowerBound, envelopeUpperBound, selectCurvedDistribution(2, 16, 2, 6), selectCurvedDistribution(1, 64, 32, 31),
-                        selectWeightedRandom([{ item: BaseWaveTypes.sine, weight: 2 }, { item: BaseWaveTypes.triangle, weight: 5 }]));
+                        selectWeightedRandom([{ item: LFOEnvelopeTypes.sine, weight: 2 }, { item: LFOEnvelopeTypes.triangle, weight: 5 }]));
                 }
             }
             if (Math.random() < 0.1) {
@@ -1262,7 +1262,7 @@ export class ChangeRandomGeneratedInstrument extends Change {
                         { item: "rise", weight: 8 },
                         { item: "fall", weight: 2 },
                     ])].index, true, 0, -1, selectWeightedRandom([{ item: false, weight: 8 }, { item: true, weight: 1 }]), Config.perEnvelopeSpeedIndices[selectCurvedDistribution(1, 63, 45, 20)], envelopeLowerBound, envelopeUpperBound, selectCurvedDistribution(2, 16, 2, 6), selectCurvedDistribution(1, 64, 32, 31),
-                        selectWeightedRandom([{ item: BaseWaveTypes.sine, weight: 2 }, { item: BaseWaveTypes.triangle, weight: 5 }]));
+                        selectWeightedRandom([{ item: LFOEnvelopeTypes.sine, weight: 2 }, { item: LFOEnvelopeTypes.triangle, weight: 5 }]));
                 }
             }
             if (Math.random() < 0.2) {
@@ -1474,7 +1474,7 @@ export class ChangeRandomGeneratedInstrument extends Change {
                                 { item: "rise", weight: 5 },
                                 { item: "fall", weight: 2 },
                             ])].index, true, 0, -1, selectWeightedRandom([{ item: false, weight: 8 }, { item: true, weight: 1 }]), Config.perEnvelopeSpeedIndices[selectCurvedDistribution(1, 63, 30, 30)], envelopeLowerBound, envelopeUpperBound, 2, 2,
-                                selectWeightedRandom([{ item: BaseWaveTypes.sine, weight: 8 }, { item: BaseWaveTypes.triangle, weight: 4 }, { item: BaseWaveTypes.sawtooth, weight: 2 }, { item: BaseWaveTypes.square, weight: 1 }]));
+                                selectWeightedRandom([{ item: LFOEnvelopeTypes.sine, weight: 8 }, { item: LFOEnvelopeTypes.triangle, weight: 4 }, { item: LFOEnvelopeTypes.sawtooth, weight: 2 }, { item: LFOEnvelopeTypes.square, weight: 1 }]));
                         }
                         if (instrument.envelopeCount < Config.maxEnvelopeCount && Math.random() < 0.15) {
                             let envelopeLowerBound = selectCurvedDistribution(0, 20, 8, 5) / 10;
@@ -1496,7 +1496,7 @@ export class ChangeRandomGeneratedInstrument extends Change {
                                 { item: "rise", weight: 5 },
                                 { item: "fall", weight: 2 },
                             ])].index, true, 0, -1, selectWeightedRandom([{ item: false, weight: 8 }, { item: true, weight: 1 }]), Config.perEnvelopeSpeedIndices[selectCurvedDistribution(1, 63, 30, 30)], envelopeLowerBound, envelopeUpperBound, 2, 2,
-                                selectWeightedRandom([{ item: BaseWaveTypes.sine, weight: 8 }, { item: BaseWaveTypes.triangle, weight: 4 }, { item: BaseWaveTypes.sawtooth, weight: 4 }, { item: BaseWaveTypes.square, weight: 1 }]));
+                                selectWeightedRandom([{ item: LFOEnvelopeTypes.sine, weight: 8 }, { item: LFOEnvelopeTypes.triangle, weight: 4 }, { item: LFOEnvelopeTypes.sawtooth, weight: 4 }, { item: LFOEnvelopeTypes.square, weight: 1 }]));
                         }
                         instrument.operators[i].waveform = Config.operatorWaves.dictionary[selectWeightedRandom([
                             { item: "sine", weight: 10 },
@@ -1545,7 +1545,7 @@ export class ChangeRandomGeneratedInstrument extends Change {
                             { item: "rise", weight: 3 },
                             { item: "fall", weight: 3 },
                         ])].index, true, 0, -1, selectWeightedRandom([{ item: false, weight: 8 }, { item: true, weight: 1 }]), Config.perEnvelopeSpeedIndices[selectCurvedDistribution(1, 63, 30, 30)], envelopeLowerBound, envelopeUpperBound, 2, 2,
-                            selectWeightedRandom([{ item: BaseWaveTypes.sine, weight: 8 }, { item: BaseWaveTypes.triangle, weight: 4 }, { item: BaseWaveTypes.sawtooth, weight: 2 }, { item: BaseWaveTypes.square, weight: 1 }]));
+                            selectWeightedRandom([{ item: LFOEnvelopeTypes.sine, weight: 8 }, { item: LFOEnvelopeTypes.triangle, weight: 4 }, { item: LFOEnvelopeTypes.sawtooth, weight: 2 }, { item: LFOEnvelopeTypes.square, weight: 1 }]));
                     }
                 } break;
                 case InstrumentType.customChipWave: {
@@ -5092,6 +5092,8 @@ export class ChangeRemoveEnvelope extends Change {
             instrument.envelopes[i].steps = instrument.envelopes[i + 1].steps;
             instrument.envelopes[i].seed = instrument.envelopes[i + 1].seed;
             instrument.envelopes[i].waveform = instrument.envelopes[i + 1].waveform;
+            instrument.envelopes[i].noteSizeStart = instrument.envelopes[i + 1].noteSizeStart;
+            instrument.envelopes[i].noteSizeEnd = instrument.envelopes[i + 1].noteSizeEnd;
         }
         // TODO: Shift any envelopes that were targeting other envelope indices after the removed one.
         instrument.preset = instrument.type;
@@ -5273,5 +5275,35 @@ export class ChangeSetEnvelopeWaveform extends Change {
         instrument.preset = instrument.type;
         doc.notifier.changed();
         this._didSomething();
+    }
+}
+
+export class ChangeEnvelopeNoteSizeStart extends Change {
+    constructor(doc: SongDocument, noteStart: number, index: number) {
+        super();
+        const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+        const oldNoteStart: number = instrument.envelopes[index].noteSizeStart;
+        if (oldNoteStart != noteStart) {
+            noteStart = noteStart > Config.noteSizeMax ? Config.noteSizeMax : noteStart < 0 ? 0 : noteStart;
+            instrument.envelopes[index].noteSizeStart = noteStart;
+            instrument.preset = instrument.type;
+            doc.notifier.changed();
+            this._didSomething();
+        }
+    }
+}
+
+export class ChangeEnvelopeNoteSizeEnd extends Change {
+    constructor(doc: SongDocument, noteEnd: number, index: number) {
+        super();
+        const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+        const oldNoteEnd: number = instrument.envelopes[index].noteSizeEnd;
+        if (oldNoteEnd != noteEnd) {
+            noteEnd = noteEnd > Config.noteSizeMax ? Config.noteSizeMax : noteEnd < 0 ? 0 : noteEnd;
+            instrument.envelopes[index].noteSizeEnd = noteEnd;
+            instrument.preset = instrument.type;
+            doc.notifier.changed();
+            this._didSomething();
+        }
     }
 }

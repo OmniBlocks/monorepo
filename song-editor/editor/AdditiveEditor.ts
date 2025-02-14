@@ -1,6 +1,6 @@
 // Copyright (c) 2012-2022 John Nesky and contributing authors, distributed under the MIT license, see accompanying the LICENSE.md file.
 
-import { Config, BaseWaveTypes } from "../synth/SynthConfig";
+import { Config, AdditiveWaveTypes } from "../synth/SynthConfig";
 import { AdditiveWave, Instrument } from "../synth/synth";
 import { SongDocument } from "./SongDocument";
 import { HTML, SVG } from "imperative-html/dist/esm/elements-strict";
@@ -65,6 +65,8 @@ export class AdditiveEditor {
             waveTypeButton.addEventListener("click", () => this._buttonPressed(index));
         }
 
+        this.storeChange();
+
         this.container.addEventListener("mousedown", this._whenMousePressed);
         document.addEventListener("mousemove", this._whenMouseMoved);
         document.addEventListener("mouseup", this._whenCursorReleased);
@@ -73,12 +75,11 @@ export class AdditiveEditor {
         this.container.addEventListener("touchmove", this._whenTouchMoved);
         this.container.addEventListener("touchend", this._whenCursorReleased);
         this.container.addEventListener("touchcancel", this._whenCursorReleased);
-        this.storeChange();
     }
 
     private _buttonPressed(buttonIndex: number) {
         if (this._waveTypeButtons[buttonIndex]) {
-            if (this._current.waveTypes[buttonIndex] < BaseWaveTypes.length-1) {
+            if (this._current.waveTypes[buttonIndex] < AdditiveWaveTypes.length-1) {
                 this._current.waveTypes[buttonIndex]++;
             } else {
                 this._current.waveTypes[buttonIndex] = 0
@@ -96,42 +97,36 @@ export class AdditiveEditor {
 
     private _getShape(shape: number, index: number): SVGSVGElement {
         switch (shape) {
-            case BaseWaveTypes.sine:
+            case AdditiveWaveTypes.sine:
                 return SVG.svg({ id: "SVGshape" + index, style: "flex-shrink: 0; position: absolute; left: 0; top: 0; pointer-events: none; margin:1px;", width: "20px", height: "20px", viewBox: "0 0 26 26" }, [
                     SVG.path({ d: "M 2 12 C 12 0, 13 23, 23 13", strokeWidth: "3", stroke: "currentColor", fill: "none" }),
                 ])
-            case BaseWaveTypes.square:
+            case AdditiveWaveTypes.square:
                 return SVG.svg({ id: "SVGshape" + index, style: "flex-shrink: 0; position: absolute; left: 0; top: 0; pointer-events: none; margin:1px;", width: "20px", height: "20px", viewBox: "0 0 26 26" }, [
                     SVG.path({ d: "M 2 2 L 2 23 L 23 23 L 23 2 L 2 2 z", strokeWidth: "3", stroke: "currentColor", fill: "none" }),
                 ])
-            case BaseWaveTypes.triangle:
+            case AdditiveWaveTypes.triangle:
                 return SVG.svg({ id: "SVGshape" + index, style: "flex-shrink: 0; position: absolute; left: 0; top: 0; pointer-events: none; margin:1px;", width: "20px", height: "20px", viewBox: "0 0 26 26" }, [
                     SVG.path({ d: "M 2 23 L 12 2 L 23 23 L 2 23 z", strokeWidth: "3", stroke: "currentColor", fill: "none" }),
                 ])
-            case BaseWaveTypes.sawtooth:
+            case AdditiveWaveTypes.sawtooth:
                 return SVG.svg({ id: "SVGshape" + index, style: "flex-shrink: 0; position: absolute; left: 0; top: 0; pointer-events: none; margin:1px;", width: "20px", height: "20px", viewBox: "0 0 26 26" }, [
                     SVG.path({ d: "M 3 3 L 3 24 L 13 24 L 3 3 z M 14 24 L 14 3 L 24 24 L 14 24 z", strokeWidth: "3", stroke: "currentColor", fill: "none" }),
                 ])
-            // case BaseWaveTypes.ramp:
-            //     return SVG.svg({ id: "SVGshape" + index, style: "flex-shrink: 0; position: absolute; left: 0; top: 0; pointer-events: none; margin:1px;", width: "20px", height: "20px", viewBox: "0 0 26 26" }, [
-            //         SVG.path({ d: "M 12 3 L 2 24 L 12 24 L 12 3 z M 13 24 L 23 3 L 23 24 L 13 24 z", strokeWidth: "3", stroke: "currentColor", fill: "none" }),
-            //     ])
+            case AdditiveWaveTypes.ramp:
+                return SVG.svg({ id: "SVGshape" + index, style: "flex-shrink: 0; position: absolute; left: 0; top: 0; pointer-events: none; margin:1px;", width: "20px", height: "20px", viewBox: "0 0 26 26" }, [
+                    SVG.path({ d: "M 12 3 L 2 24 L 12 24 L 12 3 z M 13 24 L 23 3 L 23 24 L 13 24 z", strokeWidth: "3", stroke: "currentColor", fill: "none" }),
+                ])
             // case BaseWaveTypes.trapezoid:
             //     return SVG.svg({ id: "SVGshape" + index, style: "flex-shrink: 0; position: absolute; left: 0; top: 0; pointer-events: none; margin:1px;", width: "20px", height: "20px", viewBox: "0 0 26 26" }, [
             //         SVG.path({ d: "M 2 23 L 23 23 L 17 2 L 8 2 L 2 23 z", strokeWidth: "3", stroke: "currentColor", fill: "none" }),
             //     ])
             default:
-                return this._getShape(BaseWaveTypes.sine, index);
+                return this._getShape(AdditiveWaveTypes.sine, index);
         }
     }
 
-    private _xToFreq(x: number): number {
-        return (Config.additiveControlPoints - 1) * x / (this._editorWidth - 8) - 0.5;
-    }
 
-    private _yToAmp(y: number): number {
-        return Config.additiveMax * (1 - y / this._editorHeight);
-    }
 
     public storeChange = (): void => {
         // Check if change is unique compared to the current history state
@@ -188,7 +183,14 @@ export class AdditiveEditor {
             additive.waveTypes = this._changeQueue[this._undoHistoryState].waveTypes.slice()
             this.setAdditiveWave(additive);
         }
+    }
 
+    private _xToFreq(x: number): number {
+        return (Config.additiveControlPoints - 1) * x / (this._editorWidth - 8) - 0.5;
+    }
+
+    private _yToAmp(y: number): number {
+        return Config.additiveMax * (1 - y / this._editorHeight);
     }
 
     private _whenMousePressed = (event: MouseEvent): void => {
@@ -239,6 +241,7 @@ export class AdditiveEditor {
         if (isNaN(this._mouseX)) this._mouseX = 0;
         if (isNaN(this._mouseY)) this._mouseY = 0;
         this._whenCursorMoved();
+        this.render();
     }
 
     private _whenCursorMoved(): void {
@@ -253,6 +256,7 @@ export class AdditiveEditor {
 
     private _updateAdditive(freq: number, amp: number) {
         const instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
+        const additiveWave: AdditiveWave = instrument.additiveWave;
 
         if (freq != this._freqPrev) {
             const slope: number = (amp - this._ampPrev) / (freq - this._freqPrev);
@@ -261,16 +265,27 @@ export class AdditiveEditor {
             const upperFreq: number = Math.floor(Math.max(this._freqPrev, freq));
             for (let i: number = lowerFreq; i <= upperFreq; i++) {
                 if (i < 0 || i >= Config.additiveControlPoints) continue;
-                this._current.additives[i] = Math.max(0, Math.min(Config.additiveMax, Math.round(i * slope + offset)));
+                additiveWave.additives[i] = Math.max(0, Math.min(Config.additiveMax, Math.round(i * slope + offset)));
             }
         }
 
-        this._current.additives[Math.max(0, Math.min(Config.additiveControlPoints - 1, Math.round(freq)))] = Math.max(0, Math.min(Config.additiveMax, Math.round(amp)));
+        additiveWave.additives[Math.max(0, Math.min(Config.additiveControlPoints - 1, Math.round(freq)))] = Math.max(0, Math.min(Config.additiveMax, Math.round(amp)));
 
         this._freqPrev = freq;
         this._ampPrev = amp;
 
         this._change = new ChangeAdditive(this._doc, instrument, this._current);
+    }
+
+    private _whenCursorReleased = (event: Event): void => {
+        if (this._mouseDown) {
+            if (!this._isPrompt) {
+                this._doc.record(this._change!);
+            }
+            this.storeChange();
+            this._change = null;
+        }
+        this._mouseDown = false;
     }
 
     public getAddditiveWave(): AdditiveWave {
@@ -280,13 +295,17 @@ export class AdditiveEditor {
     public setAdditiveWave(additive: AdditiveWave, saveHistory: boolean = false) {
         const instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
         this._current = additive;
-        const additiveChange = new ChangeAdditive(this._doc, instrument, this._current);
-        this.render();
+        for (let i = 0; i < Config.additiveControlPoints; i++) {
+            instrument.additiveWave.additives[i] = additive.additives[i];
+            instrument.additiveWave.waveTypes[i] = additive.waveTypes[i];
+        }
+        const additiveChange = new ChangeAdditive(this._doc, instrument, instrument.additiveWave);
         if (!this._isPrompt || saveHistory) {
             this._doc.record(additiveChange);
         }
         if (this._isPrompt) {
             for (let i: number = 0; i < Config.additiveControlPoints; i++) {
+
                 if (this._waveTypeButtons[i]) {
                     const existingChild = document.getElementById("SVGshape" + i);
                     if (existingChild) {
@@ -296,22 +315,12 @@ export class AdditiveEditor {
                 }
             }
         }
-    }
-
-    private _whenCursorReleased = (event: Event): void => {
-        if (this._mouseDown) {
-            if (!this._isPrompt) {
-                this._doc.record(this._change!);
-            }
-            this._change = null;
-            this.storeChange();
-        }
-        this._mouseDown = false;
+        this.render();
     }
 
     public saveSettings() {
         const instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
-        return new ChangeAdditive(this._doc, instrument, this._current);
+        return new ChangeAdditive(this._doc, instrument, instrument.additiveWave);
     }
 
     public resetToInitial() {
@@ -320,13 +329,6 @@ export class AdditiveEditor {
         //this._doc.record(new ChangeAdditive(this._doc, instrument, this._initial));
         this._changeQueue = [];
         this._undoHistoryState = 0;
-    }
-
-    public rerenderWave() {
-        this._instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
-        this._initial = this._instrument.additiveWave;
-        this._current = this._initial;
-        this.render();
     }
 
     public render(): void {
@@ -413,7 +415,7 @@ export class AdditiveEditorPrompt implements Prompt {
         this._playButton.addEventListener("click", this._togglePlay);
         this.additiveEditor.container.addEventListener("mousemove", () => this.additiveEditor.render());
         this.container.addEventListener("mousemove", () => this.additiveEditor.render());
-        this.container.addEventListener("mousedown", () => this.additiveEditor.render());
+        this.additiveEditor.container.addEventListener("mousedown", () => this.additiveEditor.render());
         this.updatePlayButton();
 
         setTimeout(() => this._playButton.focus());

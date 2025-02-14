@@ -144,7 +144,16 @@ export const enum EnvelopeComputeIndex {
     length,
 }
 
-export const enum BaseWaveTypes {
+export const enum AdditiveWaveTypes {
+    sine,
+    square,
+    triangle,
+    sawtooth,
+    ramp,
+    length,
+}
+
+export const enum LFOEnvelopeTypes {
     sine,
     square,
     triangle,
@@ -975,7 +984,7 @@ export class Config {
     public static readonly pwmBaseExpression: number = 0.04725; // It's actually closer to half of this, the synthesized pulse amplitude range is only .5 to -.5, but also note that the fundamental sine partial amplitude of a square wave is 4/π times the measured square wave amplitude.
     public static readonly supersawBaseExpression: number = 0.061425; // It's actually closer to half of this, the synthesized sawtooth amplitude range is only .5 to -.5.
     public static readonly pickedStringBaseExpression: number = 0.025; // Same as harmonics.
-    public static readonly additiveBaseExpression: number = 0.045; //For now. We'll see how is goes
+    public static readonly additiveBaseExpression: number = 0.3; //For now. We'll see how is goes
     public static readonly distortionBaseVolume: number = 0.011; // Distortion is not affected by pitchDamping, which otherwise approximately halves expression for notes around the middle of the range.
     public static readonly bitcrusherBaseVolume: number = 0.010; // Also not affected by pitchDamping, used when bit crushing is maxed out (aka "1-bit" output).
     public static rawChipWaves: DictionaryArray<ChipWave> = toNameMap([
@@ -1186,6 +1195,12 @@ export class Config {
         { name: "askewed", voices: 2, spread: 0.0, offset: 0.42, expression: 0.7, sign: 1.0 },
         { name: "resonance", voices: 2, spread: 0.0025, offset: 0.1, expression: 0.8, sign: -1.5 },
         { name: "FART", voices: 2, spread: 13, offset: -5, expression: 1.0, sign: -3 },
+        { name: "augmented", voices: 4, spread: 6, offset: 6, expression: 0.8, sign: 1.0 },
+        { name: "diminished", voices: 5, spread: 6, offset: 6, expression: 0.8, sign: 1.0 },
+        { name: "chorus", voices: 9, spread: 0.22, offset: 0, expression: 0.6, sign: 1.0 },
+        { name: "block", voices: 9, spread: 6, offset: 6, expression: 0.6, sign: 0.8 },
+        { name: "extraterrestrial", voices: 6, spread: 15.2, offset: -6, expression: 0.5, sign: 0.7 },
+        { name: "bow", voices: 9, spread: 0.006, offset: 0, expression: 0.5, sign: 0.5}
 		
         //for modbox; voices = riffapp, spread = intervals, offset = offsets, expression = volume, and sign = signs
     ]);
@@ -1523,7 +1538,7 @@ export class Config {
     public static readonly songDetuneMin: number = 0;
     public static readonly songDetuneMax: number = 500;
     public static readonly unisonVoicesMin: number = 1;
-    public static readonly unisonVoicesMax: number = 2;
+    public static readonly unisonVoicesMax: number = 9;
     public static readonly unisonSpreadMin: number = -96;
     public static readonly unisonSpreadMax: number = 96; 
     public static readonly unisonOffsetMin: number = -96;
@@ -1632,7 +1647,7 @@ export class Config {
         { name: "noteVolume", computeIndex: EnvelopeComputeIndex.noteVolume, displayName: "note volume",      /*perNote:  true,*/ interleave: false, isFilter: false, /*range: Config.volumeRange,             */    maxCount: 1, effect: null, compatibleInstruments: null },
         { name: "pulseWidth", computeIndex: EnvelopeComputeIndex.pulseWidth, displayName: "pulse width",      /*perNote:  true,*/ interleave: false, isFilter: false, /*range: Config.pulseWidthRange,         */    maxCount: 1, effect: null, compatibleInstruments: [InstrumentType.pwm, InstrumentType.supersaw] },
         { name: "stringSustain", computeIndex: EnvelopeComputeIndex.stringSustain, displayName: "sustain",          /*perNote:  true,*/ interleave: false, isFilter: false, /*range: Config.stringSustainRange,      */    maxCount: 1, effect: null, compatibleInstruments: [InstrumentType.pickedString] },
-        { name: "unison", computeIndex: EnvelopeComputeIndex.unison, displayName: "unison",           /*perNote:  true,*/ interleave: false, isFilter: false, /*range: Config.defaultAutomationRange,  */    maxCount: 1, effect: null, compatibleInstruments: [InstrumentType.chip, InstrumentType.harmonics, InstrumentType.pickedString, InstrumentType.customChipWave, InstrumentType.pwm, InstrumentType.noise, InstrumentType.spectrum] },
+        { name: "unison", computeIndex: EnvelopeComputeIndex.unison, displayName: "unison",           /*perNote:  true,*/ interleave: false, isFilter: false, /*range: Config.defaultAutomationRange,  */    maxCount: 1, effect: null, compatibleInstruments: [InstrumentType.chip, InstrumentType.harmonics, InstrumentType.pickedString, InstrumentType.customChipWave, InstrumentType.pwm, InstrumentType.noise, InstrumentType.spectrum, InstrumentType.drumset] },
         { name: "operatorFrequency", computeIndex: EnvelopeComputeIndex.operatorFrequency0, displayName: "fm# freq",         /*perNote:  true,*/ interleave: true, isFilter: false, /*range: Config.defaultAutomationRange,  */    maxCount: Config.operatorCount+2, effect: null, compatibleInstruments: [InstrumentType.fm, InstrumentType.fm6op] },
         { name: "operatorAmplitude", computeIndex: EnvelopeComputeIndex.operatorAmplitude0, displayName: "fm# volume",       /*perNote:  true,*/ interleave: false, isFilter: false, /*range: Config.operatorAmplitudeMax + 1,*/    maxCount: Config.operatorCount+2, effect: null, compatibleInstruments: [InstrumentType.fm, InstrumentType.fm6op] },
         { name: "feedbackAmplitude", computeIndex: EnvelopeComputeIndex.feedbackAmplitude, displayName: "fm feedback",      /*perNote:  true,*/ interleave: false, isFilter: false, /*range: Config.operatorAmplitudeMax + 1,*/    maxCount: 1, effect: null, compatibleInstruments: [InstrumentType.fm, InstrumentType.fm6op] },
@@ -1796,7 +1811,10 @@ export class Config {
         // { name: "individual envelope upper bound", pianoName: "IndvEnvUp", maxRawVol: 20, newNoteVol: 10, forSong: false, convertRealFactor: 0, associatedEffect: EffectType.length,
         //     promptName: "Individual Envelope Upper Bound", promptDesc: ["This setting controlsthe envelope lower bound", "At $LO, your the envelope will output a 0 to lower envelope bound, and at $HI your envelope will output a 2 to lower envelope bound.", "This settings will not work if your lower envelope bound is higher than your upper envelope bound", ]},
         { name: "song eq", pianoName: "Song EQ", maxRawVol: 10, newNoteVol: 0, forSong: true, convertRealFactor: 0, associatedEffect: EffectType.length, maxIndex: 0,
-            promptName: "Song EQ Filter", promptDesc: ["This setting overwrites every instrument's eq filter. You can do this in a few separate ways, similar to the per instrument eq filter modulator.", "When the option 'morph' is selected, your modulator values will indicate a sub-filter index of your EQ filter to 'morph' to over time. For example, a change from 0 to 1 means your main filter (default) will morph to sub-filter 1 over the specified duration. You can shape the main filter and sub-filters in the large filter editor ('+' button). If your two filters' number, type, and order of filter dots all match up, the morph will happen smoothly and you'll be able to hear them changing. If they do not match up, the filters will simply jump between each other.", "Note that filters will morph based on endpoints in the pattern editor. So, if you specify a morph from sub-filter 1 to 4 but do not specifically drag in new endpoints for 2 and 3, it will morph directly between 1 and 4 without going through the others.", "If you target Dot X or Dot Y, you can finely tune the coordinates of a single dot for your filter. The number of available dots to choose is dependent on your main filter's dot count.", "[OVERWRITING] [$LO - $HI]"]},
+            promptName: "Song EQ Filter", promptDesc: ["This setting overwrites every instrument's eq filter. You can do this in a few separate ways, similar to the per instrument eq filter modulator.", "When the option 'morph' is selected, your modulator values will indicate a sub-filter index of your EQ filter to 'morph' to over time. For example, a change from 0 to 1 means your main filter (default) will morph to sub-filter 1 over the specified duration. You can shape the main filter and sub-filters in the large filter editor ('+' button). If your two filters' number, type, and order of filter dots all match up, the morph will happen smoothly and you'll be able to hear them changing. If they do not match up, the filters will simply jump between each other.", "Note that filters will morph based on endpoints in the pattern editor. So, if you specify a morph from sub-filter 1 to 4 but do not specifically drag in new endpoints for 2 and 3, it will morph directly between 1 and 4 without going through the others.", "If you target Dot X or Dot Y, you can finely tune the coordinates of a single dot for your filter. The number of available dots to choose is dependent on your main filter's dot count.", "[OVERWRITING] [$LO - $HI]"]
+        },
+         { name: "reset envelope", pianoName: "ResetEnv", maxRawVol: 1, newNoteVol: 1, forSong: false, convertRealFactor: 0, associatedEffect: EffectType.length, maxIndex: this.maxEnvelopeCount-1,
+             promptName: "Reset Envelope", promptDesc: ["This setting functions a lot like the reset arp modulator. Wherever a note is placed, the envelope of this instrument at the specified index will reset at the very start of that note. ", "[$LO - $HI]",]},
         ]);
 }
 

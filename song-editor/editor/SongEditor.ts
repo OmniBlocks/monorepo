@@ -2875,7 +2875,7 @@ export class SongEditor {
                 this._reverbRow.style.display = "none";
             }
 
-            if (instrument.type == InstrumentType.chip || instrument.type == InstrumentType.customChipWave || instrument.type == InstrumentType.harmonics || instrument.type == InstrumentType.pickedString || instrument.type == InstrumentType.spectrum || instrument.type == InstrumentType.pwm || instrument.type == InstrumentType.noise) {
+            if (instrument.type == InstrumentType.chip || instrument.type == InstrumentType.customChipWave || instrument.type == InstrumentType.harmonics || instrument.type == InstrumentType.pickedString || instrument.type == InstrumentType.spectrum || instrument.type == InstrumentType.pwm || instrument.type == InstrumentType.noise || instrument.type == InstrumentType.drumset) {
                 this._unisonSelectRow.style.display = "";
                 setSelectedValue(this._unisonSelect, instrument.unison);
                 this._unisonVoicesInputBox.value = instrument.unisonVoices + "";
@@ -2896,7 +2896,6 @@ export class SongEditor {
 
             this.envelopeEditor.render();
             this.envelopeEditor.rerenderExtraSettings();
-            this._additiveEditor.rerenderWave();
 
             for (let chordIndex: number = 0; chordIndex < Config.chords.length; chordIndex++) {
                 let hidden: boolean = (!Config.instrumentTypeHasSpecialInterval[instrument.type] && Config.chords[chordIndex].customInterval);
@@ -3366,6 +3365,7 @@ export class SongEditor {
                         if (anyInstrumentHasEnvelopes) {
                             settingList.push("envelope speed");
                             settingList.push("individual envelope speed");
+                            settingList.push("reset envelope");
                         }
 
                     }
@@ -3513,7 +3513,7 @@ export class SongEditor {
                 }
 
                 let envelopes: string = Config.modulators[instrument.modulators[mod]].name;
-                if (envelopes == "individual envelope speed") {
+                if (envelopes == "individual envelope speed" || envelopes == "reset envelope") {
                     $("#modEnvelopeText" + mod).get(0)!.style.display = "";
                     $("#modFilterText" + mod).get(0)!.style.display = "none";
                     $("#modSettingText" + mod).get(0)!.style.setProperty("margin-bottom", "2px");
@@ -3531,14 +3531,14 @@ export class SongEditor {
                     while (this._modEnvelopeBoxes[mod].firstChild) this._modEnvelopeBoxes[mod].remove(0);
                     const envelopeList: string[] = [];
                     for (let i: number = 0; i < envCount; i++) {
-                        envelopeList.push("envelope " + (i + 1) + " speed");
+                        envelopeList.push("envelope " + (i + 1));
                     }
                     buildOptions(this._modEnvelopeBoxes[mod], envelopeList);
 
                     if (instrument.modEnvelopeNumbers[mod] >= this._modEnvelopeBoxes[mod].length) {
                         this._modEnvelopeBoxes[mod].classList.add("invalidSetting");
                         instrument.invalidModulators[mod] = true;
-                        let useName: string = "envelope " + (instrument.modEnvelopeNumbers[mod]) + " speed"
+                        let useName: string = "envelope " + (instrument.modEnvelopeNumbers[mod]);
                         this._modEnvelopeBoxes[mod].insertBefore(option({ value: useName, style: "color: red;" }, useName), this._modEnvelopeBoxes[mod].children[0]);
                         this._modEnvelopeBoxes[mod].selectedIndex = 0;
 
@@ -4580,7 +4580,6 @@ export class SongEditor {
                     this._doc.selection.resetBoxSelection();
                     //envelopes aren't rerendering when channels are changed so...
                     this.envelopeEditor.rerenderExtraSettings();
-                    this._additiveEditor.rerenderWave();
 
                 }
                 event.preventDefault();
@@ -4596,8 +4595,6 @@ export class SongEditor {
                     this._doc.selection.setChannelBar((this._doc.channel + 1) % this._doc.song.getChannelCount(), this._doc.bar);
                     this._doc.selection.resetBoxSelection();
                     this.envelopeEditor.rerenderExtraSettings();
-                    this._additiveEditor.rerenderWave();
-
                 }
                 event.preventDefault();
                 break;

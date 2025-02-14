@@ -7,10 +7,12 @@ import { Prompt } from "./Prompt";
 import { ChangeGroup } from "./Change";
 import { ChangeBarCount } from "./changes";
 import { ColorConfig } from "./ColorConfig";
+import { ExportPrompt } from "./ExportPrompt";
 
 const { button, div, span, h2, input, br, select, option } = HTML;
 
 export class SongDurationPrompt implements Prompt {
+    private readonly _computedSamplesLabel: HTMLDivElement = div({ style: "width: 10em;" }, new Text("0:00"));
     private readonly _barsStepper: HTMLInputElement = input({ style: "width: 3em; margin-left: 1em;", type: "number", step: "1" });
     private readonly _positionSelect: HTMLSelectElement = select({ style: "width: 100%;" },
         option({ value: "end" }, "Apply change at end of song."),
@@ -21,6 +23,10 @@ export class SongDurationPrompt implements Prompt {
 
     public readonly container: HTMLDivElement = div({ class: "prompt noSelection", style: "width: 250px;" },
         h2("Song Length"),
+        div({ style: "display: flex; flex-direction: row; align-items: center; justify-content: space-between;" },
+            "Length:",
+            this._computedSamplesLabel,
+        ),
         div({ style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;" },
             div({ style: "display: inline-block; text-align: right;" },
                 "Bars per song:",
@@ -58,6 +64,9 @@ export class SongDurationPrompt implements Prompt {
         this._barsStepper.addEventListener("keypress", SongDurationPrompt._validateKey);
         this._barsStepper.addEventListener("blur", SongDurationPrompt._validateNumber);
         this.container.addEventListener("keydown", this._whenKeyPressed);
+        this._barsStepper.addEventListener("input", () => { (this._computedSamplesLabel.firstChild as Text).textContent = this._predictFutureLength(); });
+        this._positionSelect.addEventListener("change", () => { (this._computedSamplesLabel.firstChild as Text).textContent = this._predictFutureLength(); });
+        (this._computedSamplesLabel.firstChild as Text).textContent = ExportPrompt.samplesToTime(this._doc, this._doc.synth.getTotalSamples(true, true, 0));
     }
 
     private _close = (): void => {
@@ -94,6 +103,13 @@ export class SongDurationPrompt implements Prompt {
 
     private static _validate(input: HTMLInputElement): number {
         return Math.floor(Math.max(Number(input.min), Math.min(Number(input.max), Number(input.value))));
+    }
+
+    private _predictFutureLength(): string {
+        const futureDoc: SongDocument = new SongDocument();
+        futureDoc.synth.song?.fromBase64String(this._doc.synth.song?.toBase64String() ? this._doc.synth.song?.toBase64String() : "");
+        new ChangeBarCount(futureDoc, SongDurationPrompt._validate(this._barsStepper), this._positionSelect.value == "beginning");
+        return ExportPrompt.samplesToTime(futureDoc, futureDoc.synth.getTotalSamples(true, true, 0));
     }
 
     private _saveChanges = (): void => {

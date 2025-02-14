@@ -37,13 +37,17 @@ export class SpectrumEditor {
     private _change: ChangeSpectrum | null = null;
     private _renderedPath: String = "";
     private _renderedFifths: boolean = true;
-    private instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
+    private instrument: Instrument;
     private _initial: SpectrumWave = new SpectrumWave(this._spectrumIndex != null);
 
     private _undoHistoryState: number = 0;
     private _changeQueue: number[][] = [];
 
-    constructor(private _doc: SongDocument, private _spectrumIndex: number | null, private _isPrompt: boolean = false) {
+    private _doc: SongDocument;
+
+    constructor(_doc: SongDocument, private _spectrumIndex: number | null, private _isPrompt: boolean = false) {
+        this._doc = _doc;
+        this.instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
         this._initial.spectrum = this._spectrumIndex == null ? this.instrument.spectrumWave.spectrum.slice() : this.instrument.drumsetSpectrumWaves[this._spectrumIndex].spectrum.slice();
         for (let i: number = 0; i < Config.spectrumControlPoints; i += Config.spectrumControlPointsPerOctave) {
             this._octaves.appendChild(SVG.rect({ fill: ColorConfig.tonic, x: (i + 1) * this._editorWidth / (Config.spectrumControlPoints + 2) - 1, y: 0, width: 2, height: this._editorHeight }));
@@ -295,6 +299,10 @@ export class SpectrumEditor {
             this._fifths.style.display = this._doc.prefs.showFifth ? "" : "none";
         }
     }
+
+    // public reassignDoc(_doc: SongDocument) {
+    //     this._doc = _doc;
+    // }
 }
 
 export class SpectrumEditorPrompt implements Prompt {
@@ -361,6 +369,8 @@ export class SpectrumEditorPrompt implements Prompt {
         });
         this.spectrumEditor.container.addEventListener("mousedown", this.spectrumEditor.render);
         this.updatePlayButton();
+        // this.spectrumEditor.reassignDoc(_doc);
+        
         if (this._isDrumset) {
             for (let i: number = Config.drumCount - 1; i >= 0; i--) {
                 this.spectrumEditors[i] = new SpectrumEditor(this._doc, Config.drumCount - 1 - i, true);

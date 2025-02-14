@@ -1,9 +1,9 @@
 // Copyright (c) 2012-2022 John Nesky and contributing authors, distributed under the MIT license, see accompanying the LICENSE.md file.
 
-import { InstrumentType, Config, DropdownID, BaseWaveTypes, RandomEnvelopeTypes } from "../synth/SynthConfig";
+import { InstrumentType, Config, DropdownID, LFOEnvelopeTypes, RandomEnvelopeTypes } from "../synth/SynthConfig";
 import { Instrument } from "../synth/synth";
 import { SongDocument } from "./SongDocument";
-import { ChangeSetEnvelopeTarget, ChangeSetEnvelopeType, ChangeRemoveEnvelope, ChangeEnvelopePitchStart, ChangeEnvelopePitchEnd, ChangeEnvelopeInverse, ChangePerEnvelopeSpeed, ChangeEnvelopeLowerBound, ChangeEnvelopeUpperBound, ChangeRandomEnvelopeSteps, ChangeRandomEnvelopeSeed, PasteEnvelope, ChangeSetEnvelopeWaveform } from "./changes";
+import { ChangeSetEnvelopeTarget, ChangeSetEnvelopeType, ChangeRemoveEnvelope, ChangeEnvelopePitchStart, ChangeEnvelopePitchEnd, ChangeEnvelopeInverse, ChangePerEnvelopeSpeed, ChangeEnvelopeLowerBound, ChangeEnvelopeUpperBound, ChangeRandomEnvelopeSteps, ChangeRandomEnvelopeSeed, PasteEnvelope, ChangeSetEnvelopeWaveform, ChangeEnvelopeNoteSizeStart, ChangeEnvelopeNoteSizeEnd } from "./changes";
 import { HTML, SVG } from "imperative-html/dist/esm/elements-strict";
 import { Change } from "./Change";
 import { prettyNumber } from "./EditorConfig";
@@ -22,6 +22,7 @@ export class EnvelopeEditor {
 	public readonly extraSettingsDropdownGroups: HTMLDivElement[] = [];
 	public readonly extraRandomSettingsGroups: HTMLDivElement[] = [];
 	public readonly extraLFODropdownGroups: HTMLDivElement[] = [];
+	public readonly extraNoteSizeSettingsGroups: HTMLDivElement[] = [];
 	public readonly openExtraSettingsDropdowns: Boolean[] = [];
 	public readonly perEnvelopeSpeedGroups: HTMLElement[] = [];
 
@@ -58,6 +59,11 @@ export class EnvelopeEditor {
 	public readonly LFOStepsBoxes: HTMLInputElement[] = [];
 	private readonly _LFOStepsSliders: HTMLInputElement[] = [];
 	private readonly _LFOStepsWrappers: HTMLDivElement[] = [];
+	//note size
+	private readonly _noteSizeStartSliders: HTMLInputElement[] = [];
+	public readonly noteSizeStartBoxes: HTMLInputElement[] = [];
+	private readonly _noteSizeEndSliders: HTMLInputElement[] = [];
+	public readonly noteSizeEndBoxes: HTMLInputElement[] = [];
 
 
 	private _renderedEnvelopeCount: number = 0;
@@ -95,6 +101,10 @@ export class EnvelopeEditor {
 		const randomTypeSelectIndex: number = this._randomEnvelopeTypeSelects.indexOf(<any>event.target);
 		const LFOStepsBoxIndex: number = this.LFOStepsBoxes.indexOf(<any>event.target);
 		const LFOStepsSliderIndex: number = this._LFOStepsSliders.indexOf(<any>event.target);
+		const noteSizeStartBoxIndex: number = this.noteSizeStartBoxes.indexOf(<any>event.target);
+		const noteSizeStartSliderIndex: number = this._noteSizeStartSliders.indexOf(<any>event.target);
+		const noteSizeEndBoxIndex: number = this.noteSizeEndBoxes.indexOf(<any>event.target);
+		const noteSizeEndSliderIndex: number = this._noteSizeEndSliders.indexOf(<any>event.target);
 		if (targetSelectIndex != -1) {
 			const combinedValue: number = parseInt(this._targetSelects[targetSelectIndex].value);
 			const target: number = combinedValue % Config.instrumentAutomationTargets.length;
@@ -114,82 +124,16 @@ export class EnvelopeEditor {
 			this._doc.record(new ChangeSetEnvelopeWaveform(this._doc, this._randomEnvelopeTypeSelects[randomTypeSelectIndex].value, randomTypeSelectIndex));
 		} else if (inverterIndex != -1) {
 			this._doc.record(new ChangeEnvelopeInverse(this._doc, this._inverters[inverterIndex].checked, inverterIndex));
-		} else if (startBoxIndex != -1) {
+		} else if (startBoxIndex != -1 || endBoxIndex != -1 || startSliderIndex != -1 || endSliderIndex != -1 ||
+			lowerBoundBoxIndex != -1 || upperBoundBoxIndex != -1 || lowerBoundSliderIndex != -1 || upperBoundSliderIndex != -1 ||
+			randomStepsBoxIndex != -1 || randomSeedBoxIndex != -1 || randomStepsSliderIndex != -1 || randomSeedSliderIndex != -1 ||
+			LFOStepsBoxIndex != -1 || LFOStepsSliderIndex != -1 || noteSizeStartBoxIndex != -1 || noteSizeStartSliderIndex != -1 ||
+			noteSizeEndBoxIndex != -1 || noteSizeEndSliderIndex != -1) {
 			if (this._lastChange != null) {
 				this._doc.record(this._lastChange);
 				this._lastChange = null;
 			}
-		} else if (endBoxIndex != -1) {
-			if (this._lastChange != null) {
-				this._doc.record(this._lastChange);
-				this._lastChange = null;
-			}
-		} else if (startSliderIndex != -1) {
-			if (this._lastChange != null) {
-				this._doc.record(this._lastChange);
-				this._lastChange = null;
-			}
-		} else if (endSliderIndex != -1) {
-			if (this._lastChange != null) {
-				this._doc.record(this._lastChange);
-				this._lastChange = null;
-			}
-		// } else if (speedSliderIndex != -1) {
-		// 	if (this._lastChange != null) {
-		// 		this._doc.record(this._lastChange);
-		// 		this._lastChange = null;
-		// 	}
-		} else if (lowerBoundBoxIndex != -1) {
-			if (this._lastChange != null) {
-				this._doc.record(this._lastChange);
-				this._lastChange = null;
-			}
-		} else if (upperBoundBoxIndex != -1) {
-			if (this._lastChange != null) {
-				this._doc.record(this._lastChange);
-				this._lastChange = null;
-			}
-		} else if (lowerBoundSliderIndex != -1) {
-			if (this._lastChange != null) {
-				this._doc.record(this._lastChange);
-				this._lastChange = null;
-			}
-		} else if (upperBoundSliderIndex != -1) {
-			if (this._lastChange != null) {
-				this._doc.record(this._lastChange);
-				this._lastChange = null;
-			}
-		} else if (randomStepsBoxIndex != -1) {
-			if (this._lastChange != null) {
-				this._doc.record(this._lastChange);
-				this._lastChange = null;
-			}
-		} else if (randomSeedBoxIndex != -1) {
-			if (this._lastChange != null) {
-				this._doc.record(this._lastChange);
-				this._lastChange = null;
-			}
-		} else if (randomStepsSliderIndex != -1) {
-			if (this._lastChange != null) {
-				this._doc.record(this._lastChange);
-				this._lastChange = null;
-			}
-		} else if (randomSeedSliderIndex != -1) {
-			if (this._lastChange != null) {
-				this._doc.record(this._lastChange);
-				this._lastChange = null;
-			}
-		} else if (LFOStepsBoxIndex != -1) {
-			if (this._lastChange != null) {
-				this._doc.record(this._lastChange);
-				this._lastChange = null;
-			}
-		} else if (LFOStepsSliderIndex != -1) {
-			if (this._lastChange != null) {
-				this._doc.record(this._lastChange);
-				this._lastChange = null;
-			}
-		}
+		} 
 	}
 
 	private _onClick = (event: MouseEvent): void => {
@@ -224,6 +168,10 @@ export class EnvelopeEditor {
 		const randomSeedSliderIndex: number = this._randomSeedSliders.indexOf(<any>event.target);
 		const LFOStepsBoxIndex: number = this.LFOStepsBoxes.indexOf(<any>event.target);
 		const LFOStepsSliderIndex: number = this._LFOStepsSliders.indexOf(<any>event.target);
+		const noteSizeStartBoxIndex: number = this.noteSizeStartBoxes.indexOf(<any>event.target);
+		const noteSizeStartSliderIndex: number = this._noteSizeStartSliders.indexOf(<any>event.target);
+		const noteSizeEndBoxIndex: number = this.noteSizeEndBoxes.indexOf(<any>event.target);
+		const noteSizeEndSliderIndex: number = this._noteSizeEndSliders.indexOf(<any>event.target);
 		if (startBoxIndex != -1) {
 			this._lastChange = new ChangeEnvelopePitchStart(this._doc, parseInt(this.pitchStartBoxes[startBoxIndex].value), startBoxIndex);
 		} else if (endBoxIndex != -1) {
@@ -232,9 +180,9 @@ export class EnvelopeEditor {
 			this._lastChange = new ChangeEnvelopePitchStart(this._doc, parseInt(this._pitchStartSliders[startSliderIndex].value), startSliderIndex);
 		} else if (endSliderIndex != -1) {
 			this._lastChange = new ChangeEnvelopePitchEnd(this._doc, parseInt(this._pitchEndSliders[endSliderIndex].value), endSliderIndex);
-		// } else if (speedSliderIndex != -1) {
-		// 	this._lastChange = this.perEnvelopeSpeedSliders[speedSliderIndex].
-		// 	// this._lastChange = new ChangePerEnvelopeSpeed(this._doc, this.convertIndexSpeed(parseFloat(this.perEnvelopeSpeedSliders[speedSliderIndex].value), "speed"), speedSliderIndex);
+			// } else if (speedSliderIndex != -1) {
+			// 	this._lastChange = this.perEnvelopeSpeedSliders[speedSliderIndex].
+			// 	// this._lastChange = new ChangePerEnvelopeSpeed(this._doc, this.convertIndexSpeed(parseFloat(this.perEnvelopeSpeedSliders[speedSliderIndex].value), "speed"), speedSliderIndex);
 		} else if (lowerBoundBoxIndex != -1) {
 			this._lastChange = new ChangeEnvelopeLowerBound(this._doc, parseFloat(this.perEnvelopeLowerBoundBoxes[lowerBoundBoxIndex].value), lowerBoundBoxIndex);
 		} else if (upperBoundBoxIndex != -1) {
@@ -255,6 +203,14 @@ export class EnvelopeEditor {
 			this._lastChange = new ChangeRandomEnvelopeSteps(this._doc, parseFloat(this.LFOStepsBoxes[LFOStepsBoxIndex].value), LFOStepsBoxIndex);
 		} else if (LFOStepsSliderIndex != -1) {
 			this._lastChange = new ChangeRandomEnvelopeSteps(this._doc, parseFloat(this._LFOStepsSliders[LFOStepsSliderIndex].value), LFOStepsSliderIndex);
+		} else if (noteSizeStartBoxIndex != -1) {
+			this._lastChange = new ChangeEnvelopeNoteSizeStart(this._doc, parseInt(this.noteSizeStartBoxes[noteSizeStartBoxIndex].value), noteSizeStartBoxIndex);
+		} else if (noteSizeEndBoxIndex != -1) {
+			this._lastChange = new ChangeEnvelopeNoteSizeEnd(this._doc, parseInt(this.noteSizeEndBoxes[noteSizeEndBoxIndex].value), noteSizeEndBoxIndex);
+		} else if (noteSizeStartSliderIndex != -1) {
+			this._lastChange = new ChangeEnvelopeNoteSizeStart(this._doc, parseInt(this._noteSizeStartSliders[noteSizeStartSliderIndex].value), noteSizeStartSliderIndex);
+		} else if (noteSizeEndSliderIndex != -1) {
+			this._lastChange = new ChangeEnvelopeNoteSizeEnd(this._doc, parseInt(this._noteSizeEndSliders[noteSizeEndSliderIndex].value), noteSizeEndSliderIndex);
 		}
 	}
 
@@ -324,8 +280,9 @@ export class EnvelopeEditor {
 				this.extraSettingsDropdownGroups[i].style.display = "flex";
 				this.extraSettingsDropdowns[i].style.display = "inline";
 				this.updateSpeedDisplay(i);
+
 				if (Config.newEnvelopes[instrument.envelopes[i].envelope].name == "pitch") {
-					this.extraPitchSettingsGroups[i].style.display = "flex";
+					//update values
 					this.pitchStartBoxes[i].value = instrument.envelopes[i].pitchEnvelopeStart.toString();
 					this.pitchEndBoxes[i].value = instrument.envelopes[i].pitchEnvelopeEnd.toString();
 					//reset bounds between noise and pitch channels
@@ -342,11 +299,12 @@ export class EnvelopeEditor {
 					//update note displays
 					this._startNoteDisplays[i].textContent = "Start " + this._pitchToNote(parseInt(this.pitchStartBoxes[i].value), instrument.isNoiseInstrument) + ": ";
 					this._endNoteDisplays[i].textContent = "End " + this._pitchToNote(parseInt(this.pitchEndBoxes[i].value), instrument.isNoiseInstrument) + ": ";
-					//hide perEnvelopeSpeed, random, and lfo
+					//show pitch, hide others
+					this.extraPitchSettingsGroups[i].style.display = "flex";
 					this.perEnvelopeSpeedGroups[i].style.display = "none";
 					this.extraRandomSettingsGroups[i].style.display = "none";
 					this.extraLFODropdownGroups[i].style.display = "none";
-
+					this.extraNoteSizeSettingsGroups[i].style.display = "none";
 
 				} else if (Config.newEnvelopes[instrument.envelopes[i].envelope].name == "random") {
 					
@@ -368,7 +326,7 @@ export class EnvelopeEditor {
 					this.extraPitchSettingsGroups[i].style.display = "none";
 					this.extraRandomSettingsGroups[i].style.display = "";
 					this.extraLFODropdownGroups[i].style.display = "none";
-
+					this.extraNoteSizeSettingsGroups[i].style.display = "none";
 
 				} else if (Config.newEnvelopes[instrument.envelopes[i].envelope].name == "lfo") {
 
@@ -377,7 +335,7 @@ export class EnvelopeEditor {
 					this.perEnvelopeSpeedSliders[i].updateValue(EnvelopeEditor.convertIndexSpeed(instrument.envelopes[i].perEnvelopeSpeed, "index"));
 
 					//show / hide steps based on waveform
-					if (instrument.envelopes[i].waveform == BaseWaveTypes.steppedSaw || instrument.envelopes[i].waveform == BaseWaveTypes.steppedTri) {
+					if (instrument.envelopes[i].waveform == LFOEnvelopeTypes.steppedSaw || instrument.envelopes[i].waveform == LFOEnvelopeTypes.steppedTri) {
 						this._LFOStepsWrappers[i].style.display = "flex";
 					} else {
 						this._LFOStepsWrappers[i].style.display = "none";
@@ -390,13 +348,29 @@ export class EnvelopeEditor {
 					this.extraSettingsDropdowns[i].style.display = "inline";
 					this.extraPitchSettingsGroups[i].style.display = "none";
 					this.extraRandomSettingsGroups[i].style.display = "none";
+					this.extraNoteSizeSettingsGroups[i].style.display = "none";
 
+				} else if (Config.newEnvelopes[instrument.envelopes[i].envelope].name == "note size") {
+
+					//update values
+					this.noteSizeStartBoxes[i].value = instrument.envelopes[i].noteSizeStart.toString();
+					this.noteSizeEndBoxes[i].value = instrument.envelopes[i].noteSizeEnd.toString();
+
+					//hide other dropdown groups, show lfo settings and speed
+					this.extraNoteSizeSettingsGroups[i].style.display = "";
+					this.extraLFODropdownGroups[i].style.display = "none";
+					this.perEnvelopeSpeedGroups[i].style.display = "none"
+					this.extraSettingsDropdownGroups[i].style.display = "flex";
+					this.extraSettingsDropdowns[i].style.display = "inline";
+					this.extraPitchSettingsGroups[i].style.display = "none";
+					this.extraRandomSettingsGroups[i].style.display = "none";
 
 				} else {
 					this.extraPitchSettingsGroups[i].style.display = "none";
 					this.extraRandomSettingsGroups[i].style.display = "none";
 					this.extraLFODropdownGroups[i].style.display = "none";
-					if (Config.newEnvelopes[instrument.envelopes[i].envelope].name == "note size" || Config.newEnvelopes[instrument.envelopes[i].envelope].name == "punch" || Config.newEnvelopes[instrument.envelopes[i].envelope].name == "none") {
+					this.extraNoteSizeSettingsGroups[i].style.display = "none";
+					if (Config.newEnvelopes[instrument.envelopes[i].envelope].name == "punch" || Config.newEnvelopes[instrument.envelopes[i].envelope].name == "none") {
 						this.perEnvelopeSpeedGroups[i].style.display = "none"
 					} else {
 						//perEnvelopeSpeed
@@ -432,6 +406,9 @@ export class EnvelopeEditor {
 				}
 				if (this.extraRandomSettingsGroups[i]) {
 					this.extraRandomSettingsGroups[i].style.display = "none";
+				}
+				if (this.extraNoteSizeSettingsGroups[i]) {
+					this.extraNoteSizeSettingsGroups[i].style.display = "none";
 				}
 			}
 		}
@@ -540,14 +517,28 @@ export class EnvelopeEditor {
 
 			const LFOStepsWrapper: HTMLDivElement = HTML.div({ style: "margin-top: 3px; flex:1; display:flex; flex-direction: row; align-items:center; justify-content:right;" }, LFOStepsBoxWrapper, LFOStepsSlider);
 			const wavenames: string[] = ["sine", "square", "triangle", "sawtooth", "trapezoid", "stepped saw", "stepped tri"];
-			for (let waveform: number = 0; waveform < BaseWaveTypes.length; waveform++) {
+			for (let waveform: number = 0; waveform < LFOEnvelopeTypes.length; waveform++) {
 				waveformSelect.appendChild(HTML.option({ value: waveform }, wavenames[waveform]));
 			}
-
 			
 			const waveformWrapper: HTMLDivElement = HTML.div({ class: "editor-controls selectContainer", style: "margin-top: 3px; flex:1; display:flex; flex-direction: row; align-items:center; justify-content:right;" }, HTML.span({ style: "font-size: smaller; margin-right: 10px;", class: "tip", onclick: () => this._openPrompt("lfoEnvelopeWaveform") }, "Waveform: "), waveformSelect);
 			const extraLFOSettingsGroup: HTMLDivElement = HTML.div({ class: "editor-controls", style: "margin-top: 3px; flex:1; display:flex; flex-direction: column; align-items:center; justify-content:right;" }, waveformWrapper, LFOStepsWrapper);
 			extraLFOSettingsGroup.style.display = "none";
+
+			//note size settings
+			const noteSizeStartBox: HTMLInputElement = HTML.input({ value: instrument.envelopes[envelopeIndex].noteSizeStart, type: "number", min: 0, max: Config.noteSizeMax, step: 1, style: "width: 4em; font-size: 80%; " });
+			const noteSizeStartSlider: HTMLInputElement = HTML.input({ value: instrument.envelopes[envelopeIndex].noteSizeStart, type: "range", min: 0, max: Config.noteSizeMax, step: 1, style: "width: 113px; margin-left: 0px;" });
+			const noteSizeEndBox: HTMLInputElement = HTML.input({ value: instrument.envelopes[envelopeIndex].noteSizeEnd, type: "number", min: 0, max: Config.noteSizeMax, step: 1, style: "width: 4em; font-size: 80%; " });
+			const noteSizeEndSlider: HTMLInputElement = HTML.input({ value: instrument.envelopes[envelopeIndex].noteSizeEnd, type: "range", min: 0, max: Config.noteSizeMax, step: 1, style: "width: 113px; margin-left: 0px;" });
+
+			const noteSizeStartBoxWrapper: HTMLDivElement = HTML.div({ style: "flex: 1; display: flex; flex-direction: column; align-items: center;" }, HTML.span({ class: "tip", style: `width:68px; flex:1; height:1em; font-size: smaller;`, onclick: () => this._openPrompt("noteSizeRange") }, "Start: "), noteSizeStartBox);
+			const noteSizeEndBoxWrapper: HTMLDivElement = HTML.div({ style: "flex: 1; display: flex; flex-direction: column; align-items: center;" }, HTML.span({ class: "tip", style: `width:68px; flex:1; height:1em; font-size: smaller;`, onclick: () => this._openPrompt("noteSizeRange") }, "End: "), noteSizeEndBox);
+
+			const noteSizeStartWrapper: HTMLDivElement = HTML.div({ style: "margin-top: 3px; flex:1; display:flex; flex-direction: row; align-items:center; justify-content:right;" }, noteSizeStartBoxWrapper, noteSizeStartSlider);
+			const noteSizeEndWrapper: HTMLDivElement = HTML.div({ style: "margin-top: 3px; flex:1; display:flex; flex-direction: row; align-items:center; justify-content:right;" }, noteSizeEndBoxWrapper, noteSizeEndSlider);
+
+			const extraNoteSizeSettingsGroup: HTMLDivElement = HTML.div({ class: "editor-controls", style: "margin-top: 3px; flex:1; display:flex; flex-direction: column; align-items:center; justify-content:right;" }, noteSizeStartWrapper, noteSizeEndWrapper);
+			extraNoteSizeSettingsGroup.style.display = "none";
 
 			//speed settings
 			const perEnvelopeSpeedSlider: Slider = new Slider(HTML.input({ oninput: () => this.updateSpeedDisplay(envelopeIndex), style: "margin: 0; width: 113px", type: "range", min: 0, max: Config.perEnvelopeSpeedIndices.length - 1, value: EnvelopeEditor.convertIndexSpeed(instrument.envelopes[envelopeIndex].perEnvelopeSpeed, "index"), step: "1" }), this._doc, (oldSpeed: number, newSpeed: number) => new ChangePerEnvelopeSpeed(this._doc, EnvelopeEditor.convertIndexSpeed(oldSpeed, "speed"), EnvelopeEditor.convertIndexSpeed(newSpeed, "speed"), envelopeIndex), false);
@@ -594,7 +585,7 @@ export class EnvelopeEditor {
 			const extraSettingsDropdown: HTMLButtonElement = HTML.button({ style: "margin-left:0em; margin-right: 0.3em; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: () => { const instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()]; this._extraSettingsDropdown(DropdownID.EnvelopeSettings, envelopeIndex, Config.newEnvelopes[instrument.envelopes[envelopeIndex].envelope].name); } }, "▼");
 			extraSettingsDropdown.style.display = "inline";
 
-			const extraSettingsDropdownGroup: HTMLDivElement = HTML.div({ class: "editor-controls", style: "flex-direction:column; align-items:center;" }, extraRandomSettingsGroup, extraLFOSettingsGroup, extraPitchSettingsGroup, perEnvelopeSpeedGroup, lowerBoundWrapper, upperBoundWrapper, invertWrapper, copyPasteContainer);
+			const extraSettingsDropdownGroup: HTMLDivElement = HTML.div({ class: "editor-controls", style: "flex-direction:column; align-items:center;" }, extraRandomSettingsGroup, extraLFOSettingsGroup, extraNoteSizeSettingsGroup, extraPitchSettingsGroup, perEnvelopeSpeedGroup, lowerBoundWrapper, upperBoundWrapper, invertWrapper, copyPasteContainer);
 			extraSettingsDropdownGroup.style.display = "none";
 
 
@@ -647,6 +638,12 @@ export class EnvelopeEditor {
 			this._LFOStepsSliders[envelopeIndex] = LFOStepsSlider;
 			this._LFOStepsWrappers[envelopeIndex] = LFOStepsWrapper;
 
+			this.extraNoteSizeSettingsGroups[envelopeIndex] = extraNoteSizeSettingsGroup;
+			this._noteSizeStartSliders[envelopeIndex] = noteSizeStartSlider;
+			this.noteSizeStartBoxes[envelopeIndex] = noteSizeStartBox;
+			this._noteSizeEndSliders[envelopeIndex] = noteSizeEndSlider;
+			this.noteSizeEndBoxes[envelopeIndex] = noteSizeEndBox;
+
 			this._envelopeCopyButtons[envelopeIndex] = envelopeCopyButton;
 			this._envelopePasteButtons[envelopeIndex] = envelopePasteButton;
 		}
@@ -695,6 +692,10 @@ export class EnvelopeEditor {
 			this._randomSeedSliders[envelopeIndex].value = String(instrument.envelopes[envelopeIndex].seed);
 			this.LFOStepsBoxes[envelopeIndex].value = String(instrument.envelopes[envelopeIndex].steps);
 			this._LFOStepsSliders[envelopeIndex].value = String(instrument.envelopes[envelopeIndex].steps);
+			this.noteSizeStartBoxes[envelopeIndex].value = String(instrument.envelopes[envelopeIndex].noteSizeStart);
+			this._noteSizeStartSliders[envelopeIndex].value = String(instrument.envelopes[envelopeIndex].noteSizeStart);
+			this.noteSizeEndBoxes[envelopeIndex].value = String(instrument.envelopes[envelopeIndex].noteSizeEnd);
+			this._noteSizeEndSliders[envelopeIndex].value = String(instrument.envelopes[envelopeIndex].noteSizeEnd);
 			this.openExtraSettingsDropdowns[envelopeIndex] = this.openExtraSettingsDropdowns[envelopeIndex] ? true : false
 		}
 

@@ -7892,8 +7892,8 @@ class EnvelopeComputer {
             let steps: number = 2;
             let seed: number = 2;
             let waveform: number = LFOEnvelopeTypes.sine;
-            let noteSizeStart: number = 0;
-            let noteSizeEnd: number = Config.noteSizeMax;
+            let noteSizeEnvelopeStart: number = 0;
+            let noteSizeEnvelopeEnd: number = Config.noteSizeMax;
             let startPinTickAbsolute: number = this.startPinTickAbsolute || 0.0;
             if (envelopeIndex == instrument.envelopeCount) {
                 if (usedNoteSize /*|| !this._perNote*/) break;
@@ -7901,8 +7901,8 @@ class EnvelopeComputer {
                 automationTarget = Config.instrumentAutomationTargets.dictionary["noteVolume"];
                 targetIndex = 0;
                 envelope = Config.newEnvelopes.dictionary["note size"];
-                noteSizeStart = 0;
-                noteSizeEnd = Config.noteSizeMax;
+                noteSizeEnvelopeStart = 0;
+                noteSizeEnvelopeEnd = Config.noteSizeMax;
             } else {
                 let envelopeSettings: EnvelopeSettings = instrument.envelopes[envelopeIndex];
                 automationTarget = Config.instrumentAutomationTargets[envelopeSettings.target];
@@ -7922,8 +7922,8 @@ class EnvelopeComputer {
                     instrument.envelopes[envelopeIndex].waveform = 0; //make sure that waveform is a proper index
                 }
                 waveform = instrument.envelopes[envelopeIndex].waveform;
-                noteSizeStart = instrument.envelopes[envelopeIndex].noteSizeStart;
-                noteSizeEnd = instrument.envelopes[envelopeIndex].noteSizeEnd;
+                noteSizeEnvelopeStart = instrument.envelopes[envelopeIndex].noteSizeStart;
+                noteSizeEnvelopeEnd = instrument.envelopes[envelopeIndex].noteSizeEnd;
                 
 
                 if (!timeScale[envelopeIndex]) timeScale[envelopeIndex] = 0;
@@ -7947,24 +7947,24 @@ class EnvelopeComputer {
             //calculate envelope values if target isn't null
             if (automationTarget.computeIndex != null) {
                 const computeIndex: number = automationTarget.computeIndex + targetIndex;
-                let envelopeStart: number = EnvelopeComputer.computeEnvelope(envelope, envelopeSpeed, noteSecondsStartUnscaled, noteSecondsStart[envelopeIndex], beatTimeStart[envelopeIndex], timeSinceStart, noteSizeStart, pitch, inverse, perEnvelopeLowerBound, perEnvelopeUpperBound, false, steps, seed, waveform, defaultPitch, startPinTickAbsolute, noteSizeStart, noteSizeEnd);
+                let envelopeStart: number = EnvelopeComputer.computeEnvelope(envelope, envelopeSpeed, noteSecondsStartUnscaled, noteSecondsStart[envelopeIndex], beatTimeStart[envelopeIndex], timeSinceStart, noteSizeStart, pitch, inverse, perEnvelopeLowerBound, perEnvelopeUpperBound, false, steps, seed, waveform, defaultPitch, startPinTickAbsolute, noteSizeEnvelopeStart, noteSizeEnvelopeEnd);
                 if (prevSlideStart) {
-                    const other: number = EnvelopeComputer.computeEnvelope(envelope, envelopeSpeed, prevNoteSecondsStartUnscaled, prevNoteSecondsStart[envelopeIndex], beatTimeStart[envelopeIndex], timeSinceStart, prevNoteSize, pitch, inverse, perEnvelopeLowerBound, perEnvelopeUpperBound, false, steps, seed, waveform, defaultPitch, startPinTickAbsolute, noteSizeStart, noteSizeEnd);
+                    const other: number = EnvelopeComputer.computeEnvelope(envelope, envelopeSpeed, prevNoteSecondsStartUnscaled, prevNoteSecondsStart[envelopeIndex], beatTimeStart[envelopeIndex], timeSinceStart, prevNoteSize, pitch, inverse, perEnvelopeLowerBound, perEnvelopeUpperBound, false, steps, seed, waveform, defaultPitch, startPinTickAbsolute, noteSizeEnvelopeStart, noteSizeEnvelopeEnd);
                     envelopeStart += (other - envelopeStart) * prevSlideRatioStart;
                 }
                 if (nextSlideStart) {
-                    const other: number = EnvelopeComputer.computeEnvelope(envelope, envelopeSpeed, 0.0, 0.0, beatTimeStart[envelopeIndex], timeSinceStart, nextNoteSize, pitch, inverse, perEnvelopeLowerBound, perEnvelopeUpperBound, false, steps, seed, waveform, defaultPitch, startPinTickAbsolute, noteSizeStart, noteSizeEnd);
+                    const other: number = EnvelopeComputer.computeEnvelope(envelope, envelopeSpeed, 0.0, 0.0, beatTimeStart[envelopeIndex], timeSinceStart, nextNoteSize, pitch, inverse, perEnvelopeLowerBound, perEnvelopeUpperBound, false, steps, seed, waveform, defaultPitch, startPinTickAbsolute, noteSizeEnvelopeStart, noteSizeEnvelopeEnd);
                     envelopeStart += (other - envelopeStart) * nextSlideRatioStart;
                 }
                 let envelopeEnd: number = envelopeStart;
                 if (instrument.discreteEnvelope == false) {
-                    envelopeEnd = EnvelopeComputer.computeEnvelope(envelope, envelopeSpeed, noteSecondsEndUnscaled, noteSecondsEnd[envelopeIndex], beatTimeEnd[envelopeIndex], timeSinceStart, noteSizeEnd, pitch, inverse, perEnvelopeLowerBound, perEnvelopeUpperBound, false, steps, seed, waveform, defaultPitch, startPinTickAbsolute, noteSizeStart, noteSizeEnd);
+                    envelopeEnd = EnvelopeComputer.computeEnvelope(envelope, envelopeSpeed, noteSecondsEndUnscaled, noteSecondsEnd[envelopeIndex], beatTimeEnd[envelopeIndex], timeSinceStart, noteSizeEnd, pitch, inverse, perEnvelopeLowerBound, perEnvelopeUpperBound, false, steps, seed, waveform, defaultPitch, startPinTickAbsolute, noteSizeEnvelopeStart, noteSizeEnvelopeEnd);
                     if (prevSlideEnd) {
-                        const other: number = EnvelopeComputer.computeEnvelope(envelope, envelopeSpeed, prevNoteSecondsEndUnscaled, prevNoteSecondsEnd[envelopeIndex], beatTimeEnd[envelopeIndex], timeSinceStart, prevNoteSize, pitch, inverse, perEnvelopeLowerBound, perEnvelopeUpperBound, false, steps, seed, waveform, defaultPitch, startPinTickAbsolute, noteSizeStart, noteSizeEnd);
+                        const other: number = EnvelopeComputer.computeEnvelope(envelope, envelopeSpeed, prevNoteSecondsEndUnscaled, prevNoteSecondsEnd[envelopeIndex], beatTimeEnd[envelopeIndex], timeSinceStart, prevNoteSize, pitch, inverse, perEnvelopeLowerBound, perEnvelopeUpperBound, false, steps, seed, waveform, defaultPitch, startPinTickAbsolute, noteSizeEnvelopeStart, noteSizeEnvelopeEnd);
                         envelopeEnd += (other - envelopeEnd) * prevSlideRatioEnd;
                     }
                     if (nextSlideEnd) {
-                        const other: number = EnvelopeComputer.computeEnvelope(envelope, envelopeSpeed, 0.0, 0.0, beatTimeEnd[envelopeIndex], timeSinceStart, nextNoteSize, pitch, inverse, perEnvelopeLowerBound, perEnvelopeUpperBound, false, steps, seed, waveform, defaultPitch, startPinTickAbsolute, noteSizeStart, noteSizeEnd);
+                        const other: number = EnvelopeComputer.computeEnvelope(envelope, envelopeSpeed, 0.0, 0.0, beatTimeEnd[envelopeIndex], timeSinceStart, nextNoteSize, pitch, inverse, perEnvelopeLowerBound, perEnvelopeUpperBound, false, steps, seed, waveform, defaultPitch, startPinTickAbsolute, noteSizeEnvelopeStart, noteSizeEnvelopeEnd);
                         envelopeEnd += (other - envelopeEnd) * nextSlideRatioEnd;
                     }
                 }
@@ -8026,13 +8026,25 @@ class EnvelopeComputer {
         switch (envelope.type) {
             case EnvelopeType.none: return perEnvelopeUpperBound;
             case EnvelopeType.noteSize:
-                if (inverse) {
-
-                        return perEnvelopeUpperBound - (Synth.noteSizeToVolumeMult(noteSize)) * (boundAdjust);
-                    
+                // const range = (noteSizeEnd - noteSizeStart)/6;
+                if (!inverse) {
+                    // if (noteSize <= noteSizeStart) {
+                    //     return perEnvelopeLowerBound;
+                    // } else if (pitch >= noteSizeEnd) {
+                    //     return perEnvelopeUpperBound;
+                    // } else {
+                    //     return (Synth.noteSizeToVolumeMult(noteSize) - Synth.noteSizeToVolumeMult(noteSizeStart)) * (boundAdjust) / range + perEnvelopeLowerBound;
+                    // }
+                    return Synth.noteSizeToVolumeMult(noteSize) * (boundAdjust) + perEnvelopeLowerBound;
                 } else {
-                        return (Synth.noteSizeToVolumeMult(noteSize)) * (boundAdjust) + perEnvelopeLowerBound;
-                    
+                    // if (noteSize <= noteSizeStart) {
+                    //     return perEnvelopeUpperBound;
+                    // } else if (pitch >= noteSizeEnd) {
+                    //     return perEnvelopeLowerBound;
+                    // } else {
+                        // return perEnvelopeUpperBound - (Synth.noteSizeToVolumeMult(noteSize) - Synth.noteSizeToVolumeMult(noteSizeStart)) * (boundAdjust) / range;
+                    // }
+                    return perEnvelopeUpperBound - Synth.noteSizeToVolumeMult(noteSize) * (boundAdjust);
                 }
             case EnvelopeType.pitch:
                 //inversion and bounds are handled in the pitch calculation that we did prior
@@ -13136,6 +13148,10 @@ export class Synth {
                 prevWaveIntegrals[i] += (wave[index + 1] - prevWaveIntegrals[i]) * phaseRatio;
 
             }
+        } else {
+            for (let i: number = 0; i < phases.length; i++) {
+                prevWaveIntegrals[i] = 0.0;
+            }
         }
 
         const stopIndex: number = bufferIndex + roundedSamplesPerTick;
@@ -13146,25 +13162,29 @@ export class Synth {
             const waves: number[] = []
 
             if (aliases) {
-                for (let i: number = 0; i < /*phases.length*/1; i++) {
+                for (let i: number = 0; i < phases.length; i++) {
                     phases[i] += phaseDeltas[i];
 
                     inputSample += wave[(0 | phases[i]) % waveLength];
                 }
             } else {
-                for (let i: number = 0; i < /*phases.length*/1; i++) {
+                for (let i: number = 0; i < phases.length; i++) {
                     phases[i] += phaseDeltas[i];
 
-                    const phaseInt = phases[i] | 0;
-                    const index = phaseInt % waveLength;
-                    nextWaveIntegrals[i] = wave[index]
-                    const phaseRatio = phases[i] - phaseInt;
-                    nextWaveIntegrals[i] += (wave[index + 1] - nextWaveIntegrals[i]) * phaseRatio;
-                    waves[i] = (nextWaveIntegrals[i] - prevWaveIntegrals[i]) / phaseDeltas[i];
-                    prevWaveIntegrals[i] = nextWaveIntegrals[i];
+                    if (instrumentState.unisonVoices <= i) {
+                        waves[i] = waves[i - 1];
+                    } else {
+                        const phaseInt = phases[i] | 0;
+                        const index = phaseInt % waveLength;
+                        nextWaveIntegrals[i] = wave[index]
+                        const phaseRatio = phases[i] - phaseInt;
+                        nextWaveIntegrals[i] += (wave[index + 1] - nextWaveIntegrals[i]) * phaseRatio;
+                        waves[i] = (nextWaveIntegrals[i] - prevWaveIntegrals[i]) / phaseDeltas[i];
+                        prevWaveIntegrals[i] = nextWaveIntegrals[i];
+                    }
                 }
                 inputSample == waves[0];
-                for (let i: number = 1; i < 1/*Config.unisonVoicesMax*/; i++) {
+                for (let i: number = 1; i < Config.unisonVoicesMax; i++) {
                     inputSample += waves[i] * unisonSign;
                 }
             }
@@ -13177,7 +13197,7 @@ export class Synth {
                 phaseDeltas[i] *= phaseDeltaScales[i];
             }
 
-            const output: number = sample * expression;
+            const output: number = sample * expression * 1/4; 
             expression += expressionDelta;
 
             data[sampleIndex] += output;
@@ -13261,7 +13281,7 @@ export class Synth {
                 phaseDeltas[i] *= phaseDeltaScales[i];
             }
 
-            const output: number = sample * expression;
+            const output: number = sample * expression * 1.38/6;
             expression += expressionDelta;
 
             data[sampleIndex] += output;
@@ -14085,30 +14105,20 @@ export class Synth {
         const unisonSign: number = tone.specialIntervalExpressionMult * instrumentState.unisonSign;
         const phaseDeltas: number[] = [];
         const phaseDeltaScales: number[] = [];
-        const pitchRelativefilters: number[] = [];
         for (let i: number = 0; i < tone.phaseDeltas.length; i++) {
             phaseDeltas[i] = tone.phaseDeltas[i];
             phaseDeltaScales[i] = +tone.phaseDeltaScales[i];
-            // This is for a "legacy" style simplified 1st order lowpass filter with
-            // a cutoff frequency that is relative to the tone's fundamental frequency.
-            pitchRelativefilters[i] = Math.min(1.0, phaseDeltas[i] * instrumentState.noisePitchFilterMult);
 
             if (instrumentState.unisonVoices <= i && instrumentState.unisonSpread == 0 && !instrumentState.chord!.customInterval) tone.phases[i] = tone.phases[i - 1];
         }
 
         let expression: number = +tone.expression;
         const expressionDelta: number = +tone.expressionDelta;
+        
         const phases: number[] = [];
         for (let i: number = 0; i < tone.phases.length; i++) {
             phases[i] = (tone.phases[i] % 1);
         }
-        // if (instrumentState.unisonVoices == 1 && instrumentState.unisonSpread == 0 && !instrumentState.chord!.customInterval) tone.phases[1] = tone.phases[0];
-        // let phaseDeltaA: number = tone.phaseDeltas[0];
-        // let phaseDeltaB: number = tone.phaseDeltas[1];
-        // const phaseDeltaScaleA: number = +tone.phaseDeltaScales[0];
-        // const phaseDeltaScaleB: number = +tone.phaseDeltaScales[1];
-        // let phaseA: number = (tone.phases[0] % 1);
-        // let phaseB: number = (tone.phases[1] % 1);
 
         let pulseWidth: number = tone.pulseWidth;
         const pulseWidthDelta: number = tone.pulseWidthDelta;
@@ -14122,14 +14132,9 @@ export class Synth {
         const stopIndex: number = bufferIndex + roundedSamplesPerTick;
         for (let sampleIndex: number = bufferIndex; sampleIndex < stopIndex; sampleIndex++) {
 
-            // const sawPhaseA: number = phaseA % 1;
-            // const sawPhaseB: number = (phaseA + pulseWidth) % 1;
-            // const sawPhaseC: number = phaseB % 1;
-            // const sawPhaseD: number = (phaseB + pulseWidth) % 1;
-
             const pulseWaves: number[] = [];
 
-            for (let i: number = 0; i < phaseDeltas.length; i++) {
+            for (let i: number = 0; i < phases.length; i++) {
                 const sawPhaseA: number = phases[i] % 1;
                 const sawPhaseB: number = (phases[i] + pulseWidth) % 1;
                 pulseWaves[i] = sawPhaseB - sawPhaseA;
@@ -14156,70 +14161,25 @@ export class Synth {
                 inputSample += pulseWaves[i] * unisonSign;
             }
 
-            // let pulseWaveA: number = sawPhaseB - sawPhaseA;
-            // let pulseWaveB: number = sawPhaseD - sawPhaseC;
-
-            // This is a PolyBLEP, which smooths out discontinuities at any frequency to reduce aliasing. 
-            // if (!instrumentState.aliases) {
-            //     if (sawPhaseA < phaseDeltaA) {
-            //         var t = sawPhaseA / phaseDeltaA;
-            //         pulseWaveA += (t + t - t * t - 1) * 0.5;
-            //     } else if (sawPhaseA > 1.0 - phaseDeltaA) {
-            //         var t = (sawPhaseA - 1.0) / phaseDeltaA;
-            //         pulseWaveA += (t + t + t * t + 1) * 0.5;
-            //     }
-            //     if (sawPhaseB < phaseDeltaA) {
-            //         var t = sawPhaseB / phaseDeltaA;
-            //         pulseWaveA -= (t + t - t * t - 1) * 0.5;
-            //     } else if (sawPhaseB > 1.0 - phaseDeltaA) {
-            //         var t = (sawPhaseB - 1.0) / phaseDeltaA;
-            //         pulseWaveA -= (t + t + t * t + 1) * 0.5;
-            //     }
-
-            //     if (sawPhaseC < phaseDeltaB) {
-            //         var t = sawPhaseC / phaseDeltaB;
-            //         pulseWaveB += (t + t - t * t - 1) * 0.5;
-            //     } else if (sawPhaseC > 1.0 - phaseDeltaB) {
-            //         var t = (sawPhaseC - 1.0) / phaseDeltaB;
-            //         pulseWaveB += (t + t + t * t + 1) * 0.5;
-            //     }
-            //     if (sawPhaseD < phaseDeltaB) {
-            //         var t = sawPhaseD / phaseDeltaB;
-            //         pulseWaveB -= (t + t - t * t - 1) * 0.5;
-            //     } else if (sawPhaseD > 1.0 - phaseDeltaB) {
-            //         var t = (sawPhaseD - 1.0) / phaseDeltaB;
-            //         pulseWaveB -= (t + t + t * t + 1) * 0.5;
-            //     }
-            // }
-
-            // const inputSample: number = pulseWaveA + pulseWaveB * unisonSign;
             const sample: number = applyFilters(inputSample, initialFilterInput1, initialFilterInput2, filterCount, filters);
             initialFilterInput2 = initialFilterInput1;
             initialFilterInput1 = inputSample;
 
-            // phaseA += phaseDeltaA;
-            // phaseB += phaseDeltaB;
-            // phaseDeltaA *= phaseDeltaScaleA;
-            // phaseDeltaB *= phaseDeltaScaleB;
             for (let i: number = 0; i < phases.length; i++) {
                 phases[i] += phaseDeltas[i];
                 phaseDeltas[i] *= phaseDeltaScales[i];
             }
             pulseWidth += pulseWidthDelta;
 
-            const output: number = sample * expression;
+            const output: number = sample * expression * 1.26/6;
             expression += expressionDelta;
 
             data[sampleIndex] += output;
         }
 
-        // tone.phases[0] = phaseA;
-        // tone.phases[1] = phaseB;
-        // tone.phaseDeltas[0] = phaseDeltaA;
-        // tone.phaseDeltas[1] = phaseDeltaB;
         for (let i: number = 0; i < phases.length; i++) {
-            tone.phases[i] += phases[i];
-            tone.phaseDeltas[i] *= phaseDeltas[i];
+            tone.phases[i] = phases[i];
+            tone.phaseDeltas[i] = phaseDeltas[i];
         }
         tone.expression = expression;
         tone.pulseWidth = pulseWidth;
@@ -14473,7 +14433,7 @@ export class Synth {
                 phaseDeltas[i] *= phaseDeltaScales[i];
             }
 
-            const output: number = sample * expression;
+            const output: number = sample * expression * 1.25/6;
             expression += expressionDelta;
 
             data[sampleIndex] += output;
@@ -14571,7 +14531,7 @@ export class Synth {
                 phaseDeltas[i] *= phaseDeltaScales[i];
             }
 
-            const output: number = sample * expression;
+            const output: number = sample * expression * 1.25/6;
             expression += expressionDelta;
             data[sampleIndex] += output;
         }
@@ -14598,14 +14558,9 @@ export class Synth {
         const unisonSign: number = tone.specialIntervalExpressionMult * instrumentState.unisonSign;
         const phaseDeltas: number[] = [];
         const phaseDeltaScales: number[] = [];
-        const pitchRelativefilters: number[] = [];
         for (let i: number = 0; i < tone.phaseDeltas.length; i++) {
             phaseDeltas[i] = tone.phaseDeltas[i] / referenceDelta;
             phaseDeltaScales[i] = +tone.phaseDeltaScales[i];
-            // This is for a "legacy" style simplified 1st order lowpass filter with
-            // a cutoff frequency that is relative to the tone's fundamental frequency.
-            pitchRelativefilters[i] = Math.min(1.0, phaseDeltas[i]);
-
             if (instrumentState.unisonVoices <= i && instrumentState.unisonSpread == 0 && !instrumentState.chord!.customInterval) tone.phases[i] = tone.phases[i - 1];
         }
         let expression: number = +tone.expression;

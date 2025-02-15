@@ -16267,8 +16267,8 @@ var beepbox = (function (exports) {
                 let steps = 2;
                 let seed = 2;
                 let waveform = 0;
-                let noteSizeStart = 0;
-                let noteSizeEnd = Config.noteSizeMax;
+                let noteSizeEnvelopeStart = 0;
+                let noteSizeEnvelopeEnd = Config.noteSizeMax;
                 let startPinTickAbsolute = this.startPinTickAbsolute || 0.0;
                 if (envelopeIndex == instrument.envelopeCount) {
                     if (usedNoteSize)
@@ -16276,8 +16276,8 @@ var beepbox = (function (exports) {
                     automationTarget = Config.instrumentAutomationTargets.dictionary["noteVolume"];
                     targetIndex = 0;
                     envelope = Config.newEnvelopes.dictionary["note size"];
-                    noteSizeStart = 0;
-                    noteSizeEnd = Config.noteSizeMax;
+                    noteSizeEnvelopeStart = 0;
+                    noteSizeEnvelopeEnd = Config.noteSizeMax;
                 }
                 else {
                     let envelopeSettings = instrument.envelopes[envelopeIndex];
@@ -16298,8 +16298,8 @@ var beepbox = (function (exports) {
                         instrument.envelopes[envelopeIndex].waveform = 0;
                     }
                     waveform = instrument.envelopes[envelopeIndex].waveform;
-                    noteSizeStart = instrument.envelopes[envelopeIndex].noteSizeStart;
-                    noteSizeEnd = instrument.envelopes[envelopeIndex].noteSizeEnd;
+                    noteSizeEnvelopeStart = instrument.envelopes[envelopeIndex].noteSizeStart;
+                    noteSizeEnvelopeEnd = instrument.envelopes[envelopeIndex].noteSizeEnd;
                     if (!timeScale[envelopeIndex])
                         timeScale[envelopeIndex] = 0;
                     const secondsPerTickScaled = secondsPerTick * timeScale[envelopeIndex];
@@ -16319,24 +16319,24 @@ var beepbox = (function (exports) {
                 const pitch = (envelope.type == 2) ? this.computePitchEnvelope(instrument, envelopeIndex, this.getPitchValue(instrument, tone, instrumentState, true)) : 0;
                 if (automationTarget.computeIndex != null) {
                     const computeIndex = automationTarget.computeIndex + targetIndex;
-                    let envelopeStart = EnvelopeComputer.computeEnvelope(envelope, envelopeSpeed, noteSecondsStartUnscaled, noteSecondsStart[envelopeIndex], beatTimeStart[envelopeIndex], timeSinceStart, noteSizeStart, pitch, inverse, perEnvelopeLowerBound, perEnvelopeUpperBound, false, steps, seed, waveform, defaultPitch, startPinTickAbsolute, noteSizeStart, noteSizeEnd);
+                    let envelopeStart = EnvelopeComputer.computeEnvelope(envelope, envelopeSpeed, noteSecondsStartUnscaled, noteSecondsStart[envelopeIndex], beatTimeStart[envelopeIndex], timeSinceStart, noteSizeStart, pitch, inverse, perEnvelopeLowerBound, perEnvelopeUpperBound, false, steps, seed, waveform, defaultPitch, startPinTickAbsolute, noteSizeEnvelopeStart, noteSizeEnvelopeEnd);
                     if (prevSlideStart) {
-                        const other = EnvelopeComputer.computeEnvelope(envelope, envelopeSpeed, prevNoteSecondsStartUnscaled, prevNoteSecondsStart[envelopeIndex], beatTimeStart[envelopeIndex], timeSinceStart, prevNoteSize, pitch, inverse, perEnvelopeLowerBound, perEnvelopeUpperBound, false, steps, seed, waveform, defaultPitch, startPinTickAbsolute, noteSizeStart, noteSizeEnd);
+                        const other = EnvelopeComputer.computeEnvelope(envelope, envelopeSpeed, prevNoteSecondsStartUnscaled, prevNoteSecondsStart[envelopeIndex], beatTimeStart[envelopeIndex], timeSinceStart, prevNoteSize, pitch, inverse, perEnvelopeLowerBound, perEnvelopeUpperBound, false, steps, seed, waveform, defaultPitch, startPinTickAbsolute, noteSizeEnvelopeStart, noteSizeEnvelopeEnd);
                         envelopeStart += (other - envelopeStart) * prevSlideRatioStart;
                     }
                     if (nextSlideStart) {
-                        const other = EnvelopeComputer.computeEnvelope(envelope, envelopeSpeed, 0.0, 0.0, beatTimeStart[envelopeIndex], timeSinceStart, nextNoteSize, pitch, inverse, perEnvelopeLowerBound, perEnvelopeUpperBound, false, steps, seed, waveform, defaultPitch, startPinTickAbsolute, noteSizeStart, noteSizeEnd);
+                        const other = EnvelopeComputer.computeEnvelope(envelope, envelopeSpeed, 0.0, 0.0, beatTimeStart[envelopeIndex], timeSinceStart, nextNoteSize, pitch, inverse, perEnvelopeLowerBound, perEnvelopeUpperBound, false, steps, seed, waveform, defaultPitch, startPinTickAbsolute, noteSizeEnvelopeStart, noteSizeEnvelopeEnd);
                         envelopeStart += (other - envelopeStart) * nextSlideRatioStart;
                     }
                     let envelopeEnd = envelopeStart;
                     if (instrument.discreteEnvelope == false) {
-                        envelopeEnd = EnvelopeComputer.computeEnvelope(envelope, envelopeSpeed, noteSecondsEndUnscaled, noteSecondsEnd[envelopeIndex], beatTimeEnd[envelopeIndex], timeSinceStart, noteSizeEnd, pitch, inverse, perEnvelopeLowerBound, perEnvelopeUpperBound, false, steps, seed, waveform, defaultPitch, startPinTickAbsolute, noteSizeStart, noteSizeEnd);
+                        envelopeEnd = EnvelopeComputer.computeEnvelope(envelope, envelopeSpeed, noteSecondsEndUnscaled, noteSecondsEnd[envelopeIndex], beatTimeEnd[envelopeIndex], timeSinceStart, noteSizeEnd, pitch, inverse, perEnvelopeLowerBound, perEnvelopeUpperBound, false, steps, seed, waveform, defaultPitch, startPinTickAbsolute, noteSizeEnvelopeStart, noteSizeEnvelopeEnd);
                         if (prevSlideEnd) {
-                            const other = EnvelopeComputer.computeEnvelope(envelope, envelopeSpeed, prevNoteSecondsEndUnscaled, prevNoteSecondsEnd[envelopeIndex], beatTimeEnd[envelopeIndex], timeSinceStart, prevNoteSize, pitch, inverse, perEnvelopeLowerBound, perEnvelopeUpperBound, false, steps, seed, waveform, defaultPitch, startPinTickAbsolute, noteSizeStart, noteSizeEnd);
+                            const other = EnvelopeComputer.computeEnvelope(envelope, envelopeSpeed, prevNoteSecondsEndUnscaled, prevNoteSecondsEnd[envelopeIndex], beatTimeEnd[envelopeIndex], timeSinceStart, prevNoteSize, pitch, inverse, perEnvelopeLowerBound, perEnvelopeUpperBound, false, steps, seed, waveform, defaultPitch, startPinTickAbsolute, noteSizeEnvelopeStart, noteSizeEnvelopeEnd);
                             envelopeEnd += (other - envelopeEnd) * prevSlideRatioEnd;
                         }
                         if (nextSlideEnd) {
-                            const other = EnvelopeComputer.computeEnvelope(envelope, envelopeSpeed, 0.0, 0.0, beatTimeEnd[envelopeIndex], timeSinceStart, nextNoteSize, pitch, inverse, perEnvelopeLowerBound, perEnvelopeUpperBound, false, steps, seed, waveform, defaultPitch, startPinTickAbsolute, noteSizeStart, noteSizeEnd);
+                            const other = EnvelopeComputer.computeEnvelope(envelope, envelopeSpeed, 0.0, 0.0, beatTimeEnd[envelopeIndex], timeSinceStart, nextNoteSize, pitch, inverse, perEnvelopeLowerBound, perEnvelopeUpperBound, false, steps, seed, waveform, defaultPitch, startPinTickAbsolute, noteSizeEnvelopeStart, noteSizeEnvelopeEnd);
                             envelopeEnd += (other - envelopeEnd) * nextSlideRatioEnd;
                         }
                     }
@@ -16393,11 +16393,11 @@ var beepbox = (function (exports) {
             switch (envelope.type) {
                 case 0: return perEnvelopeUpperBound;
                 case 1:
-                    if (inverse) {
-                        return perEnvelopeUpperBound - (Synth.noteSizeToVolumeMult(noteSize)) * (boundAdjust);
+                    if (!inverse) {
+                        return Synth.noteSizeToVolumeMult(noteSize) * (boundAdjust) + perEnvelopeLowerBound;
                     }
                     else {
-                        return (Synth.noteSizeToVolumeMult(noteSize)) * (boundAdjust) + perEnvelopeLowerBound;
+                        return perEnvelopeUpperBound - Synth.noteSizeToVolumeMult(noteSize) * (boundAdjust);
                     }
                 case 2:
                     return pitch;
@@ -20815,29 +20815,39 @@ var beepbox = (function (exports) {
                     prevWaveIntegrals[i] += (wave[index + 1] - prevWaveIntegrals[i]) * phaseRatio;
                 }
             }
+            else {
+                for (let i = 0; i < phases.length; i++) {
+                    prevWaveIntegrals[i] = 0.0;
+                }
+            }
             const stopIndex = bufferIndex + roundedSamplesPerTick;
             for (let sampleIndex = bufferIndex; sampleIndex < stopIndex; sampleIndex++) {
                 let inputSample = 0;
                 const nextWaveIntegrals = [];
                 const waves = [];
                 if (aliases) {
-                    for (let i = 0; i < 1; i++) {
+                    for (let i = 0; i < phases.length; i++) {
                         phases[i] += phaseDeltas[i];
                         inputSample += wave[(0 | phases[i]) % waveLength];
                     }
                 }
                 else {
-                    for (let i = 0; i < 1; i++) {
+                    for (let i = 0; i < phases.length; i++) {
                         phases[i] += phaseDeltas[i];
-                        const phaseInt = phases[i] | 0;
-                        const index = phaseInt % waveLength;
-                        nextWaveIntegrals[i] = wave[index];
-                        const phaseRatio = phases[i] - phaseInt;
-                        nextWaveIntegrals[i] += (wave[index + 1] - nextWaveIntegrals[i]) * phaseRatio;
-                        waves[i] = (nextWaveIntegrals[i] - prevWaveIntegrals[i]) / phaseDeltas[i];
-                        prevWaveIntegrals[i] = nextWaveIntegrals[i];
+                        if (instrumentState.unisonVoices <= i) {
+                            waves[i] = waves[i - 1];
+                        }
+                        else {
+                            const phaseInt = phases[i] | 0;
+                            const index = phaseInt % waveLength;
+                            nextWaveIntegrals[i] = wave[index];
+                            const phaseRatio = phases[i] - phaseInt;
+                            nextWaveIntegrals[i] += (wave[index + 1] - nextWaveIntegrals[i]) * phaseRatio;
+                            waves[i] = (nextWaveIntegrals[i] - prevWaveIntegrals[i]) / phaseDeltas[i];
+                            prevWaveIntegrals[i] = nextWaveIntegrals[i];
+                        }
                     }
-                    for (let i = 1; i < 1; i++) {
+                    for (let i = 1; i < Config.unisonVoicesMax; i++) {
                         inputSample += waves[i] * unisonSign;
                     }
                 }
@@ -20847,7 +20857,7 @@ var beepbox = (function (exports) {
                 for (let i = 0; i < phaseDeltas.length; i++) {
                     phaseDeltas[i] *= phaseDeltaScales[i];
                 }
-                const output = sample * expression;
+                const output = sample * expression * 1 / 4;
                 expression += expressionDelta;
                 data[sampleIndex] += output;
             }
@@ -20916,7 +20926,7 @@ var beepbox = (function (exports) {
                 for (let i = 0; i < phaseDeltas.length; i++) {
                     phaseDeltas[i] *= phaseDeltaScales[i];
                 }
-                const output = sample * expression;
+                const output = sample * expression * 1.38 / 6;
                 expression += expressionDelta;
                 data[sampleIndex] += output;
             }
@@ -21665,7 +21675,6 @@ var beepbox = (function (exports) {
             for (let i = 0; i < tone.phaseDeltas.length; i++) {
                 phaseDeltas[i] = tone.phaseDeltas[i];
                 phaseDeltaScales[i] = +tone.phaseDeltaScales[i];
-                Math.min(1.0, phaseDeltas[i] * instrumentState.noisePitchFilterMult);
                 if (instrumentState.unisonVoices <= i && instrumentState.unisonSpread == 0 && !instrumentState.chord.customInterval)
                     tone.phases[i] = tone.phases[i - 1];
             }
@@ -21685,7 +21694,7 @@ var beepbox = (function (exports) {
             const stopIndex = bufferIndex + roundedSamplesPerTick;
             for (let sampleIndex = bufferIndex; sampleIndex < stopIndex; sampleIndex++) {
                 const pulseWaves = [];
-                for (let i = 0; i < phaseDeltas.length; i++) {
+                for (let i = 0; i < phases.length; i++) {
                     const sawPhaseA = phases[i] % 1;
                     const sawPhaseB = (phases[i] + pulseWidth) % 1;
                     pulseWaves[i] = sawPhaseB - sawPhaseA;
@@ -21720,13 +21729,13 @@ var beepbox = (function (exports) {
                     phaseDeltas[i] *= phaseDeltaScales[i];
                 }
                 pulseWidth += pulseWidthDelta;
-                const output = sample * expression;
+                const output = sample * expression * 1.26 / 6;
                 expression += expressionDelta;
                 data[sampleIndex] += output;
             }
             for (let i = 0; i < phases.length; i++) {
-                tone.phases[i] += phases[i];
-                tone.phaseDeltas[i] *= phaseDeltas[i];
+                tone.phases[i] = phases[i];
+                tone.phaseDeltas[i] = phaseDeltas[i];
             }
             tone.expression = expression;
             tone.pulseWidth = pulseWidth;
@@ -21878,7 +21887,7 @@ var beepbox = (function (exports) {
                     phases[i] += phaseDeltas[i];
                     phaseDeltas[i] *= phaseDeltaScales[i];
                 }
-                const output = sample * expression;
+                const output = sample * expression * 1.25 / 6;
                 expression += expressionDelta;
                 data[sampleIndex] += output;
             }
@@ -21957,7 +21966,7 @@ var beepbox = (function (exports) {
                     phases[i] += phaseDeltas[i];
                     phaseDeltas[i] *= phaseDeltaScales[i];
                 }
-                const output = sample * expression;
+                const output = sample * expression * 1.25 / 6;
                 expression += expressionDelta;
                 data[sampleIndex] += output;
             }

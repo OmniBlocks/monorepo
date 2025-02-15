@@ -350,20 +350,20 @@ export class EnvelopeEditor {
 					this.extraRandomSettingsGroups[i].style.display = "none";
 					this.extraNoteSizeSettingsGroups[i].style.display = "none";
 
-				} else if (Config.newEnvelopes[instrument.envelopes[i].envelope].name == "note size") {
+				// } else if (Config.newEnvelopes[instrument.envelopes[i].envelope].name == "note size") {
 
-					//update values
-					this.noteSizeStartBoxes[i].value = instrument.envelopes[i].noteSizeStart.toString();
-					this.noteSizeEndBoxes[i].value = instrument.envelopes[i].noteSizeEnd.toString();
+				// 	//update values
+				// 	this.noteSizeStartBoxes[i].value = instrument.envelopes[i].noteSizeStart.toString();
+				// 	this.noteSizeEndBoxes[i].value = instrument.envelopes[i].noteSizeEnd.toString();
 
-					//hide other dropdown groups, show lfo settings and speed
-					this.extraNoteSizeSettingsGroups[i].style.display = "";
-					this.extraLFODropdownGroups[i].style.display = "none";
-					this.perEnvelopeSpeedGroups[i].style.display = "none"
-					this.extraSettingsDropdownGroups[i].style.display = "flex";
-					this.extraSettingsDropdowns[i].style.display = "inline";
-					this.extraPitchSettingsGroups[i].style.display = "none";
-					this.extraRandomSettingsGroups[i].style.display = "none";
+				// 	//hide other dropdown groups, show lfo settings and speed
+				// 	this.extraNoteSizeSettingsGroups[i].style.display = "";
+				// 	this.extraLFODropdownGroups[i].style.display = "none";
+				// 	this.perEnvelopeSpeedGroups[i].style.display = "none"
+				// 	this.extraSettingsDropdownGroups[i].style.display = "flex";
+				// 	this.extraSettingsDropdowns[i].style.display = "inline";
+				// 	this.extraPitchSettingsGroups[i].style.display = "none";
+				// 	this.extraRandomSettingsGroups[i].style.display = "none";
 
 				} else {
 					this.extraPitchSettingsGroups[i].style.display = "none";

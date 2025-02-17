@@ -548,6 +548,7 @@ export class TipPrompt implements Prompt {
 				message = div(
 					h2("Unison Volume"),
 					p("This setting controls the unison volume. Use this if the unison makes your instrument too loud in comparison to other instruments."),
+					p("If this is set to a negative value, it will invert the wave!"),
 				);
 			} break;
 			case "unisonSign": {

@@ -568,8 +568,8 @@ function renderTimeline(): void {
 	let noteFlashColor: string = "#ffffff";
 	let noteFlashColorSecondary: string = "#ffffff77";
 	if (notesFlashWhenPlayed) {
-		noteFlashColor = ColorConfig.getComputed("--note-flash") !== "" ? "var(--note-flash)" : "#ffffff";
-		noteFlashColorSecondary = ColorConfig.getComputed("--note-flash-secondary") !== "" ? "var(--note-flash-secondary)" : "#ffffff77";
+		noteFlashColor = "var(--note-flash)";
+		noteFlashColorSecondary = "var(--note-flash-secondary)";
 	}
 
 	if (notesFlashWhenPlayed) {

@@ -15,4 +15,4 @@ sed \
 	-e '/INSERT_MARIOPAINTBOXSAMPLES_SCRIPT_HERE/{r website/mario_paintbox_samples.js' -e 'd' -e '}' \
 	-e '/INSERT_NINTARIBOXSAMPLES_SCRIPT_HERE/{r website/nintaribox_samples.js' -e 'd' -e '}' \
 	website/ultrabox_offline_template.html \
-	> to_deploy/ultrabox_offline_HTML.html
+	> to_deploy/ultrabox-HTML.html

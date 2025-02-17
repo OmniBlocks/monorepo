@@ -1,5 +1,3 @@
-// Copyright (C) 2020 John Nesky, distributed under the MIT license.
-
 import { HTML } from "imperative-html/dist/esm/elements-strict";
 import { Prompt } from "./Prompt";
 import { SongDocument } from "./SongDocument";

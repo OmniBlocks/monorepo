@@ -93,7 +93,7 @@
             color: var(--link-accent, #98f);
         }
 
-        /* .donation form {
+        .donation form {
             display: inline;
         }
 
@@ -109,7 +109,7 @@
             cursor: pointer;
             padding: 0;
             margin: 0;
-        } */
+        } 
 
         /* wide screen */
 		@media (min-width: 711px) {
@@ -179,7 +179,7 @@
             </h1>
             
             <p id="introduction">
-                Slarmoo's Box is a mod of Ultrabox that aims to advance Beepbox's capabilities (see the <a href="./faq.html">FAQ</a> for more information). <br>
+                Slarmoo's Box is a mod of Ultrabox that aims to advance Beepbox's capabilities. <br>
                 UltraBox is a mod first envisioned by Neptendo, made possible by contributing community members (see <a href="./credits.html">credits</a>).<br>
                 It takes elements from most of the beepbox mods available and puts them in one convenient package.
             </p>
@@ -199,6 +199,11 @@
             <input type="hidden" name="business" value="QZJTX9GRYEV9N" />
             <input type="hidden" name="currency_code" value="USD" />
             <input type="submit" name="submit" value="Paypal"/>
+        </form>
+        <br/>
+        Additionally, Slarmoo's Box takes a lot of time to make and update. If you have found it valuable and are able to do so, please consider donating to Slarmoo here: 
+        <form action="https://www.paypal.com/donate/?hosted_button_id=BMLD7HPKFR6NG" method="post" target="_blank">
+            <input type="submit" name="submit" value="Paypal" />
         </form>
     </div>
         </section>
@@ -401,7 +406,9 @@
         // blubox desktop plants 
         "⚡","🔵","💫",
         // Slarmoo's Box plants
-        "✨","🌈","🌧️","🪨","🐍","🌲","🌳","𓆏","🦀"
+        "✨","🌈","🌧️","🪨","🐍","🌲","🌳","𓆏","🦀",
+        //Current version
+        "1.3.9"
         ];
         const date = new Date();
         if (Math.floor(Math.random() * 3) == 0) { //more than doubled chance for a plant to show up
@@ -416,9 +423,14 @@
             if ((date.getDate() == 31) && date.getMonth() == 9) {
                 document.getElementById("goldboxPlant").innerHTML = "  " + spookyPlants[(Math.floor(Math.random() * spookyPlants.length))];
             }
+            //Slarmoo's Box valentines plants
+            const heartPlants = ["❤️", "🧡", "💛", "💚", "💙", "💜"];
+            if ((date.getDate() >= 13 && date.getDate() <= 15) && date.getMonth() == 1) {
+                document.getElementById("goldboxPlant").innerHTML = "  " + heartPlants[(Math.floor(Math.random() * heartPlants.length))];
+            }
         }
         if ((date.getDate() == 1) && date.getMonth() == 3) {
-            document.getElementById("goldboxPlant").innerHTML = "  Free speech? What's that?";
+            document.getElementById("goldboxPlant").innerHTML = "  Censorship Update";
         }
         if ((date.getDate() == 13) && date.getMonth() == 4) {
             const years = date.getFullYear() - 2024;
@@ -455,7 +467,11 @@
             // Go ahead and load js beepbox editor interface:
             var fileref = document.createElement("script");
             fileref.setAttribute("type", "text/javascript");
-            fileref.setAttribute("src", "beepbox_editor.min.js");
+            if ((date.getDate() == 1) && date.getMonth() == 3) {
+                //
+            } else {
+                fileref.setAttribute("src", "beepbox_editor.min.js");
+            }
             document.head.appendChild(fileref);
         } else {
             document.getElementById("beepboxEditorContainer").innerHTML = "Sorry, Slarmoo's Box doesn't support your browser. Try a recent version of Chrome, Firefox, Edge, Safari, or Opera.";

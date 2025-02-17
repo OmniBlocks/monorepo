@@ -116,3 +116,18 @@ export class ChangeSequence extends UndoableChange {
         this._committed = true;
     }
 }
+
+
+//for envelope mod recording
+export class IndexableChange extends Change {
+    constructor(index: number) {
+        super();
+        this.index = index;
+    }
+
+    private index: number = 0;
+
+    public getIndex(): number {
+        return this.index;
+    }
+}

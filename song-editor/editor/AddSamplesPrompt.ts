@@ -92,7 +92,7 @@ export class AddSamplesPrompt {
             ul({ style: "text-align: left;" },
                 li(a({ href: "https://filegarden.com" }, "File Garden")),
 
-                // this probably won't last, dropbox has changed their URL formatting at least once in the pastssss
+                // there's no guarantee this will continue to work; dropbox has changed their URL formatting at least once in the past
                 li(a({ href: "https://www.dropbox.com" }, "Dropbox"), " (domain needs to be ", code("https://dl.dropboxusercontent.com"), ")"),
 
                 // discord is not a file storage site. files expire after a month if shared outside of discord

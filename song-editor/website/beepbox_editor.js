@@ -1112,7 +1112,11 @@ var beepbox = (function (exports) {
         { name: "noteVolume", computeIndex: 0, displayName: "note volume", interleave: false, isFilter: false, maxCount: 1, effect: null, compatibleInstruments: null },
         { name: "pulseWidth", computeIndex: 2, displayName: "pulse width", interleave: false, isFilter: false, maxCount: 1, effect: null, compatibleInstruments: [6, 8] },
         { name: "stringSustain", computeIndex: 3, displayName: "sustain", interleave: false, isFilter: false, maxCount: 1, effect: null, compatibleInstruments: [7] },
+<<<<<<< HEAD
         { name: "unison", computeIndex: 4, displayName: "unison", interleave: false, isFilter: false, maxCount: 1, effect: null, compatibleInstruments: [0, 5, 7, 9, 6, 2, 3, 4] },
+=======
+        { name: "unison", computeIndex: 4, displayName: "unison", interleave: false, isFilter: false, maxCount: 1, effect: null, compatibleInstruments: [0, 5, 7, 9, 6, 2, 3] },
+>>>>>>> 80efe0517e99f7029c819687125e0f811ece433e
         { name: "operatorFrequency", computeIndex: 5, displayName: "fm# freq", interleave: true, isFilter: false, maxCount: _a$1.operatorCount + 2, effect: null, compatibleInstruments: [1, 11] },
         { name: "operatorAmplitude", computeIndex: 11, displayName: "fm# volume", interleave: false, isFilter: false, maxCount: _a$1.operatorCount + 2, effect: null, compatibleInstruments: [1, 11] },
         { name: "feedbackAmplitude", computeIndex: 17, displayName: "fm feedback", interleave: false, isFilter: false, maxCount: 1, effect: null, compatibleInstruments: [1, 11] },
@@ -1158,8 +1162,15 @@ var beepbox = (function (exports) {
     ]);
     Config.barEditorHeight = 10;
     Config.modulators = toNameMap([
+<<<<<<< HEAD
         { name: "none", pianoName: "None", maxRawVol: 6, newNoteVol: 6, forSong: true, convertRealFactor: 0, associatedEffect: 12, maxIndex: 0,
             promptName: "No Mod Setting", promptDesc: ["No setting has been chosen yet, so this modulator will have no effect. Try choosing a setting with the dropdown, then click this '?' again for more info.", "[$LO - $HI]"] },
+=======
+        {
+            name: "none", pianoName: "None", maxRawVol: 6, newNoteVol: 6, forSong: true, convertRealFactor: 0, associatedEffect: 12, maxIndex: 0,
+            promptName: "No Mod Setting", promptDesc: ["No setting has been chosen yet, so this modulator will have no effect. Try choosing a setting with the dropdown, then click this '?' again for more info.", "[$LO - $HI]"]
+        },
+>>>>>>> 80efe0517e99f7029c819687125e0f811ece433e
         { name: "song volume", pianoName: "Volume", maxRawVol: 100, newNoteVol: 100, forSong: true, convertRealFactor: 0, associatedEffect: 12, maxIndex: 0,
             promptName: "Song Volume", promptDesc: ["This setting affects the overall volume of the song, just like the main volume slider.", "At $HI, the volume will be unchanged from default, and it will get gradually quieter down to $LO.", "[MULTIPLICATIVE] [$LO - $HI] [%]"] },
         { name: "tempo", pianoName: "Tempo", maxRawVol: _a$1.tempoMax - _a$1.tempoMin, newNoteVol: Math.ceil((_a$1.tempoMax - _a$1.tempoMin) / 2), forSong: true, convertRealFactor: _a$1.tempoMin, associatedEffect: 12, maxIndex: 0,
@@ -1253,10 +1264,14 @@ var beepbox = (function (exports) {
             promptName: "Individual Envelope Speed", promptDesc: ["This setting controls how fast the specified envelope of the instrument will play.", "At $LO, your the envelope will be frozen, and at values near there they will change very slowly. At 23, the envelope will work as usual, performing at normal speed. This increases up to $HI, where the envelope will change very quickly. The speeds are given below:",
                 "[0-4]: x0, x0.01, x0.02, x0.03, x0.04,", "[5-9]: x0.05, x0.06, x0.07, x0.08, x0.09,", "[10-14]: x0.1, x0.2, x0.25, x0.3, x0.33,", "[15-19]: x0.4, x0.5, x0.6, x0.6667, x0.7,", "[20-24]: x0.75, x0.8, x0.9, x1, x1.25,", "[25-29]: x1.3333, x1.5, x1.6667, x1.75, x2,", "[30-34]: x2.25, x2.5, x2.75, x3, x3.5,", "[35-39]: x4, x4.5, x5, x5.5, x6,", "[40-44]: x6.5, x7, x7.5, x8, x8.5,", "[45-49]: x9, x9.5, x10, x11, x12", "[50-54]: x13, x14, x15, x16, x17", "[55-59]: x18, x19, x20, x24, x32", "[60-63]: x40, x64, x128, x256", "[OVERWRITING] [$LO - $HI]"] },
         { name: "song eq", pianoName: "Song EQ", maxRawVol: 10, newNoteVol: 0, forSong: true, convertRealFactor: 0, associatedEffect: 12, maxIndex: 0,
+<<<<<<< HEAD
             promptName: "Song EQ Filter", promptDesc: ["This setting overwrites every instrument's eq filter. You can do this in a few separate ways, similar to the per instrument eq filter modulator.", "When the option 'morph' is selected, your modulator values will indicate a sub-filter index of your EQ filter to 'morph' to over time. For example, a change from 0 to 1 means your main filter (default) will morph to sub-filter 1 over the specified duration. You can shape the main filter and sub-filters in the large filter editor ('+' button). If your two filters' number, type, and order of filter dots all match up, the morph will happen smoothly and you'll be able to hear them changing. If they do not match up, the filters will simply jump between each other.", "Note that filters will morph based on endpoints in the pattern editor. So, if you specify a morph from sub-filter 1 to 4 but do not specifically drag in new endpoints for 2 and 3, it will morph directly between 1 and 4 without going through the others.", "If you target Dot X or Dot Y, you can finely tune the coordinates of a single dot for your filter. The number of available dots to choose is dependent on your main filter's dot count.", "[OVERWRITING] [$LO - $HI]"]
         },
         { name: "reset envelope", pianoName: "ResetEnv", maxRawVol: 1, newNoteVol: 1, forSong: false, convertRealFactor: 0, associatedEffect: 12, maxIndex: _a$1.maxEnvelopeCount - 1,
             promptName: "Reset Envelope", promptDesc: ["This setting functions a lot like the reset arp modulator. Wherever a note is placed, the envelope of this instrument at the specified index will reset at the very start of that note. ", "[$LO - $HI]",] },
+=======
+            promptName: "Song EQ Filter", promptDesc: ["This setting overwrites every instrument's eq filter. You can do this in a few separate ways, similar to the per instrument eq filter modulator.", "When the option 'morph' is selected, your modulator values will indicate a sub-filter index of your EQ filter to 'morph' to over time. For example, a change from 0 to 1 means your main filter (default) will morph to sub-filter 1 over the specified duration. You can shape the main filter and sub-filters in the large filter editor ('+' button). If your two filters' number, type, and order of filter dots all match up, the morph will happen smoothly and you'll be able to hear them changing. If they do not match up, the filters will simply jump between each other.", "Note that filters will morph based on endpoints in the pattern editor. So, if you specify a morph from sub-filter 1 to 4 but do not specifically drag in new endpoints for 2 and 3, it will morph directly between 1 and 4 without going through the others.", "If you target Dot X or Dot Y, you can finely tune the coordinates of a single dot for your filter. The number of available dots to choose is dependent on your main filter's dot count.", "[OVERWRITING] [$LO - $HI]"] },
+>>>>>>> 80efe0517e99f7029c819687125e0f811ece433e
     ]);
     function centerWave(wave) {
         let sum = 0.0;
@@ -1632,8 +1647,13 @@ var beepbox = (function (exports) {
             return (_a = EditorConfig.presetCategories[0].presets.dictionary) === null || _a === void 0 ? void 0 : _a[TypePresets === null || TypePresets === void 0 ? void 0 : TypePresets[instrument]];
         }
     }
+<<<<<<< HEAD
     EditorConfig.version = "1.4";
     EditorConfig.versionDisplayName = "Slarmoo's Box Testing " + EditorConfig.version;
+=======
+    EditorConfig.version = "1.3.9";
+    EditorConfig.versionDisplayName = "Slarmoo's Box " + EditorConfig.version;
+>>>>>>> 80efe0517e99f7029c819687125e0f811ece433e
     EditorConfig.releaseNotesURL = "./patch_notes.html";
     EditorConfig.isOnMac = /^Mac/i.test(navigator.platform) || /Mac OS X/i.test(navigator.userAgent) || /^(iPhone|iPad|iPod)/i.test(navigator.platform) || /(iPhone|iPad|iPod)/i.test(navigator.userAgent);
     EditorConfig.ctrlSymbol = EditorConfig.isOnMac ? "⌘" : "Ctrl+";
@@ -2207,16 +2227,16 @@ var beepbox = (function (exports) {
                 let base;
                 switch (type) {
                     case ("noise"): {
-                        base = ColorConfig.noiseChannels[(channel % +ColorConfig.getComputed("--noise-channel-limit")) % ColorConfig.noiseChannels.length];
+                        base = ColorConfig.noiseChannels[(channel % this.c_noiseLimit) % ColorConfig.noiseChannels.length];
                         break;
                     }
                     case ("mod"): {
-                        base = ColorConfig.modChannels[(channel % +ColorConfig.getComputed("--mod-channel-limit")) % ColorConfig.modChannels.length];
+                        base = ColorConfig.modChannels[(channel % this.c_modLimit) % ColorConfig.modChannels.length];
                         break;
                     }
                     case ("pitch"):
                     default: {
-                        base = ColorConfig.pitchChannels[(channel % +ColorConfig.getComputed("--pitch-channel-limit")) % ColorConfig.pitchChannels.length];
+                        base = ColorConfig.pitchChannels[(channel % this.c_pitchLimit) % ColorConfig.pitchChannels.length];
                         break;
                     }
                 }
@@ -2227,9 +2247,9 @@ var beepbox = (function (exports) {
                 let newNotePrimary = ColorConfig.getComputed(regex.exec(base.primaryNote)[1]);
                 return { secondaryChannel: newChannelSecondary, primaryChannel: newChannelPrimary, secondaryNote: newNoteSecondary, primaryNote: newNotePrimary };
             }
-            let colorFormulaPitchLimit = +ColorConfig.getComputed("--formula-pitch-channel-limit");
-            let colorFormulaNoiseLimit = +ColorConfig.getComputed("--formula-noise-channel-limit");
-            let colorFormulaModLimit = +ColorConfig.getComputed("--formula-mod-channel-limit");
+            let colorFormulaPitchLimit = this.c_colorFormulaPitchLimit;
+            let colorFormulaNoiseLimit = this.c_colorFormulaNoiseLimit;
+            let colorFormulaModLimit = this.c_colorFormulaModLimit;
             switch (type) {
                 case ("noise"): {
                     let newChannelSecondary = "hsl(" + ((this.c_noiseSecondaryChannelHue + ((channel * this.c_noiseSecondaryChannelHueScale) / this.c_noiseChannelCountOverride) * 256) % colorFormulaNoiseLimit) + ","
@@ -2300,13 +2320,13 @@ var beepbox = (function (exports) {
         static getChannelColor(song, channel) {
             if (!this.usesColorFormula) {
                 if (channel < song.pitchChannelCount) {
-                    return ColorConfig.pitchChannels[(channel % +(ColorConfig.getComputed("--pitch-channel-limit"))) % ColorConfig.pitchChannels.length];
+                    return ColorConfig.pitchChannels[(channel % this.c_pitchLimit) % ColorConfig.pitchChannels.length];
                 }
                 else if (channel < song.pitchChannelCount + song.noiseChannelCount) {
-                    return ColorConfig.noiseChannels[((channel - song.pitchChannelCount) % +(ColorConfig.getComputed("--noise-channel-limit"))) % ColorConfig.noiseChannels.length];
+                    return ColorConfig.noiseChannels[((channel - song.pitchChannelCount) % this.c_noiseLimit) % ColorConfig.noiseChannels.length];
                 }
                 else {
-                    return ColorConfig.modChannels[((channel - song.pitchChannelCount - song.noiseChannelCount) % +(ColorConfig.getComputed("--mod-channel-limit"))) % ColorConfig.modChannels.length];
+                    return ColorConfig.modChannels[((channel - song.pitchChannelCount - song.noiseChannelCount) % this.c_modLimit) % ColorConfig.modChannels.length];
                 }
             }
             else {
@@ -2314,9 +2334,9 @@ var beepbox = (function (exports) {
                     return ColorConfig.colorLookup.get(channel);
                 }
                 else {
-                    let colorFormulaPitchLimit = +ColorConfig.getComputed("--formula-pitch-channel-limit");
-                    let colorFormulaNoiseLimit = +ColorConfig.getComputed("--formula-noise-channel-limit");
-                    let colorFormulaModLimit = +ColorConfig.getComputed("--formula-mod-channel-limit");
+                    let colorFormulaPitchLimit = this.c_colorFormulaPitchLimit;
+                    let colorFormulaNoiseLimit = this.c_colorFormulaNoiseLimit;
+                    let colorFormulaModLimit = this.c_colorFormulaModLimit;
                     if (channel < song.pitchChannelCount) {
                         let newChannelSecondary = "hsl(" + ((this.c_pitchSecondaryChannelHue + (channel * this.c_pitchSecondaryChannelHueScale / this.c_pitchChannelCountOverride) * 256) % colorFormulaPitchLimit) + ","
                             + (this.c_pitchSecondaryChannelSat * (1 - (this.c_pitchSecondaryChannelSatScale * Math.floor(channel / 9)))) + "%,"
@@ -2591,6 +2611,12 @@ var beepbox = (function (exports) {
             }
             this.resetColors();
             this.usesColorFormula = (getComputedStyle(this._styleElement).getPropertyValue("--use-color-formula").trim() == "true");
+            this.c_pitchLimit = +getComputedStyle(this._styleElement).getPropertyValue("--pitch-channel-limit");
+            this.c_noiseLimit = +getComputedStyle(this._styleElement).getPropertyValue("--noise-channel-limit");
+            this.c_modLimit = +getComputedStyle(this._styleElement).getPropertyValue("--mod-channel-limit");
+            this.c_colorFormulaPitchLimit = +getComputedStyle(this._styleElement).getPropertyValue("--formula-pitch-channel-limit");
+            this.c_colorFormulaNoiseLimit = +getComputedStyle(this._styleElement).getPropertyValue("--formula-noise-channel-limit");
+            this.c_colorFormulaModLimit = +getComputedStyle(this._styleElement).getPropertyValue("--formula-mod-channel-limit");
             this.c_invertedText = getComputedStyle(this._styleElement).getPropertyValue("--inverted-text");
             this.c_trackEditorBgNoiseDim = getComputedStyle(this._styleElement).getPropertyValue("--track-editor-bg-noise-dim");
             this.c_trackEditorBgNoise = getComputedStyle(this._styleElement).getPropertyValue("--track-editor-bg-noise");
@@ -8503,6 +8529,12 @@ var beepbox = (function (exports) {
     ColorConfig.c_pitchChannelCountOverride = 40;
     ColorConfig.c_noiseChannelCountOverride = 16;
     ColorConfig.c_modChannelCountOverride = 12;
+    ColorConfig.c_pitchLimit = 1;
+    ColorConfig.c_noiseLimit = 1;
+    ColorConfig.c_modLimit = 1;
+    ColorConfig.c_colorFormulaPitchLimit = 1;
+    ColorConfig.c_colorFormulaNoiseLimit = 1;
+    ColorConfig.c_colorFormulaModLimit = 1;
     ColorConfig.c_invertedText = "";
     ColorConfig.c_trackEditorBgNoiseDim = "";
     ColorConfig.c_trackEditorBgNoise = "";
@@ -13850,23 +13882,97 @@ li.select2-results__option[role=group] > strong:hover {
             this.eqSubFilters = [];
             this.getNewNoteVolume = (isMod, modChannel, modInstrument, modCount) => {
                 if (!isMod || modChannel == undefined || modInstrument == undefined || modCount == undefined)
-                    return 6;
+                    return Config.noteSizeMax;
                 else {
                     modCount = Config.modCount - modCount - 1;
-                    let vol = Config.modulators[this.channels[modChannel].instruments[modInstrument].modulators[modCount]].newNoteVol;
+                    const instrument = this.channels[modChannel].instruments[modInstrument];
+                    let vol = Config.modulators[instrument.modulators[modCount]].newNoteVol;
+                    let currentIndex = instrument.modulators[modCount];
                     let tempoIndex = Config.modulators.dictionary["tempo"].index;
-                    if (this.channels[modChannel].instruments[modInstrument].modulators[modCount] == tempoIndex) {
+                    if (currentIndex == tempoIndex)
                         vol = this.tempo - Config.modulators[tempoIndex].convertRealFactor;
+                    if (!Config.modulators[currentIndex].forSong && instrument.modInstruments[modCount] < this.channels[instrument.modChannels[modCount]].instruments.length) {
+                        let chorusIndex = Config.modulators.dictionary["chorus"].index;
+                        let reverbIndex = Config.modulators.dictionary["reverb"].index;
+                        let panningIndex = Config.modulators.dictionary["pan"].index;
+                        let panDelayIndex = Config.modulators.dictionary["pan delay"].index;
+                        let distortionIndex = Config.modulators.dictionary["distortion"].index;
+                        let detuneIndex = Config.modulators.dictionary["detune"].index;
+                        let vibratoDepthIndex = Config.modulators.dictionary["vibrato depth"].index;
+                        let vibratoSpeedIndex = Config.modulators.dictionary["vibrato speed"].index;
+                        let vibratoDelayIndex = Config.modulators.dictionary["vibrato delay"].index;
+                        let arpSpeedIndex = Config.modulators.dictionary["arp speed"].index;
+                        let bitCrushIndex = Config.modulators.dictionary["bit crush"].index;
+                        let freqCrushIndex = Config.modulators.dictionary["freq crush"].index;
+                        let echoIndex = Config.modulators.dictionary["echo"].index;
+                        let echoDelayIndex = Config.modulators.dictionary["echo delay"].index;
+                        let pitchShiftIndex = Config.modulators.dictionary["pitch shift"].index;
+                        let envSpeedIndex = Config.modulators.dictionary["envelope speed"].index;
+                        let perEnvSpeedIndex = Config.modulators.dictionary["individual envelope speed"].index;
+                        let instrumentIndex = instrument.modInstruments[modCount];
+                        switch (currentIndex) {
+                            case chorusIndex:
+                                vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].chorus - Config.modulators[chorusIndex].convertRealFactor;
+                                break;
+                            case reverbIndex:
+                                vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].reverb - Config.modulators[reverbIndex].convertRealFactor;
+                                break;
+                            case panningIndex:
+                                vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].pan - Config.modulators[panningIndex].convertRealFactor;
+                                break;
+                            case panDelayIndex:
+                                vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].panDelay - Config.modulators[panDelayIndex].convertRealFactor;
+                                break;
+                            case distortionIndex:
+                                vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].distortion - Config.modulators[distortionIndex].convertRealFactor;
+                                break;
+                            case detuneIndex:
+                                vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].detune;
+                                break;
+                            case vibratoDepthIndex:
+                                vol = Math.round(this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].vibratoDepth * 25 - Config.modulators[vibratoDepthIndex].convertRealFactor);
+                                break;
+                            case vibratoSpeedIndex:
+                                vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].vibratoSpeed - Config.modulators[vibratoSpeedIndex].convertRealFactor;
+                                break;
+                            case vibratoDelayIndex:
+                                vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].vibratoDelay - Config.modulators[vibratoDelayIndex].convertRealFactor;
+                                break;
+                            case arpSpeedIndex:
+                                vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].arpeggioSpeed - Config.modulators[arpSpeedIndex].convertRealFactor;
+                                break;
+                            case bitCrushIndex:
+                                vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].bitcrusherQuantization - Config.modulators[bitCrushIndex].convertRealFactor;
+                                break;
+                            case freqCrushIndex:
+                                vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].bitcrusherFreq - Config.modulators[freqCrushIndex].convertRealFactor;
+                                break;
+                            case echoIndex:
+                                vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].echoSustain - Config.modulators[echoIndex].convertRealFactor;
+                                break;
+                            case echoDelayIndex:
+                                vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].echoDelay - Config.modulators[echoDelayIndex].convertRealFactor;
+                                break;
+                            case pitchShiftIndex:
+                                vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].pitchShift;
+                                break;
+                            case envSpeedIndex:
+                                vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].envelopeSpeed - Config.modulators[envSpeedIndex].convertRealFactor;
+                                break;
+                            case perEnvSpeedIndex:
+                                vol = Config.perEnvelopeSpeedToIndices[this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].envelopes[instrument.modEnvelopeNumbers[modCount]].perEnvelopeSpeed] - Config.modulators[perEnvSpeedIndex].convertRealFactor;
+                                break;
+                        }
                     }
                     if (vol != undefined)
                         return vol;
                     else
-                        return 6;
+                        return Config.noteSizeMax;
                 }
             };
             this.getVolumeCap = (isMod, modChannel, modInstrument, modCount) => {
                 if (!isMod || modChannel == undefined || modInstrument == undefined || modCount == undefined)
-                    return 6;
+                    return Config.noteSizeMax;
                 else {
                     modCount = Config.modCount - modCount - 1;
                     let instrument = this.channels[modChannel].instruments[modInstrument];
@@ -13885,7 +13991,7 @@ li.select2-results__option[role=group] > strong:hover {
                         return cap;
                     }
                     else
-                        return 6;
+                        return Config.noteSizeMax;
                 }
             };
             this.getVolumeCapForSetting = (isMod, modSetting, filterType) => {
@@ -29110,6 +29216,7 @@ li.select2-results__option[role=group] > strong:hover {
             const instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
             if (oldSpeed != speed) {
                 instrument.envelopes[index].perEnvelopeSpeed = speed;
+                doc.synth.unsetMod(Config.modulators.dictionary["individual envelope speed"].index, doc.channel, doc.getCurrentInstrument());
                 instrument.preset = instrument.type;
                 doc.notifier.changed();
                 this._didSomething();
@@ -34934,6 +35041,9 @@ You should be redirected to the song at:<br /><br />
             this.container = HTML.div({ class: "channelBox", style: `margin: 1px; height: ${ChannelRow.patternHeight - 2}px;` }, this._label);
             this._renderedIndex = -1;
             this._renderedLabelColor = "?";
+            this._renderedVisibility = "?";
+            this._renderedBorderLeft = "?";
+            this._renderedBorderRight = "?";
             this._renderedBackgroundColor = "?";
             this.container.style.background = ColorConfig.uiWidgetBackground;
             this._label.style.color = color;
@@ -34974,6 +35084,24 @@ You should be redirected to the song at:<br /><br />
             if (this._renderedBackgroundColor != color) {
                 this.container.style.background = color;
                 this._renderedBackgroundColor = color;
+            }
+        }
+        setVisibility(visibility) {
+            if (this._renderedVisibility != visibility) {
+                this.container.style.visibility = visibility;
+                this._renderedVisibility = visibility;
+            }
+        }
+        setBorderLeft(borderLeft) {
+            if (this._renderedBorderLeft != borderLeft) {
+                this.container.style.setProperty("border-left", borderLeft);
+                this._renderedBorderLeft = borderLeft;
+            }
+        }
+        setBorderRight(borderRight) {
+            if (this._renderedBorderRight != borderRight) {
+                this.container.style.setProperty("border-right", borderRight);
+                this._renderedBorderRight = borderRight;
             }
         }
     }
@@ -35021,22 +35149,22 @@ You should be redirected to the song at:<br /><br />
                 if (i < this._doc.song.barCount) {
                     const colors = ColorConfig.getChannelColor(this._doc.song, this.index);
                     box.setIndex(this._doc.song.channels[this.index].bars[i], selected, dim, dim && !selected ? colors.secondaryChannel : colors.primaryChannel, this.index >= this._doc.song.pitchChannelCount && this.index < this._doc.song.pitchChannelCount + this._doc.song.noiseChannelCount, this.index >= this._doc.song.pitchChannelCount + this._doc.song.noiseChannelCount);
-                    box.container.style.visibility = "visible";
+                    box.setVisibility("visible");
                 }
                 else {
-                    box.container.style.visibility = "hidden";
+                    box.setVisibility("hidden");
                 }
                 if (i == this._doc.synth.loopBarStart) {
-                    box.container.style.setProperty("border-left", `1px dashed ${ColorConfig.uiWidgetFocus}`);
+                    box.setBorderLeft(`1px dashed ${ColorConfig.uiWidgetFocus}`);
                 }
                 else {
-                    box.container.style.setProperty("border-left", "none");
+                    box.setBorderLeft("none");
                 }
                 if (i == this._doc.synth.loopBarEnd) {
-                    box.container.style.setProperty("border-right", `1px dashed ${ColorConfig.uiWidgetFocus}`);
+                    box.setBorderRight(`1px dashed ${ColorConfig.uiWidgetFocus}`);
                 }
                 else {
-                    box.container.style.setProperty("border-right", "none");
+                    box.setBorderRight("none");
                 }
             }
         }
@@ -35233,8 +35361,12 @@ You should be redirected to the song at:<br /><br />
                 else if (startBoxIndex != -1 || endBoxIndex != -1 || startSliderIndex != -1 || endSliderIndex != -1 ||
                     lowerBoundBoxIndex != -1 || upperBoundBoxIndex != -1 || lowerBoundSliderIndex != -1 || upperBoundSliderIndex != -1 ||
                     randomStepsBoxIndex != -1 || randomSeedBoxIndex != -1 || randomStepsSliderIndex != -1 || randomSeedSliderIndex != -1 ||
+<<<<<<< HEAD
                     LFOStepsBoxIndex != -1 || LFOStepsSliderIndex != -1 || noteSizeStartBoxIndex != -1 || noteSizeStartSliderIndex != -1 ||
                     noteSizeEndBoxIndex != -1 || noteSizeEndSliderIndex != -1) {
+=======
+                    LFOStepsBoxIndex != -1 || LFOStepsSliderIndex != -1) {
+>>>>>>> 80efe0517e99f7029c819687125e0f811ece433e
                     if (this._lastChange != null) {
                         this._doc.record(this._lastChange);
                         this._lastChange = null;
@@ -35582,6 +35714,7 @@ You should be redirected to the song at:<br /><br />
                 const waveformWrapper = HTML.div({ class: "editor-controls selectContainer", style: "margin-top: 3px; flex:1; display:flex; flex-direction: row; align-items:center; justify-content:right;" }, HTML.span({ style: "font-size: smaller; margin-right: 10px;", class: "tip", onclick: () => this._openPrompt("lfoEnvelopeWaveform") }, "Waveform: "), waveformSelect);
                 const extraLFOSettingsGroup = HTML.div({ class: "editor-controls", style: "margin-top: 3px; flex:1; display:flex; flex-direction: column; align-items:center; justify-content:right;" }, waveformWrapper, LFOStepsWrapper);
                 extraLFOSettingsGroup.style.display = "none";
+<<<<<<< HEAD
                 const noteSizeStartBox = HTML.input({ value: instrument.envelopes[envelopeIndex].noteSizeStart, type: "number", min: 0, max: Config.noteSizeMax, step: 1, style: "width: 4em; font-size: 80%; " });
                 const noteSizeStartSlider = HTML.input({ value: instrument.envelopes[envelopeIndex].noteSizeStart, type: "range", min: 0, max: Config.noteSizeMax, step: 1, style: "width: 113px; margin-left: 0px;" });
                 const noteSizeEndBox = HTML.input({ value: instrument.envelopes[envelopeIndex].noteSizeEnd, type: "number", min: 0, max: Config.noteSizeMax, step: 1, style: "width: 4em; font-size: 80%; " });
@@ -35592,6 +35725,8 @@ You should be redirected to the song at:<br /><br />
                 const noteSizeEndWrapper = HTML.div({ style: "margin-top: 3px; flex:1; display:flex; flex-direction: row; align-items:center; justify-content:right;" }, noteSizeEndBoxWrapper, noteSizeEndSlider);
                 const extraNoteSizeSettingsGroup = HTML.div({ class: "editor-controls", style: "margin-top: 3px; flex:1; display:flex; flex-direction: column; align-items:center; justify-content:right;" }, noteSizeStartWrapper, noteSizeEndWrapper);
                 extraNoteSizeSettingsGroup.style.display = "none";
+=======
+>>>>>>> 80efe0517e99f7029c819687125e0f811ece433e
                 const perEnvelopeSpeedSlider = new Slider(HTML.input({ oninput: () => this.updateSpeedDisplay(envelopeIndex), style: "margin: 0; width: 113px", type: "range", min: 0, max: Config.perEnvelopeSpeedIndices.length - 1, value: EnvelopeEditor.convertIndexSpeed(instrument.envelopes[envelopeIndex].perEnvelopeSpeed, "index"), step: "1" }), this._doc, (oldSpeed, newSpeed) => new ChangePerEnvelopeSpeed(this._doc, EnvelopeEditor.convertIndexSpeed(oldSpeed, "speed"), EnvelopeEditor.convertIndexSpeed(newSpeed, "speed"), envelopeIndex), false);
                 const perEnvelopeSpeedDisplay = HTML.span({ class: "tip", style: `width:58px; flex:1; height:1em; font-size: smaller; margin-left: 10px;`, onclick: () => this._openPrompt("perEnvelopeSpeed") }, "Spd: x" + prettyNumber(EnvelopeEditor.convertIndexSpeed(perEnvelopeSpeedSlider.getValueBeforeProspectiveChange(), "speed")));
                 const perEnvelopeSpeedWrapper = HTML.div({ style: "margin-top: 3px; flex:1; display:flex; flex-direction: row; align-items:center; justify-content:right;" }, perEnvelopeSpeedDisplay, perEnvelopeSpeedSlider.container);
@@ -43535,7 +43670,7 @@ You should be redirected to the song at:<br /><br />
                     break;
                 case "unisonExpression":
                     {
-                        message = div$5(h2$4("Unison Volume"), p("This setting controls the unison volume. Use this if the unison makes your instrument too loud in comparison to other instruments."));
+                        message = div$5(h2$4("Unison Volume"), p("This setting controls the unison volume. Use this if the unison makes your instrument too loud in comparison to other instruments."), p("If this is set to a negative value, it will invert the wave!"));
                     }
                     break;
                 case "unisonSign":
@@ -44879,7 +45014,7 @@ You should be redirected to the song at:<br /><br />
             this._instructionsLink = a({ href: "#" }, "Here's more information and some instructions on how to use custom samples in Slarmoo's Box.");
             this._description = div$2(div$2({ style: "margin-bottom: 0.5em; -webkit-user-select: text; -moz-user-select: text; -ms-user-select: text; user-select: text; cursor: text;" }, "In order to use the old Slarmoo's Box samples, you should add ", code("legacySamples"), " as an URL. You can also use ", code("nintariboxSamples"), " and ", code("marioPaintboxSamples"), " for more built-in sample packs."), div$2({ style: "margin-bottom: 0.5em;" }, "The order of these samples is important - if you change it you'll break your song!"), div$2({ style: "margin-bottom: 0.5em;" }, this._instructionsLink));
             this._closeInstructionsButton = button$2({ style: "height: auto; min-height: var(--button-size); width: 100%;" }, "Close instructions");
-            this._instructionsArea = div$2({ style: "display: none; margin-top: 0; -webkit-user-select: text; -moz-user-select: text; -ms-user-select: text; user-select: text; cursor: text; overflow-y: auto;" }, h2$1("Add Samples"), div$2({ style: "margin-top: 0.5em; margin-bottom: 0.5em;" }, "In Slarmoo's Box, custom samples are loaded from arbitrary URLs."), div$2({ style: `margin-top: 0.5em; margin-bottom: 0.5em; color: ${ColorConfig.secondaryText};` }, "(Technically, the web server behind the URL needs to support ", a({ href: "https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS", target: "_blank", }, "CORS"), ", but you don't need to know about that: ", " the sample just won't load if that's not the case)"), div$2({ style: "margin-top: 0.5em; margin-bottom: 0.5em;" }, details(summary("Why arbitrary URLs?"), a({ href: "https://pandoras-box-archive.neptendo.repl.co/" }, "A certain BeepBox mod"), " did this with one central server, but it went down, taking down", " the samples with it, though thankfully it got archived.", " This is always an issue with servers: it may run out of space,", " stop working, and so on. With arbitrary URLs, you can always ", " change them to different ones if they stop working.")), div$2({ style: "margin-top: 0.5em; margin-bottom: 0.5em;" }, "As for where to upload your samples, here are some suggestions:", ul({ style: "text-align: left;" }, li(a({ href: "https://filegarden.com" }, "File Garden")), li(a({ href: "https://catbox.moe/" }, "Catbox")), li(a({ href: "https://www.dropbox.com" }, "Dropbox"), " (domain needs to be ", code("https://dl.dropboxusercontent.com"), ")"))), div$2({ style: "margin-top: 0.5em; margin-bottom: 0.5em;" }, "Static website hosting services may also work (such as ", a({ href: "https://pages.github.com" }, "GitHub Pages"), ")", " but those require a bit more setup."), div$2({ style: "margin-top: 0.5em; margin-bottom: 1em;" }, "Finally, if have a soundfont you'd like to get samples from, consider using this ", a({ href: "./sample_extractor.html", target: "_blank" }, "sample extractor"), "."), div$2({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between; margin-top: 0.5em;" }, this._closeInstructionsButton));
+            this._instructionsArea = div$2({ style: "display: none; margin-top: 0; -webkit-user-select: text; -moz-user-select: text; -ms-user-select: text; user-select: text; cursor: text; overflow-y: auto;" }, h2$1("Add Samples"), div$2({ style: "margin-top: 0.5em; margin-bottom: 0.5em;" }, "In Slarmoo's Box, custom samples are loaded from arbitrary URLs."), div$2({ style: `margin-top: 0.5em; margin-bottom: 0.5em; color: ${ColorConfig.secondaryText};` }, "(Technically, the web server behind the URL needs to support ", a({ href: "https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS", target: "_blank", }, "CORS"), ", but you don't need to know about that: ", " the sample just won't load if that's not the case)"), div$2({ style: "margin-top: 0.5em; margin-bottom: 0.5em;" }, details(summary("Why arbitrary URLs?"), a({ href: "https://pandoras-box-archive.neptendo.repl.co/" }, "A certain BeepBox mod"), " did this with one central server, but it went down, taking down", " the samples with it, though thankfully it got archived.", " This is always an issue with servers: it may run out of space,", " stop working, and so on. With arbitrary URLs, you can always ", " change them to different ones if they stop working.")), div$2({ style: "margin-top: 0.5em; margin-bottom: 0.5em;" }, "As for where to upload your samples, here are some suggestions:", ul({ style: "text-align: left;" }, li(a({ href: "https://filegarden.com" }, "File Garden")), li(a({ href: "https://www.dropbox.com" }, "Dropbox"), " (domain needs to be ", code("https://dl.dropboxusercontent.com"), ")"))), div$2({ style: "margin-top: 0.5em; margin-bottom: 0.5em;" }, "Static website hosting services may also work (such as ", a({ href: "https://pages.github.com" }, "GitHub Pages"), ")", " but those require a bit more setup."), div$2({ style: "margin-top: 0.5em; margin-bottom: 1em;" }, "Finally, if have a soundfont you'd like to get samples from, consider using this ", a({ href: "./sample_extractor.html", target: "_blank" }, "sample extractor"), "."), div$2({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between; margin-top: 0.5em;" }, this._closeInstructionsButton));
             this._addSamplesArea = div$2({ style: "overflow-y: auto;" }, h2$1("Add Samples"), div$2({ style: "display: flex; flex-direction: column; align-items: center; margin-bottom: 0.5em;" }, this._description, div$2({ style: "width: 100%; max-height: 450px; overflow-y: scroll;" }, this._entryContainer), this._addSamplesAreaBottom), div$2({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between;" }, this._okayButton));
             this._bulkAddTextarea = textarea({
                 style: "width: 100%; height: 100%; resize: none; box-sizing: border-box;",
@@ -49939,6 +50074,1788 @@ You should be redirected to the song at:<br /><br />
         }
     }
 
+<<<<<<< HEAD
+=======
+    class SongPerformance {
+        constructor(_doc) {
+            this._doc = _doc;
+            this._channelIsDrum = false;
+            this._channelOctave = -1;
+            this._songKey = -1;
+            this._pitchesAreTemporary = false;
+            this._bassPitchesAreTemporary = false;
+            this._recentlyAddedPitches = [];
+            this._recentlyAddedBassPitches = [];
+            this._songLengthWhenRecordingStarted = -1;
+            this._playheadPart = -1;
+            this._bassPlayheadPart = -1;
+            this._playheadPattern = null;
+            this._bassPlayheadPattern = null;
+            this._pitchesChanged = false;
+            this._bassPitchesChanged = false;
+            this._lastNote = null;
+            this._lastBassNote = null;
+            this._recordingChange = null;
+            this._onAnimationFrame = () => {
+                window.requestAnimationFrame(this._onAnimationFrame);
+                if (this._doc.synth.recording) {
+                    let dirty = this._updateRecordedNotes();
+                    dirty = this._updateRecordedBassNotes() ? true : dirty;
+                    if (dirty) {
+                        this._doc.notifier.notifyWatchers();
+                    }
+                }
+            };
+            this._documentChanged = () => {
+                const isDrum = this._doc.song.getChannelIsNoise(this._doc.channel);
+                const octave = this._doc.song.channels[this._doc.channel].octave;
+                if (this._doc.synth.liveInputChannel != this._doc.channel || this._doc.synth.liveBassInputChannel != this._getBassOffsetChannel() || this._channelIsDrum != isDrum || this._channelOctave != octave || this._songKey != this._doc.song.key) {
+                    this._doc.synth.liveInputChannel = this._doc.channel;
+                    this._doc.synth.liveBassInputChannel = this._getBassOffsetChannel();
+                    this._channelIsDrum = isDrum;
+                    this._channelOctave = octave;
+                    this._songKey = this._doc.song.key;
+                    this.clearAllPitches();
+                    this.clearAllBassPitches();
+                }
+                this._doc.synth.liveInputInstruments = this._doc.recentPatternInstruments[this._doc.channel];
+                this._doc.synth.liveBassInputInstruments = this._doc.recentPatternInstruments[this._doc.synth.liveBassInputChannel];
+            };
+            this._doc.notifier.watch(this._documentChanged);
+            this._documentChanged();
+            window.requestAnimationFrame(this._onAnimationFrame);
+        }
+        play() {
+            this._doc.synth.play();
+            this._doc.synth.enableMetronome = false;
+            this._doc.synth.countInMetronome = false;
+            this._doc.synth.maintainLiveInput();
+        }
+        pause() {
+            this.clearAllPitches();
+            this.clearAllBassPitches();
+            if (this._recordingChange != null) {
+                if (this._doc.song.barCount > this._songLengthWhenRecordingStarted && !this._lastBarHasPatterns()) {
+                    new ChangeDeleteBars(this._doc, this._doc.song.barCount - 1, 1);
+                    new ChangeChannelBar(this._doc, this._doc.channel, this._doc.song.barCount - 1);
+                }
+                if (!this._recordingChange.isNoop()) {
+                    this._doc.record(this._recordingChange);
+                    this._recordingChange = null;
+                }
+                this._lastNote = null;
+            }
+            this._doc.synth.pause();
+            this._doc.synth.resetEffects();
+            this._doc.synth.enableMetronome = false;
+            this._doc.synth.countInMetronome = false;
+            if (this._doc.prefs.autoFollow) {
+                this._doc.synth.goToBar(this._doc.bar);
+            }
+            this._doc.synth.snapToBar();
+        }
+        record() {
+            this._doc.synth.snapToBar();
+            const playheadBar = Math.floor(this._doc.synth.playhead);
+            if (playheadBar != this._doc.bar) {
+                new ChangeChannelBar(this._doc, this._doc.channel, playheadBar);
+            }
+            if (this._pitchesAreTemporary) {
+                this.clearAllPitches();
+                this._pitchesAreTemporary = false;
+            }
+            if (this._bassPitchesAreTemporary) {
+                this.clearAllBassPitches();
+                this._bassPitchesAreTemporary = false;
+            }
+            this._doc.synth.enableMetronome = this._doc.prefs.metronomeWhileRecording;
+            this._doc.synth.countInMetronome = this._doc.prefs.metronomeCountIn;
+            this._doc.synth.startRecording();
+            this._doc.synth.maintainLiveInput();
+            this._songLengthWhenRecordingStarted = this._doc.song.barCount;
+            this._playheadPart = this._getCurrentPlayheadPart();
+            this._bassPlayheadPart = this._getCurrentPlayheadPart();
+            this._playheadPattern = null;
+            this._bassPlayheadPattern = null;
+            this._pitchesChanged = false;
+            this._bassPitchesChanged = false;
+            this._lastNote = null;
+            this._lastBassNote = null;
+            this._recentlyAddedPitches.length = 0;
+            this._recentlyAddedBassPitches.length = 0;
+            this._recordingChange = new ChangeGroup();
+            this._doc.setProspectiveChange(this._recordingChange);
+        }
+        abortRecording() {
+            this._recordingChange = null;
+            this.pause();
+        }
+        pitchesAreTemporary() {
+            return this._pitchesAreTemporary;
+        }
+        bassPitchesAreTemporary() {
+            return this._bassPitchesAreTemporary;
+        }
+        _getBassOffsetChannel() {
+            if (this._doc.channel >= this._doc.song.pitchChannelCount)
+                return this._doc.channel;
+            return Math.max(0, Math.min(this._doc.song.pitchChannelCount - 1, this._doc.channel + this._doc.prefs.bassOffset));
+        }
+        _getMinDivision() {
+            if (this._doc.prefs.snapRecordedNotesToRhythm) {
+                return Config.partsPerBeat / Config.rhythms[this._doc.song.rhythm].stepsPerBeat;
+            }
+            else {
+                return 1;
+            }
+        }
+        _getCurrentPlayheadPart() {
+            const currentPart = this._doc.synth.playhead * this._doc.song.beatsPerBar * Config.partsPerBeat;
+            if (this._doc.prefs.snapRecordedNotesToRhythm) {
+                const minDivision = this._getMinDivision();
+                return Math.round(currentPart / minDivision) * minDivision;
+            }
+            return Math.round(currentPart);
+        }
+        _lastBarHasPatterns() {
+            for (let channelIndex = 0; channelIndex < this._doc.song.getChannelCount(); channelIndex++) {
+                if (this._doc.song.channels[channelIndex].bars[this._doc.song.barCount - 1] != 0)
+                    return true;
+            }
+            return false;
+        }
+        _updateRecordedNotes() {
+            if (this._recordingChange == null)
+                return false;
+            if (!this._doc.lastChangeWas(this._recordingChange)) {
+                this.abortRecording();
+                return false;
+            }
+            if (this._doc.synth.countInMetronome) {
+                this._recentlyAddedPitches.length = 0;
+                this._pitchesChanged = false;
+                return false;
+            }
+            const partsPerBar = this._doc.song.beatsPerBar * Config.partsPerBeat;
+            const oldPart = this._playheadPart % partsPerBar;
+            const oldBar = Math.floor(this._playheadPart / partsPerBar);
+            const oldPlayheadPart = this._playheadPart;
+            this._playheadPart = this._getCurrentPlayheadPart();
+            const newPart = this._playheadPart % partsPerBar;
+            const newBar = Math.floor(this._playheadPart / partsPerBar);
+            if (oldPart == newPart && oldBar == newBar)
+                return false;
+            if (this._playheadPart < oldPlayheadPart) {
+                this._lastNote = null;
+                this._playheadPattern = null;
+                return false;
+            }
+            let dirty = false;
+            for (let bar = oldBar; bar <= newBar; bar++) {
+                if (bar != oldBar) {
+                    this._playheadPattern = null;
+                }
+                const startPart = (bar == oldBar) ? oldPart : 0;
+                const endPart = (bar == newBar) ? newPart : partsPerBar;
+                if (startPart == endPart)
+                    break;
+                if (this._lastNote != null && !this._pitchesChanged && startPart > 0 && this._doc.synth.liveInputPitches.length > 0) {
+                    this._recordingChange.append(new ChangePinTime(this._doc, this._lastNote, 1, endPart, this._lastNote.continuesLastPattern));
+                    this._doc.currentPatternIsDirty = true;
+                }
+                else {
+                    if (this._lastNote != null) {
+                        this._lastNote = null;
+                    }
+                    let noteStartPart = startPart;
+                    let noteEndPart = endPart;
+                    while (noteStartPart < endPart) {
+                        let addedAlreadyReleasedPitch = false;
+                        if (this._recentlyAddedPitches.length > 0 || this._doc.synth.liveInputPitches.length > 0) {
+                            if (this._playheadPattern == null) {
+                                this._doc.selection.erasePatternInBar(this._recordingChange, this._doc.synth.liveInputChannel, bar);
+                                this._recordingChange.append(new ChangeEnsurePatternExists(this._doc, this._doc.synth.liveInputChannel, bar));
+                                this._playheadPattern = this._doc.song.getPattern(this._doc.synth.liveInputChannel, bar);
+                            }
+                            if (this._playheadPattern == null)
+                                throw new Error();
+                            this._lastNote = new Note(-1, noteStartPart, noteEndPart, Config.noteSizeMax, this._doc.song.getChannelIsNoise(this._doc.synth.liveInputChannel));
+                            this._lastNote.continuesLastPattern = (noteStartPart == 0 && !this._pitchesChanged);
+                            this._lastNote.pitches.length = 0;
+                            while (this._recentlyAddedPitches.length > 0) {
+                                if (this._lastNote.pitches.length >= Config.maxChordSize)
+                                    break;
+                                const recentPitch = this._recentlyAddedPitches.shift();
+                                if (this._doc.synth.liveInputPitches.indexOf(recentPitch) == -1) {
+                                    this._lastNote.pitches.push(recentPitch);
+                                    addedAlreadyReleasedPitch = true;
+                                }
+                            }
+                            for (let i = 0; i < this._doc.synth.liveInputPitches.length; i++) {
+                                if (this._lastNote.pitches.length >= Config.maxChordSize)
+                                    break;
+                                this._lastNote.pitches.push(this._doc.synth.liveInputPitches[i]);
+                            }
+                            this._recordingChange.append(new ChangeNoteAdded(this._doc, this._playheadPattern, this._lastNote, this._playheadPattern.notes.length));
+                            if (addedAlreadyReleasedPitch) {
+                                noteEndPart = noteStartPart + this._getMinDivision();
+                                new ChangeNoteLength(this._doc, this._lastNote, this._lastNote.start, noteEndPart);
+                                this._lastNote = null;
+                            }
+                            dirty = true;
+                        }
+                        this._pitchesChanged = addedAlreadyReleasedPitch;
+                        noteStartPart = noteEndPart;
+                        noteEndPart = endPart;
+                    }
+                }
+                if (bar == this._doc.song.barCount - 1) {
+                    if (this._lastBarHasPatterns()) {
+                        new ChangeInsertBars(this._doc, this._doc.song.barCount, 1);
+                        this._doc.bar--;
+                        dirty = true;
+                    }
+                }
+            }
+            return dirty;
+        }
+        _updateRecordedBassNotes() {
+            if (this._recordingChange == null)
+                return false;
+            if (!this._doc.lastChangeWas(this._recordingChange)) {
+                this.abortRecording();
+                return false;
+            }
+            if (this._doc.synth.countInMetronome) {
+                this._recentlyAddedBassPitches.length = 0;
+                this._bassPitchesChanged = false;
+                return false;
+            }
+            const partsPerBar = this._doc.song.beatsPerBar * Config.partsPerBeat;
+            const oldPart = this._bassPlayheadPart % partsPerBar;
+            const oldBar = Math.floor(this._bassPlayheadPart / partsPerBar);
+            const oldPlayheadPart = this._bassPlayheadPart;
+            this._bassPlayheadPart = this._getCurrentPlayheadPart();
+            const newPart = this._bassPlayheadPart % partsPerBar;
+            const newBar = Math.floor(this._bassPlayheadPart / partsPerBar);
+            if (oldPart == newPart && oldBar == newBar)
+                return false;
+            if (this._bassPlayheadPart < oldPlayheadPart) {
+                this._lastBassNote = null;
+                this._bassPlayheadPattern = null;
+                return false;
+            }
+            let dirty = false;
+            for (let bar = oldBar; bar <= newBar; bar++) {
+                if (bar != oldBar) {
+                    this._bassPlayheadPattern = null;
+                }
+                const startPart = (bar == oldBar) ? oldPart : 0;
+                const endPart = (bar == newBar) ? newPart : partsPerBar;
+                if (startPart == endPart)
+                    break;
+                if (this._lastBassNote != null && !this._bassPitchesChanged && startPart > 0 && this._doc.synth.liveBassInputPitches.length > 0) {
+                    this._recordingChange.append(new ChangePinTime(this._doc, this._lastBassNote, 1, endPart, this._lastBassNote.continuesLastPattern));
+                    this._doc.currentPatternIsDirty = true;
+                }
+                else {
+                    if (this._lastBassNote != null) {
+                        this._lastBassNote = null;
+                    }
+                    let noteStartPart = startPart;
+                    let noteEndPart = endPart;
+                    while (noteStartPart < endPart) {
+                        let addedAlreadyReleasedPitch = false;
+                        if (this._recentlyAddedBassPitches.length > 0 || this._doc.synth.liveBassInputPitches.length > 0) {
+                            if (this._bassPlayheadPattern == null) {
+                                this._doc.selection.erasePatternInBar(this._recordingChange, this._doc.synth.liveBassInputChannel, bar);
+                                this._recordingChange.append(new ChangeEnsurePatternExists(this._doc, this._doc.synth.liveBassInputChannel, bar));
+                                this._bassPlayheadPattern = this._doc.song.getPattern(this._doc.synth.liveBassInputChannel, bar);
+                            }
+                            if (this._bassPlayheadPattern == null)
+                                throw new Error();
+                            this._lastBassNote = new Note(-1, noteStartPart, noteEndPart, Config.noteSizeMax, this._doc.song.getChannelIsNoise(this._doc.synth.liveBassInputChannel));
+                            this._lastBassNote.continuesLastPattern = (noteStartPart == 0 && !this._bassPitchesChanged);
+                            this._lastBassNote.pitches.length = 0;
+                            while (this._recentlyAddedBassPitches.length > 0) {
+                                if (this._lastBassNote.pitches.length >= Config.maxChordSize)
+                                    break;
+                                const recentPitch = this._recentlyAddedBassPitches.shift();
+                                if (this._doc.synth.liveBassInputPitches.indexOf(recentPitch) == -1) {
+                                    this._lastBassNote.pitches.push(recentPitch);
+                                    addedAlreadyReleasedPitch = true;
+                                }
+                            }
+                            for (let i = 0; i < this._doc.synth.liveBassInputPitches.length; i++) {
+                                if (this._lastBassNote.pitches.length >= Config.maxChordSize)
+                                    break;
+                                this._lastBassNote.pitches.push(this._doc.synth.liveBassInputPitches[i]);
+                            }
+                            this._recordingChange.append(new ChangeNoteAdded(this._doc, this._bassPlayheadPattern, this._lastBassNote, this._bassPlayheadPattern.notes.length));
+                            if (addedAlreadyReleasedPitch) {
+                                noteEndPart = noteStartPart + this._getMinDivision();
+                                new ChangeNoteLength(this._doc, this._lastBassNote, this._lastBassNote.start, noteEndPart);
+                                this._lastBassNote = null;
+                            }
+                            dirty = true;
+                        }
+                        this._bassPitchesChanged = addedAlreadyReleasedPitch;
+                        noteStartPart = noteEndPart;
+                        noteEndPart = endPart;
+                    }
+                }
+                if (bar == this._doc.song.barCount - 1) {
+                    if (this._lastBarHasPatterns()) {
+                        new ChangeInsertBars(this._doc, this._doc.song.barCount, 1);
+                        this._doc.bar--;
+                        dirty = true;
+                    }
+                }
+            }
+            return dirty;
+        }
+        setTemporaryPitches(pitches, duration) {
+            this._updateRecordedNotes();
+            for (let i = 0; i < pitches.length; i++) {
+                this._doc.synth.liveInputPitches[i] = pitches[i];
+            }
+            this._doc.synth.liveInputPitches.length = Math.min(pitches.length, Config.maxChordSize);
+            this._doc.synth.liveInputDuration = duration;
+            this._doc.synth.liveInputStarted = true;
+            this._pitchesAreTemporary = true;
+            this._pitchesChanged = true;
+        }
+        setTemporaryBassPitches(pitches, duration) {
+            this._updateRecordedBassNotes();
+            for (let i = 0; i < pitches.length; i++) {
+                this._doc.synth.liveBassInputPitches[i] = pitches[i];
+            }
+            this._doc.synth.liveBassInputPitches.length = Math.min(pitches.length, Config.maxChordSize);
+            this._doc.synth.liveBassInputDuration = duration;
+            this._doc.synth.liveBassInputStarted = true;
+            this._bassPitchesAreTemporary = true;
+            this._bassPitchesChanged = true;
+        }
+        addPerformedPitch(pitch) {
+            this._doc.synth.maintainLiveInput();
+            if (pitch > Piano.getBassCutoffPitch(this._doc) || this._getBassOffsetChannel() == this._doc.channel) {
+                this._updateRecordedNotes();
+                if (this._pitchesAreTemporary) {
+                    this.clearAllPitches();
+                    this._pitchesAreTemporary = false;
+                }
+                if (this._doc.prefs.ignorePerformedNotesNotInScale && !Config.scales[this._doc.song.scale].flags[pitch % Config.pitchesPerOctave]) {
+                    return;
+                }
+                if (this._doc.synth.liveInputPitches.indexOf(pitch) == -1) {
+                    this._doc.synth.liveInputPitches.push(pitch);
+                    this._pitchesChanged = true;
+                    while (this._doc.synth.liveInputPitches.length > Config.maxChordSize) {
+                        this._doc.synth.liveInputPitches.shift();
+                    }
+                    this._doc.synth.liveInputDuration = Number.MAX_SAFE_INTEGER;
+                    if (this._recordingChange != null) {
+                        const recentIndex = this._recentlyAddedPitches.indexOf(pitch);
+                        if (recentIndex != -1) {
+                            this._recentlyAddedPitches.splice(recentIndex, 1);
+                        }
+                        this._recentlyAddedPitches.push(pitch);
+                        while (this._recentlyAddedPitches.length > Config.maxChordSize * 4) {
+                            this._recentlyAddedPitches.shift();
+                        }
+                    }
+                }
+            }
+            else {
+                this._updateRecordedBassNotes();
+                if (this._bassPitchesAreTemporary) {
+                    this.clearAllBassPitches();
+                    this._bassPitchesAreTemporary = false;
+                }
+                if (this._doc.prefs.ignorePerformedNotesNotInScale && !Config.scales[this._doc.song.scale].flags[pitch % Config.pitchesPerOctave]) {
+                    return;
+                }
+                if (this._doc.synth.liveBassInputPitches.indexOf(pitch) == -1) {
+                    this._doc.synth.liveBassInputPitches.push(pitch);
+                    this._bassPitchesChanged = true;
+                    while (this._doc.synth.liveBassInputPitches.length > Config.maxChordSize) {
+                        this._doc.synth.liveBassInputPitches.shift();
+                    }
+                    this._doc.synth.liveBassInputDuration = Number.MAX_SAFE_INTEGER;
+                    if (this._recordingChange != null) {
+                        const recentIndex = this._recentlyAddedPitches.indexOf(pitch);
+                        if (recentIndex != -1) {
+                            this._recentlyAddedBassPitches.splice(recentIndex, 1);
+                        }
+                        this._recentlyAddedBassPitches.push(pitch);
+                        while (this._recentlyAddedBassPitches.length > Config.maxChordSize * 4) {
+                            this._recentlyAddedBassPitches.shift();
+                        }
+                    }
+                }
+            }
+        }
+        removePerformedPitch(pitch) {
+            if (pitch > Piano.getBassCutoffPitch(this._doc) || this._getBassOffsetChannel() == this._doc.channel) {
+                this._updateRecordedNotes();
+                for (let i = 0; i < this._doc.synth.liveInputPitches.length; i++) {
+                    if (this._doc.synth.liveInputPitches[i] == pitch) {
+                        this._doc.synth.liveInputPitches.splice(i, 1);
+                        this._pitchesChanged = true;
+                        i--;
+                    }
+                }
+            }
+            else {
+                this._updateRecordedBassNotes();
+                for (let i = 0; i < this._doc.synth.liveBassInputPitches.length; i++) {
+                    if (this._doc.synth.liveBassInputPitches[i] == pitch) {
+                        this._doc.synth.liveBassInputPitches.splice(i, 1);
+                        this._bassPitchesChanged = true;
+                        i--;
+                    }
+                }
+            }
+        }
+        clearAllPitches() {
+            this._updateRecordedNotes();
+            this._doc.synth.liveInputPitches.length = 0;
+            this._pitchesChanged = true;
+        }
+        clearAllBassPitches() {
+            this._updateRecordedBassNotes();
+            this._doc.synth.liveBassInputPitches.length = 0;
+            this._bassPitchesChanged = true;
+        }
+    }
+
+    class Selection {
+        constructor(_doc) {
+            this._doc = _doc;
+            this.boxSelectionX0 = 0;
+            this.boxSelectionY0 = 0;
+            this.boxSelectionX1 = 0;
+            this.boxSelectionY1 = 0;
+            this.digits = "";
+            this.instrumentDigits = "";
+            this.patternSelectionStart = 0;
+            this.patternSelectionEnd = 0;
+            this.patternSelectionActive = false;
+            this._changeTranspose = null;
+            this._changeTrack = null;
+            this._changeInstrument = null;
+            this._changeReorder = null;
+        }
+        toJSON() {
+            return {
+                "x0": this.boxSelectionX0,
+                "x1": this.boxSelectionX1,
+                "y0": this.boxSelectionY0,
+                "y1": this.boxSelectionY1,
+                "start": this.patternSelectionStart,
+                "end": this.patternSelectionEnd,
+            };
+        }
+        fromJSON(json) {
+            if (json == null)
+                return;
+            this.boxSelectionX0 = +json["x0"];
+            this.boxSelectionX1 = +json["x1"];
+            this.boxSelectionY0 = +json["y0"];
+            this.boxSelectionY1 = +json["y1"];
+            this.patternSelectionStart = +json["start"];
+            this.patternSelectionEnd = +json["end"];
+            this.digits = "";
+            this.instrumentDigits = "";
+            this.patternSelectionActive = this.patternSelectionStart < this.patternSelectionEnd;
+        }
+        selectionUpdated() {
+            this._doc.notifier.changed();
+            this.digits = "";
+            this.instrumentDigits = "";
+        }
+        get boxSelectionBar() {
+            return Math.min(this.boxSelectionX0, this.boxSelectionX1);
+        }
+        get boxSelectionChannel() {
+            return Math.min(this.boxSelectionY0, this.boxSelectionY1);
+        }
+        get boxSelectionWidth() {
+            return Math.abs(this.boxSelectionX0 - this.boxSelectionX1) + 1;
+        }
+        get boxSelectionHeight() {
+            return Math.abs(this.boxSelectionY0 - this.boxSelectionY1) + 1;
+        }
+        get boxSelectionActive() {
+            return this.boxSelectionWidth > 1 || this.boxSelectionHeight > 1;
+        }
+        scrollToSelectedPattern() {
+            this._doc.barScrollPos = Math.min(this._doc.bar, Math.max(this._doc.bar - (this._doc.trackVisibleBars - 1), this._doc.barScrollPos));
+            this._doc.channelScrollPos = Math.min(this._doc.channel, Math.max(this._doc.channel - (this._doc.trackVisibleChannels - 1), this._doc.channelScrollPos));
+        }
+        scrollToEndOfSelection() {
+            this._doc.barScrollPos = Math.min(this.boxSelectionX1, Math.max(this.boxSelectionX1 - (this._doc.trackVisibleBars - 1), this._doc.barScrollPos));
+            this._doc.channelScrollPos = Math.min(this.boxSelectionY1, Math.max(this.boxSelectionY1 - (this._doc.trackVisibleChannels - 1), this._doc.channelScrollPos));
+        }
+        setChannelBar(channelIndex, bar) {
+            if (channelIndex == this._doc.channel && bar == this._doc.bar)
+                return;
+            const canReplaceLastChange = this._doc.lastChangeWas(this._changeTrack);
+            this._changeTrack = new ChangeGroup();
+            this._changeTrack.append(new ChangeChannelBar(this._doc, channelIndex, bar));
+            const pattern = this._doc.getCurrentPattern(0);
+            if (pattern != null) {
+                if (pattern.instruments.indexOf(this._doc.viewedInstrument[this._doc.channel]) < 0) {
+                    this._doc.viewedInstrument[this._doc.channel] = pattern.instruments[0];
+                }
+            }
+            if (!this._doc.hasRedoHistory()) {
+                this._doc.record(this._changeTrack, canReplaceLastChange);
+            }
+            this.selectionUpdated();
+        }
+        setPattern(pattern) {
+            this._doc.record(new ChangePatternNumbers(this._doc, pattern, this.boxSelectionBar, this.boxSelectionChannel, this.boxSelectionWidth, this.boxSelectionHeight));
+        }
+        nextDigit(digit, forInstrument, forRhythms) {
+            if (forRhythms) {
+                if (digit == "3") {
+                    this._doc.record(new ChangeRhythm(this._doc, 0));
+                }
+                else if (digit == "4") {
+                    this._doc.record(new ChangeRhythm(this._doc, 1));
+                }
+                else if (digit == "6") {
+                    this._doc.record(new ChangeRhythm(this._doc, 2));
+                }
+                else if (digit == "8") {
+                    this._doc.record(new ChangeRhythm(this._doc, 3));
+                }
+                else if (digit == "0" || digit == "1") {
+                    this._doc.record(new ChangeRhythm(this._doc, 4));
+                }
+            }
+            else if (forInstrument) {
+                if (digit == "0")
+                    digit = "10";
+                this.instrumentDigits += digit;
+                var parsed = parseInt(this.instrumentDigits);
+                if (parsed != 0 && parsed <= this._doc.song.channels[this._doc.channel].instruments.length) {
+                    this.selectInstrument(parsed - 1);
+                    return;
+                }
+                this.instrumentDigits = digit;
+                parsed = parseInt(this.instrumentDigits);
+                if (parsed != 0 && parsed <= this._doc.song.channels[this._doc.channel].instruments.length) {
+                    this.selectInstrument(parsed - 1);
+                    return;
+                }
+                this.instrumentDigits = "";
+            }
+            else {
+                this.digits += digit;
+                let parsed = parseInt(this.digits);
+                if (parsed <= this._doc.song.patternsPerChannel) {
+                    this.setPattern(parsed);
+                    return;
+                }
+                this.digits = digit;
+                parsed = parseInt(this.digits);
+                if (parsed <= this._doc.song.patternsPerChannel) {
+                    this.setPattern(parsed);
+                    return;
+                }
+                this.digits = "";
+            }
+        }
+        setModChannel(mod, index) {
+            this._doc.record(new ChangeModChannel(this._doc, mod, index));
+        }
+        setModInstrument(mod, instrument) {
+            this._doc.record(new ChangeModInstrument(this._doc, mod, instrument));
+        }
+        setModSetting(mod, text) {
+            this._doc.record(new ChangeModSetting(this._doc, mod, text));
+        }
+        setModFilter(mod, type) {
+            this._doc.record(new ChangeModFilter(this._doc, mod, type));
+        }
+        setModEnvelope(mod, type) {
+            this._doc.record(new ChangeModEnvelope(this._doc, mod, type));
+        }
+        insertBars() {
+            this._doc.record(new ChangeInsertBars(this._doc, this.boxSelectionBar + this.boxSelectionWidth, this.boxSelectionWidth));
+            const width = this.boxSelectionWidth;
+            this.boxSelectionX0 += width;
+            this.boxSelectionX1 += width;
+        }
+        insertChannel() {
+            const group = new ChangeGroup();
+            const insertIndex = this.boxSelectionChannel + this.boxSelectionHeight;
+            const isNoise = this._doc.song.getChannelIsNoise(insertIndex - 1);
+            const isMod = this._doc.song.getChannelIsMod(insertIndex - 1);
+            group.append(new ChangeAddChannel(this._doc, insertIndex, isNoise, isMod));
+            if (!group.isNoop()) {
+                this.boxSelectionY0 = this.boxSelectionY1 = insertIndex;
+                group.append(new ChangeChannelBar(this._doc, insertIndex, this._doc.bar));
+                this._doc.record(group);
+            }
+        }
+        deleteBars() {
+            const group = new ChangeGroup();
+            if (this._doc.selection.patternSelectionActive) {
+                if (this.boxSelectionActive) {
+                    group.append(new ChangeDuplicateSelectedReusedPatterns(this._doc, this.boxSelectionBar, this.boxSelectionWidth, this.boxSelectionChannel, this.boxSelectionHeight, false));
+                }
+                for (const channelIndex of this._eachSelectedChannel()) {
+                    for (const pattern of this._eachSelectedPattern(channelIndex)) {
+                        group.append(new ChangeNoteTruncate(this._doc, pattern, this._doc.selection.patternSelectionStart, this._doc.selection.patternSelectionEnd));
+                    }
+                }
+                group.append(new ChangePatternSelection(this._doc, 0, 0));
+            }
+            else {
+                group.append(new ChangeDeleteBars(this._doc, this.boxSelectionBar, this.boxSelectionWidth));
+                const width = this.boxSelectionWidth;
+                this.boxSelectionX0 = Math.max(0, this.boxSelectionX0 - width);
+                this.boxSelectionX1 = Math.max(0, this.boxSelectionX1 - width);
+            }
+            this._doc.record(group);
+        }
+        deleteChannel() {
+            this._doc.record(new ChangeRemoveChannel(this._doc, this.boxSelectionChannel, this.boxSelectionChannel + this.boxSelectionHeight - 1));
+            this.boxSelectionY0 = this.boxSelectionY1 = this._doc.channel;
+            ColorConfig.resetColors();
+        }
+        *_eachSelectedChannel() {
+            for (let channelIndex = this.boxSelectionChannel; channelIndex < this.boxSelectionChannel + this.boxSelectionHeight; channelIndex++) {
+                yield channelIndex;
+            }
+        }
+        *_eachSelectedBar() {
+            for (let bar = this.boxSelectionBar; bar < this.boxSelectionBar + this.boxSelectionWidth; bar++) {
+                yield bar;
+            }
+        }
+        *_eachSelectedPattern(channelIndex) {
+            const handledPatterns = {};
+            for (const bar of this._eachSelectedBar()) {
+                const currentPatternIndex = this._doc.song.channels[channelIndex].bars[bar];
+                if (currentPatternIndex == 0)
+                    continue;
+                if (handledPatterns[String(currentPatternIndex)])
+                    continue;
+                handledPatterns[String(currentPatternIndex)] = true;
+                const pattern = this._doc.song.getPattern(channelIndex, bar);
+                if (pattern == null)
+                    throw new Error();
+                yield pattern;
+            }
+        }
+        _parseCopiedInstrumentArray(patternCopy, channelIndex) {
+            const instruments = Array.from(patternCopy["instruments"]).map(i => i >>> 0);
+            discardInvalidPatternInstruments(instruments, this._doc.song, channelIndex);
+            return instruments;
+        }
+        _patternIndexIsUnused(channelIndex, patternIndex) {
+            for (let i = 0; i < this._doc.song.barCount; i++) {
+                if (this._doc.song.channels[channelIndex].bars[i] == patternIndex) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        copy() {
+            const channels = [];
+            for (const channelIndex of this._eachSelectedChannel()) {
+                const patterns = {};
+                const bars = [];
+                for (const bar of this._eachSelectedBar()) {
+                    const patternNumber = this._doc.song.channels[channelIndex].bars[bar];
+                    bars.push(patternNumber);
+                    if (patterns[String(patternNumber)] == undefined) {
+                        const pattern = this._doc.song.getPattern(channelIndex, bar);
+                        let instruments = this._doc.recentPatternInstruments[channelIndex];
+                        let notes = [];
+                        if (pattern != null) {
+                            instruments = pattern.instruments.concat();
+                            if (this.patternSelectionActive) {
+                                for (const note of pattern.cloneNotes()) {
+                                    if (note.end <= this.patternSelectionStart)
+                                        continue;
+                                    if (note.start >= this.patternSelectionEnd)
+                                        continue;
+                                    note.start -= this.patternSelectionStart;
+                                    note.end -= this.patternSelectionStart;
+                                    if (note.start < 0 || note.end > this.patternSelectionEnd - this.patternSelectionStart) {
+                                        new ChangeNoteLength(null, note, Math.max(note.start, 0), Math.min(this.patternSelectionEnd - this.patternSelectionStart, note.end));
+                                    }
+                                    notes.push(note);
+                                }
+                            }
+                            else {
+                                notes = pattern.notes;
+                            }
+                        }
+                        patterns[String(patternNumber)] = { "instruments": instruments, "notes": notes };
+                    }
+                }
+                const channelCopy = {
+                    "isNoise": this._doc.song.getChannelIsNoise(channelIndex),
+                    "isMod": this._doc.song.getChannelIsMod(channelIndex),
+                    "patterns": patterns,
+                    "bars": bars,
+                };
+                channels.push(channelCopy);
+            }
+            const selectionCopy = {
+                "partDuration": this.patternSelectionActive ? this.patternSelectionEnd - this.patternSelectionStart : this._doc.song.beatsPerBar * Config.partsPerBeat,
+                "channels": channels,
+            };
+            window.localStorage.setItem("selectionCopy", JSON.stringify(selectionCopy));
+            new ChangePatternSelection(this._doc, 0, 0);
+        }
+        _remapToNoisePitches(oldPitches) {
+            let newPitches = oldPitches.slice();
+            newPitches.sort(function (a, b) { return a - b; });
+            let lowestPitch = newPitches[0] % Config.drumCount;
+            const numberOfPitches = newPitches.length;
+            let highestPitch = lowestPitch + (numberOfPitches - 1);
+            while (highestPitch >= Config.drumCount) {
+                lowestPitch--;
+                highestPitch--;
+            }
+            for (let notePitchIndex = 0; notePitchIndex < newPitches.length; notePitchIndex++) {
+                newPitches[notePitchIndex] = notePitchIndex + lowestPitch;
+            }
+            return newPitches;
+        }
+        _convertCopiedPitchNotesToNoiseNotes(oldNotes) {
+            let newNotes = [];
+            for (let noteIndex = 0; noteIndex < oldNotes.length; noteIndex++) {
+                const oldNote = oldNotes[noteIndex];
+                const newNotePitches = this._remapToNoisePitches(oldNote["pitches"].slice());
+                const oldNotePins = oldNote.pins;
+                let newNotePins = [];
+                for (let notePinIndex = 0; notePinIndex < oldNotePins.length; notePinIndex++) {
+                    const oldPin = oldNotePins[notePinIndex];
+                    newNotePins.push({
+                        interval: oldPin.interval,
+                        time: oldPin.time,
+                        size: oldPin.size,
+                    });
+                }
+                const newNoteStart = oldNote["start"];
+                const newNoteEnd = oldNote["end"];
+                const newNoteContinuesLastPattern = oldNote["continuesLastPattern"];
+                const newNote = new Note(0, newNoteStart, newNoteEnd, 0, false);
+                newNote.pitches = newNotePitches;
+                newNote.pins = newNotePins;
+                newNote.continuesLastPattern = newNoteContinuesLastPattern;
+                newNotes.push(newNote);
+            }
+            return newNotes;
+        }
+        cutNotes() {
+            const group = new ChangeGroup();
+            const channelIndex = this.boxSelectionChannel;
+            const barIndex = this.boxSelectionBar;
+            const cutHeight = this.boxSelectionHeight;
+            const cutWidth = this.boxSelectionWidth;
+            this.copy();
+            for (let channel = channelIndex; channel < channelIndex + cutHeight; channel++) {
+                for (let bar = barIndex; bar < barIndex + cutWidth; bar++) {
+                    const patternNumber = this._doc.song.channels[channel].bars[bar];
+                    if (patternNumber != 0) {
+                        const pattern = this._doc.song.channels[channel].patterns[patternNumber - 1];
+                        group.append(new ChangeNoteTruncate(this._doc, pattern, 0, Config.partsPerBeat * this._doc.song.beatsPerBar));
+                    }
+                }
+            }
+            this._doc.record(group);
+        }
+        pasteNotes() {
+            const selectionCopy = JSON.parse(String(window.localStorage.getItem("selectionCopy")));
+            if (selectionCopy == null)
+                return;
+            const channelCopies = selectionCopy["channels"] || [];
+            const copiedPartDuration = selectionCopy["partDuration"] >>> 0;
+            const group = new ChangeGroup();
+            const fillSelection = (this.boxSelectionWidth > 1 || this.boxSelectionHeight > 1);
+            const pasteHeight = fillSelection ? this.boxSelectionHeight : Math.min(channelCopies.length, this._doc.song.getChannelCount() - this.boxSelectionChannel);
+            for (let pasteChannel = 0; pasteChannel < pasteHeight; pasteChannel++) {
+                const channelCopy = channelCopies[pasteChannel % channelCopies.length];
+                const channelIndex = this.boxSelectionChannel + pasteChannel;
+                const channelIsNoise = this._doc.song.getChannelIsNoise(channelIndex);
+                const isNoise = !!channelCopy["isNoise"];
+                const isMod = !!channelCopy["isMod"];
+                const isPitch = !isNoise && !isMod;
+                const patternCopies = channelCopy["patterns"] || {};
+                const copiedBars = channelCopy["bars"] || [];
+                if (copiedBars.length == 0)
+                    continue;
+                if (isNoise && this._doc.song.getChannelIsMod(channelIndex))
+                    continue;
+                if (isMod != this._doc.song.getChannelIsMod(channelIndex))
+                    continue;
+                const pasteWidth = fillSelection ? this.boxSelectionWidth : Math.min(copiedBars.length, this._doc.song.barCount - this.boxSelectionBar);
+                if (!fillSelection && copiedBars.length == 1 && channelCopies.length == 1) {
+                    const copiedPatternIndex = copiedBars[0] >>> 0;
+                    const bar = this.boxSelectionBar;
+                    const currentPatternIndex = this._doc.song.channels[channelIndex].bars[bar];
+                    if (copiedPatternIndex == 0 && currentPatternIndex == 0)
+                        continue;
+                    const patternCopy = patternCopies[String(copiedPatternIndex)];
+                    const instrumentsCopy = this._parseCopiedInstrumentArray(patternCopy, channelIndex);
+                    let pastedNotes = patternCopy["notes"];
+                    if (isPitch && channelIsNoise) {
+                        pastedNotes = this._convertCopiedPitchNotesToNoiseNotes(pastedNotes);
+                    }
+                    if (currentPatternIndex == 0) {
+                        const existingPattern = this._doc.song.channels[channelIndex].patterns[copiedPatternIndex - 1];
+                        if (existingPattern != undefined &&
+                            !this.patternSelectionActive &&
+                            ((comparePatternNotes(pastedNotes, existingPattern.notes) && patternsContainSameInstruments(instrumentsCopy, existingPattern.instruments)) ||
+                                this._patternIndexIsUnused(channelIndex, copiedPatternIndex))) {
+                            group.append(new ChangePatternNumbers(this._doc, copiedPatternIndex, bar, channelIndex, 1, 1));
+                        }
+                        else {
+                            group.append(new ChangeEnsurePatternExists(this._doc, channelIndex, bar));
+                        }
+                    }
+                    const pattern = this._doc.song.getPattern(channelIndex, bar);
+                    if (pattern == null)
+                        throw new Error();
+                    group.append(new ChangePaste(this._doc, pattern, pastedNotes, this.patternSelectionActive ? this.patternSelectionStart : 0, this.patternSelectionActive ? this.patternSelectionEnd : Config.partsPerBeat * this._doc.song.beatsPerBar, copiedPartDuration));
+                    if (currentPatternIndex == 0 || patternCopy.notes.length == 0 || channelIndex >= this._doc.song.pitchChannelCount + this._doc.song.noiseChannelCount) {
+                        this.selectInstrument(instrumentsCopy[0]);
+                        group.append(new ChangeSetPatternInstruments(this._doc, channelIndex, instrumentsCopy, pattern));
+                    }
+                }
+                else if (this.patternSelectionActive) {
+                    const reusablePatterns = {};
+                    const usedPatterns = {};
+                    group.append(new ChangeDuplicateSelectedReusedPatterns(this._doc, this.boxSelectionBar, pasteWidth, this.boxSelectionChannel, pasteHeight, false));
+                    for (let pasteBar = 0; pasteBar < pasteWidth; pasteBar++) {
+                        const bar = this.boxSelectionBar + pasteBar;
+                        const copiedPatternIndex = copiedBars[pasteBar % copiedBars.length] >>> 0;
+                        const currentPatternIndex = this._doc.song.channels[channelIndex].bars[bar];
+                        const reusedIndex = [copiedPatternIndex, currentPatternIndex].join(",");
+                        if (copiedPatternIndex == 0 && currentPatternIndex == 0)
+                            continue;
+                        if (reusablePatterns[reusedIndex] != undefined) {
+                            group.append(new ChangePatternNumbers(this._doc, reusablePatterns[reusedIndex], bar, channelIndex, 1, 1));
+                            continue;
+                        }
+                        if (currentPatternIndex == 0) {
+                            group.append(new ChangeEnsurePatternExists(this._doc, channelIndex, bar));
+                            const patternCopy = patternCopies[String(copiedPatternIndex)];
+                            const instrumentsCopy = this._parseCopiedInstrumentArray(patternCopy, channelIndex);
+                            const pattern = this._doc.song.getPattern(channelIndex, bar);
+                            group.append(new ChangeSetPatternInstruments(this._doc, channelIndex, instrumentsCopy, pattern));
+                        }
+                        else {
+                            const pattern = this._doc.song.getPattern(channelIndex, bar);
+                            if (pattern == null)
+                                throw new Error();
+                            if (!usedPatterns[String(currentPatternIndex)]) {
+                                usedPatterns[String(currentPatternIndex)] = true;
+                            }
+                            else {
+                                group.append(new ChangePatternNumbers(this._doc, 0, bar, channelIndex, 1, 1));
+                                group.append(new ChangeEnsurePatternExists(this._doc, channelIndex, bar));
+                                const newPattern = this._doc.song.getPattern(channelIndex, bar);
+                                if (newPattern == null)
+                                    throw new Error();
+                                for (const note of pattern.cloneNotes()) {
+                                    if (isPitch && channelIsNoise) {
+                                        note.pitches = this._remapToNoisePitches(note.pitches);
+                                    }
+                                    group.append(new ChangeNoteAdded(this._doc, newPattern, note, newPattern.notes.length, false));
+                                }
+                            }
+                        }
+                        const pattern = this._doc.song.getPattern(channelIndex, bar);
+                        if (pattern == null)
+                            throw new Error();
+                        if (copiedPatternIndex == 0) {
+                            group.append(new ChangeNoteTruncate(this._doc, pattern, this.patternSelectionStart, this.patternSelectionEnd));
+                        }
+                        else {
+                            const patternCopy = patternCopies[String(copiedPatternIndex)];
+                            let pastedNotes = patternCopy["notes"];
+                            if (isPitch && channelIsNoise) {
+                                pastedNotes = this._convertCopiedPitchNotesToNoiseNotes(pastedNotes);
+                            }
+                            group.append(new ChangePaste(this._doc, pattern, pastedNotes, this.patternSelectionStart, this.patternSelectionEnd, copiedPartDuration));
+                        }
+                        reusablePatterns[reusedIndex] = this._doc.song.channels[channelIndex].bars[bar];
+                    }
+                }
+                else {
+                    for (let pasteBar = 0; pasteBar < pasteWidth; pasteBar++) {
+                        this.erasePatternInBar(group, channelIndex, this.boxSelectionBar + pasteBar);
+                    }
+                    const reusablePatterns = {};
+                    for (let pasteBar = 0; pasteBar < pasteWidth; pasteBar++) {
+                        const bar = this.boxSelectionBar + pasteBar;
+                        const copiedPatternIndex = copiedBars[pasteBar % copiedBars.length] >>> 0;
+                        const reusedIndex = String(copiedPatternIndex);
+                        if (copiedPatternIndex == 0)
+                            continue;
+                        if (reusablePatterns[reusedIndex] != undefined) {
+                            group.append(new ChangePatternNumbers(this._doc, reusablePatterns[reusedIndex], bar, channelIndex, 1, 1));
+                            continue;
+                        }
+                        const patternCopy = patternCopies[String(copiedPatternIndex)];
+                        const instrumentsCopy = this._parseCopiedInstrumentArray(patternCopy, channelIndex);
+                        const existingPattern = this._doc.song.channels[channelIndex].patterns[copiedPatternIndex - 1];
+                        let pastedNotes = patternCopy["notes"];
+                        if (isPitch && channelIsNoise) {
+                            pastedNotes = this._convertCopiedPitchNotesToNoiseNotes(pastedNotes);
+                        }
+                        if (existingPattern != undefined &&
+                            copiedPartDuration == Config.partsPerBeat * this._doc.song.beatsPerBar &&
+                            comparePatternNotes(pastedNotes, existingPattern.notes) &&
+                            patternsContainSameInstruments(instrumentsCopy, existingPattern.instruments)) {
+                            group.append(new ChangePatternNumbers(this._doc, copiedPatternIndex, bar, channelIndex, 1, 1));
+                        }
+                        else {
+                            if (existingPattern != undefined && this._patternIndexIsUnused(channelIndex, copiedPatternIndex)) {
+                                group.append(new ChangePatternNumbers(this._doc, copiedPatternIndex, bar, channelIndex, 1, 1));
+                            }
+                            else {
+                                group.append(new ChangeEnsurePatternExists(this._doc, channelIndex, bar));
+                            }
+                            const pattern = this._doc.song.getPattern(channelIndex, bar);
+                            if (pattern == null)
+                                throw new Error();
+                            group.append(new ChangePaste(this._doc, pattern, pastedNotes, this.patternSelectionActive ? this.patternSelectionStart : 0, this.patternSelectionActive ? this.patternSelectionEnd : Config.partsPerBeat * this._doc.song.beatsPerBar, copiedPartDuration));
+                            group.append(new ChangeSetPatternInstruments(this._doc, channelIndex, instrumentsCopy, pattern));
+                        }
+                        reusablePatterns[reusedIndex] = this._doc.song.channels[channelIndex].bars[bar];
+                    }
+                }
+            }
+            this._doc.record(group);
+        }
+        erasePatternInBar(group, channelIndex, bar) {
+            const removedPattern = this._doc.song.channels[channelIndex].bars[bar];
+            if (removedPattern != 0) {
+                group.append(new ChangePatternNumbers(this._doc, 0, bar, channelIndex, 1, 1));
+                if (this._patternIndexIsUnused(channelIndex, removedPattern)) {
+                    this._doc.song.channels[channelIndex].patterns[removedPattern - 1].notes.length = 0;
+                }
+            }
+        }
+        pasteNumbers() {
+            const selectionCopy = JSON.parse(String(window.localStorage.getItem("selectionCopy")));
+            if (selectionCopy == null)
+                return;
+            const channelCopies = selectionCopy["channels"] || [];
+            const group = new ChangeGroup();
+            const fillSelection = this.boxSelectionActive;
+            const pasteHeight = fillSelection ? this.boxSelectionHeight : Math.min(channelCopies.length, this._doc.song.getChannelCount() - this.boxSelectionChannel);
+            for (let pasteChannel = 0; pasteChannel < pasteHeight; pasteChannel++) {
+                const channelCopy = channelCopies[pasteChannel % channelCopies.length];
+                const channelIndex = this.boxSelectionChannel + pasteChannel;
+                const copiedBars = channelCopy["bars"] || [];
+                if (copiedBars.length == 0)
+                    continue;
+                const pasteWidth = fillSelection ? this.boxSelectionWidth : Math.min(copiedBars.length, this._doc.song.barCount - this.boxSelectionBar);
+                for (let pasteBar = 0; pasteBar < pasteWidth; pasteBar++) {
+                    const copiedPatternIndex = copiedBars[pasteBar % copiedBars.length] >>> 0;
+                    const bar = this.boxSelectionBar + pasteBar;
+                    if (copiedPatternIndex > this._doc.song.patternsPerChannel) {
+                        group.append(new ChangePatternsPerChannel(this._doc, copiedPatternIndex));
+                    }
+                    group.append(new ChangePatternNumbers(this._doc, copiedPatternIndex, bar, channelIndex, 1, 1));
+                }
+            }
+            this._doc.record(group);
+        }
+        selectAll() {
+            new ChangePatternSelection(this._doc, 0, 0);
+            if (this.boxSelectionBar == 0 &&
+                this.boxSelectionChannel == 0 &&
+                this.boxSelectionWidth == this._doc.song.barCount &&
+                this.boxSelectionHeight == this._doc.song.getChannelCount()) {
+                this.setTrackSelection(this._doc.bar, this._doc.bar, this._doc.channel, this._doc.channel);
+            }
+            else {
+                this.setTrackSelection(0, this._doc.song.barCount - 1, 0, this._doc.song.getChannelCount() - 1);
+            }
+            this.selectionUpdated();
+        }
+        selectChannel() {
+            new ChangePatternSelection(this._doc, 0, 0);
+            if (this.boxSelectionBar == 0 && this.boxSelectionWidth == this._doc.song.barCount) {
+                this.setTrackSelection(this._doc.bar, this._doc.bar, this.boxSelectionY0, this.boxSelectionY1);
+            }
+            else {
+                this.setTrackSelection(0, this._doc.song.barCount - 1, this.boxSelectionY0, this.boxSelectionY1);
+            }
+            this.selectionUpdated();
+        }
+        duplicatePatterns(replaceUnused) {
+            this._doc.record(new ChangeDuplicateSelectedReusedPatterns(this._doc, this.boxSelectionBar, this.boxSelectionWidth, this.boxSelectionChannel, this.boxSelectionHeight, replaceUnused));
+        }
+        muteChannels(allChannels) {
+            if (allChannels) {
+                let anyMuted = false;
+                for (let channelIndex = 0; channelIndex < this._doc.song.channels.length; channelIndex++) {
+                    if (this._doc.song.channels[channelIndex].muted) {
+                        anyMuted = true;
+                        break;
+                    }
+                }
+                for (let channelIndex = 0; channelIndex < this._doc.song.channels.length; channelIndex++) {
+                    this._doc.song.channels[channelIndex].muted = !anyMuted;
+                }
+            }
+            else {
+                let anyUnmuted = false;
+                for (const channelIndex of this._eachSelectedChannel()) {
+                    if (!this._doc.song.channels[channelIndex].muted) {
+                        anyUnmuted = true;
+                        break;
+                    }
+                }
+                for (const channelIndex of this._eachSelectedChannel()) {
+                    this._doc.song.channels[channelIndex].muted = anyUnmuted;
+                }
+            }
+            this._doc.notifier.changed();
+        }
+        soloChannels(invert) {
+            let alreadySoloed = true;
+            if (this.boxSelectionChannel >= this._doc.song.pitchChannelCount + this._doc.song.noiseChannelCount) {
+                const currentChannel = this._doc.song.channels[this.boxSelectionChannel];
+                const bar = currentChannel.bars[this._doc.bar] - 1;
+                const modInstrument = (bar >= 0) ? currentChannel.instruments[currentChannel.patterns[bar].instruments[0]] : currentChannel.instruments[this._doc.viewedInstrument[this.boxSelectionChannel]];
+                const soloPattern = [];
+                let matchesSoloPattern = !invert;
+                for (let channelIndex = 0; channelIndex < this._doc.song.pitchChannelCount + this._doc.song.noiseChannelCount; channelIndex++) {
+                    soloPattern[channelIndex] = false;
+                    for (let mod = 0; mod < Config.modCount; mod++) {
+                        if (modInstrument.modChannels[mod] == channelIndex) {
+                            soloPattern[channelIndex] = true;
+                        }
+                    }
+                }
+                for (let channelIndex = 0; channelIndex < this._doc.song.pitchChannelCount + this._doc.song.noiseChannelCount; channelIndex++) {
+                    if (this._doc.song.channels[channelIndex].muted == soloPattern[channelIndex]) {
+                        matchesSoloPattern = invert;
+                        break;
+                    }
+                }
+                for (let channelIndex = 0; channelIndex < this._doc.song.pitchChannelCount + this._doc.song.noiseChannelCount; channelIndex++) {
+                    if (matchesSoloPattern) {
+                        this._doc.song.channels[channelIndex].muted = false;
+                    }
+                    else {
+                        this._doc.song.channels[channelIndex].muted = !soloPattern[channelIndex];
+                    }
+                }
+            }
+            else {
+                for (let channelIndex = 0; channelIndex < this._doc.song.pitchChannelCount + this._doc.song.noiseChannelCount; channelIndex++) {
+                    const shouldBeMuted = (channelIndex < this.boxSelectionChannel || channelIndex >= this.boxSelectionChannel + this.boxSelectionHeight) ? !invert : invert;
+                    if (this._doc.song.channels[channelIndex].muted != shouldBeMuted) {
+                        alreadySoloed = false;
+                        break;
+                    }
+                }
+                if (alreadySoloed) {
+                    for (let channelIndex = 0; channelIndex < this._doc.song.channels.length; channelIndex++) {
+                        this._doc.song.channels[channelIndex].muted = false;
+                    }
+                }
+                else {
+                    for (let channelIndex = 0; channelIndex < this._doc.song.pitchChannelCount + this._doc.song.noiseChannelCount; channelIndex++) {
+                        this._doc.song.channels[channelIndex].muted = (channelIndex < this.boxSelectionChannel || channelIndex >= this.boxSelectionChannel + this.boxSelectionHeight) ? !invert : invert;
+                    }
+                }
+            }
+            this._doc.notifier.changed();
+        }
+        forceRhythm() {
+            const group = new ChangeGroup();
+            if (this.boxSelectionActive) {
+                group.append(new ChangeDuplicateSelectedReusedPatterns(this._doc, this.boxSelectionBar, this.boxSelectionWidth, this.boxSelectionChannel, this.boxSelectionHeight, false));
+            }
+            for (const channelIndex of this._eachSelectedChannel()) {
+                for (const pattern of this._eachSelectedPattern(channelIndex)) {
+                    group.append(new ChangePatternRhythm(this._doc, pattern));
+                }
+            }
+            this._doc.record(group);
+        }
+        forceScale() {
+            const group = new ChangeGroup();
+            if (this.boxSelectionActive) {
+                group.append(new ChangeDuplicateSelectedReusedPatterns(this._doc, this.boxSelectionBar, this.boxSelectionWidth, this.boxSelectionChannel, this.boxSelectionHeight, false));
+            }
+            const scaleFlags = [true, false, false, false, false, false, false, false, false, false, false, false];
+            for (const channelIndex of this._eachSelectedChannel()) {
+                if (this._doc.song.getChannelIsNoise(channelIndex) || this._doc.song.getChannelIsMod(channelIndex))
+                    continue;
+                for (const pattern of this._eachSelectedPattern(channelIndex)) {
+                    unionOfUsedNotes(pattern, scaleFlags);
+                }
+            }
+            const scaleMap = generateScaleMap(scaleFlags, this._doc.song.scale, this._doc.song.scaleCustom);
+            for (const channelIndex of this._eachSelectedChannel()) {
+                if (this._doc.song.getChannelIsNoise(channelIndex) || this._doc.song.getChannelIsMod(channelIndex))
+                    continue;
+                for (const pattern of this._eachSelectedPattern(channelIndex)) {
+                    group.append(new ChangePatternScale(this._doc, pattern, scaleMap));
+                }
+            }
+            this._doc.record(group);
+        }
+        setTrackSelection(newX0, newX1, newY0, newY1) {
+            const canReplaceLastChange = true;
+            this._changeTrack = new ChangeGroup();
+            this._changeTrack.append(new ChangeTrackSelection(this._doc, newX0, newX1, newY0, newY1));
+            this._doc.record(this._changeTrack, canReplaceLastChange);
+        }
+        transpose(upward, octave) {
+            const canReplaceLastChange = this._doc.lastChangeWas(this._changeTranspose);
+            this._changeTranspose = new ChangeGroup();
+            if (this.boxSelectionActive) {
+                this._changeTranspose.append(new ChangeDuplicateSelectedReusedPatterns(this._doc, this.boxSelectionBar, this.boxSelectionWidth, this.boxSelectionChannel, this.boxSelectionHeight, false));
+            }
+            for (const channelIndex of this._eachSelectedChannel()) {
+                if (channelIndex >= this._doc.song.pitchChannelCount + this._doc.song.noiseChannelCount)
+                    continue;
+                for (const pattern of this._eachSelectedPattern(channelIndex)) {
+                    this._changeTranspose.append(new ChangeTranspose(this._doc, channelIndex, pattern, upward, this._doc.prefs.notesOutsideScale, octave));
+                }
+            }
+            this._doc.record(this._changeTranspose, canReplaceLastChange);
+        }
+        swapChannels(offset) {
+            const possibleSectionBoundaries = [
+                this._doc.song.pitchChannelCount,
+                this._doc.song.pitchChannelCount + this._doc.song.noiseChannelCount,
+                this._doc.song.pitchChannelCount + this._doc.song.noiseChannelCount + this._doc.song.modChannelCount,
+                this._doc.song.getChannelCount(),
+            ];
+            let channelSectionMin = 0;
+            let channelSectionMax = 0;
+            for (const nextBoundary of possibleSectionBoundaries) {
+                if ((this.boxSelectionChannel < nextBoundary && offset < 0) || (this.boxSelectionChannel + this.boxSelectionHeight <= nextBoundary)) {
+                    channelSectionMax = nextBoundary - 1;
+                    break;
+                }
+                channelSectionMin = nextBoundary;
+            }
+            const newSelectionMin = Math.max(this.boxSelectionChannel, channelSectionMin);
+            const newSelectionMax = Math.min(this.boxSelectionChannel + this.boxSelectionHeight - 1, channelSectionMax);
+            offset = Math.max(offset, channelSectionMin - newSelectionMin);
+            offset = Math.min(offset, channelSectionMax - newSelectionMax);
+            if (offset != 0) {
+                const canReplaceLastChange = this._doc.lastChangeWas(this._changeReorder);
+                this._changeReorder = new ChangeGroup();
+                this.boxSelectionY0 = newSelectionMin + offset;
+                this.boxSelectionY1 = newSelectionMax + offset;
+                this._changeReorder.append(new ChangeChannelOrder(this._doc, newSelectionMin, newSelectionMax, offset));
+                this._changeReorder.append(new ChangeChannelBar(this._doc, Math.max(this.boxSelectionY0, Math.min(this.boxSelectionY1, this._doc.channel + offset)), this._doc.bar));
+                this.selectionUpdated();
+                this._doc.record(this._changeReorder, canReplaceLastChange);
+            }
+        }
+        selectInstrument(instrument) {
+            if (this._doc.viewedInstrument[this._doc.channel] == instrument) {
+                if (this._doc.song.layeredInstruments && this._doc.song.patternInstruments && this._doc.channel < this._doc.song.pitchChannelCount + this._doc.song.noiseChannelCount) {
+                    const canReplaceLastChange = this._doc.lastChangeWas(this._changeInstrument);
+                    this._changeInstrument = new ChangeGroup();
+                    const instruments = this._doc.recentPatternInstruments[this._doc.channel];
+                    this._doc.notifier.changed();
+                    if (instruments.indexOf(instrument) == -1) {
+                        instruments.push(instrument);
+                        const maxLayers = this._doc.song.getMaxInstrumentsPerPattern(this._doc.channel);
+                        if (instruments.length > maxLayers) {
+                            instruments.splice(0, instruments.length - maxLayers);
+                        }
+                    }
+                    else {
+                        instruments.splice(instruments.indexOf(instrument), 1);
+                        if (instruments.length == 0)
+                            instruments[0] = 0;
+                    }
+                    if (this.boxSelectionActive) {
+                        this._changeInstrument.append(new ChangeDuplicateSelectedReusedPatterns(this._doc, this.boxSelectionBar, this.boxSelectionWidth, this.boxSelectionChannel, this.boxSelectionHeight, false));
+                    }
+                    for (const channelIndex of this._eachSelectedChannel()) {
+                        for (const pattern of this._eachSelectedPattern(channelIndex)) {
+                            this._changeInstrument.append(new ChangeSetPatternInstruments(this._doc, channelIndex, instruments, pattern));
+                        }
+                    }
+                    if (!this._changeInstrument.isNoop())
+                        this._doc.record(this._changeInstrument, canReplaceLastChange);
+                }
+            }
+            else {
+                const canReplaceLastChange = this._doc.lastChangeWas(this._changeInstrument);
+                this._changeInstrument = new ChangeGroup();
+                this._changeInstrument.append(new ChangeViewInstrument(this._doc, instrument));
+                if (!(this._doc.song.layeredInstruments && this._doc.channel < this._doc.song.pitchChannelCount + this._doc.song.noiseChannelCount) && this._doc.song.patternInstruments) {
+                    if (this.boxSelectionActive) {
+                        this._changeInstrument.append(new ChangeDuplicateSelectedReusedPatterns(this._doc, this.boxSelectionBar, this.boxSelectionWidth, this.boxSelectionChannel, this.boxSelectionHeight, false));
+                    }
+                    const instruments = [instrument];
+                    for (const channelIndex of this._eachSelectedChannel()) {
+                        for (const pattern of this._eachSelectedPattern(channelIndex)) {
+                            this._changeInstrument.append(new ChangeSetPatternInstruments(this._doc, channelIndex, instruments, pattern));
+                        }
+                    }
+                    this._doc.record(this._changeInstrument, canReplaceLastChange);
+                }
+                else if (!this._doc.hasRedoHistory()) {
+                    this._doc.record(this._changeInstrument, canReplaceLastChange);
+                }
+            }
+        }
+        resetBoxSelection() {
+            this.boxSelectionX0 = this.boxSelectionX1 = this._doc.bar;
+            this.boxSelectionY0 = this.boxSelectionY1 = this._doc.channel;
+        }
+    }
+
+    class Preferences {
+        constructor() {
+            this.showFifth = true;
+            this.volume = 75;
+            this.visibleOctaves = Preferences.defaultVisibleOctaves;
+            this.reload();
+        }
+        reload() {
+            this.autoPlay = window.localStorage.getItem("autoPlay") == "true";
+            this.autoFollow = window.localStorage.getItem("autoFollow") != "false";
+            this.enableNotePreview = window.localStorage.getItem("enableNotePreview") != "false";
+            this.showFifth = window.localStorage.getItem("showFifth") == "true";
+            this.notesOutsideScale = window.localStorage.getItem("notesOutsideScale") == "true";
+            this.showLetters = window.localStorage.getItem("showLetters") == "true";
+            this.showChannels = window.localStorage.getItem("showChannels") == "true";
+            this.showScrollBar = window.localStorage.getItem("showScrollBar") != "false";
+            this.alwaysFineNoteVol = window.localStorage.getItem("alwaysFineNoteVol") == "true";
+            this.displayVolumeBar = window.localStorage.getItem("displayVolumeBar") != "false";
+            this.instrumentCopyPaste = window.localStorage.getItem("instrumentCopyPaste") != "false";
+            this.instrumentImportExport = window.localStorage.getItem("instrumentImportExport") == "true";
+            this.instrumentButtonsAtTop = window.localStorage.getItem("instrumentButtonsAtTop") == "true";
+            this.enableChannelMuting = window.localStorage.getItem("enableChannelMuting") != "false";
+            this.displayBrowserUrl = window.localStorage.getItem("displayBrowserUrl") != "false";
+            this.pressControlForShortcuts = window.localStorage.getItem("pressControlForShortcuts") == "true";
+            this.enableMidi = window.localStorage.getItem("enableMidi") != "false";
+            this.showRecordButton = window.localStorage.getItem("showRecordButton") == "true";
+            this.snapRecordedNotesToRhythm = window.localStorage.getItem("snapRecordedNotesToRhythm") == "true";
+            this.ignorePerformedNotesNotInScale = window.localStorage.getItem("ignorePerformedNotesNotInScale") == "true";
+            this.metronomeCountIn = window.localStorage.getItem("metronomeCountIn") != "false";
+            this.metronomeWhileRecording = window.localStorage.getItem("metronomeWhileRecording") != "false";
+            this.notesFlashWhenPlayed = window.localStorage.getItem("notesFlashWhenPlayed") == "true";
+            this.showOscilloscope = window.localStorage.getItem("showOscilloscope") == "true";
+            this.showSampleLoadingStatus = window.localStorage.getItem("showSampleLoadingStatus") != "false";
+            this.showDescription = window.localStorage.getItem("showDescription") != "false";
+            this.showInstrumentScrollbars = window.localStorage.getItem("showInstrumentScrollbars") == "true";
+            this.closePromptByClickoff = window.localStorage.getItem("closePromptByClickoff") == "true";
+            this.frostedGlassBackground = window.localStorage.getItem("frostedGlassBackground") == "true";
+            this.keyboardLayout = window.localStorage.getItem("keyboardLayout") || "wickiHayden";
+            this.bassOffset = (+window.localStorage.getItem("bassOffset")) || 0;
+            this.layout = window.localStorage.getItem("layout") || "small";
+            this.colorTheme = window.localStorage.getItem("colorTheme") || ColorConfig.defaultTheme;
+            this.customTheme = window.localStorage.getItem("customTheme");
+            this.customTheme2 = window.localStorage.getItem("customTheme2");
+            this.visibleOctaves = (window.localStorage.getItem("visibleOctaves") >>> 0) || Preferences.defaultVisibleOctaves;
+            const defaultScale = Config.scales.dictionary[window.localStorage.getItem("defaultScale")];
+            this.defaultScale = (defaultScale != undefined) ? defaultScale.index : 0;
+            if (window.localStorage.getItem("volume") != null) {
+                this.volume = Math.min(window.localStorage.getItem("volume") >>> 0, 75);
+            }
+            if (window.localStorage.getItem("fullScreen") != null) {
+                if (window.localStorage.getItem("fullScreen") == "true")
+                    this.layout = "long";
+                window.localStorage.removeItem("fullScreen");
+            }
+        }
+        save() {
+            window.localStorage.setItem("autoPlay", this.autoPlay ? "true" : "false");
+            window.localStorage.setItem("autoFollow", this.autoFollow ? "true" : "false");
+            window.localStorage.setItem("enableNotePreview", this.enableNotePreview ? "true" : "false");
+            window.localStorage.setItem("showFifth", this.showFifth ? "true" : "false");
+            window.localStorage.setItem("notesOutsideScale", this.notesOutsideScale ? "true" : "false");
+            window.localStorage.setItem("defaultScale", Config.scales[this.defaultScale].name);
+            window.localStorage.setItem("showLetters", this.showLetters ? "true" : "false");
+            window.localStorage.setItem("showChannels", this.showChannels ? "true" : "false");
+            window.localStorage.setItem("showScrollBar", this.showScrollBar ? "true" : "false");
+            window.localStorage.setItem("alwaysFineNoteVol", this.alwaysFineNoteVol ? "true" : "false");
+            window.localStorage.setItem("displayVolumeBar", this.displayVolumeBar ? "true" : "false");
+            window.localStorage.setItem("enableChannelMuting", this.enableChannelMuting ? "true" : "false");
+            window.localStorage.setItem("instrumentCopyPaste", this.instrumentCopyPaste ? "true" : "false");
+            window.localStorage.setItem("instrumentImportExport", this.instrumentImportExport ? "true" : "false");
+            window.localStorage.setItem("instrumentButtonsAtTop", this.instrumentButtonsAtTop ? "true" : "false");
+            window.localStorage.setItem("displayBrowserUrl", this.displayBrowserUrl ? "true" : "false");
+            window.localStorage.setItem("pressControlForShortcuts", this.pressControlForShortcuts ? "true" : "false");
+            window.localStorage.setItem("enableMidi", this.enableMidi ? "true" : "false");
+            window.localStorage.setItem("showRecordButton", this.showRecordButton ? "true" : "false");
+            window.localStorage.setItem("snapRecordedNotesToRhythm", this.snapRecordedNotesToRhythm ? "true" : "false");
+            window.localStorage.setItem("ignorePerformedNotesNotInScale", this.ignorePerformedNotesNotInScale ? "true" : "false");
+            window.localStorage.setItem("metronomeCountIn", this.metronomeCountIn ? "true" : "false");
+            window.localStorage.setItem("metronomeWhileRecording", this.metronomeWhileRecording ? "true" : "false");
+            window.localStorage.setItem("notesFlashWhenPlayed", this.notesFlashWhenPlayed ? "true" : "false");
+            window.localStorage.setItem("showOscilloscope", this.showOscilloscope ? "true" : "false");
+            window.localStorage.setItem("showSampleLoadingStatus", this.showSampleLoadingStatus ? "true" : "false");
+            window.localStorage.setItem("showDescription", this.showDescription ? "true" : "false");
+            window.localStorage.setItem("showInstrumentScrollbars", this.showInstrumentScrollbars ? "true" : "false");
+            window.localStorage.setItem("closePromptByClickoff", this.closePromptByClickoff ? "true" : "false");
+            window.localStorage.setItem("frostedGlassBackground", this.frostedGlassBackground ? "true" : "false");
+            window.localStorage.setItem("keyboardLayout", this.keyboardLayout);
+            window.localStorage.setItem("bassOffset", String(this.bassOffset));
+            window.localStorage.setItem("layout", this.layout);
+            window.localStorage.setItem("colorTheme", this.colorTheme);
+            window.localStorage.setItem("customTheme", this.customTheme);
+            window.localStorage.setItem("customTheme2", this.customTheme2);
+            window.localStorage.setItem("volume", String(this.volume));
+            window.localStorage.setItem("visibleOctaves", String(this.visibleOctaves));
+        }
+    }
+    Preferences.defaultVisibleOctaves = 3;
+
+    class ChangeNotifier {
+        constructor() {
+            this._watchers = [];
+            this._dirty = false;
+        }
+        watch(watcher) {
+            if (this._watchers.indexOf(watcher) == -1) {
+                this._watchers.push(watcher);
+            }
+        }
+        unwatch(watcher) {
+            const index = this._watchers.indexOf(watcher);
+            if (index != -1) {
+                this._watchers.splice(index, 1);
+            }
+        }
+        changed() {
+            this._dirty = true;
+        }
+        notifyWatchers() {
+            if (!this._dirty)
+                return;
+            this._dirty = false;
+            for (const watcher of this._watchers.concat()) {
+                watcher();
+            }
+        }
+    }
+
+    class SongDocument {
+        constructor() {
+            this.notifier = new ChangeNotifier();
+            this.selection = new Selection(this);
+            this.prefs = new Preferences();
+            this.channel = 0;
+            this.muteEditorChannel = 0;
+            this.bar = 0;
+            this.recentPatternInstruments = [];
+            this.viewedInstrument = [];
+            this.recordingModulators = false;
+            this.continuingModRecordingChange = null;
+            this.trackVisibleBars = 16;
+            this.trackVisibleChannels = 4;
+            this.barScrollPos = 0;
+            this.channelScrollPos = 0;
+            this.prompt = null;
+            this.addedEffect = false;
+            this.addedEnvelope = false;
+            this.currentPatternIsDirty = false;
+            this._recovery = new SongRecovery();
+            this._recentChange = null;
+            this._sequenceNumber = 0;
+            this._lastSequenceNumber = 0;
+            this._stateShouldBePushed = false;
+            this._recordedNewSong = false;
+            this._waitingToUpdateState = false;
+            this._whenHistoryStateChanged = () => {
+                if (this.synth.recording) {
+                    this.performance.abortRecording();
+                }
+                if (window.history.state == null && window.location.hash != "") {
+                    this._sequenceNumber++;
+                    this._resetSongRecoveryUid();
+                    const state = { canUndo: true, sequenceNumber: this._sequenceNumber, bar: this.bar, channel: this.channel, instrument: this.viewedInstrument[this.channel], recoveryUid: this._recoveryUid, prompt: null, selection: this.selection.toJSON() };
+                    try {
+                        new ChangeSong(this, this._getHash());
+                    }
+                    catch (error) {
+                        errorAlert(error);
+                    }
+                    this.prompt = state.prompt;
+                    if (this.prefs.displayBrowserUrl) {
+                        this._replaceState(state, this.song.toBase64String());
+                    }
+                    else {
+                        this._pushState(state, this.song.toBase64String());
+                    }
+                    this.forgetLastChange();
+                    this.notifier.notifyWatchers();
+                    this.synth.pause();
+                    this.synth.goToBar(0);
+                    return;
+                }
+                const state = this._getHistoryState();
+                if (state == null)
+                    throw new Error("History state is null.");
+                if (state.sequenceNumber == this._sequenceNumber)
+                    return;
+                this.bar = state.bar;
+                this.channel = state.channel;
+                this.viewedInstrument[this.channel] = state.instrument;
+                this._sequenceNumber = state.sequenceNumber;
+                this.prompt = state.prompt;
+                try {
+                    new ChangeSong(this, this._getHash());
+                }
+                catch (error) {
+                    errorAlert(error);
+                }
+                this._recoveryUid = state.recoveryUid;
+                this.selection.fromJSON(state.selection);
+                this.forgetLastChange();
+                this.notifier.notifyWatchers();
+            };
+            this._cleanDocument = () => {
+                this.notifier.notifyWatchers();
+            };
+            this._cleanDocumentIfNotRecordingMods = () => {
+                if (!this.recordingModulators)
+                    this.notifier.notifyWatchers();
+                else {
+                    this.modRecordingHandler();
+                }
+            };
+            this._validateDocState = () => {
+                const channelCount = this.song.getChannelCount();
+                for (let i = this.recentPatternInstruments.length; i < channelCount; i++) {
+                    this.recentPatternInstruments[i] = [0];
+                }
+                this.recentPatternInstruments.length = channelCount;
+                for (let i = 0; i < channelCount; i++) {
+                    if (i == this.channel) {
+                        if (this.song.patternInstruments) {
+                            const pattern = this.song.getPattern(this.channel, this.bar);
+                            if (pattern != null) {
+                                this.recentPatternInstruments[i] = pattern.instruments.concat();
+                            }
+                        }
+                        else {
+                            const channel = this.song.channels[this.channel];
+                            for (let j = 0; j < channel.instruments.length; j++) {
+                                this.recentPatternInstruments[i][j] = j;
+                            }
+                            this.recentPatternInstruments[i].length = channel.instruments.length;
+                        }
+                    }
+                    discardInvalidPatternInstruments(this.recentPatternInstruments[i], this.song, i);
+                }
+                for (let i = this.viewedInstrument.length; i < channelCount; i++) {
+                    this.viewedInstrument[i] = 0;
+                }
+                this.viewedInstrument.length = channelCount;
+                for (let i = 0; i < channelCount; i++) {
+                    if (this.song.patternInstruments && !this.song.layeredInstruments && i == this.channel) {
+                        const pattern = this.song.getPattern(this.channel, this.bar);
+                        if (pattern != null) {
+                            this.viewedInstrument[i] = pattern.instruments[0];
+                        }
+                    }
+                    this.viewedInstrument[i] = Math.min(this.viewedInstrument[i] | 0, this.song.channels[i].instruments.length - 1);
+                }
+                const highlightedPattern = this.getCurrentPattern();
+                if (highlightedPattern != null && this.song.patternInstruments) {
+                    this.recentPatternInstruments[this.channel] = highlightedPattern.instruments.concat();
+                }
+                if ((!this.synth.playing && (this.bar < this.selection.boxSelectionBar || this.selection.boxSelectionBar + this.selection.boxSelectionWidth <= this.bar)) ||
+                    this.channel < this.selection.boxSelectionChannel ||
+                    this.selection.boxSelectionChannel + this.selection.boxSelectionHeight <= this.channel ||
+                    this.song.barCount < this.selection.boxSelectionBar + this.selection.boxSelectionWidth ||
+                    channelCount < this.selection.boxSelectionChannel + this.selection.boxSelectionHeight ||
+                    (this.selection.boxSelectionWidth == 1 && this.selection.boxSelectionHeight == 1)) {
+                    this.selection.resetBoxSelection();
+                }
+                this.barScrollPos = Math.max(0, Math.min(this.song.barCount - this.trackVisibleBars, this.barScrollPos));
+                this.channelScrollPos = Math.max(0, Math.min(this.song.getChannelCount() - this.trackVisibleChannels, this.channelScrollPos));
+            };
+            this._updateHistoryState = () => {
+                this._waitingToUpdateState = false;
+                let hash;
+                try {
+                    hash = this.song.toBase64String();
+                }
+                catch (error) {
+                    errorAlert(error);
+                    return;
+                }
+                if (this._stateShouldBePushed)
+                    this._sequenceNumber++;
+                if (this._recordedNewSong) {
+                    this._resetSongRecoveryUid();
+                }
+                else {
+                    this._recovery.saveVersion(this._recoveryUid, this.song.title, hash);
+                }
+                let state = { canUndo: true, sequenceNumber: this._sequenceNumber, bar: this.bar, channel: this.channel, instrument: this.viewedInstrument[this.channel], recoveryUid: this._recoveryUid, prompt: this.prompt, selection: this.selection.toJSON() };
+                if (this._stateShouldBePushed) {
+                    this._pushState(state, hash);
+                }
+                else {
+                    this._replaceState(state, hash);
+                }
+                this._stateShouldBePushed = false;
+                this._recordedNewSong = false;
+            };
+            this.notifier.watch(this._validateDocState);
+            ColorConfig.setTheme(this.prefs.colorTheme);
+            Layout.setLayout(this.prefs.layout);
+            if (window.sessionStorage.getItem("currentUndoIndex") == null) {
+                window.sessionStorage.setItem("currentUndoIndex", "0");
+                window.sessionStorage.setItem("oldestUndoIndex", "0");
+                window.sessionStorage.setItem("newestUndoIndex", "0");
+            }
+            let songString = window.location.hash;
+            if (songString == "") {
+                songString = this._getHash();
+            }
+            try {
+                this.song = new Song(songString);
+                if (songString == "" || songString == undefined) {
+                    setDefaultInstruments(this.song);
+                    this.song.scale = this.prefs.defaultScale;
+                }
+            }
+            catch (error) {
+                errorAlert(error);
+            }
+            songString = this.song.toBase64String();
+            this.synth = new Synth(this.song);
+            this.synth.volume = this._calcVolume();
+            this.synth.anticipatePoorPerformance = isMobile;
+            let state = this._getHistoryState();
+            if (state == null) {
+                state = { canUndo: false, sequenceNumber: 0, bar: 0, channel: 0, instrument: 0, recoveryUid: generateUid(), prompt: null, selection: this.selection.toJSON() };
+            }
+            if (state.recoveryUid == undefined)
+                state.recoveryUid = generateUid();
+            this._replaceState(state, songString);
+            window.addEventListener("hashchange", this._whenHistoryStateChanged);
+            window.addEventListener("popstate", this._whenHistoryStateChanged);
+            this.bar = state.bar | 0;
+            this.channel = state.channel | 0;
+            for (let i = 0; i <= this.channel; i++)
+                this.viewedInstrument[i] = 0;
+            this.viewedInstrument[this.channel] = state.instrument | 0;
+            this._recoveryUid = state.recoveryUid;
+            this.prompt = state.prompt;
+            this.selection.fromJSON(state.selection);
+            this.selection.scrollToSelectedPattern();
+            for (const eventName of ["change", "click", "keyup", "mousedown", "mouseup", "touchstart", "touchmove", "touchend", "touchcancel"]) {
+                window.addEventListener(eventName, this._cleanDocument);
+            }
+            for (const eventName of ["keydown", "input", "mousemove"]) {
+                window.addEventListener(eventName, this._cleanDocumentIfNotRecordingMods);
+            }
+            this._validateDocState();
+            this.performance = new SongPerformance(this);
+        }
+        toggleDisplayBrowserUrl() {
+            const state = this._getHistoryState();
+            if (state == null)
+                throw new Error("History state is null.");
+            this.prefs.displayBrowserUrl = !this.prefs.displayBrowserUrl;
+            this._replaceState(state, this.song.toBase64String());
+        }
+        _getHistoryState() {
+            if (this.prefs.displayBrowserUrl) {
+                return window.history.state;
+            }
+            else {
+                const json = JSON.parse(window.sessionStorage.getItem(window.sessionStorage.getItem("currentUndoIndex")));
+                return json == null ? null : json.state;
+            }
+        }
+        _getHash() {
+            if (this.prefs.displayBrowserUrl) {
+                return window.location.hash;
+            }
+            else {
+                const json = JSON.parse(window.sessionStorage.getItem(window.sessionStorage.getItem("currentUndoIndex")));
+                return json == null ? "" : json.hash;
+            }
+        }
+        _replaceState(state, hash) {
+            if (this.prefs.displayBrowserUrl) {
+                window.history.replaceState(state, "", "#" + hash);
+            }
+            else {
+                window.sessionStorage.setItem(window.sessionStorage.getItem("currentUndoIndex") || "0", JSON.stringify({ state, hash }));
+                window.history.replaceState(null, "", location.pathname);
+            }
+        }
+        _pushState(state, hash) {
+            if (this.prefs.displayBrowserUrl) {
+                window.history.pushState(state, "", "#" + hash);
+            }
+            else {
+                let currentIndex = Number(window.sessionStorage.getItem("currentUndoIndex"));
+                let oldestIndex = Number(window.sessionStorage.getItem("oldestUndoIndex"));
+                currentIndex = (currentIndex + 1) % SongDocument._maximumUndoHistory;
+                window.sessionStorage.setItem("currentUndoIndex", String(currentIndex));
+                window.sessionStorage.setItem("newestUndoIndex", String(currentIndex));
+                if (currentIndex == oldestIndex) {
+                    oldestIndex = (oldestIndex + 1) % SongDocument._maximumUndoHistory;
+                    window.sessionStorage.setItem("oldestUndoIndex", String(oldestIndex));
+                }
+                window.sessionStorage.setItem(String(currentIndex), JSON.stringify({ state, hash }));
+                window.history.replaceState(null, "", location.pathname);
+            }
+            this._lastSequenceNumber = state.sequenceNumber;
+        }
+        hasRedoHistory() {
+            return this._lastSequenceNumber > this._sequenceNumber;
+        }
+        _forward() {
+            if (this.prefs.displayBrowserUrl) {
+                window.history.forward();
+            }
+            else {
+                let currentIndex = Number(window.sessionStorage.getItem("currentUndoIndex"));
+                let newestIndex = Number(window.sessionStorage.getItem("newestUndoIndex"));
+                if (currentIndex != newestIndex) {
+                    currentIndex = (currentIndex + 1) % SongDocument._maximumUndoHistory;
+                    window.sessionStorage.setItem("currentUndoIndex", String(currentIndex));
+                    setTimeout(this._whenHistoryStateChanged);
+                }
+            }
+        }
+        _back() {
+            if (this.prefs.displayBrowserUrl) {
+                window.history.back();
+            }
+            else {
+                let currentIndex = Number(window.sessionStorage.getItem("currentUndoIndex"));
+                let oldestIndex = Number(window.sessionStorage.getItem("oldestUndoIndex"));
+                if (currentIndex != oldestIndex) {
+                    currentIndex = (currentIndex + SongDocument._maximumUndoHistory - 1) % SongDocument._maximumUndoHistory;
+                    window.sessionStorage.setItem("currentUndoIndex", String(currentIndex));
+                    setTimeout(this._whenHistoryStateChanged);
+                }
+            }
+        }
+        record(change, replace = false, newSong = false) {
+            if (change.isNoop()) {
+                this._recentChange = null;
+                if (replace)
+                    this._back();
+            }
+            else {
+                change.commit();
+                this._recentChange = change;
+                this._stateShouldBePushed = this._stateShouldBePushed || !replace;
+                this._recordedNewSong = this._recordedNewSong || newSong;
+                if (!this._waitingToUpdateState) {
+                    window.requestAnimationFrame(this._updateHistoryState);
+                    this._waitingToUpdateState = true;
+                }
+            }
+        }
+        _resetSongRecoveryUid() {
+            this._recoveryUid = generateUid();
+        }
+        openPrompt(prompt) {
+            this.prompt = prompt;
+            const hash = this.song.toBase64String();
+            this._sequenceNumber++;
+            const state = { canUndo: true, sequenceNumber: this._sequenceNumber, bar: this.bar, channel: this.channel, instrument: this.viewedInstrument[this.channel], recoveryUid: this._recoveryUid, prompt: this.prompt, selection: this.selection.toJSON() };
+            this._pushState(state, hash);
+        }
+        undo() {
+            const state = this._getHistoryState();
+            if (state == null || state.canUndo)
+                this._back();
+        }
+        redo() {
+            this._forward();
+        }
+        setProspectiveChange(change) {
+            this._recentChange = change;
+        }
+        forgetLastChange() {
+            this._recentChange = null;
+        }
+        checkLastChange() {
+            return this._recentChange;
+        }
+        lastChangeWas(change) {
+            return change != null && change == this._recentChange;
+        }
+        goBackToStart() {
+            this.bar = 0;
+            this.channel = 0;
+            this.barScrollPos = 0;
+            this.channelScrollPos = 0;
+            this.synth.snapToStart();
+            this.notifier.changed();
+        }
+        setVolume(val) {
+            this.prefs.volume = val;
+            this.prefs.save();
+            this.synth.volume = this._calcVolume();
+        }
+        _calcVolume() {
+            return Math.min(1.0, Math.pow(this.prefs.volume / 50.0, 0.5)) * Math.pow(2.0, (this.prefs.volume - 75.0) / 25.0);
+        }
+        getCurrentPattern(barOffset = 0) {
+            return this.song.getPattern(this.channel, this.bar + barOffset);
+        }
+        getCurrentInstrument(barOffset = 0) {
+            if (barOffset == 0) {
+                return this.viewedInstrument[this.channel];
+            }
+            else {
+                const pattern = this.getCurrentPattern(barOffset);
+                return pattern == null ? 0 : pattern.instruments[0];
+            }
+        }
+        getMobileLayout() {
+            return (this.prefs.layout == "wide") ? window.innerWidth <= 1000 : window.innerWidth <= 710;
+        }
+        getBarWidth() {
+            return (!this.getMobileLayout() && this.prefs.enableChannelMuting && (!this.getFullScreen() || this.prefs.layout == "wide")) ? 30 : 32;
+        }
+        getChannelHeight() {
+            const squashed = this.getMobileLayout() || this.song.getChannelCount() > 4 || (this.song.barCount > this.trackVisibleBars && this.song.getChannelCount() > 3);
+            const megaSquashed = !this.getMobileLayout() && (((this.prefs.layout != "wide") && this.song.getChannelCount() > 11) || this.song.getChannelCount() > 22);
+            return megaSquashed ? 23 : (squashed ? 27 : 32);
+        }
+        getFullScreen() {
+            return !this.getMobileLayout() && (this.prefs.layout != "small");
+        }
+        getVisibleOctaveCount() {
+            return this.getFullScreen() ? this.prefs.visibleOctaves : Preferences.defaultVisibleOctaves;
+        }
+        getVisiblePitchCount() {
+            return this.getVisibleOctaveCount() * Config.pitchesPerOctave + 1;
+        }
+        getBaseVisibleOctave(channel) {
+            const visibleOctaveCount = this.getVisibleOctaveCount();
+            return Math.max(0, Math.min(Config.pitchOctaves - visibleOctaveCount, Math.ceil(this.song.channels[channel].octave - visibleOctaveCount * 0.5)));
+        }
+    }
+    SongDocument._maximumUndoHistory = 300;
+
+>>>>>>> 80efe0517e99f7029c819687125e0f811ece433e
     const doc = new SongDocument();
     const editor = new SongEditor(doc);
     const beepboxEditorContainer = document.getElementById("beepboxEditorContainer");

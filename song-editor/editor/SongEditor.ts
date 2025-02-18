@@ -1933,12 +1933,10 @@ export class SongEditor {
                         this._newShowModSliders[setting][index] = Boolean(this._showModSliders[setting][index]);
 
                         // Check for newer value
-                   
                         let slider: Slider | null = this.getSliderForModSetting(setting, index);
 
                         if (slider != null) {
                             this._newShowModSliders[setting][index] = updateModSlider(this, slider, setting, this._doc.channel, instrument);
-
                         }
                     }
                 }
@@ -1975,8 +1973,7 @@ export class SongEditor {
                                     }
 
                                 }
-                            }
-                        
+                            }         
                         }
 
                         if (this._newShowModSliders[setting][index] == true)

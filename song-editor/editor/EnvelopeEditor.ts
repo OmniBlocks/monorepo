@@ -88,7 +88,6 @@ export class EnvelopeEditor {
 		const endBoxIndex: number = this.pitchEndBoxes.indexOf(<any>event.target);
 		const startSliderIndex: number = this._pitchStartSliders.indexOf(<any>event.target);
 		const endSliderIndex: number = this._pitchEndSliders.indexOf(<any>event.target);
-		// const speedSliderIndex: number = this.perEnvelopeSpeedSliders.indexOf(<any>event.target);
 		const lowerBoundBoxIndex: number = this.perEnvelopeLowerBoundBoxes.indexOf(<any>event.target);
 		const upperBoundBoxIndex: number = this.perEnvelopeUpperBoundBoxes.indexOf(<any>event.target);
 		const lowerBoundSliderIndex: number = this._perEnvelopeLowerBoundSliders.indexOf(<any>event.target);
@@ -133,7 +132,7 @@ export class EnvelopeEditor {
 				this._doc.record(this._lastChange);
 				this._lastChange = null;
 			}
-		} 
+		}
 	}
 
 	private _onClick = (event: MouseEvent): void => {
@@ -157,7 +156,6 @@ export class EnvelopeEditor {
 		const endBoxIndex: number = this.pitchEndBoxes.indexOf(<any>event.target);
 		const startSliderIndex: number = this._pitchStartSliders.indexOf(<any>event.target);
 		const endSliderIndex: number = this._pitchEndSliders.indexOf(<any>event.target);
-		// const speedSliderIndex: number = this.perEnvelopeSpeedSliders.indexOf(<any>event.target);
 		const lowerBoundBoxIndex: number = this.perEnvelopeLowerBoundBoxes.indexOf(<any>event.target);
 		const upperBoundBoxIndex: number = this.perEnvelopeUpperBoundBoxes.indexOf(<any>event.target);
 		const lowerBoundSliderIndex: number = this._perEnvelopeLowerBoundSliders.indexOf(<any>event.target);
@@ -180,9 +178,6 @@ export class EnvelopeEditor {
 			this._lastChange = new ChangeEnvelopePitchStart(this._doc, parseInt(this._pitchStartSliders[startSliderIndex].value), startSliderIndex);
 		} else if (endSliderIndex != -1) {
 			this._lastChange = new ChangeEnvelopePitchEnd(this._doc, parseInt(this._pitchEndSliders[endSliderIndex].value), endSliderIndex);
-			// } else if (speedSliderIndex != -1) {
-			// 	this._lastChange = this.perEnvelopeSpeedSliders[speedSliderIndex].
-			// 	// this._lastChange = new ChangePerEnvelopeSpeed(this._doc, this.convertIndexSpeed(parseFloat(this.perEnvelopeSpeedSliders[speedSliderIndex].value), "speed"), speedSliderIndex);
 		} else if (lowerBoundBoxIndex != -1) {
 			this._lastChange = new ChangeEnvelopeLowerBound(this._doc, parseFloat(this.perEnvelopeLowerBoundBoxes[lowerBoundBoxIndex].value), lowerBoundBoxIndex);
 		} else if (upperBoundBoxIndex != -1) {

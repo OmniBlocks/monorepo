@@ -5850,6 +5850,13 @@ export class ColorConfig {
 	public static c_noiseChannelCountOverride: number = 16;
 	public static c_modChannelCountOverride: number = 12;
 
+	public static c_pitchLimit: number = 1;
+	public static c_noiseLimit: number = 1;
+	public static c_modLimit: number = 1;
+	public static c_colorFormulaPitchLimit: number = 1;
+	public static c_colorFormulaNoiseLimit: number = 1;
+	public static c_colorFormulaModLimit: number = 1;
+
 	public static c_invertedText: string = "";
 	public static c_trackEditorBgNoiseDim: string = "";
 	public static c_trackEditorBgNoise: string = "";
@@ -5992,16 +5999,16 @@ export class ColorConfig {
             let base: ChannelColors;
             switch (type) {
                 case ("noise"): {
-                    base = ColorConfig.noiseChannels[(channel % +ColorConfig.getComputed("--noise-channel-limit")) % ColorConfig.noiseChannels.length];
+                    base = ColorConfig.noiseChannels[(channel % this.c_noiseLimit) % ColorConfig.noiseChannels.length];
                     break;
                 }
                 case ("mod"): {
-                    base = ColorConfig.modChannels[(channel % +ColorConfig.getComputed("--mod-channel-limit")) % ColorConfig.modChannels.length];
+                    base = ColorConfig.modChannels[(channel % this.c_modLimit) % ColorConfig.modChannels.length];
                     break;
                 }
                 case ("pitch"):
                 default: {
-                    base = ColorConfig.pitchChannels[(channel % +ColorConfig.getComputed("--pitch-channel-limit")) % ColorConfig.pitchChannels.length];
+                    base = ColorConfig.pitchChannels[(channel % this.c_pitchLimit) % ColorConfig.pitchChannels.length];
                     break;
                 }
             }
@@ -6012,9 +6019,9 @@ export class ColorConfig {
             let newNotePrimary: string = ColorConfig.getComputed((regex.exec(base.primaryNote) as RegExpExecArray)[1] as string);
             return <ChannelColors>{ secondaryChannel: newChannelSecondary, primaryChannel: newChannelPrimary, secondaryNote: newNoteSecondary, primaryNote: newNotePrimary };
         }
-		let colorFormulaPitchLimit: number = +ColorConfig.getComputed("--formula-pitch-channel-limit");
-		let colorFormulaNoiseLimit: number = +ColorConfig.getComputed("--formula-noise-channel-limit");
-		let colorFormulaModLimit: number = +ColorConfig.getComputed("--formula-mod-channel-limit");
+		let colorFormulaPitchLimit: number = this.c_colorFormulaPitchLimit;
+		let colorFormulaNoiseLimit: number = this.c_colorFormulaNoiseLimit;
+		let colorFormulaModLimit: number = this.c_colorFormulaModLimit;
         switch (type) {
             case ("noise"): {
                 // Noise formula
@@ -6097,23 +6104,23 @@ export class ColorConfig {
         if (!this.usesColorFormula) {
             // Set colors, not defined by formula
             if (channel < song.pitchChannelCount) {
-				return ColorConfig.pitchChannels[(channel % +(ColorConfig.getComputed("--pitch-channel-limit"))) % ColorConfig.pitchChannels.length];
+				return ColorConfig.pitchChannels[(channel % this.c_pitchLimit) % ColorConfig.pitchChannels.length];
             } else if (channel < song.pitchChannelCount + song.noiseChannelCount) {
-                return ColorConfig.noiseChannels[((channel - song.pitchChannelCount) % +(ColorConfig.getComputed("--noise-channel-limit"))) % ColorConfig.noiseChannels.length];
+				return ColorConfig.noiseChannels[((channel - song.pitchChannelCount) % this.c_noiseLimit) % ColorConfig.noiseChannels.length];
             } else {
-                return ColorConfig.modChannels[((channel - song.pitchChannelCount - song.noiseChannelCount) % +(ColorConfig.getComputed("--mod-channel-limit"))) % ColorConfig.modChannels.length];
+				return ColorConfig.modChannels[((channel - song.pitchChannelCount - song.noiseChannelCount) % this.c_modLimit) % ColorConfig.modChannels.length];
             }
         }
         else {
             // Determine if color is cached
-            if (ColorConfig.colorLookup.has(channel)) {
+			if (ColorConfig.colorLookup.has(channel)) {
                 return ColorConfig.colorLookup.get(channel) as ChannelColors;
             }
             else {
                 // Formulaic color definition
-				let colorFormulaPitchLimit: number = +ColorConfig.getComputed("--formula-pitch-channel-limit");
-				let colorFormulaNoiseLimit: number = +ColorConfig.getComputed("--formula-noise-channel-limit");
-				let colorFormulaModLimit: number = +ColorConfig.getComputed("--formula-mod-channel-limit");
+				let colorFormulaPitchLimit: number = this.c_colorFormulaPitchLimit;
+				let colorFormulaNoiseLimit: number = this.c_colorFormulaNoiseLimit;
+				let colorFormulaModLimit: number = this.c_colorFormulaModLimit;
                 if (channel < song.pitchChannelCount) {
                     // Pitch formula
 
@@ -6310,13 +6317,20 @@ export class ColorConfig {
 
         this.usesColorFormula = (getComputedStyle(this._styleElement).getPropertyValue("--use-color-formula").trim() == "true");
 
-        this.c_invertedText = getComputedStyle(this._styleElement).getPropertyValue("--inverted-text");
-        this.c_trackEditorBgNoiseDim = getComputedStyle(this._styleElement).getPropertyValue("--track-editor-bg-noise-dim");
-        this.c_trackEditorBgNoise = getComputedStyle(this._styleElement).getPropertyValue("--track-editor-bg-noise");
-        this.c_trackEditorBgModDim = getComputedStyle(this._styleElement).getPropertyValue("--track-editor-bg-mod-dim");
-        this.c_trackEditorBgMod = getComputedStyle(this._styleElement).getPropertyValue("--track-editor-bg-mod");
-        this.c_trackEditorBgPitchDim = getComputedStyle(this._styleElement).getPropertyValue("--track-editor-bg-pitch-dim");
-        this.c_trackEditorBgPitch = getComputedStyle(this._styleElement).getPropertyValue("--track-editor-bg-pitch");
+		this.c_pitchLimit = +getComputedStyle(this._styleElement).getPropertyValue("--pitch-channel-limit");
+		this.c_noiseLimit = +getComputedStyle(this._styleElement).getPropertyValue("--noise-channel-limit");
+		this.c_modLimit = +getComputedStyle(this._styleElement).getPropertyValue("--mod-channel-limit");
+		this.c_colorFormulaPitchLimit = +getComputedStyle(this._styleElement).getPropertyValue("--formula-pitch-channel-limit");
+		this.c_colorFormulaNoiseLimit = +getComputedStyle(this._styleElement).getPropertyValue("--formula-noise-channel-limit");
+		this.c_colorFormulaModLimit = +getComputedStyle(this._styleElement).getPropertyValue("--formula-mod-channel-limit");
+
+		this.c_invertedText = getComputedStyle(this._styleElement).getPropertyValue("--inverted-text");
+		this.c_trackEditorBgNoiseDim = getComputedStyle(this._styleElement).getPropertyValue("--track-editor-bg-noise-dim");
+		this.c_trackEditorBgNoise = getComputedStyle(this._styleElement).getPropertyValue("--track-editor-bg-noise");
+		this.c_trackEditorBgModDim = getComputedStyle(this._styleElement).getPropertyValue("--track-editor-bg-mod-dim");
+		this.c_trackEditorBgMod = getComputedStyle(this._styleElement).getPropertyValue("--track-editor-bg-mod");
+		this.c_trackEditorBgPitchDim = getComputedStyle(this._styleElement).getPropertyValue("--track-editor-bg-pitch-dim");
+		this.c_trackEditorBgPitch = getComputedStyle(this._styleElement).getPropertyValue("--track-editor-bg-pitch");
 
         if (this.usesColorFormula) {
             this.c_pitchSecondaryChannelHue = +getComputedStyle(this._styleElement).getPropertyValue("--pitch-secondary-channel-hue");

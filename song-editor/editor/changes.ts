@@ -3,7 +3,7 @@
 import { Algorithm, Dictionary, FilterType, SustainType, InstrumentType, EffectType, AutomationTarget, Config, effectsIncludeDistortion, LFOEnvelopeTypes, RandomEnvelopeTypes } from "../synth/SynthConfig";
 import { NotePin, Note, makeNotePin, Pattern, FilterSettings, FilterControlPoint, SpectrumWave, HarmonicsWave, AdditiveWave, Instrument, Channel, Song, Synth, clamp } from "../synth/synth";
 import { Preset, PresetCategory, EditorConfig } from "./EditorConfig";
-import { Change, ChangeGroup, ChangeSequence, IndexableChange, UndoableChange } from "./Change";
+import { Change, ChangeGroup, ChangeSequence, UndoableChange, IndexableChange} from "./Change";
 import { SongDocument } from "./SongDocument";
 import { ColorConfig } from "./ColorConfig";
 import { Slider } from "./HTMLWrapper";
@@ -5178,9 +5178,9 @@ export class ChangePerEnvelopeSpeed extends IndexableChange {
     constructor(doc: SongDocument, oldSpeed: number, speed: number, index: number) {
         super(index);
         const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
-        // const oldSpeed: number = instrument.envelopes[index].perEnvelopeSpeed;
         if (oldSpeed != speed) {
             instrument.envelopes[index].perEnvelopeSpeed = speed;
+            doc.synth.unsetMod(Config.modulators.dictionary["individual envelope speed"].index, doc.channel, doc.getCurrentInstrument());
             instrument.preset = instrument.type;
             doc.notifier.changed();
             this._didSomething();

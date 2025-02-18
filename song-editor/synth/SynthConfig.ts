@@ -108,7 +108,10 @@ export const enum EffectType {
     vibrato,
     transition,
     chord,
-    // If you add more, you'll also have to extend the bitfield used in Base64 which currently uses two six-bit characters.
+    // If you add more, you'll also have to extend the bitfield used in Base64 which currently uses three six-bit characters.
+    noteRange, //placeholder for ultrabox 2.3 update
+    ringModulation,
+    granular,
     length,
 }
 
@@ -172,17 +175,6 @@ export const enum RandomEnvelopeTypes {
     timeSmooth,
     length,
 }
-
-/*
-export const enum InstrumentAutomationIndex {
-    mixVolume,
-    eqFilterAllFreqs,
-    eqFilterFreq0, eqFilterFreq1, eqFilterFreq2, eqFilterFreq3, eqFilterFreq4, eqFilterFreq5, eqFilterFreq6, eqFilterFreq7,
-    eqFilterGain0, eqFilterGain1, eqFilterGain2, eqFilterGain3, eqFilterGain4, eqFilterGain5, eqFilterGain6, eqFilterGain7,
-    //echoDelay, // Wait until tick settings can be computed once for multiple run lengths.
-    length,
-}
-*/
 
 export interface BeepBoxOption {
     readonly index: number;
@@ -1204,8 +1196,8 @@ export class Config {
 		
         //for modbox; voices = riffapp, spread = intervals, offset = offsets, expression = volume, and sign = signs
     ]);
-    public static readonly effectNames: ReadonlyArray<string> = ["reverb", "chorus", "panning", "distortion", "bitcrusher", "note filter", "echo", "pitch shift", "detune", "vibrato", "transition type", "chord type"];
-    public static readonly effectOrder: ReadonlyArray<EffectType> = [EffectType.panning, EffectType.transition, EffectType.chord, EffectType.pitchShift, EffectType.detune, EffectType.vibrato, EffectType.noteFilter, EffectType.distortion, EffectType.bitcrusher, EffectType.chorus, EffectType.echo, EffectType.reverb];
+    public static readonly effectNames: ReadonlyArray<string> = ["reverb", "chorus", "panning", "distortion", "bitcrusher", "note filter", "echo", "pitch shift", "detune", "vibrato", "transition type", "chord type", "", "ring mod", "granular"];
+    public static readonly effectOrder: ReadonlyArray<EffectType> = [EffectType.panning, EffectType.transition, EffectType.chord, EffectType.pitchShift, EffectType.detune, EffectType.vibrato, EffectType.noteFilter, EffectType.granular, EffectType.ringModulation, EffectType.distortion, EffectType.bitcrusher, EffectType.chorus, EffectType.echo, EffectType.reverb];
     public static readonly noteSizeMax: number = 6;
     public static readonly volumeRange: number = 50;
     // Beepbox's old volume scale used factor -0.5 and was [0~7] had roughly value 6 = 0.125 power. This new value is chosen to have -21 be the same,
@@ -2199,6 +2191,15 @@ export function effectsIncludeEcho(effects: number): boolean {
 }
 export function effectsIncludeReverb(effects: number): boolean {
     return (effects & (1 << EffectType.reverb)) != 0;
+}
+export function effectsIncludeRingModulation(effects: number): boolean {
+    return (effects & (1 << EffectType.ringModulation)) != 0;
+}
+export function effectsIncludeGranular(effects: number): boolean {
+    return (effects & (1 << EffectType.granular)) != 0;
+}
+export function effectsIncludeNoteRange(effects: number): boolean {
+    return (effects & (1 << EffectType.noteRange)) != 0;
 }
 export function rawChipToIntegrated(raw: DictionaryArray<ChipWave>): DictionaryArray<ChipWave> {
     const newArray: Array<ChipWave> = new Array<ChipWave>(raw.length);

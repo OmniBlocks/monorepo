@@ -4291,6 +4291,26 @@ export class ChangeReverb extends ChangeInstrumentSlider {
     }
 }
 
+// export class ChangeCorruption extends ChangeInstrumentSlider {
+//     constructor(doc: SongDocument, oldValue: number, newValue: number) {
+//         super(doc);
+//         this._instrument.corruption = newValue;
+//         // doc.synth.unsetMod(Config.modulators.dictionary["reverb"].index, doc.channel, doc.getCurrentInstrument());
+//         doc.notifier.changed();
+//         if (oldValue != newValue) this._didSomething();
+//     }
+// }
+
+// export class ChangeCorruptionType extends ChangeInstrumentSlider {
+//     constructor(doc: SongDocument, oldValue: number, newValue: number) {
+//         super(doc);
+//         this._instrument.corruptionType = newValue;
+//         // doc.synth.unsetMod(Config.modulators.dictionary["reverb"].index, doc.channel, doc.getCurrentInstrument());
+//         doc.notifier.changed();
+//         if (oldValue != newValue) this._didSomething();
+//     }
+// }
+
 export class ChangeSongReverb extends Change {
     constructor(doc: SongDocument, oldValue: number, newValue: number) {
         super();

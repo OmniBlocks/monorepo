@@ -1,7 +1,7 @@
 // Copyright (c) 2012-2022 John Nesky and contributing authors, distributed under the MIT license, see accompanying the LICENSE.md file.
 
 import { Algorithm, Dictionary, FilterType, SustainType, InstrumentType, EffectType, AutomationTarget, Config, effectsIncludeDistortion, LFOEnvelopeTypes, RandomEnvelopeTypes } from "../synth/SynthConfig";
-import { NotePin, Note, makeNotePin, Pattern, FilterSettings, FilterControlPoint, SpectrumWave, HarmonicsWave, AdditiveWave, Instrument, Channel, Song, Synth, clamp } from "../synth/synth";
+import { NotePin, Note, makeNotePin, Pattern, FilterSettings, FilterControlPoint, SpectrumWave, HarmonicsWave, Instrument, Channel, Song, Synth, clamp } from "../synth/synth";
 import { Preset, PresetCategory, EditorConfig } from "./EditorConfig";
 import { Change, ChangeGroup, ChangeSequence, UndoableChange, IndexableChange} from "./Change";
 import { SongDocument } from "./SongDocument";
@@ -999,7 +999,6 @@ export class ChangeRandomGeneratedInstrument extends Change {
                 { item: InstrumentType.supersaw, weight: 2 },
                 { item: InstrumentType.customChipWave, weight: 2 },
                 { item: InstrumentType.harmonics, weight: 2 },
-                // { item: InstrumentType.additive, weight: 2},
                 { item: InstrumentType.pickedString, weight: 2 },
                 { item: InstrumentType.spectrum, weight: 2 },
                 { item: InstrumentType.fm, weight: 2 },
@@ -1236,6 +1235,10 @@ export class ChangeRandomGeneratedInstrument extends Change {
                 if (instrument.echoSustain != 0 || instrument.echoDelay != 0) {
                     instrument.effects |= 1 << EffectType.echo;
                 }
+            }
+            if (Math.random() < 0.1) {
+                instrument.effects |= 1 << EffectType.ringModulation;
+                instrument.ringModulation = selectCurvedDistribution(1, Config.ringModRange - 1, Config.ringModRange - 1, 1);
             }
             if (Math.random() < 0.5) {
                 instrument.effects |= 1 << EffectType.reverb;
@@ -2307,20 +2310,6 @@ export class ChangeHarmonics extends Change {
     }
 }
 
-export class ChangeAdditive extends Change {
-    constructor(doc: SongDocument, instrument: Instrument, additiveWave: AdditiveWave) {
-        super();
-        for (let i: number = 0; i < additiveWave.waveTypes.length; i++) {
-            instrument.additiveWave.waveTypes[i] = additiveWave.waveTypes[i];
-            instrument.additiveWave.additives[i] = additiveWave.additives[i];
-        }
-        additiveWave.markCustomWaveDirty();
-        instrument.preset = instrument.type;
-        doc.notifier.changed();
-        this._didSomething();
-    }
-}
-
 export class ChangeDrumsetEnvelope extends Change {
     constructor(doc: SongDocument, drumIndex: number, newValue: number) {
         super();
@@ -2414,6 +2403,36 @@ export class ChangeDetune extends ChangeInstrumentSlider {
         doc.notifier.changed();
         doc.synth.unsetMod(Config.modulators.dictionary["detune"].index, doc.channel, doc.getCurrentInstrument());
         if (oldValue != newValue) this._didSomething();
+    }
+}
+
+export class ChangeRingMod extends ChangeInstrumentSlider {
+    constructor(doc: SongDocument, oldValue: number, newValue: number) {
+        super(doc);
+        this._instrument.ringModulation = newValue;
+        doc.notifier.changed();
+        if (oldValue != newValue) this._didSomething();
+    }
+}
+
+export class ChangeRingModHz extends ChangeInstrumentSlider {
+    constructor(doc: SongDocument, oldValue: number, newValue: number) {
+        super(doc);
+        this._instrument.ringModulationHz = newValue;
+        doc.notifier.changed();
+        if (oldValue != newValue) this._didSomething();
+    }
+}
+
+export class ChangeRingModChipWave extends Change {
+    constructor(doc: SongDocument, newValue: number) {
+        super();
+        const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+        if (instrument.ringModWaveformIndex != newValue) {
+            instrument.ringModWaveformIndex = newValue;
+            doc.notifier.changed();
+            this._didSomething();
+        }
     }
 }
 

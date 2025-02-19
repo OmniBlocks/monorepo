@@ -1,6 +1,6 @@
 // Copyright (c) 2012-2022 John Nesky and contributing authors, distributed under the MIT license, see accompanying the LICENSE.md file.
 
-import { startLoadingSample, sampleLoadingState, SampleLoadingState, sampleLoadEvents, SampleLoadedEvent, SampleLoadingStatus, loadBuiltInSamples, Dictionary, DictionaryArray, toNameMap, FilterType, SustainType, EnvelopeType, InstrumentType, EffectType, EnvelopeComputeIndex, Transition, Unison, Chord, Vibrato, Envelope, AutomationTarget, Config, getDrumWave, drawNoiseSpectrum, getArpeggioPitchIndex, performIntegralOld, getPulseWidthRatio, effectsIncludeTransition, effectsIncludeChord, effectsIncludePitchShift, effectsIncludeDetune, effectsIncludeVibrato, effectsIncludeNoteFilter, effectsIncludeDistortion, effectsIncludeBitcrusher, effectsIncludePanning, effectsIncludeChorus, effectsIncludeEcho, effectsIncludeReverb, /*effectsIncludeNoteRange,*/ effectsIncludeRingModulation, effectsIncludeGranular, OperatorWave, AdditiveWaveTypes, LFOEnvelopeTypes, RandomEnvelopeTypes } from "./SynthConfig";
+import { startLoadingSample, sampleLoadingState, SampleLoadingState, sampleLoadEvents, SampleLoadedEvent, SampleLoadingStatus, loadBuiltInSamples, Dictionary, DictionaryArray, toNameMap, FilterType, SustainType, EnvelopeType, InstrumentType, EffectType, EnvelopeComputeIndex, Transition, Unison, Chord, Vibrato, Envelope, AutomationTarget, Config, getDrumWave, drawNoiseSpectrum, getArpeggioPitchIndex, performIntegralOld, getPulseWidthRatio, effectsIncludeTransition, effectsIncludeChord, effectsIncludePitchShift, effectsIncludeDetune, effectsIncludeVibrato, effectsIncludeNoteFilter, effectsIncludeDistortion, effectsIncludeBitcrusher, effectsIncludePanning, effectsIncludeChorus, effectsIncludeEcho, effectsIncludeReverb, /*effectsIncludeNoteRange,*/ effectsIncludeRingModulation, effectsIncludeGranular, OperatorWave, LFOEnvelopeTypes, RandomEnvelopeTypes } from "./SynthConfig";
 import { Preset, EditorConfig } from "../editor/EditorConfig";
 import { scaleElementsByFactor, inverseRealFourierTransform } from "./FFT";
 import { Deque } from "./Deque";
@@ -258,7 +258,7 @@ const enum SongTagCode {
 	feedbackEnvelope    = CharCode.V, // added in BeepBox URL version 6, DEPRECATED
 	pulseWidth          = CharCode.W, // added in BeepBox URL version 7
 	aliases             = CharCode.X, // added in JummBox URL version 4 for aliases, DEPRECATED, [UB] repurposed for PWM decimal offset (DEPRECATED as well)
-	additive            = CharCode.Y, // added in Slarmoo's box URL version 2, currently unused
+//                      = CharCode.Y, 
 //	                    = CharCode.Z,
 //	                    = CharCode.NUM_0,
 //	                    = CharCode.NUM_1,
@@ -969,113 +969,6 @@ class HarmonicsWaveState {
     }
 }
 
-export class AdditiveWave {
-    public additives: number[] = [];
-    public hash: number = -1;
-    public waveTypes: number[] = [];
-
-    constructor() {
-        this.reset();
-    }
-
-    public reset(): void {
-        for (let i: number = 0; i < Config.additiveControlPoints; i++) {
-            this.additives[i] = 0;
-            this.waveTypes[i] = AdditiveWaveTypes.triangle;
-        }
-        this.additives[0] = Config.additiveMax;
-        this.additives[3] = Config.additiveMax;
-        this.additives[6] = Config.additiveMax;
-        this.markCustomWaveDirty();
-    }
-
-    public markCustomWaveDirty(): void {
-        const hashMult: number = Synth.fittingPowerOfTwo(Config.additiveMax + 2) - 1;
-        let hash: number = 0;
-        for (const point of this.additives) hash = ((hash * hashMult) + point) >>> 0;
-        this.hash = hash;
-    }
-}
-
-class AdditiveWaveState {
-    public wave: Float32Array | null = null;
-    private _hash: number = -1;
-
-    public getCustomWave(settings: AdditiveWave): Float32Array {
-        if (this._hash == settings.hash) return this.wave!;
-        this._hash = settings.hash;
-
-        const additiveRendered: number = Config.additiveRendered;
-
-        const waveLength: number = Config.additiveWavelength;
-
-        const retroWave: Float32Array = getDrumWave(0, null, null);
-
-        if (this.wave == null || this.wave.length != waveLength + 1) {
-            this.wave = new Float32Array(waveLength + 1);
-        }
-        const wave: Float32Array = this.wave;
-
-        for (let i: number = 0; i < waveLength; i++) {
-            wave[i] = 0;
-        }
-
-        const overallSlope: number = -0.25;
-        let combinedControlPointAmplitude: number = 1;
-
-        for (let additiveIndex = 0; additiveIndex < additiveRendered; additiveIndex++) {
-            const additiveFreq = additiveIndex + 1;
-            let amplitude = 0;
-            for (let i: number = 0; i < waveLength; i++) {
-                let additiveHarmonic = this.waveExpressions(settings.waveTypes[additiveIndex], i / waveLength, additiveFreq) * (settings.additives[additiveIndex] != undefined ? settings.additives[additiveIndex] / Config.additiveMax : 1);
-                if (additiveHarmonic > amplitude) {
-                    amplitude = additiveHarmonic;
-                }
-                additiveHarmonic *= Math.pow(additiveFreq, overallSlope);
-
-                additiveHarmonic *= retroWave[additiveIndex + 589];
-
-                wave[i] += additiveHarmonic;
-                
-            }
-            combinedControlPointAmplitude += amplitude/2;
-        }
-
-        // inverseRealFourierTransform(wave, waveLength);
-
-        // Limit the maximum wave amplitude.
-        const mult: number = 2;/*1 / Math.pow(combinedControlPointAmplitude, 0.7);*/
-        for (let i: number = 0; i < wave.length; i++) wave[i] *= mult;
-
-        // performIntegralOld(wave);
-
-        // The first sample should be zero, and we'll duplicate it at the end for easier interpolation.
-        wave[waveLength] = 0;
-
-        return wave;
-    }
-
-    private waveExpressions(waveType: number, time: number, harmonic: number): number {
-        switch (waveType) {
-            case AdditiveWaveTypes.sine:
-                return (Math.sin(time * harmonic * Math.PI * 2)) / harmonic;
-            case AdditiveWaveTypes.square:
-                return (2 * (Math.floor((time * harmonic - 1) % 2+2)%2) - 1) / harmonic;
-            case AdditiveWaveTypes.triangle:
-                return (2 * (Math.abs(((time * harmonic / 2 + 1 / 2) % 1+1)%1) * 2 - 1) - 1)/harmonic;
-            case AdditiveWaveTypes.sawtooth:
-                return (2 * Math.abs(((time * harmonic / 2 + 1 / 2) % 1+1)%1) - 1)/harmonic;
-            case AdditiveWaveTypes.ramp:
-                return (-2 * Math.abs(((time * harmonic / 2 + 1 / 2) % 1 +1)%1) + 1)/harmonic;
-            // case AdditiveWaveTypes.trapezoid:
-            //     return this.waveExpressions(AdditiveWaveTypes.triangle, time, harmonic) + this.waveExpressions(AdditiveWaveTypes.triangle, (time + 1 / 2), harmonic);
-            default:
-                return (Math.sin(time * harmonic * Math.PI * 2)) / harmonic; //default to sine
-        }
-    }
-
-}
-
 export class FilterControlPoint {
     public freq: number = 0;
     public gain: number = Config.filterGainCenter;
@@ -1700,6 +1593,9 @@ export class Instrument {
     public distortion: number = 0;
     public bitcrusherFreq: number = 0;
     public bitcrusherQuantization: number = 0;
+    public ringModulation: number = 0;
+    public ringModulationHz: number = 0;
+    public ringModWaveformIndex: number = 0;
     public chorus: number = 0;
     public reverb: number = 0;
     public echoSustain: number = 0;
@@ -1716,7 +1612,6 @@ export class Instrument {
     public readonly operators: Operator[] = [];
     public readonly spectrumWave: SpectrumWave;
     public readonly harmonicsWave: HarmonicsWave = new HarmonicsWave();
-    public readonly additiveWave: AdditiveWave = new AdditiveWave();
     public readonly drumsetEnvelopes: number[] = [];
     public readonly drumsetSpectrumWaves: SpectrumWave[] = [];
     public modChannels: number[] = [];
@@ -1818,6 +1713,9 @@ export class Instrument {
         this.distortion = Math.floor((Config.distortionRange - 1) * 0.75);
         this.bitcrusherFreq = Math.floor((Config.bitcrusherFreqRange - 1) * 0.5)
         this.bitcrusherQuantization = Math.floor((Config.bitcrusherQuantizationRange - 1) * 0.5);
+        this.ringModulation = 0;
+        this.ringModulationHz = 0;
+        this.ringModWaveformIndex = 0;
         this.pan = Config.panCenter;
         this.panDelay = 0;
         this.pitchShift = Config.pitchShiftCenter;
@@ -1929,10 +1827,6 @@ export class Instrument {
             case InstrumentType.pickedString:
                 this.chord = Config.chords.dictionary["strum"].index;
                 this.harmonicsWave.reset();
-                break;
-            case InstrumentType.additive:
-                this.chord = Config.chords.dictionary["simultaneous"].index;
-                this.additiveWave.reset();
                 break;
             case InstrumentType.mod:
                 this.transition = 0;
@@ -2139,8 +2033,11 @@ export class Instrument {
             // instrumentObject["corruptionType"] = this.corruptionType;
         }
         if (effectsIncludeRingModulation(this.effects)) {
-            // instrumentObject["corruption"] = this.corruption; 
-            // instrumentObject["corruptionType"] = this.corruptionType;
+            instrumentObject["ringMod"] = Math.round(100 * this.ringModulation / (Config.ringModRange - 1));
+            instrumentObject["ringModHz"] = Math.round(100 * this.ringModulationHz / (Config.ringModHzRange - 1));
+            instrumentObject["ringModWaveformIndex"] = this.ringModWaveformIndex;
+            // instrumentObject["rmPulseWidth"] = Math.round(100 * this.rmPulseWidth / (Config.pulseWidthRange - 1));
+            // instrumentObject["rmHzOffset"] = Math.round(100 * this.rmHzOffset / (Config.rmHzOffsetMax));
         }
         if (effectsIncludeDistortion(this.effects)) {
             instrumentObject["distortion"] = Math.round(100 * this.distortion / (Config.distortionRange - 1));
@@ -2174,15 +2071,6 @@ export class Instrument {
             instrumentObject["harmonics"] = [];
             for (let i: number = 0; i < Config.harmonicsControlPoints; i++) {
                 instrumentObject["harmonics"][i] = Math.round(100 * this.harmonicsWave.harmonics[i] / Config.harmonicsMax);
-            }
-        }
-
-        if (this.type == InstrumentType.additive) {
-            instrumentObject["additive"] = [];
-            instrumentObject["additiveWaves"] = [];
-            for (let i: number = 0; i < Config.additiveControlPoints; i++) {
-                instrumentObject["additive"][i] = Math.round(100 * this.additiveWave.additives[i] / Config.additiveMax);
-                instrumentObject["additiveWaves"][i] = this.additiveWave.waveTypes[i];
             }
         }
 
@@ -2588,10 +2476,15 @@ export class Instrument {
             this.detune = Config.detuneCenter;
         }
 
-        // if (instrumentObject["corruption"] != undefined) {
-        //     this.corruption = instrumentObject["corruption"];
-        //     this.corruptionType = instrumentObject["corruptionType"];
-        // }
+        if (instrumentObject["ringMod"] != undefined) {
+            this.ringModulation = clamp(0, Config.ringModRange, Math.round((Config.ringModRange - 1) * (instrumentObject["ringMod"] | 0) / 100));
+        }
+        if (instrumentObject["ringModHz"] != undefined) {
+            this.ringModulationHz = clamp(0, Config.ringModHzRange, Math.round((Config.ringModHzRange - 1) * (instrumentObject["ringModHz"] | 0) / 100));
+        }
+        if (instrumentObject["ringModWaveformIndex"] != undefined) {
+            this.ringModWaveformIndex = clamp(0, Config.operatorWaves.length, instrumentObject["ringModWaveformIndex"]);
+        }
 
         if (instrumentObject["distortion"] != undefined) {
             this.distortion = clamp(0, Config.distortionRange, Math.round((Config.distortionRange - 1) * (instrumentObject["distortion"] | 0) / 100));
@@ -2656,19 +2549,6 @@ export class Instrument {
             this.harmonicsWave.markCustomWaveDirty();
         } else {
             this.harmonicsWave.reset();
-        }
-
-        if (instrumentObject["additives"] != undefined) {
-            for (let i: number = 0; i < Config.additiveControlPoints; i++) {
-                this.additiveWave.additives[i] = Math.max(0, Math.min(Config.additiveMax, Math.round(Config.additiveMax * (+instrumentObject["additive"][i]) / 100)));
-                if (instrumentObject["additiveWaves"][i] != undefined) {
-                    this.additiveWave.waveTypes[i] = instrumentObject["additiveWaves"][i];
-                } else {
-                    this.additiveWave.waveTypes[i] = AdditiveWaveTypes.sine;
-                }
-            }
-        } else {
-            this.additiveWave.reset();
         }
 
         if (instrumentObject["spectrum"] != undefined) {
@@ -3682,14 +3562,12 @@ export class Song {
                     if (instrument.noteFilterType) {
                         buffer.push(base64IntToCharCode[instrument.noteFilterSimpleCut]);
                         buffer.push(base64IntToCharCode[instrument.noteFilterSimplePeak]);
-                    }
-                    else {
+                    } else {
                         if (instrument.noteFilter == null) {
                             // Push null filter settings
                             buffer.push(base64IntToCharCode[0]);
                             console.log("Null note filter settings detected in toBase64String for channelIndex " + channelIndex + ", instrumentIndex " + i);
-                        }
-                        else {
+                        } else {
                             buffer.push(base64IntToCharCode[instrument.noteFilter.controlPointCount]);
                             for (let j: number = 0; j < instrument.noteFilter.controlPointCount; j++) {
                                 const point: FilterControlPoint = instrument.noteFilter.controlPoints[j];
@@ -3772,8 +3650,9 @@ export class Song {
                     // buffer.push(base64IntToCharCode[instrument.corruptionType]);
                 }
                 if (effectsIncludeRingModulation(instrument.effects)) {
-                    // buffer.push(base64IntToCharCode[instrument.corruption]);
-                    // buffer.push(base64IntToCharCode[instrument.corruptionType]);
+                    buffer.push(base64IntToCharCode[instrument.ringModulation]);
+                    buffer.push(base64IntToCharCode[instrument.ringModulationHz]);
+                    buffer.push(base64IntToCharCode[instrument.ringModWaveformIndex]);	
                 }
 
                 if (instrument.type != InstrumentType.drumset) {
@@ -3789,18 +3668,6 @@ export class Song {
                         harmonicsBits.write(Config.harmonicsControlPointBits, instrument.harmonicsWave.harmonics[i]);
                     }
                     harmonicsBits.encodeBase64(buffer);
-                }
-
-                if (instrument.type == InstrumentType.additive) {
-                    buffer.push(SongTagCode.additive);
-                    const additiveBits: BitFieldWriter = new BitFieldWriter();
-                    for (let i: number = 0; i < Config.additiveControlPoints; i++) {
-                        additiveBits.write(Config.additiveControlPointBits, instrument.additiveWave.additives[i]);
-                    }
-                    additiveBits.encodeBase64(buffer);
-                    for (let i: number = 0; i < Config.additiveControlPoints; i++) {
-                        buffer.push(base64IntToCharCode[instrument.additiveWave.waveTypes[i]]);
-                    }
                 }
 
                 if (instrument.type == InstrumentType.chip) {
@@ -3968,8 +3835,6 @@ export class Song {
                     buffer.push(SongTagCode.stringSustain, base64IntToCharCode[instrument.stringSustain | (instrument.stringSustainType << 5)]);
                 } else if (instrument.type == InstrumentType.mod) {
                     // Handled down below. Could be moved, but meh.
-                } else if (instrument.type == InstrumentType.additive) {
-                    //Handled above
                 } else {
                     throw new Error("Unknown instrument type.");
                 }
@@ -4761,12 +4626,7 @@ export class Song {
                         this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].preset = InstrumentType.fm6op;
                         this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].type = InstrumentType.fm6op;
                     }
-                } else if (!fromSlarmoosBox || (fromSlarmoosBox && beforeTwo)) {
-                    if (this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].preset == InstrumentType.mod) {
-                        this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].preset = InstrumentType.additive;
-                        this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].type = InstrumentType.additive;
-                    }
-                }
+                } 
                 // BeepBox directly tweaked "grand piano", but JB kept it the same. The most up to date version is now "grand piano 3"
                 if (fromBeepBox && presetValue == EditorConfig.nameToPresetValue("grand piano 1")) {
                     this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].preset = EditorConfig.nameToPresetValue("grand piano 3")!;
@@ -5593,8 +5453,9 @@ export class Song {
                         // instrument.corruptionType = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                     }
                     if (effectsIncludeRingModulation(instrument.effects)) {
-                        // instrument.corruption = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
-                        // instrument.corruptionType = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                        instrument.ringModulation = clamp(0, Config.ringModRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                        instrument.ringModulationHz = clamp(0, Config.ringModHzRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                        instrument.ringModWaveformIndex = clamp(0, Config.operatorWaves.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);	
                     }
                 }
                 // Clamp the range.
@@ -6077,21 +5938,6 @@ export class Song {
                 }
                 instrument.harmonicsWave.markCustomWaveDirty();
                 charIndex += byteCount;
-            } break;
-            case SongTagCode.additive: {
-                lastViewedSetting = "Additive";
-                const instrument: Instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
-                const byteCount: number = Math.ceil(Config.additiveControlPoints * Config.additiveControlPointBits / 6);
-                const bits: BitFieldReader = new BitFieldReader(compressed, charIndex, charIndex + byteCount);
-                for (let i: number = 0; i < Config.additiveControlPoints; i++) {
-                    instrument.additiveWave.additives[i] = bits.read(Config.additiveControlPointBits);
-                }
-                instrument.additiveWave.markCustomWaveDirty();
-                charIndex += byteCount;
-
-                for (let i: number = 0; i < Config.additiveControlPoints; i++) {
-                    instrument.additiveWave.waveTypes[i] = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
-                }
             } break;
             case SongTagCode.aliases: {
                 lastViewedSetting = "Aliases + Distortion";
@@ -8613,9 +8459,15 @@ class InstrumentState {
     public delayInputMult: number = 0.0;
     public delayInputMultDelta: number = 0.0;
 
-    // public corruption: number = 0.0;
-    // public corruptionType: number = 0;
-    // public corruptionAmount: number = 0.0;
+    public ringModMix: number = 0;
+    public ringModMixDelta: number = 0;
+    public ringModPhase: number = 0;
+    public ringModPhaseDelta: number = 0;
+    public ringModPhaseDeltaScale: number = 1.0;
+    public ringModWaveformIndex: number = 0.0;
+    public rmHzOffset: number = 0.0
+    public ringModMixFade: number = 1.0;
+    public ringModMixFadeDelta: number = 0;
 
     public distortion: number = 0.0;
     public distortionDelta: number = 0.0;
@@ -8700,7 +8552,6 @@ class InstrumentState {
 
     public readonly spectrumWave: SpectrumWaveState = new SpectrumWaveState();
     public readonly harmonicsWave: HarmonicsWaveState = new HarmonicsWaveState();
-    public readonly additiveWave: AdditiveWaveState = new AdditiveWaveState();
     public readonly drumsetSpectrumWaves: SpectrumWaveState[] = [];
 
     constructor() {
@@ -8823,6 +8674,8 @@ class InstrumentState {
         }
 
         this.chorusPhase = 0.0;
+        this.ringModPhase = 0.0;
+        this.ringModMixFade = 1.0;
     }
 
     public compute(synth: Synth, instrument: Instrument, samplesPerTick: number, roundedSamplesPerTick: number, tone: Tone | null, channelIndex: number, instrumentIndex: number): void {
@@ -8873,20 +8726,13 @@ class InstrumentState {
         const envelopeEnds: number[] = this.envelopeComputer.envelopeEnds;
 
         // const usesGranular: boolean = effectsIncludeGranular(this.effects);
-        // const usesRingModulation: boolean = effectsIncludeRingModulation(this.effects);
+        const usesRingModulation: boolean = effectsIncludeRingModulation(this.effects);
         const usesDistortion: boolean = effectsIncludeDistortion(this.effects);
         const usesBitcrusher: boolean = effectsIncludeBitcrusher(this.effects);
         const usesPanning: boolean = effectsIncludePanning(this.effects);
         const usesChorus: boolean = effectsIncludeChorus(this.effects);
         const usesEcho: boolean = effectsIncludeEcho(this.effects);
         const usesReverb: boolean = effectsIncludeReverb(this.effects);
-
-        // if (usesCorruption) {
-        //     this.corruptionAmount = instrument.corruption;
-        //     this.corruptionType = instrument.corruptionType;
-        //     this.corruption = synth.computeTicksSinceStart()
-        //     // todo: corruption mods and envelopes
-        // }
 
         if (usesDistortion) {
             let useDistortionStart: number = instrument.distortion;
@@ -9130,6 +8976,53 @@ class InstrumentState {
             this.chorusCombinedMultDelta = (chorusCombinedMultEnd - chorusCombinedMultStart) / roundedSamplesPerTick;
         }
 
+        if (usesRingModulation) {
+            let useRingModStart: number = instrument.ringModulation;
+            let useRingModEnd: number = instrument.ringModulation;
+
+            let useRingModEnvelopeStart: number = envelopeStarts[EnvelopeComputeIndex.ringModulation];
+            let useRingModEnvelopeEnd: number = envelopeEnds[EnvelopeComputeIndex.ringModulation];
+
+            let useRingModHzStart: number = Math.min(1.0, instrument.ringModulationHz / (Config.ringModHzRange - 1));
+            let useRingModHzEnd: number = Math.min(1.0, instrument.ringModulationHz / (Config.ringModHzRange - 1));
+            let useRingModHzEnvelopeStart: number = envelopeStarts[EnvelopeComputeIndex.ringModulationHz];
+            let useRingModHzEnvelopeEnd: number = envelopeEnds[EnvelopeComputeIndex.ringModulationHz];
+            
+
+            if (synth.isModActive(Config.modulators.dictionary["ring modulation"].index, channelIndex, instrumentIndex)) {
+                useRingModStart = (synth.getModValue(Config.modulators.dictionary["ring modulation"].index, channelIndex, instrumentIndex, false));
+                useRingModEnd = (synth.getModValue(Config.modulators.dictionary["ring modulation"].index, channelIndex, instrumentIndex, true));
+            }
+            if (synth.isModActive(Config.modulators.dictionary["ring mod hertz"].index, channelIndex, instrumentIndex)) {
+                useRingModHzStart = Math.min(1.0, Math.max(0.0, (synth.getModValue(Config.modulators.dictionary["ring mod hertz"].index, channelIndex, instrumentIndex, false)) / (Config.ringModHzRange - 1)));
+                useRingModHzEnd = Math.min(1.0, Math.max(0.0, (synth.getModValue(Config.modulators.dictionary["ring mod hertz"].index, channelIndex, instrumentIndex, false)) / (Config.ringModHzRange - 1)));
+            }
+            useRingModHzStart *= useRingModHzEnvelopeStart;
+            useRingModHzEnd *= useRingModHzEnvelopeEnd;
+            let ringModStart: number = Math.min(1.0, (useRingModStart * useRingModEnvelopeStart) / (Config.ringModRange - 1));
+            let ringModEnd: number = Math.min(1.0, (useRingModEnd * useRingModEnvelopeEnd) / (Config.ringModRange - 1));
+
+            this.ringModMix = ringModStart;
+            this.ringModMixDelta = (ringModEnd - ringModStart) / roundedSamplesPerTick;
+
+            this.rmHzOffset = Config.rmHzOffsetCenter;
+
+            let ringModPhaseDeltaStart = (Math.max(1, ((Config.ringModMinHz * Math.pow(Config.ringModMaxHz / Config.ringModMinHz, useRingModHzStart))) + (this.rmHzOffset - Config.rmHzOffsetCenter))) / synth.samplesPerSecond;
+            let ringModPhaseDeltaEnd = (Math.max(1, ((Config.ringModMinHz * Math.pow(Config.ringModMaxHz / Config.ringModMinHz, useRingModHzEnd))) + (this.rmHzOffset - Config.rmHzOffsetCenter))) / synth.samplesPerSecond;
+            this.ringModMixFadeDelta = 0;
+            if (this.ringModMixFade < 0) this.ringModMixFade = 0
+            if (useRingModHzStart <= 0 && useRingModHzEnd <= 0 && this.ringModMixFade != 0) {
+                this.ringModMixFadeDelta = this.ringModMix / -10;
+            } else if (this.ringModMixFade == 0 && useRingModHzStart > 0 && useRingModHzEnd > 0) this.ringModMixFade = 1.0;
+
+            this.ringModPhaseDelta = ringModPhaseDeltaStart;
+            this.ringModPhaseDeltaScale = Math.pow(ringModPhaseDeltaEnd / ringModPhaseDeltaStart, 1.0 / roundedSamplesPerTick);
+            this.ringModWaveformIndex = instrument.ringModWaveformIndex;
+
+            // this.rmPulseWidth = instrument.rmPulseWidth;
+
+        }
+
         let maxEchoMult = 0.0;
         let averageEchoDelaySeconds: number = 0.0;
         if (usesEcho) {
@@ -9364,8 +9257,6 @@ class InstrumentState {
             this.unisonOffset = instrument.unisonOffset;
             this.unisonExpression = instrument.unisonExpression;
             this.unisonSign = instrument.unisonSign;
-        } else if (instrument.type == InstrumentType.additive) {
-            this.wave = this.additiveWave.getCustomWave(instrument.additiveWave);
         } else {
             this.wave = null;
         }
@@ -11833,8 +11724,6 @@ export class Synth {
             baseExpression = Config.chipBaseExpression;
         } else if (instrument.type == InstrumentType.harmonics) {
             baseExpression = Config.harmonicsBaseExpression;
-        } else if (instrument.type == InstrumentType.additive) {
-            baseExpression = Config.additiveBaseExpression;
         } else if (instrument.type == InstrumentType.pwm) {
             baseExpression = Config.pwmBaseExpression;
         } else if (instrument.type == InstrumentType.supersaw) {
@@ -12488,16 +12377,13 @@ export class Synth {
                 tone.phaseDeltas[0] = startFreq * sampleTime * unisonStartA;
                 tone.phaseDeltaScales[0] = basePhaseDeltaScale * Math.pow(unisonEndA / unisonStartA, 1.0 / roundedSamplesPerTick);
                 const divisor = (unisonVoices - 1 == 0) ? 1 : (unisonVoices - 1);
-                console.log("unison A: ",0, unisonStartA);
                 for (let i: number = 1; i < unisonVoices; i++) {
                     const unisonStart: number = Math.pow(2.0, (unisonOffset + unisonSpread - (2 * i * unisonSpread / divisor)) * unisonEnvelopeStart / 12.0) * (specialIntervalMult);
                     const unisonEnd: number = Math.pow(2.0, (unisonOffset + unisonSpread - (2 * i * unisonSpread / divisor)) * unisonEnvelopeEnd / 12.0) * (specialIntervalMult);
-                    console.log("unison Add: ", i, unisonStart);
                     tone.phaseDeltas[i] = startFreq * sampleTime * unisonStart;
                     tone.phaseDeltaScales[i] = basePhaseDeltaScale * Math.pow(unisonEnd / unisonStart, 1.0 / roundedSamplesPerTick);
                 }
                 for (let i: number = unisonVoices; i < Config.unisonVoicesMax; i++) {
-                    console.log("unison Fin: ", i, unisonStartA);
                     tone.phaseDeltas[i] = startFreq * sampleTime * unisonStartA;
                     tone.phaseDeltaScales[i] = basePhaseDeltaScale * Math.pow(unisonEndA / unisonStartA, 1.0 / roundedSamplesPerTick);
                 }
@@ -12822,8 +12708,6 @@ export class Synth {
             return Synth.chipSynth;
         } else if (instrument.type == InstrumentType.harmonics) {
             return Synth.harmonicsSynth;
-        } else if (instrument.type == InstrumentType.additive) {
-            return Synth.additiveSynth;
         } else if (instrument.type == InstrumentType.pwm) {
             return Synth.pulseWidthSynth;
         } else if (instrument.type == InstrumentType.supersaw) {
@@ -13579,66 +13463,6 @@ export class Synth {
         pickedStringFunction(synth, bufferIndex, roundedSamplesPerTick, tone, instrumentState);
     }
 
-    private static additiveSynth(synth: Synth, bufferIndex: number, roundedSamplesPerTick: number, tone: Tone, instrumentState: InstrumentState): void {
-        //Essentially identical to harmonics, just without unison (for now)
-        const data: Float32Array = synth.tempMonoInstrumentSampleBuffer!;
-        const wave: Float32Array = instrumentState.wave!;
-        const waveLength: number = wave.length - 1; // The first sample is duplicated at the end, don't double-count it.
-
-        if (!instrumentState.chord!.customInterval) tone.phases[1] = tone.phases[0];
-        let phaseDeltaA: number = tone.phaseDeltas[0] * waveLength;
-        const phaseDeltaScaleA: number = +tone.phaseDeltaScales[0];
-        let expression: number = +tone.expression;
-        const expressionDelta: number = +tone.expressionDelta;
-        let phaseA: number = (tone.phases[0] % 1) * waveLength;
-
-        const filters: DynamicBiquadFilter[] = tone.noteFilters;
-        const filterCount: number = tone.noteFilterCount | 0;
-        let initialFilterInput1: number = +tone.initialNoteFilterInput1;
-        let initialFilterInput2: number = +tone.initialNoteFilterInput2;
-        const applyFilters: Function = Synth.applyFilters;
-
-        const phaseAInt: number = phaseA | 0;
-        const indexA: number = phaseAInt % waveLength;
-        const phaseRatioA: number = phaseA - phaseAInt;
-        let prevWaveIntegralA: number = +wave[indexA];
-        prevWaveIntegralA += (wave[indexA + 1] - prevWaveIntegralA) * phaseRatioA;
-
-        const stopIndex: number = bufferIndex + roundedSamplesPerTick;
-        for (let sampleIndex: number = bufferIndex; sampleIndex < stopIndex; sampleIndex++) {
-
-            phaseA += phaseDeltaA;
-
-            const phaseAInt: number = phaseA | 0;
-            const indexA: number = phaseAInt % waveLength;
-            let nextWaveIntegralA: number = wave[indexA];
-            const phaseRatioA: number = phaseA - phaseAInt;
-            nextWaveIntegralA += (wave[indexA + 1] - nextWaveIntegralA) * phaseRatioA;
-            const waveA: number = (nextWaveIntegralA - prevWaveIntegralA) / phaseDeltaA;
-            prevWaveIntegralA = nextWaveIntegralA;
-
-            const inputSample: number = waveA;
-            const sample: number = applyFilters(inputSample, initialFilterInput1, initialFilterInput2, filterCount, filters);
-            initialFilterInput2 = initialFilterInput1;
-            initialFilterInput1 = inputSample;
-
-            phaseDeltaA *= phaseDeltaScaleA;
-
-            const output: number = sample * expression;
-            expression += expressionDelta;
-
-            data[sampleIndex] += output;
-        }
-
-        tone.phases[0] = phaseA / waveLength;
-        tone.phaseDeltas[0] = phaseDeltaA / waveLength;
-        tone.expression = expression;
-
-        synth.sanitizeFilters(filters);
-        tone.initialNoteFilterInput1 = initialFilterInput1;
-        tone.initialNoteFilterInput2 = initialFilterInput2;
-    }
-
     private static effectsSynth(synth: Synth, outputDataL: Float32Array, outputDataR: Float32Array, bufferIndex: number, runLength: number, instrumentState: InstrumentState): void {
         // TODO: If automation is involved, don't assume sliders will stay at zero.
         // @jummbus - ^ Correct, removed the non-zero checks as modulation can change them.
@@ -13743,6 +13567,22 @@ export class Synth {
 				const bitcrusherScaleScale = +instrumentState.bitcrusherScaleScale;
 				let bitcrusherFoldLevel = +instrumentState.bitcrusherFoldLevel;
 				const bitcrusherFoldLevelScale = +instrumentState.bitcrusherFoldLevelScale;`
+            }
+
+            if (usesRingModulation) {
+                effectsSource += `
+				
+                let ringModMix = +instrumentState.ringModMix;
+                let ringModMixDelta = +instrumentState.ringModMixDelta;
+                let ringModPhase = +instrumentState.ringModPhase;
+                let ringModPhaseDelta = +instrumentState.ringModPhaseDelta;
+                let ringModPhaseDeltaScale = +instrumentState.ringModPhaseDeltaScale;
+                let ringModWaveformIndex = +instrumentState.ringModWaveformIndex;
+                let ringModMixFade = +instrumentState.ringModMixFade;
+                let ringModMixFadeDelta = +instrumentState.ringModMixFadeDelta;
+                
+                let waveform = Config.operatorWaves[ringModWaveformIndex].samples;
+                const waveformLength = waveform.length - 1;`
             }
 
             if (usesEqFilter) {
@@ -13934,6 +13774,20 @@ export class Synth {
 					bitcrusherPhaseDelta *= bitcrusherPhaseDeltaScale;
 					bitcrusherScale *= bitcrusherScaleScale;
 					bitcrusherFoldLevel *= bitcrusherFoldLevelScale;`
+            }
+
+            if (usesRingModulation) {
+                effectsSource += ` 
+                
+                const ringModOutput = sample * waveform[(ringModPhase*waveformLength)|0];
+                const ringModMixF = Math.max(0, ringModMix * ringModMixFade);
+                sample = sample * (1 - ringModMixF) + ringModOutput * ringModMixF;
+
+                ringModMix += ringModMixDelta;
+                ringModPhase += ringModPhaseDelta;
+                ringModPhase = ringModPhase % 1.0;
+                ringModPhaseDelta *= ringModPhaseDeltaScale;
+                ringModMixFade += ringModMixFadeDelta;`
             }
 
             if (usesEqFilter) {
@@ -14150,6 +14004,17 @@ export class Synth {
 				instrumentState.bitcrusherScale = bitcrusherScale;
 				instrumentState.bitcrusherFoldLevel = bitcrusherFoldLevel;`
 
+            }
+
+            if (usesRingModulation) {
+                effectsSource += ` 
+                instrumentState.ringModMix = ringModMix;
+                instrumentState.ringModMixDelta = ringModMixDelta;
+                instrumentState.ringModPhase = ringModPhase;
+                instrumentState.ringModPhaseDelta = ringModPhaseDelta;
+                instrumentState.ringModPhaseDeltaScale = ringModPhaseDeltaScale;
+                instrumentState.ringModWaveformIndex = ringModWaveformIndex; 
+                instrumentState.ringModMixFade = ringModMixFade;`
             }
 
             if (usesEqFilter) {

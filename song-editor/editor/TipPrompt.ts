@@ -578,13 +578,6 @@ export class TipPrompt implements Prompt {
 					p("This setting will invert the envelope curve. So instead of, for example, lower pitches leading to a smaller output, lower pitches can lead to a greater output."),
 				);
 			} break;
-			case "additive": {
-				message = div(
-					h2("Additive Instrument"),
-					p("The \"Additive\" instrument type works very similar to harmonics, but instead of working with just sine waves, you can combine many different types of waves."),
-					p("These waves are: sines, squares, triangles, sawtooths, and ramps (a sawtooth wave flipped over the y-axis). All of these are technically sine approximations of each waveform, but they function effectively the same."),
-				);
-			} break;
 			case "envelopeRange": {
 				message = div(
 					h2("Envelope Bounds"),
@@ -630,6 +623,19 @@ export class TipPrompt implements Prompt {
 				message = div(
 					h2("Random Envelope Type"),
 					p("Random Envelopes can switch between being determined by the time in the song, the pitch of the note, or per note trigger."),
+				);
+			} break;
+			case "ringMod": {
+				message = div(
+					h2("Ring Modulation"),
+					p(`This setting multiplies a selected wave's frequency with an instrument frequency, this is useful for "bell-like" instruments.`),
+				);
+			} break;
+			case "RingModHz": {
+				message = div(
+					h2("Ring Modulation (Hertz)"),
+					p(`This setting changes the Hertz of the multiplied frequency.`),
+					// p(`The offset allows you to increment the Hertz by 1.`),
 				);
 			} break;
 

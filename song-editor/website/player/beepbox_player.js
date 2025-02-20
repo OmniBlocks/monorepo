@@ -20499,480 +20499,509 @@ var beepbox = (function (exports) {
             return (x % b + b) % b;
         }
         static loopableChipSynth(synth, bufferIndex, roundedSamplesPerTick, tone, instrumentState) {
-            const aliases = (effectsIncludeDistortion(instrumentState.effects) && instrumentState.aliases);
-            const data = synth.tempMonoInstrumentSampleBuffer;
-            const wave = instrumentState.wave;
-            const volumeScale = instrumentState.volumeScale;
-            const waveLength = (aliases && instrumentState.type == 8) ? wave.length : wave.length - 1;
-            let chipWaveLoopEnd = Math.max(0, Math.min(waveLength, instrumentState.chipWaveLoopEnd));
-            let chipWaveLoopStart = Math.max(0, Math.min(chipWaveLoopEnd - 1, instrumentState.chipWaveLoopStart));
-            let chipWaveLoopLength = chipWaveLoopEnd - chipWaveLoopStart;
-            if (chipWaveLoopLength < 2) {
-                chipWaveLoopStart = 0;
-                chipWaveLoopEnd = waveLength;
-                chipWaveLoopLength = waveLength;
-            }
+            const voiceCount = Math.max(2, instrumentState.unisonVoices);
             const chipWaveLoopMode = instrumentState.chipWaveLoopMode;
-            const chipWavePlayBackwards = instrumentState.chipWavePlayBackwards;
-            const unisonSign = tone.specialIntervalExpressionMult * instrumentState.unisonSign;
-            if (instrumentState.unisonVoices == 1 && instrumentState.unisonSpread == 0 && !instrumentState.chord.customInterval)
-                tone.phases[1] = tone.phases[0];
-            let phaseDeltaA = tone.phaseDeltas[0] * waveLength;
-            let phaseDeltaB = tone.phaseDeltas[1] * waveLength;
-            let directionA = tone.directions[0];
-            let directionB = tone.directions[1];
-            let chipWaveCompletionA = tone.chipWaveCompletions[0];
-            let chipWaveCompletionB = tone.chipWaveCompletions[1];
-            if (chipWaveLoopMode === 3 || chipWaveLoopMode === 2 || chipWaveLoopMode === 0) {
-                if (!chipWavePlayBackwards) {
-                    directionA = 1;
-                    directionB = 1;
+            let chipFunction = Synth.loopableChipFunctionCache[voiceCount][chipWaveLoopMode];
+            if (chipFunction == undefined) {
+                let chipSource = "return (synth, bufferIndex, roundedSamplesPerTick, tone, instrumentState) => {";
+                chipSource += `
+        const aliases = (effectsIncludeDistortion(instrumentState.effects) && instrumentState.aliases);
+        // const aliases = false;
+        const data = synth.tempMonoInstrumentSampleBuffer;
+        const wave = instrumentState.wave;
+        const volumeScale = instrumentState.volumeScale;
+        const waveLength = (aliases && instrumentState.type == 8) ? wave.length : wave.length - 1;
+        let chipWaveLoopEnd = Math.max(0, Math.min(waveLength, instrumentState.chipWaveLoopEnd));
+        let chipWaveLoopStart = Math.max(0, Math.min(chipWaveLoopEnd - 1, instrumentState.chipWaveLoopStart));
+        // @TODO: This is where to set things up for the release loop mode.
+        // const ticksSinceReleased = tone.ticksSinceReleased;
+        // if (ticksSinceReleased > 0) {
+        //     chipWaveLoopStart = 0;
+        //     chipWaveLoopEnd = waveLength - 1;
+        // }
+        let chipWaveLoopLength = chipWaveLoopEnd - chipWaveLoopStart;
+        if (chipWaveLoopLength < 2) {
+            chipWaveLoopStart = 0;
+            chipWaveLoopEnd = waveLength;
+            chipWaveLoopLength = waveLength;
+        }
+        const chipWavePlayBackwards = instrumentState.chipWavePlayBackwards;
+        const unisonSign = tone.specialIntervalExpressionMult * instrumentState.unisonSign;
+        `;
+                for (let i = 0; i < voiceCount; i++) {
+                    chipSource += `let phaseDelta# = tone.phaseDeltas[#] * waveLength;
+            let direction# = tone.directions[#];
+            let chipWaveCompletion# = tone.chipWaveCompletions[#];
+            let phaseDeltaScale# = +tone.phaseDeltaScales[#];
+            let lastWave# = tone.chipWaveCompletionsLastWave[#];
+            let prevWave# = tone.chipWavePrevWaves[#];
+
+            if (instrumentState.unisonVoices <= # && instrumentState.unisonSpread == 0 && !instrumentState.chord.customInterval) tone.phases[#] = tone.phases[# - 1];
+            `.replaceAll("#", i + "");
                 }
-                else {
-                    directionA = -1;
-                    directionB = -1;
+                for (let i = 0; i < voiceCount; i++) {
+                    chipSource += `let phase# = Synth.wrap(tone.phases[#], 1) * waveLength;
+            let prevWaveIntegral# = 0.0;
+            `.replaceAll("#", i + "");
                 }
+                if (chipWaveLoopMode === 3 || chipWaveLoopMode === 2 || chipWaveLoopMode === 0) {
+                    for (let i = 0; i < voiceCount; i++) {
+                        chipSource += `
+            if (!chipWavePlayBackwards) {
+                direction# = 1;
+            } else {
+                direction# = -1;
             }
-            if (chipWaveLoopMode === 0 || chipWaveLoopMode === 1) {
-                chipWaveCompletionA = 0;
-                chipWaveCompletionB = 0;
-            }
-            let lastWaveA = tone.chipWaveCompletionsLastWave[0];
-            let lastWaveB = tone.chipWaveCompletionsLastWave[1];
-            const chipWaveCompletionFadeLength = 1000;
-            const phaseDeltaScaleA = +tone.phaseDeltaScales[0];
-            const phaseDeltaScaleB = +tone.phaseDeltaScales[1];
-            let expression = +tone.expression;
-            const expressionDelta = +tone.expressionDelta;
-            let phaseA = Synth.wrap(tone.phases[0], 1) * waveLength;
-            let phaseB = Synth.wrap(tone.phases[1], 1) * waveLength;
-            let prevWaveIntegralA = 0;
-            let prevWaveIntegralB = 0;
-            if (!aliases) {
-                const phaseAInt = Math.floor(phaseA);
-                const phaseBInt = Math.floor(phaseB);
-                const indexA = Synth.wrap(phaseAInt, waveLength);
-                const indexB = Synth.wrap(phaseBInt, waveLength);
-                const phaseRatioA = phaseA - phaseAInt;
-                const phaseRatioB = phaseB - phaseBInt;
-                prevWaveIntegralA = +wave[indexA];
-                prevWaveIntegralB = +wave[indexB];
-                prevWaveIntegralA += (wave[Synth.wrap(indexA + 1, waveLength)] - prevWaveIntegralA) * phaseRatioA;
-                prevWaveIntegralB += (wave[Synth.wrap(indexB + 1, waveLength)] - prevWaveIntegralB) * phaseRatioB;
-            }
-            const filters = tone.noteFilters;
-            const filterCount = tone.noteFilterCount | 0;
-            let initialFilterInput1 = +tone.initialNoteFilterInput1;
-            let initialFilterInput2 = +tone.initialNoteFilterInput2;
-            const applyFilters = Synth.applyFilters;
-            const stopIndex = bufferIndex + roundedSamplesPerTick;
-            let prevWaveA = tone.chipWavePrevWaves[0];
-            let prevWaveB = tone.chipWavePrevWaves[1];
-            for (let sampleIndex = bufferIndex; sampleIndex < stopIndex; sampleIndex++) {
-                if (chipWaveCompletionA > 0 && chipWaveCompletionA < chipWaveCompletionFadeLength) {
-                    chipWaveCompletionA++;
+                `.replaceAll("#", i + "");
+                    }
                 }
-                if (chipWaveCompletionB > 0 && chipWaveCompletionB < chipWaveCompletionFadeLength) {
-                    chipWaveCompletionB++;
+                if (chipWaveLoopMode === 0 || chipWaveLoopMode === 1) {
+                    for (let i = 0; i < voiceCount; i++) {
+                        chipSource += `
+        chipWaveCompletion# = 0;
+        `.replaceAll("#", i + "");
+                    }
                 }
-                let wrapped = 0;
-                phaseA += phaseDeltaA * directionA;
-                phaseB += phaseDeltaB * directionB;
+                chipSource += `let expression = +tone.expression;
+        const expressionDelta = +tone.expressionDelta;
+        const chipWaveCompletionFadeLength = 1000;
+        if (!aliases) {`;
+                for (let i = 0; i < voiceCount; i++) {
+                    chipSource += `const phase#Int = Math.floor(phase#);
+                const index# = Synth.wrap(phase#Int, waveLength);
+                prevWaveIntegral# = +wave[index#]
+                const phaseRatio# = phase# - phase#Int;
+                prevWaveIntegral# += (wave[Synth.wrap(index# + 1, waveLength)] - prevWaveIntegral#) * phaseRatio#;
+                `.replaceAll("#", i + "");
+                }
+                chipSource += `
+        } 
+            
+        const filters = tone.noteFilters;
+        const filterCount = tone.noteFilterCount | 0;
+        let initialFilterInput1 = +tone.initialNoteFilterInput1;
+        let initialFilterInput2 = +tone.initialNoteFilterInput2;
+        const applyFilters = Synth.applyFilters;
+        const stopIndex = bufferIndex + roundedSamplesPerTick;
+        
+        for (let sampleIndex = bufferIndex; sampleIndex < stopIndex; sampleIndex++) {
+            
+            let wrapped = 0;`;
+                for (let i = 0; i < voiceCount; i++) {
+                    chipSource += `
+                if (chipWaveCompletion# > 0 && chipWaveCompletion# < chipWaveCompletionFadeLength) {
+                    chipWaveCompletion#++;
+                }
+                phase# += phaseDelta# * direction#;
+                `.replaceAll("#", i + "");
+                }
                 if (chipWaveLoopMode === 2) {
-                    if (directionA === 1) {
-                        if (phaseA > waveLength) {
-                            if (chipWaveCompletionA <= 0) {
-                                lastWaveA = prevWaveA;
-                                chipWaveCompletionA++;
-                            }
-                            wrapped = 1;
+                    for (let i = 0; i < voiceCount; i++) {
+                        chipSource += `
+                if (direction# === 1) {
+                    if (phase# > waveLength) {
+                        if (chipWaveCompletion# <= 0) {
+                            lastWave# = prevWave#;
+                            chipWaveCompletion#++;
                         }
+                        wrapped = 1;
                     }
-                    else if (directionA === -1) {
-                        if (phaseA < 0) {
-                            if (chipWaveCompletionA <= 0) {
-                                lastWaveA = prevWaveA;
-                                chipWaveCompletionA++;
-                            }
-                            wrapped = 1;
+                } else if (direction# === -1) {
+                    if (phase# < 0) {
+                        if (chipWaveCompletion# <= 0) {
+                            lastWave# = prevWave#;
+                            chipWaveCompletion#++;
                         }
+                        wrapped = 1;
                     }
-                    if (directionB === 1) {
-                        if (phaseB > waveLength) {
-                            if (chipWaveCompletionB <= 0) {
-                                lastWaveB = prevWaveB;
-                                chipWaveCompletionB++;
-                            }
-                            wrapped = 1;
-                        }
-                    }
-                    else if (directionA === -1) {
-                        if (phaseB < 0) {
-                            if (chipWaveCompletionB <= 0) {
-                                lastWaveB = prevWaveB;
-                                chipWaveCompletionB++;
-                            }
-                            wrapped = 1;
-                        }
+                }
+                `.replaceAll("#", i + "");
                     }
                 }
                 else if (chipWaveLoopMode === 3) {
-                    if (directionA === 1) {
-                        if (phaseA > chipWaveLoopEnd) {
-                            if (chipWaveCompletionA <= 0) {
-                                lastWaveA = prevWaveA;
-                                chipWaveCompletionA++;
-                            }
-                            wrapped = 1;
+                    for (let i = 0; i < voiceCount; i++) {
+                        chipSource += `
+                if (direction# === 1) {
+                    if (phase# > chipWaveLoopEnd) {
+                        if (chipWaveCompletion# <= 0) {
+                            lastWave# = prevWave#;
+                            chipWaveCompletion#++;
                         }
+                        wrapped = 1;
                     }
-                    else if (directionA === -1) {
-                        if (phaseA < chipWaveLoopStart) {
-                            if (chipWaveCompletionA <= 0) {
-                                lastWaveA = prevWaveA;
-                                chipWaveCompletionA++;
-                            }
-                            wrapped = 1;
+                } else if (direction# === -1) {
+                    if (phase# < chipWaveLoopStart) {
+                        if (chipWaveCompletion# <= 0) {
+                            lastWave# = prevWave#;
+                            chipWaveCompletion#++;
                         }
+                        wrapped = 1;
                     }
-                    if (directionB === 1) {
-                        if (phaseB > chipWaveLoopEnd) {
-                            if (chipWaveCompletionB <= 0) {
-                                lastWaveB = prevWaveB;
-                                chipWaveCompletionB++;
-                            }
-                            wrapped = 1;
-                        }
-                    }
-                    else if (directionA === -1) {
-                        if (phaseB < chipWaveLoopStart) {
-                            if (chipWaveCompletionB <= 0) {
-                                lastWaveB = prevWaveB;
-                                chipWaveCompletionB++;
-                            }
-                            wrapped = 1;
-                        }
+                }
+                `.replaceAll("#", i + "");
                     }
                 }
                 else if (chipWaveLoopMode === 0) {
-                    if (directionA === 1) {
-                        if (phaseA > chipWaveLoopEnd) {
-                            phaseA = chipWaveLoopStart + Synth.wrap(phaseA - chipWaveLoopEnd, chipWaveLoopLength);
-                            wrapped = 1;
-                        }
+                    for (let i = 0; i < voiceCount; i++) {
+                        chipSource += `
+                if (direction# === 1) {
+                    if (phase# > chipWaveLoopEnd) {
+                        phase# = chipWaveLoopStart + Synth.wrap(phase# - chipWaveLoopEnd, chipWaveLoopLength);
+                        // phase# = chipWaveLoopStart;
+                        wrapped = 1;
                     }
-                    else if (directionA === -1) {
-                        if (phaseA < chipWaveLoopStart) {
-                            phaseA = chipWaveLoopEnd - Synth.wrap(chipWaveLoopStart - phaseA, chipWaveLoopLength);
-                            wrapped = 1;
-                        }
+                } else if (direction# === -1) {
+                    if (phase# < chipWaveLoopStart) {
+                        phase# = chipWaveLoopEnd - Synth.wrap(chipWaveLoopStart - phase#, chipWaveLoopLength);
+                        // phase# = chipWaveLoopEnd;
+                        wrapped = 1;
                     }
-                    if (directionB === 1) {
-                        if (phaseB > chipWaveLoopEnd) {
-                            phaseB = chipWaveLoopStart + Synth.wrap(phaseB - chipWaveLoopEnd, chipWaveLoopLength);
-                            wrapped = 1;
-                        }
-                    }
-                    else if (directionB === -1) {
-                        if (phaseB < chipWaveLoopStart) {
-                            phaseB = chipWaveLoopEnd - Synth.wrap(chipWaveLoopStart - phaseB, chipWaveLoopLength);
-                            wrapped = 1;
-                        }
+                }
+                `.replaceAll("#", i + "");
                     }
                 }
                 else if (chipWaveLoopMode === 1) {
-                    if (directionA === 1) {
-                        if (phaseA > chipWaveLoopEnd) {
-                            phaseA = chipWaveLoopEnd - Synth.wrap(phaseA - chipWaveLoopEnd, chipWaveLoopLength);
-                            directionA = -1;
-                            wrapped = 1;
-                        }
+                    for (let i = 0; i < voiceCount; i++) {
+                        chipSource += `
+                if (direction# === 1) {
+                    if (phase# > chipWaveLoopEnd) {
+                        phase# = chipWaveLoopEnd - Synth.wrap(phase# - chipWaveLoopEnd, chipWaveLoopLength);
+                        // phase# = chipWaveLoopEnd;
+                        direction# = -1;
+                        wrapped = 1;
                     }
-                    else if (directionA === -1) {
-                        if (phaseA < chipWaveLoopStart) {
-                            phaseA = chipWaveLoopStart + Synth.wrap(chipWaveLoopStart - phaseA, chipWaveLoopLength);
-                            directionA = 1;
-                            wrapped = 1;
-                        }
-                    }
-                    if (directionB === 1) {
-                        if (phaseB > chipWaveLoopEnd) {
-                            phaseB = chipWaveLoopEnd - Synth.wrap(phaseB - chipWaveLoopEnd, chipWaveLoopLength);
-                            directionB = -1;
-                            wrapped = 1;
-                        }
-                    }
-                    else if (directionB === -1) {
-                        if (phaseB < chipWaveLoopStart) {
-                            phaseB = chipWaveLoopStart + Synth.wrap(chipWaveLoopStart - phaseB, chipWaveLoopLength);
-                            directionB = 1;
-                            wrapped = 1;
-                        }
+                } else if (direction# === -1) {
+                    if (phase# < chipWaveLoopStart) {
+                        phase# = chipWaveLoopStart + Synth.wrap(chipWaveLoopStart - phase#, chipWaveLoopLength);
+                        // phase# = chipWaveLoopStart;
+                        direction# = 1;
+                        wrapped = 1;
                     }
                 }
-                let waveA = 0;
-                let waveB = 0;
-                let inputSample = 0;
-                if (aliases) {
-                    waveA = wave[Synth.wrap(Math.floor(phaseA), waveLength)];
-                    waveB = wave[Synth.wrap(Math.floor(phaseB), waveLength)];
-                    prevWaveA = waveA;
-                    prevWaveB = waveB;
-                    const completionFadeA = chipWaveCompletionA > 0 ? ((chipWaveCompletionFadeLength - Math.min(chipWaveCompletionA, chipWaveCompletionFadeLength)) / chipWaveCompletionFadeLength) : 1;
-                    const completionFadeB = chipWaveCompletionB > 0 ? ((chipWaveCompletionFadeLength - Math.min(chipWaveCompletionB, chipWaveCompletionFadeLength)) / chipWaveCompletionFadeLength) : 1;
-                    inputSample = 0;
-                    if (chipWaveCompletionA > 0) {
-                        inputSample += lastWaveA * completionFadeA;
+                `.replaceAll("#", i + "");
                     }
-                    else {
-                        inputSample += waveA;
+                }
+                for (let i = 0; i < voiceCount; i++) {
+                    chipSource += `
+                let wave# = 0;
+                `.replaceAll("#", i + "");
+                }
+                chipSource += `let inputSample = 0;
+            if (aliases) {
+            `;
+                for (let i = 0; i < voiceCount; i++) {
+                    chipSource += `
+                wave# = wave[Synth.wrap(Math.floor(phase#), waveLength)];
+                prevWave# = wave#;
+                const completionFade# = chipWaveCompletion# > 0 ? ((chipWaveCompletionFadeLength - Math.min(chipWaveCompletion#, chipWaveCompletionFadeLength)) / chipWaveCompletionFadeLength) : 1;
+                if (chipWaveCompletion# > 0) {
+                    inputSample += lastWave# * completionFade#;
+                } else {
+                    inputSample += wave#;
+                }
+                `.replaceAll("#", i + "");
+                }
+                chipSource += `} else {
+            `;
+                for (let i = 0; i < voiceCount; i++) {
+                    chipSource += `
+                const phase#Int = Math.floor(phase#);
+                const index# = Synth.wrap(phase#Int, waveLength);
+                let nextWaveIntegral# = wave[index#];
+                const phaseRatio# = phase# - phase#Int;
+                nextWaveIntegral# += (wave[Synth.wrap(index# + 1, waveLength)] - nextWaveIntegral#) * phaseRatio#;
+
+                `.replaceAll("#", i + "");
+                }
+                if (!(chipWaveLoopMode === 0)) {
+                    chipSource += `if (!(chipWaveLoopStart === 0 && chipWaveLoopEnd === waveLength) && wrapped !== 0) {
+                    `;
+                    for (let i = 0; i < voiceCount; i++) {
+                        chipSource += `let pwi# = 0;
+                    const phase#_ = Math.max(0, phase# - phaseDelta# * direction#);
+                    const phase#Int = Math.floor(phase#_);
+                    const index# = Synth.wrap(phase#Int, waveLength);
+                    pwi# = wave[index#];
+                    pwi# += (wave[Synth.wrap(index# + 1, waveLength)] - pwi#) * (phase#_ - phase#Int) * direction#;
+                    prevWaveIntegral# = pwi#;
+                `.replaceAll("#", i + "");
                     }
-                    if (chipWaveCompletionB > 0) {
-                        inputSample += lastWaveB * completionFadeB;
+                    chipSource += "}";
+                }
+                if (chipWaveLoopMode === 1) {
+                    chipSource += `if (wrapped !== 0) {`;
+                    for (let i = 0; i < voiceCount; i++) {
+                        chipSource += `wave# = prevWave#;
+                    `.replaceAll("#", i + "");
                     }
-                    else {
-                        inputSample += waveB;
+                    chipSource += "} else {";
+                    for (let i = 0; i < voiceCount; i++) {
+                        chipSource += `wave# = (nextWaveIntegral# - prevWaveIntegral#) / (phaseDelta# * direction#);
+                    `.replaceAll("#", i + "");
                     }
+                    chipSource += "}";
                 }
                 else {
-                    const phaseAInt = Math.floor(phaseA);
-                    const phaseBInt = Math.floor(phaseB);
-                    const indexA = Synth.wrap(phaseAInt, waveLength);
-                    const indexB = Synth.wrap(phaseBInt, waveLength);
-                    let nextWaveIntegralA = wave[indexA];
-                    let nextWaveIntegralB = wave[indexB];
-                    const phaseRatioA = phaseA - phaseAInt;
-                    const phaseRatioB = phaseB - phaseBInt;
-                    nextWaveIntegralA += (wave[Synth.wrap(indexA + 1, waveLength)] - nextWaveIntegralA) * phaseRatioA;
-                    nextWaveIntegralB += (wave[Synth.wrap(indexB + 1, waveLength)] - nextWaveIntegralB) * phaseRatioB;
-                    if (!(chipWaveLoopMode === 0 && chipWaveLoopStart === 0 && chipWaveLoopEnd === waveLength) && wrapped !== 0) {
-                        let pwia = 0;
-                        let pwib = 0;
-                        const phaseA_ = Math.max(0, phaseA - phaseDeltaA * directionA);
-                        const phaseB_ = Math.max(0, phaseB - phaseDeltaB * directionB);
-                        const phaseAInt = Math.floor(phaseA_);
-                        const phaseBInt = Math.floor(phaseB_);
-                        const indexA = Synth.wrap(phaseAInt, waveLength);
-                        const indexB = Synth.wrap(phaseBInt, waveLength);
-                        pwia = wave[indexA];
-                        pwib = wave[indexB];
-                        pwia += (wave[Synth.wrap(indexA + 1, waveLength)] - pwia) * (phaseA_ - phaseAInt) * directionA;
-                        pwib += (wave[Synth.wrap(indexB + 1, waveLength)] - pwib) * (phaseB_ - phaseBInt) * directionB;
-                        prevWaveIntegralA = pwia;
-                        prevWaveIntegralB = pwib;
-                    }
-                    if (chipWaveLoopMode === 1 && wrapped !== 0) {
-                        waveA = prevWaveA;
-                        waveB = prevWaveB;
-                    }
-                    else {
-                        waveA = (nextWaveIntegralA - prevWaveIntegralA) / (phaseDeltaA * directionA);
-                        waveB = (nextWaveIntegralB - prevWaveIntegralB) / (phaseDeltaB * directionB);
-                    }
-                    prevWaveA = waveA;
-                    prevWaveB = waveB;
-                    prevWaveIntegralA = nextWaveIntegralA;
-                    prevWaveIntegralB = nextWaveIntegralB;
-                    const completionFadeA = chipWaveCompletionA > 0 ? ((chipWaveCompletionFadeLength - Math.min(chipWaveCompletionA, chipWaveCompletionFadeLength)) / chipWaveCompletionFadeLength) : 1;
-                    const completionFadeB = chipWaveCompletionB > 0 ? ((chipWaveCompletionFadeLength - Math.min(chipWaveCompletionB, chipWaveCompletionFadeLength)) / chipWaveCompletionFadeLength) : 1;
-                    if (chipWaveCompletionA > 0) {
-                        inputSample += lastWaveA * completionFadeA;
-                    }
-                    else {
-                        inputSample += waveA;
-                    }
-                    if (chipWaveCompletionB > 0) {
-                        inputSample += lastWaveB * completionFadeB;
-                    }
-                    else {
-                        inputSample += waveB * unisonSign;
+                    for (let i = 0; i < voiceCount; i++) {
+                        chipSource += `wave# = (nextWaveIntegral# - prevWaveIntegral#) / (phaseDelta# * direction#);
+                    `.replaceAll("#", i + "");
                     }
                 }
-                const sample = applyFilters(inputSample * volumeScale, initialFilterInput1, initialFilterInput2, filterCount, filters);
-                initialFilterInput2 = initialFilterInput1;
-                initialFilterInput1 = inputSample * volumeScale;
-                phaseDeltaA *= phaseDeltaScaleA;
-                phaseDeltaB *= phaseDeltaScaleB;
-                const output = sample * expression;
-                expression += expressionDelta;
-                data[sampleIndex] += output;
+                for (let i = 0; i < voiceCount; i++) {
+                    chipSource += `prevWave# = wave#;
+                prevWaveIntegral# = nextWaveIntegral#;
+                const completionFade# = chipWaveCompletion# > 0 ? ((chipWaveCompletionFadeLength - Math.min(chipWaveCompletion#, chipWaveCompletionFadeLength)) / chipWaveCompletionFadeLength) : 1;
+                if (chipWaveCompletion# > 0) {
+                    inputSample += lastWave# * completionFade#;
+                } else {
+                    inputSample += wave#;
+                }
+                `.replaceAll("#", i + "");
+                }
+                chipSource += `}
+            const sample = applyFilters(inputSample * volumeScale, initialFilterInput1, initialFilterInput2, filterCount, filters);
+            initialFilterInput2 = initialFilterInput1;
+            initialFilterInput1 = inputSample * volumeScale;
+            const output = sample * expression;
+            expression += expressionDelta;
+            data[sampleIndex] += output;`;
+                for (let i = 0; i < voiceCount; i++) {
+                    chipSource += ` phaseDelta# *= phaseDeltaScale#;
+                    `.replaceAll("#", i + "");
+                }
+                chipSource += "}";
+                for (let i = 0; i < voiceCount; i++) {
+                    chipSource += `tone.phases[#] = phase# / waveLength;
+                tone.phaseDeltas[#] = phaseDelta# / waveLength;
+                tone.directions[#] = direction#;
+                tone.chipWaveCompletions[#] = chipWaveCompletion#;
+                tone.chipWavePrevWaves[#] = prevWave#;
+                tone.chipWaveCompletionsLastWave[#] = lastWave#;
+
+                    `.replaceAll("#", i + "");
+                }
+                chipSource += `tone.expression = expression;
+        synth.sanitizeFilters(filters);
+        tone.initialNoteFilterInput1 = initialFilterInput1;
+        tone.initialNoteFilterInput2 = initialFilterInput2;
+        }`;
+                chipFunction = new Function("Config", "Synth", "effectsIncludeDistortion", chipSource)(Config, Synth, effectsIncludeDistortion);
+                Synth.loopableChipFunctionCache[voiceCount][chipWaveLoopMode] = chipFunction;
             }
-            tone.phases[0] = phaseA / waveLength;
-            tone.phases[1] = phaseB / waveLength;
-            tone.phaseDeltas[0] = phaseDeltaA / waveLength;
-            tone.phaseDeltas[1] = phaseDeltaB / waveLength;
-            tone.directions[0] = directionA;
-            tone.directions[1] = directionB;
-            tone.chipWaveCompletions[0] = chipWaveCompletionA;
-            tone.chipWaveCompletions[1] = chipWaveCompletionB;
-            tone.chipWavePrevWaves[0] = prevWaveA;
-            tone.chipWavePrevWaves[1] = prevWaveB;
-            tone.chipWaveCompletionsLastWave[0] = lastWaveA;
-            tone.chipWaveCompletionsLastWave[1] = lastWaveB;
-            tone.expression = expression;
-            synth.sanitizeFilters(filters);
-            tone.initialNoteFilterInput1 = initialFilterInput1;
-            tone.initialNoteFilterInput2 = initialFilterInput2;
+            chipFunction(synth, bufferIndex, roundedSamplesPerTick, tone, instrumentState);
         }
         static chipSynth(synth, bufferIndex, roundedSamplesPerTick, tone, instrumentState) {
-            const aliases = (effectsIncludeDistortion(instrumentState.effects) && instrumentState.aliases);
-            const data = synth.tempMonoInstrumentSampleBuffer;
-            const wave = instrumentState.wave;
-            const volumeScale = instrumentState.volumeScale;
-            const waveLength = (aliases && instrumentState.type == 8) ? wave.length : wave.length - 1;
-            const unisonSign = tone.specialIntervalExpressionMult * instrumentState.unisonSign;
-            const phaseDeltas = [];
-            const phaseDeltaScales = [];
-            for (let i = 0; i < tone.phaseDeltas.length; i++) {
-                phaseDeltas[i] = tone.phaseDeltas[i] * waveLength;
-                phaseDeltaScales[i] = +tone.phaseDeltaScales[i];
-                if (instrumentState.unisonVoices <= i && instrumentState.unisonSpread == 0 && !instrumentState.chord.customInterval)
-                    tone.phases[i] = tone.phases[i - 1];
-            }
-            let expression = +tone.expression;
-            const expressionDelta = +tone.expressionDelta;
-            const phases = [];
-            for (let i = 0; i < tone.phases.length; i++) {
-                phases[i] = (tone.phases[i] % 1) * waveLength;
-            }
-            const filters = tone.noteFilters;
-            const filterCount = tone.noteFilterCount | 0;
-            let initialFilterInput1 = +tone.initialNoteFilterInput1;
-            let initialFilterInput2 = +tone.initialNoteFilterInput2;
-            const applyFilters = Synth.applyFilters;
-            const prevWaveIntegrals = [];
-            if (!aliases) {
-                for (let i = 0; i < phases.length; i++) {
-                    const phaseInt = phases[i] | 0;
-                    const index = phaseInt % waveLength;
-                    prevWaveIntegrals[i] = +wave[index];
-                    const phaseRatio = phases[i] - phaseInt;
-                    prevWaveIntegrals[i] += (wave[index + 1] - prevWaveIntegrals[i]) * phaseRatio;
+            const voiceCount = Math.max(2, instrumentState.unisonVoices);
+            let chipFunction = Synth.chipFunctionCache[voiceCount];
+            if (chipFunction == undefined) {
+                let chipSource = "return (synth, bufferIndex, roundedSamplesPerTick, tone, instrumentState) => {";
+                chipSource += `
+        const aliases = (effectsIncludeDistortion(instrumentState.effects) && instrumentState.aliases);
+        const data = synth.tempMonoInstrumentSampleBuffer;
+        const wave = instrumentState.wave;
+        const volumeScale = instrumentState.volumeScale;
+
+        const waveLength = (aliases && instrumentState.type == 8) ? wave.length : wave.length - 1;
+
+        const unisonSign = tone.specialIntervalExpressionMult * instrumentState.unisonSign;
+        let expression = +tone.expression;
+        const expressionDelta = +tone.expressionDelta;
+        `;
+                for (let i = 0; i < voiceCount; i++) {
+                    chipSource += `let phaseDelta# = tone.phaseDeltas[#] * waveLength;
+            let phaseDeltaScale# = +tone.phaseDeltaScales[#];
+
+            if (instrumentState.unisonVoices <= # && instrumentState.unisonSpread == 0 && !instrumentState.chord.customInterval) tone.phases[#] = tone.phases[# - 1];
+            `.replaceAll("#", i + "");
                 }
-            }
-            else {
-                for (let i = 0; i < phases.length; i++) {
-                    prevWaveIntegrals[i] = 0.0;
+                for (let i = 0; i < voiceCount; i++) {
+                    chipSource += `let phase# = (tone.phases[#] % 1) * waveLength;
+            let prevWaveIntegral# = 0.0;
+            `.replaceAll("#", i + "");
                 }
-            }
-            const stopIndex = bufferIndex + roundedSamplesPerTick;
-            for (let sampleIndex = bufferIndex; sampleIndex < stopIndex; sampleIndex++) {
-                let inputSample = 0;
-                const nextWaveIntegrals = [];
-                const waves = [];
-                if (aliases) {
-                    for (let i = 0; i < phases.length; i++) {
-                        phases[i] += phaseDeltas[i];
-                        inputSample += wave[(0 | phases[i]) % waveLength];
-                    }
+                chipSource += `const filters = tone.noteFilters;
+        const filterCount = tone.noteFilterCount | 0;
+        let initialFilterInput1 = +tone.initialNoteFilterInput1;
+        let initialFilterInput2 = +tone.initialNoteFilterInput2;
+        const applyFilters = Synth.applyFilters;
+
+        if (!aliases) {
+        `;
+                for (let i = 0; i < voiceCount; i++) {
+                    chipSource += `const phase#Int = phase# | 0;
+                const index# = phase#Int % waveLength;
+                prevWaveIntegral# = +wave[index#]
+                const phase#Ratio = phase# - phase#Int;
+                prevWaveIntegral# += (wave[index# + 1] - prevWaveIntegral#) * phase#Ratio;
+                `.replaceAll("#", i + "");
                 }
-                else {
-                    for (let i = 0; i < phases.length; i++) {
-                        phases[i] += phaseDeltas[i];
-                        if (instrumentState.unisonVoices <= i) {
-                            waves[i] = waves[i - 1];
-                        }
-                        else {
-                            const phaseInt = phases[i] | 0;
-                            const index = phaseInt % waveLength;
-                            nextWaveIntegrals[i] = wave[index];
-                            const phaseRatio = phases[i] - phaseInt;
-                            nextWaveIntegrals[i] += (wave[index + 1] - nextWaveIntegrals[i]) * phaseRatio;
-                            waves[i] = (nextWaveIntegrals[i] - prevWaveIntegrals[i]) / phaseDeltas[i];
-                            prevWaveIntegrals[i] = nextWaveIntegrals[i];
-                        }
-                    }
-                    for (let i = 1; i < Config.unisonVoicesMax; i++) {
-                        inputSample += waves[i] * unisonSign;
-                    }
+                chipSource += `
+        } 
+
+        const stopIndex = bufferIndex + roundedSamplesPerTick;
+        for (let sampleIndex = bufferIndex; sampleIndex < stopIndex; sampleIndex++) {
+        let inputSample = 0;
+            if (aliases) {
+                `;
+                for (let i = 0; i < voiceCount; i++) {
+                    chipSource += `phase# += phaseDelta#;
+
+                    const inputSample# = wave[(0 | phase#) % waveLength];
+                    `.replaceAll("#", i + "");
                 }
-                const sample = applyFilters(inputSample * volumeScale, initialFilterInput1, initialFilterInput2, filterCount, filters);
-                initialFilterInput2 = initialFilterInput1;
-                initialFilterInput1 = inputSample * volumeScale;
-                for (let i = 0; i < phaseDeltas.length; i++) {
-                    phaseDeltas[i] *= phaseDeltaScales[i];
+                const sampleListA = [];
+                for (let voice = 0; voice < voiceCount; voice++) {
+                    sampleListA.push("inputSample" + voice + (voice != 0 ? " * unisonSign" : ""));
                 }
-                const output = sample * expression * 1 / 4;
-                expression += expressionDelta;
-                data[sampleIndex] += output;
+                chipSource += "inputSample = " + sampleListA.join(" + ") + ";";
+                chipSource += `} else {
+                    `;
+                for (let i = 0; i < instrumentState.unisonVoices; i++) {
+                    chipSource += `phase# += phaseDelta#;
+
+                     
+                        const phase#Int = phase# | 0;
+                        const index# = phase#Int % waveLength;
+                        let nextWaveIntegral# = wave[index#]
+                        const phase#Ratio = phase# - phase#Int;
+                        nextWaveIntegral# += (wave[index# + 1] - nextWaveIntegral#) * phase#Ratio;
+                        const wave# = (nextWaveIntegral# - prevWaveIntegral#) / phaseDelta#;
+                        prevWaveIntegral# = nextWaveIntegral#;
+                        let inputSample# = wave#;
+                        `.replaceAll("#", i + "");
+                }
+                if (instrumentState.unisonVoices == 1) {
+                    chipSource += `const inputSample1 = inputSample0;
+                `;
+                }
+                const sampleListB = [];
+                for (let voice = 0; voice < voiceCount; voice++) {
+                    sampleListB.push("inputSample" + voice + (voice != 0 ? " * unisonSign" : ""));
+                }
+                chipSource += "inputSample = " + sampleListB.join(" + ") + ";";
+                chipSource += `}
+        `;
+                chipSource += `const sample = applyFilters(inputSample, initialFilterInput1, initialFilterInput2, filterCount, filters);
+            initialFilterInput2 = initialFilterInput1;
+            initialFilterInput1 = inputSample;`;
+                for (let i = 0; i < voiceCount; i++) {
+                    chipSource += `
+                phaseDelta# *= phaseDeltaScale#;
+                `.replaceAll("#", i + "");
+                }
+                chipSource += `const output = sample * expression;
+            expression += expressionDelta;
+            data[sampleIndex] += output;
+        }
+            `;
+                for (let i = 0; i < voiceCount; i++) {
+                    chipSource += `tone.phases[#] = phase# / waveLength;
+            tone.phaseDeltas[#] = phaseDelta# / waveLength;
+            `.replaceAll("#", i + "");
+                }
+                chipSource += "tone.expression = expression;";
+                chipSource += `
+        synth.sanitizeFilters(filters);
+        tone.initialNoteFilterInput1 = initialFilterInput1;
+        tone.initialNoteFilterInput2 = initialFilterInput2;
+    }`;
+                chipFunction = new Function("Config", "Synth", "effectsIncludeDistortion", chipSource)(Config, Synth, effectsIncludeDistortion);
+                Synth.chipFunctionCache[voiceCount] = chipFunction;
             }
-            for (let i = 0; i < phases.length; i++) {
-                tone.phases[i] = phases[i] / waveLength;
-                tone.phaseDeltas[i] = phaseDeltas[i] / waveLength;
-            }
-            tone.expression = expression;
-            synth.sanitizeFilters(filters);
-            tone.initialNoteFilterInput1 = initialFilterInput1;
-            tone.initialNoteFilterInput2 = initialFilterInput2;
+            chipFunction(synth, bufferIndex, roundedSamplesPerTick, tone, instrumentState);
         }
         static harmonicsSynth(synth, bufferIndex, roundedSamplesPerTick, tone, instrumentState) {
-            const data = synth.tempMonoInstrumentSampleBuffer;
-            const wave = instrumentState.wave;
-            const waveLength = wave.length - 1;
-            const unisonSign = tone.specialIntervalExpressionMult * instrumentState.unisonSign;
-            const phaseDeltas = [];
-            const phaseDeltaScales = [];
-            for (let i = 0; i < tone.phaseDeltas.length; i++) {
-                phaseDeltas[i] = tone.phaseDeltas[i] * waveLength;
-                phaseDeltaScales[i] = +tone.phaseDeltaScales[i];
-                if (instrumentState.unisonVoices <= i && instrumentState.unisonSpread == 0 && !instrumentState.chord.customInterval)
-                    tone.phases[i] = tone.phases[i - 1];
-            }
-            let expression = +tone.expression;
-            const expressionDelta = +tone.expressionDelta;
-            const phases = [];
-            for (let i = 0; i < tone.phases.length; i++) {
-                phases[i] = (tone.phases[i] % 1) * waveLength;
-            }
-            const filters = tone.noteFilters;
-            const filterCount = tone.noteFilterCount | 0;
-            let initialFilterInput1 = +tone.initialNoteFilterInput1;
-            let initialFilterInput2 = +tone.initialNoteFilterInput2;
-            const applyFilters = Synth.applyFilters;
-            const prevWaveIntegrals = [];
-            for (let i = 0; i < phases.length; i++) {
-                const phaseInt = phases[i] | 0;
-                const index = phaseInt % waveLength;
-                prevWaveIntegrals[i] = +wave[index];
-                const phaseRatio = phases[i] - phaseInt;
-                prevWaveIntegrals[i] += (wave[index + 1] - prevWaveIntegrals[i]) * phaseRatio;
-            }
-            const stopIndex = bufferIndex + roundedSamplesPerTick;
-            for (let sampleIndex = bufferIndex; sampleIndex < stopIndex; sampleIndex++) {
-                const nextWaveIntegrals = [];
-                const waves = [];
-                for (let i = 0; i < phases.length; i++) {
-                    phases[i] += phaseDeltas[i];
-                    const phaseInt = phases[i] | 0;
-                    const index = phaseInt % waveLength;
-                    nextWaveIntegrals[i] = wave[index];
-                    const phaseRatio = phases[i] - phaseInt;
-                    nextWaveIntegrals[i] += (wave[index + 1] - nextWaveIntegrals[i]) * phaseRatio;
-                    waves[i] = (nextWaveIntegrals[i] - prevWaveIntegrals[i]) / phaseDeltas[i];
-                    prevWaveIntegrals[i] = nextWaveIntegrals[i];
+            const voiceCount = Math.max(2, instrumentState.unisonVoices);
+            let harmonicsFunction = Synth.harmonicsFunctionCache[voiceCount];
+            if (harmonicsFunction == undefined) {
+                let harmonicsSource = "return (synth, bufferIndex, roundedSamplesPerTick, tone, instrumentState) => {";
+                harmonicsSource += `
+        const data = synth.tempMonoInstrumentSampleBuffer;
+        const wave = instrumentState.wave;
+        const waveLength = wave.length - 1; // The first sample is duplicated at the end, don't double-count it.
+
+        const unisonSign = tone.specialIntervalExpressionMult * instrumentState.unisonSign;
+        let expression = +tone.expression;
+        const expressionDelta = +tone.expressionDelta;
+         `;
+                for (let i = 0; i < voiceCount; i++) {
+                    harmonicsSource += `let phaseDelta# = tone.phaseDeltas[#] * waveLength;
+            let phaseDeltaScale# = +tone.phaseDeltaScales[#];
+
+            if (instrumentState.unisonVoices <= # && instrumentState.unisonSpread == 0 && !instrumentState.chord.customInterval) tone.phases[#] = tone.phases[# - 1];
+            `.replaceAll("#", i + "");
                 }
-                let inputSample = waves[0];
-                for (let i = 1; i < Config.unisonVoicesMax; i++) {
-                    inputSample += waves[i] * unisonSign;
+                for (let i = 0; i < voiceCount; i++) {
+                    harmonicsSource += `let phase# = (tone.phases[#] % 1) * waveLength;
+            `.replaceAll("#", i + "");
                 }
-                const sample = applyFilters(inputSample, initialFilterInput1, initialFilterInput2, filterCount, filters);
-                initialFilterInput2 = initialFilterInput1;
-                initialFilterInput1 = inputSample;
-                for (let i = 0; i < phaseDeltas.length; i++) {
-                    phaseDeltas[i] *= phaseDeltaScales[i];
+                harmonicsSource += `const filters = tone.noteFilters;
+        const filterCount = tone.noteFilterCount | 0;
+        let initialFilterInput1 = +tone.initialNoteFilterInput1;
+        let initialFilterInput2 = +tone.initialNoteFilterInput2;
+        const applyFilters = Synth.applyFilters;
+        `;
+                for (let i = 0; i < voiceCount; i++) {
+                    harmonicsSource += `const phase#Int = phase# | 0;
+            const index# = phase#Int % waveLength;
+            prevWaveIntegral# = +wave[index#]
+            const phase#Ratio = phase# - phase#Int;
+            prevWaveIntegral# += (wave[index# + 1] - prevWaveIntegral#) * phase#Ratio;
+            `.replaceAll("#", i + "");
                 }
-                const output = sample * expression * 1.38 / 6;
-                expression += expressionDelta;
-                data[sampleIndex] += output;
+                harmonicsSource += `const stopIndex = bufferIndex + roundedSamplesPerTick;
+        for (let sampleIndex = bufferIndex; sampleIndex < stopIndex; sampleIndex++) {
+        `;
+                for (let i = 0; i < instrumentState.unisonVoices; i++) {
+                    harmonicsSource += `
+                        phase# += phaseDelta#;
+                        const phase#Int = phase# | 0;
+                        const index# = phase#Int % waveLength;
+                        let nextWaveIntegral# = wave[index#]
+                        const phase#Ratio = phase# - phase#Int;
+                        nextWaveIntegral# += (wave[index# + 1] - nextWaveIntegral#) * phase#Ratio;
+                        const wave# = (nextWaveIntegral# - prevWaveIntegral#) / phaseDelta#;
+                        prevWaveIntegral# = nextWaveIntegral#;
+                        let inputSample# = wave#;
+                        `.replaceAll("#", i + "");
+                }
+                if (instrumentState.unisonVoices == 1) {
+                    harmonicsSource += `const inputSample1 = inputSample0;
+                `;
+                }
+                const sampleList = [];
+                for (let voice = 0; voice < voiceCount; voice++) {
+                    sampleList.push("inputSample" + voice + (voice != 0 ? " * unisonSign" : ""));
+                }
+                harmonicsSource += "inputSample = " + sampleList.join(" + ") + ";";
+                harmonicsSource += `const sample = applyFilters(inputSample, initialFilterInput1, initialFilterInput2, filterCount, filters);
+            initialFilterInput2 = initialFilterInput1;
+            initialFilterInput1 = inputSample;`;
+                for (let i = 0; i < voiceCount; i++) {
+                    harmonicsSource += `
+                phaseDelta# *= phaseDeltaScale#;
+                `.replaceAll("#", i + "");
+                }
+                harmonicsSource += `const output = sample * expression;
+            expression += expressionDelta;
+            data[sampleIndex] += output;
+        }
+            `;
+                for (let i = 0; i < voiceCount; i++) {
+                    harmonicsSource += `tone.phases[#] = phase# / waveLength;
+            tone.phaseDeltas[#] = phaseDelta# / waveLength;
+            `.replaceAll("#", i + "");
+                }
+                harmonicsSource += "tone.expression = expression;";
+                harmonicsSource += `
+        synth.sanitizeFilters(filters);
+        tone.initialNoteFilterInput1 = initialFilterInput1;
+        tone.initialNoteFilterInput2 = initialFilterInput2;
+    }`;
+                harmonicsFunction = new Function("Config", "Synth", harmonicsSource)(Config, Synth);
+                Synth.harmonicsFunctionCache[voiceCount] = harmonicsFunction;
             }
-            for (let i = 0; i < phases.length; i++) {
-                tone.phases[i] = phases[i] / waveLength;
-                tone.phaseDeltas[i] = phaseDeltas[i] / waveLength;
-            }
-            tone.expression = expression;
-            synth.sanitizeFilters(filters);
-            tone.initialNoteFilterInput1 = initialFilterInput1;
-            tone.initialNoteFilterInput2 = initialFilterInput2;
+            harmonicsFunction(synth, bufferIndex, roundedSamplesPerTick, tone, instrumentState);
         }
         static pickedStringSynth(synth, bufferIndex, roundedSamplesPerTick, tone, instrumentState) {
             const voiceCount = instrumentState.unisonVoices;
@@ -21938,83 +21967,111 @@ var beepbox = (function (exports) {
             tone.initialNoteFilterInput2 = initialFilterInput2;
         }
         static spectrumSynth(synth, bufferIndex, runLength, tone, instrumentState) {
-            const data = synth.tempMonoInstrumentSampleBuffer;
-            const wave = instrumentState.wave;
-            const samplesInPeriod = (1 << 7);
-            const unisonSign = tone.specialIntervalExpressionMult * instrumentState.unisonSign;
-            const phaseDeltas = [];
-            const phaseDeltaScales = [];
-            const pitchRelativefilters = [];
-            for (let i = 0; i < tone.phaseDeltas.length; i++) {
-                phaseDeltas[i] = tone.phaseDeltas[i] * samplesInPeriod;
-                phaseDeltaScales[i] = +tone.phaseDeltaScales[i];
-                pitchRelativefilters[i] = Math.min(1.0, phaseDeltas[i]);
-                if (instrumentState.unisonVoices <= i && instrumentState.unisonSpread == 0 && !instrumentState.chord.customInterval)
-                    tone.phases[i] = tone.phases[i - 1];
-            }
-            let expression = +tone.expression;
-            const expressionDelta = +tone.expressionDelta;
-            const noiseSamples = [];
-            for (let i = 0; i < tone.noiseSamples.length; i++) {
-                noiseSamples[i] = +tone.noiseSamples[i];
-            }
-            const filters = tone.noteFilters;
-            const filterCount = tone.noteFilterCount | 0;
-            let initialFilterInput1 = +tone.initialNoteFilterInput1;
-            let initialFilterInput2 = +tone.initialNoteFilterInput2;
-            const applyFilters = Synth.applyFilters;
-            const phaseMask = Config.spectrumNoiseLength - 1;
-            const phases = [];
-            for (let i = 0; i < tone.phases.length; i++) {
-                phases[i] = (tone.phases[i] % 1) * Config.spectrumNoiseLength;
-            }
-            for (let i = 0; i < phases.length; i++) {
-                if (tone.phases[i] == 0.0) {
-                    phases[i] = Synth.findRandomZeroCrossing(wave, Config.spectrumNoiseLength) + phaseDeltas[i];
-                    if (instrumentState.unisonVoices <= i && instrumentState.unisonSpread == 0 && !instrumentState.chord.customInterval) {
-                        for (let j = i + 1; j < phases.length; j++) {
-                            phases[j] = phases[i];
-                        }
-                        break;
+            const voiceCount = Math.max(2, instrumentState.unisonVoices);
+            let spectrumFunction = Synth.spectrumFunctionCache[voiceCount];
+            if (spectrumFunction == undefined) {
+                let spectrumSource = "return (synth, bufferIndex, runLength, tone, instrumentState) => {";
+                spectrumSource += `
+        const data = synth.tempMonoInstrumentSampleBuffer;
+        const wave = instrumentState.wave;
+        const samplesInPeriod = (1 << 7);
+
+        const unisonSign = tone.specialIntervalExpressionMult * instrumentState.unisonSign;
+        `;
+                for (let i = 0; i < voiceCount; i++) {
+                    spectrumSource += `
+            let phaseDelta# = tone.phaseDeltas[#] * samplesInPeriod;
+            let phaseDeltaScale# = +tone.phaseDeltaScales[#];
+            let noiseSample# = +tone.noiseSamples[#];
+            // This is for a "legacy" style simplified 1st order lowpass filter with
+            // a cutoff frequency that is relative to the tone's fundamental frequency.
+            const pitchRelativefilter# = Math.min(1.0, phaseDelta#);
+            
+            if (instrumentState.unisonVoices <= # && instrumentState.unisonSpread == 0 && !instrumentState.chord.customInterval) tone.phases[#] = tone.phases[#-1];
+            `.replaceAll("#", i + "");
+                }
+                spectrumSource += `
+        let expression = +tone.expression;
+        const expressionDelta = +tone.expressionDelta;
+
+        const filters = tone.noteFilters;
+        const filterCount = tone.noteFilterCount | 0;
+        let initialFilterInput1 = +tone.initialNoteFilterInput1;
+        let initialFilterInput2 = +tone.initialNoteFilterInput2;
+        const applyFilters = Synth.applyFilters;
+
+        const phaseMask = Config.spectrumNoiseLength - 1;
+
+        `;
+                for (let i = 0; i < voiceCount; i++) {
+                    spectrumSource += `let phase# = (tone.phases[#] % 1) * Config.spectrumNoiseLength;
+                `.replaceAll("#", i + "");
+                }
+                spectrumSource += "let test = true;";
+                for (let i = 0; i < voiceCount; i++) {
+                    spectrumSource += `
+            if (tone.phases[#] == 0.0) {
+                // Zero phase means the tone was reset, just give noise a random start phase instead.
+                phase# = Synth.findRandomZeroCrossing(wave, Config.spectrumNoiseLength) + phaseDelta#;
+                if (@ <= # && test && instrumentState.unisonSpread == 0 && !instrumentState.chord.customInterval) {`.replaceAll("#", i + "").replaceAll("@", voiceCount + "").replaceAll("~", tone.phases.length + "");
+                    for (let j = i + 1; j < tone.phases.length; j++) {
+                        spectrumSource += "phase~ = phase#;".replaceAll("#", i + "").replaceAll("~", j + "");
                     }
+                    spectrumSource += `
+                    test = false;
                 }
-            }
-            const stopIndex = bufferIndex + runLength;
-            for (let sampleIndex = bufferIndex; sampleIndex < stopIndex; sampleIndex++) {
-                for (let i = 0; i < phases.length; i++) {
-                    const phaseInt = phases[i] | 0;
-                    const index = phaseInt & phaseMask;
-                    let waveSample = wave[index];
-                    const phaseRatio = phases[i] - phaseInt;
-                    waveSample += (wave[index + 1] - waveSample) * phaseRatio;
-                    noiseSamples[i] += (waveSample - noiseSamples[i]) * pitchRelativefilters[i];
+            }`;
                 }
-                let inputSample = noiseSamples[0];
-                for (let i = 1; i < Config.unisonVoicesMax; i++) {
-                    inputSample += noiseSamples[i] * unisonSign;
+                spectrumSource += `
+        const stopIndex = bufferIndex + runLength;
+        for (let sampleIndex = bufferIndex; sampleIndex < stopIndex; sampleIndex++) {`;
+                for (let i = 0; i < voiceCount; i++) {
+                    spectrumSource += `
+                const phase#Int = phase# | 0;
+                const index# = phase#Int & phaseMask;
+                let waveSample# = wave[index#]
+                const phase#Ratio = phase# - phase#Int;
+                waveSample# += (wave[index# + 1] - waveSample#) * phase#Ratio;
+
+                noiseSample# += (waveSample# - noiseSample#) * pitchRelativefilter#;
+                `.replaceAll("#", i + "");
                 }
-                const sample = applyFilters(inputSample, initialFilterInput1, initialFilterInput2, filterCount, filters);
-                initialFilterInput2 = initialFilterInput1;
-                initialFilterInput1 = inputSample;
-                for (let i = 0; i < phases.length; i++) {
-                    phases[i] += phaseDeltas[i];
-                    phaseDeltas[i] *= phaseDeltaScales[i];
+                const sampleList = [];
+                for (let voice = 0; voice < voiceCount; voice++) {
+                    sampleList.push("noiseSample" + voice + (voice != 0 ? " * unisonSign" : ""));
                 }
-                const output = sample * expression * 1.25 / 6;
-                expression += expressionDelta;
-                data[sampleIndex] += output;
+                spectrumSource += "let inputSample = " + sampleList.join(" + ") + ";";
+                spectrumSource += `const sample = applyFilters(inputSample, initialFilterInput1, initialFilterInput2, filterCount, filters);
+            initialFilterInput2 = initialFilterInput1;
+            initialFilterInput1 = inputSample;`;
+                for (let i = 0; i < voiceCount; i++) {
+                    spectrumSource += `phase# += phaseDelta#;
+                phaseDelta# *= phaseDeltaScale#;
+                `.replaceAll("#", i + "");
+                }
+                spectrumSource += `const output = sample * expression;
+            expression += expressionDelta;
+            data[sampleIndex] += output;
+        }`;
+                for (let i = 0; i < voiceCount; i++) {
+                    spectrumSource += `tone.phases[#] = phase# / `.replaceAll("#", i + "") + Config.spectrumNoiseLength + `;
+            tone.phaseDeltas[#] = phaseDelta# / samplesInPeriod;
+            `.replaceAll("#", i + "");
+                }
+                spectrumSource += "tone.expression = expression;";
+                for (let i = 0; i < voiceCount; i++) {
+                    spectrumSource += `tone.noiseSamples[#] = noiseSample#;
+             `.replaceAll("#", i + "");
+                }
+                spectrumSource += `
+        synth.sanitizeFilters(filters);
+        tone.initialNoteFilterInput1 = initialFilterInput1;
+        tone.initialNoteFilterInput2 = initialFilterInput2;
+    }`;
+                spectrumFunction = new Function("Config", "Synth", spectrumSource)(Config, Synth);
+                Synth.spectrumFunctionCache[voiceCount] = spectrumFunction;
             }
-            for (let i = 0; i < phases.length; i++) {
-                tone.phases[i] = phases[i] / Config.spectrumNoiseLength;
-                tone.phaseDeltas[i] = phaseDeltas[i] / samplesInPeriod;
-            }
-            tone.expression = expression;
-            for (let i = 0; i < tone.noiseSamples.length; i++) {
-                tone.noiseSamples[i] = noiseSamples[i];
-            }
-            synth.sanitizeFilters(filters);
-            tone.initialNoteFilterInput1 = initialFilterInput1;
-            tone.initialNoteFilterInput2 = initialFilterInput2;
+            spectrumFunction(synth, bufferIndex, runLength, tone, instrumentState);
         }
         static drumsetSynth(synth, bufferIndex, runLength, tone, instrumentState) {
             const data = synth.tempMonoInstrumentSampleBuffer;
@@ -22446,6 +22503,10 @@ var beepbox = (function (exports) {
     Synth.fm6SynthFunctionCache = {};
     Synth.effectsFunctionCache = Array(1 << 7).fill(undefined);
     Synth.pickedStringFunctionCache = Array(3).fill(undefined);
+    Synth.spectrumFunctionCache = [];
+    Synth.chipFunctionCache = [];
+    Synth.harmonicsFunctionCache = [];
+    Synth.loopableChipFunctionCache = Array(Config.unisonVoicesMax + 1).fill([]);
     Synth.fmSourceTemplate = (`
 		const data = synth.tempMonoInstrumentSampleBuffer;
 		const sineWave = Config.sineWave;

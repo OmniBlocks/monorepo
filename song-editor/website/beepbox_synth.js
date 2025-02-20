@@ -15508,7 +15508,7 @@ var beepbox = (function (exports) {
                 const index# = phase#Int & phaseMask;
                 let noiseSample# = wave[index#]
                 const phase#Ratio = phase# - phase#Int;
-                noiseSample# += (wave[index# + 1] - waveSample#) * phase#Ratio;
+                noiseSample# += (wave[index# + 1] - noiseSample#) * phase#Ratio;
                 `.replaceAll("#", i + "");
                 }
                 const sampleList = [];
@@ -15524,7 +15524,7 @@ var beepbox = (function (exports) {
                 phaseDelta# *= phaseDeltaScale#;
                 `.replaceAll("#", i + "");
                 }
-                drumSource += `const output = sample * expression / 9;
+                drumSource += `const output = sample * expression;
             expression += expressionDelta;
             data[sampleIndex] += output;
         }`;

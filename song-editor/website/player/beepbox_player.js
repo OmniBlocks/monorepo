@@ -22206,7 +22206,7 @@ var beepbox = (function (exports) {
         tone.initialNoteFilterInput1 = initialFilterInput1;
         tone.initialNoteFilterInput2 = initialFilterInput2;
     }`;
-                drumFunction = new Function("Config", "Synth", drumSource)(Config, Synth);
+                drumFunction = new Function("Config", "Synth", "InstrumentState", drumSource)(Config, Synth, InstrumentState);
                 Synth.drumFunctionCache[voiceCount] = drumFunction;
             }
             drumFunction(synth, bufferIndex, runLength, tone, instrumentState);

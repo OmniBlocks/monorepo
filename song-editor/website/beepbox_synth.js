@@ -15153,7 +15153,7 @@ var beepbox = (function (exports) {
         tone.initialNoteFilterInput2 = initialFilterInput2;
     }`;
                 pulseFunction = new Function("Config", "Synth", pulseSource)(Config, Synth);
-                Synth.effectsFunctionCache[voiceCount] = pulseFunction;
+                Synth.pulseFunctionCache[voiceCount] = pulseFunction;
             }
             pulseFunction(synth, bufferIndex, roundedSamplesPerTick, tone, instrumentState);
         }

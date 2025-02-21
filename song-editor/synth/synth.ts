@@ -14134,8 +14134,8 @@ export class Synth {
         const expressionDelta = +tone.expressionDelta;
         `
         for (let i: number = 0; i < voiceCount; i++) {
-            pulseSource += `phaseDelta# = tone.phaseDeltas[#];
-            phaseDeltaScale# = +tone.phaseDeltaScales[#];
+            pulseSource += `let phaseDelta# = tone.phaseDeltas[#];
+            let phaseDeltaScale# = +tone.phaseDeltaScales[#];
 
             if (instrumentState.unisonVoices <= # && instrumentState.unisonSpread == 0 && !instrumentState.chord.customInterval) tone.phases[#] = tone.phases[# - 1];
             `.replaceAll("#", i + "");
@@ -14458,20 +14458,6 @@ export class Synth {
             }`
             }
 
-
-        // for (let i: number = 0; i < phases.length; i++) {
-        //     if (tone.phases[i] == 0.0) {
-        //         // Zero phase means the tone was reset, just give noise a random start phase instead.
-        //         phases[i] = Math.random() * Config.chipNoiseLength;
-        //         if (instrumentState.unisonVoices <= i && instrumentState.unisonSpread == 0 && !instrumentState.chord!.customInterval) {
-        //             for (let j: number = i + 1; j < phases.length; j++) {
-        //                 phases[j] = phases[i];
-        //             }
-        //             break;
-        //         }
-        //     }
-        // }
-
             noiseSource += `
         const stopIndex = bufferIndex + runLength;
         for (let sampleIndex = bufferIndex; sampleIndex < stopIndex; sampleIndex++) {
@@ -14666,8 +14652,8 @@ export class Synth {
         const unisonSign = tone.specialIntervalExpressionMult * instrumentState.unisonSign;
         `
         for (let i: number = 0; i < voiceCount; i++) {
-            drumSource += `phaseDelta# = tone.phaseDeltas[#] / referenceDelta;
-            phaseDeltaScale# = +tone.phaseDeltaScales[#];
+            drumSource += `let phaseDelta# = tone.phaseDeltas[#] / referenceDelta;
+            let phaseDeltaScale# = +tone.phaseDeltaScales[#];
             if (instrumentState.unisonVoices <= # && instrumentState.unisonSpread == 0 && !instrumentState.chord.customInterval) tone.phases[#] = tone.phases[# - 1];
             `.replaceAll("#", i + "");
         }

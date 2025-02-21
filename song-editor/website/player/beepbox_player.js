@@ -21744,8 +21744,8 @@ var beepbox = (function (exports) {
         const expressionDelta = +tone.expressionDelta;
         `;
                 for (let i = 0; i < voiceCount; i++) {
-                    pulseSource += `phaseDelta# = tone.phaseDeltas[#];
-            phaseDeltaScale# = +tone.phaseDeltaScales[#];
+                    pulseSource += `let phaseDelta# = tone.phaseDeltas[#];
+            let phaseDeltaScale# = +tone.phaseDeltaScales[#];
 
             if (instrumentState.unisonVoices <= # && instrumentState.unisonSpread == 0 && !instrumentState.chord.customInterval) tone.phases[#] = tone.phases[# - 1];
             `.replaceAll("#", i + "");
@@ -22133,8 +22133,8 @@ var beepbox = (function (exports) {
         const unisonSign = tone.specialIntervalExpressionMult * instrumentState.unisonSign;
         `;
                 for (let i = 0; i < voiceCount; i++) {
-                    drumSource += `phaseDelta# = tone.phaseDeltas[#] / referenceDelta;
-            phaseDeltaScale# = +tone.phaseDeltaScales[#];
+                    drumSource += `let phaseDelta# = tone.phaseDeltas[#] / referenceDelta;
+            let phaseDeltaScale# = +tone.phaseDeltaScales[#];
             if (instrumentState.unisonVoices <= # && instrumentState.unisonSpread == 0 && !instrumentState.chord.customInterval) tone.phases[#] = tone.phases[# - 1];
             `.replaceAll("#", i + "");
                 }

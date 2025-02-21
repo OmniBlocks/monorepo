@@ -22774,9 +22774,9 @@ li.select2-results__option[role=group] > strong:hover {
                 chipSource += "inputSample = " + sampleListB.join(" + ") + ";";
                 chipSource += `}
         `;
-                chipSource += `const sample = applyFilters(inputSample, initialFilterInput1, initialFilterInput2, filterCount, filters);
+                chipSource += `const sample = applyFilters(inputSample * volumeScale, initialFilterInput1, initialFilterInput2, filterCount, filters);
             initialFilterInput2 = initialFilterInput1;
-            initialFilterInput1 = inputSample;`;
+            initialFilterInput1 = inputSample * volumeScale;`;
                 for (let i = 0; i < voiceCount; i++) {
                     chipSource += `
                 phaseDelta# *= phaseDeltaScale#;

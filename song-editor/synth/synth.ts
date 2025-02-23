@@ -969,6 +969,68 @@ class HarmonicsWaveState {
     }
 }
 
+class Grain {
+    public envelopePeak: number = 0.5;
+    public sampleLine: number[] = [];
+    public grainLength: number = Config.grainSizeMin;
+    public grainIndex: number = 0;
+    public mode: number = 0; //0 for writeonly, 1 for readonly 
+
+    constructor(peak: number, length: number) {
+        this.envelopePeak = peak;
+        this.reset(length);
+    }
+
+    public reset(length: number) {
+        this.sampleLine = [];
+        this.mode = 0;
+        this.grainIndex = 0;
+        this.grainLength = length;
+    }
+
+    public static computeEnvelope(time: number, duration: number, peak: number) {
+        if (time <= peak * duration) {
+            return time / (duration * peak) * (2 - time / (duration * peak));
+        } else {
+            return (duration - time) / (duration - peak * duration) * (2 - (duration - time) / (duration - peak * duration));
+        }
+    }
+
+    public addDelay(delay: number) {
+        if (this.mode == 1) {
+            this.sampleLine = Array<number>(delay).fill(0).concat(this.sampleLine);
+            this.grainLength += delay;
+        } else if(this.sampleLine.length == 0) {
+            this.grainIndex -= delay;
+        }
+    }
+
+    public writeSample(sample: number): boolean { //return true if in readonly
+        if (this.mode == 0) {
+            this.grainIndex++;
+            if (this.grainIndex >= 0) {
+                this.sampleLine.push(sample);
+                if (this.grainIndex >= this.grainLength) {
+                    this.mode = 1;
+                    this.grainIndex = 0;
+                    return true;
+                }
+            }
+            return false;
+        }
+        return true;
+    }
+
+    public readSample(): number {
+        if (this.mode != 1 || this.grainIndex >= this.grainLength) return 0.0;
+        else {
+            const sample: number = this.sampleLine[this.grainIndex] * Grain.computeEnvelope(this.grainIndex, this.grainLength, this.envelopePeak);
+            this.grainIndex++;
+            return sample;
+        }
+    }
+}
+
 export class FilterControlPoint {
     public freq: number = 0;
     public gain: number = Config.filterGainCenter;
@@ -1596,6 +1658,10 @@ export class Instrument {
     public ringModulation: number = 0;
     public ringModulationHz: number = 0;
     public ringModWaveformIndex: number = 0;
+    public granular: number = 4;
+    public grainSize: number = (Config.grainSizeMax-Config.grainSizeMin)/Config.grainSizeStep;
+    public grainEnvelope: number = 0.5 / Config.grainEnvelopeStep;
+    public grainRange: number = 0;
     public chorus: number = 0;
     public reverb: number = 0;
     public echoSustain: number = 0;
@@ -1716,6 +1782,10 @@ export class Instrument {
         this.ringModulation = 0;
         this.ringModulationHz = 0;
         this.ringModWaveformIndex = 0;
+        this.granular = 4;
+        this.grainSize = (Config.grainSizeMax - Config.grainSizeMin) / Config.grainSizeStep;;
+        this.grainEnvelope = 0.5 / Config.grainEnvelopeStep;
+        this.grainRange = 0;
         this.pan = Config.panCenter;
         this.panDelay = 0;
         this.pitchShift = Config.pitchShiftCenter;
@@ -2029,8 +2099,10 @@ export class Instrument {
             }
         }
         if (effectsIncludeGranular(this.effects)) {
-            // instrumentObject["corruption"] = this.corruption; 
-            // instrumentObject["corruptionType"] = this.corruptionType;
+            instrumentObject["granular"] = this.granular;
+            instrumentObject["grainSize"] = this.grainSize;
+            instrumentObject["grainEnvelope"] = this.grainEnvelope;
+            instrumentObject["grainRange"] = this.grainRange;
         }
         if (effectsIncludeRingModulation(this.effects)) {
             instrumentObject["ringMod"] = Math.round(100 * this.ringModulation / (Config.ringModRange - 1));
@@ -2484,6 +2556,19 @@ export class Instrument {
         }
         if (instrumentObject["ringModWaveformIndex"] != undefined) {
             this.ringModWaveformIndex = clamp(0, Config.operatorWaves.length, instrumentObject["ringModWaveformIndex"]);
+        }
+
+        if (instrumentObject["granular"] != undefined) {
+            this.granular = clamp(0, Config.granularRange, instrumentObject["granular"]);
+        }
+        if (instrumentObject["grainSize"] != undefined) {
+            this.grainSize = clamp(Config.grainSizeMin, Config.grainSizeMax, instrumentObject["grainSize"]);
+        }
+        if (instrumentObject["grainEnvelope"] != undefined) {
+            this.granular = clamp(0, 1 / Config.grainEnvelopeStep, instrumentObject["grainEnvelope"]);
+        }
+        if (instrumentObject["grainRange"] != undefined) {
+            this.grainSize = clamp(0, Config.grainRangeMax, instrumentObject["grainRange"]);
         }
 
         if (instrumentObject["distortion"] != undefined) {
@@ -3646,8 +3731,10 @@ export class Song {
                 //     buffer.push(base64IntToCharCode[instrument.noteRange]);
                 // }
                 if (effectsIncludeGranular(instrument.effects)) {
-                    // buffer.push(base64IntToCharCode[instrument.corruption]);
-                    // buffer.push(base64IntToCharCode[instrument.corruptionType]);
+                    buffer.push(base64IntToCharCode[instrument.granular]);
+                    buffer.push(base64IntToCharCode[instrument.grainSize]);
+                    buffer.push(base64IntToCharCode[instrument.grainEnvelope]);
+                    buffer.push(base64IntToCharCode[instrument.grainRange]);
                 }
                 if (effectsIncludeRingModulation(instrument.effects)) {
                     buffer.push(base64IntToCharCode[instrument.ringModulation]);
@@ -5449,8 +5536,10 @@ export class Song {
                         }
                     }
                     if (effectsIncludeGranular(instrument.effects)) {
-                        // instrument.corruption = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
-                        // instrument.corruptionType = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                        instrument.granular = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                        instrument.grainSize = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                        instrument.grainEnvelope = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                        instrument.grainRange = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                     }
                     if (effectsIncludeRingModulation(instrument.effects)) {
                         instrument.ringModulation = clamp(0, Config.ringModRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
@@ -8459,6 +8548,15 @@ class InstrumentState {
     public delayInputMult: number = 0.0;
     public delayInputMultDelta: number = 0.0;
 
+    public granularGrains: Grain[] = [];
+    public maxGranularDelayLength: number = 1.0;
+    public activeGrains: number[] = [];
+    public inactiveGrains: number[] = [];
+    public storedGrains: number[] = [];
+    public grainEnvelope: number = 0.5;
+    public grainRange: number = 0;
+    public granular: number = 0;
+
     public ringModMix: number = 0;
     public ringModMixDelta: number = 0;
     public ringModPhase: number = 0;
@@ -8676,6 +8774,11 @@ class InstrumentState {
         this.chorusPhase = 0.0;
         this.ringModPhase = 0.0;
         this.ringModMixFade = 1.0;
+        //empty grain silos
+        this.granularGrains = [];
+        this.activeGrains = [];
+        this.inactiveGrains = [];
+        this.storedGrains = [];
     }
 
     public compute(synth: Synth, instrument: Instrument, samplesPerTick: number, roundedSamplesPerTick: number, tone: Tone | null, channelIndex: number, instrumentIndex: number): void {
@@ -8725,7 +8828,7 @@ class InstrumentState {
         const envelopeStarts: number[] = this.envelopeComputer.envelopeStarts;
         const envelopeEnds: number[] = this.envelopeComputer.envelopeEnds;
 
-        // const usesGranular: boolean = effectsIncludeGranular(this.effects);
+        const usesGranular: boolean = effectsIncludeGranular(this.effects);
         const usesRingModulation: boolean = effectsIncludeRingModulation(this.effects);
         const usesDistortion: boolean = effectsIncludeDistortion(this.effects);
         const usesBitcrusher: boolean = effectsIncludeBitcrusher(this.effects);
@@ -8733,6 +8836,101 @@ class InstrumentState {
         const usesChorus: boolean = effectsIncludeChorus(this.effects);
         const usesEcho: boolean = effectsIncludeEcho(this.effects);
         const usesReverb: boolean = effectsIncludeReverb(this.effects);
+
+        if (usesGranular) {
+            let useGranularStart: number = instrument.granular;
+            let useGranularEnd: number = instrument.granular;
+            let grainSizeStart: number = instrument.grainSize * Config.grainSizeStep;
+            let grainEnvelope: number = instrument.grainEnvelope * Config.grainEnvelopeStep;
+            let grainRange: number = instrument.grainRange * Config.grainSizeStep;
+            // let grainSizeEnd: number = instrument.grainSize;
+
+            // Check for granular mods
+            if (synth.isModActive(Config.modulators.dictionary["granular"].index, channelIndex, instrumentIndex)) {
+                useGranularStart = synth.getModValue(Config.modulators.dictionary["granular"].index, channelIndex, instrumentIndex, false);
+                useGranularEnd = synth.getModValue(Config.modulators.dictionary["granular"].index, channelIndex, instrumentIndex, true);
+            }
+
+            // Check for grain size mods
+            if (synth.isModActive(Config.modulators.dictionary["grain size"].index, channelIndex, instrumentIndex)) {
+                grainSizeStart = synth.getModValue(Config.modulators.dictionary["grain size"].index, channelIndex, instrumentIndex, false) * Config.grainSizeStep;
+                // grainSizeEnd = synth.getModValue(Config.modulators.dictionary["grain size"].index, channelIndex, instrumentIndex, true) * Config.grainSizeStep;
+            }
+
+            const granularStart: number = useGranularStart * envelopeStarts[EnvelopeComputeIndex.granular];
+            this.granular = granularStart;
+            if (granularStart != 0) {
+                const granularDelayLengthStart: number = Math.floor(Math.pow(2, granularStart));
+                const granularDelayLengthEnd: number = Math.floor(Math.pow(2, useGranularEnd * envelopeEnds[EnvelopeComputeIndex.granular]));
+                const maxGranularDelayLength: number = Math.max(granularDelayLengthStart, granularDelayLengthEnd)
+
+                // this.grainSizeDelta = (grainSizeEnd - grainSizeStart) / roundedSamplesPerTick;
+                this.maxGranularDelayLength = maxGranularDelayLength;
+
+                for (let i = this.granularGrains.length; i < maxGranularDelayLength; i++) {
+                    this.granularGrains[i] = new Grain(grainEnvelope, Math.max(Config.grainSizeMin, grainSizeStart + Math.floor(grainRange * (Math.random() * 2 - 1))));
+                }
+                /*A grain can be in 1 of 4 states:
+                    Active: Is currently reading out samples
+                    Stored: Is fully written to; waiting to read out
+                    Inactive: Is currently writing in samples
+                    Unused: Is empty; waiting to write in
+                */
+                let activeGrains: number[] = [];
+                let storedGrains: number[] = [];
+                let inactiveGrains: number[] = [];
+                let grainsInUse: number[] = [];
+                for (let i = 0; i < this.activeGrains.length; i++) {
+                    const grainIndex: number = this.activeGrains[i];
+                    const grain: Grain = this.granularGrains[grainIndex];
+                    if (grain.grainIndex < grain.grainLength) {
+                        activeGrains.push(grainIndex);
+                        grainsInUse.push(grainIndex);
+                    } else if (Math.random() > (granularStart / Config.granularRange)) { //chance to go back to storage
+                        storedGrains.push(grainIndex);
+                        grainsInUse.push(grainIndex);
+                    } else { //otherwise reset the grain
+                        grain.reset(grainSizeStart);
+                    }
+                }
+                for (let i = 0; i < this.storedGrains.length; i++) {
+                    const grainIndex: number = this.storedGrains[i];
+                    const grain: Grain = this.granularGrains[grainIndex];
+                    grain.envelopePeak = this.grainEnvelope; //reset envelope shape
+                    if (Math.random() < (granularStart / Config.granularRange)) { //chance to add to activeGrains (with a delay)
+                        activeGrains.push(grainIndex);
+                        grainsInUse.push(grainIndex);
+                        grain.addDelay(Math.floor(Math.random() * roundedSamplesPerTick));
+                    } else { //otherwise, remain in storage
+                        storedGrains.push(grainIndex);
+                        grainsInUse.push(grainIndex);
+                    }
+                }
+                for (let i = 0; i < this.inactiveGrains.length; i++) {
+                    const grainIndex: number = this.inactiveGrains[i];
+                    const grain: Grain = this.granularGrains[grainIndex];
+                    if (grain.mode != 0) { //if grain isn't in write only anymore
+                        storedGrains.push(grainIndex);
+                        grainsInUse.push(grainIndex);
+                    } else { //otherwise, keep reading in
+                        inactiveGrains.push(grainIndex);
+                        grainsInUse.push(grainIndex);
+                    }
+                }
+                for (let i = 0; i < Math.min(this.granularGrains.length, maxGranularDelayLength); i++) {
+                    if (!grainsInUse.includes(i)) { //looking at unused grains
+                        if (Math.random() < (granularStart / Config.granularRange)) { //chance to add to inactiveGrains (with a delay)
+                            inactiveGrains.push(i);
+                            this.granularGrains[i].addDelay(Math.floor(Math.random() * roundedSamplesPerTick));
+                        }
+                        //otherwise leave alone
+                    }
+                }
+                this.activeGrains = activeGrains;
+                this.storedGrains = storedGrains;
+                this.inactiveGrains = inactiveGrains;
+            }
+        }
 
         if (usesDistortion) {
             let useDistortionStart: number = instrument.distortion;
@@ -13502,7 +13700,8 @@ export class Synth {
 				const tempMonoInstrumentSampleBuffer = synth.tempMonoInstrumentSampleBuffer;
 				
 				let mixVolume = +instrumentState.mixVolume;
-				const mixVolumeDelta = +instrumentState.mixVolumeDelta;`
+				const mixVolumeDelta = +instrumentState.mixVolumeDelta;
+                `
 
             if (usesDelays) {
                 effectsSource += `
@@ -13511,14 +13710,16 @@ export class Synth {
 				const delayInputMultDelta = +instrumentState.delayInputMultDelta;`
             }
 
-            // if (usesCorruption) {
-            //     effectsSource += `
-                
-            //     let corruption = instrumentState.corruption;
-            //     let corruptionAmount = instrumentState.corruptionAmount+1;
-            //     const corruptionType = instrumentState.corruptionType;`
-            // }
-
+            if (usesGranular) {
+                effectsSource += `
+                const granularGrains = instrumentState.granularGrains;
+                const activeGrains = instrumentState.activeGrains;
+                const inactiveGrains = instrumentState.inactiveGrains;
+                const granular = instrumentState.granular;
+                // const storedGrains = instrumentState.storedGrains;
+                `
+            }
+            
             if (usesDistortion) {
                 // Distortion can sometimes create noticeable aliasing.
                 // It seems the established industry best practice for distortion antialiasing
@@ -13586,7 +13787,6 @@ export class Synth {
                 let ringModWaveformIndex = +instrumentState.ringModWaveformIndex;
                 let ringModMixFade = +instrumentState.ringModMixFade;
                 let ringModMixFadeDelta = +instrumentState.ringModMixFadeDelta;
-                
                 let waveform = Config.operatorWaves[ringModWaveformIndex].samples;
                 const waveformLength = waveform.length - 1;`
             }
@@ -13721,16 +13921,36 @@ export class Synth {
             effectsSource += `
 				
 				const stopIndex = bufferIndex + runLength;
-				for (let sampleIndex = bufferIndex; sampleIndex < stopIndex; sampleIndex++) {
-					let sample = tempMonoInstrumentSampleBuffer[sampleIndex];
-					tempMonoInstrumentSampleBuffer[sampleIndex] = 0.0;`
-            
-            // if (usesCorruption) {
-            //     effectsSource += `
-                
-            //     const corruptChance = (Math.floor(((corruption%corruptionAmount)+1)/corruptionAmount)-0.5)*2;
-            //     sample *= corruptChance;`
-            // }
+            for (let sampleIndex = bufferIndex; sampleIndex < stopIndex; sampleIndex++) {
+                    `
+            if (usesGranular) {
+                effectsSource += `
+                let sample = 0.0;
+                if(granular == 0) {
+                    sample = tempMonoInstrumentSampleBuffer[sampleIndex];
+                } else {
+                    let simultaneousVoices = 0;
+                    for (let i = 0; i < activeGrains.length; i++) {
+                        const grainIndex = activeGrains[i];
+                        const grain = granularGrains[grainIndex];
+                        const sampleRead = grain.readSample();
+                        sample += sampleRead
+                        // simultaneousVoices += Math.ceil(Math.abs(sampleRead)); //only read grains that are actually outputting a value
+                    }
+                    // sample = sample/simultaneousVoices * 2 //the 2 accounts for grain envelopes
+                    for (let i = 0; i < inactiveGrains.length; i++) {
+                        const grainIndex = inactiveGrains[i];
+                        const grain = granularGrains[grainIndex];
+                        grain.writeSample(tempMonoInstrumentSampleBuffer[sampleIndex]);
+                    }
+                }
+                tempMonoInstrumentSampleBuffer[sampleIndex] = 0.0;
+                `
+            } else {
+                effectsSource += `let sample = tempMonoInstrumentSampleBuffer[sampleIndex];
+                tempMonoInstrumentSampleBuffer[sampleIndex] = 0.0;`
+            }
+
 
             if (usesDistortion) {
                 effectsSource += `
@@ -13973,11 +14193,10 @@ export class Synth {
 				instrumentState.delayInputMult = delayInputMult;`
             }
 
-            // if (usesCorruption) {
-            //     effectsSource += `
-                
-            //     instrumentState.corruption = corruption+1;`
-            // }
+            if (usesGranular) { 
+                effectsSource += `
+                `
+            }
 
             if (usesDistortion) {
                 effectsSource += `

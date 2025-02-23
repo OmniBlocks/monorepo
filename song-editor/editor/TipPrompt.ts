@@ -195,8 +195,9 @@ export class TipPrompt implements Prompt {
 			case "unison": {
 				message = div(
 					h2("Unison"),
-					p("This instrument can play two identical waves at different frequencies. When two waves play at slightly different frequencies, they move in and out of phase with each other over time as different parts of the waves line up. This creates a dynamic, shifting sound. Pianos are a common example of this kind of sound, because each piano key strikes multiple strings that are tuned to slightly different frequencies."),
+					p("This instrument can play multiple identical waves at different frequencies. When two waves play at slightly different frequencies, they move in and out of phase with each other over time as different parts of the waves line up. This creates a dynamic, shifting sound. Pianos are a common example of this kind of sound, because each piano key strikes multiple strings that are tuned to slightly different frequencies."),
 					p("The distance between two frequencies is called an \"interval\", and this setting controls how large it is. If the interval is too wide, then the waves may sound out-of-tune and \"dissonant\". However, if the interval is even larger, then the two frequencies can even be distinct pitches."),
+					p("Adding more than two waves amplifies these effects. "),
 				);
 			} break;
 			case "chords": {
@@ -529,19 +530,19 @@ export class TipPrompt implements Prompt {
 			case "unisonVoices": {
 				message = div(
 					h2("Unison Voices"),
-					p("This setting controls how many voices there are in a unison. Unisons such as \"none\" or \"detune\" use 1 voice, while most other unisons use 2 voices."),
+					p("This setting controls how many voices there are in a unison. Unisons such as \"none\" or \"detune\" use 1 voice, many other unisons use 2 voices, and some use up to " + Config.unisonVoicesMax + " voices"),
 				);
 			} break;
 			case "unisonSpread": {
 				message = div(
 					h2("Unison Spread"),
-					p("This setting controls the distance between the two voices, in semitones. A small amount of spread causes the voice's waves to shift in and out from each other, causing a shimmering effect. Larger spread will cause the voices to act like separate notes."),
+					p("This setting controls the distance between the voices, in semitones. A small amount of spread causes the voice's waves to shift in and out from each other, causing a shimmering effect. Larger spread will cause the voices to act like separate notes."),
 				);
 			} break;
 			case "unisonOffset": {
 				message = div(
 					h2("Unison Offset"),
-					p("This setting controls the detune applied to BOTH voices, in semitones."),
+					p("This setting controls the detune applied to ALL voices, in semitones."),
 				);
 			} break;
 			case "unisonExpression": {
@@ -554,7 +555,7 @@ export class TipPrompt implements Prompt {
 			case "unisonSign": {
 				message = div(
 					h2("Unison Sign"),
-					p("This setting is a volume multiplier applied to the second voice. This setting will only work correctly with two voices."),
+					p("This setting is a volume multiplier applied to every voice EXCEPT the first. This setting will only work correctly with more than one voices."),
 				);
 			} break;
 			case "pitchRange": {
@@ -636,6 +637,31 @@ export class TipPrompt implements Prompt {
 					h2("Ring Modulation (Hertz)"),
 					p(`This setting changes the Hertz of the multiplied frequency.`),
 					// p(`The offset allows you to increment the Hertz by 1.`),
+				);
+			} break;
+			case "granular": {
+				message = div(
+					h2("Granular Synthesis"),
+					p(`This effect is based on granular synthsis! It takes random points from a wave and rearranges them to form "sonic clouds".`),
+					p(`This particular slider controls about how often a grain (a group of audio samples) is added to the output, from very rarely to multiple at once`)
+				);
+			} break;
+			case "grainSize": {
+				message = div(
+					h2("Grain Size"),
+					p(`This setting controls the size of the grain.`),
+				);
+			} break;
+			case "grainEnvelope": {
+				message = div(
+					h2("Grain Envelope"),
+					p(`This setting controls the shape of the envelope that affects the grain.`),
+				);
+			} break;
+			case "grainRange": {
+				message = div(
+					h2("Grain Range"),
+					p(`This setting controls the range of randomization for grain sizes. `),
 				);
 			} break;
 

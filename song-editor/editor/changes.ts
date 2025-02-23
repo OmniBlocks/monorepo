@@ -2411,6 +2411,7 @@ export class ChangeRingMod extends ChangeInstrumentSlider {
         super(doc);
         this._instrument.ringModulation = newValue;
         doc.notifier.changed();
+        doc.synth.unsetMod(Config.modulators.dictionary["ring modulation"].index, doc.channel, doc.getCurrentInstrument());
         if (oldValue != newValue) this._didSomething();
     }
 }
@@ -2420,6 +2421,7 @@ export class ChangeRingModHz extends ChangeInstrumentSlider {
         super(doc);
         this._instrument.ringModulationHz = newValue;
         doc.notifier.changed();
+        doc.synth.unsetMod(Config.modulators.dictionary["ring mod hertz"].index, doc.channel, doc.getCurrentInstrument());
         if (oldValue != newValue) this._didSomething();
     }
 }
@@ -2433,6 +2435,46 @@ export class ChangeRingModChipWave extends Change {
             doc.notifier.changed();
             this._didSomething();
         }
+    }
+}
+
+export class ChangeGranular extends ChangeInstrumentSlider {
+    constructor(doc: SongDocument, oldValue: number, newValue: number) {
+        super(doc);
+        this._instrument.granular = newValue;
+        doc.notifier.changed();
+        doc.synth.unsetMod(Config.modulators.dictionary["granular"].index, doc.channel, doc.getCurrentInstrument());
+        if (oldValue != newValue) this._didSomething();
+    }
+}
+
+export class ChangeGrainSize extends ChangeInstrumentSlider {
+    constructor(doc: SongDocument, oldValue: number, newValue: number) {
+        super(doc);
+        this._instrument.grainSize = newValue;
+        doc.notifier.changed();
+        doc.synth.unsetMod(Config.modulators.dictionary["grain size"].index, doc.channel, doc.getCurrentInstrument());
+        if (oldValue != newValue) this._didSomething();
+    }
+}
+
+export class ChangeGrainEnvelope extends ChangeInstrumentSlider {
+    constructor(doc: SongDocument, oldValue: number, newValue: number) {
+        super(doc);
+        this._instrument.grainEnvelope = newValue;
+        doc.notifier.changed();
+        // doc.synth.unsetMod(Config.modulators.dictionary["granular"].index, doc.channel, doc.getCurrentInstrument());
+        if (oldValue != newValue) this._didSomething();
+    }
+}
+
+export class ChangeGrainRange extends ChangeInstrumentSlider {
+    constructor(doc: SongDocument, oldValue: number, newValue: number) {
+        super(doc);
+        this._instrument.grainRange = newValue;
+        doc.notifier.changed();
+        // doc.synth.unsetMod(Config.modulators.dictionary["grain size"].index, doc.channel, doc.getCurrentInstrument());
+        if (oldValue != newValue) this._didSomething();
     }
 }
 

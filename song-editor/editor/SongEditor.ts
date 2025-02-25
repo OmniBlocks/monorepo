@@ -3408,11 +3408,11 @@ export class SongEditor {
                         if (anyInstrumentEchoes) {
                             settingList.push("echo");
                             // Still need to look into this...
-                            //settingList.push("echo delay");
+                            settingList.push("echo delay");
                         }
                         if (!allInstrumentEchoes) {
                             unusedSettingList.push("+ echo");
-                            //unusedSettingList.push("echo delay");
+                            unusedSettingList.push("echo delay");
                         }
                         if (anyInstrumentReverbs) {
                             settingList.push("reverb");

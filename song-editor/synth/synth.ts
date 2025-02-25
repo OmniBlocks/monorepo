@@ -971,21 +971,20 @@ class HarmonicsWaveState {
 
 class Grain {
     public envelopePeak: number = 0.5;
-    public sampleLine: number[] = [];
+    public readonly sampleLine: number[] = Array(Config.grainSizeMax+Config.grainRangeMax).fill(0.0);
     public grainLength: number = Config.grainSizeMin;
     public grainIndex: number = 0;
     public mode: number = 0; //0 for writeonly, 1 for readonly 
 
     constructor(peak: number, length: number) {
-        this.envelopePeak = peak;
-        this.reset(length);
+        this.reset(length, peak);
     }
 
-    public reset(length: number) {
-        this.sampleLine = [];
+    public reset(length: number, envelope: number) {
         this.mode = 0;
         this.grainIndex = 0;
         this.grainLength = length;
+        this.envelopePeak = envelope;
     }
 
     public static computeEnvelope(time: number, duration: number, peak: number) {
@@ -998,31 +997,32 @@ class Grain {
 
     public addDelay(delay: number) {
         if (this.mode == 1) {
-            this.sampleLine = Array<number>(delay).fill(0).concat(this.sampleLine);
-            this.grainLength += delay;
+            this.grainIndex -= delay;
         } else if(this.sampleLine.length == 0) {
             this.grainIndex -= delay;
         }
     }
 
-    public writeSample(sample: number): boolean { //return true if in readonly
+    public writeSample(sample: number): void {
         if (this.mode == 0) {
-            this.grainIndex++;
             if (this.grainIndex >= 0) {
-                this.sampleLine.push(sample);
+                this.sampleLine[this.grainIndex] = sample;
                 if (this.grainIndex >= this.grainLength) {
                     this.mode = 1;
                     this.grainIndex = 0;
-                    return true;
+                    return;
                 }
             }
-            return false;
+            this.grainIndex++;
         }
-        return true;
     }
 
     public readSample(): number {
         if (this.mode != 1 || this.grainIndex >= this.grainLength) return 0.0;
+        else if (this.grainIndex < 0) {
+            this.grainIndex++;
+            return 0.0;
+        }
         else {
             const sample: number = this.sampleLine[this.grainIndex] * Grain.computeEnvelope(this.grainIndex, this.grainLength, this.envelopePeak);
             this.grainIndex++;
@@ -1783,7 +1783,7 @@ export class Instrument {
         this.ringModulationHz = 0;
         this.ringModWaveformIndex = 0;
         this.granular = 4;
-        this.grainSize = (Config.grainSizeMax - Config.grainSizeMin) / Config.grainSizeStep;;
+        this.grainSize = (Config.grainSizeMax - Config.grainSizeMin) / Config.grainSizeStep;
         this.grainEnvelope = 0.5 / Config.grainEnvelopeStep;
         this.grainRange = 0;
         this.pan = Config.panCenter;
@@ -2559,18 +2559,18 @@ export class Instrument {
         }
 
         if (instrumentObject["granular"] != undefined) {
-            this.granular = clamp(0, Config.granularRange, instrumentObject["granular"]);
+            this.granular = instrumentObject["granular"];
         }
         if (instrumentObject["grainSize"] != undefined) {
-            this.grainSize = clamp(Config.grainSizeMin, Config.grainSizeMax, instrumentObject["grainSize"]);
+            this.grainSize = instrumentObject["grainSize"];
         }
         if (instrumentObject["grainEnvelope"] != undefined) {
-            this.granular = clamp(0, 1 / Config.grainEnvelopeStep, instrumentObject["grainEnvelope"]);
+            this.grainEnvelope = clamp(0, 1 / Config.grainEnvelopeStep, instrumentObject["grainEnvelope"]);
         }
         if (instrumentObject["grainRange"] != undefined) {
-            this.grainSize = clamp(0, Config.grainRangeMax, instrumentObject["grainRange"]);
+            this.grainRange = clamp(0, Config.grainRangeMax / Config.grainSizeStep + 1, instrumentObject["grainRange"]);
         }
-
+        
         if (instrumentObject["distortion"] != undefined) {
             this.distortion = clamp(0, Config.distortionRange, Math.round((Config.distortionRange - 1) * (instrumentObject["distortion"] | 0) / 100));
         }
@@ -8656,6 +8656,9 @@ class InstrumentState {
         for (let i: number = 0; i < Config.drumCount; i++) {
             this.drumsetSpectrumWaves[i] = new SpectrumWaveState();
         }
+        for (let i = 0; i < 1 << Config.granularRange; i++) {
+            this.granularGrains[i] = new Grain(this.grainEnvelope, Config.grainSizeMax);
+        }
     }
 
     public readonly envelopeComputer: EnvelopeComputer = new EnvelopeComputer();
@@ -8675,37 +8678,41 @@ class InstrumentState {
             }
         }
         if (effectsIncludeEcho(instrument.effects)) {
-            // account for tempo and delay automation changing delay length during a tick?
-            const safeEchoDelaySteps: number = Math.max(Config.echoDelayRange >> 1, (instrument.echoDelay + 1)); // The delay may be very short now, but if it increases later make sure we have enough sample history.
-            const baseEchoDelayBufferSize: number = Synth.fittingPowerOfTwo(safeEchoDelaySteps * Config.echoDelayStepTicks * samplesPerTick);
-            const safeEchoDelayBufferSize: number = baseEchoDelayBufferSize * 2; // If the tempo or delay changes and we suddenly need a longer delay, make sure that we have enough sample history to accomodate the longer delay.
-
-            if (this.echoDelayLineL == null || this.echoDelayLineR == null) {
-                this.echoDelayLineL = new Float32Array(safeEchoDelayBufferSize);
-                this.echoDelayLineR = new Float32Array(safeEchoDelayBufferSize);
-            } else if (this.echoDelayLineL.length < safeEchoDelayBufferSize || this.echoDelayLineR.length < safeEchoDelayBufferSize) {
-                // The echo delay length may change while the song is playing if tempo changes,
-                // so buffers may need to be reallocated, but we don't want to lose any echoes
-                // so we need to copy the contents of the old buffer to the new one.
-                const newDelayLineL: Float32Array = new Float32Array(safeEchoDelayBufferSize);
-                const newDelayLineR: Float32Array = new Float32Array(safeEchoDelayBufferSize);
-                const oldMask: number = this.echoDelayLineL.length - 1;
-
-                for (let i = 0; i < this.echoDelayLineL.length; i++) {
-                    newDelayLineL[i] = this.echoDelayLineL[(this.echoDelayPos + i) & oldMask];
-                    newDelayLineR[i] = this.echoDelayLineL[(this.echoDelayPos + i) & oldMask];
-                }
-
-                this.echoDelayPos = this.echoDelayLineL.length;
-                this.echoDelayLineL = newDelayLineL;
-                this.echoDelayLineR = newDelayLineR;
-            }
+            this.allocateEchoBuffers(samplesPerTick, instrument.echoDelay);
         }
         if (effectsIncludeReverb(instrument.effects)) {
             // TODO: Make reverb delay line sample rate agnostic. Maybe just double buffer size for 96KHz? Adjust attenuation and shelf cutoff appropriately?
             if (this.reverbDelayLine == null) {
                 this.reverbDelayLine = new Float32Array(Config.reverbDelayBufferSize);
             }
+        }
+    }
+
+    public allocateEchoBuffers(samplesPerTick: number, echoDelay: number) {
+        // account for tempo and delay automation changing delay length during a tick?
+        const safeEchoDelaySteps: number = Math.max(Config.echoDelayRange >> 1, (echoDelay + 1)); // The delay may be very short now, but if it increases later make sure we have enough sample history.
+        const baseEchoDelayBufferSize: number = Synth.fittingPowerOfTwo(safeEchoDelaySteps * Config.echoDelayStepTicks * samplesPerTick);
+        const safeEchoDelayBufferSize: number = baseEchoDelayBufferSize * 2; // If the tempo or delay changes and we suddenly need a longer delay, make sure that we have enough sample history to accomodate the longer delay.
+
+        if (this.echoDelayLineL == null || this.echoDelayLineR == null) {
+            this.echoDelayLineL = new Float32Array(safeEchoDelayBufferSize);
+            this.echoDelayLineR = new Float32Array(safeEchoDelayBufferSize);
+        } else if (this.echoDelayLineL.length < safeEchoDelayBufferSize || this.echoDelayLineR.length < safeEchoDelayBufferSize) {
+            // The echo delay length may change while the song is playing if tempo changes,
+            // so buffers may need to be reallocated, but we don't want to lose any echoes
+            // so we need to copy the contents of the old buffer to the new one.
+            const newDelayLineL: Float32Array = new Float32Array(safeEchoDelayBufferSize);
+            const newDelayLineR: Float32Array = new Float32Array(safeEchoDelayBufferSize);
+            const oldMask: number = this.echoDelayLineL.length - 1;
+
+            for (let i = 0; i < this.echoDelayLineL.length; i++) {
+                newDelayLineL[i] = this.echoDelayLineL[(this.echoDelayPos + i) & oldMask];
+                newDelayLineR[i] = this.echoDelayLineL[(this.echoDelayPos + i) & oldMask];
+            }
+
+            this.echoDelayPos = this.echoDelayLineL.length;
+            this.echoDelayLineL = newDelayLineL;
+            this.echoDelayLineR = newDelayLineR;
         }
     }
 
@@ -8775,7 +8782,6 @@ class InstrumentState {
         this.ringModPhase = 0.0;
         this.ringModMixFade = 1.0;
         //empty grain silos
-        this.granularGrains = [];
         this.activeGrains = [];
         this.inactiveGrains = [];
         this.storedGrains = [];
@@ -8838,10 +8844,11 @@ class InstrumentState {
         const usesReverb: boolean = effectsIncludeReverb(this.effects);
 
         if (usesGranular) {
+            const grainReuseChance: number = 0.5;
             let useGranularStart: number = instrument.granular;
             let useGranularEnd: number = instrument.granular;
             let grainSizeStart: number = instrument.grainSize * Config.grainSizeStep;
-            let grainEnvelope: number = instrument.grainEnvelope * Config.grainEnvelopeStep;
+            this.grainEnvelope = instrument.grainEnvelope * Config.grainEnvelopeStep;
             let grainRange: number = instrument.grainRange * Config.grainSizeStep;
             // let grainSizeEnd: number = instrument.grainSize;
 
@@ -8867,9 +8874,6 @@ class InstrumentState {
                 // this.grainSizeDelta = (grainSizeEnd - grainSizeStart) / roundedSamplesPerTick;
                 this.maxGranularDelayLength = maxGranularDelayLength;
 
-                for (let i = this.granularGrains.length; i < maxGranularDelayLength; i++) {
-                    this.granularGrains[i] = new Grain(grainEnvelope, Math.max(Config.grainSizeMin, grainSizeStart + Math.floor(grainRange * (Math.random() * 2 - 1))));
-                }
                 /*A grain can be in 1 of 4 states:
                     Active: Is currently reading out samples
                     Stored: Is fully written to; waiting to read out
@@ -8886,17 +8890,15 @@ class InstrumentState {
                     if (grain.grainIndex < grain.grainLength) {
                         activeGrains.push(grainIndex);
                         grainsInUse.push(grainIndex);
-                    } else if (Math.random() > (granularStart / Config.granularRange)) { //chance to go back to storage
+                    } else if (Math.random() < grainReuseChance) { //chance to go back to storage
                         storedGrains.push(grainIndex);
                         grainsInUse.push(grainIndex);
-                    } else { //otherwise reset the grain
-                        grain.reset(grainSizeStart);
-                    }
+                    } //otherwise become unused
                 }
                 for (let i = 0; i < this.storedGrains.length; i++) {
                     const grainIndex: number = this.storedGrains[i];
                     const grain: Grain = this.granularGrains[grainIndex];
-                    grain.envelopePeak = this.grainEnvelope; //reset envelope shape
+                    // grain.envelopePeak = this.grainEnvelope; //reset envelope shape
                     if (Math.random() < (granularStart / Config.granularRange)) { //chance to add to activeGrains (with a delay)
                         activeGrains.push(grainIndex);
                         grainsInUse.push(grainIndex);
@@ -8917,10 +8919,11 @@ class InstrumentState {
                         grainsInUse.push(grainIndex);
                     }
                 }
-                for (let i = 0; i < Math.min(this.granularGrains.length, maxGranularDelayLength); i++) {
+                for (let i = 0; i < maxGranularDelayLength; i++) {
                     if (!grainsInUse.includes(i)) { //looking at unused grains
                         if (Math.random() < (granularStart / Config.granularRange)) { //chance to add to inactiveGrains (with a delay)
                             inactiveGrains.push(i);
+                            this.granularGrains[i].reset(grainSizeStart + Math.floor(grainRange * (Math.random() * 2 - 1)), this.grainEnvelope)
                             this.granularGrains[i].addDelay(Math.floor(Math.random() * roundedSamplesPerTick));
                         }
                         //otherwise leave alone
@@ -9224,6 +9227,7 @@ class InstrumentState {
         let maxEchoMult = 0.0;
         let averageEchoDelaySeconds: number = 0.0;
         if (usesEcho) {
+
             const echoSustainEnvelopeStart: number = envelopeStarts[EnvelopeComputeIndex.echoSustain];
             const echoSustainEnvelopeEnd: number = envelopeEnds[EnvelopeComputeIndex.echoSustain];
             let useEchoSustainStart: number = instrument.echoSustain;
@@ -9242,21 +9246,21 @@ class InstrumentState {
             // TODO: After computing a tick's settings once for multiple run lengths (which is
             // good for audio worklet threads), compute the echo delay envelopes at tick (or
             // part) boundaries to interpolate between two delay taps.
-            //const echoDelayEnvelopeStart: number = envelopeStarts[EnvelopeComputeIndex.echoDelay];
-            //const echoDelayEnvelopeEnd: number = envelopeEnds[EnvelopeComputeIndex.echoDelay];
-            let useEchoDelayStart: number = instrument.echoDelay;
-            let useEchoDelayEnd: number = instrument.echoDelay;
+            const echoDelayEnvelopeStart: number = envelopeStarts[EnvelopeComputeIndex.echoDelay];
+            const echoDelayEnvelopeEnd: number = envelopeEnds[EnvelopeComputeIndex.echoDelay];
+            let useEchoDelayStart: number = instrument.echoDelay * echoDelayEnvelopeStart;
+            let useEchoDelayEnd: number = instrument.echoDelay * echoDelayEnvelopeEnd;
             let ignoreTicks: boolean = false;
-            // Check for pan delay mods
+            // Check for echo delay mods
             if (synth.isModActive(Config.modulators.dictionary["echo delay"].index, channelIndex, instrumentIndex)) {
-                useEchoDelayStart = synth.getModValue(Config.modulators.dictionary["echo delay"].index, channelIndex, instrumentIndex, false);
-                useEchoDelayEnd = synth.getModValue(Config.modulators.dictionary["echo delay"].index, channelIndex, instrumentIndex, true);
-                ignoreTicks = true;
+                useEchoDelayStart = synth.getModValue(Config.modulators.dictionary["echo delay"].index, channelIndex, instrumentIndex, false) * echoDelayEnvelopeStart;
+                useEchoDelayEnd = synth.getModValue(Config.modulators.dictionary["echo delay"].index, channelIndex, instrumentIndex, true) * echoDelayEnvelopeEnd;
+                // ignoreTicks = true;
+                this.allocateEchoBuffers(samplesPerTick, Math.max(useEchoDelayStart,useEchoDelayEnd)); //update buffer size for modulation / envelopes
             }
-
             const tmpEchoDelayOffsetStart: number = ignoreTicks ? (useEchoDelayStart + 1) * Config.echoDelayStepTicks * samplesPerTick : Math.round((useEchoDelayStart + 1) * Config.echoDelayStepTicks * samplesPerTick);
             const tmpEchoDelayOffsetEnd: number = ignoreTicks ? (useEchoDelayEnd + 1) * Config.echoDelayStepTicks * samplesPerTick : Math.round((useEchoDelayEnd + 1) * Config.echoDelayStepTicks * samplesPerTick);
-            if (this.echoDelayOffsetEnd != null && !ignoreTicks) {
+            if (this.echoDelayOffsetEnd != null /*&& !ignoreTicks*/) {
                 this.echoDelayOffsetStart = this.echoDelayOffsetEnd;
             } else {
                 this.echoDelayOffsetStart = tmpEchoDelayOffsetStart;
@@ -13870,7 +13874,6 @@ export class Synth {
 
             if (usesEcho) {
                 effectsSource += `
-				
 				let echoMult = +instrumentState.echoMult;
 				const echoMultDelta = +instrumentState.echoMultDelta;
 				
@@ -13930,14 +13933,16 @@ export class Synth {
                     sample = tempMonoInstrumentSampleBuffer[sampleIndex];
                 } else {
                     let simultaneousVoices = 0;
+                    //output grain samples
                     for (let i = 0; i < activeGrains.length; i++) {
                         const grainIndex = activeGrains[i];
                         const grain = granularGrains[grainIndex];
                         const sampleRead = grain.readSample();
                         sample += sampleRead
-                        // simultaneousVoices += Math.ceil(Math.abs(sampleRead)); //only read grains that are actually outputting a value
+                        simultaneousVoices += Math.ceil(Math.abs(sampleRead)); //only read grains that are actually outputting a value
                     }
-                    // sample = sample/simultaneousVoices * 2 //the 2 accounts for grain envelopes
+                    sample /= Math.sqrt(simultaneousVoices) //dampen granular if too many grains are playing at once
+                    //input grain samples
                     for (let i = 0; i < inactiveGrains.length; i++) {
                         const grainIndex = inactiveGrains[i];
                         const grain = granularGrains[grainIndex];

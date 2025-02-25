@@ -1130,6 +1130,7 @@ var beepbox = (function (exports) {
         { name: "ringModulationHz", computeIndex: 50, displayName: "ring mod hz", interleave: false, isFilter: false, maxCount: 1, effect: 13, compatibleInstruments: null },
         { name: "granular", computeIndex: 51, displayName: "granular", interleave: false, isFilter: false, maxCount: 1, effect: 14, compatibleInstruments: null },
         { name: "grainSize", computeIndex: 52, displayName: "grain size", interleave: false, isFilter: false, maxCount: 1, effect: 14, compatibleInstruments: null },
+        { name: "echoDelay", computeIndex: 53, displayName: "echo delay", interleave: false, isFilter: false, maxCount: 1, effect: 6, compatibleInstruments: null },
     ]);
     Config.operatorWaves = toNameMap([
         { name: "sine", samples: _a.sineWave },
@@ -3289,18 +3290,17 @@ var beepbox = (function (exports) {
     class Grain {
         constructor(peak, length) {
             this.envelopePeak = 0.5;
-            this.sampleLine = [];
+            this.sampleLine = Array(Config.grainSizeMax + Config.grainRangeMax).fill(0.0);
             this.grainLength = Config.grainSizeMin;
             this.grainIndex = 0;
             this.mode = 0;
-            this.envelopePeak = peak;
-            this.reset(length);
+            this.reset(length, peak);
         }
-        reset(length) {
-            this.sampleLine = [];
+        reset(length, envelope) {
             this.mode = 0;
             this.grainIndex = 0;
             this.grainLength = length;
+            this.envelopePeak = envelope;
         }
         static computeEnvelope(time, duration, peak) {
             if (time <= peak * duration) {
@@ -3312,8 +3312,7 @@ var beepbox = (function (exports) {
         }
         addDelay(delay) {
             if (this.mode == 1) {
-                this.sampleLine = Array(delay).fill(0).concat(this.sampleLine);
-                this.grainLength += delay;
+                this.grainIndex -= delay;
             }
             else if (this.sampleLine.length == 0) {
                 this.grainIndex -= delay;
@@ -3321,22 +3320,24 @@ var beepbox = (function (exports) {
         }
         writeSample(sample) {
             if (this.mode == 0) {
-                this.grainIndex++;
                 if (this.grainIndex >= 0) {
-                    this.sampleLine.push(sample);
+                    this.sampleLine[this.grainIndex] = sample;
                     if (this.grainIndex >= this.grainLength) {
                         this.mode = 1;
                         this.grainIndex = 0;
-                        return true;
+                        return;
                     }
                 }
-                return false;
+                this.grainIndex++;
             }
-            return true;
         }
         readSample() {
             if (this.mode != 1 || this.grainIndex >= this.grainLength)
                 return 0.0;
+            else if (this.grainIndex < 0) {
+                this.grainIndex++;
+                return 0.0;
+            }
             else {
                 const sample = this.sampleLine[this.grainIndex] * Grain.computeEnvelope(this.grainIndex, this.grainLength, this.envelopePeak);
                 this.grainIndex++;
@@ -4704,16 +4705,16 @@ var beepbox = (function (exports) {
                 this.ringModWaveformIndex = clamp(0, Config.operatorWaves.length, instrumentObject["ringModWaveformIndex"]);
             }
             if (instrumentObject["granular"] != undefined) {
-                this.granular = clamp(0, Config.granularRange, instrumentObject["granular"]);
+                this.granular = instrumentObject["granular"];
             }
             if (instrumentObject["grainSize"] != undefined) {
-                this.grainSize = clamp(Config.grainSizeMin, Config.grainSizeMax, instrumentObject["grainSize"]);
+                this.grainSize = instrumentObject["grainSize"];
             }
             if (instrumentObject["grainEnvelope"] != undefined) {
-                this.granular = clamp(0, 1 / Config.grainEnvelopeStep, instrumentObject["grainEnvelope"]);
+                this.grainEnvelope = clamp(0, 1 / Config.grainEnvelopeStep, instrumentObject["grainEnvelope"]);
             }
             if (instrumentObject["grainRange"] != undefined) {
-                this.grainSize = clamp(0, Config.grainRangeMax, instrumentObject["grainRange"]);
+                this.grainRange = clamp(0, Config.grainRangeMax / Config.grainSizeStep + 1, instrumentObject["grainRange"]);
             }
             if (instrumentObject["distortion"] != undefined) {
                 this.distortion = clamp(0, Config.distortionRange, Math.round((Config.distortionRange - 1) * (instrumentObject["distortion"] | 0) / 100));
@@ -9573,7 +9574,7 @@ var beepbox = (function (exports) {
             this._modifiedEnvelopeIndices = [];
             this._modifiedEnvelopeCount = 0;
             this.lowpassCutoffDecayVolumeCompensation = 1.0;
-            const length = 53;
+            const length = 54;
             for (let i = 0; i < length; i++) {
                 this.envelopeStarts[i] = 1.0;
                 this.envelopeEnds[i] = 1.0;
@@ -10377,6 +10378,9 @@ var beepbox = (function (exports) {
             for (let i = 0; i < Config.drumCount; i++) {
                 this.drumsetSpectrumWaves[i] = new SpectrumWaveState();
             }
+            for (let i = 0; i < 1 << Config.granularRange; i++) {
+                this.granularGrains[i] = new Grain(this.grainEnvelope, Config.grainSizeMax);
+            }
         }
         allocateNecessaryBuffers(synth, instrument, samplesPerTick) {
             if (effectsIncludePanning(instrument.effects)) {
@@ -10393,30 +10397,33 @@ var beepbox = (function (exports) {
                 }
             }
             if (effectsIncludeEcho(instrument.effects)) {
-                const safeEchoDelaySteps = Math.max(Config.echoDelayRange >> 1, (instrument.echoDelay + 1));
-                const baseEchoDelayBufferSize = Synth.fittingPowerOfTwo(safeEchoDelaySteps * Config.echoDelayStepTicks * samplesPerTick);
-                const safeEchoDelayBufferSize = baseEchoDelayBufferSize * 2;
-                if (this.echoDelayLineL == null || this.echoDelayLineR == null) {
-                    this.echoDelayLineL = new Float32Array(safeEchoDelayBufferSize);
-                    this.echoDelayLineR = new Float32Array(safeEchoDelayBufferSize);
-                }
-                else if (this.echoDelayLineL.length < safeEchoDelayBufferSize || this.echoDelayLineR.length < safeEchoDelayBufferSize) {
-                    const newDelayLineL = new Float32Array(safeEchoDelayBufferSize);
-                    const newDelayLineR = new Float32Array(safeEchoDelayBufferSize);
-                    const oldMask = this.echoDelayLineL.length - 1;
-                    for (let i = 0; i < this.echoDelayLineL.length; i++) {
-                        newDelayLineL[i] = this.echoDelayLineL[(this.echoDelayPos + i) & oldMask];
-                        newDelayLineR[i] = this.echoDelayLineL[(this.echoDelayPos + i) & oldMask];
-                    }
-                    this.echoDelayPos = this.echoDelayLineL.length;
-                    this.echoDelayLineL = newDelayLineL;
-                    this.echoDelayLineR = newDelayLineR;
-                }
+                this.allocateEchoBuffers(samplesPerTick, instrument.echoDelay);
             }
             if (effectsIncludeReverb(instrument.effects)) {
                 if (this.reverbDelayLine == null) {
                     this.reverbDelayLine = new Float32Array(Config.reverbDelayBufferSize);
                 }
+            }
+        }
+        allocateEchoBuffers(samplesPerTick, echoDelay) {
+            const safeEchoDelaySteps = Math.max(Config.echoDelayRange >> 1, (echoDelay + 1));
+            const baseEchoDelayBufferSize = Synth.fittingPowerOfTwo(safeEchoDelaySteps * Config.echoDelayStepTicks * samplesPerTick);
+            const safeEchoDelayBufferSize = baseEchoDelayBufferSize * 2;
+            if (this.echoDelayLineL == null || this.echoDelayLineR == null) {
+                this.echoDelayLineL = new Float32Array(safeEchoDelayBufferSize);
+                this.echoDelayLineR = new Float32Array(safeEchoDelayBufferSize);
+            }
+            else if (this.echoDelayLineL.length < safeEchoDelayBufferSize || this.echoDelayLineR.length < safeEchoDelayBufferSize) {
+                const newDelayLineL = new Float32Array(safeEchoDelayBufferSize);
+                const newDelayLineR = new Float32Array(safeEchoDelayBufferSize);
+                const oldMask = this.echoDelayLineL.length - 1;
+                for (let i = 0; i < this.echoDelayLineL.length; i++) {
+                    newDelayLineL[i] = this.echoDelayLineL[(this.echoDelayPos + i) & oldMask];
+                    newDelayLineR[i] = this.echoDelayLineL[(this.echoDelayPos + i) & oldMask];
+                }
+                this.echoDelayPos = this.echoDelayLineL.length;
+                this.echoDelayLineL = newDelayLineL;
+                this.echoDelayLineR = newDelayLineR;
             }
         }
         deactivate() {
@@ -10486,7 +10493,6 @@ var beepbox = (function (exports) {
             this.chorusPhase = 0.0;
             this.ringModPhase = 0.0;
             this.ringModMixFade = 1.0;
-            this.granularGrains = [];
             this.activeGrains = [];
             this.inactiveGrains = [];
             this.storedGrains = [];
@@ -10541,10 +10547,11 @@ var beepbox = (function (exports) {
             const usesEcho = effectsIncludeEcho(this.effects);
             const usesReverb = effectsIncludeReverb(this.effects);
             if (usesGranular) {
+                const grainReuseChance = 0.5;
                 let useGranularStart = instrument.granular;
                 let useGranularEnd = instrument.granular;
                 let grainSizeStart = instrument.grainSize * Config.grainSizeStep;
-                let grainEnvelope = instrument.grainEnvelope * Config.grainEnvelopeStep;
+                this.grainEnvelope = instrument.grainEnvelope * Config.grainEnvelopeStep;
                 let grainRange = instrument.grainRange * Config.grainSizeStep;
                 if (synth.isModActive(Config.modulators.dictionary["granular"].index, channelIndex, instrumentIndex)) {
                     useGranularStart = synth.getModValue(Config.modulators.dictionary["granular"].index, channelIndex, instrumentIndex, false);
@@ -10560,9 +10567,6 @@ var beepbox = (function (exports) {
                     const granularDelayLengthEnd = Math.floor(Math.pow(2, useGranularEnd * envelopeEnds[51]));
                     const maxGranularDelayLength = Math.max(granularDelayLengthStart, granularDelayLengthEnd);
                     this.maxGranularDelayLength = maxGranularDelayLength;
-                    for (let i = this.granularGrains.length; i < maxGranularDelayLength; i++) {
-                        this.granularGrains[i] = new Grain(grainEnvelope, Math.max(Config.grainSizeMin, grainSizeStart + Math.floor(grainRange * (Math.random() * 2 - 1))));
-                    }
                     let activeGrains = [];
                     let storedGrains = [];
                     let inactiveGrains = [];
@@ -10574,18 +10578,14 @@ var beepbox = (function (exports) {
                             activeGrains.push(grainIndex);
                             grainsInUse.push(grainIndex);
                         }
-                        else if (Math.random() > (granularStart / Config.granularRange)) {
+                        else if (Math.random() < grainReuseChance) {
                             storedGrains.push(grainIndex);
                             grainsInUse.push(grainIndex);
-                        }
-                        else {
-                            grain.reset(grainSizeStart);
                         }
                     }
                     for (let i = 0; i < this.storedGrains.length; i++) {
                         const grainIndex = this.storedGrains[i];
                         const grain = this.granularGrains[grainIndex];
-                        grain.envelopePeak = this.grainEnvelope;
                         if (Math.random() < (granularStart / Config.granularRange)) {
                             activeGrains.push(grainIndex);
                             grainsInUse.push(grainIndex);
@@ -10608,10 +10608,11 @@ var beepbox = (function (exports) {
                             grainsInUse.push(grainIndex);
                         }
                     }
-                    for (let i = 0; i < Math.min(this.granularGrains.length, maxGranularDelayLength); i++) {
+                    for (let i = 0; i < maxGranularDelayLength; i++) {
                         if (!grainsInUse.includes(i)) {
                             if (Math.random() < (granularStart / Config.granularRange)) {
                                 inactiveGrains.push(i);
+                                this.granularGrains[i].reset(grainSizeStart + Math.floor(grainRange * (Math.random() * 2 - 1)), this.grainEnvelope);
                                 this.granularGrains[i].addDelay(Math.floor(Math.random() * roundedSamplesPerTick));
                             }
                         }
@@ -10860,17 +10861,18 @@ var beepbox = (function (exports) {
                 this.echoMult = echoMultStart;
                 this.echoMultDelta = Math.max(0.0, (echoMultEnd - echoMultStart) / roundedSamplesPerTick);
                 maxEchoMult = Math.max(echoMultStart, echoMultEnd);
-                let useEchoDelayStart = instrument.echoDelay;
-                let useEchoDelayEnd = instrument.echoDelay;
-                let ignoreTicks = false;
+                const echoDelayEnvelopeStart = envelopeStarts[53];
+                const echoDelayEnvelopeEnd = envelopeEnds[53];
+                let useEchoDelayStart = instrument.echoDelay * echoDelayEnvelopeStart;
+                let useEchoDelayEnd = instrument.echoDelay * echoDelayEnvelopeEnd;
                 if (synth.isModActive(Config.modulators.dictionary["echo delay"].index, channelIndex, instrumentIndex)) {
-                    useEchoDelayStart = synth.getModValue(Config.modulators.dictionary["echo delay"].index, channelIndex, instrumentIndex, false);
-                    useEchoDelayEnd = synth.getModValue(Config.modulators.dictionary["echo delay"].index, channelIndex, instrumentIndex, true);
-                    ignoreTicks = true;
+                    useEchoDelayStart = synth.getModValue(Config.modulators.dictionary["echo delay"].index, channelIndex, instrumentIndex, false) * echoDelayEnvelopeStart;
+                    useEchoDelayEnd = synth.getModValue(Config.modulators.dictionary["echo delay"].index, channelIndex, instrumentIndex, true) * echoDelayEnvelopeEnd;
+                    this.allocateEchoBuffers(samplesPerTick, Math.max(useEchoDelayStart, useEchoDelayEnd));
                 }
-                const tmpEchoDelayOffsetStart = ignoreTicks ? (useEchoDelayStart + 1) * Config.echoDelayStepTicks * samplesPerTick : Math.round((useEchoDelayStart + 1) * Config.echoDelayStepTicks * samplesPerTick);
-                const tmpEchoDelayOffsetEnd = ignoreTicks ? (useEchoDelayEnd + 1) * Config.echoDelayStepTicks * samplesPerTick : Math.round((useEchoDelayEnd + 1) * Config.echoDelayStepTicks * samplesPerTick);
-                if (this.echoDelayOffsetEnd != null && !ignoreTicks) {
+                const tmpEchoDelayOffsetStart = Math.round((useEchoDelayStart + 1) * Config.echoDelayStepTicks * samplesPerTick);
+                const tmpEchoDelayOffsetEnd = Math.round((useEchoDelayEnd + 1) * Config.echoDelayStepTicks * samplesPerTick);
+                if (this.echoDelayOffsetEnd != null) {
                     this.echoDelayOffsetStart = this.echoDelayOffsetEnd;
                 }
                 else {
@@ -14868,7 +14870,6 @@ var beepbox = (function (exports) {
                 }
                 if (usesEcho) {
                     effectsSource += `
-				
 				let echoMult = +instrumentState.echoMult;
 				const echoMultDelta = +instrumentState.echoMultDelta;
 				
@@ -14926,14 +14927,16 @@ var beepbox = (function (exports) {
                     sample = tempMonoInstrumentSampleBuffer[sampleIndex];
                 } else {
                     let simultaneousVoices = 0;
+                    //output grain samples
                     for (let i = 0; i < activeGrains.length; i++) {
                         const grainIndex = activeGrains[i];
                         const grain = granularGrains[grainIndex];
                         const sampleRead = grain.readSample();
                         sample += sampleRead
-                        // simultaneousVoices += Math.ceil(Math.abs(sampleRead)); //only read grains that are actually outputting a value
+                        simultaneousVoices += Math.ceil(Math.abs(sampleRead)); //only read grains that are actually outputting a value
                     }
-                    // sample = sample/simultaneousVoices * 2 //the 2 accounts for grain envelopes
+                    sample /= Math.sqrt(simultaneousVoices) //dampen granular if too many grains are playing at once
+                    //input grain samples
                     for (let i = 0; i < inactiveGrains.length; i++) {
                         const grainIndex = inactiveGrains[i];
                         const grain = granularGrains[grainIndex];

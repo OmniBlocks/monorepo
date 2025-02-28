@@ -3292,19 +3292,17 @@ var beepbox = (function (exports) {
         }
     }
     class Grain {
-        constructor(peak, length) {
-            this.envelopePeak = 0.5;
+        constructor(length) {
             this.sampleLine = Array(Config.grainSizeMax + Config.grainRangeMax).fill(0.0);
             this.grainLength = Config.grainSizeMin;
             this.grainIndex = 0;
             this.mode = 0;
-            this.reset(length, peak);
+            this.reset(length);
         }
-        reset(length, envelope) {
+        reset(length) {
             this.mode = 0;
             this.grainIndex = 0;
             this.grainLength = length;
-            this.envelopePeak = envelope;
         }
         static computeEnvelope(time, duration, peak) {
             if (time <= peak * duration) {
@@ -3315,12 +3313,7 @@ var beepbox = (function (exports) {
             }
         }
         addDelay(delay) {
-            if (this.mode == 1) {
-                this.grainIndex -= delay;
-            }
-            else if (this.sampleLine.length == 0) {
-                this.grainIndex -= delay;
-            }
+            this.grainIndex -= delay;
         }
         writeSample(sample) {
             if (this.mode == 0) {
@@ -3335,7 +3328,7 @@ var beepbox = (function (exports) {
                 this.grainIndex++;
             }
         }
-        readSample() {
+        readSample(envelope) {
             if (this.mode != 1 || this.grainIndex >= this.grainLength)
                 return 0.0;
             else if (this.grainIndex < 0) {
@@ -3343,7 +3336,7 @@ var beepbox = (function (exports) {
                 return 0.0;
             }
             else {
-                const sample = this.sampleLine[this.grainIndex] * Grain.computeEnvelope(this.grainIndex, this.grainLength, this.envelopePeak);
+                const sample = this.sampleLine[this.grainIndex] * Grain.computeEnvelope(this.grainIndex, this.grainLength, envelope);
                 this.grainIndex++;
                 return sample;
             }
@@ -10407,7 +10400,7 @@ var beepbox = (function (exports) {
                 this.drumsetSpectrumWaves[i] = new SpectrumWaveState();
             }
             for (let i = 0; i < 1 << Config.granularRange; i++) {
-                this.granularGrains[i] = new Grain(this.grainEnvelope, Config.grainSizeMax);
+                this.granularGrains[i] = new Grain(Config.grainSizeMax);
             }
         }
         allocateNecessaryBuffers(synth, instrument, samplesPerTick) {
@@ -10640,7 +10633,7 @@ var beepbox = (function (exports) {
                         if (!grainsInUse.includes(i)) {
                             if (Math.random() < (granularStart / Config.granularRange)) {
                                 inactiveGrains.push(i);
-                                this.granularGrains[i].reset(grainSizeStart + Math.floor(grainRange * (Math.random() * 2 - 1)), this.grainEnvelope);
+                                this.granularGrains[i].reset(grainSizeStart + Math.floor(grainRange * (Math.random() * 2 - 1)));
                                 this.granularGrains[i].addDelay(Math.floor(Math.random() * roundedSamplesPerTick));
                             }
                         }
@@ -14764,6 +14757,7 @@ var beepbox = (function (exports) {
                 const activeGrains = instrumentState.activeGrains;
                 const inactiveGrains = instrumentState.inactiveGrains;
                 const granular = instrumentState.granular;
+                const grainEnvelope = instrumentState.grainEnvelope;
                 // const storedGrains = instrumentState.storedGrains;
                 `;
                 }
@@ -14953,12 +14947,12 @@ var beepbox = (function (exports) {
                 if(granular == 0) {
                     sample = tempMonoInstrumentSampleBuffer[sampleIndex];
                 } else {
-                    let simultaneousVoices = 0;
+                    let simultaneousVoices = 1;
                     //output grain samples
                     for (let i = 0; i < activeGrains.length; i++) {
                         const grainIndex = activeGrains[i];
                         const grain = granularGrains[grainIndex];
-                        const sampleRead = grain.readSample();
+                        const sampleRead = grain.readSample(grainEnvelope);
                         sample += sampleRead
                         simultaneousVoices += Math.ceil(Math.abs(sampleRead)); //only read grains that are actually outputting a value
                     }

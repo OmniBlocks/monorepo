@@ -970,21 +970,20 @@ class HarmonicsWaveState {
 }
 
 class Grain {
-    public envelopePeak: number = 0.5;
+    // public envelopePeak: number = 0.5;
     public readonly sampleLine: number[] = Array(Config.grainSizeMax+Config.grainRangeMax).fill(0.0);
     public grainLength: number = Config.grainSizeMin;
     public grainIndex: number = 0;
-    public mode: number = 0; //0 for writeonly, 1 for readonly 
+    public mode: number = 0; //0 for writeonly, 1 for readonly
 
-    constructor(peak: number, length: number) {
-        this.reset(length, peak);
+    constructor(length: number) {
+        this.reset(length);
     }
 
-    public reset(length: number, envelope: number) {
+    public reset(length: number) {
         this.mode = 0;
         this.grainIndex = 0;
         this.grainLength = length;
-        this.envelopePeak = envelope;
     }
 
     public static computeEnvelope(time: number, duration: number, peak: number) {
@@ -996,11 +995,7 @@ class Grain {
     }
 
     public addDelay(delay: number) {
-        if (this.mode == 1) {
-            this.grainIndex -= delay;
-        } else if(this.sampleLine.length == 0) {
-            this.grainIndex -= delay;
-        }
+        this.grainIndex -= delay;
     }
 
     public writeSample(sample: number): void {
@@ -1017,14 +1012,13 @@ class Grain {
         }
     }
 
-    public readSample(): number {
+    public readSample(envelope: number): number {
         if (this.mode != 1 || this.grainIndex >= this.grainLength) return 0.0;
         else if (this.grainIndex < 0) {
             this.grainIndex++;
             return 0.0;
-        }
-        else {
-            const sample: number = this.sampleLine[this.grainIndex] * Grain.computeEnvelope(this.grainIndex, this.grainLength, this.envelopePeak);
+        } else {
+            const sample: number = this.sampleLine[this.grainIndex] * Grain.computeEnvelope(this.grainIndex, this.grainLength, envelope);
             this.grainIndex++;
             return sample;
         }
@@ -8681,7 +8675,7 @@ class InstrumentState {
             this.drumsetSpectrumWaves[i] = new SpectrumWaveState();
         }
         for (let i = 0; i < 1 << Config.granularRange; i++) {
-            this.granularGrains[i] = new Grain(this.grainEnvelope, Config.grainSizeMax);
+            this.granularGrains[i] = new Grain(Config.grainSizeMax);
         }
     }
 
@@ -8922,7 +8916,6 @@ class InstrumentState {
                 for (let i = 0; i < this.storedGrains.length; i++) {
                     const grainIndex: number = this.storedGrains[i];
                     const grain: Grain = this.granularGrains[grainIndex];
-                    // grain.envelopePeak = this.grainEnvelope; //reset envelope shape
                     if (Math.random() < (granularStart / Config.granularRange)) { //chance to add to activeGrains (with a delay)
                         activeGrains.push(grainIndex);
                         grainsInUse.push(grainIndex);
@@ -8947,7 +8940,7 @@ class InstrumentState {
                     if (!grainsInUse.includes(i)) { //looking at unused grains
                         if (Math.random() < (granularStart / Config.granularRange)) { //chance to add to inactiveGrains (with a delay)
                             inactiveGrains.push(i);
-                            this.granularGrains[i].reset(grainSizeStart + Math.floor(grainRange * (Math.random() * 2 - 1)), this.grainEnvelope)
+                            this.granularGrains[i].reset(grainSizeStart + Math.floor(grainRange * (Math.random() * 2 - 1)))
                             this.granularGrains[i].addDelay(Math.floor(Math.random() * roundedSamplesPerTick));
                         }
                         //otherwise leave alone
@@ -13744,6 +13737,7 @@ export class Synth {
                 const activeGrains = instrumentState.activeGrains;
                 const inactiveGrains = instrumentState.inactiveGrains;
                 const granular = instrumentState.granular;
+                const grainEnvelope = instrumentState.grainEnvelope;
                 // const storedGrains = instrumentState.storedGrains;
                 `
             }
@@ -13956,12 +13950,12 @@ export class Synth {
                 if(granular == 0) {
                     sample = tempMonoInstrumentSampleBuffer[sampleIndex];
                 } else {
-                    let simultaneousVoices = 0;
+                    let simultaneousVoices = 1;
                     //output grain samples
                     for (let i = 0; i < activeGrains.length; i++) {
                         const grainIndex = activeGrains[i];
                         const grain = granularGrains[grainIndex];
-                        const sampleRead = grain.readSample();
+                        const sampleRead = grain.readSample(grainEnvelope);
                         sample += sampleRead
                         simultaneousVoices += Math.ceil(Math.abs(sampleRead)); //only read grains that are actually outputting a value
                     }

@@ -3271,10 +3271,16 @@ export class Song {
                 let bitCrushIndex: number = Config.modulators.dictionary["bit crush"].index;
                 let freqCrushIndex: number = Config.modulators.dictionary["freq crush"].index;
                 let echoIndex: number = Config.modulators.dictionary["echo"].index;
-                let echoDelayIndex: number = Config.modulators.dictionary["echo delay"].index; //currently disabled, but we'll support it for when it gets fixed
+                let echoDelayIndex: number = Config.modulators.dictionary["echo delay"].index; 
                 let pitchShiftIndex: number = Config.modulators.dictionary["pitch shift"].index;
+                let ringModIndex: number = Config.modulators.dictionary["ring modulation"].index;
+                let ringModHertzIndex: number = Config.modulators.dictionary["ring mod hertz"].index;
+                let granularIndex: number = Config.modulators.dictionary["granular"].index;
+                let grainSizeIndex: number = Config.modulators.dictionary["grain size"].index;
                 let envSpeedIndex: number = Config.modulators.dictionary["envelope speed"].index;
                 let perEnvSpeedIndex: number = Config.modulators.dictionary["individual envelope speed"].index;
+                let perEnvLowerIndex: number = Config.modulators.dictionary["individual envelope lower bound"].index;
+                let perEnvUpperIndex: number = Config.modulators.dictionary["individual envelope upper bound"].index;
                 let instrumentIndex: number = instrument.modInstruments[modCount];
 
                 switch (currentIndex) {
@@ -3323,11 +3329,29 @@ export class Song {
                     case pitchShiftIndex:
                         vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].pitchShift;
                         break;
+                    case ringModIndex:
+                        vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].ringModulation - Config.modulators[ringModIndex].convertRealFactor;
+                        break;
+                    case ringModHertzIndex:
+                        vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].ringModulationHz - Config.modulators[ringModHertzIndex].convertRealFactor;
+                        break;
+                    case granularIndex:
+                        vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].granular - Config.modulators[granularIndex].convertRealFactor;
+                        break;
+                    case grainSizeIndex:
+                        vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].grainSize - Config.modulators[grainSizeIndex].convertRealFactor;
+                        break;
                     case envSpeedIndex:
                         vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].envelopeSpeed - Config.modulators[envSpeedIndex].convertRealFactor;
                         break;
                     case perEnvSpeedIndex:
                         vol = Config.perEnvelopeSpeedToIndices[this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].envelopes[instrument.modEnvelopeNumbers[modCount]].perEnvelopeSpeed] - Config.modulators[perEnvSpeedIndex].convertRealFactor;
+                        break;
+                    case perEnvLowerIndex:
+                        vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].envelopes[instrument.modEnvelopeNumbers[modCount]].perEnvelopeLowerBound - Config.modulators[perEnvLowerIndex].convertRealFactor;
+                        break;
+                    case perEnvUpperIndex:
+                        vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].envelopes[instrument.modEnvelopeNumbers[modCount]].perEnvelopeUpperBound - Config.modulators[perEnvUpperIndex].convertRealFactor;
                         break;
                 }
             }    
@@ -9256,7 +9280,7 @@ class InstrumentState {
                 useEchoDelayStart = synth.getModValue(Config.modulators.dictionary["echo delay"].index, channelIndex, instrumentIndex, false) * echoDelayEnvelopeStart;
                 useEchoDelayEnd = synth.getModValue(Config.modulators.dictionary["echo delay"].index, channelIndex, instrumentIndex, true) * echoDelayEnvelopeEnd;
                 // ignoreTicks = true;
-                this.allocateEchoBuffers(samplesPerTick, Math.max(useEchoDelayStart,useEchoDelayEnd)); //update buffer size for modulation / envelopes
+                // this.allocateEchoBuffers(samplesPerTick, Math.max(useEchoDelayStart,useEchoDelayEnd)); //update buffer size for modulation / envelopes
             }
             const tmpEchoDelayOffsetStart: number = ignoreTicks ? (useEchoDelayStart + 1) * Config.echoDelayStepTicks * samplesPerTick : Math.round((useEchoDelayStart + 1) * Config.echoDelayStepTicks * samplesPerTick);
             const tmpEchoDelayOffsetEnd: number = ignoreTicks ? (useEchoDelayEnd + 1) * Config.echoDelayStepTicks * samplesPerTick : Math.round((useEchoDelayEnd + 1) * Config.echoDelayStepTicks * samplesPerTick);

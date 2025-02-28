@@ -3,7 +3,7 @@
 import { Algorithm, Dictionary, FilterType, SustainType, InstrumentType, EffectType, AutomationTarget, Config, effectsIncludeDistortion, LFOEnvelopeTypes, RandomEnvelopeTypes } from "../synth/SynthConfig";
 import { NotePin, Note, makeNotePin, Pattern, FilterSettings, FilterControlPoint, SpectrumWave, HarmonicsWave, Instrument, Channel, Song, Synth, clamp } from "../synth/synth";
 import { Preset, PresetCategory, EditorConfig } from "./EditorConfig";
-import { Change, ChangeGroup, ChangeSequence, UndoableChange, IndexableChange} from "./Change";
+import { Change, ChangeGroup, ChangeSequence, UndoableChange } from "./Change";
 import { SongDocument } from "./SongDocument";
 import { ColorConfig } from "./ColorConfig";
 import { Slider } from "./HTMLWrapper";
@@ -2339,6 +2339,21 @@ class ChangeInstrumentSlider extends Change {
     }
 }
 
+
+//for envelope mod recording
+class IndexableChange extends ChangeInstrumentSlider {
+    constructor(index: number, _doc: SongDocument) {
+        super(_doc);
+        this.index = index;
+    }
+
+    private index: number = 0;
+
+    public getIndex(): number {
+        return this.index;
+    }
+}
+
 export class ChangePulseWidth extends ChangeInstrumentSlider {
     constructor(doc: SongDocument, oldValue: number, newValue: number) {
         super(doc);
@@ -4337,6 +4352,7 @@ export class ChangeChorus extends ChangeInstrumentSlider {
     constructor(doc: SongDocument, oldValue: number, newValue: number) {
         super(doc);
         this._instrument.chorus = newValue;
+        doc.synth.unsetMod(Config.modulators.dictionary["chorus"].index, doc.channel, doc.getCurrentInstrument());
         doc.notifier.changed();
         if (oldValue != newValue) this._didSomething();
     }
@@ -4351,26 +4367,6 @@ export class ChangeReverb extends ChangeInstrumentSlider {
         if (oldValue != newValue) this._didSomething();
     }
 }
-
-// export class ChangeCorruption extends ChangeInstrumentSlider {
-//     constructor(doc: SongDocument, oldValue: number, newValue: number) {
-//         super(doc);
-//         this._instrument.corruption = newValue;
-//         // doc.synth.unsetMod(Config.modulators.dictionary["reverb"].index, doc.channel, doc.getCurrentInstrument());
-//         doc.notifier.changed();
-//         if (oldValue != newValue) this._didSomething();
-//     }
-// }
-
-// export class ChangeCorruptionType extends ChangeInstrumentSlider {
-//     constructor(doc: SongDocument, oldValue: number, newValue: number) {
-//         super(doc);
-//         this._instrument.corruptionType = newValue;
-//         // doc.synth.unsetMod(Config.modulators.dictionary["reverb"].index, doc.channel, doc.getCurrentInstrument());
-//         doc.notifier.changed();
-//         if (oldValue != newValue) this._didSomething();
-//     }
-// }
 
 export class ChangeSongReverb extends Change {
     constructor(doc: SongDocument, oldValue: number, newValue: number) {
@@ -5218,8 +5214,8 @@ export class ChangeEnvelopePitchStart extends Change {
         super();
         const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
         const oldStartNote: number = instrument.envelopes[index].pitchEnvelopeStart;
+        instrument.envelopes[index].pitchEnvelopeStart = startNote;
         if (oldStartNote != startNote) {
-            instrument.envelopes[index].pitchEnvelopeStart = startNote;
             instrument.preset = instrument.type;
             doc.notifier.changed();
             this._didSomething();
@@ -5232,8 +5228,8 @@ export class ChangeEnvelopePitchEnd extends Change {
         super();
         const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
         const oldEndNote: number = instrument.envelopes[index].pitchEnvelopeEnd;
+        instrument.envelopes[index].pitchEnvelopeEnd = endNote;
         if (oldEndNote != endNote) {
-            instrument.envelopes[index].pitchEnvelopeEnd = endNote;
             instrument.preset = instrument.type;
             doc.notifier.changed();
             this._didSomething();
@@ -5246,8 +5242,8 @@ export class ChangeEnvelopeInverse extends Change {
         super();
         const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
         const oldValue: boolean = instrument.envelopes[index].inverse;
+        instrument.envelopes[index].inverse = value;
         if (oldValue != value) {
-            instrument.envelopes[index].inverse = value;
             instrument.preset = instrument.type;
             doc.notifier.changed();
             this._didSomething();
@@ -5257,45 +5253,33 @@ export class ChangeEnvelopeInverse extends Change {
 
 export class ChangePerEnvelopeSpeed extends IndexableChange {
     constructor(doc: SongDocument, oldSpeed: number, speed: number, index: number) {
-        super(index);
-        const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
-        if (oldSpeed != speed) {
-            instrument.envelopes[index].perEnvelopeSpeed = speed;
-            doc.synth.unsetMod(Config.modulators.dictionary["individual envelope speed"].index, doc.channel, doc.getCurrentInstrument());
-            instrument.preset = instrument.type;
-            doc.notifier.changed();
-            this._didSomething();
-        }
+        super(index, doc);
+        this._instrument.envelopes[index].perEnvelopeSpeed = speed;
+        doc.synth.unsetMod(Config.modulators.dictionary["individual envelope speed"].index, doc.channel, doc.getCurrentInstrument());
+        doc.notifier.changed();
+        if (oldSpeed != speed) this._didSomething();
     }
 }
 
-export class ChangeEnvelopeLowerBound extends Change {
-    constructor(doc: SongDocument, bound: number, index: number) {
-        super();
-        const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
-        const oldBound: number = instrument.envelopes[index].perEnvelopeLowerBound;
-        if (oldBound != bound) {
-            bound = bound > Config.perEnvelopeBoundMax ? Config.perEnvelopeBoundMax : bound < Config.perEnvelopeBoundMin ? Config.perEnvelopeBoundMin : Math.round(bound * 10) != bound * 10 ? Config.perEnvelopeBoundMin : bound;
-            instrument.envelopes[index].perEnvelopeLowerBound = bound;
-            instrument.preset = instrument.type;
-            doc.notifier.changed();
-            this._didSomething();
-        }
+export class ChangeEnvelopeLowerBound extends IndexableChange {
+    constructor(doc: SongDocument, oldBound: number, bound: number, index: number) {
+        super(index, doc);
+        bound = bound > Config.perEnvelopeBoundMax ? Config.perEnvelopeBoundMax : bound < Config.perEnvelopeBoundMin ? Config.perEnvelopeBoundMin : Math.round(bound * 10) != bound * 10 ? Config.perEnvelopeBoundMin : bound;
+        this._instrument.envelopes[index].perEnvelopeLowerBound = bound;
+        doc.synth.unsetMod(Config.modulators.dictionary["individual envelope lower bound"].index, doc.channel, doc.getCurrentInstrument());
+        doc.notifier.changed();
+        if (oldBound != bound) this._didSomething();
     }
 }
 
-export class ChangeEnvelopeUpperBound extends Change {
-    constructor(doc: SongDocument, bound: number, index: number) {
-        super();
-        const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
-        const oldBound: number = instrument.envelopes[index].perEnvelopeUpperBound;
-        if (oldBound != bound) {
-            bound = bound > Config.perEnvelopeBoundMax ? Config.perEnvelopeBoundMax : bound < Config.perEnvelopeBoundMin ? Config.perEnvelopeBoundMin : Math.round(bound * 10) != bound * 10 ? Config.perEnvelopeBoundMin : bound;
-            instrument.envelopes[index].perEnvelopeUpperBound = bound;
-            instrument.preset = instrument.type;
-            doc.notifier.changed();
-            this._didSomething();
-        }
+export class ChangeEnvelopeUpperBound extends IndexableChange {
+    constructor(doc: SongDocument, oldBound: number, bound: number, index: number) {
+        super(index, doc);
+        bound = bound > Config.perEnvelopeBoundMax ? Config.perEnvelopeBoundMax : bound < Config.perEnvelopeBoundMin ? Config.perEnvelopeBoundMin : Math.round(bound * 10) != bound * 10 ? Config.perEnvelopeBoundMin : bound;
+        this._instrument.envelopes[index].perEnvelopeUpperBound = bound;
+        doc.synth.unsetMod(Config.modulators.dictionary["individual envelope upper bound"].index, doc.channel, doc.getCurrentInstrument());
+        this._didSomething();
+        if (oldBound != bound) doc.notifier.changed();
     }
 }
 
@@ -5304,9 +5288,9 @@ export class ChangeRandomEnvelopeSteps extends Change {
         super();
         const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
         const oldSteps: number = instrument.envelopes[index].steps;
+        steps = steps > Config.randomEnvelopeStepsMax ? Config.randomEnvelopeStepsMax : steps < 1 ? 2 : Math.floor(steps);
+        instrument.envelopes[index].steps = steps;
         if (oldSteps != steps) {
-            steps = steps > Config.randomEnvelopeStepsMax ? Config.randomEnvelopeStepsMax : steps < 1 ? 2 : Math.floor(steps);
-            instrument.envelopes[index].steps = steps;
             instrument.preset = instrument.type;
             doc.notifier.changed();
             this._didSomething();
@@ -5319,9 +5303,9 @@ export class ChangeRandomEnvelopeSeed extends Change {
         super();
         const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
         const oldSeed: number = instrument.envelopes[index].seed;
+        seed = seed > Config.randomEnvelopeSeedMax ? Config.randomEnvelopeSeedMax : seed < 1 ? 2 : Math.floor(seed);
+        instrument.envelopes[index].seed = seed;
         if (oldSeed != seed) {
-            seed = seed > Config.randomEnvelopeSeedMax ? Config.randomEnvelopeSeedMax : seed < 1 ? 2 : Math.floor(seed);
-            instrument.envelopes[index].seed = seed;
             //changing the seed does not change the preset
             doc.notifier.changed();
             this._didSomething();
@@ -5348,14 +5332,12 @@ export class ChangeSetEnvelopeWaveform extends Change {
         const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
         const oldWaveform: number = instrument.envelopes[index].waveform;
         waveform = parseInt(waveform + ""); //make sure waveform isn't a string
+        instrument.envelopes[index].waveform = waveform;
         if (oldWaveform != waveform) {
-            instrument.envelopes[index].waveform = waveform;
+            instrument.preset = instrument.type;
+            doc.notifier.changed();
+            this._didSomething();
         }
-
-
-        instrument.preset = instrument.type;
-        doc.notifier.changed();
-        this._didSomething();
     }
 }
 
@@ -5364,9 +5346,9 @@ export class ChangeEnvelopeNoteSizeStart extends Change {
         super();
         const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
         const oldNoteStart: number = instrument.envelopes[index].noteSizeStart;
+        noteStart = noteStart > Config.noteSizeMax ? Config.noteSizeMax : noteStart < 0 ? 0 : noteStart;
+        instrument.envelopes[index].noteSizeStart = noteStart;
         if (oldNoteStart != noteStart) {
-            noteStart = noteStart > Config.noteSizeMax ? Config.noteSizeMax : noteStart < 0 ? 0 : noteStart;
-            instrument.envelopes[index].noteSizeStart = noteStart;
             instrument.preset = instrument.type;
             doc.notifier.changed();
             this._didSomething();
@@ -5379,9 +5361,9 @@ export class ChangeEnvelopeNoteSizeEnd extends Change {
         super();
         const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
         const oldNoteEnd: number = instrument.envelopes[index].noteSizeEnd;
+        noteEnd = noteEnd > Config.noteSizeMax ? Config.noteSizeMax : noteEnd < 0 ? 0 : noteEnd;
+        instrument.envelopes[index].noteSizeEnd = noteEnd;
         if (oldNoteEnd != noteEnd) {
-            noteEnd = noteEnd > Config.noteSizeMax ? Config.noteSizeMax : noteEnd < 0 ? 0 : noteEnd;
-            instrument.envelopes[index].noteSizeEnd = noteEnd;
             instrument.preset = instrument.type;
             doc.notifier.changed();
             this._didSomething();

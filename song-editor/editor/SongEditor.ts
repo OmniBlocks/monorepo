@@ -2107,6 +2107,10 @@ export class SongEditor {
                 return this._supersawShapeSlider;
             case Config.modulators.dictionary["individual envelope speed"].index:
                 return this.envelopeEditor.perEnvelopeSpeedSliders[index];
+            case Config.modulators.dictionary["individual envelope lower bound"].index:
+                return this.envelopeEditor.perEnvelopeLowerBoundSliders[index];
+            case Config.modulators.dictionary["individual envelope upper bound"].index:
+                return this.envelopeEditor.perEnvelopeUpperBoundSliders[index];
             case Config.modulators.dictionary["ring modulation"].index:
                 return this._ringModSlider;
             case Config.modulators.dictionary["ring mod hertz"].index:
@@ -3440,6 +3444,8 @@ export class SongEditor {
                         if (anyInstrumentHasEnvelopes) {
                             settingList.push("envelope speed");
                             settingList.push("individual envelope speed");
+                            settingList.push("individual envelope lower bound");
+                            settingList.push("individual envelope upper bound");
                             settingList.push("reset envelope");
                         }
 
@@ -3588,7 +3594,7 @@ export class SongEditor {
                 }
 
                 let envelopes: string = Config.modulators[instrument.modulators[mod]].name;
-                if (envelopes == "individual envelope speed" || envelopes == "reset envelope") {
+                if (envelopes == "individual envelope speed" || envelopes == "reset envelope" || envelopes == "individual envelope lower bound" || envelopes == "individual envelope upper bound") {
                     $("#modEnvelopeText" + mod).get(0)!.style.display = "";
                     $("#modFilterText" + mod).get(0)!.style.display = "none";
                     $("#modSettingText" + mod).get(0)!.style.setProperty("margin-bottom", "2px");

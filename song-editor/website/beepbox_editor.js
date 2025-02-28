@@ -1276,6 +1276,10 @@ var beepbox = (function (exports) {
             promptName: "Granular", promptDesc: ["This setting controls the granular effect in your instrument.", "[OVERWRITING] [$LO - $HI]"] },
         { name: "grain size", pianoName: "Grain Size", maxRawVol: _a$1.grainSizeMax / _a$1.grainSizeStep, newNoteVol: _a$1.grainSizeMin / _a$1.grainSizeStep, forSong: false, convertRealFactor: 0, associatedEffect: 14, maxIndex: 0,
             promptName: "Ring Modulation (Hertz)", promptDesc: ["This setting controls the grain size of the granular effect in your instrument.", "The number shown in the mod channel is multiplied by " + _a$1.grainSizeStep + " to get the actual grain size.", "[OVERWRITING] [$LO - $HI]"] },
+        { name: "individual envelope lower bound", pianoName: "IndvEnvLow", maxRawVol: _a$1.perEnvelopeBoundMax * 10, newNoteVol: 0, forSong: false, convertRealFactor: 0, associatedEffect: 15, maxIndex: _a$1.maxEnvelopeCount - 1,
+            promptName: "Individual Envelope Lower Bound", promptDesc: ["This setting controls the envelope lower bound", "At $LO, your the envelope will output an upper envelope bound to 0, and at $HI your envelope will output an upper envelope bound to 2.", "This settings will not work if your lower envelope bound is higher than your upper envelope bound",] },
+        { name: "individual envelope upper bound", pianoName: "IndvEnvUp", maxRawVol: _a$1.perEnvelopeBoundMax * 10, newNoteVol: 10, forSong: false, convertRealFactor: 0, associatedEffect: 15, maxIndex: _a$1.maxEnvelopeCount - 1,
+            promptName: "Individual Envelope Upper Bound", promptDesc: ["This setting controls the envelope upper bound", "At $LO, your the envelope will output a 0 to lower envelope bound, and at $HI your envelope will output a 2 to lower envelope bound.", "This settings will not work if your lower envelope bound is higher than your upper envelope bound",] },
     ]);
     function centerWave(wave) {
         let sum = 0.0;
@@ -13916,8 +13920,14 @@ li.select2-results__option[role=group] > strong:hover {
                         let echoIndex = Config.modulators.dictionary["echo"].index;
                         let echoDelayIndex = Config.modulators.dictionary["echo delay"].index;
                         let pitchShiftIndex = Config.modulators.dictionary["pitch shift"].index;
+                        let ringModIndex = Config.modulators.dictionary["ring modulation"].index;
+                        let ringModHertzIndex = Config.modulators.dictionary["ring mod hertz"].index;
+                        let granularIndex = Config.modulators.dictionary["granular"].index;
+                        let grainSizeIndex = Config.modulators.dictionary["grain size"].index;
                         let envSpeedIndex = Config.modulators.dictionary["envelope speed"].index;
                         let perEnvSpeedIndex = Config.modulators.dictionary["individual envelope speed"].index;
+                        let perEnvLowerIndex = Config.modulators.dictionary["individual envelope lower bound"].index;
+                        let perEnvUpperIndex = Config.modulators.dictionary["individual envelope upper bound"].index;
                         let instrumentIndex = instrument.modInstruments[modCount];
                         switch (currentIndex) {
                             case chorusIndex:
@@ -13965,11 +13975,29 @@ li.select2-results__option[role=group] > strong:hover {
                             case pitchShiftIndex:
                                 vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].pitchShift;
                                 break;
+                            case ringModIndex:
+                                vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].ringModulation - Config.modulators[ringModIndex].convertRealFactor;
+                                break;
+                            case ringModHertzIndex:
+                                vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].ringModulationHz - Config.modulators[ringModHertzIndex].convertRealFactor;
+                                break;
+                            case granularIndex:
+                                vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].granular - Config.modulators[granularIndex].convertRealFactor;
+                                break;
+                            case grainSizeIndex:
+                                vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].grainSize - Config.modulators[grainSizeIndex].convertRealFactor;
+                                break;
                             case envSpeedIndex:
                                 vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].envelopeSpeed - Config.modulators[envSpeedIndex].convertRealFactor;
                                 break;
                             case perEnvSpeedIndex:
                                 vol = Config.perEnvelopeSpeedToIndices[this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].envelopes[instrument.modEnvelopeNumbers[modCount]].perEnvelopeSpeed] - Config.modulators[perEnvSpeedIndex].convertRealFactor;
+                                break;
+                            case perEnvLowerIndex:
+                                vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].envelopes[instrument.modEnvelopeNumbers[modCount]].perEnvelopeLowerBound - Config.modulators[perEnvLowerIndex].convertRealFactor;
+                                break;
+                            case perEnvUpperIndex:
+                                vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].envelopes[instrument.modEnvelopeNumbers[modCount]].perEnvelopeUpperBound - Config.modulators[perEnvUpperIndex].convertRealFactor;
                                 break;
                         }
                     }
@@ -19429,7 +19457,6 @@ li.select2-results__option[role=group] > strong:hover {
                 if (synth.isModActive(Config.modulators.dictionary["echo delay"].index, channelIndex, instrumentIndex)) {
                     useEchoDelayStart = synth.getModValue(Config.modulators.dictionary["echo delay"].index, channelIndex, instrumentIndex, false) * echoDelayEnvelopeStart;
                     useEchoDelayEnd = synth.getModValue(Config.modulators.dictionary["echo delay"].index, channelIndex, instrumentIndex, true) * echoDelayEnvelopeEnd;
-                    this.allocateEchoBuffers(samplesPerTick, Math.max(useEchoDelayStart, useEchoDelayEnd));
                 }
                 const tmpEchoDelayOffsetStart = Math.round((useEchoDelayStart + 1) * Config.echoDelayStepTicks * samplesPerTick);
                 const tmpEchoDelayOffsetEnd = Math.round((useEchoDelayEnd + 1) * Config.echoDelayStepTicks * samplesPerTick);
@@ -24781,6 +24808,671 @@ li.select2-results__option[role=group] > strong:hover {
 				const operator#Scaled   = operator#OutputMult * operator#Output;
 		`).split("\n");
 
+    const versionPrefix = "songVersion: ";
+    const maximumSongCount = 8;
+    const maximumWorkPerVersion = 3 * 60 * 1000;
+    const minimumWorkPerSpan = 1 * 60 * 1000;
+    function keyIsVersion(key) {
+        return key.indexOf(versionPrefix) == 0;
+    }
+    function keyToVersion(key) {
+        return JSON.parse(key.substring(versionPrefix.length));
+    }
+    function versionToKey(version) {
+        return versionPrefix + JSON.stringify(version);
+    }
+    function generateUid() {
+        return ((Math.random() * (-1 >>> 0)) >>> 0).toString(32);
+    }
+    function compareSongs(a, b) {
+        return b.versions[0].time - a.versions[0].time;
+    }
+    function errorAlert(error) {
+        console.warn(error);
+        window.alert("Whoops, the song data appears to have been corrupted! Please try to recover the last working version of the song from the \"Recover Recent Song...\" option in BeepBox's \"File\" menu.");
+    }
+    function compareVersions(a, b) {
+        return b.time - a.time;
+    }
+    class SongRecovery {
+        constructor() {
+            this._song = new Song();
+        }
+        static getAllRecoveredSongs() {
+            const songs = [];
+            const songsByUid = {};
+            for (let i = 0; i < localStorage.length; i++) {
+                const itemKey = localStorage.key(i);
+                if (keyIsVersion(itemKey)) {
+                    const version = keyToVersion(itemKey);
+                    let song = songsByUid[version.uid];
+                    if (song == undefined) {
+                        song = { versions: [] };
+                        songsByUid[version.uid] = song;
+                        songs.push(song);
+                    }
+                    song.versions.push(version);
+                }
+            }
+            for (const song of songs) {
+                song.versions.sort(compareVersions);
+            }
+            songs.sort(compareSongs);
+            return songs;
+        }
+        saveVersion(uid, name, songData) {
+            const newName = name;
+            const newTime = Math.round(Date.now());
+            clearTimeout(this._saveVersionTimeoutHandle);
+            this._saveVersionTimeoutHandle = setTimeout(() => {
+                try {
+                    this._song.fromBase64String(songData);
+                }
+                catch (error) {
+                    errorAlert(error);
+                    return;
+                }
+                const songs = SongRecovery.getAllRecoveredSongs();
+                let currentSong = null;
+                for (const song of songs) {
+                    if (song.versions[0].uid == uid) {
+                        currentSong = song;
+                    }
+                }
+                if (currentSong == null) {
+                    currentSong = { versions: [] };
+                    songs.unshift(currentSong);
+                }
+                let versions = currentSong.versions;
+                let newWork = 1000;
+                if (versions.length > 0) {
+                    const mostRecentTime = versions[0].time;
+                    const mostRecentWork = versions[0].work;
+                    newWork = mostRecentWork + Math.min(maximumWorkPerVersion, newTime - mostRecentTime);
+                }
+                const newVersion = { uid: uid, name: newName, time: newTime, work: newWork };
+                const newKey = versionToKey(newVersion);
+                versions.unshift(newVersion);
+                localStorage.setItem(newKey, songData);
+                let minSpan = minimumWorkPerSpan;
+                const spanMult = Math.pow(2, 1 / 2);
+                for (var i = 1; i < versions.length; i++) {
+                    const currentWork = versions[i].work;
+                    const olderWork = (i == versions.length - 1) ? 0.0 : versions[i + 1].work;
+                    if (currentWork - olderWork < minSpan) {
+                        let indexToDiscard = i;
+                        if (i < versions.length - 1) {
+                            const currentTime = versions[i].time;
+                            const newerTime = versions[i - 1].time;
+                            const olderTime = versions[i + 1].time;
+                            if ((currentTime - olderTime) < 0.5 * (newerTime - currentTime)) {
+                                indexToDiscard = i + 1;
+                            }
+                        }
+                        localStorage.removeItem(versionToKey(versions[indexToDiscard]));
+                        break;
+                    }
+                    minSpan *= spanMult;
+                }
+                while (songs.length > maximumSongCount) {
+                    let leastImportantSong = null;
+                    let leastImportance = Number.POSITIVE_INFINITY;
+                    for (let i = Math.round(maximumSongCount / 2); i < songs.length; i++) {
+                        const song = songs[i];
+                        const timePassed = newTime - song.versions[0].time;
+                        const timeScale = 1.0 / ((timePassed / (12 * 60 * 60 * 1000)) + 1.0);
+                        const adjustedWork = song.versions[0].work + 5 * 60 * 1000;
+                        const weight = adjustedWork * timeScale;
+                        if (leastImportance > weight) {
+                            leastImportance = weight;
+                            leastImportantSong = song;
+                        }
+                    }
+                    for (const version of leastImportantSong.versions) {
+                        localStorage.removeItem(versionToKey(version));
+                    }
+                    songs.splice(songs.indexOf(leastImportantSong), 1);
+                }
+            }, 750);
+        }
+    }
+
+    class Layout {
+        static setLayout(layout) {
+            this._styleElement.textContent = this._layoutMap[layout];
+        }
+    }
+    Layout._layoutMap = {
+        "small": "",
+        "long": `\
+
+			/* long layout */
+			@media (min-width: 711px) {
+				#beepboxEditorContainer {
+					max-width: initial;
+					height: 100vh;
+					padding-top: 0px;
+				}
+				.beepboxEditor {
+					width: 100%;
+					height: 100vh;
+					grid-template-columns: minmax(0, 1fr) 390px; /* minmax(0, 1fr) min-content; Chrome 80 grid layout regression. https://bugs.chromium.org/p/chromium/issues/detail?id=1050307 */
+					grid-template-rows: minmax(481px, 1fr) minmax(0, min-content);
+					grid-template-areas: "pattern-area settings-area" "track-area track-area";
+				}
+				.beepboxEditor .pattern-area {
+					width: 100%;
+					height: 100%;
+				}
+				.beepboxEditor .track-area {
+					width: 100%;
+					display: flex;
+					flex-direction: column;
+				}
+				.beepboxEditor .trackAndMuteContainer {
+					width: 100%;
+					min-height: 0;
+					flex: 1;
+					overflow: auto;
+					max-height: 97.5vh;
+				}
+				.beepboxEditor .instrument-settings-area {
+					overflow-y: auto;
+					position: relative;
+				}
+				.beepboxEditor .instrument-settings-area > .editor-controls {
+					position: absolute;
+					width: 100%;
+				}
+				.beepboxEditor .song-settings-area {
+					overflow-y: auto;
+				}
+				
+				.beepboxEditor .settings-area {
+					width: 390px;
+					grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+					grid-template-rows: auto auto auto minmax(0, 1fr);
+					grid-template-areas:
+						"instrument-settings-area version-area"
+						"instrument-settings-area play-pause-area"
+						"instrument-settings-area menu-area"
+						"instrument-settings-area song-settings-area";
+				}
+				
+				.beepboxEditor .barScrollBar {
+					display: none;
+				}
+				.beepboxEditor.selectRow {
+					height: 2em;
+				}
+				.beepboxEditor .trackAndMuteContainer {
+					max-height: 446px;
+				}
+
+				.beepboxEditor .trackContainer {
+					overflow: visible;
+				}
+				.beepboxEditor .trackAndMuteContainer {
+					scrollbar-width: auto;
+				}
+				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar {
+					width: 20px;
+					height: 20px;
+				}
+				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-track {
+					background: ${ColorConfig.editorBackground};
+				}
+				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-thumb {
+					background-color: ${ColorConfig.uiWidgetBackground};
+					border: 3px solid ${ColorConfig.editorBackground};
+				}
+				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-corner {
+					background-color: ${ColorConfig.editorBackground};
+				}
+			}
+		`,
+        "tall": `\
+			/* tall layout */
+			@media (min-width: 711px) {
+				#beepboxEditorContainer {
+					max-width: initial;
+					height: 100vh;
+					padding-top: 0px;
+				}
+				.beepboxEditor {
+					width: 100%;
+					height: 100vh;
+					grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 192px;
+					grid-template-rows: 1fr;
+					grid-template-areas: "track-area pattern-area settings-area";
+				}
+				.beepboxEditor .pattern-area {
+					width: 100%;
+					height: 100%;
+				}
+				.beepboxEditor .track-area {
+					width: 100%;
+					height: 100%;
+					display: flex;
+					flex-direction: column;
+					justify-content: center;
+				}
+				.beepboxEditor .trackAndMuteContainer {
+					width: 100%;
+					min-height: 0;
+					flex: 0;
+					overflow: auto;
+					flex-basis: initial;
+					flex-grow: 0;
+					max-height: 97.5vh;
+				}
+				.beepboxEditor .instrument-settings-area > .editor-controls {
+					position: absolute;
+					width: 100%;
+				}
+				
+				.beepboxEditor .settings-area {
+					width: 192px;
+					position: relative;
+					overflow-y: auto;
+					grid-template-columns: minmax(0, 1fr);
+					grid-template-rows: auto auto auto auto minmax(0, 1fr);
+					grid-template-areas:
+						"version-area"
+						"play-pause-area"
+						"menu-area"
+						"song-settings-area"
+						"instrument-settings-area";
+				}
+				.beepboxEditor .version-area {
+					position: sticky;
+					top: 0;
+					z-index: 1;
+					background: ${ColorConfig.editorBackground};
+				}
+				.beepboxEditor .play-pause-area {
+					position: sticky;
+					top: 22px;
+					z-index: 1;
+					background: ${ColorConfig.editorBackground};
+				}
+				.beepboxEditor .menu-area {
+					position: sticky;
+					top: 82px;
+					z-index: 1;
+					background: ${ColorConfig.editorBackground};
+				}
+				
+				.beepboxEditor .barScrollBar {
+					display: none;
+				}
+				.beepboxEditor .trackContainer {
+					overflow: visible;
+				}
+				.beepboxEditor .trackAndMuteContainer {
+					scrollbar-width: auto;
+				}
+				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar {
+					width: 20px;
+					height: 20px;
+				}
+				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-track {
+					background: ${ColorConfig.editorBackground};
+				}
+				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-thumb {
+					background-color: ${ColorConfig.uiWidgetBackground};
+					border: 3px solid ${ColorConfig.editorBackground};
+				}
+				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-corner {
+					background-color: ${ColorConfig.editorBackground};
+				}
+			}
+		`,
+        "wide": `\
+			/* wide (JB) layout */
+			@media (min-width: 1001px) {
+				#beepboxEditorContainer {
+					max-width: initial;
+					height: 100vh;
+					padding-top: 0px;
+				}
+				.beepboxEditor {
+					width: 100%;
+					height: 100vh;
+					grid-template-columns: 512px minmax(0, 1fr) 30em;
+					grid-template-rows: minmax(481px, 1fr) min-content;
+					grid-template-areas: "track-area pattern-area settings-area";
+				}
+				.beepboxEditor .pattern-area {
+					width: 100%;
+					height: 100%;
+				}
+				.beepboxEditor .track-area {
+					width: 100%;
+					height: 100%;
+					max-height: 100%
+				}
+				.beepboxEditor .editor-widget-column {
+					flex: 0;
+				}
+				.beepboxEditor .trackAndMuteContainer {
+					width: 100%;
+					flex: 0;
+					flex-basis: initial;
+					flex-grow: 0;
+					overflow-y: auto;
+					max-height: 97.5vh;
+				}
+				.beepboxEditor .instrument-settings-area {
+					overflow-y: auto;
+					position: relative;
+				}
+				.beepboxEditor .instrument-settings-area > .editor-controls {
+					position: absolute;
+					width: 100%;
+				}
+				
+				.beepboxEditor .song-settings-area {
+					overflow-y: auto;
+				}
+				
+				.beepboxEditor .settings-area {
+					width: 30em;
+					grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+					grid-template-rows: auto auto auto minmax(0, 1fr);
+					grid-template-areas:
+						"instrument-settings-area version-area"
+						"instrument-settings-area play-pause-area"
+						"instrument-settings-area menu-area"
+						"instrument-settings-area song-settings-area";
+				}
+				.beepboxEditor .version-area {
+					position: sticky;
+					top: 0;
+					z-index: 1;
+					background: ${ColorConfig.editorBackground};
+				}
+				.beepboxEditor .play-pause-area {
+					position: sticky;
+					top: 22px;
+					z-index: 1;
+					background: ${ColorConfig.editorBackground};
+				}
+				.beepboxEditor .menu-area {
+					position: sticky;
+					top: 82px;
+					z-index: 1;
+					background: ${ColorConfig.editorBackground};
+				}
+				
+				.beepboxEditor .trackContainer {
+					overflow: visible;
+				}
+			}
+		`,
+        "flipped long": `\
+
+            	/* AB Special layout */
+			@media (min-width: 711px) {
+				#beepboxEditorContainer {
+					max-width: initial;
+					height: 100vh;
+					padding-top: 0px;
+				}
+				.beepboxEditor {
+					width: 100%;
+					height: 100vh;
+					grid-template-columns: 390px minmax(0, 1fr);
+					grid-template-rows: minmax(481px, 1fr) minmax(0, min-content);
+					grid-template-areas: "settings-area pattern-area" "track-area track-area";
+				}
+				.beepboxEditor .pattern-area {
+					width: 100%;
+					height: 100%;
+				}
+				.beepboxEditor .track-area {
+					width: 100%;
+					display: flex;
+					flex-direction: column;
+				}
+				.beepboxEditor .trackAndMuteContainer {
+					width: 100%;
+					min-height: 0;
+					flex: 1;
+					overflow: auto;
+					max-height: 97.5vh;
+				}
+				.beepboxEditor .instrument-settings-area {
+					overflow-y: auto;
+					position: relative;
+				}
+				.beepboxEditor .instrument-settings-area > .editor-controls {
+					position: absolute;
+					width: 100%;
+				}
+				.beepboxEditor .song-settings-area {
+					overflow-y: auto;
+				}
+				
+				.beepboxEditor .settings-area {
+					width: 30em;
+					grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+					grid-template-rows: auto auto auto minmax(0, 1fr);
+					grid-template-areas:
+						"version-area instrument-settings-area"
+						"play-pause-area instrument-settings-area"
+						"menu-area instrument-settings-area"
+						"song-settings-area instrument-settings-area";
+				}
+				
+				.beepboxEditor .barScrollBar {
+					display: none;
+				}
+				.beepboxEditor.selectRow {
+					height: 2em;
+				}
+				.beepboxEditor .trackAndMuteContainer {
+					max-height: 446px;
+				}
+
+				.beepboxEditor .trackContainer {
+					overflow: visible;
+				}
+				.beepboxEditor .trackAndMuteContainer {
+					scrollbar-width: auto;
+				}
+				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar {
+					width: 20px;
+					height: 20px;
+				}
+				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-track {
+					background: ${ColorConfig.editorBackground};
+				}
+				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-thumb {
+					background-color: ${ColorConfig.uiWidgetBackground};
+					border: 3px solid ${ColorConfig.editorBackground};
+				}
+				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-corner {
+					background-color: ${ColorConfig.editorBackground};
+				}
+			}
+		`,
+        "wide long": `\
+
+			@media (min-width: 711px) {
+				#beepboxEditorContainer {
+					max-width: initial;
+					height: 100vh;
+					padding-top: 0px;
+				}
+				.beepboxEditor {
+					width: 100%;
+					height: 100vh;
+					grid-template-columns: minmax(0, 1fr) 390px; /* minmax(0, 1fr) min-content; Chrome 80 grid layout regression. https://bugs.chromium.org/p/chromium/issues/detail?id=1050307 */
+					grid-template-rows: minmax(481px, 1fr) minmax(0, min-content);
+					grid-template-areas: "pattern-area settings-area" "track-area settings-area";
+				}
+				.beepboxEditor .pattern-area {
+					width: 100%;
+					height: 100%;
+				}
+				.beepboxEditor .track-area {
+					display: flex;
+				}
+				.beepboxEditor .trackAndMuteContainer {
+					width: 100%;
+					min-height: 0;
+					flex: 1;
+					overflow: auto;
+					max-height: 97.5vh;
+				}
+				.beepboxEditor .instrument-settings-area {
+					overflow-y: auto;
+					position: relative;
+				}
+				.beepboxEditor .instrument-settings-area > .editor-controls {
+					position: absolute;
+					width: 100%;
+				}
+				
+				.beepboxEditor .song-settings-area {
+					overflow-y: auto;
+				}
+				
+				.beepboxEditor .settings-area {
+					width: 30em;
+					grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+					grid-template-rows: auto auto auto minmax(0, 1fr);
+					grid-template-areas:
+						"instrument-settings-area version-area"
+						"instrument-settings-area play-pause-area"
+						"instrument-settings-area menu-area"
+						"instrument-settings-area song-settings-area";
+				}				
+				.beepboxEditor .barScrollBar {
+					display: none;
+				}
+				.beepboxEditor.selectRow {
+					height: 2em;
+				}
+				.beepboxEditor .trackAndMuteContainer {
+					max-height: 446px;
+				}
+
+				.beepboxEditor .trackContainer {
+					overflow: visible;
+				}
+				.beepboxEditor .trackAndMuteContainer {
+					scrollbar-width: auto;
+				}
+				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar {
+					width: 20px;
+					height: 20px;
+				}
+				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-track {
+					background: ${ColorConfig.editorBackground};
+				}
+				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-thumb {
+					background-color: ${ColorConfig.uiWidgetBackground};
+					border: 3px solid ${ColorConfig.editorBackground};
+				}
+				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-corner {
+					background-color: ${ColorConfig.editorBackground};
+				}
+			}
+		`,
+        "focused long": `\
+
+			/* focused long layout */
+			@media (min-width: 711px) {
+				#beepboxEditorContainer {
+					max-width: initial;
+					height: 100vh;
+					padding-top: 0px;
+				}
+				.beepboxEditor {
+					width: 100%;
+					height: 100vh;
+					grid-template-columns: minmax(0, 1fr) 190px; 
+					grid-template-rows: minmax(481px, 1fr) minmax(0, min-content);
+					grid-template-areas: "pattern-area settings-area" "track-area settings-area";
+				}
+				.beepboxEditor .pattern-area {
+					width: 100%;
+					height: 100%;
+				}
+				.beepboxEditor .track-area {
+					display: flex;
+				}
+				.beepboxEditor .trackAndMuteContainer {
+					width: 100%;
+					min-height: 0;
+					flex: 1;
+					overflow: auto;
+					max-height: 97.5vh;
+				}
+				.beepboxEditor .instrument-settings-area {
+					overflow-y: auto;
+					position: relative;
+				}
+				.beepboxEditor .instrument-settings-area > .editor-controls {
+					position: absolute;
+					width: 100%;
+				}
+				
+				.beepboxEditor .instrument-settings-area > .editor-controls {
+					position: absolute;
+					width: 100%;
+				}
+
+				.beepboxEditor .settings-area {
+					width: 100%;
+					position: relative;
+					overflow-y: auto;
+					grid-template-columns: minmax(0, 1fr);
+					grid-template-rows: auto auto auto auto minmax(0, 1fr);
+					grid-template-areas:
+						"version-area"
+						"play-pause-area"
+						"menu-area"
+						"song-settings-area"
+						"instrument-settings-area";
+				}
+				.beepboxEditor .barScrollBar {
+					display: none;
+				}
+				.beepboxEditor.selectRow {
+					height: 2em;
+				}
+				.beepboxEditor .trackAndMuteContainer {
+					max-height: 446px;
+				}
+
+				.beepboxEditor .trackContainer {
+					overflow: visible;
+				}
+				.beepboxEditor .trackAndMuteContainer {
+					scrollbar-width: auto;
+				}
+				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar {
+					width: 20px;
+					height: 20px;
+				}
+				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-track {
+					background: ${ColorConfig.editorBackground};
+				}
+				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-thumb {
+					background-color: ${ColorConfig.uiWidgetBackground};
+					border: 3px solid ${ColorConfig.editorBackground};
+				}
+				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-corner {
+					background-color: ${ColorConfig.editorBackground};
+				}
+			}
+		`,
+    };
+    Layout._styleElement = document.head.appendChild(HTML.style({ type: "text/css" }));
+
     class Change {
         constructor() {
             this._noop = true;
@@ -24876,16 +25568,6 @@ li.select2-results__option[role=group] > strong:hover {
         }
         commit() {
             this._committed = true;
-        }
-    }
-    class IndexableChange extends Change {
-        constructor(index) {
-            super();
-            this.index = 0;
-            this.index = index;
-        }
-        getIndex() {
-            return this.index;
         }
     }
 
@@ -26995,6 +27677,16 @@ li.select2-results__option[role=group] > strong:hover {
             }
         }
     }
+    class IndexableChange extends ChangeInstrumentSlider {
+        constructor(index, _doc) {
+            super(_doc);
+            this.index = 0;
+            this.index = index;
+        }
+        getIndex() {
+            return this.index;
+        }
+    }
     class ChangePulseWidth extends ChangeInstrumentSlider {
         constructor(doc, oldValue, newValue) {
             super(doc);
@@ -28774,6 +29466,7 @@ li.select2-results__option[role=group] > strong:hover {
         constructor(doc, oldValue, newValue) {
             super(doc);
             this._instrument.chorus = newValue;
+            doc.synth.unsetMod(Config.modulators.dictionary["chorus"].index, doc.channel, doc.getCurrentInstrument());
             doc.notifier.changed();
             if (oldValue != newValue)
                 this._didSomething();
@@ -29542,8 +30235,8 @@ li.select2-results__option[role=group] > strong:hover {
             super();
             const instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
             const oldStartNote = instrument.envelopes[index].pitchEnvelopeStart;
+            instrument.envelopes[index].pitchEnvelopeStart = startNote;
             if (oldStartNote != startNote) {
-                instrument.envelopes[index].pitchEnvelopeStart = startNote;
                 instrument.preset = instrument.type;
                 doc.notifier.changed();
                 this._didSomething();
@@ -29555,8 +30248,8 @@ li.select2-results__option[role=group] > strong:hover {
             super();
             const instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
             const oldEndNote = instrument.envelopes[index].pitchEnvelopeEnd;
+            instrument.envelopes[index].pitchEnvelopeEnd = endNote;
             if (oldEndNote != endNote) {
-                instrument.envelopes[index].pitchEnvelopeEnd = endNote;
                 instrument.preset = instrument.type;
                 doc.notifier.changed();
                 this._didSomething();
@@ -29568,8 +30261,8 @@ li.select2-results__option[role=group] > strong:hover {
             super();
             const instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
             const oldValue = instrument.envelopes[index].inverse;
+            instrument.envelopes[index].inverse = value;
             if (oldValue != value) {
-                instrument.envelopes[index].inverse = value;
                 instrument.preset = instrument.type;
                 doc.notifier.changed();
                 this._didSomething();
@@ -29578,43 +30271,34 @@ li.select2-results__option[role=group] > strong:hover {
     }
     class ChangePerEnvelopeSpeed extends IndexableChange {
         constructor(doc, oldSpeed, speed, index) {
-            super(index);
-            const instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
-            if (oldSpeed != speed) {
-                instrument.envelopes[index].perEnvelopeSpeed = speed;
-                doc.synth.unsetMod(Config.modulators.dictionary["individual envelope speed"].index, doc.channel, doc.getCurrentInstrument());
-                instrument.preset = instrument.type;
-                doc.notifier.changed();
+            super(index, doc);
+            this._instrument.envelopes[index].perEnvelopeSpeed = speed;
+            doc.synth.unsetMod(Config.modulators.dictionary["individual envelope speed"].index, doc.channel, doc.getCurrentInstrument());
+            doc.notifier.changed();
+            if (oldSpeed != speed)
                 this._didSomething();
-            }
         }
     }
-    class ChangeEnvelopeLowerBound extends Change {
-        constructor(doc, bound, index) {
-            super();
-            const instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
-            const oldBound = instrument.envelopes[index].perEnvelopeLowerBound;
-            if (oldBound != bound) {
-                bound = bound > Config.perEnvelopeBoundMax ? Config.perEnvelopeBoundMax : bound < Config.perEnvelopeBoundMin ? Config.perEnvelopeBoundMin : Math.round(bound * 10) != bound * 10 ? Config.perEnvelopeBoundMin : bound;
-                instrument.envelopes[index].perEnvelopeLowerBound = bound;
-                instrument.preset = instrument.type;
-                doc.notifier.changed();
+    class ChangeEnvelopeLowerBound extends IndexableChange {
+        constructor(doc, oldBound, bound, index) {
+            super(index, doc);
+            bound = bound > Config.perEnvelopeBoundMax ? Config.perEnvelopeBoundMax : bound < Config.perEnvelopeBoundMin ? Config.perEnvelopeBoundMin : Math.round(bound * 10) != bound * 10 ? Config.perEnvelopeBoundMin : bound;
+            this._instrument.envelopes[index].perEnvelopeLowerBound = bound;
+            doc.synth.unsetMod(Config.modulators.dictionary["individual envelope lower bound"].index, doc.channel, doc.getCurrentInstrument());
+            doc.notifier.changed();
+            if (oldBound != bound)
                 this._didSomething();
-            }
         }
     }
-    class ChangeEnvelopeUpperBound extends Change {
-        constructor(doc, bound, index) {
-            super();
-            const instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
-            const oldBound = instrument.envelopes[index].perEnvelopeUpperBound;
-            if (oldBound != bound) {
-                bound = bound > Config.perEnvelopeBoundMax ? Config.perEnvelopeBoundMax : bound < Config.perEnvelopeBoundMin ? Config.perEnvelopeBoundMin : Math.round(bound * 10) != bound * 10 ? Config.perEnvelopeBoundMin : bound;
-                instrument.envelopes[index].perEnvelopeUpperBound = bound;
-                instrument.preset = instrument.type;
+    class ChangeEnvelopeUpperBound extends IndexableChange {
+        constructor(doc, oldBound, bound, index) {
+            super(index, doc);
+            bound = bound > Config.perEnvelopeBoundMax ? Config.perEnvelopeBoundMax : bound < Config.perEnvelopeBoundMin ? Config.perEnvelopeBoundMin : Math.round(bound * 10) != bound * 10 ? Config.perEnvelopeBoundMin : bound;
+            this._instrument.envelopes[index].perEnvelopeUpperBound = bound;
+            doc.synth.unsetMod(Config.modulators.dictionary["individual envelope upper bound"].index, doc.channel, doc.getCurrentInstrument());
+            this._didSomething();
+            if (oldBound != bound)
                 doc.notifier.changed();
-                this._didSomething();
-            }
         }
     }
     class ChangeRandomEnvelopeSteps extends Change {
@@ -29622,9 +30306,9 @@ li.select2-results__option[role=group] > strong:hover {
             super();
             const instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
             const oldSteps = instrument.envelopes[index].steps;
+            steps = steps > Config.randomEnvelopeStepsMax ? Config.randomEnvelopeStepsMax : steps < 1 ? 2 : Math.floor(steps);
+            instrument.envelopes[index].steps = steps;
             if (oldSteps != steps) {
-                steps = steps > Config.randomEnvelopeStepsMax ? Config.randomEnvelopeStepsMax : steps < 1 ? 2 : Math.floor(steps);
-                instrument.envelopes[index].steps = steps;
                 instrument.preset = instrument.type;
                 doc.notifier.changed();
                 this._didSomething();
@@ -29636,9 +30320,9 @@ li.select2-results__option[role=group] > strong:hover {
             super();
             const instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
             const oldSeed = instrument.envelopes[index].seed;
+            seed = seed > Config.randomEnvelopeSeedMax ? Config.randomEnvelopeSeedMax : seed < 1 ? 2 : Math.floor(seed);
+            instrument.envelopes[index].seed = seed;
             if (oldSeed != seed) {
-                seed = seed > Config.randomEnvelopeSeedMax ? Config.randomEnvelopeSeedMax : seed < 1 ? 2 : Math.floor(seed);
-                instrument.envelopes[index].seed = seed;
                 doc.notifier.changed();
                 this._didSomething();
             }
@@ -29660,12 +30344,12 @@ li.select2-results__option[role=group] > strong:hover {
             const instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
             const oldWaveform = instrument.envelopes[index].waveform;
             waveform = parseInt(waveform + "");
+            instrument.envelopes[index].waveform = waveform;
             if (oldWaveform != waveform) {
-                instrument.envelopes[index].waveform = waveform;
+                instrument.preset = instrument.type;
+                doc.notifier.changed();
+                this._didSomething();
             }
-            instrument.preset = instrument.type;
-            doc.notifier.changed();
-            this._didSomething();
         }
     }
     class ChangeEnvelopeNoteSizeStart extends Change {
@@ -29673,9 +30357,9 @@ li.select2-results__option[role=group] > strong:hover {
             super();
             const instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
             const oldNoteStart = instrument.envelopes[index].noteSizeStart;
+            noteStart = noteStart > Config.noteSizeMax ? Config.noteSizeMax : noteStart < 0 ? 0 : noteStart;
+            instrument.envelopes[index].noteSizeStart = noteStart;
             if (oldNoteStart != noteStart) {
-                noteStart = noteStart > Config.noteSizeMax ? Config.noteSizeMax : noteStart < 0 ? 0 : noteStart;
-                instrument.envelopes[index].noteSizeStart = noteStart;
                 instrument.preset = instrument.type;
                 doc.notifier.changed();
                 this._didSomething();
@@ -29687,9 +30371,9 @@ li.select2-results__option[role=group] > strong:hover {
             super();
             const instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
             const oldNoteEnd = instrument.envelopes[index].noteSizeEnd;
+            noteEnd = noteEnd > Config.noteSizeMax ? Config.noteSizeMax : noteEnd < 0 ? 0 : noteEnd;
+            instrument.envelopes[index].noteSizeEnd = noteEnd;
             if (oldNoteEnd != noteEnd) {
-                noteEnd = noteEnd > Config.noteSizeMax ? Config.noteSizeMax : noteEnd < 0 ? 0 : noteEnd;
-                instrument.envelopes[index].noteSizeEnd = noteEnd;
                 instrument.preset = instrument.type;
                 doc.notifier.changed();
                 this._didSomething();
@@ -29697,15 +30381,3234 @@ li.select2-results__option[role=group] > strong:hover {
         }
     }
 
-    const { button: button$o, div: div$o, span: span$6, h2: h2$n, input: input$h, br: br$4, select: select$d, option: option$d } = HTML;
+    class Piano {
+        forceRender() {
+            this._renderedScale = -1;
+            this._documentChanged();
+        }
+        static getBassCutoffPitch(doc) {
+            const octaveOffset = doc.getBaseVisibleOctave(doc.channel);
+            return octaveOffset * Config.pitchesPerOctave + Math.floor(doc.getVisiblePitchCount() / (Config.pitchesPerOctave * 2)) * Config.pitchesPerOctave;
+        }
+        constructor(_doc) {
+            this._doc = _doc;
+            this._pianoContainer = HTML.div({ style: "width: 100%; height: 100%; display: flex; flex-direction: column-reverse; align-items: stretch;" });
+            this._drumContainer = HTML.div({ style: "width: 100%; height: 100%; display: flex; flex-direction: column-reverse; align-items: stretch;" });
+            this._modContainer = HTML.div({ style: "width: 100%; height: 100%; display: flex; flex-direction: column-reverse; align-items: stretch;" });
+            this._preview = HTML.div({ style: `width: 100%; height: 40px; border: 2px solid ${ColorConfig.primaryText}; position: absolute; box-sizing: border-box; pointer-events: none;` });
+            this.container = HTML.div({ style: "width: 32px; height: 100%; overflow: hidden; position: relative; flex-shrink: 0; touch-action: none;" }, this._pianoContainer, this._drumContainer, this._modContainer, this._preview);
+            this._editorHeight = 481;
+            this._pianoKeys = [];
+            this._pianoLabels = [];
+            this._modFirstLabels = [];
+            this._modSecondLabels = [];
+            this._modCountLabels = [];
+            this._modCountRects = [];
+            this._mouseY = 0;
+            this._mouseDown = false;
+            this._mouseOver = false;
+            this._playedPitch = -1;
+            this._renderedScale = -1;
+            this._renderedDrums = false;
+            this._renderedMod = false;
+            this._renderedKey = -1;
+            this._renderedPitchCount = -1;
+            this._renderedLiveInputPitches = [];
+            this._whenMouseOver = (event) => {
+                if (this._mouseOver)
+                    return;
+                this._mouseOver = true;
+                this._updatePreview();
+            };
+            this._whenMouseOut = (event) => {
+                if (!this._mouseOver)
+                    return;
+                this._mouseOver = false;
+                this._updatePreview();
+            };
+            this._whenMousePressed = (event) => {
+                event.preventDefault();
+                this._doc.synth.maintainLiveInput();
+                this._mouseDown = true;
+                const boundingRect = this.container.getBoundingClientRect();
+                this._mouseY = ((event.clientY || event.pageY) - boundingRect.top) * this._editorHeight / (boundingRect.bottom - boundingRect.top);
+                if (isNaN(this._mouseY))
+                    this._mouseY = 0;
+                this._updateCursorPitch();
+                this._playLiveInput();
+                this._updatePreview();
+            };
+            this._whenMouseMoved = (event) => {
+                if (this._mouseDown || this._mouseOver)
+                    this._doc.synth.maintainLiveInput();
+                const boundingRect = this.container.getBoundingClientRect();
+                this._mouseY = ((event.clientY || event.pageY) - boundingRect.top) * this._editorHeight / (boundingRect.bottom - boundingRect.top);
+                if (isNaN(this._mouseY))
+                    this._mouseY = 0;
+                this._updateCursorPitch();
+                if (this._mouseDown)
+                    this._playLiveInput();
+                this._updatePreview();
+            };
+            this._whenMouseReleased = (event) => {
+                if (this._mouseDown)
+                    this._releaseLiveInput();
+                this._mouseDown = false;
+                this._updatePreview();
+            };
+            this._whenTouchPressed = (event) => {
+                event.preventDefault();
+                this._doc.synth.maintainLiveInput();
+                this._mouseDown = true;
+                const boundingRect = this.container.getBoundingClientRect();
+                this._mouseY = (event.touches[0].clientY - boundingRect.top) * this._editorHeight / (boundingRect.bottom - boundingRect.top);
+                if (isNaN(this._mouseY))
+                    this._mouseY = 0;
+                this._updateCursorPitch();
+                this._playLiveInput();
+            };
+            this._whenTouchMoved = (event) => {
+                event.preventDefault();
+                this._doc.synth.maintainLiveInput();
+                const boundingRect = this.container.getBoundingClientRect();
+                this._mouseY = (event.touches[0].clientY - boundingRect.top) * this._editorHeight / (boundingRect.bottom - boundingRect.top);
+                if (isNaN(this._mouseY))
+                    this._mouseY = 0;
+                this._updateCursorPitch();
+                if (this._mouseDown)
+                    this._playLiveInput();
+            };
+            this._whenTouchReleased = (event) => {
+                event.preventDefault();
+                this._mouseDown = false;
+                this._releaseLiveInput();
+            };
+            this._onAnimationFrame = () => {
+                window.requestAnimationFrame(this._onAnimationFrame);
+                let liveInputChanged = false;
+                let liveInputPitchCount = !this._doc.performance.pitchesAreTemporary() ? this._doc.synth.liveInputPitches.length : 0;
+                liveInputPitchCount += !this._doc.performance.bassPitchesAreTemporary() ? this._doc.synth.liveBassInputPitches.length : 0;
+                if (this._renderedLiveInputPitches.length != liveInputPitchCount) {
+                    liveInputChanged = true;
+                }
+                for (let i = 0; i < this._doc.synth.liveInputPitches.length; i++) {
+                    if (this._renderedLiveInputPitches[i] != this._doc.synth.liveInputPitches[i]) {
+                        this._renderedLiveInputPitches[i] = this._doc.synth.liveInputPitches[i];
+                        liveInputChanged = true;
+                    }
+                }
+                for (let i = this._doc.synth.liveInputPitches.length; i < liveInputPitchCount; i++) {
+                    if (this._renderedLiveInputPitches[i] != this._doc.synth.liveBassInputPitches[i - this._doc.synth.liveInputPitches.length]) {
+                        this._renderedLiveInputPitches[i] = this._doc.synth.liveBassInputPitches[i - this._doc.synth.liveInputPitches.length];
+                        liveInputChanged = true;
+                    }
+                }
+                this._renderedLiveInputPitches.length = liveInputPitchCount;
+                if (liveInputChanged) {
+                    this._updatePreview();
+                }
+            };
+            this._documentChanged = () => {
+                const isDrum = this._doc.song.getChannelIsNoise(this._doc.channel);
+                const isMod = this._doc.song.getChannelIsMod(this._doc.channel);
+                this._pitchCount = isMod ? Config.modCount : (isDrum ? Config.drumCount : this._doc.getVisiblePitchCount());
+                this._pitchHeight = this._editorHeight / this._pitchCount;
+                this._updateCursorPitch();
+                if (this._mouseDown)
+                    this._playLiveInput();
+                if (!this._doc.prefs.showLetters)
+                    return;
+                if ((this._renderedScale == this._doc.song.scale && this._doc.song.scale != Config.scales.dictionary["Custom"].index) && this._renderedKey == this._doc.song.key && this._renderedDrums == isDrum && this._renderedMod == isMod && this._renderedPitchCount == this._pitchCount)
+                    return;
+                this._renderedScale = this._doc.song.scale;
+                this._renderedKey = this._doc.song.key;
+                this._renderedDrums = isDrum;
+                this._renderedMod = isMod;
+                const instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
+                this._pianoContainer.style.display = (isDrum || isMod) ? "none" : "flex";
+                this._drumContainer.style.display = isDrum ? "flex" : "none";
+                this._modContainer.style.display = isMod ? "flex" : "none";
+                if (!isDrum && !isMod) {
+                    if (this._renderedPitchCount != this._pitchCount) {
+                        this._pianoContainer.innerHTML = "";
+                        for (let i = 0; i < this._pitchCount; i++) {
+                            const pianoLabel = HTML.div({ class: "piano-label", style: "font-weight: bold; -webkit-text-stroke-width: 0; font-size: 11px; font-family: sans-serif; position: absolute; padding-left: 15px; white-space: nowrap;" });
+                            const pianoKey = HTML.div({ class: "piano-button", style: "background: gray;" }, pianoLabel);
+                            this._pianoContainer.appendChild(pianoKey);
+                            this._pianoLabels[i] = pianoLabel;
+                            this._pianoKeys[i] = pianoKey;
+                        }
+                        this._pianoLabels.length = this._pitchCount;
+                        this._pianoKeys.length = this._pitchCount;
+                        this._renderedPitchCount = this._pitchCount;
+                    }
+                    for (let j = 0; j < this._pitchCount; j++) {
+                        const pitchNameIndex = (j + Config.keys[this._doc.song.key].basePitch) % Config.pitchesPerOctave;
+                        const isWhiteKey = Config.keys[pitchNameIndex].isWhiteKey;
+                        this._pianoKeys[j].style.background = isWhiteKey ? ColorConfig.whitePianoKey : ColorConfig.blackPianoKey;
+                        let scale = this._doc.song.scale == Config.scales.dictionary["Custom"].index ? this._doc.song.scaleCustom : Config.scales[this._doc.song.scale].flags;
+                        if (!scale[j % Config.pitchesPerOctave]) {
+                            this._pianoKeys[j].classList.add("disabled");
+                            this._pianoLabels[j].style.display = "none";
+                        }
+                        else {
+                            this._pianoKeys[j].classList.remove("disabled");
+                            this._pianoLabels[j].style.display = "";
+                            const label = this._pianoLabels[j];
+                            if ((j % 12) == 0) {
+                                label.style.transform = "translate(-5px, 0px)";
+                            }
+                            else {
+                                label.style.transform = "translate(0px, 0px)";
+                            }
+                            label.style.color = Config.keys[pitchNameIndex].isWhiteKey ? ColorConfig.whitePianoKeyText : ColorConfig.blackPianoKeyText;
+                            label.textContent = Piano.getPitchName(pitchNameIndex, j, this._doc.getBaseVisibleOctave(this._doc.channel) + this._doc.song.octave);
+                        }
+                    }
+                }
+                else if (isMod) {
+                    let firstRow = "";
+                    let secondRow = "";
+                    let useFirstColor = ColorConfig.modLabelPrimaryText;
+                    let useSecondColor = ColorConfig.modLabelSecondaryText;
+                    for (let j = 0; j < Config.modCount; j++) {
+                        let usingSecondRow = true;
+                        let usingMod = true;
+                        let instrumentVal = instrument.modInstruments[Config.modCount - j - 1] + 1;
+                        let channelVal = instrument.modChannels[Config.modCount - j - 1] + 1;
+                        let modulator = instrument.modulators[Config.modCount - j - 1];
+                        let status = 1 + +(channelVal - 1 >= this._doc.song.pitchChannelCount);
+                        if (instrument.modChannels[Config.modCount - j - 1] == -2)
+                            status = 0;
+                        else if (instrument.modChannels[Config.modCount - j - 1] == -1)
+                            status = 3;
+                        let instrumentsLength = this._doc.song.channels[Math.max(0, channelVal - 1)].instruments.length;
+                        switch (status) {
+                            case 0:
+                                firstRow = "Mod";
+                                usingSecondRow = false;
+                                useSecondColor = ColorConfig.modLabelSecondaryText;
+                                usingMod = false;
+                                break;
+                            case 1:
+                                if (this._doc.song.channels[channelVal - 1].name == "") {
+                                    if (instrumentsLength > 1) {
+                                        if (channelVal >= 10 || instrumentVal >= 10) {
+                                            firstRow = "P" + channelVal;
+                                            if (instrumentVal - 1 == instrumentsLength) {
+                                                firstRow += " All";
+                                            }
+                                            else if (instrumentVal - 1 > instrumentsLength) {
+                                                firstRow += " Act";
+                                            }
+                                            else {
+                                                firstRow += " I" + instrumentVal;
+                                            }
+                                        }
+                                        else {
+                                            firstRow = "Pitch" + channelVal;
+                                            if (instrumentVal - 1 == instrumentsLength) {
+                                                firstRow += " All";
+                                            }
+                                            else if (instrumentVal - 1 > instrumentsLength) {
+                                                firstRow += " Act";
+                                            }
+                                            else {
+                                                firstRow += " Ins" + instrumentVal;
+                                            }
+                                        }
+                                    }
+                                    else {
+                                        firstRow = "Pitch " + channelVal;
+                                    }
+                                }
+                                else {
+                                    let insText;
+                                    if (instrumentVal - 1 == instrumentsLength) {
+                                        insText = " All";
+                                    }
+                                    else if (instrumentVal - 1 > instrumentsLength) {
+                                        insText = " Act";
+                                    }
+                                    else {
+                                        insText = " I" + instrumentVal;
+                                    }
+                                    if (instrumentsLength > 1) {
+                                        firstRow = "P" + channelVal + " " + this._doc.song.channels[channelVal - 1].name + insText;
+                                    }
+                                    else {
+                                        firstRow = "P" + channelVal + " " + this._doc.song.channels[channelVal - 1].name;
+                                    }
+                                }
+                                break;
+                            case 2:
+                                const absoluteChannelVal = instrument.modChannels[Config.modCount - j - 1];
+                                const relativeChannelVal = absoluteChannelVal - this._doc.song.pitchChannelCount;
+                                if (this._doc.song.channels[absoluteChannelVal].name == "") {
+                                    if (instrumentsLength > 1) {
+                                        if ((relativeChannelVal + 1) >= 10 || instrumentVal >= 10) {
+                                            firstRow = "N" + (relativeChannelVal + 1);
+                                            if (instrumentVal - 1 == instrumentsLength) {
+                                                firstRow += " All";
+                                            }
+                                            else if (instrumentVal - 1 > instrumentsLength) {
+                                                firstRow += " Act";
+                                            }
+                                            else {
+                                                firstRow += " I" + instrumentVal;
+                                            }
+                                        }
+                                        else {
+                                            firstRow = "Noise" + (relativeChannelVal + 1);
+                                            if (instrumentVal - 1 == instrumentsLength) {
+                                                firstRow += " All";
+                                            }
+                                            else if (instrumentVal - 1 > instrumentsLength) {
+                                                firstRow += " Act";
+                                            }
+                                            else {
+                                                firstRow += " Ins" + instrumentVal;
+                                            }
+                                        }
+                                    }
+                                    else {
+                                        firstRow = "Noise " + (relativeChannelVal + 1);
+                                    }
+                                }
+                                else {
+                                    if (instrumentsLength > 1) {
+                                        let insText;
+                                        if (instrumentVal - 1 == instrumentsLength) {
+                                            insText = " All";
+                                        }
+                                        else if (instrumentVal - 1 > instrumentsLength) {
+                                            insText = " Act";
+                                        }
+                                        else {
+                                            insText = " I" + instrumentVal;
+                                        }
+                                        firstRow = "N" + (relativeChannelVal + 1) + " " + this._doc.song.channels[absoluteChannelVal].name + insText;
+                                    }
+                                    else {
+                                        firstRow = "N" + (relativeChannelVal + 1) + " " + this._doc.song.channels[absoluteChannelVal].name;
+                                    }
+                                }
+                                break;
+                            case 3:
+                                firstRow = "Song";
+                                break;
+                        }
+                        if (usingSecondRow) {
+                            secondRow = Config.modulators[modulator].pianoName;
+                            if (modulator == Config.modulators.dictionary["none"].index) {
+                                useSecondColor = ColorConfig.modLabelSecondaryText;
+                                usingMod = false;
+                            }
+                            else if (modulator == Config.modulators.dictionary["eq filter"].index || modulator == Config.modulators.dictionary["note filter"].index || modulator == Config.modulators.dictionary["song eq"].index) {
+                                var text = " Morph";
+                                var filterVal = instrument.modFilterTypes[Config.modCount - j - 1];
+                                if (filterVal > 0 && (filterVal % 2)) {
+                                    text = " Dot" + Math.ceil(filterVal / 2) + "X";
+                                }
+                                else if (filterVal > 0) {
+                                    text = " Dot" + Math.ceil(filterVal / 2) + "Y";
+                                }
+                                secondRow += text;
+                            }
+                        }
+                        const firstLabel = this._modFirstLabels[j];
+                        const secondLabel = this._modSecondLabels[j];
+                        const modCountLabel = this._modCountLabels[j];
+                        const modCountRect = this._modCountRects[j];
+                        firstLabel.style.fill = useFirstColor;
+                        firstLabel.textContent = firstRow;
+                        secondLabel.style.fill = useSecondColor;
+                        secondLabel.textContent = usingSecondRow ? secondRow : "Not set";
+                        modCountLabel.textContent = "" + (Config.modCount - j);
+                        modCountRect.style.fill = usingMod ? ColorConfig.indicatorPrimary : ColorConfig.modLabelSecondaryText;
+                        if (this._doc.song.channels[Math.max(0, instrument.modChannels[Config.modCount - j - 1])].name != "") {
+                            let scaleFactor = "1";
+                            let height = firstLabel.parentElement.parentElement.getBoundingClientRect().height;
+                            let length = firstLabel.getComputedTextLength();
+                            let squeeze = 0;
+                            if (length > height - 8) {
+                                scaleFactor = "0.65";
+                                squeeze = 2;
+                            }
+                            else if (length > height - 24) {
+                                scaleFactor = "0.8";
+                                squeeze = 1;
+                            }
+                            firstLabel.style.transform = "rotate(-90deg) translate(" + (-20 - squeeze - Math.round(Math.max(0, (height - 80) / 2))) + "px, 39px) scale(" + scaleFactor + ", 1)";
+                            while (scaleFactor == "0.65" && firstLabel.getComputedTextLength() > height + 8) {
+                                var offset = 4 + (instrumentVal >= 10 ? 1 : 0);
+                                firstLabel.textContent = firstLabel.textContent.substr(0, firstLabel.textContent.length - offset) + firstLabel.textContent.substr(firstLabel.textContent.length - offset + 1);
+                            }
+                        }
+                        else {
+                            let height = firstLabel.parentElement.parentElement.getBoundingClientRect().height;
+                            firstLabel.style.transform = "rotate(-90deg) translate(" + (-20 - Math.round(Math.max(0, (height - 80) / 2))) + "px, 39px) scale(1, 1)";
+                        }
+                    }
+                }
+                this._updatePreview();
+            };
+            for (let i = 0; i < Config.drumCount; i++) {
+                const scale = (1.0 - (i / Config.drumCount) * 0.35) * 100;
+                this._drumContainer.appendChild(HTML.div({ class: "drum-button", style: `background-size: ${scale}% ${scale}%;` }));
+            }
+            for (let i = 0; i < Config.modCount; i++) {
+                const firstRowText = SVG.text({ class: "modulator-label", "text-anchor": "left", fill: ColorConfig.modLabelPrimaryText, style: "font-weight: bold; align-self: flex-start; transform-origin: center; transform: rotate(-90deg) translate(-19px, 39px); font-size: 11px; font-family: sans-serif;" });
+                const secondRowText = SVG.text({ class: "modulator-label", "text-anchor": "left", fill: ColorConfig.modLabelPrimaryText, style: "font-weight: bold; align-self: flex-end; transform-origin: center; transform: rotate(-90deg) translate(-26px, 42px); font-size: 11px; font-family: sans-serif;" });
+                const countText = SVG.text({ class: "modulator-inverse-label", fill: ColorConfig.modLabelPrimary, style: "font-weight: bold; align-self: flex-start; transform-origin: center; transform: rotate(-90deg) translate(4px, 13px); font-size: 11px; font-family: sans-serif;" });
+                const countRect = SVG.rect({ width: "12px", height: "9px", fill: ColorConfig.indicatorPrimary, style: "pointer-events: none; transform: translate(4px, 4px);" });
+                const firstRowSVG = SVG.svg({ viewBox: "0 0 16 66", width: "16px", style: "pointer-events: none; flex-grow: 1;" }, [
+                    firstRowText,
+                ]);
+                const countSVG = SVG.svg({ viewBox: "0 0 16 14", width: "16px", style: "pointer-events: none;" }, [
+                    countRect,
+                    countText,
+                ]);
+                const secondRowSVG = SVG.svg({ viewBox: "0 0 16 80", width: "16px", style: "pointer-events: none;" }, [
+                    secondRowText,
+                ]);
+                const flexRow1 = HTML.div({ style: "display: flex; flex-direction: column; justify-content: space-between; pointer-events: none;" }, [
+                    countSVG,
+                    firstRowSVG,
+                ]);
+                const flexRow2 = HTML.div({ style: "display: flex; flex-direction: column-reverse; justify-content: space-between; pointer-events: none;" }, [
+                    secondRowSVG,
+                ]);
+                const flexContainer = HTML.div({ style: "display: flex; flex-direction: row; justify-content: space-between; padding: 0px; width: 32px; height: 100%; overflow: hidden; pointer-events: none;" }, [
+                    flexRow1,
+                    flexRow2,
+                ]);
+                const modKey = HTML.div({ class: "modulator-button", style: "background: " + ColorConfig.modLabelPrimary + ";" }, flexContainer);
+                this._modContainer.appendChild(modKey);
+                this._modFirstLabels.push(firstRowText);
+                this._modSecondLabels.push(secondRowText);
+                this._modCountLabels.push(countText);
+                this._modCountRects.push(countRect);
+            }
+            this.container.addEventListener("mousedown", this._whenMousePressed);
+            document.addEventListener("mousemove", this._whenMouseMoved);
+            document.addEventListener("mouseup", this._whenMouseReleased);
+            this.container.addEventListener("mouseover", this._whenMouseOver);
+            this.container.addEventListener("mouseout", this._whenMouseOut);
+            this.container.addEventListener("touchstart", this._whenTouchPressed);
+            this.container.addEventListener("touchmove", this._whenTouchMoved);
+            this.container.addEventListener("touchend", this._whenTouchReleased);
+            this.container.addEventListener("touchcancel", this._whenTouchReleased);
+            this._doc.notifier.watch(this._documentChanged);
+            this._documentChanged();
+            window.requestAnimationFrame(this._onAnimationFrame);
+        }
+        _updateCursorPitch() {
+            const scale = this._doc.song.scale == Config.scales.dictionary["Custom"].index ? this._doc.song.scaleCustom : Config.scales[this._doc.song.scale].flags;
+            const mousePitch = Math.max(0, Math.min(this._pitchCount - 1, this._pitchCount - (this._mouseY / this._pitchHeight)));
+            if (scale[Math.floor(mousePitch) % Config.pitchesPerOctave] || this._doc.song.getChannelIsNoise(this._doc.channel)) {
+                this._cursorPitch = Math.floor(mousePitch);
+            }
+            else {
+                let topPitch = Math.floor(mousePitch) + 1;
+                let bottomPitch = Math.floor(mousePitch) - 1;
+                while (!scale[topPitch % Config.pitchesPerOctave]) {
+                    topPitch++;
+                }
+                while (!scale[(bottomPitch) % Config.pitchesPerOctave]) {
+                    bottomPitch--;
+                }
+                let topRange = topPitch;
+                let bottomRange = bottomPitch + 1;
+                if (topPitch % Config.pitchesPerOctave == 0 || topPitch % Config.pitchesPerOctave == 7) {
+                    topRange -= 0.5;
+                }
+                if (bottomPitch % Config.pitchesPerOctave == 0 || bottomPitch % Config.pitchesPerOctave == 7) {
+                    bottomRange += 0.5;
+                }
+                this._cursorPitch = mousePitch - bottomRange > topRange - mousePitch ? topPitch : bottomPitch;
+            }
+        }
+        _playLiveInput() {
+            const octaveOffset = this._doc.getBaseVisibleOctave(this._doc.channel) * Config.pitchesPerOctave;
+            const currentPitch = this._cursorPitch + octaveOffset;
+            if (this._playedPitch == currentPitch)
+                return;
+            this._doc.performance.removePerformedPitch(this._playedPitch);
+            this._playedPitch = currentPitch;
+            this._doc.performance.addPerformedPitch(currentPitch);
+        }
+        _releaseLiveInput() {
+            this._doc.performance.removePerformedPitch(this._playedPitch);
+            this._playedPitch = -1;
+        }
+        _updatePreview() {
+            this._preview.style.visibility = (!this._mouseOver || this._mouseDown) ? "hidden" : "visible";
+            if (this._mouseOver && !this._mouseDown) {
+                const boundingRect = this.container.getBoundingClientRect();
+                const pitchHeight = this._pitchHeight / (this._editorHeight / (boundingRect.bottom - boundingRect.top));
+                this._preview.style.left = "0px";
+                this._preview.style.top = pitchHeight * (this._pitchCount - this._cursorPitch - 1) + "px";
+                this._preview.style.height = pitchHeight + "px";
+            }
+            const octaveOffset = this._doc.getBaseVisibleOctave(this._doc.channel) * Config.pitchesPerOctave;
+            const container = this._doc.song.getChannelIsNoise(this._doc.channel) ? this._drumContainer : this._pianoContainer;
+            const children = container.children;
+            for (let i = 0; i < children.length; i++) {
+                const child = children[i];
+                if (this._renderedLiveInputPitches.indexOf(i + octaveOffset) == -1) {
+                    child.classList.remove("pressed");
+                }
+                else {
+                    child.classList.add("pressed");
+                }
+            }
+        }
+        static getPitchName(pitchNameIndex, scaleIndex, baseVisibleOctave) {
+            let text;
+            if (Config.keys[pitchNameIndex].isWhiteKey) {
+                text = Config.keys[pitchNameIndex].name;
+            }
+            else {
+                const shiftDir = Config.blackKeyNameParents[scaleIndex % Config.pitchesPerOctave];
+                text = Config.keys[(pitchNameIndex + Config.pitchesPerOctave + shiftDir) % Config.pitchesPerOctave].name;
+                if (shiftDir == 1) {
+                    text += "♭";
+                }
+                else if (shiftDir == -1) {
+                    text += "♯";
+                }
+            }
+            if (scaleIndex % 12 == 0) {
+                text += Math.floor(scaleIndex / 12) + baseVisibleOctave;
+            }
+            return text;
+        }
+    }
+
+    class SongPerformance {
+        constructor(_doc) {
+            this._doc = _doc;
+            this._channelIsDrum = false;
+            this._channelOctave = -1;
+            this._songKey = -1;
+            this._pitchesAreTemporary = false;
+            this._bassPitchesAreTemporary = false;
+            this._recentlyAddedPitches = [];
+            this._recentlyAddedBassPitches = [];
+            this._songLengthWhenRecordingStarted = -1;
+            this._playheadPart = -1;
+            this._bassPlayheadPart = -1;
+            this._playheadPattern = null;
+            this._bassPlayheadPattern = null;
+            this._pitchesChanged = false;
+            this._bassPitchesChanged = false;
+            this._lastNote = null;
+            this._lastBassNote = null;
+            this._recordingChange = null;
+            this._onAnimationFrame = () => {
+                window.requestAnimationFrame(this._onAnimationFrame);
+                if (this._doc.synth.recording) {
+                    let dirty = this._updateRecordedNotes();
+                    dirty = this._updateRecordedBassNotes() ? true : dirty;
+                    if (dirty) {
+                        this._doc.notifier.notifyWatchers();
+                    }
+                }
+            };
+            this._documentChanged = () => {
+                const isDrum = this._doc.song.getChannelIsNoise(this._doc.channel);
+                const octave = this._doc.song.channels[this._doc.channel].octave;
+                if (this._doc.synth.liveInputChannel != this._doc.channel || this._doc.synth.liveBassInputChannel != this._getBassOffsetChannel() || this._channelIsDrum != isDrum || this._channelOctave != octave || this._songKey != this._doc.song.key) {
+                    this._doc.synth.liveInputChannel = this._doc.channel;
+                    this._doc.synth.liveBassInputChannel = this._getBassOffsetChannel();
+                    this._channelIsDrum = isDrum;
+                    this._channelOctave = octave;
+                    this._songKey = this._doc.song.key;
+                    this.clearAllPitches();
+                    this.clearAllBassPitches();
+                }
+                this._doc.synth.liveInputInstruments = this._doc.recentPatternInstruments[this._doc.channel];
+                this._doc.synth.liveBassInputInstruments = this._doc.recentPatternInstruments[this._doc.synth.liveBassInputChannel];
+            };
+            this._doc.notifier.watch(this._documentChanged);
+            this._documentChanged();
+            window.requestAnimationFrame(this._onAnimationFrame);
+        }
+        play() {
+            this._doc.synth.play();
+            this._doc.synth.enableMetronome = false;
+            this._doc.synth.countInMetronome = false;
+            this._doc.synth.maintainLiveInput();
+        }
+        pause() {
+            this.clearAllPitches();
+            this.clearAllBassPitches();
+            if (this._recordingChange != null) {
+                if (this._doc.song.barCount > this._songLengthWhenRecordingStarted && !this._lastBarHasPatterns()) {
+                    new ChangeDeleteBars(this._doc, this._doc.song.barCount - 1, 1);
+                    new ChangeChannelBar(this._doc, this._doc.channel, this._doc.song.barCount - 1);
+                }
+                if (!this._recordingChange.isNoop()) {
+                    this._doc.record(this._recordingChange);
+                    this._recordingChange = null;
+                }
+                this._lastNote = null;
+            }
+            this._doc.synth.pause();
+            this._doc.synth.resetEffects();
+            this._doc.synth.enableMetronome = false;
+            this._doc.synth.countInMetronome = false;
+            if (this._doc.prefs.autoFollow) {
+                this._doc.synth.goToBar(this._doc.bar);
+            }
+            this._doc.synth.snapToBar();
+        }
+        record() {
+            this._doc.synth.snapToBar();
+            const playheadBar = Math.floor(this._doc.synth.playhead);
+            if (playheadBar != this._doc.bar) {
+                new ChangeChannelBar(this._doc, this._doc.channel, playheadBar);
+            }
+            if (this._pitchesAreTemporary) {
+                this.clearAllPitches();
+                this._pitchesAreTemporary = false;
+            }
+            if (this._bassPitchesAreTemporary) {
+                this.clearAllBassPitches();
+                this._bassPitchesAreTemporary = false;
+            }
+            this._doc.synth.enableMetronome = this._doc.prefs.metronomeWhileRecording;
+            this._doc.synth.countInMetronome = this._doc.prefs.metronomeCountIn;
+            this._doc.synth.startRecording();
+            this._doc.synth.maintainLiveInput();
+            this._songLengthWhenRecordingStarted = this._doc.song.barCount;
+            this._playheadPart = this._getCurrentPlayheadPart();
+            this._bassPlayheadPart = this._getCurrentPlayheadPart();
+            this._playheadPattern = null;
+            this._bassPlayheadPattern = null;
+            this._pitchesChanged = false;
+            this._bassPitchesChanged = false;
+            this._lastNote = null;
+            this._lastBassNote = null;
+            this._recentlyAddedPitches.length = 0;
+            this._recentlyAddedBassPitches.length = 0;
+            this._recordingChange = new ChangeGroup();
+            this._doc.setProspectiveChange(this._recordingChange);
+        }
+        abortRecording() {
+            this._recordingChange = null;
+            this.pause();
+        }
+        pitchesAreTemporary() {
+            return this._pitchesAreTemporary;
+        }
+        bassPitchesAreTemporary() {
+            return this._bassPitchesAreTemporary;
+        }
+        _getBassOffsetChannel() {
+            if (this._doc.channel >= this._doc.song.pitchChannelCount)
+                return this._doc.channel;
+            return Math.max(0, Math.min(this._doc.song.pitchChannelCount - 1, this._doc.channel + this._doc.prefs.bassOffset));
+        }
+        _getMinDivision() {
+            if (this._doc.prefs.snapRecordedNotesToRhythm) {
+                return Config.partsPerBeat / Config.rhythms[this._doc.song.rhythm].stepsPerBeat;
+            }
+            else {
+                return 1;
+            }
+        }
+        _getCurrentPlayheadPart() {
+            const currentPart = this._doc.synth.playhead * this._doc.song.beatsPerBar * Config.partsPerBeat;
+            if (this._doc.prefs.snapRecordedNotesToRhythm) {
+                const minDivision = this._getMinDivision();
+                return Math.round(currentPart / minDivision) * minDivision;
+            }
+            return Math.round(currentPart);
+        }
+        _lastBarHasPatterns() {
+            for (let channelIndex = 0; channelIndex < this._doc.song.getChannelCount(); channelIndex++) {
+                if (this._doc.song.channels[channelIndex].bars[this._doc.song.barCount - 1] != 0)
+                    return true;
+            }
+            return false;
+        }
+        _updateRecordedNotes() {
+            if (this._recordingChange == null)
+                return false;
+            if (!this._doc.lastChangeWas(this._recordingChange)) {
+                this.abortRecording();
+                return false;
+            }
+            if (this._doc.synth.countInMetronome) {
+                this._recentlyAddedPitches.length = 0;
+                this._pitchesChanged = false;
+                return false;
+            }
+            const partsPerBar = this._doc.song.beatsPerBar * Config.partsPerBeat;
+            const oldPart = this._playheadPart % partsPerBar;
+            const oldBar = Math.floor(this._playheadPart / partsPerBar);
+            const oldPlayheadPart = this._playheadPart;
+            this._playheadPart = this._getCurrentPlayheadPart();
+            const newPart = this._playheadPart % partsPerBar;
+            const newBar = Math.floor(this._playheadPart / partsPerBar);
+            if (oldPart == newPart && oldBar == newBar)
+                return false;
+            if (this._playheadPart < oldPlayheadPart) {
+                this._lastNote = null;
+                this._playheadPattern = null;
+                return false;
+            }
+            let dirty = false;
+            for (let bar = oldBar; bar <= newBar; bar++) {
+                if (bar != oldBar) {
+                    this._playheadPattern = null;
+                }
+                const startPart = (bar == oldBar) ? oldPart : 0;
+                const endPart = (bar == newBar) ? newPart : partsPerBar;
+                if (startPart == endPart)
+                    break;
+                if (this._lastNote != null && !this._pitchesChanged && startPart > 0 && this._doc.synth.liveInputPitches.length > 0) {
+                    this._recordingChange.append(new ChangePinTime(this._doc, this._lastNote, 1, endPart, this._lastNote.continuesLastPattern));
+                    this._doc.currentPatternIsDirty = true;
+                }
+                else {
+                    if (this._lastNote != null) {
+                        this._lastNote = null;
+                    }
+                    let noteStartPart = startPart;
+                    let noteEndPart = endPart;
+                    while (noteStartPart < endPart) {
+                        let addedAlreadyReleasedPitch = false;
+                        if (this._recentlyAddedPitches.length > 0 || this._doc.synth.liveInputPitches.length > 0) {
+                            if (this._playheadPattern == null) {
+                                this._doc.selection.erasePatternInBar(this._recordingChange, this._doc.synth.liveInputChannel, bar);
+                                this._recordingChange.append(new ChangeEnsurePatternExists(this._doc, this._doc.synth.liveInputChannel, bar));
+                                this._playheadPattern = this._doc.song.getPattern(this._doc.synth.liveInputChannel, bar);
+                            }
+                            if (this._playheadPattern == null)
+                                throw new Error();
+                            this._lastNote = new Note(-1, noteStartPart, noteEndPart, Config.noteSizeMax, this._doc.song.getChannelIsNoise(this._doc.synth.liveInputChannel));
+                            this._lastNote.continuesLastPattern = (noteStartPart == 0 && !this._pitchesChanged);
+                            this._lastNote.pitches.length = 0;
+                            while (this._recentlyAddedPitches.length > 0) {
+                                if (this._lastNote.pitches.length >= Config.maxChordSize)
+                                    break;
+                                const recentPitch = this._recentlyAddedPitches.shift();
+                                if (this._doc.synth.liveInputPitches.indexOf(recentPitch) == -1) {
+                                    this._lastNote.pitches.push(recentPitch);
+                                    addedAlreadyReleasedPitch = true;
+                                }
+                            }
+                            for (let i = 0; i < this._doc.synth.liveInputPitches.length; i++) {
+                                if (this._lastNote.pitches.length >= Config.maxChordSize)
+                                    break;
+                                this._lastNote.pitches.push(this._doc.synth.liveInputPitches[i]);
+                            }
+                            this._recordingChange.append(new ChangeNoteAdded(this._doc, this._playheadPattern, this._lastNote, this._playheadPattern.notes.length));
+                            if (addedAlreadyReleasedPitch) {
+                                noteEndPart = noteStartPart + this._getMinDivision();
+                                new ChangeNoteLength(this._doc, this._lastNote, this._lastNote.start, noteEndPart);
+                                this._lastNote = null;
+                            }
+                            dirty = true;
+                        }
+                        this._pitchesChanged = addedAlreadyReleasedPitch;
+                        noteStartPart = noteEndPart;
+                        noteEndPart = endPart;
+                    }
+                }
+                if (bar == this._doc.song.barCount - 1) {
+                    if (this._lastBarHasPatterns()) {
+                        new ChangeInsertBars(this._doc, this._doc.song.barCount, 1);
+                        this._doc.bar--;
+                        dirty = true;
+                    }
+                }
+            }
+            return dirty;
+        }
+        _updateRecordedBassNotes() {
+            if (this._recordingChange == null)
+                return false;
+            if (!this._doc.lastChangeWas(this._recordingChange)) {
+                this.abortRecording();
+                return false;
+            }
+            if (this._doc.synth.countInMetronome) {
+                this._recentlyAddedBassPitches.length = 0;
+                this._bassPitchesChanged = false;
+                return false;
+            }
+            const partsPerBar = this._doc.song.beatsPerBar * Config.partsPerBeat;
+            const oldPart = this._bassPlayheadPart % partsPerBar;
+            const oldBar = Math.floor(this._bassPlayheadPart / partsPerBar);
+            const oldPlayheadPart = this._bassPlayheadPart;
+            this._bassPlayheadPart = this._getCurrentPlayheadPart();
+            const newPart = this._bassPlayheadPart % partsPerBar;
+            const newBar = Math.floor(this._bassPlayheadPart / partsPerBar);
+            if (oldPart == newPart && oldBar == newBar)
+                return false;
+            if (this._bassPlayheadPart < oldPlayheadPart) {
+                this._lastBassNote = null;
+                this._bassPlayheadPattern = null;
+                return false;
+            }
+            let dirty = false;
+            for (let bar = oldBar; bar <= newBar; bar++) {
+                if (bar != oldBar) {
+                    this._bassPlayheadPattern = null;
+                }
+                const startPart = (bar == oldBar) ? oldPart : 0;
+                const endPart = (bar == newBar) ? newPart : partsPerBar;
+                if (startPart == endPart)
+                    break;
+                if (this._lastBassNote != null && !this._bassPitchesChanged && startPart > 0 && this._doc.synth.liveBassInputPitches.length > 0) {
+                    this._recordingChange.append(new ChangePinTime(this._doc, this._lastBassNote, 1, endPart, this._lastBassNote.continuesLastPattern));
+                    this._doc.currentPatternIsDirty = true;
+                }
+                else {
+                    if (this._lastBassNote != null) {
+                        this._lastBassNote = null;
+                    }
+                    let noteStartPart = startPart;
+                    let noteEndPart = endPart;
+                    while (noteStartPart < endPart) {
+                        let addedAlreadyReleasedPitch = false;
+                        if (this._recentlyAddedBassPitches.length > 0 || this._doc.synth.liveBassInputPitches.length > 0) {
+                            if (this._bassPlayheadPattern == null) {
+                                this._doc.selection.erasePatternInBar(this._recordingChange, this._doc.synth.liveBassInputChannel, bar);
+                                this._recordingChange.append(new ChangeEnsurePatternExists(this._doc, this._doc.synth.liveBassInputChannel, bar));
+                                this._bassPlayheadPattern = this._doc.song.getPattern(this._doc.synth.liveBassInputChannel, bar);
+                            }
+                            if (this._bassPlayheadPattern == null)
+                                throw new Error();
+                            this._lastBassNote = new Note(-1, noteStartPart, noteEndPart, Config.noteSizeMax, this._doc.song.getChannelIsNoise(this._doc.synth.liveBassInputChannel));
+                            this._lastBassNote.continuesLastPattern = (noteStartPart == 0 && !this._bassPitchesChanged);
+                            this._lastBassNote.pitches.length = 0;
+                            while (this._recentlyAddedBassPitches.length > 0) {
+                                if (this._lastBassNote.pitches.length >= Config.maxChordSize)
+                                    break;
+                                const recentPitch = this._recentlyAddedBassPitches.shift();
+                                if (this._doc.synth.liveBassInputPitches.indexOf(recentPitch) == -1) {
+                                    this._lastBassNote.pitches.push(recentPitch);
+                                    addedAlreadyReleasedPitch = true;
+                                }
+                            }
+                            for (let i = 0; i < this._doc.synth.liveBassInputPitches.length; i++) {
+                                if (this._lastBassNote.pitches.length >= Config.maxChordSize)
+                                    break;
+                                this._lastBassNote.pitches.push(this._doc.synth.liveBassInputPitches[i]);
+                            }
+                            this._recordingChange.append(new ChangeNoteAdded(this._doc, this._bassPlayheadPattern, this._lastBassNote, this._bassPlayheadPattern.notes.length));
+                            if (addedAlreadyReleasedPitch) {
+                                noteEndPart = noteStartPart + this._getMinDivision();
+                                new ChangeNoteLength(this._doc, this._lastBassNote, this._lastBassNote.start, noteEndPart);
+                                this._lastBassNote = null;
+                            }
+                            dirty = true;
+                        }
+                        this._bassPitchesChanged = addedAlreadyReleasedPitch;
+                        noteStartPart = noteEndPart;
+                        noteEndPart = endPart;
+                    }
+                }
+                if (bar == this._doc.song.barCount - 1) {
+                    if (this._lastBarHasPatterns()) {
+                        new ChangeInsertBars(this._doc, this._doc.song.barCount, 1);
+                        this._doc.bar--;
+                        dirty = true;
+                    }
+                }
+            }
+            return dirty;
+        }
+        setTemporaryPitches(pitches, duration) {
+            this._updateRecordedNotes();
+            for (let i = 0; i < pitches.length; i++) {
+                this._doc.synth.liveInputPitches[i] = pitches[i];
+            }
+            this._doc.synth.liveInputPitches.length = Math.min(pitches.length, Config.maxChordSize);
+            this._doc.synth.liveInputDuration = duration;
+            this._doc.synth.liveInputStarted = true;
+            this._pitchesAreTemporary = true;
+            this._pitchesChanged = true;
+        }
+        setTemporaryBassPitches(pitches, duration) {
+            this._updateRecordedBassNotes();
+            for (let i = 0; i < pitches.length; i++) {
+                this._doc.synth.liveBassInputPitches[i] = pitches[i];
+            }
+            this._doc.synth.liveBassInputPitches.length = Math.min(pitches.length, Config.maxChordSize);
+            this._doc.synth.liveBassInputDuration = duration;
+            this._doc.synth.liveBassInputStarted = true;
+            this._bassPitchesAreTemporary = true;
+            this._bassPitchesChanged = true;
+        }
+        addPerformedPitch(pitch) {
+            this._doc.synth.maintainLiveInput();
+            if (pitch > Piano.getBassCutoffPitch(this._doc) || this._getBassOffsetChannel() == this._doc.channel) {
+                this._updateRecordedNotes();
+                if (this._pitchesAreTemporary) {
+                    this.clearAllPitches();
+                    this._pitchesAreTemporary = false;
+                }
+                if (this._doc.prefs.ignorePerformedNotesNotInScale && !Config.scales[this._doc.song.scale].flags[pitch % Config.pitchesPerOctave]) {
+                    return;
+                }
+                if (this._doc.synth.liveInputPitches.indexOf(pitch) == -1) {
+                    this._doc.synth.liveInputPitches.push(pitch);
+                    this._pitchesChanged = true;
+                    while (this._doc.synth.liveInputPitches.length > Config.maxChordSize) {
+                        this._doc.synth.liveInputPitches.shift();
+                    }
+                    this._doc.synth.liveInputDuration = Number.MAX_SAFE_INTEGER;
+                    if (this._recordingChange != null) {
+                        const recentIndex = this._recentlyAddedPitches.indexOf(pitch);
+                        if (recentIndex != -1) {
+                            this._recentlyAddedPitches.splice(recentIndex, 1);
+                        }
+                        this._recentlyAddedPitches.push(pitch);
+                        while (this._recentlyAddedPitches.length > Config.maxChordSize * 4) {
+                            this._recentlyAddedPitches.shift();
+                        }
+                    }
+                }
+            }
+            else {
+                this._updateRecordedBassNotes();
+                if (this._bassPitchesAreTemporary) {
+                    this.clearAllBassPitches();
+                    this._bassPitchesAreTemporary = false;
+                }
+                if (this._doc.prefs.ignorePerformedNotesNotInScale && !Config.scales[this._doc.song.scale].flags[pitch % Config.pitchesPerOctave]) {
+                    return;
+                }
+                if (this._doc.synth.liveBassInputPitches.indexOf(pitch) == -1) {
+                    this._doc.synth.liveBassInputPitches.push(pitch);
+                    this._bassPitchesChanged = true;
+                    while (this._doc.synth.liveBassInputPitches.length > Config.maxChordSize) {
+                        this._doc.synth.liveBassInputPitches.shift();
+                    }
+                    this._doc.synth.liveBassInputDuration = Number.MAX_SAFE_INTEGER;
+                    if (this._recordingChange != null) {
+                        const recentIndex = this._recentlyAddedPitches.indexOf(pitch);
+                        if (recentIndex != -1) {
+                            this._recentlyAddedBassPitches.splice(recentIndex, 1);
+                        }
+                        this._recentlyAddedBassPitches.push(pitch);
+                        while (this._recentlyAddedBassPitches.length > Config.maxChordSize * 4) {
+                            this._recentlyAddedBassPitches.shift();
+                        }
+                    }
+                }
+            }
+        }
+        removePerformedPitch(pitch) {
+            if (pitch > Piano.getBassCutoffPitch(this._doc) || this._getBassOffsetChannel() == this._doc.channel) {
+                this._updateRecordedNotes();
+                for (let i = 0; i < this._doc.synth.liveInputPitches.length; i++) {
+                    if (this._doc.synth.liveInputPitches[i] == pitch) {
+                        this._doc.synth.liveInputPitches.splice(i, 1);
+                        this._pitchesChanged = true;
+                        i--;
+                    }
+                }
+            }
+            else {
+                this._updateRecordedBassNotes();
+                for (let i = 0; i < this._doc.synth.liveBassInputPitches.length; i++) {
+                    if (this._doc.synth.liveBassInputPitches[i] == pitch) {
+                        this._doc.synth.liveBassInputPitches.splice(i, 1);
+                        this._bassPitchesChanged = true;
+                        i--;
+                    }
+                }
+            }
+        }
+        clearAllPitches() {
+            this._updateRecordedNotes();
+            this._doc.synth.liveInputPitches.length = 0;
+            this._pitchesChanged = true;
+        }
+        clearAllBassPitches() {
+            this._updateRecordedBassNotes();
+            this._doc.synth.liveBassInputPitches.length = 0;
+            this._bassPitchesChanged = true;
+        }
+    }
+
+    class Selection {
+        constructor(_doc) {
+            this._doc = _doc;
+            this.boxSelectionX0 = 0;
+            this.boxSelectionY0 = 0;
+            this.boxSelectionX1 = 0;
+            this.boxSelectionY1 = 0;
+            this.digits = "";
+            this.instrumentDigits = "";
+            this.patternSelectionStart = 0;
+            this.patternSelectionEnd = 0;
+            this.patternSelectionActive = false;
+            this._changeTranspose = null;
+            this._changeTrack = null;
+            this._changeInstrument = null;
+            this._changeReorder = null;
+        }
+        toJSON() {
+            return {
+                "x0": this.boxSelectionX0,
+                "x1": this.boxSelectionX1,
+                "y0": this.boxSelectionY0,
+                "y1": this.boxSelectionY1,
+                "start": this.patternSelectionStart,
+                "end": this.patternSelectionEnd,
+            };
+        }
+        fromJSON(json) {
+            if (json == null)
+                return;
+            this.boxSelectionX0 = +json["x0"];
+            this.boxSelectionX1 = +json["x1"];
+            this.boxSelectionY0 = +json["y0"];
+            this.boxSelectionY1 = +json["y1"];
+            this.patternSelectionStart = +json["start"];
+            this.patternSelectionEnd = +json["end"];
+            this.digits = "";
+            this.instrumentDigits = "";
+            this.patternSelectionActive = this.patternSelectionStart < this.patternSelectionEnd;
+        }
+        selectionUpdated() {
+            this._doc.notifier.changed();
+            this.digits = "";
+            this.instrumentDigits = "";
+        }
+        get boxSelectionBar() {
+            return Math.min(this.boxSelectionX0, this.boxSelectionX1);
+        }
+        get boxSelectionChannel() {
+            return Math.min(this.boxSelectionY0, this.boxSelectionY1);
+        }
+        get boxSelectionWidth() {
+            return Math.abs(this.boxSelectionX0 - this.boxSelectionX1) + 1;
+        }
+        get boxSelectionHeight() {
+            return Math.abs(this.boxSelectionY0 - this.boxSelectionY1) + 1;
+        }
+        get boxSelectionActive() {
+            return this.boxSelectionWidth > 1 || this.boxSelectionHeight > 1;
+        }
+        scrollToSelectedPattern() {
+            this._doc.barScrollPos = Math.min(this._doc.bar, Math.max(this._doc.bar - (this._doc.trackVisibleBars - 1), this._doc.barScrollPos));
+            this._doc.channelScrollPos = Math.min(this._doc.channel, Math.max(this._doc.channel - (this._doc.trackVisibleChannels - 1), this._doc.channelScrollPos));
+        }
+        scrollToEndOfSelection() {
+            this._doc.barScrollPos = Math.min(this.boxSelectionX1, Math.max(this.boxSelectionX1 - (this._doc.trackVisibleBars - 1), this._doc.barScrollPos));
+            this._doc.channelScrollPos = Math.min(this.boxSelectionY1, Math.max(this.boxSelectionY1 - (this._doc.trackVisibleChannels - 1), this._doc.channelScrollPos));
+        }
+        setChannelBar(channelIndex, bar) {
+            if (channelIndex == this._doc.channel && bar == this._doc.bar)
+                return;
+            const canReplaceLastChange = this._doc.lastChangeWas(this._changeTrack);
+            this._changeTrack = new ChangeGroup();
+            this._changeTrack.append(new ChangeChannelBar(this._doc, channelIndex, bar));
+            const pattern = this._doc.getCurrentPattern(0);
+            if (pattern != null) {
+                if (pattern.instruments.indexOf(this._doc.viewedInstrument[this._doc.channel]) < 0) {
+                    this._doc.viewedInstrument[this._doc.channel] = pattern.instruments[0];
+                }
+            }
+            if (!this._doc.hasRedoHistory()) {
+                this._doc.record(this._changeTrack, canReplaceLastChange);
+            }
+            this.selectionUpdated();
+        }
+        setPattern(pattern) {
+            this._doc.record(new ChangePatternNumbers(this._doc, pattern, this.boxSelectionBar, this.boxSelectionChannel, this.boxSelectionWidth, this.boxSelectionHeight));
+        }
+        nextDigit(digit, forInstrument, forRhythms) {
+            if (forRhythms) {
+                if (digit == "3") {
+                    this._doc.record(new ChangeRhythm(this._doc, 0));
+                }
+                else if (digit == "4") {
+                    this._doc.record(new ChangeRhythm(this._doc, 1));
+                }
+                else if (digit == "6") {
+                    this._doc.record(new ChangeRhythm(this._doc, 2));
+                }
+                else if (digit == "8") {
+                    this._doc.record(new ChangeRhythm(this._doc, 3));
+                }
+                else if (digit == "0" || digit == "1") {
+                    this._doc.record(new ChangeRhythm(this._doc, 4));
+                }
+            }
+            else if (forInstrument) {
+                if (digit == "0")
+                    digit = "10";
+                this.instrumentDigits += digit;
+                var parsed = parseInt(this.instrumentDigits);
+                if (parsed != 0 && parsed <= this._doc.song.channels[this._doc.channel].instruments.length) {
+                    this.selectInstrument(parsed - 1);
+                    return;
+                }
+                this.instrumentDigits = digit;
+                parsed = parseInt(this.instrumentDigits);
+                if (parsed != 0 && parsed <= this._doc.song.channels[this._doc.channel].instruments.length) {
+                    this.selectInstrument(parsed - 1);
+                    return;
+                }
+                this.instrumentDigits = "";
+            }
+            else {
+                this.digits += digit;
+                let parsed = parseInt(this.digits);
+                if (parsed <= this._doc.song.patternsPerChannel) {
+                    this.setPattern(parsed);
+                    return;
+                }
+                this.digits = digit;
+                parsed = parseInt(this.digits);
+                if (parsed <= this._doc.song.patternsPerChannel) {
+                    this.setPattern(parsed);
+                    return;
+                }
+                this.digits = "";
+            }
+        }
+        setModChannel(mod, index) {
+            this._doc.record(new ChangeModChannel(this._doc, mod, index));
+        }
+        setModInstrument(mod, instrument) {
+            this._doc.record(new ChangeModInstrument(this._doc, mod, instrument));
+        }
+        setModSetting(mod, text) {
+            this._doc.record(new ChangeModSetting(this._doc, mod, text));
+        }
+        setModFilter(mod, type) {
+            this._doc.record(new ChangeModFilter(this._doc, mod, type));
+        }
+        setModEnvelope(mod, type) {
+            this._doc.record(new ChangeModEnvelope(this._doc, mod, type));
+        }
+        insertBars() {
+            this._doc.record(new ChangeInsertBars(this._doc, this.boxSelectionBar + this.boxSelectionWidth, this.boxSelectionWidth));
+            const width = this.boxSelectionWidth;
+            this.boxSelectionX0 += width;
+            this.boxSelectionX1 += width;
+        }
+        insertChannel() {
+            const group = new ChangeGroup();
+            const insertIndex = this.boxSelectionChannel + this.boxSelectionHeight;
+            const isNoise = this._doc.song.getChannelIsNoise(insertIndex - 1);
+            const isMod = this._doc.song.getChannelIsMod(insertIndex - 1);
+            group.append(new ChangeAddChannel(this._doc, insertIndex, isNoise, isMod));
+            if (!group.isNoop()) {
+                this.boxSelectionY0 = this.boxSelectionY1 = insertIndex;
+                group.append(new ChangeChannelBar(this._doc, insertIndex, this._doc.bar));
+                this._doc.record(group);
+            }
+        }
+        deleteBars() {
+            const group = new ChangeGroup();
+            if (this._doc.selection.patternSelectionActive) {
+                if (this.boxSelectionActive) {
+                    group.append(new ChangeDuplicateSelectedReusedPatterns(this._doc, this.boxSelectionBar, this.boxSelectionWidth, this.boxSelectionChannel, this.boxSelectionHeight, false));
+                }
+                for (const channelIndex of this._eachSelectedChannel()) {
+                    for (const pattern of this._eachSelectedPattern(channelIndex)) {
+                        group.append(new ChangeNoteTruncate(this._doc, pattern, this._doc.selection.patternSelectionStart, this._doc.selection.patternSelectionEnd));
+                    }
+                }
+                group.append(new ChangePatternSelection(this._doc, 0, 0));
+            }
+            else {
+                group.append(new ChangeDeleteBars(this._doc, this.boxSelectionBar, this.boxSelectionWidth));
+                const width = this.boxSelectionWidth;
+                this.boxSelectionX0 = Math.max(0, this.boxSelectionX0 - width);
+                this.boxSelectionX1 = Math.max(0, this.boxSelectionX1 - width);
+            }
+            this._doc.record(group);
+        }
+        deleteChannel() {
+            this._doc.record(new ChangeRemoveChannel(this._doc, this.boxSelectionChannel, this.boxSelectionChannel + this.boxSelectionHeight - 1));
+            this.boxSelectionY0 = this.boxSelectionY1 = this._doc.channel;
+            ColorConfig.resetColors();
+        }
+        *_eachSelectedChannel() {
+            for (let channelIndex = this.boxSelectionChannel; channelIndex < this.boxSelectionChannel + this.boxSelectionHeight; channelIndex++) {
+                yield channelIndex;
+            }
+        }
+        *_eachSelectedBar() {
+            for (let bar = this.boxSelectionBar; bar < this.boxSelectionBar + this.boxSelectionWidth; bar++) {
+                yield bar;
+            }
+        }
+        *_eachSelectedPattern(channelIndex) {
+            const handledPatterns = {};
+            for (const bar of this._eachSelectedBar()) {
+                const currentPatternIndex = this._doc.song.channels[channelIndex].bars[bar];
+                if (currentPatternIndex == 0)
+                    continue;
+                if (handledPatterns[String(currentPatternIndex)])
+                    continue;
+                handledPatterns[String(currentPatternIndex)] = true;
+                const pattern = this._doc.song.getPattern(channelIndex, bar);
+                if (pattern == null)
+                    throw new Error();
+                yield pattern;
+            }
+        }
+        _parseCopiedInstrumentArray(patternCopy, channelIndex) {
+            const instruments = Array.from(patternCopy["instruments"]).map(i => i >>> 0);
+            discardInvalidPatternInstruments(instruments, this._doc.song, channelIndex);
+            return instruments;
+        }
+        _patternIndexIsUnused(channelIndex, patternIndex) {
+            for (let i = 0; i < this._doc.song.barCount; i++) {
+                if (this._doc.song.channels[channelIndex].bars[i] == patternIndex) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        copy() {
+            const channels = [];
+            for (const channelIndex of this._eachSelectedChannel()) {
+                const patterns = {};
+                const bars = [];
+                for (const bar of this._eachSelectedBar()) {
+                    const patternNumber = this._doc.song.channels[channelIndex].bars[bar];
+                    bars.push(patternNumber);
+                    if (patterns[String(patternNumber)] == undefined) {
+                        const pattern = this._doc.song.getPattern(channelIndex, bar);
+                        let instruments = this._doc.recentPatternInstruments[channelIndex];
+                        let notes = [];
+                        if (pattern != null) {
+                            instruments = pattern.instruments.concat();
+                            if (this.patternSelectionActive) {
+                                for (const note of pattern.cloneNotes()) {
+                                    if (note.end <= this.patternSelectionStart)
+                                        continue;
+                                    if (note.start >= this.patternSelectionEnd)
+                                        continue;
+                                    note.start -= this.patternSelectionStart;
+                                    note.end -= this.patternSelectionStart;
+                                    if (note.start < 0 || note.end > this.patternSelectionEnd - this.patternSelectionStart) {
+                                        new ChangeNoteLength(null, note, Math.max(note.start, 0), Math.min(this.patternSelectionEnd - this.patternSelectionStart, note.end));
+                                    }
+                                    notes.push(note);
+                                }
+                            }
+                            else {
+                                notes = pattern.notes;
+                            }
+                        }
+                        patterns[String(patternNumber)] = { "instruments": instruments, "notes": notes };
+                    }
+                }
+                const channelCopy = {
+                    "isNoise": this._doc.song.getChannelIsNoise(channelIndex),
+                    "isMod": this._doc.song.getChannelIsMod(channelIndex),
+                    "patterns": patterns,
+                    "bars": bars,
+                };
+                channels.push(channelCopy);
+            }
+            const selectionCopy = {
+                "partDuration": this.patternSelectionActive ? this.patternSelectionEnd - this.patternSelectionStart : this._doc.song.beatsPerBar * Config.partsPerBeat,
+                "channels": channels,
+            };
+            window.localStorage.setItem("selectionCopy", JSON.stringify(selectionCopy));
+            new ChangePatternSelection(this._doc, 0, 0);
+        }
+        _remapToNoisePitches(oldPitches) {
+            let newPitches = oldPitches.slice();
+            newPitches.sort(function (a, b) { return a - b; });
+            let lowestPitch = newPitches[0] % Config.drumCount;
+            const numberOfPitches = newPitches.length;
+            let highestPitch = lowestPitch + (numberOfPitches - 1);
+            while (highestPitch >= Config.drumCount) {
+                lowestPitch--;
+                highestPitch--;
+            }
+            for (let notePitchIndex = 0; notePitchIndex < newPitches.length; notePitchIndex++) {
+                newPitches[notePitchIndex] = notePitchIndex + lowestPitch;
+            }
+            return newPitches;
+        }
+        _convertCopiedPitchNotesToNoiseNotes(oldNotes) {
+            let newNotes = [];
+            for (let noteIndex = 0; noteIndex < oldNotes.length; noteIndex++) {
+                const oldNote = oldNotes[noteIndex];
+                const newNotePitches = this._remapToNoisePitches(oldNote["pitches"].slice());
+                const oldNotePins = oldNote.pins;
+                let newNotePins = [];
+                for (let notePinIndex = 0; notePinIndex < oldNotePins.length; notePinIndex++) {
+                    const oldPin = oldNotePins[notePinIndex];
+                    newNotePins.push({
+                        interval: oldPin.interval,
+                        time: oldPin.time,
+                        size: oldPin.size,
+                    });
+                }
+                const newNoteStart = oldNote["start"];
+                const newNoteEnd = oldNote["end"];
+                const newNoteContinuesLastPattern = oldNote["continuesLastPattern"];
+                const newNote = new Note(0, newNoteStart, newNoteEnd, 0, false);
+                newNote.pitches = newNotePitches;
+                newNote.pins = newNotePins;
+                newNote.continuesLastPattern = newNoteContinuesLastPattern;
+                newNotes.push(newNote);
+            }
+            return newNotes;
+        }
+        cutNotes() {
+            const group = new ChangeGroup();
+            const channelIndex = this.boxSelectionChannel;
+            const barIndex = this.boxSelectionBar;
+            const cutHeight = this.boxSelectionHeight;
+            const cutWidth = this.boxSelectionWidth;
+            this.copy();
+            for (let channel = channelIndex; channel < channelIndex + cutHeight; channel++) {
+                for (let bar = barIndex; bar < barIndex + cutWidth; bar++) {
+                    const patternNumber = this._doc.song.channels[channel].bars[bar];
+                    if (patternNumber != 0) {
+                        const pattern = this._doc.song.channels[channel].patterns[patternNumber - 1];
+                        group.append(new ChangeNoteTruncate(this._doc, pattern, 0, Config.partsPerBeat * this._doc.song.beatsPerBar));
+                    }
+                }
+            }
+            this._doc.record(group);
+        }
+        pasteNotes() {
+            const selectionCopy = JSON.parse(String(window.localStorage.getItem("selectionCopy")));
+            if (selectionCopy == null)
+                return;
+            const channelCopies = selectionCopy["channels"] || [];
+            const copiedPartDuration = selectionCopy["partDuration"] >>> 0;
+            const group = new ChangeGroup();
+            const fillSelection = (this.boxSelectionWidth > 1 || this.boxSelectionHeight > 1);
+            const pasteHeight = fillSelection ? this.boxSelectionHeight : Math.min(channelCopies.length, this._doc.song.getChannelCount() - this.boxSelectionChannel);
+            for (let pasteChannel = 0; pasteChannel < pasteHeight; pasteChannel++) {
+                const channelCopy = channelCopies[pasteChannel % channelCopies.length];
+                const channelIndex = this.boxSelectionChannel + pasteChannel;
+                const channelIsNoise = this._doc.song.getChannelIsNoise(channelIndex);
+                const isNoise = !!channelCopy["isNoise"];
+                const isMod = !!channelCopy["isMod"];
+                const isPitch = !isNoise && !isMod;
+                const patternCopies = channelCopy["patterns"] || {};
+                const copiedBars = channelCopy["bars"] || [];
+                if (copiedBars.length == 0)
+                    continue;
+                if (isNoise && this._doc.song.getChannelIsMod(channelIndex))
+                    continue;
+                if (isMod != this._doc.song.getChannelIsMod(channelIndex))
+                    continue;
+                const pasteWidth = fillSelection ? this.boxSelectionWidth : Math.min(copiedBars.length, this._doc.song.barCount - this.boxSelectionBar);
+                if (!fillSelection && copiedBars.length == 1 && channelCopies.length == 1) {
+                    const copiedPatternIndex = copiedBars[0] >>> 0;
+                    const bar = this.boxSelectionBar;
+                    const currentPatternIndex = this._doc.song.channels[channelIndex].bars[bar];
+                    if (copiedPatternIndex == 0 && currentPatternIndex == 0)
+                        continue;
+                    const patternCopy = patternCopies[String(copiedPatternIndex)];
+                    const instrumentsCopy = this._parseCopiedInstrumentArray(patternCopy, channelIndex);
+                    let pastedNotes = patternCopy["notes"];
+                    if (isPitch && channelIsNoise) {
+                        pastedNotes = this._convertCopiedPitchNotesToNoiseNotes(pastedNotes);
+                    }
+                    if (currentPatternIndex == 0) {
+                        const existingPattern = this._doc.song.channels[channelIndex].patterns[copiedPatternIndex - 1];
+                        if (existingPattern != undefined &&
+                            !this.patternSelectionActive &&
+                            ((comparePatternNotes(pastedNotes, existingPattern.notes) && patternsContainSameInstruments(instrumentsCopy, existingPattern.instruments)) ||
+                                this._patternIndexIsUnused(channelIndex, copiedPatternIndex))) {
+                            group.append(new ChangePatternNumbers(this._doc, copiedPatternIndex, bar, channelIndex, 1, 1));
+                        }
+                        else {
+                            group.append(new ChangeEnsurePatternExists(this._doc, channelIndex, bar));
+                        }
+                    }
+                    const pattern = this._doc.song.getPattern(channelIndex, bar);
+                    if (pattern == null)
+                        throw new Error();
+                    group.append(new ChangePaste(this._doc, pattern, pastedNotes, this.patternSelectionActive ? this.patternSelectionStart : 0, this.patternSelectionActive ? this.patternSelectionEnd : Config.partsPerBeat * this._doc.song.beatsPerBar, copiedPartDuration));
+                    if (currentPatternIndex == 0 || patternCopy.notes.length == 0 || channelIndex >= this._doc.song.pitchChannelCount + this._doc.song.noiseChannelCount) {
+                        this.selectInstrument(instrumentsCopy[0]);
+                        group.append(new ChangeSetPatternInstruments(this._doc, channelIndex, instrumentsCopy, pattern));
+                    }
+                }
+                else if (this.patternSelectionActive) {
+                    const reusablePatterns = {};
+                    const usedPatterns = {};
+                    group.append(new ChangeDuplicateSelectedReusedPatterns(this._doc, this.boxSelectionBar, pasteWidth, this.boxSelectionChannel, pasteHeight, false));
+                    for (let pasteBar = 0; pasteBar < pasteWidth; pasteBar++) {
+                        const bar = this.boxSelectionBar + pasteBar;
+                        const copiedPatternIndex = copiedBars[pasteBar % copiedBars.length] >>> 0;
+                        const currentPatternIndex = this._doc.song.channels[channelIndex].bars[bar];
+                        const reusedIndex = [copiedPatternIndex, currentPatternIndex].join(",");
+                        if (copiedPatternIndex == 0 && currentPatternIndex == 0)
+                            continue;
+                        if (reusablePatterns[reusedIndex] != undefined) {
+                            group.append(new ChangePatternNumbers(this._doc, reusablePatterns[reusedIndex], bar, channelIndex, 1, 1));
+                            continue;
+                        }
+                        if (currentPatternIndex == 0) {
+                            group.append(new ChangeEnsurePatternExists(this._doc, channelIndex, bar));
+                            const patternCopy = patternCopies[String(copiedPatternIndex)];
+                            const instrumentsCopy = this._parseCopiedInstrumentArray(patternCopy, channelIndex);
+                            const pattern = this._doc.song.getPattern(channelIndex, bar);
+                            group.append(new ChangeSetPatternInstruments(this._doc, channelIndex, instrumentsCopy, pattern));
+                        }
+                        else {
+                            const pattern = this._doc.song.getPattern(channelIndex, bar);
+                            if (pattern == null)
+                                throw new Error();
+                            if (!usedPatterns[String(currentPatternIndex)]) {
+                                usedPatterns[String(currentPatternIndex)] = true;
+                            }
+                            else {
+                                group.append(new ChangePatternNumbers(this._doc, 0, bar, channelIndex, 1, 1));
+                                group.append(new ChangeEnsurePatternExists(this._doc, channelIndex, bar));
+                                const newPattern = this._doc.song.getPattern(channelIndex, bar);
+                                if (newPattern == null)
+                                    throw new Error();
+                                for (const note of pattern.cloneNotes()) {
+                                    if (isPitch && channelIsNoise) {
+                                        note.pitches = this._remapToNoisePitches(note.pitches);
+                                    }
+                                    group.append(new ChangeNoteAdded(this._doc, newPattern, note, newPattern.notes.length, false));
+                                }
+                            }
+                        }
+                        const pattern = this._doc.song.getPattern(channelIndex, bar);
+                        if (pattern == null)
+                            throw new Error();
+                        if (copiedPatternIndex == 0) {
+                            group.append(new ChangeNoteTruncate(this._doc, pattern, this.patternSelectionStart, this.patternSelectionEnd));
+                        }
+                        else {
+                            const patternCopy = patternCopies[String(copiedPatternIndex)];
+                            let pastedNotes = patternCopy["notes"];
+                            if (isPitch && channelIsNoise) {
+                                pastedNotes = this._convertCopiedPitchNotesToNoiseNotes(pastedNotes);
+                            }
+                            group.append(new ChangePaste(this._doc, pattern, pastedNotes, this.patternSelectionStart, this.patternSelectionEnd, copiedPartDuration));
+                        }
+                        reusablePatterns[reusedIndex] = this._doc.song.channels[channelIndex].bars[bar];
+                    }
+                }
+                else {
+                    for (let pasteBar = 0; pasteBar < pasteWidth; pasteBar++) {
+                        this.erasePatternInBar(group, channelIndex, this.boxSelectionBar + pasteBar);
+                    }
+                    const reusablePatterns = {};
+                    for (let pasteBar = 0; pasteBar < pasteWidth; pasteBar++) {
+                        const bar = this.boxSelectionBar + pasteBar;
+                        const copiedPatternIndex = copiedBars[pasteBar % copiedBars.length] >>> 0;
+                        const reusedIndex = String(copiedPatternIndex);
+                        if (copiedPatternIndex == 0)
+                            continue;
+                        if (reusablePatterns[reusedIndex] != undefined) {
+                            group.append(new ChangePatternNumbers(this._doc, reusablePatterns[reusedIndex], bar, channelIndex, 1, 1));
+                            continue;
+                        }
+                        const patternCopy = patternCopies[String(copiedPatternIndex)];
+                        const instrumentsCopy = this._parseCopiedInstrumentArray(patternCopy, channelIndex);
+                        const existingPattern = this._doc.song.channels[channelIndex].patterns[copiedPatternIndex - 1];
+                        let pastedNotes = patternCopy["notes"];
+                        if (isPitch && channelIsNoise) {
+                            pastedNotes = this._convertCopiedPitchNotesToNoiseNotes(pastedNotes);
+                        }
+                        if (existingPattern != undefined &&
+                            copiedPartDuration == Config.partsPerBeat * this._doc.song.beatsPerBar &&
+                            comparePatternNotes(pastedNotes, existingPattern.notes) &&
+                            patternsContainSameInstruments(instrumentsCopy, existingPattern.instruments)) {
+                            group.append(new ChangePatternNumbers(this._doc, copiedPatternIndex, bar, channelIndex, 1, 1));
+                        }
+                        else {
+                            if (existingPattern != undefined && this._patternIndexIsUnused(channelIndex, copiedPatternIndex)) {
+                                group.append(new ChangePatternNumbers(this._doc, copiedPatternIndex, bar, channelIndex, 1, 1));
+                            }
+                            else {
+                                group.append(new ChangeEnsurePatternExists(this._doc, channelIndex, bar));
+                            }
+                            const pattern = this._doc.song.getPattern(channelIndex, bar);
+                            if (pattern == null)
+                                throw new Error();
+                            group.append(new ChangePaste(this._doc, pattern, pastedNotes, this.patternSelectionActive ? this.patternSelectionStart : 0, this.patternSelectionActive ? this.patternSelectionEnd : Config.partsPerBeat * this._doc.song.beatsPerBar, copiedPartDuration));
+                            group.append(new ChangeSetPatternInstruments(this._doc, channelIndex, instrumentsCopy, pattern));
+                        }
+                        reusablePatterns[reusedIndex] = this._doc.song.channels[channelIndex].bars[bar];
+                    }
+                }
+            }
+            this._doc.record(group);
+        }
+        erasePatternInBar(group, channelIndex, bar) {
+            const removedPattern = this._doc.song.channels[channelIndex].bars[bar];
+            if (removedPattern != 0) {
+                group.append(new ChangePatternNumbers(this._doc, 0, bar, channelIndex, 1, 1));
+                if (this._patternIndexIsUnused(channelIndex, removedPattern)) {
+                    this._doc.song.channels[channelIndex].patterns[removedPattern - 1].notes.length = 0;
+                }
+            }
+        }
+        pasteNumbers() {
+            const selectionCopy = JSON.parse(String(window.localStorage.getItem("selectionCopy")));
+            if (selectionCopy == null)
+                return;
+            const channelCopies = selectionCopy["channels"] || [];
+            const group = new ChangeGroup();
+            const fillSelection = this.boxSelectionActive;
+            const pasteHeight = fillSelection ? this.boxSelectionHeight : Math.min(channelCopies.length, this._doc.song.getChannelCount() - this.boxSelectionChannel);
+            for (let pasteChannel = 0; pasteChannel < pasteHeight; pasteChannel++) {
+                const channelCopy = channelCopies[pasteChannel % channelCopies.length];
+                const channelIndex = this.boxSelectionChannel + pasteChannel;
+                const copiedBars = channelCopy["bars"] || [];
+                if (copiedBars.length == 0)
+                    continue;
+                const pasteWidth = fillSelection ? this.boxSelectionWidth : Math.min(copiedBars.length, this._doc.song.barCount - this.boxSelectionBar);
+                for (let pasteBar = 0; pasteBar < pasteWidth; pasteBar++) {
+                    const copiedPatternIndex = copiedBars[pasteBar % copiedBars.length] >>> 0;
+                    const bar = this.boxSelectionBar + pasteBar;
+                    if (copiedPatternIndex > this._doc.song.patternsPerChannel) {
+                        group.append(new ChangePatternsPerChannel(this._doc, copiedPatternIndex));
+                    }
+                    group.append(new ChangePatternNumbers(this._doc, copiedPatternIndex, bar, channelIndex, 1, 1));
+                }
+            }
+            this._doc.record(group);
+        }
+        selectAll() {
+            new ChangePatternSelection(this._doc, 0, 0);
+            if (this.boxSelectionBar == 0 &&
+                this.boxSelectionChannel == 0 &&
+                this.boxSelectionWidth == this._doc.song.barCount &&
+                this.boxSelectionHeight == this._doc.song.getChannelCount()) {
+                this.setTrackSelection(this._doc.bar, this._doc.bar, this._doc.channel, this._doc.channel);
+            }
+            else {
+                this.setTrackSelection(0, this._doc.song.barCount - 1, 0, this._doc.song.getChannelCount() - 1);
+            }
+            this.selectionUpdated();
+        }
+        selectChannel() {
+            new ChangePatternSelection(this._doc, 0, 0);
+            if (this.boxSelectionBar == 0 && this.boxSelectionWidth == this._doc.song.barCount) {
+                this.setTrackSelection(this._doc.bar, this._doc.bar, this.boxSelectionY0, this.boxSelectionY1);
+            }
+            else {
+                this.setTrackSelection(0, this._doc.song.barCount - 1, this.boxSelectionY0, this.boxSelectionY1);
+            }
+            this.selectionUpdated();
+        }
+        duplicatePatterns(replaceUnused) {
+            this._doc.record(new ChangeDuplicateSelectedReusedPatterns(this._doc, this.boxSelectionBar, this.boxSelectionWidth, this.boxSelectionChannel, this.boxSelectionHeight, replaceUnused));
+        }
+        muteChannels(allChannels) {
+            if (allChannels) {
+                let anyMuted = false;
+                for (let channelIndex = 0; channelIndex < this._doc.song.channels.length; channelIndex++) {
+                    if (this._doc.song.channels[channelIndex].muted) {
+                        anyMuted = true;
+                        break;
+                    }
+                }
+                for (let channelIndex = 0; channelIndex < this._doc.song.channels.length; channelIndex++) {
+                    this._doc.song.channels[channelIndex].muted = !anyMuted;
+                }
+            }
+            else {
+                let anyUnmuted = false;
+                for (const channelIndex of this._eachSelectedChannel()) {
+                    if (!this._doc.song.channels[channelIndex].muted) {
+                        anyUnmuted = true;
+                        break;
+                    }
+                }
+                for (const channelIndex of this._eachSelectedChannel()) {
+                    this._doc.song.channels[channelIndex].muted = anyUnmuted;
+                }
+            }
+            this._doc.notifier.changed();
+        }
+        soloChannels(invert) {
+            let alreadySoloed = true;
+            if (this.boxSelectionChannel >= this._doc.song.pitchChannelCount + this._doc.song.noiseChannelCount) {
+                const currentChannel = this._doc.song.channels[this.boxSelectionChannel];
+                const bar = currentChannel.bars[this._doc.bar] - 1;
+                const modInstrument = (bar >= 0) ? currentChannel.instruments[currentChannel.patterns[bar].instruments[0]] : currentChannel.instruments[this._doc.viewedInstrument[this.boxSelectionChannel]];
+                const soloPattern = [];
+                let matchesSoloPattern = !invert;
+                for (let channelIndex = 0; channelIndex < this._doc.song.pitchChannelCount + this._doc.song.noiseChannelCount; channelIndex++) {
+                    soloPattern[channelIndex] = false;
+                    for (let mod = 0; mod < Config.modCount; mod++) {
+                        if (modInstrument.modChannels[mod] == channelIndex) {
+                            soloPattern[channelIndex] = true;
+                        }
+                    }
+                }
+                for (let channelIndex = 0; channelIndex < this._doc.song.pitchChannelCount + this._doc.song.noiseChannelCount; channelIndex++) {
+                    if (this._doc.song.channels[channelIndex].muted == soloPattern[channelIndex]) {
+                        matchesSoloPattern = invert;
+                        break;
+                    }
+                }
+                for (let channelIndex = 0; channelIndex < this._doc.song.pitchChannelCount + this._doc.song.noiseChannelCount; channelIndex++) {
+                    if (matchesSoloPattern) {
+                        this._doc.song.channels[channelIndex].muted = false;
+                    }
+                    else {
+                        this._doc.song.channels[channelIndex].muted = !soloPattern[channelIndex];
+                    }
+                }
+            }
+            else {
+                for (let channelIndex = 0; channelIndex < this._doc.song.pitchChannelCount + this._doc.song.noiseChannelCount; channelIndex++) {
+                    const shouldBeMuted = (channelIndex < this.boxSelectionChannel || channelIndex >= this.boxSelectionChannel + this.boxSelectionHeight) ? !invert : invert;
+                    if (this._doc.song.channels[channelIndex].muted != shouldBeMuted) {
+                        alreadySoloed = false;
+                        break;
+                    }
+                }
+                if (alreadySoloed) {
+                    for (let channelIndex = 0; channelIndex < this._doc.song.channels.length; channelIndex++) {
+                        this._doc.song.channels[channelIndex].muted = false;
+                    }
+                }
+                else {
+                    for (let channelIndex = 0; channelIndex < this._doc.song.pitchChannelCount + this._doc.song.noiseChannelCount; channelIndex++) {
+                        this._doc.song.channels[channelIndex].muted = (channelIndex < this.boxSelectionChannel || channelIndex >= this.boxSelectionChannel + this.boxSelectionHeight) ? !invert : invert;
+                    }
+                }
+            }
+            this._doc.notifier.changed();
+        }
+        forceRhythm() {
+            const group = new ChangeGroup();
+            if (this.boxSelectionActive) {
+                group.append(new ChangeDuplicateSelectedReusedPatterns(this._doc, this.boxSelectionBar, this.boxSelectionWidth, this.boxSelectionChannel, this.boxSelectionHeight, false));
+            }
+            for (const channelIndex of this._eachSelectedChannel()) {
+                for (const pattern of this._eachSelectedPattern(channelIndex)) {
+                    group.append(new ChangePatternRhythm(this._doc, pattern));
+                }
+            }
+            this._doc.record(group);
+        }
+        forceScale() {
+            const group = new ChangeGroup();
+            if (this.boxSelectionActive) {
+                group.append(new ChangeDuplicateSelectedReusedPatterns(this._doc, this.boxSelectionBar, this.boxSelectionWidth, this.boxSelectionChannel, this.boxSelectionHeight, false));
+            }
+            const scaleFlags = [true, false, false, false, false, false, false, false, false, false, false, false];
+            for (const channelIndex of this._eachSelectedChannel()) {
+                if (this._doc.song.getChannelIsNoise(channelIndex) || this._doc.song.getChannelIsMod(channelIndex))
+                    continue;
+                for (const pattern of this._eachSelectedPattern(channelIndex)) {
+                    unionOfUsedNotes(pattern, scaleFlags);
+                }
+            }
+            const scaleMap = generateScaleMap(scaleFlags, this._doc.song.scale, this._doc.song.scaleCustom);
+            for (const channelIndex of this._eachSelectedChannel()) {
+                if (this._doc.song.getChannelIsNoise(channelIndex) || this._doc.song.getChannelIsMod(channelIndex))
+                    continue;
+                for (const pattern of this._eachSelectedPattern(channelIndex)) {
+                    group.append(new ChangePatternScale(this._doc, pattern, scaleMap));
+                }
+            }
+            this._doc.record(group);
+        }
+        setTrackSelection(newX0, newX1, newY0, newY1) {
+            const canReplaceLastChange = true;
+            this._changeTrack = new ChangeGroup();
+            this._changeTrack.append(new ChangeTrackSelection(this._doc, newX0, newX1, newY0, newY1));
+            this._doc.record(this._changeTrack, canReplaceLastChange);
+        }
+        transpose(upward, octave) {
+            const canReplaceLastChange = this._doc.lastChangeWas(this._changeTranspose);
+            this._changeTranspose = new ChangeGroup();
+            if (this.boxSelectionActive) {
+                this._changeTranspose.append(new ChangeDuplicateSelectedReusedPatterns(this._doc, this.boxSelectionBar, this.boxSelectionWidth, this.boxSelectionChannel, this.boxSelectionHeight, false));
+            }
+            for (const channelIndex of this._eachSelectedChannel()) {
+                if (channelIndex >= this._doc.song.pitchChannelCount + this._doc.song.noiseChannelCount)
+                    continue;
+                for (const pattern of this._eachSelectedPattern(channelIndex)) {
+                    this._changeTranspose.append(new ChangeTranspose(this._doc, channelIndex, pattern, upward, this._doc.prefs.notesOutsideScale, octave));
+                }
+            }
+            this._doc.record(this._changeTranspose, canReplaceLastChange);
+        }
+        swapChannels(offset) {
+            const possibleSectionBoundaries = [
+                this._doc.song.pitchChannelCount,
+                this._doc.song.pitchChannelCount + this._doc.song.noiseChannelCount,
+                this._doc.song.pitchChannelCount + this._doc.song.noiseChannelCount + this._doc.song.modChannelCount,
+                this._doc.song.getChannelCount(),
+            ];
+            let channelSectionMin = 0;
+            let channelSectionMax = 0;
+            for (const nextBoundary of possibleSectionBoundaries) {
+                if ((this.boxSelectionChannel < nextBoundary && offset < 0) || (this.boxSelectionChannel + this.boxSelectionHeight <= nextBoundary)) {
+                    channelSectionMax = nextBoundary - 1;
+                    break;
+                }
+                channelSectionMin = nextBoundary;
+            }
+            const newSelectionMin = Math.max(this.boxSelectionChannel, channelSectionMin);
+            const newSelectionMax = Math.min(this.boxSelectionChannel + this.boxSelectionHeight - 1, channelSectionMax);
+            offset = Math.max(offset, channelSectionMin - newSelectionMin);
+            offset = Math.min(offset, channelSectionMax - newSelectionMax);
+            if (offset != 0) {
+                const canReplaceLastChange = this._doc.lastChangeWas(this._changeReorder);
+                this._changeReorder = new ChangeGroup();
+                this.boxSelectionY0 = newSelectionMin + offset;
+                this.boxSelectionY1 = newSelectionMax + offset;
+                this._changeReorder.append(new ChangeChannelOrder(this._doc, newSelectionMin, newSelectionMax, offset));
+                this._changeReorder.append(new ChangeChannelBar(this._doc, Math.max(this.boxSelectionY0, Math.min(this.boxSelectionY1, this._doc.channel + offset)), this._doc.bar));
+                this.selectionUpdated();
+                this._doc.record(this._changeReorder, canReplaceLastChange);
+            }
+        }
+        selectInstrument(instrument) {
+            if (this._doc.viewedInstrument[this._doc.channel] == instrument) {
+                if (this._doc.song.layeredInstruments && this._doc.song.patternInstruments && this._doc.channel < this._doc.song.pitchChannelCount + this._doc.song.noiseChannelCount) {
+                    const canReplaceLastChange = this._doc.lastChangeWas(this._changeInstrument);
+                    this._changeInstrument = new ChangeGroup();
+                    const instruments = this._doc.recentPatternInstruments[this._doc.channel];
+                    this._doc.notifier.changed();
+                    if (instruments.indexOf(instrument) == -1) {
+                        instruments.push(instrument);
+                        const maxLayers = this._doc.song.getMaxInstrumentsPerPattern(this._doc.channel);
+                        if (instruments.length > maxLayers) {
+                            instruments.splice(0, instruments.length - maxLayers);
+                        }
+                    }
+                    else {
+                        instruments.splice(instruments.indexOf(instrument), 1);
+                        if (instruments.length == 0)
+                            instruments[0] = 0;
+                    }
+                    if (this.boxSelectionActive) {
+                        this._changeInstrument.append(new ChangeDuplicateSelectedReusedPatterns(this._doc, this.boxSelectionBar, this.boxSelectionWidth, this.boxSelectionChannel, this.boxSelectionHeight, false));
+                    }
+                    for (const channelIndex of this._eachSelectedChannel()) {
+                        for (const pattern of this._eachSelectedPattern(channelIndex)) {
+                            this._changeInstrument.append(new ChangeSetPatternInstruments(this._doc, channelIndex, instruments, pattern));
+                        }
+                    }
+                    if (!this._changeInstrument.isNoop())
+                        this._doc.record(this._changeInstrument, canReplaceLastChange);
+                }
+            }
+            else {
+                const canReplaceLastChange = this._doc.lastChangeWas(this._changeInstrument);
+                this._changeInstrument = new ChangeGroup();
+                this._changeInstrument.append(new ChangeViewInstrument(this._doc, instrument));
+                if (!(this._doc.song.layeredInstruments && this._doc.channel < this._doc.song.pitchChannelCount + this._doc.song.noiseChannelCount) && this._doc.song.patternInstruments) {
+                    if (this.boxSelectionActive) {
+                        this._changeInstrument.append(new ChangeDuplicateSelectedReusedPatterns(this._doc, this.boxSelectionBar, this.boxSelectionWidth, this.boxSelectionChannel, this.boxSelectionHeight, false));
+                    }
+                    const instruments = [instrument];
+                    for (const channelIndex of this._eachSelectedChannel()) {
+                        for (const pattern of this._eachSelectedPattern(channelIndex)) {
+                            this._changeInstrument.append(new ChangeSetPatternInstruments(this._doc, channelIndex, instruments, pattern));
+                        }
+                    }
+                    this._doc.record(this._changeInstrument, canReplaceLastChange);
+                }
+                else if (!this._doc.hasRedoHistory()) {
+                    this._doc.record(this._changeInstrument, canReplaceLastChange);
+                }
+            }
+        }
+        resetBoxSelection() {
+            this.boxSelectionX0 = this.boxSelectionX1 = this._doc.bar;
+            this.boxSelectionY0 = this.boxSelectionY1 = this._doc.channel;
+        }
+    }
+
+    class Preferences {
+        constructor() {
+            this.showFifth = true;
+            this.volume = 75;
+            this.visibleOctaves = Preferences.defaultVisibleOctaves;
+            this.reload();
+        }
+        reload() {
+            this.autoPlay = window.localStorage.getItem("autoPlay") == "true";
+            this.autoFollow = window.localStorage.getItem("autoFollow") != "false";
+            this.enableNotePreview = window.localStorage.getItem("enableNotePreview") != "false";
+            this.showFifth = window.localStorage.getItem("showFifth") == "true";
+            this.notesOutsideScale = window.localStorage.getItem("notesOutsideScale") == "true";
+            this.showLetters = window.localStorage.getItem("showLetters") == "true";
+            this.showChannels = window.localStorage.getItem("showChannels") == "true";
+            this.showScrollBar = window.localStorage.getItem("showScrollBar") != "false";
+            this.alwaysFineNoteVol = window.localStorage.getItem("alwaysFineNoteVol") == "true";
+            this.displayVolumeBar = window.localStorage.getItem("displayVolumeBar") != "false";
+            this.instrumentCopyPaste = window.localStorage.getItem("instrumentCopyPaste") != "false";
+            this.instrumentImportExport = window.localStorage.getItem("instrumentImportExport") == "true";
+            this.instrumentButtonsAtTop = window.localStorage.getItem("instrumentButtonsAtTop") == "true";
+            this.enableChannelMuting = window.localStorage.getItem("enableChannelMuting") != "false";
+            this.displayBrowserUrl = window.localStorage.getItem("displayBrowserUrl") != "false";
+            this.pressControlForShortcuts = window.localStorage.getItem("pressControlForShortcuts") == "true";
+            this.enableMidi = window.localStorage.getItem("enableMidi") != "false";
+            this.showRecordButton = window.localStorage.getItem("showRecordButton") == "true";
+            this.snapRecordedNotesToRhythm = window.localStorage.getItem("snapRecordedNotesToRhythm") == "true";
+            this.ignorePerformedNotesNotInScale = window.localStorage.getItem("ignorePerformedNotesNotInScale") == "true";
+            this.metronomeCountIn = window.localStorage.getItem("metronomeCountIn") != "false";
+            this.metronomeWhileRecording = window.localStorage.getItem("metronomeWhileRecording") != "false";
+            this.notesFlashWhenPlayed = window.localStorage.getItem("notesFlashWhenPlayed") == "true";
+            this.showOscilloscope = window.localStorage.getItem("showOscilloscope") == "true";
+            this.showSampleLoadingStatus = window.localStorage.getItem("showSampleLoadingStatus") != "false";
+            this.showDescription = window.localStorage.getItem("showDescription") != "false";
+            this.showInstrumentScrollbars = window.localStorage.getItem("showInstrumentScrollbars") == "true";
+            this.closePromptByClickoff = window.localStorage.getItem("closePromptByClickoff") == "true";
+            this.frostedGlassBackground = window.localStorage.getItem("frostedGlassBackground") == "true";
+            this.keyboardLayout = window.localStorage.getItem("keyboardLayout") || "wickiHayden";
+            this.bassOffset = (+window.localStorage.getItem("bassOffset")) || 0;
+            this.layout = window.localStorage.getItem("layout") || "small";
+            this.colorTheme = window.localStorage.getItem("colorTheme") || ColorConfig.defaultTheme;
+            this.customTheme = window.localStorage.getItem("customTheme");
+            this.customTheme2 = window.localStorage.getItem("customTheme2");
+            this.visibleOctaves = (window.localStorage.getItem("visibleOctaves") >>> 0) || Preferences.defaultVisibleOctaves;
+            const defaultScale = Config.scales.dictionary[window.localStorage.getItem("defaultScale")];
+            this.defaultScale = (defaultScale != undefined) ? defaultScale.index : 0;
+            if (window.localStorage.getItem("volume") != null) {
+                this.volume = Math.min(window.localStorage.getItem("volume") >>> 0, 75);
+            }
+            if (window.localStorage.getItem("fullScreen") != null) {
+                if (window.localStorage.getItem("fullScreen") == "true")
+                    this.layout = "long";
+                window.localStorage.removeItem("fullScreen");
+            }
+        }
+        save() {
+            window.localStorage.setItem("autoPlay", this.autoPlay ? "true" : "false");
+            window.localStorage.setItem("autoFollow", this.autoFollow ? "true" : "false");
+            window.localStorage.setItem("enableNotePreview", this.enableNotePreview ? "true" : "false");
+            window.localStorage.setItem("showFifth", this.showFifth ? "true" : "false");
+            window.localStorage.setItem("notesOutsideScale", this.notesOutsideScale ? "true" : "false");
+            window.localStorage.setItem("defaultScale", Config.scales[this.defaultScale].name);
+            window.localStorage.setItem("showLetters", this.showLetters ? "true" : "false");
+            window.localStorage.setItem("showChannels", this.showChannels ? "true" : "false");
+            window.localStorage.setItem("showScrollBar", this.showScrollBar ? "true" : "false");
+            window.localStorage.setItem("alwaysFineNoteVol", this.alwaysFineNoteVol ? "true" : "false");
+            window.localStorage.setItem("displayVolumeBar", this.displayVolumeBar ? "true" : "false");
+            window.localStorage.setItem("enableChannelMuting", this.enableChannelMuting ? "true" : "false");
+            window.localStorage.setItem("instrumentCopyPaste", this.instrumentCopyPaste ? "true" : "false");
+            window.localStorage.setItem("instrumentImportExport", this.instrumentImportExport ? "true" : "false");
+            window.localStorage.setItem("instrumentButtonsAtTop", this.instrumentButtonsAtTop ? "true" : "false");
+            window.localStorage.setItem("displayBrowserUrl", this.displayBrowserUrl ? "true" : "false");
+            window.localStorage.setItem("pressControlForShortcuts", this.pressControlForShortcuts ? "true" : "false");
+            window.localStorage.setItem("enableMidi", this.enableMidi ? "true" : "false");
+            window.localStorage.setItem("showRecordButton", this.showRecordButton ? "true" : "false");
+            window.localStorage.setItem("snapRecordedNotesToRhythm", this.snapRecordedNotesToRhythm ? "true" : "false");
+            window.localStorage.setItem("ignorePerformedNotesNotInScale", this.ignorePerformedNotesNotInScale ? "true" : "false");
+            window.localStorage.setItem("metronomeCountIn", this.metronomeCountIn ? "true" : "false");
+            window.localStorage.setItem("metronomeWhileRecording", this.metronomeWhileRecording ? "true" : "false");
+            window.localStorage.setItem("notesFlashWhenPlayed", this.notesFlashWhenPlayed ? "true" : "false");
+            window.localStorage.setItem("showOscilloscope", this.showOscilloscope ? "true" : "false");
+            window.localStorage.setItem("showSampleLoadingStatus", this.showSampleLoadingStatus ? "true" : "false");
+            window.localStorage.setItem("showDescription", this.showDescription ? "true" : "false");
+            window.localStorage.setItem("showInstrumentScrollbars", this.showInstrumentScrollbars ? "true" : "false");
+            window.localStorage.setItem("closePromptByClickoff", this.closePromptByClickoff ? "true" : "false");
+            window.localStorage.setItem("frostedGlassBackground", this.frostedGlassBackground ? "true" : "false");
+            window.localStorage.setItem("keyboardLayout", this.keyboardLayout);
+            window.localStorage.setItem("bassOffset", String(this.bassOffset));
+            window.localStorage.setItem("layout", this.layout);
+            window.localStorage.setItem("colorTheme", this.colorTheme);
+            window.localStorage.setItem("customTheme", this.customTheme);
+            window.localStorage.setItem("customTheme2", this.customTheme2);
+            window.localStorage.setItem("volume", String(this.volume));
+            window.localStorage.setItem("visibleOctaves", String(this.visibleOctaves));
+        }
+    }
+    Preferences.defaultVisibleOctaves = 3;
+
+    class ChangeNotifier {
+        constructor() {
+            this._watchers = [];
+            this._dirty = false;
+        }
+        watch(watcher) {
+            if (this._watchers.indexOf(watcher) == -1) {
+                this._watchers.push(watcher);
+            }
+        }
+        unwatch(watcher) {
+            const index = this._watchers.indexOf(watcher);
+            if (index != -1) {
+                this._watchers.splice(index, 1);
+            }
+        }
+        changed() {
+            this._dirty = true;
+        }
+        notifyWatchers() {
+            if (!this._dirty)
+                return;
+            this._dirty = false;
+            for (const watcher of this._watchers.concat()) {
+                watcher();
+            }
+        }
+    }
+
+    class SongDocument {
+        constructor() {
+            this.notifier = new ChangeNotifier();
+            this.selection = new Selection(this);
+            this.prefs = new Preferences();
+            this.channel = 0;
+            this.muteEditorChannel = 0;
+            this.bar = 0;
+            this.recentPatternInstruments = [];
+            this.viewedInstrument = [];
+            this.recordingModulators = false;
+            this.continuingModRecordingChange = null;
+            this.trackVisibleBars = 16;
+            this.trackVisibleChannels = 4;
+            this.barScrollPos = 0;
+            this.channelScrollPos = 0;
+            this.prompt = null;
+            this.addedEffect = false;
+            this.addedEnvelope = false;
+            this.currentPatternIsDirty = false;
+            this._recovery = new SongRecovery();
+            this._recentChange = null;
+            this._sequenceNumber = 0;
+            this._lastSequenceNumber = 0;
+            this._stateShouldBePushed = false;
+            this._recordedNewSong = false;
+            this._waitingToUpdateState = false;
+            this._whenHistoryStateChanged = () => {
+                if (this.synth.recording) {
+                    this.performance.abortRecording();
+                }
+                if (window.history.state == null && window.location.hash != "") {
+                    this._sequenceNumber++;
+                    this._resetSongRecoveryUid();
+                    const state = { canUndo: true, sequenceNumber: this._sequenceNumber, bar: this.bar, channel: this.channel, instrument: this.viewedInstrument[this.channel], recoveryUid: this._recoveryUid, prompt: null, selection: this.selection.toJSON() };
+                    try {
+                        new ChangeSong(this, this._getHash());
+                    }
+                    catch (error) {
+                        errorAlert(error);
+                    }
+                    this.prompt = state.prompt;
+                    if (this.prefs.displayBrowserUrl) {
+                        this._replaceState(state, this.song.toBase64String());
+                    }
+                    else {
+                        this._pushState(state, this.song.toBase64String());
+                    }
+                    this.forgetLastChange();
+                    this.notifier.notifyWatchers();
+                    this.synth.pause();
+                    this.synth.goToBar(0);
+                    return;
+                }
+                const state = this._getHistoryState();
+                if (state == null)
+                    throw new Error("History state is null.");
+                if (state.sequenceNumber == this._sequenceNumber)
+                    return;
+                this.bar = state.bar;
+                this.channel = state.channel;
+                this.viewedInstrument[this.channel] = state.instrument;
+                this._sequenceNumber = state.sequenceNumber;
+                this.prompt = state.prompt;
+                try {
+                    new ChangeSong(this, this._getHash());
+                }
+                catch (error) {
+                    errorAlert(error);
+                }
+                this._recoveryUid = state.recoveryUid;
+                this.selection.fromJSON(state.selection);
+                this.forgetLastChange();
+                this.notifier.notifyWatchers();
+            };
+            this._cleanDocument = () => {
+                this.notifier.notifyWatchers();
+            };
+            this._cleanDocumentIfNotRecordingMods = () => {
+                if (!this.recordingModulators)
+                    this.notifier.notifyWatchers();
+                else {
+                    this.modRecordingHandler();
+                }
+            };
+            this._validateDocState = () => {
+                const channelCount = this.song.getChannelCount();
+                for (let i = this.recentPatternInstruments.length; i < channelCount; i++) {
+                    this.recentPatternInstruments[i] = [0];
+                }
+                this.recentPatternInstruments.length = channelCount;
+                for (let i = 0; i < channelCount; i++) {
+                    if (i == this.channel) {
+                        if (this.song.patternInstruments) {
+                            const pattern = this.song.getPattern(this.channel, this.bar);
+                            if (pattern != null) {
+                                this.recentPatternInstruments[i] = pattern.instruments.concat();
+                            }
+                        }
+                        else {
+                            const channel = this.song.channels[this.channel];
+                            for (let j = 0; j < channel.instruments.length; j++) {
+                                this.recentPatternInstruments[i][j] = j;
+                            }
+                            this.recentPatternInstruments[i].length = channel.instruments.length;
+                        }
+                    }
+                    discardInvalidPatternInstruments(this.recentPatternInstruments[i], this.song, i);
+                }
+                for (let i = this.viewedInstrument.length; i < channelCount; i++) {
+                    this.viewedInstrument[i] = 0;
+                }
+                this.viewedInstrument.length = channelCount;
+                for (let i = 0; i < channelCount; i++) {
+                    if (this.song.patternInstruments && !this.song.layeredInstruments && i == this.channel) {
+                        const pattern = this.song.getPattern(this.channel, this.bar);
+                        if (pattern != null) {
+                            this.viewedInstrument[i] = pattern.instruments[0];
+                        }
+                    }
+                    this.viewedInstrument[i] = Math.min(this.viewedInstrument[i] | 0, this.song.channels[i].instruments.length - 1);
+                }
+                const highlightedPattern = this.getCurrentPattern();
+                if (highlightedPattern != null && this.song.patternInstruments) {
+                    this.recentPatternInstruments[this.channel] = highlightedPattern.instruments.concat();
+                }
+                if ((!this.synth.playing && (this.bar < this.selection.boxSelectionBar || this.selection.boxSelectionBar + this.selection.boxSelectionWidth <= this.bar)) ||
+                    this.channel < this.selection.boxSelectionChannel ||
+                    this.selection.boxSelectionChannel + this.selection.boxSelectionHeight <= this.channel ||
+                    this.song.barCount < this.selection.boxSelectionBar + this.selection.boxSelectionWidth ||
+                    channelCount < this.selection.boxSelectionChannel + this.selection.boxSelectionHeight ||
+                    (this.selection.boxSelectionWidth == 1 && this.selection.boxSelectionHeight == 1)) {
+                    this.selection.resetBoxSelection();
+                }
+                this.barScrollPos = Math.max(0, Math.min(this.song.barCount - this.trackVisibleBars, this.barScrollPos));
+                this.channelScrollPos = Math.max(0, Math.min(this.song.getChannelCount() - this.trackVisibleChannels, this.channelScrollPos));
+            };
+            this._updateHistoryState = () => {
+                this._waitingToUpdateState = false;
+                let hash;
+                try {
+                    hash = this.song.toBase64String();
+                }
+                catch (error) {
+                    errorAlert(error);
+                    return;
+                }
+                if (this._stateShouldBePushed)
+                    this._sequenceNumber++;
+                if (this._recordedNewSong) {
+                    this._resetSongRecoveryUid();
+                }
+                else {
+                    this._recovery.saveVersion(this._recoveryUid, this.song.title, hash);
+                }
+                let state = { canUndo: true, sequenceNumber: this._sequenceNumber, bar: this.bar, channel: this.channel, instrument: this.viewedInstrument[this.channel], recoveryUid: this._recoveryUid, prompt: this.prompt, selection: this.selection.toJSON() };
+                if (this._stateShouldBePushed) {
+                    this._pushState(state, hash);
+                }
+                else {
+                    this._replaceState(state, hash);
+                }
+                this._stateShouldBePushed = false;
+                this._recordedNewSong = false;
+            };
+            this.notifier.watch(this._validateDocState);
+            ColorConfig.setTheme(this.prefs.colorTheme);
+            Layout.setLayout(this.prefs.layout);
+            if (window.sessionStorage.getItem("currentUndoIndex") == null) {
+                window.sessionStorage.setItem("currentUndoIndex", "0");
+                window.sessionStorage.setItem("oldestUndoIndex", "0");
+                window.sessionStorage.setItem("newestUndoIndex", "0");
+            }
+            let songString = window.location.hash;
+            if (songString == "") {
+                songString = this._getHash();
+            }
+            try {
+                this.song = new Song(songString);
+                if (songString == "" || songString == undefined) {
+                    setDefaultInstruments(this.song);
+                    this.song.scale = this.prefs.defaultScale;
+                }
+            }
+            catch (error) {
+                errorAlert(error);
+            }
+            songString = this.song.toBase64String();
+            this.synth = new Synth(this.song);
+            this.synth.volume = this._calcVolume();
+            this.synth.anticipatePoorPerformance = isMobile;
+            let state = this._getHistoryState();
+            if (state == null) {
+                state = { canUndo: false, sequenceNumber: 0, bar: 0, channel: 0, instrument: 0, recoveryUid: generateUid(), prompt: null, selection: this.selection.toJSON() };
+            }
+            if (state.recoveryUid == undefined)
+                state.recoveryUid = generateUid();
+            this._replaceState(state, songString);
+            window.addEventListener("hashchange", this._whenHistoryStateChanged);
+            window.addEventListener("popstate", this._whenHistoryStateChanged);
+            this.bar = state.bar | 0;
+            this.channel = state.channel | 0;
+            for (let i = 0; i <= this.channel; i++)
+                this.viewedInstrument[i] = 0;
+            this.viewedInstrument[this.channel] = state.instrument | 0;
+            this._recoveryUid = state.recoveryUid;
+            this.prompt = state.prompt;
+            this.selection.fromJSON(state.selection);
+            this.selection.scrollToSelectedPattern();
+            for (const eventName of ["change", "click", "keyup", "mousedown", "mouseup", "touchstart", "touchmove", "touchend", "touchcancel"]) {
+                window.addEventListener(eventName, this._cleanDocument);
+            }
+            for (const eventName of ["keydown", "input", "mousemove"]) {
+                window.addEventListener(eventName, this._cleanDocumentIfNotRecordingMods);
+            }
+            this._validateDocState();
+            this.performance = new SongPerformance(this);
+        }
+        toggleDisplayBrowserUrl() {
+            const state = this._getHistoryState();
+            if (state == null)
+                throw new Error("History state is null.");
+            this.prefs.displayBrowserUrl = !this.prefs.displayBrowserUrl;
+            this._replaceState(state, this.song.toBase64String());
+        }
+        _getHistoryState() {
+            if (this.prefs.displayBrowserUrl) {
+                return window.history.state;
+            }
+            else {
+                const json = JSON.parse(window.sessionStorage.getItem(window.sessionStorage.getItem("currentUndoIndex")));
+                return json == null ? null : json.state;
+            }
+        }
+        _getHash() {
+            if (this.prefs.displayBrowserUrl) {
+                return window.location.hash;
+            }
+            else {
+                const json = JSON.parse(window.sessionStorage.getItem(window.sessionStorage.getItem("currentUndoIndex")));
+                return json == null ? "" : json.hash;
+            }
+        }
+        _replaceState(state, hash) {
+            if (this.prefs.displayBrowserUrl) {
+                window.history.replaceState(state, "", "#" + hash);
+            }
+            else {
+                window.sessionStorage.setItem(window.sessionStorage.getItem("currentUndoIndex") || "0", JSON.stringify({ state, hash }));
+                window.history.replaceState(null, "", location.pathname);
+            }
+        }
+        _pushState(state, hash) {
+            if (this.prefs.displayBrowserUrl) {
+                window.history.pushState(state, "", "#" + hash);
+            }
+            else {
+                let currentIndex = Number(window.sessionStorage.getItem("currentUndoIndex"));
+                let oldestIndex = Number(window.sessionStorage.getItem("oldestUndoIndex"));
+                currentIndex = (currentIndex + 1) % SongDocument._maximumUndoHistory;
+                window.sessionStorage.setItem("currentUndoIndex", String(currentIndex));
+                window.sessionStorage.setItem("newestUndoIndex", String(currentIndex));
+                if (currentIndex == oldestIndex) {
+                    oldestIndex = (oldestIndex + 1) % SongDocument._maximumUndoHistory;
+                    window.sessionStorage.setItem("oldestUndoIndex", String(oldestIndex));
+                }
+                window.sessionStorage.setItem(String(currentIndex), JSON.stringify({ state, hash }));
+                window.history.replaceState(null, "", location.pathname);
+            }
+            this._lastSequenceNumber = state.sequenceNumber;
+        }
+        hasRedoHistory() {
+            return this._lastSequenceNumber > this._sequenceNumber;
+        }
+        _forward() {
+            if (this.prefs.displayBrowserUrl) {
+                window.history.forward();
+            }
+            else {
+                let currentIndex = Number(window.sessionStorage.getItem("currentUndoIndex"));
+                let newestIndex = Number(window.sessionStorage.getItem("newestUndoIndex"));
+                if (currentIndex != newestIndex) {
+                    currentIndex = (currentIndex + 1) % SongDocument._maximumUndoHistory;
+                    window.sessionStorage.setItem("currentUndoIndex", String(currentIndex));
+                    setTimeout(this._whenHistoryStateChanged);
+                }
+            }
+        }
+        _back() {
+            if (this.prefs.displayBrowserUrl) {
+                window.history.back();
+            }
+            else {
+                let currentIndex = Number(window.sessionStorage.getItem("currentUndoIndex"));
+                let oldestIndex = Number(window.sessionStorage.getItem("oldestUndoIndex"));
+                if (currentIndex != oldestIndex) {
+                    currentIndex = (currentIndex + SongDocument._maximumUndoHistory - 1) % SongDocument._maximumUndoHistory;
+                    window.sessionStorage.setItem("currentUndoIndex", String(currentIndex));
+                    setTimeout(this._whenHistoryStateChanged);
+                }
+            }
+        }
+        record(change, replace = false, newSong = false) {
+            if (change.isNoop()) {
+                this._recentChange = null;
+                if (replace)
+                    this._back();
+            }
+            else {
+                change.commit();
+                this._recentChange = change;
+                this._stateShouldBePushed = this._stateShouldBePushed || !replace;
+                this._recordedNewSong = this._recordedNewSong || newSong;
+                if (!this._waitingToUpdateState) {
+                    window.requestAnimationFrame(this._updateHistoryState);
+                    this._waitingToUpdateState = true;
+                }
+            }
+        }
+        _resetSongRecoveryUid() {
+            this._recoveryUid = generateUid();
+        }
+        openPrompt(prompt) {
+            this.prompt = prompt;
+            const hash = this.song.toBase64String();
+            this._sequenceNumber++;
+            const state = { canUndo: true, sequenceNumber: this._sequenceNumber, bar: this.bar, channel: this.channel, instrument: this.viewedInstrument[this.channel], recoveryUid: this._recoveryUid, prompt: this.prompt, selection: this.selection.toJSON() };
+            this._pushState(state, hash);
+        }
+        undo() {
+            const state = this._getHistoryState();
+            if (state == null || state.canUndo)
+                this._back();
+        }
+        redo() {
+            this._forward();
+        }
+        setProspectiveChange(change) {
+            this._recentChange = change;
+        }
+        forgetLastChange() {
+            this._recentChange = null;
+        }
+        checkLastChange() {
+            return this._recentChange;
+        }
+        lastChangeWas(change) {
+            return change != null && change == this._recentChange;
+        }
+        goBackToStart() {
+            this.bar = 0;
+            this.channel = 0;
+            this.barScrollPos = 0;
+            this.channelScrollPos = 0;
+            this.synth.snapToStart();
+            this.notifier.changed();
+        }
+        setVolume(val) {
+            this.prefs.volume = val;
+            this.prefs.save();
+            this.synth.volume = this._calcVolume();
+        }
+        _calcVolume() {
+            return Math.min(1.0, Math.pow(this.prefs.volume / 50.0, 0.5)) * Math.pow(2.0, (this.prefs.volume - 75.0) / 25.0);
+        }
+        getCurrentPattern(barOffset = 0) {
+            return this.song.getPattern(this.channel, this.bar + barOffset);
+        }
+        getCurrentInstrument(barOffset = 0) {
+            if (barOffset == 0) {
+                return this.viewedInstrument[this.channel];
+            }
+            else {
+                const pattern = this.getCurrentPattern(barOffset);
+                return pattern == null ? 0 : pattern.instruments[0];
+            }
+        }
+        getMobileLayout() {
+            return (this.prefs.layout == "wide") ? window.innerWidth <= 1000 : window.innerWidth <= 710;
+        }
+        getBarWidth() {
+            return (!this.getMobileLayout() && this.prefs.enableChannelMuting && (!this.getFullScreen() || this.prefs.layout == "wide")) ? 30 : 32;
+        }
+        getChannelHeight() {
+            const squashed = this.getMobileLayout() || this.song.getChannelCount() > 4 || (this.song.barCount > this.trackVisibleBars && this.song.getChannelCount() > 3);
+            const megaSquashed = !this.getMobileLayout() && (((this.prefs.layout != "wide") && this.song.getChannelCount() > 11) || this.song.getChannelCount() > 22);
+            return megaSquashed ? 23 : (squashed ? 27 : 32);
+        }
+        getFullScreen() {
+            return !this.getMobileLayout() && (this.prefs.layout != "small");
+        }
+        getVisibleOctaveCount() {
+            return this.getFullScreen() ? this.prefs.visibleOctaves : Preferences.defaultVisibleOctaves;
+        }
+        getVisiblePitchCount() {
+            return this.getVisibleOctaveCount() * Config.pitchesPerOctave + 1;
+        }
+        getBaseVisibleOctave(channel) {
+            const visibleOctaveCount = this.getVisibleOctaveCount();
+            return Math.max(0, Math.min(Config.pitchOctaves - visibleOctaveCount, Math.ceil(this.song.channels[channel].octave - visibleOctaveCount * 0.5)));
+        }
+    }
+    SongDocument._maximumUndoHistory = 300;
+
+    function transfer(source, length) {
+        const dest = new ArrayBuffer(length);
+        let nextOffset = 0;
+        let leftBytes = Math.min(source.byteLength, dest.byteLength);
+        const wordSizes = [8, 4, 2, 1];
+        for (const wordSize of wordSizes) {
+            if (leftBytes >= wordSize) {
+                const done = transferWith(wordSize, source, dest, nextOffset, leftBytes);
+                nextOffset = done.nextOffset;
+                leftBytes = done.leftBytes;
+            }
+        }
+        return dest;
+        function transferWith(wordSize, source, dest, nextOffset, leftBytes) {
+            let ViewClass = Uint8Array;
+            switch (wordSize) {
+                case 8:
+                    ViewClass = Float64Array;
+                    break;
+                case 4:
+                    ViewClass = Float32Array;
+                    break;
+                case 2:
+                    ViewClass = Uint16Array;
+                    break;
+                case 1:
+                    ViewClass = Uint8Array;
+                    break;
+                default:
+                    ViewClass = Uint8Array;
+                    break;
+            }
+            const view_source = new ViewClass(source, nextOffset, (leftBytes / wordSize) | 0);
+            const view_dest = new ViewClass(dest, nextOffset, (leftBytes / wordSize) | 0);
+            for (let i = 0; i < view_dest.length; i++) {
+                view_dest[i] = view_source[i];
+            }
+            return {
+                nextOffset: view_source.byteOffset + view_source.byteLength,
+                leftBytes: leftBytes - view_dest.length * wordSize,
+            };
+        }
+    }
+    class ArrayBufferWriter {
+        constructor(initialCapacity) {
+            this._writeIndex = 0;
+            this._fileSize = 0;
+            this._arrayBuffer = new ArrayBuffer(initialCapacity);
+            this._data = new DataView(this._arrayBuffer);
+        }
+        _addBytes(numBytes) {
+            this._fileSize += numBytes;
+            if (this._fileSize > this._arrayBuffer.byteLength) {
+                this._arrayBuffer = transfer(this._arrayBuffer, Math.max(this._arrayBuffer.byteLength * 2, this._fileSize));
+                this._data = new DataView(this._arrayBuffer);
+            }
+        }
+        getWriteIndex() {
+            return this._writeIndex;
+        }
+        rewriteUint32(index, value) {
+            this._data.setUint32(index, value >>> 0, false);
+        }
+        writeUint32(value) {
+            value = value >>> 0;
+            this._addBytes(4);
+            this._data.setUint32(this._writeIndex, value, false);
+            this._writeIndex = this._fileSize;
+        }
+        writeUint24(value) {
+            value = value >>> 0;
+            this._addBytes(3);
+            this._data.setUint8(this._writeIndex, (value >> 16) & 0xff);
+            this._data.setUint8(this._writeIndex + 1, (value >> 8) & 0xff);
+            this._data.setUint8(this._writeIndex + 2, (value) & 0xff);
+            this._writeIndex = this._fileSize;
+        }
+        writeUint16(value) {
+            value = value >>> 0;
+            this._addBytes(2);
+            this._data.setUint16(this._writeIndex, value, false);
+            this._writeIndex = this._fileSize;
+        }
+        writeUint8(value) {
+            value = value >>> 0;
+            this._addBytes(1);
+            this._data.setUint8(this._writeIndex, value);
+            this._writeIndex = this._fileSize;
+        }
+        writeInt8(value) {
+            value = value | 0;
+            this._addBytes(1);
+            this._data.setInt8(this._writeIndex, value);
+            this._writeIndex = this._fileSize;
+        }
+        writeMidi7Bits(value) {
+            value = value >>> 0;
+            if (value >= 0x80)
+                throw new Error("7 bit value contained 8th bit!");
+            this._addBytes(1);
+            this._data.setUint8(this._writeIndex, value);
+            this._writeIndex = this._fileSize;
+        }
+        writeMidiVariableLength(value) {
+            value = value >>> 0;
+            if (value > 0x0fffffff)
+                throw new Error("writeVariableLength value too big.");
+            let startWriting = false;
+            for (let i = 0; i < 4; i++) {
+                const shift = 21 - i * 7;
+                const bits = (value >>> shift) & 0x7f;
+                if (bits != 0 || i == 3)
+                    startWriting = true;
+                if (startWriting)
+                    this.writeUint8((i == 3 ? 0x00 : 0x80) | bits);
+            }
+        }
+        writeMidiAscii(string) {
+            this.writeMidiVariableLength(string.length);
+            for (let i = 0; i < string.length; i++) {
+                const charCode = string.charCodeAt(i);
+                if (charCode > 0x7f)
+                    throw new Error("Trying to write unicode character as ascii.");
+                this.writeUint8(charCode);
+            }
+        }
+        toCompactArrayBuffer() {
+            return transfer(this._arrayBuffer, this._fileSize);
+        }
+    }
+
+    const defaultMidiExpression = 0x7F;
+    const defaultMidiPitchBend = 0x2000;
+    const analogousDrumMap = {
+        35: { frequency: 0, duration: 2, volume: 3 },
+        36: { frequency: 0, duration: 2, volume: 3 },
+        37: { frequency: 5, duration: 1, volume: 3 },
+        38: { frequency: 4, duration: 2, volume: 3 },
+        39: { frequency: 5, duration: 2, volume: 3 },
+        40: { frequency: 4, duration: 2, volume: 3 },
+        41: { frequency: 1, duration: 2, volume: 3 },
+        42: { frequency: 8, duration: 1, volume: 3 },
+        43: { frequency: 1, duration: 2, volume: 3 },
+        44: { frequency: 8, duration: 1, volume: 2 },
+        45: { frequency: 2, duration: 2, volume: 3 },
+        46: { frequency: 8, duration: 4, volume: 3 },
+        47: { frequency: 2, duration: 2, volume: 3 },
+        48: { frequency: 3, duration: 2, volume: 3 },
+        49: { frequency: 7, duration: 4, volume: 3 },
+        50: { frequency: 3, duration: 2, volume: 3 },
+        51: { frequency: 6, duration: 4, volume: 2 },
+        52: { frequency: 7, duration: 4, volume: 3 },
+        53: { frequency: 6, duration: 2, volume: 3 },
+        54: { frequency: 11, duration: 2, volume: 3 },
+        55: { frequency: 9, duration: 4, volume: 3 },
+        56: { frequency: 7, duration: 1, volume: 2 },
+        57: { frequency: 7, duration: 4, volume: 3 },
+        58: { frequency: 10, duration: 2, volume: 2 },
+        59: { frequency: 6, duration: 4, volume: 3 },
+        69: { frequency: 10, duration: 2, volume: 3 },
+        70: { frequency: 10, duration: 2, volume: 3 },
+        73: { frequency: 10, duration: 1, volume: 2 },
+        74: { frequency: 10, duration: 2, volume: 2 },
+    };
+    function midiVolumeToVolumeMult(volume) {
+        return Math.pow(volume / 127, 4.0) / 0.3844015376046128;
+    }
+    function volumeMultToMidiVolume(volumeMult) {
+        return Math.pow(volumeMult * 0.3844015376046128, 0.25) * 127;
+    }
+    function midiExpressionToVolumeMult(expression) {
+        return Math.pow(expression / 127, 4.0);
+    }
+    function volumeMultToMidiExpression(volumeMult) {
+        return Math.pow(volumeMult, 0.25) * 127;
+    }
+
+    const { button: button$o, div: div$o, h2: h2$n, input: input$h, select: select$d, option: option$d } = HTML;
+    function lerp(low, high, t) {
+        return low + t * (high - low);
+    }
+    function save(blob, name) {
+        if (navigator.msSaveOrOpenBlob) {
+            navigator.msSaveOrOpenBlob(blob, name);
+            return;
+        }
+        const anchor = document.createElement("a");
+        if (anchor.download != undefined) {
+            const url = URL.createObjectURL(blob);
+            setTimeout(function () { URL.revokeObjectURL(url); }, 60000);
+            anchor.href = url;
+            anchor.download = name;
+            setTimeout(function () { anchor.dispatchEvent(new MouseEvent("click")); }, 0);
+        }
+        else {
+            const url = URL.createObjectURL(blob);
+            setTimeout(function () { URL.revokeObjectURL(url); }, 60000);
+            if (!window.open(url, "_blank"))
+                window.location.href = url;
+        }
+    }
+    class ExportPrompt {
+        constructor(_doc) {
+            this._doc = _doc;
+            this.outputStarted = false;
+            this._fileName = input$h({ type: "text", style: "width: 10em;", value: Config.jsonFormat + "-Song", maxlength: 250, "autofocus": "autofocus" });
+            this._computedSamplesLabel = div$o({ style: "width: 10em;" }, new Text("0:00"));
+            this._enableIntro = input$h({ type: "checkbox" });
+            this._loopDropDown = input$h({ style: "width: 2em;", type: "number", min: "1", max: "4", step: "1" });
+            this._enableOutro = input$h({ type: "checkbox" });
+            this._formatSelect = select$d({ style: "width: 100%;" }, option$d({ value: "wav" }, "Export to .wav file."), option$d({ value: "mp3" }, "Export to .mp3 file."), option$d({ value: "midi" }, "Export to .mid file."), option$d({ value: "json" }, "Export to .json file."), option$d({ value: "html" }, "Export to .html file."));
+            this._removeWhitespace = input$h({ type: "checkbox" });
+            this._removeWhitespaceDiv = div$o({ style: "vertical-align: middle; align-items: center; justify-content: space-between; margin-bottom: 14px;" }, "Remove Whitespace: ", this._removeWhitespace);
+            this._cancelButton = button$o({ class: "cancelButton" });
+            this._exportButton = button$o({ class: "exportButton", style: "width:45%;" }, "Export");
+            this._outputProgressBar = div$o({ style: `width: 0%; background: ${ColorConfig.loopAccent}; height: 100%; position: absolute; z-index: 2;` });
+            this._outputProgressLabel = div$o({ style: `position: relative; top: -1px; z-index: 3;` }, "0%");
+            this._outputProgressContainer = div$o({ style: `height: 12px; background: ${ColorConfig.uiWidgetBackground}; display: block; position: relative; z-index: 1;` }, this._outputProgressBar, this._outputProgressLabel);
+            this.container = div$o({ class: "prompt noSelection", style: "width: 200px;" }, h2$n("Export Options"), div$o({ style: "display: flex; flex-direction: row; align-items: center; justify-content: space-between;" }, "File name:", this._fileName), div$o({ style: "display: flex; flex-direction: row; align-items: center; justify-content: space-between;" }, "Length:", this._computedSamplesLabel), div$o({ style: "display: table; width: 100%;" }, div$o({ style: "display: table-row;" }, div$o({ style: "display: table-cell;" }, "Intro:"), div$o({ style: "display: table-cell;" }, "Loop Count:"), div$o({ style: "display: table-cell;" }, "Outro:")), div$o({ style: "display: table-row;" }, div$o({ style: "display: table-cell; vertical-align: middle;" }, this._enableIntro), div$o({ style: "display: table-cell; vertical-align: middle;" }, this._loopDropDown), div$o({ style: "display: table-cell; vertical-align: middle;" }, this._enableOutro))), div$o({ class: "selectContainer", style: "width: 100%;" }, this._formatSelect), this._removeWhitespaceDiv, div$o({ style: "text-align: left;" }, "Exporting can be slow. Reloading the page or clicking the X will cancel it. Please be patient."), this._outputProgressContainer, div$o({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between;" }, this._exportButton), this._cancelButton);
+            this._close = () => {
+                if (this.synth != null)
+                    this.synth.renderingSong = false;
+                this.outputStarted = false;
+                this._doc.undo();
+            };
+            this.cleanUp = () => {
+                this._fileName.removeEventListener("input", ExportPrompt._validateFileName);
+                this._loopDropDown.removeEventListener("blur", ExportPrompt._validateNumber);
+                this._exportButton.removeEventListener("click", this._export);
+                this._cancelButton.removeEventListener("click", this._close);
+                this.container.removeEventListener("keydown", this._whenKeyPressed);
+            };
+            this._whenKeyPressed = (event) => {
+                if (event.target.tagName != "BUTTON" && event.keyCode == 13) {
+                    this._export();
+                }
+            };
+            this._export = () => {
+                if (this.outputStarted == true)
+                    return;
+                window.localStorage.setItem("exportFormat", this._formatSelect.value);
+                window.localStorage.setItem("exportWhitespace", this._removeWhitespace.value);
+                switch (this._formatSelect.value) {
+                    case "wav":
+                        this.outputStarted = true;
+                        this._exportTo("wav");
+                        break;
+                    case "mp3":
+                        this.outputStarted = true;
+                        this._exportTo("mp3");
+                        break;
+                    case "midi":
+                        this.outputStarted = true;
+                        this._exportToMidi();
+                        break;
+                    case "json":
+                        this.outputStarted = true;
+                        this._exportToJson();
+                        break;
+                    case "html":
+                        this._exportToHtml();
+                        break;
+                    default:
+                        throw new Error("Unhandled file export type.");
+                }
+            };
+            this._loopDropDown.value = "1";
+            if (this._doc.song.loopStart == 0) {
+                this._enableIntro.checked = false;
+                this._enableIntro.disabled = true;
+            }
+            else {
+                this._enableIntro.checked = true;
+                this._enableIntro.disabled = false;
+            }
+            if (this._doc.song.loopStart + this._doc.song.loopLength == this._doc.song.barCount) {
+                this._enableOutro.checked = false;
+                this._enableOutro.disabled = true;
+            }
+            else {
+                this._enableOutro.checked = true;
+                this._enableOutro.disabled = false;
+            }
+            const lastExportFormat = window.localStorage.getItem("exportFormat");
+            if (lastExportFormat != null) {
+                this._formatSelect.value = lastExportFormat;
+            }
+            const lastExportWhitespace = window.localStorage.getItem("exportWhitespace") != "false";
+            if (lastExportWhitespace != null) {
+                this._removeWhitespace.checked = lastExportWhitespace;
+            }
+            if (this._formatSelect.value == "json") {
+                this._removeWhitespaceDiv.style.display = "block";
+            }
+            else {
+                this._removeWhitespaceDiv.style.display = "none";
+            }
+            this._fileName.select();
+            setTimeout(() => this._fileName.focus());
+            this._fileName.addEventListener("input", ExportPrompt._validateFileName);
+            this._loopDropDown.addEventListener("blur", ExportPrompt._validateNumber);
+            this._exportButton.addEventListener("click", this._export);
+            this._cancelButton.addEventListener("click", this._close);
+            this._enableOutro.addEventListener("click", () => { this._computedSamplesLabel.firstChild.textContent = ExportPrompt.samplesToTime(this._doc, this._doc.synth.getTotalSamples(this._enableIntro.checked, this._enableOutro.checked, +this._loopDropDown.value - 1)); });
+            this._enableIntro.addEventListener("click", () => { this._computedSamplesLabel.firstChild.textContent = ExportPrompt.samplesToTime(this._doc, this._doc.synth.getTotalSamples(this._enableIntro.checked, this._enableOutro.checked, +this._loopDropDown.value - 1)); });
+            this._loopDropDown.addEventListener("change", () => { this._computedSamplesLabel.firstChild.textContent = ExportPrompt.samplesToTime(this._doc, this._doc.synth.getTotalSamples(this._enableIntro.checked, this._enableOutro.checked, +this._loopDropDown.value - 1)); });
+            this._formatSelect.addEventListener("change", () => { if (this._formatSelect.value == "json") {
+                this._removeWhitespaceDiv.style.display = "block";
+            }
+            else {
+                this._removeWhitespaceDiv.style.display = "none";
+            } });
+            this.container.addEventListener("keydown", this._whenKeyPressed);
+            this._fileName.value = _doc.song.title;
+            ExportPrompt._validateFileName(null, this._fileName);
+            this._computedSamplesLabel.firstChild.textContent = ExportPrompt.samplesToTime(this._doc, this._doc.synth.getTotalSamples(this._enableIntro.checked, this._enableOutro.checked, +this._loopDropDown.value - 1));
+        }
+        static samplesToTime(_doc, samples) {
+            const rawSeconds = Math.round(samples / _doc.synth.samplesPerSecond);
+            const seconds = rawSeconds % 60;
+            const minutes = Math.floor(rawSeconds / 60);
+            return minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+        }
+        changeFileName(newValue) {
+            this._fileName.value = newValue;
+        }
+        static _validateFileName(event, use) {
+            let input;
+            if (event != null) {
+                input = event.target;
+            }
+            else if (use != undefined) {
+                input = use;
+            }
+            else {
+                return;
+            }
+            const deleteChars = /[\+\*\$\?\|\{\}\\\/<>#%!`&'"=:@]/gi;
+            if (deleteChars.test(input.value)) {
+                let cursorPos = input.selectionStart;
+                input.value = input.value.replace(deleteChars, "");
+                cursorPos--;
+                input.setSelectionRange(cursorPos, cursorPos);
+            }
+        }
+        static _validateNumber(event) {
+            const input = event.target;
+            input.value = Math.floor(Math.max(Number(input.min), Math.min(Number(input.max), Number(input.value)))) + "";
+        }
+        _synthesize() {
+            if (this.outputStarted == false) {
+                return;
+            }
+            const samplesPerChunk = this.synth.samplesPerSecond * 5;
+            const currentFrame = this.currentChunk * samplesPerChunk;
+            const samplesInChunk = Math.min(samplesPerChunk, this.sampleFrames - currentFrame);
+            const tempSamplesL = new Float32Array(samplesInChunk);
+            const tempSamplesR = new Float32Array(samplesInChunk);
+            this.synth.renderingSong = true;
+            this.synth.synthesize(tempSamplesL, tempSamplesR, samplesInChunk);
+            this.recordedSamplesL.set(tempSamplesL, currentFrame);
+            this.recordedSamplesR.set(tempSamplesR, currentFrame);
+            this._outputProgressBar.style.setProperty("width", Math.round((this.currentChunk + 1) / this.totalChunks * 100.0) + "%");
+            this._outputProgressLabel.innerText = Math.round((this.currentChunk + 1) / this.totalChunks * 100.0) + "%";
+            this.currentChunk++;
+            if (this.currentChunk >= this.totalChunks) {
+                this.synth.renderingSong = false;
+                this._outputProgressLabel.innerText = "Encoding...";
+                if (this.thenExportTo == "wav") {
+                    this._exportToWavFinish();
+                }
+                else if (this.thenExportTo == "mp3") {
+                    this._exportToMp3Finish();
+                }
+                else {
+                    throw new Error("Unrecognized file export type chosen!");
+                }
+            }
+            else {
+                setTimeout(() => { this._synthesize(); });
+            }
+        }
+        _exportTo(type) {
+            this.thenExportTo = type;
+            this.currentChunk = 0;
+            this.synth = new Synth(this._doc.song);
+            if (type == "wav") {
+                this.synth.samplesPerSecond = 48000;
+            }
+            else if (type == "mp3") {
+                this.synth.samplesPerSecond = 44100;
+            }
+            else {
+                throw new Error("Unrecognized file export type chosen!");
+            }
+            this._outputProgressBar.style.setProperty("width", "0%");
+            this._outputProgressLabel.innerText = "0%";
+            this.synth.loopRepeatCount = Number(this._loopDropDown.value) - 1;
+            if (!this._enableIntro.checked) {
+                for (let introIter = 0; introIter < this._doc.song.loopStart; introIter++) {
+                    this.synth.goToNextBar();
+                }
+            }
+            this.synth.initModFilters(this._doc.song);
+            this.synth.computeLatestModValues();
+            this.synth.warmUpSynthesizer(this._doc.song);
+            this.sampleFrames = this.synth.getTotalSamples(this._enableIntro.checked, this._enableOutro.checked, this.synth.loopRepeatCount);
+            this.totalChunks = Math.ceil(this.sampleFrames / (this.synth.samplesPerSecond * 5));
+            this.recordedSamplesL = new Float32Array(this.sampleFrames);
+            this.recordedSamplesR = new Float32Array(this.sampleFrames);
+            setTimeout(() => { this._synthesize(); });
+        }
+        _exportToWavFinish() {
+            const sampleFrames = this.recordedSamplesL.length;
+            const sampleRate = this.synth.samplesPerSecond;
+            const wavChannelCount = 2;
+            const bytesPerSample = 2;
+            const bitsPerSample = 8 * bytesPerSample;
+            const sampleCount = wavChannelCount * sampleFrames;
+            const totalFileSize = 44 + sampleCount * bytesPerSample;
+            let index = 0;
+            const arrayBuffer = new ArrayBuffer(totalFileSize);
+            const data = new DataView(arrayBuffer);
+            data.setUint32(index, 0x52494646, false);
+            index += 4;
+            data.setUint32(index, 36 + sampleCount * bytesPerSample, true);
+            index += 4;
+            data.setUint32(index, 0x57415645, false);
+            index += 4;
+            data.setUint32(index, 0x666D7420, false);
+            index += 4;
+            data.setUint32(index, 0x00000010, true);
+            index += 4;
+            data.setUint16(index, 0x0001, true);
+            index += 2;
+            data.setUint16(index, wavChannelCount, true);
+            index += 2;
+            data.setUint32(index, sampleRate, true);
+            index += 4;
+            data.setUint32(index, sampleRate * bytesPerSample * wavChannelCount, true);
+            index += 4;
+            data.setUint16(index, bytesPerSample * wavChannelCount, true);
+            index += 2;
+            data.setUint16(index, bitsPerSample, true);
+            index += 2;
+            data.setUint32(index, 0x64617461, false);
+            index += 4;
+            data.setUint32(index, sampleCount * bytesPerSample, true);
+            index += 4;
+            {
+                const range = (1 << (bitsPerSample - 1)) - 1;
+                for (let i = 0; i < sampleFrames; i++) {
+                    let valL = Math.floor(Math.max(-1, Math.min(1, this.recordedSamplesL[i])) * range);
+                    let valR = Math.floor(Math.max(-1, Math.min(1, this.recordedSamplesR[i])) * range);
+                    {
+                        data.setInt16(index, valL, true);
+                        index += 2;
+                        data.setInt16(index, valR, true);
+                        index += 2;
+                    }
+                }
+            }
+            const blob = new Blob([arrayBuffer], { type: "audio/wav" });
+            save(blob, this._fileName.value.trim() + ".wav");
+            this._close();
+        }
+        _exportToMp3Finish() {
+            const whenEncoderIsAvailable = () => {
+                const lamejs = window["lamejs"];
+                const channelCount = 2;
+                const kbps = 192;
+                const sampleBlockSize = 1152;
+                const mp3encoder = new lamejs.Mp3Encoder(channelCount, this.synth.samplesPerSecond, kbps);
+                const mp3Data = [];
+                const left = new Int16Array(this.recordedSamplesL.length);
+                const right = new Int16Array(this.recordedSamplesR.length);
+                const range = (1 << 15) - 1;
+                for (let i = 0; i < this.recordedSamplesL.length; i++) {
+                    left[i] = Math.floor(Math.max(-1, Math.min(1, this.recordedSamplesL[i])) * range);
+                    right[i] = Math.floor(Math.max(-1, Math.min(1, this.recordedSamplesR[i])) * range);
+                }
+                for (let i = 0; i < left.length; i += sampleBlockSize) {
+                    const leftChunk = left.subarray(i, i + sampleBlockSize);
+                    const rightChunk = right.subarray(i, i + sampleBlockSize);
+                    const mp3buf = mp3encoder.encodeBuffer(leftChunk, rightChunk);
+                    if (mp3buf.length > 0)
+                        mp3Data.push(mp3buf);
+                }
+                const mp3buf = mp3encoder.flush();
+                if (mp3buf.length > 0)
+                    mp3Data.push(mp3buf);
+                const blob = new Blob(mp3Data, { type: "audio/mp3" });
+                save(blob, this._fileName.value.trim() + ".mp3");
+                this._close();
+            };
+            if ("lamejs" in window) {
+                whenEncoderIsAvailable();
+            }
+            else {
+                var script = document.createElement("script");
+                script.src = "https://cdn.jsdelivr.net/npm/lamejs@1.2.0/lame.min.js";
+                script.onload = whenEncoderIsAvailable;
+                document.head.appendChild(script);
+            }
+        }
+        _exportToMidi() {
+            const song = this._doc.song;
+            const midiTicksPerBeepBoxTick = 2;
+            const midiTicksPerBeat = midiTicksPerBeepBoxTick * Config.ticksPerPart * Config.partsPerBeat;
+            const midiTicksPerPart = midiTicksPerBeepBoxTick * Config.ticksPerPart;
+            const secondsPerMinute = 60;
+            const microsecondsPerMinute = secondsPerMinute * 1000000;
+            const beatsPerMinute = song.getBeatsPerMinute();
+            const microsecondsPerBeat = Math.round(microsecondsPerMinute / beatsPerMinute);
+            const midiTicksPerBar = midiTicksPerBeat * song.beatsPerBar;
+            const pitchBendRange = 24;
+            const defaultNoteVelocity = 90;
+            const unrolledBars = [];
+            if (this._enableIntro.checked) {
+                for (let bar = 0; bar < song.loopStart; bar++) {
+                    unrolledBars.push(bar);
+                }
+            }
+            for (let loopIndex = 0; loopIndex < Number(this._loopDropDown.value); loopIndex++) {
+                for (let bar = song.loopStart; bar < song.loopStart + song.loopLength; bar++) {
+                    unrolledBars.push(bar);
+                }
+            }
+            if (this._enableOutro.checked) {
+                for (let bar = song.loopStart + song.loopLength; bar < song.barCount; bar++) {
+                    unrolledBars.push(bar);
+                }
+            }
+            const tracks = [{ isMeta: true, channel: -1, midiChannel: -1, isNoise: false, isDrumset: false }];
+            let midiChannelCounter = 0;
+            let foundADrumset = false;
+            for (let channel = 0; channel < this._doc.song.pitchChannelCount + this._doc.song.noiseChannelCount; channel++) {
+                if (!foundADrumset && this._doc.song.channels[channel].instruments[0].type == 4) {
+                    tracks.push({ isMeta: false, channel: channel, midiChannel: 9, isNoise: true, isDrumset: true });
+                    foundADrumset = true;
+                }
+                else {
+                    if (midiChannelCounter >= 16)
+                        continue;
+                    tracks.push({ isMeta: false, channel: channel, midiChannel: midiChannelCounter++, isNoise: this._doc.song.getChannelIsNoise(channel), isDrumset: false });
+                    if (midiChannelCounter == 9)
+                        midiChannelCounter++;
+                }
+            }
+            const writer = new ArrayBufferWriter(1024);
+            writer.writeUint32(1297377380);
+            writer.writeUint32(6);
+            writer.writeUint16(1);
+            writer.writeUint16(tracks.length);
+            writer.writeUint16(midiTicksPerBeat);
+            for (const track of tracks) {
+                writer.writeUint32(1297379947);
+                const { isMeta, channel, midiChannel, isNoise, isDrumset } = track;
+                const trackStartIndex = writer.getWriteIndex();
+                writer.writeUint32(0);
+                let prevTime = 0;
+                let barStartTime = 0;
+                const writeEventTime = function (time) {
+                    if (time < prevTime)
+                        throw new Error("Midi event time cannot go backwards.");
+                    writer.writeMidiVariableLength(time - prevTime);
+                    prevTime = time;
+                };
+                const writeControlEvent = function (message, value) {
+                    if (!(value >= 0 && value <= 0x7F))
+                        throw new Error("Midi control event value out of range: " + value);
+                    writer.writeUint8(176 | midiChannel);
+                    writer.writeMidi7Bits(message);
+                    writer.writeMidi7Bits(value | 0);
+                };
+                if (isMeta) {
+                    writeEventTime(0);
+                    writer.writeUint8(255);
+                    writer.writeMidi7Bits(1);
+                    writer.writeMidiAscii("Composed with jummbus.bitbucket.io");
+                    writeEventTime(0);
+                    writer.writeUint8(255);
+                    writer.writeMidi7Bits(81);
+                    writer.writeMidiVariableLength(3);
+                    writer.writeUint24(microsecondsPerBeat);
+                    writeEventTime(0);
+                    writer.writeUint8(255);
+                    writer.writeMidi7Bits(88);
+                    writer.writeMidiVariableLength(4);
+                    writer.writeUint8(song.beatsPerBar);
+                    writer.writeUint8(2);
+                    writer.writeUint8(24);
+                    writer.writeUint8(8);
+                    let tempScale = song.scale == Config.scales.dictionary["Custom"].index ? song.scaleCustom : Config.scales[song.scale].flags;
+                    const isMinor = tempScale[3] && !tempScale[4];
+                    const key = song.key;
+                    let numSharps = key;
+                    if ((key & 1) == 1)
+                        numSharps += 6;
+                    if (isMinor)
+                        numSharps += 9;
+                    while (numSharps > 6)
+                        numSharps -= 12;
+                    writeEventTime(0);
+                    writer.writeUint8(255);
+                    writer.writeMidi7Bits(89);
+                    writer.writeMidiVariableLength(2);
+                    writer.writeInt8(numSharps);
+                    writer.writeUint8(isMinor ? 1 : 0);
+                    if (this._enableIntro.checked)
+                        barStartTime += midiTicksPerBar * song.loopStart;
+                    writeEventTime(barStartTime);
+                    writer.writeUint8(255);
+                    writer.writeMidi7Bits(6);
+                    writer.writeMidiAscii("Loop Start");
+                    for (let loopIndex = 0; loopIndex < parseInt(this._loopDropDown.value); loopIndex++) {
+                        barStartTime += midiTicksPerBar * song.loopLength;
+                        writeEventTime(barStartTime);
+                        writer.writeUint8(255);
+                        writer.writeMidi7Bits(6);
+                        writer.writeMidiAscii(loopIndex < Number(this._loopDropDown.value) - 1 ? "Loop Repeat" : "Loop End");
+                    }
+                    if (this._enableOutro.checked)
+                        barStartTime += midiTicksPerBar * (song.barCount - song.loopStart - song.loopLength);
+                    if (barStartTime != midiTicksPerBar * unrolledBars.length)
+                        throw new Error("Miscalculated number of bars.");
+                }
+                else {
+                    let channelName = isNoise
+                        ? "noise channel " + channel
+                        : "pitch channel " + channel;
+                    writeEventTime(0);
+                    writer.writeUint8(255);
+                    writer.writeMidi7Bits(3);
+                    writer.writeMidiAscii(channelName);
+                    writeEventTime(0);
+                    writeControlEvent(101, 0);
+                    writeEventTime(0);
+                    writeControlEvent(100, 0);
+                    writeEventTime(0);
+                    writeControlEvent(6, pitchBendRange);
+                    writeEventTime(0);
+                    writeControlEvent(38, 0);
+                    writeEventTime(0);
+                    writeControlEvent(101, 127);
+                    writeEventTime(0);
+                    writeControlEvent(100, 127);
+                    let prevInstrumentIndex = -1;
+                    function writeInstrumentSettings(instrumentIndex) {
+                        const instrument = song.channels[channel].instruments[instrumentIndex];
+                        const preset = EditorConfig.valueToPreset(instrument.preset);
+                        if (prevInstrumentIndex != instrumentIndex) {
+                            prevInstrumentIndex = instrumentIndex;
+                            writeEventTime(barStartTime);
+                            writer.writeUint8(255);
+                            writer.writeMidi7Bits(4);
+                            writer.writeMidiAscii("Instrument " + (instrumentIndex + 1));
+                            if (!isDrumset) {
+                                let instrumentProgram = 81;
+                                if (preset != null && preset.midiProgram != undefined) {
+                                    instrumentProgram = preset.midiProgram;
+                                }
+                                else if (instrument.type == 4) {
+                                    instrumentProgram = 116;
+                                }
+                                else {
+                                    if (instrument.type == 2 || instrument.type == 3) {
+                                        if (isNoise) {
+                                            instrumentProgram = 116;
+                                        }
+                                        else {
+                                            instrumentProgram = 75;
+                                        }
+                                    }
+                                    else if (instrument.type == 0) {
+                                        if (ExportPrompt.midiChipInstruments.length > instrument.chipWave) {
+                                            instrumentProgram = ExportPrompt.midiChipInstruments[instrument.chipWave];
+                                        }
+                                    }
+                                    else if (instrument.type == 6 || instrument.type == 1 || instrument.type == 11 || instrument.type == 5 || instrument.type == 8) {
+                                        instrumentProgram = 81;
+                                    }
+                                    else if (instrument.type == 7) {
+                                        instrumentProgram = 0x19;
+                                    }
+                                    else if (instrument.type == 9) {
+                                        instrumentProgram = 81;
+                                    }
+                                    else {
+                                        throw new Error("Unrecognized instrument type.");
+                                    }
+                                }
+                                writeEventTime(barStartTime);
+                                writer.writeUint8(192 | midiChannel);
+                                writer.writeMidi7Bits(instrumentProgram);
+                            }
+                            writeEventTime(barStartTime);
+                            let instrumentVolume = volumeMultToMidiVolume(Synth.instrumentVolumeToVolumeMult(instrument.volume));
+                            writeControlEvent(7, Math.min(0x7f, Math.round(instrumentVolume)));
+                            writeEventTime(barStartTime);
+                            let instrumentPan = (instrument.pan / Config.panCenter - 1) * 0x3f + 0x40;
+                            writeControlEvent(10, Math.min(0x7f, Math.round(instrumentPan)));
+                        }
+                    }
+                    if (song.getPattern(channel, 0) == null) {
+                        writeInstrumentSettings(0);
+                    }
+                    let prevPitchBend = defaultMidiPitchBend;
+                    let prevExpression = defaultMidiExpression;
+                    let shouldResetExpressionAndPitchBend = false;
+                    const channelRoot = isNoise ? Config.spectrumBasePitch : Config.keys[song.key].basePitch;
+                    const intervalScale = isNoise ? Config.noiseInterval : 1;
+                    for (const bar of unrolledBars) {
+                        const pattern = song.getPattern(channel, bar);
+                        if (pattern != null) {
+                            const instrumentIndex = pattern.instruments[0];
+                            const instrument = song.channels[channel].instruments[instrumentIndex];
+                            const preset = EditorConfig.valueToPreset(instrument.preset);
+                            writeInstrumentSettings(instrumentIndex);
+                            let usesArpeggio = instrument.getChord().arpeggiates;
+                            let polyphony = usesArpeggio ? 1 : Config.maxChordSize;
+                            if (instrument.getChord().customInterval) {
+                                if (instrument.type == 0 || instrument.type == 5) {
+                                    polyphony = 2;
+                                    usesArpeggio = true;
+                                }
+                                else if (instrument.type == 1) {
+                                    polyphony = Config.operatorCount;
+                                }
+                                else {
+                                    console.error("Unrecognized instrument type for harmonizing arpeggio: " + instrument.type);
+                                }
+                            }
+                            for (let noteIndex = 0; noteIndex < pattern.notes.length; noteIndex++) {
+                                const note = pattern.notes[noteIndex];
+                                const noteStartTime = barStartTime + note.start * midiTicksPerPart;
+                                let pinTime = noteStartTime;
+                                let pinSize = note.pins[0].size;
+                                let pinInterval = note.pins[0].interval;
+                                const prevPitches = [-1, -1, -1, -1];
+                                const nextPitches = [-1, -1, -1, -1];
+                                const toneCount = Math.min(polyphony, note.pitches.length);
+                                const velocity = isDrumset ? Math.max(1, Math.round(defaultNoteVelocity * note.pins[0].size / Config.noteSizeMax)) : defaultNoteVelocity;
+                                let mainInterval = note.pickMainInterval();
+                                let pitchOffset = mainInterval * intervalScale;
+                                if (!isDrumset) {
+                                    let maxPitchOffset = pitchBendRange;
+                                    let minPitchOffset = -pitchBendRange;
+                                    for (let pinIndex = 1; pinIndex < note.pins.length; pinIndex++) {
+                                        const interval = note.pins[pinIndex].interval * intervalScale;
+                                        maxPitchOffset = Math.min(maxPitchOffset, interval + pitchBendRange);
+                                        minPitchOffset = Math.max(minPitchOffset, interval - pitchBendRange);
+                                    }
+                                    pitchOffset = Math.min(maxPitchOffset, Math.max(minPitchOffset, pitchOffset));
+                                }
+                                for (let pinIndex = 1; pinIndex < note.pins.length; pinIndex++) {
+                                    const nextPinTime = noteStartTime + note.pins[pinIndex].time * midiTicksPerPart;
+                                    const nextPinSize = note.pins[pinIndex].size;
+                                    const nextPinInterval = note.pins[pinIndex].interval;
+                                    const length = nextPinTime - pinTime;
+                                    for (let midiTick = 0; midiTick < length; midiTick++) {
+                                        const midiTickTime = pinTime + midiTick;
+                                        const linearSize = lerp(pinSize, nextPinSize, midiTick / length);
+                                        const linearInterval = lerp(pinInterval, nextPinInterval, midiTick / length);
+                                        const interval = linearInterval * intervalScale - pitchOffset;
+                                        const pitchBend = Math.max(0, Math.min(0x3fff, Math.round(0x2000 * (1.0 + interval / pitchBendRange))));
+                                        const expression = Math.min(0x7f, Math.round(volumeMultToMidiExpression(Synth.noteSizeToVolumeMult(linearSize))));
+                                        if (pitchBend != prevPitchBend) {
+                                            writeEventTime(midiTickTime);
+                                            writer.writeUint8(224 | midiChannel);
+                                            writer.writeMidi7Bits(pitchBend & 0x7f);
+                                            writer.writeMidi7Bits((pitchBend >> 7) & 0x7f);
+                                            prevPitchBend = pitchBend;
+                                        }
+                                        if (expression != prevExpression && !isDrumset) {
+                                            writeEventTime(midiTickTime);
+                                            writeControlEvent(11, expression);
+                                            prevExpression = expression;
+                                        }
+                                        const noteStarting = midiTickTime == noteStartTime;
+                                        for (let toneIndex = 0; toneIndex < toneCount; toneIndex++) {
+                                            let nextPitch = note.pitches[toneIndex];
+                                            if (isDrumset) {
+                                                nextPitch += mainInterval;
+                                                const drumsetMap = [
+                                                    36,
+                                                    41,
+                                                    45,
+                                                    48,
+                                                    40,
+                                                    39,
+                                                    59,
+                                                    49,
+                                                    46,
+                                                    55,
+                                                    69,
+                                                    54,
+                                                ];
+                                                if (nextPitch < 0 || nextPitch >= drumsetMap.length)
+                                                    throw new Error("Could not find corresponding drumset pitch. " + nextPitch);
+                                                nextPitch = drumsetMap[nextPitch];
+                                            }
+                                            else {
+                                                if (usesArpeggio && note.pitches.length > toneIndex + 1 && toneIndex == toneCount - 1) {
+                                                    const midiTicksSinceBeat = (midiTickTime - barStartTime) % midiTicksPerBeat;
+                                                    const midiTicksPerArpeggio = Config.ticksPerArpeggio * midiTicksPerPart / Config.ticksPerPart;
+                                                    const arpeggio = Math.floor(midiTicksSinceBeat / midiTicksPerArpeggio);
+                                                    nextPitch = note.pitches[toneIndex + getArpeggioPitchIndex(note.pitches.length - toneIndex, instrument.fastTwoNoteArp, arpeggio)];
+                                                }
+                                                nextPitch = channelRoot + nextPitch * intervalScale + pitchOffset;
+                                                if (preset != null && preset.midiSubharmonicOctaves != undefined) {
+                                                    nextPitch += 12 * preset.midiSubharmonicOctaves;
+                                                }
+                                                else if (isNoise) {
+                                                    nextPitch += 12 * (+EditorConfig.presetCategories.dictionary["Drum Presets"].presets.dictionary["taiko drum"].midiSubharmonicOctaves);
+                                                }
+                                                if (isNoise)
+                                                    nextPitch *= 2;
+                                            }
+                                            nextPitch = Math.max(0, Math.min(127, nextPitch));
+                                            nextPitches[toneIndex] = nextPitch;
+                                            if (!noteStarting && prevPitches[toneIndex] != nextPitches[toneIndex]) {
+                                                writeEventTime(midiTickTime);
+                                                writer.writeUint8(128 | midiChannel);
+                                                writer.writeMidi7Bits(prevPitches[toneIndex]);
+                                                writer.writeMidi7Bits(velocity);
+                                            }
+                                        }
+                                        for (let toneIndex = 0; toneIndex < toneCount; toneIndex++) {
+                                            if (noteStarting || prevPitches[toneIndex] != nextPitches[toneIndex]) {
+                                                writeEventTime(midiTickTime);
+                                                writer.writeUint8(144 | midiChannel);
+                                                writer.writeMidi7Bits(nextPitches[toneIndex]);
+                                                writer.writeMidi7Bits(velocity);
+                                                prevPitches[toneIndex] = nextPitches[toneIndex];
+                                            }
+                                        }
+                                    }
+                                    pinTime = nextPinTime;
+                                    pinSize = nextPinSize;
+                                    pinInterval = nextPinInterval;
+                                }
+                                const noteEndTime = barStartTime + note.end * midiTicksPerPart;
+                                for (let toneIndex = 0; toneIndex < toneCount; toneIndex++) {
+                                    writeEventTime(noteEndTime);
+                                    writer.writeUint8(128 | midiChannel);
+                                    writer.writeMidi7Bits(prevPitches[toneIndex]);
+                                    writer.writeMidi7Bits(velocity);
+                                }
+                                shouldResetExpressionAndPitchBend = true;
+                            }
+                        }
+                        else {
+                            if (shouldResetExpressionAndPitchBend) {
+                                shouldResetExpressionAndPitchBend = false;
+                                if (prevExpression != defaultMidiExpression) {
+                                    prevExpression = defaultMidiExpression;
+                                    writeEventTime(barStartTime);
+                                    writeControlEvent(11, prevExpression);
+                                }
+                                if (prevPitchBend != defaultMidiPitchBend) {
+                                    prevPitchBend = defaultMidiPitchBend;
+                                    writeEventTime(barStartTime);
+                                    writer.writeUint8(224 | midiChannel);
+                                    writer.writeMidi7Bits(prevPitchBend & 0x7f);
+                                    writer.writeMidi7Bits((prevPitchBend >> 7) & 0x7f);
+                                }
+                            }
+                        }
+                        barStartTime += midiTicksPerBar;
+                    }
+                }
+                writeEventTime(barStartTime);
+                writer.writeUint8(255);
+                writer.writeMidi7Bits(47);
+                writer.writeMidiVariableLength(0x00);
+                writer.rewriteUint32(trackStartIndex, writer.getWriteIndex() - trackStartIndex - 4);
+            }
+            const blob = new Blob([writer.toCompactArrayBuffer()], { type: "audio/midi" });
+            save(blob, this._fileName.value.trim() + ".mid");
+            this._close();
+        }
+        _exportToJson() {
+            const jsonObject = this._doc.song.toJsonObject(this._enableIntro.checked, Number(this._loopDropDown.value), this._enableOutro.checked);
+            let whiteSpaceParam = this._removeWhitespace.checked ? undefined : '\t';
+            const jsonString = JSON.stringify(jsonObject, null, whiteSpaceParam);
+            const blob = new Blob([jsonString], { type: "application/json" });
+            save(blob, this._fileName.value.trim() + ".json");
+            this._close();
+        }
+        _exportToHtml() {
+            const fileContents = `\
+<!DOCTYPE html><meta charset="utf-8">
+
+You should be redirected to the song at:<br /><br />
+
+<a id="destination" href="${new URL("#" + this._doc.song.toBase64String(), location.href).href}"></a>
+
+<style>
+	:root {
+		color: white;
+		background: black;
+		font-family:
+		sans-serif;
+	}
+	a {
+		color: #98f;
+	}
+	a[href]::before {
+		content: attr(href);
+	}
+</style>
+
+<script>
+	location.assign(document.querySelector("a#destination").href);
+</script>
+`;
+            const blob = new Blob([fileContents], { type: "text/html" });
+            save(blob, this._fileName.value.trim() + ".html");
+            this._close();
+        }
+    }
+    ExportPrompt.midiChipInstruments = [
+        0x4A,
+        0x47,
+        0x50,
+        0x46,
+        0x44,
+        0x51,
+        0x51,
+        0x51,
+        0x51,
+    ];
+
+    const { button: button$n, div: div$n, span: span$6, h2: h2$m, input: input$g, br: br$4, select: select$c, option: option$c } = HTML;
     class BeatsPerBarPrompt {
         constructor(_doc) {
             this._doc = _doc;
-            this._beatsStepper = input$h({ style: "width: 3em; margin-left: 1em;", type: "number", step: "1" });
-            this._conversionStrategySelect = select$d({ style: "width: 100%;" }, option$d({ value: "splice" }, "Splice beats at end of bars."), option$d({ value: "stretch" }, "Stretch notes to fit in bars."), option$d({ value: "overflow" }, "Overflow notes across bars."));
-            this._cancelButton = button$o({ class: "cancelButton" });
-            this._okayButton = button$o({ class: "okayButton", style: "width:45%;" }, "Okay");
-            this.container = div$o({ class: "prompt noSelection", style: "width: 250px;" }, h2$n("Beats Per Bar"), div$o({ style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;" }, div$o({ style: "text-align: right;" }, "Beats per bar:", br$4(), span$6({ style: "font-size: smaller; color: ${ColorConfig.secondaryText};" }, "(Multiples of 3 or 4 are recommended)")), this._beatsStepper), div$o({ style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;" }, div$o({ class: "selectContainer", style: "width: 100%;" }, this._conversionStrategySelect)), div$o({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between;" }, this._okayButton), this._cancelButton);
+            this._computedSamplesLabel = div$n({ style: "width: 10em;" }, new Text("0:00"));
+            this._beatsStepper = input$g({ style: "width: 3em; margin-left: 1em;", type: "number", step: "1" });
+            this._conversionStrategySelect = select$c({ style: "width: 100%;" }, option$c({ value: "splice" }, "Splice beats at end of bars."), option$c({ value: "stretch" }, "Stretch notes to fit in bars."), option$c({ value: "overflow" }, "Overflow notes across bars."));
+            this._cancelButton = button$n({ class: "cancelButton" });
+            this._okayButton = button$n({ class: "okayButton", style: "width:45%;" }, "Okay");
+            this.container = div$n({ class: "prompt noSelection", style: "width: 250px;" }, h2$m("Beats Per Bar"), div$n({ style: "display: flex; flex-direction: row; align-items: center; justify-content: space-between;" }, "Length:", this._computedSamplesLabel), div$n({ style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;" }, div$n({ style: "text-align: right;" }, "Beats per bar:", br$4(), span$6({ style: "font-size: smaller; color: ${ColorConfig.secondaryText};" }, "(Multiples of 3 or 4 are recommended)")), this._beatsStepper), div$n({ style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;" }, div$n({ class: "selectContainer", style: "width: 100%;" }, this._conversionStrategySelect)), div$n({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between;" }, this._okayButton), this._cancelButton);
             this._close = () => {
                 this._doc.undo();
             };
@@ -29740,6 +33643,9 @@ li.select2-results__option[role=group] > strong:hover {
             this._beatsStepper.addEventListener("keypress", BeatsPerBarPrompt._validateKey);
             this._beatsStepper.addEventListener("blur", BeatsPerBarPrompt._validateNumber);
             this.container.addEventListener("keydown", this._whenKeyPressed);
+            this._beatsStepper.addEventListener("input", () => { this._computedSamplesLabel.firstChild.textContent = this._predictFutureLength(); });
+            this._conversionStrategySelect.addEventListener("change", () => { this._computedSamplesLabel.firstChild.textContent = this._predictFutureLength(); });
+            this._computedSamplesLabel.firstChild.textContent = ExportPrompt.samplesToTime(this._doc, this._doc.synth.getTotalSamples(true, true, 0));
         }
         static _validateKey(event) {
             const charCode = (event.which) ? event.which : event.keyCode;
@@ -29756,21 +33662,28 @@ li.select2-results__option[role=group] > strong:hover {
         static _validate(input) {
             return Math.floor(Math.max(Number(input.min), Math.min(Number(input.max), Number(input.value))));
         }
+        _predictFutureLength() {
+            var _a, _b, _c;
+            const futureDoc = new SongDocument();
+            (_a = futureDoc.synth.song) === null || _a === void 0 ? void 0 : _a.fromBase64String(((_b = this._doc.synth.song) === null || _b === void 0 ? void 0 : _b.toBase64String()) ? (_c = this._doc.synth.song) === null || _c === void 0 ? void 0 : _c.toBase64String() : "");
+            new ChangeBeatsPerBar(futureDoc, BeatsPerBarPrompt._validate(this._beatsStepper), this._conversionStrategySelect.value);
+            return ExportPrompt.samplesToTime(futureDoc, futureDoc.synth.getTotalSamples(true, true, 0));
+        }
     }
 
-    const { button: button$n, div: div$n, label: label$3, br: br$3, h2: h2$m, input: input$g } = HTML;
+    const { button: button$m, div: div$m, label: label$3, br: br$3, h2: h2$l, input: input$f } = HTML;
     class ChannelSettingsPrompt {
         constructor(_doc) {
             this._doc = _doc;
-            this._patternsStepper = input$g({ style: "width: 3em; margin-left: 1em;", type: "number", step: "1" });
-            this._pitchChannelStepper = input$g({ style: "width: 3em; margin-left: 1em;", type: "number", step: "1" });
-            this._drumChannelStepper = input$g({ style: "width: 3em; margin-left: 1em;", type: "number", step: "1" });
-            this._modChannelStepper = input$g({ style: "width: 3em; margin-left: 1em;", type: "number", step: "1" });
-            this._layeredInstrumentsBox = input$g({ style: "width: 3em; margin-left: 1em;", type: "checkbox" });
-            this._patternInstrumentsBox = input$g({ style: "width: 3em; margin-left: 1em;", type: "checkbox" });
-            this._cancelButton = button$n({ class: "cancelButton" });
-            this._okayButton = button$n({ class: "okayButton", style: "width:45%;" }, "Okay");
-            this.container = div$n({ class: "prompt noSelection", style: "width: 250px; text-align: right;" }, h2$m("Channel Settings"), label$3({ style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;" }, "Pitch channels:", this._pitchChannelStepper), label$3({ style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;" }, "Drum channels:", this._drumChannelStepper), div$n({ style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;" }, "Mod channels:", this._modChannelStepper), label$3({ style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;" }, "Available patterns per channel:", this._patternsStepper), label$3({ style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;" }, "Simultaneous instruments", br$3(), "per channel:", this._layeredInstrumentsBox), label$3({ style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;" }, "Different instruments", br$3(), "per pattern:", this._patternInstrumentsBox), div$n({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between;" }, this._okayButton), this._cancelButton);
+            this._patternsStepper = input$f({ style: "width: 3em; margin-left: 1em;", type: "number", step: "1" });
+            this._pitchChannelStepper = input$f({ style: "width: 3em; margin-left: 1em;", type: "number", step: "1" });
+            this._drumChannelStepper = input$f({ style: "width: 3em; margin-left: 1em;", type: "number", step: "1" });
+            this._modChannelStepper = input$f({ style: "width: 3em; margin-left: 1em;", type: "number", step: "1" });
+            this._layeredInstrumentsBox = input$f({ style: "width: 3em; margin-left: 1em;", type: "checkbox" });
+            this._patternInstrumentsBox = input$f({ style: "width: 3em; margin-left: 1em;", type: "checkbox" });
+            this._cancelButton = button$m({ class: "cancelButton" });
+            this._okayButton = button$m({ class: "okayButton", style: "width:45%;" }, "Okay");
+            this.container = div$m({ class: "prompt noSelection", style: "width: 250px; text-align: right;" }, h2$l("Channel Settings"), label$3({ style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;" }, "Pitch channels:", this._pitchChannelStepper), label$3({ style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;" }, "Drum channels:", this._drumChannelStepper), div$m({ style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;" }, "Mod channels:", this._modChannelStepper), label$3({ style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;" }, "Available patterns per channel:", this._patternsStepper), label$3({ style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;" }, "Simultaneous instruments", br$3(), "per channel:", this._layeredInstrumentsBox), label$3({ style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;" }, "Different instruments", br$3(), "per pattern:", this._patternInstrumentsBox), div$m({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between;" }, this._okayButton), this._cancelButton);
             this._close = () => {
                 this._doc.undo();
             };
@@ -29845,7 +33758,7 @@ li.select2-results__option[role=group] > strong:hover {
         }
     }
 
-    const { button: button$m, div: div$m, h2: h2$l } = HTML;
+    const { button: button$l, div: div$l, h2: h2$k } = HTML;
     class CustomChipPromptCanvas {
         constructor(doc) {
             this._mouseX = 0;
@@ -30038,24 +33951,24 @@ li.select2-results__option[role=group] > strong:hover {
             this._doc = _doc;
             this._songEditor = _songEditor;
             this.customChipCanvas = new CustomChipPromptCanvas(this._doc);
-            this._playButton = button$m({ style: "width: 55%;", type: "button" });
-            this._cancelButton = button$m({ class: "cancelButton" });
-            this._okayButton = button$m({ class: "okayButton", style: "width:45%;" }, "Okay");
-            this.copyButton = button$m({ style: "width:86px; margin-right: 5px;", class: "copyButton" }, [
+            this._playButton = button$l({ style: "width: 55%;", type: "button" });
+            this._cancelButton = button$l({ class: "cancelButton" });
+            this._okayButton = button$l({ class: "okayButton", style: "width:45%;" }, "Okay");
+            this.copyButton = button$l({ style: "width:86px; margin-right: 5px;", class: "copyButton" }, [
                 "Copy",
                 SVG.svg({ style: "flex-shrink: 0; position: absolute; left: 0; top: 50%; margin-top: -1em; pointer-events: none;", width: "2em", height: "2em", viewBox: "-5 -21 26 26" }, [
                     SVG.path({ d: "M 0 -15 L 1 -15 L 1 0 L 13 0 L 13 1 L 0 1 L 0 -15 z M 2 -1 L 2 -17 L 10 -17 L 14 -13 L 14 -1 z M 3 -2 L 13 -2 L 13 -12 L 9 -12 L 9 -16 L 3 -16 z", fill: "currentColor" }),
                 ]),
             ]);
-            this.pasteButton = button$m({ style: "width:86px;", class: "pasteButton" }, [
+            this.pasteButton = button$l({ style: "width:86px;", class: "pasteButton" }, [
                 "Paste",
                 SVG.svg({ style: "flex-shrink: 0; position: absolute; left: 0; top: 50%; margin-top: -1em; pointer-events: none;", width: "2em", height: "2em", viewBox: "0 0 26 26" }, [
                     SVG.path({ d: "M 8 18 L 6 18 L 6 5 L 17 5 L 17 7 M 9 8 L 16 8 L 20 12 L 20 22 L 9 22 z", stroke: "currentColor", fill: "none" }),
                     SVG.path({ d: "M 9 3 L 14 3 L 14 6 L 9 6 L 9 3 z M 16 8 L 20 12 L 16 12 L 16 8 z", fill: "currentColor", }),
                 ]),
             ]);
-            this.copyPasteContainer = div$m({ style: "width: 185px;" }, this.copyButton, this.pasteButton);
-            this.container = div$m({ class: "prompt noSelection", style: "width: 600px;" }, h2$l("Edit Custom Chip Instrument"), div$m({ style: "display: flex; width: 55%; align-self: center; flex-direction: row; align-items: center; justify-content: center;" }, this._playButton), div$m({ style: "display: flex; flex-direction: row; align-items: center; justify-content: center;" }, this.customChipCanvas.container), div$m({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between;" }, this._okayButton, this.copyPasteContainer), this._cancelButton);
+            this.copyPasteContainer = div$l({ style: "width: 185px;" }, this.copyButton, this.pasteButton);
+            this.container = div$l({ class: "prompt noSelection", style: "width: 600px;" }, h2$k("Edit Custom Chip Instrument"), div$l({ style: "display: flex; width: 55%; align-self: center; flex-direction: row; align-items: center; justify-content: center;" }, this._playButton), div$l({ style: "display: flex; flex-direction: row; align-items: center; justify-content: center;" }, this.customChipCanvas.container), div$l({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between;" }, this._okayButton, this.copyPasteContainer), this._cancelButton);
             this._togglePlay = () => {
                 this._songEditor.togglePlay();
                 this.updatePlayButton();
@@ -30818,7 +34731,7 @@ li.select2-results__option[role=group] > strong:hover {
         }
     }
 
-    const { button: button$l, div: div$l, h2: h2$k, p: p$7 } = HTML;
+    const { button: button$k, div: div$k, h2: h2$j, p: p$7 } = HTML;
     class CustomFilterPrompt {
         constructor(_doc, _songEditor, _useNoteFilter, forSong = false) {
             this._doc = _doc;
@@ -30828,29 +34741,29 @@ li.select2-results__option[role=group] > strong:hover {
             this.filterData = new FilterSettings;
             this.startingFilterData = new FilterSettings;
             this._subfilterIndex = 0;
-            this._playButton = button$l({ style: "width: 55%;", type: "button" });
+            this._playButton = button$k({ style: "width: 55%;", type: "button" });
             this._filterButtons = [];
-            this._filterButtonContainer = div$l({ class: "instrument-bar", style: "justify-content: center;" });
-            this._cancelButton = button$l({ class: "cancelButton" });
-            this._okayButton = button$l({ class: "okayButton", style: "width:45%;" }, "Okay");
-            this._filterContainer = div$l({ style: "width: 100%; display: flex; flex-direction: row; align-items: center; justify-content: center;" });
-            this._editorTitle = div$l({}, h2$k("Edit Filter"));
-            this._filterCopyButton = button$l({ style: "width:86px; margin-right: 5px;", class: "copyButton" }, [
+            this._filterButtonContainer = div$k({ class: "instrument-bar", style: "justify-content: center;" });
+            this._cancelButton = button$k({ class: "cancelButton" });
+            this._okayButton = button$k({ class: "okayButton", style: "width:45%;" }, "Okay");
+            this._filterContainer = div$k({ style: "width: 100%; display: flex; flex-direction: row; align-items: center; justify-content: center;" });
+            this._editorTitle = div$k({}, h2$j("Edit Filter"));
+            this._filterCopyButton = button$k({ style: "width:86px; margin-right: 5px;", class: "copyButton" }, [
                 "Copy",
                 SVG.svg({ style: "flex-shrink: 0; position: absolute; left: 0; top: 50%; margin-top: -1em; pointer-events: none;", width: "2em", height: "2em", viewBox: "-5 -21 26 26" }, [
                     SVG.path({ d: "M 0 -15 L 1 -15 L 1 0 L 13 0 L 13 1 L 0 1 L 0 -15 z M 2 -1 L 2 -17 L 10 -17 L 14 -13 L 14 -1 z M 3 -2 L 13 -2 L 13 -12 L 9 -12 L 9 -16 L 3 -16 z", fill: "currentColor" }),
                 ]),
             ]);
-            this._filterPasteButton = button$l({ style: "width:86px;", class: "pasteButton" }, [
+            this._filterPasteButton = button$k({ style: "width:86px;", class: "pasteButton" }, [
                 "Paste",
                 SVG.svg({ style: "flex-shrink: 0; position: absolute; left: 0; top: 50%; margin-top: -1em; pointer-events: none;", width: "2em", height: "2em", viewBox: "0 0 26 26" }, [
                     SVG.path({ d: "M 8 18 L 6 18 L 6 5 L 17 5 L 17 7 M 9 8 L 16 8 L 20 12 L 20 22 L 9 22 z", stroke: "currentColor", fill: "none" }),
                     SVG.path({ d: "M 9 3 L 14 3 L 14 6 L 9 6 L 9 3 z M 16 8 L 20 12 L 16 12 L 16 8 z", fill: "currentColor", }),
                 ]),
             ]);
-            this._filterCopyPasteContainer = div$l({ style: "width: 185px;" }, this._filterCopyButton, this._filterPasteButton);
-            this._filterCoordinateText = div$l({ style: "text-align: left; margin-bottom: 0px; font-size: x-small; height: 1.3em; color: " + ColorConfig.secondaryText + ";" }, p$7(""));
-            this.container = div$l({ class: "prompt noSelection", style: "width: 600px;" }, this._editorTitle, div$l({ style: "display: flex; width: 55%; align-self: center; flex-direction: row; align-items: center; justify-content: center;" }, this._playButton), this._filterButtonContainer, this._filterContainer, div$l({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between;" }, this._okayButton, this._filterCopyPasteContainer), this._cancelButton);
+            this._filterCopyPasteContainer = div$k({ style: "width: 185px;" }, this._filterCopyButton, this._filterPasteButton);
+            this._filterCoordinateText = div$k({ style: "text-align: left; margin-bottom: 0px; font-size: x-small; height: 1.3em; color: " + ColorConfig.secondaryText + ";" }, p$7(""));
+            this.container = div$k({ class: "prompt noSelection", style: "width: 600px;" }, this._editorTitle, div$k({ style: "display: flex; width: 55%; align-self: center; flex-direction: row; align-items: center; justify-content: center;" }, this._playButton), this._filterButtonContainer, this._filterContainer, div$k({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between;" }, this._okayButton, this._filterCopyPasteContainer), this._cancelButton);
             this._setSubfilter = (index, useHistory = true, doSwap = true) => {
                 this._filterButtons[this._subfilterIndex].classList.remove("selected-instrument");
                 if (doSwap)
@@ -30954,12 +34867,12 @@ li.select2-results__option[role=group] > strong:hover {
             this.filterEditor.container.insertBefore(this._filterCoordinateText, this.filterEditor.container.firstChild);
             this.filterEditor.coordText = this._filterCoordinateText;
             this._editorTitle.children[0].innerHTML = forSong ? "Edit Song EQ Filter" : (_useNoteFilter) ? "Edit Note Filter" : "Edit EQ Filter";
-            let newButton = button$l({ class: "no-underline", style: "max-width: 5em;" }, "Main");
+            let newButton = button$k({ class: "no-underline", style: "max-width: 5em;" }, "Main");
             this._filterButtonContainer.appendChild(newButton);
             this._filterButtons.push(newButton);
             newButton.addEventListener("click", () => { this._setSubfilter(0); });
             for (let i = 1; i < Config.filterMorphCount; i++) {
-                let newSubButton = button$l({ class: "no-underline", style: "max-width: 2em;" }, "" + i);
+                let newSubButton = button$k({ class: "no-underline", style: "max-width: 2em;" }, "" + i);
                 this._filterButtons.push(newSubButton);
                 this._filterButtonContainer.appendChild(newSubButton);
                 newSubButton.addEventListener("click", () => { this._setSubfilter(i); });
@@ -30992,16 +34905,16 @@ li.select2-results__option[role=group] > strong:hover {
         }
     }
 
-    const { button: button$k, div: div$k, h2: h2$j, input: input$f, label: label$2, br: br$2 } = HTML;
+    const { button: button$j, div: div$j, h2: h2$i, input: input$e, label: label$2, br: br$2 } = HTML;
     class InstrumentExportPrompt {
         constructor(_doc) {
             this._doc = _doc;
-            this._cancelButton = button$k({ class: "cancelButton" });
-            this._exportButton = button$k({ class: "exportButton", style: "width:45%;" }, "Export");
-            this._exportMultipleBox = input$f({ style: "width: 3em; margin-left: 1em;", type: "checkbox" });
+            this._cancelButton = button$j({ class: "cancelButton" });
+            this._exportButton = button$j({ class: "exportButton", style: "width:45%;" }, "Export");
+            this._exportMultipleBox = input$e({ style: "width: 3em; margin-left: 1em;", type: "checkbox" });
             this._channelName = this._doc.song.channels[this._doc.channel].name == "" ? Config.jsonFormat + "-Instrument" : this._doc.song.channels[this._doc.channel].name;
-            this._fileName = input$f({ type: "text", style: "width: 10em;", value: this._channelName, maxlength: 250, "autofocus": "autofocus" });
-            this.container = div$k({ class: "prompt noSelection", style: "width: 200px;" }, h2$j("Export Instruments Options"), div$k({ style: "display: flex; flex-direction: row; align-items: center; justify-content: space-between;" }, "File name:", this._fileName), label$2({ style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;" }, "Export all instruments", br$2(), "in channel:", this._exportMultipleBox), div$k({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between;" }, this._exportButton), this._cancelButton);
+            this._fileName = input$e({ type: "text", style: "width: 10em;", value: this._channelName, maxlength: 250, "autofocus": "autofocus" });
+            this.container = div$j({ class: "prompt noSelection", style: "width: 200px;" }, h2$i("Export Instruments Options"), div$j({ style: "display: flex; flex-direction: row; align-items: center; justify-content: space-between;" }, "File name:", this._fileName), label$2({ style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;" }, "Export all instruments", br$2(), "in channel:", this._exportMultipleBox), div$j({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between;" }, this._exportButton), this._cancelButton);
             this._close = () => {
                 this._doc.undo();
             };
@@ -31068,15 +34981,15 @@ li.select2-results__option[role=group] > strong:hover {
         }
     }
 
-    const { button: button$j, div: div$j, h2: h2$i, input: input$e, select: select$c, option: option$c, code: code$1 } = HTML;
+    const { button: button$i, div: div$i, h2: h2$h, input: input$d, select: select$b, option: option$b, code: code$1 } = HTML;
     class InstrumentImportPrompt {
         constructor(_doc) {
             this._doc = _doc;
-            this._cancelButton = button$j({ class: "cancelButton" });
-            this._importStrategySelect = select$c({ style: "width: 100%;" }, option$c({ value: "append" }, "Append instruments to the end of the list."), option$c({ value: "replace" }, "Replace only the selected instrument."), option$c({ value: "all" }, "Replace all instruments in the channel."));
-            this._fileInput = input$e({ type: "file", accept: ".json,application/json" });
-            this._strategyInfoText = div$j({ style: "text-align: left;" }, "You must enable either ", code$1("Simultaneous instruments per channel"), " or ", code$1("Different instruments per pattern"), " to change the import strategy.");
-            this.container = div$j({ class: "prompt noSelection", style: "width: 300px;" }, h2$i("Import Instrument(s)"), this._strategyInfoText, div$j({ style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;" }, div$j({ class: "selectContainer", style: "width: 100%;" }, this._importStrategySelect)), this._fileInput, this._cancelButton);
+            this._cancelButton = button$i({ class: "cancelButton" });
+            this._importStrategySelect = select$b({ style: "width: 100%;" }, option$b({ value: "append" }, "Append instruments to the end of the list."), option$b({ value: "replace" }, "Replace only the selected instrument."), option$b({ value: "all" }, "Replace all instruments in the channel."));
+            this._fileInput = input$d({ type: "file", accept: ".json,application/json" });
+            this._strategyInfoText = div$i({ style: "text-align: left;" }, "You must enable either ", code$1("Simultaneous instruments per channel"), " or ", code$1("Different instruments per pattern"), " to change the import strategy.");
+            this.container = div$i({ class: "prompt noSelection", style: "width: 300px;" }, h2$h("Import Instrument(s)"), this._strategyInfoText, div$i({ style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;" }, div$i({ class: "selectContainer", style: "width: 100%;" }, this._importStrategySelect)), this._fileInput, this._cancelButton);
             this._whenFileSelected = () => {
                 const file = this._fileInput.files[0];
                 if (!file)
@@ -31217,7 +35130,7 @@ li.select2-results__option[role=group] > strong:hover {
         }
     }
 
-    const { button: button$i, div: div$i, h2: h2$h, input: input$d } = HTML;
+    const { button: button$h, div: div$h, h2: h2$g, input: input$c } = HTML;
     function gcd(x, y) {
         while (y !== 0) {
             const z = x % y;
@@ -31323,32 +35236,32 @@ li.select2-results__option[role=group] > strong:hover {
             this._clockPadding = this._clockWidth / this._maxSteps;
             this._clockRadius = this._clockWidth / 2 - this._clockPointMaxRadius - this._clockPadding;
             this._sequenceButtons = [];
-            this._sequenceRemoveButton = button$i({ class: "no-underline", style: "flex-grow: 0; flex-basis: 30px;" }, SVG.svg({ width: "26", height: "26", viewBox: "-13 -13 26 26", "pointer-events": "none" }, SVG.path({ d: "M -7.07 -5.66 L -5.66 -7.07 L 0 -1.4 L 5.66 -7.07 L 7.07 -5.66 L 1.4 0 L 7.07 5.66 L 5.66 7.07 L 0 1.4 L -5.66 7.07 L -7.07 5.66 L -1.4 0 z", fill: ColorConfig.primaryText })));
-            this._sequenceAddButton = button$i({ class: "no-underline last-button", style: "flex-grow: 0; flex-basis: 30px;" }, SVG.svg({ width: "26", height: "26", viewBox: "-13 -13 26 26", "pointer-events": "none" }, SVG.path({ d: "M -8 -1 L -1 -1 L -1 -8 L 1 -8 L 1 -1 L 8 -1 L 8 1 L 1 1 L 1 8 L -1 8 L -1 1 L -8 1 z", fill: ColorConfig.primaryText })));
-            this._sequenceButtonContainer = div$i({ class: "instrument-bar", style: "justify-content: center; width: 100%;" }, this._sequenceRemoveButton, this._sequenceAddButton);
+            this._sequenceRemoveButton = button$h({ class: "no-underline", style: "flex-grow: 0; flex-basis: 30px;" }, SVG.svg({ width: "26", height: "26", viewBox: "-13 -13 26 26", "pointer-events": "none" }, SVG.path({ d: "M -7.07 -5.66 L -5.66 -7.07 L 0 -1.4 L 5.66 -7.07 L 7.07 -5.66 L 1.4 0 L 7.07 5.66 L 5.66 7.07 L 0 1.4 L -5.66 7.07 L -7.07 5.66 L -1.4 0 z", fill: ColorConfig.primaryText })));
+            this._sequenceAddButton = button$h({ class: "no-underline last-button", style: "flex-grow: 0; flex-basis: 30px;" }, SVG.svg({ width: "26", height: "26", viewBox: "-13 -13 26 26", "pointer-events": "none" }, SVG.path({ d: "M -8 -1 L -1 -1 L -1 -8 L 1 -8 L 1 -1 L 8 -1 L 8 1 L 1 1 L 1 8 L -1 8 L -1 1 L -8 1 z", fill: ColorConfig.primaryText })));
+            this._sequenceButtonContainer = div$h({ class: "instrument-bar", style: "justify-content: center; width: 100%;" }, this._sequenceRemoveButton, this._sequenceAddButton);
             this._barPreviewBackground = SVG.svg({ "pointer-events": "none" });
             this._barPreviewSteps = SVG.svg({ "pointer-events": "none" });
-            this._barPreviewLabel = div$i({ style: `flex-grow: 1; color: ${ColorConfig.secondaryText}` });
-            this._barPreviewGoToFirstButton = button$i({ style: "height: auto; min-height: var(--button-size);" }, SVG.svg({ width: "26", height: "26", viewBox: "-13 -14 26 26", "pointer-events": "none" }, SVG.rect({ x: "-6", y: "-6", width: "2", height: "12", fill: ColorConfig.primaryText }), SVG.path({ d: "M 6 -6 L 6 6 L -3 0 z", fill: ColorConfig.primaryText })));
-            this._barPreviewGoBackButton = button$i({ style: "height: auto; min-height: var(--button-size); margin-left: 1em;" }, SVG.svg({ width: "24", height: "26", viewBox: "-10 -14 24 26", "pointer-events": "none" }, SVG.path({ d: "M 6 -6 L 6 6 L -3 0 z", fill: ColorConfig.primaryText })));
-            this._barPreviewGoForwardButton = button$i({ style: "height: auto; min-height: var(--button-size);" }, SVG.svg({ width: "24", height: "26", viewBox: "-14 -14 24 26", "pointer-events": "none" }, SVG.path({ d: "M -6 -6 L -6 6 L 3 0 z", fill: ColorConfig.primaryText })));
-            this._barPreviewGoToLastButton = button$i({ style: "height: auto; min-height: var(--button-size); margin-left: 1em;" }, SVG.svg({ width: "26", height: "26", viewBox: "-13 -14 26 26", "pointer-events": "none" }, SVG.rect({ x: "4", y: "-6", width: "2", height: "12", fill: ColorConfig.primaryText }), SVG.path({ d: "M -6 -6 L -6 6 L 3 0 z", fill: ColorConfig.primaryText })));
+            this._barPreviewLabel = div$h({ style: `flex-grow: 1; color: ${ColorConfig.secondaryText}` });
+            this._barPreviewGoToFirstButton = button$h({ style: "height: auto; min-height: var(--button-size);" }, SVG.svg({ width: "26", height: "26", viewBox: "-13 -14 26 26", "pointer-events": "none" }, SVG.rect({ x: "-6", y: "-6", width: "2", height: "12", fill: ColorConfig.primaryText }), SVG.path({ d: "M 6 -6 L 6 6 L -3 0 z", fill: ColorConfig.primaryText })));
+            this._barPreviewGoBackButton = button$h({ style: "height: auto; min-height: var(--button-size); margin-left: 1em;" }, SVG.svg({ width: "24", height: "26", viewBox: "-10 -14 24 26", "pointer-events": "none" }, SVG.path({ d: "M 6 -6 L 6 6 L -3 0 z", fill: ColorConfig.primaryText })));
+            this._barPreviewGoForwardButton = button$h({ style: "height: auto; min-height: var(--button-size);" }, SVG.svg({ width: "24", height: "26", viewBox: "-14 -14 24 26", "pointer-events": "none" }, SVG.path({ d: "M -6 -6 L -6 6 L 3 0 z", fill: ColorConfig.primaryText })));
+            this._barPreviewGoToLastButton = button$h({ style: "height: auto; min-height: var(--button-size); margin-left: 1em;" }, SVG.svg({ width: "26", height: "26", viewBox: "-13 -14 26 26", "pointer-events": "none" }, SVG.rect({ x: "4", y: "-6", width: "2", height: "12", fill: ColorConfig.primaryText }), SVG.path({ d: "M -6 -6 L -6 6 L 3 0 z", fill: ColorConfig.primaryText })));
             this._clockWire = SVG.circle({ cx: this._clockWidth / 2, cy: this._clockHeight / 2, r: this._clockRadius, stroke: ColorConfig.primaryText, "stroke-width": "0.5", fill: "none" });
             this._clockPoints = SVG.svg({ "pointer-events": "none" });
-            this._stepsStepper = input$d({ style: "width: 3em; margin-left: 1em;", type: "number", min: this._minSteps, max: this._maxSteps, value: "8", step: "1" });
-            this._pulsesStepper = input$d({ style: "width: 3em; margin-left: 1em;", type: "number", min: "0", max: "8", value: "5", step: "1" });
-            this._rotationStepper = input$d({ style: "width: 3em; margin-left: 1em;", type: "number", min: "0", max: this._maxSteps, value: "0", step: "1" });
-            this._stepSizeNumeratorStepper = input$d({ style: "width: 3em; margin-left: 1em;", type: "number", min: "1", max: Config.partsPerBeat, value: "1", step: "1" });
-            this._stepSizeDenominatorStepper = input$d({ style: "width: 3em; margin-left: 1em;", type: "number", min: "1", max: Config.partsPerBeat, value: "4", step: "1" });
-            this._channelStepper = input$d({ style: "width: 3em; margin-left: 1em;", type: "number", min: "1", max: this._maxChannel + 1, value: "1", step: "1" });
-            this._pitchStepper = input$d({ style: "width: 3em; margin-left: 1em;", type: "number", min: "0", max: Config.maxPitch, value: "0", step: "1" });
-            this._barAmountStepper = input$d({ style: "width: 3em; margin-left: 1em;", type: "number", min: "1", max: Config.barCountMax, value: "1", step: "1" });
-            this._extendUntilLoopButton = button$i({ style: "height: auto; min-height: var(--button-size); margin-left: 1em;" }, "Extend until loop");
-            this._generateFadingNotesBox = input$d({ type: "checkbox", style: "width: 1em; padding: 0; margin-left: 1em;" });
-            this._invertBox = input$d({ type: "checkbox", style: "width: 1em; padding: 0; margin-left: 1em;" });
-            this._okayButton = button$i({ class: "okayButton", style: "width: 45%;" }, "Okay");
-            this._cancelButton = button$i({ class: "cancelButton" });
-            this.container = div$i({ class: "prompt noSelection", style: "width: 600px;" }, h2$h("Generate Euclidean Rhythm"), div$i({ style: "display: flex; flex-direction: row; align-items: center;" }, this._sequenceButtonContainer), div$i({ style: "display: flex; flex-direction: row; align-items: center; justify-content: space-between;" }, div$i({ style: "flex-grow: 0; flex-shrink: 0;" }, this._barPreviewGoToFirstButton, this._barPreviewGoBackButton), this._barPreviewLabel, div$i({ style: "flex-grow: 0; flex-shrink: 0;" }, this._barPreviewGoForwardButton, this._barPreviewGoToLastButton)), div$i({ style: "display: flex; flex-direction: row; align-items: center; justify-content: center;" }, SVG.svg({ "pointer-events": "none", style: "touch-action: none; overflow: hidden;", width: "100%", height: "20px", viewBox: `0 0 ${this._barPreviewWidth} ${this._barPreviewHeight}`, preserveAspectRatio: "none" }, this._barPreviewBackground, this._barPreviewSteps)), div$i({ style: "display: flex; flex-direction: row; align-items: center; justify-content: space-evenly;" }, div$i({ style: "max-width: 150px; height: 100%;" }, SVG.svg({ "pointer-events": "none", width: "100%", height: "100%", style: "touch-action: none; overflow: hidden; margin-right: 1.5em; max-width: 150px; height: 100%;", viewBox: `0 0 ${this._clockWidth} ${this._clockHeight}`, preserveAspectRatio: "none" }, this._clockWire, this._clockPoints)), div$i({ style: "display: flex; height: 100%;" }, div$i({ style: "flex-grow: 1; " }, div$i({ style: "display: flex; flex-direction: row; align-items: center; height: 3em; justify-content: flex-end;" }, div$i({ style: `text-align: right; flex-grow: 1; color: ${ColorConfig.primaryText};` }, "Steps"), this._stepsStepper), div$i({ style: "display: flex; flex-direction: row; align-items: center; height: 3em; justify-content: flex-end; margin-top: 0.5em;" }, div$i({ style: `text-align: right; flex-grow: 1; color: ${ColorConfig.primaryText};` }, "Pulses"), this._pulsesStepper), div$i({ style: "display: flex; flex-direction: row; align-items: center; height: 3em; justify-content: flex-end; margin-top: 0.5em;" }, div$i({ style: `text-align: right; flex-grow: 1; color: ${ColorConfig.primaryText};` }, "Rotation"), this._rotationStepper)), div$i({ style: "flex-grow: 1; margin-left: 1em;" }, div$i({ style: "display: flex; flex-direction: row; align-items: center; height: 3em; justify-content: flex-end; margin-bottom: 1em;" }, div$i({ style: `text-align: right; flex-grow: 1; color: ${ColorConfig.primaryText};` }, "Size"), div$i({ style: "display: flex; flex-direction: column;" }, this._stepSizeNumeratorStepper, this._stepSizeDenominatorStepper)), div$i({ style: "display: flex; flex-direction: row; align-items: center; height: 3em; justify-content: flex-end; margin-top: 0.5em;" }, div$i({ style: `text-align: right; flex-grow: 1; color: ${ColorConfig.primaryText};` }, "Channel"), this._channelStepper), div$i({ style: "display: flex; flex-direction: row; align-items: center; height: 3em; justify-content: flex-end; margin-top: 0.5em;" }, div$i({ style: `text-align: right; flex-grow: 1; color: ${ColorConfig.primaryText};` }, "Pitch"), this._pitchStepper)))), div$i({ style: "display: flex; flex-direction: row; align-items: center; justify-content: flex-end;" }, div$i({ style: `text-align: right; color: ${ColorConfig.primaryText};` }, "Generate fading notes"), this._generateFadingNotesBox, div$i({ style: `text-align: right; color: ${ColorConfig.primaryText}; margin-left: 1em;` }, "Invert"), this._invertBox), div$i({ style: "display: flex; flex-direction: row; align-items: center; justify-content: flex-end;" }, div$i({ style: `text-align: right; color: ${ColorConfig.primaryText};` }, "Length (in bars)"), this._barAmountStepper, this._extendUntilLoopButton), div$i({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between;" }, this._okayButton), this._cancelButton);
+            this._stepsStepper = input$c({ style: "width: 3em; margin-left: 1em;", type: "number", min: this._minSteps, max: this._maxSteps, value: "8", step: "1" });
+            this._pulsesStepper = input$c({ style: "width: 3em; margin-left: 1em;", type: "number", min: "0", max: "8", value: "5", step: "1" });
+            this._rotationStepper = input$c({ style: "width: 3em; margin-left: 1em;", type: "number", min: "0", max: this._maxSteps, value: "0", step: "1" });
+            this._stepSizeNumeratorStepper = input$c({ style: "width: 3em; margin-left: 1em;", type: "number", min: "1", max: Config.partsPerBeat, value: "1", step: "1" });
+            this._stepSizeDenominatorStepper = input$c({ style: "width: 3em; margin-left: 1em;", type: "number", min: "1", max: Config.partsPerBeat, value: "4", step: "1" });
+            this._channelStepper = input$c({ style: "width: 3em; margin-left: 1em;", type: "number", min: "1", max: this._maxChannel + 1, value: "1", step: "1" });
+            this._pitchStepper = input$c({ style: "width: 3em; margin-left: 1em;", type: "number", min: "0", max: Config.maxPitch, value: "0", step: "1" });
+            this._barAmountStepper = input$c({ style: "width: 3em; margin-left: 1em;", type: "number", min: "1", max: Config.barCountMax, value: "1", step: "1" });
+            this._extendUntilLoopButton = button$h({ style: "height: auto; min-height: var(--button-size); margin-left: 1em;" }, "Extend until loop");
+            this._generateFadingNotesBox = input$c({ type: "checkbox", style: "width: 1em; padding: 0; margin-left: 1em;" });
+            this._invertBox = input$c({ type: "checkbox", style: "width: 1em; padding: 0; margin-left: 1em;" });
+            this._okayButton = button$h({ class: "okayButton", style: "width: 45%;" }, "Okay");
+            this._cancelButton = button$h({ class: "cancelButton" });
+            this.container = div$h({ class: "prompt noSelection", style: "width: 600px;" }, h2$g("Generate Euclidean Rhythm"), div$h({ style: "display: flex; flex-direction: row; align-items: center;" }, this._sequenceButtonContainer), div$h({ style: "display: flex; flex-direction: row; align-items: center; justify-content: space-between;" }, div$h({ style: "flex-grow: 0; flex-shrink: 0;" }, this._barPreviewGoToFirstButton, this._barPreviewGoBackButton), this._barPreviewLabel, div$h({ style: "flex-grow: 0; flex-shrink: 0;" }, this._barPreviewGoForwardButton, this._barPreviewGoToLastButton)), div$h({ style: "display: flex; flex-direction: row; align-items: center; justify-content: center;" }, SVG.svg({ "pointer-events": "none", style: "touch-action: none; overflow: hidden;", width: "100%", height: "20px", viewBox: `0 0 ${this._barPreviewWidth} ${this._barPreviewHeight}`, preserveAspectRatio: "none" }, this._barPreviewBackground, this._barPreviewSteps)), div$h({ style: "display: flex; flex-direction: row; align-items: center; justify-content: space-evenly;" }, div$h({ style: "max-width: 150px; height: 100%;" }, SVG.svg({ "pointer-events": "none", width: "100%", height: "100%", style: "touch-action: none; overflow: hidden; margin-right: 1.5em; max-width: 150px; height: 100%;", viewBox: `0 0 ${this._clockWidth} ${this._clockHeight}`, preserveAspectRatio: "none" }, this._clockWire, this._clockPoints)), div$h({ style: "display: flex; height: 100%;" }, div$h({ style: "flex-grow: 1; " }, div$h({ style: "display: flex; flex-direction: row; align-items: center; height: 3em; justify-content: flex-end;" }, div$h({ style: `text-align: right; flex-grow: 1; color: ${ColorConfig.primaryText};` }, "Steps"), this._stepsStepper), div$h({ style: "display: flex; flex-direction: row; align-items: center; height: 3em; justify-content: flex-end; margin-top: 0.5em;" }, div$h({ style: `text-align: right; flex-grow: 1; color: ${ColorConfig.primaryText};` }, "Pulses"), this._pulsesStepper), div$h({ style: "display: flex; flex-direction: row; align-items: center; height: 3em; justify-content: flex-end; margin-top: 0.5em;" }, div$h({ style: `text-align: right; flex-grow: 1; color: ${ColorConfig.primaryText};` }, "Rotation"), this._rotationStepper)), div$h({ style: "flex-grow: 1; margin-left: 1em;" }, div$h({ style: "display: flex; flex-direction: row; align-items: center; height: 3em; justify-content: flex-end; margin-bottom: 1em;" }, div$h({ style: `text-align: right; flex-grow: 1; color: ${ColorConfig.primaryText};` }, "Size"), div$h({ style: "display: flex; flex-direction: column;" }, this._stepSizeNumeratorStepper, this._stepSizeDenominatorStepper)), div$h({ style: "display: flex; flex-direction: row; align-items: center; height: 3em; justify-content: flex-end; margin-top: 0.5em;" }, div$h({ style: `text-align: right; flex-grow: 1; color: ${ColorConfig.primaryText};` }, "Channel"), this._channelStepper), div$h({ style: "display: flex; flex-direction: row; align-items: center; height: 3em; justify-content: flex-end; margin-top: 0.5em;" }, div$h({ style: `text-align: right; flex-grow: 1; color: ${ColorConfig.primaryText};` }, "Pitch"), this._pitchStepper)))), div$h({ style: "display: flex; flex-direction: row; align-items: center; justify-content: flex-end;" }, div$h({ style: `text-align: right; color: ${ColorConfig.primaryText};` }, "Generate fading notes"), this._generateFadingNotesBox, div$h({ style: `text-align: right; color: ${ColorConfig.primaryText}; margin-left: 1em;` }, "Invert"), this._invertBox), div$h({ style: "display: flex; flex-direction: row; align-items: center; justify-content: flex-end;" }, div$h({ style: `text-align: right; color: ${ColorConfig.primaryText};` }, "Length (in bars)"), this._barAmountStepper, this._extendUntilLoopButton), div$h({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between;" }, this._okayButton), this._cancelButton);
             this.cleanUp = () => {
                 this._okayButton.removeEventListener("click", this._saveChanges);
                 this._cancelButton.removeEventListener("click", this._close);
@@ -31935,7 +35848,7 @@ li.select2-results__option[role=group] > strong:hover {
             this._renderSequenceButtons = () => {
                 const container = this._sequenceButtonContainer;
                 while (this._sequenceButtons.length < this._sequences.length) {
-                    const sequenceButton = button$i({ class: "no-underline" }, (this._sequenceButtons.length + 1) + "");
+                    const sequenceButton = button$h({ class: "no-underline" }, (this._sequenceButtons.length + 1) + "");
                     this._sequenceButtons.push(sequenceButton);
                     container.insertBefore(sequenceButton, this._sequenceRemoveButton);
                 }
@@ -32246,1476 +36159,6 @@ li.select2-results__option[role=group] > strong:hover {
             this._render();
         }
     }
-
-    function transfer(source, length) {
-        const dest = new ArrayBuffer(length);
-        let nextOffset = 0;
-        let leftBytes = Math.min(source.byteLength, dest.byteLength);
-        const wordSizes = [8, 4, 2, 1];
-        for (const wordSize of wordSizes) {
-            if (leftBytes >= wordSize) {
-                const done = transferWith(wordSize, source, dest, nextOffset, leftBytes);
-                nextOffset = done.nextOffset;
-                leftBytes = done.leftBytes;
-            }
-        }
-        return dest;
-        function transferWith(wordSize, source, dest, nextOffset, leftBytes) {
-            let ViewClass = Uint8Array;
-            switch (wordSize) {
-                case 8:
-                    ViewClass = Float64Array;
-                    break;
-                case 4:
-                    ViewClass = Float32Array;
-                    break;
-                case 2:
-                    ViewClass = Uint16Array;
-                    break;
-                case 1:
-                    ViewClass = Uint8Array;
-                    break;
-                default:
-                    ViewClass = Uint8Array;
-                    break;
-            }
-            const view_source = new ViewClass(source, nextOffset, (leftBytes / wordSize) | 0);
-            const view_dest = new ViewClass(dest, nextOffset, (leftBytes / wordSize) | 0);
-            for (let i = 0; i < view_dest.length; i++) {
-                view_dest[i] = view_source[i];
-            }
-            return {
-                nextOffset: view_source.byteOffset + view_source.byteLength,
-                leftBytes: leftBytes - view_dest.length * wordSize,
-            };
-        }
-    }
-    class ArrayBufferWriter {
-        constructor(initialCapacity) {
-            this._writeIndex = 0;
-            this._fileSize = 0;
-            this._arrayBuffer = new ArrayBuffer(initialCapacity);
-            this._data = new DataView(this._arrayBuffer);
-        }
-        _addBytes(numBytes) {
-            this._fileSize += numBytes;
-            if (this._fileSize > this._arrayBuffer.byteLength) {
-                this._arrayBuffer = transfer(this._arrayBuffer, Math.max(this._arrayBuffer.byteLength * 2, this._fileSize));
-                this._data = new DataView(this._arrayBuffer);
-            }
-        }
-        getWriteIndex() {
-            return this._writeIndex;
-        }
-        rewriteUint32(index, value) {
-            this._data.setUint32(index, value >>> 0, false);
-        }
-        writeUint32(value) {
-            value = value >>> 0;
-            this._addBytes(4);
-            this._data.setUint32(this._writeIndex, value, false);
-            this._writeIndex = this._fileSize;
-        }
-        writeUint24(value) {
-            value = value >>> 0;
-            this._addBytes(3);
-            this._data.setUint8(this._writeIndex, (value >> 16) & 0xff);
-            this._data.setUint8(this._writeIndex + 1, (value >> 8) & 0xff);
-            this._data.setUint8(this._writeIndex + 2, (value) & 0xff);
-            this._writeIndex = this._fileSize;
-        }
-        writeUint16(value) {
-            value = value >>> 0;
-            this._addBytes(2);
-            this._data.setUint16(this._writeIndex, value, false);
-            this._writeIndex = this._fileSize;
-        }
-        writeUint8(value) {
-            value = value >>> 0;
-            this._addBytes(1);
-            this._data.setUint8(this._writeIndex, value);
-            this._writeIndex = this._fileSize;
-        }
-        writeInt8(value) {
-            value = value | 0;
-            this._addBytes(1);
-            this._data.setInt8(this._writeIndex, value);
-            this._writeIndex = this._fileSize;
-        }
-        writeMidi7Bits(value) {
-            value = value >>> 0;
-            if (value >= 0x80)
-                throw new Error("7 bit value contained 8th bit!");
-            this._addBytes(1);
-            this._data.setUint8(this._writeIndex, value);
-            this._writeIndex = this._fileSize;
-        }
-        writeMidiVariableLength(value) {
-            value = value >>> 0;
-            if (value > 0x0fffffff)
-                throw new Error("writeVariableLength value too big.");
-            let startWriting = false;
-            for (let i = 0; i < 4; i++) {
-                const shift = 21 - i * 7;
-                const bits = (value >>> shift) & 0x7f;
-                if (bits != 0 || i == 3)
-                    startWriting = true;
-                if (startWriting)
-                    this.writeUint8((i == 3 ? 0x00 : 0x80) | bits);
-            }
-        }
-        writeMidiAscii(string) {
-            this.writeMidiVariableLength(string.length);
-            for (let i = 0; i < string.length; i++) {
-                const charCode = string.charCodeAt(i);
-                if (charCode > 0x7f)
-                    throw new Error("Trying to write unicode character as ascii.");
-                this.writeUint8(charCode);
-            }
-        }
-        toCompactArrayBuffer() {
-            return transfer(this._arrayBuffer, this._fileSize);
-        }
-    }
-
-    const defaultMidiExpression = 0x7F;
-    const defaultMidiPitchBend = 0x2000;
-    const analogousDrumMap = {
-        35: { frequency: 0, duration: 2, volume: 3 },
-        36: { frequency: 0, duration: 2, volume: 3 },
-        37: { frequency: 5, duration: 1, volume: 3 },
-        38: { frequency: 4, duration: 2, volume: 3 },
-        39: { frequency: 5, duration: 2, volume: 3 },
-        40: { frequency: 4, duration: 2, volume: 3 },
-        41: { frequency: 1, duration: 2, volume: 3 },
-        42: { frequency: 8, duration: 1, volume: 3 },
-        43: { frequency: 1, duration: 2, volume: 3 },
-        44: { frequency: 8, duration: 1, volume: 2 },
-        45: { frequency: 2, duration: 2, volume: 3 },
-        46: { frequency: 8, duration: 4, volume: 3 },
-        47: { frequency: 2, duration: 2, volume: 3 },
-        48: { frequency: 3, duration: 2, volume: 3 },
-        49: { frequency: 7, duration: 4, volume: 3 },
-        50: { frequency: 3, duration: 2, volume: 3 },
-        51: { frequency: 6, duration: 4, volume: 2 },
-        52: { frequency: 7, duration: 4, volume: 3 },
-        53: { frequency: 6, duration: 2, volume: 3 },
-        54: { frequency: 11, duration: 2, volume: 3 },
-        55: { frequency: 9, duration: 4, volume: 3 },
-        56: { frequency: 7, duration: 1, volume: 2 },
-        57: { frequency: 7, duration: 4, volume: 3 },
-        58: { frequency: 10, duration: 2, volume: 2 },
-        59: { frequency: 6, duration: 4, volume: 3 },
-        69: { frequency: 10, duration: 2, volume: 3 },
-        70: { frequency: 10, duration: 2, volume: 3 },
-        73: { frequency: 10, duration: 1, volume: 2 },
-        74: { frequency: 10, duration: 2, volume: 2 },
-    };
-    function midiVolumeToVolumeMult(volume) {
-        return Math.pow(volume / 127, 4.0) / 0.3844015376046128;
-    }
-    function volumeMultToMidiVolume(volumeMult) {
-        return Math.pow(volumeMult * 0.3844015376046128, 0.25) * 127;
-    }
-    function midiExpressionToVolumeMult(expression) {
-        return Math.pow(expression / 127, 4.0);
-    }
-    function volumeMultToMidiExpression(volumeMult) {
-        return Math.pow(volumeMult, 0.25) * 127;
-    }
-
-    const { button: button$h, div: div$h, h2: h2$g, input: input$c, select: select$b, option: option$b } = HTML;
-    function lerp(low, high, t) {
-        return low + t * (high - low);
-    }
-    function save(blob, name) {
-        if (navigator.msSaveOrOpenBlob) {
-            navigator.msSaveOrOpenBlob(blob, name);
-            return;
-        }
-        const anchor = document.createElement("a");
-        if (anchor.download != undefined) {
-            const url = URL.createObjectURL(blob);
-            setTimeout(function () { URL.revokeObjectURL(url); }, 60000);
-            anchor.href = url;
-            anchor.download = name;
-            setTimeout(function () { anchor.dispatchEvent(new MouseEvent("click")); }, 0);
-        }
-        else {
-            const url = URL.createObjectURL(blob);
-            setTimeout(function () { URL.revokeObjectURL(url); }, 60000);
-            if (!window.open(url, "_blank"))
-                window.location.href = url;
-        }
-    }
-    class ExportPrompt {
-        constructor(_doc) {
-            this._doc = _doc;
-            this.outputStarted = false;
-            this._fileName = input$c({ type: "text", style: "width: 10em;", value: Config.jsonFormat + "-Song", maxlength: 250, "autofocus": "autofocus" });
-            this._computedSamplesLabel = div$h({ style: "width: 10em;" }, new Text("0:00"));
-            this._enableIntro = input$c({ type: "checkbox" });
-            this._loopDropDown = input$c({ style: "width: 2em;", type: "number", min: "1", max: "4", step: "1" });
-            this._enableOutro = input$c({ type: "checkbox" });
-            this._formatSelect = select$b({ style: "width: 100%;" }, option$b({ value: "wav" }, "Export to .wav file."), option$b({ value: "mp3" }, "Export to .mp3 file."), option$b({ value: "midi" }, "Export to .mid file."), option$b({ value: "json" }, "Export to .json file."), option$b({ value: "html" }, "Export to .html file."));
-            this._removeWhitespace = input$c({ type: "checkbox" });
-            this._removeWhitespaceDiv = div$h({ style: "vertical-align: middle; align-items: center; justify-content: space-between; margin-bottom: 14px;" }, "Remove Whitespace: ", this._removeWhitespace);
-            this._cancelButton = button$h({ class: "cancelButton" });
-            this._exportButton = button$h({ class: "exportButton", style: "width:45%;" }, "Export");
-            this._outputProgressBar = div$h({ style: `width: 0%; background: ${ColorConfig.loopAccent}; height: 100%; position: absolute; z-index: 2;` });
-            this._outputProgressLabel = div$h({ style: `position: relative; top: -1px; z-index: 3;` }, "0%");
-            this._outputProgressContainer = div$h({ style: `height: 12px; background: ${ColorConfig.uiWidgetBackground}; display: block; position: relative; z-index: 1;` }, this._outputProgressBar, this._outputProgressLabel);
-            this.container = div$h({ class: "prompt noSelection", style: "width: 200px;" }, h2$g("Export Options"), div$h({ style: "display: flex; flex-direction: row; align-items: center; justify-content: space-between;" }, "File name:", this._fileName), div$h({ style: "display: flex; flex-direction: row; align-items: center; justify-content: space-between;" }, "Length:", this._computedSamplesLabel), div$h({ style: "display: table; width: 100%;" }, div$h({ style: "display: table-row;" }, div$h({ style: "display: table-cell;" }, "Intro:"), div$h({ style: "display: table-cell;" }, "Loop Count:"), div$h({ style: "display: table-cell;" }, "Outro:")), div$h({ style: "display: table-row;" }, div$h({ style: "display: table-cell; vertical-align: middle;" }, this._enableIntro), div$h({ style: "display: table-cell; vertical-align: middle;" }, this._loopDropDown), div$h({ style: "display: table-cell; vertical-align: middle;" }, this._enableOutro))), div$h({ class: "selectContainer", style: "width: 100%;" }, this._formatSelect), this._removeWhitespaceDiv, div$h({ style: "text-align: left;" }, "Exporting can be slow. Reloading the page or clicking the X will cancel it. Please be patient."), this._outputProgressContainer, div$h({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between;" }, this._exportButton), this._cancelButton);
-            this._close = () => {
-                if (this.synth != null)
-                    this.synth.renderingSong = false;
-                this.outputStarted = false;
-                this._doc.undo();
-            };
-            this.cleanUp = () => {
-                this._fileName.removeEventListener("input", ExportPrompt._validateFileName);
-                this._loopDropDown.removeEventListener("blur", ExportPrompt._validateNumber);
-                this._exportButton.removeEventListener("click", this._export);
-                this._cancelButton.removeEventListener("click", this._close);
-                this.container.removeEventListener("keydown", this._whenKeyPressed);
-            };
-            this._whenKeyPressed = (event) => {
-                if (event.target.tagName != "BUTTON" && event.keyCode == 13) {
-                    this._export();
-                }
-            };
-            this._export = () => {
-                if (this.outputStarted == true)
-                    return;
-                window.localStorage.setItem("exportFormat", this._formatSelect.value);
-                window.localStorage.setItem("exportWhitespace", this._removeWhitespace.value);
-                switch (this._formatSelect.value) {
-                    case "wav":
-                        this.outputStarted = true;
-                        this._exportTo("wav");
-                        break;
-                    case "mp3":
-                        this.outputStarted = true;
-                        this._exportTo("mp3");
-                        break;
-                    case "midi":
-                        this.outputStarted = true;
-                        this._exportToMidi();
-                        break;
-                    case "json":
-                        this.outputStarted = true;
-                        this._exportToJson();
-                        break;
-                    case "html":
-                        this._exportToHtml();
-                        break;
-                    default:
-                        throw new Error("Unhandled file export type.");
-                }
-            };
-            this._loopDropDown.value = "1";
-            if (this._doc.song.loopStart == 0) {
-                this._enableIntro.checked = false;
-                this._enableIntro.disabled = true;
-            }
-            else {
-                this._enableIntro.checked = true;
-                this._enableIntro.disabled = false;
-            }
-            if (this._doc.song.loopStart + this._doc.song.loopLength == this._doc.song.barCount) {
-                this._enableOutro.checked = false;
-                this._enableOutro.disabled = true;
-            }
-            else {
-                this._enableOutro.checked = true;
-                this._enableOutro.disabled = false;
-            }
-            const lastExportFormat = window.localStorage.getItem("exportFormat");
-            if (lastExportFormat != null) {
-                this._formatSelect.value = lastExportFormat;
-            }
-            const lastExportWhitespace = window.localStorage.getItem("exportWhitespace") != "false";
-            if (lastExportWhitespace != null) {
-                this._removeWhitespace.checked = lastExportWhitespace;
-            }
-            if (this._formatSelect.value == "json") {
-                this._removeWhitespaceDiv.style.display = "block";
-            }
-            else {
-                this._removeWhitespaceDiv.style.display = "none";
-            }
-            this._fileName.select();
-            setTimeout(() => this._fileName.focus());
-            this._fileName.addEventListener("input", ExportPrompt._validateFileName);
-            this._loopDropDown.addEventListener("blur", ExportPrompt._validateNumber);
-            this._exportButton.addEventListener("click", this._export);
-            this._cancelButton.addEventListener("click", this._close);
-            this._enableOutro.addEventListener("click", () => { this._computedSamplesLabel.firstChild.textContent = ExportPrompt.samplesToTime(this._doc, this._doc.synth.getTotalSamples(this._enableIntro.checked, this._enableOutro.checked, +this._loopDropDown.value - 1)); });
-            this._enableIntro.addEventListener("click", () => { this._computedSamplesLabel.firstChild.textContent = ExportPrompt.samplesToTime(this._doc, this._doc.synth.getTotalSamples(this._enableIntro.checked, this._enableOutro.checked, +this._loopDropDown.value - 1)); });
-            this._loopDropDown.addEventListener("change", () => { this._computedSamplesLabel.firstChild.textContent = ExportPrompt.samplesToTime(this._doc, this._doc.synth.getTotalSamples(this._enableIntro.checked, this._enableOutro.checked, +this._loopDropDown.value - 1)); });
-            this._formatSelect.addEventListener("change", () => { if (this._formatSelect.value == "json") {
-                this._removeWhitespaceDiv.style.display = "block";
-            }
-            else {
-                this._removeWhitespaceDiv.style.display = "none";
-            } });
-            this.container.addEventListener("keydown", this._whenKeyPressed);
-            this._fileName.value = _doc.song.title;
-            ExportPrompt._validateFileName(null, this._fileName);
-            this._computedSamplesLabel.firstChild.textContent = ExportPrompt.samplesToTime(this._doc, this._doc.synth.getTotalSamples(this._enableIntro.checked, this._enableOutro.checked, +this._loopDropDown.value - 1));
-        }
-        static samplesToTime(_doc, samples) {
-            const rawSeconds = Math.round(samples / _doc.synth.samplesPerSecond);
-            const seconds = rawSeconds % 60;
-            const minutes = Math.floor(rawSeconds / 60);
-            return minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
-        }
-        changeFileName(newValue) {
-            this._fileName.value = newValue;
-        }
-        static _validateFileName(event, use) {
-            let input;
-            if (event != null) {
-                input = event.target;
-            }
-            else if (use != undefined) {
-                input = use;
-            }
-            else {
-                return;
-            }
-            const deleteChars = /[\+\*\$\?\|\{\}\\\/<>#%!`&'"=:@]/gi;
-            if (deleteChars.test(input.value)) {
-                let cursorPos = input.selectionStart;
-                input.value = input.value.replace(deleteChars, "");
-                cursorPos--;
-                input.setSelectionRange(cursorPos, cursorPos);
-            }
-        }
-        static _validateNumber(event) {
-            const input = event.target;
-            input.value = Math.floor(Math.max(Number(input.min), Math.min(Number(input.max), Number(input.value)))) + "";
-        }
-        _synthesize() {
-            if (this.outputStarted == false) {
-                return;
-            }
-            const samplesPerChunk = this.synth.samplesPerSecond * 5;
-            const currentFrame = this.currentChunk * samplesPerChunk;
-            const samplesInChunk = Math.min(samplesPerChunk, this.sampleFrames - currentFrame);
-            const tempSamplesL = new Float32Array(samplesInChunk);
-            const tempSamplesR = new Float32Array(samplesInChunk);
-            this.synth.renderingSong = true;
-            this.synth.synthesize(tempSamplesL, tempSamplesR, samplesInChunk);
-            this.recordedSamplesL.set(tempSamplesL, currentFrame);
-            this.recordedSamplesR.set(tempSamplesR, currentFrame);
-            this._outputProgressBar.style.setProperty("width", Math.round((this.currentChunk + 1) / this.totalChunks * 100.0) + "%");
-            this._outputProgressLabel.innerText = Math.round((this.currentChunk + 1) / this.totalChunks * 100.0) + "%";
-            this.currentChunk++;
-            if (this.currentChunk >= this.totalChunks) {
-                this.synth.renderingSong = false;
-                this._outputProgressLabel.innerText = "Encoding...";
-                if (this.thenExportTo == "wav") {
-                    this._exportToWavFinish();
-                }
-                else if (this.thenExportTo == "mp3") {
-                    this._exportToMp3Finish();
-                }
-                else {
-                    throw new Error("Unrecognized file export type chosen!");
-                }
-            }
-            else {
-                setTimeout(() => { this._synthesize(); });
-            }
-        }
-        _exportTo(type) {
-            this.thenExportTo = type;
-            this.currentChunk = 0;
-            this.synth = new Synth(this._doc.song);
-            if (type == "wav") {
-                this.synth.samplesPerSecond = 48000;
-            }
-            else if (type == "mp3") {
-                this.synth.samplesPerSecond = 44100;
-            }
-            else {
-                throw new Error("Unrecognized file export type chosen!");
-            }
-            this._outputProgressBar.style.setProperty("width", "0%");
-            this._outputProgressLabel.innerText = "0%";
-            this.synth.loopRepeatCount = Number(this._loopDropDown.value) - 1;
-            if (!this._enableIntro.checked) {
-                for (let introIter = 0; introIter < this._doc.song.loopStart; introIter++) {
-                    this.synth.goToNextBar();
-                }
-            }
-            this.synth.initModFilters(this._doc.song);
-            this.synth.computeLatestModValues();
-            this.synth.warmUpSynthesizer(this._doc.song);
-            this.sampleFrames = this.synth.getTotalSamples(this._enableIntro.checked, this._enableOutro.checked, this.synth.loopRepeatCount);
-            this.totalChunks = Math.ceil(this.sampleFrames / (this.synth.samplesPerSecond * 5));
-            this.recordedSamplesL = new Float32Array(this.sampleFrames);
-            this.recordedSamplesR = new Float32Array(this.sampleFrames);
-            setTimeout(() => { this._synthesize(); });
-        }
-        _exportToWavFinish() {
-            const sampleFrames = this.recordedSamplesL.length;
-            const sampleRate = this.synth.samplesPerSecond;
-            const wavChannelCount = 2;
-            const bytesPerSample = 2;
-            const bitsPerSample = 8 * bytesPerSample;
-            const sampleCount = wavChannelCount * sampleFrames;
-            const totalFileSize = 44 + sampleCount * bytesPerSample;
-            let index = 0;
-            const arrayBuffer = new ArrayBuffer(totalFileSize);
-            const data = new DataView(arrayBuffer);
-            data.setUint32(index, 0x52494646, false);
-            index += 4;
-            data.setUint32(index, 36 + sampleCount * bytesPerSample, true);
-            index += 4;
-            data.setUint32(index, 0x57415645, false);
-            index += 4;
-            data.setUint32(index, 0x666D7420, false);
-            index += 4;
-            data.setUint32(index, 0x00000010, true);
-            index += 4;
-            data.setUint16(index, 0x0001, true);
-            index += 2;
-            data.setUint16(index, wavChannelCount, true);
-            index += 2;
-            data.setUint32(index, sampleRate, true);
-            index += 4;
-            data.setUint32(index, sampleRate * bytesPerSample * wavChannelCount, true);
-            index += 4;
-            data.setUint16(index, bytesPerSample * wavChannelCount, true);
-            index += 2;
-            data.setUint16(index, bitsPerSample, true);
-            index += 2;
-            data.setUint32(index, 0x64617461, false);
-            index += 4;
-            data.setUint32(index, sampleCount * bytesPerSample, true);
-            index += 4;
-            {
-                const range = (1 << (bitsPerSample - 1)) - 1;
-                for (let i = 0; i < sampleFrames; i++) {
-                    let valL = Math.floor(Math.max(-1, Math.min(1, this.recordedSamplesL[i])) * range);
-                    let valR = Math.floor(Math.max(-1, Math.min(1, this.recordedSamplesR[i])) * range);
-                    {
-                        data.setInt16(index, valL, true);
-                        index += 2;
-                        data.setInt16(index, valR, true);
-                        index += 2;
-                    }
-                }
-            }
-            const blob = new Blob([arrayBuffer], { type: "audio/wav" });
-            save(blob, this._fileName.value.trim() + ".wav");
-            this._close();
-        }
-        _exportToMp3Finish() {
-            const whenEncoderIsAvailable = () => {
-                const lamejs = window["lamejs"];
-                const channelCount = 2;
-                const kbps = 192;
-                const sampleBlockSize = 1152;
-                const mp3encoder = new lamejs.Mp3Encoder(channelCount, this.synth.samplesPerSecond, kbps);
-                const mp3Data = [];
-                const left = new Int16Array(this.recordedSamplesL.length);
-                const right = new Int16Array(this.recordedSamplesR.length);
-                const range = (1 << 15) - 1;
-                for (let i = 0; i < this.recordedSamplesL.length; i++) {
-                    left[i] = Math.floor(Math.max(-1, Math.min(1, this.recordedSamplesL[i])) * range);
-                    right[i] = Math.floor(Math.max(-1, Math.min(1, this.recordedSamplesR[i])) * range);
-                }
-                for (let i = 0; i < left.length; i += sampleBlockSize) {
-                    const leftChunk = left.subarray(i, i + sampleBlockSize);
-                    const rightChunk = right.subarray(i, i + sampleBlockSize);
-                    const mp3buf = mp3encoder.encodeBuffer(leftChunk, rightChunk);
-                    if (mp3buf.length > 0)
-                        mp3Data.push(mp3buf);
-                }
-                const mp3buf = mp3encoder.flush();
-                if (mp3buf.length > 0)
-                    mp3Data.push(mp3buf);
-                const blob = new Blob(mp3Data, { type: "audio/mp3" });
-                save(blob, this._fileName.value.trim() + ".mp3");
-                this._close();
-            };
-            if ("lamejs" in window) {
-                whenEncoderIsAvailable();
-            }
-            else {
-                var script = document.createElement("script");
-                script.src = "https://cdn.jsdelivr.net/npm/lamejs@1.2.0/lame.min.js";
-                script.onload = whenEncoderIsAvailable;
-                document.head.appendChild(script);
-            }
-        }
-        _exportToMidi() {
-            const song = this._doc.song;
-            const midiTicksPerBeepBoxTick = 2;
-            const midiTicksPerBeat = midiTicksPerBeepBoxTick * Config.ticksPerPart * Config.partsPerBeat;
-            const midiTicksPerPart = midiTicksPerBeepBoxTick * Config.ticksPerPart;
-            const secondsPerMinute = 60;
-            const microsecondsPerMinute = secondsPerMinute * 1000000;
-            const beatsPerMinute = song.getBeatsPerMinute();
-            const microsecondsPerBeat = Math.round(microsecondsPerMinute / beatsPerMinute);
-            const midiTicksPerBar = midiTicksPerBeat * song.beatsPerBar;
-            const pitchBendRange = 24;
-            const defaultNoteVelocity = 90;
-            const unrolledBars = [];
-            if (this._enableIntro.checked) {
-                for (let bar = 0; bar < song.loopStart; bar++) {
-                    unrolledBars.push(bar);
-                }
-            }
-            for (let loopIndex = 0; loopIndex < Number(this._loopDropDown.value); loopIndex++) {
-                for (let bar = song.loopStart; bar < song.loopStart + song.loopLength; bar++) {
-                    unrolledBars.push(bar);
-                }
-            }
-            if (this._enableOutro.checked) {
-                for (let bar = song.loopStart + song.loopLength; bar < song.barCount; bar++) {
-                    unrolledBars.push(bar);
-                }
-            }
-            const tracks = [{ isMeta: true, channel: -1, midiChannel: -1, isNoise: false, isDrumset: false }];
-            let midiChannelCounter = 0;
-            let foundADrumset = false;
-            for (let channel = 0; channel < this._doc.song.pitchChannelCount + this._doc.song.noiseChannelCount; channel++) {
-                if (!foundADrumset && this._doc.song.channels[channel].instruments[0].type == 4) {
-                    tracks.push({ isMeta: false, channel: channel, midiChannel: 9, isNoise: true, isDrumset: true });
-                    foundADrumset = true;
-                }
-                else {
-                    if (midiChannelCounter >= 16)
-                        continue;
-                    tracks.push({ isMeta: false, channel: channel, midiChannel: midiChannelCounter++, isNoise: this._doc.song.getChannelIsNoise(channel), isDrumset: false });
-                    if (midiChannelCounter == 9)
-                        midiChannelCounter++;
-                }
-            }
-            const writer = new ArrayBufferWriter(1024);
-            writer.writeUint32(1297377380);
-            writer.writeUint32(6);
-            writer.writeUint16(1);
-            writer.writeUint16(tracks.length);
-            writer.writeUint16(midiTicksPerBeat);
-            for (const track of tracks) {
-                writer.writeUint32(1297379947);
-                const { isMeta, channel, midiChannel, isNoise, isDrumset } = track;
-                const trackStartIndex = writer.getWriteIndex();
-                writer.writeUint32(0);
-                let prevTime = 0;
-                let barStartTime = 0;
-                const writeEventTime = function (time) {
-                    if (time < prevTime)
-                        throw new Error("Midi event time cannot go backwards.");
-                    writer.writeMidiVariableLength(time - prevTime);
-                    prevTime = time;
-                };
-                const writeControlEvent = function (message, value) {
-                    if (!(value >= 0 && value <= 0x7F))
-                        throw new Error("Midi control event value out of range: " + value);
-                    writer.writeUint8(176 | midiChannel);
-                    writer.writeMidi7Bits(message);
-                    writer.writeMidi7Bits(value | 0);
-                };
-                if (isMeta) {
-                    writeEventTime(0);
-                    writer.writeUint8(255);
-                    writer.writeMidi7Bits(1);
-                    writer.writeMidiAscii("Composed with jummbus.bitbucket.io");
-                    writeEventTime(0);
-                    writer.writeUint8(255);
-                    writer.writeMidi7Bits(81);
-                    writer.writeMidiVariableLength(3);
-                    writer.writeUint24(microsecondsPerBeat);
-                    writeEventTime(0);
-                    writer.writeUint8(255);
-                    writer.writeMidi7Bits(88);
-                    writer.writeMidiVariableLength(4);
-                    writer.writeUint8(song.beatsPerBar);
-                    writer.writeUint8(2);
-                    writer.writeUint8(24);
-                    writer.writeUint8(8);
-                    let tempScale = song.scale == Config.scales.dictionary["Custom"].index ? song.scaleCustom : Config.scales[song.scale].flags;
-                    const isMinor = tempScale[3] && !tempScale[4];
-                    const key = song.key;
-                    let numSharps = key;
-                    if ((key & 1) == 1)
-                        numSharps += 6;
-                    if (isMinor)
-                        numSharps += 9;
-                    while (numSharps > 6)
-                        numSharps -= 12;
-                    writeEventTime(0);
-                    writer.writeUint8(255);
-                    writer.writeMidi7Bits(89);
-                    writer.writeMidiVariableLength(2);
-                    writer.writeInt8(numSharps);
-                    writer.writeUint8(isMinor ? 1 : 0);
-                    if (this._enableIntro.checked)
-                        barStartTime += midiTicksPerBar * song.loopStart;
-                    writeEventTime(barStartTime);
-                    writer.writeUint8(255);
-                    writer.writeMidi7Bits(6);
-                    writer.writeMidiAscii("Loop Start");
-                    for (let loopIndex = 0; loopIndex < parseInt(this._loopDropDown.value); loopIndex++) {
-                        barStartTime += midiTicksPerBar * song.loopLength;
-                        writeEventTime(barStartTime);
-                        writer.writeUint8(255);
-                        writer.writeMidi7Bits(6);
-                        writer.writeMidiAscii(loopIndex < Number(this._loopDropDown.value) - 1 ? "Loop Repeat" : "Loop End");
-                    }
-                    if (this._enableOutro.checked)
-                        barStartTime += midiTicksPerBar * (song.barCount - song.loopStart - song.loopLength);
-                    if (barStartTime != midiTicksPerBar * unrolledBars.length)
-                        throw new Error("Miscalculated number of bars.");
-                }
-                else {
-                    let channelName = isNoise
-                        ? "noise channel " + channel
-                        : "pitch channel " + channel;
-                    writeEventTime(0);
-                    writer.writeUint8(255);
-                    writer.writeMidi7Bits(3);
-                    writer.writeMidiAscii(channelName);
-                    writeEventTime(0);
-                    writeControlEvent(101, 0);
-                    writeEventTime(0);
-                    writeControlEvent(100, 0);
-                    writeEventTime(0);
-                    writeControlEvent(6, pitchBendRange);
-                    writeEventTime(0);
-                    writeControlEvent(38, 0);
-                    writeEventTime(0);
-                    writeControlEvent(101, 127);
-                    writeEventTime(0);
-                    writeControlEvent(100, 127);
-                    let prevInstrumentIndex = -1;
-                    function writeInstrumentSettings(instrumentIndex) {
-                        const instrument = song.channels[channel].instruments[instrumentIndex];
-                        const preset = EditorConfig.valueToPreset(instrument.preset);
-                        if (prevInstrumentIndex != instrumentIndex) {
-                            prevInstrumentIndex = instrumentIndex;
-                            writeEventTime(barStartTime);
-                            writer.writeUint8(255);
-                            writer.writeMidi7Bits(4);
-                            writer.writeMidiAscii("Instrument " + (instrumentIndex + 1));
-                            if (!isDrumset) {
-                                let instrumentProgram = 81;
-                                if (preset != null && preset.midiProgram != undefined) {
-                                    instrumentProgram = preset.midiProgram;
-                                }
-                                else if (instrument.type == 4) {
-                                    instrumentProgram = 116;
-                                }
-                                else {
-                                    if (instrument.type == 2 || instrument.type == 3) {
-                                        if (isNoise) {
-                                            instrumentProgram = 116;
-                                        }
-                                        else {
-                                            instrumentProgram = 75;
-                                        }
-                                    }
-                                    else if (instrument.type == 0) {
-                                        if (ExportPrompt.midiChipInstruments.length > instrument.chipWave) {
-                                            instrumentProgram = ExportPrompt.midiChipInstruments[instrument.chipWave];
-                                        }
-                                    }
-                                    else if (instrument.type == 6 || instrument.type == 1 || instrument.type == 11 || instrument.type == 5 || instrument.type == 8) {
-                                        instrumentProgram = 81;
-                                    }
-                                    else if (instrument.type == 7) {
-                                        instrumentProgram = 0x19;
-                                    }
-                                    else if (instrument.type == 9) {
-                                        instrumentProgram = 81;
-                                    }
-                                    else {
-                                        throw new Error("Unrecognized instrument type.");
-                                    }
-                                }
-                                writeEventTime(barStartTime);
-                                writer.writeUint8(192 | midiChannel);
-                                writer.writeMidi7Bits(instrumentProgram);
-                            }
-                            writeEventTime(barStartTime);
-                            let instrumentVolume = volumeMultToMidiVolume(Synth.instrumentVolumeToVolumeMult(instrument.volume));
-                            writeControlEvent(7, Math.min(0x7f, Math.round(instrumentVolume)));
-                            writeEventTime(barStartTime);
-                            let instrumentPan = (instrument.pan / Config.panCenter - 1) * 0x3f + 0x40;
-                            writeControlEvent(10, Math.min(0x7f, Math.round(instrumentPan)));
-                        }
-                    }
-                    if (song.getPattern(channel, 0) == null) {
-                        writeInstrumentSettings(0);
-                    }
-                    let prevPitchBend = defaultMidiPitchBend;
-                    let prevExpression = defaultMidiExpression;
-                    let shouldResetExpressionAndPitchBend = false;
-                    const channelRoot = isNoise ? Config.spectrumBasePitch : Config.keys[song.key].basePitch;
-                    const intervalScale = isNoise ? Config.noiseInterval : 1;
-                    for (const bar of unrolledBars) {
-                        const pattern = song.getPattern(channel, bar);
-                        if (pattern != null) {
-                            const instrumentIndex = pattern.instruments[0];
-                            const instrument = song.channels[channel].instruments[instrumentIndex];
-                            const preset = EditorConfig.valueToPreset(instrument.preset);
-                            writeInstrumentSettings(instrumentIndex);
-                            let usesArpeggio = instrument.getChord().arpeggiates;
-                            let polyphony = usesArpeggio ? 1 : Config.maxChordSize;
-                            if (instrument.getChord().customInterval) {
-                                if (instrument.type == 0 || instrument.type == 5) {
-                                    polyphony = 2;
-                                    usesArpeggio = true;
-                                }
-                                else if (instrument.type == 1) {
-                                    polyphony = Config.operatorCount;
-                                }
-                                else {
-                                    console.error("Unrecognized instrument type for harmonizing arpeggio: " + instrument.type);
-                                }
-                            }
-                            for (let noteIndex = 0; noteIndex < pattern.notes.length; noteIndex++) {
-                                const note = pattern.notes[noteIndex];
-                                const noteStartTime = barStartTime + note.start * midiTicksPerPart;
-                                let pinTime = noteStartTime;
-                                let pinSize = note.pins[0].size;
-                                let pinInterval = note.pins[0].interval;
-                                const prevPitches = [-1, -1, -1, -1];
-                                const nextPitches = [-1, -1, -1, -1];
-                                const toneCount = Math.min(polyphony, note.pitches.length);
-                                const velocity = isDrumset ? Math.max(1, Math.round(defaultNoteVelocity * note.pins[0].size / Config.noteSizeMax)) : defaultNoteVelocity;
-                                let mainInterval = note.pickMainInterval();
-                                let pitchOffset = mainInterval * intervalScale;
-                                if (!isDrumset) {
-                                    let maxPitchOffset = pitchBendRange;
-                                    let minPitchOffset = -pitchBendRange;
-                                    for (let pinIndex = 1; pinIndex < note.pins.length; pinIndex++) {
-                                        const interval = note.pins[pinIndex].interval * intervalScale;
-                                        maxPitchOffset = Math.min(maxPitchOffset, interval + pitchBendRange);
-                                        minPitchOffset = Math.max(minPitchOffset, interval - pitchBendRange);
-                                    }
-                                    pitchOffset = Math.min(maxPitchOffset, Math.max(minPitchOffset, pitchOffset));
-                                }
-                                for (let pinIndex = 1; pinIndex < note.pins.length; pinIndex++) {
-                                    const nextPinTime = noteStartTime + note.pins[pinIndex].time * midiTicksPerPart;
-                                    const nextPinSize = note.pins[pinIndex].size;
-                                    const nextPinInterval = note.pins[pinIndex].interval;
-                                    const length = nextPinTime - pinTime;
-                                    for (let midiTick = 0; midiTick < length; midiTick++) {
-                                        const midiTickTime = pinTime + midiTick;
-                                        const linearSize = lerp(pinSize, nextPinSize, midiTick / length);
-                                        const linearInterval = lerp(pinInterval, nextPinInterval, midiTick / length);
-                                        const interval = linearInterval * intervalScale - pitchOffset;
-                                        const pitchBend = Math.max(0, Math.min(0x3fff, Math.round(0x2000 * (1.0 + interval / pitchBendRange))));
-                                        const expression = Math.min(0x7f, Math.round(volumeMultToMidiExpression(Synth.noteSizeToVolumeMult(linearSize))));
-                                        if (pitchBend != prevPitchBend) {
-                                            writeEventTime(midiTickTime);
-                                            writer.writeUint8(224 | midiChannel);
-                                            writer.writeMidi7Bits(pitchBend & 0x7f);
-                                            writer.writeMidi7Bits((pitchBend >> 7) & 0x7f);
-                                            prevPitchBend = pitchBend;
-                                        }
-                                        if (expression != prevExpression && !isDrumset) {
-                                            writeEventTime(midiTickTime);
-                                            writeControlEvent(11, expression);
-                                            prevExpression = expression;
-                                        }
-                                        const noteStarting = midiTickTime == noteStartTime;
-                                        for (let toneIndex = 0; toneIndex < toneCount; toneIndex++) {
-                                            let nextPitch = note.pitches[toneIndex];
-                                            if (isDrumset) {
-                                                nextPitch += mainInterval;
-                                                const drumsetMap = [
-                                                    36,
-                                                    41,
-                                                    45,
-                                                    48,
-                                                    40,
-                                                    39,
-                                                    59,
-                                                    49,
-                                                    46,
-                                                    55,
-                                                    69,
-                                                    54,
-                                                ];
-                                                if (nextPitch < 0 || nextPitch >= drumsetMap.length)
-                                                    throw new Error("Could not find corresponding drumset pitch. " + nextPitch);
-                                                nextPitch = drumsetMap[nextPitch];
-                                            }
-                                            else {
-                                                if (usesArpeggio && note.pitches.length > toneIndex + 1 && toneIndex == toneCount - 1) {
-                                                    const midiTicksSinceBeat = (midiTickTime - barStartTime) % midiTicksPerBeat;
-                                                    const midiTicksPerArpeggio = Config.ticksPerArpeggio * midiTicksPerPart / Config.ticksPerPart;
-                                                    const arpeggio = Math.floor(midiTicksSinceBeat / midiTicksPerArpeggio);
-                                                    nextPitch = note.pitches[toneIndex + getArpeggioPitchIndex(note.pitches.length - toneIndex, instrument.fastTwoNoteArp, arpeggio)];
-                                                }
-                                                nextPitch = channelRoot + nextPitch * intervalScale + pitchOffset;
-                                                if (preset != null && preset.midiSubharmonicOctaves != undefined) {
-                                                    nextPitch += 12 * preset.midiSubharmonicOctaves;
-                                                }
-                                                else if (isNoise) {
-                                                    nextPitch += 12 * (+EditorConfig.presetCategories.dictionary["Drum Presets"].presets.dictionary["taiko drum"].midiSubharmonicOctaves);
-                                                }
-                                                if (isNoise)
-                                                    nextPitch *= 2;
-                                            }
-                                            nextPitch = Math.max(0, Math.min(127, nextPitch));
-                                            nextPitches[toneIndex] = nextPitch;
-                                            if (!noteStarting && prevPitches[toneIndex] != nextPitches[toneIndex]) {
-                                                writeEventTime(midiTickTime);
-                                                writer.writeUint8(128 | midiChannel);
-                                                writer.writeMidi7Bits(prevPitches[toneIndex]);
-                                                writer.writeMidi7Bits(velocity);
-                                            }
-                                        }
-                                        for (let toneIndex = 0; toneIndex < toneCount; toneIndex++) {
-                                            if (noteStarting || prevPitches[toneIndex] != nextPitches[toneIndex]) {
-                                                writeEventTime(midiTickTime);
-                                                writer.writeUint8(144 | midiChannel);
-                                                writer.writeMidi7Bits(nextPitches[toneIndex]);
-                                                writer.writeMidi7Bits(velocity);
-                                                prevPitches[toneIndex] = nextPitches[toneIndex];
-                                            }
-                                        }
-                                    }
-                                    pinTime = nextPinTime;
-                                    pinSize = nextPinSize;
-                                    pinInterval = nextPinInterval;
-                                }
-                                const noteEndTime = barStartTime + note.end * midiTicksPerPart;
-                                for (let toneIndex = 0; toneIndex < toneCount; toneIndex++) {
-                                    writeEventTime(noteEndTime);
-                                    writer.writeUint8(128 | midiChannel);
-                                    writer.writeMidi7Bits(prevPitches[toneIndex]);
-                                    writer.writeMidi7Bits(velocity);
-                                }
-                                shouldResetExpressionAndPitchBend = true;
-                            }
-                        }
-                        else {
-                            if (shouldResetExpressionAndPitchBend) {
-                                shouldResetExpressionAndPitchBend = false;
-                                if (prevExpression != defaultMidiExpression) {
-                                    prevExpression = defaultMidiExpression;
-                                    writeEventTime(barStartTime);
-                                    writeControlEvent(11, prevExpression);
-                                }
-                                if (prevPitchBend != defaultMidiPitchBend) {
-                                    prevPitchBend = defaultMidiPitchBend;
-                                    writeEventTime(barStartTime);
-                                    writer.writeUint8(224 | midiChannel);
-                                    writer.writeMidi7Bits(prevPitchBend & 0x7f);
-                                    writer.writeMidi7Bits((prevPitchBend >> 7) & 0x7f);
-                                }
-                            }
-                        }
-                        barStartTime += midiTicksPerBar;
-                    }
-                }
-                writeEventTime(barStartTime);
-                writer.writeUint8(255);
-                writer.writeMidi7Bits(47);
-                writer.writeMidiVariableLength(0x00);
-                writer.rewriteUint32(trackStartIndex, writer.getWriteIndex() - trackStartIndex - 4);
-            }
-            const blob = new Blob([writer.toCompactArrayBuffer()], { type: "audio/midi" });
-            save(blob, this._fileName.value.trim() + ".mid");
-            this._close();
-        }
-        _exportToJson() {
-            const jsonObject = this._doc.song.toJsonObject(this._enableIntro.checked, Number(this._loopDropDown.value), this._enableOutro.checked);
-            let whiteSpaceParam = this._removeWhitespace.checked ? undefined : '\t';
-            const jsonString = JSON.stringify(jsonObject, null, whiteSpaceParam);
-            const blob = new Blob([jsonString], { type: "application/json" });
-            save(blob, this._fileName.value.trim() + ".json");
-            this._close();
-        }
-        _exportToHtml() {
-            const fileContents = `\
-<!DOCTYPE html><meta charset="utf-8">
-
-You should be redirected to the song at:<br /><br />
-
-<a id="destination" href="${new URL("#" + this._doc.song.toBase64String(), location.href).href}"></a>
-
-<style>
-	:root {
-		color: white;
-		background: black;
-		font-family:
-		sans-serif;
-	}
-	a {
-		color: #98f;
-	}
-	a[href]::before {
-		content: attr(href);
-	}
-</style>
-
-<script>
-	location.assign(document.querySelector("a#destination").href);
-</script>
-`;
-            const blob = new Blob([fileContents], { type: "text/html" });
-            save(blob, this._fileName.value.trim() + ".html");
-            this._close();
-        }
-    }
-    ExportPrompt.midiChipInstruments = [
-        0x4A,
-        0x47,
-        0x50,
-        0x46,
-        0x44,
-        0x51,
-        0x51,
-        0x51,
-        0x51,
-    ];
-
-    class Layout {
-        static setLayout(layout) {
-            this._styleElement.textContent = this._layoutMap[layout];
-        }
-    }
-    Layout._layoutMap = {
-        "small": "",
-        "long": `\
-
-			/* long layout */
-			@media (min-width: 711px) {
-				#beepboxEditorContainer {
-					max-width: initial;
-					height: 100vh;
-					padding-top: 0px;
-				}
-				.beepboxEditor {
-					width: 100%;
-					height: 100vh;
-					grid-template-columns: minmax(0, 1fr) 390px; /* minmax(0, 1fr) min-content; Chrome 80 grid layout regression. https://bugs.chromium.org/p/chromium/issues/detail?id=1050307 */
-					grid-template-rows: minmax(481px, 1fr) minmax(0, min-content);
-					grid-template-areas: "pattern-area settings-area" "track-area track-area";
-				}
-				.beepboxEditor .pattern-area {
-					width: 100%;
-					height: 100%;
-				}
-				.beepboxEditor .track-area {
-					width: 100%;
-					display: flex;
-					flex-direction: column;
-				}
-				.beepboxEditor .trackAndMuteContainer {
-					width: 100%;
-					min-height: 0;
-					flex: 1;
-					overflow: auto;
-					max-height: 97.5vh;
-				}
-				.beepboxEditor .instrument-settings-area {
-					overflow-y: auto;
-					position: relative;
-				}
-				.beepboxEditor .instrument-settings-area > .editor-controls {
-					position: absolute;
-					width: 100%;
-				}
-				.beepboxEditor .song-settings-area {
-					overflow-y: auto;
-				}
-				
-				.beepboxEditor .settings-area {
-					width: 390px;
-					grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-					grid-template-rows: auto auto auto minmax(0, 1fr);
-					grid-template-areas:
-						"instrument-settings-area version-area"
-						"instrument-settings-area play-pause-area"
-						"instrument-settings-area menu-area"
-						"instrument-settings-area song-settings-area";
-				}
-				
-				.beepboxEditor .barScrollBar {
-					display: none;
-				}
-				.beepboxEditor.selectRow {
-					height: 2em;
-				}
-				.beepboxEditor .trackAndMuteContainer {
-					max-height: 446px;
-				}
-
-				.beepboxEditor .trackContainer {
-					overflow: visible;
-				}
-				.beepboxEditor .trackAndMuteContainer {
-					scrollbar-width: auto;
-				}
-				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar {
-					width: 20px;
-					height: 20px;
-				}
-				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-track {
-					background: ${ColorConfig.editorBackground};
-				}
-				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-thumb {
-					background-color: ${ColorConfig.uiWidgetBackground};
-					border: 3px solid ${ColorConfig.editorBackground};
-				}
-				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-corner {
-					background-color: ${ColorConfig.editorBackground};
-				}
-			}
-		`,
-        "tall": `\
-			/* tall layout */
-			@media (min-width: 711px) {
-				#beepboxEditorContainer {
-					max-width: initial;
-					height: 100vh;
-					padding-top: 0px;
-				}
-				.beepboxEditor {
-					width: 100%;
-					height: 100vh;
-					grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 192px;
-					grid-template-rows: 1fr;
-					grid-template-areas: "track-area pattern-area settings-area";
-				}
-				.beepboxEditor .pattern-area {
-					width: 100%;
-					height: 100%;
-				}
-				.beepboxEditor .track-area {
-					width: 100%;
-					height: 100%;
-					display: flex;
-					flex-direction: column;
-					justify-content: center;
-				}
-				.beepboxEditor .trackAndMuteContainer {
-					width: 100%;
-					min-height: 0;
-					flex: 0;
-					overflow: auto;
-					flex-basis: initial;
-					flex-grow: 0;
-					max-height: 97.5vh;
-				}
-				.beepboxEditor .instrument-settings-area > .editor-controls {
-					position: absolute;
-					width: 100%;
-				}
-				
-				.beepboxEditor .settings-area {
-					width: 192px;
-					position: relative;
-					overflow-y: auto;
-					grid-template-columns: minmax(0, 1fr);
-					grid-template-rows: auto auto auto auto minmax(0, 1fr);
-					grid-template-areas:
-						"version-area"
-						"play-pause-area"
-						"menu-area"
-						"song-settings-area"
-						"instrument-settings-area";
-				}
-				.beepboxEditor .version-area {
-					position: sticky;
-					top: 0;
-					z-index: 1;
-					background: ${ColorConfig.editorBackground};
-				}
-				.beepboxEditor .play-pause-area {
-					position: sticky;
-					top: 22px;
-					z-index: 1;
-					background: ${ColorConfig.editorBackground};
-				}
-				.beepboxEditor .menu-area {
-					position: sticky;
-					top: 82px;
-					z-index: 1;
-					background: ${ColorConfig.editorBackground};
-				}
-				
-				.beepboxEditor .barScrollBar {
-					display: none;
-				}
-				.beepboxEditor .trackContainer {
-					overflow: visible;
-				}
-				.beepboxEditor .trackAndMuteContainer {
-					scrollbar-width: auto;
-				}
-				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar {
-					width: 20px;
-					height: 20px;
-				}
-				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-track {
-					background: ${ColorConfig.editorBackground};
-				}
-				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-thumb {
-					background-color: ${ColorConfig.uiWidgetBackground};
-					border: 3px solid ${ColorConfig.editorBackground};
-				}
-				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-corner {
-					background-color: ${ColorConfig.editorBackground};
-				}
-			}
-		`,
-        "wide": `\
-			/* wide (JB) layout */
-			@media (min-width: 1001px) {
-				#beepboxEditorContainer {
-					max-width: initial;
-					height: 100vh;
-					padding-top: 0px;
-				}
-				.beepboxEditor {
-					width: 100%;
-					height: 100vh;
-					grid-template-columns: 512px minmax(0, 1fr) 30em;
-					grid-template-rows: minmax(481px, 1fr) min-content;
-					grid-template-areas: "track-area pattern-area settings-area";
-				}
-				.beepboxEditor .pattern-area {
-					width: 100%;
-					height: 100%;
-				}
-				.beepboxEditor .track-area {
-					width: 100%;
-					height: 100%;
-					max-height: 100%
-				}
-				.beepboxEditor .editor-widget-column {
-					flex: 0;
-				}
-				.beepboxEditor .trackAndMuteContainer {
-					width: 100%;
-					flex: 0;
-					flex-basis: initial;
-					flex-grow: 0;
-					overflow-y: auto;
-					max-height: 97.5vh;
-				}
-				.beepboxEditor .instrument-settings-area {
-					overflow-y: auto;
-					position: relative;
-				}
-				.beepboxEditor .instrument-settings-area > .editor-controls {
-					position: absolute;
-					width: 100%;
-				}
-				
-				.beepboxEditor .song-settings-area {
-					overflow-y: auto;
-				}
-				
-				.beepboxEditor .settings-area {
-					width: 30em;
-					grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-					grid-template-rows: auto auto auto minmax(0, 1fr);
-					grid-template-areas:
-						"instrument-settings-area version-area"
-						"instrument-settings-area play-pause-area"
-						"instrument-settings-area menu-area"
-						"instrument-settings-area song-settings-area";
-				}
-				.beepboxEditor .version-area {
-					position: sticky;
-					top: 0;
-					z-index: 1;
-					background: ${ColorConfig.editorBackground};
-				}
-				.beepboxEditor .play-pause-area {
-					position: sticky;
-					top: 22px;
-					z-index: 1;
-					background: ${ColorConfig.editorBackground};
-				}
-				.beepboxEditor .menu-area {
-					position: sticky;
-					top: 82px;
-					z-index: 1;
-					background: ${ColorConfig.editorBackground};
-				}
-				
-				.beepboxEditor .trackContainer {
-					overflow: visible;
-				}
-			}
-		`,
-        "flipped long": `\
-
-            	/* AB Special layout */
-			@media (min-width: 711px) {
-				#beepboxEditorContainer {
-					max-width: initial;
-					height: 100vh;
-					padding-top: 0px;
-				}
-				.beepboxEditor {
-					width: 100%;
-					height: 100vh;
-					grid-template-columns: 390px minmax(0, 1fr);
-					grid-template-rows: minmax(481px, 1fr) minmax(0, min-content);
-					grid-template-areas: "settings-area pattern-area" "track-area track-area";
-				}
-				.beepboxEditor .pattern-area {
-					width: 100%;
-					height: 100%;
-				}
-				.beepboxEditor .track-area {
-					width: 100%;
-					display: flex;
-					flex-direction: column;
-				}
-				.beepboxEditor .trackAndMuteContainer {
-					width: 100%;
-					min-height: 0;
-					flex: 1;
-					overflow: auto;
-					max-height: 97.5vh;
-				}
-				.beepboxEditor .instrument-settings-area {
-					overflow-y: auto;
-					position: relative;
-				}
-				.beepboxEditor .instrument-settings-area > .editor-controls {
-					position: absolute;
-					width: 100%;
-				}
-				.beepboxEditor .song-settings-area {
-					overflow-y: auto;
-				}
-				
-				.beepboxEditor .settings-area {
-					width: 30em;
-					grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-					grid-template-rows: auto auto auto minmax(0, 1fr);
-					grid-template-areas:
-						"version-area instrument-settings-area"
-						"play-pause-area instrument-settings-area"
-						"menu-area instrument-settings-area"
-						"song-settings-area instrument-settings-area";
-				}
-				
-				.beepboxEditor .barScrollBar {
-					display: none;
-				}
-				.beepboxEditor.selectRow {
-					height: 2em;
-				}
-				.beepboxEditor .trackAndMuteContainer {
-					max-height: 446px;
-				}
-
-				.beepboxEditor .trackContainer {
-					overflow: visible;
-				}
-				.beepboxEditor .trackAndMuteContainer {
-					scrollbar-width: auto;
-				}
-				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar {
-					width: 20px;
-					height: 20px;
-				}
-				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-track {
-					background: ${ColorConfig.editorBackground};
-				}
-				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-thumb {
-					background-color: ${ColorConfig.uiWidgetBackground};
-					border: 3px solid ${ColorConfig.editorBackground};
-				}
-				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-corner {
-					background-color: ${ColorConfig.editorBackground};
-				}
-			}
-		`,
-        "wide long": `\
-
-			@media (min-width: 711px) {
-				#beepboxEditorContainer {
-					max-width: initial;
-					height: 100vh;
-					padding-top: 0px;
-				}
-				.beepboxEditor {
-					width: 100%;
-					height: 100vh;
-					grid-template-columns: minmax(0, 1fr) 390px; /* minmax(0, 1fr) min-content; Chrome 80 grid layout regression. https://bugs.chromium.org/p/chromium/issues/detail?id=1050307 */
-					grid-template-rows: minmax(481px, 1fr) minmax(0, min-content);
-					grid-template-areas: "pattern-area settings-area" "track-area settings-area";
-				}
-				.beepboxEditor .pattern-area {
-					width: 100%;
-					height: 100%;
-				}
-				.beepboxEditor .track-area {
-					display: flex;
-				}
-				.beepboxEditor .trackAndMuteContainer {
-					width: 100%;
-					min-height: 0;
-					flex: 1;
-					overflow: auto;
-					max-height: 97.5vh;
-				}
-				.beepboxEditor .instrument-settings-area {
-					overflow-y: auto;
-					position: relative;
-				}
-				.beepboxEditor .instrument-settings-area > .editor-controls {
-					position: absolute;
-					width: 100%;
-				}
-				
-				.beepboxEditor .song-settings-area {
-					overflow-y: auto;
-				}
-				
-				.beepboxEditor .settings-area {
-					width: 30em;
-					grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-					grid-template-rows: auto auto auto minmax(0, 1fr);
-					grid-template-areas:
-						"instrument-settings-area version-area"
-						"instrument-settings-area play-pause-area"
-						"instrument-settings-area menu-area"
-						"instrument-settings-area song-settings-area";
-				}				
-				.beepboxEditor .barScrollBar {
-					display: none;
-				}
-				.beepboxEditor.selectRow {
-					height: 2em;
-				}
-				.beepboxEditor .trackAndMuteContainer {
-					max-height: 446px;
-				}
-
-				.beepboxEditor .trackContainer {
-					overflow: visible;
-				}
-				.beepboxEditor .trackAndMuteContainer {
-					scrollbar-width: auto;
-				}
-				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar {
-					width: 20px;
-					height: 20px;
-				}
-				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-track {
-					background: ${ColorConfig.editorBackground};
-				}
-				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-thumb {
-					background-color: ${ColorConfig.uiWidgetBackground};
-					border: 3px solid ${ColorConfig.editorBackground};
-				}
-				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-corner {
-					background-color: ${ColorConfig.editorBackground};
-				}
-			}
-		`,
-        "focused long": `\
-
-			/* focused long layout */
-			@media (min-width: 711px) {
-				#beepboxEditorContainer {
-					max-width: initial;
-					height: 100vh;
-					padding-top: 0px;
-				}
-				.beepboxEditor {
-					width: 100%;
-					height: 100vh;
-					grid-template-columns: minmax(0, 1fr) 190px; 
-					grid-template-rows: minmax(481px, 1fr) minmax(0, min-content);
-					grid-template-areas: "pattern-area settings-area" "track-area settings-area";
-				}
-				.beepboxEditor .pattern-area {
-					width: 100%;
-					height: 100%;
-				}
-				.beepboxEditor .track-area {
-					display: flex;
-				}
-				.beepboxEditor .trackAndMuteContainer {
-					width: 100%;
-					min-height: 0;
-					flex: 1;
-					overflow: auto;
-					max-height: 97.5vh;
-				}
-				.beepboxEditor .instrument-settings-area {
-					overflow-y: auto;
-					position: relative;
-				}
-				.beepboxEditor .instrument-settings-area > .editor-controls {
-					position: absolute;
-					width: 100%;
-				}
-				
-				.beepboxEditor .instrument-settings-area > .editor-controls {
-					position: absolute;
-					width: 100%;
-				}
-
-				.beepboxEditor .settings-area {
-					width: 100%;
-					position: relative;
-					overflow-y: auto;
-					grid-template-columns: minmax(0, 1fr);
-					grid-template-rows: auto auto auto auto minmax(0, 1fr);
-					grid-template-areas:
-						"version-area"
-						"play-pause-area"
-						"menu-area"
-						"song-settings-area"
-						"instrument-settings-area";
-				}
-				.beepboxEditor .barScrollBar {
-					display: none;
-				}
-				.beepboxEditor.selectRow {
-					height: 2em;
-				}
-				.beepboxEditor .trackAndMuteContainer {
-					max-height: 446px;
-				}
-
-				.beepboxEditor .trackContainer {
-					overflow: visible;
-				}
-				.beepboxEditor .trackAndMuteContainer {
-					scrollbar-width: auto;
-				}
-				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar {
-					width: 20px;
-					height: 20px;
-				}
-				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-track {
-					background: ${ColorConfig.editorBackground};
-				}
-				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-thumb {
-					background-color: ${ColorConfig.uiWidgetBackground};
-					border: 3px solid ${ColorConfig.editorBackground};
-				}
-				.beepboxEditor .trackAndMuteContainer::-webkit-scrollbar-corner {
-					background-color: ${ColorConfig.editorBackground};
-				}
-			}
-		`,
-    };
-    Layout._styleElement = document.head.appendChild(HTML.style({ type: "text/css" }));
 
     class HarmonicsEditor {
         constructor(_doc, _isPrompt = false) {
@@ -34089,7 +36532,7 @@ You should be redirected to the song at:<br /><br />
                 if (!continuingProspectiveChange)
                     this._oldValue = this._value;
                 if (this._getChange != null) {
-                    this._change = this._getChange(this._oldValue, parseInt(this.input.value));
+                    this._change = this._getChange(this._oldValue, parseFloat(this.input.value));
                     this._doc.setProspectiveChange(this._change);
                 }
             };
@@ -35239,8 +37682,8 @@ You should be redirected to the song at:<br /><br />
             this._perEnvelopeSpeedDisplays = [];
             this.perEnvelopeLowerBoundBoxes = [];
             this.perEnvelopeUpperBoundBoxes = [];
-            this._perEnvelopeLowerBoundSliders = [];
-            this._perEnvelopeUpperBoundSliders = [];
+            this.perEnvelopeLowerBoundSliders = [];
+            this.perEnvelopeUpperBoundSliders = [];
             this.randomStepsBoxes = [];
             this.randomSeedBoxes = [];
             this._randomStepsSliders = [];
@@ -35272,8 +37715,6 @@ You should be redirected to the song at:<br /><br />
                 const endSliderIndex = this._pitchEndSliders.indexOf(event.target);
                 const lowerBoundBoxIndex = this.perEnvelopeLowerBoundBoxes.indexOf(event.target);
                 const upperBoundBoxIndex = this.perEnvelopeUpperBoundBoxes.indexOf(event.target);
-                const lowerBoundSliderIndex = this._perEnvelopeLowerBoundSliders.indexOf(event.target);
-                const upperBoundSliderIndex = this._perEnvelopeUpperBoundSliders.indexOf(event.target);
                 const randomStepsBoxIndex = this.randomStepsBoxes.indexOf(event.target);
                 const randomSeedBoxIndex = this.randomSeedBoxes.indexOf(event.target);
                 const randomStepsSliderIndex = this._randomStepsSliders.indexOf(event.target);
@@ -35308,7 +37749,7 @@ You should be redirected to the song at:<br /><br />
                     this._doc.record(new ChangeEnvelopeInverse(this._doc, this._inverters[inverterIndex].checked, inverterIndex));
                 }
                 else if (startBoxIndex != -1 || endBoxIndex != -1 || startSliderIndex != -1 || endSliderIndex != -1 ||
-                    lowerBoundBoxIndex != -1 || upperBoundBoxIndex != -1 || lowerBoundSliderIndex != -1 || upperBoundSliderIndex != -1 ||
+                    lowerBoundBoxIndex != -1 || upperBoundBoxIndex != -1 ||
                     randomStepsBoxIndex != -1 || randomSeedBoxIndex != -1 || randomStepsSliderIndex != -1 || randomSeedSliderIndex != -1 ||
                     LFOStepsBoxIndex != -1 || LFOStepsSliderIndex != -1 || noteSizeStartBoxIndex != -1 || noteSizeStartSliderIndex != -1 ||
                     noteSizeEndBoxIndex != -1 || noteSizeEndSliderIndex != -1) {
@@ -35342,8 +37783,6 @@ You should be redirected to the song at:<br /><br />
                 const endSliderIndex = this._pitchEndSliders.indexOf(event.target);
                 const lowerBoundBoxIndex = this.perEnvelopeLowerBoundBoxes.indexOf(event.target);
                 const upperBoundBoxIndex = this.perEnvelopeUpperBoundBoxes.indexOf(event.target);
-                const lowerBoundSliderIndex = this._perEnvelopeLowerBoundSliders.indexOf(event.target);
-                const upperBoundSliderIndex = this._perEnvelopeUpperBoundSliders.indexOf(event.target);
                 const randomStepsBoxIndex = this.randomStepsBoxes.indexOf(event.target);
                 const randomSeedBoxIndex = this.randomSeedBoxes.indexOf(event.target);
                 const randomStepsSliderIndex = this._randomStepsSliders.indexOf(event.target);
@@ -35354,6 +37793,7 @@ You should be redirected to the song at:<br /><br />
                 const noteSizeStartSliderIndex = this._noteSizeStartSliders.indexOf(event.target);
                 const noteSizeEndBoxIndex = this.noteSizeEndBoxes.indexOf(event.target);
                 const noteSizeEndSliderIndex = this._noteSizeEndSliders.indexOf(event.target);
+                const instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
                 if (startBoxIndex != -1) {
                     this._lastChange = new ChangeEnvelopePitchStart(this._doc, parseInt(this.pitchStartBoxes[startBoxIndex].value), startBoxIndex);
                 }
@@ -35367,16 +37807,10 @@ You should be redirected to the song at:<br /><br />
                     this._lastChange = new ChangeEnvelopePitchEnd(this._doc, parseInt(this._pitchEndSliders[endSliderIndex].value), endSliderIndex);
                 }
                 else if (lowerBoundBoxIndex != -1) {
-                    this._lastChange = new ChangeEnvelopeLowerBound(this._doc, parseFloat(this.perEnvelopeLowerBoundBoxes[lowerBoundBoxIndex].value), lowerBoundBoxIndex);
+                    this._lastChange = new ChangeEnvelopeLowerBound(this._doc, instrument.envelopes[lowerBoundBoxIndex].perEnvelopeLowerBound, parseFloat(this.perEnvelopeLowerBoundBoxes[lowerBoundBoxIndex].value), lowerBoundBoxIndex);
                 }
                 else if (upperBoundBoxIndex != -1) {
-                    this._lastChange = new ChangeEnvelopeUpperBound(this._doc, parseFloat(this.perEnvelopeUpperBoundBoxes[upperBoundBoxIndex].value), upperBoundBoxIndex);
-                }
-                else if (lowerBoundSliderIndex != -1) {
-                    this._lastChange = new ChangeEnvelopeLowerBound(this._doc, parseFloat(this._perEnvelopeLowerBoundSliders[lowerBoundSliderIndex].value), lowerBoundSliderIndex);
-                }
-                else if (upperBoundSliderIndex != -1) {
-                    this._lastChange = new ChangeEnvelopeUpperBound(this._doc, parseFloat(this._perEnvelopeUpperBoundSliders[upperBoundSliderIndex].value), upperBoundSliderIndex);
+                    this._lastChange = new ChangeEnvelopeUpperBound(this._doc, instrument.envelopes[upperBoundBoxIndex].perEnvelopeUpperBound, parseFloat(this.perEnvelopeUpperBoundBoxes[upperBoundBoxIndex].value), upperBoundBoxIndex);
                 }
                 else if (randomStepsBoxIndex != -1) {
                     this._lastChange = new ChangeRandomEnvelopeSteps(this._doc, parseFloat(this.randomStepsBoxes[randomStepsBoxIndex].value), randomStepsBoxIndex);
@@ -35553,8 +37987,8 @@ You should be redirected to the song at:<br /><br />
                     this._inverters[i].checked = instrument.envelopes[i].inverse;
                     this.perEnvelopeLowerBoundBoxes[i].value = instrument.envelopes[i].perEnvelopeLowerBound.toString();
                     this.perEnvelopeUpperBoundBoxes[i].value = instrument.envelopes[i].perEnvelopeUpperBound.toString();
-                    this._perEnvelopeLowerBoundSliders[i].value = instrument.envelopes[i].perEnvelopeLowerBound.toString();
-                    this._perEnvelopeUpperBoundSliders[i].value = instrument.envelopes[i].perEnvelopeUpperBound.toString();
+                    this.perEnvelopeLowerBoundSliders[i].updateValue(instrument.envelopes[i].perEnvelopeLowerBound);
+                    this.perEnvelopeUpperBoundSliders[i].updateValue(instrument.envelopes[i].perEnvelopeUpperBound);
                 }
                 else if (this.openExtraSettingsDropdowns[i] == false) {
                     this.extraSettingsDropdownGroups[i].style.display = "none";
@@ -35674,13 +38108,13 @@ You should be redirected to the song at:<br /><br />
                 const perEnvelopeSpeedWrapper = HTML.div({ style: "margin-top: 3px; flex:1; display:flex; flex-direction: row; align-items:center; justify-content:right;" }, perEnvelopeSpeedDisplay, perEnvelopeSpeedSlider.container);
                 const perEnvelopeSpeedGroup = HTML.div({ class: "editor-controls", style: "flex-direction:column; align-items:center;" }, perEnvelopeSpeedWrapper);
                 const lowerBoundBox = HTML.input({ value: instrument.envelopes[envelopeIndex].perEnvelopeLowerBound, type: "number", min: Config.perEnvelopeBoundMin, max: Config.perEnvelopeBoundMax, step: 0.1, style: "width: 4em; font-size: 80%; " });
-                const lowerBoundSlider = HTML.input({ value: instrument.envelopes[envelopeIndex].perEnvelopeLowerBound, type: "range", min: Config.perEnvelopeBoundMin, max: Config.perEnvelopeBoundMax, step: 0.1, style: "width: 113px; margin-left: 0px;" });
+                const lowerBoundSlider = new Slider(HTML.input({ value: instrument.envelopes[envelopeIndex].perEnvelopeLowerBound, type: "range", min: Config.perEnvelopeBoundMin, max: Config.perEnvelopeBoundMax, step: 0.1, style: "width: 113px; margin-left: 0px;" }), this._doc, (oldBound, newBound) => new ChangeEnvelopeLowerBound(this._doc, oldBound, newBound, envelopeIndex), false);
                 const upperBoundBox = HTML.input({ value: instrument.envelopes[envelopeIndex].perEnvelopeUpperBound, type: "number", min: Config.perEnvelopeBoundMin, max: Config.perEnvelopeBoundMax, step: 0.1, style: "width: 4em; font-size: 80%; " });
-                const upperBoundSlider = HTML.input({ value: instrument.envelopes[envelopeIndex].perEnvelopeUpperBound, type: "range", min: Config.perEnvelopeBoundMin, max: Config.perEnvelopeBoundMax, step: 0.1, style: "width: 113px; margin-left: 0px;" });
+                const upperBoundSlider = new Slider(HTML.input({ value: instrument.envelopes[envelopeIndex].perEnvelopeUpperBound, type: "range", min: Config.perEnvelopeBoundMin, max: Config.perEnvelopeBoundMax, step: 0.1, style: "width: 113px; margin-left: 0px;" }), this._doc, (oldBound, newBound) => new ChangeEnvelopeUpperBound(this._doc, oldBound, newBound, envelopeIndex), false);
                 const lowerBoundBoxWrapper = HTML.div({ style: "flex: 1; display: flex; flex-direction: column; align-items: center;" }, HTML.span({ class: "tip", style: `width:68px; flex:1; height:1em; font-size: smaller;`, onclick: () => this._openPrompt("envelopeRange") }, "Lwr bnd: "), lowerBoundBox);
                 const upperBoundBoxWrapper = HTML.div({ style: "flex: 1; display: flex; flex-direction: column; align-items: center;" }, HTML.span({ class: "tip", style: `width:68px; flex:1; height:1em; font-size: smaller;`, onclick: () => this._openPrompt("envelopeRange") }, "Upr bnd: "), upperBoundBox);
-                const lowerBoundWrapper = HTML.div({ style: "margin-top: 3px; flex:1; display:flex; flex-direction: row; align-items:center; justify-content:right;" }, lowerBoundBoxWrapper, lowerBoundSlider);
-                const upperBoundWrapper = HTML.div({ style: "margin-top: 3px; flex:1; display:flex; flex-direction: row; align-items:center; justify-content:right;" }, upperBoundBoxWrapper, upperBoundSlider);
+                const lowerBoundWrapper = HTML.div({ style: "margin-top: 3px; flex:1; display:flex; flex-direction: row; align-items:center; justify-content:right;" }, lowerBoundBoxWrapper, lowerBoundSlider.container);
+                const upperBoundWrapper = HTML.div({ style: "margin-top: 3px; flex:1; display:flex; flex-direction: row; align-items:center; justify-content:right;" }, upperBoundBoxWrapper, upperBoundSlider.container);
                 const invertBox = HTML.input({ "checked": instrument.envelopes[envelopeIndex].inverse, type: "checkbox", style: "width: 1em; padding: 0.5em; margin-left: 4em;", id: "invertBox" });
                 const invertWrapper = HTML.div({ style: "margin: 0.5em; align-items:center; justify-content:right;" }, HTML.span({ class: "tip", onclick: () => this._openPrompt("envelopeInvert") }, "Invert: "), invertBox);
                 const envelopeCopyButton = HTML.button({ style: "margin-left:0px; max-width:86px; width: 86px; height: 26px; padding-left: 22px", class: "copyButton", title: "Copy Envelope" }, [
@@ -35713,8 +38147,8 @@ You should be redirected to the song at:<br /><br />
                 this._inverters[envelopeIndex] = invertBox;
                 this.perEnvelopeLowerBoundBoxes[envelopeIndex] = lowerBoundBox;
                 this.perEnvelopeUpperBoundBoxes[envelopeIndex] = upperBoundBox;
-                this._perEnvelopeLowerBoundSliders[envelopeIndex] = lowerBoundSlider;
-                this._perEnvelopeUpperBoundSliders[envelopeIndex] = upperBoundSlider;
+                this.perEnvelopeLowerBoundSliders[envelopeIndex] = lowerBoundSlider;
+                this.perEnvelopeUpperBoundSliders[envelopeIndex] = upperBoundSlider;
                 this._perEnvelopeSpeedDisplays[envelopeIndex] = perEnvelopeSpeedDisplay;
                 this.perEnvelopeSpeedSliders[envelopeIndex] = perEnvelopeSpeedSlider;
                 this.perEnvelopeSpeedGroups[envelopeIndex] = perEnvelopeSpeedGroup;
@@ -35775,8 +38209,8 @@ You should be redirected to the song at:<br /><br />
                 this.updateSpeedDisplay(envelopeIndex);
                 this.perEnvelopeLowerBoundBoxes[envelopeIndex].value = String(instrument.envelopes[envelopeIndex].perEnvelopeLowerBound);
                 this.perEnvelopeUpperBoundBoxes[envelopeIndex].value = String(instrument.envelopes[envelopeIndex].perEnvelopeUpperBound);
-                this._perEnvelopeLowerBoundSliders[envelopeIndex].value = String(instrument.envelopes[envelopeIndex].perEnvelopeLowerBound);
-                this._perEnvelopeUpperBoundSliders[envelopeIndex].value = String(instrument.envelopes[envelopeIndex].perEnvelopeUpperBound);
+                this.perEnvelopeLowerBoundSliders[envelopeIndex].updateValue(instrument.envelopes[envelopeIndex].perEnvelopeLowerBound);
+                this.perEnvelopeUpperBoundSliders[envelopeIndex].updateValue(instrument.envelopes[envelopeIndex].perEnvelopeUpperBound);
                 this.randomStepsBoxes[envelopeIndex].value = String(instrument.envelopes[envelopeIndex].steps);
                 this.randomSeedBoxes[envelopeIndex].value = String(instrument.envelopes[envelopeIndex].seed);
                 this._randomStepsSliders[envelopeIndex].value = String(instrument.envelopes[envelopeIndex].steps);
@@ -38237,7 +40671,9 @@ You should be redirected to the song at:<br /><br />
                                     if (instrument.modFilterTypes[mod] == modFilterIndex)
                                         return [instrumentIndex, mod];
                                 }
-                                else if (modEnvIndex != undefined && applyToMod == Config.modulators.dictionary["individual envelope speed"].index) {
+                                else if (modEnvIndex != undefined && applyToMod == Config.modulators.dictionary["individual envelope speed"].index ||
+                                    applyToMod == Config.modulators.dictionary["individual envelope lower bound"].index ||
+                                    applyToMod == Config.modulators.dictionary["individual envelope upper bound"].index) {
                                     if (instrument.modEnvelopeNumbers[mod] == modEnvIndex)
                                         return [instrumentIndex, mod];
                                 }
@@ -38765,6 +41201,30 @@ You should be redirected to the song at:<br /><br />
                 slider = songEditor.getSliderForModSetting(modulator.index, envelopeIndex);
                 if (slider != null) {
                     instrument.envelopes[envelopeIndex].perEnvelopeSpeed = EnvelopeEditor.convertIndexSpeed(slider.getValueBeforeProspectiveChange(), "speed");
+                }
+                applyToEnvelopeTargets.push(envelopeIndex);
+            }
+            else if (change instanceof ChangeEnvelopeLowerBound) {
+                var modulator = Config.modulators.dictionary["individual envelope lower bound"];
+                applyToMods.push(modulator.index);
+                const envelopeIndex = change.getIndex();
+                if (toApply)
+                    applyValues.push(instrument.envelopes[envelopeIndex].perEnvelopeLowerBound * 10 - modulator.convertRealFactor);
+                slider = songEditor.getSliderForModSetting(modulator.index, envelopeIndex);
+                if (slider != null) {
+                    instrument.envelopes[envelopeIndex].perEnvelopeLowerBound = slider.getValueBeforeProspectiveChange();
+                }
+                applyToEnvelopeTargets.push(envelopeIndex);
+            }
+            else if (change instanceof ChangeEnvelopeUpperBound) {
+                var modulator = Config.modulators.dictionary["individual envelope upper bound"];
+                applyToMods.push(modulator.index);
+                const envelopeIndex = change.getIndex();
+                if (toApply)
+                    applyValues.push(instrument.envelopes[envelopeIndex].perEnvelopeUpperBound * 10 - modulator.convertRealFactor);
+                slider = songEditor.getSliderForModSetting(modulator.index, envelopeIndex);
+                if (slider != null) {
+                    instrument.envelopes[envelopeIndex].perEnvelopeUpperBound = slider.getValueBeforeProspectiveChange();
                 }
                 applyToEnvelopeTargets.push(envelopeIndex);
             }
@@ -39908,2419 +42368,6 @@ You should be redirected to the song at:<br /><br />
             return this._pitchHeight * (this._pitchCount - (pitch) - 0.5);
         }
     }
-
-    class Piano {
-        forceRender() {
-            this._renderedScale = -1;
-            this._documentChanged();
-        }
-        static getBassCutoffPitch(doc) {
-            const octaveOffset = doc.getBaseVisibleOctave(doc.channel);
-            return octaveOffset * Config.pitchesPerOctave + Math.floor(doc.getVisiblePitchCount() / (Config.pitchesPerOctave * 2)) * Config.pitchesPerOctave;
-        }
-        constructor(_doc) {
-            this._doc = _doc;
-            this._pianoContainer = HTML.div({ style: "width: 100%; height: 100%; display: flex; flex-direction: column-reverse; align-items: stretch;" });
-            this._drumContainer = HTML.div({ style: "width: 100%; height: 100%; display: flex; flex-direction: column-reverse; align-items: stretch;" });
-            this._modContainer = HTML.div({ style: "width: 100%; height: 100%; display: flex; flex-direction: column-reverse; align-items: stretch;" });
-            this._preview = HTML.div({ style: `width: 100%; height: 40px; border: 2px solid ${ColorConfig.primaryText}; position: absolute; box-sizing: border-box; pointer-events: none;` });
-            this.container = HTML.div({ style: "width: 32px; height: 100%; overflow: hidden; position: relative; flex-shrink: 0; touch-action: none;" }, this._pianoContainer, this._drumContainer, this._modContainer, this._preview);
-            this._editorHeight = 481;
-            this._pianoKeys = [];
-            this._pianoLabels = [];
-            this._modFirstLabels = [];
-            this._modSecondLabels = [];
-            this._modCountLabels = [];
-            this._modCountRects = [];
-            this._mouseY = 0;
-            this._mouseDown = false;
-            this._mouseOver = false;
-            this._playedPitch = -1;
-            this._renderedScale = -1;
-            this._renderedDrums = false;
-            this._renderedMod = false;
-            this._renderedKey = -1;
-            this._renderedPitchCount = -1;
-            this._renderedLiveInputPitches = [];
-            this._whenMouseOver = (event) => {
-                if (this._mouseOver)
-                    return;
-                this._mouseOver = true;
-                this._updatePreview();
-            };
-            this._whenMouseOut = (event) => {
-                if (!this._mouseOver)
-                    return;
-                this._mouseOver = false;
-                this._updatePreview();
-            };
-            this._whenMousePressed = (event) => {
-                event.preventDefault();
-                this._doc.synth.maintainLiveInput();
-                this._mouseDown = true;
-                const boundingRect = this.container.getBoundingClientRect();
-                this._mouseY = ((event.clientY || event.pageY) - boundingRect.top) * this._editorHeight / (boundingRect.bottom - boundingRect.top);
-                if (isNaN(this._mouseY))
-                    this._mouseY = 0;
-                this._updateCursorPitch();
-                this._playLiveInput();
-                this._updatePreview();
-            };
-            this._whenMouseMoved = (event) => {
-                if (this._mouseDown || this._mouseOver)
-                    this._doc.synth.maintainLiveInput();
-                const boundingRect = this.container.getBoundingClientRect();
-                this._mouseY = ((event.clientY || event.pageY) - boundingRect.top) * this._editorHeight / (boundingRect.bottom - boundingRect.top);
-                if (isNaN(this._mouseY))
-                    this._mouseY = 0;
-                this._updateCursorPitch();
-                if (this._mouseDown)
-                    this._playLiveInput();
-                this._updatePreview();
-            };
-            this._whenMouseReleased = (event) => {
-                if (this._mouseDown)
-                    this._releaseLiveInput();
-                this._mouseDown = false;
-                this._updatePreview();
-            };
-            this._whenTouchPressed = (event) => {
-                event.preventDefault();
-                this._doc.synth.maintainLiveInput();
-                this._mouseDown = true;
-                const boundingRect = this.container.getBoundingClientRect();
-                this._mouseY = (event.touches[0].clientY - boundingRect.top) * this._editorHeight / (boundingRect.bottom - boundingRect.top);
-                if (isNaN(this._mouseY))
-                    this._mouseY = 0;
-                this._updateCursorPitch();
-                this._playLiveInput();
-            };
-            this._whenTouchMoved = (event) => {
-                event.preventDefault();
-                this._doc.synth.maintainLiveInput();
-                const boundingRect = this.container.getBoundingClientRect();
-                this._mouseY = (event.touches[0].clientY - boundingRect.top) * this._editorHeight / (boundingRect.bottom - boundingRect.top);
-                if (isNaN(this._mouseY))
-                    this._mouseY = 0;
-                this._updateCursorPitch();
-                if (this._mouseDown)
-                    this._playLiveInput();
-            };
-            this._whenTouchReleased = (event) => {
-                event.preventDefault();
-                this._mouseDown = false;
-                this._releaseLiveInput();
-            };
-            this._onAnimationFrame = () => {
-                window.requestAnimationFrame(this._onAnimationFrame);
-                let liveInputChanged = false;
-                let liveInputPitchCount = !this._doc.performance.pitchesAreTemporary() ? this._doc.synth.liveInputPitches.length : 0;
-                liveInputPitchCount += !this._doc.performance.bassPitchesAreTemporary() ? this._doc.synth.liveBassInputPitches.length : 0;
-                if (this._renderedLiveInputPitches.length != liveInputPitchCount) {
-                    liveInputChanged = true;
-                }
-                for (let i = 0; i < this._doc.synth.liveInputPitches.length; i++) {
-                    if (this._renderedLiveInputPitches[i] != this._doc.synth.liveInputPitches[i]) {
-                        this._renderedLiveInputPitches[i] = this._doc.synth.liveInputPitches[i];
-                        liveInputChanged = true;
-                    }
-                }
-                for (let i = this._doc.synth.liveInputPitches.length; i < liveInputPitchCount; i++) {
-                    if (this._renderedLiveInputPitches[i] != this._doc.synth.liveBassInputPitches[i - this._doc.synth.liveInputPitches.length]) {
-                        this._renderedLiveInputPitches[i] = this._doc.synth.liveBassInputPitches[i - this._doc.synth.liveInputPitches.length];
-                        liveInputChanged = true;
-                    }
-                }
-                this._renderedLiveInputPitches.length = liveInputPitchCount;
-                if (liveInputChanged) {
-                    this._updatePreview();
-                }
-            };
-            this._documentChanged = () => {
-                const isDrum = this._doc.song.getChannelIsNoise(this._doc.channel);
-                const isMod = this._doc.song.getChannelIsMod(this._doc.channel);
-                this._pitchCount = isMod ? Config.modCount : (isDrum ? Config.drumCount : this._doc.getVisiblePitchCount());
-                this._pitchHeight = this._editorHeight / this._pitchCount;
-                this._updateCursorPitch();
-                if (this._mouseDown)
-                    this._playLiveInput();
-                if (!this._doc.prefs.showLetters)
-                    return;
-                if ((this._renderedScale == this._doc.song.scale && this._doc.song.scale != Config.scales.dictionary["Custom"].index) && this._renderedKey == this._doc.song.key && this._renderedDrums == isDrum && this._renderedMod == isMod && this._renderedPitchCount == this._pitchCount)
-                    return;
-                this._renderedScale = this._doc.song.scale;
-                this._renderedKey = this._doc.song.key;
-                this._renderedDrums = isDrum;
-                this._renderedMod = isMod;
-                const instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
-                this._pianoContainer.style.display = (isDrum || isMod) ? "none" : "flex";
-                this._drumContainer.style.display = isDrum ? "flex" : "none";
-                this._modContainer.style.display = isMod ? "flex" : "none";
-                if (!isDrum && !isMod) {
-                    if (this._renderedPitchCount != this._pitchCount) {
-                        this._pianoContainer.innerHTML = "";
-                        for (let i = 0; i < this._pitchCount; i++) {
-                            const pianoLabel = HTML.div({ class: "piano-label", style: "font-weight: bold; -webkit-text-stroke-width: 0; font-size: 11px; font-family: sans-serif; position: absolute; padding-left: 15px; white-space: nowrap;" });
-                            const pianoKey = HTML.div({ class: "piano-button", style: "background: gray;" }, pianoLabel);
-                            this._pianoContainer.appendChild(pianoKey);
-                            this._pianoLabels[i] = pianoLabel;
-                            this._pianoKeys[i] = pianoKey;
-                        }
-                        this._pianoLabels.length = this._pitchCount;
-                        this._pianoKeys.length = this._pitchCount;
-                        this._renderedPitchCount = this._pitchCount;
-                    }
-                    for (let j = 0; j < this._pitchCount; j++) {
-                        const pitchNameIndex = (j + Config.keys[this._doc.song.key].basePitch) % Config.pitchesPerOctave;
-                        const isWhiteKey = Config.keys[pitchNameIndex].isWhiteKey;
-                        this._pianoKeys[j].style.background = isWhiteKey ? ColorConfig.whitePianoKey : ColorConfig.blackPianoKey;
-                        let scale = this._doc.song.scale == Config.scales.dictionary["Custom"].index ? this._doc.song.scaleCustom : Config.scales[this._doc.song.scale].flags;
-                        if (!scale[j % Config.pitchesPerOctave]) {
-                            this._pianoKeys[j].classList.add("disabled");
-                            this._pianoLabels[j].style.display = "none";
-                        }
-                        else {
-                            this._pianoKeys[j].classList.remove("disabled");
-                            this._pianoLabels[j].style.display = "";
-                            const label = this._pianoLabels[j];
-                            if ((j % 12) == 0) {
-                                label.style.transform = "translate(-5px, 0px)";
-                            }
-                            else {
-                                label.style.transform = "translate(0px, 0px)";
-                            }
-                            label.style.color = Config.keys[pitchNameIndex].isWhiteKey ? ColorConfig.whitePianoKeyText : ColorConfig.blackPianoKeyText;
-                            label.textContent = Piano.getPitchName(pitchNameIndex, j, this._doc.getBaseVisibleOctave(this._doc.channel) + this._doc.song.octave);
-                        }
-                    }
-                }
-                else if (isMod) {
-                    let firstRow = "";
-                    let secondRow = "";
-                    let useFirstColor = ColorConfig.modLabelPrimaryText;
-                    let useSecondColor = ColorConfig.modLabelSecondaryText;
-                    for (let j = 0; j < Config.modCount; j++) {
-                        let usingSecondRow = true;
-                        let usingMod = true;
-                        let instrumentVal = instrument.modInstruments[Config.modCount - j - 1] + 1;
-                        let channelVal = instrument.modChannels[Config.modCount - j - 1] + 1;
-                        let modulator = instrument.modulators[Config.modCount - j - 1];
-                        let status = 1 + +(channelVal - 1 >= this._doc.song.pitchChannelCount);
-                        if (instrument.modChannels[Config.modCount - j - 1] == -2)
-                            status = 0;
-                        else if (instrument.modChannels[Config.modCount - j - 1] == -1)
-                            status = 3;
-                        let instrumentsLength = this._doc.song.channels[Math.max(0, channelVal - 1)].instruments.length;
-                        switch (status) {
-                            case 0:
-                                firstRow = "Mod";
-                                usingSecondRow = false;
-                                useSecondColor = ColorConfig.modLabelSecondaryText;
-                                usingMod = false;
-                                break;
-                            case 1:
-                                if (this._doc.song.channels[channelVal - 1].name == "") {
-                                    if (instrumentsLength > 1) {
-                                        if (channelVal >= 10 || instrumentVal >= 10) {
-                                            firstRow = "P" + channelVal;
-                                            if (instrumentVal - 1 == instrumentsLength) {
-                                                firstRow += " All";
-                                            }
-                                            else if (instrumentVal - 1 > instrumentsLength) {
-                                                firstRow += " Act";
-                                            }
-                                            else {
-                                                firstRow += " I" + instrumentVal;
-                                            }
-                                        }
-                                        else {
-                                            firstRow = "Pitch" + channelVal;
-                                            if (instrumentVal - 1 == instrumentsLength) {
-                                                firstRow += " All";
-                                            }
-                                            else if (instrumentVal - 1 > instrumentsLength) {
-                                                firstRow += " Act";
-                                            }
-                                            else {
-                                                firstRow += " Ins" + instrumentVal;
-                                            }
-                                        }
-                                    }
-                                    else {
-                                        firstRow = "Pitch " + channelVal;
-                                    }
-                                }
-                                else {
-                                    let insText;
-                                    if (instrumentVal - 1 == instrumentsLength) {
-                                        insText = " All";
-                                    }
-                                    else if (instrumentVal - 1 > instrumentsLength) {
-                                        insText = " Act";
-                                    }
-                                    else {
-                                        insText = " I" + instrumentVal;
-                                    }
-                                    if (instrumentsLength > 1) {
-                                        firstRow = "P" + channelVal + " " + this._doc.song.channels[channelVal - 1].name + insText;
-                                    }
-                                    else {
-                                        firstRow = "P" + channelVal + " " + this._doc.song.channels[channelVal - 1].name;
-                                    }
-                                }
-                                break;
-                            case 2:
-                                const absoluteChannelVal = instrument.modChannels[Config.modCount - j - 1];
-                                const relativeChannelVal = absoluteChannelVal - this._doc.song.pitchChannelCount;
-                                if (this._doc.song.channels[absoluteChannelVal].name == "") {
-                                    if (instrumentsLength > 1) {
-                                        if ((relativeChannelVal + 1) >= 10 || instrumentVal >= 10) {
-                                            firstRow = "N" + (relativeChannelVal + 1);
-                                            if (instrumentVal - 1 == instrumentsLength) {
-                                                firstRow += " All";
-                                            }
-                                            else if (instrumentVal - 1 > instrumentsLength) {
-                                                firstRow += " Act";
-                                            }
-                                            else {
-                                                firstRow += " I" + instrumentVal;
-                                            }
-                                        }
-                                        else {
-                                            firstRow = "Noise" + (relativeChannelVal + 1);
-                                            if (instrumentVal - 1 == instrumentsLength) {
-                                                firstRow += " All";
-                                            }
-                                            else if (instrumentVal - 1 > instrumentsLength) {
-                                                firstRow += " Act";
-                                            }
-                                            else {
-                                                firstRow += " Ins" + instrumentVal;
-                                            }
-                                        }
-                                    }
-                                    else {
-                                        firstRow = "Noise " + (relativeChannelVal + 1);
-                                    }
-                                }
-                                else {
-                                    if (instrumentsLength > 1) {
-                                        let insText;
-                                        if (instrumentVal - 1 == instrumentsLength) {
-                                            insText = " All";
-                                        }
-                                        else if (instrumentVal - 1 > instrumentsLength) {
-                                            insText = " Act";
-                                        }
-                                        else {
-                                            insText = " I" + instrumentVal;
-                                        }
-                                        firstRow = "N" + (relativeChannelVal + 1) + " " + this._doc.song.channels[absoluteChannelVal].name + insText;
-                                    }
-                                    else {
-                                        firstRow = "N" + (relativeChannelVal + 1) + " " + this._doc.song.channels[absoluteChannelVal].name;
-                                    }
-                                }
-                                break;
-                            case 3:
-                                firstRow = "Song";
-                                break;
-                        }
-                        if (usingSecondRow) {
-                            secondRow = Config.modulators[modulator].pianoName;
-                            if (modulator == Config.modulators.dictionary["none"].index) {
-                                useSecondColor = ColorConfig.modLabelSecondaryText;
-                                usingMod = false;
-                            }
-                            else if (modulator == Config.modulators.dictionary["eq filter"].index || modulator == Config.modulators.dictionary["note filter"].index || modulator == Config.modulators.dictionary["song eq"].index) {
-                                var text = " Morph";
-                                var filterVal = instrument.modFilterTypes[Config.modCount - j - 1];
-                                if (filterVal > 0 && (filterVal % 2)) {
-                                    text = " Dot" + Math.ceil(filterVal / 2) + "X";
-                                }
-                                else if (filterVal > 0) {
-                                    text = " Dot" + Math.ceil(filterVal / 2) + "Y";
-                                }
-                                secondRow += text;
-                            }
-                        }
-                        const firstLabel = this._modFirstLabels[j];
-                        const secondLabel = this._modSecondLabels[j];
-                        const modCountLabel = this._modCountLabels[j];
-                        const modCountRect = this._modCountRects[j];
-                        firstLabel.style.fill = useFirstColor;
-                        firstLabel.textContent = firstRow;
-                        secondLabel.style.fill = useSecondColor;
-                        secondLabel.textContent = usingSecondRow ? secondRow : "Not set";
-                        modCountLabel.textContent = "" + (Config.modCount - j);
-                        modCountRect.style.fill = usingMod ? ColorConfig.indicatorPrimary : ColorConfig.modLabelSecondaryText;
-                        if (this._doc.song.channels[Math.max(0, instrument.modChannels[Config.modCount - j - 1])].name != "") {
-                            let scaleFactor = "1";
-                            let height = firstLabel.parentElement.parentElement.getBoundingClientRect().height;
-                            let length = firstLabel.getComputedTextLength();
-                            let squeeze = 0;
-                            if (length > height - 8) {
-                                scaleFactor = "0.65";
-                                squeeze = 2;
-                            }
-                            else if (length > height - 24) {
-                                scaleFactor = "0.8";
-                                squeeze = 1;
-                            }
-                            firstLabel.style.transform = "rotate(-90deg) translate(" + (-20 - squeeze - Math.round(Math.max(0, (height - 80) / 2))) + "px, 39px) scale(" + scaleFactor + ", 1)";
-                            while (scaleFactor == "0.65" && firstLabel.getComputedTextLength() > height + 8) {
-                                var offset = 4 + (instrumentVal >= 10 ? 1 : 0);
-                                firstLabel.textContent = firstLabel.textContent.substr(0, firstLabel.textContent.length - offset) + firstLabel.textContent.substr(firstLabel.textContent.length - offset + 1);
-                            }
-                        }
-                        else {
-                            let height = firstLabel.parentElement.parentElement.getBoundingClientRect().height;
-                            firstLabel.style.transform = "rotate(-90deg) translate(" + (-20 - Math.round(Math.max(0, (height - 80) / 2))) + "px, 39px) scale(1, 1)";
-                        }
-                    }
-                }
-                this._updatePreview();
-            };
-            for (let i = 0; i < Config.drumCount; i++) {
-                const scale = (1.0 - (i / Config.drumCount) * 0.35) * 100;
-                this._drumContainer.appendChild(HTML.div({ class: "drum-button", style: `background-size: ${scale}% ${scale}%;` }));
-            }
-            for (let i = 0; i < Config.modCount; i++) {
-                const firstRowText = SVG.text({ class: "modulator-label", "text-anchor": "left", fill: ColorConfig.modLabelPrimaryText, style: "font-weight: bold; align-self: flex-start; transform-origin: center; transform: rotate(-90deg) translate(-19px, 39px); font-size: 11px; font-family: sans-serif;" });
-                const secondRowText = SVG.text({ class: "modulator-label", "text-anchor": "left", fill: ColorConfig.modLabelPrimaryText, style: "font-weight: bold; align-self: flex-end; transform-origin: center; transform: rotate(-90deg) translate(-26px, 42px); font-size: 11px; font-family: sans-serif;" });
-                const countText = SVG.text({ class: "modulator-inverse-label", fill: ColorConfig.modLabelPrimary, style: "font-weight: bold; align-self: flex-start; transform-origin: center; transform: rotate(-90deg) translate(4px, 13px); font-size: 11px; font-family: sans-serif;" });
-                const countRect = SVG.rect({ width: "12px", height: "9px", fill: ColorConfig.indicatorPrimary, style: "pointer-events: none; transform: translate(4px, 4px);" });
-                const firstRowSVG = SVG.svg({ viewBox: "0 0 16 66", width: "16px", style: "pointer-events: none; flex-grow: 1;" }, [
-                    firstRowText,
-                ]);
-                const countSVG = SVG.svg({ viewBox: "0 0 16 14", width: "16px", style: "pointer-events: none;" }, [
-                    countRect,
-                    countText,
-                ]);
-                const secondRowSVG = SVG.svg({ viewBox: "0 0 16 80", width: "16px", style: "pointer-events: none;" }, [
-                    secondRowText,
-                ]);
-                const flexRow1 = HTML.div({ style: "display: flex; flex-direction: column; justify-content: space-between; pointer-events: none;" }, [
-                    countSVG,
-                    firstRowSVG,
-                ]);
-                const flexRow2 = HTML.div({ style: "display: flex; flex-direction: column-reverse; justify-content: space-between; pointer-events: none;" }, [
-                    secondRowSVG,
-                ]);
-                const flexContainer = HTML.div({ style: "display: flex; flex-direction: row; justify-content: space-between; padding: 0px; width: 32px; height: 100%; overflow: hidden; pointer-events: none;" }, [
-                    flexRow1,
-                    flexRow2,
-                ]);
-                const modKey = HTML.div({ class: "modulator-button", style: "background: " + ColorConfig.modLabelPrimary + ";" }, flexContainer);
-                this._modContainer.appendChild(modKey);
-                this._modFirstLabels.push(firstRowText);
-                this._modSecondLabels.push(secondRowText);
-                this._modCountLabels.push(countText);
-                this._modCountRects.push(countRect);
-            }
-            this.container.addEventListener("mousedown", this._whenMousePressed);
-            document.addEventListener("mousemove", this._whenMouseMoved);
-            document.addEventListener("mouseup", this._whenMouseReleased);
-            this.container.addEventListener("mouseover", this._whenMouseOver);
-            this.container.addEventListener("mouseout", this._whenMouseOut);
-            this.container.addEventListener("touchstart", this._whenTouchPressed);
-            this.container.addEventListener("touchmove", this._whenTouchMoved);
-            this.container.addEventListener("touchend", this._whenTouchReleased);
-            this.container.addEventListener("touchcancel", this._whenTouchReleased);
-            this._doc.notifier.watch(this._documentChanged);
-            this._documentChanged();
-            window.requestAnimationFrame(this._onAnimationFrame);
-        }
-        _updateCursorPitch() {
-            const scale = this._doc.song.scale == Config.scales.dictionary["Custom"].index ? this._doc.song.scaleCustom : Config.scales[this._doc.song.scale].flags;
-            const mousePitch = Math.max(0, Math.min(this._pitchCount - 1, this._pitchCount - (this._mouseY / this._pitchHeight)));
-            if (scale[Math.floor(mousePitch) % Config.pitchesPerOctave] || this._doc.song.getChannelIsNoise(this._doc.channel)) {
-                this._cursorPitch = Math.floor(mousePitch);
-            }
-            else {
-                let topPitch = Math.floor(mousePitch) + 1;
-                let bottomPitch = Math.floor(mousePitch) - 1;
-                while (!scale[topPitch % Config.pitchesPerOctave]) {
-                    topPitch++;
-                }
-                while (!scale[(bottomPitch) % Config.pitchesPerOctave]) {
-                    bottomPitch--;
-                }
-                let topRange = topPitch;
-                let bottomRange = bottomPitch + 1;
-                if (topPitch % Config.pitchesPerOctave == 0 || topPitch % Config.pitchesPerOctave == 7) {
-                    topRange -= 0.5;
-                }
-                if (bottomPitch % Config.pitchesPerOctave == 0 || bottomPitch % Config.pitchesPerOctave == 7) {
-                    bottomRange += 0.5;
-                }
-                this._cursorPitch = mousePitch - bottomRange > topRange - mousePitch ? topPitch : bottomPitch;
-            }
-        }
-        _playLiveInput() {
-            const octaveOffset = this._doc.getBaseVisibleOctave(this._doc.channel) * Config.pitchesPerOctave;
-            const currentPitch = this._cursorPitch + octaveOffset;
-            if (this._playedPitch == currentPitch)
-                return;
-            this._doc.performance.removePerformedPitch(this._playedPitch);
-            this._playedPitch = currentPitch;
-            this._doc.performance.addPerformedPitch(currentPitch);
-        }
-        _releaseLiveInput() {
-            this._doc.performance.removePerformedPitch(this._playedPitch);
-            this._playedPitch = -1;
-        }
-        _updatePreview() {
-            this._preview.style.visibility = (!this._mouseOver || this._mouseDown) ? "hidden" : "visible";
-            if (this._mouseOver && !this._mouseDown) {
-                const boundingRect = this.container.getBoundingClientRect();
-                const pitchHeight = this._pitchHeight / (this._editorHeight / (boundingRect.bottom - boundingRect.top));
-                this._preview.style.left = "0px";
-                this._preview.style.top = pitchHeight * (this._pitchCount - this._cursorPitch - 1) + "px";
-                this._preview.style.height = pitchHeight + "px";
-            }
-            const octaveOffset = this._doc.getBaseVisibleOctave(this._doc.channel) * Config.pitchesPerOctave;
-            const container = this._doc.song.getChannelIsNoise(this._doc.channel) ? this._drumContainer : this._pianoContainer;
-            const children = container.children;
-            for (let i = 0; i < children.length; i++) {
-                const child = children[i];
-                if (this._renderedLiveInputPitches.indexOf(i + octaveOffset) == -1) {
-                    child.classList.remove("pressed");
-                }
-                else {
-                    child.classList.add("pressed");
-                }
-            }
-        }
-        static getPitchName(pitchNameIndex, scaleIndex, baseVisibleOctave) {
-            let text;
-            if (Config.keys[pitchNameIndex].isWhiteKey) {
-                text = Config.keys[pitchNameIndex].name;
-            }
-            else {
-                const shiftDir = Config.blackKeyNameParents[scaleIndex % Config.pitchesPerOctave];
-                text = Config.keys[(pitchNameIndex + Config.pitchesPerOctave + shiftDir) % Config.pitchesPerOctave].name;
-                if (shiftDir == 1) {
-                    text += "♭";
-                }
-                else if (shiftDir == -1) {
-                    text += "♯";
-                }
-            }
-            if (scaleIndex % 12 == 0) {
-                text += Math.floor(scaleIndex / 12) + baseVisibleOctave;
-            }
-            return text;
-        }
-    }
-
-    const versionPrefix = "songVersion: ";
-    const maximumSongCount = 8;
-    const maximumWorkPerVersion = 3 * 60 * 1000;
-    const minimumWorkPerSpan = 1 * 60 * 1000;
-    function keyIsVersion(key) {
-        return key.indexOf(versionPrefix) == 0;
-    }
-    function keyToVersion(key) {
-        return JSON.parse(key.substring(versionPrefix.length));
-    }
-    function versionToKey(version) {
-        return versionPrefix + JSON.stringify(version);
-    }
-    function generateUid() {
-        return ((Math.random() * (-1 >>> 0)) >>> 0).toString(32);
-    }
-    function compareSongs(a, b) {
-        return b.versions[0].time - a.versions[0].time;
-    }
-    function errorAlert(error) {
-        console.warn(error);
-        window.alert("Whoops, the song data appears to have been corrupted! Please try to recover the last working version of the song from the \"Recover Recent Song...\" option in BeepBox's \"File\" menu.");
-    }
-    function compareVersions(a, b) {
-        return b.time - a.time;
-    }
-    class SongRecovery {
-        constructor() {
-            this._song = new Song();
-        }
-        static getAllRecoveredSongs() {
-            const songs = [];
-            const songsByUid = {};
-            for (let i = 0; i < localStorage.length; i++) {
-                const itemKey = localStorage.key(i);
-                if (keyIsVersion(itemKey)) {
-                    const version = keyToVersion(itemKey);
-                    let song = songsByUid[version.uid];
-                    if (song == undefined) {
-                        song = { versions: [] };
-                        songsByUid[version.uid] = song;
-                        songs.push(song);
-                    }
-                    song.versions.push(version);
-                }
-            }
-            for (const song of songs) {
-                song.versions.sort(compareVersions);
-            }
-            songs.sort(compareSongs);
-            return songs;
-        }
-        saveVersion(uid, name, songData) {
-            const newName = name;
-            const newTime = Math.round(Date.now());
-            clearTimeout(this._saveVersionTimeoutHandle);
-            this._saveVersionTimeoutHandle = setTimeout(() => {
-                try {
-                    this._song.fromBase64String(songData);
-                }
-                catch (error) {
-                    errorAlert(error);
-                    return;
-                }
-                const songs = SongRecovery.getAllRecoveredSongs();
-                let currentSong = null;
-                for (const song of songs) {
-                    if (song.versions[0].uid == uid) {
-                        currentSong = song;
-                    }
-                }
-                if (currentSong == null) {
-                    currentSong = { versions: [] };
-                    songs.unshift(currentSong);
-                }
-                let versions = currentSong.versions;
-                let newWork = 1000;
-                if (versions.length > 0) {
-                    const mostRecentTime = versions[0].time;
-                    const mostRecentWork = versions[0].work;
-                    newWork = mostRecentWork + Math.min(maximumWorkPerVersion, newTime - mostRecentTime);
-                }
-                const newVersion = { uid: uid, name: newName, time: newTime, work: newWork };
-                const newKey = versionToKey(newVersion);
-                versions.unshift(newVersion);
-                localStorage.setItem(newKey, songData);
-                let minSpan = minimumWorkPerSpan;
-                const spanMult = Math.pow(2, 1 / 2);
-                for (var i = 1; i < versions.length; i++) {
-                    const currentWork = versions[i].work;
-                    const olderWork = (i == versions.length - 1) ? 0.0 : versions[i + 1].work;
-                    if (currentWork - olderWork < minSpan) {
-                        let indexToDiscard = i;
-                        if (i < versions.length - 1) {
-                            const currentTime = versions[i].time;
-                            const newerTime = versions[i - 1].time;
-                            const olderTime = versions[i + 1].time;
-                            if ((currentTime - olderTime) < 0.5 * (newerTime - currentTime)) {
-                                indexToDiscard = i + 1;
-                            }
-                        }
-                        localStorage.removeItem(versionToKey(versions[indexToDiscard]));
-                        break;
-                    }
-                    minSpan *= spanMult;
-                }
-                while (songs.length > maximumSongCount) {
-                    let leastImportantSong = null;
-                    let leastImportance = Number.POSITIVE_INFINITY;
-                    for (let i = Math.round(maximumSongCount / 2); i < songs.length; i++) {
-                        const song = songs[i];
-                        const timePassed = newTime - song.versions[0].time;
-                        const timeScale = 1.0 / ((timePassed / (12 * 60 * 60 * 1000)) + 1.0);
-                        const adjustedWork = song.versions[0].work + 5 * 60 * 1000;
-                        const weight = adjustedWork * timeScale;
-                        if (leastImportance > weight) {
-                            leastImportance = weight;
-                            leastImportantSong = song;
-                        }
-                    }
-                    for (const version of leastImportantSong.versions) {
-                        localStorage.removeItem(versionToKey(version));
-                    }
-                    songs.splice(songs.indexOf(leastImportantSong), 1);
-                }
-            }, 750);
-        }
-    }
-
-    class SongPerformance {
-        constructor(_doc) {
-            this._doc = _doc;
-            this._channelIsDrum = false;
-            this._channelOctave = -1;
-            this._songKey = -1;
-            this._pitchesAreTemporary = false;
-            this._bassPitchesAreTemporary = false;
-            this._recentlyAddedPitches = [];
-            this._recentlyAddedBassPitches = [];
-            this._songLengthWhenRecordingStarted = -1;
-            this._playheadPart = -1;
-            this._bassPlayheadPart = -1;
-            this._playheadPattern = null;
-            this._bassPlayheadPattern = null;
-            this._pitchesChanged = false;
-            this._bassPitchesChanged = false;
-            this._lastNote = null;
-            this._lastBassNote = null;
-            this._recordingChange = null;
-            this._onAnimationFrame = () => {
-                window.requestAnimationFrame(this._onAnimationFrame);
-                if (this._doc.synth.recording) {
-                    let dirty = this._updateRecordedNotes();
-                    dirty = this._updateRecordedBassNotes() ? true : dirty;
-                    if (dirty) {
-                        this._doc.notifier.notifyWatchers();
-                    }
-                }
-            };
-            this._documentChanged = () => {
-                const isDrum = this._doc.song.getChannelIsNoise(this._doc.channel);
-                const octave = this._doc.song.channels[this._doc.channel].octave;
-                if (this._doc.synth.liveInputChannel != this._doc.channel || this._doc.synth.liveBassInputChannel != this._getBassOffsetChannel() || this._channelIsDrum != isDrum || this._channelOctave != octave || this._songKey != this._doc.song.key) {
-                    this._doc.synth.liveInputChannel = this._doc.channel;
-                    this._doc.synth.liveBassInputChannel = this._getBassOffsetChannel();
-                    this._channelIsDrum = isDrum;
-                    this._channelOctave = octave;
-                    this._songKey = this._doc.song.key;
-                    this.clearAllPitches();
-                    this.clearAllBassPitches();
-                }
-                this._doc.synth.liveInputInstruments = this._doc.recentPatternInstruments[this._doc.channel];
-                this._doc.synth.liveBassInputInstruments = this._doc.recentPatternInstruments[this._doc.synth.liveBassInputChannel];
-            };
-            this._doc.notifier.watch(this._documentChanged);
-            this._documentChanged();
-            window.requestAnimationFrame(this._onAnimationFrame);
-        }
-        play() {
-            this._doc.synth.play();
-            this._doc.synth.enableMetronome = false;
-            this._doc.synth.countInMetronome = false;
-            this._doc.synth.maintainLiveInput();
-        }
-        pause() {
-            this.clearAllPitches();
-            this.clearAllBassPitches();
-            if (this._recordingChange != null) {
-                if (this._doc.song.barCount > this._songLengthWhenRecordingStarted && !this._lastBarHasPatterns()) {
-                    new ChangeDeleteBars(this._doc, this._doc.song.barCount - 1, 1);
-                    new ChangeChannelBar(this._doc, this._doc.channel, this._doc.song.barCount - 1);
-                }
-                if (!this._recordingChange.isNoop()) {
-                    this._doc.record(this._recordingChange);
-                    this._recordingChange = null;
-                }
-                this._lastNote = null;
-            }
-            this._doc.synth.pause();
-            this._doc.synth.resetEffects();
-            this._doc.synth.enableMetronome = false;
-            this._doc.synth.countInMetronome = false;
-            if (this._doc.prefs.autoFollow) {
-                this._doc.synth.goToBar(this._doc.bar);
-            }
-            this._doc.synth.snapToBar();
-        }
-        record() {
-            this._doc.synth.snapToBar();
-            const playheadBar = Math.floor(this._doc.synth.playhead);
-            if (playheadBar != this._doc.bar) {
-                new ChangeChannelBar(this._doc, this._doc.channel, playheadBar);
-            }
-            if (this._pitchesAreTemporary) {
-                this.clearAllPitches();
-                this._pitchesAreTemporary = false;
-            }
-            if (this._bassPitchesAreTemporary) {
-                this.clearAllBassPitches();
-                this._bassPitchesAreTemporary = false;
-            }
-            this._doc.synth.enableMetronome = this._doc.prefs.metronomeWhileRecording;
-            this._doc.synth.countInMetronome = this._doc.prefs.metronomeCountIn;
-            this._doc.synth.startRecording();
-            this._doc.synth.maintainLiveInput();
-            this._songLengthWhenRecordingStarted = this._doc.song.barCount;
-            this._playheadPart = this._getCurrentPlayheadPart();
-            this._bassPlayheadPart = this._getCurrentPlayheadPart();
-            this._playheadPattern = null;
-            this._bassPlayheadPattern = null;
-            this._pitchesChanged = false;
-            this._bassPitchesChanged = false;
-            this._lastNote = null;
-            this._lastBassNote = null;
-            this._recentlyAddedPitches.length = 0;
-            this._recentlyAddedBassPitches.length = 0;
-            this._recordingChange = new ChangeGroup();
-            this._doc.setProspectiveChange(this._recordingChange);
-        }
-        abortRecording() {
-            this._recordingChange = null;
-            this.pause();
-        }
-        pitchesAreTemporary() {
-            return this._pitchesAreTemporary;
-        }
-        bassPitchesAreTemporary() {
-            return this._bassPitchesAreTemporary;
-        }
-        _getBassOffsetChannel() {
-            if (this._doc.channel >= this._doc.song.pitchChannelCount)
-                return this._doc.channel;
-            return Math.max(0, Math.min(this._doc.song.pitchChannelCount - 1, this._doc.channel + this._doc.prefs.bassOffset));
-        }
-        _getMinDivision() {
-            if (this._doc.prefs.snapRecordedNotesToRhythm) {
-                return Config.partsPerBeat / Config.rhythms[this._doc.song.rhythm].stepsPerBeat;
-            }
-            else {
-                return 1;
-            }
-        }
-        _getCurrentPlayheadPart() {
-            const currentPart = this._doc.synth.playhead * this._doc.song.beatsPerBar * Config.partsPerBeat;
-            if (this._doc.prefs.snapRecordedNotesToRhythm) {
-                const minDivision = this._getMinDivision();
-                return Math.round(currentPart / minDivision) * minDivision;
-            }
-            return Math.round(currentPart);
-        }
-        _lastBarHasPatterns() {
-            for (let channelIndex = 0; channelIndex < this._doc.song.getChannelCount(); channelIndex++) {
-                if (this._doc.song.channels[channelIndex].bars[this._doc.song.barCount - 1] != 0)
-                    return true;
-            }
-            return false;
-        }
-        _updateRecordedNotes() {
-            if (this._recordingChange == null)
-                return false;
-            if (!this._doc.lastChangeWas(this._recordingChange)) {
-                this.abortRecording();
-                return false;
-            }
-            if (this._doc.synth.countInMetronome) {
-                this._recentlyAddedPitches.length = 0;
-                this._pitchesChanged = false;
-                return false;
-            }
-            const partsPerBar = this._doc.song.beatsPerBar * Config.partsPerBeat;
-            const oldPart = this._playheadPart % partsPerBar;
-            const oldBar = Math.floor(this._playheadPart / partsPerBar);
-            const oldPlayheadPart = this._playheadPart;
-            this._playheadPart = this._getCurrentPlayheadPart();
-            const newPart = this._playheadPart % partsPerBar;
-            const newBar = Math.floor(this._playheadPart / partsPerBar);
-            if (oldPart == newPart && oldBar == newBar)
-                return false;
-            if (this._playheadPart < oldPlayheadPart) {
-                this._lastNote = null;
-                this._playheadPattern = null;
-                return false;
-            }
-            let dirty = false;
-            for (let bar = oldBar; bar <= newBar; bar++) {
-                if (bar != oldBar) {
-                    this._playheadPattern = null;
-                }
-                const startPart = (bar == oldBar) ? oldPart : 0;
-                const endPart = (bar == newBar) ? newPart : partsPerBar;
-                if (startPart == endPart)
-                    break;
-                if (this._lastNote != null && !this._pitchesChanged && startPart > 0 && this._doc.synth.liveInputPitches.length > 0) {
-                    this._recordingChange.append(new ChangePinTime(this._doc, this._lastNote, 1, endPart, this._lastNote.continuesLastPattern));
-                    this._doc.currentPatternIsDirty = true;
-                }
-                else {
-                    if (this._lastNote != null) {
-                        this._lastNote = null;
-                    }
-                    let noteStartPart = startPart;
-                    let noteEndPart = endPart;
-                    while (noteStartPart < endPart) {
-                        let addedAlreadyReleasedPitch = false;
-                        if (this._recentlyAddedPitches.length > 0 || this._doc.synth.liveInputPitches.length > 0) {
-                            if (this._playheadPattern == null) {
-                                this._doc.selection.erasePatternInBar(this._recordingChange, this._doc.synth.liveInputChannel, bar);
-                                this._recordingChange.append(new ChangeEnsurePatternExists(this._doc, this._doc.synth.liveInputChannel, bar));
-                                this._playheadPattern = this._doc.song.getPattern(this._doc.synth.liveInputChannel, bar);
-                            }
-                            if (this._playheadPattern == null)
-                                throw new Error();
-                            this._lastNote = new Note(-1, noteStartPart, noteEndPart, Config.noteSizeMax, this._doc.song.getChannelIsNoise(this._doc.synth.liveInputChannel));
-                            this._lastNote.continuesLastPattern = (noteStartPart == 0 && !this._pitchesChanged);
-                            this._lastNote.pitches.length = 0;
-                            while (this._recentlyAddedPitches.length > 0) {
-                                if (this._lastNote.pitches.length >= Config.maxChordSize)
-                                    break;
-                                const recentPitch = this._recentlyAddedPitches.shift();
-                                if (this._doc.synth.liveInputPitches.indexOf(recentPitch) == -1) {
-                                    this._lastNote.pitches.push(recentPitch);
-                                    addedAlreadyReleasedPitch = true;
-                                }
-                            }
-                            for (let i = 0; i < this._doc.synth.liveInputPitches.length; i++) {
-                                if (this._lastNote.pitches.length >= Config.maxChordSize)
-                                    break;
-                                this._lastNote.pitches.push(this._doc.synth.liveInputPitches[i]);
-                            }
-                            this._recordingChange.append(new ChangeNoteAdded(this._doc, this._playheadPattern, this._lastNote, this._playheadPattern.notes.length));
-                            if (addedAlreadyReleasedPitch) {
-                                noteEndPart = noteStartPart + this._getMinDivision();
-                                new ChangeNoteLength(this._doc, this._lastNote, this._lastNote.start, noteEndPart);
-                                this._lastNote = null;
-                            }
-                            dirty = true;
-                        }
-                        this._pitchesChanged = addedAlreadyReleasedPitch;
-                        noteStartPart = noteEndPart;
-                        noteEndPart = endPart;
-                    }
-                }
-                if (bar == this._doc.song.barCount - 1) {
-                    if (this._lastBarHasPatterns()) {
-                        new ChangeInsertBars(this._doc, this._doc.song.barCount, 1);
-                        this._doc.bar--;
-                        dirty = true;
-                    }
-                }
-            }
-            return dirty;
-        }
-        _updateRecordedBassNotes() {
-            if (this._recordingChange == null)
-                return false;
-            if (!this._doc.lastChangeWas(this._recordingChange)) {
-                this.abortRecording();
-                return false;
-            }
-            if (this._doc.synth.countInMetronome) {
-                this._recentlyAddedBassPitches.length = 0;
-                this._bassPitchesChanged = false;
-                return false;
-            }
-            const partsPerBar = this._doc.song.beatsPerBar * Config.partsPerBeat;
-            const oldPart = this._bassPlayheadPart % partsPerBar;
-            const oldBar = Math.floor(this._bassPlayheadPart / partsPerBar);
-            const oldPlayheadPart = this._bassPlayheadPart;
-            this._bassPlayheadPart = this._getCurrentPlayheadPart();
-            const newPart = this._bassPlayheadPart % partsPerBar;
-            const newBar = Math.floor(this._bassPlayheadPart / partsPerBar);
-            if (oldPart == newPart && oldBar == newBar)
-                return false;
-            if (this._bassPlayheadPart < oldPlayheadPart) {
-                this._lastBassNote = null;
-                this._bassPlayheadPattern = null;
-                return false;
-            }
-            let dirty = false;
-            for (let bar = oldBar; bar <= newBar; bar++) {
-                if (bar != oldBar) {
-                    this._bassPlayheadPattern = null;
-                }
-                const startPart = (bar == oldBar) ? oldPart : 0;
-                const endPart = (bar == newBar) ? newPart : partsPerBar;
-                if (startPart == endPart)
-                    break;
-                if (this._lastBassNote != null && !this._bassPitchesChanged && startPart > 0 && this._doc.synth.liveBassInputPitches.length > 0) {
-                    this._recordingChange.append(new ChangePinTime(this._doc, this._lastBassNote, 1, endPart, this._lastBassNote.continuesLastPattern));
-                    this._doc.currentPatternIsDirty = true;
-                }
-                else {
-                    if (this._lastBassNote != null) {
-                        this._lastBassNote = null;
-                    }
-                    let noteStartPart = startPart;
-                    let noteEndPart = endPart;
-                    while (noteStartPart < endPart) {
-                        let addedAlreadyReleasedPitch = false;
-                        if (this._recentlyAddedBassPitches.length > 0 || this._doc.synth.liveBassInputPitches.length > 0) {
-                            if (this._bassPlayheadPattern == null) {
-                                this._doc.selection.erasePatternInBar(this._recordingChange, this._doc.synth.liveBassInputChannel, bar);
-                                this._recordingChange.append(new ChangeEnsurePatternExists(this._doc, this._doc.synth.liveBassInputChannel, bar));
-                                this._bassPlayheadPattern = this._doc.song.getPattern(this._doc.synth.liveBassInputChannel, bar);
-                            }
-                            if (this._bassPlayheadPattern == null)
-                                throw new Error();
-                            this._lastBassNote = new Note(-1, noteStartPart, noteEndPart, Config.noteSizeMax, this._doc.song.getChannelIsNoise(this._doc.synth.liveBassInputChannel));
-                            this._lastBassNote.continuesLastPattern = (noteStartPart == 0 && !this._bassPitchesChanged);
-                            this._lastBassNote.pitches.length = 0;
-                            while (this._recentlyAddedBassPitches.length > 0) {
-                                if (this._lastBassNote.pitches.length >= Config.maxChordSize)
-                                    break;
-                                const recentPitch = this._recentlyAddedBassPitches.shift();
-                                if (this._doc.synth.liveBassInputPitches.indexOf(recentPitch) == -1) {
-                                    this._lastBassNote.pitches.push(recentPitch);
-                                    addedAlreadyReleasedPitch = true;
-                                }
-                            }
-                            for (let i = 0; i < this._doc.synth.liveBassInputPitches.length; i++) {
-                                if (this._lastBassNote.pitches.length >= Config.maxChordSize)
-                                    break;
-                                this._lastBassNote.pitches.push(this._doc.synth.liveBassInputPitches[i]);
-                            }
-                            this._recordingChange.append(new ChangeNoteAdded(this._doc, this._bassPlayheadPattern, this._lastBassNote, this._bassPlayheadPattern.notes.length));
-                            if (addedAlreadyReleasedPitch) {
-                                noteEndPart = noteStartPart + this._getMinDivision();
-                                new ChangeNoteLength(this._doc, this._lastBassNote, this._lastBassNote.start, noteEndPart);
-                                this._lastBassNote = null;
-                            }
-                            dirty = true;
-                        }
-                        this._bassPitchesChanged = addedAlreadyReleasedPitch;
-                        noteStartPart = noteEndPart;
-                        noteEndPart = endPart;
-                    }
-                }
-                if (bar == this._doc.song.barCount - 1) {
-                    if (this._lastBarHasPatterns()) {
-                        new ChangeInsertBars(this._doc, this._doc.song.barCount, 1);
-                        this._doc.bar--;
-                        dirty = true;
-                    }
-                }
-            }
-            return dirty;
-        }
-        setTemporaryPitches(pitches, duration) {
-            this._updateRecordedNotes();
-            for (let i = 0; i < pitches.length; i++) {
-                this._doc.synth.liveInputPitches[i] = pitches[i];
-            }
-            this._doc.synth.liveInputPitches.length = Math.min(pitches.length, Config.maxChordSize);
-            this._doc.synth.liveInputDuration = duration;
-            this._doc.synth.liveInputStarted = true;
-            this._pitchesAreTemporary = true;
-            this._pitchesChanged = true;
-        }
-        setTemporaryBassPitches(pitches, duration) {
-            this._updateRecordedBassNotes();
-            for (let i = 0; i < pitches.length; i++) {
-                this._doc.synth.liveBassInputPitches[i] = pitches[i];
-            }
-            this._doc.synth.liveBassInputPitches.length = Math.min(pitches.length, Config.maxChordSize);
-            this._doc.synth.liveBassInputDuration = duration;
-            this._doc.synth.liveBassInputStarted = true;
-            this._bassPitchesAreTemporary = true;
-            this._bassPitchesChanged = true;
-        }
-        addPerformedPitch(pitch) {
-            this._doc.synth.maintainLiveInput();
-            if (pitch > Piano.getBassCutoffPitch(this._doc) || this._getBassOffsetChannel() == this._doc.channel) {
-                this._updateRecordedNotes();
-                if (this._pitchesAreTemporary) {
-                    this.clearAllPitches();
-                    this._pitchesAreTemporary = false;
-                }
-                if (this._doc.prefs.ignorePerformedNotesNotInScale && !Config.scales[this._doc.song.scale].flags[pitch % Config.pitchesPerOctave]) {
-                    return;
-                }
-                if (this._doc.synth.liveInputPitches.indexOf(pitch) == -1) {
-                    this._doc.synth.liveInputPitches.push(pitch);
-                    this._pitchesChanged = true;
-                    while (this._doc.synth.liveInputPitches.length > Config.maxChordSize) {
-                        this._doc.synth.liveInputPitches.shift();
-                    }
-                    this._doc.synth.liveInputDuration = Number.MAX_SAFE_INTEGER;
-                    if (this._recordingChange != null) {
-                        const recentIndex = this._recentlyAddedPitches.indexOf(pitch);
-                        if (recentIndex != -1) {
-                            this._recentlyAddedPitches.splice(recentIndex, 1);
-                        }
-                        this._recentlyAddedPitches.push(pitch);
-                        while (this._recentlyAddedPitches.length > Config.maxChordSize * 4) {
-                            this._recentlyAddedPitches.shift();
-                        }
-                    }
-                }
-            }
-            else {
-                this._updateRecordedBassNotes();
-                if (this._bassPitchesAreTemporary) {
-                    this.clearAllBassPitches();
-                    this._bassPitchesAreTemporary = false;
-                }
-                if (this._doc.prefs.ignorePerformedNotesNotInScale && !Config.scales[this._doc.song.scale].flags[pitch % Config.pitchesPerOctave]) {
-                    return;
-                }
-                if (this._doc.synth.liveBassInputPitches.indexOf(pitch) == -1) {
-                    this._doc.synth.liveBassInputPitches.push(pitch);
-                    this._bassPitchesChanged = true;
-                    while (this._doc.synth.liveBassInputPitches.length > Config.maxChordSize) {
-                        this._doc.synth.liveBassInputPitches.shift();
-                    }
-                    this._doc.synth.liveBassInputDuration = Number.MAX_SAFE_INTEGER;
-                    if (this._recordingChange != null) {
-                        const recentIndex = this._recentlyAddedPitches.indexOf(pitch);
-                        if (recentIndex != -1) {
-                            this._recentlyAddedBassPitches.splice(recentIndex, 1);
-                        }
-                        this._recentlyAddedBassPitches.push(pitch);
-                        while (this._recentlyAddedBassPitches.length > Config.maxChordSize * 4) {
-                            this._recentlyAddedBassPitches.shift();
-                        }
-                    }
-                }
-            }
-        }
-        removePerformedPitch(pitch) {
-            if (pitch > Piano.getBassCutoffPitch(this._doc) || this._getBassOffsetChannel() == this._doc.channel) {
-                this._updateRecordedNotes();
-                for (let i = 0; i < this._doc.synth.liveInputPitches.length; i++) {
-                    if (this._doc.synth.liveInputPitches[i] == pitch) {
-                        this._doc.synth.liveInputPitches.splice(i, 1);
-                        this._pitchesChanged = true;
-                        i--;
-                    }
-                }
-            }
-            else {
-                this._updateRecordedBassNotes();
-                for (let i = 0; i < this._doc.synth.liveBassInputPitches.length; i++) {
-                    if (this._doc.synth.liveBassInputPitches[i] == pitch) {
-                        this._doc.synth.liveBassInputPitches.splice(i, 1);
-                        this._bassPitchesChanged = true;
-                        i--;
-                    }
-                }
-            }
-        }
-        clearAllPitches() {
-            this._updateRecordedNotes();
-            this._doc.synth.liveInputPitches.length = 0;
-            this._pitchesChanged = true;
-        }
-        clearAllBassPitches() {
-            this._updateRecordedBassNotes();
-            this._doc.synth.liveBassInputPitches.length = 0;
-            this._bassPitchesChanged = true;
-        }
-    }
-
-    class Selection {
-        constructor(_doc) {
-            this._doc = _doc;
-            this.boxSelectionX0 = 0;
-            this.boxSelectionY0 = 0;
-            this.boxSelectionX1 = 0;
-            this.boxSelectionY1 = 0;
-            this.digits = "";
-            this.instrumentDigits = "";
-            this.patternSelectionStart = 0;
-            this.patternSelectionEnd = 0;
-            this.patternSelectionActive = false;
-            this._changeTranspose = null;
-            this._changeTrack = null;
-            this._changeInstrument = null;
-            this._changeReorder = null;
-        }
-        toJSON() {
-            return {
-                "x0": this.boxSelectionX0,
-                "x1": this.boxSelectionX1,
-                "y0": this.boxSelectionY0,
-                "y1": this.boxSelectionY1,
-                "start": this.patternSelectionStart,
-                "end": this.patternSelectionEnd,
-            };
-        }
-        fromJSON(json) {
-            if (json == null)
-                return;
-            this.boxSelectionX0 = +json["x0"];
-            this.boxSelectionX1 = +json["x1"];
-            this.boxSelectionY0 = +json["y0"];
-            this.boxSelectionY1 = +json["y1"];
-            this.patternSelectionStart = +json["start"];
-            this.patternSelectionEnd = +json["end"];
-            this.digits = "";
-            this.instrumentDigits = "";
-            this.patternSelectionActive = this.patternSelectionStart < this.patternSelectionEnd;
-        }
-        selectionUpdated() {
-            this._doc.notifier.changed();
-            this.digits = "";
-            this.instrumentDigits = "";
-        }
-        get boxSelectionBar() {
-            return Math.min(this.boxSelectionX0, this.boxSelectionX1);
-        }
-        get boxSelectionChannel() {
-            return Math.min(this.boxSelectionY0, this.boxSelectionY1);
-        }
-        get boxSelectionWidth() {
-            return Math.abs(this.boxSelectionX0 - this.boxSelectionX1) + 1;
-        }
-        get boxSelectionHeight() {
-            return Math.abs(this.boxSelectionY0 - this.boxSelectionY1) + 1;
-        }
-        get boxSelectionActive() {
-            return this.boxSelectionWidth > 1 || this.boxSelectionHeight > 1;
-        }
-        scrollToSelectedPattern() {
-            this._doc.barScrollPos = Math.min(this._doc.bar, Math.max(this._doc.bar - (this._doc.trackVisibleBars - 1), this._doc.barScrollPos));
-            this._doc.channelScrollPos = Math.min(this._doc.channel, Math.max(this._doc.channel - (this._doc.trackVisibleChannels - 1), this._doc.channelScrollPos));
-        }
-        scrollToEndOfSelection() {
-            this._doc.barScrollPos = Math.min(this.boxSelectionX1, Math.max(this.boxSelectionX1 - (this._doc.trackVisibleBars - 1), this._doc.barScrollPos));
-            this._doc.channelScrollPos = Math.min(this.boxSelectionY1, Math.max(this.boxSelectionY1 - (this._doc.trackVisibleChannels - 1), this._doc.channelScrollPos));
-        }
-        setChannelBar(channelIndex, bar) {
-            if (channelIndex == this._doc.channel && bar == this._doc.bar)
-                return;
-            const canReplaceLastChange = this._doc.lastChangeWas(this._changeTrack);
-            this._changeTrack = new ChangeGroup();
-            this._changeTrack.append(new ChangeChannelBar(this._doc, channelIndex, bar));
-            const pattern = this._doc.getCurrentPattern(0);
-            if (pattern != null) {
-                if (pattern.instruments.indexOf(this._doc.viewedInstrument[this._doc.channel]) < 0) {
-                    this._doc.viewedInstrument[this._doc.channel] = pattern.instruments[0];
-                }
-            }
-            if (!this._doc.hasRedoHistory()) {
-                this._doc.record(this._changeTrack, canReplaceLastChange);
-            }
-            this.selectionUpdated();
-        }
-        setPattern(pattern) {
-            this._doc.record(new ChangePatternNumbers(this._doc, pattern, this.boxSelectionBar, this.boxSelectionChannel, this.boxSelectionWidth, this.boxSelectionHeight));
-        }
-        nextDigit(digit, forInstrument, forRhythms) {
-            if (forRhythms) {
-                if (digit == "3") {
-                    this._doc.record(new ChangeRhythm(this._doc, 0));
-                }
-                else if (digit == "4") {
-                    this._doc.record(new ChangeRhythm(this._doc, 1));
-                }
-                else if (digit == "6") {
-                    this._doc.record(new ChangeRhythm(this._doc, 2));
-                }
-                else if (digit == "8") {
-                    this._doc.record(new ChangeRhythm(this._doc, 3));
-                }
-                else if (digit == "0" || digit == "1") {
-                    this._doc.record(new ChangeRhythm(this._doc, 4));
-                }
-            }
-            else if (forInstrument) {
-                if (digit == "0")
-                    digit = "10";
-                this.instrumentDigits += digit;
-                var parsed = parseInt(this.instrumentDigits);
-                if (parsed != 0 && parsed <= this._doc.song.channels[this._doc.channel].instruments.length) {
-                    this.selectInstrument(parsed - 1);
-                    return;
-                }
-                this.instrumentDigits = digit;
-                parsed = parseInt(this.instrumentDigits);
-                if (parsed != 0 && parsed <= this._doc.song.channels[this._doc.channel].instruments.length) {
-                    this.selectInstrument(parsed - 1);
-                    return;
-                }
-                this.instrumentDigits = "";
-            }
-            else {
-                this.digits += digit;
-                let parsed = parseInt(this.digits);
-                if (parsed <= this._doc.song.patternsPerChannel) {
-                    this.setPattern(parsed);
-                    return;
-                }
-                this.digits = digit;
-                parsed = parseInt(this.digits);
-                if (parsed <= this._doc.song.patternsPerChannel) {
-                    this.setPattern(parsed);
-                    return;
-                }
-                this.digits = "";
-            }
-        }
-        setModChannel(mod, index) {
-            this._doc.record(new ChangeModChannel(this._doc, mod, index));
-        }
-        setModInstrument(mod, instrument) {
-            this._doc.record(new ChangeModInstrument(this._doc, mod, instrument));
-        }
-        setModSetting(mod, text) {
-            this._doc.record(new ChangeModSetting(this._doc, mod, text));
-        }
-        setModFilter(mod, type) {
-            this._doc.record(new ChangeModFilter(this._doc, mod, type));
-        }
-        setModEnvelope(mod, type) {
-            this._doc.record(new ChangeModEnvelope(this._doc, mod, type));
-        }
-        insertBars() {
-            this._doc.record(new ChangeInsertBars(this._doc, this.boxSelectionBar + this.boxSelectionWidth, this.boxSelectionWidth));
-            const width = this.boxSelectionWidth;
-            this.boxSelectionX0 += width;
-            this.boxSelectionX1 += width;
-        }
-        insertChannel() {
-            const group = new ChangeGroup();
-            const insertIndex = this.boxSelectionChannel + this.boxSelectionHeight;
-            const isNoise = this._doc.song.getChannelIsNoise(insertIndex - 1);
-            const isMod = this._doc.song.getChannelIsMod(insertIndex - 1);
-            group.append(new ChangeAddChannel(this._doc, insertIndex, isNoise, isMod));
-            if (!group.isNoop()) {
-                this.boxSelectionY0 = this.boxSelectionY1 = insertIndex;
-                group.append(new ChangeChannelBar(this._doc, insertIndex, this._doc.bar));
-                this._doc.record(group);
-            }
-        }
-        deleteBars() {
-            const group = new ChangeGroup();
-            if (this._doc.selection.patternSelectionActive) {
-                if (this.boxSelectionActive) {
-                    group.append(new ChangeDuplicateSelectedReusedPatterns(this._doc, this.boxSelectionBar, this.boxSelectionWidth, this.boxSelectionChannel, this.boxSelectionHeight, false));
-                }
-                for (const channelIndex of this._eachSelectedChannel()) {
-                    for (const pattern of this._eachSelectedPattern(channelIndex)) {
-                        group.append(new ChangeNoteTruncate(this._doc, pattern, this._doc.selection.patternSelectionStart, this._doc.selection.patternSelectionEnd));
-                    }
-                }
-                group.append(new ChangePatternSelection(this._doc, 0, 0));
-            }
-            else {
-                group.append(new ChangeDeleteBars(this._doc, this.boxSelectionBar, this.boxSelectionWidth));
-                const width = this.boxSelectionWidth;
-                this.boxSelectionX0 = Math.max(0, this.boxSelectionX0 - width);
-                this.boxSelectionX1 = Math.max(0, this.boxSelectionX1 - width);
-            }
-            this._doc.record(group);
-        }
-        deleteChannel() {
-            this._doc.record(new ChangeRemoveChannel(this._doc, this.boxSelectionChannel, this.boxSelectionChannel + this.boxSelectionHeight - 1));
-            this.boxSelectionY0 = this.boxSelectionY1 = this._doc.channel;
-            ColorConfig.resetColors();
-        }
-        *_eachSelectedChannel() {
-            for (let channelIndex = this.boxSelectionChannel; channelIndex < this.boxSelectionChannel + this.boxSelectionHeight; channelIndex++) {
-                yield channelIndex;
-            }
-        }
-        *_eachSelectedBar() {
-            for (let bar = this.boxSelectionBar; bar < this.boxSelectionBar + this.boxSelectionWidth; bar++) {
-                yield bar;
-            }
-        }
-        *_eachSelectedPattern(channelIndex) {
-            const handledPatterns = {};
-            for (const bar of this._eachSelectedBar()) {
-                const currentPatternIndex = this._doc.song.channels[channelIndex].bars[bar];
-                if (currentPatternIndex == 0)
-                    continue;
-                if (handledPatterns[String(currentPatternIndex)])
-                    continue;
-                handledPatterns[String(currentPatternIndex)] = true;
-                const pattern = this._doc.song.getPattern(channelIndex, bar);
-                if (pattern == null)
-                    throw new Error();
-                yield pattern;
-            }
-        }
-        _parseCopiedInstrumentArray(patternCopy, channelIndex) {
-            const instruments = Array.from(patternCopy["instruments"]).map(i => i >>> 0);
-            discardInvalidPatternInstruments(instruments, this._doc.song, channelIndex);
-            return instruments;
-        }
-        _patternIndexIsUnused(channelIndex, patternIndex) {
-            for (let i = 0; i < this._doc.song.barCount; i++) {
-                if (this._doc.song.channels[channelIndex].bars[i] == patternIndex) {
-                    return false;
-                }
-            }
-            return true;
-        }
-        copy() {
-            const channels = [];
-            for (const channelIndex of this._eachSelectedChannel()) {
-                const patterns = {};
-                const bars = [];
-                for (const bar of this._eachSelectedBar()) {
-                    const patternNumber = this._doc.song.channels[channelIndex].bars[bar];
-                    bars.push(patternNumber);
-                    if (patterns[String(patternNumber)] == undefined) {
-                        const pattern = this._doc.song.getPattern(channelIndex, bar);
-                        let instruments = this._doc.recentPatternInstruments[channelIndex];
-                        let notes = [];
-                        if (pattern != null) {
-                            instruments = pattern.instruments.concat();
-                            if (this.patternSelectionActive) {
-                                for (const note of pattern.cloneNotes()) {
-                                    if (note.end <= this.patternSelectionStart)
-                                        continue;
-                                    if (note.start >= this.patternSelectionEnd)
-                                        continue;
-                                    note.start -= this.patternSelectionStart;
-                                    note.end -= this.patternSelectionStart;
-                                    if (note.start < 0 || note.end > this.patternSelectionEnd - this.patternSelectionStart) {
-                                        new ChangeNoteLength(null, note, Math.max(note.start, 0), Math.min(this.patternSelectionEnd - this.patternSelectionStart, note.end));
-                                    }
-                                    notes.push(note);
-                                }
-                            }
-                            else {
-                                notes = pattern.notes;
-                            }
-                        }
-                        patterns[String(patternNumber)] = { "instruments": instruments, "notes": notes };
-                    }
-                }
-                const channelCopy = {
-                    "isNoise": this._doc.song.getChannelIsNoise(channelIndex),
-                    "isMod": this._doc.song.getChannelIsMod(channelIndex),
-                    "patterns": patterns,
-                    "bars": bars,
-                };
-                channels.push(channelCopy);
-            }
-            const selectionCopy = {
-                "partDuration": this.patternSelectionActive ? this.patternSelectionEnd - this.patternSelectionStart : this._doc.song.beatsPerBar * Config.partsPerBeat,
-                "channels": channels,
-            };
-            window.localStorage.setItem("selectionCopy", JSON.stringify(selectionCopy));
-            new ChangePatternSelection(this._doc, 0, 0);
-        }
-        _remapToNoisePitches(oldPitches) {
-            let newPitches = oldPitches.slice();
-            newPitches.sort(function (a, b) { return a - b; });
-            let lowestPitch = newPitches[0] % Config.drumCount;
-            const numberOfPitches = newPitches.length;
-            let highestPitch = lowestPitch + (numberOfPitches - 1);
-            while (highestPitch >= Config.drumCount) {
-                lowestPitch--;
-                highestPitch--;
-            }
-            for (let notePitchIndex = 0; notePitchIndex < newPitches.length; notePitchIndex++) {
-                newPitches[notePitchIndex] = notePitchIndex + lowestPitch;
-            }
-            return newPitches;
-        }
-        _convertCopiedPitchNotesToNoiseNotes(oldNotes) {
-            let newNotes = [];
-            for (let noteIndex = 0; noteIndex < oldNotes.length; noteIndex++) {
-                const oldNote = oldNotes[noteIndex];
-                const newNotePitches = this._remapToNoisePitches(oldNote["pitches"].slice());
-                const oldNotePins = oldNote.pins;
-                let newNotePins = [];
-                for (let notePinIndex = 0; notePinIndex < oldNotePins.length; notePinIndex++) {
-                    const oldPin = oldNotePins[notePinIndex];
-                    newNotePins.push({
-                        interval: oldPin.interval,
-                        time: oldPin.time,
-                        size: oldPin.size,
-                    });
-                }
-                const newNoteStart = oldNote["start"];
-                const newNoteEnd = oldNote["end"];
-                const newNoteContinuesLastPattern = oldNote["continuesLastPattern"];
-                const newNote = new Note(0, newNoteStart, newNoteEnd, 0, false);
-                newNote.pitches = newNotePitches;
-                newNote.pins = newNotePins;
-                newNote.continuesLastPattern = newNoteContinuesLastPattern;
-                newNotes.push(newNote);
-            }
-            return newNotes;
-        }
-        cutNotes() {
-            const group = new ChangeGroup();
-            const channelIndex = this.boxSelectionChannel;
-            const barIndex = this.boxSelectionBar;
-            const cutHeight = this.boxSelectionHeight;
-            const cutWidth = this.boxSelectionWidth;
-            this.copy();
-            for (let channel = channelIndex; channel < channelIndex + cutHeight; channel++) {
-                for (let bar = barIndex; bar < barIndex + cutWidth; bar++) {
-                    const patternNumber = this._doc.song.channels[channel].bars[bar];
-                    if (patternNumber != 0) {
-                        const pattern = this._doc.song.channels[channel].patterns[patternNumber - 1];
-                        group.append(new ChangeNoteTruncate(this._doc, pattern, 0, Config.partsPerBeat * this._doc.song.beatsPerBar));
-                    }
-                }
-            }
-            this._doc.record(group);
-        }
-        pasteNotes() {
-            const selectionCopy = JSON.parse(String(window.localStorage.getItem("selectionCopy")));
-            if (selectionCopy == null)
-                return;
-            const channelCopies = selectionCopy["channels"] || [];
-            const copiedPartDuration = selectionCopy["partDuration"] >>> 0;
-            const group = new ChangeGroup();
-            const fillSelection = (this.boxSelectionWidth > 1 || this.boxSelectionHeight > 1);
-            const pasteHeight = fillSelection ? this.boxSelectionHeight : Math.min(channelCopies.length, this._doc.song.getChannelCount() - this.boxSelectionChannel);
-            for (let pasteChannel = 0; pasteChannel < pasteHeight; pasteChannel++) {
-                const channelCopy = channelCopies[pasteChannel % channelCopies.length];
-                const channelIndex = this.boxSelectionChannel + pasteChannel;
-                const channelIsNoise = this._doc.song.getChannelIsNoise(channelIndex);
-                const isNoise = !!channelCopy["isNoise"];
-                const isMod = !!channelCopy["isMod"];
-                const isPitch = !isNoise && !isMod;
-                const patternCopies = channelCopy["patterns"] || {};
-                const copiedBars = channelCopy["bars"] || [];
-                if (copiedBars.length == 0)
-                    continue;
-                if (isNoise && this._doc.song.getChannelIsMod(channelIndex))
-                    continue;
-                if (isMod != this._doc.song.getChannelIsMod(channelIndex))
-                    continue;
-                const pasteWidth = fillSelection ? this.boxSelectionWidth : Math.min(copiedBars.length, this._doc.song.barCount - this.boxSelectionBar);
-                if (!fillSelection && copiedBars.length == 1 && channelCopies.length == 1) {
-                    const copiedPatternIndex = copiedBars[0] >>> 0;
-                    const bar = this.boxSelectionBar;
-                    const currentPatternIndex = this._doc.song.channels[channelIndex].bars[bar];
-                    if (copiedPatternIndex == 0 && currentPatternIndex == 0)
-                        continue;
-                    const patternCopy = patternCopies[String(copiedPatternIndex)];
-                    const instrumentsCopy = this._parseCopiedInstrumentArray(patternCopy, channelIndex);
-                    let pastedNotes = patternCopy["notes"];
-                    if (isPitch && channelIsNoise) {
-                        pastedNotes = this._convertCopiedPitchNotesToNoiseNotes(pastedNotes);
-                    }
-                    if (currentPatternIndex == 0) {
-                        const existingPattern = this._doc.song.channels[channelIndex].patterns[copiedPatternIndex - 1];
-                        if (existingPattern != undefined &&
-                            !this.patternSelectionActive &&
-                            ((comparePatternNotes(pastedNotes, existingPattern.notes) && patternsContainSameInstruments(instrumentsCopy, existingPattern.instruments)) ||
-                                this._patternIndexIsUnused(channelIndex, copiedPatternIndex))) {
-                            group.append(new ChangePatternNumbers(this._doc, copiedPatternIndex, bar, channelIndex, 1, 1));
-                        }
-                        else {
-                            group.append(new ChangeEnsurePatternExists(this._doc, channelIndex, bar));
-                        }
-                    }
-                    const pattern = this._doc.song.getPattern(channelIndex, bar);
-                    if (pattern == null)
-                        throw new Error();
-                    group.append(new ChangePaste(this._doc, pattern, pastedNotes, this.patternSelectionActive ? this.patternSelectionStart : 0, this.patternSelectionActive ? this.patternSelectionEnd : Config.partsPerBeat * this._doc.song.beatsPerBar, copiedPartDuration));
-                    if (currentPatternIndex == 0 || patternCopy.notes.length == 0 || channelIndex >= this._doc.song.pitchChannelCount + this._doc.song.noiseChannelCount) {
-                        this.selectInstrument(instrumentsCopy[0]);
-                        group.append(new ChangeSetPatternInstruments(this._doc, channelIndex, instrumentsCopy, pattern));
-                    }
-                }
-                else if (this.patternSelectionActive) {
-                    const reusablePatterns = {};
-                    const usedPatterns = {};
-                    group.append(new ChangeDuplicateSelectedReusedPatterns(this._doc, this.boxSelectionBar, pasteWidth, this.boxSelectionChannel, pasteHeight, false));
-                    for (let pasteBar = 0; pasteBar < pasteWidth; pasteBar++) {
-                        const bar = this.boxSelectionBar + pasteBar;
-                        const copiedPatternIndex = copiedBars[pasteBar % copiedBars.length] >>> 0;
-                        const currentPatternIndex = this._doc.song.channels[channelIndex].bars[bar];
-                        const reusedIndex = [copiedPatternIndex, currentPatternIndex].join(",");
-                        if (copiedPatternIndex == 0 && currentPatternIndex == 0)
-                            continue;
-                        if (reusablePatterns[reusedIndex] != undefined) {
-                            group.append(new ChangePatternNumbers(this._doc, reusablePatterns[reusedIndex], bar, channelIndex, 1, 1));
-                            continue;
-                        }
-                        if (currentPatternIndex == 0) {
-                            group.append(new ChangeEnsurePatternExists(this._doc, channelIndex, bar));
-                            const patternCopy = patternCopies[String(copiedPatternIndex)];
-                            const instrumentsCopy = this._parseCopiedInstrumentArray(patternCopy, channelIndex);
-                            const pattern = this._doc.song.getPattern(channelIndex, bar);
-                            group.append(new ChangeSetPatternInstruments(this._doc, channelIndex, instrumentsCopy, pattern));
-                        }
-                        else {
-                            const pattern = this._doc.song.getPattern(channelIndex, bar);
-                            if (pattern == null)
-                                throw new Error();
-                            if (!usedPatterns[String(currentPatternIndex)]) {
-                                usedPatterns[String(currentPatternIndex)] = true;
-                            }
-                            else {
-                                group.append(new ChangePatternNumbers(this._doc, 0, bar, channelIndex, 1, 1));
-                                group.append(new ChangeEnsurePatternExists(this._doc, channelIndex, bar));
-                                const newPattern = this._doc.song.getPattern(channelIndex, bar);
-                                if (newPattern == null)
-                                    throw new Error();
-                                for (const note of pattern.cloneNotes()) {
-                                    if (isPitch && channelIsNoise) {
-                                        note.pitches = this._remapToNoisePitches(note.pitches);
-                                    }
-                                    group.append(new ChangeNoteAdded(this._doc, newPattern, note, newPattern.notes.length, false));
-                                }
-                            }
-                        }
-                        const pattern = this._doc.song.getPattern(channelIndex, bar);
-                        if (pattern == null)
-                            throw new Error();
-                        if (copiedPatternIndex == 0) {
-                            group.append(new ChangeNoteTruncate(this._doc, pattern, this.patternSelectionStart, this.patternSelectionEnd));
-                        }
-                        else {
-                            const patternCopy = patternCopies[String(copiedPatternIndex)];
-                            let pastedNotes = patternCopy["notes"];
-                            if (isPitch && channelIsNoise) {
-                                pastedNotes = this._convertCopiedPitchNotesToNoiseNotes(pastedNotes);
-                            }
-                            group.append(new ChangePaste(this._doc, pattern, pastedNotes, this.patternSelectionStart, this.patternSelectionEnd, copiedPartDuration));
-                        }
-                        reusablePatterns[reusedIndex] = this._doc.song.channels[channelIndex].bars[bar];
-                    }
-                }
-                else {
-                    for (let pasteBar = 0; pasteBar < pasteWidth; pasteBar++) {
-                        this.erasePatternInBar(group, channelIndex, this.boxSelectionBar + pasteBar);
-                    }
-                    const reusablePatterns = {};
-                    for (let pasteBar = 0; pasteBar < pasteWidth; pasteBar++) {
-                        const bar = this.boxSelectionBar + pasteBar;
-                        const copiedPatternIndex = copiedBars[pasteBar % copiedBars.length] >>> 0;
-                        const reusedIndex = String(copiedPatternIndex);
-                        if (copiedPatternIndex == 0)
-                            continue;
-                        if (reusablePatterns[reusedIndex] != undefined) {
-                            group.append(new ChangePatternNumbers(this._doc, reusablePatterns[reusedIndex], bar, channelIndex, 1, 1));
-                            continue;
-                        }
-                        const patternCopy = patternCopies[String(copiedPatternIndex)];
-                        const instrumentsCopy = this._parseCopiedInstrumentArray(patternCopy, channelIndex);
-                        const existingPattern = this._doc.song.channels[channelIndex].patterns[copiedPatternIndex - 1];
-                        let pastedNotes = patternCopy["notes"];
-                        if (isPitch && channelIsNoise) {
-                            pastedNotes = this._convertCopiedPitchNotesToNoiseNotes(pastedNotes);
-                        }
-                        if (existingPattern != undefined &&
-                            copiedPartDuration == Config.partsPerBeat * this._doc.song.beatsPerBar &&
-                            comparePatternNotes(pastedNotes, existingPattern.notes) &&
-                            patternsContainSameInstruments(instrumentsCopy, existingPattern.instruments)) {
-                            group.append(new ChangePatternNumbers(this._doc, copiedPatternIndex, bar, channelIndex, 1, 1));
-                        }
-                        else {
-                            if (existingPattern != undefined && this._patternIndexIsUnused(channelIndex, copiedPatternIndex)) {
-                                group.append(new ChangePatternNumbers(this._doc, copiedPatternIndex, bar, channelIndex, 1, 1));
-                            }
-                            else {
-                                group.append(new ChangeEnsurePatternExists(this._doc, channelIndex, bar));
-                            }
-                            const pattern = this._doc.song.getPattern(channelIndex, bar);
-                            if (pattern == null)
-                                throw new Error();
-                            group.append(new ChangePaste(this._doc, pattern, pastedNotes, this.patternSelectionActive ? this.patternSelectionStart : 0, this.patternSelectionActive ? this.patternSelectionEnd : Config.partsPerBeat * this._doc.song.beatsPerBar, copiedPartDuration));
-                            group.append(new ChangeSetPatternInstruments(this._doc, channelIndex, instrumentsCopy, pattern));
-                        }
-                        reusablePatterns[reusedIndex] = this._doc.song.channels[channelIndex].bars[bar];
-                    }
-                }
-            }
-            this._doc.record(group);
-        }
-        erasePatternInBar(group, channelIndex, bar) {
-            const removedPattern = this._doc.song.channels[channelIndex].bars[bar];
-            if (removedPattern != 0) {
-                group.append(new ChangePatternNumbers(this._doc, 0, bar, channelIndex, 1, 1));
-                if (this._patternIndexIsUnused(channelIndex, removedPattern)) {
-                    this._doc.song.channels[channelIndex].patterns[removedPattern - 1].notes.length = 0;
-                }
-            }
-        }
-        pasteNumbers() {
-            const selectionCopy = JSON.parse(String(window.localStorage.getItem("selectionCopy")));
-            if (selectionCopy == null)
-                return;
-            const channelCopies = selectionCopy["channels"] || [];
-            const group = new ChangeGroup();
-            const fillSelection = this.boxSelectionActive;
-            const pasteHeight = fillSelection ? this.boxSelectionHeight : Math.min(channelCopies.length, this._doc.song.getChannelCount() - this.boxSelectionChannel);
-            for (let pasteChannel = 0; pasteChannel < pasteHeight; pasteChannel++) {
-                const channelCopy = channelCopies[pasteChannel % channelCopies.length];
-                const channelIndex = this.boxSelectionChannel + pasteChannel;
-                const copiedBars = channelCopy["bars"] || [];
-                if (copiedBars.length == 0)
-                    continue;
-                const pasteWidth = fillSelection ? this.boxSelectionWidth : Math.min(copiedBars.length, this._doc.song.barCount - this.boxSelectionBar);
-                for (let pasteBar = 0; pasteBar < pasteWidth; pasteBar++) {
-                    const copiedPatternIndex = copiedBars[pasteBar % copiedBars.length] >>> 0;
-                    const bar = this.boxSelectionBar + pasteBar;
-                    if (copiedPatternIndex > this._doc.song.patternsPerChannel) {
-                        group.append(new ChangePatternsPerChannel(this._doc, copiedPatternIndex));
-                    }
-                    group.append(new ChangePatternNumbers(this._doc, copiedPatternIndex, bar, channelIndex, 1, 1));
-                }
-            }
-            this._doc.record(group);
-        }
-        selectAll() {
-            new ChangePatternSelection(this._doc, 0, 0);
-            if (this.boxSelectionBar == 0 &&
-                this.boxSelectionChannel == 0 &&
-                this.boxSelectionWidth == this._doc.song.barCount &&
-                this.boxSelectionHeight == this._doc.song.getChannelCount()) {
-                this.setTrackSelection(this._doc.bar, this._doc.bar, this._doc.channel, this._doc.channel);
-            }
-            else {
-                this.setTrackSelection(0, this._doc.song.barCount - 1, 0, this._doc.song.getChannelCount() - 1);
-            }
-            this.selectionUpdated();
-        }
-        selectChannel() {
-            new ChangePatternSelection(this._doc, 0, 0);
-            if (this.boxSelectionBar == 0 && this.boxSelectionWidth == this._doc.song.barCount) {
-                this.setTrackSelection(this._doc.bar, this._doc.bar, this.boxSelectionY0, this.boxSelectionY1);
-            }
-            else {
-                this.setTrackSelection(0, this._doc.song.barCount - 1, this.boxSelectionY0, this.boxSelectionY1);
-            }
-            this.selectionUpdated();
-        }
-        duplicatePatterns(replaceUnused) {
-            this._doc.record(new ChangeDuplicateSelectedReusedPatterns(this._doc, this.boxSelectionBar, this.boxSelectionWidth, this.boxSelectionChannel, this.boxSelectionHeight, replaceUnused));
-        }
-        muteChannels(allChannels) {
-            if (allChannels) {
-                let anyMuted = false;
-                for (let channelIndex = 0; channelIndex < this._doc.song.channels.length; channelIndex++) {
-                    if (this._doc.song.channels[channelIndex].muted) {
-                        anyMuted = true;
-                        break;
-                    }
-                }
-                for (let channelIndex = 0; channelIndex < this._doc.song.channels.length; channelIndex++) {
-                    this._doc.song.channels[channelIndex].muted = !anyMuted;
-                }
-            }
-            else {
-                let anyUnmuted = false;
-                for (const channelIndex of this._eachSelectedChannel()) {
-                    if (!this._doc.song.channels[channelIndex].muted) {
-                        anyUnmuted = true;
-                        break;
-                    }
-                }
-                for (const channelIndex of this._eachSelectedChannel()) {
-                    this._doc.song.channels[channelIndex].muted = anyUnmuted;
-                }
-            }
-            this._doc.notifier.changed();
-        }
-        soloChannels(invert) {
-            let alreadySoloed = true;
-            if (this.boxSelectionChannel >= this._doc.song.pitchChannelCount + this._doc.song.noiseChannelCount) {
-                const currentChannel = this._doc.song.channels[this.boxSelectionChannel];
-                const bar = currentChannel.bars[this._doc.bar] - 1;
-                const modInstrument = (bar >= 0) ? currentChannel.instruments[currentChannel.patterns[bar].instruments[0]] : currentChannel.instruments[this._doc.viewedInstrument[this.boxSelectionChannel]];
-                const soloPattern = [];
-                let matchesSoloPattern = !invert;
-                for (let channelIndex = 0; channelIndex < this._doc.song.pitchChannelCount + this._doc.song.noiseChannelCount; channelIndex++) {
-                    soloPattern[channelIndex] = false;
-                    for (let mod = 0; mod < Config.modCount; mod++) {
-                        if (modInstrument.modChannels[mod] == channelIndex) {
-                            soloPattern[channelIndex] = true;
-                        }
-                    }
-                }
-                for (let channelIndex = 0; channelIndex < this._doc.song.pitchChannelCount + this._doc.song.noiseChannelCount; channelIndex++) {
-                    if (this._doc.song.channels[channelIndex].muted == soloPattern[channelIndex]) {
-                        matchesSoloPattern = invert;
-                        break;
-                    }
-                }
-                for (let channelIndex = 0; channelIndex < this._doc.song.pitchChannelCount + this._doc.song.noiseChannelCount; channelIndex++) {
-                    if (matchesSoloPattern) {
-                        this._doc.song.channels[channelIndex].muted = false;
-                    }
-                    else {
-                        this._doc.song.channels[channelIndex].muted = !soloPattern[channelIndex];
-                    }
-                }
-            }
-            else {
-                for (let channelIndex = 0; channelIndex < this._doc.song.pitchChannelCount + this._doc.song.noiseChannelCount; channelIndex++) {
-                    const shouldBeMuted = (channelIndex < this.boxSelectionChannel || channelIndex >= this.boxSelectionChannel + this.boxSelectionHeight) ? !invert : invert;
-                    if (this._doc.song.channels[channelIndex].muted != shouldBeMuted) {
-                        alreadySoloed = false;
-                        break;
-                    }
-                }
-                if (alreadySoloed) {
-                    for (let channelIndex = 0; channelIndex < this._doc.song.channels.length; channelIndex++) {
-                        this._doc.song.channels[channelIndex].muted = false;
-                    }
-                }
-                else {
-                    for (let channelIndex = 0; channelIndex < this._doc.song.pitchChannelCount + this._doc.song.noiseChannelCount; channelIndex++) {
-                        this._doc.song.channels[channelIndex].muted = (channelIndex < this.boxSelectionChannel || channelIndex >= this.boxSelectionChannel + this.boxSelectionHeight) ? !invert : invert;
-                    }
-                }
-            }
-            this._doc.notifier.changed();
-        }
-        forceRhythm() {
-            const group = new ChangeGroup();
-            if (this.boxSelectionActive) {
-                group.append(new ChangeDuplicateSelectedReusedPatterns(this._doc, this.boxSelectionBar, this.boxSelectionWidth, this.boxSelectionChannel, this.boxSelectionHeight, false));
-            }
-            for (const channelIndex of this._eachSelectedChannel()) {
-                for (const pattern of this._eachSelectedPattern(channelIndex)) {
-                    group.append(new ChangePatternRhythm(this._doc, pattern));
-                }
-            }
-            this._doc.record(group);
-        }
-        forceScale() {
-            const group = new ChangeGroup();
-            if (this.boxSelectionActive) {
-                group.append(new ChangeDuplicateSelectedReusedPatterns(this._doc, this.boxSelectionBar, this.boxSelectionWidth, this.boxSelectionChannel, this.boxSelectionHeight, false));
-            }
-            const scaleFlags = [true, false, false, false, false, false, false, false, false, false, false, false];
-            for (const channelIndex of this._eachSelectedChannel()) {
-                if (this._doc.song.getChannelIsNoise(channelIndex) || this._doc.song.getChannelIsMod(channelIndex))
-                    continue;
-                for (const pattern of this._eachSelectedPattern(channelIndex)) {
-                    unionOfUsedNotes(pattern, scaleFlags);
-                }
-            }
-            const scaleMap = generateScaleMap(scaleFlags, this._doc.song.scale, this._doc.song.scaleCustom);
-            for (const channelIndex of this._eachSelectedChannel()) {
-                if (this._doc.song.getChannelIsNoise(channelIndex) || this._doc.song.getChannelIsMod(channelIndex))
-                    continue;
-                for (const pattern of this._eachSelectedPattern(channelIndex)) {
-                    group.append(new ChangePatternScale(this._doc, pattern, scaleMap));
-                }
-            }
-            this._doc.record(group);
-        }
-        setTrackSelection(newX0, newX1, newY0, newY1) {
-            const canReplaceLastChange = true;
-            this._changeTrack = new ChangeGroup();
-            this._changeTrack.append(new ChangeTrackSelection(this._doc, newX0, newX1, newY0, newY1));
-            this._doc.record(this._changeTrack, canReplaceLastChange);
-        }
-        transpose(upward, octave) {
-            const canReplaceLastChange = this._doc.lastChangeWas(this._changeTranspose);
-            this._changeTranspose = new ChangeGroup();
-            if (this.boxSelectionActive) {
-                this._changeTranspose.append(new ChangeDuplicateSelectedReusedPatterns(this._doc, this.boxSelectionBar, this.boxSelectionWidth, this.boxSelectionChannel, this.boxSelectionHeight, false));
-            }
-            for (const channelIndex of this._eachSelectedChannel()) {
-                if (channelIndex >= this._doc.song.pitchChannelCount + this._doc.song.noiseChannelCount)
-                    continue;
-                for (const pattern of this._eachSelectedPattern(channelIndex)) {
-                    this._changeTranspose.append(new ChangeTranspose(this._doc, channelIndex, pattern, upward, this._doc.prefs.notesOutsideScale, octave));
-                }
-            }
-            this._doc.record(this._changeTranspose, canReplaceLastChange);
-        }
-        swapChannels(offset) {
-            const possibleSectionBoundaries = [
-                this._doc.song.pitchChannelCount,
-                this._doc.song.pitchChannelCount + this._doc.song.noiseChannelCount,
-                this._doc.song.pitchChannelCount + this._doc.song.noiseChannelCount + this._doc.song.modChannelCount,
-                this._doc.song.getChannelCount(),
-            ];
-            let channelSectionMin = 0;
-            let channelSectionMax = 0;
-            for (const nextBoundary of possibleSectionBoundaries) {
-                if ((this.boxSelectionChannel < nextBoundary && offset < 0) || (this.boxSelectionChannel + this.boxSelectionHeight <= nextBoundary)) {
-                    channelSectionMax = nextBoundary - 1;
-                    break;
-                }
-                channelSectionMin = nextBoundary;
-            }
-            const newSelectionMin = Math.max(this.boxSelectionChannel, channelSectionMin);
-            const newSelectionMax = Math.min(this.boxSelectionChannel + this.boxSelectionHeight - 1, channelSectionMax);
-            offset = Math.max(offset, channelSectionMin - newSelectionMin);
-            offset = Math.min(offset, channelSectionMax - newSelectionMax);
-            if (offset != 0) {
-                const canReplaceLastChange = this._doc.lastChangeWas(this._changeReorder);
-                this._changeReorder = new ChangeGroup();
-                this.boxSelectionY0 = newSelectionMin + offset;
-                this.boxSelectionY1 = newSelectionMax + offset;
-                this._changeReorder.append(new ChangeChannelOrder(this._doc, newSelectionMin, newSelectionMax, offset));
-                this._changeReorder.append(new ChangeChannelBar(this._doc, Math.max(this.boxSelectionY0, Math.min(this.boxSelectionY1, this._doc.channel + offset)), this._doc.bar));
-                this.selectionUpdated();
-                this._doc.record(this._changeReorder, canReplaceLastChange);
-            }
-        }
-        selectInstrument(instrument) {
-            if (this._doc.viewedInstrument[this._doc.channel] == instrument) {
-                if (this._doc.song.layeredInstruments && this._doc.song.patternInstruments && this._doc.channel < this._doc.song.pitchChannelCount + this._doc.song.noiseChannelCount) {
-                    const canReplaceLastChange = this._doc.lastChangeWas(this._changeInstrument);
-                    this._changeInstrument = new ChangeGroup();
-                    const instruments = this._doc.recentPatternInstruments[this._doc.channel];
-                    this._doc.notifier.changed();
-                    if (instruments.indexOf(instrument) == -1) {
-                        instruments.push(instrument);
-                        const maxLayers = this._doc.song.getMaxInstrumentsPerPattern(this._doc.channel);
-                        if (instruments.length > maxLayers) {
-                            instruments.splice(0, instruments.length - maxLayers);
-                        }
-                    }
-                    else {
-                        instruments.splice(instruments.indexOf(instrument), 1);
-                        if (instruments.length == 0)
-                            instruments[0] = 0;
-                    }
-                    if (this.boxSelectionActive) {
-                        this._changeInstrument.append(new ChangeDuplicateSelectedReusedPatterns(this._doc, this.boxSelectionBar, this.boxSelectionWidth, this.boxSelectionChannel, this.boxSelectionHeight, false));
-                    }
-                    for (const channelIndex of this._eachSelectedChannel()) {
-                        for (const pattern of this._eachSelectedPattern(channelIndex)) {
-                            this._changeInstrument.append(new ChangeSetPatternInstruments(this._doc, channelIndex, instruments, pattern));
-                        }
-                    }
-                    if (!this._changeInstrument.isNoop())
-                        this._doc.record(this._changeInstrument, canReplaceLastChange);
-                }
-            }
-            else {
-                const canReplaceLastChange = this._doc.lastChangeWas(this._changeInstrument);
-                this._changeInstrument = new ChangeGroup();
-                this._changeInstrument.append(new ChangeViewInstrument(this._doc, instrument));
-                if (!(this._doc.song.layeredInstruments && this._doc.channel < this._doc.song.pitchChannelCount + this._doc.song.noiseChannelCount) && this._doc.song.patternInstruments) {
-                    if (this.boxSelectionActive) {
-                        this._changeInstrument.append(new ChangeDuplicateSelectedReusedPatterns(this._doc, this.boxSelectionBar, this.boxSelectionWidth, this.boxSelectionChannel, this.boxSelectionHeight, false));
-                    }
-                    const instruments = [instrument];
-                    for (const channelIndex of this._eachSelectedChannel()) {
-                        for (const pattern of this._eachSelectedPattern(channelIndex)) {
-                            this._changeInstrument.append(new ChangeSetPatternInstruments(this._doc, channelIndex, instruments, pattern));
-                        }
-                    }
-                    this._doc.record(this._changeInstrument, canReplaceLastChange);
-                }
-                else if (!this._doc.hasRedoHistory()) {
-                    this._doc.record(this._changeInstrument, canReplaceLastChange);
-                }
-            }
-        }
-        resetBoxSelection() {
-            this.boxSelectionX0 = this.boxSelectionX1 = this._doc.bar;
-            this.boxSelectionY0 = this.boxSelectionY1 = this._doc.channel;
-        }
-    }
-
-    class Preferences {
-        constructor() {
-            this.showFifth = true;
-            this.volume = 75;
-            this.visibleOctaves = Preferences.defaultVisibleOctaves;
-            this.reload();
-        }
-        reload() {
-            this.autoPlay = window.localStorage.getItem("autoPlay") == "true";
-            this.autoFollow = window.localStorage.getItem("autoFollow") != "false";
-            this.enableNotePreview = window.localStorage.getItem("enableNotePreview") != "false";
-            this.showFifth = window.localStorage.getItem("showFifth") == "true";
-            this.notesOutsideScale = window.localStorage.getItem("notesOutsideScale") == "true";
-            this.showLetters = window.localStorage.getItem("showLetters") == "true";
-            this.showChannels = window.localStorage.getItem("showChannels") == "true";
-            this.showScrollBar = window.localStorage.getItem("showScrollBar") != "false";
-            this.alwaysFineNoteVol = window.localStorage.getItem("alwaysFineNoteVol") == "true";
-            this.displayVolumeBar = window.localStorage.getItem("displayVolumeBar") != "false";
-            this.instrumentCopyPaste = window.localStorage.getItem("instrumentCopyPaste") != "false";
-            this.instrumentImportExport = window.localStorage.getItem("instrumentImportExport") == "true";
-            this.instrumentButtonsAtTop = window.localStorage.getItem("instrumentButtonsAtTop") == "true";
-            this.enableChannelMuting = window.localStorage.getItem("enableChannelMuting") != "false";
-            this.displayBrowserUrl = window.localStorage.getItem("displayBrowserUrl") != "false";
-            this.pressControlForShortcuts = window.localStorage.getItem("pressControlForShortcuts") == "true";
-            this.enableMidi = window.localStorage.getItem("enableMidi") != "false";
-            this.showRecordButton = window.localStorage.getItem("showRecordButton") == "true";
-            this.snapRecordedNotesToRhythm = window.localStorage.getItem("snapRecordedNotesToRhythm") == "true";
-            this.ignorePerformedNotesNotInScale = window.localStorage.getItem("ignorePerformedNotesNotInScale") == "true";
-            this.metronomeCountIn = window.localStorage.getItem("metronomeCountIn") != "false";
-            this.metronomeWhileRecording = window.localStorage.getItem("metronomeWhileRecording") != "false";
-            this.notesFlashWhenPlayed = window.localStorage.getItem("notesFlashWhenPlayed") == "true";
-            this.showOscilloscope = window.localStorage.getItem("showOscilloscope") == "true";
-            this.showSampleLoadingStatus = window.localStorage.getItem("showSampleLoadingStatus") != "false";
-            this.showDescription = window.localStorage.getItem("showDescription") != "false";
-            this.showInstrumentScrollbars = window.localStorage.getItem("showInstrumentScrollbars") == "true";
-            this.closePromptByClickoff = window.localStorage.getItem("closePromptByClickoff") == "true";
-            this.frostedGlassBackground = window.localStorage.getItem("frostedGlassBackground") == "true";
-            this.keyboardLayout = window.localStorage.getItem("keyboardLayout") || "wickiHayden";
-            this.bassOffset = (+window.localStorage.getItem("bassOffset")) || 0;
-            this.layout = window.localStorage.getItem("layout") || "small";
-            this.colorTheme = window.localStorage.getItem("colorTheme") || ColorConfig.defaultTheme;
-            this.customTheme = window.localStorage.getItem("customTheme");
-            this.customTheme2 = window.localStorage.getItem("customTheme2");
-            this.visibleOctaves = (window.localStorage.getItem("visibleOctaves") >>> 0) || Preferences.defaultVisibleOctaves;
-            const defaultScale = Config.scales.dictionary[window.localStorage.getItem("defaultScale")];
-            this.defaultScale = (defaultScale != undefined) ? defaultScale.index : 0;
-            if (window.localStorage.getItem("volume") != null) {
-                this.volume = Math.min(window.localStorage.getItem("volume") >>> 0, 75);
-            }
-            if (window.localStorage.getItem("fullScreen") != null) {
-                if (window.localStorage.getItem("fullScreen") == "true")
-                    this.layout = "long";
-                window.localStorage.removeItem("fullScreen");
-            }
-        }
-        save() {
-            window.localStorage.setItem("autoPlay", this.autoPlay ? "true" : "false");
-            window.localStorage.setItem("autoFollow", this.autoFollow ? "true" : "false");
-            window.localStorage.setItem("enableNotePreview", this.enableNotePreview ? "true" : "false");
-            window.localStorage.setItem("showFifth", this.showFifth ? "true" : "false");
-            window.localStorage.setItem("notesOutsideScale", this.notesOutsideScale ? "true" : "false");
-            window.localStorage.setItem("defaultScale", Config.scales[this.defaultScale].name);
-            window.localStorage.setItem("showLetters", this.showLetters ? "true" : "false");
-            window.localStorage.setItem("showChannels", this.showChannels ? "true" : "false");
-            window.localStorage.setItem("showScrollBar", this.showScrollBar ? "true" : "false");
-            window.localStorage.setItem("alwaysFineNoteVol", this.alwaysFineNoteVol ? "true" : "false");
-            window.localStorage.setItem("displayVolumeBar", this.displayVolumeBar ? "true" : "false");
-            window.localStorage.setItem("enableChannelMuting", this.enableChannelMuting ? "true" : "false");
-            window.localStorage.setItem("instrumentCopyPaste", this.instrumentCopyPaste ? "true" : "false");
-            window.localStorage.setItem("instrumentImportExport", this.instrumentImportExport ? "true" : "false");
-            window.localStorage.setItem("instrumentButtonsAtTop", this.instrumentButtonsAtTop ? "true" : "false");
-            window.localStorage.setItem("displayBrowserUrl", this.displayBrowserUrl ? "true" : "false");
-            window.localStorage.setItem("pressControlForShortcuts", this.pressControlForShortcuts ? "true" : "false");
-            window.localStorage.setItem("enableMidi", this.enableMidi ? "true" : "false");
-            window.localStorage.setItem("showRecordButton", this.showRecordButton ? "true" : "false");
-            window.localStorage.setItem("snapRecordedNotesToRhythm", this.snapRecordedNotesToRhythm ? "true" : "false");
-            window.localStorage.setItem("ignorePerformedNotesNotInScale", this.ignorePerformedNotesNotInScale ? "true" : "false");
-            window.localStorage.setItem("metronomeCountIn", this.metronomeCountIn ? "true" : "false");
-            window.localStorage.setItem("metronomeWhileRecording", this.metronomeWhileRecording ? "true" : "false");
-            window.localStorage.setItem("notesFlashWhenPlayed", this.notesFlashWhenPlayed ? "true" : "false");
-            window.localStorage.setItem("showOscilloscope", this.showOscilloscope ? "true" : "false");
-            window.localStorage.setItem("showSampleLoadingStatus", this.showSampleLoadingStatus ? "true" : "false");
-            window.localStorage.setItem("showDescription", this.showDescription ? "true" : "false");
-            window.localStorage.setItem("showInstrumentScrollbars", this.showInstrumentScrollbars ? "true" : "false");
-            window.localStorage.setItem("closePromptByClickoff", this.closePromptByClickoff ? "true" : "false");
-            window.localStorage.setItem("frostedGlassBackground", this.frostedGlassBackground ? "true" : "false");
-            window.localStorage.setItem("keyboardLayout", this.keyboardLayout);
-            window.localStorage.setItem("bassOffset", String(this.bassOffset));
-            window.localStorage.setItem("layout", this.layout);
-            window.localStorage.setItem("colorTheme", this.colorTheme);
-            window.localStorage.setItem("customTheme", this.customTheme);
-            window.localStorage.setItem("customTheme2", this.customTheme2);
-            window.localStorage.setItem("volume", String(this.volume));
-            window.localStorage.setItem("visibleOctaves", String(this.visibleOctaves));
-        }
-    }
-    Preferences.defaultVisibleOctaves = 3;
-
-    class ChangeNotifier {
-        constructor() {
-            this._watchers = [];
-            this._dirty = false;
-        }
-        watch(watcher) {
-            if (this._watchers.indexOf(watcher) == -1) {
-                this._watchers.push(watcher);
-            }
-        }
-        unwatch(watcher) {
-            const index = this._watchers.indexOf(watcher);
-            if (index != -1) {
-                this._watchers.splice(index, 1);
-            }
-        }
-        changed() {
-            this._dirty = true;
-        }
-        notifyWatchers() {
-            if (!this._dirty)
-                return;
-            this._dirty = false;
-            for (const watcher of this._watchers.concat()) {
-                watcher();
-            }
-        }
-    }
-
-    class SongDocument {
-        constructor() {
-            this.notifier = new ChangeNotifier();
-            this.selection = new Selection(this);
-            this.prefs = new Preferences();
-            this.channel = 0;
-            this.muteEditorChannel = 0;
-            this.bar = 0;
-            this.recentPatternInstruments = [];
-            this.viewedInstrument = [];
-            this.recordingModulators = false;
-            this.continuingModRecordingChange = null;
-            this.trackVisibleBars = 16;
-            this.trackVisibleChannels = 4;
-            this.barScrollPos = 0;
-            this.channelScrollPos = 0;
-            this.prompt = null;
-            this.addedEffect = false;
-            this.addedEnvelope = false;
-            this.currentPatternIsDirty = false;
-            this._recovery = new SongRecovery();
-            this._recentChange = null;
-            this._sequenceNumber = 0;
-            this._lastSequenceNumber = 0;
-            this._stateShouldBePushed = false;
-            this._recordedNewSong = false;
-            this._waitingToUpdateState = false;
-            this._whenHistoryStateChanged = () => {
-                if (this.synth.recording) {
-                    this.performance.abortRecording();
-                }
-                if (window.history.state == null && window.location.hash != "") {
-                    this._sequenceNumber++;
-                    this._resetSongRecoveryUid();
-                    const state = { canUndo: true, sequenceNumber: this._sequenceNumber, bar: this.bar, channel: this.channel, instrument: this.viewedInstrument[this.channel], recoveryUid: this._recoveryUid, prompt: null, selection: this.selection.toJSON() };
-                    try {
-                        new ChangeSong(this, this._getHash());
-                    }
-                    catch (error) {
-                        errorAlert(error);
-                    }
-                    this.prompt = state.prompt;
-                    if (this.prefs.displayBrowserUrl) {
-                        this._replaceState(state, this.song.toBase64String());
-                    }
-                    else {
-                        this._pushState(state, this.song.toBase64String());
-                    }
-                    this.forgetLastChange();
-                    this.notifier.notifyWatchers();
-                    this.synth.pause();
-                    this.synth.goToBar(0);
-                    return;
-                }
-                const state = this._getHistoryState();
-                if (state == null)
-                    throw new Error("History state is null.");
-                if (state.sequenceNumber == this._sequenceNumber)
-                    return;
-                this.bar = state.bar;
-                this.channel = state.channel;
-                this.viewedInstrument[this.channel] = state.instrument;
-                this._sequenceNumber = state.sequenceNumber;
-                this.prompt = state.prompt;
-                try {
-                    new ChangeSong(this, this._getHash());
-                }
-                catch (error) {
-                    errorAlert(error);
-                }
-                this._recoveryUid = state.recoveryUid;
-                this.selection.fromJSON(state.selection);
-                this.forgetLastChange();
-                this.notifier.notifyWatchers();
-            };
-            this._cleanDocument = () => {
-                this.notifier.notifyWatchers();
-            };
-            this._cleanDocumentIfNotRecordingMods = () => {
-                if (!this.recordingModulators)
-                    this.notifier.notifyWatchers();
-                else {
-                    this.modRecordingHandler();
-                }
-            };
-            this._validateDocState = () => {
-                const channelCount = this.song.getChannelCount();
-                for (let i = this.recentPatternInstruments.length; i < channelCount; i++) {
-                    this.recentPatternInstruments[i] = [0];
-                }
-                this.recentPatternInstruments.length = channelCount;
-                for (let i = 0; i < channelCount; i++) {
-                    if (i == this.channel) {
-                        if (this.song.patternInstruments) {
-                            const pattern = this.song.getPattern(this.channel, this.bar);
-                            if (pattern != null) {
-                                this.recentPatternInstruments[i] = pattern.instruments.concat();
-                            }
-                        }
-                        else {
-                            const channel = this.song.channels[this.channel];
-                            for (let j = 0; j < channel.instruments.length; j++) {
-                                this.recentPatternInstruments[i][j] = j;
-                            }
-                            this.recentPatternInstruments[i].length = channel.instruments.length;
-                        }
-                    }
-                    discardInvalidPatternInstruments(this.recentPatternInstruments[i], this.song, i);
-                }
-                for (let i = this.viewedInstrument.length; i < channelCount; i++) {
-                    this.viewedInstrument[i] = 0;
-                }
-                this.viewedInstrument.length = channelCount;
-                for (let i = 0; i < channelCount; i++) {
-                    if (this.song.patternInstruments && !this.song.layeredInstruments && i == this.channel) {
-                        const pattern = this.song.getPattern(this.channel, this.bar);
-                        if (pattern != null) {
-                            this.viewedInstrument[i] = pattern.instruments[0];
-                        }
-                    }
-                    this.viewedInstrument[i] = Math.min(this.viewedInstrument[i] | 0, this.song.channels[i].instruments.length - 1);
-                }
-                const highlightedPattern = this.getCurrentPattern();
-                if (highlightedPattern != null && this.song.patternInstruments) {
-                    this.recentPatternInstruments[this.channel] = highlightedPattern.instruments.concat();
-                }
-                if ((!this.synth.playing && (this.bar < this.selection.boxSelectionBar || this.selection.boxSelectionBar + this.selection.boxSelectionWidth <= this.bar)) ||
-                    this.channel < this.selection.boxSelectionChannel ||
-                    this.selection.boxSelectionChannel + this.selection.boxSelectionHeight <= this.channel ||
-                    this.song.barCount < this.selection.boxSelectionBar + this.selection.boxSelectionWidth ||
-                    channelCount < this.selection.boxSelectionChannel + this.selection.boxSelectionHeight ||
-                    (this.selection.boxSelectionWidth == 1 && this.selection.boxSelectionHeight == 1)) {
-                    this.selection.resetBoxSelection();
-                }
-                this.barScrollPos = Math.max(0, Math.min(this.song.barCount - this.trackVisibleBars, this.barScrollPos));
-                this.channelScrollPos = Math.max(0, Math.min(this.song.getChannelCount() - this.trackVisibleChannels, this.channelScrollPos));
-            };
-            this._updateHistoryState = () => {
-                this._waitingToUpdateState = false;
-                let hash;
-                try {
-                    hash = this.song.toBase64String();
-                }
-                catch (error) {
-                    errorAlert(error);
-                    return;
-                }
-                if (this._stateShouldBePushed)
-                    this._sequenceNumber++;
-                if (this._recordedNewSong) {
-                    this._resetSongRecoveryUid();
-                }
-                else {
-                    this._recovery.saveVersion(this._recoveryUid, this.song.title, hash);
-                }
-                let state = { canUndo: true, sequenceNumber: this._sequenceNumber, bar: this.bar, channel: this.channel, instrument: this.viewedInstrument[this.channel], recoveryUid: this._recoveryUid, prompt: this.prompt, selection: this.selection.toJSON() };
-                if (this._stateShouldBePushed) {
-                    this._pushState(state, hash);
-                }
-                else {
-                    this._replaceState(state, hash);
-                }
-                this._stateShouldBePushed = false;
-                this._recordedNewSong = false;
-            };
-            this.notifier.watch(this._validateDocState);
-            ColorConfig.setTheme(this.prefs.colorTheme);
-            Layout.setLayout(this.prefs.layout);
-            if (window.sessionStorage.getItem("currentUndoIndex") == null) {
-                window.sessionStorage.setItem("currentUndoIndex", "0");
-                window.sessionStorage.setItem("oldestUndoIndex", "0");
-                window.sessionStorage.setItem("newestUndoIndex", "0");
-            }
-            let songString = window.location.hash;
-            if (songString == "") {
-                songString = this._getHash();
-            }
-            try {
-                this.song = new Song(songString);
-                if (songString == "" || songString == undefined) {
-                    setDefaultInstruments(this.song);
-                    this.song.scale = this.prefs.defaultScale;
-                }
-            }
-            catch (error) {
-                errorAlert(error);
-            }
-            songString = this.song.toBase64String();
-            this.synth = new Synth(this.song);
-            this.synth.volume = this._calcVolume();
-            this.synth.anticipatePoorPerformance = isMobile;
-            let state = this._getHistoryState();
-            if (state == null) {
-                state = { canUndo: false, sequenceNumber: 0, bar: 0, channel: 0, instrument: 0, recoveryUid: generateUid(), prompt: null, selection: this.selection.toJSON() };
-            }
-            if (state.recoveryUid == undefined)
-                state.recoveryUid = generateUid();
-            this._replaceState(state, songString);
-            window.addEventListener("hashchange", this._whenHistoryStateChanged);
-            window.addEventListener("popstate", this._whenHistoryStateChanged);
-            this.bar = state.bar | 0;
-            this.channel = state.channel | 0;
-            for (let i = 0; i <= this.channel; i++)
-                this.viewedInstrument[i] = 0;
-            this.viewedInstrument[this.channel] = state.instrument | 0;
-            this._recoveryUid = state.recoveryUid;
-            this.prompt = state.prompt;
-            this.selection.fromJSON(state.selection);
-            this.selection.scrollToSelectedPattern();
-            for (const eventName of ["change", "click", "keyup", "mousedown", "mouseup", "touchstart", "touchmove", "touchend", "touchcancel"]) {
-                window.addEventListener(eventName, this._cleanDocument);
-            }
-            for (const eventName of ["keydown", "input", "mousemove"]) {
-                window.addEventListener(eventName, this._cleanDocumentIfNotRecordingMods);
-            }
-            this._validateDocState();
-            this.performance = new SongPerformance(this);
-        }
-        toggleDisplayBrowserUrl() {
-            const state = this._getHistoryState();
-            if (state == null)
-                throw new Error("History state is null.");
-            this.prefs.displayBrowserUrl = !this.prefs.displayBrowserUrl;
-            this._replaceState(state, this.song.toBase64String());
-        }
-        _getHistoryState() {
-            if (this.prefs.displayBrowserUrl) {
-                return window.history.state;
-            }
-            else {
-                const json = JSON.parse(window.sessionStorage.getItem(window.sessionStorage.getItem("currentUndoIndex")));
-                return json == null ? null : json.state;
-            }
-        }
-        _getHash() {
-            if (this.prefs.displayBrowserUrl) {
-                return window.location.hash;
-            }
-            else {
-                const json = JSON.parse(window.sessionStorage.getItem(window.sessionStorage.getItem("currentUndoIndex")));
-                return json == null ? "" : json.hash;
-            }
-        }
-        _replaceState(state, hash) {
-            if (this.prefs.displayBrowserUrl) {
-                window.history.replaceState(state, "", "#" + hash);
-            }
-            else {
-                window.sessionStorage.setItem(window.sessionStorage.getItem("currentUndoIndex") || "0", JSON.stringify({ state, hash }));
-                window.history.replaceState(null, "", location.pathname);
-            }
-        }
-        _pushState(state, hash) {
-            if (this.prefs.displayBrowserUrl) {
-                window.history.pushState(state, "", "#" + hash);
-            }
-            else {
-                let currentIndex = Number(window.sessionStorage.getItem("currentUndoIndex"));
-                let oldestIndex = Number(window.sessionStorage.getItem("oldestUndoIndex"));
-                currentIndex = (currentIndex + 1) % SongDocument._maximumUndoHistory;
-                window.sessionStorage.setItem("currentUndoIndex", String(currentIndex));
-                window.sessionStorage.setItem("newestUndoIndex", String(currentIndex));
-                if (currentIndex == oldestIndex) {
-                    oldestIndex = (oldestIndex + 1) % SongDocument._maximumUndoHistory;
-                    window.sessionStorage.setItem("oldestUndoIndex", String(oldestIndex));
-                }
-                window.sessionStorage.setItem(String(currentIndex), JSON.stringify({ state, hash }));
-                window.history.replaceState(null, "", location.pathname);
-            }
-            this._lastSequenceNumber = state.sequenceNumber;
-        }
-        hasRedoHistory() {
-            return this._lastSequenceNumber > this._sequenceNumber;
-        }
-        _forward() {
-            if (this.prefs.displayBrowserUrl) {
-                window.history.forward();
-            }
-            else {
-                let currentIndex = Number(window.sessionStorage.getItem("currentUndoIndex"));
-                let newestIndex = Number(window.sessionStorage.getItem("newestUndoIndex"));
-                if (currentIndex != newestIndex) {
-                    currentIndex = (currentIndex + 1) % SongDocument._maximumUndoHistory;
-                    window.sessionStorage.setItem("currentUndoIndex", String(currentIndex));
-                    setTimeout(this._whenHistoryStateChanged);
-                }
-            }
-        }
-        _back() {
-            if (this.prefs.displayBrowserUrl) {
-                window.history.back();
-            }
-            else {
-                let currentIndex = Number(window.sessionStorage.getItem("currentUndoIndex"));
-                let oldestIndex = Number(window.sessionStorage.getItem("oldestUndoIndex"));
-                if (currentIndex != oldestIndex) {
-                    currentIndex = (currentIndex + SongDocument._maximumUndoHistory - 1) % SongDocument._maximumUndoHistory;
-                    window.sessionStorage.setItem("currentUndoIndex", String(currentIndex));
-                    setTimeout(this._whenHistoryStateChanged);
-                }
-            }
-        }
-        record(change, replace = false, newSong = false) {
-            if (change.isNoop()) {
-                this._recentChange = null;
-                if (replace)
-                    this._back();
-            }
-            else {
-                change.commit();
-                this._recentChange = change;
-                this._stateShouldBePushed = this._stateShouldBePushed || !replace;
-                this._recordedNewSong = this._recordedNewSong || newSong;
-                if (!this._waitingToUpdateState) {
-                    window.requestAnimationFrame(this._updateHistoryState);
-                    this._waitingToUpdateState = true;
-                }
-            }
-        }
-        _resetSongRecoveryUid() {
-            this._recoveryUid = generateUid();
-        }
-        openPrompt(prompt) {
-            this.prompt = prompt;
-            const hash = this.song.toBase64String();
-            this._sequenceNumber++;
-            const state = { canUndo: true, sequenceNumber: this._sequenceNumber, bar: this.bar, channel: this.channel, instrument: this.viewedInstrument[this.channel], recoveryUid: this._recoveryUid, prompt: this.prompt, selection: this.selection.toJSON() };
-            this._pushState(state, hash);
-        }
-        undo() {
-            const state = this._getHistoryState();
-            if (state == null || state.canUndo)
-                this._back();
-        }
-        redo() {
-            this._forward();
-        }
-        setProspectiveChange(change) {
-            this._recentChange = change;
-        }
-        forgetLastChange() {
-            this._recentChange = null;
-        }
-        checkLastChange() {
-            return this._recentChange;
-        }
-        lastChangeWas(change) {
-            return change != null && change == this._recentChange;
-        }
-        goBackToStart() {
-            this.bar = 0;
-            this.channel = 0;
-            this.barScrollPos = 0;
-            this.channelScrollPos = 0;
-            this.synth.snapToStart();
-            this.notifier.changed();
-        }
-        setVolume(val) {
-            this.prefs.volume = val;
-            this.prefs.save();
-            this.synth.volume = this._calcVolume();
-        }
-        _calcVolume() {
-            return Math.min(1.0, Math.pow(this.prefs.volume / 50.0, 0.5)) * Math.pow(2.0, (this.prefs.volume - 75.0) / 25.0);
-        }
-        getCurrentPattern(barOffset = 0) {
-            return this.song.getPattern(this.channel, this.bar + barOffset);
-        }
-        getCurrentInstrument(barOffset = 0) {
-            if (barOffset == 0) {
-                return this.viewedInstrument[this.channel];
-            }
-            else {
-                const pattern = this.getCurrentPattern(barOffset);
-                return pattern == null ? 0 : pattern.instruments[0];
-            }
-        }
-        getMobileLayout() {
-            return (this.prefs.layout == "wide") ? window.innerWidth <= 1000 : window.innerWidth <= 710;
-        }
-        getBarWidth() {
-            return (!this.getMobileLayout() && this.prefs.enableChannelMuting && (!this.getFullScreen() || this.prefs.layout == "wide")) ? 30 : 32;
-        }
-        getChannelHeight() {
-            const squashed = this.getMobileLayout() || this.song.getChannelCount() > 4 || (this.song.barCount > this.trackVisibleBars && this.song.getChannelCount() > 3);
-            const megaSquashed = !this.getMobileLayout() && (((this.prefs.layout != "wide") && this.song.getChannelCount() > 11) || this.song.getChannelCount() > 22);
-            return megaSquashed ? 23 : (squashed ? 27 : 32);
-        }
-        getFullScreen() {
-            return !this.getMobileLayout() && (this.prefs.layout != "small");
-        }
-        getVisibleOctaveCount() {
-            return this.getFullScreen() ? this.prefs.visibleOctaves : Preferences.defaultVisibleOctaves;
-        }
-        getVisiblePitchCount() {
-            return this.getVisibleOctaveCount() * Config.pitchesPerOctave + 1;
-        }
-        getBaseVisibleOctave(channel) {
-            const visibleOctaveCount = this.getVisibleOctaveCount();
-            return Math.max(0, Math.min(Config.pitchOctaves - visibleOctaveCount, Math.ceil(this.song.channels[channel].octave - visibleOctaveCount * 0.5)));
-        }
-    }
-    SongDocument._maximumUndoHistory = 300;
 
     const { button: button$b, div: div$b, span: span$3, h2: h2$a, input: input$6, br, select: select$8, option: option$8 } = HTML;
     class SongDurationPrompt {
@@ -47566,6 +47613,8 @@ You should be redirected to the song at:<br /><br />
                                 if (anyInstrumentHasEnvelopes) {
                                     settingList.push("envelope speed");
                                     settingList.push("individual envelope speed");
+                                    settingList.push("individual envelope lower bound");
+                                    settingList.push("individual envelope upper bound");
                                     settingList.push("reset envelope");
                                 }
                             }
@@ -47695,7 +47744,7 @@ You should be redirected to the song at:<br /><br />
                             $("#modSettingText" + mod).get(0).style.setProperty("margin-bottom", "0.9em");
                         }
                         let envelopes = Config.modulators[instrument.modulators[mod]].name;
-                        if (envelopes == "individual envelope speed" || envelopes == "reset envelope") {
+                        if (envelopes == "individual envelope speed" || envelopes == "reset envelope" || envelopes == "individual envelope lower bound" || envelopes == "individual envelope upper bound") {
                             $("#modEnvelopeText" + mod).get(0).style.display = "";
                             $("#modFilterText" + mod).get(0).style.display = "none";
                             $("#modSettingText" + mod).get(0).style.setProperty("margin-bottom", "2px");
@@ -49745,6 +49794,10 @@ You should be redirected to the song at:<br /><br />
                     return this._supersawShapeSlider;
                 case Config.modulators.dictionary["individual envelope speed"].index:
                     return this.envelopeEditor.perEnvelopeSpeedSliders[index];
+                case Config.modulators.dictionary["individual envelope lower bound"].index:
+                    return this.envelopeEditor.perEnvelopeLowerBoundSliders[index];
+                case Config.modulators.dictionary["individual envelope upper bound"].index:
+                    return this.envelopeEditor.perEnvelopeUpperBoundSliders[index];
                 case Config.modulators.dictionary["ring modulation"].index:
                     return this._ringModSlider;
                 case Config.modulators.dictionary["ring mod hertz"].index:

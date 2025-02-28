@@ -5,10 +5,12 @@ import { HTML } from "imperative-html/dist/esm/elements-strict";
 import { SongDocument } from "./SongDocument";
 import { Prompt } from "./Prompt";
 import { ChangeBeatsPerBar } from "./changes";
+import { ExportPrompt } from "./ExportPrompt";
 
 const { button, div, span, h2, input, br, select, option } = HTML;
 
 export class BeatsPerBarPrompt implements Prompt {
+    private readonly _computedSamplesLabel: HTMLDivElement = div({ style: "width: 10em;" }, new Text("0:00"));
     private readonly _beatsStepper: HTMLInputElement = input({ style: "width: 3em; margin-left: 1em;", type: "number", step: "1" });
     private readonly _conversionStrategySelect: HTMLSelectElement = select({ style: "width: 100%;" },
         option({ value: "splice" }, "Splice beats at end of bars."),
@@ -20,6 +22,10 @@ export class BeatsPerBarPrompt implements Prompt {
 
     public readonly container: HTMLDivElement = div({ class: "prompt noSelection", style: "width: 250px;" },
         h2("Beats Per Bar"),
+        div({ style: "display: flex; flex-direction: row; align-items: center; justify-content: space-between;" },
+            "Length:",
+            this._computedSamplesLabel,
+        ),
         div({ style: "display: flex; flex-direction: row; align-items: center; height: 2em; justify-content: flex-end;" },
             div({ style: "text-align: right;" },
                 "Beats per bar:",
@@ -55,6 +61,9 @@ export class BeatsPerBarPrompt implements Prompt {
         this._beatsStepper.addEventListener("keypress", BeatsPerBarPrompt._validateKey);
         this._beatsStepper.addEventListener("blur", BeatsPerBarPrompt._validateNumber);
         this.container.addEventListener("keydown", this._whenKeyPressed);
+        this._beatsStepper.addEventListener("input", () => { (this._computedSamplesLabel.firstChild as Text).textContent = this._predictFutureLength(); });
+        this._conversionStrategySelect.addEventListener("change", () => { (this._computedSamplesLabel.firstChild as Text).textContent = this._predictFutureLength(); });
+        (this._computedSamplesLabel.firstChild as Text).textContent = ExportPrompt.samplesToTime(this._doc, this._doc.synth.getTotalSamples(true, true, 0));
     }
 
     private _close = (): void => {
@@ -91,6 +100,13 @@ export class BeatsPerBarPrompt implements Prompt {
 
     private static _validate(input: HTMLInputElement): number {
         return Math.floor(Math.max(Number(input.min), Math.min(Number(input.max), Number(input.value))));
+    }
+
+    private _predictFutureLength(): string {
+        const futureDoc: SongDocument = new SongDocument();
+        futureDoc.synth.song?.fromBase64String(this._doc.synth.song?.toBase64String() ? this._doc.synth.song?.toBase64String() : "");
+        new ChangeBeatsPerBar(futureDoc, BeatsPerBarPrompt._validate(this._beatsStepper), this._conversionStrategySelect.value);
+        return ExportPrompt.samplesToTime(futureDoc, futureDoc.synth.getTotalSamples(true, true, 0));
     }
 
     private _saveChanges = (): void => {

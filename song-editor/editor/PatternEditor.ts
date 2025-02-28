@@ -8,7 +8,7 @@ import { Slider } from "./HTMLWrapper";
 import { SongEditor } from "./SongEditor";
 import { HTML, SVG } from "imperative-html/dist/esm/elements-strict";
 import { ChangeSequence, UndoableChange } from "./Change";
-import { ChangeVolume, FilterMoveData, ChangeTempo, ChangePan, ChangeReverb, ChangeDistortion, ChangeOperatorAmplitude, ChangeFeedbackAmplitude, ChangePulseWidth, ChangeDetune, ChangeVibratoDepth, ChangeVibratoSpeed, ChangeVibratoDelay, ChangePanDelay, ChangeChorus, ChangeEQFilterSimplePeak, ChangeNoteFilterSimplePeak, ChangeStringSustain, ChangeEnvelopeSpeed, ChangeSupersawDynamism, ChangeSupersawShape, ChangeSupersawSpread, ChangePitchShift, ChangeChannelBar, ChangeDragSelectedNotes, ChangeEnsurePatternExists, ChangeNoteTruncate, ChangeNoteAdded, ChangePatternSelection, ChangePinTime, ChangeSizeBend, ChangePitchBend, ChangePitchAdded, ChangeArpeggioSpeed, ChangeBitcrusherQuantization, ChangeBitcrusherFreq, ChangeEchoSustain, ChangeEQFilterSimpleCut, ChangeNoteFilterSimpleCut, ChangeFilterMovePoint, ChangeDuplicateSelectedReusedPatterns, ChangeHoldingModRecording, ChangeDecimalOffset, ChangePerEnvelopeSpeed, ChangeSongFilterMovePoint, ChangeRingMod, ChangeRingModHz, ChangeGranular, ChangeGrainSize } from "./changes";
+import { ChangeVolume, FilterMoveData, ChangeTempo, ChangePan, ChangeReverb, ChangeDistortion, ChangeOperatorAmplitude, ChangeFeedbackAmplitude, ChangePulseWidth, ChangeDetune, ChangeVibratoDepth, ChangeVibratoSpeed, ChangeVibratoDelay, ChangePanDelay, ChangeChorus, ChangeEQFilterSimplePeak, ChangeNoteFilterSimplePeak, ChangeStringSustain, ChangeEnvelopeSpeed, ChangeSupersawDynamism, ChangeSupersawShape, ChangeSupersawSpread, ChangePitchShift, ChangeChannelBar, ChangeDragSelectedNotes, ChangeEnsurePatternExists, ChangeNoteTruncate, ChangeNoteAdded, ChangePatternSelection, ChangePinTime, ChangeSizeBend, ChangePitchBend, ChangePitchAdded, ChangeArpeggioSpeed, ChangeBitcrusherQuantization, ChangeBitcrusherFreq, ChangeEchoSustain, ChangeEQFilterSimpleCut, ChangeNoteFilterSimpleCut, ChangeFilterMovePoint, ChangeDuplicateSelectedReusedPatterns, ChangeHoldingModRecording, ChangeDecimalOffset, ChangePerEnvelopeSpeed, ChangeSongFilterMovePoint, ChangeRingMod, ChangeRingModHz, ChangeGranular, ChangeGrainSize, ChangeEnvelopeLowerBound, ChangeEnvelopeUpperBound } from "./changes";
 import { prettyNumber } from "./EditorConfig";
 import { EnvelopeEditor } from "./EnvelopeEditor";
 
@@ -739,7 +739,10 @@ export class PatternEditor {
                             if (modFilterIndex != undefined && (applyToMod == Config.modulators.dictionary["eq filter"].index || applyToMod == Config.modulators.dictionary["note filter"].index)) {
                                 if (instrument.modFilterTypes[mod] == modFilterIndex)
                                     return [instrumentIndex, mod];
-                            } else if (modEnvIndex != undefined && applyToMod == Config.modulators.dictionary["individual envelope speed"].index) {
+                            } else if (modEnvIndex != undefined && applyToMod == Config.modulators.dictionary["individual envelope speed"].index ||
+                                applyToMod == Config.modulators.dictionary["individual envelope lower bound"].index ||
+                                applyToMod == Config.modulators.dictionary["individual envelope upper bound"].index
+                             ) {
                                 if (instrument.modEnvelopeNumbers[mod] == modEnvIndex)
                                     return [instrumentIndex, mod];
                             } else
@@ -1323,8 +1326,32 @@ export class PatternEditor {
             if (slider != null) {
                 instrument.envelopes[envelopeIndex].perEnvelopeSpeed = EnvelopeEditor.convertIndexSpeed(slider.getValueBeforeProspectiveChange(), "speed");
             }
-
             applyToEnvelopeTargets.push(envelopeIndex);
+
+        } else if (change instanceof ChangeEnvelopeLowerBound) {
+            var modulator = Config.modulators.dictionary["individual envelope lower bound"];
+            applyToMods.push(modulator.index);
+            const envelopeIndex: number = change.getIndex();
+            if (toApply) applyValues.push(instrument.envelopes[envelopeIndex].perEnvelopeLowerBound*10 - modulator.convertRealFactor);
+            // Move the actual value back, since we just want to update the modulated value and not the base slider.
+            slider = songEditor.getSliderForModSetting(modulator.index, envelopeIndex);
+            if (slider != null) {
+                instrument.envelopes[envelopeIndex].perEnvelopeLowerBound = slider.getValueBeforeProspectiveChange();
+            }
+            applyToEnvelopeTargets.push(envelopeIndex);
+
+        } else if (change instanceof ChangeEnvelopeUpperBound) {
+            var modulator = Config.modulators.dictionary["individual envelope upper bound"];
+            applyToMods.push(modulator.index);
+            const envelopeIndex: number = change.getIndex();
+            if (toApply) applyValues.push(instrument.envelopes[envelopeIndex].perEnvelopeUpperBound*10 - modulator.convertRealFactor);
+            // Move the actual value back, since we just want to update the modulated value and not the base slider.
+            slider = songEditor.getSliderForModSetting(modulator.index, envelopeIndex);
+            if (slider != null) {
+                instrument.envelopes[envelopeIndex].perEnvelopeUpperBound = slider.getValueBeforeProspectiveChange();
+            }
+            applyToEnvelopeTargets.push(envelopeIndex);
+
         }
 
         for (let applyIndex: number = 0; applyIndex < applyValues.length; applyIndex++) {
@@ -1455,8 +1482,7 @@ export class PatternEditor {
                                         instrument.modFilterTypes[mod] = applyToFilterTargets[applyIndex];
                                     }
                                     instrument.modChannels[mod] = -1; // Song
-                                }
-                                else {
+                                } else {
                                     instrument.modChannels[mod] = this._doc.channel;
 
                                     if (this._doc.song.channels[this._doc.channel].instruments.length > 1) {
@@ -1473,7 +1499,9 @@ export class PatternEditor {
                                     // Filter dot. Add appropriate filter target settings (dot# X and dot# Y mod).
                                     if (applyToFilterTargets.length > applyIndex) {
                                         instrument.modFilterTypes[mod] = applyToFilterTargets[applyIndex];
-                                    } else if (applyToEnvelopeTargets.length > applyIndex)
+                                    }
+                                    //or add appropriate envelope settings
+                                    else if (applyToEnvelopeTargets.length > applyIndex)
                                         instrument.modEnvelopeNumbers[mod] = applyToEnvelopeTargets[applyIndex];
                                 }
 

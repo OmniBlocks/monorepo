@@ -57,7 +57,7 @@ export class Slider {
         const continuingProspectiveChange: boolean = this._doc.lastChangeWas(this._change);
         if (!continuingProspectiveChange) this._oldValue = this._value;
         if (this._getChange != null) {
-            this._change = this._getChange(this._oldValue, parseInt(this.input.value));
+            this._change = this._getChange(this._oldValue, parseFloat(this.input.value));
             this._doc.setProspectiveChange(this._change);
         }
     };

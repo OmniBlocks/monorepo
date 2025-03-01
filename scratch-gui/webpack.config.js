@@ -200,7 +200,7 @@ module.exports = [
                 chunks: ['fullscreen'],
                 template: 'src/playground/index.ejs',
                 filename: 'fullscreen.html',
-                title: `${APP_NAME} - Run Scratch projects faster`,
+                title: `${APP_NAME} - Create Scratch and Python Projects Online`,
                 ...htmlWebpackPluginCommon
             }),
             new HtmlWebpackPlugin({

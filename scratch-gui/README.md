@@ -14,7 +14,7 @@ The following is the original license for scratch-gui, which we are required to 
 
 ```
 Copyright (c) 2016, Massachusetts Institute of Technology
-All rights reserved.
+All rights reserved. 
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 

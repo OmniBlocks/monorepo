@@ -41,7 +41,7 @@ import GUIComponent from '../components/gui/gui.jsx';
 import {setIsScratchDesktop} from '../lib/isScratchDesktop.js';
 import TWFullScreenResizerHOC from '../lib/tw-fullscreen-resizer-hoc.jsx';
 import TWThemeManagerHOC from './tw-theme-manager-hoc.jsx';
-import SongsTab from './songs-tab';
+import SongsTab from './songs-tab.jsx';
 
 const {RequestMetadata, setMetadata, unsetMetadata} = storage.scratchFetch;
 

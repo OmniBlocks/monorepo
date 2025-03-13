@@ -255,7 +255,10 @@ const GUIComponent = props => {
                     />
                 ) : null}
                 {isBrowserSupported() ? null : (
-                    <BrowserModal isRtl={isRtl} />
+                    <BrowserModal
+                        isRtl={isRtl}
+                        onClickDesktopSettings={onClickDesktopSettings}
+                    />
                 )}
                 {tipsLibraryVisible ? (
                     <TipsLibrary />

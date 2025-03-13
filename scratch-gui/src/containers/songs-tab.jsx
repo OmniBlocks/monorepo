@@ -41,7 +41,7 @@ import {
 import {setRestore} from '../reducers/restore-deletion';
 import {showStandardAlert, closeAlertWithId} from '../reducers/alerts';
 
-import SongEditor from './song-editor';
+import SongEditor from './song-editor.jsx';
 
 class SoundTab extends React.Component {
     constructor (props) {

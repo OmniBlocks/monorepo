@@ -14,8 +14,6 @@ import surpriseIcon from '../components/action-menu/icon--surprise.svg';
 import searchIcon from '../components/action-menu/icon--search.svg';
 
 import RecordModal from './record-modal.jsx';
-import SoundEditor from './sound-editor.jsx';
-import SoundLibrary from './sound-library.jsx';
 import SoundEditorNotSupported from '../components/tw-sound-editor-not-supported/sound-editor-not-supported.jsx';
 
 import {getSoundLibrary} from '../lib/libraries/tw-async-libraries';
@@ -35,7 +33,8 @@ import {
 
 import {
     activateTab,
-    COSTUMES_TAB_INDEX
+    COSTUMES_TAB_INDEX,
+    SONGS_TAB_INDEX // Add this import
 } from '../reducers/editor-tab';
 
 import {setRestore} from '../reducers/restore-deletion';
@@ -43,7 +42,7 @@ import {showStandardAlert, closeAlertWithId} from '../reducers/alerts';
 
 import SongEditor from './song-editor.jsx';
 
-class SoundTab extends React.Component {
+class SongsTab extends React.Component {
     constructor (props) {
         super(props);
         bindAll(this, [
@@ -56,9 +55,15 @@ class SoundTab extends React.Component {
             'handleFileUploadClick',
             'handleSoundUpload',
             'handleDrop',
-            'setFileInput'
+            'setFileInput',
+            'handleOpenSongEditor',
+            'handleCloseSongEditor',
+            'onActivateSongsTab' // Bind the new function
         ]);
-        this.state = {selectedSoundIndex: 0};
+        this.state = {
+            selectedSoundIndex: 0,
+            isSongEditorOpen: false
+        };
     }
 
     componentWillReceiveProps (nextProps) {
@@ -176,6 +181,20 @@ class SoundTab extends React.Component {
         this.fileInput = input;
     }
 
+    handleOpenSongEditor () {
+        this.setState({isSongEditorOpen: true});
+        this.props.onActivateSongsTab(); // Activate the songs tab when opening the song editor
+    }
+
+    handleCloseSongEditor () {
+        this.setState({isSongEditorOpen: false});
+    }
+
+    // Add the missing function definition
+    onActivateSongsTab() {
+        this.props.onActivateSongsTab();
+    }
+
     render () {
         const {
             dispatchUpdateRestore, // eslint-disable-line no-unused-vars
@@ -223,6 +242,11 @@ class SoundTab extends React.Component {
                 defaultMessage: 'Choose a Sound',
                 description: 'Button to add a sound in the editor tab',
                 id: 'gui.soundTab.addSoundFromLibrary'
+            },
+            openSongEditor: {
+                defaultMessage: 'Open Song Editor',
+                description: 'Button to open the song editor in the editor tab',
+                id: 'gui.soundTab.openSongEditor'
             }
         });
 
@@ -252,6 +276,10 @@ class SoundTab extends React.Component {
                     title: intl.formatMessage(messages.addSound),
                     img: searchIcon,
                     onClick: onNewSoundFromLibraryClick
+                }, {
+                    title: intl.formatMessage(messages.openSongEditor),
+                    img: searchIcon,
+                    onClick: this.handleOpenSongEditor
                 }] : []}
                 dragType={DragConstants.SOUND}
                 isRtl={isRtl}
@@ -265,9 +293,9 @@ class SoundTab extends React.Component {
             >
                 {sprite.sounds && sprite.sounds[this.state.selectedSoundIndex] ? (
                     isSupported ? (
-                        <SoundEditor soundIndex={this.state.selectedSoundIndex} />
+                        <SongEditor soundIndex={this.state.selectedSoundIndex} />
                     ) : (
-                        <SoundEditorNotSupported />
+                        <SongEditorNotSupported />
                     )
                 ) : null}
                 {this.props.soundRecorderVisible ? (
@@ -282,18 +310,21 @@ class SoundTab extends React.Component {
                         onRequestClose={this.props.onRequestCloseSoundLibrary}
                     />
                 ) : null}
-                <SongEditor />
+                {this.state.isSongEditorOpen ? (
+                    <SongEditor onClose={this.handleCloseSongEditor} />
+                ) : null}
             </AssetPanel>
         );
     }
 }
 
-SoundTab.propTypes = {
+SongsTab.propTypes = {
     dispatchUpdateRestore: PropTypes.func,
     editingTarget: PropTypes.string,
     intl: intlShape,
     isRtl: PropTypes.bool,
     onActivateCostumesTab: PropTypes.func.isRequired,
+    onActivateSongsTab: PropTypes.func.isRequired, // Add this prop type
     onCloseImporting: PropTypes.func.isRequired,
     onNewSoundFromLibraryClick: PropTypes.func.isRequired,
     onNewSoundFromRecordingClick: PropTypes.func.isRequired,
@@ -327,6 +358,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
     onActivateCostumesTab: () => dispatch(activateTab(COSTUMES_TAB_INDEX)),
+    onActivateSongsTab: () => dispatch(activateTab(SONGS_TAB_INDEX)), 
     onNewSoundFromLibraryClick: e => {
         e.preventDefault();
         dispatch(openSoundLibrary());
@@ -348,5 +380,5 @@ export default errorBoundaryHOC('Sound Tab')(
     injectIntl(connect(
         mapStateToProps,
         mapDispatchToProps
-    )(SoundTab))
+    )(SongsTab))
 );

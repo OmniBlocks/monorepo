@@ -88,11 +88,8 @@ const BrowserModal = ({intl, ...props}) => {
                                     <p>
                                         <FormattedMessage
                                             defaultMessage={'You can also try toggling the "graphics acceleration" option in desktop settings:'}
-                                            description="Error message when browser does not support WebGL (desktop app version)"
+                                            description="Error message when browser does not support WebGL (desktop app version). Consider seeing how Chrome translates 'graphics acceleration' into your language."
                                             id="tw.browserModal.webglDesktop"
-                                            values={{
-                                                APP_NAME
-                                            }}
                                         />
                                     </p>
                                     <div className={styles.desktopSettingsOuter}>
@@ -114,9 +111,6 @@ const BrowserModal = ({intl, ...props}) => {
                                         defaultMessage={'Use a recent version of Chrome, Firefox, or Safari, and ensure your graphics drivers are up to date. You can also try toggling the "graphics acceleration" or "hardware acceleration" option in your browser\'s settings.'}
                                         description="Error message when browser does not support WebGL (browser version). Chrome calls it graphics acceleration and Firefox calls it hardware acceleration; consider seeing how they actually translate these"
                                         id="tw.browserModal.webglBrowser"
-                                        values={{
-                                            APP_NAME
-                                        }}
                                     />
                                 </p>
                             )}

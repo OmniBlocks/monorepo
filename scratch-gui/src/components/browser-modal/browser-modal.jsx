@@ -87,7 +87,7 @@ const BrowserModal = ({intl, ...props}) => {
                                 <React.Fragment>
                                     <p>
                                         <FormattedMessage
-                                            defaultMessage={'You can also try toggling the "Hardware Acceleration" option in desktop settings:'}
+                                            defaultMessage={'You can also try toggling the "graphics acceleration" option in desktop settings:'}
                                             description="Error message when browser does not support WebGL (desktop app version)"
                                             id="tw.browserModal.webglDesktop"
                                             values={{
@@ -111,7 +111,7 @@ const BrowserModal = ({intl, ...props}) => {
                             ) : (
                                 <p>
                                     <FormattedMessage
-                                        defaultMessage={'Use a recent version of Chrome, Firefox, or Safari, and ensure your graphics drivers are up to date. You can also try toggling the "Graphics Acceleration" or "Hardware Acceleration" option in your browser\'s settings.'}
+                                        defaultMessage={'Use a recent version of Chrome, Firefox, or Safari, and ensure your graphics drivers are up to date. You can also try toggling the "graphics acceleration" or "hardware acceleration" option in your browser\'s settings.'}
                                         description="Error message when browser does not support WebGL (browser version). Chrome calls it graphics acceleration and Firefox calls it hardware acceleration; consider seeing how they actually translate these"
                                         id="tw.browserModal.webglBrowser"
                                         values={{

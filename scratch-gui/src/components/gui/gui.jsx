@@ -127,6 +127,7 @@ const GUIComponent = props => {
         onToggleLoginOpen,
         onActivateCostumesTab,
         onActivateSoundsTab,
+        onActivateSongsTab,
         onActivateTab,
         onClickLogo,
         onExtensionButtonClick,

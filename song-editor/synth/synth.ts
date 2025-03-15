@@ -3284,6 +3284,7 @@ export class Song {
                 let ringModIndex: number = Config.modulators.dictionary["ring modulation"].index;
                 let ringModHertzIndex: number = Config.modulators.dictionary["ring mod hertz"].index;
                 let granularIndex: number = Config.modulators.dictionary["granular"].index;
+                let grainAmountIndex: number = Config.modulators.dictionary["grain amount"].index;
                 let grainSizeIndex: number = Config.modulators.dictionary["grain size"].index;
                 let envSpeedIndex: number = Config.modulators.dictionary["envelope speed"].index;
                 let perEnvSpeedIndex: number = Config.modulators.dictionary["individual envelope speed"].index;
@@ -3345,6 +3346,9 @@ export class Song {
                         break;
                     case granularIndex:
                         vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].granular - Config.modulators[granularIndex].convertRealFactor;
+                        break;
+                    case grainAmountIndex:
+                        vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].grainAmounts - Config.modulators[grainAmountIndex].convertRealFactor;
                         break;
                     case grainSizeIndex:
                         vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].grainSize - Config.modulators[grainSizeIndex].convertRealFactor;
@@ -8852,16 +8856,6 @@ class InstrumentState {
         this.aliases = instrument.aliases;
         this.volumeScale = 1.0;
 
-
-        if (effectsIncludeGranular(this.effects)) { //has to happen before buffer allocation
-            this.granularMaximumGrains = Math.pow(2, instrument.grainAmounts);
-            if (synth.isModActive(Config.modulators.dictionary["grain amount"].index, channelIndex, instrumentIndex)) {
-                this.granularMaximumGrains = Math.floor(Math.pow(2, synth.getModValue(Config.modulators.dictionary["grain amount"].index, channelIndex, instrumentIndex, false)));
-            }
-        }
-
-        this.allocateNecessaryBuffers(synth, instrument, samplesPerTick);
-
         const samplesPerSecond: number = synth.samplesPerSecond;
         this.updateWaves(instrument, samplesPerSecond);
 
@@ -8903,6 +8897,17 @@ class InstrumentState {
         const usesEcho: boolean = effectsIncludeEcho(this.effects);
         const usesReverb: boolean = effectsIncludeReverb(this.effects);
 
+        if (usesGranular) { //has to happen before buffer allocation
+            this.granularMaximumGrains = Math.pow(2, instrument.grainAmounts);
+            if (synth.isModActive(Config.modulators.dictionary["grain amount"].index, channelIndex, instrumentIndex)) {
+                this.granularMaximumGrains = Math.pow(2, synth.getModValue(Config.modulators.dictionary["grain amount"].index, channelIndex, instrumentIndex, false));
+            }
+            this.granularMaximumGrains == Math.floor(this.granularMaximumGrains * envelopeStarts[EnvelopeComputeIndex.grainAmount]);
+        }
+
+        this.allocateNecessaryBuffers(synth, instrument, samplesPerTick);
+
+
         if (usesGranular) {
             this.granularMix = instrument.granular / Config.granularRange;
             let granularMixEnd = this.granularMix;
@@ -8910,6 +8915,8 @@ class InstrumentState {
                 this.granularMix = synth.getModValue(Config.modulators.dictionary["granular"].index, channelIndex, instrumentIndex, false) / Config.granularRange;
                 granularMixEnd = synth.getModValue(Config.modulators.dictionary["granular"].index, channelIndex, instrumentIndex, true) / Config.granularRange;
             }
+            this.granularMix *= envelopeStarts[EnvelopeComputeIndex.granular];
+            granularMixEnd *= envelopeEnds[EnvelopeComputeIndex.granular];
             this.granularMixDelta = (granularMixEnd - this.granularMix) / roundedSamplesPerTick;
             for (let iterations: number = 0; iterations < Math.ceil(Math.random() * Math.random() * 10); iterations++) { //dirty weighting toward lower numbers
                 //create a grain
@@ -8918,6 +8925,7 @@ class InstrumentState {
                     if (synth.isModActive(Config.modulators.dictionary["grain size"].index, channelIndex, instrumentIndex)) {
                         granularMinGrainSizeInMilliseconds = synth.getModValue(Config.modulators.dictionary["grain size"].index, channelIndex, instrumentIndex, false);
                     }
+                    granularMinGrainSizeInMilliseconds *= envelopeStarts[EnvelopeComputeIndex.grainSize];
                     const granularMaxGrainSizeInMilliseconds: number = instrument.grainSize + instrument.grainRange;
                     const granularGrainSizeInMilliseconds: number = granularMinGrainSizeInMilliseconds + (granularMaxGrainSizeInMilliseconds - granularMinGrainSizeInMilliseconds) * Math.random();
                     const granularGrainSizeInSeconds: number = granularGrainSizeInMilliseconds / 1000.0;

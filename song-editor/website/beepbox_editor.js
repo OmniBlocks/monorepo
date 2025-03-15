@@ -19107,13 +19107,6 @@ li.select2-results__option[role=group] > strong:hover {
             this.effects = instrument.effects;
             this.aliases = instrument.aliases;
             this.volumeScale = 1.0;
-            if (effectsIncludeGranular(this.effects)) {
-                this.granularMaximumGrains = Math.pow(2, instrument.grainAmounts);
-                if (synth.isModActive(Config.modulators.dictionary["grain amount"].index, channelIndex, instrumentIndex)) {
-                    this.granularMaximumGrains = Math.floor(Math.pow(2, synth.getModValue(Config.modulators.dictionary["grain amount"].index, channelIndex, instrumentIndex, false)));
-                }
-            }
-            this.allocateNecessaryBuffers(synth, instrument, samplesPerTick);
             const samplesPerSecond = synth.samplesPerSecond;
             this.updateWaves(instrument, samplesPerSecond);
             const ticksIntoBar = synth.getTicksIntoBar();
@@ -19153,12 +19146,22 @@ li.select2-results__option[role=group] > strong:hover {
             const usesEcho = effectsIncludeEcho(this.effects);
             const usesReverb = effectsIncludeReverb(this.effects);
             if (usesGranular) {
+                this.granularMaximumGrains = Math.pow(2, instrument.grainAmounts);
+                if (synth.isModActive(Config.modulators.dictionary["grain amount"].index, channelIndex, instrumentIndex)) {
+                    this.granularMaximumGrains = Math.pow(2, synth.getModValue(Config.modulators.dictionary["grain amount"].index, channelIndex, instrumentIndex, false));
+                }
+                this.granularMaximumGrains == Math.floor(this.granularMaximumGrains * envelopeStarts[52]);
+            }
+            this.allocateNecessaryBuffers(synth, instrument, samplesPerTick);
+            if (usesGranular) {
                 this.granularMix = instrument.granular / Config.granularRange;
                 let granularMixEnd = this.granularMix;
                 if (synth.isModActive(Config.modulators.dictionary["granular"].index, channelIndex, instrumentIndex)) {
                     this.granularMix = synth.getModValue(Config.modulators.dictionary["granular"].index, channelIndex, instrumentIndex, false) / Config.granularRange;
                     granularMixEnd = synth.getModValue(Config.modulators.dictionary["granular"].index, channelIndex, instrumentIndex, true) / Config.granularRange;
                 }
+                this.granularMix *= envelopeStarts[51];
+                granularMixEnd *= envelopeEnds[51];
                 this.granularMixDelta = (granularMixEnd - this.granularMix) / roundedSamplesPerTick;
                 for (let iterations = 0; iterations < Math.ceil(Math.random() * Math.random() * 10); iterations++) {
                     if (this.granularGrainsLength < this.granularMaximumGrains) {
@@ -19166,6 +19169,7 @@ li.select2-results__option[role=group] > strong:hover {
                         if (synth.isModActive(Config.modulators.dictionary["grain size"].index, channelIndex, instrumentIndex)) {
                             granularMinGrainSizeInMilliseconds = synth.getModValue(Config.modulators.dictionary["grain size"].index, channelIndex, instrumentIndex, false);
                         }
+                        granularMinGrainSizeInMilliseconds *= envelopeStarts[53];
                         const granularMaxGrainSizeInMilliseconds = instrument.grainSize + instrument.grainRange;
                         const granularGrainSizeInMilliseconds = granularMinGrainSizeInMilliseconds + (granularMaxGrainSizeInMilliseconds - granularMinGrainSizeInMilliseconds) * Math.random();
                         const granularGrainSizeInSeconds = granularGrainSizeInMilliseconds / 1000.0;

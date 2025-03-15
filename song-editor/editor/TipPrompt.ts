@@ -643,7 +643,7 @@ export class TipPrompt implements Prompt {
 				message = div(
 					h2("Granular Synthesis"),
 					p(`This effect is based on granular synthsis! It takes random points from a wave and rearranges them to form "sonic clouds".`),
-					p(`This particular slider controls about how often a grain (a group of audio samples) is added to the output, from very rarely to multiple at once`)
+					p(`This particular slider controls the wet/dry mix of the granulation.`)
 				);
 			} break;
 			case "grainSize": {
@@ -652,10 +652,10 @@ export class TipPrompt implements Prompt {
 					p(`This setting controls the size of the grain.`),
 				);
 			} break;
-			case "grainEnvelope": {
+			case "grainAmount": {
 				message = div(
-					h2("Grain Envelope"),
-					p(`This setting controls the shape of the envelope that affects the grain.`),
+					h2("Grain Count"),
+					p(`This setting controls about how often a grain (a group of audio samples) is added to the output, from very rarely to multiple at once.`),
 				);
 			} break;
 			case "grainRange": {

@@ -40,7 +40,14 @@ export const enum FilterType {
 export const enum SustainType {
 	bright,
 	acoustic,
-	length,
+    length,
+}
+
+export const enum GranularEnvelopeType {
+    parabolic,
+    raisedCosineBell,
+    // trapezoid,
+    length
 }
 
 export const enum EnvelopeType {
@@ -56,7 +63,6 @@ export const enum EnvelopeType {
     tremolo2, //deprecated as of slarmoo's box 1.3; Kept for updating integrity and drumsets
     decay,
     wibble,
-    //hard, hoping nothing goes wrong by removing this
     linear,
     rise,
     blip,
@@ -144,6 +150,7 @@ export const enum EnvelopeComputeIndex {
     ringModulation,
     ringModulationHz,
     granular,
+    grainAmount,
     grainSize,
     echoDelay,
     //Add more here
@@ -973,6 +980,7 @@ export class Config {
     public static readonly pickedStringBaseExpression: number = 0.025; // Same as harmonics.
     public static readonly distortionBaseVolume: number = 0.011; // Distortion is not affected by pitchDamping, which otherwise approximately halves expression for notes around the middle of the range.
     public static readonly bitcrusherBaseVolume: number = 0.010; // Also not affected by pitchDamping, used when bit crushing is maxed out (aka "1-bit" output).
+    public static readonly granularOutputLoudnessCompensation: number = 0.5; //compensate for multiple grains playing at once
     public static rawChipWaves: DictionaryArray<ChipWave> = toNameMap([
         { name: "rounded", expression: 0.94, samples: centerWave([0.0, 0.2, 0.4, 0.5, 0.6, 0.7, 0.8, 0.85, 0.9, 0.95, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.95, 0.9, 0.85, 0.8, 0.7, 0.6, 0.5, 0.4, 0.2, 0.0, -0.2, -0.4, -0.5, -0.6, -0.7, -0.8, -0.85, -0.9, -0.95, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -0.95, -0.9, -0.85, -0.8, -0.7, -0.6, -0.5, -0.4, -0.2]) },
         { name: "triangle", expression: 1.0, samples: centerWave([1.0 / 15.0, 3.0 / 15.0, 5.0 / 15.0, 7.0 / 15.0, 9.0 / 15.0, 11.0 / 15.0, 13.0 / 15.0, 15.0 / 15.0, 15.0 / 15.0, 13.0 / 15.0, 11.0 / 15.0, 9.0 / 15.0, 7.0 / 15.0, 5.0 / 15.0, 3.0 / 15.0, 1.0 / 15.0, -1.0 / 15.0, -3.0 / 15.0, -5.0 / 15.0, -7.0 / 15.0, -9.0 / 15.0, -11.0 / 15.0, -13.0 / 15.0, -15.0 / 15.0, -15.0 / 15.0, -13.0 / 15.0, -11.0 / 15.0, -9.0 / 15.0, -7.0 / 15.0, -5.0 / 15.0, -3.0 / 15.0, -1.0 / 15.0]) },
@@ -1211,8 +1219,9 @@ export class Config {
     public static readonly grainSizeMin: number = 40;
     public static readonly grainSizeMax: number = 2000;
     public static readonly grainSizeStep: number = 40;
-    public static readonly grainEnvelopeStep: number = 1 / 16;
     public static readonly grainRangeMax: number = 1600;
+    public static readonly grainAmountsMax: number = 10; //2^grainAmountsMax is what is actually used
+    public static readonly granularEnvelopeType: number = GranularEnvelopeType.parabolic; //here you can change which envelope implementation is used for grains
     public static readonly chorusRange: number = 8;
     public static readonly chorusPeriodSeconds: number = 2.0;
     public static readonly chorusDelayRange: number = 0.0034;
@@ -1666,6 +1675,7 @@ export class Config {
         { name: "ringModulation", computeIndex: EnvelopeComputeIndex.ringModulation, displayName: "ring mod", interleave: false, isFilter: false, maxCount: 1, effect: EffectType.ringModulation, compatibleInstruments: null },
         { name: "ringModulationHz", computeIndex: EnvelopeComputeIndex.ringModulationHz, displayName: "ring mod hz", interleave: false, isFilter: false, maxCount: 1, effect: EffectType.ringModulation, compatibleInstruments: null },
         { name: "granular", computeIndex: EnvelopeComputeIndex.granular, displayName: "granular", interleave: false, isFilter: false, maxCount: 1, effect: EffectType.granular, compatibleInstruments: null },
+        { name: "grainAmount", computeIndex: EnvelopeComputeIndex.grainAmount, displayName: "grain #", interleave: false, isFilter: false, maxCount: 1, effect: EffectType.granular, compatibleInstruments: null },
         { name: "grainSize", computeIndex: EnvelopeComputeIndex.grainSize, displayName: "grain size", interleave: false, isFilter: false, maxCount: 1, effect: EffectType.granular, compatibleInstruments: null },
         { name: "echoDelay", computeIndex: EnvelopeComputeIndex.echoDelay, displayName: "echo delay", interleave: false, isFilter: false, maxCount: 1, effect: EffectType.echo, compatibleInstruments: null }, // wait until after we're computing a tick's settings for multiple run lengths.
         // Controlling filter gain is less obvious and intuitive than controlling filter freq, so to avoid confusion I've disabled it for now...
@@ -1814,8 +1824,10 @@ export class Config {
             promptName: "Ring Modulation (Hertz)", promptDesc: [ "This setting controls the Hertz (Hz) used in the Ring Modulation effect in your instrument.", "[OVERWRITING] [$LO - $HI]" ] },
         { name: "granular", pianoName: "Granular", maxRawVol: Config.granularRange, newNoteVol: 0, forSong: false, convertRealFactor: 0, associatedEffect: EffectType.granular, maxIndex: 0,
             promptName: "Granular", promptDesc: [ "This setting controls the granular effect in your instrument.", "[OVERWRITING] [$LO - $HI]" ] },
+        { name: "grain amount", pianoName: "Grain #", maxRawVol: Config.grainAmountsMax, newNoteVol: 8, forSong: false, convertRealFactor: 0, associatedEffect: EffectType.granular, maxIndex: 0,
+            promptName: "Grain Count", promptDesc: [ "This setting controls the density of grains for the granular effect on your instrument." ,"[OVERWRITING] [$LO - $HI]" ] },
         { name: "grain size", pianoName: "Grain Size", maxRawVol: Config.grainSizeMax/Config.grainSizeStep, newNoteVol: Config.grainSizeMin/Config.grainSizeStep, forSong: false, convertRealFactor: 0, associatedEffect: EffectType.granular, maxIndex: 0,
-            promptName: "Ring Modulation (Hertz)", promptDesc: [ "This setting controls the grain size of the granular effect in your instrument.", "The number shown in the mod channel is multiplied by " + Config.grainSizeStep + " to get the actual grain size." ,"[OVERWRITING] [$LO - $HI]" ] },
+            promptName: "Grain Size", promptDesc: [ "This setting controls the grain size of the granular effect in your instrument.", "The number shown in the mod channel is multiplied by " + Config.grainSizeStep + " to get the actual grain size." ,"[OVERWRITING] [$LO - $HI]" ] },
         { name: "individual envelope lower bound", pianoName: "IndvEnvLow", maxRawVol: Config.perEnvelopeBoundMax * 10, newNoteVol: 0, forSong: false, convertRealFactor: 0, associatedEffect: EffectType.length, maxIndex: this.maxEnvelopeCount-1,
             promptName: "Individual Envelope Lower Bound", promptDesc: ["This setting controls the envelope lower bound", "At $LO, your the envelope will output an upper envelope bound to 0, and at $HI your envelope will output an upper envelope bound to 2.", "This settings will not work if your lower envelope bound is higher than your upper envelope bound", ]},
         { name: "individual envelope upper bound", pianoName: "IndvEnvUp", maxRawVol: Config.perEnvelopeBoundMax * 10, newNoteVol: 10, forSong: false, convertRealFactor: 0, associatedEffect: EffectType.length, maxIndex: this.maxEnvelopeCount-1,

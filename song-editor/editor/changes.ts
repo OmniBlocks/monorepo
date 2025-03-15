@@ -2473,10 +2473,10 @@ export class ChangeGrainSize extends ChangeInstrumentSlider {
     }
 }
 
-export class ChangeGrainEnvelope extends ChangeInstrumentSlider {
+export class ChangeGrainAmounts extends ChangeInstrumentSlider {
     constructor(doc: SongDocument, oldValue: number, newValue: number) {
         super(doc);
-        this._instrument.grainEnvelope = newValue;
+        this._instrument.grainAmounts = newValue;
         doc.notifier.changed();
         // doc.synth.unsetMod(Config.modulators.dictionary["granular"].index, doc.channel, doc.getCurrentInstrument());
         if (oldValue != newValue) this._didSomething();

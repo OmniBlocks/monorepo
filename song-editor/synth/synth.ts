@@ -8592,6 +8592,7 @@ class InstrumentState {
     public granularGrains: Grain[];
     public granularGrainsLength: number;
     public granularMaximumGrains: number;
+    public usesRandomGrainLocation: boolean = true; //eventually I might use the granular code for sample pitch shifting, but we'll see
 
     public ringModMix: number = 0;
     public ringModMixDelta: number = 0;
@@ -8743,7 +8744,7 @@ class InstrumentState {
                 }
             }
             if (this.granularMaximumGrains < this.granularGrainsLength) {
-                this.granularGrainsLength = this.granularMaximumGrains;
+                this.granularGrainsLength = Math.round(this.granularMaximumGrains);
             }
         }
     }
@@ -8898,11 +8899,11 @@ class InstrumentState {
         const usesReverb: boolean = effectsIncludeReverb(this.effects);
 
         if (usesGranular) { //has to happen before buffer allocation
-            this.granularMaximumGrains = Math.pow(2, instrument.grainAmounts);
+            this.granularMaximumGrains = Math.pow(2, instrument.grainAmounts * envelopeStarts[EnvelopeComputeIndex.grainAmount]);
             if (synth.isModActive(Config.modulators.dictionary["grain amount"].index, channelIndex, instrumentIndex)) {
-                this.granularMaximumGrains = Math.pow(2, synth.getModValue(Config.modulators.dictionary["grain amount"].index, channelIndex, instrumentIndex, false));
+                this.granularMaximumGrains = Math.pow(2, synth.getModValue(Config.modulators.dictionary["grain amount"].index, channelIndex, instrumentIndex, false) * envelopeStarts[EnvelopeComputeIndex.grainAmount]);
             }
-            this.granularMaximumGrains == Math.floor(this.granularMaximumGrains * envelopeStarts[EnvelopeComputeIndex.grainAmount]);
+            this.granularMaximumGrains == Math.floor(this.granularMaximumGrains);
         }
 
         this.allocateNecessaryBuffers(synth, instrument, samplesPerTick);
@@ -8942,13 +8943,15 @@ class InstrumentState {
                     const minDelayTimeInSeconds: number = 0.02;
                     // const maxDelayTimeInSeconds: number = this.granularMaximumDelayTimeInSeconds;
                     const maxDelayTimeInSeconds: number = 2.4;
-                    grain.delayLinePosition = (minDelayTimeInSeconds + (maxDelayTimeInSeconds - minDelayTimeInSeconds) * Math.random() * Math.random() * samplesPerSecond) % (granularDelayLineLength - 1); //dirty weighting toward lower numbers ; The clamp was clumping everything at the end, so I decided to use a modulo instead
+                    grain.delayLinePosition = this.usesRandomGrainLocation ? (minDelayTimeInSeconds + (maxDelayTimeInSeconds - minDelayTimeInSeconds) * Math.random() * Math.random() * samplesPerSecond) % (granularDelayLineLength - 1) : minDelayTimeInSeconds; //dirty weighting toward lower numbers ; The clamp was clumping everything at the end, so I decided to use a modulo instead
                     if (Config.granularEnvelopeType == GranularEnvelopeType.parabolic) {
                         grain.initializeParabolicEnvelope(grain.maxAgeInSamples, 1.0);
                     } else if (Config.granularEnvelopeType == GranularEnvelopeType.raisedCosineBell) {
                         grain.initializeRCBEnvelope(grain.maxAgeInSamples, 1.0);
                     }
-                    grain.addDelay(Math.random()*samplesPerTick*2); //offset when grains begin playing ; This is different from the above delay, which delays how far back in time the grain looks for samples
+                    if (this.usesRandomGrainLocation) {
+                        grain.addDelay(Math.random() * samplesPerTick * 2); //offset when grains begin playing ; This is different from the above delay, which delays how far back in time the grain looks for samples
+                    }
                 } 
             }
         }
@@ -9392,6 +9395,7 @@ class InstrumentState {
             if (usesChorus) totalDelaySamples += synth.chorusDelayBufferSize;
             if (usesEcho) totalDelaySamples += this.echoDelayLineL!.length;
             if (usesReverb) totalDelaySamples += Config.reverbDelayBufferSize;
+            if (usesGranular) totalDelaySamples += this.granularMaximumDelayTimeInSeconds;
 
             this.flushedSamples += roundedSamplesPerTick;
             if (this.flushedSamples >= totalDelaySamples) {
@@ -12580,7 +12584,7 @@ export class Synth {
                 const unisonEndA: number = Math.pow(2.0, (unisonOffset + unisonSpread) * unisonEnvelopeEnd / 12.0);
                 tone.phaseDeltas[0] = startFreq * sampleTime * unisonStartA;
                 tone.phaseDeltaScales[0] = basePhaseDeltaScale * Math.pow(unisonEndA / unisonStartA, 1.0 / roundedSamplesPerTick);
-                const divisor = (unisonVoices - 1 == 0) ? 1 : (unisonVoices - 1);
+                const divisor = (unisonVoices == 1) ? 1 : (unisonVoices - 1);
                 for (let i: number = 1; i < unisonVoices; i++) {
                     const unisonStart: number = Math.pow(2.0, (unisonOffset + unisonSpread - (2 * i * unisonSpread / divisor)) * unisonEnvelopeStart / 12.0) * (specialIntervalMult);
                     const unisonEnd: number = Math.pow(2.0, (unisonOffset + unisonSpread - (2 * i * unisonSpread / divisor)) * unisonEnvelopeEnd / 12.0) * (specialIntervalMult);
@@ -12588,8 +12592,8 @@ export class Synth {
                     tone.phaseDeltaScales[i] = basePhaseDeltaScale * Math.pow(unisonEnd / unisonStart, 1.0 / roundedSamplesPerTick);
                 }
                 for (let i: number = unisonVoices; i < Config.unisonVoicesMax; i++) {
-                    tone.phaseDeltas[i] = startFreq * sampleTime * unisonStartA;
-                    tone.phaseDeltaScales[i] = basePhaseDeltaScale * Math.pow(unisonEndA / unisonStartA, 1.0 / roundedSamplesPerTick);
+                    tone.phaseDeltas[i] = tone.phaseDeltas[0];
+                    tone.phaseDeltaScales[i] = tone.phaseDeltaScales[0];
                 }
                 
             } else {
@@ -12987,7 +12991,7 @@ export class Synth {
         //   user.
         const voiceCount: number = Math.max(2, instrumentState.unisonVoices);
         const chipWaveLoopMode: number = instrumentState.chipWaveLoopMode;
-        let chipFunction: Function = Synth.loopableChipFunctionCache[voiceCount][chipWaveLoopMode];
+        let chipFunction: Function = Synth.loopableChipFunctionCache[instrumentState.unisonVoices][chipWaveLoopMode];
         if (chipFunction == undefined) {
             let chipSource: string = "return (synth, bufferIndex, roundedSamplesPerTick, tone, instrumentState) => {";
 
@@ -13284,14 +13288,14 @@ export class Synth {
         }`
          
             chipFunction = new Function("Config", "Synth", "effectsIncludeDistortion", chipSource)(Config, Synth, effectsIncludeDistortion);
-            Synth.loopableChipFunctionCache[voiceCount][chipWaveLoopMode] = chipFunction;
+            Synth.loopableChipFunctionCache[instrumentState.unisonVoices][chipWaveLoopMode] = chipFunction;
         }
         chipFunction(synth, bufferIndex, roundedSamplesPerTick, tone, instrumentState);
     }
     // advloop addition
     private static chipSynth(synth: Synth, bufferIndex: number, roundedSamplesPerTick: number, tone: Tone, instrumentState: InstrumentState): void {
         const voiceCount: number = Math.max(2, instrumentState.unisonVoices);
-        let chipFunction: Function = Synth.chipFunctionCache[voiceCount];
+        let chipFunction: Function = Synth.chipFunctionCache[instrumentState.unisonVoices];
         if (chipFunction == undefined) {
             let chipSource: string = "return (synth, bufferIndex, roundedSamplesPerTick, tone, instrumentState) => {";
 
@@ -13418,14 +13422,15 @@ export class Synth {
         tone.initialNoteFilterInput2 = initialFilterInput2;
     }`;
             chipFunction = new Function("Config", "Synth", "effectsIncludeDistortion", chipSource)(Config, Synth, effectsIncludeDistortion);
-            Synth.chipFunctionCache[voiceCount] = chipFunction;
+            Synth.chipFunctionCache[instrumentState.unisonVoices] = chipFunction;
         }
         chipFunction(synth, bufferIndex, roundedSamplesPerTick, tone, instrumentState);
     }
 
     private static harmonicsSynth(synth: Synth, bufferIndex: number, roundedSamplesPerTick: number, tone: Tone, instrumentState: InstrumentState): void {
         const voiceCount: number = Math.max(2, instrumentState.unisonVoices);
-        let harmonicsFunction: Function = Synth.harmonicsFunctionCache[voiceCount];
+        let harmonicsFunction: Function = Synth.harmonicsFunctionCache[instrumentState.unisonVoices];
+        console.log(harmonicsFunction);
         if (harmonicsFunction == undefined) {
             let harmonicsSource: string = "return (synth, bufferIndex, roundedSamplesPerTick, tone, instrumentState) => {";
 
@@ -13526,7 +13531,7 @@ export class Synth {
         tone.initialNoteFilterInput2 = initialFilterInput2;
     }`;
         harmonicsFunction = new Function("Config", "Synth", harmonicsSource)(Config, Synth);
-        Synth.harmonicsFunctionCache[voiceCount] = harmonicsFunction;
+        Synth.harmonicsFunctionCache[instrumentState.unisonVoices] = harmonicsFunction;
         }
         harmonicsFunction(synth, bufferIndex, roundedSamplesPerTick, tone, instrumentState);
     }
@@ -14415,7 +14420,7 @@ export class Synth {
 
     private static pulseWidthSynth(synth: Synth, bufferIndex: number, roundedSamplesPerTick: number, tone: Tone, instrumentState: InstrumentState): void {
         const voiceCount: number = Math.max(2, instrumentState.unisonVoices);
-        let pulseFunction: Function = Synth.pulseFunctionCache[voiceCount];
+        let pulseFunction: Function = Synth.pulseFunctionCache[instrumentState.unisonVoices];
         if (pulseFunction == undefined) {
             let pulseSource: string = "return (synth, bufferIndex, roundedSamplesPerTick, tone, instrumentState) => {";
 
@@ -14517,7 +14522,7 @@ export class Synth {
         tone.initialNoteFilterInput2 = initialFilterInput2;
     }`
             pulseFunction = new Function("Config", "Synth", pulseSource)(Config, Synth);
-            Synth.pulseFunctionCache[voiceCount] = pulseFunction;
+            Synth.pulseFunctionCache[instrumentState.unisonVoices] = pulseFunction;
         }
 
         pulseFunction(synth, bufferIndex, roundedSamplesPerTick, tone, instrumentState);
@@ -14697,7 +14702,7 @@ export class Synth {
 
     private static noiseSynth(synth: Synth, bufferIndex: number, runLength: number, tone: Tone, instrumentState: InstrumentState): void {
         const voiceCount: number = Math.max(2, instrumentState.unisonVoices);
-        let noiseFunction: Function = Synth.noiseFunctionCache[voiceCount];
+        let noiseFunction: Function = Synth.noiseFunctionCache[instrumentState.unisonVoices];
         if (noiseFunction == undefined) {
             let noiseSource: string = "return (synth, bufferIndex, runLength, tone, instrumentState) => {";
 
@@ -14806,7 +14811,7 @@ export class Synth {
         tone.initialNoteFilterInput2 = initialFilterInput2;
     }`;
             noiseFunction = new Function("Config", "Synth", noiseSource)(Config, Synth);;
-            Synth.noiseFunctionCache[voiceCount] = noiseFunction;
+            Synth.noiseFunctionCache[instrumentState.unisonVoices] = noiseFunction;
         }
         noiseFunction(synth, bufferIndex, runLength, tone, instrumentState);
 
@@ -14815,7 +14820,7 @@ export class Synth {
 
     private static spectrumSynth(synth: Synth, bufferIndex: number, runLength: number, tone: Tone, instrumentState: InstrumentState): void {
         const voiceCount: number = Math.max(2,instrumentState.unisonVoices);
-        let spectrumFunction: Function = Synth.spectrumFunctionCache[voiceCount];
+        let spectrumFunction: Function = Synth.spectrumFunctionCache[instrumentState.unisonVoices];
         if (spectrumFunction == undefined) {
             let spectrumSource: string = "return (synth, bufferIndex, runLength, tone, instrumentState) => {";
 
@@ -14928,14 +14933,14 @@ export class Synth {
         tone.initialNoteFilterInput2 = initialFilterInput2;
     }`;
             spectrumFunction = new Function("Config", "Synth", spectrumSource)(Config, Synth);;
-            Synth.spectrumFunctionCache[voiceCount] = spectrumFunction;
+            Synth.spectrumFunctionCache[instrumentState.unisonVoices] = spectrumFunction;
         }
         spectrumFunction(synth, bufferIndex, runLength, tone, instrumentState);
     }
 
     private static drumsetSynth(synth: Synth, bufferIndex: number, runLength: number, tone: Tone, instrumentState: InstrumentState): void {
         const voiceCount: number = Math.max(2, instrumentState.unisonVoices);
-        let drumFunction: Function = Synth.drumFunctionCache[voiceCount];
+        let drumFunction: Function = Synth.drumFunctionCache[instrumentState.unisonVoices];
         if (drumFunction == undefined) {
             let drumSource: string = "return (synth, bufferIndex, runLength, tone, instrumentState) => {";
 
@@ -15031,7 +15036,7 @@ export class Synth {
         tone.initialNoteFilterInput2 = initialFilterInput2;
     }`;
             drumFunction = new Function("Config", "Synth", "InstrumentState", drumSource)(Config, Synth, InstrumentState);;
-            Synth.drumFunctionCache[voiceCount] = drumFunction;
+            Synth.drumFunctionCache[instrumentState.unisonVoices] = drumFunction;
         }
         drumFunction(synth, bufferIndex, runLength, tone, instrumentState);
     }

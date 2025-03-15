@@ -5357,6 +5357,7 @@ var beepbox = (function (exports) {
                         let ringModIndex = Config.modulators.dictionary["ring modulation"].index;
                         let ringModHertzIndex = Config.modulators.dictionary["ring mod hertz"].index;
                         let granularIndex = Config.modulators.dictionary["granular"].index;
+                        let grainAmountIndex = Config.modulators.dictionary["grain amount"].index;
                         let grainSizeIndex = Config.modulators.dictionary["grain size"].index;
                         let envSpeedIndex = Config.modulators.dictionary["envelope speed"].index;
                         let perEnvSpeedIndex = Config.modulators.dictionary["individual envelope speed"].index;
@@ -5417,6 +5418,9 @@ var beepbox = (function (exports) {
                                 break;
                             case granularIndex:
                                 vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].granular - Config.modulators[granularIndex].convertRealFactor;
+                                break;
+                            case grainAmountIndex:
+                                vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].grainAmounts - Config.modulators[grainAmountIndex].convertRealFactor;
                                 break;
                             case grainSizeIndex:
                                 vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].grainSize - Config.modulators[grainSizeIndex].convertRealFactor;
@@ -10308,6 +10312,7 @@ var beepbox = (function (exports) {
             this.granularDelayLine = null;
             this.granularDelayLineIndex = 0;
             this.granularMaximumDelayTimeInSeconds = 1;
+            this.usesRandomGrainLocation = true;
             this.ringModMix = 0;
             this.ringModMixDelta = 0;
             this.ringModPhase = 0;
@@ -10443,7 +10448,7 @@ var beepbox = (function (exports) {
                     }
                 }
                 if (this.granularMaximumGrains < this.granularGrainsLength) {
-                    this.granularGrainsLength = this.granularMaximumGrains;
+                    this.granularGrainsLength = Math.round(this.granularMaximumGrains);
                 }
             }
         }
@@ -10585,11 +10590,11 @@ var beepbox = (function (exports) {
             const usesEcho = effectsIncludeEcho(this.effects);
             const usesReverb = effectsIncludeReverb(this.effects);
             if (usesGranular) {
-                this.granularMaximumGrains = Math.pow(2, instrument.grainAmounts);
+                this.granularMaximumGrains = Math.pow(2, instrument.grainAmounts * envelopeStarts[52]);
                 if (synth.isModActive(Config.modulators.dictionary["grain amount"].index, channelIndex, instrumentIndex)) {
-                    this.granularMaximumGrains = Math.pow(2, synth.getModValue(Config.modulators.dictionary["grain amount"].index, channelIndex, instrumentIndex, false));
+                    this.granularMaximumGrains = Math.pow(2, synth.getModValue(Config.modulators.dictionary["grain amount"].index, channelIndex, instrumentIndex, false) * envelopeStarts[52]);
                 }
-                this.granularMaximumGrains == Math.floor(this.granularMaximumGrains * envelopeStarts[52]);
+                this.granularMaximumGrains == Math.floor(this.granularMaximumGrains);
             }
             this.allocateNecessaryBuffers(synth, instrument, samplesPerTick);
             if (usesGranular) {
@@ -10621,14 +10626,16 @@ var beepbox = (function (exports) {
                         grain.maxAgeInSamples = granularGrainSizeInSamples;
                         const minDelayTimeInSeconds = 0.02;
                         const maxDelayTimeInSeconds = 2.4;
-                        grain.delayLinePosition = (minDelayTimeInSeconds + (maxDelayTimeInSeconds - minDelayTimeInSeconds) * Math.random() * Math.random() * samplesPerSecond) % (granularDelayLineLength - 1);
+                        grain.delayLinePosition = this.usesRandomGrainLocation ? (minDelayTimeInSeconds + (maxDelayTimeInSeconds - minDelayTimeInSeconds) * Math.random() * Math.random() * samplesPerSecond) % (granularDelayLineLength - 1) : minDelayTimeInSeconds;
                         if (Config.granularEnvelopeType == 0) {
                             grain.initializeParabolicEnvelope(grain.maxAgeInSamples, 1.0);
                         }
                         else if (Config.granularEnvelopeType == 1) {
                             grain.initializeRCBEnvelope(grain.maxAgeInSamples, 1.0);
                         }
-                        grain.addDelay(Math.random() * samplesPerTick * 2);
+                        if (this.usesRandomGrainLocation) {
+                            grain.addDelay(Math.random() * samplesPerTick * 2);
+                        }
                     }
                 }
             }
@@ -10978,6 +10985,8 @@ var beepbox = (function (exports) {
                     totalDelaySamples += this.echoDelayLineL.length;
                 if (usesReverb)
                     totalDelaySamples += Config.reverbDelayBufferSize;
+                if (usesGranular)
+                    totalDelaySamples += this.granularMaximumDelayTimeInSeconds;
                 this.flushedSamples += roundedSamplesPerTick;
                 if (this.flushedSamples >= totalDelaySamples) {
                     this.deactivateAfterThisTick = true;
@@ -13709,7 +13718,7 @@ var beepbox = (function (exports) {
                     const unisonEndA = Math.pow(2.0, (unisonOffset + unisonSpread) * unisonEnvelopeEnd / 12.0);
                     tone.phaseDeltas[0] = startFreq * sampleTime * unisonStartA;
                     tone.phaseDeltaScales[0] = basePhaseDeltaScale * Math.pow(unisonEndA / unisonStartA, 1.0 / roundedSamplesPerTick);
-                    const divisor = (unisonVoices - 1 == 0) ? 1 : (unisonVoices - 1);
+                    const divisor = (unisonVoices == 1) ? 1 : (unisonVoices - 1);
                     for (let i = 1; i < unisonVoices; i++) {
                         const unisonStart = Math.pow(2.0, (unisonOffset + unisonSpread - (2 * i * unisonSpread / divisor)) * unisonEnvelopeStart / 12.0) * (specialIntervalMult);
                         const unisonEnd = Math.pow(2.0, (unisonOffset + unisonSpread - (2 * i * unisonSpread / divisor)) * unisonEnvelopeEnd / 12.0) * (specialIntervalMult);
@@ -13717,8 +13726,8 @@ var beepbox = (function (exports) {
                         tone.phaseDeltaScales[i] = basePhaseDeltaScale * Math.pow(unisonEnd / unisonStart, 1.0 / roundedSamplesPerTick);
                     }
                     for (let i = unisonVoices; i < Config.unisonVoicesMax; i++) {
-                        tone.phaseDeltas[i] = startFreq * sampleTime * unisonStartA;
-                        tone.phaseDeltaScales[i] = basePhaseDeltaScale * Math.pow(unisonEndA / unisonStartA, 1.0 / roundedSamplesPerTick);
+                        tone.phaseDeltas[i] = tone.phaseDeltas[0];
+                        tone.phaseDeltaScales[i] = tone.phaseDeltaScales[0];
                     }
                 }
                 else {
@@ -14047,7 +14056,7 @@ var beepbox = (function (exports) {
         static loopableChipSynth(synth, bufferIndex, roundedSamplesPerTick, tone, instrumentState) {
             const voiceCount = Math.max(2, instrumentState.unisonVoices);
             const chipWaveLoopMode = instrumentState.chipWaveLoopMode;
-            let chipFunction = Synth.loopableChipFunctionCache[voiceCount][chipWaveLoopMode];
+            let chipFunction = Synth.loopableChipFunctionCache[instrumentState.unisonVoices][chipWaveLoopMode];
             if (chipFunction == undefined) {
                 let chipSource = "return (synth, bufferIndex, roundedSamplesPerTick, tone, instrumentState) => {";
                 chipSource += `
@@ -14332,13 +14341,13 @@ var beepbox = (function (exports) {
         tone.initialNoteFilterInput2 = initialFilterInput2;
         }`;
                 chipFunction = new Function("Config", "Synth", "effectsIncludeDistortion", chipSource)(Config, Synth, effectsIncludeDistortion);
-                Synth.loopableChipFunctionCache[voiceCount][chipWaveLoopMode] = chipFunction;
+                Synth.loopableChipFunctionCache[instrumentState.unisonVoices][chipWaveLoopMode] = chipFunction;
             }
             chipFunction(synth, bufferIndex, roundedSamplesPerTick, tone, instrumentState);
         }
         static chipSynth(synth, bufferIndex, roundedSamplesPerTick, tone, instrumentState) {
             const voiceCount = Math.max(2, instrumentState.unisonVoices);
-            let chipFunction = Synth.chipFunctionCache[voiceCount];
+            let chipFunction = Synth.chipFunctionCache[instrumentState.unisonVoices];
             if (chipFunction == undefined) {
                 let chipSource = "return (synth, bufferIndex, roundedSamplesPerTick, tone, instrumentState) => {";
                 chipSource += `
@@ -14452,13 +14461,14 @@ var beepbox = (function (exports) {
         tone.initialNoteFilterInput2 = initialFilterInput2;
     }`;
                 chipFunction = new Function("Config", "Synth", "effectsIncludeDistortion", chipSource)(Config, Synth, effectsIncludeDistortion);
-                Synth.chipFunctionCache[voiceCount] = chipFunction;
+                Synth.chipFunctionCache[instrumentState.unisonVoices] = chipFunction;
             }
             chipFunction(synth, bufferIndex, roundedSamplesPerTick, tone, instrumentState);
         }
         static harmonicsSynth(synth, bufferIndex, roundedSamplesPerTick, tone, instrumentState) {
             const voiceCount = Math.max(2, instrumentState.unisonVoices);
-            let harmonicsFunction = Synth.harmonicsFunctionCache[voiceCount];
+            let harmonicsFunction = Synth.harmonicsFunctionCache[instrumentState.unisonVoices];
+            console.log(harmonicsFunction);
             if (harmonicsFunction == undefined) {
                 let harmonicsSource = "return (synth, bufferIndex, roundedSamplesPerTick, tone, instrumentState) => {";
                 harmonicsSource += `
@@ -14545,7 +14555,7 @@ var beepbox = (function (exports) {
         tone.initialNoteFilterInput2 = initialFilterInput2;
     }`;
                 harmonicsFunction = new Function("Config", "Synth", harmonicsSource)(Config, Synth);
-                Synth.harmonicsFunctionCache[voiceCount] = harmonicsFunction;
+                Synth.harmonicsFunctionCache[instrumentState.unisonVoices] = harmonicsFunction;
             }
             harmonicsFunction(synth, bufferIndex, roundedSamplesPerTick, tone, instrumentState);
         }
@@ -15372,7 +15382,7 @@ var beepbox = (function (exports) {
         }
         static pulseWidthSynth(synth, bufferIndex, roundedSamplesPerTick, tone, instrumentState) {
             const voiceCount = Math.max(2, instrumentState.unisonVoices);
-            let pulseFunction = Synth.pulseFunctionCache[voiceCount];
+            let pulseFunction = Synth.pulseFunctionCache[instrumentState.unisonVoices];
             if (pulseFunction == undefined) {
                 let pulseSource = "return (synth, bufferIndex, roundedSamplesPerTick, tone, instrumentState) => {";
                 pulseSource += `
@@ -15461,7 +15471,7 @@ var beepbox = (function (exports) {
         tone.initialNoteFilterInput2 = initialFilterInput2;
     }`;
                 pulseFunction = new Function("Config", "Synth", pulseSource)(Config, Synth);
-                Synth.pulseFunctionCache[voiceCount] = pulseFunction;
+                Synth.pulseFunctionCache[instrumentState.unisonVoices] = pulseFunction;
             }
             pulseFunction(synth, bufferIndex, roundedSamplesPerTick, tone, instrumentState);
         }
@@ -15553,7 +15563,7 @@ var beepbox = (function (exports) {
         }
         static noiseSynth(synth, bufferIndex, runLength, tone, instrumentState) {
             const voiceCount = Math.max(2, instrumentState.unisonVoices);
-            let noiseFunction = Synth.noiseFunctionCache[voiceCount];
+            let noiseFunction = Synth.noiseFunctionCache[instrumentState.unisonVoices];
             if (noiseFunction == undefined) {
                 let noiseSource = "return (synth, bufferIndex, runLength, tone, instrumentState) => {";
                 noiseSource += `
@@ -15650,13 +15660,13 @@ var beepbox = (function (exports) {
         tone.initialNoteFilterInput2 = initialFilterInput2;
     }`;
                 noiseFunction = new Function("Config", "Synth", noiseSource)(Config, Synth);
-                Synth.noiseFunctionCache[voiceCount] = noiseFunction;
+                Synth.noiseFunctionCache[instrumentState.unisonVoices] = noiseFunction;
             }
             noiseFunction(synth, bufferIndex, runLength, tone, instrumentState);
         }
         static spectrumSynth(synth, bufferIndex, runLength, tone, instrumentState) {
             const voiceCount = Math.max(2, instrumentState.unisonVoices);
-            let spectrumFunction = Synth.spectrumFunctionCache[voiceCount];
+            let spectrumFunction = Synth.spectrumFunctionCache[instrumentState.unisonVoices];
             if (spectrumFunction == undefined) {
                 let spectrumSource = "return (synth, bufferIndex, runLength, tone, instrumentState) => {";
                 spectrumSource += `
@@ -15757,13 +15767,13 @@ var beepbox = (function (exports) {
         tone.initialNoteFilterInput2 = initialFilterInput2;
     }`;
                 spectrumFunction = new Function("Config", "Synth", spectrumSource)(Config, Synth);
-                Synth.spectrumFunctionCache[voiceCount] = spectrumFunction;
+                Synth.spectrumFunctionCache[instrumentState.unisonVoices] = spectrumFunction;
             }
             spectrumFunction(synth, bufferIndex, runLength, tone, instrumentState);
         }
         static drumsetSynth(synth, bufferIndex, runLength, tone, instrumentState) {
             const voiceCount = Math.max(2, instrumentState.unisonVoices);
-            let drumFunction = Synth.drumFunctionCache[voiceCount];
+            let drumFunction = Synth.drumFunctionCache[instrumentState.unisonVoices];
             if (drumFunction == undefined) {
                 let drumSource = "return (synth, bufferIndex, runLength, tone, instrumentState) => {";
                 drumSource += `
@@ -15847,7 +15857,7 @@ var beepbox = (function (exports) {
         tone.initialNoteFilterInput2 = initialFilterInput2;
     }`;
                 drumFunction = new Function("Config", "Synth", "InstrumentState", drumSource)(Config, Synth, InstrumentState);
-                Synth.drumFunctionCache[voiceCount] = drumFunction;
+                Synth.drumFunctionCache[instrumentState.unisonVoices] = drumFunction;
             }
             drumFunction(synth, bufferIndex, runLength, tone, instrumentState);
         }

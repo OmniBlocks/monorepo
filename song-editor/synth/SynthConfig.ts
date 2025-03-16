@@ -1675,7 +1675,7 @@ export class Config {
         { name: "ringModulation", computeIndex: EnvelopeComputeIndex.ringModulation, displayName: "ring mod", interleave: false, isFilter: false, maxCount: 1, effect: EffectType.ringModulation, compatibleInstruments: null },
         { name: "ringModulationHz", computeIndex: EnvelopeComputeIndex.ringModulationHz, displayName: "ring mod hz", interleave: false, isFilter: false, maxCount: 1, effect: EffectType.ringModulation, compatibleInstruments: null },
         { name: "granular", computeIndex: EnvelopeComputeIndex.granular, displayName: "granular", interleave: false, isFilter: false, maxCount: 1, effect: EffectType.granular, compatibleInstruments: null },
-        { name: "grainAmount", computeIndex: EnvelopeComputeIndex.grainAmount, displayName: "grain #", interleave: false, isFilter: false, maxCount: 1, effect: EffectType.granular, compatibleInstruments: null },
+        { name: "grain Freq", computeIndex: EnvelopeComputeIndex.grainAmount, displayName: "grain freq", interleave: false, isFilter: false, maxCount: 1, effect: EffectType.granular, compatibleInstruments: null },
         { name: "grainSize", computeIndex: EnvelopeComputeIndex.grainSize, displayName: "grain size", interleave: false, isFilter: false, maxCount: 1, effect: EffectType.granular, compatibleInstruments: null },
         { name: "echoDelay", computeIndex: EnvelopeComputeIndex.echoDelay, displayName: "echo delay", interleave: false, isFilter: false, maxCount: 1, effect: EffectType.echo, compatibleInstruments: null }, // wait until after we're computing a tick's settings for multiple run lengths.
         // Controlling filter gain is less obvious and intuitive than controlling filter freq, so to avoid confusion I've disabled it for now...

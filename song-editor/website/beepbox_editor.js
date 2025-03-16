@@ -1145,7 +1145,7 @@ var beepbox = (function (exports) {
         { name: "ringModulation", computeIndex: 49, displayName: "ring mod", interleave: false, isFilter: false, maxCount: 1, effect: 13, compatibleInstruments: null },
         { name: "ringModulationHz", computeIndex: 50, displayName: "ring mod hz", interleave: false, isFilter: false, maxCount: 1, effect: 13, compatibleInstruments: null },
         { name: "granular", computeIndex: 51, displayName: "granular", interleave: false, isFilter: false, maxCount: 1, effect: 14, compatibleInstruments: null },
-        { name: "grainAmount", computeIndex: 52, displayName: "grain #", interleave: false, isFilter: false, maxCount: 1, effect: 14, compatibleInstruments: null },
+        { name: "grain Freq", computeIndex: 52, displayName: "grain freq", interleave: false, isFilter: false, maxCount: 1, effect: 14, compatibleInstruments: null },
         { name: "grainSize", computeIndex: 53, displayName: "grain size", interleave: false, isFilter: false, maxCount: 1, effect: 14, compatibleInstruments: null },
         { name: "echoDelay", computeIndex: 54, displayName: "echo delay", interleave: false, isFilter: false, maxCount: 1, effect: 6, compatibleInstruments: null },
     ]);
@@ -12199,6 +12199,7 @@ li.select2-results__option[role=group] > strong:hover {
             this.steps = 2;
             this.seed = 2;
             this.waveform = 0;
+            this.discrete = false;
             this.reset();
         }
         reset() {
@@ -12216,8 +12217,7 @@ li.select2-results__option[role=group] > strong:hover {
             this.steps = 2;
             this.seed = 2;
             this.waveform = 0;
-            this.noteSizeStart = 0;
-            this.noteSizeEnd = Config.noteSizeMax;
+            this.discrete = false;
         }
         toJsonObject() {
             const envelopeObject = {
@@ -12227,6 +12227,7 @@ li.select2-results__option[role=group] > strong:hover {
                 "perEnvelopeSpeed": this.perEnvelopeSpeed,
                 "perEnvelopeLowerBound": this.perEnvelopeLowerBound,
                 "perEnvelopeUpperBound": this.perEnvelopeUpperBound,
+                "discrete": this.discrete,
             };
             if (Config.instrumentAutomationTargets[this.target].maxCount > 1) {
                 envelopeObject["index"] = this.index;
@@ -12243,10 +12244,6 @@ li.select2-results__option[role=group] > strong:hover {
             else if (Config.newEnvelopes[this.envelope].name == "lfo") {
                 envelopeObject["waveform"] = this.waveform;
                 envelopeObject["steps"] = this.steps;
-            }
-            else if (Config.newEnvelopes[this.envelope].name == "note size") {
-                envelopeObject["noteSizeStart"] = this.noteSizeStart;
-                envelopeObject["noteSizeEnd"] = this.noteSizeEnd;
             }
             return envelopeObject;
         }
@@ -12363,17 +12360,11 @@ li.select2-results__option[role=group] > strong:hover {
             else {
                 this.waveform = 0;
             }
-            if (envelopeObject["noteSizeStart"] != undefined) {
-                this.noteSizeStart = envelopeObject["noteSizeStart"];
+            if (envelopeObject["discrete"] != undefined) {
+                this.discrete = envelopeObject["discrete"];
             }
             else {
-                this.noteSizeStart = 0;
-            }
-            if (envelopeObject["noteSizeEnd"] != undefined) {
-                this.noteSizeEnd = envelopeObject["noteSizeEnd"];
-            }
-            else {
-                this.noteSizeEnd = Config.noteSizeMax;
+                this.discrete = false;
             }
         }
     }
@@ -12413,7 +12404,6 @@ li.select2-results__option[role=group] > strong:hover {
             this.vibratoDelay = 0;
             this.vibratoType = 0;
             this.envelopeSpeed = 12;
-            this.discreteEnvelope = false;
             this.unison = 0;
             this.unisonVoices = 1;
             this.unisonSpread = 0.0;
@@ -12548,7 +12538,6 @@ li.select2-results__option[role=group] > strong:hover {
             this.clicklessTransition = false;
             this.arpeggioSpeed = 12;
             this.envelopeSpeed = 12;
-            this.discreteEnvelope = false;
             this.legacyTieOver = false;
             this.aliases = false;
             this.fadeIn = 0;
@@ -12773,8 +12762,7 @@ li.select2-results__option[role=group] > strong:hover {
                 "eqFilterType": this.eqFilterType,
                 "eqSimpleCut": this.eqFilterSimpleCut,
                 "eqSimplePeak": this.eqFilterSimplePeak,
-                "envelopeSpeed": this.envelopeSpeed,
-                "discreteEnvelope": this.discreteEnvelope,
+                "envelopeSpeed": this.envelopeSpeed
             };
             if (this.preset != this.type) {
                 instrumentObject["preset"] = this.preset;
@@ -13079,12 +13067,6 @@ li.select2-results__option[role=group] > strong:hover {
                 this.volume = 0;
             }
             this.envelopeSpeed = instrumentObject["envelopeSpeed"] != undefined ? clamp(0, Config.modulators.dictionary["envelope speed"].maxRawVol + 1, instrumentObject["envelopeSpeed"] | 0) : 12;
-            if (instrumentObject["discreteEnvelope"] != undefined) {
-                this.discreteEnvelope = instrumentObject["discreteEnvelope"];
-            }
-            else {
-                this.discreteEnvelope = false;
-            }
             if (Array.isArray(instrumentObject["effects"])) {
                 let effects = 0;
                 for (let i = 0; i < instrumentObject["effects"].length; i++) {
@@ -13728,7 +13710,14 @@ li.select2-results__option[role=group] > strong:hover {
                         else {
                             envelopeInverse = tempEnvelope.inverse;
                         }
-                        this.addEnvelope(tempEnvelope.target, tempEnvelope.index, tempEnvelope.envelope, true, pitchEnvelopeStart, pitchEnvelopeEnd, envelopeInverse, tempEnvelope.perEnvelopeSpeed, tempEnvelope.perEnvelopeLowerBound, tempEnvelope.perEnvelopeUpperBound, tempEnvelope.steps, tempEnvelope.seed, tempEnvelope.waveform);
+                        let discreteEnvelope;
+                        if (instrumentObject["discreteEnvelope"] != undefined) {
+                            discreteEnvelope = instrumentObject["discreteEnvelope"];
+                        }
+                        else {
+                            discreteEnvelope = tempEnvelope.discrete;
+                        }
+                        this.addEnvelope(tempEnvelope.target, tempEnvelope.index, tempEnvelope.envelope, true, pitchEnvelopeStart, pitchEnvelopeEnd, envelopeInverse, tempEnvelope.perEnvelopeSpeed, tempEnvelope.perEnvelopeLowerBound, tempEnvelope.perEnvelopeUpperBound, tempEnvelope.steps, tempEnvelope.seed, tempEnvelope.waveform, discreteEnvelope);
                     }
                 }
             }
@@ -13772,7 +13761,7 @@ li.select2-results__option[role=group] > strong:hover {
         static frequencyFromPitch(pitch) {
             return 440.0 * Math.pow(2.0, (pitch - 69.0) / 12.0);
         }
-        addEnvelope(target, index, envelope, newEnvelopes, start = 0, end = -1, inverse = false, perEnvelopeSpeed = -1, perEnvelopeLowerBound = 0, perEnvelopeUpperBound = 1, steps = 2, seed = 2, waveform = 0, noteSizeStart = 0, noteSizeEnd = Config.noteSizeMax) {
+        addEnvelope(target, index, envelope, newEnvelopes, start = 0, end = -1, inverse = false, perEnvelopeSpeed = -1, perEnvelopeLowerBound = 0, perEnvelopeUpperBound = 1, steps = 2, seed = 2, waveform = 0, discrete = false) {
             end = end != -1 ? end : this.isNoiseInstrument ? Config.drumCount - 1 : Config.maxPitch;
             perEnvelopeSpeed = perEnvelopeSpeed != -1 ? perEnvelopeSpeed : newEnvelopes ? 1 : Config.envelopes[envelope].speed;
             let makeEmpty = false;
@@ -13800,8 +13789,7 @@ li.select2-results__option[role=group] > strong:hover {
             envelopeSettings.steps = steps;
             envelopeSettings.seed = seed;
             envelopeSettings.waveform = waveform;
-            envelopeSettings.noteSizeStart = noteSizeStart;
-            envelopeSettings.noteSizeEnd = noteSizeEnd;
+            envelopeSettings.discrete = discrete;
             this.envelopeCount++;
         }
         supportsEnvelopeTarget(target, index) {
@@ -14529,7 +14517,6 @@ li.select2-results__option[role=group] > strong:hover {
                     }
                     buffer.push(69, base64IntToCharCode[instrument.envelopeCount]);
                     buffer.push(base64IntToCharCode[instrument.envelopeSpeed]);
-                    buffer.push(base64IntToCharCode[+instrument.discreteEnvelope]);
                     for (let envelopeIndex = 0; envelopeIndex < instrument.envelopeCount; envelopeIndex++) {
                         buffer.push(base64IntToCharCode[instrument.envelopes[envelopeIndex].target]);
                         if (Config.instrumentAutomationTargets[instrument.envelopes[envelopeIndex].target].maxCount > 1) {
@@ -14557,11 +14544,10 @@ li.select2-results__option[role=group] > strong:hover {
                                 buffer.push(base64IntToCharCode[instrument.envelopes[envelopeIndex].steps]);
                             }
                         }
-                        else if (Config.newEnvelopes[instrument.envelopes[envelopeIndex].envelope].name == "note size") {
-                            buffer.push(base64IntToCharCode[instrument.envelopes[envelopeIndex].noteSizeStart]);
-                            buffer.push(base64IntToCharCode[instrument.envelopes[envelopeIndex].noteSizeEnd]);
-                        }
-                        buffer.push(base64IntToCharCode[(+instrument.envelopes[envelopeIndex].inverse)] ? base64IntToCharCode[(+instrument.envelopes[envelopeIndex].inverse)] : base64IntToCharCode[0]);
+                        let checkboxValues = +instrument.envelopes[envelopeIndex].inverse;
+                        checkboxValues = checkboxValues << 1;
+                        checkboxValues += +instrument.envelopes[envelopeIndex].discrete;
+                        buffer.push(base64IntToCharCode[checkboxValues] ? base64IntToCharCode[checkboxValues] : base64IntToCharCode[0]);
                         if (Config.newEnvelopes[instrument.envelopes[envelopeIndex].envelope].name != "pitch" && Config.newEnvelopes[instrument.envelopes[envelopeIndex].envelope].name != "note size" && Config.newEnvelopes[instrument.envelopes[envelopeIndex].envelope].name != "punch" && Config.newEnvelopes[instrument.envelopes[envelopeIndex].envelope].name != "none") {
                             buffer.push(base64IntToCharCode[Config.perEnvelopeSpeedToIndices[instrument.envelopes[envelopeIndex].perEnvelopeSpeed]]);
                         }
@@ -16358,10 +16344,13 @@ li.select2-results__option[role=group] > strong:hover {
                             }
                             else {
                                 const envelopeCount = clamp(0, Config.maxEnvelopeCount + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                                let envelopeDiscrete = false;
                                 if ((fromJummBox && !beforeSix) || (fromUltraBox && !beforeFive) || (fromSlarmoosBox)) {
                                     lastViewedSetting = "Envelope Speed";
                                     instrument.envelopeSpeed = clamp(0, Config.modulators.dictionary["envelope speed"].maxRawVol + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
-                                    instrument.discreteEnvelope = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)]) ? true : false;
+                                    if (!fromSlarmoosBox || beforeFive) {
+                                        envelopeDiscrete = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)]) ? true : false;
+                                    }
                                 }
                                 lastViewedSetting = "Envelopes " + ((fromSlarmoosBox && !beforeThree) ? "(advanced)" : "(simple)");
                                 for (let i = 0; i < envelopeCount; i++) {
@@ -16403,14 +16392,6 @@ li.select2-results__option[role=group] > strong:hover {
                                     let steps = 2;
                                     let seed = 2;
                                     let waveform = 0;
-                                    let noteSizeStart = 0;
-                                    let noteSizeEnd = Config.noteSizeMax;
-                                    if (fromSlarmoosBox && !beforeFive) {
-                                        if (Config.newEnvelopes[envelope].name == "note size") {
-                                            noteSizeStart = clamp(0, Config.noteSizeMax + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
-                                            noteSizeEnd = clamp(0, Config.noteSizeMax + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
-                                        }
-                                    }
                                     if (fromSlarmoosBox && !beforeFour) {
                                         if (Config.newEnvelopes[envelope].name == "lfo") {
                                             waveform = clamp(0, 7, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
@@ -16437,7 +16418,11 @@ li.select2-results__option[role=group] > strong:hover {
                                                 pitchEnvelopeEnd = clamp(0, Config.drumCount, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                                             }
                                         }
-                                        envelopeInverse = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] == 1 ? true : false;
+                                        let checkboxValues = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                                        if (fromSlarmoosBox && !beforeFive) {
+                                            envelopeDiscrete = (checkboxValues & 1) == 1 ? true : false;
+                                        }
+                                        envelopeInverse = (checkboxValues >> 1) == 1 ? true : false;
                                         if (Config.newEnvelopes[envelope].name != "pitch" && Config.newEnvelopes[envelope].name != "note size" && Config.newEnvelopes[envelope].name != "punch" && Config.newEnvelopes[envelope].name != "none") {
                                             perEnvelopeSpeed = Config.perEnvelopeSpeedIndices[base64CharCodeToInt[compressed.charCodeAt(charIndex++)]];
                                         }
@@ -16457,7 +16442,7 @@ li.select2-results__option[role=group] > strong:hover {
                                             }
                                         }
                                     }
-                                    instrument.addEnvelope(target, index, envelope, true, pitchEnvelopeStart, pitchEnvelopeEnd, envelopeInverse, perEnvelopeSpeed, perEnvelopeLowerBound, perEnvelopeUpperBound, steps, seed, waveform, noteSizeStart, noteSizeEnd);
+                                    instrument.addEnvelope(target, index, envelope, true, pitchEnvelopeStart, pitchEnvelopeEnd, envelopeInverse, perEnvelopeSpeed, perEnvelopeLowerBound, perEnvelopeUpperBound, steps, seed, waveform, envelopeDiscrete);
                                     if (fromSlarmoosBox && beforeThree && !beforeTwo) {
                                         let pitchEnvelopeCompact = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                                         instrument.envelopes[i].pitchEnvelopeStart = pitchEnvelopeCompact * 64 + base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
@@ -18286,6 +18271,7 @@ li.select2-results__option[role=group] > strong:hover {
                 let targetIndex;
                 let envelope;
                 let inverse = false;
+                let isDiscrete = false;
                 let perEnvelopeSpeed = 1;
                 let globalEnvelopeSpeed = 1;
                 let envelopeSpeed = perEnvelopeSpeed * globalEnvelopeSpeed;
@@ -18295,8 +18281,6 @@ li.select2-results__option[role=group] > strong:hover {
                 let steps = 2;
                 let seed = 2;
                 let waveform = 0;
-                let noteSizeEnvelopeStart = 0;
-                let noteSizeEnvelopeEnd = Config.noteSizeMax;
                 let startPinTickAbsolute = this.startPinTickAbsolute || 0.0;
                 if (envelopeIndex == instrument.envelopeCount) {
                     if (usedNoteSize)
@@ -18304,8 +18288,6 @@ li.select2-results__option[role=group] > strong:hover {
                     automationTarget = Config.instrumentAutomationTargets.dictionary["noteVolume"];
                     targetIndex = 0;
                     envelope = Config.newEnvelopes.dictionary["note size"];
-                    noteSizeEnvelopeStart = 0;
-                    noteSizeEnvelopeEnd = Config.noteSizeMax;
                 }
                 else {
                     let envelopeSettings = instrument.envelopes[envelopeIndex];
@@ -18313,6 +18295,7 @@ li.select2-results__option[role=group] > strong:hover {
                     targetIndex = envelopeSettings.index;
                     envelope = Config.newEnvelopes[envelopeSettings.envelope];
                     inverse = instrument.envelopes[envelopeIndex].inverse;
+                    isDiscrete = instrument.envelopes[envelopeIndex].discrete;
                     perEnvelopeSpeed = instrument.envelopes[envelopeIndex].perEnvelopeSpeed;
                     globalEnvelopeSpeed = Math.pow(instrument.envelopeSpeed, 2) / 144;
                     envelopeSpeed = perEnvelopeSpeed == 0 || globalEnvelopeSpeed == 0 ? perEnvelopeSpeed + globalEnvelopeSpeed : perEnvelopeSpeed * globalEnvelopeSpeed;
@@ -18326,8 +18309,6 @@ li.select2-results__option[role=group] > strong:hover {
                         instrument.envelopes[envelopeIndex].waveform = 0;
                     }
                     waveform = instrument.envelopes[envelopeIndex].waveform;
-                    noteSizeEnvelopeStart = instrument.envelopes[envelopeIndex].noteSizeStart;
-                    noteSizeEnvelopeEnd = instrument.envelopes[envelopeIndex].noteSizeEnd;
                     if (!timeScale[envelopeIndex])
                         timeScale[envelopeIndex] = 0;
                     const secondsPerTickScaled = secondsPerTick * timeScale[envelopeIndex];
@@ -18347,24 +18328,24 @@ li.select2-results__option[role=group] > strong:hover {
                 const pitch = (envelope.type == 2) ? this.computePitchEnvelope(instrument, envelopeIndex, this.getPitchValue(instrument, tone, instrumentState, true)) : 0;
                 if (automationTarget.computeIndex != null) {
                     const computeIndex = automationTarget.computeIndex + targetIndex;
-                    let envelopeStart = EnvelopeComputer.computeEnvelope(envelope, envelopeSpeed, noteSecondsStartUnscaled, noteSecondsStart[envelopeIndex], beatTimeStart[envelopeIndex], timeSinceStart, noteSizeStart, pitch, inverse, perEnvelopeLowerBound, perEnvelopeUpperBound, false, steps, seed, waveform, defaultPitch, startPinTickAbsolute, noteSizeEnvelopeStart, noteSizeEnvelopeEnd);
+                    let envelopeStart = EnvelopeComputer.computeEnvelope(envelope, envelopeSpeed, noteSecondsStartUnscaled, noteSecondsStart[envelopeIndex], beatTimeStart[envelopeIndex], timeSinceStart, noteSizeStart, pitch, inverse, perEnvelopeLowerBound, perEnvelopeUpperBound, false, steps, seed, waveform, defaultPitch, startPinTickAbsolute);
                     if (prevSlideStart) {
-                        const other = EnvelopeComputer.computeEnvelope(envelope, envelopeSpeed, prevNoteSecondsStartUnscaled, prevNoteSecondsStart[envelopeIndex], beatTimeStart[envelopeIndex], timeSinceStart, prevNoteSize, pitch, inverse, perEnvelopeLowerBound, perEnvelopeUpperBound, false, steps, seed, waveform, defaultPitch, startPinTickAbsolute, noteSizeEnvelopeStart, noteSizeEnvelopeEnd);
+                        const other = EnvelopeComputer.computeEnvelope(envelope, envelopeSpeed, prevNoteSecondsStartUnscaled, prevNoteSecondsStart[envelopeIndex], beatTimeStart[envelopeIndex], timeSinceStart, prevNoteSize, pitch, inverse, perEnvelopeLowerBound, perEnvelopeUpperBound, false, steps, seed, waveform, defaultPitch, startPinTickAbsolute);
                         envelopeStart += (other - envelopeStart) * prevSlideRatioStart;
                     }
                     if (nextSlideStart) {
-                        const other = EnvelopeComputer.computeEnvelope(envelope, envelopeSpeed, 0.0, 0.0, beatTimeStart[envelopeIndex], timeSinceStart, nextNoteSize, pitch, inverse, perEnvelopeLowerBound, perEnvelopeUpperBound, false, steps, seed, waveform, defaultPitch, startPinTickAbsolute, noteSizeEnvelopeStart, noteSizeEnvelopeEnd);
+                        const other = EnvelopeComputer.computeEnvelope(envelope, envelopeSpeed, 0.0, 0.0, beatTimeStart[envelopeIndex], timeSinceStart, nextNoteSize, pitch, inverse, perEnvelopeLowerBound, perEnvelopeUpperBound, false, steps, seed, waveform, defaultPitch, startPinTickAbsolute);
                         envelopeStart += (other - envelopeStart) * nextSlideRatioStart;
                     }
                     let envelopeEnd = envelopeStart;
-                    if (instrument.discreteEnvelope == false) {
-                        envelopeEnd = EnvelopeComputer.computeEnvelope(envelope, envelopeSpeed, noteSecondsEndUnscaled, noteSecondsEnd[envelopeIndex], beatTimeEnd[envelopeIndex], timeSinceStart, noteSizeEnd, pitch, inverse, perEnvelopeLowerBound, perEnvelopeUpperBound, false, steps, seed, waveform, defaultPitch, startPinTickAbsolute, noteSizeEnvelopeStart, noteSizeEnvelopeEnd);
+                    if (isDiscrete == false) {
+                        envelopeEnd = EnvelopeComputer.computeEnvelope(envelope, envelopeSpeed, noteSecondsEndUnscaled, noteSecondsEnd[envelopeIndex], beatTimeEnd[envelopeIndex], timeSinceStart, noteSizeEnd, pitch, inverse, perEnvelopeLowerBound, perEnvelopeUpperBound, false, steps, seed, waveform, defaultPitch, startPinTickAbsolute);
                         if (prevSlideEnd) {
-                            const other = EnvelopeComputer.computeEnvelope(envelope, envelopeSpeed, prevNoteSecondsEndUnscaled, prevNoteSecondsEnd[envelopeIndex], beatTimeEnd[envelopeIndex], timeSinceStart, prevNoteSize, pitch, inverse, perEnvelopeLowerBound, perEnvelopeUpperBound, false, steps, seed, waveform, defaultPitch, startPinTickAbsolute, noteSizeEnvelopeStart, noteSizeEnvelopeEnd);
+                            const other = EnvelopeComputer.computeEnvelope(envelope, envelopeSpeed, prevNoteSecondsEndUnscaled, prevNoteSecondsEnd[envelopeIndex], beatTimeEnd[envelopeIndex], timeSinceStart, prevNoteSize, pitch, inverse, perEnvelopeLowerBound, perEnvelopeUpperBound, false, steps, seed, waveform, defaultPitch, startPinTickAbsolute);
                             envelopeEnd += (other - envelopeEnd) * prevSlideRatioEnd;
                         }
                         if (nextSlideEnd) {
-                            const other = EnvelopeComputer.computeEnvelope(envelope, envelopeSpeed, 0.0, 0.0, beatTimeEnd[envelopeIndex], timeSinceStart, nextNoteSize, pitch, inverse, perEnvelopeLowerBound, perEnvelopeUpperBound, false, steps, seed, waveform, defaultPitch, startPinTickAbsolute, noteSizeEnvelopeStart, noteSizeEnvelopeEnd);
+                            const other = EnvelopeComputer.computeEnvelope(envelope, envelopeSpeed, 0.0, 0.0, beatTimeEnd[envelopeIndex], timeSinceStart, nextNoteSize, pitch, inverse, perEnvelopeLowerBound, perEnvelopeUpperBound, false, steps, seed, waveform, defaultPitch, startPinTickAbsolute);
                             envelopeEnd += (other - envelopeEnd) * nextSlideRatioEnd;
                         }
                     }
@@ -18415,7 +18396,7 @@ li.select2-results__option[role=group] > strong:hover {
             }
             this._modifiedEnvelopeCount = 0;
         }
-        static computeEnvelope(envelope, perEnvelopeSpeed, unspedTime, time, beats, timeSinceStart, noteSize, pitch, inverse, perEnvelopeLowerBound, perEnvelopeUpperBound, isDrumset = false, steps, seed, waveform, defaultPitch, notePinStart, noteSizeStart, noteSizeEnd) {
+        static computeEnvelope(envelope, perEnvelopeSpeed, unspedTime, time, beats, timeSinceStart, noteSize, pitch, inverse, perEnvelopeLowerBound, perEnvelopeUpperBound, isDrumset = false, steps, seed, waveform, defaultPitch, notePinStart) {
             const envelopeSpeed = isDrumset ? envelope.speed : 1;
             const boundAdjust = (perEnvelopeUpperBound - perEnvelopeLowerBound);
             switch (envelope.type) {
@@ -18689,7 +18670,7 @@ li.select2-results__option[role=group] > strong:hover {
         computeDrumsetEnvelopes(instrument, drumsetFilterEnvelope, beatsPerPart, partTimeStart, partTimeEnd) {
             const pitch = 1;
             function computeDrumsetEnvelope(unspedTime, time, beats, noteSize) {
-                return EnvelopeComputer.computeEnvelope(drumsetFilterEnvelope, 1, unspedTime, time, beats, 0, noteSize, pitch, false, 0, 1, true, 2, 2, 0, pitch, 0, 0, Config.noteSizeMax);
+                return EnvelopeComputer.computeEnvelope(drumsetFilterEnvelope, 1, unspedTime, time, beats, 0, noteSize, pitch, false, 0, 1, true, 2, 2, 0, pitch, 0);
             }
             let drumsetFilterEnvelopeStart = computeDrumsetEnvelope(this.noteSecondsStartUnscaled, this.noteSecondsStartUnscaled, beatsPerPart * partTimeStart, this.noteSizeStart);
             if (this.prevSlideStart) {
@@ -18701,16 +18682,14 @@ li.select2-results__option[role=group] > strong:hover {
                 drumsetFilterEnvelopeStart += (other - drumsetFilterEnvelopeStart) * this.nextSlideRatioStart;
             }
             let drumsetFilterEnvelopeEnd = drumsetFilterEnvelopeStart;
-            if (instrument.discreteEnvelope == false) {
-                drumsetFilterEnvelopeEnd = computeDrumsetEnvelope(this.noteSecondsEndUnscaled, this.noteSecondsEndUnscaled, beatsPerPart * partTimeEnd, this.noteSizeEnd);
-                if (this.prevSlideEnd) {
-                    const other = computeDrumsetEnvelope(this.prevNoteSecondsEndUnscaled, this.prevNoteSecondsEndUnscaled, beatsPerPart * partTimeEnd, this.prevNoteSize);
-                    drumsetFilterEnvelopeEnd += (other - drumsetFilterEnvelopeEnd) * this.prevSlideRatioEnd;
-                }
-                if (this.nextSlideEnd) {
-                    const other = computeDrumsetEnvelope(0.0, 0.0, beatsPerPart * partTimeEnd, this.nextNoteSize);
-                    drumsetFilterEnvelopeEnd += (other - drumsetFilterEnvelopeEnd) * this.nextSlideRatioEnd;
-                }
+            drumsetFilterEnvelopeEnd = computeDrumsetEnvelope(this.noteSecondsEndUnscaled, this.noteSecondsEndUnscaled, beatsPerPart * partTimeEnd, this.noteSizeEnd);
+            if (this.prevSlideEnd) {
+                const other = computeDrumsetEnvelope(this.prevNoteSecondsEndUnscaled, this.prevNoteSecondsEndUnscaled, beatsPerPart * partTimeEnd, this.prevNoteSize);
+                drumsetFilterEnvelopeEnd += (other - drumsetFilterEnvelopeEnd) * this.prevSlideRatioEnd;
+            }
+            if (this.nextSlideEnd) {
+                const other = computeDrumsetEnvelope(0.0, 0.0, beatsPerPart * partTimeEnd, this.nextNoteSize);
+                drumsetFilterEnvelopeEnd += (other - drumsetFilterEnvelopeEnd) * this.nextSlideRatioEnd;
             }
             this.drumsetFilterEnvelopeStart = drumsetFilterEnvelopeStart;
             this.drumsetFilterEnvelopeEnd = drumsetFilterEnvelopeEnd;
@@ -19152,8 +19131,8 @@ li.select2-results__option[role=group] > strong:hover {
             const usesReverb = effectsIncludeReverb(this.effects);
             if (usesGranular) {
                 this.granularMaximumGrains = Math.pow(2, instrument.grainAmounts * envelopeStarts[52]);
-                if (synth.isModActive(Config.modulators.dictionary["grain amount"].index, channelIndex, instrumentIndex)) {
-                    this.granularMaximumGrains = Math.pow(2, synth.getModValue(Config.modulators.dictionary["grain amount"].index, channelIndex, instrumentIndex, false) * envelopeStarts[52]);
+                if (synth.isModActive(Config.modulators.dictionary["grain freq"].index, channelIndex, instrumentIndex)) {
+                    this.granularMaximumGrains = Math.pow(2, synth.getModValue(Config.modulators.dictionary["grain freq"].index, channelIndex, instrumentIndex, false) * envelopeStarts[52]);
                 }
                 this.granularMaximumGrains == Math.floor(this.granularMaximumGrains);
             }
@@ -19195,7 +19174,7 @@ li.select2-results__option[role=group] > strong:hover {
                             grain.initializeRCBEnvelope(grain.maxAgeInSamples, 1.0);
                         }
                         if (this.usesRandomGrainLocation) {
-                            grain.addDelay(Math.random() * samplesPerTick * 2);
+                            grain.addDelay(Math.random() * samplesPerTick * 4);
                         }
                     }
                 }
@@ -23322,6 +23301,8 @@ li.select2-results__option[role=group] > strong:hover {
                 const granularDelayLineLength = granularDelayLine.length;
                 const granularDelayLineMask = granularDelayLineLength - 1;
                 let granularDelayLineIndex = instrumentState.granularDelayLineIndex;
+                const usesRandomGrainLocation = instrumentState.usesRandomGrainLocation;
+                const grainPitchShift = Math.pow(2, 12/instrumentState.activeTones.get(0).pitches[0]);
                 `;
                 }
                 if (usesDistortion) {
@@ -23564,6 +23545,9 @@ li.select2-results__option[role=group] > strong:hover {
                     }
                     effectsSource += `
                             grain.ageInSamples = grainAgeInSamples;
+                            if(usesRandomGrainLocation) {
+                                grain.delayLine -= grainPitchShift;
+                            }
                         }
                     }
                 }
@@ -27665,19 +27649,6 @@ li.select2-results__option[role=group] > strong:hover {
             }
         }
     }
-    class ChangeDiscreteEnvelope extends Change {
-        constructor(doc, newValue) {
-            super();
-            const instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
-            const oldValue = instrument.discreteEnvelope;
-            doc.notifier.changed();
-            if (oldValue != newValue) {
-                instrument.discreteEnvelope = newValue;
-                instrument.preset = instrument.type;
-                this._didSomething();
-            }
-        }
-    }
     class ChangeSpectrum extends Change {
         constructor(doc, instrument, spectrumWave) {
             super();
@@ -30239,8 +30210,7 @@ li.select2-results__option[role=group] > strong:hover {
                 instrument.envelopes[i].steps = instrument.envelopes[i + 1].steps;
                 instrument.envelopes[i].seed = instrument.envelopes[i + 1].seed;
                 instrument.envelopes[i].waveform = instrument.envelopes[i + 1].waveform;
-                instrument.envelopes[i].noteSizeStart = instrument.envelopes[i + 1].noteSizeStart;
-                instrument.envelopes[i].noteSizeEnd = instrument.envelopes[i + 1].noteSizeEnd;
+                instrument.envelopes[i].discrete = instrument.envelopes[i + 1].discrete;
             }
             instrument.preset = instrument.type;
             doc.notifier.changed();
@@ -30310,6 +30280,19 @@ li.select2-results__option[role=group] > strong:hover {
             if (oldValue != value) {
                 instrument.preset = instrument.type;
                 doc.notifier.changed();
+                this._didSomething();
+            }
+        }
+    }
+    class ChangeDiscreteEnvelope extends Change {
+        constructor(doc, newValue, index) {
+            super();
+            const instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+            const oldValue = instrument.envelopes[index].discrete;
+            doc.notifier.changed();
+            if (oldValue != newValue) {
+                instrument.envelopes[index].discrete = newValue;
+                instrument.preset = instrument.type;
                 this._didSomething();
             }
         }
@@ -30391,34 +30374,6 @@ li.select2-results__option[role=group] > strong:hover {
             waveform = parseInt(waveform + "");
             instrument.envelopes[index].waveform = waveform;
             if (oldWaveform != waveform) {
-                instrument.preset = instrument.type;
-                doc.notifier.changed();
-                this._didSomething();
-            }
-        }
-    }
-    class ChangeEnvelopeNoteSizeStart extends Change {
-        constructor(doc, noteStart, index) {
-            super();
-            const instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
-            const oldNoteStart = instrument.envelopes[index].noteSizeStart;
-            noteStart = noteStart > Config.noteSizeMax ? Config.noteSizeMax : noteStart < 0 ? 0 : noteStart;
-            instrument.envelopes[index].noteSizeStart = noteStart;
-            if (oldNoteStart != noteStart) {
-                instrument.preset = instrument.type;
-                doc.notifier.changed();
-                this._didSomething();
-            }
-        }
-    }
-    class ChangeEnvelopeNoteSizeEnd extends Change {
-        constructor(doc, noteEnd, index) {
-            super();
-            const instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
-            const oldNoteEnd = instrument.envelopes[index].noteSizeEnd;
-            noteEnd = noteEnd > Config.noteSizeMax ? Config.noteSizeMax : noteEnd < 0 ? 0 : noteEnd;
-            instrument.envelopes[index].noteSizeEnd = noteEnd;
-            if (oldNoteEnd != noteEnd) {
                 instrument.preset = instrument.type;
                 doc.notifier.changed();
                 this._didSomething();
@@ -37713,7 +37668,6 @@ You should be redirected to the song at:<br /><br />
             this.extraSettingsDropdownGroups = [];
             this.extraRandomSettingsGroups = [];
             this.extraLFODropdownGroups = [];
-            this.extraNoteSizeSettingsGroups = [];
             this.openExtraSettingsDropdowns = [];
             this.perEnvelopeSpeedGroups = [];
             this._pitchStartSliders = [];
@@ -37723,6 +37677,7 @@ You should be redirected to the song at:<br /><br />
             this._startNoteDisplays = [];
             this._endNoteDisplays = [];
             this._inverters = [];
+            this._discreters = [];
             this.perEnvelopeSpeedSliders = [];
             this._perEnvelopeSpeedDisplays = [];
             this.perEnvelopeLowerBoundBoxes = [];
@@ -37741,10 +37696,6 @@ You should be redirected to the song at:<br /><br />
             this.LFOStepsBoxes = [];
             this._LFOStepsSliders = [];
             this._LFOStepsWrappers = [];
-            this._noteSizeStartSliders = [];
-            this.noteSizeStartBoxes = [];
-            this._noteSizeEndSliders = [];
-            this.noteSizeEndBoxes = [];
             this._renderedEnvelopeCount = 0;
             this._renderedEqFilterCount = -1;
             this._renderedNoteFilterCount = -1;
@@ -37754,6 +37705,7 @@ You should be redirected to the song at:<br /><br />
                 const targetSelectIndex = this._targetSelects.indexOf(event.target);
                 const envelopeSelectIndex = this._envelopeSelects.indexOf(event.target);
                 const inverterIndex = this._inverters.indexOf(event.target);
+                const discreterIndex = this._discreters.indexOf(event.target);
                 const startBoxIndex = this.pitchStartBoxes.indexOf(event.target);
                 const endBoxIndex = this.pitchEndBoxes.indexOf(event.target);
                 const startSliderIndex = this._pitchStartSliders.indexOf(event.target);
@@ -37768,10 +37720,6 @@ You should be redirected to the song at:<br /><br />
                 const randomTypeSelectIndex = this._randomEnvelopeTypeSelects.indexOf(event.target);
                 const LFOStepsBoxIndex = this.LFOStepsBoxes.indexOf(event.target);
                 const LFOStepsSliderIndex = this._LFOStepsSliders.indexOf(event.target);
-                const noteSizeStartBoxIndex = this.noteSizeStartBoxes.indexOf(event.target);
-                const noteSizeStartSliderIndex = this._noteSizeStartSliders.indexOf(event.target);
-                const noteSizeEndBoxIndex = this.noteSizeEndBoxes.indexOf(event.target);
-                const noteSizeEndSliderIndex = this._noteSizeEndSliders.indexOf(event.target);
                 if (targetSelectIndex != -1) {
                     const combinedValue = parseInt(this._targetSelects[targetSelectIndex].value);
                     const target = combinedValue % Config.instrumentAutomationTargets.length;
@@ -37793,11 +37741,13 @@ You should be redirected to the song at:<br /><br />
                 else if (inverterIndex != -1) {
                     this._doc.record(new ChangeEnvelopeInverse(this._doc, this._inverters[inverterIndex].checked, inverterIndex));
                 }
+                else if (discreterIndex != -1) {
+                    this._doc.record(new ChangeDiscreteEnvelope(this._doc, this._discreters[discreterIndex].checked, discreterIndex));
+                }
                 else if (startBoxIndex != -1 || endBoxIndex != -1 || startSliderIndex != -1 || endSliderIndex != -1 ||
                     lowerBoundBoxIndex != -1 || upperBoundBoxIndex != -1 ||
                     randomStepsBoxIndex != -1 || randomSeedBoxIndex != -1 || randomStepsSliderIndex != -1 || randomSeedSliderIndex != -1 ||
-                    LFOStepsBoxIndex != -1 || LFOStepsSliderIndex != -1 || noteSizeStartBoxIndex != -1 || noteSizeStartSliderIndex != -1 ||
-                    noteSizeEndBoxIndex != -1 || noteSizeEndSliderIndex != -1) {
+                    LFOStepsBoxIndex != -1 || LFOStepsSliderIndex != -1) {
                     if (this._lastChange != null) {
                         this._doc.record(this._lastChange);
                         this._lastChange = null;
@@ -37834,10 +37784,6 @@ You should be redirected to the song at:<br /><br />
                 const randomSeedSliderIndex = this._randomSeedSliders.indexOf(event.target);
                 const LFOStepsBoxIndex = this.LFOStepsBoxes.indexOf(event.target);
                 const LFOStepsSliderIndex = this._LFOStepsSliders.indexOf(event.target);
-                const noteSizeStartBoxIndex = this.noteSizeStartBoxes.indexOf(event.target);
-                const noteSizeStartSliderIndex = this._noteSizeStartSliders.indexOf(event.target);
-                const noteSizeEndBoxIndex = this.noteSizeEndBoxes.indexOf(event.target);
-                const noteSizeEndSliderIndex = this._noteSizeEndSliders.indexOf(event.target);
                 const instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
                 if (startBoxIndex != -1) {
                     this._lastChange = new ChangeEnvelopePitchStart(this._doc, parseInt(this.pitchStartBoxes[startBoxIndex].value), startBoxIndex);
@@ -37874,18 +37820,6 @@ You should be redirected to the song at:<br /><br />
                 }
                 else if (LFOStepsSliderIndex != -1) {
                     this._lastChange = new ChangeRandomEnvelopeSteps(this._doc, parseFloat(this._LFOStepsSliders[LFOStepsSliderIndex].value), LFOStepsSliderIndex);
-                }
-                else if (noteSizeStartBoxIndex != -1) {
-                    this._lastChange = new ChangeEnvelopeNoteSizeStart(this._doc, parseInt(this.noteSizeStartBoxes[noteSizeStartBoxIndex].value), noteSizeStartBoxIndex);
-                }
-                else if (noteSizeEndBoxIndex != -1) {
-                    this._lastChange = new ChangeEnvelopeNoteSizeEnd(this._doc, parseInt(this.noteSizeEndBoxes[noteSizeEndBoxIndex].value), noteSizeEndBoxIndex);
-                }
-                else if (noteSizeStartSliderIndex != -1) {
-                    this._lastChange = new ChangeEnvelopeNoteSizeStart(this._doc, parseInt(this._noteSizeStartSliders[noteSizeStartSliderIndex].value), noteSizeStartSliderIndex);
-                }
-                else if (noteSizeEndSliderIndex != -1) {
-                    this._lastChange = new ChangeEnvelopeNoteSizeEnd(this._doc, parseInt(this._noteSizeEndSliders[noteSizeEndSliderIndex].value), noteSizeEndSliderIndex);
                 }
             };
             this.container.addEventListener("change", this._onChange);
@@ -37978,7 +37912,6 @@ You should be redirected to the song at:<br /><br />
                         this.perEnvelopeSpeedGroups[i].style.display = "none";
                         this.extraRandomSettingsGroups[i].style.display = "none";
                         this.extraLFODropdownGroups[i].style.display = "none";
-                        this.extraNoteSizeSettingsGroups[i].style.display = "none";
                     }
                     else if (Config.newEnvelopes[instrument.envelopes[i].envelope].name == "random") {
                         const isRandomTime = instrument.envelopes[i].waveform == 0 || instrument.envelopes[i].waveform == 3;
@@ -37997,7 +37930,6 @@ You should be redirected to the song at:<br /><br />
                         this.extraPitchSettingsGroups[i].style.display = "none";
                         this.extraRandomSettingsGroups[i].style.display = "";
                         this.extraLFODropdownGroups[i].style.display = "none";
-                        this.extraNoteSizeSettingsGroups[i].style.display = "none";
                     }
                     else if (Config.newEnvelopes[instrument.envelopes[i].envelope].name == "lfo") {
                         this._waveformSelects[i].value = instrument.envelopes[i].waveform.toString();
@@ -38014,14 +37946,12 @@ You should be redirected to the song at:<br /><br />
                         this.extraSettingsDropdowns[i].style.display = "inline";
                         this.extraPitchSettingsGroups[i].style.display = "none";
                         this.extraRandomSettingsGroups[i].style.display = "none";
-                        this.extraNoteSizeSettingsGroups[i].style.display = "none";
                     }
                     else {
                         this.extraPitchSettingsGroups[i].style.display = "none";
                         this.extraRandomSettingsGroups[i].style.display = "none";
                         this.extraLFODropdownGroups[i].style.display = "none";
-                        this.extraNoteSizeSettingsGroups[i].style.display = "none";
-                        if (Config.newEnvelopes[instrument.envelopes[i].envelope].name == "punch" || Config.newEnvelopes[instrument.envelopes[i].envelope].name == "none") {
+                        if (Config.newEnvelopes[instrument.envelopes[i].envelope].name == "punch" || Config.newEnvelopes[instrument.envelopes[i].envelope].name == "none" || Config.newEnvelopes[instrument.envelopes[i].envelope].name == "note size") {
                             this.perEnvelopeSpeedGroups[i].style.display = "none";
                         }
                         else {
@@ -38030,6 +37960,7 @@ You should be redirected to the song at:<br /><br />
                         }
                     }
                     this._inverters[i].checked = instrument.envelopes[i].inverse;
+                    this._discreters[i].checked = instrument.envelopes[i].discrete;
                     this.perEnvelopeLowerBoundBoxes[i].value = instrument.envelopes[i].perEnvelopeLowerBound.toString();
                     this.perEnvelopeUpperBoundBoxes[i].value = instrument.envelopes[i].perEnvelopeUpperBound.toString();
                     this.perEnvelopeLowerBoundSliders[i].updateValue(instrument.envelopes[i].perEnvelopeLowerBound);
@@ -38059,9 +37990,6 @@ You should be redirected to the song at:<br /><br />
                     }
                     if (this.extraRandomSettingsGroups[i]) {
                         this.extraRandomSettingsGroups[i].style.display = "none";
-                    }
-                    if (this.extraNoteSizeSettingsGroups[i]) {
-                        this.extraNoteSizeSettingsGroups[i].style.display = "none";
                     }
                 }
             }
@@ -38138,16 +38066,6 @@ You should be redirected to the song at:<br /><br />
                 const waveformWrapper = HTML.div({ class: "editor-controls selectContainer", style: "margin-top: 3px; flex:1; display:flex; flex-direction: row; align-items:center; justify-content:right;" }, HTML.span({ style: "font-size: smaller; margin-right: 10px;", class: "tip", onclick: () => this._openPrompt("lfoEnvelopeWaveform") }, "Waveform: "), waveformSelect);
                 const extraLFOSettingsGroup = HTML.div({ class: "editor-controls", style: "margin-top: 3px; flex:1; display:flex; flex-direction: column; align-items:center; justify-content:right;" }, waveformWrapper, LFOStepsWrapper);
                 extraLFOSettingsGroup.style.display = "none";
-                const noteSizeStartBox = HTML.input({ value: instrument.envelopes[envelopeIndex].noteSizeStart, type: "number", min: 0, max: Config.noteSizeMax, step: 1, style: "width: 4em; font-size: 80%; " });
-                const noteSizeStartSlider = HTML.input({ value: instrument.envelopes[envelopeIndex].noteSizeStart, type: "range", min: 0, max: Config.noteSizeMax, step: 1, style: "width: 113px; margin-left: 0px;" });
-                const noteSizeEndBox = HTML.input({ value: instrument.envelopes[envelopeIndex].noteSizeEnd, type: "number", min: 0, max: Config.noteSizeMax, step: 1, style: "width: 4em; font-size: 80%; " });
-                const noteSizeEndSlider = HTML.input({ value: instrument.envelopes[envelopeIndex].noteSizeEnd, type: "range", min: 0, max: Config.noteSizeMax, step: 1, style: "width: 113px; margin-left: 0px;" });
-                const noteSizeStartBoxWrapper = HTML.div({ style: "flex: 1; display: flex; flex-direction: column; align-items: center;" }, HTML.span({ class: "tip", style: `width:68px; flex:1; height:1em; font-size: smaller;`, onclick: () => this._openPrompt("noteSizeRange") }, "Start: "), noteSizeStartBox);
-                const noteSizeEndBoxWrapper = HTML.div({ style: "flex: 1; display: flex; flex-direction: column; align-items: center;" }, HTML.span({ class: "tip", style: `width:68px; flex:1; height:1em; font-size: smaller;`, onclick: () => this._openPrompt("noteSizeRange") }, "End: "), noteSizeEndBox);
-                const noteSizeStartWrapper = HTML.div({ style: "margin-top: 3px; flex:1; display:flex; flex-direction: row; align-items:center; justify-content:right;" }, noteSizeStartBoxWrapper, noteSizeStartSlider);
-                const noteSizeEndWrapper = HTML.div({ style: "margin-top: 3px; flex:1; display:flex; flex-direction: row; align-items:center; justify-content:right;" }, noteSizeEndBoxWrapper, noteSizeEndSlider);
-                const extraNoteSizeSettingsGroup = HTML.div({ class: "editor-controls", style: "margin-top: 3px; flex:1; display:flex; flex-direction: column; align-items:center; justify-content:right;" }, noteSizeStartWrapper, noteSizeEndWrapper);
-                extraNoteSizeSettingsGroup.style.display = "none";
                 const perEnvelopeSpeedSlider = new Slider(HTML.input({ oninput: () => this.updateSpeedDisplay(envelopeIndex), style: "margin: 0; width: 113px", type: "range", min: 0, max: Config.perEnvelopeSpeedIndices.length - 1, value: EnvelopeEditor.convertIndexSpeed(instrument.envelopes[envelopeIndex].perEnvelopeSpeed, "index"), step: "1" }), this._doc, (oldSpeed, newSpeed) => new ChangePerEnvelopeSpeed(this._doc, EnvelopeEditor.convertIndexSpeed(oldSpeed, "speed"), EnvelopeEditor.convertIndexSpeed(newSpeed, "speed"), envelopeIndex), false);
                 const perEnvelopeSpeedDisplay = HTML.span({ class: "tip", style: `width:58px; flex:1; height:1em; font-size: smaller; margin-left: 10px;`, onclick: () => this._openPrompt("perEnvelopeSpeed") }, "Spd: x" + prettyNumber(EnvelopeEditor.convertIndexSpeed(perEnvelopeSpeedSlider.getValueBeforeProspectiveChange(), "speed")));
                 const perEnvelopeSpeedWrapper = HTML.div({ style: "margin-top: 3px; flex:1; display:flex; flex-direction: row; align-items:center; justify-content:right;" }, perEnvelopeSpeedDisplay, perEnvelopeSpeedSlider.container);
@@ -38160,8 +38078,9 @@ You should be redirected to the song at:<br /><br />
                 const upperBoundBoxWrapper = HTML.div({ style: "flex: 1; display: flex; flex-direction: column; align-items: center;" }, HTML.span({ class: "tip", style: `width:68px; flex:1; height:1em; font-size: smaller;`, onclick: () => this._openPrompt("envelopeRange") }, "Upr bnd: "), upperBoundBox);
                 const lowerBoundWrapper = HTML.div({ style: "margin-top: 3px; flex:1; display:flex; flex-direction: row; align-items:center; justify-content:right;" }, lowerBoundBoxWrapper, lowerBoundSlider.container);
                 const upperBoundWrapper = HTML.div({ style: "margin-top: 3px; flex:1; display:flex; flex-direction: row; align-items:center; justify-content:right;" }, upperBoundBoxWrapper, upperBoundSlider.container);
-                const invertBox = HTML.input({ "checked": instrument.envelopes[envelopeIndex].inverse, type: "checkbox", style: "width: 1em; padding: 0.5em; margin-left: 4em;", id: "invertBox" });
-                const invertWrapper = HTML.div({ style: "margin: 0.5em; align-items:center; justify-content:right;" }, HTML.span({ class: "tip", onclick: () => this._openPrompt("envelopeInvert") }, "Invert: "), invertBox);
+                const invertBox = HTML.input({ "checked": instrument.envelopes[envelopeIndex].inverse, type: "checkbox", style: "width: 1em; padding: 0.5em;", id: "invertBox" });
+                const discreteEnvelopeBox = HTML.input({ "checked": instrument.envelopes[envelopeIndex].discrete, type: "checkbox", style: "width: 1em; padding: 0.5em;" });
+                const checkboxWrapper = HTML.div({ style: "margin: 0.1em; align-items:center; justify-content:right;" }, HTML.span({ class: "tip", onclick: () => this._openPrompt("envelopeInvert") }, "‣ Invert: "), invertBox, HTML.span({ class: "tip", style: "margin-left:4px;", onclick: () => this._openPrompt("discreteEnvelope") }, "‣ Discrete:"), discreteEnvelopeBox);
                 const envelopeCopyButton = HTML.button({ style: "margin-left:0px; max-width:86px; width: 86px; height: 26px; padding-left: 22px", class: "copyButton", title: "Copy Envelope" }, [
                     "Copy Env",
                     SVG.svg({ style: "flex-shrink: 0; position: absolute; left: 0; top: 50%; margin-top: -1em; pointer-events: none;", width: "26px", height: "26px", viewBox: "-5 -21 26 26" }, [
@@ -38178,7 +38097,7 @@ You should be redirected to the song at:<br /><br />
                 const copyPasteContainer = HTML.div({ class: "editor-controls", style: "margin: 0.5em; display: flex; flex-direction:row; align-items:center;" }, envelopeCopyButton, envelopePasteButton);
                 const extraSettingsDropdown = HTML.button({ style: "margin-left:0em; margin-right: 0.3em; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: () => { const instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()]; this._extraSettingsDropdown(8, envelopeIndex, Config.newEnvelopes[instrument.envelopes[envelopeIndex].envelope].name); } }, "▼");
                 extraSettingsDropdown.style.display = "inline";
-                const extraSettingsDropdownGroup = HTML.div({ class: "editor-controls", style: "flex-direction:column; align-items:center;" }, extraRandomSettingsGroup, extraLFOSettingsGroup, extraNoteSizeSettingsGroup, extraPitchSettingsGroup, perEnvelopeSpeedGroup, lowerBoundWrapper, upperBoundWrapper, invertWrapper, copyPasteContainer);
+                const extraSettingsDropdownGroup = HTML.div({ class: "editor-controls", style: "flex-direction:column; align-items:center;" }, extraRandomSettingsGroup, extraLFOSettingsGroup, extraPitchSettingsGroup, perEnvelopeSpeedGroup, lowerBoundWrapper, upperBoundWrapper, checkboxWrapper, copyPasteContainer);
                 extraSettingsDropdownGroup.style.display = "none";
                 const row = HTML.div({ class: "envelope-row" }, extraSettingsDropdown, HTML.div({ class: "selectContainer", style: "width: 0; flex: 1;" }, targetSelect), HTML.div({ class: "selectContainer", style: "width: 0; flex: 0.85" }, envelopeSelect), deleteButton);
                 this.container.appendChild(row);
@@ -38190,6 +38109,7 @@ You should be redirected to the song at:<br /><br />
                 this.extraSettingsDropdowns[envelopeIndex] = extraSettingsDropdown;
                 this.extraSettingsDropdownGroups[envelopeIndex] = extraSettingsDropdownGroup;
                 this._inverters[envelopeIndex] = invertBox;
+                this._discreters[envelopeIndex] = discreteEnvelopeBox;
                 this.perEnvelopeLowerBoundBoxes[envelopeIndex] = lowerBoundBox;
                 this.perEnvelopeUpperBoundBoxes[envelopeIndex] = upperBoundBox;
                 this.perEnvelopeLowerBoundSliders[envelopeIndex] = lowerBoundSlider;
@@ -38216,11 +38136,6 @@ You should be redirected to the song at:<br /><br />
                 this.LFOStepsBoxes[envelopeIndex] = LFOStepsBox;
                 this._LFOStepsSliders[envelopeIndex] = LFOStepsSlider;
                 this._LFOStepsWrappers[envelopeIndex] = LFOStepsWrapper;
-                this.extraNoteSizeSettingsGroups[envelopeIndex] = extraNoteSizeSettingsGroup;
-                this._noteSizeStartSliders[envelopeIndex] = noteSizeStartSlider;
-                this.noteSizeStartBoxes[envelopeIndex] = noteSizeStartBox;
-                this._noteSizeEndSliders[envelopeIndex] = noteSizeEndSlider;
-                this.noteSizeEndBoxes[envelopeIndex] = noteSizeEndBox;
                 this._envelopeCopyButtons[envelopeIndex] = envelopeCopyButton;
                 this._envelopePasteButtons[envelopeIndex] = envelopePasteButton;
             }
@@ -38250,6 +38165,7 @@ You should be redirected to the song at:<br /><br />
                 this._pitchStartSliders[envelopeIndex].value = String(instrument.envelopes[envelopeIndex].pitchEnvelopeStart);
                 this._pitchEndSliders[envelopeIndex].value = String(instrument.envelopes[envelopeIndex].pitchEnvelopeEnd);
                 this._inverters[envelopeIndex].checked = instrument.envelopes[envelopeIndex].inverse;
+                this._discreters[envelopeIndex].checked = instrument.envelopes[envelopeIndex].discrete;
                 this.perEnvelopeSpeedSliders[envelopeIndex].updateValue(EnvelopeEditor.convertIndexSpeed(instrument.envelopes[envelopeIndex].perEnvelopeSpeed, "index"));
                 this.updateSpeedDisplay(envelopeIndex);
                 this.perEnvelopeLowerBoundBoxes[envelopeIndex].value = String(instrument.envelopes[envelopeIndex].perEnvelopeLowerBound);
@@ -38262,10 +38178,6 @@ You should be redirected to the song at:<br /><br />
                 this._randomSeedSliders[envelopeIndex].value = String(instrument.envelopes[envelopeIndex].seed);
                 this.LFOStepsBoxes[envelopeIndex].value = String(instrument.envelopes[envelopeIndex].steps);
                 this._LFOStepsSliders[envelopeIndex].value = String(instrument.envelopes[envelopeIndex].steps);
-                this.noteSizeStartBoxes[envelopeIndex].value = String(instrument.envelopes[envelopeIndex].noteSizeStart);
-                this._noteSizeStartSliders[envelopeIndex].value = String(instrument.envelopes[envelopeIndex].noteSizeStart);
-                this.noteSizeEndBoxes[envelopeIndex].value = String(instrument.envelopes[envelopeIndex].noteSizeEnd);
-                this._noteSizeEndSliders[envelopeIndex].value = String(instrument.envelopes[envelopeIndex].noteSizeEnd);
                 this.openExtraSettingsDropdowns[envelopeIndex] = this.openExtraSettingsDropdowns[envelopeIndex] ? true : false;
             }
             this._renderedEnvelopeCount = instrument.envelopeCount;
@@ -43835,7 +43747,7 @@ You should be redirected to the song at:<br /><br />
                     break;
                 case "grainAmount":
                     {
-                        message = div$5(h2$4("Grain Count"), p(`This setting controls about how often a grain (a group of audio samples) is added to the output, from very rarely to multiple at once.`));
+                        message = div$5(h2$4("Grain Freq"), p(`This setting controls about how often a grain (a group of audio samples) is added to the output, from rarely to multiple at once.`));
                     }
                     break;
                 case "grainRange":
@@ -46345,7 +46257,7 @@ You should be redirected to the song at:<br /><br />
             this._grainSizeNum = div({ style: "font-size: 80%; ", id: "grainSizeNum" });
             this._grainSizeSliderRow = div({ class: "selectRow", style: "width:100%;" }, div({ style: "display:flex; flex-direction:column; align-items:center;" }, span({ class: "tip", style: "font-size: smaller;", onclick: () => this._openPrompt("grainSize") }, "Grain: "), div({ style: `color: ${ColorConfig.secondaryText}; ` }, this._grainSizeNum)), this._grainSizeSlider.container);
             this._grainAmountsSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.grainAmountsMax, value: 8, step: "1" }), this._doc, (oldValue, newValue) => new ChangeGrainAmounts(this._doc, oldValue, newValue), false);
-            this._grainAmountsRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("grainAmount") }, "Grain #:"), this._grainAmountsSlider.container);
+            this._grainAmountsRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("grainAmount") }, "Grain Freq:"), this._grainAmountsSlider.container);
             this._grainRangeSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.grainRangeMax / Config.grainSizeStep, value: "0", step: "1" }), this._doc, (oldValue, newValue) => new ChangeGrainRange(this._doc, oldValue, newValue), false);
             this._grainRangeNum = div({ style: "font-size: 80%; ", id: "grainRangeNum" });
             this._grainRangeSliderRow = div({ class: "selectRow", style: "width:100%;" }, div({ style: "display:flex; flex-direction:column; align-items:center;" }, span({ class: "tip", style: "font-size: smaller;", onclick: () => this._openPrompt("grainRange") }, "Range: "), div({ style: `color: ${ColorConfig.secondaryText}; ` }, this._grainRangeNum)), this._grainRangeSlider.container);
@@ -46500,12 +46412,10 @@ You should be redirected to the song at:<br /><br />
             this._harmonicsZoom = button({ style: "padding-left:0.2em; height:1.5em; max-width: 12px;", onclick: () => this._openPrompt("harmonicsSettings") }, "+");
             this._harmonicsRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("harmonics"), style: "font-size: smaller" }, "Harmonics:"), this._harmonicsZoom, this._harmonicsEditor.container);
             this.envelopeEditor = new EnvelopeEditor(this._doc, (id, submenu, subtype) => this._toggleDropdownMenu(id, submenu, subtype), (name) => this._openPrompt(name));
-            this._discreteEnvelopeBox = input({ type: "checkbox", style: "width: 1em; padding: 0; margin-right: 4em;" });
-            this._discreteEnvelopeRow = div({ class: "selectRow dropFader" }, span({ class: "tip", style: "margin-left:4px;", onclick: () => this._openPrompt("discreteEnvelope") }, "‣ Discrete:"), this._discreteEnvelopeBox);
             this._envelopeSpeedDisplay = span({ style: `color: ${ColorConfig.secondaryText}; font-size: smaller; text-overflow: clip;` }, "x1");
             this._envelopeSpeedSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.modulators.dictionary["envelope speed"].maxRawVol, value: "0", step: "1" }), this._doc, (oldValue, newValue) => new ChangeEnvelopeSpeed(this._doc, oldValue, newValue), false);
             this._envelopeSpeedRow = div({ class: "selectRow dropFader" }, span({ class: "tip", style: "margin-left:4px;", onclick: () => this._openPrompt("envelopeSpeed") }, "‣ Spd:"), this._envelopeSpeedDisplay, this._envelopeSpeedSlider.container);
-            this._envelopeDropdownGroup = div({ class: "editor-controls", style: "display: none;" }, this._discreteEnvelopeRow, this._envelopeSpeedRow);
+            this._envelopeDropdownGroup = div({ class: "editor-controls", style: "display: none;" }, this._envelopeSpeedRow);
             this._envelopeDropdown = button({ style: "margin-left:0em; margin-right: 1em; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: () => this._toggleDropdownMenu(7) }, "▼");
             this._drumsetGroup = div({ class: "editor-controls" });
             this._drumsetZoom = button({ style: "margin-left:0em; padding-left:0.3em; margin-right:0.5em; height:1.5em; max-width: 16px;", onclick: () => this._openPrompt("drumsetSettings") }, "+");
@@ -47662,12 +47572,12 @@ You should be redirected to the song at:<br /><br />
                                 }
                                 if (anyInstrumentGranulars) {
                                     settingList.push("granular");
-                                    settingList.push("grain amount");
+                                    settingList.push("grain freq");
                                     settingList.push("grain size");
                                 }
                                 if (!allInstrumentGranulars) {
                                     unusedSettingList.push("+ granular");
-                                    unusedSettingList.push("+ grain amount");
+                                    unusedSettingList.push("+ grain freq");
                                     unusedSettingList.push("+ grain size");
                                 }
                                 if (anyInstrumentHasEnvelopes) {
@@ -47879,7 +47789,6 @@ You should be redirected to the song at:<br /><br />
                 this._clicklessTransitionBox.checked = instrument.clicklessTransition ? true : false;
                 this._aliasingBox.checked = instrument.aliases ? true : false;
                 this._addEnvelopeButton.disabled = (instrument.envelopeCount >= Config.maxEnvelopeCount);
-                this._discreteEnvelopeBox.checked = instrument.discreteEnvelope ? true : false;
                 this._volumeSlider.updateValue(prefs.volume);
                 if (wasActive && activeElement != null && activeElement.clientWidth == 0) {
                     this.refocusStage();
@@ -48036,9 +47945,7 @@ You should be redirected to the song at:<br /><br />
                     || this.envelopeEditor.perEnvelopeUpperBoundBoxes.find((element) => element == document.activeElement)
                     || this.envelopeEditor.randomStepsBoxes.find((element) => element == document.activeElement)
                     || this.envelopeEditor.randomStepsBoxes.find((element) => element == document.activeElement)
-                    || this.envelopeEditor.LFOStepsBoxes.find((element) => element == document.activeElement)
-                    || this.envelopeEditor.noteSizeStartBoxes.find((element) => element == document.activeElement)
-                    || this.envelopeEditor.noteSizeEndBoxes.find((element) => element == document.activeElement)) {
+                    || this.envelopeEditor.LFOStepsBoxes.find((element) => element == document.activeElement)) {
                     if (event.keyCode == 13 || event.keyCode == 27) {
                         this.mainLayer.focus();
                     }
@@ -49572,7 +49479,6 @@ You should be redirected to the song at:<br /><br />
             this._twoNoteArpBox.addEventListener("input", () => { this._doc.record(new ChangeFastTwoNoteArp(this._doc, this._twoNoteArpBox.checked)); });
             this._clicklessTransitionBox.addEventListener("input", () => { this._doc.record(new ChangeClicklessTransition(this._doc, this._clicklessTransitionBox.checked)); });
             this._aliasingBox.addEventListener("input", () => { this._doc.record(new ChangeAliasing(this._doc, this._aliasingBox.checked)); });
-            this._discreteEnvelopeBox.addEventListener("input", () => { this._doc.record(new ChangeDiscreteEnvelope(this._doc, this._discreteEnvelopeBox.checked)); });
             this._promptContainer.addEventListener("click", (event) => {
                 if (this._doc.prefs.closePromptByClickoff === true) {
                     if (this.prompt != null && this.prompt.gotMouseUp === true)
@@ -49864,7 +49770,7 @@ You should be redirected to the song at:<br /><br />
                     return this._ringModHzSlider;
                 case Config.modulators.dictionary["granular"].index:
                     return this._granularSlider;
-                case Config.modulators.dictionary["grain amount"].index:
+                case Config.modulators.dictionary["grain freq"].index:
                     return this._grainAmountsSlider;
                 case Config.modulators.dictionary["grain size"].index:
                     return this._grainSizeSlider;

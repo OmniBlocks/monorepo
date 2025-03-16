@@ -2275,21 +2275,6 @@ export class ChangeAliasing extends Change {
     }
 }
 
-export class ChangeDiscreteEnvelope extends Change {
-    constructor(doc: SongDocument, newValue: boolean) {
-        super();
-        const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
-        const oldValue = instrument.discreteEnvelope;
-
-        doc.notifier.changed();
-        if (oldValue != newValue) {
-            instrument.discreteEnvelope = newValue;
-            instrument.preset = instrument.type;
-            this._didSomething();
-        }
-    }
-}
-
 export class ChangeSpectrum extends Change {
     constructor(doc: SongDocument, instrument: Instrument, spectrumWave: SpectrumWave) {
         super();
@@ -5169,8 +5154,7 @@ export class ChangeRemoveEnvelope extends Change {
             instrument.envelopes[i].steps = instrument.envelopes[i + 1].steps;
             instrument.envelopes[i].seed = instrument.envelopes[i + 1].seed;
             instrument.envelopes[i].waveform = instrument.envelopes[i + 1].waveform;
-            instrument.envelopes[i].noteSizeStart = instrument.envelopes[i + 1].noteSizeStart;
-            instrument.envelopes[i].noteSizeEnd = instrument.envelopes[i + 1].noteSizeEnd;
+            instrument.envelopes[i].discrete = instrument.envelopes[i + 1].discrete;
         }
         // TODO: Shift any envelopes that were targeting other envelope indices after the removed one.
         instrument.preset = instrument.type;
@@ -5246,6 +5230,21 @@ export class ChangeEnvelopeInverse extends Change {
         if (oldValue != value) {
             instrument.preset = instrument.type;
             doc.notifier.changed();
+            this._didSomething();
+        }
+    }
+}
+
+export class ChangeDiscreteEnvelope extends Change {
+    constructor(doc: SongDocument, newValue: boolean, index: number) {
+        super();
+        const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+        const oldValue = instrument.envelopes[index].discrete;
+
+        doc.notifier.changed();
+        if (oldValue != newValue) {
+            instrument.envelopes[index].discrete = newValue;
+            instrument.preset = instrument.type;
             this._didSomething();
         }
     }
@@ -5334,36 +5333,6 @@ export class ChangeSetEnvelopeWaveform extends Change {
         waveform = parseInt(waveform + ""); //make sure waveform isn't a string
         instrument.envelopes[index].waveform = waveform;
         if (oldWaveform != waveform) {
-            instrument.preset = instrument.type;
-            doc.notifier.changed();
-            this._didSomething();
-        }
-    }
-}
-
-export class ChangeEnvelopeNoteSizeStart extends Change {
-    constructor(doc: SongDocument, noteStart: number, index: number) {
-        super();
-        const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
-        const oldNoteStart: number = instrument.envelopes[index].noteSizeStart;
-        noteStart = noteStart > Config.noteSizeMax ? Config.noteSizeMax : noteStart < 0 ? 0 : noteStart;
-        instrument.envelopes[index].noteSizeStart = noteStart;
-        if (oldNoteStart != noteStart) {
-            instrument.preset = instrument.type;
-            doc.notifier.changed();
-            this._didSomething();
-        }
-    }
-}
-
-export class ChangeEnvelopeNoteSizeEnd extends Change {
-    constructor(doc: SongDocument, noteEnd: number, index: number) {
-        super();
-        const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
-        const oldNoteEnd: number = instrument.envelopes[index].noteSizeEnd;
-        noteEnd = noteEnd > Config.noteSizeMax ? Config.noteSizeMax : noteEnd < 0 ? 0 : noteEnd;
-        instrument.envelopes[index].noteSizeEnd = noteEnd;
-        if (oldNoteEnd != noteEnd) {
             instrument.preset = instrument.type;
             doc.notifier.changed();
             this._didSomething();

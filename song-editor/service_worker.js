@@ -5,10 +5,10 @@ self.addEventListener("install", function(event) {
 	event.waitUntil(
 		caches.open(cacheName).then(function(cache) {
 			return cache.addAll([
-				"/",
-				"/beepbox_editor.min.js",
-				"/player/",
-				"/player/beepbox_player.min.js",
+				"/website/",
+				"/website/beepbox_editor.min.js",
+				"/website/player/",
+				"/website/player/beepbox_player.min.js",
 				// "/2_4/",
 				// "/2_4/beepbox_editor.min.js",
 				// "/2_4/player/",
@@ -16,14 +16,14 @@ self.addEventListener("install", function(event) {
 				//"/2_3/",
 				//"/2_3/beepbox_editor.min.js",
 				"https://cdn.jsdelivr.net/npm/lamejs@1.2.0/lame.min.js",
-				"/samples.js",
-				"/samples2.js",
-				"/samples3.js",
-				"/drumsamples.js",
-				"/kirby_samples.js",
-				"/wario_samples.js",
-				"/mario_paintbox_samples.js",
-				"/nintaribox_samples.js",
+				"/website/samples.js",
+				"/website/samples2.js",
+				"/website/samples3.js",
+				"/website/drumsamples.js",
+				"/website/kirby_samples.js",
+				"/website/wario_samples.js",
+				"/website/mario_paintbox_samples.js",
+				"/website/nintaribox_samples.js",
 			]).then(() => self.skipWaiting());
 		})
 	);

@@ -1393,9 +1393,8 @@ export class EnvelopeSettings {
     public seed: number = 2;
     //lfo and random types
     public waveform: number = LFOEnvelopeTypes.sine;
-    //note size
-    public noteSizeStart: number;
-    public noteSizeEnd: number;
+    //moved discrete into here
+    public discrete: boolean = false;
 
     constructor(public isNoiseEnvelope: boolean) {
         this.reset();
@@ -1416,8 +1415,7 @@ export class EnvelopeSettings {
         this.steps = 2;
         this.seed = 2;
         this.waveform = LFOEnvelopeTypes.sine;
-        this.noteSizeStart = 0
-        this.noteSizeEnd = Config.noteSizeMax;
+        this.discrete = false;
     }
 
     public toJsonObject(): Object {
@@ -1428,6 +1426,7 @@ export class EnvelopeSettings {
             "perEnvelopeSpeed": this.perEnvelopeSpeed,
             "perEnvelopeLowerBound": this.perEnvelopeLowerBound,
             "perEnvelopeUpperBound": this.perEnvelopeUpperBound,
+            "discrete": this.discrete,
         };
         if (Config.instrumentAutomationTargets[this.target].maxCount > 1) {
             envelopeObject["index"] = this.index;
@@ -1442,9 +1441,6 @@ export class EnvelopeSettings {
         } else if (Config.newEnvelopes[this.envelope].name == "lfo") {
             envelopeObject["waveform"] = this.waveform;
             envelopeObject["steps"] = this.steps;
-        } else if (Config.newEnvelopes[this.envelope].name == "note size") {
-            envelopeObject["noteSizeStart"] = this.noteSizeStart;
-            envelopeObject["noteSizeEnd"] = this.noteSizeEnd;
         }
         return envelopeObject;
     }
@@ -1559,16 +1555,10 @@ export class EnvelopeSettings {
             this.waveform = LFOEnvelopeTypes.sine;
         }
 
-        if (envelopeObject["noteSizeStart"] != undefined) {
-            this.noteSizeStart = envelopeObject["noteSizeStart"];
+        if (envelopeObject["discrete"] != undefined) {
+            this.discrete = envelopeObject["discrete"];
         } else {
-            this.noteSizeStart = 0;
-        }
-
-        if (envelopeObject["noteSizeEnd"] != undefined) {
-            this.noteSizeEnd = envelopeObject["noteSizeEnd"];
-        } else {
-            this.noteSizeEnd = Config.noteSizeMax;
+            this.discrete = false;
         }
     }
 }
@@ -1636,7 +1626,6 @@ export class Instrument {
     public vibratoDelay: number = 0;
     public vibratoType: number = 0;
     public envelopeSpeed: number = 12;
-    public discreteEnvelope: boolean = false;
     public unison: number = 0;
     public unisonVoices: number = 1;
     public unisonSpread: number = 0.0;
@@ -1805,7 +1794,6 @@ export class Instrument {
         this.clicklessTransition = false;
         this.arpeggioSpeed = 12;
         this.envelopeSpeed = 12;
-        this.discreteEnvelope = false;
         this.legacyTieOver = false;
         this.aliases = false;
         this.fadeIn = 0;
@@ -2044,8 +2032,7 @@ export class Instrument {
             "eqFilterType": this.eqFilterType,
             "eqSimpleCut": this.eqFilterSimpleCut,
             "eqSimplePeak": this.eqFilterSimplePeak,
-            "envelopeSpeed": this.envelopeSpeed,
-            "discreteEnvelope": this.discreteEnvelope,
+            "envelopeSpeed": this.envelopeSpeed
         };
 
         if (this.preset != this.type) {
@@ -2363,12 +2350,6 @@ export class Instrument {
 
         //These can probably be condensed with ternary operators
         this.envelopeSpeed = instrumentObject["envelopeSpeed"] != undefined ? clamp(0, Config.modulators.dictionary["envelope speed"].maxRawVol + 1, instrumentObject["envelopeSpeed"] | 0) : 12;
-
-        if (instrumentObject["discreteEnvelope"] != undefined) {
-            this.discreteEnvelope = instrumentObject["discreteEnvelope"];
-        } else {
-            this.discreteEnvelope = false;
-        }
 
         if (Array.isArray(instrumentObject["effects"])) {
             let effects: number = 0;
@@ -3039,7 +3020,13 @@ export class Instrument {
                     } else {
                         envelopeInverse = tempEnvelope.inverse;
                     }
-                    this.addEnvelope(tempEnvelope.target, tempEnvelope.index, tempEnvelope.envelope, true, pitchEnvelopeStart, pitchEnvelopeEnd, envelopeInverse, tempEnvelope.perEnvelopeSpeed, tempEnvelope.perEnvelopeLowerBound, tempEnvelope.perEnvelopeUpperBound, tempEnvelope.steps, tempEnvelope.seed, tempEnvelope.waveform);
+                    let discreteEnvelope: boolean;
+                    if (instrumentObject["discreteEnvelope"] != undefined) {
+                        discreteEnvelope = instrumentObject["discreteEnvelope"];
+                    } else {
+                        discreteEnvelope = tempEnvelope.discrete;
+                    }
+                    this.addEnvelope(tempEnvelope.target, tempEnvelope.index, tempEnvelope.envelope, true, pitchEnvelopeStart, pitchEnvelopeEnd, envelopeInverse, tempEnvelope.perEnvelopeSpeed, tempEnvelope.perEnvelopeLowerBound, tempEnvelope.perEnvelopeUpperBound, tempEnvelope.steps, tempEnvelope.seed, tempEnvelope.waveform, discreteEnvelope);
                 }
             }
         }
@@ -3087,7 +3074,7 @@ export class Instrument {
         return 440.0 * Math.pow(2.0, (pitch - 69.0) / 12.0);
     }
 
-    public addEnvelope(target: number, index: number, envelope: number, newEnvelopes: boolean, start: number = 0, end: number = -1, inverse: boolean = false, perEnvelopeSpeed: number = -1, perEnvelopeLowerBound: number = 0, perEnvelopeUpperBound: number = 1, steps: number = 2, seed: number = 2, waveform: number = LFOEnvelopeTypes.sine, noteSizeStart: number = 0, noteSizeEnd: number = Config.noteSizeMax): void {
+    public addEnvelope(target: number, index: number, envelope: number, newEnvelopes: boolean, start: number = 0, end: number = -1, inverse: boolean = false, perEnvelopeSpeed: number = -1, perEnvelopeLowerBound: number = 0, perEnvelopeUpperBound: number = 1, steps: number = 2, seed: number = 2, waveform: number = LFOEnvelopeTypes.sine, discrete: boolean = false): void {
         end = end != -1 ? end : this.isNoiseInstrument ? Config.drumCount - 1 : Config.maxPitch; //find default if none is given
         perEnvelopeSpeed = perEnvelopeSpeed != -1 ? perEnvelopeSpeed : newEnvelopes ? 1 : Config.envelopes[envelope].speed; //find default if none is given
         let makeEmpty: boolean = false;
@@ -3111,8 +3098,7 @@ export class Instrument {
         envelopeSettings.steps = steps;
         envelopeSettings.seed = seed;
         envelopeSettings.waveform = waveform;
-        envelopeSettings.noteSizeStart = noteSizeStart;
-        envelopeSettings.noteSizeEnd = noteSizeEnd;
+        envelopeSettings.discrete = discrete;
         this.envelopeCount++;
     }
 
@@ -3965,7 +3951,6 @@ export class Song {
                 buffer.push(SongTagCode.envelopes, base64IntToCharCode[instrument.envelopeCount]);
                 // Added in JB v6: Options for envelopes come next.
                 buffer.push(base64IntToCharCode[instrument.envelopeSpeed]);
-                buffer.push(base64IntToCharCode[+instrument.discreteEnvelope]);
                 for (let envelopeIndex: number = 0; envelopeIndex < instrument.envelopeCount; envelopeIndex++) {
                     buffer.push(base64IntToCharCode[instrument.envelopes[envelopeIndex].target]);
                     if (Config.instrumentAutomationTargets[instrument.envelopes[envelopeIndex].target].maxCount > 1) {
@@ -3992,12 +3977,12 @@ export class Song {
                         if (instrument.envelopes[envelopeIndex].waveform == LFOEnvelopeTypes.steppedSaw || instrument.envelopes[envelopeIndex].waveform == LFOEnvelopeTypes.steppedTri) {
                             buffer.push(base64IntToCharCode[instrument.envelopes[envelopeIndex].steps]);
                         }
-                    } else if (Config.newEnvelopes[instrument.envelopes[envelopeIndex].envelope].name == "note size") {
-                        buffer.push(base64IntToCharCode[instrument.envelopes[envelopeIndex].noteSizeStart]);
-                        buffer.push(base64IntToCharCode[instrument.envelopes[envelopeIndex].noteSizeEnd]);
-                    } 
+                    }
                     //inverse
-                    buffer.push(base64IntToCharCode[(+instrument.envelopes[envelopeIndex].inverse)] ? base64IntToCharCode[(+instrument.envelopes[envelopeIndex].inverse)] : base64IntToCharCode[0]);
+                    let checkboxValues: number = +instrument.envelopes[envelopeIndex].inverse;
+                    checkboxValues = checkboxValues << 1;
+                    checkboxValues += +instrument.envelopes[envelopeIndex].discrete;
+                    buffer.push(base64IntToCharCode[checkboxValues] ? base64IntToCharCode[checkboxValues] : base64IntToCharCode[0]);
                     //midbox envelope port
                     if (Config.newEnvelopes[instrument.envelopes[envelopeIndex].envelope].name != "pitch" && Config.newEnvelopes[instrument.envelopes[envelopeIndex].envelope].name != "note size" && Config.newEnvelopes[instrument.envelopes[envelopeIndex].envelope].name != "punch" && Config.newEnvelopes[instrument.envelopes[envelopeIndex].envelope].name != "none") {
                         buffer.push(base64IntToCharCode[Config.perEnvelopeSpeedToIndices[instrument.envelopes[envelopeIndex].perEnvelopeSpeed]]);
@@ -5875,10 +5860,13 @@ export class Song {
                 } else {
                     const envelopeCount: number = clamp(0, Config.maxEnvelopeCount + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                     // JB v6 adds some envelope options here in the sequence.
+                    let envelopeDiscrete: boolean = false;
                     if ((fromJummBox && !beforeSix) || (fromUltraBox && !beforeFive) || (fromSlarmoosBox)) {
                         lastViewedSetting = "Envelope Speed";
                         instrument.envelopeSpeed = clamp(0, Config.modulators.dictionary["envelope speed"].maxRawVol + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
-                        instrument.discreteEnvelope = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)]) ? true : false;
+                        if(!fromSlarmoosBox || beforeFive) {
+                            envelopeDiscrete = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)]) ? true : false;
+                        }
                     }
                     lastViewedSetting = "Envelopes " + ((fromSlarmoosBox && !beforeThree) ? "(advanced)" : "(simple)");
                     for (let i: number = 0; i < envelopeCount; i++) {
@@ -5914,15 +5902,7 @@ export class Song {
                         let steps: number = 2;
                         let seed: number = 2;
                         let waveform: number = LFOEnvelopeTypes.sine;
-                        let noteSizeStart: number = 0;
-                        let noteSizeEnd: number = Config.noteSizeMax;
                         //pull out unique envelope setting values first, then general ones
-                        if (fromSlarmoosBox && !beforeFive) {
-                            if (Config.newEnvelopes[envelope].name == "note size") {
-                                noteSizeStart = clamp(0, Config.noteSizeMax + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
-                                noteSizeEnd = clamp(0, Config.noteSizeMax + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
-                            }
-                        } 
                         if (fromSlarmoosBox && !beforeFour) {
                             if (Config.newEnvelopes[envelope].name == "lfo") { 
                                 waveform = clamp(0, LFOEnvelopeTypes.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
@@ -5947,7 +5927,11 @@ export class Song {
                                     pitchEnvelopeEnd = clamp(0, Config.drumCount, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                                 }
                             } 
-                            envelopeInverse = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] == 1 ? true : false;
+                            let checkboxValues: number = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                            if (fromSlarmoosBox && !beforeFive) {
+                                envelopeDiscrete = (checkboxValues & 1) == 1 ? true : false;
+                            }
+                            envelopeInverse = (checkboxValues >> 1) == 1 ? true : false;
                             if (Config.newEnvelopes[envelope].name != "pitch" && Config.newEnvelopes[envelope].name != "note size" && Config.newEnvelopes[envelope].name != "punch" && Config.newEnvelopes[envelope].name != "none") {
                                 perEnvelopeSpeed = Config.perEnvelopeSpeedIndices[base64CharCodeToInt[compressed.charCodeAt(charIndex++)]];
                             }
@@ -5967,7 +5951,7 @@ export class Song {
                             }
                         }
 
-                        instrument.addEnvelope(target, index, envelope, true, pitchEnvelopeStart, pitchEnvelopeEnd, envelopeInverse, perEnvelopeSpeed, perEnvelopeLowerBound, perEnvelopeUpperBound, steps, seed, waveform, noteSizeStart, noteSizeEnd);
+                        instrument.addEnvelope(target, index, envelope, true, pitchEnvelopeStart, pitchEnvelopeEnd, envelopeInverse, perEnvelopeSpeed, perEnvelopeLowerBound, perEnvelopeUpperBound, steps, seed, waveform, envelopeDiscrete);
                         if (fromSlarmoosBox && beforeThree && !beforeTwo) {
                             let pitchEnvelopeCompact: number = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                             instrument.envelopes[i].pitchEnvelopeStart = pitchEnvelopeCompact * 64 + base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
@@ -7964,6 +7948,7 @@ class EnvelopeComputer {
             let envelope: Envelope;
 
             let inverse: boolean = false;
+            let isDiscrete: boolean = false;
             let perEnvelopeSpeed: number = 1;
             let globalEnvelopeSpeed: number = 1;
             let envelopeSpeed: number = perEnvelopeSpeed * globalEnvelopeSpeed;
@@ -7973,8 +7958,6 @@ class EnvelopeComputer {
             let steps: number = 2;
             let seed: number = 2;
             let waveform: number = LFOEnvelopeTypes.sine;
-            let noteSizeEnvelopeStart: number = 0;
-            let noteSizeEnvelopeEnd: number = Config.noteSizeMax;
             let startPinTickAbsolute: number = this.startPinTickAbsolute || 0.0;
             if (envelopeIndex == instrument.envelopeCount) {
                 if (usedNoteSize /*|| !this._perNote*/) break;
@@ -7982,14 +7965,13 @@ class EnvelopeComputer {
                 automationTarget = Config.instrumentAutomationTargets.dictionary["noteVolume"];
                 targetIndex = 0;
                 envelope = Config.newEnvelopes.dictionary["note size"];
-                noteSizeEnvelopeStart = 0;
-                noteSizeEnvelopeEnd = Config.noteSizeMax;
             } else {
                 let envelopeSettings: EnvelopeSettings = instrument.envelopes[envelopeIndex];
                 automationTarget = Config.instrumentAutomationTargets[envelopeSettings.target];
                 targetIndex = envelopeSettings.index;
                 envelope = Config.newEnvelopes[envelopeSettings.envelope];
                 inverse = instrument.envelopes[envelopeIndex].inverse;
+                isDiscrete = instrument.envelopes[envelopeIndex].discrete;
                 perEnvelopeSpeed = instrument.envelopes[envelopeIndex].perEnvelopeSpeed;
                 globalEnvelopeSpeed = Math.pow(instrument.envelopeSpeed, 2) / 144;
                 envelopeSpeed = perEnvelopeSpeed == 0 || globalEnvelopeSpeed == 0 ? perEnvelopeSpeed + globalEnvelopeSpeed : perEnvelopeSpeed * globalEnvelopeSpeed;
@@ -8003,8 +7985,6 @@ class EnvelopeComputer {
                     instrument.envelopes[envelopeIndex].waveform = 0; //make sure that waveform is a proper index
                 }
                 waveform = instrument.envelopes[envelopeIndex].waveform;
-                noteSizeEnvelopeStart = instrument.envelopes[envelopeIndex].noteSizeStart;
-                noteSizeEnvelopeEnd = instrument.envelopes[envelopeIndex].noteSizeEnd;
                 
 
                 if (!timeScale[envelopeIndex]) timeScale[envelopeIndex] = 0;
@@ -8028,24 +8008,24 @@ class EnvelopeComputer {
             //calculate envelope values if target isn't null
             if (automationTarget.computeIndex != null) {
                 const computeIndex: number = automationTarget.computeIndex + targetIndex;
-                let envelopeStart: number = EnvelopeComputer.computeEnvelope(envelope, envelopeSpeed, noteSecondsStartUnscaled, noteSecondsStart[envelopeIndex], beatTimeStart[envelopeIndex], timeSinceStart, noteSizeStart, pitch, inverse, perEnvelopeLowerBound, perEnvelopeUpperBound, false, steps, seed, waveform, defaultPitch, startPinTickAbsolute, noteSizeEnvelopeStart, noteSizeEnvelopeEnd);
+                let envelopeStart: number = EnvelopeComputer.computeEnvelope(envelope, envelopeSpeed, noteSecondsStartUnscaled, noteSecondsStart[envelopeIndex], beatTimeStart[envelopeIndex], timeSinceStart, noteSizeStart, pitch, inverse, perEnvelopeLowerBound, perEnvelopeUpperBound, false, steps, seed, waveform, defaultPitch, startPinTickAbsolute);
                 if (prevSlideStart) {
-                    const other: number = EnvelopeComputer.computeEnvelope(envelope, envelopeSpeed, prevNoteSecondsStartUnscaled, prevNoteSecondsStart[envelopeIndex], beatTimeStart[envelopeIndex], timeSinceStart, prevNoteSize, pitch, inverse, perEnvelopeLowerBound, perEnvelopeUpperBound, false, steps, seed, waveform, defaultPitch, startPinTickAbsolute, noteSizeEnvelopeStart, noteSizeEnvelopeEnd);
+                    const other: number = EnvelopeComputer.computeEnvelope(envelope, envelopeSpeed, prevNoteSecondsStartUnscaled, prevNoteSecondsStart[envelopeIndex], beatTimeStart[envelopeIndex], timeSinceStart, prevNoteSize, pitch, inverse, perEnvelopeLowerBound, perEnvelopeUpperBound, false, steps, seed, waveform, defaultPitch, startPinTickAbsolute);
                     envelopeStart += (other - envelopeStart) * prevSlideRatioStart;
                 }
                 if (nextSlideStart) {
-                    const other: number = EnvelopeComputer.computeEnvelope(envelope, envelopeSpeed, 0.0, 0.0, beatTimeStart[envelopeIndex], timeSinceStart, nextNoteSize, pitch, inverse, perEnvelopeLowerBound, perEnvelopeUpperBound, false, steps, seed, waveform, defaultPitch, startPinTickAbsolute, noteSizeEnvelopeStart, noteSizeEnvelopeEnd);
+                    const other: number = EnvelopeComputer.computeEnvelope(envelope, envelopeSpeed, 0.0, 0.0, beatTimeStart[envelopeIndex], timeSinceStart, nextNoteSize, pitch, inverse, perEnvelopeLowerBound, perEnvelopeUpperBound, false, steps, seed, waveform, defaultPitch, startPinTickAbsolute);
                     envelopeStart += (other - envelopeStart) * nextSlideRatioStart;
                 }
                 let envelopeEnd: number = envelopeStart;
-                if (instrument.discreteEnvelope == false) {
-                    envelopeEnd = EnvelopeComputer.computeEnvelope(envelope, envelopeSpeed, noteSecondsEndUnscaled, noteSecondsEnd[envelopeIndex], beatTimeEnd[envelopeIndex], timeSinceStart, noteSizeEnd, pitch, inverse, perEnvelopeLowerBound, perEnvelopeUpperBound, false, steps, seed, waveform, defaultPitch, startPinTickAbsolute, noteSizeEnvelopeStart, noteSizeEnvelopeEnd);
+                if (isDiscrete == false) {
+                    envelopeEnd = EnvelopeComputer.computeEnvelope(envelope, envelopeSpeed, noteSecondsEndUnscaled, noteSecondsEnd[envelopeIndex], beatTimeEnd[envelopeIndex], timeSinceStart, noteSizeEnd, pitch, inverse, perEnvelopeLowerBound, perEnvelopeUpperBound, false, steps, seed, waveform, defaultPitch, startPinTickAbsolute);
                     if (prevSlideEnd) {
-                        const other: number = EnvelopeComputer.computeEnvelope(envelope, envelopeSpeed, prevNoteSecondsEndUnscaled, prevNoteSecondsEnd[envelopeIndex], beatTimeEnd[envelopeIndex], timeSinceStart, prevNoteSize, pitch, inverse, perEnvelopeLowerBound, perEnvelopeUpperBound, false, steps, seed, waveform, defaultPitch, startPinTickAbsolute, noteSizeEnvelopeStart, noteSizeEnvelopeEnd);
+                        const other: number = EnvelopeComputer.computeEnvelope(envelope, envelopeSpeed, prevNoteSecondsEndUnscaled, prevNoteSecondsEnd[envelopeIndex], beatTimeEnd[envelopeIndex], timeSinceStart, prevNoteSize, pitch, inverse, perEnvelopeLowerBound, perEnvelopeUpperBound, false, steps, seed, waveform, defaultPitch, startPinTickAbsolute);
                         envelopeEnd += (other - envelopeEnd) * prevSlideRatioEnd;
                     }
                     if (nextSlideEnd) {
-                        const other: number = EnvelopeComputer.computeEnvelope(envelope, envelopeSpeed, 0.0, 0.0, beatTimeEnd[envelopeIndex], timeSinceStart, nextNoteSize, pitch, inverse, perEnvelopeLowerBound, perEnvelopeUpperBound, false, steps, seed, waveform, defaultPitch, startPinTickAbsolute, noteSizeEnvelopeStart, noteSizeEnvelopeEnd);
+                        const other: number = EnvelopeComputer.computeEnvelope(envelope, envelopeSpeed, 0.0, 0.0, beatTimeEnd[envelopeIndex], timeSinceStart, nextNoteSize, pitch, inverse, perEnvelopeLowerBound, perEnvelopeUpperBound, false, steps, seed, waveform, defaultPitch, startPinTickAbsolute);
                         envelopeEnd += (other - envelopeEnd) * nextSlideRatioEnd;
                     }
                 }
@@ -8101,30 +8081,15 @@ class EnvelopeComputer {
         this._modifiedEnvelopeCount = 0;
     }
 
-    public static computeEnvelope(envelope: Envelope, perEnvelopeSpeed: number, unspedTime: number, time: number, beats: number, timeSinceStart: number, noteSize: number, pitch: number, inverse: boolean, perEnvelopeLowerBound: number, perEnvelopeUpperBound: number, isDrumset: boolean = false, steps: number, seed: number, waveform: number, defaultPitch: number, notePinStart: number, noteSizeStart: number, noteSizeEnd: number): number {
+    public static computeEnvelope(envelope: Envelope, perEnvelopeSpeed: number, unspedTime: number, time: number, beats: number, timeSinceStart: number, noteSize: number, pitch: number, inverse: boolean, perEnvelopeLowerBound: number, perEnvelopeUpperBound: number, isDrumset: boolean = false, steps: number, seed: number, waveform: number, defaultPitch: number, notePinStart: number): number {
         const envelopeSpeed = isDrumset ? envelope.speed : 1;
         const boundAdjust = (perEnvelopeUpperBound - perEnvelopeLowerBound);
         switch (envelope.type) {
             case EnvelopeType.none: return perEnvelopeUpperBound;
             case EnvelopeType.noteSize:
-                // const range = (noteSizeEnd - noteSizeStart)/6;
                 if (!inverse) {
-                    // if (noteSize <= noteSizeStart) {
-                    //     return perEnvelopeLowerBound;
-                    // } else if (pitch >= noteSizeEnd) {
-                    //     return perEnvelopeUpperBound;
-                    // } else {
-                    //     return (Synth.noteSizeToVolumeMult(noteSize) - Synth.noteSizeToVolumeMult(noteSizeStart)) * (boundAdjust) / range + perEnvelopeLowerBound;
-                    // }
                     return Synth.noteSizeToVolumeMult(noteSize) * (boundAdjust) + perEnvelopeLowerBound;
                 } else {
-                    // if (noteSize <= noteSizeStart) {
-                    //     return perEnvelopeUpperBound;
-                    // } else if (pitch >= noteSizeEnd) {
-                    //     return perEnvelopeLowerBound;
-                    // } else {
-                        // return perEnvelopeUpperBound - (Synth.noteSizeToVolumeMult(noteSize) - Synth.noteSizeToVolumeMult(noteSizeStart)) * (boundAdjust) / range;
-                    // }
                     return perEnvelopeUpperBound - Synth.noteSizeToVolumeMult(noteSize) * (boundAdjust);
                 }
             case EnvelopeType.pitch:
@@ -8375,7 +8340,7 @@ class EnvelopeComputer {
         const pitch = 1
 
         function computeDrumsetEnvelope(unspedTime: number, time: number, beats: number, noteSize: number):number {
-            return EnvelopeComputer.computeEnvelope(drumsetFilterEnvelope, 1, unspedTime, time, beats, 0, noteSize, pitch, false, 0, 1, true, 2, 2, LFOEnvelopeTypes.sine, pitch, 0, 0, Config.noteSizeMax)
+            return EnvelopeComputer.computeEnvelope(drumsetFilterEnvelope, 1, unspedTime, time, beats, 0, noteSize, pitch, false, 0, 1, true, 2, 2, LFOEnvelopeTypes.sine, pitch, 0);
         }
 
         // Drumset filters use the same envelope timing as the rest of the envelopes, but do not include support for slide transitions.
@@ -8393,17 +8358,17 @@ class EnvelopeComputer {
 
         let drumsetFilterEnvelopeEnd: number = drumsetFilterEnvelopeStart;
 
-        if (instrument.discreteEnvelope == false) {
-            drumsetFilterEnvelopeEnd = computeDrumsetEnvelope(this.noteSecondsEndUnscaled, this.noteSecondsEndUnscaled, beatsPerPart * partTimeEnd, this.noteSizeEnd);
 
-            if (this.prevSlideEnd) {
-                const other: number = computeDrumsetEnvelope(this.prevNoteSecondsEndUnscaled, this.prevNoteSecondsEndUnscaled, beatsPerPart * partTimeEnd, this.prevNoteSize);
-                drumsetFilterEnvelopeEnd += (other - drumsetFilterEnvelopeEnd) * this.prevSlideRatioEnd;
-            }
-            if (this.nextSlideEnd) {
-                const other: number = computeDrumsetEnvelope(0.0, 0.0, beatsPerPart * partTimeEnd, this.nextNoteSize);
-                drumsetFilterEnvelopeEnd += (other - drumsetFilterEnvelopeEnd) * this.nextSlideRatioEnd;
-            }
+        //hmm, I guess making discrete per envelope leaves out drumsets....
+        drumsetFilterEnvelopeEnd = computeDrumsetEnvelope(this.noteSecondsEndUnscaled, this.noteSecondsEndUnscaled, beatsPerPart * partTimeEnd, this.noteSizeEnd);
+
+        if (this.prevSlideEnd) {
+            const other: number = computeDrumsetEnvelope(this.prevNoteSecondsEndUnscaled, this.prevNoteSecondsEndUnscaled, beatsPerPart * partTimeEnd, this.prevNoteSize);
+            drumsetFilterEnvelopeEnd += (other - drumsetFilterEnvelopeEnd) * this.prevSlideRatioEnd;
+        }
+        if (this.nextSlideEnd) {
+            const other: number = computeDrumsetEnvelope(0.0, 0.0, beatsPerPart * partTimeEnd, this.nextNoteSize);
+            drumsetFilterEnvelopeEnd += (other - drumsetFilterEnvelopeEnd) * this.nextSlideRatioEnd;
         }
 
         this.drumsetFilterEnvelopeStart = drumsetFilterEnvelopeStart;
@@ -8900,8 +8865,8 @@ class InstrumentState {
 
         if (usesGranular) { //has to happen before buffer allocation
             this.granularMaximumGrains = Math.pow(2, instrument.grainAmounts * envelopeStarts[EnvelopeComputeIndex.grainAmount]);
-            if (synth.isModActive(Config.modulators.dictionary["grain amount"].index, channelIndex, instrumentIndex)) {
-                this.granularMaximumGrains = Math.pow(2, synth.getModValue(Config.modulators.dictionary["grain amount"].index, channelIndex, instrumentIndex, false) * envelopeStarts[EnvelopeComputeIndex.grainAmount]);
+            if (synth.isModActive(Config.modulators.dictionary["grain freq"].index, channelIndex, instrumentIndex)) {
+                this.granularMaximumGrains = Math.pow(2, synth.getModValue(Config.modulators.dictionary["grain freq"].index, channelIndex, instrumentIndex, false) * envelopeStarts[EnvelopeComputeIndex.grainAmount]);
             }
             this.granularMaximumGrains == Math.floor(this.granularMaximumGrains);
         }
@@ -8950,7 +8915,7 @@ class InstrumentState {
                         grain.initializeRCBEnvelope(grain.maxAgeInSamples, 1.0);
                     }
                     if (this.usesRandomGrainLocation) {
-                        grain.addDelay(Math.random() * samplesPerTick * 2); //offset when grains begin playing ; This is different from the above delay, which delays how far back in time the grain looks for samples
+                        grain.addDelay(Math.random() * samplesPerTick * 4); //offset when grains begin playing ; This is different from the above delay, which delays how far back in time the grain looks for samples
                     }
                 } 
             }
@@ -11937,17 +11902,13 @@ export class Synth {
             if (Config.chipWaves[instrument.chipWave].isCustomSampled) {
                 if (Config.chipWaves[instrument.chipWave].isPercussion) {
                     basePitch = -84.37 + Math.log2(Config.chipWaves[instrument.chipWave].samples.length / Config.chipWaves[instrument.chipWave].sampleRate!) * -12 - (-60 + Config.chipWaves[instrument.chipWave].rootKey!);
-                }
-
-                else {
+                } else {
                     basePitch += -96.37 + Math.log2(Config.chipWaves[instrument.chipWave].samples.length / Config.chipWaves[instrument.chipWave].sampleRate!) * -12 - (-60 + Config.chipWaves[instrument.chipWave].rootKey!);
                 }
-            }
-            else {
+            } else {
                 if (Config.chipWaves[instrument.chipWave].isSampled && !Config.chipWaves[instrument.chipWave].isPercussion) {
                     basePitch = basePitch - 63 + Config.chipWaves[instrument.chipWave].extraSampleDetune!
-                }
-                else if (Config.chipWaves[instrument.chipWave].isSampled && Config.chipWaves[instrument.chipWave].isPercussion) {
+                } else if (Config.chipWaves[instrument.chipWave].isSampled && Config.chipWaves[instrument.chipWave].isPercussion) {
                     basePitch = -51 + Config.chipWaves[instrument.chipWave].extraSampleDetune!;
                 }
             }
@@ -13748,6 +13709,8 @@ export class Synth {
                 const granularDelayLineLength = granularDelayLine.length;
                 const granularDelayLineMask = granularDelayLineLength - 1;
                 let granularDelayLineIndex = instrumentState.granularDelayLineIndex;
+                const usesRandomGrainLocation = instrumentState.usesRandomGrainLocation;
+                const grainPitchShift = Math.pow(2, 12/instrumentState.activeTones.get(0).pitches[0]);
                 `
             }
             
@@ -14013,6 +13976,9 @@ export class Synth {
                             }
                             effectsSource +=`
                             grain.ageInSamples = grainAgeInSamples;
+                            if(usesRandomGrainLocation) {
+                                grain.delayLine -= grainPitchShift;
+                            }
                         }
                     }
                 }

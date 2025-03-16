@@ -654,8 +654,8 @@ export class TipPrompt implements Prompt {
 			} break;
 			case "grainAmount": {
 				message = div(
-					h2("Grain Count"),
-					p(`This setting controls about how often a grain (a group of audio samples) is added to the output, from very rarely to multiple at once.`),
+					h2("Grain Freq"),
+					p(`This setting controls about how often a grain (a group of audio samples) is added to the output, from rarely to multiple at once.`),
 				);
 			} break;
 			case "grainRange": {

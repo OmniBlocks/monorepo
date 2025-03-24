@@ -1236,9 +1236,12 @@ export class ChangeRandomGeneratedInstrument extends Change {
                     instrument.effects |= 1 << EffectType.echo;
                 }
             }
-            if (Math.random() < 0.1) {
+            if (Math.random() < 0.07) {
                 instrument.effects |= 1 << EffectType.ringModulation;
                 instrument.ringModulation = selectCurvedDistribution(1, Config.ringModRange - 1, Config.ringModRange - 1, 1);
+                instrument.ringModulationHz = selectCurvedDistribution(1, Config.ringModHzRange - 1, 1, 1);
+                instrument.ringModWaveformIndex = 0;
+                //add envelopes
             }
             if (Math.random() < 0.5) {
                 instrument.effects |= 1 << EffectType.reverb;
@@ -1267,6 +1270,14 @@ export class ChangeRandomGeneratedInstrument extends Change {
                     ])].index, true, 0, -1, selectWeightedRandom([{ item: false, weight: 8 }, { item: true, weight: 1 }]), Config.perEnvelopeSpeedIndices[selectCurvedDistribution(1, 63, 45, 20)], envelopeLowerBound, envelopeUpperBound, selectCurvedDistribution(2, 16, 2, 6), selectCurvedDistribution(1, 64, 32, 31),
                         selectWeightedRandom([{ item: LFOEnvelopeTypes.sine, weight: 2 }, { item: LFOEnvelopeTypes.triangle, weight: 5 }]));
                 }
+            }
+            if (Math.random() < 0.1) {
+                instrument.effects |= 1 << EffectType.granular;
+                instrument.granular = selectCurvedDistribution(1, Config.granularRange - 1, Config.granularRange / 2, Config.granularRange / 3);
+                instrument.grainAmounts = selectCurvedDistribution(1, Config.grainAmountsMax - 1, Config.grainAmountsMax-2, 3);
+                instrument.grainSize = selectCurvedDistribution(Config.grainSizeMin / Config.grainSizeStep, Config.grainSizeMax / Config.grainSizeStep, Config.grainSizeMax / Config.grainSizeStep, Config.grainSizeMax / Config.grainSizeStep / 2);
+                instrument.grainRange = selectCurvedDistribution(0, Config.grainRangeMax / Config.grainSizeStep, Config.grainRangeMax / Config.grainSizeStep / 2, Config.grainSizeMax / Config.grainSizeStep / 2);
+                //add envelopes
             }
             if (Math.random() < 0.2) {
                 let envelopeLowerBound = selectCurvedDistribution(0, 20, 8, 5) / 10;
@@ -2239,6 +2250,21 @@ export class ChangeFastTwoNoteArp extends Change {
         doc.notifier.changed();
         if (oldValue != newValue) {
             instrument.fastTwoNoteArp = newValue;
+            instrument.preset = instrument.type;
+            this._didSomething();
+        }
+    }
+}
+
+export class ChangeMonophonicTone extends Change {
+    constructor(doc: SongDocument, newValue: number) {
+        super();
+        const instrument: Instrument = doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()];
+        const oldValue = instrument.monoChordTone;
+
+        doc.notifier.changed();
+        if (oldValue != newValue) {
+            instrument.monoChordTone = newValue;
             instrument.preset = instrument.type;
             this._didSomething();
         }

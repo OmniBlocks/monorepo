@@ -1233,6 +1233,7 @@ export class Config {
         { name: "strum", customInterval: false, arpeggiates: false, strumParts: 1, singleTone: false },
         { name: "arpeggio", customInterval: false, arpeggiates: true, strumParts: 0, singleTone: true },
         { name: "custom interval", customInterval: true, arpeggiates: false, strumParts: 0, singleTone: true },
+        { name: "monophonic", customInterval: false, arpeggiates: false, strumParts: 0, singleTone: true}
     ]);
     public static readonly maxChordSize: number = 9;
     public static readonly operatorCount: number = 4;
@@ -1339,8 +1340,8 @@ export class Config {
         { name: "100×", mult: 100.0, hzOffset: 0.0, amplitudeSign: 1.0 },
         //50 and 100 are from dogebox
         //128 and 256 from slarmoo's box
-        { name: "128x", mult: 128.0, hzOffset: 0.0, amplitudeSign: 1.0 },
-        { name: "256x", mult: 250.0, hzOffset: 0.0, amplitudeSign: 1.0},
+        { name: "128×", mult: 128.0, hzOffset: 0.0, amplitudeSign: 1.0 },
+        { name: "256×", mult: 250.0, hzOffset: 0.0, amplitudeSign: 1.0},
     ]);
 
     //still used for drumsets
@@ -1675,7 +1676,7 @@ export class Config {
         { name: "ringModulation", computeIndex: EnvelopeComputeIndex.ringModulation, displayName: "ring mod", interleave: false, isFilter: false, maxCount: 1, effect: EffectType.ringModulation, compatibleInstruments: null },
         { name: "ringModulationHz", computeIndex: EnvelopeComputeIndex.ringModulationHz, displayName: "ring mod hz", interleave: false, isFilter: false, maxCount: 1, effect: EffectType.ringModulation, compatibleInstruments: null },
         { name: "granular", computeIndex: EnvelopeComputeIndex.granular, displayName: "granular", interleave: false, isFilter: false, maxCount: 1, effect: EffectType.granular, compatibleInstruments: null },
-        { name: "grain Freq", computeIndex: EnvelopeComputeIndex.grainAmount, displayName: "grain freq", interleave: false, isFilter: false, maxCount: 1, effect: EffectType.granular, compatibleInstruments: null },
+        { name: "grainFreq", computeIndex: EnvelopeComputeIndex.grainAmount, displayName: "grain freq", interleave: false, isFilter: false, maxCount: 1, effect: EffectType.granular, compatibleInstruments: null },
         { name: "grainSize", computeIndex: EnvelopeComputeIndex.grainSize, displayName: "grain size", interleave: false, isFilter: false, maxCount: 1, effect: EffectType.granular, compatibleInstruments: null },
         { name: "echoDelay", computeIndex: EnvelopeComputeIndex.echoDelay, displayName: "echo delay", interleave: false, isFilter: false, maxCount: 1, effect: EffectType.echo, compatibleInstruments: null }, // wait until after we're computing a tick's settings for multiple run lengths.
         // Controlling filter gain is less obvious and intuitive than controlling filter freq, so to avoid confusion I've disabled it for now...
@@ -1824,7 +1825,7 @@ export class Config {
             promptName: "Ring Modulation (Hertz)", promptDesc: [ "This setting controls the Hertz (Hz) used in the Ring Modulation effect in your instrument.", "[OVERWRITING] [$LO - $HI]" ] },
         { name: "granular", pianoName: "Granular", maxRawVol: Config.granularRange, newNoteVol: 0, forSong: false, convertRealFactor: 0, associatedEffect: EffectType.granular, maxIndex: 0,
             promptName: "Granular", promptDesc: [ "This setting controls the granular effect in your instrument.", "[OVERWRITING] [$LO - $HI]" ] },
-        { name: "grain amount", pianoName: "Grain #", maxRawVol: Config.grainAmountsMax, newNoteVol: 8, forSong: false, convertRealFactor: 0, associatedEffect: EffectType.granular, maxIndex: 0,
+        { name: "grain freq", pianoName: "Grain #", maxRawVol: Config.grainAmountsMax, newNoteVol: 8, forSong: false, convertRealFactor: 0, associatedEffect: EffectType.granular, maxIndex: 0,
             promptName: "Grain Count", promptDesc: [ "This setting controls the density of grains for the granular effect on your instrument." ,"[OVERWRITING] [$LO - $HI]" ] },
         { name: "grain size", pianoName: "Grain Size", maxRawVol: Config.grainSizeMax/Config.grainSizeStep, newNoteVol: Config.grainSizeMin/Config.grainSizeStep, forSong: false, convertRealFactor: 0, associatedEffect: EffectType.granular, maxIndex: 0,
             promptName: "Grain Size", promptDesc: [ "This setting controls the grain size of the granular effect in your instrument.", "The number shown in the mod channel is multiplied by " + Config.grainSizeStep + " to get the actual grain size." ,"[OVERWRITING] [$LO - $HI]" ] },
@@ -2225,6 +2226,9 @@ export function effectsIncludeGranular(effects: number): boolean {
 }
 export function effectsIncludeNoteRange(effects: number): boolean {
     return (effects & (1 << EffectType.noteRange)) != 0;
+}
+export function calculateRingModHertz(sliderHz: number): number {
+    return Math.floor(Config.ringModMinHz * Math.pow(Config.ringModMaxHz / Config.ringModMinHz, sliderHz))
 }
 export function rawChipToIntegrated(raw: DictionaryArray<ChipWave>): DictionaryArray<ChipWave> {
     const newArray: Array<ChipWave> = new Array<ChipWave>(raw.length);

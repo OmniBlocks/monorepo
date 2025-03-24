@@ -724,6 +724,7 @@ var beepbox = (function (exports) {
         { name: "strum", customInterval: false, arpeggiates: false, strumParts: 1, singleTone: false },
         { name: "arpeggio", customInterval: false, arpeggiates: true, strumParts: 0, singleTone: true },
         { name: "custom interval", customInterval: true, arpeggiates: false, strumParts: 0, singleTone: true },
+        { name: "monophonic", customInterval: false, arpeggiates: false, strumParts: 0, singleTone: true }
     ]);
     Config.maxChordSize = 9;
     Config.operatorCount = 4;
@@ -817,8 +818,8 @@ var beepbox = (function (exports) {
         { name: "50×", mult: 50.0, hzOffset: 0.0, amplitudeSign: 1.0 },
         { name: "75×", mult: 75.0, hzOffset: 0.0, amplitudeSign: 1.0 },
         { name: "100×", mult: 100.0, hzOffset: 0.0, amplitudeSign: 1.0 },
-        { name: "128x", mult: 128.0, hzOffset: 0.0, amplitudeSign: 1.0 },
-        { name: "256x", mult: 250.0, hzOffset: 0.0, amplitudeSign: 1.0 },
+        { name: "128×", mult: 128.0, hzOffset: 0.0, amplitudeSign: 1.0 },
+        { name: "256×", mult: 250.0, hzOffset: 0.0, amplitudeSign: 1.0 },
     ]);
     Config.envelopes = toNameMap([
         { name: "none", type: 0, speed: 0.0 },
@@ -1131,7 +1132,7 @@ var beepbox = (function (exports) {
         { name: "ringModulation", computeIndex: 49, displayName: "ring mod", interleave: false, isFilter: false, maxCount: 1, effect: 13, compatibleInstruments: null },
         { name: "ringModulationHz", computeIndex: 50, displayName: "ring mod hz", interleave: false, isFilter: false, maxCount: 1, effect: 13, compatibleInstruments: null },
         { name: "granular", computeIndex: 51, displayName: "granular", interleave: false, isFilter: false, maxCount: 1, effect: 14, compatibleInstruments: null },
-        { name: "grain Freq", computeIndex: 52, displayName: "grain freq", interleave: false, isFilter: false, maxCount: 1, effect: 14, compatibleInstruments: null },
+        { name: "grainFreq", computeIndex: 52, displayName: "grain freq", interleave: false, isFilter: false, maxCount: 1, effect: 14, compatibleInstruments: null },
         { name: "grainSize", computeIndex: 53, displayName: "grain size", interleave: false, isFilter: false, maxCount: 1, effect: 14, compatibleInstruments: null },
         { name: "echoDelay", computeIndex: 54, displayName: "echo delay", interleave: false, isFilter: false, maxCount: 1, effect: 6, compatibleInstruments: null },
     ]);
@@ -1263,7 +1264,7 @@ var beepbox = (function (exports) {
             promptName: "Ring Modulation (Hertz)", promptDesc: ["This setting controls the Hertz (Hz) used in the Ring Modulation effect in your instrument.", "[OVERWRITING] [$LO - $HI]"] },
         { name: "granular", pianoName: "Granular", maxRawVol: _a$1.granularRange, newNoteVol: 0, forSong: false, convertRealFactor: 0, associatedEffect: 14, maxIndex: 0,
             promptName: "Granular", promptDesc: ["This setting controls the granular effect in your instrument.", "[OVERWRITING] [$LO - $HI]"] },
-        { name: "grain amount", pianoName: "Grain #", maxRawVol: _a$1.grainAmountsMax, newNoteVol: 8, forSong: false, convertRealFactor: 0, associatedEffect: 14, maxIndex: 0,
+        { name: "grain freq", pianoName: "Grain #", maxRawVol: _a$1.grainAmountsMax, newNoteVol: 8, forSong: false, convertRealFactor: 0, associatedEffect: 14, maxIndex: 0,
             promptName: "Grain Count", promptDesc: ["This setting controls the density of grains for the granular effect on your instrument.", "[OVERWRITING] [$LO - $HI]"] },
         { name: "grain size", pianoName: "Grain Size", maxRawVol: _a$1.grainSizeMax / _a$1.grainSizeStep, newNoteVol: _a$1.grainSizeMin / _a$1.grainSizeStep, forSong: false, convertRealFactor: 0, associatedEffect: 14, maxIndex: 0,
             promptName: "Grain Size", promptDesc: ["This setting controls the grain size of the granular effect in your instrument.", "The number shown in the mod channel is multiplied by " + _a$1.grainSizeStep + " to get the actual grain size.", "[OVERWRITING] [$LO - $HI]"] },
@@ -1596,6 +1597,9 @@ var beepbox = (function (exports) {
     }
     function effectsIncludeGranular(effects) {
         return (effects & (1 << 14)) != 0;
+    }
+    function calculateRingModHertz(sliderHz) {
+        return Math.floor(Config.ringModMinHz * Math.pow(Config.ringModMaxHz / Config.ringModMinHz, sliderHz));
     }
     function rawChipToIntegrated(raw) {
         const newArray = new Array(raw.length);
@@ -8657,8 +8661,8 @@ var beepbox = (function (exports) {
                 { name: "pan flute 2", midiProgram: 75, isNoise: false, settings: { "type": "spectrum", "volume": 0, "eqFilter": [{ "type": "peak", "cutoffHz": 2828.43, "linearGain": 2 }, { "type": "high-pass", "cutoffHz": 594.6, "linearGain": 0.3536 }, { "type": "low-pass", "cutoffHz": 8000, "linearGain": 0.5 }], "eqFilterType": false, "eqSimpleCut": 10, "eqSimplePeak": 0, "envelopeSpeed": 12, "discreteEnvelope": false, "eqSubFilters0": [{ "type": "peak", "cutoffHz": 2828.43, "linearGain": 2 }, { "type": "high-pass", "cutoffHz": 594.6, "linearGain": 0.3536 }, { "type": "low-pass", "cutoffHz": 8000, "linearGain": 0.5 }], "effects": ["panning", "transition type", "note filter", "bitcrusher", "reverb"], "transition": "continue", "clicklessTransition": false, "noteFilterType": false, "noteSimpleCut": 10, "noteSimplePeak": 0, "noteFilter": [{ "type": "low-pass", "cutoffHz": 9513.66, "linearGain": 0.5 }], "noteSubFilters0": [{ "type": "low-pass", "cutoffHz": 9513.66, "linearGain": 0.5 }], "noteSubFilters1": [{ "type": "low-pass", "cutoffHz": 9513.66, "linearGain": 0.5 }], "bitcrusherOctave": 6, "bitcrusherQuantization": 57, "pan": 0, "panDelay": 10, "reverb": 16, "fadeInSeconds": 0.0125, "fadeOutTicks": -6, "spectrum": [100, 29, 14, 14, 57, 0, 0, 71, 0, 86, 57, 43, 57, 71, 14, 29, 14, 14, 14, 100, 71, 14, 14, 14, 14, 86, 43, 14, 0, 0], "unison": "none", "pitchEnvelopeStart0": 0, "pitchEnvelopeEnd0": 96, "envelopeInverse0": false, "pitchEnvelopeStart1": 0, "pitchEnvelopeEnd1": 96, "envelopeInverse1": false, "pitchEnvelopeStart2": 0, "pitchEnvelopeEnd2": 96, "envelopeInverse2": false, "envelopes": [{ "target": "noteFilterAllFreqs", "envelope": "note size" }, { "target": "bitcrusherQuantization", "envelope": "note size" }, { "target": "noteVolume", "envelope": "note size" }], "isDrum": false } },
                 { name: "trumpet 2", midiProgram: 56, settings: { "type": "FM", "volume": 0, "eqFilter": [{ "type": "low-pass", "cutoffHz": 3049.17, "linearGain": 1.4142 }], "eqFilterType": true, "eqSimpleCut": 7, "eqSimplePeak": 3, "envelopeSpeed": 12, "discreteEnvelope": false, "eqSubFilters1": [], "effects": ["panning", "detune", "vibrato", "note filter", "distortion", "chorus", "reverb"], "detuneCents": -64, "vibrato": "custom", "vibratoDepth": 0.68, "vibratoDelay": 17, "vibratoSpeed": 12, "vibratoType": 0, "noteFilterType": false, "noteSimpleCut": 10, "noteSimplePeak": 0, "noteFilter": [{ "type": "low-pass", "cutoffHz": 13454.34, "linearGain": 0.5 }, { "type": "peak", "cutoffHz": 3363.59, "linearGain": 0.1768 }, { "type": "high-pass", "cutoffHz": 1000, "linearGain": 0.1768 }], "noteSubFilters0": [{ "type": "low-pass", "cutoffHz": 13454.34, "linearGain": 0.5 }, { "type": "peak", "cutoffHz": 3363.59, "linearGain": 0.1768 }, { "type": "high-pass", "cutoffHz": 1000, "linearGain": 0.1768 }], "distortion": 29, "aliases": false, "pan": 0, "panDelay": 10, "chorus": 14, "reverb": 0, "fadeInSeconds": 0.0263, "fadeOutTicks": -3, "algorithm": "1 2←(3 4)", "feedbackType": "1⟲", "feedbackAmplitude": 9, "operators": [{ "frequency": "0.75×", "amplitude": 14, "waveform": "pulse width", "pulseWidth": 2 }, { "frequency": "1×", "amplitude": 14, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 8, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 5, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 0, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 0, "waveform": "sine", "pulseWidth": 5 }], "envelopes": [{ "target": "operatorAmplitude", "envelope": "flare", "pitchEnvelopeStart": 0, "pitchEnvelopeEnd": 96, "inverse": false, "perEnvelopeSpeed": 8, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1, "index": 3 }, { "target": "feedbackAmplitude", "envelope": "swell", "pitchEnvelopeStart": 0, "pitchEnvelopeEnd": 96, "inverse": false, "perEnvelopeSpeed": 32, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1 }, { "target": "operatorFrequency", "envelope": "decay", "pitchEnvelopeStart": 0, "pitchEnvelopeEnd": 96, "inverse": false, "perEnvelopeSpeed": 128, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1, "index": 0 }, { "target": "noteFilterFreq", "envelope": "swell", "pitchEnvelopeStart": 0, "pitchEnvelopeEnd": 96, "inverse": false, "perEnvelopeSpeed": 2.5, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1, "index": 2 }, { "target": "noteVolume", "envelope": "note size", "pitchEnvelopeStart": 0, "pitchEnvelopeEnd": 96, "inverse": false, "perEnvelopeSpeed": 0, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1 }, { "target": "detune", "envelope": "note size", "pitchEnvelopeStart": 0, "pitchEnvelopeEnd": 96, "inverse": true, "perEnvelopeSpeed": 0, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1 }], "isDrum": false } },
                 { name: "harp 2", midiProgram: 46, settings: { "type": "FM6op", "volume": 0, "eqFilter": [{ "type": "low-pass", "cutoffHz": 13454.34, "linearGain": 0.0884 }, { "type": "peak", "cutoffHz": 1000, "linearGain": 2.8284 }, { "type": "high-pass", "cutoffHz": 62.5, "linearGain": 0.25 }, { "type": "high-pass", "cutoffHz": 148.65, "linearGain": 0.5 }], "eqFilterType": false, "eqSimpleCut": 10, "eqSimplePeak": 0, "envelopeSpeed": 12, "discreteEnvelope": false, "eqSubFilters0": [{ "type": "low-pass", "cutoffHz": 13454.34, "linearGain": 0.0884 }, { "type": "peak", "cutoffHz": 1000, "linearGain": 2.8284 }, { "type": "high-pass", "cutoffHz": 62.5, "linearGain": 0.25 }, { "type": "high-pass", "cutoffHz": 148.65, "linearGain": 0.5 }], "eqSubFilters1": [], "effects": ["panning", "detune", "note filter", "echo", "reverb"], "detuneCents": -23, "noteFilterType": false, "noteSimpleCut": 10, "noteSimplePeak": 0, "noteFilter": [{ "type": "low-pass", "cutoffHz": 6727.17, "linearGain": 0.0884 }, { "type": "peak", "cutoffHz": 105.11, "linearGain": 2.8284 }], "noteSubFilters0": [{ "type": "low-pass", "cutoffHz": 6727.17, "linearGain": 0.0884 }, { "type": "peak", "cutoffHz": 105.11, "linearGain": 2.8284 }], "pan": 0, "panDelay": 10, "echoSustain": 29, "echoDelayBeats": 1.083, "reverb": 74, "fadeInSeconds": 0, "fadeOutTicks": -1, "algorithm": "1←4 2←5 3←6", "feedbackType": "1⟲", "feedbackAmplitude": 5, "operators": [{ "frequency": "1×", "amplitude": 10, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 5, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 10, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "4×", "amplitude": 6, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "6×", "amplitude": 12, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 2, "waveform": "sine", "pulseWidth": 5 }], "envelopes": [{ "target": "noteVolume", "envelope": "decay", "pitchEnvelopeStart": 0, "pitchEnvelopeEnd": 96, "inverse": false, "perEnvelopeSpeed": 4, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1 }, { "target": "operatorFrequency", "envelope": "tremolo", "pitchEnvelopeStart": 0, "pitchEnvelopeEnd": 96, "inverse": false, "perEnvelopeSpeed": 8, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1, "index": 1 }, { "target": "detune", "envelope": "decay", "pitchEnvelopeStart": 0, "pitchEnvelopeEnd": 96, "inverse": false, "perEnvelopeSpeed": 7, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1 }, { "target": "noteFilterFreq", "envelope": "tremolo2", "pitchEnvelopeStart": 0, "pitchEnvelopeEnd": 96, "inverse": false, "perEnvelopeSpeed": 1, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1, "index": 0 }, { "target": "operatorAmplitude", "envelope": "twang", "pitchEnvelopeStart": 0, "pitchEnvelopeEnd": 96, "inverse": false, "perEnvelopeSpeed": 8, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1, "index": 4 }, { "target": "operatorAmplitude", "envelope": "swell", "pitchEnvelopeStart": 0, "pitchEnvelopeEnd": 96, "inverse": true, "perEnvelopeSpeed": 8, "perEnvelopeLowerBound": 0.4, "perEnvelopeUpperBound": 1, "index": 0 }, { "target": "noteVolume", "envelope": "punch", "pitchEnvelopeStart": 0, "pitchEnvelopeEnd": 96, "inverse": false, "perEnvelopeSpeed": 0, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1 }], "isDrum": false } },
-                { name: "electric guitar 1", midiProgram: 30, settings: { "type": "FM", "volume": 0, "eqFilter": [{ "type": "high-pass", "cutoffHz": 1189.21, "linearGain": 2 }, { "type": "low-pass", "cutoffHz": 4000, "linearGain": 1.4142 }, { "type": "peak", "cutoffHz": 707.11, "linearGain": 0.0884 }, { "type": "peak", "cutoffHz": 420.45, "linearGain": 0.0884 }], "eqFilterType": false, "eqSimpleCut": 10, "eqSimplePeak": 0, "envelopeSpeed": 12, "discreteEnvelope": false, "eqSubFilters0": [{ "type": "high-pass", "cutoffHz": 1189.21, "linearGain": 2 }, { "type": "low-pass", "cutoffHz": 4000, "linearGain": 1.4142 }, { "type": "peak", "cutoffHz": 707.11, "linearGain": 0.0884 }, { "type": "peak", "cutoffHz": 420.45, "linearGain": 0.0884 }], "effects": ["panning", "vibrato", "note filter", "distortion", "reverb"], "vibrato": "delayed", "vibratoDepth": 0.3, "vibratoDelay": 18.5, "vibratoSpeed": 10, "vibratoType": 0, "noteFilterType": false, "noteSimpleCut": 10, "noteSimplePeak": 0, "noteFilter": [{ "type": "low-pass", "cutoffHz": 1414.21, "linearGain": 4 }, { "type": "high-pass", "cutoffHz": 594.6, "linearGain": 1 }], "noteSubFilters0": [{ "type": "low-pass", "cutoffHz": 1414.21, "linearGain": 4 }, { "type": "high-pass", "cutoffHz": 594.6, "linearGain": 1 }], "distortion": 100, "aliases": false, "pan": 0, "panDelay": 0, "reverb": 6, "fadeInSeconds": 0, "fadeOutTicks": 24, "algorithm": "1←2←3←4", "feedbackType": "2→4", "feedbackAmplitude": 5, "operators": [{ "frequency": "0.75×", "amplitude": 4, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 2, "waveform": "triangle", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 5, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "~1×", "amplitude": 2, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 0, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 0, "waveform": "sine", "pulseWidth": 5 }], "envelopes": [{ "target": "operatorAmplitude", "envelope": "rise", "inverse": false, "perEnvelopeSpeed": 6, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1, "index": 3 }, { "target": "feedbackAmplitude", "envelope": "flare", "inverse": false, "perEnvelopeSpeed": 6.5, "perEnvelopeLowerBound": 0.3, "perEnvelopeUpperBound": 0.7 }, { "target": "noteVolume", "envelope": "punch", "inverse": false, "perEnvelopeSpeed": 0, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1 }, { "target": "vibratoDepth", "envelope": "rise", "inverse": false, "perEnvelopeSpeed": 9, "perEnvelopeLowerBound": 1, "perEnvelopeUpperBound": 2 }, { "target": "noteVolume", "envelope": "note size", "inverse": false, "perEnvelopeSpeed": 0, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1 }, { "target": "distortion", "envelope": "note size", "inverse": false, "perEnvelopeSpeed": 0, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1 }], "isDrum": false } },
-                { name: "electric guitar 2", midiProgram: 30, settings: { "type": "PWM", "volume": 0, "eqFilter": [{ "type": "low-pass", "cutoffHz": 3363.59, "linearGain": 5.6569 }, { "type": "high-pass", "cutoffHz": 1681.79, "linearGain": 0.25 }, { "type": "peak", "cutoffHz": 5656.85, "linearGain": 2 }], "eqFilterType": false, "eqSimpleCut": 10, "eqSimplePeak": 0, "envelopeSpeed": 12, "discreteEnvelope": false, "eqSubFilters0": [{ "type": "low-pass", "cutoffHz": 3363.59, "linearGain": 5.6569 }, { "type": "high-pass", "cutoffHz": 1681.79, "linearGain": 0.25 }, { "type": "peak", "cutoffHz": 5656.85, "linearGain": 2 }], "effects": ["panning", "vibrato", "note filter", "distortion", "bitcrusher", "reverb"], "vibrato": "custom", "vibratoDepth": 0.68, "vibratoDelay": 22, "vibratoSpeed": 10, "vibratoType": 0, "noteFilterType": false, "noteSimpleCut": 10, "noteSimplePeak": 0, "noteFilter": [{ "type": "low-pass", "cutoffHz": 1000, "linearGain": 2.8284 }], "noteSubFilters0": [{ "type": "low-pass", "cutoffHz": 1000, "linearGain": 2.8284 }], "distortion": 43, "aliases": false, "bitcrusherOctave": 6.5, "bitcrusherQuantization": 71, "pan": 0, "panDelay": 0, "reverb": 13, "fadeInSeconds": 0, "fadeOutTicks": 24, "pulseWidth": 49, "decimalOffset": 0, "unison": "none", "envelopes": [{ "target": "noteFilterAllFreqs", "envelope": "rise", "inverse": false, "perEnvelopeSpeed": 0.3333, "perEnvelopeLowerBound": 0.8, "perEnvelopeUpperBound": 1 }, { "target": "bitcrusherFrequency", "envelope": "blip", "inverse": false, "perEnvelopeSpeed": 2.5, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1 }, { "target": "pulseWidth", "envelope": "twang", "inverse": true, "perEnvelopeSpeed": 2.25, "perEnvelopeLowerBound": 0.5, "perEnvelopeUpperBound": 0.9 }, { "target": "noteVolume", "envelope": "note size", "inverse": false, "perEnvelopeSpeed": 0, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1 }, { "target": "bitcrusherQuantization", "envelope": "note size", "inverse": false, "perEnvelopeSpeed": 0, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1 }], "isDrum": false } },
+                { name: "electric guitar 1", midiProgram: 30, settings: { "type": "FM", "volume": 0, "eqFilter": [{ "type": "high-pass", "cutoffHz": 1189.21, "linearGain": 2 }, { "type": "low-pass", "cutoffHz": 4000, "linearGain": 1.4142 }, { "type": "peak", "cutoffHz": 707.11, "linearGain": 0.0884 }, { "type": "peak", "cutoffHz": 420.45, "linearGain": 0.0884 }], "eqFilterType": false, "eqSimpleCut": 10, "eqSimplePeak": 0, "envelopeSpeed": 12, "eqSubFilters0": [{ "type": "high-pass", "cutoffHz": 1189.21, "linearGain": 2 }, { "type": "low-pass", "cutoffHz": 4000, "linearGain": 1.4142 }, { "type": "peak", "cutoffHz": 707.11, "linearGain": 0.0884 }, { "type": "peak", "cutoffHz": 420.45, "linearGain": 0.0884 }], "effects": ["panning", "chord type", "vibrato", "note filter", "distortion", "reverb"], "chord": "monophonic", "fastTwoNoteArp": false, "arpeggioSpeed": 12, "monoChordTone": 0, "vibrato": "delayed", "vibratoDepth": 0.3, "vibratoDelay": 18.5, "vibratoSpeed": 10, "vibratoType": 0, "noteFilterType": false, "noteSimpleCut": 10, "noteSimplePeak": 0, "noteFilter": [{ "type": "low-pass", "cutoffHz": 1414.21, "linearGain": 4 }, { "type": "high-pass", "cutoffHz": 594.6, "linearGain": 1 }], "noteSubFilters0": [{ "type": "low-pass", "cutoffHz": 1414.21, "linearGain": 4 }, { "type": "high-pass", "cutoffHz": 594.6, "linearGain": 1 }], "distortion": 100, "aliases": false, "pan": 0, "panDelay": 0, "reverb": 6, "fadeInSeconds": 0, "fadeOutTicks": 24, "algorithm": "1 2 3 4", "feedbackType": "1⟲", "feedbackAmplitude": 0, "operators": [{ "frequency": "0.5×", "amplitude": 15, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 0, "waveform": "triangle", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 0, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "~1×", "amplitude": 0, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 0, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 0, "waveform": "sine", "pulseWidth": 5 }], "envelopes": [{ "target": "noteVolume", "envelope": "punch", "inverse": false, "perEnvelopeSpeed": 0, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1, "discrete": false }, { "target": "vibratoDepth", "envelope": "rise", "inverse": false, "perEnvelopeSpeed": 9, "perEnvelopeLowerBound": 1, "perEnvelopeUpperBound": 2, "discrete": false }, { "target": "noteVolume", "envelope": "note size", "inverse": false, "perEnvelopeSpeed": 0, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1, "discrete": false }, { "target": "distortion", "envelope": "note size", "inverse": false, "perEnvelopeSpeed": 0, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1, "discrete": false }], "isDrum": false } },
+                { name: "electric guitar 2", midiProgram: 30, settings: { "type": "PWM", "volume": 0, "eqFilter": [{ "type": "low-pass", "cutoffHz": 3363.59, "linearGain": 5.6569 }, { "type": "high-pass", "cutoffHz": 1681.79, "linearGain": 0.25 }, { "type": "peak", "cutoffHz": 5656.85, "linearGain": 2 }], "eqFilterType": false, "eqSimpleCut": 10, "eqSimplePeak": 0, "envelopeSpeed": 12, "discreteEnvelope": false, "eqSubFilters0": [{ "type": "low-pass", "cutoffHz": 3363.59, "linearGain": 5.6569 }, { "type": "high-pass", "cutoffHz": 1681.79, "linearGain": 0.25 }, { "type": "peak", "cutoffHz": 5656.85, "linearGain": 2 }], "effects": ["panning", "vibrato", "note filter", "distortion", "bitcrusher", "reverb"], "vibrato": "custom", "vibratoDepth": 0.68, "vibratoDelay": 22, "vibratoSpeed": 10, "vibratoType": 0, "noteFilterType": false, "noteSimpleCut": 10, "noteSimplePeak": 0, "noteFilter": [{ "type": "low-pass", "cutoffHz": 1000, "linearGain": 2.8284 }], "noteSubFilters0": [{ "type": "low-pass", "cutoffHz": 1000, "linearGain": 2.8284 }], "distortion": 43, "aliases": false, "bitcrusherOctave": 6.5, "bitcrusherQuantization": 71, "pan": 0, "panDelay": 0, "reverb": 13, "fadeInSeconds": 0, "fadeOutTicks": 24, "pulseWidth": 49, "decimalOffset": 0, "unison": "none", "envelopes": [{ "target": "noteFilterAllFreqs", "envelope": "rise", "inverse": false, "perEnvelopeSpeed": 0.3333, "perEnvelopeLowerBound": 0.8, "perEnvelopeUpperBound": 1 }, { "target": "pulseWidth", "envelope": "twang", "inverse": true, "perEnvelopeSpeed": 2.25, "perEnvelopeLowerBound": 0.5, "perEnvelopeUpperBound": 0.9 }, { "target": "noteVolume", "envelope": "note size", "inverse": false, "perEnvelopeSpeed": 0, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1 }, { "target": "bitcrusherQuantization", "envelope": "note size", "inverse": false, "perEnvelopeSpeed": 0, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1 }], "isDrum": false } },
             ])
         },
         {
@@ -10476,6 +10480,7 @@ var beepbox = (function (exports) {
         }
     }
     class Instrument {
+        ;
         constructor(isNoiseChannel, isModChannel) {
             this.type = 0;
             this.preset = 0;
@@ -10523,6 +10528,7 @@ var beepbox = (function (exports) {
             this.pan = Config.panCenter;
             this.panDelay = 0;
             this.arpeggioSpeed = 12;
+            this.monoChordTone = 0;
             this.fastTwoNoteArp = false;
             this.legacyTieOver = false;
             this.clicklessTransition = false;
@@ -10537,8 +10543,8 @@ var beepbox = (function (exports) {
             this.distortion = 0;
             this.bitcrusherFreq = 0;
             this.bitcrusherQuantization = 0;
-            this.ringModulation = 0;
-            this.ringModulationHz = 0;
+            this.ringModulation = Math.floor(Config.ringModRange / 2);
+            this.ringModulationHz = Math.floor(Config.ringModHzRange / 2);
             this.ringModWaveformIndex = 0;
             this.granular = 4;
             this.grainSize = (Config.grainSizeMax - Config.grainSizeMin) / Config.grainSizeStep;
@@ -10644,6 +10650,7 @@ var beepbox = (function (exports) {
             this.stringSustainType = Config.enableAcousticSustain ? 1 : 0;
             this.clicklessTransition = false;
             this.arpeggioSpeed = 12;
+            this.monoChordTone = 1;
             this.envelopeSpeed = 12;
             this.legacyTieOver = false;
             this.aliases = false;
@@ -10893,6 +10900,7 @@ var beepbox = (function (exports) {
                 instrumentObject["chord"] = this.getChord().name;
                 instrumentObject["fastTwoNoteArp"] = this.fastTwoNoteArp;
                 instrumentObject["arpeggioSpeed"] = this.arpeggioSpeed;
+                instrumentObject["monoChordTone"] = this.monoChordTone;
             }
             if (effectsIncludePitchShift(this.effects)) {
                 instrumentObject["pitchShiftSemitones"] = this.pitchShift;
@@ -11671,6 +11679,9 @@ var beepbox = (function (exports) {
                 else {
                     this.arpeggioSpeed = (useSlowerRhythm) ? 9 : 12;
                 }
+                if (this.chord == Config.chords.dictionary["monophonic"].index && instrumentObject["monoChordTone"] != undefined) {
+                    this.monoChordTone = instrumentObject["monoChordTone"];
+                }
                 if (instrumentObject["fastTwoNoteArp"] != undefined) {
                     this.fastTwoNoteArp = instrumentObject["fastTwoNoteArp"];
                 }
@@ -12013,7 +12024,7 @@ var beepbox = (function (exports) {
                         let ringModIndex = Config.modulators.dictionary["ring modulation"].index;
                         let ringModHertzIndex = Config.modulators.dictionary["ring mod hertz"].index;
                         let granularIndex = Config.modulators.dictionary["granular"].index;
-                        let grainAmountIndex = Config.modulators.dictionary["grain amount"].index;
+                        let grainAmountIndex = Config.modulators.dictionary["grain freq"].index;
                         let grainSizeIndex = Config.modulators.dictionary["grain size"].index;
                         let envSpeedIndex = Config.modulators.dictionary["envelope speed"].index;
                         let perEnvSpeedIndex = Config.modulators.dictionary["individual envelope speed"].index;
@@ -12395,6 +12406,9 @@ var beepbox = (function (exports) {
                         if (instrument.chord == Config.chords.dictionary["arpeggio"].index) {
                             buffer.push(base64IntToCharCode[instrument.arpeggioSpeed]);
                             buffer.push(base64IntToCharCode[+instrument.fastTwoNoteArp]);
+                        }
+                        if (instrument.chord == Config.chords.dictionary["monophonic"].index) {
+                            buffer.push(base64IntToCharCode[instrument.monoChordTone]);
                         }
                     }
                     if (effectsIncludePitchShift(instrument.effects)) {
@@ -14074,6 +14088,9 @@ var beepbox = (function (exports) {
                                     if (instrument.chord == Config.chords.dictionary["arpeggio"].index && (fromJummBox || fromGoldBox || fromUltraBox || fromSlarmoosBox)) {
                                         instrument.arpeggioSpeed = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                                         instrument.fastTwoNoteArp = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)]) ? true : false;
+                                    }
+                                    if (instrument.chord == Config.chords.dictionary["monophonic"].index && fromSlarmoosBox && !beforeFive) {
+                                        instrument.monoChordTone = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                                     }
                                 }
                                 if (effectsIncludePitchShift(instrument.effects)) {
@@ -16249,6 +16266,7 @@ var beepbox = (function (exports) {
             this.nextSlideRatioStart = 0.0;
             this.nextSlideRatioEnd = 0.0;
             this.startPinTickAbsolute = null;
+            this.startPinTickPitch = null;
             this.envelopeStarts = [];
             this.envelopeEnds = [];
             this._modifiedEnvelopeIndices = [];
@@ -16276,6 +16294,7 @@ var beepbox = (function (exports) {
             this.drumsetFilterEnvelopeStart = 0.0;
             this.drumsetFilterEnvelopeEnd = 0.0;
             this.startPinTickAbsolute = null;
+            this.startPinTickPitch = null;
         }
         computeEnvelopes(instrument, currentPart, tickTimeStart, tickTimeStartReal, secondsPerTick, tone, timeScale, instrumentState, synth) {
             const secondsPerTickUnscaled = secondsPerTick;
@@ -16328,8 +16347,10 @@ var beepbox = (function (exports) {
             let prevSlideRatioEnd = 0.0;
             let nextSlideRatioStart = 0.0;
             let nextSlideRatioEnd = 0.0;
-            if (tone == null)
+            if (tone == null) {
                 this.startPinTickAbsolute = null;
+                this.startPinTickPitch = null;
+            }
             if (tone != null && tone.note != null && !tone.passedEndOfNote) {
                 const endPinIndex = tone.note.getEndPinIndex(currentPart);
                 const startPin = tone.note.pins[endPinIndex - 1];
@@ -16337,6 +16358,8 @@ var beepbox = (function (exports) {
                 const startPinTick = (tone.note.start + startPin.time) * Config.ticksPerPart;
                 if (this.startPinTickAbsolute == null || (!(transition.continues || transition.slides)) && tone.passedEndOfNote)
                     this.startPinTickAbsolute = startPinTick + synth.computeTicksSinceStart(true);
+                if (this.startPinTickPitch == null || tone.passedEndOfNote)
+                    this.startPinTickPitch = this.getPitchValue(instrument, tone, instrumentState, false);
                 const endPinTick = (tone.note.start + endPin.time) * Config.ticksPerPart;
                 const ratioStart = (tickTimeStartReal - startPinTick) / (endPinTick - startPinTick);
                 const ratioEnd = (tickTimeEndReal - startPinTick) / (endPinTick - startPinTick);
@@ -16389,6 +16412,7 @@ var beepbox = (function (exports) {
                 let seed = 2;
                 let waveform = 0;
                 let startPinTickAbsolute = this.startPinTickAbsolute || 0.0;
+                let defaultPitch = this.startPinTickPitch || 0.0;
                 if (envelopeIndex == instrument.envelopeCount) {
                     if (usedNoteSize)
                         break;
@@ -16431,7 +16455,6 @@ var beepbox = (function (exports) {
                     if (envelope.type == 1)
                         usedNoteSize = true;
                 }
-                const defaultPitch = (envelope.type == 3) ? this.getPitchValue(instrument, tone, instrumentState, false) : 0;
                 const pitch = (envelope.type == 2) ? this.computePitchEnvelope(instrument, envelopeIndex, this.getPitchValue(instrument, tone, instrumentState, true)) : 0;
                 if (automationTarget.computeIndex != null) {
                     const computeIndex = automationTarget.computeIndex + targetIndex;
@@ -16586,10 +16609,10 @@ var beepbox = (function (exports) {
                             }
                         case 1:
                             if (inverse) {
-                                return (Math.cos(beats * 2.0 * Math.PI * envelopeSpeed) < 0) ? perEnvelopeUpperBound : perEnvelopeLowerBound;
+                                return (Math.cos(beats * 2.0 * Math.PI * envelopeSpeed + 3 * Math.PI / 2) < 0) ? perEnvelopeUpperBound : perEnvelopeLowerBound;
                             }
                             else {
-                                return (Math.cos(beats * 2.0 * Math.PI * envelopeSpeed) < 0) ? perEnvelopeLowerBound : perEnvelopeUpperBound;
+                                return (Math.cos(beats * 2.0 * Math.PI * envelopeSpeed + 3 * Math.PI / 2) < 0) ? perEnvelopeLowerBound : perEnvelopeUpperBound;
                             }
                         case 2:
                             if (inverse) {
@@ -16712,8 +16735,9 @@ var beepbox = (function (exports) {
             if (tone && tone.pitchCount >= 1) {
                 const chord = instrument.getChord();
                 const arpeggiates = chord.arpeggiates;
+                const monophonic = chord.name == "monophonic";
                 const arpeggio = Math.floor(instrumentState.arpTime / Config.ticksPerArpeggio);
-                const tonePitch = tone.pitches[arpeggiates ? getArpeggioPitchIndex(tone.pitchCount, instrument.fastTwoNoteArp, arpeggio) : 0];
+                const tonePitch = tone.pitches[arpeggiates ? getArpeggioPitchIndex(tone.pitchCount, instrument.fastTwoNoteArp, arpeggio) : monophonic ? instrument.monoChordTone : 0];
                 if (calculateBends) {
                     return tone.lastInterval != tonePitch ? tonePitch + tone.lastInterval : tonePitch;
                 }
@@ -16960,6 +16984,8 @@ var beepbox = (function (exports) {
             this.granularDelayLineIndex = 0;
             this.granularMaximumDelayTimeInSeconds = 1;
             this.usesRandomGrainLocation = true;
+            this.granularDelayLineDirty = false;
+            this.computeGrains = true;
             this.ringModMix = 0;
             this.ringModMixDelta = 0;
             this.ringModPhase = 0;
@@ -16967,8 +16993,6 @@ var beepbox = (function (exports) {
             this.ringModPhaseDeltaScale = 1.0;
             this.ringModWaveformIndex = 0.0;
             this.rmHzOffset = 0.0;
-            this.ringModMixFade = 1.0;
-            this.ringModMixFadeDelta = 0;
             this.distortion = 0.0;
             this.distortionDelta = 0.0;
             this.distortionDrive = 0.0;
@@ -17184,9 +17208,12 @@ var beepbox = (function (exports) {
                 for (let i = 0; i < this.reverbDelayLine.length; i++)
                     this.reverbDelayLine[i] = 0.0;
             }
+            if (this.granularDelayLineDirty) {
+                for (let i = 0; i < this.granularDelayLine.length; i++)
+                    this.granularDelayLine[i] = 0.0;
+            }
             this.chorusPhase = 0.0;
             this.ringModPhase = 0.0;
-            this.ringModMixFade = 1.0;
         }
         compute(synth, instrument, samplesPerTick, roundedSamplesPerTick, tone, channelIndex, instrumentIndex) {
             this.computed = true;
@@ -17246,6 +17273,7 @@ var beepbox = (function (exports) {
             this.allocateNecessaryBuffers(synth, instrument, samplesPerTick);
             if (usesGranular) {
                 this.granularMix = instrument.granular / Config.granularRange;
+                this.computeGrains = true;
                 let granularMixEnd = this.granularMix;
                 if (synth.isModActive(Config.modulators.dictionary["granular"].index, channelIndex, instrumentIndex)) {
                     this.granularMix = synth.getModValue(Config.modulators.dictionary["granular"].index, channelIndex, instrumentIndex, false) / Config.granularRange;
@@ -17494,17 +17522,8 @@ var beepbox = (function (exports) {
                 let ringModEnd = Math.min(1.0, (useRingModEnd * useRingModEnvelopeEnd) / (Config.ringModRange - 1));
                 this.ringModMix = ringModStart;
                 this.ringModMixDelta = (ringModEnd - ringModStart) / roundedSamplesPerTick;
-                this.rmHzOffset = Config.rmHzOffsetCenter;
-                let ringModPhaseDeltaStart = (Math.max(1, ((Config.ringModMinHz * Math.pow(Config.ringModMaxHz / Config.ringModMinHz, useRingModHzStart))) + (this.rmHzOffset - Config.rmHzOffsetCenter))) / synth.samplesPerSecond;
-                let ringModPhaseDeltaEnd = (Math.max(1, ((Config.ringModMinHz * Math.pow(Config.ringModMaxHz / Config.ringModMinHz, useRingModHzEnd))) + (this.rmHzOffset - Config.rmHzOffsetCenter))) / synth.samplesPerSecond;
-                this.ringModMixFadeDelta = 0;
-                if (this.ringModMixFade < 0)
-                    this.ringModMixFade = 0;
-                if (useRingModHzStart <= 0 && useRingModHzEnd <= 0 && this.ringModMixFade != 0) {
-                    this.ringModMixFadeDelta = this.ringModMix / -10;
-                }
-                else if (this.ringModMixFade == 0 && useRingModHzStart > 0 && useRingModHzEnd > 0)
-                    this.ringModMixFade = 1.0;
+                let ringModPhaseDeltaStart = (Math.max(0, calculateRingModHertz(useRingModHzStart))) / synth.samplesPerSecond;
+                let ringModPhaseDeltaEnd = (Math.max(0, calculateRingModHertz(useRingModHzEnd))) / synth.samplesPerSecond;
                 this.ringModPhaseDelta = ringModPhaseDeltaStart;
                 this.ringModPhaseDeltaScale = Math.pow(ringModPhaseDeltaEnd / ringModPhaseDeltaStart, 1.0 / roundedSamplesPerTick);
                 this.ringModWaveformIndex = instrument.ringModWaveformIndex;
@@ -17608,6 +17627,9 @@ var beepbox = (function (exports) {
                     const halfLife = -1.0 / Math.log2(attenuationPerSecond);
                     const reverbDuration = halfLife * halfLifeMult;
                     delayDuration += reverbDuration;
+                }
+                if (usesGranular) {
+                    this.computeGrains = false;
                 }
                 const secondsInTick = samplesPerTick / samplesPerSecond;
                 const progressInTick = secondsInTick / delayDuration;
@@ -20186,6 +20208,7 @@ var beepbox = (function (exports) {
                 let totalCarrierExpression = 0.0;
                 let arpeggioInterval = 0;
                 const arpeggiates = chord.arpeggiates;
+                const isMono = chord.name == "monophonic";
                 if (tone.pitchCount > 1 && arpeggiates) {
                     const arpeggio = Math.floor(instrumentState.arpTime / Config.ticksPerArpeggio);
                     arpeggioInterval = tone.pitches[getArpeggioPitchIndex(tone.pitchCount, instrument.fastTwoNoteArp, arpeggio)] - tone.pitches[0];
@@ -20193,7 +20216,7 @@ var beepbox = (function (exports) {
                 const carrierCount = (instrument.type == 11 ? instrument.customAlgorithm.carrierCount : Config.algorithms[instrument.algorithm].carrierCount);
                 for (let i = 0; i < (instrument.type == 11 ? 6 : Config.operatorCount); i++) {
                     const associatedCarrierIndex = (instrument.type == 11 ? instrument.customAlgorithm.associatedCarrier[i] - 1 : Config.algorithms[instrument.algorithm].associatedCarrier[i] - 1);
-                    const pitch = tone.pitches[arpeggiates ? 0 : ((i < tone.pitchCount) ? i : ((associatedCarrierIndex < tone.pitchCount) ? associatedCarrierIndex : 0))];
+                    const pitch = tone.pitches[arpeggiates ? 0 : isMono ? instrument.monoChordTone : ((i < tone.pitchCount) ? i : ((associatedCarrierIndex < tone.pitchCount) ? associatedCarrierIndex : 0))];
                     const freqMult = Config.operatorFrequencies[instrument.operators[i].frequency].mult;
                     const interval = Config.operatorCarrierInterval[associatedCarrierIndex] + arpeggioInterval;
                     const pitchStart = basePitch + (pitch + intervalStart) * intervalScale + interval;
@@ -20270,8 +20293,12 @@ var beepbox = (function (exports) {
                 sineExpressionBoost *= (Math.pow(2.0, (2.0 - 1.4 * instrument.feedbackAmplitude / 15.0)) - 1.0) / 3.0;
                 sineExpressionBoost *= 1.0 - Math.min(1.0, Math.max(0.0, totalCarrierExpression - 1) / 2.0);
                 sineExpressionBoost = 1.0 + sineExpressionBoost * 3.0;
-                const expressionStart = baseExpression * sineExpressionBoost * noteFilterExpression * fadeExpressionStart * chordExpressionStart * envelopeStarts[0];
-                const expressionEnd = baseExpression * sineExpressionBoost * noteFilterExpression * fadeExpressionEnd * chordExpressionEnd * envelopeEnds[0];
+                let expressionStart = baseExpression * sineExpressionBoost * noteFilterExpression * fadeExpressionStart * chordExpressionStart * envelopeStarts[0];
+                let expressionEnd = baseExpression * sineExpressionBoost * noteFilterExpression * fadeExpressionEnd * chordExpressionEnd * envelopeEnds[0];
+                if (isMono && tone.pitchCount <= instrument.monoChordTone) {
+                    expressionStart = 0;
+                    expressionEnd = 0;
+                }
                 tone.expression = expressionStart;
                 tone.expressionDelta = (expressionEnd - expressionStart) / roundedSamplesPerTick;
                 let useFeedbackAmplitudeStart = instrument.feedbackAmplitude;
@@ -20290,16 +20317,20 @@ var beepbox = (function (exports) {
             else {
                 const freqEndRatio = Math.pow(2.0, (intervalEnd - intervalStart) * intervalScale / 12.0);
                 const basePhaseDeltaScale = Math.pow(freqEndRatio, 1.0 / roundedSamplesPerTick);
+                const isMono = chord.name == "monophonic";
                 let pitch = tone.pitches[0];
-                if (tone.pitchCount > 1 && (chord.arpeggiates || chord.customInterval)) {
+                if (tone.pitchCount > 1 && (chord.arpeggiates || chord.customInterval || isMono)) {
                     const arpeggio = Math.floor(instrumentState.arpTime / Config.ticksPerArpeggio);
                     if (chord.customInterval) {
                         const intervalOffset = tone.pitches[1 + getArpeggioPitchIndex(tone.pitchCount - 1, instrument.fastTwoNoteArp, arpeggio)] - tone.pitches[0];
                         specialIntervalMult = Math.pow(2.0, intervalOffset / 12.0);
                         tone.specialIntervalExpressionMult = Math.pow(2.0, -intervalOffset / pitchDamping);
                     }
-                    else {
+                    else if (chord.arpeggiates) {
                         pitch = tone.pitches[getArpeggioPitchIndex(tone.pitchCount, instrument.fastTwoNoteArp, arpeggio)];
+                    }
+                    else {
+                        pitch = tone.pitches[instrument.monoChordTone];
                     }
                 }
                 const startPitch = basePitch + (pitch + intervalStart) * intervalScale;
@@ -20520,6 +20551,10 @@ var beepbox = (function (exports) {
                     const endVal = this.getModValue(Config.modulators.dictionary["note volume"].index, channelIndex, tone.instrumentIndex, true);
                     expressionStart *= ((startVal <= 0) ? ((startVal + Config.volumeRange / 2) / (Config.volumeRange / 2)) : Synth.instrumentVolumeToVolumeMult(startVal));
                     expressionEnd *= ((endVal <= 0) ? ((endVal + Config.volumeRange / 2) / (Config.volumeRange / 2)) : Synth.instrumentVolumeToVolumeMult(endVal));
+                }
+                if (isMono && tone.pitchCount <= instrument.monoChordTone) {
+                    expressionStart = 0;
+                    expressionEnd = 0;
                 }
                 tone.expression = expressionStart;
                 tone.expressionDelta = (expressionEnd - expressionStart) / roundedSamplesPerTick;
@@ -21115,7 +21150,6 @@ var beepbox = (function (exports) {
         static harmonicsSynth(synth, bufferIndex, roundedSamplesPerTick, tone, instrumentState) {
             const voiceCount = Math.max(2, instrumentState.unisonVoices);
             let harmonicsFunction = Synth.harmonicsFunctionCache[instrumentState.unisonVoices];
-            console.log(harmonicsFunction);
             if (harmonicsFunction == undefined) {
                 let harmonicsSource = "return (synth, bufferIndex, roundedSamplesPerTick, tone, instrumentState) => {";
                 harmonicsSource += `
@@ -21409,7 +21443,8 @@ var beepbox = (function (exports) {
                 const granularDelayLineMask = granularDelayLineLength - 1;
                 let granularDelayLineIndex = instrumentState.granularDelayLineIndex;
                 const usesRandomGrainLocation = instrumentState.usesRandomGrainLocation;
-                const grainPitchShift = Math.pow(2, 12/instrumentState.activeTones.get(0).pitches[0]);
+                const computeGrains = instrumentState.computeGrains;
+                instrumentState.granularDelayLineDirty = true;
                 `;
                 }
                 if (usesDistortion) {
@@ -21463,8 +21498,6 @@ var beepbox = (function (exports) {
                 let ringModPhaseDelta = +instrumentState.ringModPhaseDelta;
                 let ringModPhaseDeltaScale = +instrumentState.ringModPhaseDeltaScale;
                 let ringModWaveformIndex = +instrumentState.ringModWaveformIndex;
-                let ringModMixFade = +instrumentState.ringModMixFade;
-                let ringModMixFadeDelta = +instrumentState.ringModMixFadeDelta;
                 let waveform = Config.operatorWaves[ringModWaveformIndex].samples;
                 const waveformLength = waveform.length - 1;`;
                 }
@@ -21598,62 +21631,64 @@ var beepbox = (function (exports) {
                 let granularOutput = 0;
                 for (let grainIndex = 0; grainIndex < granularGrainCount; grainIndex++) {
                     const grain = granularGrains[grainIndex];
-                    if(grain.delay > 0) {
-                        grain.delay--;
-                    } else {
-                        const grainDelayLinePosition = grain.delayLinePosition;
-                        const grainDelayLinePositionInt = grainDelayLinePosition | 0;
-                        // const grainDelayLinePositionT = grainDelayLinePosition - grainDelayLinePositionInt;
-                        let grainAgeInSamples = grain.ageInSamples;
-                        const grainMaxAgeInSamples = grain.maxAgeInSamples;
-                        // const grainSample0 = granularDelayLine[((granularDelayLineIndex + (granularDelayLineLength - grainDelayLinePositionInt))    ) & granularDelayLineMask];
-                        // const grainSample1 = granularDelayLine[((granularDelayLineIndex + (granularDelayLineLength - grainDelayLinePositionInt)) + 1) & granularDelayLineMask];
-                        // let grainSample = grainSample0 + (grainSample1 - grainSample0) * grainDelayLinePositionT; // Linear interpolation (@TODO: sounds quite bad?)
-                        let grainSample = granularDelayLine[((granularDelayLineIndex + (granularDelayLineLength - grainDelayLinePositionInt))    ) & granularDelayLineMask]; // No interpolation
-                        `;
-                    if (Config.granularEnvelopeType == 0) {
-                        effectsSource += `
-                            const grainEnvelope = grain.parabolicEnvelopeAmplitude;
-                            `;
-                    }
-                    else if (Config.granularEnvelopeType == 1) {
-                        effectsSource += `
-                            const grainEnvelope = grain.rcbEnvelopeAmplitude;
-                            `;
-                    }
-                    effectsSource += `
-                        grainSample *= grainEnvelope;
-                        granularOutput += grainSample;
-                        if (grainAgeInSamples > grainMaxAgeInSamples) {
-                            if (granularGrainCount > 0) {
-                                // Faster equivalent of .pop, ignoring the order in the array.
-                                const lastGrainIndex = granularGrainCount - 1;
-                                const lastGrain = granularGrains[lastGrainIndex];
-                                granularGrains[grainIndex] = lastGrain;
-                                granularGrains[lastGrainIndex] = grain;
-                                granularGrainCount--;
-                                grainIndex--;
-                                // ^ Dangerous, since this could end up causing an infinite loop,
-                                // but should be okay in this case.
-                            }
+                    if(computeGrains) {
+                        if(grain.delay > 0) {
+                            grain.delay--;
                         } else {
-                            grainAgeInSamples++;
-                        `;
+                            const grainDelayLinePosition = grain.delayLinePosition;
+                            const grainDelayLinePositionInt = grainDelayLinePosition | 0;
+                            // const grainDelayLinePositionT = grainDelayLinePosition - grainDelayLinePositionInt;
+                            let grainAgeInSamples = grain.ageInSamples;
+                            const grainMaxAgeInSamples = grain.maxAgeInSamples;
+                            // const grainSample0 = granularDelayLine[((granularDelayLineIndex + (granularDelayLineLength - grainDelayLinePositionInt))    ) & granularDelayLineMask];
+                            // const grainSample1 = granularDelayLine[((granularDelayLineIndex + (granularDelayLineLength - grainDelayLinePositionInt)) + 1) & granularDelayLineMask];
+                            // let grainSample = grainSample0 + (grainSample1 - grainSample0) * grainDelayLinePositionT; // Linear interpolation (@TODO: sounds quite bad?)
+                            let grainSample = granularDelayLine[((granularDelayLineIndex + (granularDelayLineLength - grainDelayLinePositionInt))    ) & granularDelayLineMask]; // No interpolation
+                            `;
                     if (Config.granularEnvelopeType == 0) {
                         effectsSource += `
-                                grain.parabolicEnvelopeAmplitude += grain.parabolicEnvelopeSlope;
-                                grain.parabolicEnvelopeSlope += grain.parabolicEnvelopeCurve;
+                                const grainEnvelope = grain.parabolicEnvelopeAmplitude;
                                 `;
                     }
                     else if (Config.granularEnvelopeType == 1) {
                         effectsSource += `
-                                grain.updateRCBEnvelope();
+                                const grainEnvelope = grain.rcbEnvelopeAmplitude;
                                 `;
                     }
                     effectsSource += `
-                            grain.ageInSamples = grainAgeInSamples;
-                            if(usesRandomGrainLocation) {
-                                grain.delayLine -= grainPitchShift;
+                            grainSample *= grainEnvelope;
+                            granularOutput += grainSample;
+                            if (grainAgeInSamples > grainMaxAgeInSamples) {
+                                if (granularGrainCount > 0) {
+                                    // Faster equivalent of .pop, ignoring the order in the array.
+                                    const lastGrainIndex = granularGrainCount - 1;
+                                    const lastGrain = granularGrains[lastGrainIndex];
+                                    granularGrains[grainIndex] = lastGrain;
+                                    granularGrains[lastGrainIndex] = grain;
+                                    granularGrainCount--;
+                                    grainIndex--;
+                                    // ^ Dangerous, since this could end up causing an infinite loop,
+                                    // but should be okay in this case.
+                                }
+                            } else {
+                                grainAgeInSamples++;
+                            `;
+                    if (Config.granularEnvelopeType == 0) {
+                        effectsSource += `
+                                    grain.parabolicEnvelopeAmplitude += grain.parabolicEnvelopeSlope;
+                                    grain.parabolicEnvelopeSlope += grain.parabolicEnvelopeCurve;
+                                    `;
+                    }
+                    else if (Config.granularEnvelopeType == 1) {
+                        effectsSource += `
+                                    grain.updateRCBEnvelope();
+                                    `;
+                    }
+                    effectsSource += `
+                                grain.ageInSamples = grainAgeInSamples;
+                                // if(usesRandomGrainLocation) {
+                                //     grain.delayLine -= grainPitchShift;
+                                // }
                             }
                         }
                     }
@@ -21723,14 +21758,13 @@ var beepbox = (function (exports) {
                     effectsSource += ` 
                 
                 const ringModOutput = sample * waveform[(ringModPhase*waveformLength)|0];
-                const ringModMixF = Math.max(0, ringModMix * ringModMixFade);
-                sample = sample * (1 - ringModMixF) + ringModOutput * ringModMixF;
+                sample = sample * (1 - ringModMix) + ringModOutput * ringModMix;
 
                 ringModMix += ringModMixDelta;
                 ringModPhase += ringModPhaseDelta;
                 ringModPhase = ringModPhase % 1.0;
                 ringModPhaseDelta *= ringModPhaseDeltaScale;
-                ringModMixFade += ringModMixFadeDelta;`;
+                `;
                 }
                 if (usesEqFilter) {
                     effectsSource += `
@@ -21943,8 +21977,7 @@ var beepbox = (function (exports) {
                 instrumentState.ringModPhase = ringModPhase;
                 instrumentState.ringModPhaseDelta = ringModPhaseDelta;
                 instrumentState.ringModPhaseDeltaScale = ringModPhaseDeltaScale;
-                instrumentState.ringModWaveformIndex = ringModWaveformIndex; 
-                instrumentState.ringModMixFade = ringModMixFade;`;
+                instrumentState.ringModWaveformIndex = ringModWaveformIndex; `;
                 }
                 if (usesEqFilter) {
                     effectsSource += `

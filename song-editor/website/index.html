@@ -22,7 +22,7 @@
     <meta name="msapplication-TileColor" content="#247d1d" />
     <meta name="msapplication-config" content="/browserconfig.xml" />
     <meta name="format-detection" content="telephone=no" />
-    <meta property="og:image" content="https://slarmoo.github.io/slarmoosbox/website/icon_shadow_192.png">
+    <meta property="og:image" content="./icon_shadow_192.png">
     <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="32x32" href="./icon_32.png" />
     <link rel="manifest" href="./manifest.webmanifest" />
@@ -430,7 +430,8 @@
             }
         }
         if ((date.getDate() == 1) && date.getMonth() == 3) {
-            document.getElementById("goldboxPlant").innerHTML = "  Censorship Update";
+            const foolishPlants = ["Censorship Update", "19.8.4", "👁️"];
+            document.getElementById("goldboxPlant").innerHTML = "  " + foolishPlants[(Math.floor(Math.random() * foolishPlants.length))];
         }
         if ((date.getDate() == 13) && date.getMonth() == 4) {
             const years = date.getFullYear() - 2024;
@@ -468,7 +469,7 @@
             var fileref = document.createElement("script");
             fileref.setAttribute("type", "text/javascript");
             if ((date.getDate() == 1) && date.getMonth() == 3) {
-                //
+                fileref.setAttribute("src", "foolish_editor.min.js");
             } else {
                 fileref.setAttribute("src", "beepbox_editor.min.js");
             }

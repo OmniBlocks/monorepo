@@ -2627,7 +2627,7 @@ export class PatternEditor {
             const instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument(this._barOffset)];
             const chord: Chord = instrument.getChord();
             const transition: Transition = instrument.getTransition();
-            const displayNumberedChords: boolean = chord.customInterval || chord.arpeggiates || chord.strumParts > 0 || transition.slides;
+            const displayNumberedChords: boolean = chord.customInterval || chord.arpeggiates || chord.strumParts > 0 || transition.slides || chord.name == "monophonic";
             let noteFlashColor: string = "#ffffff";
             if (this._doc.prefs.notesFlashWhenPlayed) noteFlashColor = ColorConfig.getComputed("--note-flash");
             for (const note of this._pattern.notes) {

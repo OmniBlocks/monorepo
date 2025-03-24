@@ -105,6 +105,12 @@ export class TipPrompt implements Prompt {
 					);
 				}
 				break;
+			case "monophonic": {
+				message = div(
+					h2("Monophonic Note"),
+					p(`This setting controls which note of the chord your instrument will play. `),
+				);
+			} break;
 			case "detune": {
 				message = div(
 					h2("Detune"),
@@ -204,7 +210,7 @@ export class TipPrompt implements Prompt {
 				message = div(
 					h2("Chords"),
 					p("When multiple different notes occur at the same time, this is called a chord. Chords can be created in Slarmoo's Box's pattern editor by adding notes above or below another note."),
-					p("This setting determines how chords are played. The standard option is \"simultaneous\" which starts playing all of the pitches in a chord at the same instant. The \"strum\" option is similar, but plays the notes starting at slightly different times. The \"arpeggio\" option is used in \"chiptune\" style music and plays a single tone that rapidly alternates between all of the pitches in the chord."),
+					p("This setting determines how chords are played. The standard option is \"simultaneous\" which starts playing all of the pitches in a chord at the same instant. The \"strum\" option is similar, but plays the notes starting at slightly different times. The \"arpeggio\" option is used in \"chiptune\" style music and plays a single tone that rapidly alternates between all of the pitches in the chord. The \"monophonic\" option allows you to have only one tone in a chord play at a time. "),
 					p("Some Slarmoo's Box instruments have an option called \"custom interval\" which uses the chord notes to control the interval between the waves of a single tone. This can create strange sound effects when combined with FM modulators."),
 				);
 			} break;
@@ -664,6 +670,7 @@ export class TipPrompt implements Prompt {
 					p(`This setting controls the range of randomization for grain sizes. `),
 				);
 			} break;
+			
 
 			default:
 				// Check for modSetinfo#

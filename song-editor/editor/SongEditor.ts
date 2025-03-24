@@ -1,7 +1,7 @@
 // Copyright (c) 2012-2022 John Nesky and contributing authors, distributed under the MIT license, see accompanying the LICENSE.md file.
 
 //import {Layout} from "./Layout";
-import { sampleLoadEvents, SampleLoadedEvent, InstrumentType, EffectType, Config, effectsIncludeTransition, effectsIncludeChord, effectsIncludePitchShift, effectsIncludeDetune, effectsIncludeVibrato, effectsIncludeNoteFilter, effectsIncludeDistortion, effectsIncludeBitcrusher, effectsIncludePanning, effectsIncludeChorus, effectsIncludeEcho, effectsIncludeReverb, effectsIncludeRingModulation, effectsIncludeGranular, DropdownID } from "../synth/SynthConfig";
+import { sampleLoadEvents, SampleLoadedEvent, InstrumentType, EffectType, Config, effectsIncludeTransition, effectsIncludeChord, effectsIncludePitchShift, effectsIncludeDetune, effectsIncludeVibrato, effectsIncludeNoteFilter, effectsIncludeDistortion, effectsIncludeBitcrusher, effectsIncludePanning, effectsIncludeChorus, effectsIncludeEcho, effectsIncludeReverb, effectsIncludeRingModulation, effectsIncludeGranular, DropdownID, calculateRingModHertz } from "../synth/SynthConfig";
 import { BarScrollBar } from "./BarScrollBar";
 import { BeatsPerBarPrompt } from "./BeatsPerBarPrompt";
 import { Change, ChangeGroup } from "./Change";
@@ -15,7 +15,7 @@ import { EditorConfig, isMobile, prettyNumber, Preset, PresetCategory } from "./
 import { EuclideanRhythmPrompt } from "./EuclidgenRhythmPrompt";
 import { ExportPrompt } from "./ExportPrompt";
 import "./Layout"; // Imported here for the sake of ensuring this code is transpiled early.
-import { Instrument, Channel, Synth, clamp } from "../synth/synth";
+import { Instrument, Channel, Synth } from "../synth/synth";
 import { HTML, SVG } from "imperative-html/dist/esm/elements-strict";
 import { Preferences } from "./Preferences";
 import { HarmonicsEditor, HarmonicsEditorPrompt } from "./HarmonicsEditor";
@@ -46,7 +46,7 @@ import { SpectrumEditor, SpectrumEditorPrompt } from "./SpectrumEditor";
 import { CustomThemePrompt } from "./CustomThemePrompt";
 import { ThemePrompt } from "./ThemePrompt";
 import { TipPrompt } from "./TipPrompt";
-import { ChangeTempo, ChangeKeyOctave, ChangeChorus, ChangeEchoDelay, ChangeEchoSustain, ChangeReverb, ChangeVolume, ChangePan, ChangePatternSelection, ChangePatternsPerChannel, ChangePatternNumbers, ChangeSupersawDynamism, ChangeSupersawSpread, ChangeSupersawShape, ChangePulseWidth, ChangeFeedbackAmplitude, ChangeOperatorAmplitude, ChangeOperatorFrequency, ChangeDrumsetEnvelope, ChangePasteInstrument, ChangePreset, pickRandomPresetValue, ChangeRandomGeneratedInstrument, ChangeEQFilterType, ChangeNoteFilterType, ChangeEQFilterSimpleCut, ChangeEQFilterSimplePeak, ChangeNoteFilterSimpleCut, ChangeNoteFilterSimplePeak, ChangeScale, ChangeDetectKey, ChangeKey, ChangeRhythm, ChangeFeedbackType, ChangeAlgorithm, ChangeChipWave, ChangeNoiseWave, ChangeTransition, ChangeToggleEffects, ChangeVibrato, ChangeUnison, ChangeChord, ChangeSong, ChangePitchShift, ChangeDetune, ChangeDistortion, ChangeStringSustain, ChangeBitcrusherFreq, ChangeBitcrusherQuantization, ChangeAddEnvelope, ChangeEnvelopeSpeed, ChangeAddChannelInstrument, ChangeRemoveChannelInstrument, ChangeCustomWave, ChangeOperatorWaveform, ChangeOperatorPulseWidth, ChangeSongTitle, ChangeVibratoDepth, ChangeVibratoSpeed, ChangeVibratoDelay, ChangeVibratoType, ChangePanDelay, ChangeArpeggioSpeed, ChangeFastTwoNoteArp, ChangeClicklessTransition, ChangeAliasing, ChangeSetPatternInstruments, ChangeHoldingModRecording, ChangeChipWavePlayBackwards, ChangeChipWaveStartOffset, ChangeChipWaveLoopEnd, ChangeChipWaveLoopStart, ChangeChipWaveLoopMode, ChangeChipWaveUseAdvancedLoopControls, ChangeDecimalOffset, ChangeUnisonVoices, ChangeUnisonSpread, ChangeUnisonOffset, ChangeUnisonExpression, ChangeUnisonSign, Change6OpFeedbackType, Change6OpAlgorithm, ChangeCustomAlgorythmorFeedback, ChangeRingMod, ChangeRingModHz, ChangeRingModChipWave, ChangeGranular, ChangeGrainSize, ChangeGrainAmounts, ChangeGrainRange } from "./changes";
+import { ChangeTempo, ChangeKeyOctave, ChangeChorus, ChangeEchoDelay, ChangeEchoSustain, ChangeReverb, ChangeVolume, ChangePan, ChangePatternSelection, ChangePatternsPerChannel, ChangePatternNumbers, ChangeSupersawDynamism, ChangeSupersawSpread, ChangeSupersawShape, ChangePulseWidth, ChangeFeedbackAmplitude, ChangeOperatorAmplitude, ChangeOperatorFrequency, ChangeDrumsetEnvelope, ChangePasteInstrument, ChangePreset, pickRandomPresetValue, ChangeRandomGeneratedInstrument, ChangeEQFilterType, ChangeNoteFilterType, ChangeEQFilterSimpleCut, ChangeEQFilterSimplePeak, ChangeNoteFilterSimpleCut, ChangeNoteFilterSimplePeak, ChangeScale, ChangeDetectKey, ChangeKey, ChangeRhythm, ChangeFeedbackType, ChangeAlgorithm, ChangeChipWave, ChangeNoiseWave, ChangeTransition, ChangeToggleEffects, ChangeVibrato, ChangeUnison, ChangeChord, ChangeSong, ChangePitchShift, ChangeDetune, ChangeDistortion, ChangeStringSustain, ChangeBitcrusherFreq, ChangeBitcrusherQuantization, ChangeAddEnvelope, ChangeEnvelopeSpeed, ChangeAddChannelInstrument, ChangeRemoveChannelInstrument, ChangeCustomWave, ChangeOperatorWaveform, ChangeOperatorPulseWidth, ChangeSongTitle, ChangeVibratoDepth, ChangeVibratoSpeed, ChangeVibratoDelay, ChangeVibratoType, ChangePanDelay, ChangeArpeggioSpeed, ChangeFastTwoNoteArp, ChangeClicklessTransition, ChangeAliasing, ChangeSetPatternInstruments, ChangeHoldingModRecording, ChangeChipWavePlayBackwards, ChangeChipWaveStartOffset, ChangeChipWaveLoopEnd, ChangeChipWaveLoopStart, ChangeChipWaveLoopMode, ChangeChipWaveUseAdvancedLoopControls, ChangeDecimalOffset, ChangeUnisonVoices, ChangeUnisonSpread, ChangeUnisonOffset, ChangeUnisonExpression, ChangeUnisonSign, Change6OpFeedbackType, Change6OpAlgorithm, ChangeCustomAlgorythmorFeedback, ChangeRingMod, ChangeRingModHz, ChangeRingModChipWave, ChangeGranular, ChangeGrainSize, ChangeGrainAmounts, ChangeGrainRange, ChangeMonophonicTone } from "./changes";
 
 import { TrackEditor } from "./TrackEditor";
 import { oscilloscopeCanvas } from "../global/Oscilloscope";
@@ -1048,7 +1048,9 @@ export class SongEditor {
     private readonly _arpeggioSpeedRow: HTMLElement = div({ class: "selectRow dropFader" }, span({ class: "tip", style: "margin-left:4px;", onclick: () => this._openPrompt("arpeggioSpeed") }, "‣ Spd:"), this._arpeggioSpeedDisplay, this._arpeggioSpeedSlider.container);
     private readonly _twoNoteArpBox: HTMLInputElement = input({ type: "checkbox", style: "width: 1em; padding: 0; margin-right: 4em;" });
     private readonly _twoNoteArpRow: HTMLElement = div({ class: "selectRow dropFader" }, span({ class: "tip", style: "margin-left:4px;", onclick: () => this._openPrompt("twoNoteArpeggio") }, "‣ Fast Two-Note:"), this._twoNoteArpBox);
-    private readonly _chordDropdownGroup: HTMLElement = div({ class: "editor-controls", style: "display: none;" }, this._arpeggioSpeedRow, this._twoNoteArpRow);
+    private readonly _monophonicNoteSelect: HTMLSelectElement = buildOptions(select(), [1, 2, 3, 4, 5, 6, 7, 8, 9]);
+    private readonly _monophonicRow: HTMLElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("monophonic") }, "‣ Note:"), div({ class: "selectContainer" }, this._monophonicNoteSelect));
+    private readonly _chordDropdownGroup: HTMLElement = div({ class: "editor-controls", style: "display: none;" }, this._arpeggioSpeedRow, this._twoNoteArpRow, this._monophonicRow);
 
     private readonly _vibratoSelect: HTMLSelectElement = buildOptions(select(), Config.vibratos.map(vibrato => vibrato.name));
     private readonly _vibratoDropdown: HTMLButtonElement = button({ style: "margin-left:0em; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: () => this._toggleDropdownMenu(DropdownID.Vibrato) }, "▼");
@@ -1665,6 +1667,7 @@ export class SongEditor {
         this._effectsSelect.addEventListener("change", this._whenSetEffects);
         this._unisonSelect.addEventListener("change", this._whenSetUnison);
         this._chordSelect.addEventListener("change", this._whenSetChord);
+        this._monophonicNoteSelect.addEventListener("change", this._whenSetMonophonicNote)
         this._vibratoSelect.addEventListener("change", this._whenSetVibrato);
         this._vibratoTypeSelect.addEventListener("change", this._whenSetVibratoType);
         this._playButton.addEventListener("click", this.togglePlay);
@@ -1884,9 +1887,23 @@ export class SongEditor {
                 this.envelopeEditor.rerenderExtraSettings();
             } else if (group != this._chordDropdownGroup) {
                 group.style.display = "";
-            } // Only show arpeggio dropdown if chord arpeggiates
-            else if (instrument.chord == Config.chords.dictionary["arpeggio"].index) {
+            } // Only show arpeggio dropdown if chord arpeggiates or is monophonic
+            else if (instrument.chord == Config.chords.dictionary["arpeggio"].index || instrument.chord == Config.chords.dictionary["monophonic"].index) {
                 group.style.display = "";
+                if (instrument.chord == Config.chords.dictionary["arpeggio"].index) {
+                    this._chordDropdownGroup.style.display = "";
+                    this._arpeggioSpeedRow.style.display = "";
+                    this._twoNoteArpRow.style.display = "";
+                    this._monophonicRow.style.display = "none";
+                } else if (instrument.chord == Config.chords.dictionary["monophonic"].index) {
+                    this._chordDropdownGroup.style.display = "";
+                    this._arpeggioSpeedRow.style.display = "none";
+                    this._twoNoteArpRow.style.display = "none";
+                    this._monophonicRow.style.display = "";
+                    setSelectedValue(this._chordSelect, instrument.chord);
+                } else {
+                    this._chordDropdownGroup.style.display = "none";
+                }
             }
 
             for (let i: number = 0; i < group.children.length; i++) {
@@ -2770,9 +2787,24 @@ export class SongEditor {
 
             if (effectsIncludeChord(instrument.effects)) {
                 this._chordSelectRow.style.display = "";
-                this._chordDropdown.style.display = (instrument.chord == Config.chords.dictionary["arpeggio"].index) ? "" : "none";
-                this._chordDropdownGroup.style.display = (instrument.chord == Config.chords.dictionary["arpeggio"].index && this._openChordDropdown) ? "" : "none";
-                setSelectedValue(this._chordSelect, instrument.chord);
+                this._chordDropdown.style.display = (instrument.chord == Config.chords.dictionary["arpeggio"].index || instrument.chord == Config.chords.dictionary["monophonic"].index) ? "" : "none";
+                if (this._openChordDropdown) {
+                    if (instrument.chord == Config.chords.dictionary["arpeggio"].index) {
+                        this._chordDropdownGroup.style.display = "";
+                        this._arpeggioSpeedRow.style.display = "";
+                        this._twoNoteArpRow.style.display = "";
+                        this._monophonicRow.style.display = "none";
+                    } else if (instrument.chord == Config.chords.dictionary["monophonic"].index) {
+                        this._chordDropdownGroup.style.display = "";
+                        this._arpeggioSpeedRow.style.display = "none";
+                        this._twoNoteArpRow.style.display = "none";
+                        this._monophonicRow.style.display = "";
+                        setSelectedValue(this._chordSelect, instrument.chord);
+                    } else {
+                        this._chordDropdownGroup.style.display = "none";
+                    }
+                }
+                setSelectedValue(this._monophonicNoteSelect, instrument.monoChordTone);
             } else {
                 this._chordSelectRow.style.display = "none";
                 this._chordDropdown.style.display = "none";
@@ -2962,9 +2994,9 @@ export class SongEditor {
             this._panSliderInputBox.value = instrument.pan + "";
             this._pwmSliderInputBox.value = instrument.pulseWidth + "";
             this._detuneSliderInputBox.value = (instrument.detune - Config.detuneCenter) + "";
-            this._ringModHzNum.innerHTML = (clamp(1, 4600, Math.floor(20 * Math.pow(4400 / 20, Math.min(1.0, instrument.ringModulationHz / (Config.ringModHzRange - 1)))) /*+ (instrument.rmHzOffset - Config.rmHzOffsetCenter)*/)) + " (" + (Math.floor(20 * Math.pow(4400 / 20, Math.min(1.0, instrument.ringModulationHz / (Config.ringModHzRange - 1))))) + ")";
-            this._grainSizeNum.innerHTML = instrument.grainSize * Config.grainSizeStep + "";
-            this._grainRangeNum.innerHTML = instrument.grainRange * Config.grainSizeStep + "";
+            this._ringModHzNum.innerHTML = " (" + calculateRingModHertz(instrument.ringModulationHz / (Config.ringModHzRange - 1)) + ")";
+            this._grainSizeNum.innerHTML = " (" + instrument.grainSize * Config.grainSizeStep + ")";
+            this._grainRangeNum.innerHTML = " (" + instrument.grainRange * Config.grainSizeStep + ")";
             this._instrumentVolumeSlider.updateValue(instrument.volume);
             this._instrumentVolumeSliderInputBox.value = "" + (instrument.volume);
             this._vibratoDepthSlider.updateValue(Math.round(instrument.vibratoDepth * 25));
@@ -5291,6 +5323,10 @@ export class SongEditor {
 
     private _whenSetChord = (): void => {
         this._doc.record(new ChangeChord(this._doc, this._chordSelect.selectedIndex));
+    }
+
+    private _whenSetMonophonicNote = (): void => {
+        this._doc.record(new ChangeMonophonicTone(this._doc, this._monophonicNoteSelect.selectedIndex))
     }
 
     private _addNewEnvelope = (): void => {

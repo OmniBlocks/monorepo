@@ -14,9 +14,9 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
       - run: npm ci
       - run: npm run lint
       - run: npm run build
-      - run: npm run test
+      - run: npm run tap

@@ -1039,18 +1039,18 @@ export class SongEditor {
     ));
     private readonly _unisonDropdownGroup: HTMLElement = div({ class: "editor-controls", style: "display: none; gap: 3px; margin-bottom: 0.5em;" }, this._unisonVoicesRow, this._unisonSpreadRow, this._unisonOffsetRow, this._unisonExpressionRow, this._unisonSignRow);
    
-    private readonly _chordSelect: HTMLSelectElement = buildOptions(select(), Config.chords.map(chord => chord.name));
+    private readonly _chordSelect: HTMLSelectElement = buildOptions(select({ style: "flex-shrink: 100"}), Config.chords.map(chord => chord.name));
     private readonly _chordDropdown: HTMLButtonElement = button({ style: "margin-left:0em; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: () => this._toggleDropdownMenu(DropdownID.Chord) }, "▼");
+    private readonly _monophonicNoteInputBox: HTMLInputElement = input({ style: "width: 2em; height: 1.5em; font-size: 80%; margin: 0.5em; vertical-align: middle;", id: "unisonSignInputBox", type: "number", step: "1", min: 1, max: Config.maxChordSize, value: 1.0 });
 
-    private readonly _chordSelectRow: HTMLElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("chords") }, "Chords:"), this._chordDropdown, div({ class: "selectContainer" }, this._chordSelect));
+    private readonly _chordSelectRow: HTMLElement = div({ class: "selectRow", style: "display: flex; flex-direction: row" }, span({ class: "tip", onclick: () => this._openPrompt("chords") }, "Chords:"), this._monophonicNoteInputBox, this._chordDropdown, div({ class: "selectContainer" }, this._chordSelect));
     private readonly _arpeggioSpeedDisplay: HTMLSpanElement = span({ style: `color: ${ColorConfig.secondaryText}; font-size: smaller; text-overflow: clip;` }, "x1");
     private readonly _arpeggioSpeedSlider: Slider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.modulators.dictionary["arp speed"].maxRawVol, value: "0", step: "1" }), this._doc, (oldValue: number, newValue: number) => new ChangeArpeggioSpeed(this._doc, oldValue, newValue), false);
     private readonly _arpeggioSpeedRow: HTMLElement = div({ class: "selectRow dropFader" }, span({ class: "tip", style: "margin-left:4px;", onclick: () => this._openPrompt("arpeggioSpeed") }, "‣ Spd:"), this._arpeggioSpeedDisplay, this._arpeggioSpeedSlider.container);
     private readonly _twoNoteArpBox: HTMLInputElement = input({ type: "checkbox", style: "width: 1em; padding: 0; margin-right: 4em;" });
     private readonly _twoNoteArpRow: HTMLElement = div({ class: "selectRow dropFader" }, span({ class: "tip", style: "margin-left:4px;", onclick: () => this._openPrompt("twoNoteArpeggio") }, "‣ Fast Two-Note:"), this._twoNoteArpBox);
-    private readonly _monophonicNoteSelect: HTMLSelectElement = buildOptions(select(), [1, 2, 3, 4, 5, 6, 7, 8, 9]);
-    private readonly _monophonicRow: HTMLElement = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("monophonic") }, "‣ Note:"), div({ class: "selectContainer" }, this._monophonicNoteSelect));
-    private readonly _chordDropdownGroup: HTMLElement = div({ class: "editor-controls", style: "display: none;" }, this._arpeggioSpeedRow, this._twoNoteArpRow, this._monophonicRow);
+
+    private readonly _chordDropdownGroup: HTMLElement = div({ class: "editor-controls", style: "display: none;" }, this._arpeggioSpeedRow, this._twoNoteArpRow);
 
     private readonly _vibratoSelect: HTMLSelectElement = buildOptions(select(), Config.vibratos.map(vibrato => vibrato.name));
     private readonly _vibratoDropdown: HTMLButtonElement = button({ style: "margin-left:0em; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: () => this._toggleDropdownMenu(DropdownID.Vibrato) }, "▼");
@@ -1667,7 +1667,7 @@ export class SongEditor {
         this._effectsSelect.addEventListener("change", this._whenSetEffects);
         this._unisonSelect.addEventListener("change", this._whenSetUnison);
         this._chordSelect.addEventListener("change", this._whenSetChord);
-        this._monophonicNoteSelect.addEventListener("change", this._whenSetMonophonicNote)
+        this._monophonicNoteInputBox.addEventListener("input", this._whenSetMonophonicNote)
         this._vibratoSelect.addEventListener("change", this._whenSetVibrato);
         this._vibratoTypeSelect.addEventListener("change", this._whenSetVibratoType);
         this._playButton.addEventListener("click", this.togglePlay);
@@ -1888,19 +1888,10 @@ export class SongEditor {
             } else if (group != this._chordDropdownGroup) {
                 group.style.display = "";
             } // Only show arpeggio dropdown if chord arpeggiates or is monophonic
-            else if (instrument.chord == Config.chords.dictionary["arpeggio"].index || instrument.chord == Config.chords.dictionary["monophonic"].index) {
+            else if (instrument.chord == Config.chords.dictionary["arpeggio"].index) {
                 group.style.display = "";
                 if (instrument.chord == Config.chords.dictionary["arpeggio"].index) {
                     this._chordDropdownGroup.style.display = "";
-                    this._arpeggioSpeedRow.style.display = "";
-                    this._twoNoteArpRow.style.display = "";
-                    this._monophonicRow.style.display = "none";
-                } else if (instrument.chord == Config.chords.dictionary["monophonic"].index) {
-                    this._chordDropdownGroup.style.display = "";
-                    this._arpeggioSpeedRow.style.display = "none";
-                    this._twoNoteArpRow.style.display = "none";
-                    this._monophonicRow.style.display = "";
-                    setSelectedValue(this._chordSelect, instrument.chord);
                 } else {
                     this._chordDropdownGroup.style.display = "none";
                 }
@@ -2786,25 +2777,24 @@ export class SongEditor {
             }
 
             if (effectsIncludeChord(instrument.effects)) {
-                this._chordSelectRow.style.display = "";
-                this._chordDropdown.style.display = (instrument.chord == Config.chords.dictionary["arpeggio"].index || instrument.chord == Config.chords.dictionary["monophonic"].index) ? "" : "none";
+                this._chordSelectRow.style.display = "flex";
+                this._chordDropdown.style.display = instrument.chord == Config.chords.dictionary["arpeggio"].index ? "" : "none";
                 if (this._openChordDropdown) {
                     if (instrument.chord == Config.chords.dictionary["arpeggio"].index) {
                         this._chordDropdownGroup.style.display = "";
-                        this._arpeggioSpeedRow.style.display = "";
-                        this._twoNoteArpRow.style.display = "";
-                        this._monophonicRow.style.display = "none";
                     } else if (instrument.chord == Config.chords.dictionary["monophonic"].index) {
                         this._chordDropdownGroup.style.display = "";
-                        this._arpeggioSpeedRow.style.display = "none";
-                        this._twoNoteArpRow.style.display = "none";
-                        this._monophonicRow.style.display = "";
                         setSelectedValue(this._chordSelect, instrument.chord);
                     } else {
                         this._chordDropdownGroup.style.display = "none";
                     }
                 }
-                setSelectedValue(this._monophonicNoteSelect, instrument.monoChordTone);
+                if (instrument.chord == Config.chords.dictionary["monophonic"].index) {
+                    this._monophonicNoteInputBox.value = instrument.monoChordTone + 1 + "";
+                    this._monophonicNoteInputBox.style.display = "";
+                } else {
+                    this._monophonicNoteInputBox.style.display = "none";
+                }
             } else {
                 this._chordSelectRow.style.display = "none";
                 this._chordDropdown.style.display = "none";
@@ -4083,6 +4073,7 @@ export class SongEditor {
             || document.activeElement == this._unisonOffsetInputBox
             || document.activeElement == this._unisonExpressionInputBox
             || document.activeElement == this._unisonSignInputBox
+            || document.activeElement == this._monophonicNoteInputBox
             || this.envelopeEditor.pitchStartBoxes.find((element) => element == document.activeElement)
             || this.envelopeEditor.pitchEndBoxes.find((element) => element == document.activeElement)
             || this.envelopeEditor.perEnvelopeLowerBoundBoxes.find((element) => element == document.activeElement)
@@ -5326,7 +5317,7 @@ export class SongEditor {
     }
 
     private _whenSetMonophonicNote = (): void => {
-        this._doc.record(new ChangeMonophonicTone(this._doc, this._monophonicNoteSelect.selectedIndex))
+        this._doc.record(new ChangeMonophonicTone(this._doc, parseInt(this._monophonicNoteInputBox.value)-1))
     }
 
     private _addNewEnvelope = (): void => {

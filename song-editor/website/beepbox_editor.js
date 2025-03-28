@@ -46440,17 +46440,16 @@ You should be redirected to the song at:<br /><br />
             this._unisonSignInputBox = input({ style: "width: 150%; height: 1.5em; font-size: 80%; margin-left: 0.4em; vertical-align: middle;", id: "unisonSignInputBox", type: "number", step: "0.001", min: Config.unisonSignMin, max: Config.unisonSignMax, value: 1.0 });
             this._unisonSignRow = div({ class: "selectRow dropFader" }, div({}, span({ class: "tip", style: "height:1em; font-size: smaller;", onclick: () => this._openPrompt("unisonSign") }, "‣ Sign: "), div({ style: "color: " + ColorConfig.secondaryText + "; margin-top: -3px;" }, this._unisonSignInputBox)));
             this._unisonDropdownGroup = div({ class: "editor-controls", style: "display: none; gap: 3px; margin-bottom: 0.5em;" }, this._unisonVoicesRow, this._unisonSpreadRow, this._unisonOffsetRow, this._unisonExpressionRow, this._unisonSignRow);
-            this._chordSelect = buildOptions(select(), Config.chords.map(chord => chord.name));
+            this._chordSelect = buildOptions(select({ style: "flex-shrink: 100" }), Config.chords.map(chord => chord.name));
             this._chordDropdown = button({ style: "margin-left:0em; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: () => this._toggleDropdownMenu(2) }, "▼");
-            this._chordSelectRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("chords") }, "Chords:"), this._chordDropdown, div({ class: "selectContainer" }, this._chordSelect));
+            this._monophonicNoteInputBox = input({ style: "width: 2em; height: 1.5em; font-size: 80%; margin: 0.5em; vertical-align: middle;", id: "unisonSignInputBox", type: "number", step: "1", min: 1, max: Config.maxChordSize, value: 1.0 });
+            this._chordSelectRow = div({ class: "selectRow", style: "display: flex; flex-direction: row" }, span({ class: "tip", onclick: () => this._openPrompt("chords") }, "Chords:"), this._monophonicNoteInputBox, this._chordDropdown, div({ class: "selectContainer" }, this._chordSelect));
             this._arpeggioSpeedDisplay = span({ style: `color: ${ColorConfig.secondaryText}; font-size: smaller; text-overflow: clip;` }, "x1");
             this._arpeggioSpeedSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.modulators.dictionary["arp speed"].maxRawVol, value: "0", step: "1" }), this._doc, (oldValue, newValue) => new ChangeArpeggioSpeed(this._doc, oldValue, newValue), false);
             this._arpeggioSpeedRow = div({ class: "selectRow dropFader" }, span({ class: "tip", style: "margin-left:4px;", onclick: () => this._openPrompt("arpeggioSpeed") }, "‣ Spd:"), this._arpeggioSpeedDisplay, this._arpeggioSpeedSlider.container);
             this._twoNoteArpBox = input({ type: "checkbox", style: "width: 1em; padding: 0; margin-right: 4em;" });
             this._twoNoteArpRow = div({ class: "selectRow dropFader" }, span({ class: "tip", style: "margin-left:4px;", onclick: () => this._openPrompt("twoNoteArpeggio") }, "‣ Fast Two-Note:"), this._twoNoteArpBox);
-            this._monophonicNoteSelect = buildOptions(select(), [1, 2, 3, 4, 5, 6, 7, 8, 9]);
-            this._monophonicRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("monophonic") }, "‣ Note:"), div({ class: "selectContainer" }, this._monophonicNoteSelect));
-            this._chordDropdownGroup = div({ class: "editor-controls", style: "display: none;" }, this._arpeggioSpeedRow, this._twoNoteArpRow, this._monophonicRow);
+            this._chordDropdownGroup = div({ class: "editor-controls", style: "display: none;" }, this._arpeggioSpeedRow, this._twoNoteArpRow);
             this._vibratoSelect = buildOptions(select(), Config.vibratos.map(vibrato => vibrato.name));
             this._vibratoDropdown = button({ style: "margin-left:0em; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: () => this._toggleDropdownMenu(0) }, "▼");
             this._vibratoSelectRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("vibrato") }, "Vibrato:"), this._vibratoDropdown, div({ class: "selectContainer", style: "width: 61.5%;" }, this._vibratoSelect));
@@ -47047,27 +47046,27 @@ You should be redirected to the song at:<br /><br />
                         this._transitionRow.style.display = "none";
                     }
                     if (effectsIncludeChord(instrument.effects)) {
-                        this._chordSelectRow.style.display = "";
-                        this._chordDropdown.style.display = (instrument.chord == Config.chords.dictionary["arpeggio"].index || instrument.chord == Config.chords.dictionary["monophonic"].index) ? "" : "none";
+                        this._chordSelectRow.style.display = "flex";
+                        this._chordDropdown.style.display = instrument.chord == Config.chords.dictionary["arpeggio"].index ? "" : "none";
                         if (this._openChordDropdown) {
                             if (instrument.chord == Config.chords.dictionary["arpeggio"].index) {
                                 this._chordDropdownGroup.style.display = "";
-                                this._arpeggioSpeedRow.style.display = "";
-                                this._twoNoteArpRow.style.display = "";
-                                this._monophonicRow.style.display = "none";
                             }
                             else if (instrument.chord == Config.chords.dictionary["monophonic"].index) {
                                 this._chordDropdownGroup.style.display = "";
-                                this._arpeggioSpeedRow.style.display = "none";
-                                this._twoNoteArpRow.style.display = "none";
-                                this._monophonicRow.style.display = "";
                                 setSelectedValue(this._chordSelect, instrument.chord);
                             }
                             else {
                                 this._chordDropdownGroup.style.display = "none";
                             }
                         }
-                        setSelectedValue(this._monophonicNoteSelect, instrument.monoChordTone);
+                        if (instrument.chord == Config.chords.dictionary["monophonic"].index) {
+                            this._monophonicNoteInputBox.value = instrument.monoChordTone + 1 + "";
+                            this._monophonicNoteInputBox.style.display = "";
+                        }
+                        else {
+                            this._monophonicNoteInputBox.style.display = "none";
+                        }
                     }
                     else {
                         this._chordSelectRow.style.display = "none";
@@ -48018,6 +48017,7 @@ You should be redirected to the song at:<br /><br />
                     || document.activeElement == this._unisonOffsetInputBox
                     || document.activeElement == this._unisonExpressionInputBox
                     || document.activeElement == this._unisonSignInputBox
+                    || document.activeElement == this._monophonicNoteInputBox
                     || this.envelopeEditor.pitchStartBoxes.find((element) => element == document.activeElement)
                     || this.envelopeEditor.pitchEndBoxes.find((element) => element == document.activeElement)
                     || this.envelopeEditor.perEnvelopeLowerBoundBoxes.find((element) => element == document.activeElement)
@@ -49086,7 +49086,7 @@ You should be redirected to the song at:<br /><br />
                 this._doc.record(new ChangeChord(this._doc, this._chordSelect.selectedIndex));
             };
             this._whenSetMonophonicNote = () => {
-                this._doc.record(new ChangeMonophonicTone(this._doc, this._monophonicNoteSelect.selectedIndex));
+                this._doc.record(new ChangeMonophonicTone(this._doc, parseInt(this._monophonicNoteInputBox.value) - 1));
             };
             this._addNewEnvelope = () => {
                 this._doc.record(new ChangeAddEnvelope(this._doc));
@@ -49480,7 +49480,7 @@ You should be redirected to the song at:<br /><br />
             this._effectsSelect.addEventListener("change", this._whenSetEffects);
             this._unisonSelect.addEventListener("change", this._whenSetUnison);
             this._chordSelect.addEventListener("change", this._whenSetChord);
-            this._monophonicNoteSelect.addEventListener("change", this._whenSetMonophonicNote);
+            this._monophonicNoteInputBox.addEventListener("input", this._whenSetMonophonicNote);
             this._vibratoSelect.addEventListener("change", this._whenSetVibrato);
             this._vibratoTypeSelect.addEventListener("change", this._whenSetVibratoType);
             this._playButton.addEventListener("click", this.togglePlay);
@@ -49662,20 +49662,10 @@ You should be redirected to the song at:<br /><br />
                 else if (group != this._chordDropdownGroup) {
                     group.style.display = "";
                 }
-                else if (instrument.chord == Config.chords.dictionary["arpeggio"].index || instrument.chord == Config.chords.dictionary["monophonic"].index) {
+                else if (instrument.chord == Config.chords.dictionary["arpeggio"].index) {
                     group.style.display = "";
                     if (instrument.chord == Config.chords.dictionary["arpeggio"].index) {
                         this._chordDropdownGroup.style.display = "";
-                        this._arpeggioSpeedRow.style.display = "";
-                        this._twoNoteArpRow.style.display = "";
-                        this._monophonicRow.style.display = "none";
-                    }
-                    else if (instrument.chord == Config.chords.dictionary["monophonic"].index) {
-                        this._chordDropdownGroup.style.display = "";
-                        this._arpeggioSpeedRow.style.display = "none";
-                        this._twoNoteArpRow.style.display = "none";
-                        this._monophonicRow.style.display = "";
-                        setSelectedValue(this._chordSelect, instrument.chord);
                     }
                     else {
                         this._chordDropdownGroup.style.display = "none";

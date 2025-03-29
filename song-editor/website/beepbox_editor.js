@@ -1282,6 +1282,8 @@ var beepbox = (function (exports) {
             promptName: "Grain Count", promptDesc: ["This setting controls the density of grains for the granular effect on your instrument.", "[OVERWRITING] [$LO - $HI]"] },
         { name: "grain size", pianoName: "Grain Size", maxRawVol: _a$1.grainSizeMax / _a$1.grainSizeStep, newNoteVol: _a$1.grainSizeMin / _a$1.grainSizeStep, forSong: false, convertRealFactor: 0, associatedEffect: 14, maxIndex: 0,
             promptName: "Grain Size", promptDesc: ["This setting controls the grain size of the granular effect in your instrument.", "The number shown in the mod channel is multiplied by " + _a$1.grainSizeStep + " to get the actual grain size.", "[OVERWRITING] [$LO - $HI]"] },
+        { name: "grain range", pianoName: "Grain Range", maxRawVol: _a$1.grainRangeMax / _a$1.grainSizeStep, newNoteVol: 0, forSong: false, convertRealFactor: 0, associatedEffect: 14, maxIndex: 0,
+            promptName: "Grain Range", promptDesc: ["This setting controls the range of values for your grain size of the granular effect in your instrument, from no variation to a lot", "The number shown in the mod channel is multiplied by " + _a$1.grainSizeStep + " to get the actual grain size.", "[OVERWRITING] [$LO - $HI]"] },
         { name: "individual envelope lower bound", pianoName: "IndvEnvLow", maxRawVol: _a$1.perEnvelopeBoundMax * 10, newNoteVol: 0, forSong: false, convertRealFactor: 0, associatedEffect: 15, maxIndex: _a$1.maxEnvelopeCount - 1,
             promptName: "Individual Envelope Lower Bound", promptDesc: ["This setting controls the envelope lower bound", "At $LO, your the envelope will output an upper envelope bound to 0, and at $HI your envelope will output an upper envelope bound to 2.", "This settings will not work if your lower envelope bound is higher than your upper envelope bound",] },
         { name: "individual envelope upper bound", pianoName: "IndvEnvUp", maxRawVol: _a$1.perEnvelopeBoundMax * 10, newNoteVol: 10, forSong: false, convertRealFactor: 0, associatedEffect: 15, maxIndex: _a$1.maxEnvelopeCount - 1,
@@ -13919,6 +13921,7 @@ li.select2-results__option[role=group] > strong:hover {
                         let granularIndex = Config.modulators.dictionary["granular"].index;
                         let grainAmountIndex = Config.modulators.dictionary["grain freq"].index;
                         let grainSizeIndex = Config.modulators.dictionary["grain size"].index;
+                        let grainRangeIndex = Config.modulators.dictionary["grain range"].index;
                         let envSpeedIndex = Config.modulators.dictionary["envelope speed"].index;
                         let perEnvSpeedIndex = Config.modulators.dictionary["individual envelope speed"].index;
                         let perEnvLowerIndex = Config.modulators.dictionary["individual envelope lower bound"].index;
@@ -13984,6 +13987,9 @@ li.select2-results__option[role=group] > strong:hover {
                                 break;
                             case grainSizeIndex:
                                 vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].grainSize - Config.modulators[grainSizeIndex].convertRealFactor;
+                                break;
+                            case grainRangeIndex:
+                                vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].grainRange - Config.modulators[grainRangeIndex].convertRealFactor;
                                 break;
                             case envSpeedIndex:
                                 vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].envelopeSpeed - Config.modulators[envSpeedIndex].convertRealFactor;
@@ -19182,7 +19188,11 @@ li.select2-results__option[role=group] > strong:hover {
                             granularMinGrainSizeInMilliseconds = synth.getModValue(Config.modulators.dictionary["grain size"].index, channelIndex, instrumentIndex, false);
                         }
                         granularMinGrainSizeInMilliseconds *= envelopeStarts[53];
-                        const granularMaxGrainSizeInMilliseconds = instrument.grainSize + instrument.grainRange;
+                        let grainRange = instrument.grainRange;
+                        if (synth.isModActive(Config.modulators.dictionary["grain range"].index, channelIndex, instrumentIndex)) {
+                            grainRange = synth.getModValue(Config.modulators.dictionary["grain range"].index, channelIndex, instrumentIndex, false);
+                        }
+                        const granularMaxGrainSizeInMilliseconds = granularMinGrainSizeInMilliseconds + grainRange;
                         const granularGrainSizeInMilliseconds = granularMinGrainSizeInMilliseconds + (granularMaxGrainSizeInMilliseconds - granularMinGrainSizeInMilliseconds) * Math.random();
                         const granularGrainSizeInSeconds = granularGrainSizeInMilliseconds / 1000.0;
                         const granularGrainSizeInSamples = Math.floor(granularGrainSizeInSeconds * samplesPerSecond);
@@ -19201,9 +19211,7 @@ li.select2-results__option[role=group] > strong:hover {
                         else if (Config.granularEnvelopeType == 1) {
                             grain.initializeRCBEnvelope(grain.maxAgeInSamples, 1.0);
                         }
-                        if (this.usesRandomGrainLocation) {
-                            grain.addDelay(Math.random() * samplesPerTick * 4);
-                        }
+                        grain.addDelay(Math.random() * samplesPerTick * 4);
                     }
                 }
             }
@@ -40893,6 +40901,7 @@ You should be redirected to the song at:<br /><br />
                 slider = songEditor.getSliderForModSetting(modulator.index);
                 if (slider != null) {
                     instrument.ringModulationHz = slider.getValueBeforeProspectiveChange();
+                    songEditor.ringModHzNum.innerHTML = "(" + instrument.ringModulationHz + ")";
                 }
             }
             else if (change instanceof ChangeGranular) {
@@ -40906,7 +40915,7 @@ You should be redirected to the song at:<br /><br />
                 }
             }
             else if (change instanceof ChangeGrainAmounts) {
-                var modulator = Config.modulators.dictionary["grain amount"];
+                var modulator = Config.modulators.dictionary["grain freq"];
                 applyToMods.push(modulator.index);
                 if (toApply)
                     applyValues.push(instrument.grainAmounts - modulator.convertRealFactor);
@@ -40922,8 +40931,19 @@ You should be redirected to the song at:<br /><br />
                     applyValues.push(instrument.grainSize - modulator.convertRealFactor);
                 slider = songEditor.getSliderForModSetting(modulator.index);
                 if (slider != null) {
-                    songEditor._grainSizeNum.innerHTML = instrument.grainSize * Config.grainSizeStep + "";
                     instrument.grainSize = slider.getValueBeforeProspectiveChange();
+                    songEditor.grainSizeNum.innerHTML = "(" + (instrument.grainSize * Config.grainSizeStep) + ")";
+                }
+            }
+            else if (change instanceof ChangeGrainRange) {
+                var modulator = Config.modulators.dictionary["grain range"];
+                applyToMods.push(modulator.index);
+                if (toApply)
+                    applyValues.push(instrument.grainRange - modulator.convertRealFactor);
+                slider = songEditor.getSliderForModSetting(modulator.index);
+                if (slider != null) {
+                    instrument.grainRange = slider.getValueBeforeProspectiveChange();
+                    songEditor.grainRangeNum.innerHTML = "(" + (instrument.grainRange * Config.grainSizeStep) + ")";
                 }
             }
             else if (change instanceof ChangeOperatorAmplitude) {
@@ -46306,21 +46326,21 @@ You should be redirected to the song at:<br /><br />
             this._ringModSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.ringModRange - 1, value: "0", step: "1" }), this._doc, (oldValue, newValue) => new ChangeRingMod(this._doc, oldValue, newValue), false);
             this._ringModRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("ringMod") }, "Ring Mod:"), this._ringModSlider.container);
             this._ringModHzSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.ringModHzRange - 1, value: (Config.ringModHzRange - (Config.ringModHzRange / 2)), step: "1" }), this._doc, (oldValue, newValue) => new ChangeRingModHz(this._doc, oldValue, newValue), true);
-            this._ringModHzNum = div({ style: "font-size: 80%; ", id: "ringModHzNum" });
-            this._ringModHzSliderRow = div({ class: "selectRow", style: "width:100%;" }, div({ style: "display:flex; flex-direction:column; align-items:center;" }, span({ class: "tip", style: "font-size: smaller;", onclick: () => this._openPrompt("RingModHz") }, "Hertz: "), div({ style: `color: ${ColorConfig.secondaryText}; ` }, this._ringModHzNum)), this._ringModHzSlider.container);
+            this.ringModHzNum = div({ style: "font-size: 80%; ", id: "ringModHzNum" });
+            this._ringModHzSliderRow = div({ class: "selectRow", style: "width:100%;" }, div({ style: "display:flex; flex-direction:column; align-items:center;" }, span({ class: "tip", style: "font-size: smaller;", onclick: () => this._openPrompt("RingModHz") }, "Hertz: "), div({ style: `color: ${ColorConfig.secondaryText}; ` }, this.ringModHzNum)), this._ringModHzSlider.container);
             this._ringModWaveText = span({ class: "tip", onclick: () => this._openPrompt("chipWave") }, "Wave: ");
             this._ringModWaveSelectRow = div({ class: "selectRow", style: "width: 100%;" }, this._ringModWaveText, div({ class: "selectContainer", style: "width:40%;" }, this._ringModWaveSelect));
             this._ringModContainerRow = div({ class: "", style: "display:flex; flex-direction:column;" }, this._ringModRow, this._ringModHzSliderRow, this._ringModWaveSelectRow);
             this._granularSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.granularRange, value: "0", step: "1" }), this._doc, (oldValue, newValue) => new ChangeGranular(this._doc, oldValue, newValue), false);
             this._granularRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("granular") }, "Granular:"), this._granularSlider.container);
             this._grainSizeSlider = new Slider(input({ style: "margin: 0;", type: "range", min: Config.grainSizeMin / Config.grainSizeStep, max: Config.grainSizeMax / Config.grainSizeStep, value: Config.grainSizeMin / Config.grainSizeStep, step: "1" }), this._doc, (oldValue, newValue) => new ChangeGrainSize(this._doc, oldValue, newValue), false);
-            this._grainSizeNum = div({ style: "font-size: 80%; ", id: "grainSizeNum" });
-            this._grainSizeSliderRow = div({ class: "selectRow", style: "width:100%;" }, div({ style: "display:flex; flex-direction:column; align-items:center;" }, span({ class: "tip", style: "font-size: smaller;", onclick: () => this._openPrompt("grainSize") }, "Grain: "), div({ style: `color: ${ColorConfig.secondaryText}; ` }, this._grainSizeNum)), this._grainSizeSlider.container);
+            this.grainSizeNum = div({ style: "font-size: 80%; ", id: "grainSizeNum" });
+            this._grainSizeSliderRow = div({ class: "selectRow", style: "width:100%;" }, div({ style: "display:flex; flex-direction:column; align-items:center;" }, span({ class: "tip", style: "font-size: smaller;", onclick: () => this._openPrompt("grainSize") }, "Grain: "), div({ style: `color: ${ColorConfig.secondaryText}; ` }, this.grainSizeNum)), this._grainSizeSlider.container);
             this._grainAmountsSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.grainAmountsMax, value: 8, step: "1" }), this._doc, (oldValue, newValue) => new ChangeGrainAmounts(this._doc, oldValue, newValue), false);
             this._grainAmountsRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("grainAmount") }, "Grain Freq:"), this._grainAmountsSlider.container);
             this._grainRangeSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.grainRangeMax / Config.grainSizeStep, value: "0", step: "1" }), this._doc, (oldValue, newValue) => new ChangeGrainRange(this._doc, oldValue, newValue), false);
-            this._grainRangeNum = div({ style: "font-size: 80%; ", id: "grainRangeNum" });
-            this._grainRangeSliderRow = div({ class: "selectRow", style: "width:100%;" }, div({ style: "display:flex; flex-direction:column; align-items:center;" }, span({ class: "tip", style: "font-size: smaller;", onclick: () => this._openPrompt("grainRange") }, "Range: "), div({ style: `color: ${ColorConfig.secondaryText}; ` }, this._grainRangeNum)), this._grainRangeSlider.container);
+            this.grainRangeNum = div({ style: "font-size: 80%; ", id: "grainRangeNum" });
+            this._grainRangeSliderRow = div({ class: "selectRow", style: "width:100%;" }, div({ style: "display:flex; flex-direction:column; align-items:center;" }, span({ class: "tip", style: "font-size: smaller;", onclick: () => this._openPrompt("grainRange") }, "Range: "), div({ style: `color: ${ColorConfig.secondaryText}; ` }, this.grainRangeNum)), this._grainRangeSlider.container);
             this._granularContainerRow = div({ class: "", style: "display:flex; flex-direction:column;" }, this._granularRow, this._grainAmountsRow, this._grainSizeSliderRow, this._grainRangeSliderRow);
             this._echoSustainSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: Config.echoSustainRange - 1, value: "0", step: "1" }), this._doc, (oldValue, newValue) => new ChangeEchoSustain(this._doc, oldValue, newValue), false);
             this._echoSustainRow = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("echoSustain") }, "Echo:"), this._echoSustainSlider.container);
@@ -47251,9 +47271,9 @@ You should be redirected to the song at:<br /><br />
                     this._panSliderInputBox.value = instrument.pan + "";
                     this._pwmSliderInputBox.value = instrument.pulseWidth + "";
                     this._detuneSliderInputBox.value = (instrument.detune - Config.detuneCenter) + "";
-                    this._ringModHzNum.innerHTML = " (" + calculateRingModHertz(instrument.ringModulationHz / (Config.ringModHzRange - 1)) + ")";
-                    this._grainSizeNum.innerHTML = " (" + instrument.grainSize * Config.grainSizeStep + ")";
-                    this._grainRangeNum.innerHTML = " (" + instrument.grainRange * Config.grainSizeStep + ")";
+                    this.ringModHzNum.innerHTML = " (" + calculateRingModHertz(instrument.ringModulationHz / (Config.ringModHzRange - 1)) + ")";
+                    this.grainSizeNum.innerHTML = " (" + instrument.grainSize * Config.grainSizeStep + ")";
+                    this.grainRangeNum.innerHTML = " (" + instrument.grainRange * Config.grainSizeStep + ")";
                     this._instrumentVolumeSlider.updateValue(instrument.volume);
                     this._instrumentVolumeSliderInputBox.value = "" + (instrument.volume);
                     this._vibratoDepthSlider.updateValue(Math.round(instrument.vibratoDepth * 25));
@@ -47652,11 +47672,13 @@ You should be redirected to the song at:<br /><br />
                                     settingList.push("granular");
                                     settingList.push("grain freq");
                                     settingList.push("grain size");
+                                    settingList.push("grain range");
                                 }
                                 if (!allInstrumentGranulars) {
                                     unusedSettingList.push("+ granular");
                                     unusedSettingList.push("+ grain freq");
                                     unusedSettingList.push("+ grain size");
+                                    unusedSettingList.push("+ grain range");
                                 }
                                 if (anyInstrumentHasEnvelopes) {
                                     settingList.push("envelope speed");
@@ -49863,6 +49885,8 @@ You should be redirected to the song at:<br /><br />
                     return this._grainAmountsSlider;
                 case Config.modulators.dictionary["grain size"].index:
                     return this._grainSizeSlider;
+                case Config.modulators.dictionary["grain range"].index:
+                    return this._grainRangeSlider;
                 default:
                     return null;
             }

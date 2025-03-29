@@ -1268,6 +1268,8 @@ var beepbox = (function (exports) {
             promptName: "Grain Count", promptDesc: ["This setting controls the density of grains for the granular effect on your instrument.", "[OVERWRITING] [$LO - $HI]"] },
         { name: "grain size", pianoName: "Grain Size", maxRawVol: _a.grainSizeMax / _a.grainSizeStep, newNoteVol: _a.grainSizeMin / _a.grainSizeStep, forSong: false, convertRealFactor: 0, associatedEffect: 14, maxIndex: 0,
             promptName: "Grain Size", promptDesc: ["This setting controls the grain size of the granular effect in your instrument.", "The number shown in the mod channel is multiplied by " + _a.grainSizeStep + " to get the actual grain size.", "[OVERWRITING] [$LO - $HI]"] },
+        { name: "grain range", pianoName: "Grain Range", maxRawVol: _a.grainRangeMax / _a.grainSizeStep, newNoteVol: 0, forSong: false, convertRealFactor: 0, associatedEffect: 14, maxIndex: 0,
+            promptName: "Grain Range", promptDesc: ["This setting controls the range of values for your grain size of the granular effect in your instrument, from no variation to a lot", "The number shown in the mod channel is multiplied by " + _a.grainSizeStep + " to get the actual grain size.", "[OVERWRITING] [$LO - $HI]"] },
         { name: "individual envelope lower bound", pianoName: "IndvEnvLow", maxRawVol: _a.perEnvelopeBoundMax * 10, newNoteVol: 0, forSong: false, convertRealFactor: 0, associatedEffect: 15, maxIndex: _a.maxEnvelopeCount - 1,
             promptName: "Individual Envelope Lower Bound", promptDesc: ["This setting controls the envelope lower bound", "At $LO, your the envelope will output an upper envelope bound to 0, and at $HI your envelope will output an upper envelope bound to 2.", "This settings will not work if your lower envelope bound is higher than your upper envelope bound",] },
         { name: "individual envelope upper bound", pianoName: "IndvEnvUp", maxRawVol: _a.perEnvelopeBoundMax * 10, newNoteVol: 10, forSong: false, convertRealFactor: 0, associatedEffect: 15, maxIndex: _a.maxEnvelopeCount - 1,
@@ -5358,6 +5360,7 @@ var beepbox = (function (exports) {
                         let granularIndex = Config.modulators.dictionary["granular"].index;
                         let grainAmountIndex = Config.modulators.dictionary["grain freq"].index;
                         let grainSizeIndex = Config.modulators.dictionary["grain size"].index;
+                        let grainRangeIndex = Config.modulators.dictionary["grain range"].index;
                         let envSpeedIndex = Config.modulators.dictionary["envelope speed"].index;
                         let perEnvSpeedIndex = Config.modulators.dictionary["individual envelope speed"].index;
                         let perEnvLowerIndex = Config.modulators.dictionary["individual envelope lower bound"].index;
@@ -5423,6 +5426,9 @@ var beepbox = (function (exports) {
                                 break;
                             case grainSizeIndex:
                                 vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].grainSize - Config.modulators[grainSizeIndex].convertRealFactor;
+                                break;
+                            case grainRangeIndex:
+                                vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].grainRange - Config.modulators[grainRangeIndex].convertRealFactor;
                                 break;
                             case envSpeedIndex:
                                 vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].envelopeSpeed - Config.modulators[envSpeedIndex].convertRealFactor;
@@ -10621,7 +10627,11 @@ var beepbox = (function (exports) {
                             granularMinGrainSizeInMilliseconds = synth.getModValue(Config.modulators.dictionary["grain size"].index, channelIndex, instrumentIndex, false);
                         }
                         granularMinGrainSizeInMilliseconds *= envelopeStarts[53];
-                        const granularMaxGrainSizeInMilliseconds = instrument.grainSize + instrument.grainRange;
+                        let grainRange = instrument.grainRange;
+                        if (synth.isModActive(Config.modulators.dictionary["grain range"].index, channelIndex, instrumentIndex)) {
+                            grainRange = synth.getModValue(Config.modulators.dictionary["grain range"].index, channelIndex, instrumentIndex, false);
+                        }
+                        const granularMaxGrainSizeInMilliseconds = granularMinGrainSizeInMilliseconds + grainRange;
                         const granularGrainSizeInMilliseconds = granularMinGrainSizeInMilliseconds + (granularMaxGrainSizeInMilliseconds - granularMinGrainSizeInMilliseconds) * Math.random();
                         const granularGrainSizeInSeconds = granularGrainSizeInMilliseconds / 1000.0;
                         const granularGrainSizeInSamples = Math.floor(granularGrainSizeInSeconds * samplesPerSecond);
@@ -10640,9 +10650,7 @@ var beepbox = (function (exports) {
                         else if (Config.granularEnvelopeType == 1) {
                             grain.initializeRCBEnvelope(grain.maxAgeInSamples, 1.0);
                         }
-                        if (this.usesRandomGrainLocation) {
-                            grain.addDelay(Math.random() * samplesPerTick * 4);
-                        }
+                        grain.addDelay(Math.random() * samplesPerTick * 4);
                     }
                 }
             }

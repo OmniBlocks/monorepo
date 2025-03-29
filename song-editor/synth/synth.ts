@@ -3278,6 +3278,7 @@ export class Song {
                 let granularIndex: number = Config.modulators.dictionary["granular"].index;
                 let grainAmountIndex: number = Config.modulators.dictionary["grain freq"].index;
                 let grainSizeIndex: number = Config.modulators.dictionary["grain size"].index;
+                let grainRangeIndex: number = Config.modulators.dictionary["grain range"].index;
                 let envSpeedIndex: number = Config.modulators.dictionary["envelope speed"].index;
                 let perEnvSpeedIndex: number = Config.modulators.dictionary["individual envelope speed"].index;
                 let perEnvLowerIndex: number = Config.modulators.dictionary["individual envelope lower bound"].index;
@@ -3344,6 +3345,9 @@ export class Song {
                         break;
                     case grainSizeIndex:
                         vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].grainSize - Config.modulators[grainSizeIndex].convertRealFactor;
+                        break;
+                    case grainRangeIndex:
+                        vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].grainRange - Config.modulators[grainRangeIndex].convertRealFactor;
                         break;
                     case envSpeedIndex:
                         vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].envelopeSpeed - Config.modulators[envSpeedIndex].convertRealFactor;
@@ -8914,7 +8918,11 @@ class InstrumentState {
                         granularMinGrainSizeInMilliseconds = synth.getModValue(Config.modulators.dictionary["grain size"].index, channelIndex, instrumentIndex, false);
                     }
                     granularMinGrainSizeInMilliseconds *= envelopeStarts[EnvelopeComputeIndex.grainSize];
-                    const granularMaxGrainSizeInMilliseconds: number = instrument.grainSize + instrument.grainRange;
+                    let grainRange = instrument.grainRange;
+                    if (synth.isModActive(Config.modulators.dictionary["grain range"].index, channelIndex, instrumentIndex)) {
+                        grainRange = synth.getModValue(Config.modulators.dictionary["grain range"].index, channelIndex, instrumentIndex, false);
+                    }
+                    const granularMaxGrainSizeInMilliseconds: number = granularMinGrainSizeInMilliseconds + grainRange;
                     const granularGrainSizeInMilliseconds: number = granularMinGrainSizeInMilliseconds + (granularMaxGrainSizeInMilliseconds - granularMinGrainSizeInMilliseconds) * Math.random();
                     const granularGrainSizeInSeconds: number = granularGrainSizeInMilliseconds / 1000.0;
                     const granularGrainSizeInSamples: number = Math.floor(granularGrainSizeInSeconds * samplesPerSecond);
@@ -8936,9 +8944,9 @@ class InstrumentState {
                     } else if (Config.granularEnvelopeType == GranularEnvelopeType.raisedCosineBell) {
                         grain.initializeRCBEnvelope(grain.maxAgeInSamples, 1.0);
                     }
-                    if (this.usesRandomGrainLocation) {
-                        grain.addDelay(Math.random() * samplesPerTick * 4); //offset when grains begin playing ; This is different from the above delay, which delays how far back in time the grain looks for samples
-                    }
+                    // if (this.usesRandomGrainLocation) {
+                    grain.addDelay(Math.random() * samplesPerTick * 4); //offset when grains begin playing ; This is different from the above delay, which delays how far back in time the grain looks for samples
+                    // }
                 } 
             }
         }

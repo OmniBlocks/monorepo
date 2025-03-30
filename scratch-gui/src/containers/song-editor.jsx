@@ -1,61 +1,61 @@
 import React, { useEffect, useRef } from 'react';
 
 const SongEditor = () => {
-    const containerRef = useRef(null);
-    
+    const iframeRef = useRef(null);
+
     useEffect(() => {
-        let scriptElements = [];
+        console.log("🎶 Song Editor component mounted");
 
-        const loadEditor = async () => {
-            try {
-                const response = await fetch('/index.html');
-                const htmlText = await response.text();
+        const handleMessage = (event) => {
+            console.log("🔗 Message received from:", event.origin);
+            console.log("💬 Message data:", event.data);
 
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(htmlText, 'text/html');
-                const container = containerRef.current;
+            // Only proceed if the message origin matches the iframe origin
+            if (event.origin !== window.location.origin) {
+                console.warn(`❌ Message origin mismatch: expected ${window.location.origin}, received ${event.origin}`);
+                return;
+            }
 
-                if (!container) return;
-
-                // Safely append new children without breaking React
-                while (container.firstChild) {
-                    container.removeChild(container.firstChild);
-                }
-                doc.body.childNodes.forEach(node => {
-                    container.appendChild(node.cloneNode(true));
-                });
-
-                // Script Handling: Load them without React breaking
-                doc.querySelectorAll("script").forEach(oldScript => {
-                    const newScript = document.createElement("script");
-                    if (oldScript.src) {
-                        newScript.src = oldScript.src;
-                        newScript.async = true;
-                    } else {
-                        newScript.textContent = oldScript.textContent;
-                    }
-                    container.appendChild(newScript);
-                    scriptElements.push(newScript);
-                });
-
-            } catch (error) {
-                console.error('Error loading editor:', error);
+            const { type, payload } = event.data;
+            if (type === 'SONG_DATA') {
+                console.log('🎶 Received song data:', payload);
+            } else {
+                console.log(`🔍 Received unknown message type: ${type}`);
             }
         };
 
-        loadEditor();
+        window.addEventListener('message', handleMessage);
 
         return () => {
-            // Cleanup: Remove all added scripts
-            scriptElements.forEach(script => {
-                if (script.parentNode === containerRef.current) {
-                    script.remove();
-                }
-            });
+            console.log("🛑 Cleaning up message listener");
+            window.removeEventListener('message', handleMessage);
         };
     }, []);
 
-    return <div id="beepboxEditorContainer" ref={containerRef} />;
+    return (
+        <div
+            style={{
+                width: '100%',
+                height: '100vh', // Use full viewport height
+                position: 'absolute', // Absolute positioning to fill space
+                top: 0,
+                left: 0
+            }}
+        >
+            <iframe
+                ref={iframeRef}
+                id="beepboxEditorIframe"
+                src="songeditor.html" // Make sure the path is correct!
+                style={{
+                    width: '100%',
+                    height: '100%',
+                    border: 'none',
+                    display: 'block' // Prevent inline spacing issues
+                }}
+                sandbox="allow-scripts allow-same-origin"
+            />
+        </div>
+    );
 };
 
 export default SongEditor;

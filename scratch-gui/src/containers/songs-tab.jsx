@@ -16,18 +16,12 @@ class SongsTab extends React.Component {
     constructor (props) {
         super(props);
         bindAll(this, [
-            'handleOpenSongEditor',
             'handleCloseSongEditor',
             'onActivateSongsTab'
         ]);
         this.state = {
-            isSongEditorOpen: false
+            isSongEditorOpen: true // Automatically open the song editor
         };
-    }
-
-    handleOpenSongEditor () {
-        this.setState({isSongEditorOpen: true});
-        this.props.onActivateSongsTab();
     }
 
     handleCloseSongEditor () {
@@ -50,7 +44,7 @@ class SongsTab extends React.Component {
 
         return (
             <div>
-                {this.state.isSongEditorOpen && <SongEditor onClose={this.handleCloseSongEditor} />}
+                <SongEditor onClose={this.handleCloseSongEditor} />
             </div>
         );
     }

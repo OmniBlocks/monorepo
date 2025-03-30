@@ -179,19 +179,13 @@
                 <!-- <span id="goldboxPlant" style="display: inline; color: var(--plant-color, var(--link-accent, #62a13b));"></span> -->
             </h1>
             
-            <p id="introduction">
-                UltraBox is a mod first envisioned by Neptendo, made possible by contributing community members (see <a href="./credits.html">credits</a>).<br>
-                It takes elements from most of the beepbox mods available and puts them in one convenient package.
-            </p>
+            
             <!-- <p>
                 All song data is contained in the URL at the top of your browser.
                 When you make changes to the song, the URL is updated to reflect your changes.
                 When you are satisfied with your song, just copy and paste the URL to save and share your song!
             </p> -->
-            <p>
-                If you have any questions, please visit the <a href="./faq.html">FAQ</a>. Visit the <a href="./patch_notes.html">patch notes</a> to see the latest changes made.
-                <img id="Hotdog" src="" width="500" height="333" onclick="changeHotdogSize()" />
-            </p>
+            
             <!--
     <div class="donation">
         BeepBox is a passion project, and will always be free to use. If you find it valuable and have the means, any gratuity via
@@ -206,117 +200,7 @@
     -->
         </section>
 
-        <div class="column-container">
-            <main class="instructions-column">
-                <section>
-                    <h2>
-                        Instructions
-                    </h2>
-                    <p>
-                        You can add or remove notes by clicking on the gray rows at the top.
-                        UltraBox automatically plays the notes out loud for you. Try it!
-		
-                    </p>
-                    <p>
-                        Notes go into patterns, and you can edit one pattern at a time.
-                        Those numbered boxes at the bottom of the editor are the different patterns you can edit.
-                        <span id="bar-editing">
-                            Click the boxes to move to a different part of the song, or click the arrows on the currently selected box to swap which pattern is played during that part of the song.
-                        </span>
-                    </p>
-                    <p>
-                        UltraBox can play several rows of patterns simultaneously, and each row has its own set of patterns.
-                        Most rows can play melodies or harmonies, but the bottom row is for drums.
-                    </p>
-                    <p>
-                        All song data is contained in the URL at the top of your browser.
-                        When you make changes to the song, the URL is updated to reflect your changes.
-                        When you are satisfied with your song, just copy and paste the URL to save and share your song!
-                    </p>
-
-                    <div id="keyboard-instructions">
-                        <p>
-                            When UltraBox has focus (click on its interface above), you can use these keyboard shortcuts: <br />
-                        </p>
-                        <ul>
-                            <li><b>Spacebar</b>: play or pause the song</li>
-                            <li><b>Shift Spacebar</b>: play from mouse location</li>
-							<li><b>Z</b>: undo, <b>Y or Shift Z</b>: redo</li>
-                            <li><b>C</b>: copy pattern from selection</li>
-                            <li><b>V</b>: paste pattern into selection</li>
-                            <li><b>0-9</b>: assign pattern number to selection</li>
-							<li><b>Arrows</b>: move selection</li>
-							<li><b>Ctrl + Arrows</b>: rearrange channels</li>
-							<li><b>[ ]</b>: move playhead backward or forward</li>
-							<li><b>F/H</b>: move to First or Highlighted pattern </li>
-							<li><b>Shift & Drag</b>: select part of a pattern</li>
-							<li>These are just a few shortcuts, check UltraBox's edit menu for more!</li>
-                            <!-- need to edit this eventually -->
-                        </ul>
-                    </div>
-                    <p>
-                        In the note pattern editor, you can click and drag horizontally on a note to adjust its duration.
-                        You can also click above or below an existing note to add more notes to be played simultaneously, which is called a chord.
-                    </p>
-                    <div id="mobile-instructions" style="display: none;">
-						<p>
-							You can also long-press in the pattern editor to select a time range within a pattern, which you can then drag to move multiple notes at once.<br/>
-						</p>
-					</div>
-                    <p>
-                        ADVANCED: Drag vertically from an existing note to bend its pitch, or drag vertically from above or below the note to adjust its volume. You can perform fine volume adjustment if you hold Control while doing this!
-                    </p>
-                    <p>
-                        ADVANCED: Click and drag on the pattern grid to make a selection. You can then press C/V to mass copy/paste parts of your song.
-
-                    </p>
-                    <p>
-                        UltraBox has many more features.
-                        Try playing with the buttons and menus on the right side to find out what it can do!
-                        You can also click on the label next to each option for a description of what it does.
-                        Some features are hard to find anywhere though - for example, if your song has any modulator channels, you can hold Ctrl or Shift while the song is playing to record the movement of sliders directly! If you want to learn more tips, tricks, and best practices though, see below.
-                    </p>
-                    <p>
-						Want to see what people have made with BeepBox? Songs that were shared on Twitter prior to 2023-05-22 can now be browsed in <a href="https://twitter-archive.beepbox.co/" target="_blank">this interactive archive</a>!
-                        <!-- Additionally, there's an active <a href="https://discord.gg/beepbox">BeepBox Discord</a> where you can share songs and ask questions! -->
-                    </p>
-                </section>
-            </main>
-            <aside class="bsky-column">
-				<h2>
-					Shared on Bluesky:
-				</h2>
-				<div>
-					<!-- <a class="bsky-timeline" data-width="300" data-height="2000" data-link-color="#9988ff" data-chrome="noheader nofooter transparent" data-dnt="true" data-theme="dark" href="https://twitter.com/beepboxco?ref_src=twsrc%5Etfw" target="_blank">Songs retweeted by @beepboxco</a> -->
-                    <bsky-embed
-						feed="at://did:plc:mbrx5fkqsdgk5l2dfhygecm6/app.bsky.feed.generator/aaabsv7gjrgl2"
-						mode="dark"
-						link-target="_blank"
-						link-image="false"
-						limit="5"
-						load-more="true"
-						disable-styles="false"
-						custom-styles="a.mt-4.rounded-md.border.border-slate-300.block {display: none;} .flex > div { max-width: 90%; } .whitespace-pre-wrap { word-wrap: break-word;}"
-					  >
-                    </bsky-embed>
-                    <script async>
-                    // only load bsky-embed if it's actually visible
-                    // (the downside of doing this is that you have to manually reload the page to load/unload the library)
-                    if (window.localStorage.getItem("showDescription") != "false") {
-                        const bsky_script = document.createElement("script");
-
-                        bsky_script.src = "https://cdn.jsdelivr.net/npm/bsky-embed@0.2.2/dist/bsky-embed.es.min.js";
-                        bsky_script.type = "module";
-
-                        document.head.appendChild(bsky_script);
-                    }
-                    </script>
-					<!-- <script type="module" src="https://cdn.jsdelivr.net/npm/bsky-embed/dist/bsky-embed.es.js" async></script> -->
-				</div>
-			</aside>
-        </div>
-    </div>
-
+        
     <!--
     Instead of loading js beepbox editor interface directly, test for browser support.
     <script type="text/javascript" src="beepbox_editor.min.js"></script>
@@ -409,6 +293,21 @@
 		if (/^#[1-8]/.test(location.hash)) {
 			document.getElementById("linkTo3_0").href += location.hash;
 		}
+
+        window.addEventListener('message', (event) => {
+            if (event.origin !== window.location.origin) return;
+
+            const { type, payload } = event.data;
+            if (type === 'REQUEST_SONG_DATA') {
+                const songData = getSongData(); // Replace with actual logic to retrieve song data
+                event.source.postMessage({ type: 'SONG_DATA', payload: songData }, event.origin);
+            }
+        });
+
+        function getSongData() {
+            // Replace this with actual logic to retrieve song data
+            return { title: 'Sample Song', notes: [] };
+        }
     </script>
 </body>
 </html>

@@ -1615,13 +1615,7 @@ var beepbox = (function (exports) {
     function effectsIncludeGranular(effects) {
         return (effects & (1 << 14)) != 0;
     }
-    function calculateRingModHertz(sliderHz, sliderHzOffset = 0) {
-        if (sliderHz == 0)
-            return 0;
-        if (sliderHz > 0)
-            sliderHz -= 1 / Config.ringModHzRange;
-        if (sliderHz > 1 / Config.ringModHzRange)
-            sliderHz += 1 / Config.ringModHzRange;
+    function calculateRingModHertz(sliderHz) {
         return Math.floor(Config.ringModMinHz * Math.pow(Config.ringModMaxHz / Config.ringModMinHz, sliderHz));
     }
     function rawChipToIntegrated(raw) {
@@ -12448,8 +12442,6 @@ li.select2-results__option[role=group] > strong:hover {
             this.ringModulation = Math.floor(Config.ringModRange / 2);
             this.ringModulationHz = Math.floor(Config.ringModHzRange / 2);
             this.ringModWaveformIndex = 0;
-            this.ringModPulseWidth = 0;
-            this.ringModHzOffset = 200;
             this.granular = 4;
             this.grainSize = (Config.grainSizeMax - Config.grainSizeMin) / Config.grainSizeStep;
             this.grainAmounts = Config.grainAmountsMax;
@@ -12540,8 +12532,6 @@ li.select2-results__option[role=group] > strong:hover {
             this.ringModulation = 0;
             this.ringModulationHz = 0;
             this.ringModWaveformIndex = 0;
-            this.ringModPulseWidth = 0;
-            this.ringModHzOffset = 200;
             this.granular = 4;
             this.grainSize = (Config.grainSizeMax - Config.grainSizeMin) / Config.grainSizeStep;
             this.grainAmounts = Config.grainAmountsMax;
@@ -12849,8 +12839,6 @@ li.select2-results__option[role=group] > strong:hover {
                 instrumentObject["ringMod"] = Math.round(100 * this.ringModulation / (Config.ringModRange - 1));
                 instrumentObject["ringModHz"] = Math.round(100 * this.ringModulationHz / (Config.ringModHzRange - 1));
                 instrumentObject["ringModWaveformIndex"] = this.ringModWaveformIndex;
-                instrumentObject["ringModPulseWidth"] = Math.round(100 * this.ringModPulseWidth / (Config.pulseWidthRange - 1));
-                instrumentObject["ringModHzOffset"] = Math.round(100 * this.ringModHzOffset / (Config.rmHzOffsetMax));
             }
             if (effectsIncludeDistortion(this.effects)) {
                 instrumentObject["distortion"] = Math.round(100 * this.distortion / (Config.distortionRange - 1));
@@ -13268,12 +13256,6 @@ li.select2-results__option[role=group] > strong:hover {
             }
             if (instrumentObject["ringModWaveformIndex"] != undefined) {
                 this.ringModWaveformIndex = clamp(0, Config.operatorWaves.length, instrumentObject["ringModWaveformIndex"]);
-            }
-            if (instrumentObject["ringModPulseWidth"] != undefined) {
-                this.ringModPulseWidth = clamp(0, Config.pulseWidthRange, Math.round((Config.pulseWidthRange - 1) * (instrumentObject["ringModPulseWidth"] | 0) / 100));
-            }
-            if (instrumentObject["ringModHzOffset"] != undefined) {
-                this.ringModHzOffset = clamp(0, Config.rmHzOffsetMax, Math.round((Config.rmHzOffsetMax - 1) * (instrumentObject["ringModHzOffset"] | 0) / 100));
             }
             if (instrumentObject["granular"] != undefined) {
                 this.granular = instrumentObject["granular"];
@@ -14374,8 +14356,6 @@ li.select2-results__option[role=group] > strong:hover {
                         buffer.push(base64IntToCharCode[instrument.ringModulation]);
                         buffer.push(base64IntToCharCode[instrument.ringModulationHz]);
                         buffer.push(base64IntToCharCode[instrument.ringModWaveformIndex]);
-                        buffer.push(base64IntToCharCode[(instrument.ringModPulseWidth)]);
-                        buffer.push(base64IntToCharCode[(instrument.ringModHzOffset - Config.rmHzOffsetMin) >> 6], base64IntToCharCode[(instrument.ringModHzOffset - Config.rmHzOffsetMin) & 0x3F]);
                     }
                     if (instrument.type != 4) {
                         buffer.push(100, base64IntToCharCode[instrument.fadeIn], base64IntToCharCode[instrument.fadeOut]);
@@ -16053,8 +16033,6 @@ li.select2-results__option[role=group] > strong:hover {
                                     instrument.ringModulation = clamp(0, Config.ringModRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                                     instrument.ringModulationHz = clamp(0, Config.ringModHzRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                                     instrument.ringModWaveformIndex = clamp(0, Config.operatorWaves.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
-                                    instrument.ringModPulseWidth = clamp(0, Config.pulseWidthRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
-                                    instrument.ringModHzOffset = clamp(Config.rmHzOffsetMin, Config.rmHzOffsetMax + 1, (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) + base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                                 }
                             }
                             instrument.effects &= (1 << 15) - 1;
@@ -18855,10 +18833,7 @@ li.select2-results__option[role=group] > strong:hover {
             this.ringModPhaseDelta = 0;
             this.ringModPhaseDeltaScale = 1.0;
             this.ringModWaveformIndex = 0.0;
-            this.ringModPulseWidth = 0.0;
-            this.ringModHzOffset = 0.0;
-            this.ringModMixFade = 1.0;
-            this.ringModMixFadeDelta = 0;
+            this.rmHzOffset = 0.0;
             this.distortion = 0.0;
             this.distortionDelta = 0.0;
             this.distortionDrive = 0.0;
@@ -19080,7 +19055,6 @@ li.select2-results__option[role=group] > strong:hover {
             }
             this.chorusPhase = 0.0;
             this.ringModPhase = 0.0;
-            this.ringModMixFade = 1.0;
         }
         compute(synth, instrument, samplesPerTick, roundedSamplesPerTick, tone, channelIndex, instrumentIndex) {
             this.computed = true;
@@ -19392,22 +19366,11 @@ li.select2-results__option[role=group] > strong:hover {
                 let ringModEnd = Math.min(1.0, (useRingModEnd * useRingModEnvelopeEnd) / (Config.ringModRange - 1));
                 this.ringModMix = ringModStart;
                 this.ringModMixDelta = (ringModEnd - ringModStart) / roundedSamplesPerTick;
-                this.ringModHzOffset = instrument.ringModHzOffset;
                 let ringModPhaseDeltaStart = (Math.max(0, calculateRingModHertz(useRingModHzStart))) / synth.samplesPerSecond;
                 let ringModPhaseDeltaEnd = (Math.max(0, calculateRingModHertz(useRingModHzEnd))) / synth.samplesPerSecond;
-                this.ringModMixFadeDelta = 0;
-                if (this.ringModMixFade < 0)
-                    this.ringModMixFade = 0;
-                if (ringModPhaseDeltaStart <= 0 && ringModPhaseDeltaEnd <= 0 && this.ringModMixFade != 0) {
-                    this.ringModMixFadeDelta = this.ringModMixFade / -10;
-                }
-                else if (ringModPhaseDeltaStart > 0 && ringModPhaseDeltaEnd > 0) {
-                    this.ringModMixFade = 1.0;
-                }
                 this.ringModPhaseDelta = ringModPhaseDeltaStart;
-                this.ringModPhaseDeltaScale = ringModPhaseDeltaStart == 0 ? 1 : Math.pow(ringModPhaseDeltaEnd / ringModPhaseDeltaStart, 1.0 / roundedSamplesPerTick);
+                this.ringModPhaseDeltaScale = Math.pow(ringModPhaseDeltaEnd / ringModPhaseDeltaStart, 1.0 / roundedSamplesPerTick);
                 this.ringModWaveformIndex = instrument.ringModWaveformIndex;
-                this.ringModPulseWidth = instrument.ringModPulseWidth;
             }
             let maxEchoMult = 0.0;
             let averageEchoDelaySeconds = 0.0;
@@ -23379,17 +23342,8 @@ li.select2-results__option[role=group] > strong:hover {
                 let ringModPhaseDelta = +instrumentState.ringModPhaseDelta;
                 let ringModPhaseDeltaScale = +instrumentState.ringModPhaseDeltaScale;
                 let ringModWaveformIndex = +instrumentState.ringModWaveformIndex;
-                let ringModMixFade = +instrumentState.ringModMixFade;
-                let ringModMixFadeDelta = +instrumentState.ringModMixFadeDelta;
-                
-                let ringModPulseWidth = +instrumentState.ringModPulseWidth;
-
-                let waveform = Config.operatorWaves[ringModWaveformIndex].samples; 
-                if (ringModWaveformIndex == 2) {
-                    waveform = Synth.getOperatorWave(ringModWaveformIndex, ringModPulseWidth).samples;
-                }
-                const waveformLength = waveform.length - 1;
-                `;
+                let waveform = Config.operatorWaves[ringModWaveformIndex].samples;
+                const waveformLength = waveform.length - 1;`;
                 }
                 if (usesEqFilter) {
                     effectsSource += `
@@ -23648,14 +23602,12 @@ li.select2-results__option[role=group] > strong:hover {
                     effectsSource += ` 
                 
                 const ringModOutput = sample * waveform[(ringModPhase*waveformLength)|0];
-                const ringModMixF = Math.max(0, ringModMix * ringModMixFade);
-                sample = sample * (1 - ringModMixF) + ringModOutput * ringModMixF;
+                sample = sample * (1 - ringModMix) + ringModOutput * ringModMix;
 
                 ringModMix += ringModMixDelta;
                 ringModPhase += ringModPhaseDelta;
                 ringModPhase = ringModPhase % 1.0;
                 ringModPhaseDelta *= ringModPhaseDeltaScale;
-                ringModMixFade += ringModMixFadeDelta;
                 `;
                 }
                 if (usesEqFilter) {
@@ -23869,10 +23821,7 @@ li.select2-results__option[role=group] > strong:hover {
                 instrumentState.ringModPhase = ringModPhase;
                 instrumentState.ringModPhaseDelta = ringModPhaseDelta;
                 instrumentState.ringModPhaseDeltaScale = ringModPhaseDeltaScale;
-                instrumentState.ringModWaveformIndex = ringModWaveformIndex;
-                instrumentState.ringModPulseWidth = ringModPulseWidth;
-                instrumentState.ringModMixFade = ringModMixFade;
-                 `;
+                instrumentState.ringModWaveformIndex = ringModWaveformIndex; `;
                 }
                 if (usesEqFilter) {
                     effectsSource += `
@@ -39094,7 +39043,7 @@ You should be redirected to the song at:<br /><br />
             this._channelCounts = [];
             this._channelNameDisplay = HTML.div({ style: `background-color: ${ColorConfig.uiWidgetFocus}; white-space:nowrap; display: none; transform:translate(20px); width: auto; pointer-events: none; position: absolute; border-radius: 0.2em; z-index: 2;`, "color": ColorConfig.primaryText }, "");
             this._channelNameInput = new InputBox(HTML.input({ style: `color: ${ColorConfig.primaryText}; background-color: ${ColorConfig.uiWidgetFocus}; margin-top: -2px; display: none; width: 6em; position: absolute; border-radius: 0.2em; z-index: 2;`, "color": ColorConfig.primaryText }, ""), this._doc, (oldValue, newValue) => new ChangeChannelName(this._doc, oldValue, newValue));
-            this._channelDropDown = HTML.select({ style: "width: 0px; left: 19px; height: 19px; position:absolute; opacity:0" }, HTML.option({ value: "rename" }, "Rename..."), HTML.option({ value: "chnUp" }, "Move Channel Up"), HTML.option({ value: "chnDown" }, "Move Channel Down"), HTML.option({ value: "chnMute" }, "Mute Channel"), HTML.option({ value: "chnSolo" }, "Solo Channel"), HTML.option({ value: "chnInsert" }, "Insert Channel Below"), HTML.option({ value: "chnDelete" }, "Delete This Channel"));
+            this._channelDropDown = HTML.select({ style: "width: 0px; left: 19px; height: 19px; position:absolute; opacity:0" }, HTML.option({ value: "chnUp" }, "Move Channel Up"), HTML.option({ value: "chnDown" }, "Move Channel Down"), HTML.option({ value: "chnMute" }, "Mute Channel"), HTML.option({ value: "chnSolo" }, "Solo Channel"), HTML.option({ value: "chnInsert" }, "Insert Channel Below"), HTML.option({ value: "chnDelete" }, "Delete This Channel"));
             this.container = HTML.div({ class: "muteEditor", style: "position: sticky; padding-top: " + Config.barEditorHeight + "px;" }, this._channelNameDisplay, this._channelNameInput.input, this._channelDropDown);
             this._editorHeight = 128;
             this._renderedPitchChannels = 0;
@@ -39250,19 +39199,11 @@ You should be redirected to the song at:<br /><br />
                         var height = ChannelRow.patternHeight;
                         this._channelNameDisplay.style.setProperty("transform", "translate(20px, " + (height / 4 + height * index) + "px)");
                         if (this._doc.song.channels[index].name != "") {
-                            this._channelNameDisplay.textContent = this._doc.song.channels[index].name;
+                            this._channelNameDisplay.textContent = "not permitted";
                             this._channelNameDisplay.style.setProperty("display", "");
                         }
                         else {
-                            if (index < this._doc.song.pitchChannelCount) {
-                                this._channelNameDisplay.textContent = "Pitch " + (index + 1);
-                            }
-                            else if (index < this._doc.song.pitchChannelCount + this._doc.song.noiseChannelCount) {
-                                this._channelNameDisplay.textContent = "Noise " + (index - this._doc.song.pitchChannelCount + 1);
-                            }
-                            else {
-                                this._channelNameDisplay.textContent = "Mod " + (index - this._doc.song.pitchChannelCount - this._doc.song.noiseChannelCount + 1);
-                            }
+                            this._channelNameDisplay.textContent = "no";
                             this._channelNameDisplay.style.setProperty("display", "none");
                         }
                         this._channelDropDown.style.top = (Config.barEditorHeight + 2 + index * ChannelRow.patternHeight) + "px";
@@ -46535,7 +46476,7 @@ You should be redirected to the song at:<br /><br />
                 div({ style: "height:54px; display:flex; justify-content:center;" }, [this._customWaveDrawCanvas.canvas]),
                 div({ style: "margin-top:5px; display:flex; justify-content:center;" }, [this._customWavePresetDrop, this._customWaveZoom]),
             ]);
-            this._songTitleInputBox = new InputBox(input({ style: "font-weight:bold; border:none; width: 98%; background-color:${ColorConfig.editorBackground}; color:${ColorConfig.primaryText}; text-align:center", maxlength: "30", type: "text", value: EditorConfig.versionDisplayName }), this._doc, (oldValue, newValue) => new ChangeSongTitle(this._doc, oldValue, newValue));
+            this._songTitleInputBox = new InputBox(input({ style: "font-weight:bold; border:none; width: 98%; background-color:${ColorConfig.editorBackground}; color:${ColorConfig.primaryText}; text-align:center", maxlength: "30", type: "hidden", value: EditorConfig.versionDisplayName }), this._doc, (oldValue, newValue) => new ChangeSongTitle(this._doc, oldValue, newValue));
             this._feedbackAmplitudeSlider = new Slider(input({ type: "range", min: "0", max: Config.operatorAmplitudeMax, value: "0", step: "1", title: "Feedback Amplitude" }), this._doc, (oldValue, newValue) => new ChangeFeedbackAmplitude(this._doc, oldValue, newValue), false);
             this._feedbackRow2 = div({ class: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("feedbackVolume") }, "Fdback Vol:"), this._feedbackAmplitudeSlider.container);
             this._addEnvelopeButton = button({ type: "button", class: "add-envelope" });
@@ -46812,12 +46753,7 @@ You should be redirected to the song at:<br /><br />
                     }
                     this._instrumentSettingsGroup.insertBefore(this._instrumentsButtonRow, this._instrumentSettingsGroup.firstChild);
                     this._instrumentSettingsGroup.insertBefore(this._instrumentSettingsTextRow, this._instrumentSettingsGroup.firstChild);
-                    if (this._doc.song.channels[this._doc.channel].name == "") {
-                        this._instrumentSettingsTextRow.textContent = "Instrument Settings";
-                    }
-                    else {
-                        this._instrumentSettingsTextRow.textContent = this._doc.song.channels[this._doc.channel].name;
-                    }
+                    this._instrumentSettingsTextRow.textContent = "Instrument Settings";
                     this._modulatorGroup.style.display = "none";
                     this._usageCheck(this._doc.channel, instrumentIndex);
                     if (this._doc.song.getChannelIsNoise(this._doc.channel)) {
@@ -47314,12 +47250,7 @@ You should be redirected to the song at:<br /><br />
                     }
                     this._modulatorGroup.insertBefore(this._instrumentsButtonRow, this._modulatorGroup.firstChild);
                     this._modulatorGroup.insertBefore(this._instrumentSettingsTextRow, this._modulatorGroup.firstChild);
-                    if (this._doc.song.channels[this._doc.channel].name == "") {
-                        this._instrumentSettingsTextRow.textContent = "Modulator Settings";
-                    }
-                    else {
-                        this._instrumentSettingsTextRow.textContent = this._doc.song.channels[this._doc.channel].name;
-                    }
+                    this._instrumentSettingsTextRow.textContent = "Modulator Settings";
                     this._chipNoiseSelectRow.style.display = "none";
                     this._chipWaveSelectRow.style.display = "none";
                     this._useChipWaveAdvancedLoopControlsRow.style.display = "none";
@@ -47376,7 +47307,7 @@ You should be redirected to the song at:<br /><br />
                                     channelList.push("pitch " + (i + 1));
                                 }
                                 else {
-                                    channelList.push(this._doc.song.channels[i].name);
+                                    channelList.push("no");
                                 }
                             }
                             for (let i = 0; i < this._doc.song.noiseChannelCount; i++) {
@@ -47384,7 +47315,7 @@ You should be redirected to the song at:<br /><br />
                                     channelList.push("noise " + (i + 1));
                                 }
                                 else {
-                                    channelList.push(this._doc.song.channels[i + this._doc.song.pitchChannelCount].name);
+                                    channelList.push("not permitted");
                                 }
                             }
                             buildOptions(this._modChannelBoxes[mod], channelList);

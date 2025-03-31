@@ -2231,7 +2231,12 @@ export function effectsIncludeGranular(effects: number): boolean {
 export function effectsIncludeNoteRange(effects: number): boolean {
     return (effects & (1 << EffectType.noteRange)) != 0;
 }
-export function calculateRingModHertz(sliderHz: number): number {
+export function calculateRingModHertz(sliderHz: number, sliderHzOffset: number = 0): number {
+    //replaces the value 21 with 0
+    if (sliderHz == 0) return 0;
+    if (sliderHz > 0) sliderHz -= 1 / Config.ringModHzRange;
+    if (sliderHz > 1 / Config.ringModHzRange) sliderHz += 1 / Config.ringModHzRange;
+    //calculate ring mod
     return Math.floor(Config.ringModMinHz * Math.pow(Config.ringModMaxHz / Config.ringModMinHz, sliderHz))
 }
 export function rawChipToIntegrated(raw: DictionaryArray<ChipWave>): DictionaryArray<ChipWave> {

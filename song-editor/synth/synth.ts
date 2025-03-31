@@ -1656,6 +1656,8 @@ export class Instrument {
     public ringModulation: number = Math.floor(Config.ringModRange/2);
     public ringModulationHz: number = Math.floor(Config.ringModHzRange / 2);;
     public ringModWaveformIndex: number = 0;
+    public ringModPulseWidth: number = 0;
+    public ringModHzOffset: number = 200;
     public granular: number = 4;
     public grainSize: number = (Config.grainSizeMax-Config.grainSizeMin)/Config.grainSizeStep;
     public grainAmounts: number = Config.grainAmountsMax;
@@ -1780,6 +1782,8 @@ export class Instrument {
         this.ringModulation = 0;
         this.ringModulationHz = 0;
         this.ringModWaveformIndex = 0;
+        this.ringModPulseWidth = 0;
+        this.ringModHzOffset = 200;
         this.granular = 4;
         this.grainSize = (Config.grainSizeMax - Config.grainSizeMin) / Config.grainSizeStep;
         this.grainAmounts = Config.grainAmountsMax;
@@ -2106,8 +2110,8 @@ export class Instrument {
             instrumentObject["ringMod"] = Math.round(100 * this.ringModulation / (Config.ringModRange - 1));
             instrumentObject["ringModHz"] = Math.round(100 * this.ringModulationHz / (Config.ringModHzRange - 1));
             instrumentObject["ringModWaveformIndex"] = this.ringModWaveformIndex;
-            // instrumentObject["rmPulseWidth"] = Math.round(100 * this.rmPulseWidth / (Config.pulseWidthRange - 1));
-            // instrumentObject["rmHzOffset"] = Math.round(100 * this.rmHzOffset / (Config.rmHzOffsetMax));
+            instrumentObject["ringModPulseWidth"] = Math.round(100 * this.ringModPulseWidth / (Config.pulseWidthRange - 1));
+            instrumentObject["ringModHzOffset"] = Math.round(100 * this.ringModHzOffset / (Config.rmHzOffsetMax));
         }
         if (effectsIncludeDistortion(this.effects)) {
             instrumentObject["distortion"] = Math.round(100 * this.distortion / (Config.distortionRange - 1));
@@ -2548,6 +2552,12 @@ export class Instrument {
         }
         if (instrumentObject["ringModWaveformIndex"] != undefined) {
             this.ringModWaveformIndex = clamp(0, Config.operatorWaves.length, instrumentObject["ringModWaveformIndex"]);
+        }
+        if (instrumentObject["ringModPulseWidth"] != undefined) {
+            this.ringModPulseWidth = clamp(0, Config.pulseWidthRange, Math.round((Config.pulseWidthRange - 1) * (instrumentObject["ringModPulseWidth"] | 0) / 100));
+        }
+        if (instrumentObject["ringModHzOffset"] != undefined) {
+            this.ringModHzOffset = clamp(0, Config.rmHzOffsetMax, Math.round((Config.rmHzOffsetMax - 1) * (instrumentObject["ringModHzOffset"] | 0) / 100));
         }
 
         if (instrumentObject["granular"] != undefined) {
@@ -3775,6 +3785,8 @@ export class Song {
                     buffer.push(base64IntToCharCode[instrument.ringModulation]);
                     buffer.push(base64IntToCharCode[instrument.ringModulationHz]);
                     buffer.push(base64IntToCharCode[instrument.ringModWaveformIndex]);	
+                    buffer.push(base64IntToCharCode[(instrument.ringModPulseWidth)]);
+                    buffer.push(base64IntToCharCode[(instrument.ringModHzOffset - Config.rmHzOffsetMin) >> 6], base64IntToCharCode[(instrument.ringModHzOffset - Config.rmHzOffsetMin) & 0x3F]);
                 }
 
                 if (instrument.type != InstrumentType.drumset) {
@@ -5546,6 +5558,8 @@ export class Song {
                         instrument.ringModulation = clamp(0, Config.ringModRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                         instrument.ringModulationHz = clamp(0, Config.ringModHzRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                         instrument.ringModWaveformIndex = clamp(0, Config.operatorWaves.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);	
+                        instrument.ringModPulseWidth = clamp(0, Config.pulseWidthRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]); 
+                        instrument.ringModHzOffset = clamp(Config.rmHzOffsetMin, Config.rmHzOffsetMax + 1, (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) + base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);	
                     }
                 }
                 // Clamp the range.
@@ -8531,7 +8545,10 @@ class InstrumentState {
     public ringModPhaseDelta: number = 0;
     public ringModPhaseDeltaScale: number = 1.0;
     public ringModWaveformIndex: number = 0.0;
-    public rmHzOffset: number = 0.0
+    public ringModPulseWidth: number = 0.0;
+    public ringModHzOffset: number = 0.0;
+    public ringModMixFade: number = 1.0;
+    public ringModMixFadeDelta: number = 0;
 
     public distortion: number = 0.0;
     public distortionDelta: number = 0.0;
@@ -8773,6 +8790,7 @@ class InstrumentState {
 
         this.chorusPhase = 0.0;
         this.ringModPhase = 0.0;
+        this.ringModMixFade = 1.0;
     }
 
     public compute(synth: Synth, instrument: Instrument, samplesPerTick: number, roundedSamplesPerTick: number, tone: Tone | null, channelIndex: number, instrumentIndex: number): void {
@@ -9164,13 +9182,24 @@ class InstrumentState {
             this.ringModMix = ringModStart;
             this.ringModMixDelta = (ringModEnd - ringModStart) / roundedSamplesPerTick;
 
+            this.ringModHzOffset = instrument.ringModHzOffset;
+
             let ringModPhaseDeltaStart = (Math.max(0, calculateRingModHertz(useRingModHzStart))) / synth.samplesPerSecond;
             let ringModPhaseDeltaEnd = (Math.max(0, calculateRingModHertz(useRingModHzEnd))) / synth.samplesPerSecond;
-            this.ringModPhaseDelta = ringModPhaseDeltaStart;
-            this.ringModPhaseDeltaScale = Math.pow(ringModPhaseDeltaEnd / ringModPhaseDeltaStart, 1.0 / roundedSamplesPerTick);
-            this.ringModWaveformIndex = instrument.ringModWaveformIndex;
+            
+            this.ringModMixFadeDelta = 0;
+            if (this.ringModMixFade < 0) this.ringModMixFade = 0;
+            if (ringModPhaseDeltaStart <= 0 && ringModPhaseDeltaEnd <= 0 && this.ringModMixFade != 0) {
+                this.ringModMixFadeDelta = this.ringModMixFade / -10;
+            } else if (ringModPhaseDeltaStart > 0 && ringModPhaseDeltaEnd > 0) {
+                this.ringModMixFade = 1.0;
+            }
 
-            // this.rmPulseWidth = instrument.rmPulseWidth;
+            this.ringModPhaseDelta = ringModPhaseDeltaStart;
+            this.ringModPhaseDeltaScale = ringModPhaseDeltaStart == 0 ? 1 : Math.pow(ringModPhaseDeltaEnd / ringModPhaseDeltaStart, 1.0 / roundedSamplesPerTick);
+            
+            this.ringModWaveformIndex = instrument.ringModWaveformIndex;
+            this.ringModPulseWidth = instrument.ringModPulseWidth;
 
         }
 
@@ -13760,8 +13789,17 @@ export class Synth {
                 let ringModPhaseDelta = +instrumentState.ringModPhaseDelta;
                 let ringModPhaseDeltaScale = +instrumentState.ringModPhaseDeltaScale;
                 let ringModWaveformIndex = +instrumentState.ringModWaveformIndex;
-                let waveform = Config.operatorWaves[ringModWaveformIndex].samples;
-                const waveformLength = waveform.length - 1;`
+                let ringModMixFade = +instrumentState.ringModMixFade;
+                let ringModMixFadeDelta = +instrumentState.ringModMixFadeDelta;
+                
+                let ringModPulseWidth = +instrumentState.ringModPulseWidth;
+
+                let waveform = Config.operatorWaves[ringModWaveformIndex].samples; 
+                if (ringModWaveformIndex == 2) {
+                    waveform = Synth.getOperatorWave(ringModWaveformIndex, ringModPulseWidth).samples;
+                }
+                const waveformLength = waveform.length - 1;
+                `
             }
 
             if (usesEqFilter) {
@@ -14031,12 +14069,14 @@ export class Synth {
                 effectsSource += ` 
                 
                 const ringModOutput = sample * waveform[(ringModPhase*waveformLength)|0];
-                sample = sample * (1 - ringModMix) + ringModOutput * ringModMix;
+                const ringModMixF = Math.max(0, ringModMix * ringModMixFade);
+                sample = sample * (1 - ringModMixF) + ringModOutput * ringModMixF;
 
                 ringModMix += ringModMixDelta;
                 ringModPhase += ringModPhaseDelta;
                 ringModPhase = ringModPhase % 1.0;
                 ringModPhaseDelta *= ringModPhaseDeltaScale;
+                ringModMixFade += ringModMixFadeDelta;
                 `
             }
 
@@ -14265,7 +14305,10 @@ export class Synth {
                 instrumentState.ringModPhase = ringModPhase;
                 instrumentState.ringModPhaseDelta = ringModPhaseDelta;
                 instrumentState.ringModPhaseDeltaScale = ringModPhaseDeltaScale;
-                instrumentState.ringModWaveformIndex = ringModWaveformIndex; `
+                instrumentState.ringModWaveformIndex = ringModWaveformIndex;
+                instrumentState.ringModPulseWidth = ringModPulseWidth;
+                instrumentState.ringModMixFade = ringModMixFade;
+                 `
             }
 
             if (usesEqFilter) {

@@ -1148,7 +1148,8 @@ var beepbox = (function (exports) {
         { name: "granular", computeIndex: 51, displayName: "granular", interleave: false, isFilter: false, maxCount: 1, effect: 14, compatibleInstruments: null },
         { name: "grainFreq", computeIndex: 52, displayName: "grain freq", interleave: false, isFilter: false, maxCount: 1, effect: 14, compatibleInstruments: null },
         { name: "grainSize", computeIndex: 53, displayName: "grain size", interleave: false, isFilter: false, maxCount: 1, effect: 14, compatibleInstruments: null },
-        { name: "echoDelay", computeIndex: 54, displayName: "echo delay", interleave: false, isFilter: false, maxCount: 1, effect: 6, compatibleInstruments: null },
+        { name: "grainRange", computeIndex: 54, displayName: "grain range", interleave: false, isFilter: false, maxCount: 1, effect: 14, compatibleInstruments: null },
+        { name: "echoDelay", computeIndex: 55, displayName: "echo delay", interleave: false, isFilter: false, maxCount: 1, effect: 6, compatibleInstruments: null },
     ]);
     Config.operatorWaves = toNameMap([
         { name: "sine", samples: _a$1.sineWave },
@@ -12443,7 +12444,7 @@ li.select2-results__option[role=group] > strong:hover {
             this.ringModWaveformIndex = 0;
             this.granular = 4;
             this.grainSize = (Config.grainSizeMax - Config.grainSizeMin) / Config.grainSizeStep;
-            this.grainAmounts = 1;
+            this.grainAmounts = Config.grainAmountsMax;
             this.grainRange = 40;
             this.chorus = 0;
             this.reverb = 0;
@@ -12533,7 +12534,7 @@ li.select2-results__option[role=group] > strong:hover {
             this.ringModWaveformIndex = 0;
             this.granular = 4;
             this.grainSize = (Config.grainSizeMax - Config.grainSizeMin) / Config.grainSizeStep;
-            this.grainAmounts = 1;
+            this.grainAmounts = Config.grainAmountsMax;
             this.grainRange = 40;
             this.pan = Config.panCenter;
             this.panDelay = 0;
@@ -14800,7 +14801,6 @@ li.select2-results__option[role=group] > strong:hover {
             return Config.envelopes[clamp(0, Config.envelopes.length, legacyIndex)];
         }
         fromBase64String(compressed, jsonFormat = "auto") {
-            let lastViewedSetting = "url type";
             if (compressed == null || compressed == "") {
                 Song._clearSamples();
                 this.initToDefault(true);
@@ -14875,7 +14875,6 @@ li.select2-results__option[role=group] > strong:hover {
                 var compressed_array = compressed.split("|");
                 compressed = compressed_array.shift();
                 if (EditorConfig.customSamples == null || EditorConfig.customSamples.join(", ") != compressed_array.join(", ")) {
-                    lastViewedSetting = "customSamples";
                     Song._restoreChipWaveListToDefault();
                     let willLoadLegacySamples = false;
                     let willLoadNintariboxSamples = false;
@@ -14939,7 +14938,6 @@ li.select2-results__option[role=group] > strong:hover {
             }
             let legacySettingsCache = null;
             if ((fromBeepBox && beforeNine) || ((fromJummBox && beforeFive) || (beforeFour && fromGoldBox))) {
-                lastViewedSetting = "legacy settings";
                 legacySettingsCache = [];
                 for (let i = legacySettingsCache.length; i < this.getChannelCount(); i++) {
                     legacySettingsCache[i] = [];
@@ -14957,7 +14955,6 @@ li.select2-results__option[role=group] > strong:hover {
                 switch (command = compressed.charCodeAt(charIndex++)) {
                     case 78:
                         {
-                            lastViewedSetting = "Song Title";
                             var songNameLength = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) + base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                             this.title = decodeURIComponent(compressed.substring(charIndex, charIndex + songNameLength));
                             document.title = this.title + " - " + EditorConfig.versionDisplayName;
@@ -14966,7 +14963,6 @@ li.select2-results__option[role=group] > strong:hover {
                         break;
                     case 110:
                         {
-                            lastViewedSetting = "Channel Count";
                             this.pitchChannelCount = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                             this.noiseChannelCount = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                             if (fromBeepBox || (fromJummBox && beforeTwo)) {
@@ -14993,7 +14989,6 @@ li.select2-results__option[role=group] > strong:hover {
                         break;
                     case 115:
                         {
-                            lastViewedSetting = "Scale";
                             this.scale = clamp(0, Config.scales.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                             if (this.scale == Config.scales["dictionary"]["Custom"].index) {
                                 for (var i = 1; i < Config.pitchesPerOctave; i++) {
@@ -15006,7 +15001,6 @@ li.select2-results__option[role=group] > strong:hover {
                         break;
                     case 107:
                         {
-                            lastViewedSetting = "Key";
                             if (beforeSeven && fromBeepBox) {
                                 this.key = clamp(0, Config.keys.length, 11 - base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                                 this.octave = 0;
@@ -15029,7 +15023,6 @@ li.select2-results__option[role=group] > strong:hover {
                         break;
                     case 108:
                         {
-                            lastViewedSetting = "Loop Start";
                             if (beforeFive && fromBeepBox) {
                                 this.loopStart = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                             }
@@ -15040,7 +15033,6 @@ li.select2-results__option[role=group] > strong:hover {
                         break;
                     case 101:
                         {
-                            lastViewedSetting = "Loop End";
                             if (beforeFive && fromBeepBox) {
                                 this.loopLength = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                             }
@@ -15051,7 +15043,6 @@ li.select2-results__option[role=group] > strong:hover {
                         break;
                     case 116:
                         {
-                            lastViewedSetting = "Tempo";
                             if (beforeFour && fromBeepBox) {
                                 this.tempo = [95, 120, 151, 190][base64CharCodeToInt[compressed.charCodeAt(charIndex++)]];
                             }
@@ -15066,7 +15057,6 @@ li.select2-results__option[role=group] > strong:hover {
                         break;
                     case 109:
                         {
-                            lastViewedSetting = "Song Reverb (legacy)";
                             if (beforeNine && fromBeepBox) {
                                 legacyGlobalReverb = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] * 12;
                                 legacyGlobalReverb = clamp(0, Config.reverbRange, legacyGlobalReverb);
@@ -15080,7 +15070,6 @@ li.select2-results__option[role=group] > strong:hover {
                         break;
                     case 97:
                         {
-                            lastViewedSetting = "Beats per bar (Time Signature)";
                             if (beforeThree && fromBeepBox) {
                                 this.beatsPerBar = [6, 7, 8, 9, 10][base64CharCodeToInt[compressed.charCodeAt(charIndex++)]];
                             }
@@ -15092,7 +15081,6 @@ li.select2-results__option[role=group] > strong:hover {
                         break;
                     case 103:
                         {
-                            lastViewedSetting = "Song Length";
                             const barCount = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) + base64CharCodeToInt[compressed.charCodeAt(charIndex++)] + 1;
                             this.barCount = validateRange(Config.barCountMin, Config.barCountMax, barCount);
                             for (let channelIndex = 0; channelIndex < this.getChannelCount(); channelIndex++) {
@@ -15105,7 +15093,6 @@ li.select2-results__option[role=group] > strong:hover {
                         break;
                     case 106:
                         {
-                            lastViewedSetting = "Patterns (amount)";
                             let patternsPerChannel;
                             if (beforeEight && fromBeepBox) {
                                 patternsPerChannel = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] + 1;
@@ -15126,7 +15113,6 @@ li.select2-results__option[role=group] > strong:hover {
                         break;
                     case 105:
                         {
-                            lastViewedSetting = "Instrument Amount";
                             if ((beforeNine && fromBeepBox) || ((fromJummBox && beforeFive) || (beforeFour && fromGoldBox))) {
                                 const instrumentsPerChannel = validateRange(Config.instrumentCountMin, Config.patternInstrumentCountMax, base64CharCodeToInt[compressed.charCodeAt(charIndex++)] + Config.instrumentCountMin);
                                 this.layeredInstruments = false;
@@ -15170,7 +15156,6 @@ li.select2-results__option[role=group] > strong:hover {
                         break;
                     case 114:
                         {
-                            lastViewedSetting = "Rhythm";
                             if (!fromUltraBox && !fromSlarmoosBox) {
                                 let newRhythm = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                                 this.rhythm = clamp(0, Config.rhythms.length, newRhythm);
@@ -15194,7 +15179,6 @@ li.select2-results__option[role=group] > strong:hover {
                         break;
                     case 111:
                         {
-                            lastViewedSetting = "Channel Octave";
                             if (beforeThree && fromBeepBox) {
                                 const channelIndex = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                                 this.channels[channelIndex].octave = clamp(0, Config.pitchOctaves, base64CharCodeToInt[compressed.charCodeAt(charIndex++)] + 1);
@@ -15220,7 +15204,6 @@ li.select2-results__option[role=group] > strong:hover {
                         break;
                     case 84:
                         {
-                            lastViewedSetting = "Instrument (start parsing)";
                             instrumentIndexIterator++;
                             if (instrumentIndexIterator >= this.channels[instrumentChannelIterator].instruments.length) {
                                 instrumentChannelIterator++;
@@ -15260,7 +15243,6 @@ li.select2-results__option[role=group] > strong:hover {
                         break;
                     case 117:
                         {
-                            lastViewedSetting = "Instrument Preset";
                             const presetValue = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) | (base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                             this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].preset = presetValue;
                             if ((fromJummBox && beforeFive) || (beforeFour && fromGoldBox)) {
@@ -15286,7 +15268,6 @@ li.select2-results__option[role=group] > strong:hover {
                         break;
                     case 119:
                         {
-                            lastViewedSetting = "Chipwave / Noise";
                             if (beforeThree && fromBeepBox) {
                                 const legacyWaves = [1, 2, 3, 4, 5, 6, 7, 8, 0];
                                 const channelIndex = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
@@ -15346,7 +15327,6 @@ li.select2-results__option[role=group] > strong:hover {
                         break;
                     case 102:
                         {
-                            lastViewedSetting = "EQ Filter";
                             if ((beforeNine && fromBeepBox) || (beforeFive && fromJummBox) || (beforeFour && fromGoldBox)) {
                                 if (beforeSeven && fromBeepBox) {
                                     const legacyToCutoff = [10, 6, 3, 0, 8, 5, 2];
@@ -15456,7 +15436,6 @@ li.select2-results__option[role=group] > strong:hover {
                     case 121:
                         {
                             if (fromSlarmoosBox || fromUltraBox) {
-                                lastViewedSetting = "Chipwave loop controls (custom samples)";
                                 if (beforeThree && fromUltraBox) {
                                     const sampleLoopInfoEncodedLength = decode32BitNumber(compressed, charIndex);
                                     charIndex += 6;
@@ -15498,7 +15477,6 @@ li.select2-results__option[role=group] > strong:hover {
                                 }
                             }
                             else if (fromGoldBox && !beforeFour && beforeSix) {
-                                lastViewedSetting = "Legacy Samples (Goldbox)";
                                 if (document.URL.substring(document.URL.length - 13).toLowerCase() != "legacysamples") {
                                     if (!willLoadLegacySamplesForOldSongs) {
                                         willLoadLegacySamplesForOldSongs = true;
@@ -15510,7 +15488,6 @@ li.select2-results__option[role=group] > strong:hover {
                                 this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].chipWave = clamp(0, Config.chipWaves.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)] + 125);
                             }
                             else if ((beforeNine && fromBeepBox) || ((fromJummBox && beforeFive) || (beforeFour && fromGoldBox))) {
-                                lastViewedSetting = "Filter Resonance (legacy)";
                                 const filterResonanceRange = 8;
                                 const instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                                 const legacySettings = legacySettingsCache[instrumentChannelIterator][instrumentIndexIterator];
@@ -15521,7 +15498,6 @@ li.select2-results__option[role=group] > strong:hover {
                         break;
                     case 122:
                         {
-                            lastViewedSetting = "Drumset Envelopes";
                             const instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                             const pregoldToEnvelope = [0, 1, 2, 4, 5, 6, 8, 9, 10, 12, 13, 14, 16, 17, 18, 19, 20, 21, 23, 24, 25, 27, 28, 29, 32, 33, 34, 31, 11];
                             if ((beforeNine && fromBeepBox) || (beforeFive && fromJummBox) || (beforeFour && fromGoldBox)) {
@@ -15556,7 +15532,6 @@ li.select2-results__option[role=group] > strong:hover {
                         break;
                     case 87:
                         {
-                            lastViewedSetting = "Pulse Width";
                             const instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                             instrument.pulseWidth = clamp(0, Config.pulseWidthRange + (+(fromJummBox)) + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                             if (fromBeepBox) {
@@ -15571,7 +15546,6 @@ li.select2-results__option[role=group] > strong:hover {
                                 legacySettings.pulseEnvelope = Song._envelopeFromLegacyIndex(aa);
                                 instrument.convertLegacySettings(legacySettings, forceSimpleFilter);
                             }
-                            lastViewedSetting = "Decimal Offset";
                             if ((fromUltraBox && !beforeFour) || fromSlarmoosBox) {
                                 instrument.decimalOffset = clamp(0, 99 + 1, (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) + base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                             }
@@ -15579,7 +15553,6 @@ li.select2-results__option[role=group] > strong:hover {
                         break;
                     case 73:
                         {
-                            lastViewedSetting = "Sustain (Picked String)";
                             const instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                             const sustainValue = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                             instrument.stringSustain = clamp(0, Config.stringSustainRange, sustainValue & 0x1F);
@@ -15588,9 +15561,7 @@ li.select2-results__option[role=group] > strong:hover {
                         break;
                     case 100:
                         {
-                            lastViewedSetting = "Fade";
                             if ((beforeNine && fromBeepBox) || ((fromJummBox && beforeFive) || (beforeFour && fromGoldBox))) {
-                                lastViewedSetting = "Transition + Fade (legacy)";
                                 const legacySettings = [
                                     { transition: "interrupt", fadeInSeconds: 0.0, fadeOutTicks: -1 },
                                     { transition: "normal", fadeInSeconds: 0.0, fadeOutTicks: -3 },
@@ -15663,7 +15634,6 @@ li.select2-results__option[role=group] > strong:hover {
                     case 99:
                         {
                             if ((beforeNine && fromBeepBox) || ((fromJummBox && beforeFive) || (beforeFour && fromGoldBox))) {
-                                lastViewedSetting = "Vibrato (legacy)";
                                 if (beforeSeven && fromBeepBox) {
                                     if (beforeThree && fromBeepBox) {
                                         const legacyEffects = [0, 3, 2, 0];
@@ -15747,7 +15717,6 @@ li.select2-results__option[role=group] > strong:hover {
                                 }
                             }
                             else {
-                                lastViewedSetting = "Song EQ";
                                 if (fromSlarmoosBox && !beforeFour) {
                                     const originalControlPointCount = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                                     this.eqFilter.controlPointCount = clamp(0, Config.filterMaxPoints + 1, originalControlPointCount);
@@ -15791,7 +15760,6 @@ li.select2-results__option[role=group] > strong:hover {
                         break;
                     case 71:
                         {
-                            lastViewedSetting = "Arp Speed (legacy)";
                             if ((fromJummBox && beforeFive) || (beforeFour && fromGoldBox)) {
                                 const instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                                 instrument.arpeggioSpeed = clamp(0, Config.modulators.dictionary["arp speed"].maxRawVol + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
@@ -15801,7 +15769,6 @@ li.select2-results__option[role=group] > strong:hover {
                         break;
                     case 104:
                         {
-                            lastViewedSetting = "Unison";
                             if (beforeThree && fromBeepBox) {
                                 const channelIndex = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                                 const instrument = this.channels[channelIndex].instruments[0];
@@ -15885,7 +15852,6 @@ li.select2-results__option[role=group] > strong:hover {
                         break;
                     case 67:
                         {
-                            lastViewedSetting = "Chord Type (legacy)";
                             if ((beforeNine && fromBeepBox) || ((fromJummBox && beforeFive) || (beforeFour && fromGoldBox))) {
                                 const instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                                 instrument.chord = clamp(0, Config.chords.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
@@ -15897,7 +15863,6 @@ li.select2-results__option[role=group] > strong:hover {
                         break;
                     case 113:
                         {
-                            lastViewedSetting = "Effects";
                             const instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                             if ((beforeNine && fromBeepBox) || ((fromJummBox && beforeFive) || (beforeFour && fromGoldBox))) {
                                 instrument.effects = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] & ((1 << 15) - 1));
@@ -16075,7 +16040,6 @@ li.select2-results__option[role=group] > strong:hover {
                         break;
                     case 118:
                         {
-                            lastViewedSetting = "Instrument Volume";
                             if (beforeThree && fromBeepBox) {
                                 const channelIndex = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                                 const instrument = this.channels[channelIndex].instruments[0];
@@ -16104,7 +16068,6 @@ li.select2-results__option[role=group] > strong:hover {
                         break;
                     case 76:
                         {
-                            lastViewedSetting = "Panning (legacy)";
                             if (beforeNine && fromBeepBox) {
                                 const instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                                 instrument.pan = clamp(0, Config.panMax + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)] * ((Config.panMax) / 8.0));
@@ -16121,7 +16084,6 @@ li.select2-results__option[role=group] > strong:hover {
                         break;
                     case 68:
                         {
-                            lastViewedSetting = "Detune (legacy)";
                             const instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                             if ((fromJummBox && beforeFive) || (beforeFour && fromGoldBox)) {
                                 instrument.detune = clamp(Config.detuneMin, Config.detuneMax + 1, ((base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) + base64CharCodeToInt[compressed.charCodeAt(charIndex++)]) * 4);
@@ -16131,7 +16093,6 @@ li.select2-results__option[role=group] > strong:hover {
                         break;
                     case 77:
                         {
-                            lastViewedSetting = "Custom Chip";
                             let instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                             for (let j = 0; j < 64; j++) {
                                 instrument.customChipWave[j]
@@ -16154,7 +16115,6 @@ li.select2-results__option[role=group] > strong:hover {
                         break;
                     case 79:
                         {
-                            lastViewedSetting = "Limiter";
                             let nextValue = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                             if (nextValue == 0x3f) {
                                 this.restoreLimiterDefaults();
@@ -16173,7 +16133,6 @@ li.select2-results__option[role=group] > strong:hover {
                         break;
                     case 85:
                         {
-                            lastViewedSetting = "Channel Names";
                             for (let channel = 0; channel < this.getChannelCount(); channel++) {
                                 var channelNameLength;
                                 if (beforeFour && !fromGoldBox && !fromUltraBox && !fromSlarmoosBox)
@@ -16187,7 +16146,6 @@ li.select2-results__option[role=group] > strong:hover {
                         break;
                     case 65:
                         {
-                            lastViewedSetting = "FM Algorithm";
                             const instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                             if (instrument.type == 1) {
                                 instrument.algorithm = clamp(0, Config.algorithms.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
@@ -16227,7 +16185,6 @@ li.select2-results__option[role=group] > strong:hover {
                         break;
                     case 120:
                         {
-                            lastViewedSetting = "Supersaw";
                             if (fromGoldBox && !beforeFour && beforeSix) {
                                 const chipWaveForCompat = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                                 if ((chipWaveForCompat + 62) > 85) {
@@ -16263,7 +16220,6 @@ li.select2-results__option[role=group] > strong:hover {
                         break;
                     case 70:
                         {
-                            lastViewedSetting = "FM Feedback";
                             const instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                             if (instrument.type == 1) {
                                 instrument.feedbackType = clamp(0, Config.feedbacks.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
@@ -16294,13 +16250,11 @@ li.select2-results__option[role=group] > strong:hover {
                         break;
                     case 66:
                         {
-                            lastViewedSetting = "FM Feedback amount";
                             this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].feedbackAmplitude = clamp(0, Config.operatorAmplitudeMax + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                         }
                         break;
                     case 86:
                         {
-                            lastViewedSetting = "Feedback Envelope (legacy)";
                             if ((beforeNine && fromBeepBox) || (beforeFive && fromJummBox) || (beforeFour && fromGoldBox)) {
                                 const pregoldToEnvelope = [0, 1, 2, 4, 5, 6, 8, 9, 10, 12, 13, 14, 16, 17, 18, 19, 20, 21, 23, 24, 25, 27, 28, 29, 32, 33, 34, 31, 11];
                                 const instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
@@ -16315,7 +16269,6 @@ li.select2-results__option[role=group] > strong:hover {
                         break;
                     case 81:
                         {
-                            lastViewedSetting = "FM Operator Frequencies";
                             const instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                             if (beforeThree && fromGoldBox) {
                                 const freqToGold3 = [4, 5, 6, 7, 8, 10, 12, 13, 14, 15, 16, 18, 20, 22, 24, 2, 1, 9, 17, 19, 21, 23, 0, 3];
@@ -16338,7 +16291,6 @@ li.select2-results__option[role=group] > strong:hover {
                         break;
                     case 80:
                         {
-                            lastViewedSetting = "FM Operator Amounts";
                             const instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                             for (let o = 0; o < (instrument.type == 11 ? 6 : Config.operatorCount); o++) {
                                 instrument.operators[o].amplitude = clamp(0, Config.operatorAmplitudeMax + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
@@ -16352,7 +16304,6 @@ li.select2-results__option[role=group] > strong:hover {
                             const slarURL3toURL4Envelope = [0, 1, 2, 3, 4, 5, 6, 7, 8, 8, 9, 10, 11, 12, 13, 14];
                             const instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                             if ((beforeNine && fromBeepBox) || (beforeFive && fromJummBox) || (beforeFour && fromGoldBox)) {
-                                lastViewedSetting = "Envelopes (legacy)";
                                 const legacySettings = legacySettingsCache[instrumentChannelIterator][instrumentIndexIterator];
                                 legacySettings.operatorEnvelopes = [];
                                 for (let o = 0; o < (instrument.type == 11 ? 6 : Config.operatorCount); o++) {
@@ -16369,13 +16320,11 @@ li.select2-results__option[role=group] > strong:hover {
                                 const envelopeCount = clamp(0, Config.maxEnvelopeCount + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                                 let envelopeDiscrete = false;
                                 if ((fromJummBox && !beforeSix) || (fromUltraBox && !beforeFive) || (fromSlarmoosBox)) {
-                                    lastViewedSetting = "Envelope Speed";
                                     instrument.envelopeSpeed = clamp(0, Config.modulators.dictionary["envelope speed"].maxRawVol + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                                     if (!fromSlarmoosBox || beforeFive) {
                                         envelopeDiscrete = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)]) ? true : false;
                                     }
                                 }
-                                lastViewedSetting = "Envelopes " + ((fromSlarmoosBox && !beforeThree) ? "(advanced)" : "(simple)");
                                 for (let i = 0; i < envelopeCount; i++) {
                                     const target = clamp(0, Config.instrumentAutomationTargets.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                                     let index = 0;
@@ -16494,7 +16443,6 @@ li.select2-results__option[role=group] > strong:hover {
                         break;
                     case 82:
                         {
-                            lastViewedSetting = "FM Operator Waveforms";
                             const instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                             if (beforeThree && fromGoldBox) {
                                 for (let o = 0; o < Config.operatorCount; o++) {
@@ -16530,7 +16478,6 @@ li.select2-results__option[role=group] > strong:hover {
                         break;
                     case 83:
                         {
-                            lastViewedSetting = "Spectrum";
                             const instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                             if (instrument.type == 3) {
                                 const byteCount = Math.ceil(Config.spectrumControlPoints * Config.spectrumControlPointBits / 6);
@@ -16559,7 +16506,6 @@ li.select2-results__option[role=group] > strong:hover {
                         break;
                     case 72:
                         {
-                            lastViewedSetting = "Harmonics";
                             const instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                             const byteCount = Math.ceil(Config.harmonicsControlPoints * Config.harmonicsControlPointBits / 6);
                             const bits = new BitFieldReader(compressed, charIndex, charIndex + byteCount);
@@ -16572,7 +16518,6 @@ li.select2-results__option[role=group] > strong:hover {
                         break;
                     case 88:
                         {
-                            lastViewedSetting = "Aliases + Distortion";
                             if ((fromJummBox && beforeFive) || (fromGoldBox && beforeFour)) {
                                 const instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                                 instrument.aliases = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)]) ? true : false;
@@ -16582,7 +16527,6 @@ li.select2-results__option[role=group] > strong:hover {
                                 }
                             }
                             else {
-                                lastViewedSetting = "Decimal Offset";
                                 if (fromUltraBox || fromSlarmoosBox) {
                                     const instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                                     instrument.decimalOffset = clamp(0, 50 + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
@@ -16592,7 +16536,6 @@ li.select2-results__option[role=group] > strong:hover {
                         break;
                     case 98:
                         {
-                            lastViewedSetting = "Bars";
                             let subStringLength;
                             if (beforeThree && fromBeepBox) {
                                 const channelIndex = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
@@ -16632,7 +16575,6 @@ li.select2-results__option[role=group] > strong:hover {
                         break;
                     case 112:
                         {
-                            lastViewedSetting = "Patterns";
                             let bitStringLength = 0;
                             let channelIndex;
                             let largerChords = !((beforeFour && fromJummBox) || fromBeepBox);
@@ -17028,7 +16970,7 @@ li.select2-results__option[role=group] > strong:hover {
                         break;
                     default:
                         {
-                            throw new Error("Unrecognized song tag code " + String.fromCharCode(command) + " at index " + (charIndex - 1) + " while parsing " + lastViewedSetting + " " + compressed.substring(0, charIndex));
+                            throw new Error("Unrecognized song tag code " + String.fromCharCode(command) + " at index " + (charIndex - 1) + " " + compressed.substring(0, charIndex));
                         }
                 }
             if (Config.willReloadForCustomSamples) {
@@ -18171,7 +18113,7 @@ li.select2-results__option[role=group] > strong:hover {
             this._modifiedEnvelopeIndices = [];
             this._modifiedEnvelopeCount = 0;
             this.lowpassCutoffDecayVolumeCompensation = 1.0;
-            const length = 55;
+            const length = 56;
             for (let i = 0; i < length; i++) {
                 this.envelopeStarts[i] = 1.0;
                 this.envelopeEnds[i] = 1.0;
@@ -19192,6 +19134,7 @@ li.select2-results__option[role=group] > strong:hover {
                         if (synth.isModActive(Config.modulators.dictionary["grain range"].index, channelIndex, instrumentIndex)) {
                             grainRange = synth.getModValue(Config.modulators.dictionary["grain range"].index, channelIndex, instrumentIndex, false);
                         }
+                        grainRange *= envelopeStarts[54];
                         const granularMaxGrainSizeInMilliseconds = granularMinGrainSizeInMilliseconds + grainRange;
                         const granularGrainSizeInMilliseconds = granularMinGrainSizeInMilliseconds + (granularMaxGrainSizeInMilliseconds - granularMinGrainSizeInMilliseconds) * Math.random();
                         const granularGrainSizeInSeconds = granularGrainSizeInMilliseconds / 1000.0;
@@ -19445,8 +19388,8 @@ li.select2-results__option[role=group] > strong:hover {
                 this.echoMult = echoMultStart;
                 this.echoMultDelta = Math.max(0.0, (echoMultEnd - echoMultStart) / roundedSamplesPerTick);
                 maxEchoMult = Math.max(echoMultStart, echoMultEnd);
-                const echoDelayEnvelopeStart = envelopeStarts[54];
-                const echoDelayEnvelopeEnd = envelopeEnds[54];
+                const echoDelayEnvelopeStart = envelopeStarts[55];
+                const echoDelayEnvelopeEnd = envelopeEnds[55];
                 let useEchoDelayStart = instrument.echoDelay * echoDelayEnvelopeStart;
                 let useEchoDelayEnd = instrument.echoDelay * echoDelayEnvelopeEnd;
                 if (synth.isModActive(Config.modulators.dictionary["echo delay"].index, channelIndex, instrumentIndex)) {

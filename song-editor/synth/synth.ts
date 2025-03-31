@@ -1658,7 +1658,7 @@ export class Instrument {
     public ringModWaveformIndex: number = 0;
     public granular: number = 4;
     public grainSize: number = (Config.grainSizeMax-Config.grainSizeMin)/Config.grainSizeStep;
-    public grainAmounts: number = 1;
+    public grainAmounts: number = Config.grainAmountsMax;
     public grainRange: number = 40;
     public chorus: number = 0;
     public reverb: number = 0;
@@ -1782,7 +1782,7 @@ export class Instrument {
         this.ringModWaveformIndex = 0;
         this.granular = 4;
         this.grainSize = (Config.grainSizeMax - Config.grainSizeMin) / Config.grainSizeStep;
-        this.grainAmounts = 1;
+        this.grainAmounts = Config.grainAmountsMax;
         this.grainRange = 40;
         this.pan = Config.panCenter;
         this.panDelay = 0;
@@ -4262,7 +4262,6 @@ export class Song {
     }
 
     public fromBase64String(compressed: string, jsonFormat: string = "auto"): void {
-        let lastViewedSetting: string = "url type";
         if (compressed == null || compressed == "") {
             Song._clearSamples();
 
@@ -4340,7 +4339,6 @@ export class Song {
             var compressed_array = compressed.split("|");
             compressed = compressed_array.shift()!;
             if (EditorConfig.customSamples == null || EditorConfig.customSamples.join(", ") != compressed_array.join(", ")) {
-                lastViewedSetting = "customSamples";
 
                 Song._restoreChipWaveListToDefault();
 
@@ -4429,7 +4427,6 @@ export class Song {
             // settings by collecting all the old settings for an instrument and passing them to
             // convertLegacySettings(), so I use this data structure to collect the settings
             // for each instrument if necessary.
-            lastViewedSetting = "legacy settings";
             legacySettingsCache = [];
             for (let i: number = legacySettingsCache.length; i < this.getChannelCount(); i++) {
                 legacySettingsCache[i] = [];
@@ -4446,7 +4443,6 @@ export class Song {
         let useFastTwoNoteArp: boolean = false;
         while (charIndex < compressed.length) switch (command = compressed.charCodeAt(charIndex++)) {
             case SongTagCode.songTitle: {
-                lastViewedSetting = "Song Title";
                 // Length of song name string
                 var songNameLength = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) + base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                 this.title = decodeURIComponent(compressed.substring(charIndex, charIndex + songNameLength));
@@ -4455,7 +4451,6 @@ export class Song {
                 charIndex += songNameLength;
             } break;
             case SongTagCode.channelCount: {
-                lastViewedSetting = "Channel Count";
                 this.pitchChannelCount = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                 this.noiseChannelCount = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                 if (fromBeepBox || (fromJummBox && beforeTwo)) {
@@ -4480,7 +4475,6 @@ export class Song {
                 }
             } break;
             case SongTagCode.scale: {
-                lastViewedSetting = "Scale";
                 this.scale = clamp(0, Config.scales.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                 // All the scales were jumbled around by Jummbox. Just convert to free.
                 if (this.scale == Config.scales["dictionary"]["Custom"].index) {
@@ -4491,7 +4485,6 @@ export class Song {
                 if (fromBeepBox) this.scale = 0;
             } break;
             case SongTagCode.key: {
-                lastViewedSetting = "Key";
                 if (beforeSeven && fromBeepBox) {
                     this.key = clamp(0, Config.keys.length, 11 - base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                     this.octave = 0;
@@ -4514,7 +4507,6 @@ export class Song {
                 }
             } break;
             case SongTagCode.loopStart: {
-                lastViewedSetting = "Loop Start";
                 if (beforeFive && fromBeepBox) {
                     this.loopStart = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                 } else {
@@ -4522,7 +4514,6 @@ export class Song {
                 }
             } break;
             case SongTagCode.loopEnd: {
-                lastViewedSetting = "Loop End";
                 if (beforeFive && fromBeepBox) {
                     this.loopLength = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                 } else {
@@ -4530,7 +4521,6 @@ export class Song {
                 }
             } break;
             case SongTagCode.tempo: {
-                lastViewedSetting = "Tempo";
                 if (beforeFour && fromBeepBox) {
                     this.tempo = [95, 120, 151, 190][base64CharCodeToInt[compressed.charCodeAt(charIndex++)]];
                 } else if (beforeSeven && fromBeepBox) {
@@ -4541,7 +4531,6 @@ export class Song {
                 this.tempo = clamp(Config.tempoMin, Config.tempoMax + 1, this.tempo);
             } break;
             case SongTagCode.reverb: {
-                lastViewedSetting = "Song Reverb (legacy)";
                 if (beforeNine && fromBeepBox) {
                     legacyGlobalReverb = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] * 12;
                     legacyGlobalReverb = clamp(0, Config.reverbRange, legacyGlobalReverb);
@@ -4553,7 +4542,6 @@ export class Song {
                 }
             } break;
             case SongTagCode.beatCount: {
-                lastViewedSetting = "Beats per bar (Time Signature)"
                 if (beforeThree && fromBeepBox) {
                     this.beatsPerBar = [6, 7, 8, 9, 10][base64CharCodeToInt[compressed.charCodeAt(charIndex++)]];
                 } else {
@@ -4562,7 +4550,6 @@ export class Song {
                 this.beatsPerBar = Math.max(Config.beatsPerBarMin, Math.min(Config.beatsPerBarMax, this.beatsPerBar));
             } break;
             case SongTagCode.barCount: {
-                lastViewedSetting = "Song Length";
                 const barCount: number = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) + base64CharCodeToInt[compressed.charCodeAt(charIndex++)] + 1;
                 this.barCount = validateRange(Config.barCountMin, Config.barCountMax, barCount);
                 for (let channelIndex: number = 0; channelIndex < this.getChannelCount(); channelIndex++) {
@@ -4573,7 +4560,6 @@ export class Song {
                 }
             } break;
             case SongTagCode.patternCount: {
-                lastViewedSetting = "Patterns (amount)";
                 let patternsPerChannel: number;
                 if (beforeEight && fromBeepBox) {
                     patternsPerChannel = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] + 1;
@@ -4591,7 +4577,6 @@ export class Song {
                 }
             } break;
             case SongTagCode.instrumentCount: {
-                lastViewedSetting = "Instrument Amount";
                 if ((beforeNine && fromBeepBox) || ((fromJummBox && beforeFive) || (beforeFour && fromGoldBox))) {
                     const instrumentsPerChannel: number = validateRange(Config.instrumentCountMin, Config.patternInstrumentCountMax, base64CharCodeToInt[compressed.charCodeAt(charIndex++)] + Config.instrumentCountMin);
                     this.layeredInstruments = false;
@@ -4635,7 +4620,6 @@ export class Song {
                 }
             } break;
             case SongTagCode.rhythm: {
-                lastViewedSetting = "Rhythm";
                 if (!fromUltraBox && !fromSlarmoosBox) {
                     let newRhythm = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                     this.rhythm = clamp(0, Config.rhythms.length, newRhythm);
@@ -4659,7 +4643,6 @@ export class Song {
                 }
             } break;
             case SongTagCode.channelOctave: {
-                lastViewedSetting = "Channel Octave";
                 if (beforeThree && fromBeepBox) {
                     const channelIndex: number = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                     this.channels[channelIndex].octave = clamp(0, Config.pitchOctaves, base64CharCodeToInt[compressed.charCodeAt(charIndex++)] + 1);
@@ -4679,7 +4662,6 @@ export class Song {
                 }
             } break;
             case SongTagCode.startInstrument: {
-                lastViewedSetting = "Instrument (start parsing)";
                 instrumentIndexIterator++;
                 if (instrumentIndexIterator >= this.channels[instrumentChannelIterator].instruments.length) {
                     instrumentChannelIterator++;
@@ -4726,7 +4708,6 @@ export class Song {
                 }
             } break;
             case SongTagCode.preset: {
-                lastViewedSetting = "Instrument Preset";
                 const presetValue: number = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) | (base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                 this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].preset = presetValue;
                 // Picked string was inserted before custom chip in JB v5, so bump up preset index.
@@ -4754,7 +4735,6 @@ export class Song {
                 }
             } break;
             case SongTagCode.wave: {
-                lastViewedSetting = "Chipwave / Noise";
                 if (beforeThree && fromBeepBox) {
                     const legacyWaves: number[] = [1, 2, 3, 4, 5, 6, 7, 8, 0];
                     const channelIndex: number = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
@@ -4808,7 +4788,6 @@ export class Song {
                 }
             } break;
             case SongTagCode.eqFilter: {
-                lastViewedSetting = "EQ Filter";
                 if ((beforeNine && fromBeepBox) || (beforeFive && fromJummBox) || (beforeFour && fromGoldBox)) {
                     if (beforeSeven && fromBeepBox) {
                         const legacyToCutoff: number[] = [10, 6, 3, 0, 8, 5, 2];
@@ -4917,7 +4896,6 @@ export class Song {
             } break;
             case SongTagCode.loopControls: {
                 if (fromSlarmoosBox || fromUltraBox) {
-                    lastViewedSetting = "Chipwave loop controls (custom samples)";
                     if (beforeThree && fromUltraBox) {
                         // Still have to support the old and bad loop control data format written as a test, sigh.
                         const sampleLoopInfoEncodedLength = decode32BitNumber(compressed, charIndex);
@@ -4977,7 +4955,6 @@ export class Song {
                     }
                 }
                 else if (fromGoldBox && !beforeFour && beforeSix) {
-                    lastViewedSetting = "Legacy Samples (Goldbox)";
                     if (document.URL.substring(document.URL.length - 13).toLowerCase() != "legacysamples") {
                         if (!willLoadLegacySamplesForOldSongs) {
                             willLoadLegacySamplesForOldSongs = true;
@@ -4988,7 +4965,6 @@ export class Song {
                     }
                     this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].chipWave = clamp(0, Config.chipWaves.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)] + 125);
                 } else if ((beforeNine && fromBeepBox) || ((fromJummBox && beforeFive) || (beforeFour && fromGoldBox))) {
-                    lastViewedSetting = "Filter Resonance (legacy)";
                     const filterResonanceRange: number = 8;
                     const instrument: Instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                     const legacySettings: LegacySettings = legacySettingsCache![instrumentChannelIterator][instrumentIndexIterator];
@@ -4998,7 +4974,6 @@ export class Song {
                 } 
             } break;
             case SongTagCode.drumsetEnvelopes: {
-                lastViewedSetting = "Drumset Envelopes";
                 const instrument: Instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                 const pregoldToEnvelope: number[] = [0, 1, 2, 4, 5, 6, 8, 9, 10, 12, 13, 14, 16, 17, 18, 19, 20, 21, 23, 24, 25, 27, 28, 29, 32, 33, 34, 31, 11];
                 if ((beforeNine && fromBeepBox) || (beforeFive && fromJummBox) || (beforeFour && fromGoldBox)) {
@@ -5032,7 +5007,6 @@ export class Song {
                 }
             } break;
             case SongTagCode.pulseWidth: {
-                lastViewedSetting = "Pulse Width";
                 const instrument: Instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                 instrument.pulseWidth = clamp(0, Config.pulseWidthRange + (+(fromJummBox)) + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                 if (fromBeepBox) {
@@ -5050,24 +5024,20 @@ export class Song {
                     instrument.convertLegacySettings(legacySettings, forceSimpleFilter);
                 }
 
-                lastViewedSetting = "Decimal Offset";
                 if ((fromUltraBox && !beforeFour) || fromSlarmoosBox) {
                     instrument.decimalOffset = clamp(0, 99 + 1, (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) + base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                 }
 
             } break;
             case SongTagCode.stringSustain: {
-                lastViewedSetting = "Sustain (Picked String)";
                 const instrument: Instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                 const sustainValue: number = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                 instrument.stringSustain = clamp(0, Config.stringSustainRange, sustainValue & 0x1F);
                 instrument.stringSustainType = Config.enableAcousticSustain ? clamp(0, SustainType.length, sustainValue >> 5) : SustainType.bright;
             } break;
             case SongTagCode.fadeInOut: {
-                lastViewedSetting = "Fade";
                 if ((beforeNine && fromBeepBox) || ((fromJummBox && beforeFive) || (beforeFour && fromGoldBox))) {
                     // this tag was used for a combination of transition and fade in/out.
-                    lastViewedSetting = "Transition + Fade (legacy)";
                     const legacySettings = [
                         { transition: "interrupt", fadeInSeconds: 0.0, fadeOutTicks: -1 },
                         { transition: "normal", fadeInSeconds: 0.0, fadeOutTicks: -3 },
@@ -5143,7 +5113,6 @@ export class Song {
             } break;
             case SongTagCode.songEq: { //deprecated vibrato tag repurposed for songEq
                 if ((beforeNine && fromBeepBox) || ((fromJummBox && beforeFive) || (beforeFour && fromGoldBox))) {
-                    lastViewedSetting = "Vibrato (legacy)";
                     if (beforeSeven && fromBeepBox) {
                         if (beforeThree && fromBeepBox) {
                             const legacyEffects: number[] = [0, 3, 2, 0];
@@ -5235,7 +5204,6 @@ export class Song {
                     }
                 } else {
                     // songeq
-                    lastViewedSetting = "Song EQ";
                     if (fromSlarmoosBox && !beforeFour) { //double check that it's from a valid version
                         const originalControlPointCount: number = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                         this.eqFilter.controlPointCount = clamp(0, Config.filterMaxPoints + 1, originalControlPointCount);
@@ -5280,7 +5248,6 @@ export class Song {
                 }
             } break;
             case SongTagCode.arpeggioSpeed: {
-                lastViewedSetting = "Arp Speed (legacy)";
                 // Deprecated, but supported for legacy purposes
                 if ((fromJummBox && beforeFive) || (beforeFour && fromGoldBox)) {
                     const instrument: Instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
@@ -5292,7 +5259,6 @@ export class Song {
                 }
             } break;
             case SongTagCode.unison: {
-                lastViewedSetting = "Unison";
                 if (beforeThree && fromBeepBox) {
                     const channelIndex: number = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                     const instrument = this.channels[channelIndex].instruments[0];
@@ -5379,7 +5345,6 @@ export class Song {
 
             } break;
             case SongTagCode.chord: {
-                lastViewedSetting = "Chord Type (legacy)";
                 if ((beforeNine && fromBeepBox) || ((fromJummBox && beforeFive) || (beforeFour && fromGoldBox))) {
                     const instrument: Instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                     instrument.chord = clamp(0, Config.chords.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
@@ -5392,7 +5357,6 @@ export class Song {
                 }
             } break;
             case SongTagCode.effects: {
-                lastViewedSetting = "Effects";
                 const instrument: Instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                 if ((beforeNine && fromBeepBox) || ((fromJummBox && beforeFive) || (beforeFour && fromGoldBox))) {
                     instrument.effects = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] & ((1 << EffectType.length) - 1));
@@ -5588,7 +5552,6 @@ export class Song {
                 instrument.effects &= (1 << EffectType.length) - 1;
             } break;
             case SongTagCode.volume: {
-                lastViewedSetting = "Instrument Volume";
                 if (beforeThree && fromBeepBox) {
                     const channelIndex: number = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                     const instrument: Instrument = this.channels[channelIndex].instruments[0];
@@ -5613,7 +5576,6 @@ export class Song {
                 }
             } break;
             case SongTagCode.pan: {
-                lastViewedSetting = "Panning (legacy)";
                 if (beforeNine && fromBeepBox) {
                     // Beepbox has a panMax of 8 (9 total positions), Jummbox has a panMax of 100 (101 total positions)
                     const instrument: Instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
@@ -5630,7 +5592,6 @@ export class Song {
                 }
             } break;
             case SongTagCode.detune: {
-                lastViewedSetting = "Detune (legacy)";
                 const instrument: Instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
 
                 if ((fromJummBox && beforeFive) || (beforeFour && fromGoldBox)) {
@@ -5642,7 +5603,6 @@ export class Song {
                 }
             } break;
             case SongTagCode.customChipWave: {
-                lastViewedSetting = "Custom Chip";
                 let instrument: Instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                 // Pop custom wave values
                 for (let j: number = 0; j < 64; j++) {
@@ -5670,7 +5630,6 @@ export class Song {
 
             } break;
             case SongTagCode.limiterSettings: {
-                lastViewedSetting = "Limiter";
                 let nextValue: number = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
 
                 // Check if limiter settings are used... if not, restore to default
@@ -5690,7 +5649,6 @@ export class Song {
                 }
             } break;
             case SongTagCode.channelNames: {
-                lastViewedSetting = "Channel Names";
                 for (let channel: number = 0; channel < this.getChannelCount(); channel++) {
                     // Length of channel name string. Due to some crazy Unicode characters this needs to be 2 bytes...
                     var channelNameLength;
@@ -5704,7 +5662,6 @@ export class Song {
                 }
             } break;
             case SongTagCode.algorithm: {
-                lastViewedSetting = "FM Algorithm";
                 const instrument: Instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                 if (instrument.type == InstrumentType.fm) {
                     instrument.algorithm = clamp(0, Config.algorithms.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
@@ -5743,7 +5700,6 @@ export class Song {
                 }
             } break;
             case SongTagCode.supersaw: {
-                lastViewedSetting = "Supersaw";
                 if (fromGoldBox && !beforeFour && beforeSix) {
                     //is it more useful to save base64 characters or url length?
                     const chipWaveForCompat = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
@@ -5778,7 +5734,6 @@ export class Song {
                 }
             } break;
             case SongTagCode.feedbackType: {
-                lastViewedSetting = "FM Feedback";
                 const instrument: Instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                 if (instrument.type == InstrumentType.fm) {
                     instrument.feedbackType = clamp(0, Config.feedbacks.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
@@ -5808,11 +5763,9 @@ export class Song {
 
             } break;
             case SongTagCode.feedbackAmplitude: {
-                lastViewedSetting = "FM Feedback amount";
                 this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].feedbackAmplitude = clamp(0, Config.operatorAmplitudeMax + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
             } break;
             case SongTagCode.feedbackEnvelope: {
-                lastViewedSetting = "Feedback Envelope (legacy)";
                 if ((beforeNine && fromBeepBox) || (beforeFive && fromJummBox) || (beforeFour && fromGoldBox)) {
                     const pregoldToEnvelope: number[] = [0, 1, 2, 4, 5, 6, 8, 9, 10, 12, 13, 14, 16, 17, 18, 19, 20, 21, 23, 24, 25, 27, 28, 29, 32, 33, 34, 31, 11];
                     const instrument: Instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
@@ -5827,7 +5780,6 @@ export class Song {
                 }
             } break;
             case SongTagCode.operatorFrequencies: {
-                lastViewedSetting = "FM Operator Frequencies";
                 const instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                 if (beforeThree && fromGoldBox) {
                     const freqToGold3 = [4, 5, 6, 7, 8, 10, 12, 13, 14, 15, 16, 18, 20, 22, 24, 2, 1, 9, 17, 19, 21, 23, 0, 3];
@@ -5851,7 +5803,6 @@ export class Song {
                 }
             } break;
             case SongTagCode.operatorAmplitudes: {
-                lastViewedSetting = "FM Operator Amounts"
                 const instrument: Instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                 for (let o: number = 0; o < (instrument.type == InstrumentType.fm6op ? 6 : Config.operatorCount); o++) {
                     instrument.operators[o].amplitude = clamp(0, Config.operatorAmplitudeMax + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
@@ -5863,7 +5814,6 @@ export class Song {
                 const slarURL3toURL4Envelope: number[] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 8, 9, 10, 11, 12, 13, 14];
                 const instrument: Instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                 if ((beforeNine && fromBeepBox) || (beforeFive && fromJummBox) || (beforeFour && fromGoldBox)) {
-                    lastViewedSetting = "Envelopes (legacy)";
                     const legacySettings: LegacySettings = legacySettingsCache![instrumentChannelIterator][instrumentIndexIterator];
                     legacySettings.operatorEnvelopes = [];
                     for (let o: number = 0; o < (instrument.type == InstrumentType.fm6op ? 6 : Config.operatorCount); o++) {
@@ -5878,13 +5828,11 @@ export class Song {
                     // JB v6 adds some envelope options here in the sequence.
                     let envelopeDiscrete: boolean = false;
                     if ((fromJummBox && !beforeSix) || (fromUltraBox && !beforeFive) || (fromSlarmoosBox)) {
-                        lastViewedSetting = "Envelope Speed";
                         instrument.envelopeSpeed = clamp(0, Config.modulators.dictionary["envelope speed"].maxRawVol + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                         if(!fromSlarmoosBox || beforeFive) {
                             envelopeDiscrete = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)]) ? true : false;
                         }
                     }
-                    lastViewedSetting = "Envelopes " + ((fromSlarmoosBox && !beforeThree) ? "(advanced)" : "(simple)");
                     for (let i: number = 0; i < envelopeCount; i++) {
                         const target: number = clamp(0, Config.instrumentAutomationTargets.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                         let index: number = 0;
@@ -5996,7 +5944,6 @@ export class Song {
                 }
             } break;
             case SongTagCode.operatorWaves: {
-                lastViewedSetting = "FM Operator Waveforms";
                 const instrument: Instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
 
                 if (beforeThree && fromGoldBox) {
@@ -6029,7 +5976,6 @@ export class Song {
 
             } break;
             case SongTagCode.spectrum: {
-                lastViewedSetting = "Spectrum";
                 const instrument: Instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                 if (instrument.type == InstrumentType.spectrum) {
                     const byteCount: number = Math.ceil(Config.spectrumControlPoints * Config.spectrumControlPointBits / 6)
@@ -6054,7 +6000,6 @@ export class Song {
                 }
             } break;
             case SongTagCode.harmonics: {
-                lastViewedSetting = "Harmonics";
                 const instrument: Instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                 const byteCount: number = Math.ceil(Config.harmonicsControlPoints * Config.harmonicsControlPointBits / 6);
                 const bits: BitFieldReader = new BitFieldReader(compressed, charIndex, charIndex + byteCount);
@@ -6065,7 +6010,6 @@ export class Song {
                 charIndex += byteCount;
             } break;
             case SongTagCode.aliases: {
-                lastViewedSetting = "Aliases + Distortion";
                 if ((fromJummBox && beforeFive) || (fromGoldBox && beforeFour)) {
                     const instrument: Instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                     instrument.aliases = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)]) ? true : false;
@@ -6074,7 +6018,6 @@ export class Song {
                         instrument.effects |= 1 << EffectType.distortion;
                     }
                 } else {
-                    lastViewedSetting = "Decimal Offset";
                     if (fromUltraBox || fromSlarmoosBox) {
                         const instrument: Instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                         instrument.decimalOffset = clamp(0, 50 + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
@@ -6083,7 +6026,6 @@ export class Song {
             }
                 break;
             case SongTagCode.bars: {
-                lastViewedSetting = "Bars";
                 let subStringLength: number;
                 if (beforeThree && fromBeepBox) {
                     const channelIndex: number = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
@@ -6117,7 +6059,6 @@ export class Song {
                 charIndex += subStringLength;
             } break;
             case SongTagCode.patterns: {
-                lastViewedSetting = "Patterns";
                 let bitStringLength: number = 0;
                 let channelIndex: number;
                 let largerChords: boolean = !((beforeFour && fromJummBox) || fromBeepBox);
@@ -6560,7 +6501,7 @@ export class Song {
                 }
             } break;
             default: {
-                throw new Error("Unrecognized song tag code " + String.fromCharCode(command) + " at index " + (charIndex - 1) + " while parsing " + lastViewedSetting + " " + compressed.substring(/*charIndex - 2*/0, charIndex));
+                throw new Error("Unrecognized song tag code " + String.fromCharCode(command) + " at index " + (charIndex - 1) + " " + compressed.substring(/*charIndex - 2*/0, charIndex));
             } break;
         }
 
@@ -8922,6 +8863,7 @@ class InstrumentState {
                     if (synth.isModActive(Config.modulators.dictionary["grain range"].index, channelIndex, instrumentIndex)) {
                         grainRange = synth.getModValue(Config.modulators.dictionary["grain range"].index, channelIndex, instrumentIndex, false);
                     }
+                    grainRange *= envelopeStarts[EnvelopeComputeIndex.grainRange];
                     const granularMaxGrainSizeInMilliseconds: number = granularMinGrainSizeInMilliseconds + grainRange;
                     const granularGrainSizeInMilliseconds: number = granularMinGrainSizeInMilliseconds + (granularMaxGrainSizeInMilliseconds - granularMinGrainSizeInMilliseconds) * Math.random();
                     const granularGrainSizeInSeconds: number = granularGrainSizeInMilliseconds / 1000.0;

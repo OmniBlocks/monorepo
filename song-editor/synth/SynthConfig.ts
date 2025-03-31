@@ -152,6 +152,7 @@ export const enum EnvelopeComputeIndex {
     granular,
     grainAmount,
     grainSize,
+    grainRange,
     echoDelay,
     //Add more here
 
@@ -1221,7 +1222,7 @@ export class Config {
     public static readonly grainSizeStep: number = 40;
     public static readonly grainRangeMax: number = 1600;
     public static readonly grainAmountsMax: number = 10; //2^grainAmountsMax is what is actually used
-    public static readonly granularEnvelopeType: number = GranularEnvelopeType.parabolic; //here you can change which envelope implementation is used for grains
+    public static readonly granularEnvelopeType: number = GranularEnvelopeType.parabolic; //here you can change which envelope implementation is used for grains (RaisedCosineBell still needs work)
     public static readonly chorusRange: number = 8;
     public static readonly chorusPeriodSeconds: number = 2.0;
     public static readonly chorusDelayRange: number = 0.0034;
@@ -1678,6 +1679,7 @@ export class Config {
         { name: "granular", computeIndex: EnvelopeComputeIndex.granular, displayName: "granular", interleave: false, isFilter: false, maxCount: 1, effect: EffectType.granular, compatibleInstruments: null },
         { name: "grainFreq", computeIndex: EnvelopeComputeIndex.grainAmount, displayName: "grain freq", interleave: false, isFilter: false, maxCount: 1, effect: EffectType.granular, compatibleInstruments: null },
         { name: "grainSize", computeIndex: EnvelopeComputeIndex.grainSize, displayName: "grain size", interleave: false, isFilter: false, maxCount: 1, effect: EffectType.granular, compatibleInstruments: null },
+        { name: "grainRange", computeIndex: EnvelopeComputeIndex.grainRange, displayName: "grain range", interleave: false, isFilter: false, maxCount: 1, effect: EffectType.granular, compatibleInstruments: null },
         { name: "echoDelay", computeIndex: EnvelopeComputeIndex.echoDelay, displayName: "echo delay", interleave: false, isFilter: false, maxCount: 1, effect: EffectType.echo, compatibleInstruments: null }, // wait until after we're computing a tick's settings for multiple run lengths.
         // Controlling filter gain is less obvious and intuitive than controlling filter freq, so to avoid confusion I've disabled it for now...
         //{name: "noteFilterGain",         computeIndex:       EnvelopeComputeIndex.noteFilterGain0,        displayName: "n. filter # vol",  /*perNote:  true,*/ interleave: false, isFilter:  true, range: Config.filterGainRange,             maxCount: Config.filterMaxPoints, effect: EffectType.noteFilter, compatibleInstruments: null},

@@ -213,7 +213,9 @@
         // blubox desktop plants 
         "⚡", "🔵", "💫",
         // Slarmoo's Box plants
-        "✨", "🌈", "🌧️", "🪨", "🐍", "🌲", "🌳", "𓆏", "🦀"
+        "✨", "🌈", "🌧️", "🪨", "🐍", "🌲", "🌳", "𓆏", "🦀", "🍄‍🟫",
+        //Current version
+        "1.4"
     ];
     const date = new Date();
     if (Math.floor(Math.random() * 3) == 0) { //more than doubled chance for a plant to show up
@@ -228,16 +230,21 @@
         if ((date.getDate() == 31) && date.getMonth() == 9) {
             document.getElementById("goldboxPlant").innerHTML = "  " + spookyPlants[(Math.floor(Math.random() * spookyPlants.length))];
         }
+        //Slarmoo's Box valentines plants
+        const heartPlants = ["❤️", "🧡", "💛", "💚", "💙", "💜"];
+        if ((date.getDate() >= 13 && date.getDate() <= 15) && date.getMonth() == 1) {
+            document.getElementById("goldboxPlant").innerHTML = "  " + heartPlants[(Math.floor(Math.random() * heartPlants.length))];
+        }
     }
     if ((date.getDate() == 1) && date.getMonth() == 3) {
-        document.getElementById("goldboxPlant").innerHTML = "  Happy Halloween!";
+        const foolishPlants = ["Censorship Update", "19.8.4", "👁️", "🐍", "🚫"];
+        document.getElementById("goldboxPlant").innerHTML = "  " + foolishPlants[(Math.floor(Math.random() * foolishPlants.length))];
     }
     if ((date.getDate() == 13) && date.getMonth() == 4) {
         const years = date.getFullYear() - 2024;
         const birthdayPlants = [years + " year" + (years != 1 ? "s" : "") + "!", "🎂", "🎉", "Happy Birthday!", "Anniversary"];
         document.getElementById("goldboxPlant").innerHTML = "  " + birthdayPlants[(Math.floor(Math.random() * birthdayPlants.length))];
     }
-
 
         if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|android|ipad|playbook|silk/i.test(navigator.userAgent)) {
             document.getElementById("introduction").innerHTML = "Slarmoo's Box is an online tool for sketching and sharing chiptune melodies. Make sure that your volume is turned up, then press the play button!";
@@ -268,7 +275,11 @@
             // Go ahead and load js beepbox editor interface:
             var fileref = document.createElement("script");
             fileref.setAttribute("type", "text/javascript");
-            fileref.setAttribute("src", "beepbox_editor.min.js");
+            if ((date.getDate() == 1) && date.getMonth() == 3) {
+                fileref.setAttribute("src", "foolish_editor.min.js");
+            } else {
+                fileref.setAttribute("src", "beepbox_editor.min.js");
+            }
             document.head.appendChild(fileref);
         } else {
             document.getElementById("beepboxEditorContainer").innerHTML = "Sorry, Slarmoo's Box doesn't support your browser. Try a recent version of Chrome, Firefox, Edge, Safari, or Opera.";

@@ -4004,9 +4004,9 @@ export class Song {
                         }
                     }
                     //inverse
-                    let checkboxValues: number = +instrument.envelopes[envelopeIndex].inverse;
+                    let checkboxValues: number = +instrument.envelopes[envelopeIndex].discrete;
                     checkboxValues = checkboxValues << 1;
-                    checkboxValues += +instrument.envelopes[envelopeIndex].discrete;
+                    checkboxValues += +instrument.envelopes[envelopeIndex].inverse;
                     buffer.push(base64IntToCharCode[checkboxValues] ? base64IntToCharCode[checkboxValues] : base64IntToCharCode[0]);
                     //midbox envelope port
                     if (Config.newEnvelopes[instrument.envelopes[envelopeIndex].envelope].name != "pitch" && Config.newEnvelopes[instrument.envelopes[envelopeIndex].envelope].name != "note size" && Config.newEnvelopes[instrument.envelopes[envelopeIndex].envelope].name != "punch" && Config.newEnvelopes[instrument.envelopes[envelopeIndex].envelope].name != "none") {
@@ -5907,9 +5907,9 @@ export class Song {
                             } 
                             let checkboxValues: number = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                             if (fromSlarmoosBox && !beforeFive) {
-                                envelopeDiscrete = (checkboxValues & 1) == 1 ? true : false;
+                                envelopeDiscrete = (checkboxValues >> 1) == 1 ? true : false;
                             }
-                            envelopeInverse = (checkboxValues >> 1) == 1 ? true : false;
+                            envelopeInverse = (checkboxValues & 1) == 1 ? true : false;
                             if (Config.newEnvelopes[envelope].name != "pitch" && Config.newEnvelopes[envelope].name != "note size" && Config.newEnvelopes[envelope].name != "punch" && Config.newEnvelopes[envelope].name != "none") {
                                 perEnvelopeSpeed = Config.perEnvelopeSpeedIndices[base64CharCodeToInt[compressed.charCodeAt(charIndex++)]];
                             }

@@ -14585,9 +14585,9 @@ li.select2-results__option[role=group] > strong:hover {
                                 buffer.push(base64IntToCharCode[instrument.envelopes[envelopeIndex].steps]);
                             }
                         }
-                        let checkboxValues = +instrument.envelopes[envelopeIndex].inverse;
+                        let checkboxValues = +instrument.envelopes[envelopeIndex].discrete;
                         checkboxValues = checkboxValues << 1;
-                        checkboxValues += +instrument.envelopes[envelopeIndex].discrete;
+                        checkboxValues += +instrument.envelopes[envelopeIndex].inverse;
                         buffer.push(base64IntToCharCode[checkboxValues] ? base64IntToCharCode[checkboxValues] : base64IntToCharCode[0]);
                         if (Config.newEnvelopes[instrument.envelopes[envelopeIndex].envelope].name != "pitch" && Config.newEnvelopes[instrument.envelopes[envelopeIndex].envelope].name != "note size" && Config.newEnvelopes[instrument.envelopes[envelopeIndex].envelope].name != "punch" && Config.newEnvelopes[instrument.envelopes[envelopeIndex].envelope].name != "none") {
                             buffer.push(base64IntToCharCode[Config.perEnvelopeSpeedToIndices[instrument.envelopes[envelopeIndex].perEnvelopeSpeed]]);
@@ -16414,9 +16414,9 @@ li.select2-results__option[role=group] > strong:hover {
                                         }
                                         let checkboxValues = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                                         if (fromSlarmoosBox && !beforeFive) {
-                                            envelopeDiscrete = (checkboxValues & 1) == 1 ? true : false;
+                                            envelopeDiscrete = (checkboxValues >> 1) == 1 ? true : false;
                                         }
-                                        envelopeInverse = (checkboxValues >> 1) == 1 ? true : false;
+                                        envelopeInverse = (checkboxValues & 1) == 1 ? true : false;
                                         if (Config.newEnvelopes[envelope].name != "pitch" && Config.newEnvelopes[envelope].name != "note size" && Config.newEnvelopes[envelope].name != "punch" && Config.newEnvelopes[envelope].name != "none") {
                                             perEnvelopeSpeed = Config.perEnvelopeSpeedIndices[base64CharCodeToInt[compressed.charCodeAt(charIndex++)]];
                                         }

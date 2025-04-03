@@ -85,8 +85,6 @@ export class EnvelopeEditor {
 		const endSliderIndex: number = this._pitchEndSliders.indexOf(<any>event.target);
 		const lowerBoundBoxIndex: number = this.perEnvelopeLowerBoundBoxes.indexOf(<any>event.target);
 		const upperBoundBoxIndex: number = this.perEnvelopeUpperBoundBoxes.indexOf(<any>event.target);
-		// const lowerBoundSliderIndex: number = this.perEnvelopeLowerBoundSliders.indexOf(<any>event.target);
-		// const upperBoundSliderIndex: number = this.perEnvelopeUpperBoundSliders.indexOf(<any>event.target);
 		const randomStepsBoxIndex: number = this.randomStepsBoxes.indexOf(<any>event.target);
 		const randomSeedBoxIndex: number = this.randomSeedBoxes.indexOf(<any>event.target);
 		const randomStepsSliderIndex: number = this._randomStepsSliders.indexOf(<any>event.target);
@@ -118,9 +116,8 @@ export class EnvelopeEditor {
 			this._doc.record(new ChangeDiscreteEnvelope(this._doc, this._discreters[discreterIndex].checked, discreterIndex));
 
 		} else if (startBoxIndex != -1 || endBoxIndex != -1 || startSliderIndex != -1 || endSliderIndex != -1 ||
-			lowerBoundBoxIndex != -1 || upperBoundBoxIndex != -1 /*|| lowerBoundSliderIndex != -1 || upperBoundSliderIndex != -1*/ ||
-			randomStepsBoxIndex != -1 || randomSeedBoxIndex != -1 || randomStepsSliderIndex != -1 || randomSeedSliderIndex != -1 ||
-			LFOStepsBoxIndex != -1 || LFOStepsSliderIndex != -1) {
+			lowerBoundBoxIndex != -1 || upperBoundBoxIndex != -1 || randomStepsBoxIndex != -1 || randomSeedBoxIndex != -1 ||
+			randomStepsSliderIndex != -1 || randomSeedSliderIndex != -1 || LFOStepsBoxIndex != -1 || LFOStepsSliderIndex != -1) {
 			if (this._lastChange != null) {
 				this._doc.record(this._lastChange);
 				this._lastChange = null;
@@ -151,8 +148,6 @@ export class EnvelopeEditor {
 		const endSliderIndex: number = this._pitchEndSliders.indexOf(<any>event.target);
 		const lowerBoundBoxIndex: number = this.perEnvelopeLowerBoundBoxes.indexOf(<any>event.target);
 		const upperBoundBoxIndex: number = this.perEnvelopeUpperBoundBoxes.indexOf(<any>event.target);
-		// const lowerBoundSliderIndex: number = this._perEnvelopeLowerBoundSliders.indexOf(<any>event.target);
-		// const upperBoundSliderIndex: number = this._perEnvelopeUpperBoundSliders.indexOf(<any>event.target);
 		const randomStepsBoxIndex: number = this.randomStepsBoxes.indexOf(<any>event.target);
 		const randomSeedBoxIndex: number = this.randomSeedBoxes.indexOf(<any>event.target);
 		const randomStepsSliderIndex: number = this._randomStepsSliders.indexOf(<any>event.target);
@@ -172,10 +167,6 @@ export class EnvelopeEditor {
 			this._lastChange = new ChangeEnvelopeLowerBound(this._doc, instrument.envelopes[lowerBoundBoxIndex].perEnvelopeLowerBound, parseFloat(this.perEnvelopeLowerBoundBoxes[lowerBoundBoxIndex].value), lowerBoundBoxIndex);
 		} else if (upperBoundBoxIndex != -1) {
 			this._lastChange = new ChangeEnvelopeUpperBound(this._doc, instrument.envelopes[upperBoundBoxIndex].perEnvelopeUpperBound, parseFloat(this.perEnvelopeUpperBoundBoxes[upperBoundBoxIndex].value), upperBoundBoxIndex);
-		// } else if (lowerBoundSliderIndex != -1) {
-		// 	this._lastChange = new ChangeEnvelopeLowerBound(this._doc, parseFloat(this._perEnvelopeLowerBoundSliders[lowerBoundSliderIndex].value), lowerBoundSliderIndex);
-		// } else if (upperBoundSliderIndex != -1) {
-		// 	this._lastChange = new ChangeEnvelopeUpperBound(this._doc, parseFloat(this._perEnvelopeUpperBoundSliders[upperBoundSliderIndex].value), upperBoundSliderIndex);
 		} else if (randomStepsBoxIndex != -1) {
 			this._lastChange = new ChangeRandomEnvelopeSteps(this._doc, parseFloat(this.randomStepsBoxes[randomStepsBoxIndex].value), randomStepsBoxIndex);
 		} else if (randomSeedBoxIndex != -1) {

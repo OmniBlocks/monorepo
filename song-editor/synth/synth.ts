@@ -1388,6 +1388,8 @@ export class EnvelopeSettings {
     public perEnvelopeUpperBound: number = 1;
     //modulation support
     public tempEnvelopeSpeed: number | null = null;
+    public tempEnvelopeLowerBound: number | null = null;
+    public tempEnvelopeUpperBound: number | null = null;
     //pseudo random
     public steps: number = 2;
     public seed: number = 2;
@@ -1412,6 +1414,8 @@ export class EnvelopeSettings {
         this.perEnvelopeLowerBound = 0;
         this.perEnvelopeUpperBound = 1;
         this.tempEnvelopeSpeed = null;
+        this.tempEnvelopeLowerBound = null;
+        this.tempEnvelopeUpperBound = null;
         this.steps = 2;
         this.seed = 2;
         this.waveform = LFOEnvelopeTypes.sine;
@@ -4083,7 +4087,9 @@ export class Song {
 
                         //write envelope info only if needed
                         if (Config.modulators[instrument.modulators[mod]].name == "individual envelope speed" ||
-                            Config.modulators[instrument.modulators[mod]].name == "reset envelope"
+                            Config.modulators[instrument.modulators[mod]].name == "reset envelope" ||
+                            Config.modulators[instrument.modulators[mod]].name == "individual envelope lower bound" ||
+                            Config.modulators[instrument.modulators[mod]].name == "individual envelope upper bound"
                         ) {
                             bits.write(6, modEnvelope);
                         }
@@ -6166,7 +6172,9 @@ export class Song {
                                 }
 
                                 if (Config.modulators[instrument.modulators[mod]].name == "individual envelope speed" ||
-                                    Config.modulators[instrument.modulators[mod]].name == "reset envelope"
+                                    Config.modulators[instrument.modulators[mod]].name == "reset envelope" ||
+                                    Config.modulators[instrument.modulators[mod]].name == "individual envelope lower bound" ||
+                                    Config.modulators[instrument.modulators[mod]].name == "individual envelope upper bound"
                                 ) {
                                     instrument.modEnvelopeNumbers[mod] = bits.read(6);
                                 }
@@ -7818,7 +7826,7 @@ class EnvelopeComputer {
         this.startPinTickPitch = null;
     }
 
-    public computeEnvelopes(instrument: Instrument, currentPart: number, tickTimeStart: number[], tickTimeStartReal: number, secondsPerTick: number, tone: Tone | null, timeScale: number[], instrumentState: InstrumentState, synth: Synth): void {
+    public computeEnvelopes(instrument: Instrument, currentPart: number, tickTimeStart: number[], tickTimeStartReal: number, secondsPerTick: number, tone: Tone | null, timeScale: number[], instrumentState: InstrumentState, synth: Synth, channelIndex: number, instrumentIndex: number): void {
         const secondsPerTickUnscaled: number = secondsPerTick;
         const transition: Transition = instrument.getTransition();
         if (tone != null && tone.atNoteStart && !transition.continues && !tone.forceContinueAtStart) {
@@ -7952,10 +7960,21 @@ class EnvelopeComputer {
                 isDiscrete = instrument.envelopes[envelopeIndex].discrete;
                 perEnvelopeSpeed = instrument.envelopes[envelopeIndex].perEnvelopeSpeed;
                 globalEnvelopeSpeed = Math.pow(instrument.envelopeSpeed, 2) / 144;
-                envelopeSpeed = perEnvelopeSpeed == 0 || globalEnvelopeSpeed == 0 ? perEnvelopeSpeed + globalEnvelopeSpeed : perEnvelopeSpeed * globalEnvelopeSpeed;
-                const boundsCorrect: boolean = instrument.envelopes[envelopeIndex].perEnvelopeLowerBound <= instrument.envelopes[envelopeIndex].perEnvelopeUpperBound;
-                perEnvelopeLowerBound = boundsCorrect ? instrument.envelopes[envelopeIndex].perEnvelopeLowerBound : 0;
-                perEnvelopeUpperBound = boundsCorrect ? instrument.envelopes[envelopeIndex].perEnvelopeUpperBound : 1;
+                envelopeSpeed = perEnvelopeSpeed * globalEnvelopeSpeed;
+
+                perEnvelopeLowerBound = instrument.envelopes[envelopeIndex].perEnvelopeLowerBound;
+                perEnvelopeUpperBound = instrument.envelopes[envelopeIndex].perEnvelopeUpperBound;
+                if (synth.isModActive(Config.modulators.dictionary["individual envelope lower bound"].index, channelIndex, instrumentIndex) && instrument.envelopes[envelopeIndex].tempEnvelopeLowerBound != null) { //modulation
+                    perEnvelopeLowerBound = instrument.envelopes[envelopeIndex].tempEnvelopeLowerBound!;
+                }
+                if (synth.isModActive(Config.modulators.dictionary["individual envelope upper bound"].index, channelIndex, instrumentIndex) && instrument.envelopes[envelopeIndex].tempEnvelopeUpperBound != null) { //modulation
+                    perEnvelopeUpperBound = instrument.envelopes[envelopeIndex].tempEnvelopeUpperBound!;
+                }
+                if (!(perEnvelopeLowerBound <= perEnvelopeUpperBound)) { //reset bounds if incorrect
+                    perEnvelopeLowerBound = 0;
+                    perEnvelopeUpperBound = 1;
+                }
+
                 timeSinceStart = synth.computeTicksSinceStart();
                 steps = instrument.envelopes[envelopeIndex].steps;
                 seed = instrument.envelopes[envelopeIndex].seed;
@@ -8834,7 +8853,7 @@ class InstrumentState {
             }
             envelopeSpeeds[envelopeIndex] = useEnvelopeSpeed * perEnvelopeSpeed;
         }
-        this.envelopeComputer.computeEnvelopes(instrument, currentPart, this.envelopeTime, tickTimeStart, secondsPerTick, tone, envelopeSpeeds, this, synth);
+        this.envelopeComputer.computeEnvelopes(instrument, currentPart, this.envelopeTime, tickTimeStart, secondsPerTick, tone, envelopeSpeeds, this, synth, channelIndex, instrumentIndex);
         const envelopeStarts: number[] = this.envelopeComputer.envelopeStarts;
         const envelopeEnds: number[] = this.envelopeComputer.envelopeEnds;
 
@@ -11000,7 +11019,7 @@ export class Synth {
                         } else {
                             tone = new Tone;
                         }
-                        envelopeComputer.computeEnvelopes(instrument, currentPart, instrumentState.envelopeTime, tickTimeStart, secondsPerTick, tone, envelopeSpeeds, instrumentState, this);
+                        envelopeComputer.computeEnvelopes(instrument, currentPart, instrumentState.envelopeTime, tickTimeStart, secondsPerTick, tone, envelopeSpeeds, instrumentState, this, channel, instrumentIdx);
                         const envelopeStarts: number[] = envelopeComputer.envelopeStarts;
                         //const envelopeEnds: number[] = envelopeComputer.envelopeEnds;
 
@@ -12090,7 +12109,7 @@ export class Synth {
             }
             envelopeSpeeds[envelopeIndex] = useEnvelopeSpeed;
         }
-        envelopeComputer.computeEnvelopes(instrument, currentPart, instrumentState.envelopeTime, Config.ticksPerPart * partTimeStart, samplesPerTick / this.samplesPerSecond, tone, envelopeSpeeds, instrumentState, this);
+        envelopeComputer.computeEnvelopes(instrument, currentPart, instrumentState.envelopeTime, Config.ticksPerPart * partTimeStart, samplesPerTick / this.samplesPerSecond, tone, envelopeSpeeds, instrumentState, this, channelIndex, tone.instrumentIndex);
         const envelopeStarts: number[] = tone.envelopeComputer.envelopeStarts;
         const envelopeEnds: number[] = tone.envelopeComputer.envelopeEnds;
         instrument.noteFilter = tmpNoteFilter;
@@ -12768,6 +12787,7 @@ export class Synth {
             if (isMono && tone.pitchCount <= instrument.monoChordTone) { //silence if tone doesn't exist
                 expressionStart = 0;
                 expressionEnd = 0;
+                instrumentState.awake = false;
             }
 
             tone.expression = expressionStart;
@@ -15260,7 +15280,23 @@ export class Synth {
                         tgtInstrument.envelopes[envelopeTarget].tempEnvelopeSpeed = speed;
                     }
                 }
+            } else if (setting == Config.modulators.dictionary["individual envelope lower bound"].index) {
+                const tgtInstrument = synth.song.channels[instrument.modChannels[mod]].instruments[usedInstruments[instrumentIndex]];
+                let envelopeTarget = instrument.modEnvelopeNumbers[mod];
 
+                let bound: number = tone.expression + tone.expressionDelta;
+                if (tgtInstrument.envelopeCount > envelopeTarget) {
+                    tgtInstrument.envelopes[envelopeTarget].tempEnvelopeLowerBound = bound/10;
+                }
+            } else if (setting == Config.modulators.dictionary["individual envelope upper bound"].index) {
+                const tgtInstrument = synth.song.channels[instrument.modChannels[mod]].instruments[usedInstruments[instrumentIndex]];
+                let envelopeTarget = instrument.modEnvelopeNumbers[mod];
+
+                let bound: number = tone.expression + tone.expressionDelta;
+                if (tgtInstrument.envelopeCount > envelopeTarget) {
+                    tgtInstrument.envelopes[envelopeTarget].tempEnvelopeUpperBound = bound / 10;
+                }
+                console.log(tgtInstrument.envelopes[envelopeTarget]);
             }
         }
     }

@@ -5303,8 +5303,8 @@ export class ChangeEnvelopeUpperBound extends IndexableChange {
         bound = bound > Config.perEnvelopeBoundMax ? Config.perEnvelopeBoundMax : bound < Config.perEnvelopeBoundMin ? Config.perEnvelopeBoundMin : Math.round(bound * 10) != bound * 10 ? Config.perEnvelopeBoundMin : bound;
         this._instrument.envelopes[index].perEnvelopeUpperBound = bound;
         doc.synth.unsetMod(Config.modulators.dictionary["individual envelope upper bound"].index, doc.channel, doc.getCurrentInstrument());
-        this._didSomething();
-        if (oldBound != bound) doc.notifier.changed();
+        doc.notifier.changed();
+        if (oldBound != bound) this._didSomething();
     }
 }
 

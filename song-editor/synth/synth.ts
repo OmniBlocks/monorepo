@@ -12992,7 +12992,8 @@ export class Synth {
         const unisonSign = tone.specialIntervalExpressionMult * instrumentState.unisonSign;
         `
         for (let i: number = 0; i < voiceCount; i++) {
-            chipSource += `let phaseDelta# = tone.phaseDeltas[#] * waveLength;
+            chipSource += `
+            let phaseDelta# = tone.phaseDeltas[#] * waveLength;
             let direction# = tone.directions[#];
             let chipWaveCompletion# = tone.chipWaveCompletions[#];
             let phaseDeltaScale# = +tone.phaseDeltaScales[#];
@@ -13004,7 +13005,8 @@ export class Synth {
         }
         
         for (let i: number = 0; i < voiceCount; i++) {
-            chipSource += `let phase# = Synth.wrap(tone.phases[#], 1) * waveLength;
+            chipSource += `
+            let phase# = Synth.wrap(tone.phases[#], 1) * waveLength;
             let prevWaveIntegral# = 0.0;
             `.replaceAll("#", i + "");
         }
@@ -13039,7 +13041,8 @@ export class Synth {
         const chipWaveCompletionFadeLength = 1000;
         if (!aliases) {`
             for (let i: number = 0; i < voiceCount; i++) {
-                chipSource += `const phase#Int = Math.floor(phase#);
+                chipSource += `
+                const phase#Int = Math.floor(phase#);
                 const index# = Synth.wrap(phase#Int, waveLength);
                 prevWaveIntegral# = +wave[index#]
                 const phaseRatio# = phase# - phase#Int;
@@ -13159,7 +13162,8 @@ export class Synth {
                 let wave# = 0;
                 `.replaceAll("#", i + "");
             }
-            chipSource += `let inputSample = 0;
+            chipSource += `
+            let inputSample = 0;
             if (aliases) {
             `
             for (let i: number = 0; i < voiceCount; i++) {
@@ -13167,6 +13171,7 @@ export class Synth {
                 wave# = wave[Synth.wrap(Math.floor(phase#), waveLength)];
                 prevWave# = wave#;
                 const completionFade# = chipWaveCompletion# > 0 ? ((chipWaveCompletionFadeLength - Math.min(chipWaveCompletion#, chipWaveCompletionFadeLength)) / chipWaveCompletionFadeLength) : 1;
+                inputSample = 0;
                 if (chipWaveCompletion# > 0) {
                     inputSample += lastWave# * completionFade#;
                 } else {
@@ -13190,7 +13195,8 @@ export class Synth {
                 chipSource += `if (!(chipWaveLoopStart === 0 && chipWaveLoopEnd === waveLength) && wrapped !== 0) {
                     `
                 for (let i: number = 0; i < voiceCount; i++) {
-                    chipSource += `let pwi# = 0;
+                    chipSource += `
+                    let pwi# = 0;
                     const phase#_ = Math.max(0, phase# - phaseDelta# * direction#);
                     const phase#Int = Math.floor(phase#_);
                     const index# = Synth.wrap(phase#Int, waveLength);
@@ -13220,7 +13226,8 @@ export class Synth {
                 }
             }
             for (let i: number = 0; i < voiceCount; i++) {
-                chipSource += `prevWave# = wave#;
+                chipSource += `
+                prevWave# = wave#;
                 prevWaveIntegral# = nextWaveIntegral#;
                 const completionFade# = chipWaveCompletion# > 0 ? ((chipWaveCompletionFadeLength - Math.min(chipWaveCompletion#, chipWaveCompletionFadeLength)) / chipWaveCompletionFadeLength) : 1;
                 if (chipWaveCompletion# > 0) {
@@ -13243,7 +13250,8 @@ export class Synth {
             }
             chipSource += "}"
             for (let i: number = 0; i < voiceCount; i++) {
-                chipSource += `tone.phases[#] = phase# / waveLength;
+                chipSource += `
+                tone.phases[#] = phase# / waveLength;
                 tone.phaseDeltas[#] = phaseDelta# / waveLength;
                 tone.directions[#] = direction#;
                 tone.chipWaveCompletions[#] = chipWaveCompletion#;
@@ -13252,10 +13260,11 @@ export class Synth {
 
                     `.replaceAll("#", i + "");
             }
-            chipSource += `tone.expression = expression;
-        synth.sanitizeFilters(filters);
-        tone.initialNoteFilterInput1 = initialFilterInput1;
-        tone.initialNoteFilterInput2 = initialFilterInput2;
+            chipSource += `
+            tone.expression = expression;
+            synth.sanitizeFilters(filters);
+            tone.initialNoteFilterInput1 = initialFilterInput1;
+            tone.initialNoteFilterInput2 = initialFilterInput2;
         }`
          
             chipFunction = new Function("Config", "Synth", "effectsIncludeDistortion", chipSource)(Config, Synth, effectsIncludeDistortion);

@@ -22642,6 +22642,7 @@ li.select2-results__option[role=group] > strong:hover {
                 let chipSource = "return (synth, bufferIndex, roundedSamplesPerTick, tone, instrumentState) => {";
                 chipSource += `
         const aliases = (effectsIncludeDistortion(instrumentState.effects) && instrumentState.aliases);
+        const chipWaveLoopMode = instrumentState.chipWaveLoopMode;
         // const aliases = false;
         const data = synth.tempMonoInstrumentSampleBuffer;
         const wave = instrumentState.wave;
@@ -22854,22 +22855,20 @@ li.select2-results__option[role=group] > strong:hover {
 
                 `.replaceAll("#", i + "");
                 }
-                if (!(chipWaveLoopMode === 0)) {
-                    chipSource += `if (!(chipWaveLoopStart === 0 && chipWaveLoopEnd === waveLength) && wrapped !== 0) {
+                chipSource += `if (!(chipWaveLoopMode === 0 && chipWaveLoopStart === 0 && chipWaveLoopEnd === waveLength) && wrapped !== 0) {
                     `;
-                    for (let i = 0; i < voiceCount; i++) {
-                        chipSource += `
+                for (let i = 0; i < voiceCount; i++) {
+                    chipSource += `
                     let pwi# = 0;
                     const phase#_ = Math.max(0, phase# - phaseDelta# * direction#);
-                    const phase#Int = Math.floor(phase#_);
-                    const index# = Synth.wrap(phase#Int, waveLength);
+                    const phase#Int_ = Math.floor(phase#_);
+                    const index#_ = Synth.wrap(phase#Int_, waveLength);
                     pwi# = wave[index#];
-                    pwi# += (wave[Synth.wrap(index# + 1, waveLength)] - pwi#) * (phase#_ - phase#Int) * direction#;
+                    pwi# += (wave[Synth.wrap(index#_ + 1, waveLength)] - pwi#) * (phase#_ - phase#Int_) * direction#;
                     prevWaveIntegral# = pwi#;
                 `.replaceAll("#", i + "");
-                    }
-                    chipSource += "}";
                 }
+                chipSource += "}";
                 if (chipWaveLoopMode === 1) {
                     chipSource += `if (wrapped !== 0) {`;
                     for (let i = 0; i < voiceCount; i++) {

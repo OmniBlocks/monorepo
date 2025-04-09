@@ -41,7 +41,6 @@ import GUIComponent from '../components/gui/gui.jsx';
 import {setIsScratchDesktop} from '../lib/isScratchDesktop.js';
 import TWFullScreenResizerHOC from '../lib/tw-fullscreen-resizer-hoc.jsx';
 import TWThemeManagerHOC from './tw-theme-manager-hoc.jsx';
-import SongsTab from './songs-tab.jsx';
 
 const {RequestMetadata, setMetadata, unsetMetadata} = storage.scratchFetch;
 
@@ -101,15 +100,15 @@ class GUI extends React.Component {
             ...componentProps
         } = this.props;
         return (
-            <div>
+            <>
                 <GUIComponent
                     loading={fetchingProject || isLoading || loadingStateVisible}
                     {...componentProps}
                 >
                     {children}
                 </GUIComponent>
-                <SongsTab />
-            </div>
+
+            </>
         );
     }
 }
@@ -206,6 +205,9 @@ const ConnectedGUI = injectIntl(connect(
 // note that redux's 'compose' function is just being used as a general utility to make
 // the hierarchy of HOC constructor calls clearer here; it has nothing to do with redux's
 // ability to compose reducers.
+/* why are the og developers using double slashes
+ for multiline comments? when you can just use
+   /* and  */
 const WrappedGui = compose(
     LocalizationHOC,
     ErrorBoundaryHOC('Top Level App'),

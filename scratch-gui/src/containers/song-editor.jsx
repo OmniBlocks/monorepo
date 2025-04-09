@@ -18,7 +18,7 @@ const SongEditor = () => {
 
             const { type, payload } = event.data;
             if (type === 'SONG_DATA') {
-                console.log('🎶 Received song data:', payload);
+                console.log('🎶 Received UJ data:', payload);
             } else {
                 console.log(`🔍 Received unknown message type: ${type}`);
             }
@@ -36,8 +36,7 @@ const SongEditor = () => {
         <div
             style={{
                 width: '100%',
-                height: '100vh', // Use full viewport height
-                position: 'absolute', // Absolute positioning to fill space
+                height: '100%', // Use full viewport height
                 top: 0,
                 left: 0
             }}
@@ -47,8 +46,8 @@ const SongEditor = () => {
                 id="beepboxEditorIframe"
                 src="songeditor.html" // Make sure the path is correct!
                 style={{
-                    width: '100%',
-                    height: '100%',
+                    width: '100vh',
+                    height: '100vh',
                     border: 'none',
                     display: 'block' // Prevent inline spacing issues
                 }}

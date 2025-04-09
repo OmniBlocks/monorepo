@@ -20,7 +20,7 @@ class SongsTab extends React.Component {
             'onActivateSongsTab'
         ]);
         this.state = {
-            isSongEditorOpen: true // Automatically open the song editor
+            isSongEditorOpen: true 
         };
     }
 
@@ -69,3 +69,4 @@ export default injectIntl(connect(
     mapDispatchToProps
 )(SongsTab));
 
+// this script contains the whitespace bug somewhere

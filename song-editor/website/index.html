@@ -408,7 +408,7 @@
         // Slarmoo's Box plants
         "✨","🌈","🌧️","🪨","🐍","🌲","🌳","𓆏","🦀","🍄‍🟫",
         //Current version
-        "1.4.1"
+        "1.4.2"
         ];
         const date = new Date();
         if (Math.floor(Math.random() * 3) == 0) { //more than doubled chance for a plant to show up
@@ -438,6 +438,12 @@
             const birthdayPlants = [years + " year" + (years != 1 ? "s" : "") + "!", "🎂", "🎉", "Happy Birthday!", "Anniversary"];
             document.getElementById("goldboxPlant").innerHTML = "  " + birthdayPlants[(Math.floor(Math.random() * birthdayPlants.length))];
         }
+
+        if(document.getElementById("goldboxPlant").innerText.includes("🐲")) {
+            document.getElementById("goldboxPlant").addEventListener("mouseover", function (event) {
+                document.getElementById("goldboxPlant").innerText = " 🌈🍂🍁🍀🌷🍄🐍🌈🍃🌺🍄";
+            }, { once: true })
+        } 
 
         if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|android|ipad|playbook|silk/i.test(navigator.userAgent)) {
             document.getElementById("introduction").innerHTML = "Slarmoo's Box is an online tool for sketching and sharing chiptune melodies. Make sure that your volume is turned up, then press the play button!";

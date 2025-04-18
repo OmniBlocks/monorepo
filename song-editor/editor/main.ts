@@ -29,8 +29,8 @@ editor.mainLayer.getElementsByClassName("trackAndMuteContainer")[0].className +=
 editor.mainLayer.getElementsByClassName("barScrollBar")[0].className += " load";
 
 // Give select2 class to these
-$('#pitchPresetSelect').select2({ dropdownAutoWidth: false });
-$('#drumPresetSelect').select2({ dropdownAutoWidth: false });
+$('#pitchPresetSelect').select2({ dropdownAutoWidth: true });
+$('#drumPresetSelect').select2({ dropdownAutoWidth: true });
 // $('#envelopeSelect').select2({ dropdownAutoWidth: true });
 
 // Onclick event to expand/collapse optgroups

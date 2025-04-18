@@ -1255,9 +1255,9 @@ export class SongEditor {
     );
     private readonly _instrumentTypeSelectRow: HTMLDivElement = div({ class: "selectRow", id: "typeSelectRow" },
         span({ class: "tip", onclick: () => this._openPrompt("instrumentType") }, "Type:"),
-        div({ style: "display:contents"}, 
-            div({ class: "pitchSelect", style: "display:contents" }, this._pitchedPresetSelect),
-            div({ class: "drumSelect", style: "display:contents" }, this._drumPresetSelect)
+        div( 
+            div({ class: "pitchSelect" }, this._pitchedPresetSelect),
+            div({ class: "drumSelect" }, this._drumPresetSelect)
         ),
     );
     private readonly _instrumentSettingsGroup: HTMLDivElement = div({ class: "editor-controls" },
@@ -1473,8 +1473,6 @@ export class SongEditor {
         if (!("share" in navigator)) {
             this._fileMenu.removeChild(this._fileMenu.querySelector("[value='shareUrl']")!);
         }
-        this._pitchedPresetSelect.style.width = "4em";
-        this._drumPresetSelect.style.width = "4em";
 
         this._scaleSelect.appendChild(optgroup({ label: "Edit" },
             option({ value: "forceScale" }, "Snap Notes To Scale"),
@@ -1888,7 +1886,7 @@ export class SongEditor {
                 this.envelopeEditor.rerenderExtraSettings();
             } else if (group != this._chordDropdownGroup) {
                 group.style.display = "";
-            } // Only show arpeggio dropdown if chord arpeggiates or is monophonic
+            } // Only show arpeggio dropdown if chord arpeggiates
             else if (instrument.chord == Config.chords.dictionary["arpeggio"].index) {
                 group.style.display = "";
                 if (instrument.chord == Config.chords.dictionary["arpeggio"].index) {
@@ -4622,7 +4620,9 @@ export class SongEditor {
                 if (canPlayNotes) break;
                 if (needControlForShortcuts == (event.ctrlKey || event.metaKey)) {
                     if (event.shiftKey) {
-                        this._randomGenerated();
+                        this._randomGenerated(false);
+                    } else if (event.altKey) {
+                        this._randomGenerated(true);
                     } else {
                         this._randomPreset();
                     }
@@ -5031,8 +5031,8 @@ export class SongEditor {
         this._doc.record(new ChangePreset(this._doc, pickRandomPresetValue(isNoise)));
     }
 
-    private _randomGenerated(): void {
-        this._doc.record(new ChangeRandomGeneratedInstrument(this._doc));
+    private _randomGenerated(usesCurrentInstrumentType: boolean): void {
+        this._doc.record(new ChangeRandomGeneratedInstrument(this._doc, usesCurrentInstrumentType));
     }
 
 
@@ -5114,7 +5114,7 @@ export class SongEditor {
                     this._randomPreset();
                     break;
                 case "randomGenerated":
-                    this._randomGenerated();
+                    this._randomGenerated(false);
                     break;
             }
             this._doc.notifier.changed();

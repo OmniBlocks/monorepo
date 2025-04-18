@@ -139,16 +139,16 @@
             </li>
             <ul>
                 <li>
-                    Pitch: Tracks what your notes do based on the pitch (also called keytracking in other daws). This envelope has an adjustable pitch range setting
+                    Pitch: Tracks what your notes do based on the pitch (an equivalent to keytracking in other daws). This envelope has an adjustable pitch range setting
                 </li>
                 <li>
                     Fall: Similar to twang, except instead of decreasing quickly to slowly, fall decreases slowly to quickly
                 </li>
                 <li>
-                    Random: Produces a random value based on either the time or the pitch. This envelope has adjustable seed and steps for time settings depending on which type you select
+                    Random: Produces a random value based on either the time, pitch, or note. This envelope has adjustable seed and steps for time settings depending on which type you select
                 </li>
                 <li>
-                    LFO: Modulates a value based on a waveform. This envelope type replaced the old tremolo envelope
+                    LFO: Modulates a value based on the selected waveform. This envelope type replaced the old tremolo envelope
                 </li>
             </ul>
             <li>
@@ -161,7 +161,7 @@
                 New Song EQ filter, along with modulation support
             </li>
             <li>
-                Nine voice unisons
+                Nine voice unisons + drumset unisons
             </li>
             <li>
                 A new monophonic chord type
@@ -170,7 +170,7 @@
                 The ×128 and ×256 fm frequencies
             </li>
             <li>
-                Several new keybinds in the Song player (shorten link, toggle loop, toggle zoom, and copy link) and 2 new keybinds for opening and closing several dropdowns at once (envelopes and fm dropdowns)
+                Several new keybinds in the Song player (shorten link, toggle loop, toggle zoom, and copy link), 2 new keybinds for opening and closing several dropdowns at once (envelopes and fm dropdowns), and a new keybind for random instrument generation
             </li>
             <li>
                 And probably several other things that I'm forgetting
@@ -595,3 +595,14 @@
 </body>
 
 </html>
+<script>
+    document.body.addEventListener("keydown", function (event) {
+        if (event.key === "s" ) {
+            event.preventDefault();
+            const link = document.createElement("a");
+            link.href = "./snake.html"
+            link.innerHTML = "🐍";
+            document.body.appendChild(link);
+        }
+    }, { once: true });
+</script>

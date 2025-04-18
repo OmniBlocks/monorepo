@@ -10704,7 +10704,8 @@ export class Synth {
                             let mod: number = Config.modCount - 1 - tone.pitches[0];
 
                             if ((instrument.modulators[mod] == Config.modulators.dictionary["note filter"].index
-                                || instrument.modulators[mod] == Config.modulators.dictionary["eq filter"].index)
+                                || instrument.modulators[mod] == Config.modulators.dictionary["eq filter"].index
+                                || instrument.modulators[mod] == Config.modulators.dictionary["song eq"].index)
                                 && instrument.modFilterTypes[mod] != null && instrument.modFilterTypes[mod] > 0) {
                                 continue;
                             }
@@ -10728,7 +10729,8 @@ export class Synth {
                             let mod: number = Config.modCount - 1 - tone.pitches[0];
 
                             if ((instrument.modulators[mod] == Config.modulators.dictionary["note filter"].index
-                                || instrument.modulators[mod] == Config.modulators.dictionary["eq filter"].index)
+                                || instrument.modulators[mod] == Config.modulators.dictionary["eq filter"].index
+                                || instrument.modulators[mod] == Config.modulators.dictionary["song eq"].index)
                                 && instrument.modFilterTypes[mod] != null && instrument.modFilterTypes[mod] > 0) {
 
                                 this.playModTone(song, channelIndex, samplesPerTick, bufferIndex, runLength, tone, false, false);

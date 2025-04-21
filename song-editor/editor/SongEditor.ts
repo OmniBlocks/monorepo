@@ -3440,7 +3440,7 @@ export class SongEditor {
                         }
                         if (!allInstrumentEchoes) {
                             unusedSettingList.push("+ echo");
-                            unusedSettingList.push("echo delay");
+                            unusedSettingList.push("+ echo delay");
                         }
                         if (anyInstrumentReverbs) {
                             settingList.push("reverb");

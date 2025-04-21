@@ -597,12 +597,15 @@
 </html>
 <script>
     document.body.addEventListener("keydown", function (event) {
-        if (event.key === "s" ) {
+        if (event.key == "s" ) {
             event.preventDefault();
-            const link = document.createElement("a");
-            link.href = "./snake.html"
-            link.innerHTML = "🐍";
-            document.body.appendChild(link);
+            if(!document.getElementById("snake")) {
+                const link = document.createElement("a");
+                link.href = "./snake.html"
+                link.id = "snake"
+                link.innerHTML = "🐍";
+                document.body.appendChild(link);
+            }
         }
-    }, { once: true });
+    });
 </script>

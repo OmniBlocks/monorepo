@@ -35,8 +35,8 @@ const SongEditor = () => {
     return (
         <div
             style={{
-                width: '100%',
-                height: '100%', // Use full viewport height
+                width: '100vh',
+                height: '100%',
                 top: 0,
                 left: 0
             }}
@@ -44,13 +44,14 @@ const SongEditor = () => {
             <iframe
                 ref={iframeRef}
                 id="beepboxEditorIframe"
-                src="songeditor.html" // Make sure the path is correct!
+                src="songeditor.html" 
                 style={{
                     width: '100vh',
-                    height: '100vh',
+                    height: '100%',
                     border: 'none',
-                    display: 'block' // Prevent inline spacing issues
-                }}
+                    display: 'block',
+                    
+                                }}
                 sandbox="allow-scripts allow-same-origin"
             />
         </div>

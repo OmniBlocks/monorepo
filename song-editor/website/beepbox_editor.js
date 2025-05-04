@@ -49570,7 +49570,7 @@ You should be redirected to the song at:<br /><br />
                     this._customWaveDrawCanvas.newArray[i] = customWaveArray[i];
                 }
                 this._doc.record(new ChangeCustomWave(this._doc, customWaveArray));
-                this._doc.record(new ChangeVolume(this._doc, +this._instrumentVolumeSlider.input.value, -Config.volumeRange / 2 + Math.round(Math.sqrt(Config.chipWaves[index].expression) * Config.volumeRange / 2)));
+                this._doc.record(new ChangeVolume(this._doc, +this._instrumentVolumeSlider.input.value, Math.min(Math.max(-Config.volumeRange / 2 + Math.round(Math.sqrt(Config.chipWaves[index].expression) * Config.volumeRange / 2 + parseInt(this._instrumentVolumeSlider.input.value)), -Config.volumeRange / 2) >> 1, Config.volumeRange / 2)));
                 this._customWavePresetDrop.selectedIndex = 0;
                 this._doc.notifier.changed();
                 this._doc.prefs.save();
@@ -49945,19 +49945,40 @@ You should be redirected to the song at:<br /><br />
                 const anyModActive = this._doc.synth.isAnyModActive(this._doc.channel, instrument);
                 if (anyModActive) {
                     let instrument = this._doc.getCurrentInstrument();
-                    function updateModSlider(editor, slider, setting, channel, instrument) {
+                    function updateModSlider(editor, slider, setting, channel, instrument, index) {
                         if (editor._doc.synth.isModActive(setting, channel, instrument)) {
-                            for (let index = 0; index <= Config.modulators[setting].maxIndex; index++) {
-                                let currentVal = (editor._doc.synth.getModValue(setting, channel, instrument, false) - Config.modulators[setting].convertRealFactor) / Config.modulators[setting].maxRawVol;
-                                if (Config.modulators[setting].invertSliderIndicator == true) {
-                                    currentVal = 1 - currentVal;
+                            if (Config.modulators[setting].maxIndex > 0) {
+                                const envelope = editor._doc.synth.song.channels[channel].instruments[instrument].envelopes[index];
+                                switch (setting) {
+                                    case Config.modulators.dictionary["individual envelope speed"].index: {
+                                        if (envelope.tempEnvelopeSpeed == null) {
+                                            return false;
+                                        }
+                                        break;
+                                    }
+                                    case Config.modulators.dictionary["individual envelope lower bound"].index: {
+                                        if (envelope.tempEnvelopeLowerBound == null) {
+                                            return false;
+                                        }
+                                        break;
+                                    }
+                                    case Config.modulators.dictionary["individual envelope upper bound"].index: {
+                                        if (envelope.tempEnvelopeUpperBound == null) {
+                                            return false;
+                                        }
+                                        break;
+                                    }
                                 }
-                                if (currentVal != editor._modSliderValues[setting][index]) {
-                                    editor._modSliderValues[setting][index] = currentVal;
-                                    slider.container.style.setProperty("--mod-position", (currentVal * 96.0 + 2.0) + "%");
-                                }
-                                return true;
                             }
+                            let currentVal = (editor._doc.synth.getModValue(setting, channel, instrument, false) - Config.modulators[setting].convertRealFactor) / Config.modulators[setting].maxRawVol;
+                            if (Config.modulators[setting].invertSliderIndicator == true) {
+                                currentVal = 1 - currentVal;
+                            }
+                            if (currentVal != editor._modSliderValues[setting][index]) {
+                                editor._modSliderValues[setting][index] = currentVal;
+                                slider.container.style.setProperty("--mod-position", (currentVal * 96.0 + 2.0) + "%");
+                            }
+                            return true;
                         }
                         return false;
                     }
@@ -49966,7 +49987,7 @@ You should be redirected to the song at:<br /><br />
                             this._newShowModSliders[setting][index] = Boolean(this._showModSliders[setting][index]);
                             let slider = this.getSliderForModSetting(setting, index);
                             if (slider != null) {
-                                this._newShowModSliders[setting][index] = updateModSlider(this, slider, setting, this._doc.channel, instrument);
+                                this._newShowModSliders[setting][index] = updateModSlider(this, slider, setting, this._doc.channel, instrument, index);
                             }
                         }
                     }
@@ -49984,15 +50005,13 @@ You should be redirected to the song at:<br /><br />
                         for (let index = 0; index <= Config.modulators[setting].maxIndex; index++) {
                             if (this._newShowModSliders[setting][index] != this._showModSliders[setting][index]) {
                                 this._showModSliders[setting][index] = this._newShowModSliders[setting][index];
-                                for (let index = 0; index <= Config.modulators[setting].maxIndex; index++) {
-                                    let slider = this.getSliderForModSetting(setting, index);
-                                    if (slider != null) {
-                                        if (this._showModSliders[setting][index] == true) {
-                                            slider.container.classList.add("modSlider");
-                                        }
-                                        else {
-                                            slider.container.classList.remove("modSlider");
-                                        }
+                                let slider = this.getSliderForModSetting(setting, index);
+                                if (slider != null) {
+                                    if (this._showModSliders[setting][index] == true) {
+                                        slider.container.classList.add("modSlider");
+                                    }
+                                    else {
+                                        slider.container.classList.remove("modSlider");
                                     }
                                 }
                             }

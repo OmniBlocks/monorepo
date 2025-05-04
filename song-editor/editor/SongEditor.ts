@@ -1946,21 +1946,43 @@ export class SongEditor {
 
                 let instrument: number = this._doc.getCurrentInstrument();
 
-                function updateModSlider(editor: SongEditor, slider: Slider, setting: number, channel: number, instrument: number): boolean {
+                function updateModSlider(editor: SongEditor, slider: Slider, setting: number, channel: number, instrument: number, index: number): boolean {
                     if (editor._doc.synth.isModActive(setting, channel, instrument)) {
-                        for (let index: number = 0; index <= Config.modulators[setting].maxIndex; index++) {
-                            let currentVal: number = (editor._doc.synth.getModValue(setting, channel, instrument, false) - Config.modulators[setting].convertRealFactor) / Config.modulators[setting].maxRawVol;
-
-                            if (Config.modulators[setting].invertSliderIndicator == true) {
-                                currentVal = 1 - currentVal;
+                        if (Config.modulators[setting].maxIndex > 0) {
+                            //detect that the mod actually does need updating for the specific index
+                            const envelope = editor._doc.synth.song!.channels[channel].instruments[instrument].envelopes[index];
+                            switch (setting) {
+                                case Config.modulators.dictionary["individual envelope speed"].index: {
+                                    if (envelope.tempEnvelopeSpeed == null) {
+                                        return false;
+                                    }
+                                    break;
+                                }
+                                case Config.modulators.dictionary["individual envelope lower bound"].index: {
+                                    if (envelope.tempEnvelopeLowerBound == null) {
+                                        return false;
+                                    }
+                                    break;
+                                }
+                                case Config.modulators.dictionary["individual envelope upper bound"].index: {
+                                    if (envelope.tempEnvelopeUpperBound == null) {
+                                        return false;
+                                    }
+                                    break;
+                                }
                             }
-
-                            if (currentVal != editor._modSliderValues[setting][index]) {
-                                editor._modSliderValues[setting][index] = currentVal;
-                                slider.container.style.setProperty("--mod-position", (currentVal * 96.0 + 2.0) + "%");
-                            }
-                            return true;
                         }
+                        let currentVal: number = (editor._doc.synth.getModValue(setting, channel, instrument, false) - Config.modulators[setting].convertRealFactor) / Config.modulators[setting].maxRawVol;
+
+                        if (Config.modulators[setting].invertSliderIndicator == true) {
+                            currentVal = 1 - currentVal;
+                        }
+
+                        if (currentVal != editor._modSliderValues[setting][index]) {
+                            editor._modSliderValues[setting][index] = currentVal;
+                            slider.container.style.setProperty("--mod-position", (currentVal * 96.0 + 2.0) + "%");
+                        }
+                        return true;
                     }
                     return false;
                 }
@@ -1975,7 +1997,7 @@ export class SongEditor {
                         let slider: Slider | null = this.getSliderForModSetting(setting, index);
 
                         if (slider != null) {
-                            this._newShowModSliders[setting][index] = updateModSlider(this, slider, setting, this._doc.channel, instrument);
+                            this._newShowModSliders[setting][index] = updateModSlider(this, slider, setting, this._doc.channel, instrument, index);
                         }
                     }
                 }
@@ -1999,20 +2021,18 @@ export class SongEditor {
                     for (let index: number = 0; index <= Config.modulators[setting].maxIndex; index++) {
                         if (this._newShowModSliders[setting][index] != this._showModSliders[setting][index]) {
                             this._showModSliders[setting][index] = this._newShowModSliders[setting][index];
-                            for (let index: number = 0; index <= Config.modulators[setting].maxIndex; index++) {
-                                let slider: Slider | null = this.getSliderForModSetting(setting, index);
+                            let slider: Slider | null = this.getSliderForModSetting(setting, index);
 
-                                if (slider != null) {
+                            if (slider != null) {
 
-                                    if (this._showModSliders[setting][index] == true) {
-                                        slider.container.classList.add("modSlider");
-                                    }
-                                    else {
-                                        slider.container.classList.remove("modSlider");
-                                    }
-
+                                if (this._showModSliders[setting][index] == true) {
+                                    slider.container.classList.add("modSlider");
                                 }
-                            }         
+                                else {
+                                    slider.container.classList.remove("modSlider");
+                                }
+
+                            }
                         }
 
                         if (this._newShowModSliders[setting][index] == true)
@@ -5597,7 +5617,7 @@ export class SongEditor {
         //this._instrumentVolumeSlider.input.value = "" + Math.round(Config.waveVolumes[index] * 50.0 - 50.0);
 
         this._doc.record(new ChangeCustomWave(this._doc, customWaveArray))
-        this._doc.record(new ChangeVolume(this._doc, +this._instrumentVolumeSlider.input.value, -Config.volumeRange / 2 + Math.round(Math.sqrt(Config.chipWaves[index].expression) * Config.volumeRange / 2)));
+        this._doc.record(new ChangeVolume(this._doc, +this._instrumentVolumeSlider.input.value, Math.min(Math.max(-Config.volumeRange / 2 + Math.round(Math.sqrt(Config.chipWaves[index].expression) * Config.volumeRange / 2 + parseInt(this._instrumentVolumeSlider.input.value)), -Config.volumeRange / 2) >> 1, Config.volumeRange / 2)));
 
         this._customWavePresetDrop.selectedIndex = 0;
         this._doc.notifier.changed();

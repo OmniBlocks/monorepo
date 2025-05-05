@@ -406,9 +406,9 @@
         // blubox desktop plants 
         "⚡","🔵","💫",
         // Slarmoo's Box plants
-        "✨","🌈","🌧️","🪨","🐍","🌲","🌳","𓆏","🦀","🍄‍🟫",
+        "✨","🌈","🌧️","🪨","🐍","🌲","🌳","𓆏","🦀","🍄‍🟫","🌵",
         //Current version
-        "1.4.2"
+        "1.4.3"
         ];
         const date = new Date();
         if (Math.floor(Math.random() * 3) == 0) { //more than doubled chance for a plant to show up
@@ -427,6 +427,11 @@
             const heartPlants = ["❤️", "🧡", "💛", "💚", "💙", "💜"];
             if ((date.getDate() >= 13 && date.getDate() <= 15) && date.getMonth() == 1) {
                 document.getElementById("goldboxPlant").innerHTML = "  " + heartPlants[(Math.floor(Math.random() * heartPlants.length))];
+            }
+            //Slarmoo's Box pi day plants
+            if ((date.getDate() == 14) && date.getMonth() == 2) {
+                const piePlants = ["π", "🥧", "🍏", "🍋", "3.14"];
+                document.getElementById("goldboxPlant").innerHTML = "  " + piePlants[(Math.floor(Math.random() * piePlants.length))];
             }
         }
         if ((date.getDate() == 1) && date.getMonth() == 3) {

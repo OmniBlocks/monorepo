@@ -11018,20 +11018,21 @@ export class Synth {
                             }
                         }
 
-                        let tone: Tone = new Tone;
                         if (instrumentState.activeTones.count() > 0) {
-                            tone = instrumentState.activeTones.peakBack();
-                        } else {
-                            tone = new Tone;
+                            const tone: Tone = instrumentState.activeTones.get(0);
+                            envelopeComputer.computeEnvelopes(instrument, currentPart, instrumentState.envelopeTime, tickTimeStart, secondsPerTick, tone, envelopeSpeeds, instrumentState, this, channel, instrumentIdx);
                         }
-                        envelopeComputer.computeEnvelopes(instrument, currentPart, instrumentState.envelopeTime, tickTimeStart, secondsPerTick, tone, envelopeSpeeds, instrumentState, this, channel, instrumentIdx);
+                        
                         const envelopeStarts: number[] = envelopeComputer.envelopeStarts;
                         //const envelopeEnds: number[] = envelopeComputer.envelopeEnds;
 
                         // Update arpeggio time, which is used to calculate arpeggio position
+
+                        const arpEnvelopeStart: number = envelopeStarts[EnvelopeComputeIndex.arpeggioSpeed]; //only discrete for now
+                        //const arpEnvelopeEnd: number = envelopeEnds[EnvelopeComputeIndex.arpeggioSpeed];
                         let useArpeggioSpeed: number = instrument.arpeggioSpeed;
                         if (this.isModActive(Config.modulators.dictionary["arp speed"].index, channel, instrumentIdx)) {
-                            useArpeggioSpeed = clamp(0, Config.arpSpeedScale.length, this.getModValue(Config.modulators.dictionary["arp speed"].index, channel, instrumentIdx, false));
+                            useArpeggioSpeed = clamp(0, Config.arpSpeedScale.length, arpEnvelopeStart * this.getModValue(Config.modulators.dictionary["arp speed"].index, channel, instrumentIdx, false));
                             if (Number.isInteger(useArpeggioSpeed)) {
                                 instrumentState.arpTime += Config.arpSpeedScale[useArpeggioSpeed];
                             } else {
@@ -11040,9 +11041,7 @@ export class Synth {
                             }
                         }
                         else {
-                            const envelopeStart: number = envelopeStarts[EnvelopeComputeIndex.arpeggioSpeed]; //only discrete for now
-                            //const envelopeEnd: number = envelopeEnds[EnvelopeComputeIndex.arpeggioSpeed];
-                            useArpeggioSpeed = clamp(0, Config.arpSpeedScale.length, envelopeStart*useArpeggioSpeed);
+                            useArpeggioSpeed = clamp(0, Config.arpSpeedScale.length, arpEnvelopeStart *useArpeggioSpeed);
                             if (Number.isInteger(useArpeggioSpeed)) {
                                 instrumentState.arpTime += Config.arpSpeedScale[useArpeggioSpeed];
                             } else {

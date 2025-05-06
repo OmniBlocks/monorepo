@@ -8002,7 +8002,7 @@ class EnvelopeComputer {
                 if (envelope.type == EnvelopeType.noteSize) usedNoteSize = true;
             }
             //only calculate pitch if needed
-            const pitch: number = (envelope.type == EnvelopeType.pitch) ? this.computePitchEnvelope(instrument, envelopeIndex, (this.startPinTickPitch || 0)) : 0;
+            const pitch: number = (envelope.type == EnvelopeType.pitch) ? this.computePitchEnvelope(instrument, envelopeIndex, (this.startPinTickPitch || this.getPitchValue(instrument, tone, instrumentState, true))) : 0;
             
             //calculate envelope values if target isn't null
             if (automationTarget.computeIndex != null) {

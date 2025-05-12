@@ -3,6 +3,7 @@ const SvgElement = require('./svg-element');
 const convertFonts = require('./font-converter');
 const fixupSvgString = require('./fixup-svg-string');
 const transformStrokeWidths = require('./transform-applier');
+const getSandbox = require('./tw-svg-sandbox');
 
 /**
  * @param {SVGElement} svgTag the tag to search within
@@ -203,6 +204,8 @@ const findLargestStrokeWidth = rootNode => {
  * @param {SVGSVGElement} svgTag the SVG tag to apply the transformation to
  */
 const transformMeasurements = svgTag => {
+    const sandbox = getSandbox();
+
     // Append the SVG dom to the document.
     // This allows us to use `getBBox` on the page,
     // which returns the full bounding-box of all drawn SVG
@@ -226,13 +229,13 @@ const transformMeasurements = svgTag => {
     try {
         // Insert sanitized value.
         svgSpot.innerHTML = sanitizedValue;
-        document.body.appendChild(svgSpot);
+        sandbox.appendChild(svgSpot);
         // Take the bounding box. We have to get elements via svgSpot
         // because we added it via innerHTML.
         bbox = svgSpot.children[0].getBBox();
     } finally {
         // Always destroy the element, even if, for example, getBBox throws.
-        document.body.removeChild(svgSpot);
+        sandbox.removeChild(svgSpot);
     }
 
     // Enlarge the bbox from the largest found stroke width

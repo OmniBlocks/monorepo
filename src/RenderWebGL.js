@@ -122,7 +122,12 @@ class RenderWebGL extends EventEmitter {
     static isSupported (optCanvas) {
         try {
             optCanvas = optCanvas || document.createElement('canvas');
-            const options = {alpha: false, stencil: true, antialias: false};
+            const options = {
+                alpha: false,
+                stencil: true,
+                antialias: false,
+                powerPreference: RenderWebGL.powerPreference
+            };
             // Don't use twgl's getContext here because it will spend a few milliseconds enabling extensions
             // on a context that won't get used.
             return !!(

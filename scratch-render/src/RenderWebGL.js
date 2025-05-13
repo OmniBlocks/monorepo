@@ -123,7 +123,7 @@ class RenderWebGL extends EventEmitter {
         try {
             optCanvas = optCanvas || document.createElement('canvas');
             const options = {
-                alpha: false,
+                alpha: true,
                 stencil: true,
                 antialias: false,
                 powerPreference: RenderWebGL.powerPreference
@@ -148,7 +148,7 @@ class RenderWebGL extends EventEmitter {
      */
     static _getContext (canvas) {
         const contextAttribs = {
-            alpha: false,
+            alpha: true,
             stencil: true,
             antialias: false,
             powerPreference: RenderWebGL.powerPreference
@@ -417,13 +417,15 @@ class RenderWebGL extends EventEmitter {
      * @param {number} red The red component for the background.
      * @param {number} green The green component for the background.
      * @param {number} blue The blue component for the background.
+     * @param {number} alpha The alpha component for the background.
      */
-    setBackgroundColor (red, green, blue) {
+    setBackgroundColor (red, green, blue, alpha=1) {
         this.dirty = true;
 
         this._backgroundColor4f[0] = red;
         this._backgroundColor4f[1] = green;
         this._backgroundColor4f[2] = blue;
+        this._backgroundColor4f[3] = alpha;
 
         this._backgroundColor3b[0] = red * 255;
         this._backgroundColor3b[1] = green * 255;

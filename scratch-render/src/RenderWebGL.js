@@ -419,7 +419,7 @@ class RenderWebGL extends EventEmitter {
      * @param {number} blue The blue component for the background.
      * @param {number} alpha The alpha component for the background.
      */
-    setBackgroundColor (red, green, blue, alpha=1) {
+    setBackgroundColor (red, green, blue, alpha = 1) {
         this.dirty = true;
 
         // WebGL will want the color to be pre-multiplied.

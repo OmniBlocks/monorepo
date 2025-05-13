@@ -422,14 +422,16 @@ class RenderWebGL extends EventEmitter {
     setBackgroundColor (red, green, blue, alpha=1) {
         this.dirty = true;
 
-        this._backgroundColor4f[0] = red;
-        this._backgroundColor4f[1] = green;
-        this._backgroundColor4f[2] = blue;
+        // WebGL will want the color to be pre-multiplied.
+
+        this._backgroundColor4f[0] = red * alpha;
+        this._backgroundColor4f[1] = green * alpha;
+        this._backgroundColor4f[2] = blue * alpha;
         this._backgroundColor4f[3] = alpha;
 
-        this._backgroundColor3b[0] = red * 255;
-        this._backgroundColor3b[1] = green * 255;
-        this._backgroundColor3b[2] = blue * 255;
+        this._backgroundColor3b[0] = red * alpha * 255;
+        this._backgroundColor3b[1] = green * alpha * 255;
+        this._backgroundColor3b[2] = blue * alpha * 255;
 
     }
 
@@ -915,7 +917,13 @@ class RenderWebGL extends EventEmitter {
 
         twgl.bindFramebufferInfo(gl, null);
         gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-        gl.clearColor(...this._backgroundColor4f);
+        // Context expects pre-multiplied colors.
+        gl.clearColor(
+            this._backgroundColor4f[0],
+            this._backgroundColor4f[1],
+            this._backgroundColor4f[2],
+            this._backgroundColor4f[3]
+        );
         gl.clear(gl.COLOR_BUFFER_BIT);
 
         const snapshotRequested = this._snapshotCallbacks.length > 0;
@@ -1557,7 +1565,13 @@ class RenderWebGL extends EventEmitter {
         gl.viewport(0, 0, bounds.width, bounds.height);
         const projection = twgl.m4.ortho(bounds.left, bounds.right, bounds.top, bounds.bottom, -1, 1);
 
-        gl.clearColor(...this._backgroundColor4f);
+        // Context expects pre-multiplied colors.
+        gl.clearColor(
+            this._backgroundColor4f[0],
+            this._backgroundColor4f[1],
+            this._backgroundColor4f[2],
+            this._backgroundColor4f[3]
+        );
         gl.clear(gl.COLOR_BUFFER_BIT);
         this._drawThese(this._drawList, ShaderManager.DRAW_MODE.default, projection);
 

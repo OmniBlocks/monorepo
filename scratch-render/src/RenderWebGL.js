@@ -1098,7 +1098,7 @@ class RenderWebGL extends EventEmitter {
                 if (hasMask ?
                     maskMatches(Drawable.sampleColor4b(point, drawable, color, effectMask), mask3b) :
                     drawable.isTouching(point)) {
-                    RenderWebGL.sampleColor3b(point, candidates, color);
+                    this.sampleColor4b(point, candidates, color);
                     if (debugCanvasContext) {
                         debugCanvasContext.fillStyle = `rgb(${color[0]},${color[1]},${color[2]})`;
                         debugCanvasContext.fillRect(x - bounds.left, bounds.bottom - y, 1, 1);
@@ -2299,9 +2299,13 @@ class RenderWebGL extends EventEmitter {
      * @param {Uint8ClampedArray} dst The color3b space to store the answer in.
      * @return {Uint8ClampedArray} The dst vector with everything blended down.
      */
-    static sampleColor3b (vec, drawables, dst) {
-        dst = dst || new Uint8ClampedArray(3);
-        dst.fill(0);
+    sampleColor4b (vec, drawables, dst) {
+        dst = dst || new Uint8ClampedArray(4);
+        dst[0] = 0;
+        dst[1] = 0;
+        dst[2] = 0;
+        // dst[3] is set at the end
+
         let blendAlpha = 1;
         for (let index = 0; blendAlpha !== 0 && index < drawables.length; index++) {
             /*
@@ -2317,11 +2321,13 @@ class RenderWebGL extends EventEmitter {
             dst[2] += __blendColor[2] * blendAlpha;
             blendAlpha *= (1 - (__blendColor[3] / 255));
         }
-        // Backdrop could be transparent, so we need to go to the "clear color" of the
-        // draw scene (white) as a fallback if everything was alpha
-        dst[0] += blendAlpha * 255;
-        dst[1] += blendAlpha * 255;
-        dst[2] += blendAlpha * 255;
+        // Backdrop could be transparent, so we need to go to the background color of the
+        // draw scene as a fallback if drawables are transparent.
+        dst[0] += 255 * this._backgroundColor4f[0] * blendAlpha;
+        dst[1] += 255 * this._backgroundColor4f[1] * blendAlpha;
+        dst[2] += 255 * this._backgroundColor4f[2] * blendAlpha;
+        blendAlpha *= 1 - this._backgroundColor4f[3];
+        dst[3] = 255 * (1 - blendAlpha);
         return dst;
     }
 

@@ -537,6 +537,22 @@ class VirtualMachine extends EventEmitter {
             file.date = date;
         }
 
+        // Tell JSZip to only compress file formats where there will be a significant gain.
+        const COMPRESSABLE_FORMATS = [
+            '.json',
+            '.svg',
+            '.wav',
+            '.ttf',
+            '.otf'
+        ];
+        for (const file of Object.values(zip.files)) {
+            if (COMPRESSABLE_FORMATS.some(ext => file.name.endsWith(ext))) {
+                file.options.compression = 'DEFLATE';
+            } else {
+                file.options.compression = 'STORE';
+            }
+        }
+
         return zip;
     }
 
@@ -546,9 +562,9 @@ class VirtualMachine extends EventEmitter {
      */
     saveProjectSb3 (type) {
         return this._saveProjectZip().generateAsync({
+            // Don't configure compression here. _saveProjectZip() will set it for each file.
             type: type || 'blob',
-            mimeType: 'application/x.scratch.sb3',
-            compression: 'DEFLATE'
+            mimeType: 'application/x.scratch.sb3'
         });
     }
 

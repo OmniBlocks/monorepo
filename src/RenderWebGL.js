@@ -1365,7 +1365,7 @@ class RenderWebGL extends EventEmitter {
     pick (centerX, centerY, touchWidth, touchHeight, candidateIDs) {
         const bounds = this.clientSpaceToScratchBounds(centerX, centerY, touchWidth, touchHeight);
         if (bounds.left === -Infinity || bounds.bottom === -Infinity) {
-            return false;
+            return RenderConstants.ID_NONE;
         }
 
         candidateIDs = (candidateIDs || this._drawList).filter(id => {
@@ -1383,7 +1383,7 @@ class RenderWebGL extends EventEmitter {
             return false;
         });
         if (candidateIDs.length === 0) {
-            return false;
+            return RenderConstants.ID_NONE;
         }
 
         const hits = [];

@@ -1429,6 +1429,11 @@ class Runtime extends EventEmitter {
             break;
         }
 
+        // Allow extensiosn to override outputShape
+        if (blockInfo.blockShape) {
+            blockJSON.outputShape = blockInfo.blockShape;
+        }
+
         const blockText = Array.isArray(blockInfo.text) ? blockInfo.text : [blockInfo.text];
         let inTextNum = 0; // text for the next block "arm" is blockText[inTextNum]
         let inBranchNum = 0; // how many branches have we placed into the JSON so far?

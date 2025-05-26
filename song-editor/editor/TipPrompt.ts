@@ -645,6 +645,12 @@ export class TipPrompt implements Prompt {
 					// p(`The offset allows you to increment the Hertz by 1.`),
 				);
 			} break;
+			case "ringModChipWave": {
+				message = div(
+					h2("Ring Mod Chip Wave"),
+					p("This is the shape of the wave modulating your instrument's sound"),
+				);
+			} break;
 			case "granular": {
 				message = div(
 					h2("Granular Synthesis"),

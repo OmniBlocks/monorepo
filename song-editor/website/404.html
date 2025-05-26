@@ -65,7 +65,7 @@
 <!--<font color="#FF8EC5">404</font>-->
 <h1>... oops.</h1>
 
-<p>So it seems that, for whatever reason, you hit a 404.</p>  
+<p>So it seems that, for whatever reason, you hit a <span id="score">404</span>.</p>  
 <canvas id="root"></canvas>
 <p>Controls: </p>
 <ul>
@@ -74,16 +74,11 @@
     <li>Q to decrease speed and E to increase speed (while paused)</li>
     <li>Space to start/pause</li>
 </ul>
-<!-- <h1><img id="404" src="uh_oh_404.png" /></h1>
-  
-  <audio controls="false" autoplay="true" loop="true">
-  <source src="Game_Over.ogg" type="audio/ogg">
-  Your browser does not support the audio element.
-</audio>  -->
 <script type="text/javascript" src="https://slarmoo.github.io/slarmoosbox/website/beepbox_synth.min.js"></script>
 <script>
 let board;
 let mute = false;
+const scoreboard = document.getElementById("score");
 const colorConfig = {
     snake: {
         eyeWhite: "#ffffff",
@@ -105,6 +100,9 @@ const colorConfig = {
 }
 
     window.onload = () => {
+        if(Math.random() < 1/404) {
+            scoreboard.innerText = "5 error";
+        }
         board = new Board();
     };
 
@@ -387,6 +385,8 @@ const colorConfig = {
                 case "OOB": this.board.gameOver("Out of bounds"); break;
                 case "apple": {
                     this.board.spawnApple();
+                    
+                    scoreboard.innerText = (this.length - 2); //snake hasn't lengthened yet
                     if (!mute) {
                         const collect = new beepbox.Synth("#s4N08Untitledn100s0k02l01e00t2ma0g01j07r1O_c11d700U00i0o5T6v0puj0f0000qQ412813w0Oad040WO00h0E1c092001w00ab40p19FyWhcFR00");
                         collect.play();

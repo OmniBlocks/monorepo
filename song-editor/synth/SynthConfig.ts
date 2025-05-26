@@ -167,7 +167,6 @@ export const enum LFOEnvelopeTypes {
     trapezoid,
     steppedSaw,
     steppedTri,
-    // ramp,
     length,
 }
 
@@ -1347,10 +1346,10 @@ export class Config {
 
     //still used for drumsets
     public static readonly envelopes: DictionaryArray<Envelope> = toNameMap([
-        { name: "none", type: EnvelopeType.none, speed: 0.0 },
-        { name: "note size", type: EnvelopeType.noteSize, speed: 0.0 },
-        { name: "pitch", type: EnvelopeType.pitch, speed: 0.0 }, // Slarmoo's box (fairly useless on drumsets)
-        { name: "punch", type: EnvelopeType.punch, speed: 0.0 },
+        { name: "none", type: EnvelopeType.none, speed: 1.0 },
+        { name: "note size", type: EnvelopeType.noteSize, speed: 1.0 },
+        { name: "pitch", type: EnvelopeType.pitch, speed: 1.0 }, // Slarmoo's box (fairly useless on drumsets)
+        { name: "punch", type: EnvelopeType.punch, speed: 1.0 },
         { name: "flare -1", type: EnvelopeType.flare, speed: 128.0 },
         { name: "flare 1", type: EnvelopeType.flare, speed: 32.0 },
         { name: "flare 2", type: EnvelopeType.flare, speed: 8.0 },
@@ -1420,16 +1419,15 @@ export class Config {
     ]);
 
     public static readonly newEnvelopes: DictionaryArray<Envelope> = toNameMap([
-        { name: "none", type: EnvelopeType.none, speed: 0.0 },
-        { name: "note size", type: EnvelopeType.noteSize, speed: 0.0 },
-        { name: "pitch", type: EnvelopeType.pitch, speed: 0.0 },
+        { name: "none", type: EnvelopeType.none, speed: 1.0 },
+        { name: "note size", type: EnvelopeType.noteSize, speed: 1.0 },
+        { name: "pitch", type: EnvelopeType.pitch, speed: 1.0 },
         { name: "random", type: EnvelopeType.pseudorandom, speed: 4.0 }, //Slarmoo's box 1.3
-        { name: "punch", type: EnvelopeType.punch, speed: 0.0 },
+        { name: "punch", type: EnvelopeType.punch, speed: 1.0 },
         { name: "flare", type: EnvelopeType.flare, speed: 32.0 },
         { name: "twang", type: EnvelopeType.twang, speed: 32.0 },
         { name: "swell", type: EnvelopeType.swell, speed: 32.0 },
-        { name: "lfo", type: EnvelopeType.lfo, speed: 4.0 }, //replaced tremolo and tremolo2
-        // { name: "tremolo2", type: EnvelopeType.tremolo2, speed: 4.0 }, //removed Slarmoo's Box 1.3
+        { name: "lfo", type: EnvelopeType.lfo, speed: 4.0 }, //replaced tremolo and tremolo2 Slarmoo's Box 1.3
         { name: "decay", type: EnvelopeType.decay, speed: 10.0 },
         { name: "wibble", type: EnvelopeType.wibble, speed: 24.0 },
         { name: "linear", type: EnvelopeType.linear, speed: 32.0 },

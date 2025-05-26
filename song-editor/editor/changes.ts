@@ -2645,6 +2645,15 @@ export class ChangeRingModChipWave extends Change {
     }
 }
 
+export class ChangeRingModPulseWidth extends ChangeInstrumentSlider {
+    constructor(doc: SongDocument, oldValue: number, newValue: number) {
+        super(doc);
+        this._instrument.ringModPulseWidth = newValue;
+        doc.notifier.changed();
+        if (oldValue != newValue) this._didSomething();
+    }
+}
+
 export class ChangeGranular extends ChangeInstrumentSlider {
     constructor(doc: SongDocument, oldValue: number, newValue: number) {
         super(doc);
@@ -5394,6 +5403,9 @@ export class ChangeSetEnvelopeType extends Change {
         if (oldValue != newValue) {
             instrument.envelopes[envelopeIndex].envelope = newValue;
             instrument.preset = instrument.type;
+            if (oldValue == Config.newEnvelopes.dictionary["none"].index) {
+                instrument.envelopes[envelopeIndex].perEnvelopeSpeed = Config.newEnvelopes[newValue].speed;
+            }
             doc.notifier.changed();
             this._didSomething();
         }

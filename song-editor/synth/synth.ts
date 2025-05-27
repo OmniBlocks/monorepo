@@ -11992,7 +11992,6 @@ export class Synth {
 				const expressionDelta = +tone.expressionDelta;
 				
 				const unisonSign = tone.specialIntervalExpressionMult * instrumentState.unisonSign;
-				if (instrumentState.unisonVoices == 1 && instrumentState.unisonSpread == 0 && !instrumentState.chord.customInterval) tone.phases[1] = tone.phases[0];
 				const delayResetOffset# = pickedString#.delayResetOffset|0;
 				
 				const filters = tone.noteFilters;

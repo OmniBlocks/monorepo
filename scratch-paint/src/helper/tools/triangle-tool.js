@@ -156,6 +156,8 @@ class TriangleTool extends paper.Tool {
             wasOj = false;
         }
 
+        this.tri.remove();
+
         this.tri = new paper.Path();
 
         for (let s of newSeg) {

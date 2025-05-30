@@ -11,7 +11,7 @@ import layout from '../../lib/layout-constants';
 import { changeBrushSize, changeSegSize } from '../../reducers/brush-mode';
 import { changeBrushSize as changeEraserSize } from '../../reducers/eraser-mode';
 import { changeRoundedCornerSize } from '../../reducers/rounded-rect-mode';
-import { changeTrianglePolyCount } from '../../reducers/triangle-mode';
+import { changeTrianglePolyCount, changeTrianglePointCount } from '../../reducers/triangle-mode';
 import { changeCurrentlySelectedShape } from '../../reducers/sussy-mode';
 import { changeBitBrushSize } from '../../reducers/bit-brush-size';
 import { changeBitEraserSize } from '../../reducers/bit-eraser-size';
@@ -270,6 +270,8 @@ const ModeToolsComponent = props => {
                 const currentIcon = triangleIcon;
                 const currentSideValue = props.trianglePolyValue;
                 const changeFunction = props.onPolyCountSliderChange;
+                const currentPointValue = props.trianglePointValue;
+                const changeFunctionPoint = props.onPointCountSliderChange;
                 return (
                     <div className={classNames(props.className, styles.modeTools)}>
                         <div>
@@ -288,6 +290,15 @@ const ModeToolsComponent = props => {
                             type="number"
                             value={currentSideValue}
                             onSubmit={changeFunction}
+                        />
+                        <LiveInput
+                            range
+                            small
+                            max={1000}
+                            min="1"
+                            type="number"
+                            value={currentPointValue}
+                            onSubmit={changeFunctionPoint}
                         />
                     </div>
                 );
@@ -706,6 +717,7 @@ ModeToolsComponent.propTypes = {
     eraserValue: PropTypes.number,
     roundedCornerValue: PropTypes.number,
     trianglePolyValue: PropTypes.number,
+    trianglePointValue: PropTypes.number,
     currentlySelectedShape: PropTypes.string,
     fillBitmapShapes: PropTypes.bool,
     format: PropTypes.oneOf(Object.keys(Formats)),
@@ -753,6 +765,7 @@ const mapStateToProps = state => ({
     eraserValue: state.scratchPaint.eraserMode.brushSize,
     roundedCornerValue: state.scratchPaint.roundedRectMode.roundedCornerSize,
     trianglePolyValue: state.scratchPaint.triangleMode.trianglePolyCount,
+    trianglePointValue: state.scratchPaint.triangleMode.trianglePointCount,
     currentlySelectedShape: state.scratchPaint.sussyMode.currentlySelectedShape
 });
 const mapDispatchToProps = dispatch => ({
@@ -767,6 +780,9 @@ const mapDispatchToProps = dispatch => ({
     },
     onPolyCountSliderChange: polyCount => {
         dispatch(changeTrianglePolyCount(polyCount));
+    },
+    onPointCountSliderChange: polyCount => {
+        dispatch(changeTrianglePointCount(polyCount));
     },
     onCurrentlySelectedShapeChange: shape => {
         dispatch(changeCurrentlySelectedShape(shape));

@@ -10,15 +10,25 @@ const sideCount = {
     value: 3
 };
 
+const pointCount = {
+    value: 1
+};
+
 /**
  * Tool for drawing triangles.
  */
 class TriangleTool extends paper.Tool {
-    static set sideCount (value) {
+    static set sideCount(value) {
         sideCount.value = value;
     }
-    static get sideCount () {
+    static get sideCount() {
         return sideCount.value;
+    }
+    static set pointCount(value) {
+        pointCount.value = value;
+    }
+    static get pointCount() {
+        return pointCount.value;
     }
 
     static get TOLERANCE() {
@@ -121,6 +131,41 @@ class TriangleTool extends paper.Tool {
         } else {
             const dimensions = event.point.subtract(event.downPoint);
             this.tri.position = event.downPoint.add(dimensions.multiply(0.5));
+        }
+
+        let seg = this.tri.segments;
+        let newSeg = [[]];
+
+        let j = 0;
+        let oj = 0;
+        let wasOj = true;
+
+        let l = seg.length;
+
+        // this is the worst code ever
+        for (let i = 0; i < l; i++) {
+            newSeg[newSeg.length - 1].push(seg[j]);
+            j += TriangleTool.pointCount;
+            j = j % (seg.length);
+            if (j == oj && !wasOj) {
+                j = oj + 1;
+                oj++;
+                wasOj = true;
+                newSeg.push([]);
+            }
+            wasOj = false;
+        }
+
+        this.tri.remove();
+
+        this.tri = new paper.Path();
+
+        for (let s of newSeg) {
+            let t2 = new paper.Path({ segments: s, closed: true });          
+            let otri = this.tri;
+            this.tri = otri.unite(t2); 
+            t2.remove();
+            otri.remove();
         }
 
         styleShape(this.tri, this.colorState);

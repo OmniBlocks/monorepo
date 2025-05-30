@@ -3,10 +3,10 @@ import log from '../../log/log';
 import keyMirror from 'keymirror';
 
 import Modes from '../../lib/modes';
-import {isBoundsItem} from '../item';
-import {hoverBounds, hoverItem} from '../guides';
-import {sortItemsByZIndex} from '../math';
-import {getSelectedLeafItems, getSelectedSegments} from '../selection';
+import { isBoundsItem } from '../item';
+import { hoverBounds, hoverItem } from '../guides';
+import { sortItemsByZIndex } from '../math';
+import { getSelectedLeafItems, getSelectedSegments } from '../selection';
 import MoveTool from './move-tool';
 import PointTool from './point-tool';
 import HandleTool from './handle-tool';
@@ -32,23 +32,23 @@ const ReshapeModes = keyMirror({
  */
 class ReshapeTool extends paper.Tool {
     /** Distance within which mouse is considered to be hitting an item */
-    static get TOLERANCE () {
+    static get TOLERANCE() {
         return ReshapeTool.HANDLE_RADIUS + ReshapeTool.HANDLE_PADDING;
     }
     /**
      * Units of padding around the visible handle area that will still register clicks as "touching the handle"
      */
-    static get HANDLE_PADDING () {
+    static get HANDLE_PADDING() {
         return 1;
     }
     /**
      * Handles' radius, including the stroke
      */
-    static get HANDLE_RADIUS () {
+    static get HANDLE_RADIUS() {
         return 5.25;
     }
     /** Clicks registered within this amount of time are registered as double clicks */
-    static get DOUBLE_CLICK_MILLIS () {
+    static get DOUBLE_CLICK_MILLIS() {
         return 250;
     }
     /**
@@ -59,7 +59,7 @@ class ReshapeTool extends paper.Tool {
      * @param {!function} onUpdateImage A callback to call when the image visibly changes
      * @param {!function} switchToTextTool A callback to call to switch to the text tool
      */
-    constructor (setHoveredItem, clearHoveredItem, setSelectedItems, clearSelectedItems, onUpdateImage,
+    constructor(setHoveredItem, clearHoveredItem, setSelectedItems, clearSelectedItems, onUpdateImage,
         switchToTextTool) {
         super();
         this.setHoveredItem = setHoveredItem;
@@ -97,7 +97,7 @@ class ReshapeTool extends paper.Tool {
      * to be grabbable. (Segments are the little circles)
      * @return {object} See paper.Item.hitTest for definition of options
      */
-    getSelectedSegmentHitOptions () {
+    getSelectedSegmentHitOptions() {
         const hitOptions = {
             segments: true,
             tolerance: ReshapeTool.TOLERANCE / paper.view.zoom,
@@ -116,7 +116,7 @@ class ReshapeTool extends paper.Tool {
      * legitimate hits on other things (like if the handle is over part of the fill). (Handles are the diamonds)
      * @return {object} See paper.Item.hitTest for definition of options
      */
-    getHandleHitOptions () {
+    getHandleHitOptions() {
         const hitOptions = {
             handles: true,
             tolerance: ReshapeTool.TOLERANCE / paper.view.zoom,
@@ -137,7 +137,7 @@ class ReshapeTool extends paper.Tool {
      * unselected things and fills.
      * @return {object} See paper.Item.hitTest for definition of options
      */
-    getSelectedStrokeHitOptions () {
+    getSelectedStrokeHitOptions() {
         const hitOptions = {
             segments: false,
             stroke: false,
@@ -161,7 +161,7 @@ class ReshapeTool extends paper.Tool {
      *     selected.
      * @return {object} See paper.Item.hitTest for definition of options
      */
-    getUnselectedAndFillHitOptions () {
+    getUnselectedAndFillHitOptions() {
         const hitOptions = {
             fill: true,
             stroke: true,
@@ -181,7 +181,7 @@ class ReshapeTool extends paper.Tool {
      * @param {paper.Item} prevHoveredItemId ID of the highlight item that indicates the mouse is
      *     over a given item currently
      */
-    setPrevHoveredItemId (prevHoveredItemId) {
+    setPrevHoveredItemId(prevHoveredItemId) {
         this.prevHoveredItemId = prevHoveredItemId;
     }
     /**
@@ -189,7 +189,7 @@ class ReshapeTool extends paper.Tool {
      * @param {paper.Point} point Point to hit test on canvas
      * @return {?paper.HitResult} hitResult
      */
-    getHitResult (point) {
+    getHitResult(point) {
         // Prefer hits on segments to other types of hits, since segments always overlap curves.
         let hitResults =
             paper.project.hitTestAll(point, this.getSelectedSegmentHitOptions());
@@ -215,7 +215,7 @@ class ReshapeTool extends paper.Tool {
         }
         return hitResult;
     }
-    handleMouseDown (event) {
+    handleMouseDown(event) {
         if (event.event.button > 0) return; // only first mouse button
         this.active = true;
         this.clearHoveredItem();
@@ -248,9 +248,9 @@ class ReshapeTool extends paper.Tool {
         // If item is not yet selected, don't behave differently depending on if they clicked a segment
         // (since those were invisible), just select the whole thing as if they clicked the fill.
         if (!hitResult.item.selected ||
-                hitResult.type === 'fill' ||
-                hitResult.type === 'stroke' ||
-                (hitResult.type !== 'segment' && doubleClicked)) {
+            hitResult.type === 'fill' ||
+            hitResult.type === 'stroke' ||
+            (hitResult.type !== 'segment' && doubleClicked)) {
             this.mode = ReshapeModes.FILL;
             this._modeMap[this.mode].onMouseDown(hitProperties);
         } else if (hitResult.type === 'segment') {
@@ -273,7 +273,7 @@ class ReshapeTool extends paper.Tool {
             this._modeMap[this.mode].onMouseDown(hitProperties);
         }
     }
-    handleMouseMove (event) {
+    handleMouseMove(event) {
         const hitResult = this.getHitResult(event.point);
         let hoveredItem;
 
@@ -289,17 +289,17 @@ class ReshapeTool extends paper.Tool {
         }
 
         if ((!hoveredItem && this.prevHoveredItemId) || // There is no longer a hovered item
-                (hoveredItem && !this.prevHoveredItemId) || // There is now a hovered item
-                (hoveredItem && this.prevHoveredItemId &&
-                    hoveredItem.id !== this.prevHoveredItemId)) { // hovered item changed
+            (hoveredItem && !this.prevHoveredItemId) || // There is now a hovered item
+            (hoveredItem && this.prevHoveredItemId &&
+                hoveredItem.id !== this.prevHoveredItemId)) { // hovered item changed
             this.setHoveredItem(hoveredItem ? hoveredItem.id : null);
         }
     }
-    handleMouseDrag (event) {
+    handleMouseDrag(event) {
         if (event.event.button > 0 || !this.active) return; // only first mouse button
         this._modeMap[this.mode].onMouseDrag(event);
     }
-    handleMouseUp (event) {
+    handleMouseUp(event) {
         if (event.event.button > 0 || !this.active) return; // only first mouse button
         if (this.mode === ReshapeModes.SELECTION_BOX) {
             this._modeMap[this.mode].onMouseUpVector(event);
@@ -309,7 +309,7 @@ class ReshapeTool extends paper.Tool {
         this.mode = ReshapeModes.SELECTION_BOX;
         this.active = false;
     }
-    handleKeyDown (event) {
+    handleKeyDown(event) {
         if (event.event.target instanceof HTMLInputElement || event.event.target instanceof HTMLTextAreaElement) {
             // Ignore nudge if a text input field is focused
             return;
@@ -329,15 +329,19 @@ class ReshapeTool extends paper.Tool {
         } else if (event.key === 'right') {
             translation = new paper.Point(nudgeAmount, 0);
         } else if (event.key == 'i' || event.key == 'o') {
-            
+
             const segments = getSelectedSegments();
             for (const seg of segments) {
                 let parent = seg.path;
                 let p = seg.point;
+                let o = parent.getOffsetOf(p);
+                let o1 = o + 0.01;
+                let o2 = o + (parent.length - 0.01);
+                let n = (parent.getNormalAt(o1 % parent.length).add(parent.getNormalAt(o2 % parent.length))).divide(2);
                 if (event.key == 'o') {
-                    seg.point = p.add(parent.getNormalAt(parent.getOffsetOf(p)));
+                    seg.point = p.add(n);
                 } else {
-                    seg.point = p.subtract(parent.getNormalAt(parent.getOffsetOf(p)));
+                    seg.point = p.subtract(n);
                 }
             }
         }
@@ -356,7 +360,7 @@ class ReshapeTool extends paper.Tool {
             }
         }
     }
-    handleKeyUp (event) {
+    handleKeyUp(event) {
         const selected = getSelectedLeafItems();
         if (selected.length === 0) return;
 
@@ -364,7 +368,7 @@ class ReshapeTool extends paper.Tool {
             this.onUpdateImage();
         }
     }
-    deactivateTool () {
+    deactivateTool() {
         paper.settings.handleSize = 0;
         this.clearHoveredItem();
         this.setHoveredItem = null;

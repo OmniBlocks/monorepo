@@ -89,7 +89,7 @@ class RectTool extends paper.Tool {
             this.onUpdateImage();
         }
     }
-    handleMouseDown (this) {
+    handleMouseDown (event) {
         if (event.event.button > 0) return; // only first mouse button
         this.active = true;
 

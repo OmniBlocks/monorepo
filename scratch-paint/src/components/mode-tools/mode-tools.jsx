@@ -283,24 +283,28 @@ const ModeToolsComponent = props => {
                                 src={currentIcon}
                             />
                         </div>
-                        <LiveInput
-                            range
-                            small
-                            max={1000}
-                            min="3"
-                            type="number"
-                            value={currentSideValue}
-                            onSubmit={changeFunction}
-                        />
-                        <LiveInput
-                            range
-                            small
-                            max={1000}
-                            min="1"
-                            type="number"
-                            value={currentPointValue}
-                            onSubmit={changeFunctionPoint}
-                        />
+                        <Label text={"Side Count"}>
+                            <LiveInput
+                                range
+                                small
+                                max={1000}
+                                min="3"
+                                type="number"
+                                value={currentSideValue}
+                                onSubmit={changeFunction}
+                            />
+                        </Label>
+                        <Label text={"Spike Ratio"}>
+                            <LiveInput
+                                range
+                                small
+                                max={1000}
+                                min="0"
+                                type="number"
+                                value={currentPointValue}
+                                onSubmit={changeFunctionPoint}
+                            />
+                        </Label>
                     </div>
                 );
             }

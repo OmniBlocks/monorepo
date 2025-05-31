@@ -57,6 +57,7 @@ import curvedPointIcon from './icons/curved-point.svg';
 import eraserIcon from '../eraser-mode/eraser.svg';
 import roundedRectIcon from '../rounded-rect-mode/rounded-rectangle.svg';
 import triangleIcon from '../triangle-mode/triangle.svg';
+import triangleSpikeRatioIcon from './icons/triangle-spike-ratio.svg';
 import flipHorizontalIcon from './icons/flip-horizontal.svg';
 import flipVerticalIcon from './icons/flip-vertical.svg';
 import centerSelectionIcon from './icons/centerSelection.svg';
@@ -97,6 +98,11 @@ const ModeToolsComponent = props => {
             defaultMessage: 'Polygon side count',
             description: 'Label for the Polygon side count input',
             id: 'paint.modeTools.currentSideCount'
+        },
+        spokeRatio: {
+            defaultMessage: 'Star spoke ratio',
+            description: 'Label for the Star spoke ratio input, controls the size of the spokes on a star',
+            id: 'paint.modeTools.spikeRatio'
         },
         copy: {
             defaultMessage: 'Copy',
@@ -268,7 +274,6 @@ const ModeToolsComponent = props => {
             }
         case Modes.TRIANGLE:
             {
-                const currentIcon = triangleIcon;
                 const currentSideValue = props.trianglePolyValue;
                 const currentPointValue = props.trianglePointValue;
                 const changeFunction = props.onPolyCountSliderChange;
@@ -278,33 +283,40 @@ const ModeToolsComponent = props => {
                         <div>
                             <img
                                 alt={props.intl.formatMessage(messages.currentSideCount)}
+                                title={props.intl.formatMessage(messages.currentSideCount)}
                                 className={styles.modeToolsIcon}
                                 draggable={false}
-                                src={currentIcon}
+                                src={triangleIcon}
                             />
                         </div>
-                        <Label text={"Side Count"}>
-                            <LiveInput
-                                range
-                                small
-                                max={1000}
-                                min="3"
-                                type="number"
-                                value={currentSideValue}
-                                onSubmit={changeFunction}
+                        <LiveInput
+                            range
+                            small
+                            max={1000}
+                            min="3"
+                            type="number"
+                            value={currentSideValue}
+                            onSubmit={changeFunction}
+                        />
+                        <div>
+                            <img
+                                alt={props.intl.formatMessage(messages.spokeRatio)}
+                                title={props.intl.formatMessage(messages.spokeRatio)}
+                                className={styles.modeToolsIcon}
+                                draggable={false}
+                                src={triangleSpikeRatioIcon}
                             />
-                        </Label>
-                        <Label text={"Spike Ratio"}>
-                            <LiveInput
-                                range
-                                small
-                                max={1000}
-                                min="0"
-                                type="number"
-                                value={currentPointValue}
-                                onSubmit={changeFunctionPoint}
-                            />
-                        </Label>
+                        </div>
+                        <LiveInput
+                            range
+                            small
+                            max={1000}
+                            min="0" // Spike ratio is limited to 0.01, but setting that here makes the number input arrows work really ugly
+                            step="0.1"
+                            type="number"
+                            value={currentPointValue}
+                            onSubmit={changeFunctionPoint}
+                        />
                     </div>
                 );
             }

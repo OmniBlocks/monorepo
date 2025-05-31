@@ -13,6 +13,7 @@ import { changeStrokeColor, clearStrokeGradient } from '../reducers/stroke-style
 import { changeMode } from '../reducers/modes';
 import { clearSelectedItems, setSelectedItems } from '../reducers/selected-items';
 import { setCursor } from '../reducers/cursor';
+import { changeCurrentlySelectedShape } from '../reducers/sussy-mode';
 
 import { clearSelection, getSelectedLeafItems } from '../helper/selection';
 import SussyTool from '../helper/tools/sussy-tool';
@@ -39,6 +40,9 @@ class SussyMode extends React.Component {
         if (this.tool && nextProps.selectedItems !== this.props.selectedItems) {
             this.tool.onSelectionChanged(nextProps.selectedItems);
         }
+        if (this.tool && nextProps.shape !== this.props.shape) {
+            this.tool.setShape(nextProps.shape);
+        }
 
         if (nextProps.isSussyModeActive && !this.props.isSussyModeActive) {
             this.activateTool();
@@ -58,6 +62,10 @@ class SussyMode extends React.Component {
         clearSelection(this.props.clearSelectedItems);
         this.validateColorState();
 
+        if (!this.props.shape) {
+            this.props.onSetSelectedShape("smile");
+        }
+
         this.tool = new SussyTool(
             this.props.setSelectedItems,
             this.props.clearSelectedItems,
@@ -65,6 +73,7 @@ class SussyMode extends React.Component {
             this.props.onUpdateImage
         );
         this.tool.setColorState(this.props.colorState);
+        this.tool.setShape(this.props.shape);
         this.tool.activate();
     }
     validateColorState() { // TODO move to shared class
@@ -136,20 +145,23 @@ SussyMode.propTypes = {
         strokeColor: ColorStyleProptype,
         strokeWidth: PropTypes.number
     }).isRequired,
+    shape: PropTypes.string.isRequired,
     handleMouseDown: PropTypes.func.isRequired,
     isSussyModeActive: PropTypes.bool.isRequired,
     onChangeFillColor: PropTypes.func.isRequired,
     onChangeStrokeColor: PropTypes.func.isRequired,
+    onSetSelectedShape: PropTypes.func.isRequired,
     onUpdateImage: PropTypes.func.isRequired,
     selectedItems: PropTypes.arrayOf(PropTypes.instanceOf(paper.Item)),
     setCursor: PropTypes.func.isRequired,
-    setSelectedItems: PropTypes.func.isRequired
+    setSelectedItems: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = state => ({
     colorState: state.scratchPaint.color,
     isSussyModeActive: state.scratchPaint.mode === Modes.SUSSY,
-    selectedItems: state.scratchPaint.selectedItems
+    selectedItems: state.scratchPaint.selectedItems,
+    shape: state.scratchPaint.sussyMode.shape,
 });
 const mapDispatchToProps = dispatch => ({
     clearSelectedItems: () => {
@@ -175,6 +187,9 @@ const mapDispatchToProps = dispatch => ({
     },
     onChangeStrokeColor: strokeColor => {
         dispatch(changeStrokeColor(strokeColor));
+    },
+    onSetSelectedShape: shape => {
+        dispatch(changeCurrentlySelectedShape(shape));
     }
 });
 

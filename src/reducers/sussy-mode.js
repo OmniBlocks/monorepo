@@ -1,20 +1,17 @@
 import log from '../log/log';
-import SussyTool from '../helper/tools/sussy-tool';
 
 const CHANGE_SUSSY_CURRENTLY_SELECTED_SHAPE = 'scratch-paint/sussy-mode/CHANGE_SUSSY_CURRENTLY_SELECTED_SHAPE';
-const initialState = { currentlySelectedShape: "smile" };
+const initialState = { shape: "smile" };
 
 const reducer = function (state, action) {
     if (typeof state === 'undefined') state = initialState;
     switch (action.type) {
         case CHANGE_SUSSY_CURRENTLY_SELECTED_SHAPE:
-            if (typeof action.currentlySelectedShape !== "string") {
-                log.warn(`Invalid shape: ${action.currentlySelectedShape}`);
+            if (typeof action.shape !== "string") {
+                log.warn(`Invalid shape: ${action.shape}`);
                 return state;
             }
-            const value = String(action.currentlySelectedShape);
-            SussyTool.currentlySelectedShape = value;
-            return { currentlySelectedShape: value };
+            return { shape: String(action.shape) };
         default:
             return state;
     }
@@ -24,7 +21,7 @@ const reducer = function (state, action) {
 const changeCurrentlySelectedShape = function (shape) {
     return {
         type: CHANGE_SUSSY_CURRENTLY_SELECTED_SHAPE,
-        currentlySelectedShape: shape
+        shape: shape
     };
 };
 

@@ -1,5 +1,6 @@
 import {combineReducers} from 'redux';
 import modeReducer from './modes';
+import addonUtilReducer from './addon-util';
 import bitBrushSizeReducer from './bit-brush-size';
 import bitEraserSizeReducer from './bit-eraser-size';
 import brushModeReducer from './brush-mode';
@@ -29,6 +30,7 @@ import zoomLevelsReducer from './zoom-levels';
 
 export default combineReducers({
     mode: modeReducer,
+    addonUtil: addonUtilReducer,
     bitBrushSize: bitBrushSizeReducer,
     bitEraserSize: bitEraserSizeReducer,
     brushMode: brushModeReducer,

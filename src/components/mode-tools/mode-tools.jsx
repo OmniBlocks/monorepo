@@ -238,9 +238,9 @@ const ModeToolsComponent = props => {
                     </div>
                 );
             }
-        case Modes.ROUNDED_RECT:
+        case Modes.RECT:
             {
-                const currentIcon = roundedRectIcon;
+                // NOTE: BIT_RECT doesnt use Path, so this can't be added there the same way as RECT has it.
                 const currentCornerValue = props.roundedCornerValue;
                 const changeFunction = props.onRoundedCornerSliderChange;
                 return (
@@ -250,14 +250,14 @@ const ModeToolsComponent = props => {
                                 alt={props.intl.formatMessage(messages.roundedCornerSize)}
                                 className={styles.modeToolsIcon}
                                 draggable={false}
-                                src={currentIcon}
+                                src={roundedRectIcon}
                             />
                         </div>
                         <LiveInput
                             range
                             small
+                            min={0}
                             max={1000}
-                            min="1"
                             type="number"
                             value={currentCornerValue}
                             onSubmit={changeFunction}

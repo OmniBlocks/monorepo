@@ -46,6 +46,7 @@ class TriangleTool extends paper.Tool {
         this.colorState = null;
         this.isBoundingBoxMode = null;
         this.active = false;
+        this.lastUpPoint = null;
 
         this.sideCount = 3;
         this.pointCount = 1;
@@ -75,9 +76,39 @@ class TriangleTool extends paper.Tool {
     }
     setSideCount(sideCount) {
         this.sideCount = sideCount;
+        this.updateExistingShape();
     }
     setPointCount(pointCount) {
         this.pointCount = pointCount;
+        this.updateExistingShape();
+    }
+    calculateSegments() {
+        let segs = [];
+
+        for (let i = 0; i < this.sideCount; i++) {
+            let angle = (i / this.sideCount) * Math.PI * 2;
+            let angleIn = angle + (1 / this.sideCount) * Math.PI;
+
+            segs.push(new paper.Point(Math.sin(angle) * 50, -Math.cos(angle) * 50))
+            if (this.pointCount !== 1) {
+                segs.push(new paper.Point(Math.sin(angleIn) * 50 * this.pointCount, -Math.cos(angleIn) * 50 * this.pointCount));
+            }
+        }
+
+        return segs;
+    }
+    updateExistingShape() {
+        // if editing a tri, update the curves
+        const oldTri = paper.project.selectedItems[0];
+        if (oldTri) {
+            const path = new paper.Path({segments: this.calculateSegments(), closed: true});
+            path.position = oldTri.position;
+            oldTri.segments = path.segments;
+            oldTri.closed = true;
+            path.remove();
+            this.setSelectedItems();
+            this.onUpdateImage();
+        }
     }
     handleMouseDown(event) {
         if (event.event.button > 0) return; // only first mouse button
@@ -110,19 +141,7 @@ class TriangleTool extends paper.Tool {
             tri.size = squareDimensions.size.abs();
         }
 
-        let segs = [];
-
-        for (let i = 0; i < this.sideCount; i++) {
-            let angle = (i / this.sideCount) * Math.PI * 2;
-            let angleIn = angle + (1 / this.sideCount) * Math.PI;
-
-            segs.push(new paper.Point(Math.sin(angle) * 50, -Math.cos(angle) * 50))
-            if (this.pointCount != 1.0) {
-                segs.push(new paper.Point(Math.sin(angleIn) * 50 * this.pointCount, -Math.cos(angleIn) * 50 * this.pointCount));
-            }
-        }
-
-        this.tri = new paper.Path({segments: segs, closed: true});
+        this.tri = new paper.Path({segments: this.calculateSegments(), closed: true});
         this.tri.scale(tri.size.width / 100, tri.size.height / 100, event.downPoint);
         if (event.modifiers.alt) {
             this.tri.position = event.downPoint;
@@ -145,6 +164,7 @@ class TriangleTool extends paper.Tool {
         }
 
         if (this.tri) {
+            this.lastUpPoint = event.point;
             if (this.tri.area < TriangleTool.TOLERANCE / paper.view.zoom) {
                 // Tiny triangle created unintentionally?
                 this.tri.remove();

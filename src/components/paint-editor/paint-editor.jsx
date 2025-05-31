@@ -1,5 +1,6 @@
 import paper from '@turbowarp/paper';
 import classNames from 'classnames';
+import { connect } from 'react-redux';
 import {defineMessages, injectIntl, intlShape} from 'react-intl';
 import React from 'react';
 import PropTypes from 'prop-types';
@@ -178,6 +179,11 @@ const PaintEditorComponent = props => (
                     <RectMode
                         onUpdateImage={props.onUpdateImage}
                     />
+                    {props.showRoundedRectMode && (
+                        <RoundedRectMode
+                            onUpdateImage={props.onUpdateImage}
+                        />
+                    )}
                     <TriangleMode
                         onUpdateImage={props.onUpdateImage}
                     />
@@ -375,6 +381,7 @@ PaintEditorComponent.propTypes = {
     rtl: PropTypes.bool,
     setCanvas: PropTypes.func.isRequired,
     setTextArea: PropTypes.func.isRequired,
+    showRoundedRectMode: PropTypes.bool,
     textArea: PropTypes.instanceOf(Element),
     theme: PropTypes.string,
     width: PropTypes.number,
@@ -382,4 +389,10 @@ PaintEditorComponent.propTypes = {
     zoomLevelId: PropTypes.string
 };
 
-export default injectIntl(PaintEditorComponent);
+const mapStateToProps = state => ({
+    showRoundedRectMode: state.scratchPaint.addonUtil.showRoundedRectMode
+});
+
+export default connect(
+    mapStateToProps,
+)(injectIntl(PaintEditorComponent));

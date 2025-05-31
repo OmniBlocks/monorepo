@@ -23,8 +23,6 @@ import {flipBitmapHorizontal, flipBitmapVertical, selectAllBitmap} from '../help
 import Formats, {isBitmap} from '../lib/format';
 import Modes from '../lib/modes';
 
-import TextTool from '../helper/tools/text-tool.js';
-
 class ModeTools extends React.Component {
     constructor (props) {
         super(props);
@@ -40,9 +38,6 @@ class ModeTools extends React.Component {
             'handleDelete',
             'handlePasteFromClipboard',
             'handlePointPoints',
-            'handleTextAlignLeft',
-            'handleTextAlignRight',
-            'handleTextAlignCenter',
             'handleMergeShape',
             'handleMaskShape',
             'handleSubtractShape',
@@ -291,16 +286,6 @@ class ModeTools extends React.Component {
         }
     }
 
-    handleTextAlignLeft () {
-        TextTool.textAlignment = "left";
-    }
-    handleTextAlignCenter () {
-        TextTool.textAlignment = "center";
-    }
-    handleTextAlignRight () {
-        TextTool.textAlignment = "right";
-    }
-
     handleMergeShape (specificOperation) {
         const selectedItems = getSelectedRootItems();
         if (selectedItems.length < 2) {
@@ -464,10 +449,6 @@ class ModeTools extends React.Component {
                 onMiterLineJoin={this.handleMiterLineJoin}
                 onRoundLineJoin={this.handleRoundLineJoin}
                 onBevelLineJoin={this.handleBevelLineJoin}
-
-                onTextAlignLeft={this.handleTextAlignLeft}
-                onTextAlignRight={this.handleTextAlignRight}
-                onTextAlignCenter={this.handleTextAlignCenter}
 
                 onMergeShape={this.handleMergeShape}
                 onMaskShape={this.handleMaskShape}

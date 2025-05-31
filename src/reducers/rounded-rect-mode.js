@@ -11,7 +11,7 @@ const reducer = function (state, action) {
                 log.warn(`Invalid rounded corner size: ${action.roundedCornerSize}`);
                 return state;
             }
-            return { roundedCornerSize: Math.floor(Math.max(1, action.roundedCornerSize)) };
+            return { roundedCornerSize: Math.floor(Math.max(0, action.roundedCornerSize)) };
         default:
             return state;
     }

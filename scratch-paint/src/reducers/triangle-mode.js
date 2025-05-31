@@ -19,7 +19,7 @@ const reducer = function (state, action) {
                 log.warn(`Invalid spike ratio: ${action.trianglePointCount}`);
                 return state;
             }
-            return { trianglePointCount: Math.max(0, action.trianglePointCount), trianglePolyCount: state.trianglePolyCount };
+            return { trianglePointCount: Math.max(0.01, action.trianglePointCount), trianglePolyCount: state.trianglePolyCount };
         default:
             return state;
     }

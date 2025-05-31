@@ -13,6 +13,7 @@ import {changeStrokeColor, clearStrokeGradient} from '../reducers/stroke-style';
 import {changeMode} from '../reducers/modes';
 import {clearSelectedItems, setSelectedItems} from '../reducers/selected-items';
 import {setCursor} from '../reducers/cursor';
+import {changeRoundedCornerSize} from '../reducers/rounded-rect-mode';
 
 import {clearSelection, getSelectedLeafItems} from '../helper/selection';
 import RectTool from '../helper/tools/rect-tool';
@@ -39,6 +40,9 @@ class RectMode extends React.Component {
         if (this.tool && nextProps.selectedItems !== this.props.selectedItems) {
             this.tool.onSelectionChanged(nextProps.selectedItems);
         }
+        if (this.tool && nextProps.roundedCornerSize !== this.props.roundedCornerSize) {
+            this.tool.setRoundedCornerSize(nextProps.roundedCornerSize);
+        }
 
         if (nextProps.isRectModeActive && !this.props.isRectModeActive) {
             this.activateTool();
@@ -58,12 +62,17 @@ class RectMode extends React.Component {
         clearSelection(this.props.clearSelectedItems);
         this.validateColorState();
 
+        if (typeof this.props.roundedCornerSize !== "number") {
+            this.props.onSetPointCount(1);
+        }
+
         this.tool = new RectTool(
             this.props.setSelectedItems,
             this.props.clearSelectedItems,
             this.props.setCursor,
             this.props.onUpdateImage
         );
+        this.tool.setRoundedCornerSize(this.props.roundedCornerSize);
         this.tool.setColorState(this.props.colorState);
         this.tool.activate();
     }
@@ -143,13 +152,16 @@ RectMode.propTypes = {
     onUpdateImage: PropTypes.func.isRequired,
     selectedItems: PropTypes.arrayOf(PropTypes.instanceOf(paper.Item)),
     setCursor: PropTypes.func.isRequired,
-    setSelectedItems: PropTypes.func.isRequired
+    setSelectedItems: PropTypes.func.isRequired,
+    roundedCornerSize: PropTypes.number.isRequired,
+    onChangeRoundedCornerSize: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = state => ({
     colorState: state.scratchPaint.color,
     isRectModeActive: state.scratchPaint.mode === Modes.RECT,
-    selectedItems: state.scratchPaint.selectedItems
+    selectedItems: state.scratchPaint.selectedItems,
+    roundedCornerSize: state.scratchPaint.roundedRectMode.roundedCornerSize,
 });
 const mapDispatchToProps = dispatch => ({
     clearSelectedItems: () => {
@@ -175,6 +187,9 @@ const mapDispatchToProps = dispatch => ({
     },
     onChangeStrokeColor: strokeColor => {
         dispatch(changeStrokeColor(strokeColor));
+    },
+    onChangeRoundedCornerSize: roundedCornerSize => {
+        dispatch(changeRoundedCornerSize(roundedCornerSize));
     }
 });
 

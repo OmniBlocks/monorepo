@@ -13,6 +13,7 @@ import {changeFillColor, clearFillGradient, DEFAULT_COLOR} from '../reducers/fil
 import {changeStrokeColor} from '../reducers/stroke-style';
 import {changeMode} from '../reducers/modes';
 import {setTextEditTarget} from '../reducers/text-edit-target';
+import {setTextAlignment} from '../reducers/text-alignment';
 import {clearSelectedItems, setSelectedItems} from '../reducers/selected-items';
 import {setCursor} from '../reducers/cursor';
 
@@ -50,6 +51,9 @@ class TextMode extends React.Component {
             }
             if (nextProps.font !== this.props.font) {
                 this.tool.setFont(nextProps.font);
+            }
+            if (nextProps.alignment !== this.props.alignment) {
+                this.tool.setAlignment(nextProps.alignment);
             }
         }
 
@@ -96,6 +100,9 @@ class TextMode extends React.Component {
         if (!nextProps.font) {
             this.props.changeFont(Fonts.SANS_SERIF);
         }
+        if (!nextProps.alignment) {
+            this.props.changeAlignment("left");
+        }
 
         this.tool = new TextTool(
             this.props.textArea,
@@ -105,10 +112,12 @@ class TextMode extends React.Component {
             this.props.onUpdateImage,
             this.props.setTextEditTarget,
             this.props.changeFont,
+            this.props.changeAlignment,
             nextProps.isBitmap
         );
         this.tool.setColorState(nextProps.colorState);
         this.tool.setFont(nextProps.font);
+        this.tool.setAlignment(nextProps.alignment);
         this.tool.activate();
         if (textBoxToStartEditing) {
             this.tool.beginTextEdit(textBoxToStartEditing);
@@ -137,6 +146,7 @@ class TextMode extends React.Component {
 
 TextMode.propTypes = {
     changeFont: PropTypes.func.isRequired,
+    changeAlignment: PropTypes.func.isRequired,
     clearGradient: PropTypes.func.isRequired,
     clearSelectedItems: PropTypes.func.isRequired,
     colorState: PropTypes.shape({
@@ -145,6 +155,7 @@ TextMode.propTypes = {
         strokeWidth: PropTypes.number
     }).isRequired,
     font: PropTypes.string,
+    alignment: PropTypes.string,
     handleChangeModeBitText: PropTypes.func.isRequired,
     handleChangeModeText: PropTypes.func.isRequired,
     isBitmap: PropTypes.bool,
@@ -165,6 +176,7 @@ TextMode.propTypes = {
 const mapStateToProps = (state, ownProps) => ({
     colorState: state.scratchPaint.color,
     font: state.scratchPaint.font,
+    alignment: state.scratchPaint.textAlignment.alignment,
     isTextModeActive: ownProps.isBitmap ?
         state.scratchPaint.mode === Modes.BIT_TEXT :
         state.scratchPaint.mode === Modes.TEXT,
@@ -203,6 +215,9 @@ const mapDispatchToProps = (dispatch, ownProps) => ({
     },
     onChangeStrokeColor: strokeColor => {
         dispatch(changeStrokeColor(strokeColor));
+    },
+    changeAlignment: alignment => {
+        dispatch(setTextAlignment(alignment));
     }
 });
 

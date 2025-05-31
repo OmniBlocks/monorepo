@@ -19,6 +19,7 @@ import hoverReducer from './hover';
 import layoutReducer from './layout';
 import modalsReducer from './modals';
 import selectedItemReducer from './selected-items';
+import textAlignmentReducer from './text-alignment';
 import textEditTargetReducer from './text-edit-target';
 import themeReducer from './theme';
 import viewBoundsReducer from './view-bounds';
@@ -46,6 +47,7 @@ export default combineReducers({
     layout: layoutReducer,
     modals: modalsReducer,
     selectedItems: selectedItemReducer,
+    textAlignment: textAlignmentReducer,
     textEditTarget: textEditTargetReducer,
     theme: themeReducer,
     undo: undoReducer,

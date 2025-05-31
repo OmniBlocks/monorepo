@@ -6,15 +6,6 @@ import { getSquareDimensions } from '../math';
 import BoundingBoxTool from '../selection-tools/bounding-box-tool';
 import NudgeTool from '../selection-tools/nudge-tool';
 
-const arrowSettings = {
-    lineWidth: 24,
-    lineLength: 60,
-    headWidth: 60,
-    headLength: 60
-}
-
-const guideText = `Hold Shift to resize arrow tip`;
-
 const constructArrowPath = (left, lineWidth, lineLength, headWidth, headLength) => {
     if (typeof lineWidth !== "number") {
         lineWidth = 24;
@@ -39,20 +30,6 @@ const constructArrowPath = (left, lineWidth, lineLength, headWidth, headLength) 
  * Tool for drawing arrows.
  */
 class ArrowTool extends paper.Tool {
-    static update(settings) {
-        if (typeof settings.lineWidth === "number") arrowSettings.lineWidth = settings.lineWidth;
-        if (typeof settings.lineLength === "number") arrowSettings.lineLength = settings.lineLength;
-        if (typeof settings.headWidth === "number") arrowSettings.headWidth = settings.headWidth;
-        if (typeof settings.headLength === "number") arrowSettings.headLength = settings.headLength;
-    }
-
-    static set arrowSettings(_) {
-        throw new Error('arrowSettings cannot be set; use ArrowTool.update(<Object:ArrowToolSettings>);');
-    }
-    static get arrowSettings() {
-        return arrowSettings;
-    }
-
     static get TOLERANCE() {
         return 2;
     }
@@ -104,7 +81,6 @@ class ArrowTool extends paper.Tool {
         this.arrowPathLockedState = {};
         this.arrowPathLockedPositionSet = false;
         this.arrowPathLockedPosition = { x: 0, y: 0 };
-        this.guideText = null;
     }
     getHitOptions() {
         return {
@@ -148,10 +124,6 @@ class ArrowTool extends paper.Tool {
         this.arrowPathLockedState = {};
         this.arrowPathLockedPositionSet = false;
         this.arrowPathLockedPosition = { x: 0, y: 0 };
-        if (this.guideText) {
-            this.guideText.remove();
-        }
-        this.guideText = null;
 
         if (this.boundingBoxTool.onMouseDown(
             event, false /* clone */, false /* multiselect */, false /* doubleClicked */, this.getHitOptions())) {
@@ -257,10 +229,12 @@ class ArrowTool extends paper.Tool {
             }
         }
 
-        this.tri = new paper.Path(constructArrowPath(event.modifiers.control, pathOptions.width, pathOptions.length, pathOptions.head.width, pathOptions.head.length));
-        // console.log(pathOptions.angle, this.tri)
-        // console.log(pathOptions.angle)
-        // this.tri.scale(tri.size.width / 100, tri.size.height / 100, event.downPoint);
+        this.tri = new paper.Path(constructArrowPath(
+            event.modifiers.control,
+            pathOptions.width, pathOptions.length,
+            pathOptions.head.width,
+            pathOptions.head.length
+        ));
 
         // create new position
         if ((!this.arrowPathLocked) && this.arrowPathLockedState) {
@@ -274,27 +248,6 @@ class ArrowTool extends paper.Tool {
 
         if (this.canModifyState) {
             this.tri.rotate(pathOptions.angle, event.downPoint);
-        }
-
-        // add guide text
-        // remove first
-        if (this.guideText) {
-            this.guideText.remove();
-        }
-        this.guideText = null;
-        if (event.modifiers.alt && (!event.modifiers.shift)) {
-            // create
-            this.guideText = new paper.PointText({
-                point: event.point,
-                content: guideText,
-                font: 'Sans Serif',
-                fontSize: 32,
-                fillColor: '#000000',
-                // Default leading for both the HTML text area and paper.PointText
-                // is 120%, but for some reason they are slightly off from each other.
-                // This value was obtained experimentally.
-                leading: 46.15
-            });
         }
 
         this.arrowPathLockedState = {
@@ -313,11 +266,6 @@ class ArrowTool extends paper.Tool {
             this.isBoundingBoxMode = null;
             return;
         }
-
-        if (this.guideText) {
-            this.guideText.remove();
-        }
-        this.guideText = null;
 
         this.arrowPathLockedPositionSet = false;
         this.arrowPathLockedPosition = { x: 0, y: 0 };

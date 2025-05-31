@@ -46,7 +46,6 @@ class TriangleTool extends paper.Tool {
         this.colorState = null;
         this.isBoundingBoxMode = null;
         this.active = false;
-        this.lastUpPoint = null;
 
         this.sideCount = 3;
         this.pointCount = 1;
@@ -102,7 +101,7 @@ class TriangleTool extends paper.Tool {
         const oldTri = paper.project.selectedItems[0];
         if (oldTri) {
             const path = new paper.Path({segments: this.calculateSegments(), closed: true});
-            path.position = oldTri.position;
+            path.bounds = oldTri.bounds;
             oldTri.segments = path.segments;
             oldTri.closed = true;
             path.remove();
@@ -134,15 +133,14 @@ class TriangleTool extends paper.Tool {
             this.tri.remove();
         }
 
-        // idk how paper works so we use rectangle to make a triangle
-        const tri = new paper.Rectangle(event.downPoint, event.point);
+        const bounds = new paper.Rectangle(event.downPoint, event.point);
         const squareDimensions = getSquareDimensions(event.downPoint, event.point);
         if (event.modifiers.shift) {
-            tri.size = squareDimensions.size.abs();
+            bounds.size = squareDimensions.size.abs();
         }
 
         this.tri = new paper.Path({segments: this.calculateSegments(), closed: true});
-        this.tri.scale(tri.size.width / 100, tri.size.height / 100, event.downPoint);
+        this.tri.bounds = bounds;
         if (event.modifiers.alt) {
             this.tri.position = event.downPoint;
         } else if (event.modifiers.shift) {
@@ -164,7 +162,6 @@ class TriangleTool extends paper.Tool {
         }
 
         if (this.tri) {
-            this.lastUpPoint = event.point;
             if (this.tri.area < TriangleTool.TOLERANCE / paper.view.zoom) {
                 // Tiny triangle created unintentionally?
                 this.tri.remove();

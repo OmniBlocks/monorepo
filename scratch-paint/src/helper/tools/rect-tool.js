@@ -48,7 +48,6 @@ class RectTool extends paper.Tool {
         this.active = false;
 
         this.roundedCornerSize = 0;
-        this.lastUpPoint = null;
     }
     getHitOptions () {
         return {
@@ -79,9 +78,7 @@ class RectTool extends paper.Tool {
         // if editing a rect, update the curves
         const oldRect = paper.project.selectedItems[0];
         if (oldRect) {
-            const bounds = new paper.Rectangle(this._downPoint, this.lastUpPoint);
-            const rounded = new paper.Path.Rectangle(bounds, newCornerSize);
-
+            const rounded = new paper.Path.Rectangle(oldRect.bounds, newCornerSize);
             oldRect.segments = rounded.segments;
             oldRect.closed = true;
             rounded.remove();
@@ -141,7 +138,6 @@ class RectTool extends paper.Tool {
         }
 
         if (this.rect) {
-            this.lastUpPoint = event.point;
             if (this.rect.area < RectTool.TOLERANCE / paper.view.zoom) {
                 // Tiny rectangle created unintentionally?
                 this.rect.remove();

@@ -1,11 +1,3 @@
-// Use JS implemented TextDecoder and TextEncoder if it is not provided by the
-// browser.
-if (typeof TextDecoder === 'undefined' || typeof TextEncoder === 'undefined') {
-    // Wait to require the text encoding polyfill until we know it's needed.
-    // eslint-disable-next-line global-require
-    require('fastestsmallesttextencoderdecoder');
-}
-
 const md5 = require('js-md5');
 
 /**

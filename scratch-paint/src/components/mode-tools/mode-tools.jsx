@@ -81,8 +81,8 @@ const ModeToolsComponent = props => {
             id: 'paint.modeTools.brushSize'
         },
         brushSeg: {
-            defaultMessage: 'Accuracy',
-            description: 'Label for the brush accuracy input',
+            defaultMessage: 'Stability',
+            description: 'Label for the brush stability input, higher numbers control how much the drawn line will be corrected',
             id: 'paint.modeTools.brushSeg'
         },
         eraserSize: {
@@ -177,21 +177,47 @@ const ModeToolsComponent = props => {
                 const currentIcon = isVector(props.format) ? brushIcon :
                     props.mode === Modes.BIT_LINE ? bitLineIcon : bitBrushIcon;
                 const currentBrushValue = isBitmap(props.format) ? props.bitBrushSize : props.brushValue;
-                const currentSegValue = isBitmap(props.format) ? props.bitBrushSize : props.segValue;
+                const currentSegValue = props.segValue;
                 const changeFunction = isBitmap(props.format) ? props.onBitBrushSliderChange : props.onBrushSliderChange;
-                const changeFunctionSeg = isBitmap(props.format) ? props.onBitBrushSliderChange : props.onSegSliderChange;
+                const changeFunctionSeg = props.onSegSliderChange;
                 const currentMessage = props.mode === Modes.BIT_LINE ? messages.thickness : messages.brushSize;
+                const hasAccuracyOption = props.mode === Modes.BRUSH;
                 return (
                     <div className={classNames(props.className, styles.modeTools)}>
                         <div>
                             <img
                                 alt={props.intl.formatMessage(currentMessage)}
+                                title={props.intl.formatMessage(currentMessage)}
                                 className={styles.modeToolsIcon}
                                 draggable={false}
                                 src={currentIcon}
                             />
                         </div>
-                        <Label text={props.intl.formatMessage(messages.brushSize)}>
+                        {hasAccuracyOption ? (<>
+                            <Label text={props.intl.formatMessage(messages.brushSize)}>
+                                <LiveInput
+                                    range
+                                    small
+                                    max={MAX_STROKE_WIDTH}
+                                    min="1"
+                                    type="number"
+                                    value={currentBrushValue}
+                                    onSubmit={changeFunction}
+                                />
+                            </Label>
+
+                            <Label text={props.intl.formatMessage(messages.brushSeg)}>
+                                <LiveInput
+                                    range
+                                    small
+                                    max={MAX_STROKE_WIDTH * 10}
+                                    min="0"
+                                    type="number"
+                                    value={currentSegValue}
+                                    onSubmit={changeFunctionSeg}
+                                />
+                            </Label>
+                        </>) : (
                             <LiveInput
                                 range
                                 small
@@ -201,20 +227,8 @@ const ModeToolsComponent = props => {
                                 value={currentBrushValue}
                                 onSubmit={changeFunction}
                             />
-                        </Label>
-
-                        <Label text={props.intl.formatMessage(messages.brushSeg)}>
-                        <LiveInput
-                            range
-                            small
-                            max={MAX_STROKE_WIDTH * 10}
-                            min="1"
-                            type="number"
-                            value={currentSegValue}
-                            onSubmit={changeFunctionSeg}
-                        />
-                        </Label>
-                    </div >
+                        )}
+                    </div>
                 );
             }
         case Modes.BIT_ERASER:

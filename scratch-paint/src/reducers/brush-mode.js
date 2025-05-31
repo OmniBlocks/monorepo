@@ -2,7 +2,7 @@ import log from '../log/log';
 
 const CHANGE_BRUSH_SIZE = 'scratch-paint/brush-mode/CHANGE_BRUSH_SIZE';
 const CHANGE_SEG_SIZE = CHANGE_BRUSH_SIZE + 1;
-const initialState = { brushSize: 10, segSize: 1 };
+const initialState = { brushSize: 10, segSize: 10 };
 
 const reducer = function (state, action) {
     if (typeof state === 'undefined') state = initialState;
@@ -16,10 +16,10 @@ const reducer = function (state, action) {
             return { segSize, brushSize: Math.max(1, action.brushSize) };
         case CHANGE_SEG_SIZE:
             if (isNaN(action.segSize)) {
-                log.warn(`Invalid brush size: ${action.segSize}`);
+                log.warn(`Invalid stabilize setting: ${action.segSize}`);
                 return state;
             }
-            return { brushSize, segSize: Math.max(1, action.segSize) };
+            return { brushSize, segSize: Math.max(0, action.segSize) };
         default:
             return state;
     }

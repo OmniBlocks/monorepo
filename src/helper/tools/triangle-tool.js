@@ -116,9 +116,9 @@ class TriangleTool extends paper.Tool {
             let angle = (i / this.sideCount) * Math.PI * 2;
             let angleIn = angle + (1 / this.sideCount) * Math.PI;
 
-            segs.push(new paper.Point(Math.cos(angle) * 50, Math.sin(angle) * 50))
+            segs.push(new paper.Point(Math.sin(angle) * 50, -Math.cos(angle) * 50))
             if (this.pointCount != 1.0) {
-                segs.push(new paper.Point(Math.cos(angleIn) * 50 * this.pointCount, Math.sin(angleIn) * 50 * this.pointCount));
+                segs.push(new paper.Point(Math.sin(angleIn) * 50 * this.pointCount, -Math.cos(angleIn) * 50 * this.pointCount));
             }
         }
 

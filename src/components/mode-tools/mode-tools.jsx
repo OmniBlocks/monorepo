@@ -10,7 +10,8 @@ import layout from '../../lib/layout-constants';
 
 import { changeBrushSize, changeSegSize } from '../../reducers/brush-mode';
 import { changeBrushSize as changeEraserSize } from '../../reducers/eraser-mode';
-import { changeRoundedCornerSize } from '../../reducers/rounded-rect-mode';
+import { changeRoundedRectCornerSize } from '../../reducers/rounded-rect-mode';
+import { changeRoundedCornerSize } from '../../reducers/rect-mode';
 import { changeTrianglePolyCount, changeTrianglePointCount } from '../../reducers/triangle-mode';
 import { changeCurrentlySelectedShape } from '../../reducers/sussy-mode';
 import { changeBitBrushSize } from '../../reducers/bit-brush-size';
@@ -245,16 +246,19 @@ const ModeToolsComponent = props => {
                     </div>
                 );
             }
+        case Modes.ROUNDED_RECT:
+        /* falls through */
         case Modes.RECT:
             {
                 // NOTE: BIT_RECT doesnt use Path, so this can't be added there the same way as RECT has it.
-                const currentCornerValue = props.roundedCornerValue;
-                const changeFunction = props.onRoundedCornerSliderChange;
+                const currentCornerValue = props.mode === Modes.ROUNDED_RECT ? props.roundedRectCornerValue : props.roundedCornerValue;
+                const changeFunction = props.mode === Modes.ROUNDED_RECT ? props.onRoundedRectCornerSliderChange : props.onRoundedCornerSliderChange;
                 return (
                     <div className={classNames(props.className, styles.modeTools)}>
                         <div>
                             <img
                                 alt={props.intl.formatMessage(messages.roundedCornerSize)}
+                                title={props.intl.formatMessage(messages.roundedCornerSize)}
                                 className={styles.modeToolsIcon}
                                 draggable={false}
                                 src={roundedRectIcon}
@@ -742,6 +746,7 @@ ModeToolsComponent.propTypes = {
     clipboardItems: PropTypes.arrayOf(PropTypes.array),
     eraserValue: PropTypes.number,
     roundedCornerValue: PropTypes.number,
+    roundedRectCornerValue: PropTypes.number,
     trianglePolyValue: PropTypes.number,
     trianglePointValue: PropTypes.number,
     currentlySelectedShape: PropTypes.string,
@@ -785,7 +790,8 @@ const mapStateToProps = state => ({
     segValue: state.scratchPaint.brushMode.segSize,
     clipboardItems: state.scratchPaint.clipboard.items,
     eraserValue: state.scratchPaint.eraserMode.brushSize,
-    roundedCornerValue: state.scratchPaint.roundedRectMode.roundedCornerSize,
+    roundedRectCornerValue: state.scratchPaint.roundedRectMode.roundedCornerSize,
+    roundedCornerValue: state.scratchPaint.rectMode.roundedCornerSize,
     trianglePolyValue: state.scratchPaint.triangleMode.trianglePolyCount,
     trianglePointValue: state.scratchPaint.triangleMode.trianglePointCount,
     currentlySelectedShape: state.scratchPaint.sussyMode.shape
@@ -796,6 +802,9 @@ const mapDispatchToProps = dispatch => ({
     },
     onSegSliderChange: brushSize => {
         dispatch(changeSegSize(brushSize));
+    },
+    onRoundedRectCornerSliderChange: roundedCornerSize => {
+        dispatch(changeRoundedRectCornerSize(roundedCornerSize));
     },
     onRoundedCornerSliderChange: roundedCornerSize => {
         dispatch(changeRoundedCornerSize(roundedCornerSize));

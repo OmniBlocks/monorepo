@@ -29,6 +29,7 @@ import ModeToolsContainer from '../../containers/mode-tools.jsx';
 import OvalMode from '../../containers/oval-mode.jsx';
 import PenMode from '../../containers/pen-mode.jsx';
 import RectMode from '../../containers/rect-mode.jsx';
+import RoundedRectMode from '../../containers/rounded-rect-mode.jsx';
 import SussyMode from '../../containers/sussy-mode.jsx';
 import TriangleMode from '../../containers/triangle-mode.jsx';
 import ArrowMode from '../../containers/arrow-mode.jsx';

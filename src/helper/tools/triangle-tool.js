@@ -6,31 +6,10 @@ import { getSquareDimensions } from '../math';
 import BoundingBoxTool from '../selection-tools/bounding-box-tool';
 import NudgeTool from '../selection-tools/nudge-tool';
 
-const sideCount = {
-    value: 3
-};
-
-const pointCount = {
-    value: 1
-};
-
 /**
  * Tool for drawing triangles.
  */
 class TriangleTool extends paper.Tool {
-    static set sideCount(value) {
-        sideCount.value = value;
-    }
-    static get sideCount() {
-        return sideCount.value;
-    }
-    static set pointCount(value) {
-        pointCount.value = value;
-    }
-    static get pointCount() {
-        return pointCount.value;
-    }
-
     static get TOLERANCE() {
         return 2;
     }
@@ -67,6 +46,9 @@ class TriangleTool extends paper.Tool {
         this.colorState = null;
         this.isBoundingBoxMode = null;
         this.active = false;
+
+        this.sideCount = 3;
+        this.pointCount = 1;
     }
     getHitOptions() {
         return {
@@ -90,6 +72,12 @@ class TriangleTool extends paper.Tool {
     }
     setColorState(colorState) {
         this.colorState = colorState;
+    }
+    setSideCount(sideCount) {
+        this.sideCount = sideCount;
+    }
+    setPointCount(pointCount) {
+        this.pointCount = pointCount;
     }
     handleMouseDown(event) {
         if (event.event.button > 0) return; // only first mouse button
@@ -122,7 +110,7 @@ class TriangleTool extends paper.Tool {
             tri.size = squareDimensions.size.abs();
         }
 
-        this.tri = new paper.Path.RegularPolygon(event.downPoint, TriangleTool.sideCount, 50);
+        this.tri = new paper.Path.RegularPolygon(event.downPoint, this.sideCount, 50);
         this.tri.scale(tri.size.width / 100, tri.size.height / 100, event.downPoint);
         if (event.modifiers.alt) {
             this.tri.position = event.downPoint;
@@ -136,36 +124,35 @@ class TriangleTool extends paper.Tool {
         let seg = this.tri.segments;
         let newSeg = [[]];
 
-        let j = 0;
-        let oj = 0;
-        let wasOj = true;
-
-        let l = seg.length;
+        let idx = 0;
+        let origin = 0;
+        let wasOrigin = true;
+        const length = seg.length;
 
         // this is the worst code ever
-        for (let i = 0; i < l; i++) {
-            newSeg[newSeg.length - 1].push(seg[j]);
-            j += TriangleTool.pointCount;
-            j = j % (seg.length);
-            if (j == oj && !wasOj) {
-                j = oj + 1;
-                oj++;
-                wasOj = true;
+        for (let i = 0; i < length; i++) {
+            newSeg[newSeg.length - 1].push(seg[idx]);
+            idx += this.pointCount;
+            idx = idx % (seg.length);
+            if (idx == origin && !wasOrigin) {
+                idx = origin + 1;
+                origin++;
+                wasOrigin = true;
                 newSeg.push([]);
             }
-            wasOj = false;
+            wasOrigin = false;
         }
 
         this.tri.remove();
 
         this.tri = new paper.Path();
 
-        for (let s of newSeg) {
-            let t2 = new paper.Path({ segments: s, closed: true });          
-            let otri = this.tri;
-            this.tri = otri.unite(t2); 
-            t2.remove();
-            otri.remove();
+        for (let segGroup of newSeg) {
+            let toUnite = new paper.Path({ segments: segGroup, closed: true });          
+            let oldTri = this.tri;
+            this.tri = oldTri.unite(toUnite); 
+            toUnite.remove();
+            oldTri.remove();
         }
 
         styleShape(this.tri, this.colorState);

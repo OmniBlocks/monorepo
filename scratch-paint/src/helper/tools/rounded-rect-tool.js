@@ -6,21 +6,12 @@ import {getSquareDimensions} from '../math';
 import BoundingBoxTool from '../selection-tools/bounding-box-tool';
 import NudgeTool from '../selection-tools/nudge-tool';
 
-// since we arent a blob tool we have to improvise
-// this gets set by the reducer when the corner value is changed
-const toolCornerSize = {
-    value: 8
-}
-
 /**
  * Tool for drawing rounded rectangles.
  */
 class RoundedRectTool extends paper.Tool {
     static get TOLERANCE () {
         return 2;
-    }
-    static set cornerSize (value) {
-        toolCornerSize.value = value;
     }
     /**
      * @param {function} setSelectedItems Callback to set the set of selected items in the Redux state
@@ -56,7 +47,7 @@ class RoundedRectTool extends paper.Tool {
         this.isBoundingBoxMode = null;
         this.active = false;
 
-        this.roundedCornerSize = toolCornerSize.value;
+        this.roundedCornerSize = 0;
     }
     getHitOptions () {
         return {
@@ -71,11 +62,6 @@ class RoundedRectTool extends paper.Tool {
             tolerance: RoundedRectTool.TOLERANCE / paper.view.zoom
         };
     }
-    setRoundedCornerSize () {
-        // For performance, make sure this is an integer
-        this.roundedCornerSize = toolCornerSize.value;
-        this.roundedCornerSize = Math.max(1, ~~this.roundedCornerSize);
-    }
     /**
      * Should be called if the selection changes to update the bounds of the bounding box.
      * @param {Array<paper.Item>} selectedItems Array of selected items.
@@ -85,6 +71,20 @@ class RoundedRectTool extends paper.Tool {
     }
     setColorState (colorState) {
         this.colorState = colorState;
+    }
+    setRoundedCornerSize (newCornerSize) {
+        this.roundedCornerSize = newCornerSize;
+
+        // if editing a rect, update the curves
+        const oldRect = paper.project.selectedItems[0];
+        if (oldRect) {
+            const rounded = new paper.Path.Rectangle(oldRect.bounds, newCornerSize);
+            oldRect.segments = rounded.segments;
+            oldRect.closed = true;
+            rounded.remove();
+            this.setSelectedItems();
+            this.onUpdateImage();
+        }
     }
     handleMouseDown (event) {
         if (event.event.button > 0) return; // only first mouse button
@@ -116,9 +116,7 @@ class RoundedRectTool extends paper.Tool {
             rect.size = squareDimensions.size.abs();
         }
 
-        // update corner size
-        this.setRoundedCornerSize();
-        this.rect = new paper.Path.Rectangle(rect, this.roundedCornerSize);
+        this.rect = new paper.Path.Rectangle(rect, this.roundedCornerSize === 0 ? null : this.roundedCornerSize);
         if (event.modifiers.alt) {
             this.rect.position = event.downPoint;
         } else if (event.modifiers.shift) {

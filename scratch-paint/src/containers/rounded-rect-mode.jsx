@@ -13,6 +13,7 @@ import {changeStrokeColor, clearStrokeGradient} from '../reducers/stroke-style';
 import {changeMode} from '../reducers/modes';
 import {clearSelectedItems, setSelectedItems} from '../reducers/selected-items';
 import {setCursor} from '../reducers/cursor';
+import {changeRoundedRectCornerSize} from '../reducers/rounded-rect-mode';
 
 import {clearSelection, getSelectedLeafItems} from '../helper/selection';
 import RoundedRectTool from '../helper/tools/rounded-rect-tool';
@@ -26,7 +27,6 @@ class RoundedRectMode extends React.Component {
             'deactivateTool',
             'validateColorState'
         ]);
-        console.log(props)
     }
     componentDidMount () {
         if (this.props.isRoundedRectModeActive) {
@@ -39,6 +39,9 @@ class RoundedRectMode extends React.Component {
         }
         if (this.tool && nextProps.selectedItems !== this.props.selectedItems) {
             this.tool.onSelectionChanged(nextProps.selectedItems);
+        }
+        if (this.tool && nextProps.roundedCornerSize !== this.props.roundedCornerSize) {
+            this.tool.setRoundedCornerSize(nextProps.roundedCornerSize);
         }
 
         if (nextProps.isRoundedRectModeActive && !this.props.isRoundedRectModeActive) {
@@ -59,12 +62,17 @@ class RoundedRectMode extends React.Component {
         clearSelection(this.props.clearSelectedItems);
         this.validateColorState();
 
+        if (typeof this.props.roundedCornerSize !== "number") {
+            this.props.onChangeRoundedCornerSize(0);
+        }
+
         this.tool = new RoundedRectTool(
             this.props.setSelectedItems,
             this.props.clearSelectedItems,
             this.props.setCursor,
             this.props.onUpdateImage
         );
+        this.tool.setRoundedCornerSize(this.props.roundedCornerSize);
         this.tool.setColorState(this.props.colorState);
         this.tool.activate();
     }
@@ -129,9 +137,6 @@ class RoundedRectMode extends React.Component {
 }
 
 RoundedRectMode.propTypes = {
-    roundedCornerModeState: PropTypes.shape({
-        roundedCornerSize: PropTypes.number.isRequired
-    }),
     clearFillGradient: PropTypes.func.isRequired,
     clearStrokeGradient: PropTypes.func.isRequired,
     clearSelectedItems: PropTypes.func.isRequired,
@@ -147,13 +152,16 @@ RoundedRectMode.propTypes = {
     onUpdateImage: PropTypes.func.isRequired,
     selectedItems: PropTypes.arrayOf(PropTypes.instanceOf(paper.Item)),
     setCursor: PropTypes.func.isRequired,
-    setSelectedItems: PropTypes.func.isRequired
+    setSelectedItems: PropTypes.func.isRequired,
+    roundedCornerSize: PropTypes.number.isRequired,
+    onChangeRoundedCornerSize: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = state => ({
     colorState: state.scratchPaint.color,
     isRoundedRectModeActive: state.scratchPaint.mode === Modes.ROUNDED_RECT,
-    selectedItems: state.scratchPaint.selectedItems
+    selectedItems: state.scratchPaint.selectedItems,
+    roundedCornerSize: state.scratchPaint.roundedRectMode.roundedCornerSize,
 });
 const mapDispatchToProps = dispatch => ({
     clearSelectedItems: () => {
@@ -179,6 +187,9 @@ const mapDispatchToProps = dispatch => ({
     },
     onChangeStrokeColor: strokeColor => {
         dispatch(changeStrokeColor(strokeColor));
+    },
+    onChangeRoundedCornerSize: roundedCornerSize => {
+        dispatch(changeRoundedRectCornerSize(roundedCornerSize));
     }
 });
 

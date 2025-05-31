@@ -13,7 +13,7 @@ import {changeStrokeColor, clearStrokeGradient} from '../reducers/stroke-style';
 import {changeMode} from '../reducers/modes';
 import {clearSelectedItems, setSelectedItems} from '../reducers/selected-items';
 import {setCursor} from '../reducers/cursor';
-import {changeRoundedCornerSize} from '../reducers/rounded-rect-mode';
+import {changeRoundedCornerSize} from '../reducers/rect-mode';
 
 import {clearSelection, getSelectedLeafItems} from '../helper/selection';
 import RectTool from '../helper/tools/rect-tool';
@@ -63,7 +63,7 @@ class RectMode extends React.Component {
         this.validateColorState();
 
         if (typeof this.props.roundedCornerSize !== "number") {
-            this.props.onSetPointCount(1);
+            this.props.onChangeRoundedCornerSize(0);
         }
 
         this.tool = new RectTool(
@@ -161,7 +161,7 @@ const mapStateToProps = state => ({
     colorState: state.scratchPaint.color,
     isRectModeActive: state.scratchPaint.mode === Modes.RECT,
     selectedItems: state.scratchPaint.selectedItems,
-    roundedCornerSize: state.scratchPaint.roundedRectMode.roundedCornerSize,
+    roundedCornerSize: state.scratchPaint.rectMode.roundedCornerSize,
 });
 const mapDispatchToProps = dispatch => ({
     clearSelectedItems: () => {

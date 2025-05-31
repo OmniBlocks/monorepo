@@ -1,6 +1,6 @@
 import log from '../log/log';
 
-const CHANGE_ROUNDED_CORNER_SIZE = 'scratch-paint/rounded-rect-mode/CHANGE_ROUNDED_CORNER_SIZE';
+const CHANGE_ROUNDED_CORNER_SIZE = 'scratch-paint/rect-mode/CHANGE_ROUNDED_CORNER_SIZE';
 const initialState = {roundedCornerSize: 0};
 
 const reducer = function (state, action) {
@@ -18,7 +18,7 @@ const reducer = function (state, action) {
 };
 
 // Action creators ==================================
-const changeRoundedRectCornerSize = function (roundedCornerSize) {
+const changeRoundedCornerSize = function (roundedCornerSize) {
     return {
         type: CHANGE_ROUNDED_CORNER_SIZE,
         roundedCornerSize: roundedCornerSize
@@ -27,5 +27,5 @@ const changeRoundedRectCornerSize = function (roundedCornerSize) {
 
 export {
     reducer as default,
-    changeRoundedRectCornerSize
+    changeRoundedCornerSize
 };

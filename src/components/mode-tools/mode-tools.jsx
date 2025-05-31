@@ -717,6 +717,14 @@ const ModeToolsComponent = props => {
                     </div>
                 );
             }
+        case Modes.ARROW:
+            {
+                return (
+                    <div className={classNames(props.className, styles.modeTools)}>
+                        <span>{`Hold Alt + Shift to resize arrow tip`}</span>
+                    </div>
+                );
+            }
         default:
             // Leave empty for now, if mode not supported
             return (

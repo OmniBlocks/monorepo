@@ -9,6 +9,7 @@ import {changeStrokeWidth} from '../reducers/stroke-width';
 import {changeMode} from '../reducers/modes';
 import {clearSelectedItems} from '../reducers/selected-items';
 import {MIXED} from '../helper/style-path';
+import ColorStyleProptype from '../lib/color-style-proptype';
 
 import {clearSelection} from '../helper/selection';
 import PenTool from '../helper/tools/pen-tool';
@@ -82,8 +83,8 @@ class PenMode extends React.Component {
 PenMode.propTypes = {
     clearSelectedItems: PropTypes.func.isRequired,
     colorState: PropTypes.shape({
-        fillStyle: PropTypes.string,
-        strokeColor: PropTypes.string,
+        fillStyle: ColorStyleProptype,
+        strokeColor: ColorStyleProptype,
         strokeWidth: PropTypes.number
     }).isRequired,
     handleMouseDown: PropTypes.func.isRequired,

@@ -84,7 +84,8 @@ class BrushMode extends React.Component {
 
 BrushMode.propTypes = {
     brushModeState: PropTypes.shape({
-        brushSize: PropTypes.number.isRequired
+        brushSize: PropTypes.number.isRequired,
+        segSize: PropTypes.number
     }),
     clearGradient: PropTypes.func.isRequired,
     clearSelectedItems: PropTypes.func.isRequired,

@@ -110,7 +110,19 @@ class TriangleTool extends paper.Tool {
             tri.size = squareDimensions.size.abs();
         }
 
-        this.tri = new paper.Path.RegularPolygon(event.downPoint, this.sideCount, 50);
+        let segs = [];
+
+        for (let i = 0; i < this.sideCount; i++) {
+            let angle = (i / this.sideCount) * Math.PI * 2;
+            let angleIn = angle + (1 / this.sideCount) * Math.PI;
+
+            segs.push(new paper.Point(Math.cos(angle) * 50, Math.sin(angle) * 50))
+            if (this.pointCount != 1.0) {
+                segs.push(new paper.Point(Math.cos(angleIn) * 50 * this.pointCount, Math.sin(angleIn) * 50 * this.pointCount));
+            }
+        }
+
+        this.tri = new paper.Path({segments: segs, closed: true});
         this.tri.scale(tri.size.width / 100, tri.size.height / 100, event.downPoint);
         if (event.modifiers.alt) {
             this.tri.position = event.downPoint;
@@ -119,40 +131,6 @@ class TriangleTool extends paper.Tool {
         } else {
             const dimensions = event.point.subtract(event.downPoint);
             this.tri.position = event.downPoint.add(dimensions.multiply(0.5));
-        }
-
-        let seg = this.tri.segments;
-        let newSeg = [[]];
-
-        let idx = 0;
-        let origin = 0;
-        let wasOrigin = true;
-        const length = seg.length;
-
-        // this is the worst code ever
-        for (let i = 0; i < length; i++) {
-            newSeg[newSeg.length - 1].push(seg[idx]);
-            idx += this.pointCount;
-            idx = idx % (seg.length);
-            if (idx == origin && !wasOrigin) {
-                idx = origin + 1;
-                origin++;
-                wasOrigin = true;
-                newSeg.push([]);
-            }
-            wasOrigin = false;
-        }
-
-        this.tri.remove();
-
-        this.tri = new paper.Path();
-
-        for (let segGroup of newSeg) {
-            let toUnite = new paper.Path({ segments: segGroup, closed: true });          
-            let oldTri = this.tri;
-            this.tri = oldTri.unite(toUnite); 
-            toUnite.remove();
-            oldTri.remove();
         }
 
         styleShape(this.tri, this.colorState);

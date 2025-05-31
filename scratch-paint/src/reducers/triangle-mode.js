@@ -16,10 +16,10 @@ const reducer = function (state, action) {
 
         case CHANGE_TRIANGLE_POINT_COUNT:
             if (isNaN(action.trianglePointCount)) {
-                log.warn(`Invalid side count: ${action.trianglePointCount}`);
+                log.warn(`Invalid spike ratio: ${action.trianglePointCount}`);
                 return state;
             }
-            return { trianglePointCount: Math.floor(Math.max(1, action.trianglePointCount)), trianglePolyCount: state.trianglePolyCount };
+            return { trianglePointCount: Math.max(0, action.trianglePointCount), trianglePolyCount: state.trianglePolyCount };
         default:
             return state;
     }

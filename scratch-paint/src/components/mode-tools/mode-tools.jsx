@@ -295,7 +295,7 @@ const ModeToolsComponent = props => {
                             range
                             small
                             max={1000}
-                            min="1"
+                            min="0"
                             type="number"
                             value={currentPointValue}
                             onSubmit={changeFunctionPoint}

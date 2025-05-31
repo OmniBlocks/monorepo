@@ -348,11 +348,12 @@ const ModeToolsComponent = props => {
                     <InputGroup
                         className={classNames(
                             styles.modDashedBorder,
-                            // styles.modLabeledIconHeight,
+                            styles.flexCenterer,
                             styles.dropdownMaxItemList
                         )}
                     >
                         {selectableShapes.map(shape => (<LabeledIconButton
+                            className={classNames(styles.dropItemShapeTool)}
                             hideLabel={hideLabel(props.intl.locale)}
                             imgSrc={`data:image/svg+xml,${encodeURIComponent(generateShapeSVG(shape))}`}
                             title={shape.name}

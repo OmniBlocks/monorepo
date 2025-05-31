@@ -38,3 +38,17 @@
     width: 340px;
     flex-wrap: wrap;
 }
+
+.flex-centerer {
+    align-items: center;
+    justify-content: center;
+}
+
+.dropItemShapeTool {
+    width: 50px;
+    transition: filter 0.3s ease;
+    filter: saturate(1);
+}
+.dropItemShapeTool:hover {
+    filter: saturate(8);
+}

@@ -7,20 +7,10 @@ import BoundingBoxTool from '../selection-tools/bounding-box-tool';
 import NudgeTool from '../selection-tools/nudge-tool';
 import selectableShapes from '../selectable-shapes';
 
-const currentlySelectedShape = {
-    value: "smile"
-};
-
 /**
  * Tool for drawing sussys.
  */
 class SussyTool extends paper.Tool {
-    static set currentlySelectedShape (value) {
-        currentlySelectedShape.value = value;
-    }
-    static get currentlySelectedShape () {
-        return currentlySelectedShape.value;
-    }
     static get TOLERANCE() {
         return 2;
     }
@@ -57,6 +47,8 @@ class SussyTool extends paper.Tool {
         this.colorState = null;
         this.isBoundingBoxMode = null;
         this.active = false;
+
+        this.shape = "smile";
     }
     getHitOptions() {
         return {
@@ -80,6 +72,10 @@ class SussyTool extends paper.Tool {
     }
     setColorState(colorState) {
         this.colorState = colorState;
+    }
+    setShape(shape) {
+        // NOTE: Purposefully not doing live updates here since users probably dont want that for this tool.
+        this.shape = shape;
     }
     handleMouseDown(event) {
         if (event.event.button > 0) return; // only first mouse button
@@ -112,10 +108,10 @@ class SussyTool extends paper.Tool {
         }
 
         const shapeObject = selectableShapes
-            .filter(shape => shape.id === currentlySelectedShape.value)[0];
+            .filter(shape => shape.id === this.shape)[0];
         const path = shapeObject.path;
         this.sussy = new paper.CompoundPath(path);
-        this.sussy.scale(sussy.size.divide(shapeObject.size));
+        this.sussy.bounds = sussy;
         if (event.modifiers.alt) {
             this.sussy.position = event.downPoint;
         } else if (event.modifiers.shift) {

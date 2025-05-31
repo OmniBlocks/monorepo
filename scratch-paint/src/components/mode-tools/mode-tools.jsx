@@ -780,7 +780,7 @@ const mapStateToProps = state => ({
     roundedCornerValue: state.scratchPaint.roundedRectMode.roundedCornerSize,
     trianglePolyValue: state.scratchPaint.triangleMode.trianglePolyCount,
     trianglePointValue: state.scratchPaint.triangleMode.trianglePointCount,
-    currentlySelectedShape: state.scratchPaint.sussyMode.currentlySelectedShape
+    currentlySelectedShape: state.scratchPaint.sussyMode.shape
 });
 const mapDispatchToProps = dispatch => ({
     onBrushSliderChange: brushSize => {

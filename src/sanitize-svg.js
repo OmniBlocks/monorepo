@@ -54,29 +54,14 @@ if (DOMPurify.isSupported) {
     );
 }
 
-// Use JS implemented TextDecoder and TextEncoder if it is not provided by the
-// browser.
-let _TextDecoder;
-let _TextEncoder;
-if (typeof TextDecoder === 'undefined' || typeof TextEncoder === 'undefined') {
-    // Wait to require the text encoding polyfill until we know it's needed.
-    // eslint-disable-next-line global-require
-    const encoding = require('fastestsmallesttextencoderdecoder');
-    _TextDecoder = encoding.TextDecoder;
-    _TextEncoder = encoding.TextEncoder;
-} else {
-    _TextDecoder = TextDecoder;
-    _TextEncoder = TextEncoder;
-}
-
 /**
  * Load an SVG Uint8Array of bytes and "sanitize" it
  * @param {!Uint8Array} rawData unsanitized SVG daata
  * @return {Uint8Array} sanitized SVG data
  */
 sanitizeSvg.sanitizeByteStream = function (rawData) {
-    const decoder = new _TextDecoder();
-    const encoder = new _TextEncoder();
+    const decoder = new TextDecoder();
+    const encoder = new TextEncoder();
     const sanitizedText = sanitizeSvg.sanitizeSvgText(decoder.decode(rawData));
     return encoder.encode(sanitizedText);
 };

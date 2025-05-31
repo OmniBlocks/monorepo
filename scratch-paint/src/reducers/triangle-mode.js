@@ -1,5 +1,4 @@
 import log from '../log/log';
-import TriangleTool from '../helper/tools/triangle-tool';
 
 const CHANGE_TRIANGLE_SIDE_COUNT = 'scratch-paint/triangle-mode/CHANGE_TRIANGLE_SIDE_COUNT';
 const CHANGE_TRIANGLE_POINT_COUNT = 'scratch-paint/triangle-mode/CHANGE_TRIANGLE_POINT_COUNT';
@@ -13,18 +12,14 @@ const reducer = function (state, action) {
                 log.warn(`Invalid side count: ${action.trianglePolyCount}`);
                 return state;
             }
-            const value = Math.floor(Math.max(3, action.trianglePolyCount));
-            TriangleTool.sideCount = value;
-            return { trianglePolyCount: value, trianglePointCount: state.trianglePointCount };
+            return { trianglePolyCount: Math.floor(Math.max(3, action.trianglePolyCount)), trianglePointCount: state.trianglePointCount };
 
         case CHANGE_TRIANGLE_POINT_COUNT:
             if (isNaN(action.trianglePointCount)) {
                 log.warn(`Invalid side count: ${action.trianglePointCount}`);
                 return state;
             }
-            const value2 = Math.floor(Math.max(1, action.trianglePointCount));
-            TriangleTool.pointCount = value2;
-            return { trianglePointCount: value2, trianglePolyCount: state.trianglePolyCount };
+            return { trianglePointCount: Math.floor(Math.max(1, action.trianglePointCount)), trianglePolyCount: state.trianglePolyCount };
         default:
             return state;
     }

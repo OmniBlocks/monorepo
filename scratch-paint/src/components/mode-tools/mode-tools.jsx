@@ -269,8 +269,8 @@ const ModeToolsComponent = props => {
             {
                 const currentIcon = triangleIcon;
                 const currentSideValue = props.trianglePolyValue;
-                const changeFunction = props.onPolyCountSliderChange;
                 const currentPointValue = props.trianglePointValue;
+                const changeFunction = props.onPolyCountSliderChange;
                 const changeFunctionPoint = props.onPointCountSliderChange;
                 return (
                     <div className={classNames(props.className, styles.modeTools)}>

@@ -30,6 +30,7 @@ class EraserMode extends React.Component {
         } else if (!nextProps.isEraserModeActive && this.props.isEraserModeActive) {
             this.deactivateTool();
         } else if (nextProps.isEraserModeActive && this.props.isEraserModeActive) {
+            console.log(nextProps.eraserModeState);
             this.blob.setOptions({
                 isEraser: true,
                 ...nextProps.eraserModeState
@@ -45,6 +46,7 @@ class EraserMode extends React.Component {
         }
     }
     activateTool () {
+        console.log(this.props.eraserModeState);
         this.blob.activateTool({isEraser: true, ...this.props.eraserModeState});
     }
     deactivateTool () {
@@ -63,7 +65,8 @@ class EraserMode extends React.Component {
 EraserMode.propTypes = {
     clearSelectedItems: PropTypes.func.isRequired,
     eraserModeState: PropTypes.shape({
-        brushSize: PropTypes.number.isRequired
+        brushSize: PropTypes.number.isRequired,
+        simplifySize: PropTypes.number
     }),
     handleMouseDown: PropTypes.func.isRequired,
     isEraserModeActive: PropTypes.bool.isRequired,

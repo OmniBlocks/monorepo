@@ -113,9 +113,10 @@ class BroadBrushHelper {
         this.finalPath.add(event.point.add(step));
         this.finalPath.insert(0, event.point.subtract(step));
 
-        if (options.segSize > 0) {
+        console.log("broad", options.simplifySize);
+        if (options.simplifySize > 0) {
             if (this.finalPath.segments.length > this.smoothed + (this.smoothingThreshold * 2)) {
-                this.simplify(options.segSize);
+                this.simplify(options.simplifySize);
             }
         }
 

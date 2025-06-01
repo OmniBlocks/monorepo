@@ -1,25 +1,25 @@
 import log from '../log/log';
 
 const CHANGE_BRUSH_SIZE = 'scratch-paint/brush-mode/CHANGE_BRUSH_SIZE';
-const CHANGE_SEG_SIZE = CHANGE_BRUSH_SIZE + 1;
-const initialState = { brushSize: 10, segSize: 10 };
+const CHANGE_SIMPLIFY_SIZE = 'scratch-paint/brush-mode/CHANGE_SIMPLIFY_SIZE';
+const initialState = { brushSize: 10, simplifySize: 10 };
 
 const reducer = function (state, action) {
     if (typeof state === 'undefined') state = initialState;
-    let {segSize, brushSize} = state;
+    let {simplifySize, brushSize} = state;
     switch (action.type) {
         case CHANGE_BRUSH_SIZE:
             if (isNaN(action.brushSize)) {
                 log.warn(`Invalid brush size: ${action.brushSize}`);
                 return state;
             }
-            return { segSize, brushSize: Math.max(1, action.brushSize) };
-        case CHANGE_SEG_SIZE:
-            if (isNaN(action.segSize)) {
-                log.warn(`Invalid stabilize setting: ${action.segSize}`);
+            return { brushSize: Math.max(1, action.brushSize), simplifySize };
+        case CHANGE_SIMPLIFY_SIZE:
+            if (isNaN(action.simplifySize)) {
+                log.warn(`Invalid simplify setting: ${action.simplifySize}`);
                 return state;
             }
-            return { brushSize, segSize: Math.max(0, action.segSize) };
+            return { brushSize, simplifySize: Math.max(0, action.simplifySize) };
         default:
             return state;
     }
@@ -33,15 +33,15 @@ const changeBrushSize = function (brushSize) {
     };
 };
 
-const changeSegSize = function (segSize) {
+const changeSimplifySize = function (simplifySize) {
     return {
-        type: CHANGE_SEG_SIZE,
-        segSize: segSize
+        type: CHANGE_SIMPLIFY_SIZE,
+        simplifySize: simplifySize
     };
 };
 
 export {
     reducer as default,
     changeBrushSize,
-    changeSegSize
+    changeSimplifySize
 };

@@ -63,7 +63,8 @@ class EraserMode extends React.Component {
 EraserMode.propTypes = {
     clearSelectedItems: PropTypes.func.isRequired,
     eraserModeState: PropTypes.shape({
-        brushSize: PropTypes.number.isRequired
+        brushSize: PropTypes.number.isRequired,
+        simplifySize: PropTypes.number
     }),
     handleMouseDown: PropTypes.func.isRequired,
     isEraserModeActive: PropTypes.bool.isRequired,

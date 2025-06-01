@@ -81,7 +81,6 @@ class SegmentBrushHelper {
         // paths tends to cut off the path.
         if (this.finalPath.segments && this.finalPath.segments.length > 4) {
             this.finalPath.closed = false;
-            console.log("segment", options.simplifySize);
             if (options.simplifySize > 0) {
                 this.finalPath.simplify(options.simplifySize);
             }

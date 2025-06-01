@@ -15,7 +15,7 @@ test('initialState', () => {
 test('changeBrushSize', () => {
     let defaultState;
     const newBrushSize = 8078;
-    const initialSimplifySize = 1;
+    const initialSimplifySize = 10;
 
     expect(brushReducer(defaultState /* state */, changeBrushSize(newBrushSize) /* action */))
         .toEqual({brushSize: newBrushSize, simplifySize: initialSimplifySize});

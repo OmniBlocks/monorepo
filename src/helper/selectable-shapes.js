@@ -38,6 +38,11 @@ TEMPLATE:
         icon: '',
     },
 
+    Generate icon:
+    1. Set fill color to none
+    2. Clear the costume
+    3. Draw the shape using shape tool (make it look the way it should if drawn properly)
+    4. Run atob(vm.getExportedCostumeBase64(vm.editingTarget.sprite.costumes[0]))
 */
 
 const strokeColor = "none";

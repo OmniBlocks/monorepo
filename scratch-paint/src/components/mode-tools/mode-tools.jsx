@@ -390,7 +390,7 @@ const ModeToolsComponent = props => {
                     ].join(',');
                     const newIcon = icon
                         .replace(`viewBox="${viewBoxString}"`, `viewBox="${newViewBox}"`)
-                        .replace('stroke="none"', `stroke="${strokeColor}"`)
+                        .replace(/stroke="[^"]*"/, `stroke="${strokeColor}"`)
                         .replace(`fill="${fillColorString}"`, 'fill="none"')
                         .replace(`stroke-width="${strokeWidthString}"`, `stroke-width="${shapeObject.strokeWidth}"`);
                     return `${newIcon}`;

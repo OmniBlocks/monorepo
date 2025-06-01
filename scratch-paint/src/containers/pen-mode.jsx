@@ -9,6 +9,7 @@ import {changeStrokeWidth} from '../reducers/stroke-width';
 import {changeMode} from '../reducers/modes';
 import {clearSelectedItems} from '../reducers/selected-items';
 import {MIXED} from '../helper/style-path';
+import {changeSimplifySize} from '../reducers/pen-mode';
 import ColorStyleProptype from '../lib/color-style-proptype';
 
 import {clearSelection} from '../helper/selection';
@@ -38,6 +39,10 @@ class PenMode extends React.Component {
             this.tool.setColorState(nextProps.colorState);
         }
 
+        if (this.tool && nextProps.simplifySize !== this.props.simplifySize) {
+            this.tool.setSimplifySize(nextProps.simplifySize);
+        }
+
         if (nextProps.isPenModeActive && !this.props.isPenModeActive) {
             this.activateTool();
         } else if (!nextProps.isPenModeActive && this.props.isPenModeActive) {
@@ -58,11 +63,15 @@ class PenMode extends React.Component {
         if (!this.props.colorState.strokeWidth) {
             this.props.onChangeStrokeWidth(1);
         }
+        if (typeof this.props.simplifySize !== "number") {
+            this.props.onChangeSimplifySize(2);
+        }
         this.tool = new PenTool(
             this.props.clearSelectedItems,
             this.props.onUpdateSvg
         );
         this.tool.setColorState(this.props.colorState);
+        this.tool.setSimplifySize(this.props.simplifySize);
         this.tool.activate();
     }
     deactivateTool () {
@@ -87,16 +96,19 @@ PenMode.propTypes = {
         strokeColor: ColorStyleProptype,
         strokeWidth: PropTypes.number
     }).isRequired,
+    simplifySize: PropTypes.number,
     handleMouseDown: PropTypes.func.isRequired,
     isPenModeActive: PropTypes.bool.isRequired,
     onChangeStrokeColor: PropTypes.func.isRequired,
     onChangeStrokeWidth: PropTypes.func.isRequired,
+    onChangeSimplifySize: PropTypes.func.isRequired,
     onUpdateSvg: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
     colorState: state.scratchPaint.color,
-    isPenModeActive: state.scratchPaint.mode === Modes.PEN
+    isPenModeActive: state.scratchPaint.mode === Modes.PEN,
+    simplifySize: state.scratchPaint.penMode.simplifySize
 });
 const mapDispatchToProps = dispatch => ({
     clearSelectedItems: () => {
@@ -112,6 +124,9 @@ const mapDispatchToProps = dispatch => ({
     },
     onChangeStrokeWidth: strokeWidth => {
         dispatch(changeStrokeWidth(strokeWidth));
+    },
+    onChangeSimplifySize: simplifySize => {
+        dispatch(changeSimplifySize(simplifySize));
     }
 });
 

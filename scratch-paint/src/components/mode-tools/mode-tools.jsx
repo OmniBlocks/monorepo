@@ -8,8 +8,8 @@ import Dropdown from '../dropdown/dropdown.jsx';
 import MediaQuery from 'react-responsive';
 import layout from '../../lib/layout-constants';
 
-import { changeBrushSize, changeSegSize } from '../../reducers/brush-mode';
-import { changeBrushSize as changeEraserSize } from '../../reducers/eraser-mode';
+import { changeBrushSize, changeSimplifySize } from '../../reducers/brush-mode';
+import { changeBrushSize as changeEraserSize, changeSimplifySize as changeEraserSimplifySize } from '../../reducers/eraser-mode';
 import { changeRoundedRectCornerSize } from '../../reducers/rounded-rect-mode';
 import { changeRoundedCornerSize } from '../../reducers/rect-mode';
 import { changeTrianglePolyCount, changeTrianglePointCount } from '../../reducers/triangle-mode';
@@ -80,15 +80,20 @@ const ModeToolsComponent = props => {
             description: 'Label for the brush size input',
             id: 'paint.modeTools.brushSize'
         },
-        brushSeg: {
-            defaultMessage: 'Stability',
-            description: 'Label for the brush stability input, higher numbers control how much the drawn line will be corrected',
-            id: 'paint.modeTools.brushSeg'
+        brushSimplify: {
+            defaultMessage: 'Smoothing',
+            description: 'Label for the brush smoothing input, higher numbers control how much the drawn line will be corrected',
+            id: 'paint.modeTools.brushSimplify'
         },
         eraserSize: {
             defaultMessage: 'Eraser size',
             description: 'Label for the eraser size input',
             id: 'paint.modeTools.eraserSize'
+        },
+        eraserSimplify: {
+            defaultMessage: 'Smoothing',
+            description: 'Label for the eraser smoothing input, higher numbers control how much the drawn line will be corrected',
+            id: 'paint.modeTools.eraserSimplify'
         },
         roundedCornerSize: {
             defaultMessage: 'Rounded corner size',
@@ -177,11 +182,11 @@ const ModeToolsComponent = props => {
                 const currentIcon = isVector(props.format) ? brushIcon :
                     props.mode === Modes.BIT_LINE ? bitLineIcon : bitBrushIcon;
                 const currentBrushValue = isBitmap(props.format) ? props.bitBrushSize : props.brushValue;
-                const currentSegValue = props.segValue;
+                const currentSimplifyValue = props.simplifyValue;
                 const changeFunction = isBitmap(props.format) ? props.onBitBrushSliderChange : props.onBrushSliderChange;
-                const changeFunctionSeg = props.onSegSliderChange;
+                const changeFunctionSimplify = props.onSimplifySliderChange;
                 const currentMessage = props.mode === Modes.BIT_LINE ? messages.thickness : messages.brushSize;
-                const hasAccuracyOption = props.mode === Modes.BRUSH;
+                const hasSimplifyOption = props.mode === Modes.BRUSH;
                 return (
                     <div className={classNames(props.className, styles.modeTools)}>
                         <div>
@@ -193,40 +198,28 @@ const ModeToolsComponent = props => {
                                 src={currentIcon}
                             />
                         </div>
-                        {hasAccuracyOption ? (<>
-                            <Label text={props.intl.formatMessage(messages.brushSize)}>
+                        <LiveInput
+                            range
+                            small
+                            max={MAX_STROKE_WIDTH}
+                            min="1"
+                            type="number"
+                            value={currentBrushValue}
+                            onSubmit={changeFunction}
+                        />
+                        
+                        {hasSimplifyOption && (
+                            <Label text={props.intl.formatMessage(messages.brushSimplify)}>
                                 <LiveInput
                                     range
                                     small
-                                    max={MAX_STROKE_WIDTH}
-                                    min="1"
-                                    type="number"
-                                    value={currentBrushValue}
-                                    onSubmit={changeFunction}
-                                />
-                            </Label>
-
-                            <Label text={props.intl.formatMessage(messages.brushSeg)}>
-                                <LiveInput
-                                    range
-                                    small
-                                    max={MAX_STROKE_WIDTH * 10}
+                                    max={1000}
                                     min="0"
                                     type="number"
-                                    value={currentSegValue}
-                                    onSubmit={changeFunctionSeg}
+                                    value={currentSimplifyValue}
+                                    onSubmit={changeFunctionSimplify}
                                 />
                             </Label>
-                        </>) : (
-                            <LiveInput
-                                range
-                                small
-                                max={MAX_STROKE_WIDTH}
-                                min="1"
-                                type="number"
-                                value={currentBrushValue}
-                                onSubmit={changeFunction}
-                            />
                         )}
                     </div>
                 );
@@ -237,7 +230,10 @@ const ModeToolsComponent = props => {
             {
                 const currentIcon = isVector(props.format) ? eraserIcon : bitEraserIcon;
                 const currentEraserValue = isBitmap(props.format) ? props.bitEraserSize : props.eraserValue;
+                const currentEraserSimplifyValue = props.eraserSimplifyValue;
                 const changeFunction = isBitmap(props.format) ? props.onBitEraserSliderChange : props.onEraserSliderChange;
+                const changeFunctionSimplify = props.onEraserSimplifySliderChange;
+                const hasSimplifyOption = props.mode === Modes.ERASER;
                 return (
                     <div className={classNames(props.className, styles.modeTools)}>
                         <div>
@@ -257,6 +253,20 @@ const ModeToolsComponent = props => {
                             value={currentEraserValue}
                             onSubmit={changeFunction}
                         />
+
+                        {hasSimplifyOption && (
+                            <Label text={props.intl.formatMessage(messages.eraserSimplify)}>
+                                <LiveInput
+                                    range
+                                    small
+                                    max={1000}
+                                    min="0"
+                                    type="number"
+                                    value={currentEraserSimplifyValue}
+                                    onSubmit={changeFunctionSimplify}
+                                />
+                            </Label>
+                        )}
                     </div>
                 );
             }
@@ -755,10 +765,11 @@ ModeToolsComponent.propTypes = {
     bitBrushSize: PropTypes.number,
     bitEraserSize: PropTypes.number,
     brushValue: PropTypes.number,
-    segValue: PropTypes.number,
+    simplifyValue: PropTypes.number,
     className: PropTypes.string,
     clipboardItems: PropTypes.arrayOf(PropTypes.array),
     eraserValue: PropTypes.number,
+    eraserSimplifyValue: PropTypes.number,
     roundedCornerValue: PropTypes.number,
     roundedRectCornerValue: PropTypes.number,
     trianglePolyValue: PropTypes.number,
@@ -773,11 +784,13 @@ ModeToolsComponent.propTypes = {
     onBitBrushSliderChange: PropTypes.func.isRequired,
     onBitEraserSliderChange: PropTypes.func.isRequired,
     onBrushSliderChange: PropTypes.func.isRequired,
+    onSimplifySliderChange: PropTypes.func.isRequired,
     onCopyToClipboard: PropTypes.func.isRequired,
     onCutToClipboard: PropTypes.func.isRequired,
     onCurvePoints: PropTypes.func.isRequired,
     onDelete: PropTypes.func.isRequired,
     onEraserSliderChange: PropTypes.func,
+    onEraserSimplifySliderChange: PropTypes.func,
     onFillShapes: PropTypes.func.isRequired,
     onFlipHorizontal: PropTypes.func.isRequired,
     onFlipVertical: PropTypes.func.isRequired,
@@ -801,9 +814,10 @@ const mapStateToProps = state => ({
     bitBrushSize: state.scratchPaint.bitBrushSize,
     bitEraserSize: state.scratchPaint.bitEraserSize,
     brushValue: state.scratchPaint.brushMode.brushSize,
-    segValue: state.scratchPaint.brushMode.segSize,
+    simplifyValue: state.scratchPaint.brushMode.simplifySize,
     clipboardItems: state.scratchPaint.clipboard.items,
     eraserValue: state.scratchPaint.eraserMode.brushSize,
+    eraserSimplifyValue: state.scratchPaint.eraserMode.simplifySize,
     roundedRectCornerValue: state.scratchPaint.roundedRectMode.roundedCornerSize,
     roundedCornerValue: state.scratchPaint.rectMode.roundedCornerSize,
     trianglePolyValue: state.scratchPaint.triangleMode.trianglePolyCount,
@@ -814,8 +828,8 @@ const mapDispatchToProps = dispatch => ({
     onBrushSliderChange: brushSize => {
         dispatch(changeBrushSize(brushSize));
     },
-    onSegSliderChange: brushSize => {
-        dispatch(changeSegSize(brushSize));
+    onSimplifySliderChange: brushSize => {
+        dispatch(changeSimplifySize(brushSize));
     },
     onRoundedRectCornerSliderChange: roundedCornerSize => {
         dispatch(changeRoundedRectCornerSize(roundedCornerSize));
@@ -840,6 +854,9 @@ const mapDispatchToProps = dispatch => ({
     },
     onEraserSliderChange: eraserSize => {
         dispatch(changeEraserSize(eraserSize));
+    },
+    onEraserSimplifySliderChange: eraserSize => {
+        dispatch(changeEraserSimplifySize(eraserSize));
     },
     onFillShapes: () => {
         dispatch(setShapesFilled(true));

@@ -71,7 +71,7 @@ class SegmentBrushHelper {
         this.finalPath = newPath;
     }
 
-    onSegmentMouseUp (event, options) {
+    onSegmentMouseUp(event, tool, options) {
         if (event.event.button > 0) return; // only first mouse button
 
         // TODO: This smoothing tends to cut off large portions of the path! Would like to eventually
@@ -81,7 +81,10 @@ class SegmentBrushHelper {
         // paths tends to cut off the path.
         if (this.finalPath.segments && this.finalPath.segments.length > 4) {
             this.finalPath.closed = false;
-            this.finalPath.simplify(10 / options.segSize); // TODO: Add Stabilize setting to Eraser. The default should be 5 since Scratch uses simplify(2) here.
+            console.log("segment", options.simplifySize);
+            if (options.simplifySize > 0) {
+                this.finalPath.simplify(options.simplifySize);
+            }
             this.finalPath.closed = true;
             // Merge again with the first point, since it gets distorted when we unclose the path.
             const temp = this.finalPath.unite(this.firstCircle);

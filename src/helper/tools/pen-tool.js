@@ -10,10 +10,7 @@ class PenTool extends paper.Tool {
     static get SNAP_TOLERANCE () {
         return 5;
     }
-    /** Smaller numbers match the line more closely, larger numbers for smoother curves */
-    static get SMOOTHING () {
-        return 2;
-    }
+    
     /**
      * @param {function} clearSelectedItems Callback to clear the set of selected items in the Redux state
      * @param {!function} onUpdateSvg A callback to call when the image visibly changes
@@ -39,9 +36,14 @@ class PenTool extends paper.Tool {
         this.onMouseUp = this.handleMouseUp;
 
         this.fixedDistance = 2;
+        /** Smaller numbers match the line more closely, larger numbers for smoother curves */
+        this.simplifySize = 2;
     }
     setColorState (colorState) {
         this.colorState = colorState;
+    }
+    setSimplifySize (simplifySize) {
+        this.simplifySize = simplifySize;
     }
     drawHitPoint (hitResult) {
         // If near another path's endpoint, draw hit point to indicate that paths would merge
@@ -145,7 +147,10 @@ class PenTool extends paper.Tool {
         const hasStartConnection = this.subpathIndex > 0;
         const hasEndConnection = !!this.hitResult;
         this.path.removeSegments(this.subpathIndex);
-        this.subpath.simplify(this.SMOOTHING);
+        
+        if (this.simplifySize > 0) {
+            this.subpath.simplify(this.simplifySize);
+        }
         if (hasStartConnection && this.subpath.length > 0) {
             this.subpath.removeSegment(0);
         }

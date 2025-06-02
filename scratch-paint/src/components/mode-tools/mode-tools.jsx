@@ -31,6 +31,13 @@ import Modes from '../../lib/modes';
 import Formats, { isBitmap, isVector } from '../../lib/format';
 import { hideLabel } from '../../lib/hide-label';
 import styles from './mode-tools.css';
+import { MAX_STROKE_WIDTH } from '../../reducers/stroke-width';
+import {
+    selectableShapes as sussyToolShapes,
+    categories as sussyToolCategories,
+    generateShapeSVG as generateSussyShapeSVG,
+    categorizeShapes as categorizeSussyShapes,
+} from '../../helper/selectable-shapes.js';
 
 import copyIcon from './icons/copy.svg';
 import cutIcon from './icons/cut.svg';
@@ -41,16 +48,13 @@ import squareLine from './icons/square-line.svg';
 import miterLineJoin from './icons/miter-line-join.svg';
 import roundLineJoin from './icons/round-line-join.svg';
 import bevelLineJoin from './icons/bevel-line-join.svg';
-
 import shapeMergeIcon from './icons/merge.svg';
 import shapeMaskIcon from './icons/mask.svg';
 import shapeSubtractIcon from './icons/subtract.svg';
 import shapeFilterIcon from './icons/filter.svg';
-
 import alignLeftIcon from './icons/alignLeft.svg';
 import alignRightIcon from './icons/alignRight.svg';
 import alignCenterIcon from './icons/alignCenter.svg';
-
 import bitBrushIcon from '../bit-brush-mode/brush.svg';
 import bitEraserIcon from '../bit-eraser-mode/eraser.svg';
 import bitLineIcon from '../bit-line-mode/line.svg';
@@ -68,10 +72,6 @@ import bitOvalIcon from '../bit-oval-mode/oval.svg';
 import bitRectIcon from '../bit-rect-mode/rectangle.svg';
 import bitOvalOutlinedIcon from '../bit-oval-mode/oval-outlined.svg';
 import bitRectOutlinedIcon from '../bit-rect-mode/rectangle-outlined.svg';
-
-import { MAX_STROKE_WIDTH } from '../../reducers/stroke-width';
-
-import selectableShapes from '../../helper/selectable-shapes.js';
 
 const LiveInput = LiveInputHOC(Input);
 const ModeToolsComponent = props => {
@@ -359,57 +359,33 @@ const ModeToolsComponent = props => {
             {
                 const currentlySelectedShape = props.currentlySelectedShape;
                 const changeFunction = props.onCurrentlySelectedShapeChange;
-                const selectedShapeObject = selectableShapes
+                const selectedShapeObject = sussyToolShapes
                     .filter(shape => shape.id === currentlySelectedShape)[0];
-                const generateShapeSVG = shapeObject => {
-                    const strokeColor = '#575e75';
-                    const icon = shapeObject.icon;
-                    // extract viewbox
-                    const viewBoxStart = icon.substring(icon.indexOf('viewBox="') + 9);
-                    const viewBoxString = viewBoxStart
-                        .substring(0, viewBoxStart.indexOf('"'));
-                    // extract fill color
-                    const fillColorStart = icon.substring(icon.indexOf('fill="') + 6);
-                    const fillColorString = fillColorStart
-                        .substring(0, fillColorStart.indexOf('"'));
-                    // extract stroke width
-                    const strokeWidthStart = icon.substring(icon.indexOf('stroke-width="') + 14);
-                    const strokeWidthString = strokeWidthStart
-                        .substring(0, strokeWidthStart.indexOf('"'));
-                    // extract viewbox to array
-                    const viewBox = viewBoxString
-                        .replace(/ /gmi, ',')
-                        .split(',')
-                        .map(value => value.trim())
-                        .map(num => Number(num));
-                    const newViewBox = [
-                        viewBox[0] - 1.5,
-                        viewBox[1] - 1.5,
-                        viewBox[2] + (1.5 * 2),
-                        viewBox[3] + (1.5 * 2)
-                    ].join(',');
-                    const newIcon = icon
-                        .replace(`viewBox="${viewBoxString}"`, `viewBox="${newViewBox}"`)
-                        .replace(/stroke="[^"]*"/, `stroke="${strokeColor}"`)
-                        .replace(`fill="${fillColorString}"`, 'fill="none"')
-                        .replace(`stroke-width="${strokeWidthString}"`, `stroke-width="${shapeObject.strokeWidth}"`);
-                    return `${newIcon}`;
-                };
+                const categorizedShapes = categorizeSussyShapes(sussyToolShapes);
                 const selectableShapesList = (
                     <InputGroup
                         className={classNames(
                             styles.modDashedBorder,
-                            styles.flexCenterer,
+                            styles.dropItemShapeToolMenu,
                             styles.dropdownMaxItemList
                         )}
                     >
-                        {selectableShapes.map(shape => (<LabeledIconButton
-                            className={classNames(styles.dropItemShapeTool)}
-                            hideLabel={hideLabel(props.intl.locale)}
-                            imgSrc={`data:image/svg+xml,${encodeURIComponent(generateShapeSVG(shape))}`}
-                            title={shape.name}
-                            onClick={() => changeFunction(shape.id)}
-                        />))}
+                        {Object.keys(categorizedShapes).map(categoryId => categorizedShapes[categoryId].length === 0 ?
+                            (<React.Fragment key={categoryId} />) : (<React.Fragment key={categoryId}>
+                                <p className={classNames(styles.dropItemShapeToolLabel)}>
+                                    {sussyToolCategories[categoryId]}
+                                </p>
+                                {categorizedShapes[categoryId].map(shape => (
+                                    <LabeledIconButton
+                                        key={shape.id}
+                                        className={classNames(styles.dropItemShapeTool)}
+                                        hideLabel={hideLabel(props.intl.locale)}
+                                        imgSrc={`data:image/svg+xml,${encodeURIComponent(generateSussyShapeSVG(shape))}`}
+                                        title={shape.name}
+                                        onClick={() => changeFunction(shape.id)}
+                                    />
+                                ))}
+                        </React.Fragment>))}
                     </InputGroup>
                 );
                 return (
@@ -428,7 +404,7 @@ const ModeToolsComponent = props => {
                             tipSize={.01}
                         >
                             <img
-                                src={`data:image/svg+xml,${encodeURIComponent(generateShapeSVG(selectedShapeObject))}`}
+                                src={`data:image/svg+xml,${encodeURIComponent(generateSussyShapeSVG(selectedShapeObject))}`}
                                 alt={selectedShapeObject.name}
                                 title={selectedShapeObject.name}
                                 height={16}

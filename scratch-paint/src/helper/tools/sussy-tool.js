@@ -131,7 +131,7 @@ class SussyTool extends paper.Tool {
         }
 
         if (this.sussy) {
-            if (this.sussy.area < SussyTool.TOLERANCE / paper.view.zoom) {
+            if (Math.abs(this.sussy.area) < SussyTool.TOLERANCE / paper.view.zoom) {
                 // Tiny sussy created unintentionally?
                 this.sussy.remove();
                 this.sussy = null;

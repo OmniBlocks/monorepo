@@ -184,6 +184,10 @@ class Stage extends React.Component {
             ...this.renderer.extractColor(x, y, colorPickerRadius)
         };
     }
+    getTargetDrawableIDs () {
+        // Disregard pen, video sensing, and other drawables added by extensions.
+        return this.props.vm.runtime.targets.map(i => i.drawableID);
+    }
     handleDoubleClick (e) {
         // tw: Disable editing target changing in certain circumstances to avoid lag
         if (this.props.disableEditingTargetChange) {
@@ -192,7 +196,13 @@ class Stage extends React.Component {
         const {x, y} = getEventXY(e);
         // Set editing target from cursor position, if clicking on a sprite.
         const mousePosition = [x - this.rect.left, y - this.rect.top];
-        const drawableId = this.renderer.pick(mousePosition[0], mousePosition[1]);
+        const drawableId = this.renderer.pick(
+            mousePosition[0],
+            mousePosition[1],
+            1,
+            1,
+            this.getTargetDrawableIDs()
+        );
         if (drawableId === -1) return;
         const targetId = this.props.vm.getTargetIdForDrawableId(drawableId);
         if (targetId === null) return;
@@ -375,7 +385,13 @@ class Stage extends React.Component {
     }
     onStartDrag (x, y) {
         if (this.state.dragId) return;
-        const drawableId = this.renderer.pick(x, y);
+        const drawableId = this.renderer.pick(
+            x,
+            y,
+            1,
+            1,
+            this.getTargetDrawableIDs()
+        );
         if (drawableId === -1) return;
         const targetId = this.props.vm.getTargetIdForDrawableId(drawableId);
         if (targetId === null) return;

@@ -158,7 +158,7 @@ class Video {
                 renderer.markSkinAsPrivate(this._skinId);
             }
             if (renderer.markDrawableAsNoninteractive) {
-                renderer.markDrawableAsNoninteractive(this._skinId);
+                renderer.markDrawableAsNoninteractive(this._drawable);
             }
         }
 

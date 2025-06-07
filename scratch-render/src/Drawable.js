@@ -129,6 +129,12 @@ class Drawable {
         this.isTouching = this._isTouchingNever;
 
         this._highQuality = false;
+
+        /**
+         * If false, this drawable will be ignored by pick() by default.
+         * The drawable may still be considered by pick() if its ID is explicitly given to pick().
+         */
+        this.interactive = true;
     }
 
     setHighQuality (highQuality) {

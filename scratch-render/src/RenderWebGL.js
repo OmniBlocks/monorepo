@@ -737,6 +737,18 @@ class RenderWebGL extends EventEmitter {
     }
 
     /**
+     * Mark a drawable as being non-interactive by default.
+     * @param {number} drawableID The drawable's ID
+     */
+    markDrawableAsNoninteractive (drawableID) {
+        const drawable = this._allDrawables[drawableID];
+        if (!drawable) {
+            return;
+        }
+        drawable.interactive = false;
+    }
+
+    /**
      * Set the layer group ordering for the renderer.
      * @param {Array<string>} groupOrdering The ordered array of layer group
      * names
@@ -1370,12 +1382,14 @@ class RenderWebGL extends EventEmitter {
 
         candidateIDs = (candidateIDs || this._drawList).filter(id => {
             const drawable = this._allDrawables[id];
+            if (!candidateIDs && !drawable.interactive) {
+                return false;
+            }
             // default pick list ignores visible and ghosted sprites.
             if (drawable.getVisible() && drawable.getUniforms().u_ghost !== 0) {
                 const drawableBounds = drawable.getFastBounds();
                 const inRange = bounds.intersects(drawableBounds);
                 if (!inRange) return false;
-                if (drawable.skin instanceof PenSkin) return false;
 
                 drawable.updateCPURenderAttributes();
                 return true;

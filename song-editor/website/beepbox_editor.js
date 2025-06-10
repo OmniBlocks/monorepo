@@ -642,7 +642,7 @@ var beepbox = (function (exports) {
     Config.filterGainRange = 15;
     Config.filterGainCenter = 7;
     Config.filterGainStep = 1.0 / 2.0;
-    Config.filterMaxPoints = 8;
+    Config.filterMaxPoints = 16;
     Config.filterTypeNames = ["low-pass", "high-pass", "peak"];
     Config.filterMorphCount = 10;
     Config.filterSimpleCutRange = 11;
@@ -37993,6 +37993,7 @@ You should be redirected to the song at:<br /><br />
             this.container = HTML.div({ class: "envelopeEditor" });
             this._rows = [];
             this._targetSelects = [];
+            this._indexSelects = [];
             this._envelopeSelects = [];
             this._deleteButtons = [];
             this.extraSettingsDropdowns = [];
@@ -38035,6 +38036,7 @@ You should be redirected to the song at:<br /><br />
             this._lastChange = null;
             this._onChange = (event) => {
                 const targetSelectIndex = this._targetSelects.indexOf(event.target);
+                const indexSelectIndex = this._indexSelects.indexOf(event.target);
                 const envelopeSelectIndex = this._envelopeSelects.indexOf(event.target);
                 const inverterIndex = this._inverters.indexOf(event.target);
                 const discreterIndex = this._discreters.indexOf(event.target);
@@ -38053,10 +38055,33 @@ You should be redirected to the song at:<br /><br />
                 const LFOStepsBoxIndex = this.LFOStepsBoxes.indexOf(event.target);
                 const LFOStepsSliderIndex = this._LFOStepsSliders.indexOf(event.target);
                 if (targetSelectIndex != -1) {
-                    const combinedValue = parseInt(this._targetSelects[targetSelectIndex].value);
-                    const target = combinedValue % Config.instrumentAutomationTargets.length;
-                    const index = (combinedValue / Config.instrumentAutomationTargets.length) >>> 0;
+                    const target = parseInt(this._targetSelects[targetSelectIndex].value);
+                    const index = parseInt(this._indexSelects[targetSelectIndex].value);
+                    const prevMaxCount = Config.instrumentAutomationTargets[this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()].envelopes[targetSelectIndex].target].maxCount;
+                    const maxCount = Config.instrumentAutomationTargets[target].maxCount;
+                    if (maxCount > 1) {
+                        this._indexSelects[targetSelectIndex].style.display = "";
+                        for (let index = 0; index < maxCount; index++) {
+                            if (prevMaxCount == 1 && index == 0) {
+                                const displayOpt = HTML.option({ value: 0 }, 1);
+                                displayOpt.selected = true;
+                                this._indexSelects[targetSelectIndex].appendChild(displayOpt);
+                                console.log(displayOpt);
+                            }
+                            else {
+                                this._indexSelects[targetSelectIndex].appendChild(HTML.option({ value: index }, index + 1));
+                            }
+                        }
+                    }
+                    else {
+                        this._indexSelects[targetSelectIndex].style.display = "none";
+                    }
                     this._doc.record(new ChangeSetEnvelopeTarget(this._doc, targetSelectIndex, target, index));
+                }
+                else if (indexSelectIndex != -1) {
+                    const target = parseInt(this._targetSelects[indexSelectIndex].value);
+                    const index = parseInt(this._indexSelects[indexSelectIndex].value);
+                    this._doc.record(new ChangeSetEnvelopeTarget(this._doc, indexSelectIndex, target, index));
                 }
                 else if (envelopeSelectIndex != -1) {
                     const envelopeIndex = this._envelopeSelects.indexOf(event.target);
@@ -38157,17 +38182,9 @@ You should be redirected to the song at:<br /><br />
             this.container.addEventListener("click", this._onClick);
             this.container.addEventListener("input", this._onInput);
         }
-        _makeOption(target, index) {
+        _makeOption(target) {
             let displayName = Config.instrumentAutomationTargets[target].displayName;
-            if (Config.instrumentAutomationTargets[target].maxCount > 1) {
-                if (displayName.indexOf("#") != -1) {
-                    displayName = displayName.replace("#", String(index + 1));
-                }
-                else {
-                    displayName += " " + (index + 1);
-                }
-            }
-            return HTML.option({ value: target + index * Config.instrumentAutomationTargets.length }, displayName);
+            return HTML.option({ value: target }, displayName);
         }
         _updateTargetOptionVisibility(menu, instrument) {
             for (let optionIndex = 0; optionIndex < menu.childElementCount; optionIndex++) {
@@ -38341,16 +38358,9 @@ You should be redirected to the song at:<br /><br />
             const instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
             for (let envelopeIndex = this._rows.length; envelopeIndex < instrument.envelopeCount; envelopeIndex++) {
                 const targetSelect = HTML.select();
+                const indexSelect = HTML.select({ style: "width: 0; flex: 0.2;" });
                 for (let target = 0; target < Config.instrumentAutomationTargets.length; target++) {
-                    const interleaved = (Config.instrumentAutomationTargets[target].interleave);
-                    for (let index = 0; index < Config.instrumentAutomationTargets[target].maxCount; index++) {
-                        targetSelect.appendChild(this._makeOption(target, index));
-                        if (interleaved) {
-                            targetSelect.appendChild(this._makeOption(target + 1, index));
-                        }
-                    }
-                    if (interleaved)
-                        target++;
+                    targetSelect.appendChild(this._makeOption(target));
                 }
                 const envelopeSelect = HTML.select({ id: "envelopeSelect" });
                 for (let envelope = 0; envelope < Config.newEnvelopes.length; envelope++) {
@@ -38430,11 +38440,12 @@ You should be redirected to the song at:<br /><br />
                 extraSettingsDropdown.style.display = "inline";
                 const extraSettingsDropdownGroup = HTML.div({ class: "editor-controls", style: "flex-direction:column; align-items:center;" }, extraRandomSettingsGroup, extraLFOSettingsGroup, extraPitchSettingsGroup, perEnvelopeSpeedGroup, lowerBoundWrapper, upperBoundWrapper, checkboxWrapper, copyPasteContainer);
                 extraSettingsDropdownGroup.style.display = "none";
-                const row = HTML.div({ class: "envelope-row" }, extraSettingsDropdown, HTML.div({ class: "selectContainer", style: "width: 0; flex: 1;" }, targetSelect), HTML.div({ class: "selectContainer", style: "width: 0; flex: 0.85" }, envelopeSelect), deleteButton);
+                const row = HTML.div({ class: "envelope-row" }, extraSettingsDropdown, HTML.div({ style: "width: 0; flex: 1; display: flex; flex-direction: row" }, HTML.div({ class: "selectContainer", style: "width: 0; flex: 1;" }, targetSelect), indexSelect), HTML.div({ class: "selectContainer", style: "width: 0; flex: 0.85" }, envelopeSelect), deleteButton);
                 this.container.appendChild(row);
                 this.container.appendChild(extraSettingsDropdownGroup);
                 this._rows[envelopeIndex] = row;
                 this._targetSelects[envelopeIndex] = targetSelect;
+                this._indexSelects[envelopeIndex] = indexSelect;
                 this._envelopeSelects[envelopeIndex] = envelopeSelect;
                 this._deleteButtons[envelopeIndex] = deleteButton;
                 this.extraSettingsDropdowns[envelopeIndex] = extraSettingsDropdown;
@@ -38473,6 +38484,16 @@ You should be redirected to the song at:<br /><br />
             for (let envelopeIndex = this._renderedEnvelopeCount; envelopeIndex < instrument.envelopeCount; envelopeIndex++) {
                 this._rows[envelopeIndex].style.display = "";
                 this._updateTargetOptionVisibility(this._targetSelects[envelopeIndex], instrument);
+                const maxCount = Config.instrumentAutomationTargets[instrument.envelopes[envelopeIndex].target].maxCount;
+                if (maxCount > 1) {
+                    this._indexSelects[envelopeIndex].style.display = "";
+                    for (let index = 0; index < maxCount; index++) {
+                        this._indexSelects[envelopeIndex].appendChild(HTML.option({ value: index }, index + 1));
+                    }
+                }
+                else {
+                    this._indexSelects[envelopeIndex].style.display = "none";
+                }
             }
             for (let envelopeIndex = instrument.envelopeCount; envelopeIndex < this._renderedEnvelopeCount; envelopeIndex++) {
                 this._rows[envelopeIndex].style.display = "none";
@@ -38489,7 +38510,8 @@ You should be redirected to the song at:<br /><br />
                 }
             }
             for (let envelopeIndex = 0; envelopeIndex < instrument.envelopeCount; envelopeIndex++) {
-                this._targetSelects[envelopeIndex].value = String(instrument.envelopes[envelopeIndex].target + instrument.envelopes[envelopeIndex].index * Config.instrumentAutomationTargets.length);
+                this._targetSelects[envelopeIndex].value = String(instrument.envelopes[envelopeIndex].target);
+                this._indexSelects[envelopeIndex].value = String(instrument.envelopes[envelopeIndex].index);
                 this._envelopeSelects[envelopeIndex].selectedIndex = instrument.envelopes[envelopeIndex].envelope;
                 this.pitchStartBoxes[envelopeIndex].value = String(instrument.envelopes[envelopeIndex].pitchEnvelopeStart);
                 this.pitchEndBoxes[envelopeIndex].value = String(instrument.envelopes[envelopeIndex].pitchEnvelopeEnd);

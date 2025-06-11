@@ -9,13 +9,15 @@ offline/node_modules
 /website/**/beepbox*.js.map
 /website/beepbox_offline.html
 /website/jummbox_offline.html
-#for github pages
+#for github pages / live editor
 /editor/*.js
 /player/*.js
 /synth/*.js
+/global/*.js
 /editor/*.js.map
 /player/*.js.map
 /synth/*.js.map
+/global/*.js.map
 #unsure
 /**/*.ts.bak
 /**/*.html.bak

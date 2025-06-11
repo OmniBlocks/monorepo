@@ -3136,6 +3136,9 @@ export class Instrument {
         if (automationTarget.effect != null && (this.effects & (1 << automationTarget.effect)) == 0) {
             return false;
         }
+        if (automationTarget.name == "arpeggioSpeed") {
+            return effectsIncludeChord(this.effects) && this.chord == Config.chords.dictionary["arpeggio"].index;
+        }
         if (automationTarget.isFilter) {
             //if (automationTarget.perNote) {
             let useControlPointCount: number = this.noteFilter.controlPointCount;

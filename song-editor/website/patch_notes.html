@@ -69,23 +69,41 @@
         a {
             color: var(--link-accent, #98f);
         }
+
+        p {
+            color: var(--secondary-text, rgb(193, 193, 193));
+            margin-top: -1em;
+        }
+
+        @media (min-width: 1100px) {
+            body {
+                width: 1100px;
+                align-items: start;
+                align-content: start;
+            }
+            h2 {
+                border-left: white solid 4px;
+                padding-left: 8px;
+            }
+        }
     </style>
     </body>
     <h1>
         <font color="#247d1d">Patch Notes (in reverse chronological order);</font>
     </h1>
-
 <h2>Version 1.4.5 (Patch)</h2>
 <h3>
     <ul>
         <li> Granular freq and ring mod hertz now better compute fractional values </li>
-        <li> Increased max filter points to 9 </li>
+        <li> Increased max filter points to 12 </li>
         <li> Increased max envelope steps to 32 </li>
         <li> Removed default panning settings from all presets </li>
+        <li> Arp Speed now no longer displays as an envelope target when chord type isn't arpeggio </li>
+        <li> Cleaned up patch notes CSS slightly </li>
         <!-- Live Editor support added -->
     </ul>
 </h3>
-<p>6/10/2025</p>
+<p>6/11/2025</p>
 
 <h2>Version 1.4.4 (Ring Mod Pulse Width)</h2>
 <h3>

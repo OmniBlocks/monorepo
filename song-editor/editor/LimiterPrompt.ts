@@ -334,7 +334,6 @@ export class LimiterPrompt implements Prompt {
         }
 
         this.limiterCanvas.animateVolume(this._doc.song.inVolumeCap, this.inVolumeHistoricCap, this._doc.song.outVolumeCap, this.outVolumeHistoricCap);
-        //console.log(this._doc.song.volumeCap);
         window.requestAnimationFrame(this._volumeUpdate);
     }
 

@@ -28,7 +28,8 @@
 		"package": "electron-packager ./scripts/to_deploy --platform=darwin,linux,win32 --arch=ia32,x64 --asar --overwrite && npm run build-offline-html",
 		"package-host": "electron-packager ./scripts/to_deploy slarmoosbox --asar --overwrite && npm run build-offline-html",
 		"live_editor": "bash ./scripts/live_editor.sh",
-		"live_editor_typeless": "bash ./scripts/live_editor_typeless.sh"
+		"live_editor_typeless": "bash ./scripts/live_editor_typeless.sh",
+		"let": "npm run live_editor_typeless"
 	},
 	"repository": {
 		"type": "git",

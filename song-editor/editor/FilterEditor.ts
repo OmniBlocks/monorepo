@@ -93,13 +93,18 @@ export class FilterEditor {
             for (let i: number = 0; i < Config.filterMaxPoints; i++) {
                 this._indicators[i] = SVG.text();
                 this._indicators[i].setAttribute("fill", ColorConfig.invertedText);
-                this._indicators[i].setAttribute("text-anchor", "start");
+                this._indicators[i].setAttribute("text-anchor", "middle");
                 this._indicators[i].setAttribute("dominant-baseline", "central");
                 this._indicators[i].setAttribute("pointer-events", "none");
                 this._indicators[i].setAttribute("font-weight", "bolder");
                 this._indicators[i].textContent = "" + (i + 1);
                 this._indicators[i].style.setProperty("display", "none");
-                this._indicators[i].style.setProperty("font-size", "24px");
+                if (i > 8) { //two digit
+                    this._indicators[i].style.setProperty("font-size", "19px");
+                } else {
+                    this._indicators[i].style.setProperty("font-size", "24px");
+                }
+                
                 this._svg.appendChild(this._indicators[i]);
             }
 
@@ -508,7 +513,7 @@ export class FilterEditor {
 
             if (this._larger) {
                 this._indicators[i].style.setProperty("display", "");
-                this._indicators[i].setAttribute("x", "" + (pointX - 7));
+                this._indicators[i].setAttribute("x", "" + (pointX));
                 this._indicators[i].setAttribute("y", "" + (pointY + 2));
             }
         }

@@ -108,7 +108,7 @@ $('#pitchPresetSelect').on("select2:close", editor._refocus);
 $('#drumPresetSelect').on("change", editor._whenSetDrumPreset);
 $('#drumPresetSelect').on("select2:close", editor._refocus);
 
-// $('#envelopeSelect').on("change", (change: Event) => { editor.envelopeEditor.whenSetEnvelopePreset(change); console.log("here4???") });
+// $('#envelopeSelect').on("change", (change: Event) => { editor.envelopeEditor.whenSetEnvelopePreset(change) });
 // $('#envelopeSelect').on("select2:close", editor._refocus);
 
 // $('#envelopeSelect').each((index, v) => {

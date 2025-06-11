@@ -8879,7 +8879,6 @@ class InstrumentState {
             }
             this.granularMaximumGrains = Math.floor(Math.pow(2, this.granularMaximumGrains * envelopeStarts[EnvelopeComputeIndex.grainAmount]));
             granularChance = granularChance * envelopeStarts[EnvelopeComputeIndex.grainAmount];
-            console.log(this.granularMaximumGrains, granularChance)
         }
 
         this.allocateNecessaryBuffers(synth, instrument, samplesPerTick);
@@ -9213,11 +9212,16 @@ class InstrumentState {
 
             let ringModPhaseDeltaStart = (Math.max(0, calculateRingModHertz(useRingModHzStart))) / synth.samplesPerSecond;
             let ringModPhaseDeltaEnd = (Math.max(0, calculateRingModHertz(useRingModHzEnd))) / synth.samplesPerSecond;
+            
+            if (useRingModHzStart < 1 / (Config.ringModHzRange - 1) || useRingModHzEnd < 1 / (Config.ringModHzRange - 1)) {
+                ringModPhaseDeltaStart *= useRingModHzStart * (Config.ringModHzRange - 1);
+                ringModPhaseDeltaEnd *= useRingModHzEnd * (Config.ringModHzRange - 1);
+            }
 
             this.ringModMixFadeDelta = 0;
             if (this.ringModMixFade < 0) this.ringModMixFade = 0;
             if (ringModPhaseDeltaStart <= 0 && ringModPhaseDeltaEnd <= 0 && this.ringModMixFade != 0) {
-                this.ringModMixFadeDelta = this.ringModMixFade / -10;
+                this.ringModMixFadeDelta = this.ringModMixFade / -40;
             } else if (ringModPhaseDeltaStart > 0 && ringModPhaseDeltaEnd > 0) {
                 this.ringModMixFade = 1.0;
             }
@@ -13748,8 +13752,6 @@ export class Synth {
                 }
                 return lines.join("\n");
             });
-
-            //console.log(pickedStringSource);
             pickedStringFunction = new Function("Config", "Synth", pickedStringSource)(Config, Synth);
             Synth.pickedStringFunctionCache[voiceCount] = pickedStringFunction;
         }
@@ -14490,8 +14492,6 @@ export class Synth {
             }
 
             effectsSource += "}";
-
-            //console.log(effectsSource);
             effectsFunction = new Function("Config", "Synth", effectsSource)(Config, Synth);
             Synth.effectsFunctionCache[signature] = effectsFunction;
         }

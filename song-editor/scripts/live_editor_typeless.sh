@@ -19,4 +19,4 @@ done
 npx concurrently \
   "npx esbuild --format=iife --keep-names --global-name=beepbox --bundle ./synth/synth.js --outfile=website/beepbox_synth.js --sourcemap --watch" \
 	"npx esbuild --format=iife --keep-names --global-name=beepbox --bundle ./editor/main.js --outfile=website/beepbox_editor.js --sourcemap --watch" \
-	"npx five-server --wait=200 --watch=website/** --port=4000 --open=$open_browser_path website/"
+	"npx five-server --wait=200 --watch=website --port=4000 --open=$open_browser_path website/"

@@ -471,7 +471,6 @@ class CustomAlgorythmCanvas {
                                 this.lookUpArray[i] = [this.drawArray.length - (testPos[0] + 1), testPos[1]];
                                 break;
                             }
-                            //console.log(testPos[1])
                         }
                     } else {
                         this.drawArray[testPos[0]][testPos[1]] = i + 1;
@@ -618,8 +617,6 @@ class CustomAlgorythmCanvas {
             }
         }
         this.drawLines(ctx);
-
-        //console.log("draw complete")
     }
 
     private _onMouseMove = (event: MouseEvent): void => {

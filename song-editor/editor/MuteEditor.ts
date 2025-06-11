@@ -77,13 +77,11 @@ export class MuteEditor {
     private _channelDropDownClick = (event: MouseEvent): void => {
         this._channelDropDownOpen = !this._channelDropDownLastState;
         this._channelDropDownGetOpenedPosition(event);
-        //console.log("click " + this._channelDropDownOpen);
     }
 
     private _channelDropDownBlur = (): void => {
         this._channelDropDownOpen = false;
         this._channelNameDisplay.style.setProperty("display", "none");
-        //console.log("blur " + this._channelDropDownOpen);
     }
 
     private _channelDropDownGetOpenedPosition = (event: MouseEvent): void => {
@@ -133,7 +131,6 @@ export class MuteEditor {
         this._channelDropDown.style.setProperty("display", "none");
         this._channelDropDownOpen = false;
         event.stopPropagation();
-        //console.log("handler " + this._channelDropDownOpen);
 
         switch (this._channelDropDown.value) {
             case "rename":
@@ -269,13 +266,8 @@ export class MuteEditor {
     public onKeyUp(event: KeyboardEvent): void {
         switch (event.keyCode) {
             case 27: // esc
-                this._channelDropDownOpen = false;
-                //console.log("close");
-                this._channelNameDisplay.style.setProperty("display", "none");
-                break;
             case 13: // enter
                 this._channelDropDownOpen = false;
-                //console.log("close");
                 this._channelNameDisplay.style.setProperty("display", "none");
                 break;
             default:

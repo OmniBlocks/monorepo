@@ -841,6 +841,7 @@ var beepbox = (() => {
         // todbox beta
         { name: "todbox beta banana wave", expression: 0.8, samples: centerAndNormalizeWave([0, 0.2, 0.4, 0.5, 0.6, 0.7, 0.8, 0.85, 0.9, 0.95, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0.95, 0.9, 0.85, 0.8, 0.7, 0.6, 0.5, 0.4, 0.2, 0]) },
         { name: "todbox beta test wave", expression: 0.5, samples: centerAndNormalizeWave([56, 0, -52, 16, 3, 3, 2, -35, 20, 147, -53, 0, 0, 5, -6]) },
+<<<<<<< HEAD
         { name: "todbox beta real snare", expression: 1, samples: centerAndNormalizeWave([0, -0.01208, -0.02997, -0.04382, -0.06042, -0.07529, -0.09116, -0.10654, -0.12189, -0.13751, -0.15289, -0.16849, -0.18387, -0.19974, -0.21484, -0.23071, -0.24557, -0.26144, -0.27731, -0.29141, -0.3035, -0.32416, -0.34406, -0.32947, -0.31158, -0.33725, -0.37579, -0.39746, -0.40201, -0.40906, -0.4418, -0.47229, -0.47379, -0.47733, -0.45239, -0.33954, -0.22894, -0.22443, -0.32138, -0.46371, -0.57178, -0.61081, -0.59998, -0.61459, -0.62189, -0.43979, -0.19217, -0.12643, -0.17252, -0.20956, -0.20981, -0.19217, -0.22845, -0.34332, -0.50629, -0.64307, -0.72922, -0.81384, -0.87857, -0.90149, -0.88687, -0.86169, -0.87781, -0.80478, -0.52493, -0.31308, -0.33249, -0.39395, -0.39017, -0.30301, -0.19949, -0.13071, -0.02493, 0.14307, 0.34961, 0.52542, 0.63223, 0.68613, 0.7471, 0.87305, 0.98184, 0.98889, 0.97052, 0.99066, 0.99747, 0.99344, 0.99469, 0.99393, 0.9957, 0.99393, 0.99521, 0.99469, 0.9942, 0.99521, 0.9942, 0.99521, 0.99469, 0.99469, 0.99521, 0.9942, 0.99545, 0.99445, 0.99469, 0.99493, 0.9942, 0.99521, 0.99393, 0.99493, 0.99469, 0.99445, 0.9957, 0.99445, 0.99521, 0.99469, 0.99469, 0.99521, 0.9942, 0.99545, 0.99445, 0.99445, 0.99493, 0.9942, 0.99545, 0.9942, 0.99493, 0.99493, 0.9942, 0.99545, 0.99445, 0.99521, 0.99469, 0.99445, 0.99545, 0.99368, 0.99393, 0.99445, 0.99268, 0.97983, 0.97229, 0.95944, 0.88486, 0.76773, 0.64481, 0.53098, 0.39847, 0.19318, -0.03827, -0.20325, -0.39319, -0.68765, -0.88461, -0.93448, -0.96069, -0.97681, -0.98715, -0.99042, -0.99142, -0.99091, -0.99142, -0.99219, -0.99091, -0.99219, -0.99066, -0.99142, -0.99142, -0.99118, -0.99191, -0.99066, -0.99191, -0.99142, -0.99142, -0.99191, -0.99091, -0.99219, -0.99118, -0.99142, -0.99167, -0.99091, -0.99219, -0.99091, -0.99167, -0.99142, -0.99091, -0.99191, -0.99091, -0.99191, -0.99142, -0.99118, -0.99191, -0.99066, -0.99191, -0.99118, -0.99142, -0.99191, -0.99066, -0.99191, -0.99091, -0.99167, -0.99191, -0.99118, -0.99219, -0.99091, -0.99191, -0.99142, -0.99142, -0.99243, -0.98865, -0.98764, -0.99219, -0.98083, -0.92517, -0.9277, -0.91486, -0.59042, -0.15189, 0.02945, 0.05667, 0.06195, 629e-5, -0.18008, -0.56497, -0.8801, -0.9277, -0.92871, -0.97705, -0.99167, -0.98663, -0.99118, -0.99042, -0.99219, -0.99142, -0.99118, -0.98941, -0.99219, -1, -0.9758, -0.95993, -0.99948, -0.98236, -0.84659, -0.7486, -0.70679, -0.59747, -0.48035, -0.41687, -0.36826, -0.29745, -0.18185, -0.06219, 0.02164, 0.07907, 0.13123, 0.18033, 0.1962, 0.15692, 0.14053, 0.20251, 0.2753, 0.30905, 0.29092, 0.27252, 0.30402, 0.32416, 0.32214, 0.35239, 0.3967, 0.43198, 0.4942, 0.58487, 0.64154, 0.65967, 0.6705, 0.67026, 0.66522, 0.6554, 0.66119, 0.70627, 0.75842, 0.78738, 0.7894, 0.78763, 0.80402, 0.85944, 0.94559, 0.9899, 0.9816, 0.98007, 0.99368, 0.99393, 0.98538, 0.9758, 0.97101, 0.93802, 0.81812, 0.64633, 0.46649, 0.28613, 0.14685, 0.08966, 0.12543, 0.20325, 0.24557, 0.18866, 0.02795, -0.20175, -0.44205, -0.58713, -0.57629, -0.41385, -0.14255, 0.18033, 0.47882, 0.68311, 0.72314, 0.62064, 0.48309, 0.43073, 0.53577, 0.72794, 0.9025, 0.97354, 0.97, 0.98083, 0.99191, 0.99319, 0.99493, 0.99393, 0.99521, 0.99393, 0.99545, 0.9942, 0.99493, 0.99493, 0.99445, 0.99545, 0.9942, 0.99545, 0.99243, 0.98917, 0.98386, 0.97781, 0.95844, 0.89066, 0.81561, 0.78134, 0.77277, 0.75995, 0.73022, 0.67126, 0.57178, 0.47, 0.38361, 0.29419, 0.20703, 0.14734, 0.15866, 0.25162, 0.35818, 0.45062, 0.5675, 0.69748, 0.81232, 0.89697, 0.95062, 0.97656, 0.98615, 0.99191, 0.99219, 0.99243, 0.99368, 0.99368, 0.97028, 0.95566, 0.94559, 0.82617, 0.59973, 0.38361, 0.23901, 0.15338, 0.12921, 0.11206, 0.04382, -0.12946, -0.43552, -0.72644, -0.89847, -0.95465, -0.95541, -0.97229, -0.99268, -0.99319, -0.9884, -0.99142, -0.99167, -0.99091, -0.9884, -0.98965, -0.99368, -0.97455, -0.9501, -0.94684, -0.96219, -0.98514, -0.99243, -0.98889, -0.98917, -0.99142, -0.99219, -0.99091, -0.99191, -0.99142, -0.99142, -0.99191, -0.99066, -0.99167, -0.99091, -0.99142, -0.99191, -0.99091, -0.99191, -0.99091, -0.99167, -0.99167, -0.99091, -0.99219, -0.99091, -0.99191, -0.99142, -0.99118, -0.99191, -0.99066, -0.99191, -0.99091, -0.99118, -0.99243, -0.98941, -0.98462, -0.96976, -0.9632, -0.96194, -0.87305, -0.66196, -0.44809, -0.29495, -0.18085, -0.11813, -0.11334, -0.18564, -0.34885, -0.58237, -0.8045, -0.93726, -0.97806, -0.97354, -0.97531, -0.9899, -0.99368, -0.98941, -0.99219, -0.99091, -0.99142, -0.99167, -0.99091, -0.99191, -0.99118, -0.99219, -0.98236, -0.97781, -0.97656, -0.95135, -0.87204, -0.71335, -0.52139, -0.34232, -0.17783, -906e-5, 0.14886, 0.3045, 0.48889, 0.67404, 0.8403, 0.94128, 0.97681, 0.98462, 0.98337, 0.99142, 0.99521, 0.99493, 0.9942, 0.99445, 0.99521, 0.99393, 0.99545, 0.99445, 0.99521, 0.99521, 0.99445, 0.9957, 0.99445, 0.99521, 0.99469, 0.99445, 0.99521, 0.9942, 0.99521, 0.99445, 0.99445, 0.99521, 0.99445, 0.99545, 0.99445, 0.99469, 0.99493, 0.99393, 0.99493, 0.99445, 0.99393, 0.98285, 0.97781, 0.97479, 0.92844, 0.82114, 0.66095, 0.52417, 0.46826, 0.46722, 0.47934, 0.47379, 0.47076, 0.48209, 0.42014, 0.25439, 0.10074, -302e-5, -0.08966, -0.16068, -0.21436, -0.2204, -0.15137, -476e-5, 0.18536, 0.37631, 0.52292, 0.62164, 0.70425, 0.74835, 0.72366, 0.63928, 0.52567, 0.40805, 0.35666, 0.42896, 0.60175, 0.802, 0.92743, 0.96548, 0.97632, 0.98337, 0.99066, 0.99521, 0.9942, 0.99368, 0.99292, 0.9884, 0.98083, 0.96774, 0.93323, 0.8544, 0.6947, 0.47202, 0.20425, -0.0889, -0.36423, -0.60025, -0.77481, -0.90173, -0.96017, -0.97028, -0.98108, -0.9884, -0.99219, -0.9899, -0.99219, -0.99142, -0.99142, -0.99219, -0.99091, -0.99243, -0.99066, -0.99142, -0.99142, -0.99118, -0.99191, -0.99066, -0.99167, -0.99142, -0.99142, -0.99219, -0.99091, -0.99191, -0.99118, -0.99142, -0.99191, -0.99091, -0.99191, -0.99091, -0.99167, -0.99191, -0.99118, -0.99219, -0.99091, -0.99167, -0.99142, -0.99142, -0.99219, -0.99091, -0.99191, -0.99142, -0.99118, -0.98917, -0.99042, -0.99445, -0.9733, -0.9559, -0.96219, -0.8967, -0.72241, -0.55112, -0.44809, -0.39319, -0.37833, -0.35641, -0.2627, -0.1423, -0.11282, -0.13525, -0.11536, -0.09671, -0.11511, -0.1806, -0.26874, -0.33374, -0.42215, -0.51358, -0.44785, -0.3045, -0.28613, -0.30527, -0.25037, -0.1539, -0.08286, -0.11157, -0.12592, -327e-5, 0.13803, 0.19141, 0.1282, 0.01788, -0.03952, -0.12592, -0.26773, -0.34634, -0.31384, -0.1806, -0.0108, 0.13574, 0.2612, 0.36975, 0.46573, 0.55087, 0.63626, 0.73022, 0.83072, 0.92014, 0.97177, 0.98587, 0.98413, 0.99167, 0.99445, 0.99292, 0.99219, 0.9874, 0.98007, 0.96472, 0.92239, 0.82166, 0.69067, 0.57959, 0.54962, 0.59695, 0.64255, 0.64633, 0.60629, 0.55942, 0.5491, 0.58966, 0.61887, 0.56952, 0.54181, 0.59518, 0.63248, 0.63876, 0.65463, 0.73398, 0.88312, 0.96927, 0.97101, 0.97958, 0.99344, 0.9942, 0.99268, 0.99493, 0.99469, 0.99445, 0.99521, 0.99445, 0.99545, 0.9942, 0.99493, 0.99493, 0.9942, 0.99545, 0.9942, 0.99493, 0.9942, 0.99393, 0.9942, 0.9884, 0.98309, 0.98309, 0.96069, 0.88461, 0.7937, 0.72064, 0.65765, 0.59998, 0.53247, 0.49268, 0.48615, 0.44205, 0.38034, 0.36447, 0.38715, 0.39294, 0.32645, 0.19595, 0.07782, -0.05893, -0.27832, -0.48309, -0.62619, -0.72995, -0.79999, -0.84583, -0.82166, -0.73575, -0.67227, -0.65491, -0.6496, -0.66397, -0.70175, -0.72894, -0.74658, -0.76724, -0.7952, -0.82846, -0.86523, -0.90527, -0.94382, -0.89948, -0.69849, -0.47479, -0.31662, -0.15414, -729e-5, 0.07077, 0.08237, 0.04431, -0.02292, -0.11761, -0.24307, -0.36926, -0.45087, -0.4617, -0.4025, -0.30679, -0.17529, 0, 0.14331, 0.24179, 0.36774, 0.49545, 0.56522, 0.57907, 0.56775, 0.53851, 0.51132, 0.48688, 0.41913, 0.26044, 955e-5, -0.26297, -0.46396, -0.62341, -0.82214, -0.94684, -0.96774, -0.97531, -0.98413, -0.99017, -0.9899, -0.99219, -0.99066, -0.99142, -0.99167, -0.99118, -0.99219, -0.9899, -0.99118, -0.99368, -0.99142, -0.97757, -0.97403, -0.98007, -0.9617, -0.86826, -0.67783, -0.52719, -0.48788, -0.4549, -0.43146, -0.47681, -0.54105, -0.57983, -0.60904, -0.62317, -0.59949, -0.55566, -0.52063, -0.52115, -0.55112, -0.56244, -0.58337, -0.6554, -0.73373, -0.77228, -0.74759, -0.6889, -0.64609, -0.61887, -0.5806, -0.50351, -0.40729, -0.33929, -0.3511, -0.42944, -0.47028, -0.42267, -0.32718, -0.20224, -0.0564, 0.04556, 0.10529, 0.1763, 0.26169, 0.33197, 0.32138, 0.23776, 0.20956, 0.23148, 0.20352, 0.23325, 0.39267, 0.52719, 0.58438, 0.62289, 0.66345, 0.70023, 0.66296, 0.5433, 0.42618, 0.33475, 0.24533, 0.14105, 0.03851, 0.01358, 0.09143, 0.22845, 0.34961, 0.41711, 0.4874, 0.58914, 0.69519, 0.78186, 0.84357, 0.89822, 0.95389, 0.98135, 0.98615, 0.99167, 0.99243, 0.99445, 0.9942, 0.99469, 0.99493, 0.99393, 0.99545, 0.99445, 0.99521, 0.99469, 0.99445, 0.99521, 0.9942, 0.99469, 0.98965, 0.98715, 0.98563, 0.96295, 0.91736, 0.86624, 0.82367, 0.77554, 0.68411, 0.53549, 0.38916, 0.2612, 0.11435, -0.04053, -0.18161, -0.23172, -0.19394, -0.15237, -0.1073, -0.02997, 0.08588, 0.2262, 0.34305, 0.44104, 0.5574, 0.65765, 0.71259, 0.69217, 0.65363, 0.69748, 0.79572, 0.89368, 0.95514, 0.97733, 0.98413, 0.98816, 0.99243, 0.99445, 0.99243, 0.97302, 0.96674, 0.97983, 0.90378, 0.71005, 0.51056, 0.40451, 0.40982, 0.41559, 0.32996, 0.24356, 0.18866, 0.11411, 0.05365, 0.01157, -0.03247, -0.09216, -0.16095, -0.23248, -0.31662, -0.39771, -0.48663, -0.59647, -0.71536, -0.82013, -0.85287, -0.82947, -0.84937, -0.92215, -0.97177, -0.98663, -0.98816, -0.98438, -0.99091, -0.99219, -0.99091, -0.99191, -0.99042, -0.99191, -0.99091, -0.99142, -0.99191, -0.99091, -0.99191, -0.99091, -0.99167, -0.99142]) },
         // based off an old mp3 in #modded-beepbox where someone tried to shorten the overdrive guitar into the size of other chip waves 
         // search "normie alert" in beepcord
@@ -939,6 +940,50 @@ var beepbox = (() => {
     }
     static {
       this.transitions = toNameMap([
+=======
+        { name: "todbox beta real snare", expression: 1.0, samples: centerAndNormalizeWave([0.00000, -0.01208, -0.02997, -0.04382, -0.06042, -0.07529, -0.09116, -0.10654, -0.12189, -0.13751, -0.15289, -0.16849, -0.18387, -0.19974, -0.21484, -0.23071, -0.24557, -0.26144, -0.27731, -0.29141, -0.30350, -0.32416, -0.34406, -0.32947, -0.31158, -0.33725, -0.37579, -0.39746, -0.40201, -0.40906, -0.44180, -0.47229, -0.47379, -0.47733, -0.45239, -0.33954, -0.22894, -0.22443, -0.32138, -0.46371, -0.57178, -0.61081, -0.59998, -0.61459, -0.62189, -0.43979, -0.19217, -0.12643, -0.17252, -0.20956, -0.20981, -0.19217, -0.22845, -0.34332, -0.50629, -0.64307, -0.72922, -0.81384, -0.87857, -0.90149, -0.88687, -0.86169, -0.87781, -0.80478, -0.52493, -0.31308, -0.33249, -0.39395, -0.39017, -0.30301, -0.19949, -0.13071, -0.02493, 0.14307, 0.34961, 0.52542, 0.63223, 0.68613, 0.74710, 0.87305, 0.98184, 0.98889, 0.97052, 0.99066, 0.99747, 0.99344, 0.99469, 0.99393, 0.99570, 0.99393, 0.99521, 0.99469, 0.99420, 0.99521, 0.99420, 0.99521, 0.99469, 0.99469, 0.99521, 0.99420, 0.99545, 0.99445, 0.99469, 0.99493, 0.99420, 0.99521, 0.99393, 0.99493, 0.99469, 0.99445, 0.99570, 0.99445, 0.99521, 0.99469, 0.99469, 0.99521, 0.99420, 0.99545, 0.99445, 0.99445, 0.99493, 0.99420, 0.99545, 0.99420, 0.99493, 0.99493, 0.99420, 0.99545, 0.99445, 0.99521, 0.99469, 0.99445, 0.99545, 0.99368, 0.99393, 0.99445, 0.99268, 0.97983, 0.97229, 0.95944, 0.88486, 0.76773, 0.64481, 0.53098, 0.39847, 0.19318, -0.03827, -0.20325, -0.39319, -0.68765, -0.88461, -0.93448, -0.96069, -0.97681, -0.98715, -0.99042, -0.99142, -0.99091, -0.99142, -0.99219, -0.99091, -0.99219, -0.99066, -0.99142, -0.99142, -0.99118, -0.99191, -0.99066, -0.99191, -0.99142, -0.99142, -0.99191, -0.99091, -0.99219, -0.99118, -0.99142, -0.99167, -0.99091, -0.99219, -0.99091, -0.99167, -0.99142, -0.99091, -0.99191, -0.99091, -0.99191, -0.99142, -0.99118, -0.99191, -0.99066, -0.99191, -0.99118, -0.99142, -0.99191, -0.99066, -0.99191, -0.99091, -0.99167, -0.99191, -0.99118, -0.99219, -0.99091, -0.99191, -0.99142, -0.99142, -0.99243, -0.98865, -0.98764, -0.99219, -0.98083, -0.92517, -0.92770, -0.91486, -0.59042, -0.15189, 0.02945, 0.05667, 0.06195, 0.00629, -0.18008, -0.56497, -0.88010, -0.92770, -0.92871, -0.97705, -0.99167, -0.98663, -0.99118, -0.99042, -0.99219, -0.99142, -0.99118, -0.98941, -0.99219, -1.00000, -0.97580, -0.95993, -0.99948, -0.98236, -0.84659, -0.74860, -0.70679, -0.59747, -0.48035, -0.41687, -0.36826, -0.29745, -0.18185, -0.06219, 0.02164, 0.07907, 0.13123, 0.18033, 0.19620, 0.15692, 0.14053, 0.20251, 0.27530, 0.30905, 0.29092, 0.27252, 0.30402, 0.32416, 0.32214, 0.35239, 0.39670, 0.43198, 0.49420, 0.58487, 0.64154, 0.65967, 0.67050, 0.67026, 0.66522, 0.65540, 0.66119, 0.70627, 0.75842, 0.78738, 0.78940, 0.78763, 0.80402, 0.85944, 0.94559, 0.98990, 0.98160, 0.98007, 0.99368, 0.99393, 0.98538, 0.97580, 0.97101, 0.93802, 0.81812, 0.64633, 0.46649, 0.28613, 0.14685, 0.08966, 0.12543, 0.20325, 0.24557, 0.18866, 0.02795, -0.20175, -0.44205, -0.58713, -0.57629, -0.41385, -0.14255, 0.18033, 0.47882, 0.68311, 0.72314, 0.62064, 0.48309, 0.43073, 0.53577, 0.72794, 0.90250, 0.97354, 0.97000, 0.98083, 0.99191, 0.99319, 0.99493, 0.99393, 0.99521, 0.99393, 0.99545, 0.99420, 0.99493, 0.99493, 0.99445, 0.99545, 0.99420, 0.99545, 0.99243, 0.98917, 0.98386, 0.97781, 0.95844, 0.89066, 0.81561, 0.78134, 0.77277, 0.75995, 0.73022, 0.67126, 0.57178, 0.47000, 0.38361, 0.29419, 0.20703, 0.14734, 0.15866, 0.25162, 0.35818, 0.45062, 0.56750, 0.69748, 0.81232, 0.89697, 0.95062, 0.97656, 0.98615, 0.99191, 0.99219, 0.99243, 0.99368, 0.99368, 0.97028, 0.95566, 0.94559, 0.82617, 0.59973, 0.38361, 0.23901, 0.15338, 0.12921, 0.11206, 0.04382, -0.12946, -0.43552, -0.72644, -0.89847, -0.95465, -0.95541, -0.97229, -0.99268, -0.99319, -0.98840, -0.99142, -0.99167, -0.99091, -0.98840, -0.98965, -0.99368, -0.97455, -0.95010, -0.94684, -0.96219, -0.98514, -0.99243, -0.98889, -0.98917, -0.99142, -0.99219, -0.99091, -0.99191, -0.99142, -0.99142, -0.99191, -0.99066, -0.99167, -0.99091, -0.99142, -0.99191, -0.99091, -0.99191, -0.99091, -0.99167, -0.99167, -0.99091, -0.99219, -0.99091, -0.99191, -0.99142, -0.99118, -0.99191, -0.99066, -0.99191, -0.99091, -0.99118, -0.99243, -0.98941, -0.98462, -0.96976, -0.96320, -0.96194, -0.87305, -0.66196, -0.44809, -0.29495, -0.18085, -0.11813, -0.11334, -0.18564, -0.34885, -0.58237, -0.80450, -0.93726, -0.97806, -0.97354, -0.97531, -0.98990, -0.99368, -0.98941, -0.99219, -0.99091, -0.99142, -0.99167, -0.99091, -0.99191, -0.99118, -0.99219, -0.98236, -0.97781, -0.97656, -0.95135, -0.87204, -0.71335, -0.52139, -0.34232, -0.17783, -0.00906, 0.14886, 0.30450, 0.48889, 0.67404, 0.84030, 0.94128, 0.97681, 0.98462, 0.98337, 0.99142, 0.99521, 0.99493, 0.99420, 0.99445, 0.99521, 0.99393, 0.99545, 0.99445, 0.99521, 0.99521, 0.99445, 0.99570, 0.99445, 0.99521, 0.99469, 0.99445, 0.99521, 0.99420, 0.99521, 0.99445, 0.99445, 0.99521, 0.99445, 0.99545, 0.99445, 0.99469, 0.99493, 0.99393, 0.99493, 0.99445, 0.99393, 0.98285, 0.97781, 0.97479, 0.92844, 0.82114, 0.66095, 0.52417, 0.46826, 0.46722, 0.47934, 0.47379, 0.47076, 0.48209, 0.42014, 0.25439, 0.10074, -0.00302, -0.08966, -0.16068, -0.21436, -0.22040, -0.15137, -0.00476, 0.18536, 0.37631, 0.52292, 0.62164, 0.70425, 0.74835, 0.72366, 0.63928, 0.52567, 0.40805, 0.35666, 0.42896, 0.60175, 0.80200, 0.92743, 0.96548, 0.97632, 0.98337, 0.99066, 0.99521, 0.99420, 0.99368, 0.99292, 0.98840, 0.98083, 0.96774, 0.93323, 0.85440, 0.69470, 0.47202, 0.20425, -0.08890, -0.36423, -0.60025, -0.77481, -0.90173, -0.96017, -0.97028, -0.98108, -0.98840, -0.99219, -0.98990, -0.99219, -0.99142, -0.99142, -0.99219, -0.99091, -0.99243, -0.99066, -0.99142, -0.99142, -0.99118, -0.99191, -0.99066, -0.99167, -0.99142, -0.99142, -0.99219, -0.99091, -0.99191, -0.99118, -0.99142, -0.99191, -0.99091, -0.99191, -0.99091, -0.99167, -0.99191, -0.99118, -0.99219, -0.99091, -0.99167, -0.99142, -0.99142, -0.99219, -0.99091, -0.99191, -0.99142, -0.99118, -0.98917, -0.99042, -0.99445, -0.97330, -0.95590, -0.96219, -0.89670, -0.72241, -0.55112, -0.44809, -0.39319, -0.37833, -0.35641, -0.26270, -0.14230, -0.11282, -0.13525, -0.11536, -0.09671, -0.11511, -0.18060, -0.26874, -0.33374, -0.42215, -0.51358, -0.44785, -0.30450, -0.28613, -0.30527, -0.25037, -0.15390, -0.08286, -0.11157, -0.12592, -0.00327, 0.13803, 0.19141, 0.12820, 0.01788, -0.03952, -0.12592, -0.26773, -0.34634, -0.31384, -0.18060, -0.01080, 0.13574, 0.26120, 0.36975, 0.46573, 0.55087, 0.63626, 0.73022, 0.83072, 0.92014, 0.97177, 0.98587, 0.98413, 0.99167, 0.99445, 0.99292, 0.99219, 0.98740, 0.98007, 0.96472, 0.92239, 0.82166, 0.69067, 0.57959, 0.54962, 0.59695, 0.64255, 0.64633, 0.60629, 0.55942, 0.54910, 0.58966, 0.61887, 0.56952, 0.54181, 0.59518, 0.63248, 0.63876, 0.65463, 0.73398, 0.88312, 0.96927, 0.97101, 0.97958, 0.99344, 0.99420, 0.99268, 0.99493, 0.99469, 0.99445, 0.99521, 0.99445, 0.99545, 0.99420, 0.99493, 0.99493, 0.99420, 0.99545, 0.99420, 0.99493, 0.99420, 0.99393, 0.99420, 0.98840, 0.98309, 0.98309, 0.96069, 0.88461, 0.79370, 0.72064, 0.65765, 0.59998, 0.53247, 0.49268, 0.48615, 0.44205, 0.38034, 0.36447, 0.38715, 0.39294, 0.32645, 0.19595, 0.07782, -0.05893, -0.27832, -0.48309, -0.62619, -0.72995, -0.79999, -0.84583, -0.82166, -0.73575, -0.67227, -0.65491, -0.64960, -0.66397, -0.70175, -0.72894, -0.74658, -0.76724, -0.79520, -0.82846, -0.86523, -0.90527, -0.94382, -0.89948, -0.69849, -0.47479, -0.31662, -0.15414, -0.00729, 0.07077, 0.08237, 0.04431, -0.02292, -0.11761, -0.24307, -0.36926, -0.45087, -0.46170, -0.40250, -0.30679, -0.17529, 0.00000, 0.14331, 0.24179, 0.36774, 0.49545, 0.56522, 0.57907, 0.56775, 0.53851, 0.51132, 0.48688, 0.41913, 0.26044, 0.00955, -0.26297, -0.46396, -0.62341, -0.82214, -0.94684, -0.96774, -0.97531, -0.98413, -0.99017, -0.98990, -0.99219, -0.99066, -0.99142, -0.99167, -0.99118, -0.99219, -0.98990, -0.99118, -0.99368, -0.99142, -0.97757, -0.97403, -0.98007, -0.96170, -0.86826, -0.67783, -0.52719, -0.48788, -0.45490, -0.43146, -0.47681, -0.54105, -0.57983, -0.60904, -0.62317, -0.59949, -0.55566, -0.52063, -0.52115, -0.55112, -0.56244, -0.58337, -0.65540, -0.73373, -0.77228, -0.74759, -0.68890, -0.64609, -0.61887, -0.58060, -0.50351, -0.40729, -0.33929, -0.35110, -0.42944, -0.47028, -0.42267, -0.32718, -0.20224, -0.05640, 0.04556, 0.10529, 0.17630, 0.26169, 0.33197, 0.32138, 0.23776, 0.20956, 0.23148, 0.20352, 0.23325, 0.39267, 0.52719, 0.58438, 0.62289, 0.66345, 0.70023, 0.66296, 0.54330, 0.42618, 0.33475, 0.24533, 0.14105, 0.03851, 0.01358, 0.09143, 0.22845, 0.34961, 0.41711, 0.48740, 0.58914, 0.69519, 0.78186, 0.84357, 0.89822, 0.95389, 0.98135, 0.98615, 0.99167, 0.99243, 0.99445, 0.99420, 0.99469, 0.99493, 0.99393, 0.99545, 0.99445, 0.99521, 0.99469, 0.99445, 0.99521, 0.99420, 0.99469, 0.98965, 0.98715, 0.98563, 0.96295, 0.91736, 0.86624, 0.82367, 0.77554, 0.68411, 0.53549, 0.38916, 0.26120, 0.11435, -0.04053, -0.18161, -0.23172, -0.19394, -0.15237, -0.10730, -0.02997, 0.08588, 0.22620, 0.34305, 0.44104, 0.55740, 0.65765, 0.71259, 0.69217, 0.65363, 0.69748, 0.79572, 0.89368, 0.95514, 0.97733, 0.98413, 0.98816, 0.99243, 0.99445, 0.99243, 0.97302, 0.96674, 0.97983, 0.90378, 0.71005, 0.51056, 0.40451, 0.40982, 0.41559, 0.32996, 0.24356, 0.18866, 0.11411, 0.05365, 0.01157, -0.03247, -0.09216, -0.16095, -0.23248, -0.31662, -0.39771, -0.48663, -0.59647, -0.71536, -0.82013, -0.85287, -0.82947, -0.84937, -0.92215, -0.97177, -0.98663, -0.98816, -0.98438, -0.99091, -0.99219, -0.99091, -0.99191, -0.99042, -0.99191, -0.99091, -0.99142, -0.99191, -0.99091, -0.99191, -0.99091, -0.99167, -0.99142]) },
+        { name: "ultrabox shortened od guitar", expression: 0.5, samples: centerAndNormalizeWave([-0.82785, -0.67621, -0.40268, -0.43817, -0.45468, -0.22531, -0.18329, 0.24750, 0.71246, 0.52155, 0.56082, 0.48395, 0.33990, 0.46957, 0.27744, 0.42313, 0.47104, 0.18796, 0.12930, -0.13901, -0.07431, -0.16348, -0.74857, -0.73206, -0.35181, -0.26227, -0.41882, -0.27786, -0.19806, -0.19867, 0.18643, 0.24808, 0.08847, -0.06964, 0.06912, 0.20474, -0.05304, 0.29416, 0.31967, 0.14243, 0.27521, -0.23932, -0.14752, 0.12360, -0.26123, -0.26111, 0.06616, 0.26520, 0.08090, 0.15240, 0.16254, -0.12061, 0.04562, 0.00131, 0.04050, 0.08182, -0.21729, -0.17041, -0.16312, -0.08563, 0.06390, 0.05099, 0.05627, 0.02728, 0.00726, -0.13028, -0.05673, -0.14969, -0.17645, 0.35492, 0.16766, -0.00897, 0.24326, -0.00461, -0.04456, 0.01776, -0.04950, -0.01221, 0.02039, 0.07684, 0.13397, 0.39850, 0.35962, 0.13754, 0.42310, 0.27161, -0.17609, 0.03659, 0.10635, -0.21909, -0.22046, -0.20258, -0.40973, -0.40280, -0.40521, -0.66284]) },
+    ]);
+    Config.chipWaves = rawChipToIntegrated(_a$1.rawChipWaves);
+    Config.rawRawChipWaves = _a$1.rawChipWaves;
+    Config.firstIndexForSamplesInChipWaveList = _a$1.chipWaves.length;
+    Config.chipNoises = toNameMap([
+        { name: "retro", expression: 0.25, basePitch: 69, pitchFilterMult: 1024.0, isSoft: false, samples: null },
+        { name: "white", expression: 1.0, basePitch: 69, pitchFilterMult: 8.0, isSoft: true, samples: null },
+        { name: "clang", expression: 0.4, basePitch: 69, pitchFilterMult: 1024.0, isSoft: false, samples: null },
+        { name: "buzz", expression: 0.3, basePitch: 69, pitchFilterMult: 1024.0, isSoft: false, samples: null },
+        { name: "hollow", expression: 1.5, basePitch: 96, pitchFilterMult: 1.0, isSoft: true, samples: null },
+        { name: "shine", expression: 1.0, basePitch: 69, pitchFilterMult: 1024.0, isSoft: false, samples: null },
+        { name: "deep", expression: 1.5, basePitch: 120, pitchFilterMult: 1024.0, isSoft: true, samples: null },
+        { name: "cutter", expression: 0.005, basePitch: 96, pitchFilterMult: 1024.0, isSoft: false, samples: null },
+        { name: "metallic", expression: 1.0, basePitch: 96, pitchFilterMult: 1024.0, isSoft: false, samples: null },
+        { name: "static", expression: 1.0, basePitch: 96, pitchFilterMult: 1024.0, isSoft: false, samples: null },
+        { name: "1-bit white", expression: 0.5, basePitch: 74.41, pitchFilterMult: 1024.0, isSoft: false, samples: null },
+        { name: "1-bit metallic", expression: 0.5, basePitch: 86.41, pitchFilterMult: 1024.0, isSoft: false, samples: null },
+        { name: "crackling", expression: 0.9, basePitch: 69, pitchFilterMult: 1024.0, isSoft: false, samples: null },
+        { name: "pink", expression: 1.0, basePitch: 69, pitchFilterMult: 8.0, isSoft: true, samples: null },
+        { name: "brownian", expression: 1.0, basePitch: 69, pitchFilterMult: 8.0, isSoft: true, samples: null },
+    ]);
+    Config.filterFreqStep = 1.0 / 4.0;
+    Config.filterFreqRange = 34;
+    Config.filterFreqReferenceSetting = 28;
+    Config.filterFreqReferenceHz = 8000.0;
+    Config.filterFreqMaxHz = _a$1.filterFreqReferenceHz * Math.pow(2.0, _a$1.filterFreqStep * (_a$1.filterFreqRange - 1 - _a$1.filterFreqReferenceSetting));
+    Config.filterFreqMinHz = 8.0;
+    Config.filterGainRange = 15;
+    Config.filterGainCenter = 7;
+    Config.filterGainStep = 1.0 / 2.0;
+    Config.filterMaxPoints = 16;
+    Config.filterTypeNames = ["low-pass", "high-pass", "peak"];
+    Config.filterMorphCount = 10;
+    Config.filterSimpleCutRange = 11;
+    Config.filterSimplePeakRange = 8;
+    Config.fadeInRange = 10;
+    Config.fadeOutTicks = [-24, -12, -6, -3, -1, 6, 12, 24, 48, 72, 96];
+    Config.fadeOutNeutral = 4;
+    Config.drumsetFadeOutTicks = 48;
+    Config.transitions = toNameMap([
+>>>>>>> envIndex
         { name: "normal", isSeamless: false, continues: false, slides: false, slideTicks: 3, includeAdjacentPatterns: false },
         { name: "interrupt", isSeamless: true, continues: false, slides: false, slideTicks: 3, includeAdjacentPatterns: true },
         { name: "continue", isSeamless: true, continues: true, slides: false, slideTicks: 3, includeAdjacentPatterns: true },
@@ -40233,6 +40278,7 @@ You should be redirected to the song at:<br /><br />
     }
   };
 
+<<<<<<< HEAD
   // editor/EnvelopeEditor.ts
   var EnvelopeEditor = class _EnvelopeEditor {
     constructor(_doc, _extraSettingsDropdown, _openPrompt) {
@@ -40349,6 +40395,208 @@ You should be redirected to the song at:<br /><br />
         } else if (envelopePasteButtonIndex != -1) {
           const envelopeCopy = window.localStorage.getItem("envelopeCopy");
           this._doc.record(new PasteEnvelope(this._doc, JSON.parse(String(envelopeCopy)), envelopePasteButtonIndex));
+=======
+    class EnvelopeEditor {
+        constructor(_doc, _extraSettingsDropdown, _openPrompt) {
+            this._doc = _doc;
+            this._extraSettingsDropdown = _extraSettingsDropdown;
+            this._openPrompt = _openPrompt;
+            this.container = HTML.div({ class: "envelopeEditor" });
+            this._rows = [];
+            this._targetSelects = [];
+            this._indexSelects = [];
+            this._envelopeSelects = [];
+            this._deleteButtons = [];
+            this.extraSettingsDropdowns = [];
+            this.extraPitchSettingsGroups = [];
+            this.extraSettingsDropdownGroups = [];
+            this.extraRandomSettingsGroups = [];
+            this.extraLFODropdownGroups = [];
+            this.openExtraSettingsDropdowns = [];
+            this.perEnvelopeSpeedGroups = [];
+            this._pitchStartSliders = [];
+            this.pitchStartBoxes = [];
+            this._pitchEndSliders = [];
+            this.pitchEndBoxes = [];
+            this._startNoteDisplays = [];
+            this._endNoteDisplays = [];
+            this._inverters = [];
+            this._discreters = [];
+            this.perEnvelopeSpeedSliders = [];
+            this._perEnvelopeSpeedDisplays = [];
+            this.perEnvelopeLowerBoundBoxes = [];
+            this.perEnvelopeUpperBoundBoxes = [];
+            this.perEnvelopeLowerBoundSliders = [];
+            this.perEnvelopeUpperBoundSliders = [];
+            this.randomStepsBoxes = [];
+            this.randomSeedBoxes = [];
+            this._randomStepsSliders = [];
+            this._randomSeedSliders = [];
+            this._randomEnvelopeTypeSelects = [];
+            this._randomStepsWrappers = [];
+            this._envelopeCopyButtons = [];
+            this._envelopePasteButtons = [];
+            this._waveformSelects = [];
+            this.LFOStepsBoxes = [];
+            this._LFOStepsSliders = [];
+            this._LFOStepsWrappers = [];
+            this._renderedEnvelopeCount = 0;
+            this._renderedEqFilterCount = -1;
+            this._renderedNoteFilterCount = -1;
+            this._renderedEffects = 0;
+            this._lastChange = null;
+            this._onChange = (event) => {
+                const targetSelectIndex = this._targetSelects.indexOf(event.target);
+                const indexSelectIndex = this._indexSelects.indexOf(event.target);
+                const envelopeSelectIndex = this._envelopeSelects.indexOf(event.target);
+                const inverterIndex = this._inverters.indexOf(event.target);
+                const discreterIndex = this._discreters.indexOf(event.target);
+                const startBoxIndex = this.pitchStartBoxes.indexOf(event.target);
+                const endBoxIndex = this.pitchEndBoxes.indexOf(event.target);
+                const startSliderIndex = this._pitchStartSliders.indexOf(event.target);
+                const endSliderIndex = this._pitchEndSliders.indexOf(event.target);
+                const lowerBoundBoxIndex = this.perEnvelopeLowerBoundBoxes.indexOf(event.target);
+                const upperBoundBoxIndex = this.perEnvelopeUpperBoundBoxes.indexOf(event.target);
+                const randomStepsBoxIndex = this.randomStepsBoxes.indexOf(event.target);
+                const randomSeedBoxIndex = this.randomSeedBoxes.indexOf(event.target);
+                const randomStepsSliderIndex = this._randomStepsSliders.indexOf(event.target);
+                const randomSeedSliderIndex = this._randomSeedSliders.indexOf(event.target);
+                const waveformSelectIndex = this._waveformSelects.indexOf(event.target);
+                const randomTypeSelectIndex = this._randomEnvelopeTypeSelects.indexOf(event.target);
+                const LFOStepsBoxIndex = this.LFOStepsBoxes.indexOf(event.target);
+                const LFOStepsSliderIndex = this._LFOStepsSliders.indexOf(event.target);
+                if (targetSelectIndex != -1) {
+                    const target = parseInt(this._targetSelects[targetSelectIndex].value);
+                    const index = parseInt(this._indexSelects[targetSelectIndex].value);
+                    const prevMaxCount = Config.instrumentAutomationTargets[this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()].envelopes[targetSelectIndex].target].maxCount;
+                    const maxCount = Config.instrumentAutomationTargets[target].maxCount;
+                    if (maxCount > 1) {
+                        this._indexSelects[targetSelectIndex].style.display = "";
+                        for (let index = 0; index < maxCount; index++) {
+                            if (prevMaxCount == 1 && index == 0) {
+                                const displayOpt = HTML.option({ value: 0 }, 1);
+                                displayOpt.selected = true;
+                                this._indexSelects[targetSelectIndex].appendChild(displayOpt);
+                                console.log(displayOpt);
+                            }
+                            else {
+                                this._indexSelects[targetSelectIndex].appendChild(HTML.option({ value: index }, index + 1));
+                            }
+                        }
+                    }
+                    else {
+                        this._indexSelects[targetSelectIndex].style.display = "none";
+                    }
+                    this._doc.record(new ChangeSetEnvelopeTarget(this._doc, targetSelectIndex, target, index));
+                }
+                else if (indexSelectIndex != -1) {
+                    const target = parseInt(this._targetSelects[indexSelectIndex].value);
+                    const index = parseInt(this._indexSelects[indexSelectIndex].value);
+                    this._doc.record(new ChangeSetEnvelopeTarget(this._doc, indexSelectIndex, target, index));
+                }
+                else if (envelopeSelectIndex != -1) {
+                    const envelopeIndex = this._envelopeSelects.indexOf(event.target);
+                    this._doc.record(new ChangeSetEnvelopeType(this._doc, envelopeIndex, this._envelopeSelects[envelopeIndex].selectedIndex));
+                    this.rerenderExtraSettings(envelopeSelectIndex);
+                    this.render();
+                }
+                else if (waveformSelectIndex != -1) {
+                    this._doc.record(new ChangeSetEnvelopeWaveform(this._doc, this._waveformSelects[waveformSelectIndex].value, waveformSelectIndex));
+                }
+                else if (randomTypeSelectIndex != -1) {
+                    this._doc.record(new ChangeSetEnvelopeWaveform(this._doc, this._randomEnvelopeTypeSelects[randomTypeSelectIndex].value, randomTypeSelectIndex));
+                }
+                else if (inverterIndex != -1) {
+                    this._doc.record(new ChangeEnvelopeInverse(this._doc, this._inverters[inverterIndex].checked, inverterIndex));
+                }
+                else if (discreterIndex != -1) {
+                    this._doc.record(new ChangeDiscreteEnvelope(this._doc, this._discreters[discreterIndex].checked, discreterIndex));
+                }
+                else if (startBoxIndex != -1 || endBoxIndex != -1 || startSliderIndex != -1 || endSliderIndex != -1 ||
+                    lowerBoundBoxIndex != -1 || upperBoundBoxIndex != -1 || randomStepsBoxIndex != -1 || randomSeedBoxIndex != -1 ||
+                    randomStepsSliderIndex != -1 || randomSeedSliderIndex != -1 || LFOStepsBoxIndex != -1 || LFOStepsSliderIndex != -1) {
+                    if (this._lastChange != null) {
+                        this._doc.record(this._lastChange);
+                        this._lastChange = null;
+                    }
+                }
+            };
+            this._onClick = (event) => {
+                const deleteButtonIndex = this._deleteButtons.indexOf(event.target);
+                const envelopeCopyButtonIndex = this._envelopeCopyButtons.indexOf(event.target);
+                const envelopePasteButtonIndex = this._envelopePasteButtons.indexOf(event.target);
+                if (deleteButtonIndex != -1) {
+                    this._doc.record(new ChangeRemoveEnvelope(this._doc, deleteButtonIndex));
+                    this.extraSettingsDropdownGroups[deleteButtonIndex].style.display = "none";
+                }
+                else if (envelopeCopyButtonIndex != -1) {
+                    const instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
+                    window.localStorage.setItem("envelopeCopy", JSON.stringify(instrument.envelopes[envelopeCopyButtonIndex].toJsonObject()));
+                }
+                else if (envelopePasteButtonIndex != -1) {
+                    const envelopeCopy = window.localStorage.getItem("envelopeCopy");
+                    this._doc.record(new PasteEnvelope(this._doc, JSON.parse(String(envelopeCopy)), envelopePasteButtonIndex));
+                }
+            };
+            this._onInput = (event) => {
+                const startBoxIndex = this.pitchStartBoxes.indexOf(event.target);
+                const endBoxIndex = this.pitchEndBoxes.indexOf(event.target);
+                const startSliderIndex = this._pitchStartSliders.indexOf(event.target);
+                const endSliderIndex = this._pitchEndSliders.indexOf(event.target);
+                const lowerBoundBoxIndex = this.perEnvelopeLowerBoundBoxes.indexOf(event.target);
+                const upperBoundBoxIndex = this.perEnvelopeUpperBoundBoxes.indexOf(event.target);
+                const randomStepsBoxIndex = this.randomStepsBoxes.indexOf(event.target);
+                const randomSeedBoxIndex = this.randomSeedBoxes.indexOf(event.target);
+                const randomStepsSliderIndex = this._randomStepsSliders.indexOf(event.target);
+                const randomSeedSliderIndex = this._randomSeedSliders.indexOf(event.target);
+                const LFOStepsBoxIndex = this.LFOStepsBoxes.indexOf(event.target);
+                const LFOStepsSliderIndex = this._LFOStepsSliders.indexOf(event.target);
+                const instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
+                if (startBoxIndex != -1) {
+                    this._lastChange = new ChangeEnvelopePitchStart(this._doc, parseInt(this.pitchStartBoxes[startBoxIndex].value), startBoxIndex);
+                }
+                else if (endBoxIndex != -1) {
+                    this._lastChange = new ChangeEnvelopePitchEnd(this._doc, parseInt(this.pitchEndBoxes[endBoxIndex].value), endBoxIndex);
+                }
+                else if (startSliderIndex != -1) {
+                    this._lastChange = new ChangeEnvelopePitchStart(this._doc, parseInt(this._pitchStartSliders[startSliderIndex].value), startSliderIndex);
+                }
+                else if (endSliderIndex != -1) {
+                    this._lastChange = new ChangeEnvelopePitchEnd(this._doc, parseInt(this._pitchEndSliders[endSliderIndex].value), endSliderIndex);
+                }
+                else if (lowerBoundBoxIndex != -1) {
+                    this._lastChange = new ChangeEnvelopeLowerBound(this._doc, instrument.envelopes[lowerBoundBoxIndex].perEnvelopeLowerBound, parseFloat(this.perEnvelopeLowerBoundBoxes[lowerBoundBoxIndex].value), lowerBoundBoxIndex);
+                }
+                else if (upperBoundBoxIndex != -1) {
+                    this._lastChange = new ChangeEnvelopeUpperBound(this._doc, instrument.envelopes[upperBoundBoxIndex].perEnvelopeUpperBound, parseFloat(this.perEnvelopeUpperBoundBoxes[upperBoundBoxIndex].value), upperBoundBoxIndex);
+                }
+                else if (randomStepsBoxIndex != -1) {
+                    this._lastChange = new ChangeRandomEnvelopeSteps(this._doc, parseFloat(this.randomStepsBoxes[randomStepsBoxIndex].value), randomStepsBoxIndex);
+                }
+                else if (randomSeedBoxIndex != -1) {
+                    this._lastChange = new ChangeRandomEnvelopeSeed(this._doc, parseFloat(this.randomSeedBoxes[randomSeedBoxIndex].value), randomSeedBoxIndex);
+                }
+                else if (randomStepsSliderIndex != -1) {
+                    this._lastChange = new ChangeRandomEnvelopeSteps(this._doc, parseFloat(this._randomStepsSliders[randomStepsSliderIndex].value), randomStepsSliderIndex);
+                }
+                else if (randomSeedSliderIndex != -1) {
+                    this._lastChange = new ChangeRandomEnvelopeSeed(this._doc, parseFloat(this._randomSeedSliders[randomSeedSliderIndex].value), randomSeedSliderIndex);
+                }
+                else if (LFOStepsBoxIndex != -1) {
+                    this._lastChange = new ChangeRandomEnvelopeSteps(this._doc, parseFloat(this.LFOStepsBoxes[LFOStepsBoxIndex].value), LFOStepsBoxIndex);
+                }
+                else if (LFOStepsSliderIndex != -1) {
+                    this._lastChange = new ChangeRandomEnvelopeSteps(this._doc, parseFloat(this._LFOStepsSliders[LFOStepsSliderIndex].value), LFOStepsSliderIndex);
+                }
+            };
+            this.container.addEventListener("change", this._onChange);
+            this.container.addEventListener("click", this._onClick);
+            this.container.addEventListener("input", this._onInput);
+        }
+        _makeOption(target) {
+            let displayName = Config.instrumentAutomationTargets[target].displayName;
+            return HTML.option({ value: target }, displayName);
+>>>>>>> envIndex
         }
       }, "_onClick");
       this._onInput = /* @__PURE__ */ __name((event) => {
@@ -40824,6 +41072,7 @@ You should be redirected to the song at:<br /><br />
             this._doc.record(this._dragChange);
           }
         }
+<<<<<<< HEAD
         this._dragChange = null;
         this._mouseDragging = false;
         this._mouseDown = false;
@@ -40837,6 +41086,205 @@ You should be redirected to the song at:<br /><br />
       this.container.addEventListener("touchmove", this._whenTouchMoved);
       this.container.addEventListener("touchend", this._whenCursorReleased);
       this.container.addEventListener("touchcancel", this._whenCursorReleased);
+=======
+        static convertIndexSpeed(value, convertTo) {
+            switch (convertTo) {
+                case "index":
+                    return Config.perEnvelopeSpeedToIndices[value] != null ? Config.perEnvelopeSpeedToIndices[value] : 23;
+                case "speed":
+                    return Config.perEnvelopeSpeedIndices[value] != null ? Config.perEnvelopeSpeedIndices[value] : 1;
+            }
+            return 0;
+        }
+        updateSpeedDisplay(envelopeIndex) {
+            this._perEnvelopeSpeedDisplays[envelopeIndex].textContent = "Spd: x" + prettyNumber(this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()].envelopes[envelopeIndex].perEnvelopeSpeed);
+        }
+        render() {
+            const instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
+            for (let envelopeIndex = this._rows.length; envelopeIndex < instrument.envelopeCount; envelopeIndex++) {
+                const targetSelect = HTML.select();
+                const indexSelect = HTML.select({ style: "width: 0; flex: 0.2;" });
+                for (let target = 0; target < Config.instrumentAutomationTargets.length; target++) {
+                    targetSelect.appendChild(this._makeOption(target));
+                }
+                const envelopeSelect = HTML.select({ id: "envelopeSelect" });
+                for (let envelope = 0; envelope < Config.newEnvelopes.length; envelope++) {
+                    envelopeSelect.appendChild(HTML.option({ value: envelope }, Config.newEnvelopes[envelope].name));
+                }
+                const deleteButton = HTML.button({ type: "button", class: "delete-envelope", style: "flex: 0.2" });
+                const pitchStartNoteSlider = HTML.input({ value: instrument.envelopes[envelopeIndex].pitchEnvelopeStart ? instrument.envelopes[envelopeIndex].pitchEnvelopeStart : 0, style: "width: 113px; margin-left: 0px;", type: "range", min: "0", max: instrument.isNoiseInstrument ? Config.drumCount - 1 : Config.maxPitch, step: "1" });
+                const pitchStartNoteBox = HTML.input({ value: instrument.envelopes[envelopeIndex].pitchEnvelopeStart ? instrument.envelopes[envelopeIndex].pitchEnvelopeStart : 0, style: "width: 4em; font-size: 80%; ", id: "startNoteBox", type: "number", step: "1", min: "0", max: instrument.isNoiseInstrument ? Config.drumCount - 1 : Config.maxPitch });
+                const pitchEndNoteSlider = HTML.input({ value: instrument.envelopes[envelopeIndex].pitchEnvelopeEnd ? instrument.envelopes[envelopeIndex].pitchEnvelopeEnd : instrument.isNoiseInstrument ? Config.drumCount - 1 : Config.maxPitch, style: "width: 113px; margin-left: 0px;", type: "range", min: "0", max: instrument.isNoiseInstrument ? Config.drumCount - 1 : Config.maxPitch, step: "1" });
+                const pitchEndNoteBox = HTML.input({ value: instrument.envelopes[envelopeIndex].pitchEnvelopeEnd ? instrument.envelopes[envelopeIndex].pitchEnvelopeEnd : instrument.isNoiseInstrument ? Config.drumCount - 1 : Config.maxPitch, style: "width: 4em; font-size: 80%; ", id: "endNoteBox", type: "number", step: "1", min: "0", max: instrument.isNoiseInstrument ? Config.drumCount - 1 : Config.maxPitch });
+                const pitchStartNoteDisplay = HTML.span({ class: "tip", style: `width:68px; flex:1; height:1em; font-size: smaller;`, onclick: () => this._openPrompt("pitchRange") }, "Start " + this._pitchToNote(parseInt(pitchStartNoteBox.value), instrument.isNoiseInstrument) + ": ");
+                const pitchEndNoteDisplay = HTML.span({ class: "tip", style: `width:68px; flex:1; height:1em; font-size: smaller;`, onclick: () => this._openPrompt("pitchRange") }, "End " + this._pitchToNote(parseInt(pitchEndNoteBox.value), instrument.isNoiseInstrument) + ": ");
+                const pitchStartBoxWrapper = HTML.div({ style: "flex: 1; display: flex; flex-direction: column; align-items: center;" }, pitchStartNoteDisplay, pitchStartNoteBox);
+                const pitchEndBoxWrapper = HTML.div({ style: "flex: 1; display: flex; flex-direction: column; align-items: center;" }, pitchEndNoteDisplay, pitchEndNoteBox);
+                const pitchStartNoteWrapper = HTML.div({ style: "margin-top: 3px; flex:1; display:flex; flex-direction: row; align-items:center; justify-content:right;" }, pitchStartBoxWrapper, pitchStartNoteSlider);
+                const pitchEndNoteWrapper = HTML.div({ style: "margin-top: 3px; flex:1; display:flex; flex-direction: row; align-items:center; justify-content:right;" }, pitchEndBoxWrapper, pitchEndNoteSlider);
+                const extraPitchSettingsGroup = HTML.div({ class: "editor-controls", style: "flex-direction:column; align-items:center;" }, pitchStartNoteWrapper, pitchEndNoteWrapper);
+                extraPitchSettingsGroup.style.display = "none";
+                const randomStepsBox = HTML.input({ value: instrument.envelopes[envelopeIndex].steps, type: "number", min: 1, max: Config.randomEnvelopeStepsMax, step: 1, style: "width: 4em; font-size: 80%; " });
+                const randomStepsSlider = HTML.input({ value: instrument.envelopes[envelopeIndex].steps, type: "range", min: 1, max: Config.randomEnvelopeStepsMax, step: 1, style: "width: 113px; margin-left: 0px;" });
+                const randomSeedBox = HTML.input({ value: instrument.envelopes[envelopeIndex].seed, type: "number", min: 1, max: Config.randomEnvelopeSeedMax, step: 1, style: "width: 4em; font-size: 80%; " });
+                const randomSeedSlider = HTML.input({ value: instrument.envelopes[envelopeIndex].seed, type: "range", min: 1, max: Config.randomEnvelopeSeedMax, step: 1, style: "width: 113px; margin-left: 0px;" });
+                const randomStepsBoxWrapper = HTML.div({ style: "flex: 1; display: flex; flex-direction: column; align-items: center;" }, HTML.span({ class: "tip", style: `width:68px; flex:1; height:1em; font-size: smaller;`, onclick: () => this._openPrompt("randomSteps") }, "Steps: "), randomStepsBox);
+                const randomSeedBoxWrapper = HTML.div({ style: "flex: 1; display: flex; flex-direction: column; align-items: center;" }, HTML.span({ class: "tip", style: `width:68px; flex:1; height:1em; font-size: smaller;`, onclick: () => this._openPrompt("randomSeed") }, "Seed: "), randomSeedBox);
+                const randomStepsWrapper = HTML.div({ style: "margin-top: 3px; flex:1; display:flex; flex-direction: row; align-items:center; justify-content:right;" }, randomStepsBoxWrapper, randomStepsSlider);
+                const randomSeedWrapper = HTML.div({ style: "margin-top: 3px; flex:1; display:flex; flex-direction: row; align-items:center; justify-content:right;" }, randomSeedBoxWrapper, randomSeedSlider);
+                const randomTypeSelect = HTML.select({ style: "width: 115px;" });
+                const randomNames = ["time", "pitch", "note", "time smooth"];
+                for (let waveform = 0; waveform < 4; waveform++) {
+                    randomTypeSelect.appendChild(HTML.option({ value: waveform }, randomNames[waveform]));
+                }
+                const randomTypeSelectWrapper = HTML.div({ class: "editor-controls selectContainer", style: "margin-top: 3px; flex:1; display:flex; flex-direction: row; align-items:center; justify-content:right;" }, HTML.span({ style: "font-size: smaller; margin-right: 35px;", class: "tip", onclick: () => this._openPrompt("randomEnvelopeType") }, "Type: "), randomTypeSelect);
+                const extraRandomSettingsGroup = HTML.div({ class: "editor-controls", style: "flex-direction:column; align-items:center;" }, randomTypeSelectWrapper, randomStepsWrapper, randomSeedWrapper);
+                extraRandomSettingsGroup.style.display = "none";
+                const waveformSelect = HTML.select({ style: "width: 115px;" });
+                const LFOStepsBox = HTML.input({ value: instrument.envelopes[envelopeIndex].steps, type: "number", min: 1, max: Config.randomEnvelopeStepsMax, step: 1, style: "width: 4em; font-size: 80%; " });
+                const LFOStepsSlider = HTML.input({ value: instrument.envelopes[envelopeIndex].steps, type: "range", min: 1, max: Config.randomEnvelopeStepsMax, step: 1, style: "width: 113px; margin-left: 0px;" });
+                const LFOStepsBoxWrapper = HTML.div({ style: "flex: 1; display: flex; flex-direction: column; align-items: center;" }, HTML.span({ class: "tip", style: `width:68px; flex:1; height:1em; font-size: smaller;`, onclick: () => this._openPrompt("randomSteps") }, "Steps: "), LFOStepsBox);
+                const LFOStepsWrapper = HTML.div({ style: "margin-top: 3px; flex:1; display:flex; flex-direction: row; align-items:center; justify-content:right;" }, LFOStepsBoxWrapper, LFOStepsSlider);
+                const wavenames = ["sine", "square", "triangle", "sawtooth", "trapezoid", "stepped saw", "stepped tri"];
+                for (let waveform = 0; waveform < 7; waveform++) {
+                    waveformSelect.appendChild(HTML.option({ value: waveform }, wavenames[waveform]));
+                }
+                const waveformWrapper = HTML.div({ class: "editor-controls selectContainer", style: "margin-top: 3px; flex:1; display:flex; flex-direction: row; align-items:center; justify-content:right;" }, HTML.span({ style: "font-size: smaller; margin-right: 10px;", class: "tip", onclick: () => this._openPrompt("lfoEnvelopeWaveform") }, "Waveform: "), waveformSelect);
+                const extraLFOSettingsGroup = HTML.div({ class: "editor-controls", style: "margin-top: 3px; flex:1; display:flex; flex-direction: column; align-items:center; justify-content:right;" }, waveformWrapper, LFOStepsWrapper);
+                extraLFOSettingsGroup.style.display = "none";
+                const perEnvelopeSpeedSlider = new Slider(HTML.input({ oninput: () => this.updateSpeedDisplay(envelopeIndex), style: "margin: 0; width: 113px", type: "range", min: 0, max: Config.perEnvelopeSpeedIndices.length - 1, value: EnvelopeEditor.convertIndexSpeed(instrument.envelopes[envelopeIndex].perEnvelopeSpeed, "index"), step: "1" }), this._doc, (oldSpeed, newSpeed) => new ChangePerEnvelopeSpeed(this._doc, EnvelopeEditor.convertIndexSpeed(oldSpeed, "speed"), EnvelopeEditor.convertIndexSpeed(newSpeed, "speed"), envelopeIndex), false);
+                const perEnvelopeSpeedDisplay = HTML.span({ class: "tip", style: `width:58px; flex:1; height:1em; font-size: smaller; margin-left: 10px;`, onclick: () => this._openPrompt("perEnvelopeSpeed") }, "Spd: x" + prettyNumber(EnvelopeEditor.convertIndexSpeed(perEnvelopeSpeedSlider.getValueBeforeProspectiveChange(), "speed")));
+                const perEnvelopeSpeedWrapper = HTML.div({ style: "margin-top: 3px; flex:1; display:flex; flex-direction: row; align-items:center; justify-content:right;" }, perEnvelopeSpeedDisplay, perEnvelopeSpeedSlider.container);
+                const perEnvelopeSpeedGroup = HTML.div({ class: "editor-controls", style: "flex-direction:column; align-items:center;" }, perEnvelopeSpeedWrapper);
+                const lowerBoundBox = HTML.input({ value: instrument.envelopes[envelopeIndex].perEnvelopeLowerBound, type: "number", min: Config.perEnvelopeBoundMin, max: Config.perEnvelopeBoundMax, step: 0.1, style: "width: 4em; font-size: 80%; " });
+                const lowerBoundSlider = new Slider(HTML.input({ value: instrument.envelopes[envelopeIndex].perEnvelopeLowerBound, type: "range", min: Config.perEnvelopeBoundMin, max: Config.perEnvelopeBoundMax, step: 0.1, style: "width: 113px; margin-left: 0px;" }), this._doc, (oldBound, newBound) => new ChangeEnvelopeLowerBound(this._doc, oldBound, newBound, envelopeIndex), false);
+                const upperBoundBox = HTML.input({ value: instrument.envelopes[envelopeIndex].perEnvelopeUpperBound, type: "number", min: Config.perEnvelopeBoundMin, max: Config.perEnvelopeBoundMax, step: 0.1, style: "width: 4em; font-size: 80%; " });
+                const upperBoundSlider = new Slider(HTML.input({ value: instrument.envelopes[envelopeIndex].perEnvelopeUpperBound, type: "range", min: Config.perEnvelopeBoundMin, max: Config.perEnvelopeBoundMax, step: 0.1, style: "width: 113px; margin-left: 0px;" }), this._doc, (oldBound, newBound) => new ChangeEnvelopeUpperBound(this._doc, oldBound, newBound, envelopeIndex), false);
+                const lowerBoundBoxWrapper = HTML.div({ style: "flex: 1; display: flex; flex-direction: column; align-items: center;" }, HTML.span({ class: "tip", style: `width:68px; flex:1; height:1em; font-size: smaller;`, onclick: () => this._openPrompt("envelopeRange") }, "Lwr bnd: "), lowerBoundBox);
+                const upperBoundBoxWrapper = HTML.div({ style: "flex: 1; display: flex; flex-direction: column; align-items: center;" }, HTML.span({ class: "tip", style: `width:68px; flex:1; height:1em; font-size: smaller;`, onclick: () => this._openPrompt("envelopeRange") }, "Upr bnd: "), upperBoundBox);
+                const lowerBoundWrapper = HTML.div({ style: "margin-top: 3px; flex:1; display:flex; flex-direction: row; align-items:center; justify-content:right;" }, lowerBoundBoxWrapper, lowerBoundSlider.container);
+                const upperBoundWrapper = HTML.div({ style: "margin-top: 3px; flex:1; display:flex; flex-direction: row; align-items:center; justify-content:right;" }, upperBoundBoxWrapper, upperBoundSlider.container);
+                const invertBox = HTML.input({ "checked": instrument.envelopes[envelopeIndex].inverse, type: "checkbox", style: "width: 1em; padding: 0.5em;", id: "invertBox" });
+                const discreteEnvelopeBox = HTML.input({ "checked": instrument.envelopes[envelopeIndex].discrete, type: "checkbox", style: "width: 1em; padding: 0.5em;" });
+                const checkboxWrapper = HTML.div({ style: "margin: 0.1em; align-items:center; justify-content:right;" }, HTML.span({ class: "tip", onclick: () => this._openPrompt("envelopeInvert") }, "‣ Invert: "), invertBox, HTML.span({ class: "tip", style: "margin-left:4px;", onclick: () => this._openPrompt("discreteEnvelope") }, "‣ Discrete:"), discreteEnvelopeBox);
+                const envelopeCopyButton = HTML.button({ style: "margin-left:0px; max-width:86px; width: 86px; height: 26px; padding-left: 22px", class: "copyButton", title: "Copy Envelope" }, [
+                    "Copy Env",
+                    SVG.svg({ style: "flex-shrink: 0; position: absolute; left: 0; top: 50%; margin-top: -1em; pointer-events: none;", width: "26px", height: "26px", viewBox: "-5 -21 26 26" }, [
+                        SVG.path({ d: "M 0 -15 L 1 -15 L 1 0 L 13 0 L 13 1 L 0 1 L 0 -15 z M 2 -1 L 2 -17 L 10 -17 L 14 -13 L 14 -1 z M 3 -2 L 13 -2 L 13 -12 L 9 -12 L 9 -16 L 3 -16 z", fill: "currentColor" }),
+                    ]),
+                ]);
+                const envelopePasteButton = HTML.button({ style: "margin-left:2px; max-width:89px; width: 89px; height: 26px; padding-left: 22px", class: "pasteButton", title: "Paste Envelope" }, [
+                    "Paste Env",
+                    SVG.svg({ style: "flex-shrink: 0; position: absolute; left: 0; top: 50%; margin-top: -1em; pointer-events: none;", width: "26px", height: "26px", viewBox: "0 0 26 26" }, [
+                        SVG.path({ d: "M 8 18 L 6 18 L 6 5 L 17 5 L 17 7 M 9 8 L 16 8 L 20 12 L 20 22 L 9 22 z", stroke: "currentColor", fill: "none" }),
+                        SVG.path({ d: "M 9 3 L 14 3 L 14 6 L 9 6 L 9 3 z M 16 8 L 20 12 L 16 12 L 16 8 z", fill: "currentColor", }),
+                    ]),
+                ]);
+                const copyPasteContainer = HTML.div({ class: "editor-controls", style: "margin: 0.5em; display: flex; flex-direction:row; align-items:center;" }, envelopeCopyButton, envelopePasteButton);
+                const extraSettingsDropdown = HTML.button({ style: "margin-left:0em; margin-right: 0.3em; height:1.5em; width: 10px; padding: 0px; font-size: 8px;", onclick: () => { const instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()]; this._extraSettingsDropdown(8, envelopeIndex, Config.newEnvelopes[instrument.envelopes[envelopeIndex].envelope].name); } }, "▼");
+                extraSettingsDropdown.style.display = "inline";
+                const extraSettingsDropdownGroup = HTML.div({ class: "editor-controls", style: "flex-direction:column; align-items:center;" }, extraRandomSettingsGroup, extraLFOSettingsGroup, extraPitchSettingsGroup, perEnvelopeSpeedGroup, lowerBoundWrapper, upperBoundWrapper, checkboxWrapper, copyPasteContainer);
+                extraSettingsDropdownGroup.style.display = "none";
+                const row = HTML.div({ class: "envelope-row" }, extraSettingsDropdown, HTML.div({ style: "width: 0; flex: 1; display: flex; flex-direction: row" }, HTML.div({ class: "selectContainer", style: "width: 0; flex: 1;" }, targetSelect), indexSelect), HTML.div({ class: "selectContainer", style: "width: 0; flex: 0.85" }, envelopeSelect), deleteButton);
+                this.container.appendChild(row);
+                this.container.appendChild(extraSettingsDropdownGroup);
+                this._rows[envelopeIndex] = row;
+                this._targetSelects[envelopeIndex] = targetSelect;
+                this._indexSelects[envelopeIndex] = indexSelect;
+                this._envelopeSelects[envelopeIndex] = envelopeSelect;
+                this._deleteButtons[envelopeIndex] = deleteButton;
+                this.extraSettingsDropdowns[envelopeIndex] = extraSettingsDropdown;
+                this.extraSettingsDropdownGroups[envelopeIndex] = extraSettingsDropdownGroup;
+                this._inverters[envelopeIndex] = invertBox;
+                this._discreters[envelopeIndex] = discreteEnvelopeBox;
+                this.perEnvelopeLowerBoundBoxes[envelopeIndex] = lowerBoundBox;
+                this.perEnvelopeUpperBoundBoxes[envelopeIndex] = upperBoundBox;
+                this.perEnvelopeLowerBoundSliders[envelopeIndex] = lowerBoundSlider;
+                this.perEnvelopeUpperBoundSliders[envelopeIndex] = upperBoundSlider;
+                this._perEnvelopeSpeedDisplays[envelopeIndex] = perEnvelopeSpeedDisplay;
+                this.perEnvelopeSpeedSliders[envelopeIndex] = perEnvelopeSpeedSlider;
+                this.perEnvelopeSpeedGroups[envelopeIndex] = perEnvelopeSpeedGroup;
+                this.extraPitchSettingsGroups[envelopeIndex] = extraPitchSettingsGroup;
+                this._pitchStartSliders[envelopeIndex] = pitchStartNoteSlider;
+                this.pitchStartBoxes[envelopeIndex] = pitchStartNoteBox;
+                this._pitchEndSliders[envelopeIndex] = pitchEndNoteSlider;
+                this.pitchEndBoxes[envelopeIndex] = pitchEndNoteBox;
+                this._startNoteDisplays[envelopeIndex] = pitchStartNoteDisplay;
+                this._endNoteDisplays[envelopeIndex] = pitchEndNoteDisplay;
+                this.extraRandomSettingsGroups[envelopeIndex] = extraRandomSettingsGroup;
+                this.randomStepsBoxes[envelopeIndex] = randomStepsBox;
+                this.randomSeedBoxes[envelopeIndex] = randomSeedBox;
+                this._randomStepsSliders[envelopeIndex] = randomStepsSlider;
+                this._randomSeedSliders[envelopeIndex] = randomSeedSlider;
+                this._randomStepsWrappers[envelopeIndex] = randomStepsWrapper;
+                this._randomEnvelopeTypeSelects[envelopeIndex] = randomTypeSelect;
+                this.extraLFODropdownGroups[envelopeIndex] = extraLFOSettingsGroup;
+                this._waveformSelects[envelopeIndex] = waveformSelect;
+                this.LFOStepsBoxes[envelopeIndex] = LFOStepsBox;
+                this._LFOStepsSliders[envelopeIndex] = LFOStepsSlider;
+                this._LFOStepsWrappers[envelopeIndex] = LFOStepsWrapper;
+                this._envelopeCopyButtons[envelopeIndex] = envelopeCopyButton;
+                this._envelopePasteButtons[envelopeIndex] = envelopePasteButton;
+            }
+            for (let envelopeIndex = this._renderedEnvelopeCount; envelopeIndex < instrument.envelopeCount; envelopeIndex++) {
+                this._rows[envelopeIndex].style.display = "";
+                this._updateTargetOptionVisibility(this._targetSelects[envelopeIndex], instrument);
+                const maxCount = Config.instrumentAutomationTargets[instrument.envelopes[envelopeIndex].target].maxCount;
+                if (maxCount > 1) {
+                    this._indexSelects[envelopeIndex].style.display = "";
+                    for (let index = 0; index < maxCount; index++) {
+                        this._indexSelects[envelopeIndex].appendChild(HTML.option({ value: index }, index + 1));
+                    }
+                }
+                else {
+                    this._indexSelects[envelopeIndex].style.display = "none";
+                }
+            }
+            for (let envelopeIndex = instrument.envelopeCount; envelopeIndex < this._renderedEnvelopeCount; envelopeIndex++) {
+                this._rows[envelopeIndex].style.display = "none";
+            }
+            let useControlPointCount = instrument.noteFilter.controlPointCount;
+            if (instrument.noteFilterType)
+                useControlPointCount = 1;
+            if (this._renderedEqFilterCount != instrument.eqFilter.controlPointCount ||
+                this._renderedNoteFilterCount != useControlPointCount ||
+                this._renderedInstrumentType != instrument.type ||
+                this._renderedEffects != instrument.effects) {
+                for (let envelopeIndex = 0; envelopeIndex < this._renderedEnvelopeCount; envelopeIndex++) {
+                    this._updateTargetOptionVisibility(this._targetSelects[envelopeIndex], instrument);
+                }
+            }
+            for (let envelopeIndex = 0; envelopeIndex < instrument.envelopeCount; envelopeIndex++) {
+                this._targetSelects[envelopeIndex].value = String(instrument.envelopes[envelopeIndex].target);
+                this._indexSelects[envelopeIndex].value = String(instrument.envelopes[envelopeIndex].index);
+                this._envelopeSelects[envelopeIndex].selectedIndex = instrument.envelopes[envelopeIndex].envelope;
+                this.pitchStartBoxes[envelopeIndex].value = String(instrument.envelopes[envelopeIndex].pitchEnvelopeStart);
+                this.pitchEndBoxes[envelopeIndex].value = String(instrument.envelopes[envelopeIndex].pitchEnvelopeEnd);
+                this._pitchStartSliders[envelopeIndex].value = String(instrument.envelopes[envelopeIndex].pitchEnvelopeStart);
+                this._pitchEndSliders[envelopeIndex].value = String(instrument.envelopes[envelopeIndex].pitchEnvelopeEnd);
+                this._inverters[envelopeIndex].checked = instrument.envelopes[envelopeIndex].inverse;
+                this._discreters[envelopeIndex].checked = instrument.envelopes[envelopeIndex].discrete;
+                this.perEnvelopeSpeedSliders[envelopeIndex].updateValue(EnvelopeEditor.convertIndexSpeed(instrument.envelopes[envelopeIndex].perEnvelopeSpeed, "index"));
+                this.updateSpeedDisplay(envelopeIndex);
+                this.perEnvelopeLowerBoundBoxes[envelopeIndex].value = String(instrument.envelopes[envelopeIndex].perEnvelopeLowerBound);
+                this.perEnvelopeUpperBoundBoxes[envelopeIndex].value = String(instrument.envelopes[envelopeIndex].perEnvelopeUpperBound);
+                this.perEnvelopeLowerBoundSliders[envelopeIndex].updateValue(instrument.envelopes[envelopeIndex].perEnvelopeLowerBound);
+                this.perEnvelopeUpperBoundSliders[envelopeIndex].updateValue(instrument.envelopes[envelopeIndex].perEnvelopeUpperBound);
+                this.randomStepsBoxes[envelopeIndex].value = String(instrument.envelopes[envelopeIndex].steps);
+                this.randomSeedBoxes[envelopeIndex].value = String(instrument.envelopes[envelopeIndex].seed);
+                this._randomStepsSliders[envelopeIndex].value = String(instrument.envelopes[envelopeIndex].steps);
+                this._randomSeedSliders[envelopeIndex].value = String(instrument.envelopes[envelopeIndex].seed);
+                this.LFOStepsBoxes[envelopeIndex].value = String(instrument.envelopes[envelopeIndex].steps);
+                this._LFOStepsSliders[envelopeIndex].value = String(instrument.envelopes[envelopeIndex].steps);
+                this.openExtraSettingsDropdowns[envelopeIndex] = this.openExtraSettingsDropdowns[envelopeIndex] ? true : false;
+            }
+            this._renderedEnvelopeCount = instrument.envelopeCount;
+            this._renderedEqFilterCount = instrument.eqFilter.controlPointCount;
+            this._renderedNoteFilterCount = useControlPointCount;
+            this._renderedInstrumentType = instrument.type;
+            this._renderedEffects = instrument.effects;
+        }
+>>>>>>> envIndex
     }
     static {
       __name(this, "FadeInOutEditor");

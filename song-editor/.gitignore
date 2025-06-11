@@ -2,7 +2,7 @@
 .dropbox
 .DS_Store
 .vs
-.vscode/
+/.vscode
 /node_modules
 offline/node_modules
 #unneeded mod inheritance
@@ -21,6 +21,7 @@ offline/node_modules
 /**/*.html.bak
 #for offline
 /build
+/scripts/build/
 /to_deploy/
 #for deployment
 deployFiles.sh

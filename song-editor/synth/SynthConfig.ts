@@ -1117,7 +1117,7 @@ export class Config {
     public static readonly filterGainRange: number = 15;
     public static readonly filterGainCenter: number = 7;
     public static readonly filterGainStep: number = 1.0 / 2.0;
-    public static readonly filterMaxPoints: number = 8;
+    public static readonly filterMaxPoints: number = 9;
     public static readonly filterTypeNames: ReadonlyArray<string> = ["low-pass", "high-pass", "peak"]; // See FilterType enum above.
     public static readonly filterMorphCount: number = 10; // Number of filter shapes allowed for modulating between. Counts the 0/default position.
 
@@ -1552,7 +1552,75 @@ export class Config {
     public static readonly unisonSignMax: number = 2; 
     public static readonly sineWaveLength: number = 1 << 8; // 256
     public static readonly sineWaveMask: number = Config.sineWaveLength - 1;
-    public static readonly sineWave: Float32Array = generateSineWave();
+
+    public static generateSineWave(): Float32Array {
+        const wave: Float32Array = new Float32Array(Config.sineWaveLength + 1);
+        for (let i: number = 0; i < Config.sineWaveLength + 1; i++) {
+            wave[i] = Math.sin(i * Math.PI * 2.0 / Config.sineWaveLength);
+        }
+        return wave;
+    }
+
+    public static generateTriWave(): Float32Array {
+        const wave: Float32Array = new Float32Array(Config.sineWaveLength + 1);
+        for (let i: number = 0; i < Config.sineWaveLength + 1; i++) {
+            wave[i] = Math.asin(Math.sin(i * Math.PI * 2.0 / Config.sineWaveLength)) / (Math.PI / 2);
+        }
+        return wave;
+    }
+
+    public static generateTrapezoidWave(drive: number = 2): Float32Array {
+        const wave: Float32Array = new Float32Array(Config.sineWaveLength + 1);
+        for (let i: number = 0; i < Config.sineWaveLength + 1; i++) {
+            wave[i] = Math.max(-1.0, Math.min(1.0, Math.asin(Math.sin(i * Math.PI * 2.0 / Config.sineWaveLength)) * drive));
+        }
+        return wave;
+    }
+
+    public static generateSquareWave(phaseWidth: number = 0): Float32Array {
+        const wave: Float32Array = new Float32Array(Config.sineWaveLength + 1);
+        const centerPoint: number = Config.sineWaveLength / 4;
+        for (let i: number = 0; i < Config.sineWaveLength + 1; i++) {
+            wave[i] = +((Math.abs(i - centerPoint) < phaseWidth * Config.sineWaveLength / 2)
+                || ((Math.abs(i - Config.sineWaveLength - centerPoint) < phaseWidth * Config.sineWaveLength / 2))) * 2 - 1;
+        }
+        return wave;
+    }
+
+    public static generateSawWave(inverse: boolean = false): Float32Array {
+        const wave: Float32Array = new Float32Array(Config.sineWaveLength + 1);
+        for (let i: number = 0; i < Config.sineWaveLength + 1; i++) {
+            wave[i] = ((i + (Config.sineWaveLength / 4.0)) * 2.0 / Config.sineWaveLength) % 2 - 1;
+            wave[i] = inverse ? -wave[i] : wave[i];
+        }
+        return wave;
+    }
+
+    // public static generateWhiteNoiseFmWave() {
+    // const wave = new Float32Array(Config.sineWaveLength + 1);
+    // for (let i = 0; i < Config.sineWaveLength + 1; i++) {
+    // wave[i] = Math.random() * 2.0 - 1.0;
+    // }
+    // return wave;
+    // }
+    // pupblic static generateOneBitWhiteNoiseFmWave() {
+    // const wave = new Float32Array(Config.sineWaveLength + 1);
+    // for (let i = 0; i < Config.sineWaveLength + 1; i++) {
+    // wave[i] = Math.round(Math.random());
+    // }
+    // return wave;
+    // }
+    
+    public static generateQuasiSineWave() {
+        const wave = new Float32Array(Config.sineWaveLength + 1);
+        for (let i = 0; i < Config.sineWaveLength + 1; i++) {
+            wave[i] = Math.round(Math.sin(i * Math.PI * 2.0 / Config.sineWaveLength));
+        }
+        return wave;
+    }
+    
+
+    public static readonly sineWave: Float32Array = Config.generateSineWave();
 
     public static readonly perEnvelopeSpeedIndices: number[] = [0, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.1, 0.2, 0.25, 0.3, 0.3333, 0.4, 0.5, 0.6, 0.6667, 0.7, 0.75, 0.8, 0.9, 1, 1.25, 1.3333, 1.5, 1.6667, 1.75, 2, 2.25, 2.5, 2.75, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 24, 32, 40, 64, 128, 256];
     public static readonly perEnvelopeSpeedToIndices: Dictionary<number> = { //used to convert speeds back into indices
@@ -1625,7 +1693,7 @@ export class Config {
     public static readonly perEnvelopeBoundMin: number = 0; //probably should leave at 0. Negative envelopes are problematic right now
     public static readonly perEnvelopeBoundMax: number = 2; //max of 6.3 unless you update url
     public static readonly randomEnvelopeSeedMax: number = 63; //if you increase this you'll need to update the url to support it
-    public static readonly randomEnvelopeStepsMax: number = 24; 
+    public static readonly randomEnvelopeStepsMax: number = 32; 
 
     // Picked strings have an all-pass filter with a corner frequency based on the tone fundamental frequency, in order to add a slight inharmonicity. (Which is important for distortion.)
     public static readonly pickedStringDispersionCenterFreq: number = 6000.0; // The tone fundamental freq is pulled toward this freq for computing the all-pass corner freq.
@@ -1691,27 +1759,27 @@ export class Config {
     ]);
     public static readonly operatorWaves: DictionaryArray<OperatorWave> = toNameMap([
 		{ name: "sine", samples: Config.sineWave },
-		{ name: "triangle", samples: generateTriWave() },
-		{ name: "pulse width", samples: generateSquareWave(0.5) },
-		{ name: "sawtooth", samples: generateSawWave() },
-		{ name: "ramp", samples: generateSawWave(true) },
-		{ name: "trapezoid", samples: generateTrapezoidWave(2) },
-	    { name: "quasi-sine", samples: generateQuasiSineWave() },
-		//{ name: "white noise", samples: generateWhiteNoiseFmWave() },
-		//{ name: "1-bit white noise", samples: generateOneBitWhiteNoiseFmWave() },
+        { name: "triangle", samples: Config.generateTriWave() },
+        { name: "pulse width", samples: Config.generateSquareWave(0.5) },
+        { name: "sawtooth", samples: Config.generateSawWave() },
+        { name: "ramp", samples: Config.generateSawWave(true) },
+        { name: "trapezoid", samples: Config.generateTrapezoidWave(2) },
+        { name: "quasi-sine", samples: Config.generateQuasiSineWave() },
+		//{ name: "white noise", samples: Config.generateWhiteNoiseFmWave() },
+		//{ name: "1-bit white noise", samples: Config.generateOneBitWhiteNoiseFmWave() },
     ]);
     public static readonly pwmOperatorWaves: DictionaryArray<OperatorWave> = toNameMap([
-        { name: "1%", samples: generateSquareWave(0.01) },
-        { name: "5%", samples: generateSquareWave(0.05) },
-        { name: "12.5%", samples: generateSquareWave(0.125) },
-        { name: "25%", samples: generateSquareWave(0.25) },
-        { name: "33%", samples: generateSquareWave(1 / 3) },
-        { name: "50%", samples: generateSquareWave(0.5) },
-        { name: "66%", samples: generateSquareWave(2 / 3) },
-        { name: "75%", samples: generateSquareWave(0.75) },
-        { name: "87.5%", samples: generateSquareWave(0.875) },
-        { name: "95%", samples: generateSquareWave(0.95) },
-        { name: "99%", samples: generateSquareWave(0.99) },
+        { name: "1%", samples: Config.generateSquareWave(0.01) },
+        { name: "5%", samples: Config.generateSquareWave(0.05) },
+        { name: "12.5%", samples: Config.generateSquareWave(0.125) },
+        { name: "25%", samples: Config.generateSquareWave(0.25) },
+        { name: "33%", samples: Config.generateSquareWave(1 / 3) },
+        { name: "50%", samples: Config.generateSquareWave(0.5) },
+        { name: "66%", samples: Config.generateSquareWave(2 / 3) },
+        { name: "75%", samples: Config.generateSquareWave(0.75) },
+        { name: "87.5%", samples: Config.generateSquareWave(0.875) },
+        { name: "95%", samples: Config.generateSquareWave(0.95) },
+        { name: "99%", samples: Config.generateSquareWave(0.99) },
     ]);
 
 
@@ -2092,71 +2160,6 @@ export function drawNoiseSpectrum(wave: Float32Array, waveLength: number, lowOct
 
     return combinedAmplitude;
 }
-
-function generateSineWave(): Float32Array {
-    const wave: Float32Array = new Float32Array(Config.sineWaveLength + 1);
-    for (let i: number = 0; i < Config.sineWaveLength + 1; i++) {
-        wave[i] = Math.sin(i * Math.PI * 2.0 / Config.sineWaveLength);
-    }
-    return wave;
-}
-
-function generateTriWave(): Float32Array {
-    const wave: Float32Array = new Float32Array(Config.sineWaveLength + 1);
-    for (let i: number = 0; i < Config.sineWaveLength + 1; i++) {
-        wave[i] = Math.asin(Math.sin(i * Math.PI * 2.0 / Config.sineWaveLength)) / (Math.PI / 2);
-    }
-    return wave;
-}
-
-function generateTrapezoidWave(drive: number = 2): Float32Array {
-    const wave: Float32Array = new Float32Array(Config.sineWaveLength + 1);
-    for (let i: number = 0; i < Config.sineWaveLength + 1; i++) {
-        wave[i] = Math.max(-1.0, Math.min(1.0, Math.asin(Math.sin(i * Math.PI * 2.0 / Config.sineWaveLength)) * drive));
-    }
-    return wave;
-}
-
-function generateSquareWave(phaseWidth: number = 0): Float32Array {
-    const wave: Float32Array = new Float32Array(Config.sineWaveLength + 1);
-    const centerPoint: number = Config.sineWaveLength / 4;
-    for (let i: number = 0; i < Config.sineWaveLength + 1; i++) {
-        wave[i] = +((Math.abs(i - centerPoint) < phaseWidth * Config.sineWaveLength / 2)
-            || ((Math.abs(i - Config.sineWaveLength - centerPoint) < phaseWidth * Config.sineWaveLength / 2))) * 2 - 1;
-    }
-    return wave;
-}
-
-function generateSawWave(inverse: boolean = false): Float32Array {
-    const wave: Float32Array = new Float32Array(Config.sineWaveLength + 1);
-    for (let i: number = 0; i < Config.sineWaveLength + 1; i++) {
-        wave[i] = ((i + (Config.sineWaveLength / 4.0)) * 2.0 / Config.sineWaveLength) % 2 - 1;
-        wave[i] = inverse ? -wave[i] : wave[i];
-    }
-    return wave;
-}
-
-	// function generateWhiteNoiseFmWave() {
-        // const wave = new Float32Array(Config.sineWaveLength + 1);
-        // for (let i = 0; i < Config.sineWaveLength + 1; i++) {
-            // wave[i] = Math.random() * 2.0 - 1.0;
-        // }
-        // return wave;
-    // }
-	// function generateOneBitWhiteNoiseFmWave() {
-        // const wave = new Float32Array(Config.sineWaveLength + 1);
-        // for (let i = 0; i < Config.sineWaveLength + 1; i++) {
-            // wave[i] = Math.round(Math.random());
-        // }
-        // return wave;
-    // }
-	function generateQuasiSineWave() {
-        const wave = new Float32Array(Config.sineWaveLength + 1);
-        for (let i = 0; i < Config.sineWaveLength + 1; i++) {
-            wave[i] = Math.round(Math.sin(i * Math.PI * 2.0 / Config.sineWaveLength));
-        }
-        return wave;
-	}
 
 export function getArpeggioPitchIndex(pitchCount: number, useFastTwoNoteArp: boolean, arpeggio: number): number {
     let arpeggioPattern: ReadonlyArray<number> = Config.arpeggioPatterns[pitchCount - 1];

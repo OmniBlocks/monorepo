@@ -2,7 +2,7 @@
 set -e
 
 # Compile editor/main.ts into build/editor/main.js and dependencies
-npx tsc
+npx tsc -p scripts/tsconfig_editor.json
 
 # Combine build/editor/main.js and dependencies into website/beepbox_editor.js
 npx rollup build/editor/main.js \

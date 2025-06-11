@@ -1814,7 +1814,7 @@ export class Instrument {
         switch (type) {
             case InstrumentType.chip:
                 this.chipWave = 2;
-                // TODO: enable the chord effect?
+                // TODO: enable the chord effect? //slarmoo - My decision is no, others can if they would like though
                 this.chord = Config.chords.dictionary["arpeggio"].index;
                 // advloop addition
                 this.isUsingAdvancedLoopControls = false;
@@ -4363,7 +4363,7 @@ export class Song {
                 let willLoadLegacySamples = false;
                 let willLoadNintariboxSamples = false;
                 let willLoadMarioPaintboxSamples = false;
-                const customSampleUrls = [];
+                const customSampleUrls: string[] = [];
                 const customSamplePresets: Preset[] = [];
                 sampleLoadingState.statusTable = {};
                 sampleLoadingState.urlTable = {};
@@ -6111,7 +6111,7 @@ export class Song {
                 let songReverbInstrument: number = -1;
                 let songReverbIndex: number = -1;
 
-                // @TODO: Include GoldBox here.
+                //TODO: Goldbox detecting (ultrabox used the goldbox tag for a bit, sadly making things more complicated)
                 const shouldCorrectTempoMods: boolean = fromJummBox;
                 const jummboxTempoMin: number = 30;
 
@@ -8869,12 +8869,17 @@ class InstrumentState {
         const usesEcho: boolean = effectsIncludeEcho(this.effects);
         const usesReverb: boolean = effectsIncludeReverb(this.effects);
 
+        let granularChance: number = 0;
         if (usesGranular) { //has to happen before buffer allocation
-            this.granularMaximumGrains = Math.pow(2, instrument.grainAmounts * envelopeStarts[EnvelopeComputeIndex.grainAmount]);
+            granularChance = (instrument.grainAmounts + 1);
+            this.granularMaximumGrains = instrument.grainAmounts;
             if (synth.isModActive(Config.modulators.dictionary["grain freq"].index, channelIndex, instrumentIndex)) {
-                this.granularMaximumGrains = Math.pow(2, synth.getModValue(Config.modulators.dictionary["grain freq"].index, channelIndex, instrumentIndex, false) * envelopeStarts[EnvelopeComputeIndex.grainAmount]);
+                this.granularMaximumGrains = synth.getModValue(Config.modulators.dictionary["grain freq"].index, channelIndex, instrumentIndex, false);
+                granularChance = (synth.getModValue(Config.modulators.dictionary["grain freq"].index, channelIndex, instrumentIndex, false) + 1);
             }
-            this.granularMaximumGrains == Math.floor(this.granularMaximumGrains);
+            this.granularMaximumGrains = Math.floor(Math.pow(2, this.granularMaximumGrains * envelopeStarts[EnvelopeComputeIndex.grainAmount]));
+            granularChance = granularChance * envelopeStarts[EnvelopeComputeIndex.grainAmount];
+            console.log(this.granularMaximumGrains, granularChance)
         }
 
         this.allocateNecessaryBuffers(synth, instrument, samplesPerTick);
@@ -8893,7 +8898,7 @@ class InstrumentState {
             this.granularMixDelta = (granularMixEnd - this.granularMix) / roundedSamplesPerTick;
             for (let iterations: number = 0; iterations < Math.ceil(Math.random() * Math.random() * 10); iterations++) { //dirty weighting toward lower numbers
                 //create a grain
-                if (this.granularGrainsLength < this.granularMaximumGrains) {
+                if (this.granularGrainsLength < this.granularMaximumGrains && Math.random() <= granularChance) { //only create a grain if there's room and based on grainFreq
                     let granularMinGrainSizeInMilliseconds: number = instrument.grainSize;
                     if (synth.isModActive(Config.modulators.dictionary["grain size"].index, channelIndex, instrumentIndex)) {
                         granularMinGrainSizeInMilliseconds = synth.getModValue(Config.modulators.dictionary["grain size"].index, channelIndex, instrumentIndex, false);
@@ -9247,21 +9252,22 @@ class InstrumentState {
             // TODO: After computing a tick's settings once for multiple run lengths (which is
             // good for audio worklet threads), compute the echo delay envelopes at tick (or
             // part) boundaries to interpolate between two delay taps.
+
+            // slarmoo - I decided instead to enable and have the artifacts be part of the sound. 
+            // Worst case scenario I add a toggle for if upstream it gets done differently
             const echoDelayEnvelopeStart: number = envelopeStarts[EnvelopeComputeIndex.echoDelay];
             const echoDelayEnvelopeEnd: number = envelopeEnds[EnvelopeComputeIndex.echoDelay];
             let useEchoDelayStart: number = instrument.echoDelay * echoDelayEnvelopeStart;
             let useEchoDelayEnd: number = instrument.echoDelay * echoDelayEnvelopeEnd;
-            // let ignoreTicks: boolean = false;
+            
             // Check for echo delay mods
             if (synth.isModActive(Config.modulators.dictionary["echo delay"].index, channelIndex, instrumentIndex)) {
                 useEchoDelayStart = synth.getModValue(Config.modulators.dictionary["echo delay"].index, channelIndex, instrumentIndex, false) * echoDelayEnvelopeStart;
                 useEchoDelayEnd = synth.getModValue(Config.modulators.dictionary["echo delay"].index, channelIndex, instrumentIndex, true) * echoDelayEnvelopeEnd;
-                // ignoreTicks = true;
-                // this.allocateEchoBuffers(samplesPerTick, Math.max(useEchoDelayStart,useEchoDelayEnd)); //update buffer size for modulation / envelopes
             }
-            const tmpEchoDelayOffsetStart: number = /*ignoreTicks ? (useEchoDelayStart + 1) * Config.echoDelayStepTicks * samplesPerTick : */Math.round((useEchoDelayStart + 1) * Config.echoDelayStepTicks * samplesPerTick);
-            const tmpEchoDelayOffsetEnd: number = /*ignoreTicks ? (useEchoDelayEnd + 1) * Config.echoDelayStepTicks * samplesPerTick : */Math.round((useEchoDelayEnd + 1) * Config.echoDelayStepTicks * samplesPerTick);
-            if (this.echoDelayOffsetEnd != null/* && !ignoreTicks*/) {
+            const tmpEchoDelayOffsetStart: number = Math.round((useEchoDelayStart + 1) * Config.echoDelayStepTicks * samplesPerTick);
+            const tmpEchoDelayOffsetEnd: number = Math.round((useEchoDelayEnd + 1) * Config.echoDelayStepTicks * samplesPerTick);
+            if (this.echoDelayOffsetEnd != null) {
                 this.echoDelayOffsetStart = this.echoDelayOffsetEnd;
             } else {
                 this.echoDelayOffsetStart = tmpEchoDelayOffsetStart;
@@ -10674,7 +10680,7 @@ export class Synth {
         const limitDecay: number = 1.0 - Math.pow(0.5, this.song.limitDecay / this.samplesPerSecond);
         const limitRise: number = 1.0 - Math.pow(0.5, this.song.limitRise / this.samplesPerSecond);
         let limit: number = +this.limit;
-        let skippedBars = [];
+        let skippedBars: number[] = [];
         let firstSkippedBufferIndex = -1;
 
         let bufferIndex: number = 0;
@@ -10748,7 +10754,7 @@ export class Synth {
             if (this.wantToSkip) {
                 // Unable to continue, as we have skipped back to a previously visited bar without generating new samples, which means we are infinitely skipping.
                 // In this case processing will return before the designated number of samples are processed. In other words, silence will be generated.
-                let barVisited = skippedBars.includes(this.bar);
+                let barVisited: boolean = skippedBars.includes(this.bar);
                 if (barVisited && bufferIndex == firstSkippedBufferIndex) {
                     this.pause();
                     return;
@@ -13736,7 +13742,7 @@ export class Synth {
 
             // Duplicate lines containing "#" for each voice and replace the "#" with the voice index.
             pickedStringSource = pickedStringSource.replace(/^.*\#.*$/mg, line => {
-                const lines = [];
+                const lines: string[] = [];
                 for (let voice: number = 0; voice < voiceCount; voice++) {
                     lines.push(line.replace(/\#/g, String(voice)));
                 }
@@ -13991,7 +13997,7 @@ export class Synth {
 				let echoShelfPrevInputR = +instrumentState.echoShelfPrevInputR;`
             }
 
-            if (usesReverb) {
+            if (usesReverb) { //TODO: reverb wet/dry?
                 effectsSource += `
 				
 				const reverbMask = Config.reverbDelayBufferMask >>> 0; //TODO: Dynamic reverb buffer size.

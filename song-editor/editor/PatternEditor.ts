@@ -37,28 +37,17 @@ class PatternCursor {
 export class PatternEditor {
     public controlMode: boolean = false;
     public shiftMode: boolean = false;
-    private readonly _svgNoteBackground: SVGPatternElement = SVG.pattern({ id: "patternEditorNoteBackground" + this._barOffset, x: "0", y: "0", patternUnits: "userSpaceOnUse" });
-    private readonly _svgDrumBackground: SVGPatternElement = SVG.pattern({ id: "patternEditorDrumBackground" + this._barOffset, x: "0", y: "0", patternUnits: "userSpaceOnUse" });
-    private readonly _svgModBackground: SVGPatternElement = SVG.pattern({ id: "patternEditorModBackground" + this._barOffset, x: "0", y: "0", patternUnits: "userSpaceOnUse" });
-    private readonly _svgBackground: SVGRectElement = SVG.rect({ x: "0", y: "0", "pointer-events": "none", fill: "url(#patternEditorNoteBackground" + this._barOffset + ")" });
-    private _svgNoteContainer: SVGSVGElement = SVG.svg();
-    private readonly _svgPlayhead: SVGRectElement = SVG.rect({ x: "0", y: "0", width: "4", fill: ColorConfig.playhead, "pointer-events": "none" });
-    private readonly _selectionRect: SVGRectElement = SVG.rect({ class: "dashed-line dash-move", fill: ColorConfig.boxSelectionFill, stroke: ColorConfig.hoverPreview, "stroke-width": 2, "stroke-dasharray": "5, 3", "fill-opacity": "0.4", "pointer-events": "none", visibility: "hidden" });
-    private readonly _svgPreview: SVGPathElement = SVG.path({ fill: "none", stroke: ColorConfig.hoverPreview, "stroke-width": "2", "pointer-events": "none" });
-    public modDragValueLabel: HTMLDivElement = HTML.div({ width: "90", "text-anchor": "start", contenteditable: "true", style: "display: flex, justify-content: center; align-items:center; position:absolute; pointer-events: none;", "dominant-baseline": "central", });
-    public _svg: SVGSVGElement = SVG.svg({ id: 'firstImage', style: `background-image: url(${getLocalStorageItem("customTheme", "")}); background-repeat: no-repeat; background-size: 100% 100%; background-color: ${ColorConfig.editorBackground}; touch-action: none; position: absolute;`, width: "100%", height: "100%" },
-        SVG.defs(
-            this._svgNoteBackground,
-            this._svgDrumBackground,
-            this._svgModBackground,
-        ),
-        this._svgBackground,
-        this._selectionRect,
-        this._svgNoteContainer,
-        this._svgPreview,
-        this._svgPlayhead,
-    );
-    public readonly container: HTMLDivElement = HTML.div({ style: "height: 100%; overflow:hidden; position: relative; flex-grow: 1;" }, this._svg, this.modDragValueLabel);
+    private readonly _svgNoteBackground: SVGPatternElement;
+    private readonly _svgDrumBackground: SVGPatternElement;
+    private readonly _svgModBackground: SVGPatternElement;
+    private readonly _svgBackground: SVGRectElement;
+    private _svgNoteContainer: SVGSVGElement;
+    private readonly _svgPlayhead: SVGRectElement;
+    private readonly _selectionRect: SVGRectElement;
+    private readonly _svgPreview: SVGPathElement;
+    public modDragValueLabel: HTMLDivElement;
+    public _svg: SVGSVGElement;
+    public readonly container: HTMLDivElement;
 
     private readonly _defaultModBorder: number = 34;
     private readonly _backgroundPitchRows: SVGRectElement[] = [];
@@ -126,6 +115,29 @@ export class PatternEditor {
     private _followPlayheadBar: number = -1;
 
     constructor(private _doc: SongDocument, private _interactive: boolean, private _barOffset: number) {
+        this._svgNoteBackground = SVG.pattern({ id: "patternEditorNoteBackground" + this._barOffset, x: "0", y: "0", patternUnits: "userSpaceOnUse" });
+        this._svgDrumBackground = SVG.pattern({ id: "patternEditorDrumBackground" + this._barOffset, x: "0", y: "0", patternUnits: "userSpaceOnUse" });
+        this._svgModBackground = SVG.pattern({ id: "patternEditorModBackground" + this._barOffset, x: "0", y: "0", patternUnits: "userSpaceOnUse" });
+        this._svgBackground = SVG.rect({ x: "0", y: "0", "pointer-events": "none", fill: "url(#patternEditorNoteBackground" + this._barOffset + ")" });
+        this._svgNoteContainer = SVG.svg();
+        this._svgPlayhead = SVG.rect({ x: "0", y: "0", width: "4", fill: ColorConfig.playhead, "pointer-events": "none" });
+        this._selectionRect = SVG.rect({ class: "dashed-line dash-move", fill: ColorConfig.boxSelectionFill, stroke: ColorConfig.hoverPreview, "stroke-width": 2, "stroke-dasharray": "5, 3", "fill-opacity": "0.4", "pointer-events": "none", visibility: "hidden" });
+        this._svgPreview = SVG.path({ fill: "none", stroke: ColorConfig.hoverPreview, "stroke-width": "2", "pointer-events": "none" });
+        this.modDragValueLabel = HTML.div({ width: "90", "text-anchor": "start", contenteditable: "true", style: "display: flex, justify-content: center; align-items:center; position:absolute; pointer-events: none;", "dominant-baseline": "central", });
+        this._svg = SVG.svg({ id: 'firstImage', style: `background-image: url(${getLocalStorageItem("customTheme", "")}); background-repeat: no-repeat; background-size: 100% 100%; background-color: ${ColorConfig.editorBackground}; touch-action: none; position: absolute;`, width: "100%", height: "100%" },
+            SVG.defs(
+                this._svgNoteBackground,
+                this._svgDrumBackground,
+                this._svgModBackground,
+            ),
+            this._svgBackground,
+            this._selectionRect,
+            this._svgNoteContainer,
+            this._svgPreview,
+            this._svgPlayhead,
+        );
+        this.container = HTML.div({ style: "height: 100%; overflow:hidden; position: relative; flex-grow: 1;" }, this._svg, this.modDragValueLabel);
+
         for (let i: number = 0; i < Config.pitchesPerOctave; i++) {
             const rectangle: SVGRectElement = SVG.rect();
             rectangle.setAttribute("x", "1");

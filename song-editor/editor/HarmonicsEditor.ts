@@ -35,13 +35,14 @@ export class HarmonicsEditor {
     private _change: ChangeHarmonics | null = null;
     private _renderedPath: String = "";
     private _renderedFifths: boolean = true;
-    private instrument: Instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
-    //private readonly _initial: HarmonicsWave = this.instrument.harmonicsWave;
+    private instrument: Instrument;
 
     private _undoHistoryState: number = 0;
     private _changeQueue: number[][] = [];
 
     constructor(private _doc: SongDocument, private _isPrompt: boolean = false) {
+        this.instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
+
         for (let i: number = 1; i <= Config.harmonicsControlPoints; i = i * 2) {
             this._octaves.appendChild(SVG.rect({ fill: ColorConfig.tonic, x: (i - 0.5) * (this._editorWidth - 8) / (Config.harmonicsControlPoints - 1) - 1, y: 0, width: 2, height: this._editorHeight }));
         }

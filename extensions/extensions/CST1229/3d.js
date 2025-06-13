@@ -147,7 +147,7 @@
 
   // to convert to data url, use https://www.adminbooster.com/tool/data_uri
   // @ts-expect-error we're running in a browser
-  const THREE = await import("https://cdn.jsdelivr.net/npm/three@0.169/build/three.module.min.js");
+  const THREE = await import("https://cdn.jsdelivr.net/npm/three@0.176/build/three.module.min.js");
 
 
   class ThreeD {

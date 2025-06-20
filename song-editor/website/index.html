@@ -406,7 +406,7 @@
         // blubox desktop plants 
         "⚡","🔵","💫",
         // Slarmoo's Box plants
-        "✨","🌈","🌧️","🪨","🐍","🌲","🌳","𓆏","🦀","🍄‍🟫","🌵","and Bobby",
+        "✨","🌈","🌧️","🪨","🐍","🌲","🌳","𓆏","🦀","🍄‍🟫","🌵","and Bobby","🥚",
         //Current version
         "1.4.5"
         ];
@@ -442,6 +442,15 @@
             const years = date.getFullYear() - 2024;
             const birthdayPlants = [years + " year" + (years != 1 ? "s" : "") + "!", "🎂", "🎉", "Happy Birthday!", "Anniversary"];
             document.getElementById("goldboxPlant").innerHTML = "  " + birthdayPlants[(Math.floor(Math.random() * birthdayPlants.length))];
+        }
+
+        if(Math.random() * 10000 < 1) {
+            document.getElementById("goldboxPlant").addEventListener("click", function (event) {
+                window.open("./macandcheese.html", "_blank");
+            })
+            const a = document.createElement("a");
+            document.getElementById("goldboxPlant").innerHTML = " macaroni and cheese";
+            document.getElementById("goldboxPlant").style.color = "#bb8822";
         }
 
         if(document.getElementById("goldboxPlant").innerText.includes("🐲")) {

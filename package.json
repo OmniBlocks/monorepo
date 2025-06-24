@@ -46,10 +46,10 @@
     "webpack-dev-server": "3.11.2"
   },
   "dependencies": {
+    "@turbowarp/ancient-hull.js": "^0.2.12",
     "@turbowarp/nanolog": "^0.2.0",
     "@turbowarp/scratch-svg-renderer": "^1.0.0-202312242305-12c360b",
     "grapheme-breaker": "0.3.2",
-    "hull.js": "0.2.10",
     "ify-loader": "1.0.4",
     "linebreak": "0.3.0",
     "raw-loader": "^0.5.1",

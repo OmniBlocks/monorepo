@@ -33,6 +33,7 @@ const TargetPane = ({
     onDrop,
     onDuplicateSprite,
     onExportSprite,
+    onExportCostumesButtonClick,
     onFileUploadClick,
     onNewSpriteClick,
     onPaintSpriteClick,
@@ -71,6 +72,7 @@ const TargetPane = ({
             onDrop={onDrop}
             onDuplicateSprite={onDuplicateSprite}
             onExportSprite={onExportSprite}
+            onExportCostumesButtonClick={onExportCostumesButtonClick}
             onFileUploadClick={onFileUploadClick}
             onNewSpriteClick={onNewSpriteClick}
             onPaintSpriteClick={onPaintSpriteClick}

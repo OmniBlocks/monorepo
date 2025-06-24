@@ -54,7 +54,7 @@ const SpriteSelectorItem = props => (
                 onClick={props.onDeleteButtonClick}
             />
         ) : null }
-        {props.onDuplicateButtonClick || props.onDeleteButtonClick || props.onExportButtonClick ? (
+        {props.onDuplicateButtonClick || props.onDeleteButtonClick || props.onExportButtonClick || props.onExportCostumesButtonClick ? (
             <ContextMenu id={`${props.name}-${contextMenuId++}`}>
                 {props.onDuplicateButtonClick ? (
                     <MenuItem onClick={props.onDuplicateButtonClick}>
@@ -80,6 +80,15 @@ const SpriteSelectorItem = props => (
                             defaultMessage="rename"
                             description="Menu item to rename an item"
                             id="tw.spriteSelectorItem.rename"
+                        />
+                    </MenuItem>
+                ) : null}
+                {props.onExportCostumesButtonClick ? (
+                    <MenuItem onClick={props.onExportCostumesButtonClick}>
+                        <FormattedMessage
+                            defaultMessage="export costumes"
+                            description="Menu item to export the costumes of the selected item"
+                            id="ob.SpriteSelectorItem.exportCostumes"
                         />
                     </MenuItem>
                 ) : null}
@@ -109,6 +118,7 @@ SpriteSelectorItem.propTypes = {
     onDeleteButtonClick: PropTypes.func,
     onDuplicateButtonClick: PropTypes.func,
     onExportButtonClick: PropTypes.func,
+    onExportCostumesButtonClick: PropTypes.func,
     onRenameButtonClick: PropTypes.func,
     onMouseDown: PropTypes.func,
     onMouseEnter: PropTypes.func,

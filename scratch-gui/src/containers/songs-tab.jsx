@@ -43,8 +43,7 @@ class SongsTab extends React.Component {
         }
 
         return (
-            <div>
-                <SongEditor onClose={this.handleCloseSongEditor} />
+            <div>            <SongEditor onClose={this.handleCloseSongEditor}/>
             </div>
         );
     }
@@ -69,4 +68,3 @@ export default injectIntl(connect(
     mapDispatchToProps
 )(SongsTab));
 
-// this script contains the whitespace bug somewhere

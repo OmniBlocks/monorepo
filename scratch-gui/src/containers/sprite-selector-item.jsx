@@ -28,7 +28,8 @@ class SpriteSelectorItem extends React.PureComponent {
             'handleMouseDown',
             'handleDragEnd',
             'handleDrag',
-            'handleTouchEnd'
+            'handleTouchEnd',
+            'handleExportCostumes'
         ]);
 
         this.dragRecognizer = new DragRecognizer({
@@ -106,6 +107,19 @@ class SpriteSelectorItem extends React.PureComponent {
         e.stopPropagation();
         this.props.onRenameButtonClick(this.props.id);
     }
+    async handleExportCostumes (e) {
+        e.stopPropagation();
+        console.log('Export costumes button clicked for sprite id:', this.props.id);
+        if (this.props.onExportCostumesButtonClick) {
+            try {
+                await this.props.onExportCostumesButtonClick(this.props.id);
+            } catch (err) {
+                // Optionally, show an alert or log
+                // alert('Failed to export costumes');
+                // console.error(err);
+            }
+        }
+    }
     handleMouseLeave () {
         this.props.dispatchSetHoveredSprite(null);
     }
@@ -126,6 +140,7 @@ class SpriteSelectorItem extends React.PureComponent {
             onDeleteButtonClick,
             onDuplicateButtonClick,
             onExportButtonClick,
+            onExportCostumesButtonClick,
             onRenameButtonClick,
             dragPayload,
             receivedBlocks,
@@ -142,6 +157,7 @@ class SpriteSelectorItem extends React.PureComponent {
                 onClick={this.handleClick}
                 onDeleteButtonClick={onDeleteButtonClick ? this.handleDelete : null}
                 onDuplicateButtonClick={onDuplicateButtonClick ? this.handleDuplicate : null}
+                onExportCostumesButtonClick={onExportCostumesButtonClick ? this.handleExportCostumes : null}
                 onExportButtonClick={onExportButtonClick ? this.handleExport : null}
                 onRenameButtonClick={onRenameButtonClick ? this.handleRename : null}
                 onMouseDown={this.handleMouseDown}

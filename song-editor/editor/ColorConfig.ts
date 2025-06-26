@@ -5501,7 +5501,173 @@ export class ColorConfig {
 			--oscilloscope-line-R: white;
 			--oscilloscope-line-L: var(--secondary-text);
 		}`,
-		"azur lane":`
+	"axobox": `
+		:root {
+			--page-margin: #000e1c;
+			--editor-background: #000e1c;
+			--playhead: rgba(255, 255, 255, 0.9);
+			--secondary-text: #84859a;
+			--box-selection-fill: #044b94;
+			--ui-widget-background: #2a3045;
+			--ui-widget-focus: #4f4a68;
+			--pitch-background: #3c5773;
+			--tonic: #453e80;
+			--fifth-note: #545498;
+			--white-piano-key: #eee;
+			--black-piano-key: #666;
+			--use-color-formula: true;
+			--track-editor-bg-pitch: #393e4f;
+			--track-editor-bg-pitch-dim: #1c1d28;
+			--track-editor-bg-noise: #3d3535;
+			--track-editor-bg-noise-dim: #161313;
+			--track-editor-bg-mod: #283560;
+			--track-editor-bg-mod-dim: #0a101f;
+			--multiplicative-mod-slider: #606c9f;
+			--overwriting-mod-slider: #6850b5;
+			--indicator-primary: #1E90FF;
+			--indicator-secondary: #1560BD;
+			--select2-opt-group: #3f3951;
+			--input-box-outline: #222;
+			--mute-button-normal: #dda85d;
+			--mute-button-mod: #886eae;
+			--mod-label-primary: #282840;
+			--mod-label-secondary-text: rgb(87, 86, 120);
+			--mod-label-primary-text: white;
+			--pitch-secondary-channel-hue: 210;
+			--pitch-secondary-channel-hue-scale: 6.5;
+			--pitch-secondary-channel-sat: 100;
+			--pitch-secondary-channel-sat-scale: 0.1;
+			--pitch-secondary-channel-lum: 50;
+			--pitch-secondary-channel-lum-scale: 0.05;
+			--pitch-primary-channel-hue: 205;
+			--pitch-primary-channel-hue-scale: 6.5;
+			--pitch-primary-channel-sat: 39;
+			--pitch-primary-channel-sat-scale: 0.1;
+			--pitch-primary-channel-lum: 60;
+			--pitch-primary-channel-lum-scale: 0.05;
+			--pitch-secondary-note-hue: 225;
+			--pitch-secondary-note-hue-scale: 6.5;
+			--pitch-secondary-note-sat: 55;
+			--pitch-secondary-note-sat-scale: 0.1;
+			--pitch-secondary-note-lum: 37;
+			--pitch-secondary-note-lum-scale: 0.05;
+			--pitch-primary-note-hue: 204;
+			--pitch-primary-note-hue-scale: 6.5;
+			--pitch-primary-note-sat: 100;
+			--pitch-primary-note-sat-scale: 0.05;
+			--pitch-primary-note-lum: 37;
+			--pitch-primary-note-lum-scale: 0.025;
+			--noise-secondary-channel-hue: 138;
+			--noise-secondary-channel-hue-scale: 2;
+			--noise-secondary-channel-sat: 97;
+			--noise-secondary-channel-sat-scale: 0;
+			--noise-secondary-channel-lum: 38;
+			--noise-secondary-channel-lum-scale: 0;
+			--noise-primary-channel-hue: 74;
+			--noise-primary-channel-hue-scale: 2;
+			--noise-primary-channel-sat: 100;
+			--noise-primary-channel-sat-scale: 0;
+			--noise-primary-channel-lum: 36;
+			--noise-primary-channel-lum-scale: 0;
+			--noise-secondary-note-hue: 175;
+			--noise-secondary-note-hue-scale: 2;
+			--noise-secondary-note-sat: 98;
+			--noise-secondary-note-sat-scale: 0;
+			--noise-secondary-note-lum: 24;
+			--noise-secondary-note-lum-scale: 0;
+			--noise-primary-note-hue: 149;
+			--noise-primary-note-hue-scale: 2;
+			--noise-primary-note-sat: 100;
+			--noise-primary-note-sat-scale: 0;
+			--noise-primary-note-lum: 32;
+			--noise-primary-note-lum-scale: 0;
+			--mod-secondary-channel-hue: 44;
+			--mod-secondary-channel-hue-scale: 1.5;
+			--mod-secondary-channel-sat: 100;
+			--mod-secondary-channel-sat-scale: 0;
+			--mod-secondary-channel-lum: 50;
+			--mod-secondary-channel-lum-scale: 0;
+			--mod-primary-channel-hue: 45;
+			--mod-primary-channel-hue-scale: 1.5;
+			--mod-primary-channel-sat: 90;
+			--mod-primary-channel-sat-scale: 0;
+			--mod-primary-channel-lum: 57;
+			--mod-primary-channel-lum-scale: 0;
+			--mod-secondary-note-hue: 33;
+			--mod-secondary-note-hue-scale: 1.5;
+			--mod-secondary-note-sat: 100;
+			--mod-secondary-note-sat-scale: 0;
+			--mod-secondary-note-lum: 47;
+			--mod-secondary-note-lum-scale: 0;
+			--mod-primary-note-hue: 45;
+			--mod-primary-note-hue-scale: 1.5;
+			--mod-primary-note-sat: 100;
+			--mod-primary-note-sat-scale: 0;
+			--mod-primary-note-lum: 60;
+			--mod-primary-note-lum-scale: 0;
+			--disabled-note-primary:    #9187d1;
+			--disabled-note-secondary:  #6a67ac;
+		}`,
+	"lemmbox dark": `
+		:root {
+			--page-margin: #020009;
+			--editor-background: #020009;
+			--secondary-text: white;
+			--text-selection: #c2a855;
+			--loop-accent: #fff570;
+			--link-accent: #fff570;
+			--ui-widget-background: #191721;
+			--ui-widget-focus: #2d293b;
+			--pitch-background: #44444A;
+			--tonic: #c2a855;
+			--white-piano-key-text: #131200;
+			--black-piano-key-text: #fff;
+			--pitch-channel-limit: 10;
+			--indicator-primary: #6a38ff;
+			--input-box-outline: #403b4f;
+			--mute-button-mod: #8066cc;
+			--pitch1-secondary-channel: #0099A1;
+			--pitch1-primary-channel:   #25F3FF;
+			--pitch1-secondary-note:    #00BDC7;
+			--pitch1-primary-note:      #92F9FF;
+			--pitch2-secondary-channel: #A1A100;
+			--pitch2-primary-channel:   #FFFF25;
+			--pitch2-secondary-note:    #C7C700;
+			--pitch2-primary-note:      #FFFF92;
+			--pitch3-secondary-channel: #C75000;
+			--pitch3-primary-channel:   #FF9752;
+			--pitch3-secondary-note:    #FF771C;
+			--pitch3-primary-note:      #FFCDAB;
+			--pitch4-secondary-channel: #00A100;
+			--pitch4-primary-channel:   #50FF50;
+			--pitch4-secondary-note:    #00C700;
+			--pitch4-primary-note:      #A0FFA0;
+			--pitch5-secondary-channel: #D020D0;
+			--pitch5-primary-channel:   #FF90FF;
+			--pitch5-secondary-note:    #E040E0;
+			--pitch5-primary-note:      #FFC0FF;
+			--pitch6-secondary-channel: #7777B0;
+			--pitch6-primary-channel:   #A0A0FF;
+			--pitch6-secondary-note:    #8888D0;
+			--pitch6-primary-note:      #D0D0FF;
+			--pitch7-secondary-channel: #8AA100;
+			--pitch7-primary-channel:   #DEFF25;
+			--pitch7-secondary-note:    #AAC700;
+			--pitch7-primary-note:      #E6FF92;
+			--pitch8-secondary-channel: #DF0019;
+			--pitch8-primary-channel:   #FF98A4;
+			--pitch8-secondary-note:    #FF4E63;
+			--pitch8-primary-note:      #FFB2BB;
+			--pitch9-secondary-channel: #00A170;
+			--pitch9-primary-channel:   #50FFC9;
+			--pitch9-secondary-note:    #00C78A;
+			--pitch9-primary-note:      #83FFD9;
+			--pitch10-secondary-channel:#A11FFF;
+			--pitch10-primary-channel:  #CE8BFF;
+			--pitch10-secondary-note:   #B757FF;
+			--pitch10-primary-note:     #DFACFF;
+		}`,
+	"azur lane":`
 		:root {
 			--page-margin: #19337e;
 			--editor-background: #000333cf;
@@ -5646,7 +5812,7 @@ export class ColorConfig {
 		.promptContainerBG::before {
 			box-shadow: inset 0 0 2000px rgba(255, 255, 255, .5);
 		}
-	}`,
+		}`,
 	"custom": `${localStorage.getItem("customColors") || `:root {  }`}`,
     };
 

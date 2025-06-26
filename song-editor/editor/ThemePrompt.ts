@@ -66,6 +66,8 @@ export class ThemePrompt implements Prompt {
 			option({ value: "abyssbox light"}, "AbyssBox Light"),
 			option({ value: "nepbox" }, "Nepbox"),
 			option({ value: "ultrabox dark" }, "UltraBox"),
+			option({ value: "axobox"}, "AxoBox"),
+			option({ value: "lemmbox dark"}, "LemmBox"),
 		),
 		optgroup({ label: "Misc" },
 			option({ value: "azur lane" }, "Azur Lane"),

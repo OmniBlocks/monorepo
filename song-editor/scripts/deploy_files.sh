@@ -26,7 +26,6 @@ cp website/nintaribox_samples.js to_deploy/player
 
 cp website/index.html to_deploy/
 cp website/favicon.ico to_deploy/
-cp website/icon_32.png to_deploy/
 cp website/icon_maskable_192.png to_deploy/
 cp website/404.html to_deploy/
 cp website/404.html to_deploy/player/

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel='shortcut icon' type='image/x-icon' href='./favicon.ico' />
+    <link rel="icon" type="image/x-icon" href="./favicon.ico" />
     <!-- CDN for jQuery and select2 -->
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"
             integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
@@ -22,9 +22,8 @@
     <meta name="msapplication-TileColor" content="#247d1d" />
     <meta name="msapplication-config" content="/browserconfig.xml" />
     <meta name="format-detection" content="telephone=no" />
-    <meta property="og:image" content="https://slarmoo.github.io/slarmoosbox/website/icon_shadow_192.png">
+    <meta property="og:image" content="./icon_maskable_192.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png" />
-    <link rel="icon" type="image/png" sizes="32x32" href="./icon_32.png" />
     <link rel="manifest" href="./manifest.webmanifest" />
     <link href="https://fonts.googleapis.com/css?family=B612" rel="stylesheet" media="none" onload="if (this.media != 'all') this.media='all';" /> <!-- this is a trick to load CSS asynchronously. -->
     <style type="text/css">
@@ -180,7 +179,7 @@
             
             <p id="introduction">
                 Slarmoo's Box is a mod of Ultrabox that aims to advance Beepbox's capabilities. <br>
-                UltraBox is a mod first envisioned by Neptendo, made possible by contributing community members (see <a href="./credits.html">credits</a>).<br>
+                UltraBox is a mod first envisioned by Neptendo and made possible by contributing community members (see <a href="./credits.html">credits</a>).<br>
                 It takes elements from most of the beepbox mods available and puts them in one convenient package.
             </p>
             <!-- <p>
@@ -401,14 +400,16 @@
         // I believe this is from paandorasbox (might have also been present in familiarbox???? maybe not though...)
         //slarmoo - changed to not wackybox, because it isn't :p
         "not :wackybox:",
-        // plant suggested by mel, in reference to the "(don't eat) thegubbys" meme
+        // plant originally suggested by mel in reference to the "(don't) eat thegubbys" meme        
         "🐟",
         // blubox desktop plants 
         "⚡","🔵","💫",
+        // LemmBox 
+		"🍋",
         // Slarmoo's Box plants
         "✨","🌈","🌧️","🪨","🐍","🌲","🌳","𓆏","🦀","🍄‍🟫","🌵","and Bobby","🥚",
         //Current version
-        "1.4.5"
+        "1.4.6"
         ];
         const date = new Date();
         if (Math.floor(Math.random() * 3) == 0) { //more than doubled chance for a plant to show up

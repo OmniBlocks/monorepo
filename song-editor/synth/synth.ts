@@ -10639,6 +10639,8 @@ export class Synth {
             this.deactivateAudio();
             return;
         }
+        const outputDataLUnfiltered: Float32Array = outputDataL.slice();
+        const outputDataRUnfiltered: Float32Array = outputDataR.slice();
 
         const song: Song = this.song;
         this.song.inVolumeCap = 0.0 // Reset volume cap for this run
@@ -10884,8 +10886,8 @@ export class Synth {
                         const stopIndex: number = Math.min(runEnd, bufferIndex + this.metronomeSamplesRemaining);
                         this.metronomeSamplesRemaining -= stopIndex - bufferIndex;
                         for (let i: number = bufferIndex; i < stopIndex; i++) {
-                            outputDataL[i] += this.metronomeAmplitude;
-                            outputDataR[i] += this.metronomeAmplitude;
+                            outputDataLUnfiltered[i] += this.metronomeAmplitude;
+                            outputDataRUnfiltered[i] += this.metronomeAmplitude;
                             const tempAmplitude: number = this.metronomeFilter * this.metronomeAmplitude - this.metronomePrevAmplitude;
                             this.metronomePrevAmplitude = this.metronomeAmplitude;
                             this.metronomeAmplitude = tempAmplitude;
@@ -10948,8 +10950,8 @@ export class Synth {
                 }
 
                 // A compressor/limiter.
-                const sampleL = outputDataL[i] * song.masterGain * song.masterGain;
-                const sampleR = outputDataR[i] * song.masterGain * song.masterGain;
+                const sampleL = (outputDataL[i] + outputDataLUnfiltered[i]) * song.masterGain * song.masterGain;
+                const sampleR = (outputDataR[i] + outputDataRUnfiltered[i]) * song.masterGain * song.masterGain;
                 const absL: number = sampleL < 0.0 ? -sampleL : sampleL;
                 const absR: number = sampleR < 0.0 ? -sampleR : sampleR;
                 const abs: number = absL > absR ? absL : absR;

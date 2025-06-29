@@ -1662,7 +1662,7 @@ var beepbox = (function (exports) {
             return (_a = EditorConfig.presetCategories[0].presets.dictionary) === null || _a === void 0 ? void 0 : _a[TypePresets === null || TypePresets === void 0 ? void 0 : TypePresets[instrument]];
         }
     }
-    EditorConfig.version = "1.4.6";
+    EditorConfig.version = "1.4.7";
     EditorConfig.versionDisplayName = "Slarmoo's Box " + EditorConfig.version;
     EditorConfig.releaseNotesURL = "./patch_notes.html";
     EditorConfig.isOnMac = /^Mac/i.test(navigator.platform) || /Mac OS X/i.test(navigator.userAgent) || /^(iPhone|iPad|iPod)/i.test(navigator.platform) || /(iPhone|iPad|iPod)/i.test(navigator.userAgent);
@@ -15787,15 +15787,14 @@ var beepbox = (function (exports) {
         `;
                 for (let i = 0; i < voiceCount; i++) {
                     spectrumSource += `
-            let phaseDelta# = tone.phaseDeltas[#] * samplesInPeriod;
-            let phaseDeltaScale# = +tone.phaseDeltaScales[#];
-            let noiseSample# = +tone.noiseSamples[#];
-            // This is for a "legacy" style simplified 1st order lowpass filter with
-            // a cutoff frequency that is relative to the tone's fundamental frequency.
-            const pitchRelativefilter# = Math.min(1.0, phaseDelta#);
-            
-            if (instrumentState.unisonVoices <= # && instrumentState.unisonSpread == 0 && !instrumentState.chord.customInterval) tone.phases[#] = tone.phases[#-1];
-            `.replaceAll("#", i + "");
+                if (instrumentState.unisonVoices <= # && instrumentState.unisonSpread == 0 && !instrumentState.chord.customInterval) tone.phases[#] = tone.phases[#-1];
+                let phaseDelta# = tone.phaseDeltas[#] * samplesInPeriod;
+                let phaseDeltaScale# = +tone.phaseDeltaScales[#];
+                let noiseSample# = +tone.noiseSamples[#];
+                // This is for a "legacy" style simplified 1st order lowpass filter with
+                // a cutoff frequency that is relative to the tone's fundamental frequency.
+                const pitchRelativefilter# = Math.min(1.0, phaseDelta#);
+                `.replaceAll("#", i + "");
                 }
                 spectrumSource += `
         let expression = +tone.expression;
@@ -15808,26 +15807,31 @@ var beepbox = (function (exports) {
         const applyFilters = Synth.applyFilters;
 
         const phaseMask = Config.spectrumNoiseLength - 1;
-
         `;
                 for (let i = 0; i < voiceCount; i++) {
                     spectrumSource += `let phase# = (tone.phases[#] % 1) * Config.spectrumNoiseLength;
                 `.replaceAll("#", i + "");
                 }
-                spectrumSource += "let test = true;";
-                for (let i = 0; i < voiceCount; i++) {
-                    spectrumSource += `
-            if (tone.phases[#] == 0.0) {
+                spectrumSource += `
+            if (tone.phases[0] == 0.0) {
                 // Zero phase means the tone was reset, just give noise a random start phase instead.
-                phase# = Synth.findRandomZeroCrossing(wave, Config.spectrumNoiseLength) + phaseDelta#;
-                if (@ <= # && test && instrumentState.unisonSpread == 0 && !instrumentState.chord.customInterval) {`.replaceAll("#", i + "").replaceAll("@", voiceCount + "").replaceAll("~", tone.phases.length + "");
-                    for (let j = i + 1; j < tone.phases.length; j++) {
-                        spectrumSource += "phase~ = phase#;".replaceAll("#", i + "").replaceAll("~", j + "");
-                    }
+                phase0 = Synth.findRandomZeroCrossing(wave, Config.spectrumNoiseLength) + phaseDelta0;
+            `;
+                for (let i = 1; i < voiceCount; i++) {
                     spectrumSource += `
-                    test = false;
+                if (instrumentState.unisonVoices <= # && instrumentState.unisonSpread == 0 && !instrumentState.chord.customInterval) {
+                    phase# = phase0;
                 }
-            }`;
+            `.replaceAll("#", i + "");
+                }
+                spectrumSource += `}`;
+                for (let i = 1; i < voiceCount; i++) {
+                    spectrumSource += `
+                if (tone.phases[#] == 0.0 && !(instrumentState.unisonVoices <= # && instrumentState.unisonSpread == 0 && !instrumentState.chord.customInterval)) {
+                    // Zero phase means the tone was reset, just give noise a random start phase instead.
+                phase# = Synth.findRandomZeroCrossing(wave, Config.spectrumNoiseLength) + phaseDelta#;
+                }
+            `.replaceAll("#", i + "");
                 }
                 spectrumSource += `
         const stopIndex = bufferIndex + runLength;
@@ -15909,20 +15913,26 @@ var beepbox = (function (exports) {
                     drumSource += `let phase# = (tone.phases[#] % 1) * Config.spectrumNoiseLength;
             `.replaceAll("#", i + "");
                 }
-                drumSource += "let test = true;";
-                for (let i = 0; i < voiceCount; i++) {
-                    drumSource += `
-        if (tone.phases[#] == 0.0) {
+                drumSource += `
+        if (tone.phases[0] == 0.0) {
             // Zero phase means the tone was reset, just give noise a random start phase instead.
-            phase# = Synth.findRandomZeroCrossing(wave, Config.spectrumNoiseLength) + phaseDelta#;
-            if (@ <= # && test && instrumentState.unisonSpread == 0 && !instrumentState.chord.customInterval) {`.replaceAll("#", i + "").replaceAll("@", voiceCount + "").replaceAll("~", tone.phases.length + "");
-                    for (let j = i + 1; j < tone.phases.length; j++) {
-                        drumSource += "phase~ = phase#;".replaceAll("#", i + "").replaceAll("~", j + "");
-                    }
+            phase0 = Synth.findRandomZeroCrossing(wave, Config.spectrumNoiseLength) + phaseDelta0;
+        `;
+                for (let i = 1; i < voiceCount; i++) {
                     drumSource += `
-                test = false;
+            if (instrumentState.unisonVoices <= # && instrumentState.unisonSpread == 0 && !instrumentState.chord.customInterval) {
+                phase# = phase0;
             }
-        }`;
+        `.replaceAll("#", i + "");
+                }
+                drumSource += `}`;
+                for (let i = 1; i < voiceCount; i++) {
+                    drumSource += `
+            if (tone.phases[#] == 0.0 && !(instrumentState.unisonVoices <= # && instrumentState.unisonSpread == 0 && !instrumentState.chord.customInterval)) {
+                // Zero phase means the tone was reset, just give noise a random start phase instead.
+            phase# = Synth.findRandomZeroCrossing(wave, Config.spectrumNoiseLength) + phaseDelta#;
+            }
+        `.replaceAll("#", i + "");
                 }
                 drumSource += `const phaseMask = Config.spectrumNoiseLength - 1;
 

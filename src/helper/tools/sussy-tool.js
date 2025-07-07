@@ -97,27 +97,29 @@ class SussyTool extends paper.Tool {
             return;
         }
 
-        if (this.sussy) {
-            this.sussy.remove();
-        }
+        if (this.sussy) this.sussy.remove();
 
-        const sussy = new paper.Rectangle(event.downPoint, event.point);
-        const squareDimensions = getSquareDimensions(event.downPoint, event.point);
-        if (event.modifiers.shift) {
-            sussy.size = squareDimensions.size.abs();
-        }
-
+        const rawBounds = new paper.Rectangle(event.downPoint, event.point);
         const path = selectablePaths[this.shape];
         this.sussy = new paper.CompoundPath(path);
-        this.sussy.bounds = sussy;
-        if (event.modifiers.alt) {
-            this.sussy.position = event.downPoint;
-        } else if (event.modifiers.shift) {
-            this.sussy.position = squareDimensions.position;
+
+        if (event.modifiers.shift) {
+            // maintain aspect ratio of shape
+            const aspect = this.sussy.bounds.width / this.sussy.bounds.height;
+            let { width, height } = rawBounds.size.width;
+
+            if (Math.abs(width / height) > aspect) width = Math.sign(width) * Math.abs(height * aspect);
+            else height = Math.sign(height) * Math.abs(width / aspect);
+
+            const fixedSize = new paper.Size(width, height);
+            const fixedBounds = new paper.Rectangle(event.downPoint, event.downPoint.add(fixedSize));
+            this.sussy.bounds = fixedBounds;
         } else {
-            const dimensions = event.point.subtract(event.downPoint);
-            this.sussy.position = event.downPoint.add(dimensions.multiply(0.5));
+            this.sussy.bounds = rawBounds;
         }
+
+        if (event.modifiers.alt) this.sussy.position = event.downPoint;
+        else this.sussy.position = this.sussy.bounds.center;
 
         styleShape(this.sussy, this.colorState);
     }

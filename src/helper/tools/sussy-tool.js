@@ -115,9 +115,16 @@ class SussyTool extends paper.Tool {
             if (width / height > shapeRatio) w0 = Math.sign(width) * Math.abs(height * shapeRatio);
             else h0 = Math.sign(height) * Math.abs(width / shapeRatio);
 
+            const opposite = event.downPoint.add(new paper.Point(w0, h0));
             finalBounds = new paper.Rectangle(
-                event.downPoint,
-                event.downPoint.add(new paper.Point(w0, h0))
+                new paper.Point(
+                    Math.min(event.downPoint.x, opposite.x),
+                    Math.min(event.downPoint.y, opposite.y)
+                ),
+                new paper.Point(
+                    Math.max(event.downPoint.x, opposite.x),
+                    Math.max(event.downPoint.y, opposite.y)
+                )
             );
         }
 

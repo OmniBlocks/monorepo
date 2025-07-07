@@ -100,24 +100,28 @@ class SussyTool extends paper.Tool {
         if (this.sussy) this.sussy.remove();
 
         const rawBounds = new paper.Rectangle(event.downPoint, event.point);
-        const path = selectablePaths[this.shape];
-        this.sussy = new paper.CompoundPath(path);
+        const pathData = selectablePaths[this.shape];
+        this.sussy = new paper.CompoundPath(pathData);
+
+        const shapeBounds = this.sussy.bounds.clone();
+        const shapeRatio = shapeBounds.width / shapeBounds.height;
+        let finalBounds = rawBounds;
 
         if (event.modifiers.shift) {
-            // maintain aspect ratio of shape
-            const aspect = this.sussy.bounds.width / this.sussy.bounds.height;
-            let { width, height } = rawBounds.size.width;
+            const { width, height } = rawBounds.size;
+            let w0 = width, h0 = height;
 
-            if (Math.abs(width / height) > aspect) width = Math.sign(width) * Math.abs(height * aspect);
-            else height = Math.sign(height) * Math.abs(width / aspect);
+            // adjust to keep aspect ratio
+            if (width / height > shapeRatio) w0 = Math.sign(width) * Math.abs(height * shapeRatio);
+            else h0 = Math.sign(height) * Math.abs(width / shapeRatio);
 
-            const fixedSize = new paper.Size(width, height);
-            const fixedBounds = new paper.Rectangle(event.downPoint, event.downPoint.add(fixedSize));
-            this.sussy.bounds = fixedBounds;
-        } else {
-            this.sussy.bounds = rawBounds;
+            finalBounds = new paper.Rectangle(
+                event.downPoint,
+                event.downPoint.add(new paper.Point(w0, h0))
+            );
         }
 
+        this.sussy.bounds = finalBounds;
         if (event.modifiers.alt) this.sussy.position = event.downPoint;
         else this.sussy.position = this.sussy.bounds.center;
 

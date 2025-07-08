@@ -440,6 +440,26 @@ const getTrimmedRaster = function (shouldInsert) {
     return trimmedRaster;
 };
 
+/**
+ * @returns {string} css for directions to custom fonts, used by <style> in 'convertToBitmap'
+ */
+const generateCustomFontsCSS = function() {
+  if (!ReduxStore) return '';
+  const fonts = ReduxStore.getState().scratchPaint.customFonts.filter(f => !f.system);
+
+  let fontCSS = '';
+  for (const font of fonts) {
+    const base64 = btoa(String.fromCharCode.apply(null, font.data));
+    fontCSS += "@font-face {\n";
+    fontCSS += `font-family: "${font.name}";\n`;
+    fontCSS += `src: url('data:font/${font.format};base64,${base64}') format('${font.format}');\n`;
+    fontCSS += `font-display: block;\n`;
+    fontCSS += "}\n";
+  }
+
+  return fontCSS;
+};
+
 const convertToBitmap = function (clearSelectedItems, onUpdateImage, optFontInlineFn) {
     // @todo if the active layer contains only rasters, drawing them directly to the raster layer
     // would be more efficient.
@@ -455,9 +475,26 @@ const convertToBitmap = function (clearSelectedItems, onUpdateImage, optFontInli
     });
     showGuideLayers(guideLayers);
 
+    svg.setAttribute('shape-rendering', 'crispEdges');
+
     // Get rid of anti-aliasing
     // @todo get crisp text https://github.com/LLK/scratch-paint/issues/508
-    svg.setAttribute('shape-rendering', 'crispEdges');
+    // sharkpool here -- this might fix/help it, not 100%
+    svg.setAttribute('text-rendering', 'geometricPrecision');
+
+    const customFontCSS = generateCustomFontsCSS();
+    if (customFontCSS) {
+        let defs = svg.querySelector('defs');
+        if (!defs) {
+            defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+            svg.insertBefore(defs, svg.firstChild);
+        }
+
+        const style = document.createElementNS('http://www.w3.org/2000/svg', 'style');
+        style.setAttribute('type', 'text/css');
+        style.innerHTML = customFontCSS;
+        defs.appendChild(style);
+    }
 
     let svgString = (new XMLSerializer()).serializeToString(svg);
     if (optFontInlineFn) {

@@ -444,20 +444,26 @@ const getTrimmedRaster = function (shouldInsert) {
  * @returns {string} css for directions to custom fonts, used by <style> in 'convertToBitmap'
  */
 const generateCustomFontsCSS = function() {
-  if (!ReduxStore) return '';
-  const fonts = ReduxStore.getState().scratchPaint.customFonts.filter(f => !f.system);
+    if (!ReduxStore) return '';
+    const fonts = ReduxStore.getState().scratchPaint.customFonts.filter(f => !f.system);
 
-  let fontCSS = '';
-  for (const font of fonts) {
-    const base64 = btoa(String.fromCharCode.apply(null, font.data));
-    fontCSS += "@font-face {\n";
-    fontCSS += `font-family: "${font.name}";\n`;
-    fontCSS += `src: url('data:font/${font.format};base64,${base64}') format('${font.format}');\n`;
-    fontCSS += `font-display: block;\n`;
-    fontCSS += "}\n";
-  }
+    let fontCSS = '';
+    for (const font of fonts) {
+        const base64 = btoa(String.fromCharCode.apply(null, font.data));
 
-  return fontCSS;
+        // normalize format for browser compatibility
+        let format = font.format.toLowerCase();
+        if (format === 'otf') format = 'opentype';
+        if (format === 'ttf') format = 'truetype';
+
+        fontCSS += "@font-face {\n";
+        fontCSS += `font-family: "${font.name}";\n`;
+        fontCSS += `src: url('data:font/${format};base64,${base64}') format('${format}');\n`;
+        fontCSS += `font-display: block;\n`;
+        fontCSS += "}\n";
+    }
+
+    return fontCSS;
 };
 
 const convertToBitmap = function (clearSelectedItems, onUpdateImage, optFontInlineFn) {

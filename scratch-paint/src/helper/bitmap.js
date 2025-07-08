@@ -441,6 +441,20 @@ const getTrimmedRaster = function (shouldInsert) {
 };
 
 /**
+ * @param {uint8array} uint8 uint8array
+ * @returns {string} base64 data
+ */
+const uint8ToBase64 = function(uint8) {
+    let binary = '';
+    const chunkSize = 0x8000;
+    for (let i = 0; i < uint8.length; i += chunkSize) {
+        const chunk = uint8.subarray(i, i + chunkSize);
+        binary += String.fromCharCode.apply(null, chunk);
+    }
+    return btoa(binary);
+}
+
+/**
  * @returns {string} css for directions to custom fonts, used by <style> in 'convertToBitmap'
  */
 const generateCustomFontsCSS = function() {
@@ -449,7 +463,7 @@ const generateCustomFontsCSS = function() {
 
     let fontCSS = '';
     for (const font of fonts) {
-        const base64 = btoa(String.fromCharCode.apply(null, font.data));
+        const base64 = uint8ToBase64(font.data);
 
         // normalize format for browser compatibility
         let format = font.format.toLowerCase();

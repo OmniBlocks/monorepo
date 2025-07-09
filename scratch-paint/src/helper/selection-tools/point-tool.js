@@ -129,11 +129,13 @@ class PointTool {
 
             let constrainedDelta = delta;
             if (event.modifiers.shift) {
-                // horizontal movement only
-                constrainedDelta = new paper.Point(delta.x, 0);
-            } else if (event.modifiers.control || event.modifiers.meta) {
+                seg.point = seg.origPoint.add(snapDeltaToAngle(dragVector, Math.PI / 4));
+            } else if (event.modifiers.alt) {
                 // vertical movement only
                 constrainedDelta = new paper.Point(0, delta.y);
+            } else if (event.modifiers.control || event.modifiers.meta) {
+                // horizontal movement only
+                constrainedDelta = new paper.Point(delta.x, 0);
             }
             seg.point = seg.point.add(constrainedDelta);
         }

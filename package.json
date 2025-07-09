@@ -44,7 +44,7 @@
     "react-style-proptype": "^3",
     "react-tooltip": "^3",
     "redux": "^3",
-    "scratch-render-fonts": "https://github.com/PenguinMod/penguinmod-render-fonts.git"
+    "scratch-render-fonts": "github:PenguinMod/penguinmod-render-fonts#master"
   },
   "devDependencies": {
     "autoprefixer": "9.7.4",

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel='shortcut icon' type='image/x-icon' href='./favicon.ico' />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<meta name="theme-color" content="#ad7760"/>
+	<meta property="og:image" content="/icon_maskable_192.png" />
+	<meta name="description" content="JukeBox is a mod of Slarmoo's Box that aims to add a crap ton of presets." />
+	<script>
+		function linkTo(update) {
+			window.history.replaceState(null, "", location.pathname + "#" + update);
+			navigator.clipboard.writeText(window.location).then(() => {
+				const popup = document.getElementById("popup");
+				popup.classList.add("show");
+				setTimeout(() => {
+					popup.classList.remove("show");
+				}, 2000);
+			});
+		}
+	</script>
+	<title>JukeBox Patch Notes</title>
+    <style type="text/css">
+
+        html {
+            background: var(--page-margin, #020009);
+            overflow-x: hidden;
+            font-size: large;
+            font-family: 'B612', sans-serif;
+            line-height: 1.3;
+            color: var(--primary-text, white);
+        }
+
+		body {
+			max-width: 1100px;
+			margin: auto;
+			padding: 1rem;
+		}
+
+        h1 {
+            font-size: 1.7rem;
+            text-align: center;
+            margin-top: 0.5em;
+            margin-bottom: 0.5em;
+            -webkit-text-stroke-width: 0;
+        }
+
+		h2 {
+			border-top: 2px solid #808080;
+			padding-top: 1rem;
+			margin-top: 2rem;
+			font-size: 1.5rem;
+		}
+
+		h3 {
+            font-size: 1.2rem;
+            margin-top: 0.5em;
+            margin-bottom: 0.5em;
+            -webkit-text-stroke-width: 0;
+        }
+
+        a {
+            color: var(--link-accent, #98f);
+        }
+		button {
+			margin-top: 15px;
+			padding: 10px 15px;
+			border: 0;
+			border-radius: 100px;
+			background-color: #d7a481;
+			color: #020009;
+			font-weight: Bold;
+			transition: all 0.5s;
+			-webkit-transition: all 0.5s;
+		}
+
+		button:hover {
+			background-color: #dbaa89;
+			box-shadow: 0 0 20px #fff57050;
+			transform: scale(1.1);
+		}
+
+		button:active {
+			background-color: #af876c;
+			transition: all 0.25s;
+			-webkit-transition: all 0.25s;
+			box-shadow: none;
+			transform: scale(0.98);
+		}
+
+		@media (min-width: 1100px) {
+			body {
+				width: 1100px;
+			}
+			h2 {
+				width: 1100px;
+				align-items: start;
+				align-content: start;
+				border-top: #808080 solid 2px;
+				border-radius: 2px;
+				padding-top: 32px;
+			}
+		}
+		p {
+			font-size: 0.8rem;
+			color: #9C9BA3;
+		}
+		.backbuttondiv {
+			display: flex;
+			justify-content: center;
+			width: 100%;
+		}
+		.headertext{
+			color: #ad7760;
+			width: 100%;
+		}
+
+
+		a {
+			color: var(--link-accent, #ad7760);
+		}
+
+		a.link {
+			color: var(--secondary-text, rgb(193, 193, 193));
+			margin-left: 8px;
+		}
+
+		a.link:hover {
+			color: var(--secondary-text, rgb(233, 233, 233));
+		}
+
+		#popup {
+			position: fixed;
+			bottom: 20px;
+			left: 20px;
+			background-color: #78c25a;
+			color: white;
+			margin-top: 15px;
+			padding: 10px 15px;
+			font-weight: bold;
+			border-radius: 4px;
+			opacity: 0;
+			transform: translateX(-100%);
+			transition: all 0.5s ease;
+			pointer-events: none;
+			z-index: 1000;
+		}
+
+
+		#popup.show {
+			opacity: 1;
+			transform: translateX(0);
+			pointer-events: auto;
+		}
+
+
+	</style>
+</head>
+<body>
+
+<div class="backbuttondiv"><button class="backbutton" onclick="history.back()">Go Back</button></div>
+<h1> <span class="headertext"> Patch Notes (in reverse chronological order)</span> </h1>
+
+<article id="0.1a">
+	<h2>Version 0.0.1 | the website exists now! (wo)<a class="link" onclick="linkTo('0.0.1')" title="Copy link">⎋</a></h2>
+    <h3>Actually New And Cool Things:</h3>
+    <ul>  
+		<li>57 new presets</li>
+        <li>“double octave” and “triple octave” unison types</li>
+        <li>in the “edit custom scale” menu, the order of the note has been flipped vertically to better reflect the music sheet</li>
+	</ul>
+    <h3>Changes to max values:</h3>
+    <ul>  
+		<li>max tempo: 500 -> 2000</li>
+        <li>bar count max: 1024 -> 4096 (it refused to go higher without imploding)</li>
+	</ul>
+    <h3>Ports:</h3>
+    <ul>  
+		<li>instuments from MidBox, AbyssBox, SandBox, Lemmbox, VoxBox, TodBox, BlackBox, and ModBox</li>
+        <li>MidBox Unison Types</li>
+        <li>LemonLime's patch notes</li>
+	</ul>
+    <h3>Minor Things:</h3>
+    <ul>  
+		<li>Default theme is now violet verdant</li>
+        <li>“show all channels” is now on by default</li>
+        <li>“long” layout is now default</li>
+        <li>New theme category: “objectively the best ones”</li>
+        <li>unison types have been reorganized</li>
+	</ul>
+
+	<p class="date">07/21/2025</p>
+</article>
+
+<div id="popup">Link to patch note is now copied!</div>
+
+</body>
+</html>

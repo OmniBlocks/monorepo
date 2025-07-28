@@ -10646,15 +10646,20 @@ export class Synth {
 
     public synthesize(outputDataL: Float32Array, outputDataR: Float32Array, outputBufferLength: number, playSong: boolean = true): void {
         if (this.song == null) {
-            for (let i: number = 0; i < outputBufferLength; i++) {
-                outputDataL[i] = 0.0;
-                outputDataR[i] = 0.0;
-            }
+            outputDataL.fill(0.0);
+            outputDataR.fill(0.0);
             this.deactivateAudio();
             return;
         }
-        this.outputDataLUnfiltered = new Float32Array(outputBufferLength);
-        this.outputDataRUnfiltered = new Float32Array(outputBufferLength);
+
+        //clear the unfiltered (not affected by song eq) output
+        if (this.outputDataLUnfiltered == null || this.outputDataLUnfiltered.length < outputBufferLength) {
+            this.outputDataLUnfiltered = new Float32Array(outputBufferLength);
+            this.outputDataRUnfiltered = new Float32Array(outputBufferLength);
+        } else {
+            this.outputDataLUnfiltered.fill(0.0);
+            this.outputDataRUnfiltered!.fill(0.0);
+        }
         
         const song: Song = this.song;
         this.song.inVolumeCap = 0.0 // Reset volume cap for this run

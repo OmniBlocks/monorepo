@@ -19057,15 +19057,19 @@ var beepbox = (function (exports) {
         }
         synthesize(outputDataL, outputDataR, outputBufferLength, playSong = true) {
             if (this.song == null) {
-                for (let i = 0; i < outputBufferLength; i++) {
-                    outputDataL[i] = 0.0;
-                    outputDataR[i] = 0.0;
-                }
+                outputDataL.fill(0.0);
+                outputDataR.fill(0.0);
                 this.deactivateAudio();
                 return;
             }
-            this.outputDataLUnfiltered = new Float32Array(outputBufferLength);
-            this.outputDataRUnfiltered = new Float32Array(outputBufferLength);
+            if (this.outputDataLUnfiltered == null || this.outputDataLUnfiltered.length < outputBufferLength) {
+                this.outputDataLUnfiltered = new Float32Array(outputBufferLength);
+                this.outputDataRUnfiltered = new Float32Array(outputBufferLength);
+            }
+            else {
+                this.outputDataLUnfiltered.fill(0.0);
+                this.outputDataRUnfiltered.fill(0.0);
+            }
             const song = this.song;
             this.song.inVolumeCap = 0.0;
             this.song.outVolumeCap = 0.0;

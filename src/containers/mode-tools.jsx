@@ -299,7 +299,7 @@ class ModeTools extends React.Component {
         const manager = window.vm ? window.vm.runtime.fontManager : undefined;
         if (!manager) return undefined;
 
-        const customCheck = manager.fonts.find(f => !f.system && fontName === f.family);
+        const customCheck = manager.fonts.find(f => !f.system && f.family.includes(fontName));
         if (customCheck) return customCheck.asset.encodeDataURI();
         else {
             // could be a default font
@@ -310,7 +310,7 @@ class ModeTools extends React.Component {
                     if (rule.type === CSSRule.FONT_FACE_RULE) {
                         const name = rule.style.getPropertyValue("font-family").replace(/["']/g, "").trim();
                         this._defaultCache[name] = rule.style.getPropertyValue("src")
-                            .replace("url(\"", "").replace(")", "");
+                            .replace("url(\"", "").replace("\")", "");
                     }
                 }
             }

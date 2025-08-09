@@ -299,7 +299,7 @@ class ModeTools extends React.Component {
         const manager = window.vm ? window.vm.runtime.fontManager : undefined;
         if (!manager) return undefined;
 
-        const customCheck = manager.fonts.find(f => !f.system && f.family.includes(fontName));
+        const customCheck = manager.fonts.find(f => !f.system && fontName.includes(f.family));
         if (customCheck) return customCheck.asset.encodeDataURI();
         else {
             // could be a default font

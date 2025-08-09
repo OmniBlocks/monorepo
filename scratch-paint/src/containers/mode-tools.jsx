@@ -49,6 +49,10 @@ class ModeTools extends React.Component {
             'handleRoundLineJoin',
             'handleBevelLineJoin'
         ]);
+
+        // defined when merging shapes
+        // stores urls for default fonts
+        this._defaultCache = undefined;
     }
     _getSelectedUncurvedPoints () {
         const items = [];
@@ -291,7 +295,6 @@ class ModeTools extends React.Component {
         utility funcs for 'handleMergeShape'
         convert text nodes to paths to allow merging
     */
-    this._defaultCache = undefined;
     extractFontURL(fontName) {
         const manager = window.vm ? window.vm.runtime.fontManager : undefined;
         if (!manager) return undefined;

@@ -22,6 +22,7 @@ import {getRaster} from '../helper/layer';
 import {flipBitmapHorizontal, flipBitmapVertical, selectAllBitmap} from '../helper/bitmap';
 import Formats, {isBitmap} from '../lib/format';
 import Modes from '../lib/modes';
+import opentype from 'opentype.js';
 
 class ModeTools extends React.Component {
     constructor (props) {
@@ -286,41 +287,88 @@ class ModeTools extends React.Component {
         }
     }
 
-    handleMergeShape (specificOperation) {
+    /*
+        utility funcs for 'handleMergeShape'
+        convert text nodes to paths to allow merging
+    */
+    this._defaultCache = undefined;
+    extractFontURL(fontName) {
+        const manager = window.vm ? window.vm.runtime.fontManager : undefined;
+        if (!manager) return undefined;
+
+        const customCheck = manager.fonts.find(f => !f.system && fontName === f.family);
+        if (customCheck) return customCheck.asset.encodeDataURI();
+        else {
+            // could be a default font
+            if (!this._defaultCache) {
+                const defaultFontsCss = document.querySelector(`style[id="scratch-font-styles"]`).sheet;
+                this._defaultCache = {};
+                for (const rule of defaultFontsCss.cssRules) {
+                    if (rule.type === CSSRule.FONT_FACE_RULE) {
+                        const name = rule.style.getPropertyValue("font-family").replace(/["']/g, "").trim();
+                        this._defaultCache[name] = rule.style.getPropertyValue("src")
+                            .replace("url(\"", "").replace(")", "");
+                    }
+                }
+            }
+
+            if (this._defaultCache[fontName]) return this._defaultCache[fontName];
+            else return undefined;
+        }
+    }
+
+    convertText2Path (textNode) {
+        const fontURL = extractFontURL(textNode.font);
+        return new Promise((resolve) => {
+            opentype.load(fontURL, (err, font) => {
+                if (err) {
+                    console.warn("Font merge load error:", err);
+                    resolve(undefined);
+                    return;
+                }
+
+                const pathData = font.getPath(
+                    textNode.content, 0, 0,
+                    textNode.fontSize || 16
+                ).toPathData();
+
+                const compound = new paper.CompoundPath(pathData);
+                compound.fillColor = this.fillColor || "black";
+                compound.matrix = textNode.matrix.clone();
+                resolve(compound);
+            });
+        });
+    }
+
+    async handleMergeShape (specificOperation) {
         const selectedItems = getSelectedRootItems();
         if (selectedItems.length < 2) {
             // If nothing or not enough items are selected,
             // we probably shouldnt select and merge everything
             return;
         }
-        if (!selectedItems[0].unite) {
+
+        // Convert text items to paths
+        for (let i = 0; i < selectedItems.length; i++) {
+            if (selectedItems[i].className === "PointText") {
+                const path = await this.convertText2Path(selectedItems[i]);
+                if (path) selectedItems[i] = path;
+            }
+        }
+
+        const topItem = selectedItems[0];
+        if (topItem.className !== "PointText" && !topItem.unite) {
             // we cant unite this item, cancel
             return;
         }
-        const results = [];
+
+        if (typeof specificOperation !== "string") specificOperation = "unite";
+
         // unite the shapes together, creating a clone on top of the original
-        if (typeof specificOperation === "string") {
-            let idx = 0;
-            selectedItems.forEach(item => {
-                if (idx === 0) {
-                    idx++;
-                    return;
-                }
-                const result = selectedItems[0][specificOperation](item);
-                results.push(result);
-                idx++;
-            });
-        } else {
-            let idx = 0;
-            selectedItems.forEach(item => {
-                if (idx === 0) {
-                    idx++;
-                    return;
-                }
-                const result = selectedItems[0].unite(item);
-                results.push(result);
-                idx++;
-            });
+        const results = [];
+        for (let i = 1; i < selectedItems.length; i++) {
+            const result = topItem[specificOperation](selectedItems[i]);
+            results.push(result);
         }
 
         if (results.length <= 1) {

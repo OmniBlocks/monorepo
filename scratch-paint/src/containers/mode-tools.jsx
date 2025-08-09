@@ -321,7 +321,7 @@ class ModeTools extends React.Component {
     }
 
     convertText2Path (textNode) {
-        const fontURL = extractFontURL(textNode.font);
+        const fontURL = this.extractFontURL(textNode.font);
         return new Promise((resolve) => {
             opentype.load(fontURL, (err, font) => {
                 if (err) {

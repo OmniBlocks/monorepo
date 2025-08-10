@@ -215,7 +215,7 @@ const ModeToolsComponent = props => {
                         />
                         
                         {hasSimplifyOption && (
-                            <Label text={props.intl.formatMessage(messages.brushSimplify)}>
+                            <Label text={props.intl.formatMessage(messages.brushSimplify)} style={{ marginLeft: 'calc(2 * .25rem)' }}>
                                 <LiveInput
                                     range
                                     small
@@ -262,7 +262,7 @@ const ModeToolsComponent = props => {
                         />
 
                         {hasSimplifyOption && (
-                            <Label text={props.intl.formatMessage(messages.eraserSimplify)}>
+                            <Label text={props.intl.formatMessage(messages.eraserSimplify)} style={{ marginLeft: 'calc(2 * .25rem)' }}>
                                 <LiveInput
                                     range
                                     small
@@ -419,7 +419,7 @@ const ModeToolsComponent = props => {
                 const changeFunctionSimplify = props.onPenSimplifySliderChange;
                 return (
                     <div className={classNames(props.className, styles.modeTools)}>
-                        <Label text={props.intl.formatMessage(messages.eraserSimplify)}>
+                        <Label text={props.intl.formatMessage(messages.eraserSimplify)} style={{ marginLeft: 'calc(2 * .25rem)' }}>
                             <LiveInput
                                 range
                                 small

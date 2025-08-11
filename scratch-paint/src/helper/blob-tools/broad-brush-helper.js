@@ -89,8 +89,8 @@ class BroadBrushHelper {
             const handleVec = event.delta.normalize(options.brushSize / 2);
             this.finalPath.add(new paper.Segment(
                 this.lastPoint.subtract(handleVec),
-                if (!window.test) handleVec.rotate(-90),
-                if (!window.test) handleVec.rotate(90)
+                window.test ? handleVec : handleVec.rotate(-90),
+                window.test ? handleVec : handleVec.rotate(90)
             ));
             styleBlob(this.finalPath, options);
             this.finalPath.insert(0, new paper.Segment(this.lastPoint.subtract(step)));
@@ -222,8 +222,8 @@ class BroadBrushHelper {
         const handleVec = delta.normalize(options.brushSize / 2);
         this.finalPath.add(new paper.Segment(
             event.point.add(handleVec),
-            handleVec.rotate(90),
-            handleVec.rotate(-90)
+            window.test ? handleVec : handleVec.rotate(90),
+            window.test ? handleVec : handleVec.rotate(-90)
         ));
         this.finalPath.closePath();
 

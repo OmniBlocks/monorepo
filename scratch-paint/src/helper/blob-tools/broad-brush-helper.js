@@ -37,7 +37,8 @@ class BroadBrushHelper {
         this.smoothed = 0;
         this.lastVec = null;
         const size = options.brushSize / 2;
-        if (window.test) {
+        if (window.toggleBrushTest) {
+            // TODO fix this so big brush sizes dont look circular
             tool.minDistance = Math.max(1, (size / paper.view.zoom) / 2);
             tool.maxDistance = options.brushSize;
         } else {
@@ -46,7 +47,7 @@ class BroadBrushHelper {
         }
         if (event.event.button > 0) return; // only first mouse button
 
-        this.finalPath = window.test ? new paper.Path.Rectangle(
+        this.finalPath = window.toggleBrushTest ? new paper.Path.Rectangle(
             new paper.Rectangle(
                 new paper.Point(event.point.x - size, event.point.y - size),
                 new paper.Point(event.point.x + size, event.point.y + size)
@@ -72,7 +73,7 @@ class BroadBrushHelper {
         }
         const point = this.lastPoint.add(delta);
 
-        if (window.test) this.squareHandler({ point, delta }, tool, options);
+        if (window.toggleBrushTest) this.squareHandler({ point, delta }, tool, options);
         else this.roundHandler({ point, delta }, tool, options);
     }
     // square brush
@@ -248,7 +249,7 @@ class BroadBrushHelper {
         }
 
         // no need for normalization with the square brush
-        if (window.test) {
+        if (window.toggleBrushTest) {
             if (options.simplifySize > 0) this.simplify(options.simplifySize);
             return this.finalPath;
         }

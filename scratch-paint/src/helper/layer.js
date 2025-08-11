@@ -40,7 +40,7 @@ const clearRaster = function () {
     
     // Generate blank raster
     const raster = new paper.Raster(createCanvas());
-    raster.canvas.getContext('2d').imageSmoothingEnabled = false;
+    raster.canvas.getContext('2d', { willReadFrequently: true }).imageSmoothingEnabled = false;
     raster.parent = layer;
     raster.guide = true;
     raster.locked = true;

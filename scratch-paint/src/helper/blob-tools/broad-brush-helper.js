@@ -38,7 +38,7 @@ class BroadBrushHelper {
         this.lastVec = null;
         const size = options.brushSize / 2;
         if (window.test) {
-            tool.minDistance = size;
+            tool.minDistance = Math.max(1, (size / paper.view.zoom) / 2);
             tool.maxDistance = options.brushSize;
         } else {
             tool.minDistance = Math.min(5, Math.max(2 / paper.view.zoom, size));

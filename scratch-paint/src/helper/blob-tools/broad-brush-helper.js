@@ -242,6 +242,8 @@ class BroadBrushHelper {
             return this.finalPath;
         }
 
+        // no need for normalization with the square brush
+        if (window.test) return;
         let delta = this.lastVec;
 
         // If the mouse up is at the same point as the mouse drag event then we need

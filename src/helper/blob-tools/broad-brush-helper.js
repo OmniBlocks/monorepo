@@ -39,7 +39,7 @@ class BroadBrushHelper {
         tool.maxDistance = options.brushSize;
         if (event.event.button > 0) return; // only first mouse button
 
-        this.finalPath = window.test ? window.test(event.point, options.brushSize) : new paper.Path.Circle({
+        this.finalPath = window.test ? window.test(event.point, options.brushSize, 0) : new paper.Path.Circle({
             center: event.point,
             radius: options.brushSize / 2
         });
@@ -62,14 +62,14 @@ class BroadBrushHelper {
 
                 // If the angle is large, the broad brush tends to leave behind a flat edge.
                 // This code makes a shape to fill in that flat edge with a rounded cap.
-                const circ = window.test ? window.test(this.lastPoint, options.brushSize) : new paper.Path.Circle(this.lastPoint, options.brushSize / 2);
+                const circ = window.test ? window.test(this.lastPoint, options.brushSize, angle) : new paper.Path.Circle(this.lastPoint, options.brushSize / 2);
                 circ.fillColor = options.fillColor;
                 const rect = new paper.Path.Rectangle(
                     this.lastPoint.subtract(new paper.Point(-options.brushSize / 2, 0)),
                     this.lastPoint.subtract(new paper.Point(options.brushSize / 2, this.lastVec.length))
                 );
                 rect.fillColor = options.fillColor;
-                if (!window.test) rect.rotate(this.lastVec.angle - 90, this.lastPoint);
+                if (!window.test) rect.rotate(this.lastVec.angle - 90, this.lastPoint, angle);
                 const rect2 = new paper.Path.Rectangle(
                     event.point.subtract(new paper.Point(-options.brushSize / 2, 0)),
                     event.point.subtract(new paper.Point(options.brushSize / 2, event.delta.length))

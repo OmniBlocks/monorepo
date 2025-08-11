@@ -23,7 +23,7 @@ const createMaskingCanvas = (originalContext, fillStyle) => {
     }
     if (doesColorRequireMask(fillStyle)) {
         const tempCanvas = createCanvas(originalCanvas.width, originalCanvas.height);
-        const tempContext = tempCanvas.getContext('2d');
+        const tempContext = tempCanvas.getContext('2d', { willReadFrequently: true });
         return {
             context: tempContext,
             unmask: () => {
@@ -242,7 +242,7 @@ const getBrushMark = function (size, color, isEraser) {
     const roundedUpRadius = Math.ceil(size / 2);
     canvas.width = roundedUpRadius * 2;
     canvas.height = roundedUpRadius * 2;
-    const {context, unmask} = createMaskingCanvas(canvas.getContext('2d'), isEraser ? 'white' : color);
+    const {context, unmask} = createMaskingCanvas(canvas.getContext('2d', { willReadFrequently: true }), isEraser ? 'white' : color);
     context.imageSmoothingEnabled = false;
     // Small squares for pixel artists
     if (size <= 5) {
@@ -654,7 +654,7 @@ const fillStyleToColor_ = function (fillStyleString) {
     const tmpCanvas = document.createElement('canvas');
     tmpCanvas.width = 1;
     tmpCanvas.height = 1;
-    const context = tmpCanvas.getContext('2d');
+    const context = tmpCanvas.getContext('2d', { willReadFrequently: true });
     context.fillStyle = fillStyleString;
     context.fillRect(0, 0, 1, 1);
     return context.getImageData(0, 0, 1, 1).data;

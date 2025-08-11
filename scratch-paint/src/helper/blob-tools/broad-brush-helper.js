@@ -37,8 +37,13 @@ class BroadBrushHelper {
         this.smoothed = 0;
         this.lastVec = null;
         const size = options.brushSize / 2;
-        tool.minDistance = Math.min(5, Math.max(2 / paper.view.zoom, size));
-        tool.maxDistance = options.brushSize;
+        if (window.test) {
+            tool.minDistance = size;
+            tool.maxDistance = options.brushSize;
+        } else {
+            tool.minDistance = Math.min(5, Math.max(2 / paper.view.zoom, size));
+            tool.maxDistance = options.brushSize;
+        }
         if (event.event.button > 0) return; // only first mouse button
 
         this.finalPath = window.test ? new paper.Path.Rectangle(

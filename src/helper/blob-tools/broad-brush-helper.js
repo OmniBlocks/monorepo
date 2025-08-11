@@ -62,7 +62,7 @@ class BroadBrushHelper {
 
                 // If the angle is large, the broad brush tends to leave behind a flat edge.
                 // This code makes a shape to fill in that flat edge with a rounded cap.
-                const circ = new paper.Path.Circle(this.lastPoint, options.brushSize / 2);
+                const circ = window.test ? window.test(this.lastPoint, options.brushSize) : new paper.Path.Circle(this.lastPoint, options.brushSize / 2);
                 circ.fillColor = options.fillColor;
                 const rect = new paper.Path.Rectangle(
                     this.lastPoint.subtract(new paper.Point(-options.brushSize / 2, 0)),

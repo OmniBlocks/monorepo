@@ -532,7 +532,7 @@ const ModeToolsComponent = props => {
         case Modes.BIT_SELECT:
         /* falls through */
         case Modes.SELECT:
-            const reshapingMethods = (
+            const reshapingMethods = props.format.startsWith("BITMAP") ? null : (
                 <InputGroup className={classNames(styles.modDashedBorder, styles.modLabeledIconHeight)}>
                     <LabeledIconButton
                         hideLabel={hideLabel(props.intl.locale)}

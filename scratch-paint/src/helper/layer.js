@@ -30,7 +30,7 @@ const createCanvas = function (width, height) {
     const canvas = document.createElement('canvas');
     canvas.width = width ? width : ART_BOARD_WIDTH;
     canvas.height = height ? height : ART_BOARD_HEIGHT;
-    canvas.getContext('2d').imageSmoothingEnabled = false;
+    canvas.getContext('2d', { willReadFrequently: true }).imageSmoothingEnabled = false;
     return canvas;
 };
 

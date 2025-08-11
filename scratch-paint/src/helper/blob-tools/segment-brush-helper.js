@@ -38,7 +38,20 @@ class SegmentBrushHelper {
     onSegmentMouseDrag (event, tool, options) {
         if (event.event.button > 0) return; // only first mouse button
 
-        const step = (event.delta).normalize(options.brushSize / 2);
+        let delta = event.delta;
+        if (event.modifiers.shift) {
+            // 45 degree movement
+            delta = snapDeltaToAngle(delta, Math.PI / 4);
+        } else if (event.modifiers.alt) {
+            // vertical movement
+            delta = new paper.Point(0, delta.y);
+        } else if (event.modifiers.control || event.modifiers.meta) {
+            // horizontal movement
+            delta = new paper.Point(delta.x, 0);
+        }
+        const point = this.lastPoint.add(delta);
+
+        const step = (delta).normalize(options.brushSize / 2);
         const handleVec = step.clone();
         handleVec.length = options.brushSize / 2;
         handleVec.angle += 90;
@@ -51,20 +64,20 @@ class SegmentBrushHelper {
         path.add(new paper.Segment(this.lastPoint.subtract(step), handleVec.multiply(-1), handleVec));
         step.angle += 90;
 
-        path.add(event.lastPoint.add(step));
-        path.insert(0, event.lastPoint.subtract(step));
-        path.add(event.point.add(step));
-        path.insert(0, event.point.subtract(step));
+        path.add(this.lastPoint.add(step));
+        path.insert(0, this.lastPoint.subtract(step));
+        path.add(point.add(step));
+        path.insert(0, point.subtract(step));
 
         // Add end cap
         step.angle -= 90;
-        path.add(new paper.Segment(event.point.add(step), handleVec, handleVec.multiply(-1)));
+        path.add(new paper.Segment(point.add(step), handleVec, handleVec.multiply(-1)));
         path.closed = true;
         // The unite function on curved paths does not always work (sometimes deletes half the path)
         // so we have to flatten.
         path.flatten(Math.min(5, options.brushSize / 5));
         
-        this.lastPoint = event.point;
+        this.lastPoint = point;
         const newPath = this.finalPath.unite(path);
         path.remove();
         this.finalPath.remove();

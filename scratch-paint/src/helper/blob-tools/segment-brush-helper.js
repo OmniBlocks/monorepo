@@ -1,5 +1,6 @@
 import paper from '@turbowarp/paper';
 import {styleBlob} from '../../helper/style-path';
+import {snapDeltaToAngle} from '../math';
 
 /**
  * Segment brush functions to add as listeners on the mouse. Call them when the corresponding mouse event happens

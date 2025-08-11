@@ -39,7 +39,7 @@ class BroadBrushHelper {
         tool.maxDistance = options.brushSize;
         if (event.event.button > 0) return; // only first mouse button
 
-        this.finalPath = new paper.Path.Circle({
+        this.finalPath = window.test ? window.test(event.point, options.brushSize) : new paper.Path.Circle({
             center: event.point,
             radius: options.brushSize / 2
         });
@@ -69,13 +69,13 @@ class BroadBrushHelper {
                     this.lastPoint.subtract(new paper.Point(options.brushSize / 2, this.lastVec.length))
                 );
                 rect.fillColor = options.fillColor;
-                rect.rotate(this.lastVec.angle - 90, this.lastPoint);
+                if (!window.test) rect.rotate(this.lastVec.angle - 90, this.lastPoint);
                 const rect2 = new paper.Path.Rectangle(
                     event.point.subtract(new paper.Point(-options.brushSize / 2, 0)),
                     event.point.subtract(new paper.Point(options.brushSize / 2, event.delta.length))
                 );
                 rect2.fillColor = options.fillColor;
-                rect2.rotate(step.angle - 90, event.point);
+                if (!window.test) rect2.rotate(step.angle - 90, event.point);
                 this.endCaps.push(this.union(circ, this.union(rect, rect2)));
             }
         }

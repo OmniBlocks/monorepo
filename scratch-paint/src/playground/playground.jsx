@@ -70,7 +70,7 @@ class Playground extends React.Component {
             // paint editor takes dataURI as input
             this.reusableCanvas.width = image.width;
             this.reusableCanvas.height = image.height;
-            const context = this.reusableCanvas.getContext('2d');
+            const context = this.reusableCanvas.getContext('2d', { willReadFrequently: true });
             context.putImageData(image, 0, 0);
             this.setState({
                 image: this.reusableCanvas.toDataURL('image/png'),

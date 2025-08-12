@@ -101,7 +101,7 @@ class Blobbiness {
             blob.resizeCursorIfNeeded(event.point);
             if (event.event.button > 0) return; // only first mouse button
             this.active = true;
-            console.log(this.brushShape, this.options);
+            console.log(this);
 
             if (blob.options.brushSize < Blobbiness.THRESHOLD) {
                 blob.brush = Blobbiness.BROAD;
@@ -163,6 +163,7 @@ class Blobbiness {
     }
 
     resizeCursorIfNeeded(point) {
+        console.log(this.brushShape, this.options);
         if (!this.options) {
             return;
         }
@@ -171,11 +172,11 @@ class Blobbiness {
         if (this.cursorPreview && !this.cursorPreview.parent) {
             this.cursorPreview = null;
         }
-        this.brushShape = this.options.brushType;
         if (this.cursorPreview &&
             this.brushSize === this.options.brushSize &&
             this.fillColor === this.options.fillColor &&
             this.strokeColor === this.options.strokeColor &&
+            this.brushShape === this.options.brushType &&
             this.cursorPreviewLastPoint.equals(point)) {
             return;
         }
@@ -200,6 +201,7 @@ class Blobbiness {
         this.brushSize = this.options.brushSize;
         this.fillColor = this.options.fillColor;
         this.strokeColor = this.options.strokeColor;
+        this.brushShape = this.options.brushType;
         styleCursorPreview(this.cursorPreview, this.options);
     }
 

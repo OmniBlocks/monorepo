@@ -181,10 +181,7 @@ class Blobbiness {
         }
 
         if (!this.cursorPreview) {
-            this.cursorPreview = window.toggleSquareTest ? new paper.Shape.Rectangle({
-                point: this.cursorPreviewLastPoint,
-                size: this.options.brushSize / 2
-            }) : new paper.Shape.Ellipse({
+            this.cursorPreview = new paper.Shape.Rectangle({
                 point: this.cursorPreviewLastPoint,
                 size: this.options.brushSize / 2
             });
@@ -193,7 +190,10 @@ class Blobbiness {
             setGuideItem(this.cursorPreview);
         }
         this.cursorPreview.position = this.cursorPreviewLastPoint;
-        this.cursorPreview.radius = this.options.brushSize / 2;
+        this.cursorPreview.size = new paper.Size(this.options.brushSize, this.options.brushSize);
+        if (window.toggleSquareTest) this.cursorPreview.radius = 0;
+        else this.cursorPreview.radius = this.options.brushSize / 2;
+
         this.brushSize = this.options.brushSize;
         this.fillColor = this.options.fillColor;
         this.strokeColor = this.options.strokeColor;

@@ -964,7 +964,7 @@ const mapDispatchToProps = dispatch => ({
     },
     onBrushChange: type => {
         dispatch(setBrushType(type));
-    }
+    },
     onPenSimplifySliderChange: eraserSize => {
         dispatch(changePenSimplifySize(eraserSize));
     },

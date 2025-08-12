@@ -248,11 +248,11 @@ const ModeToolsComponent = props => {
                                         className={
                                             classNames(
                                                 styles.buttonGroupButton,
-                                                { [styles.modNoEndBorder]: props.brushType === "SQUARE" }
+                                                { [styles.modNoEndBorder]: props.brushType !== "SQUARE" }
                                             )
                                         }
-                                        disabled={props.brushType === "SQUARE"}
-                                        onClick={props.onBrushChange}
+                                        disabled={props.brushType !== "SQUARE"}
+                                        onClick={() => props.onBrushChange("CIRCLE")}
                                     >
                                         <img
                                             alt={props.intl.formatMessage(messages.brushCircle)}
@@ -265,11 +265,11 @@ const ModeToolsComponent = props => {
                                         className={
                                             classNames(
                                                 styles.buttonGroupButton,
-                                                { [styles.modStartBorder]: props.brushType !== "SQUARE" }
+                                                { [styles.modStartBorder]: props.brushType === "SQUARE" }
                                             )
                                         }
-                                        disabled={props.brushType !== "SQUARE"}
-                                        onClick={props.onBrushChange}
+                                        disabled={props.brushType === "SQUARE"}
+                                        onClick={() => props.onBrushChange("SQUARE")}
                                     >
                                         <img
                                             alt={props.intl.formatMessage(messages.brushSquare)}

@@ -39,7 +39,7 @@ class BroadBrushHelper {
         const size = options.brushSize / 2;
         if (window.toggleBrushTest) {
             // TODO fix this so big brush sizes dont look circular
-            tool.minDistance = Math.max(1, (size / paper.view.zoom) / 2);
+            tool.minDistance = window.test(size, paper.view.zoom);
             tool.maxDistance = options.brushSize;
         } else {
             tool.minDistance = Math.min(5, Math.max(2 / paper.view.zoom, size));

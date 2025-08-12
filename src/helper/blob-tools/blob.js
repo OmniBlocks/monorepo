@@ -103,9 +103,11 @@ class Blobbiness {
 
             if (blob.options.brushSize < Blobbiness.THRESHOLD) {
                 blob.brush = Blobbiness.BROAD;
+                blob.broadBrushHelper.isSquareBrush = window.toggleSquareTest;
                 blob.broadBrushHelper.onBroadMouseDown(event, blob.tool, blob.options);
             } else {
                 blob.brush = Blobbiness.SEGMENT;
+                blob.segmentBrushHelper.isSquareBrush = window.toggleSquareTest;
                 blob.segmentBrushHelper.onSegmentMouseDown(event, blob.tool, blob.options);
             }
             blob.cursorPreview.bringToFront();

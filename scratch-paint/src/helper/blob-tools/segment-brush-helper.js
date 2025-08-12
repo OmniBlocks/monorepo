@@ -81,7 +81,9 @@ class SegmentBrushHelper {
         this.lastPoint = point;
         if (!this.finalPath) this.finalPath = square;
         else {
-            const merged = this.union(this.finalPath, square);
+            const merged = this.finalPath.unite(square);
+            this.finalPath.remove();
+            square.remove();
             this.finalPath = merged;
         }
     }

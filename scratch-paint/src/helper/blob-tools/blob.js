@@ -101,6 +101,7 @@ class Blobbiness {
             blob.resizeCursorIfNeeded(event.point);
             if (event.event.button > 0) return; // only first mouse button
             this.active = true;
+            console.log(this.brushShape, this.options);
 
             if (blob.options.brushSize < Blobbiness.THRESHOLD) {
                 blob.brush = Blobbiness.BROAD;

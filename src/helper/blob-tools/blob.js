@@ -181,7 +181,10 @@ class Blobbiness {
         }
 
         if (!this.cursorPreview) {
-            this.cursorPreview = new paper.Shape.Ellipse({
+            this.cursorPreview = window.toggleSquareTest ? new paper.Shape.Rectangle({
+                point: this.cursorPreviewLastPoint,
+                size: this.options.brushSize / 2
+            }) : new paper.Shape.Ellipse({
                 point: this.cursorPreviewLastPoint,
                 size: this.options.brushSize / 2
             });

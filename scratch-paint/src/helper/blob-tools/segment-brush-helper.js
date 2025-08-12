@@ -27,7 +27,7 @@ class SegmentBrushHelper {
 
         const size = options.brushSize / 2;
         if (this.isSquareBrush) {
-            tool.minDistance = window.test(size, paper.view.zoom);//Math.max(1, (size / paper.view.zoom) / 2);
+            tool.minDistance = options.brushSize / (paper.view.zoom / 2);
             tool.maxDistance = options.brushSize;
         } else {
             tool.minDistance = 2 / paper.view.zoom;

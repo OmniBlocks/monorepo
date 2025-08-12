@@ -251,7 +251,7 @@ class BroadBrushHelper {
 
         // no need for normalization with the square brush
         if (this.isSquareBrush) {
-            if (options.simplifySize > 0) this.simplify(options.simplifySize);
+            if (options.simplifySize > 0 && this.finalPath.segments) this.simplify(options.simplifySize);
             return this.finalPath;
         }
         let delta = this.lastVec;

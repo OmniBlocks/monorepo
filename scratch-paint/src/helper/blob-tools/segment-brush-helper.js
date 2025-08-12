@@ -86,7 +86,9 @@ class SegmentBrushHelper {
         }
     }
     // round brush
-    roundHandler(movement, tool, options)
+    roundHandler(movement, tool, options) {
+        const { delta, point } = movement;
+
         const step = (delta).normalize(options.brushSize / 2);
         const handleVec = step.clone();
         handleVec.length = options.brushSize / 2;

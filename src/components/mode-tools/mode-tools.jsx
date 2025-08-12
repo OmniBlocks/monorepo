@@ -329,7 +329,7 @@ const ModeToolsComponent = props => {
                                         className={
                                             classNames(styles.buttonGroupButton)
                                         }
-                                        onClick={props.onBrushChange}
+                                        onClick={() => props.onBrushChange("CIRCLE")}
                                     >
                                         <img
                                             alt={props.intl.formatMessage(messages.brushCircle)}
@@ -342,7 +342,7 @@ const ModeToolsComponent = props => {
                                         className={
                                             classNames(styles.buttonGroupButton)
                                         }
-                                        onClick={props.onBrushChange}
+                                        onClick={() => props.onBrushChange("SQUARE")}
                                     >
                                         <img
                                             alt={props.intl.formatMessage(messages.brushSquare)}

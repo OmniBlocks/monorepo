@@ -19,19 +19,31 @@ class SegmentBrushHelper {
     constructor () {
         this.lastPoint = null;
         this.finalPath = null;
-        this.firstCircle = null;
+        this.initialShape = null;
+        this.isSquareBrush = false;
     }
     onSegmentMouseDown (event, tool, options) {
         if (event.event.button > 0) return; // only first mouse button
 
-        tool.minDistance = 2 / paper.view.zoom;
-        tool.maxDistance = options.brushSize;
-        
-        this.firstCircle = new paper.Path.Circle({
+        if (this.isSquareBrush) {
+            tool.minDistance = window.test(size, paper.view.zoom);//Math.max(1, (size / paper.view.zoom) / 2);
+            tool.maxDistance = options.brushSize;
+        } else {
+            tool.minDistance = 2 / paper.view.zoom;
+            tool.maxDistance = options.brushSize;
+        }
+
+        const size = options.brushSize / 2;
+        this.initialShape = this.isSquareBrush ? new paper.Path.Rectangle(
+            new paper.Rectangle(
+                new paper.Point(event.point.x - size, event.point.y - size),
+                new paper.Point(event.point.x + size, event.point.y + size)
+            )) : new paper.Path.Circle({
             center: event.point,
-            radius: options.brushSize / 2
+            radius: size
         });
-        this.finalPath = this.firstCircle;
+
+        this.finalPath = this.initialShape;
         styleBlob(this.finalPath, options);
         this.lastPoint = event.point;
     }
@@ -52,6 +64,29 @@ class SegmentBrushHelper {
         }
         const point = this.lastPoint.add(delta);
 
+        if (this.isSquareBrush) this.squareHandler({ point, delta }, tool, options);
+        else this.roundHandler({ point, delta }, tool, options);
+    }
+    // square brush
+    squareHandler (movement, tool, options) {
+        const { delta, point } = movement;
+
+        const size = options.brushSize / 2;
+        const square = new paper.Path.Rectangle(new paper.Rectangle(
+            new paper.Point(point.x - size, point.y - size),
+            new paper.Point(point.x + size, point.y + size)
+        ));
+
+        square.fillColor = options.fillColor;
+        this.lastPoint = point;
+        if (!this.finalPath) this.finalPath = square;
+        else {
+            const merged = this.union(this.finalPath, square);
+            this.finalPath = merged;
+        }
+    }
+    // round brush
+    roundHandler(movement, tool, options)
         const step = (delta).normalize(options.brushSize / 2);
         const handleVec = step.clone();
         handleVec.length = options.brushSize / 2;
@@ -91,6 +126,12 @@ class SegmentBrushHelper {
         // TODO: This smoothing tends to cut off large portions of the path! Would like to eventually
         // add back smoothing, maybe a custom implementation that only applies to a subset of the line?
 
+        // no need for normalization with the square brush
+        if (this.isSquareBrush) {
+            if (options.simplifySize > 0) this.finalPath.simplify(options.simplifySize);
+            return this.finalPath;
+        }
+
         // Smooth the path. Make it unclosed first because smoothing of closed
         // paths tends to cut off the path.
         if (this.finalPath.segments && this.finalPath.segments.length > 4) {
@@ -100,7 +141,7 @@ class SegmentBrushHelper {
             }
             this.finalPath.closed = true;
             // Merge again with the first point, since it gets distorted when we unclose the path.
-            const temp = this.finalPath.unite(this.firstCircle);
+            const temp = this.finalPath.unite(this.initialShape);
             this.finalPath.remove();
             this.finalPath = temp;
         }

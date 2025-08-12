@@ -101,15 +101,14 @@ class Blobbiness {
             blob.resizeCursorIfNeeded(event.point);
             if (event.event.button > 0) return; // only first mouse button
             this.active = true;
-            console.log(this);
 
             if (blob.options.brushSize < Blobbiness.THRESHOLD) {
                 blob.brush = Blobbiness.BROAD;
-                blob.broadBrushHelper.isSquareBrush = this.brushShape === "SQUARE";
+                blob.broadBrushHelper.isSquareBrush = blob.brushShape === "SQUARE";
                 blob.broadBrushHelper.onBroadMouseDown(event, blob.tool, blob.options);
             } else {
                 blob.brush = Blobbiness.SEGMENT;
-                blob.segmentBrushHelper.isSquareBrush = this.brushShape === "SQUARE";
+                blob.segmentBrushHelper.isSquareBrush = blob.brushShape === "SQUARE";
                 blob.segmentBrushHelper.onSegmentMouseDown(event, blob.tool, blob.options);
             }
             blob.cursorPreview.bringToFront();
@@ -163,7 +162,6 @@ class Blobbiness {
     }
 
     resizeCursorIfNeeded(point) {
-        console.log(this.brushShape, this.options);
         if (!this.options) {
             return;
         }
@@ -195,13 +193,13 @@ class Blobbiness {
         }
         this.cursorPreview.position = this.cursorPreviewLastPoint;
         this.cursorPreview.size = new paper.Size(this.options.brushSize, this.options.brushSize);
-        if (this.brushShape === "SQUARE") this.cursorPreview.radius = 0;
-        else this.cursorPreview.radius = this.options.brushSize / 2;
 
         this.brushSize = this.options.brushSize;
         this.fillColor = this.options.fillColor;
         this.strokeColor = this.options.strokeColor;
         this.brushShape = this.options.brushType;
+        if (this.brushShape === "SQUARE") this.cursorPreview.radius = 0;
+        else this.cursorPreview.radius = this.options.brushSize / 2;
         styleCursorPreview(this.cursorPreview, this.options);
     }
 

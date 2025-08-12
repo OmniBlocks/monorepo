@@ -327,12 +327,8 @@ const ModeToolsComponent = props => {
                                 <ButtonGroup>
                                     <Button
                                         className={
-                                            classNames(
-                                                styles.buttonGroupButton,
-                                                { [styles.modNoEndBorder]: props.brushType === "SQUARE" }
-                                            )
+                                            classNames(styles.buttonGroupButton)
                                         }
-                                        disabled={props.brushType === "SQUARE"}
                                         onClick={props.onBrushChange}
                                     >
                                         <img
@@ -344,12 +340,8 @@ const ModeToolsComponent = props => {
                                     </Button>
                                     <Button
                                         className={
-                                            classNames(
-                                                styles.buttonGroupButton,
-                                                { [styles.modStartBorder]: props.brushType !== "SQUARE" }
-                                            )
+                                            classNames(styles.buttonGroupButton)
                                         }
-                                        disabled={props.brushType !== "SQUARE"}
                                         onClick={props.onBrushChange}
                                     >
                                         <img

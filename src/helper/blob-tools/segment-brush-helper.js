@@ -25,6 +25,7 @@ class SegmentBrushHelper {
     onSegmentMouseDown (event, tool, options) {
         if (event.event.button > 0) return; // only first mouse button
 
+        const size = options.brushSize / 2;
         if (this.isSquareBrush) {
             tool.minDistance = window.test(size, paper.view.zoom);//Math.max(1, (size / paper.view.zoom) / 2);
             tool.maxDistance = options.brushSize;
@@ -33,7 +34,6 @@ class SegmentBrushHelper {
             tool.maxDistance = options.brushSize;
         }
 
-        const size = options.brushSize / 2;
         this.initialShape = this.isSquareBrush ? new paper.Path.Rectangle(
             new paper.Rectangle(
                 new paper.Point(event.point.x - size, event.point.y - size),

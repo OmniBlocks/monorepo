@@ -27,6 +27,7 @@ import { defineMessages, injectIntl, intlShape } from 'react-intl';
 import Input from '../forms/input.jsx';
 import InputGroup from '../input-group/input-group.jsx';
 import ButtonGroup from '../button-group/button-group.jsx';
+import Button from '../button/button.jsx';
 import LabeledIconButton from '../labeled-icon-button/labeled-icon-button.jsx';
 import Modes from '../../lib/modes';
 import Formats, { isBitmap, isVector } from '../../lib/format';

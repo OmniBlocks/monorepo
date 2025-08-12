@@ -194,7 +194,7 @@ class Blobbiness {
         this.cursorPreview.position = this.cursorPreviewLastPoint;
         this.cursorPreview.size = new paper.Size(this.options.brushSize, this.options.brushSize);
 
-        this.brushSize = this.options.brushSize;
+        if (this.options.brushSize) this.brushSize = this.options.brushSize;
         this.fillColor = this.options.fillColor;
         this.strokeColor = this.options.strokeColor;
         this.brushShape = this.options.brushType;

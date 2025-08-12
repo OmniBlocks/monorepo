@@ -15,7 +15,7 @@ import {snapDeltaToAngle} from '../math';
  * @param {!Tool} tool paper.js mouse object
  */
 class BroadBrushHelper {
-    constructor () {
+    constructor (isSquareBrush) {
         // Direction vector of the last mouse move
         this.lastVec = null;
         // End point of the last mouse move
@@ -30,6 +30,8 @@ class BroadBrushHelper {
         this.steps = 0;
         // End caps round out corners and are not merged into the path until the end.
         this.endCaps = [];
+        // toggle wether we're using a square brush
+        this.isSquareBrush = isSquareBrush || false;
     }
 
     onBroadMouseDown (event, tool, options) {
@@ -37,9 +39,8 @@ class BroadBrushHelper {
         this.smoothed = 0;
         this.lastVec = null;
         const size = options.brushSize / 2;
-        if (window.toggleBrushTest) {
-            // TODO fix this so big brush sizes dont look circular
-            tool.minDistance = window.test(size, paper.view.zoom);
+        if (this.isSquareBrush) {
+            tool.minDistance = Math.max(1, (size / paper.view.zoom) / 2);
             tool.maxDistance = options.brushSize;
         } else {
             tool.minDistance = Math.min(5, Math.max(2 / paper.view.zoom, size));
@@ -47,7 +48,7 @@ class BroadBrushHelper {
         }
         if (event.event.button > 0) return; // only first mouse button
 
-        this.finalPath = window.toggleBrushTest ? new paper.Path.Rectangle(
+        this.finalPath = this.isSquareBrush ? new paper.Path.Rectangle(
             new paper.Rectangle(
                 new paper.Point(event.point.x - size, event.point.y - size),
                 new paper.Point(event.point.x + size, event.point.y + size)
@@ -73,7 +74,7 @@ class BroadBrushHelper {
         }
         const point = this.lastPoint.add(delta);
 
-        if (window.toggleBrushTest) this.squareHandler({ point, delta }, tool, options);
+        if (this.isSquareBrush) this.squareHandler({ point, delta }, tool, options);
         else this.roundHandler({ point, delta }, tool, options);
     }
     // square brush
@@ -249,7 +250,7 @@ class BroadBrushHelper {
         }
 
         // no need for normalization with the square brush
-        if (window.toggleBrushTest) {
+        if (this.isSquareBrush) {
             if (options.simplifySize > 0) this.simplify(options.simplifySize);
             return this.finalPath;
         }

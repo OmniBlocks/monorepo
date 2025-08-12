@@ -41,6 +41,7 @@ class Blobbiness {
         this.strokeColor = null;
         this.brushSize = null;
         this.fillColor = null;
+        this.brushShape = "CIRCLE";
     }
 
     /**
@@ -103,11 +104,11 @@ class Blobbiness {
 
             if (blob.options.brushSize < Blobbiness.THRESHOLD) {
                 blob.brush = Blobbiness.BROAD;
-                blob.broadBrushHelper.isSquareBrush = window.toggleSquareTest;
+                blob.broadBrushHelper.isSquareBrush = this.brushShape === "SQUARE";
                 blob.broadBrushHelper.onBroadMouseDown(event, blob.tool, blob.options);
             } else {
                 blob.brush = Blobbiness.SEGMENT;
-                blob.segmentBrushHelper.isSquareBrush = window.toggleSquareTest;
+                blob.segmentBrushHelper.isSquareBrush = this.brushShape === "SQUARE";
                 blob.segmentBrushHelper.onSegmentMouseDown(event, blob.tool, blob.options);
             }
             blob.cursorPreview.bringToFront();
@@ -169,6 +170,7 @@ class Blobbiness {
         if (this.cursorPreview && !this.cursorPreview.parent) {
             this.cursorPreview = null;
         }
+        this.brushShape = this.options.brushType;
         if (this.cursorPreview &&
             this.brushSize === this.options.brushSize &&
             this.fillColor === this.options.fillColor &&
@@ -191,7 +193,7 @@ class Blobbiness {
         }
         this.cursorPreview.position = this.cursorPreviewLastPoint;
         this.cursorPreview.size = new paper.Size(this.options.brushSize, this.options.brushSize);
-        if (window.toggleSquareTest) this.cursorPreview.radius = 0;
+        if (this.brushShape === "SQUARE") this.cursorPreview.radius = 0;
         else this.cursorPreview.radius = this.options.brushSize / 2;
 
         this.brushSize = this.options.brushSize;

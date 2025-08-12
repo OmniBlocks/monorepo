@@ -132,7 +132,7 @@ class SegmentBrushHelper {
 
         // no need for normalization with the square brush
         if (this.isSquareBrush) {
-            if (options.simplifySize > 0) this.finalPath.simplify(options.simplifySize);
+            if (options.simplifySize > 0 && this.finalPath.segments) this.finalPath.simplify(options.simplifySize);
             return this.finalPath;
         }
 

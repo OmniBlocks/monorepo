@@ -15,7 +15,7 @@ import {snapDeltaToAngle} from '../math';
  * @param {!Tool} tool paper.js mouse object
  */
 class BroadBrushHelper {
-    constructor (isSquareBrush) {
+    constructor () {
         // Direction vector of the last mouse move
         this.lastVec = null;
         // End point of the last mouse move
@@ -31,7 +31,7 @@ class BroadBrushHelper {
         // End caps round out corners and are not merged into the path until the end.
         this.endCaps = [];
         // toggle wether we're using a square brush
-        this.isSquareBrush = isSquareBrush || false;
+        this.isSquareBrush = false;
     }
 
     onBroadMouseDown (event, tool, options) {

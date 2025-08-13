@@ -44,6 +44,7 @@ class BroadBrushHelper {
         this.lastVec = null;
         const size = options.brushSize / 2;
         if (this.isSquareBrush) {
+            this.pendingSquares = [];
             tool.minDistance = Math.max(1, (size / paper.view.zoom) / 2);
             tool.maxDistance = options.brushSize;
         } else {
@@ -99,6 +100,7 @@ class BroadBrushHelper {
     if (this.pendingSquares.length >= this.mergeBatchSize) {
         this.flushPending();
     }
+    this.lastPoint = point;
 }
 
     flushPending() {

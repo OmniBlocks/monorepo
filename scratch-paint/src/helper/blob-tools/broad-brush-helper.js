@@ -32,10 +32,6 @@ class BroadBrushHelper {
         this.endCaps = [];
         // toggle wether we're using a square brush
         this.isSquareBrush = false;
-        //test
-         this.mergeBatchSize = 20;
-    this.previewGroup = new paper.Group();
-    this.pendingSquares = [];
     }
 
     onBroadMouseDown (event, tool, options) {
@@ -44,7 +40,6 @@ class BroadBrushHelper {
         this.lastVec = null;
         const size = options.brushSize / 2;
         if (this.isSquareBrush) {
-            this.pendingSquares = [];
             tool.minDistance = Math.max(1, (size / paper.view.zoom) / 2);
             tool.maxDistance = options.brushSize;
         } else {
@@ -83,45 +78,26 @@ class BroadBrushHelper {
         else this.roundHandler({ point, delta }, tool, options);
     }
     // square brush
-    squareHandler(movement, tool, options) {
-    const { point } = movement;
+    squareHandler (movement, tool, options) {
+        // TODO this can technically handle other shapes, which we should add. However we need to implement some
+        // cahce or flush system to make this less laggy when you have a large complex brush drawing (same goes for the segment brush)
+        const { delta, point } = movement;
         this.steps++;
-    const size = options.brushSize / 2;
-    const square = new paper.Path.Rectangle(
-        new paper.Rectangle(
-            point.subtract(new paper.Point(size, size)),
-            point.add(new paper.Point(size, size))
-        )
-    );
-    square.fillColor = options.fillColor;
-    this.previewGroup.addChild(square);
-    this.pendingSquares.push(square);
 
-    if (this.pendingSquares.length >= this.mergeBatchSize) {
-        this.flushPending();
+        const size = options.brushSize / 2;
+        const square = new paper.Path.Rectangle(new paper.Rectangle(
+            new paper.Point(point.x - size, point.y - size),
+            new paper.Point(point.x + size, point.y + size)
+        ));
+
+        square.fillColor = options.fillColor;
+        this.lastPoint = point;
+        if (!this.finalPath) this.finalPath = square;
+        else {
+            const merged = this.union(this.finalPath, square);
+            this.finalPath = merged;
+        }
     }
-    this.lastPoint = point;
-}
-
-    flushPending() {
-    if (this.pendingSquares.length === 0) return;
-
-    // Merge preview shapes into finalPath
-    let merged = this.pendingSquares.shift();
-    for (const sq of this.pendingSquares) {
-        merged = this.union(merged, sq);
-    }
-    this.pendingSquares.length = 0;
-
-    if (!this.finalPath) {
-        this.finalPath = merged;
-    } else {
-        this.finalPath = this.union(this.finalPath, merged);
-    }
-
-    // Clear preview layer
-    this.previewGroup.removeChildren();
-}
     // round brush
     roundHandler (movement, tool, options) {
         const { delta, point } = movement;
@@ -277,7 +253,6 @@ class BroadBrushHelper {
 
         // no need for normalization with the square brush
         if (this.isSquareBrush) {
-            this.flushPending();
             if (options.simplifySize > 0 && this.finalPath.segments) this.simplify(options.simplifySize);
             return this.finalPath;
         }

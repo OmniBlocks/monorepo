@@ -35,6 +35,7 @@ class BroadBrushHelper {
         //test
          this.mergeBatchSize = 20;
     this.previewGroup = new paper.Group();
+    this.pendingSquares = [];
     }
 
     onBroadMouseDown (event, tool, options) {

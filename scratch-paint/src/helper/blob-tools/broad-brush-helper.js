@@ -256,6 +256,7 @@ class BroadBrushHelper {
             if (options.simplifySize > 0 && this.finalPath.segments) this.simplify(options.simplifySize);
             return this.finalPath;
         }
+
         let delta = this.lastVec;
 
         // If the mouse up is at the same point as the mouse drag event then we need
@@ -264,6 +265,18 @@ class BroadBrushHelper {
             // The given event.delta is the difference between the mouse down coords and the mouse up coords,
             // but we want the difference between the last mouse drag coords and the mouse up coords.
             delta = event.point.subtract(this.lastPoint);
+
+            if (event.modifiers.shift) {
+                // 45 degree movement
+                delta = snapDeltaToAngle(delta, Math.PI / 4);
+            } else if (event.modifiers.alt) {
+                // vertical movement
+                delta = new paper.Point(0, delta.y);
+            } else if (event.modifiers.control || event.modifiers.meta) {
+                // horizontal movement
+                delta = new paper.Point(delta.x, 0);
+            }
+
             const step = delta.normalize(options.brushSize / 2);
             step.angle += 90;
 

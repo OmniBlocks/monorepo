@@ -258,6 +258,7 @@ class BroadBrushHelper {
         }
 
         let delta = this.lastVec;
+        let constraintPoint = event.point;
 
         // If the mouse up is at the same point as the mouse drag event then we need
         // the second to last point to get the right direction vector for the end cap
@@ -277,7 +278,7 @@ class BroadBrushHelper {
                 delta = new paper.Point(delta.x, 0);
             }
 
-            const constraintPoint = this.lastPoint.add(delta);
+            constraintPoint = this.lastPoint.add(delta);
             const step = delta.normalize(options.brushSize / 2);
             step.angle += 90;
 

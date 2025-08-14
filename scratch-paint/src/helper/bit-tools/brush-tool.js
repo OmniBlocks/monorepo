@@ -88,7 +88,8 @@ class BrushTool extends paper.Tool {
         this.lastSize = this.size;
         this.lastColor = this.color;
     }
-    constrainPoint(delta, lastPoint, modifiers) {
+    constrainPoint(currentPoint, lastPoint, modifiers) {
+        let delta = currentPoint.subtract(lastPoint);
         if (modifiers.shift) {
             // 45 degree movement
             delta = snapDeltaToAngle(delta, Math.PI / 4);
@@ -129,21 +130,21 @@ class BrushTool extends paper.Tool {
             }
         }
 
-        const point = this.constrainPoint(event.delta, event.point, event.modifiers);
+        const point = event.point;
         this.drawNextLine(point, point);
         this.lastPoint = point;
     }
     handleMouseDrag (event) {
         if (event.event.button > 0 || !this.active) return; // only first mouse button
 
-        const point = this.constrainPoint(event.delta, event.point, event.modifiers);
+        const point = this.constrainPoint(event.point, this.lastPoint, event.modifiers);
         this.drawNextLine(this.lastPoint, point);
         this.lastPoint = point;
     }
     handleMouseUp (event) {
         if (event.event.button > 0 || !this.active) return; // only first mouse button
 
-        const point = this.constrainPoint(event.delta, event.point, event.modifiers);
+        const point = this.constrainPoint(event.point, this.lastPoint, event.modifiers);
         this.drawNextLine(this.lastPoint, point);
         if (!this.isEraser) {
             getRaster().drawImage(this.drawTarget.canvas, new paper.Point(0, 0));

@@ -1,6 +1,7 @@
 import paper from '@turbowarp/paper';
 import {getRaster, getGuideLayer, createCanvas} from '../layer';
 import {doesColorRequireMask, forEachLinePoint, getBrushMark} from '../bitmap';
+import {snapDeltaToAngle} from '../math';
 
 /**
  * Tool for drawing with the bitmap brush and eraser
@@ -87,6 +88,19 @@ class BrushTool extends paper.Tool {
         this.lastSize = this.size;
         this.lastColor = this.color;
     }
+    constrainPoint(delta, lastPoint, modifiers) {
+        if (modifiers.shift) {
+            // 45 degree movement
+            delta = snapDeltaToAngle(delta, Math.PI / 4);
+        } else if (modifiers.alt) {
+            // vertical movement
+            delta = new paper.Point(0, delta.y);
+        } else if (modifiers.control || modifiers.meta) {
+            // horizontal movement
+            delta = new paper.Point(delta.x, 0);
+        }
+        return lastPoint.add(delta);
+    }
     handleMouseMove (event) {
         this.updateCursorIfNeeded();
         this.cursorPreview.position = new paper.Point(~~event.point.x, ~~event.point.y);
@@ -115,19 +129,22 @@ class BrushTool extends paper.Tool {
             }
         }
 
-        this.drawNextLine(event.point, event.point);
-        this.lastPoint = event.point;
+        const point = this.constrainPoint(event.delta, event.point, event.modifiers);
+        this.drawNextLine(point, point);
+        this.lastPoint = point;
     }
     handleMouseDrag (event) {
         if (event.event.button > 0 || !this.active) return; // only first mouse button
 
-        this.drawNextLine(this.lastPoint, event.point);
-        this.lastPoint = event.point;
+        const point = this.constrainPoint(event.delta, event.point, event.modifiers);
+        this.drawNextLine(this.lastPoint, point);
+        this.lastPoint = point;
     }
     handleMouseUp (event) {
         if (event.event.button > 0 || !this.active) return; // only first mouse button
 
-        this.drawNextLine(this.lastPoint, event.point);
+        const point = this.constrainPoint(event.delta, event.point, event.modifiers);
+        this.drawNextLine(this.lastPoint, point);
         if (!this.isEraser) {
             getRaster().drawImage(this.drawTarget.canvas, new paper.Point(0, 0));
             this.drawTarget.remove();

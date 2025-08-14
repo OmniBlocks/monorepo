@@ -277,11 +277,12 @@ class BroadBrushHelper {
                 delta = new paper.Point(delta.x, 0);
             }
 
+            const constraintPoint = this.lastPoint.add(delta);
             const step = delta.normalize(options.brushSize / 2);
             step.angle += 90;
 
-            const top = event.point.add(step);
-            const bottom = event.point.subtract(step);
+            const top = constraintPoint.add(step);
+            const bottom = constraintPoint.subtract(step);
             this.finalPath.add(top);
             this.finalPath.insert(0, bottom);
         }
@@ -292,7 +293,7 @@ class BroadBrushHelper {
         }
         const handleVec = delta.normalize(options.brushSize / 2);
         this.finalPath.add(new paper.Segment(
-            event.point.add(handleVec),
+            constraintPoint.add(handleVec),
             handleVec.rotate(90),
             handleVec.rotate(-90)
         ));

@@ -1006,6 +1006,7 @@ class Grain {
 
     public initializeParabolicEnvelope(durationInSamples: number, amplitude: number): void {
         this.parabolicEnvelopeAmplitude = 0;
+        if (durationInSamples == 0) durationInSamples++; //prevent division by 0
         const invDuration: number = 1.0 / durationInSamples;
         const invDurationSquared: number = invDuration * invDuration;
         this.parabolicEnvelopeSlope = 4.0 * amplitude * (invDuration - invDurationSquared);
@@ -1017,6 +1018,7 @@ class Grain {
         this.parabolicEnvelopeSlope += this.parabolicEnvelopeCurve;
     }
 
+    //rcb is unfinished and unused rn
     public initializeRCBEnvelope(durationInSamples: number, amplitude: number): void {
         // attack:
         this.rcbEnvelopeAttackIndex = Math.floor(durationInSamples / 6);

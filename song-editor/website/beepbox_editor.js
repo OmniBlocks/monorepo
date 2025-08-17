@@ -12226,6 +12226,8 @@ li.select2-results__option[role=group] > strong:hover {
         }
         initializeParabolicEnvelope(durationInSamples, amplitude) {
             this.parabolicEnvelopeAmplitude = 0;
+            if (durationInSamples == 0)
+                durationInSamples++;
             const invDuration = 1.0 / durationInSamples;
             const invDurationSquared = invDuration * invDuration;
             this.parabolicEnvelopeSlope = 4.0 * amplitude * (invDuration - invDurationSquared);

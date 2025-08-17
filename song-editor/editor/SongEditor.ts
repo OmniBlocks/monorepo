@@ -811,7 +811,7 @@ export class SongEditor {
             option({ value: "displayBrowserUrl" }, "Enable Song Data in URL"),
             option({ value: "closePromptByClickoff" }, "Close Prompts on Click Off"),
             option({ value: "recordingSetup" }, "Note Recording..."),
-        ),
+        ), 
         optgroup({ label: "Appearance" },
             option({ value: "showFifth" }, 'Highlight "Fifth" Note'),
             option({ value: "notesFlashWhenPlayed" }, "Notes Flash When Played"),

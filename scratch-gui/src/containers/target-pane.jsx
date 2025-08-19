@@ -43,7 +43,8 @@ class TargetPane extends React.Component {
             'handleDrop',
             'handleDuplicateSprite',
             'handleExportSprite',
-            'handleExportCostumes', // <-- Added binding for this async method
+            'handleExportCostumes', 
+            'handleExportSounds',
             'handleNewSprite',
             'handleSelectSprite',
             'handleSurpriseSpriteClick',
@@ -93,6 +94,59 @@ class TargetPane extends React.Component {
     handleDuplicateSprite (id) {
         this.props.vm.duplicateSprite(id);
     }
+
+
+    /* To avoid confusion, please know that the following function is NOT the regular export sound function 
+    that you would find while normally exporting an individual sound from the sounds tab. This is the extra
+    "export all sounds" function to add to the sprite menu. The original individual export can be found in 
+    sound-tab.jsx at lines 94-98. */
+
+    async handleExportSounds(id) { // literally just reskined handleexportcostumes with sounds instead
+    console.log('TargetPane.handleExportSounds called for sprite id:', id);
+    const zip = new JSZip();
+
+    const target = this.props.vm.runtime.getTargetById(id);
+    if (!target || !target.sprite || !target.sprite.sounds) {
+        alert('No target or sounds found for this sprite.');
+        console.warn('No target or sounds found for id:', id, target);
+        return;
+    }
+
+    let addedCount = 0;
+    const soundPromises = target.sprite.sounds.map(async (item, idx) => {
+        try {
+            // item.asset.data is usually a Uint8Array or ArrayBuffer
+            if (!item.asset || !item.asset.data) {
+                console.warn(`No data for sound ${item.name} at index ${idx}`, item);
+                return;
+            }
+            zip.file(
+                `${item.name}.${item.asset.dataFormat}`,
+                item.asset.data,
+                {binary: true}
+            );
+            addedCount++;
+        } catch (err) {
+            console.error(`Error exporting sound ${item.name}:`, err);
+        }
+    });
+
+    await Promise.all(soundPromises);
+
+    if (addedCount === 0 || Object.keys(zip.files).length === 0) {
+        alert('No sounds could be exported for this sprite.'); // i wish i knew how to do the react-style vanilla scratch alerts
+        console.warn('No files added to zip, aborting download.');
+        return;
+    }
+
+    zip.generateAsync({type: 'blob'}).then((content) => {
+        const filename = `${target.getName()}-sounds.zip`;
+        downloadBlob(filename, content);
+    }).catch((err) => {
+        alert('Error generating zip file.');
+        console.error('Error generating zip:', err);
+    });
+}
     handleExportSprite (id) {
         const spriteName = this.props.vm.runtime.getTargetById(id).getName();
         const saveLink = document.createElement('a');

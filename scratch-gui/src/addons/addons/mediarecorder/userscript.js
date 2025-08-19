@@ -1,4 +1,5 @@
 import downloadBlob from "../../libraries/common/cs/download-blob.js";
+import recordIcon from "./record.svg";
 
 export default async ({ addon, console, msg }) => {
   let recordElem;
@@ -327,24 +328,33 @@ export default async ({ addon, console, msg }) => {
         (delay - roundedDelay) * 1000
       );
     };
-    if (!recordElem) {
-      recordElem = Object.assign(document.createElement("div"), {
-        className: "sa-record " + elem.className,
-        textContent: msg("record"),
-      });
-      recordElem.addEventListener("click", async () => {
-        if (isRecording) {
-          stopRecording();
-        } else {
-          const opts = await getOptions();
-          if (!opts) {
-            console.log("Canceled");
-            return;
-          }
-          startRecording(opts);
-        }
-      });
+if (!recordElem) {
+  recordElem = Object.assign(document.createElement("div"), {
+    className: "sa-record " + elem.className,
+  });
+  const icon = Object.assign(document.createElement("img"), {
+    src: recordIcon,
+    className: "sa-record-icon",
+  });
+  recordElem.appendChild(icon);
+  const text = Object.assign(document.createElement("span"), {
+    textContent: msg("record"),
+  });
+  recordElem.appendChild(text);
+  recordElem.addEventListener("click", async () => {
+    if (isRecording) {
+      stopRecording();
+    } else {
+      const opts = await getOptions();
+      if (!opts) {
+        console.log("Canceled");
+        return;
+      }
+      startRecording(opts);
     }
+  });
+}
+
     elem.parentElement.appendChild(recordElem);
   }
 };

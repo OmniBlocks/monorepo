@@ -49,6 +49,17 @@ p.mediaRecorderPopupOption {
   margin-left: 0.5rem;
 }
 
+.sa-record {
+  display: flex;
+  align-items: center;
+}
+
+.sa-record-icon {
+  width: 2em; /* adjust the size as needed */
+  height: 2em; /* adjust the size as needed */
+  margin-right: 0.5em; /* adjust the spacing as needed */
+}
+
 .mediaRecorderPopupButtons button:nth-of-type(1) {
   color: black;
 }

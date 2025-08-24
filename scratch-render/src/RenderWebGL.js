@@ -1915,9 +1915,7 @@ class RenderWebGL extends EventEmitter {
         }
 
         const bounds = stampDrawable.getFastBounds();
-        if (!this.offscreenTouching) {
-            bounds.clamp(this._xLeft, this._xRight, this._yBottom, this._yTop);
-        }
+        bounds.clamp(this._xLeft, this._xRight, this._yBottom, this._yTop);
         if (bounds.width === 0 || bounds.height === 0) {
             return;
         }

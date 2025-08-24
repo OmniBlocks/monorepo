@@ -1230,7 +1230,7 @@ export class Config {
         { name: "FART",             voices: 2, spread: 13,       offset: -5,      expression: 1.0,   sign: -3   },
         //for modbox; voices = riffapp, spread = intervals, offset = offsets, expression = volume, and sign = signs
     ]);
-    public static readonly effectNames: ReadonlyArray<string> = ["reverb", "chorus", "panning", "distortion", "bitcrusher", "note filter", "echo", "pitch shift", "detune", "vibrato", "transition type", "chord type", "", "ring mod", "granular"];
+    public static readonly effectNames: ReadonlyArray<string> = ["reverb", "chorus", "panning", "distortion", "bitcrusher", "note filter", "echo", "pitch shift", "detune", "vibrato", "transition type", "chord type", "", "ring mod", "granular", "invert wave"];
     public static readonly effectOrder: ReadonlyArray<EffectType> = [EffectType.panning, EffectType.transition, EffectType.chord, EffectType.pitchShift, EffectType.detune, EffectType.vibrato, EffectType.noteFilter, EffectType.granular, EffectType.distortion, EffectType.bitcrusher, EffectType.chorus, EffectType.echo, EffectType.reverb, EffectType.ringModulation];
     public static readonly noteSizeMax: number = 6;
     public static readonly volumeRange: number = 50;
@@ -1630,13 +1630,21 @@ export class Config {
         return wave;
     }
 
-    // public static generateWhiteNoiseFmWave() {
-    // const wave = new Float32Array(Config.sineWaveLength + 1);
-    // for (let i = 0; i < Config.sineWaveLength + 1; i++) {
-    // wave[i] = Math.random() * 2.0 - 1.0;
-    // }
-    // return wave;
-    // }
+    public static generateSemisineWave() {
+        const wave = new Float32Array(Config.sineWaveLength + 1);
+        for (let i = 0; i < Config.sineWaveLength + 1; i++) {
+            wave[i] = Math.max(Math.sin(i * Math.PI * 2.0 / Config.sineWaveLength), 0) - 0.5;
+        }
+        return wave;
+    }
+
+    public static generateWhiteNoiseFmWave() {
+        const wave = new Float32Array(Config.sineWaveLength + 1);
+        for (let i = 0; i < Config.sineWaveLength + 1; i++) {
+            wave[i] = Math.random() * 2.0 - 1.0;
+        }
+        return wave;
+    }
     // pupblic static generateOneBitWhiteNoiseFmWave() {
     // const wave = new Float32Array(Config.sineWaveLength + 1);
     // for (let i = 0; i < Config.sineWaveLength + 1; i++) {
@@ -1799,8 +1807,9 @@ export class Config {
         { name: "ramp", samples: Config.generateSawWave(true) },
         { name: "trapezoid", samples: Config.generateTrapezoidWave(2) },
         { name: "quasi-sine", samples: Config.generateQuasiSineWave() },
-		//{ name: "white noise", samples: Config.generateWhiteNoiseFmWave() },
-		//{ name: "1-bit white noise", samples: Config.generateOneBitWhiteNoiseFmWave() },
+        { name: "half-sine", samples: Config.generateSemisineWave() },
+		{ name: "white noise", samples: Config.generateWhiteNoiseFmWave() },
+		// { name: "1-bit white noise", samples: Config.generateOneBitWhiteNoiseFmWave() },
     ]);
     public static readonly pwmOperatorWaves: DictionaryArray<OperatorWave> = toNameMap([
         { name: "1%", samples: Config.generateSquareWave(0.01) },

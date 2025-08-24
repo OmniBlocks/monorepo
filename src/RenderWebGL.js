@@ -1652,20 +1652,6 @@ class RenderWebGL extends EventEmitter {
         return bounds;
     }
 
-    _unsnappedTouchingBounds (drawableID) {
-        // _touchingBounds with the snapToint call removed.
-        const drawable = this._allDrawables[drawableID];
-        if (!drawable.skin || !drawable.skin.getTexture([100, 100])) return null;
-        const bounds = drawable.getFastBounds();
-        if (!this.offscreenTouching) {
-            bounds.clamp(this._xLeft, this._xRight, this._yBottom, this._yTop);
-        }
-        if (bounds.width === 0 || bounds.height === 0) {
-            return null;
-        }
-        return bounds;
-    }
-
     /**
      * Filter a list of candidates for a touching query into only those that
      * could possibly intersect the given bounds.
@@ -1920,13 +1906,19 @@ class RenderWebGL extends EventEmitter {
      */
     penStamp (penSkinID, stampID) {
         const stampDrawable = this._allDrawables[stampID];
-        if (!stampDrawable) {
+        if (
+            !stampDrawable ||
+            !stampDrawable.skin ||
+            !stampDrawable.skin.getTexture([100, 100])
+        ) {
             return;
         }
 
-        // TW: The bounds will be snapped later
-        const bounds = this._unsnappedTouchingBounds(stampID);
-        if (!bounds) {
+        const bounds = stampDrawable.getFastBounds();
+        if (!this.offscreenTouching) {
+            bounds.clamp(this._xLeft, this._xRight, this._yBottom, this._yTop);
+        }
+        if (bounds.width === 0 || bounds.height === 0) {
             return;
         }
 

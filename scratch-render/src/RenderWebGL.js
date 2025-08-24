@@ -1919,7 +1919,6 @@ class RenderWebGL extends EventEmitter {
      * @param {int} stampID - the unique ID of the Drawable to use as the stamp.
      */
     penStamp (penSkinID, stampID) {
-        this.dirty = true;
         const stampDrawable = this._allDrawables[stampID];
         if (!stampDrawable) {
             return;
@@ -1970,6 +1969,7 @@ class RenderWebGL extends EventEmitter {
             framebufferHeight: this._nativeSize[1] * quality
         });
         skin._silhouetteDirty = true;
+        this.dirty = true;
     }
 
     /* ******

@@ -1674,6 +1674,8 @@ class RenderWebGL extends EventEmitter {
             const id = candidateIDs[index];
             if (id !== drawableID) {
                 const drawable = this._allDrawables[id];
+                // Text bubbles aren't considered in "touching" queries
+                if (drawable.skin instanceof TextBubbleSkin) continue;
                 if (drawable.skin && drawable._visible) {
                     // If private skin access is disabled, do not allow projects to use touching blocks to guess the
                     // contents of a private skin.

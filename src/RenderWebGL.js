@@ -1251,11 +1251,15 @@ class RenderWebGL extends EventEmitter {
      * @returns {boolean} True if the Drawable is touching one of candidateIDs.
      */
     isTouchingDrawables (drawableID, candidateIDs = this._drawList) {
+        // if we are invisible we don't touch anything.
+        if (!this._allDrawables[drawableID]._visible) {
+            return false;
+        }
+
         const candidates = this._candidatesTouching(drawableID,
             // even if passed an invisible drawable, we will NEVER touch it!
             candidateIDs.filter(id => this._allDrawables[id]._visible));
-        // if we are invisble we don't touch anything.
-        if (candidates.length === 0 || !this._allDrawables[drawableID]._visible) {
+        if (candidates.length === 0) {
             return false;
         }
 
@@ -1670,8 +1674,6 @@ class RenderWebGL extends EventEmitter {
             const id = candidateIDs[index];
             if (id !== drawableID) {
                 const drawable = this._allDrawables[id];
-                // Text bubbles aren't considered in "touching" queries
-                if (drawable.skin instanceof TextBubbleSkin) continue;
                 if (drawable.skin && drawable._visible) {
                     // If private skin access is disabled, do not allow projects to use touching blocks to guess the
                     // contents of a private skin.

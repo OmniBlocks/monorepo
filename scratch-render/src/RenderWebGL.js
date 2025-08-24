@@ -1636,7 +1636,7 @@ class RenderWebGL extends EventEmitter {
         const drawable = this._allDrawables[drawableID];
 
         /** @todo remove this once URL-based skin setting is removed. */
-        if (!drawable.skin || !drawable.skin.getTexture([100, 100])) return null;
+        if (!drawable.skin || !drawable.skin.isMetricsReady()) return null;
 
         const bounds = drawable.getFastBounds();
 
@@ -1911,7 +1911,7 @@ class RenderWebGL extends EventEmitter {
         if (
             !stampDrawable ||
             !stampDrawable.skin ||
-            !stampDrawable.skin.getTexture([100, 100])
+            !stampDrawable.skin.isMetricsReady()
         ) {
             return;
         }

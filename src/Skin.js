@@ -116,6 +116,17 @@ class Skin {
     }
 
     /**
+     * Determine if the skin's size and rotation center properties are accurate.
+     * Default implementation returns true if getTexture([100, 100]) succeeds
+     * as this indicates that the skin is ready to be rendered. Child classes
+     * should override appropriately if getTexture() is known to be slow.
+     * @returns {boolean} true if size and rotation center are accurate.
+     */
+    isMetricsReady () {
+        return !!this.getTexture([100, 100]);
+    }
+
+    /**
      * Get the bounds of the drawable for determining its fenced position.
      * @param {Array<number>} drawable - The Drawable instance this skin is using.
      * @param {?Rectangle} result - Optional destination for bounds calculation.

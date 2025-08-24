@@ -2111,11 +2111,14 @@ class RenderWebGL extends EventEmitter {
                 drawable.scale[1] * opts.framebufferHeight / this._nativeSize[1]
             ] : drawable.scale;
 
-            // If the skin or texture isn't ready yet, skip it.
-            if (!drawable.skin || !drawable.skin.getTexture(drawableScale)) continue;
+            // Skip drawables with no skin.
+            if (!drawable.skin) continue;
 
             // Skip private skins, if requested.
             if (opts.skipPrivateSkins && drawable.skin.private) continue;
+
+            // Skip drawables with a skin that does not have a texture.
+            if (!drawable.skin.getTexture(drawableScale)) continue;
 
             const uniforms = {};
 

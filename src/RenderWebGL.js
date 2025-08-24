@@ -1919,7 +1919,11 @@ class RenderWebGL extends EventEmitter {
         }
 
         const bounds = stampDrawable.getFastBounds();
-        bounds.clamp(this._xLeft, this._xRight, this._yBottom, this._yTop);
+        // Ideally we wouldn't need to check offscreenTouching at all here, but the camera extensions
+        // do too many crazy things to risk changing this control flow.
+        if (!this.offscreenTouching) {
+            bounds.clamp(this._xLeft, this._xRight, this._yBottom, this._yTop);
+        }
         if (bounds.width === 0 || bounds.height === 0) {
             return;
         }

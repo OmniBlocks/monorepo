@@ -24419,8 +24419,8 @@ var beepbox = (function (exports) {
             case 76:
                 onToggleLoop();
                 break;
-            case 83:
-                if (event.ctrlKey) {
+            case 85:
+                if (event.shiftKey) {
                     shortenUrl();
                     event.preventDefault();
                 }

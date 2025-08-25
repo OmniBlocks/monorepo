@@ -767,7 +767,7 @@ export class SongEditor {
         option({ value: "copyUrl" }, "⎘ Copy Song URL"),
         option({ value: "shareUrl" }, "⤳ Share Song URL"),
         option({ value: "configureShortener" }, "🛠 Customize Url Shortener..."),
-        option({ value: "shortenUrl" }, "… Shorten Song URL"),
+        option({ value: "shortenUrl" }, "… Shorten Song URL (⇧U)"),
         option({ value: "viewPlayer" }, "▶ View in Song Player (⇧P)"),
         option({ value: "copyEmbed" }, "⎘ Copy HTML Embed Code"),
         option({ value: "songRecovery" }, "⚠ Recover Recent Song... (`)"),
@@ -4193,6 +4193,17 @@ export class SongEditor {
                 if (needControlForShortcuts == (event.ctrlKey || event.metaKey) && event.shiftKey) {
                     location.href = "player/" + (OFFLINE ? "index.html" : "") + "#song=" + this.doc.song.toBase64String();
                     event.preventDefault();
+                }
+                break;
+            case 85: // u
+                if (event.shiftKey) {
+                    let shortenerStrategy: string = "https://tinyurl.com/api-create.php?url=";
+                    const localShortenerStrategy: string | null = window.localStorage.getItem("shortenerStrategySelect");
+
+                    // if (localShortenerStrategy == "beepboxnet") shortenerStrategy = "https://www.beepbox.net/api-create.php?url=";
+                    if (localShortenerStrategy == "isgd") shortenerStrategy = "https://is.gd/create.php?format=simple&url=";
+
+                    window.open(shortenerStrategy + encodeURIComponent(new URL("#" + this.doc.song.toBase64String(), location.href).href));
                 }
                 break;
             case 192: // `/~

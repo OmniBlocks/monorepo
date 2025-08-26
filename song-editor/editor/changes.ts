@@ -4291,7 +4291,7 @@ export function pickRandomPresetValue(isNoise: boolean): number {
     const eligiblePresetValues: number[] = [];
     for (let categoryIndex: number = 0; categoryIndex < EditorConfig.presetCategories.length; categoryIndex++) {
         const category: PresetCategory = EditorConfig.presetCategories[categoryIndex];
-        if (category.name == "Novelty Presets") continue;
+        if (category.name.includes("Novelty") || category.name == "Unmodified") continue;
         for (let presetIndex: number = 0; presetIndex < category.presets.length; presetIndex++) {
             const preset: Preset = category.presets[presetIndex];
             if (preset.settings != undefined && (preset.isNoise == true) == isNoise) {

@@ -11,9 +11,14 @@ const generateRandomUsername = () => {
     } else if (typeof require === 'function') {
         // NodeJS fallback
         const crypto = require('crypto');
-        // Generate enough bytes for a secure random integer
-        // 4 bytes: up to 32 bits
-        randomNumber = crypto.randomBytes(4).readUInt32BE(0) % max;
+        // Use rejection sampling for unbiased random integer in [0, max)
+        const UINT32_MAX = 0xFFFFFFFF;
+        const limit = UINT32_MAX - (UINT32_MAX % max);
+        let rand;
+        do {
+            rand = crypto.randomBytes(4).readUInt32BE(0);
+        } while (rand >= limit);
+        randomNumber = rand % max;
     } else {
         // Fallback to Math.random (not secure - but not recommended)
         randomNumber = Math.floor(Math.random() * max);

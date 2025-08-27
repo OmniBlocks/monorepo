@@ -1,0 +1,53 @@
+name: AI Issue Categorization
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  categorize:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      models: read
+
+    steps:
+      - name: Analyze issue with AI
+        id: ai-categorize
+        uses: actions/ai-inference@v1
+        with:
+          prompt: |
+            Categorize this GitHub issue into exactly one of these labels: 
+            bug, question, enhancement, documentation.
+            
+            Respond ONLY with the label name. No explanations.
+            
+            Issue Title: ${{ github.event.issue.title }}
+            Issue Body: |
+              ${{ github.event.issue.body }}
+
+      - name: Clean AI output
+        id: clean-label
+        run: |
+          # Remove quotes and trim whitespace
+          CLEAN_LABEL=$(echo '${{ steps.ai-categorize.outputs.response }}' | tr -d '"' | tr -d "'" | xargs echo -n)
+          echo "label=$CLEAN_LABEL" >> $GITHUB_OUTPUT
+
+      - name: Apply label to issue
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const label = '${{ steps.clean-label.outputs.label }}'.toLowerCase();
+            const validLabels = ['bug', 'question', 'enhancement', 'documentation'];
+            
+            // Validate AI response
+            const finalLabel = validLabels.includes(label) 
+              ? label 
+              : 'question';  // Fallback label
+            
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: ${{ github.event.issue.number }},
+              labels: [finalLabel]
+            });

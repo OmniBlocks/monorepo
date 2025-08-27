@@ -810,6 +810,7 @@ export class SongEditor {
             option({ value: "instrumentImportExport" }, "Enable Import/Export Buttons"),
             option({ value: "displayBrowserUrl" }, "Enable Song Data in URL"),
             option({ value: "closePromptByClickoff" }, "Close Prompts on Click Off"),
+            option({ value: "rollNoveltyPresets" }, "Can Randomly Select Novelty Presets"),
             option({ value: "recordingSetup" }, "Note Recording..."),
         ), 
         optgroup({ label: "Appearance" },
@@ -2409,6 +2410,7 @@ export class SongEditor {
             (prefs.instrumentImportExport ? textOnIcon : textOffIcon) + "Enable Import/Export Buttons",
             (prefs.displayBrowserUrl ? textOnIcon : textOffIcon) + "Enable Song Data in URL",
             (prefs.closePromptByClickoff ? textOnIcon : textOffIcon) + "Close Prompts on Click Off",
+            (prefs.rollNoveltyPresets ? textOnIcon : textOffIcon) + "Can Randomly Select Novelty Presets",
             textSpacingIcon + "Note Recording...",
             textSpacingIcon + "Appearance",
             (prefs.showFifth ? textOnIcon : textOffIcon) + 'Highlight "Fifth" Note',
@@ -4337,12 +4339,16 @@ export class SongEditor {
                 event.preventDefault();
                 break;
             case 68: // d
-                if (canPlayNotes) break;
-                if (needControlForShortcuts == (event.ctrlKey || event.metaKey)) {
-                    //shift d replaces old d functionality, while d will duplicate replacing an unused pattern
-                    //This is for consistency with n (n uses ctrl instead of shift, but this will have to do for now)
-                    this.doc.selection.duplicatePatterns(event.shiftKey ? false : true); 
-                    event.preventDefault();
+                if (event.shiftKey) {
+                    
+                } else {
+                    if (canPlayNotes) break;
+                    if (needControlForShortcuts == (event.ctrlKey || event.metaKey)) {
+                        //shift d replaces old d functionality, while d will duplicate replacing an unused pattern
+                       //This is for consistency with n (n uses ctrl instead of shift, but this will have to do for now)
+                       this.doc.selection.duplicatePatterns(event.shiftKey ? false : true); 
+                       event.preventDefault();
+                    }
                 }
                 break;
             case 69: // e (+shift: eq filter settings)
@@ -5068,7 +5074,7 @@ export class SongEditor {
 
     private _randomPreset(): void {
         const isNoise: boolean = this.doc.song.getChannelIsNoise(this.doc.channel);
-        this.doc.record(new ChangePreset(this.doc, pickRandomPresetValue(isNoise)));
+        this.doc.record(new ChangePreset(this.doc, pickRandomPresetValue(isNoise,this.doc.prefs.rollNoveltyPresets)));
     }
 
     private _randomGenerated(usesCurrentInstrumentType: boolean): void {
@@ -5587,6 +5593,9 @@ export class SongEditor {
                 break;
             case "frostedGlassBackground":
                 this.doc.prefs.frostedGlassBackground = !this.doc.prefs.frostedGlassBackground;
+                break;
+            case "rollNoveltyPresets":
+                this.doc.prefs.rollNoveltyPresets = !this.doc.prefs.rollNoveltyPresets;
                 break;
         }
         this._optionsMenu.selectedIndex = 0;

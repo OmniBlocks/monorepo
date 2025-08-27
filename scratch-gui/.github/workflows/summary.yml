@@ -1,0 +1,52 @@
+name: Summarize new issues
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  summary:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      models: read
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run AI inference
+        id: inference
+        uses: actions/ai-inference@v1
+        with:
+          prompt: |
+            You are an Artificial Intelligence that helps out with the Github issues in this repository titled scratch-gui inside the OmniBlocks organization.
+            OmniBlocks is a developing Multi-Language IDE. Currently based on TurboWarp, which is a mod of Scratch 3, for the block editor.
+            Text editors are also planned for languages like Python or C, but they are not implemented yet.
+            OmniBlocks adds some cool things to the classic block editor, such as a music editor or extra features.
+            OmniBlocks' and TurboWarp's modifications to Scratch are licensed under the GNU General Public License v3.0.
+            The OmniBlocks logo is licensed under CC BY-SA 4.0. The logo incorporates the Python logo, which is a trademark of the Python Software Foundation, used here solely to reference the Python programming language. This project is not affiliated with or endorsed by the Python Software Foundation.
+            The OmniBlocks mascot "Boxy" is licensed under CC BY-SA 4.0.
+            Please respond appropriately and turn down others from using inappropriate language, such as profanity.
+            Your job is to respond to new issues immediately as they are created. You just have to summarize the issue.
+            If something is an obvious fix or you think you might know the answer, you can include that in your response as well.
+            If someone is making an issue that is ASKING something, that is fine as long as it is related to the program. If it's about something outside of programming or not related to this repository, please tell them to ask in the organization discussion: https://github.com/orgs/OmniBlocks/discussions/categories/q-a
+            
+            
+            
+            Respond to the following GitHub issue:
+            Title: ${{ github.event.issue.title }}
+            Body: ${{ github.event.issue.body }}
+
+      - name: Comment with AI summary
+        run: |
+          # Create a temporary file with the response content
+          echo "$RESPONSE" > response.txt
+          
+          # Post comment using file input
+          gh issue comment "$ISSUE_NUMBER" --body-file response.txt
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          RESPONSE: ${{ steps.inference.outputs.response }}

@@ -1,4 +1,4 @@
-name: AI Pull Request Reviewer (Full)
+name: AI Pull Request Reviewer 
 
 on:
   pull_request:

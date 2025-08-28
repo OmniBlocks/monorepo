@@ -1,4 +1,4 @@
-name: AI Pull Request Reviewer
+name: AI Pull Request Reviewer 
 
 on:
   pull_request:
@@ -9,25 +9,20 @@ permissions:
   issues: write
   contents: read
   checks: write
-  models: read   # needed for inference actions
+  models: read
 
 jobs:
-  # -------------------------------------------------
-  # 1️⃣ Gather the diff **once** – this is cheap and
-  #    lets us reuse the same data for all matrix runs.
-  # -------------------------------------------------
-  gather-diff:
+  ai-review:
     runs-on: ubuntu-latest
-    outputs:
-      diff: ${{ steps.diff.outputs.result }}
+
     steps:
       - name: Checkout PR code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Assemble PR patches (trimmed)
-        id: diff
+      - name: Gather PR file patches (truncated if large)
+        id: gather-diff
         uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -39,84 +34,27 @@ jobs:
               pull_number: pr.number,
             });
 
-            const maxChars = 60000;               // keep prompt well below most context windows
-            let out = `PR #${pr.number} – ${pr.title}\n\n`;
-            out += `URL: ${pr.html_url}\n\n`;
-
+            const maxChars = 6000;
+            let combined = `PR #${pr.number} - ${pr.title}\n\n`;
+            combined += `PR URL: ${pr.html_url}\n\n`;
             for (const f of files) {
               const header = `--- ${f.filename} ---\n`;
-              const patch = f.patch || '[binary or too large]\n';
-              if (out.length + header.length + patch.length > maxChars) {
-                const remaining = maxChars - out.length - header.length;
-                out += header + patch.slice(0, Math.max(0, remaining)) + '\n...[truncated]...\n';
+              const patch = f.patch || '[binary or too large to show]\n';
+              if (combined.length + header.length + patch.length > maxChars) {
+                const remaining = maxChars - combined.length - header.length;
+                combined += header + patch.slice(0, Math.max(0, remaining)) + '\n...[truncated]...\n';
                 break;
               } else {
-                out += header + patch + '\n';
+                combined += header + patch + '\n';
               }
             }
+            combined += '\nChanged files:\n' + files.map(f => `- ${f.filename}`).join('\n') + '\n';
+            return combined;
 
-            out += '\nChanged files:\n' + files.map(f => `- ${f.filename}`).join('\n') + '\n';
-            return out;
-
-  # -------------------------------------------------
-  # 2️⃣ Split the diff into *chunks* that will each be
-  #    fed to the model.  The split size (CHUNK_SIZE)
-  #    is deliberately conservative (≈ 8 k chars) so
-  #    that the **prompt + model output** never hits
-  #    the token limit.
-  # -------------------------------------------------
-  split-chunks:
-    needs: gather-diff
-    runs-on: ubuntu-latest
-    outputs:
-      matrix: ${{ steps.make-matrix.outputs.matrix }}
-    steps:
-      - name: Compute chunk matrix
-        id: make-matrix
-        env:
-          DIFF: ${{ needs.gather-diff.outputs.diff }}
-        run: |
-          #!/usr/bin/env bash
-          set -euo pipefail
-          CHUNK_SIZE=8000            # characters per chunk (adjust as needed)
-          DIFF="${DIFF}"
-          # split into parts and produce a JSON array like: [{"chunk":0,"text":"..."} , ...]
-          MATRIX=$(python - <<'PY'
-import os, json, textwrap, sys, math
-diff = os.getenv("DIFF")
-chunk_size = int(os.getenv("CHUNK_SIZE"))
-chunks = [diff[i:i+chunk_size] for i in range(0, len(diff), chunk_size)]
-matrix = [{"chunk": i, "text": c} for i,c in enumerate(chunks)]
-print(json.dumps(matrix))
-PY
-          )
-          echo "matrix=$MATRIX" >> $GITHUB_OUTPUT
-
-  # -------------------------------------------------
-  # 3️⃣ Matrix job – one call to the model per chunk.
-  #    The AI step requests a **max‑output‑tokens**
-  #    limit (4000 for OpenAI gpt‑3.5‑turbo).  If the
-  #    model reaches the limit it will automatically
-  #    emit the ``---CONTINUED---`` token (because we
-  #    added it to the system‑prompt below).
-  # -------------------------------------------------
-  review-chunk:
-    needs: [gather-diff, split-chunks]
-    runs-on: ubuntu-latest
-    strategy:
-      matrix: ${{ fromJSON(needs.split-chunks.outputs.matrix) }}
-      fail-fast: false
-    steps:
-      - name: Run AI review on this chunk
-        id: ai
+      - name: Run AI code review
+        id: ai-review
         uses: actions/ai-inference@v1
         with:
-          # Choose the provider you actually use – example shows OpenAI
-          provider: openai
-          model: gpt-3.5-turbo
-          max-output-tokens: 4000               # keep the model from over‑running
-          # Build a *single* prompt that contains the fixed instructions,
-          # the PR metadata, **and** the chunk we are reviewing.
           prompt: |
             You are an expert code reviewer for this repository. Your job is to inspect the provided pull request title, body, and file patches and produce a helpful, accurate code review.
 
@@ -124,14 +62,14 @@ PY
             1. Start the comment with the exact sentence: "Thank you for submitting this pull request."
             2. End the comment with the exact sentence: "This will still be reviewed by a human soon"
             3. Between those sentences include:
-               - A 1‑2 sentence high‑level summary of the PR.
+               - A 1-2 sentence high-level summary of the PR.
                - Any obvious syntax/runtime errors or likely bugs to fix.
                - Security or safety concerns (if any).
                - Performance or maintainability issues.
-               - Suggestions to improve tests, documentation, or edge‑case handling.
-               - File‑specific comments: mention filename and a short snippet or hunk reference for notable items.
+               - Suggestions to improve tests, documentation, or edge-case handling.
+               - File-specific comments: mention filename and a short snippet or hunk reference for notable items.
                - If everything looks good, say so explicitly.
-            4. Use Markdown formatting. **Never exceed** 3500 tokens in the answer. If you hit that limit, end the output with exactly: ---CONTINUED---
+            4. Use Markdown formatting. Keep the entire response under 6,000 characters. If you cannot finish within that limit, end the output with exactly: ---CONTINUED---
             5. Be polite and constructive; recommend exact changes where possible.
 
             --- CONTEXT: ---
@@ -139,85 +77,54 @@ PY
             PR Body: |
               ${{ github.event.pull_request.body }}
 
-            --- PATCH CHUNK ${{ matrix.chunk }} (truncated if large) ---
-            ${{ matrix.text }}
+            --- PATCHES & FILES (truncated if large): ---
+            ${{ steps.gather-diff.outputs.result }}
 
-      - name: Persist this chunk’s answer
-        run: |
-          echo "${{ steps.ai.outputs.response }}" > review-part-${{ matrix.chunk }}.txt
-      - name: Upload artifact for later concatenation
-        uses: actions/upload-artifact@v4
+      - name: Post AI review (split long responses; fallback)
+        uses: actions/github-script@v6
         with:
-          name: review-parts
-          path: review-part-${{ matrix.chunk }}.txt
-          retention-days: 1   # short‑lived – we only need it for this PR
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const prNumber = context.issue.number;
+            const AI_RESPONSE = process.env.AI_RESPONSE || '';
+            const FALLBACK = process.env.FALLBACK || "Thanks for submitting a pull request! I don't see any issues at first glance, but don't take my word for it! I am just a friendly AI. A human will review this soon :)";
 
-  # -------------------------------------------------
-  # 4️⃣ Assemble all the parts, split into GitHub‑comment‑size
-  #    chunks (≤ 64 k chars) and post them.  If any part
-  #    still ends with ``---CONTINUED---`` we *re‑run* the matrix
-  #    a single extra time (max 5 rounds total) – this
-  #    guarantees the AI can finish even for extremely long PRs.
-  # -------------------------------------------------
-  post-review:
-    needs: review-chunk
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download all review parts
-        uses: actions/download-artifact@v4
-        with:
-          name: review-parts
-          path: parts
+            let text = AI_RESPONSE.replace(/\r\n/g, '\n');
 
-      - name: Concatenate everything
-        id: cat
-        run: |
-          echo "## Concatenating parts…" >&2
-          cat parts/review-part-*.txt > full-review.txt
-          # Normalise line endings
-          tr -d '\r' < full-review.txt > full-review-clean.txt
-          echo "full=$(cat full-review-clean.txt)" >> $GITHUB_OUTPUT
+            const MAX_CHARS = 64000;
 
-      - name: Split into GitHub‑comment sized chunks (≤ 64000 chars)
-        id: splitter
+            if (!text.trim()) {
+              await github.rest.issues.createComment({
+                owner, repo, issue_number: prNumber,
+                body: FALLBACK
+              });
+              return;
+            }
+
+            if (text.length <= MAX_CHARS) {
+              await github.rest.pulls.createReview({
+                owner, repo, pull_number: prNumber,
+                body: text,
+                event: 'COMMENT'
+              });
+              return;
+            }
+
+            // If too long, split into safe-sized issue comments
+            let index = 0;
+            let part = 1;
+            while (index < text.length) {
+              const chunk = text.slice(index, index + MAX_CHARS);
+              const header = part === 1 ? '' : `Continuation (part ${part}):\n\n`;
+              await github.rest.issues.createComment({
+                owner, repo, issue_number: prNumber,
+                body: header + chunk
+              });
+              index += MAX_CHARS;
+              part++;
+            }
         env:
-          TEXT: ${{ steps.cat.outputs.full }}
-        run: |
-          #!/usr/bin/env python3
-          import os, textwrap, json, sys
-          txt = os.getenv("TEXT")
-          max_len = 64000
-          parts = [txt[i:i+max_len] for i in range(0, len(txt), max_len)]
-          print("chunks=" + json.dumps(parts))
-          open(os.getenv("GITHUB_OUTPUT"), "a").write("\nchunks=" + json.dumps(parts))
-
-      - name: Post the review (first chunk as PR review, the rest as issue comments)
-        env:
-          OWNER: ${{ github.repository_owner }}
-          REPO: ${{ github.event.repository.name }}
-          PR: ${{ github.event.pull_request.number }}
-        run: |
-          #!/usr/bin/env bash
-          set -euo pipefail
-          CHUNKS=$(jq -r '.chunks[]' <<<"${{ steps.splitter.outputs.chunks }}")
-          i=0
-          while IFS= read -r chunk; do
-            i=$((i+1))
-            if [[ $i -eq 1 ]]; then
-              # First chunk → PR review (so it appears in the “Files changed” UI)
-              gh api \
-                -H "Accept: application/vnd.github+json" \
-                /repos/${OWNER}/${REPO}/pulls/${PR}/reviews \
-                -f event=COMMENT -f body="${chunk}"
-            else
-              # Subsequent chunks → normal issue comments (they can be threaded)
-              gh api \
-                -H "Accept: application/vnd.github+json" \
-                /repos/${OWNER}/${REPO}/issues/${PR}/comments \
-                -f body="${chunk}"
-            fi
-          done <<<"${CHUNKS}"
-        # gh is pre‑installed on ubuntu‑latest; if you prefer actions/github-script you can
-        # replace the above block with a JavaScript version that calls `github.rest.issues.createComment`
-        # and `github.rest.pulls.createReview`.
-
+          AI_RESPONSE: ${{ steps.ai-review.outputs.response }}
+          FALLBACK: "Thanks for submitting a pull request! I don't see any issues at first glance, but don't take my word for it! I am just a friendly AI. A human will review this soon :)"

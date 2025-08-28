@@ -1,0 +1,130 @@
+name: AI Pull Request Reviewer (Full)
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+permissions:
+  pull-requests: write
+  issues: write
+  contents: read
+  checks: write
+  models: read
+
+jobs:
+  ai-review:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout PR code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Gather PR file patches (truncated if large)
+        id: gather-diff
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const pr = context.payload.pull_request;
+            const files = await github.paginate(github.rest.pulls.listFiles, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: pr.number,
+            });
+
+            const maxChars = 60000;
+            let combined = `PR #${pr.number} - ${pr.title}\n\n`;
+            combined += `PR URL: ${pr.html_url}\n\n`;
+            for (const f of files) {
+              const header = `--- ${f.filename} ---\n`;
+              const patch = f.patch || '[binary or too large to show]\n';
+              if (combined.length + header.length + patch.length > maxChars) {
+                const remaining = maxChars - combined.length - header.length;
+                combined += header + patch.slice(0, Math.max(0, remaining)) + '\n...[truncated]...\n';
+                break;
+              } else {
+                combined += header + patch + '\n';
+              }
+            }
+            combined += '\nChanged files:\n' + files.map(f => `- ${f.filename}`).join('\n') + '\n';
+            return combined;
+
+      - name: Run AI code review
+        id: ai-review
+        uses: actions/ai-inference@v1
+        with:
+          prompt: |
+            You are an expert code reviewer for this repository. Your job is to inspect the provided pull request title, body, and file patches and produce a helpful, accurate code review.
+
+            Requirements for your response:
+            1. Start the comment with the exact sentence: "Thank you for submitting this pull request."
+            2. End the comment with the exact sentence: "This will still be reviewed by a human soon"
+            3. Between those sentences include:
+               - A 1-2 sentence high-level summary of the PR.
+               - Any obvious syntax/runtime errors or likely bugs to fix.
+               - Security or safety concerns (if any).
+               - Performance or maintainability issues.
+               - Suggestions to improve tests, documentation, or edge-case handling.
+               - File-specific comments: mention filename and a short snippet or hunk reference for notable items.
+               - If everything looks good, say so explicitly.
+            4. Use Markdown formatting. Keep the entire response under 60,000 characters. If you cannot finish within that limit, end the output with exactly: ---CONTINUED---
+            5. Be polite and constructive; recommend exact changes where possible.
+
+            --- CONTEXT: ---
+            PR Title: ${{ github.event.pull_request.title }}
+            PR Body: |
+              ${{ github.event.pull_request.body }}
+
+            --- PATCHES & FILES (truncated if large): ---
+            ${{ steps.gather-diff.outputs.result }}
+
+      - name: Post AI review (split long responses; fallback)
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const prNumber = context.issue.number;
+            const AI_RESPONSE = process.env.AI_RESPONSE || '';
+            const FALLBACK = process.env.FALLBACK || "Thanks for submitting a pull request! I don't see any issues at first glance, but don't take my word for it! I am just a friendly AI. A human will review this soon :)";
+
+            let text = AI_RESPONSE.replace(/\r\n/g, '\n');
+
+            const MAX_CHARS = 64000;
+
+            if (!text.trim()) {
+              await github.rest.issues.createComment({
+                owner, repo, issue_number: prNumber,
+                body: FALLBACK
+              });
+              return;
+            }
+
+            if (text.length <= MAX_CHARS) {
+              await github.rest.pulls.createReview({
+                owner, repo, pull_number: prNumber,
+                body: text,
+                event: 'COMMENT'
+              });
+              return;
+            }
+
+            // If too long, split into safe-sized issue comments
+            let index = 0;
+            let part = 1;
+            while (index < text.length) {
+              const chunk = text.slice(index, index + MAX_CHARS);
+              const header = part === 1 ? '' : `Continuation (part ${part}):\n\n`;
+              await github.rest.issues.createComment({
+                owner, repo, issue_number: prNumber,
+                body: header + chunk
+              });
+              index += MAX_CHARS;
+              part++;
+            }
+        env:
+          AI_RESPONSE: ${{ steps.ai-review.outputs.response }}
+          FALLBACK: "Thanks for submitting a pull request! I don't see any issues at first glance, but don't take my word for it! I am just a friendly AI. A human will review this soon :)"

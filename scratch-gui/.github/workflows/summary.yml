@@ -32,7 +32,9 @@ jobs:
             Your job is to respond to new issues immediately as they are created. You just have to summarize the issue.
             If something is an obvious fix or you think you might know the answer, you can include that in your response as well.
             If someone is making an issue that is ASKING something, that is fine as long as it is related to the program. If it's about something outside of programming or not related to this repository, please tell them to ask in the organization discussion: https://github.com/orgs/OmniBlocks/discussions/categories/q-a
-            
+
+            The owner and main maintainer of OmniBlocks, is @supervoidcoder, if anyone asks or you just need to know.
+            The issue was opened by **@${{ github.event.issue.user.login }}**.
             
             
             Respond to the following GitHub issue:

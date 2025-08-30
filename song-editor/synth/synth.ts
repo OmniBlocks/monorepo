@@ -1006,7 +1006,6 @@ class Grain {
 
     public initializeParabolicEnvelope(durationInSamples: number, amplitude: number): void {
         this.parabolicEnvelopeAmplitude = 0;
-        if (durationInSamples == 0) durationInSamples++; //prevent division by 0
         const invDuration: number = 1.0 / durationInSamples;
         const invDurationSquared: number = invDuration * invDuration;
         this.parabolicEnvelopeSlope = 4.0 * amplitude * (invDuration - invDurationSquared);
@@ -1018,7 +1017,6 @@ class Grain {
         this.parabolicEnvelopeSlope += this.parabolicEnvelopeCurve;
     }
 
-    //rcb is unfinished and unused rn
     public initializeRCBEnvelope(durationInSamples: number, amplitude: number): void {
         // attack:
         this.rcbEnvelopeAttackIndex = Math.floor(durationInSamples / 6);
@@ -3375,10 +3373,10 @@ export class Song {
                         vol = Config.perEnvelopeSpeedToIndices[this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].envelopes[instrument.modEnvelopeNumbers[modCount]].perEnvelopeSpeed] - Config.modulators[perEnvSpeedIndex].convertRealFactor;
                         break;
                     case perEnvLowerIndex:
-                        vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].envelopes[instrument.modEnvelopeNumbers[modCount]].perEnvelopeLowerBound * 10 - Config.modulators[perEnvLowerIndex].convertRealFactor;
+                        vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].envelopes[instrument.modEnvelopeNumbers[modCount]].perEnvelopeLowerBound - Config.modulators[perEnvLowerIndex].convertRealFactor;
                         break;
                     case perEnvUpperIndex:
-                        vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].envelopes[instrument.modEnvelopeNumbers[modCount]].perEnvelopeUpperBound * 10 - Config.modulators[perEnvUpperIndex].convertRealFactor;
+                        vol = this.channels[instrument.modChannels[modCount]].instruments[instrumentIndex].envelopes[instrument.modEnvelopeNumbers[modCount]].perEnvelopeUpperBound - Config.modulators[perEnvUpperIndex].convertRealFactor;
                         break;
                 }
             }
@@ -7833,7 +7831,7 @@ class EnvelopeComputer {
         this.startPinTickPitch = null
     }
 
-    public computeEnvelopes(instrument: Instrument, currentPart: number, tickTimeStart: number[], tickTimeStartReal: number, secondsPerTick: number, tone: Tone | null, timeScale: number[], instrumentState: InstrumentState, synth: Synth, channelIndex: number, instrumentIndex: number, perNote: boolean): void {
+    public computeEnvelopes(instrument: Instrument, currentPart: number, tickTimeStart: number[], tickTimeStartReal: number, secondsPerTick: number, tone: Tone | null, timeScale: number[], instrumentState: InstrumentState, synth: Synth, channelIndex: number, instrumentIndex: number): void {
         const secondsPerTickUnscaled: number = secondsPerTick;
         const transition: Transition = instrument.getTransition();
         if (tone != null && tone.atNoteStart && !transition.continues && !tone.forceContinueAtStart) {
@@ -8009,8 +8007,8 @@ class EnvelopeComputer {
             //only calculate pitch if needed
             const pitch: number = (envelope.type == EnvelopeType.pitch) ? this.computePitchEnvelope(instrument, envelopeIndex, (this.startPinTickPitch || this.getPitchValue(instrument, tone, instrumentState, true))) : 0;
 
-            //calculate envelope values if target isn't null or part of the other envelope computer's job
-            if (automationTarget.computeIndex != null && automationTarget.perNote == perNote) {
+            //calculate envelope values if target isn't null
+            if (automationTarget.computeIndex != null) {
                 const computeIndex: number = automationTarget.computeIndex + targetIndex;
                 let envelopeStart: number = EnvelopeComputer.computeEnvelope(envelope, envelopeSpeed, globalEnvelopeSpeed, noteSecondsStartUnscaled, noteSecondsStart[envelopeIndex], beatTimeStart[envelopeIndex], timeSinceStart, noteSizeStart, pitch, inverse, perEnvelopeLowerBound, perEnvelopeUpperBound, false, steps, seed, waveform, defaultPitch, startPinTickAbsolute);
                 if (prevSlideStart) {
@@ -8840,17 +8838,6 @@ class InstrumentState {
         const tickTimeStart: number = ticksIntoBar;
         const secondsPerTick: number = samplesPerTick / synth.samplesPerSecond;
         const currentPart: number = synth.getCurrentPart();
-
-        /* slarmoo -- 
-
-            There are two(ish) envelopeComputers:
-            One in the instrumentState, and one in each tone.
-            The instrumentState one handles all sound-based effects, 
-            whereas the tone envelopeComputers handle all of the instrument settings and behavior-effects
-
-        */
-
-        //handle instrumentState envelopeComputer
         const envelopeSpeeds: number[] = [];
         for (let i: number = 0; i < Config.maxEnvelopeCount; i++) {
             envelopeSpeeds[i] = 0;
@@ -8872,7 +8859,7 @@ class InstrumentState {
             }
             envelopeSpeeds[envelopeIndex] = useEnvelopeSpeed * perEnvelopeSpeed;
         }
-        this.envelopeComputer.computeEnvelopes(instrument, currentPart, this.envelopeTime, tickTimeStart, secondsPerTick, tone, envelopeSpeeds, this, synth, channelIndex, instrumentIndex, false);
+        this.envelopeComputer.computeEnvelopes(instrument, currentPart, this.envelopeTime, tickTimeStart, secondsPerTick, tone, envelopeSpeeds, this, synth, channelIndex, instrumentIndex);
         const envelopeStarts: number[] = this.envelopeComputer.envelopeStarts;
         const envelopeEnds: number[] = this.envelopeComputer.envelopeEnds;
 
@@ -9902,7 +9889,6 @@ export class Synth {
     private static readonly drumFunctionCache: Function[] = [];
     private static readonly chipFunctionCache: Function[] = [];
     private static readonly pulseFunctionCache: Function[] = [];
-    private static readonly supersawFunctionCache: Function[] = [];
     private static readonly harmonicsFunctionCache: Function[] = [];
     private static readonly loopableChipFunctionCache: Function[] = Array(Config.unisonVoicesMax + 1).fill(undefined); //For loopable chips, we have a matrix where the rows represent voices and the columns represent loop types
 
@@ -9928,8 +9914,6 @@ export class Synth {
     public initialSongEqFilterInput2R: number = 0.0;
 
     private tempMonoInstrumentSampleBuffer: Float32Array | null = null;
-    private outputDataLUnfiltered: Float32Array | null = null;
-    private outputDataRUnfiltered: Float32Array | null = null;
 
     private audioCtx: any | null = null;
     private scriptNode: any | null = null;
@@ -10648,21 +10632,16 @@ export class Synth {
 
     public synthesize(outputDataL: Float32Array, outputDataR: Float32Array, outputBufferLength: number, playSong: boolean = true): void {
         if (this.song == null) {
-            outputDataL.fill(0.0);
-            outputDataR.fill(0.0);
+            for (let i: number = 0; i < outputBufferLength; i++) {
+                outputDataL[i] = 0.0;
+                outputDataR[i] = 0.0;
+            }
             this.deactivateAudio();
             return;
         }
+        const outputDataLUnfiltered: Float32Array = outputDataL.slice();
+        const outputDataRUnfiltered: Float32Array = outputDataR.slice();
 
-        //clear the unfiltered (not affected by song eq) output
-        if (this.outputDataLUnfiltered == null || this.outputDataLUnfiltered.length < outputBufferLength) {
-            this.outputDataLUnfiltered = new Float32Array(outputBufferLength);
-            this.outputDataRUnfiltered = new Float32Array(outputBufferLength);
-        } else {
-            this.outputDataLUnfiltered.fill(0.0);
-            this.outputDataRUnfiltered!.fill(0.0);
-        }
-        
         const song: Song = this.song;
         this.song.inVolumeCap = 0.0 // Reset volume cap for this run
         this.song.outVolumeCap = 0.0;
@@ -10801,10 +10780,6 @@ export class Synth {
 
             this.computeSongState(samplesPerTick);
 
-            if (!this.isPlayingSong && (this.liveInputPitches.length > 0 || this.liveBassInputPitches.length > 0)) { //set up modulation for live input tones
-                this.computeLatestModValues();
-            }
-
             for (let channelIndex: number = 0; channelIndex < song.pitchChannelCount + song.noiseChannelCount; channelIndex++) {
                 const channel: Channel = song.channels[channelIndex];
                 const channelState: ChannelState = this.channels[channelIndex];
@@ -10911,8 +10886,8 @@ export class Synth {
                         const stopIndex: number = Math.min(runEnd, bufferIndex + this.metronomeSamplesRemaining);
                         this.metronomeSamplesRemaining -= stopIndex - bufferIndex;
                         for (let i: number = bufferIndex; i < stopIndex; i++) {
-                            this.outputDataLUnfiltered![i] += this.metronomeAmplitude;
-                            this.outputDataRUnfiltered![i] += this.metronomeAmplitude;
+                            outputDataLUnfiltered[i] += this.metronomeAmplitude;
+                            outputDataRUnfiltered[i] += this.metronomeAmplitude;
                             const tempAmplitude: number = this.metronomeFilter * this.metronomeAmplitude - this.metronomePrevAmplitude;
                             this.metronomePrevAmplitude = this.metronomeAmplitude;
                             this.metronomeAmplitude = tempAmplitude;
@@ -10975,8 +10950,8 @@ export class Synth {
                 }
 
                 // A compressor/limiter.
-                const sampleL = (outputDataL[i] + this.outputDataLUnfiltered![i]) * song.masterGain * song.masterGain;
-                const sampleR = (outputDataR[i] + this.outputDataRUnfiltered![i]) * song.masterGain * song.masterGain;
+                const sampleL = (outputDataL[i] + outputDataLUnfiltered[i]) * song.masterGain * song.masterGain;
+                const sampleR = (outputDataR[i] + outputDataRUnfiltered[i]) * song.masterGain * song.masterGain;
                 const absL: number = sampleL < 0.0 ? -sampleL : sampleL;
                 const absR: number = sampleR < 0.0 ? -sampleR : sampleR;
                 const abs: number = absL > absR ? absL : absR;
@@ -11032,7 +11007,7 @@ export class Synth {
                         let instrument: Instrument = this.song.channels[channel].instruments[instrumentIdx];
                         let instrumentState: InstrumentState = this.channels[channel].instruments[instrumentIdx];
 
-                        // Update envelope time, which is used to calculate tone-based envelopes' position position
+                        // Update envelope time, which is used to calculate (all envelopes') position
                         const envelopeComputer: EnvelopeComputer = instrumentState.envelopeComputer;
                         const envelopeSpeeds: number[] = [];
                         for (let i: number = 0; i < Config.maxEnvelopeCount; i++) {
@@ -11058,11 +11033,9 @@ export class Synth {
                             }
                         }
 
-                        //annoyingly arp speed is calculated in a completely separate place from everything else, and thus we need to run compute envelopes just for it. 
-                        // This uses the instrumentState envelopeComputer, but is effectively per tone to the user given that arpeggios cause only one tone to play at a time
                         if (instrumentState.activeTones.count() > 0) {
                             const tone: Tone = instrumentState.activeTones.get(0);
-                            envelopeComputer.computeEnvelopes(instrument, currentPart, instrumentState.envelopeTime, tickTimeStart, secondsPerTick, tone, envelopeSpeeds, instrumentState, this, channel, instrumentIdx, false);
+                            envelopeComputer.computeEnvelopes(instrument, currentPart, instrumentState.envelopeTime, tickTimeStart, secondsPerTick, tone, envelopeSpeeds, instrumentState, this, channel, instrumentIdx);
                         }
 
                         const envelopeStarts: number[] = envelopeComputer.envelopeStarts;
@@ -11267,6 +11240,10 @@ export class Synth {
         const channelState: ChannelState = this.channels[channelIndex];
         const pitches: number[] = this.liveInputPitches;
         const bassPitches: number[] = this.liveBassInputPitches;
+
+        if (this.liveInputPitches.length > 0 || this.liveBassInputPitches.length > 0) {
+            this.computeLatestModValues();
+        }
 
         for (let instrumentIndex: number = 0; instrumentIndex < channel.instruments.length; instrumentIndex++) {
             const instrumentState: InstrumentState = channelState.instruments[instrumentIndex];
@@ -12155,8 +12132,7 @@ export class Synth {
             }
             envelopeSpeeds[envelopeIndex] = useEnvelopeSpeed;
         }
-        //the perTone envelopeComputer
-        envelopeComputer.computeEnvelopes(instrument, currentPart, instrumentState.envelopeTime, Config.ticksPerPart * partTimeStart, samplesPerTick / this.samplesPerSecond, tone, envelopeSpeeds, instrumentState, this, channelIndex, tone.instrumentIndex, true);
+        envelopeComputer.computeEnvelopes(instrument, currentPart, instrumentState.envelopeTime, Config.ticksPerPart * partTimeStart, samplesPerTick / this.samplesPerSecond, tone, envelopeSpeeds, instrumentState, this, channelIndex, tone.instrumentIndex);
         const envelopeStarts: number[] = tone.envelopeComputer.envelopeStarts;
         const envelopeEnds: number[] = tone.envelopeComputer.envelopeEnds;
         instrument.noteFilter = tmpNoteFilter;
@@ -12219,13 +12195,6 @@ export class Synth {
             }
             intervalStart += Synth.detuneToCents(modDetuneStart) * envelopeStart * Config.pitchesPerOctave / (12.0 * 100.0);
             intervalEnd += Synth.detuneToCents(modDetuneEnd) * envelopeEnd * Config.pitchesPerOctave / (12.0 * 100.0);
-            // //envelopes should not affect song detune
-            // if (this.isModActive(Config.modulators.dictionary["song detune"].index, channelIndex, tone.instrumentIndex)) {
-            //     modDetuneStart = 4 * this.getModValue(Config.modulators.dictionary["song detune"].index, channelIndex, tone.instrumentIndex, false);
-            //     modDetuneEnd = 4 * this.getModValue(Config.modulators.dictionary["song detune"].index, channelIndex, tone.instrumentIndex, true);
-            //     intervalStart += modDetuneStart * Config.pitchesPerOctave / (12.0 * 100.0);
-            //     intervalEnd += modDetuneEnd * Config.pitchesPerOctave / (12.0 * 100.0);
-            // }
         }
 
         if (effectsIncludeVibrato(instrument.effects)) {
@@ -12749,10 +12718,6 @@ export class Synth {
                     useSpreadStart = (this.getModValue(Config.modulators.dictionary["spread"].index, channelIndex, tone.instrumentIndex, false)) / Config.supersawSpreadMax;
                     useSpreadEnd = (this.getModValue(Config.modulators.dictionary["spread"].index, channelIndex, tone.instrumentIndex, true)) / Config.supersawSpreadMax;
                 }
-
-                //clamp the spread values to prevent negative ones polluting the output
-                useSpreadStart = Math.max(0, useSpreadStart);
-                useSpreadEnd = Math.max(0, useSpreadEnd);
 
                 const spreadSliderStart: number = useSpreadStart * envelopeStarts[EnvelopeComputeIndex.supersawSpread];
                 const spreadSliderEnd: number = useSpreadEnd * envelopeEnds[EnvelopeComputeIndex.supersawSpread];
@@ -13436,7 +13401,7 @@ export class Synth {
             }
 
             for (let i: number = 0; i < voiceCount; i++) {
-                chipSource += `let phase# = (tone.phases[#] - (tone.phases[#] | 0)) * waveLength;
+                chipSource += `let phase# = (tone.phases[#] % 1) * waveLength;
             let prevWaveIntegral# = 0.0;
             `.replaceAll("#", i + "");
             }
@@ -13563,7 +13528,7 @@ export class Synth {
             }
 
             for (let i: number = 0; i < voiceCount; i++) {
-                harmonicsSource += `let phase# = (tone.phases[#] - (tone.phases[#] | 0)) * waveLength;
+                harmonicsSource += `let phase# = (tone.phases[#] % 1) * waveLength;
             `.replaceAll("#", i + "");
             }
 
@@ -14179,7 +14144,7 @@ export class Synth {
 						bitcrusherPrevInput = sample;
 						sample = bitcrusherCurrentOutput;
 					} else {
-						bitcrusherPhase -= (bitcrusherPhase | 0);
+						bitcrusherPhase = bitcrusherPhase % 1.0;
 						const ratio = bitcrusherPhase / bitcrusherPhaseDelta;
 						
 						const lerpedInput = sample + (bitcrusherPrevInput - sample) * ratio;
@@ -14209,7 +14174,7 @@ export class Synth {
 
                 ringModMix += ringModMixDelta;
                 ringModPhase += ringModPhaseDelta;
-                ringModPhase -= ringModPhase | 0;
+                ringModPhase = ringModPhase % 1.0;
                 ringModPhaseDelta *= ringModPhaseDeltaScale;
                 ringModMixFade += ringModMixFadeDelta;
                 `
@@ -14234,8 +14199,8 @@ export class Synth {
                 effectsSource += `
 					
 					panningDelayLine[panningDelayPos] = sample;
-					const panningRatioL  = panningOffsetL - (panningOffsetL | 0);
-					const panningRatioR  = panningOffsetR - (panningOffsetR | 0);
+					const panningRatioL  = panningOffsetL % 1;
+					const panningRatioR  = panningOffsetR % 1;
 					const panningTapLA   = panningDelayLine[(panningOffsetL) & panningMask];
 					const panningTapLB   = panningDelayLine[(panningOffsetL + 1) & panningMask];
 					const panningTapRA   = panningDelayLine[(panningOffsetR) & panningMask];
@@ -14259,12 +14224,12 @@ export class Synth {
             if (usesChorus) {
                 effectsSource += `
 					
-					const chorusTap0Ratio = chorusTap0Index - (chorusTap0Index | 0);
-					const chorusTap1Ratio = chorusTap1Index - (chorusTap1Index | 0);
-					const chorusTap2Ratio = chorusTap2Index - (chorusTap2Index | 0);
-					const chorusTap3Ratio = chorusTap3Index - (chorusTap3Index | 0);
-					const chorusTap4Ratio = chorusTap4Index - (chorusTap4Index | 0);
-					const chorusTap5Ratio = chorusTap5Index - (chorusTap5Index | 0);
+					const chorusTap0Ratio = chorusTap0Index % 1;
+					const chorusTap1Ratio = chorusTap1Index % 1;
+					const chorusTap2Ratio = chorusTap2Index % 1;
+					const chorusTap3Ratio = chorusTap3Index % 1;
+					const chorusTap4Ratio = chorusTap4Index % 1;
+					const chorusTap5Ratio = chorusTap5Index % 1;
 					const chorusTap0A = chorusDelayLineL[(chorusTap0Index) & chorusMask];
 					const chorusTap0B = chorusDelayLineL[(chorusTap0Index + 1) & chorusMask];
 					const chorusTap1A = chorusDelayLineL[(chorusTap1Index) & chorusMask];
@@ -14563,7 +14528,7 @@ export class Synth {
             }
 
             for (let i: number = 0; i < voiceCount; i++) {
-                pulseSource += `phase# = (tone.phases[#] - (tone.phases[#] | 0));
+                pulseSource += `phase# = (tone.phases[#] % 1);
             `.replaceAll("#", i + "");
 
             }
@@ -14582,8 +14547,8 @@ export class Synth {
         `
 
             for (let i: number = 0; i < voiceCount; i++) {
-                pulseSource += `const sawPhaseA# = phase# - (phase# | 0);
-                const sawPhaseB# = (phase# + pulseWidth) - ((phase# + pulseWidth) | 0);
+                pulseSource += `const sawPhaseA# = phase# % 1;
+                const sawPhaseB# = (phase# + pulseWidth) % 1;
                 let pulseWave# = sawPhaseB# - sawPhaseA#;
                 if (!instrumentState.aliases) {
                     if (sawPhaseA# < phaseDelta#) {
@@ -14650,111 +14615,86 @@ export class Synth {
     }
 
     private static supersawSynth(synth: Synth, bufferIndex: number, runLength: number, tone: Tone, instrumentState: InstrumentState): void {
+        const data: Float32Array = synth.tempMonoInstrumentSampleBuffer!;
         const voiceCount: number = Config.supersawVoiceCount | 0;
-        let supersawFunction: Function = Synth.supersawFunctionCache[0]; //currently only one supersaw function can exist in a given song / mod. Change to an array if you desire to support multiple by, for example, having unisons on supersaws
-        if (supersawFunction == undefined) {
-            let supersawSource: string = "return (synth, bufferIndex, runLength, tone, instrumentState) => {";
 
+        let phaseDelta: number = tone.phaseDeltas[0];
+        const phaseDeltaScale: number = +tone.phaseDeltaScales[0];
+        let expression: number = +tone.expression;
+        const expressionDelta: number = +tone.expressionDelta;
+        let phases: number[] = tone.phases;
 
-            supersawSource += `
-        const data = synth.tempMonoInstrumentSampleBuffer;
-
-        let phaseDelta = tone.phaseDeltas[0];
-        const phaseDeltaScale = +tone.phaseDeltaScales[0];
-        let expression = +tone.expression;
-        const expressionDelta = +tone.expressionDelta;
-        `
-            for (let i: number = 0; i < voiceCount; i++) {
-                supersawSource += `
-                let phase# = tone.phases[#];
-                const unisonDetune# = tone.supersawUnisonDetunes[#];
-                `.replaceAll("#", i + "");
-            }
-
-            supersawSource += `
-        let dynamism = +tone.supersawDynamism;
-        const dynamismDelta = +tone.supersawDynamismDelta;
-        let shape = +tone.supersawShape;
-        const shapeDelta = +tone.supersawShapeDelta;
-        let delayLength = +tone.supersawDelayLength;
-        const delayLengthDelta = +tone.supersawDelayLengthDelta;
-        const delayLine = tone.supersawDelayLine;
-        const delayBufferMask = (delayLine.length - 1) >> 0;
-        let delayIndex = tone.supersawDelayIndex | 0;
+        let dynamism: number = +tone.supersawDynamism;
+        const dynamismDelta: number = +tone.supersawDynamismDelta;
+        const unisonDetunes: number[] = tone.supersawUnisonDetunes;
+        let shape: number = +tone.supersawShape;
+        const shapeDelta: number = +tone.supersawShapeDelta;
+        let delayLength: number = +tone.supersawDelayLength;
+        const delayLengthDelta: number = +tone.supersawDelayLengthDelta;
+        const delayLine: Float32Array = tone.supersawDelayLine!;
+        const delayBufferMask: number = (delayLine.length - 1) >> 0;
+        let delayIndex: number = tone.supersawDelayIndex | 0;
         delayIndex = (delayIndex & delayBufferMask) + delayLine.length;
 
-        const filters = tone.noteFilters;
-        const filterCount = tone.noteFilterCount | 0;
-        let initialFilterInput1 = +tone.initialNoteFilterInput1;
-        let initialFilterInput2 = +tone.initialNoteFilterInput2;
-        const applyFilters = Synth.applyFilters;
+        const filters: DynamicBiquadFilter[] = tone.noteFilters;
+        const filterCount: number = tone.noteFilterCount | 0;
+        let initialFilterInput1: number = +tone.initialNoteFilterInput1;
+        let initialFilterInput2: number = +tone.initialNoteFilterInput2;
+        const applyFilters: Function = Synth.applyFilters;
 
-        const stopIndex = bufferIndex + runLength;
-        for (let sampleIndex = bufferIndex; sampleIndex < stopIndex; sampleIndex++) {
+        const stopIndex: number = bufferIndex + runLength;
+        for (let sampleIndex: number = bufferIndex; sampleIndex < stopIndex; sampleIndex++) {
             // The phase initially starts at a zero crossing so apply
             // the delta before first sample to get a nonzero value.
-            phase0 = (phase0 + phaseDelta) - ((phase0 + phaseDelta) | 0);
-            let supersawSample = phase0 - 0.5 * (1.0 + (` + voiceCount + ` - 1.0) * dynamism);
+            let phase: number = (phases[0] + phaseDelta) % 1.0;
+            let supersawSample: number = phase - 0.5 * (1.0 + (voiceCount - 1.0) * dynamism);
+
             // This is a PolyBLEP, which smooths out discontinuities at any frequency to reduce aliasing. 
             if (!instrumentState.aliases) {
-                if (phase0 < phaseDelta) {
-                    var t = phase0 / phaseDelta;
+                if (phase < phaseDelta) {
+                    var t: number = phase / phaseDelta;
                     supersawSample -= (t + t - t * t - 1) * 0.5;
-                } else if (phase0 > 1.0 - phaseDelta) {
-                    var t = (phase0 - 1.0) / phaseDelta;
+                } else if (phase > 1.0 - phaseDelta) {
+                    var t: number = (phase - 1.0) / phaseDelta;
                     supersawSample -= (t + t + t * t + 1) * 0.5;
                 }
             }
 
-            if (!instrumentState.aliases) {
-            `
+            phases[0] = phase;
 
             for (let i: number = 1; i < voiceCount; i++) {
-                supersawSource += `
-                const detunedPhaseDelta# = phaseDelta * unisonDetune#;
+                const detunedPhaseDelta: number = phaseDelta * unisonDetunes[i];
                 // The phase initially starts at a zero crossing so apply
                 // the delta before first sample to get a nonzero value.
-                const aphase# = (phase# + detunedPhaseDelta#) - ((phase# + detunedPhaseDelta#) | 0);
-                supersawSample += aphase# * dynamism;
+                let phase: number = (phases[i] + detunedPhaseDelta) % 1.0;
+                supersawSample += phase * dynamism;
 
                 // This is a PolyBLEP, which smooths out discontinuities at any frequency to reduce aliasing. 
-                if (aphase# < detunedPhaseDelta#) {
-                    const t = aphase# / detunedPhaseDelta#;
-                    supersawSample -= (t + t - t * t - 1) * 0.5 * dynamism;
-                } else if (aphase# > 1.0 - detunedPhaseDelta#) {
-                    const t = (aphase# - 1.0) / detunedPhaseDelta#;
-                    supersawSample -= (t + t + t * t + 1) * 0.5 * dynamism;
+                if (!instrumentState.aliases) {
+                    if (phase < detunedPhaseDelta) {
+                        const t: number = phase / detunedPhaseDelta;
+                        supersawSample -= (t + t - t * t - 1) * 0.5 * dynamism;
+                    } else if (phase > 1.0 - detunedPhaseDelta) {
+                        const t: number = (phase - 1.0) / detunedPhaseDelta;
+                        supersawSample -= (t + t + t * t + 1) * 0.5 * dynamism;
+                    }
                 }
-                phase# = aphase#;
-                `.replaceAll("#", i + "");
+
+                phases[i] = phase;
             }
 
-            supersawSource += `
-            } else {
-             `
-            for (let i: number = 1; i < voiceCount; i++) {
-                supersawSource += `
-                const detunedPhaseDelta# = phaseDelta * unisonDetune#;
-                // The phase initially starts at a zero crossing so apply
-                // the delta before first sample to get a nonzero value.
-                phase# = (phase# + detunedPhaseDelta#) - ((phase# + detunedPhaseDelta#) | 0);
-                supersawSample += phase# * dynamism;
-                `.replaceAll("#", i + "");
-            }
-            supersawSource += `
-            }
             delayLine[delayIndex & delayBufferMask] = supersawSample;
-            const delaySampleTime = delayIndex - delayLength;
-            const lowerIndex = delaySampleTime | 0;
-            const upperIndex = lowerIndex + 1;
-            const delayRatio = delaySampleTime - lowerIndex;
-            const prevDelaySample = delayLine[lowerIndex & delayBufferMask];
-            const nextDelaySample = delayLine[upperIndex & delayBufferMask];
-            const delaySample = prevDelaySample + (nextDelaySample - prevDelaySample) * delayRatio;
+            const delaySampleTime: number = delayIndex - delayLength;
+            const lowerIndex: number = delaySampleTime | 0;
+            const upperIndex: number = lowerIndex + 1;
+            const delayRatio: number = delaySampleTime - lowerIndex;
+            const prevDelaySample: number = delayLine[lowerIndex & delayBufferMask];
+            const nextDelaySample: number = delayLine[upperIndex & delayBufferMask];
+            const delaySample: number = prevDelaySample + (nextDelaySample - prevDelaySample) * delayRatio;
             delayIndex++;
 
-            const inputSample = supersawSample - delaySample * shape;
-            const sample = applyFilters(inputSample, initialFilterInput1, initialFilterInput2, filterCount, filters);
+            const inputSample: number = supersawSample - delaySample * shape;
+            const sample: number = applyFilters(inputSample, initialFilterInput1, initialFilterInput2, filterCount, filters);
             initialFilterInput2 = initialFilterInput1;
             initialFilterInput1 = inputSample;
 
@@ -14763,17 +14703,12 @@ export class Synth {
             shape += shapeDelta;
             delayLength += delayLengthDelta;
 
-            const output = sample * expression;
+            const output: number = sample * expression;
             expression += expressionDelta;
 
             data[sampleIndex] += output;
-        }`
-        for (let i: number = 0; i < voiceCount; i++) {
-            supersawSource += `
-            tone.phases[#] = phase#;
-            `.replaceAll("#", i + "");
         }
-        supersawSource += `
+
         tone.phaseDeltas[0] = phaseDelta;
         tone.expression = expression;
         tone.supersawDynamism = dynamism;
@@ -14784,12 +14719,6 @@ export class Synth {
         synth.sanitizeFilters(filters);
         tone.initialNoteFilterInput1 = initialFilterInput1;
         tone.initialNoteFilterInput2 = initialFilterInput2;
-        }`
-            supersawFunction = new Function("Config", "Synth", supersawSource)(Config, Synth);
-            Synth.supersawFunctionCache[0] = supersawFunction;
-        }
-
-        supersawFunction(synth, bufferIndex, runLength, tone, instrumentState);
     }
 
     private static fmSourceTemplate: string[] = (`
@@ -14797,7 +14726,7 @@ export class Synth {
 		const sineWave = Config.sineWave;
 			
 		// I'm adding 1000 to the phase to ensure that it's never negative even when modulated by other waves because negative numbers don't work with the modulus operator very well.
-		let operator#Phase       = +((tone.phases[#] - (tone.phases[#] | 0)) + 1000) * ` + Config.sineWaveLength + `;
+		let operator#Phase       = +((tone.phases[#] % 1) + 1000) * ` + Config.sineWaveLength + `;
 		let operator#PhaseDelta  = +tone.phaseDeltas[#] * ` + Config.sineWaveLength + `;
 		let operator#PhaseDeltaScale = +tone.phaseDeltaScales[#];
 		let operator#OutputMult  = +tone.operatorExpressions[#];
@@ -14896,7 +14825,7 @@ export class Synth {
 
         `
             for (let i: number = 0; i < voiceCount; i++) {
-                noiseSource += `let phase# = (tone.phases[#] - (tone.phases[#] | 0)) * Config.chipNoiseLength;
+                noiseSource += `let phase# = (tone.phases[#] % 1) * Config.chipNoiseLength;
                 `.replaceAll("#", i + "");
             }
             noiseSource += "let test = true;"
@@ -15014,7 +14943,7 @@ export class Synth {
         const phaseMask = Config.spectrumNoiseLength - 1;
         `
             for (let i: number = 0; i < voiceCount; i++) {
-                spectrumSource += `let phase# = (tone.phases[#] - (tone.phases[#] | 0)) * Config.spectrumNoiseLength;
+                spectrumSource += `let phase# = (tone.phases[#] % 1) * Config.spectrumNoiseLength;
                 `.replaceAll("#", i + "");
             }
             spectrumSource += `
@@ -15129,7 +15058,7 @@ export class Synth {
         const applyFilters = Synth.applyFilters;`
 
             for (let i: number = 0; i < voiceCount; i++) {
-                drumSource += `let phase# = (tone.phases[#] - (tone.phases[#] | 0)) * Config.spectrumNoiseLength;
+                drumSource += `let phase# = (tone.phases[#] % 1) * Config.spectrumNoiseLength;
             `.replaceAll("#", i + "");
             }
             drumSource += `

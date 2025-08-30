@@ -1,6 +1,6 @@
 // Copyright (c) 2012-2022 John Nesky and contributing authors, distributed under the MIT license, see accompanying the LICENSE.md file.
 
-import { Dictionary, DictionaryArray, EnvelopeType, InstrumentType, Transition, Chord, Envelope, Config, sampleLoadEvents, SampleLoadedEvent } from "../synth/SynthConfig";
+import { Dictionary, DictionaryArray, EnvelopeType, InstrumentType, Transition, Chord, Envelope, Config } from "../synth/SynthConfig";
 import { ColorConfig } from "../editor/ColorConfig";
 import { NotePin, Note, Pattern, Instrument, Channel, Synth } from "../synth/synth";
 import { oscilloscopeCanvas } from "../global/Oscilloscope";
@@ -156,7 +156,7 @@ let prevHash: string | null = null;
 let id: string = ((Math.random() * 0xffffffff) >>> 0).toString(16);
 let pauseButtonDisplayed: boolean = false;
 let animationRequest: number | null;
-let zoomEnabled: boolean = true; //slarmoo's: false
+let zoomEnabled: boolean = false;
 let timelineWidth: number = 1;
 let outVolumeHistoricTimer: number = 0;
 let outVolumeHistoricCap: number = 0;
@@ -220,14 +220,6 @@ const volumeBarContainer: SVGSVGElement = SVG.svg({ style: `touch-action: none; 
 	outVolumeBar,
 	outVolumeCap,
 );
-const sampleLoadingBar: HTMLDivElement = div({ style: `width: 0%; height: 100%; background-color: ${ColorConfig.indicatorPrimary};` });
-// const sampleFailedBar: HTMLDivElement = div({ style: `width: 0%; height: 100%; background-color: ${ColorConfig.sampleFailed};` });
-const sampleLoadingBarContainer: HTMLDivElement = div({ class: `sampleLoadingContainer`, style: `overflow: hidden; margin: auto; width: 90%; height: 50%; background-color: var(--empty-sample-bar, ${ColorConfig.indicatorSecondary});`, preserveAspectRatio: "none" }, sampleLoadingBar, /*sampleFailedBar*/);
-const sampleLoadingStatusContainer: HTMLDivElement = div({},
-	div({ class: "selectRow", style: "overflow: hidden; margin: auto; width: 160px; height: 10px; " },
-		sampleLoadingBarContainer,
-	));
-const volumeBarContainerDiv: HTMLDivElement = div({ class: `volBarContainer`, style: "display:flex; flex-direction:column; touch-action: none; overflow: hidden; margin: auto" }, volumeBarContainer, sampleLoadingStatusContainer);
 document.body.appendChild(visualizationContainer);
 document.body.appendChild(
 		div({style: `flex-shrink: 0; height: 20vh; min-height: 22px; max-height: 70px; display: flex; align-items: center;`},
@@ -236,7 +228,7 @@ document.body.appendChild(
 		volumeIcon,
 		volumeSlider,
 		zoomButton,
-		volumeBarContainerDiv,
+		volumeBarContainer,
 		oscilloscope.canvas, //make it auto remove itself later
 		titleText,
 		editLink,
@@ -768,30 +760,6 @@ function onShareClicked(): void {
 	(<any>navigator).share({ url: location.href });
 }
 
-function updateSampleLoadingBar(_e: Event): void {
-	// @TODO: Avoid this cast and type EventTarget/Event properly.
-	const e: SampleLoadedEvent = <SampleLoadedEvent>_e;
-	const percent: number = (
-		e.totalSamples === 0
-			? 0
-			: Math.floor((e.samplesLoaded / e.totalSamples) * 100)
-	);
-	// const failedPercent: number = (
-	// 	e.totalSamples === 0
-	// 		? 0
-	// 		: Math.floor((e.samplesFailed / e.totalSamples) * 100)
-	// );
-	// sampleNum = Boolean(percent > 0 && failedPercent > 0);
-	sampleLoadingBarContainer.title = "Total Samples: " + String(e.totalSamples) + "; Loaded Samples: " + String(e.samplesLoaded) + "; ";//Samples Failed: " + String(e.samplesFailed) + ";";
-	sampleLoadingBar.style.width = `${percent}%`;
-	// sampleFailedBar.style.width = `${failedPercent + Number(sampleNum)}%`;
-	if (e.totalSamples != 0) {
-		sampleLoadingBarContainer.style.backgroundColor = "var(--indicator-secondary)";
-	} else {
-		sampleLoadingBarContainer.style.backgroundColor = "var(--empty-sample-bar, var(--indicator-secondary))";
-	}
-}
-
 	if ( top !== self ) {
 	// In an iframe.
 	copyLink.style.display = "none";
@@ -825,7 +793,6 @@ zoomButton.addEventListener("click", onToggleZoom);
 copyLink.addEventListener("click", onCopyClicked);
 shareLink.addEventListener("click", onShareClicked);
 window.addEventListener("hashchange", hashUpdatedExternally);
-sampleLoadEvents.addEventListener("sampleloaded", updateSampleLoadingBar.bind(this));
 
 hashUpdatedExternally();
 renderLoopIcon();

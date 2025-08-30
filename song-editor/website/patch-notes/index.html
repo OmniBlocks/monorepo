@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <link rel="shortcut icon" type="image/x-icon" href="./favicon.ico"> 
+    <!-- CDN for jQuery and select2 -->
+    <script src="patch_notes_files/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+    <link href="patch_notes_files/select2.min.css" rel="stylesheet">
+    <script src="patch_notes_files/select2.min.js"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AbyssBox Patch Notes</title>
+    <meta name="application-name" content="AbyssBox Patch Notes">
+    <meta name="apple-mobile-web-app-title" content="AbyssBox Patch Notes">
+    <meta name="description" content="Read up on what AbyssBox has been up to!">
+    <meta name="keywords" content="chiptune, instrumental, music, song, melody, composition, tool, free, square wave, NES, NSF, JummBox, jummbox, BeepBox, beepbox, GoldBox, goldBox">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#444">
+    <meta name="msapplication-TileColor" content="#dba600">
+    <meta name="msapplication-config" content="/browserconfig.xml">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="apple-touch-icon" sizes="180x180" href="/icon_32.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/icon_32.png">
+    <link rel="manifest" href="/manifest.webmanifest">
+    <link href="patch_notes_files/css.css" rel="stylesheet" media="all" onload="if (this.media != 'all') this.media='all';"> <!-- this is a trick to load CSS asynchronously. -->
+    <style type="text/css">
+        html {
+            background: var(--page-margin, #1e0915);
+            overflow-x: hidden;
+            font-size: large;
+            font-family: 'B612', sans-serif;
+            line-height: 1.3;
+            color: var(--primary-text, white);
+        }
+
+        body {
+            margin: auto;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            align-content: center;
+        }
+
+		body {
+			background-image: url("../image_assets/stripesbg.gif") !important;
+			background-position: center;
+			background-repeat: repeat;
+			image-rendering: -moz-crisp-edges !important;
+			image-rendering: -webkit-optimize-contrast !important;
+			image-rendering: -o-crisp-edges !important;
+			image-rendering: pixelated !important;
+			image-rendering: optimizeSpeed !important;
+		}
+
+        #beepboxEditorContainer {
+            min-height: 645px;
+            overflow: auto;
+            background: var(--editor-background, black);
+            width: 100%;
+			max-width: 710px;
+            padding-left: 30px;
+            padding-right: 30px;
+        }
+
+        #text-content {
+            overflow: auto;
+            background: var(--editor-background, black);
+            width: 100%;
+			max-width: 710px;
+            padding-left: 30px;
+            padding-right: 30px;
+        }
+
+        h1 {
+            font-size: 1.7rem;
+            text-align: center;
+            margin-top: 0.5em;
+            margin-bottom: 0.5em;
+            -webkit-text-stroke-width: 0;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            text-align: center;
+            margin-top: 0.5em;
+            margin-bottom: 0.5em;
+            -webkit-text-stroke-width: 0;
+        }
+
+		h3 {
+            font-size: 1.2rem;
+            margin-top: 0.5em;
+            margin-bottom: 0.5em;
+            -webkit-text-stroke-width: 0;
+        }
+
+        .centerDiv {
+			margin: 0px auto;
+		}
+
+        a {
+            color: var(--link-accent, #98f);
+        }
+
+        .donation form {
+            display: inline;
+        }
+
+        .donation input[type="submit"] {
+            /*-webkit-appearance: none; */
+            background: none;
+            border: none;
+            font-family: inherit;
+            font-size: inherit;
+            color: var(--link-accent, #98f);
+            text-decoration: underline;
+            cursor: pointer;
+            padding: 0;
+            margin: 0;
+        }
+
+        /* wide screen */
+		@media (min-width: 711px) {
+            html {
+                width: 100%;
+            }
+
+            body {
+                width: 100%;
+            }
+
+            .column-container {
+				width: 710px;
+                display: flex;
+				gap: 25px;
+            }
+
+            .instructions-column {
+				min-width: 0;
+            }
+
+            .twitter-column {
+                width: 300px;
+				flex-shrink: 0;
+            }
+        }
+
+		.abyssbox-credits {
+			align-items: center;
+			display: flex;
+			flex-direction: column;
+
+			align-items: center;
+			display: flex;
+			flex-direction: column;
+			border-image-source: url("../image_assets/abyssbox_border.png");
+			padding: 0.5em;
+			border-image-slice: 4 fill;
+			border-image-width: 8px;
+			border-image-repeat: stretch;
+			padding: 12px;
+				padding-top: 12px;
+			padding-top: 0px;
+			image-rendering: -moz-crisp-edges !important;
+			image-rendering: -webkit-optimize-contrast !important;
+			image-rendering: -o-crisp-edges !important;
+			image-rendering: pixelated !important;
+			image-rendering: optimizeSpeed !important;
+		}
+
+		.ultrabox-credits {
+			align-items: center;
+			display: flex;
+			flex-direction: column;
+
+			align-items: center;
+			display: flex;
+			flex-direction: column;
+			border-image-source: url("../image_assets/beepbox_pixel_border.png");
+			padding: 0.5em;
+			border-image-slice: 4 fill;
+			border-image-width: 8px;
+			border-image-repeat: stretch;
+			padding: 12px;
+				padding-top: 12px;
+			padding-top: 0px;
+			image-rendering: -moz-crisp-edges !important;
+			image-rendering: -webkit-optimize-contrast !important;
+			image-rendering: -o-crisp-edges !important;
+			image-rendering: pixelated !important;
+			image-rendering: optimizeSpeed !important;
+
+			margin-top: 0.5em;
+			margin-bottom: 0.5em;
+		}
+
+        /* narrow screen */
+		@media (max-width: 710px) {
+            body {
+                width: 100%;
+            }
+
+            p, .donation {
+                margin: 1em 0.5em;
+            }
+
+            .column-container {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+  </head><body>
+	<div class="abyssbox-credits" style="width: 90vw; max-width: 862px; padding: 15px; padding-top: 0;">
+		<h1>
+	<font color="#c763a0">AbyssBox's Patch Notes (in reverse chronological order);</font>
+		</h1>
+		<div  class="V1.6.1">
+			<h2 style="color: #f24c4c;">Version 1.6.1 </h2><h3> <ul>
+			
+			<p></p> 
+			<p></p>
+			<li>Updated to remove Slarmoo's Box envelopes.</li>
+			<div>The reasoning?</div>
+			<ul>
+				<div>Song compatability. Older songs changed rather dramatically from one update to the next because of the new envelopes. Some envelopes had rather small changes that wouldn't be noticed but quite a few of them had rather notable differences that simply wouldn't fly. I personally disliked this and determined that to keep older songs sounding as they did that it would be better to remove the new system entirely. Everything else is untouched except the envelopes.</div>
+				<p></p>
+				<div>If your song corrupts between updates then try replacing your song url with <a target="_blank" href="https://choptop84.github.io/abyssbox-archives/sb-envelopes/">https://choptop84.github.io/abyssbox-archives/sb-envelopes/</a> and it should be recoverable.</div>
+				<p></p>
+				<div>Thank you for your understanding.</div>
+				<p></p>
+			</ul>
+		<p>6/26/2025</p>
+		</div>
+		<div  class="V1.6">
+			<h2 style="color: #f24c4c;">Version 1.6 </h2><h3> <ul>
+			
+			<p></p> 
+			<p></p>
+			<li>Updated to match UltraBox 2.3.</li>
+			<li>This includes:</li>
+			<ul>
+				<li>Note Range Effect, This prevents notes from being played if they're outside of the note range's effect.</li>
+				<p></p>
+				<li>Song Details, which allows you to put an author and description for every song. (This also gives other useful information).</li>
+				<p></p>
+				<li>Strum Speed, which allows you to change the speed at which the strum chord type plays.</li>
+				<p></p>
+				<li>Slide Speed, which allows you to change the speed at which the slide transition type plays.</li>
+				<p></p>
+				<li>Unison Buzzing.</li>
+				<p></p>
+			</ul>	
+			<p></p>
+			<li>Added Slarmoo's Box's Envelopes with Slarmoo's Box json importing compatability (Using the URL will not work!).</li>
+			<p></p>
+			<li>Added a hertz offset for Ring Modulation.</li>
+			<p></p>
+			<li>Removed the update prompt in favor for an "Update Popup" which is far less intrusive.</li>
+			<p></p>
+			<li>Due to common complaints, All 'pixel art' themes have had their font changed to Roboto (The default font).</li>
+			<ul>
+				<li>If you want to reverse this, you can apply fonts to any theme the new font prompt.</li>
+			</ul>
+			<p></p>
+			<li>Added a prompt that allows you to change the font, you can even upload your own font files to use in AbyssBox.</li>
+			<p></p>
+			<li>Most effects can now be enveloped.</li>
+			<p></p>
+			<li>Songwide pitch shift.</li>
+			<ul>
+				<li>This allows you to change the key of the entire song with only one modulator.</li>
+			</ul>
+			<p></p>
+			<li>Doubled Pulse width from 50 to 100.</li>
+			<p></p>
+			<li>Added new presets.</li>
+			<ul>
+				<li>In the "AbyssBox 1.3+ Presets":</li>
+				<ul>
+					<li>Distortion Bass.</li>
+					<p></p>
+					<li>Phased Overdrive Guitar.</li>
+					<p></p>
+					<li>Phased Picked Guitar.</li>
+					<p></p>
+					<li>Accumula Guitar.</li>
+					<p></p>
+				</ul>
+				<li>In the new "AbyssBox Spooky Presets":</li>
+				<ul>
+					<li>Chipwave Music Box.</li>
+					<p></p>
+					<li>Chipwave Spooky Pad.</li>
+					<p></p>
+				</ul>
+				<li>Due to the new preset category, the "Ghost House" preset has been moved to the "AbyssBox Spooky Presets."</li>
+			</ul>
+			<p></p>
+			<li>Added Dogebox2's Invert Wave effect.</li>
+			<p></p>
+			<li>Renamed the "Use Mobile Instrument Settings" preference to "Use Instrument Tabs".</li>
+			<p></p>
+			<li>There is now a bar telling you how many of your samples failed.</li>
+			<p></p>
+			<li>Added two new themes.</li>
+			<ul>
+				<li>Frutiger Aero Night</li>
+				<li>Woodland</li>
+			</ul>
+			<p></p>
+			<li>Updated two themes.</li>
+			<ul>
+				<li>Frutiger Aero</li>
+				<li>Windows Xp</li>
+			</ul>
+			<p></p>
+			<li>Other small Bugfixes.</li>
+			<p></p>
+			
+		<p>6/25/2025</p>
+		</div>
+		<div  class="V1.5.1">
+			<h2 style="color: #f24c4c;">Version 1.5.1 </h2><h3> <ul>
+			
+			<p></p> 
+			<p></p>
+			<li>Updated Frutiger Aero to be a little less laggy.</li>
+			<p></p>
+			<li>Added tips to the Phaser Tip Prompts and Ring Modulation Prompts.</li>
+			<p></p>
+			<li>Other small Bugfixes.</li>
+			<p></p>
+			
+		<p>10/1/2024</p>
+		</div>
+		<div  class="V1.5">
+			<h2 style="color: #f24c4c;">Version 1.5 </h2><h3> <ul>
+			
+			<p></p> 
+			<li>Added a Preset Selector.</li>
+			<ul>
+				<li>When you enter the Edit Menu, you can enable or disable certain preset categories.</li>
+				<p></p>
+				<li>Along with this, the preset categories that were once removed before have returned.</li>
+				<p></p>
+			</ul>	
+			<p></p>
+			<li>Fixes to the Song Player and Song Recovery Prompt.</li>
+			<p></p>
+			<li>New Presets:</li>
+				<ul>
+					<li>FM Violin.</li>
+					<li>Shamisen 2.</li>
+					<li>Picked Distortion Guitar.</li>
+					<li>Future Keys.</li>
+					<li>Light Bell.</li>
+					<p></p>
+				</ul>		
+			<p></p>
+			<li>Added more options for Songwide Modulation. This includes:</li>
+				<ul>
+					<li>Songwide Bitcrush.</li>
+					<li>Songwide Frequency Crush.</li>
+					<li>Songwide Panning.</li>
+					<li>Songwide Chorus.</li>
+					<li>Songwide Distortion.</li>
+					<li>Songwide Ring Modulation.</li>
+					<p></p>
+				</ul>	
+			<p></p>
+			<li>Added new Ring Modulation Effect.</li>
+			<ul>
+				<li>Ring Modulation is an effect that multiplies a frequency to a base frequency to create a unique sound.</li>
+				<li>if you want to learn more about Ring Modulation, I suggest <a href="https://en.wikipedia.org/wiki/Ring_modulation" target="_blank">checking out the Wikipedia page for more details</a>.</li> 
+				<p></p>
+			</ul>	
+			<p></p>
+			<li>Added new Phaser effect.</li>
+			<ul>
+				<li>Phaser is an effect that's quite complicated to explain so I suggest <a href="https://en.wikipedia.org/wiki/Phaser_(effect)" target="_blank">checking out the Wikipedia page if you want to know what it does</a>.</li>
+				<p></p>
+			</ul>	
+			<p></p>
+			<li>Ported UltraBox's Import Modes feature.</li>
+			<p></p>
+			<li>New SVG elements for non pixel themes.</li>
+			<p></p>
+			<li>Added two new themes.</li>
+			<ul>
+				<li>Corporate Dark.</li>
+				<li>Corporate Light.</li> 
+			</ul>
+				<p></p>
+			<p></p>
+			<li>Added a Keybind to invert the muted state of all noise and pitch channels.</li>
+			<ul>
+				<li>Inverting the muted state of channels basically makes all muted channels unmuted and all unmuted channels muted.</li>
+				<li>Selecting an area will only invert the selected channels muted states, including mod channels.</li>
+				<p></p>
+			</ul>
+			<p></p>
+			<li>Added .opus and .ogg as export options. (Thanks to LeoV for that)</li>
+			<p></p>
+			<li>Updated the Embed for AbyssBox to also include the icon and a new color.</li>
+			<p></p>
+			<li>Fixed a Bug that made the Unison Dropdown appear in instruments that didn't support it.</li>
+			<p></p>
+			<li>Other Bugfixes.</li>
+			<p></p>
+			
+		<p>9/14/2024</p>
+		</div>
+		<div  class="V1.4.5">
+		<h2 style="color: #f24c4c;">Version 1.4.5 </h2><h3> <ul>
+		
+		<p></p> 
+		<li>Added a preference which allows for PC users to use the Mobile Instrument Settings.</li>
+		<p></p>
+		<li>Added over 70 new plants</li>
+		<p></p>
+		<li>Updated a few easter eggs</li>
+		<p></p>
+		<li>Merged the Import and Export Prompts into one.</li>
+		<ul>
+			<li>The Keybind to open the Import Prompt button no longer works, you must use the Export Prompt keybind to save your songs.</li>
+			<p></p>
+		</ul>	
+		<p></p>
+		<li>Added a feature that allows you to set a theme for this song specifically:</li>
+			<ul>
+				<li>Changes the design of the mod channel notes to match the original design.</li>
+				<li>By default this is set to none.</li>
+				<p></p>
+				<p></p>
+			</ul>		
+		<p></p>
+		<li>Fixed the Beats Per Bar Prompt that prevented the user from closing the prompt.</li>
+		<p></p>
+		<li>Other Bugfixes.</li>
+		<p></p>
+		
+	<p>6/20/2024</p>
+	</div>
+	<div  class="V1.4">
+	</h1><h2 style="color: #f24c4c;">Version 1.4 - The theme Update </h2><h3>
+		<ul>
+		</ul>
+		<p></p> 
+		<ul>
+		</ul>
+			<li>Added an Advanced Theme Selector</li>
+		<ul>
+		<li>Now there are three tabs to the custom theme editor</li>
+		<ul>
+			<p></p>
+			<li>Template, which allows you to mix and match parts from other themes to make your own theme.</li>
+			<li>Editor, which allows you to edit the colors of assets in the theme.</li>
+			<li>Import/Export, which allows you to import and export themes to your computer as '.css' files</li>
+			<p></p>
+			<p></p>
+		</ul>
+		</ul>
+		<li>Changed the appearance of the mod channel notes.</li>
+		<p></p>
+		<li>Added 33 new themes, 21 of which belong to ModBox:</li>
+			<li>The ModBox themes include:</li>
+			<ul>
+			<p></p>
+				<li>ModBox 2.0</li>
+				<li>Artic</li>
+				<li>Cinnamon Roll</li>
+				<li>Ocean</li>
+				<li>Rainbow</li>
+				<li>Float</li>
+				<li>Windows</li>
+				<li>Grassland</li>
+				<li>Dessert</li>
+				<li>Kahootiest</li>
+				<li>Beam to the Bit</li>
+				<li>Pretty Egg</li>
+				<li>Poniryonshka</li>
+				<li>Gameboy</li>
+				<li>Woodkid</li>
+				<li>Midnight</li>
+				<li>Snedbox</li>
+				<li>unnamed</li>
+				<li>Piano</li>
+				<li>Halloween</li>
+				<li>Frozen Over</li>
+			<p></p>
+			<p></p>
+		</ul>	
+			<li>The Other themes include:</li>
+			<ul>
+			<p></p>
+				<li>Nepbox Laffey</li>
+				<li>Yume Nikki</li>
+				<li>ShitBox 1.0</li>
+				<li>ShitBox 3.0/shitbox4</li>
+				<li>ShitBox Realm</li>
+				<li>ShitBox ModBox 2.0</li>
+				<li>DogeBox Way too Dark</li>
+				<li>BirdBox Dark</li>
+				<li>BirdBox Light</li>
+				<li>Nepbox Piano</li>
+				<li>Nepbox Snedbox</li>
+				<li>AbyssBox Piano</li>
+			<p></p>
+			<p></p>
+		</ul>
+		<li>Speaking of themes, there are preferences to give your website a great new appearance:</li>
+		<ul>
+		<li>Advanced Color Scheme:</li>
+			<ul>
+				<li>Used in the ModBox themes, and a few of the other new themes too. This enables the pattern editors pitch backgrounds to change color individually.</li>
+				<li>Most themes that use this preference are marked with a [!] symbol.</li>
+				<li>By default this is false.</li>
+			<p></p>
+			<p></p>
+			</ul>
+		</ul>
+		<ul>
+			<li>Use Old Mod Notes:</li>
+				<ul>
+					<li>Changes the design of the mod channel notes to match the original design.</li>
+					<li>By default this is false.</li>
+				<p></p>
+				<p></p>
+				</ul>	
+		</ul>	
+		<ul>
+			<li>Highlight Third Note:</li>
+				<ul>
+					<li>Highlights the third note, similar to Highlight Fifth Note.</li>
+					<li>This will not always match the current scale, so keep that in mind.</li>
+					<li>This is a port of a Preference from Sandbox.</li>
+					<li>By default this is false.</li>
+				<p></p>
+				<p></p>
+				</ul>	
+		</ul>	
+		<p></p>
+		<li>Added 29 variables that can be used in themes.</li>
+		<p></p>
+		<li>Things from UltraBox.</li>
+		<p></p>
+		<li>Bugfixes.</li>
+		<p></p>
+		<li>Added a keybind to insert a bar before the current bar.</li>
+		<p></p>
+	</ul>
+		<p></p>
+		</ul>
+
+	<p>6/10/2024</p>
+	</div>
+	<div  class="V1.3">
+	</h1><h2 style="color: #f24c4c;">Version 1.3 - The Loops and Song Player Layouts Update </h2><h3> <ul>
+		<ul>
+		</ul>
+		<p></p> 
+		<ul>
+		</ul>
+			<li>Added Loop modes</li>
+		<ul>
+		<li>Loop modes are a feature that allow you to change how the song loops in the song editor, there are three loop modes:</li>
+		<ul>
+			<p></p>
+			<li>Loop within bar - This causes the song to loop within the oval shaped bar below the track editor.</li>
+			<li>Loop full song - This causes the song to loop when it reaches the end, it also removes the display of the loop bar.</li>
+			<li>Do not loop - This causes the song to end when it reaches the end of the last bar.</li>
+			<p></p>
+			<p></p>
+		</ul>
+		</ul>
+		<li>Added new themes:</li>
+		
+			<li>This includes:</li>
+			<ul>
+			<p></p>
+			<li>BeepBox Pixel</li>
+			<li>Skeuomorphic/Early 2000's (thanks to LeoV for making this theme)</li>
+			<li>Slushie</li>
+			<li>Slushie 2</li>
+			<li>Canyon 2</li>
+			<li>Ghost House</li>
+			<li>Ghost House 2</li>
+			<li>Starry Studio (thanks to Chuck for making this theme)</li>
+			<p></p>
+			<p></p>
+		</ul>
+		<li>Updated Themes:</li>
+			<ul>
+			<p></p>
+			<li>Pretty much every AbyssBox original theme.</li>
+			<p></p>
+			<p></p>
+		</ul>
+		<li>Added Presets:</li>
+			<ul>
+			<p></p>
+			<li>Ghost House</li>
+			<li>Supersaw Pluck</li>
+			<li>Credits Bass (The Bass from Credits song for My death, thank you Vivi for making that song and this instrument.)</li>
+			<p></p>
+			<p></p>
+		</ul>
+		<li>Added the ability to change the notes appearance (This can be seen in the Forest 2 and Nebula 2 themes).</li>
+		<p></p>
+		<li>Upgraded/Downgraded icons to match BeepBox instead of JummBox (enables more customization).</li>
+		<p></p>
+		<li>Added an Egg.</li>
+		<p></p>
+		<li>Fixed the Song Recovery Prompt.</li>
+		<p></p>
+		<li>Added UltraBox's song URL shortener config and remove whitespace options.</li>
+		<p></p>
+		<li>Added UnBox's shift+f keybind which puts the playbar at the beginning of the Loop Bar (only applies to the first loop mode).</li>
+		<p></p>
+		<li>Added the Url Shortener to the song Player.</li>
+		<p></p>
+		<li>Added a new Progress bar to the song player.</li>
+		<p></p>
+		<li>Added new Song Player Layouts</li>
+		<li>This includes:</li>
+	<ul>
+		<p></p>
+		
+		<li>Music Box. (not a new beepmod)</li>
+		<li>Vertical.</li>
+		<li>Middle.</li>
+		<p></p>
+	</ul>
+		<li>Fixed many bugs.</li>
+		<p></p>
+		<p></p>
+	</ul>
+		<p></p>
+		<ul>
+				</ul>
+		</ul>
+
+	<p>5/2/2024</p>
+	</div>
+	<div  class="V1.2">
+	</h1><h2 style="color: #f24c4c;">Version 1.2 - The Song Player Update </h2><h3> <ul>
+			<ul>
+			</ul>
+			<p></p> 
+			<ul>
+			</ul>
+				<li>Added Song Player Layouts!</li>
+				<li>This includes:</li>
+	<ul>
+				<p></p>
+				
+				<li>Classic.</li>
+				<li>Top.</li>
+				<li>shitBox4.</li>
+				<li>BoxBeep.</li>
+				<p></p>
+				<p></p>
+			</ul>
+			<li>Added new themes:</li>
+			
+				<li>This includes:</li>
+				<ul>
+				<p></p>
+				<li>BoxBeep Dark.</li>
+				<li>BoxBeep Light</li>
+				<li>JummBox Light</li>
+				<p></p>
+				<p></p>
+			</ul>
+			<li>Added Upturn Layout</li>
+			<p></p>
+			<li>Updated Themes:</li>
+				<ul>
+				<p></p>
+				<li>shitbox 1.0/3.0.</li>
+				<li>Terminal 2.0.</li>
+				<li>Frutiger Aero.</li>
+				<li>BruceBox.</li>
+				<li>AbyssBox Light.</li>
+				<p></p>
+				<p></p>
+			</ul>
+			<li>Changed song identifier from #u to #a.</li>
+			<p></p>
+			<li>Fixed a bug where the Color Picker wouldn't delete itself after closing the theme prompt.</li>
+			<p></p>
+			<li>Increased the Export Loop Limit from 4 to 16.</li>
+			<p></p>
+			<li>Added a frosted glass backdrop for prompts (off by default, change in preferences to see this change).</li>
+			<p></p>
+			<ul>
+					</ul>
+			</ul>
+			
+	<p>As always, if you would like to make a suggestion for what AbyssBox 
+	should add, go ahead and ping @choptop84 on BeepCord in the 
+	#modded-beepbox channel!</p>
+
+		<p>3/30/2024</p>
+	</div>
+	<div  class="V1.1.1">
+	</h1><h2 style="color: #f24c4c;">Version 1.1.1 - Bugfixes</h2><h3> <ul>
+		<p>Simple bug fixes, and an update to be up-to-date with UltraBox 2.2.3</p>
+			<ul>
+			</ul>
+			<p></p> 
+			<ul>
+			</ul>
+				<li>UltraBox 2.2.3 Changes</li>
+	<ul>
+				<p></p>
+				<li>JummBox bugfixes involving the loop bar.</li>
+				<p></p>
+				<li>Added Catagories to Preferences.</li>
+				<p></p>
+				<p></p>
+			</ul>
+			<li>Fixed a bug where 1.0 songs would corrupt if they had custom unisons. The fix for this will have odd effects for older ultrabox songs, but other than that it should be fine.</li>
+			<ul>
+					</ul>
+			</ul>
+			
+	<p>As always, if you would like to make a suggestion for what AbyssBox 
+	should add, go ahead and ping @choptop84 on BeepCord in the 
+	#modded-beepbox channel!</p>
+
+		<p>3/6/2024</p>
+	</div>
+	<div  class="V1.1">
+	</h1><h2 style="color: #f24c4c;">Version 1.1 - AbyssBox Expanded Update</h2><h3> <ul>
+		<p>This update is genuinely one of the biggest updates that I've done for AbyssBox, Lets start listing off features then!</p>
+			<ul>
+			</ul>
+			<p></p> 
+			<ul>
+			</ul>
+			<li>The Custom Theme Editor has been expanded!</li>
+			<ul>
+			<p></p>
+				<li>The Custom Theme Editor not supports backgrounds, has new options, has a new color picker, and it allows you to use any theme as a base!</li>
+				<p></p>
+			</ul>
+			<p></p>
+			<li>Given the massive size of this update, lets start off with the simplest things to cover, Themes! AbyssBox has added: </li>
+			<ul>
+			<p></p>
+				<li>WeebBox</li>
+				<li>AweebyssBox</li>
+				<li>Forest 2</li>
+				<li>Nebula 2</li>
+				<li>Scratch</li>
+				<li>Scratch Addons</li>
+				<li>Frutiger Aero</li>
+				<li>Undertale</li>
+				<li>Glyde</li>
+				<li>Terminal 2.0</li>
+				<li>I am on fire!</li>
+				<li>2012 Video Tutorial</li>
+				<li>Half-Life: Source</li>
+				<p></p>
+				<li>Scratch and Scratch addons was made by Neptendo, Glyde was obviously made by Glyde, and I was given Assistance with Frutiger Aero thanks to Glyde, Ruskah, LeoV and many others.</li>
+			</ul>
+			<p></p>
+			<li>Speaking of themes, I've actually updated several themes to be completely finished!</li>
+			<ul>
+			<p></p>
+				<li>Updated: Half-life. I added a new Title for the theme.</li>
+				<p></p>
+				<li>Updated: AbyssBox Classic! This update adds a new background, icons, cursor, and a track font!</li>
+				<li>This also applies to AbyssBox Competitive and AbyssBox Light</li>
+				<p></p>
+				<li>Updated: Windows Xp! This update completely overhauls Windows Xp to it's absolute extreme!</li>
+				<p></p>
+				<li>AbyssBox Classic has also been updated to feature new editor background sprites.</li>
+			</ul>
+			<p></p>
+					<li>lets move on to the new stuff!</li>
+			<ul>
+			<p></p>
+				<li>Heavily improved Mobile Support.</li>
+				<p></p>
+				<li>Added Overlays, now your themes can have things overlaying the entire screen! This feature is best shown off in 'I am on fire!' and '2012 video tutorial'.</li>
+				<p></p>
+				<li>Added Titles, Now your theme can have it's own custom title in the description. A few themes use this, 'I am on fire', 'Half-Life' and 'Half-Life: Source' use this feature.</li>
+				<p></p>
+				<li>We've also added a new preset called Nokia Ringtone.</li>
+				<p></p>
+				<li>Beyond those little things, We've also added every feature upto UltraBox 2.2.2.</li>
+				<p></p>
+					<li>lets move on to the new stuff!</li>
+			<p></p>
+	</ul>
+				<li>What? Major new stuffs???</li>
+	<ul>
+				<p></p>
+				<li>Added Shortcut buttons! These buttons do things that are only accessable in the edit menu and via keyboard shortcuts, but with the added bonus of working on Mobile too! This will undoubtably help with a lot of the issues that plauge AbyssBox Mobile. I'm hoping there will also be future things that improve Mobile.</li>
+				<p></p>
+				<li>Added a new Layout. Theatre! This layout is a fullscreen layout that allows you to view all the notes without the distractions of the Track Editor and The settings being there!</li>
+				<p></p>
+				<li>I've also combined the Themes and Custom Themes Prompt into one!</li>
+				<p></p>
+				<li>Hmm... Something's wrong with the hotdog...</li>
+				<p></p>
+			</ul>
+			</ul>
+			
+	<p>Woah! This update was massive! Pretty crazy just how big this update was!</p>
+	<p>As always, if you would like to make a suggestion for what AbyssBox 
+	should add, go ahead and ping @choptop84 on BeepCord in the 
+	#modded-beepbox channel!</p>
+
+		<p>3/2/2024</p>
+	</div>
+	<div  class="V1.0">
+	</h3><h2 style="color: #f24c4c;">Version 1.0 - The Full Release</h2>
+		<h3> <ul>
+		<p>This update is the biggest one yet! Adding several new features to AbyssBox. Starting with,</p>
+			<ul>
+			</ul>
+			<p></p> 
+			<ul>
+			</ul>
+			<li>The Custom Theme Editor!</li>
+			<ul>
+			<p></p>
+				<li>All of your custom theme needs in one place! Making your 
+	own themes couldn't be easier! Just go to the Custom Theme prompt in 
+	Prefrences and check it out yourself!</li>
+				<p></p>
+				<li>Thanks again to LeoV for helping so much on making the custom theme editor, without him this feature wouldn't of ever released!</li>
+			</ul>
+			<p></p>
+			<li>Thanks to the Custom Theme Editor, we now have three new Colorblind Assistence themes! These themes are called: </li>
+			<ul>
+			<p></p>
+				<li>Deuteranopia</li>
+				<li>Protanopia</li>
+				<li>Tritanopia</li>
+				<p></p>
+				<li>Deuteranopia was made by Neptendo, while I made the other two.</li>
+			</ul>
+			<p></p>
+			<li>Speaking of themes, We've actually added 3 new ones outside of colorblind themes, adding to a total of 6 new themes!</li>
+			<ul>
+			<p></p>
+				<li>New Theme: Half-life. This theme has a similar color scheme and appearance to the original Half-Life.</li>
+				<p></p>
+				<li>New Theme: Doom 1993. This theme features a redlit sky and 
+	the original doom font used in the first doom game. Thanks to Neptendo 
+	for adding the Doom Styled AbyssBox logo!</li>
+				<p></p>
+				<li>New Theme: Windows Xp, simulate the asthetic of the 
+	classic interface of Windows Xp, complete with the original font, mouse,
+	and wallpapaer in the background. This theme also features unique 
+	buttons similar to how Windows Xp looked Back then. We even have a 
+	Windows Xp-esque logo replacing the abyssbox logo!</li>
+				<p></p>
+				<li>AbyssBox Classic has also been updated to feature new editor background sprites.</li>
+			</ul>
+			<p></p>
+					<li>We're not done just yet!</li>
+			<ul>
+			<p></p>
+				<li>The layouts featured in update 0.9 have been updated, kind of?</li>
+				<p></p>
+				<li>The layouts themselves haven't recieved any updates, but
+	the icons for them in the Layout Prompt has been fixed and now all of 
+	them are the same size regardless of theme.</li>
+				<p></p>
+				<li>We've also added two new presets for you to try out. Harmonic Piano, and Organic Synth.</li>
+				<p></p>
+			</ul>
+			</ul>
+			
+	<p>That was quite a bit this time!</p>
+	<p>As always, if you would like to make a suggestion for what AbyssBox 
+	should add, go ahead and ping @choptop84 on BeepCord in the 
+	#modded-beepbox channel!</p>
+
+		<p>1/15/2024</p>
+	</div>
+	<div  class="V0.9.2">
+	</h3><h2 style="color: #f24c4c;">Version o.9.2</h2>
+		<h3> <ul>
+		<li>This update added only one change, but it's quite a big one!</li>
+			<ul>
+			</ul> 
+			<ul>
+			<li>Supersaw is now in AbyssBox!!! This BeepBox 9.0 Feature is 
+	quite lacking in most beepbox mods, and since now it's featured in 
+	AbyssBox, we can officially use Samples, Custom Chip, The OP FM, and 
+	Supersaw all in one package!</li>
+			</ul>
+
+	<p>If you would like to make a suggestion for what AbyssBox should add, 
+	go ahead and ping @choptop84 on BeepCord in the #modded-beepbox channel!</p>
+
+		<p>1/6/2024</p>
+	</div>
+	<div  class="V0.9">
+	<h2 style="color: #f24c4c;">Version o.9</h2>
+		<h3> <ul>
+		<li>Added three new layouts!</li>
+			<ul>
+			<li>Flipped (AB), this layout reverses the Long Layout, currently unfinished but it'll work for now.</li>
+			<li>Focus (AB), this layout reduces the size of the song settings by around 40%!</li>
+			<li>Long (AB), This is an AbyssBox twist on the classic Long 
+	Layout, normally the track editor would go under the instrument and song
+	settings, but now in this layout it actually does the opposite! The 
+	settings will now go over where track would normally go! Wanna try it 
+	out for yourself? Just make a song with over 75 Bars and swap between 
+	the two layouts!</li>
+			</ul>
+			</ul> 
+			<ul><li>Updated AbyssBox Light</li>
+			<ul>
+			<li>Before, the AbyssBox Light was a little hard to see thanks 
+	to it's low contrast, now the contrast has been bumped up thanks to the 
+	suggestion that Nintari made. She suggested that I increase the contrast
+	of the theme just a little bit and now it looks way better!</li>
+			</ul>
+			</ul> 
+			<ul><li>Added two new fonts! AbyssType and AbyssType Small, they're in the testing phase, so expect major changes!</li>
+			</ul>
+			<ul><li>The custom cursor for The three AbyssBox original themes now work!</li>
+			</ul>
+			<p>All changes now are available in AbyssBox 0.9! If you aren't seeing
+	these changes being reflected in your version of AbyssBox, then I would
+	suggest clearing your cookies, fair warning though. Your settings will 
+	be reset!</p>
+
+		<p>1/(4 or 5 idrk)/2024</p>
+	</div>
+	<div  class="V0.8">
+	</h3><h2 style="color: #f24c4c;">Version o.8</h2>
+		<h3> <ul>
+		<li>Updated Website Text</li>
+			</ul> 
+			<ul><li>Added three new themes!</li>
+			<ul>
+			<li>AbyssBox Classic, The default theme.</li>
+			<li>AbyssBox Competative, This theme is like the default theme, but all unnessasary colors are now black.</li>
+			<li>AbyssBox Light, A light theme that's mostly pastel pink!.</li>
+			</ul>
+			</ul> 
+			<ul><li>Added a new custom icon</li>
+			</ul>
+			<ul><li>Attempted to add a new custom cursor for the new themes</li>
+
+		<p>1/2/2024</p>
+	</div>
+
+	<h1><img id="donut" src="../image_assets/donut.png"/></h1>
+
+</div>
+	<div class="ultrabox-credits" style="width: 90vw; max-width: 862px; padding: 15px; padding-top: 0;">
+<h1>
+<font color="#9c64f7">UltraBox's Patch Notes (in reverse chronological order);</font>
+</h1>
+<h1 style="margin-top: 0;">
+<font color="#9c64f7">(upto 2.2);</font>
+</h1>
+<div  class="V2.2">
+<h2 style="color: #75cef0;" >Version 2.2</h2>
+	<h3> <ul>
+	<li>Ported over the latest jummbox update</li>
+		<ul>
+		<li></li>
+		</ul>
+	<li>Added custom unisons</li>
+		<ul>
+		<li></li>
+		</ul>
+	<li>The "Basic Noise" instrument type can now be used in pitch channels</li>
+		<ul>
+		<li>Because of this, the custom instrument section has been reworked</li>
+		</ul>
+	<li>"Unison" is now a valid envelope target in custom chip</li>
+	<li>The PWM Decimal Offset setting now exports in json</li>
+	<!-- reword the line below maybe possibly -->
+	<li>Renamed pink noise and brownian noise to pink and brownian respectively</li>
+	<li>Certain themes now loop like they did in their original mod (reword)</li>
+		<ul>
+		<li>The effected themes include: Modbox, </li>
+		</ul>
+	<li>Added the Dogebox2 theme and renamed "Blubox 1.0" to "Blubox"</li>
+	<li>Change logos and images and such (CLARIFIY BEFORE REALEASEFfff)</li>
+	</ul> </h3>
+	<p>1/?/2024</p>
+	<!-- figure out if you want to port --plant-color from midbox or not -->
+</div>
+<div  class="V2.2">
+<h2 style="color: #75cef0;" >Version 2.1.2</h2>
+	<h3>
+	<ul>
+	<li>Added the decimal offset slider</li>
+		<ul>
+		<li>You can use this for creating pulse width values like 12.5% or 6.25%</li>
+		</ul>
+	<li>Added four shortcuts </li>
+		<ul>
+		<li>` - open song recovery prompt</li>
+		<li>Shift+` - create blank new song</li>
+		<li>Shift+P - open in song player</li>
+		<li>X - copy and then cut pattern (like in modbox)</li>
+		</ul>
+	<li>Removed all of the themes that don't come from other beepmods</li>
+		<ul>
+		<li>These can now be found on <a href="https://docs.google.com/spreadsheets/d/1dGjEcLgJrPwzBExPmwA9pbE_KVQ3jNrnTBrd46d2IKo/edit#gid=1467448411&amp;fvid=1621178910">Mel's theme sheet</a></li>
+		<li>You can use them by importing them as a custom theme</li>
+		</ul>
+	<li>The oscilloscope and mod title colors can be customized in themes</li>
+		<ul>
+		<li>-oscilloscope-line-L/R and --mod-title respectively </li>
+		</ul>
+	<li>Fixed the 6op feedback names</li>
+	<li>The index.html has been edited: it now includes a link to the Beepbox Discord!</li>
+	<li>Made some changes to the credits</li>
+		<ul>
+		<li>Ultrabox now has <a href="./archives/">archives</a> of a few defunct beepmods</li>
+		</ul>
+	<li>Edited the sample instructions prompt (it now suggests using catbox instead of discord)</li>
+	</ul>
+	</h3>
+	<p>11/24/2023</p>
+</div>
+
+<div  class="V2.1.1">
+<h2 style="color: #75cef0;">Version 2.1.1</h2>
+	<h3>
+	<ul>
+	<li>Added the Paandorasbox, Midbox, and Azur Lane theme</li>
+		<ul>
+		<li>Thanks to becuzwhynot and LeoV for helping Nep make her idea a reality!</li>
+		</ul>
+	<li>Tweaked the Mainbox Reimagined and Neapolitan themes</li>
+	<li>Added several new "plants"</li>
+	<li>Changed several mentions of Jummbox and GoldBox to properly refer to UltraBox</li>
+	</ul></h3>
+	<p>10/9/2023</p>
+</div>
+
+<div  class="V2.1.0">
+	<h2 style="color: #75cef0;">Version 2.1.0</h2>
+	<h3>
+	<ul>
+	<li>Various quality of life changes were made to the UI:</li>
+		<ul>
+		<li>Added new prompt when adding samples</li>
+		<li>Added loop controls prompt, to visually set the loop region or start offset</li>
+		<li>Added loading bar and loading status prompt for custom samples</li>
+		<li>Custom sample presets now appear at the top of the instrument list</li>
+		<li>Added a reset button for custom themes</li>
+		<li>Added the ability to show/hide the oscilloscope and the sample loading bar</li>
+		</ul>
+	<li>Added loop control options for custom sample presets</li>
+	<li>Added a new loop mode ("Play Loop Once")</li>
+	<li>Changed the offset to not be flipped anymore when playing samples backwards</li>
+	<li>Added nintaribox and paintbox samples</li>
+	<ul>
+	<li>Use <code>nintariboxSamples</code> and <code>marioPaintboxSamples</code> respectively as URLs in the "Add Samples" prompt to load them</li>
+	</ul>
+	<li>Various custom sample-related bugfixes:</li>
+		<ul>
+		<li>Fixed custom samples not saving in json</li>
+		<li>Fixed ping-pong loop mode not inverting the sample when going backwards while anti-aliased</li>
+		<li>Fixed clicking when playing samples that end with non-zero values once</li>
+		<li>Fixed ping-pong loop mode getting stuck when changing to another loop mode during playback</li>
+		<li>Legacy samples no longer load in when they aren't needed</li>
+			<ul>
+			<li>This should improve load times</li>
+			</ul>
+		</ul>
+	<li>And finally, various misc additions:</li>
+		<ul>
+		<li>Added MicroBox theme and made changes to the Wackybox theme</li>
+		<li>Fixed nes white and nes ping presets (again)</li>
+		<li>Renamed the Blackbox presets for consistency</li>
+		<li>Added song octave option</li>
+		<ul>
+			<li>The <code>"C+"</code>, <code>"G- (actually F#-)"</code>, <code>"C-"</code>, and <code>"oh no (F-)"</code>
+ keys were obsoleted with this addition, so they have been removed, and 
+will be converted to the right key and octave settings on load</li>
+		</ul>
+			</ul>
+	</ul> </h3>
+	<p>8/24/2023</p>
+</div>	
+
+<div  class="V2.0.2">
+	<h2 style="color: #75cef0;">Version 2.0.2</h2>
+	<h3>
+<ul>
+	<li>Slightly increased the custom sample volume</li>
+	<li>Decreased clicking on looped custom samples</li>
+</ul> </h3>
+	<p>7/29/2023</p>
+
+<div  class="V2.0.1">
+	<h2 style="color: #75cef0;">Version 2.0.1</h2>
+	<h3>
+<ul>
+	<li>Renamed "twelveth notes" to "twelfth notes"</li>
+	<li>Fixed euclidean rhythm generator prompt showing up in live play mode</li>
+	<li>Removed the twitter column</li>
+</ul> </h3>
+	<p>7/28/2023</p>
+</div>
+
+	<div  class="V2.0">
+	<h2 style="color: #75cef0;">Version 2.0.0</h2>
+	<h3>
+<ul>
+	<li>Added custom sampling, chip wave looping, and a sample extractor (thank LeoV for all of these features!)</li>
+	<ul>
+	<li>Custom sampling</li>
+	<ul>
+	<li>Samples are loaded by typing a url into the custom sample prompt, which can be found by scrolling to the bottom of the edit tab</li>
+	<li>The old built-in samples can be added by typing "legacySamples" into the custom sample prompt</li>
+	</ul>
+	<li>Chip wave looping</li>
+	<ul>
+	<li>Chip wave looping can be enabling by clicking on the "Loop Controls" box</li>
+	</ul>
+	<li>Soundfont sample extractor</li>
+	<ul>
+	<li>You can extract samples from soundfonts with this tool</li>
+	<li>There are instructions on the page itself on how, so I won't repeat it here</li>
+	<li><a href="./sample_extractor.html">https://ultraabox.github.io/sample_extractor</a></li>
+	</ul>
+	</ul>
+	<li>Added todbox 1/3 and 1/5 wave, and removed the zefbox squaretooth wave</li>
+	<ul>
+	<li>Old songs using the zefbox squaretooth wave will automatically switch to the modbox squaretooth wave</li>
+	</ul>
+	<li>Added pink and brownian noise types</li>
+	<li>Added some presets from blackbox, also added "obama why" as a preset (beepcord inside joke)</li>
+	<li>Renamed all of the rhythms, and removed the song corrupter rhythm</li>
+	<li>Fixed fm frequencies not porting over correctly</li>
+	<li>Improved/fixed the beachcoming theme (thanks Mel!) and the terminal theme</li>
+	<li>UltraBox now has a new logo, made by pixelzwithaz!</li>
+</ul> </h3>
+	<p>7/28/2023</p>
+</div>
+
+	<div  class="V1.2.1">
+	<h2 style="color: #75cef0;">Version 1.2.1</h2>
+	<h3>
+<ul>
+	<li>Added LeoV's euclidean rhythm generator</li>
+	<li>Fixed a bug relating to autoplay on load</li>
+</ul> </h3>
+	<p>6/30/2023</p>
+</div>
+
+<div  class="V1.2">
+	<h2 style="color: #75cef0;">Version 1.2.0</h2>
+	<h3>
+<ul>
+	<li>Added WeebBox custom themes/images feature</li>
+	<li>Dynamic tempo now works when importing midis (thanks LeoV!)</li>
+	<li>Added super saw 2 preset</li>
+	<li>Fixed nes ping preset (for real this time)</li>
+	<li>Fixed custom chip sometimes being way too low pitch</li>
+	<li>Added two batches of bugfixes (ported from jummbox):</li>
+	<ul>
+		<li><a href="https://github.com/AurySystem/goldbox/commit/44e7bdb472d3dfcdc333755132edd07dca7b6e0a">https://github.com/AurySystem/goldbox/commit/44e7bdb472d3dfcdc333755132edd07dca7b6e0a</a></li>
+		<li><a href="https://github.com/AurySystem/goldbox/commit/dd05827f7802b56829b4b7da9d73603a804d72d8">https://github.com/AurySystem/goldbox/commit/dd05827f7802b56829b4b7da9d73603a804d72d8</a></li>
+	</ul>
+</ul> </h3>
+	<p>6/28/2023</p>
+</div>
+
+<div  class="V1.1.3">
+	<h2 style="color: #75cef0;">Version 1.1.3</h2>
+	<h3>
+<ul>
+  <li>Improved json importing from other mods (ex. importing a json with a wave named viola will now set it to modbox viola)</li>
+  <li>Made pitch and drum channel notes copy-pasteable to each other (thanks LeoV!)</li>
+  <li>Fixed a bug relating to exporting .mid files while using advanced fm</li>
+	<li>Fixed the ultrabox nes white and nes ping presets</li>
+	<li>Updated the brucebox and shitbox 3.0 themes</li>
+	<li>Added the wackybox, terminal, and upside-down beepbox themes</li>
+</ul>  
+	</h3>
+	<p>06/17/2023</p>
+	<!--changed the rhythm names because people hated them	-->
+</div>
+
+<div  class="V1.1.2">
+	<h2 style="color: #75cef0;">Version 1.1.2</h2>
+	<h3><ul>
+  <li>Fixed a small inconsistency with the song player relating to fm</li>
+  <li>Improved the dogebox theme, and removed the ultrabox foggy and 69420 themes</li>
+	</ul></h3>
+	<p>06/11/2023</p>
+</div>
+
+<div  class="V1.1.1">
+	<h2 style="color: #75cef0;">Version 1.1.1</h2>
+	<h3><ul><li>Improved the Mainbox and Todbox Dark Mode themes</li>
+		<li>Removed the unneccessary standarddrumsamples.js and plok_samples.js files, which should slightly improved load times</li>
+		<li>Basically just an extension of the last update</li>
+	</ul></h3>
+	<p>06/08/2023</p>	
+</div>	
+
+<div  class="V1.1">
+<h2 style="color: #75cef0;">Version 1.1</h2>
+	<h3><ul><li>Added the slushie, 69420, nerdbox, zefbox, and foxbox themes, and fixed the cardboardbox theme</li>
+		<li>Don't ask why I changed the version to 1.1 when it should have been 1.0.1, idk why</li>
+	</ul></h3>
+	<p>06/08/2023</p>
+<!--a few bug patch updates happened between version 1.0 and 1.1 but they aren't very important	-->
+</div>
+
+<div  class="V1.0">
+	<h2 style="color: #75cef0;">Version 1.0</h2>
+		<h3><ul><li>First release</li></ul></h3>
+		<p>06/04/2023</p>
+	</div>
+</div>
+</div>
+</ul></h3></body></html>

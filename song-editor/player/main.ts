@@ -156,7 +156,7 @@ let prevHash: string | null = null;
 let id: string = ((Math.random() * 0xffffffff) >>> 0).toString(16);
 let pauseButtonDisplayed: boolean = false;
 let animationRequest: number | null;
-let zoomEnabled: boolean = false;
+let zoomEnabled: boolean = true; //slarmoo's: false
 let timelineWidth: number = 1;
 let outVolumeHistoricTimer: number = 0;
 let outVolumeHistoricCap: number = 0;

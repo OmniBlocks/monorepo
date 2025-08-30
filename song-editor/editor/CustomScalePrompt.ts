@@ -22,7 +22,7 @@ export class CustomScalePrompt implements Prompt {
     constructor(private _doc: SongDocument) {
         this._flags = _doc.song.scaleCustom.slice();
         let scaleHolder: HTMLDivElement = div({});
-        for (var i = 1; i < Config.pitchesPerOctave; i++) {
+        for (var i = Config.pitchesPerOctave - 1; i > 0; i--) {
             this._scaleFlags[i] = input({ type: "checkbox", style: "width: 1em; padding: 0; margin-right: 4em;", "checked": this._flags[i], "value": i });
             this._scaleRows[i] = div({ style: "text-align: right; height: 2em;" },
                 "Note " + i + ":",
@@ -37,7 +37,7 @@ export class CustomScalePrompt implements Prompt {
 
         this.container = div({ class: "prompt noSelection", style: "width: 250px;" },
             h2("Custom Scale"),
-            p("Here, you can make your own scale to use in your song. Press the checkboxes below to toggle which notes of an octave are in the scale. For this to work, you'll need to have the \"Custom\" scale selected."),
+            p("Here, you can make your own scale like a pro gamer. Press the checkboxes below to toggle which notes of an octave are in the scale. For this to work, you'll need to have the \"Custom\" scale selected."),
             div({ style: "display: flex; flex-direction: row; align-items: center; justify-content: flex-end;" },
                 scaleHolder,
             ),

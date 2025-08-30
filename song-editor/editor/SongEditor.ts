@@ -767,7 +767,7 @@ export class SongEditor {
         option({ value: "copyUrl" }, "⎘ Copy Song URL"),
         option({ value: "shareUrl" }, "⤳ Share Song URL"),
         option({ value: "configureShortener" }, "🛠 Customize Url Shortener..."),
-        option({ value: "shortenUrl" }, "… Shorten Song URL"),
+        option({ value: "shortenUrl" }, "… Shorten Song URL (⇧U)"),
         option({ value: "viewPlayer" }, "▶ View in Song Player (⇧P)"),
         option({ value: "copyEmbed" }, "⎘ Copy HTML Embed Code"),
         option({ value: "songRecovery" }, "⚠ Recover Recent Song... (`)"),
@@ -810,24 +810,25 @@ export class SongEditor {
             option({ value: "instrumentImportExport" }, "Enable Import/Export Buttons"),
             option({ value: "displayBrowserUrl" }, "Enable Song Data in URL"),
             option({ value: "closePromptByClickoff" }, "Close Prompts on Click Off"),
+            option({ value: "rollNoveltyPresets" }, "Can Randomly Select Novelty Presets"),
             option({ value: "recordingSetup" }, "Note Recording..."),
-        ),
+        ), 
         optgroup({ label: "Appearance" },
-        option({ value: "showFifth" }, 'Highlight "Fifth" Note'),
-        option({ value: "notesFlashWhenPlayed" }, "Notes Flash When Played"),
-        option({ value: "instrumentButtonsAtTop" }, "Instrument Buttons at Top"),
-        option({ value: "frostedGlassBackground" }, "Frosted Glass Prompt Backdrop"),
-        option({ value: "showChannels" }, "Show All Channels"),
-        option({ value: "showScrollBar" }, "Show Octave Scroll Bar"),
-        option({ value: "showInstrumentScrollbars" }, "Show Intsrument Scrollbars"),
-        option({ value: "showLetters" }, "Show Piano Keys"),
-        option({ value: "displayVolumeBar" }, "Show Playback Volume"),
-        option({ value: "showOscilloscope" }, "Show Oscilloscope"),
-        option({ value: "showSampleLoadingStatus" }, "Show Sample Loading Status"),
-        option({ value: "showDescription" }, "Show Description"),
-        option({ value: "layout" }, "Set Layout..."),
-        option({ value: "colorTheme" }, "Set Theme..."),
-	    option({ value: "customTheme" }, "Custom Theme..."),
+            option({ value: "showFifth" }, 'Highlight "Fifth" Note'),
+            option({ value: "notesFlashWhenPlayed" }, "Notes Flash When Played"),
+            option({ value: "instrumentButtonsAtTop" }, "Instrument Buttons at Top"),
+            option({ value: "frostedGlassBackground" }, "Frosted Glass Prompt Backdrop"),
+            option({ value: "showChannels" }, "Show All Channels"),
+            option({ value: "showScrollBar" }, "Show Octave Scroll Bar"),
+            option({ value: "showInstrumentScrollbars" }, "Show Intsrument Scrollbars"),
+            option({ value: "showLetters" }, "Show Piano Keys"),
+            option({ value: "displayVolumeBar" }, "Show Playback Volume"),
+            option({ value: "showOscilloscope" }, "Show Oscilloscope"),
+            option({ value: "showSampleLoadingStatus" }, "Show Sample Loading Status"),
+            option({ value: "showDescription" }, "Show Description"),
+            option({ value: "layout" }, "Set Layout..."),
+            option({ value: "colorTheme" }, "Set Theme..."),
+	        option({ value: "customTheme" }, "Custom Theme..."),
         ),
     );
     private readonly _scaleSelect: HTMLSelectElement = buildOptions(select(), Config.scales.map(scale => scale.name));
@@ -2409,6 +2410,7 @@ export class SongEditor {
             (prefs.instrumentImportExport ? textOnIcon : textOffIcon) + "Enable Import/Export Buttons",
             (prefs.displayBrowserUrl ? textOnIcon : textOffIcon) + "Enable Song Data in URL",
             (prefs.closePromptByClickoff ? textOnIcon : textOffIcon) + "Close Prompts on Click Off",
+            (prefs.rollNoveltyPresets ? textOnIcon : textOffIcon) + "Can Randomly Select Novelty Presets",
             textSpacingIcon + "Note Recording...",
             textSpacingIcon + "Appearance",
             (prefs.showFifth ? textOnIcon : textOffIcon) + 'Highlight "Fifth" Note',
@@ -4195,6 +4197,17 @@ export class SongEditor {
                     event.preventDefault();
                 }
                 break;
+            case 85: // u
+                if (event.shiftKey) {
+                    let shortenerStrategy: string = "https://tinyurl.com/api-create.php?url=";
+                    const localShortenerStrategy: string | null = window.localStorage.getItem("shortenerStrategySelect");
+
+                    // if (localShortenerStrategy == "beepboxnet") shortenerStrategy = "https://www.beepbox.net/api-create.php?url=";
+                    if (localShortenerStrategy == "isgd") shortenerStrategy = "https://is.gd/create.php?format=simple&url=";
+
+                    window.open(shortenerStrategy + encodeURIComponent(new URL("#" + this.doc.song.toBase64String(), location.href).href));
+                }
+                break;
             case 192: // `/~
                 if (canPlayNotes) break;
                 if (event.shiftKey) {
@@ -4326,12 +4339,16 @@ export class SongEditor {
                 event.preventDefault();
                 break;
             case 68: // d
-                if (canPlayNotes) break;
-                if (needControlForShortcuts == (event.ctrlKey || event.metaKey)) {
-                    //shift d replaces old d functionality, while d will duplicate replacing an unused pattern
-                    //This is for consistency with n (n uses ctrl instead of shift, but this will have to do for now)
-                    this.doc.selection.duplicatePatterns(event.shiftKey ? false : true); 
-                    event.preventDefault();
+                if (event.shiftKey) {
+                    
+                } else {
+                    if (canPlayNotes) break;
+                    if (needControlForShortcuts == (event.ctrlKey || event.metaKey)) {
+                        //shift d replaces old d functionality, while d will duplicate replacing an unused pattern
+                       //This is for consistency with n (n uses ctrl instead of shift, but this will have to do for now)
+                       this.doc.selection.duplicatePatterns(event.shiftKey ? false : true); 
+                       event.preventDefault();
+                    }
                 }
                 break;
             case 69: // e (+shift: eq filter settings)
@@ -5057,7 +5074,7 @@ export class SongEditor {
 
     private _randomPreset(): void {
         const isNoise: boolean = this.doc.song.getChannelIsNoise(this.doc.channel);
-        this.doc.record(new ChangePreset(this.doc, pickRandomPresetValue(isNoise)));
+        this.doc.record(new ChangePreset(this.doc, pickRandomPresetValue(isNoise,this.doc.prefs.rollNoveltyPresets)));
     }
 
     private _randomGenerated(usesCurrentInstrumentType: boolean): void {
@@ -5576,6 +5593,9 @@ export class SongEditor {
                 break;
             case "frostedGlassBackground":
                 this.doc.prefs.frostedGlassBackground = !this.doc.prefs.frostedGlassBackground;
+                break;
+            case "rollNoveltyPresets":
+                this.doc.prefs.rollNoveltyPresets = !this.doc.prefs.rollNoveltyPresets;
                 break;
         }
         this._optionsMenu.selectedIndex = 0;

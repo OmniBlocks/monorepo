@@ -4,7 +4,7 @@ import {Scale, Config} from "../synth/SynthConfig";
 import {ColorConfig} from "../editor/ColorConfig";
 
 export class Preferences {
-	public static readonly defaultVisibleOctaves: number = 3;
+	public static readonly defaultVisibleOctaves: number = 4; //slarmoo's: 3
 	
 	public customTheme: string | null;
 	public customTheme2: string | null;
@@ -22,7 +22,7 @@ export class Preferences {
 	public instrumentCopyPaste: boolean;
 	public instrumentImportExport: boolean;
 	public instrumentButtonsAtTop: boolean;
-	public enableChannelMuting: boolean;
+	public enableChannelMuting: boolean = true;
 	public colorTheme: string;
 	public layout: string;
 	public displayBrowserUrl: boolean;
@@ -44,7 +44,9 @@ export class Preferences {
 	public showInstrumentScrollbars: boolean;
 	public closePromptByClickoff: boolean;
 	public frostedGlassBackground: boolean;
-	
+
+	public rollNoveltyPresets: boolean;
+
 	constructor() {
 		this.reload();
 	}
@@ -56,13 +58,13 @@ export class Preferences {
 		this.showFifth = window.localStorage.getItem("showFifth") != "false";
 		this.notesOutsideScale = window.localStorage.getItem("notesOutsideScale") == "true";
 		this.showLetters = window.localStorage.getItem("showLetters") != "false";
-		this.showChannels = window.localStorage.getItem("showChannels") == "true";
+		this.showChannels = window.localStorage.getItem("showChannels") != "false";
 		this.showScrollBar = window.localStorage.getItem("showScrollBar") != "false";
 		this.alwaysFineNoteVol = window.localStorage.getItem("alwaysFineNoteVol") == "true";
 		this.displayVolumeBar = window.localStorage.getItem("displayVolumeBar") != "false";
 		this.instrumentCopyPaste = window.localStorage.getItem("instrumentCopyPaste") != "false";
 		this.instrumentImportExport = window.localStorage.getItem("instrumentImportExport") == "true";
-		this.instrumentButtonsAtTop = window.localStorage.getItem("instrumentButtonsAtTop") == "true"
+		this.instrumentButtonsAtTop = window.localStorage.getItem("instrumentButtonsAtTop") == "true";
 		this.enableChannelMuting = window.localStorage.getItem("enableChannelMuting") != "false";
 		this.displayBrowserUrl = window.localStorage.getItem("displayBrowserUrl") != "false";
 		this.pressControlForShortcuts = window.localStorage.getItem("pressControlForShortcuts") == "true";
@@ -72,7 +74,7 @@ export class Preferences {
 		this.ignorePerformedNotesNotInScale = window.localStorage.getItem("ignorePerformedNotesNotInScale") == "true";
 		this.metronomeCountIn = window.localStorage.getItem("metronomeCountIn") != "false";
 		this.metronomeWhileRecording = window.localStorage.getItem("metronomeWhileRecording") != "false";
-		this.notesFlashWhenPlayed = window.localStorage.getItem("notesFlashWhenPlayed") == "true";
+		this.notesFlashWhenPlayed = window.localStorage.getItem("notesFlashWhenPlayed") != "flase";
 		this.showOscilloscope = window.localStorage.getItem("showOscilloscope") == "true";
 		this.showSampleLoadingStatus = window.localStorage.getItem("showSampleLoadingStatus") != "false";
 		this.showDescription = window.localStorage.getItem("showDescription") != "false";
@@ -81,12 +83,14 @@ export class Preferences {
 		this.frostedGlassBackground = window.localStorage.getItem("frostedGlassBackground") == "true";
 		this.keyboardLayout = window.localStorage.getItem("keyboardLayout") || "pianoTransposingC";
 		this.bassOffset = (+(<any>window.localStorage.getItem("bassOffset"))) || 0;
-		this.layout = window.localStorage.getItem("layout") || "small";
+		this.layout = window.localStorage.getItem("layout") || "long";
 		this.colorTheme = window.localStorage.getItem("colorTheme") || ColorConfig.defaultTheme;
 		this.customTheme = window.localStorage.getItem("customTheme");
         this.customTheme2 = window.localStorage.getItem("customTheme2");
 		this.visibleOctaves = ((<any>window.localStorage.getItem("visibleOctaves")) >>> 0) || Preferences.defaultVisibleOctaves;
 		
+		this.rollNoveltyPresets = window.localStorage.getItem("rollNoveltyPresets") == "true";
+
 		const defaultScale: Scale | undefined = Config.scales.dictionary[window.localStorage.getItem("defaultScale")!];
 		this.defaultScale = (defaultScale != undefined) ? defaultScale.index : 0;
 		
@@ -141,5 +145,6 @@ export class Preferences {
 		window.localStorage.setItem("volume", String(this.volume));
 		window.localStorage.setItem("visibleOctaves", String(this.visibleOctaves));
 		
+		window.localStorage.setItem("rollNoveltyPresets", this.rollNoveltyPresets ? "true" : "false");
 	}
 }

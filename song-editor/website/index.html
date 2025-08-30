@@ -10,16 +10,16 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.7/js/select2.min.js"></script>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Slarmoo's Box</title>
-    <meta name="application-name" content="Slarmoo's Box" />
-    <meta name="apple-mobile-web-app-title" content="Slarmoo's Box">
-    <meta name="description" content="Slarmoo's Box is a mod of Ultrabox that aims to advance Beepbox's capabilities." />
-    <meta name="keywords" content="chiptune, instrumental, music, song, melody, composition, tool, free, online, square wave, NES, NSF, slarmoosbox, ultrabox, beepbox, jummbox, pandorasbox, modbox, sandbox, goldbox, wackybox, todbox, slarmoo, slarmoos" />
+    <title>JukeBox</title>
+    <meta name="application-name" content="JukeBox" />
+    <meta name="apple-mobile-web-app-title" content="JukeBox">
+    <meta name="description" content="JukeBox is a mod of Slarmoo's Box that aims to add a crap ton of presets." />
+    <meta name="keywords" content="chiptune, instrumental, music, song, melody, composition, tool, free, online, square wave, NES, NSF, jukebox, ultrabox, beepbox, jummbox, pandorasbox, modbox, sandbox, goldbox, wackybox, todbox, slarmoo's box" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="theme-color" content="#247d1d" />
-    <meta name="msapplication-TileColor" content="#247d1d" />
+    <meta name="theme-color" content="#ad7760" />
+    <meta name="msapplication-TileColor" content="#ad7760" />
     <meta name="msapplication-config" content="/browserconfig.xml" />
     <meta name="format-detection" content="telephone=no" />
     <meta property="og:image" content="https://slarmoo.github.io/slarmoosbox/website/icon_shadow_192.png" />
@@ -74,7 +74,7 @@
             margin-top: 0.5em;
             margin-bottom: 0.5em;
             -webkit-text-stroke-width: 0;
-            color: var(--mod-title, #247d1d);
+            color: var(--mod-title, #8C5D49);
         }
 
         h2 {
@@ -166,28 +166,30 @@
     </script>
     <div id="beepboxEditorContainer">
         <noscript>
-            Sorry, Slarmoo's Box requires a JavaScript-enabled browser.
+            Sorry, JukeBox requires a JavaScript-enabled browser.
         </noscript>
     </div>
     <div id="text-content">
         <section>
 
             <h1>
-                <font>Slarmoo's Box</font>
+                <font>JukeBox</font>
                 <span id="goldboxPlant" style="display: inline; color:#62a13b"></span>
                 <!-- <span id="goldboxPlant" style="display: inline; color: var(--plant-color, var(--link-accent, #62a13b));"></span> -->
             </h1>
             
             <p id="introduction">
-                Slarmoo's Box is a mod of Ultrabox that aims to advance Beepbox's capabilities. <br>
-                UltraBox is a mod first envisioned by Neptendo and made possible by contributing community members (see <a href="./credits.html">credits</a>).<br>
-                It takes elements from most of the beepbox mods available and puts them in one convenient package.
+                JukeBox is a mod of Slarmoo's Box that aims to add a crap ton of presets. <br>
+                (see <a href="./credits.html">credits</a>).
             </p>
             <!-- <p>
                 All song data is contained in the URL at the top of your browser.
                 When you make changes to the song, the URL is updated to reflect your changes.
                 When you are satisfied with your song, just copy and paste the URL to save and share your song!
             </p> -->
+            <p>
+                If you want to upload your own presets to JukeBox, you can fill out <a href="https://forms.gle/B29T3gCRHB6srueB8">This Form</a>
+            </p>
             <p>
                 If you have any questions, please visit the <a href="./faq.html">FAQ</a>. Visit the <a href="./patch_notes.html">patch notes</a> to see the latest changes made.
                 <img id="Hotdog" src="" width="500" height="333" onclick="changeHotdogSize()" />
@@ -410,7 +412,8 @@
         // Slarmoo's Box plants
         "✨","🌈","🌧️","🪨","🐍","🌲","🌳","𓆏","🦀","🍄‍🟫","🌵","and Bobby","🥚",
         //Current version
-        "1.4.9"
+        // I wonder how many times I'll forget about this
+        "0.1.3"
         ];
         const date = new Date();
         if (Math.floor(Math.random() * 3) == 0) { //more than doubled chance for a plant to show up

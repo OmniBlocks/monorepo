@@ -14,7 +14,7 @@ export interface ChannelColors extends BeepBoxOption {
 export class ColorConfig {
     public static colorLookup: Map<number, ChannelColors> = new Map<number, ChannelColors>();
 	public static usesColorFormula: boolean = false;
-	public static readonly defaultTheme: string = "slarmoosbox";
+	public static readonly defaultTheme: string = "violet verdant";
     public static readonly themes: { [name: string]: string } = {
 	"dark classic": ``,
         "dark competition": `
@@ -1643,7 +1643,7 @@ export class ColorConfig {
 			--secondary-text: #706087;
 			--box-selection-fill: #225835;
 			--loop-accent: #8f00fb;
-			--link-accent: #82dd5d;
+			--link-accent: #8c5d49;
 			--ui-widget-background: #303c66;
 			--ui-widget-focus: #62559b;
 			--pitch-background: #293b52;
@@ -5404,7 +5404,7 @@ export class ColorConfig {
 			--pitch-background: #2e0e51;
 			--tonic: #247d0d;
 			--fifth-note: #3abbb2;
-			--white-piano-key: #ffffff;
+			--white-piano-key: #000000;
 			--black-piano-key: #061705;
 			--white-piano-key-text: #061705;
 			--use-color-formula: true;

@@ -30,7 +30,7 @@ export class BeatsPerBarPrompt implements Prompt {
             div({ style: "text-align: right;" },
                 "Beats per bar:",
                 br(),
-                span({ style: "font-size: smaller; color: ${ColorConfig.secondaryText};" }, "(Multiples of 3 or 4 are recommended)"),
+                span({ style: "font-size: smaller; color: ${ColorConfig.secondaryText};" }, "(Multiples of 3 or 4 are normal and boring)"),
             ),
             this._beatsStepper,
         ),

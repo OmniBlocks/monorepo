@@ -721,8 +721,8 @@ function onKeyPressed(event: KeyboardEvent): void {
 		case 76: // l
 			onToggleLoop();
 			break;
-		case 83: // s
-			if (event.ctrlKey) {
+		case 85: // u
+			if (event.shiftKey) {
 				shortenUrl();
 				event.preventDefault();
 			}

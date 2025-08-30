@@ -10,8 +10,13 @@ const { button, div, h2, select, option, optgroup } = HTML;
 
 export class ThemePrompt implements Prompt {
 	private readonly _themeSelect: HTMLSelectElement = select({ style: "width: 100%;" },
-		optgroup({ label: "Default Themes" },
+		optgroup({ label: "Objectively The Best Ones" },
+			option({ value: "violet verdant" }, "Violet Verdant"),
+			option({ value: "dark competition" }, "BeepBox Competition Dark"),
 			option({ value: "slarmoosbox" }, "Slarmoo's Box"),
+			option({ value: "lemmbox dark"}, "LemmBox"),
+		),
+		optgroup({ label: "Default Themes" },
 			option({ value: "forest" }, "Forest"),
 			option({ value: "canyon" }, "Canyon"),
 			option({ value: "midnight" }, "Midnight"),

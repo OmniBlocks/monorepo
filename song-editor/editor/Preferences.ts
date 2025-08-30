@@ -4,7 +4,7 @@ import {Scale, Config} from "../synth/SynthConfig";
 import {ColorConfig} from "../editor/ColorConfig";
 
 export class Preferences {
-	public static readonly defaultVisibleOctaves: number = 4;
+	public static readonly defaultVisibleOctaves: number = 4; //slarmoo's: 3
 	
 	public customTheme: string | null;
 	public customTheme2: string | null;

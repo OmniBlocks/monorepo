@@ -6,6 +6,7 @@
 .stage-header-wrapper {
     position: absolute;
     top: 0;
+    transition: all 0.1s ease-in-out;
 }
 [dir="ltr"] .stage-header-wrapper {
     right: 0;

@@ -56,7 +56,7 @@ const handleClickAddonSettings = addonId => {
 
 const messages = defineMessages({
     defaultTitle: {
-        defaultMessage: 'Run Scratch projects faster',
+        defaultMessage: 'The Ultimate MultiLanguage IDE',
         description: 'Title of homepage',
         id: 'tw.guiDefaultTitle'
     }
@@ -95,7 +95,19 @@ const Footer = () => (
                     }}
                 />
             </div>
-
+            <div className={styles.footerText}>
+                <FormattedMessage
+                    // eslint-disable-next-line max-len
+                    defaultMessage="{APP_NAME} v0.5.7-alpha"
+                    /* six seven */
+                    description="Says what version of the app is running"
+                    id="tw.version.indicator"
+                    values={{
+                        APP_NAME
+                    }}
+                />
+            </div>
+                    
             <div className={styles.footerText}>
                 <FormattedMessage
                     // eslint-disable-next-line max-len

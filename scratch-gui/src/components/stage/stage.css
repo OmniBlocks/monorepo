@@ -29,10 +29,13 @@
     /* reset dark styles inherited from dark mode */
     color-scheme: light;
     color: $text-primary-default;
+    
 }
 
 .stage.full-screen {
     border: $stage-full-screen-border-width solid $ui-black-transparent;
+    transition: all 0.1s ease-in-out;
+    
 }
 
 .with-color-picker {

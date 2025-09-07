@@ -92,7 +92,7 @@ const handleReport = function (resolvedValue, sequencer, thread, blockCached, la
         // at the top of the thread stack.
         if (lastOperation && typeof resolvedValue !== 'undefined' && thread.atStackTop()) {
             if (thread.stackClick) {
-                sequencer.runtime.visualReport(currentBlockId, resolvedValue);
+                sequencer.runtime.visualReport(thread.target, currentBlockId, resolvedValue);
             }
             if (thread.updateMonitor) {
                 const targetId = sequencer.runtime.monitorBlocks.getBlock(currentBlockId).targetId;

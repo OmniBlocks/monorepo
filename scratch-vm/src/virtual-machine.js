@@ -221,6 +221,7 @@ class VirtualMachine extends EventEmitter {
             Sprite,
             RenderedTarget,
             JSZip,
+            Variable,
 
             i_will_not_ask_for_help_when_these_break: () => {
                 console.warn('You are using unsupported APIs. WHEN your code breaks, do not expect help.');
@@ -544,6 +545,22 @@ class VirtualMachine extends EventEmitter {
             file.date = date;
         }
 
+        // Tell JSZip to only compress file formats where there will be a significant gain.
+        const COMPRESSABLE_FORMATS = [
+            '.json',
+            '.svg',
+            '.wav',
+            '.ttf',
+            '.otf'
+        ];
+        for (const file of Object.values(zip.files)) {
+            if (COMPRESSABLE_FORMATS.some(ext => file.name.endsWith(ext))) {
+                file.options.compression = 'DEFLATE';
+            } else {
+                file.options.compression = 'STORE';
+            }
+        }
+
         return zip;
     }
 
@@ -553,9 +570,9 @@ class VirtualMachine extends EventEmitter {
      */
     saveProjectSb3 (type) {
         return this._saveProjectZip().generateAsync({
+            // Don't configure compression here. _saveProjectZip() will set it for each file.
             type: type || 'blob',
-            mimeType: 'application/x.scratch.sb3',
-            compression: 'DEFLATE'
+            mimeType: 'application/x.scratch.sb3'
         });
     }
 

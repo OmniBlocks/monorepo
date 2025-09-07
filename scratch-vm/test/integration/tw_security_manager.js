@@ -266,3 +266,27 @@ test('canEmbed', async t => {
 
     t.end();
 });
+
+test('canDownload', async t => {
+    const vm = new VirtualMachine();
+    setupUnsandboxedExtensionAPI(vm);
+
+    const calledWithArguments = [];
+    vm.securityManager.canDownload = async (url, name) => {
+        calledWithArguments.push([url, name]);
+        return name.includes('safe');
+    };
+
+    t.equal(await global.Scratch.canDownload('http://example.com/', 'safe.html'), true);
+    t.equal(await global.Scratch.canDownload('http://example.com/', 'dangerous.html'), false);
+
+    // should not even call security manager
+    t.equal(await global.Scratch.canDownload('javascript:alert(1)', 'safe.html'), false);
+
+    t.same(calledWithArguments, [
+        ['http://example.com/', 'safe.html'],
+        ['http://example.com/', 'dangerous.html']
+    ]);
+
+    t.end();
+});

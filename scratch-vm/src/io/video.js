@@ -157,6 +157,9 @@ class Video {
             if (renderer.markSkinAsPrivate) {
                 renderer.markSkinAsPrivate(this._skinId);
             }
+            if (renderer.markDrawableAsNoninteractive) {
+                renderer.markDrawableAsNoninteractive(this._drawable);
+            }
         }
 
         // if we haven't already created and started a preview frame render loop, do so

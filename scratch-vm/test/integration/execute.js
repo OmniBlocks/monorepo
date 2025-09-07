@@ -45,6 +45,9 @@ const whenThreadsComplete = (t, vm, uri, timeLimit = 5000) =>
         const timeoutId = setTimeout(() => {
             t.fail(`Timeout waiting for threads to complete: ${uri}`);
             reject(new Error('time limit reached'));
+
+            // Attempt to stop the lingering VM from interfering with other tests.
+            vm.quit();
         }, timeLimit);
 
         // Clear the interval to allow the process to exit

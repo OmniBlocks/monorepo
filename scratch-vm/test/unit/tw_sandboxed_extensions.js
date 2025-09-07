@@ -141,3 +141,13 @@ test('canEmbed', async t => {
     t.equal(await global.Scratch.canEmbed('https://example.com/'), false);
     t.end();
 });
+
+test('canDownload', async t => {
+    t.equal(await global.Scratch.canDownload('https://example.com/test.sb3', 'test.sb3'), false);
+    t.end();
+});
+
+test('download', async t => {
+    await t.rejects(global.Scratch.download('https://turbowarp.org/', 'index.html'), /not supported in sandboxed extension/);
+    t.end();
+});

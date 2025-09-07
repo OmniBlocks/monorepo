@@ -1,0 +1,39 @@
+// TW Snapshot
+// Input SHA-256: 99bb22ac4fb2542ce3c21fa7d2025f03d15392a33850585a4d12f4ec558663ac
+
+// Sprite1 script
+(function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
+const b0 = runtime.getOpcodeFunction("looks_say");
+const b1 = stage.variables["`jEk@4|i[#Fk?(8x)AV.-my variable"];
+const b2 = stage.variables[")|GMR5fz;%F_H,c0wGVM"];
+return function* genXYZ () {
+yield* executeInCompatibilityLayer({"MESSAGE":"plan 2",}, b0, false, false, "c", null);
+b1.value = 1;
+b2.value = 2;
+yield* waitThreads(startHats("event_whenbroadcastreceived", { BROADCAST_OPTION: "check 1" }));
+yield* waitThreads(startHats("event_whenbroadcastreceived", { BROADCAST_OPTION: "check 2" }));
+yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, "k", null);
+retire(); return;
+}; })
+
+// Sprite1 script
+(function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
+const b0 = stage.variables["`jEk@4|i[#Fk?(8x)AV.-my variable"];
+const b1 = runtime.getOpcodeFunction("looks_say");
+return function* genXYZ () {
+if (((+b0.value || 0) === 1)) {
+yield* executeInCompatibilityLayer({"MESSAGE":"pass variable 1",}, b1, false, false, "m", null);
+}
+retire(); return;
+}; })
+
+// Sprite1 script
+(function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
+const b0 = stage.variables[")|GMR5fz;%F_H,c0wGVM"];
+const b1 = runtime.getOpcodeFunction("looks_say");
+return function* genXYZ () {
+if (((+b0.value || 0) === 2)) {
+yield* executeInCompatibilityLayer({"MESSAGE":"pass variable 2",}, b1, false, false, "q", null);
+}
+retire(); return;
+}; })

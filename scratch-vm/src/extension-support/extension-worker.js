@@ -86,6 +86,8 @@ Object.assign(global.Scratch, ScratchCommon, {
     canNotify: () => Promise.resolve(false),
     canGeolocate: () => Promise.resolve(false),
     canEmbed: () => Promise.resolve(false),
+    canDownload: () => Promise.resolve(false),
+    download: () => Promise.reject(new Error('Scratch.download not supported in sandboxed extensions')),
     translate
 });
 

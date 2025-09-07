@@ -418,6 +418,110 @@ test('canEmbed', async t => {
     t.end();
 });
 
+test('canDownload', async t => {
+    const vm = new VirtualMachine();
+    UnsandboxedExtensionRunner.setupUnsandboxedExtensionAPI(vm);
+
+    const canDownloadChecks = [];
+    vm.securityManager.canDownload = (url, name) => {
+        canDownloadChecks.push([url, name]);
+        return url === 'https://example.com/safe.txt' && name === 'safe.txt';
+    };
+
+    t.ok(await global.Scratch.canDownload('https://example.com/safe.txt', 'safe.txt'));
+    t.notOk(await global.Scratch.canDownload('https://example.com/unsafe.txt', 'safe.txt'));
+    t.notOk(await global.Scratch.canDownload('https://example.com/safe.txt', 'unsafe.txt'));
+    t.notOk(await global.Scratch.canDownload('https://example.com/unsafe.txt', 'unsafe.txt'));
+
+    // Should be rejected without even calling user-provided canDownload.
+    // eslint-disable-next-line no-script-url
+    t.notOk(await global.Scratch.canDownload('javascript:alert(1)', 'index.html'));
+
+    t.same(canDownloadChecks, [
+        [
+            'https://example.com/safe.txt',
+            'safe.txt'
+        ],
+        [
+            'https://example.com/unsafe.txt',
+            'safe.txt'
+        ],
+        [
+            'https://example.com/safe.txt',
+            'unsafe.txt'
+        ],
+        [
+            'https://example.com/unsafe.txt',
+            'unsafe.txt'
+        ]
+    ]);
+
+    t.end();
+});
+
+test('download', async t => {
+    const vm = new VirtualMachine();
+    UnsandboxedExtensionRunner.setupUnsandboxedExtensionAPI(vm);
+
+    const actualDownloadAttempts = [];
+    global.document = {
+        createElement: tagName => ({
+            tagName,
+            click () {
+                actualDownloadAttempts.push([
+                    this.href,
+                    this.download
+                ]);
+            },
+            remove () {}
+        }),
+        body: {
+            appendChild () {}
+        }
+    };
+
+    const canDownloadChecks = [];
+    vm.securityManager.canDownload = (url, name) => {
+        canDownloadChecks.push([url, name]);
+        return url === 'https://example.com/safe.txt' && name === 'safe.txt';
+    };
+
+    await global.Scratch.download('https://example.com/safe.txt', 'safe.txt');
+    await t.rejects(global.Scratch.download('https://example.com/unsafe.txt', 'safe.txt'), /Permission to download/);
+    await t.rejects(global.Scratch.download('https://example.com/safe.txt', 'unsafe.txt'), /Permission to download/);
+    await t.rejects(global.Scratch.download('https://example.com/unsafe.txt', 'unsafe.txt'), /Permission to download/);
+    // eslint-disable-next-line no-script-url
+    await t.rejects(global.Scratch.download('javascript:alert(1)', 'safe.txt'), /Permission to download/);
+
+    t.same(actualDownloadAttempts, [
+        [
+            'https://example.com/safe.txt',
+            'safe.txt'
+        ]
+    ]);
+
+    t.same(canDownloadChecks, [
+        [
+            'https://example.com/safe.txt',
+            'safe.txt'
+        ],
+        [
+            'https://example.com/unsafe.txt',
+            'safe.txt'
+        ],
+        [
+            'https://example.com/safe.txt',
+            'unsafe.txt'
+        ],
+        [
+            'https://example.com/unsafe.txt',
+            'unsafe.txt'
+        ]
+    ]);
+
+    t.end();
+});
+
 test('CREATE_UNSANDBOXED_EXTENSION_API', t => {
     const vm = new VirtualMachine();
     vm.on('CREATE_UNSANDBOXED_EXTENSION_API', api => {

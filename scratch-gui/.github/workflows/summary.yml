@@ -175,7 +175,7 @@ jobs:
 
           # Close & lock the issue
           gh issue close "$ISSUE_NUMBER"
-          gh issue lock "$ISSUE_NUMBER" --reason "security"
+          gh issue lock "$ISSUE_NUMBER" 
 
       # ------------------------------------------------------
       # Normal path – post the AI‑generated summary as a comment

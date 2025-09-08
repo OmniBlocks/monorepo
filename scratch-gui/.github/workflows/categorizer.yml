@@ -19,7 +19,7 @@ jobs:
           prompt: |
             Categorize this GitHub issue using one or more of these labels: 
             bug, question, enhancement, documentation, dependencies, 
-            help wanted, High Priority, Medium Priority, Low Priority, 
+            help-wanted, High-Priority, Medium-Priority, Low-Priority, 
             invalid, javascript, wontfix.
             Always add at least one priority one.
             Respond ONLY with comma-separated label names. No explanations. No extra characters.
@@ -46,8 +46,8 @@ jobs:
             // Valid labels with exact casing
             const validLabels = new Set([
               'bug', 'question', 'enhancement', 'documentation', 
-              'dependencies', 'help wanted', 'High Priority', 
-              'Medium Priority', 'Low Priority', 'invalid', 
+              'dependencies', 'help-wanted', 'High-Priority', 
+              'Medium-Priority', 'Low-Priority', 'invalid', 
               'javascript', 'wontfix'
             ]);
             

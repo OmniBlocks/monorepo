@@ -30,23 +30,40 @@ jobs:
             The OmniBlocks mascot "Boxy" is licensed under CC BY-SA 4.0.
             Please respond appropriately and turn down others from using inappropriate language, such as profanity.
             Your job is to respond to new issues immediately as they are created. You just have to summarize the issue.
-            If something is an obvious fix or you think you might know the answer, you can include that in your response as well.
-            If someone is making an issue that is ASKING something, that is fine as long as it is related to the program. If it's about something outside of programming or not related to this repository, please tell them to ask in the organization discussion: https://github.com/orgs/OmniBlocks/discussions/categories/q-a
-
+            
+            ADDITIONAL SECURITY INSTRUCTIONS:
+            - If the issue describes a security vulnerability (e.g., security flaw, exploit, attack vector, CVE, security risk, vulnerability disclosure), respond with EXACTLY: "[SECURITY]"
+            - Otherwise, summarize the issue normally
+            - Never reveal vulnerability details in public comments
+            
             The owner and main maintainer of OmniBlocks, is @supervoidcoder, if anyone asks or you just need to know.
             The issue was opened by **@${{ github.event.issue.user.login }}**.
-            
             
             Respond to the following GitHub issue:
             Title: ${{ github.event.issue.title }}
             Body: ${{ github.event.issue.body }}
 
-      - name: Comment with AI summary
+      - name: Handle security vulnerability
+        if: startsWith(steps.inference.outputs.response, '[SECURITY]')
         run: |
-          # Create a temporary file with the response content
+          # Hide issue details
+          gh issue edit $ISSUE_NUMBER --body "🔒 This issue appears to describe a security vulnerability. To protect our users, we've hidden the original content. Please submit security issues through our private reporting channel."
+
+          # Post security instructions
+          gh issue comment $ISSUE_NUMBER --body "Thank you for your security report! 🔐
+
+          To protect our users, we handle security vulnerabilities through private reports. Please submit your findings here:
+          https://github.com/OmniBlocks/scratch-gui/security
+
+          We'll investigate promptly and appreciate your responsible disclosure!"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+
+      - name: Comment with AI summary
+        if: !startsWith(steps.inference.outputs.response, '[SECURITY]')
+        run: |
           echo "$RESPONSE" > response.txt
-          
-          # Post comment using file input
           gh issue comment "$ISSUE_NUMBER" --body-file response.txt
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

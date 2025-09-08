@@ -129,6 +129,9 @@ class IROptimizer {
         this.ir = ir;
         /** @type {boolean} Used for testing */
         this.ignoreYields = false;
+
+        /** @private @type {TypeState | null} The state the analyzed script could exit in */
+        this.exitState = null;
     }
 
     /**
@@ -511,6 +514,18 @@ class IROptimizer {
     }
 
     /**
+     * @param {TypeState} state
+     */
+    addPossibleExitState (state) {
+        if (this.exitState === null) {
+            this.exitState = state.clone();
+            return;
+        }
+
+        this.exitState.or(state);
+    }
+
+    /**
      * @param {IntermediateStackBlock} stackBlock
      * @param {TypeState} state
      * @returns {boolean}
@@ -540,6 +555,10 @@ class IROptimizer {
             modified = this.analyzeStack(inputs.whenTrue, trueState) || modified;
             modified = this.analyzeStack(inputs.whenFalse, state) || modified;
             modified = state.or(trueState) || modified;
+            break;
+        }
+        case StackOpcode.CONTROL_STOP_SCRIPT: {
+            this.addPossibleExitState(state);
             break;
         }
         case StackOpcode.PROCEDURE_CALL: {
@@ -691,8 +710,12 @@ class IROptimizer {
             this.optimizeScript(this.ir.procedures[procVariant], alreadyOptimized);
         }
 
-        script.cachedAnalysisEndState = new TypeState();
-        this.analyzeStack(script.stack, script.cachedAnalysisEndState);
+        this.exitState = null;
+        const exitState = new TypeState();
+        this.analyzeStack(script.stack, exitState);
+
+        this.addPossibleExitState(exitState);
+        script.cachedAnalysisEndState = this.exitState;
 
         this.optimizeStack(script.stack, new TypeState());
     }

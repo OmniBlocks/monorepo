@@ -1,117 +1,147 @@
 name: Summarize new issues (two-pass)
-
 on:
-  issues:
-    types: [opened]
-
+issues:
+types: [opened]
 jobs:
-  summary:
-    runs-on: ubuntu-latest
-    permissions:
-      issues: write
-      contents: read
+summary:
+runs-on: ubuntu-latest
+permissions:
+issues: write
+contents: read
+steps:
+  - name: Checkout repository (full history + tags)
+    uses: actions/checkout@v4
+    with:
+      fetch-depth: 0
 
-    steps:
-      - name: Checkout repository (full history + tags)
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+  - name: Get latest release tag (if any)
+    id: tag
+    run: |
+      set -e
+      # If no tags exist, return "none"
+      LATEST_TAG="none"
+      if git describe --tags --abbrev=0 >/dev/null 2>&1; then
+        LATEST_TAG=$(git describe --tags --abbrev=0)
+      fi
+      echo "LATEST_TAG=${LATEST_TAG}" >> $GITHUB_ENV
 
-      - name: Get latest release tag (if any)
-        id: tag
-        run: |
-          set -e
-          # If no tags exist, return "none"
-          if git describe --tags --abbrev=0 >/dev/null 2>&1; then
-            LATEST_TAG=$(git describe --tags --abbrev=0)
+  - name: First-pass: decide which files are relevant
+    id: decide
+    uses: actions/ai-inference@v1
+    with:
+      prompt: |
+        You are an assistant that decides what code context is needed to answer/understand a GitHub issue.
+        Output only a newline-separated list of at most 6 relative file paths (e.g. src/foo.js, lib/bar.py) that are most relevant to this issue.
+        If no code files are relevant, output exactly: NONE
+        Do not add any extra commentary or explanation — ONLY the newline-separated file paths or NONE.
+
+        Project: ${{ github.repository }}
+        Current version: ${{ env.LATEST_TAG }}
+
+        Issue Title:
+        ${{ github.event.issue.title }}
+
+        Issue Body:
+        ${{ github.event.issue.body }}
+
+  - name: Extract snippets for files suggested by AI (capped)
+    id: snip
+    run: |
+      set -euo pipefail
+      RESP="${{ steps.decide.outputs.response }}"
+
+      # Trim whitespace
+      FILES=$(echo "$RESP" | sed '/^\s*$/d')
+
+      # Explicitly create or truncate the file for snippets
+      OUTFILE=ai_snippets.txt
+      echo -n "" > "$OUTFILE"
+
+      if [ "$FILES" = "NONE" ] || [ -z "$FILES" ]; then
+        echo "NO_SNIPPETS" > "$OUTFILE"
+      else
+        # limit number of files to 6 as a safety cap (in case AI returns more)
+        COUNT=0
+        while IFS= read -r f && [ $COUNT -lt 6 ]; do
+          COUNT=$((COUNT+1))
+          # sanitize path a bit
+          f_clean=$(echo "$f" | tr -d '\r')
+          echo "----- FILE: $f_clean -----" >> "$OUTFILE"
+          if [ -f "$f_clean" ]; then
+            # Cap each file to first 20KB to avoid huge payloads; keep the head for context
+            head -c 20000 "$f_clean" >> "$OUTFILE" || true
+            echo "" >> "$OUTFILE"
           else
-            LATEST_TAG="none"
+            echo "[MISSING FILE: $f_clean]" >> "$OUTFILE"
           fi
-          echo "LATEST_TAG=${LATEST_TAG}" >> $GITHUB_ENV
-          echo "latest_tag=${LATEST_TAG}" >> $GITHUB_OUTPUT
+        done <<EOF
 
-      - name: First-pass: decide which files are relevant
-        id: decide
-        uses: actions/ai-inference@v1
-        with:
-          prompt: |
-            You are an assistant that decides what code context is needed to answer/understand a GitHub issue.
-            Output only a newline-separated list of at most 6 relative file paths (e.g. src/foo.js, lib/bar.py) that are most relevant to this issue.
-            If no code files are relevant, output exactly: NONE
-            Do not add any extra commentary or explanation — ONLY the newline-separated file paths or NONE.
-
-            Project: OmniBlocks (repo: scratch-gui)
-            Current version: ${{ env.LATEST_TAG }}
-
-            Issue Title:
-            ${{ github.event.issue.title }}
-
-            Issue Body:
-            ${{ github.event.issue.body }}
-
-      - name: Extract snippets for files suggested by AI (capped)
-        id: snip
-        run: |
-          set -euo pipefail
-          RESP="${{ steps.decide.outputs.response }}"
-
-          # Trim whitespace
-          FILES=$(echo "$RESP" | sed '/^\s*$/d')
-
-          OUTFILE=ai_snippets.txt
-          > "$OUTFILE"
-
-          if [ "$FILES" = "NONE" ] || [ -z "$FILES" ]; then
-            echo "NO_SNIPPETS" > "$OUTFILE"
-          else
-            # limit number of files to 6 as a safety cap (in case AI returns more)
-            COUNT=0
-            while IFS= read -r f && [ $COUNT -lt 6 ]; do
-              COUNT=$((COUNT+1))
-              # sanitize path a bit
-              f_clean=$(echo "$f" | tr -d '\r')
-              echo "----- FILE: $f_clean -----" >> "$OUTFILE"
-              if [ -f "$f_clean" ]; then
-                # Cap each file to first 20KB to avoid huge payloads; keep the head for context
-                head -c 20000 "$f_clean" >> "$OUTFILE" || true
-                echo "" >> "$OUTFILE"
-              else
-                echo "[MISSING FILE: $f_clean]" >> "$OUTFILE"
-              fi
-            done <<EOF
 $FILES
 EOF
-          fi
+fi
+      # expose snippet contents as an output (use GITHUB_OUTPUT)
+      echo "snippets<<EOF" >> $GITHUB_OUTPUT
+      cat "$OUTFILE" >> $GITHUB_OUTPUT
+      echo "EOF" >> $GITHUB_OUTPUT
 
-          # expose snippet contents as an output (use GITHUB_OUTPUT)
-          echo "snippets<<EOF" >> $GITHUB_OUTPUT
-          cat "$OUTFILE" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+  - name: Second-pass: AI summary using relevant snippets
+    id: final
+    uses: actions/ai-inference@v1
+    with:
+      prompt: |
+        You are an Artificial Intelligence that helps with GitHub issues for the ${{ github.repository }} project.
+        The current version is: ${{ env.LATEST_TAG }}.
+        Your job is to read the issue and produce a short helpful summary.
 
-      - name: Second-pass: AI summary using relevant snippets
-        id: final
-        uses: actions/ai-inference@v1
-        with:
-          prompt: |
-            You are an Artificial Intelligence that helps with GitHub issues for the OmniBlocks project (repo: scratch-gui).
-            OmniBlocks is a Multi-Language IDE built on TurboWarp (Scratch mod). The current version is: ${{ env.LATEST_TAG }}.
-            Your job is to read the issue and produce a short helpful summary.
+        IMPORTANT SECURITY INSTRUCTIONS (APPLY FIRST):
+        - If the issue describes a security vulnerability (security flaw, exploit, attack vector, CVE, disclosure), respond with EXACTLY: [SECURITY]
+        - Otherwise respond with a friendly concise summary (1-5 short paragraphs). You may optionally suggest a likely cause or next step if obvious.
+        - Never include any exploit details or sensitive information in a public comment.
 
-            IMPORTANT SECURITY INSTRUCTIONS (APPLY FIRST):
-            - If the issue describes a security vulnerability (security flaw, exploit, attack vector, CVE, disclosure), respond with EXACTLY: [SECURITY]
-            - Otherwise respond with a friendly concise summary (1-5 short paragraphs). You may optionally suggest a likely cause or next step if obvious.
-            - Never include any exploit details or sensitive information in a public comment.
+        Issue Title:
+        ${{ github.event.issue.title }}
 
-            Issue Title:
-            ${{ github.event.issue.title }}
+        Issue Body:
+        ${{ github.event.issue.body }}
 
-            Issue Body:
-            ${{ github.event.issue.body }}
+        RELEVANT CODE SNIPPETS (only what was extracted):
+        ${{ steps.snip.outputs.snippets }}
 
-            RELEVANT CODE SNIPPETS (only what was extracted):
-            ${{ steps.snip.outputs.snippets }}
+        Respond with either the single line "[SECURITY]" OR the full summary text. No extra metadata required.
 
-            Respond with either the single line "[SECURITY]" OR the full summary text. No extra metadata required.
+  - name: Handle security vulnerability
+    if: ${{ startsWith(steps.final.outputs.response, '[SECURITY]') }}
+    run: |
+      # Replace public body with a safe message
+      gh issue edit "$ISSUE_NUMBER" --body "🔒 This issue appears to describe a security vulnerability. To protect our users, we've hidden the original content. Please submit security issues through our private reporting channel."
+
+      # Post security instructions
+      gh issue comment "$ISSUE_NUMBER" --body "Thank you for your security report! 🔐
+
+To protect our users, we handle security vulnerabilities through private reports. Please submit your findings here:
+https://www.google.com/search?q=https://github.com/%24{{ github.repository }}/security/advisories/new
+We'll investigate promptly and appreciate your responsible disclosure!"
+      # Add security label
+      gh issue edit "$ISSUE_NUMBER" --add-label "security"
+
+      # Close the issue
+      gh issue close "$ISSUE_NUMBER"
+
+      # Lock the issue so no further public comments are made
+      gh issue lock "$ISSUE_NUMBER" --reason "security"
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      ISSUE_NUMBER: ${{ github.event.issue.number }}
+
+  - name: Comment with AI summary
+    if: ${{ !startsWith(steps.final.outputs.response, '[SECURITY]') }}
+    run: |
+      echo "${{ steps.final.outputs.response }}" > response.txt
+      gh issue comment "$ISSUE_NUMBER" --body-file response.txt
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      ISSUE_NUMBER: ${{ github.event.issue.number }}
+
 
       - name: Handle security vulnerability
         if: ${{ startsWith(steps.final.outputs.response, '[SECURITY]') }}

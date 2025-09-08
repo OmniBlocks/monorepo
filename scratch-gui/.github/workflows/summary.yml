@@ -42,7 +42,7 @@ jobs:
       # ------------------------------------------------------
       # First pass – ask the model which files are relevant
       # ------------------------------------------------------
-      - name: First‑pass: decide which files are relevant
+      - name: First‑pass decide which files are relevant
         id: decide
         uses: actions/ai-inference@v1
         with:
@@ -68,45 +68,52 @@ jobs:
         id: snip
         run: |
           set -euo pipefail
+          # The AI‑inference step returns a newline‑separated list of file paths
           RESP="${{ steps.decide.outputs.response }}"
 
-          # Remove empty lines / surrounding whitespace
+          # Strip empty lines / surrounding whitespace
           FILES=$(printf "%s\n" "$RESP" | sed '/^\s*$/d')
 
           OUTFILE=ai_snippets.txt
           > "$OUTFILE"
 
+          # If the model said “NONE” or gave us an empty list, nothing to grab
           if [ "$FILES" = "NONE" ] || [ -z "$FILES" ]; then
             echo "NO_SNIPPETS" > "$OUTFILE"
           else
             COUNT=0
+            # Feed the list into a while‑loop – no heredoc needed
+            printf "%s\n" "$FILES" |
             while IFS= read -r f && [ $COUNT -lt 6 ]; do
               COUNT=$((COUNT + 1))
+              # Clean the line (remove possible carriage‑return)
               f_clean=$(printf "%s" "$f" | tr -d '\r')
               echo "----- FILE: $f_clean -----" >> "$OUTFILE"
+
               if [ -f "$f_clean" ]; then
-                # Grab at most the first 20 KB of each file
+                # Grab at most the first 20 KB of each file (prevents huge payloads)
                 head -c 20000 "$f_clean" >> "$OUTFILE" || true
                 echo "" >> "$OUTFILE"
               else
                 echo "[MISSING FILE: $f_clean]" >> "$OUTFILE"
               fi
-            done <<EOF
-$FILES
-EOF
+            done
           fi
 
-          # Publish the snippets for the next step
+          # --------------------------------------------------
+          # Publish the snippets so the next step can use them
+          # --------------------------------------------------
           {
             echo "snippets<<EOF"
             cat "$OUTFILE"
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
 
+
       # ------------------------------------------------------
       # Second pass – generate the final summary (or security flag)
       # ------------------------------------------------------
-      - name: Second‑pass: AI summary using relevant snippets
+      - name: Second‑pass AI summary using relevant snippets
         id: final
         uses: actions/ai-inference@v1
         with:

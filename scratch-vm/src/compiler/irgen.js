@@ -548,7 +548,7 @@ class ScriptTreeGenerator {
 
         case 'sound_sounds_menu':
             // This menu is special compared to other menus -- it actually has an opcode function.
-            return this.createConstantInput(block.fields.SOUND_MENU.value);
+            return this.createConstantInput(block.fields.SOUND_MENU.value, true);
 
         case 'control_get_counter':
             return new IntermediateInput(InputOpcode.CONTROL_COUNTER, InputType.NUMBER_POS_INT | InputType.NUMBER_ZERO);

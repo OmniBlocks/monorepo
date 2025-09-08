@@ -44,29 +44,46 @@ jobs:
 
       - name: Handle security vulnerability
         if: ${{ startsWith(steps.inference.outputs.response, '[SECURITY]') }}
-        run: |
-          # Hide issue details
-          gh issue edit "$ISSUE_NUMBER" --body "🔒 This issue appears to describe a security vulnerability. To protect our users, we've hidden the original content. Please submit security issues through our private reporting channel."
-
-          # Post security instructions
-          gh issue comment "$ISSUE_NUMBER" --body "Thank you for your security report! 🔐
-
-          To protect our users, we handle security vulnerabilities through private reports. Please submit your findings here:
-          https://github.com/OmniBlocks/scratch-gui/security
-
-          We'll investigate promptly and appreciate your responsible disclosure!"
-
-          # Add security label
-          gh issue edit "$ISSUE_NUMBER" --add-label "security"
-
-          # Close the issue
-          gh issue close "$ISSUE_NUMBER"
-
-          # Lock the issue so no further public comments are made
-          gh issue lock "$ISSUE_NUMBER" --reason "security"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          # 1. Overwrite the issue body
+          curl -s -X PATCH \
+            -H "Authorization: token $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/$REPO/issues/$ISSUE_NUMBER \
+            -d '{"body":"🔒 This issue appears to describe a security vulnerability. To protect our users, we have hidden the original content. Please submit security issues through our private reporting channel."}'
+
+          # 2. Attempt to delete old edits from timeline
+          TIMELINE=$(curl -s -H "Authorization: token $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/$REPO/issues/$ISSUE_NUMBER/timeline)
+
+          echo "$TIMELINE" | jq -r '.[] | select(.event=="edited") | .id' | while read id; do
+            curl -s -X DELETE \
+              -H "Authorization: token $GH_TOKEN" \
+              -H "Accept: application/vnd.github+json" \
+              https://api.github.com/repos/$REPO/issues/events/$id
+          done
+
+          # 3. Add security label
+          gh issue edit "$ISSUE_NUMBER" --add-label "security"
+
+          # 4. Close the issue
+          gh issue close "$ISSUE_NUMBER"
+
+          # 5. Lock the issue
+          gh issue lock "$ISSUE_NUMBER" --reason "security"
+
+          # 6. Post security instructions
+          gh issue comment "$ISSUE_NUMBER" --body "Thank you for your security report! 🔐
+
+          To protect our users, we handle security vulnerabilities through private reports. Please submit your findings here:
+          https://github.com/$REPO/security
+
+          We'll investigate promptly and appreciate your responsible disclosure!"
 
       - name: Comment with AI summary
         if: ${{ !startsWith(steps.inference.outputs.response, '[SECURITY]') }}

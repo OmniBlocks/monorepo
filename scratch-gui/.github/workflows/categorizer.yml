@@ -21,7 +21,7 @@ jobs:
             bug, question, enhancement, documentation, dependencies, 
             help wanted, High Priority, Medium Priority, Low Priority, 
             invalid, javascript, wontfix.
-            
+            Always add at least one priority one.
             Respond ONLY with comma-separated label names. No explanations. No extra characters.
             
             Issue Title: ${{ github.event.issue.title }}

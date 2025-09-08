@@ -20,7 +20,7 @@ jobs:
             Categorize this GitHub issue using one or more of these labels: 
             bug, question, enhancement, documentation, dependencies, 
             help wanted, High Priority, Medium Priority, Low Priority, 
-            invalid, javascript, wontfix, security issue.
+            invalid, javascript, wontfix.
             
             Respond ONLY with comma-separated label names. No explanations. No extra characters.
             
@@ -48,7 +48,7 @@ jobs:
               'bug', 'question', 'enhancement', 'documentation', 
               'dependencies', 'help wanted', 'High Priority', 
               'Medium Priority', 'Low Priority', 'invalid', 
-              'javascript', 'wontfix', 'security issue'
+              'javascript', 'wontfix'
             ]);
             
             // Case-insensitive mapping

@@ -126,7 +126,9 @@ jobs:
             The OmniBlocks logo is licensed under CC BY‑SA 4.0. The logo incorporates the Python logo, which is a trademark of the Python Software Foundation, used here solely to reference the Python programming language. This project is not affiliated with or endorsed by the Python Software Foundation.
             The OmniBlocks mascot "Boxy" is licensed under CC BY‑SA 4.0.
             Please respond appropriately and turn down others from using inappropriate language, such as profanity.
-            Your job is to respond to new issues immediately as they are created. You just have to summarize the issue.
+            Your job is to respond to new issues immediately as they are created. You just have to summarize the issue. 
+            Be friendly! You don't need to be stoic. Greet the user! 
+            Also, there is a limit on how much you can type. It's not a super short limit, but don't go all out either. It's around 2-3 paragraphs.
 
             ADDITIONAL SECURITY INSTRUCTIONS:
             - If the issue describes a security vulnerability (e.g., security flaw, exploit, attack vector, CVE, security risk, vulnerability disclosure), respond with EXACTLY: "[SECURITY]"
@@ -139,7 +141,7 @@ jobs:
             Respond to the following GitHub issue:
             Title: ${{ github.event.issue.title }}
             Body: ${{ github.event.issue.body }}
-            The current version is: ${{ env.LATEST_TAG }}.
+            The current version of OmniBlocks is: ${{ env.LATEST_TAG }}.
 
             RELEVANT CODE SNIPPETS (only what was extracted):
             ${{ steps.snip.outputs.snippets }}

@@ -2,7 +2,7 @@ name: AI Issue Categorization
 
 on:
   issues:
-    types: [opened]
+    types: [opened, edited]
 
 jobs:
   categorize:
@@ -17,10 +17,12 @@ jobs:
         uses: actions/ai-inference@v1
         with:
           prompt: |
-            Categorize this GitHub issue into exactly one of these labels: 
-            bug, question, enhancement, documentation.
+            Categorize this GitHub issue using one or more of these labels: 
+            bug, question, enhancement, documentation, dependencies, 
+            help wanted, High Priority, Medium Priority, Low Priority, 
+            invalid, javascript, wontfix, security issue.
             
-            Respond ONLY with the label name. No explanations.
+            Respond ONLY with comma-separated label names. No explanations. No extra characters.
             
             Issue Title: ${{ github.event.issue.title }}
             Issue Body: |
@@ -29,25 +31,55 @@ jobs:
       - name: Clean AI output
         id: clean-label
         run: |
-          # Remove quotes and trim whitespace
-          CLEAN_LABEL=$(echo '${{ steps.ai-categorize.outputs.response }}' | tr -d '"' | tr -d "'" | xargs echo -n)
-          echo "label=$CLEAN_LABEL" >> $GITHUB_OUTPUT
+          # Clean and normalize AI output
+          RAW_OUTPUT='${{ steps.ai-categorize.outputs.response }}'
+          CLEANED=$(echo "$RAW_OUTPUT" | \
+            tr '[:upper:]' '[:lower:]' | \
+            sed -e 's/["'\''$$$$]//g' -e 's/[, ]\+/, /g' -e 's/^[ ,]*//' -e 's/[ ,]*$//')
+          
+          echo "raw_labels=$CLEANED" >> $GITHUB_OUTPUT
 
-      - name: Apply label to issue
+      - name: Apply validated labels
         uses: actions/github-script@v6
         with:
           script: |
-            const label = '${{ steps.clean-label.outputs.label }}'.toLowerCase();
-            const validLabels = ['bug', 'question', 'enhancement', 'documentation'];
+            // Valid labels with exact casing
+            const validLabels = new Set([
+              'bug', 'question', 'enhancement', 'documentation', 
+              'dependencies', 'help wanted', 'High Priority', 
+              'Medium Priority', 'Low Priority', 'invalid', 
+              'javascript', 'wontfix', 'security issue'
+            ]);
             
-            // Validate AI response
-            const finalLabel = validLabels.includes(label) 
-              ? label 
-              : 'question';  // Fallback label
+            // Case-insensitive mapping
+            const labelMap = new Map();
+            validLabels.forEach(label => {
+              labelMap.set(label.toLowerCase(), label);
+            });
             
+            // Process AI output
+            const rawLabels = '${{ steps.clean-label.outputs.raw_labels }}';
+            const receivedLabels = new Set();
+            const finalLabels = new Set();
+            
+            // Split and validate labels
+            rawLabels.split(/\s*,\s*/).forEach(label => {
+              const normalized = label.trim().toLowerCase();
+              if (labelMap.has(normalized) && !receivedLabels.has(normalized)) {
+                finalLabels.add(labelMap.get(normalized));
+                receivedLabels.add(normalized);
+              }
+            });
+            
+            // Add fallback if no valid labels found
+            if (finalLabels.size === 0) {
+              finalLabels.add('question');
+            }
+            
+            // Apply labels to issue
             await github.rest.issues.addLabels({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: ${{ github.event.issue.number }},
-              labels: [finalLabel]
+              labels: Array.from(finalLabels)
             });

@@ -55,6 +55,15 @@ jobs:
           https://github.com/OmniBlocks/scratch-gui/security
 
           We'll investigate promptly and appreciate your responsible disclosure!"
+
+          # Add security label
+          gh issue edit "$ISSUE_NUMBER" --add-label "security"
+
+          # Close the issue
+          gh issue close "$ISSUE_NUMBER"
+
+          # Lock the issue so no further public comments are made
+          gh issue lock "$ISSUE_NUMBER" --reason "security"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}

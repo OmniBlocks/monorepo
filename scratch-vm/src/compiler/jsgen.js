@@ -57,8 +57,8 @@ const isSafeInputForEqualsOptimization = (input, other) => {
     if (input.opcode !== InputOpcode.CONSTANT) return false;
     // Only optimize when the constant can always be thought of as a number
     if (input.isAlwaysType(InputType.NUMBER) || input.isAlwaysType(InputType.STRING_NUM)) {
-        if (other.isSometimesType(InputType.STRING_NAN) || other.isSometimesType(InputType.BOOLEAN_INTERPRETABLE)) {
-            // Never optimize 0 if the other input can be '' or a boolean.
+        if (other.isSometimesType(InputType.NUMBER_NAN | InputType.STRING_NAN | InputType.BOOLEAN_INTERPRETABLE)) {
+            // Never optimize 0 if the other input can be NaN, '' or a boolean.
             // eg. if '< 0 = "" >' was optimized it would turn into `0 === +""`,
             //  which would be true even though Scratch would return false.
             return (+input.inputs.value) !== 0;

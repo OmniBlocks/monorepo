@@ -620,11 +620,13 @@ class IROptimizer {
      */
     analyzeLoopedStack (stack, state, block) {
         if (block.yields && !this.ignoreYields) {
-            const modified = state.clear();
+            let modified = state.clear();
             block.entryState = state.clone();
             block.exitState = state.clone();
+            modified = this.analyzeInputs(block.inputs, state) || modified;
             return this.analyzeStack(stack, state) || modified;
         }
+
         let modified = false;
         let keepLooping;
         do {

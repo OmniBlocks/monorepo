@@ -39,7 +39,13 @@
 
 .sprite {
     height: 100%;
+    transition: all 0.1s ease-in-out;
 }
+.sprite:hover {
+    /* this has to be eased in for smooth or else idk it looks bad */
+    transform: scale(1.05);
+}
+
 
 
 .scroll-wrapper {

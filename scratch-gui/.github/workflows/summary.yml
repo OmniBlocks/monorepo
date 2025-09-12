@@ -1,47 +1,52 @@
+# .github/workflows/summary.yml
 name: Summarize new issues (two‑pass – file‑aware & conditional checkout)
 
+# ------------------------------------------------------------
+# Trigger on newly opened issues only
+# ------------------------------------------------------------
 on:
   issues:
     types: [opened]
 
+# ------------------------------------------------------------
 jobs:
   summary:
     runs-on: ubuntu-latest
     permissions:
-      issues: write
-      contents: read
-      pull-requests: read
-      repository-projects: read
+      issues: write          # edit / comment / label
+      contents: read         # checkout repo (when needed)
+      pull-requests: read    # list recent PRs (new)
+      repository-projects: read   # read the GitHub Project board (new)
 
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      ORG: OmniBlocks          # ← change if needed
-      REPO: scratch-gui        # ← change if needed
-      PROJECT_NUMBER: 1        # ← change if needed
-      # How many file‑paths we will ship to the LLM (keep it reasonable)
-      FILE_INDEX_LIMIT: 5000
+      ORG: OmniBlocks            # <-- change if your org has a different name
+      REPO: scratch-gui          # <-- repository name
+      PROJECT_NUMBER: 1          # <-- the number you see in the URL /projects/1
+      FILE_INDEX_LIMIT: 5000     # max number of paths shipped to the LLM
 
     steps:
       # -------------------------------------------------
-      # 0️⃣  Build a tiny *file‑index* of the repository
+      # 0️⃣  Build a tiny *file‑index* of the repository (no checkout)
       # -------------------------------------------------
       - name: Get repository file list (no checkout)
         id: file_index
         run: |
-          # The GitHub REST “git/trees” endpoint can give us every path in one call
-          # (use ?recursive=1).  The result is JSON; we keep only the “path” fields.
+          # Pull every path in the repo via the GitHub “git/trees” API
           curl -s -H "Authorization: token $GH_TOKEN" \
             "https://api.github.com/repos/$ORG/$REPO/git/trees/HEAD?recursive=1" |
             jq -r '.tree[].path' |
-            # Truncate to a safe size – 5000 lines is ~150 KB, well below the typical prompt limit.
             head -n $FILE_INDEX_LIMIT > file_index.txt
 
-          # Export the file as a multiline environment variable (as base64 to avoid quoting issues)
-          FILE_INDEX_B64=$(base64 -w 0 file_index.txt)
-          echo "file_index_b64=${FILE_INDEX_B64}" >> "$GITHUB_OUTPUT"
+          # Export the whole list as a multiline output called "file_index"
+          {
+            echo "file_index<<EOF"
+            cat file_index.txt
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
 
       # -------------------------------------------------
-      # 1️⃣  (unchanged) – Get the latest tag
+      # 1️⃣  Get latest release tag (if any)
       # -------------------------------------------------
       - name: Get latest release tag (if any)
         id: tag
@@ -55,16 +60,60 @@ jobs:
           echo "latest_tag=${LATEST_TAG}" >> "$GITHUB_OUTPUT"
 
       # -------------------------------------------------
-      # 2️⃣  (unchanged) – Project status snapshot
+      # 2️⃣  Generate real‑time project status snapshot
       # -------------------------------------------------
       - name: Generate real‑time project status report
         id: project-status
         run: |
-          # … (keep the exact script you already have) …
-          # At the end:
+          STATUS_FILE="project_status_report.txt"
+          echo "# Real‑Time Project Status Snapshot" > "$STATUS_FILE"
+          echo "Generated on $(date)" >> "$STATUS_FILE"
+          echo "-----------------------------------" >> "$STATUS_FILE"
+          echo "" >> "$STATUS_FILE"
+
+          # ---- Recent merged PRs (last 10) ----
+          echo "## Recent Merged Pull Requests (last 10)" >> "$STATUS_FILE"
+          gh pr list \
+            --repo "$ORG/$REPO" \
+            --state merged \
+            --limit 10 \
+            --json number,title,author,url \
+            --jq '.[] | "- PR #$$.number): $$.title) (by $$.author.login)) $$.url)"' \
+            >> "$STATUS_FILE" 2>/dev/null || echo "⚠️ Could not fetch PRs" >> "$STATUS_FILE"
+          echo "" >> "$STATUS_FILE"
+
+          # ---- Recent open issues (last 10) ----
+          echo "## Recent Open Issues (last 10)" >> "$STATUS_FILE"
+          gh issue list \
+            --repo "$ORG/$REPO" \
+            --state open \
+            --limit 10 \
+            --json number,title,author,url \
+            --jq '.[] | "- Issue #$$.number): $$.title) (by $$.author.login)) $$.url)"' \
+            >> "$STATUS_FILE" 2>/dev/null || echo "⚠️ Could not fetch issues" >> "$STATUS_FILE"
+          echo "" >> "$STATUS_FILE"
+
+          # ---- Project board columns & cards ----
+          echo "## Current GitHub Project Board (Project #$PROJECT_NUMBER)" >> "$STATUS_FILE"
+          gh project column-list "$PROJECT_NUMBER" \
+            --owner "$ORG" \
+            --format json > columns.json 2>/dev/null || echo "[]" > columns.json
+
+          jq -r '.[].name' columns.json | while read -r COL; do
+            echo "- **$COL**:" >> "$STATUS_FILE"
+            COL_ID=$(jq -r ".[] | select(.name==\"$COL\") | .id" columns.json)
+            gh project item-list "$PROJECT_NUMBER" \
+              --owner "$ORG" \
+              --column "$COL_ID" \
+              --format json > cards.json 2>/dev/null || echo "[]" > cards.json
+            jq -r '.[] | "- $$.content.title) ($$.content.url))"' cards.json \
+              | head -n 5 >> "$STATUS_FILE"
+          done
+
+          # Export the report
           {
             echo "status_report<<EOF"
-            cat project_status_report.txt
+            cat "$STATUS_FILE"
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
 
@@ -75,15 +124,13 @@ jobs:
         id: decide
         uses: actions/ai-inference@v1
         with:
-          # Decode the base64 list and embed it directly into the prompt.
-          # The model sees the repo layout (up to 5 k files) and can pick intelligently.
           prompt: |
             You are an assistant that decides which source files a GitHub issue needs
-            to understand.  Below is a **compact list of every file in the repository**.
-            (If the list is too long you may ignore the obvious binary‑ish entries.)
+            to understand. Below is a **compact list of every file in the repository**.
+            (If the list is too long you may ignore obvious binary‑ish entries.)
 
             ---- REPOSITORY FILE LIST ----
-            ${{ fromJSON('"' + steps.file_index.outputs.file_index_b64 + '"') | decodeBase64 }}
+            ${{ steps.file_index.outputs.file_index }}
 
             ------------------------------------------------------------
             Output only a newline‑separated list of at most **6** relative file
@@ -100,13 +147,13 @@ jobs:
             ${{ github.event.issue.body }}
 
       # -------------------------------------------------
-      # 4️⃣  Conditional checkout – only if we need snippets
+      # 4️⃣  Conditional checkout – only if files are requested
       # -------------------------------------------------
-      - name: Checkout repository (full history + tags)   # ← runs only when needed
+      - name: Checkout repository (full history + tags)
         if: ${{ steps.decide.outputs.response != 'NONE' && steps.decide.outputs.response != '' }}
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0   # needed for tag lookup & later snippets
+          fetch-depth: 0   # needed for tag lookup & later snippet reading
 
       # -------------------------------------------------
       # 5️⃣  Extract tiny snippets from the files the model suggested
@@ -135,7 +182,7 @@ jobs:
               echo "----- FILE: $f_clean -----" >> "$OUTFILE"
 
               if [ -f "$f_clean" ]; then
-                # Grab the first 20 KB of each file (enough for context, cheap to ship)
+                # Grab first 20 KB of each file (enough context, cheap to ship)
                 head -c 20000 "$f_clean" >> "$OUTFILE"
                 echo "" >> "$OUTFILE"
               else
@@ -199,18 +246,42 @@ jobs:
             Respond with either the single line "[SECURITY]" OR the full summary text. No extra metadata required.
 
       # -------------------------------------------------
-      # 7️⃣  Security‑issue handling (unchanged)
+      # 7️⃣  If the AI flagged a security issue → hide, label, close, lock
       # -------------------------------------------------
       - name: Handle security vulnerability
         if: ${{ steps.final.outputs.response == '[SECURITY]' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
         run: |
-          # … (your existing script) …
-      
+          # Replace the public body with a safe placeholder
+          gh issue edit "$ISSUE_NUMBER" \
+            --title "Redacted Security Vulnerability" \
+            --body "🔒 This issue appears to describe a security vulnerability. To protect our users, we've hidden the original content. Please submit security issues through our private reporting channel."
+
+          # Post a comment with the reporting instructions
+          gh issue comment "$ISSUE_NUMBER" --body "Thank you for your security report! 🔐
+
+          To protect our users, we handle security vulnerabilities through private reports. Please submit your findings here:
+          https://github.com/OmniBlocks/scratch-gui/security
+
+          We'll investigate promptly and appreciate your responsible disclosure!"
+
+          # Add a “security” label
+          gh issue edit "$ISSUE_NUMBER" --add-label "security"
+
+          # Close & lock the issue
+          gh issue close "$ISSUE_NUMBER"
+          gh issue lock "$ISSUE_NUMBER"
+
       # -------------------------------------------------
-      # 8️⃣  Comment with AI summary (unchanged)
+      # 8️⃣  Normal path – post the AI‑generated summary as a comment
       # -------------------------------------------------
       - name: Comment with AI summary
         if: ${{ steps.final.outputs.response != '[SECURITY]' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
         run: |
           echo "${{ steps.final.outputs.response }}" > response.txt
-          gh issue comment "${{ github.event.issue.number }}" --body-file response.txt
+          gh issue comment "$ISSUE_NUMBER" --body-file response.txt

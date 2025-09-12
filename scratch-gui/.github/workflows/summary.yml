@@ -1,37 +1,34 @@
-name: Summarize new issues (two‑pass – always checkout)
+name: Summarize new issues (two-pass)
 
+# ------------------------------------------------------------
+# Trigger on newly opened issues only
+# ------------------------------------------------------------
 on:
   issues:
     types: [opened]
 
+# ------------------------------------------------------------
 jobs:
   summary:
     runs-on: ubuntu-latest
     permissions:
-      issues: write
-      contents: read
-      pull-requests: read
-      repository-projects: read
-
-    env:
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      ORG: OmniBlocks
-      REPO: scratch-gui
-      PROJECT_NUMBER: 1
-      FILE_INDEX_LIMIT: 670   # still used only for the *prompt* (keeps it short)
+      issues: write          # edit / comment / label
+      contents: read         # checkout repo
+      pull-requests: read    # list recent PRs (new)
+      repository-projects: read   # read the GitHub Project board (new)
 
     steps:
-      # -------------------------------------------------
-      # 0️⃣  Full checkout – we always need the source files
-      # -------------------------------------------------
+      # ------------------------------------------------------
+      # 1️⃣ Checkout the whole repository (history + tags)
+      # ------------------------------------------------------
       - name: Checkout repository (full history + tags)
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0   # complete history – needed for git describe & snippets
+          fetch-depth: 0   # needed for tag lookup
 
-      # -------------------------------------------------
-      # 1️⃣  Find the most recent Git tag (or “none”)
-      # -------------------------------------------------
+      # ------------------------------------------------------
+      # 2️⃣ Find the most recent git tag (or “none”)
+      # ------------------------------------------------------
       - name: Get latest release tag (if any)
         id: tag
         run: |
@@ -44,16 +41,16 @@ jobs:
           echo "LATEST_TAG=${LATEST_TAG}" >> "$GITHUB_ENV"
           echo "latest_tag=${LATEST_TAG}" >> "$GITHUB_OUTPUT"
 
-      # -------------------------------------------------
-      # 2️⃣  Generate a live “project status” snapshot
-      # -------------------------------------------------
+      # ------------------------------------------------------
+      # 3️⃣ **NEW** – Build a live “project status” snapshot
+      # ------------------------------------------------------
       - name: Generate real‑time project status report
         id: project-status
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ORG: ${{ env.ORG }}
-          REPO: ${{ env.REPO }}
-          PROJECT_NUMBER: ${{ env.PROJECT_NUMBER }}
+          ORG: OmniBlocks                # <-- change if your org has a different name
+          REPO: scratch-gui              # <-- repository name
+          PROJECT_NUMBER: 1              # <-- the number you see in the URL /projects/1
         run: |
           STATUS_FILE="project_status_report.txt"
           echo "# Real‑Time Project Status Snapshot" > "$STATUS_FILE"
@@ -61,6 +58,7 @@ jobs:
           echo "-----------------------------------" >> "$STATUS_FILE"
           echo "" >> "$STATUS_FILE"
 
+          # ---- Recent merged PRs (last 10) ----
           echo "## Recent Merged Pull Requests (last 10)" >> "$STATUS_FILE"
           gh pr list \
             --repo "$ORG/$REPO" \
@@ -71,6 +69,7 @@ jobs:
             >> "$STATUS_FILE" 2>/dev/null || echo "⚠️ Could not fetch PRs" >> "$STATUS_FILE"
           echo "" >> "$STATUS_FILE"
 
+          # ---- Recent open issues (last 10) ----
           echo "## Recent Open Issues (last 10)" >> "$STATUS_FILE"
           gh issue list \
             --repo "$ORG/$REPO" \
@@ -81,13 +80,14 @@ jobs:
             >> "$STATUS_FILE" 2>/dev/null || echo "⚠️ Could not fetch issues" >> "$STATUS_FILE"
           echo "" >> "$STATUS_FILE"
 
+          # ---- Project board columns & cards ----
           echo "## Current GitHub Project Board (Project #$PROJECT_NUMBER)" >> "$STATUS_FILE"
           gh project column-list "$PROJECT_NUMBER" \
             --owner "$ORG" \
             --format json > columns.json 2>/dev/null || echo "[]" > columns.json
 
           jq -r '.[].name' columns.json | while read -r COL; do
-            echo "- **$COL:**" >> "$STATUS_FILE"
+            echo "- **$COL**:" >> "$STATUS_FILE"
             COL_ID=$(jq -r ".[] | select(.name==\"$COL\") | .id" columns.json)
             gh project item-list "$PROJECT_NUMBER" \
               --owner "$ORG" \
@@ -97,43 +97,25 @@ jobs:
               | head -n 5 >> "$STATUS_FILE"
           done
 
+          # -------------------------------------------------
+          # Export the report for later steps
+          # -------------------------------------------------
           {
             echo "status_report<<EOF"
             cat "$STATUS_FILE"
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
 
-      # -------------------------------------------------
-      # 3️⃣  Build a *compact* file‑index (only to keep the prompt short)
-      # -------------------------------------------------
-      - name: Get repository file list (no checkout)
-        id: file_index
-        run: |
-          # We already have the repo, but we still want a *short* list for the AI.
-          # This grabs every path, filters to source‑code dirs, drops binaries,
-          # and limits the count.
-          find . -type f \
-            -regextype posix-extended \
-            -regex './(src|blocks|extensions|src/gui|src/lib|src/components|src/common)/.*' \
-            -not -regex '.*\.(png|gif|jpe?g|svg|ico|webp|bmp|psd|avif|heic)$' |
-            head -n $FILE_INDEX_LIMIT > file_index.txt
-
-          {
-            echo "file_index<<EOF"
-            cat file_index.txt
-            echo "EOF"
-          } >> "$GITHUB_OUTPUT"
-
-      # -------------------------------------------------
-      # 4️⃣  First‑pass – let the model pick relevant files
-      # -------------------------------------------------
+      # ------------------------------------------------------
+      # 4️⃣ First‑pass – decide which files are relevant
+      # ------------------------------------------------------
       - name: First‑pass decide which files are relevant
         id: decide
         uses: actions/ai-inference@v1
         with:
           prompt: |
             You are an assistant that decides what code context is needed to understand a GitHub issue.
-            Output only a newline‑separated list of at most **6** relative file paths (e.g. src/foo.js) that are most relevant to this issue.
+            Output only a newline‑separated list of at most 6 relative file paths (e.g. src/foo.js) that are most relevant to this issue.
             If no code files are relevant, output exactly: NONE
 
             Project: OmniBlocks (repo: scratch-gui)
@@ -145,71 +127,39 @@ jobs:
             Issue Body:
             ${{ github.event.issue.body }}
 
-            ---- REPOSITORY FILE LIST ----
-            ${{ steps.file_index.outputs.file_index }}
-
-      # -------------------------------------------------
-      # 5️⃣  **Validate** the model output
-      # -------------------------------------------------
-      - name: Validate AI‑suggested file list
-        id: validate
-        run: |
-          # The model may wrap the list in a markdown fence.
-          # Use single‑quotes so Bash never treats back‑ticks as command substitution.
-          RAW='${{ steps.decide.outputs.response }}'
-
-          # Strip fences, CR characters and blank lines.
-          CLEAN=$(printf "%s\n" "$RAW" \
-            | sed -e 's/^```//;s/```$//' \
-            | tr -d '\r' \
-            | sed '/^\s*$/d')
-
-          if [ "$CLEAN" = "NONE" ] || [ -z "$CLEAN" ]; then
-            echo "valid=NONE" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          # Keep only files that actually exist in the repo (extra safety).
-          echo "$CLEAN" > __tmp_all.txt
-          grep -Fxf <(git ls-files) __tmp_all.txt > __tmp_valid.txt || true
-
-          if [ -s __tmp_valid.txt ]; then
-            {
-              echo "valid<<EOF"
-              cat __tmp_valid.txt
-              echo "EOF"
-            } >> "$GITHUB_OUTPUT"
-          else
-            echo "valid=NONE" >> "$GITHUB_OUTPUT"
-          fi
-
-      # -------------------------------------------------
-      # 6️⃣  Extract tiny snippets from the (now‑validated) files
-      # -------------------------------------------------
+      # ------------------------------------------------------
+      # 5️⃣ Extract tiny snippets from the files the model suggested
+      # ------------------------------------------------------
       - name: Extract snippets for files suggested by AI (capped)
         id: snip
-        if: ${{ steps.validate.outputs.valid != 'NONE' && steps.validate.outputs.valid != '' }}
         run: |
           set -euo pipefail
-          FILES=$(printf "%s\n" "${{ steps.validate.outputs.valid }}")
+          RESP="${{ steps.decide.outputs.response }}"
+
+          # Clean empty lines
+          FILES=$(printf "%s\n" "$RESP" | sed '/^\s*$/d')
 
           OUTFILE=ai_snippets.txt
           > "$OUTFILE"
 
-          COUNT=0
-          printf "%s\n" "$FILES" |
-          while IFS= read -r f && [ $COUNT -lt 6 ]; do
-            COUNT=$((COUNT + 1))
-            echo "----- FILE: $f -----" >> "$OUTFILE"
-            if [ -f "$f" ]; then
-              head -c 20000 "$f" >> "$OUTFILE"
-              echo "" >> "$OUTFILE"
-            else
-              # Should never happen because we filtered with `git ls-files`,
-              # but keep the guard so the job never fails.
-              echo "[MISSING FILE: $f]" >> "$OUTFILE"
-            fi
-          done
+          if [ "$FILES" = "NONE" ] || [ -z "$FILES" ]; then
+            echo "NO_SNIPPETS" > "$OUTFILE"
+          else
+            COUNT=0
+            printf "%s\n" "$FILES" |
+            while IFS= read -r f && [ $COUNT -lt 6 ]; do
+              COUNT=$((COUNT + 1))
+              f_clean=$(printf "%s" "$f" | tr -d '\r')
+              echo "----- FILE: $f_clean -----" >> "$OUTFILE"
+
+              if [ -f "$f_clean" ]; then
+                head -c 20000 "$f_clean" >> "$OUTFILE" || true
+                echo "" >> "$OUTFILE"
+              else
+                echo "[MISSING FILE: $f_clean]" >> "$OUTFILE"
+              fi
+            done
+          fi
 
           {
             echo "snippets<<EOF"
@@ -217,12 +167,12 @@ jobs:
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
 
-      # -------------------------------------------------
-      # 7️⃣  Second‑pass – generate the final summary (or security flag)
-      # -------------------------------------------------
+      # ------------------------------------------------------
+      # 6️⃣ Second‑pass – generate the final summary (or security flag)
+      # ------------------------------------------------------
       - name: Second‑pass AI summary using relevant snippets
         id: final
-        uses: actions.ai-inference@v1
+        uses: actions/ai-inference@v1
         with:
           prompt: |
             # ------------------------------------------------------
@@ -233,7 +183,7 @@ jobs:
             # ------------------------------------------------------
             # ORIGINAL INSTRUCTION BLOCK (unchanged)
             # ------------------------------------------------------
-            You are an Artificial Intelligence that helps out with the Github issues in this repository titled scratch‑gui inside the OmniBlocks organization.
+            You are an Artificial Intelligence that helps out with the Github issues in this repository titled scratch-gui inside the OmniBlocks organization.
             OmniBlocks is a developing Multi‑Language IDE. Currently based on TurboWarp, which is a mod of Scratch 3, for the block editor.
             Text editors are also planned for languages like Python or C, but they are not implemented yet. 
             OmniBlocks adds some cool things to the classic block editor, such as a music editor or extra features.
@@ -244,7 +194,7 @@ jobs:
             Please respond appropriately and turn down others from using inappropriate language, such as profanity.
             Your job is to respond to new issues immediately as they are created. You just have to summarize the issue. 
             Be friendly! You don't need to be stoic. Greet the user! 
-            Also, there is a limit on how much you can type. It's not a super short limit, but don't go all out either. It's around 2‑3 paragraphs.
+            Also, there is a limit on how much you can type. It's not a super short limit, but don't go all out either. It's around 2-3 paragraphs.
             One quirk is backticks, like the one for code blocks. Don't use those as anything inside them will just get deleted.
 
             ADDITIONAL SECURITY INSTRUCTIONS:
@@ -265,19 +215,21 @@ jobs:
 
             Respond with either the single line "[SECURITY]" OR the full summary text. No extra metadata required.
 
-      # -------------------------------------------------
-      # 8️⃣  Security handling
-      # -------------------------------------------------
+      # ------------------------------------------------------
+      # 7️⃣ If the AI flagged a security issue → hide, label, close, lock
+      # ------------------------------------------------------
       - name: Handle security vulnerability
         if: ${{ steps.final.outputs.response == '[SECURITY]' }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
         run: |
+          # Replace the public body with a safe placeholder
           gh issue edit "$ISSUE_NUMBER" \
             --title "Redacted Security Vulnerability" \
             --body "🔒 This issue appears to describe a security vulnerability. To protect our users, we've hidden the original content. Please submit security issues through our private reporting channel."
 
+          # Post a comment with the reporting instructions
           gh issue comment "$ISSUE_NUMBER" --body "Thank you for your security report! 🔐
 
           To protect our users, we handle security vulnerabilities through private reports. Please submit your findings here:
@@ -285,13 +237,16 @@ jobs:
 
           We'll investigate promptly and appreciate your responsible disclosure!"
 
+          # Add a “security” label
           gh issue edit "$ISSUE_NUMBER" --add-label "security"
+
+          # Close & lock the issue
           gh issue close "$ISSUE_NUMBER"
           gh issue lock "$ISSUE_NUMBER"
 
-      # -------------------------------------------------
-      # 9️⃣  Normal path – post the AI‑generated summary as a comment
-      # -------------------------------------------------
+      # ------------------------------------------------------
+      # 8️⃣ Normal path – post the AI‑generated summary as a comment
+      # ------------------------------------------------------
       - name: Comment with AI summary
         if: ${{ steps.final.outputs.response != '[SECURITY]' }}
         env:

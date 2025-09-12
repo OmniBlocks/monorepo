@@ -22,7 +22,7 @@ jobs:
       REPO: scratch-gui              # change if your repo has a different name
       PROJECT_NUMBER: 1              # change to match your project board
       # Keep the file‑list short – 300 entries is plenty for the model
-      FILE_INDEX_LIMIT: 300
+      FILE_INDEX_LIMIT: 670 #six seven
 
     steps:
       # -------------------------------------------------

@@ -45,6 +45,14 @@ jobs:
           } >> "$GITHUB_OUTPUT"
 
       # -------------------------------------------------
+      # 0️⃣️⃣  Shallow checkout – ONLY needed for tag lookup
+      # -------------------------------------------------
+      - name: Shallow checkout (for tag lookup)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1   # we only need .git history enough for tags
+
+      # -------------------------------------------------
       # 1️⃣  Get latest release tag (if any)
       # -------------------------------------------------
       - name: Get latest release tag (if any)
@@ -145,39 +153,30 @@ jobs:
             ${{ github.event.issue.body }}
 
       # -------------------------------------------------
-      # 3.5️⃣  **Validate AI‑suggested files**
-      #         – keep only files that really exist in the repo
+      # 3.5️⃣  **Validate AI‑suggested file list**
+      #         – just normalise, keep everything that isn’t NONE
       # -------------------------------------------------
       - name: Validate AI‑suggested file list
         id: validate
         run: |
-          # 1️⃣ Pull the raw response from the first‑pass model
+          # Raw response from the model
           RAW="${{ steps.decide.outputs.response }}"
 
-          # Normalise line‑breaks and strip possible Windows \r
-          echo "$RAW" | tr -d '\r' > suggested_raw.txt
+          # Strip Windows CR, drop empty lines
+          CLEAN=$(printf "%s\n" "$RAW" | tr -d '\r' | sed '/^\s*$/d')
 
-          # If the model answered NONE (or gave an empty string) we are done
-          if grep -q -Fx "NONE" suggested_raw.txt || ! grep -q . suggested_raw.txt; then
+          # If model said NONE or we got nothing → treat as NONE
+          if [ "$CLEAN" = "NONE" ] || [ -z "$CLEAN" ]; then
             echo "valid=NONE" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
-          # 2️⃣ Intersect with the real file‑index we built earlier.
-          #    The file_index.txt file lives in the workspace from step 0.
-          grep -Fxf file_index.txt suggested_raw.txt > valid.txt || true
-
-          # 3️⃣ If after filtering nothing remains → treat as NONE
-          if [ -s valid.txt ]; then
-            # Join the list back into a single multi‑line string for the output
-            {
-              echo "valid<<EOF"
-              cat valid.txt
-              echo "EOF"
-            } >> "$GITHUB_OUTPUT"
-          else
-            echo "valid=NONE" >> "$GITHUB_OUTPUT"
-          fi
+          # Otherwise expose the (possibly multi‑line) list as an output
+          {
+            echo "valid<<EOF"
+            printf "%s\n" "$CLEAN"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
 
       # -------------------------------------------------
       # 4️⃣  Conditional checkout – run only when we really need files
@@ -186,7 +185,7 @@ jobs:
         if: ${{ steps.validate.outputs.valid != 'NONE' && steps.validate.outputs.valid != '' }}
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0   # needed for tag lookup
+          fetch-depth: 0   # we need full history for later steps
 
       # -------------------------------------------------
       # 5️⃣  Extract tiny snippets from the files the model suggested
@@ -197,7 +196,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          # This is the *filtered* list – we know every entry exists in the repo
+          # This is the *validated* list – we know it isn’t the special NONE
           FILES=$(printf "%s\n" "${{ steps.validate.outputs.valid }}")
 
           OUTFILE=ai_snippets.txt
@@ -208,12 +207,12 @@ jobs:
           while IFS= read -r f && [ $COUNT -lt 6 ]; do
             COUNT=$((COUNT + 1))
             echo "----- FILE: $f -----" >> "$OUTFILE"
-            # The file is guaranteed to exist, but we still guard against weirdness
             if [ -f "$f" ]; then
               head -c 20000 "$f" >> "$OUTFILE"
               echo "" >> "$OUTFILE"
             else
-              # This branch should never run, but keeping it makes the step 100 % safe
+              # This branch should *rarely* happen – it only means the file
+              # exists in the repo but wasn’t fetched (e.g. sub‑module)
               echo "[MISSING FILE: $f]" >> "$OUTFILE"
             fi
           done
@@ -251,7 +250,7 @@ jobs:
             Please respond appropriately and turn down others from using inappropriate language, such as profanity.
             Your job is to respond to new issues immediately as they are created. You just have to summarize the issue. 
             Be friendly! You don't need to be stoic. Greet the user! 
-            Also, there is a limit on how much you can type. It's not a super short limit, but don't go all out either. It's around 2-3 paragraphs.
+            Also, there is a limit on how much you can type. It's not a super short limit, but don't go all out either. It's around 2‑3 paragraphs.
             One quirk is backticks, like the one for code blocks. Don't use those as anything inside them will just get deleted.
 
             ADDITIONAL SECURITY INSTRUCTIONS:

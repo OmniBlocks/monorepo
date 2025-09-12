@@ -1,44 +1,49 @@
-# .github/workflows/summary.yml
-name: Summarize new issues (two‑pass – file‑aware & conditional checkout)
+# ------------------------------------------------------------
+# Summarize newly opened issues – two‑pass, file‑aware, conditional checkout
+# ------------------------------------------------------------
+name: Summarize new issues (two‑pass – trimmed file index)
 
-# ------------------------------------------------------------
-# Trigger on newly opened issues only
-# ------------------------------------------------------------
 on:
   issues:
     types: [opened]
 
-# ------------------------------------------------------------
 jobs:
   summary:
     runs-on: ubuntu-latest
     permissions:
       issues: write          # edit / comment / label
       contents: read         # checkout repo (when needed)
-      pull-requests: read    # list recent PRs (new)
-      repository-projects: read   # read the GitHub Project board (new)
+      pull-requests: read    # list recent PRs
+      repository-projects: read   # read the GitHub Project board
 
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      ORG: OmniBlocks            # <-- change if your org has a different name
-      REPO: scratch-gui          # <-- repository name
-      PROJECT_NUMBER: 1          # <-- the number you see in the URL /projects/1
-      FILE_INDEX_LIMIT: 5000     # max number of paths shipped to the LLM
+      ORG: OmniBlocks                # change if your org has a different name
+      REPO: scratch-gui              # change if your repo has a different name
+      PROJECT_NUMBER: 1              # change to match your project board
+      # Keep the file‑list short – 300 entries is plenty for the model
+      FILE_INDEX_LIMIT: 300
 
     steps:
       # -------------------------------------------------
-      # 0️⃣  Build a tiny *file‑index* of the repository (no checkout)
+      # 0️⃣  Build a *compact* file‑index (no checkout)
       # -------------------------------------------------
       - name: Get repository file list (no checkout)
         id: file_index
         run: |
-          # Pull every path in the repo via the GitHub “git/trees” API
+          # 1️⃣ Pull the whole tree via the GitHub API
           curl -s -H "Authorization: token $GH_TOKEN" \
             "https://api.github.com/repos/$ORG/$REPO/git/trees/HEAD?recursive=1" |
+            # 2️⃣ Extract just the path strings
             jq -r '.tree[].path' |
+            # 3️⃣ Keep only source‑code directories (adjust if you have more)
+            grep -E '^(src|blocks|extensions|src/gui|src/lib|src/components|src/common)/' |
+            # 4️⃣ **Exclude image / binary assets** (add/remove patterns as needed)
+            grep -vE '\.(png|gif|jpe?g|svg|ico|webp|bmp|psd|avif|heic)$' |
+            # 5️⃣ Trim to a safe number of entries
             head -n $FILE_INDEX_LIMIT > file_index.txt
 
-          # Export the whole list as a multiline output called "file_index"
+          # 6️⃣ Export the whole list as a multiline output called “file_index”
           {
             echo "file_index<<EOF"
             cat file_index.txt
@@ -110,7 +115,7 @@ jobs:
               | head -n 5 >> "$STATUS_FILE"
           done
 
-          # Export the report
+          # Export the report for later steps
           {
             echo "status_report<<EOF"
             cat "$STATUS_FILE"
@@ -147,13 +152,13 @@ jobs:
             ${{ github.event.issue.body }}
 
       # -------------------------------------------------
-      # 4️⃣  Conditional checkout – only if files are requested
+      # 4️⃣  Conditional checkout – run only when we need files
       # -------------------------------------------------
       - name: Checkout repository (full history + tags)
         if: ${{ steps.decide.outputs.response != 'NONE' && steps.decide.outputs.response != '' }}
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0   # needed for tag lookup & later snippet reading
+          fetch-depth: 0   # needed for tag lookup
 
       # -------------------------------------------------
       # 5️⃣  Extract tiny snippets from the files the model suggested

@@ -14,37 +14,29 @@
     text-align: center;
     font-size: 0.85rem;
     color: $text-primary;
+    transition: 0.2s;
     cursor: pointer;
     user-select: none;
-    transition: all 0.2s ease-in-out;
 }
+
 [dir="ltr"] .backpack-header {
     border-top-right-radius: $space;
 }
+
 [dir="rtl"] .backpack-header {
     border-top-left-radius: $space;
 }
 
-/* The list - conditionally rendered */
 .backpack-list {
     position: relative;
     display: flex;
     flex-direction: row;
     align-items: center;
     border-right: 1px solid $ui-black-transparent;
-    overflow: hidden;
-    min-height: 0;
-    max-height: 0;
-    transition: all 0.3s ease-in-out;
+    min-height: 5.5rem;
 }
 
-/* Expanded state */
-.backpack-list.expanded {
-    min-height: 5.5rem !important;
-    max-height: 5.5rem !important;
-}
-
-/* Inner wrapper */
+/* Absolute position the inner list to allow scrolling inside flex sized container */
 .backpack-list-inner {
     position: absolute;
     top: 0;
@@ -57,7 +49,6 @@
     overflow-x: auto;
 }
 
-/* Drag-over styling */
 .drag-over:after {
     content: '';
     position: absolute;
@@ -70,30 +61,32 @@
     transition: all 0.25s ease;
 }
 
-/* Status messages */
 .status-message {
     width: 100%;
     text-align: center;
     font-size: 0.85rem;
     color: $text-primary;
 }
+
 .error-message {
     font-family: monospace;
 }
 
-/* Backpack items */
 .backpack-item {
     width: 4rem;
     height: 4.5rem;
     margin: 0 0.25rem;
     flex-shrink: 0;
+
+    /* Need to hide overflow because of background setting below */
     overflow: hidden;
 }
+
 .backpack-item > div {
+    /* Need to set the background to get blend-mode below to work */
     background: $ui-primary;
 }
 
-/* More button */
 .more {
     background: $looks-secondary;
     color: $ui-white;

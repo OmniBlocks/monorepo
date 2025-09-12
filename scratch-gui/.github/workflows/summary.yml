@@ -1,7 +1,4 @@
-# ------------------------------------------------------------
-# Summarize newly opened issues – two‑pass, file‑aware, conditional checkout
-# ------------------------------------------------------------
-name: Summarize new issues (two‑pass – trimmed file index)
+name: Summarize new issues (two‑pass – always checkout)
 
 on:
   issues:
@@ -11,53 +8,34 @@ jobs:
   summary:
     runs-on: ubuntu-latest
     permissions:
-      issues: write          # edit / comment / label
-      contents: read         # checkout repo (when needed)
-      pull-requests: read    # list recent PRs
-      repository-projects: read   # read the GitHub Project board
+      issues: write
+      contents: read
+      pull-requests: read
+      repository-projects: read
 
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      ORG: OmniBlocks                # change if your org has a different name
-      REPO: scratch-gui              # change if your repo has a different name
-      PROJECT_NUMBER: 1              # change to match your project board
-      # Keep the file‑list short – 300 entries is plenty for the model
-      FILE_INDEX_LIMIT: 670 #six seven
+      ORG: OmniBlocks
+      REPO: scratch-gui
+      PROJECT_NUMBER: 1
+      FILE_INDEX_LIMIT: 670   # still used only for the *prompt* (keeps it short)
 
     steps:
       # -------------------------------------------------
-      # 0️⃣  Build a *compact* file‑index (no checkout)
+      # 0️⃣  Full checkout – we always need the source files
       # -------------------------------------------------
-      - name: Get repository file list (no checkout)
-        id: file_index
-        run: |
-          curl -s -H "Authorization: token $GH_TOKEN" \
-            "https://api.github.com/repos/$ORG/$REPO/git/trees/HEAD?recursive=1" |
-            jq -r '.tree[].path' |
-            grep -E '^(src|blocks|extensions|src/gui|src/lib|src/components|src/common)/' |
-            grep -vE '\.(png|gif|jpe?g|svg|ico|webp|bmp|psd|avif|heic)$' |
-            head -n $FILE_INDEX_LIMIT > file_index.txt
-
-          {
-            echo "file_index<<EOF"
-            cat file_index.txt
-            echo "EOF"
-          } >> "$GITHUB_OUTPUT"
-
-      # -------------------------------------------------
-      # 0️⃣️⃣  Shallow checkout – ONLY needed for tag lookup
-      # -------------------------------------------------
-      - name: Shallow checkout (for tag lookup)
+      - name: Checkout repository (full history + tags)
         uses: actions/checkout@v4
         with:
-          fetch-depth: 1   # we only need .git history enough for tags
+          fetch-depth: 0   # complete history – needed for git describe & snippets
 
       # -------------------------------------------------
-      # 1️⃣  Get latest release tag (if any)
+      # 1️⃣  Find the most recent Git tag (or “none”)
       # -------------------------------------------------
       - name: Get latest release tag (if any)
         id: tag
         run: |
+          set -e
           if git describe --tags --abbrev=0 >/dev/null 2>&1; then
             LATEST_TAG=$(git describe --tags --abbrev=0)
           else
@@ -67,10 +45,15 @@ jobs:
           echo "latest_tag=${LATEST_TAG}" >> "$GITHUB_OUTPUT"
 
       # -------------------------------------------------
-      # 2️⃣  Generate real‑time project status snapshot
+      # 2️⃣  Generate a live “project status” snapshot
       # -------------------------------------------------
       - name: Generate real‑time project status report
         id: project-status
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ORG: ${{ env.ORG }}
+          REPO: ${{ env.REPO }}
+          PROJECT_NUMBER: ${{ env.PROJECT_NUMBER }}
         run: |
           STATUS_FILE="project_status_report.txt"
           echo "# Real‑Time Project Status Snapshot" > "$STATUS_FILE"
@@ -78,7 +61,6 @@ jobs:
           echo "-----------------------------------" >> "$STATUS_FILE"
           echo "" >> "$STATUS_FILE"
 
-          # ----- Recent merged PRs (last 10) -----
           echo "## Recent Merged Pull Requests (last 10)" >> "$STATUS_FILE"
           gh pr list \
             --repo "$ORG/$REPO" \
@@ -89,7 +71,6 @@ jobs:
             >> "$STATUS_FILE" 2>/dev/null || echo "⚠️ Could not fetch PRs" >> "$STATUS_FILE"
           echo "" >> "$STATUS_FILE"
 
-          # ----- Recent open issues (last 10) -----
           echo "## Recent Open Issues (last 10)" >> "$STATUS_FILE"
           gh issue list \
             --repo "$ORG/$REPO" \
@@ -100,7 +81,6 @@ jobs:
             >> "$STATUS_FILE" 2>/dev/null || echo "⚠️ Could not fetch issues" >> "$STATUS_FILE"
           echo "" >> "$STATUS_FILE"
 
-          # ----- Project board columns & cards -----
           echo "## Current GitHub Project Board (Project #$PROJECT_NUMBER)" >> "$STATUS_FILE"
           gh project column-list "$PROJECT_NUMBER" \
             --owner "$ORG" \
@@ -124,24 +104,37 @@ jobs:
           } >> "$GITHUB_OUTPUT"
 
       # -------------------------------------------------
-      # 3️⃣  First‑pass – decide which files are relevant
+      # 3️⃣  Build a *compact* file‑index (only to keep the prompt short)
       # -------------------------------------------------
-      - name: First‑pass decide relevant files (file‑aware)
+      - name: Get repository file list (no checkout)
+        id: file_index
+        run: |
+          # We already have the repo, but we still want a *short* list for the AI.
+          # This grabs every path, filters to source‑code dirs, drops binaries,
+          # and limits the count.
+          find . -type f \
+            -regextype posix-extended \
+            -regex './(src|blocks|extensions|src/gui|src/lib|src/components|src/common)/.*' \
+            -not -regex '.*\.(png|gif|jpe?g|svg|ico|webp|bmp|psd|avif|heic)$' |
+            head -n $FILE_INDEX_LIMIT > file_index.txt
+
+          {
+            echo "file_index<<EOF"
+            cat file_index.txt
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      # -------------------------------------------------
+      # 4️⃣  First‑pass – let the model pick relevant files
+      # -------------------------------------------------
+      - name: First‑pass decide which files are relevant
         id: decide
         uses: actions/ai-inference@v1
         with:
           prompt: |
-            You are an assistant that decides which source files a GitHub issue needs
-            to understand. Below is a **compact list of every file in the repository**.
-            (If the list is too long you may ignore obvious binary‑ish entries.)
-
-            ---- REPOSITORY FILE LIST ----
-            ${{ steps.file_index.outputs.file_index }}
-
-            ------------------------------------------------------------
-            Output only a newline‑separated list of at most **6** relative file
-            paths (e.g. `src/foo.js`) that are most relevant for the issue.
-            If no code files are relevant, output exactly: `NONE`.
+            You are an assistant that decides what code context is needed to understand a GitHub issue.
+            Output only a newline‑separated list of at most **6** relative file paths (e.g. src/foo.js) that are most relevant to this issue.
+            If no code files are relevant, output exactly: NONE
 
             Project: OmniBlocks (repo: scratch-gui)
             Current version: ${{ env.LATEST_TAG }}
@@ -152,51 +145,52 @@ jobs:
             Issue Body:
             ${{ github.event.issue.body }}
 
+            ---- REPOSITORY FILE LIST ----
+            ${{ steps.file_index.outputs.file_index }}
+
       # -------------------------------------------------
-      # 3.5️⃣  **Validate AI‑suggested file list**
-      #         – just normalise, keep everything that isn’t NONE
+      # 5️⃣  **Validate** the model output
       # -------------------------------------------------
       - name: Validate AI‑suggested file list
         id: validate
         run: |
-          # Raw response from the model
-          RAW="${{ steps.decide.outputs.response }}"
+          # The model may wrap the list in a markdown fence.
+          # Use single‑quotes so Bash never treats back‑ticks as command substitution.
+          RAW='${{ steps.decide.outputs.response }}'
 
-          # Strip Windows CR, drop empty lines
-          CLEAN=$(printf "%s\n" "$RAW" | tr -d '\r' | sed '/^\s*$/d')
+          # Strip fences, CR characters and blank lines.
+          CLEAN=$(printf "%s\n" "$RAW" \
+            | sed -e 's/^```//;s/```$//' \
+            | tr -d '\r' \
+            | sed '/^\s*$/d')
 
-          # If model said NONE or we got nothing → treat as NONE
           if [ "$CLEAN" = "NONE" ] || [ -z "$CLEAN" ]; then
             echo "valid=NONE" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
-          # Otherwise expose the (possibly multi‑line) list as an output
-          {
-            echo "valid<<EOF"
-            printf "%s\n" "$CLEAN"
-            echo "EOF"
-          } >> "$GITHUB_OUTPUT"
+          # Keep only files that actually exist in the repo (extra safety).
+          echo "$CLEAN" > __tmp_all.txt
+          grep -Fxf <(git ls-files) __tmp_all.txt > __tmp_valid.txt || true
+
+          if [ -s __tmp_valid.txt ]; then
+            {
+              echo "valid<<EOF"
+              cat __tmp_valid.txt
+              echo "EOF"
+            } >> "$GITHUB_OUTPUT"
+          else
+            echo "valid=NONE" >> "$GITHUB_OUTPUT"
+          fi
 
       # -------------------------------------------------
-      # 4️⃣  Conditional checkout – run only when we really need files
-      # -------------------------------------------------
-      - name: Checkout repository (full history + tags)
-        if: ${{ steps.validate.outputs.valid != 'NONE' && steps.validate.outputs.valid != '' }}
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0   # we need full history for later steps
-
-      # -------------------------------------------------
-      # 5️⃣  Extract tiny snippets from the files the model suggested
+      # 6️⃣  Extract tiny snippets from the (now‑validated) files
       # -------------------------------------------------
       - name: Extract snippets for files suggested by AI (capped)
         id: snip
         if: ${{ steps.validate.outputs.valid != 'NONE' && steps.validate.outputs.valid != '' }}
         run: |
           set -euo pipefail
-
-          # This is the *validated* list – we know it isn’t the special NONE
           FILES=$(printf "%s\n" "${{ steps.validate.outputs.valid }}")
 
           OUTFILE=ai_snippets.txt
@@ -211,8 +205,8 @@ jobs:
               head -c 20000 "$f" >> "$OUTFILE"
               echo "" >> "$OUTFILE"
             else
-              # This branch should *rarely* happen – it only means the file
-              # exists in the repo but wasn’t fetched (e.g. sub‑module)
+              # Should never happen because we filtered with `git ls-files`,
+              # but keep the guard so the job never fails.
               echo "[MISSING FILE: $f]" >> "$OUTFILE"
             fi
           done
@@ -224,11 +218,11 @@ jobs:
           } >> "$GITHUB_OUTPUT"
 
       # -------------------------------------------------
-      # 6️⃣  Second‑pass – generate the final summary (or security flag)
+      # 7️⃣  Second‑pass – generate the final summary (or security flag)
       # -------------------------------------------------
       - name: Second‑pass AI summary using relevant snippets
         id: final
-        uses: actions/ai-inference@v1
+        uses: actions.ai-inference@v1
         with:
           prompt: |
             # ------------------------------------------------------
@@ -272,7 +266,7 @@ jobs:
             Respond with either the single line "[SECURITY]" OR the full summary text. No extra metadata required.
 
       # -------------------------------------------------
-      # 7️⃣  If the AI flagged a security issue → hide, label, close, lock
+      # 8️⃣  Security handling
       # -------------------------------------------------
       - name: Handle security vulnerability
         if: ${{ steps.final.outputs.response == '[SECURITY]' }}
@@ -296,7 +290,7 @@ jobs:
           gh issue lock "$ISSUE_NUMBER"
 
       # -------------------------------------------------
-      # 8️⃣  Normal path – post the AI‑generated summary as a comment
+      # 9️⃣  Normal path – post the AI‑generated summary as a comment
       # -------------------------------------------------
       - name: Comment with AI summary
         if: ${{ steps.final.outputs.response != '[SECURITY]' }}

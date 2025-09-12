@@ -31,19 +31,13 @@ jobs:
       - name: Get repository file list (no checkout)
         id: file_index
         run: |
-          # 1️⃣ Pull the whole tree via the GitHub API
           curl -s -H "Authorization: token $GH_TOKEN" \
             "https://api.github.com/repos/$ORG/$REPO/git/trees/HEAD?recursive=1" |
-            # 2️⃣ Extract just the path strings
             jq -r '.tree[].path' |
-            # 3️⃣ Keep only source‑code directories (adjust if you have more)
             grep -E '^(src|blocks|extensions|src/gui|src/lib|src/components|src/common)/' |
-            # 4️⃣ **Exclude image / binary assets** (add/remove patterns as needed)
             grep -vE '\.(png|gif|jpe?g|svg|ico|webp|bmp|psd|avif|heic)$' |
-            # 5️⃣ Trim to a safe number of entries
             head -n $FILE_INDEX_LIMIT > file_index.txt
 
-          # 6️⃣ Export the whole list as a multiline output called “file_index”
           {
             echo "file_index<<EOF"
             cat file_index.txt
@@ -76,7 +70,7 @@ jobs:
           echo "-----------------------------------" >> "$STATUS_FILE"
           echo "" >> "$STATUS_FILE"
 
-          # ---- Recent merged PRs (last 10) ----
+          # ----- Recent merged PRs (last 10) -----
           echo "## Recent Merged Pull Requests (last 10)" >> "$STATUS_FILE"
           gh pr list \
             --repo "$ORG/$REPO" \
@@ -87,7 +81,7 @@ jobs:
             >> "$STATUS_FILE" 2>/dev/null || echo "⚠️ Could not fetch PRs" >> "$STATUS_FILE"
           echo "" >> "$STATUS_FILE"
 
-          # ---- Recent open issues (last 10) ----
+          # ----- Recent open issues (last 10) -----
           echo "## Recent Open Issues (last 10)" >> "$STATUS_FILE"
           gh issue list \
             --repo "$ORG/$REPO" \
@@ -98,14 +92,14 @@ jobs:
             >> "$STATUS_FILE" 2>/dev/null || echo "⚠️ Could not fetch issues" >> "$STATUS_FILE"
           echo "" >> "$STATUS_FILE"
 
-          # ---- Project board columns & cards ----
+          # ----- Project board columns & cards -----
           echo "## Current GitHub Project Board (Project #$PROJECT_NUMBER)" >> "$STATUS_FILE"
           gh project column-list "$PROJECT_NUMBER" \
             --owner "$ORG" \
             --format json > columns.json 2>/dev/null || echo "[]" > columns.json
 
           jq -r '.[].name' columns.json | while read -r COL; do
-            echo "- **$COL**:" >> "$STATUS_FILE"
+            echo "- **$COL:**" >> "$STATUS_FILE"
             COL_ID=$(jq -r ".[] | select(.name==\"$COL\") | .id" columns.json)
             gh project item-list "$PROJECT_NUMBER" \
               --owner "$ORG" \
@@ -115,7 +109,6 @@ jobs:
               | head -n 5 >> "$STATUS_FILE"
           done
 
-          # Export the report for later steps
           {
             echo "status_report<<EOF"
             cat "$STATUS_FILE"
@@ -152,10 +145,45 @@ jobs:
             ${{ github.event.issue.body }}
 
       # -------------------------------------------------
-      # 4️⃣  Conditional checkout – run only when we need files
+      # 3.5️⃣  **Validate AI‑suggested files**
+      #         – keep only files that really exist in the repo
+      # -------------------------------------------------
+      - name: Validate AI‑suggested file list
+        id: validate
+        run: |
+          # 1️⃣ Pull the raw response from the first‑pass model
+          RAW="${{ steps.decide.outputs.response }}"
+
+          # Normalise line‑breaks and strip possible Windows \r
+          echo "$RAW" | tr -d '\r' > suggested_raw.txt
+
+          # If the model answered NONE (or gave an empty string) we are done
+          if grep -q -Fx "NONE" suggested_raw.txt || ! grep -q . suggested_raw.txt; then
+            echo "valid=NONE" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # 2️⃣ Intersect with the real file‑index we built earlier.
+          #    The file_index.txt file lives in the workspace from step 0.
+          grep -Fxf file_index.txt suggested_raw.txt > valid.txt || true
+
+          # 3️⃣ If after filtering nothing remains → treat as NONE
+          if [ -s valid.txt ]; then
+            # Join the list back into a single multi‑line string for the output
+            {
+              echo "valid<<EOF"
+              cat valid.txt
+              echo "EOF"
+            } >> "$GITHUB_OUTPUT"
+          else
+            echo "valid=NONE" >> "$GITHUB_OUTPUT"
+          fi
+
+      # -------------------------------------------------
+      # 4️⃣  Conditional checkout – run only when we really need files
       # -------------------------------------------------
       - name: Checkout repository (full history + tags)
-        if: ${{ steps.decide.outputs.response != 'NONE' && steps.decide.outputs.response != '' }}
+        if: ${{ steps.validate.outputs.valid != 'NONE' && steps.validate.outputs.valid != '' }}
         uses: actions/checkout@v4
         with:
           fetch-depth: 0   # needed for tag lookup
@@ -165,36 +193,30 @@ jobs:
       # -------------------------------------------------
       - name: Extract snippets for files suggested by AI (capped)
         id: snip
-        if: ${{ steps.decide.outputs.response != 'NONE' && steps.decide.outputs.response != '' }}
+        if: ${{ steps.validate.outputs.valid != 'NONE' && steps.validate.outputs.valid != '' }}
         run: |
           set -euo pipefail
-          RESP="${{ steps.decide.outputs.response }}"
 
-          # Clean empty lines
-          FILES=$(printf "%s\n" "$RESP" | sed '/^\s*$/d')
+          # This is the *filtered* list – we know every entry exists in the repo
+          FILES=$(printf "%s\n" "${{ steps.validate.outputs.valid }}")
 
           OUTFILE=ai_snippets.txt
           > "$OUTFILE"
 
-          if [ -z "$FILES" ]; then
-            echo "NO_SNIPPETS" > "$OUTFILE"
-          else
-            COUNT=0
-            printf "%s\n" "$FILES" |
-            while IFS= read -r f && [ $COUNT -lt 6 ]; do
-              COUNT=$((COUNT + 1))
-              f_clean=$(printf "%s" "$f" | tr -d '\r')
-              echo "----- FILE: $f_clean -----" >> "$OUTFILE"
-
-              if [ -f "$f_clean" ]; then
-                # Grab first 20 KB of each file (enough context, cheap to ship)
-                head -c 20000 "$f_clean" >> "$OUTFILE"
-                echo "" >> "$OUTFILE"
-              else
-                echo "[MISSING FILE: $f_clean]" >> "$OUTFILE"
-              fi
-            done
-          fi
+          COUNT=0
+          printf "%s\n" "$FILES" |
+          while IFS= read -r f && [ $COUNT -lt 6 ]; do
+            COUNT=$((COUNT + 1))
+            echo "----- FILE: $f -----" >> "$OUTFILE"
+            # The file is guaranteed to exist, but we still guard against weirdness
+            if [ -f "$f" ]; then
+              head -c 20000 "$f" >> "$OUTFILE"
+              echo "" >> "$OUTFILE"
+            else
+              # This branch should never run, but keeping it makes the step 100 % safe
+              echo "[MISSING FILE: $f]" >> "$OUTFILE"
+            fi
+          done
 
           {
             echo "snippets<<EOF"
@@ -259,12 +281,10 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
         run: |
-          # Replace the public body with a safe placeholder
           gh issue edit "$ISSUE_NUMBER" \
             --title "Redacted Security Vulnerability" \
             --body "🔒 This issue appears to describe a security vulnerability. To protect our users, we've hidden the original content. Please submit security issues through our private reporting channel."
 
-          # Post a comment with the reporting instructions
           gh issue comment "$ISSUE_NUMBER" --body "Thank you for your security report! 🔐
 
           To protect our users, we handle security vulnerabilities through private reports. Please submit your findings here:
@@ -272,10 +292,7 @@ jobs:
 
           We'll investigate promptly and appreciate your responsible disclosure!"
 
-          # Add a “security” label
           gh issue edit "$ISSUE_NUMBER" --add-label "security"
-
-          # Close & lock the issue
           gh issue close "$ISSUE_NUMBER"
           gh issue lock "$ISSUE_NUMBER"
 

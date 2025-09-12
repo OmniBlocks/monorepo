@@ -1638,7 +1638,7 @@ export class Config {
     public static generateSemisineWave() {
         const wave = new Float32Array(Config.sineWaveLength + 1);
         for (let i = 0; i < Config.sineWaveLength + 1; i++) {
-            wave[i] = Math.max(Math.sin(i * Math.PI * 2.0 / Config.sineWaveLength), 0) - 0.5;
+            wave[i] = Math.max(Math.sin(i * Math.PI * 2.0 / Config.sineWaveLength), 0);
         }
         return wave;
     }

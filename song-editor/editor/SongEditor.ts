@@ -4311,11 +4311,14 @@ export class SongEditor {
                     this.doc.selection.boxSelectionX0 -= width;
                     this.doc.selection.boxSelectionX1 -= width;
                     this.doc.selection.insertBars();
+                } else if (event.altKey) {
+                    this.doc.record(new ChangeAddChannelInstrument(this.doc));
                 } else {
                     this.doc.selection.insertBars();
                 }
                 event.preventDefault();
                 break;
+            
             case 8: // backspace/delete
                 this.doc.synth.loopBarStart = -1;
                 this.doc.synth.loopBarEnd = -1;
@@ -4323,6 +4326,8 @@ export class SongEditor {
 
                 if (event.ctrlKey || event.metaKey) {
                     this.doc.selection.deleteChannel();
+                } else if (event.altKey) {
+                    this.doc.record(new ChangeRemoveChannelInstrument(this.doc));
                 } else {
                     this.doc.selection.deleteBars();
                 }
@@ -4604,6 +4609,8 @@ export class SongEditor {
                 } else if (event.ctrlKey || event.metaKey) {
                     this._openPrompt("export");
                     event.preventDefault();
+                } else if (event.altKey) {
+                    this._openPrompt("exportInstrument");
                 } else if (this.doc.prefs.enableChannelMuting) {
                     // JummBox deviation: I like shift+s as just another mute toggle personally.
                     // Easier to reach than M and the shift+s invert functionality I am overwriting could be 
@@ -4621,6 +4628,8 @@ export class SongEditor {
                 if (event.ctrlKey || event.metaKey) {
                     this._openPrompt("import");
                     event.preventDefault();
+                } else if (event.altKey) {
+                    this._openPrompt("importInstrument");
                 }
                 break;
             case 86: // v

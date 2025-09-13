@@ -19,7 +19,7 @@ const b1 = stage.variables["rQq!wAuU2T9DV9,S[/s."];
 return function funXYZ_run () {
 b0.value = [];
 for (var a0 = 100; a0 >= 0.5; a0--) {
-b0.value.push((b1.value[(((b0.value.length + 1) || 0) | 0) - 1] ?? ""));
+b0.value.push((b1.value[((b0.value.length + 1) | 0) - 1] ?? ""));
 b0._monitorUpToDate = false;
 }
 thread.procedures["Wqsort %s %s"](1,b0.value.length);
@@ -37,7 +37,7 @@ return function* genXYZ_validate () {
 b0.value = 1;
 b1.value = 1;
 for (var a0 = b2.value.length; a0 >= 0.5; a0--) {
-if (!compareEqual(listGet(b2.value, b1.value), listGet(b3.value, b1.value))) {
+if (!compareEqual((b2.value[(b1.value | 0) - 1] ?? ""), (b3.value[(b1.value | 0) - 1] ?? ""))) {
 b0.value = 0;
 yield* executeInCompatibilityLayer({"MESSAGE":("fail mismatch at index " + ("" + b1.value)),}, b4, true, false, ",", null);
 }
@@ -63,7 +63,7 @@ const b8 = target.variables["JIHtr29*ug5G;5*`f2.K-j-"];
 return function funXYZ_qsort__ (p0,p1) {
 if (compareLessThan(p0, p1)) {
 if (!(((+p1 || 0) - (+p0 || 0)) <= 7)) {
-b0.value = (b1.value[((((((+p1 || 0) + (+p0 || 0)) || 0) / 2) || 0) | 0) - 1] ?? "");
+b0.value = (b1.value[(((((+p1 || 0) + (+p0 || 0)) || 0) / 2) | 0) - 1] ?? "");
 b2.value = p0;
 b3.value = p1;
 while (true) {
@@ -92,11 +92,11 @@ b6.value = b5.value;
 b7.value = listGet(b1.value, b5.value);
 b8.value = ((+b5.value || 0) + 1);
 for (var a1 = (((+p1 || 0) - (+b5.value || 0)) || 0); a1 >= 0.5; a1--) {
-if (compareLessThan(listGet(b1.value, b8.value), b7.value)) {
-b7.value = listGet(b1.value, b8.value);
+if (compareLessThan((b1.value[(b8.value | 0) - 1] ?? ""), b7.value)) {
+b7.value = (b1.value[(b8.value | 0) - 1] ?? "");
 b6.value = b8.value;
 }
-b8.value = ((+b8.value || 0) + 1);
+b8.value = (b8.value + 1);
 }
 if (compareEqual(b6.value, b5.value)) {
 } else {

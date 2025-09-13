@@ -20,7 +20,7 @@ if (((+thread.procedures["Wfactorial %s"](12) || 0) === 479001600)) {
 yield* executeInCompatibilityLayer({"MESSAGE":"pass factorial 12",}, b0, false, false, "]", null);
 }
 b1.value = (yield* thread.procedures["Zno shadowing 1 %s %s"]("f","g"));
-if (compareEqual(b1.value, "")) {
+if ((("" + b1.value).toLowerCase() === "".toLowerCase())) {
 yield* executeInCompatibilityLayer({"MESSAGE":"pass default return value",}, b0, false, false, "|", null);
 }
 yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, "`", null);

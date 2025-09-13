@@ -19,7 +19,7 @@ const b1 = stage.variables["rQq!wAuU2T9DV9,S[/s."];
 return function* genXYZ_run () {
 b0.value = [];
 for (var a0 = 100; a0 >= 0.5; a0--) {
-b0.value.push((b1.value[(((b0.value.length + 1) || 0) | 0) - 1] ?? ""));
+b0.value.push((b1.value[((b0.value.length + 1) | 0) - 1] ?? ""));
 b0._monitorUpToDate = false;
 if (isStuck()) yield;
 }
@@ -65,7 +65,7 @@ const b8 = target.variables["JIHtr29*ug5G;5*`f2.K-j-"];
 return function* genXYZ_qsort__ (p0,p1) {
 if (compareLessThan(p0, p1)) {
 if (!(((+p1 || 0) - (+p0 || 0)) <= 7)) {
-b0.value = (b1.value[((((((+p1 || 0) + (+p0 || 0)) || 0) / 2) || 0) | 0) - 1] ?? "");
+b0.value = (b1.value[(((((+p1 || 0) + (+p0 || 0)) || 0) / 2) | 0) - 1] ?? "");
 b2.value = p0;
 b3.value = p1;
 while (true) {

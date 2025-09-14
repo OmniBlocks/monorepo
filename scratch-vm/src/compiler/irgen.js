@@ -14,6 +14,7 @@ const {
     IntermediateScript,
     IntermediateRepresentation
 } = require('./intermediate');
+const oldCompilerCompatiblity = require('./old-compiler-compatibility.js');
 
 /**
  * @fileoverview Generate intermediate representations from Scratch blocks.
@@ -96,6 +97,12 @@ class ScriptTreeGenerator {
                 }
             }
         }
+
+        this.oldCompilerStub = (
+            oldCompilerCompatiblity.enabled ?
+                new oldCompilerCompatiblity.ScriptTreeGeneratorStub(this) :
+                null
+        );
     }
 
     setProcedureVariant (procedureVariant) {
@@ -199,6 +206,13 @@ class ScriptTreeGenerator {
      * @returns {IntermediateInput} Compiled input node for this input.
      */
     descendInput (block, preserveStrings = false) {
+        if (this.oldCompilerStub) {
+            const oldCompilerResult = this.oldCompilerStub.descendInputFromNewCompiler(block);
+            if (oldCompilerResult) {
+                return oldCompilerResult;
+            }
+        }
+
         switch (block.opcode) {
         case 'colour_picker':
             return this.createConstantInput(block.fields.COLOUR.value, true);
@@ -593,6 +607,13 @@ class ScriptTreeGenerator {
      * @returns {IntermediateStackBlock} Compiled node for this block.
      */
     descendStackedBlock (block) {
+        if (this.oldCompilerStub) {
+            const oldCompilerResult = this.oldCompilerStub.descendStackedBlockFromNewCompiler(block);
+            if (oldCompilerResult) {
+                return oldCompilerResult;
+            }
+        }
+
         switch (block.opcode) {
         case 'control_all_at_once':
             // In Scratch 3, this block behaves like "if 1 = 1"

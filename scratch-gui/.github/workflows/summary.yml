@@ -210,6 +210,8 @@ jobs:
             If the issue is a user casually asking a question, being confused, or isn't really making an issue, respond, but also tell users to go to the discussions tab for general discussions: https://github.com/orgs/OmniBlocks/discussions
             For genuine questions, no need to give that link.
             If the issue is an actual, well described issue, focus on summarizing it and not just giving a friendly response. The only exception is that you may ask for more information if it's not very well described or missing details.
+            If you see new, recent comments with that mention you (@github-actions) in the full conversation that means that it isn't a new issue open but rather someone has mentioned you, either to ask a follow up question or summmarize again, or something like that. 
+            
 
             ADDITIONAL SECURITY INSTRUCTIONS:
             - If the issue describes a security vulnerability (e.g., security flaw, exploit, attack vector, CVE, security risk, vulnerability disclosure), respond with EXACTLY: "[SECURITY]"

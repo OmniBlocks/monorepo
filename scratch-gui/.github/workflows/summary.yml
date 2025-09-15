@@ -13,10 +13,9 @@ on:
 
 jobs:
   summary:
-    # Run for new issues OR for comments that mention @github-actions (case‑insensitive)
-    if: >
-      github.event_name == 'issues' ||
-      (github.event_name == 'issue_comment' && contains(toLower(github.event.comment.body), '@github-actions'))
+    # Run for new issues OR for comments that mention @github-actions
+    if: ${{ github.event_name == 'issues' ||
+           (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@github-actions')) }}
     runs-on: ubuntu-latest
     permissions:
       issues: write          # edit / comment / label
@@ -64,6 +63,7 @@ jobs:
           echo "Generated on $(date)" >> "$STATUS_FILE"
           echo "-----------------------------------" >> "$STATUS_FILE"
           echo "" >> "$STATUS_FILE"
+
           echo "## Recent Merged Pull Requests (last 10)" >> "$STATUS_FILE"
           gh pr list \
             --repo "$ORG/$REPO" \
@@ -73,6 +73,7 @@ jobs:
             --jq '.[] | "- PR #$$.number): $$.title) (by $$.author.login)) $$.url)"' \
             >> "$STATUS_FILE" 2>/dev/null || echo "⚠️ Could not fetch PRs" >> "$STATUS_FILE"
           echo "" >> "$STATUS_FILE"
+
           echo "## Recent Open Issues (last 10)" >> "$STATUS_FILE"
           gh issue list \
             --repo "$ORG/$REPO" \
@@ -82,6 +83,7 @@ jobs:
             --jq '.[] | "- Issue #$$.number): $$.title) (by $$.author.login)) $$.url)"' \
             >> "$STATUS_FILE" 2>/dev/null || echo "⚠️ Could not fetch issues" >> "$STATUS_FILE"
           echo "" >> "$STATUS_FILE"
+
           echo "## Current GitHub Project Board (Project #$PROJECT_NUMBER)" >> "$STATUS_FILE"
           gh project column-list "$PROJECT_NUMBER" \
             --owner "$ORG" \
@@ -96,6 +98,7 @@ jobs:
             jq -r '.[] | "- $$.content.title) ($$.content.url))"' cards.json \
               | head -n 5 >> "$STATUS_FILE"
           done
+
           {
             echo "status_report<<EOF"
             cat "$STATUS_FILE"

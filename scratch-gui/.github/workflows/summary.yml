@@ -1,4 +1,4 @@
-name: Summarize issues and comments (two‑pass – file‑aware)
+name: Summarize issues and comments (two-pass – file‑aware)
 
 # --------------------------------------------------------------------------
 # Trigger on new issues OR new comments that mention the bot
@@ -55,23 +55,18 @@ jobs:
           echo "latest_tag=${LATEST_TAG}" >> "$GITHUB_OUTPUT"
 
       # ------------------------------------------------------
-      # 2️⃣  Build a *compact* file‑index (no extra checkout)
+      # 2️⃣  Build a *compact* file‑index (real tracked files)
       # ------------------------------------------------------
       - name: Build repository file index (compact)
         id: file_index
         run: |
-          # Find source files that are likely to be read by the model.
-          # Adjust the extensions / paths if you need a different subset.
-          find . -type f \
-            $$ -name "*.js" -o -name "*.ts" -o -name "*.jsx" -o -name "*.tsx" \
-               -o -name "*.css" -o -name "*.scss" -o -name "*.json" $$ \
-            ! -path "*/node_modules/*" \
-            ! -path "*/dist/*" \
-            ! -path "*/.git/*" \
-            | sed 's|^\./||' \
-            | head -n $FILE_INDEX_LIMIT > file_index.txt
+          # Grab only source‑code files that are tracked by git.
+          # Adjust the extensions list if you need other types.
+          git ls-files |
+            grep -E '\.(js|jsx|ts|tsx|css|scss|json)$' |
+            head -n ${{ env.FILE_INDEX_LIMIT }} > file_index.txt
 
-          # Output the list as a multiline GitHub output variable
+          # Export as a multiline output called “file_index”
           {
             echo "file_index<<EOF"
             cat file_index.txt

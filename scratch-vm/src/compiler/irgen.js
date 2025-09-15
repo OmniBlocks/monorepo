@@ -865,14 +865,14 @@ class ScriptTreeGenerator {
             return new IntermediateStackBlock(StackOpcode.MOTION_DIRECTION_SET, {
                 direction: new IntermediateInput(InputOpcode.OP_SUBTRACT, InputType.NUMBER, {
                     left: new IntermediateInput(InputOpcode.MOTION_DIRECTION_GET, InputType.NUMBER),
-                    right: this.descendInputOfBlock(block, 'DEGREES')
+                    right: this.descendInputOfBlock(block, 'DEGREES').toType(InputType.NUMBER)
                 })
             });
         case 'motion_turnright':
             return new IntermediateStackBlock(StackOpcode.MOTION_DIRECTION_SET, {
                 direction: new IntermediateInput(InputOpcode.OP_ADD, InputType.NUMBER, {
                     left: new IntermediateInput(InputOpcode.MOTION_DIRECTION_GET, InputType.NUMBER),
-                    right: this.descendInputOfBlock(block, 'DEGREES')
+                    right: this.descendInputOfBlock(block, 'DEGREES').toType(InputType.NUMBER)
                 })
             });
 

@@ -1,15 +1,24 @@
-name: Summarize new issues (two-pass)
+name: Summarize issues and comments (two-pass)
 
-# ------------------------------------------------------------
-# Trigger on newly opened issues only
-# ------------------------------------------------------------
+# --------------------------------------------------------------------------
+# Trigger on new issues OR new comments that mention the bot
+# --------------------------------------------------------------------------
 on:
   issues:
     types: [opened]
+  issue_comment:
+    types: [created]
 
-# ------------------------------------------------------------
+# --------------------------------------------------------------------------
+
 jobs:
   summary:
+    # This condition ensures the job only runs for new issues OR for
+    # comments that explicitly mention @github-actions.
+    if: >
+      github.event_name == 'issues' ||
+      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@github-actions'))
+    
     runs-on: ubuntu-latest
     permissions:
       issues: write          # edit / comment / label
@@ -42,7 +51,7 @@ jobs:
           echo "latest_tag=${LATEST_TAG}" >> "$GITHUB_OUTPUT"
 
       # ------------------------------------------------------
-      # 3️⃣ **NEW** – Build a live “project status” snapshot
+      # 3️⃣ Build a live “project status” snapshot
       # ------------------------------------------------------
       - name: Generate real‑time project status report
         id: project-status
@@ -52,40 +61,34 @@ jobs:
           REPO: scratch-gui              # <-- repository name
           PROJECT_NUMBER: 1              # <-- the number you see in the URL /projects/1
         run: |
+          # This step is unchanged
           STATUS_FILE="project_status_report.txt"
           echo "# Real‑Time Project Status Snapshot" > "$STATUS_FILE"
           echo "Generated on $(date)" >> "$STATUS_FILE"
           echo "-----------------------------------" >> "$STATUS_FILE"
           echo "" >> "$STATUS_FILE"
-
-          # ---- Recent merged PRs (last 10) ----
           echo "## Recent Merged Pull Requests (last 10)" >> "$STATUS_FILE"
           gh pr list \
             --repo "$ORG/$REPO" \
             --state merged \
             --limit 10 \
             --json number,title,author,url \
-            --jq '.[] | "- PR #$$.number): $$.title) (by $$.author.login)) $$.url)"' \
+            --jq '.[] | "- PR #\(.number): \(.title) (by \(.author.login)) \(.url)"' \
             >> "$STATUS_FILE" 2>/dev/null || echo "⚠️ Could not fetch PRs" >> "$STATUS_FILE"
           echo "" >> "$STATUS_FILE"
-
-          # ---- Recent open issues (last 10) ----
           echo "## Recent Open Issues (last 10)" >> "$STATUS_FILE"
           gh issue list \
             --repo "$ORG/$REPO" \
             --state open \
             --limit 10 \
             --json number,title,author,url \
-            --jq '.[] | "- Issue #$$.number): $$.title) (by $$.author.login)) $$.url)"' \
+            --jq '.[] | "- Issue #\(.number): \(.title) (by \(.author.login)) \(.url)"' \
             >> "$STATUS_FILE" 2>/dev/null || echo "⚠️ Could not fetch issues" >> "$STATUS_FILE"
           echo "" >> "$STATUS_FILE"
-
-          # ---- Project board columns & cards ----
           echo "## Current GitHub Project Board (Project #$PROJECT_NUMBER)" >> "$STATUS_FILE"
           gh project column-list "$PROJECT_NUMBER" \
             --owner "$ORG" \
             --format json > columns.json 2>/dev/null || echo "[]" > columns.json
-
           jq -r '.[].name' columns.json | while read -r COL; do
             echo "- **$COL**:" >> "$STATUS_FILE"
             COL_ID=$(jq -r ".[] | select(.name==\"$COL\") | .id" columns.json)
@@ -93,13 +96,9 @@ jobs:
               --owner "$ORG" \
               --column "$COL_ID" \
               --format json > cards.json 2>/dev/null || echo "[]" > cards.json
-            jq -r '.[] | "- $$.content.title) ($$.content.url))"' cards.json \
+            jq -r '.[] | "- \(.content.title) (\(.content.url))"' cards.json \
               | head -n 5 >> "$STATUS_FILE"
           done
-
-          # -------------------------------------------------
-          # Export the report for later steps
-          # -------------------------------------------------
           {
             echo "status_report<<EOF"
             cat "$STATUS_FILE"
@@ -107,11 +106,167 @@ jobs:
           } >> "$GITHUB_OUTPUT"
 
       # ------------------------------------------------------
-      # 4️⃣ First‑pass – decide which files are relevant
+      # 4️⃣ NEW – Get full issue context (body + all comments)
+      # ------------------------------------------------------
+      - name: Get full issue context (body + all comments)
+        id: get-context
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          CONTEXT=$(gh issue view ${{ github.event.issue.number }} --comments)
+          {
+            echo "full_context<<EOF"
+            echo "$CONTEXT"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      # ------------------------------------------------------
+      # 5️⃣ First‑pass – decide which files are relevant
       # ------------------------------------------------------
       - name: First‑pass decide which files are relevant
         id: decide
         uses: actions/ai-inference@v1
+        with:
+          prompt: |
+            You are an assistant that decides what code context is needed to understand a GitHub issue.
+            Output only a newline‑separated list of at most 6 relative file paths (e.g. src/foo.js) that are most relevant to this issue.
+            If no code files are relevant, output exactly: NONE
+
+            Project: OmniBlocks (repo: scratch-gui)
+            Current version: ${{ env.LATEST_TAG }}
+
+            Issue Title:
+            ${{ github.event.issue.title }}
+
+            Full Issue Conversation (including original body and all comments):
+            ${{ steps.get-context.outputs.full_context }}
+
+      # ------------------------------------------------------
+      # 6️⃣ Extract tiny snippets from the files the model suggested
+      # ------------------------------------------------------
+      - name: Extract snippets for files suggested by AI (capped)
+        id: snip
+        run: |
+          set -euo pipefail
+          RESP="${{ steps.decide.outputs.response }}"
+          FILES=$(printf "%s\n" "$RESP" | sed '/^\s*$/d')
+          OUTFILE=ai_snippets.txt
+          > "$OUTFILE"
+          if [ "$FILES" = "NONE" ] || [ -z "$FILES" ]; then
+            echo "NO_SNIPPETS" > "$OUTFILE"
+          else
+            COUNT=0
+            printf "%s\n" "$FILES" |
+            while IFS= read -r f && [ $COUNT -lt 6 ]; do
+              COUNT=$((COUNT + 1))
+              f_clean=$(printf "%s" "$f" | tr -d '\r')
+              echo "----- FILE: $f_clean -----" >> "$OUTFILE"
+              if [ -f "$f_clean" ]; then
+                head -c 20000 "$f_clean" >> "$OUTFILE" || true
+                echo "" >> "$OUTFILE"
+              else
+                echo "[MISSING FILE: $f_clean]" >> "$OUTFILE"
+              fi
+            done
+          fi
+          {
+            echo "snippets<<EOF"
+            cat "$OUTFILE"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      # ------------------------------------------------------
+      # 7️⃣ Second‑pass – generate the final summary (or security flag)
+      # ------------------------------------------------------
+      - name: Second‑pass AI summary using relevant snippets
+        id: final
+        uses: actions/ai-inference@v1
+        with:
+          prompt: |
+            # ------------------------------------------------------
+            # LIVE PROJECT STATUS (auto‑generated)
+            # ------------------------------------------------------
+            ${{ steps.project-status.outputs.status_report }}
+
+            # ------------------------------------------------------
+            # ORIGINAL INSTRUCTION BLOCK (unchanged)
+            # ------------------------------------------------------
+            You are an Artificial Intelligence that helps out with the Github issues in this repository titled scratch-gui inside the OmniBlocks organization.
+            OmniBlocks is a developing Multi‑Language IDE. Currently based on TurboWarp, which is a mod of Scratch 3, for the block editor.
+            Text editors are also planned for languages like Python or C, but they are not implemented yet.
+            OmniBlocks adds some cool things to the classic block editor, such as a music editor or extra features.
+            OmniBlocks' and TurboWarp's modifications to Scratch are licensed under the GNU General Public License v3.0.
+            The OmniBlocks logo is licensed under CC BY‑SA 4.0. The logo incorporates the Python logo, which is a trademark of the Python Software Foundation, used here solely to reference the Python programming language. This project is not affiliated with or endorsed by the Python Software Foundation.
+            The OmniBlocks mascot "Boxy" is licensed under CC BY‑SA 4.0.
+
+            Please respond appropriately and turn down others from using inappropriate language, such as profanity.
+            Your job is to respond to new issues immediately as they are created. You just have to summarize the issue.
+            Be friendly! You don't need to be stoic. Greet the user!
+            Also, there is a limit on how much you can type. It's not a super short limit, but don't go all out either. It's around 2-3 paragraphs.
+            One quirk is backticks, like the one for code blocks. Don't use those as anything inside them will just get deleted.
+            If the issue is a user casually asking a question, being confused, or isn't really making an issue, respond, but also tell users to go to the discussions tab for general discussions: https://github.com/orgs/OmniBlocks/discussions
+            For genuine questions, no need to give that link.
+            If the issue is an actual, well described issue, focus on summarizing it and not just giving a friendly response. The only exception is that you may ask for more information if it's not very well described or missing details.
+
+            ADDITIONAL SECURITY INSTRUCTIONS:
+            - If the issue describes a security vulnerability (e.g., security flaw, exploit, attack vector, CVE, security risk, vulnerability disclosure), respond with EXACTLY: "[SECURITY]"
+            - Otherwise, summarize the issue normally
+            - Never reveal vulnerability details in public comments
+
+            The owner and main maintainer of OmniBlocks, is @supervoidcoder, if anyone asks or you just need to know.
+            The issue was opened by **@${{ github.event.issue.user.login }}**.
+
+            Respond to the following GitHub issue conversation:
+            Title: ${{ github.event.issue.title }}
+            Full Conversation (including original body and all comments):
+            ${{ steps.get-context.outputs.full_context }}
+            The current version of OmniBlocks is: ${{ env.LATEST_TAG }}.
+
+            RELEVANT CODE SNIPPETS (only what was extracted):
+            ${{ steps.snip.outputs.snippets }}
+
+            Respond with either the single line "[SECURITY]" OR the full summary text. No extra metadata required.
+
+      # ------------------------------------------------------
+      # 8️⃣ If the AI flagged a security issue → hide, label, close, lock
+      # ------------------------------------------------------
+      - name: Handle security vulnerability
+        if: ${{ steps.final.outputs.response == '[SECURITY]' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          # Replace the public body with a safe placeholder
+          gh issue edit "$ISSUE_NUMBER" \
+            --title "Redacted Security Vulnerability" \
+            --body "🔒 This issue appears to describe a security vulnerability. To protect our users, we've hidden the original content. Please submit security issues through our private reporting channel."
+
+          # Post a comment with the reporting instructions
+          gh issue comment "$ISSUE_NUMBER" --body "Thank you for your security report! 🔐
+
+          To protect our users, we handle security vulnerabilities through private reports. Please submit your findings here:
+          https://github.com/OmniBlocks/scratch-gui/security
+
+          We'll investigate promptly and appreciate your responsible disclosure!"
+
+          # Add a “security” label
+          gh issue edit "$ISSUE_NUMBER" --add-label "security"
+
+          # Close & lock the issue
+          gh issue close "$ISSUE_NUMBER"
+          gh issue lock "$ISSUE_NUMBER"
+
+      # ------------------------------------------------------
+      # 9️⃣ Normal path – post the AI‑generated summary as a comment
+      # ------------------------------------------------------
+      - name: Comment with AI summary
+        if: ${{ steps.final.outputs.response != '[SECURITY]' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          echo "${{ steps.final.outputs.response }}" > response.txt
+          gh issue comment "$ISSUE_NUMBER" --body-file response.txt
         with:
           prompt: |
             You are an assistant that decides what code context is needed to understand a GitHub issue.

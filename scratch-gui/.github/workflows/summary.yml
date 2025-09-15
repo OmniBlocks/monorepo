@@ -1,4 +1,4 @@
-name: Summarize issues and comments (two-pass – file‑aware)
+name: Summarize issues and comments (two-pass)
 
 # --------------------------------------------------------------------------
 # Trigger on new issues OR new comments that mention the bot
@@ -23,16 +23,9 @@ jobs:
       pull-requests: read    # list recent PRs (new)
       repository-projects: read   # read the GitHub Project board (new)
 
-    env:
-      ORG: OmniBlocks                # <-- change if your org has a different name
-      REPO: scratch-gui              # <-- repository name
-      PROJECT_NUMBER: 1              # <-- the number you see in the URL /projects/1
-      # Keep the file‑list short – 300 entries is plenty for the model
-      FILE_INDEX_LIMIT: 300
-
     steps:
       # ------------------------------------------------------
-      # 0️⃣  Checkout the whole repository (history + tags)
+      # 1️⃣ Checkout the whole repository (history + tags)
       # ------------------------------------------------------
       - name: Checkout repository (full history + tags)
         uses: actions/checkout@v4
@@ -40,7 +33,7 @@ jobs:
           fetch-depth: 0   # needed for tag lookup
 
       # ------------------------------------------------------
-      # 1️⃣  Find the most recent git tag (or “none”)
+      # 2️⃣ Find the most recent git tag (or “none”)
       # ------------------------------------------------------
       - name: Get latest release tag (if any)
         id: tag
@@ -55,31 +48,15 @@ jobs:
           echo "latest_tag=${LATEST_TAG}" >> "$GITHUB_OUTPUT"
 
       # ------------------------------------------------------
-      # 2️⃣  Build a *compact* file‑index (real tracked files)
-      # ------------------------------------------------------
-      - name: Build repository file index (compact)
-        id: file_index
-        run: |
-          # Grab only source‑code files that are tracked by git.
-          # Adjust the extensions list if you need other types.
-          git ls-files |
-            grep -E '\.(js|jsx|ts|tsx|css|scss|json)$' |
-            head -n ${{ env.FILE_INDEX_LIMIT }} > file_index.txt
-
-          # Export as a multiline output called “file_index”
-          {
-            echo "file_index<<EOF"
-            cat file_index.txt
-            echo "EOF"
-          } >> "$GITHUB_OUTPUT"
-
-      # ------------------------------------------------------
-      # 3️⃣  Build a live “project status” snapshot
+      # 3️⃣ Build a live “project status” snapshot
       # ------------------------------------------------------
       - name: Generate real‑time project status report
         id: project-status
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ORG: OmniBlocks                # <-- change if your org has a different name
+          REPO: scratch-gui              # <-- repository name
+          PROJECT_NUMBER: 1              # <-- the number you see in the URL /projects/1
         run: |
           STATUS_FILE="project_status_report.txt"
           echo "# Real‑Time Project Status Snapshot" > "$STATUS_FILE"
@@ -129,7 +106,7 @@ jobs:
           } >> "$GITHUB_OUTPUT"
 
       # ------------------------------------------------------
-      # 4️⃣  Get full issue context (body + all comments)
+      # 4️⃣ NEW – Get full issue context (body + all comments)
       # ------------------------------------------------------
       - name: Get full issue context (body + all comments)
         id: get-context
@@ -144,7 +121,7 @@ jobs:
           } >> "$GITHUB_OUTPUT"
 
       # ------------------------------------------------------
-      # 5️⃣  First‑pass – decide which files are relevant
+      # 5️⃣ First‑pass – decide which files are relevant
       # ------------------------------------------------------
       - name: First‑pass decide which files are relevant
         id: decide
@@ -167,13 +144,8 @@ jobs:
             Full Issue Conversation (including original body and all comments):
             ${{ steps.get-context.outputs.full_context }}
 
-            # -------------------------------------------------
-            # REPOSITORY FILE LIST (trimmed to ${{ env.FILE_INDEX_LIMIT }} entries)
-            # -------------------------------------------------
-            ${{ steps.file_index.outputs.file_index }}
-
       # ------------------------------------------------------
-      # 6️⃣  Extract tiny snippets from the files the model suggested
+      # 6️⃣ Extract tiny snippets from the files the model suggested
       # ------------------------------------------------------
       - name: Extract snippets for files suggested by AI (capped)
         id: snip
@@ -207,7 +179,7 @@ jobs:
           } >> "$GITHUB_OUTPUT"
 
       # ------------------------------------------------------
-      # 7️⃣  Second‑pass – generate the final summary (or security flag)
+      # 7️⃣ Second‑pass – generate the final summary (or security flag)
       # ------------------------------------------------------
       - name: Second‑pass AI summary using relevant snippets
         id: final
@@ -224,7 +196,7 @@ jobs:
             # ------------------------------------------------------
             You are an Artificial Intelligence that helps out with the Github issues in this repository titled scratch-gui inside the OmniBlocks organization.
             OmniBlocks is a developing Multi‑Language IDE. Currently based on TurboWarp, which is a mod of Scratch 3, for the block editor.
-            Text editors are also planned for languages like Python or C, but they are not implemented yet. 
+            Text editors are also planned for languages like Python or C, but they are not implemented yet.
             OmniBlocks adds some cool things to the classic block editor, such as a music editor or extra features.
             OmniBlocks' and TurboWarp's modifications to Scratch are licensed under the GNU General Public License v3.0.
             The OmniBlocks logo is licensed under CC BY‑SA 4.0. The logo incorporates the Python logo, which is a trademark of the Python Software Foundation, used here solely to reference the Python programming language. This project is not affiliated with or endorsed by the Python Software Foundation.
@@ -263,7 +235,7 @@ jobs:
             Respond with either the single line "[SECURITY]" OR the full summary text. No extra metadata required.
 
       # ------------------------------------------------------
-      # 8️⃣  If the AI flagged a security issue → hide, label, close, lock
+      # 8️⃣ If the AI flagged a security issue → hide, label, close, lock
       # ------------------------------------------------------
       - name: Handle security vulnerability
         if: ${{ steps.final.outputs.response == '[SECURITY]' }}
@@ -292,7 +264,7 @@ jobs:
           gh issue lock "$ISSUE_NUMBER"
 
       # ------------------------------------------------------
-      # 9️⃣  Normal path – post the AI‑generated summary as a comment
+      # 9️⃣ Normal path – post the AI‑generated summary as a comment
       # ------------------------------------------------------
       - name: Comment with AI summary
         if: ${{ steps.final.outputs.response != '[SECURITY]' }}

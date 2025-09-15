@@ -137,6 +137,9 @@ jobs:
 
             Issue Title:
             ${{ github.event.issue.title }}
+            ----------------------------
+            Issue Body:
+            Body: ${{ github.event.issue.body }}
 
             Full Issue Conversation (including original body and all comments):
             ${{ steps.get-context.outputs.full_context }}
@@ -218,8 +221,12 @@ jobs:
 
             Respond to the following GitHub issue conversation:
             Title: ${{ github.event.issue.title }}
+            ----------------------------
+            Issue Body: ${{ github.event.issue.body }}
+            ----------------------------
             Full Conversation (including original body and all comments):
             ${{ steps.get-context.outputs.full_context }}
+            ----------------------------
             The current version of OmniBlocks is: ${{ env.LATEST_TAG }}.
 
             RELEVANT CODE SNIPPETS (only what was extracted):

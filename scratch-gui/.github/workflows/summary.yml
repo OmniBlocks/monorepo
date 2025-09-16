@@ -193,23 +193,25 @@ jobs:
           FILES=$(printf "%s\n" "$RESP" | sed '/^\s*$/d')
           OUTFILE=ai_snippets.txt
           > "$OUTFILE"
-
+      
           if [ "$FILES" = "NONE" ] || [ -z "$FILES" ]; then
             echo "NO_SNIPPETS" > "$OUTFILE"
           else
             COUNT=0
-            REPO_ROOT="$GITHUB_WORKSPACE"   # absolute repo root
+            REPO_ROOT="$GITHUB_WORKSPACE"
             printf "%s\n" "$FILES" |
             while IFS= read -r f && [ $COUNT -lt 6 ]; do
               COUNT=$((COUNT + 1))
-              f_clean=$(printf "%s" "$f" | tr -d '\r')
-
-              # ---- SECURITY: block traversal/absolute paths ----
+      
+              # ---- NEW: strip **all** whitespace (leading & trailing) ----
+              f_clean=$(echo "$f" | xargs)   # xargs removes leading/trailing blanks
+      
+              # ---- (optional) keep your existing security guard ----
               if [[ "$f_clean" == *"../"* ]] || [[ "$f_clean" == /* ]]; then
                 echo "[SECURITY BLOCKED: Invalid path '$f_clean']" >> "$OUTFILE"
                 continue
               fi
-
+      
               ABS_PATH="$REPO_ROOT/$f_clean"
               echo "----- FILE: $f_clean -----" >> "$OUTFILE"
               if [ -f "$ABS_PATH" ]; then
@@ -220,7 +222,7 @@ jobs:
               fi
             done
           fi
-
+      
           {
             echo "snippets<<EOF"
             cat "$OUTFILE"

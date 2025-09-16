@@ -14,8 +14,9 @@ on:
 jobs:
   summary:
     # Run for new issues OR for comments that mention @github-actions
-    if: ${{ github.event_name == 'issues' ||
-           (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@github-actions')) }}
+    if: >-
+      ${{ github.event_name == 'issues' ||
+         (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@github-actions')) }}
     runs-on: ubuntu-latest
     permissions:
       issues: write          # edit / comment / label
@@ -121,7 +122,41 @@ jobs:
           } >> "$GITHUB_OUTPUT"
 
       # ------------------------------------------------------
-      # 5️⃣ First‑pass – decide which files are relevant
+      # 5️⃣ Generate a compact repository index for the AI
+      # ------------------------------------------------------
+      - name: Generate repository index
+        id: repo-index
+        run: |
+          INDEX_FILE="repo_index.txt"
+          echo "# Repository Structure Summary" > $INDEX_FILE
+          echo "## Core Directories (depth ≤ 2)" >> $INDEX_FILE
+          find src -maxdepth 2 -type d | sort >> $INDEX_FILE
+          echo "" >> $INDEX_FILE
+
+          echo "## Important JS/JSX Files (first 100)" >> $INDEX_FILE
+          find src -type f $$ -name "*.js" -o -name "*.jsx" $$ \
+            -not -path "*/node_modules/*" \
+            | head -n 100 >> $INDEX_FILE
+          echo "" >> $INDEX_FILE
+
+          echo "## Addons Quick Reference" >> $INDEX_FILE
+          for addon in src/addons/*; do
+            if [ -d "$addon" ]; then
+              echo "Addon: $(basename "$addon")" >> $INDEX_FILE
+              [ -f "$addon/manifest.js" ] && echo "  - manifest.js" >> $INDEX_FILE
+              [ -f "$addon/userscript.js" ] && echo "  - userscript.js" >> $INDEX_FILE
+            fi
+          done
+          echo "" >> $INDEX_FILE
+
+          {
+            echo "repo_index<<EOF"
+            cat $INDEX_FILE
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      # ------------------------------------------------------
+      # 6️⃣ First‑pass – decide which files are relevant
       # ------------------------------------------------------
       - name: First‑pass decide which files are relevant
         id: decide
@@ -129,6 +164,9 @@ jobs:
         with:
           prompt: |
             You are an assistant that decides what code context is needed to understand a GitHub issue.
+            Use the repository index below to guide your selection.
+            ${{ steps.repo-index.outputs.repo_index }}
+
             Output only a newline‑separated list of at most 6 relative file paths (e.g. src/foo.js) that are most relevant to this issue.
             If no code files are relevant, output exactly: NONE
 
@@ -139,13 +177,13 @@ jobs:
             ${{ github.event.issue.title }}
             ----------------------------
             Issue Body:
-            Body: ${{ github.event.issue.body }}
+            ${{ github.event.issue.body }}
 
             Full Issue Conversation (including original body and all comments):
             ${{ steps.get-context.outputs.full_context }}
 
       # ------------------------------------------------------
-      # 6️⃣ Extract tiny snippets from the files the model suggested
+      # 7️⃣ Extract tiny snippets from the files the model suggested
       # ------------------------------------------------------
       - name: Extract snippets for files suggested by AI (capped)
         id: snip
@@ -155,23 +193,34 @@ jobs:
           FILES=$(printf "%s\n" "$RESP" | sed '/^\s*$/d')
           OUTFILE=ai_snippets.txt
           > "$OUTFILE"
+
           if [ "$FILES" = "NONE" ] || [ -z "$FILES" ]; then
             echo "NO_SNIPPETS" > "$OUTFILE"
           else
             COUNT=0
+            REPO_ROOT="$GITHUB_WORKSPACE"   # absolute repo root
             printf "%s\n" "$FILES" |
             while IFS= read -r f && [ $COUNT -lt 6 ]; do
               COUNT=$((COUNT + 1))
               f_clean=$(printf "%s" "$f" | tr -d '\r')
+
+              # ---- SECURITY: block traversal/absolute paths ----
+              if [[ "$f_clean" == *"../"* ]] || [[ "$f_clean" == /* ]]; then
+                echo "[SECURITY BLOCKED: Invalid path '$f_clean']" >> "$OUTFILE"
+                continue
+              fi
+
+              ABS_PATH="$REPO_ROOT/$f_clean"
               echo "----- FILE: $f_clean -----" >> "$OUTFILE"
-              if [ -f "$f_clean" ]; then
-                head -c 20000 "$f_clean" >> "$OUTFILE" || true
+              if [ -f "$ABS_PATH" ]; then
+                head -c 20000 "$ABS_PATH" >> "$OUTFILE" || true
                 echo "" >> "$OUTFILE"
               else
                 echo "[MISSING FILE: $f_clean]" >> "$OUTFILE"
               fi
             done
           fi
+
           {
             echo "snippets<<EOF"
             cat "$OUTFILE"
@@ -179,7 +228,7 @@ jobs:
           } >> "$GITHUB_OUTPUT"
 
       # ------------------------------------------------------
-      # 7️⃣ Second‑pass – generate the final summary (or security flag)
+      # 8️⃣ Second‑pass – generate the final summary (or security flag)
       # ------------------------------------------------------
       - name: Second‑pass AI summary using relevant snippets
         id: final
@@ -237,7 +286,7 @@ jobs:
             Respond with either the single line "[SECURITY]" OR the full summary text. No extra metadata required.
 
       # ------------------------------------------------------
-      # 8️⃣ If the AI flagged a security issue → hide, label, close, lock
+      # 9️⃣ If the AI flagged a security issue → hide, label, close, lock
       # ------------------------------------------------------
       - name: Handle security vulnerability
         if: ${{ steps.final.outputs.response == '[SECURITY]' }}
@@ -266,7 +315,7 @@ jobs:
           gh issue lock "$ISSUE_NUMBER"
 
       # ------------------------------------------------------
-      # 9️⃣ Normal path – post the AI‑generated summary as a comment
+      # 🔟 Normal path – post the AI‑generated summary as a comment
       # ------------------------------------------------------
       - name: Comment with AI summary
         if: ${{ steps.final.outputs.response != '[SECURITY]' }}

@@ -130,7 +130,7 @@ jobs:
           INDEX_FILE="repo_index.txt"
           echo "# Repository Structure Summary" > $INDEX_FILE
           echo "## Core Directories (depth ≤ 2)" >> $INDEX_FILE
-          find src -maxdepth 2 -type d | sort >> $INDEX_FILE
+          find src -maxdepth 3 -type d | sort >> $INDEX_FILE
           echo "" >> $INDEX_FILE
 
           echo "## Important JS/JSX Files (first 100)" >> $INDEX_FILE

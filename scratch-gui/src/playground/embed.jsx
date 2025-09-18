@@ -24,9 +24,10 @@ alert(`Project ID: ${projectId}`);
 let embedUrl;
 if (projectId != null) {
     alert("Project id not null, trying to embed ${projectId}");  
-    embedUrl = `https://turbowarp.org/${projectId}/embed`;
+    embedUrl = `https://omniblocks.github.io/#${projectId}/embed`;
 } else if (projectId == null) {
     // im gonna name all my files con
+    // ^ yo who wrote this comment... actual real funny comment in tw codebase?
     console.warn('No project ID found: Embedding without a project.');
     embedUrl = location.href; // locashionn hyper reference
         if (!window.location.pathname.endsWith('/embed')) {

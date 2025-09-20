@@ -36,6 +36,7 @@ class TWNews extends React.Component {
         this.setState({
             closed: true
         });
+        window.dispatchEvent(new Event('resize'));
     }
     render () {
         if (this.state.closed || isScratchDesktop()) {

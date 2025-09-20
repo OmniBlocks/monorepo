@@ -627,9 +627,21 @@ class IROptimizer {
             return this.analyzeStack(stack, state) || modified;
         }
 
+        let iterations = 0;
         let modified = false;
         let keepLooping;
         do {
+            // If we are stuck in an apparent infinite loop, give up and assume the worst.
+            if (iterations > 10000) {
+                console.error('analyzeLoopedStack stuck in likely infinite loop; quitting', block, state);
+                modified = state.clear();
+                block.entryState = state.clone();
+                block.exitState = state.clone();
+                modified = this.analyzeInputs(block.inputs, state) || modified;
+                return this.analyzeStack(stack, state) || modified;
+            }
+            iterations++;
+
             const newState = state.clone();
             modified = this.analyzeStack(stack, newState) || modified;
             modified = (keepLooping = state.or(newState)) || modified;

@@ -209,6 +209,46 @@ class IntermediateInput {
     }
 }
 
+
+/**
+ * @param {InputType} type
+ * @returns {string}
+ */
+const stringifyType = type => {
+    let formatFlags = [];
+
+    for (const enumValue in InputType) {
+        const testFormat = InputType[enumValue];
+
+        if ((testFormat & type) === testFormat) {
+            for (const existingFormat of formatFlags) {
+                if ((testFormat & InputType[existingFormat]) === testFormat) {
+                    continue;
+                }
+            }
+
+            formatFlags = formatFlags.filter(value => (InputType[value] & testFormat) !== InputType[value]);
+            formatFlags.push(enumValue);
+        }
+    }
+
+    let str = null;
+
+    for (const formatFlag of formatFlags) {
+        if (str === null) {
+            str = formatFlag;
+        } else {
+            str = `${str} | ${formatFlag}`;
+        }
+    }
+
+    if (str === null) {
+        return 'INVALID';
+    }
+
+    return str;
+};
+
 /**
  * A 'stack' of blocks, like the contents of a script or the inside
  * of a C block.
@@ -350,5 +390,6 @@ module.exports = {
     IntermediateInput,
     IntermediateStack,
     IntermediateScript,
-    IntermediateRepresentation
+    IntermediateRepresentation,
+    stringifyType
 };

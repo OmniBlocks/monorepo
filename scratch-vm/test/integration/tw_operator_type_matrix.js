@@ -3,7 +3,7 @@ const VM = require('../../src/virtual-machine');
 const {BlockType, ArgumentType} = require('../../src/extension-support/tw-extension-api-common');
 const {IRGenerator} = require('../../src/compiler/irgen');
 const {IROptimizer} = require('../../src/compiler/iroptimizer');
-const {IntermediateInput} = require('../../src/compiler/intermediate');
+const {IntermediateInput, stringifyType} = require('../../src/compiler/intermediate');
 const nanolog = require('@turbowarp/nanolog');
 
 const VALUES = [
@@ -113,7 +113,7 @@ test('operator type matrix', async t => {
                 1,
                 [
                     4,
-                    `${inputs[i]}`
+                    `${Object.is(inputs[i], -0) ? '-0' : inputs[i]}`
                 ]
             ];
         }
@@ -180,7 +180,7 @@ test('operator type matrix', async t => {
         t.ok(
             irOperator.isSometimesType(expectedType),
             `${operator.opcode}${JSON.stringify(operator.fields)}[${inputs.map(str)}] ` +
-            `outputted value ${str(reportedValue)} is of the expected type ${irOperator.type}.`
+            `outputted value ${str(reportedValue)} is of the expected type ${stringifyType(irOperator.type)}.`
         );
     };
 

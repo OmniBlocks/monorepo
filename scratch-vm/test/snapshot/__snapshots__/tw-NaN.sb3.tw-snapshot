@@ -57,13 +57,13 @@ yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b0, false, false, "ao", 
 if (((((Math.log(-1) / Math.LN10) || 0) * 1) === 0)) {
 yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b0, false, false, "aq", null);
 }
-if (((((Math.round(Math.sin((Math.PI * ((1 / 0) || 0)) / 180) * 1e10) / 1e10) || 0) * 1) === 0)) {
+if (((((Math.round(Math.sin((Math.PI * (1 / 0)) / 180) * 1e10) / 1e10) || 0) * 1) === 0)) {
 yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b0, false, false, "as", null);
 }
-if (((((Math.round(Math.cos((Math.PI * ((1 / 0) || 0)) / 180) * 1e10) / 1e10) || 0) * 1) === 0)) {
+if (((((Math.round(Math.cos((Math.PI * (1 / 0)) / 180) * 1e10) / 1e10) || 0) * 1) === 0)) {
 yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b0, false, false, "au", null);
 }
-if ((((tan(((1 / 0) || 0)) || 0) * 1) === 0)) {
+if ((((tan((1 / 0)) || 0) * 1) === 0)) {
 yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b0, false, false, "aw", null);
 }
 if ((((runtime.ext_scratch3_operators._random((-1 / 0), (1 / 0)) || 0) * 1) === 0)) {

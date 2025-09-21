@@ -299,14 +299,14 @@ class ScriptTreeGenerator {
             }
             return new IntermediateInput(InputOpcode.LOOKS_COSTUME_NAME, InputType.STRING);
         case 'looks_size':
-            return new IntermediateInput(InputOpcode.LOOKS_SIZE_GET, InputType.NUMBER_POS_REAL);
+            return new IntermediateInput(InputOpcode.LOOKS_SIZE_GET, InputType.NUMBER_POS);
 
         case 'motion_direction':
             return new IntermediateInput(InputOpcode.MOTION_DIRECTION_GET, InputType.NUMBER_REAL);
         case 'motion_xposition':
-            return new IntermediateInput(InputOpcode.MOTION_X_GET, InputType.NUMBER_REAL);
+            return new IntermediateInput(InputOpcode.MOTION_X_GET, InputType.NUMBER);
         case 'motion_yposition':
-            return new IntermediateInput(InputOpcode.MOTION_Y_GET, InputType.NUMBER_REAL);
+            return new IntermediateInput(InputOpcode.MOTION_Y_GET, InputType.NUMBER);
 
         case 'operator_add':
             return new IntermediateInput(InputOpcode.OP_ADD, InputType.NUMBER_OR_NAN, {
@@ -494,7 +494,7 @@ class ScriptTreeGenerator {
         case 'sensing_dayssince2000':
             return new IntermediateInput(InputOpcode.SENSING_TIME_DAYS_SINCE_2000, InputType.NUMBER);
         case 'sensing_distanceto':
-            return new IntermediateInput(InputOpcode.SENSING_DISTANCE, InputType.NUMBER_POS_REAL | InputType.NUMBER_ZERO, {
+            return new IntermediateInput(InputOpcode.SENSING_DISTANCE, InputType.NUMBER_POS | InputType.NUMBER_ZERO, {
                 target: this.descendInputOfBlock(block, 'DISTANCETOMENU').toType(InputType.STRING)
             });
         case 'sensing_keypressed':

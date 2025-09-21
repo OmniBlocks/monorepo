@@ -377,8 +377,8 @@ class IROptimizer {
             let resultType = 0;
 
             const canBeNaN = function () {
-                // REAL / 0 = NaN
-                if ((leftType & InputType.NUMBER_REAL) && (rightType & InputType.NUMBER_ZERO)) return true;
+                // (-)0 / (-)0 = NaN
+                if ((leftType & InputType.NUMBER_ANY_ZERO) && (rightType & InputType.NUMBER_ANY_ZERO)) return true;
                 // (-)Infinity / (-)Infinity = NaN
                 if ((leftType & InputType.NUMBER_INF) && (rightType & InputType.NUMBER_INF)) return true;
                 // (-)0 / NaN = NaN
@@ -395,24 +395,26 @@ class IROptimizer {
             if (canBePos()) resultType |= InputType.NUMBER_POS;
 
             const canBeNegInfinity = function () {
-                // -Infinity / 0 = -Infinity
-                if ((leftType & InputType.NUMBER_NEG_INF) && (rightType & InputType.NUMBER_ZERO)) return true;
-                // Infinity / -0 = -Infinity
-                if ((leftType & InputType.NUMBER_POS_INF) && (rightType & InputType.NUMBER_NEG_ZERO)) return true;
-                // NEG_REAL / NaN = -Infinity
-                if ((leftType & InputType.NUMBER_NEG_REAL) && (rightType & InputType.NUMBER_NAN)) return true;
-                // NEG_REAL / NUMBER_OR_NAN ~= -Infinity
-                if ((leftType & InputType.NUMBER_NEG_REAL) && (rightType & InputType.NUMBER_OR_NAN)) return true;
+                // NEG / 0 = -Infinity
+                if ((leftType & InputType.NUMBER_NEG) && (rightType & InputType.NUMBER_ZERO)) return true;
+                // POS / -0 = -Infinity
+                if ((leftType & InputType.NUMBER_POS) && (rightType & InputType.NUMBER_NEG_ZERO)) return true;
+                // NEG_REAL / POS_REAL ~= -Infinity
+                if ((leftType & InputType.NUMBER_NEG_REAL) && (rightType & InputType.NUMBER_POS_REAL)) return true;
+                // POS_REAL / NEG_REAL ~= -Infinity
+                if ((leftType & InputType.NUMBER_POS_REAL) && (rightType & InputType.NUMBER_NEG_REAL)) return true;
             };
             if (canBeNegInfinity()) resultType |= InputType.NUMBER_NEG_INF;
 
             const canBeInfinity = function () {
-                // Infinity / 0 = Infinity
-                if ((leftType & InputType.NUMBER_POS_INF) && (rightType & InputType.NUMBER_ZERO)) return true;
-                // -Infinity / -0 = Infinity
-                if ((leftType & InputType.NUMBER_NEG_INF) && (rightType & InputType.NUMBER_NEG_ZERO)) return true;
-                // POS_REAL / NUMBER_OR_NAN ~= Infinity
-                if ((leftType & InputType.NUMBER_POS_REAL) && (rightType & InputType.NUMBER_OR_NAN)) return true;
+                // POS / 0 = Infinity
+                if ((leftType & InputType.NUMBER_POS) && (rightType & InputType.NUMBER_ZERO)) return true;
+                // NEG / -0 = Infinity
+                if ((leftType & InputType.NUMBER_NEG) && (rightType & InputType.NUMBER_NEG_ZERO)) return true;
+                // POS_REAL / POS_REAL ~= Infinity
+                if ((leftType & InputType.NUMBER_POS_REAL) && (rightType & InputType.NUMBER_POS_REAL)) return true;
+                // NEG_REAL / NEG_REAL ~= Infinity
+                if ((leftType & InputType.NUMBER_NEG_REAL) && (rightType & InputType.NUMBER_NEG_REAL)) return true;
             };
             if (canBeInfinity()) resultType |= InputType.NUMBER_POS_INF;
 

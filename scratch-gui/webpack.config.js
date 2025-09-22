@@ -46,7 +46,8 @@ const base = {
                 {from: /^\/\d+\/embed\/?$/, to: '/embed.html'},
                 {from: /^\/addons\/?$/, to: '/addons.html'}
             ]
-        }
+        },
+            hot: true
     },
     output: {
         library: 'GUI',
@@ -136,6 +137,7 @@ const base = {
 
 if (!process.env.CI) {
     base.plugins.push(new webpack.ProgressPlugin());
+        base.plugins.push(new webpack.HotModuleReplacementPlugin());
 }
 
 module.exports = [

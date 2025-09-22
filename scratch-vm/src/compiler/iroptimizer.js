@@ -659,8 +659,8 @@ class IROptimizer {
 
             const newState = state.clone();
             modified = this.analyzeStack(stack, newState) || modified;
-            modified = this.analyzeInputs(block.inputs, newState) || modified;
             modified = (keepLooping = state.or(newState)) || modified;
+            modified = this.analyzeInputs(block.inputs, state) || modified;
         } while (keepLooping);
         block.entryState = state.clone();
         return modified;

@@ -67,10 +67,10 @@ b0.value = (b1.value[(((((+p1 || 0) + (+p0 || 0)) || 0) / 2) | 0) - 1] ?? "");
 b2.value = p0;
 b3.value = p1;
 while (true) {
-while (compareLessThan((b1.value[(b2.value | 0) - 1] ?? ""), b0.value)) {
+while (compareLessThan(listGet(b1.value, b2.value), b0.value)) {
 b2.value = ((+b2.value || 0) + 1);
 }
-while (compareGreaterThan((b1.value[(b3.value | 0) - 1] ?? ""), b0.value)) {
+while (compareGreaterThan(listGet(b1.value, b3.value), b0.value)) {
 b3.value = ((+b3.value || 0) + -1);
 }
 if (compareGreaterThan(b2.value, b3.value)) {

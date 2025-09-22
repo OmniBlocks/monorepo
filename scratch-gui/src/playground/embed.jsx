@@ -1,3 +1,4 @@
+
 import './import-first';
 
 import React from 'react';
@@ -11,33 +12,28 @@ import {Theme} from '../lib/themes/index.js';
 import GUI from './render-gui.jsx';
 import render from './app-target';
 
-
+// Extract project ID from URL hash or pathname for OmniBlocks
 const getProjectId = () => {
-    
-    const hashMatch = location.hash.match(/#(\d+)/);
+    // OmniBlocks expects #<id>/embed only (GH Pages)
+    const hashMatch = location.hash.match(/^#(\d+)\/embed/);
     if (hashMatch) return hashMatch[1];
 
-   
-    const pathMatch = location.pathname.match(/(\d+)\/embed/);
-    if (pathMatch) return pathMatch[1];
+    // If custom domain support is added, uncomment below:
+    // const pathMatch = location.pathname.match(/^\/(\d+)\/embed/);
+    // if (pathMatch) return pathMatch[1];
 
-    
     return null;
 };
 
 const projectId = getProjectId();
-alert(`Project ID: ${projectId} (don't panic, it's fine)`);
 
-// Construct embed URL for OmniBlocks mod
+// Construct embed URL for OmniBlocks
 let embedUrl;
 if (projectId != null) {
-    // Use /embed path, but keep the hash style for OmniBlocks
     embedUrl = `${location.origin}/#${projectId}/embed`;
-    alert(`Embedding project ${projectId} at ${embedUrl} (please work pls)`);
 } else {
-    console.warn('No project ID found: Embedding without a project. Brace yourself.');
-    embedUrl = location.href; // locashionn hyper reference 
-    // (what the heck is locashionn hyper)
+    console.warn('No project ID found: Embedding without a project.');
+    embedUrl = location.href;
 }
 
 const urlParams = new URLSearchParams(location.search);
@@ -46,17 +42,21 @@ let vm;
 
 const onVmInit = _vm => {
     vm = _vm;
-    // vm is alive. feed it coffee ☕
 };
 
 const onProjectLoaded = () => {
     if (urlParams.has('autoplay')) {
-        vm.start(); // i lived my whole life without KNOWING THERE WAS AN AUTOPLAY FEATURE???
-        vm.greenFlag(); 
+        vm.start();
+        vm.greenFlag();
     }
 };
 
-// Wrap the GUI with your HOCs
+// Hide splash screen when GUI is ready
+const hideSplash = () => {
+    if (window.SplashEnd) window.SplashEnd();
+};
+
+// Wrap the GUI with HOCs
 const WrappedGUI = compose(
     AppStateHOC,
     TWStateManagerHOC,
@@ -67,16 +67,18 @@ const WrappedGUI = compose(
 render(
     <WrappedGUI
         isEmbedded
-        projectId={projectId} 
+        projectId={projectId}
         onVmInit={onVmInit}
-        onProjectLoaded={onProjectLoaded}
+        onProjectLoaded={() => {
+            onProjectLoaded();
+            hideSplash();
+        }}
         routingStyle="none"
-        theme={Theme.light} // force light theme for embeds because i'm EVIL MWAHAHHA
-        /* wait normally with omniblocks it autosaves your last used theme to local storage so why doesn't the same apply here??? */
+        theme={Theme.light}
     />
 );
 
 // Run addons if requested
 if (urlParams.has('addons')) {
-    runAddons(); // addons are fun 
+    runAddons();
 }

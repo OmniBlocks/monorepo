@@ -1,6 +1,7 @@
 // @ts-check
 
 const {StackOpcode, InputOpcode, InputType} = require('./enums.js');
+const log = require('../util/log');
 
 // These imports are used by jsdoc comments but eslint doesn't know that
 /* eslint-disable no-unused-vars */
@@ -647,7 +648,7 @@ class IROptimizer {
         do {
             // If we are stuck in an apparent infinite loop, give up and assume the worst.
             if (iterations > 10000) {
-                console.error('analyzeLoopedStack stuck in likely infinite loop; quitting', block, state);
+                log.error('analyzeLoopedStack stuck in likely infinite loop; quitting', block, state);
                 modified = state.clear();
                 block.entryState = state.clone();
                 block.exitState = state.clone();

@@ -565,6 +565,11 @@ class IROptimizer {
             this.addPossibleExitState(state);
             break;
         }
+        case StackOpcode.CONTROL_WAIT_UNTIL: {
+            modified = state.clear() || modified;
+            modified = this.analyzeInputs(inputs, state) || modified;
+            break;
+        }
         case StackOpcode.PROCEDURE_CALL: {
             modified = this.analyzeInputs(inputs, state) || modified;
             modified = this.analyzeInputs(inputs.inputs, state) || modified;

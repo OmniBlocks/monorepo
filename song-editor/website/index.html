@@ -203,151 +203,190 @@
             <input type="submit" name="submit" value="Paypal"/>
         </form>
         <br/>
-        Additionally, Slarmoo's Box takes a lot of time to make and update. If you have found it valuable and are able to do so, please consider donating to Slarmoo here: 
+        Additionally, Slarmoo's Box, which is the basis of JukeBox, takes a lot of time to make and update. If you have found it valuable and are able to do so, please consider donating to Slarmoo here: 
         <form action="https://www.paypal.com/donate/?hosted_button_id=BMLD7HPKFR6NG" method="post" target="_blank">
             <input type="submit" name="submit" value="Paypal" />
         </form>
     </div>
         </section>
+                <h2>
+                    Instructions
+                </h2>
+                <p>
+                    You can add or remove notes by clicking on the gray rows at the top.
+                    Slarmoo's Box automatically plays the notes out loud for you. Try it!		
+                </p>
+                <p>
+                    Notes go into patterns, and you can edit one pattern at a time.
+                    Those numbered boxes at the bottom of the editor are the different patterns you can edit.
+                    <span id="bar-editing">
+                        Click the boxes to move to a different part of the song, or click the arrows on the currently selected box to swap which pattern is played during that part of the song.
+                    </span>
+                </p>
+                <p>
+                    Slarmoo's Box can play several rows of patterns simultaneously, and each row has its own set of patterns.
+                    Most rows can play melodies or harmonies, but the bottom row is for drums.
+                </p>
+                <p>
+                    All song data is contained in the URL at the top of your browser.
+                    When you make changes to the song, the URL is updated to reflect your changes.
+                    When you are satisfied with your song, just copy and paste the URL to save and share your song!
+                </p>
 
-        <div class="column-container">
-            <main class="instructions-column">
-                <section>
-                    <h2>
-                        Instructions
-                    </h2>
+                <div id="keyboard-instructions">
                     <p>
-                        You can add or remove notes by clicking on the gray rows at the top.
-                        Slarmoo's Box automatically plays the notes out loud for you. Try it!
-		
+                        When Slarmoo's Box has focus (click on its interface above), you can use these keyboard shortcuts: <br />
                     </p>
-                    <p>
-                        Notes go into patterns, and you can edit one pattern at a time.
-                        Those numbered boxes at the bottom of the editor are the different patterns you can edit.
-                        <span id="bar-editing">
-                            Click the boxes to move to a different part of the song, or click the arrows on the currently selected box to swap which pattern is played during that part of the song.
-                        </span>
-                    </p>
-                    <p>
-                        Slarmoo's Box can play several rows of patterns simultaneously, and each row has its own set of patterns.
-                        Most rows can play melodies or harmonies, but the bottom row is for drums.
-                    </p>
-                    <p>
-                        All song data is contained in the URL at the top of your browser.
-                        When you make changes to the song, the URL is updated to reflect your changes.
-                        When you are satisfied with your song, just copy and paste the URL to save and share your song!
-                    </p>
+                    <ul>
+                        <li><b>Spacebar</b>: play or pause the song</li>
+                        <li><b>Shift Spacebar</b>: play from mouse location</li>
+						<li><b>Z</b>: undo, <b>Y or Shift Z</b>: redo</li>
+                        <li><b>C</b>: copy pattern from selection</li>
+                        <li><b>V</b>: paste pattern into selection</li>
+                        <li><b>X</b>: cut pattern</li>
+                        <li><b>0-9</b>: assign pattern number to selection</li>
+						<li><b>Arrows</b>: move selection</li>
+						<li><b>Ctrl & Arrows</b>: move selected channel up or down</li>
+						<li><b>[ ]</b>: move playhead backward or forward one bar</li>
+						<li><b>F/H</b>: move to First or Highlighted pattern</li>
+                        <li><b>Shift F</b>: move to start of loop</li>
+						<li><b>Shift & Drag</b>: select part of a pattern</li>
+                        <li><b>Enter</b>: add a new bar after currently selected one</li>
+                        <li><b>Shift Enter</b>: add a new bar before currently selected one</li>
+                        <li><b>Backspace</b>: delete currently selected bar</li>
+                        <li><b>Ctrl Enter</b>: add channel</li>
+                        <li><b>Ctrl Backspace</b>: delete currently selected channel</li>
+                        <li><b>D</b>: duplicate a pattern</li>
+                        <li><b>N</b>: create a new blank pattern</li>
+                        <li><b>+/-</b>: move notes up or down</li>
+                        <li><b>Shift & +/-</b>: move notes up or down one octave</li>
+                        <li><b>A</b>: select entire song</li>
+                        <li><b>Shift A</b>: select current channel</li>
+                        <li><b>Shift ~</b>: new blank song</li>
+                        <li><b>B</b>: loop selected bars</li>
+                        <li><b>R</b>: random preset</li>
+                        <li><b>Shift R</b>: random instrument</li>
+                        <li><b>Shift P</b>: open song player</li>
+                        <li><b>Alt E</b>: open/close all envelope dropdowns</li>
+                        <li><b>Alt F</b>: open/close all fm dropdowns</li>
+                    </ul>
+                    If you have channel muting enabled: 
+                    <ul>
+                        <li><b>S</b>: Solo/unsolo a channel</li>
+                        <li><b>M</b> (or shift S): Mute/unmute a channel</li>
+                        <li><b>Shift M</b>: Mute/unmute entire song</li>
+                    </ul>
+                    If you have simultaneous instrument per channel enabled: 
+                    <ul>
+                        <li><b>Alt Enter</b>: add instrument within channel</li>
+                        <li><b>Alt Backspace</b> delete instrument within channel</li>
+                    </ul>
+                    And if you're in the song player:
+                    <ul>
+                        <li><b>Spacebar</b>: play or pause the song</li>
+                        <li><b>[ ]</b>: move playhead backward or forward one bar</li>
+						<li><b>F</b>: move to first pattern </li>
+                        <li><b>L</b>: toggle loop</li>
+                        <li><b>Z/+/-</b>: toggle zoom</li>
+                        <li><b> Ctrl E/P</b>: return to editor</li>
+                        <li><b>Shift U</b>: shorten song player link</li>
+                        <li><b>C</b>: copy link</li>
+                    </ul>
+                <p>These are just a few shortcuts, check JukeBox's edit menu for more!</p>
+                </div>
+                <p>
+                    In the note pattern editor, you can click and drag horizontally on a note to adjust its duration.
+                    You can also click above or below an existing note to add more notes to be played simultaneously, which is called a chord.
+                </p>
+                <div id="mobile-instructions" style="display: none;">
+					<p>
+						You can also long-press in the pattern editor to select a time range within a pattern, which you can then drag to move multiple notes at once.<br/>
+					</p>
+				</div>
+                <p>
+                    ADVANCED: Drag vertically from an existing note to bend its pitch, or drag vertically from above or below the note to adjust its volume. You can perform fine volume adjustment if you hold Control while doing this!
+                </p>
+                <p>
+                    ADVANCED: Click and drag on the pattern grid to make a selection. You can then press C/V to mass copy/paste parts of your song.
 
-                    <div id="keyboard-instructions">
-                        <p>
-                            When Slarmoo's Box has focus (click on its interface above), you can use these keyboard shortcuts: <br />
-                        </p>
-                        <ul>
-                            <li><b>Spacebar</b>: play or pause the song</li>
-                            <li><b>Shift Spacebar</b>: play from mouse location</li>
-							<li><b>Z</b>: undo, <b>Y or Shift Z</b>: redo</li>
-                            <li><b>C</b>: copy pattern from selection</li>
-                            <li><b>V</b>: paste pattern into selection</li>
-                            <li><b>X</b>: cut pattern</li>
-                            <li><b>0-9</b>: assign pattern number to selection</li>
-							<li><b>Arrows</b>: move selection</li>
-							<li><b>Ctrl & Arrows</b>: move selected channel up or down</li>
-							<li><b>[ ]</b>: move playhead backward or forward one bar</li>
-							<li><b>F/H</b>: move to First or Highlighted pattern</li>
-                            <li><b>Shift F</b>: move to start of loop</li>
-							<li><b>Shift & Drag</b>: select part of a pattern</li>
-                            <li><b>Enter</b>: add a new bar after currently selected one</li>
-                            <li><b>Shift Enter</b>: add a new bar before currently selected one</li>
-                            <li><b>Backspace</b>: delete currently selected bar</li>
-                            <li><b>Ctrl Enter</b>: add channel</li>
-                            <li><b>Ctrl Backspace</b>: delete currently selected channel</li>
-                            <li><b>D</b>: duplicate a pattern</li>
-                            <li><b>N</b>: create a new blank pattern</li>
-                            <li><b>+/-</b>: move notes up or down</li>
-                            <li><b>Shift & +/-</b>: move notes up or down one octave</li>
-                            <li><b>A</b>: select entire song</li>
-                            <li><b>Shift A</b>: select current channel</li>
-                            <li><b>Shift ~</b>: new blank song</li>
-                            <li><b>B</b>: loop bar</li>
-                            <li><b>R</b>: random preset</li>
-                            <li><b>Shift R</b>: random instrument</li>
-                            <li><b>Shift P</b>: open song player</li>
-                            <li><b>Alt E</b>: open/close all envelope dropdowns</li>
-                            <li><b>Alt F</b>: open/close all fm dropdowns</li>
-                        </ul>
-                        If you have channel muting enabled: 
-                        <ul>
-                            <li><b>S</b>: Solo/unsolo a channel</li>
-                            <li><b>M</b> (or shift S): Mute/unmute a channel</li>
-                            <li><b>Shift M</b>: Mute/unmute entire song</li>
-                        </ul>
-                        And if you're in the song player:
-                        <ul>
-                            <li><b>Spacebar</b>: play or pause the song</li>
-                            <li><b>[ ]</b>: move playhead backward or forward one bar</li>
-							<li><b>F</b>: move to first pattern </li>
-                            <li><b>L</b>: toggle loop</li>
-                            <li><b>Z/+/-</b>: toggle zoom</li>
-                            <li><b> Ctrl E/P</b>: return to editor</li>
-                            <li><b>Ctrl S</b>: shorten song player link</li>
-                            <li><b>C</b>: copy link</li>
-                        </ul>
-                        <p>These are just a few shortcuts, check Slarmoo's Box's edit menu for more!</p>
-                    </div>
-                    <p>
-                        In the note pattern editor, you can click and drag horizontally on a note to adjust its duration.
-                        You can also click above or below an existing note to add more notes to be played simultaneously, which is called a chord.
-                    </p>
-                    <div id="mobile-instructions" style="display: none;">
-						<p>
-							You can also long-press in the pattern editor to select a time range within a pattern, which you can then drag to move multiple notes at once.<br/>
-						</p>
-					</div>
-                    <p>
-                        ADVANCED: Drag vertically from an existing note to bend its pitch, or drag vertically from above or below the note to adjust its volume. You can perform fine volume adjustment if you hold Control while doing this!
-                    </p>
-                    <p>
-                        ADVANCED: Click and drag on the pattern grid to make a selection. You can then press C/V to mass copy/paste parts of your song.
-
-                    </p>
-                    <p>
-                        Slarmoo's Box has many more features.
-                        Try playing with the buttons and menus on the right side to find out what it can do!
-                        You can also click on the label next to each option for a description of what it does.
-                        Some features are hard to find anywhere though - for example, if your song has any modulator channels, you can hold Ctrl or Shift while the song is playing to record the movement of sliders directly! If you want to learn more tips, tricks, and best practices though, see below.
-                    </p>
-                    <p>
-						Want to see what people have made with BeepBox? Songs that were shared on Twitter prior to 2023-05-22 can now be browsed in <a href="https://twitter-archive.beepbox.co/" target="_blank">this interactive archive</a>!
-                        <!-- Additionally, there's an active <a href="https://discord.gg/beepbox">BeepBox Discord</a> where you can share songs and ask questions! -->
-                    </p>
+                </p>
+                <p>
+                    JukeBox has many more features.
+                    Try playing with the buttons and menus on the right side to find out what it can do!
+                    You can also click on the label next to each option for a description of what it does.
+                    Some features are hard to find anywhere though - for example, if your song has any modulator channels, you can hold Ctrl or Shift while the song is playing to record the movement of sliders directly! If you want to learn more tips, tricks, and best practices though, see below.
+                </p>
+                <p>
+					Want to see what people have made with BeepBox? Songs that were shared on Twitter prior to 2023-05-22 can now be browsed in <a href="https://twitter-archive.beepbox.co/" target="_blank">this interactive archive</a>!
+                </p>
                 </section>
                 <section>
                     <h2>
                         About
                     </h2>
                     <p>
-                        Slarmoo's Box is a mod of BeepBox developed by Slarmoo. The easiest way to contact the developers is via the <a href="https://discord.gg/Tc997TstJb" target="_blank">Beepbox Modding Discord</a>.<br><br>
+                        JukeBox, developed by CoolTasDude, is a mod of Slarmoo's Box which is a mod of UltraBox which ported features from Pandora's Box into GoldBox which are both mods of JummBox which is a mod of BeepBox.
                     </p>
                     <p>
-                        Slarmoo's Box does not claim ownership over songs created with it, so original songs belong to their authors.
+                        JukeBox does not claim ownership over songs created with it, so original songs belong to their authors.
                     </p>
                     <p>
-                        Neither Slarmoo's Box nor its creators assume responsibility for any copyrighted material played on Slarmoo's Box. No songs are ever received, recorded, or distributed by Slarmoo's Box's servers. All song data is contained in the URL after the hash (#) mark, and Slarmoo's Box running inside your browser converts that data into sound waves.
+                        Neither JukeBox nor its creators assume responsibility for any copyrighted material played on JukeBox. No songs are ever received, recorded, or distributed by JukeBox's servers. All song data is contained in the URL after the hash (#) mark, and JukeBox running inside your browser converts that data into sound waves.
                     </p>
                     <p>
-                        Slarmoo's Box does not collect, track, or share any user data.
+                        JukeBox does not collect, track, or share any user data.
                     </p>
-                    <p>
-                        You can download and use <a href="https://github.com/slarmoo/slarmoosbox" target="_blank">the source code</a> under the MIT license.
-                        The original BeepBox source code by John Nesky can be found <a href="https://github.com/johnnesky/beepbox" target="_blank">here</a>.
-                    </p>
-                    <p>
-                        The patch notes of Slarmoo's Box are available <a href="./patch_notes.html">here</a>.
-                    </p>     
                 </section>
-            </main>
-            <aside class="bsky-column">
-				<h2>
+                <section>
+                    <h2>
+                        Resources
+                    </h2>
+                    <h3>
+                        <a href="https://discord.gg/beepbox">BeepBox Discord</a>
+                    </h3>
+                    <p>
+                        An active community about everything BeepBox. Share songs and ask questions here!
+                    </p>
+                    <h3>
+                        <a href="https://discord.gg/xSs9nABmP5JukeBox">JukeBox Discord</a>
+                    </h3>
+                    <p>
+                        A new discord server for fellow JukeBox enjoyers. You can also get insight or give feedback for future JukeBox development!
+                    </p>
+                    <h3>
+                        <a href="https://discord.gg/Tc997TstJb" target="_blank">Beepbox Modding Discord</a>
+                    </h3>
+                    <p>
+                        This is the easiest way to contact the developers of most beepmods, although I (CoolTasDude) am not particularly active on it 
+                    </p>
+                    <h3>
+                        <a href="https://github.com/JukeeBox/JukeBox_TypeScript" target="_blank">JukeBox Source Code</a>
+                    </h3>
+                    <p>
+                        You can download and use the source code under the MIT license.The original BeepBox source code by John Nesky can be found <a href="https://github.com/johnnesky/beepbox" target="_blank">here</a>.
+                    </p>
+                    <h3>
+                        <a href="./patch_notes.html">JukeBox Patch Notes</a>
+                    </h3>
+                    <p>
+                         An up-to-date list of all of JukeBox's features, changes, and bugfixes.
+                    </p>
+                    <h3>
+                        <a href="./credits.html">Credits</a>
+                    </h3>
+                    <p>
+                         Every beepmod and user who has or may have a contribution to JukeBox.
+                    </p>
+                    <h3>
+                        
+                    </h3>
+                    <p>
+                         
+                    </p>
+
+                </section>
+            <br><br>
+            <h2>
 					Shared on Bluesky:
 				</h2>
 				<div>
@@ -377,7 +416,6 @@
                     </script>
 					<!-- <script type="module" src="https://cdn.jsdelivr.net/npm/bsky-embed/dist/bsky-embed.es.js" async></script> -->
 				</div>
-			</aside>
         </div>
     </div>
 
@@ -413,7 +451,7 @@
         "✨","🌈","🌧️","🪨","🐍","🌲","🌳","𓆏","🦀","🍄‍🟫","🌵","and Bobby","🥚",
         //Current version
         // I wonder how many times I'll forget about this
-        "0.1.5"
+        "0.2.0"
         ];
         const date = new Date();
         if (Math.floor(Math.random() * 3) == 0) { //more than doubled chance for a plant to show up

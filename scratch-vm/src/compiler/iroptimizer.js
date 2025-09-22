@@ -94,7 +94,7 @@ class TypeState {
     after (other) {
         return this.mutate(other, varId => {
             const otherType = other.variables[varId];
-            if (otherType !== 0) return otherType;
+            if (otherType) return otherType;
             return this.variables[varId] ?? InputType.ANY;
         });
     }

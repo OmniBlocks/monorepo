@@ -541,18 +541,19 @@ class IROptimizer {
             state = state.clone();
         }
 
-        modified = this.analyzeInputs(inputs, state) || modified;
-
         switch (stackBlock.opcode) {
         case StackOpcode.VAR_SET:
+            modified = this.analyzeInputs(inputs, state) || modified;
             modified = state.setVariableType(inputs.variable, inputs.value.type) || modified;
             break;
         case StackOpcode.CONTROL_WHILE:
         case StackOpcode.CONTROL_FOR:
         case StackOpcode.CONTROL_REPEAT:
+            modified = this.analyzeInputs(inputs, state) || modified;
             modified = this.analyzeLoopedStack(inputs.do, state, stackBlock) || modified;
             break;
         case StackOpcode.CONTROL_IF_ELSE: {
+            modified = this.analyzeInputs(inputs, state) || modified;
             const trueState = state.clone();
             modified = this.analyzeStack(inputs.whenTrue, trueState) || modified;
             modified = this.analyzeStack(inputs.whenFalse, state) || modified;
@@ -560,10 +561,12 @@ class IROptimizer {
             break;
         }
         case StackOpcode.CONTROL_STOP_SCRIPT: {
+            modified = this.analyzeInputs(inputs, state) || modified;
             this.addPossibleExitState(state);
             break;
         }
         case StackOpcode.PROCEDURE_CALL: {
+            modified = this.analyzeInputs(inputs, state) || modified;
             modified = this.analyzeInputs(inputs.inputs, state) || modified;
             const script = this.ir.procedures[inputs.variant];
 
@@ -575,6 +578,7 @@ class IROptimizer {
             break;
         }
         case StackOpcode.COMPATIBILITY_LAYER: {
+            modified = this.analyzeInputs(inputs, state) || modified;
             this.analyzeInputs(inputs.inputs, state);
             for (const substackName in inputs.substacks) {
                 const newState = state.clone();
@@ -583,6 +587,9 @@ class IROptimizer {
             }
             break;
         }
+        default:
+            modified = this.analyzeInputs(inputs, state) || modified;
+            break;
         }
 
         return modified;

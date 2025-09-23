@@ -1,0 +1,30 @@
+// TW Snapshot
+// Input SHA-256: 7f99a41ef716935ae486087d8adf955cbd853c893bc94e58e4cc1c46ad1a7883
+
+// Sprite1 script
+(function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
+const b0 = runtime.getOpcodeFunction("looks_say");
+const b1 = stage.variables["KMKx1gRubgLz,!L]^TBS"];
+const b2 = stage.variables["`jEk@4|i[#Fk?(8x)AV.-my variable"];
+return function* genXYZ () {
+yield* executeInCompatibilityLayer({"MESSAGE":"plan 1",}, b0, false, false, "g", null);
+thread.procedures["Wtest"]();
+if ((("" + listGet(b1.value, b2.value)).toLowerCase() === "thing".toLowerCase())) {
+yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b0, false, false, "m", null);
+}
+yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, "o", null);
+retire(); return;
+}; })
+
+// Sprite1 Wtest
+(function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
+const b0 = stage.variables["yz}9Y:gLL0ZWEs}l)s+Q"];
+const b1 = stage.variables["`jEk@4|i[#Fk?(8x)AV.-my variable"];
+return function funXYZ_test () {
+if ((("" + b0.value).toLowerCase() === "true".toLowerCase())) {
+b1.value = "last";
+return "";
+}
+b1.value = (1 + 2);
+return "";
+}; })

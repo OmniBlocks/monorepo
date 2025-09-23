@@ -17,7 +17,7 @@ const {
 class TypeState {
     constructor () {
         /** @type {Object.<string, InputType | 0>}*/
-        this.variables = {};
+        this.variables = Object.create(null);
     }
 
     /**
@@ -31,7 +31,7 @@ class TypeState {
                 break;
             }
         }
-        this.variables = {};
+        this.variables = Object.create(null);
         return modified;
     }
 

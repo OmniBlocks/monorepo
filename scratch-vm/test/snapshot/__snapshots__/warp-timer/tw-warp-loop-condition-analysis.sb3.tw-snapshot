@@ -16,7 +16,7 @@ b1._monitorUpToDate = false;
 b1.value.push("final");
 b1._monitorUpToDate = false;
 yield* thread.procedures["Wtest"]();
-if (((+b2.value || 0) === 4)) {
+if ((toNotNaN(+b2.value) === 4)) {
 yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b0, false, false, "u", null);
 }
 yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, "t", null);
@@ -33,7 +33,7 @@ b0.value = "";
 b1.value = 1;
 while (!(("" + b0.value).toLowerCase() === "final".toLowerCase())) {
 b0.value = listGet(b2.value, b1.value);
-b1.value = ((+b1.value || 0) + 1);
+b1.value = (toNotNaN(+b1.value) + 1);
 if (isStuck()) yield;
 }
 return "";

@@ -18,7 +18,7 @@ while (thread.timer.timeElapsed() < a0) {
 yield;
 }
 thread.timer = null;
-if (((+b1.value || 0) === 1)) {
+if ((toNotNaN(+b1.value) === 1)) {
 yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b0, false, false, "`SX*FG*Lwo*0_T=box-@", null);
 }
 yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, "|#`zzPA_x%{`FyIAQhb4", null);
@@ -29,6 +29,6 @@ retire(); return;
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
 const b0 = stage.variables["`jEk@4|i[#Fk?(8x)AV.-my variable"];
 return function* genXYZ () {
-b0.value = ((+b0.value || 0) + 1);
+b0.value = (toNotNaN(+b0.value) + 1);
 retire(); return;
 }; })

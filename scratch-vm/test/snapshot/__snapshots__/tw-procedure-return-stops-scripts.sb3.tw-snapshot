@@ -8,11 +8,11 @@ const b1 = stage.variables["PsAI*C{QHI3*4?O8p#TM"];
 return function* genXYZ () {
 yield* executeInCompatibilityLayer({"MESSAGE":"plan 2",}, b0, false, false, "f", null);
 yield* thread.procedures["Wreturn stops the script immediately"]();
-if (((+b1.value || 0) === 25)) {
+if ((toNotNaN(+b1.value) === 25)) {
 yield* executeInCompatibilityLayer({"MESSAGE":"pass return stopped the script immediately",}, b0, false, false, "u", null);
 }
 yield* waitThreads(startHats("event_whenbroadcastreceived", { BROADCAST_OPTION: "Test return outside of custom block" }));
-if (((+b1.value || 0) === 18)) {
+if ((toNotNaN(+b1.value) === 18)) {
 yield* executeInCompatibilityLayer({"MESSAGE":"pass return worked to stop outside of custom block",}, b0, false, false, "x", null);
 }
 yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, "v", null);
@@ -41,7 +41,7 @@ const b0 = stage.variables["PsAI*C{QHI3*4?O8p#TM"];
 return function* genXYZ () {
 b0.value = 0;
 while (true) {
-b0.value = ((+b0.value || 0) + 1);
+b0.value = (toNotNaN(+b0.value) + 1);
 if ((b0.value === 18)) {
 retire(); return;
 }

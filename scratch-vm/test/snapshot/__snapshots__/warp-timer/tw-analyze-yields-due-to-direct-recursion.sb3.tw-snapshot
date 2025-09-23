@@ -22,7 +22,7 @@ retire(); return;
 return function* genXYZ_non_warp_recursion_ (p0) {
 if (compareGreaterThan(p0, 0)) {
 yield;
-yield* thread.procedures["Znon-warp recursion %s"](((+p0 || 0) - 1));
+yield* thread.procedures["Znon-warp recursion %s"]((toNotNaN(+p0) - 1));
 }
 return "";
 }; })

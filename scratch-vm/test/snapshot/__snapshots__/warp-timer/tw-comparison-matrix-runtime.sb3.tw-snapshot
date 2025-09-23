@@ -24,19 +24,19 @@ thread.procedures["Wsetup values"]();
 b0.value = 0;
 b1.value = 0;
 for (var a0 = b2.value.length; a0 > 0; a0--) {
-b1.value = ((+b1.value || 0) + 1);
+b1.value = (toNotNaN(+b1.value) + 1);
 b3.value = 0;
 for (var a1 = b2.value.length; a1 > 0; a1--) {
-b3.value = ((+b3.value || 0) + 1);
-b0.value = ((+b0.value || 0) + 1);
+b3.value = (toNotNaN(+b3.value) + 1);
+b0.value = (toNotNaN(+b0.value) + 1);
 if (!compareEqual(compareGreaterThan(listGet(b2.value, b1.value), (b2.value[(b3.value | 0) - 1] ?? "")), (b4.value[(b0.value | 0) - 1] ?? ""))) {
 yield* executeInCompatibilityLayer({"MESSAGE":("fail " + (("" + listGet(b2.value, b1.value)) + (" should be > " + ("" + (b2.value[(b3.value | 0) - 1] ?? ""))))),}, b5, true, false, "]", null);
 }
-b0.value = ((+b0.value || 0) + 1);
+b0.value = (toNotNaN(+b0.value) + 1);
 if (!compareEqual(compareEqual(listGet(b2.value, b1.value), listGet(b2.value, b3.value)), (b4.value[(b0.value | 0) - 1] ?? ""))) {
 yield* executeInCompatibilityLayer({"MESSAGE":("fail " + (("" + listGet(b2.value, b1.value)) + (" should be = " + ("" + listGet(b2.value, b3.value))))),}, b5, true, false, "|", null);
 }
-b0.value = ((+b0.value || 0) + 1);
+b0.value = (toNotNaN(+b0.value) + 1);
 if (!compareEqual(compareLessThan(listGet(b2.value, b1.value), listGet(b2.value, b3.value)), (b4.value[(b0.value | 0) - 1] ?? ""))) {
 yield* executeInCompatibilityLayer({"MESSAGE":("fail " + (("" + listGet(b2.value, b1.value)) + (" should be < " + ("" + listGet(b2.value, b3.value))))),}, b5, true, true, "ab", null);
 if (hasResumedFromPromise) {hasResumedFromPromise = false;continue;}

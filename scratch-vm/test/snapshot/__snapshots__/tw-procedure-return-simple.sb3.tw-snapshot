@@ -13,10 +13,10 @@ yield* executeInCompatibilityLayer({"MESSAGE":"pass simplest",}, b0, false, fals
 if ((("" + thread.procedures["Znesting 1"]()).toLowerCase() === "42-54".toLowerCase())) {
 yield* executeInCompatibilityLayer({"MESSAGE":"pass nesting1",}, b0, false, false, "=", null);
 }
-if (((+thread.procedures["Wwarp fib %s"](12) || 0) === 144)) {
+if ((toNotNaN(+thread.procedures["Wwarp fib %s"](12)) === 144)) {
 yield* executeInCompatibilityLayer({"MESSAGE":"pass fib 12",}, b0, false, false, "@", null);
 }
-if (((+thread.procedures["Wfactorial %s"](12) || 0) === 479001600)) {
+if ((toNotNaN(+thread.procedures["Wfactorial %s"](12)) === 479001600)) {
 yield* executeInCompatibilityLayer({"MESSAGE":"pass factorial 12",}, b0, false, false, "]", null);
 }
 b1.value = (yield* thread.procedures["Zno shadowing 1 %s %s"]("f","g"));
@@ -53,7 +53,7 @@ return "";
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
 return function funXYZ_factorial_ (p0) {
 if (compareGreaterThan(p0, 1)) {
-return ((+p0 || 0) * (+thread.procedures["Wfactorial %s"](((+p0 || 0) - 1)) || 0));
+return (toNotNaN(+p0) * toNotNaN(+thread.procedures["Wfactorial %s"]((toNotNaN(+p0) - 1))));
 }
 return 1;
 return "";
@@ -88,7 +88,7 @@ return "";
 // Sprite1 Znesting 3 %s %s
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
 return function funXYZ_nesting_3__ (p0,p1) {
-return ((+p0 || 0) * (+p1 || 0));
+return (toNotNaN(+p0) * toNotNaN(+p1));
 return "";
 }; })
 
@@ -98,7 +98,7 @@ return function funXYZ_fib_ (p0) {
 if (compareLessThan(p0, 2)) {
 return p0;
 } else {
-return ((+thread.procedures["Wfib %s"](((+p0 || 0) - 1)) || 0) + (+thread.procedures["Wfib %s"](((+p0 || 0) - 2)) || 0));
+return (toNotNaN(+thread.procedures["Wfib %s"]((toNotNaN(+p0) - 1))) + toNotNaN(+thread.procedures["Wfib %s"]((toNotNaN(+p0) - 2))));
 }
 return "";
 }; })

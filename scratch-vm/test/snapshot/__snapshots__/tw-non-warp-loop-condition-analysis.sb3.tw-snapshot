@@ -17,11 +17,11 @@ b1._monitorUpToDate = false;
 b2.value = 0;
 b3.value = "bwah";
 while (!(("" + b3.value).toLowerCase() === "eof".toLowerCase())) {
-b2.value = ((+b2.value || 0) + 1);
+b2.value = (toNotNaN(+b2.value) + 1);
 b3.value = (b1.value[(b2.value | 0) - 1] ?? "");
 yield;
 }
-if (((+b2.value || 0) === 2)) {
+if ((toNotNaN(+b2.value) === 2)) {
 yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b0, false, false, "q", null);
 }
 yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, "o", null);

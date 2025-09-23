@@ -22,7 +22,7 @@ const b1 = stage.variables["t)]?yi[*8XU73qhMqOa8"];
 return function funXYZ_test_ (p0) {
 b0.value = p0;
 while (!(("" + listGet(b1.value, b0.value)).toLowerCase() === "something".toLowerCase())) {
-b0.value = ((+b0.value || 0) + 1);
+b0.value = (toNotNaN(+b0.value) + 1);
 }
 return "";
 }; })

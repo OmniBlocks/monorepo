@@ -29,7 +29,7 @@ yield;
 }
 b1.value = 2;
 } else {
-if (((+b1.value || 0) === 1)) {
+if ((toNotNaN(+b1.value) === 1)) {
 yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b2, false, false, "p", null);
 }
 yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b2, false, false, "n", null);

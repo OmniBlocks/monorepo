@@ -1,6 +1,7 @@
 // @ts-check
 
 const {StackOpcode, InputOpcode, InputType} = require('./enums.js');
+const log = require('../util/log');
 
 // These imports are used by jsdoc comments but eslint doesn't know that
 /* eslint-disable no-unused-vars */
@@ -16,7 +17,7 @@ const {
 class TypeState {
     constructor () {
         /** @type {Object.<string, InputType | 0>}*/
-        this.variables = {};
+        this.variables = Object.create(null);
     }
 
     /**
@@ -30,7 +31,7 @@ class TypeState {
                 break;
             }
         }
-        this.variables = {};
+        this.variables = Object.create(null);
         return modified;
     }
 
@@ -93,7 +94,7 @@ class TypeState {
     after (other) {
         return this.mutate(other, varId => {
             const otherType = other.variables[varId];
-            if (otherType !== 0) return otherType;
+            if (otherType) return otherType;
             return this.variables[varId] ?? InputType.ANY;
         });
     }
@@ -541,18 +542,19 @@ class IROptimizer {
             state = state.clone();
         }
 
-        modified = this.analyzeInputs(inputs, state) || modified;
-
         switch (stackBlock.opcode) {
         case StackOpcode.VAR_SET:
+            modified = this.analyzeInputs(inputs, state) || modified;
             modified = state.setVariableType(inputs.variable, inputs.value.type) || modified;
             break;
         case StackOpcode.CONTROL_WHILE:
         case StackOpcode.CONTROL_FOR:
         case StackOpcode.CONTROL_REPEAT:
+            modified = this.analyzeInputs(inputs, state) || modified;
             modified = this.analyzeLoopedStack(inputs.do, state, stackBlock) || modified;
             break;
         case StackOpcode.CONTROL_IF_ELSE: {
+            modified = this.analyzeInputs(inputs, state) || modified;
             const trueState = state.clone();
             modified = this.analyzeStack(inputs.whenTrue, trueState) || modified;
             modified = this.analyzeStack(inputs.whenFalse, state) || modified;
@@ -560,10 +562,17 @@ class IROptimizer {
             break;
         }
         case StackOpcode.CONTROL_STOP_SCRIPT: {
+            modified = this.analyzeInputs(inputs, state) || modified;
             this.addPossibleExitState(state);
             break;
         }
+        case StackOpcode.CONTROL_WAIT_UNTIL: {
+            modified = state.clear() || modified;
+            modified = this.analyzeInputs(inputs, state) || modified;
+            break;
+        }
         case StackOpcode.PROCEDURE_CALL: {
+            modified = this.analyzeInputs(inputs, state) || modified;
             modified = this.analyzeInputs(inputs.inputs, state) || modified;
             const script = this.ir.procedures[inputs.variant];
 
@@ -575,6 +584,7 @@ class IROptimizer {
             break;
         }
         case StackOpcode.COMPATIBILITY_LAYER: {
+            modified = this.analyzeInputs(inputs, state) || modified;
             this.analyzeInputs(inputs.inputs, state);
             for (const substackName in inputs.substacks) {
                 const newState = state.clone();
@@ -583,6 +593,9 @@ class IROptimizer {
             }
             break;
         }
+        default:
+            modified = this.analyzeInputs(inputs, state) || modified;
+            break;
         }
 
         return modified;
@@ -635,7 +648,7 @@ class IROptimizer {
         do {
             // If we are stuck in an apparent infinite loop, give up and assume the worst.
             if (iterations > 10000) {
-                console.error('analyzeLoopedStack stuck in likely infinite loop; quitting', block, state);
+                log.error('analyzeLoopedStack stuck in likely infinite loop; quitting', block, state);
                 modified = state.clear();
                 block.entryState = state.clone();
                 block.exitState = state.clone();
@@ -646,8 +659,8 @@ class IROptimizer {
 
             const newState = state.clone();
             modified = this.analyzeStack(stack, newState) || modified;
-            modified = this.analyzeInputs(block.inputs, newState) || modified;
             modified = (keepLooping = state.or(newState)) || modified;
+            modified = this.analyzeInputs(block.inputs, state) || modified;
         } while (keepLooping);
         block.entryState = state.clone();
         return modified;

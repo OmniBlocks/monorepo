@@ -1,0 +1,38 @@
+// TW Snapshot
+// Input SHA-256: 4715c75fe8effcdcdea3ad810949e33a7b6beb3fbd253c1edc2ed4f2bd093df3
+
+// Sprite1 script
+(function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
+const b0 = runtime.getOpcodeFunction("looks_say");
+const b1 = stage.variables["`jEk@4|i[#Fk?(8x)AV.-my variable"];
+const b2 = stage.variables["FpLI$ida6)qR,q~y`1|*"];
+return function* genXYZ () {
+yield* executeInCompatibilityLayer({"MESSAGE":"plan 1",}, b0, false, false, "e", null);
+b1.value = (1 + 2);
+yield* thread.procedures["Zsomething that yields"]();
+if ((("" + listGet(b2.value, b1.value)).toLowerCase() === "the only thing".toLowerCase())) {
+yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b0, false, false, "o", null);
+}
+yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, "n", null);
+retire(); return;
+}; })
+
+// Sprite1 Zsomething that yields
+(function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
+return function* genXYZ_something_that_yield () {
+for (var a0 = 2; a0 >= 0.5; a0--) {
+yield;
+}
+return "";
+}; })
+
+// Sprite1 script
+(function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
+const b0 = stage.variables["`jEk@4|i[#Fk?(8x)AV.-my variable"];
+return function* genXYZ () {
+for (var a0 = 1; a0 >= 0.5; a0--) {
+yield;
+}
+b0.value = "random";
+retire(); return;
+}; })

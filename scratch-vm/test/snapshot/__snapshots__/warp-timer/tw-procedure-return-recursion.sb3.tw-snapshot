@@ -10,7 +10,7 @@ return function* genXYZ () {
 yield* executeInCompatibilityLayer({"MESSAGE":"plan 18",}, b0, false, false, "G", null);
 b1.value = 0;
 b2.value = (yield* thread.procedures["Znon warp recursion should yield %s"](8));
-if ((b1.value === 4)) {
+if (((+b1.value || 0) === 4)) {
 yield* executeInCompatibilityLayer({"MESSAGE":"pass non warp recursion yields",}, b0, false, false, "ao", null);
 }
 b1.value = 0;
@@ -20,7 +20,7 @@ yield* executeInCompatibilityLayer({"MESSAGE":"pass warp recursion does not yiel
 }
 b1.value = 0;
 b2.value = (yield* thread.procedures["Zfib %s"](7));
-if ((b1.value === 20)) {
+if (((+b1.value || 0) === 20)) {
 yield* executeInCompatibilityLayer({"MESSAGE":"pass non warp fib yielded",}, b0, false, false, "au", null);
 }
 yield* thread.procedures["Zrecursing yields between each %s"]("initial");

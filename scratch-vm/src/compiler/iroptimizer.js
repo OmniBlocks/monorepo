@@ -100,6 +100,14 @@ class TypeState {
     }
 
     /**
+     * @param {TypeState} other
+     * @returns {boolean}
+     */
+    overwrite (other) {
+        return this.mutate(other, varId => other.variables[varId] ?? InputType.ANY);
+    }
+
+    /**
      * @param {*} variable A variable codegen object.
      * @param {InputType} type The type to set this variable to
      * @returns {boolean}
@@ -490,6 +498,8 @@ class IROptimizer {
 
             if (!script || !script.cachedAnalysisEndState) {
                 modified = state.clear() || modified;
+            } else if (script.yields) {
+                modified = state.overwrite(script.cachedAnalysisEndState) || modified;
             } else {
                 modified = state.after(script.cachedAnalysisEndState) || modified;
             }
@@ -578,6 +588,8 @@ class IROptimizer {
 
             if (!script || !script.cachedAnalysisEndState) {
                 modified = state.clear() || modified;
+            } else if (script.yields) {
+                modified = state.overwrite(script.cachedAnalysisEndState) || modified;
             } else {
                 modified = state.after(script.cachedAnalysisEndState) || modified;
             }

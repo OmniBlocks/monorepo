@@ -1,0 +1,29 @@
+// TW Snapshot
+// Input SHA-256: be149d21cc69628647000cc698ebd60949252730a0ea7b19f71cc85fe927b294
+
+// Sprite1 script
+(function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
+const b0 = runtime.getOpcodeFunction("looks_say");
+const b1 = stage.variables["%ehs:~!Y0l-5=!mnd-B?"];
+const b2 = stage.variables["=3aHfv[mKa)v,Wfpy:y?"];
+const b3 = stage.variables["`jEk@4|i[#Fk?(8x)AV.-my variable"];
+return function* genXYZ () {
+yield* executeInCompatibilityLayer({"MESSAGE":"plan 1",}, b0, false, false, "d", null);
+b1.value = [];
+b1.value.push((1 + 2));
+b1._monitorUpToDate = false;
+b1.value.push("eof");
+b1._monitorUpToDate = false;
+b2.value = 0;
+b3.value = "bwah";
+while (!(("" + b3.value).toLowerCase() === "eof".toLowerCase())) {
+b2.value = ((+b2.value || 0) + 1);
+b3.value = (b1.value[(b2.value | 0) - 1] ?? "");
+yield;
+}
+if (((+b2.value || 0) === 2)) {
+yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b0, false, false, "q", null);
+}
+yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, "o", null);
+retire(); return;
+}; })

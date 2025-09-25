@@ -137,10 +137,14 @@ class Scratch3PenBlocks {
      * @private
      */
     _getPenLayerID () {
-        if (this._penSkinId < 0 && this.runtime.renderer) {
-            this._penSkinId = this.runtime.renderer.createPenSkin();
-            this._penDrawableId = this.runtime.renderer.createDrawable(StageLayering.PEN_LAYER);
-            this.runtime.renderer.updateDrawableSkinId(this._penDrawableId, this._penSkinId);
+        const renderer = this.runtime.renderer;
+        if (this._penSkinId < 0 && renderer) {
+            this._penSkinId = renderer.createPenSkin();
+            this._penDrawableId = renderer.createDrawable(StageLayering.PEN_LAYER);
+            if (renderer.markDrawableAsNoninteractive) {
+                renderer.markDrawableAsNoninteractive(this._penDrawableId);
+            }
+            renderer.updateDrawableSkinId(this._penDrawableId, this._penSkinId);
         }
         return this._penSkinId;
     }

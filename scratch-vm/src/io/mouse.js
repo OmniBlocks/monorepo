@@ -101,16 +101,19 @@ class Mouse {
             if (!(data.x > 0 && data.x < data.canvasWidth &&
                 data.y > 0 && data.y < data.canvasHeight)) return;
 
+            // target will not exist if project is still loading
             const target = this._pickTarget(data.x, data.y);
-            const isNewMouseDown = !previousDownState && this._isDown;
-            const isNewMouseUp = previousDownState && !this._isDown;
+            if (target) {
+                const isNewMouseDown = !previousDownState && this._isDown;
+                const isNewMouseUp = previousDownState && !this._isDown;
 
-            // Draggable targets start click hats on mouse up.
-            // Non-draggable targets start click hats on mouse down.
-            if (target.draggable && isNewMouseUp) {
-                this._activateClickHats(target);
-            } else if (!target.draggable && isNewMouseDown) {
-                this._activateClickHats(target);
+                // Draggable targets start click hats on mouse up.
+                // Non-draggable targets start click hats on mouse down.
+                if (target.draggable && isNewMouseUp) {
+                    this._activateClickHats(target);
+                } else if (!target.draggable && isNewMouseDown) {
+                    this._activateClickHats(target);
+                }
             }
         }
     }

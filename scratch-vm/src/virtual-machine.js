@@ -223,15 +223,38 @@ class VirtualMachine extends EventEmitter {
             JSZip,
             Variable,
 
-            i_will_not_ask_for_help_when_these_break: () => {
+            these_broke_before_and_will_break_again: () => {
                 console.warn('You are using unsupported APIs. WHEN your code breaks, do not expect help.');
-                return ({
+                return {
                     JSGenerator: require('./compiler/jsgen.js'),
                     IRGenerator: require('./compiler/irgen.js').IRGenerator,
                     ScriptTreeGenerator: require('./compiler/irgen.js').ScriptTreeGenerator,
+                    IntermediateStackBlock: require('./compiler/intermediate.js').IntermediateStackBlock,
+                    IntermediateInput: require('./compiler/intermediate.js').IntermediateInput,
+                    IntermediateStack: require('./compiler/intermediate.js').IntermediateStack,
+                    IntermediateScript: require('./compiler/intermediate.js').IntermediateScript,
+                    IntermediateRepresentation: require('./compiler/intermediate.js').IntermediateRepresentation,
+                    StackOpcode: require('./compiler/enums.js').StackOpcode,
+                    InputOpcode: require('./compiler/enums.js').InputOpcode,
+                    InputType: require('./compiler/enums.js').InputType,
                     Thread: require('./engine/thread.js'),
                     execute: require('./engine/execute.js')
-                });
+                };
+            },
+
+            i_will_not_ask_for_help_when_these_break: () => {
+                this.emit('LEGACY_EXTENSION_API', 'i_will_not_ask_for_help_when_these_break');
+
+                const oldCompilerCompatibility = require('./compiler/old-compiler-compatibility.js');
+                oldCompilerCompatibility.enabled = true;
+
+                return {
+                    IRGenerator: oldCompilerCompatibility.IRGeneratorStub,
+                    ScriptTreeGenerator: oldCompilerCompatibility.ScriptTreeGeneratorStub,
+                    JSGenerator: oldCompilerCompatibility.JSGeneratorStub,
+                    Thread: require('./engine/thread.js'),
+                    execute: require('./engine/execute.js')
+                };
             }
         };
     }
@@ -537,6 +560,22 @@ class VirtualMachine extends EventEmitter {
             file.date = date;
         }
 
+        // Tell JSZip to only compress file formats where there will be a significant gain.
+        const COMPRESSABLE_FORMATS = [
+            '.json',
+            '.svg',
+            '.wav',
+            '.ttf',
+            '.otf'
+        ];
+        for (const file of Object.values(zip.files)) {
+            if (COMPRESSABLE_FORMATS.some(ext => file.name.endsWith(ext))) {
+                file.options.compression = 'DEFLATE';
+            } else {
+                file.options.compression = 'STORE';
+            }
+        }
+
         return zip;
     }
 
@@ -546,9 +585,9 @@ class VirtualMachine extends EventEmitter {
      */
     saveProjectSb3 (type) {
         return this._saveProjectZip().generateAsync({
+            // Don't configure compression here. _saveProjectZip() will set it for each file.
             type: type || 'blob',
-            mimeType: 'application/x.scratch.sb3',
-            compression: 'DEFLATE'
+            mimeType: 'application/x.scratch.sb3'
         });
     }
 

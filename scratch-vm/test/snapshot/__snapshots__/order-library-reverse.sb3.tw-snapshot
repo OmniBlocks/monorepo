@@ -17,7 +17,7 @@ yield;
 }
 thread.timer = null;
 b0.value = ((+b0.value || 0) + 1);
-if (((b0.value || 0) === 1)) {
+if ((b0.value === 1)) {
 yield* executeInCompatibilityLayer({"MESSAGE":"pass order is correct (1)",}, b2, false, false, "]4hbk*5ix]V00h|!x1oy", null);
 } else {
 yield* executeInCompatibilityLayer({"MESSAGE":("fail order is incorrect 1 != " + ("" + b0.value)),}, b2, false, false, "H=x@7SpNJeX|!}8x5y4,", null);
@@ -75,7 +75,7 @@ yield;
 }
 thread.timer = null;
 b0.value = ((+b0.value || 0) + 1);
-if (((b0.value || 0) === 2)) {
+if ((b0.value === 2)) {
 yield* executeInCompatibilityLayer({"MESSAGE":"pass order is correct (2)",}, b2, false, false, "0i[-T:vYTt=bi47@byUE", null);
 } else {
 yield* executeInCompatibilityLayer({"MESSAGE":("fail order is incorrect 2 != " + ("" + b0.value)),}, b2, false, false, "Coc1aZ;L9M-RyEt`syps", null);

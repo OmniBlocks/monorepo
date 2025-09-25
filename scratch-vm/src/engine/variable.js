@@ -8,13 +8,14 @@ const xmlEscape = require('../util/xml-escape');
 
 class Variable {
     /**
-     * @param {string} id Id of the variable.
+     * @param {string | null} id Id of the variable.
      * @param {string} name Name of the variable.
      * @param {string} type Type of the variable, one of '' or 'list'
      * @param {boolean} isCloud Whether the variable is stored in the cloud.
      * @constructor
      */
     constructor (id, name, type, isCloud) {
+        /** @type {string} */
         this.id = id || uid();
         this.name = name;
         this.type = type;

@@ -60,6 +60,12 @@ class Scratch3OperatorsBlocks {
     equals (args) {
         return Cast.compare(args.OPERAND1, args.OPERAND2) === 0;
     }
+    ltoreq (args) {
+        return Cast.compare(args.OPERAND1, args.OPERAND2) <= 0; // less than or equals to
+    }
+    gtoreq (args) {
+        return Cast.compare(args.OPERAND1, args.OPERAND2) >= 0; // greater than or equals to
+    }
 
     gt (args) {
         return Cast.compare(args.OPERAND1, args.OPERAND2) > 0;

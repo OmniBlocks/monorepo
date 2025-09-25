@@ -2,7 +2,7 @@ name: Test Monitor (Auto-Issue on Fail)
 
 on:
   push:
-    branches: [ main, master ]  # Runs on every commit to main/master
+    branches: [ develop ]  
 
 jobs:
   test-monitor:

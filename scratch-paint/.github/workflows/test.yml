@@ -48,7 +48,7 @@ jobs:
 
             Test output:
             ${{ env.TEST_OUTPUT }}
-
+ 
             Commit: ${{ github.sha }}
 
       # 6. Create issue if tests failed

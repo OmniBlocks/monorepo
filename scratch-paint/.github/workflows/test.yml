@@ -29,9 +29,24 @@ jobs:
       - name: Run tests
         id: tests
         run: |
-          npm run test > test-output.txt 2>&1 || echo "TESTS_FAILED=true" >> $GITHUB_ENV
-          echo "TEST_OUTPUT=$(cat test-output.txt)" >> $GITHUB_ENV
+          # Run tests and capture both stdout and stderr
+          set +e
+          npm run test 2>&1 | tee test-output.txt
+          TEST_EXIT_CODE=${PIPESTATUS[0]}
+          set -e
+          
+          # Set environment variables based on test results
+          if [ $TEST_EXIT_CODE -ne 0 ]; then
+            echo "TESTS_FAILED=true" >> $GITHUB_ENV
+          fi
+          
+          # Escape newlines and special characters for JSON output
+          echo "TEST_OUTPUT<<EOF" >> $GITHUB_ENV
+          cat test-output.txt >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+          
           echo "SHORT_SHA=${GITHUB_SHA:0:7}" >> $GITHUB_ENV
+
 
       # 5. Generate failure summary with AI
       - name: Generate failure report

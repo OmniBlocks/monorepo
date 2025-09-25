@@ -1,15 +1,15 @@
-name: Test Monitor (Auto-Issue on Fail)
+name: PR Test Reporter
 
 on:
-  push:
-    branches: [ develop ]  
+  pull_request:
+    branches: [ develop ]
 
 jobs:
-  test-monitor:
+  test-and-comment:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      issues: write  # Required to create issues
+      pull-requests: write
 
     steps:
       # 1. Checkout code
@@ -32,44 +32,44 @@ jobs:
           npm run test > test-output.txt 2>&1 || echo "TESTS_FAILED=true" >> $GITHUB_ENV
           echo "TEST_OUTPUT=$(cat test-output.txt | jq -R -s -c '.')" >> $GITHUB_ENV
 
-      # 5. Generate AI summary (only if tests failed)
-      - name: Generate failure summary
+      # 5. AI Summary (using YOUR original AI inference action)
+      - name: Generate test summary
         if: env.TESTS_FAILED == 'true'
         id: ai-summary
-        uses: actions/ai@v0
+        uses: actions/ai-inference@v1  # From your original workflow
         with:
           prompt: |
-            Create a GitHub issue body for failed tests:
-            - Start with "🚨 Tests failed in commit: [SHA]"
-            - List 1-3 key failures (file + error snippet)
-            - Add a "How to Reproduce" section
-            - Format as markdown
-            - Keep it under 200 words
+            Summarize these test failures for a GitHub PR comment:
+            - Start with "❌ Tests failed"
+            - List 1-3 key errors (file + error type)
+            - Format as bullet points
+            - Keep it under 100 words
+            - Example:
+              """
+              ❌ Tests failed
+              - `src/utils.js`: TypeError: undefined is not a function
+              - `test/api.js`: Timeout of 2000ms exceeded
+              """
 
-            Test output:
+            Raw test output:
             ${{ env.TEST_OUTPUT }}
- 
-            Commit: ${{ github.sha }}
 
-      # 6. Create issue if tests failed
-      - name: Create failure issue
+      # 6. Post comment to PR
+      - name: Comment on PR
         if: env.TESTS_FAILED == 'true'
         uses: actions/github-script@v6
         with:
           script: |
-            const { data: issue } = await github.rest.issues.create({
+            const { data: comment } = await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              title: `🚨 Tests failed in ${context.sha.substring(0, 7)}`,
+              issue_number: context.issue.number,
               body: `
                 ${{ steps.ai-summary.outputs.response }}
 
-                **Full Test Output:**
                 <details>
+                  <summary>📜 Full Test Output</summary>
                   <pre>${{ env.TEST_OUTPUT }}</pre>
                 </details>
-
-                *Triggered by push to ${context.ref}*
-              `,
-              labels: ['tests', 'bug']
+              `
             });

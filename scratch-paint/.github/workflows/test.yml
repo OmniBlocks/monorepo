@@ -23,7 +23,7 @@ jobs:
 
       # 3. Install dependencies
       - name: Install dependencies
-        run: npm ci
+        run: npm install  --legacy-peer-deps
 
       # 4. Run tests and capture output
       - name: Run tests

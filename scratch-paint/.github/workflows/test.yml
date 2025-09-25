@@ -23,7 +23,7 @@ jobs:
 
       # 3. Install dependencies
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       # 4. Run tests and capture output
       - name: Run tests

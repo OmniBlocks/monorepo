@@ -540,7 +540,7 @@ class ScriptTreeGenerator {
                 case 'costume name':
                     return new IntermediateInput(InputOpcode.SENSING_OF_COSTUME_NAME, InputType.STRING, {object});
                 case 'size':
-                    return new IntermediateInput(InputOpcode.SENSING_OF_SIZE, InputType.NUMBER_POS_REAL, {object});
+                    return new IntermediateInput(InputOpcode.SENSING_OF_SIZE, InputType.NUMBER_POS, {object});
                 }
             }
 

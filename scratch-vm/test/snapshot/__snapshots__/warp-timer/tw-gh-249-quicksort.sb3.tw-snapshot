@@ -19,7 +19,7 @@ const b1 = stage.variables["rQq!wAuU2T9DV9,S[/s."];
 return function* genXYZ_run () {
 b0.value = [];
 for (var a0 = 100; a0 >= 0.5; a0--) {
-b0.value.push((b1.value[((b0.value.length + 1) | 0) - 1] ?? ""));
+b0.value.push((b1.value[(b0.value.length + 1) - 1] ?? ""));
 b0._monitorUpToDate = false;
 if (isStuck()) yield;
 }

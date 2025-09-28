@@ -8,6 +8,10 @@ const OPT_OUT_KEY = 'tw:windchime_opt_out';
 const submittedThisSession = new Set();
 
 const isOptedOut = () => {
+    if (!process.env.ENABLE_WINDCHIMES) {
+        return true;
+    }
+
     try {
         const local = localStorage.getItem(OPT_OUT_KEY);
         if (local !== null) {

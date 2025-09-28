@@ -262,7 +262,7 @@ class ScriptTreeGenerator {
                 index: this.descendInputOfBlock(block, 'INDEX')
             });
         case 'data_lengthoflist':
-            return new IntermediateInput(InputOpcode.LIST_LENGTH, InputType.NUMBER_POS_REAL | InputType.NUMBER_ZERO, {
+            return new IntermediateInput(InputOpcode.LIST_LENGTH, InputType.NUMBER_POS_INT | InputType.NUMBER_ZERO, {
                 list: this.descendVariable(block, 'LIST', LIST_TYPE)
             });
         case 'data_listcontainsitem':
@@ -271,7 +271,7 @@ class ScriptTreeGenerator {
                 item: this.descendInputOfBlock(block, 'ITEM')
             });
         case 'data_itemnumoflist':
-            return new IntermediateInput(InputOpcode.LIST_INDEX_OF, InputType.NUMBER_POS_REAL | InputType.NUMBER_ZERO, {
+            return new IntermediateInput(InputOpcode.LIST_INDEX_OF, InputType.NUMBER_POS_INT | InputType.NUMBER_ZERO, {
                 list: this.descendVariable(block, 'LIST', LIST_TYPE),
                 item: this.descendInputOfBlock(block, 'ITEM')
             });
@@ -290,12 +290,12 @@ class ScriptTreeGenerator {
 
         case 'looks_backdropnumbername':
             if (block.fields.NUMBER_NAME.value === 'number') {
-                return new IntermediateInput(InputOpcode.LOOKS_BACKDROP_NUMBER, InputType.NUMBER_POS_REAL);
+                return new IntermediateInput(InputOpcode.LOOKS_BACKDROP_NUMBER, InputType.NUMBER_POS_INT);
             }
             return new IntermediateInput(InputOpcode.LOOKS_BACKDROP_NAME, InputType.STRING);
         case 'looks_costumenumbername':
             if (block.fields.NUMBER_NAME.value === 'number') {
-                return new IntermediateInput(InputOpcode.LOOKS_COSTUME_NUMBER, InputType.NUMBER_POS_REAL);
+                return new IntermediateInput(InputOpcode.LOOKS_COSTUME_NUMBER, InputType.NUMBER_POS_INT);
             }
             return new IntermediateInput(InputOpcode.LOOKS_COSTUME_NAME, InputType.STRING);
         case 'looks_size':
@@ -482,13 +482,13 @@ class ScriptTreeGenerator {
             });
         case 'sensing_current':
             switch (block.fields.CURRENTMENU.value.toLowerCase()) {
-            case 'year': return new IntermediateInput(InputOpcode.SENSING_TIME_YEAR, InputType.NUMBER_POS_REAL | InputType.NUMBER_ZERO);
-            case 'month': return new IntermediateInput(InputOpcode.SENSING_TIME_MONTH, InputType.NUMBER_POS_REAL);
-            case 'date': return new IntermediateInput(InputOpcode.SENSING_TIME_DATE, InputType.NUMBER_POS_REAL);
-            case 'dayofweek': return new IntermediateInput(InputOpcode.SENSING_TIME_WEEKDAY, InputType.NUMBER_POS_REAL);
-            case 'hour': return new IntermediateInput(InputOpcode.SENSING_TIME_HOUR, InputType.NUMBER_POS_REAL | InputType.NUMBER_ZERO);
-            case 'minute': return new IntermediateInput(InputOpcode.SENSING_TIME_MINUTE, InputType.NUMBER_POS_REAL | InputType.NUMBER_ZERO);
-            case 'second': return new IntermediateInput(InputOpcode.SENSING_TIME_SECOND, InputType.NUMBER_POS_REAL | InputType.NUMBER_ZERO);
+            case 'year': return new IntermediateInput(InputOpcode.SENSING_TIME_YEAR, InputType.NUMBER_POS_INT | InputType.NUMBER_ZERO);
+            case 'month': return new IntermediateInput(InputOpcode.SENSING_TIME_MONTH, InputType.NUMBER_POS_INT);
+            case 'date': return new IntermediateInput(InputOpcode.SENSING_TIME_DATE, InputType.NUMBER_POS_INT);
+            case 'dayofweek': return new IntermediateInput(InputOpcode.SENSING_TIME_WEEKDAY, InputType.NUMBER_POS_INT);
+            case 'hour': return new IntermediateInput(InputOpcode.SENSING_TIME_HOUR, InputType.NUMBER_POS_INT | InputType.NUMBER_ZERO);
+            case 'minute': return new IntermediateInput(InputOpcode.SENSING_TIME_MINUTE, InputType.NUMBER_POS_INT | InputType.NUMBER_ZERO);
+            case 'second': return new IntermediateInput(InputOpcode.SENSING_TIME_SECOND, InputType.NUMBER_POS_INT | InputType.NUMBER_ZERO);
             default: return this.createConstantInput(0);
             }
         case 'sensing_dayssince2000':
@@ -523,7 +523,7 @@ class ScriptTreeGenerator {
                 switch (property) {
                 case 'background #': // fallthrough for scratch 1.0 compatibility
                 case 'backdrop #':
-                    return new IntermediateInput(InputOpcode.SENSING_OF_BACKDROP_NUMBER, InputType.NUMBER_POS_REAL);
+                    return new IntermediateInput(InputOpcode.SENSING_OF_BACKDROP_NUMBER, InputType.NUMBER_POS_INT);
                 case 'backdrop name':
                     return new IntermediateInput(InputOpcode.SENSING_OF_BACKDROP_NAME, InputType.STRING);
                 }
@@ -536,7 +536,7 @@ class ScriptTreeGenerator {
                 case 'direction':
                     return new IntermediateInput(InputOpcode.SENSING_OF_DIRECTION, InputType.NUMBER_REAL, {object});
                 case 'costume #':
-                    return new IntermediateInput(InputOpcode.SENSING_OF_COSTUME_NUMBER, InputType.NUMBER_POS_REAL, {object});
+                    return new IntermediateInput(InputOpcode.SENSING_OF_COSTUME_NUMBER, InputType.NUMBER_POS_INT, {object});
                 case 'costume name':
                     return new IntermediateInput(InputOpcode.SENSING_OF_COSTUME_NAME, InputType.STRING, {object});
                 case 'size':

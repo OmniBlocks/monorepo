@@ -530,9 +530,9 @@ class ScriptTreeGenerator {
             } else {
                 switch (property) {
                 case 'x position':
-                    return new IntermediateInput(InputOpcode.SENSING_OF_POS_X, InputType.NUMBER_REAL, {object});
+                    return new IntermediateInput(InputOpcode.SENSING_OF_POS_X, InputType.NUMBER, {object});
                 case 'y position':
-                    return new IntermediateInput(InputOpcode.SENSING_OF_POS_Y, InputType.NUMBER_REAL, {object});
+                    return new IntermediateInput(InputOpcode.SENSING_OF_POS_Y, InputType.NUMBER, {object});
                 case 'direction':
                     return new IntermediateInput(InputOpcode.SENSING_OF_DIRECTION, InputType.NUMBER_REAL, {object});
                 case 'costume #':
@@ -540,7 +540,7 @@ class ScriptTreeGenerator {
                 case 'costume name':
                     return new IntermediateInput(InputOpcode.SENSING_OF_COSTUME_NAME, InputType.STRING, {object});
                 case 'size':
-                    return new IntermediateInput(InputOpcode.SENSING_OF_SIZE, InputType.NUMBER_POS_REAL, {object});
+                    return new IntermediateInput(InputOpcode.SENSING_OF_SIZE, InputType.NUMBER_POS, {object});
                 }
             }
 

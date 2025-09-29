@@ -9,19 +9,6 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
-    - name: Check package.json
-      id: check-package
-      run: |
-        if [ ! -f package.json ]; then
-          echo "error=missing-package-json" >> $GITHUB_OUTPUT
-          echo "Package.json file not found!"
-        elif ! jq empty package.json 2>/dev/null; then
-          echo "error=invalid-package-json" >> $GITHUB_OUTPUT
-          json_error=$(jq empty package.json 2>&1 | head -1 || true)
-          echo "json_error=$json_error" >> $GITHUB_OUTPUT
-          echo "Package.json contains invalid JSON"
-        fi
-        
     - name: Set up Node.js
       uses: actions/setup-node@v3
       with:
@@ -30,13 +17,6 @@ jobs:
     - name: Install dependencies
       id: install
       run: |
-        # Skip if package.json is invalid
-        if [ "${{ steps.check-package.outputs.error }}" = "invalid-package-json" ] || [ "${{ steps.check-package.outputs.error }}" = "missing-package-json" ]; then
-          echo "Skipping npm ci due to package.json issues"
-          echo "status=failure" >> $GITHUB_OUTPUT
-          exit 0
-        fi
-        
         npm ci 2>&1 | tee install-output.log || {
           echo "status=failure" >> $GITHUB_OUTPUT
           echo "error=npm-ci-failed" >> $GITHUB_OUTPUT
@@ -46,13 +26,6 @@ jobs:
     - name: Run build
       id: build
       run: |
-        # Skip if package.json is invalid or installation failed
-        if [ "${{ steps.check-package.outputs.error }}" ] || [ "${{ steps.install.outputs.status }}" = "failure" ]; then
-          echo "Skipping build due to previous failures"
-          echo "status=failure" >> $GITHUB_OUTPUT
-          exit 0
-        fi
-        
         npm run build 2>&1 | tee build-output.log || {
           echo "status=failure" >> $GITHUB_OUTPUT
           echo "error=build-failed" >> $GITHUB_OUTPUT
@@ -60,39 +33,19 @@ jobs:
         }
       
     - name: Create issue if failed
-      if: steps.check-package.outputs.error || steps.install.outputs.status == 'failure' || steps.build.outputs.status == 'failure'
+      if: steps.install.outputs.status == 'failure' || steps.build.outputs.status == 'failure'
       uses: actions/github-script@v6
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         script: |
-          const errorType = '${{ steps.check-package.outputs.error || steps.install.outputs.error || steps.build.outputs.error }}';
-          const jsonError = '${{ steps.check-package.outputs.json_error }}';
-          
-          let title = '';
-          let body = '';
-          let logContent = '';
-          
           try {
             const fs = require('fs');
-            
-            if (errorType === 'missing-package-json') {
-              title = `Build Failure - Missing package.json - ${new Date().toLocaleString()}`;
-              body = `🚨 **package.json file not found in commit [\`${context.sha.substring(0, 7)}\`](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/commit/${context.sha})**`;
-            } 
-            else if (errorType === 'invalid-package-json') {
-              title = `Build Failure - Invalid package.json - ${new Date().toLocaleString()}`;
-              body = [
-                `🚨 **package.json contains invalid JSON in commit [\`${context.sha.substring(0, 7)}\`](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/commit/${context.sha})**`,
-                '',
-                `**JSON Error:** ${jsonError}`,
-                '',
-                '**Next steps:**',
-                '1. Check the package.json file for syntax errors',
-                '2. Validate your JSON using a JSON validator',
-                '3. Fix the issues or revert the commit'
-              ].join('\n');
-            }
-            else if (errorType === 'npm-ci-failed') {
+            const errorType = process.env.INPUT_ERROR_TYPE || '${{ steps.install.outputs.error || steps.build.outputs.error }}';
+            let logContent = '';
+            let title = '';
+            let body = '';
+
+            if (errorType === 'npm-ci-failed') {
               logContent = fs.readFileSync('install-output.log', 'utf8');
               title = `Build Failure - Dependency Installation Failed - ${new Date().toLocaleString()}`;
               body = [
@@ -100,11 +53,7 @@ jobs:
                 '',
                 '**Most relevant errors:**',
                 '```',
-                logContent.split('\n').filter(line => 
-                  line.toLowerCase().includes('error') || 
-                  line.toLowerCase().includes('fail') || 
-                  line.includes('ERR!')
-                ).join('\n'),
+                logContent.split('\n').filter(line => line.toLowerCase().includes('error') || line.toLowerCase().includes('fail') || line.includes('ERR!')).join('\n'),
                 '```',
                 '',
                 `**Workflow run:** [View details](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`,
@@ -115,16 +64,9 @@ jobs:
                 '```',
                 logContent,
                 '```',
-                '</details>',
-                '',
-                '**Next steps:**',
-                '1. Check the package.json and package-lock.json files',
-                '2. Verify all dependencies are properly specified',
-                '3. Try running "npm ci" locally to debug',
-                '4. Fix the issues or revert the commit'
+                '</details>'
               ].join('\n');
-            }
-            else if (errorType === 'build-failed') {
+            } else if (errorType === 'build-failed') {
               logContent = fs.readFileSync('build-output.log', 'utf8');
               title = `Build Failure - Build Process Failed - ${new Date().toLocaleString()}`;
               body = [
@@ -132,11 +74,7 @@ jobs:
                 '',
                 '**Most relevant errors:**',
                 '```',
-                logContent.split('\n').filter(line => 
-                  line.toLowerCase().includes('error') || 
-                  line.toLowerCase().includes('fail') || 
-                  line.includes('ERR!')
-                ).join('\n'),
+                logContent.split('\n').filter(line => line.toLowerCase().includes('error') || line.toLowerCase().includes('fail') || line.includes('ERR!')).join('\n'),
                 '```',
                 '',
                 `**Workflow run:** [View details](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`,
@@ -147,15 +85,10 @@ jobs:
                 '```',
                 logContent,
                 '```',
-                '</details>',
-                '',
-                '**Next steps:**',
-                '1. Check the commit changes',
-                '2. Review the build errors above',
-                '3. Fix the issues or revert the commit'
+                '</details>'
               ].join('\n');
             }
-            
+
             // Check for existing issues
             const { data: issues } = await github.rest.issues.listForRepo({
               owner: context.repo.owner,

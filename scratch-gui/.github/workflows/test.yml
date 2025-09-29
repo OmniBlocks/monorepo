@@ -9,37 +9,34 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
-    - name: Validate package.json
-      id: validate-package
+    - name: Check package.json
+      id: check-package
       run: |
         if [ ! -f package.json ]; then
-          echo "status=failure" >> $GITHUB_OUTPUT
           echo "error=missing-package-json" >> $GITHUB_OUTPUT
           echo "Package.json file not found!"
-          exit 1
-        fi
-        
-        # Check if package.json is valid JSON
-        if ! jq empty package.json 2>/dev/null; then
-          echo "status=failure" >> $GITHUB_OUTPUT
+        elif ! jq empty package.json 2>/dev/null; then
           echo "error=invalid-package-json" >> $GITHUB_OUTPUT
-          echo "Package.json contains invalid JSON"
-          # Capture the first syntax error
           json_error=$(jq empty package.json 2>&1 | head -1 || true)
           echo "json_error=$json_error" >> $GITHUB_OUTPUT
-          exit 1
+          echo "Package.json contains invalid JSON"
         fi
         
     - name: Set up Node.js
-      if: steps.validate-package.outputs.status != 'failure'
       uses: actions/setup-node@v3
       with:
         node-version: '20'
         
     - name: Install dependencies
-      if: steps.validate-package.outputs.status != 'failure'
       id: install
       run: |
+        # Skip if package.json is invalid
+        if [ "${{ steps.check-package.outputs.error }}" = "invalid-package-json" ] || [ "${{ steps.check-package.outputs.error }}" = "missing-package-json" ]; then
+          echo "Skipping npm ci due to package.json issues"
+          echo "status=failure" >> $GITHUB_OUTPUT
+          exit 0
+        fi
+        
         npm ci 2>&1 | tee install-output.log || {
           echo "status=failure" >> $GITHUB_OUTPUT
           echo "error=npm-ci-failed" >> $GITHUB_OUTPUT
@@ -47,9 +44,15 @@ jobs:
         }
       
     - name: Run build
-      if: steps.validate-package.outputs.status != 'failure' && steps.install.outputs.status != 'failure'
       id: build
       run: |
+        # Skip if package.json is invalid or installation failed
+        if [ "${{ steps.check-package.outputs.error }}" ] || [ "${{ steps.install.outputs.status }}" = "failure" ]; then
+          echo "Skipping build due to previous failures"
+          echo "status=failure" >> $GITHUB_OUTPUT
+          exit 0
+        fi
+        
         npm run build 2>&1 | tee build-output.log || {
           echo "status=failure" >> $GITHUB_OUTPUT
           echo "error=build-failed" >> $GITHUB_OUTPUT
@@ -57,13 +60,13 @@ jobs:
         }
       
     - name: Create issue if failed
-      if: steps.validate-package.outputs.status == 'failure' || steps.install.outputs.status == 'failure' || steps.build.outputs.status == 'failure'
+      if: steps.check-package.outputs.error || steps.install.outputs.status == 'failure' || steps.build.outputs.status == 'failure'
       uses: actions/github-script@v6
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         script: |
-          const errorType = '${{ steps.validate-package.outputs.error || steps.install.outputs.error || steps.build.outputs.error }}';
-          const jsonError = '${{ steps.validate-package.outputs.json_error }}';
+          const errorType = '${{ steps.check-package.outputs.error || steps.install.outputs.error || steps.build.outputs.error }}';
+          const jsonError = '${{ steps.check-package.outputs.json_error }}';
           
           let title = '';
           let body = '';

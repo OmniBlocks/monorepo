@@ -16,31 +16,37 @@ jobs:
         
     - name: Install dependencies
       id: install
+      continue-on-error: true
       run: |
         install_output=$(npm ci 2>&1)
         if [ $? -ne 0 ]; then
-          echo "::set-output name=status::failure"
-          echo "::set-output name=error_output::${install_output//$'\n'/'%0A'}"
-          exit 1
+          echo "install-failed=true" >> $GITHUB_OUTPUT
+          echo "error-output<<EOF" >> $GITHUB_OUTPUT
+          echo "$install_output" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+          exit 0
         fi
         
     - name: Run build
       id: build
-      if: steps.install.outputs.status != 'failure'
+      if: steps.install.outputs.install-failed != 'true'
+      continue-on-error: true
       run: |
         build_output=$(npm run build 2>&1)
         if [ $? -ne 0 ]; then
-          echo "::set-output name=status::failure"
-          echo "::set-output name=error_output::${build_output//$'\n'/'%0A'}"
-          exit 1
+          echo "build-failed=true" >> $GITHUB_OUTPUT
+          echo "error-output<<EOF" >> $GITHUB_OUTPUT
+          echo "$build_output" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+          exit 0
         fi
         
     - name: Create issue if failed
-      if: steps.install.outputs.status == 'failure' || steps.build.outputs.status == 'failure'
+      if: steps.install.outputs.install-failed == 'true' || steps.build.outputs.build-failed == 'true'
       uses: actions/github-script@v6
       with:
         script: |
-          const errorStep = steps.install.outputs.status == 'failure' ? 'dependency installation' : 'build';
+          const errorStep = steps.install.outputs.install-failed == 'true' ? 'dependency installation' : 'build';
           const errorOutput = `\`\`\`\n${process.env.ERROR_OUTPUT}\n\`\`\``;
           
           const { data: issues } = await github.rest.issues.listForRepo({
@@ -50,7 +56,6 @@ jobs:
             labels: 'build-failure'
           });
           
-          // Check if an open issue with this label already exists
           const existingIssue = issues.find(issue => 
             issue.title.includes('Build Failure') && 
             issue.labels.some(label => label.name === 'build-failure')
@@ -76,5 +81,5 @@ jobs:
             });
           }
       env:
-        ERROR_OUTPUT: ${{ steps.install.outputs.error_output || steps.build.outputs.error_output }}
+        ERROR_OUTPUT: ${{ steps.install.outputs.error-output || steps.build.outputs.error-output }}
         steps: ${{ toJson(steps) }}

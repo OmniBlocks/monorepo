@@ -36,21 +36,21 @@ jobs:
             const buildOutput = fs.readFileSync('build-output.log', 'utf8');
             
             // Create issue body
-            const issueBody = `
-🚨 **Build failed in commit [\`${context.sha.substring(0, 7)}\`](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/commit/${context.sha})**
-
-**Workflow run:** [View details](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})
-
-**Build output:**
-\`\`\`
-${buildOutput}
-\`\`\`
-
-**Next steps:**
-1. Check the commit changes
-2. Review the build errors above
-3. Fix the issues or revert the commit
-`;
+            const issueBody = [
+              `🚨 Build failed in commit [${context.sha.substring(0, 7)}](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/commit/${context.sha})`,
+              '',
+              `**Workflow run:** [View details](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`,
+              '',
+              '**Build output:**',
+              '```',
+              buildOutput,
+              '```',
+              '',
+              '**Next steps:**',
+              '1. Check the commit changes',
+              '2. Review the build errors above',
+              '3. Fix the issues or revert the commit'
+            ].join('\n');
             
             // Create issue
             await github.rest.issues.create({

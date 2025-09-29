@@ -5,9 +5,9 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#59C0C0"/>
-    <meta property="og:image" content="/boxy_sad.svg" />
+    <meta property="og:image" content="/Boxy-sad.svg" />
     <meta name="description" content="OmniBlocks is a Multi-Language IDE based on TurboWarp with enhanced features like a music editor and planned support for text-based languages." />
-    <title>Page Not Found | OmniBlocks</title>
+    <title>Page Not Found - OmniBlocks</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style type="text/css">
         :root {
@@ -125,12 +125,13 @@
             text-decoration: none;
             font-weight: bold;
             margin-top: 2rem;
-            transition: all 0.2s ease;
+            transition: all 0.2s ease-in-out;
+            transform: scale(100%)
         }
 
         .home-button:hover {
             background: var(--primary-dark);
-            transform: translateY(-2px);
+            transform: scale(120%);
             box-shadow: 0 4px 8px var(--looks-light-transparent);
         }
 
@@ -151,14 +152,14 @@
         }
 
         .scrtxt {
-            color: #F5F5F5;
+            color: transparent;
             font-weight: bold;
         }
 
         .license {
             margin-top: 3rem;
             font-size: 0.8rem;
-            color: #666;
+            color: #646464;
             text-align: center;
         }
 
@@ -185,7 +186,7 @@
             <h1>404 - Page Not Found</h1>
             <h2>Looks like you hit a bug!</h2>
             
-            <p>The requested URL couldn't be found in our codebase:</p>
+            <p>The requested URL couldn't be found in OmniBlocks:</p>
             <p class="url-display" id="url-display"></p>
             <p>It may have been moved, renamed, or does not exist.</p>
             
@@ -198,8 +199,8 @@
         </div>
         
         <div class="images">
-            <img src="https://raw.githubusercontent.com/OmniBlocks/scratch-gui/refs/heads/main/static/favicon.ico" alt="OmniBlocks Logo" class="logo">
-            <img src="https://raw.githubusercontent.com/OmniBlocks/scratch-gui/d39834ac34f4fd5475dd7d03153822d6d39af9f7/static/Boxy-sad.svg" alt="Sad Boxy. :(" class="boxy-sad">
+            <img src="./favicon.ico" alt="OmniBlocks Logo" class="logo">
+            <img src="./Boxy-sad.svg" alt="Sad Boxy. :(" class="boxy-sad">
         </div>
     </div>
     
@@ -212,7 +213,6 @@
         You got the egg.<br>
         It's an easter egg. Inside is a...<br>
         OmniBlock?
-        </p>
     </div>
 <script>
         // man i couldve done it like that.

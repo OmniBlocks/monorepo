@@ -1,0 +1,61 @@
+name: Test and Build Monitor
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Run tests
+      id: tests
+      run: npm test || echo "::set-output name=status::failure"
+      
+    - name: Run build
+      id: build
+      run: npm run build || echo "::set-output name=status::failure"
+      
+    - name: Create issue if tests or build failed
+      if: steps.tests.outputs.status == 'failure' || steps.build.outputs.status == 'failure'
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const { data: issues } = await github.rest.issues.listForRepo({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            state: 'open',
+            labels: 'build-failure'
+          });
+          
+          // Check if an open issue with this label already exists
+          const existingIssue = issues.find(issue => 
+            issue.title.includes('Test/Build Failure') && 
+            issue.labels.some(label => label.name === 'build-failure')
+          );
+          
+          if (!existingIssue) {
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `Test/Build Failure - ${new Date().toISOString()}`,
+              body: `The latest commit (${context.sha}) failed tests or build. Please check the [workflow run](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}).`,
+              labels: ['build-failure', 'bug']
+            });
+          } else {
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: existingIssue.number,
+              body: `Another failure detected in commit ${context.sha}. See the [workflow run](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}).`
+            });
+          }

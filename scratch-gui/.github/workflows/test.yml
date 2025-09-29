@@ -42,7 +42,7 @@ jobs:
       uses: actions/github-script@v6
       with:
         script: |
-          const failedStep = steps.install.outputs.install_status == 'failure' ? 'dependency installation' : 'build';
+          const failedStep = process.env.INSTALL_STATUS === 'failure' ? 'dependency installation' : 'build';
           const errorOutput = `\`\`\`\n${process.env.ERROR_OUTPUT}\n\`\`\``;
           
           const { data: issues } = await github.rest.issues.listForRepo({
@@ -78,4 +78,5 @@ jobs:
           }
       env:
         ERROR_OUTPUT: ${{ steps.install.outputs.error_output || steps.build.outputs.error_output }}
-        steps: ${{ toJson(steps) }}
+        INSTALL_STATUS: ${{ steps.install.outputs.install_status }}
+        BUILD_STATUS: ${{ steps.build.outputs.build_status }}

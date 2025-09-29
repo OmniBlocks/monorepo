@@ -1,4 +1,7 @@
 name: Build Monitor
+permissions:
+  contents: read
+  issues: write
 on:
   push:
     branches: [ main ]

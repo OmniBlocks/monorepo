@@ -14,31 +14,43 @@ jobs:
       with:
         node-version: '20'
         
-    - name: Install dependencies
-      run: npm ci
+    - name: Install dependencies and capture output
+      id: install
+      run: |
+        npm ci 2>&1 | tee install-output.log
+        if [ ${PIPESTATUS[0]} -ne 0 ]; then
+          echo "status=failure" >> $GITHUB_OUTPUT
+          echo "step=failed-install" >> $GITHUB_OUTPUT
+          echo "npm ci failed, see install-output.log"
+          exit 1
+        fi
       
     - name: Run build and capture output
       id: build
+      if: steps.install.outputs.status != 'failure'
       run: |
-        # Run build and capture both stdout and stderr
         npm run build 2>&1 | tee build-output.log
         if [ ${PIPESTATUS[0]} -ne 0 ]; then
           echo "status=failure" >> $GITHUB_OUTPUT
+          echo "step=failed-build" >> $GITHUB_OUTPUT
           echo "Build failed, see build-output.log"
+          exit 1
         fi
       
-    - name: Create issue if build failed
-      if: steps.build.outputs.status == 'failure'
+    - name: Create issue if failed
+      if: steps.install.outputs.status == 'failure' || steps.build.outputs.status == 'failure'
       uses: actions/github-script@v6
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         script: |
           const fs = require('fs');
           try {
-            const buildOutput = fs.readFileSync('build-output.log', 'utf8');
+            const failedStep = '${{ steps.install.outputs.step || steps.build.outputs.step }}';
+            const logFile = failedStep === 'failed-install' ? 'install-output.log' : 'build-output.log';
+            const output = fs.readFileSync(logFile, 'utf8');
             
             // Extract the most relevant error lines
-            const errorLines = buildOutput.split('\n').filter(line => 
+            const errorLines = output.split('\n').filter(line => 
               line.toLowerCase().includes('error') || 
               line.toLowerCase().includes('fail') || 
               line.includes('ERR!')
@@ -57,25 +69,29 @@ jobs:
               errorSummary = 'No specific error messages detected';
             }
             
+            const failureType = failedStep === 'failed-install' 
+              ? 'Dependency installation (npm ci)' 
+              : 'Build (npm run build)';
+            
             // Format the issue body
             const issueBody = [
-              `🚨 **Build failed in commit [\`${context.sha.substring(0, 7)}\`](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/commit/${context.sha})**`,
+              `🚨 **${failureType} failed in commit [\`${context.sha.substring(0, 7)}\`](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/commit/${context.sha})**`,
               '',
               errorSummary,
               '',
               `**Workflow run:** [View details](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`,
               '',
               '<details>',
-              '<summary>Full build output</summary>',
+              '<summary>Full output</summary>',
               '',
               '```',
-              buildOutput,
+              output,
               '```',
               '</details>',
               '',
               '**Next steps:**',
               '1. Check the commit changes',
-              '2. Review the build errors above',
+              failedStep === 'failed-install' ? '2. Check package.json and lockfile' : '2. Review the build errors',
               '3. Fix the issues or revert the commit'
             ].join('\n');
 
@@ -96,7 +112,7 @@ jobs:
               await github.rest.issues.create({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                title: `Build Failure - ${new Date().toLocaleString()}`,
+                title: `Build Failure - ${failureType} - ${new Date().toLocaleString()}`,
                 body: issueBody,
                 labels: ['build-failure', 'bug']
               });
@@ -105,17 +121,17 @@ jobs:
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: existingIssue.number,
-                body: `⚠️ **New build failure detected**\n\n${issueBody}`
+                body: `⚠️ **New failure detected**\n\n${issueBody}`
               });
             }
           } catch (error) {
             console.error('Error creating issue:', error);
-            // Fallback to simple issue creation if file reading fails
+            // Fallback to simple issue creation
             await github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
               title: `Build Failure - ${new Date().toLocaleString()}`,
-              body: `Build failed in commit ${context.sha}. Please check the [workflow run](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}) for details.`,
+              body: `Build process failed in commit ${context.sha}. Please check the [workflow run](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}) for details.`,
               labels: ['build-failure', 'bug']
             });
           }

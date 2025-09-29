@@ -1,7 +1,7 @@
 {
   "short_name": "OmniBlocks",
   "name": "OmniBlocks",
-  "description": "Mod of Scratch 3 with a compiler, dark mode, python execution, music creatino, and more features.",
+  "description": "Developing Open Source MultiLanguage IDE with features such as a code, paint, sound, and even music editor.",
   "icons": [
     {
       "src": "images/192.png",

@@ -1,4 +1,3 @@
-
 import './import-first';
 
 import React from 'react';
@@ -12,30 +11,23 @@ import {Theme} from '../lib/themes/index.js';
 import GUI from './render-gui.jsx';
 import render from './app-target';
 
-// Extract project ID from URL hash or pathname for OmniBlocks
 const getProjectId = () => {
-    // OmniBlocks expects #<id>/embed only (GH Pages)
-    const hashMatch = location.hash.match(/^#(\d+)\/embed/);
-    if (hashMatch) return hashMatch[1];
-
-    // If custom domain support is added, uncomment below:
-    // const pathMatch = location.pathname.match(/^\/(\d+)\/embed/);
-    // if (pathMatch) return pathMatch[1];
-
-    return null;
+    // For compatibility reasons, we first look at the hash.
+    // eg. https://turbowarp.org/embed.html#1
+    const hashMatch = location.hash.match(/#(\d+)/);
+    if (hashMatch !== null) {
+        return hashMatch[1];
+    }
+    // Otherwise, we'll recreate what "wildcard" routing does.
+    // eg. https://turbowarp.org/1/embed
+    const pathMatch = location.pathname.match(/(\d+)\/embed/);
+    if (pathMatch !== null) {
+        return pathMatch[pathMatch.length - 1];
+    }
+    return '0';
 };
 
 const projectId = getProjectId();
-
-// Construct embed URL for OmniBlocks
-let embedUrl;
-if (projectId != null) {
-    embedUrl = `${location.origin}/#${projectId}/embed`;
-} else {
-    console.warn('No project ID found: Embedding without a project.');
-    embedUrl = location.href;
-}
-
 const urlParams = new URLSearchParams(location.search);
 
 let vm;
@@ -51,34 +43,21 @@ const onProjectLoaded = () => {
     }
 };
 
-// Hide splash screen when GUI is ready
-const hideSplash = () => {
-    if (window.SplashEnd) window.SplashEnd();
-};
-
-// Wrap the GUI with HOCs
 const WrappedGUI = compose(
     AppStateHOC,
     TWStateManagerHOC,
     TWEmbedFullScreenHOC
 )(GUI);
 
-// Render the embedded GUI
-render(
-    <WrappedGUI
-        isEmbedded
-        projectId={projectId}
-        onVmInit={onVmInit}
-        onProjectLoaded={() => {
-            onProjectLoaded();
-            hideSplash();
-        }}
-        routingStyle="none"
-        theme={Theme.light}
-    />
-);
+render(<WrappedGUI
+    isEmbedded
+    projectId={projectId}
+    onVmInit={onVmInit}
+    onProjectLoaded={onProjectLoaded}
+    routingStyle="none"
+    theme={Theme.light}
+/>);
 
-// Run addons if requested
 if (urlParams.has('addons')) {
     runAddons();
 }

@@ -15,23 +15,34 @@ jobs:
         node-version: '20'
         
     - name: Install dependencies
-      run: npm ci
-      
+      id: install
+      run: |
+        install_output=$(npm ci 2>&1)
+        if [ $? -ne 0 ]; then
+          echo "::set-output name=status::failure"
+          echo "::set-output name=error_output::${install_output//$'\n'/'%0A'}"
+          exit 1
+        fi
+        
     - name: Run build
       id: build
+      if: steps.install.outputs.status != 'failure'
       run: |
         build_output=$(npm run build 2>&1)
         if [ $? -ne 0 ]; then
           echo "::set-output name=status::failure"
-          echo "::set-output name=build_output::${build_output//$'\n'/'%0A'}"
+          echo "::set-output name=error_output::${build_output//$'\n'/'%0A'}"
+          exit 1
         fi
         
-    - name: Create issue if build failed
-      if: steps.build.outputs.status == 'failure'
+    - name: Create issue if failed
+      if: steps.install.outputs.status == 'failure' || steps.build.outputs.status == 'failure'
       uses: actions/github-script@v6
       with:
         script: |
-          const buildOutput = `\`\`\`\n${process.env.BUILD_OUTPUT}\n\`\`\``;
+          const errorStep = steps.install.outputs.status == 'failure' ? 'dependency installation' : 'build';
+          const errorOutput = `\`\`\`\n${process.env.ERROR_OUTPUT}\n\`\`\``;
+          
           const { data: issues } = await github.rest.issues.listForRepo({
             owner: context.repo.owner,
             repo: context.repo.repo,
@@ -45,12 +56,15 @@ jobs:
             issue.labels.some(label => label.name === 'build-failure')
           );
           
+          const title = `Build Failure - ${new Date().toISOString()}`;
+          const body = `The latest commit (${context.sha}) failed during ${errorStep}.\n\n**Error Output:**\n${errorOutput}\n\n[View Workflow Run](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`;
+          
           if (!existingIssue) {
             await github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              title: `Build Failure - ${new Date().toISOString()}`,
-              body: `The latest commit (${context.sha}) failed to build.\n\n**Build Output:**\n${buildOutput}\n\n[View Workflow Run](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`,
+              title: title,
+              body: body,
               labels: ['build-failure', 'bug']
             });
           } else {
@@ -58,8 +72,9 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: existingIssue.number,
-              body: `Another build failure detected in commit ${context.sha}.\n\n**Build Output:**\n${buildOutput}\n\n[View Workflow Run](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`
+              body: `Another failure detected in commit ${context.sha} during ${errorStep}.\n\n**Error Output:**\n${errorOutput}\n\n[View Workflow Run](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`
             });
           }
       env:
-        BUILD_OUTPUT: ${{ steps.build.outputs.build_output }}
+        ERROR_OUTPUT: ${{ steps.install.outputs.error_output || steps.build.outputs.error_output }}
+        steps: ${{ toJson(steps) }}

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Wrong Page Song</title>
+
+    <style>
+        @font-face {
+            font-family: 'Determination';
+            src: url('DeterminationMono.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        body {
+            font-family: 'Determination', 'Courier New', monospace;
+            background-color: black;
+            color: white;
+            text-align: center;
+            padding-top: 15vh;
+            margin: 0;
+            height: 100vh;
+        }
+
+        .lyrics {
+            font-size: 2em;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+
+    <audio id="audioPlayer" autoplay loop hidden>
+        <source src="wpa.mp3" type="audio/mp3">
+    </audio>
+
+    <div class="lyrics">
+        <p>
+            Oh, it's the wrong page,
+            the wrong page song!
+            We're very very sorry
+            it isn't real!
+        </p>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const audio = document.getElementById('audioPlayer');
+            audio.play().catch(error => {
+                console.log("Autoplay blocked.");
+            });
+        });
+    </script>
+
+</body>
+</html>

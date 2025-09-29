@@ -1,4 +1,4 @@
-name: Build Failure Reporter
+name: Build Monitor
 on:
   push:
     branches: [ main ]
@@ -20,53 +20,46 @@ jobs:
     - name: Run build
       id: build
       run: |
-        # Run build and capture output
-        npm run build 2>&1 | tee build-output.log
-        echo "exit_status=$?" >> $GITHUB_OUTPUT
+        build_output=$(npm run build 2>&1)
+        if [ $? -ne 0 ]; then
+          echo "::set-output name=status::failure"
+          echo "::set-output name=build_output::${build_output//$'\n'/'%0A'}"
+        fi
         
     - name: Create issue if build failed
-      if: steps.build.outputs.exit_status != '0'
+      if: steps.build.outputs.status == 'failure'
       uses: actions/github-script@v6
       with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
         script: |
-          const fs = require('fs');
-          try {
-            // Read build output
-            const buildOutput = fs.readFileSync('build-output.log', 'utf8');
-            
-            // Create issue body
-            const issueBody = [
-              `🚨 Build failed in commit [${context.sha.substring(0, 7)}](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/commit/${context.sha})`,
-              '',
-              `**Workflow run:** [View details](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`,
-              '',
-              '**Build output:**',
-              '```',
-              buildOutput,
-              '```',
-              '',
-              '**Next steps:**',
-              '1. Check the commit changes',
-              '2. Review the build errors above',
-              '3. Fix the issues or revert the commit'
-            ].join('\n');
-            
-            // Create issue
+          const buildOutput = `\`\`\`\n${process.env.BUILD_OUTPUT}\n\`\`\``;
+          const { data: issues } = await github.rest.issues.listForRepo({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            state: 'open',
+            labels: 'build-failure'
+          });
+          
+          // Check if an open issue with this label already exists
+          const existingIssue = issues.find(issue => 
+            issue.title.includes('Build Failure') && 
+            issue.labels.some(label => label.name === 'build-failure')
+          );
+          
+          if (!existingIssue) {
             await github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              title: `Build Failed - ${new Date().toLocaleString()}`,
-              body: issueBody,
+              title: `Build Failure - ${new Date().toISOString()}`,
+              body: `The latest commit (${context.sha}) failed to build.\n\n**Build Output:**\n${buildOutput}\n\n[View Workflow Run](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`,
               labels: ['build-failure', 'bug']
             });
-          } catch (error) {
-            // Fallback if log reading fails
-            await github.rest.issues.create({
+          } else {
+            await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              title: `Build Failed - ${new Date().toLocaleString()}`,
-              body: `Build failed in commit ${context.sha}. Please check the [workflow run](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}) for details.`,
-              labels: ['build-failure', 'bug']
+              issue_number: existingIssue.number,
+              body: `Another build failure detected in commit ${context.sha}.\n\n**Build Output:**\n${buildOutput}\n\n[View Workflow Run](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`
             });
           }
+      env:
+        BUILD_OUTPUT: ${{ steps.build.outputs.build_output }}

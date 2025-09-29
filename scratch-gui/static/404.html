@@ -150,6 +150,11 @@
             100% { transform: rotate(5deg); }
         }
 
+        .scrtxt {
+            color: white;
+            font-weight: bold;
+        }
+
         .license {
             margin-top: 3rem;
             font-size: 0.8rem;
@@ -186,22 +191,28 @@
             <p>OmniBlocks is a Multi-Language IDE in development, based on TurboWarp with enhanced features like a music editor. Future plans include text editors for Python, C, and more!</p>
             
             <a href="/" class="home-button">
-                <img src="./favicon.ico" alt="Home">
+                <img src="https://raw.githubusercontent.com/OmniBlocks/scratch-gui/refs/heads/main/static/favicon.ico" alt="Home">
                 Take Me Home
             </a>
         </div>
         
         <div class="images">
-            <img src="./favicon.ico" alt="OmniBlocks Logo" class="logo">
-            <img src="./Boxy-sad.svg" alt="Sad Boxy" class="boxy-sad">
+            <img src="https://raw.githubusercontent.com/OmniBlocks/scratch-gui/refs/heads/main/static/favicon.ico" alt="OmniBlocks Logo" class="logo">
+            <img src="https://raw.githubusercontent.com/OmniBlocks/scratch-gui/d39834ac34f4fd5475dd7d03153822d6d39af9f7/static/Boxy-sad.svg" alt="Sad Boxy. :(" class="boxy-sad">
         </div>
     </div>
     
     <div class="license">
         OmniBlocks is open source (GNU GPL v3) | Media licensed CC BY-SA 4.0
     </div>
-
-    <script>
+    <div class="scrtxt">
+        <p>Well, there is a man here.<br>
+        He offers you an egg. Take it?<br>
+        You got the egg
+        </p>
+    </div>
+<script>
+        // man i couldve done it like that.
         document.getElementById('url-display').textContent = window.location.href;
     </script>
 </body>

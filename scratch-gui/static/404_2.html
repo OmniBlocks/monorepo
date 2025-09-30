@@ -32,7 +32,7 @@
 </head>
 <body>
 
-    <audio id="audioPlayer" autostart="true" loop="true" hidden="true">
+    <audio id="audioPlayer" autoplay loop muted style="display:none">
         <source src="wpa.mp3" type="audio/mp3">
     </audio>
 
@@ -48,8 +48,18 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const audio = document.getElementById('audioPlayer');
+            // Try to play, unmute if possible after user interaction
             audio.play().catch(error => {
-                console.log("Autoplay blocked.");
+                // If autoplay is blocked, show controls to the user
+                audio.controls = true;
+                audio.style.display = "block";
+                audio.muted = false;
+                // Optionally inform the user
+                const msg = document.createElement('div');
+                msg.style.color = 'orange';
+                msg.style.fontSize = '1em';
+                msg.textContent = "Click play to hear The Wrong Page Song!";
+                document.body.insertBefore(msg, audio.nextSibling);
             });
         });
     </script>

@@ -16,9 +16,12 @@ body :global(.Popover) {
     color: $text-primary;
     background: $popover-background;
     border: 1px solid $ui-pane-border;
+:global(.Popover-body) {
+    /* ... */
     padding: 4px;
     border-radius: 4px;
-    padding: 4px;
+    box-shadow: 0px 0px 8px 1px $ui-pane-border;
+}
     box-shadow: 0px 0px 8px 1px $ui-pane-border;
 }
 

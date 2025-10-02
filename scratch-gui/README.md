@@ -16,7 +16,7 @@ This repository contains the frontend interface of the Block-Based editor for Om
 *   **Integrated Tools:** Includes a custom music editor and other quality-of-life improvements. Keep in mind that if you're seeing this, it means the music editor is currently not fully implemented. It works, you can go try it out, but it doesn't fully integrate with OmniBlocks just yet.
 
 ### A great feature inherited from TurboWarp: 
-*   **High Performance:** This is a fork of TurboWarp, meaning it uses the compiler that TurboWarp uses, making projects run way faster than other projects. This isn't listed as an enhancement/feature since we didn't implemented, the team at TurboWarp did, and we don't claim to have written the TurboWarp compiler that makes OmniBlocks projects run so fast. 
+*   **High Performance:** This is a fork of TurboWarp, meaning it uses the compiler that TurboWarp uses, making projects run way faster than other projects. This isn't listed as an enhancement/feature since we didn't implement it; the team at TurboWarp did, and we don't claim to have written the TurboWarp compiler that makes OmniBlocks projects run so fast. 
 
 ## 🚀 Quick Start
 
@@ -109,7 +109,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 ## 🤝 Contributing
 
-Contributions are welcome! We are especially int pplerested in addons, bug fixes, and accessibility improvements.
+Contributions are welcome! We are especially interested in addons, bug fixes, and accessibility improvements.
 
 1. Fork the project.
 2. Create a feature branch (`git checkout -b feature/AmazingFeature`).

@@ -61,21 +61,21 @@ This section is for developers looking to understand, modify, or contribute to t
 - **State Management:** Uses Redux. Reducers are located in `src/reducers/`.
 - **Core GUI Logic:** Located in `src/`.
 - **Addons:** Managed in `src/addons/`. Synced and patched from upstream repositories using `pull.js`. If you try hard enough you can make your own by making all the files you need yourself.
-- **Extensions:** Custom blocks and hardware integrations are in `src/lib/libraries/extensions/`. Extensions are in scratch-vm, an external dependency. You'l
+- **Extensions:** Custom blocks and hardware integrations are in `src/lib/libraries/extensions/`. Extensions are in scratch-vm, an external dependency. You'll need to fork that separate repository with your changes there, and link the new forked repository to scratch-vm. This isn't very easy if you don't know much about NPM, so we're sorry about this, although we might move to the monorepo that doesn't require all these repos someday.
 - **Translations:** Located in `src/lib/tw-translations/`.
 - **Theming:** Theme definitions (Aqua, Blue, etc.) are in `src/lib/themes/accent/<theme>.js`. Global color variables are set in `src/css/colors.css` and overridden in JS as needed.
 
 ### Key Workflows
 - **Syncing Addons:** Run `node pull.js` to fetch and patch the latest addons from upstream sources.
 - **Adding a New Addon:** Create a new directory within `src/addons/` with all necessary files and ensure it's imported in `src/addons/entry.js`.
-- **Modifying Themes:** Edit color variables in `src/css/colors.css` and update the theme definitions in `src/lib/themes/guiHelpers.js`.
+- **Modifying Themes:** Make a new file and title it "<color-name>.js". For example, if you want to make a new yellow theme, you can do "yellow.js". Then look for all the other JS files where the themes are imported, such as scratch-gui/src/lib/themes/index.js.
 - **Debugging:** For build issues, inspect the output in the `build/` directory or check the console output from `npm run build`.
 
 ### Integration Points
 - **Addon Entry Point:** `src/addons/entry.js`
 - **Extensions:** `src/lib/libraries/extensions/`
 - **Translations:** `src/lib/tw-translations/`
-- **Static Assets:** Pre-downloaded hex files for micro:bit are stored in `static/microbit/`.
+- **Static Assets:**  `static/`.
 
 ## 📜 Licensing
 
@@ -88,7 +88,7 @@ This project is licensed under multiple agreements due to its forked nature.
 - **Assets:**
   - `src/lib/default-project/dango.svg`: Based on Twemoji, licensed under CC BY 4.0.
   - **OmniBlocks Logo:** Licensed under CC BY-SA 4.0. Incorporates the Python logo (a trademark of the Python Software Foundation) for referential purposes. This project is not affiliated with or endorsed by the Python Software Foundation.
-  - **Mascot "Boxy":** Licensed under CC BY-SA 4.0.
+  - **OmniBlocks Mascot "Boxy":** Licensed under CC BY-SA 4.0.
 
 <details>
 <summary>Original Scratch (MIT) License</summary>
@@ -116,9 +116,10 @@ Contributions are welcome! We are especially interested in addons, bug fixes, an
 3. Commit your changes (`git commit -m 'Add some AmazingFeature'`).
 4. Push to the branch (`git push origin feature/AmazingFeature`).
 5. Open a Pull Request.
+6. Sit and wait as it gets reviewed :)
 
-Please ensure your code follows the existing patterns and conventions used in the project.
+Please ensure your code follows the existing patterns and conventions used in the project. 
 
 ---
 
-**Note:** This is a fork designed for specific use cases. For general Scratch development, please refer to the [upstream scratch-gui repository](https://github.com/LLK/scratch-gui).
+**Note:** This is a fork designed specifically for OmniBlocks. If you want to make your own Scratch or TurboWarp mod, please refer to the [upstream scratch-gui repository](https://github.com/LLK/scratch-gui) or the [turbowarp scratch-gui repository](https://github.com/TurboWarp/scratch-gui) instead.

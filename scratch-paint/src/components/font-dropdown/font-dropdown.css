@@ -16,17 +16,13 @@
 }
 
 .mod-menu-item:hover {
-    background: $motion-primary;
+    background: $looks-secondary;
     color: white;
 }
 
 .mod-context-menu {
     display: flex;
     flex-direction: column;
-}
-.font-context-menu {
-    display: grid;
-    grid-template-columns: auto auto auto;
 }
 
 .mod-unselect {

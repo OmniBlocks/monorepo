@@ -409,7 +409,7 @@ if (selectedFormat === "mp4") {
   const mp4WithCodecs = "video/mp4; codecs=avc1,mp4a.40.2";
   if (MediaRecorder.isTypeSupported(mp4WithCodecs)) {
     recordMimeType = mp4WithCodecs;
-  } else if (supportedMimeTypes.includes("video/mp4")) {
+  } else if (MediaRecorder.isTypeSupported("video/mp4")) {
     recordMimeType = "video/mp4";
   } else {
     // Fall back to WebM if MP4 not supported

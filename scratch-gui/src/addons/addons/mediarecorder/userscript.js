@@ -400,15 +400,24 @@ export default async ({ addon, console, msg }) => {
         stream.addTrack(dest.stream.getAudioTracks()[0]);
       }
       
-      // Determine recording format
-      const selectedFormat = opts.format || defaultFileExtension;
-      let recordMimeType;
-      
-      if (selectedFormat === "mp4" && supportedMimeTypes.includes("video/mp4")) {
-        recordMimeType = "video/mp4";
-      } else {
-        recordMimeType = supportedMimeTypes.find(m => m.startsWith("video/webm")) || defaultMimeType;
-      }
+// Determine recording format
+const selectedFormat = opts.format || defaultFileExtension;
+let recordMimeType;
+
+if (selectedFormat === "mp4") {
+  // Try MP4 with specific codec support for audio
+  const mp4WithCodecs = "video/mp4; codecs=avc1,mp4a.40.2";
+  if (MediaRecorder.isTypeSupported(mp4WithCodecs)) {
+    recordMimeType = mp4WithCodecs;
+  } else if (MediaRecorder.isTypeSupported("video/mp4")) {
+    recordMimeType = "video/mp4";
+  } else {
+    // Fall back to WebM if MP4 not supported
+    recordMimeType = supportedMimeTypes.find(m => m.startsWith("video/webm")) || defaultMimeType;
+  }
+} else {
+  recordMimeType = supportedMimeTypes.find(m => m.startsWith("video/webm")) || defaultMimeType;
+}
       
       recorder = new MediaRecorder(stream, { mimeType: recordMimeType });
       recorder.ondataavailable = (e) => {

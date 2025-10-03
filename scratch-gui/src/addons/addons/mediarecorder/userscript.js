@@ -34,6 +34,7 @@ export default async ({ addon, console, msg }) => {
 
   // Load FFmpeg.wasm only when needed
   // Load FFmpeg.wasm v0.12.x (matches package.json)
+// Load FFmpeg.wasm v0.12.x (matches package.json)
 const loadFFmpeg = async () => {
   if (ffmpeg) return ffmpeg;
   
@@ -348,26 +349,14 @@ const convertWebmToMp4 = async (webmBlob) => {
     console.log('Starting ffmpeg encoding...');
     await ffmpeg.exec([
       '-i', inputName,
-      // TIMESTAMP FIXES:
-      '-fflags', '+genpts',       // Generate missing PTS
-      '-reset_timestamps', '1',   // Reset timestamps to start at 0
-      '-avoid_negative_ts', 'make_zero',  // Prevent negative timestamps
-      
-      // Video encoding
       '-c:v', 'libx264',
       '-preset', 'ultrafast',
       '-crf', '23',
       '-pix_fmt', 'yuv420p',
       '-r', fps.toString(),
       '-g', '30',
-      '-vsync', 'cfr',            // Constant frame rate
-      
-      // Audio encoding
-      '-c:a', 'aac', 
-      '-b:a', '128k',
-      
-      // Metadata fixes
-      '-movflags', '+faststart',  // Move metadata to start of file
+      '-movflags', '+faststart',
+      '-c:a', 'aac', '-b:a', '128k',
       outputName
     ]);
     console.log('Encoding complete');
@@ -389,7 +378,6 @@ const convertWebmToMp4 = async (webmBlob) => {
     throw error;
   }
 };
-
     const stopRecording = async (force, selectedFormat) => {
       if (isWaitingForFlag) {
         addon.tab.traps.vm.runtime.off("PROJECT_START", waitingForFlagFunc);

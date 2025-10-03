@@ -55,9 +55,8 @@ If you're using a GitHub Codespace, all these things come preinstalled.
 Some packages may want some additional things installed, so check the README in each package you want to develop.
 
 OmniBlocks is a very large app that can require multiple gigabytes of disk space and memory to build.
-
-#### 📂 How Scratch is Organized 
-Scratch is broken up into a bunch of different packages, each implementing one part of the app.
+ 
+Scratch is broken up into a bunch of different packages, each implementing one part of the app. Our dependencies are:
 
 * scratch-gui implements much of the interface (eg. the sprite list), connects everything together, and is where addons live. There are instructions on most of that here :)
 * scratch-vm runs projects. It's where the compiler lives, as well as the JavaScript definitions for any blocks. To add a new block, define the block there, and add the gui entry for the block here in scratch-gui.
@@ -68,6 +67,7 @@ Scratch is broken up into a bunch of different packages, each implementing one p
 * scratch-parser extracts and validates sb2 and sb3 files
 * scratch-storage is an abstraction around fetch() used for downloading (and theoretically uploading) files. It is the reason why you can add files to your workspace and they work without being uploaded to any cloud storage.
 * scratch-l10n contains translations and localizations. This provides accessibility to people who speak other languages but want to use OmniBlocks.
+* caffeine- wait- wha? how did this one get here?
 
 
 

@@ -287,7 +287,23 @@ export default async ({ addon, console, msg }) => {
         ffmpeg.FS('writeFile', inputName, new Uint8Array(arrayBuffer));
         
         // Convert to MP4
-        await ffmpeg.run('-i', inputName, '-c', 'copy', outputName);
+        // Convert to MP4 with proper timestamp normalization
+        // -fflags +genpts: generate missing PTS timestamps
+        // -reset_timestamps 1: start streams at timestamp 0
+        // -movflags +faststart: move moov atom to beginning for seeking
+        // -avoid_negative_ts make_zero: clamp negative timestamps to 0
+        // -c:v copy: copy video stream without re-encoding
+        // -c:a aac: encode audio to AAC for MP4 compatibility
+        await ffmpeg.run(
+        '-i', inputName,
+        '-fflags', '+genpts',
+        '-reset_timestamps', '1',
+        '-movflags', '+faststart',
+        '-avoid_negative_ts', 'make_zero',
+        '-c:v', 'copy',
+        '-c:a', 'aac', '-b:a', '192k',
+        outputName
+        );
         
         // Read converted file
         const data = ffmpeg.FS('readFile', outputName);

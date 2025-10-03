@@ -1,11 +1,34 @@
-# scratch-gui for OmniBlocks & TurboWarp
-
+# OmniBlocks/scratch-gui
+![Build Status](https://github.com/OmniBlocks/scratch-gui/workflows/CI/badge.svg)
+![GitHub issues](https://img.shields.io/github/issues/OmniBlocks/scratch-gui)
 ![GitHub](https://img.shields.io/badge/license-GPLv3-blue.svg)
+![GitHub last commit](https://img.shields.io/github/last-commit/OmniBlocks/scratch-gui)
 ![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
+![GitHub contributors](https://img.shields.io/github/contributors/OmniBlocks/scratch-gui)
+[![Star History Chart](https://api.star-history.com/svg?repos=OmniBlocks/scratch-gui&type=Date)](https://www.star-history.com/#OmniBlocks/scratch-gui&Date)
 
 > A fork of the Scratch 3.0 GUI, modified and enhanced for the [TurboWarp](https://turbowarp.org/) compiler and the [OmniBlocks](https://omniblocks.github.io) multi-language IDE.
 
 This repository contains the frontend interface of the Block-Based editor for OmniBlocks and TurboWarp. It builds upon Scratch's foundation with significant performance improvements, addons, themes, and other features for an amazing coding experience.
+## 📑 Table of Contents
+- [🎮 Try It Out](#-try-it-out)
+- [✨ Features & Enhancements](#-features--enhancements)
+- [🚀 Quick Start](#-quick-start)
+- [🏗️ Project Architecture & Development Guide](#%EF%B8%8F-project-architecture--development-guide)
+  - [Data Flow & Structure](#data-flow--structure)
+  - [Key Workflows](#key-workflows)
+  - [Integration Points](#integration-points)
+- [📜 Licensing](#-licensing)
+- [🤝 Contributing](#-contributing)
+- [❓ Frequently Asked Questions (FAQ)](#-frequently-asked-questions-faq)
+  - [General Questions](#general-questions)
+  - [Compatibility](#compatibility)
+  - [Features & Development](#features--development)
+  - [Technical Questions](#technical-questions)
+  - [Contributions](#contributions)
+
+## 🎮 Try It Out
+Experience OmniBlocks live: [https://omniblocks.github.io](https://omniblocks.github.io)
 
 ## ✨ Features & Enhancements
 
@@ -181,7 +204,7 @@ A: Please open an issue on our GitHub repository with:
 - Browser and OS information
 - Screenshots if applicable
 
-### Contributing
+### Contributions
 
 **Q: I want to contribute! Where do I start?**  
 A: Awesome! Check out our `CONTRIBUTING.md` file for guidelines. Good starting points are:

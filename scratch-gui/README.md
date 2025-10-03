@@ -49,8 +49,30 @@ Want to run a local copy of the OmniBlocks editor? Follow these steps.
 
 *   Node.js (version specified in `.nvmrc`)
 *   npm (duhh)
+*   Git
+If you're using a GitHub Codespace, all these things come preinstalled.
+### Dependencies
+Some packages may want some additional things installed, so check the README in each package you want to develop.
+
+OmniBlocks is a very large app that can require multiple gigabytes of disk space and memory to build.
+
+#### 📂 How Scratch is Organized 
+Scratch is broken up into a bunch of different packages, each implementing one part of the app.
+
+* scratch-gui implements much of the interface (eg. the sprite list), connects everything together, and is where addons live. There are instructions on most of that here :)
+* scratch-vm runs projects. It's where the compiler lives, as well as the JavaScript definitions for any blocks. To add a new block, define the block there, and add the gui entry for the block here in scratch-gui.
+* scratch-render is what displays things like the stage, sprites, text bubbles, and pen. It also implements blocks like "touching". Note that things that are rendered on top of sprites such as variable monitors are actually part of scratch-gui.
+* scratch-svg-renderer helps fix various SVG rendering problems. If you don't know what an SVG is, it is essentially an image with theoretically infinite quality due to using mathematical equations to render instead of pixels.
+* scratch-render-fonts contains all the fonts that SVG costumes can use
+* scratch-paint is the costume editor. 
+* scratch-parser extracts and validates sb2 and sb3 files
+* scratch-storage is an abstraction around fetch() used for downloading (and theoretically uploading) files. It is the reason why you can add files to your workspace and they work without being uploaded to any cloud storage.
+* scratch-l10n contains translations and localizations. This provides accessibility to people who speak other languages but want to use OmniBlocks.
+
+
 
 ### Installation & Running
+To actually mod Scratch, you need to build the GUI, as it is the main package that connects everything. Here's how to do it:
 
 1.  **Clone the repository:**
     ```bash
@@ -68,7 +90,7 @@ Want to run a local copy of the OmniBlocks editor? Follow these steps.
     ```bash
     npm start
     ```
-    The GUI will open in your browser at `http://localhost:8601`. If you're using GitHub Codespaces, it will be https://<codespace-name>-<codespace-hash>-8601.app.github.dev/
+    The GUI will open in your browser at `http://localhost:8601`. If you're using GitHub Codespaces, it will be `https://<codespace-name>-<codespace-hash>-8601.app.github.dev/`
 
 4.  **To create a production build:**
     ```bash
@@ -93,6 +115,7 @@ This section is for developers looking to understand, modify, or contribute to t
 - **Adding a New Addon:** Create a new directory within `src/addons/` with all necessary files and ensure it's imported in `src/addons/entry.js`.
 - **Modifying Themes:** Make a new file and title it "<color-name>.js". For example, if you want to make a new yellow theme, you can do "yellow.js". Then look for all the other JS files where the themes are imported, such as scratch-gui/src/lib/themes/index.js.
 - **Debugging:** For build issues, inspect the output in the `build/` directory or check the console output from `npm run build`.
+
 
 ### Integration Points
 - **Addon Entry Point:** `src/addons/entry.js`

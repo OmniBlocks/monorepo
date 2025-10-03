@@ -33,30 +33,42 @@ export default async ({ addon, console, msg }) => {
   }
 
   // Load FFmpeg.wasm only when needed
-  const loadFFmpeg = async () => {
-    if (ffmpeg) return ffmpeg;
-    // Create script tag to load FFmpeg
-    return new Promise((resolve, reject) => {
-      const script = document.createElement('script');
-      script.src = "https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.11.0/dist/ffmpeg.min.js";
-      script.onload = async () => {
-        try {
-          // Access FFmpeg from global scope
-          const { createFFmpeg } = window.FFmpeg;
-          ffmpeg = createFFmpeg({
-            corePath: "https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js",
-            log: false,
-          });
-          await ffmpeg.load();
-          resolve(ffmpeg);
-        } catch (error) {
-          reject(error);
-        }
-      };
-      script.onerror = reject;
-      document.head.appendChild(script);
-    });
-  };
+  // Load FFmpeg.wasm v0.12.x (matches package.json)
+const loadFFmpeg = async () => {
+  if (ffmpeg) return ffmpeg;
+  
+  return new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    // Use v0.12.10 which has stable libx264 support
+    script.src = "https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/dist/umd/ffmpeg.min.js";
+    script.onload = async () => {
+      try {
+        const { FFmpeg } = window.FFmpegWASM;
+        ffmpeg = new FFmpeg();
+        
+        // Set up logging
+        ffmpeg.on('log', ({ message }) => {
+          console.log('FFmpeg:', message);
+        });
+        
+        // Load with multi-threaded core
+        await ffmpeg.load({
+          coreURL: "https://cdn.jsdelivr.net/npm/@ffmpeg/core-mt@0.12.6/dist/esm/ffmpeg-core.js",
+          wasmURL: "https://cdn.jsdelivr.net/npm/@ffmpeg/core-mt@0.12.6/dist/esm/ffmpeg-core.wasm",
+          workerURL: "https://cdn.jsdelivr.net/npm/@ffmpeg/core-mt@0.12.6/dist/esm/ffmpeg-core.worker.js"
+        });
+        
+        console.log('FFmpeg v0.12 loaded successfully');
+        resolve(ffmpeg);
+      } catch (error) {
+        console.error('FFmpeg load error:', error);
+        reject(error);
+      }
+    };
+    script.onerror = reject;
+    document.head.appendChild(script);
+  });
+};
 
   while (true) {
     const elem = await addon.tab.waitForElement('div[class*="menu-bar_file-group"] > div:last-child:not(.sa-record)', {
@@ -275,45 +287,109 @@ export default async ({ addon, console, msg }) => {
         stopSignFunc = null;
       }
     };
-    
-    const convertWebmToMp4 = async (webmBlob) => {
-      try {
-        const ffmpeg = await loadFFmpeg();
-        const inputName = 'input.webm';
-        const outputName = 'output.mp4';
-        
-        // Write WebM file to FFmpeg's memory
-        const arrayBuffer = await webmBlob.arrayBuffer();
-        ffmpeg.FS('writeFile', inputName, new Uint8Array(arrayBuffer));
-        
-        // Convert to MP4
-        // Convert to MP4 with proper timestamp normalization
-        // -fflags +genpts: generate missing PTS timestamps
-        // -reset_timestamps 1: start streams at timestamp 0
-        // -movflags +faststart: move moov atom to beginning for seeking
-        // -avoid_negative_ts make_zero: clamp negative timestamps to 0
-        // -c:v copy: copy video stream without re-encoding
-        // -c:a aac: encode audio to AAC for MP4 compatibility
-        await ffmpeg.run(
-        '-i', inputName,
-        '-fflags', '+genpts',
-        '-reset_timestamps', '1',
-        '-movflags', '+faststart',
-        '-avoid_negative_ts', 'make_zero',
-        '-c:v', 'copy',
-        '-c:a', 'aac', '-b:a', '192k',
-        outputName
-        );
-        
-        // Read converted file
-        const data = ffmpeg.FS('readFile', outputName);
-        return new Blob([data.buffer], { type: 'video/mp4' });
-      } catch (error) {
-        console.error('FFmpeg conversion error:', error);
-        throw new Error('Conversion failed');
-      }
+    // Helper function to detect frame rate from video
+const detectFrameRate = async (ffmpeg, inputName) => {
+  try {
+    let probeOutput = '';
+    const logHandler = ({ message }) => {
+      probeOutput += message + '\n';
     };
     
+    ffmpeg.on('log', logHandler);
+    
+    try {
+      await ffmpeg.exec(['-i', inputName, '-hide_banner']);
+    } catch (e) {
+      // ffmpeg exits with error code when no output specified
+    }
+    
+    ffmpeg.off('log', logHandler);
+    
+    // Parse fps
+    const fpsMatch = probeOutput.match(/(\d+(?:\.\d+)?)\s*fps/i);
+    if (fpsMatch) {
+      const fps = parseFloat(fpsMatch[1]);
+      console.log(`Detected frame rate: ${fps} fps`);
+      return fps;
+    }
+    
+    const rateMatch = probeOutput.match(/(\d+)\/(\d+)\s*fps/);
+    if (rateMatch) {
+      const fps = parseInt(rateMatch[1]) / parseInt(rateMatch[2]);
+      console.log(`Detected frame rate: ${fps} fps`);
+      return fps;
+    }
+  } catch (error) {
+    console.warn('FPS detection failed:', error);
+  }
+  return null;
+};
+
+const convertWebmToMp4 = async (webmBlob) => {
+  try {
+    console.log('=== Starting conversion ===');
+    console.log('Input size:', webmBlob.size, 'bytes');
+    
+    const ffmpeg = await loadFFmpeg();
+    const inputName = 'input.webm';
+    const outputName = 'output.mp4';
+    
+    // Write input file using v0.12 API
+    const arrayBuffer = await webmBlob.arrayBuffer();
+    await ffmpeg.writeFile(inputName, new Uint8Array(arrayBuffer));
+    console.log('Input file written');
+    
+    // Detect FPS
+    const detectedFps = await detectFrameRate(ffmpeg, inputName);
+    const fps = detectedFps || 30;
+    console.log(`Using ${fps} fps`);
+    
+    // Convert with H.264 encoding
+    console.log('Starting ffmpeg encoding...');
+    await ffmpeg.exec([
+      '-i', inputName,
+      // TIMESTAMP FIXES:
+      '-fflags', '+genpts',       // Generate missing PTS
+      '-reset_timestamps', '1',   // Reset timestamps to start at 0
+      '-avoid_negative_ts', 'make_zero',  // Prevent negative timestamps
+      
+      // Video encoding
+      '-c:v', 'libx264',
+      '-preset', 'ultrafast',
+      '-crf', '23',
+      '-pix_fmt', 'yuv420p',
+      '-r', fps.toString(),
+      '-g', '30',
+      '-vsync', 'cfr',            // Constant frame rate
+      
+      // Audio encoding
+      '-c:a', 'aac', 
+      '-b:a', '128k',
+      
+      // Metadata fixes
+      '-movflags', '+faststart',  // Move metadata to start of file
+      outputName
+    ]);
+    console.log('Encoding complete');
+    
+    // Read output using v0.12 API
+    const data = await ffmpeg.readFile(outputName);
+    console.log('Output size:', data.length, 'bytes');
+    
+    // Clean up
+    await ffmpeg.deleteFile(inputName);
+    await ffmpeg.deleteFile(outputName);
+    
+    const outputBlob = new Blob([data.buffer], { type: 'video/mp4' });
+    console.log('=== Conversion successful ===');
+    return outputBlob;
+  } catch (error) {
+    console.error('=== Conversion FAILED ===');
+    console.error(error);
+    throw error;
+  }
+};
+
     const stopRecording = async (force, selectedFormat) => {
       if (isWaitingForFlag) {
         addon.tab.traps.vm.runtime.off("PROJECT_START", waitingForFlagFunc);

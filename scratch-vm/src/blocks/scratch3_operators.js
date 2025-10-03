@@ -23,6 +23,8 @@ class Scratch3OperatorsBlocks {
             operator_lt: this.lt,
             operator_equals: this.equals,
             operator_gt: this.gt,
+            operator_ltoreq: this.ltoreq,
+            operator_gtoreq: this.gtoreq,
             operator_and: this.and,
             operator_or: this.or,
             operator_not: this.not,

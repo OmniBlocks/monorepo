@@ -243,6 +243,10 @@ A: Not at all! That's the beauty of open source. Just make sure to follow the li
 
 **Still have questions?** Feel free to open an issue here or start a discussion on our GitHub organization!
 
+**Made a mod or a cool project?** We would love to see what people are creating! If you made your own mod of OmniBlocks or made a cool project in it, show it off in [the Discussion tab!](https://github.com/orgs/OmniBlocks/discussions)
+
+
+
 Please ensure your code follows the existing patterns and conventions used in the project. 
 
 ---

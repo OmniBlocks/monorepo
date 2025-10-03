@@ -117,6 +117,85 @@ Contributions are welcome! We are especially interested in addons, bug fixes, an
 4. Push to the branch (`git push origin feature/AmazingFeature`).
 5. Open a Pull Request.
 6. Sit and wait as it gets reviewed :)
+7. (six seven)
+
+
+## ❓ Frequently Asked Questions (FAQ)
+
+### General Questions
+
+**Q: What is OmniBlocks?**  
+A: OmniBlocks is an enhanced fork of TurboWarp for faster project execution, adds quality-of-life features, and constant updates.
+
+**Q: How is OmniBlocks different from TurboWarp?**  
+A: While we use TurboWarp's excellent compiler and extra features, OmniBlocks focuses on providing a more advanced, mature IDE. We plan to be able to be used by kids and adults alike, adding new advanced features for already knowledgeable coders, as well as being able to be booted up by children and/or beginners to explore programming. We will also be exploring additional features like alternative language editors (Python/C) in the future.
+
+**Q: Is OmniBlocks free to use?**  
+A: Yes! OmniBlocks is open-source and free forever! Unless you count paying your internet provider as an indirect fee ;)
+
+### Compatibility
+
+**Q: Can I use my Scratch account with OmniBlocks?**  
+A: You can't log in with your Scratch Accounts for integration with OmniBlocks, and we don't have any planned features that would use such a thing. Please remember that giving your Scratch password to ANY site, even if it seems good, could be used as bait and take over your Scratch account. If we ever do implement such integration, it will be through secure Auths. 
+Anyways, you can import/export `.sb3` project files to load a Scratch project into OmniBlocks and code there, and even use the new tools and features to aid development.
+
+**Q: Will projects created in OmniBlocks work in vanilla Scratch?**  
+A: Yes! As long as you don't use extensions that add custom blocks not available in vanilla Scratch, your projects will work perfectly. The TurboWarp compiler only affects runtime performance, not project compatibility.
+
+**Q: Can I import my existing Scratch projects?**  
+A: Absolutely! Just click "File > Load from your computer" and select your `.sb3` or `.sb2` file.
+
+**Q: What about projects with cloud variables? Can I still play online games with OmniBlocks?**
+A: Yup! The TurboWarp cloud data server is used to ensure that you can still play your favorite online games in OmniBlocks. Keep in mind that since we don't integrate with Scratch, you can choose any username that exists in Scratch (except for Scratch Team member names), so if you see someone claiming to be a famous Scratcher (e.g., griffpatch), it is most likely not actually that person.
+
+### Features & Development
+
+**Q: What's the status of the music editor feature?**  
+A: The music editor is currently in development and not fully integrated. We're working on it, but for now, the traditional sound editor is available. You can go ahead and use it, but if you click out of the tab... well, say goodbye to your music. You can test the raw song editor [here](https://omniblocks.github.io/songeditor.html)
+
+**Q: Can I create my own extensions?**  
+A: Yes, but be aware that extension development is complex and requires understanding of Scratch's architecture. Check out the `scratch-vm` repository and our contributing guidelines for more information.
+
+**Q: Can I request new features?**  
+A: Yes! Open an issue on our GitHub repository with the "enhancement" label. We love hearing ideas from the community, though we can't guarantee implementation timelines or whether they are going to be added. For example, let's say you want a new feature to be added: the ability to collaborate live with other people. While this is a cool idea in theory, there are many flaws. The smaller problem is that maintaining the servers would cost money, and we want to keep OmniBlocks free. The other bigger problem is that it is simply a huge security risk. Since we want kids to be able to use OmniBlocks, adding such a feature would allow for private communication and other terrible things to happen. We don't want to turn OmniBlocks into a Roblox clone.
+
+### Technical Questions
+
+**Q: What are the system requirements?**  
+A: OmniBlocks runs in any modern web browser (Chrome, Firefox, Safari, Edge). Keep in mind that for the best performance, Chromium-based browsers are significantly faster, such as Chrome or Edge. For development, you'll need Node.js 18+ and npm. If you don't have access to such tools (for example, if you want to develop on an iPad or tablet), you can start a GitHub Codespace, which is a free browser environment for coding.
+
+**Q: Can I self-host OmniBlocks?**  
+A: Yes! Follow the development setup instructions above, then build the project with `npm run build`. The output in the `build/` directory can be hosted on any static web server.
+
+**Q: The editor is slow/laggy. What can I do?**  
+A: Try these steps:
+1. Close unnecessary browser tabs
+2. Make sure you're using a modern browser
+3. Check if your project has very large assets or complex scripts
+
+**Q: I found a bug! Where do I report it?**  
+A: Please open an issue on our GitHub repository with:
+- A clear description of the bug
+- Steps to reproduce it
+- Expected vs actual behavior
+- Browser and OS information
+- Screenshots if applicable
+
+### Contributing
+
+**Q: I want to contribute! Where do I start?**  
+A: Awesome! Check out our `CONTRIBUTING.md` file for guidelines. Good starting points are:
+- Fixing bugs labeled "good first issue"
+- Improving documentation
+- Adding tests
+- Translating the interface
+
+**Q: Do I need permission to fork OmniBlocks?**  
+A: Not at all! That's the beauty of open source. Just make sure to follow the license terms and give proper attribution.
+
+---
+
+**Still have questions?** Feel free to open an issue here or start a discussion on our GitHub organization!
 
 Please ensure your code follows the existing patterns and conventions used in the project. 
 

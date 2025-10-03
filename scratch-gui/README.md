@@ -47,7 +47,7 @@ Want to run a local copy of the OmniBlocks editor? Follow these steps.
 
 ### Prerequisites
 
-*   Node.js (version specified in `.nvmrc`)
+*   Node.js version Node.js v22 (versions v18 or newer will probably work, but we can’t guarantee it)
 *   npm (duhh)
 *   Git
 If you're using a GitHub Codespace, all these things come preinstalled.

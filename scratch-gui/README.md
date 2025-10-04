@@ -129,7 +129,7 @@ This project is licensed under multiple agreements due to its forked nature.
 
 - **OmniBlocks & TurboWarp Modifications:** Licensed under the **GNU General Public License v3.0**. See the `LICENSE` file or [gnu.org/licenses](https://www.gnu.org/licenses/) for details.
 
-- **Original Scratch Code (MIT License):** Copyright (c) 2016, Massachusetts Institute of Technology. The original license text is retained below as required.
+- **Original Scratch Code (BSD License):** Copyright (c) 2016, Massachusetts Institute of Technology. The original license text is retained below as required.
 
 - **Assets:**
   - `src/lib/default-project/dango.svg`: Based on Twemoji, licensed under CC BY 4.0.
@@ -137,7 +137,7 @@ This project is licensed under multiple agreements due to its forked nature.
   - **OmniBlocks Mascot "Boxy":** Licensed under CC BY-SA 4.0.
 
 <details>
-<summary>Original Scratch (MIT) License</summary>
+<summary>Original Scratch (BSD) License</summary>
 
 Copyright (c) 2016, Massachusetts Institute of Technology All rights reserved.
 

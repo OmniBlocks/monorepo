@@ -270,7 +270,7 @@ Blockly.ScratchBlocks.VerticalExtensions.registerAll = function() {
   Blockly.Extensions.register('shape_end',
       Blockly.ScratchBlocks.VerticalExtensions.SHAPE_END);
   Blockly.Extensions.register('shape_reporter',
-      Blockly.ScratchBlocks.VerticalExtensions.SHAPE_ROUND);
+      Blockly.ScratchBlocks.VerticalExtensions.SHAPE_REPORTER);
 
   // Output shapes and types are related.
   Blockly.Extensions.register('output_number',

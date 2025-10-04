@@ -24,7 +24,7 @@ const isOptedOut = () => {
     // These headers are really intended to be about third-parties so we don't need to follow them,
     // but if someone has these set, it's good to assume that they would opt out if given the choice.
     // So we'll just respect that preemptively.
-    return navigator.globalPrivacyControl === 'true' || navigator.doNotTrack === '1';
+    return navigator.globalPrivacyControl || navigator.doNotTrack === '1';
 };
 
 class TWWindchimeSubmitter extends React.Component {

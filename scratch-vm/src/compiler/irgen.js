@@ -338,13 +338,18 @@ class ScriptTreeGenerator {
                 left: this.descendInputOfBlock(block, 'OPERAND1'),
                 right: this.descendInputOfBlock(block, 'OPERAND2')
             });
-        case 'operator_gtoreq':
+        case 'operator_gt':
             return new IntermediateInput(InputOpcode.OP_GREATER, InputType.BOOLEAN, {
                 left: this.descendInputOfBlock(block, 'OPERAND1'),
                 right: this.descendInputOfBlock(block, 'OPERAND2')
             });
+        case 'operator_gtoreq':
+            return new IntermediateInput(InputOpcode.OP_GTOREQ, InputType.BOOLEAN, {
+                left: this.descendInputOfBlock(block, 'OPERAND1'),
+                right: this.descendInputOfBlock(block, 'OPERAND2')
+            });
         case 'operator_ltoreq':
-            return new IntermediateInput(InputOpcode.OP_GREATER, InputType.BOOLEAN, {
+            return new IntermediateInput(InputOpcode.OP_LTOREQ, InputType.BOOLEAN, {
                 left: this.descendInputOfBlock(block, 'OPERAND1'),
                 right: this.descendInputOfBlock(block, 'OPERAND2')
             });

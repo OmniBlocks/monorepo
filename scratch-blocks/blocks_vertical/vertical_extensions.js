@@ -131,6 +131,17 @@ Blockly.ScratchBlocks.VerticalExtensions.OUTPUT_STRING = function() {
 };
 
 /**
+ * Extension to make represent a round, but generic, reporter in Scratch-Blocks.
+ * That means the block has inline inputs, and a round output shape.
+ * @this {Blockly.Block}
+ * @readonly
+ */
+Blockly.ScratchBlocks.VerticalExtensions.SHAPE_REPORTER = function() {
+  this.setInputsInline(true);
+  this.setOutputShape(Blockly.OUTPUT_SHAPE_ROUND);
+};
+
+/**
  * Extension to make represent a boolean reporter in Scratch-Blocks.
  * That means the block has inline inputs, a round output shape, and a 'Boolean'
  * output type.
@@ -258,6 +269,8 @@ Blockly.ScratchBlocks.VerticalExtensions.registerAll = function() {
       Blockly.ScratchBlocks.VerticalExtensions.SHAPE_HAT);
   Blockly.Extensions.register('shape_end',
       Blockly.ScratchBlocks.VerticalExtensions.SHAPE_END);
+  Blockly.Extensions.register('shape_reporter',
+      Blockly.ScratchBlocks.VerticalExtensions.SHAPE_ROUND);
 
   // Output shapes and types are related.
   Blockly.Extensions.register('output_number',

@@ -30,8 +30,8 @@ const isOptedOut = () => {
 class TWWindchimeSubmitter extends React.Component {
     componentDidUpdate (prevProps) {
         if (
-            (this.props.isRunning && !prevProps.isRunning) &&
-            this.props.projectId
+            (this.props.isStarted && !prevProps.isStarted) &&
+            this.props.projectId !== '0'
         ) {
             this.submit();
         }
@@ -72,12 +72,12 @@ class TWWindchimeSubmitter extends React.Component {
 
 TWWindchimeSubmitter.propTypes = {
     isEmbedded: PropTypes.bool.isRequired,
-    isRunning: PropTypes.bool.isRequired,
+    isStarted: PropTypes.bool.isRequired,
     projectId: PropTypes.string.isRequired
 };
 
 const mapStateToProps = state => ({
-    isRunning: state.scratchGui.vmStatus.running,
+    isStarted: state.scratchGui.vmStatus.running,
     projectId: state.scratchGui.projectState.projectId
 });
 

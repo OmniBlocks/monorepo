@@ -24,7 +24,7 @@ yield* executeInCompatibilityLayer({"MESSAGE":"pass 4",}, b0, false, false, "8]2
 if (((+b1.value || 0) === 10)) {
 yield* executeInCompatibilityLayer({"MESSAGE":"pass 5",}, b0, false, false, "ZU^{OfKTg|+Au$$q0[]u", null);
 }
-for (var a0 = 1; a0 >= 0.5; a0--) {
+for (var a0 = 1; a0 > 0; a0--) {
 if (((+b1.value || 0) === 10)) {
 yield* executeInCompatibilityLayer({"MESSAGE":"pass 6",}, b0, false, false, "HB+_IN}6=K[*ksxKXH0`", null);
 }
@@ -47,7 +47,7 @@ yield* executeInCompatibilityLayer({"MESSAGE":"pass 10",}, b0, false, false, "B`
 if (((+b2.value || 0) === 10)) {
 yield* executeInCompatibilityLayer({"MESSAGE":"pass 11",}, b0, false, false, "TJ:#TkYBys*!RYiKLXb)", null);
 }
-for (var a1 = 1; a1 >= 0.5; a1--) {
+for (var a1 = 1; a1 > 0; a1--) {
 if (((+b2.value || 0) === 10)) {
 yield* executeInCompatibilityLayer({"MESSAGE":"pass 12",}, b0, false, false, ",Z,~10Qo~j;(+VL+I3q:", null);
 }

@@ -29,7 +29,7 @@ const b2 = stage.variables["JbF5exWEi*m?-UEmkASS"];
 return function* genXYZ () {
 b0.value = 0;
 yield* executeInCompatibilityLayer({"MESSAGE":"plan 15",}, b1, false, false, "0/2-)Gp^^=haQ1OMD.xb", null);
-for (var a0 = 15; a0 >= 0.5; a0--) {
+for (var a0 = 15; a0 > 0; a0--) {
 if (((+b2.value || 0) === 200)) {
 b2.value = 50;
 } else {

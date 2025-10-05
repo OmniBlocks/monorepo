@@ -610,7 +610,7 @@ class JSGenerator {
             break;
         case StackOpcode.CONTROL_REPEAT: {
             const i = this.localVariables.next();
-            if (node.times.isAlwaysType(InputType.NUMBER_INT)) {
+            if (node.times.isAlwaysType(InputType.NUMBER_INT | InputType.NUMBER_INF)) {
                 this.source += `for (var ${i} = ${this.descendInput(node.times)}; ${i} > 0; ${i}--) {\n`;
             } else {
                 this.source += `for (var ${i} = ${this.descendInput(node.times)}; ${i} >= 0.5; ${i}--) {\n`;

@@ -32,7 +32,7 @@ runtime.ext_scratch3_control._counter = 0;
 if ((runtime.ext_scratch3_control._counter === 0)) {
 yield* executeInCompatibilityLayer({"MESSAGE":"pass clear = 0",}, b0, false, false, "w", null);
 }
-for (var a0 = 10; a0 >= 0.5; a0--) {
+for (var a0 = 10; a0 > 0; a0--) {
 runtime.ext_scratch3_control._counter++;
 yield;
 }

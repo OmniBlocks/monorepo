@@ -38,7 +38,7 @@ const b0 = stage.variables["Go=PJS7BFXYo_qi2S:kQ"];
 const b1 = runtime.getOpcodeFunction("looks_say");
 return function* genXYZ_non_warp () {
 b0.value = 0;
-for (var a0 = 5; a0 >= 0.5; a0--) {
+for (var a0 = 5; a0 > 0; a0--) {
 thread.timer = timer();
 var a1 = Math.max(0, 1000 * 0);
 runtime.requestRedraw();
@@ -56,7 +56,7 @@ if ((("" + (yield* thread.procedures["Wverify runs warp %s"]((yield* thread.proc
 yield* executeInCompatibilityLayer({"MESSAGE":"pass non warp and warp mix",}, b1, false, false, "S", null);
 }
 b0.value = 0;
-for (var a2 = 5; a2 >= 0.5; a2--) {
+for (var a2 = 5; a2 > 0; a2--) {
 thread.timer = timer();
 var a3 = Math.max(0, 1000 * 0);
 runtime.requestRedraw();
@@ -79,7 +79,7 @@ const b0 = stage.variables["Go=PJS7BFXYo_qi2S:kQ"];
 const b1 = runtime.getOpcodeFunction("looks_say");
 return function* genXYZ_verify_runs_warp_ (p0) {
 b0.value = 0;
-for (var a0 = 5; a0 >= 0.5; a0--) {
+for (var a0 = 5; a0 > 0; a0--) {
 thread.timer = timer();
 var a1 = Math.max(0, 1000 * 0);
 runtime.requestRedraw();
@@ -102,7 +102,7 @@ const b0 = stage.variables["Go=PJS7BFXYo_qi2S:kQ"];
 const b1 = runtime.getOpcodeFunction("looks_say");
 return function* genXYZ_verify_runs_non_warp (p0) {
 b0.value = 0;
-for (var a0 = 5; a0 >= 0.5; a0--) {
+for (var a0 = 5; a0 > 0; a0--) {
 thread.timer = timer();
 var a1 = Math.max(0, 1000 * 0);
 runtime.requestRedraw();

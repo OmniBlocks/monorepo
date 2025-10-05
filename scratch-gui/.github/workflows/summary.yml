@@ -1,4 +1,4 @@
-name: Summarize issues and comments (two-pass)
+name: Summarize issues and comments (two-pass) + Duplicate Detection
 
 # --------------------------------------------------------------------------
 # Trigger on new issues OR new comments that mention the bot
@@ -34,7 +34,7 @@ jobs:
           fetch-depth: 0   # needed for tag lookup
 
       # ------------------------------------------------------
-      # 2️⃣ Find the most recent git tag (or “none”)
+      # 2️⃣ Find the most recent git tag (or "none")
       # ------------------------------------------------------
       - name: Get latest release tag (if any)
         id: tag
@@ -49,7 +49,7 @@ jobs:
           echo "latest_tag=${LATEST_TAG}" >> "$GITHUB_OUTPUT"
 
       # ------------------------------------------------------
-      # 3️⃣ Build a live “project status” snapshot
+      # 3️⃣ Build a live "project status" snapshot
       # ------------------------------------------------------
       - name: Generate real‑time project status report
         id: project-status
@@ -107,7 +107,7 @@ jobs:
           } >> "$GITHUB_OUTPUT"
 
       # ------------------------------------------------------
-      # 4️⃣ NEW – Get full issue context (body + all comments)
+      # 4️⃣ Get full issue context (body + all comments)
       # ------------------------------------------------------
       - name: Get full issue context (body + all comments)
         id: get-context
@@ -120,6 +120,92 @@ jobs:
             echo "$CONTEXT"
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
+
+      # ------------------------------------------------------
+      # 🆕 DUPLICATE DETECTION - Fetch all open issues
+      # ------------------------------------------------------
+      - name: Fetch all open issues for duplicate detection
+        id: fetch-issues
+        if: ${{ github.event_name == 'issues' }}  # Only run on new issues
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ISSUES_FILE="open_issues.json"
+          gh issue list \
+            --repo OmniBlocks/scratch-gui \
+            --state open \
+            --limit 100 \
+            --json number,title,body,url \
+            --jq '.[] | select(.number != ${{ github.event.issue.number }})' \
+            > "$ISSUES_FILE"
+
+          {
+            echo "open_issues<<EOF"
+            cat "$ISSUES_FILE"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      # ------------------------------------------------------
+      # 🆕 DUPLICATE DETECTION - AI-based semantic matching
+      # ------------------------------------------------------
+      - name: Check for duplicate issues using AI
+        id: check-duplicates
+        if: ${{ github.event_name == 'issues' }}  # Only run on new issues
+        uses: actions/ai-inference@v1
+        with:
+          prompt: |
+            You are a duplicate issue detector for the OmniBlocks scratch-gui repository.
+            Your job is to find potential duplicate issues by comparing the new issue against existing open issues.
+
+            NEW ISSUE:
+            Title: ${{ github.event.issue.title }}
+            Body: ${{ github.event.issue.body }}
+            
+            EXISTING OPEN ISSUES:
+            ${{ steps.fetch-issues.outputs.open_issues }}
+
+            Analyze the semantic similarity between the new issue and existing open issues.
+            Consider:
+            - Similar problem descriptions
+            - Related features or components
+            - Same error messages or symptoms
+            - Related metadata (e.g., both about recordings, timestamps, etc.)
+
+            OUTPUT FORMAT:
+            If you find potential duplicates, respond with ONLY the issue numbers separated by commas, like: "42,78,123"
+            If NO duplicates are found, respond with EXACTLY: "NONE"
+            Do not include any other text, explanations, or formatting.
+
+      # ------------------------------------------------------
+      # 🆕 DUPLICATE DETECTION - Comment if duplicates found
+      # ------------------------------------------------------
+      - name: Comment on potential duplicates
+        if: ${{ github.event_name == 'issues' && steps.check-duplicates.outputs.response != 'NONE' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          DUPLICATES="${{ steps.check-duplicates.outputs.response }}"
+          
+          # Build the comment with links to potential duplicates
+          COMMENT="👋 Hi @${{ github.event.issue.user.login }}! I've detected potential duplicate issues:\n\n"
+          
+          IFS=',' read -ra ISSUE_NUMS <<< "$DUPLICATES"
+          for NUM in "${ISSUE_NUMS[@]}"; do
+            # Trim whitespace
+            NUM=$(echo "$NUM" | xargs)
+            ISSUE_INFO=$(gh issue view "$NUM" --json title,url)
+            TITLE=$(echo "$ISSUE_INFO" | jq -r '.title')
+            URL=$(echo "$ISSUE_INFO" | jq -r '.url')
+            COMMENT="${COMMENT}- #${NUM}: ${TITLE}\n"
+          done
+          
+          COMMENT="${COMMENT}\nPlease check if any of these existing issues describe the same problem. If so, feel free to add your comments there instead! 🙂"
+          
+          echo -e "$COMMENT" | gh issue comment "$ISSUE_NUMBER" --body-file -
+          
+          # Add a "possible-duplicate" label
+          gh issue edit "$ISSUE_NUMBER" --add-label "possible-duplicate"
 
       # ------------------------------------------------------
       # 5️⃣ Generate a compact repository index for the AI
@@ -244,12 +330,12 @@ jobs:
 
          
             You are an Artificial Intelligence that helps out with the Github issues in this repository titled scratch-gui inside the OmniBlocks organization.
-            OmniBlocks is a developing Multi‑Language IDE. Currently based on TurboWarp, which is a mod of Scratch 3, for the block editor.
+            OmniBlocks is a developing Multi‑Language IDE. Currently based on TurboWarp, which is a mod of Scratch 3, for the block editor.
             Text editors are also planned for languages like Python or C, but they are not implemented yet.
             OmniBlocks adds some cool things to the classic block editor, such as a music editor or extra features.
             OmniBlocks' and TurboWarp's modifications to Scratch are licensed under the GNU General Public License v3.0.
-            The OmniBlocks logo is licensed under CC BY‑SA 4.0. The logo incorporates the Python logo, which is a trademark of the Python Software Foundation, used here solely to reference the Python programming language. This project is not affiliated with or endorsed by the Python Software Foundation.
-            The OmniBlocks mascot "Boxy" is licensed under CC BY‑SA 4.0.
+            The OmniBlocks logo is licensed under CC BY‑SA 4.0. The logo incorporates the Python logo, which is a trademark of the Python Software Foundation, used here solely to reference the Python programming language. This project is not affiliated with or endorsed by the Python Software Foundation.
+            The OmniBlocks mascot "Boxy" is licensed under CC BY‑SA 4.0.
 
             Please respond appropriately and turn down others from using inappropriate language, such as profanity.
             Your job is to respond to new issues immediately as they are created. You just have to summarize the issue.
@@ -301,7 +387,7 @@ jobs:
 
 
       # ------------------------------------------------------
-      # 8️⃣ If the AI flagged a security issue → hide, label, close, lock
+      # 9️⃣ If the AI flagged a security issue → hide, label, close, lock
       # ------------------------------------------------------
       - name: Handle special keywords
         if: ${{ steps.final.outputs.response == '[SECURITY]' }}
@@ -321,7 +407,7 @@ jobs:
 
           We'll investigate promptly and appreciate your responsible disclosure!"
 
-          # Add a “security” label
+          # Add a "security" label
           gh issue edit "$ISSUE_NUMBER" --add-label "security"
 
           # Close & lock the issue

@@ -9,7 +9,7 @@ const b2 = stage.variables["l^q!%fq]Bv;72dlGf}^Z"];
 return function* genXYZ () {
 b0.value = 0;
 yield* executeInCompatibilityLayer({"MESSAGE":"plan 0",}, b1, false, false, "}fY]VN(X|v/[G`P0?@s2", null);
-for (var a0 = 30; a0 >= 0.5; a0--) {
+for (var a0 = 30; a0 > 0; a0--) {
 b2.value = runtime.ioDevices.clock.projectTimer();
 thread.timer = timer();
 var a1 = Math.max(0, 1000 * 0);

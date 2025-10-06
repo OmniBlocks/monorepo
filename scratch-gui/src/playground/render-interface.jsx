@@ -51,7 +51,30 @@ const handleClickAddonSettings = addonId => {
     // addonId might be a string of the addon to focus on, undefined, or an event (treat like undefined)
     const path = process.env.ROUTING_STYLE === 'wildcard' ? 'addons' : 'addons.html';
     const url = `${process.env.ROOT}${path}${typeof addonId === 'string' ? `#${addonId}` : ''}`;
-    window.open(url);
+    const width = 600;
+const height = 800;
+// my teacher told me write descriptive variable names :)
+// so that my self from 6 or 7 months later can understand what the heck I was thinking >:) 
+// did you see how many months i said
+
+// center popup
+const left = (window.screen.width / 2) - (width / 2);
+const top = (window.screen.height / 2) - (height / 2);
+// yes i know this isn't perfect because it doesn't account for taskbars or whatever but it's close enough
+// and it's better than nothing
+// also it doesn't work properly with multiple monitors but oh well
+// wait what about phonse i didn't even think of that
+window.open(
+  url,
+  '_blank',
+  `width=${width},height=${height},left=${left},top=${top},menubar=no,toolbar=no,location=no,resizable=yes,scrollbars=yes`
+);
+
+/* make it open as a popup, i always found it kinda jarring that it just opened as a new tab, especially
+if you're using OmniBlocks as  PWA, and the link just opens in your browser
+the only downside i can think of is getting blocked by browser protections but welp ¯\_(ツ)_/¯ */
+// i just realized this could be a problem when developing the electron based desktop app
+// todo: make the electorn app handle this properly or something idk
 };
 
 const messages = defineMessages({
@@ -171,14 +194,21 @@ const Footer = () => (
                     </a>
                     <a href="https://docs.turbowarp.org/">
                         <FormattedMessage
-                            defaultMessage="Documentation"
+                            defaultMessage="TurboWarp Documentation"
                             description="Link in footer to additional documentation"
                             id="tw.footer.documentation"
                         />
                     </a>
+                    <a href="https://omniblocks.miraheze.org/">
+                        <FormattedMessage
+                            defaultMessage="OmniBlocks Wiki"
+                            description="Link in footer to OmniBlocks wiki"
+                            id="tw.footer.wiki"
+                        />
+                    </a>
                 </div>
                 <div className={styles.footerSection}>
-                    <a href="https://scratch.mit.edu/users/GarboMuffin/#comments">
+                    <a href="https://scratch.mit.edu/users/scratchcode1_2_3/#comments">
                         <FormattedMessage
                             defaultMessage="Feedback & Bugs"
                             description="Link to feedback/bugs page"
@@ -290,7 +320,10 @@ class Interface extends React.Component {
                                 <div className={classNames(styles.infobox, styles.unsharedUpdate)}>
                                     <p>
                                         <FormattedMessage
-                                            defaultMessage="Unshared projects are no longer visible."
+                                            defaultMessage="Unshared projects are not visible."
+                                            /* changed from "no longer visible" to "not visible" to
+                                            not dissapoint the new users that might not have known you used to be able to 
+                                            see unshared projects */
                                             description="Appears on unshared projects"
                                             id="tw.unshared2.1"
                                         />
@@ -350,7 +383,7 @@ class Interface extends React.Component {
                                     <FormattedMessage
                                         // eslint-disable-next-line max-len
                                         defaultMessage="{APP_NAME} is a Scratch mod that has many different features with different editors. Some notable features include free client-side python execution, and music creation built in."
-                                        description="Description of TurboWarp on the homepage"
+                                        description="Description of Omniblocks on the homepage"
                                         id="tw.home.description"
                                         values={{
                                             APP_NAME

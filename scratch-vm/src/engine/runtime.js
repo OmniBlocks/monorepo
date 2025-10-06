@@ -1235,7 +1235,7 @@ categoryInfo.blockText = extensionInfo.blockText;
                 colour: categoryInfo.color1,
                 colourSecondary: categoryInfo.color2,
                 colourTertiary: categoryInfo.color3,
-                blockText: blockInfo.blockText ?? extensionInfo.blockText,
+                blockText: menuInfo.blockText ?? categoryInfo.blockText,
                 outputShape: menuInfo.acceptReporters ?
                     ScratchBlocksConstants.OUTPUT_SHAPE_ROUND : ScratchBlocksConstants.OUTPUT_SHAPE_SQUARE,
                 args0: [

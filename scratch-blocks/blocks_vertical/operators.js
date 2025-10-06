@@ -174,7 +174,7 @@ Blockly.Blocks['operator_lt'] = {
 Blockly.Blocks['operator_gtoreq'] = {
   init: function() {
     this.jsonInit({
-      "message0": "%1 >= %2",
+      "message0": "%1 ≥ %2",
       "args0": [
         {
           "type": "input_value",
@@ -194,7 +194,7 @@ Blockly.Blocks['operator_gtoreq'] = {
 Blockly.Blocks['operator_ltoreq'] = {
   init: function() {
     this.jsonInit({
-      "message0": "%1 <= %2",
+      "message0": "%1 ≤ %2",
       "args0": [
         {
           "type": "input_value",

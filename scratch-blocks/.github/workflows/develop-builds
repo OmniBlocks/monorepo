@@ -1,0 +1,51 @@
+name: Build and Publish to develop-builds
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout develop branch
+        uses: actions/checkout@v4
+        with:
+          ref: develop
+          fetch-depth: 0  # Fetch all history for all branches
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      
+      - name: Install dependencies and build
+        run: |
+          npm ci  # This triggers prepublish which builds compressed files
+      
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+      
+      - name: Checkout develop-builds branch
+        run: |
+          git fetch origin develop-builds:develop-builds || git checkout -b develop-builds
+          git checkout develop-builds
+      
+      - name: Merge develop into develop-builds
+        run: |
+          git merge origin/develop --no-edit || true
+      
+      - name: Add compiled files
+        run: |
+          git add -f blockly_compressed*.js blocks_compressed*.js msg/*.js
+          git diff --staged --quiet || git commit -m "Auto-build: Update compiled files from develop ($(git rev-parse --short origin/develop))"
+      
+      - name: Push to develop-builds
+        run: |
+          git push origin develop-builds

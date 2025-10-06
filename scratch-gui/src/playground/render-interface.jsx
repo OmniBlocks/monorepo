@@ -41,7 +41,7 @@ import AddonChannels from '../addons/channels';
 import {loadServiceWorker} from './load-service-worker';
 import runAddons from '../addons/entry';
 import InvalidEmbed from '../components/tw-invalid-embed/invalid-embed.jsx';
-import {APP_NAME} from '../lib/brand.js';
+import {APP_NAME, APP_VERSION} from '../lib/brand.js';
 
 import styles from './interface.css';
 
@@ -98,12 +98,13 @@ const Footer = () => (
             <div className={styles.footerText}>
                 <FormattedMessage
                     // eslint-disable-next-line max-len
-                    defaultMessage="{APP_NAME} v0.5.7-alpha"
+                    defaultMessage="{APP_NAME} {APP_VERSION}"
                     /* six seven */
                     description="Says what version of the app is running"
                     id="tw.version.indicator"
                     values={{
-                        APP_NAME
+                        APP_NAME, 
+                        APP_VERSION
                     }}
                 />
             </div>

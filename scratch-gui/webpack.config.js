@@ -13,6 +13,9 @@ const postcssImport = require('postcss-import');
 
 const STATIC_PATH = process.env.STATIC_PATH || '/static';
 const {APP_NAME} = require('./src/lib/brand');
+console.log('🔍 DEBUG: Webpack config loading...');
+console.log('🔍 DEBUG: APP_VERSION from env:', process.env.APP_VERSION);
+console.log('🔍 DEBUG: Will inject:', JSON.stringify(process.env.APP_VERSION || ''));
 
 const root = process.env.ROOT || '';
 if (root.length > 0 && !root.endsWith('/')) {

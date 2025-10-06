@@ -24,8 +24,11 @@ const manuallyTrustExtension = url => {
  * @returns {boolean} True if the extension can is trusted
  */
 const isTrustedExtension = url => (
-    // Always trust our official extension repostiory.
+    // Always trust TW's official extension repostiory.
     url.startsWith('https://extensions.turbowarp.org/') ||
+
+    // ours too
+    url.startsWith('https://omniblocks.github.io/extensions/') ||
 
     // For development.
     url.startsWith('http://localhost:8000/') ||

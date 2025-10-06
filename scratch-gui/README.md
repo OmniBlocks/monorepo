@@ -1,5 +1,5 @@
 # OmniBlocks/scratch-gui
-![Build Status](https://github.com/OmniBlocks/scratch-gui/workflows/Build Monitor/badge.svg)
+![Build Status](https://github.com/OmniBlocks/scratch-gui/workflows/CI/badge.svg)
 ![GitHub issues](https://img.shields.io/github/issues/OmniBlocks/scratch-gui)
 ![GitHub](https://img.shields.io/badge/license-GPLv3-blue.svg)
 ![GitHub last commit](https://img.shields.io/github/last-commit/OmniBlocks/scratch-gui)

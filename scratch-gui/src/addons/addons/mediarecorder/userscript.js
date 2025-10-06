@@ -66,6 +66,7 @@ const loadFFmpeg = async () => {
         resolve(ffmpeg);
       } catch (error) {
         console.error('FFmpeg load error:', error);
+        ffmpeg = null;
         reject(error);
       }
     };

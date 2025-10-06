@@ -1070,7 +1070,7 @@ class Runtime extends EventEmitter {
             categoryInfo.color2 = defaultExtensionColors[1];
             categoryInfo.color3 = defaultExtensionColors[2];
         }
-
+categoryInfo.blockText = extensionInfo.blockText;
         this._blockInfo.push(categoryInfo);
 
         this._fillExtensionCategory(categoryInfo, extensionInfo);
@@ -1235,6 +1235,7 @@ class Runtime extends EventEmitter {
                 colour: categoryInfo.color1,
                 colourSecondary: categoryInfo.color2,
                 colourTertiary: categoryInfo.color3,
+                blockText: blockInfo.blockText ?? extensionInfo.blockText,
                 outputShape: menuInfo.acceptReporters ?
                     ScratchBlocksConstants.OUTPUT_SHAPE_ROUND : ScratchBlocksConstants.OUTPUT_SHAPE_SQUARE,
                 args0: [

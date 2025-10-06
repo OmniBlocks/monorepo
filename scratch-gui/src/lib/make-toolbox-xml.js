@@ -608,41 +608,66 @@ const operators = function (isInitialSetup, isStage, targetId, colors) {
         </block>
         ${blockSeparator}
         <block type="operator_gt">
-            <value name="OPERAND1">
-                <shadow type="text">
-                    <field name="TEXT"/>
-                </shadow>
-            </value>
-            <value name="OPERAND2">
-                <shadow type="text">
-                    <field name="TEXT">50</field>
-                </shadow>
-            </value>
-        </block>
-        <block type="operator_lt">
-            <value name="OPERAND1">
-                <shadow type="text">
-                    <field name="TEXT"/>
-                </shadow>
-            </value>
-            <value name="OPERAND2">
-                <shadow type="text">
-                    <field name="TEXT">50</field>
-                </shadow>
-            </value>
-        </block>
-        <block type="operator_equals">
-            <value name="OPERAND1">
-                <shadow type="text">
-                    <field name="TEXT"/>
-                </shadow>
-            </value>
-            <value name="OPERAND2">
-                <shadow type="text">
-                    <field name="TEXT">50</field>
-                </shadow>
-            </value>
-        </block>
+    <value name="OPERAND1">
+        <shadow type="text">
+            <field name="TEXT"/>
+        </shadow>
+    </value>
+    <value name="OPERAND2">
+        <shadow type="text">
+            <field name="TEXT">50</field>
+        </shadow>
+    </value>
+</block>
+<block type="operator_gtoreq">
+    <value name="OPERAND1">
+        <shadow type="text">
+            <field name="TEXT"/>
+        </shadow>
+    </value>
+    <value name="OPERAND2">
+        <shadow type="text">
+            <field name="TEXT">50</field>
+        </shadow>
+    </value>
+</block>
+<block type="operator_lt">
+    <value name="OPERAND1">
+        <shadow type="text">
+            <field name="TEXT"/>
+        </shadow>
+    </value>
+    <value name="OPERAND2">
+        <shadow type="text">
+            <field name="TEXT">50</field>
+        </shadow>
+    </value>
+</block>
+<block type="operator_ltoreq">
+    <value name="OPERAND1">
+        <shadow type="text">
+            <field name="TEXT"/>
+        </shadow>
+    </value>
+    <value name="OPERAND2">
+        <shadow type="text">
+            <field name="TEXT">50</field>
+        </shadow>
+    </value>
+</block>
+<block type="operator_equals">
+    <value name="OPERAND1">
+        <shadow type="text">
+            <field name="TEXT"/>
+        </shadow>
+    </value>
+    <value name="OPERAND2">
+        <shadow type="text">
+            <field name="TEXT">50</field>
+        </shadow>
+    </value>
+</block>
+
         ${blockSeparator}
         <block type="operator_and"/>
         <block type="operator_or"/>

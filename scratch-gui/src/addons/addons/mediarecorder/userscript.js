@@ -44,7 +44,10 @@ const loadFFmpeg = async () => {
     script.src = "https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/dist/umd/ffmpeg.min.js";
     script.onload = async () => {
       try {
-        const { FFmpeg } = window.FFmpegWASM;
+        const { FFmpeg } = window.FFmpeg || {};
+        if (!FFmpeg) {
+          throw new Error("FFmpeg UMD bundle not found on window.FFmpeg");
+        }
         ffmpeg = new FFmpeg();
         
         // Set up logging

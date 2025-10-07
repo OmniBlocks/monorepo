@@ -1,0 +1,182 @@
+name: Test PR Deployment
+
+on:
+  issue_comment:
+    types: [created]
+  pull_request:
+    types: [opened]
+
+permissions:
+  contents: write
+  pull-requests: write
+  pages: write
+  id-token: write
+
+jobs:
+  test-pr:
+    if: >-
+      (github.event_name == 'pull_request' && github.event.action == 'opened') ||
+      (github.event_name == 'issue_comment' && github.event.issue.pull_request && contains(github.event.comment.body, '/test pr'))
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Record start time
+        id: start_time
+        run: echo "timestamp=$(date +%s)" >> $GITHUB_OUTPUT
+
+      - name: Cancel previous runs
+        uses: styfle/cancel-workflow-action@0.12.0
+        with:
+          workflow_id: 'prtest.yml'
+          access_token: ${{ github.token }}
+          all_but_latest: true
+
+      - name: React to comment (if triggered by comment)
+        if: github.event_name == 'issue_comment'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.reactions.createForIssueComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: context.payload.comment.id,
+              content: 'rocket'
+            });
+
+      - name: Post building comment
+        id: build_comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // FIXED: Use context.eventName and context.payload
+            const username = context.eventName === 'issue_comment' 
+              ? context.payload.comment.user.login 
+              : context.payload.pull_request.user.login;
+            const issueNumber = context.eventName === 'issue_comment'
+              ? context.issue.number
+              : context.payload.number;
+            
+            const comment = await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber,
+              body: `🔨 **Building PR for testing...** (requested by @${username}) 🚧\n\n` +
+                    `<img src="https://lh5.googleusercontent.com/proxy/OUqG0HgVNVMNorlPCmI4VgJa-3h7uHLkkMy9vdJ0eRsQlvJBytFUS-HvuW-O9EJd-c9xB7KAqlwby4Fzp59g1705FzBuP-F8dC1ZaBQtmLeCu5i6FfSd6Mmzh8mjOwgrEYZwy5UStg" width="20" height="20">` +
+                    `🏗️ Please wait while the build completes. This may take a few minutes. ⛏️`
+            });
+            return comment.data.id;
+
+      - name: Get PR details
+        id: pr
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // FIXED: Use context.eventName and context.payload
+            const prNumber = context.eventName === 'issue_comment'
+              ? context.issue.number
+              : context.payload.number;
+              
+            const pr = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber
+            });
+            return {
+              ref: pr.data.head.ref,
+              sha: pr.data.head.sha,
+              number: pr.data.number
+            };
+
+      - name: Checkout PR code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ fromJSON(steps.pr.outputs.result).sha }}
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build website
+        run: npm run build
+        env:
+          NODE_ENV: production
+
+      - name: Add .nojekyll file
+        run: touch build/.nojekyll
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./build
+          publish_branch: gh-pages
+          force_orphan: true
+          commit_message: '[PR Test] Deploy PR #${{ fromJSON(steps.pr.outputs.result).number }} (${{ fromJSON(steps.pr.outputs.result).sha }})'
+
+      - name: Calculate duration
+        id: duration
+        if: always()
+        run: |
+          END_TIME=$(date +%s)
+          START_TIME=${{ steps.start_time.outputs.timestamp }}
+          DURATION=$((END_TIME - START_TIME))
+          MINUTES=$((DURATION / 60))
+          SECONDS=$((DURATION % 60))
+          echo "duration=${MINUTES}m ${SECONDS}s" >> $GITHUB_OUTPUT
+
+      - name: Update comment with success
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // FIXED: Use context.eventName and context.payload
+            const prNumber = ${{ fromJSON(steps.pr.outputs.result).number }};
+            const sha = '${{ fromJSON(steps.pr.outputs.result).sha }}'.substring(0, 7);
+            const commentId = ${{ steps.build_comment.outputs.result }};
+            const username = context.eventName === 'issue_comment' 
+              ? context.payload.comment.user.login 
+              : context.payload.pull_request.user.login;
+            const duration = '${{ steps.duration.outputs.duration }}';
+            
+            await github.rest.issues.updateComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: commentId,
+              body: `🚀 **PR Test Deployment Complete!**\n\n` +
+                    `Hi, @${username}! Your pull request test deployment is complete! ✅🎉\n\n` +
+                    `View your changes at: https://omniblocks.github.io/scratch-gui\n\n` +
+                    `**Details:**\n` +
+                    `- PR: #${prNumber}\n` +
+                    `- Commit: \`${sha}\`\n` +
+                    `- Requested by: @${username}\n` +
+                    `- Build time: ${duration}\n` +
+                    `- Note: This deployment will be replaced when another PR is tested.`
+            });
+
+      - name: Update comment with failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // FIXED: Use context.eventName and context.payload
+            const commentId = ${{ steps.build_comment.outputs.result }};
+            const username = context.eventName === 'issue_comment' 
+              ? context.payload.comment.user.login 
+              : context.payload.pull_request.user.login;
+            const duration = '${{ steps.duration.outputs.duration }}';
+            
+            await github.rest.issues.updateComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: commentId,
+              body: `❌ **PR Test Deployment Failed** @${username}\n\n` +
+                    `Something went wrong during the build or deployment process.\n` +
+                    `Build time: ${duration}\n\n` +
+                    `Check the [workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details.`
+            });

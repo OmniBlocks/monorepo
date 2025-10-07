@@ -10,11 +10,6 @@ permissions:
   pages: write
   id-token: write
 
-# Only allow one PR test per PR number
-concurrency:
-  group: pr-test-deployment-${{ github.event.issue.number }}
-  cancel-in-progress: true
-
 jobs:
   test-pr:
     # Only run if:
@@ -26,6 +21,14 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
+      - name: Cancel previous runs
+        uses: styfle/cancel-workflow-action@0.12.0
+        with:
+          workflow_id: 'Test PR Deployment.yml'
+          access_token: ${{ github.token }}
+          all_but_latest: true
+          skip_running: false
+
       - name: React to comment
         uses: actions/github-script@v7
         with:
@@ -47,7 +50,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
-              body: `🔨 **Building PR for testing...** (requested by @${username})\n\nPlease wait while the build completes. This may take a few minutes.`
+              body: `🔨 **Building PR for testing...** (requested by @${username})🚧\n\n🏗️ Please wait while the build completes. This may take a few minutes. ⛏️`
             });
             return comment.data.id;
 
@@ -113,8 +116,8 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               comment_id: commentId,
-              body: `🚀 **PR Test Deployment Complete!**\n\n` +
-                    `Hi  @${username}! Your pull request test deployment is complete ✅🎉` +
+              body: `🚀 **PR Test Deployment Complete!** \n\n` +
+                    `Hi, @${username}! Your pull request test deployment is complete! ✅🎉` +
                     `View your changes at: https://omniblocks.github.io/scratch-gui\n\n` +
                     `**Details:**\n` +
                     `- PR: #${prNumber}\n` +

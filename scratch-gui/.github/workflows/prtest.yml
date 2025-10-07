@@ -37,6 +37,19 @@ jobs:
               content: 'rocket'
             });
 
+      - name: Post building comment
+        id: build_comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const comment = await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `🔨 **Building PR for testing...**\n\nPlease wait while the build completes. This may take a few minutes.`
+            });
+            return comment.data.id;
+
       - name: Get PR details
         id: pr
         uses: actions/github-script@v7
@@ -85,17 +98,19 @@ jobs:
           force_orphan: true
           commit_message: '[PR Test] Deploy PR #${{ fromJSON(steps.pr.outputs.result).number }} (${{ fromJSON(steps.pr.outputs.result).sha }})'
 
-      - name: Comment with deployment URL
+      - name: Update comment with success
+        if: success()
         uses: actions/github-script@v7
         with:
           script: |
             const prNumber = ${{ fromJSON(steps.pr.outputs.result).number }};
             const sha = '${{ fromJSON(steps.pr.outputs.result).sha }}'.substring(0, 7);
+            const commentId = ${{ steps.build_comment.outputs.result }};
             
-            await github.rest.issues.createComment({
+            await github.rest.issues.updateComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              issue_number: context.issue.number,
+              comment_id: commentId,
               body: `🚀 **PR Test Deployment Complete!**\n\n` +
                     `View your changes at: https://omniblocks.github.io/scratch-gui\n\n` +
                     `**Details:**\n` +
@@ -104,15 +119,17 @@ jobs:
                     `- Note: This deployment will be replaced when another PR is tested.`
             });
 
-      - name: Handle deployment failure
+      - name: Update comment with failure
         if: failure()
         uses: actions/github-script@v7
         with:
           script: |
-            await github.rest.issues.createComment({
+            const commentId = ${{ steps.build_comment.outputs.result }};
+            
+            await github.rest.issues.updateComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              issue_number: context.issue.number,
+              comment_id: commentId,
               body: `❌ **PR Test Deployment Failed**\n\n` +
                     `Something went wrong during the build or deployment process.\n` +
                     `Check the [workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details.`

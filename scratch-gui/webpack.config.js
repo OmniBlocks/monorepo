@@ -29,7 +29,7 @@ const htmlWebpackPluginCommon = {
 };
 
 // When this changes, the path for all JS files will change, bypassing any HTTP caches
-const CACHE_EPOCH = 'pentapod';
+const CACHE_EPOCH = 'omnibruh';
 
 const base = {
     mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',

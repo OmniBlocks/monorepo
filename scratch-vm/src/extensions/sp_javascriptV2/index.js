@@ -177,8 +177,6 @@ class SPjavascriptV2 {
         }
       });
     }
-  }
-    });
 
     this.globalFuncs = new Map();
   }
@@ -366,11 +364,13 @@ class SPjavascriptV2 {
   }
 
   // helper funcs
-  toggleSandbox() {
-    if (this.isEditorUnsandboxed) {
-      this.isEditorUnsandboxed = false;
-      this.runtime.extensionManager.refreshBlocks("SPjavascriptV2");
-    } else {
+toggleSandbox() {
+  if (this.isEditorUnsandboxed) {
+    this.isEditorUnsandboxed = false;
+    this.runtime.extensionManager.refreshBlocks("SPjavascriptV2");
+  } else {
+    // Guard against runtime.vm being undefined
+    if (this.runtime.vm && this.runtime.vm.securityManager) {
       this.runtime.vm.securityManager.canUnsandbox("JavaScript").then((isAllowed) => {
         if (!isAllowed) return;
         this.isEditorUnsandboxed = true;
@@ -378,6 +378,7 @@ class SPjavascriptV2 {
       });
     }
   }
+}
 
   packagerInfo() {
     alert([

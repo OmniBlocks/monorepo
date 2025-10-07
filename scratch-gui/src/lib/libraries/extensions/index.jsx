@@ -368,6 +368,9 @@ export default [
                 defaultMessage="TurboWarp Blocks"
                 description="Name of the strange 'TurboWarp Blocks' extension"
                 id="tw.twExtension.name"
+                values={{
+                    APP_NAME: "TurboWarp",
+                }}
             />
         ),
         extensionId: 'tw',

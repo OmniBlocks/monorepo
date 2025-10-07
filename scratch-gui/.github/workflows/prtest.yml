@@ -17,7 +17,7 @@ jobs:
     # Run if:
     # 1. Comment on PR contains '/test pr'
     # 2. OR a new PR is opened
-    if: |
+    if: >-
       (github.event_name == 'pull_request' && github.event.action == 'opened') ||
       (github.event_name == 'issue_comment' && github.event.issue.pull_request && contains(github.event.comment.body, '/test pr'))
     runs-on: ubuntu-latest

@@ -1,0 +1,119 @@
+name: Test PR Deployment
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: write
+  pull-requests: write
+  pages: write
+  id-token: write
+
+# Only allow one PR test at a time
+concurrency:
+  group: pr-test-deployment
+  cancel-in-progress: true
+
+jobs:
+  test-pr:
+    # Only run if:
+    # 1. Comment is on a PR (not an issue)
+    # 2. Comment contains '/test pr'
+    if: |
+      github.event.issue.pull_request &&
+      contains(github.event.comment.body, '/test pr')
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: React to comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.reactions.createForIssueComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: context.payload.comment.id,
+              content: 'rocket'
+            });
+
+      - name: Get PR details
+        id: pr
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number
+            });
+            return {
+              ref: pr.data.head.ref,
+              sha: pr.data.head.sha,
+              number: pr.data.number
+            };
+
+      - name: Checkout PR code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ fromJSON(steps.pr.outputs.result).sha }}
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build website
+        run: npm run build
+        env:
+          NODE_ENV: production
+
+      - name: Add .nojekyll file
+        run: touch build/.nojekyll
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./build
+          publish_branch: gh-pages
+          force_orphan: true
+          commit_message: '[PR Test] Deploy PR #${{ fromJSON(steps.pr.outputs.result).number }} (${{ fromJSON(steps.pr.outputs.result).sha }})'
+
+      - name: Comment with deployment URL
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = ${{ fromJSON(steps.pr.outputs.result).number }};
+            const sha = '${{ fromJSON(steps.pr.outputs.result).sha }}'.substring(0, 7);
+            
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `🚀 **PR Test Deployment Complete!**\n\n` +
+                    `View your changes at: https://omniblocks.github.io/scratch-gui\n\n` +
+                    `**Details:**\n` +
+                    `- PR: #${prNumber}\n` +
+                    `- Commit: \`${sha}\`\n` +
+                    `- Note: This deployment will be replaced when another PR is tested.`
+            });
+
+      - name: Handle deployment failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `❌ **PR Test Deployment Failed**\n\n` +
+                    `Something went wrong during the build or deployment process.\n` +
+                    `Check the [workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details.`
+            });

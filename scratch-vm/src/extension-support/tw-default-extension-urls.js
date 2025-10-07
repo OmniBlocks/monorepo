@@ -9,7 +9,10 @@ const defaults = {
     text: 'https://extensions.turbowarp.org/lab/text.js',
 
     // Turboloader's AudioStream
-    audiostr: 'https://extensions.turbowarp.org/turboloader/audiostream.js'
+    audiostr: 'https://extensions.turbowarp.org/turboloader/audiostream.js',
+
+    // https://scratch.mit.edu/discuss/topic/842592/
+    faceSensing: 'https://extensions.turbowarp.org/lab/face-sensing.js'
 };
 
 module.exports = defaults;

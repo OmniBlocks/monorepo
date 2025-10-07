@@ -166,13 +166,18 @@ class SPjavascriptV2 {
     this.runtime = runtime;
     this.isEditorUnsandboxed = false;
 
-    this.runtime.vm.on("workspaceUpdate", () => {
-      codeEditorHandlers.clear();
-      if (!isScratchBlocksReady) {
-        isScratchBlocksReady = typeof ScratchBlocks === "object" && 
-                        typeof ScratchBlocks.FieldCustom === "object";
-        if (isScratchBlocksReady) initBlockTools();
-      }
+    // Safely attach workspaceUpdate listener only if runtime.vm exists
+    if (this.runtime.vm) {
+      this.runtime.vm.on("workspaceUpdate", () => {
+        codeEditorHandlers.clear();
+        if (!isScratchBlocksReady) {
+          isScratchBlocksReady = typeof ScratchBlocks === "object" && 
+                                  typeof ScratchBlocks.FieldCustom === "object";
+          if (isScratchBlocksReady) initBlockTools();
+        }
+      });
+    }
+  }
     });
 
     this.globalFuncs = new Map();

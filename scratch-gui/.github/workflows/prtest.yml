@@ -7,7 +7,7 @@ on:
     types: [opened]
 
 permissions:
-  contents: write
+  contents: read
   pull-requests: write
   pages: write
   id-token: write
@@ -18,7 +18,11 @@ jobs:
       (github.event_name == 'pull_request' && github.event.action == 'opened') ||
       (github.event_name == 'issue_comment' && github.event.issue.pull_request && contains(github.event.comment.body, '/test pr'))
     runs-on: ubuntu-latest
-    
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
     steps:
       - name: Record start time
         id: start_time
@@ -48,7 +52,6 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            // FIXED: Use context.eventName and context.payload
             const username = context.eventName === 'issue_comment' 
               ? context.payload.comment.user.login 
               : context.payload.pull_request.user.login;
@@ -60,9 +63,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: issueNumber,
-              body: `🔨 **Building PR for testing...** (requested by @${username}) 🚧\n\n` +
-                    `<img src="https://lh5.googleusercontent.com/proxy/OUqG0HgVNVMNorlPCmI4VgJa-3h7uHLkkMy9vdJ0eRsQlvJBytFUS-HvuW-O9EJd-c9xB7KAqlwby4Fzp59g1705FzBuP-F8dC1ZaBQtmLeCu5i6FfSd6Mmzh8mjOwgrEYZwy5UStg" width="20" height="20">` +
-                    `🏗️ Please wait while the build completes. This may take a few minutes. ⛏️`
+              body: `🔨 **Building PR for testing...** (requested by @${username}) 🚧`
             });
             return comment.data.id;
 
@@ -71,7 +72,6 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            // FIXED: Use context.eventName and context.payload
             const prNumber = context.eventName === 'issue_comment'
               ? context.issue.number
               : context.payload.number;
@@ -107,17 +107,20 @@ jobs:
         env:
           NODE_ENV: production
 
-      - name: Add .nojekyll file
-        run: touch build/.nojekyll
+      - name: Prepare per-PR directory
+        run: |
+          mkdir -p ./public/${{ github.actor }}/${{ fromJSON(steps.pr.outputs.result).number }}
+          cp -r ./build/* ./public/${{ github.actor }}/${{ fromJSON(steps.pr.outputs.result).number }}/
+          touch ./public/.nojekyll
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./public
 
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./build
-          publish_branch: gh-pages
-          force_orphan: true
-          commit_message: '[PR Test] Deploy PR #${{ fromJSON(steps.pr.outputs.result).number }} (${{ fromJSON(steps.pr.outputs.result).sha }})'
+        id: deployment
+        uses: actions/deploy-pages@v4
 
       - name: Calculate duration
         id: duration
@@ -135,7 +138,6 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            // FIXED: Use context.eventName and context.payload
             const prNumber = ${{ fromJSON(steps.pr.outputs.result).number }};
             const sha = '${{ fromJSON(steps.pr.outputs.result).sha }}'.substring(0, 7);
             const commentId = ${{ steps.build_comment.outputs.result }};
@@ -143,20 +145,21 @@ jobs:
               ? context.payload.comment.user.login 
               : context.payload.pull_request.user.login;
             const duration = '${{ steps.duration.outputs.duration }}';
+            const pageUrl = '${{ steps.deployment.outputs.page_url }}';
             
             await github.rest.issues.updateComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               comment_id: commentId,
               body: `🚀 **PR Test Deployment Complete!**\n\n` +
-                    `Hi, @${username}! Your pull request test deployment is complete! ✅🎉\n\n` +
-                    `View your changes at: https://omniblocks.github.io/scratch-gui\n\n` +
+                    `Hi, @${username}! Your PR test deployment is ready! ✅🎉\n\n` +
+                    `🌍 View it here:\n` +
+                    `${pageUrl}${username}/${prNumber}/\n\n` +
                     `**Details:**\n` +
                     `- PR: #${prNumber}\n` +
                     `- Commit: \`${sha}\`\n` +
                     `- Requested by: @${username}\n` +
-                    `- Build time: ${duration}\n` +
-                    `- Note: This deployment will be replaced when another PR is tested.`
+                    `- Build time: ${duration}\n`
             });
 
       - name: Update comment with failure
@@ -164,7 +167,6 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            // FIXED: Use context.eventName and context.payload
             const commentId = ${{ steps.build_comment.outputs.result }};
             const username = context.eventName === 'issue_comment' 
               ? context.payload.comment.user.login 
@@ -176,7 +178,7 @@ jobs:
               repo: context.repo.repo,
               comment_id: commentId,
               body: `❌ **PR Test Deployment Failed** @${username}\n\n` +
-                    `Something went wrong during the build or deployment process.\n` +
+                    `Something went wrong during build or deployment.\n` +
                     `Build time: ${duration}\n\n` +
-                    `Check the [workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details.`
+                    `Check logs: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}`
             });

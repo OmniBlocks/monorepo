@@ -68,6 +68,9 @@ const base = {
     },
     cache: {
         type: 'filesystem',
+        buildDependencies: {
+            config: [__filename]
+        }
     },
     module: {
         rules: [{

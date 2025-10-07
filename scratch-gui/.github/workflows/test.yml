@@ -1,144 +1,85 @@
-name: Test PR Deployment
-
-on:
-  issue_comment:
-    types: [created]
-
+name: Build Monitor
 permissions:
-  contents: write
-  pull-requests: write
-  pages: write
-  id-token: write
+  contents: read
+  issues: write
+on:
+  push:
+    branches: [ main ]
 
 jobs:
-  test-pr:
-    # Only run if:
-    # 1. Comment is on a PR (not an issue)
-    # 2. Comment contains '/test pr'
-    if: |
-      github.event.issue.pull_request &&
-      contains(github.event.comment.body, '/test pr')
+  build-monitor:
     runs-on: ubuntu-latest
-    
     steps:
-      - name: Cancel previous runs
-        uses: styfle/cancel-workflow-action@0.12.0
-        with:
-          workflow_id: 'Test PR Deployment.yml'
-          access_token: ${{ github.token }}
-          all_but_latest: true
-          skip_running: false
-
-      - name: React to comment
-        uses: actions/github-script@v7
-        with:
-          script: |
-            await github.rest.reactions.createForIssueComment({
+    - uses: actions/checkout@v4
+    
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'
+        
+    - name: Install dependencies
+      id: install
+      run: |
+        echo "install_status=success" >> $GITHUB_OUTPUT
+        install_output=$(npm ci 2>&1) || {
+          echo "install_status=failure" >> $GITHUB_OUTPUT
+          echo "error_output<<EOF" >> $GITHUB_OUTPUT
+          echo "$install_output" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+        }
+        
+    - name: Run build
+      id: build
+      if: steps.install.outputs.install_status == 'success'
+      run: |
+        echo "build_status=success" >> $GITHUB_OUTPUT
+        build_output=$(npm run build 2>&1) || {
+          echo "build_status=failure" >> $GITHUB_OUTPUT
+          echo "error_output<<EOF" >> $GITHUB_OUTPUT
+          echo "$build_output" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+        }
+        
+    - name: Create issue if failed
+      if: steps.install.outputs.install_status == 'failure' || steps.build.outputs.build_status == 'failure'
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const failedStep = process.env.INSTALL_STATUS === 'failure' ? 'dependency installation' : 'build';
+          const errorOutput = `\`\`\`\n${process.env.ERROR_OUTPUT}\n\`\`\``;
+          
+          const { data: issues } = await github.rest.issues.listForRepo({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            state: 'open',
+            labels: 'build-failure'
+          });
+          
+          const existingIssue = issues.find(issue => 
+            issue.title.includes('Build Failure') && 
+            issue.labels.some(label => label.name === 'build-failure')
+          );
+          
+          const title = `Build Failure - ${new Date().toISOString()}`;
+          const body = `The latest commit (${context.sha}) failed during ${failedStep}.\n\n**Error Output:**\n${errorOutput}\n\n[View Workflow Run](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`;
+          
+          if (!existingIssue) {
+            await github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              comment_id: context.payload.comment.id,
-              content: 'rocket'
+              title: title,
+              body: body,
+              labels: ['build-failure', 'bug']
             });
-
-      - name: Post building comment
-        id: build_comment
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const username = context.payload.comment.user.login;
-            const comment = await github.rest.issues.createComment({
+          } else {
+            await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              issue_number: context.issue.number,
-              body: `🔨 **Building PR for testing...** (requested by @${username})🚧\n\n🏗️ Please wait while the build completes. This may take a few minutes. ⛏️`
+              issue_number: existingIssue.number,
+              body: `Another failure detected in commit ${context.sha} during ${failedStep}.\n\n**Error Output:**\n${errorOutput}\n\n[View Workflow Run](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`
             });
-            return comment.data.id;
-
-      - name: Get PR details
-        id: pr
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const pr = await github.rest.pulls.get({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: context.issue.number
-            });
-            return {
-              ref: pr.data.head.ref,
-              sha: pr.data.head.sha,
-              number: pr.data.number
-            };
-
-      - name: Checkout PR code
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ fromJSON(steps.pr.outputs.result).sha }}
-          fetch-depth: 0
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build website
-        run: npm run build
-        env:
-          NODE_ENV: production
-
-      - name: Add .nojekyll file
-        run: touch build/.nojekyll
-
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./build
-          publish_branch: gh-pages
-          force_orphan: true
-          commit_message: '[PR Test] Deploy PR #${{ fromJSON(steps.pr.outputs.result).number }} (${{ fromJSON(steps.pr.outputs.result).sha }})'
-
-      - name: Update comment with success
-        if: success()
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const prNumber = ${{ fromJSON(steps.pr.outputs.result).number }};
-            const sha = '${{ fromJSON(steps.pr.outputs.result).sha }}'.substring(0, 7);
-            const commentId = ${{ steps.build_comment.outputs.result }};
-            const username = context.payload.comment.user.login;
-            
-            await github.rest.issues.updateComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              comment_id: commentId,
-              body: `🚀 **PR Test Deployment Complete!** \n\n` +
-                    `Hi, @${username}! Your pull request test deployment is complete! ✅🎉` +
-                    `View your changes at: https://omniblocks.github.io/scratch-gui\n\n` +
-                    `**Details:**\n` +
-                    `- PR: #${prNumber}\n` +
-                    `- Commit: \`${sha}\`\n` +
-                    `- Requested by: @${username}\n` +
-                    `- Note: This deployment will be replaced when another PR is tested.`
-            });
-
-      - name: Update comment with failure
-        if: failure()
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const commentId = ${{ steps.build_comment.outputs.result }};
-            const username = context.payload.comment.user.login;
-            
-            await github.rest.issues.updateComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              comment_id: commentId,
-              body: `❌ **PR Test Deployment Failed** @${username}\n\n` +
-                    `Something went wrong during the build or deployment process.\n` +
-                    `Check the [workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details.`
-            });
+          }
+      env:
+        ERROR_OUTPUT: ${{ steps.install.outputs.error_output || steps.build.outputs.error_output }}
+        INSTALL_STATUS: ${{ steps.install.outputs.install_status }}
+        BUILD_STATUS: ${{ steps.build.outputs.build_status }}

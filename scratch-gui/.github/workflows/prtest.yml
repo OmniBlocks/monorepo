@@ -33,7 +33,6 @@ jobs:
           workflow_id: 'prtest.yml'
           access_token: ${{ github.token }}
           all_but_latest: true
-          skip_running: false
 
       - name: React to comment (if triggered by comment)
         if: github.event_name == 'issue_comment'
@@ -54,17 +53,17 @@ jobs:
           script: |
             const username = github.event_name === 'issue_comment' 
               ? context.payload.comment.user.login 
-              : context.payload.pull_request.user.login;
+              : github.event.pull_request.user.login;
             const issueNumber = github.event_name === 'issue_comment'
               ? context.issue.number
-              : context.payload.pull_request.number;
+              : github.event.pull_request.number;
             
             const comment = await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: issueNumber,
               body: `🔨 **Building PR for testing...** (requested by @${username}) 🚧\n\n` +
-                    `<img src="https://lh5.googleusercontent.com/proxy/OUqG0HgVNVMNorlPCmI4VgJa-3h7uHLkkMy9vdJ0eRsQlvJBytFUS-HvuW-O9EJd-c9xB7KAqlwby4Fzp59g1705FzBuP-F8dC1ZaBQtmLeCu5i6FfSd6Mmzh8mjOwgrEYZwy5UStg" width="20" height="20">\n\n` +
+                    `<img src="https://lh5.googleusercontent.com/proxy/OUqG0HgVNVMNorlPCmI4VgJa-3h7uHLkkMy9vdJ0eRsQlvJBytFUS-HvuW-O9EJd-c9xB7KAqlwby4Fzp59g1705FzBuP-F8dC1ZaBQtmLeCu5i6FfSd6Mmzh8mjOwgrEYZwy5UStg" width="20" height="20"> +
                     `🏗️ Please wait while the build completes. This may take a few minutes. ⛏️`
             });
             return comment.data.id;
@@ -76,7 +75,7 @@ jobs:
           script: |
             const prNumber = github.event_name === 'issue_comment'
               ? context.issue.number
-              : context.payload.pull_request.number;
+              : github.event.pull_request.number;
               
             const pr = await github.rest.pulls.get({
               owner: context.repo.owner,
@@ -142,7 +141,7 @@ jobs:
             const commentId = ${{ steps.build_comment.outputs.result }};
             const username = github.event_name === 'issue_comment' 
               ? context.payload.comment.user.login 
-              : context.payload.pull_request.user.login;
+              : github.event.pull_request.user.login;
             const duration = '${{ steps.duration.outputs.duration }}';
             
             await github.rest.issues.updateComment({
@@ -168,7 +167,7 @@ jobs:
             const commentId = ${{ steps.build_comment.outputs.result }};
             const username = github.event_name === 'issue_comment' 
               ? context.payload.comment.user.login 
-              : context.payload.pull_request.user.login;
+              : github.event.pull_request.user.login;
             const duration = '${{ steps.duration.outputs.duration }}';
             
             await github.rest.issues.updateComment({

@@ -63,7 +63,7 @@ jobs:
               repo: context.repo.repo,
               issue_number: issueNumber,
               body: `🔨 **Building PR for testing...** (requested by @${username}) 🚧\n\n` +
-                    `<img src="https://lh5.googleusercontent.com/proxy/OUqG0HgVNVMNorlPCmI4VgJa-3h7uHLkkMy9vdJ0eRsQlvJBytFUS-HvuW-O9EJd-c9xB7KAqlwby4Fzp59g1705FzBuP-F8dC1ZaBQtmLeCu5i6FfSd6Mmzh8mjOwgrEYZwy5UStg" width="20" height="20"> +
+                    `<img src="https://lh5.googleusercontent.com/proxy/OUqG0HgVNVMNorlPCmI4VgJa-3h7uHLkkMy9vdJ0eRsQlvJBytFUS-HvuW-O9EJd-c9xB7KAqlwby4Fzp59g1705FzBuP-F8dC1ZaBQtmLeCu5i6FfSd6Mmzh8mjOwgrEYZwy5UStg" width="20" height="20">` +
                     `🏗️ Please wait while the build completes. This may take a few minutes. ⛏️`
             });
             return comment.data.id;

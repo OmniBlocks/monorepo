@@ -4,7 +4,8 @@ const ArgumentType = require("../../extension-support/argument-type");
 const SandboxRunner = require("../../util/sandboxed-javascript-runner");
 const Cast = require("../../util/cast");
  
-let isScratchBlocksReady = typeof ScratchBlocks === "object";
+let isScratchBlocksReady = typeof ScratchBlocks === "object" && 
+                            typeof ScratchBlocks.FieldCustom === "object";
 const codeEditorHandlers = new Map();
 
 // we cant have nice things
@@ -168,7 +169,8 @@ class SPjavascriptV2 {
     this.runtime.vm.on("workspaceUpdate", () => {
       codeEditorHandlers.clear();
       if (!isScratchBlocksReady) {
-        isScratchBlocksReady = typeof ScratchBlocks === "object";
+        isScratchBlocksReady = typeof ScratchBlocks === "object" && 
+                        typeof ScratchBlocks.FieldCustom === "object";
         if (isScratchBlocksReady) initBlockTools();
       }
     });

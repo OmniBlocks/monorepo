@@ -69,6 +69,9 @@ const base = {
             'scratch-render-fonts$': path.resolve(__dirname, 'src/lib/tw-scratch-render-fonts')
         }
     },
+    cache: {
+        type: 'filesystem',
+    },
     module: {
         rules: [{
             test: /\.jsx?$/,
@@ -87,7 +90,8 @@ const base = {
                     ['react-intl', {
                         messagesDir: './translations/messages/'
                     }]],
-                presets: ['@babel/preset-env', '@babel/preset-react']
+                presets: ['@babel/preset-env', '@babel/preset-react'],
+                cacheDirectory: true,
             }
         },
         {
@@ -140,7 +144,7 @@ const base = {
 
 if (!process.env.CI) {
     base.plugins.push(new webpack.ProgressPlugin());
-        base.plugins.push(new webpack.HotModuleReplacementPlugin());
+    base.plugins.push(new webpack.HotModuleReplacementPlugin());
 }
 
 module.exports = [

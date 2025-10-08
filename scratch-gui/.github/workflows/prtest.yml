@@ -67,167 +67,64 @@ jobs:
               number: pr.data.number
             };
 
-      ####################################################################
-      # Anti-spam confirmation:
-      # If a prior run for this PR happened within 10 minutes, require a
-      # reaction on a confirmation comment. This polls for a reaction up to
-      # 10 minutes (configurable).
-      ####################################################################
-      - name: Anti-spam - check recent run and require reaction if within 10m
-        id: anti_spam
+      # ---------- Sticky comment support: find existing comment with hidden marker ----------
+      - name: Find existing sticky comment
+        id: find_comment
         uses: actions/github-script@v7
         with:
           script: |
-            const prNumber = Number(${JSON.stringify("${{ fromJSON(steps.pr.outputs.result).number }}")});
-            const owner = context.repo.owner;
-            const repo = context.repo.repo;
-            const THREE_LETTERS = 'pr-test-deploy-comment'; // marker
-
-            // Get comments on the PR
+            // We'll look for an existing comment that contains the hidden marker so we can edit it
+            const issue_number = Number(${ { fromJSON(steps.pr.outputs.result).number }});
+            const marker = '<!-- PR_TEST_COMMENT -->';
             const comments = await github.rest.issues.listComments({
-              owner, repo, issue_number: prNumber,
-              per_page: 100
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number
             });
-
-            // Find the first bot comment that contains our hidden marker and parse timestamp
-            let botComment = null;
-            let lastTimestamp = 0;
-            for (const c of comments.data) {
-              if (c.body && c.body.includes('<!-- pr-test-deploy-comment -->')) {
-                botComment = c;
-                const m = /pr-test-deploy-timestamp:\s*(\d+)/.exec(c.body);
-                if (m) lastTimestamp = Number(m[1]);
-                break; // we edit the first match (sticky behavior)
-              }
+            // Prefer bot comment with the marker, otherwise any comment with the marker
+            const found = comments.data.find(c => (c.user && c.user.type === 'Bot' && c.body && c.body.includes(marker)) || (c.body && c.body.includes(marker)));
+            if (found) {
+              return { comment_id: found.id };
             }
+            return { comment_id: null };
 
-            const now = Math.floor(Date.now() / 1000);
-            const TEN_MIN = 10 * 60;
-
-            if (lastTimestamp && (now - lastTimestamp) < TEN_MIN) {
-              // Post a confirmation comment and wait for a reaction on it
-              const confirm = await github.rest.issues.createComment({
-                owner, repo, issue_number: prNumber,
-                body:
-`⚠️ **Quick confirmation required** ⚠️
-
-A PR test was already run less than 10 minutes ago. To prevent accidental spam, please **react to this comment with :rocket:** within 10 minutes to confirm you want to re-run the test.
-
-(If you prefer, reply with \`/confirm test pr\` as a comment.)`
-              });
-
-              const confirmCommentId = confirm.data.id;
-
-              // Poll for reactions up to 10 minutes
-              const until = Date.now() + TEN_MIN * 1000;
-              const pollIntervalMs = 10 * 1000; // 10s
-              let confirmed = false;
-
-              while (Date.now() < until) {
-                // list reactions for the confirmation comment
-                const reacts = await github.request('GET /repos/{owner}/{repo}/issues/comments/{comment_id}/reactions', {
-                  owner, repo, comment_id: confirmCommentId,
-                  mediaType: { previews: ['squirrel-girl'] }
-                });
-                // Accept any reaction from a non-bot user (not the action)
-                for (const r of reacts.data) {
-                  if (r.user && r.user.type !== 'Bot') {
-                    confirmed = true;
-                    break;
-                  }
-                }
-                if (confirmed) break;
-                // Also check for a textual confirmation comment
-                const replies = await github.rest.issues.listComments({
-                  owner, repo, issue_number: prNumber,
-                  per_page: 100
-                });
-                for (const rep of replies.data) {
-                  if (rep.body && rep.body.match(/\/confirm\s+test\s+pr/i) && rep.user.type !== 'Bot') {
-                    confirmed = true;
-                    break;
-                  }
-                }
-                if (confirmed) break;
-                // sleep
-                await new Promise(r => setTimeout(r, pollIntervalMs));
-              }
-
-              if (!confirmed) {
-                // No confirmation — stop the workflow early
-                core = require('@actions/core');
-                core.setFailed("No confirmation reaction received within 10 minutes. Cancelling test deployment to avoid spam.");
-                return { cancelled: "true" };
-              } else {
-                return { cancelled: "false" };
-              }
-            } else {
-              return { cancelled: "false" };
-            }
-
-      - name: Exit if anti-spam cancelled
-        if: steps.anti_spam.outputs.cancelled == 'true'
-        run: |
-          echo "Cancelled by anti-spam check. Exiting job."
-          exit 1
-
-      ####################################################################
-      # Sticky post / Create or update the single bot comment we use.
-      # We add a big heading, include a hidden marker and timestamp so
-      # future runs can find and update the same comment (sticky behavior).
-      ####################################################################
-      - name: Post or update sticky building comment
+      # ---------- Post building comment (create or update existing sticky comment) ----------
+      - name: Post or update building comment
         id: build_comment
         uses: actions/github-script@v7
         with:
           script: |
-            const prNumber = Number(${JSON.stringify("${{ fromJSON(steps.pr.outputs.result).number }}")});
-            const owner = context.repo.owner;
-            const repo = context.repo.repo;
+            const initial_spinner = '<img src="https://lh5.googleusercontent.com/proxy/OUqG0HgVNVMNorlPCmI4VgJa-3h7uHLkkMy9vdJ0eRsQlvJBytFUS-HvuW-O9EJd-c9xB7KAqlwby4Fzp59g1705FzBuP-F8dC1ZaBQtmLeCu5i6FfSd6Mmzh8mjOwgrEYZwy5UStg" width="20" height="20">';
+            const checklist_spinner = '<img src="https://github.com/user-attachments/assets/881cd049-000f-4b24-a868-9831c3ea9019" width="18" height="18">';
             const username = context.eventName === 'issue_comment'
               ? context.payload.comment.user.login
               : context.payload.pull_request.user.login;
+            const issue_number = Number(${ { fromJSON(steps.pr.outputs.result).number }});
+            const marker = '<!-- PR_TEST_COMMENT -->';
+            const body = `${marker}\n${initial_spinner} **Building PR for testing, requested by @${username}...**\n\n` +
+                  `${checklist_spinner} Checkout & Setup\n` +
+                  `⬜ Installing dependencies\n` +
+                  `⬜ Building\n` +
+                  `⬜ Deploying`;
 
-            const initial_spinner = '<img src="https://lh5.googleusercontent.com/proxy/OUqG0HgVNVMNorlPCmI4VgJa-3h7uHLkkMy9vdJ0eRsQlvJBytFUS-HvuW-O9EJd-c9xB7KAqlwby4Fzp59g1705FzBuP-F8dC1ZaBQtmLeCu5i6FfSd6Mmzh8mjOwgrEYZwy5UStg" width="20" height="20">';
-            const checklist_spinner = '<img src="https://github.com/user-attachments/assets/881cd049-000f-4b24-a868-9831c3ea9019" width="18" height="18">';
-            const marker = '<!-- pr-test-deploy-comment -->';
-            const timestamp = Math.floor(Date.now() / 1000);
-
-            // Find an existing bot comment with our marker (sticky)
-            const comments = await github.rest.issues.listComments({
-              owner, repo, issue_number: prNumber,
-              per_page: 100
-            });
-
-            let existing = null;
-            for (const c of comments.data) {
-              if (c.body && c.body.includes(marker)) {
-                existing = c;
-                break; // edit the first matching comment
-              }
-            }
-
-            const body = `# 🚧 Test PR Deployment\n\n` +
-                         `${initial_spinner} **Building PR for testing, requested by @${username}...**\n\n` +
-                         `${checklist_spinner} Checkout & Setup\n` +
-                         `⬜ Installing dependencies\n` +
-                         `⬜ Building\n` +
-                         `⬜ Deploying\n\n` +
-                         `<!-- pr-test-deploy-timestamp: ${timestamp} -->\n` +
-                         `${marker}`;
-
-            if (existing) {
-              const updated = await github.rest.issues.updateComment({
-                owner, repo, comment_id: existing.id,
+            // If we found an existing comment, update it; otherwise create a new one
+            const existingId = ${ { fromJSON(steps.find_comment.outputs.result || '{}').comment_id || 'null' } };
+            if (existingId) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existingId,
                 body
               });
-              return updated.data.id;
+              return existingId;
             } else {
-              const created = await github.rest.issues.createComment({
-                owner, repo, issue_number: prNumber,
+              const comment = await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number,
                 body
               });
-              return created.data.id;
+              return comment.data.id;
             }
 
       - name: Checkout PR code
@@ -242,20 +139,6 @@ A PR test was already run less than 10 minutes ago. To prevent accidental spam, 
           node-version: '20'
           cache: 'npm'
 
-      ####################################################################
-      # Cache to speed up Puppeteer/Chromium and npm installs
-      # - caches npm cache and puppeteer chromium download directory
-      ####################################################################
-      - name: Cache npm and Puppeteer
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.npm
-            ~/.cache/puppeteer
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}-${{ env.GITHUB_SHA || github.run_id }}
-          restore-keys: |
-            ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}-
-
       - name: Update comment - Installing Dependencies
         uses: actions/github-script@v7
         with:
@@ -266,192 +149,6 @@ A PR test was already run less than 10 minutes ago. To prevent accidental spam, 
               ? context.payload.comment.user.login
               : context.payload.pull_request.user.login;
             await github.rest.issues.updateComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              comment_id: ${{ steps.build_comment.outputs.result }},
-              body: `${initial_spinner} **Building PR for testing, requested by @${username}...**\n\n` +
-                    `✅ Checkout & Setup\n` +
-                    `${checklist_spinner} Installing dependencies\n` +
-                    `⬜ Building\n` +
-                    `⬜ Deploying\n\n` +
-                    `<!-- pr-test-deploy-timestamp: ${Math.floor(Date.now() / 1000)} -->\n` +
-                    `<!-- pr-test-deploy-comment -->`
-            });
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Update comment - Building
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const initial_spinner = '<img src="https://lh5.googleusercontent.com/proxy/OUqG0HgVNVMNorlPCmI4VgJa-3h7uHLkkMy9vdJ0eRsQlvJBytFUS-HvuW-O9EJd-c9xB7KAqlwby4Fzp59g1705FzBuP-F8dC1ZaBQtmLeCu5i6FfSd6Mmzh8mjOwgrEYZwy5UStg" width="20" height="20">';
-            const checklist_spinner = '<img src="https://github.com/user-attachments/assets/881cd049-000f-4b24-a868-9831c3ea9019" width="18" height="18">';
-            const username = context.eventName === 'issue_comment'
-              ? context.payload.comment.user.login
-              : context.payload.pull_request.user.login;
-            await github.rest.issues.updateComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              comment_id: ${{ steps.build_comment.outputs.result }},
-              body: `${initial_spinner} **Building PR for testing, requested by @${username}...**\n\n` +
-                    `✅ Checkout & Setup\n` +
-                    `✅ Installing dependencies\n` +
-                    `${checklist_spinner} Building\n` +
-                    `⬜ Deploying\n\n` +
-                    `<!-- pr-test-deploy-timestamp: ${Math.floor(Date.now() / 1000)} -->\n` +
-                    `<!-- pr-test-deploy-comment -->`
-            });
-
-      - name: Build website
-        run: npm run build
-        env:
-          NODE_ENV: production
-
-      - name: Update comment - Deploying
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const initial_spinner = '<img src="https://lh5.googleusercontent.com/proxy/OUqG0HgVNVMNorlPCmI4VgJa-3h7uHLkkMy9vdJ0eRsQlvJBytFUS-HvuW-O9EJd-c9xB7KAqlwby4Fzp59g1705FzBuP-F8dC1ZaBQtmLeCu5i6FfSd6Mmzh8mjOwgrEYZwy5UStg" width="20" height="20">';
-            const checklist_spinner = '<img src="https://github.com/user-attachments/assets/881cd049-000f-4b24-a868-9831c3ea9019" width="18" height="18">';
-            const username = context.eventName === 'issue_comment'
-              ? context.payload.comment.user.login
-              : context.payload.pull_request.user.login;
-            await github.rest.issues.updateComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              comment_id: ${{ steps.build_comment.outputs.result }},
-              body: `${initial_spinner} **Building PR for testing, requested by @${username}...**\n\n` +
-                    `✅ Checkout & Setup\n` +
-                    `✅ Installing dependencies\n` +
-                    `✅ Building\n` +
-                    `${checklist_spinner} Deploying to GitHub Pages\n\n` +
-                    `<!-- pr-test-deploy-timestamp: ${Math.floor(Date.now() / 1000)} -->\n` +
-                    `<!-- pr-test-deploy-comment -->`
-            });
-
-      - name: Prepare per-PR directory
-        run: |
-          mkdir -p ./public/${{ github.actor }}/${{ fromJSON(steps.pr.outputs.result).number }}
-          cp -r ./build/* ./public/${{ github.actor }}/${{ fromJSON(steps.pr.outputs.result).number }}/
-          touch ./public/.nojekyll
-
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: ./public
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
-
-      - name: Calculate duration
-        id: duration
-        if: always()
-        run: |
-          END_TIME=$(date +%s)
-          START_TIME=${{ steps.start_time.outputs.timestamp }}
-          DURATION=$((END_TIME - START_TIME))
-          MINUTES=$((DURATION / 60))
-          SECONDS=$((DURATION % 60))
-          echo "duration=${MINUTES}m ${SECONDS}s" >> $GITHUB_OUTPUT
-
-      ####################################################################
-      # Screenshot step using Puppeteer:
-      # - installs puppeteer (cached), waits briefly for site to be ready,
-      # - captures a full-page screenshot, uploads as artifact,
-      # - updates the sticky comment with a link to the artifact and screenshot.
-      ####################################################################
-      - name: Take screenshot of deployed site (cached Puppeteer)
-        if: success()
-        env:
-          PAGE_URL: ${{ steps.deployment.outputs.page_url }}${{ github.actor }}/${{ fromJSON(steps.pr.outputs.result).number }}/
-        run: |
-          set -e
-          # create a tiny Node script on the fly
-          cat > take_screenshot.js <<'NODE'
-          const fs = require('fs');
-          (async () => {
-            // lazy install puppeteer if not present (npm ci previously ran and cached chromium)
-            try {
-              const puppeteer = require('puppeteer');
-              const url = process.env.PAGE_URL;
-              const out = `screenshot-${process.env.GITHUB_RUN_ID || 'run'}.png`;
-              const browser = await puppeteer.launch({
-                args: ['--no-sandbox','--disable-setuid-sandbox']
-              });
-              const page = await browser.newPage();
-              // Wait a bit for pages with client-side rendering
-              await page.goto(url, { waitUntil: 'networkidle2', timeout: 60000 }).catch(()=>{});
-              await page.waitForTimeout(5000); // allow extra rendering time
-              await page.screenshot({ path: out, fullPage: true });
-              await browser.close();
-              console.log('SCREENSHOT_PATH=' + out);
-              fs.writeFileSync('/tmp/screenshot_path', out);
-            } catch (e) {
-              console.error('Screenshot failed:', e);
-              process.exit(0); // don't fail entire workflow if screenshot fails
-            }
-          })();
-          NODE
-
-          # ensure puppeteer is installed (leverages cached npm/artifacts)
-          if [ ! -d node_modules/puppeteer ]; then
-            echo "Installing puppeteer (cached when possible)..."
-            npm i puppeteer --no-audit --no-fund --silent
-          fi
-
-          node take_screenshot.js || true
-        continue-on-error: true
-
-      - name: Upload screenshot artifact (if any)
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: pr-test-screenshot-${{ github.run_id }}
-          path: |
-            screenshot-*.png
-            /tmp/screenshot_path
-
-      - name: Update comment with success
-        if: success()
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const prNumber = ${{ fromJSON(steps.pr.outputs.result).number }};
-            const sha = '${{ fromJSON(steps.pr.outputs.result).sha }}'.substring(0, 7);
-            const commentId = ${{ steps.build_comment.outputs.result }};
-            const username = context.eventName === 'issue_comment'
-              ? context.payload.comment.user.login
-              : context.payload.pull_request.user.login;
-            const duration = '${{ steps.duration.outputs.duration }}';
-            const pageUrl = '${{ steps.deployment.outputs.page_url }}';
-            // Try to get screenshot artifact file name from /tmp/screenshot_path if present in runner workspace
-            const fs = require('fs');
-            let screenshotLine = '';
-            try {
-              if (fs.existsSync('/tmp/screenshot_path')) {
-                const p = fs.readFileSync('/tmp/screenshot_path', 'utf8').trim();
-                screenshotLine = `- Screenshot artifact: screenshot attached to workflow run (see "Artifacts" on this run).`;
-              } else {
-                // fallback note
-                screenshotLine = `- Screenshot: (no screenshot available)`;
-              }
-            } catch (e) {
-              screenshotLine = `- Screenshot: (error checking screenshot)`;
-            }
-
-            await github.rest.issues.updateComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              comment_id: commentId,
-              body: `🚀 **PR Test Deployment Complete!**\n\n` +
-                    `Hi, @${username}! Your PR test deployment is ready! ✅🎉\n\n` +
-                    `🌍 View it here:\n` +
-                    `${pageUrl}${username}/${prNumber}/\n\n` +
-                    `**Details:**\n` +
-                    `- PR: #${prNumber}\n` +
-                    `- Commit: \`${sha}\`\n` +            await github.rest.issues.updateComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               comment_id: ${{ steps.build_comment.outputs.result }},
@@ -525,6 +222,71 @@ A PR test was already run less than 10 minutes ago. To prevent accidental spam, 
         id: deployment
         uses: actions/deploy-pages@v4
 
+      # ---------- Screenshot step: run AFTER pages deploy (runs only on success) ----------
+      - name: Install puppeteer-core (fast, no Chromium download)
+        if: success()
+        run: |
+          npm install --no-audit --no-fund puppeteer-core@latest
+        # npm cache is used above via setup-node cache to speed up installs
+
+      - name: Take screenshot of deployed PR site
+        if: success()
+        id: take_screenshot
+        run: |
+          node <<'NODE_SCRIPT'
+          const fs = require('fs');
+          const path = require('path');
+          const puppeteer = require('puppeteer-core');
+
+          // Use runner's chrome executable (no chromium download)
+          const chromePaths = [
+            '/usr/bin/google-chrome-stable',
+            '/usr/bin/google-chrome',
+            '/usr/bin/chromium-browser',
+            '/usr/bin/chromium'
+          ];
+          const execPath = chromePaths.find(p => require('fs').existsSync(p));
+          if (!execPath) {
+            console.error('No bundled chrome found at expected paths. Attempting to launch without executablePath (may download Chromium).');
+          }
+
+          // Build target URL (same as in the success comment)
+          const username = process.env.GITHUB_ACTOR;
+          const prNumber = ${ { fromJSON(steps.pr.outputs.result).number } };
+          const pageRoot = process.env.PAGE_URL || '${{ steps.deployment.outputs.page_url }}';
+          const target = `${pageRoot}${username}/${prNumber}/`;
+
+          (async () => {
+            const browser = await puppeteer.launch(execPath ? { executablePath: execPath, args: ['--no-sandbox', '--disable-setuid-sandbox'] } : { args: ['--no-sandbox', '--disable-setuid-sandbox']});
+            const page = await browser.newPage();
+            // give the site some extra time to settle
+            const waitMs = process.env.SCREENSHOT_WAIT_MS ? Number(process.env.SCREENSHOT_WAIT_MS) : 8000;
+            try {
+              await page.goto(target, { waitUntil: 'networkidle2', timeout: 60000 });
+              await page.waitForTimeout(waitMs);
+              // optional: set viewport large enough
+              await page.setViewport({ width: 1280, height: 900 });
+              const outPath = path.resolve('screenshot.png');
+              await page.screenshot({ path: outPath, fullPage: false });
+              console.log('Screenshot saved to', outPath);
+              await browser.close();
+              // print out so subsequent steps can reference it
+              console.log('::set-output name=path::' + outPath);
+            } catch (err) {
+              console.error('Error taking screenshot:', err);
+              await browser.close();
+              process.exit(0); // do not fail the job if screenshot fails
+            }
+          })();
+          NODE_SCRIPT
+
+      - name: Upload screenshot artifact
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-screenshot-${{ github.run_id }}
+          path: screenshot.png
+
       - name: Calculate duration
         id: duration
         if: always()
@@ -549,6 +311,8 @@ A PR test was already run less than 10 minutes ago. To prevent accidental spam, 
               : context.payload.pull_request.user.login;
             const duration = '${{ steps.duration.outputs.duration }}';
             const pageUrl = '${{ steps.deployment.outputs.page_url }}';
+            // Provide a link to artifacts for this run (artifact viewer for the run)
+            const artifactsLink = `${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}#artifacts`;
 
             await github.rest.issues.updateComment({
               owner: context.repo.owner,
@@ -562,26 +326,4 @@ A PR test was already run less than 10 minutes ago. To prevent accidental spam, 
                     `- PR: #${prNumber}\n` +
                     `- Commit: \`${sha}\`\n` +
                     `- Requested by: @${username}\n` +
-                    `- Build time: ${duration}\n`
-            });
-
-      - name: Update comment with failure
-        if: failure()
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const commentId = ${{ steps.build_comment.outputs.result }};
-            const username = context.eventName === 'issue_comment'
-              ? context.payload.comment.user.login
-              : context.payload.pull_request.user.login;
-            const duration = '${{ steps.duration.outputs.duration }}';
-
-            await github.rest.issues.updateComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              comment_id: commentId,
-              body: `❌ **PR Test Deployment Failed** @${username}\n\n` +
-                    `Something went wrong during build or deployment.\n` +
-                    `Build time: ${duration}\n\n` +
-                    `Check logs: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}`
-            });
+                    `- Build

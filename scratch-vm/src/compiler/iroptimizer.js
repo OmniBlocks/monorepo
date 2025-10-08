@@ -164,6 +164,12 @@ class IROptimizer {
             return InputType.NUMBER;
         }
 
+        case InputOpcode.CAST_NUMBER_INDEX: {
+            const innerType = inputs.target.type;
+            if (innerType & InputType.NUMBER_INDEX) return innerType;
+            return InputType.NUMBER_INDEX;
+        }
+
         case InputOpcode.CAST_NUMBER_OR_NAN: {
             const innerType = inputs.target.type;
             if (innerType & InputType.NUMBER_OR_NAN) return innerType;
@@ -704,6 +710,14 @@ class IROptimizer {
         case InputOpcode.CAST_NUMBER: {
             const targetType = input.inputs.target.type;
             if ((targetType & InputType.NUMBER) === targetType) {
+                return input.inputs.target;
+            }
+            return input;
+        }
+
+        case InputOpcode.CAST_NUMBER_INDEX: {
+            const targetType = input.inputs.target.type;
+            if ((targetType & InputType.NUMBER_INDEX) === targetType) {
                 return input.inputs.target;
             }
             return input;

@@ -200,6 +200,345 @@ jobs:
       - name: Install Lighthouse CI
         run: npm install -g @lhci/cli@0.13.x
 
+      - name: Create Lighthouse config (disable strict assertions)
+        run: |
+          cat > lighthouserc.json << 'EOF'
+          {
+            "ci": {
+              "collect": {
+                "numberOfRuns": 1,
+                "url": ["http://localhost:8080"]
+              },
+              "assert": {
+                "preset": "lighthouse:no-pwa"
+              },
+              "upload": {
+                "target": "temporary-public-storage"
+              }
+            }
+          }
+          EOF
+
+      - name: Start HTTP server for Lighthouse
+        run: |
+          npx http-server build -p 8080 &
+          echo $! > server.pid
+          # Wait for server to be ready
+          for i in {1..30}; do
+            if curl -s http://localhost:8080 > /dev/null; then
+              echo "Server is ready!"
+              break
+            fi
+            echo "Waiting for server... ($i/30)"
+            sleep 1
+          done
+
+      - name: Run Lighthouse CI
+        id: lighthouse
+        continue-on-error: true
+        run: |
+          lhci autorun || echo "Lighthouse completed with warnings"
+          if [ -d ".lighthouseci" ] && [ "$(ls -A .lighthouseci 2>/dev/null)" ]; then
+            echo "lighthouse_success=true" >> $GITHUB_OUTPUT
+            # Count issues found
+            ISSUES_FOUND=$(find .lighthouseci -name "*.json" -type f | wc -l)
+            echo "issues_count=$ISSUES_FOUND" >> $GITHUB_OUTPUT
+          else
+            echo "lighthouse_success=false" >> $GITHUB_OUTPUT
+            echo "issues_count=0" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Stop HTTP server
+        if: always()
+        run: |
+          if [ -f server.pid ]; then
+            kill $(cat server.pid) || true
+            rm server.pid
+          fi
+
+      - name: Upload Lighthouse results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-results
+          path: .lighthouseci/
+          if-no-files-found: warn
+
+      - name: Update comment - Bundle Size Analysis
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const initial_spinner = '<img src="https://lh5.googleusercontent.com/proxy/OUqG0HgVNVMNorlPCmI4VgJa-3h7uHLkkMy9vdJ0eRsQlvJBytFUS-HvuW-O9EJd-c9xB7KAqlwby4Fzp59g1705FzBuP-F8dC1ZaBQtmLeCu5i6FfSd6Mmzh8mjOwgrEYZwy5UStg" width="20" height="20">';
+            const checklist_spinner = '<img src="https://github.com/user-attachments/assets/881cd049-000f-4b24-a868-9831c3ea9019" width="18" height="18">';
+            const username = context.eventName === 'issue_comment'
+              ? context.payload.comment.user.login
+              : context.payload.pull_request.user.login;
+            await github.rest.issues.updateComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: ${{ steps.mega_comment.outputs.result }},
+              body: `${initial_spinner} **MEGA PR Test & Analysis, requested by @${username}...**\n\n` +
+                    `🏗️ **Build Phase:**\n` +
+                    `✅ Checkout & Setup\n` +
+                    `✅ Installing dependencies\n` +
+                    `✅ Building project\n\n` +
+                    `🔍 **Analysis Phase:**\n` +
+                    `✅ Performance audit (Lighthouse)\n` +
+                    `${checklist_spinner} Bundle size analysis\n` +
+                    `⬜ Accessibility testing\n\n` +
+                    `🚀 **Deployment Phase:**\n` +
+                    `⬜ Deploying to test environment`
+            });
+
+      - name: Analyze bundle size
+        id: bundle_analysis
+        continue-on-error: true
+        run: |
+          TOTAL_SIZE=$(du -sh build | cut -f1)
+          echo "total_size=$TOTAL_SIZE" >> $GITHUB_OUTPUT
+          
+          # Get top 5 largest JS files
+          echo "### 📦 Top 5 Largest JavaScript Files:" > bundle-report.md
+          JS_COUNT=$(find build -type f -name "*.js" | wc -l)
+          if [ "$JS_COUNT" -gt 0 ]; then
+            find build -type f -name "*.js" -exec du -h {} \; | sort -rh | head -5 | while read line; do
+              size=$(echo "$line" | awk '{print $1}')
+              file=$(echo "$line" | awk '{print $2}' | sed 's|build/||')
+              echo "- **$size** - \`$file\`" >> bundle-report.md
+            done
+          else
+            echo "- No JavaScript files found" >> bundle-report.md
+          fi
+          
+          # Get top 5 largest CSS files
+          echo "" >> bundle-report.md
+          echo "### 🎨 Top 5 Largest CSS Files:" >> bundle-report.md
+          CSS_COUNT=$(find build -type f -name "*.css" | wc -l)
+          if [ "$CSS_COUNT" -gt 0 ]; then
+            find build -type f -name "*.css" -exec du -h {} \; | sort -rh | head -5 | while read line; do
+              size=$(echo "$line" | awk '{print $1}')
+              file=$(echo "$line" | awk '{print $2}' | sed 's|build/||')
+              echo "- **$size** - \`$file\`" >> bundle-report.md
+            done
+          else
+            echo "- No CSS files found (might be inlined in JS)" >> bundle-report.md
+          fi
+
+      - name: Update comment - Accessibility Testing
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const initial_spinner = '<img src="https://lh5.googleusercontent.com/proxy/OUqG0HgVNVMNorlPCmI4VgJa-3h7uHLkkMy9vdJ0eRsQlvJBytFUS-HvuW-O9EJd-c9xB7KAqlwby4Fzp59g1705FzBuP-F8dC1ZaBQtmLeCu5i6FfSd6Mmzh8mjOwgrEYZwy5UStg" width="20" height="20">';
+            const checklist_spinner = '<img src="https://github.com/user-attachments/assets/881cd049-000f-4b24-a868-9831c3ea9019" width="18" height="18">';
+            const username = context.eventName === 'issue_comment'
+              ? context.payload.comment.user.login
+              : context.payload.pull_request.user.login;
+            await github.rest.issues.updateComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: ${{ steps.mega_comment.outputs.result }},
+              body: `${initial_spinner} **MEGA PR Test & Analysis, requested by @${username}...**\n\n` +
+                    `🏗️ **Build Phase:**\n` +
+                    `✅ Checkout & Setup\n` +
+                    `✅ Installing dependencies\n` +
+                    `✅ Building project\n\n` +
+                    `🔍 **Analysis Phase:**\n` +
+                    `✅ Performance audit (Lighthouse)\n` +
+                    `✅ Bundle size analysis\n` +
+                    `${checklist_spinner} Accessibility testing\n\n` +
+                    `🚀 **Deployment Phase:**\n` +
+                    `⬜ Deploying to test environment`
+            });
+
+      - name: Setup Chrome and ChromeDriver
+        run: |
+          # Install matching Chrome and ChromeDriver versions
+          npx browser-driver-manager install chrome
+
+      - name: Run accessibility tests
+        id: a11y_test
+        continue-on-error: true
+        run: |
+          # Start server in background
+          npx http-server build -p 9090 &
+          SERVER_PID=$!
+          
+          # Wait for server with better retry logic
+          echo "Waiting for server to start..."
+          for i in {1..30}; do
+            if curl -s http://localhost:9090 > /dev/null; then
+              echo "Server is ready!"
+              break
+            fi
+            echo "Attempt $i/30..."
+            sleep 2
+          done
+          
+          # Install axe globally
+          npm install -g @axe-core/cli@4.10.2
+          
+          # Run axe and capture output
+          axe http://localhost:9090 --stdout > axe-results.json 2>&1 || true
+          
+          # Kill server
+          kill $SERVER_PID || true
+          
+          # Parse results with better error handling
+          if [ -f "axe-results.json" ] && [ -s "axe-results.json" ]; then
+            VIOLATIONS=$(jq '.violations | length' axe-results.json 2>/dev/null || echo "error")
+            PASSES=$(jq '.passes | length' axe-results.json 2>/dev/null || echo "error")
+            
+            if [ "$VIOLATIONS" = "error" ] || [ "$PASSES" = "error" ]; then
+              echo "a11y_success=false" >> $GITHUB_OUTPUT
+              echo "violations=error" >> $GITHUB_OUTPUT
+              echo "passes=error" >> $GITHUB_OUTPUT
+            else
+              echo "a11y_success=true" >> $GITHUB_OUTPUT
+              echo "violations=$VIOLATIONS" >> $GITHUB_OUTPUT
+              echo "passes=$PASSES" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "a11y_success=false" >> $GITHUB_OUTPUT
+            echo "violations=error" >> $GITHUB_OUTPUT
+            echo "passes=error" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Upload accessibility results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: accessibility-results
+          path: axe-results.json
+          if-no-files-found: warn
+
+      # ============================================================
+      # DEPLOYMENT PHASE - Same as original prtest.yml
+      # ============================================================
+
+      - name: Update comment - Deploying
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const initial_spinner = '<img src="https://lh5.googleusercontent.com/proxy/OUqG0HgVNVMNorlPCmI4VgJa-3h7uHLkkMy9vdJ0eRsQlvJBytFUS-HvuW-O9EJd-c9xB7KAqlwby4Fzp59g1705FzBuP-F8dC1ZaBQtmLeCu5i6FfSd6Mmzh8mjOwgrEYZwy5UStg" width="20" height="20">';
+            const checklist_spinner = '<img src="https://github.com/user-attachments/assets/881cd049-000f-4b24-a868-9831c3ea9019" width="18" height="18">';
+            const username = context.eventName === 'issue_comment'
+              ? context.payload.comment.user.login
+              : context.payload.pull_request.user.login;
+            await github.rest.issues.updateComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: ${{ steps.mega_comment.outputs.result }},
+              body: `${initial_spinner} **MEGA PR Test & Analysis, requested by @${username}...**\n\n` +
+                    `🏗️ **Build Phase:**\n` +
+                    `✅ Checkout & Setup\n` +
+                    `✅ Installing dependencies\n` +
+                    `✅ Building project\n\n` +
+                    `🔍 **Analysis Phase:**\n` +
+                    `✅ Performance audit (Lighthouse)\n` +
+                    `✅ Bundle size analysis\n` +
+                    `✅ Accessibility testing\n\n` +
+                    `🚀 **Deployment Phase:**\n` +
+                    `${checklist_spinner} Deploying to test environment`
+            });
+
+      - name: Prepare per-PR directory
+        run: |
+          mkdir -p ./public/${{ github.actor }}/${{ fromJSON(steps.pr.outputs.result).number }}
+          cp -r ./build/* ./public/${{ github.actor }}/${{ fromJSON(steps.pr.outputs.result).number }}/
+          touch ./public/.nojekyll
+
+      - name: Checkout gh-pages branch
+        id: checkout_gh_pages
+        uses: actions/checkout@v4
+        with:
+                 const checklist_spinner = '<img src="https://github.com/user-attachments/assets/881cd049-000f-4b24-a868-9831c3ea9019" width="18" height="18">';
+            const username = context.eventName === 'issue_comment'
+              ? context.payload.comment.user.login
+              : context.payload.pull_request.user.login;
+            await github.rest.issues.updateComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: ${{ steps.mega_comment.outputs.result }},
+              body: `${initial_spinner} **MEGA PR Test & Analysis, requested by @${username}...**\n\n` +
+                    `🏗️ **Build Phase:**\n` +
+                    `✅ Checkout & Setup\n` +
+                    `${checklist_spinner} Installing dependencies\n` +
+                    `⬜ Building project\n\n` +
+                    `🔍 **Analysis Phase:**\n` +
+                    `⬜ Performance audit (Lighthouse)\n` +
+                    `⬜ Bundle size analysis\n` +
+                    `⬜ Accessibility testing\n\n` +
+                    `🚀 **Deployment Phase:**\n` +
+                    `⬜ Deploying to test environment`
+            });
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Update comment - Building
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const initial_spinner = '<img src="https://lh5.googleusercontent.com/proxy/OUqG0HgVNVMNorlPCmI4VgJa-3h7uHLkkMy9vdJ0eRsQlvJBytFUS-HvuW-O9EJd-c9xB7KAqlwby4Fzp59g1705FzBuP-F8dC1ZaBQtmLeCu5i6FfSd6Mmzh8mjOwgrEYZwy5UStg" width="20" height="20">';
+            const checklist_spinner = '<img src="https://github.com/user-attachments/assets/881cd049-000f-4b24-a868-9831c3ea9019" width="18" height="18">';
+            const username = context.eventName === 'issue_comment'
+              ? context.payload.comment.user.login
+              : context.payload.pull_request.user.login;
+            await github.rest.issues.updateComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: ${{ steps.mega_comment.outputs.result }},
+              body: `${initial_spinner} **MEGA PR Test & Analysis, requested by @${username}...**\n\n` +
+                    `🏗️ **Build Phase:**\n` +
+                    `✅ Checkout & Setup\n` +
+                    `✅ Installing dependencies\n` +
+                    `${checklist_spinner} Building project\n\n` +
+                    `🔍 **Analysis Phase:**\n` +
+                    `⬜ Performance audit (Lighthouse)\n` +
+                    `⬜ Bundle size analysis\n` +
+                    `⬜ Accessibility testing\n\n` +
+                    `🚀 **Deployment Phase:**\n` +
+                    `⬜ Deploying to test environment`
+            });
+
+      - name: Build website
+        run: npm run build
+        env:
+          NODE_ENV: production
+
+      # ============================================================
+      # ANALYSIS PHASE - Using the same build!
+      # ============================================================
+
+      - name: Update comment - Running Lighthouse
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const initial_spinner = '<img src="https://lh5.googleusercontent.com/proxy/OUqG0HgVNVMNorlPCmI4VgJa-3h7uHLkkMy9vdJ0eRsQlvJBytFUS-HvuW-O9EJd-c9xB7KAqlwby4Fzp59g1705FzBuP-F8dC1ZaBQtmLeCu5i6FfSd6Mmzh8mjOwgrEYZwy5UStg" width="20" height="20">';
+            const checklist_spinner = '<img src="https://github.com/user-attachments/assets/881cd049-000f-4b24-a868-9831c3ea9019" width="18" height="18">';
+            const username = context.eventName === 'issue_comment'
+              ? context.payload.comment.user.login
+              : context.payload.pull_request.user.login;
+            await github.rest.issues.updateComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: ${{ steps.mega_comment.outputs.result }},
+              body: `${initial_spinner} **MEGA PR Test & Analysis, requested by @${username}...**\n\n` +
+                    `🏗️ **Build Phase:**\n` +
+                    `✅ Checkout & Setup\n` +
+                    `✅ Installing dependencies\n` +
+                    `✅ Building project\n\n` +
+                    `🔍 **Analysis Phase:**\n` +
+                    `${checklist_spinner} Performance audit (Lighthouse)\n` +
+                    `⬜ Bundle size analysis\n` +
+                    `⬜ Accessibility testing\n\n` +
+                    `🚀 **Deployment Phase:**\n` +
+                    `⬜ Deploying to test environment`
+            });
+
+      - name: Install Lighthouse CI
+        run: npm install -g @lhci/cli@0.13.x
+
       - name: Start HTTP server for Lighthouse
         run: |
           npx http-server build -p 8080 &

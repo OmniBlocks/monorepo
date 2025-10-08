@@ -133,7 +133,7 @@ jobs:
           path: |
             ~/.npm
             node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}-${{ fromJSON(steps.pr.outputs.result).number || 'main' }}
           restore-keys: |
             ${{ runner.os }}-node-
 

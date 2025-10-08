@@ -26,8 +26,38 @@ jobs:
         id: start_time
         run: echo "timestamp=$(date +%s)" >> $GITHUB_OUTPUT
 
+      - name: Get PR details
+        id: pr
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = context.eventName === 'issue_comment'
+              ? context.issue.number
+              : context.payload.number;
+
+            const pr = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber
+            });
+            return {
+              ref: pr.data.head.ref,
+              sha: pr.data.head.sha,
+              number: pr.data.number
+            };
+
+      # ============================================================
+      # CRITICAL: Checkout BEFORE paths-filter!
+      # ============================================================
+      
+      - name: Checkout PR code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ fromJSON(steps.pr.outputs.result).sha }}
+          fetch-depth: 0
+
       # -----------------------
-      # QUICK: detect changed paths
+      # QUICK: detect changed paths (needs checkout first!)
       # -----------------------
       - name: Determine changed paths
         id: paths
@@ -50,30 +80,10 @@ jobs:
               - 'playwright.config.*'
       # outputs: steps.paths.outputs.<filter> = 'true' or 'false'
 
-      - name: Get PR details
-        id: pr
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const prNumber = context.eventName === 'issue_comment'
-              ? context.issue.number
-              : context.payload.number;
-
-            const pr = await github.rest.pulls.get({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: prNumber
-            });
-            return {
-              ref: pr.data.head.ref,
-              sha: pr.data.head.sha,
-              number: pr.data.number
-            };
-
       - name: Cancel previous runs
         uses: styfle/cancel-workflow-action@0.12.0
         with:
-          workflow_id: 'mega-pr-test.yml'
+          workflow_id: 'prtest.yml'
           access_token: ${{ github.token }}
           all_but_latest: true
 
@@ -120,12 +130,6 @@ jobs:
       # ============================================================
       # BUILD PHASE - Only happens ONCE!
       # ============================================================
-
-      - name: Checkout PR code
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ fromJSON(steps.pr.outputs.result).sha }}
-          fetch-depth: 0
 
       - name: Cache node modules
         uses: actions/cache@v4
@@ -701,14 +705,27 @@ jobs:
             const username = context.eventName === 'issue_comment'
               ? context.payload.comment.user.login
               : context.payload.pull_request.user.login;
-            const duration = '${{ steps.duration.outputs.duration }}';
-
-            await github.rest.issues.updateComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              comment_id: ${{ steps.mega_comment.outputs.result }},
-              body: `❌ **MEGA PR Test Failed** @${username}\n\n` +
-                    `Something went wrong during the build or analysis process.\n` +
-                    `Total time: ${duration}\n\n` +
-                    `Check the logs for details: [View Logs](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})`
-            });
+            const duration = '${{ steps.duration.outputs.duration }}' || 'N/A';
+            const commentId = '${{ steps.mega_comment.outputs.result }}';
+            
+            const failureBody = `❌ **MEGA PR Test Failed** @${username}\n\n` +
+                  `Something went wrong during the build or analysis process.\n` +
+                  `Total time: ${duration}\n\n` +
+                  `Check the logs for details: [View Logs](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})`;
+            
+            // If comment was created, update it; otherwise create a new one
+            if (commentId && commentId !== '') {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: commentId,
+                body: failureBody
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: ${{ fromJSON(steps.pr.outputs.result).number }},
+                body: failureBody
+              });
+            }

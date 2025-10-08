@@ -344,7 +344,7 @@ class ScriptTreeGenerator {
                 right: this.descendInputOfBlock(block, 'STRING2').toType(InputType.STRING)
             });
         case 'operator_length':
-            return new IntermediateInput(InputOpcode.OP_LENGTH, InputType.NUMBER_REAL, {
+            return new IntermediateInput(InputOpcode.OP_LENGTH, InputType.NUMBER_POS_INT | InputType.NUMBER_ZERO, {
                 string: this.descendInputOfBlock(block, 'STRING').toType(InputType.STRING)
             });
         case 'operator_letter_of':

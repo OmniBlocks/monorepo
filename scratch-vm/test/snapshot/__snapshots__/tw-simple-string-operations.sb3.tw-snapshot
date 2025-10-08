@@ -24,7 +24,7 @@ return function funXYZ_a () {
 b0.value = "ababa";
 b1.value = "";
 b2.value = 1;
-for (var a0 = ("" + b0.value).length; a0 >= 0.5; a0--) {
+for (var a0 = ("" + b0.value).length; a0 > 0; a0--) {
 if ((((("" + b0.value))[(b2.value | 0) - 1] || "").toLowerCase() === "a".toLowerCase())) {
 b1.value = (("" + b1.value) + "b");
 } else {

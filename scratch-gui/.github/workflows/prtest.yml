@@ -425,21 +425,31 @@ jobs:
             sleep 2
           done
           npm install -g @axe-core/cli@4.10.2
-          axe http://localhost:9090 --stdout > axe-results.json 2>&1 || true
+          # Separate stderr from JSON output
+          axe http://localhost:9090 --stdout 2>axe-errors.log > axe-results.json || true
           kill $SERVER_PID || true
+          
+          # Debug: show file size and first few lines
+          echo "axe-results.json size: $(wc -c < axe-results.json 2>/dev/null || echo 0) bytes"
+          
           if [ -f "axe-results.json" ] && [ -s "axe-results.json" ]; then
-            VIOLATIONS=$(jq '.violations | length' axe-results.json 2>/dev/null || echo "error")
-            PASSES=$(jq '.passes | length' axe-results.json 2>/dev/null || echo "error")
-            if [ "$VIOLATIONS" = "error" ] || [ "$PASSES" = "error" ]; then
-              echo "a11y_success=false" >> $GITHUB_OUTPUT
-              echo "violations=error" >> $GITHUB_OUTPUT
-              echo "passes=error" >> $GITHUB_OUTPUT
-            else
+            # Validate JSON before parsing - axe returns an array
+            if jq empty axe-results.json 2>/dev/null; then
+              # Parse violations and passes from the first result in the array
+              VIOLATIONS=$(jq '.[0].violations | length' axe-results.json 2>/dev/null || echo "0")
+              PASSES=$(jq '.[0].passes | length' axe-results.json 2>/dev/null || echo "0")
+              echo "Successfully parsed: $VIOLATIONS violations, $PASSES passes"
               echo "a11y_success=true" >> $GITHUB_OUTPUT
               echo "violations=$VIOLATIONS" >> $GITHUB_OUTPUT
               echo "passes=$PASSES" >> $GITHUB_OUTPUT
+            else
+              echo "JSON parsing failed"
+              echo "a11y_success=false" >> $GITHUB_OUTPUT
+              echo "violations=error" >> $GITHUB_OUTPUT
+              echo "passes=error" >> $GITHUB_OUTPUT
             fi
           else
+            echo "File doesn't exist or is empty"
             echo "a11y_success=false" >> $GITHUB_OUTPUT
             echo "violations=error" >> $GITHUB_OUTPUT
             echo "passes=error" >> $GITHUB_OUTPUT
@@ -569,18 +579,67 @@ jobs:
             const bundleReport = fs.readFileSync('bundle-report.md', 'utf8');
             const totalSize = '${{ steps.bundle_analysis.outputs.total_size }}';
             
-            // Lighthouse results
+            // Lighthouse results - READ THE SCORES!
             const lighthouseSuccess = '${{ steps.lighthouse.outputs.lighthouse_success }}' === 'true';
             let lighthouseSection = '';
+            
             if (lighthouseSuccess) {
-              lighthouseSection = `✅ Audit completed successfully!\n` +
-                `- View detailed results in [workflow artifacts](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})\n\n` +
-                `**What was checked:**\n` +
-                `- Performance score\n` +
-                `- Accessibility score\n` +
-                `- Best Practices score\n` +
-                `- SEO score\n` +
-                `- Progressive Web App score`;
+              try {
+                // Read the summary file we created
+                const lhSummary = JSON.parse(fs.readFileSync('lh-summary.json', 'utf8'));
+                
+                // Find the full report for detailed metrics
+                const { execSync } = require('child_process');
+                let detailedMetrics = '';
+                try {
+                  const reportFile = execSync('find .lighthouseci -type f -name "*.report.json" | head -n1', {encoding: 'utf8'}).trim();
+                  if (reportFile) {
+                    const fullReport = JSON.parse(fs.readFileSync(reportFile, 'utf8'));
+                    const audits = fullReport.audits;
+                    
+                    // Extract detailed performance metrics
+                    detailedMetrics = `\n\n**📊 Detailed Performance Metrics:**\n` +
+                      `- **First Contentful Paint (FCP):** ${audits['first-contentful-paint']?.displayValue || 'N/A'}\n` +
+                      `- **Largest Contentful Paint (LCP):** ${audits['largest-contentful-paint']?.displayValue || 'N/A'}\n` +
+                      `- **Total Blocking Time (TBT):** ${audits['total-blocking-time']?.displayValue || 'N/A'}\n` +
+                      `- **Cumulative Layout Shift (CLS):** ${audits['cumulative-layout-shift']?.displayValue || 'N/A'}\n` +
+                      `- **Speed Index:** ${audits['speed-index']?.displayValue || 'N/A'}\n` +
+                      `- **Time to Interactive (TTI):** ${audits['interactive']?.displayValue || 'N/A'}\n` +
+                      `- **Max Potential FID:** ${audits['max-potential-fid']?.displayValue || 'N/A'}\n` +
+                      `- **Server Response Time:** ${audits['server-response-time']?.displayValue || 'N/A'}\n` +
+                      `- **DOM Size:** ${audits['dom-size']?.displayValue || 'N/A'}\n` +
+                      `- **Main Thread Work:** ${audits['mainthread-work-breakdown']?.displayValue || 'N/A'}`;
+                  }
+                } catch (e) {
+                  console.log('Could not extract detailed metrics:', e.message);
+                }
+                
+                // Convert scores to percentages
+                const perfScore = lhSummary.performance !== null ? Math.round(lhSummary.performance * 100) : 'N/A';
+                const accScore = lhSummary.accessibility !== null ? Math.round(lhSummary.accessibility * 100) : 'N/A';
+                const bpScore = lhSummary.best_practices !== null ? Math.round(lhSummary.best_practices * 100) : 'N/A';
+                const seoScore = lhSummary.seo !== null ? Math.round(lhSummary.seo * 100) : 'N/A';
+                
+                // Determine emoji based on score
+                const getEmoji = (score) => {
+                  if (score === 'N/A') return '❓';
+                  if (score >= 90) return '🟢';
+                  if (score >= 50) return '🟠';
+                  return '🔴';
+                };
+                
+                lighthouseSection = `**Core Scores:**\n` +
+                  `- ${getEmoji(perfScore)} **Performance:** ${perfScore}/100\n` +
+                  `- ${getEmoji(accScore)} **Accessibility:** ${accScore}/100\n` +
+                  `- ${getEmoji(bpScore)} **Best Practices:** ${bpScore}/100\n` +
+                  `- ${getEmoji(seoScore)} **SEO:** ${seoScore}/100\n` +
+                  detailedMetrics +
+                  `\n\n📥 [Download full Lighthouse report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})`;
+              } catch (error) {
+                console.log('Error reading Lighthouse scores:', error.message);
+                lighthouseSection = `✅ Audit completed successfully!\n` +
+                  `- View detailed results in [workflow artifacts](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})`;
+              }
             } else {
               lighthouseSection = `⚠️ Lighthouse audit encountered issues\n` +
                 `- Check [workflow logs](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details\n` +
@@ -609,7 +668,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               comment_id: ${{ steps.mega_comment.outputs.result }},
-              body: `## 🎉 MEGA PR Test & Analysis Complete!\n\n` +
+              body: `# 🎉 MEGA PR Test & Analysis Complete!\n\n` +
                     `Hi @${username}! Your PR has been fully tested and analyzed! 🚀✨\n\n` +
                     `---\n\n` +
                     `### 🌍 Test Deployment\n` +

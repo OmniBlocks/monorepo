@@ -28,25 +28,7 @@ jobs:
         id: start_time
         run: echo "timestamp=$(date +%s)" >> $GITHUB_OUTPUT
 
-      - name: Cancel previous runs
-        uses: styfle/cancel-workflow-action@0.12.0
-        with:
-          workflow_id: 'prtest.yml'
-          access_token: ${{ github.token }}
-          all_but_latest: true
-
-      - name: React to comment (if triggered by comment)
-        if: github.event_name == 'issue_comment'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            await github.rest.reactions.createForIssueComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              comment_id: context.payload.comment.id,
-              content: 'rocket'
-            });
-
+      # Moved this step up to get branch for cancellation
       - name: Get PR details
         id: pr
         uses: actions/github-script@v7
@@ -66,6 +48,29 @@ jobs:
               sha: pr.data.head.sha,
               number: pr.data.number
             };
+
+      - name: Cancel previous runs
+        uses: styfle/cancel-workflow-action@0.12.0
+        with:
+          workflow_id: 'prtest.yml'
+          access_token: ${{ github.token }}
+          all_but_latest: true
+          # Cancel ONLY runs in the same PR branch
+          branch: ${{ fromJSON(steps.pr.outputs.result).ref }}
+
+      - name: React to comment (if triggered by comment)
+        if: github.event_name == 'issue_comment'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.reactions.createForIssueComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: context.payload.comment.id,
+              content: 'rocket'
+            });
+
+      # Removed duplicate "Get PR details" step here (now handled above)
 
       - name: Post building comment
         id: build_comment

@@ -50,7 +50,6 @@ jobs:
           workflow_id: 'mega-pr-test.yml'
           access_token: ${{ github.token }}
           all_but_latest: true
-          branch: ${{ fromJSON(steps.pr.outputs.result).ref }}
 
       - name: React to comment (if triggered by comment)
         if: github.event_name == 'issue_comment'
@@ -198,15 +197,48 @@ jobs:
                     `⬜ Deploying to test environment`
             });
 
+      - name: Install Lighthouse CI
+        run: npm install -g @lhci/cli@0.13.x
+
+      - name: Start HTTP server for Lighthouse
+        run: |
+          npx http-server build -p 8080 &
+          echo $! > server.pid
+          # Wait for server to be ready
+          for i in {1..30}; do
+            if curl -s http://localhost:8080 > /dev/null; then
+              echo "Server is ready!"
+              break
+            fi
+            echo "Waiting for server... ($i/30)"
+            sleep 1
+          done
+
       - name: Run Lighthouse CI
         id: lighthouse
-        uses: treosh/lighthouse-ci-action@v11
         continue-on-error: true
+        run: |
+          lhci autorun --collect.url=http://localhost:8080 --collect.numberOfRuns=1 || echo "Lighthouse failed but continuing..."
+          if [ -f ".lighthouseci/manifest.json" ]; then
+            echo "lighthouse_success=true" >> $GITHUB_OUTPUT
+          else
+            echo "lighthouse_success=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Stop HTTP server
+        if: always()
+        run: |
+          if [ -f server.pid ]; then
+            kill $(cat server.pid) || true
+            rm server.pid
+          fi
+
+      - name: Upload Lighthouse results
+        if: always()
+        uses: actions/upload-artifact@v4
         with:
-          urls: |
-            file:///${{ github.workspace }}/build/index.html
-          uploadArtifacts: true
-          temporaryPublicStorage: true
+          name: lighthouse-results
+          path: .lighthouseci/
 
       - name: Update comment - Bundle Size Analysis
         uses: actions/github-script@v7
@@ -243,20 +275,30 @@ jobs:
           
           # Get top 5 largest JS files
           echo "### 📦 Top 5 Largest JavaScript Files:" > bundle-report.md
-          find build -type f -name "*.js" -exec du -h {} \; | sort -rh | head -5 | while read line; do
-            size=$(echo "$line" | awk '{print $1}')
-            file=$(echo "$line" | awk '{print $2}' | sed 's|build/||')
-            echo "- **$size** - \`$file\`" >> bundle-report.md
-          done
+          JS_COUNT=$(find build -type f -name "*.js" | wc -l)
+          if [ "$JS_COUNT" -gt 0 ]; then
+            find build -type f -name "*.js" -exec du -h {} \; | sort -rh | head -5 | while read line; do
+              size=$(echo "$line" | awk '{print $1}')
+              file=$(echo "$line" | awk '{print $2}' | sed 's|build/||')
+              echo "- **$size** - \`$file\`" >> bundle-report.md
+            done
+          else
+            echo "- No JavaScript files found" >> bundle-report.md
+          fi
           
           # Get top 5 largest CSS files
           echo "" >> bundle-report.md
           echo "### 🎨 Top 5 Largest CSS Files:" >> bundle-report.md
-          find build -type f -name "*.css" -exec du -h {} \; | sort -rh | head -5 | while read line; do
-            size=$(echo "$line" | awk '{print $1}')
-            file=$(echo "$line" | awk '{print $2}' | sed 's|build/||')
-            echo "- **$size** - \`$file\`" >> bundle-report.md
-          done
+          CSS_COUNT=$(find build -type f -name "*.css" | wc -l)
+          if [ "$CSS_COUNT" -gt 0 ]; then
+            find build -type f -name "*.css" -exec du -h {} \; | sort -rh | head -5 | while read line; do
+              size=$(echo "$line" | awk '{print $1}')
+              file=$(echo "$line" | awk '{print $2}' | sed 's|build/||')
+              echo "- **$size** - \`$file\`" >> bundle-report.md
+            done
+          else
+            echo "- No CSS files found (might be inlined in JS)" >> bundle-report.md
+          fi
 
       - name: Update comment - Accessibility Testing
         uses: actions/github-script@v7
@@ -285,28 +327,52 @@ jobs:
             });
 
       - name: Install axe-core CLI
-        run: npm install -g @axe-core/cli http-server
+        run: npm install -g @axe-core/cli@4.10.2
 
       - name: Run accessibility tests
         id: a11y_test
         continue-on-error: true
         run: |
           # Start server in background
-          npx http-server build -p 8080 &
+          npx http-server build -p 9090 &
           SERVER_PID=$!
-          sleep 5
+          
+          # Wait for server with better retry logic
+          echo "Waiting for server to start..."
+          for i in {1..30}; do
+            if curl -s http://localhost:9090 > /dev/null; then
+              echo "Server is ready!"
+              break
+            fi
+            echo "Attempt $i/30..."
+            sleep 2
+          done
           
           # Run axe and capture output
-          axe http://localhost:8080 --stdout > axe-results.json || true
+          axe http://localhost:9090 --stdout > axe-results.json 2>&1 || true
           
           # Kill server
-          kill $SERVER_PID
+          kill $SERVER_PID || true
           
-          # Parse results
-          VIOLATIONS=$(cat axe-results.json | jq '.violations | length' || echo "0")
-          PASSES=$(cat axe-results.json | jq '.passes | length' || echo "0")
-          echo "violations=$VIOLATIONS" >> $GITHUB_OUTPUT
-          echo "passes=$PASSES" >> $GITHUB_OUTPUT
+          # Parse results with better error handling
+          if [ -f "axe-results.json" ] && [ -s "axe-results.json" ]; then
+            VIOLATIONS=$(jq '.violations | length' axe-results.json 2>/dev/null || echo "error")
+            PASSES=$(jq '.passes | length' axe-results.json 2>/dev/null || echo "error")
+            
+            if [ "$VIOLATIONS" = "error" ] || [ "$PASSES" = "error" ]; then
+              echo "a11y_success=false" >> $GITHUB_OUTPUT
+              echo "violations=error" >> $GITHUB_OUTPUT
+              echo "passes=error" >> $GITHUB_OUTPUT
+            else
+              echo "a11y_success=true" >> $GITHUB_OUTPUT
+              echo "violations=$VIOLATIONS" >> $GITHUB_OUTPUT
+              echo "passes=$PASSES" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "a11y_success=false" >> $GITHUB_OUTPUT
+            echo "violations=error" >> $GITHUB_OUTPUT
+            echo "passes=error" >> $GITHUB_OUTPUT
+          fi
 
       - name: Upload accessibility results
         if: always()
@@ -422,14 +488,41 @@ jobs:
             const bundleReport = fs.readFileSync('bundle-report.md', 'utf8');
             const totalSize = '${{ steps.bundle_analysis.outputs.total_size }}';
             
+            // Lighthouse results
+            const lighthouseSuccess = '${{ steps.lighthouse.outputs.lighthouse_success }}' === 'true';
+            let lighthouseSection = '';
+            if (lighthouseSuccess) {
+              lighthouseSection = `✅ Audit completed successfully!\n` +
+                `- View detailed results in [workflow artifacts](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})\n\n` +
+                `**What was checked:**\n` +
+                `- Performance score\n` +
+                `- Accessibility score\n` +
+                `- Best Practices score\n` +
+                `- SEO score\n` +
+                `- Progressive Web App score`;
+            } else {
+              lighthouseSection = `⚠️ Lighthouse audit encountered issues\n` +
+                `- Check [workflow logs](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details\n` +
+                `- This may be due to app complexity or server startup issues`;
+            }
+            
             // Accessibility results
+            const a11ySuccess = '${{ steps.a11y_test.outputs.a11y_success }}' === 'true';
             const a11yViolations = '${{ steps.a11y_test.outputs.violations }}';
             const a11yPasses = '${{ steps.a11y_test.outputs.passes }}';
-            const a11yStatus = a11yViolations === '0' ? '✅ All Clear!' : `⚠️ ${a11yViolations} issue(s) found`;
+            let a11ySection = '';
             
-            // Lighthouse info
-            const lighthouseResults = ${{ toJSON(steps.lighthouse.outputs) }};
-            const lighthouseUrl = lighthouseResults.manifest ? lighthouseResults.manifest[0].url : 'Check artifacts';
+            if (a11ySuccess && a11yViolations !== 'error') {
+              const status = a11yViolations === '0' ? '✅ All Clear!' : `⚠️ ${a11yViolations} issue(s) found`;
+              a11ySection = `${status}\n` +
+                `- ✅ Passed checks: ${a11yPasses}\n` +
+                `- ${a11yViolations !== '0' ? '⚠️' : '✅'} Violations: ${a11yViolations}\n` +
+                `- Full report available in [artifacts](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})`;
+            } else {
+              a11ySection = `⚠️ Accessibility testing encountered issues\n` +
+                `- Check [workflow logs](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details\n` +
+                `- Manual accessibility review recommended`;
+            }
 
             await github.rest.issues.updateComment({
               owner: context.repo.owner,
@@ -442,25 +535,14 @@ jobs:
                     `**Live Preview:** ${pageUrl}\n\n` +
                     `---\n\n` +
                     `### 🔦 Performance Audit (Lighthouse)\n` +
-                    `✅ Audit completed successfully!\n` +
-                    `- View detailed results: ${lighthouseUrl}\n` +
-                    `- Or check the [workflow artifacts](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})\n\n` +
-                    `**What was checked:**\n` +
-                    `- Performance score\n` +
-                    `- Accessibility score\n` +
-                    `- Best Practices score\n` +
-                    `- SEO score\n` +
-                    `- Progressive Web App score\n\n` +
+                    lighthouseSection + `\n\n` +
                     `---\n\n` +
                     `### 📦 Bundle Size Analysis\n` +
                     `**Total Build Size:** ${totalSize}\n\n` +
                     bundleReport + `\n\n` +
                     `---\n\n` +
                     `### ♿ Accessibility Testing\n` +
-                    `${a11yStatus}\n` +
-                    `- ✅ Passed checks: ${a11yPasses}\n` +
-                    `- ${a11yViolations !== '0' ? '⚠️' : '✅'} Violations: ${a11yViolations}\n` +
-                    `- Full report available in [artifacts](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})\n\n` +
+                    a11ySection + `\n\n` +
                     `---\n\n` +
                     `### 📊 Build Details\n` +
                     `- **PR:** #${prNumber}\n` +

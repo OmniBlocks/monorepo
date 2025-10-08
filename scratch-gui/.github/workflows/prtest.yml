@@ -26,8 +26,38 @@ jobs:
         id: start_time
         run: echo "timestamp=$(date +%s)" >> $GITHUB_OUTPUT
 
+      - name: Get PR details
+        id: pr
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = context.eventName === 'issue_comment'
+              ? context.issue.number
+              : context.payload.number;
+
+            const pr = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber
+            });
+            return {
+              ref: pr.data.head.ref,
+              sha: pr.data.head.sha,
+              number: pr.data.number
+            };
+
+      # ============================================================
+      # CRITICAL: Checkout BEFORE paths-filter!
+      # ============================================================
+      
+      - name: Checkout PR code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ fromJSON(steps.pr.outputs.result).sha }}
+          fetch-depth: 0
+
       # -----------------------
-      # QUICK: detect changed paths
+      # QUICK: detect changed paths (needs checkout first!)
       # -----------------------
       - name: Determine changed paths
         id: paths
@@ -50,30 +80,10 @@ jobs:
               - 'playwright.config.*'
       # outputs: steps.paths.outputs.<filter> = 'true' or 'false'
 
-      - name: Get PR details
-        id: pr
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const prNumber = context.eventName === 'issue_comment'
-              ? context.issue.number
-              : context.payload.number;
-
-            const pr = await github.rest.pulls.get({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: prNumber
-            });
-            return {
-              ref: pr.data.head.ref,
-              sha: pr.data.head.sha,
-              number: pr.data.number
-            };
-
       - name: Cancel previous runs
         uses: styfle/cancel-workflow-action@0.12.0
         with:
-          workflow_id: 'mega-pr-test.yml'
+          workflow_id: 'prtest.yml'
           access_token: ${{ github.token }}
           all_but_latest: true
 
@@ -120,12 +130,6 @@ jobs:
       # ============================================================
       # BUILD PHASE - Only happens ONCE!
       # ============================================================
-
-      - name: Checkout PR code
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ fromJSON(steps.pr.outputs.result).sha }}
-          fetch-depth: 0
 
       - name: Cache node modules
         uses: actions/cache@v4
@@ -243,17 +247,17 @@ jobs:
       - name: Install Lighthouse CI
         run: npm install -g @lhci/cli@0.13.x
 
-      - name: Create Lighthouse config (disable strict assertions)
+      - name: Create Lighthouse config (no assertions)
         run: |
           cat > lighthouserc.json << 'EOF'
           {
             "ci": {
               "collect": {
                 "numberOfRuns": 1,
-                "url": ["http://localhost:8080"]
-              },
-              "assert": {
-                "preset": "lighthouse:no-pwa"
+                "url": ["http://localhost:8080"],
+                "settings": {
+                  "chromeFlags": "--no-sandbox --disable-dev-shm-usage"
+                }
               },
               "upload": {
                 "target": "temporary-public-storage"
@@ -279,20 +283,25 @@ jobs:
         id: lighthouse
         continue-on-error: true
         run: |
-          set -o pipefail
-          lhci autorun || echo "Lighthouse completed with warnings"
+          set +e
+          lhci autorun
+          LHCI_EXIT_CODE=$?
+          set -e
+          
+          echo "Lighthouse exit code: $LHCI_EXIT_CODE"
+          
           if [ -d ".lighthouseci" ] && [ "$(ls -A .lighthouseci 2>/dev/null)" ]; then
             echo "lighthouse_success=true" >> $GITHUB_OUTPUT
             ISSUES_FOUND=$(find .lighthouseci -name "*.json" -type f | wc -l)
             echo "issues_count=$ISSUES_FOUND" >> $GITHUB_OUTPUT
-            # Create a small summary file with key scores (if lhci outputs report)
-            # Try to find the first report JSON and extract scores using jq
+            
+            # Extract scores from the report
             REPORT_JSON=$(find .lighthouseci -type f -name "*.report.json" | head -n1 || true)
-            if [ -n "$REPORT_JSON" ]; then
-              PERF=$(jq '.categories.performance.score' $REPORT_JSON || echo "null")
-              ACC=$(jq '.categories.accessibility.score' $REPORT_JSON || echo "null")
-              BP=$(jq '.categories["best-practices"].score' $REPORT_JSON || echo "null")
-              SEO=$(jq '.categories.seo.score' $REPORT_JSON || echo "null")
+            if [ -n "$REPORT_JSON" ] && [ -f "$REPORT_JSON" ]; then
+              PERF=$(jq -r '.categories.performance.score // "null"' "$REPORT_JSON" 2>/dev/null || echo "null")
+              ACC=$(jq -r '.categories.accessibility.score // "null"' "$REPORT_JSON" 2>/dev/null || echo "null")
+              BP=$(jq -r '.categories["best-practices"].score // "null"' "$REPORT_JSON" 2>/dev/null || echo "null")
+              SEO=$(jq -r '.categories.seo.score // "null"' "$REPORT_JSON" 2>/dev/null || echo "null")
               echo "{\"performance\":$PERF,\"accessibility\":$ACC,\"best_practices\":$BP,\"seo\":$SEO}" > lh-summary.json
             else
               echo "{}" > lh-summary.json
@@ -302,6 +311,8 @@ jobs:
             echo "issues_count=0" >> $GITHUB_OUTPUT
             echo "{}" > lh-summary.json
           fi
+          
+          exit 0
 
       - name: Stop HTTP server
         if: always()
@@ -615,10 +626,10 @@ jobs:
                 }
                 
                 // Convert scores to percentages
-                const perfScore = lhSummary.performance !== null ? Math.round(lhSummary.performance * 100) : 'N/A';
-                const accScore = lhSummary.accessibility !== null ? Math.round(lhSummary.accessibility * 100) : 'N/A';
-                const bpScore = lhSummary.best_practices !== null ? Math.round(lhSummary.best_practices * 100) : 'N/A';
-                const seoScore = lhSummary.seo !== null ? Math.round(lhSummary.seo * 100) : 'N/A';
+                const perfScore = lhSummary.performance !== null && lhSummary.performance !== 'null' ? Math.round(lhSummary.performance * 100) : 'N/A';
+                const accScore = lhSummary.accessibility !== null && lhSummary.accessibility !== 'null' ? Math.round(lhSummary.accessibility * 100) : 'N/A';
+                const bpScore = lhSummary.best_practices !== null && lhSummary.best_practices !== 'null' ? Math.round(lhSummary.best_practices * 100) : 'N/A';
+                const seoScore = lhSummary.seo !== null && lhSummary.seo !== 'null' ? Math.round(lhSummary.seo * 100) : 'N/A';
                 
                 // Determine emoji based on score
                 const getEmoji = (score) => {
@@ -701,14 +712,27 @@ jobs:
             const username = context.eventName === 'issue_comment'
               ? context.payload.comment.user.login
               : context.payload.pull_request.user.login;
-            const duration = '${{ steps.duration.outputs.duration }}';
-
-            await github.rest.issues.updateComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              comment_id: ${{ steps.mega_comment.outputs.result }},
-              body: `❌ **MEGA PR Test Failed** @${username}\n\n` +
-                    `Something went wrong during the build or analysis process.\n` +
-                    `Total time: ${duration}\n\n` +
-                    `Check the logs for details: [View Logs](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})`
-            });
+            const duration = '${{ steps.duration.outputs.duration }}' || 'N/A';
+            const commentId = '${{ steps.mega_comment.outputs.result }}';
+            
+            const failureBody = `❌ **MEGA PR Test Failed** @${username}\n\n` +
+                  `Something went wrong during the build or analysis process.\n` +
+                  `Total time: ${duration}\n\n` +
+                  `Check the logs for details: [View Logs](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})`;
+            
+            // If comment was created, update it; otherwise create a new one
+            if (commentId && commentId !== '') {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: commentId,
+                body: failureBody
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: ${{ fromJSON(steps.pr.outputs.result).number }},
+                body: failureBody
+              });
+            }

@@ -73,7 +73,7 @@ jobs:
       # reaction on a confirmation comment. This polls for a reaction up to
       # 10 minutes (configurable).
       ####################################################################
-      - name: Anti-spam: check recent run and require reaction if within 10m
+      - name: Anti-spam - check recent run and require reaction if within 10m
         id: anti_spam
         uses: actions/github-script@v7
         with:

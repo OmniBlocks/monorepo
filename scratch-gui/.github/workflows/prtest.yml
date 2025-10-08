@@ -133,9 +133,9 @@ jobs:
           path: |
             ~/.npm
             node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}-${{ fromJSON(steps.pr.outputs.result).number || 'main' }}
+          key: ${{ runner.os }}-node-${{ fromJSON(steps.pr.outputs.result).number || 'main' }}-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
-            ${{ runner.os }}-node-
+            ${{ runner.os }}-node-${{ fromJSON(steps.pr.outputs.result).number || 'main' }}-
 
       - name: Setup Node.js
         uses: actions/setup-node@v4

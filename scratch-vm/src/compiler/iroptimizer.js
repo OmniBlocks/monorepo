@@ -158,6 +158,12 @@ class IROptimizer {
         case InputOpcode.ADDON_CALL:
             break;
 
+        case InputOpcode.CAST_BOOLEAN: {
+            const innerType = inputs.target.type;
+            if (innerType & InputType.BOOLEAN) return innerType;
+            return InputType.BOOLEAN;
+        }
+
         case InputOpcode.CAST_NUMBER: {
             const innerType = inputs.target.type;
             if (innerType & InputType.NUMBER) return innerType;
@@ -707,6 +713,14 @@ class IROptimizer {
         }
 
         switch (input.opcode) {
+        case InputOpcode.CAST_BOOLEAN: {
+            const targetType = input.inputs.target.type;
+            if ((targetType & InputType.BOOLEAN) === targetType) {
+                return input.inputs.target;
+            }
+            return input;
+        }
+
         case InputOpcode.CAST_NUMBER: {
             const targetType = input.inputs.target.type;
             if ((targetType & InputType.NUMBER) === targetType) {

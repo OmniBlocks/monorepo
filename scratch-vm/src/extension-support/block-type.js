@@ -14,9 +14,10 @@ const BlockType = {
     BUTTON: 'button',
 
     /**
-     * A text label (not an actual block) for adding comments or labling blocks
+     * A text label (not an actual block) for adding comments or labling blocks 
      */
     LABEL: 'label',
+
 
     /**
      * Command block

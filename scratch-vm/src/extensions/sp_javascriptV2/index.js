@@ -3,9 +3,8 @@ const BlockShape = require("../../extension-support/block-shape");
 const ArgumentType = require("../../extension-support/argument-type");
 const SandboxRunner = require("../../util/sandboxed-javascript-runner");
 const Cast = require("../../util/cast");
- 
-let isScratchBlocksReady = typeof ScratchBlocks === "object" && 
-                            typeof ScratchBlocks.FieldCustom === "object";
+
+let isScratchBlocksReady = typeof ScratchBlocks === "object";
 const codeEditorHandlers = new Map();
 
 // we cant have nice things
@@ -166,18 +165,14 @@ class SPjavascriptV2 {
     this.runtime = runtime;
     this.isEditorUnsandboxed = false;
 
-    // Only attach after VM is available
-    if (this.runtime?.vm) {
-      this.runtime.vm.on('workspaceUpdate', () => {
-        codeEditorHandlers.clear();
-        if (typeof ScratchBlocks === 'object' &&
-            typeof ScratchBlocks.FieldCustom === 'object') {
-          initBlockTools();
-        }
-      });
-    }
+    this.runtime.vm.on("workspaceUpdate", () => {
+      codeEditorHandlers.clear();
+      if (!isScratchBlocksReady) {
+        isScratchBlocksReady = typeof ScratchBlocks === "object";
+        if (isScratchBlocksReady) initBlockTools();
+      }
+    });
 
-    // Keep this inside the constructor
     this.globalFuncs = new Map();
   }
   getInfo() {
@@ -364,13 +359,11 @@ class SPjavascriptV2 {
   }
 
   // helper funcs
-toggleSandbox() {
-  if (this.isEditorUnsandboxed) {
-    this.isEditorUnsandboxed = false;
-    this.runtime.extensionManager.refreshBlocks("SPjavascriptV2");
-  } else {
-    // Guard against runtime.vm being undefined
-    if (this.runtime.vm && this.runtime.vm.securityManager) {
+  toggleSandbox() {
+    if (this.isEditorUnsandboxed) {
+      this.isEditorUnsandboxed = false;
+      this.runtime.extensionManager.refreshBlocks("SPjavascriptV2");
+    } else {
       this.runtime.vm.securityManager.canUnsandbox("JavaScript").then((isAllowed) => {
         if (!isAllowed) return;
         this.isEditorUnsandboxed = true;
@@ -378,7 +371,6 @@ toggleSandbox() {
       });
     }
   }
-}
 
   packagerInfo() {
     alert([
@@ -463,7 +455,7 @@ toggleSandbox() {
     }
 
     /* 'extensionRuntimeOptions.javascriptUnsandboxed' is used for packager */
-    if (this.isEditorUnsandboxed || this.runtime.extensionRuntimeOptions?.javascriptUnsandboxed === true) {
+    if (this.isEditorUnsandboxed || this.runtime.extensionRuntimeOptions.javascriptUnsandboxed === true) {
       let result;
       try {
         // eslint-disable-next-line no-eval

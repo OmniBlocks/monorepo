@@ -247,7 +247,7 @@ jobs:
       - name: Install Lighthouse CI
         run: npm install -g @lhci/cli@0.13.x
 
-      - name: Create Lighthouse config (dual upload targets)
+      - name: Create Lighthouse config (filesystem only)
         run: |
           cat > lighthouserc.json << 'EOF'
           {
@@ -259,31 +259,25 @@ jobs:
                   "chromeFlags": "--no-sandbox --disable-dev-shm-usage"
                 }
               },
-              "upload": [
-                {
-                  "target": "temporary-public-storage"
-                },
-                {
-                  "target": "filesystem",
-                  "outputDir": ".lighthouseci"
-                }
-              ]
+              "upload": {
+                "target": "filesystem",
+                "outputDir": ".lighthouseci"
+              }
             }
           }
           EOF
-
-      - name: Start HTTP server for Lighthouse
-        run: |
-          npx http-server build -p 8080 &
-          echo $! > server.pid
-          for i in {1..30}; do
-            if curl -s http://localhost:8080 > /dev/null; then
-              echo "Server is ready!"
-              break
-            fi
-            echo "Waiting for server... ($i/30)"
-            sleep 1
-          done
+            - name: Start HTTP server for Lighthouse
+              run: |
+                npx http-server build -p 8080 &
+                echo $! > server.pid
+                for i in {1..30}; do
+                  if curl -s http://localhost:8080 > /dev/null; then
+                    echo "Server is ready!"
+                    break
+                  fi
+                  echo "Waiting for server... ($i/30)"
+                  sleep 1
+                done
 
       - name: Run Lighthouse CI
         id: lighthouse

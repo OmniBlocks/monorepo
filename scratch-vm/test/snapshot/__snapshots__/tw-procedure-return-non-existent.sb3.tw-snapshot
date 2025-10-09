@@ -3,15 +3,14 @@
 
 // Sprite2 script
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
-const b0 = runtime.getOpcodeFunction("looks_say");
-const b1 = stage.variables["`jEk@4|i[#Fk?(8x)AV.-my variable"];
+const b0 = stage.variables["`jEk@4|i[#Fk?(8x)AV.-my variable"];
 return function* genXYZ () {
-yield* executeInCompatibilityLayer({"MESSAGE":"plan 1",}, b0, false, false, "d", null);
-b1.value = "discard me";
-b1.value = "";
-if ((("" + b1.value).toLowerCase() === "".toLowerCase())) {
-yield* executeInCompatibilityLayer({"MESSAGE":"pass non existent procedure returned empty string",}, b0, false, false, "h", null);
+runtime.ext_scratch3_looks._say("plan 1", target);
+b0.value = "discard me";
+b0.value = "";
+if ((("" + b0.value).toLowerCase() === "".toLowerCase())) {
+runtime.ext_scratch3_looks._say("pass non existent procedure returned empty string", target);
 }
-yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, "g", null);
+runtime.ext_scratch3_looks._say("end", target);
 retire(); return;
 }; })

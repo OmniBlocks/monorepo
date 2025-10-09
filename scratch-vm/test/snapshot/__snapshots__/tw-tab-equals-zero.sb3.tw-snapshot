@@ -3,11 +3,10 @@
 
 // Sprite1 script
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
-const b0 = runtime.getOpcodeFunction("looks_say");
-const b1 = stage.variables["Kl,Own0m6{^v3$E{Wsc="];
+const b0 = stage.variables["Kl,Own0m6{^v3$E{Wsc="];
 return function* genXYZ () {
-yield* executeInCompatibilityLayer({"MESSAGE":"plan 6",}, b0, false, false, "i", null);
-b1.value = "\t";
+runtime.ext_scratch3_looks._say("plan 6", target);
+b0.value = "\t";
 startHats("event_whenbroadcastreceived", { BROADCAST_OPTION: "message1" });
 retire(); return;
 }; })
@@ -15,26 +14,25 @@ retire(); return;
 // Sprite1 script
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
 const b0 = stage.variables["Kl,Own0m6{^v3$E{Wsc="];
-const b1 = runtime.getOpcodeFunction("looks_say");
 return function* genXYZ () {
 if (compareEqual(b0.value, ("0" + ""))) {
-yield* executeInCompatibilityLayer({"MESSAGE":"pass \\t in a variable = string 0",}, b1, false, false, "q", null);
+runtime.ext_scratch3_looks._say("pass \\t in a variable = string 0", target);
 }
 if (compareEqual("\t", ("0" + ""))) {
-yield* executeInCompatibilityLayer({"MESSAGE":"pass literal \\t = string 0",}, b1, false, false, "u", null);
+runtime.ext_scratch3_looks._say("pass literal \\t = string 0", target);
 }
 if (compareEqual(("    " + ("" + b0.value)), ("0" + ""))) {
-yield* executeInCompatibilityLayer({"MESSAGE":"pass \\t and other spaces = string 0",}, b1, false, false, "w", null);
+runtime.ext_scratch3_looks._say("pass \\t and other spaces = string 0", target);
 }
 if (compareEqual(b0.value, (0 + 0))) {
-yield* executeInCompatibilityLayer({"MESSAGE":"pass \\t in a variable = number 0",}, b1, false, false, "z", null);
+runtime.ext_scratch3_looks._say("pass \\t in a variable = number 0", target);
 }
 if ((0 === (0 + 0))) {
-yield* executeInCompatibilityLayer({"MESSAGE":"pass literal \\t = number 0",}, b1, false, false, "B", null);
+runtime.ext_scratch3_looks._say("pass literal \\t = number 0", target);
 }
 if (compareEqual(("    " + ("" + b0.value)), (0 + 0))) {
-yield* executeInCompatibilityLayer({"MESSAGE":"pass \\t and other spaces = number 0",}, b1, false, false, "E", null);
+runtime.ext_scratch3_looks._say("pass \\t and other spaces = number 0", target);
 }
-yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b1, false, false, "D", null);
+runtime.ext_scratch3_looks._say("end", target);
 retire(); return;
 }; })

@@ -3,36 +3,35 @@
 
 // Sprite2 script
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
-const b0 = runtime.getOpcodeFunction("looks_say");
-const b1 = stage.variables["eFlmP1{XC+I1:h0Yln.K"];
+const b0 = stage.variables["eFlmP1{XC+I1:h0Yln.K"];
 return function* genXYZ () {
-yield* executeInCompatibilityLayer({"MESSAGE":"plan 7",}, b0, false, false, "h", null);
-b1.value = [];
-listInsert(b1, "any", "a");
-listInsert(b1, "any", "b");
-listInsert(b1, "any", "c");
-if ((b1.value.length === 3)) {
-yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b0, false, false, "s", null);
+runtime.ext_scratch3_looks._say("plan 7", target);
+b0.value = [];
+listInsert(b0, "any", "a");
+listInsert(b0, "any", "b");
+listInsert(b0, "any", "c");
+if ((b0.value.length === 3)) {
+runtime.ext_scratch3_looks._say("pass", target);
 }
-if (listContains(b1, "a")) {
-yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b0, false, false, "v", null);
+if (listContains(b0, "a")) {
+runtime.ext_scratch3_looks._say("pass", target);
 }
-if (listContains(b1, "b")) {
-yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b0, false, false, "x", null);
+if (listContains(b0, "b")) {
+runtime.ext_scratch3_looks._say("pass", target);
 }
-if (listContains(b1, "c")) {
-yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b0, false, false, "z", null);
+if (listContains(b0, "c")) {
+runtime.ext_scratch3_looks._say("pass", target);
 }
-if (listContains(b1, listGet(b1.value, "any"))) {
-yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b0, false, false, "A", null);
+if (listContains(b0, listGet(b0.value, "any"))) {
+runtime.ext_scratch3_looks._say("pass", target);
 }
-listDelete(b1, "any");
-if ((b1.value.length === 2)) {
-yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b0, false, false, "C", null);
+listDelete(b0, "any");
+if ((b0.value.length === 2)) {
+runtime.ext_scratch3_looks._say("pass", target);
 }
-if ((("" + listGet(b1.value, "*")).toLowerCase() === "".toLowerCase())) {
-yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b0, false, false, "F", null);
+if ((("" + listGet(b0.value, "*")).toLowerCase() === "".toLowerCase())) {
+runtime.ext_scratch3_looks._say("pass", target);
 }
-yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b0, false, false, "E", null);
+runtime.ext_scratch3_looks._say("end", target);
 retire(); return;
 }; })

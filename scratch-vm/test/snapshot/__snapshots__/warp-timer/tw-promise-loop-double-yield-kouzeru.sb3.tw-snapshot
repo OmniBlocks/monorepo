@@ -5,15 +5,14 @@
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
 const b0 = stage.variables["JbF5exWEi*m?-UEmkASS"];
 const b1 = stage.variables["[G/@.KGc-4y[(GZ(bt7o"];
-const b2 = runtime.getOpcodeFunction("looks_say");
-const b3 = runtime.getOpcodeFunction("sound_seteffectto");
+const b2 = runtime.getOpcodeFunction("sound_seteffectto");
 return function* genXYZ () {
 while (true) {
 if (compareEqual(b0.value, b1.value)) {
 } else {
-yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b2, false, false, "89/dl$1dp$~nj81:jj@H", null);
+runtime.ext_scratch3_looks._say("pass", target);
 b1.value = b0.value;
-yield* executeInCompatibilityLayer({"VALUE":b0.value,"EFFECT":"pitch",}, b3, false, true, "*=8r,g4Pzvxo?aSMcpfX", null);
+yield* executeInCompatibilityLayer({"VALUE":b0.value,"EFFECT":"pitch",}, b2, false, true, "*=8r,g4Pzvxo?aSMcpfX", null);
 if (hasResumedFromPromise) {hasResumedFromPromise = false;continue;}
 }
 yield;
@@ -24,16 +23,15 @@ retire(); return;
 // Sprite1 script
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
 const b0 = stage.variables["[G/@.KGc-4y[(GZ(bt7o"];
-const b1 = runtime.getOpcodeFunction("looks_say");
-const b2 = stage.variables["JbF5exWEi*m?-UEmkASS"];
+const b1 = stage.variables["JbF5exWEi*m?-UEmkASS"];
 return function* genXYZ () {
 b0.value = 0;
-yield* executeInCompatibilityLayer({"MESSAGE":"plan 15",}, b1, false, false, "0/2-)Gp^^=haQ1OMD.xb", null);
+runtime.ext_scratch3_looks._say("plan 15", target);
 for (var a0 = 15; a0 > 0; a0--) {
-if ((toNotNaN(+b2.value) === 200)) {
-b2.value = 50;
+if ((toNotNaN(+b1.value) === 200)) {
+b1.value = 50;
 } else {
-b2.value = 200;
+b1.value = 200;
 }
 thread.timer = timer();
 var a1 = Math.max(0, 1000 * 0);
@@ -45,7 +43,7 @@ yield;
 thread.timer = null;
 yield;
 }
-yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b1, false, false, "--nBRXyJfqS0MM9`#S3}", null);
+runtime.ext_scratch3_looks._say("end", target);
 runtime.stopAll();
 retire(); return;
 retire(); return;

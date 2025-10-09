@@ -3,13 +3,12 @@
 
 // Sprite1 script
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
-const b0 = runtime.getOpcodeFunction("looks_say");
-const b1 = stage.variables["G{NQ*NXG*qzywe1Q3?FM"];
-const b2 = stage.variables["`jEk@4|i[#Fk?(8x)AV.-my variable"];
+const b0 = stage.variables["G{NQ*NXG*qzywe1Q3?FM"];
+const b1 = stage.variables["`jEk@4|i[#Fk?(8x)AV.-my variable"];
 return function* genXYZ () {
-yield* executeInCompatibilityLayer({"MESSAGE":"plan 1",}, b0, false, false, "c", null);
+runtime.ext_scratch3_looks._say("plan 1", target);
+b0.value = 0;
 b1.value = 0;
-b2.value = 0;
 startHats("event_whenbroadcastreceived", { BROADCAST_OPTION: "message1" });
 retire(); return;
 }; })
@@ -18,7 +17,6 @@ retire(); return;
 (function factoryXYZ(thread) { const target = thread.target; const runtime = target.runtime; const stage = runtime.getTargetForStage();
 const b0 = stage.variables["`jEk@4|i[#Fk?(8x)AV.-my variable"];
 const b1 = stage.variables["G{NQ*NXG*qzywe1Q3?FM"];
-const b2 = runtime.getOpcodeFunction("looks_say");
 return function* genXYZ () {
 if (compareEqual(b0.value, 0)) {
 b0.value = 1;
@@ -30,9 +28,9 @@ yield;
 b1.value = 2;
 } else {
 if ((toNotNaN(+b1.value) === 1)) {
-yield* executeInCompatibilityLayer({"MESSAGE":"pass",}, b2, false, false, "p", null);
+runtime.ext_scratch3_looks._say("pass", target);
 }
-yield* executeInCompatibilityLayer({"MESSAGE":"end",}, b2, false, false, "n", null);
+runtime.ext_scratch3_looks._say("end", target);
 }
 retire(); return;
 }; })

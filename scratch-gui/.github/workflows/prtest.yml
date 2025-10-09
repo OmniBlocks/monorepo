@@ -247,7 +247,7 @@ jobs:
       - name: Install Lighthouse CI
         run: npm install -g @lhci/cli@0.13.x
 
-      - name: Create Lighthouse config (no assertions)
+      - name: Create Lighthouse config (dual upload targets)
         run: |
           cat > lighthouserc.json << 'EOF'
           {
@@ -259,9 +259,15 @@ jobs:
                   "chromeFlags": "--no-sandbox --disable-dev-shm-usage"
                 }
               },
-              "upload": {
-                "target": "temporary-public-storage"
-              }
+              "upload": [
+                {
+                  "target": "temporary-public-storage"
+                },
+                {
+                  "target": "filesystem",
+                  "outputDir": ".lighthouseci"
+                }
+              ]
             }
           }
           EOF

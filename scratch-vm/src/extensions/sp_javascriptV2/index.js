@@ -166,18 +166,18 @@ class SPjavascriptV2 {
     this.runtime = runtime;
     this.isEditorUnsandboxed = false;
 
-    // Safely attach workspaceUpdate listener only if runtime.vm exists
-    if (this.runtime.vm) {
-      this.runtime.vm.on("workspaceUpdate", () => {
+    // Only attach after VM is available
+    if (this.runtime?.vm) {
+      this.runtime.vm.on('workspaceUpdate', () => {
         codeEditorHandlers.clear();
-        if (!isScratchBlocksReady) {
-          isScratchBlocksReady = typeof ScratchBlocks === "object" && 
-                                  typeof ScratchBlocks.FieldCustom === "object";
-          if (isScratchBlocksReady) initBlockTools();
+        if (typeof ScratchBlocks === 'object' &&
+            typeof ScratchBlocks.FieldCustom === 'object') {
+          initBlockTools();
         }
       });
     }
 
+    // Keep this inside the constructor
     this.globalFuncs = new Map();
   }
   getInfo() {
@@ -463,7 +463,7 @@ toggleSandbox() {
     }
 
     /* 'extensionRuntimeOptions.javascriptUnsandboxed' is used for packager */
-    if (this.isEditorUnsandboxed || this.runtime.extensionRuntimeOptions.javascriptUnsandboxed === true) {
+    if (this.isEditorUnsandboxed || this.runtime.extensionRuntimeOptions?.javascriptUnsandboxed === true) {
       let result;
       try {
         // eslint-disable-next-line no-eval

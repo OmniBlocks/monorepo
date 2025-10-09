@@ -93,7 +93,7 @@ jobs:
 
             let text = AI_RESPONSE.replace(/\r\n/g, '\n');
 
-            const MAX_CHARS = 64000;
+            const MAX_CHARS = 164000;
 
             if (!text.trim()) {
               await github.rest.issues.createComment({

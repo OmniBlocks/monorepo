@@ -13,6 +13,9 @@ const postcssImport = require('postcss-import');
 
 const STATIC_PATH = process.env.STATIC_PATH || '/static';
 const {APP_NAME} = require('./src/lib/brand');
+console.log('🔍 DEBUG: Webpack config loading...');
+console.log('🔍 DEBUG: APP_VERSION from env:', process.env.APP_VERSION);
+console.log('🔍 DEBUG: Will inject:', JSON.stringify(process.env.APP_VERSION || ''));
 
 const root = process.env.ROOT || '';
 if (root.length > 0 && !root.endsWith('/')) {
@@ -26,7 +29,7 @@ const htmlWebpackPluginCommon = {
 };
 
 // When this changes, the path for all JS files will change, bypassing any HTTP caches
-const CACHE_EPOCH = 'omnibruh';
+const CACHE_EPOCH = 'pentapod';
 
 const base = {
     mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
@@ -66,12 +69,6 @@ const base = {
             'scratch-render-fonts$': path.resolve(__dirname, 'src/lib/tw-scratch-render-fonts')
         }
     },
-    cache: {
-        type: 'filesystem',
-        buildDependencies: {
-            config: [__filename]
-        }
-    },
     module: {
         rules: [{
             test: /\.jsx?$/,
@@ -90,8 +87,7 @@ const base = {
                     ['react-intl', {
                         messagesDir: './translations/messages/'
                     }]],
-                presets: ['@babel/preset-env', '@babel/preset-react'],
-                cacheDirectory: true,
+                presets: ['@babel/preset-env', '@babel/preset-react']
             }
         },
         {
@@ -144,7 +140,7 @@ const base = {
 
 if (!process.env.CI) {
     base.plugins.push(new webpack.ProgressPlugin());
-    base.plugins.push(new webpack.HotModuleReplacementPlugin());
+        base.plugins.push(new webpack.HotModuleReplacementPlugin());
 }
 
 module.exports = [

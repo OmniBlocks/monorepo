@@ -20,7 +20,7 @@ This repository contains the frontend interface of the Block-Based editor for Om
   - [Integration Points](#integration-points)
 - [📜 Licensing](#-licensing)
 - [🤝 Contributing](#-contributing)
-- [📝 The Super Strict Style Guide of Doom 😈](#the-super-strict-style-guide-of-doom)
+- [📝 The Super Strict Style Guide of Doom 😈](#-the-super-strict-style-guide-of-doom)
 - [❓ Frequently Asked Questions (FAQ)](#-frequently-asked-questions-faq)
   - [General Questions](#general-questions)
   - [Compatibility](#compatibility)

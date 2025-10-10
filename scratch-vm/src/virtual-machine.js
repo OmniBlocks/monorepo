@@ -22,7 +22,6 @@ const Blocks = require('./engine/blocks');
 const Comment = require('./engine/comment.js');
 const formatMessage = require('format-message');
 const ExtensionStorage = require('./util/deprecated-extension-storage.js');
-const StringUtil = require('./util/string-util');
 const Variable = require('./engine/variable');
 const newBlockIds = require('./util/new-block-ids');
 

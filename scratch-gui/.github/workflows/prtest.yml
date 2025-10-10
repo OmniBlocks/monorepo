@@ -56,7 +56,7 @@ jobs:
             const username = context.eventName === 'issue_comment'
               ? context.payload.comment.user.login
               : context.payload.pull_request.user.login;
-            if (username.endsWith('[bot]') || username == "dependabot-preview" { 
+            if (username.endsWith('[bot]') || username == "dependabot-preview") { 
             const comment = await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,

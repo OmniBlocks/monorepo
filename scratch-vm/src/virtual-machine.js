@@ -6,7 +6,7 @@ if (typeof TextEncoder === 'undefined') {
     _TextEncoder = TextEncoder;
 }
 const EventEmitter = require('events');
-const JSZip = require('jszip');
+const JSZip = require('@turbowarp/jszip');
 
 const Buffer = require('buffer').Buffer;
 const centralDispatch = require('./dispatch/central-dispatch');
@@ -22,7 +22,7 @@ const Blocks = require('./engine/blocks');
 const Comment = require('./engine/comment.js');
 const formatMessage = require('format-message');
 const ExtensionStorage = require('./util/deprecated-extension-storage.js');
-
+const StringUtil = require('./util/string-util');
 const Variable = require('./engine/variable');
 const newBlockIds = require('./util/new-block-ids');
 
@@ -216,6 +216,7 @@ class VirtualMachine extends EventEmitter {
         this.securityManager = this.extensionManager.securityManager;
         this.runtime.extensionManager = this.extensionManager;
         this.runtime.vm = this;
+        this.runtime.extensionRuntimeOptions = this.runtime.extensionRuntimeOptions || {};
 
         // Load core extensions
         for (const id of CORE_EXTENSIONS) {

@@ -243,14 +243,27 @@ A: Please open an issue on our GitHub repository with:
 ### Contributions
 
 **Q: I want to contribute! Where do I start?**  
-A: Awesome! Check out our `CONTRIBUTING.md` file for guidelines. Good starting points are:
+A: Awesome! Read everything above for guidelines. Good starting points are:
 - Fixing bugs labeled "good first issue"
 - Improving documentation
 - Adding tests
 - Translating the interface
 
 **Q: Do I need permission to fork OmniBlocks?**  
-A: Not at all! That's the beauty of open source. Just make sure to follow the license terms and give proper attribution.
+A: Not at all! That's what's so good about our open source license. You can use our code at the expense of anyone using your code too. Just make sure to follow the license terms and give proper attribution.
+
+**Q: Can we talk to any of the maintainers or just have a chat?**
+A: Totally! That's what you do in [the Discussion tab!](https://github.com/orgs/OmniBlocks/discussions) to talk to any of our maintainers.
+Q: But aren't you busy?
+A: True. I, supervoidcoder, the lead maintainer and creator of OmniBlocks, am very busy as I have to do school and other things too. But I'm not one of those people who is "onLy HeRe foR SeRiOuS sTuFF" or "iM a VeRy ImpOrtanT person With PrioRities, not your FrienD". I genuinely care about anyone that wants to reach out to me.
+Most of the maintainers and contributors have our own personal Scratch Account too. Here are some:
+@supervoidcoder: [scratchcode1_2_3](https://scratch.mit.edu/users/scratchcode1_2_3/)
+@ampelectrecuted: [AmpElectrecuted](https://scratch.mit.edu/users/AmpElectrecuted/) or [8to16](https://scratch.mit.edu/users/8to16/) (banned, unfortunately)
+@gvyt: [GvYoutube](https://scratch.mit.edu/users/GvYoutube/)
+@NotTheBaton: [TheBaton](https://scratch.mit.edu/users/TheBaton/)
+
+
+
 
 ---
 
@@ -258,9 +271,6 @@ A: Not at all! That's the beauty of open source. Just make sure to follow the li
 
 **Made a mod or a cool project?** We would love to see what people are creating! If you made your own mod of OmniBlocks or made a cool project in it, show it off in [the Discussion tab!](https://github.com/orgs/OmniBlocks/discussions)
 
-
-
-Please ensure your code follows the existing patterns and conventions used in the project. 
 
 ---
 

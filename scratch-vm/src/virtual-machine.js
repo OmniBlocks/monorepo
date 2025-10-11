@@ -16,12 +16,8 @@ const MathUtil = require('./util/math-util');
 const Runtime = require('./engine/runtime');
 const StringUtil = require('./util/string-util');
 const RenderedTarget = require('./sprites/rendered-target');
-const StageLayering = require('./engine/stage-layering');
 const Sprite = require('./sprites/sprite');
-const Blocks = require('./engine/blocks');
-const Comment = require('./engine/comment.js');
 const formatMessage = require('format-message');
-const ExtensionStorage = require('./util/deprecated-extension-storage.js');
 const Variable = require('./engine/variable');
 const newBlockIds = require('./util/new-block-ids');
 
@@ -33,11 +29,6 @@ const {exportCostume} = require('./serialization/tw-costume-import-export');
 const Base64Util = require('./util/base64-util');
 
 const RESERVED_NAMES = ['_mouse_', '_stage_', '_edge_', '_myself_', '_random_'];
-
-const IRGenerator = require('./compiler/irgen');
-const JSGenerator = require('./compiler/jsgen');
-const jsexecute = require('./compiler/jsexecute');
-const { SyntheticModule } = require('vm');
 
 const CORE_EXTENSIONS = [
     // 'motion',

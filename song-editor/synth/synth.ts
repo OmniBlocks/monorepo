@@ -3481,7 +3481,7 @@ export class Song {
 
     public initToDefault(andResetChannels: boolean = true): void {
         this.scale = 0;
-        this.scaleCustom = [false, false, false, false, false, false, false, false, false, false, false, false];
+        this.scaleCustom = [true, false, false, false, false, false, false, false, false, false, false, false];
         //this.scaleCustom = [true, false, true, true, false, false, false, true, true, false, true, true];
         //this.scaleCustom = [true, false, false, false, false, false, false, false, false, false, false, false];
         this.key = 0;
@@ -3504,7 +3504,6 @@ export class Song {
         //This is the tab's display name
         this.title = "Untitled";
         document.title = this.title + " - " + EditorConfig.versionDisplayName;
-
         if (andResetChannels) {
             this.pitchChannelCount = 5; //Slarmoo's Box: 3
             this.noiseChannelCount = 1;
@@ -3550,7 +3549,7 @@ export class Song {
         let buffer: number[] = [];
 
         buffer.push(Song._variant);
-        buffer.push(base64IntToCharCode[Song._latestSlarmoosBoxVersion]);
+        buffer.push(base64IntToCharCode[Song._latestJukeBoxVersion]);
 
         // Length of the song name string
         buffer.push(SongTagCode.songTitle);
@@ -4305,7 +4304,6 @@ export class Song {
             this.fromJsonObject(JSON.parse(charIndex == 0 ? compressed : compressed.substring(charIndex)), jsonFormat);
             return;
         }
-
         const variantTest: number = compressed.charCodeAt(charIndex);
         //I cleaned up these boolean setters with an initial value. Idk why this wasn't done earlier...
         let fromBeepBox: boolean = false;
@@ -4345,7 +4343,6 @@ export class Song {
         } else {
             fromBeepBox = true;
         }
-
         const version: number = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
         if (fromBeepBox && (version == -1 || version > Song._latestBeepboxVersion || version < Song._oldestBeepboxVersion)) return;
         if (fromJummBox && (version == -1 || version > Song._latestJummBoxVersion || version < Song._oldestJummBoxVersion)) return;
@@ -4363,7 +4360,6 @@ export class Song {
         const beforeNine: boolean = version < 9;
         this.initToDefault((fromBeepBox && beforeNine) || ((fromJummBox && beforeFive) || (beforeFour && fromGoldBox)));
         const forceSimpleFilter: boolean = (fromBeepBox && beforeNine || fromJummBox && beforeFive);
-
         let willLoadLegacySamplesForOldSongs: boolean = false;
 
         if (fromJukeBox || fromSlarmoosBox || fromUltraBox || fromGoldBox) {
@@ -5863,7 +5859,7 @@ export class Song {
                     let envelopeDiscrete: boolean = false;
                     if ((fromJummBox && !beforeSix) || (fromUltraBox && !beforeFive) || (fromSlarmoosBox) || fromJukeBox) {
                         instrument.envelopeSpeed = clamp(0, Config.modulators.dictionary["envelope speed"].maxRawVol + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
-                        if (/*fromJukeBox || */(!fromSlarmoosBox || beforeFive)) {
+                        if ((!fromSlarmoosBox || beforeFive) && !fromJukeBox) {
                             envelopeDiscrete = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)]) ? true : false;
                         }
                     }
@@ -5880,11 +5876,11 @@ export class Song {
                         if (!fromJukeBox && !fromSlarmoosBox && aa >= 2) aa++; //2 for pitch
                         let updatedEnvelopes: boolean = false;
                         let perEnvelopeSpeed: number = 1;
-                        if (/*fromJukeBox || */(!fromSlarmoosBox || beforeThree)) {
+                        if (!fromJukeBox && (!fromSlarmoosBox || beforeThree)) {
                             updatedEnvelopes = true;
                             perEnvelopeSpeed = Config.envelopes[aa].speed;
                             aa = Config.envelopes[aa].type; //update envelopes
-                        } else if (beforeFour && aa >= 3) aa++; //3 for random
+                        } else if (!fromJukeBox && beforeFour && aa >= 3) aa++; //3 for random
                         let isTremolo2: boolean = false;
                         if ((fromSlarmoosBox && !beforeThree && beforeFour) || updatedEnvelopes) { //remove tremolo2
                             if (aa == 9) isTremolo2 = true;
@@ -6882,7 +6878,7 @@ export class Song {
         const result: any = {
             "name": this.title,
             "format": Song._format,
-            "version": Song._latestSlarmoosBoxVersion,
+            "version": Song._latestJukeBoxVersion,
             "scale": Config.scales[this.scale].name,
             "customScale": this.scaleCustom,
             "key": Config.keys[this.key].name,

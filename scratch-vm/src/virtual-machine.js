@@ -2,7 +2,6 @@ let _TextEncoder;
 if (typeof TextEncoder === 'undefined') {
     _TextEncoder = require('text-encoding').TextEncoder;
 } else {
-    /* global TextEncoder */
     _TextEncoder = TextEncoder;
 }
 const EventEmitter = require('events');
@@ -14,10 +13,11 @@ const ExtensionManager = require('./extension-support/extension-manager');
 const log = require('./util/log');
 const MathUtil = require('./util/math-util');
 const Runtime = require('./engine/runtime');
-const StringUtil = require('./util/string-util');
 const RenderedTarget = require('./sprites/rendered-target');
 const Sprite = require('./sprites/sprite');
+const StringUtil = require('./util/string-util');
 const formatMessage = require('format-message');
+
 const Variable = require('./engine/variable');
 const newBlockIds = require('./util/new-block-ids');
 
@@ -51,10 +51,8 @@ const createRuntimeService = runtime => {
     const service = {};
     service._refreshExtensionPrimitives = runtime._refreshExtensionPrimitives.bind(runtime);
     service._registerExtensionPrimitives = runtime._registerExtensionPrimitives.bind(runtime);
-    service._removeExtensionPrimitive = runtime._removeExtensionPrimitive.bind(runtime);
     return service;
 };
-
 
 /**
  * Handles connections between blocks, stage, and extensions.
@@ -206,7 +204,6 @@ class VirtualMachine extends EventEmitter {
         this.securityManager = this.extensionManager.securityManager;
         this.runtime.extensionManager = this.extensionManager;
         this.runtime.vm = this;
-        this.runtime.extensionRuntimeOptions = this.runtime.extensionRuntimeOptions || {};
 
         // Load core extensions
         for (const id of CORE_EXTENSIONS) {
@@ -217,9 +214,7 @@ class VirtualMachine extends EventEmitter {
         this.flyoutBlockListener = this.flyoutBlockListener.bind(this);
         this.monitorBlockListener = this.monitorBlockListener.bind(this);
         this.variableListener = this.variableListener.bind(this);
-        this.addListener('workspaceUpdate', () => {
-            this.extensionManager.refreshDynamicCategorys();
-        });
+
         /**
          * Export some internal classes for extensions.
          */
@@ -230,7 +225,7 @@ class VirtualMachine extends EventEmitter {
             Variable,
 
             these_broke_before_and_will_break_again: () => {
-                console.warn('You are using unsupported APIs. WHEN your code breaks, do not expect help.'); // ooooh hahahah ifound the new turbowarp compiler code hehehhheh
+                console.warn('You are using unsupported APIs. WHEN your code breaks, do not expect help.');
                 return {
                     JSGenerator: require('./compiler/jsgen.js'),
                     IRGenerator: require('./compiler/irgen.js').IRGenerator,
@@ -316,7 +311,6 @@ class VirtualMachine extends EventEmitter {
     setCompatibilityMode (compatibilityModeOn) {
         this.runtime.setCompatibilityMode(!!compatibilityModeOn);
     }
-    
 
     setFramerate (framerate) {
         this.runtime.setFramerate(framerate);

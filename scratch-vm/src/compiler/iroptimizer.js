@@ -650,16 +650,19 @@ class IROptimizer {
      * @private
      */
     analyzeLoopedStack (stack, state, block, willReevaluateInputs) {
+        let modified = false;
+
         if (block.yields && !this.ignoreYields) {
-            let modified = state.clear();
+            modified = state.clear();
+            if (willReevaluateInputs) {
+                modified = this.analyzeInputs(block.inputs, state) || modified;
+            }
             block.entryState = state.clone();
             block.exitState = state.clone();
-            modified = this.analyzeInputs(block.inputs, state) || modified;
             return this.analyzeStack(stack, state) || modified;
         }
 
         let iterations = 0;
-        let modified = false;
         let keepLooping;
         do {
             // If we are stuck in an apparent infinite loop, give up and assume the worst.

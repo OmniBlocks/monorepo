@@ -21,7 +21,7 @@ const b0 = stage.variables["`jEk@4|i[#Fk?(8x)AV.-my variable"];
 const b1 = stage.variables["6h7bpiz0`;;x^G1B3(%["];
 return function* genXYZ_a () {
 b0.value = b1.value.length;
-for (var a0 = (+b0.value || 0); a0 >= 0.5; a0--) {
+for (var a0 = b0.value; a0 > 0; a0--) {
 b0.value = "bwah";
 if (isStuck()) yield;
 }

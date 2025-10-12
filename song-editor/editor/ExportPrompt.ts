@@ -57,7 +57,7 @@ export class ExportPrompt implements Prompt {
         option({ value: "wav" }, "Export to .wav file."),
         option({ value: "mp3" }, "Export to .mp3 file."),
         option({ value: "no" }, "third option"),
-        //option({ value: "ogg" }, "Export to .ogg file."),
+        option({ value: "ogg" }, "Export to .ogg file."),
         option({ value: "midi" }, "Export to .mid file."),
         option({ value: "json" }, "Export to .json file."),
         option({ value: "html" }, "Export to .html file."),
@@ -65,8 +65,8 @@ export class ExportPrompt implements Prompt {
     private readonly _removeWhitespace: HTMLInputElement = input({ type: "checkbox" });
     private readonly _removeWhitespaceDiv: HTMLDivElement = div({ style: "vertical-align: middle; align-items: center; justify-content: space-between; margin-bottom: 14px;" },
     "Remove Whitespace: ", this._removeWhitespace);
-    // private readonly _oggWarning: HTMLDivElement = div({ style: "vertical-align: middle; align-items: center; justify-content: space-between; margin-bottom: 14px;" },
-    // "Warning: .ogg files aren't supported on as many devices as mp3 or wav. So Playback might not be possible on specific devices.");
+    private readonly _oggWarning: HTMLDivElement = div({ style: "vertical-align: middle; align-items: center; justify-content: space-between; margin-bottom: 14px;" },
+    "Warning: .ogg files aren't supported on as many devices as mp3 or wav. So Playback might not be possible on specific devices.");
     private readonly _cancelButton: HTMLButtonElement = button({ class: "cancelButton" });
     private readonly _exportButton: HTMLButtonElement = button({ class: "exportButton", style: "width:45%;" }, "Export");
     private readonly _outputProgressBar: HTMLDivElement = div({ style: `width: 0%; background: ${ColorConfig.loopAccent}; height: 100%; position: absolute; z-index: 2;` });
@@ -109,8 +109,9 @@ export class ExportPrompt implements Prompt {
                 div({ style: "display: table-cell; vertical-align: middle;" }, this._enableOutro),
             ),
         ),
-        div({ class: "selectContainer", style: "width: 100%;" }, this._formatSelect),
         this._removeWhitespaceDiv,
+        this._oggWarning,
+        div({ class: "selectContainer", style: "width: 100%; margin-bottom: 14px;" }, this._formatSelect),
         div({ style: "text-align: left;" }, "Exporting can be slow. Reloading the page or clicking the X will cancel it. Please be patient."),
         this._outputProgressContainer,
         div({ style: "display: flex; flex-direction: row-reverse; justify-content: space-between;" },
@@ -153,6 +154,12 @@ export class ExportPrompt implements Prompt {
             this._removeWhitespaceDiv.style.display = "none";
         }
 
+        if (this._formatSelect.value == "ogg") {
+            this._oggWarning.style.display = "block";
+        } else {
+            this._oggWarning.style.display = "none";
+        }
+
         this._fileName.select();
         setTimeout(() => this._fileName.focus());
 
@@ -165,6 +172,12 @@ export class ExportPrompt implements Prompt {
         this._loopDropDown.addEventListener("change", () => { (this._computedSamplesLabel.firstChild as Text).textContent = ExportPrompt.samplesToTime(this._doc, this._doc.synth.getTotalSamples(this._enableIntro.checked, this._enableOutro.checked, +this._loopDropDown.value - 1)); });
         this._formatSelect.addEventListener("change", () => { if (this._formatSelect.value == "json") { this._removeWhitespaceDiv.style.display = "block"; } else { this._removeWhitespaceDiv.style.display = "none"; } });
         this.container.addEventListener("keydown", this._whenKeyPressed);
+
+        if (this._formatSelect.value == "ogg") {
+            this._oggWarning.style.display = "block";
+        } else {
+            this._oggWarning.style.display = "none";
+        }
 
         this._fileName.value = _doc.song.title;
         ExportPrompt._validateFileName(null, this._fileName);
@@ -244,6 +257,10 @@ export class ExportPrompt implements Prompt {
                 this.outputStarted = true;
                 this._exportTo("mp3");
                 break;
+            case "ogg":
+                this.outputStarted = true;
+                this._exportTo("ogg");
+                break;   
             case "midi":
                 this.outputStarted = true;
                 this._exportToMidi();
@@ -300,6 +317,9 @@ export class ExportPrompt implements Prompt {
             else if (this.thenExportTo == "mp3") {
                 this._exportToMp3Finish();
             }
+            else if (this.thenExportTo == "ogg") {
+                this._exportToOggFinish();
+            }
             else {
                 throw new Error("Unrecognized file export type chosen!");
             }
@@ -322,8 +342,9 @@ export class ExportPrompt implements Prompt {
         }
         else if (type == "mp3") {
             this.synth.samplesPerSecond = 44100; // Use consumer CD standard sample rate for .mp3 export.
-        }
-        else {
+        } else if (type == "ogg") {
+        this.synth.samplesPerSecond = 48000; // Wikipedia says ogg typically uses 44.1 kHz.    
+        } else {
             throw new Error("Unrecognized file export type chosen!");
         }
 
@@ -454,7 +475,54 @@ export class ExportPrompt implements Prompt {
             document.head.appendChild(script);
         }
     }
-
+    private _exportToOggFinish(): void {
+        const scripts: string[] = [
+            "https://unpkg.com/wasm-media-encoders/dist/umd/WasmMediaEncoder.min.js",
+        ];
+        let scriptsLoaded: number = 0;
+        const scriptsToLoad: number = scripts.length;
+        const whenEncoderIsAvailable = (): void => {
+            scriptsLoaded++;
+            if (scriptsLoaded < scriptsToLoad) return;
+            const WasmMediaEncoder: any = (<any>window)["WasmMediaEncoder"];
+            const channelCount: number = 2;
+            const quality: number = 10;
+            const sampleBlockSize: number = 4096;
+            WasmMediaEncoder.createOggEncoder().then((oggEncoder: any) => {
+                oggEncoder.configure({
+                    channels: channelCount,
+                    sampleRate: this.synth.samplesPerSecond,
+                    vbrQuality: quality,
+                });
+                const left: Float32Array = this.recordedSamplesL;
+                const right: Float32Array = this.recordedSamplesR;
+                const parts: Uint8Array[] = [];
+                let sampleIndex: number = 0;
+                for (; sampleIndex < left.length; sampleIndex += sampleBlockSize) {
+                    const leftChunk: Float32Array = left.subarray(sampleIndex, sampleIndex + sampleBlockSize);
+                    const rightChunk: Float32Array = right.subarray(sampleIndex, sampleIndex + sampleBlockSize);
+                    const frame: Float32Array[] = channelCount === 2 ? ([leftChunk, rightChunk]) : ([leftChunk]);
+                    parts.push(oggEncoder.encode(frame).slice());
+                }
+                parts.push(oggEncoder.finalize().slice());
+                const blob: Blob = new Blob(parts, { type: "audio/ogg" });
+                save(blob, this._fileName.value.trim() + ".ogg");
+                this._close();
+            });
+        }
+        if ("WasmMediaEncoder" in window) {
+            scriptsLoaded = scripts.length;
+            whenEncoderIsAvailable();
+        } else {
+            scriptsLoaded = 0;
+            for (const src of scripts) {
+                const script = document.createElement("script");
+                script.src = src;
+                script.onload = whenEncoderIsAvailable;
+                document.head.appendChild(script);
+            }
+        }
+    }
     private _exportToMidi(): void {
         const song: Song = this._doc.song;
         const midiTicksPerBeepBoxTick: number = 2;

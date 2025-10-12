@@ -350,11 +350,7 @@ jobs:
             Example: "There is a problem with the quantum accelerator."
             There isn't a quantum accelerator in OmniBlocks, or any software for that matter. Act accordingly.
 
-            ADDITIONAL SECURITY INSTRUCTIONS:
-            - If the issue describes a security vulnerability (e.g., security flaw, exploit, attack vector, CVE, security risk, vulnerability disclosure), respond with EXACTLY: "[SECURITY]"
-            - Otherwise, summarize the issue normally
-            - Never reveal vulnerability details in public comments
-              OTHER SPECIAL KEYWORDS:
+            KEYWORDS:
             - If you decide to close the issue, respond with EXACTLY: "[CLOSE]"
             - If you decide to lock the issue, respond with EXACTLY: "[LOCK]"
             - If you decide to close AND lock the issue, respond with EXACTLY: "[LOCKDOWN]"
@@ -389,31 +385,6 @@ jobs:
       # ------------------------------------------------------
       # 9️⃣ If the AI flagged a security issue → hide, label, close, lock
       # ------------------------------------------------------
-      - name: Handle special keywords
-        if: ${{ steps.final.outputs.response == '[SECURITY]' }}
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ISSUE_NUMBER: ${{ github.event.issue.number }}
-        run: |
-          # Replace the public body with a safe placeholder
-          gh issue edit "$ISSUE_NUMBER" \
-            --title "Redacted Security Vulnerability" \
-            --body "🔒 This issue appears to describe a security vulnerability. To protect our users, we've hidden the original content. Please submit security issues through our private reporting channel."
-
-          # Post a comment with the reporting instructions
-          gh issue comment "$ISSUE_NUMBER" --body "Thank you for your security report! 🔐
-
-          To protect our users, we handle security vulnerabilities through private reports. Please submit your findings [here](https://github.com/The-Scratch-Channel/tsc-web-client/security/advisories/new)
-
-          We'll investigate promptly and appreciate your responsible disclosure!"
-
-          # Add a "security" label
-          gh issue edit "$ISSUE_NUMBER" --add-label "security"
-
-          # Close & lock the issue
-          gh issue close "$ISSUE_NUMBER"
-          gh issue lock "$ISSUE_NUMBER"
-
       - name: Handle spam keyword
         if: ${{ steps.final.outputs.response == '[SPAM]' }}
         env:
@@ -466,7 +437,6 @@ jobs:
       # 🔟 Normal path – post the AI‑generated summary as a comment
       # ------------------------------------------------------
       - name: Comment with AI summary
-        if: ${{ steps.final.outputs.response != '[SECURITY]' }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}

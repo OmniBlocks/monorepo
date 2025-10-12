@@ -559,9 +559,12 @@ class IROptimizer {
             break;
         case StackOpcode.CONTROL_WHILE:
         case StackOpcode.CONTROL_FOR:
+            modified = this.analyzeInputs(inputs, state) || modified;
+            modified = this.analyzeLoopedStack(inputs.do, state, stackBlock, true) || modified;
+            break;
         case StackOpcode.CONTROL_REPEAT:
             modified = this.analyzeInputs(inputs, state) || modified;
-            modified = this.analyzeLoopedStack(inputs.do, state, stackBlock) || modified;
+            modified = this.analyzeLoopedStack(inputs.do, state, stackBlock, false) || modified;
             break;
         case StackOpcode.CONTROL_IF_ELSE: {
             modified = this.analyzeInputs(inputs, state) || modified;
@@ -642,10 +645,11 @@ class IROptimizer {
      * @param {IntermediateStack} stack
      * @param {TypeState} state
      * @param {IntermediateStackBlock} block
+     * @param {boolean} willReevaluateInputs
      * @returns {boolean}
      * @private
      */
-    analyzeLoopedStack (stack, state, block) {
+    analyzeLoopedStack (stack, state, block, willReevaluateInputs) {
         if (block.yields && !this.ignoreYields) {
             let modified = state.clear();
             block.entryState = state.clone();
@@ -672,7 +676,10 @@ class IROptimizer {
             const newState = state.clone();
             modified = this.analyzeStack(stack, newState) || modified;
             modified = (keepLooping = state.or(newState)) || modified;
-            modified = this.analyzeInputs(block.inputs, state) || modified;
+
+            if (willReevaluateInputs) {
+                modified = this.analyzeInputs(block.inputs, state) || modified;
+            }
         } while (keepLooping);
         block.entryState = state.clone();
         return modified;

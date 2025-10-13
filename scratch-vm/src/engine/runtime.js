@@ -797,7 +797,13 @@ class Runtime extends EventEmitter {
     static get EXTENSION_ADDED () {
         return 'EXTENSION_ADDED';
     }
-
+    /**
+     * Event name for reporting that an extension was removed.
+     * @const {string}
+     */
+    static get EXTENSION_REMOVED () {
+        return 'EXTENSION_REMOVED';
+    }
     /**
      * Event name for reporting that an extension as asked for a custom field to be added
      * @const {string}

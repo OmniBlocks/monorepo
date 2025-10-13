@@ -1121,6 +1121,31 @@ categoryInfo.blockText = extensionInfo.blockText;
         
         const info = this._blockInfo[extIdx];
         this._blockInfo.splice(extIdx, 1);
+        
+        // Clean up primitives, hats, and flow metadata
+        for (const block of info.blocks) {
+            if (block.json) {
+                const opcode = block.json.type;
+                delete this._primitives[opcode];
+                delete this._hats[opcode];
+                delete this._flowing[opcode];
+            }
+        }
+        
+        // Clean up monitor metadata
+        for (const opcode in this.monitorBlockInfo) {
+            if (opcode.startsWith(extensionId + '_')) {
+                delete this.monitorBlockInfo[opcode];
+            }
+        }
+        
+        // Clean up extension buttons
+        for (const [key] of this.extensionButtons) {
+            if (key.startsWith(extensionId + '_')) {
+                this.extensionButtons.delete(key);
+            }
+        }
+        
         this.emit(Runtime.EXTENSION_REMOVED, extensionId);
         
         // Cleanup blocks from all targets

@@ -1151,7 +1151,16 @@ categoryInfo.blockText = extensionInfo.blockText;
         // Cleanup blocks from all targets
         for (const target of this.targets) {
             for (const blockId in target.blocks._blocks) {
-                const {opcode} = target.blocks.getBlock(blockId);
+        for (const target of this.targets) {
+            for (const blockId in target.blocks._blocks) {
+                const block = target.blocks.getBlock(blockId);
+                if (!block) continue;
+                const {opcode} = block;
+                if (info.blocks.find(block => block.json?.type === opcode)) {
+                    target.blocks.deleteBlock(blockId, true);
+                }
+            }
+        }
                 if (info.blocks.find(block => block.json?.type === opcode)) {
                     target.blocks.deleteBlock(blockId, true);
                 }

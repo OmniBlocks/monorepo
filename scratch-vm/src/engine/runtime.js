@@ -1115,65 +1115,66 @@ categoryInfo.blockText = extensionInfo.blockText;
      * @param {string} extensionId - the ID of the extension to remove
      * @private
      */
-    _removeExtensionPrimitive(extensionId) {
+    _removeExtensionPrimitive (extensionId) {
         const extIdx = this._blockInfo.findIndex(ext => ext.id === extensionId);
-        if (extIdx === -1) return; // Extension not found
-        
+        if (extIdx === -1) return;
+
         const info = this._blockInfo[extIdx];
         this._blockInfo.splice(extIdx, 1);
-        
+
         // Clean up primitives, hats, and flow metadata
         for (const block of info.blocks) {
-            if (block.json) {
-                const opcode = block.json.type;
-                delete this._primitives[opcode];
-                delete this._hats[opcode];
-                delete this._flowing[opcode];
-            }
+            const opcode = block.json?.type;
+            if (!opcode) continue;
+            delete this._primitives[opcode];
+            delete this._hats[opcode];
+            delete this._flowing[opcode];
         }
-        
+
+        // Remove compiler extension handle if present
+        if (this[`ext_${extensionId}`]) {
+            delete this[`ext_${extensionId}`];
+        }
+
         // Clean up monitor metadata
         for (const opcode in this.monitorBlockInfo) {
-            if (opcode.startsWith(extensionId + '_')) {
+            if (opcode.startsWith(`${extensionId}_`)) {
                 delete this.monitorBlockInfo[opcode];
             }
         }
-        
-        // Clean up extension buttons
+
+        // Clean up extension buttons (avoid mutating while iterating)
+        const buttonsToDelete = [];
         for (const [key] of this.extensionButtons) {
-            if (key.startsWith(extensionId + '_')) {
-                this.extensionButtons.delete(key);
+            if (key.startsWith(`${extensionId}_`)) {
+                buttonsToDelete.push(key);
             }
         }
-        
-        this.emit(Runtime.EXTENSION_REMOVED, extensionId);
-        
-        // Cleanup blocks from all targets
+        for (const key of buttonsToDelete) {
+            this.extensionButtons.delete(key);
+        }
+
+        // Remove blocks from all targets
         for (const target of this.targets) {
-            for (const blockId in target.blocks._blocks) {
-        for (const target of this.targets) {
+            const blocksToDelete = [];
             for (const blockId in target.blocks._blocks) {
                 const block = target.blocks.getBlock(blockId);
                 if (!block) continue;
                 const {opcode} = block;
-                if (info.blocks.find(block => block.json?.type === opcode)) {
-                    target.blocks.deleteBlock(blockId, true);
-// Cleanup blocks from all targets
-for (const target of this.targets) {
-    const blocksToDelete = [];
-    for (const blockId in target.blocks._blocks) {
-        const block = target.blocks.getBlock(blockId);
-        if (!block) continue;
-        const {opcode} = block;
-        if (info.blocks.find(b => b.json?.type === opcode)) {
-            blocksToDelete.push(blockId);
+                if (info.blocks.some(b => b.json?.type === opcode)) {
+                    blocksToDelete.push(blockId);
+                }
+            }
+            for (const blockId of blocksToDelete) {
+                target.blocks.deleteBlock(blockId, true);
+            }
         }
-    }
-    for (const blockId of blocksToDelete) {
-        target.blocks.deleteBlock(blockId, true);
-    }
-}
+
+        // Refresh caches and UI
+        this.resetAllCaches();
         this.emit(Runtime.BLOCKS_NEED_UPDATE);
+        this.requestToolboxExtensionsUpdate();
+        this.emit(Runtime.EXTENSION_REMOVED, extensionId);
     }
 
     /**

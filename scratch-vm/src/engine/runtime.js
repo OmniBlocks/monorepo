@@ -1158,14 +1158,21 @@ categoryInfo.blockText = extensionInfo.blockText;
                 const {opcode} = block;
                 if (info.blocks.find(block => block.json?.type === opcode)) {
                     target.blocks.deleteBlock(blockId, true);
-                }
-            }
+// Cleanup blocks from all targets
+for (const target of this.targets) {
+    const blocksToDelete = [];
+    for (const blockId in target.blocks._blocks) {
+        const block = target.blocks.getBlock(blockId);
+        if (!block) continue;
+        const {opcode} = block;
+        if (info.blocks.find(b => b.json?.type === opcode)) {
+            blocksToDelete.push(blockId);
         }
-                if (info.blocks.find(block => block.json?.type === opcode)) {
-                    target.blocks.deleteBlock(blockId, true);
-                }
-            }
-        }
+    }
+    for (const blockId of blocksToDelete) {
+        target.blocks.deleteBlock(blockId, true);
+    }
+}
         this.emit(Runtime.BLOCKS_NEED_UPDATE);
     }
 

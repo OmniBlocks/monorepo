@@ -1110,6 +1110,30 @@ categoryInfo.blockText = extensionInfo.blockText;
             this.emit(Runtime.BLOCKSINFO_UPDATE, categoryInfo);
         }
     }
+    /**
+     * Remove an extension's primitives.
+     * @param {string} extensionId - the ID of the extension to remove
+     * @private
+     */
+    _removeExtensionPrimitive(extensionId) {
+        const extIdx = this._blockInfo.findIndex(ext => ext.id === extensionId);
+        if (extIdx === -1) return; // Extension not found
+        
+        const info = this._blockInfo[extIdx];
+        this._blockInfo.splice(extIdx, 1);
+        this.emit(Runtime.EXTENSION_REMOVED, extensionId);
+        
+        // Cleanup blocks from all targets
+        for (const target of this.targets) {
+            for (const blockId in target.blocks._blocks) {
+                const {opcode} = target.blocks.getBlock(blockId);
+                if (info.blocks.find(block => block.json?.type === opcode)) {
+                    target.blocks.deleteBlock(blockId, true);
+                }
+            }
+        }
+        this.emit(Runtime.BLOCKS_NEED_UPDATE);
+    }
 
     /**
      * Read extension information, convert menus, blocks and custom field types

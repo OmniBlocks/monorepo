@@ -51,6 +51,7 @@ const createRuntimeService = runtime => {
     const service = {};
     service._refreshExtensionPrimitives = runtime._refreshExtensionPrimitives.bind(runtime);
     service._registerExtensionPrimitives = runtime._registerExtensionPrimitives.bind(runtime);
+    service._removeExtensionPrimitive = runtime._removeExtensionPrimitive.bind(runtime);  // Add this line
     return service;
 };
 

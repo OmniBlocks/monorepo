@@ -6,7 +6,7 @@ if (typeof TextEncoder === 'undefined') {
 }
 const EventEmitter = require('events');
 const JSZip = require('@turbowarp/jszip');
-
+const ExtensionStorage = require('./util/deprecated-extension-storage.js');
 const Buffer = require('buffer').Buffer;
 const centralDispatch = require('./dispatch/central-dispatch');
 const ExtensionManager = require('./extension-support/extension-manager');
@@ -17,7 +17,7 @@ const RenderedTarget = require('./sprites/rendered-target');
 const Sprite = require('./sprites/sprite');
 const StringUtil = require('./util/string-util');
 const formatMessage = require('format-message');
-
+const { SyntheticModule } = require('vm');
 const Variable = require('./engine/variable');
 const newBlockIds = require('./util/new-block-ids');
 

@@ -57,6 +57,13 @@ Blockly.FieldCustom.fromJson = function(options) {
 };
 
 Blockly.FieldCustom.registerInput = function(id, templateHTML, onInit, onClick, onUpdate, optOnDispose) {
+  if (!id || typeof id !== 'string') {
+    console.warn('Param 1 must be a non-empty string id!');
+    return;
+  }
+  if (customInputs.has && customInputs.has(id)) {
+    console.warn('An input with id "' + id + '" is already registered; overriding.');
+  }
   if (!templateHTML || !(templateHTML instanceof Node)) {
     console.warn('Param 2 must be a valid DOM element!');
     return;

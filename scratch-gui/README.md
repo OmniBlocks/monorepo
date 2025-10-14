@@ -20,6 +20,7 @@ This repository contains the frontend interface of the Block-Based editor for Om
   - [Integration Points](#integration-points)
 - [📜 Licensing](#-licensing)
 - [🤝 Contributing](#-contributing)
+- [📝 The Super Strict Style Guide of Doom 😈](#-the-super-strict-style-guide-of-doom-)
 - [❓ Frequently Asked Questions (FAQ)](#-frequently-asked-questions-faq)
   - [General Questions](#general-questions)
   - [Compatibility](#compatibility)
@@ -123,6 +124,7 @@ This section is for developers looking to understand, modify, or contribute to t
 - **Translations:** `src/lib/tw-translations/`
 - **Static Assets:**  `static/`.
 
+
 ## 📜 Licensing
 
 This project is licensed under multiple agreements due to its forked nature.
@@ -155,15 +157,26 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 ## 🤝 Contributing
 
-Contributions are welcome! We are especially interested in addons, bug fixes, and accessibility improvements.
+Contributions are welcome! We are especially interested in addons, bug fixes, and new features!
 
 1. Fork the project.
 2. Create a feature branch (`git checkout -b feature/AmazingFeature`).
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`).
-4. Push to the branch (`git push origin feature/AmazingFeature`).
-5. Open a Pull Request.
-6. Sit and wait as it gets reviewed :)
-7. (six seven)
+3. Code your feature (make sure to follow our super strict style guide below)
+4. Commit your changes (`git commit -m 'Add some AmazingFeature'`).
+5. Push to the branch (`git push origin feature/AmazingFeature`).
+6. Open a Pull Request.
+7. Sit and wait as it gets reviewed :)
+8. (six seven)
+
+
+## 📝 The Super Strict Style Guide of Doom 😈
+As you may know from the earlier parts of the readme, this is all made in React JS, a modular JavaScript framework. We're pretty laid back, so we don't have a super strict style guide or coding conventions, just know the following:
+
+-  Go all out on your code! It doesn't matter if you don't use proper indentation, or other stuff like that, just make sure to add comments explaining it. After all, this is JavaScript, not Python we're talking about, so any valid syntax is valid syntax.
+-  Make sure your variables are readable. While everyone loves fun code, please make sure your variables are legible. For example, if you need a variable for a new multi-backpack feature you're planning to add (not quite sure what the feature would do, but it's just an example), we'd prefer "multibackpack" or even "backpackthing" over "qwnpvoitwegjk".
+- Absolutely NO profanity. I have seen other repos have profanity in commit messages or comments, and while it is relatable and even hilarious to see how miserably we fail at code sometimes, there is no need to use profanity. Since our project is for All Ages and open source, we assume anyone of all ages will also see the code. Some words, however, are not considered profanity, such as crap or heck. If you snoop in _OUR_ commit messages, we have some pretty hilarious frustrations in there too! Just no bad words.
+
+Other than that, Code On! We don't require much other than these rules. Have fun!
 
 
 ## ❓ Frequently Asked Questions (FAQ)
@@ -230,14 +243,27 @@ A: Please open an issue on our GitHub repository with:
 ### Contributions
 
 **Q: I want to contribute! Where do I start?**  
-A: Awesome! Check out our `CONTRIBUTING.md` file for guidelines. Good starting points are:
+A: Awesome! Read everything above for guidelines. Good starting points are:
 - Fixing bugs labeled "good first issue"
 - Improving documentation
 - Adding tests
 - Translating the interface
 
 **Q: Do I need permission to fork OmniBlocks?**  
-A: Not at all! That's the beauty of open source. Just make sure to follow the license terms and give proper attribution.
+A: Not at all! That's what's so good about our open source license. You can use our code at the expense of anyone using your code too. Just make sure to follow the license terms and give proper attribution.
+
+**Q: Can we talk to any of the maintainers or just have a chat?**
+A: Totally! That's what you do in [the Discussion tab!](https://github.com/orgs/OmniBlocks/discussions) to talk to any of our maintainers.
+Q: But aren't you busy?
+A: True. I, supervoidcoder, the lead maintainer and creator of OmniBlocks, am very busy as I have to do school and other things too. But I'm not one of those people who is "onLy HeRe foR SeRiOuS sTuFF" or "iM a VeRy ImpOrtanT person With PrioRities, not your FrienD". I genuinely care about anyone that wants to reach out to me.
+Most of the maintainers and contributors have our own personal Scratch Account too. Here are some:
+@supervoidcoder: [scratchcode1_2_3](https://scratch.mit.edu/users/scratchcode1_2_3/)
+@ampelectrecuted: [AmpElectrecuted](https://scratch.mit.edu/users/AmpElectrecuted/) or [8to16](https://scratch.mit.edu/users/8to16/) (banned, unfortunately)
+@gvyt: [GvYoutube](https://scratch.mit.edu/users/GvYoutube/)
+@NotTheBaton: [TheBaton](https://scratch.mit.edu/users/TheBaton/)
+
+
+
 
 ---
 
@@ -245,9 +271,6 @@ A: Not at all! That's the beauty of open source. Just make sure to follow the li
 
 **Made a mod or a cool project?** We would love to see what people are creating! If you made your own mod of OmniBlocks or made a cool project in it, show it off in [the Discussion tab!](https://github.com/orgs/OmniBlocks/discussions)
 
-
-
-Please ensure your code follows the existing patterns and conventions used in the project. 
 
 ---
 

@@ -5,6 +5,7 @@ on:
     types: [created]
   pull_request:
     types: [opened, synchronize]
+    branches: [main]
 
 permissions:
   contents: write
@@ -14,6 +15,7 @@ permissions:
   checks: write
 
 jobs:
+       
   mega-test:
     if: >-
       (github.event_name == 'pull_request') ||
@@ -45,7 +47,32 @@ jobs:
               sha: pr.data.head.sha,
               number: pr.data.number
             };
-
+      # Check if owner of pr or user who triggered it was a bot
+      - name: Check for bot
+        id: botcheck
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const username = context.eventName === 'issue_comment'
+              ? context.payload.comment.user.login
+              : context.payload.pull_request.user.login;
+            if (username.endsWith('[bot]') || username == "dependabot-preview") { 
+            const comment = await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: ${{ fromJSON(steps.pr.outputs.result).number }},
+              body: `🤖❌ Clanke-uh, I mean- Bot user detected. Checks do not run when triggered by a bot. ` +
+                    `If you want to trigger a mega pr test in a pull request made by a bot, type a forward slash followed by \`test pr\` which will trigger the test. Make sure to be a human while doing this 😆`
+            });
+            await github.rest.actions.cancelWorkflowRun({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            run_id: context.runId
+            });
+            return comment.data.id;
+            }
+            
+            
       # ============================================================
       # CRITICAL: Checkout BEFORE paths-filter!
       # ============================================================

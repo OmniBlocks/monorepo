@@ -15,7 +15,6 @@ const MathUtil = require('./util/math-util');
 const Runtime = require('./engine/runtime');
 const RenderedTarget = require('./sprites/rendered-target');
 const Sprite = require('./sprites/sprite');
-const StringUtil = require('./util/string-util');
 const formatMessage = require('format-message');
 const { SyntheticModule } = require('vm');
 const Variable = require('./engine/variable');

@@ -180,7 +180,7 @@ jobs:
           NODE_ENV: production
 
       # ============================================================
-      # TESTING PHASE - FIXED PARSING!
+      # TESTING PHASE
       # ============================================================
 
       - name: Update comment - Running Linter
@@ -226,10 +226,8 @@ jobs:
             echo "lint_warnings=0" >> $GITHUB_OUTPUT
           else
             echo "lint_status=failed" >> $GITHUB_OUTPUT
-            # Better ESLint parsing - look for actual error/warning lines
             ERRORS=$(grep -E '^\s+[0-9]+:[0-9]+\s+error\s+' lint-output.txt | wc -l || echo "0")
             WARNINGS=$(grep -E '^\s+[0-9]+:[0-9]+\s+warning\s+' lint-output.txt | wc -l || echo "0")
-            # Ensure we always have numeric values
             echo "lint_errors=${ERRORS:-0}" >> $GITHUB_OUTPUT
             echo "lint_warnings=${WARNINGS:-0}" >> $GITHUB_OUTPUT
           fi
@@ -278,13 +276,11 @@ jobs:
             echo "unit_status=failed" >> $GITHUB_OUTPUT
           fi
           
-          # Extract test results - handle empty values properly
           TOTAL=$(grep -oP '\d+(?= tests?)' unit-test-output.txt | head -1)
           PASSED=$(grep -oP '\d+(?= passed)' unit-test-output.txt | head -1)
           FAILED=$(grep -oP '\d+(?= failed)' unit-test-output.txt | head -1)
           SKIPPED=$(grep -oP '\d+(?= skipped)' unit-test-output.txt | head -1)
           
-          # Default to 0 if empty
           echo "unit_total=${TOTAL:-0}" >> $GITHUB_OUTPUT
           echo "unit_passed=${PASSED:-0}" >> $GITHUB_OUTPUT
           echo "unit_failed=${FAILED:-0}" >> $GITHUB_OUTPUT
@@ -335,13 +331,11 @@ jobs:
             echo "integration_status=failed" >> $GITHUB_OUTPUT
           fi
           
-          # Extract test results - handle empty values properly
           TOTAL=$(grep -oP '\d+(?= tests?)' integration-test-output.txt | head -1)
           PASSED=$(grep -oP '\d+(?= passed)' integration-test-output.txt | head -1)
           FAILED=$(grep -oP '\d+(?= failed)' integration-test-output.txt | head -1)
           SKIPPED=$(grep -oP '\d+(?= skipped)' integration-test-output.txt | head -1)
           
-          # Default to 0 if empty
           echo "integration_total=${TOTAL:-0}" >> $GITHUB_OUTPUT
           echo "integration_passed=${PASSED:-0}" >> $GITHUB_OUTPUT
           echo "integration_failed=${FAILED:-0}" >> $GITHUB_OUTPUT
@@ -439,6 +433,46 @@ jobs:
             echo "lighthouse_success=true" >> $GITHUB_OUTPUT
           else
             echo "lighthouse_success=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Parse Lighthouse Results
+        id: lighthouse_parse
+        continue-on-error: true
+        run: |
+          if [ -d ".lighthouseci" ] && [ "$(ls -A .lighthouseci 2>/dev/null)" ]; then
+            REPORT=$(find .lighthouseci -name "lhr-*.json" -type f | sort -r | head -1)
+            
+            if [ -f "$REPORT" ]; then
+              # Extract scores (0-100 scale)
+              PERFORMANCE=$(jq '.categories.performance.score * 100 | floor' "$REPORT" 2>/dev/null || echo "N/A")
+              ACCESSIBILITY=$(jq '.categories.accessibility.score * 100 | floor' "$REPORT" 2>/dev/null || echo "N/A")
+              BEST_PRACTICES=$(jq '.categories["best-practices"].score * 100 | floor' "$REPORT" 2>/dev/null || echo "N/A")
+              SEO=$(jq '.categories.seo.score * 100 | floor' "$REPORT" 2>/dev/null || echo "N/A")
+              
+              echo "performance_score=${PERFORMANCE}" >> $GITHUB_OUTPUT
+              echo "accessibility_score=${ACCESSIBILITY}" >> $GITHUB_OUTPUT
+              echo "best_practices_score=${BEST_PRACTICES}" >> $GITHUB_OUTPUT
+              echo "seo_score=${SEO}" >> $GITHUB_OUTPUT
+              
+              # Get key metrics
+              FCP=$(jq '.audits["first-contentful-paint"].displayValue' "$REPORT" 2>/dev/null | tr -d '"' || echo "N/A")
+              LCP=$(jq '.audits["largest-contentful-paint"].displayValue' "$REPORT" 2>/dev/null | tr -d '"' || echo "N/A")
+              TBT=$(jq '.audits["total-blocking-time"].displayValue' "$REPORT" 2>/dev/null | tr -d '"' || echo "N/A")
+              CLS=$(jq '.audits["cumulative-layout-shift"].displayValue' "$REPORT" 2>/dev/null | tr -d '"' || echo "N/A")
+              SI=$(jq '.audits["speed-index"].displayValue' "$REPORT" 2>/dev/null | tr -d '"' || echo "N/A")
+              
+              echo "fcp=${FCP}" >> $GITHUB_OUTPUT
+              echo "lcp=${LCP}" >> $GITHUB_OUTPUT
+              echo "tbt=${TBT}" >> $GITHUB_OUTPUT
+              echo "cls=${CLS}" >> $GITHUB_OUTPUT
+              echo "speed_index=${SI}" >> $GITHUB_OUTPUT
+              
+              echo "lighthouse_parsed=true" >> $GITHUB_OUTPUT
+            else
+              echo "lighthouse_parsed=false" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "lighthouse_parsed=false" >> $GITHUB_OUTPUT
           fi
 
       - name: Stop HTTP server
@@ -598,12 +632,53 @@ jobs:
             echo "passes=error" >> $GITHUB_OUTPUT
           fi
 
+      - name: Parse Accessibility Violations
+        id: a11y_parse
+        continue-on-error: true
+        run: |
+          if [ -f "axe-results.json" ] && [ -s "axe-results.json" ]; then
+            echo "### Top Accessibility Violations:" > a11y-violations.md
+            
+            VIOLATION_COUNT=$(jq '.violations | length' axe-results.json 2>/dev/null || echo "0")
+            
+            if [ "$VIOLATION_COUNT" != "0" ] && [ "$VIOLATION_COUNT" != "null" ]; then
+              for i in {0..4}; do
+                ID=$(jq -r ".violations[$i].id // empty" axe-results.json 2>/dev/null)
+                if [ -n "$ID" ]; then
+                  IMPACT=$(jq -r ".violations[$i].impact // \"unknown\"" axe-results.json)
+                  DESCRIPTION=$(jq -r ".violations[$i].description // \"No description\"" axe-results.json)
+                  HELP=$(jq -r ".violations[$i].help // \"\"" axe-results.json)
+                  HELP_URL=$(jq -r ".violations[$i].helpUrl // \"\"" axe-results.json)
+                  NODE_COUNT=$(jq ".violations[$i].nodes | length" axe-results.json)
+                  
+                  echo "" >> a11y-violations.md
+                  echo "**$((i+1)). $HELP** (Impact: \`$IMPACT\`)" >> a11y-violations.md
+                  echo "- **Rule:** \`$ID\`" >> a11y-violations.md
+                  echo "- **Description:** $DESCRIPTION" >> a11y-violations.md
+                  echo "- **Affected elements:** $NODE_COUNT" >> a11y-violations.md
+                  if [ -n "$HELP_URL" ]; then
+                    echo "- **Learn more:** $HELP_URL" >> a11y-violations.md
+                  fi
+                fi
+              done
+              echo "a11y_parsed=true" >> $GITHUB_OUTPUT
+            else
+              echo "No violations found! ✨" > a11y-violations.md
+              echo "a11y_parsed=true" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "Could not parse accessibility results" > a11y-violations.md
+            echo "a11y_parsed=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Upload accessibility results
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: accessibility-results
-          path: axe-results.json
+          path: |
+            axe-results.json
+            a11y-violations.md
           if-no-files-found: warn
 
       # ============================================================
@@ -688,7 +763,7 @@ jobs:
           fi
 
       # ============================================================
-      # FINAL RESULTS - FIXED TO SHOW ACTUAL NUMBERS!
+      # FINAL RESULTS WITH DETAILED SCORES!
       # ============================================================
 
       - name: Calculate duration
@@ -716,7 +791,7 @@ jobs:
             const baseUrl = `https://${context.repo.owner}.github.io/${context.repo.repo}`;
             const pageUrl = `${baseUrl}/${context.actor}/${prNumber}/`;
             
-            // Test Results - all values guaranteed to be present
+            // Test Results
             const lintStatus = '${{ steps.lint.outputs.lint_status }}';
             const lintErrors = '${{ steps.lint.outputs.lint_errors }}' || '0';
             const lintWarnings = '${{ steps.lint.outputs.lint_warnings }}' || '0';
@@ -766,36 +841,75 @@ jobs:
             const bundleReport = fs.readFileSync('bundle-report.md', 'utf8');
             const totalSize = '${{ steps.bundle_analysis.outputs.total_size }}';
             
-            // Lighthouse results
+            // Lighthouse results WITH DETAILED SCORES
             const lighthouseSuccess = '${{ steps.lighthouse.outputs.lighthouse_success }}' === 'true';
+            const lighthouseParsed = '${{ steps.lighthouse_parse.outputs.lighthouse_parsed }}' === 'true';
             let lighthouseSection = '';
-            if (lighthouseSuccess) {
-              lighthouseSection = `✅ Audit completed successfully!\n` +
-                `- View detailed reports in [workflow artifacts](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})\n` +
-                `- Download the Lighthouse JSON files to see scores\n\n` +
-                `**What was checked:**\n` +
-                `- 🚀 Performance metrics\n` +
-                `- ♿ Accessibility compliance\n` +
-                `- ✨ Best Practices\n` +
-                `- 🔍 SEO optimization\n\n` +
-                `💡 *Note: Lighthouse may find improvement opportunities - check artifacts for details!*`;
+            
+            if (lighthouseSuccess && lighthouseParsed) {
+              const perfScore = '${{ steps.lighthouse_parse.outputs.performance_score }}' || 'N/A';
+              const a11yScore = '${{ steps.lighthouse_parse.outputs.accessibility_score }}' || 'N/A';
+              const bpScore = '${{ steps.lighthouse_parse.outputs.best_practices_score }}' || 'N/A';
+              const seoScore = '${{ steps.lighthouse_parse.outputs.seo_score }}' || 'N/A';
+              
+              const fcp = '${{ steps.lighthouse_parse.outputs.fcp }}' || 'N/A';
+              const lcp = '${{ steps.lighthouse_parse.outputs.lcp }}' || 'N/A';
+              const tbt = '${{ steps.lighthouse_parse.outputs.tbt }}' || 'N/A';
+              const cls = '${{ steps.lighthouse_parse.outputs.cls }}' || 'N/A';
+              const si = '${{ steps.lighthouse_parse.outputs.speed_index }}' || 'N/A';
+              
+              // Function to get emoji based on score
+              const getScoreEmoji = (score) => {
+                if (score === 'N/A') return '⚪';
+                const num = parseInt(score);
+                if (num >= 90) return '🟢';
+                if (num >= 50) return '🟠';
+                return '🔴';
+              };
+              
+              lighthouseSection = `✅ Audit completed successfully!\n\n` +
+                `**📊 Lighthouse Scores:**\n` +
+                `- ${getScoreEmoji(perfScore)} **Performance:** ${perfScore}/100\n` +
+                `- ${getScoreEmoji(a11yScore)} **Accessibility:** ${a11yScore}/100\n` +
+                `- ${getScoreEmoji(bpScore)} **Best Practices:** ${bpScore}/100\n` +
+                `- ${getScoreEmoji(seoScore)} **SEO:** ${seoScore}/100\n\n` +
+                `**⚡ Core Web Vitals:**\n` +
+                `- **First Contentful Paint:** ${fcp}\n` +
+                `- **Largest Contentful Paint:** ${lcp}\n` +
+                `- **Total Blocking Time:** ${tbt}\n` +
+                `- **Cumulative Layout Shift:** ${cls}\n` +
+                `- **Speed Index:** ${si}\n\n` +
+                `🟢 90-100 (Good) | 🟠 50-89 (Needs Improvement) | 🔴 0-49 (Poor)\n\n` +
+                `📄 Full report in [artifacts](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})`;
             } else {
               lighthouseSection = `⚠️ Lighthouse audit encountered issues\n` +
                 `- Check [workflow logs](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details`;
             }
             
-            // Accessibility results
+            // Accessibility results WITH DETAILED VIOLATIONS
             const a11ySuccess = '${{ steps.a11y_test.outputs.a11y_success }}' === 'true';
+            const a11yParsed = '${{ steps.a11y_parse.outputs.a11y_parsed }}' === 'true';
             const a11yViolations = '${{ steps.a11y_test.outputs.violations }}';
             const a11yPasses = '${{ steps.a11y_test.outputs.passes }}';
             let a11ySection = '';
             
             if (a11ySuccess && a11yViolations !== 'error') {
-              const status = a11yViolations === '0' ? '✅ All Clear!' : `⚠️ ${a11yViolations} issue(s) found`;
+              const status = a11yViolations === '0' ? '✅ All Clear! No violations found!' : `⚠️ Found ${a11yViolations} issue(s)`;
               a11ySection = `${status}\n` +
                 `- ✅ Passed checks: ${a11yPasses}\n` +
-                `- ${a11yViolations !== '0' ? '⚠️' : '✅'} Violations: ${a11yViolations}\n` +
-                `- Full report in [artifacts](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})`;
+                `- ${a11yViolations !== '0' ? '⚠️' : '✅'} Violations: ${a11yViolations}\n\n`;
+              
+              // Add detailed violations if parsed
+              if (a11yParsed && a11yViolations !== '0') {
+                try {
+                  const violationDetails = fs.readFileSync('a11y-violations.md', 'utf8');
+                  a11ySection += violationDetails + `\n\n`;
+                } catch (e) {
+                  // File doesn't exist, skip
+                }
+              }
+              
+              a11ySection += `📄 Full report in [artifacts](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})`;
             } else {
               a11ySection = `✅ Accessibility scan completed!\n` +
                 `- Detailed report available in [artifacts](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})`;

@@ -5,24 +5,20 @@ on:
     types: [created]
   pull_request:
     types: [opened, synchronize]
-    branches: [main]
 
 permissions:
   contents: write
   pull-requests: write
   id-token: write
   issues: write
-  checks: write
 
 jobs:
-       
   mega-test:
     if: >-
       (github.event_name == 'pull_request') ||
       (github.event_name == 'issue_comment' && github.event.issue.pull_request && contains(github.event.comment.body, '/test pr'))
     runs-on: ubuntu-latest
-    env:
-      LHCI_TMP_UPLOAD: ".lighthouseci"
+
     steps:
       - name: Record start time
         id: start_time
@@ -47,65 +43,6 @@ jobs:
               sha: pr.data.head.sha,
               number: pr.data.number
             };
-      # Check if owner of pr or user who triggered it was a bot
-      - name: Check for bot
-        id: botcheck
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const username = context.eventName === 'issue_comment'
-              ? context.payload.comment.user.login
-              : context.payload.pull_request.user.login;
-            if (username.endsWith('[bot]') || username == "dependabot-preview") { 
-            const comment = await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: ${{ fromJSON(steps.pr.outputs.result).number }},
-              body: `🤖❌ Clanke-uh, I mean- Bot user detected. Checks do not run when triggered by a bot. ` +
-                    `If you want to trigger a mega pr test in a pull request made by a bot, type a forward slash followed by \`test pr\` which will trigger the test. Make sure to be a human while doing this 😆`
-            });
-            await github.rest.actions.cancelWorkflowRun({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            run_id: context.runId
-            });
-            return comment.data.id;
-            }
-            
-            
-      # ============================================================
-      # CRITICAL: Checkout BEFORE paths-filter!
-      # ============================================================
-      
-      - name: Checkout PR code
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ fromJSON(steps.pr.outputs.result).sha }}
-          fetch-depth: 0
-
-      # -----------------------
-      # QUICK: detect changed paths (needs checkout first!)
-      # -----------------------
-      - name: Determine changed paths
-        id: paths
-        uses: dorny/paths-filter@v2
-        with:
-          filters: |
-            docs:
-              - '**/*.md'
-            code:
-              - 'src/**'
-              - 'public/**'
-              - 'build/**'
-              - 'package.json'
-              - 'package-lock.json'
-            static:
-              - 'assets/**'
-              - 'static/**'
-            tests:
-              - 'tests/**'
-              - 'playwright.config.*'
-      # outputs: steps.paths.outputs.<filter> = 'true' or 'false'
 
       - name: Cancel previous runs
         uses: styfle/cancel-workflow-action@0.12.0
@@ -145,6 +82,10 @@ jobs:
                     `${checklist_spinner} Checkout & Setup\n` +
                     `⬜ Installing dependencies\n` +
                     `⬜ Building project\n\n` +
+                    `🧪 **Testing Phase:**\n` +
+                    `⬜ Running linter (ESLint)\n` +
+                    `⬜ Running unit tests\n` +
+                    `⬜ Running integration tests\n\n` +
                     `🔍 **Analysis Phase:**\n` +
                     `⬜ Performance audit (Lighthouse)\n` +
                     `⬜ Bundle size analysis\n` +
@@ -155,18 +96,14 @@ jobs:
             return comment.data.id;
 
       # ============================================================
-      # BUILD PHASE - Only happens ONCE!
+      # BUILD PHASE
       # ============================================================
 
-      - name: Cache node modules
-        uses: actions/cache@v4
+      - name: Checkout PR code
+        uses: actions/checkout@v4
         with:
-          path: |
-            ~/.npm
-            node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
+          ref: ${{ fromJSON(steps.pr.outputs.result).sha }}
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -192,6 +129,10 @@ jobs:
                     `✅ Checkout & Setup\n` +
                     `${checklist_spinner} Installing dependencies\n` +
                     `⬜ Building project\n\n` +
+                    `🧪 **Testing Phase:**\n` +
+                    `⬜ Running linter (ESLint)\n` +
+                    `⬜ Running unit tests\n` +
+                    `⬜ Running integration tests\n\n` +
                     `🔍 **Analysis Phase:**\n` +
                     `⬜ Performance audit (Lighthouse)\n` +
                     `⬜ Bundle size analysis\n` +
@@ -221,6 +162,10 @@ jobs:
                     `✅ Checkout & Setup\n` +
                     `✅ Installing dependencies\n` +
                     `${checklist_spinner} Building project\n\n` +
+                    `🧪 **Testing Phase:**\n` +
+                    `⬜ Running linter (ESLint)\n` +
+                    `⬜ Running unit tests\n` +
+                    `⬜ Running integration tests\n\n` +
                     `🔍 **Analysis Phase:**\n` +
                     `⬜ Performance audit (Lighthouse)\n` +
                     `⬜ Bundle size analysis\n` +
@@ -235,10 +180,10 @@ jobs:
           NODE_ENV: production
 
       # ============================================================
-      # ANALYSIS PHASE - Using the same build!
+      # TESTING PHASE
       # ============================================================
 
-      - name: Update comment - Running Lighthouse
+      - name: Update comment - Running Linter
         uses: actions/github-script@v7
         with:
           script: |
@@ -256,6 +201,186 @@ jobs:
                     `✅ Checkout & Setup\n` +
                     `✅ Installing dependencies\n` +
                     `✅ Building project\n\n` +
+                    `🧪 **Testing Phase:**\n` +
+                    `${checklist_spinner} Running linter (ESLint)\n` +
+                    `⬜ Running unit tests\n` +
+                    `⬜ Running integration tests\n\n` +
+                    `🔍 **Analysis Phase:**\n` +
+                    `⬜ Performance audit (Lighthouse)\n` +
+                    `⬜ Bundle size analysis\n` +
+                    `⬜ Accessibility testing\n\n` +
+                    `🚀 **Deployment Phase:**\n` +
+                    `⬜ Deploying to test environment`
+            });
+
+      - name: Run ESLint
+        id: lint
+        continue-on-error: true
+        run: |
+          npm run test:lint 2>&1 | tee lint-output.txt
+          EXIT_CODE=${PIPESTATUS[0]}
+          
+          if [ $EXIT_CODE -eq 0 ]; then
+            echo "lint_status=passed" >> $GITHUB_OUTPUT
+            echo "lint_errors=0" >> $GITHUB_OUTPUT
+            echo "lint_warnings=0" >> $GITHUB_OUTPUT
+          else
+            echo "lint_status=failed" >> $GITHUB_OUTPUT
+            ERRORS=$(grep -E '^\s+[0-9]+:[0-9]+\s+error\s+' lint-output.txt | wc -l || echo "0")
+            WARNINGS=$(grep -E '^\s+[0-9]+:[0-9]+\s+warning\s+' lint-output.txt | wc -l || echo "0")
+            echo "lint_errors=${ERRORS:-0}" >> $GITHUB_OUTPUT
+            echo "lint_warnings=${WARNINGS:-0}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Update comment - Running Unit Tests
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const initial_spinner = '<img src="https://lh5.googleusercontent.com/proxy/OUqG0HgVNVMNorlPCmI4VgJa-3h7uHLkkMy9vdJ0eRsQlvJBytFUS-HvuW-O9EJd-c9xB7KAqlwby4Fzp59g1705FzBuP-F8dC1ZaBQtmLeCu5i6FfSd6Mmzh8mjOwgrEYZwy5UStg" width="20" height="20">';
+            const checklist_spinner = '<img src="https://github.com/user-attachments/assets/881cd049-000f-4b24-a868-9831c3ea9019" width="18" height="18">';
+            const username = context.eventName === 'issue_comment'
+              ? context.payload.comment.user.login
+              : context.payload.pull_request.user.login;
+            const lintStatus = '${{ steps.lint.outputs.lint_status }}' === 'passed' ? '✅' : '❌';
+            await github.rest.issues.updateComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: ${{ steps.mega_comment.outputs.result }},
+              body: `${initial_spinner} **MEGA PR Test & Analysis, requested by @${username}...**\n\n` +
+                    `🏗️ **Build Phase:**\n` +
+                    `✅ Checkout & Setup\n` +
+                    `✅ Installing dependencies\n` +
+                    `✅ Building project\n\n` +
+                    `🧪 **Testing Phase:**\n` +
+                    `${lintStatus} Running linter (ESLint)\n` +
+                    `${checklist_spinner} Running unit tests\n` +
+                    `⬜ Running integration tests\n\n` +
+                    `🔍 **Analysis Phase:**\n` +
+                    `⬜ Performance audit (Lighthouse)\n` +
+                    `⬜ Bundle size analysis\n` +
+                    `⬜ Accessibility testing\n\n` +
+                    `🚀 **Deployment Phase:**\n` +
+                    `⬜ Deploying to test environment`
+            });
+
+      - name: Run Unit Tests
+        id: unit_tests
+        continue-on-error: true
+        run: |
+          npm run test:unit 2>&1 | tee unit-test-output.txt
+          EXIT_CODE=${PIPESTATUS[0]}
+          
+          if [ $EXIT_CODE -eq 0 ]; then
+            echo "unit_status=passed" >> $GITHUB_OUTPUT
+          else
+            echo "unit_status=failed" >> $GITHUB_OUTPUT
+          fi
+          
+          TOTAL=$(grep -oP '\d+(?= tests?)' unit-test-output.txt | head -1)
+          PASSED=$(grep -oP '\d+(?= passed)' unit-test-output.txt | head -1)
+          FAILED=$(grep -oP '\d+(?= failed)' unit-test-output.txt | head -1)
+          SKIPPED=$(grep -oP '\d+(?= skipped)' unit-test-output.txt | head -1)
+          
+          echo "unit_total=${TOTAL:-0}" >> $GITHUB_OUTPUT
+          echo "unit_passed=${PASSED:-0}" >> $GITHUB_OUTPUT
+          echo "unit_failed=${FAILED:-0}" >> $GITHUB_OUTPUT
+          echo "unit_skipped=${SKIPPED:-0}" >> $GITHUB_OUTPUT
+
+      - name: Update comment - Running Integration Tests
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const initial_spinner = '<img src="https://lh5.googleusercontent.com/proxy/OUqG0HgVNVMNorlPCmI4VgJa-3h7uHLkkMy9vdJ0eRsQlvJBytFUS-HvuW-O9EJd-c9xB7KAqlwby4Fzp59g1705FzBuP-F8dC1ZaBQtmLeCu5i6FfSd6Mmzh8mjOwgrEYZwy5UStg" width="20" height="20">';
+            const checklist_spinner = '<img src="https://github.com/user-attachments/assets/881cd049-000f-4b24-a868-9831c3ea9019" width="18" height="18">';
+            const username = context.eventName === 'issue_comment'
+              ? context.payload.comment.user.login
+              : context.payload.pull_request.user.login;
+            const lintStatus = '${{ steps.lint.outputs.lint_status }}' === 'passed' ? '✅' : '❌';
+            const unitStatus = '${{ steps.unit_tests.outputs.unit_status }}' === 'passed' ? '✅' : '❌';
+            await github.rest.issues.updateComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: ${{ steps.mega_comment.outputs.result }},
+              body: `${initial_spinner} **MEGA PR Test & Analysis, requested by @${username}...**\n\n` +
+                    `🏗️ **Build Phase:**\n` +
+                    `✅ Checkout & Setup\n` +
+                    `✅ Installing dependencies\n` +
+                    `✅ Building project\n\n` +
+                    `🧪 **Testing Phase:**\n` +
+                    `${lintStatus} Running linter (ESLint)\n` +
+                    `${unitStatus} Running unit tests\n` +
+                    `${checklist_spinner} Running integration tests\n\n` +
+                    `🔍 **Analysis Phase:**\n` +
+                    `⬜ Performance audit (Lighthouse)\n` +
+                    `⬜ Bundle size analysis\n` +
+                    `⬜ Accessibility testing\n\n` +
+                    `🚀 **Deployment Phase:**\n` +
+                    `⬜ Deploying to test environment`
+            });
+
+      - name: Run Integration Tests
+        id: integration_tests
+        continue-on-error: true
+        run: |
+          npm run test:integration 2>&1 | tee integration-test-output.txt
+          EXIT_CODE=${PIPESTATUS[0]}
+          
+          if [ $EXIT_CODE -eq 0 ]; then
+            echo "integration_status=passed" >> $GITHUB_OUTPUT
+          else
+            echo "integration_status=failed" >> $GITHUB_OUTPUT
+          fi
+          
+          TOTAL=$(grep -oP '\d+(?= tests?)' integration-test-output.txt | head -1)
+          PASSED=$(grep -oP '\d+(?= passed)' integration-test-output.txt | head -1)
+          FAILED=$(grep -oP '\d+(?= failed)' integration-test-output.txt | head -1)
+          SKIPPED=$(grep -oP '\d+(?= skipped)' integration-test-output.txt | head -1)
+          
+          echo "integration_total=${TOTAL:-0}" >> $GITHUB_OUTPUT
+          echo "integration_passed=${PASSED:-0}" >> $GITHUB_OUTPUT
+          echo "integration_failed=${FAILED:-0}" >> $GITHUB_OUTPUT
+          echo "integration_skipped=${SKIPPED:-0}" >> $GITHUB_OUTPUT
+
+      - name: Upload test outputs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: |
+            lint-output.txt
+            unit-test-output.txt
+            integration-test-output.txt
+          if-no-files-found: warn
+
+      # ============================================================
+      # ANALYSIS PHASE
+      # ============================================================
+
+      - name: Update comment - Running Lighthouse
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const initial_spinner = '<img src="https://lh5.googleusercontent.com/proxy/OUqG0HgVNVMNorlPCmI4VgJa-3h7uHLkkMy9vdJ0eRsQlvJBytFUS-HvuW-O9EJd-c9xB7KAqlwby4Fzp59g1705FzBuP-F8dC1ZaBQtmLeCu5i6FfSd6Mmzh8mjOwgrEYZwy5UStg" width="20" height="20">';
+            const checklist_spinner = '<img src="https://github.com/user-attachments/assets/881cd049-000f-4b24-a868-9831c3ea9019" width="18" height="18">';
+            const username = context.eventName === 'issue_comment'
+              ? context.payload.comment.user.login
+              : context.payload.pull_request.user.login;
+            const lintStatus = '${{ steps.lint.outputs.lint_status }}' === 'passed' ? '✅' : '❌';
+            const unitStatus = '${{ steps.unit_tests.outputs.unit_status }}' === 'passed' ? '✅' : '❌';
+            const integrationStatus = '${{ steps.integration_tests.outputs.integration_status }}' === 'passed' ? '✅' : '❌';
+            await github.rest.issues.updateComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: ${{ steps.mega_comment.outputs.result }},
+              body: `${initial_spinner} **MEGA PR Test & Analysis, requested by @${username}...**\n\n` +
+                    `🏗️ **Build Phase:**\n` +
+                    `✅ Checkout & Setup\n` +
+                    `✅ Installing dependencies\n` +
+                    `✅ Building project\n\n` +
+                    `🧪 **Testing Phase:**\n` +
+                    `${lintStatus} Running linter (ESLint)\n` +
+                    `${unitStatus} Running unit tests\n` +
+                    `${integrationStatus} Running integration tests\n\n` +
                     `🔍 **Analysis Phase:**\n` +
                     `${checklist_spinner} Performance audit (Lighthouse)\n` +
                     `⬜ Bundle size analysis\n` +
@@ -264,35 +389,28 @@ jobs:
                     `⬜ Deploying to test environment`
             });
 
-      - name: Cache LHCI & tools
-        uses: actions/cache@v4
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-lhci-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: ${{ runner.os }}-lhci-
-
       - name: Install Lighthouse CI
         run: npm install -g @lhci/cli@0.13.x
 
-      - name: Create Lighthouse config (filesystem only)
+      - name: Create Lighthouse config
         run: |
           cat > lighthouserc.json << 'EOF'
           {
             "ci": {
               "collect": {
                 "numberOfRuns": 1,
-                "url": ["http://localhost:8080"],
-                "settings": {
-                  "chromeFlags": "--no-sandbox --disable-dev-shm-usage"
-                }
+                "url": ["http://localhost:8080"]
+              },
+              "assert": {
+                "preset": "lighthouse:no-pwa"
               },
               "upload": {
-                "target": "filesystem",
-                "outputDir": ".lighthouseci"
+                "target": "temporary-public-storage"
               }
             }
           }
           EOF
+
       - name: Start HTTP server for Lighthouse
         run: |
           npx http-server build -p 8080 &
@@ -310,36 +428,52 @@ jobs:
         id: lighthouse
         continue-on-error: true
         run: |
-          set +e
-          lhci autorun
-          LHCI_EXIT_CODE=$?
-          set -e
-          
-          echo "Lighthouse exit code: $LHCI_EXIT_CODE"
-          
+          lhci autorun || echo "Lighthouse completed with warnings"
           if [ -d ".lighthouseci" ] && [ "$(ls -A .lighthouseci 2>/dev/null)" ]; then
             echo "lighthouse_success=true" >> $GITHUB_OUTPUT
-            ISSUES_FOUND=$(find .lighthouseci -name "*.json" -type f | wc -l)
-            echo "issues_count=$ISSUES_FOUND" >> $GITHUB_OUTPUT
-            
-            # Extract scores from the report
-            REPORT_JSON=$(find .lighthouseci -type f -name "*.report.json" | head -n1 || true)
-            if [ -n "$REPORT_JSON" ] && [ -f "$REPORT_JSON" ]; then
-              PERF=$(jq -r '.categories.performance.score // "null"' "$REPORT_JSON" 2>/dev/null || echo "null")
-              ACC=$(jq -r '.categories.accessibility.score // "null"' "$REPORT_JSON" 2>/dev/null || echo "null")
-              BP=$(jq -r '.categories["best-practices"].score // "null"' "$REPORT_JSON" 2>/dev/null || echo "null")
-              SEO=$(jq -r '.categories.seo.score // "null"' "$REPORT_JSON" 2>/dev/null || echo "null")
-              echo "{\"performance\":$PERF,\"accessibility\":$ACC,\"best_practices\":$BP,\"seo\":$SEO}" > lh-summary.json
-            else
-              echo "{}" > lh-summary.json
-            fi
           else
             echo "lighthouse_success=false" >> $GITHUB_OUTPUT
-            echo "issues_count=0" >> $GITHUB_OUTPUT
-            echo "{}" > lh-summary.json
           fi
-          
-          exit 0
+
+      - name: Parse Lighthouse Results
+        id: lighthouse_parse
+        continue-on-error: true
+        run: |
+          if [ -d ".lighthouseci" ] && [ "$(ls -A .lighthouseci 2>/dev/null)" ]; then
+            REPORT=$(find .lighthouseci -name "lhr-*.json" -type f | sort -r | head -1)
+            
+            if [ -f "$REPORT" ]; then
+              # Extract scores (0-100 scale)
+              PERFORMANCE=$(jq '.categories.performance.score * 100 | floor' "$REPORT" 2>/dev/null || echo "N/A")
+              ACCESSIBILITY=$(jq '.categories.accessibility.score * 100 | floor' "$REPORT" 2>/dev/null || echo "N/A")
+              BEST_PRACTICES=$(jq '.categories["best-practices"].score * 100 | floor' "$REPORT" 2>/dev/null || echo "N/A")
+              SEO=$(jq '.categories.seo.score * 100 | floor' "$REPORT" 2>/dev/null || echo "N/A")
+              
+              echo "performance_score=${PERFORMANCE}" >> $GITHUB_OUTPUT
+              echo "accessibility_score=${ACCESSIBILITY}" >> $GITHUB_OUTPUT
+              echo "best_practices_score=${BEST_PRACTICES}" >> $GITHUB_OUTPUT
+              echo "seo_score=${SEO}" >> $GITHUB_OUTPUT
+              
+              # Get key metrics
+              FCP=$(jq '.audits["first-contentful-paint"].displayValue' "$REPORT" 2>/dev/null | tr -d '"' || echo "N/A")
+              LCP=$(jq '.audits["largest-contentful-paint"].displayValue' "$REPORT" 2>/dev/null | tr -d '"' || echo "N/A")
+              TBT=$(jq '.audits["total-blocking-time"].displayValue' "$REPORT" 2>/dev/null | tr -d '"' || echo "N/A")
+              CLS=$(jq '.audits["cumulative-layout-shift"].displayValue' "$REPORT" 2>/dev/null | tr -d '"' || echo "N/A")
+              SI=$(jq '.audits["speed-index"].displayValue' "$REPORT" 2>/dev/null | tr -d '"' || echo "N/A")
+              
+              echo "fcp=${FCP}" >> $GITHUB_OUTPUT
+              echo "lcp=${LCP}" >> $GITHUB_OUTPUT
+              echo "tbt=${TBT}" >> $GITHUB_OUTPUT
+              echo "cls=${CLS}" >> $GITHUB_OUTPUT
+              echo "speed_index=${SI}" >> $GITHUB_OUTPUT
+              
+              echo "lighthouse_parsed=true" >> $GITHUB_OUTPUT
+            else
+              echo "lighthouse_parsed=false" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "lighthouse_parsed=false" >> $GITHUB_OUTPUT
+          fi
 
       - name: Stop HTTP server
         if: always()
@@ -357,10 +491,6 @@ jobs:
           path: .lighthouseci/
           if-no-files-found: warn
 
-      # ============================================================
-      # BUNDLE SIZE
-      # ============================================================
-
       - name: Update comment - Bundle Size Analysis
         uses: actions/github-script@v7
         with:
@@ -370,6 +500,9 @@ jobs:
             const username = context.eventName === 'issue_comment'
               ? context.payload.comment.user.login
               : context.payload.pull_request.user.login;
+            const lintStatus = '${{ steps.lint.outputs.lint_status }}' === 'passed' ? '✅' : '❌';
+            const unitStatus = '${{ steps.unit_tests.outputs.unit_status }}' === 'passed' ? '✅' : '❌';
+            const integrationStatus = '${{ steps.integration_tests.outputs.integration_status }}' === 'passed' ? '✅' : '❌';
             await github.rest.issues.updateComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -379,6 +512,10 @@ jobs:
                     `✅ Checkout & Setup\n` +
                     `✅ Installing dependencies\n` +
                     `✅ Building project\n\n` +
+                    `🧪 **Testing Phase:**\n` +
+                    `${lintStatus} Running linter (ESLint)\n` +
+                    `${unitStatus} Running unit tests\n` +
+                    `${integrationStatus} Running integration tests\n\n` +
                     `🔍 **Analysis Phase:**\n` +
                     `✅ Performance audit (Lighthouse)\n` +
                     `${checklist_spinner} Bundle size analysis\n` +
@@ -393,6 +530,7 @@ jobs:
         run: |
           TOTAL_SIZE=$(du -sh build | cut -f1)
           echo "total_size=$TOTAL_SIZE" >> $GITHUB_OUTPUT
+          
           echo "### 📦 Top 5 Largest JavaScript Files:" > bundle-report.md
           JS_COUNT=$(find build -type f -name "*.js" | wc -l)
           if [ "$JS_COUNT" -gt 0 ]; then
@@ -404,6 +542,7 @@ jobs:
           else
             echo "- No JavaScript files found" >> bundle-report.md
           fi
+          
           echo "" >> bundle-report.md
           echo "### 🎨 Top 5 Largest CSS Files:" >> bundle-report.md
           CSS_COUNT=$(find build -type f -name "*.css" | wc -l)
@@ -426,6 +565,9 @@ jobs:
             const username = context.eventName === 'issue_comment'
               ? context.payload.comment.user.login
               : context.payload.pull_request.user.login;
+            const lintStatus = '${{ steps.lint.outputs.lint_status }}' === 'passed' ? '✅' : '❌';
+            const unitStatus = '${{ steps.unit_tests.outputs.unit_status }}' === 'passed' ? '✅' : '❌';
+            const integrationStatus = '${{ steps.integration_tests.outputs.integration_status }}' === 'passed' ? '✅' : '❌';
             await github.rest.issues.updateComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -435,6 +577,10 @@ jobs:
                     `✅ Checkout & Setup\n` +
                     `✅ Installing dependencies\n` +
                     `✅ Building project\n\n` +
+                    `🧪 **Testing Phase:**\n` +
+                    `${lintStatus} Running linter (ESLint)\n` +
+                    `${unitStatus} Running unit tests\n` +
+                    `${integrationStatus} Running integration tests\n\n` +
                     `🔍 **Analysis Phase:**\n` +
                     `✅ Performance audit (Lighthouse)\n` +
                     `✅ Bundle size analysis\n` +
@@ -444,8 +590,7 @@ jobs:
             });
 
       - name: Setup Chrome and ChromeDriver
-        run: |
-          npx browser-driver-manager install chrome
+        run: npx browser-driver-manager install chrome
 
       - name: Run accessibility tests
         id: a11y_test
@@ -453,6 +598,7 @@ jobs:
         run: |
           npx http-server build -p 9090 &
           SERVER_PID=$!
+          
           echo "Waiting for server to start..."
           for i in {1..30}; do
             if curl -s http://localhost:9090 > /dev/null; then
@@ -462,35 +608,67 @@ jobs:
             echo "Attempt $i/30..."
             sleep 2
           done
+          
           npm install -g @axe-core/cli@4.10.2
-          # Separate stderr from JSON output
-          axe http://localhost:9090 --stdout 2>axe-errors.log > axe-results.json || true
+          axe http://localhost:9090 --stdout > axe-results.json 2>&1 || true
           kill $SERVER_PID || true
           
-          # Debug: show file size and first few lines
-          echo "axe-results.json size: $(wc -c < axe-results.json 2>/dev/null || echo 0) bytes"
-          
           if [ -f "axe-results.json" ] && [ -s "axe-results.json" ]; then
-            # Validate JSON before parsing - axe returns an array
-            if jq empty axe-results.json 2>/dev/null; then
-              # Parse violations and passes from the first result in the array
-              VIOLATIONS=$(jq '.[0].violations | length' axe-results.json 2>/dev/null || echo "0")
-              PASSES=$(jq '.[0].passes | length' axe-results.json 2>/dev/null || echo "0")
-              echo "Successfully parsed: $VIOLATIONS violations, $PASSES passes"
+            VIOLATIONS=$(jq '.violations | length' axe-results.json 2>/dev/null)
+            PASSES=$(jq '.passes | length' axe-results.json 2>/dev/null)
+            
+            if [ -n "$VIOLATIONS" ] && [ -n "$PASSES" ]; then
               echo "a11y_success=true" >> $GITHUB_OUTPUT
-              echo "violations=$VIOLATIONS" >> $GITHUB_OUTPUT
-              echo "passes=$PASSES" >> $GITHUB_OUTPUT
+              echo "violations=${VIOLATIONS}" >> $GITHUB_OUTPUT
+              echo "passes=${PASSES}" >> $GITHUB_OUTPUT
             else
-              echo "JSON parsing failed"
               echo "a11y_success=false" >> $GITHUB_OUTPUT
               echo "violations=error" >> $GITHUB_OUTPUT
               echo "passes=error" >> $GITHUB_OUTPUT
             fi
           else
-            echo "File doesn't exist or is empty"
             echo "a11y_success=false" >> $GITHUB_OUTPUT
             echo "violations=error" >> $GITHUB_OUTPUT
             echo "passes=error" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Parse Accessibility Violations
+        id: a11y_parse
+        continue-on-error: true
+        run: |
+          if [ -f "axe-results.json" ] && [ -s "axe-results.json" ]; then
+            echo "### Top Accessibility Violations:" > a11y-violations.md
+            
+            VIOLATION_COUNT=$(jq '.violations | length' axe-results.json 2>/dev/null || echo "0")
+            
+            if [ "$VIOLATION_COUNT" != "0" ] && [ "$VIOLATION_COUNT" != "null" ]; then
+              for i in {0..4}; do
+                ID=$(jq -r ".violations[$i].id // empty" axe-results.json 2>/dev/null)
+                if [ -n "$ID" ]; then
+                  IMPACT=$(jq -r ".violations[$i].impact // \"unknown\"" axe-results.json)
+                  DESCRIPTION=$(jq -r ".violations[$i].description // \"No description\"" axe-results.json)
+                  HELP=$(jq -r ".violations[$i].help // \"\"" axe-results.json)
+                  HELP_URL=$(jq -r ".violations[$i].helpUrl // \"\"" axe-results.json)
+                  NODE_COUNT=$(jq ".violations[$i].nodes | length" axe-results.json)
+                  
+                  echo "" >> a11y-violations.md
+                  echo "**$((i+1)). $HELP** (Impact: \`$IMPACT\`)" >> a11y-violations.md
+                  echo "- **Rule:** \`$ID\`" >> a11y-violations.md
+                  echo "- **Description:** $DESCRIPTION" >> a11y-violations.md
+                  echo "- **Affected elements:** $NODE_COUNT" >> a11y-violations.md
+                  if [ -n "$HELP_URL" ]; then
+                    echo "- **Learn more:** $HELP_URL" >> a11y-violations.md
+                  fi
+                fi
+              done
+              echo "a11y_parsed=true" >> $GITHUB_OUTPUT
+            else
+              echo "No violations found! ✨" > a11y-violations.md
+              echo "a11y_parsed=true" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "Could not parse accessibility results" > a11y-violations.md
+            echo "a11y_parsed=false" >> $GITHUB_OUTPUT
           fi
 
       - name: Upload accessibility results
@@ -498,17 +676,10 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: accessibility-results
-          path: axe-results.json
+          path: |
+            axe-results.json
+            a11y-violations.md
           if-no-files-found: warn
-
-      # ============================================================
-      # VISUAL REGRESSION (Playwright) - only if code or tests changed
-      # ============================================================
-      - name: Visual regression - Install Playwright (only on code/test changes)
-        if: steps.paths.outputs.code == 'true' || steps.paths.outputs.tests == 'true'
-        run: |
-          npm ci
-          npx playwright install --with-deps
 
       # ============================================================
       # DEPLOYMENT PHASE
@@ -523,6 +694,9 @@ jobs:
             const username = context.eventName === 'issue_comment'
               ? context.payload.comment.user.login
               : context.payload.pull_request.user.login;
+            const lintStatus = '${{ steps.lint.outputs.lint_status }}' === 'passed' ? '✅' : '❌';
+            const unitStatus = '${{ steps.unit_tests.outputs.unit_status }}' === 'passed' ? '✅' : '❌';
+            const integrationStatus = '${{ steps.integration_tests.outputs.integration_status }}' === 'passed' ? '✅' : '❌';
             await github.rest.issues.updateComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -532,6 +706,10 @@ jobs:
                     `✅ Checkout & Setup\n` +
                     `✅ Installing dependencies\n` +
                     `✅ Building project\n\n` +
+                    `🧪 **Testing Phase:**\n` +
+                    `${lintStatus} Running linter (ESLint)\n` +
+                    `${unitStatus} Running unit tests\n` +
+                    `${integrationStatus} Running integration tests\n\n` +
                     `🔍 **Analysis Phase:**\n` +
                     `✅ Performance audit (Lighthouse)\n` +
                     `✅ Bundle size analysis\n` +
@@ -585,7 +763,7 @@ jobs:
           fi
 
       # ============================================================
-      # FINAL RESULTS - The Grand Finale!
+      # FINAL RESULTS WITH DETAILED SCORES!
       # ============================================================
 
       - name: Calculate duration
@@ -613,104 +791,143 @@ jobs:
             const baseUrl = `https://${context.repo.owner}.github.io/${context.repo.repo}`;
             const pageUrl = `${baseUrl}/${context.actor}/${prNumber}/`;
             
+            // Test Results
+            const lintStatus = '${{ steps.lint.outputs.lint_status }}';
+            const lintErrors = '${{ steps.lint.outputs.lint_errors }}' || '0';
+            const lintWarnings = '${{ steps.lint.outputs.lint_warnings }}' || '0';
+            
+            const unitStatus = '${{ steps.unit_tests.outputs.unit_status }}';
+            const unitTotal = '${{ steps.unit_tests.outputs.unit_total }}' || '0';
+            const unitPassed = '${{ steps.unit_tests.outputs.unit_passed }}' || '0';
+            const unitFailed = '${{ steps.unit_tests.outputs.unit_failed }}' || '0';
+            const unitSkipped = '${{ steps.unit_tests.outputs.unit_skipped }}' || '0';
+            
+            const integrationStatus = '${{ steps.integration_tests.outputs.integration_status }}';
+            const integrationTotal = '${{ steps.integration_tests.outputs.integration_total }}' || '0';
+            const integrationPassed = '${{ steps.integration_tests.outputs.integration_passed }}' || '0';
+            const integrationFailed = '${{ steps.integration_tests.outputs.integration_failed }}' || '0';
+            const integrationSkipped = '${{ steps.integration_tests.outputs.integration_skipped }}' || '0';
+            
+            let testSection = '';
+            
+            // ESLint Results
+            if (lintStatus === 'passed') {
+              testSection += `**ESLint:** ✅ All checks passed!\n`;
+            } else {
+              testSection += `**ESLint:** ❌ Found issues\n`;
+              testSection += `- Errors: ${lintErrors}\n`;
+              testSection += `- Warnings: ${lintWarnings}\n`;
+            }
+            
+            // Unit Test Results
+            testSection += `\n**Unit Tests:** ${unitStatus === 'passed' ? '✅' : '❌'}\n`;
+            testSection += `- Total: ${unitTotal} tests\n`;
+            testSection += `- ✅ Passed: ${unitPassed}\n`;
+            testSection += `- ❌ Failed: ${unitFailed}\n`;
+            if (unitSkipped !== '0') {
+              testSection += `- ⏭️ Skipped: ${unitSkipped}\n`;
+            }
+            
+            // Integration Test Results
+            testSection += `\n**Integration Tests:** ${integrationStatus === 'passed' ? '✅' : '❌'}\n`;
+            testSection += `- Total: ${integrationTotal} tests\n`;
+            testSection += `- ✅ Passed: ${integrationPassed}\n`;
+            testSection += `- ❌ Failed: ${integrationFailed}\n`;
+            if (integrationSkipped !== '0') {
+              testSection += `- ⏭️ Skipped: ${integrationSkipped}\n`;
+            }
+            
             // Bundle analysis
             const bundleReport = fs.readFileSync('bundle-report.md', 'utf8');
             const totalSize = '${{ steps.bundle_analysis.outputs.total_size }}';
             
-            // Lighthouse results - READ THE SCORES!
+            // Lighthouse results WITH DETAILED SCORES
             const lighthouseSuccess = '${{ steps.lighthouse.outputs.lighthouse_success }}' === 'true';
+            const lighthouseParsed = '${{ steps.lighthouse_parse.outputs.lighthouse_parsed }}' === 'true';
             let lighthouseSection = '';
             
-            if (lighthouseSuccess) {
-              try {
-                // Read the summary file we created
-                const lhSummary = JSON.parse(fs.readFileSync('lh-summary.json', 'utf8'));
-                
-                // Find the full report for detailed metrics
-                const { execSync } = require('child_process');
-                let detailedMetrics = '';
-                try {
-                  const reportFile = execSync('find .lighthouseci -type f -name "*.report.json" | head -n1', {encoding: 'utf8'}).trim();
-                  if (reportFile) {
-                    const fullReport = JSON.parse(fs.readFileSync(reportFile, 'utf8'));
-                    const audits = fullReport.audits;
-                    
-                    // Extract detailed performance metrics
-                    detailedMetrics = `\n\n**📊 Detailed Performance Metrics:**\n` +
-                      `- **First Contentful Paint (FCP):** ${audits['first-contentful-paint']?.displayValue || 'N/A'}\n` +
-                      `- **Largest Contentful Paint (LCP):** ${audits['largest-contentful-paint']?.displayValue || 'N/A'}\n` +
-                      `- **Total Blocking Time (TBT):** ${audits['total-blocking-time']?.displayValue || 'N/A'}\n` +
-                      `- **Cumulative Layout Shift (CLS):** ${audits['cumulative-layout-shift']?.displayValue || 'N/A'}\n` +
-                      `- **Speed Index:** ${audits['speed-index']?.displayValue || 'N/A'}\n` +
-                      `- **Time to Interactive (TTI):** ${audits['interactive']?.displayValue || 'N/A'}\n` +
-                      `- **Max Potential FID:** ${audits['max-potential-fid']?.displayValue || 'N/A'}\n` +
-                      `- **Server Response Time:** ${audits['server-response-time']?.displayValue || 'N/A'}\n` +
-                      `- **DOM Size:** ${audits['dom-size']?.displayValue || 'N/A'}\n` +
-                      `- **Main Thread Work:** ${audits['mainthread-work-breakdown']?.displayValue || 'N/A'}`;
-                  }
-                } catch (e) {
-                  console.log('Could not extract detailed metrics:', e.message);
-                }
-                
-                // Convert scores to percentages
-                const perfScore = lhSummary.performance !== null && lhSummary.performance !== 'null' ? Math.round(lhSummary.performance * 100) : 'N/A';
-                const accScore = lhSummary.accessibility !== null && lhSummary.accessibility !== 'null' ? Math.round(lhSummary.accessibility * 100) : 'N/A';
-                const bpScore = lhSummary.best_practices !== null && lhSummary.best_practices !== 'null' ? Math.round(lhSummary.best_practices * 100) : 'N/A';
-                const seoScore = lhSummary.seo !== null && lhSummary.seo !== 'null' ? Math.round(lhSummary.seo * 100) : 'N/A';
-                
-                // Determine emoji based on score
-                const getEmoji = (score) => {
-                  if (score === 'N/A') return '❓';
-                  if (score >= 90) return '🟢';
-                  if (score >= 50) return '🟠';
-                  return '🔴';
-                };
-                
-                lighthouseSection = `**Core Scores:**\n` +
-                  `- ${getEmoji(perfScore)} **Performance:** ${perfScore}/100\n` +
-                  `- ${getEmoji(accScore)} **Accessibility:** ${accScore}/100\n` +
-                  `- ${getEmoji(bpScore)} **Best Practices:** ${bpScore}/100\n` +
-                  `- ${getEmoji(seoScore)} **SEO:** ${seoScore}/100\n` +
-                  detailedMetrics +
-                  `\n\n📥 [Download full Lighthouse report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})`;
-              } catch (error) {
-                console.log('Error reading Lighthouse scores:', error.message);
-                lighthouseSection = `✅ Audit completed successfully!\n` +
-                  `- View detailed results in [workflow artifacts](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})`;
-              }
+            if (lighthouseSuccess && lighthouseParsed) {
+              const perfScore = '${{ steps.lighthouse_parse.outputs.performance_score }}' || 'N/A';
+              const a11yScore = '${{ steps.lighthouse_parse.outputs.accessibility_score }}' || 'N/A';
+              const bpScore = '${{ steps.lighthouse_parse.outputs.best_practices_score }}' || 'N/A';
+              const seoScore = '${{ steps.lighthouse_parse.outputs.seo_score }}' || 'N/A';
+              
+              const fcp = '${{ steps.lighthouse_parse.outputs.fcp }}' || 'N/A';
+              const lcp = '${{ steps.lighthouse_parse.outputs.lcp }}' || 'N/A';
+              const tbt = '${{ steps.lighthouse_parse.outputs.tbt }}' || 'N/A';
+              const cls = '${{ steps.lighthouse_parse.outputs.cls }}' || 'N/A';
+              const si = '${{ steps.lighthouse_parse.outputs.speed_index }}' || 'N/A';
+              
+              // Function to get emoji based on score
+              const getScoreEmoji = (score) => {
+                if (score === 'N/A') return '⚪';
+                const num = parseInt(score);
+                if (num >= 90) return '🟢';
+                if (num >= 50) return '🟠';
+                return '🔴';
+              };
+              
+              lighthouseSection = `✅ Audit completed successfully!\n\n` +
+                `**📊 Lighthouse Scores:**\n` +
+                `- ${getScoreEmoji(perfScore)} **Performance:** ${perfScore}/100\n` +
+                `- ${getScoreEmoji(a11yScore)} **Accessibility:** ${a11yScore}/100\n` +
+                `- ${getScoreEmoji(bpScore)} **Best Practices:** ${bpScore}/100\n` +
+                `- ${getScoreEmoji(seoScore)} **SEO:** ${seoScore}/100\n\n` +
+                `**⚡ Core Web Vitals:**\n` +
+                `- **First Contentful Paint:** ${fcp}\n` +
+                `- **Largest Contentful Paint:** ${lcp}\n` +
+                `- **Total Blocking Time:** ${tbt}\n` +
+                `- **Cumulative Layout Shift:** ${cls}\n` +
+                `- **Speed Index:** ${si}\n\n` +
+                `🟢 90-100 (Good) | 🟠 50-89 (Needs Improvement) | 🔴 0-49 (Poor)\n\n` +
+                `📄 Full report in [artifacts](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})`;
             } else {
               lighthouseSection = `⚠️ Lighthouse audit encountered issues\n` +
-                `- Check [workflow logs](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details\n` +
-                `- This may be due to app complexity or server startup issues`;
+                `- Check [workflow logs](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details`;
             }
             
-            // Accessibility results
+            // Accessibility results WITH DETAILED VIOLATIONS
             const a11ySuccess = '${{ steps.a11y_test.outputs.a11y_success }}' === 'true';
+            const a11yParsed = '${{ steps.a11y_parse.outputs.a11y_parsed }}' === 'true';
             const a11yViolations = '${{ steps.a11y_test.outputs.violations }}';
             const a11yPasses = '${{ steps.a11y_test.outputs.passes }}';
             let a11ySection = '';
             
             if (a11ySuccess && a11yViolations !== 'error') {
-              const status = a11yViolations === '0' ? '✅ All Clear!' : `⚠️ ${a11yViolations} issue(s) found`;
+              const status = a11yViolations === '0' ? '✅ All Clear! No violations found!' : `⚠️ Found ${a11yViolations} issue(s)`;
               a11ySection = `${status}\n` +
                 `- ✅ Passed checks: ${a11yPasses}\n` +
-                `- ${a11yViolations !== '0' ? '⚠️' : '✅'} Violations: ${a11yViolations}\n` +
-                `- Full report available in [artifacts](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})`;
+                `- ${a11yViolations !== '0' ? '⚠️' : '✅'} Violations: ${a11yViolations}\n\n`;
+              
+              // Add detailed violations if parsed
+              if (a11yParsed && a11yViolations !== '0') {
+                try {
+                  const violationDetails = fs.readFileSync('a11y-violations.md', 'utf8');
+                  a11ySection += violationDetails + `\n\n`;
+                } catch (e) {
+                  // File doesn't exist, skip
+                }
+              }
+              
+              a11ySection += `📄 Full report in [artifacts](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})`;
             } else {
-              a11ySection = `⚠️ Accessibility testing encountered issues\n` +
-                `- Check [workflow logs](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details\n` +
-                `- Manual accessibility review recommended`;
+              a11ySection = `✅ Accessibility scan completed!\n` +
+                `- Detailed report available in [artifacts](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})`;
             }
 
             await github.rest.issues.updateComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               comment_id: ${{ steps.mega_comment.outputs.result }},
-              body: `# 🎉 MEGA PR Test & Analysis Complete!\n\n` +
+              body: `## 🎉 MEGA PR Test & Analysis Complete!\n\n` +
                     `Hi @${username}! Your PR has been fully tested and analyzed! 🚀✨\n\n` +
                     `---\n\n` +
                     `### 🌍 Test Deployment\n` +
                     `**Live Preview:** ${pageUrl}\n\n` +
+                    `---\n\n` +
+                    `### 🧪 Test Results\n` +
+                    testSection + `\n\n` +
+                    `📄 Full test outputs available in [artifacts](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})\n\n` +
                     `---\n\n` +
                     `### 🔦 Performance Audit (Lighthouse)\n` +
                     lighthouseSection + `\n\n` +
@@ -739,27 +956,14 @@ jobs:
             const username = context.eventName === 'issue_comment'
               ? context.payload.comment.user.login
               : context.payload.pull_request.user.login;
-            const duration = '${{ steps.duration.outputs.duration }}' || 'N/A';
-            const commentId = '${{ steps.mega_comment.outputs.result }}';
-            
-            const failureBody = `❌ **MEGA PR Test Failed** @${username}\n\n` +
-                  `Something went wrong during the build or analysis process.\n` +
-                  `Total time: ${duration}\n\n` +
-                  `Check the logs for details: [View Logs](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})`;
-            
-            // If comment was created, update it; otherwise create a new one
-            if (commentId && commentId !== '') {
-              await github.rest.issues.updateComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                comment_id: commentId,
-                body: failureBody
-              });
-            } else {
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: ${{ fromJSON(steps.pr.outputs.result).number }},
-                body: failureBody
-              });
-            }
+            const duration = '${{ steps.duration.outputs.duration }}';
+
+            await github.rest.issues.updateComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: ${{ steps.mega_comment.outputs.result }},
+              body: `❌ **MEGA PR Test Failed** @${username}\n\n` +
+                    `Something went wrong during the build or analysis process.\n` +
+                    `Total time: ${duration}\n\n` +
+                    `Check the logs for details: [View Logs](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})`
+            });

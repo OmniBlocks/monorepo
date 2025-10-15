@@ -28,10 +28,14 @@
 > A fork of the Scratch 3.0 GUI, modified and enhanced for the [TurboWarp](https://turbowarp.org/) compiler and the [OmniBlocks](https://omniblocks.github.io) multi-language IDE.
 
 This repository contains the frontend interface of the Block-Based editor for OmniBlocks and TurboWarp. It builds upon Scratch's foundation with significant performance improvements, addons, themes, and other features for an amazing coding experience.
+
 ## 📑 Table of Contents
 - [🎮 Try It Out](#-try-it-out)
 - [✨ Features & Enhancements](#-features--enhancements)
 - [🚀 Quick Start](#-quick-start)
+  - [Prerequisites](#prerequisites)
+  - [Dependencies](#dependencies)
+  - [Installation & Running](#installation--running)
 - [🏗️ Project Architecture & Development Guide](#%EF%B8%8F-project-architecture--development-guide)
   - [Data Flow & Structure](#data-flow--structure)
   - [Key Workflows](#key-workflows)
@@ -45,6 +49,12 @@ This repository contains the frontend interface of the Block-Based editor for Om
   - [Features & Development](#features--development)
   - [Technical Questions](#technical-questions)
   - [Contributions](#contributions)
+- [Roadmap](#roadmap)
+  - [Current Focus](#current-focus)
+  - [Short-term Goals (Next 3-6 months)](#short-term-goals-next-3-6-months)
+  - [Long-term Vision](#long-term-vision)
+  - [Completed ✅](#completed-)
+- [Feature Comparison](#feature-comparison)
 
 ## 🎮 Try It Out
 Experience OmniBlocks live: [https://omniblocks.github.io](https://omniblocks.github.io)

@@ -47,7 +47,7 @@ jobs:
       - name: Cancel previous runs
         uses: styfle/cancel-workflow-action@0.12.0
         with:
-          workflow_id: 'mega-pr-test.yml'
+          workflow_id: 'prtest.yml'
           access_token: ${{ github.token }}
           all_but_latest: true
 
@@ -96,7 +96,7 @@ jobs:
             return comment.data.id;
 
       # ============================================================
-      # BUILD PHASE - Only happens ONCE!
+      # BUILD PHASE
       # ============================================================
 
       - name: Checkout PR code
@@ -180,7 +180,7 @@ jobs:
           NODE_ENV: production
 
       # ============================================================
-      # TESTING PHASE - NEW!
+      # TESTING PHASE - FIXED PARSING!
       # ============================================================
 
       - name: Update comment - Running Linter
@@ -218,17 +218,20 @@ jobs:
         continue-on-error: true
         run: |
           npm run test:lint 2>&1 | tee lint-output.txt
-          if [ ${PIPESTATUS[0]} -eq 0 ]; then
+          EXIT_CODE=${PIPESTATUS[0]}
+          
+          if [ $EXIT_CODE -eq 0 ]; then
             echo "lint_status=passed" >> $GITHUB_OUTPUT
             echo "lint_errors=0" >> $GITHUB_OUTPUT
             echo "lint_warnings=0" >> $GITHUB_OUTPUT
           else
             echo "lint_status=failed" >> $GITHUB_OUTPUT
-            # Count errors and warnings from ESLint output
-            ERRORS=$(grep -c "error" lint-output.txt || echo "0")
-            WARNINGS=$(grep -c "warning" lint-output.txt || echo "0")
-            echo "lint_errors=$ERRORS" >> $GITHUB_OUTPUT
-            echo "lint_warnings=$WARNINGS" >> $GITHUB_OUTPUT
+            # Better ESLint parsing - look for actual error/warning lines
+            ERRORS=$(grep -E '^\s+[0-9]+:[0-9]+\s+error\s+' lint-output.txt | wc -l || echo "0")
+            WARNINGS=$(grep -E '^\s+[0-9]+:[0-9]+\s+warning\s+' lint-output.txt | wc -l || echo "0")
+            # Ensure we always have numeric values
+            echo "lint_errors=${ERRORS:-0}" >> $GITHUB_OUTPUT
+            echo "lint_warnings=${WARNINGS:-0}" >> $GITHUB_OUTPUT
           fi
 
       - name: Update comment - Running Unit Tests
@@ -267,18 +270,25 @@ jobs:
         continue-on-error: true
         run: |
           npm run test:unit 2>&1 | tee unit-test-output.txt
-          if [ ${PIPESTATUS[0]} -eq 0 ]; then
+          EXIT_CODE=${PIPESTATUS[0]}
+          
+          if [ $EXIT_CODE -eq 0 ]; then
             echo "unit_status=passed" >> $GITHUB_OUTPUT
           else
             echo "unit_status=failed" >> $GITHUB_OUTPUT
           fi
-          # Extract test results from Jest output
-          TOTAL=$(grep -oP '\d+(?= tests?)' unit-test-output.txt | head -1 || echo "0")
-          PASSED=$(grep -oP '\d+(?= passed)' unit-test-output.txt | head -1 || echo "0")
-          FAILED=$(grep -oP '\d+(?= failed)' unit-test-output.txt | head -1 || echo "0")
-          echo "unit_total=$TOTAL" >> $GITHUB_OUTPUT
-          echo "unit_passed=$PASSED" >> $GITHUB_OUTPUT
-          echo "unit_failed=$FAILED" >> $GITHUB_OUTPUT
+          
+          # Extract test results - handle empty values properly
+          TOTAL=$(grep -oP '\d+(?= tests?)' unit-test-output.txt | head -1)
+          PASSED=$(grep -oP '\d+(?= passed)' unit-test-output.txt | head -1)
+          FAILED=$(grep -oP '\d+(?= failed)' unit-test-output.txt | head -1)
+          SKIPPED=$(grep -oP '\d+(?= skipped)' unit-test-output.txt | head -1)
+          
+          # Default to 0 if empty
+          echo "unit_total=${TOTAL:-0}" >> $GITHUB_OUTPUT
+          echo "unit_passed=${PASSED:-0}" >> $GITHUB_OUTPUT
+          echo "unit_failed=${FAILED:-0}" >> $GITHUB_OUTPUT
+          echo "unit_skipped=${SKIPPED:-0}" >> $GITHUB_OUTPUT
 
       - name: Update comment - Running Integration Tests
         uses: actions/github-script@v7
@@ -317,18 +327,25 @@ jobs:
         continue-on-error: true
         run: |
           npm run test:integration 2>&1 | tee integration-test-output.txt
-          if [ ${PIPESTATUS[0]} -eq 0 ]; then
+          EXIT_CODE=${PIPESTATUS[0]}
+          
+          if [ $EXIT_CODE -eq 0 ]; then
             echo "integration_status=passed" >> $GITHUB_OUTPUT
           else
             echo "integration_status=failed" >> $GITHUB_OUTPUT
           fi
-          # Extract test results from Jest output
-          TOTAL=$(grep -oP '\d+(?= tests?)' integration-test-output.txt | head -1 || echo "0")
-          PASSED=$(grep -oP '\d+(?= passed)' integration-test-output.txt | head -1 || echo "0")
-          FAILED=$(grep -oP '\d+(?= failed)' integration-test-output.txt | head -1 || echo "0")
-          echo "integration_total=$TOTAL" >> $GITHUB_OUTPUT
-          echo "integration_passed=$PASSED" >> $GITHUB_OUTPUT
-          echo "integration_failed=$FAILED" >> $GITHUB_OUTPUT
+          
+          # Extract test results - handle empty values properly
+          TOTAL=$(grep -oP '\d+(?= tests?)' integration-test-output.txt | head -1)
+          PASSED=$(grep -oP '\d+(?= passed)' integration-test-output.txt | head -1)
+          FAILED=$(grep -oP '\d+(?= failed)' integration-test-output.txt | head -1)
+          SKIPPED=$(grep -oP '\d+(?= skipped)' integration-test-output.txt | head -1)
+          
+          # Default to 0 if empty
+          echo "integration_total=${TOTAL:-0}" >> $GITHUB_OUTPUT
+          echo "integration_passed=${PASSED:-0}" >> $GITHUB_OUTPUT
+          echo "integration_failed=${FAILED:-0}" >> $GITHUB_OUTPUT
+          echo "integration_skipped=${SKIPPED:-0}" >> $GITHUB_OUTPUT
 
       - name: Upload test outputs
         if: always()
@@ -342,7 +359,7 @@ jobs:
           if-no-files-found: warn
 
       # ============================================================
-      # ANALYSIS PHASE - Using the same build!
+      # ANALYSIS PHASE
       # ============================================================
 
       - name: Update comment - Running Lighthouse
@@ -381,7 +398,7 @@ jobs:
       - name: Install Lighthouse CI
         run: npm install -g @lhci/cli@0.13.x
 
-      - name: Create Lighthouse config (disable strict assertions)
+      - name: Create Lighthouse config
         run: |
           cat > lighthouserc.json << 'EOF'
           {
@@ -404,7 +421,6 @@ jobs:
         run: |
           npx http-server build -p 8080 &
           echo $! > server.pid
-          # Wait for server to be ready
           for i in {1..30}; do
             if curl -s http://localhost:8080 > /dev/null; then
               echo "Server is ready!"
@@ -421,12 +437,8 @@ jobs:
           lhci autorun || echo "Lighthouse completed with warnings"
           if [ -d ".lighthouseci" ] && [ "$(ls -A .lighthouseci 2>/dev/null)" ]; then
             echo "lighthouse_success=true" >> $GITHUB_OUTPUT
-            # Count issues found
-            ISSUES_FOUND=$(find .lighthouseci -name "*.json" -type f | wc -l)
-            echo "issues_count=$ISSUES_FOUND" >> $GITHUB_OUTPUT
           else
             echo "lighthouse_success=false" >> $GITHUB_OUTPUT
-            echo "issues_count=0" >> $GITHUB_OUTPUT
           fi
 
       - name: Stop HTTP server
@@ -485,7 +497,6 @@ jobs:
           TOTAL_SIZE=$(du -sh build | cut -f1)
           echo "total_size=$TOTAL_SIZE" >> $GITHUB_OUTPUT
           
-          # Get top 5 largest JS files
           echo "### 📦 Top 5 Largest JavaScript Files:" > bundle-report.md
           JS_COUNT=$(find build -type f -name "*.js" | wc -l)
           if [ "$JS_COUNT" -gt 0 ]; then
@@ -498,7 +509,6 @@ jobs:
             echo "- No JavaScript files found" >> bundle-report.md
           fi
           
-          # Get top 5 largest CSS files
           echo "" >> bundle-report.md
           echo "### 🎨 Top 5 Largest CSS Files:" >> bundle-report.md
           CSS_COUNT=$(find build -type f -name "*.css" | wc -l)
@@ -546,19 +556,15 @@ jobs:
             });
 
       - name: Setup Chrome and ChromeDriver
-        run: |
-          # Install matching Chrome and ChromeDriver versions
-          npx browser-driver-manager install chrome
+        run: npx browser-driver-manager install chrome
 
       - name: Run accessibility tests
         id: a11y_test
         continue-on-error: true
         run: |
-          # Start server in background
           npx http-server build -p 9090 &
           SERVER_PID=$!
           
-          # Wait for server with better retry logic
           echo "Waiting for server to start..."
           for i in {1..30}; do
             if curl -s http://localhost:9090 > /dev/null; then
@@ -569,28 +575,22 @@ jobs:
             sleep 2
           done
           
-          # Install axe globally
           npm install -g @axe-core/cli@4.10.2
-          
-          # Run axe and capture output
           axe http://localhost:9090 --stdout > axe-results.json 2>&1 || true
-          
-          # Kill server
           kill $SERVER_PID || true
           
-          # Parse results with better error handling
           if [ -f "axe-results.json" ] && [ -s "axe-results.json" ]; then
-            VIOLATIONS=$(jq '.violations | length' axe-results.json 2>/dev/null || echo "error")
-            PASSES=$(jq '.passes | length' axe-results.json 2>/dev/null || echo "error")
+            VIOLATIONS=$(jq '.violations | length' axe-results.json 2>/dev/null)
+            PASSES=$(jq '.passes | length' axe-results.json 2>/dev/null)
             
-            if [ "$VIOLATIONS" = "error" ] || [ "$PASSES" = "error" ]; then
+            if [ -n "$VIOLATIONS" ] && [ -n "$PASSES" ]; then
+              echo "a11y_success=true" >> $GITHUB_OUTPUT
+              echo "violations=${VIOLATIONS}" >> $GITHUB_OUTPUT
+              echo "passes=${PASSES}" >> $GITHUB_OUTPUT
+            else
               echo "a11y_success=false" >> $GITHUB_OUTPUT
               echo "violations=error" >> $GITHUB_OUTPUT
               echo "passes=error" >> $GITHUB_OUTPUT
-            else
-              echo "a11y_success=true" >> $GITHUB_OUTPUT
-              echo "violations=$VIOLATIONS" >> $GITHUB_OUTPUT
-              echo "passes=$PASSES" >> $GITHUB_OUTPUT
             fi
           else
             echo "a11y_success=false" >> $GITHUB_OUTPUT
@@ -607,7 +607,7 @@ jobs:
           if-no-files-found: warn
 
       # ============================================================
-      # DEPLOYMENT PHASE - Same as original prtest.yml
+      # DEPLOYMENT PHASE
       # ============================================================
 
       - name: Update comment - Deploying
@@ -688,7 +688,7 @@ jobs:
           fi
 
       # ============================================================
-      # FINAL RESULTS - The Grand Finale!
+      # FINAL RESULTS - FIXED TO SHOW ACTUAL NUMBERS!
       # ============================================================
 
       - name: Calculate duration
@@ -716,20 +716,22 @@ jobs:
             const baseUrl = `https://${context.repo.owner}.github.io/${context.repo.repo}`;
             const pageUrl = `${baseUrl}/${context.actor}/${prNumber}/`;
             
-            // Test Results
+            // Test Results - all values guaranteed to be present
             const lintStatus = '${{ steps.lint.outputs.lint_status }}';
-            const lintErrors = '${{ steps.lint.outputs.lint_errors }}';
-            const lintWarnings = '${{ steps.lint.outputs.lint_warnings }}';
+            const lintErrors = '${{ steps.lint.outputs.lint_errors }}' || '0';
+            const lintWarnings = '${{ steps.lint.outputs.lint_warnings }}' || '0';
             
             const unitStatus = '${{ steps.unit_tests.outputs.unit_status }}';
-            const unitTotal = '${{ steps.unit_tests.outputs.unit_total }}';
-            const unitPassed = '${{ steps.unit_tests.outputs.unit_passed }}';
-            const unitFailed = '${{ steps.unit_tests.outputs.unit_failed }}';
+            const unitTotal = '${{ steps.unit_tests.outputs.unit_total }}' || '0';
+            const unitPassed = '${{ steps.unit_tests.outputs.unit_passed }}' || '0';
+            const unitFailed = '${{ steps.unit_tests.outputs.unit_failed }}' || '0';
+            const unitSkipped = '${{ steps.unit_tests.outputs.unit_skipped }}' || '0';
             
             const integrationStatus = '${{ steps.integration_tests.outputs.integration_status }}';
-            const integrationTotal = '${{ steps.integration_tests.outputs.integration_total }}';
-            const integrationPassed = '${{ steps.integration_tests.outputs.integration_passed }}';
-            const integrationFailed = '${{ steps.integration_tests.outputs.integration_failed }}';
+            const integrationTotal = '${{ steps.integration_tests.outputs.integration_total }}' || '0';
+            const integrationPassed = '${{ steps.integration_tests.outputs.integration_passed }}' || '0';
+            const integrationFailed = '${{ steps.integration_tests.outputs.integration_failed }}' || '0';
+            const integrationSkipped = '${{ steps.integration_tests.outputs.integration_skipped }}' || '0';
             
             let testSection = '';
             
@@ -744,22 +746,20 @@ jobs:
             
             // Unit Test Results
             testSection += `\n**Unit Tests:** ${unitStatus === 'passed' ? '✅' : '❌'}\n`;
-            if (unitTotal !== '0') {
-              testSection += `- Total: ${unitTotal} tests\n`;
-              testSection += `- ✅ Passed: ${unitPassed}\n`;
-              if (unitFailed !== '0') {
-                testSection += `- ❌ Failed: ${unitFailed}\n`;
-              }
+            testSection += `- Total: ${unitTotal} tests\n`;
+            testSection += `- ✅ Passed: ${unitPassed}\n`;
+            testSection += `- ❌ Failed: ${unitFailed}\n`;
+            if (unitSkipped !== '0') {
+              testSection += `- ⏭️ Skipped: ${unitSkipped}\n`;
             }
             
             // Integration Test Results
             testSection += `\n**Integration Tests:** ${integrationStatus === 'passed' ? '✅' : '❌'}\n`;
-            if (integrationTotal !== '0') {
-              testSection += `- Total: ${integrationTotal} tests\n`;
-              testSection += `- ✅ Passed: ${integrationPassed}\n`;
-              if (integrationFailed !== '0') {
-                testSection += `- ❌ Failed: ${integrationFailed}\n`;
-              }
+            testSection += `- Total: ${integrationTotal} tests\n`;
+            testSection += `- ✅ Passed: ${integrationPassed}\n`;
+            testSection += `- ❌ Failed: ${integrationFailed}\n`;
+            if (integrationSkipped !== '0') {
+              testSection += `- ⏭️ Skipped: ${integrationSkipped}\n`;
             }
             
             // Bundle analysis

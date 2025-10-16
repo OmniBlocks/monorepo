@@ -15,14 +15,24 @@ permissions:
 jobs:
   mega-test:
     if: >-
-      (github.event_name == 'pull_request') ||
-      (github.event_name == 'issue_comment' && github.event.issue.pull_request && contains(github.event.comment.body, '/test pr'))
+      (github.actor != 'dependabot[bot]') &&
+      ((github.event_name == 'pull_request') ||
+      (github.event_name == 'issue_comment' && github.event.issue.pull_request && contains(github.event.comment.body, '/test pr')))
     runs-on: ubuntu-latest
 
     steps:
       - name: Record start time
         id: start_time
         run: echo "timestamp=$(date +%s)" >> $GITHUB_OUTPUT
+
+      - name: Sanitize actor name
+        id: sanitize_actor
+        run: |
+          ACTOR="${{ github.actor }}"
+          # Remove [bot] suffix from actor name for file paths and URLs
+          SANITIZED_ACTOR="${ACTOR%\[bot\]}"
+          echo "sanitized_actor=$SANITIZED_ACTOR" >> $GITHUB_OUTPUT
+          echo "Sanitized actor: $ACTOR -> $SANITIZED_ACTOR"
 
       - name: Get PR details
         id: pr
@@ -720,8 +730,8 @@ jobs:
 
       - name: Prepare per-PR directory
         run: |
-          mkdir -p ./public/${{ github.actor }}/${{ fromJSON(steps.pr.outputs.result).number }}
-          cp -r ./build/* ./public/${{ github.actor }}/${{ fromJSON(steps.pr.outputs.result).number }}/
+          mkdir -p ./public/${{ steps.sanitize_actor.outputs.sanitized_actor }}/${{ fromJSON(steps.pr.outputs.result).number }}
+          cp -r ./build/* ./public/${{ steps.sanitize_actor.outputs.sanitized_actor }}/${{ fromJSON(steps.pr.outputs.result).number }}/
           touch ./public/.nojekyll
 
       - name: Checkout gh-pages branch
@@ -744,8 +754,8 @@ jobs:
 
       - name: Sync files to gh-pages
         run: |
-          mkdir -p gh-pages/${{ github.actor }}/${{ fromJSON(steps.pr.outputs.result).number }}
-          cp -r public/${{ github.actor }}/${{ fromJSON(steps.pr.outputs.result).number }}/* gh-pages/${{ github.actor }}/${{ fromJSON(steps.pr.outputs.result).number }}/
+          mkdir -p gh-pages/${{ steps.sanitize_actor.outputs.sanitized_actor }}/${{ fromJSON(steps.pr.outputs.result).number }}
+          cp -r public/${{ steps.sanitize_actor.outputs.sanitized_actor }}/${{ fromJSON(steps.pr.outputs.result).number }}/* gh-pages/${{ steps.sanitize_actor.outputs.sanitized_actor }}/${{ fromJSON(steps.pr.outputs.result).number }}/
           cp public/.nojekyll gh-pages/ || true
 
       - name: Commit and push to gh-pages
@@ -755,7 +765,7 @@ jobs:
           git config user.email 'github-actions[bot]@users.noreply.github.com'
           git add .
           if [ -n "$(git status --porcelain)" ]; then
-            git commit -m "Deploy PR ${{ fromJSON(steps.pr.outputs.result).number }} by ${{ github.actor }}"
+            git commit -m "Deploy PR ${{ fromJSON(steps.pr.outputs.result).number }} by ${{ steps.sanitize_actor.outputs.sanitized_actor }}"
             git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
             git push origin gh-pages
           else
@@ -788,8 +798,9 @@ jobs:
               ? context.payload.comment.user.login
               : context.payload.pull_request.user.login;
             const duration = '${{ steps.duration.outputs.duration }}';
+            const sanitizedActor = '${{ steps.sanitize_actor.outputs.sanitized_actor }}';
             const baseUrl = `https://${context.repo.owner}.github.io/${context.repo.repo}`;
-            const pageUrl = `${baseUrl}/${context.actor}/${prNumber}/`;
+            const pageUrl = `${baseUrl}/${sanitizedActor}/${prNumber}/`;
             
             // Test Results
             const lintStatus = '${{ steps.lint.outputs.lint_status }}';

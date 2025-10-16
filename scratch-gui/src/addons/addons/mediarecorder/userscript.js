@@ -3,6 +3,7 @@ import recordIcon from "./record.svg";
 
 export default async ({ addon, console, msg }) => {
   let recordElem;
+  let recordTextSpan;
   let isRecording = false;
   let isWaitingForFlag = false;
   let waitingForFlagFunc = null;
@@ -281,7 +282,7 @@ const loadFFmpeg = async () => {
     
     const disposeRecorder = () => {
       isRecording = false;
-      recordElem.textContent = msg("record");
+      recordTextSpan.textContent = msg("record");
       recordElem.title = "";
       recorder = null;
       recordBuffer = [];
@@ -404,7 +405,7 @@ const convertWebmToMp4 = async (webmBlob) => {
           // Convert to MP4 if requested and not native
           if (selectedFormat === "mp4" && !recorder.mimeType.includes("mp4")) {
             try {
-              recordElem.textContent = msg("converting");
+              recordTextSpan.textContent = msg("converting");
               blob = await convertWebmToMp4(blob);
               finalExtension = "mp4";
             } catch (e) {
@@ -442,10 +443,8 @@ const convertWebmToMp4 = async (webmBlob) => {
       }
       if (opts.waitUntilFlag) {
         isWaitingForFlag = true;
-        Object.assign(recordElem, {
-          textContent: msg("click-flag"),
-          title: msg("click-flag-description"),
-        });
+        recordTextSpan.textContent = msg("click-flag");
+        recordElem.title = msg("click-flag-description");
         abortController = new AbortController();
         try {
           await Promise.race([
@@ -521,12 +520,12 @@ if (selectedFormat === "mp4") {
       const delay = opts.delay || 0;
       const roundedDelay = Math.floor(delay);
       for (let index = 0; index < roundedDelay; index++) {
-        recordElem.textContent = msg("starting-in", { secs: roundedDelay - index });
+        recordTextSpan.textContent = msg("starting-in", { secs: roundedDelay - index });
         await new Promise((resolve) => setTimeout(resolve, 975));
       }
       setTimeout(
         () => {
-          recordElem.textContent = msg("stop");
+          recordTextSpan.textContent = msg("stop");
           recorder.start(1000);
         },
         (delay - roundedDelay) * 1000
@@ -542,10 +541,10 @@ if (selectedFormat === "mp4") {
         className: "sa-record-icon",
       });
       recordElem.appendChild(icon);
-      const text = Object.assign(document.createElement("span"), {
+      recordTextSpan = Object.assign(document.createElement("span"), {
         textContent: msg("record"),
       });
-      recordElem.appendChild(text);
+      recordElem.appendChild(recordTextSpan);
       recordElem.addEventListener("click", async () => {
         if (isRecording) {
           // Get selected format from options if available

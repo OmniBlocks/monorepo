@@ -291,8 +291,8 @@ class ExtensionManager {
 
         this.loadingAsyncExtensions++;
 
-        const sandboxMode = await this.securityManager.getSandboxMode(normalURL);
-        const rewritten = await this.securityManager.rewriteExtensionURL(normalURL);
+        const sandboxMode = await this.securityManager.getSandboxMode(extensionURL);
+        const rewritten = await this.securityManager.rewriteExtensionURL(extensionURL);
         const blob = (await fetch(rewritten).then(req => req.blob()))
         const blobUrl = URL.createObjectURL(blob)
         const newHash = await new Promise(resolve => {
@@ -316,7 +316,7 @@ class ExtensionManager {
                 .catch(error => this._failedLoadingExtensionScript(error));
             const fakeWorkerId = this.nextExtensionWorker++;
             const returnedIDs = [];
-            this.workerURLs[fakeWorkerId] = normalURL;
+            this.workerURLs[fakeWorkerId] = extensionURL;
 
             for (const extensionObject of extensionObjects) {
                 const extensionInfo = extensionObject.getInfo();

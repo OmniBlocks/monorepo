@@ -5,15 +5,37 @@
 ![GitHub last commit](https://img.shields.io/github/last-commit/OmniBlocks/scratch-gui)
 ![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
 ![GitHub contributors](https://img.shields.io/github/contributors/OmniBlocks/scratch-gui)
+![GitHub package.json version](https://img.shields.io/github/package-json/v/OmniBlocks/scratch-gui)
+![GitHub repo size](https://img.shields.io/github/repo-size/OmniBlocks/scratch-gui)
+![GitHub commit activity](https://img.shields.io/github/commit-activity/m/OmniBlocks/scratch-gui)
+![GitHub pull requests](https://img.shields.io/github/issues-pr/OmniBlocks/scratch-gui)
+![Made with React](https://img.shields.io/badge/Made%20with-React-61DAFB?logo=react)
+![Powered by Webpack](https://img.shields.io/badge/Powered%20by-Webpack-8DD6F9?logo=webpack)
+![GitHub Repo stars](https://img.shields.io/github/stars/OmniBlocks/scratch-gui?style=flat)
+![GitHub forks](https://img.shields.io/github/forks/OmniBlocks/scratch-gui?style=flat)
+![Website](https://img.shields.io/website?down_message=offline&up_message=online&url=https%3A%2F%2Fomniblocks.github.io)
+![GitHub language count](https://img.shields.io/github/languages/count/OmniBlocks/scratch-gui)
+![GitHub top language](https://img.shields.io/github/languages/top/OmniBlocks/scratch-gui)
+![GitHub Created At](https://img.shields.io/github/created-at/OmniBlocks/scratch-gui)
+![GitHub Release Date](https://img.shields.io/github/release-date-pre/OmniBlocks/scratch-gui)
+![GitHub Sponsors](https://img.shields.io/github/sponsors/OmniBlocks?logo=githubsponsors)
+![CodeRabbit Pull Request Reviews](https://img.shields.io/coderabbit/prs/github/OmniBlocks/scratch-gui)
+![GitHub number of milestones](https://img.shields.io/github/milestones/closed/OmniBlocks/scratch-gui)
+![GitHub License](https://img.shields.io/github/license/OmniBlocks/scratch-gui)
+![GitHub followers](https://img.shields.io/github/followers/OmniBlocks?style=flat&logo=github)
 [![Star History Chart](https://api.star-history.com/svg?repos=OmniBlocks/scratch-gui&type=Date)](https://www.star-history.com/#OmniBlocks/scratch-gui&Date)
 
 > A fork of the Scratch 3.0 GUI, modified and enhanced for the [TurboWarp](https://turbowarp.org/) compiler and the [OmniBlocks](https://omniblocks.github.io) multi-language IDE.
 
 This repository contains the frontend interface of the Block-Based editor for OmniBlocks and TurboWarp. It builds upon Scratch's foundation with significant performance improvements, addons, themes, and other features for an amazing coding experience.
+
 ## 📑 Table of Contents
 - [🎮 Try It Out](#-try-it-out)
 - [✨ Features & Enhancements](#-features--enhancements)
 - [🚀 Quick Start](#-quick-start)
+  - [Prerequisites](#prerequisites)
+  - [Dependencies](#dependencies)
+  - [Installation & Running](#installation--running)
 - [🏗️ Project Architecture & Development Guide](#%EF%B8%8F-project-architecture--development-guide)
   - [Data Flow & Structure](#data-flow--structure)
   - [Key Workflows](#key-workflows)
@@ -27,6 +49,12 @@ This repository contains the frontend interface of the Block-Based editor for Om
   - [Features & Development](#features--development)
   - [Technical Questions](#technical-questions)
   - [Contributions](#contributions)
+- [Roadmap](#roadmap)
+  - [Current Focus](#current-focus)
+  - [Short-term Goals (Next 3-6 months)](#short-term-goals-next-3-6-months)
+  - [Long-term Vision](#long-term-vision)
+  - [Completed ✅](#completed-)
+- [Feature Comparison](#feature-comparison)
 
 ## 🎮 Try It Out
 Experience OmniBlocks live: [https://omniblocks.github.io](https://omniblocks.github.io)
@@ -69,6 +97,32 @@ Scratch is broken up into a bunch of different packages, each implementing one p
 * scratch-storage is an abstraction around fetch() used for downloading (and theoretically uploading) files. It is the reason why you can add files to your workspace and they work without being uploaded to any cloud storage.
 * scratch-l10n contains translations and localizations. This provides accessibility to people who speak other languages but want to use OmniBlocks.
 * caffeine- wait- wha? how did this one get here?
+
+Here's a diagram to help you understand how these are connected:
+
+```mermaid
+graph TD
+    A["scratch-gui<br/>Main Editor Interface"] --> B["scratch-vm<br/>Virtual Machine"]
+    A --> C["scratch-render<br/>WebGL Renderer"]
+    A --> D["scratch-paint<br/>Vector Editor"]
+    A --> E["scratch-blocks<br/>Block Editor"]
+    A --> F["scratch-audio<br/>Audio Engine"]
+    B --> G["scratch-storage<br/>Asset Manager"]
+    C --> H["scratch-svg-renderer<br/>SVG Processor"]
+    B --> I["scratch-parser<br/>Project Parser"]
+    B --> J["scratch-translate<br/>i18n System"]
+    
+    style A fill:#4C97FF,color:#fff
+    style B fill:#FF6680,color:#fff
+    style C fill:#FFAB19,color:#fff
+    style D fill:#0FBD8C,color:#fff
+    style E fill:#CF63CF,color:#fff
+    style F fill:#9966FF,color:#fff
+    style G fill:#FF6680,color:#fff
+    style H fill:#FFAB19,color:#fff
+    style I fill:#FF6680,color:#fff
+    style J fill:#FF6680,color:#fff
+```
 
 
 
@@ -123,6 +177,15 @@ This section is for developers looking to understand, modify, or contribute to t
 - **Extensions:** `src/lib/libraries/extensions/`
 - **Translations:** `src/lib/tw-translations/`
 - **Static Assets:**  `static/`.
+
+### Component Documentation
+For detailed information about specific components and development tools:
+
+- **[Extension Development](src/examples/README.md)** - Create custom extensions and blocks
+- **[Development Playground](src/playground/README.md)** - Testing and debugging environment  
+- **[Music Player](static/player/README.md)** - BeepBox-based music creation tool
+- **[Testing Infrastructure](test/README.md)** - Comprehensive testing suite and guidelines
+- **[Addon System](src/addons/README.md)** - Addon management and development
 
 
 ## 📜 Licensing
@@ -262,8 +325,63 @@ Most of the maintainers and contributors have our own personal Scratch Account t
 @gvyt: [GvYoutube](https://scratch.mit.edu/users/GvYoutube/)
 @NotTheBaton: [TheBaton](https://scratch.mit.edu/users/TheBaton/)
 
+## Roadmap
+
+### Current Focus
+- [ ] Complete music editor integration
+- [ ] Python editor improvements
+- [ ] C/C++ editor enhancements
+- [ ] JavaScript Extension
+
+### Short-term Goals (Next 3-6 months)
+- [ ] Additional theme options
+- [ ] More addon integrations
+- [ ] Enhanced mobile experience
+- [ ] Improved documentation
+- [ ] Tutorial system for new users
+- [ ] Project templates library
+
+### Long-term Vision
+- [ ] Full Python/C++ IDE integration
+- [ ] Plugin system for community extensions
+- [ ] Advanced debugging tools
+- [ ] Mobile app version
+
+### Completed ✅
+- [x] TurboWarp compiler integration
+- [x] Basic addon support
+- [x] Custom splash screen
 
 
+Have ideas for the roadmap? [Open a discussion](https://github.com/OmniBlocks/scratch-gui/discussions)!
+
+## Feature Comparison
+
+| Feature | Scratch 3.0 | TurboWarp | OmniBlocks |
+|---------|-------------|-----------|------------|
+| **Performance** |
+| Compiler | ❌ | ✅ | ✅ |
+| 60 FPS Mode | ❌ | ✅ | ✅ |
+| Interpolation | ❌ | ✅ | ✅ |
+| **Customization** |
+| Custom Themes | ❌ | ⚠️ Limited | ✅ Multiple Built-in |
+| Addon Support | ❌ | ✅ | ✅ |
+| Custom Splash | ❌ | ✅ | ✅ Unique |
+| **Editors** |
+| Block Editor | ✅ | ✅ | ✅ |
+| Text Code Viewer | ❌ | ⚠️ Limited | ✅ |
+| Python Editor | ❌ | ❌ | ✅ In Progress |
+| C/C++ Editor | ❌ | ❌ | ✅ In Progress |
+| Music Editor | ❌ | ❌ | ✅ Planned |
+| **Development** |
+| Open Source | ✅ | ✅ | ✅ |
+| Active Development | ✅ | ✅ | ✅ |
+| Community Driven | ✅ | ✅ | ✅ |
+
+**Legend:**
+- ✅ Fully Supported
+- ⚠️ Partially Supported  
+- ❌ Not Available
 
 ---
 

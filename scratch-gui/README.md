@@ -178,6 +178,15 @@ This section is for developers looking to understand, modify, or contribute to t
 - **Translations:** `src/lib/tw-translations/`
 - **Static Assets:**  `static/`.
 
+### Component Documentation
+For detailed information about specific components and development tools:
+
+- **[Extension Development](src/examples/README.md)** - Create custom extensions and blocks
+- **[Development Playground](src/playground/README.md)** - Testing and debugging environment  
+- **[Music Player](static/player/README.md)** - BeepBox-based music creation tool
+- **[Testing Infrastructure](test/README.md)** - Comprehensive testing suite and guidelines
+- **[Addon System](src/addons/README.md)** - Addon management and development
+
 
 ## 📜 Licensing
 

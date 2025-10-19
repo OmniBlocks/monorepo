@@ -143,6 +143,8 @@ class Blocks extends React.Component {
         this.ScratchBlocks.FieldColourSlider.activateEyedropper_ = this.props.onActivateColorPicker;
         this.ScratchBlocks.Procedures.externalProcedureDefCallback = this.props.onActivateCustomProcedures;
         this.ScratchBlocks.ScratchMsgs.setLocale(this.props.locale);
+          if (window.ScratchBlocks && window.Blockly && !window.ScratchBlocks.FieldCustom && window.Blockly.FieldCustom) {
+    window.ScratchBlocks.FieldCustom = window.Blockly.FieldCustom;
 
         const Msg = this.ScratchBlocks.Msg;
         Msg.PROCEDURES_RETURN = this.props.intl.formatMessage(messages.PROCEDURES_RETURN, {

@@ -116,7 +116,7 @@ MyExtension.prototype.checkCondition = function () {
 
 Extensions are actually loaded by scratch-vm, not scratch-gui. To add your extension:
 
-1. Fork the [scratch-vm repository](https://github.com/TurboWarp/scratch-vm)
+1. Fork the [scratch-vm repository](https://github.com/OmniBlocks/scratch-vm)
 2. Add your extension to `src/extensions/`
 3. Register it in the extension manager
 4. Link your forked scratch-vm to this project

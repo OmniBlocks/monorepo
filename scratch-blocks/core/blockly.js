@@ -64,6 +64,7 @@ goog.require('Blockly.constants');
 goog.require('Blockly.inject');
 goog.require('Blockly.utils');
 goog.require('goog.color');
+goog.require('Blockly.FieldCustom');
 
 
 // Turn off debugging when compiled.

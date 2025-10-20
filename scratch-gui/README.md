@@ -389,7 +389,7 @@ Have ideas for the roadmap? [Open a discussion](https://github.com/OmniBlocks/sc
 
 **Made a mod or a cool project?** We would love to see what people are creating! If you made your own mod of OmniBlocks or made a cool project in it, show it off in [the Discussion tab!](https://github.com/orgs/OmniBlocks/discussions)
 
-
+<!-- thisi is not a six seeven joke !-->
 ---
 
 **Note:** This is a fork designed specifically for OmniBlocks. If you want to make your own Scratch or TurboWarp mod, please refer to the [upstream scratch-gui repository](https://github.com/LLK/scratch-gui) or the [turbowarp scratch-gui repository](https://github.com/TurboWarp/scratch-gui) instead.

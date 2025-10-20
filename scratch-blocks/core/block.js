@@ -47,6 +47,7 @@ goog.require('goog.array');
 goog.require('goog.asserts');
 goog.require('goog.math.Coordinate');
 goog.require('goog.string');
+goog.require('Blockly.FieldCustom');
 
 
 /**

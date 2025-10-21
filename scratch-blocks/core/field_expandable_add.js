@@ -27,7 +27,7 @@
 goog.provide('Blockly.FieldExpandableAdd');
 
 goog.require('Blockly.Field');
-
+goog.require('Blockly.utils');
 
 /**
  * Class for a button field.

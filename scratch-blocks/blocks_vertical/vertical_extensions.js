@@ -56,6 +56,7 @@ return function() {
   this.setColourFromRawValues_(colours.primary, colours.secondary,
       colours.tertiary, colours.quaternary);
 };
+};
 /**
  * Extension to set the colours of a text field, which are all the same.
  */

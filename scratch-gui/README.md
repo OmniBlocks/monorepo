@@ -66,6 +66,7 @@ Experience OmniBlocks live: [https://omniblocks.github.io](https://omniblocks.gi
 *   **Themes:** Multiple color themes (Aqua, Blue, Rainbow, Red, Purple) to personalize your editor. The Aqua theme is the default, as it is the main brand color of OmniBlocks.
 *   **OmniBlocks IDE:** OmniBlocks plans to be a full-featured IDE extending beyond blocks. There will be editors for text languages like Python and C in the future!
 *   **Integrated Tools:** Includes a custom music editor and other quality-of-life improvements. Keep in mind that if you're seeing this, it means the music editor is currently not fully implemented. It works, you can go try it out, but it doesn't fully integrate with OmniBlocks just yet.
+*   **Quality of Life**: As said earlier, we add a bunch of subtle, but definitely cool or useful quality-of-life additions, even if they seem niche or workaroundable. Most of these stem from mild annoyances that we ourselves have had, and don't hesitate to report yours too in the issues tab!
 
 ### A great feature inherited from TurboWarp: 
 *   **High Performance:** This is a fork of TurboWarp, meaning it uses the compiler that TurboWarp uses, making projects run way faster than other projects. This isn't listed as an enhancement/feature since we didn't implement it; the team at TurboWarp did, and we don't claim to have written the TurboWarp compiler that makes OmniBlocks projects run so fast. 
@@ -80,6 +81,8 @@ Want to run a local copy of the OmniBlocks editor? Follow these steps.
 *   npm (duhh)
 *   Git
 If you're using a GitHub Codespace, all these things come preinstalled.
+**Note about GitHub Codespaces: to create a GitHub codespace, make sure you are on the repo you want to code in, such as your fork of OmniBlocks. When you are there, click the big green button that says "Code". On the Codespace tab, click the button saying "Create codespace on main". Now, just wait a few minutes, and it will install everything for you. 
+<!-- wait like 6 or 7 minutes lol !-->
 ### Dependencies
 Some packages may want some additional things installed, so check the README in each package you want to develop.
 
@@ -152,6 +155,7 @@ To actually mod Scratch, you need to build the GUI, as it is the main package th
     npm run build
     ```
     Output will be in the `build/` directory. You can then use this output with a GitHub Actions workflow to push to a website or something like that.
+
 
 ## 🏗️ Project Architecture & Development Guide
 
@@ -238,7 +242,6 @@ As you may know from the earlier parts of the readme, this is all made in React 
 -  Go all out on your code! It doesn't matter if you don't use proper indentation, or other stuff like that, just make sure to add comments explaining it. After all, this is JavaScript, not Python we're talking about, so any valid syntax is valid syntax.
 -  Make sure your variables are readable. While everyone loves fun code, please make sure your variables are legible. For example, if you need a variable for a new multi-backpack feature you're planning to add (not quite sure what the feature would do, but it's just an example), we'd prefer "multibackpack" or even "backpackthing" over "qwnpvoitwegjk".
 - Absolutely NO profanity. I have seen other repos have profanity in commit messages or comments, and while it is relatable and even hilarious to see how miserably we fail at code sometimes, there is no need to use profanity. Since our project is for All Ages and open source, we assume anyone of all ages will also see the code. Some words, however, are not considered profanity, such as crap or heck. If you snoop in _OUR_ commit messages, we have some pretty hilarious frustrations in there too! Just no bad words.
-
 Other than that, Code On! We don't require much other than these rules. Have fun!
 
 
@@ -320,10 +323,13 @@ A: Totally! That's what you do in [the Discussion tab!](https://github.com/orgs/
 Q: But aren't you busy?
 A: True. I, supervoidcoder, the lead maintainer and creator of OmniBlocks, am very busy as I have to do school and other things too. But I'm not one of those people who is "onLy HeRe foR SeRiOuS sTuFF" or "iM a VeRy ImpOrtanT person With PrioRities, not your FrienD". I genuinely care about anyone that wants to reach out to me.
 Most of the maintainers and contributors have our own personal Scratch Account too. Here are some:
-@supervoidcoder: [scratchcode1_2_3](https://scratch.mit.edu/users/scratchcode1_2_3/)
-@ampelectrecuted: [AmpElectrecuted](https://scratch.mit.edu/users/AmpElectrecuted/) or [8to16](https://scratch.mit.edu/users/8to16/) (banned, unfortunately)
-@gvyt: [GvYoutube](https://scratch.mit.edu/users/GvYoutube/)
-@NotTheBaton: [TheBaton](https://scratch.mit.edu/users/TheBaton/)
+- @supervoidcoder: [scratchcode1_2_3](https://scratch.mit.edu/users/scratchcode1_2_3/)
+- @ampelectrecuted: [AmpElectrecuted](https://scratch.mit.edu/users/AmpElectrecuted/) or [8to16](https://scratch.mit.edu/users/8to16/) (banned, unfortunately)
+- @gvyt: [GvYoutube](https://scratch.mit.edu/users/GvYoutube/)
+- @NotTheBaton: [TheBaton](https://scratch.mit.edu/users/TheBaton/)
+
+**Q: I tried submitting a PR for OmniBlocks, but I got tons of lint errors.**
+A: Ignore lint. It's only there because it is from upstream, but we don't actually use it. As long as the code itself compiles and runs and is, well, functional, I could literally NOT care LESS if you're indenting with tabs, spaces, or you put 6 or 7 indents instead of 4. Just make sure your code works 😎
 
 ## Roadmap
 

@@ -103,7 +103,9 @@ Blockly.FieldExpandableRemove.prototype.getValue = function() {
 Blockly.FieldExpandableRemove.prototype.showEditor_ = function() {
   // true is add
   // false is remove
-  this.sourceBlock_.onExpandableButtonClicked_(false);
+  if (this.sourceBlock_ && typeof this.sourceBlock_.onExpandableButtonClicked_ === 'function') {
+    this.sourceBlock_.onExpandableButtonClicked_(false);
+  }
 };
 
 Blockly.Field.register('field_expandable_remove', Blockly.FieldExpandableRemove);

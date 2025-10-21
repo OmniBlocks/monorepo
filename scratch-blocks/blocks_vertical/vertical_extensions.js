@@ -47,17 +47,15 @@ Blockly.ScratchBlocks.VerticalExtensions.colourHelper = function(category) {
     colours.quaternary)) {
     throw new Error('Could not find colours for category "' + category + '"');
   }
-  /**
-   * Set the primary, secondary, tertiary, and quaternary colours on this block for
-   * the given category.
-   * @this {Blockly.Block}
-   */
-  return function() {
-    this.setColourFromRawValues_(colours.primary, colours.secondary,
-        colours.tertiary, colours.quaternary);
-  };
+/**
+ * Set the primary, secondary, tertiary, and quaternary colours on this block for
+ * the given category.
+ * @this {Blockly.Block}
+ */
+return function() {
+  this.setColourFromRawValues_(colours.primary, colours.secondary,
+      colours.tertiary, colours.quaternary);
 };
-
 /**
  * Extension to set the colours of a text field, which are all the same.
  */

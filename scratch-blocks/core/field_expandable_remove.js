@@ -27,6 +27,7 @@
 goog.provide('Blockly.FieldExpandableRemove');
 
 goog.require('Blockly.Field');
+goog.require('Blockly.utils');
 
 
 /**

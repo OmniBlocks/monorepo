@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#855CD6"/>
+    <meta name="description" content="Explore amazing music projects created with UltraBox. Get inspired and discover what's possible with our powerful music creation tool." />
+    
+    <title>Sample Projects - UltraBox</title>
+    
+    <link rel='shortcut icon' type='image/x-icon' href='./favicon.ico' />
+    <link rel="stylesheet" href="./website-styles.css" />
+    
+    <style>
+        .project-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+        
+        .project-card {
+            background: var(--ui-white);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px var(--shadow);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border: 1px solid var(--ui-tertiary);
+        }
+        
+        .project-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px var(--shadow);
+        }
+        
+        .project-header {
+            padding: 20px;
+            background: linear-gradient(135deg, var(--ui-primary), var(--ui-secondary));
+        }
+        
+        .project-title {
+            margin: 0 0 8px 0;
+            font-size: 1.3rem;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+        
+        .project-genre {
+            display: inline-block;
+            background: var(--motion-primary);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .project-content {
+            padding: 20px;
+        }
+        
+        .project-description {
+            color: var(--text-primary);
+            opacity: 0.8;
+            margin: 0 0 20px 0;
+            line-height: 1.5;
+        }
+        
+        .project-features {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 20px 0;
+        }
+        
+        .project-features li {
+            padding: 4px 0;
+            color: var(--text-primary);
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+        
+        .project-features li:before {
+            content: "✓ ";
+            color: var(--extensions-primary);
+            font-weight: bold;
+        }
+        
+        .project-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 0.9rem;
+        }
+        
+        .category-filter {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 40px 0;
+            flex-wrap: wrap;
+        }
+        
+        .filter-btn {
+            padding: 8px 20px;
+            border: 2px solid var(--ui-tertiary);
+            background: transparent;
+            color: var(--text-primary);
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: var(--motion-primary);
+            color: white;
+            border-color: var(--motion-primary);
+        }
+    </style>
+</head>
+<body>
+    <!-- Menu Bar -->
+    <nav class="menu-bar">
+        <div class="menu-bar-content">
+            <a href="./index.html" class="menu-bar-logo">
+                🎵 UltraBox
+            </a>
+            <div class="menu-bar-nav">
+                <a href="./index.html">Home</a>
+                <a href="./projects.html" class="active">Projects</a>
+                <a href="./credits.html">Credits</a>
+                <a href="./songeditor.html" class="btn btn-primary">Create Music</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Header -->
+        <section class="text-center mb-4">
+            <h1>Sample Projects</h1>
+            <p>Discover the incredible range of music you can create with UltraBox. From chiptune classics to modern electronic beats, explore these community creations and get inspired for your own musical journey.</p>
+        </section>
+
+        <!-- Category Filter -->
+        <div class="category-filter">
+            <button class="filter-btn active" data-category="all">All Projects</button>
+            <button class="filter-btn" data-category="chiptune">Chiptune</button>
+            <button class="filter-btn" data-category="electronic">Electronic</button>
+            <button class="filter-btn" data-category="ambient">Ambient</button>
+            <button class="filter-btn" data-category="game">Game Music</button>
+            <button class="filter-btn" data-category="experimental">Experimental</button>
+        </div>
+
+        <!-- Projects Grid -->
+        <div class="project-grid">
+            <!-- Chiptune Projects -->
+            <div class="project-card" data-category="chiptune">
+                <div class="project-header">
+                    <h3 class="project-title">Pixel Adventure</h3>
+                    <span class="project-genre">Chiptune</span>
+                </div>
+                <div class="project-content">
+                    <p class="project-description">A classic 8-bit style adventure theme reminiscent of retro platformer games. Features catchy melodies and driving rhythms.</p>
+                    <ul class="project-features">
+                        <li>Classic square wave leads</li>
+                        <li>Punchy drum patterns</li>
+                        <li>Nostalgic chord progressions</li>
+                    </ul>
+                    <div class="project-actions">
+                        <a href="./songeditor.html" class="btn btn-primary btn-small">Play & Edit</a>
+                        <a href="#" class="btn btn-outline btn-small">Download</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="project-card" data-category="electronic">
+                <div class="project-header">
+                    <h3 class="project-title">Neon Nights</h3>
+                    <span class="project-genre">Electronic</span>
+                </div>
+                <div class="project-content">
+                    <p class="project-description">A synthwave-inspired track with lush pads, arpeggiated sequences, and a driving beat that captures the essence of 80s futurism.</p>
+                    <ul class="project-features">
+                        <li>Rich synthesizer textures</li>
+                        <li>Complex arpeggios</li>
+                        <li>Atmospheric reverb effects</li>
+                    </ul>
+                    <div class="project-actions">
+                        <a href="./songeditor.html" class="btn btn-primary btn-small">Play & Edit</a>
+                        <a href="#" class="btn btn-outline btn-small">Download</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="project-card" data-category="ambient">
+                <div class="project-header">
+                    <h3 class="project-title">Cosmic Drift</h3>
+                    <span class="project-genre">Ambient</span>
+                </div>
+                <div class="project-content">
+                    <p class="project-description">An ethereal soundscape that evokes the vastness of space. Slow-evolving textures and gentle melodies create a meditative atmosphere.</p>
+                    <ul class="project-features">
+                        <li>Evolving pad sounds</li>
+                        <li>Subtle melodic elements</li>
+                        <li>Spacious reverb and delay</li>
+                    </ul>
+                    <div class="project-actions">
+                        <a href="./songeditor.html" class="btn btn-primary btn-small">Play & Edit</a>
+                        <a href="#" class="btn btn-outline btn-small">Download</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="project-card" data-category="game">
+                <div class="project-header">
+                    <h3 class="project-title">Boss Battle</h3>
+                    <span class="project-genre">Game Music</span>
+                </div>
+                <div class="project-content">
+                    <p class="project-description">An intense, high-energy track perfect for epic boss encounters. Features dramatic orchestral elements and driving percussion.</p>
+                    <ul class="project-features">
+                        <li>Dramatic orchestral sounds</li>
+                        <li>Intense percussion</li>
+                        <li>Dynamic arrangement</li>
+                    </ul>
+                    <div class="project-actions">
+                        <a href="./songeditor.html" class="btn btn-primary btn-small">Play & Edit</a>
+                        <a href="#" class="btn btn-outline btn-small">Download</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="project-card" data-category="chiptune">
+                <div class="project-header">
+                    <h3 class="project-title">Retro Racer</h3>
+                    <span class="project-genre">Chiptune</span>
+                </div>
+                <div class="project-content">
+                    <p class="project-description">High-octane racing music with fast arpeggios and energetic beats. Perfect for arcade-style racing games.</p>
+                    <ul class="project-features">
+                        <li>Fast-paced arpeggios</li>
+                        <li>Energetic drum loops</li>
+                        <li>Catchy bass lines</li>
+                    </ul>
+                    <div class="project-actions">
+                        <a href="./songeditor.html" class="btn btn-primary btn-small">Play & Edit</a>
+                        <a href="#" class="btn btn-outline btn-small">Download</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="project-card" data-category="experimental">
+                <div class="project-header">
+                    <h3 class="project-title">Glitch Matrix</h3>
+                    <span class="project-genre">Experimental</span>
+                </div>
+                <div class="project-content">
+                    <p class="project-description">A cutting-edge exploration of digital sound manipulation featuring complex rhythms, glitch effects, and unconventional structures.</p>
+                    <ul class="project-features">
+                        <li>Complex polyrhythms</li>
+                        <li>Digital glitch effects</li>
+                        <li>Unconventional song structure</li>
+                    </ul>
+                    <div class="project-actions">
+                        <a href="./songeditor.html" class="btn btn-primary btn-small">Play & Edit</a>
+                        <a href="#" class="btn btn-outline btn-small">Download</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Call to Action -->
+        <section class="text-center mt-4">
+            <h2>Create Your Own Masterpiece</h2>
+            <p class="mb-4">Inspired by these projects? Start creating your own music with UltraBox's powerful tools and extensive sound library.</p>
+            <a href="./songeditor.html" class="btn btn-primary">Start Creating</a>
+            <a href="./index.html" class="btn btn-secondary">Learn More</a>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <p>
+                UltraBox is a community-driven project built on top of <a href="https://beepbox.co/">BeepBox</a> by John Nesky.
+                <br>
+                <a href="./credits.html">View full credits</a> | 
+                <a href="./privacy.html">Privacy Policy</a> | 
+                <a href="https://github.com/ultraabox/ultraabox.github.io">Source Code</a>
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Handle category filtering
+        document.addEventListener('DOMContentLoaded', function() {
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            const projectCards = document.querySelectorAll('.project-card');
+            
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const category = this.getAttribute('data-category');
+                    
+                    // Update active filter button
+                    filterBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Filter project cards
+                    projectCards.forEach(card => {
+                        if (category === 'all' || card.getAttribute('data-category') === category) {
+                            card.style.display = 'block';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+                });
+            });
+            
+            // Handle active menu state
+            const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+            const menuLinks = document.querySelectorAll('.menu-bar-nav a:not(.btn)');
+            
+            menuLinks.forEach(link => {
+                const href = link.getAttribute('href').replace('./', '');
+                if (href === currentPage) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -69,7 +69,7 @@ jobs:
         run: |
           ACTOR="${{ github.actor }}"
           # Remove [bot] suffix from actor name for file paths and URLs
-          SANITIZED_ACTOR="${ACTOR%$$bot$$}"
+          SANITIZED_ACTOR="${ACTOR%\[bot\]}"
           echo "sanitized_actor=$SANITIZED_ACTOR" >> $GITHUB_OUTPUT
           echo "Sanitized actor: $ACTOR -> $SANITIZED_ACTOR"
 

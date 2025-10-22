@@ -69,7 +69,7 @@ jobs:
         run: |
           ACTOR="${{ github.actor }}"
           # Remove [bot] suffix from actor name for file paths and URLs
-          SANITIZED_ACTOR="${ACTOR%\[bot\]}"
+          SANITIZED_ACTOR="${ACTOR%$$bot$$}"
           echo "sanitized_actor=$SANITIZED_ACTOR" >> $GITHUB_OUTPUT
           echo "Sanitized actor: $ACTOR -> $SANITIZED_ACTOR"
 
@@ -131,6 +131,8 @@ jobs:
                     `${checklist_spinner} Checkout & Setup\n` +
                     `⬜ Installing dependencies\n` +
                     `⬜ Building project\n\n` +
+                    `🚀 **Deployment Phase:**\n` +
+                    `⬜ Deploying to test environment\n\n` +
                     `🧪 **Testing Phase:**\n` +
                     `⬜ Running linter (ESLint)\n` +
                     `⬜ Running unit tests\n` +
@@ -138,9 +140,7 @@ jobs:
                     `🔍 **Analysis Phase:**\n` +
                     `⬜ Performance audit (Lighthouse)\n` +
                     `⬜ Bundle size analysis\n` +
-                    `⬜ Accessibility testing\n\n` +
-                    `🚀 **Deployment Phase:**\n` +
-                    `⬜ Deploying to test environment`
+                    `⬜ Accessibility testing`
             });
             return comment.data.id;
 
@@ -178,6 +178,8 @@ jobs:
                     `✅ Checkout & Setup\n` +
                     `${checklist_spinner} Installing dependencies\n` +
                     `⬜ Building project\n\n` +
+                    `🚀 **Deployment Phase:**\n` +
+                    `⬜ Deploying to test environment\n\n` +
                     `🧪 **Testing Phase:**\n` +
                     `⬜ Running linter (ESLint)\n` +
                     `⬜ Running unit tests\n` +
@@ -185,9 +187,7 @@ jobs:
                     `🔍 **Analysis Phase:**\n` +
                     `⬜ Performance audit (Lighthouse)\n` +
                     `⬜ Bundle size analysis\n` +
-                    `⬜ Accessibility testing\n\n` +
-                    `🚀 **Deployment Phase:**\n` +
-                    `⬜ Deploying to test environment`
+                    `⬜ Accessibility testing`
             });
 
       - name: Install dependencies
@@ -211,6 +211,8 @@ jobs:
                     `✅ Checkout & Setup\n` +
                     `✅ Installing dependencies\n` +
                     `${checklist_spinner} Building project\n\n` +
+                    `🚀 **Deployment Phase:**\n` +
+                    `⬜ Deploying to test environment\n\n` +
                     `🧪 **Testing Phase:**\n` +
                     `⬜ Running linter (ESLint)\n` +
                     `⬜ Running unit tests\n` +
@@ -218,9 +220,7 @@ jobs:
                     `🔍 **Analysis Phase:**\n` +
                     `⬜ Performance audit (Lighthouse)\n` +
                     `⬜ Bundle size analysis\n` +
-                    `⬜ Accessibility testing\n\n` +
-                    `🚀 **Deployment Phase:**\n` +
-                    `⬜ Deploying to test environment`
+                    `⬜ Accessibility testing`
             });
 
       - name: Build website
@@ -229,10 +229,10 @@ jobs:
           NODE_ENV: production
 
       # ============================================================
-      # TESTING PHASE
+      # DEPLOYMENT PHASE (MOVED UP BEFORE TESTS)
       # ============================================================
 
-      - name: Update comment - Running Linter
+      - name: Update comment - Deploying
         uses: actions/github-script@v7
         with:
           script: |
@@ -250,6 +250,82 @@ jobs:
                     `✅ Checkout & Setup\n` +
                     `✅ Installing dependencies\n` +
                     `✅ Building project\n\n` +
+                    `🚀 **Deployment Phase:**\n` +
+                    `${checklist_spinner} Deploying to test environment\n\n` +
+                    `🧪 **Testing Phase:**\n` +
+                    `⬜ Running linter (ESLint)\n` +
+                    `⬜ Running unit tests\n` +
+                    `⬜ Running integration tests\n\n` +
+                    `🔍 **Analysis Phase:**\n` +
+                    `⬜ Performance audit (Lighthouse)\n` +
+                    `⬜ Bundle size analysis\n` +
+                    `⬜ Accessibility testing`
+            });
+
+      - name: Prepare per-PR directory
+        run: |
+          mkdir -p ./public/${{ steps.sanitize_actor.outputs.sanitized_actor }}/${{ fromJSON(steps.pr.outputs.result).number }}
+          cp -r ./build/* ./public/${{ steps.sanitize_actor.outputs.sanitized_actor }}/${{ fromJSON(steps.pr.outputs.result).number }}/
+          touch ./public/.nojekyll
+
+      - name: Checkout gh-pages branch
+        id: checkout_gh_pages
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: gh-pages
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+        continue-on-error: true
+
+      - name: Create gh-pages branch if not exists
+        if: steps.checkout_gh_pages.outcome == 'failure'
+        run: |
+          mkdir -p gh-pages
+          cd gh-pages
+          git init -b gh-pages
+          git remote add origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+
+      - name: Sync files to gh-pages
+        run: |
+          mkdir -p gh-pages/${{ steps.sanitize_actor.outputs.sanitized_actor }}/${{ fromJSON(steps.pr.outputs.result).number }}
+          cp -r public/${{ steps.sanitize_actor.outputs.sanitized_actor }}/${{ fromJSON(steps.pr.outputs.result).number }}/* gh-pages/${{ steps.sanitize_actor.outputs.sanitized_actor }}/${{ fromJSON(steps.pr.outputs.result).number }}/
+          cp public/.nojekyll gh-pages/ || true
+
+      - name: Commit and push to gh-pages
+        run: |
+          cd gh-pages
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add .
+          if [ -n "$(git status --porcelain)" ]; then
+            git commit -m "Deploy PR ${{ fromJSON(steps.pr.outputs.result).number }} by ${{ steps.sanitize_actor.outputs.sanitized_actor }}"
+            git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+            git push origin gh-pages
+          else
+            echo "No changes to commit."
+          fi
+
+      - name: Update comment - Deployment Done
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const initial_spinner = '<img src="https://lh5.googleusercontent.com/proxy/OUqG0HgVNVMNorlPCmI4VgJa-3h7uHLkkMy9vdJ0eRsQlvJBytFUS-HvuW-O9EJd-c9xB7KAqlwby4Fzp59g1705FzBuP-F8dC1ZaBQtmLeCu5i6FfSd6Mmzh8mjOwgrEYZwy5UStg" width="20" height="20">';
+            const checklist_spinner = '<img src="https://github.com/user-attachments/assets/881cd049-000f-4b24-a868-9831c3ea9019" width="18" height="18">';
+            const username = context.eventName === 'issue_comment'
+              ? context.payload.comment.user.login
+              : context.payload.pull_request.user.login;
+            await github.rest.issues.updateComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: ${{ steps.mega_comment.outputs.result }},
+              body: `${initial_spinner} **MEGA PR Test & Analysis, requested by @${username}...**\n\n` +
+                    `🏗️ **Build Phase:**\n` +
+                    `✅ Checkout & Setup\n` +
+                    `✅ Installing dependencies\n` +
+                    `✅ Building project\n\n` +
+                    `🚀 **Deployment Phase:**\n` +
+                    `✅ Deploying to test environment\n\n` +
                     `🧪 **Testing Phase:**\n` +
                     `${checklist_spinner} Running linter (ESLint)\n` +
                     `⬜ Running unit tests\n` +
@@ -257,10 +333,12 @@ jobs:
                     `🔍 **Analysis Phase:**\n` +
                     `⬜ Performance audit (Lighthouse)\n` +
                     `⬜ Bundle size analysis\n` +
-                    `⬜ Accessibility testing\n\n` +
-                    `🚀 **Deployment Phase:**\n` +
-                    `⬜ Deploying to test environment`
+                    `⬜ Accessibility testing`
             });
+
+      # ============================================================
+      # TESTING PHASE
+      # ============================================================
 
       - name: Run ESLint
         id: lint
@@ -300,6 +378,8 @@ jobs:
                     `✅ Checkout & Setup\n` +
                     `✅ Installing dependencies\n` +
                     `✅ Building project\n\n` +
+                    `🚀 **Deployment Phase:**\n` +
+                    `✅ Deploying to test environment\n\n` +
                     `🧪 **Testing Phase:**\n` +
                     `${lintStatus} Running linter (ESLint)\n` +
                     `${checklist_spinner} Running unit tests\n` +
@@ -307,9 +387,7 @@ jobs:
                     `🔍 **Analysis Phase:**\n` +
                     `⬜ Performance audit (Lighthouse)\n` +
                     `⬜ Bundle size analysis\n` +
-                    `⬜ Accessibility testing\n\n` +
-                    `🚀 **Deployment Phase:**\n` +
-                    `⬜ Deploying to test environment`
+                    `⬜ Accessibility testing`
             });
 
       - name: Run Unit Tests
@@ -355,6 +433,8 @@ jobs:
                     `✅ Checkout & Setup\n` +
                     `✅ Installing dependencies\n` +
                     `✅ Building project\n\n` +
+                    `🚀 **Deployment Phase:**\n` +
+                    `✅ Deploying to test environment\n\n` +
                     `🧪 **Testing Phase:**\n` +
                     `${lintStatus} Running linter (ESLint)\n` +
                     `${unitStatus} Running unit tests\n` +
@@ -362,9 +442,7 @@ jobs:
                     `🔍 **Analysis Phase:**\n` +
                     `⬜ Performance audit (Lighthouse)\n` +
                     `⬜ Bundle size analysis\n` +
-                    `⬜ Accessibility testing\n\n` +
-                    `🚀 **Deployment Phase:**\n` +
-                    `⬜ Deploying to test environment`
+                    `⬜ Accessibility testing`
             });
 
       - name: Run Integration Tests
@@ -426,6 +504,8 @@ jobs:
                     `✅ Checkout & Setup\n` +
                     `✅ Installing dependencies\n` +
                     `✅ Building project\n\n` +
+                    `🚀 **Deployment Phase:**\n` +
+                    `✅ Deploying to test environment\n\n` +
                     `🧪 **Testing Phase:**\n` +
                     `${lintStatus} Running linter (ESLint)\n` +
                     `${unitStatus} Running unit tests\n` +
@@ -433,9 +513,7 @@ jobs:
                     `🔍 **Analysis Phase:**\n` +
                     `${checklist_spinner} Performance audit (Lighthouse)\n` +
                     `⬜ Bundle size analysis\n` +
-                    `⬜ Accessibility testing\n\n` +
-                    `🚀 **Deployment Phase:**\n` +
-                    `⬜ Deploying to test environment`
+                    `⬜ Accessibility testing`
             });
 
       - name: Install Lighthouse CI
@@ -561,6 +639,8 @@ jobs:
                     `✅ Checkout & Setup\n` +
                     `✅ Installing dependencies\n` +
                     `✅ Building project\n\n` +
+                    `🚀 **Deployment Phase:**\n` +
+                    `✅ Deploying to test environment\n\n` +
                     `🧪 **Testing Phase:**\n` +
                     `${lintStatus} Running linter (ESLint)\n` +
                     `${unitStatus} Running unit tests\n` +
@@ -568,9 +648,7 @@ jobs:
                     `🔍 **Analysis Phase:**\n` +
                     `✅ Performance audit (Lighthouse)\n` +
                     `${checklist_spinner} Bundle size analysis\n` +
-                    `⬜ Accessibility testing\n\n` +
-                    `🚀 **Deployment Phase:**\n` +
-                    `⬜ Deploying to test environment`
+                    `⬜ Accessibility testing`
             });
 
       - name: Analyze bundle size
@@ -626,6 +704,8 @@ jobs:
                     `✅ Checkout & Setup\n` +
                     `✅ Installing dependencies\n` +
                     `✅ Building project\n\n` +
+                    `🚀 **Deployment Phase:**\n` +
+                    `✅ Deploying to test environment\n\n` +
                     `🧪 **Testing Phase:**\n` +
                     `${lintStatus} Running linter (ESLint)\n` +
                     `${unitStatus} Running unit tests\n` +
@@ -633,9 +713,7 @@ jobs:
                     `🔍 **Analysis Phase:**\n` +
                     `✅ Performance audit (Lighthouse)\n` +
                     `✅ Bundle size analysis\n` +
-                    `${checklist_spinner} Accessibility testing\n\n` +
-                    `🚀 **Deployment Phase:**\n` +
-                    `⬜ Deploying to test environment`
+                    `${checklist_spinner} Accessibility testing`
             });
 
       - name: Setup Chrome and ChromeDriver
@@ -729,87 +807,6 @@ jobs:
             axe-results.json
             a11y-violations.md
           if-no-files-found: warn
-
-      # ============================================================
-      # DEPLOYMENT PHASE
-      # ============================================================
-
-      - name: Update comment - Deploying
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const initial_spinner = '<img src="https://lh5.googleusercontent.com/proxy/OUqG0HgVNVMNorlPCmI4VgJa-3h7uHLkkMy9vdJ0eRsQlvJBytFUS-HvuW-O9EJd-c9xB7KAqlwby4Fzp59g1705FzBuP-F8dC1ZaBQtmLeCu5i6FfSd6Mmzh8mjOwgrEYZwy5UStg" width="20" height="20">';
-            const checklist_spinner = '<img src="https://github.com/user-attachments/assets/881cd049-000f-4b24-a868-9831c3ea9019" width="18" height="18">';
-            const username = context.eventName === 'issue_comment'
-              ? context.payload.comment.user.login
-              : context.payload.pull_request.user.login;
-            const lintStatus = '${{ steps.lint.outputs.lint_status }}' === 'passed' ? '✅' : '❌';
-            const unitStatus = '${{ steps.unit_tests.outputs.unit_status }}' === 'passed' ? '✅' : '❌';
-            const integrationStatus = '${{ steps.integration_tests.outputs.integration_status }}' === 'passed' ? '✅' : '❌';
-            await github.rest.issues.updateComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              comment_id: ${{ steps.mega_comment.outputs.result }},
-              body: `${initial_spinner} **MEGA PR Test & Analysis, requested by @${username}...**\n\n` +
-                    `🏗️ **Build Phase:**\n` +
-                    `✅ Checkout & Setup\n` +
-                    `✅ Installing dependencies\n` +
-                    `✅ Building project\n\n` +
-                    `🧪 **Testing Phase:**\n` +
-                    `${lintStatus} Running linter (ESLint)\n` +
-                    `${unitStatus} Running unit tests\n` +
-                    `${integrationStatus} Running integration tests\n\n` +
-                    `🔍 **Analysis Phase:**\n` +
-                    `✅ Performance audit (Lighthouse)\n` +
-                    `✅ Bundle size analysis\n` +
-                    `✅ Accessibility testing\n\n` +
-                    `🚀 **Deployment Phase:**\n` +
-                    `${checklist_spinner} Deploying to test environment`
-            });
-
-      - name: Prepare per-PR directory
-        run: |
-          mkdir -p ./public/${{ steps.sanitize_actor.outputs.sanitized_actor }}/${{ fromJSON(steps.pr.outputs.result).number }}
-          cp -r ./build/* ./public/${{ steps.sanitize_actor.outputs.sanitized_actor }}/${{ fromJSON(steps.pr.outputs.result).number }}/
-          touch ./public/.nojekyll
-
-      - name: Checkout gh-pages branch
-        id: checkout_gh_pages
-        uses: actions/checkout@v4
-        with:
-          ref: gh-pages
-          path: gh-pages
-          token: ${{ secrets.GITHUB_TOKEN }}
-          fetch-depth: 0
-        continue-on-error: true
-
-      - name: Create gh-pages branch if not exists
-        if: steps.checkout_gh_pages.outcome == 'failure'
-        run: |
-          mkdir -p gh-pages
-          cd gh-pages
-          git init -b gh-pages
-          git remote add origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
-
-      - name: Sync files to gh-pages
-        run: |
-          mkdir -p gh-pages/${{ steps.sanitize_actor.outputs.sanitized_actor }}/${{ fromJSON(steps.pr.outputs.result).number }}
-          cp -r public/${{ steps.sanitize_actor.outputs.sanitized_actor }}/${{ fromJSON(steps.pr.outputs.result).number }}/* gh-pages/${{ steps.sanitize_actor.outputs.sanitized_actor }}/${{ fromJSON(steps.pr.outputs.result).number }}/
-          cp public/.nojekyll gh-pages/ || true
-
-      - name: Commit and push to gh-pages
-        run: |
-          cd gh-pages
-          git config user.name 'github-actions[bot]'
-          git config user.email 'github-actions[bot]@users.noreply.github.com'
-          git add .
-          if [ -n "$(git status --porcelain)" ]; then
-            git commit -m "Deploy PR ${{ fromJSON(steps.pr.outputs.result).number }} by ${{ steps.sanitize_actor.outputs.sanitized_actor }}"
-            git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
-            git push origin gh-pages
-          else
-            echo "No changes to commit."
-          fi
 
       # ============================================================
       # FINAL RESULTS WITH DETAILED SCORES!

@@ -28,39 +28,79 @@ jobs:
           ALL_TIME_STATS=$(mktemp)
           LAST_30_DAYS_STATS=$(mktemp)
           LAST_YEAR_STATS=$(mktemp)
+          AUTHOR_COMMITS_ALL=$(mktemp)
+          AUTHOR_COMMITS_30=$(mktemp)
+          AUTHOR_COMMITS_YEAR=$(mktemp)
           
           # Get date 30 days ago and 1 year ago
           DATE_30_DAYS_AGO=$(date -d '30 days ago' +%Y-%m-%d 2>/dev/null || date -v-30d +%Y-%m-%d)
           DATE_1_YEAR_AGO=$(date -d '1 year ago' +%Y-%m-%d 2>/dev/null || date -v-1y +%Y-%m-%d)
           
-          # Generate all-time stats
-          git log --format='%aN' | sort | uniq -c | sort -rn | while read count author; do
-            additions=$(git log --author="$author" --pretty=tformat: --numstat | awk '{add+=$1} END {print add+0}')
-            deletions=$(git log --author="$author" --pretty=tformat: --numstat | awk '{del+=$2} END {print del+0}')
-            total_changes=$((additions + deletions))
-            echo "$count|$author|$additions|$deletions|$total_changes"
-          done > "$ALL_TIME_STATS"
+          # Function to calculate stats using git diff for accurate counts
+          calculate_stats() {
+            local commits_file=$1
+            local output_file=$2
+            
+            # Get unique authors and their commit counts
+            cat "$commits_file" | awk -F'|' '{print $1}' | sort | uniq -c | sort -rn | while read count author; do
+              author=$(echo "$author" | xargs) # trim whitespace
+              if [ -z "$author" ]; then continue; fi
+              
+              echo "Processing $author..." >&2
+              
+              # Get all commit SHAs for this author from the commits file
+              shas=$(grep "^${author}|" "$commits_file" | awk -F'|' '{print $2}')
+              
+              additions=0
+              deletions=0
+              
+              # For each commit, use git show to get accurate diff stats
+              for sha in $shas; do
+                # Use git show with --numstat and handle binary files
+                stats=$(git show --numstat --format="" "$sha" 2>/dev/null | awk '
+                  BEGIN { add=0; del=0 }
+                  $1 != "-" && $2 != "-" { add+=$1; del+=$2 }
+                  END { print add" "del }
+                ')
+                
+                if [ -n "$stats" ]; then
+                  add=$(echo "$stats" | awk '{print $1}')
+                  del=$(echo "$stats" | awk '{print $2}')
+                  additions=$((additions + add))
+                  deletions=$((deletions + del))
+                fi
+              done
+              
+              total_changes=$((additions + deletions))
+              echo "$count|$author|$additions|$deletions|$total_changes"
+            done > "$output_file"
+          }
           
-          # Generate last 30 days stats
-          git log --since="$DATE_30_DAYS_AGO" --format='%aN' | sort | uniq -c | sort -rn | while read count author; do
-            additions=$(git log --since="$DATE_30_DAYS_AGO" --author="$author" --pretty=tformat: --numstat | awk '{add+=$1} END {print add+0}')
-            deletions=$(git log --since="$DATE_30_DAYS_AGO" --author="$author" --pretty=tformat: --numstat | awk '{del+=$2} END {print del+0}')
-            total_changes=$((additions + deletions))
-            echo "$count|$author|$additions|$deletions|$total_changes"
-          done > "$LAST_30_DAYS_STATS"
+          # Get all commits with author and SHA (all time)
+          git log --format='%aN|%H' > "$AUTHOR_COMMITS_ALL"
           
-          # Generate last year stats
-          git log --since="$DATE_1_YEAR_AGO" --format='%aN' | sort | uniq -c | sort -rn | while read count author; do
-            additions=$(git log --since="$DATE_1_YEAR_AGO" --author="$author" --pretty=tformat: --numstat | awk '{add+=$1} END {print add+0}')
-            deletions=$(git log --since="$DATE_1_YEAR_AGO" --author="$author" --pretty=tformat: --numstat | awk '{del+=$2} END {print del+0}')
-            total_changes=$((additions + deletions))
-            echo "$count|$author|$additions|$deletions|$total_changes"
-          done > "$LAST_YEAR_STATS"
+          # Get commits from last 30 days
+          git log --since="$DATE_30_DAYS_AGO" --format='%aN|%H' > "$AUTHOR_COMMITS_30"
+          
+          # Get commits from last year
+          git log --since="$DATE_1_YEAR_AGO" --format='%aN|%H' > "$AUTHOR_COMMITS_YEAR"
+          
+          # Calculate stats for each time period
+          echo "Calculating all-time statistics..." >&2
+          calculate_stats "$AUTHOR_COMMITS_ALL" "$ALL_TIME_STATS"
+          
+          echo "Calculating last 30 days statistics..." >&2
+          calculate_stats "$AUTHOR_COMMITS_30" "$LAST_30_DAYS_STATS"
+          
+          echo "Calculating last year statistics..." >&2
+          calculate_stats "$AUTHOR_COMMITS_YEAR" "$LAST_YEAR_STATS"
           
           # Store file paths
           echo "all_time_stats=$ALL_TIME_STATS" >> $GITHUB_OUTPUT
           echo "last_30_days_stats=$LAST_30_DAYS_STATS" >> $GITHUB_OUTPUT
           echo "last_year_stats=$LAST_YEAR_STATS" >> $GITHUB_OUTPUT
+          
+          echo "Statistics generation complete!" >&2
       
       - name: Format Leaderboard
         id: format
@@ -142,11 +182,21 @@ jobs:
           
           EOF
           
-          # Add repository summary
+          # Add repository summary using git show for accurate counts
           total_commits=$(git rev-list --count HEAD)
           total_contributors=$(git log --format='%aN' | sort -u | wc -l)
-          total_additions=$(git log --pretty=tformat: --numstat | awk '{add+=$1} END {print add+0}')
-          total_deletions=$(git log --pretty=tformat: --numstat | awk '{del+=$2} END {print del+0}')
+          
+          # Calculate total additions/deletions accurately
+          echo "Calculating repository totals..."
+          total_stats=$(git log --format='%H' | while read sha; do
+            git show --numstat --format="" "$sha" 2>/dev/null | awk '
+              $1 != "-" && $2 != "-" { add+=$1; del+=$2 }
+              END { print add" "del }
+            '
+          done | awk '{add+=$1; del+=$2} END {print add" "del}')
+          
+          total_additions=$(echo "$total_stats" | awk '{print $1}')
+          total_deletions=$(echo "$total_stats" | awk '{print $2}')
           
           cat >> leaderboard.md << EOF
           - **Total Commits:** $total_commits

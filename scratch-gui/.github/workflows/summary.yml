@@ -122,15 +122,16 @@ jobs:
           } >> "$GITHUB_OUTPUT"
 
       # ------------------------------------------------------
-      # 🆕 DUPLICATE DETECTION - Fetch all open issues
+      # 🆕 DUPLICATE DETECTION - Fetch all open issues (Tier 1: Full context)
       # ------------------------------------------------------
-      - name: Fetch all open issues for duplicate detection
-        id: fetch-issues
+      - name: Fetch all open issues for duplicate detection (full context)
+        id: fetch-issues-full
         if: ${{ github.event_name == 'issues' }}  # Only run on new issues
+        continue-on-error: true
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          ISSUES_FILE="open_issues.json"
+          ISSUES_FILE="open_issues_full.json"
           gh issue list \
             --repo OmniBlocks/scratch-gui \
             --state open \
@@ -140,17 +141,47 @@ jobs:
             > "$ISSUES_FILE"
 
           {
-            echo "open_issues<<EOF"
+            echo "open_issues_full<<EOF"
             cat "$ISSUES_FILE"
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
+          
+          echo "success=true" >> "$GITHUB_OUTPUT"
 
       # ------------------------------------------------------
-      # 🆕 DUPLICATE DETECTION - AI-based semantic matching
+      # 🆕 DUPLICATE DETECTION - Fetch titles only (Tier 2: Titles only)
       # ------------------------------------------------------
-      - name: Check for duplicate issues using AI
-        id: check-duplicates
+      - name: Fetch open issue titles for duplicate detection (titles only)
+        id: fetch-issues-titles
         if: ${{ github.event_name == 'issues' }}  # Only run on new issues
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ISSUES_FILE="open_issues_titles.json"
+          gh issue list \
+            --repo OmniBlocks/scratch-gui \
+            --state open \
+            --limit 100 \
+            --json number,title,url \
+            --jq '.[] | select(.number != ${{ github.event.issue.number }})' \
+            > "$ISSUES_FILE"
+
+          {
+            echo "open_issues_titles<<EOF"
+            cat "$ISSUES_FILE"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+          
+          echo "success=true" >> "$GITHUB_OUTPUT"
+
+      # ------------------------------------------------------
+      # 🆕 DUPLICATE DETECTION - AI-based semantic matching (Tier 1: Full context)
+      # ------------------------------------------------------
+      - name: Check for duplicate issues using AI (full context)
+        id: check-duplicates-full
+        if: ${{ github.event_name == 'issues' && steps.fetch-issues-full.outputs.success == 'true' }}
+        continue-on-error: true
         uses: actions/ai-inference@v1
         with:
           prompt: |
@@ -162,7 +193,7 @@ jobs:
             Body: ${{ github.event.issue.body }}
             
             EXISTING OPEN ISSUES:
-            ${{ steps.fetch-issues.outputs.open_issues }}
+            ${{ steps.fetch-issues-full.outputs.open_issues_full }}
 
             Analyze the semantic similarity between the new issue and existing open issues.
             Consider:
@@ -177,18 +208,51 @@ jobs:
             Do not include any other text, explanations, or formatting.
 
       # ------------------------------------------------------
-      # 🆕 DUPLICATE DETECTION - Comment if duplicates found
+      # 🆕 DUPLICATE DETECTION - AI-based semantic matching (Tier 2: Titles only)
       # ------------------------------------------------------
-      - name: Comment on potential duplicates
-        if: ${{ github.event_name == 'issues' && steps.check-duplicates.outputs.response != 'NONE' }}
+      - name: Check for duplicate issues using AI (titles only)
+        id: check-duplicates-titles
+        if: ${{ github.event_name == 'issues' && steps.check-duplicates-full.outcome != 'success' && steps.fetch-issues-titles.outputs.success == 'true' }}
+        continue-on-error: true
+        uses: actions/ai-inference@v1
+        with:
+          prompt: |
+            You are a duplicate issue detector for the OmniBlocks scratch-gui repository.
+            Your job is to find potential duplicate issues by comparing the new issue against existing open issues.
+            
+            NOTE: You only have access to issue titles (not full bodies), so your analysis will be based on title similarity only.
+
+            NEW ISSUE:
+            Title: ${{ github.event.issue.title }}
+            Body: ${{ github.event.issue.body }}
+            
+            EXISTING OPEN ISSUE TITLES:
+            ${{ steps.fetch-issues-titles.outputs.open_issues_titles }}
+
+            Analyze the semantic similarity between the new issue title and existing open issue titles.
+            Consider:
+            - Similar keywords and terminology
+            - Related features or components mentioned in titles
+            - Same error messages or symptoms mentioned in titles
+
+            OUTPUT FORMAT:
+            If you find potential duplicates, respond with ONLY the issue numbers separated by commas, like: "42,78,123"
+            If NO duplicates are found, respond with EXACTLY: "NONE"
+            Do not include any other text, explanations, or formatting.
+
+      # ------------------------------------------------------
+      # 🆕 DUPLICATE DETECTION - Comment if duplicates found (High confidence)
+      # ------------------------------------------------------
+      - name: Comment on potential duplicates (high confidence)
+        if: ${{ github.event_name == 'issues' && steps.check-duplicates-full.outcome == 'success' && steps.check-duplicates-full.outputs.response != 'NONE' }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
         run: |
-          DUPLICATES="${{ steps.check-duplicates.outputs.response }}"
+          DUPLICATES="${{ steps.check-duplicates-full.outputs.response }}"
           
           # Build the comment with links to potential duplicates
-          COMMENT="👋 Hi @${{ github.event.issue.user.login }}! I've detected potential duplicate issues:\n\n"
+          COMMENT="👋 Hi @${{ github.event.issue.user.login }}! I've detected potential duplicate issues with **high confidence** (analyzed full issue content):\n\n"
           
           IFS=',' read -ra ISSUE_NUMS <<< "$DUPLICATES"
           for NUM in "${ISSUE_NUMS[@]}"; do
@@ -201,6 +265,37 @@ jobs:
           done
           
           COMMENT="${COMMENT}\nPlease check if any of these existing issues describe the same problem. If so, feel free to add your comments there instead! 🙂"
+          
+          echo -e "$COMMENT" | gh issue comment "$ISSUE_NUMBER" --body-file -
+          
+          # Add a "possible-duplicate" label
+          gh issue edit "$ISSUE_NUMBER" --add-label "possible-duplicate"
+
+      # ------------------------------------------------------
+      # 🆕 DUPLICATE DETECTION - Comment if duplicates found (Lower confidence)
+      # ------------------------------------------------------
+      - name: Comment on potential duplicates (lower confidence)
+        if: ${{ github.event_name == 'issues' && steps.check-duplicates-full.outcome != 'success' && steps.check-duplicates-titles.outcome == 'success' && steps.check-duplicates-titles.outputs.response != 'NONE' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          DUPLICATES="${{ steps.check-duplicates-titles.outputs.response }}"
+          
+          # Build the comment with links to potential duplicates
+          COMMENT="👋 Hi @${{ github.event.issue.user.login }}! I've detected potential duplicate issues with **lower confidence** (analyzed titles only due to context limitations):\n\n"
+          
+          IFS=',' read -ra ISSUE_NUMS <<< "$DUPLICATES"
+          for NUM in "${ISSUE_NUMS[@]}"; do
+            # Trim whitespace
+            NUM=$(echo "$NUM" | xargs)
+            ISSUE_INFO=$(gh issue view "$NUM" --json title,url)
+            TITLE=$(echo "$ISSUE_INFO" | jq -r '.title')
+            URL=$(echo "$ISSUE_INFO" | jq -r '.url')
+            COMMENT="${COMMENT}- #${NUM}: ${TITLE}\n"
+          done
+          
+          COMMENT="${COMMENT}\nPlease check if any of these existing issues describe the same problem. Since this analysis was based on titles only, please review the full content of these issues to confirm if they're truly duplicates. If so, feel free to add your comments there instead! 🙂"
           
           echo -e "$COMMENT" | gh issue comment "$ISSUE_NUMBER" --body-file -
           

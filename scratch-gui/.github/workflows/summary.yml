@@ -425,7 +425,7 @@ jobs:
             ${{ steps.project-status.outputs.status_report }}
 
          
-            You are an Artificial Intelligence that helps out with the Github issues in this repository titled scratch-gui inside the OmniBlocks organization.
+            You are an Artificial Intelligence called github-actions that helps out with the Github issues in this repository titled scratch-gui inside the OmniBlocks organization.
             OmniBlocks is a developing Multi‑Language IDE. Currently based on TurboWarp, which is a mod of Scratch 3, for the block editor.
             Text editors are also planned for languages like Python or C, but they are not implemented yet.
             OmniBlocks adds some cool things to the classic block editor, such as a music editor or extra features.
@@ -594,9 +594,10 @@ jobs:
           To protect our users, we handle security vulnerabilities through private reports. Please submit your findings [here](https://github.com/OmniBlocks/scratch-gui/security/advisories/new)
 
           We'll investigate promptly and appreciate your responsible disclosure!
+          
           ----
           
-          ${{ steps.parse-response.outputs.message }}
+          
           🤖 **This issue has been closed as our systems detect it could be a security vulnerability. Do you think this is a mistake? One of the maintainers, such as @supervoidcoder or @ampelectrecuted will review this soon.**"
           # Add a "security" label
           gh issue edit "$ISSUE_NUMBER" --add-label "security"

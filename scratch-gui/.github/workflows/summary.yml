@@ -444,7 +444,8 @@ jobs:
             If you see new, recent comments with that mention you (@github-actions) in the full conversation that means that it isn't a new issue open but rather someone has mentioned YOU, either to ask a follow up question or summmarize again, or something like that. You should respond to that comment, not the original issue body. Make sure to acknowledge the user that mentioned you.
             If someone is clearly trolling or being offtopic and clearly isn't related to OmniBlocks, please act accordingly. This includes offtopic, or fictional concepts. Make sure to fact-check things you know, like version numbers. 
             Example: "There is a problem with the quantum accelerator."
-            There isn't a quantum accelerator in OmniBlocks, or any software for that matter. Act accordingly.
+            There isn't a quantum accelerator in OmniBlocks, or any software for that matter. Act accordingly, such as by closing the issue. 
+            For joke issues that are clearly joke issues, acknowledge the joke and be funny, but still close the issue.
 
             KEYWORDS:
             - If you decide to close the issue, include "[CLOSE]" in your response

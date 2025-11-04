@@ -599,7 +599,11 @@ jobs:
         id: parse-response
         run: |
           set -euo pipefail
-          RESPONSE="${{ steps.final.outputs.response }}"
+          
+          # Read the response using a here-document to avoid quoting issues
+          read -r -d '' RESPONSE << 'EOF' || true
+          ${{ steps.final.outputs.response }}
+          EOF
           
           # Initialize outputs
           KEYWORD=""
@@ -608,16 +612,16 @@ jobs:
           # Check for each keyword and extract it
           if echo "$RESPONSE" | grep -q '\[SPAM\]'; then
             KEYWORD="SPAM"
-            MESSAGE=$(echo "$RESPONSE" | sed 's/\[SPAM\]//g' | xargs)
+            MESSAGE=$(echo "$RESPONSE" | sed 's/\[SPAM\]//g' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
           elif echo "$RESPONSE" | grep -q '\[LOCKDOWN\]'; then
             KEYWORD="LOCKDOWN"
-            MESSAGE=$(echo "$RESPONSE" | sed 's/\[LOCKDOWN\]//g' | xargs)
+            MESSAGE=$(echo "$RESPONSE" | sed 's/\[LOCKDOWN\]//g' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
           elif echo "$RESPONSE" | grep -q '\[CLOSE\]'; then
             KEYWORD="CLOSE"
-            MESSAGE=$(echo "$RESPONSE" | sed 's/\[CLOSE\]//g' | xargs)
+            MESSAGE=$(echo "$RESPONSE" | sed 's/\[CLOSE\]//g' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
           elif echo "$RESPONSE" | grep -q '\[LOCK\]'; then
             KEYWORD="LOCK"
-            MESSAGE=$(echo "$RESPONSE" | sed 's/\[LOCK\]//g' | xargs)
+            MESSAGE=$(echo "$RESPONSE" | sed 's/\[LOCK\]//g' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
           else
             # No keyword found, treat entire response as message
             MESSAGE="$RESPONSE"
@@ -625,12 +629,16 @@ jobs:
           
           # Set outputs
           echo "keyword=$KEYWORD" >> "$GITHUB_OUTPUT"
-          echo "message<<EOF" >> "$GITHUB_OUTPUT"
-          echo "$MESSAGE" >> "$GITHUB_OUTPUT"
-          echo "EOF" >> "$GITHUB_OUTPUT"
-          echo "full_response<<EOF" >> "$GITHUB_OUTPUT"
-          echo "$RESPONSE" >> "$GITHUB_OUTPUT"
-          echo "EOF" >> "$GITHUB_OUTPUT"
+          {
+            echo "message<<EOF"
+            echo "$MESSAGE"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+          {
+            echo "full_response<<EOF"
+            echo "$RESPONSE"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
 
 
       # ------------------------------------------------------

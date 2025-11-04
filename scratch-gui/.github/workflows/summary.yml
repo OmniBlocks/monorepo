@@ -592,15 +592,11 @@ jobs:
 
           To protect our users, we handle security vulnerabilities through private reports. Please submit your findings [here](https://github.com/OmniBlocks/scratch-gui/security/advisories/new)
 
-          We'll investigate promptly and appreciate your responsible disclosure!"
+          We'll investigate promptly and appreciate your responsible disclosure!
           ----
-          AI_MESSAGE="${{ steps.parse-response.outputs.message }}"
-          if [ -n "$AI_MESSAGE" ]; then
-            echo "🤖 **This issue has been closed as our systems detect it could be a security vulnerability. Do you think this is a mistake? One of the maintainers, such as @supervoidcoder or @ampelectrecuted will review this soon.**
-
-          $AI_MESSAGE" | gh issue comment "$ISSUE_NUMBER" --body-file -
-          fi
-
+          
+          ${{ steps.parse-response.outputs.message }}
+          🤖 **This issue has been closed as our systems detect it could be a security vulnerability. Do you think this is a mistake? One of the maintainers, such as @supervoidcoder or @ampelectrecuted will review this soon.**"
           # Add a "security" label
           gh issue edit "$ISSUE_NUMBER" --add-label "security"
 

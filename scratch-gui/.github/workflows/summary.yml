@@ -654,28 +654,33 @@ jobs:
           gh issue edit "$ISSUE_NUMBER" \
             --title "SPAM" \
             --body "🗯️ This issue appears to be spam. To prevent clutter, we have hidden its contents. Please don't spam, as it can result in a ban from GitHub."
-
+      
+          # Read AI message safely using heredoc
+          read -r -d '' AI_MESSAGE << 'EOF' || true
+          ${{ steps.parse-response.outputs.message }}
+          EOF
+      
           # Post a comment with the reporting instructions and AI reasoning
           COMMENT="Hi, ${{ github.event.issue.user.login }}! 💬
-
+      
           Please refrain from spamming inside GitHub issues. GitHub issues are designed to help people, answer questions, gather input from the community, and improve everything for us as a whole. 
           Spamming goes against that in many ways. If you keep spamming, it might even result in a ban from GitHub itself, locking access to your account in the entirety of GitHub.
           
           Please remember to be civil and don't spam!"
           
           # Add AI reasoning if provided
-          AI_MESSAGE="${{ steps.parse-response.outputs.message }}"
           if [ -n "$AI_MESSAGE" ]; then
             COMMENT="$COMMENT
-
+      
           **AI Analysis:** $AI_MESSAGE"
           fi
           
           echo "$COMMENT" | gh issue comment "$ISSUE_NUMBER" --body-file -
-
+      
           # Close & lock the issue
           gh issue close "$ISSUE_NUMBER"
           gh issue lock "$ISSUE_NUMBER"
+      
       - name: Handle security keyword
         if: ${{ steps.final.outputs.response == '[SECURITY]' }}
         env:
@@ -686,12 +691,12 @@ jobs:
           gh issue edit "$ISSUE_NUMBER" \
             --title "Redacted Security Vulnerability" \
             --body "🔒 This issue appears to describe a security vulnerability. To protect our users, we've hidden the original content. Please submit security issues through our private reporting channel."
-
+      
           # Post a comment with the reporting instructions
           gh issue comment "$ISSUE_NUMBER" --body "Thank you for your security report! 🔐
-
+      
           To protect our users, we handle security vulnerabilities through private reports. Please submit your findings [here](https://github.com/OmniBlocks/scratch-gui/security/advisories/new)
-
+      
           We'll investigate promptly and appreciate your responsible disclosure!
           
           ----
@@ -700,7 +705,7 @@ jobs:
           🤖 **This issue has been closed as our systems detect it could be a security vulnerability. Do you think this is a mistake? One of the maintainers, such as @supervoidcoder or @ampelectrecuted will review this soon.**"
           # Add a "security" label
           gh issue edit "$ISSUE_NUMBER" --add-label "security"
-
+      
           # Close & lock the issue
           gh issue close "$ISSUE_NUMBER"
           gh issue lock "$ISSUE_NUMBER"
@@ -711,43 +716,55 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
         run: |
+          # Read AI message safely using heredoc
+          read -r -d '' AI_MESSAGE << 'EOF' || true
+          ${{ steps.parse-response.outputs.message }}
+          EOF
+          
           # Post a comment with AI reasoning if provided
-          AI_MESSAGE="${{ steps.parse-response.outputs.message }}"
           if [ -n "$AI_MESSAGE" ]; then
             echo "🤖 **Issue Closed**
-
+      
           $AI_MESSAGE" | gh issue comment "$ISSUE_NUMBER" --body-file -
           fi
           
           gh issue close "$ISSUE_NUMBER"
-
+      
       - name: Handle lock keyword
         if: ${{ steps.parse-response.outputs.keyword == 'LOCK' }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
         run: |
+          # Read AI message safely using heredoc
+          read -r -d '' AI_MESSAGE << 'EOF' || true
+          ${{ steps.parse-response.outputs.message }}
+          EOF
+          
           # Post a comment with AI reasoning if provided
-          AI_MESSAGE="${{ steps.parse-response.outputs.message }}"
           if [ -n "$AI_MESSAGE" ]; then
             echo "🔒 **Issue Locked**
-
+      
           $AI_MESSAGE" | gh issue comment "$ISSUE_NUMBER" --body-file -
           fi
           
           gh issue lock "$ISSUE_NUMBER"
-
+      
       - name: Handle lockdown keyword
         if: ${{ steps.parse-response.outputs.keyword == 'LOCKDOWN' }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
         run: |
+          # Read AI message safely using heredoc
+          read -r -d '' AI_MESSAGE << 'EOF' || true
+          ${{ steps.parse-response.outputs.message }}
+          EOF
+          
           # Post a comment with AI reasoning if provided
-          AI_MESSAGE="${{ steps.parse-response.outputs.message }}"
           if [ -n "$AI_MESSAGE" ]; then
             echo "🔒 **Issue Closed and Locked**
-
+      
           $AI_MESSAGE" | gh issue comment "$ISSUE_NUMBER" --body-file -
           fi
           

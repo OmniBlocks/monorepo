@@ -177,11 +177,86 @@ jobs:
           echo "success=true" >> "$GITHUB_OUTPUT"
 
       # ------------------------------------------------------
+      # 🆕 DUPLICATE DETECTION - Exact match (100% confidence)
+      # This runs BEFORE AI detection and uses pure code comparison
+      # ------------------------------------------------------
+      - name: Check for exact duplicates (100% confidence)
+        id: check-exact-duplicates
+        if: ${{ github.event_name == 'issues' && steps.fetch-issues-full.outputs.success == 'true' }}
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NEW_TITLE: ${{ github.event.issue.title }}
+          NEW_BODY: ${{ github.event.issue.body }}
+        run: |
+          set -e
+          
+          # Read the fetched issues
+          ISSUES_JSON='${{ steps.fetch-issues-full.outputs.open_issues_full }}'
+          
+          # Variables to track exact matches
+          EXACT_MATCH_FOUND=false
+          EXACT_MATCH_NUMBER=""
+          
+          # Parse JSON and compare each issue
+          echo "$ISSUES_JSON" | jq -c '.' | while IFS= read -r issue; do
+            ISSUE_NUM=$(echo "$issue" | jq -r '.number')
+            ISSUE_TITLE=$(echo "$issue" | jq -r '.title')
+            ISSUE_BODY=$(echo "$issue" | jq -r '.body')
+            
+            # Exact string comparison (title AND body must match)
+            if [ "$ISSUE_TITLE" = "$NEW_TITLE" ] && [ "$ISSUE_BODY" = "$NEW_BODY" ]; then
+              echo "EXACT_MATCH_FOUND=true" >> "$GITHUB_OUTPUT"
+              echo "EXACT_MATCH_NUMBER=$ISSUE_NUM" >> "$GITHUB_OUTPUT"
+              echo "exact_match=true" >> "$GITHUB_OUTPUT"
+              echo "match_number=$ISSUE_NUM" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+          done
+          
+          # No exact match found
+          echo "exact_match=false" >> "$GITHUB_OUTPUT"
+
+      # ------------------------------------------------------
+      # 🆕 DUPLICATE DETECTION - Comment on exact duplicate (100% confidence)
+      # ------------------------------------------------------
+      - name: Comment and close exact duplicate (100% confidence)
+        if: ${{ github.event_name == 'issues' && steps.check-exact-duplicates.outputs.exact_match == 'true' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          DUPLICATE_NUMBER: ${{ steps.check-exact-duplicates.outputs.match_number }}
+        run: |
+          # Get info about the duplicate
+          DUPLICATE_INFO=$(gh issue view "$DUPLICATE_NUMBER" --json title,url)
+          DUPLICATE_TITLE=$(echo "$DUPLICATE_INFO" | jq -r '.title')
+          DUPLICATE_URL=$(echo "$DUPLICATE_INFO" | jq -r '.url')
+          
+          # Post comment with 100% confidence
+          COMMENT="👋 Hi @${{ github.event.issue.user.login }}! 
+
+          🎯 **Exact Duplicate Detected (100% Confidence)**
+
+          This issue is an exact duplicate of:
+          - #${DUPLICATE_NUMBER}: ${DUPLICATE_TITLE}
+
+          The title and description match exactly. Please continue the discussion in the existing issue instead.
+
+          This issue will be closed automatically to avoid fragmentation. Thank you! 🙂"
+          
+          echo "$COMMENT" | gh issue comment "$ISSUE_NUMBER" --body-file -
+          
+          # Add label and close
+          gh issue edit "$ISSUE_NUMBER" --add-label "duplicate"
+          gh issue close "$ISSUE_NUMBER" --reason "not_planned"
+
+      # ------------------------------------------------------
       # 🆕 DUPLICATE DETECTION - AI-based semantic matching (Tier 1: Full context)
+      # Only runs if NO exact duplicate was found
       # ------------------------------------------------------
       - name: Check for duplicate issues using AI (full context)
         id: check-duplicates-full
-        if: ${{ github.event_name == 'issues' && steps.fetch-issues-full.outputs.success == 'true' }}
+        if: ${{ github.event_name == 'issues' && steps.fetch-issues-full.outputs.success == 'true' && steps.check-exact-duplicates.outputs.exact_match != 'true' }}
         continue-on-error: true
         uses: actions/ai-inference@v1
         with:
@@ -210,10 +285,11 @@ jobs:
 
       # ------------------------------------------------------
       # 🆕 DUPLICATE DETECTION - AI-based semantic matching (Tier 2: Titles only)
+      # Only runs if full context AI check didn't succeed
       # ------------------------------------------------------
       - name: Check for duplicate issues using AI (titles only)
         id: check-duplicates-titles
-        if: ${{ github.event_name == 'issues' && steps.check-duplicates-full.outcome != 'success' && steps.fetch-issues-titles.outputs.success == 'true' }}
+        if: ${{ github.event_name == 'issues' && steps.check-exact-duplicates.outputs.exact_match != 'true' && steps.check-duplicates-full.outcome != 'success' && steps.fetch-issues-titles.outputs.success == 'true' }}
         continue-on-error: true
         uses: actions/ai-inference@v1
         with:
@@ -243,14 +319,21 @@ jobs:
 
       # ------------------------------------------------------
       # 🆕 DUPLICATE DETECTION - Comment if duplicates found (High confidence)
+      # Now validates response isn't empty or "NONE"
       # ------------------------------------------------------
       - name: Comment on potential duplicates (high confidence)
-        if: ${{ github.event_name == 'issues' && steps.check-duplicates-full.outcome == 'success' && steps.check-duplicates-full.outputs.response != 'NONE' }}
+        if: ${{ github.event_name == 'issues' && steps.check-exact-duplicates.outputs.exact_match != 'true' && steps.check-duplicates-full.outcome == 'success' && steps.check-duplicates-full.outputs.response != '' && steps.check-duplicates-full.outputs.response != 'NONE' }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
         run: |
           DUPLICATES="${{ steps.check-duplicates-full.outputs.response }}"
+          
+          # Additional validation - check if response is valid
+          if [ -z "$DUPLICATES" ] || [ "$DUPLICATES" = "NONE" ]; then
+            echo "No duplicates found or invalid response"
+            exit 0
+          fi
           
           # Build the comment with links to potential duplicates
           COMMENT="👋 Hi @${{ github.event.issue.user.login }}! I've detected potential duplicate issues with **high confidence** (analyzed full issue content):\n\n"
@@ -274,14 +357,21 @@ jobs:
 
       # ------------------------------------------------------
       # 🆕 DUPLICATE DETECTION - Comment if duplicates found (Lower confidence)
+      # Now validates response isn't empty or "NONE"
       # ------------------------------------------------------
       - name: Comment on potential duplicates (lower confidence)
-        if: ${{ github.event_name == 'issues' && steps.check-duplicates-full.outcome != 'success' && steps.check-duplicates-titles.outcome == 'success' && steps.check-duplicates-titles.outputs.response != 'NONE' }}
+        if: ${{ github.event_name == 'issues' && steps.check-exact-duplicates.outputs.exact_match != 'true' && steps.check-duplicates-full.outcome != 'success' && steps.check-duplicates-titles.outcome == 'success' && steps.check-duplicates-titles.outputs.response != '' && steps.check-duplicates-titles.outputs.response != 'NONE' }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
         run: |
           DUPLICATES="${{ steps.check-duplicates-titles.outputs.response }}"
+          
+          # Additional validation - check if response is valid
+          if [ -z "$DUPLICATES" ] || [ "$DUPLICATES" = "NONE" ]; then
+            echo "No duplicates found or invalid response"
+            exit 0
+          fi
           
           # Build the comment with links to potential duplicates
           COMMENT="👋 Hi @${{ github.event.issue.user.login }}! I've detected potential duplicate issues with **lower confidence** (analyzed titles only due to context limitations):\n\n"

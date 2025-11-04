@@ -194,29 +194,31 @@ jobs:
           # Read the fetched issues
           ISSUES_JSON='${{ steps.fetch-issues-full.outputs.open_issues_full }}'
           
-          # Variables to track exact matches
-          EXACT_MATCH_FOUND=false
-          EXACT_MATCH_NUMBER=""
+          # Default to no match
+          FOUND_MATCH=false
+          MATCH_NUM=""
           
-          # Parse JSON and compare each issue
-          echo "$ISSUES_JSON" | jq -c '.' | while IFS= read -r issue; do
+          # Parse JSON and compare each issue - USE PROCESS SUBSTITUTION
+          while IFS= read -r issue; do
             ISSUE_NUM=$(echo "$issue" | jq -r '.number')
             ISSUE_TITLE=$(echo "$issue" | jq -r '.title')
             ISSUE_BODY=$(echo "$issue" | jq -r '.body')
             
             # Exact string comparison (title AND body must match)
             if [ "$ISSUE_TITLE" = "$NEW_TITLE" ] && [ "$ISSUE_BODY" = "$NEW_BODY" ]; then
-              echo "EXACT_MATCH_FOUND=true" >> "$GITHUB_OUTPUT"
-              echo "EXACT_MATCH_NUMBER=$ISSUE_NUM" >> "$GITHUB_OUTPUT"
-              echo "exact_match=true" >> "$GITHUB_OUTPUT"
-              echo "match_number=$ISSUE_NUM" >> "$GITHUB_OUTPUT"
-              exit 0
+              FOUND_MATCH=true
+              MATCH_NUM=$ISSUE_NUM
+              break
             fi
-          done
+          done < <(echo "$ISSUES_JSON" | jq -c '.')
           
-          # No exact match found
-          echo "exact_match=false" >> "$GITHUB_OUTPUT"
-
+          # Set outputs based on what we found
+          if [ "$FOUND_MATCH" = "true" ]; then
+            echo "exact_match=true" >> "$GITHUB_OUTPUT"
+            echo "match_number=$MATCH_NUM" >> "$GITHUB_OUTPUT"
+          else
+            echo "exact_match=false" >> "$GITHUB_OUTPUT"
+          fi
       # ------------------------------------------------------
       # 🆕 DUPLICATE DETECTION - Comment on exact duplicate (100% confidence)
       # ------------------------------------------------------

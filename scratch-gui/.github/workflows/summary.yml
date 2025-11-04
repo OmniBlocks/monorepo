@@ -188,14 +188,12 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NEW_TITLE: ${{ github.event.issue.title }}
           NEW_BODY: ${{ github.event.issue.body }}
+          ISSUES_JSON: ${{ steps.fetch-issues-full.outputs.open_issues_full }}
         run: |
           set -e
           
-          # Read the fetched issues
-          ISSUES_JSON='${{ steps.fetch-issues-full.outputs.open_issues_full }}'
-          
-          # Write to temp file to avoid subshell issues
-          echo "$ISSUES_JSON" | jq -c '.' > /tmp/issues.jsonl
+          # Write JSON to temp file (handles special chars safely)
+          printf '%s' "$ISSUES_JSON" | jq -c '.' > /tmp/issues.jsonl
           
           # Default to no match
           FOUND_MATCH=false
@@ -203,9 +201,9 @@ jobs:
           
           # Read from file and compare each issue
           while IFS= read -r issue; do
-            ISSUE_NUM=$(echo "$issue" | jq -r '.number')
-            ISSUE_TITLE=$(echo "$issue" | jq -r '.title')
-            ISSUE_BODY=$(echo "$issue" | jq -r '.body')
+            ISSUE_NUM=$(jq -r '.number' <<< "$issue")
+            ISSUE_TITLE=$(jq -r '.title' <<< "$issue")
+            ISSUE_BODY=$(jq -r '.body' <<< "$issue")
             
             # Exact string comparison (title AND body must match)
             if [ "$ISSUE_TITLE" = "$NEW_TITLE" ] && [ "$ISSUE_BODY" = "$NEW_BODY" ]; then
@@ -215,7 +213,7 @@ jobs:
             fi
           done < /tmp/issues.jsonl
           
-          # Set outputs based on what we found
+          # Set outputs
           if [ "$FOUND_MATCH" = "true" ]; then
             echo "exact_match=true" >> "$GITHUB_OUTPUT"
             echo "match_number=$MATCH_NUM" >> "$GITHUB_OUTPUT"

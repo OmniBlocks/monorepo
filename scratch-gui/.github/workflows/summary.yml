@@ -194,11 +194,14 @@ jobs:
           # Read the fetched issues
           ISSUES_JSON='${{ steps.fetch-issues-full.outputs.open_issues_full }}'
           
+          # Write to temp file to avoid subshell issues
+          echo "$ISSUES_JSON" | jq -c '.' > /tmp/issues.jsonl
+          
           # Default to no match
           FOUND_MATCH=false
           MATCH_NUM=""
           
-          # Parse JSON and compare each issue - USE PROCESS SUBSTITUTION
+          # Read from file and compare each issue
           while IFS= read -r issue; do
             ISSUE_NUM=$(echo "$issue" | jq -r '.number')
             ISSUE_TITLE=$(echo "$issue" | jq -r '.title')
@@ -210,7 +213,7 @@ jobs:
               MATCH_NUM=$ISSUE_NUM
               break
             fi
-          done < <(echo "$ISSUES_JSON" | jq -c '.')
+          done < /tmp/issues.jsonl
           
           # Set outputs based on what we found
           if [ "$FOUND_MATCH" = "true" ]; then
@@ -235,16 +238,16 @@ jobs:
           DUPLICATE_URL=$(echo "$DUPLICATE_INFO" | jq -r '.url')
           
           # Post comment with 100% confidence
-          COMMENT="👋 Hi @${{ github.event.issue.user.login }}! 
+          COMMENT="👋 Hi, @${{ github.event.issue.user.login }}! 
 
-          🎯 **Exact Duplicate Detected (100% Confidence)**
+          🤖 **Exact Duplicate Detected (100% Confidence)**
 
           This issue is an exact duplicate of:
           - #${DUPLICATE_NUMBER}: ${DUPLICATE_TITLE}
 
           The title and description match exactly. Please continue the discussion in the existing issue instead.
 
-          This issue will be closed automatically to avoid fragmentation. Thank you! 🙂"
+          This issue will be closed automatically to avoid fragmentation. Thank you! 😁"
           
           echo "$COMMENT" | gh issue comment "$ISSUE_NUMBER" --body-file -
           

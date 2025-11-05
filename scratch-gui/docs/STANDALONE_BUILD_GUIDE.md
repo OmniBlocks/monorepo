@@ -26,6 +26,8 @@ Each HTML file can be opened directly in a browser without requiring a web serve
 ### 2. Implementation Steps
 
 **Step 1: Install plugin**
+**Step 1: Install plugin**
+```bash
 npm install --save-dev html-webpack-inline-source-plugin
 
 **Step 2: Update .gitignore**

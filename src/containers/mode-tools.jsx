@@ -365,6 +365,7 @@ class ModeTools extends React.Component {
             return;
         }
 
+        console.log(specificOperation);
         if (typeof specificOperation !== "string") specificOperation = "unite";
 
         if (window.test) {

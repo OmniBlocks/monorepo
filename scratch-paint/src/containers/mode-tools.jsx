@@ -367,15 +367,6 @@ class ModeTools extends React.Component {
 
         console.log(specificOperation);
         if (typeof specificOperation !== "string") specificOperation = "unite";
-/*
-        if (window.test) {
-            window.test(selectedItems, topItem, specificOperation, this, setItemSelection);
-            return
-
-        
-        }
-        
-        the pmod devs never fail to dissapoint  me with just casually adding secruity vulnerabilities to the code*/
         // unite the shapes together, creating a clone on top of the original
         const results = [];
         for (let i = 1; i < selectedItems.length; i++) {

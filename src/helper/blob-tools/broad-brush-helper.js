@@ -305,7 +305,7 @@ class BroadBrushHelper {
             this.finalPath
                 .resolveCrossings()
                 .reorient(true /* nonZero */, true /* clockwise */)
-                .reduce({simplify: true});
+                .reduce({simplify: true})
             : this.finalPath;
         if (newPath !== this.finalPath) {
             newPath.copyAttributes(this.finalPath);

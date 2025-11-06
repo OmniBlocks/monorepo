@@ -2,8 +2,8 @@
 
 ## Playgrounds
 
- - **Vertical blocks**: https://turbowarp.github.io/scratch-blocks/tests/vertical_playground_compressed.html
-
+ - **Vertical blocks**: https://omniblocks.github.io/scratch-blocks/tests/vertical_playground_compressed.html
+ - **Horizontal blocks**: https://omniblocks.github.io/scratch-blocks/tests/horizontal_playground_compressed.html
 ## Local development
 
 Requires Node.js (16 or later), Python (2 or 3), and Java. It is known to work in these environments but should work in many others:

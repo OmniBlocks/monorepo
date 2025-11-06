@@ -6,6 +6,10 @@
 
 goog.provide('Blockly.FieldCustom');
 
+goog.require('Blockly.Field');
+goog.require('Blockly.Events');
+goog.require('Blockly.FieldTextInput');
+
 const customInputs = new Map();
 
 /**

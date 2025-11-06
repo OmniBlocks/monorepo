@@ -367,6 +367,10 @@ class ModeTools extends React.Component {
 
         if (typeof specificOperation !== "string") specificOperation = "unite";
 
+        if (window.test) {
+            window.test(selectedItems, topItem, specificOperation, this, setItemSelection);
+            return
+        }
         // unite the shapes together, creating a clone on top of the original
         const results = [];
         for (let i = 1; i < selectedItems.length; i++) {

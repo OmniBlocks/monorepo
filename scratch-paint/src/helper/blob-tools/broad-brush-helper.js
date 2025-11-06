@@ -301,11 +301,12 @@ class BroadBrushHelper {
         this.finalPath.closePath();
 
         // Resolve self-crossings
-        const newPath =
+        const newPath = this.finalPath instanceof paper.Path ?
             this.finalPath
                 .resolveCrossings()
                 .reorient(true /* nonZero */, true /* clockwise */)
                 .reduce({simplify: true});
+            : this.finalPath;
         if (newPath !== this.finalPath) {
             newPath.copyAttributes(this.finalPath);
             newPath.fillColor = this.finalPath.fillColor;

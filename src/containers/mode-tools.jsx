@@ -382,7 +382,7 @@ class ModeTools extends React.Component {
             }
         }
 
-        setItemSelection(results[0], true);
+        setItemSelection(topItem, true);
         this.props.onUpdateImage();
     }
 

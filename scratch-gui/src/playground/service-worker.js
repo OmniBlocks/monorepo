@@ -39,7 +39,17 @@ self.addEventListener('install', event => {
             // Cache static assets
             caches.open(STATIC_CACHE).then(cache => {
                 console.log('[SW] Caching static assets...');
-                return cache.addAll(STATIC_ASSETS.concat(EXTERNAL_RESOURCES));
+                // Cache critical assets first
+                return cache.addAll(STATIC_ASSETS).then(() => {
+                    // Try to cache external resources, but don't fail if unavailable
+                    return Promise.allSettled(
+                        EXTERNAL_RESOURCES.map(url => 
+                            cache.add(url).catch(err => 
+                                console.warn('[SW] Failed to cache optional resource:', url, err)
+                            )
+                        )
+                    );
+                });
             })
         ]).then(() => {
             console.log('[SW] Installation complete');

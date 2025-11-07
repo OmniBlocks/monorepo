@@ -249,14 +249,62 @@ async function getOfflineFallback(request) {
                         padding: 2rem; 
                         background: #333; 
                         color: white; 
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: center;
+                        min-height: 100vh;
+                        margin: 0;
                     }
-                    h1 { color: #9c64f7; }
+                    h1 { color: #9c64f7; margin-bottom: 1rem; }
+                    .images {
+                        display: flex;
+                        gap: 1rem;
+                        margin: 2rem 0;
+                        align-items: center;
+                    }
+                    .logo {
+                        width: 80px;
+                        height: 80px;
+                        animation: bounce 2s infinite;
+                    }
+                    .boxy-sad {
+                        width: 120px;
+                        height: 120px;
+                        animation: shake 0.5s ease-in-out infinite alternate;
+                    }
+                    @keyframes bounce {
+                        0%, 100% { transform: translateY(0); }
+                        50% { transform: translateY(-10px); }
+                    }
+                    @keyframes shake {
+                        0% { transform: rotate(-5deg); }
+                        100% { transform: rotate(5deg); }
+                    }
+                    button {
+                        background: #9c64f7;
+                        color: white;
+                        border: none;
+                        padding: 12px 24px;
+                        border-radius: 6px;
+                        cursor: pointer;
+                        font-size: 1rem;
+                        margin: 0.5rem;
+                    }
+                    button:hover {
+                        background: #8b5cf6;
+                    }
                 </style>
             </head>
             <body>
                 <h1>You're Offline</h1>
-                <p>This page is not available offline.</p>
+                <p>Sorry! OmniBlocks doesn't seem to be working offline right now.</p>
+                <div class="images">
+                    <img src="https://omniblocks.github.io/favicon.ico" alt="OmniBlocks Logo" class="logo">
+                    <img src="https://omniblocks.github.io/Boxy-sad.svg" alt="Boxy Sad" class="boxy-sad">
+                </div>
                 <button onclick="history.back()">Go Back</button>
+                <button onclick="location.reload()">Try Again</button>
             </body>
             </html>
         `, {

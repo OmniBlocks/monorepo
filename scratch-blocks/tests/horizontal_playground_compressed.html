@@ -238,7 +238,7 @@
 
       function setSoundsEnabled(state) {
         var checkbox = document.getElementById('soundsEnabled');
-        checkbox.checked = (state) ? 'checked' : '';
+        checkbox.checked = Boolean(state);
         if (sessionStorage) {
           sessionStorage.setItem('soundsEnabled', state);
         }

@@ -4,7 +4,12 @@
 // By: CST1229 <https://scratch.mit.edu/users/CST1229/>
 // License: MPL-2.0
 
-// Special thanks to Drago NrxThulitech Cuven for finding lots of bugs
+// OFFICIAL DOWNLOAD: https://raw.githubusercontent.com/CST1229/turbowarp-extensions/3d/extensions/CST1229/3d.js
+// Version 0.1
+
+// Special thanks:
+// Drago NrxThulitech Cuven: some bug finding
+// Everyone using this extension on other platforms: Holy, I didn't know this little extension was THIS popular...
 
 /*
   TODO:

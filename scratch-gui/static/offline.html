@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offline - OmniBlocks</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="icon_32.png">
+    <style>
+        body {
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #333;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+        }
+        
+        .offline-container {
+            max-width: 500px;
+            padding: 2rem;
+        }
+        
+        .offline-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.7;
+        }
+        
+        h1 {
+            color: #9c64f7;
+            margin-bottom: 1rem;
+            font-size: 2rem;
+        }
+        
+        p {
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            opacity: 0.9;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            background: #9c64f7;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: background-color 0.2s;
+        }
+        
+        button:hover {
+            background: #8b5cf6;
+        }
+        
+        button:disabled {
+            background: #666;
+            cursor: not-allowed;
+        }
+        
+        .secondary-button {
+            background: transparent;
+            border: 2px solid #9c64f7;
+        }
+        
+        .secondary-button:hover {
+            background: #9c64f7;
+        }
+        
+        .status {
+            margin-top: 2rem;
+            padding: 1rem;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            font-size: 0.9rem;
+        }
+        
+        .online {
+            background: rgba(81, 207, 102, 0.2);
+            border: 1px solid #51cf66;
+        }
+        
+        .offline {
+            background: rgba(255, 107, 107, 0.2);
+            border: 1px solid #ff6b6b;
+        }
+    </style>
+</head>
+<body>
+    <div class="offline-container">
+        <div class="offline-icon">📱</div>
+        <h1>You're Offline</h1>
+        <p>
+            It looks like you're not connected to the internet. Don't worry! 
+            OmniBlocks works offline too. You can continue working on your projects 
+            and they'll sync when you're back online.
+        </p>
+        
+        <div class="actions">
+            <button onclick="goToEditor()">Open Editor</button>
+            <button class="secondary-button" onclick="tryAgain()">Try Again</button>
+        </div>
+        
+        <div id="status" class="status offline">
+            <strong>Status:</strong> <span id="status-text">Offline</span>
+        </div>
+    </div>
+
+    <script>
+        function goToEditor() {
+            window.location.href = '/editor.html';
+        }
+        
+        function tryAgain() {
+            window.location.reload();
+        }
+        
+        function updateStatus() {
+            const status = document.getElementById('status');
+            const statusText = document.getElementById('status-text');
+            
+            if (navigator.onLine) {
+                status.className = 'status online';
+                statusText.textContent = 'Online';
+            } else {
+                status.className = 'status offline';
+                statusText.textContent = 'Offline';
+            }
+        }
+        
+        // Listen for online/offline events
+        window.addEventListener('online', updateStatus);
+        window.addEventListener('offline', updateStatus);
+        
+        // Initial status check
+        updateStatus();
+        
+        // Auto-redirect when back online
+        window.addEventListener('online', function() {
+            setTimeout(function() {
+                if (navigator.onLine) {
+                    window.location.reload();
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

@@ -18,7 +18,12 @@ Install dependencies:
 npm ci
 ```
 
-Open tests/vertical_playground.html in a browser for development. You don't need to rebuild compressed versions for most changes. Open tests/vertical_playground_compressed.html instead to test if the compressed versions built properly.
+Open the playgrounds in a browser for development. For a local page that works without fetching Closure from node_modules, use the compressed playgrounds:
+
+- Horizontal (compressed): `tests/horizontal_playground_compressed.html`
+- Vertical (compressed): `tests/vertical_playground_compressed.html`
+
+You don't need to rebuild compressed versions for most changes. Rebuild compressed versions when you want to update the bundled artifacts.
 
 To re-build compressed versions, run:
 

@@ -381,7 +381,31 @@ async function syncProjectData() {
     }
 }
 
-// IndexedDB operations for service worker
+/*
+ * ⚠️  CRITICAL: CODE DUPLICATION WARNING ⚠️
+ * 
+ * The IndexedDB operations below (getPendingSaves, removePendingSave) intentionally
+ * duplicate schema and logic from src/lib/offline-storage.js due to service worker
+ * module import limitations. Service workers cannot directly import ES modules from
+ * the main application context.
+ * 
+ * CANONICAL SCHEMA LOCATION: src/lib/offline-storage.js (lines 6-9, 183-224)
+ * 
+ * SHARED CONSTANTS THAT MUST BE KEPT IN SYNC:
+ * - DB_NAME: 'OmniBlocksOfflineDB'
+ * - DB_VERSION: 1
+ * - PENDING_SAVES_STORE: 'pendingSaves'
+ * 
+ * RECOMMENDED ALTERNATIVES FOR FUTURE REFACTORING:
+ * 1. Message-based communication: Service worker sends messages to main thread
+ *    to perform IndexedDB operations via the offline-storage module
+ * 2. Extract shared constants to a separate file that both main and SW can reference
+ * 3. Use importScripts() to load a shared IndexedDB utility (if compatible)
+ * 
+ * ⚠️  ANY SCHEMA CHANGES MUST BE SYNCHRONIZED BETWEEN BOTH FILES ⚠️
+ * 
+ * TODO: Refactor to use message-based communication with main thread
+ */
 async function getPendingSaves() {
     return new Promise((resolve, reject) => {
         const request = indexedDB.open('OmniBlocksOfflineDB', 1);

@@ -142,7 +142,6 @@
         }
         
         // Listen for online/offline events
-        window.addEventListener('online', updateStatus);
         window.addEventListener('offline', updateStatus);
         
         // Initial status check
@@ -150,6 +149,7 @@
         
         // Auto-redirect when back online
         window.addEventListener('online', function() {
+            updateStatus();
             setTimeout(function() {
                 if (navigator.onLine) {
                     window.location.reload();

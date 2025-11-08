@@ -20,7 +20,8 @@ const STATIC_ASSETS = [
     '/static/beepbox_editor.min.js',
     '/static/beepbox_synth.min.js',
     '/static/beepbox_player.min.js',
-    '/static/DeterminationMono.ttf'
+    '/static/DeterminationMono.ttf',
+    '/static/images/boxy-sad.svg'
 ];
 
 // External resources to cache
@@ -310,8 +311,8 @@ async function getOfflineFallback(request) {
                 <h1>You're Offline</h1>
                 <p>Sorry! OmniBlocks doesn't seem to be working offline right now.</p>
                 <div class="images">
-                    <img src="https://omniblocks.github.io/favicon.ico" alt="OmniBlocks Logo" class="logo">
-                    <img src="https://omniblocks.github.io/Boxy-sad.svg" alt="Boxy Sad" class="boxy-sad">
+                    <img src="/static/favicon.ico" alt="OmniBlocks Logo" class="logo">
+                    <img src="/static/images/boxy-sad.svg" alt="Boxy Sad" class="boxy-sad">
                 </div>
                 <button onclick="history.back()">Go Back</button>
                 <button onclick="location.reload()">Try Again</button>

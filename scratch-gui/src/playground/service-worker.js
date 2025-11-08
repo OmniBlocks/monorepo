@@ -255,10 +255,10 @@ async function getOfflineFallback(request) {
                 <meta name="viewport" content="width=device-width, initial-scale=1">
                 <style>
                     body { 
-                        font-family: Arial, sans-serif; 
+                        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; 
                         text-align: center; 
                         padding: 2rem; 
-                        background: #333; 
+                        background: #1e1e1e; 
                         color: white; 
                         display: flex;
                         flex-direction: column;
@@ -267,7 +267,8 @@ async function getOfflineFallback(request) {
                         min-height: 100vh;
                         margin: 0;
                     }
-                    h1 { color: #9c64f7; margin-bottom: 1rem; }
+                    h1 { color: #59C0C0; margin-bottom: 1rem; }
+                    p { line-height: 1.6; margin: 1rem 0; }
                     .images {
                         display: flex;
                         gap: 1rem;
@@ -293,17 +294,19 @@ async function getOfflineFallback(request) {
                         100% { transform: rotate(5deg); }
                     }
                     button {
-                        background: #9c64f7;
+                        background: #59C0C0;
                         color: white;
                         border: none;
                         padding: 12px 24px;
                         border-radius: 6px;
                         cursor: pointer;
                         font-size: 1rem;
+                        font-family: inherit;
+                        transition: background-color 0.2s;
                         margin: 0.5rem;
                     }
                     button:hover {
-                        background: #8b5cf6;
+                        background: #389499;
                     }
                 </style>
             </head>
@@ -314,7 +317,7 @@ async function getOfflineFallback(request) {
                     <img src="/static/favicon.ico" alt="OmniBlocks Logo" class="logo">
                     <img src="/static/images/boxy-sad.svg" alt="Boxy Sad" class="boxy-sad">
                 </div>
-                <button onclick="history.back()">Go Back</button>
+                <button onclick="location.href='/'">Go to Editor</button>
                 <button onclick="location.reload()">Try Again</button>
             </body>
             </html>

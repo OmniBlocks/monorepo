@@ -10,7 +10,7 @@
             font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background: #333;
+            background: #1e1e1e;
             color: white;
             display: flex;
             flex-direction: column;
@@ -32,7 +32,7 @@
         }
         
         h1 {
-            color: #9c64f7;
+            color: #59C0C0;
             margin-bottom: 1rem;
             font-size: 2rem;
         }
@@ -51,7 +51,7 @@
         }
         
         button {
-            background: #9c64f7;
+            background: #59C0C0;
             color: white;
             border: none;
             padding: 12px 24px;
@@ -63,7 +63,7 @@
         }
         
         button:hover {
-            background: #8b5cf6;
+            background: #389499;
         }
         
         button:disabled {
@@ -73,11 +73,11 @@
         
         .secondary-button {
             background: transparent;
-            border: 2px solid #9c64f7;
+            border: 2px solid #59C0C0;
         }
         
         .secondary-button:hover {
-            background: #9c64f7;
+            background: #59C0C0;
         }
         
         .status {
@@ -101,12 +101,11 @@
 </head>
 <body>
     <div class="offline-container">
-        <div class="offline-icon">📱</div>
+        <img src="images/boxy-sad.svg" alt="Boxy Sad" class="offline-icon" style="width: 120px; height: 120px;">
         <h1>You're Offline</h1>
         <p>
             It looks like you're not connected to the internet. Don't worry! 
-            OmniBlocks works offline too. You can continue working on your projects 
-            and they'll sync when you're back online.
+            OmniBlocks works offline too. If the editor doesn't work, we're sorry, and try again later.
         </p>
         
         <div class="actions">
@@ -121,7 +120,7 @@
 
     <script>
         function goToEditor() {
-            window.location.href = 'editor.html';
+            window.location.href = './editor.html';
         }
         
         function tryAgain() {
@@ -142,12 +141,6 @@
         }
         
         // Listen for online/offline events
-        window.addEventListener('offline', updateStatus);
-        
-        // Initial status check
-        updateStatus();
-        
-        // Auto-redirect when back online
         window.addEventListener('online', function() {
             updateStatus();
             setTimeout(function() {
@@ -156,6 +149,10 @@
                 }
             }, 1000);
         });
+        window.addEventListener('offline', updateStatus);
+        
+        // Initial status check
+        updateStatus();
     </script>
 </body>
 </html>

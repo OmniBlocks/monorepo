@@ -31,8 +31,6 @@ OmniBlocks now supports full offline functionality as a Progressive Web App (PWA
 
 ### What Requires Internet
 - ❌ **Project Sharing**: Uploading projects to online galleries
-- ❌ **Community Features**: Browsing shared projects
-- ❌ **Account Sync**: Syncing projects across devices
 - ❌ **Featured projects gallery**: Browsing featured projects
 - ❌ **Extension Downloads**: Loading new extensions, unless you locally have the extension file
 - ❌ **Updates**: Automatic app updates (manual refresh needed)

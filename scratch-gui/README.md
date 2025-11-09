@@ -65,7 +65,7 @@ Experience OmniBlocks live: [https://omniblocks.github.io](https://omniblocks.gi
 *   **Complete Offline Functionality:** Work on projects without internet connection
 *   **Progressive Web App:** Install OmniBlocks as an app on desktop and mobile
 *   **Automatic Caching:** All resources cached for instant offline access
-*   **Local Storage:** Projects saved locally with IndexedDB for reliability
+*   **Local Storage:** Projects saved locally with existing Restore Points system for reliability
 *   **Offline Indicators:** Clear visual feedback for connection status
 *   **See the [Offline PWA Guide](docs/OFFLINE_PWA_GUIDE.md) for detailed information**
 

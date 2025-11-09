@@ -35,18 +35,15 @@ OmniBlocks now supports full offline functionality as a Progressive Web App (PWA
 - ❌ **Extension Downloads**: Loading new extensions, unless you locally have the extension file
 - ❌ **Updates**: Automatic app updates (manual refresh needed)
 
-## 💾 Data Storage
+## 💾 Project Data Storage
 
-### Local Storage
-- Projects are automatically saved to your device's local storage
-- No data is lost when going offline
-- Storage persists between browser sessions
-- Automatic cleanup of old cached data
+OmniBlocks uses its existing **Restore Points system** (`tw-restore-point-api.js`) for offline project persistence:
+- Projects are automatically saved to IndexedDB (`TW_RestorePoints` database)
+- Manual restore points can be created via the UI
+- Projects persist across sessions and work offline
+- No additional storage implementation was needed
 
-### Background Sync
-- When you go back online, any pending saves are automatically synced
-- Projects created offline will be uploaded when connection is restored
-- Seamless transition between offline and online modes
+The service worker provides offline access to the app shell (HTML, CSS, JS), while the existing Restore Points system handles project data.
 
 ## 🔄 Offline Indicators
 
@@ -95,19 +92,12 @@ OmniBlocks now supports full offline functionality as a Progressive Web App (PWA
 - Network-first with cache fallback for dynamic content
 - Automatic cache versioning and cleanup
 - Background sync for project data
-
 ### Caching Strategy
 - **Static Assets**: Cached indefinitely (JS, CSS, images, fonts)
 - **HTML Pages**: Network-first with cache fallback
 - **API Calls**: Network-first with offline fallback
-- **User Projects**: Stored in IndexedDB with sync capability
-
-### Storage APIs Used
-- **Service Worker**: For offline functionality and caching
-- **IndexedDB**: For project and user data storage
+- **User Projects**: Handled by existing Restore Points system
 - **Cache API**: For static asset caching
-- **Background Sync**: For data synchronization
-
 ## 📋 Best Practices
 
 ### For Users
@@ -119,7 +109,6 @@ OmniBlocks now supports full offline functionality as a Progressive Web App (PWA
 ### For Developers
 1. **Cache Strategy**: Different strategies for different resource types
 2. **Error Handling**: Graceful degradation when offline
-3. **User Feedback**: Clear indicators of offline status
 4. **Data Sync**: Reliable background synchronization
 
 ## 🆕 Version Updates

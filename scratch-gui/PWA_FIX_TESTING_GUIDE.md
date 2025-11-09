@@ -71,23 +71,6 @@ Test all these URLs work offline after initial cache:
 If issues persist:
 
 1. **Check Service Worker Registration**:
-   ```javascript
-   navigator.serviceWorker.getRegistrations().then(console.log)
-   ```
-
-2. **Check Cache Contents**:
-   ```javascript
-   caches.open('omniblocks-static-v1').then(cache => 
-     cache.keys().then(keys => 
-       console.log(keys.map(k => k.url))
-     )
-   )
-   ```
-
-3. **Force Service Worker Update**:
-   - DevTools → Application → Service Workers → Update
-   - Or clear all data and reload
-
 ### Expected Behavior After Fix
 
 | Scenario | Before Fix | After Fix |

@@ -1,21 +1,109 @@
 {
+  "name": "OmniBlocks - The Ultimate MultiLanguage IDE",
   "short_name": "OmniBlocks",
-  "name": "OmniBlocks",
-  "description": "Developing Open Source MultiLanguage IDE with features such as a code, paint, sound, and even music editor.",
+  "description": "A powerful offline-capable IDE for creating projects with code, paint, sound, and music editing capabilities. Based on Scratch technology with enhanced features.",
+  "start_url": "/editor.html",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "theme_color": "#59C0C0",
+  "background_color": "#333333",
+  "lang": "en",
+  "categories": ["education", "productivity", "developer"],
   "icons": [
     {
-      "src": "images/192.png",
+      "src": "icon_32.png",
+      "sizes": "32x32",
       "type": "image/png",
-      "sizes": "192x192"
+      "purpose": "any"
+    },
+    {
+      "src": "images/192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon_maskable_192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
     },
     {
       "src": "images/512.png",
+      "sizes": "512x512",
       "type": "image/png",
-      "sizes": "512x512"
+      "purpose": "any"
+    },
+    {
+      "src": "images/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
     }
   ],
-  "start_url": "editor",
-  "background_color": "#333333",
-  "display": "standalone",
-  "theme_color": "#333333"
+  "shortcuts": [
+    {
+      "name": "New Project",
+      "short_name": "New",
+      "description": "Create a new project",
+      "url": "/editor.html?new=true",
+      "icons": [
+        {
+          "src": "icon_32.png",
+          "sizes": "32x32",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Player",
+      "short_name": "Player",
+      "description": "Open project player",
+      "url": "/index.html",
+      "icons": [
+        {
+          "src": "icon_32.png",
+          "sizes": "32x32",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Fullscreen",
+      "short_name": "Fullscreen",
+      "description": "Open in fullscreen mode",
+      "url": "/fullscreen.html",
+      "icons": [
+        {
+          "src": "icon_32.png",
+          "sizes": "32x32",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "images/screenshot-wide.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "OmniBlocks IDE interface"
+    },
+    {
+      "src": "images/screenshot-narrow.png",
+      "sizes": "720x1280",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "OmniBlocks mobile interface"
+    }
+  ],
+  "prefer_related_applications": false,
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  "launch_handler": {
+    "client_mode": "focus-existing"
+  }
 }

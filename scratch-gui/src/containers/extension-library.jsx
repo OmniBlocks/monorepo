@@ -137,14 +137,13 @@ const fetchLibraryOB = async () => {
 
 class ExtensionLibrary extends React.PureComponent {
 // Helper function to handle gallery loading with timeout
-const loadGalleryWithTimeout = (fetchFunction, cache, timeoutCallback, successCallback, errorCallback) => {
+const loadGalleryWithTimeout = (fetchFunction, timeoutCallback, successCallback, errorCallback) => {
     const timeout = setTimeout(() => {
         timeoutCallback();
     }, GALLERY_TIMEOUT_MS);
 
     fetchFunction()
         .then(gallery => {
-            cache = gallery;
             successCallback(gallery);
             clearTimeout(timeout);
         })
@@ -155,7 +154,7 @@ const loadGalleryWithTimeout = (fetchFunction, cache, timeoutCallback, successCa
         });
 };
 
-    constructor (props) {
+// Helper function to handle gallery loading with timeout
         super(props);
         bindAll(this, [
             'handleItemSelect'
@@ -174,7 +173,6 @@ const loadGalleryWithTimeout = (fetchFunction, cache, timeoutCallback, successCa
         if (!this.state.galleryTW) {
             loadGalleryWithTimeout(
                 fetchLibraryTW,
-                cachedGalleryTW,
                 () => this.setState({ galleryTWTimedOut: true }),
                 gallery => {
                     cachedGalleryTW = gallery;
@@ -188,7 +186,6 @@ const loadGalleryWithTimeout = (fetchFunction, cache, timeoutCallback, successCa
         if (!this.state.galleryOB) {
             loadGalleryWithTimeout(
                 fetchLibraryOB,
-                cachedGalleryOB,
                 () => this.setState({ galleryOBTimedOut: true }),
                 gallery => {
                     cachedGalleryOB = gallery;

@@ -42,6 +42,10 @@ const translateGalleryItem = (extension, locale) => ({
     description: extension.descriptionTranslations[locale] || extension.description
 });
 
+// Timeout constant for gallery loading
+const GALLERY_TIMEOUT_MS = 750;
+
+// Common gallery fetcher function to reduce code duplication
 let cachedGalleryTW = null;
 let cachedGalleryOB = null;
 
@@ -132,6 +136,25 @@ const fetchLibraryOB = async () => {
 };
 
 class ExtensionLibrary extends React.PureComponent {
+// Helper function to handle gallery loading with timeout
+const loadGalleryWithTimeout = (fetchFunction, cache, timeoutCallback, successCallback, errorCallback) => {
+    const timeout = setTimeout(() => {
+        timeoutCallback();
+    }, GALLERY_TIMEOUT_MS);
+
+    fetchFunction()
+        .then(gallery => {
+            cache = gallery;
+            successCallback(gallery);
+            clearTimeout(timeout);
+        })
+        .catch(error => {
+            log.error(error);
+            errorCallback(error);
+            clearTimeout(timeout);
+        });
+};
+
     constructor (props) {
         super(props);
         bindAll(this, [
@@ -149,52 +172,30 @@ class ExtensionLibrary extends React.PureComponent {
     componentDidMount () {
         // Fetch TurboWarp gallery if not cached
         if (!this.state.galleryTW) {
-            const timeoutTW = setTimeout(() => {
-                this.setState({
-                    galleryTWTimedOut: true
-                });
-            }, 750);
-
-            fetchLibraryTW()
-                .then(gallery => {
+            loadGalleryWithTimeout(
+                fetchLibraryTW,
+                cachedGalleryTW,
+                () => this.setState({ galleryTWTimedOut: true }),
+                gallery => {
                     cachedGalleryTW = gallery;
-                    this.setState({
-                        galleryTW: gallery
-                    });
-                    clearTimeout(timeoutTW);
-                })
-                .catch(error => {
-                    log.error(error);
-                    this.setState({
-                        galleryTWError: error
-                    });
-                    clearTimeout(timeoutTW);
-                });
+                    this.setState({ galleryTW: gallery });
+                },
+                error => this.setState({ galleryTWError: error })
+            );
         }
 
         // Fetch OmniBlocks gallery if not cached
         if (!this.state.galleryOB) {
-            const timeoutOB = setTimeout(() => {
-                this.setState({
-                    galleryOBTimedOut: true
-                });
-            }, 750);
-
-            fetchLibraryOB()
-                .then(gallery => {
+            loadGalleryWithTimeout(
+                fetchLibraryOB,
+                cachedGalleryOB,
+                () => this.setState({ galleryOBTimedOut: true }),
+                gallery => {
                     cachedGalleryOB = gallery;
-                    this.setState({
-                        galleryOB: gallery
-                    });
-                    clearTimeout(timeoutOB);
-                })
-                .catch(error => {
-                    log.error(error);
-                    this.setState({
-                        galleryOBError: error
-                    });
-                    clearTimeout(timeoutOB);
-                });
+                    this.setState({ galleryOB: gallery });
+                },
+                error => this.setState({ galleryOBError: error })
+            );
         }
     }
     handleItemSelect (item) {

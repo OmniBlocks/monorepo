@@ -228,12 +228,6 @@ class Blocks extends React.Component {
         for (const category of this.props.vm.runtime._blockInfo) {
             this.handleExtensionAdded(category);
         }
-        if (window.ScratchBlocks &&
-            window.Blockly &&
-            !window.ScratchBlocks.FieldCustom &&
-            window.Blockly.FieldCustom) {
-          window.ScratchBlocks.FieldCustom = window.Blockly.FieldCustom;
-        }
 
         gentlyRequestPersistentStorage();
     }

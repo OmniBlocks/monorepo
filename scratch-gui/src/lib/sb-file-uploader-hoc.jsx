@@ -288,7 +288,9 @@ const SBFileUploaderHOC = function (WrappedComponent) {
         onSetFileHandle: PropTypes.func
     };
     SBFileUploaderComponent.defaultProps = {
-        showOpenFilePicker: typeof showOpenFilePicker === 'function' ? window.showOpenFilePicker.bind(window) : null
+        showOpenFilePicker: typeof showOpenFilePicker === 'function' && !navigator.userAgent.includes('Android') ?
+            window.showOpenFilePicker.bind(window) :
+            null
     };
     const mapStateToProps = (state, ownProps) => {
         const loadingState = state.scratchGui.projectState.loadingState;

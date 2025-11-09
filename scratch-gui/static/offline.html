@@ -110,11 +110,12 @@
 </head>
 <body>
     <div class="offline-container">
-        <img src="images/boxy-sad.svg" alt="Boxy Sad" class="offline-icon" style="width: 120px; height: 120px;">
         <img src="/static/images/boxy-sad.svg" alt="Boxy Sad" class="offline-icon" style="width: 120px; height: 120px;">
+        <h1>You're Offline</h1>
         <p>
             It looks like you're not connected to the internet. Don't worry! 
-            OmniBlocks works offline too. If the editor doesn't work, we're sorry, and try again later.
+            OmniBlocks works offline too. You can continue working on your projects. 
+            If the editor doesn't work, we're sorry, and try again later.
         </p>
         
         <div class="actions">
@@ -129,7 +130,7 @@
 
     <script>
         function goToEditor() {
-            window.location.href = './editor.html';
+            window.location.href = 'editor.html';
         }
         
         function tryAgain() {

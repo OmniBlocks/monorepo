@@ -67,7 +67,7 @@ async function getCachedResponse(request) {
     // Try exact match first
     let response = await caches.match(request);
     
-    if (!response) {
+    if (!response && isHTMLPage(request)) {
         // Try with .html extension
         const normalizedUrl = normalizeURL(originalUrl);
         if (normalizedUrl !== originalUrl) {

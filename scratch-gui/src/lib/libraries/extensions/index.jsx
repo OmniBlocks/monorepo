@@ -55,8 +55,6 @@ import galleryIcon from './gallery/gallery.svg';
 import obgalleryIcon from './gallery/obgallery.svg';
 import {APP_NAME} from '../../brand';
 
-
-
 export default [
     {
         name: (
@@ -385,7 +383,6 @@ export default [
         incompatibleWithScratch: true,
         tags: ['tw'],
         featured: true
-        
     },
     {
         name: (
@@ -400,14 +397,13 @@ export default [
         description: (
             <FormattedMessage
                 defaultMessage="Run your own custom code written in JavaScript! Made by SharkPool."
-                description="Run your own custom code written in JavaScript! Made by SharkPool."
+                description="Description for JavaScript V2 extension made by SharkPool"
                 id="ob.jsv2.description"
             />
         ),
         incompatibleWithScratch: true,
         tags: ['ob'],
         featured: true
-        
     },
     {
         name: (

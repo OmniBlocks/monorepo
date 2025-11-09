@@ -70,6 +70,19 @@ Test all these URLs work offline after initial cache:
 
 If issues persist:
 
+   ```javascript
+   navigator.serviceWorker.getRegistrations().then(console.log)
+   ```
+
+2. **Check Cache Contents**:
+   ```javascript
+   caches.open('omniblocks-static-v2').then(cache => 
+     cache.keys().then(keys => 
+       console.log(keys.map(k => k.url))
+     )
+   )
+   ```
+
 1. **Check Service Worker Registration**:
 ### Expected Behavior After Fix
 

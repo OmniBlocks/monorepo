@@ -7,8 +7,8 @@
     <link rel="icon" type="image/png" sizes="32x32" href="icon_32.png">
     <style>
         :root {
-          --page-bg: var(--ui-secondary, #1e1e1e);
-          --page-text: var(--text-primary, #fff);
+          --page-bg: var(--page-background, #ffffff);
+          --page-text: var(--text-primary, #575E75);
           --accent-color: var(--looks-secondary, #59C0C0);
           --accent-dark: var(--motion-tertiary, #389499);
           --status-offline: #ff6b6b;
@@ -93,24 +93,27 @@
             margin-top: 2rem;
             padding: 1rem;
             border-radius: 6px;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.05);
             font-size: 0.9rem;
+            border: 1px solid rgba(0, 0, 0, 0.1);
         }
         
         .online {
-            background: rgba(81, 207, 102, 0.2);
+            background: rgba(81, 207, 102, 0.1);
             border: 1px solid var(--status-online);
+            color: #2d5016;
         }
         
         .offline {
-            background: rgba(255, 107, 107, 0.2);
+            background: rgba(255, 107, 107, 0.1);
             border: 1px solid var(--status-offline);
+            color: #8b2635;
         }
     </style>
 </head>
 <body>
     <div class="offline-container">
-        <img src="/static/images/boxy-sad.svg" alt="Boxy Sad" class="offline-icon" style="width: 120px; height: 120px;">
+        <img src="Boxy-sad.svg" alt="Boxy Sad" class="offline-icon" style="width: 120px; height: 120px;">
         <h1>You're Offline</h1>
         <p>
             It looks like you're not connected to the internet. Don't worry! 

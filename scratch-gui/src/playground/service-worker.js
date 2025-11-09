@@ -37,19 +37,27 @@ const EXTERNAL_RESOURCES = [
 // Normalize URLs: handle routes with/without .html extension
 function normalizeURL(url) {
     const urlObj = new URL(url);
-    const pathname = urlObj.pathname;
+    let pathname = urlObj.pathname;
+    
+    // Remove trailing slash (except for root)
+    if (pathname !== '/' && pathname.endsWith('/')) {
+        pathname = pathname.slice(0, -1);
+        urlObj.pathname = pathname;
+    }
     
     // If no extension and not a file, try .html
     if (!pathname.includes('.') && pathname !== '/') {
-        return url + '.html';
+        urlObj.pathname = pathname + '.html';
+        return urlObj.toString();
     }
     
     // Handle root
     if (pathname === '/') {
-        return url + 'index.html';
+        urlObj.pathname = '/index.html';
+        return urlObj.toString();
     }
     
-    return url;
+    return urlObj.toString();
 }
 
 // Enhanced cache lookup that tries multiple URL variations

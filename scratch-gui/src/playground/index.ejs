@@ -25,9 +25,9 @@
       /* CSS Variables for theme consistency */
       :root {
         --offline-ui-bg: var(--menu-bar-background, #333);
-        --text-primary: var(--text-primary, #fff);
-        --looks-secondary: var(--looks-secondary, #59C0C0);
-        --motion-tertiary: var(--motion-tertiary, #389499);
+        --offline-text: var(--text-primary, #fff);
+        --offline-accent: var(--looks-secondary, #59C0C0);
+        --offline-accent-dark: var(--motion-tertiary, #389499);
         --status-offline: #ff6b6b;
         --status-online: #51cf66;
         --status-info: #4c97ff;
@@ -52,7 +52,7 @@
       }
       .splash-screen[data-theme="dark"] {
         background-color: var(--offline-ui-bg);
-        color: var(--text-primary);
+        color: var(--offline-text);
       }
       .splash-screen > * {
         max-width: 80%;
@@ -101,8 +101,8 @@
         position: fixed;
         top: 10px;
         right: 10px;
-        background: #ff6b6b;
-        color: var(--text-primary);
+        background: var(--status-offline);
+        color: var(--offline-text);
         padding: 8px 12px;
         border-radius: 4px;
         font-size: 12px;
@@ -112,7 +112,7 @@
         box-shadow: 0 2px 8px rgba(0,0,0,0.2);
       }
       .offline-indicator.online {
-        background: #51cf66;
+        background: var(--status-online);
       }
       .offline-indicator.show {
         display: block;
@@ -126,7 +126,7 @@
         transform: translateX(-50%);
         background: var(--status-info);
         color: var(--text-primary);
-        padding: 12px 20px;
+        color: var(--offline-text);
         border-radius: 8px;
         font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
         z-index: 10000;

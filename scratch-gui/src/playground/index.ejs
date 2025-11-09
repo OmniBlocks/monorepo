@@ -7,7 +7,7 @@
     <meta name="description" content="<%= htmlWebpackPlugin.options.APP_NAME %> is a beta Multi-Language IDE for creating projects with code, paint, sound, and music editing capabilities. Based on Scratch 3 with enhanced features." />
     
     <!-- PWA Meta Tags -->
-    <meta name="theme-color" content="#9c64f7">
+    <meta name="theme-color" content="#59C0C0">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="<%= htmlWebpackPlugin.options.APP_NAME %>">
@@ -22,6 +22,17 @@
     <link rel="icon" type="image/png" sizes="192x192" href="<%= htmlWebpackPlugin.options.root %>images/192.png">
     <link rel="manifest" href="<%= htmlWebpackPlugin.options.root %>manifest.webmanifest">
     <style>
+      /* CSS Variables for theme consistency */
+      :root {
+        --offline-ui-bg: var(--menu-bar-background, #333);
+        --text-primary: var(--text-primary, #fff);
+        --looks-secondary: var(--looks-secondary, #59C0C0);
+        --motion-tertiary: var(--motion-tertiary, #389499);
+        --status-offline: #ff6b6b;
+        --status-online: #51cf66;
+        --status-info: #4c97ff;
+      }
+      
       .splash-screen {
         position: absolute;
         width: 100%;
@@ -40,8 +51,8 @@
         display: none;
       }
       .splash-screen[data-theme="dark"] {
-        background-color: #333;
-        color: white;
+        background-color: var(--offline-ui-bg);
+        color: var(--text-primary);
       }
       .splash-screen > * {
         max-width: 80%;
@@ -91,7 +102,7 @@
         top: 10px;
         right: 10px;
         background: #ff6b6b;
-        color: white;
+        color: var(--text-primary);
         padding: 8px 12px;
         border-radius: 4px;
         font-size: 12px;
@@ -113,8 +124,8 @@
         bottom: 20px;
         left: 50%;
         transform: translateX(-50%);
-        background: #4c97ff;
-        color: white;
+        background: var(--status-info);
+        color: var(--text-primary);
         padding: 12px 20px;
         border-radius: 8px;
         font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -129,7 +140,7 @@
       }
       .update-notification button {
         background: white;
-        color: #4c97ff;
+        color: var(--status-info);
         border: none;
         padding: 6px 12px;
         border-radius: 4px;

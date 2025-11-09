@@ -265,11 +265,15 @@
           window.onerror = null;
         };
         
-        // Offline/Online indicator functionality
+        var offlineIndicatorTimer = null;
         window.showOfflineIndicator = function(isOffline) {
           var indicator = document.getElementById('offline-indicator');
           var text = document.getElementById('offline-text');
           
+          if (offlineIndicatorTimer) {
+            clearTimeout(offlineIndicatorTimer);
+            offlineIndicatorTimer = null;
+          }
           if (isOffline) {
             indicator.className = 'offline-indicator show';
             text.textContent = 'Offline';
@@ -277,10 +281,12 @@
             indicator.className = 'offline-indicator online show';
             text.textContent = 'Online';
             // Hide online indicator after 3 seconds
-            setTimeout(function() {
+            offlineIndicatorTimer = setTimeout(function() {
               indicator.className = 'offline-indicator online';
+              offlineIndicatorTimer = null;
             }, 3000);
           }
+        };
         };
         
         // Update notification functionality

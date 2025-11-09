@@ -1,14 +1,17 @@
 // Service Worker for OmniBlocks - Full Offline PWA Support
 const CACHE_NAME = 'omniblocks-v1';
-const STATIC_CACHE = 'omniblocks-static-v1';
-const DYNAMIC_CACHE = 'omniblocks-dynamic-v1';
+const STATIC_CACHE = 'omniblocks-static-v2'; // Incremented for URL normalization fix
+const DYNAMIC_CACHE = 'omniblocks-dynamic-v2'; // Incremented for consistency
 
 // Resources to cache immediately on install
 const STATIC_ASSETS = [
     '/',
+    '/editor',
     '/editor.html',
     '/index.html',
+    '/fullscreen',
     '/fullscreen.html',
+    '/embed',
     '/embed.html',
     '/offline.html',
     '/static/manifest.webmanifest',
@@ -30,6 +33,66 @@ const EXTERNAL_RESOURCES = [
     'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.7/css/select2.min.css',
     'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.7/js/select2.min.js'
 ];
+
+// Normalize URLs: handle routes with/without .html extension
+function normalizeURL(url) {
+    const urlObj = new URL(url);
+    let pathname = urlObj.pathname;
+    
+    // Remove trailing slash (except for root)
+    if (pathname !== '/' && pathname.endsWith('/')) {
+        pathname = pathname.slice(0, -1);
+        urlObj.pathname = pathname;
+    }
+    
+    // If no extension and not a file, try .html
+    if (!pathname.includes('.') && pathname !== '/') {
+        urlObj.pathname = pathname + '.html';
+        return urlObj.toString();
+    }
+    
+    // Handle root
+    if (pathname === '/') {
+        urlObj.pathname = '/index.html';
+        return urlObj.toString();
+    }
+    
+    return urlObj.toString();
+}
+
+// Enhanced cache lookup that tries multiple URL variations
+async function getCachedResponse(request) {
+    const originalUrl = request.url;
+    
+    // Try exact match first
+    let response = await caches.match(request);
+    
+    if (!response && isHTMLPage(request)) {
+        // Try with .html extension
+        const normalizedUrl = normalizeURL(originalUrl);
+        if (normalizedUrl !== originalUrl) {
+            response = await caches.match(normalizedUrl);
+        }
+    }
+    
+    if (!response) {
+        // Try without .html extension (reverse normalization)
+        if (originalUrl.endsWith('.html')) {
+            const withoutHtml = originalUrl.replace(/\.html$/, '');
+            response = await caches.match(withoutHtml);
+        }
+    }
+    
+    if (!response) {
+        // Try without query params
+        const urlWithoutParams = originalUrl.split('?')[0];
+        if (urlWithoutParams !== originalUrl) {
+            response = await caches.match(urlWithoutParams);
+        }
+    }
+    
+    return response;
+}
 
 // Install event - cache static assets
 self.addEventListener('install', event => {
@@ -137,7 +200,7 @@ async function handleRequest(request) {
 
 // Cache-first strategy: Check cache first, then network
 async function cacheFirst(request, cacheName) {
-    const cachedResponse = await caches.match(request);
+    const cachedResponse = await getCachedResponse(request);
     
     if (cachedResponse) {
         console.log('[SW] Serving from cache:', request.url);
@@ -169,7 +232,7 @@ async function networkFirst(request, cacheName) {
         return networkResponse;
     } catch (error) {
         console.log('[SW] Network failed, trying cache:', request.url);
-        const cachedResponse = await caches.match(request);
+        const cachedResponse = await getCachedResponse(request);
         
         if (cachedResponse) {
             return cachedResponse;
@@ -236,11 +299,12 @@ async function getOfflineFallback(request) {
     
     // For HTML pages, try to serve a cached page or offline page
     if (isHTMLPage(request)) {
-        // Try to serve the main editor page as fallback
-        const fallbackResponse = await caches.match('/editor.html') || 
-                                 await caches.match('/index.html') ||
-                                 await caches.match('/') ||
-                                 await caches.match('/offline.html');
+        // Try to serve the main editor page as fallback using enhanced cache lookup
+        const fallbackResponse = await getCachedResponse(new Request('/editor.html')) || 
+                                 await getCachedResponse(new Request('/editor')) ||
+                                 await getCachedResponse(new Request('/index.html')) ||
+                                 await getCachedResponse(new Request('/')) ||
+                                 await getCachedResponse(new Request('/offline.html'));
         
         if (fallbackResponse) {
             return fallbackResponse;

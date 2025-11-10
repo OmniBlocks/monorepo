@@ -12,7 +12,7 @@
   "categories": ["education", "productivity", "developer"],
   "icons": [
     {
-      "src": "icon_32.png",
+      "src": "favicon.ico",
       "sizes": "32x32",
       "type": "image/png",
       "purpose": "any"
@@ -24,7 +24,7 @@
       "purpose": "any"
     },
     {
-      "src": "icon_maskable_192.png",
+      "src": "images/192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
@@ -50,9 +50,9 @@
       "url": "/editor.html?new=true",
       "icons": [
         {
-          "src": "icon_32.png",
+          "src": "favicon.ico",
           "sizes": "32x32",
-          "type": "image/png"
+          "type": "image/x-icon"
         }
       ]
     },
@@ -63,9 +63,9 @@
       "url": "/index.html",
       "icons": [
         {
-          "src": "icon_32.png",
+          "src": "favicon.ico",
           "sizes": "32x32",
-          "type": "image/png"
+          "type": "image/x-icon"
         }
       ]
     },
@@ -76,9 +76,9 @@
       "url": "/fullscreen.html",
       "icons": [
         {
-          "src": "icon_32.png",
+          "src": "favicon.ico",
           "sizes": "32x32",
-          "type": "image/png"
+          "type": "image/x-icon"
         }
       ]
     }

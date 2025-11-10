@@ -16,8 +16,8 @@ const STATIC_ASSETS = [
     '/offline.html',
     '/static/manifest.webmanifest',
     '/static/favicon.ico',
-    '/static/icon_32.png',
-    '/static/icon_maskable_192.png',
+    '/static/favicon.ico',
+    '/static/images/192.png',
     '/static/images/192.png',
     '/static/images/512.png',
     '/static/beepbox_editor.min.js',
@@ -410,8 +410,8 @@ self.addEventListener('push', event => {
     
     const options = {
         body: 'Your project has been saved successfully!',
-        icon: '/static/icon_maskable_192.png',
-        badge: '/static/icon_32.png',
+    icon: '/static/images/192.png',
+    badge: '/static/favicon.ico',
         tag: 'project-saved'
     };
     

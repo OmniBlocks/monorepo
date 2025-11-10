@@ -61,7 +61,15 @@ Experience OmniBlocks live: [https://omniblocks.github.io](https://omniblocks.gi
 
 ## ✨ Features & Enhancements
 
+### 📱 **Full Offline PWA Support** ⭐ NEW!
+*   **Complete Offline Functionality:** Work on projects without internet connection
+*   **Progressive Web App:** Install OmniBlocks as an app on desktop and mobile
+*   **Automatic Caching:** All resources cached for instant offline access
+*   **Local Storage:** Projects saved locally with existing Restore Points system for reliability
+*   **Offline Indicators:** Clear visual feedback for connection status
+*   **See the [Offline PWA Guide](docs/OFFLINE_PWA_GUIDE.md) for detailed information**
 
+### 🎨 **Enhanced IDE Experience**
 *   **Plenty of Addons:** Dozens of community-built addons for custom blocks, UI tweaks, and new functionality. Many are inherited from TurboWarp and other mods from now, but we will implement some new ones soon.
 *   **Themes:** Multiple color themes (Aqua, Blue, Rainbow, Red, Purple) to personalize your editor. The Aqua theme is the default, as it is the main brand color of OmniBlocks.
 *   **OmniBlocks IDE:** OmniBlocks plans to be a full-featured IDE extending beyond blocks. There will be editors for text languages like Python and C in the future!

@@ -391,6 +391,15 @@ class Runtime extends EventEmitter {
             limit: 10
         };
 
+        /**
+         * Extension runtime configuration options.
+         * Used by extensions to access runtime settings (e.g., sandboxing mode).
+         * @type {Object}
+         */
+        this.extensionRuntimeOptions = {
+            javascriptUnsandboxed: false
+        };
+
         const newCloudDataManager = cloudDataManager(this.cloudOptions);
 
         /**

@@ -1,3 +1,4 @@
+# OmniBlocks - The Ultimate MultiLanguage IDE
 # OmniBlocks/scratch-gui
 ![Build Status](https://github.com/OmniBlocks/scratch-gui/workflows/CI/badge.svg)
 ![GitHub issues](https://img.shields.io/github/issues/OmniBlocks/scratch-gui)
@@ -27,7 +28,7 @@
 
 > A fork of the Scratch 3.0 GUI, modified and enhanced for the [TurboWarp](https://turbowarp.org/) compiler and the [OmniBlocks](https://omniblocks.github.io) multi-language IDE.
 
-This repository contains the frontend interface of the Block-Based editor for OmniBlocks and TurboWarp. It builds upon Scratch's foundation with significant performance improvements, addons, themes, and other features for an amazing coding experience.
+This repository contains the frontend interface of the Block-Based editor for OmniBlocks and TurboWarp. It builds upon Scratch and TurboWarp's foundation with significant performance improvements, addons, themes, and other features for an amazing coding experience.
 
 ## 📑 Table of Contents
 - [🎮 Try It Out](#-try-it-out)
@@ -81,7 +82,8 @@ Experience OmniBlocks live: [https://omniblocks.github.io](https://omniblocks.gi
 
 ## 🚀 Quick Start
 
-Want to run a local copy of the OmniBlocks editor? Follow these steps.
+Want to create your own modification/fork of OmniBlocks, or help contribute to it? Follow the following steps:
+
 
 ### Prerequisites
 
@@ -148,9 +150,9 @@ To actually mod Scratch, you need to build the GUI, as it is the main package th
 
 2.  **Install dependencies (recommended method):**
     ```bash
-    npm ci  # We prefer this as it doesn't modify package-lock.json, which keeps the dependencies the same.
+    npm ci  # We prefer this as it doesn't modify package-lock.json, which keeps the dependencies the same. 
     ```
-    *(Use `npm install` only if you need to update dependencies, which may cause breaking changes you need to fix)*
+    *(If you do decide to use `npm install`, it has to be `npm install --legacy-peer-deps` so it doesn't error)*
 
 3.  **Start the development server:**
     ```bash
@@ -162,7 +164,7 @@ To actually mod Scratch, you need to build the GUI, as it is the main package th
     ```bash
     npm run build
     ```
-    Output will be in the `build/` directory. You can then use this output with a GitHub Actions workflow to push to a website or something like that.
+    Output will be in the `build/` directory. You can then use this output with a GitHub Actions workflow to push to a website or something like that. If you go to our [site build repo,](https://github.com/OmniBlocks/omniblocks.github.io) you can use the `sh` script and `yml` workflow from there 😁
 
 
 ## 🏗️ Project Architecture & Development Guide
@@ -173,12 +175,12 @@ This section is for developers looking to understand, modify, or contribute to t
 - **State Management:** Uses Redux. Reducers are located in `src/reducers/`.
 - **Core GUI Logic:** Located in `src/`.
 - **Addons:** Managed in `src/addons/`. Synced and patched from upstream repositories using `pull.js`. If you try hard enough you can make your own by making all the files you need yourself.
-- **Extensions:** Custom blocks and hardware integrations are in `src/lib/libraries/extensions/`. Extensions are in scratch-vm, an external dependency. You'll need to fork that separate repository with your changes there, and link the new forked repository to scratch-vm. This isn't very easy if you don't know much about NPM, so we're sorry about this, although we might move to the monorepo that doesn't require all these repos someday.
+- **Extensions:** Custom blocks and hardware integrations are in `src/lib/libraries/extensions/`. Extensions are in scratch-vm, an external dependency. You'll need to fork that separate repository with your changes there, and link the new forked repository to scratch-vm. This isn't very easy if you don't know much about NPM, so we're sorry about this, although we might move to the monorepo that doesn't require all these repos someday. You can still do it manually by editing thr `package.json` file.
 - **Translations:** Located in `src/lib/tw-translations/`.
 - **Theming:** Theme definitions (Aqua, Blue, etc.) are in `src/lib/themes/accent/<theme>.js`. Global color variables are set in `src/css/colors.css` and overridden in JS as needed.
 
 ### Key Workflows
-- **Syncing Addons:** Run `node pull.js` to fetch and patch the latest addons from upstream sources.
+- **Syncing Addons:** Run `node pull.js` to fetch and patch the latest addons from upstream sources. This, unfortunately, will overwrite any hand-written addons you had before.
 - **Adding a New Addon:** Create a new directory within `src/addons/` with all necessary files and ensure it's imported in `src/addons/entry.js`.
 - **Modifying Themes:** Make a new file and title it "<color-name>.js". For example, if you want to make a new yellow theme, you can do "yellow.js". Then look for all the other JS files where the themes are imported, such as scratch-gui/src/lib/themes/index.js.
 - **Debugging:** For build issues, inspect the output in the `build/` directory or check the console output from `npm run build`.
@@ -295,7 +297,8 @@ A: Yes! Open an issue on our GitHub repository with the "enhancement" label. We 
 ### Technical Questions
 
 **Q: What are the system requirements?**  
-A: OmniBlocks runs in any modern web browser (Chrome, Firefox, Safari, Edge). Keep in mind that for the best performance, Chromium-based browsers are significantly faster, such as Chrome or Edge. For development, you'll need Node.js 18+ and npm. If you don't have access to such tools (for example, if you want to develop on an iPad or tablet), you can start a GitHub Codespace, which is a free browser environment for coding.
+A: OmniBlocks runs in any modern web browser (Chrome, Firefox, Safari, Edge). Keep in mind that for the best performance and features, Chromium-based browsers are significantly faster, such as Chrome or Edge. For development, you'll need Node.js 18+ and npm. If you don't have access to such tools (for example, if you want to develop on an iPad or tablet), you can start a GitHub Codespace, which is a free browser environment for coding.
+For best feature support, install on Microsoft Edge/Chrome as a PWA. As a Firefox user myself, yes, this is painful.
 
 **Q: Can I self-host OmniBlocks?**  
 A: Yes! Follow the development setup instructions above, then build the project with `npm run build`. The output in the `build/` directory can be hosted on any static web server.
@@ -305,6 +308,7 @@ A: Try these steps:
 1. Close unnecessary browser tabs
 2. Make sure you're using a modern browser
 3. Check if your project has very large assets or complex scripts
+4. Check for infinite loops in your code or scripts running under custom blocks with "Run without screen refresh" enabled
 
 **Q: I found a bug! Where do I report it?**  
 A: Please open an issue on our GitHub repository with:
@@ -312,7 +316,7 @@ A: Please open an issue on our GitHub repository with:
 - Steps to reproduce it
 - Expected vs actual behavior
 - Browser and OS information
-- Screenshots if applicable
+- Screenshots if applicable, screen video recordings are even better
 
 ### Contributions
 
@@ -336,35 +340,28 @@ Most of the maintainers and contributors have our own personal Scratch Account t
 - @gvyt: [GvYoutube](https://scratch.mit.edu/users/GvYoutube/)
 - @NotTheBaton: [TheBaton](https://scratch.mit.edu/users/TheBaton/)
 
-**Q: I tried submitting a PR for OmniBlocks, but I got tons of lint errors.**
+**Q: I tried submitting a pull request for OmniBlocks, but I got tons of lint errors.**
 A: Ignore lint. It's only there because it is from upstream, but we don't actually use it. As long as the code itself compiles and runs and is, well, functional, I could literally NOT care LESS if you're indenting with tabs, spaces, or you put 6 or 7 indents instead of 4. Just make sure your code works 😎
 
 ## Roadmap
 
 ### Current Focus
-- [ ] Complete music editor integration
-- [ ] Python editor improvements
-- [ ] C/C++ editor enhancements
 - [ ] JavaScript Extension
+- [ ] Complete music editor integration
+
 
 ### Short-term Goals (Next 3-6 months)
-- [ ] Additional theme options
-- [ ] More addon integrations
-- [ ] Enhanced mobile experience
-- [ ] Improved documentation
-- [ ] Tutorial system for new users
-- [ ] Project templates library
+- [ ] Add monaco react editor
 
 ### Long-term Vision
 - [ ] Full Python/C++ IDE integration
 - [ ] Plugin system for community extensions
 - [ ] Advanced debugging tools
-- [ ] Mobile app version
+- [ ] Specialized Mobile app version
+- [ ] Electron App for even deeper integration that PWA's just can't have
 
 ### Completed ✅
-- [x] TurboWarp compiler integration
-- [x] Basic addon support
-- [x] Custom splash screen
+- [x] Add a bunch of small QoL features
 
 
 Have ideas for the roadmap? [Open a discussion](https://github.com/OmniBlocks/scratch-gui/discussions)!

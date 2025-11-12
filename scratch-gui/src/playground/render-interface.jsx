@@ -42,6 +42,8 @@ import {loadServiceWorker} from './load-service-worker';
 import runAddons from '../addons/entry';
 import InvalidEmbed from '../components/tw-invalid-embed/invalid-embed.jsx';
 import {APP_NAME, APP_VERSION} from '../lib/brand.js';
+import {loadFileHandler} from './load-file-handler';
+import {setProjectTitle} from '../reducers/project-title';
 
 import styles from './interface.css';
 
@@ -243,6 +245,7 @@ class Interface extends React.Component {
     componentDidUpdate (prevProps) {
         if (prevProps.isLoading && !this.props.isLoading) {
             loadServiceWorker();
+            loadFileHandler(this.props.vm, this.props.onSetProjectTitle); // register PWA file handler once project is loaded
         }
     }
     handleUpdateProjectTitle (title, isDefault) {
@@ -418,7 +421,8 @@ Interface.propTypes = {
     isLoading: PropTypes.bool,
     isPlayerOnly: PropTypes.bool,
     isRtl: PropTypes.bool,
-    projectId: PropTypes.string
+    projectId: PropTypes.string,
+    onSetProjectTitle: PropTypes.func
 };
 
 const mapStateToProps = state => ({
@@ -432,7 +436,9 @@ const mapStateToProps = state => ({
     projectId: state.scratchGui.projectState.projectId
 });
 
-const mapDispatchToProps = () => ({});
+const mapDispatchToProps = dispatch => ({
+    onSetProjectTitle: title => dispatch(setProjectTitle(title))
+});
 
 const ConnectedInterface = injectIntl(connect(
     mapStateToProps,

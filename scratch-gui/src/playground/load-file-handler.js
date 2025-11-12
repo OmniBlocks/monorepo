@@ -44,8 +44,8 @@ const loadFileHandler = vm => {
             
             // Update project title from filename
             const projectTitle = file.name.replace(/\.sb3$/i, '').substring(0, 100);
-            if (window.setProjectTitle) {
-                window.setProjectTitle(projectTitle);
+            if (onSetProjectTitle) {
+                onSetProjectTitle(projectTitle);
             }
             
             // Force a render

@@ -37,6 +37,16 @@ const loadFileHandler = (vm, onSetProjectTitle) => {
             // Read file as ArrayBuffer (same as sb-file-uploader-hoc.jsx does)
             const arrayBuffer = await file.arrayBuffer();
             
+            // Wait for VM to be ready (with timeout)
+            const maxWaitTime = 10000; // 10 seconds
+            const startTime = Date.now();
+            while (!vm || !vm.runtime || !vm.loadProject) {
+                if (Date.now() - startTime > maxWaitTime) {
+                    throw new Error('VM failed to initialize within timeout period');
+                }
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+            
             // Stop current project and load new one
             vm.quit();
             

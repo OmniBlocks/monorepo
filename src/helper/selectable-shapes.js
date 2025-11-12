@@ -342,7 +342,7 @@ const generateShapeSVG = (shapeObj) => {
   const bounds = path.getBounds();
   const viewbox = `${bounds.x} ${bounds.y} ${bounds.width} ${bounds.height}`;
 
-  return `<svg xmlns="" viewBox="${viewbox}">`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewbox}">`
     + `<path d="${shapeObj.path}" stroke-width="${shapeObj.strokeWidth}" stroke="${strokeColor}" fill="none"/></svg>`;
 };
 

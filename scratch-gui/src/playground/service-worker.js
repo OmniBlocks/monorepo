@@ -14,8 +14,18 @@ const STATIC_ASSETS = [
     '/embed',
     '/embed.html',
     '/offline.html',
+    '/static/songeditor.html',
+    '/static/songeditor',
+    '/static/nintaribox_samples.js',
+    '/static/mario_paintbox_samples.js',
+    '/static/kirby_samples.js',
+    '/static/drumsamples.js',
+    '/static/privacy.html',
+    '/static/samples.js',
+    '/static/samples2.js',
+    '/static/samples3.js',
+    '/static/wario_samples.js',
     '/static/manifest.webmanifest',
-    '/static/favicon.ico',
     '/static/favicon.ico',
     '/static/images/192.png',
     '/static/images/192.png',
@@ -25,8 +35,8 @@ const STATIC_ASSETS = [
     '/static/beepbox_player.min.js',
     '/static/images/boxy-sad.svg',
     '/static/sb3-icon-256.png',
-    '/static/sb3-icon-512.png'
-    '/static/images/boxy-sad.svg'
+    '/static/sb3-icon-512.png',
+    
 ];
 
 // External resources to cache

@@ -42,6 +42,7 @@ import {loadServiceWorker} from './load-service-worker';
 import runAddons from '../addons/entry';
 import InvalidEmbed from '../components/tw-invalid-embed/invalid-embed.jsx';
 import {APP_NAME, APP_VERSION} from '../lib/brand.js';
+import {loadFileHandler} from './load-file-handler';
 
 import styles from './interface.css';
 
@@ -243,6 +244,7 @@ class Interface extends React.Component {
     componentDidUpdate (prevProps) {
         if (prevProps.isLoading && !this.props.isLoading) {
             loadServiceWorker();
+            loadFileHandler(this.props.vm); // register PWA file handler once project is loaded
         }
     }
     handleUpdateProjectTitle (title, isDefault) {

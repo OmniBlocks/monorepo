@@ -43,6 +43,7 @@ import runAddons from '../addons/entry';
 import InvalidEmbed from '../components/tw-invalid-embed/invalid-embed.jsx';
 import {APP_NAME, APP_VERSION} from '../lib/brand.js';
 import {loadFileHandler} from './load-file-handler';
+import {setProjectTitle} from '../reducers/project-title';
 
 import styles from './interface.css';
 

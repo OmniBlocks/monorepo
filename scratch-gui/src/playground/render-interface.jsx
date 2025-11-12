@@ -420,7 +420,8 @@ Interface.propTypes = {
     isLoading: PropTypes.bool,
     isPlayerOnly: PropTypes.bool,
     isRtl: PropTypes.bool,
-    projectId: PropTypes.string
+    projectId: PropTypes.string,
+    onSetProjectTitle: PropTypes.func
 };
 
 const mapStateToProps = state => ({

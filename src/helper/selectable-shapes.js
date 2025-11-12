@@ -340,7 +340,7 @@ const generateShapeSVG = (shapeObj) => {
   if (!window.test && shapeObj._cachedSVG) return shapeObj._cachedSVG;
 
   const strokeColor = "#575e75";
-  const strokeWidth = window.test ? window.test(shapeObj) ? 1;
+  const strokeWidth = window.test ? window.test(shapeObj) : 1;
   const path = new paper.Path(shapeObj.path);
   const bounds = path.getBounds();
   const viewbox = `${bounds.x - strokeWidth} ${bounds.y - strokeWidth} ${bounds.width + (strokeWidth * 2)} ${bounds.height + (strokeWidth * 2)}`;

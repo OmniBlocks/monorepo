@@ -56,7 +56,8 @@ const loadFileHandler = vm => {
         } catch (err) {
             log.error('Failed to handle file from launch queue:', err);
             // Show user-friendly error
-            alert(`Failed to open ${file.name}: ${err.message}`);
+            const fileName = file?.name || 'file';
+            alert(`Failed to open ${fileName}: ${err.message}`);
         }
     });
 };

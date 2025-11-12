@@ -244,7 +244,7 @@ class Interface extends React.Component {
     componentDidUpdate (prevProps) {
         if (prevProps.isLoading && !this.props.isLoading) {
             loadServiceWorker();
-            loadFileHandler(this.props.vm); // register PWA file handler once project is loaded
+            loadFileHandler(this.props.vm, this.props.onSetProjectTitle); // register PWA file handler once project is loaded
         }
     }
     handleUpdateProjectTitle (title, isDefault) {

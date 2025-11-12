@@ -337,14 +337,17 @@ const selectablePaths = Object.fromEntries(
 );
 
 const generateShapeSVG = (shapeObj) => {
+  if (shapeObj._cachedSVG) return shapeObj._cachedSVG;
+
   const strokeColor = "#575e75";
   const path = new paper.Path(shapeObj.path);
   const bounds = path.getBounds();
   const viewbox = `${bounds.x} ${bounds.y} ${bounds.width} ${bounds.height}`;
   path.remove();
 
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewbox}">`
-    + `<path d="${shapeObj.path}" stroke-width="${bounds.width / bounds.height}" stroke="${strokeColor}" fill="none"/></svg>`;
+  shapeObj._cachedSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewbox}">`
+    + `<path d="${shapeObj.path}" stroke-width="${window.test ?? 1}" stroke="${strokeColor}" fill="none"/></svg>`;
+  return shapeObj._cachedSVG;
 };
 
 export {

@@ -183,7 +183,8 @@ class TextTool extends paper.Tool {
             tx = -this.element.parentElement.clientWidth;
         }
         if ((this.alignment === "center") && this.element.parentElement) {
-            tx = -this.element.parentElement.clientWidth / 2;
+            const bounds = this.textBox.getBounds();
+            tx = bounds.x / (1 + paper.view.zoom * 0.5);
         }
         // The transform origin in paper is x at justification side, y at the baseline of the text.
         // The offset from (0, 0) to the upper left corner is recorded by internalBounds

@@ -341,9 +341,10 @@ const generateShapeSVG = (shapeObj) => {
   const path = new paper.Path(shapeObj.path);
   const bounds = path.getBounds();
   const viewbox = `${bounds.x} ${bounds.y} ${bounds.width} ${bounds.height}`;
+  path.remove();
 
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewbox}">`
-    + `<path d="${shapeObj.path}" stroke-width="${shapeObj.strokeWidth}" stroke="${strokeColor}" fill="none"/></svg>`;
+    + `<path d="${shapeObj.path}" stroke-width="${bounds.width / bounds.height}" stroke="${strokeColor}" fill="none"/></svg>`;
 };
 
 export {

@@ -322,7 +322,7 @@ const selectableShapes = [
     category: "blocks",
     strokeWidth: 6,
     path: "M 11.864 6.638 L 15.403 6.644 C 17.396 6.894 17.338 9.532 15.403 9.765 L 11.864 9.77 C 10.045 9.643 9.778 6.905 11.864 6.638 Z"
-    },
+  },
   {
     id: "codeblockBoolean",
     name: "Boolean Block",
@@ -337,16 +337,17 @@ const selectablePaths = Object.fromEntries(
 );
 
 const generateShapeSVG = (shapeObj) => {
-  if (shapeObj._cachedSVG) return shapeObj._cachedSVG;
+  if (!window.test && shapeObj._cachedSVG) return shapeObj._cachedSVG;
 
   const strokeColor = "#575e75";
+  const strokeWidth = window.test ? window.test(shapeObj) ? 1;
   const path = new paper.Path(shapeObj.path);
   const bounds = path.getBounds();
-  const viewbox = `${bounds.x} ${bounds.y} ${bounds.width} ${bounds.height}`;
+  const viewbox = `${bounds.x - strokeWidth} ${bounds.y - strokeWidth} ${bounds.width + (strokeWidth * 2)} ${bounds.height + (strokeWidth * 2)}`;
   path.remove();
 
   shapeObj._cachedSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewbox}">`
-    + `<path d="${shapeObj.path}" stroke-width="${window.test ?? 1}" stroke="${strokeColor}" fill="none"/></svg>`;
+    + `<path d="${shapeObj.path}" stroke-width="${strokeWidth}" stroke="${strokeColor}" fill="none"/></svg>`;
   return shapeObj._cachedSVG;
 };
 

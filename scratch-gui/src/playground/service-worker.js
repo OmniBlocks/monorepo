@@ -23,7 +23,9 @@ const STATIC_ASSETS = [
     '/static/beepbox_editor.min.js',
     '/static/beepbox_synth.min.js',
     '/static/beepbox_player.min.js',
-    '/static/DeterminationMono.ttf',
+    '/static/images/boxy-sad.svg',
+    '/static/sb3-icon-256.png',
+    '/static/sb3-icon-512.png'
     '/static/images/boxy-sad.svg'
 ];
 

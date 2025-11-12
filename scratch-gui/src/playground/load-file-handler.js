@@ -6,7 +6,7 @@ import log from '../lib/log';
  * Only works in installed Chromium-based PWAs
  * Based off sb-file-uploader-hoc.jsx logic
  */
-const loadFileHandler = (vm, onSetProjectTitle) => {
+const loadFileHandler = (vm, onSetProjectTitle, store) => {
     if (!('launchQueue' in window)) {
         log.info('Unfortunately, file handling not supported in this browser');
         return;
@@ -23,8 +23,10 @@ const loadFileHandler = (vm, onSetProjectTitle) => {
         // Only handle the first file (can't load multiple projects)
         const fileHandle = launchParams.files[0];
         
+        let fileName = 'file';
         try {
             const file = await fileHandle.getFile();
+            fileName = file.name || fileName;
             
             // Validate it's a .sb3 file
             if (!file.name.toLowerCase().endsWith('.sb3')) {
@@ -33,6 +35,16 @@ const loadFileHandler = (vm, onSetProjectTitle) => {
             }
 
             log.info(`Loading file from PWA handler: ${file.name} (${file.size} bytes)`);
+
+            // Show loading screen via Redux if store available
+            if (store) {
+                try {
+                    const {openLoadingProject} = await import('../reducers/modals');
+                    store.dispatch(openLoadingProject());
+                } catch (e) {
+                    log.warn('Could not open loading modal:', e);
+                }
+            }
 
             // Read file as ArrayBuffer (same as sb-file-uploader-hoc.jsx does)
             const arrayBuffer = await file.arrayBuffer();
@@ -63,10 +75,29 @@ const loadFileHandler = (vm, onSetProjectTitle) => {
             
             log.info('Project loaded successfully from file handler');
 
+            // Hide loading screen
+            if (store) {
+                try {
+                    const {closeLoadingProject} = await import('../reducers/modals');
+                    store.dispatch(closeLoadingProject());
+                } catch (e) {
+                    log.warn('Could not close loading modal:', e);
+                }
+            }
         } catch (err) {
             log.error('Failed to handle file from launch queue:', err);
+
+            // Hide loading screen on error
+            if (store) {
+                try {
+                    const {closeLoadingProject} = await import('../reducers/modals');
+                    store.dispatch(closeLoadingProject());
+                } catch (e) {
+                    log.warn('Could not close loading modal after error:', e);
+                }
+            }
+
             // Show user-friendly error
-            const fileName = file?.name || 'file';
             alert(`Failed to open ${fileName}: ${err.message}`);
         }
     });

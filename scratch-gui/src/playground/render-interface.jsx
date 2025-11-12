@@ -245,7 +245,7 @@ class Interface extends React.Component {
     componentDidUpdate (prevProps) {
         if (prevProps.isLoading && !this.props.isLoading) {
             loadServiceWorker();
-            loadFileHandler(this.props.vm, this.props.onSetProjectTitle); // register PWA file handler once project is loaded
+            loadFileHandler(this.props.vm, this.props.onSetProjectTitle, this.context.store); // register PWA file handler once project is loaded and pass Redux store
         }
     }
     handleUpdateProjectTitle (title, isDefault) {
@@ -423,6 +423,10 @@ Interface.propTypes = {
     isRtl: PropTypes.bool,
     projectId: PropTypes.string,
     onSetProjectTitle: PropTypes.func
+};
+
+Interface.contextTypes = {
+    store: PropTypes.object
 };
 
 const mapStateToProps = state => ({

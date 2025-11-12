@@ -343,7 +343,12 @@ const generateShapeSVG = (shapeObj) => {
   const strokeWidth = shapeObj.strokeWidth;
   const path = new paper.Path(shapeObj.path);
   const bounds = path.getBounds();
-  const viewbox = `${bounds.x - strokeWidth} ${bounds.y - strokeWidth} ${bounds.width + (strokeWidth * 2)} ${bounds.height + (strokeWidth * 2)}`;
+  const viewbox = [
+    shapeObj.id === "person" ? "-0.5" : bounds.x - strokeWidth,
+    bounds.y - strokeWidth,
+    bounds.width + (strokeWidth * 2),
+    bounds.height + (strokeWidth * 2)
+  ].join(" ");
   path.remove();
 
   shapeObj._cachedSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewbox}">`

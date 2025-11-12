@@ -20,17 +20,19 @@
         "application/zip": [".sb3"]
       },
       "icons": [
-        {
-          "src": "/sb3-icon-256.png",
-          "sizes": "256x256",
-          "type": "image/png"
-        },
-        {
-          "src": "/sb3-icon-512.png",
-          "sizes": "512x512",
-          "type": "image/png"
-        }
-      ],
+      {
+        "src": "/sb3-icon-256.png",
+        "sizes": "256x256",
+        "type": "image/png",
+        "purpose": "any maskable"
+      },
+      {
+        "src": "/sb3-icon-512.png",
+        "sizes": "512x512",
+        "type": "image/png",
+        "purpose": "any maskable"
+      }
+    ],
       "launch_type": "single-client"
     }
   ],

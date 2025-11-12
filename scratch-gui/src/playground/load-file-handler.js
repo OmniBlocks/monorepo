@@ -6,7 +6,7 @@ import log from '../lib/log';
  * Only works in installed Chromium-based PWAs
  * Based off sb-file-uploader-hoc.jsx logic
  */
-const loadFileHandler = vm => {
+const loadFileHandler = (vm, onSetProjectTitle) => {
     if (!('launchQueue' in window)) {
         log.info('Unfortunately, file handling not supported in this browser');
         return;

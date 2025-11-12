@@ -435,7 +435,9 @@ const mapStateToProps = state => ({
     projectId: state.scratchGui.projectState.projectId
 });
 
-const mapDispatchToProps = () => ({});
+const mapDispatchToProps = dispatch => ({
+    onSetProjectTitle: title => dispatch(setProjectTitle(title))
+});
 
 const ConnectedInterface = injectIntl(connect(
     mapStateToProps,

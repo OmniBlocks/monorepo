@@ -22,6 +22,11 @@ const SongEditor = () => {
                 return;
             }
 
+            if (typeof event.data !== 'object' || event.data === null) {
+                console.warn('❌ Ignoring non-object message payload:', event.data);
+                return;
+            }
+
             const { type, payload } = event.data;
             if (type === 'SONG_DATA') {
                 console.log('🎶 Received song data:', payload);
@@ -32,7 +37,6 @@ const SongEditor = () => {
                 console.log(`🔍 Received unknown message type: ${type}`);
             }
         };
-
         window.addEventListener('message', handleMessage);
 
         return () => {
@@ -57,7 +61,9 @@ const SongEditor = () => {
     const handleToggleFullscreen = () => {
         if (iframeRef.current) {
             if (iframeRef.current.requestFullscreen) {
-                iframeRef.current.requestFullscreen();
+                iframeRef.current.requestFullscreen().catch(err => {
+                    console.warn('Failed to enter fullscreen:', err);
+                });
             }
         }
     };

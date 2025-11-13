@@ -24,7 +24,13 @@
 ![GitHub number of milestones](https://img.shields.io/github/milestones/closed/OmniBlocks/scratch-gui)
 ![GitHub License](https://img.shields.io/github/license/OmniBlocks/scratch-gui)
 ![GitHub followers](https://img.shields.io/github/followers/OmniBlocks?style=flat&logo=github)
-[![Star History Chart](https://api.star-history.com/svg?repos=OmniBlocks/scratch-gui&type=Date)](https://www.star-history.com/#OmniBlocks/scratch-gui&Date)
+<a href="https://www.star-history.com/#OmniBlocks/scratch-gui&type=date&legend=top-left">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=OmniBlocks/scratch-gui&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=OmniBlocks/scratch-gui&type=date&legend=top-left" />
+   <img alt="star_historyChart" src="https://api.star-history.com/svg?repos=OmniBlocks/scratch-gui&type=date&legend=top-left" />
+ </picture>
+</a>
 
 > A fork of the Scratch 3.0 GUI, modified and enhanced for the [TurboWarp](https://turbowarp.org/) compiler and the [OmniBlocks](https://omniblocks.github.io) multi-language IDE.
 

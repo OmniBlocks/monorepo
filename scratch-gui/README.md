@@ -348,6 +348,7 @@ A: Ignore lint. It's only there because it is from upstream, but we don't actual
 ### Current Focus
 - [ ] JavaScript Extension
 - [ ] Complete music editor integration
+      Update: As of 11/12/2025, there is even better integration with the music editor, but it is still largely lacking. The music editor still doesn't have blocks to play your songs with or are stored in the project, but the Iframe is styled way better so it doesn't look like an iframe anymore, and using postmessage, it allows for you to download your songs using the existing export buttons in the song editor, as well as a fullscreen button, so it is far more usable than before where you had to go to omniblocks.github.io/songeditor just for it to be useful (as it's the standalone html instead of the iframe.) We got this working by using a function in the HTML that if detected it was an iframe, it intercepted incoming downloaded files and sent them using postmessage to the mainwindow as payload to be downloaded.
 
 
 ### Short-term Goals (Next 3-6 months)

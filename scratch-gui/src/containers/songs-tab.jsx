@@ -10,7 +10,7 @@ import {activateTab, SONGS_TAB_INDEX} from '../reducers/editor-tab';
 import {setRestore} from '../reducers/restore-deletion';
 import {showStandardAlert, closeAlertWithId} from '../reducers/alerts';
 
-import SongEditor from './song-editor.jsx';
+import SongEditor from '../components/song-editor/song-editor.jsx';
 
 class SongsTab extends React.Component {
     constructor (props) {

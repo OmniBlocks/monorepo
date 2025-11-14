@@ -181,19 +181,14 @@ class TextTool extends paper.Tool {
         // (so this.textBox.internalBounds.y is negative).
         // Move the transform origin down to the text baseline to match paper
         this.element.style.transformOrigin = `${-this.textBox.internalBounds.x}px ${-this.textBox.internalBounds.y}px`;
-        this.element.style.textAlign = "left";
+
 
         // In RTL, the element is moved relative to its parent's right edge instead of its left
         // edge. We need to correct for this in order for the element to overlap the object in paper.
         let tx = 0;
         if (this.element.parentElement) {
-            tx = this.textBox.internalBounds.x;
-            if (this.alignment === "right") {
-                this.element.style.textAlign = "right";
-            } else if (this.alignment === "center") {
-                this.element.style.textAlign = "center";
-                this.element.style.transformOrigin = `center ${-this.textBox.internalBounds.y}px`;
-            }
+            //tx = this.textBox.internalBounds.x;
+            if (window.test) window.test(this);
         }
 
         // Start by translating the element up so that its (0, 0) is now at the text baseline, like in paper
@@ -338,15 +333,18 @@ class TextTool extends paper.Tool {
         // Prevent line from wrapping
         this.element.style.width = `${this.textBox.internalBounds.width + 1}px`;
         this.element.style.height = `${this.textBox.internalBounds.height}px`;
+        this.element.style.textAlign = "left";
+
         // The transform origin needs to be updated in RTL because this.textBox.internalBounds.x
         // changes as you type
         if (this.alignment === "right") {
+            this.element.style.textAlign = "right";
             this.element.style.transformOrigin =
                 `${-this.textBox.internalBounds.x}px ${-this.textBox.internalBounds.y}px`;
         }
-        if (this.alignment === "center") {
-            this.element.style.transformOrigin =
-                `${-this.textBox.internalBounds.x / 2}px ${-this.textBox.internalBounds.y}px`;
+        if (this.alignment === "center") {  
+            this.element.style.textAlign = "center";
+            this.element.style.transformOrigin = `center ${-this.textBox.internalBounds.y}px`;
         }
     }
     beginSelect () {

@@ -24,11 +24,13 @@
 ![GitHub number of milestones](https://img.shields.io/github/milestones/closed/OmniBlocks/scratch-gui)
 ![GitHub License](https://img.shields.io/github/license/OmniBlocks/scratch-gui)
 ![GitHub followers](https://img.shields.io/github/followers/OmniBlocks?style=flat&logo=github)
+
+
 <a href="https://www.star-history.com/#OmniBlocks/scratch-gui&type=date&legend=top-left">
  <picture>
    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=OmniBlocks/scratch-gui&type=date&theme=dark&legend=top-left" />
    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=OmniBlocks/scratch-gui&type=date&legend=top-left" />
-   <img alt="star_historyChart" src="https://api.star-history.com/svg?repos=OmniBlocks/scratch-gui&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=OmniBlocks/scratch-gui&type=date&legend=top-left" />
  </picture>
 </a>
 

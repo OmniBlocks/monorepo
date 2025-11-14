@@ -182,13 +182,11 @@ class TextTool extends paper.Tool {
         // Move the transform origin down to the text baseline to match paper
         this.element.style.transformOrigin = `${-this.textBox.internalBounds.x}px ${-this.textBox.internalBounds.y}px`;
 
-
         // In RTL, the element is moved relative to its parent's right edge instead of its left
         // edge. We need to correct for this in order for the element to overlap the object in paper.
         let tx = 0;
         if (this.element.parentElement) {
-            //tx = this.textBox.internalBounds.x;
-            if (window.test) window.test(this);
+            tx = -this.textBox.internalBounds.x;
         }
 
         // Start by translating the element up so that its (0, 0) is now at the text baseline, like in paper

@@ -186,7 +186,13 @@ class TextTool extends paper.Tool {
         // edge. We need to correct for this in order for the element to overlap the object in paper.
         let tx = 0;
         if (this.element.parentElement) {
-            tx = -this.textBox.internalBounds.x;
+            if (this.alignment === "right") {
+                tx = -this.textBox.internalBounds.x * 2;
+            }
+            if (this.alignment === "center") {  
+                tx = -this.textBox.internalBounds.x * 2;
+            }
+            if (window.test) tx = window.test(this);
         }
 
         // Start by translating the element up so that its (0, 0) is now at the text baseline, like in paper

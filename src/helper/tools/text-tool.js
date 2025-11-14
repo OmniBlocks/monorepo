@@ -180,12 +180,12 @@ class TextTool extends paper.Tool {
         // edge. We need to correct for this in order for the element to overlap the object in paper.
         let tx = 0;
         if ((this.alignment === "right") && this.element.parentElement) {
-            if (window.test) tx = window.test({}, this, textBoxMtx);
+            if (window.test) tx = window.test({}, this, textBoxMtx, viewMtx);
             else tx = -this.element.parentElement.clientWidth;
         }
         if ((this.alignment === "center") && this.element.parentElement) {
             const bounds = this.textBox.getBounds();
-            if (window.test) tx = window.test(bounds, this, textBoxMtx);
+            if (window.test) tx = window.test(bounds, this, textBoxMtx, viewMtx);
             else tx = bounds.x / (1 + paper.view.zoom * 0.5);
         }
         // The transform origin in paper is x at justification side, y at the baseline of the text.
@@ -193,6 +193,7 @@ class TextTool extends paper.Tool {
         // (so this.textBox.internalBounds.y is negative).
         // Move the transform origin down to the text baseline to match paper
         this.element.style.transformOrigin = `${-this.textBox.internalBounds.x}px ${-this.textBox.internalBounds.y}px`;
+        if (window.test2) window.test2();
         // Start by translating the element up so that its (0, 0) is now at the text baseline, like in paper
         calculated.translate(tx, this.textBox.internalBounds.y);
         calculated.append(viewMtx);

@@ -221,7 +221,7 @@ const ModeToolsComponent = props => {
         subtract: {
             defaultMessage: 'Subtract',
             description: 'Label for the button that subtracts selected objects from eachother',
-            id: 'pm.paint.modeTools.merge'
+            id: 'pm.paint.modeTools.subtract'
         },
         mask: {
             defaultMessage: 'Mask',

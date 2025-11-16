@@ -4295,7 +4295,7 @@ export function pickRandomPresetValue(isNoise: boolean,rollNoveltyPresets: boole
         for (let presetIndex: number = 0; presetIndex < category.presets.length; presetIndex++) {
             const preset: Preset = category.presets[presetIndex];
             if (preset.settings != undefined && (preset.isNoise == true) == isNoise ) {
-                eligiblePresetValues.push((categoryIndex << 6) + presetIndex);
+                eligiblePresetValues.push((categoryIndex << 12) + presetIndex);
             }
         }
     }

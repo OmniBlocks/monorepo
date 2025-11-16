@@ -911,6 +911,9 @@ export class Config {
         // JukeBox
         { name: "Test Scale (TB)", realName: "**t", flags: [true, true, false, false, false, true, true, false, false, true, true, false] },
         
+        // crashes, but not because of the lack of a root note
+        // { name: "Empty", realName: "empty", flags: [false, false, false, false, false, false, false, false, false, false, false, false] }, // Custom? considering allowing this one to be be completely configurable
+    
         { name: "Custom", realName: "custom", flags: [true, false, false, true, false, false, false, false, false, true, true, false] }, // Custom? considering allowing this one to be be completely configurable
     ]);
     public static readonly keys: DictionaryArray<Key> = toNameMap([

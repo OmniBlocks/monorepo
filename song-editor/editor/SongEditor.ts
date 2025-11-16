@@ -117,7 +117,7 @@ function buildPresetOptions(isNoise: boolean, idSet: string): HTMLSelectElement 
         for (let presetIndex: number = 0; presetIndex < category.presets.length; presetIndex++) {
             const preset: Preset = category.presets[presetIndex];
             if ((preset.isNoise == true) == isNoise) {
-                group.appendChild(option({ value: (categoryIndex << 6) + presetIndex }, preset.name));
+                group.appendChild(option({ value: (categoryIndex << 12) + presetIndex }, preset.name));
                 foundAny = true;
             }
         }
@@ -815,7 +815,7 @@ export class SongEditor {
         ), 
         optgroup({ label: "Appearance" },
             option({ value: "showFifth" }, 'Highlight "Fifth" Note'),
-            option({ value: "notesFlashWhenPlayed" }, "Notes Flash When Played"),
+            option({ value: "notesFlashWhenPlayed" }, "Notes Flash When Played (DogeBox2)"),
             option({ value: "instrumentButtonsAtTop" }, "Instrument Buttons at Top"),
             option({ value: "frostedGlassBackground" }, "Frosted Glass Prompt Backdrop"),
             option({ value: "showChannels" }, "Show All Channels"),
@@ -2414,7 +2414,7 @@ export class SongEditor {
             textSpacingIcon + "Note Recording...",
             textSpacingIcon + "Appearance",
             (prefs.showFifth ? textOnIcon : textOffIcon) + 'Highlight "Fifth" Note',
-            (prefs.notesFlashWhenPlayed ? textOnIcon : textOffIcon) + "Notes Flash When Played",
+            (prefs.notesFlashWhenPlayed ? textOnIcon : textOffIcon) + "Notes Flash When Played (Dogebox2)",
             (prefs.instrumentButtonsAtTop ? textOnIcon : textOffIcon) + "Instrument Buttons at Top",
             (prefs.frostedGlassBackground ? textOnIcon : textOffIcon) + "Frosted Glass Prompt Backdrop",
             (prefs.showChannels ? textOnIcon : textOffIcon) + "Show All Channels",

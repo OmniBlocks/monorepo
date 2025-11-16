@@ -3654,7 +3654,7 @@ export class Song {
                 const instrument: Instrument = this.channels[channelIndex].instruments[i];
                 buffer.push(SongTagCode.startInstrument, base64IntToCharCode[instrument.type]);
                 buffer.push(SongTagCode.volume, base64IntToCharCode[(instrument.volume + Config.volumeRange / 2) >> 6], base64IntToCharCode[(instrument.volume + Config.volumeRange / 2) & 0x3f]);
-                buffer.push(SongTagCode.preset, base64IntToCharCode[instrument.preset >> 6], base64IntToCharCode[instrument.preset & 63]);
+                buffer.push(SongTagCode.preset, base64IntToCharCode[instrument.preset >> 18], base64IntToCharCode[(instrument.preset >> 12) & 63], base64IntToCharCode[(instrument.preset >> 6) & 63], base64IntToCharCode[instrument.preset & 63]);
 
                 buffer.push(SongTagCode.eqFilter);
                 buffer.push(base64IntToCharCode[+instrument.eqFilterType]);
@@ -4736,7 +4736,12 @@ export class Song {
                 }
             } break;
             case SongTagCode.preset: {
-                const presetValue: number = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) | (base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                let presetValue: number
+                if (!fromJukeBox) {
+                    presetValue = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 12) | (base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                } else { 
+                    presetValue = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 18) | (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 12) | (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) | (base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
+                }
                 this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].preset = presetValue;
                 // Picked string was inserted before custom chip in JB v5, so bump up preset index.
                 if ((fromJummBox && beforeFive) || (beforeFour && fromGoldBox)) {
@@ -5332,12 +5337,13 @@ export class Song {
                 } else {
                     const instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                     instrument.unison = clamp(0, Config.unisons.length + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
-                    const unisonLength = (beforeFive || !fromSlarmoosBox) ? 27 : Config.unisons.length; //27 was the old length before I added >2 voice presets
+                    const unisonLength = ((beforeFive || !fromSlarmoosBox) && !fromJukeBox) ? 27 : Config.unisons.length; //27 was the old length before I added >2 voice presets
+
                     if (((fromUltraBox && !beforeFive) || fromSlarmoosBox || fromJukeBox) && (instrument.unison == unisonLength)) {
+                        
                         // if (instrument.unison == Config.unisons.length) {
                         instrument.unison = Config.unisons.length;
                         instrument.unisonVoices = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
-
                         const unisonSpreadNegative = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                         const unisonSpread: number = base64CharCodeToInt[compressed.charCodeAt(charIndex++)] + ((base64CharCodeToInt[compressed.charCodeAt(charIndex++)] + (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] * 63)) * 63);
 

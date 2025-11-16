@@ -110,3 +110,21 @@ test('holding shift and key, releasing shift, waiting, then releasing key', t =>
 
     t.end();
 });
+
+test('hasUsedKey', t => {
+    const rt = new Runtime();
+    const k = new Keyboard(rt);
+
+    t.equal(k.hasUsedKey('backspace'), false);
+    t.equal(k.hasUsedKey('delete'), false);
+
+    k.getKeyIsDown('backspace');
+    t.equal(k.hasUsedKey('backspace'), true);
+    t.equal(k.hasUsedKey('delete'), false);
+
+    k.getKeyIsDown('delete');
+    t.equal(k.hasUsedKey('backspace'), true);
+    t.equal(k.hasUsedKey('delete'), true);
+
+    t.end();
+});

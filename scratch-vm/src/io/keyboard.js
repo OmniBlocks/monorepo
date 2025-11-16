@@ -53,6 +53,10 @@ class Keyboard {
         // tw: track last pressed key
         this.lastKeyPressed = '';
         this._numeralKeyCodesToStringKey = new Map();
+        /**
+         * Set of Scratch keys used by the project.
+         */
+        this._usedKeys = new Set();
     }
 
     /**
@@ -198,12 +202,21 @@ class Keyboard {
             return this._keysPressed.length > 0;
         }
         const scratchKey = this._keyArgToScratchKey(keyArg);
+        this._usedKeys.add(scratchKey);
         return this._keysPressed.indexOf(scratchKey) > -1;
     }
 
     // tw: expose last pressed key
     getLastKeyPressed () {
         return this.lastKeyPressed;
+    }
+
+    /**
+     * @param {string} scratchKey Scratch key
+     * @returns {boolean} true if the project has used this key
+     */
+    hasUsedKey (scratchKey) {
+        return this._usedKeys.has(scratchKey);
     }
 }
 

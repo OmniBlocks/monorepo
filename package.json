@@ -11,7 +11,7 @@
     "i18n:push": "tx-push-src scratch-editor paint-editor ./translations/en.json",
     "i18n:src": "rimraf ./translations/messages && babel src > tmp.js && rimraf tmp.js && ./scripts/build-i18n-source.js ./translations/messages/ ./translations/",
     "lint": "eslint . --fix --ext .js,.jsx",
-    "start": "webpack-dev-server",
+    "start": "cross-env NODE_OPTIONS=\"--openssl-legacy-provider\" webpack-dev-server",
     "test": "npm run unit && NODE_ENV=production npm run build",
     "unit": "jest --reporters=default",
     "watch": "webpack --progress --colors --watch"
@@ -26,13 +26,14 @@
   "dependencies": {
     "@turbowarp/paper": "^0.12.202407262155",
     "classnames": "2.2.5",
+    "cross-env": "^10.1.0",
     "keymirror": "0.1.1",
     "lodash.bindall": "4.4.0",
     "lodash.omit": "4.5.0",
     "minilog": "3.1.0",
+    "opentype.js": "^1.3.4",
     "parse-color": "1.0.0",
-    "prop-types": "^15.5.10",
-    "opentype.js": "^1.3.4"
+    "prop-types": "^15.5.10"
   },
   "peerDependencies": {
     "react": "^16",
@@ -48,6 +49,8 @@
     "scratch-render-fonts": "github:PenguinMod/penguinmod-render-fonts#master"
   },
   "devDependencies": {
+    "@babel/preset-env": "7.14.8",
+    "@babel/preset-react": "7.14.5",
     "autoprefixer": "9.7.4",
     "babel-cli": "6.26.0",
     "babel-core": "6.26.3",

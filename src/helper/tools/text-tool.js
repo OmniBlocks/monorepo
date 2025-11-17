@@ -315,6 +315,7 @@ class TextTool extends paper.Tool {
         if (this.mode === TextTool.TEXT_EDIT_MODE) {
             this.textBox.content = this.element.value;
         }
+        if (this.alignment !== "left") this.calculateMatrix(paper.view.matrix);
         this.resizeGuide();
     }
     resizeGuide () {

@@ -1,6 +1,6 @@
-# PenguinMod/PenguinMod-Paint
+# OmniBlocks/OmniBlocks-paint
 
-Modified version of scratch-paint from TurboWarp for use in PenguinMod.
+Modified version of scratch-paint from TurboWarp for use in OmniBlocks.
 Uses @turbowarp/paper as it includes some nice fixes.
 
 ## License

@@ -6,28 +6,29 @@
 
 goog.provide('Blockly.FieldCustom');
 
-goog.require('Blockly.Field');
-goog.require('Blockly.Events');
-goog.require('Blockly.FieldTextInput');
-
-var customInputs = new Map();
+const customInputs = new Map();
 
 /**
  * Class for a custom field.
- * @param {string} value The default value for the field
+ * @param {object} options Object containing the default value, inputID, etc for the field
  * @extends {Blockly.Field}
  * @constructor
  */
-Blockly.FieldCustom = function(value) {
-  Blockly.FieldCustom.superClass_.constructor.call(this, value);
+Blockly.FieldCustom = function(options) {
+  Blockly.FieldCustom.superClass_.constructor.call(this, options);
   this.addArgType('text');
 
   /**
    * input ID used to identify input from 'customInputs'
    * @type {string}
    */
-  this.inputID = null;
+  this.inputID = options.id ? options.id : null;
 
+  /**
+   * value of the field
+   * @type {any}
+   */
+  this.value_ = options.value ? options.value : '';
   /**
    * input parts stored in 'customInputs'
    * @type {object}
@@ -52,31 +53,37 @@ goog.inherits(Blockly.FieldCustom, Blockly.Field);
  * @nocollapse
  */
 Blockly.FieldCustom.fromJson = function(options) {
-  console.log("new custom field", options);
-  return new Blockly.FieldCustom(options['custom']);
+  return new Blockly.FieldCustom(options);
 };
 
-Blockly.FieldCustom.registerInput = function(id, html, onInit, onClick, onUpdate) {
-  if (!html || !(html instanceof Node)) {
-    console.warn('Param 1 must be a valid DOM element!');
+Blockly.FieldCustom.registerInput = function(id, templateHTML, onInit, onClick, onUpdate, optOnDispose) {
+  if (!templateHTML || !(templateHTML instanceof Node)) {
+    console.warn('Param 2 must be a valid DOM element!');
     return;
   }
   if (!onInit || typeof onInit !== 'function') {
-    console.warn('Param 2 must be a function!');
-    return;
-  }
-  if (!onClick || typeof onClick !== 'function') {
     console.warn('Param 3 must be a function!');
     return;
   }
-  if (!onUpdate || typeof onUpdate !== 'function') {
+  if (!onClick || typeof onClick !== 'function') {
     console.warn('Param 4 must be a function!');
     return;
   }
-  customInputs.set(id, { html, onInit, onClick, onUpdate });
+  if (!onUpdate || typeof onUpdate !== 'function') {
+    console.warn('Param 5 must be a function!');
+    return;
+  }
+  if (optOnDispose && typeof optOnDispose !== 'function') {
+    console.warn('Param 6 must be a function!');
+    return;
+  }
+  customInputs.set(id, { templateHTML, onInit, onClick, onUpdate, optOnDispose });
 };
 Blockly.FieldCustom.unregisterInput = function(id) {
   customInputs.delete(id);
+};
+Blockly.FieldCustom.registeredInputs = function() {
+  return customInputs;
 };
 
 /**
@@ -96,22 +103,31 @@ Blockly.FieldCustom.prototype.init = function() {
   }
 
   // Build the DOM.
-  const htmlDOM = this.inputParts.html;
+  const htmlDOM = this.inputParts.templateHTML.cloneNode(true);
+  htmlDOM.setAttribute('xmlns', 'http://www.w3.org/1999/xhtml');
+  this.inputParts.html = htmlDOM; // makes it easier for ext devs to find the input theyre editting
+  
   this.fieldGroup_ = Blockly.utils.createSvgElement('g', {}, null);
-this.size_.width = (htmlDOM.width != null) ? htmlDOM.width : 
-  (htmlDOM.style.width ? parseFloat(htmlDOM.style.width) : htmlDOM.getBoundingClientRect().width);
+  const boundingBox = htmlDOM.getBoundingClientRect();
+  this.size_.width = htmlDOM.width ? htmlDOM.width : htmlDOM.style.width ? parseFloat(htmlDOM.style.width) :
+    boundingBox.width;
+  this.size_.height = htmlDOM.height ? htmlDOM.height : htmlDOM.style.height ? parseFloat(htmlDOM.style.height) :
+    Math.max(32, boundingBox.height);
 
   this.sourceBlock_.getSvgRoot().appendChild(this.fieldGroup_);
 
   this.inputSource = Blockly.utils.createSvgElement('foreignObject', {
     'width': this.size_.width, 'height': this.size_.height,
-    'pointer-events': 'bounding-box', 'cursor': 'pointer'
+    'pointer-events': 'all', 'cursor': 'pointer', 'overflow': 'visible'
   }, this.fieldGroup_);
+  this.inputSource.appendChild(htmlDOM);
 
   this.mouseDownWrapper_ = Blockly.bindEventWithChecks_(
       this.getClickTarget_(), 'mousedown', this, this.onMouseDown_
   );
-  this.inputParts.onInit(this);
+  queueMicrotask(() => {
+    this.inputParts.onInit(this, this.inputParts.html);
+  });
 };
 
 /**
@@ -129,7 +145,10 @@ Blockly.FieldCustom.prototype.setValue = function(value) {
     ));
   }
   this.value_ = value;
-  this.inputParts.onUpdate(this);
+  if (this.inputParts !== undefined && this.inputParts.onUpdate) {
+    const htmlDOM = this.inputParts.html;
+    this.inputParts.onUpdate(this, htmlDOM);
+  }
 };
 
 /**
@@ -145,7 +164,8 @@ Blockly.FieldCustom.prototype.getValue = function() {
  * @private
  */
 Blockly.FieldCustom.prototype.showEditor_ = function() {
-  this.inputParts.onClick(this);
+  const htmlDOM = this.inputParts.html;
+  this.inputParts.onClick(this, htmlDOM);
 };
 
 /**
@@ -156,6 +176,10 @@ Blockly.FieldCustom.prototype.showEditor_ = function() {
 Blockly.FieldCustom.prototype.dispose_ = function() {
   var thisField = this;
   return function() {
+    if (thisField.inputParts.optOnDispose) {
+      const htmlDOM = this.inputParts.html;
+      thisField.inputParts.optOnDispose(thisField, htmlDOM);
+    }
     Blockly.FieldCustom.superClass_.dispose_.call(thisField)();
     if (thisField.mouseDownWrapper_) Blockly.unbindEvent_(thisField.mouseDownWrapper_);
   };

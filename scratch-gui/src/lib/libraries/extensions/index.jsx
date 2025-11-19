@@ -396,8 +396,6 @@ export default [
         iconURL: jgJavascriptExtensionIcon,
         description: (
             <FormattedMessage
-        description: (
-            <FormattedMessage
                 defaultMessage="Run your own custom code written in JavaScript! Made by SharkPool."
                 description="Description for JavaScript V2 extension made by SharkPool"
                 id="ob.jsv2.description"

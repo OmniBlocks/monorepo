@@ -1,67 +1,49 @@
 // Service Worker for OmniBlocks - Full Offline PWA Support
 const CACHE_NAME = 'omniblocks-v1';
-const STATIC_CACHE = 'omniblocks-static-v2'; // Incremented for URL normalization fix
-const DYNAMIC_CACHE = 'omniblocks-dynamic-v2'; // Incremented for consistency
+// bump to clear old entries with bad paths
+const STATIC_CACHE = 'omniblocks-static-v3';
+const DYNAMIC_CACHE = 'omniblocks-dynamic-v2';
+
+// --- URL helpers: make all paths scope-relative so GH Pages subpaths work ---
+const toRel = p => p.replace(/^\//, ''); // drop leading slash
+const toURL = p => new URL(toRel(p), self.registration.scope).toString();
+const mapURLs = arr => arr.map(toURL);
 
 // Resources to cache immediately on install
-const STATIC_ASSETS = [
-    '/',
-    '/editor',
-    '/editor.html',
-    '/index.html',
-    '/fullscreen',
-    '/fullscreen.html',
-    '/embed',
-    '/embed.html',
-    '/offline.html',
-    '/static/songeditor.html',
-    '/static/songeditor',
-    '/static/nintaribox_samples.js',
-    '/static/mario_paintbox_samples.js',
-    '/static/kirby_samples.js',
-    '/static/drumsamples.js',
-    '/static/privacy.html',
-    '/static/samples.js',
-    '/static/samples2.js',
-    '/static/samples3.js',
-    '/static/wario_samples.js',
-    '/static/manifest.webmanifest',
-    '/static/favicon.ico',
-    '/static/images/192.png',
-    '/static/images/192.png',
-    '/static/images/512.png',
-    '/static/beepbox_editor.min.js',
-    '/static/beepbox_synth.min.js',
-    '/static/beepbox_player.min.js',
-    '/static/images/boxy-sad.svg',
-    '/static/sb3-icon-256.png',
-    '/static/sb3-icon-512.png',
-    '/songeditor',
-    '/songeditor.html',
-    // Player directory copies (cached for embed/player view)
-    '/static/player/samples.js',
-    '/static/player/samples2.js',
-    '/static/player/samples3.js',
-    '/static/player/wario_samples.js',
-    '/static/player/nintaribox_samples.js',
-    '/static/player/kirby_samples.js',
-    '/static/player/drumsamples.js',
-    '/static/player/mario_paintbox_samples.js',
-    '/static/player/beepbox_player.min.js',
-    // cache without /static/ just in case
-    '/player/samples.js',
-    '/player/samples2.js',
-    '/player/samples3.js',
-    '/player/wario_samples.js',
-    '/player/nintaribox_samples.js',
-    '/player/kirby_samples.js',
-    '/player/drumsamples.js',
-    '/player/mario_paintbox_samples.js',
-    '/player/beepbox_player.min.js'
-    
-    
-];
-    
+// NOTE: keep these relative (no leading "/") and only include real files
+const STATIC_ASSETS = mapURLs([
+    // entry points
+    'index.html', 'editor.html', 'fullscreen.html', 'embed.html', 'offline.html',
+    // song editor (actual file)
+    'static/songeditor.html',
+    // data/sample bundles
+    'static/nintaribox_samples.js',
+    'static/mario_paintbox_samples.js',
+    'static/kirby_samples.js',
+    'static/drumsamples.js',
+    'static/samples.js', 'static/samples2.js', 'static/samples3.js',
+    'static/wario_samples.js',
+    'static/privacy.html',
+    // meta/icons
+    'static/manifest.webmanifest', 'static/favicon.ico',
+    'static/images/192.png', 'static/images/512.png',
+    'static/sb3-icon-256.png', 'static/sb3-icon-512.png',
+    // beepbox core
+    'static/beepbox_editor.min.js',
+    'static/beepbox_synth.min.js',
+    // correct player file path (was wrong before)
+    'static/player/beepbox_player.min.js',
+    // correct boxy-sad path (file exists at this location/case)
+    'static/Boxy-sad.svg',
+    // player copies (embed/player view)
+    'static/player/samples.js', 'static/player/samples2.js', 'static/player/samples3.js',
+    'static/player/wario_samples.js', 'static/player/nintaribox_samples.js',
+    'static/player/kirby_samples.js', 'static/player/drumsamples.js',
+    'static/player/mario_paintbox_samples.js'
+]);
+
+// canonical song editor URL for aliasing navigations
+const CANONICAL_SONGEDITOR = toURL('static/songeditor.html');
 
 // External resources to cache
 const EXTERNAL_RESOURCES = [
@@ -203,6 +185,17 @@ self.addEventListener('fetch', event => {
     if (!url.protocol.startsWith('http')) {
         return;
     }
+
+    // Alias navigations for song editor routes to the actual static file
+    if (request.mode === 'navigate') {
+        const p = url.pathname.replace(/\/+$/, '');
+        if (p.endsWith('/songeditor') || p.endsWith('/songeditor.html') || p.endsWith('/static/songeditor')) {
+            event.respondWith(
+                caches.match(CANONICAL_SONGEDITOR).then(hit => hit || fetch(CANONICAL_SONGEDITOR))
+            );
+            return;
+        }
+    }
     
     event.respondWith(
         handleRequest(request)
@@ -285,25 +278,27 @@ async function networkFirst(request, cacheName) {
 
 // Check if request is for a static asset
 function isStaticAsset(request) {
-    const url = new URL(request.url);
-    const pathname = url.pathname;
+    const u = new URL(request.url);
+    // compare normalized absolute string URLs
+    const requestURL = toURL(u.pathname);
     
     return (
-        pathname.includes('/static/') ||
-        pathname.endsWith('.js') ||
-        pathname.endsWith('.css') ||
-        pathname.endsWith('.png') ||
-        pathname.endsWith('.jpg') ||
-        pathname.endsWith('.jpeg') ||
-        pathname.endsWith('.gif') ||
-        pathname.endsWith('.svg') ||
-        pathname.endsWith('.ico') ||
-        pathname.endsWith('.woff') ||
-        pathname.endsWith('.woff2') ||
-        pathname.endsWith('.ttf') ||
-        pathname.endsWith('.eot') ||
-        pathname.includes('jquery') ||
-        pathname.includes('select2')
+        STATIC_ASSETS.includes(requestURL) ||
+        u.pathname.includes('/static/') ||
+        u.pathname.endsWith('.js') ||
+        u.pathname.endsWith('.css') ||
+        u.pathname.endsWith('.png') ||
+        u.pathname.endsWith('.jpg') ||
+        u.pathname.endsWith('.jpeg') ||
+        u.pathname.endsWith('.gif') ||
+        u.pathname.endsWith('.svg') ||
+        u.pathname.endsWith('.ico') ||
+        u.pathname.endsWith('.woff') ||
+        u.pathname.endsWith('.woff2') ||
+        u.pathname.endsWith('.ttf') ||
+        u.pathname.endsWith('.eot') ||
+        u.pathname.includes('jquery') ||
+        u.pathname.includes('select2')
     );
 }
 
@@ -451,8 +446,8 @@ self.addEventListener('push', event => {
     
     const options = {
         body: 'Your project has been saved successfully!',
-    icon: '/static/images/192.png',
-    badge: '/static/favicon.ico',
+        icon: '/static/images/192.png',
+        badge: '/static/favicon.ico',
         tag: 'project-saved'
     };
     

@@ -40,7 +40,7 @@ export default async function ({ addon, console, msg }) {
 
   const searchIcon = document.createElement("img");
   searchIcon.className = "sa-search-sprites-icon";
-  searchIcon.src = addon.self.dir + "/search-icon.svg";
+  searchIcon.src = addon.self.dir + "./search-icon.svg";
   searchIcon.alt = "";
   searchIcon.draggable = false;
 

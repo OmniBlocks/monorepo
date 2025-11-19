@@ -40,7 +40,7 @@ export default async function ({ addon, console, msg }) {
 
   const searchIcon = document.createElement("img");
   searchIcon.className = "sa-search-sprites-icon";
-  searchIcon.src = addon.self.dir + "./search-icon.svg";
+  searchIcon.src = addon.self.getResource("/search-icon.svg");
   searchIcon.alt = "";
   searchIcon.draggable = false;
 
@@ -59,7 +59,7 @@ export default async function ({ addon, console, msg }) {
   addon.self.addEventListener("disabled", reset);
 
   const resetIcon = document.createElement("img");
-  resetIcon.src = addon.self.dir + "./reset-icon.svg";
+  resetIcon.src = addon.self.getResource("/reset-icon.svg");
   resetIcon.alt = msg("clear");
   resetIcon.draggable = false;
   resetButton.appendChild(resetIcon);

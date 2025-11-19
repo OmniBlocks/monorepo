@@ -14,8 +14,18 @@ const STATIC_ASSETS = [
     '/embed',
     '/embed.html',
     '/offline.html',
+    '/static/songeditor.html',
+    '/static/songeditor',
+    '/static/nintaribox_samples.js',
+    '/static/mario_paintbox_samples.js',
+    '/static/kirby_samples.js',
+    '/static/drumsamples.js',
+    '/static/privacy.html',
+    '/static/samples.js',
+    '/static/samples2.js',
+    '/static/samples3.js',
+    '/static/wario_samples.js',
     '/static/manifest.webmanifest',
-    '/static/favicon.ico',
     '/static/favicon.ico',
     '/static/images/192.png',
     '/static/images/192.png',
@@ -23,9 +33,35 @@ const STATIC_ASSETS = [
     '/static/beepbox_editor.min.js',
     '/static/beepbox_synth.min.js',
     '/static/beepbox_player.min.js',
-    '/static/DeterminationMono.ttf',
-    '/static/images/boxy-sad.svg'
+    '/static/images/boxy-sad.svg',
+    '/static/sb3-icon-256.png',
+    '/static/sb3-icon-512.png',
+    '/songeditor',
+    '/songeditor.html',
+    // Player directory copies (cached for embed/player view)
+    '/static/player/samples.js',
+    '/static/player/samples2.js',
+    '/static/player/samples3.js',
+    '/static/player/wario_samples.js',
+    '/static/player/nintaribox_samples.js',
+    '/static/player/kirby_samples.js',
+    '/static/player/drumsamples.js',
+    '/static/player/mario_paintbox_samples.js',
+    '/static/player/beepbox_player.min.js',
+    // cache without /static/ just in case
+    '/player/samples.js',
+    '/player/samples2.js',
+    '/player/samples3.js',
+    '/player/wario_samples.js',
+    '/player/nintaribox_samples.js',
+    '/player/kirby_samples.js',
+    '/player/drumsamples.js',
+    '/player/mario_paintbox_samples.js',
+    '/player/beepbox_player.min.js'
+    
+    
 ];
+    
 
 // External resources to cache
 const EXTERNAL_RESOURCES = [
@@ -99,23 +135,28 @@ self.addEventListener('install', event => {
     console.log('[SW] Installing service worker...');
     
     event.waitUntil(
-        Promise.all([
-            // Cache static assets
-            caches.open(STATIC_CACHE).then(cache => {
-                console.log('[SW] Caching static assets...');
-                // Cache critical assets first
-                return cache.addAll(STATIC_ASSETS).then(() => {
-                    // Try to cache external resources, but don't fail if unavailable
-                    return Promise.allSettled(
-                        EXTERNAL_RESOURCES.map(url => 
-                            cache.add(url).catch(err => 
-                                console.warn('[SW] Failed to cache optional resource:', url, err)
-                            )
-                        )
-                    );
-                });
-            })
-        ]).then(() => {
+        caches.open(STATIC_CACHE).then(async cache => {
+            console.log('[SW] Caching static assets (resilient)...');
+
+            // Cache static assets one-by-one and tolerate failures so
+            // a single missing file won't fail the entire install.
+            await Promise.allSettled(
+                STATIC_ASSETS.map(url =>
+                    cache.add(url).catch(err => {
+                        console.warn('[SW] Failed to cache static asset:', url, err);
+                    })
+                )
+            );
+
+            // Try to cache external resources, but don't fail install if unavailable
+            await Promise.allSettled(
+                EXTERNAL_RESOURCES.map(url =>
+                    cache.add(url).catch(err =>
+                        console.warn('[SW] Failed to cache optional resource:', url, err)
+                    )
+                )
+            );
+        }).then(() => {
             console.log('[SW] Installation complete');
             // Take control immediately
             self.skipWaiting();

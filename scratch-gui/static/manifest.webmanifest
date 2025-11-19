@@ -1,5 +1,5 @@
 {
-  "name": "OmniBlocks - The Ultimate MultiLanguage IDE",
+  "name": "OmniBlocks",
   "short_name": "OmniBlocks",
   "description": "A powerful offline-capable IDE for creating projects with code, paint, sound, and music editing capabilities. Based on Scratch technology with enhanced features.",
   "start_url": "/editor.html",
@@ -10,6 +10,32 @@
   "background_color": "#333333",
   "lang": "en",
   "categories": ["education", "productivity", "developer"],
+  "file_handlers": [
+    {
+      "action": "/editor",
+      "name": "Open Scratch Project",
+      "accept": {
+        "application/x-scratch-project": [".sb3"],
+        "application/x.scratch.sb3": [".sb3"],
+        "application/zip": [".sb3"]
+      },
+      "icons": [
+      {
+        "src": "/sb3-icon-256.png",
+        "sizes": "256x256",
+        "type": "image/png",
+        "purpose": "any maskable"
+      },
+      {
+        "src": "/sb3-icon-512.png",
+        "sizes": "512x512",
+        "type": "image/png",
+        "purpose": "any maskable"
+      }
+    ],
+      "launch_type": "single-client"
+    }
+  ],
   "icons": [
     {
       "src": "favicon.ico",

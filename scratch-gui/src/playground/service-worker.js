@@ -1,7 +1,7 @@
 // Service Worker for OmniBlocks - Full Offline PWA Support
 const CACHE_NAME = 'omniblocks-v1';
 // bump to clear old entries with bad paths
-const STATIC_CACHE = 'omniblocks-static-v3';
+const STATIC_CACHE = 'omniblocks-static-v4';
 const DYNAMIC_CACHE = 'omniblocks-dynamic-v2';
 
 // --- URL helpers: make all paths scope-relative so GH Pages subpaths work ---
@@ -15,7 +15,7 @@ const STATIC_ASSETS = mapURLs([
     // entry points
     'index.html', 'editor.html', 'fullscreen.html', 'embed.html', 'offline.html',
     // song editor (actual file)
-    'static/songeditor.html',
+    'songeditor.html',
     // data/sample bundles
     'static/nintaribox_samples.js',
     'static/mario_paintbox_samples.js',
@@ -43,7 +43,7 @@ const STATIC_ASSETS = mapURLs([
 ]);
 
 // canonical song editor URL for aliasing navigations
-const CANONICAL_SONGEDITOR = toURL('static/songeditor.html');
+const CANONICAL_SONGEDITOR = toURL('songeditor.html');
 
 // External resources to cache
 const EXTERNAL_RESOURCES = [

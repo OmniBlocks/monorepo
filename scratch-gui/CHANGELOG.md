@@ -3,6 +3,17 @@
 This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
+
+### Commit [`d8ebd2e`](https://github.com/OmniBlocks/scratch-gui/commit/d8ebd2e310002951c3d439bc2ff4be7bfadb1bd8) - 2025-11-20 16:54:05 -0500
+
+**Merge pull request #388 from OmniBlocks/Q-DEV-issue-387-1763674489**
+
+Fix: Song Editor 404 - Service Worker Caching Wrong Path
+
+*Author: supervoidcoder*
+
+---
+
 ### Commit [`c8ca5a8`](https://github.com/OmniBlocks/scratch-gui/commit/c8ca5a8b0d2baca3da32e81d890620fe809a0e42) - 2025-11-20 11:59:52 -0500
 
 **feat: add commit categorizaition per release**

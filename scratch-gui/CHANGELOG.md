@@ -4,6 +4,24 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`4e94386`](https://github.com/OmniBlocks/scratch-gui/commit/4e9438662bec2b978b0e7dfda45d72bb8f20fb07) - 2025-11-20 08:53:16 -0500
+
+**feat(ci): added new visual regression testing workflow for pull requests**
+
+This will add a workflow that detects visual changes in a pull request, automatically takes screenshots, and posts the screenshots in a comment.
+- Triggers: Runs automatically on PR events or manually with /vrt comment
+- Builds both versions: Separately builds base and PR branches
+- Captures screenshots: Takes multiple screenshots of key areas (homepage, editor, code view, stage, blocks palette)
+- Pixel-perfect comparison: Uses pixelmatch to detect even small visual differences
+- Generates diffs: Creates visual diff images highlighting changes
+- Posts results: Comments on the PR with a detailed comparison table
+- Artifacts: Uploads all screenshots (base, PR, and diff) for manual review
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`1282e0d`](https://github.com/OmniBlocks/scratch-gui/commit/1282e0d9e74adafc36b8b23b5e8214ea54f251c7) - 2025-11-19 21:58:06 -0500
 
 **another test commit**

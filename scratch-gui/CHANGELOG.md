@@ -4,6 +4,17 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`bc5ab70`](https://github.com/OmniBlocks/scratch-gui/commit/bc5ab70d0dee5796ecb06a9451283a50c685f71a) - 2025-11-20 11:54:40 -0500
+
+**Merge pull request #383 from OmniBlocks/revert-159-extensions**
+
+Revert "Extensions"
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`d9a0c2d`](https://github.com/OmniBlocks/scratch-gui/commit/d9a0c2d92475b777c9d0f3ba988ee9c9df8e9fff) - 2025-11-20 11:49:45 -0500
 
 **Merge branch 'extensions' into main**

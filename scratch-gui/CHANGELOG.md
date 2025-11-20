@@ -3,6 +3,15 @@
 This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
+
+### Commit [`b8bece3`](https://github.com/OmniBlocks/scratch-gui/commit/b8bece31db480b1d8c6a04036b44e421348d2adc) - 2025-11-19 21:39:04 -0500
+
+**Update .browserslistrc**
+
+*Author: supervoidcoder*
+
+---
+
 <!-- UNRELEASED_COMMITS_END -->
 
 ## Release [v0.5.9-alpha](https://github.com/OmniBlocks/scratch-gui/releases/tag/v0.5.9-alpha) - 2025-10-06 09:16:01 -0400

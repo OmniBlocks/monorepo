@@ -3,10 +3,2025 @@
 This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
-
 ### Commit [`b8bece3`](https://github.com/OmniBlocks/scratch-gui/commit/b8bece31db480b1d8c6a04036b44e421348d2adc) - 2025-11-19 21:39:04 -0500
 
 **Update .browserslistrc**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`7b02638`](https://github.com/OmniBlocks/scratch-gui/commit/7b02638f07e281fcf6e076962747e5a655e38887) - 2025-11-19 21:15:15 -0500
+
+**updateusername**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`ce7c360`](https://github.com/OmniBlocks/scratch-gui/commit/ce7c36049ac55b3fe976dcdd4c70c814c11ed60c) - 2025-11-19 18:20:37 -0500
+
+**Fix #375**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`d3c4791`](https://github.com/OmniBlocks/scratch-gui/commit/d3c479165a7396903f47b465b7dbad7ef04ba88e) - 2025-11-19 18:04:34 -0500
+
+**Fix missing icon actually actually by rewriting it to be more like the other addons in scratch-gui and the APIs I totally knew about 😅**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`5db6fc3`](https://github.com/OmniBlocks/scratch-gui/commit/5db6fc3eeed49e3f6cbe56d723b328b9f0e2fb53) - 2025-11-19 17:13:09 -0500
+
+**Merge pull request #373 from OmniBlocks/supervoidcoder-patch-5**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`bbaf38c`](https://github.com/OmniBlocks/scratch-gui/commit/bbaf38c671a57f6b66927e02a4bf0c30204eba62) - 2025-11-19 17:01:38 -0500
+
+**fix missing icon for real**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`5dec915`](https://github.com/OmniBlocks/scratch-gui/commit/5dec91534c81b8486d0f6ed8035755a5774329e3) - 2025-11-19 16:38:05 -0500
+
+**Update userscript.js**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`db25fd6`](https://github.com/OmniBlocks/scratch-gui/commit/db25fd64e1314e9fae89d1808709323945037698) - 2025-11-19 16:31:44 -0500
+
+**fix broken icon**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`80d61d7`](https://github.com/OmniBlocks/scratch-gui/commit/80d61d7da62a981f40d4e8f3b7cc2afcf2f3cd37) - 2025-11-19 11:17:29 -0500
+
+**make on by default**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`fc1cd21`](https://github.com/OmniBlocks/scratch-gui/commit/fc1cd21a4050fa758eaf62bc302100e47bebdde0) - 2025-11-19 11:16:19 -0500
+
+**Merge pull request #371 from OmniBlocks/better-sprite-search**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`4999fa4`](https://github.com/OmniBlocks/scratch-gui/commit/4999fa4caac200921e34eb2f1ad818a1a8aba543) - 2025-11-19 10:42:16 -0500
+
+**feat: upgraded the search bar addon to be like scratch's and yeah it's just way better**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`411106b`](https://github.com/OmniBlocks/scratch-gui/commit/411106b56f1e90946b603bc919fe7b1bec537c49) - 2025-11-17 22:59:56 -0500
+
+**Merge pull request #366 from OmniBlocks/dependabot/npm_and_yarn/scratch-paint-d425f9e**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`5374fcc`](https://github.com/OmniBlocks/scratch-gui/commit/5374fcc2350502a89b764932b68259885cc69835) - 2025-11-18 03:59:17 +0000
+
+**Bump scratch-paint from `184defe` to `d425f9e`**
+
+*Author: dependabot[bot]*
+
+---
+
+### Commit [`47dfcf7`](https://github.com/OmniBlocks/scratch-gui/commit/47dfcf76522c2ba8ea49d853f6ece311e6190bb0) - 2025-11-17 15:46:04 -0500
+
+**Merge pull request #365 from OmniBlocks/dependabot/npm_and_yarn/turbowarp/jszip-3.12.0**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`e62215e`](https://github.com/OmniBlocks/scratch-gui/commit/e62215ea774d2a3a98f9b2b3d90dd91c451aa5e8) - 2025-11-17 19:22:48 +0000
+
+**Bump @turbowarp/jszip from 3.11.1 to 3.12.0**
+
+*Author: dependabot[bot]*
+
+---
+
+### Commit [`7094aec`](https://github.com/OmniBlocks/scratch-gui/commit/7094aec6fde441ebb7a9f54f895f7c7f1b872af3) - 2025-11-17 07:31:30 -0500
+
+**Update pwa-file-icon-integration.md**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`19525ef`](https://github.com/OmniBlocks/scratch-gui/commit/19525efe7c8fa0ed8c377ca397281850c5463bce) - 2025-11-15 17:09:28 -0500
+
+**Add files via upload**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`2c8c6f7`](https://github.com/OmniBlocks/scratch-gui/commit/2c8c6f72c8b9d5c2cb513e343a1a68edd26d2dfa) - 2025-11-14 17:17:11 -0500
+
+**Update README.md**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`e00387c`](https://github.com/OmniBlocks/scratch-gui/commit/e00387c04bd89a366404e997de2ebe8828950848) - 2025-11-13 12:13:06 -0600
+
+**Update README.md**
+
+*Author: Graison P*
+
+---
+
+### Commit [`a5a7f9f`](https://github.com/OmniBlocks/scratch-gui/commit/a5a7f9f038a50cae23f58296dea846d1fff0a8b1) - 2025-11-13 09:23:56 -0500
+
+**Update README on music editor**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`93a18c4`](https://github.com/OmniBlocks/scratch-gui/commit/93a18c469a091f658b10fa703cd45c5e91399f04) - 2025-11-12 23:46:13 -0500
+
+**Merge pull request #359 from OmniBlocks/songeditor-style-tweaks**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`ecdeeeb`](https://github.com/OmniBlocks/scratch-gui/commit/ecdeeeb211f5821690f984eef61447d51f0bea16) - 2025-11-13 04:45:18 +0000
+
+**aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa idk what to do**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`5796c02`](https://github.com/OmniBlocks/scratch-gui/commit/5796c02e6716a73bd257316737d0b8ec45f89f8e) - 2025-11-12 23:30:03 -0500
+
+**Apply suggestions from code review**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`b85597b`](https://github.com/OmniBlocks/scratch-gui/commit/b85597bb29ab33502f631d6831cf62cbb05be5bd) - 2025-11-13 04:21:43 +0000
+
+**add cache**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`c2a96ba`](https://github.com/OmniBlocks/scratch-gui/commit/c2a96ba33af3c60c7b8264924045c73e3db6a6e3) - 2025-11-13 04:11:10 +0000
+
+**add some css tweaks**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`0bed201`](https://github.com/OmniBlocks/scratch-gui/commit/0bed201954956cf8f6da55f73b09b756f630157b) - 2025-11-11 22:32:04 -0500
+
+**Update manifest.webmanifest**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`cad413e`](https://github.com/OmniBlocks/scratch-gui/commit/cad413e6345ca5df342a8ac2f7dc81c4a2dc0d70) - 2025-11-11 21:08:47 -0500
+
+**Merge pull request #351 from OmniBlocks/fix-pwa-file-icon-integration**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`732d4bd`](https://github.com/OmniBlocks/scratch-gui/commit/732d4bd66210685ec1050a5c776edf525c1040e8) - 2025-11-12 02:01:37 +0000
+
+**Fix PWA file handler issues Fixes #350**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`bc3caa7`](https://github.com/OmniBlocks/scratch-gui/commit/bc3caa7ebeadf3a670e2060e2ae48c36d798a10b) - 2025-11-11 20:11:53 -0500
+
+**Merge pull request #349 from OmniBlocks/pwa-file-icon-integration**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`018099d`](https://github.com/OmniBlocks/scratch-gui/commit/018099dd2c41fbe55e305a4d98d88b0fa146cc84) - 2025-11-11 20:04:08 -0500
+
+**Add missing static offline pwa entries**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`5aa5dd3`](https://github.com/OmniBlocks/scratch-gui/commit/5aa5dd30fe88fb2ec1402c502d348a026a6e803d) - 2025-11-11 19:52:40 -0500
+
+**Add missing import**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`febb3b4`](https://github.com/OmniBlocks/scratch-gui/commit/febb3b4a7b1146ab24129d531035453d7d6168f7) - 2025-11-11 19:19:48 -0500
+
+**Update src/playground/load-file-handler.js**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`b0eb17b`](https://github.com/OmniBlocks/scratch-gui/commit/b0eb17b5d5ce0bb7fd711ab0a4ea8ffc0e0048f7) - 2025-11-12 00:12:30 +0000
+
+**feature: add PWA open file support & file icon**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`886c10c`](https://github.com/OmniBlocks/scratch-gui/commit/886c10c0ed9ad016548015d89609bd0acee3ebae) - 2025-11-11 23:17:48 +0000
+
+**update reamde some more**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`1db6210`](https://github.com/OmniBlocks/scratch-gui/commit/1db6210ec1176486d374dfcd8130b1670f0472ac) - 2025-11-11 23:09:19 +0000
+
+**update readme**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`9e36233`](https://github.com/OmniBlocks/scratch-gui/commit/9e3623323725085e5736df621e758ebfd41550ed) - 2025-11-10 08:13:35 -0500
+
+**Merge pull request #345 from OmniBlocks/dependabot/npm_and_yarn/scratch-vm-9f709a3**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`81c659e`](https://github.com/OmniBlocks/scratch-gui/commit/81c659ec3bcf64b9a9e03aabce00fecf59ef3293) - 2025-11-10 13:07:51 +0000
+
+**Bump scratch-vm from `065a453` to `9f709a3`**
+
+*Author: dependabot[bot]*
+
+---
+
+### Commit [`7a73c6e`](https://github.com/OmniBlocks/scratch-gui/commit/7a73c6ed7c983ac2be137cc182ff72e47b47e583) - 2025-11-10 08:01:59 -0500
+
+**dependabto live again**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`a64c6e4`](https://github.com/OmniBlocks/scratch-gui/commit/a64c6e4d1f86afa7e063e2f715f962993ecc9a5f) - 2025-11-10 08:01:06 -0500
+
+**kill dependabot (for now)**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`c61734d`](https://github.com/OmniBlocks/scratch-gui/commit/c61734d62843335f2ba28620f600873c206e9c29) - 2025-11-10 00:29:26 +0000
+
+**fix: fix wrong icon names after the stupid clanker changed them for no reason**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`a54c8a3`](https://github.com/OmniBlocks/scratch-gui/commit/a54c8a31a2752d91bdf310a0c016c5b3c2132494) - 2025-11-08 22:00:29 -0500
+
+**Merge pull request #342 from OmniBlocks/Q-DEV-issue-341-1762654224**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`2722e14`](https://github.com/OmniBlocks/scratch-gui/commit/2722e14fbf54bf0004c3467fa851d97a1ed89736) - 2025-11-08 21:24:09 -0500
+
+**docs: Update cache version reference**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`1142a67`](https://github.com/OmniBlocks/scratch-gui/commit/1142a67451b50624c0dec8e2de126250e651bcaf) - 2025-11-08 21:23:26 -0500
+
+**fix: Fix trailing slash handling**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`270d462`](https://github.com/OmniBlocks/scratch-gui/commit/270d462349be67300e619c7928b2452917ff4c32) - 2025-11-09 02:11:44 +0000
+
+**fix(pwa): enhance service worker and update tutorial assets**
+
+*Author: amazon-q-developer[bot]*
+
+---
+
+### Commit [`2ac0e3b`](https://github.com/OmniBlocks/scratch-gui/commit/2ac0e3b61c2e55568c50a626342bd375493389fe) - 2025-11-08 20:45:07 -0500
+
+**Merge pull request #340 from OmniBlocks/Q-DEV-issue-339-1762651260**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`c43fb2d`](https://github.com/OmniBlocks/scratch-gui/commit/c43fb2d08a87de39753598d3559935d60f73f88b) - 2025-11-09 01:22:21 +0000
+
+**Update tutorial images and assets for all languages**
+
+*Author: amazon-q-developer[bot]*
+
+---
+
+### Commit [`ddc2a2b`](https://github.com/OmniBlocks/scratch-gui/commit/ddc2a2b88cf9dcd862cb6adbb9a90d1ca2701a3f) - 2025-11-08 20:10:58 -0500
+
+**Merge pull request #338 from OmniBlocks/Q-DEV-issue-336-1762550873**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`ead33cb`](https://github.com/OmniBlocks/scratch-gui/commit/ead33cb971e2ebd7c985c44507191c1b06e5810d) - 2025-11-08 19:30:25 -0500
+
+**fix duplicate css rule**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`9c7c3e3`](https://github.com/OmniBlocks/scratch-gui/commit/9c7c3e3de526ae57deb9af6827185ed02337e370) - 2025-11-08 10:16:34 -0500
+
+**Apply suggestion from @supervoidcoder**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`9f5e03f`](https://github.com/OmniBlocks/scratch-gui/commit/9f5e03fc75f05590216577de37c37609f1fa3bff) - 2025-11-08 10:14:56 -0500
+
+**Apply suggestion from @supervoidcoder**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`13a2f91`](https://github.com/OmniBlocks/scratch-gui/commit/13a2f9147fbaede3b38e6f311d40ff0238eafd1c) - 2025-11-07 16:59:08 -0500
+
+**Update static/offline.html**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`ebc7f9a`](https://github.com/OmniBlocks/scratch-gui/commit/ebc7f9a8efe1154fb270a9724d041251b6a49ea6) - 2025-11-07 16:58:40 -0500
+
+**Update src/playground/service-worker.js**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`06ce398`](https://github.com/OmniBlocks/scratch-gui/commit/06ce3984b742995c008dfeecb65bea5bc9cb80f7) - 2025-11-07 21:56:05 +0000
+
+**Update offline experience and PWA documentation**
+
+*Author: amazon-q-developer[bot]*
+
+---
+
+### Commit [`af7c837`](https://github.com/OmniBlocks/scratch-gui/commit/af7c837941325828d7b46bc6b92df3e761735d0b) - 2025-11-07 21:29:16 +0000
+
+**feat: implement offline-first PWA with service worker and storage capabilities**
+
+*Author: amazon-q-developer[bot]*
+
+---
+
+### Commit [`9c689cd`](https://github.com/OmniBlocks/scratch-gui/commit/9c689cd57e91e2d02ec2637437e45785c8c8fb8f) - 2025-11-07 14:41:41 -0500
+
+**Merge pull request #335 from OmniBlocks/dependabot/npm_and_yarn/scratch-vm-065a453**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`fc3c123`](https://github.com/OmniBlocks/scratch-gui/commit/fc3c123694b3806a70df01621b302c99dcad6086) - 2025-11-07 19:14:34 +0000
+
+**Bump scratch-vm from `6d825a0` to `065a453`**
+
+*Author: dependabot[bot]*
+
+---
+
+### Commit [`d000a65`](https://github.com/OmniBlocks/scratch-gui/commit/d000a653f09726ef597e4b3aafe2ef95704058bc) - 2025-11-07 11:18:36 -0500
+
+**Merge pull request #333 from OmniBlocks/dependabot/npm_and_yarn/scratch-blocks-d67d6cf**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`e8256e2`](https://github.com/OmniBlocks/scratch-gui/commit/e8256e2a41e09e884d4edbec2177c1bfd19357fa) - 2025-11-07 16:17:29 +0000
+
+**Bump scratch-blocks from `6d05f81` to `d67d6cf`**
+
+*Author: dependabot[bot]*
+
+---
+
+### Commit [`2df4c46`](https://github.com/OmniBlocks/scratch-gui/commit/2df4c4687c24b063ae7045e06175bdc02adb48e2) - 2025-11-07 08:47:42 -0500
+
+**Merge pull request #331 from OmniBlocks/dependabot/npm_and_yarn/scratch-blocks-6d05f81**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`3038b1e`](https://github.com/OmniBlocks/scratch-gui/commit/3038b1e63bc4370b3b9b6975970086f6f4689123) - 2025-11-07 13:45:53 +0000
+
+**Bump scratch-blocks from `3797784` to `6d05f81`**
+
+*Author: dependabot[bot]*
+
+---
+
+### Commit [`d169976`](https://github.com/OmniBlocks/scratch-gui/commit/d1699768059bae35a2721c7255b0f1f5a82d46d0) - 2025-11-06 17:10:47 -0500
+
+**Merge pull request #329 from OmniBlocks/dependabot/npm_and_yarn/scratch-blocks-3797784**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`126f208`](https://github.com/OmniBlocks/scratch-gui/commit/126f2084504425c25a04fad10db0d613e9627d70) - 2025-11-06 22:08:14 +0000
+
+**Bump scratch-blocks from `f95c89a` to `3797784`**
+
+*Author: dependabot[bot]*
+
+---
+
+### Commit [`11a1493`](https://github.com/OmniBlocks/scratch-gui/commit/11a14937450eef529787ea4f172c0921386350f4) - 2025-11-06 16:06:39 -0500
+
+**Merge pull request #327 from OmniBlocks/dependabot/npm_and_yarn/scratch-blocks-f95c89a**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`33115a6`](https://github.com/OmniBlocks/scratch-gui/commit/33115a6cf057344568ae38ed4219e6287e324dfb) - 2025-11-06 21:04:41 +0000
+
+**Bump scratch-blocks from `fd6ca7b` to `f95c89a`**
+
+*Author: dependabot[bot]*
+
+---
+
+### Commit [`84898a8`](https://github.com/OmniBlocks/scratch-gui/commit/84898a8dbe871bcc036e83f566c9e1d708b1e9d7) - 2025-11-06 15:01:03 -0600
+
+**Update 404_2.html**
+
+*Author: Graison P*
+
+---
+
+### Commit [`f6bec7b`](https://github.com/OmniBlocks/scratch-gui/commit/f6bec7be6f4a5ac856709c73f75286061a5fe53f) - 2025-11-06 14:57:25 -0600
+
+**Update 404.html**
+
+*Author: Graison P*
+
+---
+
+### Commit [`85f3247`](https://github.com/OmniBlocks/scratch-gui/commit/85f32471c7cd684e765160fca6d8e339013fd17c) - 2025-11-06 15:16:42 -0500
+
+**Merge pull request #325 from OmniBlocks/dependabot/npm_and_yarn/scratch-paint-184defe**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`3e53bba`](https://github.com/OmniBlocks/scratch-gui/commit/3e53bba4ad2ce120ebae9f787e3ef1246783caa3) - 2025-11-06 19:27:23 +0000
+
+**Bump scratch-paint from `7498e7a` to `184defe`**
+
+*Author: dependabot[bot]*
+
+---
+
+### Commit [`25afe2f`](https://github.com/OmniBlocks/scratch-gui/commit/25afe2fb3d659a6a8b73407e2ed7f732301cd3b5) - 2025-11-06 12:08:50 -0600
+
+**I would like my secret text back, please**
+
+*Author: Graison P*
+
+---
+
+### Commit [`5316fca`](https://github.com/OmniBlocks/scratch-gui/commit/5316fcae46206639244e97fad96089ff57e368d1) - 2025-11-05 16:22:28 +0000
+
+**improve 404**
+
+*Author: ampelectrecuted*
+
+---
+
+### Commit [`38c30a4`](https://github.com/OmniBlocks/scratch-gui/commit/38c30a44256fb391dbd3c5078642322a9564bfe1) - 2025-11-04 20:52:35 -0500
+
+**Merge pull request #309 from OmniBlocks/coderabbitai/chat/61ee035**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`42b1d1b`](https://github.com/OmniBlocks/scratch-gui/commit/42b1d1b75f9eafaeb21ae3791d31d43c0936a43a) - 2025-11-04 20:35:08 -0500
+
+**Apply suggestion from @amazon-q-developer[bot]**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`e9d6769`](https://github.com/OmniBlocks/scratch-gui/commit/e9d67692fcf5e45079cb1e57becafbb898aaaf83) - 2025-11-05 00:35:03 +0000
+
+**📝 CodeRabbit Chat: Add standalone build support with inline assets**
+
+*Author: coderabbitai[bot]*
+
+---
+
+### Commit [`61ee035`](https://github.com/OmniBlocks/scratch-gui/commit/61ee035e5754df1843c3fce26eaa00a61cbf3c48) - 2025-11-04 11:44:26 -0500
+
+**Update summary.yml**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`413e45a`](https://github.com/OmniBlocks/scratch-gui/commit/413e45aaacb724b8b9d602af1f6660d2da12596b) - 2025-11-04 09:59:44 -0500
+
+**Update summary.yml**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`ee7c976`](https://github.com/OmniBlocks/scratch-gui/commit/ee7c976eb010593989dd54f2c47178d0fcd96fc4) - 2025-11-04 09:53:17 -0500
+
+**fix exact duplicate detection**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`d7c7556`](https://github.com/OmniBlocks/scratch-gui/commit/d7c7556c82e0bf4eb8e5f7a68306720ec83fc243) - 2025-11-03 19:58:52 -0500
+
+**fix parsnig aagin**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`7395092`](https://github.com/OmniBlocks/scratch-gui/commit/7395092f9b6381575ea6d6ff8a848e3e72ff1e2e) - 2025-11-03 19:53:28 -0500
+
+**fix parsing**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`489fff3`](https://github.com/OmniBlocks/scratch-gui/commit/489fff3d8857c5fe1fc2373d58d089ec5b8056f4) - 2025-11-03 19:38:47 -0500
+
+**add 100% confidence duplicate detection**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`d4f5bbb`](https://github.com/OmniBlocks/scratch-gui/commit/d4f5bbb4c8d1610457aa3f0de93bbfa2332751e3) - 2025-11-03 19:28:02 -0500
+
+**fixed some stuff**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`dc58c77`](https://github.com/OmniBlocks/scratch-gui/commit/dc58c77a7417eff8ab5a7d39c0f97b39aa79865b) - 2025-11-03 19:19:28 -0500
+
+**Update summary.yml**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`f4135f0`](https://github.com/OmniBlocks/scratch-gui/commit/f4135f08b9d4f4c0a074f367df54c1a662e985d5) - 2025-11-03 19:13:57 -0500
+
+**Update summary.yml**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`8016239`](https://github.com/OmniBlocks/scratch-gui/commit/8016239d42e6d84d5958383e9a6e49a4c382dcad) - 2025-11-03 19:13:43 -0500
+
+**Update summary.yml**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`9b0f256`](https://github.com/OmniBlocks/scratch-gui/commit/9b0f256109bc6e7cf24eed89e41d6fcfd4c3e903) - 2025-11-03 19:07:51 -0500
+
+**readd security with stricter rules**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`b38c4e9`](https://github.com/OmniBlocks/scratch-gui/commit/b38c4e9c45dfa855125b3df27adc2df36bda0909) - 2025-11-03 18:26:36 -0500
+
+**Merge pull request #298 from OmniBlocks/Q-DEV-issue-297-1762211791**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`d8ba5bd`](https://github.com/OmniBlocks/scratch-gui/commit/d8ba5bdcaf2f3326136a33087a2d26cc2985944f) - 2025-11-03 23:17:52 +0000
+
+**chore: update tutorial assets and localization resources**
+
+*Author: amazon-q-developer[bot]*
+
+---
+
+### Commit [`3f6681a`](https://github.com/OmniBlocks/scratch-gui/commit/3f6681ac618ee28274a7e7f7abff54f1bd3e1fc8) - 2025-11-03 14:16:33 -0500
+
+**Merge pull request #296 from OmniBlocks/Q-DEV-issue-295-1762196549**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`f956978`](https://github.com/OmniBlocks/scratch-gui/commit/f95697806b2de04ac7e7f086df9c407dc0aa5b28) - 2025-11-03 19:03:47 +0000
+
+**chore: update project assets and localization resources**
+
+*Author: amazon-q-developer[bot]*
+
+---
+
+### Commit [`fb0489f`](https://github.com/OmniBlocks/scratch-gui/commit/fb0489f6b4a374be0972895a62d0a976d89e9786) - 2025-10-27 23:58:58 -0400
+
+**Merge pull request #291 from OmniBlocks/Q-DEV-issue-290-1761623743**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`4c66cf9`](https://github.com/OmniBlocks/scratch-gui/commit/4c66cf947ebbd08b22f905ad7a33d027787dd5ca) - 2025-10-28 03:57:04 +0000
+
+**feat: update tutorial, deck and GUI assets for localization**
+
+*Author: amazon-q-developer[bot]*
+
+---
+
+### Commit [`271ad46`](https://github.com/OmniBlocks/scratch-gui/commit/271ad4637ce574bf68b19dcf7f3a0a6d5cabf1df) - 2025-10-27 23:45:26 -0400
+
+**Update leaderboard.yml**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`5c5dd1e`](https://github.com/OmniBlocks/scratch-gui/commit/5c5dd1ee833c38c66e56961c9b346bf1cf50a018) - 2025-10-27 23:39:31 -0400
+
+**new leaderboard**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`e507b2e`](https://github.com/OmniBlocks/scratch-gui/commit/e507b2ebbb4dc35dfdf90cc9202d629956615b91) - 2025-10-27 18:38:04 -0400
+
+**Merge pull request #288 from OmniBlocks/dependabot/npm_and_yarn/turbowarp/sb3fix-0.3.7**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`d98cf5f`](https://github.com/OmniBlocks/scratch-gui/commit/d98cf5f53bc702a4440822e6289303ed81152b46) - 2025-10-27 21:09:07 +0000
+
+**Bump @turbowarp/sb3fix from 0.3.6 to 0.3.7**
+
+*Author: dependabot[bot]*
+
+---
+
+### Commit [`8196a8a`](https://github.com/OmniBlocks/scratch-gui/commit/8196a8acdcbfde01c08a6a6dad80a999561833c6) - 2025-10-27 08:08:07 -0400
+
+**Update coderabbit.yml**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`bd65924`](https://github.com/OmniBlocks/scratch-gui/commit/bd6592423b1d222a169dd8687b96b1bbdf2faad1) - 2025-10-23 19:23:06 +0100
+
+**Create coderabbit.yml**
+
+*Author: ampelectrecuted*
+
+---
+
+### Commit [`f805153`](https://github.com/OmniBlocks/scratch-gui/commit/f80515310a6e23b9aa3095a4f8f02d5ac9df6535) - 2025-10-23 19:15:51 +0100
+
+**strip songeditor down so it doesn't load too much stuff**
+
+*Author: ampelectrecuted*
+
+---
+
+### Commit [`3706e20`](https://github.com/OmniBlocks/scratch-gui/commit/3706e202d0b55ae2da6f4a6963ba2cee6f3a3fe2) - 2025-10-23 14:14:12 -0400
+
+**Create rules**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`ea53254`](https://github.com/OmniBlocks/scratch-gui/commit/ea532543aa3ba3b75884168cc2a4d110c4f25409) - 2025-10-23 19:12:58 +0100
+
+**Update songeditor.html**
+
+*Author: ampelectrecuted*
+
+---
+
+### Commit [`8ca169a`](https://github.com/OmniBlocks/scratch-gui/commit/8ca169a4f92ceab2accfe8633eb78c0e18ed2504) - 2025-10-22 16:09:11 -0400
+
+**fix sanitization**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`bded059`](https://github.com/OmniBlocks/scratch-gui/commit/bded059453d5cc3efd8dec2889bfff25996a983e) - 2025-10-22 15:54:49 -0400
+
+**Update prtest.yml**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`081e8b1`](https://github.com/OmniBlocks/scratch-gui/commit/081e8b1a38f476330b66db4bf937c632dcd2585c) - 2025-10-22 14:45:54 -0400
+
+**Merge pull request #269 from OmniBlocks/revert-267-Q-DEV-issue-266-1761157176**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`5c5b7e5`](https://github.com/OmniBlocks/scratch-gui/commit/5c5b7e50b54d15dd13c4b39a8c5d810cc303f5f4) - 2025-10-22 14:45:33 -0400
+
+**Revert "make a website in the gui"**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`d75a113`](https://github.com/OmniBlocks/scratch-gui/commit/d75a11379f21935273f642cc011c525ef3a4311b) - 2025-10-22 14:40:28 -0400
+
+**Merge branch 'Q-DEV-issue-266-1761157176' into main**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`835796f`](https://github.com/OmniBlocks/scratch-gui/commit/835796f41aa2d805433579455f4ea3e5b8a9c246) - 2025-10-22 14:38:44 -0400
+
+**revert weird change...?**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`4ed54ff`](https://github.com/OmniBlocks/scratch-gui/commit/4ed54ffcf579aa47f173f1147006b39c2da89109) - 2025-10-22 18:32:56 +0000
+
+**Add GitHub Actions workflow for PR testing and automation**
+
+*Author: amazon-q-developer[bot]*
+
+---
+
+### Commit [`dbecb35`](https://github.com/OmniBlocks/scratch-gui/commit/dbecb35cdb0993d0da12a167e923c323775ada80) - 2025-10-22 18:21:00 +0000
+
+**feat: create UltraBox web interface with responsive design**
+
+*Author: amazon-q-developer[bot]*
+
+---
+
+### Commit [`32a5913`](https://github.com/OmniBlocks/scratch-gui/commit/32a59135b0a2b308746be4d42ce21dbe1ab03732) - 2025-10-22 19:06:37 +0100
+
+**does this work**
+
+*Author: ampelectrecuted*
+
+---
+
+### Commit [`278a17c`](https://github.com/OmniBlocks/scratch-gui/commit/278a17c125d7ed75ea7defd9c288efb133af96ce) - 2025-10-20 23:08:53 -0400
+
+**Merge pull request #252 from OmniBlocks/dependabot/npm_and_yarn/scratch-blocks-fd6ca7b**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`9e44310`](https://github.com/OmniBlocks/scratch-gui/commit/9e44310d37ce217d8e35da4e8b76f1d2e3c7738b) - 2025-10-21 03:08:41 +0000
+
+**Bump scratch-blocks from `b2e223a` to `fd6ca7b`**
+
+*Author: dependabot[bot]*
+
+---
+
+### Commit [`4df8ab6`](https://github.com/OmniBlocks/scratch-gui/commit/4df8ab67d34a26ca25963ffc0ac1fffd95974977) - 2025-10-20 22:24:18 -0400
+
+**added how i don't care about stupid lint**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`dd0e8a2`](https://github.com/OmniBlocks/scratch-gui/commit/dd0e8a2f41691badb3fee3d544355a86d6144803) - 2025-10-20 13:08:08 -0400
+
+**Update README.md**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`075bcac`](https://github.com/OmniBlocks/scratch-gui/commit/075bcac8086760ad88b491aeb0176cbd8949d51e) - 2025-10-20 08:59:12 -0400
+
+**Merge pull request #245 from OmniBlocks/dependabot/npm_and_yarn/scratch-blocks-b2e223a**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`4a9121f`](https://github.com/OmniBlocks/scratch-gui/commit/4a9121f8ceffd349fc4386d9777f75d3edada60e) - 2025-10-20 12:56:10 +0000
+
+**Bump scratch-blocks from `b16082e` to `b2e223a`**
+
+*Author: dependabot[bot]*
+
+---
+
+### Commit [`9569498`](https://github.com/OmniBlocks/scratch-gui/commit/9569498ecfafa916da599c211f20571ab1cc6344) - 2025-10-19 18:28:32 -0400
+
+**Add media query for prefers-reduced-motion**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`c0a1c5c`](https://github.com/OmniBlocks/scratch-gui/commit/c0a1c5cfab55f1c645feafe83596401a84abe9a8) - 2025-10-19 16:05:58 -0400
+
+**Merge pull request #240 from OmniBlocks/Q-DEV-issue-239-1760903206**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`421f10e`](https://github.com/OmniBlocks/scratch-gui/commit/421f10e6af7eb1e58b3b1f706c8a19da0fb45500) - 2025-10-19 20:04:41 +0000
+
+**Update repository URL from TurboWarp to OmniBlocks**
+
+*Author: amazon-q-developer[bot]*
+
+---
+
+### Commit [`b8a4995`](https://github.com/OmniBlocks/scratch-gui/commit/b8a4995bcdad9e32c0d5db76e01167ffe0e0a703) - 2025-10-19 19:48:14 +0000
+
+**feat: add comprehensive documentation for music player and extensions**
+
+*Author: amazon-q-developer[bot]*
+
+---
+
+### Commit [`22ec69c`](https://github.com/OmniBlocks/scratch-gui/commit/22ec69cf52b4e91334c271dbeaa1a689ef4166d0) - 2025-10-16 13:02:44 -0400
+
+**Merge pull request #228 from OmniBlocks/dependabot/npm_and_yarn/scratch-vm-6d825a0**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`1bbe312`](https://github.com/OmniBlocks/scratch-gui/commit/1bbe312b8686d420959bbc76a9874ed2c7cc4fd5) - 2025-10-16 17:01:12 +0000
+
+**Bump scratch-vm from `7d3a23d` to `6d825a0`**
+
+*Author: dependabot[bot]*
+
+---
+
+### Commit [`e9231ac`](https://github.com/OmniBlocks/scratch-gui/commit/e9231ac5c67b97002843bb9aa6c3b476f677de94) - 2025-10-15 23:46:51 -0400
+
+**Merge pull request #224 from OmniBlocks/fix-issue-223-bot-bracket-handling-2856**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`f7db555`](https://github.com/OmniBlocks/scratch-gui/commit/f7db5558654ddee9760fcbe4e4142e3e1efd9c95) - 2025-10-16 03:44:38 +0000
+
+**feat: add skip notice comment for dependabot PRs**
+
+*Author: devloai[bot]*
+
+---
+
+### Commit [`33df919`](https://github.com/OmniBlocks/scratch-gui/commit/33df9195315078859519f4a6575323b3f7c7dfa1) - 2025-10-15 23:33:30 -0400
+
+**Merge pull request #222 from OmniBlocks/fix-media-recorder-icon-9746**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`65a67aa`](https://github.com/OmniBlocks/scratch-gui/commit/65a67aaaed5268f1b88f1cb7adfea5a3f36753d6) - 2025-10-16 03:16:47 +0000
+
+**fix: [Issue#223] sanitize bot usernames in mega PR test workflow**
+
+*Author: devloai[bot]*
+
+---
+
+### Commit [`3a7819c`](https://github.com/OmniBlocks/scratch-gui/commit/3a7819cbc6ed387715903da689dcdf066c09d22a) - 2025-10-16 02:56:48 +0000
+
+**fix: [Issue#220] preserve camera icon in media recorder after recording stops**
+
+*Author: devloai[bot]*
+
+---
+
+### Commit [`9a6a368`](https://github.com/OmniBlocks/scratch-gui/commit/9a6a3687b0fcbe297e3aa69927247eb21964a25b) - 2025-10-15 18:30:12 -0400
+
+**Update README.md**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`7430922`](https://github.com/OmniBlocks/scratch-gui/commit/743092246c94e027d633979ce97122a907d73bfb) - 2025-10-15 18:27:29 -0400
+
+**Update README.md**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`4d07b4e`](https://github.com/OmniBlocks/scratch-gui/commit/4d07b4e0c7780f412f9b736cd2d91362b0a72e3b) - 2025-10-15 16:32:24 -0400
+
+**Merge pull request #216 from OmniBlocks/dependabot/npm_and_yarn/scratch-vm-7d3a23d**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`312b39d`](https://github.com/OmniBlocks/scratch-gui/commit/312b39db3225695d11d09841cce27dcd7ac372a0) - 2025-10-15 19:31:06 +0000
+
+**Bump scratch-vm from `d1c7bd5` to `7d3a23d`**
+
+*Author: dependabot[bot]*
+
+---
+
+### Commit [`68058b1`](https://github.com/OmniBlocks/scratch-gui/commit/68058b188836c0b7b84ecdfee02cbc42c17d5a96) - 2025-10-15 11:57:43 -0400
+
+**Update prtest.yml**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`31d3bcd`](https://github.com/OmniBlocks/scratch-gui/commit/31d3bcdea83eca0088b42441eb257418f20c9cac) - 2025-10-15 11:57:16 -0400
+
+**Update prtest.yml**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`347f27d`](https://github.com/OmniBlocks/scratch-gui/commit/347f27d5e8bf4f5c5375b0042e11368b2540c684) - 2025-10-15 10:44:50 -0400
+
+**Update prtest.yml**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`0a1a38f`](https://github.com/OmniBlocks/scratch-gui/commit/0a1a38fdbee88b79ebb8a2553f44ea0354a9f244) - 2025-10-15 09:55:28 -0400
+
+**Update prtest.yml**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`4155f96`](https://github.com/OmniBlocks/scratch-gui/commit/4155f96e3563008b909479723a283baf94f67761) - 2025-10-15 09:07:39 -0400
+
+**new stuf**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`dc045e3`](https://github.com/OmniBlocks/scratch-gui/commit/dc045e36e837f35fb9eb64fe1fbb0c29f9b77b93) - 2025-10-15 08:24:24 +0100
+
+**unnecessary due to coderabbit**
+
+*Author: ampelectrecuted*
+
+---
+
+### Commit [`f05437c`](https://github.com/OmniBlocks/scratch-gui/commit/f05437c8a2b2ab4f5693725e41960c5668693e32) - 2025-10-14 16:57:56 -0400
+
+**Merge pull request #214 from OmniBlocks/dependabot/npm_and_yarn/scratch-vm-d1c7bd5**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`3df184b`](https://github.com/OmniBlocks/scratch-gui/commit/3df184b4cc5928aaee5c61d6faf989d9ebf840ca) - 2025-10-14 20:56:26 +0000
+
+**Bump scratch-vm from `cf3588a` to `d1c7bd5`**
+
+*Author: dependabot[bot]*
+
+---
+
+### Commit [`d650b34`](https://github.com/OmniBlocks/scratch-gui/commit/d650b34e1cd8aea1b10817c0450a10ba2bce62c8) - 2025-10-14 16:22:52 -0400
+
+**Merge pull request #211 from OmniBlocks/dependabot/npm_and_yarn/scratch-vm-cf3588a**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`8f9179e`](https://github.com/OmniBlocks/scratch-gui/commit/8f9179efa7fd980a52046ec8f7b50f38ce601a1d) - 2025-10-14 20:18:04 +0000
+
+**Bump scratch-vm from `3c4e829` to `cf3588a`**
+
+*Author: dependabot[bot]*
+
+---
+
+### Commit [`b0c3fef`](https://github.com/OmniBlocks/scratch-gui/commit/b0c3fef0b4bc92145c5c009bf04ac031bb131d01) - 2025-10-13 19:39:24 -0400
+
+**Merge pull request #205 from OmniBlocks/dependabot/npm_and_yarn/scratch-vm-3c4e829**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`7e24b7f`](https://github.com/OmniBlocks/scratch-gui/commit/7e24b7f300a477766bfe7a04b754ea739feeaa1e) - 2025-10-13 23:39:12 +0000
+
+**Bump scratch-vm from `caf7d23` to `3c4e829`**
+
+*Author: dependabot[bot]*
+
+---
+
+### Commit [`c2ec96f`](https://github.com/OmniBlocks/scratch-gui/commit/c2ec96f037562db8966baea5ba851e5689450a87) - 2025-10-13 17:45:54 -0400
+
+**Merge pull request #204 from OmniBlocks/dependabot/npm_and_yarn/scratch-blocks-b16082e**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`d0d1c7d`](https://github.com/OmniBlocks/scratch-gui/commit/d0d1c7d819d48e81ca396a4783a74611d52c0fd1) - 2025-10-13 21:40:49 +0000
+
+**Bump scratch-blocks from `7b24920` to `b16082e`**
+
+*Author: dependabot[bot]*
+
+---
+
+### Commit [`28550b3`](https://github.com/OmniBlocks/scratch-gui/commit/28550b3d75a84c4dcaf830382f007df4e0d8e08e) - 2025-10-13 15:19:40 -0400
+
+**Merge pull request #203 from OmniBlocks/dependabot/npm_and_yarn/scratch-vm-caf7d23**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`1fa3bd7`](https://github.com/OmniBlocks/scratch-gui/commit/1fa3bd77c01279aa7e06c341a6bbad1e23267483) - 2025-10-13 19:18:41 +0000
+
+**Bump scratch-vm from `fd46fb2` to `caf7d23`**
+
+*Author: dependabot[bot]*
+
+---
+
+### Commit [`36c418a`](https://github.com/OmniBlocks/scratch-gui/commit/36c418a5396ce21aea85d7c15d70003c6f989b0f) - 2025-10-12 21:18:41 -0400
+
+**Merge pull request #201 from OmniBlocks/dependabot/npm_and_yarn/scratch-vm-fd46fb2**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`9aa9a8d`](https://github.com/OmniBlocks/scratch-gui/commit/9aa9a8dde5028c6992244e0294b01b78e3a3bc28) - 2025-10-13 01:15:53 +0000
+
+**Bump scratch-vm from `04d009c` to `fd46fb2`**
+
+*Author: dependabot[bot]*
+
+---
+
+### Commit [`c5f1dbe`](https://github.com/OmniBlocks/scratch-gui/commit/c5f1dbe1d49e09da7827b780f76f162f64df24bd) - 2025-10-12 16:57:09 +0100
+
+**remove security because it falsely flags severe non-security bug reports**
+
+*Author: ampelectrecuted*
+
+---
+
+### Commit [`38f9215`](https://github.com/OmniBlocks/scratch-gui/commit/38f92151fe747b88f96bdacf7f66d60038131530) - 2025-10-11 18:47:41 -0400
+
+**Merge pull request #197 from OmniBlocks/dependabot/npm_and_yarn/scratch-vm-04d009c**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`d6ec24e`](https://github.com/OmniBlocks/scratch-gui/commit/d6ec24e917ecc0149d38b178db194033e398a2af) - 2025-10-11 22:46:38 +0000
+
+**Bump scratch-vm from `da704f9` to `04d009c`**
+
+*Author: dependabot[bot]*
+
+---
+
+### Commit [`5fffc06`](https://github.com/OmniBlocks/scratch-gui/commit/5fffc060c6fee9da8a901edaf64efa98a4dc1153) - 2025-10-10 19:52:33 -0400
+
+**Merge pull request #195 from OmniBlocks/dependabot/npm_and_yarn/scratch-vm-da704f9**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`c599938`](https://github.com/OmniBlocks/scratch-gui/commit/c599938abbea2a5551370b5e37c33c97c3ecebb7) - 2025-10-10 23:26:19 +0000
+
+**Bump scratch-vm from `279ea2a` to `da704f9`**
+
+*Author: dependabot[bot]*
+
+---
+
+### Commit [`4237c30`](https://github.com/OmniBlocks/scratch-gui/commit/4237c30ba3b79cce59aad70335d37d842cb284f2) - 2025-10-10 17:34:51 -0400
+
+**Merge pull request #194 from OmniBlocks/dependabot/npm_and_yarn/scratch-vm-279ea2a**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`489fac4`](https://github.com/OmniBlocks/scratch-gui/commit/489fac4b7bb6fc6f32a4aae6f8ffa411a908d549) - 2025-10-10 17:33:12 -0400
+
+**Update prtest.yml**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`7cdd63a`](https://github.com/OmniBlocks/scratch-gui/commit/7cdd63aab61c85b5462d0eb5bb1548c5d7d243d9) - 2025-10-10 16:03:52 -0400
+
+**aaddded fun stuff**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`b922df5`](https://github.com/OmniBlocks/scratch-gui/commit/b922df5372fb5988a668865ec338f44282d6af3c) - 2025-10-10 15:51:08 -0400
+
+**ok actually ACTUALLY fixed the readme anchor**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`62d625f`](https://github.com/OmniBlocks/scratch-gui/commit/62d625f83e1fcf1f5c96610e692e9141ae2862f0) - 2025-10-10 15:50:13 -0400
+
+**why is the md anchor not working yo**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`a72d72f`](https://github.com/OmniBlocks/scratch-gui/commit/a72d72f60dfe862a15cb9c50438b160ca2f45ea6) - 2025-10-10 15:49:10 -0400
+
+**Update README.md**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`f112698`](https://github.com/OmniBlocks/scratch-gui/commit/f112698ea567f8261ff7e3d6b525a844ab919bed) - 2025-10-10 15:48:51 -0400
+
+**fix anchor**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`0e500fb`](https://github.com/OmniBlocks/scratch-gui/commit/0e500fb8256547b205e9a2d5035e4a58f958f53a) - 2025-10-10 15:48:20 -0400
+
+**super coolio readme changes XD**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`dca7bd6`](https://github.com/OmniBlocks/scratch-gui/commit/dca7bd6fcb87693f65c8a312f1699414b6bd4d3d) - 2025-10-10 17:18:37 +0000
+
+**Bump scratch-vm from `1c10641` to `279ea2a`**
+
+*Author: dependabot[bot]*
+
+---
+
+### Commit [`19db548`](https://github.com/OmniBlocks/scratch-gui/commit/19db5481ec40b6ce43461224883a61396e31d631) - 2025-10-10 11:59:34 -0400
+
+**Update alert.css**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`8375b96`](https://github.com/OmniBlocks/scratch-gui/commit/8375b9647d0f8c4dca59a7b1fbc9f66603ff27e2) - 2025-10-10 11:41:01 -0400
+
+**fixed syntax error in clanker detection**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`290b03c`](https://github.com/OmniBlocks/scratch-gui/commit/290b03c840b4c08f71aca64aab4c7ecd39bcd3c7) - 2025-10-10 11:17:31 -0400
+
+**made it so that CLANKERS can't trigger a pr test**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`a62ba6d`](https://github.com/OmniBlocks/scratch-gui/commit/a62ba6db896f8a7db3fefb218e4fcd5f6a155c12) - 2025-10-10 09:41:24 -0400
+
+**Create codeql.yml because default is bleeding minutes :(**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`de2b092`](https://github.com/OmniBlocks/scratch-gui/commit/de2b0926c51b02332ed4eb8ff9989a664310a51e) - 2025-10-09 22:29:27 -0400
+
+**Merge pull request #192 from OmniBlocks/dependabot/npm_and_yarn/scratch-vm-1c10641**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`1022675`](https://github.com/OmniBlocks/scratch-gui/commit/102267517d964fb65994242a1f9cf966e68d4a38) - 2025-10-10 02:26:18 +0000
+
+**Bump scratch-vm from `882d43d` to `1c10641`**
+
+*Author: dependabot[bot]*
+
+---
+
+### Commit [`5a3ead6`](https://github.com/OmniBlocks/scratch-gui/commit/5a3ead659632afcb8d425b01bdfcb906a1f18817) - 2025-10-09 21:21:05 -0400
+
+**Merge pull request #190 from OmniBlocks/dependabot/npm_and_yarn/scratch-vm-882d43d**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`159639e`](https://github.com/OmniBlocks/scratch-gui/commit/159639ec62e3c1cf6ab3b3820ff3e03b27d0e103) - 2025-10-10 01:20:16 +0000
+
+**Bump scratch-vm from `11c2586` to `882d43d`**
+
+*Author: dependabot[bot]*
+
+---
+
+### Commit [`0b72389`](https://github.com/OmniBlocks/scratch-gui/commit/0b72389db86e73e50b15b193f7c740eaa911ed4f) - 2025-10-09 20:16:25 -0400
+
+**Merge pull request #188 from OmniBlocks/dependabot/npm_and_yarn/scratch-vm-11c2586**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`c0c40e9`](https://github.com/OmniBlocks/scratch-gui/commit/c0c40e9d93eee46fbe1ee9d5c96676d33f24c20c) - 2025-10-10 00:08:28 +0000
+
+**Bump scratch-vm from `5f9fca7` to `11c2586`**
+
+*Author: dependabot[bot]*
+
+---
+
+### Commit [`33a76e8`](https://github.com/OmniBlocks/scratch-gui/commit/33a76e8dcb1699f624ca2563aaef42c40e1fccf8) - 2025-10-09 19:47:11 -0400
+
+**Merge pull request #185 from OmniBlocks/dependabot/npm_and_yarn/scratch-vm-5f9fca7**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`a7f40cc`](https://github.com/OmniBlocks/scratch-gui/commit/a7f40ccd63003e9bbcaf94b1f8cf4fa8b4d05a1c) - 2025-10-09 23:43:36 +0000
+
+**Bump scratch-vm from `a7ad12d` to `5f9fca7`**
+
+*Author: dependabot[bot]*
+
+---
+
+### Commit [`15f7e78`](https://github.com/OmniBlocks/scratch-gui/commit/15f7e78be191a413d09ae44bc4e4c3a8ad379b09) - 2025-10-09 10:24:52 -0400
+
+**Merge pull request #182 from OmniBlocks/dependabot/npm_and_yarn/scratch-vm-a7ad12d**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`66adc40`](https://github.com/OmniBlocks/scratch-gui/commit/66adc40b8b2c6eb617d79395f8085ff744fbd787) - 2025-10-09 14:06:48 +0000
+
+**Bump scratch-vm from `6865374` to `a7ad12d`**
+
+*Author: dependabot[bot]*
+
+---
+
+### Commit [`1e32401`](https://github.com/OmniBlocks/scratch-gui/commit/1e32401511e16197200939238c56206d9b5a6174) - 2025-10-09 09:17:54 -0400
+
+**Merge pull request #180 from OmniBlocks/dependabot/npm_and_yarn/scratch-vm-6865374**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`769befd`](https://github.com/OmniBlocks/scratch-gui/commit/769befd552019b2a1a8d62957063339308a69a1f) - 2025-10-09 13:12:05 +0000
+
+**Bump scratch-vm from `e8e4f8b` to `6865374`**
+
+*Author: dependabot[bot]*
+
+---
+
+### Commit [`077b21a`](https://github.com/OmniBlocks/scratch-gui/commit/077b21a92ef355e81ae5ebc0f9a02f03bc626938) - 2025-10-09 08:13:34 -0400
+
+**Merge pull request #178 from OmniBlocks/dependabot/npm_and_yarn/scratch-vm-e8e4f8b**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`82208f0`](https://github.com/OmniBlocks/scratch-gui/commit/82208f086cae6fb835c910c018bf1e0b49e9b0d2) - 2025-10-09 08:13:16 -0400
+
+**reveert crap**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`08e03de`](https://github.com/OmniBlocks/scratch-gui/commit/08e03de724592c10e3160e2329cdbb3e181db0ae) - 2025-10-09 12:07:55 +0000
+
+**Bump scratch-vm from `6fc3d31` to `e8e4f8b`**
+
+*Author: dependabot[bot]*
+
+---
+
+### Commit [`0ac3369`](https://github.com/OmniBlocks/scratch-gui/commit/0ac3369953d64800f84588dfa48cca3a57f7f0e4) - 2025-10-09 07:10:04 -0400
+
+**Update prtest.yml**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`5720c7d`](https://github.com/OmniBlocks/scratch-gui/commit/5720c7df6b3281e1d978672687d727d7cdf33427) - 2025-10-08 21:45:45 -0400
+
+**Merge pull request #177 from OmniBlocks/revert-168-cheetah**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`89aaea1`](https://github.com/OmniBlocks/scratch-gui/commit/89aaea17bbf6bcb7115def948db205529ddec37f) - 2025-10-08 21:43:53 -0400
+
+**Revert "Cheetah"**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`169ecef`](https://github.com/OmniBlocks/scratch-gui/commit/169ecef636bda6cdf5bf7453d25ebfa61c173b24) - 2025-10-08 21:31:05 -0400
+
+**Merge pull request #168 from OmniBlocks/cheetah**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`148696d`](https://github.com/OmniBlocks/scratch-gui/commit/148696d071bcf6e18da1b53e032cf766efc654bd) - 2025-10-08 21:22:04 -0400
+
+**Merge pull request #173 from OmniBlocks/alert-autofix-36**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`73b21a1`](https://github.com/OmniBlocks/scratch-gui/commit/73b21a16cafd47f0b53cdb0332b127df215d6cf2) - 2025-10-08 20:45:00 -0400
+
+**Update prtest.yml**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`5b502fd`](https://github.com/OmniBlocks/scratch-gui/commit/5b502fde807506be68e59149c4776b0253d30e39) - 2025-10-08 20:37:37 -0400
+
+**Update prtest.yml**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`2aea185`](https://github.com/OmniBlocks/scratch-gui/commit/2aea185ee8e2ccbc54bf0926369bf5abcf44a63b) - 2025-10-08 20:25:52 -0400
+
+**Update prtest.yml**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`ac1abe4`](https://github.com/OmniBlocks/scratch-gui/commit/ac1abe46accccc61597d768753a80c2af97538fa) - 2025-10-08 19:23:13 -0400
+
+**Merge branch 'main' into alert-autofix-36**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`16d163c`](https://github.com/OmniBlocks/scratch-gui/commit/16d163c172b238976846143075e2b92900dfae03) - 2025-10-08 19:22:42 -0400
+
+**Update prtest.yml for the freaking millonth time**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`a81eeee`](https://github.com/OmniBlocks/scratch-gui/commit/a81eeee05b9d2d2c934c065efba4d67a5ef4b494) - 2025-10-08 18:47:57 -0400
+
+**Update prtest.yml**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`9c729c6`](https://github.com/OmniBlocks/scratch-gui/commit/9c729c61fd6e778387abcb0a8d6116d49d26c1cc) - 2025-10-08 18:36:55 -0400
+
+**Update prtest.yml**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`bb40ed6`](https://github.com/OmniBlocks/scratch-gui/commit/bb40ed647bceeabf9f730af186a2b9cfb23e662d) - 2025-10-08 18:36:16 -0400
+
+**Update prtest.yml**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`34e8767`](https://github.com/OmniBlocks/scratch-gui/commit/34e8767687c78a466634dbadfacce2afab33f3ea) - 2025-10-08 17:38:43 -0400
+
+**Cache isolation still broken via restore prefix**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`ac32dda`](https://github.com/OmniBlocks/scratch-gui/commit/ac32dda2793f797f7ee6061ffb1e6bb55256b8ad) - 2025-10-08 17:29:06 -0400
+
+**Potential fix for code scanning alert no. 36: Cache Poisoning via caching of untrusted files**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`ba697b5`](https://github.com/OmniBlocks/scratch-gui/commit/ba697b5a0c1c1b2411403e4bfa5c9a73a5c7c2d8) - 2025-10-08 17:25:36 -0400
+
+**Update prtest.yml**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`151e44d`](https://github.com/OmniBlocks/scratch-gui/commit/151e44d1f1e6cf0bf1ecddd2b4f967223202781b) - 2025-10-08 17:14:13 -0400
+
+**Update prtest.yml**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`592d916`](https://github.com/OmniBlocks/scratch-gui/commit/592d916dd865a61e18a9bd0b5bb46950857192a2) - 2025-10-08 17:00:33 -0400
+
+**Update prtest.yml**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`55cce3e`](https://github.com/OmniBlocks/scratch-gui/commit/55cce3e88435b2ed8ca40090de8d96cbb7e2bded) - 2025-10-08 16:41:21 -0400
+
+**Update prtest.yml**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`742a045`](https://github.com/OmniBlocks/scratch-gui/commit/742a045a53d15fb5e48b3aa60527d92db8bf5053) - 2025-10-08 16:30:17 -0400
+
+**mega pr workflwo**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`131e5df`](https://github.com/OmniBlocks/scratch-gui/commit/131e5df6efc4a5c0616cd1d980c1f080709bbdf1) - 2025-10-08 15:24:34 -0400
+
+**Merge pull request #170 from OmniBlocks/404-image-fix**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`3a7bfd2`](https://github.com/OmniBlocks/scratch-gui/commit/3a7bfd26c62a9c260b9630ada6ad274f3cc4406b) - 2025-10-08 17:09:05 +0100
+
+**fix reviews being trimmed due to overly low max chars**
+
+*Author: ampelectrecuted*
+
+---
+
+### Commit [`3362263`](https://github.com/OmniBlocks/scratch-gui/commit/3362263343280ab2678917e50252f10fd89268a8) - 2025-10-08 12:05:34 -0400
+
+**fix images when 404 is not in root**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`a73f18e`](https://github.com/OmniBlocks/scratch-gui/commit/a73f18e1cf2fc9cf569d5fe770c4fd5ec2b8a5c4) - 2025-10-08 08:25:09 -0400
+
+**Merge pull request #169 from OmniBlocks/change-16-to-22-node**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`f21f3cd`](https://github.com/OmniBlocks/scratch-gui/commit/f21f3cd6ca1aceda39af46b3361e6f4e334be18c) - 2025-10-08 07:58:33 -0400
+
+**who the heck put node v16 here bruh your builds gonna die if you use it it's not supposed to be that**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`907a3b4`](https://github.com/OmniBlocks/scratch-gui/commit/907a3b4d7b866d9a2e1ea69cc39726bcc44b91a9) - 2025-10-08 07:57:58 -0400
+
+**rever**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`fa2d557`](https://github.com/OmniBlocks/scratch-gui/commit/fa2d557eab404bc3f9ab92a5ff2368fa5ac07a7a) - 2025-10-08 07:57:46 -0400
+
+**who the heck put v16 bro if you use v16 you better say goodbye to your build it's freaking dying**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`a966774`](https://github.com/OmniBlocks/scratch-gui/commit/a9667740a7a53751e6d0b2aede443b75a416b456) - 2025-10-08 07:55:42 -0400
+
+**Update prtest.yml**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`d2c27d1`](https://github.com/OmniBlocks/scratch-gui/commit/d2c27d1699e0c6475cab4457bf2f9cc9dbff8d3d) - 2025-10-08 07:31:08 -0400
+
+**Update prtest.yml one last time**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`f7c4255`](https://github.com/OmniBlocks/scratch-gui/commit/f7c4255d06d08e7c9c0235345a6a3fd1a4f418db) - 2025-10-07 22:07:53 -0400
+
+**Update prtest.yml**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`a9eead2`](https://github.com/OmniBlocks/scratch-gui/commit/a9eead257acce96d9a24d01de499cc863a611cd0) - 2025-10-07 22:04:43 -0400
+
+**Update prtest.yml**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`ace0505`](https://github.com/OmniBlocks/scratch-gui/commit/ace05050cbf8aeb8a22054806958c6f740a6e475) - 2025-10-07 22:00:27 -0400
+
+**Update prtest.yml**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`5d66146`](https://github.com/OmniBlocks/scratch-gui/commit/5d661463f71007d13e24ea01161e0894fe9a8afc) - 2025-10-07 21:49:43 -0400
+
+**Update prtest.yml**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`4305afd`](https://github.com/OmniBlocks/scratch-gui/commit/4305afd41848a071e15449d1f03a60cd43ca74bb) - 2025-10-07 21:45:29 -0400
+
+**Update prtest.yml**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`05c676e`](https://github.com/OmniBlocks/scratch-gui/commit/05c676ede15fa7d616d1bd0f7b0b86dff5f2f0d6) - 2025-10-07 20:06:52 -0400
+
+**Update prtest.yml**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`9b15557`](https://github.com/OmniBlocks/scratch-gui/commit/9b155576df4674ed0f793e58806f2ec18883e867) - 2025-10-07 19:55:51 -0400
+
+**Update prtest.yml**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`668f2fc`](https://github.com/OmniBlocks/scratch-gui/commit/668f2fc2dfcdd3f49104460e96f6b98bf6a46361) - 2025-10-07 19:52:59 -0400
+
+**Update prtest.yml**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`5c43407`](https://github.com/OmniBlocks/scratch-gui/commit/5c4340714dbdcca7fe7d8e0b0cbb3ccec2620724) - 2025-10-07 18:00:48 -0400
+
+**Update prtest.yml**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`709dce4`](https://github.com/OmniBlocks/scratch-gui/commit/709dce41f5f30558b90e7d79e2aa63b2ff711de8) - 2025-10-07 17:42:35 -0400
+
+**Update prtest.yml**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`46358f7`](https://github.com/OmniBlocks/scratch-gui/commit/46358f7590099fc1a898a90ba23ab1a30c4fc8fc) - 2025-10-07 16:54:23 -0400
+
+**Update prtest.yml**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`237aef8`](https://github.com/OmniBlocks/scratch-gui/commit/237aef842e7b96991f2fc31c370efa3df63056cc) - 2025-10-07 16:03:50 -0400
+
+**Update prtest.yml**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`d4fc8b0`](https://github.com/OmniBlocks/scratch-gui/commit/d4fc8b0a157669809b132be8cd95665734dadbf6) - 2025-10-07 15:47:21 -0400
+
+**Update webpack.config.js**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`9b1f7fa`](https://github.com/OmniBlocks/scratch-gui/commit/9b1f7fabb5953a096be6eef9157ab559d65426d8) - 2025-10-07 20:41:16 +0100
+
+**remove debug**
+
+*Author: ampelectrecuted*
+
+---
+
+### Commit [`f238230`](https://github.com/OmniBlocks/scratch-gui/commit/f2382300e64b082136c8cff26a75f076ab627e3d) - 2025-10-07 20:41:01 +0100
+
+**speed up with cache**
+
+*Author: ampelectrecuted*
+
+---
+
+### Commit [`fb79223`](https://github.com/OmniBlocks/scratch-gui/commit/fb792235b993720cb7a3e635854663779efc6b0d) - 2025-10-07 20:35:49 +0100
+
+**new cache epoch**
+
+*Author: ampelectrecuted*
+
+---
+
+### Commit [`4cb1a10`](https://github.com/OmniBlocks/scratch-gui/commit/4cb1a103b18162082cc7410abc672ac46ebe5cc7) - 2025-10-07 15:18:14 -0400
+
+**Update prtest.yml**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`a9b64c6`](https://github.com/OmniBlocks/scratch-gui/commit/a9b64c66052a949159ffa922a7f3a83c093ee631) - 2025-10-07 20:10:01 +0100
+
+**will this work**
+
+*Author: ampelectrecuted*
+
+---
+
+### Commit [`1777dae`](https://github.com/OmniBlocks/scratch-gui/commit/1777dae3db9d83b39f287a39c146ff65172ccd01) - 2025-10-07 14:18:33 -0400
+
+**Merge pull request #166 from OmniBlocks/dependabot/npm_and_yarn/scratch-vm-6fc3d31**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`966d80f`](https://github.com/OmniBlocks/scratch-gui/commit/966d80fcf9fabed968d72f52db3785ad3c20a3ef) - 2025-10-07 18:16:10 +0000
+
+**Bump scratch-vm from `1aea86c` to `6fc3d31`**
+
+*Author: dependabot[bot]*
+
+---
+
+### Commit [`929d76a`](https://github.com/OmniBlocks/scratch-gui/commit/929d76a2195647161faedf167bba9ddbc3748c4f) - 2025-10-07 13:12:02 -0400
+
+**Update prtest.yml**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`93037d4`](https://github.com/OmniBlocks/scratch-gui/commit/93037d4d872b0c5a64d3e2067f29a4eb7909cbc7) - 2025-10-07 13:03:53 -0400
+
+**Update prtest.yml**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`005458b`](https://github.com/OmniBlocks/scratch-gui/commit/005458ba06b0ecfd5ae1e6b90ee89a1ba6d81d93) - 2025-10-07 12:24:50 -0400
+
+**fix**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`025d627`](https://github.com/OmniBlocks/scratch-gui/commit/025d62749703065f93e2a64053f917bf2d593db9) - 2025-10-07 12:22:08 -0400
+
+**Update prtest.yml**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`d8bb99b`](https://github.com/OmniBlocks/scratch-gui/commit/d8bb99b84ba09822c0cf98df9146bf69b0fea5de) - 2025-10-07 12:13:28 -0400
+
+**change gif**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`34b8782`](https://github.com/OmniBlocks/scratch-gui/commit/34b8782ac056d6f448bb94c6eb2bb02eb3de246c) - 2025-10-07 12:12:16 -0400
+
+**Update prtest.yml**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`078dd27`](https://github.com/OmniBlocks/scratch-gui/commit/078dd27cecd543f5f481838a68d550c283661746) - 2025-10-07 11:34:32 -0400
+
+**i changed the wrong yml**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`046679d`](https://github.com/OmniBlocks/scratch-gui/commit/046679db6a86d56b836b0dff3081b480f546042f) - 2025-10-07 11:33:40 -0400
+
+**Update prtest.yml**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`4a5d7e8`](https://github.com/OmniBlocks/scratch-gui/commit/4a5d7e849581209884d3331ad3481aad754bc884) - 2025-10-07 11:29:34 -0400
+
+**needs more emojis 🤩😍**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`ba9e028`](https://github.com/OmniBlocks/scratch-gui/commit/ba9e028a1affb4bce4ce3b8dfcf5e32355bafa91) - 2025-10-07 11:18:06 -0400
+
+**Update test.yml**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`e6c591e`](https://github.com/OmniBlocks/scratch-gui/commit/e6c591e9f475c1e4c7b8f24cc43874decd9274cd) - 2025-10-07 11:07:08 -0400
+
+**Update prtest.yml**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`1af5412`](https://github.com/OmniBlocks/scratch-gui/commit/1af5412bdd75d5434339e5e2016d8521890a17c3) - 2025-10-07 10:53:46 -0400
+
+**Rename prtest to prtest.yml**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`6e592d1`](https://github.com/OmniBlocks/scratch-gui/commit/6e592d11f4e5f5eb5c52d11b076e6927572846e1) - 2025-10-07 08:12:17 -0400
+
+**Create prtest**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`1e32f8c`](https://github.com/OmniBlocks/scratch-gui/commit/1e32f8c5fe255e151adcf781436d1a4c828f296c) - 2025-10-06 21:11:42 -0400
+
+**Merge pull request #160 from OmniBlocks/dependabot/npm_and_yarn/scratch-vm-1aea86c**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`132451a`](https://github.com/OmniBlocks/scratch-gui/commit/132451add8664efb5901e3291ddb0551c8d12134) - 2025-10-07 01:06:08 +0000
+
+**Bump scratch-vm from `71c0c48` to `1aea86c`**
+
+*Author: dependabot[bot]*
+
+---
+
+### Commit [`848baf7`](https://github.com/OmniBlocks/scratch-gui/commit/848baf71e9e886182d189ab824ef2d56a6f60160) - 2025-10-06 19:01:11 -0400
+
+**Merge pull request #158 from OmniBlocks/dependabot/npm_and_yarn/scratch-vm-71c0c48**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`3a854ae`](https://github.com/OmniBlocks/scratch-gui/commit/3a854aeaab1782a17018957b2024cdf269d79027) - 2025-10-06 22:59:53 +0000
+
+**Bump scratch-vm from `f95a642` to `71c0c48`**
+
+*Author: dependabot[bot]*
+
+---
+
+### Commit [`9ec201f`](https://github.com/OmniBlocks/scratch-gui/commit/9ec201fba576bf67b980b8a08a32157d9aa54c88) - 2025-10-06 19:07:00 +0100
+
+**unsandbox OUR extensions**
+
+*Author: ampelectrecuted*
+
+---
+
+### Commit [`1bf9aaa`](https://github.com/OmniBlocks/scratch-gui/commit/1bf9aaaa3dbf085bfecf0cdfd0defc9d4eb800ef) - 2025-10-06 13:28:28 -0400
+
+**Update webpack.config.js**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`1083d22`](https://github.com/OmniBlocks/scratch-gui/commit/1083d2275efa72a8d903bd16a94c4cad2e89cf67) - 2025-10-06 18:17:23 +0100
+
+**use our library**
+
+*Author: ampelectrecuted*
+
+---
+
+### Commit [`c04e7bd`](https://github.com/OmniBlocks/scratch-gui/commit/c04e7bd2880c1d24ad6e7d26ed16dcfb043125b4) - 2025-10-06 12:51:50 -0400
+
+**Update webpack.config.js**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`e2d5562`](https://github.com/OmniBlocks/scratch-gui/commit/e2d556261b41ea9e424767c6fd497fbf7984c51e) - 2025-10-06 12:42:26 -0400
+
+**Update README.md**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`9bca26d`](https://github.com/OmniBlocks/scratch-gui/commit/9bca26df68a48e596dcbc68963964513c0261064) - 2025-10-06 12:41:58 -0400
+
+**Update README.md**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`3564ecd`](https://github.com/OmniBlocks/scratch-gui/commit/3564ecdabba3484b28233b62cdc307bc8046ebc2) - 2025-10-06 12:41:41 -0400
+
+**Update README.md**
 
 *Author: supervoidcoder*
 

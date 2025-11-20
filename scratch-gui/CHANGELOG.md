@@ -4,6 +4,15 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`07714e9`](https://github.com/OmniBlocks/scratch-gui/commit/07714e97c199294cd023fd3d94d02e384c50bfc2) - 2025-11-20 09:56:16 -0500
+
+**Update visual-regression-tester.yml**
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`a691d9c`](https://github.com/OmniBlocks/scratch-gui/commit/a691d9c93276a9608fc887243c37a9545276486c) - 2025-11-20 09:08:54 -0500
 
 **fix error**

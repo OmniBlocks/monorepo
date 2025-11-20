@@ -345,7 +345,7 @@ A: True. I, supervoidcoder, the lead maintainer and creator of OmniBlocks, am ve
 Most of the maintainers and contributors have our own personal Scratch Account too. Here are some:
 - @supervoidcoder: [scratchcode1_2_3](https://scratch.mit.edu/users/scratchcode1_2_3/)
 - @ampelectrecuted: [AmpElectrecuted](https://scratch.mit.edu/users/AmpElectrecuted/) or [8to16](https://scratch.mit.edu/users/8to16/) (banned, unfortunately)
-- @gvyt: [GvYoutube](https://scratch.mit.edu/users/GvYoutube/)
+- @Graison-P: [GvYoutube](https://scratch.mit.edu/users/GvYoutube/)
 - @NotTheBaton: [TheBaton](https://scratch.mit.edu/users/TheBaton/)
 
 **Q: I tried submitting a pull request for OmniBlocks, but I got tons of lint errors.**

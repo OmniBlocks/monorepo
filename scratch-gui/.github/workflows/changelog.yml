@@ -59,7 +59,6 @@ jobs:
           
           # Check if markers exist, add them if they don't
           if ! grep -q "UNRELEASED_COMMITS_START" CHANGELOG.md; then
-            # Insert markers after the header
             sed -i '3 i <!-- UNRELEASED_COMMITS_START -->\n<!-- UNRELEASED_COMMITS_END -->\n' CHANGELOG.md
           fi
           
@@ -96,6 +95,7 @@ jobs:
           # Get release info
           RELEASE_TAG="${{ github.event.release.tag_name }}"
           RELEASE_NAME="${{ github.event.release.name }}"
+          RELEASE_BODY="${{ github.event.release.body }}"
           RELEASE_DATE=$(date -u +"%Y-%m-%d %H:%M:%S")
           
           # Get previous release tag
@@ -103,84 +103,72 @@ jobs:
           
           # Determine if this is the initial release
           if [ -z "$PREV_TAG" ]; then
-            RELEASE_SUBTITLE="### Initial release - All commits:"
+            RELEASE_SUBTITLE="### Initial release"
           else
-            RELEASE_SUBTITLE="### Changes since ${PREV_TAG}:"
+            RELEASE_SUBTITLE="### Changes since ${PREV_TAG}"
           fi
           
-          # Extract unreleased commits and convert to bullet list with descriptions
-          UNRELEASED_COMMITS=""
-          if [ -f CHANGELOG.md ] && grep -q "UNRELEASED_COMMITS_START" CHANGELOG.md; then
-            # Extract content between markers, parse detailed entries
-            UNRELEASED_SECTION=$(sed -n '/UNRELEASED_COMMITS_START/,/UNRELEASED_COMMITS_END/p' CHANGELOG.md | sed '1d;$d')
-            
-            # Process the unreleased section to extract commits with bodies
-            echo "$UNRELEASED_SECTION" | awk '
-              /^### Commit/ {
-                if (commit_line != "") {
-                  print commit_line
-                  if (body != "") print body
-                }
-                commit_line = $0
-                gsub(/^### Commit /, "- ", commit_line)
-                gsub(/ - [0-9]{4}-[0-9]{2}-[0-9]{2}.*$/, "", commit_line)
-                subject = ""
-                body = ""
-                author = ""
-                next
-              }
-              /^\*\*.*\*\*$/ {
-                subject = $0
-                gsub(/\*\*/, "**", subject)
-                commit_line = commit_line " " subject
-                next
-              }
-              /^\*Author:/ {
-                author = $0
-                commit_line = commit_line " " author
-                next
-              }
-              /^---$/ { next }
-              /^[[:space:]]*$/ { next }
-              {
-                if (body == "") {
-                  body = "  > " $0
-                } else {
-                  body = body "\n  > " $0
-                }
-              }
-              END {
-                if (commit_line != "") {
-                  print commit_line
-                  if (body != "") print body
-                }
-              }
-            ' > /tmp/unreleased_commits.txt
-            
-            UNRELEASED_COMMITS=$(cat /tmp/unreleased_commits.txt)
+          # Get commits for this release
+          if [ -z "$PREV_TAG" ]; then
+            mapfile -t COMMIT_HASHES < <(git log ${RELEASE_TAG} --pretty=format:"%H")
+          else
+            mapfile -t COMMIT_HASHES < <(git log ${PREV_TAG}..${RELEASE_TAG} --pretty=format:"%H")
           fi
           
-          # If no unreleased commits in markers, get from git with bodies
-          if [ -z "$UNRELEASED_COMMITS" ]; then
-            if [ -z "$PREV_TAG" ]; then
-              git log ${RELEASE_TAG} --pretty=format:"%H|||%h|||%s|||%an|||%b" | while IFS='|||' read -r hash short_hash subject author body; do
-                echo "- [\`${short_hash}\`](https://github.com/${{ github.repository }}/commit/${hash}) **${subject}** - *${author}*"
-                if [ -n "$body" ] && [ "$body" != "" ]; then
-                  echo "$body" | sed 's/^/  > /'
-                fi
-              done > /tmp/unreleased_commits.txt
-            else
-              git log ${PREV_TAG}..${RELEASE_TAG} --pretty=format:"%H|||%h|||%s|||%an|||%b" | while IFS='|||' read -r hash short_hash subject author body; do
-                echo "- [\`${short_hash}\`](https://github.com/${{ github.repository }}/commit/${hash}) **${subject}** - *${author}*"
-                if [ -n "$body" ] && [ "$body" != "" ]; then
-                  echo "$body" | sed 's/^/  > /'
-                fi
-              done > /tmp/unreleased_commits.txt
+          # Categorize commits
+          declare -A CATEGORIES
+          CATEGORIES=(
+            ["feat"]="#### ✨ Features"
+            ["fix"]="#### 🐛 Bug Fixes"
+            ["refactor"]="#### ♻️ Refactoring"
+            ["perf"]="#### ⚡ Performance"
+            ["docs"]="#### 📚 Documentation"
+            ["style"]="#### 💎 Styling"
+            ["test"]="#### 🧪 Tests"
+            ["build"]="#### 📦 Build"
+            ["ci"]="#### 🔧 CI/CD"
+            ["chore"]="#### 🔨 Chores"
+            ["revert"]="#### ⏪ Reverts"
+            ["uncategorized"]="#### 📝 Other Changes"
+          )
+          
+          # Create temporary files for each category
+          for cat in "${!CATEGORIES[@]}"; do
+            > /tmp/changelog_${cat}.txt
+          done
+          
+          # Process each commit
+          for hash in "${COMMIT_HASHES[@]}"; do
+            short_hash=$(git log -1 --format=%h "$hash")
+            subject=$(git log -1 --format=%s "$hash")
+            author=$(git log -1 --format=%an "$hash")
+            body=$(git log -1 --format=%b "$hash")
+            
+            # Skip [skip ci] commits
+            if [[ "$subject" == *"[skip ci]"* ]]; then
+              continue
             fi
-            UNRELEASED_COMMITS=$(cat /tmp/unreleased_commits.txt)
-          fi
+            
+            # Detect category from conventional commit format
+            category="uncategorized"
+            if [[ "$subject" =~ ^(feat|fix|refactor|perf|docs|style|test|build|ci|chore|revert)(\(.*\))?:\ .* ]]; then
+              category="${BASH_REMATCH[1]}"
+              # Remove the prefix from subject for display
+              display_subject=$(echo "$subject" | sed -E 's/^(feat|fix|refactor|perf|docs|style|test|build|ci|chore|revert)(\(.*\))?:\ //')
+            else
+              display_subject="$subject"
+            fi
+            
+            # Add to category file
+            echo "- [\`${short_hash}\`](https://github.com/${{ github.repository }}/commit/${hash}) **${display_subject}** - *${author}*" >> /tmp/changelog_${category}.txt
+            
+            # Add body if exists
+            if [ -n "$body" ]; then
+              echo "$body" | sed 's/^/  > /' >> /tmp/changelog_${category}.txt
+            fi
+          done
           
-          # Create new release section
+          # Build the release section
           RELEASE_SECTION="## Release [${RELEASE_TAG}](https://github.com/${{ github.repository }}/releases/tag/${RELEASE_TAG}) - ${RELEASE_DATE}
           "
           
@@ -190,10 +178,31 @@ jobs:
           "
           fi
           
+          if [ -n "${RELEASE_BODY}" ]; then
+            RELEASE_SECTION="${RELEASE_SECTION}
+          ${RELEASE_BODY}
+          "
+          fi
+          
           RELEASE_SECTION="${RELEASE_SECTION}
           ${RELEASE_SUBTITLE}
+          "
+          
+          # Add categories in order (skip empty ones)
+          CATEGORY_ORDER=("feat" "fix" "refactor" "perf" "docs" "style" "test" "build" "ci" "chore" "revert" "uncategorized")
+          
+          for cat in "${CATEGORY_ORDER[@]}"; do
+            if [ -s /tmp/changelog_${cat}.txt ]; then
+              RELEASE_SECTION="${RELEASE_SECTION}
 
-          ${UNRELEASED_COMMITS}
+          ${CATEGORIES[$cat]}
+
+          $(cat /tmp/changelog_${cat}.txt)
+          "
+            fi
+          done
+          
+          RELEASE_SECTION="${RELEASE_SECTION}
 
           ---
           "

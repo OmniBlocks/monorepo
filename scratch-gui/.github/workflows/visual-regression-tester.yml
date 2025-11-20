@@ -446,5 +446,5 @@ jobs:
               comment_id: ${{ steps.vrt_comment.outputs.result }},
               body: `❌ **Visual Regression Testing Failed** @${username}\n\n` +
                     `Something went wrong during the screenshot capture or comparison.\n\n` +
-                    `Check the logs for details: [View Logs](https://github.com/${{ github.repository }}/actions/runs/${{ context.runId }})`
+                    `Check the logs for details: [View Logs](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})`
             });

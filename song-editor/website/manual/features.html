@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<link rel="stylesheet" href="subpages.css">
+    <link rel='shortcut icon' type='image/x-icon' href='./favicon.ico' />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<meta name="theme-color" content="#ad7760"/>
+	<meta property="og:image" content="/icon_maskable_192.png" />
+	<meta name="description" content="JukeBox is a mod of Slarmoo's Box that aims to add a crap ton of presets." />
+	<link href="https://fonts.googleapis.com/css?family=B612" rel="stylesheet" media="none" onload="if (this.media != 'all') this.media='all';" /> <!-- this is a trick to load CSS asynchronously. -->
+    <script>
+		function linkTo(update) {
+			window.history.replaceState(null, "", location.pathname + "#" + update);
+			navigator.clipboard.writeText(window.location).then(() => {
+				const popup = document.getElementById("popup");
+				popup.classList.add("show");
+				setTimeout(() => {
+					popup.classList.remove("show");
+				}, 2000);
+			});
+		}
+	</script>
+	<title>JukeBox Patch Notes</title>
+</head>
+<body>
+
+<style>
+
+h2, summary {
+	font-size: 1.5rem;
+	font-weight: bold;
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+	-webkit-text-stroke-width: 0;
+}
+
+.left-indent {
+	padding-left: 50px;
+}
+b {
+	font-weight: normal;
+}
+
+</style>
+
+
+<nav class="navbar">
+  <a title="Click to go back to homepage" href="https://lemmbox.github.io">
+    <div class="logo-wrapper">
+      <!--<img src="theme_resources/LemmBoxLogo.png" alt="LemmBox" class="logo" height="64px">
+      <img src="theme_resources/LemmBoxLogo.png" alt="" class="logo-glow" height="64px" aria-hidden="true">-->
+    </div>
+  </a>
+  <div class="navbartitle col"><h1>JukeBox - Features List</h1></div>
+  	<div class="col">
+		<a class="navbarlinks" href="credits.html"><button>Credits</button></a>
+    	<a class="navbarlinks" href="resources.html"><button>Resources</button></a>
+		<a class="navbarlinks" href="features.html"><button>Features</button></a>
+		<a class="navbarlinks" href="patch_notes.html"><button>Patch Notes</button></a>
+		<a class="navbarlinks" href="instructions.html"><button>Instructions</button></a>
+	</div>
+</nav>
+<article id="Presets">
+	<h2></h2>
+	<h3>JukeBox was originally created just to add as many presets as possible to Slarmoo's box.</h3>
+	<p></p>
+	<h3>Since then, CoolTasDude has branched out, and started looking for other features to add.</h3>
+	<details>
+		<summary>Presets</summary>
+		<div class="left-indent">
+			<b>Of the 1070 presets in JukeBox, 485 are original to JukeBox, and the rest are imported from other BeepMods</b>
+			<p></p>
+			<h3>JukeBox imports EVERY unique preset from:</h3>
+			<b> Slarmoo's Box, ModBox, Sandbox, BlackBox, TodBox, Midbox, Dogebox2, AwesomeBox, DinoBox, AxoBox, LemmBox, BonBox, BloxBox, Unbox Testing, and shitbox4</b>
+			<p></p>
+			<h3>JukeBox imports MOST presets from:</h3>
+			<b>AbyssBox, BulbBox, and VoxBox</b>
+			<br></br>
+			<b>JukeBox also imports presets from weekly challeges 36 and 68 (also in Unbox), as well as 5 presets from Gelli's "Vanilla Challenge"</b>
+		</div>
+	</details>
+	<details>
+		<summary>Max Values</summary>
+		<div class="left-indent">
+			<b>JukeBox Changes Max values for several song settings</b>
+			<br><br>
+			<li>Max Tempo: 500 -> 2000</li>
+			<li>Max Bar Count: 1024 -> 4096</li>
+			<li>Octave Shift Range: ±2 -> ±8</li>
+		</div>
+	</details>
+	<details>
+		<summary>Imported Features</summary>
+		<div class="left-indent">
+			<b>Presets are not included in this list</b>
+			<br><br>
+			<li>AbyssBox song editor layouts</li>
+			<li>AbyssBox file export types (.ogg and .opus)</li>
+			<li>MidBox unison types</li>
+			<li>LemmBox HD wave types</li>
+			<li>LemmBox patch notes format</li>
+			<li>AbyssBox Description Buttons</li>
+			<li>D's Quick Box Main Theme</li>
+		</div>
+	</details>
+	<details>
+		<summary>Original Features</summary>
+		<div class="left-indent">
+			<b>These are features made specifically for JukeBox</b>
+			<br><br>
+			<li>"Unmodified" presets category, containing an unmodified version of each instrument type (Inspired by BulbBox).</li>
+			<li>"Double Octave" and "Triple Octave" unison types</li>
+			<li>"shorten song url," "add instrument within channel, and "delete instrument within channel" keybinds</li>
+			<li>Custom scale menu notes are flipped upsidedown to match the song editor</li>
+			<li>Custom scale now defaults to blank</li>
+		</div>
+	</details>
+	<details>
+		<summary>Planned Features</summary>
+		<div class="left-indent">
+			<h3>Major Features (be patient):</h3>
+			<div class="left-indent">
+				<li>Porting AbyssBox Phaser</li>
+				<li>Porting Dogebox2 Invert Wave</li>
+				<li>Porting Dogebox2 Note Range</li>
+				<li>Porting EdoBox changable song edo</li>
+				<li>Adding setting for changing octave count</li>
+				<li>Adding menu for changing default settings</li>
+			</div>
+			<br>
+			<h3>Minor Features:</h3>
+			<div class="left-indent">
+				<li>Porting D's Quick Box "REAL show all channels"</li>
+				<li>Porting AbyssBox Song Player Layouts</li>
+				<li>Updating add/delete instrument within channel keybinds to automatically enable the setting</li>
+			</div>
+			<br>
+		</div>
+	</details>
+	<details>
+		<summary>NOT Planned Features</summary>
+		<div class="left-indent">
+			<h3>Porting AbyssBox Songwide Effects</h3>
+				<div class="left-indent"><b>- I just don't have the technical expertise to pull off something like this.</b></div>
+		</div>
+		<p></p>
+		<div class="left-indent">
+			<h3>Porting AbyssBox custom Fonts/Backgrounds</h3>
+				<div class="left-indent"><b>- I've always prefered technical aspects over astetics. Plus, these aren't easy to implement either.</b></div>
+		</div>
+		<p></p>
+		<div class="left-indent">
+			<h3>Porting Dogebox2 custom FM frequencies</h3>
+				<div class="left-indent"><b>- (Odds are most of you don't even know what this is. go check out Dogebox2 FM). Again, I don't have the technical knowledge to do this.</b></div>
+		</div>
+		<p></p>
+	</details>
+	<details>
+		<summary>Known Bugs</summary>
+		<div class="left-indent">
+			<h3>General BeepMod Bugs</h3>
+			<div class="left-indent">
+				<li>The "small" layout does not have buttons for zoom in/out</li>
+				<li>Song Player does not cancel audio when pausing, scrolling, and resuming</li>
+			</div>
+			<br>
+			<h3>JukeBox-Specific Bugs:</h3>
+			<div class="left-indent">
+				<li>Preset names from other versions do not import correctly</li>
+			</div>
+			<br>
+		</div>
+	</details>
+<div id="popup">Link to patch note is now copied!</div>
+
+</body>
+</html>

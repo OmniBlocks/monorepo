@@ -180,7 +180,7 @@
             
             <p id="introduction">
                 JukeBox is a mod of Slarmoo's Box that aims to add a crap ton of presets. <br>
-                (see <a href="./credits.html">credits</a>).
+                (see <a onclick="window.open('/website/Manual/credits.html')">credits</a>).
             </p>
             <!-- <p>
                 All song data is contained in the URL at the top of your browser.
@@ -188,11 +188,7 @@
                 When you are satisfied with your song, just copy and paste the URL to save and share your song!
             </p> -->
             <p>
-                If you want to upload your own presets to JukeBox, you can fill out <a href="https://forms.gle/B29T3gCRHB6srueB8">This Form</a>
-            </p>
-            <p>
-                If you have any questions, please visit the <a href="./faq.html">FAQ</a>. Visit the <a href="./patch_notes.html">patch notes</a> to see the latest changes made.
-                <img id="Hotdog" src="" width="500" height="333" onclick="changeHotdogSize()" />
+                If you want to upload your own presets to JukeBox, you can fill out <a onclick="window.open('https:/\/forms.gle/B29T3gCRHB6srueB8')">This Form</a>
             </p>
     <div class="donation">
         BeepBox is a passion project, and will always be free to use. If you find it valuable and have the means, please feel free to show your gratitude to the original creator of Beepbox here: 
@@ -202,124 +198,12 @@
             <input type="hidden" name="currency_code" value="USD" />
             <input type="submit" name="submit" value="Paypal"/>
         </form>
-        <br/>
+        <br><br>
         Additionally, Slarmoo's Box, which is the basis of JukeBox, takes a lot of time to make and update. If you have found it valuable and are able to do so, please consider donating to Slarmoo here: 
         <form action="https://www.paypal.com/donate/?hosted_button_id=BMLD7HPKFR6NG" method="post" target="_blank">
             <input type="submit" name="submit" value="Paypal" />
         </form>
-    </div>
-        </section>
-                <h2>
-                    Instructions
-                </h2>
-                <p>
-                    You can add or remove notes by clicking on the gray rows at the top.
-                    JukeBox automatically plays the notes out loud for you. Try it!		
-                </p>
-                <p>
-                    Notes go into patterns, and you can edit one pattern at a time.
-                    Those numbered boxes at the bottom of the editor are the different patterns you can edit.
-                    <span id="bar-editing">
-                        Click the boxes to move to a different part of the song, or click the arrows on the currently selected box to swap which pattern is played during that part of the song.
-                    </span>
-                </p>
-                <p>
-                    JukeBox can play several rows of patterns simultaneously, and each row has its own set of patterns.
-                    Most rows can play melodies or harmonies, but the bottom row is for drums.
-                </p>
-                <p>
-                    All song data is contained in the URL at the top of your browser.
-                    When you make changes to the song, the URL is updated to reflect your changes.
-                    When you are satisfied with your song, just copy and paste the URL to save and share your song!
-                </p>
-
-                <div id="keyboard-instructions">
-                    <p>
-                        When JukeBox has focus (click on its interface above), you can use these keyboard shortcuts: <br />
-                    </p>
-                    <ul>
-                        <li><b>Spacebar</b>: play or pause the song</li>
-                        <li><b>Shift Spacebar</b>: play from mouse location</li>
-						<li><b>Z</b>: undo, <b>Y or Shift Z</b>: redo</li>
-                        <li><b>C</b>: copy pattern from selection</li>
-                        <li><b>V</b>: paste pattern into selection</li>
-                        <li><b>X</b>: cut pattern</li>
-                        <li><b>0-9</b>: assign pattern number to selection</li>
-						<li><b>Arrows</b>: move selection</li>
-						<li><b>Ctrl & Arrows</b>: move selected channel up or down</li>
-						<li><b>[ ]</b>: move playhead backward or forward one bar</li>
-						<li><b>F/H</b>: move to First or Highlighted pattern</li>
-                        <li><b>Shift F</b>: move to start of loop</li>
-						<li><b>Shift & Drag</b>: select part of a pattern</li>
-                        <li><b>Enter</b>: add a new bar after currently selected one</li>
-                        <li><b>Shift Enter</b>: add a new bar before currently selected one</li>
-                        <li><b>Backspace</b>: delete currently selected bar</li>
-                        <li><b>Ctrl Enter</b>: add channel</li>
-                        <li><b>Ctrl Backspace</b>: delete currently selected channel</li>
-                        <li><b>D</b>: duplicate a pattern</li>
-                        <li><b>N</b>: create a new blank pattern</li>
-                        <li><b>+/-</b>: move notes up or down</li>
-                        <li><b>Shift & +/-</b>: move notes up or down one octave</li>
-                        <li><b>A</b>: select entire song</li>
-                        <li><b>Shift A</b>: select current channel</li>
-                        <li><b>Shift ~</b>: new blank song</li>
-                        <li><b>B</b>: loop selected bars</li>
-                        <li><b>R</b>: random preset</li>
-                        <li><b>Shift R</b>: random instrument</li>
-                        <li><b>Shift P</b>: open song player</li>
-                        <li><b>Alt E</b>: open/close all envelope dropdowns</li>
-                        <li><b>Alt F</b>: open/close all fm dropdowns</li>
-                    </ul>
-                    If you have channel muting enabled: 
-                    <ul>
-                        <li><b>S</b>: Solo/unsolo a channel</li>
-                        <li><b>M</b> (or shift S): Mute/unmute a channel</li>
-                        <li><b>Shift M</b>: Mute/unmute entire song</li>
-                    </ul>
-                    If you have simultaneous instrument per channel enabled: 
-                    <ul>
-                        <li><b>Alt Enter</b>: add instrument within channel</li>
-                        <li><b>Alt Backspace</b> delete instrument within channel</li>
-                    </ul>
-                    And if you're in the song player:
-                    <ul>
-                        <li><b>Spacebar</b>: play or pause the song</li>
-                        <li><b>[ ]</b>: move playhead backward or forward one bar</li>
-						<li><b>F</b>: move to first pattern </li>
-                        <li><b>L</b>: toggle loop</li>
-                        <li><b>Z/+/-</b>: toggle zoom</li>
-                        <li><b> Ctrl E/P</b>: return to editor</li>
-                        <li><b>Shift U</b>: shorten song player link</li>
-                        <li><b>C</b>: copy link</li>
-                    </ul>
-                <p>These are just a few shortcuts, check JukeBox's edit menu for more!</p>
-                </div>
-                <p>
-                    In the note pattern editor, you can click and drag horizontally on a note to adjust its duration.
-                    You can also click above or below an existing note to add more notes to be played simultaneously, which is called a chord.
-                </p>
-                <div id="mobile-instructions" style="display: none;">
-					<p>
-						You can also long-press in the pattern editor to select a time range within a pattern, which you can then drag to move multiple notes at once.<br/>
-					</p>
-				</div>
-                <p>
-                    ADVANCED: Drag vertically from an existing note to bend its pitch, or drag vertically from above or below the note to adjust its volume. You can perform fine volume adjustment if you hold Control while doing this!
-                </p>
-                <p>
-                    ADVANCED: Click and drag on the pattern grid to make a selection. You can then press C/V to mass copy/paste parts of your song.
-
-                </p>
-                <p>
-                    JukeBox has many more features.
-                    Try playing with the buttons and menus on the right side to find out what it can do!
-                    You can also click on the label next to each option for a description of what it does.
-                    Some features are hard to find anywhere though - for example, if your song has any modulator channels, you can hold Ctrl or Shift while the song is playing to record the movement of sliders directly! If you want to learn more tips, tricks, and best practices though, see below.
-                </p>
-                <p>
-					Want to see what people have made with BeepBox? Songs that were shared on Twitter prior to 2023-05-22 can now be browsed in <a href="https://twitter-archive.beepbox.co/" target="_blank">this interactive archive</a>!
-                </p>
-                </section>
+        <br><br>
                 <section>
                     <h2>
                         About
@@ -337,113 +221,48 @@
                         JukeBox does not collect, track, or share any user data.
                     </p>
                 </section>
-                <section>
-                    <h2>
-                        Resources
-                    </h2>
-                    <p>
-                        Here is a list of everything you might find helpful for working with JukeBox:
-                    </p>
-                    <h3>
-                        <a href="https://discord.gg/beepbox">BeepBox Discord</a>
-                    </h3>
-                    <p>
-                        An active community about everything BeepBox!
-                    </p>
-                    <h3>
-                        <a href="https://discord.gg/xSs9nABmP5">JukeBox Discord</a>
-                    </h3>
-                    <p>
-                        A new discord server for fellow JukeBox enjoyers. You can also get insight on or give feedback for future JukeBox development.
-                    </p>
-                    <h3>
-                        <a href="https://discord.gg/Tc997TstJb" target="_blank">Beepbox Modding Discord</a>
-                    </h3>
-                    <p>
-                        This is the easiest way to contact the developers of most beepmods, although I (CoolTasDude) am not particularly active on it.
-                    </p>
-                    <h3>
-                        <a href="https://github.com/JukeeBox/JukeBox_TypeScript" target="_blank">JukeBox Source Code</a>
-                    </h3>
-                    <p>
-                        You can download and use the source code under the MIT license. The original BeepBox source code by John Nesky can be found <a href="https://github.com/johnnesky/beepbox" target="_blank">here</a>.
-                    </p>
-                    <h3>
-                        <a href="./patch_notes.html">JukeBox Patch Notes</a>
-                    </h3>
-                    <p>
-                         An up-to-date list of all of JukeBox's features, changes, and bugfixes.
-                    </p>
-                    <h3>
-                        <a href="https://forms.gle/B29T3gCRHB6srueB8">JukeBox Preset Submission Form</a>
-                    </h3>
-                    <p>
-                         This is where you can submit your own instruments to be added to JukeBox. You can also find the Google Sheet of all presets subitted through the form <a href="https://docs.google.com/spreadsheets/d/1yyzQJd2FFR7n0TEnkE3RhWJaKZbcd6mDrK2Ie3-0ImE/" target="_blank">here</a>.
-                    </p>
-                    <h3>
-                        <a href="https://beepbox.miraheze.org/wiki/BeepBox_Mods">BeepBox Wiki</a>
-                    </h3>
-                    <p>
-                         A wiki that contains just about everything you'd ever need to know about BeepBox Mods. (I recommend bookmarking this)
-                    </p>
-                    <h3>
-                        <a href="https://beepbox-launchpad.github.io/">BeepBox Launchpad</a>
-                    </h3>
-                    <p>
-                         A website developed by Slarmoo, Choptop84, and HappyLemonLime for easy access to most BeepMods. (I recommend bookmarking this too)
-                    </p>
-                    <h3>
-                        <a href="https://pastelink.net/submit">Pastelink</a>
-                    </h3>
-                    <p>
-                         An alternative URL shortener for if your songs get REALLY big. (tinyurl has a character limit of ~13,000, Pastelink has a character limit of 180,000)
-                    </p>
-                    <h3>
-                        <a href="./credits.html">Credits</a>
-                    </h3>
-                    <p>
-                         Every BeepMod and user who has or will have a contribution to JukeBox.
-                    </p>
-                    <!--
-                    <h3>
-                        <a href=""></a>
-                    </h3>
-                    <p>
-                         
-                    </p>
-                    -->
-                </section>
+    </div>
+        <br><br>
+            <div style="justify-content: center; display: flex; cursor: pointer;">
+                <div onclick="window.open('/website/Manual/patch_notes.html')" style="height: 80px; background: black; width: 420px; border-radius: 20px; border: solid 1px #444; display: flex; flex-direction: row; align-items: center;">
+                    <div style="flex: 1;text-align: center;font-size: 21px;text-decoration: underline;color: white;">JukeBox Patch Notes</div>
+                </div>
+            </div>
+            <p></p>
+            <div style="justify-content: center; display: flex; cursor: pointer;">
+                <div onclick="window.open('/website/Manual/resources.html')" style="height: 80px; background: black; width: 420px; border-radius: 20px; border: solid 1px #444; display: flex; flex-direction: row; align-items: center;">
+                    <div style="flex: 1;text-align: center;font-size: 21px;text-decoration: underline;color: white;">Other Resources</div>
+                </div>
+            </div>
+            <p></p>
+            <div style="justify-content: center; display: flex; cursor: pointer;">
+                <div onclick="window.open('//discord.gg/xSs9nABmP5')" style="height: 80px; background: black; width: 420px; border-radius: 20px; border: solid 1px #444; display: flex; flex-direction: row; align-items: center;">
+                    <div style="height: 100%;width: 80px;border-right: 1px solid #444;/*! border-radius: 10px; */background-image: url(./image_assets/discord.png);background-size: 90%;background-repeat: no-repeat;background-position: center;"></div>
+                    <div style="flex: 1;text-align: center;font-size: 21px;text-decoration: underline;color: #5865F2;">JukeBox Community Discord</div>
+                </div>
+            </div>
+            <p></p>
+            <div style="justify-content: center; display: flex; cursor: pointer;">
+                <div onclick="window.open('//github.com/JukeeBox/JukeBox_TypeScript')" style="height: 80px; background: black; width: 420px; border-radius: 20px; border: solid 1px #444; display: flex; flex-direction: row; align-items: center;">
+                    <div style="height: 100%;width: 80px;border-right: 1px solid #444;/*! border-radius: 10px; */background-image: url(./image_assets/github.png);background-size: 90%;background-repeat: no-repeat;background-position: center;"></div>
+                    <div style="flex: 1;text-align: center;font-size: 21px;text-decoration: underline;color: white;">JukeBox Source Code</div>
+                </div>
+            </div>
+            <p></p>
+            <div style="justify-content: center; display: flex; cursor: pointer;">
+                <div onclick="window.open('//beepbox-launchpad.github.io')" style="height: 80px; background: black; width: 420px; border-radius: 20px; border: solid 1px #444; display: flex; flex-direction: row; align-items: center;">
+                    <div style="height: 100%;width: 80px;border-right: 1px solid #444;/*! border-radius: 10px; */background-image: url(./image_assets/launchpad.png);background-size: 90%;background-repeat: no-repeat;background-position: center;"></div>
+                    <div style="flex: 1;text-align: center;font-size: 21px;text-decoration: underline;color: #7744FF;">BeepBox Launchpad</div>
+                </div>
+            </div>
+            <p style="text-align: center;">Launchpad made by Slarmoo, Choptop84, and HappyLemonLime</p>
+            <div style="justify-content: center; display: flex; cursor: pointer;">
+                <div onclick="window.open('./bluesky', '_blank')" style="height: 80px; background: black; width: 420px; border-radius: 20px; border: solid 1px #444; display: flex; flex-direction: row; align-items: center;">
+                    <div style="height: 100%;width: 80px;border-right: 1px solid #444;/*! border-radius: 10px; */background-image: url(./image_assets/bsky.png);background-size: 90%;background-repeat: no-repeat;background-position: center;"></div>
+                    <div style="flex: 1;text-align: center;font-size: 21px;text-decoration: underline;color: #1185fe;"> Music on Bluesky</div>
+                </div>
+            </div>
             <br><br>
-            <h2>
-					Shared on Bluesky:
-				</h2>
-				<div>
-					<!-- <a class="bsky-timeline" data-width="300" data-height="2000" data-link-color="#9988ff" data-chrome="noheader nofooter transparent" data-dnt="true" data-theme="dark" href="https://twitter.com/beepboxco?ref_src=twsrc%5Etfw" target="_blank">Songs retweeted by @beepboxco</a> -->
-                    <bsky-embed
-						feed="at://did:plc:mbrx5fkqsdgk5l2dfhygecm6/app.bsky.feed.generator/aaabsv7gjrgl2"
-						mode="dark"
-						link-target="_blank"
-						link-image="false"
-						limit="5"
-						load-more="true"
-						disable-styles="false"
-						custom-styles="a.mt-4.rounded-md.border.border-slate-300.block {display: none;} .flex > div { max-width: 90%; } .whitespace-pre-wrap { word-wrap: break-word;}"
-					  >
-                    </bsky-embed>
-                    <script async>
-                    // only load bsky-embed if it's actually visible
-                    // (the downside of doing this is that you have to manually reload the page to load/unload the library)
-                    if (window.localStorage.getItem("showDescription") != "false") {
-                        const bsky_script = document.createElement("script");
-
-                        bsky_script.src = "https://cdn.jsdelivr.net/npm/bsky-embed@0.2.2/dist/bsky-embed.es.min.js";
-                        bsky_script.type = "module";
-
-                        document.head.appendChild(bsky_script);
-                    }
-                    </script>
-					<!-- <script type="module" src="https://cdn.jsdelivr.net/npm/bsky-embed/dist/bsky-embed.es.js" async></script> -->
-				</div>
         </div>
     </div>
 
@@ -479,10 +298,12 @@
         "✨","🌈","🌧️","🪨","🐍","🌲","🌳","𓆏","🦀","🍄‍🟫","🌵","and Bobby","🥚",
         //Current version
         // I wonder how many times I'll forget about this
-        "0.2.0"
+        "0.2.1",
+        //JukeBox
+        "(did someone say presets?)",
         ];
         const date = new Date();
-        if (Math.floor(Math.random() * 3) == 0) { //more than doubled chance for a plant to show up
+        if (Math.floor(Math.random() * 0) == 0) { // plants always show up now
             document.getElementById("goldboxPlant").innerHTML = "  " + plants[(Math.floor(Math.random() * plants.length))];
             //Slarmoo's Box holiday plants
             const winterPlants = ["🎄", "🍪", "☃️", "🎁", "❄️"];

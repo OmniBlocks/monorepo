@@ -1,26 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="icon" type="image/x-icon" href="./favicon.ico" />
+	<link rel="stylesheet" href="subpages.css">
+    <link rel='shortcut icon' type='image/x-icon' href='./favicon.ico' />
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>JukeBox Credits</title>
-    <meta name="application-name" content="JukeBox" />
-    <meta name="apple-mobile-web-app-title" content="JukeBox">
-    <meta name="description" content="JukeBox is a mod of Slarmoo's Box that aims to add a crap ton of presets." />
-    <meta name="mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="theme-color" content="#247d1d" />
-    <meta name="msapplication-TileColor" content="#247d1d" />
-    <meta name="msapplication-config" content="/browserconfig.xml" />
-    <meta name="format-detection" content="telephone=no" />
-    <meta property="og:image" content="https://jukeebox.github.io/icon_shadow_192.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png" />
-    <link rel="icon" type="image/png" sizes="32x32" href="./icon_32.png" />
-    <link rel="manifest" href="/manifest.webmanifest" />
-    <link href="https://fonts.googleapis.com/css?family=B612" rel="stylesheet" media="none" onload="if (this.media != 'all') this.media='all';" /> <!-- this is a trick to load CSS asynchronously. -->
-    <style type="text/css">
+	<meta name="theme-color" content="#ad7760"/>
+	<meta property="og:image" content="/icon_maskable_192.png" />
+	<meta name="description" content="JukeBox is a mod of Slarmoo's Box that aims to add a crap ton of presets." />
+	<link href="https://fonts.googleapis.com/css?family=B612" rel="stylesheet" media="none" onload="if (this.media != 'all') this.media='all';" /> <!-- this is a trick to load CSS asynchronously. -->
+    <script>
+		function linkTo(update) {
+			window.history.replaceState(null, "", location.pathname + "#" + update);
+			navigator.clipboard.writeText(window.location).then(() => {
+				const popup = document.getElementById("popup");
+				popup.classList.add("show");
+				setTimeout(() => {
+					popup.classList.remove("show");
+				}, 2000);
+			});
+		}
+	</script>
+	<title>JukeBox Patch Notes</title>
+</head>
+<style>
+
+h2 {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+</style>
+
+<body>
+    
+<nav class="navbar">
+  <a title="Click to go back to homepage" href="https://jukeebox.github.io">
+    <!--
+    <div class="logo-wrapper">
+      <img src="theme_resources/JukeBoxLogo.png" alt="JukeBox" class="logo" height="64px">
+      <img src="theme_resources/JukeBoxLogo.png" alt="" class="logo-glow" height="64px" aria-hidden="true">
+    </div>
+    -->
+  </a>
+  <div class="navbartitle col"><h1>JukeBox - Credits</h1></div>
+  	<div class="col">
+		<a class="navbarlinks" href="credits.html"><button>Credits</button></a>
+    	<a class="navbarlinks" href="resources.html"><button>Resources</button></a>
+		<a class="navbarlinks" href="features.html"><button>Features</button></a>
+		<a class="navbarlinks" href="patch_notes.html"><button>Patch Notes</button></a>
+		<a class="navbarlinks" href="instructions.html"><button>Instructions</button></a>
+	</div>
+</nav>
+
+<style type="text/css">
 
         html {
             background: var(--page-margin, black);
@@ -31,14 +64,7 @@
             color: var(--primary-text, white);
         }
 
-        body {
-            margin: auto;
-            overflow-x: hidden;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            align-content: center;
-        }
+        
 
         h1 {
             font-size: 1.7rem;
@@ -48,13 +74,13 @@
             -webkit-text-stroke-width: 0;
         }
 
-        h2 {
+        hmod {
             font-size: 1.5rem;
-            text-align: center;
             margin-top: 0.5em;
             margin-bottom: 0.5em;
             -webkit-text-stroke-width: 0;
         }
+        
 
         h3 {
             font-size: 1.2rem;
@@ -63,229 +89,219 @@
             -webkit-text-stroke-width: 0;
         }
 
-        a {
-            color: var(--link-accent, #3abbb2);
-        }
-
-        a:hover {
-            color: var(--link-accent, #71eee5);
-        }
-
         @media (min-width: 1100px) {
             body {
                 width: 1100px;
                 align-items: start;
                 align-content: start;
             }
-            h2 {
+            hmod {
                 border-left: white solid 4px;
                 padding-left: 8px;
             }
         }
     </style>
   </body>
-  
-<h1>
-<font color="#247d1d">Credits</font>
+<h2></h2>
 <h3>Thanks to LeoV for implementing several features for Slarmoo's Box, it's really hard to overstate how much work they've done.
     Slarmoo's Box would not be possible without them</h3>
 <h3>Thanks to Main, Neptendo, Mid, Choptop84, HappyLemonLime for various contributions</h3>
 <h3>Thanks to becuzwhynot for the help in making the Azur Lane theme</h3>
 <!-- <h3>Thanks to various community members for helping to <a href="https://slarmoo.github.io/slarmoosboxtesting/">test</a> Slarmoo's Box</h3> -->
-<h3>Huge thanks to Calamity, DX7FM, HoneyKitKD, ThatBeepboxGuy, truemori, The Tunecrusher, Bagel, ia.kisha, and more, who have collectively submitted hundreds of instruments to JukeBox.</h3>
-<h3>And huge thanks to Slarmoo, who figured out how to increase the amount of preset categories in version 0.2.0.</h3>
-</h1>
+<h3>Thanks to DX7FM, HoneykitKD, Calamity, ThatBeepboxGuy, truemori, The Tunecrusher, Bagel, ia.kisha, snowirei, Krmailence, DamageLol, and more, who have collectively submitted hundreds of presets to JukeBox.</h3>
+<h3>Huge thanks to Slarmoo, who figured out how to increase the amount of preset categories, as well as provide general programing help.</h3>
+
 
 <h1>
-<font color="#247d1d">Mod Credits (in chronological order)</font>
+<font color="#AD7760">Mod Credits (in chronological order)</font>
 </h1>
 
-<h2>Beepbox</h2>
+<hmod>Beepbox</hmod>
 <h3>Made by John Nesky</h3>
 <p><a href="https://beepbox.co/">https://beepbox.co/</a></p>
 
-<h2>Modbox</h2>
+<hmod>Modbox</hmod>
 <h3>Made by Theepicosity, Quirby, DAzombieRE, and Fillygroove</h3>
 <p><a href="https://moddedbeepbox.github.io/3.0/">https://moddedbeepbox.github.io/3.0/</a>, <a href="https://moddedbeepbox.github.io/beta/">https://moddedbeepbox.github.io/beta/</a></p>
 
-<h2>Sandbox</h2>
+<hmod>Sandbox</hmod>
 <h3>Made by Fillygroove</h3>
 <p><a href="https://fillygroove.github.io/sandbox-3.1/">https://fillygroove.github.io/sandbox-3.1/</a></p>
 
-<h2>Haileybox</h2>
+<hmod>Haileybox</hmod>
 <h3>Made by Hailey</h3>
 <p><a href="https://ultraabox.github.io/archives/haileybox">https://ultraabox.github.io/archives/haileybox</a></p>
     
-<h2>Brucebox</h2>
+<hmod>Brucebox</hmod>
 <h3>Made by Stinker06</h3>
 <p><a href="https://ultraabox.github.io/archives/brucebox">https://ultraabox.github.io/archives/brucebox</a></p>
 
-<h2>NerdBox</h2>
+<hmod>NerdBox</hmod>
 <h3>Made by Green Guy</h3>
 <p><a href="https://ultraabox.github.io/archives/nerdbox">https://ultraabox.github.io/archives/nerdbox</a></p>
 
-<h2>Zefbox</h2>
+<hmod>Zefbox</hmod>
 <h3>Made by Zef</h3>
 <p><a href="https://ultraabox.github.io/archives/zefbox">https://ultraabox.github.io/archives/zefbox</a></p>
 
-<h2>Shitbox</h2>
+<hmod>Shitbox</hmod>
 <h3>Made by HiddenRealm</h3>
 <p><a href="https://lihzahrd.github.io/shitbox/">https://lihzahrd.github.io/shitbox/</a>, <a href="https://hidden-realm.github.io/shitbox2/">https://hidden-realm.github.io/shitbox2/</a>, <a href="https://lihzahrd.github.io/shitbox3.0/">https://lihzahrd.github.io/shitbox3.0/</a></p>
 
-<h2>Blackbox</h2>
+<hmod>Blackbox</hmod>
 <h3>Made by HiddenRealm</h3>
 <p><a href="https://lihzahrd.github.io/blackbox/">https://lihzahrd.github.io/blackbox/</a></p>
 
-<h2>Jummbox</h2>
+<hmod>Jummbox</hmod>
 <h3>Made by Jummbus</h3>
 <p><a href="https://jummbus.bitbucket.io/">https://jummbus.bitbucket.io/</a></p>
 
-<h2>Cardboardbox</h2>
+<hmod>Cardboardbox</hmod>
 <h3>Made by HiddenRealm</h3>
 <p><a href="https://hidden-realm.github.io/cardboardbox/">https://hidden-realm.github.io/cardboardbox/</a></p>
 
-<h2>Dogebox</h2>
+<hmod>Dogebox</hmod>
 <h3>Made by DogeisCut</h3>
 <p><a href="https://dogeiscut.github.io/Dogebox/">https://dogeiscut.github.io/Dogebox/</a></p>
 
-<h2>Blubox</h2>
+<hmod>Blubox</hmod>
 <h3>Made by Bluto</h3>
 <p><a href="https://ultraabox.github.io/archives/blubox/">https://ultraabox.github.io/archives/blubox/</a></p>
 
-<h2>Synthbox</h2>
+<hmod>Synthbox</hmod>
 <h3>Made by Chopy61</h3>
 <p><a href="https://synthbox.co">https://synthbox.co</a></p>
 
-<h2>Wackybox</h2>
+<hmod>Wackybox</hmod>
 <h3>Made by Jinx</h3>
 <p><a href="https://bluecatgamer.github.io/Wackybox/">https://bluecatgamer.github.io/Wackybox/</a></p>	
 
-<h2>Todbox</h2>
+<hmod>Todbox</hmod>
 <h3>Made by Just a Toad and Main</h3>
 <p><a href="https://todbox.github.io/">https://todbox.github.io/</a>, <a href="https://todbox.github.io/bruhmoment/">https://todbox.github.io/bruhmoment/</a></p>
 
-<h2>Mainbox</h2>
+<hmod>Mainbox</hmod>
 <h3>Made by Main</h3>
 <p>link unavailable</p>
 
-<h2>WeebBox</h2>
+<hmod>WeebBox</hmod>
 <h3>Made by Jimothee</h3>
 <p><a href="https://jimothee.bitbucket.io/">https://jimothee.bitbucket.io/</a></p>
 
-<h2>Nintaribox</h2>
+<hmod>Nintaribox</hmod>
 <h3>Made by Nintari</h3>
 <p><a href="https://nintarigenesis.bitbucket.io/">https://nintarigenesis.bitbucket.io/</a></p>
 
-<h2>Goldbox</h2>
+<hmod>Goldbox</hmod>
 <h3>Made by AurySystem</h3>
 <p><a href="https://aurysystem.github.io/goldbox">https://aurysystem.github.io/goldbox</a></p>
 
-<h2>MicroBox</h2>
+<hmod>MicroBox</hmod>
 <h3>Made by TheThreadSnake</h3>
 <p><a href="https://thethreadsnake.github.io/microbox/">https://thethreadsnake.github.io/microbox/</a></p>
 
-<h2>PaandorasBox</h2>
+<hmod>PaandorasBox</hmod>
 <h3>Made by Main and Jinx</h3>
 <p><a href="https://paandorasbox.github.io/">https://paandorasbox.github.io/</a></p>
 
-<h2>Thurmbox</h2>
+<hmod>Thurmbox</hmod>
 <h3>Made by Thurm</h3>
 <p><a href="https://pandoras-box-archive.neptendo.repl.co">https://pandoras-box-archive.neptendo.repl.co</a></p>
 
-<h2>FoxBox</h2>
+<hmod>FoxBox</hmod>
 <h3>Made by elithefox</h3>
 <p><a href="https://elithefox.neocities.org/FoxBox">https://elithefox.neocities.org/FoxBox</a></p>
 
-<h2>NeuBox</h2>
+<hmod>NeuBox</hmod>
 <h3>Made by theparadoxbox</h3>
 <p><a href="https://github.com/TheParadoxBox/NeuBox/releases/">https://github.com/TheParadoxBox/NeuBox/releases/</a></p>
 
-<h2>Blubox Desktop</h2>
+<hmod>Blubox Desktop</hmod>
 <h3>Made by Bluto</h3>
 <p><a href="https://github.com/planet-bluto/BluBox2.0/releases/">https://github.com/planet-bluto/BluBox2.0/releases/</a></p>
 
-<h2>MarioPaintbox</h2>
+<hmod>MarioPaintbox</hmod>
 <h3>Made by siliconetemper</h3>
 <p><a href="https://pmpbox.glitch.me">pmpbox.glitch.me</a></p>
 
-<h2>UltraBox</h2>
+<hmod>UltraBox</hmod>
 <h3>Idea by Neptendo with coding help from Main and other community members</h3>
 <p><a href="https://ultraabox.github.io">https://ultraabox.github.io</a></p>
 
-<h2>Midbox</h2>
+<hmod>Midbox</hmod>
 <h3>Made by MidTheComposer</h3>
 <p><a href="https://mid-the-modder.github.io/Midbox/">https://mid-the-modder.github.io/Midbox/</a></p>
 
-<h2>Dogebox2</h2>
+<hmod>Dogebox2</hmod>
 <h3>Made by DogeisCut</h3>
 <p><a href="https://dogeiscut.github.io/dogebox2/">https://dogeiscut.github.io/dogebox2/</a></p>
 
-<h2>AbyssBox</h2>
+<hmod>AbyssBox</hmod>
 <h3>Made by choptop84</h3>
 <p><a href="https://choptop84.github.io/abyssbox-app/">https://choptop84.github.io/abyssbox-app/</a></p>
 
-<h2>Nepbox</h2>
+<hmod>Nepbox</hmod>
 <h3>Made by Neptendo</h3>
 <p><a href="https://neptendo.github.io/nepbox/">https://neptendo.github.io/nepbox/</a></p>
 
-<h2>Unbox</h2>
+<hmod>Unbox</hmod>
 <h3>Made by Unconventional</h3>
 <p><a href="https://un-conventional.github.io/">https://un-conventional.github.io/</a>, <a href="https://un-conventional.github.io/Testing/">https://un-conventional.github.io/Testing/</a></p>
 
-<h2>shitbox4</h2>
+<hmod>shitbox4</hmod>
 <h3>Made by choptop84</h3>
 <p><a href="https://choptop84.github.io/shitbox4/">https://choptop84.github.io/shitbox4/</a></p>
 
-<h2>AwesomeBox</h2>
+<hmod>AwesomeBox</hmod>
 <h3>Made by mmm_donuts2008</h3>
 <p><a href="https://mmmdonuts2008.github.io/AwesomeBox/website/">https://mmmdonuts2008.github.io/AwesomeBox/website/</a></p>
 
-<h2>Slarmoo's Box</h2>
+<hmod>Slarmoo's Box</hmod>
 <h3>Made by Slarmoo</h3>
 <p><a href="https://slarmoo.github.io/slarmoosbox/website/">https://slarmoo.github.io/slarmoosbox/website/</a></p>
 
-<h2>Voxbox</h2>
+<hmod>Voxbox</hmod>
 <h3>Made by Voxel</h3>
 <p><a href="https://voxeldeev.github.io/voxbox/website/">https://voxeldeev.github.io/voxbox/website/</a></p>
 
-<h2>DinoBox</h2>
+<hmod>DinoBox</hmod>
 <h3>Made by MrIncredibleMaker</h3>
 <p><a href="https://dinobox.vercel.app/">https://dinobox.vercel.app/</a></p>
 
-<h2>AxoBox</h2>
+<hmod>AxoBox</hmod>
 <h3>Made by axo</h3>
 <p><a href="https://axowo.xyz/axobox/">https://axowo.xyz/axobox/</a></p>
 
-<h2>EdoBox</h2>
+<hmod>EdoBox</hmod>
 <h3>Made by UnbihexiumFan</h3>
 <p><a href="https://unbihexiumfan.github.io/edobox/website/">https://unbihexiumfan.github.io/edobox/website/</a></p>
 	
-<h2>LemmBox</h2>
+<hmod>LemmBox</hmod>
 <h3>Made by HappyLemonLime</h3>
 <p><a href="https://lemmbox.github.io/">https://lemmbox.github.io/</a></p>
 
-<h2>BonBox</h2>
+<hmod>BonBox</hmod>
 <h3>Made by ChaoticBon</h3>
 <p><a href="https://chaoticbon.com/bonbox">https://chaoticbon.com/bonbox</a></p>
 
-<h2>BulbBox</h2>
-<h3>Made by thereallogg123</h3>
-<p><a href="https://thereallogg123.github.io/bulbbox-app/">https://thereallogg123.github.io/bulbbox-app/</a></p>
-
-<h2>BloxBox</h2>
-<h3>Made by thebloxer231</h3>
-<p><a href="https://jicekonemo.github.io/BloxBox/">https://jicekonemo.github.io/BloxBox/</a></p>
-
-<h2>D's Quick Box Mod</h2>
-<h3>Made by deathmodereal</h3>
-<p><a href="https://me-rn-rbh.github.io/Deathmodereals-Quick-Box-Mod/">https://github.com/Me-rn-rbh/deathmoderealsboxmod-source</a></p>
-
-<h2>JukeBox</h2>
+<hmod>JukeBox</hmod>
 <h3>Made by CoolTasDude</h3>
 <p><a href="https://jukeebox.github.io/">https://jukeebox.github.io/</a></p>
 
+<hmod>BulbBox</hmod>
+<h3>Made by thereallogg123</h3>
+<p><a href="https://thereallogg123.github.io/bulbbox-app/">https://thereallogg123.github.io/bulbbox-app/</a></p>
+
+<hmod>BloxBox</hmod>
+<h3>Made by thebloxer231</h3>
+<p><a href="https://jicekonemo.github.io/BloxBox/">https://jicekonemo.github.io/BloxBox/</a></p>
+
+<hmod>D's Quick Box Mod</hmod>
+<h3>Made by deathmodereal</h3>
+<p><a href="https://me-rn-rbh.github.io/Deathmodereals-Quick-Box-Mod/">https://github.com/Me-rn-rbh/deathmoderealsboxmod-source</a></p>
+
 <!--
-<h2>Box</h2>
+<hmod>Box</hmod>
 <h3>Made by </h3>
 <p><a href=""></a></p>
 -->

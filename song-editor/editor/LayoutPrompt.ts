@@ -12,9 +12,9 @@ export class LayoutPrompt implements Prompt {
     private readonly _okayButton: HTMLButtonElement = button({ class: "okayButton", style: "width:45%;" }, "Okay");
     private readonly _cancelButton: HTMLButtonElement = button({ class: "cancelButton" });
     private readonly _form: HTMLFormElement = form({ style: "display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;" },
-        label({ class: "layout-option" },
-            input({ type: "radio", name: "layout", value: "small" }),
-            SVG(`\
+        label({class: "layout-option"},
+				input({type: "radio", name: "layout", value: "small"}),
+				SVG(`\
 					<svg viewBox="-4 -1 28 22">
 						<rect x="0" y="0" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1"/>
 						<rect x="2" y="2" width="11" height="10" fill="currentColor"/>
@@ -22,11 +22,11 @@ export class LayoutPrompt implements Prompt {
 						<rect x="2" y="13" width="11" height="5" fill="currentColor"/>
 					</svg>
 				`),
-            div("Small"),
-        ),
-        label({ class: "layout-option" },
-            input({ type: "radio", name: "layout", value: "long" }),
-            SVG(`\
+				div("Small"),
+			),
+			label({class: "layout-option"},
+				input({type: "radio", name: "layout", value: "long"}),
+				SVG(`\
 					<svg viewBox="-1 -1 28 22">
 						<rect x="0" y="0" width="26" height="20" fill="none" stroke="currentColor" stroke-width="1"/>
 						<rect x="2" y="2" width="12" height="10" fill="currentColor"/>
@@ -35,11 +35,11 @@ export class LayoutPrompt implements Prompt {
 						<rect x="2" y="13" width="22" height="5" fill="currentColor"/>
 					</svg>
 				`),
-            div("Long"),
-        ),
-        label({ class: "layout-option" },
-            input({ type: "radio", name: "layout", value: "tall" }),
-            SVG(`\
+				div("Long"),
+			),
+			label({class: "layout-option"},
+				input({type: "radio", name: "layout", value: "tall"}),
+				SVG(`\
 					<svg viewBox="-1 -1 28 22">
 						<rect x="0" y="0" width="26" height="20" fill="none" stroke="currentColor" stroke-width="1"/>
 						<rect x="11" y="2" width="8" height="16" fill="currentColor"/>
@@ -47,11 +47,11 @@ export class LayoutPrompt implements Prompt {
 						<rect x="2" y="2" width="8" height="16" fill="currentColor"/>
 					</svg>
 				`),
-            div("Tall"),
-        ),
-        label({ class: "layout-option" },
-            input({ type: "radio", name: "layout", value: "wide" }),
-            SVG(`\
+				div("Tall"),
+			),
+			label({class: "layout-option"},
+				input({type: "radio", name: "layout", value: "wide"}),
+				SVG(`\
 					<svg viewBox="-1 -1 28 22">
 						<rect x="0" y="0" width="26" height="20" fill="none" stroke="currentColor" stroke-width="1"/>
 						<rect x="2" y="2" width="4" height="16" fill="currentColor"/>
@@ -60,11 +60,37 @@ export class LayoutPrompt implements Prompt {
 						<rect x="7" y="2" width="10" height="16" fill="currentColor"/>
 					</svg>
 				`),
-            div("Wide (JB)"),
-        ),
-        label({ class: "layout-option" },
-            input({ type: "radio", name: "layout", value: "wide long" }),
-            SVG(`\
+				div("Wide (JB)"),
+			),
+			label({class: "layout-option"},
+				input({type: "radio", name: "layout", value: "AbyssBox Special"}),
+				SVG(`\
+					<svg viewBox="-1 -1 28 22">
+						<rect x="0" y="0" width="26" height="20" fill="none" stroke="currentColor" stroke-width="1"/>
+						<rect x="7" y="2" width="4" height="11" fill="currentColor"/>
+						<rect x="2" y="2" width="4" height="11" fill="currentColor"/>
+						<rect x="10" y="2" width="14" height="11" fill="currentColor"/>
+						<rect x="2" y="14" width="22" height="4" fill="currentColor"/>
+					</svg>
+				`),
+				div("Flipped (AB)"),
+			),
+			label({class: "layout-option"},
+				input({type: "radio", name: "layout", value: "focus"}),
+				SVG(`\
+					<svg viewBox="-1 -1 28 22">
+						<rect x="0" y="0" width="26" height="20" fill="none" stroke="currentColor" stroke-width="1"/>
+						<rect x="2" y="2" width="17" height="10" fill="currentColor"/>
+						<rect x="20" y="2" width="4" height="16" fill="currentColor"/>
+						<rect x="2" y="13" width="17" height="5" fill="currentColor"/>
+					</svg>
+				`),
+				div("Focus (AB)"),
+			),
+
+			label({class: "layout-option"},
+				input({type: "radio", name: "layout", value: "long (AB)"}),
+				SVG(`\
 					<svg viewBox="-1 -1 28 22">
 						<rect x="0" y="0" width="26" height="20" fill="none" stroke="currentColor" stroke-width="1"/>
 						<rect x="2" y="2" width="12" height="10" fill="currentColor"/>
@@ -73,34 +99,34 @@ export class LayoutPrompt implements Prompt {
 						<rect x="2" y="13" width="12" height="5" fill="currentColor"/>
 					</svg>
 				`),
-            div("Wide Long (AB)"),
-        ),
-        label({ class: "layout-option" },
-            input({ type: "radio", name: "layout", value: "flipped long" }),
-            SVG(`\
+				div("Long (AB)"),
+			),
+			label({class: "layout-option"},
+				input({type: "radio", name: "layout", value: "theatre"}),
+				SVG(`\
 					<svg viewBox="-1 -1 28 22">
 						<rect x="0" y="0" width="26" height="20" fill="none" stroke="currentColor" stroke-width="1"/>
-						<rect x="2" y="2" width="22" height="2" fill="currentColor"/>
-						<rect x="2" y="5" width="4" height="8" fill="currentColor"/>
-						<rect x="7" y="5" width="17" height="8" fill="currentColor"/>
-						<rect x="2" y="14" width="22" height="4" fill="currentColor"/>
+						<rect x="2" y="2" width="22" height="10" fill="currentColor"></rect>
+						<rect x="2" y="13" width="16" height="5" fill="currentColor"></rect>
+						<rect x="19" y="13" width="2" height="5" fill="currentColor"></rect>
+						<rect x="22" y="13" width="2" height="5" fill="currentColor"></rect>
 					</svg>
 				`),
-            div("Flipped Long (AB)"),
-        ),
-        label({ class: "layout-option" },
-            input({ type: "radio", name: "layout", value: "focused long" }),
-            SVG(`\
+				div("Theatre (AB)"),
+			),
+			label({class: "layout-option"},
+				input({type: "radio", name: "layout", value: "Upside Down"}),
+				SVG(`\
 					<svg viewBox="-1 -1 28 22">
 						<rect x="0" y="0" width="26" height="20" fill="none" stroke="currentColor" stroke-width="1"/>
-						<rect x="2" y="2" width="17" height="10" fill="currentColor"/>
-						<rect x="20" y="2" width="4" height="16" fill="currentColor"/>
-						<rect x="2" y="13" width="17" height="5" fill="currentColor"/>
+						<rect x="7" y="8" width="17" height="10" fill="currentColor"/> /* pattern area */
+						<rect x="2" y="2" width="4" height="16" fill="currentColor"/> /* settings area */
+						<rect x="7" y="2" width="17" height="5" fill="currentColor"/> /* track area */
 					</svg>
 				`),
-            div("Focused long (AB)"),
-        ),
-    );
+				div("Upturn (AB)"),
+			),
+		);
 
     public readonly container: HTMLDivElement = div({ class: "prompt noSelection", style: "width: 300px;" },
         h2("Layout"),

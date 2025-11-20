@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+	<link rel="stylesheet" href="subpages.css">
     <link rel='shortcut icon' type='image/x-icon' href='./favicon.ico' />
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<meta name="theme-color" content="#ad7760"/>
 	<meta property="og:image" content="/icon_maskable_192.png" />
 	<meta name="description" content="JukeBox is a mod of Slarmoo's Box that aims to add a crap ton of presets." />
-	<script>
+	<link href="https://fonts.googleapis.com/css?family=B612" rel="stylesheet" media="none" onload="if (this.media != 'all') this.media='all';" /> <!-- this is a trick to load CSS asynchronously. -->
+    <script>
 		function linkTo(update) {
 			window.history.replaceState(null, "", location.pathname + "#" + update);
 			navigator.clipboard.writeText(window.location).then(() => {
@@ -20,150 +22,74 @@
 		}
 	</script>
 	<title>JukeBox Patch Notes</title>
-    <style type="text/css">
-
-        html {
-            background: var(--page-margin, #020009);
-            overflow-x: hidden;
-            font-size: large;
-            font-family: 'B612', sans-serif;
-            line-height: 1.3;
-            color: var(--primary-text, white);
-        }
-
-		body {
-			max-width: 1100px;
-			margin: auto;
-			padding: 1rem;
-		}
-
-        h1 {
-            font-size: 1.7rem;
-            text-align: center;
-            margin-top: 0.5em;
-            margin-bottom: 0.5em;
-            -webkit-text-stroke-width: 0;
-        }
-
-		h2 {
-			border-top: 2px solid #808080;
-			padding-top: 1rem;
-			margin-top: 2rem;
-			font-size: 1.5rem;
-		}
-
-		h3 {
-            font-size: 1.2rem;
-            margin-top: 0.5em;
-            margin-bottom: 0.5em;
-            -webkit-text-stroke-width: 0;
-        }
-
-        a {
-            color: var(--link-accent, #98f);
-        }
-		button {
-			margin-top: 15px;
-			padding: 10px 15px;
-			border: 0;
-			border-radius: 100px;
-			background-color: #d7a481;
-			color: #020009;
-			font-weight: Bold;
-			transition: all 0.5s;
-			-webkit-transition: all 0.5s;
-		}
-
-		button:hover {
-			background-color: #dbaa89;
-			box-shadow: 0 0 20px #fff57050;
-			transform: scale(1.1);
-		}
-
-		button:active {
-			background-color: #af876c;
-			transition: all 0.25s;
-			-webkit-transition: all 0.25s;
-			box-shadow: none;
-			transform: scale(0.98);
-		}
-
-		@media (min-width: 1100px) {
-			body {
-				width: 1100px;
-			}
-			h2 {
-				width: 1100px;
-				align-items: start;
-				align-content: start;
-				border-top: #808080 solid 2px;
-				border-radius: 2px;
-				padding-top: 32px;
-			}
-		}
-		p {
-			font-size: 0.8rem;
-			color: #9C9BA3;
-		}
-		.backbuttondiv {
-			display: flex;
-			justify-content: center;
-			width: 100%;
-		}
-		.headertext{
-			color: #ad7760;
-			width: 100%;
-		}
-
-
-		a {
-			color: var(--link-accent, #ad7760);
-		}
-
-		a.link {
-			color: var(--secondary-text, rgb(193, 193, 193));
-			margin-left: 8px;
-		}
-
-		a.link:hover {
-			color: var(--secondary-text, rgb(233, 233, 233));
-		}
-
-		#popup {
-			position: fixed;
-			bottom: 20px;
-			left: 20px;
-			background-color: #78c25a;
-			color: white;
-			margin-top: 15px;
-			padding: 10px 15px;
-			font-weight: bold;
-			border-radius: 4px;
-			opacity: 0;
-			transform: translateX(-100%);
-			transition: all 0.5s ease;
-			pointer-events: none;
-			z-index: 1000;
-		}
-
-
-		#popup.show {
-			opacity: 1;
-			transform: translateX(0);
-			pointer-events: auto;
-		}
-
-
-	</style>
 </head>
+
+<style>
+
+h2 {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+</style>
+
 <body>
 
-<div class="backbuttondiv"><button class="backbutton" onclick="history.back()">Go Back</button></div>
-<h1> <span class="headertext"> Patch Notes (in reverse chronological order)</span> </h1>
+<nav class="navbar">
+  <a title="Click to go back to homepage" href="https://lemmbox.github.io">
+    <div class="logo-wrapper">
+      <!--<img src="theme_resources/LemmBoxLogo.png" alt="LemmBox" class="logo" height="64px">
+      <img src="theme_resources/LemmBoxLogo.png" alt="" class="logo-glow" height="64px" aria-hidden="true">-->
+    </div>
+  </a>
+  <div class="navbartitle col"><h1>JukeBox - Patch Notes</h1></div>
+  	<div class="col">
+		<a class="navbarlinks" href="credits.html"><button>Credits</button></a>
+    	<a class="navbarlinks" href="resources.html"><button>Resources</button></a>
+		<a class="navbarlinks" href="features.html"><button>Features</button></a>
+		<a class="navbarlinks" href="patch_notes.html"><button>Patch Notes</button></a>
+		<a class="navbarlinks" href="instructions.html"><button>Instructions</button></a>
+	</div>
+</nav>
+
+<article id="0.2.1">
+	<h2>Version 0.2.1 | chilling for a bit<a class="link" onclick="linkTo('0.2.1')" title="Copy link">⎋</a></h2>
+	<h3>Major Tweaks:</h3>
+	<ul>  
+		<li>The description has been completely reworked in favor of this manual. (credits to <span class="choptop">Choptop84</span> for the fancy description buttons, credits to <span class="lemon">HappyLemonLime</span> for reworking these subpage menus)</li>
+		<li>Added Patch Notes Navigation Bar from LemmBox</li>
+	</ul>
+	<h3>Minor Tweaks:</h3>
+	<ul>
+		<li>JukeBox Netlify Port added to the resources page</li>
+		<li>BeepBox Twitter Archive moved to the resources page</li>
+		<li>"plants" now have a 100% chance of appearing, similar to AbyssBox</li>
+	</ul>
+	<h3>New Community Presets:</h3>
+	<ul>  
+		<li>12 more presets from DX7FM</li>
+		<li>3 more presets from 3001ideaz</li>
+		<li>3 more presets from Jacobar475</li>
+		<li>2 more presets from SomethingOriginal</li>
+		<li>1 more preset from CoolTasDude</li>
+		<li></li>
+	</ul><h3>Imported Features:</h3>
+	<ul>  
+		<li>Added AbyssBox song editor layouts (song player layouts coming soon-ish)</li>
+		<li>Added D's Quick Box Mod's theme</li>
+		<li></li>
+	</ul>
+	
+	<h3>Bug Fixes:</h3>
+	<ul>
+		<li>"Picked Sine Pad" has now been imported correctly</li>
+		<li></li>
+	</ul>
+	<p class="date"> ASFDIANSFUYIGSAFASFHIUFUOEWQIMNYQNPOIYFIQBUWNYFPNQWYFIBNFSVDBNIAUQWYGXZJDTBWAKSBVCTQWGIQWB&*^SFNCGW&BKJGNASUGFANUYSIFCYTZXBCGUACINSAEDFASIBFOBN09/30/2025</p>
 <article id="0.2.0">
 	<h2>Version 0.2.0 | WE ARE SO BACK!!!<a class="link" onclick="linkTo('0.2.0')" title="Copy link">⎋</a></h2>
-	<h4>Huge thanks to Slarmoo for the hours of programing help to make this update possile!</h4>
-	<h3>134 New Presets:</h3>
+	<h4 class="slarmoo">Huge thanks to Slarmoo for the hours of programing help to make this update possile!</h4>
+	<h3>136 New Community Presets:</h3>
 	<ul>  
 		<li>34 more presets made by DX7FM</li>
 		<li>17 more presets made by ThatBeepBoxGuy</li>
@@ -176,7 +102,7 @@
 		<li>6 presets made by Jacobar475</li>
 		<li>6 presets made by SunflowerSupreme</li>
 		<li>5 presets made by Malicious mandwald</li>
-		<li>3 more presets made by SomethingOriginal</li>
+		<li>5 more presets made by SomethingOriginal</li>
 		<li>2 more presets made by Randomgoof</li>
 		<li>2 presets made by literally_luigi_irl</li>
 		<li>2 more presets made by CoolTasDude</li>
@@ -195,7 +121,7 @@
 	</ul>
 	<h3>Imported Features:</h3>
 	<ul>  
-		<li>.ogg and .opus file export options added from LemmBox/AbyssBox</li>
+		<li>.ogg and .opus file export options added from AbyssBox</li>
 		<li>The default number of pitch channels has been increased: 3 -> 5, as decided by a 5 to 1 majority vote. I decided to hold this vote after seeing BloxBox and D's Quick Box Mod.</li>
 	</ul>
 	<h3>Major Tweaks:</h3>
@@ -229,13 +155,7 @@
 	<p class="date">11/16/2025</p>
 <article id="0.1.6">
 	<h2>Version 0.1.6 | 0.2.0 is taking too long so enjoy this<a class="link" onclick="linkTo('0.1.6')" title="Copy link">⎋</a></h2>
-	<h3>Imported Presets:</h3>
-	<ul>  
-		<li>All 3 instuments imported from DinoBox</li>
-		<li>All 2 instuments imported from BonBox</li>
-		<li>"Bass Triangle Wave" imported from BloxBox</li>
-	</ul>
-	<h3>New Presets:</h3>
+	<h3>75 New Community Presets:</h3>
 	<ul>  
 		<li>38 presets made by HoneykitKD</li>
 		<li>21 more presets made by DX7FM</li>
@@ -244,6 +164,12 @@
 		<li>"Shaky Wind" made by TheBloxer231</li>
 		<li>"DeathBass" made by p1th0n</li>
 		<li>"Austin FNF waveform" made by Synthetic</li>
+	</ul>
+	<h3>Imported Presets:</h3>
+	<ul>  
+		<li>All 3 instuments imported from DinoBox</li>
+		<li>All 2 instuments imported from BonBox</li>
+		<li>"Bass Triangle Wave" imported from BloxBox</li>
 	</ul>
 	<h3>Bug Fixes:</h3>
 	<ul>  
@@ -272,11 +198,7 @@
 		<li>Alt + O: open "import instruments" menu</li>
 		<li>Alt + S: open "export instruments" menu</li>
 	</ul>
-	<h3>Imported Presets:</h3>
-	<ul>  
-		<li>"Chip Guitar" imported from BloxBox</li>
-	</ul>
-	<h3>New Presets:</h3>
+	<h3>51 New Community Presets:</h3>
 	<ul>  
 		<li>31 more presets made by DX7FM</li>
 		<li>9 presets made by Yupekosi</li>
@@ -284,6 +206,10 @@
 		<li>2 presets made by Randomgoof</li>
 		<li>2 presets made by trexsiyo</li>
 		<li>"Ghoul Dance" made by Unregistered account (that's literally the username they wanted to be credited as)</li>
+	</ul>
+	<h3>Imported Presets:</h3>
+	<ul>  
+		<li>"Chip Guitar" imported from BloxBox</li>
 	</ul>
 	<h3>Bug Fixes:</h3>
 	<ul>  
@@ -313,7 +239,7 @@
 	<ul>  
 		<li>Added 207 presets from UnBox Testing</li>
 	</ul>
-	<h3>New Presets:</h3>
+	<h3>4 New Community Presets:</h3>
 	<ul>  
 		<li>4 more presets made by ia.kisha</li>
 	</ul>
@@ -337,7 +263,7 @@
 		<li>"liminal" has been moved to "Slarmoo's Box Novelty Presets</li>
 		<li>Fixed the "Celestina" preset, as it had been imported incorrectly</li>
 	</ul>
-	<h3>New Preset:</h3>
+	<h3>1 New Community Preset:</h3>
 	<ul>  
 		<li>"morsed code" made by rit</li>
 	</ul>
@@ -349,7 +275,7 @@
 	<ul>  
 		<li>"Unmodified" preset category, which has a unmodified version of each instrument type (this category will not roll in "Random Preset")</li>
 	</ul>
-	<h3>New Presets:</h3>
+	<h3>36 New Community Presets:</h3>
 	<ul>  
 		<li>30 presets made by Calamity</li>
 		<li>5 presets made by ia.kisha</li>
@@ -373,7 +299,7 @@
 		<li>The JukeBox Preset Submission Form is now public!</li>
 		<li>Keybind for shorten song url: shift + U (works in editor and song player)</li>
 	</ul>
-	<h3>New Presets:</h3>
+	<h3>54 New Community Presets:</h3>
 	<ul>  
 		<li>17 presets made by truemori</li>
 		<li>17 presets made by The TuneCrusher</li>
@@ -408,7 +334,7 @@
 </article>
 <article id="0.0.2">
 	<h2>Version 0.0.2 | A Whole Lot More Presets<a class="link" onclick="linkTo('0.0.2')" title="Copy link">⎋</a></h2>
-    <h3>New Presets:</h3>
+    <h3>45 New Community Presets:</h3>
 	<ul>  
 		<li>22 presets made by ThatBeepboxGuy</li>
 		<li>15 presets made by Bagel</li>
@@ -450,7 +376,7 @@
 		<li>“double octave” and “triple octave” unison types</li>
         <li>in the “edit custom scale” menu, the order of the notes have been flipped vertically to better reflect the music sheet</li>
 	</ul>
-	<h3>New Presets:</h3>
+	<h3>58 New JukeBox Presets:</h3>
 	<ul>  
 		<li>39 presets made by CoolTasDude (I wonder how long I'll keep this record)</li>
 		<li>8 presets made by LemonLime</li>

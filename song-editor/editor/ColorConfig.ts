@@ -5834,6 +5834,119 @@ export class ColorConfig {
 
 			--pitch1-background: #777;
 		}`,
+		"death": `
+			:root {
+				--mod-title: #CCCCFF;
+				--page-margin: #112335;
+					--editor-background: #112335;
+					--playhead: #AABBFF;
+					--secondary-text: #DDDDFF;
+					--box-selection-fill: rgba(255,255,255,0.2);
+					--ui-widget-background: #228;
+					--ui-widget-focus: #77B;
+					--pitch-background: #339;
+					--tonic: #468;
+					--fifth-note: #236;
+					--white-piano-key: #bbF;
+					--black-piano-key: #44A;
+					--use-color-formula: true;
+					--track-editor-bg-pitch: #393aaf;
+					--track-editor-bg-pitch-dim: #1c289a;
+					--track-editor-bg-noise: #2c353F;
+					--track-editor-bg-noise-dim: #16131B;
+					--track-editor-bg-mod: #28356a;
+					--track-editor-bg-mod-dim: #0a101f;
+					--multiplicative-mod-slider: #606a9f;
+					--overwriting-mod-slider: #6850ba;
+					--indicator-primary: #9c64f7;
+					--indicator-secondary: #393e4f;
+					--select2-opt-group: #5d576f;
+					--input-box-outline: #22a;
+					--mute-button-normal: #2Ea8ad;
+					--mute-button-mod: #886eae;
+					--mod-label-primary: #28284a;
+					--mod-label-secondary-text: rgb(87, 86, 120);
+					--mod-label-primary-text: white;
+					--pitch-secondary-channel-hue: 0;
+					--pitch-secondary-channel-hue-scale: 6.5;
+					--pitch-secondary-channel-sat: 83.3;
+					--pitch-secondary-channel-sat-scale: 0.1;
+					--pitch-secondary-channel-lum: 40;
+					--pitch-secondary-channel-lum-scale: 0.05;
+					--pitch-primary-channel-hue: 0;
+					--pitch-primary-channel-hue-scale: 6.5;
+					--pitch-primary-channel-sat: 100;
+					--pitch-primary-channel-sat-scale: 0.1;
+					--pitch-primary-channel-lum: 67.5;
+					--pitch-primary-channel-lum-scale: 0.05;
+					--pitch-secondary-note-hue: 0;
+					--pitch-secondary-note-hue-scale: 6.5;
+					--pitch-secondary-note-sat: 93.9;
+					--pitch-secondary-note-sat-scale: 0.1;
+					--pitch-secondary-note-lum: 25;
+					--pitch-secondary-note-lum-scale: 0.05;
+					--pitch-primary-note-hue: 0;
+					--pitch-primary-note-hue-scale: 6.5;
+					--pitch-primary-note-sat: 100;
+					--pitch-primary-note-sat-scale: 0.05;
+					--pitch-primary-note-lum: 85.6;
+					--pitch-primary-note-lum-scale: 0.025;
+					--noise-secondary-channel-hue: 0;
+					--noise-secondary-channel-hue-scale: 2;
+					--noise-secondary-channel-sat: 25;
+					--noise-secondary-channel-sat-scale: 0;
+					--noise-secondary-channel-lum: 42;
+					--noise-secondary-channel-lum-scale: 0;
+					--noise-primary-channel-hue: 0;
+					--noise-primary-channel-hue-scale: 2;
+					--noise-primary-channel-sat: 33;
+					--noise-primary-channel-sat-scale: 0;
+					--noise-primary-channel-lum: 63.5;
+					--noise-primary-channel-lum-scale: 0;
+					--noise-secondary-note-hue: 0;
+					--noise-secondary-note-hue-scale: 2;
+					--noise-secondary-note-sat: 33.5;
+					--noise-secondary-note-sat-scale: 0;
+					--noise-secondary-note-lum: 55;
+					--noise-secondary-note-lum-scale: 0;
+					--noise-primary-note-hue: 0;
+					--noise-primary-note-hue-scale: 2;
+					--noise-primary-note-sat: 46.5;
+					--noise-primary-note-sat-scale: 0;
+					--noise-primary-note-lum: 74;
+					--noise-primary-note-lum-scale: 0;
+					--mod-secondary-channel-hue: 192;
+					--mod-secondary-channel-hue-scale: 1.5;
+					--mod-secondary-channel-sat: 88;
+					--mod-secondary-channel-sat-scale: 0;
+					--mod-secondary-channel-lum: 50;
+					--mod-secondary-channel-lum-scale: 0;
+					--mod-primary-channel-hue: 192;
+					--mod-primary-channel-hue-scale: 1.5;
+					--mod-primary-channel-sat: 96;
+					--mod-primary-channel-sat-scale: 0;
+					--mod-primary-channel-lum: 80;
+					--mod-primary-channel-lum-scale: 0;
+					--mod-secondary-note-hue: 192;
+					--mod-secondary-note-hue-scale: 1.5;
+					--mod-secondary-note-sat: 92;
+					--mod-secondary-note-sat-scale: 0;
+					--mod-secondary-note-lum: 45;
+					--mod-secondary-note-lum-scale: 0;
+					--mod-primary-note-hue: 192;
+					--mod-primary-note-hue-scale: 1.5;
+					--mod-primary-note-sat: 96;
+					--mod-primary-note-sat-scale: 0;
+					--mod-primary-note-lum: 85;
+					--mod-primary-note-lum-scale: 0;
+					--disabled-note-primary:    #91879f;
+					--disabled-note-secondary:  #6a679a;
+			}
+
+			@font-face {
+			font-family: "Comic Sans MS";
+			)
+		`,
 	"azur lane":`
 		:root {
 			--page-margin: #19337e;
@@ -6105,6 +6218,9 @@ export class ColorConfig {
     public static readonly modLabelPrimaryText: string = "var(--mod-label-primary-text, black)";
     public static readonly disabledNotePrimary: string = "var(--disabled-note-primary, #999)";
     public static readonly disabledNoteSecondary: string = "var(--disabled-note-secondary, #666)";
+
+	public static readonly scrollbarColor: string = "var(--scrollbar-color)";
+	public static readonly scrollbarBackground: string = "var(--scrollbar-background)";
 
     public static c_pitchSecondaryChannelHue: number = 0;
     public static c_pitchSecondaryChannelHueScale: number = 0;

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<link rel="stylesheet" href="subpages.css">
+    <link rel='shortcut icon' type='image/x-icon' href='./favicon.ico' />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<meta name="theme-color" content="#ad7760"/>
+	<meta property="og:image" content="/icon_maskable_192.png" />
+	<meta name="description" content="JukeBox is a mod of Slarmoo's Box that aims to add a crap ton of presets." />
+	<link href="https://fonts.googleapis.com/css?family=B612" rel="stylesheet" media="none" onload="if (this.media != 'all') this.media='all';" /> <!-- this is a trick to load CSS asynchronously. -->
+    <script>
+		function linkTo(update) {
+			window.history.replaceState(null, "", location.pathname + "#" + update);
+			navigator.clipboard.writeText(window.location).then(() => {
+				const popup = document.getElementById("popup");
+				popup.classList.add("show");
+				setTimeout(() => {
+					popup.classList.remove("show");
+				}, 2000);
+			});
+		}
+	</script>
+	<title>JukeBox Patch Notes</title>
+</head>
+<body>
+
+<nav class="navbar">
+  <a title="Click to go back to homepage" href="https://lemmbox.github.io">
+    <div class="logo-wrapper">
+      <!--<img src="theme_resources/LemmBoxLogo.png" alt="LemmBox" class="logo" height="64px">
+      <img src="theme_resources/LemmBoxLogo.png" alt="" class="logo-glow" height="64px" aria-hidden="true">-->
+    </div>
+  </a>
+  <div class="navbartitle col"><h1>JukeBox - Resources</h1></div>
+  	<div class="col">
+		<a class="navbarlinks" href="credits.html"><button>Credits</button></a>
+    	<a class="navbarlinks" href="resources.html"><button>Resources</button></a>
+		<a class="navbarlinks" href="features.html"><button>Features</button></a>
+		<a class="navbarlinks" href="patch_notes.html"><button>Patch Notes</button></a>
+		<a class="navbarlinks" href="instructions.html"><button>Instructions</button></a>
+	</div>
+</nav>
+
+<style>
+
+h3 {
+    font-size: 1.5rem;
+}
+
+h2 {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+</style>
+
+<h2>
+    <a href="https://discord.gg/xSs9nABmP5">JukeBox Netlify Port</a>
+</h2>
+<b>
+    The Netlify port of JukeBox, made solely for people who have Github blocked at school.
+</b>
+<h3>
+    <a href="https://discord.gg/xSs9nABmP5">JukeBox Discord</a>
+</h3>
+<b>
+    The discord server for fellow JukeBox enjoyers. You can also get insight on or give feedback for future JukeBox development.
+</b>
+<h3>
+    <a href="https://discord.gg/beepbox">BeepBox Discord</a>
+</h3>
+<b>
+    An active community about everything BeepBox!
+</b>
+<h3>
+    <a href="https://discord.gg/Tc997TstJb" target="_blank">Beepbox Modding Discord</a>
+</h3>
+<b>
+    This is the easiest way to contact the developers of most beepmods, although I (CoolTasDude) am not particularly active on it.
+</b>
+<h3>
+    <a href="https://github.com/JukeeBox/JukeBox_TypeScript" target="_blank">JukeBox Source Code</a>
+</h3>
+<b>
+    You can download and use the source code under the MIT license. The original BeepBox source code by John Nesky can be found <a href="https://github.com/johnnesky/beepbox" target="_blank">here</a>. Feel free to make your own port of JukeBox! 
+</b>
+<h3>
+    <a href="https://forms.gle/B29T3gCRHB6srueB8">JukeBox Preset Submission Form</a>
+</h3>
+<b>
+    This is where you can submit your own instruments to be added to JukeBox. You can also find the Google Sheet of all presets subitted through the form <a href="https://docs.google.com/spreadsheets/d/1yyzQJd2FFR7n0TEnkE3RhWJaKZbcd6mDrK2Ie3-0ImE/" target="_blank">here</a>.
+</b>
+<h3>
+    <a href="https://beepbox-launchpad.github.io/">BeepBox Launchpad</a>
+</h3>
+<b>
+    A website developed by Slarmoo, Choptop84, and HappyLemonLime for easy access to most BeepMods. (I HIGHLY recommend bookmarking this)
+</b>
+<h3>
+    <a href="https://beepbox.miraheze.org/wiki/BeepBox_Mods">BeepBox Wiki</a>
+</h3>
+<b>
+    A wiki that contains just about everything you'd ever need to know about BeepBox Mods. (I recommend bookmarking this)
+</b>
+<h3>
+	<a href="https://twitter-archive.beepbox.co/" target="_blank">BeepBox Twitter archive</a>
+</h3>
+<b>
+	Want to see what people have made with BeepBox? Songs that were shared on Twitter prior to 2023-05-22 can be viewed on this interactive archive!
+</b>
+<h3>
+    <a href="./credits.html">Credits</a>
+</h3>
+<b>
+    Every BeepMod and user who has or will have a contribution to JukeBox.
+</b>
+
+</body>
+</html>

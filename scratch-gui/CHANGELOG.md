@@ -3,6 +3,36 @@
 This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
+### Commit [``](https://github.com/OmniBlocks/scratch-gui/commit/1171f069714770e234d1d1872a3b02cbdecba03c) - 
+
+****
+
+|[skip ci] yikes|||supervoidcoder|||2025-11-19 21:55:03 -0500|||
+
+*Author: 1171f06*
+
+---
+
+### Commit [``](https://github.com/OmniBlocks/scratch-gui/commit/6c42284b379af969c8888de426a13b1ea69ea2ba) - 
+
+****
+
+|[skip ci] fix initialziers|||supervoidcoder|||2025-11-19 21:54:22 -0500|||
+
+*Author: 6c42284*
+
+---
+
+### Commit [``](https://github.com/OmniBlocks/scratch-gui/commit/d2e5d5be7941e114936475fa48dc4624ea332aeb) - 
+
+****
+
+|chore: reinitialize CHANGELOG.md with commit descriptions [skip ci]|||github-actions[bot]|||2025-11-20 02:51:40 +0000|||
+
+*Author: d2e5d5b*
+
+---
+
 ### Commit [``](https://github.com/OmniBlocks/scratch-gui/commit/c81c24a3b4c4667f2886ac326a04bb417c73e388) - 
 
 ****

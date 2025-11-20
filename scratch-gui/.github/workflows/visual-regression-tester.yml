@@ -123,6 +123,31 @@ jobs:
           npm init -y
           npm install --save-dev @playwright/test@latest
           npx playwright install --with-deps chromium
+      - name: Create Playwright config
+        run: |
+          cat > playwright.config.js << 'EOF'
+          const { defineConfig, devices } = require('@playwright/test');
+
+          module.exports = defineConfig({
+            testDir: '.',
+            timeout: 30000,
+            fullyParallel: false,
+            forbidOnly: !!process.env.CI,
+            retries: 2,
+            workers: 1,
+            reporter: 'list',
+            use: {
+              trace: 'retain-on-failure',
+              screenshot: 'only-on-failure',
+            },
+            projects: [
+              {
+                name: 'chromium',
+                use: { ...devices['Desktop Chrome'] },
+              },
+            ],
+          });
+          EOF
 
       - name: Create Playwright test for base
         run: |

@@ -3,6 +3,21 @@
 This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
+### Commit [`c8ca5a8`](https://github.com/OmniBlocks/scratch-gui/commit/c8ca5a8b0d2baca3da32e81d890620fe809a0e42) - 2025-11-20 11:59:52 -0500
+
+**feat: add commit categorizaition per release**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`ae87af8`](https://github.com/OmniBlocks/scratch-gui/commit/ae87af801ae5048a77fa216b8ef67f547a6725f1) - 2025-11-20 11:58:43 -0500
+
+**fix: fix visual reggression**
+
+*Author: supervoidcoder*
+
+---
 
 ### Commit [`bc5ab70`](https://github.com/OmniBlocks/scratch-gui/commit/bc5ab70d0dee5796ecb06a9451283a50c685f71a) - 2025-11-20 11:54:40 -0500
 
@@ -14,6 +29,13 @@ Revert "Extensions"
 
 ---
 
+### Commit [`90f20e5`](https://github.com/OmniBlocks/scratch-gui/commit/90f20e5b1c80e39745a1701c8ba2daf13922034a) - 2025-11-20 11:54:21 -0500
+
+**Revert "Extensions"**
+
+*Author: supervoidcoder*
+
+---
 
 ### Commit [`d9a0c2d`](https://github.com/OmniBlocks/scratch-gui/commit/d9a0c2d92475b777c9d0f3ba988ee9c9df8e9fff) - 2025-11-20 11:49:45 -0500
 
@@ -23,7 +45,6 @@ Revert "Extensions"
 
 ---
 
-
 ### Commit [`a093453`](https://github.com/OmniBlocks/scratch-gui/commit/a0934534022162776f5efe4cdbcb43c7d01f6473) - 2025-11-20 11:48:04 -0500
 
 **Update visual-regression-tester.yml**
@@ -32,6 +53,13 @@ Revert "Extensions"
 
 ---
 
+### Commit [`77ca64f`](https://github.com/OmniBlocks/scratch-gui/commit/77ca64ff86eb1c64eec9f7f42604ea6c4edfe94c) - 2025-11-20 10:57:24 -0500
+
+**Update visual-regression-tester.yml**
+
+*Author: supervoidcoder*
+
+---
 
 ### Commit [`9e2d032`](https://github.com/OmniBlocks/scratch-gui/commit/9e2d032dcfe1c0fbd5a1f5a74f73da668b0ad7cd) - 2025-11-20 10:56:53 -0500
 
@@ -40,7 +68,6 @@ Revert "Extensions"
 *Author: supervoidcoder*
 
 ---
-
 
 ### Commit [`74427d9`](https://github.com/OmniBlocks/scratch-gui/commit/74427d9f26f91125c4b115853428408dd51bae1a) - 2025-11-20 10:27:19 -0500
 
@@ -162,6 +189,13 @@ Error: Process completed with exit code 1.
 
 ---
 
+### Commit [`71bb310`](https://github.com/OmniBlocks/scratch-gui/commit/71bb310a2f03cc386fa73cc4b061573df5c8d375) - 2025-11-20 10:26:51 -0500
+
+**Update visual-regression-tester.yml**
+
+*Author: supervoidcoder*
+
+---
 
 ### Commit [`07714e9`](https://github.com/OmniBlocks/scratch-gui/commit/07714e97c199294cd023fd3d94d02e384c50bfc2) - 2025-11-20 09:56:16 -0500
 
@@ -171,6 +205,13 @@ Error: Process completed with exit code 1.
 
 ---
 
+### Commit [`f8896fa`](https://github.com/OmniBlocks/scratch-gui/commit/f8896facbdfe2594acd570e396db42956f627e58) - 2025-11-20 09:54:58 -0500
+
+**Update visual-regression-tester.yml**
+
+*Author: supervoidcoder*
+
+---
 
 ### Commit [`a691d9c`](https://github.com/OmniBlocks/scratch-gui/commit/a691d9c93276a9608fc887243c37a9545276486c) - 2025-11-20 09:08:54 -0500
 
@@ -180,6 +221,23 @@ Error: Process completed with exit code 1.
 
 ---
 
+### Commit [`c45b9f7`](https://github.com/OmniBlocks/scratch-gui/commit/c45b9f7b51a682655f8b2a5a65645070f1b5f24f) - 2025-11-20 09:06:22 -0500
+
+**Update visual-regression-tester.yml**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`9ee7280`](https://github.com/OmniBlocks/scratch-gui/commit/9ee72805267c043addd2191a875f2aefc79b9a04) - 2025-11-20 09:00:22 -0500
+
+**Merge pull request #381 from OmniBlocks/main**
+
+Update extensions branch
+
+*Author: supervoidcoder*
+
+---
 
 ### Commit [`4e94386`](https://github.com/OmniBlocks/scratch-gui/commit/4e9438662bec2b978b0e7dfda45d72bb8f20fb07) - 2025-11-20 08:53:16 -0500
 
@@ -197,7 +255,6 @@ This will add a workflow that detects visual changes in a pull request, automati
 *Author: supervoidcoder*
 
 ---
-
 
 ### Commit [`1282e0d`](https://github.com/OmniBlocks/scratch-gui/commit/1282e0d9e74adafc36b8b23b5e8214ea54f251c7) - 2025-11-19 21:58:06 -0500
 
@@ -280,6 +337,26 @@ fix missing icon for real
 ### Commit [`db25fd6`](https://github.com/OmniBlocks/scratch-gui/commit/db25fd64e1314e9fae89d1808709323945037698) - 2025-11-19 16:31:44 -0500
 
 **fix broken icon**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`43ed2c4`](https://github.com/OmniBlocks/scratch-gui/commit/43ed2c4ac1bd8b20ce9af755629c44f3c87d8f80) - 2025-11-19 12:12:59 -0500
+
+**revert braindead suggestion by amazon qlanker**
+
+🧟🧟‍♂️🧟‍♂️🧟‍♂️🧟‍♂️🧟‍♂️🧟‍♂️🧟‍♂️
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`65c2a6d`](https://github.com/OmniBlocks/scratch-gui/commit/65c2a6de3a08fbd6638de8f097ce7d15ea3f5df9) - 2025-11-19 11:58:48 -0500
+
+**Merge pull request #372 from OmniBlocks/main**
+
+tralalelo tralaskibidi
 
 *Author: supervoidcoder*
 
@@ -544,6 +621,26 @@ Co-authored-by: coderabbitai[bot] <136622811+coderabbitai[bot]@users.noreply.git
 
 ---
 
+### Commit [`2154427`](https://github.com/OmniBlocks/scratch-gui/commit/21544274b409935d696f3317890693c59aed3a39) - 2025-11-10 19:20:21 +0000
+
+**Apply suggestion from @amazon-q-developer[bot]**
+
+Co-authored-by: amazon-q-developer[bot] <208079219+amazon-q-developer[bot]@users.noreply.github.com>
+
+*Author: ampelectrecuted*
+
+---
+
+### Commit [`3f2ad0f`](https://github.com/OmniBlocks/scratch-gui/commit/3f2ad0fa645850ced0f8633179528c4ba9677d8d) - 2025-11-10 08:14:40 -0500
+
+**Merge pull request #346 from OmniBlocks/main**
+
+Update extensions branch to main
+
+*Author: supervoidcoder*
+
+---
+
 ### Commit [`9e36233`](https://github.com/OmniBlocks/scratch-gui/commit/9e3623323725085e5736df621e758ebfd41550ed) - 2025-11-10 08:13:35 -0500
 
 **Merge pull request #345 from OmniBlocks/dependabot/npm_and_yarn/scratch-vm-9f709a3**
@@ -766,6 +863,16 @@ Signed-off-by: dependabot[bot] <support@github.com>
 
 ---
 
+### Commit [`9f551fe`](https://github.com/OmniBlocks/scratch-gui/commit/9f551fe9c3cd6433608f7be9e1586d49624a7d49) - 2025-11-07 11:22:17 -0500
+
+**Merge pull request #334 from OmniBlocks/main**
+
+update deps on branch
+
+*Author: supervoidcoder*
+
+---
+
 ### Commit [`d000a65`](https://github.com/OmniBlocks/scratch-gui/commit/d000a653f09726ef597e4b3aafe2ef95704058bc) - 2025-11-07 11:18:36 -0500
 
 **Merge pull request #333 from OmniBlocks/dependabot/npm_and_yarn/scratch-blocks-d67d6cf**
@@ -793,6 +900,16 @@ updated-dependencies:
 Signed-off-by: dependabot[bot] <support@github.com>
 
 *Author: dependabot[bot]*
+
+---
+
+### Commit [`3252a38`](https://github.com/OmniBlocks/scratch-gui/commit/3252a3820018a84a2ff23604625dff9feb214d56) - 2025-11-07 08:48:22 -0500
+
+**Merge pull request #332 from OmniBlocks/main**
+
+update depoendecy on branch
+
+*Author: supervoidcoder*
 
 ---
 
@@ -826,6 +943,16 @@ Signed-off-by: dependabot[bot] <support@github.com>
 
 ---
 
+### Commit [`f994646`](https://github.com/OmniBlocks/scratch-gui/commit/f994646f00bd1f2313e57e89b0efa7a5a144b8f2) - 2025-11-06 17:19:29 -0500
+
+**Merge pull request #330 from OmniBlocks/main**
+
+eruueturtrn
+
+*Author: supervoidcoder*
+
+---
+
 ### Commit [`d169976`](https://github.com/OmniBlocks/scratch-gui/commit/d1699768059bae35a2721c7255b0f1f5a82d46d0) - 2025-11-06 17:10:47 -0500
 
 **Merge pull request #329 from OmniBlocks/dependabot/npm_and_yarn/scratch-blocks-3797784**
@@ -853,6 +980,16 @@ updated-dependencies:
 Signed-off-by: dependabot[bot] <support@github.com>
 
 *Author: dependabot[bot]*
+
+---
+
+### Commit [`972f342`](https://github.com/OmniBlocks/scratch-gui/commit/972f3420abec23425b8d11cecb067e51cee0d598) - 2025-11-06 16:07:33 -0500
+
+**Merge pull request #328 from OmniBlocks/main**
+
+Update dependencies
+
+*Author: supervoidcoder*
 
 ---
 
@@ -929,6 +1066,14 @@ updated-dependencies:
 Signed-off-by: dependabot[bot] <support@github.com>
 
 *Author: dependabot[bot]*
+
+---
+
+### Commit [`469d9f7`](https://github.com/OmniBlocks/scratch-gui/commit/469d9f784f811f002a11f736a755b2bb8629b97d) - 2025-11-06 18:14:05 +0000
+
+**Merge remote-tracking branch 'origin/main' into extensions**
+
+*Author: supervoidcoder*
 
 ---
 
@@ -1303,6 +1448,16 @@ project showcase, and redesigned credits page.
 
 ---
 
+### Commit [`03c823a`](https://github.com/OmniBlocks/scratch-gui/commit/03c823a31a36890534f9fb26f23c1a1d4ea59716) - 2025-10-20 23:10:37 -0400
+
+**Merge pull request #253 from OmniBlocks/main**
+
+update dependenceies
+
+*Author: supervoidcoder*
+
+---
+
 ### Commit [`278a17c`](https://github.com/OmniBlocks/scratch-gui/commit/278a17c125d7ed75ea7defd9c288efb133af96ce) - 2025-10-20 23:08:53 -0400
 
 **Merge pull request #252 from OmniBlocks/dependabot/npm_and_yarn/scratch-blocks-fd6ca7b**
@@ -1349,6 +1504,16 @@ Signed-off-by: dependabot[bot] <support@github.com>
 
 ---
 
+### Commit [`8906cee`](https://github.com/OmniBlocks/scratch-gui/commit/8906cee2590d73bde8d7496ae1b189a81eb28a00) - 2025-10-20 08:59:56 -0400
+
+**Merge pull request #246 from OmniBlocks/main**
+
+raswe8r7tg6fhjhbgdkiuyhg updatde depenedencey
+
+*Author: supervoidcoder*
+
+---
+
 ### Commit [`075bcac`](https://github.com/OmniBlocks/scratch-gui/commit/075bcac8086760ad88b491aeb0176cbd8949d51e) - 2025-10-20 08:59:12 -0400
 
 **Merge pull request #245 from OmniBlocks/dependabot/npm_and_yarn/scratch-blocks-b2e223a**
@@ -1379,11 +1544,63 @@ Signed-off-by: dependabot[bot] <support@github.com>
 
 ---
 
+### Commit [`3b580d5`](https://github.com/OmniBlocks/scratch-gui/commit/3b580d527c90d587a965158513d0f834d3a5d420) - 2025-10-20 07:53:16 -0400
+
+**Merge pull request #244 from OmniBlocks/main**
+
+Add media query for prefers-reduced-motion
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`dfa0015`](https://github.com/OmniBlocks/scratch-gui/commit/dfa00159f8237d4cbe88937345516ce0ebdef8fb) - 2025-10-19 22:41:02 -0400
+
+**Update import-first.js**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`407f49f`](https://github.com/OmniBlocks/scratch-gui/commit/407f49f9fda048e10913d69e11233bc3a1069a8c) - 2025-10-19 21:18:26 -0400
+
+**Add import for custom input field**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`c59891e`](https://github.com/OmniBlocks/scratch-gui/commit/c59891e44ffd831b30d5abe86e3c3782749db750) - 2025-10-19 19:07:03 -0400
+
+**Refactor FieldCustom assignment logic**
+
+*Author: supervoidcoder*
+
+---
+
 ### Commit [`9569498`](https://github.com/OmniBlocks/scratch-gui/commit/9569498ecfafa916da599c211f20571ab1cc6344) - 2025-10-19 18:28:32 -0400
 
 **Add media query for prefers-reduced-motion**
 
 Disable all animations for users with reduced motion preference.
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`a87ee98`](https://github.com/OmniBlocks/scratch-gui/commit/a87ee9894847b0035f517b1f33f06b679691b568) - 2025-10-19 18:23:06 -0400
+
+**Fix FieldCustom assignment in blocks.jsx**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`fe955c6`](https://github.com/OmniBlocks/scratch-gui/commit/fe955c69ee0c81e50873b5d47c671558dc340adc) - 2025-10-19 16:10:25 -0400
+
+**Merge pull request #241 from OmniBlocks/main**
+
+fi cv5trhnjlngrt
 
 *Author: supervoidcoder*
 
@@ -1521,6 +1738,16 @@ fix: [Issue#220] preserve camera icon in media recorder after recording stops
 
 ---
 
+### Commit [`9dc3708`](https://github.com/OmniBlocks/scratch-gui/commit/9dc37082be31586eaa8586cadd5766e329913b11) - 2025-10-15 17:22:04 -0400
+
+**Merge pull request #217 from OmniBlocks/main**
+
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+
+*Author: supervoidcoder*
+
+---
+
 ### Commit [`4d07b4e`](https://github.com/OmniBlocks/scratch-gui/commit/4d07b4e0c7780f412f9b736cd2d91362b0a72e3b) - 2025-10-15 16:32:24 -0400
 
 **Merge pull request #216 from OmniBlocks/dependabot/npm_and_yarn/scratch-vm-7d3a23d**
@@ -1629,6 +1856,16 @@ Signed-off-by: dependabot[bot] <support@github.com>
 
 ---
 
+### Commit [`1381a35`](https://github.com/OmniBlocks/scratch-gui/commit/1381a351858ee01aad890b5066ecc9af3c821ebb) - 2025-10-14 16:24:55 -0400
+
+**Merge pull request #212 from OmniBlocks/main**
+
+Six seven
+
+*Author: supervoidcoder*
+
+---
+
 ### Commit [`d650b34`](https://github.com/OmniBlocks/scratch-gui/commit/d650b34e1cd8aea1b10817c0450a10ba2bce62c8) - 2025-10-14 16:22:52 -0400
 
 **Merge pull request #211 from OmniBlocks/dependabot/npm_and_yarn/scratch-vm-cf3588a**
@@ -1656,6 +1893,16 @@ updated-dependencies:
 Signed-off-by: dependabot[bot] <support@github.com>
 
 *Author: dependabot[bot]*
+
+---
+
+### Commit [`014c4a7`](https://github.com/OmniBlocks/scratch-gui/commit/014c4a7ef26c527c6ade18114a635f576292f501) - 2025-10-13 20:01:36 -0400
+
+**Merge pull request #206 from OmniBlocks/main**
+
+sync branmch
+
+*Author: supervoidcoder*
 
 ---
 
@@ -1965,6 +2212,16 @@ Signed-off-by: dependabot[bot] <support@github.com>
 
 ---
 
+### Commit [`534b401`](https://github.com/OmniBlocks/scratch-gui/commit/534b40126380d802a7dff6c2c8b0d6d7b43411ad) - 2025-10-09 22:31:53 -0400
+
+**Merge pull request #193 from OmniBlocks/main**
+
+and im here woondering if one day
+
+*Author: supervoidcoder*
+
+---
+
 ### Commit [`de2b092`](https://github.com/OmniBlocks/scratch-gui/commit/de2b0926c51b02332ed4eb8ff9989a664310a51e) - 2025-10-09 22:29:27 -0400
 
 **Merge pull request #192 from OmniBlocks/dependabot/npm_and_yarn/scratch-vm-1c10641**
@@ -1992,6 +2249,16 @@ updated-dependencies:
 Signed-off-by: dependabot[bot] <support@github.com>
 
 *Author: dependabot[bot]*
+
+---
+
+### Commit [`dc4c82e`](https://github.com/OmniBlocks/scratch-gui/commit/dc4c82e4397848ebc8f1a13e50a8d4003c138423) - 2025-10-09 21:21:54 -0400
+
+**Merge pull request #191 from OmniBlocks/main**
+
+thiiiiiiiiiiis is how we live our lives searching
+
+*Author: supervoidcoder*
 
 ---
 
@@ -2025,6 +2292,16 @@ Signed-off-by: dependabot[bot] <support@github.com>
 
 ---
 
+### Commit [`32978c6`](https://github.com/OmniBlocks/scratch-gui/commit/32978c6fa3be7c920beff74a1aae74f181851864) - 2025-10-09 20:17:06 -0400
+
+**Merge pull request #189 from OmniBlocks/main**
+
+another dependency update darn it
+
+*Author: supervoidcoder*
+
+---
+
 ### Commit [`0b72389`](https://github.com/OmniBlocks/scratch-gui/commit/0b72389db86e73e50b15b193f7c740eaa911ed4f) - 2025-10-09 20:16:25 -0400
 
 **Merge pull request #188 from OmniBlocks/dependabot/npm_and_yarn/scratch-vm-11c2586**
@@ -2052,6 +2329,16 @@ updated-dependencies:
 Signed-off-by: dependabot[bot] <support@github.com>
 
 *Author: dependabot[bot]*
+
+---
+
+### Commit [`f2b47c9`](https://github.com/OmniBlocks/scratch-gui/commit/f2b47c9be5c6f06eca2d80ba2c71416c382bfa98) - 2025-10-09 19:48:11 -0400
+
+**Merge pull request #186 from OmniBlocks/main**
+
+aasdfgnh whoops sory you want a real pr title i call it 67-er dependency update
+
+*Author: supervoidcoder*
 
 ---
 
@@ -2085,6 +2372,16 @@ Signed-off-by: dependabot[bot] <support@github.com>
 
 ---
 
+### Commit [`76f5124`](https://github.com/OmniBlocks/scratch-gui/commit/76f5124c2b9c2f0813bcc876641f35135ed012f0) - 2025-10-09 10:26:13 -0400
+
+**Merge pull request #183 from OmniBlocks/main**
+
+link
+
+*Author: supervoidcoder*
+
+---
+
 ### Commit [`15f7e78`](https://github.com/OmniBlocks/scratch-gui/commit/15f7e78be191a413d09ae44bc4e4c3a8ad379b09) - 2025-10-09 10:24:52 -0400
 
 **Merge pull request #182 from OmniBlocks/dependabot/npm_and_yarn/scratch-vm-a7ad12d**
@@ -2115,6 +2412,16 @@ Signed-off-by: dependabot[bot] <support@github.com>
 
 ---
 
+### Commit [`375039b`](https://github.com/OmniBlocks/scratch-gui/commit/375039b4c7ecc4758fc0aa9bd615b051905035a9) - 2025-10-09 09:18:33 -0400
+
+**Merge pull request #181 from OmniBlocks/main**
+
+mmerge
+
+*Author: supervoidcoder*
+
+---
+
 ### Commit [`1e32401`](https://github.com/OmniBlocks/scratch-gui/commit/1e32401511e16197200939238c56206d9b5a6174) - 2025-10-09 09:17:54 -0400
 
 **Merge pull request #180 from OmniBlocks/dependabot/npm_and_yarn/scratch-vm-6865374**
@@ -2142,6 +2449,16 @@ updated-dependencies:
 Signed-off-by: dependabot[bot] <support@github.com>
 
 *Author: dependabot[bot]*
+
+---
+
+### Commit [`5a236b0`](https://github.com/OmniBlocks/scratch-gui/commit/5a236b06418d55d6aa609143510c3043f1bf56e5) - 2025-10-09 08:51:59 -0400
+
+**Merge pull request #179 from OmniBlocks/main**
+
+update
+
+*Author: supervoidcoder*
 
 ---
 
@@ -2571,11 +2888,27 @@ Co-authored-by: coderabbitai[bot] <136622811+coderabbitai[bot]@users.noreply.git
 
 ---
 
+### Commit [`7c33fdc`](https://github.com/OmniBlocks/scratch-gui/commit/7c33fdcbbd0ad4ebcf7d7a8f3ddf31f52810b7d9) - 2025-10-07 20:14:08 +0100
+
+**fix translations**
+
+*Author: ampelectrecuted*
+
+---
+
 ### Commit [`a9b64c6`](https://github.com/OmniBlocks/scratch-gui/commit/a9b64c66052a949159ffa922a7f3a83c093ee631) - 2025-10-07 20:10:01 +0100
 
 **will this work**
 
 *Author: ampelectrecuted*
+
+---
+
+### Commit [`e94c5f4`](https://github.com/OmniBlocks/scratch-gui/commit/e94c5f4970aeaccfd85712e68e2ff1a1f6971eb6) - 2025-10-07 14:32:00 -0400
+
+**Merge branch 'main' into extensions**
+
+*Author: supervoidcoder*
 
 ---
 
@@ -2713,6 +3046,14 @@ Signed-off-by: dependabot[bot] <support@github.com>
 
 ---
 
+### Commit [`87ad675`](https://github.com/OmniBlocks/scratch-gui/commit/87ad67574435f36907d7d14b700f3dc353f6edd4) - 2025-10-07 07:36:33 -0400
+
+**fixpackage-lock.json**
+
+*Author: supervoidcoder*
+
+---
+
 ### Commit [`1e32f8c`](https://github.com/OmniBlocks/scratch-gui/commit/1e32f8c5fe255e151adcf781436d1a4c828f296c) - 2025-10-06 21:11:42 -0400
 
 **Merge pull request #160 from OmniBlocks/dependabot/npm_and_yarn/scratch-vm-1aea86c**
@@ -2743,6 +3084,22 @@ Signed-off-by: dependabot[bot] <support@github.com>
 
 ---
 
+### Commit [`07a758f`](https://github.com/OmniBlocks/scratch-gui/commit/07a758f7f60c45d97a694fe2296f616a569a589c) - 2025-10-06 23:30:51 +0000
+
+**added extension gallery and currently broken js sharkpool extension**
+
+*Author: supervoidcoder*
+
+---
+
+### Commit [`24faf05`](https://github.com/OmniBlocks/scratch-gui/commit/24faf053d0823e4811f94be393dc5ac16fac10a3) - 2025-10-06 23:21:31 +0000
+
+**Merge remote-tracking branch 'origin/main' into extensions**
+
+*Author: supervoidcoder*
+
+---
+
 ### Commit [`848baf7`](https://github.com/OmniBlocks/scratch-gui/commit/848baf71e9e886182d189ab824ef2d56a6f60160) - 2025-10-06 19:01:11 -0400
 
 **Merge pull request #158 from OmniBlocks/dependabot/npm_and_yarn/scratch-vm-71c0c48**
@@ -2770,6 +3127,16 @@ updated-dependencies:
 Signed-off-by: dependabot[bot] <support@github.com>
 
 *Author: dependabot[bot]*
+
+---
+
+### Commit [`e23b5d5`](https://github.com/OmniBlocks/scratch-gui/commit/e23b5d5373b80c2ce840b6164781c6257cffcfd6) - 2025-10-06 19:53:56 +0000
+
+**Revert "use our library"**
+
+This reverts commit 1083d2275efa72a8d903bd16a94c4cad2e89cf67.
+
+*Author: supervoidcoder*
 
 ---
 
@@ -2841,7 +3208,35 @@ Signed-off-by: dependabot[bot] <support@github.com>
 
 ## Release [v0.5.9-alpha](https://github.com/OmniBlocks/scratch-gui/releases/tag/v0.5.9-alpha) - 2025-10-06 09:16:01 -0400
 
-### Changes since v0.5.8-alpha:
+## Summary
+This release adds a couple of new things. First up, we fixed a LOT of bugs, mostly with features we added ourselves, though. When we added the MP4 option to the recording addon (which could only previously use webm), but as of last release it seems it wasn't tested properly and lacked audio whenever you used the mp4 option. We fixed it, but we still have a stubborn bug that we haven't been able to fix, which is fixing the metadata when you use the mp4 video. Currently, some of the metadata, notably the length metadata, is blank, which means the video fails to load the seeker in many players such as Windows Media Player or Photos. 
+On the positive side, we added two new blocks, the "() ≤ ()" and "() ≥ ()" blocks. These are self explanatory, but I am personally proud of these because they kind of took a while to add, like a week of work. This was because it was my first time actually adding a new block, and it was complicated as the repositories are split into multiple ones, and I had to modify quite a bunch of files across three separate repositories just to add these two blocks.
+
+A subtle change is that the little version indicator is no longer hardcoded and automatically updates whenever I add a new release, which is pretty cool.
+
+## What's Changed
+* Bump scratch-paint from `b67366b` to `65db82e` by @dependabot[bot] in https://github.com/OmniBlocks/scratch-gui/pull/99
+* Bump scratch-vm from `709d155` to `e28653a` by @dependabot[bot] in https://github.com/OmniBlocks/scratch-gui/pull/105
+* Potential fix for code scanning alert no. 10: Workflow does not contain permissions by @supervoidcoder in https://github.com/OmniBlocks/scratch-gui/pull/109
+* Update PULL_REQUEST_TEMPLATE.md by @supervoidcoder in https://github.com/OmniBlocks/scratch-gui/pull/121
+* Bump scratch-paint from `65db82e` to `94c1f79` by @dependabot[bot] in https://github.com/OmniBlocks/scratch-gui/pull/124
+* Bump scratch-paint from `94c1f79` to `e02f2c3` by @dependabot[bot] in https://github.com/OmniBlocks/scratch-gui/pull/125
+* Bump scratch-paint from `e02f2c3` to `b8d40da` by @dependabot[bot] in https://github.com/OmniBlocks/scratch-gui/pull/126
+* Fix Lack of Audio in media recorder addon, fixes another stuiid bug oversight by @supervoidcoder in https://github.com/OmniBlocks/scratch-gui/pull/127
+* Bump scratch-paint from `b8d40da` to `7498e7a` by @dependabot[bot] in https://github.com/OmniBlocks/scratch-gui/pull/128
+* fix mp4 timestamps Media Recorder Addon Broken timestamp by @supervoidcoder in https://github.com/OmniBlocks/scratch-gui/pull/132
+* Bump scratch-vm from `e28653a` to `9078653` by @dependabot[bot] in https://github.com/OmniBlocks/scratch-gui/pull/136
+* Bump scratch-vm from `9078653` to `29dfba0` by @dependabot[bot] in https://github.com/OmniBlocks/scratch-gui/pull/146
+* Comparison-equal-to by @supervoidcoder in https://github.com/OmniBlocks/scratch-gui/pull/147
+* add test fix for mp4 timestamp issue Media Recorder Addon Broken timestamp by @supervoidcoder in https://github.com/OmniBlocks/scratch-gui/pull/133
+* uses correct app version not hard coded #152 by @supervoidcoder in https://github.com/OmniBlocks/scratch-gui/pull/153
+
+
+**Full Changelog**: https://github.com/OmniBlocks/scratch-gui/compare/v0.5.8-alpha...v0.5.9-alpha
+
+### Changes since v0.5.8-alpha
+
+#### 📝 Other Changes
 
 - [`88742f2`](https://github.com/OmniBlocks/scratch-gui/commit/88742f26dfc01bbb8af72033ea1a93c98117fd7a) **Merge pull request #153 from OmniBlocks/correct-app-version** - *supervoidcoder*
   > uses correct app version not hard coded #152
@@ -3055,7 +3450,21 @@ Signed-off-by: dependabot[bot] <support@github.com>
 
 ## Release [v0.5.8-alpha](https://github.com/OmniBlocks/scratch-gui/releases/tag/v0.5.8-alpha) - 2025-09-23 01:56:24 +0000
 
-### Changes since v0.5.7-alpha:
+This is a massive update! It adds a new and improved Paint Editor. There are a few color inconsistensies, but it works as expected! It also adds the option to export videos as mp4 instead of just webm, when using the video recording addon.
+
+## What's Changed
+* Potential fix for code scanning alert no. 2: Shell command built from environment values by @supervoidcoder in https://github.com/OmniBlocks/scratch-gui/pull/48
+* Added HMR and fixed a red leftover and made it Aqua by @supervoidcoder in https://github.com/OmniBlocks/scratch-gui/commit/30f544bd9b457263820892cd33a9df40585f8692
+* New QoL Feature! Added MP4 support for the player recorder feature by @supervoidcoder in https://github.com/OmniBlocks/scratch-gui/commit/07db42c826b4b32fb97d3c6a0eb682f3eae7c4b7
+* New Paint Editor by @supervoidcoder in https://github.com/OmniBlocks/scratch-gui/commit/6402778eafd0cb4fc81cd52d958c7e99a1cec3d1
+
+
+
+**Full Changelog**: https://github.com/OmniBlocks/scratch-gui/compare/v0.5.7-alpha...v0.5.8-alpha
+
+### Changes since v0.5.7-alpha
+
+#### 📝 Other Changes
 
 - [`5a7a4c6`](https://github.com/OmniBlocks/scratch-gui/commit/5a7a4c6564226cf34435ac87ac7c346ad1977318) **fix package-lock json** - *supervoidcoder*
 - [`6402778`](https://github.com/OmniBlocks/scratch-gui/commit/6402778eafd0cb4fc81cd52d958c7e99a1cec3d1) **New Paint Editor** - *supervoidcoder*
@@ -3123,7 +3532,33 @@ Signed-off-by: dependabot[bot] <support@github.com>
 
 ## Release [v0.5.7-alpha](https://github.com/OmniBlocks/scratch-gui/releases/tag/v0.5.7-alpha) - 2025-09-05 02:15:29 +0000
 
-### Changes since v0.5.6-alpha:
+Yay! New OmniBlocks release. Not much has changed, and it's mostly just cosmetic/design changes for eye candy purposes, as well as fixing a few vulnerabilities in package dependencies stuff.
+Uh, yeah there's nothing else.
+
+## What's Changed
+* Bump @turbowarp/sb3fix from 0.3.5 to 0.3.6 by @dependabot[bot] in https://github.com/OmniBlocks/scratch-gui/pull/13
+* Bump scratch-blocks from `26a0738` to `6a7e7e5` by @dependabot[bot] in https://github.com/OmniBlocks/scratch-gui/pull/24
+* Bump @turbowarp/paper from 0.12.202407262155 to 0.12.202505131813 by @dependabot[bot] in https://github.com/OmniBlocks/scratch-gui/pull/11
+* Bump scratch-render from `3019ecf` to `588e6b3` by @dependabot[bot] in https://github.com/OmniBlocks/scratch-gui/pull/25
+* Bump scratch-render from `588e6b3` to `dd5d399` by @dependabot[bot] in https://github.com/OmniBlocks/scratch-gui/pull/31
+* Bump @turbowarp/scratch-storage from 0.0.202502192258 to 0.0.202505311821 by @dependabot[bot] in https://github.com/OmniBlocks/scratch-gui/pull/30
+* Bump scratch-paint from `cbd90fa` to `8093bf7` by @dependabot[bot] in https://github.com/OmniBlocks/scratch-gui/pull/29
+* Bump scratch-audio from `7f5925e` to `aba00cd` by @dependabot[bot] in https://github.com/OmniBlocks/scratch-gui/pull/28
+* Bump @turbowarp/scratch-svg-renderer from 1.0.202502192257 to 1.0.202505311824 by @dependabot[bot] in https://github.com/OmniBlocks/scratch-gui/pull/27
+* Potential fix for code scanning alert no. 1: Workflow does not contain permissions by @supervoidcoder in https://github.com/OmniBlocks/scratch-gui/pull/32
+* Potential fix for code scanning alert no. 3: Insecure randomness by @supervoidcoder in https://github.com/OmniBlocks/scratch-gui/pull/33
+* Potential fix for code scanning alert no. 5: Creating biased random numbers from a cryptographically secure source by @supervoidcoder in https://github.com/OmniBlocks/scratch-gui/pull/34
+* Bump sha.js from 2.4.11 to 2.4.12 in the npm_and_yarn group by @dependabot[bot] in https://github.com/OmniBlocks/scratch-gui/pull/38
+* Bump the npm_and_yarn group with 2 updates by @dependabot[bot] in https://github.com/OmniBlocks/scratch-gui/pull/37
+
+## New Contributors
+* @supervoidcoder made their first contribution in https://github.com/OmniBlocks/scratch-gui/pull/32
+
+**Full Changelog**: https://github.com/OmniBlocks/scratch-gui/compare/v0.5.6-alpha...v0.5.7-alpha
+
+### Changes since v0.5.6-alpha
+
+#### 📝 Other Changes
 
 - [`e12d507`](https://github.com/OmniBlocks/scratch-gui/commit/e12d50749430b8eb6a0a1ec15daea95ca1ff9c88) **More Cosmetic Updates** - *supervoidcoder*
 - [`754d40e`](https://github.com/OmniBlocks/scratch-gui/commit/754d40e305aa9bac6101f6f5316d65629f8e30bf) **Delete ahhahah.txt** - *supervoidcoder*
@@ -3342,7 +3777,15 @@ Signed-off-by: dependabot[bot] <support@github.com>
 
 ## Release [v0.5.6-alpha](https://github.com/OmniBlocks/scratch-gui/releases/tag/v0.5.6-alpha) - 2025-08-21 17:44:55 +0000
 
-### Changes since v0.5.5-alpha:
+Fixed a bug that deleted the Aqua theme from the theme selector and used Blue as the default.
+
+It might seem silly to make a whole new release just for this, but it's urgent as the Aqua theme is one of, if not the most identifiable part of OmniBlocks, aside from Boxy the computer mascot.
+
+**Full Changelog**: https://github.com/OmniBlocks/scratch-gui/compare/v0.5.5-alpha...v0.5.6-alpha
+
+### Changes since v0.5.5-alpha
+
+#### 📝 Other Changes
 
 - [`8b94546`](https://github.com/OmniBlocks/scratch-gui/commit/8b94546365d02f23fe8462b0ac9d3cb046a2ad99) **Fix missing Aqua accent theme** - *supervoidcoder*
 
@@ -3350,7 +3793,11 @@ Signed-off-by: dependabot[bot] <support@github.com>
 
 ## Release [v0.5.5-alpha](https://github.com/OmniBlocks/scratch-gui/releases/tag/v0.5.5-alpha) - 2025-08-19 01:08:35 +0000
 
-### Initial release - All commits:
+Tons of Changes. Features that are a big goal for OmniBlocks haven't been added yet, but everything is stable so far.
+
+### Initial release
+
+#### 📝 Other Changes
 
 - [`1bb3643`](https://github.com/OmniBlocks/scratch-gui/commit/1bb36438141f7d2813a9f15773f84ceb1795a438) **Big Cosmetic Update** - *supervoidcoder*
 - [`f583485`](https://github.com/OmniBlocks/scratch-gui/commit/f5834852a7a9be8d8e3ffc90248a8f465deef26b) **Added export costumes button** - *supervoidcoder*

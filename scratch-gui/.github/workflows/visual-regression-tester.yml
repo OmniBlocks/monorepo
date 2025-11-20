@@ -156,46 +156,51 @@ jobs:
           const { test } = require('@playwright/test');
 
           test.describe('Visual Regression Screenshots', () => {
-            test('Homepage - Initial Load', async ({ page }) => {
-              await page.goto('http://localhost:8080');
-              await page.waitForLoadState('networkidle');
-              await page.waitForTimeout(3000);
-              await page.screenshot({ path: 'screenshots/homepage.png', fullPage: true });
-            });
-
-            test('Editor View', async ({ page }) => {
-              await page.goto('http://localhost:8080');
-              await page.waitForLoadState('networkidle');
-              // Wait for the menu bar to be visible (it's always present)
-              await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
-              await page.waitForTimeout(5000); // Extra time for editor to fully load
-              await page.screenshot({ path: 'screenshots/editor-view.png', fullPage: true });
-            });
-
-            test('Stage Area - Focused', async ({ page }) => {
-              await page.goto('http://localhost:8080');
+            test('Editor - Initial Load', async ({ page }) => {
+              await page.goto('http://localhost:8080/editor.html');
               await page.waitForLoadState('networkidle');
               await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
-              await page.waitForTimeout(3000);
+              await page.waitForTimeout(5000);
+              await page.screenshot({ path: 'screenshots/editor-initial.png', fullPage: true });
+            });
+
+            test('Editor - Blocks Workspace', async ({ page }) => {
+              await page.goto('http://localhost:8080/editor.html');
+              await page.waitForLoadState('networkidle');
+              await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
+              await page.waitForTimeout(5000);
               
-              // Try to capture stage area if visible
-              const stageWrapper = await page.locator('[class*="stage-and-target-wrapper"]').first();
-              if (await stageWrapper.count() > 0) {
-                await stageWrapper.screenshot({ path: 'screenshots/stage-area.png' });
+              // Focus on the editor workspace area
+              const editorWrapper = await page.locator('[class*="editor-wrapper"]').first();
+              if (await editorWrapper.count() > 0) {
+                await editorWrapper.screenshot({ path: 'screenshots/blocks-workspace.png' });
               } else {
-                // Fallback to full page
-                await page.screenshot({ path: 'screenshots/stage-area.png', fullPage: false });
+                await page.screenshot({ path: 'screenshots/blocks-workspace.png', fullPage: false });
               }
             });
 
-            test('Code Tab View', async ({ page }) => {
-              await page.goto('http://localhost:8080');
+            test('Editor - Stage and Sprites', async ({ page }) => {
+              await page.goto('http://localhost:8080/editor.html');
+              await page.waitForLoadState('networkidle');
+              await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
+              await page.waitForTimeout(5000);
+              
+              const stageWrapper = await page.locator('[class*="stage-and-target-wrapper"]').first();
+              if (await stageWrapper.count() > 0) {
+                await stageWrapper.screenshot({ path: 'screenshots/stage-sprites.png' });
+              } else {
+                await page.screenshot({ path: 'screenshots/stage-sprites.png', clip: { x: 0, y: 0, width: 600, height: 800 } });
+              }
+            });
+
+            test('Editor - Code Tab', async ({ page }) => {
+              await page.goto('http://localhost:8080/editor.html');
               await page.waitForLoadState('networkidle');
               await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
               await page.waitForTimeout(4000);
               
-              // Click the first tab (Code tab)
-              const codeTab = await page.locator('[class*="tab"]:has-text("Code")').first();
+              // Try to find and click Code tab
+              const codeTab = await page.locator('[class*="react-tabs__tab"]:has-text("Code")').first();
               if (await codeTab.count() > 0) {
                 await codeTab.click();
                 await page.waitForTimeout(2000);
@@ -204,13 +209,43 @@ jobs:
               await page.screenshot({ path: 'screenshots/code-tab.png', fullPage: true });
             });
 
-            test('UI - Desktop Size', async ({ page }) => {
-              await page.setViewportSize({ width: 1920, height: 1080 });
-              await page.goto('http://localhost:8080');
+            test('Editor - Costumes Tab', async ({ page }) => {
+              await page.goto('http://localhost:8080/editor.html');
               await page.waitForLoadState('networkidle');
               await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
+              await page.waitForTimeout(4000);
+              
+              // Try to find and click Costumes tab
+              const costumesTab = await page.locator('[class*="react-tabs__tab"]:has-text("Costumes")').first();
+              if (await costumesTab.count() > 0) {
+                await costumesTab.click();
+                await page.waitForTimeout(2000);
+              }
+              
+              await page.screenshot({ path: 'screenshots/costumes-tab.png', fullPage: true });
+            });
+
+            test('Editor - Sounds Tab', async ({ page }) => {
+              await page.goto('http://localhost:8080/editor.html');
+              await page.waitForLoadState('networkidle');
+              await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
+              await page.waitForTimeout(4000);
+              
+              // Try to find and click Sounds tab
+              const soundsTab = await page.locator('[class*="react-tabs__tab"]:has-text("Sounds")').first();
+              if (await soundsTab.count() > 0) {
+                await soundsTab.click();
+                await page.waitForTimeout(2000);
+              }
+              
+              await page.screenshot({ path: 'screenshots/sounds-tab.png', fullPage: true });
+            });
+
+            test('Player View - For Comparison', async ({ page }) => {
+              await page.goto('http://localhost:8080/');
+              await page.waitForLoadState('networkidle');
               await page.waitForTimeout(3000);
-              await page.screenshot({ path: 'screenshots/desktop-view.png', fullPage: false });
+              await page.screenshot({ path: 'screenshots/player-view.png', fullPage: true });
             });
           });
           EOF
@@ -296,11 +331,13 @@ jobs:
           const pixelmatch = require('pixelmatch');
 
           const screenshots = [
-            'homepage.png',
-            'editor-view.png',
-            'stage-area.png',
+            'editor-initial.png',
+            'blocks-workspace.png',
+            'stage-sprites.png',
             'code-tab.png',
-            'desktop-view.png'
+            'costumes-tab.png',
+            'sounds-tab.png',
+            'player-view.png'
           ];
 
           let changesDetected = false;

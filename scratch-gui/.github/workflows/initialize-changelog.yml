@@ -36,8 +36,6 @@ jobs:
           This file is automatically updated by the Changelog Updater bot.
 
           <!-- UNRELEASED_COMMITS_START -->
-          <!-- UNRELEASED_COMMITS_END -->
-
           HEADER
           
           # Get all tags sorted by date (newest first)
@@ -46,33 +44,49 @@ jobs:
           
           echo "🏷️  Found ${TAG_COUNT} releases"
           
-          if [ "$TAG_COUNT" -eq "0" ]; then
-            echo "📝 No releases found, adding all commits to unreleased section..."
+          # If we have releases, add unreleased commits since the latest release
+          if [ "$TAG_COUNT" -gt "0" ]; then
+            LATEST_TAG="${TAGS[0]}"
+            echo "📝 Adding unreleased commits since ${LATEST_TAG}..."
             
-            # Add all commits to the unreleased section
-            {
-              echo "<!-- UNRELEASED_COMMITS_START -->"
+            # Get all commits since the last release, excluding [skip ci] and changelog commits
+            git log ${LATEST_TAG}..HEAD --pretty=format:"%H|%h|%s|%an|%ci" | while IFS='|' read -r hash short_hash subject author date; do
+              # Skip changelog bot commits and [skip ci] commits
+              if [[ "$subject" == *"update CHANGELOG.md"* ]] || [[ "$subject" == *"[skip ci]"* ]]; then
+                continue
+              fi
+              
+              echo "### Commit [\`${short_hash}\`](${REPO_URL}/commit/${hash}) - ${date}"
               echo ""
-              git log --pretty=format:"%H|%h|%s|%an|%ci" | while IFS='|' read -r hash short_hash subject author date; do
-                echo "### Commit [\`${short_hash}\`](${REPO_URL}/commit/${hash}) - ${date}"
-                echo ""
-                echo "**${subject}**"
-                echo ""
-                echo "*Author: ${author}*"
-                echo ""
-                echo "---"
-                echo ""
-              done
-              echo "<!-- UNRELEASED_COMMITS_END -->"
-            } > temp_unreleased.md
+              echo "**${subject}**"
+              echo ""
+              echo "*Author: ${author}*"
+              echo ""
+              echo "---"
+              echo ""
+            done >> CHANGELOG.md
+          fi
+          
+          # Close the unreleased section
+          echo "<!-- UNRELEASED_COMMITS_END -->" >> CHANGELOG.md
+          echo "" >> CHANGELOG.md
+          
+          if [ "$TAG_COUNT" -eq "0" ]; then
+            echo "📝 No releases found, adding all commits..."
             
-            # Insert unreleased section into changelog
-            sed -i '/UNRELEASED_COMMITS_START/,/UNRELEASED_COMMITS_END/{
-              /UNRELEASED_COMMITS_START/r temp_unreleased.md
-              d
-            }' CHANGELOG.md
+            echo "## All Commits" >> CHANGELOG.md
+            echo "" >> CHANGELOG.md
             
-            rm temp_unreleased.md
+            git log --pretty=format:"%H|%h|%s|%an|%ci" | while IFS='|' read -r hash short_hash subject author date; do
+              echo "### Commit [\`${short_hash}\`](${REPO_URL}/commit/${hash}) - ${date}" >> CHANGELOG.md
+              echo "" >> CHANGELOG.md
+              echo "**${subject}**" >> CHANGELOG.md
+              echo "" >> CHANGELOG.md
+              echo "*Author: ${author}*" >> CHANGELOG.md
+              echo "" >> CHANGELOG.md
+              echo "---" >> CHANGELOG.md
+              echo "" >> CHANGELOG.md
+            done
           else
             # Process each release
             for i in "${!TAGS[@]}"; do
@@ -118,15 +132,15 @@ jobs:
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "chore: initialize CHANGELOG.md [skip ci]"
+            git commit -m "chore: reinitialize CHANGELOG.md with unreleased commits [skip ci]"
             git push
-            echo "📄 CHANGELOG.md has been created and pushed!"
+            echo "📄 CHANGELOG.md has been updated and pushed!"
           fi
 
       - name: Summary
         run: |
           if [ -f CHANGELOG.md ]; then
             LINE_COUNT=$(wc -l < CHANGELOG.md)
-            echo "✅ Changelog initialized with ${LINE_COUNT} lines"
-            echo "🎉 The changelog will now be automatically updated on every commit and release!"
+            echo "✅ Changelog reinitialized with ${LINE_COUNT} lines"
+            echo "🎉 The changelog now includes unreleased commits!"
           fi

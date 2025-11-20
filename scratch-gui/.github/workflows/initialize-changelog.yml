@@ -1,0 +1,132 @@
+name: Initialize Changelog (One-time Setup)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  initialize-changelog:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Generate Complete Changelog
+        run: |
+          REPO_URL="https://github.com/${{ github.repository }}"
+          
+          echo "🚀 Initializing changelog..."
+          echo "📦 Repository: ${REPO_URL}"
+          
+          # Create changelog header with markers
+          cat > CHANGELOG.md << 'HEADER'
+          # Changelog
+
+          This file is automatically updated by the Changelog Updater bot.
+
+          <!-- UNRELEASED_COMMITS_START -->
+          <!-- UNRELEASED_COMMITS_END -->
+
+          HEADER
+          
+          # Get all tags sorted by date (newest first)
+          mapfile -t TAGS < <(git tag --sort=-creatordate)
+          TAG_COUNT=${#TAGS[@]}
+          
+          echo "🏷️  Found ${TAG_COUNT} releases"
+          
+          if [ "$TAG_COUNT" -eq "0" ]; then
+            echo "📝 No releases found, adding all commits to unreleased section..."
+            
+            # Add all commits to the unreleased section
+            {
+              echo "<!-- UNRELEASED_COMMITS_START -->"
+              echo ""
+              git log --pretty=format:"%H|%h|%s|%an|%ci" | while IFS='|' read -r hash short_hash subject author date; do
+                echo "### Commit [\`${short_hash}\`](${REPO_URL}/commit/${hash}) - ${date}"
+                echo ""
+                echo "**${subject}**"
+                echo ""
+                echo "*Author: ${author}*"
+                echo ""
+                echo "---"
+                echo ""
+              done
+              echo "<!-- UNRELEASED_COMMITS_END -->"
+            } > temp_unreleased.md
+            
+            # Insert unreleased section into changelog
+            sed -i '/UNRELEASED_COMMITS_START/,/UNRELEASED_COMMITS_END/{
+              /UNRELEASED_COMMITS_START/r temp_unreleased.md
+              d
+            }' CHANGELOG.md
+            
+            rm temp_unreleased.md
+          else
+            # Process each release
+            for i in "${!TAGS[@]}"; do
+              CURRENT_TAG="${TAGS[$i]}"
+              PREV_TAG=""
+              
+              # Get previous tag (next in array since sorted newest first)
+              if [ $((i + 1)) -lt ${TAG_COUNT} ]; then
+                PREV_TAG="${TAGS[$((i + 1))]}"
+              fi
+              
+              TAG_DATE=$(git log -1 --format=%ci "${CURRENT_TAG}")
+              
+              echo "📋 Processing release ${CURRENT_TAG}..."
+              
+              # Determine if this is the initial release
+              if [ -z "$PREV_TAG" ]; then
+                RELEASE_SUBTITLE="### Initial release - All commits:"
+                COMMITS=$(git log "${CURRENT_TAG}" --pretty=format:"- [\`%h\`](${REPO_URL}/commit/%H) **%s** - *%an*")
+              else
+                RELEASE_SUBTITLE="### Changes since ${PREV_TAG}:"
+                COMMITS=$(git log "${PREV_TAG}..${CURRENT_TAG}" --pretty=format:"- [\`%h\`](${REPO_URL}/commit/%H) **%s** - *%an*")
+              fi
+              
+              {
+                echo "## Release [${CURRENT_TAG}](${REPO_URL}/releases/tag/${CURRENT_TAG}) - ${TAG_DATE}"
+                echo ""
+                echo "${RELEASE_SUBTITLE}"
+                echo ""
+                echo "${COMMITS}"
+                echo ""
+                echo "---"
+                echo ""
+              } >> CHANGELOG.md
+            done
+          fi
+          
+          echo "✅ Changelog initialized successfully!"
+
+      - name: Commit and Push Changelog
+        run: |
+          git add CHANGELOG.md
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore: initialize CHANGELOG.md [skip ci]"
+            git push
+            echo "📄 CHANGELOG.md has been created and pushed!"
+          fi
+
+      - name: Summary
+        run: |
+          if [ -f CHANGELOG.md ]; then
+            LINE_COUNT=$(wc -l < CHANGELOG.md)
+            echo "✅ Changelog initialized with ${LINE_COUNT} lines"
+            echo "🎉 The changelog will now be automatically updated on every commit and release!"
+          fi

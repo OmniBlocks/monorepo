@@ -4,6 +4,127 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`74427d9`](https://github.com/OmniBlocks/scratch-gui/commit/74427d9f26f91125c4b115853428408dd51bae1a) - 2025-11-20 10:27:19 -0500
+
+**fix: visual-regression-tester.yml**
+
+Run mkdir -p screenshots-base
+  mkdir -p screenshots-base
+  npx playwright test screenshot-test.spec.js --project=chromium
+  mv screenshots screenshots-base/
+  shell: /usr/bin/bash -e {0}
+
+Running 5 tests using 1 worker
+
+  ✓  1 [chromium] › screenshot-test.spec.js:4:3 › Visual Regression Screenshots › Homepage (3.5s)
+  ✘  2 [chromium] › screenshot-test.spec.js:11:3 › Visual Regression Screenshots › Editor - Default view (14.4s)
+  ✘  3 [chromium] › screenshot-test.spec.js:11:3 › Visual Regression Screenshots › Editor - Default view (retry #1) (14.5s)
+  ✘  4 [chromium] › screenshot-test.spec.js:11:3 › Visual Regression Screenshots › Editor - Default view (retry #2) (14.5s)
+  ✓  5 [chromium] › screenshot-test.spec.js:21:3 › Visual Regression Screenshots › Code Editor (3.5s)
+  ✓  6 [chromium] › screenshot-test.spec.js:35:3 › Visual Regression Screenshots › Stage area (3.4s)
+  ✓  7 [chromium] › screenshot-test.spec.js:49:3 › Visual Regression Screenshots › Blocks palette (3.4s)
+
+
+  1) [chromium] › screenshot-test.spec.js:11:3 › Visual Regression Screenshots › Editor - Default view 
+
+    TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.
+    Call log:
+      - waiting for locator('[class*="gui_editor"]') to be visible
+
+
+      15 |     
+      16 |     // Wait for editor to load
+    > 17 |     await page.waitForSelector('[class*="gui_editor"]', { timeout: 10000 });
+         |                ^
+      18 |     await page.screenshot({ path: 'screenshots/editor-default.png', fullPage: true });
+      19 |   });
+      20 |
+        at /home/runner/work/scratch-gui/scratch-gui/screenshot-test.spec.js:17:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/screenshot-test-Visual-Reg-6335d-shots-Editor---Default-view-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/screenshot-test-Visual-Reg-6335d-shots-Editor---Default-view-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/screenshot-test-Visual-Reg-6335d-shots-Editor---Default-view-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/screenshot-test-Visual-Reg-6335d-shots-Editor---Default-view-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.
+    Call log:
+      - waiting for locator('[class*="gui_editor"]') to be visible
+
+
+      15 |     
+      16 |     // Wait for editor to load
+    > 17 |     await page.waitForSelector('[class*="gui_editor"]', { timeout: 10000 });
+         |                ^
+      18 |     await page.screenshot({ path: 'screenshots/editor-default.png', fullPage: true });
+      19 |   });
+      20 |
+        at /home/runner/work/scratch-gui/scratch-gui/screenshot-test.spec.js:17:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/screenshot-test-Visual-Reg-6335d-shots-Editor---Default-view-chromium-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/screenshot-test-Visual-Reg-6335d-shots-Editor---Default-view-chromium-retry1/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/screenshot-test-Visual-Reg-6335d-shots-Editor---Default-view-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/screenshot-test-Visual-Reg-6335d-shots-Editor---Default-view-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Retry #2 ───────────────────────────────────────────────────────────────────────────────────────
+
+    TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.
+    Call log:
+      - waiting for locator('[class*="gui_editor"]') to be visible
+
+
+      15 |     
+      16 |     // Wait for editor to load
+    > 17 |     await page.waitForSelector('[class*="gui_editor"]', { timeout: 10000 });
+         |                ^
+      18 |     await page.screenshot({ path: 'screenshots/editor-default.png', fullPage: true });
+      19 |   });
+      20 |
+        at /home/runner/work/scratch-gui/scratch-gui/screenshot-test.spec.js:17:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/screenshot-test-Visual-Reg-6335d-shots-Editor---Default-view-chromium-retry2/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/screenshot-test-Visual-Reg-6335d-shots-Editor---Default-view-chromium-retry2/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/screenshot-test-Visual-Reg-6335d-shots-Editor---Default-view-chromium-retry2/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/screenshot-test-Visual-Reg-6335d-shots-Editor---Default-view-chromium-retry2/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [chromium] › screenshot-test.spec.js:11:3 › Visual Regression Screenshots › Editor - Default view 
+  4 passed (1.0m)
+Error: Process completed with exit code 1.
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`07714e9`](https://github.com/OmniBlocks/scratch-gui/commit/07714e97c199294cd023fd3d94d02e384c50bfc2) - 2025-11-20 09:56:16 -0500
 
 **Update visual-regression-tester.yml**

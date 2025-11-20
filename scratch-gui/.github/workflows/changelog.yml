@@ -69,7 +69,8 @@ jobs:
           **${COMMIT_MSG}**
           "
           
-          if [ -n "$COMMIT_BODY" ]; then
+          # Add body if it exists and is not empty
+          if [ -n "$COMMIT_BODY" ] && [ "$COMMIT_BODY" != "" ]; then
             NEW_ENTRY="${NEW_ENTRY}
           ${COMMIT_BODY}
           "
@@ -107,26 +108,76 @@ jobs:
             RELEASE_SUBTITLE="### Changes since ${PREV_TAG}:"
           fi
           
-          # Extract unreleased commits and convert to bullet list
+          # Extract unreleased commits and convert to bullet list with descriptions
           UNRELEASED_COMMITS=""
           if [ -f CHANGELOG.md ] && grep -q "UNRELEASED_COMMITS_START" CHANGELOG.md; then
-            # Extract content between markers and convert format
-            UNRELEASED_COMMITS=$(sed -n '/UNRELEASED_COMMITS_START/,/UNRELEASED_COMMITS_END/p' CHANGELOG.md | \
-              sed '1d;$d' | \
-              grep -E '^\*\*.*\*\*$|^\[`.*`\]' | \
-              paste -d ' ' - - | \
-              sed 's/### Commit \(\[`[^`]*`\]([^)]*)\) - [0-9: -]*/- \1/' | \
-              sed 's/ \*\*\(.*\)\*\*/ **\1**/' | \
-              grep -v '^[[:space:]]*$')
+            # Extract content between markers, parse detailed entries
+            UNRELEASED_SECTION=$(sed -n '/UNRELEASED_COMMITS_START/,/UNRELEASED_COMMITS_END/p' CHANGELOG.md | sed '1d;$d')
+            
+            # Process the unreleased section to extract commits with bodies
+            echo "$UNRELEASED_SECTION" | awk '
+              /^### Commit/ {
+                if (commit_line != "") {
+                  print commit_line
+                  if (body != "") print body
+                }
+                commit_line = $0
+                gsub(/^### Commit /, "- ", commit_line)
+                gsub(/ - [0-9]{4}-[0-9]{2}-[0-9]{2}.*$/, "", commit_line)
+                subject = ""
+                body = ""
+                author = ""
+                next
+              }
+              /^\*\*.*\*\*$/ {
+                subject = $0
+                gsub(/\*\*/, "**", subject)
+                commit_line = commit_line " " subject
+                next
+              }
+              /^\*Author:/ {
+                author = $0
+                commit_line = commit_line " " author
+                next
+              }
+              /^---$/ { next }
+              /^[[:space:]]*$/ { next }
+              {
+                if (body == "") {
+                  body = "  > " $0
+                } else {
+                  body = body "\n  > " $0
+                }
+              }
+              END {
+                if (commit_line != "") {
+                  print commit_line
+                  if (body != "") print body
+                }
+              }
+            ' > /tmp/unreleased_commits.txt
+            
+            UNRELEASED_COMMITS=$(cat /tmp/unreleased_commits.txt)
           fi
           
-          # If no unreleased commits in markers, get from git
+          # If no unreleased commits in markers, get from git with bodies
           if [ -z "$UNRELEASED_COMMITS" ]; then
             if [ -z "$PREV_TAG" ]; then
-              UNRELEASED_COMMITS=$(git log ${RELEASE_TAG} --pretty=format:"- [\`%h\`](https://github.com/${{ github.repository }}/commit/%H) **%s** - *%an*")
+              git log ${RELEASE_TAG} --pretty=format:"%H|||%h|||%s|||%an|||%b" | while IFS='|||' read -r hash short_hash subject author body; do
+                echo "- [\`${short_hash}\`](https://github.com/${{ github.repository }}/commit/${hash}) **${subject}** - *${author}*"
+                if [ -n "$body" ] && [ "$body" != "" ]; then
+                  echo "$body" | sed 's/^/  > /'
+                fi
+              done > /tmp/unreleased_commits.txt
             else
-              UNRELEASED_COMMITS=$(git log ${PREV_TAG}..${RELEASE_TAG} --pretty=format:"- [\`%h\`](https://github.com/${{ github.repository }}/commit/%H) **%s** - *%an*")
+              git log ${PREV_TAG}..${RELEASE_TAG} --pretty=format:"%H|||%h|||%s|||%an|||%b" | while IFS='|||' read -r hash short_hash subject author body; do
+                echo "- [\`${short_hash}\`](https://github.com/${{ github.repository }}/commit/${hash}) **${subject}** - *${author}*"
+                if [ -n "$body" ] && [ "$body" != "" ]; then
+                  echo "$body" | sed 's/^/  > /'
+                fi
+              done > /tmp/unreleased_commits.txt
             fi
+            UNRELEASED_COMMITS=$(cat /tmp/unreleased_commits.txt)
           fi
           
           # Create new release section

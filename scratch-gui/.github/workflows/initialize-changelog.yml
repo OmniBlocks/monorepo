@@ -49,8 +49,8 @@ jobs:
             LATEST_TAG="${TAGS[0]}"
             echo "📝 Adding unreleased commits since ${LATEST_TAG}..."
             
-            # Get all commits since the last release, excluding [skip ci] and changelog commits
-            git log ${LATEST_TAG}..HEAD --pretty=format:"%H|%h|%s|%an|%ci" | while IFS='|' read -r hash short_hash subject author date; do
+            # Get all commits since the last release with bodies
+            git log ${LATEST_TAG}..HEAD --pretty=format:"%H|||%h|||%s|||%an|||%ci|||%b" | while IFS='|||' read -r hash short_hash subject author date body; do
               # Skip changelog bot commits and [skip ci] commits
               if [[ "$subject" == *"update CHANGELOG.md"* ]] || [[ "$subject" == *"[skip ci]"* ]]; then
                 continue
@@ -60,6 +60,13 @@ jobs:
               echo ""
               echo "**${subject}**"
               echo ""
+              
+              # Add body if it exists
+              if [ -n "$body" ] && [ "$body" != "" ]; then
+                echo "$body"
+                echo ""
+              fi
+              
               echo "*Author: ${author}*"
               echo ""
               echo "---"
@@ -77,11 +84,17 @@ jobs:
             echo "## All Commits" >> CHANGELOG.md
             echo "" >> CHANGELOG.md
             
-            git log --pretty=format:"%H|%h|%s|%an|%ci" | while IFS='|' read -r hash short_hash subject author date; do
+            git log --pretty=format:"%H|||%h|||%s|||%an|||%ci|||%b" | while IFS='|||' read -r hash short_hash subject author date body; do
               echo "### Commit [\`${short_hash}\`](${REPO_URL}/commit/${hash}) - ${date}" >> CHANGELOG.md
               echo "" >> CHANGELOG.md
               echo "**${subject}**" >> CHANGELOG.md
               echo "" >> CHANGELOG.md
+              
+              if [ -n "$body" ] && [ "$body" != "" ]; then
+                echo "$body" >> CHANGELOG.md
+                echo "" >> CHANGELOG.md
+              fi
+              
               echo "*Author: ${author}*" >> CHANGELOG.md
               echo "" >> CHANGELOG.md
               echo "---" >> CHANGELOG.md
@@ -93,7 +106,7 @@ jobs:
               CURRENT_TAG="${TAGS[$i]}"
               PREV_TAG=""
               
-              # Get previous tag (next in array since sorted newest first)
+              # Get previous tag
               if [ $((i + 1)) -lt ${TAG_COUNT} ]; then
                 PREV_TAG="${TAGS[$((i + 1))]}"
               fi
@@ -105,11 +118,23 @@ jobs:
               # Determine if this is the initial release
               if [ -z "$PREV_TAG" ]; then
                 RELEASE_SUBTITLE="### Initial release - All commits:"
-                COMMITS=$(git log "${CURRENT_TAG}" --pretty=format:"- [\`%h\`](${REPO_URL}/commit/%H) **%s** - *%an*")
+                git log "${CURRENT_TAG}" --pretty=format:"%H|||%h|||%s|||%an|||%b" | while IFS='|||' read -r hash short_hash subject author body; do
+                  echo "- [\`${short_hash}\`](${REPO_URL}/commit/${hash}) **${subject}** - *${author}*"
+                  if [ -n "$body" ] && [ "$body" != "" ]; then
+                    echo "$body" | sed 's/^/  > /'
+                  fi
+                done > /tmp/commits_${CURRENT_TAG}.txt
               else
                 RELEASE_SUBTITLE="### Changes since ${PREV_TAG}:"
-                COMMITS=$(git log "${PREV_TAG}..${CURRENT_TAG}" --pretty=format:"- [\`%h\`](${REPO_URL}/commit/%H) **%s** - *%an*")
+                git log "${PREV_TAG}..${CURRENT_TAG}" --pretty=format:"%H|||%h|||%s|||%an|||%b" | while IFS='|||' read -r hash short_hash subject author body; do
+                  echo "- [\`${short_hash}\`](${REPO_URL}/commit/${hash}) **${subject}** - *${author}*"
+                  if [ -n "$body" ] && [ "$body" != "" ]; then
+                    echo "$body" | sed 's/^/  > /'
+                  fi
+                done > /tmp/commits_${CURRENT_TAG}.txt
               fi
+              
+              COMMITS=$(cat /tmp/commits_${CURRENT_TAG}.txt)
               
               {
                 echo "## Release [${CURRENT_TAG}](${REPO_URL}/releases/tag/${CURRENT_TAG}) - ${TAG_DATE}"
@@ -132,7 +157,7 @@ jobs:
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "chore: reinitialize CHANGELOG.md with unreleased commits [skip ci]"
+            git commit -m "chore: reinitialize CHANGELOG.md with commit descriptions [skip ci]"
             git push
             echo "📄 CHANGELOG.md has been updated and pushed!"
           fi
@@ -142,5 +167,5 @@ jobs:
           if [ -f CHANGELOG.md ]; then
             LINE_COUNT=$(wc -l < CHANGELOG.md)
             echo "✅ Changelog reinitialized with ${LINE_COUNT} lines"
-            echo "🎉 The changelog now includes unreleased commits!"
+            echo "🎉 The changelog now includes commit descriptions!"
           fi

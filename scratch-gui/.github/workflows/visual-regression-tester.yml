@@ -158,7 +158,7 @@ jobs:
             test('Homepage', async ({ page }) => {
               await page.goto('http://localhost:8080');
               await page.waitForLoadState('networkidle');
-              await page.waitForTimeout(2000); // Wait for animations
+              await page.waitForTimeout(2000);
               await page.screenshot({ path: 'screenshots/homepage.png', fullPage: true });
             });
 
@@ -167,8 +167,8 @@ jobs:
               await page.waitForLoadState('networkidle');
               await page.waitForTimeout(3000);
               
-              // Wait for editor to load
-              await page.waitForSelector('[class*="gui_editor"]', { timeout: 10000 });
+              // Wait for the editor to be visible (blocks workspace)
+              await page.waitForSelector('[class*="blocks-wrapper"]', { timeout: 15000 });
               await page.screenshot({ path: 'screenshots/editor-default.png', fullPage: true });
             });
 
@@ -177,12 +177,8 @@ jobs:
               await page.waitForLoadState('networkidle');
               await page.waitForTimeout(2000);
               
-              // Try to click code editor tab if it exists
-              const codeTab = await page.locator('[class*="code-tab"]').first();
-              if (await codeTab.count() > 0) {
-                await codeTab.click();
-                await page.waitForTimeout(1000);
-              }
+              // Wait for blocks workspace to ensure editor is loaded
+              await page.waitForSelector('[class*="blocks-wrapper"]', { timeout: 10000 });
               await page.screenshot({ path: 'screenshots/code-editor.png', fullPage: true });
             });
 
@@ -191,8 +187,8 @@ jobs:
               await page.waitForLoadState('networkidle');
               await page.waitForTimeout(2000);
               
-              // Focus on stage area
-              const stage = await page.locator('[class*="stage_stage"]').first();
+              // Target the stage wrapper
+              const stage = await page.locator('[class*="stage-wrapper"]').first();
               if (await stage.count() > 0) {
                 await stage.screenshot({ path: 'screenshots/stage.png' });
               } else {
@@ -203,10 +199,11 @@ jobs:
             test('Blocks palette', async ({ page }) => {
               await page.goto('http://localhost:8080');
               await page.waitForLoadState('networkidle');
-              await page.waitForTimeout(2000);
+              await page.waitForTimeout(3000);
               
-              // Focus on blocks palette
-              const palette = await page.locator('[class*="blocks-palette"]').first();
+              // Wait for blocks to load and capture just the toolbox/palette area
+              await page.waitForSelector('[class*="blocks-wrapper"]', { timeout: 10000 });
+              const palette = await page.locator('[class*="blocks-wrapper"]').first();
               if (await palette.count() > 0) {
                 await palette.screenshot({ path: 'screenshots/blocks-palette.png' });
               } else {
@@ -215,7 +212,7 @@ jobs:
             });
           });
           EOF
-
+          
       - name: Capture base screenshots
         run: |
           mkdir -p screenshots-base

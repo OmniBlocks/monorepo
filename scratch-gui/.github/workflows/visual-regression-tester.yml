@@ -1,0 +1,450 @@
+name: Visual Regression Testing
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  visual-regression:
+    # Skip for dependabot and only run on PRs or when comment contains '/vrt'
+    if: >-
+      (github.actor != 'dependabot[bot]') &&
+      ((github.event_name == 'pull_request') ||
+      (github.event_name == 'issue_comment' && github.event.issue.pull_request && contains(github.event.comment.body, '/vrt')))
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: React to comment (if triggered by comment)
+        if: github.event_name == 'issue_comment'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.reactions.createForIssueComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: context.payload.comment.id,
+              content: 'eyes'
+            });
+
+      - name: Get PR details
+        id: pr
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = context.eventName === 'issue_comment'
+              ? context.issue.number
+              : context.payload.number;
+
+            const pr = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber
+            });
+            return {
+              ref: pr.data.head.ref,
+              sha: pr.data.head.sha,
+              number: pr.data.number,
+              base_ref: pr.data.base.ref,
+              base_sha: pr.data.base.sha
+            };
+
+      - name: Post initial comment
+        id: vrt_comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const username = context.eventName === 'issue_comment'
+              ? context.payload.comment.user.login
+              : context.payload.pull_request.user.login;
+            const comment = await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: ${{ fromJSON(steps.pr.outputs.result).number }},
+              body: `🎨 **Visual Regression Testing** requested by @${username}\n\n` +
+                    `⏳ Building and capturing screenshots...\n\n` +
+                    `This will compare visual changes between the base and PR branches.`
+            });
+            return comment.data.id;
+
+      # ============================================================
+      # BUILD BASE VERSION
+      # ============================================================
+
+      - name: Checkout base branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ fromJSON(steps.pr.outputs.result).base_sha }}
+          path: base
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: base/package-lock.json
+
+      - name: Install dependencies (base)
+        working-directory: base
+        run: npm ci
+
+      - name: Build base version
+        working-directory: base
+        run: npm run build
+        env:
+          NODE_ENV: production
+
+      - name: Start base server
+        working-directory: base
+        run: |
+          npx http-server build -p 8080 &
+          echo $! > ../base-server.pid
+          for i in {1..30}; do
+            if curl -s http://localhost:8080 > /dev/null; then
+              echo "Base server is ready!"
+              break
+            fi
+            echo "Waiting for base server... ($i/30)"
+            sleep 1
+          done
+
+      # ============================================================
+      # CAPTURE BASE SCREENSHOTS
+      # ============================================================
+
+      - name: Install Playwright
+        run: |
+          npm init -y
+          npm install --save-dev @playwright/test@latest
+          npx playwright install --with-deps chromium
+
+      - name: Create Playwright test for base
+        run: |
+          cat > screenshot-test.spec.js << 'EOF'
+          const { test } = require('@playwright/test');
+
+          test.describe('Visual Regression Screenshots', () => {
+            test('Homepage', async ({ page }) => {
+              await page.goto('http://localhost:8080');
+              await page.waitForLoadState('networkidle');
+              await page.waitForTimeout(2000); // Wait for animations
+              await page.screenshot({ path: 'screenshots/homepage.png', fullPage: true });
+            });
+
+            test('Editor - Default view', async ({ page }) => {
+              await page.goto('http://localhost:8080');
+              await page.waitForLoadState('networkidle');
+              await page.waitForTimeout(3000);
+              
+              // Wait for editor to load
+              await page.waitForSelector('[class*="gui_editor"]', { timeout: 10000 });
+              await page.screenshot({ path: 'screenshots/editor-default.png', fullPage: true });
+            });
+
+            test('Code Editor', async ({ page }) => {
+              await page.goto('http://localhost:8080');
+              await page.waitForLoadState('networkidle');
+              await page.waitForTimeout(2000);
+              
+              // Try to click code editor tab if it exists
+              const codeTab = await page.locator('[class*="code-tab"]').first();
+              if (await codeTab.count() > 0) {
+                await codeTab.click();
+                await page.waitForTimeout(1000);
+              }
+              await page.screenshot({ path: 'screenshots/code-editor.png', fullPage: true });
+            });
+
+            test('Stage area', async ({ page }) => {
+              await page.goto('http://localhost:8080');
+              await page.waitForLoadState('networkidle');
+              await page.waitForTimeout(2000);
+              
+              // Focus on stage area
+              const stage = await page.locator('[class*="stage_stage"]').first();
+              if (await stage.count() > 0) {
+                await stage.screenshot({ path: 'screenshots/stage.png' });
+              } else {
+                await page.screenshot({ path: 'screenshots/stage.png', fullPage: false });
+              }
+            });
+
+            test('Blocks palette', async ({ page }) => {
+              await page.goto('http://localhost:8080');
+              await page.waitForLoadState('networkidle');
+              await page.waitForTimeout(2000);
+              
+              // Focus on blocks palette
+              const palette = await page.locator('[class*="blocks-palette"]').first();
+              if (await palette.count() > 0) {
+                await palette.screenshot({ path: 'screenshots/blocks-palette.png' });
+              } else {
+                await page.screenshot({ path: 'screenshots/blocks-palette.png', clip: { x: 0, y: 100, width: 400, height: 600 } });
+              }
+            });
+          });
+          EOF
+
+      - name: Capture base screenshots
+        run: |
+          mkdir -p screenshots-base
+          npx playwright test screenshot-test.spec.js --project=chromium
+          mv screenshots screenshots-base/
+
+      - name: Stop base server
+        if: always()
+        run: |
+          if [ -f base-server.pid ]; then
+            kill $(cat base-server.pid) || true
+            rm base-server.pid
+          fi
+
+      # ============================================================
+      # BUILD PR VERSION
+      # ============================================================
+
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ fromJSON(steps.pr.outputs.result).sha }}
+          path: pr
+
+      - name: Install dependencies (PR)
+        working-directory: pr
+        run: npm ci
+
+      - name: Build PR version
+        working-directory: pr
+        run: npm run build
+        env:
+          NODE_ENV: production
+
+      - name: Start PR server
+        working-directory: pr
+        run: |
+          npx http-server build -p 8081 &
+          echo $! > ../pr-server.pid
+          for i in {1..30}; do
+            if curl -s http://localhost:8081 > /dev/null; then
+              echo "PR server is ready!"
+              break
+            fi
+            echo "Waiting for PR server... ($i/30)"
+            sleep 1
+          done
+
+      # ============================================================
+      # CAPTURE PR SCREENSHOTS & COMPARE
+      # ============================================================
+
+      - name: Update test for PR port
+        run: |
+          sed -i 's/localhost:8080/localhost:8081/g' screenshot-test.spec.js
+
+      - name: Capture PR screenshots
+        run: |
+          mkdir -p screenshots-pr
+          npx playwright test screenshot-test.spec.js --project=chromium
+          mv screenshots screenshots-pr/
+
+      - name: Stop PR server
+        if: always()
+        run: |
+          if [ -f pr-server.pid ]; then
+            kill $(cat pr-server.pid) || true
+            rm pr-server.pid
+          fi
+
+      - name: Compare screenshots
+        id: compare
+        run: |
+          npm install --save-dev pixelmatch pngjs
+          
+          cat > compare.js << 'EOF'
+          const fs = require('fs');
+          const PNG = require('pngjs').PNG;
+          const pixelmatch = require('pixelmatch');
+
+          const screenshots = [
+            'homepage.png',
+            'editor-default.png',
+            'code-editor.png',
+            'stage.png',
+            'blocks-palette.png'
+          ];
+
+          let changesDetected = false;
+          const results = [];
+
+          for (const screenshot of screenshots) {
+            const basePath = `screenshots-base/${screenshot}`;
+            const prPath = `screenshots-pr/${screenshot}`;
+
+            if (!fs.existsSync(basePath) || !fs.existsSync(prPath)) {
+              console.log(`Skipping ${screenshot} - file not found`);
+              continue;
+            }
+
+            const base = PNG.sync.read(fs.readFileSync(basePath));
+            const pr = PNG.sync.read(fs.readFileSync(prPath));
+
+            const { width, height } = base;
+            const diff = new PNG({ width, height });
+
+            const numDiffPixels = pixelmatch(
+              base.data,
+              pr.data,
+              diff.data,
+              width,
+              height,
+              { threshold: 0.1 }
+            );
+
+            const diffPercentage = ((numDiffPixels / (width * height)) * 100).toFixed(2);
+
+            if (numDiffPixels > 0) {
+              changesDetected = true;
+              fs.mkdirSync('screenshots-diff', { recursive: true });
+              fs.writeFileSync(
+                `screenshots-diff/${screenshot}`,
+                PNG.sync.write(diff)
+              );
+              results.push({
+                name: screenshot,
+                diffPixels: numDiffPixels,
+                diffPercentage: diffPercentage,
+                hasDiff: true
+              });
+            } else {
+              results.push({
+                name: screenshot,
+                diffPixels: 0,
+                diffPercentage: '0.00',
+                hasDiff: false
+              });
+            }
+          }
+
+          fs.writeFileSync('comparison-results.json', JSON.stringify({ changesDetected, results }, null, 2));
+          EOF
+
+          node compare.js
+          
+          CHANGES=$(jq -r '.changesDetected' comparison-results.json)
+          echo "changes_detected=$CHANGES" >> $GITHUB_OUTPUT
+
+      # ============================================================
+      # UPLOAD SCREENSHOTS TO ARTIFACTS
+      # ============================================================
+
+      - name: Upload base screenshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots-base
+          path: screenshots-base/
+
+      - name: Upload PR screenshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots-pr
+          path: screenshots-pr/
+
+      - name: Upload diff screenshots
+        if: steps.compare.outputs.changes_detected == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots-diff
+          path: screenshots-diff/
+
+      - name: Upload comparison results
+        uses: actions/upload-artifact@v4
+        with:
+          name: comparison-results
+          path: comparison-results.json
+
+      # ============================================================
+      # POST RESULTS TO PR
+      # ============================================================
+
+      - name: Post results comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const results = JSON.parse(fs.readFileSync('comparison-results.json', 'utf8'));
+            const prNumber = ${{ fromJSON(steps.pr.outputs.result).number }};
+            const runId = context.runId;
+            const username = context.eventName === 'issue_comment'
+              ? context.payload.comment.user.login
+              : context.payload.pull_request.user.login;
+
+            let body = `## 🎨 Visual Regression Test Results\n\n`;
+            body += `Hi @${username}! Here are the visual comparison results:\n\n`;
+
+            if (results.changesDetected) {
+              body += `### ⚠️ Visual Changes Detected\n\n`;
+              body += `The following screenshots show differences:\n\n`;
+              
+              const changedScreenshots = results.results.filter(r => r.hasDiff);
+              for (const result of changedScreenshots) {
+                body += `#### 📸 ${result.name.replace('.png', '').replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}\n`;
+                body += `- **Difference:** ${result.diffPercentage}% (${result.diffPixels.toLocaleString()} pixels)\n`;
+                body += `- View the [base](https://github.com/${{ github.repository }}/actions/runs/${runId}#artifacts), `;
+                body += `[PR](https://github.com/${{ github.repository }}/actions/runs/${runId}#artifacts), and `;
+                body += `[diff](https://github.com/${{ github.repository }}/actions/runs/${runId}#artifacts) screenshots in artifacts\n\n`;
+              }
+
+              body += `### 📊 Summary\n`;
+              body += `| Screenshot | Status | Difference |\n`;
+              body += `|------------|--------|------------|\n`;
+              for (const result of results.results) {
+                const status = result.hasDiff ? '⚠️ Changed' : '✅ No change';
+                const name = result.name.replace('.png', '');
+                body += `| ${name} | ${status} | ${result.diffPercentage}% |\n`;
+              }
+            } else {
+              body += `### ✅ No Visual Changes Detected\n\n`;
+              body += `All screenshots match the base branch! 🎉\n\n`;
+              
+              body += `### 📊 All Screenshots Checked\n`;
+              body += `| Screenshot | Status |\n`;
+              body += `|------------|--------|\n`;
+              for (const result of results.results) {
+                const name = result.name.replace('.png', '');
+                body += `| ${name} | ✅ No change |\n`;
+              }
+            }
+
+            body += `\n---\n\n`;
+            body += `📦 [Download all screenshots](https://github.com/${{ github.repository }}/actions/runs/${runId}#artifacts)\n\n`;
+            body += `💡 **Tip:** Download the artifacts to view detailed before/after comparisons!`;
+
+            await github.rest.issues.updateComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: ${{ steps.vrt_comment.outputs.result }},
+              body: body
+            });
+
+      - name: Update comment on failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const username = context.eventName === 'issue_comment'
+              ? context.payload.comment.user.login
+              : context.payload.pull_request.user.login;
+            await github.rest.issues.updateComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: ${{ steps.vrt_comment.outputs.result }},
+              body: `❌ **Visual Regression Testing Failed** @${username}\n\n` +
+                    `Something went wrong during the screenshot capture or comparison.\n\n` +
+                    `Check the logs for details: [View Logs](https://github.com/${{ github.repository }}/actions/runs/${{ context.runId }})`
+            });

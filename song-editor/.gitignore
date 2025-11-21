@@ -14,10 +14,7 @@ offline/node_modules
 /player/*.js
 /synth/*.js
 /global/*.js
-/editor/*.js.map
-/player/*.js.map
-/synth/*.js.map
-/global/*.js.map
+**/*.js.map
 #unsure
 /**/*.ts.bak
 /**/*.html.bak

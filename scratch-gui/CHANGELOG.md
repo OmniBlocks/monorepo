@@ -4,6 +4,17 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`b22e97e`](https://github.com/OmniBlocks/scratch-gui/commit/b22e97e1bdd827c36927c598148be5ca1b93fd18) - 2025-11-21 12:08:50 -0500
+
+**fix: build error due to wrong import #391**
+
+Both stage-wrapper.jsx and webgl-broken-modal.jsx are in the same directory (src/containers/), so the import should use ./ instead of ../../containers/. The current path tries to go up two directories and then down into containers/, which looks for the file at the wrong location. This commit fixes #391, which is just that.
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`0eba017`](https://github.com/OmniBlocks/scratch-gui/commit/0eba017538cf701fec93704a7fd2b6658f9593bf) - 2025-11-21 12:00:03 -0500
 
 **feat: Merge pull request #390 from OmniBlocks/broken-webgl-modal**

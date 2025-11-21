@@ -8303,7 +8303,201 @@ var beepbox = (function (exports) {
 			@font-face {
 			font-family: "Comic Sans MS";
 			)
-		`,
+		}`,
+        "edobox classic": `
+				:root {
+					--page-margin: #100904;
+					--editor-background: #100904;
+					--hover-preview: white;
+					--playhead: rgba(255, 255, 255, 0.9);
+					--primary-text: white;
+					--secondary-text:rgb(154, 138, 132);
+					--inverted-text: black;
+					--text-selection: rgba(255, 96, 68, 0.99);
+					--box-selection-fill:rgb(148, 4, 4);
+					--loop-accent:rgb(255, 152, 68);
+					--link-accent:rgb(255, 199, 136);
+					--ui-widget-background: #393e4f;
+					--ui-widget-focus: #6d6886;
+					--pitch-background: #393e4f;
+					--tonic:rgb(148, 93, 80);
+					--fifth-note:rgb(71, 138, 97);
+					--white-piano-key:rgb(238, 219, 198);
+					--black-piano-key:rgb(114, 105, 95);
+					--use-color-formula: true;
+					--track-editor-bg-pitch:rgb(79, 68, 57);
+					--track-editor-bg-pitch-dim:rgb(40, 33, 28);
+					--track-editor-bg-noise: #3d3535;
+					--track-editor-bg-noise-dim: #161313;
+					--track-editor-bg-mod: #283560;
+					--track-editor-bg-mod-dim: #0a101f;
+					--multiplicative-mod-slider:rgb(135, 159, 96);
+					--overwriting-mod-slider:rgb(151, 181, 80);
+					--indicator-primary:rgb(100, 247, 240);
+					--indicator-secondary:rgb(57, 79, 65);
+					--select2-opt-group:rgb(111, 103, 87);
+					--input-box-outline: #222222;
+					--mute-button-normal: #dda85d;
+					--mute-button-mod: #886eae;
+					--mod-label-primary:rgb(53, 64, 40);
+					--mod-label-secondary-text: rgb(101, 120, 86);
+					--mod-label-primary-text: white;
+					--pitch-secondary-channel-hue: -10;
+					--pitch-secondary-channel-hue-scale: -4.2;
+					--pitch-secondary-channel-sat: 50.3;
+					--pitch-secondary-channel-sat-scale: 0.1;
+					--pitch-secondary-channel-lum: 40;
+					--pitch-secondary-channel-lum-scale: 0.05;
+					--pitch-primary-channel-hue: -10;
+					--pitch-primary-channel-hue-scale: -4.2;
+					--pitch-primary-channel-sat: 70;
+					--pitch-primary-channel-sat-scale: 0.1;
+					--pitch-primary-channel-lum: 67.5;
+					--pitch-primary-channel-lum-scale: 0.05;
+					--pitch-secondary-note-hue: -10;
+					--pitch-secondary-note-hue-scale: -4.2;
+					--pitch-secondary-note-sat: 70.9;
+					--pitch-secondary-note-sat-scale: 0.1;
+					--pitch-secondary-note-lum: 25;
+					--pitch-secondary-note-lum-scale: 0.05;
+					--pitch-primary-note-hue: -10;
+					--pitch-primary-note-hue-scale: -4.2;
+					--pitch-primary-note-sat: 90;
+					--pitch-primary-note-sat-scale: 0.05;
+					--pitch-primary-note-lum: 85.6;
+					--pitch-primary-note-lum-scale: 0.025;
+					--noise-secondary-channel-hue: 16;
+					--noise-secondary-channel-hue-scale: -1.33;
+					--noise-secondary-channel-sat: 25;
+					--noise-secondary-channel-sat-scale: 0;
+					--noise-secondary-channel-lum: 42;
+					--noise-secondary-channel-lum-scale: 0;
+					--noise-primary-channel-hue: 16;
+					--noise-primary-channel-hue-scale: -1.33;
+					--noise-primary-channel-sat: 33;
+					--noise-primary-channel-sat-scale: 0;
+					--noise-primary-channel-lum: 63.5;
+					--noise-primary-channel-lum-scale: 0;
+					--noise-secondary-note-hue: 12;
+					--noise-secondary-note-hue-scale: -1.33;
+					--noise-secondary-note-sat: 33.5;
+					--noise-secondary-note-sat-scale: 0;
+					--noise-secondary-note-lum: 55;
+					--noise-secondary-note-lum-scale: 0;
+					--noise-primary-note-hue: 12;
+					--noise-primary-note-hue-scale: -1.33;
+					--noise-primary-note-sat: 46.5;
+					--noise-primary-note-sat-scale: 0;
+					--noise-primary-note-lum: 74;
+					--noise-primary-note-lum-scale: 0;
+					--mod-secondary-channel-hue: 12;
+					--mod-secondary-channel-hue-scale: -.75;
+					--mod-secondary-channel-sat: 50;
+					--mod-secondary-channel-sat-scale: 0;
+					--mod-secondary-channel-lum: 50;
+					--mod-secondary-channel-lum-scale: 0;
+					--mod-primary-channel-hue: 12;
+					--mod-primary-channel-hue-scale: -.75;
+					--mod-primary-channel-sat: 70;
+					--mod-primary-channel-sat-scale: 0;
+					--mod-primary-channel-lum: 80;
+					--mod-primary-channel-lum-scale: 0;
+					--mod-secondary-note-hue: 12;
+					--mod-secondary-note-hue-scale: -.75;
+					--mod-secondary-note-sat: 75;
+					--mod-secondary-note-sat-scale: 0;
+					--mod-secondary-note-lum: 45;
+					--mod-secondary-note-lum-scale: 0;
+					--mod-primary-note-hue: 12;
+					--mod-primary-note-hue-scale: -.75;
+					--mod-primary-note-sat: 85;
+					--mod-primary-note-sat-scale: 0;
+					--mod-primary-note-lum: 85;
+					--mod-primary-note-lum-scale: 0;
+					--disabled-note-primary:    #91879f;
+					--disabled-note-secondary:  #6a677a;
+				}`,
+        "BloxBox": `
+			:root {
+				--page-margin: #052010;
+				--editor-background: #052010;
+				--hover-preview: white;
+				--playhead: white;
+				--primary-text: white;
+				--secondary-text: #999;
+				--inverted-text: black;
+				--text-selection: rgba(119,68,255,0.99);
+				--box-selection-fill: rgba(255,255,255,0.2);
+				--loop-accent: #3a0;
+				--link-accent: #98f;
+				--ui-widget-background: #444;
+				--ui-widget-focus: #777;
+				--pitch-background: #131;
+				--tonic: #468;
+				--fifth-note: #0f5;
+				--white-piano-key: #bbb;
+				--black-piano-key: #444;
+				--pitch1-secondary-channel: #005599;
+				--pitch1-primary-channel:   #00aaff;
+				--pitch1-secondary-note:    #006699;
+				--pitch1-primary-note:      #33bbbb;
+				--pitch2-secondary-channel: #559900;
+				--pitch2-primary-channel:   #aaff00;
+				--pitch2-secondary-note:    #559900;
+				--pitch2-primary-note:      #aaff00;
+				--pitch3-secondary-channel: #997000;
+				--pitch3-primary-channel:   #FF9600;
+				--pitch3-secondary-note:    #997000;
+				--pitch3-primary-note:      #FF9600;
+				--pitch4-secondary-channel: #770000;
+				--pitch4-primary-channel:   #ff0000;
+				--pitch4-secondary-note:    #770000;
+				--pitch4-primary-note:      #ff0000;
+				--pitch5-secondary-channel: #660033;
+				--pitch5-primary-channel:   #990055;
+				--pitch5-secondary-note:    #550022;
+				--pitch5-primary-note:      #990055;
+				--pitch6-secondary-channel: #7777B0;
+				--pitch6-primary-channel:   #A0A0FF;
+				--pitch6-secondary-note:    #8888D0;
+				--pitch6-primary-note:      #D0D0FF;
+				--pitch7-secondary-channel: #8AA100;
+				--pitch7-primary-channel:   #DEFF25;
+				--pitch7-secondary-note:    #AAC700;
+				--pitch7-primary-note:      #E6FF92;
+				--pitch8-secondary-channel: #DF0019;
+				--pitch8-primary-channel:   #FF98A4;
+				--pitch8-secondary-note:    #FF4E63;
+				--pitch8-primary-note:      #FFB2BB;
+				--pitch9-secondary-channel: #00A170;
+				--pitch9-primary-channel:   #50FFC9;
+				--pitch9-secondary-note:    #00C78A;
+				--pitch9-primary-note:      #83FFD9;
+				--pitch10-secondary-channel:#A11FFF;
+				--pitch10-primary-channel:  #CE8BFF;
+				--pitch10-secondary-note:   #B757FF;
+				--pitch10-primary-note:     #DFACFF;
+				--noise1-secondary-channel: #6F6F6F;
+				--noise1-primary-channel:   #AAAAAA;
+				--noise1-secondary-note:    #A7A7A7;
+				--noise1-primary-note:      #E0E0E0;
+				--noise2-secondary-channel: #996633;
+				--noise2-primary-channel:   #DDAA77;
+				--noise2-secondary-note:    #CC9966;
+				--noise2-primary-note:      #F0D0BB;
+				--noise3-secondary-channel: #4A6D8F;
+				--noise3-primary-channel:   #77AADD;
+				--noise3-secondary-note:    #6F9FCF;
+				--noise3-primary-note:      #BBD7FF;
+				--noise4-secondary-channel: #7A4F9A;
+				--noise4-primary-channel:   #AF82D2;
+				--noise4-secondary-note:    #9E71C1;
+				--noise4-primary-note:      #D4C1EA;
+				--noise5-secondary-channel: #607837;
+				--noise5-primary-channel:   #A2BB77;
+				--noise5-secondary-note:    #91AA66;
+				--noise5-primary-note:      #C5E2B2;
+			}`,
         "azur lane": `
 		:root {
 			--page-margin: #19337e;
@@ -9706,7 +9900,7 @@ var beepbox = (function (exports) {
             ])
         },
         {
-            name: "DX7FM's FM Presets", presets: toNameMap([
+            name: "DX7FM's Presets", presets: toNameMap([
                 { name: "Simple Bass", generalMidi: false, settings: { "type": "FM6op", "eqFilter": [{ "type": "low-pass", "cutoffHz": 19027.31, "linearGain": 0.7071 }], "eqFilterType": true, "eqSimpleCut": 10, "eqSimplePeak": 0, "envelopeSpeed": 12, "eqSubFilters1": [], "effects": [], "panDelay": 0, "fadeInSeconds": 0, "fadeOutTicks": -1, "algorithm": "Custom", "feedbackType": "1⟲ 2⟲ 3⟲ 4⟲ 5⟲ 6⟲", "feedbackAmplitude": 0, "customAlgorithm": { "mods": [[6], [6, 3], [6], [6, 5], [6], []], "carrierCount": 2 }, "operators": [{ "frequency": "~1×", "amplitude": 15, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "0.5×", "amplitude": 8, "waveform": "quasi-sine", "pulseWidth": 5 }, { "frequency": "0.5×", "amplitude": 7, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "~2×", "amplitude": 11, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "0.25×", "amplitude": 7, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "0.25×", "amplitude": 9, "waveform": "sine", "pulseWidth": 5 }], "envelopes": [] } },
                 { name: "Jungle Party Bass", generalMidi: false, settings: { "type": "FM6op", "eqFilter": [{ "type": "low-pass", "cutoffHz": 19027.31, "linearGain": 0.7071 }], "eqFilterType": true, "eqSimpleCut": 10, "eqSimplePeak": 0, "envelopeSpeed": 12, "eqSubFilters1": [], "effects": [], "panDelay": 0, "fadeInSeconds": 0, "fadeOutTicks": -1, "algorithm": "Custom", "feedbackType": "Custom", "feedbackAmplitude": 6, "customAlgorithm": { "mods": [[6, 3, 4, 2], [], [5], [], [], []], "carrierCount": 2 }, "customFeedback": { "mods": [[], [], [], [3], [], []] }, "operators": [{ "frequency": "1×", "amplitude": 15, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "0.5×", "amplitude": 9, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "4×", "amplitude": 5, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "0.5×", "amplitude": 9, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "4×", "amplitude": 5, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "0.5×", "amplitude": 9, "waveform": "sine", "pulseWidth": 5 }], "envelopes": [{ "target": "operatorAmplitude", "envelope": "punch", "inverse": false, "perEnvelopeSpeed": 1, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1, "discrete": false, "index": 2 }, { "target": "noteVolume", "envelope": "decay", "inverse": false, "perEnvelopeSpeed": 16, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1, "discrete": false }, { "target": "feedbackAmplitude", "envelope": "punch", "inverse": true, "perEnvelopeSpeed": 1, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1, "discrete": false }] } },
                 { name: "Devious Bass", generalMidi: false, settings: { "type": "FM6op", "eqFilter": [{ "type": "low-pass", "cutoffHz": 19027.31, "linearGain": 0.7071 }], "eqFilterType": true, "eqSimpleCut": 10, "eqSimplePeak": 0, "envelopeSpeed": 12, "eqSubFilters1": [], "effects": ["chorus", "echo"], "panDelay": 0, "chorus": 14, "echoSustain": 29, "echoDelayBeats": 0.083, "fadeInSeconds": 0, "fadeOutTicks": -1, "algorithm": "Custom", "feedbackType": "1⟲ 2⟲ 3⟲ 4⟲ 5⟲ 6⟲", "feedbackAmplitude": 1, "customAlgorithm": { "mods": [[2, 3, 4, 5, 6], [], [4], [], [6], []], "carrierCount": 1 }, "operators": [{ "frequency": "1×", "amplitude": 15, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 13, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 11, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 9, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "2×", "amplitude": 7, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "4×", "amplitude": 5, "waveform": "sine", "pulseWidth": 5 }], "envelopes": [{ "target": "operatorAmplitude", "envelope": "punch", "inverse": false, "perEnvelopeSpeed": 1, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1, "discrete": false, "index": 5 }, { "target": "operatorAmplitude", "envelope": "punch", "inverse": false, "perEnvelopeSpeed": 1, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1, "discrete": false, "index": 4 }] } },
@@ -9751,8 +9945,8 @@ var beepbox = (function (exports) {
                 { name: "FM Pad String", generalMidi: false, settings: { "type": "FM6op", "eqFilter": [{ "type": "high-pass", "cutoffHz": 62.5, "linearGain": 0.3536 }], "eqFilterType": false, "eqSimpleCut": 10, "eqSimplePeak": 0, "envelopeSpeed": 12, "eqSubFilters0": [{ "type": "high-pass", "cutoffHz": 62.5, "linearGain": 0.3536 }], "eqSubFilters1": [], "effects": ["chorus", "echo", "reverb"], "panDelay": 10, "chorus": 14, "echoSustain": 43, "echoDelayBeats": 1, "reverb": 52, "fadeInSeconds": 0.075, "fadeOutTicks": -1, "algorithm": "1 2 3 4 5 6", "feedbackType": "1⟲ 2⟲ 3⟲ 4⟲ 5⟲ 6⟲", "feedbackAmplitude": 9, "operators": [{ "frequency": "1×", "amplitude": 15, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 15, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 15, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 15, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 15, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 15, "waveform": "sine", "pulseWidth": 5 }], "envelopes": [] } },
                 { name: "Silli Lead", generalMidi: false, settings: { "type": "custom chip", "eqFilter": [], "eqFilterType": false, "eqSimpleCut": 10, "eqSimplePeak": 0, "envelopeSpeed": 12, "eqSubFilters0": [], "effects": ["transition type", "pitch shift", "vibrato", "chorus", "echo"], "transition": "normal", "clicklessTransition": false, "pitchShiftSemitones": 14, "vibrato": "delayed", "vibratoDepth": 0.3, "vibratoDelay": 18.5, "vibratoSpeed": 10, "vibratoType": 0, "panDelay": 0, "chorus": 71, "echoSustain": 43, "echoDelayBeats": 1, "fadeInSeconds": 0, "fadeOutTicks": -1, "wave": "square", "unison": "none", "customChipWave": { "0": 24, "1": 23, "2": 22, "3": 21, "4": 20, "5": 19, "6": 18, "7": 17, "8": -18, "9": -18, "10": -18, "11": -18, "12": -18, "13": -18, "14": -18, "15": -18, "16": -18, "17": -18, "18": -18, "19": -18, "20": -1, "21": -2, "22": -3, "23": -4, "24": 1, "25": 4, "26": 6, "27": 6, "28": 6, "29": 4, "30": 1, "31": 1, "32": 1, "33": 1, "34": 4, "35": 6, "36": 6, "37": 6, "38": 4, "39": 1, "40": -4, "41": -3, "42": -2, "43": -1, "44": -18, "45": -18, "46": -18, "47": -18, "48": -18, "49": -18, "50": -18, "51": -18, "52": -18, "53": -18, "54": -18, "55": -18, "56": 17, "57": 18, "58": 19, "59": 20, "60": 21, "61": 22, "62": 23, "63": 24 }, "customChipWaveIntegral": { "0": 0, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0, "7": 0, "8": 0, "9": 0, "10": 0, "11": 0, "12": 0, "13": 0, "14": 0, "15": 0, "16": 0, "17": 0, "18": 0, "19": 0, "20": 0, "21": 0, "22": 0, "23": 0, "24": 0, "25": 0, "26": 0, "27": 0, "28": 0, "29": 0, "30": 0, "31": 0, "32": 0, "33": 0, "34": 0, "35": 0, "36": 0, "37": 0, "38": 0, "39": 0, "40": 0, "41": 0, "42": 0, "43": 0, "44": 0, "45": 0, "46": 0, "47": 0, "48": 0, "49": 0, "50": 0, "51": 0, "52": 0, "53": 0, "54": 0, "55": 0, "56": 0, "57": 0, "58": 0, "59": 0, "60": 0, "61": 0, "62": 0, "63": 0, "64": 0 }, "envelopes": [{ "target": "pitchShift", "envelope": "twang", "inverse": false, "perEnvelopeSpeed": 256, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1, "discrete": false }] } },
                 { name: "Piano Crush", generalMidi: false, settings: { "type": "Picked String", "eqFilter": [], "eqFilterType": false, "eqSimpleCut": 10, "eqSimplePeak": 0, "envelopeSpeed": 12, "eqSubFilters0": [], "eqSubFilters1": [], "effects": ["pitch shift", "chorus", "echo", "reverb"], "pitchShiftSemitones": 0, "panDelay": 0, "chorus": 100, "echoSustain": 100, "echoDelayBeats": 0.083, "reverb": 100, "fadeInSeconds": 0, "fadeOutTicks": -1, "harmonics": [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100], "unison": "thin", "stringSustain": 93, "envelopes": [] } },
-                { name: "coolsaw - DX7FM", generalMidi: false, settings: { "type": "chip", "volume": 0, "eqFilter": [], "eqFilterType": false, "eqSimpleCut": 10, "eqSimplePeak": 0, "envelopeSpeed": 12, "eqSubFilters0": [], "effects": ["transition type", "vibrato", "chorus", "echo"], "transition": "normal", "clicklessTransition": false, "vibrato": "delayed", "vibratoDepth": 0.3, "vibratoDelay": 18.5, "vibratoSpeed": 10, "vibratoType": 0, "chorus": 71, "echoSustain": 43, "echoDelayBeats": 1, "fadeInSeconds": 0, "fadeOutTicks": -1, "wave": "sawtooth", "unison": "none", "isUsingAdvancedLoopControls": false, "chipWaveLoopStart": 0, "chipWaveLoopEnd": 32, "chipWaveLoopMode": 0, "chipWavePlayBackwards": false, "chipWaveStartOffset": 0, "envelopes": [], "isDrum": false } },
-                { name: "Gadget Bass - DX7FM", generalMidi: false, settings: { "type": "FM", "volume": 0, "eqFilter": [{ "type": "low-pass", "cutoffHz": 8000, "linearGain": 0.7071 }, { "type": "peak", "cutoffHz": 13454.34, "linearGain": 0.0884 }, { "type": "peak", "cutoffHz": 11313.71, "linearGain": 0.0884 }, { "type": "peak", "cutoffHz": 9513.66, "linearGain": 1.4142 }, { "type": "peak", "cutoffHz": 594.6, "linearGain": 0.0884 }, { "type": "peak", "cutoffHz": 840.9, "linearGain": 0.0884 }, { "type": "peak", "cutoffHz": 707.11, "linearGain": 0.0884 }], "eqFilterType": false, "eqSimpleCut": 10, "eqSimplePeak": 0, "envelopeSpeed": 12, "eqSubFilters0": [{ "type": "low-pass", "cutoffHz": 8000, "linearGain": 0.7071 }, { "type": "peak", "cutoffHz": 13454.34, "linearGain": 0.0884 }, { "type": "peak", "cutoffHz": 11313.71, "linearGain": 0.0884 }, { "type": "peak", "cutoffHz": 9513.66, "linearGain": 1.4142 }, { "type": "peak", "cutoffHz": 594.6, "linearGain": 0.0884 }, { "type": "peak", "cutoffHz": 840.9, "linearGain": 0.0884 }, { "type": "peak", "cutoffHz": 707.11, "linearGain": 0.0884 }], "effects": ["panning", "pitch shift", "note filter", "bitcrusher", "chorus", "reverb"], "pitchShiftSemitones": 24, "noteFilterType": true, "noteSimpleCut": 10, "noteSimplePeak": 6, "noteFilter": [{ "type": "low-pass", "cutoffHz": 7716.72, "linearGain": 8 }], "noteSubFilters1": [{ "type": "low-pass", "cutoffHz": 7716.72, "linearGain": 8 }], "bitcrusherOctave": 3.5, "bitcrusherQuantization": 57, "pan": 0, "panDelay": 0, "chorus": 29, "reverb": 0, "fadeInSeconds": 0, "fadeOutTicks": -1, "algorithm": "1←(2 3←4)", "feedbackType": "1⟲", "feedbackAmplitude": 7, "operators": [{ "frequency": "1×", "amplitude": 15, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 4, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "4×", "amplitude": 4, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "16×", "amplitude": 4, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 0, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 0, "waveform": "sine", "pulseWidth": 5 }], "envelopes": [{ "target": "noteFilterAllFreqs", "envelope": "twang", "inverse": false, "perEnvelopeSpeed": 32, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1, "discrete": false }, { "target": "operatorAmplitude", "envelope": "twang", "inverse": false, "perEnvelopeSpeed": 2, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1, "discrete": false, "index": 1 }, { "target": "operatorAmplitude", "envelope": "twang", "inverse": false, "perEnvelopeSpeed": 8, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1, "discrete": false, "index": 2 }, { "target": "operatorAmplitude", "envelope": "twang", "inverse": false, "perEnvelopeSpeed": 32, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1, "discrete": false, "index": 3 }, { "target": "feedbackAmplitude", "envelope": "twang", "inverse": false, "perEnvelopeSpeed": 8, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1, "discrete": false }, { "target": "pitchShift", "envelope": "decay", "inverse": false, "perEnvelopeSpeed": 256, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 2, "discrete": false }, { "target": "noteFilterFreq", "envelope": "lfo", "inverse": false, "perEnvelopeSpeed": 1, "perEnvelopeLowerBound": 0.5, "perEnvelopeUpperBound": 1.1, "discrete": false, "index": 0, "waveform": 0, "steps": 2 }, { "target": "noteVolume", "envelope": "linear", "inverse": false, "perEnvelopeSpeed": 256, "perEnvelopeLowerBound": 1, "perEnvelopeUpperBound": 1.6, "discrete": true }], "isDrum": false } },
+                { name: "coolsaw", generalMidi: false, settings: { "type": "chip", "volume": 0, "eqFilter": [], "eqFilterType": false, "eqSimpleCut": 10, "eqSimplePeak": 0, "envelopeSpeed": 12, "eqSubFilters0": [], "effects": ["transition type", "vibrato", "chorus", "echo"], "transition": "normal", "clicklessTransition": false, "vibrato": "delayed", "vibratoDepth": 0.3, "vibratoDelay": 18.5, "vibratoSpeed": 10, "vibratoType": 0, "chorus": 71, "echoSustain": 43, "echoDelayBeats": 1, "fadeInSeconds": 0, "fadeOutTicks": -1, "wave": "sawtooth", "unison": "none", "isUsingAdvancedLoopControls": false, "chipWaveLoopStart": 0, "chipWaveLoopEnd": 32, "chipWaveLoopMode": 0, "chipWavePlayBackwards": false, "chipWaveStartOffset": 0, "envelopes": [], "isDrum": false } },
+                { name: "Gadget Bass", generalMidi: false, settings: { "type": "FM", "volume": 0, "eqFilter": [{ "type": "low-pass", "cutoffHz": 8000, "linearGain": 0.7071 }, { "type": "peak", "cutoffHz": 13454.34, "linearGain": 0.0884 }, { "type": "peak", "cutoffHz": 11313.71, "linearGain": 0.0884 }, { "type": "peak", "cutoffHz": 9513.66, "linearGain": 1.4142 }, { "type": "peak", "cutoffHz": 594.6, "linearGain": 0.0884 }, { "type": "peak", "cutoffHz": 840.9, "linearGain": 0.0884 }, { "type": "peak", "cutoffHz": 707.11, "linearGain": 0.0884 }], "eqFilterType": false, "eqSimpleCut": 10, "eqSimplePeak": 0, "envelopeSpeed": 12, "eqSubFilters0": [{ "type": "low-pass", "cutoffHz": 8000, "linearGain": 0.7071 }, { "type": "peak", "cutoffHz": 13454.34, "linearGain": 0.0884 }, { "type": "peak", "cutoffHz": 11313.71, "linearGain": 0.0884 }, { "type": "peak", "cutoffHz": 9513.66, "linearGain": 1.4142 }, { "type": "peak", "cutoffHz": 594.6, "linearGain": 0.0884 }, { "type": "peak", "cutoffHz": 840.9, "linearGain": 0.0884 }, { "type": "peak", "cutoffHz": 707.11, "linearGain": 0.0884 }], "effects": ["panning", "pitch shift", "note filter", "bitcrusher", "chorus", "reverb"], "pitchShiftSemitones": 24, "noteFilterType": true, "noteSimpleCut": 10, "noteSimplePeak": 6, "noteFilter": [{ "type": "low-pass", "cutoffHz": 7716.72, "linearGain": 8 }], "noteSubFilters1": [{ "type": "low-pass", "cutoffHz": 7716.72, "linearGain": 8 }], "bitcrusherOctave": 3.5, "bitcrusherQuantization": 57, "pan": 0, "panDelay": 0, "chorus": 29, "reverb": 0, "fadeInSeconds": 0, "fadeOutTicks": -1, "algorithm": "1←(2 3←4)", "feedbackType": "1⟲", "feedbackAmplitude": 7, "operators": [{ "frequency": "1×", "amplitude": 15, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 4, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "4×", "amplitude": 4, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "16×", "amplitude": 4, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 0, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 0, "waveform": "sine", "pulseWidth": 5 }], "envelopes": [{ "target": "noteFilterAllFreqs", "envelope": "twang", "inverse": false, "perEnvelopeSpeed": 32, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1, "discrete": false }, { "target": "operatorAmplitude", "envelope": "twang", "inverse": false, "perEnvelopeSpeed": 2, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1, "discrete": false, "index": 1 }, { "target": "operatorAmplitude", "envelope": "twang", "inverse": false, "perEnvelopeSpeed": 8, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1, "discrete": false, "index": 2 }, { "target": "operatorAmplitude", "envelope": "twang", "inverse": false, "perEnvelopeSpeed": 32, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1, "discrete": false, "index": 3 }, { "target": "feedbackAmplitude", "envelope": "twang", "inverse": false, "perEnvelopeSpeed": 8, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1, "discrete": false }, { "target": "pitchShift", "envelope": "decay", "inverse": false, "perEnvelopeSpeed": 256, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 2, "discrete": false }, { "target": "noteFilterFreq", "envelope": "lfo", "inverse": false, "perEnvelopeSpeed": 1, "perEnvelopeLowerBound": 0.5, "perEnvelopeUpperBound": 1.1, "discrete": false, "index": 0, "waveform": 0, "steps": 2 }, { "target": "noteVolume", "envelope": "linear", "inverse": false, "perEnvelopeSpeed": 256, "perEnvelopeLowerBound": 1, "perEnvelopeUpperBound": 1.6, "discrete": true }], "isDrum": false } },
                 { name: "Funky Twang", generalMidi: false, settings: { "type": "FM6op", "eqFilter": [], "eqFilterType": false, "eqSimpleCut": 10, "eqSimplePeak": 0, "envelopeSpeed": 12, "eqSubFilters0": [], "effects": [], "panDelay": 0, "fadeInSeconds": 0, "fadeOutTicks": -1, "algorithm": "1←2←3←4←5←6", "feedbackType": "Custom", "feedbackAmplitude": 6, "customFeedback": { "mods": [[1], [], [3], [], [], []] }, "operators": [{ "frequency": "1×", "amplitude": 15, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 4, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "2×", "amplitude": 8, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 12, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "4×", "amplitude": 4, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 0, "waveform": "sine", "pulseWidth": 5 }], "envelopes": [{ "target": "feedbackAmplitude", "envelope": "flare", "inverse": false, "perEnvelopeSpeed": 4, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1, "discrete": false }, { "target": "operatorAmplitude", "envelope": "twang", "inverse": false, "perEnvelopeSpeed": 32, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1, "discrete": false, "index": 3 }] } },
                 { name: "Spook EP", generalMidi: false, settings: { "type": "FM6op", "eqFilter": [{ "type": "low-pass", "cutoffHz": 19027.31, "linearGain": 0.7071 }], "eqFilterType": true, "eqSimpleCut": 10, "eqSimplePeak": 0, "envelopeSpeed": 12, "eqSubFilters1": [], "effects": ["chorus"], "panDelay": 0, "chorus": 29, "fadeInSeconds": 0, "fadeOutTicks": -1, "algorithm": "Custom", "feedbackType": "Custom", "feedbackAmplitude": 0, "customAlgorithm": { "mods": [[3, 2], [5], [4], [], [6], []], "carrierCount": 2 }, "customFeedback": { "mods": [[2], [], [], [], [], []] }, "operators": [{ "frequency": "1×", "amplitude": 15, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 8, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "2×", "amplitude": 4, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 12, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "3×", "amplitude": 4, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "16×", "amplitude": 8, "waveform": "sine", "pulseWidth": 5 }], "envelopes": [{ "target": "operatorAmplitude", "envelope": "twang", "inverse": false, "perEnvelopeSpeed": 12, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1, "discrete": false, "index": 5 }, { "target": "noteVolume", "envelope": "twang", "inverse": false, "perEnvelopeSpeed": 8, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1, "discrete": false }, { "target": "operatorAmplitude", "envelope": "twang", "inverse": false, "perEnvelopeSpeed": 8, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1, "discrete": false, "index": 0 }] } },
                 { name: "Lorgue 5", generalMidi: false, settings: { "type": "FM6op", "eqFilter": [{ "type": "low-pass", "cutoffHz": 9513.66, "linearGain": 0.0884 }], "eqFilterType": false, "eqSimpleCut": 10, "eqSimplePeak": 0, "envelopeSpeed": 12, "eqSubFilters0": [{ "type": "low-pass", "cutoffHz": 9513.66, "linearGain": 0.0884 }], "eqSubFilters1": [], "effects": ["chorus"], "panDelay": 0, "chorus": 29, "fadeInSeconds": 0, "fadeOutTicks": -1, "algorithm": "Custom", "feedbackType": "Custom", "feedbackAmplitude": 0, "customAlgorithm": { "mods": [[2], [3], [4], [5], [6], []], "carrierCount": 6 }, "customFeedback": { "mods": [[], [], [], [], [], []] }, "operators": [{ "frequency": "16×", "amplitude": 15, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "8×", "amplitude": 13, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "4×", "amplitude": 11, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "2×", "amplitude": 9, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 7, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "0.5×", "amplitude": 5, "waveform": "sine", "pulseWidth": 5 }], "envelopes": [] } },
@@ -10146,7 +10340,7 @@ var beepbox = (function (exports) {
             ])
         },
         {
-            name: "Community Novelty Presets", presets: toNameMap([
+            name: "Other Community Novelty Presets", presets: toNameMap([
                 { name: "neglected sawtooth - CoolTasDude", generalMidi: false, settings: { "type": "custom chip", "volume": 0, "eqFilter": [{ "type": "low-pass", "cutoffHz": 3363.59, "linearGain": 1 }], "eqFilterType": false, "eqSimpleCut": 10, "eqSimplePeak": 0, "envelopeSpeed": 12, "discreteEnvelope": false, "eqSubFilters0": [{ "type": "low-pass", "cutoffHz": 3363.59, "linearGain": 1 }], "effects": ["panning", "transition type", "vibrato", "chorus", "reverb"], "transition": "interrupt", "clicklessTransition": false, "vibrato": "custom", "vibratoDepth": 0.12, "vibratoDelay": 8, "vibratoSpeed": 4, "vibratoType": 0, "pan": 0, "panDelay": 10, "chorus": 14, "reverb": 19, "fadeInSeconds": 0, "fadeOutTicks": -1, "unison": "custom", "unisonVoices": 2, "unisonSpread": 4.894, "unisonOffset": 3, "unisonExpression": 0.8, "unisonSign": 0.5, "unisonBuzzes": false, "wave": "1/4 pulse", "customChipWave": { "0": -24, "1": -24, "2": -23, "3": -22, "4": -21, "5": -20, "6": -19, "7": -16, "8": -12, "9": -6, "10": -2, "11": 0, "12": 0, "13": 0, "14": 0, "15": 0, "16": 0, "17": 0, "18": 0, "19": 0, "20": 0, "21": 0, "22": 0, "23": 0, "24": 0, "25": -23, "26": -20, "27": -14, "28": -9, "29": -5, "30": -5, "31": -2, "32": 16, "33": 16, "34": 16, "35": 16, "36": 4, "37": 4, "38": 4, "39": 4, "40": 0, "41": 0, "42": 0, "43": 0, "44": 0, "45": 0, "46": 0, "47": 0, "48": 0, "49": 0, "50": 0, "51": 6, "52": 4, "53": 1, "54": -2, "55": -4, "56": -7, "57": -11, "58": -13, "59": -13, "60": -13, "61": -14, "62": -14, "63": -13 }, "customChipWaveIntegral": { "0": 0, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0, "7": 0, "8": 0, "9": 0, "10": 0, "11": 0, "12": 0, "13": 0, "14": 0, "15": 0, "16": 0, "17": 0, "18": 0, "19": 0, "20": 0, "21": 0, "22": 0, "23": 0, "24": 0, "25": 0, "26": 0, "27": 0, "28": 0, "29": 0, "30": 0, "31": 0, "32": 0, "33": 0, "34": 0, "35": 0, "36": 0, "37": 0, "38": 0, "39": 0, "40": 0, "41": 0, "42": 0, "43": 0, "44": 0, "45": 0, "46": 0, "47": 0, "48": 0, "49": 0, "50": 0, "51": 0, "52": 0, "53": 0, "54": 0, "55": 0, "56": 0, "57": 0, "58": 0, "59": 0, "60": 0, "61": 0, "62": 0, "63": 0, "64": 0 }, "envelopes": [], "isDrum": false } },
                 { name: "burnt speaker - CoolTasDude", generalMidi: false, settings: { "type": "FM", "volume": 0, "eqFilter": [{ "type": "low-pass", "cutoffHz": 3363.59, "linearGain": 0.3536 }], "eqFilterType": false, "eqSimpleCut": 10, "eqSimplePeak": 0, "envelopeSpeed": 12, "eqSubFilters0": [{ "type": "low-pass", "cutoffHz": 3363.59, "linearGain": 0.3536 }], "effects": ["panning", "note filter"], "noteFilterType": false, "noteSimpleCut": 10, "noteSimplePeak": 0, "noteFilter": [{ "type": "low-pass", "cutoffHz": 3363.59, "linearGain": 0.3536 }], "noteSubFilters0": [{ "type": "low-pass", "cutoffHz": 3363.59, "linearGain": 0.3536 }], "pan": 0, "panDelay": 0, "fadeInSeconds": 0.0938, "fadeOutTicks": 12, "algorithm": "(1 2)←3←4", "feedbackType": "1→2", "feedbackAmplitude": 3, "operators": [{ "frequency": "0.25×", "amplitude": 14, "waveform": "pulse width", "pulseWidth": 5 }, { "frequency": "11×", "amplitude": 12, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "~1×", "amplitude": 14, "waveform": "pulse width", "pulseWidth": 5 }, { "frequency": "6×", "amplitude": 1, "waveform": "pulse width", "pulseWidth": 1 }, { "frequency": "1×", "amplitude": 0, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 0, "waveform": "sine", "pulseWidth": 5 }], "envelopes": [{ "target": "noteFilterAllFreqs", "envelope": "twang", "inverse": false, "perEnvelopeSpeed": 5.5, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1, "discrete": false }, { "target": "operatorAmplitude", "envelope": "twang", "inverse": false, "perEnvelopeSpeed": 1.6667, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1, "discrete": false, "index": 2 }, { "target": "operatorFrequency", "envelope": "punch", "inverse": false, "perEnvelopeSpeed": 1, "perEnvelopeLowerBound": 0.3, "perEnvelopeUpperBound": 0.6, "discrete": false, "index": 2 }, { "target": "feedbackAmplitude", "envelope": "twang", "inverse": false, "perEnvelopeSpeed": 4.5, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1, "discrete": false }], "isDrum": false } },
                 { name: "decimated kick - CoolTasDude", generalMidi: false, settings: { "type": "FM", "volume": 0, "eqFilter": [{ "type": "low-pass", "cutoffHz": 3363.59, "linearGain": 0.3536 }, { "type": "high-pass", "cutoffHz": 500, "linearGain": 0.5 }], "eqFilterType": false, "eqSimpleCut": 10, "eqSimplePeak": 0, "envelopeSpeed": 12, "eqSubFilters0": [{ "type": "low-pass", "cutoffHz": 3363.59, "linearGain": 0.3536 }, { "type": "high-pass", "cutoffHz": 500, "linearGain": 0.5 }], "effects": ["panning", "pitch shift", "vibrato", "distortion", "bitcrusher", "chorus", "echo", "reverb"], "pitchShiftSemitones": 12, "vibrato": "custom", "vibratoDepth": 0.92, "vibratoDelay": 18, "vibratoSpeed": 30, "vibratoType": 0, "distortion": 29, "aliases": false, "bitcrusherOctave": 6, "bitcrusherQuantization": 57, "pan": 0, "panDelay": 10, "chorus": 0, "echoSustain": 43, "echoDelayBeats": 0.5, "reverb": 0, "fadeInSeconds": 0, "fadeOutTicks": 24, "algorithm": "1←(2 3 4)", "feedbackType": "1⟲", "feedbackAmplitude": 0, "operators": [{ "frequency": "1×", "amplitude": 15, "waveform": "triangle", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 0, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 0, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 0, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 0, "waveform": "sine", "pulseWidth": 5 }, { "frequency": "1×", "amplitude": 0, "waveform": "sine", "pulseWidth": 5 }], "envelopes": [{ "target": "operatorFrequency", "envelope": "twang", "inverse": false, "perEnvelopeSpeed": 32, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1, "discrete": false, "index": 0 }, { "target": "noteVolume", "envelope": "twang", "inverse": false, "perEnvelopeSpeed": 2, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1, "discrete": false }, { "target": "pitchShift", "envelope": "twang", "inverse": false, "perEnvelopeSpeed": 32, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1, "discrete": false }, { "target": "pitchShift", "envelope": "twang", "inverse": false, "perEnvelopeSpeed": 32, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1, "discrete": false }, { "target": "operatorFrequency", "envelope": "twang", "inverse": false, "perEnvelopeSpeed": 32, "perEnvelopeLowerBound": 0, "perEnvelopeUpperBound": 1, "discrete": false, "index": 0 }], "isDrum": false } },

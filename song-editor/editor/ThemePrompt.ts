@@ -77,6 +77,8 @@ export class ThemePrompt implements Prompt {
 			option({ value: "voxonium" }, "Voxonium"),
 			option({ value: "axobox"}, "AxoBox"),
 			option({ value: "lemmbox dark"}, "LemmBox"),
+			option({ value: "edobox classic" }, "EdoBox"),
+			//option({ value: "bloxbox classic" }, "BloxBox"),
 			option({ value: "death"}, "D's Quick Box Mod"),
 		),
 		optgroup({ label: "Misc" },

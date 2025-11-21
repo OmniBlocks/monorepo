@@ -4290,6 +4290,7 @@ export class SongEditor {
                 break;
             case 67: // c
                 if (canPlayNotes) break;
+                
                 if (event.shiftKey) {
                     this._copyInstrument();
                 } else {
@@ -4466,6 +4467,8 @@ export class SongEditor {
                     this.doc.prefs.displayVolumeBar = true;
                     this.doc.prefs.layout = "wide";
                     this.doc.prefs.visibleOctaves = 5;
+                    this.doc.prefs.colorTheme = "jummbox classic";
+                    this.doc.prefs.rollNoveltyPresets = false;
                     this.doc.prefs.save();
                     event.preventDefault();
                     location.reload();
@@ -4603,6 +4606,7 @@ export class SongEditor {
                     this.doc.prefs.instrumentImportExport = true;
                     this.doc.prefs.notesFlashWhenPlayed = true;
                     this.doc.prefs.showOscilloscope = true;
+                    this.doc.prefs.rollNoveltyPresets = false;
                     this.doc.prefs.save();
                     event.preventDefault();
                     location.reload();
@@ -4683,6 +4687,39 @@ export class SongEditor {
                     }
                     event.preventDefault();
                 }
+                break;
+            case 84: // t
+                if (canPlayNotes) break;
+                if (event.shiftKey && event.ctrlKey && event.altKey) {
+                    // Ctrl Alt Shift t: tasify - take a guess lol
+                    this.doc.prefs.autoPlay = false;
+                    this.doc.prefs.autoFollow = true;
+                    this.doc.prefs.enableNotePreview = true;
+                    this.doc.prefs.showFifth = true;
+                    this.doc.prefs.notesOutsideScale = true;
+                    this.doc.prefs.defaultScale = 0;
+                    this.doc.prefs.showLetters = true;
+                    this.doc.prefs.showChannels = true;
+                    this.doc.prefs.showScrollBar = true;
+                    this.doc.prefs.alwaysFineNoteVol = true;
+                    this.doc.prefs.enableChannelMuting = true;
+                    this.doc.prefs.displayBrowserUrl = true;
+                    this.doc.prefs.displayVolumeBar = true;
+                    this.doc.prefs.layout = "long";
+                    this.doc.prefs.visibleOctaves = 4;
+                    this.doc.prefs.closePromptByClickoff = true;
+                    this.doc.prefs.colorTheme = "violet verdant";
+                    this.doc.prefs.frostedGlassBackground = false;
+                    this.doc.prefs.instrumentButtonsAtTop = true;
+                    this.doc.prefs.instrumentCopyPaste = true;
+                    this.doc.prefs.instrumentImportExport = true;
+                    this.doc.prefs.notesFlashWhenPlayed = true;
+                    this.doc.prefs.showOscilloscope = true;
+                    this.doc.prefs.rollNoveltyPresets = true;
+                    this.doc.prefs.save();
+                    event.preventDefault();
+                    location.reload();
+                } 
                 break;
             case 219: // left brace
                 if (canPlayNotes) break;

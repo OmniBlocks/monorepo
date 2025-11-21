@@ -4,6 +4,29 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`0eba017`](https://github.com/OmniBlocks/scratch-gui/commit/0eba017538cf701fec93704a7fd2b6658f9593bf) - 2025-11-21 12:00:03 -0500
+
+**feat: Merge pull request #390 from OmniBlocks/broken-webgl-modal**
+
+Add new webgl broken modal #367 #364
+#367 #364
+
+- Resolves #
+
+### Proposed Changes
+
+_Describe what this Pull Request does_
+it makes a new modal that checks if webgl is actually supported to prevent browsers from bluffing about it
+### Reason for Changes
+apple broke all of webgl (classic apple) on iOS/iPadOS 18.7.2 Build 22H123 and fixed it silently in the next build
+_Explain why these changes should be made. Why is this helpful or necessary? Why should this be added?_
+because if the browser says that webgl is supported but it's just bluffing, scratch-gui will believe it and try to load the VM. Unfortunately, as soon as the VM spawns into existence, it crashes instantly as the browser **doesn't** actually support WebGL
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`d8ebd2e`](https://github.com/OmniBlocks/scratch-gui/commit/d8ebd2e310002951c3d439bc2ff4be7bfadb1bd8) - 2025-11-20 16:54:05 -0500
 
 **Merge pull request #388 from OmniBlocks/Q-DEV-issue-387-1763674489**

@@ -4,6 +4,15 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`ecb7ce9`](https://github.com/OmniBlocks/scratch-gui/commit/ecb7ce9e87e863fff66846cbbb385404e2ac1978) - 2025-11-21 23:24:00 -0500
+
+**feat: okay actually add fun destinaitons**
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`a07aafb`](https://github.com/OmniBlocks/scratch-gui/commit/a07aafb7e543cda2e7ef826780492de9056bc735) - 2025-11-21 23:22:46 -0500
 
 **fix: wrong file**

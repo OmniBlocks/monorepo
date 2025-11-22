@@ -4,6 +4,17 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`bd12ee5`](https://github.com/OmniBlocks/scratch-gui/commit/bd12ee53cf6db257815a87b524d04fc58a428cb5) - 2025-11-21 22:31:02 -0500
+
+**fix: remove broken leftover jsx**
+
+my stupid self copy pasted wrong jsx pluh 🥀
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`b22e97e`](https://github.com/OmniBlocks/scratch-gui/commit/b22e97e1bdd827c36927c598148be5ca1b93fd18) - 2025-11-21 12:08:50 -0500
 
 **fix: build error due to wrong import #391**

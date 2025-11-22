@@ -4,6 +4,17 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`a07aafb`](https://github.com/OmniBlocks/scratch-gui/commit/a07aafb7e543cda2e7ef826780492de9056bc735) - 2025-11-21 23:22:46 -0500
+
+**fix: wrong file**
+
+edited component instead of container on accident
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`aa357fa`](https://github.com/OmniBlocks/scratch-gui/commit/aa357faaba92fb5c70f6ce926b28cab7af1aa73f) - 2025-11-21 23:21:36 -0500
 
 **feat: add funDestinations to webgl-broken modal**

@@ -16,12 +16,19 @@ const messages = defineMessages({
 
 const WebGlBrokenModal = ({intl, ...props}) => {
     // Try to detect iOS version from user agent
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
-        (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-    const iosMatch = navigator.userAgent.match(/OS (\d+)[._](\d+)[._]?(\d+)?/);
-    const iosVersion = iosMatch ? `${iosMatch[1]}.${iosMatch[2]}${iosMatch[3] ? '.' + iosMatch[3] : ''}` : null;
-    const isIOS18_7 = iosVersion && iosVersion.startsWith('18.7');
+const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
+// Try standard iOS pattern first (iPhone, old iPads)
+let iosMatch = navigator.userAgent.match(/OS (\d+)[._](\d+)[._]?(\d+)?/);
+
+// If no match, iPad is likely reporting as Mac - try Safari Version/ instead
+if (!iosMatch && isIOS) {
+    iosMatch = navigator.userAgent.match(/Version\/(\d+)\.(\d+)(?:\.(\d+))?/);
+}
+
+const iosVersion = iosMatch ? `${iosMatch[1]}.${iosMatch[2]}${iosMatch[3] ? '.' + iosMatch[3] : ''}` : null;
+const isIOS18_7 = iosVersion && iosVersion.startsWith('18.7');
     return (
         <ReactModal
             isOpen
@@ -39,7 +46,7 @@ const WebGlBrokenModal = ({intl, ...props}) => {
                     </h2>
                     <p>
                         <FormattedMessage
-                            defaultMessage="Your browser reports WebGL support, but it appears to be malfunctioning. This is likely a browser bug or graphics driver issue."
+                            defaultMessage="Your browser claims to support WebGL, but it appears to be malfunctioning. This is likely a browser bug or graphics driver issue."
                             description="WebGL broken message"
                             id="gui.webglBrokenModal.description"
                         />
@@ -85,7 +92,7 @@ const WebGlBrokenModal = ({intl, ...props}) => {
                                 statusLink: (
                                     <a
                                         className={styles.faqLink}
-                                        href="https://github.com/OmniBlocks/scratch-gui/wiki/Status_and_Issues"
+                                        href="https://omniblocks.miraheze.org/wiki/Status_and_Issues"
                                         target="_blank"
                                         rel="noopener noreferrer"
                                     >
@@ -110,5 +117,6 @@ WebGlBrokenModal.propTypes = {
     isRtl: PropTypes.bool,
     onBack: PropTypes.func.isRequired
 };
+
 
 export default injectIntl(WebGlBrokenModal);

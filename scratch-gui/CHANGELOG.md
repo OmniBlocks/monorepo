@@ -4,6 +4,15 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`0c03752`](https://github.com/OmniBlocks/scratch-gui/commit/0c0375272ac0b0d59fafa6d42a9c0895087f1403) - 2025-11-21 23:16:52 -0500
+
+**fix: ios 18.7.2 detection & broken wiki link**
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`bd12ee5`](https://github.com/OmniBlocks/scratch-gui/commit/bd12ee53cf6db257815a87b524d04fc58a428cb5) - 2025-11-21 22:31:02 -0500
 
 **fix: remove broken leftover jsx**

@@ -4,6 +4,17 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`aa357fa`](https://github.com/OmniBlocks/scratch-gui/commit/aa357faaba92fb5c70f6ce926b28cab7af1aa73f) - 2025-11-21 23:21:36 -0500
+
+**feat: add funDestinations to webgl-broken modal**
+
+if you have no page history the back button takes you to a random omniblocks link hheheheh funny
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`0c03752`](https://github.com/OmniBlocks/scratch-gui/commit/0c0375272ac0b0d59fafa6d42a9c0895087f1403) - 2025-11-21 23:16:52 -0500
 
 **fix: ios 18.7.2 detection & broken wiki link**

@@ -155,7 +155,7 @@ class Blocks extends React.Component {
             this.ScratchBlocks.FieldCustom = {
                 registerInput: () => {},
                 unregisterInput: () => {},
-                getRegisteredInputs: () => { try { return new Map(); } catch (e) { return {}; } }
+                getRegisteredInputs: () => new Map()
             };
         }
 

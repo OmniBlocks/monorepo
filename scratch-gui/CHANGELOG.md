@@ -4,6 +4,15 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`9579872`](https://github.com/OmniBlocks/scratch-gui/commit/9579872e3da146769218c98439d3c4f11b2dd735) - 2025-11-23 17:43:00 +0000
+
+**amazon q i've had enough**
+
+*Author: ampelectrecuted*
+
+---
+
+
 ### Commit [`5cee746`](https://github.com/OmniBlocks/scratch-gui/commit/5cee746a0d95955ddf13f6999645917b6f7ea7ee) - 2025-11-21 23:25:19 -0500
 
 **feat: add funDestinations to webgl modal (the original one)**

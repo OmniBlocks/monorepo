@@ -137,18 +137,24 @@ const fetchLibraryOB = async () => {
 
 // Helper function to handle gallery loading with timeout
 const loadGalleryWithTimeout = (fetchFunction, timeoutCallback, successCallback, errorCallback) => {
+    let timeoutFired = false;
     const timeout = setTimeout(() => {
+        timeoutFired = true;
         timeoutCallback();
     }, GALLERY_TIMEOUT_MS);
 
     fetchFunction()
         .then(gallery => {
-            successCallback(gallery);
+            if (!timeoutFired) {
+                successCallback(gallery);
+            }
             clearTimeout(timeout);
         })
         .catch(error => {
-            log.error(error);
-            errorCallback(error);
+            if (!timeoutFired) {
+                log.error(error);
+                errorCallback(error);
+            }
             clearTimeout(timeout);
         });
 };

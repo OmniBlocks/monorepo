@@ -520,7 +520,7 @@ export class ExportPrompt implements Prompt {
                 });
                 const left: Float32Array = this.recordedSamplesL;
                 const right: Float32Array = this.recordedSamplesR;
-                const parts: Uint8Array[] = [];
+                const parts: Uint8Array<ArrayBuffer>[] = [];
                 let sampleIndex: number = 0;
                 for (; sampleIndex < left.length; sampleIndex += sampleBlockSize) {
                     const leftChunk: Float32Array = left.subarray(sampleIndex, sampleIndex + sampleBlockSize);
@@ -529,7 +529,7 @@ export class ExportPrompt implements Prompt {
                     parts.push(oggEncoder.encode(frame).slice());
                 }
                 parts.push(oggEncoder.finalize().slice());
-                const blob: Blob = new Blob(part, { type: "audio/ogg" });
+                const blob: Blob = new Blob(parts, { type: "audio/ogg" });
                 save(blob, this._fileName.value.trim() + ".ogg");
                 this._close();
             });
@@ -610,7 +610,7 @@ export class ExportPrompt implements Prompt {
                 encoderComplexity: 10,
                 resampleQuality: 3, // [0, 10], but we're not using this.
             }, OpusEncoderLib);
-            const parts: Uint8Array[] = [];
+            const parts: Uint8Array<ArrayBuffer>[] = [];
             const left: Float32Array = this.recordedSamplesL;
             const right: Float32Array = this.recordedSamplesR;
             oggEncoder.setBitrate(256_000); // bits per second

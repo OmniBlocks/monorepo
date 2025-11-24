@@ -4,6 +4,15 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`c6244ff`](https://github.com/OmniBlocks/scratch-gui/commit/c6244ffe9fe31ba69014a42087764dbfeae40423) - 2025-11-24 17:41:05 -0600
+
+**Added license rules notice for forks and mods**
+
+*Author: Graison P*
+
+---
+
+
 ### Commit [`f02e3a4`](https://github.com/OmniBlocks/scratch-gui/commit/f02e3a4fafc112dd119b124f00826594a2c98405) - 2025-11-24 15:00:50 -0600
 
 **commit AGPL-v3**

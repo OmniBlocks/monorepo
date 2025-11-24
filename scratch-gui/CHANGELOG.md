@@ -4,6 +4,17 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`f02e3a4`](https://github.com/OmniBlocks/scratch-gui/commit/f02e3a4fafc112dd119b124f00826594a2c98405) - 2025-11-24 15:00:50 -0600
+
+**commit AGPL-v3**
+
+GNU affero is AGPL btw
+
+*Author: Graison P*
+
+---
+
+
 ### Commit [`9579872`](https://github.com/OmniBlocks/scratch-gui/commit/9579872e3da146769218c98439d3c4f11b2dd735) - 2025-11-23 17:43:00 +0000
 
 **amazon q i've had enough**

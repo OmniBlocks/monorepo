@@ -4,6 +4,15 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`4a93ad4`](https://github.com/OmniBlocks/scratch-gui/commit/4a93ad499f10d60f4eab4a02e1fa661c5c6141b9) - 2025-11-25 12:11:45 -0600
+
+**Update README.md**
+
+*Author: Graison P*
+
+---
+
+
 ### Commit [`3d72d08`](https://github.com/OmniBlocks/scratch-gui/commit/3d72d0876ac34d8af4d21e4e67f30debaff0c906) - 2025-11-25 17:18:42 +0000
 
 **Update license reference from AGPL V3 to GPL V3**

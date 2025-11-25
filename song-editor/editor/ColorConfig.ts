@@ -6153,7 +6153,7 @@ export class ColorConfig {
 				--inverted-text: #121224;
 				--text-selection: rgb(36 00 240 / 60%);
 				--box-selection-fill: rgb(72 72 144 / 30%);
-				--loop-accent: #9000f0;
+				--loop-accent: #6000f0;
 				--link-accent: #9000f0;
 				--ui-widget-background: #121224;
 				--ui-widget-focus: #121224;

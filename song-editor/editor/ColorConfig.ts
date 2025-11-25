@@ -3812,8 +3812,8 @@ export class ColorConfig {
 					--ui-widget-background: #393e4f;
 					--ui-widget-focus: #6d6886;
 					--pitch-background: #393e4f;
-					--tonic: #725491;
-					--fifth-note: #54547a;
+					--tonic: #024ACA;
+					--fifth-note: #5BA8FF;
 					--track-editor-bg-pitch: #393e4f;
 					--track-editor-bg-pitch-dim: #1c1d28;
 					--track-editor-bg-noise: #3d3535;
@@ -6061,7 +6061,7 @@ export class ColorConfig {
 					--disabled-note-secondary:  #6a677a;
 				}`,
 
-		"BloxBox": `
+		"bloxbox classic": `
 			:root {
 				--page-margin: #052010;
 				--editor-background: #052010;
@@ -6141,6 +6141,137 @@ export class ColorConfig {
 				--noise5-primary-channel:   #A2BB77;
 				--noise5-secondary-note:    #91AA66;
 				--noise5-primary-note:      #C5E2B2;
+			}`,
+		"fmbox": `
+			:root {
+				--page-margin: #121224;
+				--editor-background: #000000;
+				--hover-preview: #606090;
+				--playhead: #f0f0f0;
+				--primary-text: #f0f0f0;
+				--secondary-text: #9090d8;
+				--inverted-text: #121224;
+				--text-selection: rgb(36 00 240 / 60%);
+				--box-selection-fill: rgb(72 72 144 / 30%);
+				--loop-accent: #9000f0;
+				--link-accent: #9000f0;
+				--ui-widget-background: #121224;
+				--ui-widget-focus: #121224;
+				--pitch-background: #121224;
+				--tonic: #2400f090;
+				--fifth-note: #f0002490;
+				--third-note: #9000f090;
+				--white-piano-key: #121224;
+				--black-piano-key: #f0f0f0;
+				--white-piano-key-text: #f0f0f0;
+				--black-piano-key-text: #121224;
+				--use-color-formula: false;
+				--pitch-channel-limit: 10;
+				--track-editor-bg-pitch: #030018;
+				--track-editor-bg-pitch-dim: rgb(36 0 240 / 12%);
+				--track-editor-bg-noise: #180003;
+				--track-editor-bg-noise-dim: rgb(240 0 36 / 12%);
+				--track-editor-bg-mod: #0c0018;
+				--track-editor-bg-mod-dim: rgb(144 0 240 / 12%);
+				--multiplicative-mod-slider: #2400f0;
+				--overwriting-mod-slider: #f00024;
+				--indicator-primary: #f0002487;
+				--indicator-secondary: #f0002448;
+				--select2-opt-group: #12006060;
+				--input-box-outline: #121224;
+				--mute-button-normal: #2400f0;
+				--mute-button-mod: #9000f0;
+				--pitch1-secondary-channel: #002478;
+				--pitch1-primary-channel: #0048f0;
+				--pitch1-secondary-note: #002478;
+				--pitch1-primary-note: #0048f0;
+				--pitch2-secondary-channel: #121278;
+				--pitch2-primary-channel: #2424f0;
+				--pitch2-secondary-note: #121278;
+				--pitch2-primary-note: #2424f0;
+				--pitch3-secondary-channel: #120078;
+				--pitch3-primary-channel: #2400f0;
+				--pitch3-secondary-note: #120078;
+				--pitch3-primary-note: #2400f0;
+				--pitch4-secondary-channel: #2a0078;
+				--pitch4-primary-channel: #5400f0;
+				--pitch4-secondary-note: #2a0078;
+				--pitch4-primary-note: #5400f0;
+				--pitch5-secondary-channel: #360078;
+				--pitch5-primary-channel: #6c00f0;
+				--pitch5-secondary-note: #360078;
+				--pitch5-primary-note: #6c00f0;
+				--pitch6-secondary-channel: #480078;
+				--pitch6-primary-channel: #9000f0;
+				--pitch6-secondary-note: #480078;
+				--pitch6-primary-note: #9000f0;
+				--pitch7-secondary-channel: #600078;
+				--pitch7-primary-channel: #c000f0;
+				--pitch7-secondary-note: #600078;
+				--pitch7-primary-note: #c000f0;
+				--pitch8-secondary-channel: #710060;
+				--pitch8-primary-channel: #e200c0;
+				--pitch8-secondary-note: #710060;
+				--pitch8-primary-note: #e200c0;
+				--pitch9-secondary-channel: #780048;
+				--pitch9-primary-channel: #f00090;
+				--pitch9-secondary-note: #780048;
+				--pitch9-primary-note: #f00090;
+				--pitch10-secondary-channel: #780012;
+				--pitch10-primary-channel: #f00024;
+				--pitch10-secondary-note: #780012;
+				--pitch10-primary-note: #f00024;
+				--noise1-secondary-channel: #2942af;
+				--noise1-primary-channel: #5281ff;
+				--noise1-secondary-note: #2942af;
+				--noise1-primary-note: #5281ff;
+				--noise2-secondary-channel: #3629af;
+				--noise2-primary-channel: #6c52ff;
+				--noise2-secondary-note: #3629af;
+				--noise2-primary-note: #6c52ff;
+				--noise3-secondary-channel: #5029af;
+				--noise3-primary-channel: #a052ff;
+				--noise3-secondary-note: #5029af;
+				--noise3-primary-note: #a052ff;
+				--noise4-secondary-channel: #7f2493;
+				--noise4-primary-channel: #ff49e3;
+				--noise4-secondary-note: #7f2493;
+				--noise4-primary-note: #ff49e3;
+				--noise5-secondary-channel: #7f2935;
+				--noise5-primary-channel: #ff526b;
+				--noise5-secondary-note: #7f2935;
+				--noise5-primary-note: #ff526b;
+				--mod1-secondary-channel: #241e60;
+				--mod1-primary-channel: #3c30a8;
+				--mod1-secondary-note: #241e60;
+				--mod1-primary-note: #3c30a8;
+				--mod2-secondary-channel: #482460;
+				--mod2-primary-channel: #843cb4;
+				--mod2-secondary-note: #482460;
+				--mod2-primary-note: #843cb4;
+				--mod3-secondary-channel: #6c3060;
+				--mod3-primary-channel: #cc60c0;
+				--mod3-secondary-note: #6c3060;
+				--mod3-primary-note: #cc60c0;
+				--mod4-secondary-channel: #601e24;
+				--mod4-primary-channel: #a8303c;
+				--mod4-secondary-note: #601e24;
+				--mod4-primary-note: #a8303c;
+				--mod-label-primary: #121224;
+				--mod-label-secondary-text: #c0c0c0;
+				--mod-label-primary-text: #f0f0f0;
+				--disabled-note-primary: #606090;
+				--disabled-note-secondary: #303048;
+				--note-flash: #f0f0f090;
+				--note-flash-secondary: #f0f0f048;
+				--song-player-margin: #000000;
+				--progress-bar: #f00024;
+			  	
+				font-family: Inter-var-v4_1, Courier !important;
+				letter-spacing: -0.022em;
+				font-weight: 300;
+				font-variation-settings: "wght" 300, "opsz" 32;
+				font-feature-settings: "case", "dlig", "frac", "dnom" 0, "numr" 0, "subs" 0, "sups" 0, "tnum" 0, "zero" 0, "ss01" 0, "ss02" 0, "ss03" 0, "ss04" 0, "ss05" 0, "ss06" 0, "ss07" 0, "ss08" 0, "cv01" 0, "cv02", "cv03", "cv04", "cv05" 0, "cv06" 0, "cv07", "cv08" 0, "cv09" 0, "cv10" 0, "cv11" 0, "cv12" 0, "cv13" 0, "cpsp" 0, "c2sc" 0, "salt" 0, "aalt" 0, "calt" 0, "ccmp", "locl", "kern";
 			}`,
 	"azur lane":`
 		:root {

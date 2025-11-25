@@ -4,6 +4,17 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`485af09`](https://github.com/OmniBlocks/scratch-gui/commit/485af0914190d3af2b2cd4e5c8c817833337cc03) - 2025-11-25 17:02:06 -0500
+
+**Update offline PWA guide with desktop app note & video**
+
+Added a note about desktop app development and installation benefits.
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`c36447d`](https://github.com/OmniBlocks/scratch-gui/commit/c36447d7128413b68e21b1e98313738ab15131b5) - 2025-11-25 16:07:51 -0500
 
 **Update README.md**

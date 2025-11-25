@@ -4,6 +4,19 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`c36447d`](https://github.com/OmniBlocks/scratch-gui/commit/c36447d7128413b68e21b1e98313738ab15131b5) - 2025-11-25 16:07:51 -0500
+
+**Update README.md**
+
+Line 196 has a typo: "editing thr package.json" should be "editing the package.json".
+
+Co-authored-by: coderabbitai[bot] <136622811+coderabbitai[bot]@users.noreply.github.com>
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`f58fcdc`](https://github.com/OmniBlocks/scratch-gui/commit/f58fcdc13f80ef69c298fe7cc55b1cbd09e2fceb) - 2025-11-25 14:50:43 -0600
 
 **added images**

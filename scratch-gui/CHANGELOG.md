@@ -4,6 +4,17 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`c8bd1fc`](https://github.com/OmniBlocks/scratch-gui/commit/c8bd1fcd80c9e05207f4dab03015a44102ede608) - 2025-11-25 15:37:09 -0500
+
+**Update AGPL compliance rules in README**
+
+This was, in fact, correct information. You can totally make it paid, but the source code must be free to access and let anyone fork it freely.
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`b84cbd9`](https://github.com/OmniBlocks/scratch-gui/commit/b84cbd9b27f6c67fc80ac9436b0ba94882a24dc2) - 2025-11-25 14:12:04 -0600
 
 **removed incorrect info**

@@ -4,6 +4,17 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`68f8efd`](https://github.com/OmniBlocks/scratch-gui/commit/68f8efdff5beebf392b3beb1237d9f387be8361e) - 2025-11-25 12:14:43 -0600
+
+**switch back to agpl**
+
+@ampelectrecuted please don't, @supervoidcoder already agreed. ALSO BATON (if i remember right) IS ON BREAK.
+
+*Author: Graison P*
+
+---
+
+
 ### Commit [`4a93ad4`](https://github.com/OmniBlocks/scratch-gui/commit/4a93ad499f10d60f4eab4a02e1fa661c5c6141b9) - 2025-11-25 12:11:45 -0600
 
 **Update README.md**

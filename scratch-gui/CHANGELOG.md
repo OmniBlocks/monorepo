@@ -4,6 +4,20 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`32b55ce`](https://github.com/OmniBlocks/scratch-gui/commit/32b55cef08c7d845b49aa3cfeb5cee04148cbd92) - 2025-11-25 14:44:16 -0600
+
+**added more info found from google**
+
+@supervoidcoder @ampelectrecuted 
+it can be paid but the main software (the ide part like coding) can't because it breaks the rules of open-source licensing. 
+
+somehow...?
+
+*Author: Graison P*
+
+---
+
+
 ### Commit [`c8bd1fc`](https://github.com/OmniBlocks/scratch-gui/commit/c8bd1fcd80c9e05207f4dab03015a44102ede608) - 2025-11-25 15:37:09 -0500
 
 **Update AGPL compliance rules in README**

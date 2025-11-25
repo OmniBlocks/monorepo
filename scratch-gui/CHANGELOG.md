@@ -4,6 +4,15 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`fa9b614`](https://github.com/OmniBlocks/scratch-gui/commit/fa9b6141a2fccb00a917a29324cef742b36b8a48) - 2025-11-25 19:56:32 +0000
+
+**you can technically make a modification of an AGPL software paid but only if it is open source**
+
+*Author: ampelectrecuted*
+
+---
+
+
 ### Commit [`68f8efd`](https://github.com/OmniBlocks/scratch-gui/commit/68f8efdff5beebf392b3beb1237d9f387be8361e) - 2025-11-25 12:14:43 -0600
 
 **switch back to agpl**

@@ -41,7 +41,7 @@ This repository contains the frontend interface of the Block-Based editor for Om
 ## Important for Developers!
 If you want to fork this repo or contribute with PR's (or modify OmniBlocks as your own) you must follow the following rules from the AGPL V3 license or you are in violation of it.
 * 1. Your fork/mod must be public.
-* 2. Your fork/mod cannot be paid software. The AGPL does not allow forks/mods to be paid if the unmodified software is free.
+* 2. Your fork/mod must be licensed under the same AGPLv3 license.
 
 ## 📑 Table of Contents
 - [🎮 Try It Out](#-try-it-out)

@@ -5,9 +5,11 @@ OmniBlocks now supports full offline functionality as a Progressive Web App (PWA
 ## 🚀 Installation as PWA
 
 ### Desktop Installation
-1. Open OmniBlocks in Chrome, Edge, or another Chromium-based browser
-2. Look for the "Install" button in the address bar or browser menu
-3. Click "Install" to add OmniBlocks to your desktop
+1. Open OmniBlocks in Chrome, Edge, or another Chromium-based browser</br>
+2. Open the 3 dots menu and hover over "Cast, save, and share." GitHub is used here as an example.</br>
+<img width="519" height="652" alt="Screenshot 2025-11-25 2 47 56 PM" src="https://github.com/user-attachments/assets/52bd3c88-8238-4cdb-878a-e4f9cd018e0b" /></br>
+3. Click "Install" to add OmniBlocks to your desktop</br>
+<img width="407" height="166" alt="Screenshot 2025-11-25 2 48 03 PM" src="https://github.com/user-attachments/assets/9fb2b478-4ee3-498d-a771-d586d3a7a8fe" /></br>
 4. The app will now work offline and can be launched like a native application
 
 ### Mobile Installation

@@ -4,6 +4,17 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`0ffda63`](https://github.com/OmniBlocks/scratch-gui/commit/0ffda635bf9dbf8c0fd642dd2fd3a659229dba93) - 2025-11-25 17:12:25 +0000
+
+**you can't retroactively do this until i and thebaton agree**
+
+i am not a lwayer but this should be obvious after a quick search
+
+*Author: ampelectrecuted*
+
+---
+
+
 ### Commit [`c6244ff`](https://github.com/OmniBlocks/scratch-gui/commit/c6244ffe9fe31ba69014a42087764dbfeae40423) - 2025-11-24 17:41:05 -0600
 
 **Added license rules notice for forks and mods**

@@ -12,6 +12,10 @@ OmniBlocks now supports full offline functionality as a Progressive Web App (PWA
 <img width="407" height="166" alt="Screenshot 2025-11-25 2 48 03 PM" src="https://github.com/user-attachments/assets/9fb2b478-4ee3-498d-a771-d586d3a7a8fe" /></br>
 4. The app will now work offline and can be launched like a native application
 
+https://github.com/user-attachments/assets/986de6a3-47e3-436b-91f5-e169a6a67a4a
+
+We are working on a desktop app for more native access and integration, but this is the best you can get for now, and it is quite great.
+
 ### Mobile Installation
 1. Open OmniBlocks in your mobile browser
 2. Tap the browser menu (usually three dots)

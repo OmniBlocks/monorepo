@@ -39,9 +39,14 @@
 This repository contains the frontend interface of the Block-Based editor for OmniBlocks and TurboWarp. It builds upon Scratch and TurboWarp's foundation with significant performance improvements, addons, themes, and other features for an amazing coding experience.
 
 ## Important for Developers!
-If you want to fork this repo or contribute with PR's (or modify OmniBlocks as your own) you must follow the following rules from the AGPL V3 license or you are in violation of it.
-* 1. Your fork/mod must be public.
-* 2. Your fork/mod must be licensed under the same AGPLv3 license.
+If you want to fork this repo or contribute with PR's (or modify OmniBlocks as your own) you must follow the following rules from the AGPLv3 license or you are in violation of it.
+* 1. Your fork/mod must be public and open-source.
+* 2. Your fork/mod can be paid, but must be licensed under the same AGPLv3 license.
+### Notice about rule 2!
+While it does say your fork/mod can be paid, the <b>main software</b> cannot be paid. Here are acceptable uses for requiring payment:
+* 1. Premium features
+  2. Support services
+  3. Subscriptions.
 
 ## 📑 Table of Contents
 - [🎮 Try It Out](#-try-it-out)

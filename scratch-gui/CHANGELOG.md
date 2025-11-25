@@ -4,6 +4,15 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`b3237ca`](https://github.com/OmniBlocks/scratch-gui/commit/b3237ca5a287ce8bf12513e6227f3cab58d1ad31) - 2025-11-25 17:54:08 -0500
+
+**Add link to OmniBlocks Writer in footer**
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`485af09`](https://github.com/OmniBlocks/scratch-gui/commit/485af0914190d3af2b2cd4e5c8c817833337cc03) - 2025-11-25 17:02:06 -0500
 
 **Update offline PWA guide with desktop app note & video**

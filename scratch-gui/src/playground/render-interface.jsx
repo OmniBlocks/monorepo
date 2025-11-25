@@ -208,6 +208,13 @@ const Footer = () => (
                             id="tw.footer.wiki"
                         />
                     </a>
+                    <a href="https://omniblocks.github.io/NoteBookWriter">
+                        <FormattedMessage
+                            defaultMessage="OmniBlocks Writer"
+                            description="Link in footer to OmniBlocks Writer, our word processor"
+                            id="tw.footer.wiki"
+                        />
+                    </a>
                 </div>
                 <div className={styles.footerSection}>
                     <a href="https://scratch.mit.edu/users/scratchcode1_2_3/#comments">

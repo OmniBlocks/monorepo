@@ -4,6 +4,17 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`dea111e`](https://github.com/OmniBlocks/scratch-gui/commit/dea111e7dd2f007330a1c682858c6e12fb3d0c00) - 2025-11-26 15:23:27 -0500
+
+**Add script to generate test dashboard in HTML**
+
+This script generates an HTML dashboard for testing results, including logs and screenshots.
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`7a9ec2e`](https://github.com/OmniBlocks/scratch-gui/commit/7a9ec2e784b256c603c08226c173bb9c138100f6) - 2025-11-26 15:12:42 -0500
 
 **Add script to create failure issue on GitHub**

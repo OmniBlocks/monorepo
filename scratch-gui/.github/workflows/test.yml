@@ -1,85 +1,1212 @@
-name: Build Monitor
+name: Main Branch Test Monitor
+
 permissions:
-  contents: read
+  contents: write
   issues: write
+
 on:
   push:
     branches: [ main ]
 
 jobs:
-  build-monitor:
+  main-branch-test:
     runs-on: ubuntu-latest
+
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Set up Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '20'
-        
-    - name: Install dependencies
-      id: install
-      run: |
-        echo "install_status=success" >> $GITHUB_OUTPUT
-        install_output=$(npm ci 2>&1) || {
-          echo "install_status=failure" >> $GITHUB_OUTPUT
-          echo "error_output<<EOF" >> $GITHUB_OUTPUT
-          echo "$install_output" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-        }
-        
-    - name: Run build
-      id: build
-      if: steps.install.outputs.install_status == 'success'
-      run: |
-        echo "build_status=success" >> $GITHUB_OUTPUT
-        build_output=$(npm run build 2>&1) || {
-          echo "build_status=failure" >> $GITHUB_OUTPUT
-          echo "error_output<<EOF" >> $GITHUB_OUTPUT
-          echo "$build_output" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-        }
-        
-    - name: Create issue if failed
-      if: steps.install.outputs.install_status == 'failure' || steps.build.outputs.build_status == 'failure'
-      uses: actions/github-script@v6
-      with:
-        script: |
-          const failedStep = process.env.INSTALL_STATUS === 'failure' ? 'dependency installation' : 'build';
-          const errorOutput = `\`\`\`\n${process.env.ERROR_OUTPUT}\n\`\`\``;
-          
-          const { data: issues } = await github.rest.issues.listForRepo({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            state: 'open',
-            labels: 'build-failure'
-          });
-          
-          const existingIssue = issues.find(issue => 
-            issue.title.includes('Build Failure') && 
-            issue.labels.some(label => label.name === 'build-failure')
-          );
-          
-          const title = `Build Failure - ${new Date().toISOString()}`;
-          const body = `The latest commit (${context.sha}) failed during ${failedStep}.\n\n**Error Output:**\n${errorOutput}\n\n[View Workflow Run](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`;
-          
-          if (!existingIssue) {
-            await github.rest.issues.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              title: title,
-              body: body,
-              labels: ['build-failure', 'bug']
-            });
-          } else {
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: existingIssue.number,
-              body: `Another failure detected in commit ${context.sha} during ${failedStep}.\n\n**Error Output:**\n${errorOutput}\n\n[View Workflow Run](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`
-            });
+      - name: Record start time
+        id: start_time
+        run: echo "timestamp=$(date +%s)" >> $GITHUB_OUTPUT
+
+      - name: Checkout main branch
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      # ============================================================
+      # BUILD PHASE
+      # ============================================================
+
+      - name: Install dependencies
+        id: install
+        run: |
+          echo "install_status=success" >> $GITHUB_OUTPUT
+          npm ci 2>&1 | tee install-output.txt || {
+            echo "install_status=failure" >> $GITHUB_OUTPUT
+            exit 1
           }
-      env:
-        ERROR_OUTPUT: ${{ steps.install.outputs.error_output || steps.build.outputs.error_output }}
-        INSTALL_STATUS: ${{ steps.install.outputs.install_status }}
-        BUILD_STATUS: ${{ steps.build.outputs.build_status }}
+
+      - name: Build project
+        id: build
+        if: steps.install.outputs.install_status == 'success'
+        run: |
+          echo "build_status=success" >> $GITHUB_OUTPUT
+          npm run build 2>&1 | tee build-output.txt || {
+            echo "build_status=failure" >> $GITHUB_OUTPUT
+            exit 1
+          }
+        env:
+          NODE_ENV: production
+
+      # ============================================================
+      # TESTING PHASE
+      # ============================================================
+
+      - name: Run linter
+        id: lint
+        if: steps.build.outputs.build_status == 'success'
+        continue-on-error: true
+        run: |
+          npm run test:lint 2>&1 | tee lint-output.txt
+          EXIT_CODE=${PIPESTATUS[0]}
+          
+          if [ $EXIT_CODE -eq 0 ]; then
+            echo "lint_status=passed" >> $GITHUB_OUTPUT
+            echo "lint_errors=0" >> $GITHUB_OUTPUT
+            echo "lint_warnings=0" >> $GITHUB_OUTPUT
+          else
+            echo "lint_status=failed" >> $GITHUB_OUTPUT
+            ERRORS=$(grep -E '^\s+[0-9]+:[0-9]+\s+error\s+' lint-output.txt | wc -l || echo "0")
+            WARNINGS=$(grep -E '^\s+[0-9]+:[0-9]+\s+warning\s+' lint-output.txt | wc -l || echo "0")
+            echo "lint_errors=${ERRORS:-0}" >> $GITHUB_OUTPUT
+            echo "lint_warnings=${WARNINGS:-0}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Run unit tests
+        id: unit_tests
+        if: steps.build.outputs.build_status == 'success'
+        continue-on-error: true
+        run: |
+          npm run test:unit 2>&1 | tee unit-test-output.txt
+          EXIT_CODE=${PIPESTATUS[0]}
+          
+          if [ $EXIT_CODE -eq 0 ]; then
+            echo "unit_status=passed" >> $GITHUB_OUTPUT
+          else
+            echo "unit_status=failed" >> $GITHUB_OUTPUT
+          fi
+          
+          TOTAL=$(grep -oP '\d+(?= tests?)' unit-test-output.txt | head -1)
+          PASSED=$(grep -oP '\d+(?= passed)' unit-test-output.txt | head -1)
+          FAILED=$(grep -oP '\d+(?= failed)' unit-test-output.txt | head -1)
+          SKIPPED=$(grep -oP '\d+(?= skipped)' unit-test-output.txt | head -1)
+          
+          echo "unit_total=${TOTAL:-0}" >> $GITHUB_OUTPUT
+          echo "unit_passed=${PASSED:-0}" >> $GITHUB_OUTPUT
+          echo "unit_failed=${FAILED:-0}" >> $GITHUB_OUTPUT
+          echo "unit_skipped=${SKIPPED:-0}" >> $GITHUB_OUTPUT
+
+      - name: Run integration tests
+        id: integration_tests
+        if: steps.build.outputs.build_status == 'success'
+        continue-on-error: true
+        run: |
+          npm run test:integration 2>&1 | tee integration-test-output.txt
+          EXIT_CODE=${PIPESTATUS[0]}
+          
+          if [ $EXIT_CODE -eq 0 ]; then
+            echo "integration_status=passed" >> $GITHUB_OUTPUT
+          else
+            echo "integration_status=failed" >> $GITHUB_OUTPUT
+          fi
+          
+          TOTAL=$(grep -oP '\d+(?= tests?)' integration-test-output.txt | head -1)
+          PASSED=$(grep -oP '\d+(?= passed)' integration-test-output.txt | head -1)
+          FAILED=$(grep -oP '\d+(?= failed)' integration-test-output.txt | head -1)
+          SKIPPED=$(grep -oP '\d+(?= skipped)' integration-test-output.txt | head -1)
+          
+          echo "integration_total=${TOTAL:-0}" >> $GITHUB_OUTPUT
+          echo "integration_passed=${PASSED:-0}" >> $GITHUB_OUTPUT
+          echo "integration_failed=${FAILED:-0}" >> $GITHUB_OUTPUT
+          echo "integration_skipped=${SKIPPED:-0}" >> $GITHUB_OUTPUT
+
+      # ============================================================
+      # SCREENSHOT PHASE
+      # ============================================================
+
+      - name: Start HTTP server
+        if: steps.build.outputs.build_status == 'success'
+        run: |
+          npx http-server build -p 8080 &
+          echo $! > server.pid
+          for i in {1..30}; do
+            if curl -s http://localhost:8080 > /dev/null; then
+              echo "Server is ready!"
+              break
+            fi
+            echo "Waiting for server... ($i/30)"
+            sleep 1
+          done
+
+      - name: Install Playwright
+        if: steps.build.outputs.build_status == 'success'
+        run: |
+          npm install --save-dev @playwright/test@latest
+          npx playwright install --with-deps chromium
+
+      - name: Create Playwright config
+        if: steps.build.outputs.build_status == 'success'
+        run: |
+          cat > playwright.config.js << 'EOF'
+          const { defineConfig, devices } = require('@playwright/test');
+
+          module.exports = defineConfig({
+            testDir: '.',
+            timeout: 60000,
+            fullyParallel: false,
+            forbidOnly: !!process.env.CI,
+            retries: 2,
+            workers: 1,
+            reporter: 'list',
+            use: {
+              trace: 'retain-on-failure',
+              screenshot: 'only-on-failure',
+            },
+            projects: [
+              {
+                name: 'chromium',
+                use: { ...devices['Desktop Chrome'] },
+              },
+            ],
+          });
+          EOF
+
+      - name: Create screenshot test
+        if: steps.build.outputs.build_status == 'success'
+        run: |
+          cat > screenshot-test.spec.js << 'EOF'
+          const { test } = require('@playwright/test');
+
+          test.describe('Main Branch Screenshots', () => {
+            test('Stage and Sprites', async ({ page }) => {
+              await page.goto('http://localhost:8080/editor.html');
+              await page.waitForLoadState('networkidle');
+              await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
+              await page.waitForTimeout(5000);
+              
+              const stageWrapper = await page.locator('[class*="stage-and-target-wrapper"]').first();
+              if (await stageWrapper.count() > 0) {
+                await stageWrapper.screenshot({ path: 'screenshots/stage-sprites.png' });
+              } else {
+                await page.screenshot({ path: 'screenshots/stage-sprites.png', clip: { x: 0, y: 0, width: 600, height: 800 } });
+              }
+            });
+
+            test('Blocks Workspace', async ({ page }) => {
+              await page.goto('http://localhost:8080/editor.html');
+              await page.waitForLoadState('networkidle');
+              await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
+              await page.waitForTimeout(5000);
+              
+              const editorWrapper = await page.locator('[class*="editor-wrapper"]').first();
+              if (await editorWrapper.count() > 0) {
+                await editorWrapper.screenshot({ path: 'screenshots/blocks-workspace.png' });
+              } else {
+                await page.screenshot({ path: 'screenshots/blocks-workspace.png', fullPage: false });
+              }
+            });
+
+            test('Player View', async ({ page }) => {
+              await page.goto('http://localhost:8080/');
+              await page.waitForLoadState('networkidle');
+              await page.waitForTimeout(3000);
+              await page.screenshot({ path: 'screenshots/player-view.png', fullPage: true });
+            });
+
+            test('Editor Initial (Code Tab)', async ({ page }) => {
+              await page.goto('http://localhost:8080/editor.html');
+              await page.waitForLoadState('networkidle');
+              await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
+              await page.waitForTimeout(4000);
+              await page.screenshot({ path: 'screenshots/editor-initial.png', fullPage: true });
+            });
+
+            test('Code Tab (Known Issue: May show songs tab)', async ({ page }) => {
+              await page.goto('http://localhost:8080/editor.html');
+              await page.waitForLoadState('networkidle');
+              await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
+              await page.waitForTimeout(4000);
+              
+              const codeTab = await page.locator('[class*="react-tabs__tab"]:has-text("Code")').first();
+              if (await codeTab.count() > 0) {
+                await codeTab.click();
+                await page.waitForTimeout(2000);
+              }
+              
+              await page.screenshot({ path: 'screenshots/code-tab.png', fullPage: true });
+            });
+
+            test('Costumes Tab (Known Issue: May show songs tab)', async ({ page }) => {
+              await page.goto('http://localhost:8080/editor.html');
+              await page.waitForLoadState('networkidle');
+              await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
+              await page.waitForTimeout(4000);
+              
+              const costumesTab = await page.locator('[class*="react-tabs__tab"]:has-text("Costumes")').first();
+              if (await costumesTab.count() > 0) {
+                await costumesTab.click();
+                await page.waitForTimeout(2000);
+              }
+              
+              await page.screenshot({ path: 'screenshots/costumes-tab.png', fullPage: true });
+            });
+
+            test('Sounds Tab (Known Issue: Clicks on songs tab)', async ({ page }) => {
+              await page.goto('http://localhost:8080/editor.html');
+              await page.waitForLoadState('networkidle');
+              await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
+              await page.waitForTimeout(4000);
+              
+              const soundsTab = await page.locator('[class*="react-tabs__tab"]:has-text("Sounds")').first();
+              if (await soundsTab.count() > 0) {
+                await soundsTab.click();
+                await page.waitForTimeout(2000);
+              }
+              
+              await page.screenshot({ path: 'screenshots/sounds-tab.png', fullPage: true });
+            });
+          });
+          EOF
+
+      - name: Capture screenshots
+        id: screenshots
+        if: steps.build.outputs.build_status == 'success'
+        continue-on-error: true
+        run: |
+          mkdir -p screenshots
+          npx playwright test screenshot-test.spec.js --project=chromium 2>&1 | tee screenshot-output.txt
+          if [ $? -eq 0 ]; then
+            echo "screenshot_status=success" >> $GITHUB_OUTPUT
+          else
+            echo "screenshot_status=failed" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Stop HTTP server
+        if: always()
+        run: |
+          if [ -f server.pid ]; then
+            kill $(cat server.pid) || true
+            rm server.pid
+          fi
+
+      # ============================================================
+      # DASHBOARD GENERATION
+      # ============================================================
+
+      - name: Calculate duration
+        id: duration
+        if: always()
+        run: |
+          END_TIME=$(date +%s)
+          START_TIME=${{ steps.start_time.outputs.timestamp }}
+          DURATION=$((END_TIME - START_TIME))
+          MINUTES=$((DURATION / 60))
+          SECONDS=$((DURATION % 60))
+          echo "duration=${MINUTES}m ${SECONDS}s" >> $GITHUB_OUTPUT
+          echo "duration_seconds=${DURATION}" >> $GITHUB_OUTPUT
+
+      - name: Generate HTML dashboard
+        if: always()
+        run: |
+          mkdir -p dashboard
+          
+          # Copy screenshots to dashboard
+          if [ -d "screenshots" ]; then
+            cp -r screenshots dashboard/
+          fi
+          
+          cat > dashboard/index.html << 'HTMLEOF'
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Main Branch Test Dashboard - OmniBlocks</title>
+            <style>
+              * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+              }
+              
+              body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: #333;
+                line-height: 1.6;
+                min-height: 100vh;
+                padding: 20px;
+              }
+              
+              .container {
+                max-width: 1400px;
+                margin: 0 auto;
+                background: white;
+                border-radius: 20px;
+                box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+                overflow: hidden;
+              }
+              
+              header {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                padding: 40px;
+                text-align: center;
+              }
+              
+              header h1 {
+                font-size: 2.5em;
+                margin-bottom: 10px;
+                text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+              }
+              
+              header .meta {
+                opacity: 0.9;
+                font-size: 1.1em;
+              }
+              
+              .content {
+                padding: 40px;
+              }
+              
+              .status-overview {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 20px;
+                margin-bottom: 40px;
+              }
+              
+              .status-card {
+                background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+                border-radius: 15px;
+                padding: 25px;
+                text-align: center;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+                transition: transform 0.3s ease;
+              }
+              
+              .status-card:hover {
+                transform: translateY(-5px);
+              }
+              
+              .status-card.success {
+                background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+              }
+              
+              .status-card.warning {
+                background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+              }
+              
+              .status-card.error {
+                background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+              }
+              
+              .status-card .icon {
+                font-size: 3em;
+                margin-bottom: 10px;
+              }
+              
+              .status-card .title {
+                font-size: 0.9em;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                opacity: 0.8;
+                margin-bottom: 5px;
+              }
+              
+              .status-card .value {
+                font-size: 2em;
+                font-weight: bold;
+              }
+              
+              section {
+                margin-bottom: 40px;
+              }
+              
+              section h2 {
+                font-size: 2em;
+                margin-bottom: 20px;
+                color: #667eea;
+                border-bottom: 3px solid #667eea;
+                padding-bottom: 10px;
+              }
+              
+              .test-results {
+                display: grid;
+                gap: 20px;
+              }
+              
+              .test-group {
+                background: #f8f9fa;
+                border-radius: 10px;
+                padding: 20px;
+                border-left: 5px solid #667eea;
+              }
+              
+              .test-group h3 {
+                margin-bottom: 15px;
+                color: #555;
+              }
+              
+              .test-stats {
+                display: flex;
+                gap: 20px;
+                flex-wrap: wrap;
+              }
+              
+              .test-stat {
+                flex: 1;
+                min-width: 150px;
+                padding: 15px;
+                background: white;
+                border-radius: 8px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+              }
+              
+              .test-stat .label {
+                font-size: 0.85em;
+                color: #666;
+                margin-bottom: 5px;
+              }
+              
+              .test-stat .value {
+                font-size: 1.8em;
+                font-weight: bold;
+                color: #333;
+              }
+              
+              .screenshots-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+                gap: 30px;
+              }
+              
+              .screenshot-card {
+                background: #f8f9fa;
+                border-radius: 10px;
+                padding: 20px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+              }
+              
+              .screenshot-card h3 {
+                margin-bottom: 15px;
+                color: #555;
+              }
+              
+              .screenshot-card img {
+                width: 100%;
+                border-radius: 8px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+                cursor: pointer;
+                transition: transform 0.3s ease;
+              }
+              
+              .screenshot-card img:hover {
+                transform: scale(1.02);
+              }
+              
+              .screenshot-card .note {
+                margin-top: 10px;
+                padding: 10px;
+                background: #fff3cd;
+                border-left: 4px solid #ffc107;
+                border-radius: 5px;
+                font-size: 0.9em;
+                color: #856404;
+              }
+              
+              .log-viewer {
+                background: #1e1e1e;
+                color: #d4d4d4;
+                border-radius: 10px;
+                padding: 20px;
+                font-family: 'Monaco', 'Courier New', monospace;
+                font-size: 0.9em;
+                max-height: 500px;
+                overflow-y: auto;
+                line-height: 1.5;
+              }
+              
+              .log-viewer pre {
+                white-space: pre-wrap;
+                word-wrap: break-word;
+              }
+              
+              .tabs {
+                display: flex;
+                gap: 10px;
+                margin-bottom: 20px;
+                border-bottom: 2px solid #e0e0e0;
+              }
+              
+              .tab {
+                padding: 12px 24px;
+                cursor: pointer;
+                border: none;
+                background: none;
+                font-size: 1em;
+                color: #666;
+                border-bottom: 3px solid transparent;
+                transition: all 0.3s ease;
+              }
+              
+              .tab:hover {
+                color: #667eea;
+              }
+              
+              .tab.active {
+                color: #667eea;
+                border-bottom-color: #667eea;
+                font-weight: bold;
+              }
+              
+              .tab-content {
+                display: none;
+              }
+              
+              .tab-content.active {
+                display: block;
+              }
+              
+              footer {
+                background: #f8f9fa;
+                padding: 30px;
+                text-align: center;
+                color: #666;
+                border-top: 1px solid #e0e0e0;
+              }
+              
+              .modal {
+                display: none;
+                position: fixed;
+                z-index: 1000;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0,0,0,0.9);
+              }
+              
+              .modal-content {
+                margin: 2% auto;
+                display: block;
+                max-width: 90%;
+                max-height: 90%;
+              }
+              
+              .close {
+                position: absolute;
+                top: 30px;
+                right: 50px;
+                color: #f1f1f1;
+                font-size: 50px;
+                font-weight: bold;
+                cursor: pointer;
+              }
+              
+              .close:hover {
+                color: #bbb;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="container">
+              <header>
+                <h1>🚀 Main Branch Test Dashboard</h1>
+                <div class="meta">
+                  <strong>Commit:</strong> COMMIT_SHA_PLACEHOLDER<br>
+                  <strong>Date:</strong> DATE_PLACEHOLDER<br>
+                  <strong>Duration:</strong> DURATION_PLACEHOLDER
+                </div>
+              </header>
+              
+              <div class="content">
+                <!-- Status Overview -->
+                <div class="status-overview">
+                  <div class="status-card BUILD_STATUS_CLASS">
+                    <div class="icon">BUILD_ICON</div>
+                    <div class="title">Build</div>
+                    <div class="value">BUILD_STATUS</div>
+                  </div>
+                  <div class="status-card LINT_STATUS_CLASS">
+                    <div class="icon">LINT_ICON</div>
+                    <div class="title">Lint</div>
+                    <div class="value">LINT_STATUS</div>
+                  </div>
+                  <div class="status-card UNIT_STATUS_CLASS">
+                    <div class="icon">UNIT_ICON</div>
+                    <div class="title">Unit Tests</div>
+                    <div class="value">UNIT_STATUS</div>
+                  </div>
+                  <div class="status-card INTEGRATION_STATUS_CLASS">
+                    <div class="icon">INTEGRATION_ICON</div>
+                    <div class="title">Integration</div>
+                    <div class="value">INTEGRATION_STATUS</div>
+                  </div>
+                  <div class="status-card SCREENSHOT_STATUS_CLASS">
+                    <div class="icon">SCREENSHOT_ICON</div>
+                    <div class="title">Screenshots</div>
+                    <div class="value">SCREENSHOT_STATUS</div>
+                  </div>
+                </div>
+                
+                <!-- Test Results -->
+                <section>
+                  <h2>📊 Test Results</h2>
+                  <div class="test-results">
+                    <div class="test-group">
+                      <h3>🔍 ESLint</h3>
+                      <div class="test-stats">
+                        <div class="test-stat">
+                          <div class="label">Status</div>
+                          <div class="value">LINT_RESULT</div>
+                        </div>
+                        <div class="test-stat">
+                          <div class="label">Errors</div>
+                          <div class="value" style="color: #dc3545;">LINT_ERRORS</div>
+                        </div>
+                        <div class="test-stat">
+                          <div class="label">Warnings</div>
+                          <div class="value" style="color: #ffc107;">LINT_WARNINGS</div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div class="test-group">
+                      <h3>🧪 Unit Tests</h3>
+                      <div class="test-stats">
+                        <div class="test-stat">
+                          <div class="label">Total</div>
+                          <div class="value">UNIT_TOTAL</div>
+                        </div>
+                        <div class="test-stat">
+                          <div class="label">Passed</div>
+                          <div class="value" style="color: #28a745;">UNIT_PASSED</div>
+                        </div>
+                        <div class="test-stat">
+                          <div class="label">Failed</div>
+                          <div class="value" style="color: #dc3545;">UNIT_FAILED</div>
+                        </div>
+                        <div class="test-stat">
+                          <div class="label">Skipped</div>
+                          <div class="value" style="color: #6c757d;">UNIT_SKIPPED</div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div class="test-group">
+                      <h3>🔗 Integration Tests</h3>
+                      <div class="test-stats">
+                        <div class="test-stat">
+                          <div class="label">Total</div>
+                          <div class="value">INTEGRATION_TOTAL</div>
+                        </div>
+                        <div class="test-stat">
+                          <div class="label">Passed</div>
+                          <div class="value" style="color: #28a745;">INTEGRATION_PASSED</div>
+                        </div>
+                        <div class="test-stat">
+                          <div class="label">Failed</div>
+                          <div class="value" style="color: #dc3545;">INTEGRATION_FAILED</div>
+                        </div>
+                        <div class="test-stat">
+                          <div class="label">Skipped</div>
+                          <div class="value" style="color: #6c757d;">INTEGRATION_SKIPPED</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+                
+                <!-- Screenshots -->
+                <section>
+                  <h2>📸 Screenshots</h2>
+                  <div class="screenshots-grid">
+                    SCREENSHOTS_PLACEHOLDER
+                  </div>
+                </section>
+                
+                <!-- Logs -->
+                <section>
+                  <h2>📝 Logs</h2>
+                  <div class="tabs">
+                    <button class="tab active" onclick="showTab('install')">Install</button>
+                    <button class="tab" onclick="showTab('build')">Build</button>
+                    <button class="tab" onclick="showTab('lint')">Lint</button>
+                    <button class="tab" onclick="showTab('unit')">Unit Tests</button>
+                    <button class="tab" onclick="showTab('integration')">Integration Tests</button>
+                    <button class="tab" onclick="showTab('screenshots')">Screenshots</button>
+                  </div>
+                  
+                  <div id="install-tab" class="tab-content active">
+                    <div class="log-viewer">
+                      <pre>INSTALL_LOG</pre>
+                    </div>
+                  </div>
+                  
+                  <div id="build-tab" class="tab-content">
+                    <div class="log-viewer">
+                      <pre>BUILD_LOG</pre>
+                    </div>
+                  </div>
+                  
+                  <div id="lint-tab" class="tab-content">
+                    <div class="log-viewer">
+                      <pre>LINT_LOG</pre>
+                    </div>
+                  </div>
+                  
+                  <div id="unit-tab" class="tab-content">
+                    <div class="log-viewer">
+                      <pre>UNIT_LOG</pre>
+                    </div>
+                  </div>
+                  
+                  <div id="integration-tab" class="tab-content">
+                    <div class="log-viewer">
+                      <pre>INTEGRATION_LOG</pre>
+                    </div>
+                  </div>
+                  
+                  <div id="screenshots-tab" class="tab-content">
+                    <div class="log-viewer">
+                      <pre>SCREENSHOT_LOG</pre>
+                    </div>
+                  </div>
+                </section>
+              </div>
+              
+              <footer>
+                <p><strong>OmniBlocks Main Branch Testing</strong></p>
+                <p>Generated automatically by GitHub Actions</p>
+                <p><a href="https://github.com/REPO_PLACEHOLDER/actions/runs/RUN_ID_PLACEHOLDER" style="color: #667eea;">View Workflow Run</a></p>
+              </footer>
+            </div>
+            
+            <!-- Image Modal -->
+            <div id="imageModal" class="modal" onclick="this.style.display='none'">
+              <span class="close">&times;</span>
+              <img class="modal-content" id="modalImage">
+            </div>
+            
+            <script>
+              function showTab(tabName) {
+                // Hide all tabs
+                document.querySelectorAll('.tab-content').forEach(tab => {
+                  tab.classList.remove('active');
+                });
+                document.querySelectorAll('.tab').forEach(btn => {
+                  btn.classList.remove('active');
+                });
+                
+                // Show selected tab
+                document.getElementById(tabName + '-tab').classList.add('active');
+                event.target.classList.add('active');
+              }
+              
+              // Image modal functionality
+              document.querySelectorAll('.screenshot-card img').forEach(img => {
+                img.onclick = function() {
+                  document.getElementById('imageModal').style.display = 'block';
+                  document.getElementById('modalImage').src = this.src;
+                };
+              });
+            </script>
+          </body>
+          </html>
+          HTMLEOF
+
+          # Replace placeholders with actual values
+          COMMIT_SHA=$(git rev-parse --short HEAD)
+          DATE=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          DURATION="${{ steps.duration.outputs.duration }}"
+          
+          # Build status
+          if [ "${{ steps.build.outputs.build_status }}" == "success" ]; then
+            BUILD_STATUS="✅ Passed"
+            BUILD_STATUS_CLASS="success"
+            BUILD_ICON="✅"
+          else
+            BUILD_STATUS="❌ Failed"
+            BUILD_STATUS_CLASS="error"
+            BUILD_ICON="❌"
+          fi
+          
+          # Lint status
+          if [ "${{ steps.lint.outputs.lint_status }}" == "passed" ]; then
+            LINT_STATUS="✅ Passed"
+            LINT_STATUS_CLASS="success"
+            LINT_ICON="✅"
+            LINT_RESULT="Passed"
+          else
+            LINT_STATUS="❌ Failed"
+            LINT_STATUS_CLASS="error"
+            LINT_ICON="❌"
+            LINT_RESULT="Failed"
+          fi
+          
+          # Unit test status
+          if [ "${{ steps.unit_tests.outputs.unit_status }}" == "passed" ]; then
+            UNIT_STATUS="✅ Passed"
+            UNIT_STATUS_CLASS="success"
+            UNIT_ICON="✅"
+          else
+            UNIT_STATUS="❌ Failed"
+            UNIT_STATUS_CLASS="error"
+            UNIT_ICON="❌"
+          fi
+          
+          # Integration test status
+          if [ "${{ steps.integration_tests.outputs.integration_status }}" == "passed" ]; then
+            INTEGRATION_STATUS="✅ Passed"
+            INTEGRATION_STATUS_CLASS="success"
+            INTEGRATION_ICON="✅"
+          else
+            INTEGRATION_STATUS="❌ Failed"
+            INTEGRATION_STATUS_CLASS="error"
+            INTEGRATION_ICON="❌"
+          fi
+          
+          # Screenshot status
+          if [ "${{ steps.screenshots.outputs.screenshot_status }}" == "success" ]; then
+            SCREENSHOT_STATUS="✅ Done"
+            SCREENSHOT_STATUS_CLASS="success"
+            SCREENSHOT_ICON="📸"
+          else
+            SCREENSHOT_STATUS="⚠️ Issues"
+            SCREENSHOT_STATUS_CLASS="warning"
+            SCREENSHOT_ICON="⚠️"
+          fi
+          
+          # Generate screenshots HTML
+          SCREENSHOTS_HTML=""
+          if [ -d "screenshots" ]; then
+            for screenshot in screenshots/*.png; do
+              if [ -f "$screenshot" ]; then
+                filename=$(basename "$screenshot")
+                name=$(echo "$filename" | sed 's/-/ /g' | sed 's/.png//' | sed 's/\b\w/\U&/g')
+                
+                NOTE=""
+                if [[ "$filename" == "sounds-tab.png" ]]; then
+                  NOTE='<div class="note">⚠️ Known Issue: This tab may display the songs tab instead</div>'
+                elif [[ "$filename" == "code-tab.png" ]] || [[ "$filename" == "costumes-tab.png" ]]; then
+                  NOTE='<div class="note">⚠️ Known Issue: May show songs tab</div>'
+                elif [[ "$filename" == "editor-initial.png" ]]; then
+                  NOTE='<div class="note">ℹ️ Note: Shows code tab (redundant with code-tab)</div>'
+                fi
+                
+                SCREENSHOTS_HTML="$SCREENSHOTS_HTML
+                <div class=\"screenshot-card\">
+                  <h3>$name</h3>
+                  <img src=\"screenshots/$filename\" alt=\"$name\">
+                  $NOTE
+                </div>"
+              fi
+            done
+          else
+            SCREENSHOTS_HTML='<p>No screenshots available</p>'
+          fi
+          
+          # Read log files
+          INSTALL_LOG=$(cat install-output.txt 2>/dev/null || echo "No install log available")
+          BUILD_LOG=$(cat build-output.txt 2>/dev/null || echo "No build log available")
+          LINT_LOG=$(cat lint-output.txt 2>/dev/null || echo "No lint log available")
+          UNIT_LOG=$(cat unit-test-output.txt 2>/dev/null || echo "No unit test log available")
+          INTEGRATION_LOG=$(cat integration-test-output.txt 2>/dev/null || echo "No integration test log available")
+          SCREENSHOT_LOG=$(cat screenshot-output.txt 2>/dev/null || echo "No screenshot log available")
+          
+          # Escape special characters for sed
+          INSTALL_LOG_ESCAPED=$(echo "$INSTALL_LOG" | sed 's/[&/\]/\\&/g' | sed ':a;N;$!ba;s/\n/\\n/g')
+          BUILD_LOG_ESCAPED=$(echo "$BUILD_LOG" | sed 's/[&/\]/\\&/g' | sed ':a;N;$!ba;s/\n/\\n/g')
+          LINT_LOG_ESCAPED=$(echo "$LINT_LOG" | sed 's/[&/\]/\\&/g' | sed ':a;N;$!ba;s/\n/\\n/g')
+          UNIT_LOG_ESCAPED=$(echo "$UNIT_LOG" | sed 's/[&/\]/\\&/g' | sed ':a;N;$!ba;s/\n/\\n/g')
+          INTEGRATION_LOG_ESCAPED=$(echo "$INTEGRATION_LOG" | sed 's/[&/\]/\\&/g' | sed ':a;N;$!ba;s/\n/\\n/g')
+          SCREENSHOT_LOG_ESCAPED=$(echo "$SCREENSHOT_LOG" | sed 's/[&/\]/\\&/g' | sed ':a;N;$!ba;s/\n/\\n/g')
+          
+          # Replace all placeholders using perl for better handling of multiline content
+          perl -i -pe "s|COMMIT_SHA_PLACEHOLDER|$COMMIT_SHA|g" dashboard/index.html
+          perl -i -pe "s|DATE_PLACEHOLDER|$DATE|g" dashboard/index.html
+          perl -i -pe "s|DURATION_PLACEHOLDER|$DURATION|g" dashboard/index.html
+          perl -i -pe "s|BUILD_STATUS_CLASS|$BUILD_STATUS_CLASS|g" dashboard/index.html
+          perl -i -pe "s|BUILD_ICON|$BUILD_ICON|g" dashboard/index.html
+          perl -i -pe "s|BUILD_STATUS|$BUILD_STATUS|g" dashboard/index.html
+          perl -i -pe "s|LINT_STATUS_CLASS|$LINT_STATUS_CLASS|g" dashboard/index.html
+          perl -i -pe "s|LINT_ICON|$LINT_ICON|g" dashboard/index.html
+          perl -i -pe "s|LINT_STATUS|$LINT_STATUS|g" dashboard/index.html
+          perl -i -pe "s|LINT_RESULT|$LINT_RESULT|g" dashboard/index.html
+          perl -i -pe "s|LINT_ERRORS|${{ steps.lint.outputs.lint_errors }}|g" dashboard/index.html
+          perl -i -pe "s|LINT_WARNINGS|${{ steps.lint.outputs.lint_warnings }}|g" dashboard/index.html
+          perl -i -pe "s|UNIT_STATUS_CLASS|$UNIT_STATUS_CLASS|g" dashboard/index.html
+          perl -i -pe "s|UNIT_ICON|$UNIT_ICON|g" dashboard/index.html
+          perl -i -pe "s|UNIT_STATUS|$UNIT_STATUS|g" dashboard/index.html
+          perl -i -pe "s|UNIT_TOTAL|${{ steps.unit_tests.outputs.unit_total }}|g" dashboard/index.html
+          perl -i -pe "s|UNIT_PASSED|${{ steps.unit_tests.outputs.unit_passed }}|g" dashboard/index.html
+          perl -i -pe "s|UNIT_FAILED|${{ steps.unit_tests.outputs.unit_failed }}|g" dashboard/index.html
+          perl -i -pe "s|UNIT_SKIPPED|${{ steps.unit_tests.outputs.unit_skipped }}|g" dashboard/index.html
+          perl -i -pe "s|INTEGRATION_STATUS_CLASS|$INTEGRATION_STATUS_CLASS|g" dashboard/index.html
+          perl -i -pe "s|INTEGRATION_ICON|$INTEGRATION_ICON|g" dashboard/index.html
+          perl -i -pe "s|INTEGRATION_STATUS|$INTEGRATION_STATUS|g" dashboard/index.html
+          perl -i -pe "s|INTEGRATION_TOTAL|${{ steps.integration_tests.outputs.integration_total }}|g" dashboard/index.html
+          perl -i -pe "s|INTEGRATION_PASSED|${{ steps.integration_tests.outputs.integration_passed }}|g" dashboard/index.html
+          perl -i -pe "s|INTEGRATION_FAILED|${{ steps.integration_tests.outputs.integration_failed }}|g" dashboard/index.html
+          perl -i -pe "s|INTEGRATION_SKIPPED|${{ steps.integration_tests.outputs.integration_skipped }}|g" dashboard/index.html
+          perl -i -pe "s|SCREENSHOT_STATUS_CLASS|$SCREENSHOT_STATUS_CLASS|g" dashboard/index.html
+          perl -i -pe "s|SCREENSHOT_ICON|$SCREENSHOT_ICON|g" dashboard/index.html
+          perl -i -pe "s|SCREENSHOT_STATUS|$SCREENSHOT_STATUS|g" dashboard/index.html
+          perl -i -pe "s|SCREENSHOTS_PLACEHOLDER|$SCREENSHOTS_HTML|g" dashboard/index.html
+          perl -i -pe "s|REPO_PLACEHOLDER|${{ github.repository }}|g" dashboard/index.html
+          perl -i -pe "s|RUN_ID_PLACEHOLDER|${{ github.run_id }}|g" dashboard/index.html
+          
+          # Replace logs (this is tricky with multiline, using a temp file approach)
+          python3 << PYEOF
+          import html
+          
+          with open('dashboard/index.html', 'r') as f:
+              content = f.read()
+          
+          install_log = open('install-output.txt', 'r').read() if open('install-output.txt', 'r') else 'No install log available'
+          build_log = open('build-output.txt', 'r').read() if open('build-output.txt', 'r') else 'No build log available'
+          lint_log = open('lint-output.txt', 'r').read() if open('lint-output.txt', 'r') else 'No lint log available'
+          unit_log = open('unit-test-output.txt', 'r').read() if open('unit-test-output.txt', 'r') else 'No unit test log available'
+          integration_log = open('integration-test-output.txt', 'r').read() if open('integration-test-output.txt', 'r') else 'No integration test log available'
+          screenshot_log = open('screenshot-output.txt', 'r').read() if open('screenshot-output.txt', 'r') else 'No screenshot log available'
+          
+          content = content.replace('INSTALL_LOG', html.escape(install_log))
+          content = content.replace('BUILD_LOG', html.escape(build_log))
+          content = content.replace('LINT_LOG', html.escape(lint_log))
+          content = content.replace('UNIT_LOG', html.escape(unit_log))
+          content = content.replace('INTEGRATION_LOG', html.escape(integration_log))
+          content = content.replace('SCREENSHOT_LOG', html.escape(screenshot_log))
+          
+          with open('dashboard/index.html', 'w') as f:
+              f.write(content)
+          PYEOF
+
+      # ============================================================
+      # DEPLOY TO GH-PAGES
+      # ============================================================
+
+      - name: Checkout gh-pages branch
+        if: always()
+        id: checkout_gh_pages
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: gh-pages
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+        continue-on-error: true
+
+      - name: Create gh-pages branch if not exists
+        if: always() && steps.checkout_gh_pages.outcome == 'failure'
+        run: |
+          mkdir -p gh-pages
+          cd gh-pages
+          git init -b gh-pages
+          git remote add origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+
+      - name: Sync dashboard to gh-pages/tests
+        if: always()
+        run: |
+          # Create tests directory structure with timestamp
+          TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+          TEST_DIR="gh-pages/tests/$TIMESTAMP"
+          mkdir -p "$TEST_DIR"
+          
+          # Copy dashboard files
+          cp -r dashboard/* "$TEST_DIR/"
+          
+          # Create/update latest symlink
+          cd gh-pages/tests
+          rm -f latest
+          ln -s "$TIMESTAMP" latest
+          
+          # Create index page for tests directory
+          cat > index.html << 'INDEXEOF'
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Test Results - OmniBlocks</title>
+            <style>
+              body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                padding: 40px;
+                text-align: center;
+              }
+              .container {
+                max-width: 800px;
+                margin: 0 auto;
+                background: rgba(255,255,255,0.1);
+                backdrop-filter: blur(10px);
+                border-radius: 20px;
+                padding: 40px;
+                box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+              }
+              h1 {
+                font-size: 3em;
+                margin-bottom: 20px;
+              }
+              .button {
+                display: inline-block;
+                padding: 15px 40px;
+                margin: 10px;
+                background: white;
+                color: #667eea;
+                text-decoration: none;
+                border-radius: 50px;
+                font-weight: bold;
+                font-size: 1.1em;
+                transition: transform 0.3s ease, box-shadow 0.3s ease;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+              }
+              .button:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+              }
+              .note {
+                margin-top: 30px;
+                opacity: 0.8;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="container">
+              <h1>🚀 OmniBlocks</h1>
+              <h2>Main Branch Test Results</h2>
+              <p>View the latest test results and screenshots</p>
+              <a href="latest/index.html" class="button">📊 View Latest Dashboard</a>
+              <p class="note">This page shows the most recent test results from the main branch</p>
+            </div>
+          </body>
+          </html>
+          INDEXEOF
+
+      - name: Commit and push to gh-pages
+        if: always()
+        run: |
+          cd gh-pages
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add .
+          if [ -n "$(git status --porcelain)" ]; then
+            git commit -m "Update main branch test results - $(date -u +"%Y-%m-%d %H:%M:%S UTC")"
+            git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+            git push origin gh-pages
+          else
+            echo "No changes to commit."
+          fi
+
+      # ============================================================
+      # CREATE ISSUE ON FAILURE
+      # ============================================================
+
+      - name: Create issue on failure
+        if: failure() || steps.build.outputs.build_status == 'failure' || steps.install.outputs.install_status == 'failure'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const sha = context.sha.substring(0, 7);
+            const timestamp = new Date().toISOString();
+            const duration = '${{ steps.duration.outputs.duration }}';
+            
+            // Determine what failed
+            let failedSteps = [];
+            if ('${{ steps.install.outputs.install_status }}' === 'failure') {
+              failedSteps.push('dependency installation');
+            }
+            if ('${{ steps.build.outputs.build_status }}' === 'failure') {
+              failedSteps.push('build');
+            }
+            if ('${{ steps.lint.outputs.lint_status }}' === 'failed') {
+              failedSteps.push('linting');
+            }
+            if ('${{ steps.unit_tests.outputs.unit_status }}' === 'failed') {
+              failedSteps.push('unit tests');
+            }
+            if ('${{ steps.integration_tests.outputs.integration_status }}' === 'failed') {
+              failedSteps.push('integration tests');
+            }
+            
+            const failedStep = failedSteps.join(', ') || 'unknown step';
+            
+            // Get error logs
+            let errorOutput = '';
+            try {
+              if (fs.existsSync('install-output.txt')) {
+                errorOutput += '### Install Output\n```\n' + fs.readFileSync('install-output.txt', 'utf8').slice(-2000) + '\n```\n\n';
+              }
+              if (fs.existsSync('build-output.txt')) {
+                errorOutput += '### Build Output\n```\n' + fs.readFileSync('build-output.txt', 'utf8').slice(-2000) + '\n```\n\n';
+              }
+              if (fs.existsSync('lint-output.txt')) {
+                errorOutput += '### Lint Output\n```\n' + fs.readFileSync('lint-output.txt', 'utf8').slice(-2000) + '\n```\n\n';
+              }
+              if (fs.existsSync('unit-test-output.txt')) {
+                errorOutput += '### Unit Test Output\n```\n' + fs.readFileSync('unit-test-output.txt', 'utf8').slice(-2000) + '\n```\n\n';
+              }
+              if (fs.existsSync('integration-test-output.txt')) {
+                errorOutput += '### Integration Test Output\n```\n' + fs.readFileSync('integration-test-output.txt', 'utf8').slice(-2000) + '\n```\n\n';
+              }
+            } catch (e) {
+              errorOutput = 'Error reading log files: ' + e.message;
+            }
+            
+            // Check for existing open issues
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'build-failure'
+            });
+            
+            const existingIssue = issues.find(issue => 
+              issue.title.includes('Main Branch Build/Test Failure')
+            );
+            
+            const baseUrl = `https://${context.repo.owner}.github.io/${context.repo.repo}`;
+            const dashboardUrl = `${baseUrl}/tests/latest/`;
+            
+            const title = `Main Branch Build/Test Failure - ${timestamp}`;
+            const body = `## 🚨 Main Branch Build/Test Failure\n\n` +
+              `The latest commit (\`${sha}\`) failed during **${failedStep}**.\n\n` +
+              `### 📊 Details\n` +
+              `- **Commit:** ${context.sha}\n` +
+              `- **Time:** ${timestamp}\n` +
+              `- **Duration:** ${duration}\n` +
+              `- **Failed Steps:** ${failedStep}\n\n` +
+              `### 📈 Dashboard\n` +
+              `View the full test dashboard: ${dashboardUrl}\n\n` +
+              `### 📝 Error Output (Last 2000 chars)\n` +
+              errorOutput + `\n\n` +
+              `### 🔗 Links\n` +
+              `- [Workflow Run](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})\n` +
+              `- [Full Dashboard](${dashboardUrl})\n` +
+              `- [Commit](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/commit/${context.sha})`;
+            
+            if (!existingIssue) {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: title,
+                body: body,
+                labels: ['build-failure', 'bug'],
+                assignees: ['supervoidcoder']
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existingIssue.number,
+                body: `## 🔄 Another Failure Detected\n\n` +
+                  `Commit \`${sha}\` also failed during **${failedStep}**.\n\n` +
+                  body
+              });
+            }

@@ -13,7 +13,6 @@ permissions:
 
 jobs:
   visual-regression:
-    # Skip for dependabot and only run on PRs or when comment contains '/vrt'
     if: >-
       (github.actor != 'dependabot[bot]') &&
       ((github.event_name == 'pull_request') ||
@@ -68,15 +67,13 @@ jobs:
               repo: context.repo.repo,
               issue_number: ${{ fromJSON(steps.pr.outputs.result).number }},
               body: `🎨 **Visual Regression Testing** requested by @${username}\n\n` +
-                    `⏳ Building and capturing screenshots...\n\n` +
-                    `This will compare visual changes between the base and PR branches.`
+                    `⏳ Building base and PR, then capturing screenshots...`
             });
             return comment.data.id;
 
       # ============================================================
       # BUILD BASE VERSION
       # ============================================================
-
       - name: Checkout base branch
         uses: actions/checkout@v4
         with:
@@ -106,19 +103,21 @@ jobs:
           npx http-server build -p 8080 &
           echo $! > ../base-server.pid
           for i in {1..30}; do
-            if curl -s http://localhost:8080 > /dev/null; then
+            if curl -fsS http://localhost:8080/ > /dev/null; then
               echo "Base server is ready!"
               break
             fi
-            echo "Waiting for base server... ($i/30)"
+            if [ $i -eq 30 ]; then
+              echo "Base server failed to start"
+              exit 1
+            fi
             sleep 1
           done
 
       # ============================================================
-      # CAPTURE BASE SCREENSHOTS
+      # PLAYWRIGHT TEST HARNESS (shared)
       # ============================================================
-
-      - name: Install Playwright
+      - name: Install Playwright in harness
         run: |
           npm init -y
           npm install --save-dev @playwright/test@latest
@@ -128,7 +127,6 @@ jobs:
         run: |
           cat > playwright.config.js << 'EOF'
           const { defineConfig, devices } = require('@playwright/test');
-
           module.exports = defineConfig({
             testDir: '.',
             timeout: 60000,
@@ -140,6 +138,7 @@ jobs:
             use: {
               trace: 'retain-on-failure',
               screenshot: 'only-on-failure',
+              viewport: { width: 1366, height: 900 }
             },
             projects: [
               {
@@ -150,29 +149,42 @@ jobs:
           });
           EOF
 
-      - name: Create Playwright test for base
+      - name: Create Playwright test (tab fix + songs)
         run: |
           cat > screenshot-test.spec.js << 'EOF'
-          const { test } = require('@playwright/test');
+          const { test, expect } = require('@playwright/test');
+
+          const PORT = process.env.PORT || '8080';
+          const BASE = `http://localhost:${PORT}`;
+
+          async function waitEditor(page) {
+            await page.waitForLoadState('networkidle');
+            await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
+            await page.waitForTimeout(1500);
+          }
+
+          async function clickTabByIndex(page, index) {
+            const tabList = page.locator('[role="tablist"]').first();
+            await expect(tabList).toBeVisible({ timeout: 10000 });
+            const tab = tabList.locator('[role="tab"]').nth(index);
+            await expect(tab).toBeVisible({ timeout: 5000 });
+            await tab.scrollIntoViewIfNeeded();
+            await tab.click({ trial: false });
+            await page.waitForTimeout(800);
+          }
 
           test.describe('Visual Regression Screenshots', () => {
             test('Editor - Initial Load', async ({ page }) => {
-              await page.goto('http://localhost:8080/editor.html');
-              await page.waitForLoadState('networkidle');
-              await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
-              await page.waitForTimeout(5000);
+              await page.goto(`${BASE}/editor.html`);
+              await waitEditor(page);
               await page.screenshot({ path: 'screenshots/editor-initial.png', fullPage: true });
             });
 
             test('Editor - Blocks Workspace', async ({ page }) => {
-              await page.goto('http://localhost:8080/editor.html');
-              await page.waitForLoadState('networkidle');
-              await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
-              await page.waitForTimeout(5000);
-              
-              // Focus on the editor workspace area
-              const editorWrapper = await page.locator('[class*="editor-wrapper"]').first();
-              if (await editorWrapper.count() > 0) {
+              await page.goto(`${BASE}/editor.html`);
+              await waitEditor(page);
+              const editorWrapper = page.locator('[class*="editor-wrapper"]').first();
+              if (await editorWrapper.count()) {
                 await editorWrapper.screenshot({ path: 'screenshots/blocks-workspace.png' });
               } else {
                 await page.screenshot({ path: 'screenshots/blocks-workspace.png', fullPage: false });
@@ -180,13 +192,10 @@ jobs:
             });
 
             test('Editor - Stage and Sprites', async ({ page }) => {
-              await page.goto('http://localhost:8080/editor.html');
-              await page.waitForLoadState('networkidle');
-              await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
-              await page.waitForTimeout(5000);
-              
-              const stageWrapper = await page.locator('[class*="stage-and-target-wrapper"]').first();
-              if (await stageWrapper.count() > 0) {
+              await page.goto(`${BASE}/editor.html`);
+              await waitEditor(page);
+              const stageWrapper = page.locator('[class*="stage-and-target-wrapper"]').first();
+              if (await stageWrapper.count()) {
                 await stageWrapper.screenshot({ path: 'screenshots/stage-sprites.png' });
               } else {
                 await page.screenshot({ path: 'screenshots/stage-sprites.png', clip: { x: 0, y: 0, width: 600, height: 800 } });
@@ -194,62 +203,45 @@ jobs:
             });
 
             test('Editor - Code Tab', async ({ page }) => {
-              await page.goto('http://localhost:8080/editor.html');
-              await page.waitForLoadState('networkidle');
-              await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
-              await page.waitForTimeout(4000);
-              
-              // Try to find and click Code tab
-              const codeTab = await page.locator('[class*="react-tabs__tab"]:has-text("Code")').first();
-              if (await codeTab.count() > 0) {
-                await codeTab.click();
-                await page.waitForTimeout(2000);
-              }
-              
+              await page.goto(`${BASE}/editor.html`);
+              await waitEditor(page);
+              await clickTabByIndex(page, 0); // Code
               await page.screenshot({ path: 'screenshots/code-tab.png', fullPage: true });
             });
 
             test('Editor - Costumes Tab', async ({ page }) => {
-              await page.goto('http://localhost:8080/editor.html');
-              await page.waitForLoadState('networkidle');
-              await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
-              await page.waitForTimeout(4000);
-              
-              // Try to find and click Costumes tab
-              const costumesTab = await page.locator('[class*="react-tabs__tab"]:has-text("Costumes")').first();
-              if (await costumesTab.count() > 0) {
-                await costumesTab.click();
-                await page.waitForTimeout(2000);
-              }
-              
+              await page.goto(`${BASE}/editor.html`);
+              await waitEditor(page);
+              await clickTabByIndex(page, 1); // Costumes
               await page.screenshot({ path: 'screenshots/costumes-tab.png', fullPage: true });
             });
 
             test('Editor - Sounds Tab', async ({ page }) => {
-              await page.goto('http://localhost:8080/editor.html');
-              await page.waitForLoadState('networkidle');
-              await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
-              await page.waitForTimeout(4000);
-              
-              // Try to find and click Sounds tab
-              const soundsTab = await page.locator('[class*="react-tabs__tab"]:has-text("Sounds")').first();
-              if (await soundsTab.count() > 0) {
-                await soundsTab.click();
-                await page.waitForTimeout(2000);
-              }
-              
+              await page.goto(`${BASE}/editor.html`);
+              await waitEditor(page);
+              await clickTabByIndex(page, 2); // Sounds
               await page.screenshot({ path: 'screenshots/sounds-tab.png', fullPage: true });
             });
 
+            test('Editor - Songs Tab', async ({ page }) => {
+              await page.goto(`${BASE}/editor.html`);
+              await waitEditor(page);
+              await clickTabByIndex(page, 3); // Songs
+              await page.screenshot({ path: 'screenshots/songs-tab.png', fullPage: true });
+            });
+
             test('Player View - For Comparison', async ({ page }) => {
-              await page.goto('http://localhost:8080/');
+              await page.goto(`${BASE}/`);
               await page.waitForLoadState('networkidle');
-              await page.waitForTimeout(3000);
+              await page.waitForTimeout(1000);
               await page.screenshot({ path: 'screenshots/player-view.png', fullPage: true });
             });
           });
           EOF
 
+      # ============================================================
+      # CAPTURE BASE SCREENSHOTS
+      # ============================================================
       - name: Capture base screenshots
         run: |
           mkdir -p screenshots-base
@@ -267,7 +259,6 @@ jobs:
       # ============================================================
       # BUILD PR VERSION
       # ============================================================
-
       - name: Checkout PR branch
         uses: actions/checkout@v4
         with:
@@ -290,23 +281,23 @@ jobs:
           npx http-server build -p 8081 &
           echo $! > ../pr-server.pid
           for i in {1..30}; do
-            if curl -s http://localhost:8081 > /dev/null; then
+            if curl -fsS http://localhost:8081/ > /dev/null; then
               echo "PR server is ready!"
               break
             fi
-            echo "Waiting for PR server... ($i/30)"
+            if [ $i -eq 30 ]; then
+              echo "PR server failed to start"
+              exit 1
+            fi
             sleep 1
           done
 
       # ============================================================
       # CAPTURE PR SCREENSHOTS & COMPARE
       # ============================================================
-
-      - name: Update test for PR port
-        run: |
-          sed -i 's/localhost:8080/localhost:8081/g' screenshot-test.spec.js
-
       - name: Capture PR screenshots
+        env:
+          PORT: '8081'
         run: |
           mkdir -p screenshots-pr
           npx playwright test screenshot-test.spec.js --project=chromium
@@ -323,7 +314,7 @@ jobs:
       - name: Compare screenshots
         id: compare
         run: |
-          npm install --save-dev pixelmatch pngjs
+          npm install --save-dev pixelmatch pngjs jq
           
           cat > compare.js << 'EOF'
           const fs = require('fs');
@@ -337,6 +328,7 @@ jobs:
             'code-tab.png',
             'costumes-tab.png',
             'sounds-tab.png',
+            'songs-tab.png',
             'player-view.png'
           ];
 
@@ -349,10 +341,7 @@ jobs:
 
             if (!fs.existsSync(basePath) || !fs.existsSync(prPath)) {
               console.log(`Skipping ${screenshot} - file not found`);
-              results.push({
-                name: screenshot,
-                skipped: true
-              });
+              results.push({ name: screenshot, skipped: true });
               continue;
             }
 
@@ -376,23 +365,10 @@ jobs:
             if (numDiffPixels > 0) {
               changesDetected = true;
               fs.mkdirSync('screenshots-diff', { recursive: true });
-              fs.writeFileSync(
-                `screenshots-diff/${screenshot}`,
-                PNG.sync.write(diff)
-              );
-              results.push({
-                name: screenshot,
-                diffPixels: numDiffPixels,
-                diffPercentage: diffPercentage,
-                hasDiff: true
-              });
+              fs.writeFileSync(`screenshots-diff/${screenshot}`, PNG.sync.write(diff));
+              results.push({ name: screenshot, diffPixels: numDiffPixels, diffPercentage, hasDiff: true });
             } else {
-              results.push({
-                name: screenshot,
-                diffPixels: 0,
-                diffPercentage: '0.00',
-                hasDiff: false
-              });
+              results.push({ name: screenshot, diffPixels: 0, diffPercentage: '0.00', hasDiff: false });
             }
           }
 
@@ -400,14 +376,12 @@ jobs:
           EOF
 
           node compare.js
-          
           CHANGES=$(jq -r '.changesDetected' comparison-results.json)
           echo "changes_detected=$CHANGES" >> $GITHUB_OUTPUT
 
       # ============================================================
-      # UPLOAD SCREENSHOTS TO ARTIFACTS
+      # UPLOAD ARTIFACTS
       # ============================================================
-
       - name: Upload base screenshots
         uses: actions/upload-artifact@v4
         with:
@@ -436,7 +410,6 @@ jobs:
       # ============================================================
       # POST RESULTS TO PR
       # ============================================================
-
       - name: Post results comment
         uses: actions/github-script@v7
         with:
@@ -502,7 +475,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               comment_id: ${{ steps.vrt_comment.outputs.result }},
-              body: body
+              body
             });
 
       - name: Update comment on failure

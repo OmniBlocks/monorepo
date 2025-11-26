@@ -4,6 +4,17 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`4fde605`](https://github.com/OmniBlocks/scratch-gui/commit/4fde605fa67fe1b5c9fcef07d66f2dbdee2ce97e) - 2025-11-25 19:12:02 -0500
+
+**Fix typo in NotebookWriter link**
+
+why is it case sensitive 😭😭🥀
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`cc1a002`](https://github.com/OmniBlocks/scratch-gui/commit/cc1a0022dd3de714f8d86e85cada70ac51794131) - 2025-11-25 19:03:20 -0500
 
 **Update footer link ID for OmniBlocks Writer**

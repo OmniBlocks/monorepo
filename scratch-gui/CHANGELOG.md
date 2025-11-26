@@ -4,6 +4,15 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`6b7abac`](https://github.com/OmniBlocks/scratch-gui/commit/6b7abacde21a00521602c4dffc3e2a7bc3485c1c) - 2025-11-26 16:54:42 -0500
+
+**docs: Rename webgl-conformance-2.0.1 (beta).txt to iPad 18.7.2 webgl test.txt**
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`d4277ba`](https://github.com/OmniBlocks/scratch-gui/commit/d4277ba534f8e1b568a7ca5f7ab3984cfe64260e) - 2025-11-26 16:39:52 -0500
 
 **fix: Refactor dashboard generation script**

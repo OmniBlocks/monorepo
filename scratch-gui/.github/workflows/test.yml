@@ -495,4 +495,8 @@ jobs:
           BUILD_STATUS: ${{ steps.build.outputs.build_status }}
           LINT_STATUS: ${{ steps.lint.outputs.lint_status }}
           UNIT_STATUS: ${{ steps.unit_tests.outputs.unit_status }}
-          INTEGRATION_STATUS: ${{ steps.
+          INTEGRATION_STATUS: ${{ steps.integration_tests.outputs.integration_status }}
+        with:
+          script: |
+            const script = require('./.github/scripts/create-failure-issue.js');
+            await script({github, context, core});

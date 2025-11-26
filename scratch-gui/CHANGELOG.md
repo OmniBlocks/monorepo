@@ -4,6 +4,17 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`4144735`](https://github.com/OmniBlocks/scratch-gui/commit/414473568f2697dbd92edbdc19de2a483ec420cb) - 2025-11-26 15:24:03 -0500
+
+**Refactor dashboard generation and improve HTML structure**
+
+Refactor dashboard generation script to use Python for metadata preparation and HTML generation. Update HTML structure and styles for better readability and maintainability.
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`dea111e`](https://github.com/OmniBlocks/scratch-gui/commit/dea111e7dd2f007330a1c682858c6e12fb3d0c00) - 2025-11-26 15:23:27 -0500
 
 **Add script to generate test dashboard in HTML**

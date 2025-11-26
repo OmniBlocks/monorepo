@@ -4,6 +4,17 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`2eb5706`](https://github.com/OmniBlocks/scratch-gui/commit/2eb5706880c6a0a989122fd5d5b0764cd36ecba4) - 2025-11-26 15:45:41 -0500
+
+**redactor: Refactor generate_dashboard to use subprocess and env vars**
+
+Updated the generate_dashboard function to retrieve commit SHA and date using subprocess. Removed metadata parameter and adjusted the dashboard generation logic to use environment variables instead.
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`04f5f19`](https://github.com/OmniBlocks/scratch-gui/commit/04f5f19076e23058dd6fe47ce10eb87417e73cf9) - 2025-11-26 15:25:18 -0500
 
 **fix: Clean up test.yml by removing extra braces**

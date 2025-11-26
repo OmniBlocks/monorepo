@@ -4,6 +4,17 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`04f5f19`](https://github.com/OmniBlocks/scratch-gui/commit/04f5f19076e23058dd6fe47ce10eb87417e73cf9) - 2025-11-26 15:25:18 -0500
+
+**fix: Clean up test.yml by removing extra braces**
+
+Removed unnecessary closing braces and whitespace.
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`4144735`](https://github.com/OmniBlocks/scratch-gui/commit/414473568f2697dbd92edbdc19de2a483ec420cb) - 2025-11-26 15:24:03 -0500
 
 **Refactor dashboard generation and improve HTML structure**

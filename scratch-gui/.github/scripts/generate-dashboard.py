@@ -26,15 +26,9 @@ def generate_screenshot_html(screenshots_dir):
         # Convert filename to nice title (e.g., "stage-sprites.png" -> "Stage Sprites")
         name = filename.replace('-', ' ').replace('.png', '').title()
         
-        # Add notes for broken tabs (not "may" - they're ALWAYS broken)
+        # Add note only for editor-initial (which is redundant with code-tab)
         note = ''
-        if filename == 'sounds-tab.png':
-            note = '<div class="note">⚠️ BUG: This tab incorrectly shows the songs tab instead of sounds</div>'
-        elif filename == 'costumes-tab.png':
-            note = '<div class="note">⚠️ BUG: This tab incorrectly shows the songs tab instead of costumes</div>'
-        elif filename == 'code-tab.png':
-            note = '<div class="note">⚠️ BUG: This tab incorrectly shows the songs tab instead of code</div>'
-        elif filename == 'editor-initial.png':
+        if filename == 'editor-initial.png':
             note = '<div class="note">ℹ️ Note: Shows code tab (redundant with code-tab)</div>'
         
         screenshots_html.append(f'''
@@ -120,7 +114,7 @@ def generate_dashboard(output_dir):
     # Generate screenshot HTML
     screenshots_html = generate_screenshot_html('screenshots')
     
-    # HTML template
+    # HTML template - NOTE: CSS/JS curly braces are escaped with {{ and }}
     html_template = '''<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -128,50 +122,50 @@ def generate_dashboard(output_dir):
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Main Branch Test Dashboard - OmniBlocks</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #333; line-height: 1.6; min-height: 100vh; padding: 20px; }
-    .container { max-width: 1400px; margin: 0 auto; background: white; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); overflow: hidden; }
-    header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px; text-align: center; }
-    header h1 { font-size: 2.5em; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); }
-    header .meta { opacity: 0.9; font-size: 1.1em; }
-    .content { padding: 40px; }
-    .status-overview { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 40px; }
-    .status-card { background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); border-radius: 15px; padding: 25px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: transform 0.3s ease; }
-    .status-card:hover { transform: translateY(-5px); }
-    .status-card.success { background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%); }
-    .status-card.warning { background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); }
-    .status-card.error { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); }
-    .status-card .icon { font-size: 3em; margin-bottom: 10px; }
-    .status-card .title { font-size: 0.9em; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; margin-bottom: 5px; }
-    .status-card .value { font-size: 2em; font-weight: bold; }
-    section { margin-bottom: 40px; }
-    section h2 { font-size: 2em; margin-bottom: 20px; color: #667eea; border-bottom: 3px solid #667eea; padding-bottom: 10px; }
-    .test-results { display: grid; gap: 20px; }
-    .test-group { background: #f8f9fa; border-radius: 10px; padding: 20px; border-left: 5px solid #667eea; }
-    .test-group h3 { margin-bottom: 15px; color: #555; }
-    .test-stats { display: flex; gap: 20px; flex-wrap: wrap; }
-    .test-stat { flex: 1; min-width: 150px; padding: 15px; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-    .test-stat .label { font-size: 0.85em; color: #666; margin-bottom: 5px; }
-    .test-stat .value { font-size: 1.8em; font-weight: bold; color: #333; }
-    .screenshots-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 30px; }
-    .screenshot-card { background: #f8f9fa; border-radius: 10px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-    .screenshot-card h3 { margin-bottom: 15px; color: #555; }
-    .screenshot-card img { width: 100%; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.15); cursor: pointer; transition: transform 0.3s ease; }
-    .screenshot-card img:hover { transform: scale(1.02); }
-    .screenshot-card .note { margin-top: 10px; padding: 10px; background: #fff3cd; border-left: 4px solid #ffc107; border-radius: 5px; font-size: 0.9em; color: #856404; }
-    .log-viewer { background: #1e1e1e; color: #d4d4d4; border-radius: 10px; padding: 20px; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.9em; max-height: 500px; overflow-y: auto; line-height: 1.5; }
-    .log-viewer pre { white-space: pre-wrap; word-wrap: break-word; }
-    .tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #e0e0e0; }
-    .tab { padding: 12px 24px; cursor: pointer; border: none; background: none; font-size: 1em; color: #666; border-bottom: 3px solid transparent; transition: all 0.3s ease; }
-    .tab:hover { color: #667eea; }
-    .tab.active { color: #667eea; border-bottom-color: #667eea; font-weight: bold; }
-    .tab-content { display: none; }
-    .tab-content.active { display: block; }
-    footer { background: #f8f9fa; padding: 30px; text-align: center; color: #666; border-top: 1px solid #e0e0e0; }
-    .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.9); }
-    .modal-content { margin: 2% auto; display: block; max-width: 90%; max-height: 90%; }
-    .close { position: absolute; top: 30px; right: 50px; color: #f1f1f1; font-size: 50px; font-weight: bold; cursor: pointer; }
-    .close:hover { color: #bbb; }
+    * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+    body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #333; line-height: 1.6; min-height: 100vh; padding: 20px; }}
+    .container {{ max-width: 1400px; margin: 0 auto; background: white; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); overflow: hidden; }}
+    header {{ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px; text-align: center; }}
+    header h1 {{ font-size: 2.5em; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); }}
+    header .meta {{ opacity: 0.9; font-size: 1.1em; }}
+    .content {{ padding: 40px; }}
+    .status-overview {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 40px; }}
+    .status-card {{ background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); border-radius: 15px; padding: 25px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: transform 0.3s ease; }}
+    .status-card:hover {{ transform: translateY(-5px); }}
+    .status-card.success {{ background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%); }}
+    .status-card.warning {{ background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); }}
+    .status-card.error {{ background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); }}
+    .status-card .icon {{ font-size: 3em; margin-bottom: 10px; }}
+    .status-card .title {{ font-size: 0.9em; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; margin-bottom: 5px; }}
+    .status-card .value {{ font-size: 2em; font-weight: bold; }}
+    section {{ margin-bottom: 40px; }}
+    section h2 {{ font-size: 2em; margin-bottom: 20px; color: #667eea; border-bottom: 3px solid #667eea; padding-bottom: 10px; }}
+    .test-results {{ display: grid; gap: 20px; }}
+    .test-group {{ background: #f8f9fa; border-radius: 10px; padding: 20px; border-left: 5px solid #667eea; }}
+    .test-group h3 {{ margin-bottom: 15px; color: #555; }}
+    .test-stats {{ display: flex; gap: 20px; flex-wrap: wrap; }}
+    .test-stat {{ flex: 1; min-width: 150px; padding: 15px; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }}
+    .test-stat .label {{ font-size: 0.85em; color: #666; margin-bottom: 5px; }}
+    .test-stat .value {{ font-size: 1.8em; font-weight: bold; color: #333; }}
+    .screenshots-grid {{ display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 30px; }}
+    .screenshot-card {{ background: #f8f9fa; border-radius: 10px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }}
+    .screenshot-card h3 {{ margin-bottom: 15px; color: #555; }}
+    .screenshot-card img {{ width: 100%; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.15); cursor: pointer; transition: transform 0.3s ease; }}
+    .screenshot-card img:hover {{ transform: scale(1.02); }}
+    .screenshot-card .note {{ margin-top: 10px; padding: 10px; background: #e7f3ff; border-left: 4px solid #2196F3; border-radius: 5px; font-size: 0.9em; color: #1565C0; }}
+    .log-viewer {{ background: #1e1e1e; color: #d4d4d4; border-radius: 10px; padding: 20px; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.9em; max-height: 500px; overflow-y: auto; line-height: 1.5; }}
+    .log-viewer pre {{ white-space: pre-wrap; word-wrap: break-word; }}
+    .tabs {{ display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #e0e0e0; }}
+    .tab {{ padding: 12px 24px; cursor: pointer; border: none; background: none; font-size: 1em; color: #666; border-bottom: 3px solid transparent; transition: all 0.3s ease; }}
+    .tab:hover {{ color: #667eea; }}
+    .tab.active {{ color: #667eea; border-bottom-color: #667eea; font-weight: bold; }}
+    .tab-content {{ display: none; }}
+    .tab-content.active {{ display: block; }}
+    footer {{ background: #f8f9fa; padding: 30px; text-align: center; color: #666; border-top: 1px solid #e0e0e0; }}
+    .modal {{ display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.9); }}
+    .modal-content {{ margin: 2% auto; display: block; max-width: 90%; max-height: 90%; }}
+    .close {{ position: absolute; top: 30px; right: 50px; color: #f1f1f1; font-size: 50px; font-weight: bold; cursor: pointer; }}
+    .close:hover {{ color: #bbb; }}
   </style>
 </head>
 <body>
@@ -276,18 +270,18 @@ def generate_dashboard(output_dir):
     <img class="modal-content" id="modalImage">
   </div>
   <script>
-    function showTab(tabName) {{
+    function showTab(tabName) {{{{
       document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
       document.querySelectorAll('.tab').forEach(btn => btn.classList.remove('active'));
       document.getElementById(tabName + '-tab').classList.add('active');
       event.target.classList.add('active');
-    }}
-    document.querySelectorAll('.screenshot-card img').forEach(img => {{
-      img.onclick = function() {{
+    }}}}
+    document.querySelectorAll('.screenshot-card img').forEach(img => {{{{
+      img.onclick = function() {{{{
         document.getElementById('imageModal').style.display = 'block';
         document.getElementById('modalImage').src = this.src;
-      }};
-    }});
+      }}}};
+    }}}});
   </script>
 </body>
 </html>'''

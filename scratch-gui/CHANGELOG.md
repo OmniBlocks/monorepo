@@ -4,6 +4,17 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`d4277ba`](https://github.com/OmniBlocks/scratch-gui/commit/d4277ba534f8e1b568a7ca5f7ab3984cfe64260e) - 2025-11-26 16:39:52 -0500
+
+**fix: Refactor dashboard generation script**
+
+Refactor notes for broken tabs and update HTML template styles by escaping braces.
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`ed0689c`](https://github.com/OmniBlocks/scratch-gui/commit/ed0689c1f2c7c1045b017243defe001e6c7f2c1e) - 2025-11-26 16:14:16 -0500
 
 **Add integration status to GitHub Actions workflow**

@@ -1,0 +1,288 @@
+#!/usr/bin/env python3
+import os
+import sys
+import html
+from pathlib import Path
+
+def read_file_safe(filename):
+    """Read file content safely, return default message if file doesn't exist."""
+    try:
+        if os.path.exists(filename):
+            with open(filename, 'r', encoding='utf-8', errors='ignore') as f:
+                return f.read()
+    except Exception as e:
+        print(f"Error reading {filename}: {e}", file=sys.stderr)
+    return f"No {filename} available"
+
+def generate_screenshot_html(screenshots_dir):
+    """Generate HTML for screenshot cards."""
+    if not os.path.exists(screenshots_dir):
+        return '<p>No screenshots available</p>'
+    
+    screenshots_html = []
+    for screenshot in sorted(Path(screenshots_dir).glob('*.png')):
+        filename = screenshot.name
+        # Convert filename to nice title (e.g., "stage-sprites.png" -> "Stage Sprites")
+        name = filename.replace('-', ' ').replace('.png', '').title()
+        
+        # Add notes for known issues
+        note = ''
+        if filename == 'sounds-tab.png':
+            note = '<div class="note">⚠️ Known Issue: This tab may display the songs tab instead</div>'
+        elif filename in ['code-tab.png', 'costumes-tab.png']:
+            note = '<div class="note">⚠️ Known Issue: May show songs tab</div>'
+        elif filename == 'editor-initial.png':
+            note = '<div class="note">ℹ️ Note: Shows code tab (redundant with code-tab)</div>'
+        
+        screenshots_html.append(f'''
+                <div class="screenshot-card">
+                  <h3>{name}</h3>
+                  <img src="screenshots/{filename}" alt="{name}">
+                  {note}
+                </div>''')
+    
+    return ''.join(screenshots_html) if screenshots_html else '<p>No screenshots available</p>'
+
+def generate_dashboard(output_dir, metadata):
+    """Generate the HTML dashboard."""
+    # Read log files
+    install_log = read_file_safe('install-output.txt')
+    build_log = read_file_safe('build-output.txt')
+    lint_log = read_file_safe('lint-output.txt')
+    unit_log = read_file_safe('unit-test-output.txt')
+    integration_log = read_file_safe('integration-test-output.txt')
+    screenshot_log = read_file_safe('screenshot-output.txt')
+    
+    # Generate screenshot HTML
+    screenshots_html = generate_screenshot_html('screenshots')
+    
+    # HTML template
+    html_template = '''<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Main Branch Test Dashboard - OmniBlocks</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #333; line-height: 1.6; min-height: 100vh; padding: 20px; }
+    .container { max-width: 1400px; margin: 0 auto; background: white; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); overflow: hidden; }
+    header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px; text-align: center; }
+    header h1 { font-size: 2.5em; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); }
+    header .meta { opacity: 0.9; font-size: 1.1em; }
+    .content { padding: 40px; }
+    .status-overview { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 40px; }
+    .status-card { background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); border-radius: 15px; padding: 25px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: transform 0.3s ease; }
+    .status-card:hover { transform: translateY(-5px); }
+    .status-card.success { background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%); }
+    .status-card.warning { background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); }
+    .status-card.error { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); }
+    .status-card .icon { font-size: 3em; margin-bottom: 10px; }
+    .status-card .title { font-size: 0.9em; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; margin-bottom: 5px; }
+    .status-card .value { font-size: 2em; font-weight: bold; }
+    section { margin-bottom: 40px; }
+    section h2 { font-size: 2em; margin-bottom: 20px; color: #667eea; border-bottom: 3px solid #667eea; padding-bottom: 10px; }
+    .test-results { display: grid; gap: 20px; }
+    .test-group { background: #f8f9fa; border-radius: 10px; padding: 20px; border-left: 5px solid #667eea; }
+    .test-group h3 { margin-bottom: 15px; color: #555; }
+    .test-stats { display: flex; gap: 20px; flex-wrap: wrap; }
+    .test-stat { flex: 1; min-width: 150px; padding: 15px; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .test-stat .label { font-size: 0.85em; color: #666; margin-bottom: 5px; }
+    .test-stat .value { font-size: 1.8em; font-weight: bold; color: #333; }
+    .screenshots-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 30px; }
+    .screenshot-card { background: #f8f9fa; border-radius: 10px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+    .screenshot-card h3 { margin-bottom: 15px; color: #555; }
+    .screenshot-card img { width: 100%; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.15); cursor: pointer; transition: transform 0.3s ease; }
+    .screenshot-card img:hover { transform: scale(1.02); }
+    .screenshot-card .note { margin-top: 10px; padding: 10px; background: #fff3cd; border-left: 4px solid #ffc107; border-radius: 5px; font-size: 0.9em; color: #856404; }
+    .log-viewer { background: #1e1e1e; color: #d4d4d4; border-radius: 10px; padding: 20px; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.9em; max-height: 500px; overflow-y: auto; line-height: 1.5; }
+    .log-viewer pre { white-space: pre-wrap; word-wrap: break-word; }
+    .tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #e0e0e0; }
+    .tab { padding: 12px 24px; cursor: pointer; border: none; background: none; font-size: 1em; color: #666; border-bottom: 3px solid transparent; transition: all 0.3s ease; }
+    .tab:hover { color: #667eea; }
+    .tab.active { color: #667eea; border-bottom-color: #667eea; font-weight: bold; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    footer { background: #f8f9fa; padding: 30px; text-align: center; color: #666; border-top: 1px solid #e0e0e0; }
+    .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.9); }
+    .modal-content { margin: 2% auto; display: block; max-width: 90%; max-height: 90%; }
+    .close { position: absolute; top: 30px; right: 50px; color: #f1f1f1; font-size: 50px; font-weight: bold; cursor: pointer; }
+    .close:hover { color: #bbb; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🚀 Main Branch Test Dashboard</h1>
+      <div class="meta">
+        <strong>Commit:</strong> {commit_sha}<br>
+        <strong>Date:</strong> {date}<br>
+        <strong>Duration:</strong> {duration}
+      </div>
+    </header>
+    <div class="content">
+      <div class="status-overview">
+        <div class="status-card {build_status_class}">
+          <div class="icon">{build_icon}</div>
+          <div class="title">Build</div>
+          <div class="value">{build_status}</div>
+        </div>
+        <div class="status-card {lint_status_class}">
+          <div class="icon">{lint_icon}</div>
+          <div class="title">Lint</div>
+          <div class="value">{lint_status}</div>
+        </div>
+        <div class="status-card {unit_status_class}">
+          <div class="icon">{unit_icon}</div>
+          <div class="title">Unit Tests</div>
+          <div class="value">{unit_status}</div>
+        </div>
+        <div class="status-card {integration_status_class}">
+          <div class="icon">{integration_icon}</div>
+          <div class="title">Integration</div>
+          <div class="value">{integration_status}</div>
+        </div>
+        <div class="status-card {screenshot_status_class}">
+          <div class="icon">{screenshot_icon}</div>
+          <div class="title">Screenshots</div>
+          <div class="value">{screenshot_status}</div>
+        </div>
+      </div>
+      <section>
+        <h2>📊 Test Results</h2>
+        <div class="test-results">
+          <div class="test-group">
+            <h3>🔍 ESLint</h3>
+            <div class="test-stats">
+              <div class="test-stat"><div class="label">Status</div><div class="value">{lint_result}</div></div>
+              <div class="test-stat"><div class="label">Errors</div><div class="value" style="color: #dc3545;">{lint_errors}</div></div>
+              <div class="test-stat"><div class="label">Warnings</div><div class="value" style="color: #ffc107;">{lint_warnings}</div></div>
+            </div>
+          </div>
+          <div class="test-group">
+            <h3>🧪 Unit Tests</h3>
+            <div class="test-stats">
+              <div class="test-stat"><div class="label">Total</div><div class="value">{unit_total}</div></div>
+              <div class="test-stat"><div class="label">Passed</div><div class="value" style="color: #28a745;">{unit_passed}</div></div>
+              <div class="test-stat"><div class="label">Failed</div><div class="value" style="color: #dc3545;">{unit_failed}</div></div>
+              <div class="test-stat"><div class="label">Skipped</div><div class="value" style="color: #6c757d;">{unit_skipped}</div></div>
+            </div>
+          </div>
+          <div class="test-group">
+            <h3>🔗 Integration Tests</h3>
+            <div class="test-stats">
+              <div class="test-stat"><div class="label">Total</div><div class="value">{integration_total}</div></div>
+              <div class="test-stat"><div class="label">Passed</div><div class="value" style="color: #28a745;">{integration_passed}</div></div>
+              <div class="test-stat"><div class="label">Failed</div><div class="value" style="color: #dc3545;">{integration_failed}</div></div>
+              <div class="test-stat"><div class="label">Skipped</div><div class="value" style="color: #6c757d;">{integration_skipped}</div></div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section>
+        <h2>📸 Screenshots</h2>
+        <div class="screenshots-grid">{screenshots_html}</div>
+      </section>
+      <section>
+        <h2>📝 Logs</h2>
+        <div class="tabs">
+          <button class="tab active" onclick="showTab('install')">Install</button>
+          <button class="tab" onclick="showTab('build')">Build</button>
+          <button class="tab" onclick="showTab('lint')">Lint</button>
+          <button class="tab" onclick="showTab('unit')">Unit Tests</button>
+          <button class="tab" onclick="showTab('integration')">Integration Tests</button>
+          <button class="tab" onclick="showTab('screenshots')">Screenshots</button>
+        </div>
+        <div id="install-tab" class="tab-content active"><div class="log-viewer"><pre>{install_log}</pre></div></div>
+        <div id="build-tab" class="tab-content"><div class="log-viewer"><pre>{build_log}</pre></div></div>
+        <div id="lint-tab" class="tab-content"><div class="log-viewer"><pre>{lint_log}</pre></div></div>
+        <div id="unit-tab" class="tab-content"><div class="log-viewer"><pre>{unit_log}</pre></div></div>
+        <div id="integration-tab" class="tab-content"><div class="log-viewer"><pre>{integration_log}</pre></div></div>
+        <div id="screenshots-tab" class="tab-content"><div class="log-viewer"><pre>{screenshot_log}</pre></div></div>
+      </section>
+    </div>
+    <footer>
+      <p><strong>OmniBlocks Main Branch Testing</strong></p>
+      <p>Generated automatically by GitHub Actions</p>
+      <p><a href="https://github.com/{repo}/actions/runs/{run_id}" style="color: #667eea;">View Workflow Run</a></p>
+    </footer>
+  </div>
+  <div id="imageModal" class="modal" onclick="this.style.display='none'">
+    <span class="close">&times;</span>
+    <img class="modal-content" id="modalImage">
+  </div>
+  <script>
+    function showTab(tabName) {{
+      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+      document.querySelectorAll('.tab').forEach(btn => btn.classList.remove('active'));
+      document.getElementById(tabName + '-tab').classList.add('active');
+      event.target.classList.add('active');
+    }}
+    document.querySelectorAll('.screenshot-card img').forEach(img => {{
+      img.onclick = function() {{
+        document.getElementById('imageModal').style.display = 'block';
+        document.getElementById('modalImage').src = this.src;
+      }};
+    }});
+  </script>
+</body>
+</html>'''
+    
+    # Prepare metadata with escaped logs
+    filled_template = html_template.format(
+        commit_sha=html.escape(metadata['commit_sha']),
+        date=html.escape(metadata['date']),
+        duration=html.escape(metadata['duration']),
+        build_status_class=metadata['build_status_class'],
+        build_icon=metadata['build_icon'],
+        build_status=metadata['build_status'],
+        lint_status_class=metadata['lint_status_class'],
+        lint_icon=metadata['lint_icon'],
+        lint_status=metadata['lint_status'],
+        lint_result=metadata['lint_result'],
+        lint_errors=metadata['lint_errors'],
+        lint_warnings=metadata['lint_warnings'],
+        unit_status_class=metadata['unit_status_class'],
+        unit_icon=metadata['unit_icon'],
+        unit_status=metadata['unit_status'],
+        unit_total=metadata['unit_total'],
+        unit_passed=metadata['unit_passed'],
+        unit_failed=metadata['unit_failed'],
+        unit_skipped=metadata['unit_skipped'],
+        integration_status_class=metadata['integration_status_class'],
+        integration_icon=metadata['integration_icon'],
+        integration_status=metadata['integration_status'],
+        integration_total=metadata['integration_total'],
+        integration_passed=metadata['integration_passed'],
+        integration_failed=metadata['integration_failed'],
+        integration_skipped=metadata['integration_skipped'],
+        screenshot_status_class=metadata['screenshot_status_class'],
+        screenshot_icon=metadata['screenshot_icon'],
+        screenshot_status=metadata['screenshot_status'],
+        screenshots_html=screenshots_html,
+        install_log=html.escape(install_log),
+        build_log=html.escape(build_log),
+        lint_log=html.escape(lint_log),
+        unit_log=html.escape(unit_log),
+        integration_log=html.escape(integration_log),
+        screenshot_log=html.escape(screenshot_log),
+        repo=metadata['repo'],
+        run_id=metadata['run_id']
+    )
+    
+    # Write the dashboard
+    os.makedirs(output_dir, exist_ok=True)
+    output_file = os.path.join(output_dir, 'index.html')
+    with open(output_file, 'w', encoding='utf-8') as f:
+        f.write(filled_template)
+    
+    print(f"Dashboard generated successfully at {output_file}")
+
+if __name__ == '__main__':
+    import json
+    
+    # Read metadata from environment or command line
+    metadata = json.loads(os.environ.get('DASHBOARD_METADATA', '{}'))
+    output_dir = sys.argv[1] if len(sys.argv) > 1 else 'dashboard'
+    
+    generate_dashboard(output_dir, metadata)

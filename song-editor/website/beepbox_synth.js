@@ -1699,7 +1699,7 @@ var beepbox = (function (exports) {
             return (_a = EditorConfig.presetCategories[0].presets.dictionary) === null || _a === void 0 ? void 0 : _a[TypePresets === null || TypePresets === void 0 ? void 0 : TypePresets[instrument]];
         }
     }
-    EditorConfig.version = "0.2.2";
+    EditorConfig.version = "0.3.0";
     EditorConfig.versionDisplayName = "JukeBox " + EditorConfig.version;
     EditorConfig.releaseNotesURL = "./patch_notes.html";
     EditorConfig.isOnMac = /^Mac/i.test(navigator.platform) || /Mac OS X/i.test(navigator.userAgent) || /^(iPhone|iPad|iPod)/i.test(navigator.platform) || /(iPhone|iPad|iPod)/i.test(navigator.userAgent);
@@ -6643,6 +6643,7 @@ var beepbox = (function (exports) {
             this.scale = 0;
             this.scaleCustom = [true, false, false, false, false, false, false, false, false, false, false, false];
             this.key = 0;
+            this.edo = 12;
             this.octave = 0;
             this.loopStart = 0;
             this.loopLength = 4;
@@ -6707,6 +6708,7 @@ var beepbox = (function (exports) {
             for (let i = 0; i < encodedSongTitle.length; i++) {
                 buffer.push(encodedSongTitle.charCodeAt(i));
             }
+            buffer.push(74, base64IntToCharCode[this.edo]);
             buffer.push(110, base64IntToCharCode[this.pitchChannelCount], base64IntToCharCode[this.noiseChannelCount], base64IntToCharCode[this.modChannelCount]);
             buffer.push(115, base64IntToCharCode[this.scale]);
             if (this.scale == Config.scales["dictionary"]["Custom"].index) {
@@ -7551,6 +7553,11 @@ var beepbox = (function (exports) {
                                         legacySettingsCache[i][j] = {};
                                 }
                             }
+                        }
+                        break;
+                    case 74:
+                        {
+                            this.edo = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                         }
                         break;
                     case 115:
@@ -10481,7 +10488,7 @@ var beepbox = (function (exports) {
     Song._oldestSlarmoosBoxVersion = 1;
     Song._latestSlarmoosBoxVersion = 5;
     Song._oldestJukeBoxVersion = 1;
-    Song._latestJukeBoxVersion = 1;
+    Song._latestJukeBoxVersion = 2;
     Song._variant = 0x4a;
     class PickedString {
         constructor() {

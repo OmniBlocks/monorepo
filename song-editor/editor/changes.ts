@@ -3449,6 +3449,19 @@ export class ChangeViewInstrument extends Change {
     }
 }
 
+export class ChangeEdo extends Change {
+	constructor(doc: SongDocument, newValue: number) {
+		super();
+		if (doc.song.edo != newValue) {
+			doc.song.edo = newValue;
+            doc.song.key = 0;
+            doc.song.scale = 0;
+			doc.notifier.changed();
+			this._didSomething();
+		}
+	}
+}
+
 export class ChangeInstrumentsFlags extends Change {
     constructor(doc: SongDocument, newLayeredInstruments: boolean, newPatternInstruments: boolean) {
         super();

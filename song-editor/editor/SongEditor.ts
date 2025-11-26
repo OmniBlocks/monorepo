@@ -12,6 +12,7 @@ import { CustomFilterPrompt } from "./CustomFilterPrompt";
 import { InstrumentExportPrompt } from "./InstrumentExportPrompt";
 import { InstrumentImportPrompt } from "./InstrumentImportPrompt";
 import { EditorConfig, isMobile, prettyNumber, Preset, PresetCategory } from "./EditorConfig";
+import { EdoPrompt } from "./EdoPrompt";
 import { EuclideanRhythmPrompt } from "./EuclidgenRhythmPrompt";
 import { ExportPrompt } from "./ExportPrompt";
 import "./Layout"; // Imported here for the sake of ensuring this code is transpiled early.
@@ -792,6 +793,7 @@ export class SongEditor {
         option({ value: "generateEuclideanRhythm" }, "Generate Euclidean Rhythm... (" + EditorConfig.ctrlSymbol + "E)"),
         option({ value: "beatsPerBar" }, "Change Beats Per Bar... (⇧B)"),
         option({ value: "barCount" }, "Change Song Length... (L)"),
+        option({ value: "edo" }, "Change EDO... (EdoBox) (E)"),
         option({ value: "channelSettings" }, "Channel Settings... (Q)"),
         option({ value: "limiterSettings" }, "Limiter Settings... (⇧L)"),
         option({ value: "addExternal" }, "Add Custom Samples... (⇧Q)"),
@@ -2192,6 +2194,9 @@ export class SongEditor {
                     break;
                 case "beatsPerBar":
                     this.prompt = new BeatsPerBarPrompt(this.doc);
+                    break;
+                case "edo":
+                    this.prompt = new EdoPrompt(this.doc);
                     break;
                 case "moveNotesSideways":
                     this.prompt = new MoveNotesSidewaysPrompt(this.doc);
@@ -4379,7 +4384,7 @@ export class SongEditor {
                     event.preventDefault();
                     break;
                 } else if (needControlForShortcuts == (event.ctrlKey || event.metaKey)) {
-                    this._openPrompt("customSongEQFilterSettings");
+                    this._openPrompt("edo");;
                 }
                 break;
             case 70: // f
@@ -5536,6 +5541,9 @@ export class SongEditor {
                 break;
             case "beatsPerBar":
                 this._openPrompt("beatsPerBar");
+                break;
+            case "edo":
+                this._openPrompt("edo");
                 break;
             case "moveNotesSideways":
                 this._openPrompt("moveNotesSideways");

@@ -4,6 +4,17 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`02c8e69`](https://github.com/OmniBlocks/scratch-gui/commit/02c8e6981f21f3ecbb1ad90f604c29f6be48b373) - 2025-11-26 16:08:40 -0500
+
+**Enhance CI with Playwright tests and dashboard**
+
+Added Playwright integration tests and dashboard generation to GitHub Actions workflow.
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`80a54be`](https://github.com/OmniBlocks/scratch-gui/commit/80a54be2b4233104ef935591dde3220287cb9d54) - 2025-11-26 16:02:40 -0500
 
 **Add tests for various tabs in the editor**

@@ -4,6 +4,17 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`7a9ec2e`](https://github.com/OmniBlocks/scratch-gui/commit/7a9ec2e784b256c603c08226c173bb9c138100f6) - 2025-11-26 15:12:42 -0500
+
+**Add script to create failure issue on GitHub**
+
+This script creates a GitHub issue for build/test failures, including details about the failure and error logs.
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`682c22b`](https://github.com/OmniBlocks/scratch-gui/commit/682c22bebe41ab7a3343f72ec451708aa46338de) - 2025-11-26 15:04:10 -0500
 
 **Merge pull request #400 from OmniBlocks/new-branch-tester**

@@ -2,6 +2,7 @@
 import os
 import sys
 import html
+import subprocess
 from pathlib import Path
 
 def read_file_safe(filename):
@@ -25,12 +26,14 @@ def generate_screenshot_html(screenshots_dir):
         # Convert filename to nice title (e.g., "stage-sprites.png" -> "Stage Sprites")
         name = filename.replace('-', ' ').replace('.png', '').title()
         
-        # Add notes for known issues
+        # Add notes for broken tabs (not "may" - they're ALWAYS broken)
         note = ''
         if filename == 'sounds-tab.png':
-            note = '<div class="note">⚠️ Known Issue: This tab may display the songs tab instead</div>'
-        elif filename in ['code-tab.png', 'costumes-tab.png']:
-            note = '<div class="note">⚠️ Known Issue: May show songs tab</div>'
+            note = '<div class="note">⚠️ BUG: This tab incorrectly shows the songs tab instead of sounds</div>'
+        elif filename == 'costumes-tab.png':
+            note = '<div class="note">⚠️ BUG: This tab incorrectly shows the songs tab instead of costumes</div>'
+        elif filename == 'code-tab.png':
+            note = '<div class="note">⚠️ BUG: This tab incorrectly shows the songs tab instead of code</div>'
         elif filename == 'editor-initial.png':
             note = '<div class="note">ℹ️ Note: Shows code tab (redundant with code-tab)</div>'
         
@@ -43,8 +46,69 @@ def generate_screenshot_html(screenshots_dir):
     
     return ''.join(screenshots_html) if screenshots_html else '<p>No screenshots available</p>'
 
-def generate_dashboard(output_dir, metadata):
+def generate_dashboard(output_dir):
     """Generate the HTML dashboard."""
+    # Get commit SHA
+    commit_sha = subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD'], text=True).strip()
+    date = subprocess.check_output(['date', '-u', '+%Y-%m-%d %H:%M:%S UTC'], text=True).strip()
+    
+    # Get metadata from environment variables
+    build_status_raw = os.environ.get('BUILD_STATUS', '')
+    if build_status_raw == "success":
+        build_status = "✅ Passed"
+        build_status_class = "success"
+        build_icon = "✅"
+    else:
+        build_status = "❌ Failed"
+        build_status_class = "error"
+        build_icon = "❌"
+    
+    # Lint status
+    lint_status_raw = os.environ.get('LINT_STATUS', '')
+    if lint_status_raw == "passed":
+        lint_status = "✅ Passed"
+        lint_status_class = "success"
+        lint_icon = "✅"
+        lint_result = "Passed"
+    else:
+        lint_status = "❌ Failed"
+        lint_status_class = "error"
+        lint_icon = "❌"
+        lint_result = "Failed"
+    
+    # Unit test status
+    unit_status_raw = os.environ.get('UNIT_STATUS', '')
+    if unit_status_raw == "passed":
+        unit_status = "✅ Passed"
+        unit_status_class = "success"
+        unit_icon = "✅"
+    else:
+        unit_status = "❌ Failed"
+        unit_status_class = "error"
+        unit_icon = "❌"
+    
+    # Integration test status
+    integration_status_raw = os.environ.get('INTEGRATION_STATUS', '')
+    if integration_status_raw == "passed":
+        integration_status = "✅ Passed"
+        integration_status_class = "success"
+        integration_icon = "✅"
+    else:
+        integration_status = "❌ Failed"
+        integration_status_class = "error"
+        integration_icon = "❌"
+    
+    # Screenshot status
+    screenshot_status_raw = os.environ.get('SCREENSHOT_STATUS', '')
+    if screenshot_status_raw == "success":
+        screenshot_status = "✅ Done"
+        screenshot_status_class = "success"
+        screenshot_icon = "📸"
+    else:
+        screenshot_status = "⚠️ Issues"
+        screenshot_status_class = "warning"
+        screenshot_icon = "⚠️"
+    
     # Read log files
     install_log = read_file_safe('install-output.txt')
     build_log = read_file_safe('build-output.txt')
@@ -228,37 +292,37 @@ def generate_dashboard(output_dir, metadata):
 </body>
 </html>'''
     
-    # Prepare metadata with escaped logs
+    # Fill template with values
     filled_template = html_template.format(
-        commit_sha=html.escape(metadata['commit_sha']),
-        date=html.escape(metadata['date']),
-        duration=html.escape(metadata['duration']),
-        build_status_class=metadata['build_status_class'],
-        build_icon=metadata['build_icon'],
-        build_status=metadata['build_status'],
-        lint_status_class=metadata['lint_status_class'],
-        lint_icon=metadata['lint_icon'],
-        lint_status=metadata['lint_status'],
-        lint_result=metadata['lint_result'],
-        lint_errors=metadata['lint_errors'],
-        lint_warnings=metadata['lint_warnings'],
-        unit_status_class=metadata['unit_status_class'],
-        unit_icon=metadata['unit_icon'],
-        unit_status=metadata['unit_status'],
-        unit_total=metadata['unit_total'],
-        unit_passed=metadata['unit_passed'],
-        unit_failed=metadata['unit_failed'],
-        unit_skipped=metadata['unit_skipped'],
-        integration_status_class=metadata['integration_status_class'],
-        integration_icon=metadata['integration_icon'],
-        integration_status=metadata['integration_status'],
-        integration_total=metadata['integration_total'],
-        integration_passed=metadata['integration_passed'],
-        integration_failed=metadata['integration_failed'],
-        integration_skipped=metadata['integration_skipped'],
-        screenshot_status_class=metadata['screenshot_status_class'],
-        screenshot_icon=metadata['screenshot_icon'],
-        screenshot_status=metadata['screenshot_status'],
+        commit_sha=html.escape(commit_sha),
+        date=html.escape(date),
+        duration=html.escape(os.environ.get('DURATION', 'Unknown')),
+        build_status_class=build_status_class,
+        build_icon=build_icon,
+        build_status=build_status,
+        lint_status_class=lint_status_class,
+        lint_icon=lint_icon,
+        lint_status=lint_status,
+        lint_result=lint_result,
+        lint_errors=os.environ.get('LINT_ERRORS', '0'),
+        lint_warnings=os.environ.get('LINT_WARNINGS', '0'),
+        unit_status_class=unit_status_class,
+        unit_icon=unit_icon,
+        unit_status=unit_status,
+        unit_total=os.environ.get('UNIT_TOTAL', '0'),
+        unit_passed=os.environ.get('UNIT_PASSED', '0'),
+        unit_failed=os.environ.get('UNIT_FAILED', '0'),
+        unit_skipped=os.environ.get('UNIT_SKIPPED', '0'),
+        integration_status_class=integration_status_class,
+        integration_icon=integration_icon,
+        integration_status=integration_status,
+        integration_total=os.environ.get('INTEGRATION_TOTAL', '0'),
+        integration_passed=os.environ.get('INTEGRATION_PASSED', '0'),
+        integration_failed=os.environ.get('INTEGRATION_FAILED', '0'),
+        integration_skipped=os.environ.get('INTEGRATION_SKIPPED', '0'),
+        screenshot_status_class=screenshot_status_class,
+        screenshot_icon=screenshot_icon,
+        screenshot_status=screenshot_status,
         screenshots_html=screenshots_html,
         install_log=html.escape(install_log),
         build_log=html.escape(build_log),
@@ -266,8 +330,8 @@ def generate_dashboard(output_dir, metadata):
         unit_log=html.escape(unit_log),
         integration_log=html.escape(integration_log),
         screenshot_log=html.escape(screenshot_log),
-        repo=metadata['repo'],
-        run_id=metadata['run_id']
+        repo=os.environ.get('REPO', 'Unknown'),
+        run_id=os.environ.get('RUN_ID', 'Unknown')
     )
     
     # Write the dashboard
@@ -279,10 +343,5 @@ def generate_dashboard(output_dir, metadata):
     print(f"Dashboard generated successfully at {output_file}")
 
 if __name__ == '__main__':
-    import json
-    
-    # Read metadata from environment or command line
-    metadata = json.loads(os.environ.get('DASHBOARD_METADATA', '{}'))
     output_dir = sys.argv[1] if len(sys.argv) > 1 else 'dashboard'
-    
-    generate_dashboard(output_dir, metadata)
+    generate_dashboard(output_dir)

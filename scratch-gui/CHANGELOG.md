@@ -4,6 +4,15 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`80a54be`](https://github.com/OmniBlocks/scratch-gui/commit/80a54be2b4233104ef935591dde3220287cb9d54) - 2025-11-26 16:02:40 -0500
+
+**Add tests for various tabs in the editor**
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`2eb5706`](https://github.com/OmniBlocks/scratch-gui/commit/2eb5706880c6a0a989122fd5d5b0764cd36ecba4) - 2025-11-26 15:45:41 -0500
 
 **redactor: Refactor generate_dashboard to use subprocess and env vars**

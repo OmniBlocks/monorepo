@@ -212,7 +212,7 @@ const Footer = () => (
                         <FormattedMessage
                             defaultMessage="OmniBlocks Writer"
                             description="Link in footer to OmniBlocks Writer, our word processor"
-                            id="tw.footer.wiki"
+                            id="tw.footer.writer"
                         />
                     </a>
                 </div>

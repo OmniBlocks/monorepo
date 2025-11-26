@@ -61,7 +61,9 @@ jobs:
         continue-on-error: true
         run: |
           npm run test:lint 2>&1 | tee lint-output.txt
-          EXIT_CODE=${PIPESTATUS[0]}
+          set -o pipefail
+          npm run test:lint 2>&1 | tee lint-output.txt
+          EXIT_CODE=$?
           
           if [ $EXIT_CODE -eq 0 ]; then
             echo "lint_status=passed" >> $GITHUB_OUTPUT
@@ -81,7 +83,9 @@ jobs:
         continue-on-error: true
         run: |
           npm run test:unit 2>&1 | tee unit-test-output.txt
-          EXIT_CODE=${PIPESTATUS[0]}
+          set -o pipefail
+          npm run test:unit 2>&1 | tee unit-test-output.txt
+          EXIT_CODE=$?
           
           if [ $EXIT_CODE -eq 0 ]; then
             echo "unit_status=passed" >> $GITHUB_OUTPUT
@@ -105,7 +109,9 @@ jobs:
         continue-on-error: true
         run: |
           npm run test:integration 2>&1 | tee integration-test-output.txt
-          EXIT_CODE=${PIPESTATUS[0]}
+          set -o pipefail
+          npm run test:integration 2>&1 | tee integration-test-output.txt
+          EXIT_CODE=$?
           
           if [ $EXIT_CODE -eq 0 ]; then
             echo "integration_status=passed" >> $GITHUB_OUTPUT
@@ -133,9 +139,13 @@ jobs:
           npx http-server build -p 8080 &
           echo $! > server.pid
           for i in {1..30}; do
-            if curl -s http://localhost:8080 > /dev/null; then
+            if curl -f -s  > /dev/null 2>&1; then
               echo "Server is ready!"
               break
+            fi
+            if [ $i -eq 30 ]; then
+              echo "Server failed to start within 30 seconds"
+              exit 1
             fi
             echo "Waiting for server... ($i/30)"
             sleep 1
@@ -963,16 +973,17 @@ jobs:
           # Replace logs (this is tricky with multiline, using a temp file approach)
           python3 << PYEOF
           import html
+          import os
           
           with open('dashboard/index.html', 'r') as f:
               content = f.read()
           
-          install_log = open('install-output.txt', 'r').read() if open('install-output.txt', 'r') else 'No install log available'
-          build_log = open('build-output.txt', 'r').read() if open('build-output.txt', 'r') else 'No build log available'
-          lint_log = open('lint-output.txt', 'r').read() if open('lint-output.txt', 'r') else 'No lint log available'
-          unit_log = open('unit-test-output.txt', 'r').read() if open('unit-test-output.txt', 'r') else 'No unit test log available'
-          integration_log = open('integration-test-output.txt', 'r').read() if open('integration-test-output.txt', 'r') else 'No integration test log available'
-          screenshot_log = open('screenshot-output.txt', 'r').read() if open('screenshot-output.txt', 'r') else 'No screenshot log available'
+          install_log = open('install-output.txt', 'r').read() if os.path.exists('install-output.txt') else 'No install log available'
+          build_log = open('build-output.txt', 'r').read() if os.path.exists('build-output.txt') else 'No build log available'
+          lint_log = open('lint-output.txt', 'r').read() if os.path.exists('lint-output.txt') else 'No lint log available'
+          unit_log = open('unit-test-output.txt', 'r').read() if os.path.exists('unit-test-output.txt') else 'No unit test log available'
+          integration_log = open('integration-test-output.txt', 'r').read() if os.path.exists('integration-test-output.txt') else 'No integration test log available'
+          screenshot_log = open('screenshot-output.txt', 'r').read() if os.path.exists('screenshot-output.txt') else 'No screenshot log available'
           
           content = content.replace('INSTALL_LOG', html.escape(install_log))
           content = content.replace('BUILD_LOG', html.escape(build_log))

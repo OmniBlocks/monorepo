@@ -8622,12 +8622,6 @@ var beepbox = (function (exports) {
 				--note-flash-secondary: #f0f0f048;
 				--song-player-margin: #000000;
 				--progress-bar: #f00024;
-			  	
-				font-family: Inter-var-v4_1, Courier !important;
-				letter-spacing: -0.022em;
-				font-weight: 300;
-				font-variation-settings: "wght" 300, "opsz" 32;
-				font-feature-settings: "case", "dlig", "frac", "dnom" 0, "numr" 0, "subs" 0, "sups" 0, "tnum" 0, "zero" 0, "ss01" 0, "ss02" 0, "ss03" 0, "ss04" 0, "ss05" 0, "ss06" 0, "ss07" 0, "ss08" 0, "cv01" 0, "cv02", "cv03", "cv04", "cv05" 0, "cv06" 0, "cv07", "cv08" 0, "cv09" 0, "cv10" 0, "cv11" 0, "cv12" 0, "cv13" 0, "cpsp" 0, "c2sc" 0, "salt" 0, "aalt" 0, "calt" 0, "ccmp", "locl", "kern";
 			}`,
         "azur lane": `
 		:root {

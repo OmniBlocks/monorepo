@@ -4,6 +4,15 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`cc1a002`](https://github.com/OmniBlocks/scratch-gui/commit/cc1a0022dd3de714f8d86e85cada70ac51794131) - 2025-11-25 19:03:20 -0500
+
+**Update footer link ID for OmniBlocks Writer**
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`b3237ca`](https://github.com/OmniBlocks/scratch-gui/commit/b3237ca5a287ce8bf12513e6227f3cab58d1ad31) - 2025-11-25 17:54:08 -0500
 
 **Add link to OmniBlocks Writer in footer**

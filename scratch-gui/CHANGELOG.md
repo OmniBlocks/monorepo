@@ -4,6 +4,17 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`28d8e2a`](https://github.com/OmniBlocks/scratch-gui/commit/28d8e2a33ca8f7ebf90f620413042a71719ad60a) - 2025-11-26 16:10:59 -0500
+
+**fix: yes**
+
+67
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`02c8e69`](https://github.com/OmniBlocks/scratch-gui/commit/02c8e6981f21f3ecbb1ad90f604c29f6be48b373) - 2025-11-26 16:08:40 -0500
 
 **Enhance CI with Playwright tests and dashboard**

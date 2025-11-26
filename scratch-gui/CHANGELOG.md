@@ -4,6 +4,17 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`453c7b5`](https://github.com/OmniBlocks/scratch-gui/commit/453c7b51de7a9d73abf160996288ddcc826d940a) - 2025-11-26 18:33:18 -0500
+
+**fear: Enhance visual regression testing workflow**
+
+Updated the visual regression testing workflow to enhance functionality and improve comments. Changes include modifying permissions, updating comments, adding video recording capabilities, and refining the results posting format.
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`11173db`](https://github.com/OmniBlocks/scratch-gui/commit/11173dbf0b304fb25bf4752fd552d5f22ea93b01) - 2025-11-26 18:13:03 -0500
 
 **refactor: Refactor visual regression testing workflow**

@@ -4,6 +4,39 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`17094e1`](https://github.com/OmniBlocks/scratch-gui/commit/17094e19a577af959932a7f1afd326271bc2b38b) - 2025-11-26 17:18:41 -0500
+
+**fix: Restrict git add to tests directory in workflow**
+
+Modified the GitHub Actions workflow to only add the tests directory instead of all files.
+Error:
+1s
+Run cd gh-pages
+warning: in the working copy of '.github/workflows/changelog.yml', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of '.github/workflows/initialize-changelog.yml', CRLF will be replaced by LF the next time Git touches it
+[gh-pages c7538af] Update main branch test results - 2025-11-26 22:04:58 UTC
+ 13 files changed, 14755 insertions(+), 493 deletions(-)
+ create mode 100644 tests/20251126-220458/index.html
+ create mode 100644 tests/20251126-220458/screenshots/blocks-workspace.png
+ create mode 100644 tests/20251126-220458/screenshots/code-tab.png
+ create mode 100644 tests/20251126-220458/screenshots/costumes-tab.png
+ create mode 100644 tests/20251126-220458/screenshots/editor-initial.png
+ create mode 100644 tests/20251126-220458/screenshots/player-view.png
+ create mode 100644 tests/20251126-220458/screenshots/songs-tab.png
+ create mode 100644 tests/20251126-220458/screenshots/sounds-tab.png
+ create mode 100644 tests/20251126-220458/screenshots/stage-sprites.png
+ create mode 100644 tests/index.html
+ create mode 120000 tests/latest
+To https://github.com/OmniBlocks/scratch-gui.git
+ ! [remote rejected] gh-pages -> gh-pages (refusing to allow a GitHub App to create or update workflow `.github/workflows/changelog.yml` without `workflows` permission)
+error: failed to push some refs to 'https://github.com/OmniBlocks/scratch-gui.git'
+Error: Process completed with exit code 1.
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`6b7abac`](https://github.com/OmniBlocks/scratch-gui/commit/6b7abacde21a00521602c4dffc3e2a7bc3485c1c) - 2025-11-26 16:54:42 -0500
 
 **docs: Rename webgl-conformance-2.0.1 (beta).txt to iPad 18.7.2 webgl test.txt**

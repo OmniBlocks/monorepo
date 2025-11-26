@@ -4,6 +4,18 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`682c22b`](https://github.com/OmniBlocks/scratch-gui/commit/682c22bebe41ab7a3343f72ec451708aa46338de) - 2025-11-26 15:04:10 -0500
+
+**Merge pull request #400 from OmniBlocks/new-branch-tester**
+
+Add comprehensive main branch tester
+Adds a workflow (test.yml) that checks the main branch on every single commit and pushes it to a github pages branch showing a nice neatly styled dashboard with logs, screenshots of tabs, and cool stuff like that because it’s just so coolio.
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`4fde605`](https://github.com/OmniBlocks/scratch-gui/commit/4fde605fa67fe1b5c9fcef07d66f2dbdee2ce97e) - 2025-11-25 19:12:02 -0500
 
 **Fix typo in NotebookWriter link**

@@ -4,6 +4,17 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`11173db`](https://github.com/OmniBlocks/scratch-gui/commit/11173dbf0b304fb25bf4752fd552d5f22ea93b01) - 2025-11-26 18:13:03 -0500
+
+**refactor: Refactor visual regression testing workflow**
+
+Refactor visual regression testing workflow to improve clarity and maintainability. Updated Playwright test structure and added new tab tests.
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`17094e1`](https://github.com/OmniBlocks/scratch-gui/commit/17094e19a577af959932a7f1afd326271bc2b38b) - 2025-11-26 17:18:41 -0500
 
 **fix: Restrict git add to tests directory in workflow**

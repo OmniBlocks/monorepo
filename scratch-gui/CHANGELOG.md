@@ -4,6 +4,15 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`ed0689c`](https://github.com/OmniBlocks/scratch-gui/commit/ed0689c1f2c7c1045b017243defe001e6c7f2c1e) - 2025-11-26 16:14:16 -0500
+
+**Add integration status to GitHub Actions workflow**
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`28d8e2a`](https://github.com/OmniBlocks/scratch-gui/commit/28d8e2a33ca8f7ebf90f620413042a71719ad60a) - 2025-11-26 16:10:59 -0500
 
 **fix: yes**

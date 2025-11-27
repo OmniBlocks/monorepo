@@ -478,9 +478,21 @@ jobs:
         run: |
           cat > compare-and-gif.js << 'EOF'
           const fs = require('fs');
-          const PNG = require('pngjs').PNG;
-          const pixelmatch = require('pixelmatch');
-          const { GIFEncoder, quantize, applyPalette } = require('gifenc');
+          const { PNG } = require('pngjs');
+
+          // ESM/CJS interop for pixelmatch
+          const pmMod = require('pixelmatch');
+          const pixelmatch = pmMod && (pmMod.default || pmMod);
+
+          // ESM/CJS interop for gifenc
+          const geMod = require('gifenc');
+          const GIFEncoder = (geMod && (geMod.GIFEncoder || geMod.default?.GIFEncoder)) || null;
+          const quantize   = (geMod && (geMod.quantize   || geMod.default?.quantize))   || null;
+          const applyPalette = (geMod && (geMod.applyPalette || geMod.default?.applyPalette)) || null;
+
+          if (typeof pixelmatch !== 'function') {
+            throw new TypeError('pixelmatch import failed: got ' + typeof pixelmatch + '. Try ESM/CJS fallback.');
+          }
 
           const screenshots = [
             'editor-initial.png',
@@ -501,7 +513,7 @@ jobs:
 
           for (const screenshot of screenshots) {
             const basePath = `screenshots-base/${screenshot}`;
-            const prPath = `screenshots-pr/${screenshot}`;
+            const prPath   = `screenshots-pr/${screenshot}`;
 
             if (!fs.existsSync(basePath) || !fs.existsSync(prPath)) {
               console.log(`Skipping ${screenshot} - file not found`);
@@ -510,17 +522,21 @@ jobs:
             }
 
             const base = PNG.sync.read(fs.readFileSync(basePath));
-            const pr = PNG.sync.read(fs.readFileSync(prPath));
+            const pr   = PNG.sync.read(fs.readFileSync(prPath));
 
             const { width, height } = base;
+            if (width !== pr.width || height !== pr.height) {
+              console.warn(`Dimension mismatch for ${screenshot}: base=${width}x${height}, pr=${pr.width}x${pr.height}`);
+            }
+
             const diff = new PNG({ width, height });
 
             const numDiffPixels = pixelmatch(
               base.data,
               pr.data,
               diff.data,
-              width,
-              height,
+              Math.min(width, pr.width),
+              Math.min(height, pr.height),
               { threshold: 0.1 }
             );
 
@@ -529,21 +545,30 @@ jobs:
             if (numDiffPixels > 0) {
               changesDetected = true;
               fs.writeFileSync(`screenshots-diff/${screenshot}`, PNG.sync.write(diff));
-              try {
-                const gif = GIFEncoder();
-                const frames = [base, pr, diff];
-                const format = 'rgba444';
-                for (const frame of frames) {
-                  const palette = quantize(frame.data, 256, { format });
-                  const index = applyPalette(frame.data, palette, format);
-                  gif.writeFrame(index, width, height, { palette, delay: 900 });
+
+              // Try to create GIF (Base → PR → Diff); skip gracefully if gifenc not available
+              if (GIFEncoder && quantize && applyPalette) {
+                try {
+                  const enc = GIFEncoder();
+                  const frames = [base, pr, diff];
+                  const format = 'rgba444';
+
+                  for (const frame of frames) {
+                    const palette = quantize(frame.data, 256, { format });
+                    const index = applyPalette(frame.data, palette, format);
+                    enc.writeFrame(index, frame.width, frame.height, { palette, delay: 900 });
+                  }
+
+                  enc.finish();
+                  const gifBuffer = Buffer.from(enc.bytes());
+                  fs.writeFileSync(`screenshots-gifs/${screenshot.replace('.png', '.gif')}`, gifBuffer);
+                } catch (e) {
+                  console.log(`Could not create GIF for ${screenshot}: ${e.message}`);
                 }
-                gif.finish();
-                const gifBuffer = Buffer.from(gif.bytes());
-                fs.writeFileSync(`screenshots-gifs/${screenshot.replace('.png', '.gif')}`, gifBuffer);
-              } catch (e) {
-                console.log(`Could not create GIF for ${screenshot}: ${e.message}`);
+              } else {
+                console.log('gifenc not available (GIFEncoder/quantize/applyPalette missing); skipping GIF creation.');
               }
+
               results.push({ name: screenshot, diffPixels: numDiffPixels, diffPercentage, hasDiff: true, skipped: false });
             } else {
               results.push({ name: screenshot, diffPixels: 0, diffPercentage: '0.00', hasDiff: false, skipped: false });
@@ -556,7 +581,7 @@ jobs:
           node compare-and-gif.js
           CHANGES=$(node -e "console.log(require('./comparison-results.json').changesDetected)")
           echo "changes_detected=$CHANGES" >> $GITHUB_OUTPUT
-
+          
       # ============================================================
       # SAVE BASELINES TO VERSION CONTROL
       # ============================================================

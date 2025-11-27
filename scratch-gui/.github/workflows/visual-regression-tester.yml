@@ -78,11 +78,10 @@ jobs:
                     `⬜ Taking PR Screenshots + Video\n\n` +
                     `🎨 **Analysis Phase:**\n` +
                     `⬜ Comparing Screenshots\n` +
-                    `⬜ Generating Diff Images\n` +
-                    `⬜ Creating GIF Animations\n\n` +
+                    `⬜ Generating Diff Images & GIFs\n\n` +
                     `💾 **Storage Phase:**\n` +
-                    `⬜ Saving to vrt-baselines branch\n` +
-                    `⬜ Uploading inline images\n\n` +
+                    `⬜ Saving to vrt-baselines\n` +
+                    `⬜ Uploading inline assets\n\n` +
                     `_Hold tight, this is going to be EPIC!_ 🚀`
             });
             return comment.data.id;
@@ -130,11 +129,10 @@ jobs:
                     `⬜ Taking PR Screenshots + Video\n\n` +
                     `🎨 **Analysis Phase:**\n` +
                     `⬜ Comparing Screenshots\n` +
-                    `⬜ Generating Diff Images\n` +
-                    `⬜ Creating GIF Animations\n\n` +
+                    `⬜ Generating Diff Images & GIFs\n\n` +
                     `💾 **Storage Phase:**\n` +
-                    `⬜ Saving to vrt-baselines branch\n` +
-                    `⬜ Uploading inline images`
+                    `⬜ Saving to vrt-baselines\n` +
+                    `⬜ Uploading inline assets`
             });
 
       - name: Build base version
@@ -161,7 +159,7 @@ jobs:
           done
 
       # ============================================================
-      # PLAYWRIGHT TEST HARNESS WITH VIDEO RECORDING
+      # PLAYWRIGHT + VIDEO
       # ============================================================
       - name: Install Playwright and dependencies
         run: |
@@ -185,21 +183,13 @@ jobs:
               trace: 'retain-on-failure',
               screenshot: 'only-on-failure',
               viewport: { width: 1366, height: 900 },
-              video: {
-                mode: 'on',
-                size: { width: 1366, height: 900 }
-              }
+              video: { mode: 'on', size: { width: 1366, height: 900 } }
             },
-            projects: [
-              {
-                name: 'chromium',
-                use: { ...devices['Desktop Chrome'] },
-              },
-            ],
+            projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }]
           });
           EOF
 
-      - name: Create Playwright test (tab fix + songs)
+      - name: Create Playwright test (tabs by index incl. Songs)
         run: |
           cat > screenshot-test.spec.js << 'EOF'
           const { test, expect } = require('@playwright/test');
@@ -208,6 +198,7 @@ jobs:
           const BASE = `http://localhost:${PORT}`;
 
           async function waitEditor(page) {
+            await page.goto(`${BASE}/editor.html`);
             await page.waitForLoadState('networkidle');
             await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
             await page.waitForTimeout(1500);
@@ -219,19 +210,17 @@ jobs:
             const tab = tabList.locator('[role="tab"]').nth(index);
             await expect(tab).toBeVisible({ timeout: 5000 });
             await tab.scrollIntoViewIfNeeded();
-            await tab.click({ trial: false });
+            await tab.click();
             await page.waitForTimeout(800);
           }
 
           test.describe('Visual Regression Screenshots', () => {
             test('Editor - Initial Load', async ({ page }) => {
-              await page.goto(`${BASE}/editor.html`);
               await waitEditor(page);
               await page.screenshot({ path: 'screenshots/editor-initial.png', fullPage: true });
             });
 
             test('Editor - Blocks Workspace', async ({ page }) => {
-              await page.goto(`${BASE}/editor.html`);
               await waitEditor(page);
               const editorWrapper = page.locator('[class*="editor-wrapper"]').first();
               if (await editorWrapper.count()) {
@@ -242,7 +231,6 @@ jobs:
             });
 
             test('Editor - Stage and Sprites', async ({ page }) => {
-              await page.goto(`${BASE}/editor.html`);
               await waitEditor(page);
               const stageWrapper = page.locator('[class*="stage-and-target-wrapper"]').first();
               if (await stageWrapper.count()) {
@@ -253,28 +241,24 @@ jobs:
             });
 
             test('Editor - Code Tab', async ({ page }) => {
-              await page.goto(`${BASE}/editor.html`);
               await waitEditor(page);
               await clickTabByIndex(page, 0);
               await page.screenshot({ path: 'screenshots/code-tab.png', fullPage: true });
             });
 
             test('Editor - Costumes Tab', async ({ page }) => {
-              await page.goto(`${BASE}/editor.html`);
               await waitEditor(page);
               await clickTabByIndex(page, 1);
               await page.screenshot({ path: 'screenshots/costumes-tab.png', fullPage: true });
             });
 
             test('Editor - Sounds Tab', async ({ page }) => {
-              await page.goto(`${BASE}/editor.html`);
               await waitEditor(page);
               await clickTabByIndex(page, 2);
               await page.screenshot({ path: 'screenshots/sounds-tab.png', fullPage: true });
             });
 
             test('Editor - Songs Tab', async ({ page }) => {
-              await page.goto(`${BASE}/editor.html`);
               await waitEditor(page);
               await clickTabByIndex(page, 3);
               await page.screenshot({ path: 'screenshots/songs-tab.png', fullPage: true });
@@ -315,18 +299,22 @@ jobs:
                     `⬜ Taking PR Screenshots + Video\n\n` +
                     `🎨 **Analysis Phase:**\n` +
                     `⬜ Comparing Screenshots\n` +
-                    `⬜ Generating Diff Images\n` +
-                    `⬜ Creating GIF Animations\n\n` +
+                    `⬜ Generating Diff Images & GIFs\n\n` +
                     `💾 **Storage Phase:**\n` +
-                    `⬜ Saving to vrt-baselines branch\n` +
-                    `⬜ Uploading inline images`
+                    `⬜ Saving to vrt-baselines\n` +
+                    `⬜ Uploading inline assets`
             });
 
       - name: Capture base screenshots
         run: |
           mkdir -p screenshots-base videos-base
+          rm -rf screenshots test-results
           npx playwright test screenshot-test.spec.js --project=chromium
-          mv screenshots screenshots-base/
+          # Move the FILES, not the folder, so compare can find them
+          shopt -s nullglob dotglob
+          cp -R screenshots/* screenshots-base/ 2>/dev/null || true
+          rm -rf screenshots
+          # Move videos if they exist
           find test-results -name "*.webm" -exec mv {} videos-base/ \; 2>/dev/null || true
 
       - name: Stop base server
@@ -363,11 +351,10 @@ jobs:
                     `⬜ Taking PR Screenshots + Video\n\n` +
                     `🎨 **Analysis Phase:**\n` +
                     `⬜ Comparing Screenshots\n` +
-                    `⬜ Generating Diff Images\n` +
-                    `⬜ Creating GIF Animations\n\n` +
+                    `⬜ Generating Diff Images & GIFs\n\n` +
                     `💾 **Storage Phase:**\n` +
-                    `⬜ Saving to vrt-baselines branch\n` +
-                    `⬜ Uploading inline images`
+                    `⬜ Saving to vrt-baselines\n` +
+                    `⬜ Uploading inline assets`
             });
 
       - name: Checkout PR branch
@@ -429,11 +416,10 @@ jobs:
                     `${checklist_spinner} Taking PR Screenshots + Video\n\n` +
                     `🎨 **Analysis Phase:**\n` +
                     `⬜ Comparing Screenshots\n` +
-                    `⬜ Generating Diff Images\n` +
-                    `⬜ Creating GIF Animations\n\n` +
+                    `⬜ Generating Diff Images & GIFs\n\n` +
                     `💾 **Storage Phase:**\n` +
-                    `⬜ Saving to vrt-baselines branch\n` +
-                    `⬜ Uploading inline images`
+                    `⬜ Saving to vrt-baselines\n` +
+                    `⬜ Uploading inline assets`
             });
 
       - name: Capture PR screenshots
@@ -441,9 +427,11 @@ jobs:
           PORT: '8081'
         run: |
           mkdir -p screenshots-pr videos-pr
-          rm -rf test-results
+          rm -rf screenshots test-results
           npx playwright test screenshot-test.spec.js --project=chromium
-          mv screenshots screenshots-pr/
+          shopt -s nullglob dotglob
+          cp -R screenshots/* screenshots-pr/ 2>/dev/null || true
+          rm -rf screenshots
           find test-results -name "*.webm" -exec mv {} videos-pr/ \; 2>/dev/null || true
 
       - name: Stop PR server
@@ -455,7 +443,7 @@ jobs:
           fi
 
       # ============================================================
-      # COMPARE & CREATE GIFS
+      # COMPARE & CREATE GIFs
       # ============================================================
       - name: Update comment - Comparing Screenshots
         uses: actions/github-script@v7
@@ -479,12 +467,10 @@ jobs:
                     `✅ Taking Base Screenshots + Video\n` +
                     `✅ Taking PR Screenshots + Video\n\n` +
                     `🎨 **Analysis Phase:**\n` +
-                    `${checklist_spinner} Comparing Screenshots\n` +
-                    `⬜ Generating Diff Images\n` +
-                    `⬜ Creating GIF Animations\n\n` +
+                    `${checklist_spinner} Comparing Screenshots & Generating Diff/GIFs\n\n` +
                     `💾 **Storage Phase:**\n` +
-                    `⬜ Saving to vrt-baselines branch\n` +
-                    `⬜ Uploading inline images`
+                    `⬜ Saving to vrt-baselines\n` +
+                    `⬜ Uploading inline assets`
             });
 
       - name: Compare screenshots and generate GIFs
@@ -542,44 +528,25 @@ jobs:
 
             if (numDiffPixels > 0) {
               changesDetected = true;
-              
-              // Save diff image
               fs.writeFileSync(`screenshots-diff/${screenshot}`, PNG.sync.write(diff));
-              
-              // Create animated GIF: base → pr → diff
               try {
                 const gif = GIFEncoder();
-                
-                // Convert PNG to indexed color for GIF
                 const frames = [base, pr, diff];
                 const format = 'rgba444';
-                
                 for (const frame of frames) {
                   const palette = quantize(frame.data, 256, { format });
                   const index = applyPalette(frame.data, palette, format);
-                  gif.writeFrame(index, width, height, { palette, delay: 1000 });
+                  gif.writeFrame(index, width, height, { palette, delay: 900 });
                 }
-                
                 gif.finish();
                 const gifBuffer = Buffer.from(gif.bytes());
                 fs.writeFileSync(`screenshots-gifs/${screenshot.replace('.png', '.gif')}`, gifBuffer);
               } catch (e) {
                 console.log(`Could not create GIF for ${screenshot}: ${e.message}`);
               }
-              
-              results.push({
-                name: screenshot,
-                diffPixels: numDiffPixels,
-                diffPercentage,
-                hasDiff: true
-              });
+              results.push({ name: screenshot, diffPixels: numDiffPixels, diffPercentage, hasDiff: true, skipped: false });
             } else {
-              results.push({
-                name: screenshot,
-                diffPixels: 0,
-                diffPercentage: '0.00',
-                hasDiff: false
-              });
+              results.push({ name: screenshot, diffPixels: 0, diffPercentage: '0.00', hasDiff: false, skipped: false });
             }
           }
 
@@ -587,7 +554,7 @@ jobs:
           EOF
 
           node compare-and-gif.js
-          CHANGES=$(cat comparison-results.json | grep -o '"changesDetected":[^,}]*' | cut -d':' -f2 | tr -d ' ')
+          CHANGES=$(node -e "console.log(require('./comparison-results.json').changesDetected)")
           echo "changes_detected=$CHANGES" >> $GITHUB_OUTPUT
 
       # ============================================================
@@ -615,12 +582,10 @@ jobs:
                     `✅ Taking Base Screenshots + Video\n` +
                     `✅ Taking PR Screenshots + Video\n\n` +
                     `🎨 **Analysis Phase:**\n` +
-                    `✅ Comparing Screenshots\n` +
-                    `✅ Generating Diff Images\n` +
-                    `✅ Creating GIF Animations\n\n` +
+                    `✅ Comparing Screenshots & Generating Diff/GIFs\n\n` +
                     `💾 **Storage Phase:**\n` +
-                    `${checklist_spinner} Saving to vrt-baselines branch\n` +
-                    `⬜ Uploading inline images`
+                    `${checklist_spinner} Saving to vrt-baselines\n` +
+                    `⬜ Uploading inline assets`
             });
 
       - name: Save baseline screenshots to vrt-baselines branch
@@ -628,40 +593,32 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           
-          # Try to clone existing branch, or create new repo
           if git ls-remote --heads https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git vrt-baselines | grep -q vrt-baselines; then
-            echo "Branch exists, cloning..."
             git clone --single-branch --branch vrt-baselines --depth 1 https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git vrt-baselines-repo
             cd vrt-baselines-repo
           else
-            echo "Branch doesn't exist, creating orphan..."
             git clone --depth 1 https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git vrt-baselines-repo
             cd vrt-baselines-repo
             git checkout --orphan vrt-baselines
             git rm -rf . 2>/dev/null || true
           fi
           
-          # Remove .github to avoid workflow permission issues
           rm -rf .github
           
-          # Create directory for this PR
           mkdir -p pr-${{ fromJSON(steps.pr.outputs.result).number }}/base
           mkdir -p pr-${{ fromJSON(steps.pr.outputs.result).number }}/pr
           mkdir -p pr-${{ fromJSON(steps.pr.outputs.result).number }}/diff
           
-          # Copy screenshots
           cp -r ../screenshots-base/* pr-${{ fromJSON(steps.pr.outputs.result).number }}/base/ 2>/dev/null || true
-          cp -r ../screenshots-pr/* pr-${{ fromJSON(steps.pr.outputs.result).number }}/pr/ 2>/dev/null || true
+          cp -r ../screenshots-pr/*   pr-${{ fromJSON(steps.pr.outputs.result).number }}/pr/   2>/dev/null || true
           cp -r ../screenshots-diff/* pr-${{ fromJSON(steps.pr.outputs.result).number }}/diff/ 2>/dev/null || true
           
-          # Create README
           cat > pr-${{ fromJSON(steps.pr.outputs.result).number }}/README.md << 'READMEEOF'
-          # Visual Regression Baseline for PR #${{ fromJSON(steps.pr.outputs.result).number }}
-          
-          - **Base SHA**: `${{ fromJSON(steps.pr.outputs.result).base_sha }}`
-          - **PR SHA**: `${{ fromJSON(steps.pr.outputs.result).sha }}`
-          - **Run**: [#${{ github.run_number }}](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
-          - **Date**: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          # Visual Regression Baseline
+          - Base SHA: `${{ fromJSON(steps.pr.outputs.result).base_sha }}`
+          - PR SHA: `${{ fromJSON(steps.pr.outputs.result).sha }}`
+          - Run: [#${{ github.run_number }}](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          - Date: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
           READMEEOF
           
           git add .
@@ -669,10 +626,9 @@ jobs:
           git push origin vrt-baselines || git push -u origin vrt-baselines
 
       # ============================================================
-      # UPLOAD INLINE IMAGES TO BRANCH
+      # UPLOAD INLINE ASSETS (ALWAYS)
       # ============================================================
-      - name: Update comment - Uploading Images
-        if: steps.compare.outputs.changes_detected == 'true'
+      - name: Update comment - Uploading Inline Assets
         uses: actions/github-script@v7
         with:
           script: |
@@ -694,181 +650,153 @@ jobs:
                     `✅ Taking Base Screenshots + Video\n` +
                     `✅ Taking PR Screenshots + Video\n\n` +
                     `🎨 **Analysis Phase:**\n` +
-                    `✅ Comparing Screenshots\n` +
-                    `✅ Generating Diff Images\n` +
-                    `✅ Creating GIF Animations\n\n` +
+                    `✅ Comparing Screenshots & Generating Diff/GIFs\n\n` +
                     `💾 **Storage Phase:**\n` +
-                    `✅ Saving to vrt-baselines branch\n` +
-                    `${checklist_spinner} Uploading inline images`
+                    `${checklist_spinner} Saving to vrt-baselines\n` +
+                    `${checklist_spinner} Uploading inline assets`
             });
 
-      - name: Upload diff images to vrt-images branch
-        id: upload_images
-        if: steps.compare.outputs.changes_detected == 'true'
+      - name: Upload assets to vrt-images branch (base/pr/diff/gifs/videos)
+        id: upload_assets
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          
-          # Try to clone existing branch, or create new repo
+
           if git ls-remote --heads https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git vrt-images | grep -q vrt-images; then
-            echo "Branch exists, cloning..."
             git clone --single-branch --branch vrt-images --depth 1 https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git vrt-images-repo
             cd vrt-images-repo
           else
-            echo "Branch doesn't exist, creating orphan..."
             git clone --depth 1 https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git vrt-images-repo
             cd vrt-images-repo
             git checkout --orphan vrt-images
             git rm -rf . 2>/dev/null || true
           fi
-          
-          # Remove .github to avoid workflow permission issues
+
           rm -rf .github
-          
-          # Create directory for this run
-          RUN_DIR="run-${{ github.run_number }}"
-          mkdir -p $RUN_DIR
-          
-          # Copy diff images and GIFs
-          cp -r ../screenshots-diff/* $RUN_DIR/ 2>/dev/null || true
-          cp -r ../screenshots-gifs/* $RUN_DIR/ 2>/dev/null || true
-          
+
+          RUN_DIR="pr-${{ fromJSON(steps.pr.outputs.result).number }}/run-${{ github.run_number }}"
+          mkdir -p "$RUN_DIR/base" "$RUN_DIR/pr" "$RUN_DIR/diff" "$RUN_DIR/gifs" "$RUN_DIR/videos-base" "$RUN_DIR/videos-pr"
+
+          cp -r ../screenshots-base/* "$RUN_DIR/base/" 2>/dev/null || true
+          cp -r ../screenshots-pr/*   "$RUN_DIR/pr/"   2>/dev/null || true
+          cp -r ../screenshots-diff/* "$RUN_DIR/diff/" 2>/dev/null || true
+          cp -r ../screenshots-gifs/* "$RUN_DIR/gifs/" 2>/dev/null || true
+          cp -r ../videos-base/*      "$RUN_DIR/videos-base/" 2>/dev/null || true
+          cp -r ../videos-pr/*        "$RUN_DIR/videos-pr/" 2>/dev/null || true
+
           git add .
-          git commit -m "Add VRT images for run #${{ github.run_number }}" || echo "No changes"
+          git commit -m "VRT assets for PR #${{ fromJSON(steps.pr.outputs.result).number }} run #${{ github.run_number }}" || echo "No changes"
           git push origin vrt-images || git push -u origin vrt-images
-          
-          # Output image URLs
-          echo "image_base_url=https://raw.githubusercontent.com/${{ github.repository }}/vrt-images/run-${{ github.run_number }}" >> $GITHUB_OUTPUT
-          
+
+          echo "base_url=https://raw.githubusercontent.com/${{ github.repository }}/vrt-images/$RUN_DIR/base" >> $GITHUB_OUTPUT
+          echo "pr_url=https://raw.githubusercontent.com/${{ github.repository }}/vrt-images/$RUN_DIR/pr" >> $GITHUB_OUTPUT
+          echo "diff_url=https://raw.githubusercontent.com/${{ github.repository }}/vrt-images/$RUN_DIR/diff" >> $GITHUB_OUTPUT
+          echo "gif_url=https://raw.githubusercontent.com/${{ github.repository }}/vrt-images/$RUN_DIR/gifs" >> $GITHUB_OUTPUT
+          echo "videos_base_url=https://raw.githubusercontent.com/${{ github.repository }}/vrt-images/$RUN_DIR/videos-base" >> $GITHUB_OUTPUT
+          echo "videos_pr_url=https://raw.githubusercontent.com/${{ github.repository }}/vrt-images/$RUN_DIR/videos-pr" >> $GITHUB_OUTPUT
+
       # ============================================================
-      # UPLOAD ARTIFACTS
+      # ARTIFACTS
       # ============================================================
-      - name: Upload base screenshots
-        uses: actions/upload-artifact@v4
-        with:
-          name: screenshots-base
-          path: screenshots-base/
-
-      - name: Upload PR screenshots
-        uses: actions/upload-artifact@v4
-        with:
-          name: screenshots-pr
-          path: screenshots-pr/
-
-      - name: Upload diff screenshots
-        if: steps.compare.outputs.changes_detected == 'true'
-        uses: actions/upload-artifact@v4
-        with:
-          name: screenshots-diff
-          path: screenshots-diff/
-
-      - name: Upload GIF animations
-        if: steps.compare.outputs.changes_detected == 'true'
-        uses: actions/upload-artifact@v4
-        with:
-          name: screenshots-gifs
-          path: screenshots-gifs/
-
       - name: Upload comparison results
         uses: actions/upload-artifact@v4
         with:
           name: comparison-results
           path: comparison-results.json
 
-      - name: Upload base videos
+      - name: Upload all screenshots and videos (single artifact)
         uses: actions/upload-artifact@v4
         with:
-          name: videos-base
-          path: videos-base/
-
-      - name: Upload PR videos
-        uses: actions/upload-artifact@v4
-        with:
-          name: videos-pr
-          path: videos-pr/
+          name: vrt-assets
+          path: |
+            screenshots-base/
+            screenshots-pr/
+            screenshots-diff/
+            screenshots-gifs/
+            videos-base/
+            videos-pr/
 
       # ============================================================
-      # POST RESULTS WITH INLINE IMAGES
+      # POST RESULTS WITH INLINE ASSETS
       # ============================================================
-      - name: Post results comment with inline images
+      - name: Post results comment with inline assets
         uses: actions/github-script@v7
         with:
           script: |
             const fs = require('fs');
+            const path = require('path');
             const results = JSON.parse(fs.readFileSync('comparison-results.json', 'utf8'));
             const prNumber = ${{ fromJSON(steps.pr.outputs.result).number }};
             const runId = context.runId;
-            const runNumber = context.runNumber;
             const username = context.eventName === 'issue_comment'
               ? context.payload.comment.user.login
               : context.payload.pull_request.user.login;
-            
-            const imageBaseUrl = '${{ steps.upload_images.outputs.image_base_url }}';
+
+            const baseURL = '${{ steps.upload_assets.outputs.base_url }}';
+            const prURL   = '${{ steps.upload_assets.outputs.pr_url }}';
+            const diffURL = '${{ steps.upload_assets.outputs.diff_url }}';
+            const gifURL  = '${{ steps.upload_assets.outputs.gif_url }}';
+            const vBase   = '${{ steps.upload_assets.outputs.videos_base_url }}';
+            const vPr     = '${{ steps.upload_assets.outputs.videos_pr_url }}';
+
+            const display = n => n.replace('.png','').replace(/-/g,' ').replace(/\b\w/g, l => l.toUpperCase());
 
             let body = `## 🎬 Visual Regression Test Results\n\n`;
-            body += `Hi @${username}! Here are the visual comparison results:\n\n`;
+            body += `Hi @${username}! Inline previews below. Scroll for all views.\n\n`;
 
-            if (results.changesDetected) {
-              body += `### ⚠️ Visual Changes Detected\n\n`;
-              
-              const changedScreenshots = results.results.filter(r => r.hasDiff);
-              
-              for (const result of changedScreenshots) {
-                const displayName = result.name.replace('.png', '').replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-                body += `#### 📸 ${displayName}\n`;
-                body += `- **Difference:** ${result.diffPercentage}% (${result.diffPixels.toLocaleString()} pixels)\n\n`;
-                
-                // Inline diff image
-                body += `**Diff Visualization:**\n\n`;
-                body += `![${displayName} Diff](${imageBaseUrl}/${result.name})\n\n`;
-                
-                // Inline GIF animation
-                const gifName = result.name.replace('.png', '.gif');
-                body += `**Animated Comparison (Base → PR → Diff):**\n\n`;
-                body += `![${displayName} Animation](${imageBaseUrl}/${gifName})\n\n`;
-                
-                body += `---\n\n`;
-              }
+            // Inline gallery
+            const items = results.results.length ? results.results : [];
+            for (const r of items) {
+              const name = r.name || '';
+              if (!name) continue;
+              const dname = display(name);
 
-              body += `### 📊 Summary Table\n\n`;
-              body += `| Screenshot | Status | Difference |\n`;
-              body += `|------------|--------|------------|\n`;
-              for (const result of results.results) {
-                if (result.skipped) {
-                  body += `| ${result.name.replace('.png', '')} | ⚠️ Skipped | N/A |\n`;
-                } else {
-                  const status = result.hasDiff ? '⚠️ Changed' : '✅ No change';
-                  const name = result.name.replace('.png', '');
-                  body += `| ${name} | ${status} | ${result.diffPercentage}% |\n`;
-                }
-              }
-            } else {
-              body += `### ✅ No Visual Changes Detected\n\n`;
-              body += `All screenshots match the base branch! 🎉\n\n`;
-              
-              body += `### 📊 All Screenshots Checked\n\n`;
-              body += `| Screenshot | Status |\n`;
-              body += `|------------|--------|\n`;
-              for (const result of results.results) {
-                if (result.skipped) {
-                  body += `| ${result.name.replace('.png', '')} | ⚠️ Skipped |\n`;
-                } else {
-                  const name = result.name.replace('.png', '');
-                  body += `| ${name} | ✅ No change |\n`;
-                }
+              body += `### ${dname}\n`;
+              body += `<table><thead><tr><th align="left">Base</th><th align="left">PR</th></tr></thead><tbody>`;
+              body += `<tr><td><img src="${baseURL}/${name}" width="420"/></td><td><img src="${prURL}/${name}" width="420"/></td></tr>`;
+              body += `</tbody></table>\n`;
+
+              if (r.hasDiff) {
+                body += `Diff and Animation:\n\n`;
+                body += `<img src="${diffURL}/${name}" width="840"/>\n\n`;
+                body += `<img src="${gifURL}/${name.replace('.png','.gif')}" width="840"/>\n\n`;
+              } else if (r.skipped) {
+                body += `_Skipped (file not found)._\n\n`;
+              } else {
+                body += `_No pixel difference detected._\n\n`;
               }
             }
 
-            body += `\n---\n\n`;
-            body += `### 📦 Downloads\n\n`;
-            body += `- 📸 [Base Screenshots](https://github.com/${{ github.repository }}/actions/runs/${runId}#artifacts)\n`;
-            body += `- 📸 [PR Screenshots](https://github.com/${{ github.repository }}/actions/runs/${runId}#artifacts)\n`;
-            body += `- 🎨 [Diff Images](https://github.com/${{ github.repository }}/actions/runs/${runId}#artifacts)\n`;
-            body += `- 🎬 [GIF Animations](https://github.com/${{ github.repository }}/actions/runs/${runId}#artifacts)\n`;
-            body += `- 🎥 [Video Recordings (Base)](https://github.com/${{ github.repository }}/actions/runs/${runId}#artifacts)\n`;
-            body += `- 🎥 [Video Recordings (PR)](https://github.com/${{ github.repository }}/actions/runs/${runId}#artifacts)\n`;
-            body += `- 💾 [Version-Controlled Baselines](https://github.com/${{ github.repository }}/tree/vrt-baselines/pr-${prNumber})\n\n`;
-            body += `💡 **Pro tip:** The baselines are saved to the \`vrt-baselines\` branch for future reference!`;
+            // Videos (link list)
+            function listFiles(dir) {
+              try {
+                return fs.readdirSync(dir).filter(f => f.endsWith('.webm'));
+              } catch { return []; }
+            }
+            const vBaseNames = listFiles('videos-base');
+            const vPrNames   = listFiles('videos-pr');
+
+            body += `\n---\n`;
+            body += `### 🎥 Video Recordings (links)\n`;
+            if (!vBaseNames.length && !vPrNames.length) {
+              body += `_No videos captured._\n`;
+            } else {
+              if (vBaseNames.length) {
+                body += `- Base: `;
+                body += vBaseNames.map(f => `[${f}](${vBase}/${encodeURIComponent(f)})`).join(' • ');
+                body += `\n`;
+              }
+              if (vPrNames.length) {
+                body += `- PR: `;
+                body += vPrNames.map(f => `[${f}](${vPr}/${encodeURIComponent(f)})`).join(' • ');
+                body += `\n`;
+              }
+            }
+
+            body += `\n---\n`;
+            body += `### 📦 Downloads\n`;
+            body += `- [Artifacts for this run](https://github.com/${{ github.repository }}/actions/runs/${runId}#artifacts)\n`;
+            body += `- [Version-Controlled Baselines](https://github.com/${{ github.repository }}/tree/vrt-baselines/pr-${prNumber})\n`;
 
             await github.rest.issues.updateComment({
               owner: context.repo.owner,

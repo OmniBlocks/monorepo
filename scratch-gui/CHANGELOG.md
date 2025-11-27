@@ -4,6 +4,17 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`006e228`](https://github.com/OmniBlocks/scratch-gui/commit/006e228a0d9c263d4de25702fb78f104d4e633c2) - 2025-11-27 15:43:59 -0500
+
+**feat: Enhance visual regression testing workflow comments**
+
+Updated visual regression testing workflow to enhance comment updates during various phases, including building, capturing, and comparing screenshots. Improved handling of branch existence for baseline and image storage.
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`9d00bb7`](https://github.com/OmniBlocks/scratch-gui/commit/9d00bb78a6a2b75fa2888509c54722b38ebd5d63) - 2025-11-26 19:20:36 -0500
 
 **fix: Remove .github directory to avoid permission issues**

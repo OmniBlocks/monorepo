@@ -4,6 +4,17 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`9d00bb7`](https://github.com/OmniBlocks/scratch-gui/commit/9d00bb78a6a2b75fa2888509c54722b38ebd5d63) - 2025-11-26 19:20:36 -0500
+
+**fix: Remove .github directory to avoid permission issues**
+
+Removed .github directory in visual regression workflow to prevent permission issues.
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`453c7b5`](https://github.com/OmniBlocks/scratch-gui/commit/453c7b51de7a9d73abf160996288ddcc826d940a) - 2025-11-26 18:33:18 -0500
 
 **fear: Enhance visual regression testing workflow**

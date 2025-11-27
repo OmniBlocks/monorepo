@@ -4,6 +4,17 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`62f68a8`](https://github.com/OmniBlocks/scratch-gui/commit/62f68a81af5c6beb102e3b77f1358aad7a8700fb) - 2025-11-27 16:11:28 -0500
+
+**refactor: Refactor visual regression workflow for efficiency**
+
+Consolidate image and GIF generation steps, update comments, and streamline storage processes.
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`006e228`](https://github.com/OmniBlocks/scratch-gui/commit/006e228a0d9c263d4de25702fb78f104d4e633c2) - 2025-11-27 15:43:59 -0500
 
 **feat: Enhance visual regression testing workflow comments**

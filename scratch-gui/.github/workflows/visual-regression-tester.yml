@@ -445,6 +445,9 @@ jobs:
           git fetch origin vrt-baselines 2>/dev/null || git checkout --orphan vrt-baselines
           git checkout vrt-baselines 2>/dev/null || echo "Creating new vrt-baselines branch"
           
+          # Remove .github directory to avoid workflow permission issues
+          rm -rf .github
+          
           # Create directory for this PR
           mkdir -p pr-${{ fromJSON(steps.pr.outputs.result).number }}/base
           mkdir -p pr-${{ fromJSON(steps.pr.outputs.result).number }}/pr
@@ -486,6 +489,9 @@ jobs:
           git fetch origin vrt-images 2>/dev/null || git checkout --orphan vrt-images
           git checkout vrt-images 2>/dev/null || echo "Creating new vrt-images branch"
           
+          # Remove .github directory to avoid workflow permission issues
+          rm -rf .github
+          
           # Create directory for this run
           RUN_DIR="run-${{ github.run_number }}"
           mkdir -p $RUN_DIR
@@ -500,7 +506,7 @@ jobs:
           
           # Output image URLs
           echo "image_base_url=https://raw.githubusercontent.com/${{ github.repository }}/vrt-images/run-${{ github.run_number }}" >> $GITHUB_OUTPUT
-
+          
       # ============================================================
       # UPLOAD ARTIFACTS
       # ============================================================

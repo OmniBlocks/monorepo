@@ -4,6 +4,17 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`7b6f7c0`](https://github.com/OmniBlocks/scratch-gui/commit/7b6f7c0c5824c5e19520cb6f09fd394117bd0711) - 2025-11-27 17:05:35 -0500
+
+**fix: Improve GIF generation in visual regression tests**
+
+Refactor GIF creation logic with ESM/CJS interop for dependencies.
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`62f68a8`](https://github.com/OmniBlocks/scratch-gui/commit/62f68a81af5c6beb102e3b77f1358aad7a8700fb) - 2025-11-27 16:11:28 -0500
 
 **refactor: Refactor visual regression workflow for efficiency**

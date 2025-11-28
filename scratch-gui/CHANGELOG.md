@@ -4,6 +4,17 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`6ff226a`](https://github.com/OmniBlocks/scratch-gui/commit/6ff226a1537a80848431bb7a6a01cab81a96e819) - 2025-11-27 20:04:19 -0500
+
+**fix: Fix build process in visual regression tester workflow**
+
+Updated build job to use manual cleanup and webpack directly.
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`d7ae2eb`](https://github.com/OmniBlocks/scratch-gui/commit/d7ae2eb395e0b67d3debdbb21ff582b947a7bac8) - 2025-11-27 19:44:01 -0500
 
 **feat: ultra visual reggresion tesitng**

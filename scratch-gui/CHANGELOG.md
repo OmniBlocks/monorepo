@@ -4,6 +4,15 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`1fb9504`](https://github.com/OmniBlocks/scratch-gui/commit/1fb95041f2e49b5406b426d7a38faec7f4c904eb) - 2025-11-27 21:54:43 -0500
+
+**fix: fix visual reggreison test for real**
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`eeae610`](https://github.com/OmniBlocks/scratch-gui/commit/eeae6103b628de5f869b23e2ff632f322cd55ded) - 2025-11-27 21:38:42 -0500
 
 **fix: npx thigny again**

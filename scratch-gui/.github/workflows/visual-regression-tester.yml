@@ -161,6 +161,7 @@ jobs:
         working-directory: base
         run: |
           npm ci
+          npm install rimraf mkdirp
           
           # Add node_modules/.bin to PATH so rimraf/mkdirp can be found
           export PATH="$PWD/node_modules/.bin:$PATH"
@@ -202,7 +203,7 @@ jobs:
         working-directory: pr
         run: |
           npm ci
-          
+          npm install rimraf mkdirp
           # Add node_modules/.bin to PATH so rimraf/mkdirp can be found
           export PATH="$PWD/node_modules/.bin:$PATH"
           

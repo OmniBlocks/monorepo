@@ -4,6 +4,17 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`d7ae2eb`](https://github.com/OmniBlocks/scratch-gui/commit/d7ae2eb395e0b67d3debdbb21ff582b947a7bac8) - 2025-11-27 19:44:01 -0500
+
+**feat: ultra visual reggresion tesitng**
+
+adds multi-platform, multi-browser testing for windows, macos, ubuntu, chromium, firefox, webkit plus a couple of extra tests
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`7b6f7c0`](https://github.com/OmniBlocks/scratch-gui/commit/7b6f7c0c5824c5e19520cb6f09fd394117bd0711) - 2025-11-27 17:05:35 -0500
 
 **fix: Improve GIF generation in visual regression tests**

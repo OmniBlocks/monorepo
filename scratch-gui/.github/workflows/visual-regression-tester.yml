@@ -145,8 +145,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
-
+        
       # Build BASE (in root!)
       - name: Checkout base branch
         uses: actions/checkout@v4

@@ -1,6 +1,7 @@
 // Copyright (c) 2012-2022 John Nesky and contributing authors, distributed under the MIT license, see accompanying the LICENSE.md file.
 
 import { Config } from "../synth/SynthConfig";
+import { createKeys } from "../synth/CreateScalesAndKeys";
 import { SongDocument } from "./SongDocument";
 import { AnalogousDrum, analogousDrumMap, MidiEventType } from "./Midi";
 
@@ -93,9 +94,9 @@ export class MidiInputHandler {
                 return;
             }
         } else {
-            key -= Config.keys[this._doc.song.key].basePitch; // The basePitch of the song key is implicit so don't include it.
-            if (key < 0 || key > Config.maxPitch) return;
-        }
+			key -= createKeys(this._doc.song.edo)[this._doc.song.key].basePitch; // The basePitch of the song key is implicit so don't include it.
+			if (key < 0 || key > this._doc.song.edo * Config.pitchOctaves) return;
+		}
 
         if (eventType == MidiEventType.noteOn && velocity == 0) {
             eventType = MidiEventType.noteOff;

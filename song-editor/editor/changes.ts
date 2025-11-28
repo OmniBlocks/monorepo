@@ -7,6 +7,7 @@ import { Change, ChangeGroup, ChangeSequence, UndoableChange } from "./Change";
 import { SongDocument } from "./SongDocument";
 import { ColorConfig } from "./ColorConfig";
 import { Slider } from "./HTMLWrapper";
+import { createScales } from "../synth/CreateScalesAndKeys";
 
 export function patternsContainSameInstruments(pattern1Instruments: number[], pattern2Instruments: number[]): boolean {
     const pattern2Has1Instruments: boolean = pattern1Instruments.every(instrument => pattern2Instruments.indexOf(instrument) != -1);
@@ -32,11 +33,11 @@ export function discardInvalidPatternInstruments(instruments: number[], song: So
     }
 }
 
-export function unionOfUsedNotes(pattern: Pattern, flags: boolean[]): void {
+export function unionOfUsedNotes(pattern: Pattern, flags: boolean[], edo: number): void {
     for (const note of pattern.notes) {
         for (const pitch of note.pitches) {
             for (const pin of note.pins) {
-                const key: number = (pitch + pin.interval) % 12;
+                const key: number = (pitch + pin.interval) % edo;
                 if (!flags[key]) {
                     flags[key] = true;
                 }
@@ -45,11 +46,11 @@ export function unionOfUsedNotes(pattern: Pattern, flags: boolean[]): void {
     }
 }
 
-export function generateScaleMap(oldScaleFlags: ReadonlyArray<boolean>, newScaleValue: number, customScaleFlags: ReadonlyArray<boolean>): number[] {
-    const newScaleFlags: ReadonlyArray<boolean> = newScaleValue == Config.scales["dictionary"]["Custom"].index ? customScaleFlags : Config.scales[newScaleValue].flags;
+export function generateScaleMap(oldScaleFlags: ReadonlyArray<boolean>, newScaleValue: number, edo: number): number[] {
+    const newScaleFlags: ReadonlyArray<boolean> = createScales(edo)[newScaleValue].flags;
     const oldScale: number[] = [];
     const newScale: number[] = [];
-    for (let i: number = 0; i < 12; i++) {
+    for (let i: number = 0; i < edo; i++) {
         if (oldScaleFlags[i]) oldScale.push(i);
         if (newScaleFlags[i]) newScale.push(i);
     }
@@ -99,12 +100,12 @@ export function generateScaleMap(oldScaleFlags: ReadonlyArray<boolean>, newScale
     }
 
     // To make it easier to wrap around.
-    sparsePitchMap.push([12, 12]);
-    newScale.push(12);
+    sparsePitchMap.push([edo, edo]);
+    newScale.push(edo);
 
     let sparseIndex: number = 0;
     const fullPitchMap: number[] = [];
-    for (let i: number = 0; i < 12; i++) {
+    for (let i: number = 0; i < edo; i++) {
         const oldLow: number = sparsePitchMap[sparseIndex][0];
         const newLow: number = sparsePitchMap[sparseIndex][1];
         const oldHigh: number = sparsePitchMap[sparseIndex + 1][0];
@@ -2007,7 +2008,7 @@ export class ChangeCustomScale extends Change {
     constructor(doc: SongDocument, flags: boolean[]) {
         super();
 
-        for (let i: number = 0; i < Config.pitchesPerOctave; i++) {
+        for (let i: number = 0; i < doc.song.edo; i++) {
             doc.song.scaleCustom[i] = flags[i];
         }
 
@@ -4759,28 +4760,28 @@ class ChangeTransposeNote extends UndoableChange {
         // Can't transpose mods
         if (doc.song.getChannelIsMod(doc.channel)) return;
 
-        const maxPitch: number = (isNoise ? Config.drumCount - 1 : Config.maxPitch);
+        const maxPitch: number = (isNoise ? Config.drumCount - 1 : doc.song.edo * Config.maxPitch);
 
         for (let i: number = 0; i < this._oldPitches.length; i++) {
             let pitch: number = this._oldPitches[i];
             if (octave && !isNoise) {
                 if (upward) {
-                    pitch = Math.min(maxPitch, pitch + 12);
+                    pitch = Math.min(maxPitch, pitch + doc.song.edo);
                 } else {
-                    pitch = Math.max(0, pitch - 12);
+                    pitch = Math.max(0, pitch - doc.song.edo);
                 }
             } else {
-                let scale = doc.song.scale == Config.scales.dictionary["Custom"].index ? doc.song.scaleCustom : Config.scales[doc.song.scale].flags;
+                // let scale = doc.song.scale == Config.scales.dictionary["Custom"].index ? doc.song.scaleCustom : Config.scales[doc.song.scale].flags;
                 if (upward) {
                     for (let j: number = pitch + 1; j <= maxPitch; j++) {
-                        if (isNoise || ignoreScale || scale[j % 12]) {
+                        if (isNoise || ignoreScale || createScales(doc.song.edo)[doc.song.scale].flags[j % doc.song.edo]) {
                             pitch = j;
                             break;
                         }
                     }
                 } else {
                     for (let j: number = pitch - 1; j >= 0; j--) {
-                        if (isNoise || ignoreScale || scale[j % 12]) {
+                        if (isNoise || ignoreScale || createScales(doc.song.edo)[doc.song.scale].flags[j % doc.song.edo]) {
                             pitch = j;
                             break;
                         }
@@ -4814,22 +4815,22 @@ class ChangeTransposeNote extends UndoableChange {
             if (interval > max) interval = max;
             if (octave && !isNoise) {
                 if (upward) {
-                    interval = Math.min(max, interval + 12);
+                    interval = Math.min(max, interval + doc.song.edo);
                 } else {
-                    interval = Math.max(min, interval - 12);
+                    interval = Math.max(min, interval - doc.song.edo);
                 }
             } else {
-                let scale = doc.song.scale == Config.scales.dictionary["Custom"].index ? doc.song.scaleCustom : Config.scales[doc.song.scale].flags;
+                //let scale = doc.song.scale == Config.scales.dictionary["Custom"].index ? doc.song.scaleCustom : Config.scales[doc.song.scale].flags;
                 if (upward) {
                     for (let i: number = interval + 1; i <= max; i++) {
-                        if (isNoise || ignoreScale || scale[i % 12]) {
+                        if (isNoise || ignoreScale || createScales(doc.song.edo)[doc.song.scale].flags[i % doc.song.edo]) {
                             interval = i;
                             break;
                         }
                     }
                 } else {
                     for (let i: number = interval - 1; i >= min; i--) {
-                        if (isNoise || ignoreScale || scale[i % 12]) {
+                        if (isNoise || ignoreScale || createScales(doc.song.edo)[doc.song.scale].flags[i % doc.song.edo]) {
                             interval = i;
                             break;
                         }
@@ -5066,7 +5067,7 @@ export class ChangePatternScale extends Change {
         if (doc.selection.patternSelectionActive) {
             new ChangeSplitNotesAtSelection(doc, pattern);
         }
-        const maxPitch: number = Config.maxPitch;
+        const maxPitch: number = doc.song.edo * Config.maxPitch;
         for (const note of pattern.notes) {
             if (doc.selection.patternSelectionActive && (note.end <= doc.selection.patternSelectionStart || note.start >= doc.selection.patternSelectionEnd)) {
                 continue;
@@ -5076,7 +5077,7 @@ export class ChangePatternScale extends Change {
             const newPins: NotePin[] = [];
             for (let i: number = 0; i < note.pitches.length; i++) {
                 const pitch: number = note.pitches[i];
-                const transformedPitch: number = scaleMap[pitch % 12] + (pitch - (pitch % 12));
+                const transformedPitch: number = scaleMap[pitch % doc.song.edo] + (pitch - (pitch % doc.song.edo));
                 if (newPitches.indexOf(transformedPitch) == -1) {
                     newPitches.push(transformedPitch);
                 }
@@ -5095,7 +5096,7 @@ export class ChangePatternScale extends Change {
                 let interval: number = oldPin.interval + note.pitches[0];
                 if (interval < min) interval = min;
                 if (interval > max) interval = max;
-                const transformedInterval: number = scaleMap[interval % 12] + (interval - (interval % 12));
+                const transformedInterval: number = scaleMap[interval % doc.song.edo] + (interval - (interval % doc.song.edo));
                 newPins.push(makeNotePin(transformedInterval - newPitches[0], oldPin.time, oldPin.size));
             }
 

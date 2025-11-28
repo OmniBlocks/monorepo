@@ -13047,6 +13047,337 @@ li.select2-results__option[role=group] > strong:hover {
         return acc < 0 ? acc + 4294967296 : acc;
     }
 
+    function gcd$1(a, b) {
+        if (b === 0)
+            return a;
+        return gcd$1(b, a % b);
+    }
+    function finishKeys(keys, edo) {
+        let keysFinished = false;
+        let newKeys;
+        while (!keysFinished) {
+            keysFinished = true;
+            newKeys = structuredClone(keys);
+            for (let i = 0; i < edo; i++) {
+                if (keys[i] == "") {
+                    if (keys[i - 1] != "") {
+                        newKeys[i] = keys[i - 1] + "+";
+                    }
+                    else if (keys[(i + 1) % edo] != "") {
+                        newKeys[i] = keys[(i + 1) % edo] + "-";
+                    }
+                    else {
+                        keysFinished = false;
+                    }
+                }
+            }
+            keys = structuredClone(newKeys);
+        }
+        return keys;
+    }
+    function appendToListItems(list, add, atBack) {
+        let newList = [];
+        for (let i = 0; i < list.length; i++) {
+            atBack ? newList.push(add + list[i]) : newList.push(list[i] + add);
+        }
+        return newList;
+    }
+    function createMOS(edo, gen, modeNames, scaleArray, numGens, realScaleName) {
+        for (let gensDown = 0; gensDown < numGens; gensDown++) {
+            let thisFlags = Array(edo).fill(false);
+            thisFlags[0] = true;
+            let gensUp = numGens - gensDown - 1;
+            for (let i = 1; i <= gensUp; i++) {
+                thisFlags[(gen * i) % edo] = true;
+            }
+            for (let i = 1; i <= gensDown; i++) {
+                thisFlags[((edo - gen) * i) % edo] = true;
+            }
+            scaleArray.push({ "index": scaleArray.length, "name": modeNames[gensDown], "realName": realScaleName + " " + gensUp + "|" + gensDown, "flags": thisFlags });
+        }
+        return scaleArray;
+    }
+    function createKeys(edo) {
+        let bestFifth = Math.round(Math.log2(3 / 2) * edo);
+        let fifthRatio = bestFifth / edo;
+        let keys = Array(edo).fill("");
+        let keyNames_5edo = ["C", "D", "F", "G", "A"];
+        let keyNames_diatonicFifthward = ["C", "G", "D", "A", "E", "B", "F♯", "C♯", "G♯", "D♯", "A♯", "E♯", "B♯"];
+        let keyNames_diatonicFourthward = ["C", "F", "B♭", "E♭", "A♭", "D♭", "G♭", "C♭", "F♭"];
+        let keyNames_mavilaFifthward = ["C", "G", "D♭", "A♭", "E♭", "B♭", "F♭", "C♭", "G♭"];
+        let keyNames_mavilaFourthward = ["C", "F", "B", "E", "A", "D", "G♯", "C♯", "F♯", "B♯", "E♯", "A♯", "D♯"];
+        let keyNames_oneiroSixthward = ["C", "H", "E♭", "B♭", "G♭", "D♭", "A♭", "F♭", "C♭", "H♭"];
+        let keyNames_oneiroFourthward = ["C", "F", "A", "D", "G", "B", "E", "H♯", "C♯", "F♯", "A♯", "D♯", "G♯", "B♯", "E♯"];
+        if (fifthRatio == 3 / 5) {
+            let fifthOctave = Math.round(edo / 5);
+            for (let i = 0; i < 5; i++) {
+                keys[i * fifthOctave] = keyNames_5edo[i];
+            }
+            keys = finishKeys(keys, edo);
+        }
+        else if (edo == 6) {
+            keys = ["C", "D", "E", "F", "A", "B"];
+        }
+        else if (edo == 11) {
+            keys = ["C", "C♯", "D", "E", "E♯", "F", "F♯", "G", "A", "A♯", "B"];
+        }
+        else if (fifthRatio >= 4 / 7 && fifthRatio < 3 / 5) {
+            let baseEdo = edo / gcd$1(edo, bestFifth);
+            keys[0] = "C";
+            for (let i = 1; i <= 5 + Math.min(Math.ceil((baseEdo - 7) / 2), 7); i++) {
+                let thisPitch = (bestFifth * i) % edo;
+                if (keyNames_diatonicFifthward[i] != "B♯" && keyNames_diatonicFifthward[i] != "E♯") {
+                    keys[thisPitch] = keyNames_diatonicFifthward[i];
+                }
+            }
+            for (let i = 1; i <= 1 + Math.min(Math.floor((baseEdo - 7) / 2), 7); i++) {
+                let thisPitch = ((edo - bestFifth) * i) % edo;
+                keys[thisPitch] = keyNames_diatonicFourthward[i];
+            }
+            keys = finishKeys(keys, edo);
+        }
+        else if (fifthRatio < 4 / 7) {
+            let baseEdo = edo / gcd$1(edo, bestFifth);
+            keys[0] = "C";
+            for (let i = 1; i <= 5 + Math.min(Math.ceil((baseEdo - 7) / 2), 7); i++) {
+                let thisPitch = ((edo - bestFifth) * i) % edo;
+                keys[thisPitch] = keyNames_mavilaFourthward[i];
+            }
+            for (let i = 1; i <= 1 + Math.min(Math.floor((baseEdo - 7) / 2), 7); i++) {
+                let thisPitch = (bestFifth * i) % edo;
+                keys[thisPitch] = keyNames_mavilaFifthward[i];
+            }
+            keys = finishKeys(keys, edo);
+        }
+        else if (fifthRatio > 3 / 5) {
+            let baseEdo = edo / gcd$1(edo, bestFifth);
+            keys[0] = "C";
+            for (let i = 1; i <= 6 + Math.min(Math.ceil((baseEdo - 8) / 2), 8); i++) {
+                let thisPitch = ((edo - bestFifth) * i) % edo;
+                keys[thisPitch] = keyNames_oneiroFourthward[i];
+            }
+            for (let i = 1; i <= 1 + Math.min(Math.floor((baseEdo - 8) / 2), 8); i++) {
+                let thisPitch = (bestFifth * i) % edo;
+                keys[thisPitch] = keyNames_oneiroSixthward[i];
+            }
+            keys = finishKeys(keys, edo);
+        }
+        let keyArray = [];
+        for (let i = 0; i < edo; i++) {
+            keyArray.push({ "index": i, "name": keys[i], "isWhiteKey": keys[i].length == 1 ? true : false, "basePitch": i + edo });
+        }
+        return toNameMap(keyArray);
+    }
+    function createScales(edo) {
+        let scaleArray = [];
+        let realScaleName;
+        let modeNames;
+        scaleArray.push({ "index": 0, "name": "Free", "realName": edo.toString() + "edo", "flags": Array(edo).fill(true) });
+        let bestGen = Math.round(Math.log2(3 / 2) * edo);
+        let ratioGen = bestGen / edo;
+        if (ratioGen >= 4 / 7 && ratioGen < 3 / 5) {
+            realScaleName = "pentic";
+            modeNames = ["Ionian", "Mixolydian", "Dorian", "Aeolian", "Phrygian"];
+            modeNames = appendToListItems(modeNames, " Soft Pentatonic", false);
+            scaleArray = createMOS(edo, bestGen, modeNames, scaleArray, 5, realScaleName);
+            if (!(ratioGen == 4 / 7)) {
+                realScaleName = "diatonic";
+                modeNames = ["Lydian", "Ionian", "Mixolydian", "Dorian", "Aeolian", "Phrygian", "Locrian"];
+                scaleArray = createMOS(edo, bestGen, modeNames, scaleArray, 7, realScaleName);
+            }
+        }
+        bestGen = Math.round(Math.log2(Math.cbrt(5 / 2)) * edo);
+        ratioGen = bestGen / edo;
+        if (ratioGen <= 4 / 9 && ratioGen > 3 / 7) {
+            realScaleName = "pentic";
+            modeNames = ["Ionian", "Mixolydian", "Dorian", "Aeolian", "Phrygian"];
+            modeNames = appendToListItems(modeNames, " Hard Pentatonic", false);
+            scaleArray = createMOS(edo, bestGen, modeNames, scaleArray, 5, realScaleName);
+            realScaleName = "antidiatonic";
+            modeNames = ["Lydian", "Ionian", "Mixolydian", "Dorian", "Aeolian", "Phrygian", "Locrian"].reverse();
+            modeNames = appendToListItems(modeNames, "Anti-", true);
+            scaleArray = createMOS(edo, bestGen, modeNames, scaleArray, 7, realScaleName);
+        }
+        bestGen = Math.round(Math.log2(14 / 9) * edo);
+        ratioGen = bestGen / edo;
+        if (ratioGen < 2 / 3 && ratioGen >= 5 / 8) {
+            realScaleName = "antipentic";
+            modeNames = ["Ionian", "Mixolydian", "Dorian", "Aeolian", "Phrygian"].reverse();
+            modeNames = appendToListItems(appendToListItems(modeNames, " Hard Pentatonic", false), "Anti-", true);
+            scaleArray = createMOS(edo, bestGen, modeNames, scaleArray, 5, realScaleName);
+            if (!(ratioGen == 5 / 8)) {
+                realScaleName = "checkertonic";
+                modeNames = ["Dylathian", "Illarnekian", "Celephaïsian", "Ultharian", "Mnarian", "Kadathian", "Hlanithian", "Sarnathian"].reverse();
+                modeNames = appendToListItems(modeNames, "Anti-", true);
+                scaleArray = createMOS(edo, bestGen, modeNames, scaleArray, 8, realScaleName);
+            }
+        }
+        bestGen = Math.round(Math.log2(Math.cbrt(20 / 9)) * edo);
+        ratioGen = bestGen / edo;
+        if (ratioGen < 2 / 5 && ratioGen > 3 / 8) {
+            realScaleName = "antipentic";
+            modeNames = ["Ionian", "Mixolydian", "Dorian", "Aeolian", "Phrygian"].reverse();
+            modeNames = appendToListItems(appendToListItems(modeNames, " Soft Pentatonic", false), "Anti-", true);
+            scaleArray = createMOS(edo, bestGen, modeNames, scaleArray, 5, realScaleName);
+            realScaleName = "oneirotonic";
+            modeNames = ["Dylathian", "Illarnekian", "Celephaïsian", "Ultharian", "Mnarian", "Kadathian", "Hlanithian", "Sarnathian"];
+            scaleArray = createMOS(edo, bestGen, modeNames, scaleArray, 8, realScaleName);
+        }
+        bestGen = Math.round(Math.log2(Math.sqrt(3 / 2)) * edo);
+        ratioGen = bestGen / edo;
+        if (ratioGen < 1 / 3 && ratioGen > 2 / 7) {
+            realScaleName = "mosh";
+            modeNames = ["Dalmatian", "Galatian", "Cilician", "Bithynian", "Pisidian", "Illyrian", "Lycian"];
+            scaleArray = createMOS(edo, bestGen, modeNames, scaleArray, 7, realScaleName);
+        }
+        bestGen = Math.round(Math.log2(128 / 77) * edo);
+        ratioGen = bestGen / edo;
+        if (ratioGen < 3 / 4 && ratioGen > 5 / 7) {
+            realScaleName = "smitonic";
+            modeNames = ["Dalmatian", "Galatian", "Cilician", "Bithynian", "Pisidian", "Illyrian", "Lycian"].reverse();
+            modeNames = appendToListItems(modeNames, "Anti-", true);
+            scaleArray = createMOS(edo, bestGen, modeNames, scaleArray, 7, realScaleName);
+        }
+        bestGen = Math.round(Math.log2(7 / 6) * edo);
+        ratioGen = bestGen / edo;
+        if (ratioGen >= 2 / 9 && ratioGen < 1 / 4) {
+            realScaleName = "manual";
+            modeNames = ["Iberian", "Alboran", "Aegean", "Eruthran", "Caspian"];
+            modeNames = appendToListItems(modeNames, " Hard Pentatonic", false);
+            scaleArray = createMOS(edo, bestGen, modeNames, scaleArray, 5, realScaleName);
+            if (!(ratioGen == 2 / 9)) {
+                realScaleName = "gramitonic";
+                modeNames = ["Adriatic", "Tyrrhenian", "Iberian", "Alboran", "Aegean", "Eruthran", "Caspian", "Axenan", "Propontian"];
+                scaleArray = createMOS(edo, bestGen, modeNames, scaleArray, 9, realScaleName);
+            }
+        }
+        bestGen = Math.round(Math.log2(Math.sqrt(3)) * edo);
+        ratioGen = bestGen / edo;
+        if (ratioGen > 7 / 9 && ratioGen < 4 / 5) {
+            realScaleName = "manual";
+            modeNames = ["Iberian", "Alboran", "Aegean", "Eruthran", "Caspian"];
+            modeNames = appendToListItems(appendToListItems(modeNames, " Soft Pentatonic", false), "Anti-", true);
+            scaleArray = createMOS(edo, bestGen, modeNames, scaleArray, 5, realScaleName);
+            realScaleName = "semiquartal";
+            modeNames = ["Adriatic", "Tyrrhenian", "Iberian", "Alboran", "Aegean", "Eruthran", "Caspian", "Axenan", "Propontian"].reverse();
+            modeNames = appendToListItems(modeNames, "Anti-", true);
+            scaleArray = createMOS(edo, bestGen, modeNames, scaleArray, 9, realScaleName);
+        }
+        return toNameMap(scaleArray);
+    }
+    function createBreaks(edo) {
+        let breaks = [1];
+        let bestGen = Math.round(Math.log2(3 / 2) * edo);
+        let ratioGen = bestGen / edo;
+        if (ratioGen >= 4 / 7 && ratioGen < 3 / 5) {
+            breaks.push(breaks[breaks.length - 1] + 5);
+            if (ratioGen != 4 / 7) {
+                breaks.push(breaks[breaks.length - 1] + 7);
+            }
+        }
+        bestGen = Math.round(Math.log2(Math.cbrt(5 / 2)) * edo);
+        ratioGen = bestGen / edo;
+        if (ratioGen <= 4 / 9 && ratioGen > 3 / 7) {
+            breaks.push(breaks[breaks.length - 1] + 5);
+            breaks.push(breaks[breaks.length - 1] + 7);
+        }
+        bestGen = Math.round(Math.log2(14 / 9) * edo);
+        ratioGen = bestGen / edo;
+        if (ratioGen < 2 / 3 && ratioGen >= 5 / 8) {
+            breaks.push(breaks[breaks.length - 1] + 5);
+            if (!(ratioGen == 5 / 8)) {
+                breaks.push(breaks[breaks.length - 1] + 8);
+            }
+        }
+        bestGen = Math.round(Math.log2(Math.cbrt(20 / 9)) * edo);
+        ratioGen = bestGen / edo;
+        if (ratioGen < 2 / 5 && ratioGen > 3 / 8) {
+            breaks.push(breaks[breaks.length - 1] + 5);
+            breaks.push(breaks[breaks.length - 1] + 8);
+        }
+        bestGen = Math.round(Math.log2(Math.sqrt(3 / 2)) * edo);
+        ratioGen = bestGen / edo;
+        if (ratioGen < 1 / 3 && ratioGen > 2 / 7) {
+            breaks.push(breaks[breaks.length - 1] + 7);
+        }
+        bestGen = Math.round(Math.log2(128 / 77) * edo);
+        ratioGen = bestGen / edo;
+        if (ratioGen < 3 / 4 && ratioGen > 5 / 7) {
+            breaks.push(breaks[breaks.length - 1] + 7);
+        }
+        bestGen = Math.round(Math.log2(7 / 6) * edo);
+        ratioGen = bestGen / edo;
+        if (ratioGen >= 2 / 9 && ratioGen < 1 / 4) {
+            breaks.push(breaks[breaks.length - 1] + 5);
+            if (!(ratioGen == 2 / 9)) {
+                breaks.push(breaks[breaks.length - 1] + 9);
+            }
+        }
+        bestGen = Math.round(Math.log2(Math.sqrt(3)) * edo);
+        ratioGen = bestGen / edo;
+        if (ratioGen > 7 / 9 && ratioGen < 4 / 5) {
+            breaks.push(breaks[breaks.length - 1] + 5);
+            breaks.push(breaks[breaks.length - 1] + 9);
+        }
+        return breaks;
+    }
+    function createBreakNames(edo) {
+        let breaks = ["aaa"];
+        let bestGen = Math.round(Math.log2(3 / 2) * edo);
+        let ratioGen = bestGen / edo;
+        if (ratioGen >= 4 / 7 && ratioGen < 3 / 5) {
+            breaks.push("Diatonic-oid pentatonic");
+            if (ratioGen != 4 / 7) {
+                breaks.push("Diatonic");
+            }
+        }
+        bestGen = Math.round(Math.log2(Math.cbrt(5 / 2)) * edo);
+        ratioGen = bestGen / edo;
+        if (ratioGen <= 4 / 9 && ratioGen > 3 / 7) {
+            breaks.push("Antidiatonic-oid pentatonic");
+            breaks.push("Antidiatonic");
+        }
+        bestGen = Math.round(Math.log2(14 / 9) * edo);
+        ratioGen = bestGen / edo;
+        if (ratioGen < 2 / 3 && ratioGen >= 5 / 8) {
+            breaks.push("Checkertonic-oid pentatonic");
+            if (!(ratioGen == 5 / 8)) {
+                breaks.push("Checkertonic");
+            }
+        }
+        bestGen = Math.round(Math.log2(Math.cbrt(20 / 9)) * edo);
+        ratioGen = bestGen / edo;
+        if (ratioGen < 2 / 5 && ratioGen > 3 / 8) {
+            breaks.push("Oneirotonic-oid pentatonic");
+            breaks.push("Oneirotonic");
+        }
+        bestGen = Math.round(Math.log2(Math.sqrt(3 / 2)) * edo);
+        ratioGen = bestGen / edo;
+        if (ratioGen < 1 / 3 && ratioGen > 2 / 7) {
+            breaks.push("Mohajira-ish");
+        }
+        bestGen = Math.round(Math.log2(128 / 77) * edo);
+        ratioGen = bestGen / edo;
+        if (ratioGen < 3 / 4 && ratioGen > 5 / 7) {
+            breaks.push("Smitonic");
+        }
+        bestGen = Math.round(Math.log2(7 / 6) * edo);
+        ratioGen = bestGen / edo;
+        if (ratioGen >= 2 / 9 && ratioGen < 1 / 4) {
+            breaks.push("Gramitonic-oid pentatonic");
+            if (!(ratioGen == 2 / 9)) {
+                breaks.push("Gramitonic");
+            }
+        }
+        bestGen = Math.round(Math.log2(Math.sqrt(3)) * edo);
+        ratioGen = bestGen / edo;
+        if (ratioGen > 7 / 9 && ratioGen < 4 / 5) {
+            breaks.push("Semiquartal-oid pentatonic");
+            breaks.push("Semiquartal");
+        }
+        return breaks;
+    }
+
     const epsilon = (1.0e-24);
     function clamp(min, max, val) {
         max = max - 1;
@@ -13427,7 +13758,7 @@ li.select2-results__option[role=group] > strong:hover {
                     if (note.pins.length < 2)
                         continue;
                     note.end = note.pins[note.pins.length - 1].time + note.start;
-                    const maxPitch = isNoiseChannel ? Config.drumCount - 1 : Config.maxPitch;
+                    const maxPitch = isNoiseChannel ? Config.drumCount - 1 : song.edo * Config.maxPitch;
                     let lowestPitch = maxPitch;
                     let highestPitch = 0;
                     for (let k = 0; k < note.pitches.length; k++) {
@@ -15651,8 +15982,8 @@ li.select2-results__option[role=group] > strong:hover {
             }
             return largest;
         }
-        static frequencyFromPitch(pitch) {
-            return 440.0 * Math.pow(2.0, (pitch - 69.0) / 12.0);
+        static frequencyFromPitch(pitch, edo) {
+            return 440.0 * Math.pow(2.0, pitch / edo - 69 / 12);
         }
         addEnvelope(target, index, envelope, newEnvelopes, start = 0, end = -1, inverse = false, perEnvelopeSpeed = -1, perEnvelopeLowerBound = 0, perEnvelopeUpperBound = 1, steps = 2, seed = 2, waveform = 0, discrete = false) {
             end = end != -1 ? end : this.isNoiseInstrument ? Config.drumCount - 1 : Config.maxPitch;
@@ -19537,7 +19868,7 @@ li.select2-results__option[role=group] > strong:hover {
                     "enigma": "strange",
                 };
                 const scaleName = (oldScaleNames[jsonObject["scale"]] != undefined) ? oldScaleNames[jsonObject["scale"]] : jsonObject["scale"];
-                const scale = Config.scales.findIndex(scale => scale.name == scaleName);
+                const scale = createScales(this.edo).findIndex(scale => scale.name == scaleName);
                 if (scale != -1)
                     this.scale = scale;
                 if (this.scale == Config.scales["dictionary"]["Custom"].index) {
@@ -19930,7 +20261,7 @@ li.select2-results__option[role=group] > strong:hover {
             const pitchChanged = Math.abs(Math.log2(delayLength / prevDelayLength)) > 0.01;
             const reinitializeImpulse = (this.delayIndex == -1 || pitchChanged);
             if (this.delayLine == null || this.delayLine.length <= minBufferLength) {
-                const likelyMaximumLength = Math.ceil(2 * synth.samplesPerSecond / Instrument.frequencyFromPitch(12));
+                const likelyMaximumLength = Math.ceil(2 * synth.samplesPerSecond / Instrument.frequencyFromPitch(((synth.song) ? synth.song.edo : 12) * 2, ((synth.song) ? synth.song.edo : 12)));
                 const newDelayLine = new Float32Array(Synth.fittingPowerOfTwo(Math.max(likelyMaximumLength, minBufferLength)));
                 if (!reinitializeImpulse && this.delayLine != null) {
                     const oldDelayBufferMask = (this.delayLine.length - 1) >> 0;
@@ -20996,7 +21327,7 @@ li.select2-results__option[role=group] > strong:hover {
             this.aliases = instrument.aliases;
             this.volumeScale = 1.0;
             const samplesPerSecond = synth.samplesPerSecond;
-            this.updateWaves(instrument, samplesPerSecond);
+            this.updateWaves(instrument, samplesPerSecond, ((synth.song) ? synth.song.edo : 12));
             const ticksIntoBar = synth.getTicksIntoBar();
             const tickTimeStart = ticksIntoBar;
             const secondsPerTick = samplesPerTick / synth.samplesPerSecond;
@@ -21122,9 +21453,9 @@ li.select2-results__option[role=group] > strong:hover {
                     quantizationSettingStart = synth.getModValue(Config.modulators.dictionary["bit crush"].index, channelIndex, instrumentIndex, false) * Math.sqrt(envelopeStarts[43]);
                     quantizationSettingEnd = synth.getModValue(Config.modulators.dictionary["bit crush"].index, channelIndex, instrumentIndex, true) * Math.sqrt(envelopeEnds[43]);
                 }
-                const basePitch = Config.keys[synth.song.key].basePitch + (Config.pitchesPerOctave * synth.song.octave);
-                const freqStart = Instrument.frequencyFromPitch(basePitch + 60) * Math.pow(2.0, (Config.bitcrusherFreqRange - 1 - freqSettingStart) * Config.bitcrusherOctaveStep);
-                const freqEnd = Instrument.frequencyFromPitch(basePitch + 60) * Math.pow(2.0, (Config.bitcrusherFreqRange - 1 - freqSettingEnd) * Config.bitcrusherOctaveStep);
+                const basePitch = synth.song ? createKeys(synth.song.edo)[synth.song.key].basePitch : createKeys(12)[synth.song.key].basePitch;
+                const freqStart = Instrument.frequencyFromPitch(basePitch + (60 * ((synth.song) ? synth.song.edo : 12) / 12), ((synth.song) ? synth.song.edo : 12)) * Math.pow(2.0, (Config.bitcrusherFreqRange - 1 - freqSettingStart) * Config.bitcrusherOctaveStep);
+                const freqEnd = Instrument.frequencyFromPitch(basePitch + (60 * ((synth.song) ? synth.song.edo : 12) / 12), ((synth.song) ? synth.song.edo : 12)) * Math.pow(2.0, (Config.bitcrusherFreqRange - 1 - freqSettingEnd) * Config.bitcrusherOctaveStep);
                 const phaseDeltaStart = Math.min(1.0, freqStart / samplesPerSecond);
                 const phaseDeltaEnd = Math.min(1.0, freqEnd / samplesPerSecond);
                 this.bitcrusherPhaseDelta = phaseDeltaStart;
@@ -21459,7 +21790,7 @@ li.select2-results__option[role=group] > strong:hover {
             this.delayInputMultDelta = (delayInputMultEnd - delayInputMultStart) / roundedSamplesPerTick;
             this.envelopeComputer.clearEnvelopes();
         }
-        updateWaves(instrument, samplesPerSecond) {
+        updateWaves(instrument, samplesPerSecond, edo) {
             this.volumeScale = 1.0;
             if (instrument.type == 0) {
                 this.wave = (this.aliases) ? Config.rawChipWaves[instrument.chipWave].samples : Config.chipWaves[instrument.chipWave].samples;
@@ -21525,7 +21856,7 @@ li.select2-results__option[role=group] > strong:hover {
             }
             else if (instrument.type == 4) {
                 for (let i = 0; i < Config.drumCount; i++) {
-                    this.drumsetSpectrumWaves[i].getCustomWave(instrument.drumsetSpectrumWaves[i], InstrumentState._drumsetIndexToSpectrumOctave(i));
+                    this.drumsetSpectrumWaves[i].getCustomWave(instrument.drumsetSpectrumWaves[i], InstrumentState._drumsetIndexToSpectrumOctave(i, 12));
                 }
                 this.wave = null;
                 this.unisonVoices = instrument.unisonVoices;
@@ -21546,11 +21877,11 @@ li.select2-results__option[role=group] > strong:hover {
                 throw new Error("Unhandled instrument type in getDrumsetWave");
             }
         }
-        static drumsetIndexReferenceDelta(index) {
-            return Instrument.frequencyFromPitch(Config.spectrumBasePitch + index * 6) / 44100;
+        static drumsetIndexReferenceDelta(index, edo) {
+            return Instrument.frequencyFromPitch(Config.spectrumBasePitch + index * 6, edo) / 44100;
         }
-        static _drumsetIndexToSpectrumOctave(index) {
-            return 15 + Math.log2(InstrumentState.drumsetIndexReferenceDelta(index));
+        static _drumsetIndexToSpectrumOctave(index, edo) {
+            return 15 + Math.log2(InstrumentState.drumsetIndexReferenceDelta(index, edo));
         }
     }
     class ChannelState {
@@ -21613,7 +21944,7 @@ li.select2-results__option[role=group] > strong:hover {
                         for (let envelopeIndex = 0; envelopeIndex < Config.maxEnvelopeCount + 1; envelopeIndex++)
                             instrumentState.envelopeTime[envelopeIndex] = 0;
                         instrumentState.arpTime = 0;
-                        instrumentState.updateWaves(instrument, this.samplesPerSecond);
+                        instrumentState.updateWaves(instrument, this.samplesPerSecond, song.edo);
                         instrumentState.allocateNecessaryBuffers(this, instrument, samplesPerTick);
                     }
                 }
@@ -23606,7 +23937,7 @@ li.select2-results__option[role=group] > strong:hover {
             let chordExpressionStart = chordExpression;
             let chordExpressionEnd = chordExpression;
             let expressionReferencePitch = 16;
-            let basePitch = Config.keys[song.key].basePitch + (Config.pitchesPerOctave * song.octave);
+            let basePitch = createKeys(song.edo)[song.key].basePitch;
             let baseExpression = 1.0;
             let pitchDamping = 48;
             if (instrument.type == 3) {
@@ -23876,8 +24207,8 @@ li.select2-results__option[role=group] > strong:hover {
                     modDetuneStart += 4 * this.getModValue(Config.modulators.dictionary["song detune"].index, channelIndex, tone.instrumentIndex, false);
                     modDetuneEnd += 4 * this.getModValue(Config.modulators.dictionary["song detune"].index, channelIndex, tone.instrumentIndex, true);
                 }
-                intervalStart += Synth.detuneToCents(modDetuneStart) * envelopeStart * Config.pitchesPerOctave / (12.0 * 100.0);
-                intervalEnd += Synth.detuneToCents(modDetuneEnd) * envelopeEnd * Config.pitchesPerOctave / (12.0 * 100.0);
+                intervalStart += Synth.detuneToCents(modDetuneStart) * envelopeStart * song.edo / (12.0 * 100.0);
+                intervalEnd += Synth.detuneToCents(modDetuneEnd) * envelopeEnd * song.edo / (12.0 * 100.0);
             }
             if (effectsIncludeVibrato(instrument.effects)) {
                 let delayTicks;
@@ -23887,12 +24218,12 @@ li.select2-results__option[role=group] > strong:hover {
                     delayTicks = instrument.vibratoDelay * 2;
                     if (instrument.vibratoDelay == Config.modulators.dictionary["vibrato delay"].maxRawVol)
                         delayTicks = Number.POSITIVE_INFINITY;
-                    vibratoAmplitudeStart = instrument.vibratoDepth;
+                    vibratoAmplitudeStart = instrument.vibratoDepth * song.edo / 12;
                     vibratoAmplitudeEnd = vibratoAmplitudeStart;
                 }
                 else {
                     delayTicks = Config.vibratos[instrument.vibrato].delayTicks;
-                    vibratoAmplitudeStart = Config.vibratos[instrument.vibrato].amplitude;
+                    vibratoAmplitudeStart = Config.vibratos[instrument.vibrato].amplitude * song.edo / 12;
                     vibratoAmplitudeEnd = vibratoAmplitudeStart;
                 }
                 if (this.isModActive(Config.modulators.dictionary["vibrato delay"].index, channelIndex, tone.instrumentIndex)) {
@@ -23901,8 +24232,8 @@ li.select2-results__option[role=group] > strong:hover {
                         delayTicks = Number.POSITIVE_INFINITY;
                 }
                 if (this.isModActive(Config.modulators.dictionary["vibrato depth"].index, channelIndex, tone.instrumentIndex)) {
-                    vibratoAmplitudeStart = this.getModValue(Config.modulators.dictionary["vibrato depth"].index, channelIndex, tone.instrumentIndex, false) / 25;
-                    vibratoAmplitudeEnd = this.getModValue(Config.modulators.dictionary["vibrato depth"].index, channelIndex, tone.instrumentIndex, true) / 25;
+                    vibratoAmplitudeStart = this.getModValue(Config.modulators.dictionary["vibrato depth"].index, channelIndex, tone.instrumentIndex, false) / 25 * song.edo / 12;
+                    vibratoAmplitudeEnd = this.getModValue(Config.modulators.dictionary["vibrato depth"].index, channelIndex, tone.instrumentIndex, true) / 25 * song.edo / 12;
                 }
                 let vibratoStart;
                 if (tone.prevVibrato != null) {
@@ -24004,6 +24335,7 @@ li.select2-results__option[role=group] > strong:hover {
                 tone.noteFilterCount++;
             }
             noteFilterExpression = Math.min(3.0, noteFilterExpression);
+            let edo_ = isNoiseChannel ? 12 : song.edo;
             if (instrument.type == 1 || instrument.type == 11) {
                 let sineExpressionBoost = 1.0;
                 let totalCarrierExpression = 0.0;
@@ -24022,8 +24354,8 @@ li.select2-results__option[role=group] > strong:hover {
                     const interval = Config.operatorCarrierInterval[associatedCarrierIndex] + arpeggioInterval;
                     const pitchStart = basePitch + (pitch + intervalStart) * intervalScale + interval;
                     const pitchEnd = basePitch + (pitch + intervalEnd) * intervalScale + interval;
-                    const baseFreqStart = Instrument.frequencyFromPitch(pitchStart);
-                    const baseFreqEnd = Instrument.frequencyFromPitch(pitchEnd);
+                    const baseFreqStart = Instrument.frequencyFromPitch(pitchStart, song.edo);
+                    const baseFreqEnd = Instrument.frequencyFromPitch(pitchEnd, song.edo);
                     const hzOffset = Config.operatorFrequencies[instrument.operators[i].frequency].hzOffset;
                     const targetFreqStart = freqMult * baseFreqStart + hzOffset;
                     const targetFreqEnd = freqMult * baseFreqEnd + hzOffset;
@@ -24116,7 +24448,7 @@ li.select2-results__option[role=group] > strong:hover {
                 tone.feedbackDelta = (feedbackEnd - feedbackStart) / roundedSamplesPerTick;
             }
             else {
-                const freqEndRatio = Math.pow(2.0, (intervalEnd - intervalStart) * intervalScale / 12.0);
+                const freqEndRatio = Math.pow(2.0, (intervalEnd - intervalStart) * intervalScale / song.edo);
                 const basePhaseDeltaScale = Math.pow(freqEndRatio, 1.0 / roundedSamplesPerTick);
                 const isMono = chord.name == "monophonic";
                 let pitch = tone.pitches[0];
@@ -24124,7 +24456,7 @@ li.select2-results__option[role=group] > strong:hover {
                     const arpeggio = Math.floor(instrumentState.arpTime / Config.ticksPerArpeggio);
                     if (chord.customInterval) {
                         const intervalOffset = tone.pitches[1 + getArpeggioPitchIndex(tone.pitchCount - 1, instrument.fastTwoNoteArp, arpeggio)] - tone.pitches[0];
-                        specialIntervalMult = Math.pow(2.0, intervalOffset / 12.0);
+                        specialIntervalMult = Math.pow(2.0, intervalOffset / song.edo);
                         tone.specialIntervalExpressionMult = Math.pow(2.0, -intervalOffset / pitchDamping);
                     }
                     else if (chord.arpeggiates) {
@@ -24183,7 +24515,7 @@ li.select2-results__option[role=group] > strong:hover {
                     tone.stringSustainEnd = useSustainEnd;
                     settingsExpressionMult *= Math.pow(2.0, 0.7 * (1.0 - useSustainStart / (Config.stringSustainRange - 1)));
                 }
-                const startFreq = Instrument.frequencyFromPitch(startPitch);
+                const startFreq = Instrument.frequencyFromPitch(startPitch, instrument.type == 4 ? song.edo : edo_);
                 if (instrument.type == 0 || instrument.type == 9 || instrument.type == 5 || instrument.type == 7 || instrument.type == 3 || instrument.type == 6 || instrument.type == 2 || instrument.type == 4) {
                     const unisonVoices = instrument.unisonVoices;
                     const unisonSpread = instrument.unisonSpread;
@@ -24296,7 +24628,7 @@ li.select2-results__option[role=group] > strong:hover {
                     const curvedSpread = Math.pow(1.0 - Math.sqrt(Math.max(0.0, 1.0 - averageSpreadSlider)), 1.75);
                     for (let i = 0; i < Config.supersawVoiceCount; i++) {
                         const offset = (i == 0) ? 0.0 : Math.pow((((i + 1) >> 1) - 0.5 + 0.025 * ((i & 2) - 1)) / (Config.supersawVoiceCount >> 1), 1.1) * ((i & 1) * 2 - 1);
-                        tone.supersawUnisonDetunes[i] = Math.pow(2.0, curvedSpread * offset / 12.0);
+                        tone.supersawUnisonDetunes[i] = Math.pow(2.0, curvedSpread * offset / song.edo);
                     }
                     const baseShape = instrument.supersawShape / Config.supersawShapeMax;
                     let useShapeStart = baseShape * envelopeStarts[40];
@@ -24335,7 +24667,7 @@ li.select2-results__option[role=group] > strong:hover {
                     tone.supersawDelayLengthDelta = (delayLengthEnd - delayLengthStart) / roundedSamplesPerTick;
                     const minBufferLength = Math.ceil(Math.max(delayLengthStart, delayLengthEnd)) + 2;
                     if (tone.supersawDelayLine == null || tone.supersawDelayLine.length <= minBufferLength) {
-                        const likelyMaximumLength = Math.ceil(0.5 * this.samplesPerSecond / Instrument.frequencyFromPitch(24));
+                        const likelyMaximumLength = Math.ceil(0.5 * this.samplesPerSecond / Instrument.frequencyFromPitch(song.edo * 2, song.edo));
                         const newDelayLine = new Float32Array(Synth.fittingPowerOfTwo(Math.max(likelyMaximumLength, minBufferLength)));
                         if (!initializeSupersaw && tone.supersawDelayLine != null) {
                             const oldDelayBufferMask = (tone.supersawDelayLine.length - 1) >> 0;
@@ -26389,7 +26721,7 @@ li.select2-results__option[role=group] > strong:hover {
                 drumSource += `
         const data = synth.tempMonoInstrumentSampleBuffer;
         let wave = instrumentState.getDrumsetWave(tone.drumsetPitch);
-        const referenceDelta = InstrumentState.drumsetIndexReferenceDelta(tone.drumsetPitch);
+        const referenceDelta: number = InstrumentState.drumsetIndexReferenceDelta(tone.drumsetPitch!, ((synth.song) ? synth.song.edo : 12));
         const unisonSign = tone.specialIntervalExpressionMult * instrumentState.unisonSign;
         `;
                 for (let i = 0; i < voiceCount; i++) {
@@ -27913,11 +28245,11 @@ li.select2-results__option[role=group] > strong:hover {
             instruments[0] = 0;
         }
     }
-    function unionOfUsedNotes(pattern, flags) {
+    function unionOfUsedNotes(pattern, flags, edo) {
         for (const note of pattern.notes) {
             for (const pitch of note.pitches) {
                 for (const pin of note.pins) {
-                    const key = (pitch + pin.interval) % 12;
+                    const key = (pitch + pin.interval) % edo;
                     if (!flags[key]) {
                         flags[key] = true;
                     }
@@ -27925,11 +28257,11 @@ li.select2-results__option[role=group] > strong:hover {
             }
         }
     }
-    function generateScaleMap(oldScaleFlags, newScaleValue, customScaleFlags) {
-        const newScaleFlags = newScaleValue == Config.scales["dictionary"]["Custom"].index ? customScaleFlags : Config.scales[newScaleValue].flags;
+    function generateScaleMap(oldScaleFlags, newScaleValue, edo) {
+        const newScaleFlags = createScales(edo)[newScaleValue].flags;
         const oldScale = [];
         const newScale = [];
-        for (let i = 0; i < 12; i++) {
+        for (let i = 0; i < edo; i++) {
             if (oldScaleFlags[i])
                 oldScale.push(i);
             if (newScaleFlags[i])
@@ -27973,11 +28305,11 @@ li.select2-results__option[role=group] > strong:hover {
                 ? [largerScalePitch, smallerScalePitch]
                 : [smallerScalePitch, largerScalePitch];
         }
-        sparsePitchMap.push([12, 12]);
-        newScale.push(12);
+        sparsePitchMap.push([edo, edo]);
+        newScale.push(edo);
         let sparseIndex = 0;
         const fullPitchMap = [];
-        for (let i = 0; i < 12; i++) {
+        for (let i = 0; i < edo; i++) {
             const oldLow = sparsePitchMap[sparseIndex][0];
             const newLow = sparsePitchMap[sparseIndex][1];
             const oldHigh = sparsePitchMap[sparseIndex + 1][0];
@@ -29714,7 +30046,7 @@ li.select2-results__option[role=group] > strong:hover {
     class ChangeCustomScale extends Change {
         constructor(doc, flags) {
             super();
-            for (let i = 0; i < Config.pitchesPerOctave; i++) {
+            for (let i = 0; i < doc.song.edo; i++) {
                 doc.song.scaleCustom[i] = flags[i];
             }
             doc.notifier.changed();
@@ -32150,22 +32482,21 @@ li.select2-results__option[role=group] > strong:hover {
                 return;
             if (doc.song.getChannelIsMod(doc.channel))
                 return;
-            const maxPitch = (isNoise ? Config.drumCount - 1 : Config.maxPitch);
+            const maxPitch = (isNoise ? Config.drumCount - 1 : doc.song.edo * Config.maxPitch);
             for (let i = 0; i < this._oldPitches.length; i++) {
                 let pitch = this._oldPitches[i];
                 if (octave && !isNoise) {
                     if (upward) {
-                        pitch = Math.min(maxPitch, pitch + 12);
+                        pitch = Math.min(maxPitch, pitch + doc.song.edo);
                     }
                     else {
-                        pitch = Math.max(0, pitch - 12);
+                        pitch = Math.max(0, pitch - doc.song.edo);
                     }
                 }
                 else {
-                    let scale = doc.song.scale == Config.scales.dictionary["Custom"].index ? doc.song.scaleCustom : Config.scales[doc.song.scale].flags;
                     if (upward) {
                         for (let j = pitch + 1; j <= maxPitch; j++) {
-                            if (isNoise || ignoreScale || scale[j % 12]) {
+                            if (isNoise || ignoreScale || createScales(doc.song.edo)[doc.song.scale].flags[j % doc.song.edo]) {
                                 pitch = j;
                                 break;
                             }
@@ -32173,7 +32504,7 @@ li.select2-results__option[role=group] > strong:hover {
                     }
                     else {
                         for (let j = pitch - 1; j >= 0; j--) {
-                            if (isNoise || ignoreScale || scale[j % 12]) {
+                            if (isNoise || ignoreScale || createScales(doc.song.edo)[doc.song.scale].flags[j % doc.song.edo]) {
                                 pitch = j;
                                 break;
                             }
@@ -32207,17 +32538,16 @@ li.select2-results__option[role=group] > strong:hover {
                     interval = max;
                 if (octave && !isNoise) {
                     if (upward) {
-                        interval = Math.min(max, interval + 12);
+                        interval = Math.min(max, interval + doc.song.edo);
                     }
                     else {
-                        interval = Math.max(min, interval - 12);
+                        interval = Math.max(min, interval - doc.song.edo);
                     }
                 }
                 else {
-                    let scale = doc.song.scale == Config.scales.dictionary["Custom"].index ? doc.song.scaleCustom : Config.scales[doc.song.scale].flags;
                     if (upward) {
                         for (let i = interval + 1; i <= max; i++) {
-                            if (isNoise || ignoreScale || scale[i % 12]) {
+                            if (isNoise || ignoreScale || createScales(doc.song.edo)[doc.song.scale].flags[i % doc.song.edo]) {
                                 interval = i;
                                 break;
                             }
@@ -32225,7 +32555,7 @@ li.select2-results__option[role=group] > strong:hover {
                     }
                     else {
                         for (let i = interval - 1; i >= min; i--) {
-                            if (isNoise || ignoreScale || scale[i % 12]) {
+                            if (isNoise || ignoreScale || createScales(doc.song.edo)[doc.song.scale].flags[i % doc.song.edo]) {
                                 interval = i;
                                 break;
                             }
@@ -32420,7 +32750,7 @@ li.select2-results__option[role=group] > strong:hover {
             if (doc.selection.patternSelectionActive) {
                 new ChangeSplitNotesAtSelection(doc, pattern);
             }
-            const maxPitch = Config.maxPitch;
+            const maxPitch = doc.song.edo * Config.maxPitch;
             for (const note of pattern.notes) {
                 if (doc.selection.patternSelectionActive && (note.end <= doc.selection.patternSelectionStart || note.start >= doc.selection.patternSelectionEnd)) {
                     continue;
@@ -32429,7 +32759,7 @@ li.select2-results__option[role=group] > strong:hover {
                 const newPins = [];
                 for (let i = 0; i < note.pitches.length; i++) {
                     const pitch = note.pitches[i];
-                    const transformedPitch = scaleMap[pitch % 12] + (pitch - (pitch % 12));
+                    const transformedPitch = scaleMap[pitch % doc.song.edo] + (pitch - (pitch % doc.song.edo));
                     if (newPitches.indexOf(transformedPitch) == -1) {
                         newPitches.push(transformedPitch);
                     }
@@ -32449,7 +32779,7 @@ li.select2-results__option[role=group] > strong:hover {
                         interval = min;
                     if (interval > max)
                         interval = max;
-                    const transformedInterval = scaleMap[interval % 12] + (interval - (interval % 12));
+                    const transformedInterval = scaleMap[interval % doc.song.edo] + (interval - (interval % doc.song.edo));
                     newPins.push(makeNotePin(transformedInterval - newPitches[0], oldPin.time, oldPin.size));
                 }
                 if (newPins[0].interval != 0)
@@ -32895,7 +33225,7 @@ li.select2-results__option[role=group] > strong:hover {
         }
         static getBassCutoffPitch(doc) {
             const octaveOffset = doc.getBaseVisibleOctave(doc.channel);
-            return octaveOffset * Config.pitchesPerOctave + Math.floor(doc.getVisiblePitchCount() / (Config.pitchesPerOctave * 2)) * Config.pitchesPerOctave;
+            return octaveOffset * doc.song.edo + Math.floor(doc.getVisiblePitchCount() / (doc.song.edo * 2)) * doc.song.edo;
         }
         constructor(_doc) {
             this._doc = _doc;
@@ -33050,11 +33380,10 @@ li.select2-results__option[role=group] > strong:hover {
                         this._renderedPitchCount = this._pitchCount;
                     }
                     for (let j = 0; j < this._pitchCount; j++) {
-                        const pitchNameIndex = (j + Config.keys[this._doc.song.key].basePitch) % Config.pitchesPerOctave;
-                        const isWhiteKey = Config.keys[pitchNameIndex].isWhiteKey;
+                        const pitchNameIndex = (j + createKeys(this._doc.song.edo)[this._doc.song.key].basePitch) % this._doc.song.edo;
+                        const isWhiteKey = createKeys(this._doc.song.edo)[pitchNameIndex].isWhiteKey;
                         this._pianoKeys[j].style.background = isWhiteKey ? ColorConfig.whitePianoKey : ColorConfig.blackPianoKey;
-                        let scale = this._doc.song.scale == Config.scales.dictionary["Custom"].index ? this._doc.song.scaleCustom : Config.scales[this._doc.song.scale].flags;
-                        if (!scale[j % Config.pitchesPerOctave]) {
+                        if (!createScales(this._doc.song.edo)[this._doc.song.scale].flags[j % this._doc.song.edo]) {
                             this._pianoKeys[j].classList.add("disabled");
                             this._pianoLabels[j].style.display = "none";
                         }
@@ -33062,14 +33391,14 @@ li.select2-results__option[role=group] > strong:hover {
                             this._pianoKeys[j].classList.remove("disabled");
                             this._pianoLabels[j].style.display = "";
                             const label = this._pianoLabels[j];
-                            if ((j % 12) == 0) {
+                            if ((j % this._doc.song.edo) == 0) {
                                 label.style.transform = "translate(-5px, 0px)";
                             }
                             else {
                                 label.style.transform = "translate(0px, 0px)";
                             }
-                            label.style.color = Config.keys[pitchNameIndex].isWhiteKey ? ColorConfig.whitePianoKeyText : ColorConfig.blackPianoKeyText;
-                            label.textContent = Piano.getPitchName(pitchNameIndex, j, this._doc.getBaseVisibleOctave(this._doc.channel) + this._doc.song.octave);
+                            label.style.color = createKeys(this._doc.song.edo)[pitchNameIndex].isWhiteKey ? "black" : "white";
+                            label.textContent = Piano.getPitchName(pitchNameIndex, j, this._doc.getBaseVisibleOctave(this._doc.channel), this._doc.song.edo);
                         }
                     }
                 }
@@ -33311,33 +33640,33 @@ li.select2-results__option[role=group] > strong:hover {
             window.requestAnimationFrame(this._onAnimationFrame);
         }
         _updateCursorPitch() {
-            const scale = this._doc.song.scale == Config.scales.dictionary["Custom"].index ? this._doc.song.scaleCustom : Config.scales[this._doc.song.scale].flags;
+            const scale = createScales(this._doc.song.edo)[this._doc.song.scale].flags;
             const mousePitch = Math.max(0, Math.min(this._pitchCount - 1, this._pitchCount - (this._mouseY / this._pitchHeight)));
-            if (scale[Math.floor(mousePitch) % Config.pitchesPerOctave] || this._doc.song.getChannelIsNoise(this._doc.channel)) {
+            if (scale[Math.floor(mousePitch) % this._doc.song.edo] || this._doc.song.getChannelIsNoise(this._doc.channel)) {
                 this._cursorPitch = Math.floor(mousePitch);
             }
             else {
                 let topPitch = Math.floor(mousePitch) + 1;
                 let bottomPitch = Math.floor(mousePitch) - 1;
-                while (!scale[topPitch % Config.pitchesPerOctave]) {
+                while (!scale[topPitch % this._doc.song.edo]) {
                     topPitch++;
                 }
-                while (!scale[(bottomPitch) % Config.pitchesPerOctave]) {
+                while (!scale[(bottomPitch) % this._doc.song.edo]) {
                     bottomPitch--;
                 }
                 let topRange = topPitch;
                 let bottomRange = bottomPitch + 1;
-                if (topPitch % Config.pitchesPerOctave == 0 || topPitch % Config.pitchesPerOctave == 7) {
+                if (topPitch % this._doc.song.edo == 0 || topPitch % this._doc.song.edo == 7) {
                     topRange -= 0.5;
                 }
-                if (bottomPitch % Config.pitchesPerOctave == 0 || bottomPitch % Config.pitchesPerOctave == 7) {
+                if (bottomPitch % this._doc.song.edo == 0 || bottomPitch % this._doc.song.edo == 7) {
                     bottomRange += 0.5;
                 }
                 this._cursorPitch = mousePitch - bottomRange > topRange - mousePitch ? topPitch : bottomPitch;
             }
         }
         _playLiveInput() {
-            const octaveOffset = this._doc.getBaseVisibleOctave(this._doc.channel) * Config.pitchesPerOctave;
+            const octaveOffset = this._doc.getBaseVisibleOctave(this._doc.channel) * this._doc.song.edo;
             const currentPitch = this._cursorPitch + octaveOffset;
             if (this._playedPitch == currentPitch)
                 return;
@@ -33358,7 +33687,7 @@ li.select2-results__option[role=group] > strong:hover {
                 this._preview.style.top = pitchHeight * (this._pitchCount - this._cursorPitch - 1) + "px";
                 this._preview.style.height = pitchHeight + "px";
             }
-            const octaveOffset = this._doc.getBaseVisibleOctave(this._doc.channel) * Config.pitchesPerOctave;
+            const octaveOffset = this._doc.getBaseVisibleOctave(this._doc.channel) * this._doc.song.edo;
             const container = this._doc.song.getChannelIsNoise(this._doc.channel) ? this._drumContainer : this._pianoContainer;
             const children = container.children;
             for (let i = 0; i < children.length; i++) {
@@ -33371,23 +33700,11 @@ li.select2-results__option[role=group] > strong:hover {
                 }
             }
         }
-        static getPitchName(pitchNameIndex, scaleIndex, baseVisibleOctave) {
+        static getPitchName(pitchNameIndex, scaleIndex, baseVisibleOctave, edo) {
             let text;
-            if (Config.keys[pitchNameIndex].isWhiteKey) {
-                text = Config.keys[pitchNameIndex].name;
-            }
-            else {
-                const shiftDir = Config.blackKeyNameParents[scaleIndex % Config.pitchesPerOctave];
-                text = Config.keys[(pitchNameIndex + Config.pitchesPerOctave + shiftDir) % Config.pitchesPerOctave].name;
-                if (shiftDir == 1) {
-                    text += "♭";
-                }
-                else if (shiftDir == -1) {
-                    text += "♯";
-                }
-            }
-            if (scaleIndex % 12 == 0) {
-                text += Math.floor(scaleIndex / 12) + baseVisibleOctave;
+            text = createKeys(edo)[(pitchNameIndex + edo) % edo].name;
+            if (scaleIndex % edo == 0) {
+                text += Math.floor(scaleIndex / edo) + baseVisibleOctave;
             }
             return text;
         }
@@ -33761,7 +34078,7 @@ li.select2-results__option[role=group] > strong:hover {
                     this.clearAllPitches();
                     this._pitchesAreTemporary = false;
                 }
-                if (this._doc.prefs.ignorePerformedNotesNotInScale && !Config.scales[this._doc.song.scale].flags[pitch % Config.pitchesPerOctave]) {
+                if (this._doc.prefs.ignorePerformedNotesNotInScale && !createScales(this._doc.song.edo)[this._doc.song.scale].flags[pitch % this._doc.song.edo]) {
                     return;
                 }
                 if (this._doc.synth.liveInputPitches.indexOf(pitch) == -1) {
@@ -33789,7 +34106,7 @@ li.select2-results__option[role=group] > strong:hover {
                     this.clearAllBassPitches();
                     this._bassPitchesAreTemporary = false;
                 }
-                if (this._doc.prefs.ignorePerformedNotesNotInScale && !Config.scales[this._doc.song.scale].flags[pitch % Config.pitchesPerOctave]) {
+                if (this._doc.prefs.ignorePerformedNotesNotInScale && !createScales(this._doc.song.edo)[this._doc.song.scale].flags[pitch % this._doc.song.edo]) {
                     return;
                 }
                 if (this._doc.synth.liveBassInputPitches.indexOf(pitch) == -1) {
@@ -34518,10 +34835,10 @@ li.select2-results__option[role=group] > strong:hover {
                 if (this._doc.song.getChannelIsNoise(channelIndex) || this._doc.song.getChannelIsMod(channelIndex))
                     continue;
                 for (const pattern of this._eachSelectedPattern(channelIndex)) {
-                    unionOfUsedNotes(pattern, scaleFlags);
+                    unionOfUsedNotes(pattern, scaleFlags, this._doc.song.edo);
                 }
             }
-            const scaleMap = generateScaleMap(scaleFlags, this._doc.song.scale, this._doc.song.scaleCustom);
+            const scaleMap = generateScaleMap(scaleFlags, this._doc.song.scale, this._doc.song.edo);
             for (const channelIndex of this._eachSelectedChannel()) {
                 if (this._doc.song.getChannelIsNoise(channelIndex) || this._doc.song.getChannelIsMod(channelIndex))
                     continue;
@@ -37880,8 +38197,8 @@ You should be redirected to the song at:<br /><br />
                 setTimeout(() => { location.reload(); }, 50);
             };
             this._edo.value = this._doc.song.edo + "";
-            this._edo.min = "1";
-            this._edo.max = "63";
+            this._edo.min = "5";
+            this._edo.max = "53";
             this._edo.select();
             setTimeout(() => this._edo.focus());
             this._okayButton.addEventListener("click", this._saveChanges);
@@ -41449,7 +41766,7 @@ You should be redirected to the song at:<br /><br />
             };
             this._flags = _doc.song.scaleCustom.slice();
             let scaleHolder = div$d({});
-            for (var i = Config.pitchesPerOctave - 1; i > 0; i--) {
+            for (var i = _doc.song.edo - 1; i > 0; i--) {
                 this._scaleFlags[i] = input$8({ type: "checkbox", style: "width: 1em; padding: 0; margin-right: 4em;", "checked": this._flags[i], "value": i });
                 this._scaleRows[i] = div$d({ style: "text-align: right; height: 2em;" }, "Note " + i + ":", this._scaleFlags[i]);
                 scaleHolder.appendChild(this._scaleRows[i]);
@@ -42404,8 +42721,8 @@ You should be redirected to the song at:<br /><br />
                     }
                 }
                 else {
-                    key -= Config.keys[this._doc.song.key].basePitch;
-                    if (key < 0 || key > Config.maxPitch)
+                    key -= createKeys(this._doc.song.edo)[this._doc.song.key].basePitch;
+                    if (key < 0 || key > this._doc.song.edo * Config.pitchOctaves)
                         return;
                 }
                 if (eventType == 144 && velocity == 0) {
@@ -43004,7 +43321,7 @@ You should be redirected to the song at:<br /><br />
             this.modDragValueLabel = HTML.div({ width: "90", "text-anchor": "start", contenteditable: "true", style: "display: flex, justify-content: center; align-items:center; position:absolute; pointer-events: none;", "dominant-baseline": "central", });
             this._svg = SVG.svg({ id: 'firstImage', style: `background-image: url(${getLocalStorageItem("customTheme", "")}); background-repeat: no-repeat; background-size: 100% 100%; background-color: ${ColorConfig.editorBackground}; touch-action: none; position: absolute;`, width: "100%", height: "100%" }, SVG.defs(this._svgNoteBackground, this._svgDrumBackground, this._svgModBackground), this._svgBackground, this._selectionRect, this._svgNoteContainer, this._svgPreview, this._svgPlayhead);
             this.container = HTML.div({ style: "height: 100%; overflow:hidden; position: relative; flex-grow: 1;" }, this._svg, this.modDragValueLabel);
-            for (let i = 0; i < Config.pitchesPerOctave; i++) {
+            for (let i = 0; i < _doc.song.edo; i++) {
                 const rectangle = SVG.rect();
                 rectangle.setAttribute("x", "1");
                 rectangle.setAttribute("fill", (i == 0) ? ColorConfig.tonic : ColorConfig.pitchBackground);
@@ -43039,7 +43356,7 @@ You should be redirected to the song at:<br /><br />
             this.resetCopiedPins();
         }
         _getMaxPitch() {
-            return this._doc.song.getChannelIsMod(this._doc.channel) ? Config.modCount - 1 : (this._doc.song.getChannelIsNoise(this._doc.channel) ? Config.drumCount - 1 : Config.maxPitch);
+            return this._doc.song.getChannelIsMod(this._doc.channel) ? Config.modCount - 1 : (this._doc.song.getChannelIsNoise(this._doc.channel) ? Config.drumCount - 1 : this._doc.song.edo * Config.maxPitch);
         }
         _getMaxDivision() {
             if (this.controlMode && this._mouseHorizontal)
@@ -43334,17 +43651,17 @@ You should be redirected to the song at:<br /><br />
                 guess = min;
             if (guess > max)
                 guess = max;
-            const scale = this._doc.prefs.notesOutsideScale ? Config.scales.dictionary["Free"].flags : this._doc.song.scale == Config.scales.dictionary["Custom"].index ? this._doc.song.scaleCustom : Config.scales[this._doc.song.scale].flags;
-            if (scale[Math.floor(guess) % Config.pitchesPerOctave] || this._doc.song.getChannelIsNoise(this._doc.channel) || this._doc.song.getChannelIsMod(this._doc.channel)) {
+            const scale = this._doc.prefs.notesOutsideScale ? createScales(this._doc.song.edo).dictionary["Free"].flags : createScales(this._doc.song.edo)[this._doc.song.scale].flags;
+            if (scale[Math.floor(guess) % this._doc.song.edo] || this._doc.song.getChannelIsNoise(this._doc.channel) || this._doc.song.getChannelIsMod(this._doc.channel)) {
                 return Math.floor(guess);
             }
             else {
                 let topPitch = Math.floor(guess) + 1;
                 let bottomPitch = Math.floor(guess) - 1;
-                while (!scale[topPitch % Config.pitchesPerOctave]) {
+                while (!scale[topPitch % this._doc.song.edo]) {
                     topPitch++;
                 }
-                while (!scale[(bottomPitch) % Config.pitchesPerOctave]) {
+                while (!scale[(bottomPitch) % this._doc.song.edo]) {
                     bottomPitch--;
                 }
                 if (topPitch > max) {
@@ -43360,10 +43677,10 @@ You should be redirected to the song at:<br /><br />
                 }
                 let topRange = topPitch;
                 let bottomRange = bottomPitch + 1;
-                if (topPitch % Config.pitchesPerOctave == 0 || topPitch % Config.pitchesPerOctave == 7) {
+                if (topPitch % this._doc.song.edo == 0 || topPitch % this._doc.song.edo == 7) {
                     topRange -= 0.5;
                 }
-                if (bottomPitch % Config.pitchesPerOctave == 0 || bottomPitch % Config.pitchesPerOctave == 7) {
+                if (bottomPitch % this._doc.song.edo == 0 || bottomPitch % this._doc.song.edo == 7) {
                     bottomRange += 0.5;
                 }
                 return guess - bottomRange > topRange - guess ? topPitch : bottomPitch;
@@ -44421,9 +44738,8 @@ You should be redirected to the song at:<br /><br />
                         const sequence = new ChangeSequence();
                         this._dragChange = sequence;
                         this._doc.setProspectiveChange(this._dragChange);
-                        let scale = this._doc.song.scale == Config.scales.dictionary["Custom"].index ? this._doc.song.scaleCustom : Config.scales[this._doc.song.scale].flags;
-                        const notesInScale = scale.filter(x => x).length;
-                        const pitchRatio = this._doc.song.getChannelIsNoise(this._doc.channel) ? 1 : 12 / notesInScale;
+                        const notesInScale = createScales(this._doc.song.edo)[this._doc.song.scale].flags.filter(x => x).length;
+                        const pitchRatio = this._doc.song.getChannelIsNoise(this._doc.channel) ? 1 : this._doc.song.edo / notesInScale;
                         const draggedParts = Math.round((this._mouseX - this._mouseXStart) / (this._partWidth * minDivision)) * minDivision;
                         const draggedTranspose = Math.round((this._mouseYStart - this._mouseY) / (this._pitchHeight * pitchRatio));
                         sequence.append(new ChangeDragSelectedNotes(this._doc, this._doc.channel, pattern, draggedParts, draggedTranspose));
@@ -44846,7 +45162,7 @@ You should be redirected to the song at:<br /><br />
             this._editorWidth = this.container.clientWidth;
             this._editorHeight = this.container.clientHeight;
             this._partWidth = this._editorWidth / (this._doc.song.beatsPerBar * Config.partsPerBeat);
-            this._octaveOffset = (this._doc.channel >= this._doc.song.pitchChannelCount) ? 0 : this._doc.song.channels[this._doc.channel].octave * Config.pitchesPerOctave;
+            this._octaveOffset = (this._doc.channel >= this._doc.song.pitchChannelCount) ? 0 : this._doc.song.channels[this._doc.channel].octave * this._doc.song.edo;
             if (this._doc.song.getChannelIsNoise(this._doc.channel)) {
                 this._pitchBorder = 0;
                 this._pitchCount = Config.drumCount;
@@ -44877,7 +45193,7 @@ You should be redirected to the song at:<br /><br />
                 this._pitchCount = this._doc.getVisiblePitchCount();
             }
             this._pitchHeight = this._editorHeight / this._pitchCount;
-            this._octaveOffset = (this._doc.channel >= this._doc.song.pitchChannelCount) ? 0 : this._doc.getBaseVisibleOctave(this._doc.channel) * Config.pitchesPerOctave;
+            this._octaveOffset = (this._doc.channel >= this._doc.song.pitchChannelCount) ? 0 : this._doc.getBaseVisibleOctave(this._doc.channel) * this._doc.song.edo;
             if (this._renderedRhythm != this._doc.song.rhythm ||
                 this._renderedPitchChannelCount != this._doc.song.pitchChannelCount ||
                 this._renderedNoiseChannelCount != this._doc.song.noiseChannelCount ||
@@ -44903,7 +45219,7 @@ You should be redirected to the song at:<br /><br />
                 this._renderedBeatWidth = beatWidth;
                 this._renderedPitchHeight = this._pitchHeight;
                 this._svgNoteBackground.setAttribute("width", "" + beatWidth);
-                this._svgNoteBackground.setAttribute("height", "" + (this._pitchHeight * Config.pitchesPerOctave));
+                this._svgNoteBackground.setAttribute("height", "" + (this._pitchHeight * this._doc.song.edo));
                 this._svgDrumBackground.setAttribute("width", "" + beatWidth);
                 this._svgDrumBackground.setAttribute("height", "" + this._pitchHeight);
                 this._svgModBackground.setAttribute("width", "" + beatWidth);
@@ -44915,9 +45231,9 @@ You should be redirected to the song at:<br /><br />
                     this._backgroundModRow.setAttribute("width", "" + (beatWidth - 2));
                     this._backgroundModRow.setAttribute("height", "" + (this._pitchHeight - this._pitchBorder));
                 }
-                for (let j = 0; j < Config.pitchesPerOctave; j++) {
+                for (let j = 0; j < this._doc.song.edo; j++) {
                     const rectangle = this._backgroundPitchRows[j];
-                    const y = (Config.pitchesPerOctave - j) % Config.pitchesPerOctave;
+                    const y = (this._doc.song.edo - j) % this._doc.song.edo;
                     rectangle.setAttribute("width", "" + (beatWidth - 2));
                     rectangle.setAttribute("y", "" + (y * this._pitchHeight + 1));
                     rectangle.setAttribute("height", "" + (this._pitchHeight - 2));
@@ -44931,11 +45247,10 @@ You should be redirected to the song at:<br /><br />
             }
             if (this._renderedFifths != this._doc.prefs.showFifth) {
                 this._renderedFifths = this._doc.prefs.showFifth;
-                this._backgroundPitchRows[7].setAttribute("fill", this._doc.prefs.showFifth ? ColorConfig.fifthNote : ColorConfig.pitchBackground);
+                this._backgroundPitchRows[Math.round(this._doc.song.edo * Math.log2(3 / 2))].setAttribute("fill", this._doc.prefs.showFifth ? ColorConfig.fifthNote : ColorConfig.pitchBackground);
             }
-            for (let j = 0; j < Config.pitchesPerOctave; j++) {
-                let scale = this._doc.song.scale == Config.scales.dictionary["Custom"].index ? this._doc.song.scaleCustom : Config.scales[this._doc.song.scale].flags;
-                this._backgroundPitchRows[j].style.visibility = scale[j] ? "visible" : "hidden";
+            for (let j = 0; j < this._doc.song.edo; j++) {
+                this._backgroundPitchRows[j].style.visibility = createScales(this._doc.song.edo)[this._doc.song.scale].flags[j] ? "visible" : "hidden";
             }
             if (this._doc.song.getChannelIsNoise(this._doc.channel)) {
                 if (!this._renderedDrums) {
@@ -44975,7 +45290,7 @@ You should be redirected to the song at:<br /><br />
                         const pattern2 = this._doc.song.getPattern(channel, this._doc.bar + this._barOffset);
                         if (pattern2 == null)
                             continue;
-                        const octaveOffset = this._doc.getBaseVisibleOctave(channel) * Config.pitchesPerOctave;
+                        const octaveOffset = this._doc.getBaseVisibleOctave(channel) * this._doc.song.edo;
                         for (const note of pattern2.notes) {
                             for (const pitch of note.pitches) {
                                 let notePath = SVG.path();
@@ -45336,7 +45651,7 @@ You should be redirected to the song at:<br /><br />
                     this._keyboardLayoutPreview.removeChild(this._keyboardLayoutPreview.firstChild);
                 }
                 const rowLengths = [12, 12, 11, 10];
-                const scale = this._doc.song.scale == Config.scales.dictionary["Custom"].index ? this._doc.song.scaleCustom : Config.scales[this._doc.song.scale].flags;
+                const scale = createScales(this._doc.song.edo)[this._doc.song.scale].flags;
                 for (let rowIndex = 0; rowIndex < 4; rowIndex++) {
                     const row = div$8({ style: "display: flex;" });
                     this._keyboardLayoutPreview.appendChild(row);
@@ -45368,8 +45683,8 @@ You should be redirected to the song at:<br /><br />
                             else {
                                 key.style.setProperty("filter", "");
                             }
-                            const pitchNameIndex = (scalePitch + Config.keys[this._doc.song.key].basePitch) % Config.pitchesPerOctave;
-                            key.textContent = Piano.getPitchName(pitchNameIndex, scalePitch, Math.floor(pitch / 12));
+                            const pitchNameIndex = (scalePitch + createKeys(this._doc.song.edo)[this._doc.song.key].basePitch) % this._doc.song.edo;
+                            key.textContent = Piano.getPitchName(pitchNameIndex, scalePitch, Math.floor(pitch / this._doc.song.edo), this._doc.song.edo);
                         }
                     }
                 }
@@ -48460,6 +48775,15 @@ You should be redirected to the song at:<br /><br />
         }
         return menu;
     }
+    function buildScaleOptions(menu, items, breaks, breakNames) {
+        for (let index = 0; index < items.length; index++) {
+            if (breaks.includes(index)) {
+                menu.appendChild(optgroup({ label: breakNames[breaks.indexOf(index) + 1] }));
+            }
+            menu.appendChild(option({ value: index }, items[index]));
+        }
+        return menu;
+    }
     function buildHeaderedOptions(header, menu, items) {
         menu.appendChild(option({ selected: true, disabled: true, value: header }, header));
         for (const item of items) {
@@ -49034,8 +49358,8 @@ You should be redirected to the song at:<br /><br />
             this._fileMenu = select({ style: "width: 100%;" }, option({ selected: true, disabled: true, hidden: false }, "File"), option({ value: "new" }, "+ New Blank Song (⇧`)"), option({ value: "import" }, "↑ Import Song... (" + EditorConfig.ctrlSymbol + "O)"), option({ value: "export" }, "↓ Export Song... (" + EditorConfig.ctrlSymbol + "S)"), option({ value: "copyUrl" }, "⎘ Copy Song URL"), option({ value: "shareUrl" }, "⤳ Share Song URL"), option({ value: "configureShortener" }, "🛠 Customize Url Shortener..."), option({ value: "shortenUrl" }, "… Shorten Song URL (⇧U)"), option({ value: "viewPlayer" }, "▶ View in Song Player (⇧P)"), option({ value: "copyEmbed" }, "⎘ Copy HTML Embed Code"), option({ value: "songRecovery" }, "⚠ Recover Recent Song... (`)"));
             this._editMenu = select({ style: "width: 100%;" }, option({ selected: true, disabled: true, hidden: false }, "Edit"), option({ value: "undo" }, "Undo (Z)"), option({ value: "redo" }, "Redo (Y)"), option({ value: "copy" }, "Copy Pattern (C)"), option({ value: "pasteNotes" }, "Paste Pattern Notes (V)"), option({ value: "pasteNumbers" }, "Paste Pattern Numbers (" + EditorConfig.ctrlSymbol + "⇧V)"), option({ value: "insertBars" }, "Insert Bar (⏎)"), option({ value: "deleteBars" }, "Delete Selected Bars (⌫)"), option({ value: "insertChannel" }, "Insert Channel (" + EditorConfig.ctrlSymbol + "⏎)"), option({ value: "deleteChannel" }, "Delete Selected Channels (" + EditorConfig.ctrlSymbol + "⌫)"), option({ value: "selectChannel" }, "Select Channel (⇧A)"), option({ value: "selectAll" }, "Select All (A)"), option({ value: "duplicatePatterns" }, "Duplicate Reused Patterns (D)"), option({ value: "transposeUp" }, "Move Notes Up (+ or ⇧+)"), option({ value: "transposeDown" }, "Move Notes Down (- or ⇧-)"), option({ value: "moveNotesSideways" }, "Move All Notes Sideways... (W)"), option({ value: "generateEuclideanRhythm" }, "Generate Euclidean Rhythm... (" + EditorConfig.ctrlSymbol + "E)"), option({ value: "beatsPerBar" }, "Change Beats Per Bar... (⇧B)"), option({ value: "barCount" }, "Change Song Length... (L)"), option({ value: "edo" }, "Change EDO... (EdoBox) (E)"), option({ value: "channelSettings" }, "Channel Settings... (Q)"), option({ value: "limiterSettings" }, "Limiter Settings... (⇧L)"), option({ value: "addExternal" }, "Add Custom Samples... (⇧Q)"));
             this._optionsMenu = select({ style: "width: 100%;" }, option({ selected: true, disabled: true, hidden: false }, "Preferences"), optgroup({ label: "Technical" }, option({ value: "autoPlay" }, "Auto Play on Load"), option({ value: "autoFollow" }, "Auto Follow Playhead"), option({ value: "enableNotePreview" }, "Hear Added Notes"), option({ value: "notesOutsideScale" }, "Place Notes Out of Scale"), option({ value: "setDefaultScale" }, "Set Current Scale as Default"), option({ value: "alwaysFineNoteVol" }, "Always Fine Note Volume"), option({ value: "enableChannelMuting" }, "Enable Channel Muting"), option({ value: "instrumentCopyPaste" }, "Enable Copy/Paste Buttons"), option({ value: "instrumentImportExport" }, "Enable Import/Export Buttons"), option({ value: "displayBrowserUrl" }, "Enable Song Data in URL"), option({ value: "closePromptByClickoff" }, "Close Prompts on Click Off"), option({ value: "rollNoveltyPresets" }, "Can Randomly Select Novelty Presets"), option({ value: "recordingSetup" }, "Note Recording...")), optgroup({ label: "Appearance" }, option({ value: "showFifth" }, 'Highlight "Fifth" Note'), option({ value: "notesFlashWhenPlayed" }, "Notes Flash When Played (DogeBox2)"), option({ value: "instrumentButtonsAtTop" }, "Instrument Buttons at Top"), option({ value: "frostedGlassBackground" }, "Frosted Glass Prompt Backdrop"), option({ value: "showChannels" }, "Show All Channels"), option({ value: "showScrollBar" }, "Show Octave Scroll Bar"), option({ value: "showInstrumentScrollbars" }, "Show Intsrument Scrollbars"), option({ value: "showLetters" }, "Show Piano Keys"), option({ value: "displayVolumeBar" }, "Show Playback Volume"), option({ value: "showOscilloscope" }, "Show Oscilloscope"), option({ value: "showSampleLoadingStatus" }, "Show Sample Loading Status"), option({ value: "showDescription" }, "Show Description"), option({ value: "layout" }, "Set Layout..."), option({ value: "colorTheme" }, "Set Theme..."), option({ value: "customTheme" }, "Custom Theme...")));
-            this._scaleSelect = buildOptions(select(), Config.scales.map(scale => scale.name));
-            this._keySelect = buildOptions(select(), Config.keys.map(key => key.name).reverse());
+            this._scaleSelect = buildScaleOptions(select(), createScales(this.doc.song.edo).map(scale => scale.name), createBreaks(this.doc.song.edo), createBreakNames(this.doc.song.edo));
+            this._keySelect = buildOptions(select(), createKeys(this.doc.song.edo).map(key => key.name).reverse());
             this._octaveStepper = input({ style: "width: 59.5%;", type: "number", min: Config.octaveMin, max: Config.octaveMax, value: "0" });
             this._tempoSlider = new Slider(input({ style: "margin: 0; vertical-align: middle;", type: "range", min: "1", max: "500", value: "160", step: "1" }), this.doc, (oldValue, newValue) => new ChangeTempo(this.doc, oldValue, newValue), false);
             this._tempoStepper = input({ style: "width: 4em; font-size: 80%; margin-left: 0.4em; vertical-align: middle;", type: "number", step: "1" });
@@ -49496,8 +49820,8 @@ You should be redirected to the song at:<br /><br />
                         option.textContent = label;
                 }
                 setSelectedValue(this._scaleSelect, this.doc.song.scale);
-                this._scaleSelect.title = Config.scales[this.doc.song.scale].realName;
-                setSelectedValue(this._keySelect, Config.keys.length - 1 - this.doc.song.key);
+                this._scaleSelect.title = createScales(this.doc.song.edo)[this.doc.song.scale].realName;
+                setSelectedValue(this._keySelect, createKeys(this.doc.song.edo).length - 1 - this.doc.song.key);
                 this._octaveStepper.value = Math.round(this.doc.song.octave).toString();
                 this._tempoSlider.updateValue(Math.max(0, Math.round(this.doc.song.tempo)));
                 this._tempoStepper.value = Math.round(this.doc.song.tempo).toString();
@@ -51723,7 +52047,7 @@ You should be redirected to the song at:<br /><br />
                     this.doc.notifier.changed();
                 }
                 else {
-                    this.doc.record(new ChangeKey(this.doc, Config.keys.length - 1 - this._keySelect.selectedIndex));
+                    this.doc.record(new ChangeKey(this.doc, createKeys(this.doc.song.edo).length - 1 - this._keySelect.selectedIndex));
                 }
             };
             this._whenSetRhythm = () => {

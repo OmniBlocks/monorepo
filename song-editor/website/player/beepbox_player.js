@@ -11154,6 +11154,225 @@ var beepbox = (function (exports) {
         return acc < 0 ? acc + 4294967296 : acc;
     }
 
+    function gcd(a, b) {
+        if (b === 0)
+            return a;
+        return gcd(b, a % b);
+    }
+    function finishKeys(keys, edo) {
+        let keysFinished = false;
+        let newKeys;
+        while (!keysFinished) {
+            keysFinished = true;
+            newKeys = structuredClone(keys);
+            for (let i = 0; i < edo; i++) {
+                if (keys[i] == "") {
+                    if (keys[i - 1] != "") {
+                        newKeys[i] = keys[i - 1] + "+";
+                    }
+                    else if (keys[(i + 1) % edo] != "") {
+                        newKeys[i] = keys[(i + 1) % edo] + "-";
+                    }
+                    else {
+                        keysFinished = false;
+                    }
+                }
+            }
+            keys = structuredClone(newKeys);
+        }
+        return keys;
+    }
+    function appendToListItems(list, add, atBack) {
+        let newList = [];
+        for (let i = 0; i < list.length; i++) {
+            atBack ? newList.push(add + list[i]) : newList.push(list[i] + add);
+        }
+        return newList;
+    }
+    function createMOS(edo, gen, modeNames, scaleArray, numGens, realScaleName) {
+        for (let gensDown = 0; gensDown < numGens; gensDown++) {
+            let thisFlags = Array(edo).fill(false);
+            thisFlags[0] = true;
+            let gensUp = numGens - gensDown - 1;
+            for (let i = 1; i <= gensUp; i++) {
+                thisFlags[(gen * i) % edo] = true;
+            }
+            for (let i = 1; i <= gensDown; i++) {
+                thisFlags[((edo - gen) * i) % edo] = true;
+            }
+            scaleArray.push({ "index": scaleArray.length, "name": modeNames[gensDown], "realName": realScaleName + " " + gensUp + "|" + gensDown, "flags": thisFlags });
+        }
+        return scaleArray;
+    }
+    function createKeys(edo) {
+        let bestFifth = Math.round(Math.log2(3 / 2) * edo);
+        let fifthRatio = bestFifth / edo;
+        let keys = Array(edo).fill("");
+        let keyNames_5edo = ["C", "D", "F", "G", "A"];
+        let keyNames_diatonicFifthward = ["C", "G", "D", "A", "E", "B", "F♯", "C♯", "G♯", "D♯", "A♯", "E♯", "B♯"];
+        let keyNames_diatonicFourthward = ["C", "F", "B♭", "E♭", "A♭", "D♭", "G♭", "C♭", "F♭"];
+        let keyNames_mavilaFifthward = ["C", "G", "D♭", "A♭", "E♭", "B♭", "F♭", "C♭", "G♭"];
+        let keyNames_mavilaFourthward = ["C", "F", "B", "E", "A", "D", "G♯", "C♯", "F♯", "B♯", "E♯", "A♯", "D♯"];
+        let keyNames_oneiroSixthward = ["C", "H", "E♭", "B♭", "G♭", "D♭", "A♭", "F♭", "C♭", "H♭"];
+        let keyNames_oneiroFourthward = ["C", "F", "A", "D", "G", "B", "E", "H♯", "C♯", "F♯", "A♯", "D♯", "G♯", "B♯", "E♯"];
+        if (fifthRatio == 3 / 5) {
+            let fifthOctave = Math.round(edo / 5);
+            for (let i = 0; i < 5; i++) {
+                keys[i * fifthOctave] = keyNames_5edo[i];
+            }
+            keys = finishKeys(keys, edo);
+        }
+        else if (edo == 6) {
+            keys = ["C", "D", "E", "F", "A", "B"];
+        }
+        else if (edo == 11) {
+            keys = ["C", "C♯", "D", "E", "E♯", "F", "F♯", "G", "A", "A♯", "B"];
+        }
+        else if (fifthRatio >= 4 / 7 && fifthRatio < 3 / 5) {
+            let baseEdo = edo / gcd(edo, bestFifth);
+            keys[0] = "C";
+            for (let i = 1; i <= 5 + Math.min(Math.ceil((baseEdo - 7) / 2), 7); i++) {
+                let thisPitch = (bestFifth * i) % edo;
+                if (keyNames_diatonicFifthward[i] != "B♯" && keyNames_diatonicFifthward[i] != "E♯") {
+                    keys[thisPitch] = keyNames_diatonicFifthward[i];
+                }
+            }
+            for (let i = 1; i <= 1 + Math.min(Math.floor((baseEdo - 7) / 2), 7); i++) {
+                let thisPitch = ((edo - bestFifth) * i) % edo;
+                keys[thisPitch] = keyNames_diatonicFourthward[i];
+            }
+            keys = finishKeys(keys, edo);
+        }
+        else if (fifthRatio < 4 / 7) {
+            let baseEdo = edo / gcd(edo, bestFifth);
+            keys[0] = "C";
+            for (let i = 1; i <= 5 + Math.min(Math.ceil((baseEdo - 7) / 2), 7); i++) {
+                let thisPitch = ((edo - bestFifth) * i) % edo;
+                keys[thisPitch] = keyNames_mavilaFourthward[i];
+            }
+            for (let i = 1; i <= 1 + Math.min(Math.floor((baseEdo - 7) / 2), 7); i++) {
+                let thisPitch = (bestFifth * i) % edo;
+                keys[thisPitch] = keyNames_mavilaFifthward[i];
+            }
+            keys = finishKeys(keys, edo);
+        }
+        else if (fifthRatio > 3 / 5) {
+            let baseEdo = edo / gcd(edo, bestFifth);
+            keys[0] = "C";
+            for (let i = 1; i <= 6 + Math.min(Math.ceil((baseEdo - 8) / 2), 8); i++) {
+                let thisPitch = ((edo - bestFifth) * i) % edo;
+                keys[thisPitch] = keyNames_oneiroFourthward[i];
+            }
+            for (let i = 1; i <= 1 + Math.min(Math.floor((baseEdo - 8) / 2), 8); i++) {
+                let thisPitch = (bestFifth * i) % edo;
+                keys[thisPitch] = keyNames_oneiroSixthward[i];
+            }
+            keys = finishKeys(keys, edo);
+        }
+        let keyArray = [];
+        for (let i = 0; i < edo; i++) {
+            keyArray.push({ "index": i, "name": keys[i], "isWhiteKey": keys[i].length == 1 ? true : false, "basePitch": i + edo });
+        }
+        return toNameMap(keyArray);
+    }
+    function createScales(edo) {
+        let scaleArray = [];
+        let realScaleName;
+        let modeNames;
+        scaleArray.push({ "index": 0, "name": "Free", "realName": edo.toString() + "edo", "flags": Array(edo).fill(true) });
+        let bestGen = Math.round(Math.log2(3 / 2) * edo);
+        let ratioGen = bestGen / edo;
+        if (ratioGen >= 4 / 7 && ratioGen < 3 / 5) {
+            realScaleName = "pentic";
+            modeNames = ["Ionian", "Mixolydian", "Dorian", "Aeolian", "Phrygian"];
+            modeNames = appendToListItems(modeNames, " Soft Pentatonic", false);
+            scaleArray = createMOS(edo, bestGen, modeNames, scaleArray, 5, realScaleName);
+            if (!(ratioGen == 4 / 7)) {
+                realScaleName = "diatonic";
+                modeNames = ["Lydian", "Ionian", "Mixolydian", "Dorian", "Aeolian", "Phrygian", "Locrian"];
+                scaleArray = createMOS(edo, bestGen, modeNames, scaleArray, 7, realScaleName);
+            }
+        }
+        bestGen = Math.round(Math.log2(Math.cbrt(5 / 2)) * edo);
+        ratioGen = bestGen / edo;
+        if (ratioGen <= 4 / 9 && ratioGen > 3 / 7) {
+            realScaleName = "pentic";
+            modeNames = ["Ionian", "Mixolydian", "Dorian", "Aeolian", "Phrygian"];
+            modeNames = appendToListItems(modeNames, " Hard Pentatonic", false);
+            scaleArray = createMOS(edo, bestGen, modeNames, scaleArray, 5, realScaleName);
+            realScaleName = "antidiatonic";
+            modeNames = ["Lydian", "Ionian", "Mixolydian", "Dorian", "Aeolian", "Phrygian", "Locrian"].reverse();
+            modeNames = appendToListItems(modeNames, "Anti-", true);
+            scaleArray = createMOS(edo, bestGen, modeNames, scaleArray, 7, realScaleName);
+        }
+        bestGen = Math.round(Math.log2(14 / 9) * edo);
+        ratioGen = bestGen / edo;
+        if (ratioGen < 2 / 3 && ratioGen >= 5 / 8) {
+            realScaleName = "antipentic";
+            modeNames = ["Ionian", "Mixolydian", "Dorian", "Aeolian", "Phrygian"].reverse();
+            modeNames = appendToListItems(appendToListItems(modeNames, " Hard Pentatonic", false), "Anti-", true);
+            scaleArray = createMOS(edo, bestGen, modeNames, scaleArray, 5, realScaleName);
+            if (!(ratioGen == 5 / 8)) {
+                realScaleName = "checkertonic";
+                modeNames = ["Dylathian", "Illarnekian", "Celephaïsian", "Ultharian", "Mnarian", "Kadathian", "Hlanithian", "Sarnathian"].reverse();
+                modeNames = appendToListItems(modeNames, "Anti-", true);
+                scaleArray = createMOS(edo, bestGen, modeNames, scaleArray, 8, realScaleName);
+            }
+        }
+        bestGen = Math.round(Math.log2(Math.cbrt(20 / 9)) * edo);
+        ratioGen = bestGen / edo;
+        if (ratioGen < 2 / 5 && ratioGen > 3 / 8) {
+            realScaleName = "antipentic";
+            modeNames = ["Ionian", "Mixolydian", "Dorian", "Aeolian", "Phrygian"].reverse();
+            modeNames = appendToListItems(appendToListItems(modeNames, " Soft Pentatonic", false), "Anti-", true);
+            scaleArray = createMOS(edo, bestGen, modeNames, scaleArray, 5, realScaleName);
+            realScaleName = "oneirotonic";
+            modeNames = ["Dylathian", "Illarnekian", "Celephaïsian", "Ultharian", "Mnarian", "Kadathian", "Hlanithian", "Sarnathian"];
+            scaleArray = createMOS(edo, bestGen, modeNames, scaleArray, 8, realScaleName);
+        }
+        bestGen = Math.round(Math.log2(Math.sqrt(3 / 2)) * edo);
+        ratioGen = bestGen / edo;
+        if (ratioGen < 1 / 3 && ratioGen > 2 / 7) {
+            realScaleName = "mosh";
+            modeNames = ["Dalmatian", "Galatian", "Cilician", "Bithynian", "Pisidian", "Illyrian", "Lycian"];
+            scaleArray = createMOS(edo, bestGen, modeNames, scaleArray, 7, realScaleName);
+        }
+        bestGen = Math.round(Math.log2(128 / 77) * edo);
+        ratioGen = bestGen / edo;
+        if (ratioGen < 3 / 4 && ratioGen > 5 / 7) {
+            realScaleName = "smitonic";
+            modeNames = ["Dalmatian", "Galatian", "Cilician", "Bithynian", "Pisidian", "Illyrian", "Lycian"].reverse();
+            modeNames = appendToListItems(modeNames, "Anti-", true);
+            scaleArray = createMOS(edo, bestGen, modeNames, scaleArray, 7, realScaleName);
+        }
+        bestGen = Math.round(Math.log2(7 / 6) * edo);
+        ratioGen = bestGen / edo;
+        if (ratioGen >= 2 / 9 && ratioGen < 1 / 4) {
+            realScaleName = "manual";
+            modeNames = ["Iberian", "Alboran", "Aegean", "Eruthran", "Caspian"];
+            modeNames = appendToListItems(modeNames, " Hard Pentatonic", false);
+            scaleArray = createMOS(edo, bestGen, modeNames, scaleArray, 5, realScaleName);
+            if (!(ratioGen == 2 / 9)) {
+                realScaleName = "gramitonic";
+                modeNames = ["Adriatic", "Tyrrhenian", "Iberian", "Alboran", "Aegean", "Eruthran", "Caspian", "Axenan", "Propontian"];
+                scaleArray = createMOS(edo, bestGen, modeNames, scaleArray, 9, realScaleName);
+            }
+        }
+        bestGen = Math.round(Math.log2(Math.sqrt(3)) * edo);
+        ratioGen = bestGen / edo;
+        if (ratioGen > 7 / 9 && ratioGen < 4 / 5) {
+            realScaleName = "manual";
+            modeNames = ["Iberian", "Alboran", "Aegean", "Eruthran", "Caspian"];
+            modeNames = appendToListItems(appendToListItems(modeNames, " Soft Pentatonic", false), "Anti-", true);
+            scaleArray = createMOS(edo, bestGen, modeNames, scaleArray, 5, realScaleName);
+            realScaleName = "semiquartal";
+            modeNames = ["Adriatic", "Tyrrhenian", "Iberian", "Alboran", "Aegean", "Eruthran", "Caspian", "Axenan", "Propontian"].reverse();
+            modeNames = appendToListItems(modeNames, "Anti-", true);
+            scaleArray = createMOS(edo, bestGen, modeNames, scaleArray, 9, realScaleName);
+        }
+        return toNameMap(scaleArray);
+    }
+
     const epsilon = (1.0e-24);
     function clamp(min, max, val) {
         max = max - 1;
@@ -11534,7 +11753,7 @@ var beepbox = (function (exports) {
                     if (note.pins.length < 2)
                         continue;
                     note.end = note.pins[note.pins.length - 1].time + note.start;
-                    const maxPitch = isNoiseChannel ? Config.drumCount - 1 : Config.maxPitch;
+                    const maxPitch = isNoiseChannel ? Config.drumCount - 1 : song.edo * Config.maxPitch;
                     let lowestPitch = maxPitch;
                     let highestPitch = 0;
                     for (let k = 0; k < note.pitches.length; k++) {
@@ -13758,8 +13977,8 @@ var beepbox = (function (exports) {
             }
             return largest;
         }
-        static frequencyFromPitch(pitch) {
-            return 440.0 * Math.pow(2.0, (pitch - 69.0) / 12.0);
+        static frequencyFromPitch(pitch, edo) {
+            return 440.0 * Math.pow(2.0, pitch / edo - 69 / 12);
         }
         addEnvelope(target, index, envelope, newEnvelopes, start = 0, end = -1, inverse = false, perEnvelopeSpeed = -1, perEnvelopeLowerBound = 0, perEnvelopeUpperBound = 1, steps = 2, seed = 2, waveform = 0, discrete = false) {
             end = end != -1 ? end : this.isNoiseInstrument ? Config.drumCount - 1 : Config.maxPitch;
@@ -17644,7 +17863,7 @@ var beepbox = (function (exports) {
                     "enigma": "strange",
                 };
                 const scaleName = (oldScaleNames[jsonObject["scale"]] != undefined) ? oldScaleNames[jsonObject["scale"]] : jsonObject["scale"];
-                const scale = Config.scales.findIndex(scale => scale.name == scaleName);
+                const scale = createScales(this.edo).findIndex(scale => scale.name == scaleName);
                 if (scale != -1)
                     this.scale = scale;
                 if (this.scale == Config.scales["dictionary"]["Custom"].index) {
@@ -18037,7 +18256,7 @@ var beepbox = (function (exports) {
             const pitchChanged = Math.abs(Math.log2(delayLength / prevDelayLength)) > 0.01;
             const reinitializeImpulse = (this.delayIndex == -1 || pitchChanged);
             if (this.delayLine == null || this.delayLine.length <= minBufferLength) {
-                const likelyMaximumLength = Math.ceil(2 * synth.samplesPerSecond / Instrument.frequencyFromPitch(12));
+                const likelyMaximumLength = Math.ceil(2 * synth.samplesPerSecond / Instrument.frequencyFromPitch(((synth.song) ? synth.song.edo : 12) * 2, ((synth.song) ? synth.song.edo : 12)));
                 const newDelayLine = new Float32Array(Synth.fittingPowerOfTwo(Math.max(likelyMaximumLength, minBufferLength)));
                 if (!reinitializeImpulse && this.delayLine != null) {
                     const oldDelayBufferMask = (this.delayLine.length - 1) >> 0;
@@ -19103,7 +19322,7 @@ var beepbox = (function (exports) {
             this.aliases = instrument.aliases;
             this.volumeScale = 1.0;
             const samplesPerSecond = synth.samplesPerSecond;
-            this.updateWaves(instrument, samplesPerSecond);
+            this.updateWaves(instrument, samplesPerSecond, ((synth.song) ? synth.song.edo : 12));
             const ticksIntoBar = synth.getTicksIntoBar();
             const tickTimeStart = ticksIntoBar;
             const secondsPerTick = samplesPerTick / synth.samplesPerSecond;
@@ -19229,9 +19448,9 @@ var beepbox = (function (exports) {
                     quantizationSettingStart = synth.getModValue(Config.modulators.dictionary["bit crush"].index, channelIndex, instrumentIndex, false) * Math.sqrt(envelopeStarts[43]);
                     quantizationSettingEnd = synth.getModValue(Config.modulators.dictionary["bit crush"].index, channelIndex, instrumentIndex, true) * Math.sqrt(envelopeEnds[43]);
                 }
-                const basePitch = Config.keys[synth.song.key].basePitch + (Config.pitchesPerOctave * synth.song.octave);
-                const freqStart = Instrument.frequencyFromPitch(basePitch + 60) * Math.pow(2.0, (Config.bitcrusherFreqRange - 1 - freqSettingStart) * Config.bitcrusherOctaveStep);
-                const freqEnd = Instrument.frequencyFromPitch(basePitch + 60) * Math.pow(2.0, (Config.bitcrusherFreqRange - 1 - freqSettingEnd) * Config.bitcrusherOctaveStep);
+                const basePitch = synth.song ? createKeys(synth.song.edo)[synth.song.key].basePitch : createKeys(12)[synth.song.key].basePitch;
+                const freqStart = Instrument.frequencyFromPitch(basePitch + (60 * ((synth.song) ? synth.song.edo : 12) / 12), ((synth.song) ? synth.song.edo : 12)) * Math.pow(2.0, (Config.bitcrusherFreqRange - 1 - freqSettingStart) * Config.bitcrusherOctaveStep);
+                const freqEnd = Instrument.frequencyFromPitch(basePitch + (60 * ((synth.song) ? synth.song.edo : 12) / 12), ((synth.song) ? synth.song.edo : 12)) * Math.pow(2.0, (Config.bitcrusherFreqRange - 1 - freqSettingEnd) * Config.bitcrusherOctaveStep);
                 const phaseDeltaStart = Math.min(1.0, freqStart / samplesPerSecond);
                 const phaseDeltaEnd = Math.min(1.0, freqEnd / samplesPerSecond);
                 this.bitcrusherPhaseDelta = phaseDeltaStart;
@@ -19566,7 +19785,7 @@ var beepbox = (function (exports) {
             this.delayInputMultDelta = (delayInputMultEnd - delayInputMultStart) / roundedSamplesPerTick;
             this.envelopeComputer.clearEnvelopes();
         }
-        updateWaves(instrument, samplesPerSecond) {
+        updateWaves(instrument, samplesPerSecond, edo) {
             this.volumeScale = 1.0;
             if (instrument.type == 0) {
                 this.wave = (this.aliases) ? Config.rawChipWaves[instrument.chipWave].samples : Config.chipWaves[instrument.chipWave].samples;
@@ -19632,7 +19851,7 @@ var beepbox = (function (exports) {
             }
             else if (instrument.type == 4) {
                 for (let i = 0; i < Config.drumCount; i++) {
-                    this.drumsetSpectrumWaves[i].getCustomWave(instrument.drumsetSpectrumWaves[i], InstrumentState._drumsetIndexToSpectrumOctave(i));
+                    this.drumsetSpectrumWaves[i].getCustomWave(instrument.drumsetSpectrumWaves[i], InstrumentState._drumsetIndexToSpectrumOctave(i, 12));
                 }
                 this.wave = null;
                 this.unisonVoices = instrument.unisonVoices;
@@ -19653,11 +19872,11 @@ var beepbox = (function (exports) {
                 throw new Error("Unhandled instrument type in getDrumsetWave");
             }
         }
-        static drumsetIndexReferenceDelta(index) {
-            return Instrument.frequencyFromPitch(Config.spectrumBasePitch + index * 6) / 44100;
+        static drumsetIndexReferenceDelta(index, edo) {
+            return Instrument.frequencyFromPitch(Config.spectrumBasePitch + index * 6, edo) / 44100;
         }
-        static _drumsetIndexToSpectrumOctave(index) {
-            return 15 + Math.log2(InstrumentState.drumsetIndexReferenceDelta(index));
+        static _drumsetIndexToSpectrumOctave(index, edo) {
+            return 15 + Math.log2(InstrumentState.drumsetIndexReferenceDelta(index, edo));
         }
     }
     class ChannelState {
@@ -19720,7 +19939,7 @@ var beepbox = (function (exports) {
                         for (let envelopeIndex = 0; envelopeIndex < Config.maxEnvelopeCount + 1; envelopeIndex++)
                             instrumentState.envelopeTime[envelopeIndex] = 0;
                         instrumentState.arpTime = 0;
-                        instrumentState.updateWaves(instrument, this.samplesPerSecond);
+                        instrumentState.updateWaves(instrument, this.samplesPerSecond, song.edo);
                         instrumentState.allocateNecessaryBuffers(this, instrument, samplesPerTick);
                     }
                 }
@@ -21713,7 +21932,7 @@ var beepbox = (function (exports) {
             let chordExpressionStart = chordExpression;
             let chordExpressionEnd = chordExpression;
             let expressionReferencePitch = 16;
-            let basePitch = Config.keys[song.key].basePitch + (Config.pitchesPerOctave * song.octave);
+            let basePitch = createKeys(song.edo)[song.key].basePitch;
             let baseExpression = 1.0;
             let pitchDamping = 48;
             if (instrument.type == 3) {
@@ -21983,8 +22202,8 @@ var beepbox = (function (exports) {
                     modDetuneStart += 4 * this.getModValue(Config.modulators.dictionary["song detune"].index, channelIndex, tone.instrumentIndex, false);
                     modDetuneEnd += 4 * this.getModValue(Config.modulators.dictionary["song detune"].index, channelIndex, tone.instrumentIndex, true);
                 }
-                intervalStart += Synth.detuneToCents(modDetuneStart) * envelopeStart * Config.pitchesPerOctave / (12.0 * 100.0);
-                intervalEnd += Synth.detuneToCents(modDetuneEnd) * envelopeEnd * Config.pitchesPerOctave / (12.0 * 100.0);
+                intervalStart += Synth.detuneToCents(modDetuneStart) * envelopeStart * song.edo / (12.0 * 100.0);
+                intervalEnd += Synth.detuneToCents(modDetuneEnd) * envelopeEnd * song.edo / (12.0 * 100.0);
             }
             if (effectsIncludeVibrato(instrument.effects)) {
                 let delayTicks;
@@ -21994,12 +22213,12 @@ var beepbox = (function (exports) {
                     delayTicks = instrument.vibratoDelay * 2;
                     if (instrument.vibratoDelay == Config.modulators.dictionary["vibrato delay"].maxRawVol)
                         delayTicks = Number.POSITIVE_INFINITY;
-                    vibratoAmplitudeStart = instrument.vibratoDepth;
+                    vibratoAmplitudeStart = instrument.vibratoDepth * song.edo / 12;
                     vibratoAmplitudeEnd = vibratoAmplitudeStart;
                 }
                 else {
                     delayTicks = Config.vibratos[instrument.vibrato].delayTicks;
-                    vibratoAmplitudeStart = Config.vibratos[instrument.vibrato].amplitude;
+                    vibratoAmplitudeStart = Config.vibratos[instrument.vibrato].amplitude * song.edo / 12;
                     vibratoAmplitudeEnd = vibratoAmplitudeStart;
                 }
                 if (this.isModActive(Config.modulators.dictionary["vibrato delay"].index, channelIndex, tone.instrumentIndex)) {
@@ -22008,8 +22227,8 @@ var beepbox = (function (exports) {
                         delayTicks = Number.POSITIVE_INFINITY;
                 }
                 if (this.isModActive(Config.modulators.dictionary["vibrato depth"].index, channelIndex, tone.instrumentIndex)) {
-                    vibratoAmplitudeStart = this.getModValue(Config.modulators.dictionary["vibrato depth"].index, channelIndex, tone.instrumentIndex, false) / 25;
-                    vibratoAmplitudeEnd = this.getModValue(Config.modulators.dictionary["vibrato depth"].index, channelIndex, tone.instrumentIndex, true) / 25;
+                    vibratoAmplitudeStart = this.getModValue(Config.modulators.dictionary["vibrato depth"].index, channelIndex, tone.instrumentIndex, false) / 25 * song.edo / 12;
+                    vibratoAmplitudeEnd = this.getModValue(Config.modulators.dictionary["vibrato depth"].index, channelIndex, tone.instrumentIndex, true) / 25 * song.edo / 12;
                 }
                 let vibratoStart;
                 if (tone.prevVibrato != null) {
@@ -22111,6 +22330,7 @@ var beepbox = (function (exports) {
                 tone.noteFilterCount++;
             }
             noteFilterExpression = Math.min(3.0, noteFilterExpression);
+            let edo_ = isNoiseChannel ? 12 : song.edo;
             if (instrument.type == 1 || instrument.type == 11) {
                 let sineExpressionBoost = 1.0;
                 let totalCarrierExpression = 0.0;
@@ -22129,8 +22349,8 @@ var beepbox = (function (exports) {
                     const interval = Config.operatorCarrierInterval[associatedCarrierIndex] + arpeggioInterval;
                     const pitchStart = basePitch + (pitch + intervalStart) * intervalScale + interval;
                     const pitchEnd = basePitch + (pitch + intervalEnd) * intervalScale + interval;
-                    const baseFreqStart = Instrument.frequencyFromPitch(pitchStart);
-                    const baseFreqEnd = Instrument.frequencyFromPitch(pitchEnd);
+                    const baseFreqStart = Instrument.frequencyFromPitch(pitchStart, song.edo);
+                    const baseFreqEnd = Instrument.frequencyFromPitch(pitchEnd, song.edo);
                     const hzOffset = Config.operatorFrequencies[instrument.operators[i].frequency].hzOffset;
                     const targetFreqStart = freqMult * baseFreqStart + hzOffset;
                     const targetFreqEnd = freqMult * baseFreqEnd + hzOffset;
@@ -22223,7 +22443,7 @@ var beepbox = (function (exports) {
                 tone.feedbackDelta = (feedbackEnd - feedbackStart) / roundedSamplesPerTick;
             }
             else {
-                const freqEndRatio = Math.pow(2.0, (intervalEnd - intervalStart) * intervalScale / 12.0);
+                const freqEndRatio = Math.pow(2.0, (intervalEnd - intervalStart) * intervalScale / song.edo);
                 const basePhaseDeltaScale = Math.pow(freqEndRatio, 1.0 / roundedSamplesPerTick);
                 const isMono = chord.name == "monophonic";
                 let pitch = tone.pitches[0];
@@ -22231,7 +22451,7 @@ var beepbox = (function (exports) {
                     const arpeggio = Math.floor(instrumentState.arpTime / Config.ticksPerArpeggio);
                     if (chord.customInterval) {
                         const intervalOffset = tone.pitches[1 + getArpeggioPitchIndex(tone.pitchCount - 1, instrument.fastTwoNoteArp, arpeggio)] - tone.pitches[0];
-                        specialIntervalMult = Math.pow(2.0, intervalOffset / 12.0);
+                        specialIntervalMult = Math.pow(2.0, intervalOffset / song.edo);
                         tone.specialIntervalExpressionMult = Math.pow(2.0, -intervalOffset / pitchDamping);
                     }
                     else if (chord.arpeggiates) {
@@ -22290,7 +22510,7 @@ var beepbox = (function (exports) {
                     tone.stringSustainEnd = useSustainEnd;
                     settingsExpressionMult *= Math.pow(2.0, 0.7 * (1.0 - useSustainStart / (Config.stringSustainRange - 1)));
                 }
-                const startFreq = Instrument.frequencyFromPitch(startPitch);
+                const startFreq = Instrument.frequencyFromPitch(startPitch, instrument.type == 4 ? song.edo : edo_);
                 if (instrument.type == 0 || instrument.type == 9 || instrument.type == 5 || instrument.type == 7 || instrument.type == 3 || instrument.type == 6 || instrument.type == 2 || instrument.type == 4) {
                     const unisonVoices = instrument.unisonVoices;
                     const unisonSpread = instrument.unisonSpread;
@@ -22403,7 +22623,7 @@ var beepbox = (function (exports) {
                     const curvedSpread = Math.pow(1.0 - Math.sqrt(Math.max(0.0, 1.0 - averageSpreadSlider)), 1.75);
                     for (let i = 0; i < Config.supersawVoiceCount; i++) {
                         const offset = (i == 0) ? 0.0 : Math.pow((((i + 1) >> 1) - 0.5 + 0.025 * ((i & 2) - 1)) / (Config.supersawVoiceCount >> 1), 1.1) * ((i & 1) * 2 - 1);
-                        tone.supersawUnisonDetunes[i] = Math.pow(2.0, curvedSpread * offset / 12.0);
+                        tone.supersawUnisonDetunes[i] = Math.pow(2.0, curvedSpread * offset / song.edo);
                     }
                     const baseShape = instrument.supersawShape / Config.supersawShapeMax;
                     let useShapeStart = baseShape * envelopeStarts[40];
@@ -22442,7 +22662,7 @@ var beepbox = (function (exports) {
                     tone.supersawDelayLengthDelta = (delayLengthEnd - delayLengthStart) / roundedSamplesPerTick;
                     const minBufferLength = Math.ceil(Math.max(delayLengthStart, delayLengthEnd)) + 2;
                     if (tone.supersawDelayLine == null || tone.supersawDelayLine.length <= minBufferLength) {
-                        const likelyMaximumLength = Math.ceil(0.5 * this.samplesPerSecond / Instrument.frequencyFromPitch(24));
+                        const likelyMaximumLength = Math.ceil(0.5 * this.samplesPerSecond / Instrument.frequencyFromPitch(song.edo * 2, song.edo));
                         const newDelayLine = new Float32Array(Synth.fittingPowerOfTwo(Math.max(likelyMaximumLength, minBufferLength)));
                         if (!initializeSupersaw && tone.supersawDelayLine != null) {
                             const oldDelayBufferMask = (tone.supersawDelayLine.length - 1) >> 0;
@@ -24496,7 +24716,7 @@ var beepbox = (function (exports) {
                 drumSource += `
         const data = synth.tempMonoInstrumentSampleBuffer;
         let wave = instrumentState.getDrumsetWave(tone.drumsetPitch);
-        const referenceDelta = InstrumentState.drumsetIndexReferenceDelta(tone.drumsetPitch);
+        const referenceDelta: number = InstrumentState.drumsetIndexReferenceDelta(tone.drumsetPitch!, ((synth.song) ? synth.song.edo : 12));
         const unisonSign = tone.specialIntervalExpressionMult * instrumentState.unisonSign;
         `;
                 for (let i = 0; i < voiceCount; i++) {
@@ -25497,8 +25717,8 @@ var beepbox = (function (exports) {
         let windowPitchCount;
         if (zoomEnabled) {
             timelineHeight = boundingRect.height;
-            windowOctaves = Math.max(1, Math.min(Config.pitchOctaves, Math.round(timelineHeight / (12 * 2))));
-            windowPitchCount = windowOctaves * 12 + 1;
+            windowOctaves = Math.max(1, Math.min(Config.pitchOctaves, Math.round(timelineHeight / (synth.song.edo * 2))));
+            windowPitchCount = windowOctaves * synth.song.edo + 1;
             const semitoneHeight = (timelineHeight - 1) / windowPitchCount;
             const targetBeatWidth = Math.max(8, semitoneHeight * 4);
             timelineWidth = Math.max(boundingRect.width, targetBeatWidth * synth.song.barCount * synth.song.beatsPerBar);
@@ -25507,8 +25727,8 @@ var beepbox = (function (exports) {
             timelineWidth = boundingRect.width;
             const targetSemitoneHeight = Math.max(1, timelineWidth / (synth.song.barCount * synth.song.beatsPerBar) / 6.0);
             timelineHeight = Math.min(boundingRect.height, targetSemitoneHeight * (Config.maxPitch + 1) + 1);
-            windowOctaves = Math.max(3, Math.min(Config.pitchOctaves, Math.round(timelineHeight / (12 * targetSemitoneHeight))));
-            windowPitchCount = windowOctaves * 12 + 1;
+            windowOctaves = Math.max(3, Math.min(Config.pitchOctaves, Math.round(timelineHeight / (synth.song.edo * targetSemitoneHeight))));
+            windowPitchCount = windowOctaves * synth.song.edo + 1;
         }
         timelineContainer.style.width = timelineWidth + "px";
         timelineContainer.style.height = timelineHeight + "px";
@@ -25523,7 +25743,7 @@ var beepbox = (function (exports) {
             timeline.appendChild(rect({ x: bar * barWidth - 1, y: 0, width: 2, height: timelineHeight, fill: color }));
         }
         for (let octave = 0; octave <= windowOctaves; octave++) {
-            timeline.appendChild(rect({ x: 0, y: octave * 12 * wavePitchHeight, width: timelineWidth, height: wavePitchHeight + 1, fill: ColorConfig.tonic, opacity: 0.75 }));
+            timeline.appendChild(rect({ x: 0, y: octave * synth.song.edo * wavePitchHeight, width: timelineWidth, height: wavePitchHeight + 1, fill: ColorConfig.tonic, opacity: 0.75 }));
         }
         let noteFlashColor = "#ffffff";
         let noteFlashColorSecondary = "#ffffff77";
@@ -25543,7 +25763,7 @@ var beepbox = (function (exports) {
             const pitchHeight = isNoise ? drumPitchHeight : wavePitchHeight;
             const configuredOctaveScroll = synth.song.channels[channel].octave;
             const newOctaveScroll = Math.max(0, Math.min(Config.pitchOctaves - windowOctaves, Math.ceil(configuredOctaveScroll - windowOctaves * 0.5)));
-            const offsetY = newOctaveScroll * pitchHeight * 12 + timelineHeight - pitchHeight * 0.5 - 0.5;
+            const offsetY = newOctaveScroll * pitchHeight * synth.song.edo + timelineHeight - pitchHeight * 0.5 - 0.5;
             for (let bar = 0; bar < synth.song.barCount; bar++) {
                 const pattern = synth.song.getPattern(channel, bar);
                 if (pattern == null)

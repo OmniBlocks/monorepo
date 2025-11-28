@@ -166,9 +166,9 @@ jobs:
           rm -rf ./build ./dist
           mkdir -p build dist
           
-          # Run webpack from node_modules/.bin (not npx!)
+          # Run webpack using npx to avoid interactive prompt
           echo "🏗️ Building base with webpack..."
-          ./node_modules/.bin/webpack --config webpack.config.js --colors --bail
+          npx webpack --config webpack.config.js --colors --bail
           
           # Verify build output exists
           if [ ! -d "build" ]; then
@@ -210,9 +210,9 @@ jobs:
           rm -rf ./build ./dist
           mkdir -p build dist
           
-          # Run webpack from node_modules/.bin (not npx!)
+          # Run webpack using npx to avoid interactive prompt
           echo "🏗️ Building PR with webpack..."
-          ./node_modules/.bin/webpack --config webpack.config.js --colors --bail
+          npx webpack --config webpack.config.js --colors --bail
           
           # Verify build output exists
           if [ ! -d "build" ]; then

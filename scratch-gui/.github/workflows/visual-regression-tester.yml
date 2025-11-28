@@ -166,9 +166,9 @@ jobs:
           rm -rf ./build ./dist
           mkdir -p build dist
           
-          # Run webpack with explicit config and verify success
+          # Run webpack from node_modules/.bin (not npx!)
           echo "🏗️ Building base with webpack..."
-          npx webpack --config webpack.config.js --colors --bail
+          ./node_modules/.bin/webpack --config webpack.config.js --colors --bail
           
           # Verify build output exists
           if [ ! -d "build" ]; then
@@ -210,9 +210,9 @@ jobs:
           rm -rf ./build ./dist
           mkdir -p build dist
           
-          # Run webpack with explicit config and verify success
+          # Run webpack from node_modules/.bin (not npx!)
           echo "🏗️ Building PR with webpack..."
-          npx webpack --config webpack.config.js --colors --bail
+          ./node_modules/.bin/webpack --config webpack.config.js --colors --bail
           
           # Verify build output exists
           if [ ! -d "build" ]; then
@@ -281,7 +281,7 @@ jobs:
   # ============================================================
   test-matrix:
     needs: [check-files, build]
-    if: success()  # Only run if build succeeded!
+    if: success()
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -429,11 +429,9 @@ jobs:
               await page.screenshot({ path: 'screenshots/player-view.png', fullPage: true });
             });
 
-            // NEW TEST 1: Extension Library Modal
             test('Editor - Extension Library Modal', async ({ page }) => {
               await waitEditor(page);
               
-              // Click the extension button (usually a + icon or "Add Extension" button)
               const extensionButton = page.locator('[class*="extension-button"]').first()
                 .or(page.locator('button:has-text("Add Extension")'))
                 .or(page.locator('[aria-label*="extension" i]').first());
@@ -448,11 +446,9 @@ jobs:
               }
             });
 
-            // NEW TEST 2: Advanced Settings Modal
             test('Editor - Advanced Settings Modal', async ({ page }) => {
               await waitEditor(page);
               
-              // Look for settings/options in menu bar (gear icon, Settings, etc.)
               const settingsButton = page.locator('[class*="menu-bar"]')
                 .locator('[class*="settings"], [aria-label*="settings" i], [aria-label*="advanced" i]')
                 .first()
@@ -500,13 +496,11 @@ jobs:
           rm -rf screenshots test-results
           npx playwright test screenshot-test.spec.js
           
-          # Copy screenshots
           if [ -d screenshots ]; then
             cp -r screenshots/* screenshots-base/ || true
           fi
           rm -rf screenshots
           
-          # Copy videos
           find test-results -name "*.webm" -exec cp {} videos-base/ \; 2>/dev/null || true
 
       - name: Stop base server
@@ -548,13 +542,11 @@ jobs:
           rm -rf screenshots test-results
           npx playwright test screenshot-test.spec.js
           
-          # Copy screenshots
           if [ -d screenshots ]; then
             cp -r screenshots/* screenshots-pr/ || true
           fi
           rm -rf screenshots
           
-          # Copy videos
           find test-results -name "*.webm" -exec cp {} videos-pr/ \; 2>/dev/null || true
 
       - name: Stop PR server
@@ -689,7 +681,6 @@ jobs:
   # ============================================================
   merge-and-report:
     needs: [check-files, build, test-matrix]
-    # Run on success OR when test-matrix completes (even if some jobs failed)
     if: |
       always() &&
       needs.check-files.outputs.should_run == 'true' &&
@@ -713,7 +704,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: all-results/
-        continue-on-error: true  # Don't fail if no artifacts exist
+        continue-on-error: true
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -729,7 +720,6 @@ jobs:
 
           const resultsDir = 'all-results';
           
-          // Check if results directory exists and has content
           if (!fs.existsSync(resultsDir)) {
             console.log('No results directory found!');
             fs.writeFileSync('merged-analysis.json', JSON.stringify({
@@ -806,7 +796,6 @@ jobs:
           
           rm -rf .github
           
-          # Save one representative set (ubuntu-chromium) to baselines
           mkdir -p pr-${{ needs.check-files.outputs.pr_number }}
           if [ -d ../all-results/vrt-results-ubuntu-latest-chromium ]; then
             cp -r ../all-results/vrt-results-ubuntu-latest-chromium/* pr-${{ needs.check-files.outputs.pr_number }}/ 2>/dev/null || true
@@ -847,7 +836,6 @@ jobs:
 
           RUN_DIR="pr-${{ needs.check-files.outputs.pr_number }}/run-${{ github.run_number }}"
           
-          # Save ALL matrix combinations
           for platform in ubuntu-latest windows-latest macos-latest; do
             for browser in chromium firefox webkit; do
               COMBO="${platform}-${browser}"
@@ -881,9 +869,9 @@ jobs:
             const baseURL = '${{ steps.upload_assets.outputs.base_url }}';
 
             const platformNames = {
-              'ubuntu-latest': '🐧 Ubuntu',
-              'windows-latest': '🪟 Windows',
-              'macos-latest': '🍎 macOS'
+              'ubuntu-latest': '<img width="12" height="12" alt="Ubuntu Logo" src="https://github.com/user-attachments/assets/f61ac63e-1fc8-4577-9fb1-736d921b81a2" /> Ubuntu',
+              'windows-latest': '<img width="12" height="12" alt="Windows Logo" src="https://github.com/user-attachments/assets/4da4c060-732a-4aaf-b080-6b8de0600c71" /> Windows',
+              'macos-latest': '<img width="12" height="12" alt="Apple Logo" src="https://github.com/user-attachments/assets/636ee068-b7a7-489d-a545-a616534900ed"/> Apple'
             };
 
             const browserNames = {
@@ -902,7 +890,6 @@ jobs:
               body += `✅ **No visual differences detected across all combinations!**\n\n`;
             }
 
-            // Summary table
             body += `### 📊 Test Matrix Summary\n\n`;
             body += `| Platform | Browser | Changes | Details |\n`;
             body += `|----------|---------|---------|----------|\n`;
@@ -920,7 +907,6 @@ jobs:
 
             body += `\n---\n\n`;
 
-            // Detailed results (collapsible, open if changes detected)
             for (const [key, result] of Object.entries(analysis.allResults)) {
               const parts = key.split('-');
               const browser = parts[parts.length - 1];
@@ -998,7 +984,7 @@ jobs:
             });
 
   # ============================================================
-  # JOB 5: HANDLE BUILD FAILURE (runs when build fails)
+  # JOB 5: HANDLE BUILD FAILURE
   # ============================================================
   handle-build-failure:
     needs: [check-files, build]
@@ -1015,7 +1001,7 @@ jobs:
           name: vrt-comment-id
         continue-on-error: true
 
-      - name: Post build failure (if comment ID exists)
+      - name: Post build failure
         if: success()
         uses: actions/github-script@v7
         with:

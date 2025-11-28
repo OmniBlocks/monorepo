@@ -181,8 +181,7 @@ jobs:
           
           echo "✅ Build successful! Contents:"
           ls -lah build/ | head -20
-        env:
-          NODE_ENV: production
+
 
       - name: Upload base build
         uses: actions/upload-artifact@v4
@@ -222,8 +221,7 @@ jobs:
           
           echo "✅ Build successful! Contents:"
           ls -lah build/ | head -20
-        env:
-          NODE_ENV: production
+
 
       - name: Upload PR build
         uses: actions/upload-artifact@v4

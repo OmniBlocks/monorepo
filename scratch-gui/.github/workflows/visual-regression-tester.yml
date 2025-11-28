@@ -13,7 +13,7 @@ permissions:
 
 jobs:
   check-files:
-    # PR events, or /vrt comment by a human on a PR. Ignore dependabot.
+    # Run on PRs or when a human comments '/vrt' on a PR. Ignore dependabot.
     if: |
       github.actor != 'dependabot[bot]' &&
       (
@@ -27,12 +27,12 @@ jobs:
       )
     runs-on: ubuntu-latest
     outputs:
-      should_run: ${{ steps.choose.outputs.should_run }}
+      should_run: ${{ steps.decide.outputs.should_run }}
       pr_number: ${{ steps.pr.outputs.number }}
-      head_sha: ${{ steps.pr.outputs.head_sha }}
-      base_sha: ${{ steps.pr.outputs.base_sha }}
-      requester: ${{ steps.pr.outputs.requester }}
-      is_human: ${{ steps.pr.outputs.is_human }}
+      head_sha:   ${{ steps.pr.outputs.head_sha }}
+      base_sha:   ${{ steps.pr.outputs.base_sha }}
+      requester:  ${{ steps.pr.outputs.requester }}
+      is_human:   ${{ steps.pr.outputs.is_human }}
     steps:
       - name: React to /vrt (comment trigger)
         if: github.event_name == 'issue_comment'
@@ -46,7 +46,7 @@ jobs:
               content: 'rocket'
             });
 
-      - name: Get PR and requester
+      - name: Get PR info
         id: pr
         uses: actions/github-script@v7
         with:
@@ -67,23 +67,22 @@ jobs:
 
             const requesterType = context.eventName === 'issue_comment'
               ? context.payload.comment.user.type
-              : (context.payload.sender && context.payload.sender.type) || 'User';
+              : (context.payload.sender?.type || 'User');
 
-            core.setOutput('number', pr.data.number);
+            core.setOutput('number',  pr.data.number);
             core.setOutput('head_sha', pr.data.head.sha);
             core.setOutput('base_sha', pr.data.base.sha);
             core.setOutput('requester', requesterLogin);
             core.setOutput('is_human', requesterType === 'User' ? 'true' : 'false');
 
       - name: Decide whether to run
-        id: choose
+        id: decide
         uses: actions/github-script@v7
         with:
           script: |
             const prNumber = Number('${{ steps.pr.outputs.number }}');
             const forced = (context.eventName === 'issue_comment') &&
-                           context.payload.comment &&
-                           /\/vrt/i.test(context.payload.comment.body);
+                           /\/vrt/i.test(context.payload.comment?.body || '');
 
             const files = await github.paginate(github.rest.pulls.listFiles, {
               owner: context.repo.owner,
@@ -94,13 +93,13 @@ jobs:
 
             const changed = files.map(f => f.filename);
             const docsOnly = changed.length > 0 && changed.every(f => /\.(md|txt|ya?ml)$/i.test(f));
-
             const shouldRun = forced || !docsOnly;
+
             core.info(`Changed files (${changed.length}): ${changed.join(', ') || '(none)'}`);
             core.setOutput('should_run', shouldRun ? 'true' : 'false');
 
       - name: Post skip notice
-        if: steps.choose.outputs.should_run == 'false'
+        if: steps.decide.outputs.should_run == 'false'
         uses: actions/github-script@v7
         with:
           script: |
@@ -112,7 +111,7 @@ jobs:
               issue_number: Number('${{ steps.pr.outputs.number }}'),
               body:
                 `## 🎬 Visual Regression Testing — Skipped\n\n` +
-                `Hi ${name}! VRT was skipped because this PR only changes .md/.txt/.yml files.\n\n` +
+                `Hi ${name}! VRT skipped because this PR only changes .md/.txt/.yml files.\n\n` +
                 `To force a run, comment \`/vrt\` on this PR.`
             });
 
@@ -128,7 +127,7 @@ jobs:
         uses: actions/github-script@v7
         env:
           REQUESTER: ${{ needs.check-files.outputs.requester }}
-          IS_HUMAN: ${{ needs.check-files.outputs.is_human }}
+          IS_HUMAN:  ${{ needs.check-files.outputs.is_human }}
           PR_NUMBER: ${{ needs.check-files.outputs.pr_number }}
         with:
           script: |
@@ -162,7 +161,7 @@ jobs:
         with:
           node-version: '20'
 
-      # Build BASE at repo root
+      # Build BASE at repo root (with rimraf/mkdirp shims)
       - name: Checkout base
         uses: actions/checkout@v4
         with:
@@ -177,7 +176,7 @@ jobs:
           set -e
           npm ci
 
-          # Provide rimraf/mkdirp shims without heredocs (avoid YAML '<<' issues)
+          # Provide rimraf/mkdirp shims (no heredocs -> YAML-safe)
           mkdir -p .github/ci-bin
           if ! command -v rimraf >/dev/null 2>&1; then
             printf '#!/usr/bin/env bash\nrm -rf "$@"\n' > .github/ci-bin/rimraf
@@ -189,7 +188,7 @@ jobs:
           fi
           export PATH="$PWD/.github/ci-bin:$PATH"
 
-          # Try normal build; fallback to manual clean + webpack if needed
+          # Normal build; fallback if needed
           if ! npm run build; then
             echo "npm run build failed; attempting fallback…"
             rm -rf ./build ./dist && mkdir -p build dist
@@ -204,7 +203,7 @@ jobs:
           mkdir -p /tmp/vrt-builds
           cp -r build /tmp/vrt-builds/base-build
 
-      # Build PR at repo root
+      # Build PR at repo root (with same shims)
       - name: Checkout PR
         uses: actions/checkout@v4
         with:
@@ -265,8 +264,8 @@ jobs:
         uses: actions/github-script@v7
         env:
           COMMENT_ID: ${{ steps.open_comment.outputs.comment_id }}
-          REQUESTER: ${{ needs.check-files.outputs.requester }}
-          IS_HUMAN: ${{ needs.check-files.outputs.is_human }}
+          REQUESTER:  ${{ needs.check-files.outputs.requester }}
+          IS_HUMAN:   ${{ needs.check-files.outputs.is_human }}
         with:
           script: |
             const name = process.env.IS_HUMAN === 'true' ? '@' + process.env.REQUESTER : process.env.REQUESTER;
@@ -288,8 +287,8 @@ jobs:
         uses: actions/github-script@v7
         env:
           COMMENT_ID: ${{ steps.open_comment.outputs.comment_id }}
-          REQUESTER: ${{ needs.check-files.outputs.requester }}
-          IS_HUMAN: ${{ needs.check-files.outputs.is_human }}
+          REQUESTER:  ${{ needs.check-files.outputs.requester }}
+          IS_HUMAN:   ${{ needs.check-files.outputs.is_human }}
         with:
           script: |
             const name = process.env.IS_HUMAN === 'true' ? '@' + process.env.REQUESTER : process.env.REQUESTER;
@@ -350,7 +349,7 @@ jobs:
           const browserDevices = {
             chromium: 'Desktop Chrome',
             firefox: 'Desktop Firefox',
-            webkit: 'Desktop Safari'
+            webkit:  'Desktop Safari'
           };
           module.exports = defineConfig({
             testDir: '.',
@@ -373,7 +372,7 @@ jobs:
           });
           EOF
 
-      - name: Write tests (initial + extension + advanced settings)
+      - name: Write tests (original set + 2 new modals)
         shell: bash
         run: |
           cat > screenshot-test.spec.js << 'EOF'
@@ -386,15 +385,78 @@ jobs:
             await page.goto(`${BASE}/editor.html`);
             await page.waitForLoadState('networkidle');
             await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
-            await page.waitForTimeout(1000);
+            await page.waitForTimeout(1200);
           }
 
-          test.describe('Visual Regression (focused set)', () => {
+          async function clickTabByIndex(page, index) {
+            const tabList = page.locator('[role="tablist"]').first();
+            await expect(tabList).toBeVisible({ timeout: 10000 });
+            const tab = tabList.locator('[role="tab"]').nth(index);
+            await expect(tab).toBeVisible({ timeout: 6000 });
+            await tab.scrollIntoViewIfNeeded();
+            await tab.click();
+            await page.waitForTimeout(700);
+          }
+
+          test.describe('Visual Regression (full + extras)', () => {
             test('Editor - Initial', async ({ page }) => {
               await waitEditor(page);
               await page.screenshot({ path: 'screenshots/editor-initial.png', fullPage: true });
             });
 
+            test('Editor - Blocks Workspace', async ({ page }) => {
+              await waitEditor(page);
+              const el = page.locator('[class*="editor-wrapper"]').first();
+              if (await el.count()) {
+                await el.screenshot({ path: 'screenshots/blocks-workspace.png' });
+              } else {
+                await page.screenshot({ path: 'screenshots/blocks-workspace.png' });
+              }
+            });
+
+            test('Editor - Stage and Sprites', async ({ page }) => {
+              await waitEditor(page);
+              const el = page.locator('[class*="stage-and-target"], [class*="stage-and-target-wrapper"]').first();
+              if (await el.count()) {
+                await el.screenshot({ path: 'screenshots/stage-sprites.png' });
+              } else {
+                await page.screenshot({ path: 'screenshots/stage-sprites.png' });
+              }
+            });
+
+            // Tabs by index: Code=0, Costumes=1, Sounds=2, Songs=3
+            test('Tab - Code', async ({ page }) => {
+              await waitEditor(page);
+              await clickTabByIndex(page, 0);
+              await page.screenshot({ path: 'screenshots/code-tab.png', fullPage: true });
+            });
+
+            test('Tab - Costumes', async ({ page }) => {
+              await waitEditor(page);
+              await clickTabByIndex(page, 1);
+              await page.screenshot({ path: 'screenshots/costumes-tab.png', fullPage: true });
+            });
+
+            test('Tab - Sounds', async ({ page }) => {
+              await waitEditor(page);
+              await clickTabByIndex(page, 2);
+              await page.screenshot({ path: 'screenshots/sounds-tab.png', fullPage: true });
+            });
+
+            test('Tab - Songs', async ({ page }) => {
+              await waitEditor(page);
+              await clickTabByIndex(page, 3);
+              await page.screenshot({ path: 'screenshots/songs-tab.png', fullPage: true });
+            });
+
+            test('Player View', async ({ page }) => {
+              await page.goto(`${BASE}/`);
+              await page.waitForLoadState('networkidle');
+              await page.waitForTimeout(900);
+              await page.screenshot({ path: 'screenshots/player-view.png', fullPage: true });
+            });
+
+            // NEW 1: Extension Library Modal
             test('Extension Library Modal', async ({ page }) => {
               await waitEditor(page);
               const extBtn = page.locator(
@@ -402,11 +464,12 @@ jobs:
               ).first();
               if (await extBtn.count()) {
                 await extBtn.click();
-                await page.waitForTimeout(800);
+                await page.waitForTimeout(900);
               }
               await page.screenshot({ path: 'screenshots/extension-library.png', fullPage: true });
             });
 
+            // NEW 2: Advanced Settings Modal
             test('Advanced Settings Modal', async ({ page }) => {
               await waitEditor(page);
               const candidates = [
@@ -419,7 +482,7 @@ jobs:
                 const h = page.locator(sel).first();
                 if (await h.count()) { await h.click(); break; }
               }
-              await page.waitForTimeout(800);
+              await page.waitForTimeout(900);
               await page.screenshot({ path: 'screenshots/advanced-settings.png', fullPage: true });
             });
           });
@@ -445,11 +508,12 @@ jobs:
         shell: bash
         run: |
           set -e
-          mkdir -p screenshots-base
+          mkdir -p screenshots-base videos-base
           rm -rf screenshots test-results || true
           npx playwright test screenshot-test.spec.js
           [ -d screenshots ] && cp -r screenshots/* screenshots-base/ || true
-          rm -rf screenshots
+          find test-results -name "*.webm" -exec cp {} videos-base/ \; 2>/dev/null || true
+          rm -rf screenshots test-results || true
 
       - name: Stop base server
         if: always()
@@ -479,13 +543,14 @@ jobs:
         shell: bash
         run: |
           set -e
-          mkdir -p screenshots-pr
+          mkdir -p screenshots-pr videos-pr
           rm -rf screenshots test-results || true
           npx playwright test screenshot-test.spec.js
           [ -d screenshots ] && cp -r screenshots/* screenshots-pr/ || true
-          rm -rf screenshots
+          find test-results -name "*.webm" -exec cp {} videos-pr/ \; 2>/dev/null || true
+          rm -rf screenshots test-results || true
 
-      - name: Compare and create diffs
+      - name: Compare and create diffs (all 10 shots)
         shell: bash
         run: |
           cat > compare.js << 'EOF'
@@ -496,6 +561,13 @@ jobs:
 
           const shots = [
             'editor-initial.png',
+            'blocks-workspace.png',
+            'stage-sprites.png',
+            'code-tab.png',
+            'costumes-tab.png',
+            'sounds-tab.png',
+            'songs-tab.png',
+            'player-view.png',
             'extension-library.png',
             'advanced-settings.png'
           ];
@@ -508,7 +580,7 @@ jobs:
 
           for (const s of shots) {
             const base = `screenshots-base/${s}`;
-            const pr = `screenshots-pr/${s}`;
+            const pr   = `screenshots-pr/${s}`;
             if (!fs.existsSync(base) || !fs.existsSync(pr)) {
               results.push({ name: s, skipped: true });
               continue;
@@ -527,7 +599,6 @@ jobs:
             if (n > 0) {
               changesDetected = true;
               fs.writeFileSync(`screenshots-diff/${s}`, PNG.sync.write(diff));
-
               try {
                 const enc = GIFEncoder();
                 for (const frame of [b, p, diff]) {
@@ -538,7 +609,6 @@ jobs:
                 enc.finish();
                 fs.writeFileSync(`screenshots-gifs/${s.replace('.png', '.gif')}`, Buffer.from(enc.bytes()));
               } catch {}
-
               results.push({ name: s, diffPixels: n, diffPercentage: pct, hasDiff: true, skipped: false });
             } else {
               results.push({ name: s, diffPixels: 0, diffPercentage: '0.00', hasDiff: false, skipped: false });
@@ -559,6 +629,8 @@ jobs:
             screenshots-pr/
             screenshots-diff/
             screenshots-gifs/
+            videos-base/
+            videos-pr/
           retention-days: 2
 
   merge-and-report:
@@ -599,7 +671,7 @@ jobs:
           const path = require('path');
 
           const platforms = ['ubuntu-latest', 'windows-latest', 'macos-latest'];
-          const browsers = ['chromium', 'firefox', 'webkit'];
+          const browsers  = ['chromium', 'firefox', 'webkit'];
 
           const all = {};
           let completed = 0;
@@ -607,7 +679,7 @@ jobs:
 
           for (const os of platforms) {
             for (const br of browsers) {
-              const dir = path.join('all-results', `vrt-results-${os}-${br}`);
+              const dir  = path.join('all-results', `vrt-results-${os}-${br}`);
               const file = path.join(dir, 'comparison-results.json');
               if (fs.existsSync(file)) {
                 const data = JSON.parse(fs.readFileSync(file, 'utf8'));
@@ -637,7 +709,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -e
-          git config --global user.name "github-actions[bot]"
+          git config --global user.name  "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
           git clone --depth 1 "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" vrt-baselines-repo
@@ -657,10 +729,10 @@ jobs:
           cat > "pr-${{ needs.check-files.outputs.pr_number }}/README.md" <<MD
           # Visual Regression Baseline (Enhanced)
           - Base SHA: \`${{ needs.check-files.outputs.base_sha }}\`
-          - PR SHA: \`${{ needs.check-files.outputs.head_sha }}\`
+          - PR  SHA: \`${{ needs.check-files.outputs.head_sha }}\`
           - Run: #${{ github.run_number }}
-          - Platforms tested: ubuntu, windows, macos
-          - Browsers tested: chromium, firefox, webkit
+          - Platforms: ubuntu, windows, macos
+          - Browsers:  chromium, firefox, webkit
           MD
 
           git add .
@@ -675,7 +747,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -e
-          git config --global user.name "github-actions[bot]"
+          git config --global user.name  "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
           git clone --depth 1 "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" vrt-images-repo
@@ -698,7 +770,7 @@ jobs:
                 mkdir -p "$RUN_DIR/${os}-${br}"
                 cp -r "$SRC/comparison-results.json" "$RUN_DIR/${os}-${br}/" || true
                 cp -r "$SRC/screenshots-base" "$RUN_DIR/${os}-${br}/" || true
-                cp -r "$SRC/screenshots-pr" "$RUN_DIR/${os}-${br}/" || true
+                cp -r "$SRC/screenshots-pr"   "$RUN_DIR/${os}-${br}/" || true
                 cp -r "$SRC/screenshots-diff" "$RUN_DIR/${os}-${br}/" || true
                 cp -r "$SRC/screenshots-gifs" "$RUN_DIR/${os}-${br}/" || true
               fi
@@ -716,9 +788,9 @@ jobs:
         uses: actions/github-script@v7
         env:
           COMMENT_ID: ${{ steps.cid.outputs.comment_id }}
-          REQUESTER: ${{ needs.check-files.outputs.requester }}
-          IS_HUMAN: ${{ needs.check-files.outputs.is_human }}
-          BASE_URL: ${{ steps.upload_images.outputs.base_url }}
+          REQUESTER:  ${{ needs.check-files.outputs.requester }}
+          IS_HUMAN:   ${{ needs.check-files.outputs.is_human }}
+          BASE_URL:   ${{ steps.upload_images.outputs.base_url }}
         with:
           script: |
             const fs = require('fs');
@@ -786,8 +858,8 @@ jobs:
         uses: actions/github-script@v7
         env:
           COMMENT_ID: ${{ steps.cid.outputs.comment_id }}
-          REQUESTER: ${{ needs.check-files.outputs.requester }}
-          IS_HUMAN: ${{ needs.check-files.outputs.is_human }}
+          REQUESTER:  ${{ needs.check-files.outputs.requester }}
+          IS_HUMAN:   ${{ needs.check-files.outputs.is_human }}
         with:
           script: |
             const name = process.env.IS_HUMAN === 'true' ? '@' + process.env.REQUESTER : process.env.REQUESTER;

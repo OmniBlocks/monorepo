@@ -1,4 +1,4 @@
-name: Visual Regression Testing 
+name: Visual Regression Testing (Enhanced)
 
 on:
   pull_request:
@@ -105,7 +105,7 @@ jobs:
             });
 
   # ============================================================
-  # JOB 2: BUILD - Single build for both base and PR (FIXED)
+  # JOB 2: BUILD - Single build for both base and PR (FIXED!)
   # ============================================================
   build:
     needs: check-files
@@ -161,11 +161,28 @@ jobs:
         working-directory: base
         run: |
           npm ci
-          # Manual cleanup instead of npm run clean
+          
+          # Manual cleanup
           rm -rf ./build ./dist
           mkdir -p build dist
-          # Run webpack directly
-          npx webpack --colors --bail
+          
+          # Run webpack with explicit config and verify success
+          echo "🏗️ Building base with webpack..."
+          npx webpack --config webpack.config.js --colors --bail
+          
+          # Verify build output exists
+          if [ ! -d "build" ]; then
+            echo "❌ ERROR: build/ directory was not created!"
+            exit 1
+          fi
+          
+          if [ -z "$(ls -A build)" ]; then
+            echo "❌ ERROR: build/ directory is empty!"
+            exit 1
+          fi
+          
+          echo "✅ Build successful! Contents:"
+          ls -lah build/ | head -20
         env:
           NODE_ENV: production
 
@@ -175,6 +192,7 @@ jobs:
           name: base-build
           path: base/build/
           retention-days: 1
+          if-no-files-found: error
 
       # Build PR
       - name: Checkout PR branch
@@ -187,11 +205,28 @@ jobs:
         working-directory: pr
         run: |
           npm ci
-          # Manual cleanup instead of npm run clean
+          
+          # Manual cleanup
           rm -rf ./build ./dist
           mkdir -p build dist
-          # Run webpack directly
-          npx webpack --colors --bail
+          
+          # Run webpack with explicit config and verify success
+          echo "🏗️ Building PR with webpack..."
+          npx webpack --config webpack.config.js --colors --bail
+          
+          # Verify build output exists
+          if [ ! -d "build" ]; then
+            echo "❌ ERROR: build/ directory was not created!"
+            exit 1
+          fi
+          
+          if [ -z "$(ls -A build)" ]; then
+            echo "❌ ERROR: build/ directory is empty!"
+            exit 1
+          fi
+          
+          echo "✅ Build successful! Contents:"
+          ls -lah build/ | head -20
         env:
           NODE_ENV: production
 
@@ -201,8 +236,10 @@ jobs:
           name: pr-build
           path: pr/build/
           retention-days: 1
+          if-no-files-found: error
 
       - name: Update comment - Builds complete
+        if: success()
         uses: actions/github-script@v7
         with:
           script: |
@@ -218,12 +255,33 @@ jobs:
                     `🎨 **Analysis:** Pending\n\n` +
                     `_Hold tight!_ 🚀`
             });
-            
+
+      - name: Update comment - Build failed
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const username = '${{ needs.check-files.outputs.username }}';
+            await github.rest.issues.updateComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: ${{ steps.vrt_comment.outputs.comment_id }},
+              body: `## ❌ ULTRA Visual Regression Testing - Build Failed\n\n` +
+                    `Hi @${username}! The build phase failed, so visual regression testing could not run.\n\n` +
+                    `**Build errors occurred for:**\n` +
+                    `- Base branch build and/or\n` +
+                    `- PR branch build\n\n` +
+                    `Please check the logs for details:\n` +
+                    `[View Workflow Run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})\n\n` +
+                    `_Common issues: webpack errors, dependency problems, or syntax errors in the code._`
+            });
+
   # ============================================================
   # JOB 3: MATRIX TEST - 3 OS × 3 Browsers = 9 combinations
   # ============================================================
   test-matrix:
     needs: [check-files, build]
+    if: success()  # Only run if build succeeded!
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -631,7 +689,12 @@ jobs:
   # ============================================================
   merge-and-report:
     needs: [check-files, build, test-matrix]
-    if: always() && needs.check-files.outputs.should_run == 'true'
+    # Run on success OR when test-matrix completes (even if some jobs failed)
+    if: |
+      always() &&
+      needs.check-files.outputs.should_run == 'true' &&
+      needs.build.result == 'success' &&
+      (needs.test-matrix.result == 'success' || needs.test-matrix.result == 'failure')
     runs-on: ubuntu-latest
     
     steps:
@@ -650,6 +713,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: all-results/
+        continue-on-error: true  # Don't fail if no artifacts exist
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -664,6 +728,20 @@ jobs:
           const path = require('path');
 
           const resultsDir = 'all-results';
+          
+          // Check if results directory exists and has content
+          if (!fs.existsSync(resultsDir)) {
+            console.log('No results directory found!');
+            fs.writeFileSync('merged-analysis.json', JSON.stringify({
+              anyChanges: false,
+              totalCombinations: 9,
+              completedCombinations: 0,
+              allResults: {},
+              failed: true
+            }, null, 2));
+            process.exit(0);
+          }
+
           const platforms = ['ubuntu-latest', 'windows-latest', 'macos-latest'];
           const browsers = ['chromium', 'firefox', 'webkit'];
 
@@ -693,7 +771,8 @@ jobs:
             anyChanges,
             totalCombinations,
             completedCombinations,
-            allResults
+            allResults,
+            failed: completedCombinations === 0
           };
 
           fs.writeFileSync('merged-analysis.json', JSON.stringify(summary, null, 2));
@@ -702,9 +781,15 @@ jobs:
           node analyze-results.js
           
           ANY_CHANGES=$(node -e "console.log(require('./merged-analysis.json').anyChanges)")
+          FAILED=$(node -e "console.log(require('./merged-analysis.json').failed)")
+          COMPLETED=$(node -e "console.log(require('./merged-analysis.json').completedCombinations)")
+          
           echo "any_changes=$ANY_CHANGES" >> $GITHUB_OUTPUT
+          echo "failed=$FAILED" >> $GITHUB_OUTPUT
+          echo "completed=$COMPLETED" >> $GITHUB_OUTPUT
 
       - name: Upload to vrt-baselines branch
+        if: steps.analyze.outputs.failed == 'false' && steps.analyze.outputs.completed > 0
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
@@ -743,6 +828,7 @@ jobs:
 
       - name: Upload to vrt-images branch
         id: upload_assets
+        if: steps.analyze.outputs.failed == 'false' && steps.analyze.outputs.completed > 0
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
@@ -774,12 +860,13 @@ jobs:
           done
 
           git add .
-          git commit -m "VRT assets for PR #${{ needs.check-files.outputs.pr_number }} run #${{ github.run_number }} (9 combinations)" || echo "No changes"
+          git commit -m "VRT assets for PR #${{ needs.check-files.outputs.pr_number }} run #${{ github.run_number }} (enhanced)" || echo "No changes"
           git push origin vrt-images || git push -u origin vrt-images
 
           echo "base_url=https://raw.githubusercontent.com/${{ github.repository }}/vrt-images/$RUN_DIR" >> $GITHUB_OUTPUT
 
-      - name: Post comprehensive results
+      - name: Post comprehensive results (success)
+        if: steps.analyze.outputs.failed == 'false' && steps.analyze.outputs.completed > 0
         uses: actions/github-script@v7
         with:
           script: |
@@ -794,9 +881,9 @@ jobs:
             const baseURL = '${{ steps.upload_assets.outputs.base_url }}';
 
             const platformNames = {
-              'ubuntu-latest': '<img width="12" height="12" alt="Ubuntu Logo" src="https://github.com/user-attachments/assets/f61ac63e-1fc8-4577-9fb1-736d921b81a2" />  Ubuntu',
-              'windows-latest': '<img width="12" height="12" alt="Windows Logo" src="https://github.com/user-attachments/assets/4da4c060-732a-4aaf-b080-6b8de0600c71" /> Windows',
-              'macos-latest': '<img width="12" height="12" alt="Apple Logo" src="https://github.com/user-attachments/assets/636ee068-b7a7-489d-a545-a616534900ed"/> MacOS'
+              'ubuntu-latest': '🐧 Ubuntu',
+              'windows-latest': '🪟 Windows',
+              'macos-latest': '🍎 macOS'
             };
 
             const browserNames = {
@@ -821,12 +908,13 @@ jobs:
             body += `|----------|---------|---------|----------|\n`;
             
             for (const [key, result] of Object.entries(analysis.allResults)) {
-              const [platform, browser] = key.split('-').slice(0, 2);
-              const fullPlatform = platform + '-latest';
-              const platformIcon = platformNames[fullPlatform] || platform;
+              const parts = key.split('-');
+              const browser = parts[parts.length - 1];
+              const platform = parts.slice(0, -1).join('-');
+              const platformIcon = platformNames[platform] || platform;
               const browserName = browserNames[browser] || browser;
               const status = result.changesDetected ? '⚠️ Changes' : '✅ No changes';
-              const link = `[View](#${key.replace(/\./g, '')})`;
+              const link = `[View](#${key.replace(/\./g, '').replace(/-/g, '')})`;
               body += `| ${platformIcon} | ${browserName} | ${status} | ${link} |\n`;
             }
 
@@ -834,13 +922,14 @@ jobs:
 
             // Detailed results (collapsible, open if changes detected)
             for (const [key, result] of Object.entries(analysis.allResults)) {
-              const [platform, browser] = key.split('-').slice(0, 2);
-              const fullPlatform = platform + '-latest';
-              const platformIcon = platformNames[fullPlatform] || platform;
+              const parts = key.split('-');
+              const browser = parts[parts.length - 1];
+              const platform = parts.slice(0, -1).join('-');
+              const platformIcon = platformNames[platform] || platform;
               const browserName = browserNames[browser] || browser;
               
               const isOpen = result.changesDetected ? ' open' : '';
-              body += `<details${isOpen} id="${key.replace(/\./g, '')}">\n`;
+              body += `<details${isOpen} id="${key.replace(/\./g, '').replace(/-/g, '')}">\n`;
               body += `<summary><strong>${platformIcon} + ${browserName}</strong></summary>\n\n`;
 
               if (!result.results || result.results.length === 0) {
@@ -886,8 +975,8 @@ jobs:
               body
             });
 
-      - name: Update comment on failure
-        if: failure()
+      - name: Post failure message (no results)
+        if: steps.analyze.outputs.failed == 'true' || steps.analyze.outputs.completed == 0
         uses: actions/github-script@v7
         with:
           script: |
@@ -896,7 +985,57 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               comment_id: ${{ steps.load_comment.outputs.comment_id }},
-              body: `❌ **ULTRA Visual Regression Testing Failed** @${username}\n\n` +
-                    `Something went wrong during the matrix testing or merge phase.\n\n` +
-                    `Check the logs: [View Logs](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})`
+              body: `## ❌ ULTRA Visual Regression Testing - Tests Failed\n\n` +
+                    `Hi @${username}! The test matrix failed to produce any results.\n\n` +
+                    `**All 9 test combinations failed.** This could be due to:\n` +
+                    `- Playwright installation issues\n` +
+                    `- Server startup failures\n` +
+                    `- Screenshot capture errors\n` +
+                    `- Build artifacts not being properly created\n\n` +
+                    `Please check the logs for details:\n` +
+                    `[View Workflow Run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})\n\n` +
+                    `_The build phase completed successfully, but the test execution failed._`
             });
+
+  # ============================================================
+  # JOB 5: HANDLE BUILD FAILURE (runs when build fails)
+  # ============================================================
+  handle-build-failure:
+    needs: [check-files, build]
+    if: |
+      always() &&
+      needs.check-files.outputs.should_run == 'true' &&
+      needs.build.result == 'failure'
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Download comment ID
+        uses: actions/download-artifact@v4
+        with:
+          name: vrt-comment-id
+        continue-on-error: true
+
+      - name: Post build failure (if comment ID exists)
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            try {
+              const fs = require('fs');
+              const commentId = fs.readFileSync('comment_id.txt', 'utf8').trim();
+              const username = '${{ needs.check-files.outputs.username }}';
+              
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: commentId,
+                body: `## ❌ ULTRA Visual Regression Testing - Build Failed\n\n` +
+                      `Hi @${username}! The build phase failed, so visual regression testing could not run.\n\n` +
+                      `**Build errors occurred** - unable to create build artifacts for base and/or PR.\n\n` +
+                      `Please check the logs for details:\n` +
+                      `[View Workflow Run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})\n\n` +
+                      `_Common issues: webpack errors, dependency problems, or syntax errors in the code._`
+              });
+            } catch (error) {
+              console.log('Could not update comment:', error.message);
+            }

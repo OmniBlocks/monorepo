@@ -4,6 +4,15 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`eeae610`](https://github.com/OmniBlocks/scratch-gui/commit/eeae6103b628de5f869b23e2ff632f322cd55ded) - 2025-11-27 21:38:42 -0500
+
+**fix: npx thigny again**
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`3d38036`](https://github.com/OmniBlocks/scratch-gui/commit/3d38036c55c49deb38a31f13bd13d998a703ea78) - 2025-11-27 21:02:35 -0500
 
 **fix: missing webpack in reggression visual thing**

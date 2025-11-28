@@ -13,7 +13,7 @@ permissions:
 
 jobs:
   # ============================================================
-  # JOB 1: CHECK FILE CHANGES - Skip if only docs
+  # JOB 1: CHECK FILE CHANGES
   # ============================================================
   check-files:
     if: >-
@@ -73,14 +73,12 @@ jobs:
       - name: Check changed files
         id: check
         run: |
-          # Get list of changed files
           git fetch origin ${{ steps.pr.outputs.base_sha }}
           CHANGED_FILES=$(git diff --name-only ${{ steps.pr.outputs.base_sha }} ${{ steps.pr.outputs.sha }})
           
           echo "Changed files:"
           echo "$CHANGED_FILES"
           
-          # Check if only .md, .txt, or .yml files changed
           if echo "$CHANGED_FILES" | grep -qvE '\.(md|txt|yml|yaml)$'; then
             echo "should_run=true" >> $GITHUB_OUTPUT
             echo "Code changes detected - VRT will run"
@@ -105,7 +103,7 @@ jobs:
             });
 
   # ============================================================
-  # JOB 2: BUILD - Single build for both base and PR (FIXED!)
+  # JOB 2: BUILD - Build in root, then save outputs!
   # ============================================================
   build:
     needs: check-files
@@ -143,34 +141,27 @@ jobs:
           name: vrt-comment-id
           path: comment_id.txt
 
-      # Build BASE
-      - name: Checkout base branch
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ needs.check-files.outputs.base_sha }}
-          path: base
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
-          cache-dependency-path: base/package-lock.json
+
+      # Build BASE (in root!)
+      - name: Checkout base branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.check-files.outputs.base_sha }}
 
       - name: Install and build base
-        working-directory: base
         run: |
           npm ci
-          
-          # Manual cleanup
-          rm -rf ./build ./dist
-          mkdir -p build dist
-          
-          # Run webpack using npx to avoid interactive prompt
-          echo "🏗️ Building base with webpack..."
-          npx webpack --config webpack.config.js --colors --bail
-          
-          # Verify build output exists
+          npm run build
+        env:
+          NODE_ENV: production
+
+      - name: Verify and save base build
+        run: |
           if [ ! -d "build" ]; then
             echo "❌ ERROR: build/ directory was not created!"
             exit 1
@@ -181,60 +172,58 @@ jobs:
             exit 1
           fi
           
-          echo "✅ Build successful! Contents:"
+          echo "✅ Base build successful! Contents:"
           ls -lah build/ | head -20
+          
+          # Move to temp location
+          mkdir -p /tmp/vrt-builds
+          cp -r build /tmp/vrt-builds/base-build
+
+      # Build PR (in root!)
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.check-files.outputs.pr_sha }}
+          clean: true
+
+      - name: Install and build PR
+        run: |
+          npm ci
+          npm run build
         env:
           NODE_ENV: production
+
+      - name: Verify and save PR build
+        run: |
+          if [ ! -d "build" ]; then
+            echo "❌ ERROR: build/ directory was not created!"
+            exit 1
+          fi
+          
+          if [ -z "$(ls -A build)" ]; then
+            echo "❌ ERROR: build/ directory is empty!"
+            exit 1
+          fi
+          
+          echo "✅ PR build successful! Contents:"
+          ls -lah build/ | head -20
+          
+          # Move to temp location
+          cp -r build /tmp/vrt-builds/pr-build
 
       - name: Upload base build
         uses: actions/upload-artifact@v4
         with:
           name: base-build
-          path: base/build/
+          path: /tmp/vrt-builds/base-build/
           retention-days: 1
           if-no-files-found: error
-
-      # Build PR
-      - name: Checkout PR branch
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ needs.check-files.outputs.pr_sha }}
-          path: pr
-
-      - name: Install and build PR
-        working-directory: pr
-        run: |
-          npm ci
-          
-          # Manual cleanup
-          rm -rf ./build ./dist
-          mkdir -p build dist
-          
-          # Run webpack using npx to avoid interactive prompt
-          echo "🏗️ Building PR with webpack..."
-          npx webpack --config webpack.config.js --colors --bail
-          
-          # Verify build output exists
-          if [ ! -d "build" ]; then
-            echo "❌ ERROR: build/ directory was not created!"
-            exit 1
-          fi
-          
-          if [ -z "$(ls -A build)" ]; then
-            echo "❌ ERROR: build/ directory is empty!"
-            exit 1
-          fi
-          
-          echo "✅ Build successful! Contents:"
-          ls -lah build/ | head -20
-        env:
-          NODE_ENV: production
 
       - name: Upload PR build
         uses: actions/upload-artifact@v4
         with:
           name: pr-build
-          path: pr/build/
+          path: /tmp/vrt-builds/pr-build/
           retention-days: 1
           if-no-files-found: error
 
@@ -268,9 +257,7 @@ jobs:
               comment_id: ${{ steps.vrt_comment.outputs.comment_id }},
               body: `## ❌ ULTRA Visual Regression Testing - Build Failed\n\n` +
                     `Hi @${username}! The build phase failed, so visual regression testing could not run.\n\n` +
-                    `**Build errors occurred for:**\n` +
-                    `- Base branch build and/or\n` +
-                    `- PR branch build\n\n` +
+                    `**Build errors occurred for base and/or PR branch.**\n\n` +
                     `Please check the logs for details:\n` +
                     `[View Workflow Run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})\n\n` +
                     `_Common issues: webpack errors, dependency problems, or syntax errors in the code._`
@@ -474,7 +461,6 @@ jobs:
           SERVER_PID=$!
           echo $SERVER_PID > base-server.pid
           
-          # Wait for server
           for i in {1..30}; do
             if curl -fsS http://localhost:8080/ > /dev/null 2>&1; then
               echo "Base server ready!"
@@ -519,7 +505,6 @@ jobs:
           SERVER_PID=$!
           echo $SERVER_PID > pr-server.pid
           
-          # Wait for server
           for i in {1..30}; do
             if curl -fsS http://localhost:8081/ > /dev/null 2>&1; then
               echo "PR server ready!"
@@ -677,7 +662,7 @@ jobs:
           retention-days: 1
 
   # ============================================================
-  # JOB 4: MERGE - Collect all results and post single comment
+  # JOB 4: MERGE - Collect results and post comment
   # ============================================================
   merge-and-report:
     needs: [check-files, build, test-matrix]
@@ -976,11 +961,9 @@ jobs:
                     `**All 9 test combinations failed.** This could be due to:\n` +
                     `- Playwright installation issues\n` +
                     `- Server startup failures\n` +
-                    `- Screenshot capture errors\n` +
-                    `- Build artifacts not being properly created\n\n` +
-                    `Please check the logs for details:\n` +
-                    `[View Workflow Run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})\n\n` +
-                    `_The build phase completed successfully, but the test execution failed._`
+                    `- Screenshot capture errors\n\n` +
+                    `Please check the logs:\n` +
+                    `[View Workflow Run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})`
             });
 
   # ============================================================
@@ -1016,11 +999,9 @@ jobs:
                 repo: context.repo.repo,
                 comment_id: commentId,
                 body: `## ❌ ULTRA Visual Regression Testing - Build Failed\n\n` +
-                      `Hi @${username}! The build phase failed, so visual regression testing could not run.\n\n` +
-                      `**Build errors occurred** - unable to create build artifacts for base and/or PR.\n\n` +
-                      `Please check the logs for details:\n` +
-                      `[View Workflow Run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})\n\n` +
-                      `_Common issues: webpack errors, dependency problems, or syntax errors in the code._`
+                      `Hi @${username}! The build phase failed.\n\n` +
+                      `Please check the logs:\n` +
+                      `[View Workflow Run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})`
               });
             } catch (error) {
               console.log('Could not update comment:', error.message);

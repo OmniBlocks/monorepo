@@ -4,6 +4,15 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`3d38036`](https://github.com/OmniBlocks/scratch-gui/commit/3d38036c55c49deb38a31f13bd13d998a703ea78) - 2025-11-27 21:02:35 -0500
+
+**fix: missing webpack in reggression visual thing**
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`8142165`](https://github.com/OmniBlocks/scratch-gui/commit/814216503857eb07b154ad8d2b3749f3d5d98374) - 2025-11-27 20:26:29 -0500
 
 **Update visual-regression-tester.yml**

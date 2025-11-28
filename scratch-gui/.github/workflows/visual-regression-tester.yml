@@ -161,6 +161,10 @@ jobs:
         working-directory: base
         run: |
           npm ci
+          
+          # Add node_modules/.bin to PATH so rimraf/mkdirp can be found
+          export PATH="$PWD/node_modules/.bin:$PATH"
+          
           npm run build
           
           # Verify build output exists
@@ -198,6 +202,10 @@ jobs:
         working-directory: pr
         run: |
           npm ci
+          
+          # Add node_modules/.bin to PATH so rimraf/mkdirp can be found
+          export PATH="$PWD/node_modules/.bin:$PATH"
+          
           npm run build
           
           # Verify build output exists
@@ -261,6 +269,7 @@ jobs:
                     `[View Workflow Run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})\n\n` +
                     `_Common issues: webpack errors, dependency problems, or syntax errors in the code._`
             });
+
 
   # ============================================================
   # JOB 3: MATRIX TEST - 3 OS × 3 Browsers = 9 combinations

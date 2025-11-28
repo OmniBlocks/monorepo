@@ -12,29 +12,24 @@ permissions:
   issues: write
 
 jobs:
+  # ============================================================
+  # JOB 1: CHECK FILE CHANGES - Skip if only docs
+  # ============================================================
   check-files:
-    # Run on PRs or when a human comments '/vrt' on a PR. Ignore dependabot.
-    if: |
-      github.actor != 'dependabot[bot]' &&
-      (
-        github.event_name == 'pull_request' ||
-        (
-          github.event_name == 'issue_comment' &&
-          github.event.issue.pull_request &&
-          contains(github.event.comment.body, '/vrt') &&
-          github.event.comment.user.type == 'User'
-        )
-      )
+    if: >-
+      (github.actor != 'dependabot[bot]') &&
+      ((github.event_name == 'pull_request') ||
+      (github.event_name == 'issue_comment' && github.event.issue.pull_request && contains(github.event.comment.body, '/vrt')))
     runs-on: ubuntu-latest
     outputs:
-      should_run: ${{ steps.decide.outputs.should_run }}
+      should_run: ${{ steps.check.outputs.should_run }}
       pr_number: ${{ steps.pr.outputs.number }}
-      head_sha:   ${{ steps.pr.outputs.head_sha }}
-      base_sha:   ${{ steps.pr.outputs.base_sha }}
-      requester:  ${{ steps.pr.outputs.requester }}
-      is_human:   ${{ steps.pr.outputs.is_human }}
+      pr_sha: ${{ steps.pr.outputs.sha }}
+      base_sha: ${{ steps.pr.outputs.base_sha }}
+      username: ${{ steps.pr.outputs.username }}
+      
     steps:
-      - name: React to /vrt (comment trigger)
+      - name: React to comment (if triggered by comment)
         if: github.event_name == 'issue_comment'
         uses: actions/github-script@v7
         with:
@@ -46,7 +41,7 @@ jobs:
               content: 'rocket'
             });
 
-      - name: Get PR info
+      - name: Get PR details
         id: pr
         uses: actions/github-script@v7
         with:
@@ -60,248 +55,216 @@ jobs:
               repo: context.repo.repo,
               pull_number: prNumber
             });
-
-            const requesterLogin = context.eventName === 'issue_comment'
+            
+            const username = context.eventName === 'issue_comment'
               ? context.payload.comment.user.login
-              : pr.data.user.login;
-
-            const requesterType = context.eventName === 'issue_comment'
-              ? context.payload.comment.user.type
-              : (context.payload.sender?.type || 'User');
-
-            core.setOutput('number',  pr.data.number);
-            core.setOutput('head_sha', pr.data.head.sha);
+              : context.payload.pull_request.user.login;
+              
+            core.setOutput('number', pr.data.number);
+            core.setOutput('sha', pr.data.head.sha);
             core.setOutput('base_sha', pr.data.base.sha);
-            core.setOutput('requester', requesterLogin);
-            core.setOutput('is_human', requesterType === 'User' ? 'true' : 'false');
+            core.setOutput('username', username);
 
-      - name: Decide whether to run
-        id: decide
-        uses: actions/github-script@v7
+      - name: Checkout PR
+        uses: actions/checkout@v4
         with:
-          script: |
-            const prNumber = Number('${{ steps.pr.outputs.number }}');
-            const forced = (context.eventName === 'issue_comment') &&
-                           /\/vrt/i.test(context.payload.comment?.body || '');
+          fetch-depth: 0
 
-            const files = await github.paginate(github.rest.pulls.listFiles, {
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: prNumber,
-              per_page: 100
-            });
-
-            const changed = files.map(f => f.filename);
-            const docsOnly = changed.length > 0 && changed.every(f => /\.(md|txt|ya?ml)$/i.test(f));
-            const shouldRun = forced || !docsOnly;
-
-            core.info(`Changed files (${changed.length}): ${changed.join(', ') || '(none)'}`);
-            core.setOutput('should_run', shouldRun ? 'true' : 'false');
+      - name: Check changed files
+        id: check
+        run: |
+          # Get list of changed files
+          git fetch origin ${{ steps.pr.outputs.base_sha }}
+          CHANGED_FILES=$(git diff --name-only ${{ steps.pr.outputs.base_sha }} ${{ steps.pr.outputs.sha }})
+          
+          echo "Changed files:"
+          echo "$CHANGED_FILES"
+          
+          # Check if only .md, .txt, or .yml files changed
+          if echo "$CHANGED_FILES" | grep -qvE '\.(md|txt|yml|yaml)$'; then
+            echo "should_run=true" >> $GITHUB_OUTPUT
+            echo "Code changes detected - VRT will run"
+          else
+            echo "should_run=false" >> $GITHUB_OUTPUT
+            echo "Only documentation/config files changed - skipping VRT"
+          fi
 
       - name: Post skip notice
-        if: steps.decide.outputs.should_run == 'false'
+        if: steps.check.outputs.should_run == 'false'
         uses: actions/github-script@v7
         with:
           script: |
-            const isHuman = '${{ steps.pr.outputs.is_human }}' === 'true';
-            const name = isHuman ? '@' + '${{ steps.pr.outputs.requester }}' : '${{ steps.pr.outputs.requester }}';
+            const username = '${{ steps.pr.outputs.username }}';
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              issue_number: Number('${{ steps.pr.outputs.number }}'),
-              body:
-                `## 🎬 Visual Regression Testing — Skipped\n\n` +
-                `Hi ${name}! VRT skipped because this PR only changes .md/.txt/.yml files.\n\n` +
-                `To force a run, comment \`/vrt\` on this PR.`
+              issue_number: ${{ steps.pr.outputs.number }},
+              body: `## 🎬 Visual Regression Testing - Skipped\n\n` +
+                    `Hi @${username}! VRT was skipped because this PR only changes documentation or configuration files (.md, .txt, .yml).\n\n` +
+                    `_To force VRT to run, comment \`/vrt\` on this PR._`
             });
 
+  # ============================================================
+  # JOB 2: BUILD - Single build for both base and PR (FIXED!)
+  # ============================================================
   build:
     needs: check-files
     if: needs.check-files.outputs.should_run == 'true'
     runs-on: ubuntu-latest
-    outputs:
-      comment_id: ${{ steps.open_comment.outputs.comment_id }}
+    
     steps:
-      - name: Open status comment
-        id: open_comment
+      - name: Post initial comment
+        id: vrt_comment
         uses: actions/github-script@v7
-        env:
-          REQUESTER: ${{ needs.check-files.outputs.requester }}
-          IS_HUMAN:  ${{ needs.check-files.outputs.is_human }}
-          PR_NUMBER: ${{ needs.check-files.outputs.pr_number }}
         with:
           script: |
-            const name = process.env.IS_HUMAN === 'true' ? '@' + process.env.REQUESTER : process.env.REQUESTER;
-            const body =
-              `## 🚀 ULTRA Visual Regression Tester — LET’S GOOOO\n\n` +
-              `Requester: ${name}\n\n` +
-              `- 🏗️ Build: spinning up\n` +
-              `- 🧪 Matrix: queued (3 OS × 3 browsers = 9 combos)\n` +
-              `- 🎨 Analysis: incoming\n\n` +
-              `_parallelize all the pixels_ ✨`;
-            const c = await github.rest.issues.createComment({
+            const initial_spinner = '<img src="https://lh5.googleusercontent.com/proxy/OUqG0HgVNVMNorlPCmI4VgJa-3h7uHLkkMy9vdJ0eRsQlvJBytFUS-HvuW-O9EJd-c9xB7KAqlwby4Fzp59g1705FzBuP-F8dC1ZaBQtmLeCu5i6FfSd6Mmzh8mjOwgrEYZwy5UStg" width="20" height="20">';
+            const username = '${{ needs.check-files.outputs.username }}';
+            const comment = await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              issue_number: Number(process.env.PR_NUMBER),
-              body
+              issue_number: ${{ needs.check-files.outputs.pr_number }},
+              body: `${initial_spinner} **ULTRA Visual Regression Testing, requested by @${username}...**\n\n` +
+                    `🏗️ **Build Phase:** In progress...\n\n` +
+                    `🧪 **Test Matrix:** Pending (3 platforms × 3 browsers = 9 combinations)\n\n` +
+                    `🎨 **Analysis:** Pending\n\n` +
+                    `_This is going to be EPIC!_ 🚀`
             });
-            core.setOutput('comment_id', String(c.data.id));
+            core.setOutput('comment_id', comment.data.id);
+            return comment.data.id;
 
-      - name: Save comment id
-        run: echo "${{ steps.open_comment.outputs.comment_id }}" > comment_id.txt
+      - name: Save comment ID
+        run: |
+          echo "${{ steps.vrt_comment.outputs.comment_id }}" > comment_id.txt
 
-      - name: Upload comment id
+      - name: Upload comment ID
         uses: actions/upload-artifact@v4
         with:
           name: vrt-comment-id
           path: comment_id.txt
 
+      # Build BASE
+      - name: Checkout base branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.check-files.outputs.base_sha }}
+          path: base
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: base/package-lock.json
 
-      # Build BASE at repo root (with rimraf/mkdirp shims)
-      - name: Checkout base
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ needs.check-files.outputs.base_sha }}
-          fetch-depth: 1
-
-      - name: Install and build (base)
+      - name: Install and build base
+        working-directory: base
+        run: |
+          npm ci
+          npm run build
+          
+          # Verify build output exists
+          if [ ! -d "build" ]; then
+            echo "❌ ERROR: build/ directory was not created!"
+            exit 1
+          fi
+          
+          if [ -z "$(ls -A build)" ]; then
+            echo "❌ ERROR: build/ directory is empty!"
+            exit 1
+          fi
+          
+          echo "✅ Build successful! Contents:"
+          ls -lah build/ | head -20
         env:
           NODE_ENV: production
-        shell: bash
-        run: |
-          set -e
-          npm ci
-
-          # Provide rimraf/mkdirp shims (no heredocs -> YAML-safe)
-          mkdir -p .github/ci-bin
-          if ! command -v rimraf >/dev/null 2>&1; then
-            printf '#!/usr/bin/env bash\nrm -rf "$@"\n' > .github/ci-bin/rimraf
-            chmod +x .github/ci-bin/rimraf
-          fi
-          if ! command -v mkdirp >/dev/null 2>&1; then
-            printf '#!/usr/bin/env bash\nmkdir -p "$@"\n' > .github/ci-bin/mkdirp
-            chmod +x .github/ci-bin/mkdirp
-          fi
-          export PATH="$PWD/.github/ci-bin:$PATH"
-
-          # Normal build; fallback if needed
-          if ! npm run build; then
-            echo "npm run build failed; attempting fallback…"
-            rm -rf ./build ./dist && mkdir -p build dist
-            if [ -x ./node_modules/.bin/webpack ]; then
-              ./node_modules/.bin/webpack --colors --bail
-            else
-              npx -y webpack-cli@3 webpack --colors --bail
-            fi
-          fi
-
-          test -d build && [ -n "$(ls -A build)" ] || { echo "build/ missing or empty"; exit 1; }
-          mkdir -p /tmp/vrt-builds
-          cp -r build /tmp/vrt-builds/base-build
-
-      # Build PR at repo root (with same shims)
-      - name: Checkout PR
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ needs.check-files.outputs.head_sha }}
-          clean: true
-          fetch-depth: 1
-
-      - name: Install and build (PR)
-        env:
-          NODE_ENV: production
-        shell: bash
-        run: |
-          set -e
-          npm ci
-
-          mkdir -p .github/ci-bin
-          if ! command -v rimraf >/dev/null 2>&1; then
-            printf '#!/usr/bin/env bash\nrm -rf "$@"\n' > .github/ci-bin/rimraf
-            chmod +x .github/ci-bin/rimraf
-          fi
-          if ! command -v mkdirp >/dev/null 2>&1; then
-            printf '#!/usr/bin/env bash\nmkdir -p "$@"\n' > .github/ci-bin/mkdirp
-            chmod +x .github/ci-bin/mkdirp
-          fi
-          export PATH="$PWD/.github/ci-bin:$PATH"
-
-          if ! npm run build; then
-            echo "npm run build failed; attempting fallback…"
-            rm -rf ./build ./dist && mkdir -p build dist
-            if [ -x ./node_modules/.bin/webpack ]; then
-              ./node_modules/.bin/webpack --colors --bail
-            else
-              npx -y webpack-cli@3 webpack --colors --bail
-            fi
-          fi
-
-          test -d build && [ -n "$(ls -A build)" ] || { echo "build/ missing or empty"; exit 1; }
-          cp -r build /tmp/vrt-builds/pr-build
 
       - name: Upload base build
         uses: actions/upload-artifact@v4
         with:
           name: base-build
-          path: /tmp/vrt-builds/base-build/
+          path: base/build/
+          retention-days: 1
           if-no-files-found: error
-          retention-days: 2
+
+      # Build PR
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.check-files.outputs.pr_sha }}
+          path: pr
+
+      - name: Install and build PR
+        working-directory: pr
+        run: |
+          npm ci
+          npm run build
+          
+          # Verify build output exists
+          if [ ! -d "build" ]; then
+            echo "❌ ERROR: build/ directory was not created!"
+            exit 1
+          fi
+          
+          if [ -z "$(ls -A build)" ]; then
+            echo "❌ ERROR: build/ directory is empty!"
+            exit 1
+          fi
+          
+          echo "✅ Build successful! Contents:"
+          ls -lah build/ | head -20
+        env:
+          NODE_ENV: production
 
       - name: Upload PR build
         uses: actions/upload-artifact@v4
         with:
           name: pr-build
-          path: /tmp/vrt-builds/pr-build/
+          path: pr/build/
+          retention-days: 1
           if-no-files-found: error
-          retention-days: 2
 
-      - name: Update comment (build complete)
+      - name: Update comment - Builds complete
         if: success()
         uses: actions/github-script@v7
-        env:
-          COMMENT_ID: ${{ steps.open_comment.outputs.comment_id }}
-          REQUESTER:  ${{ needs.check-files.outputs.requester }}
-          IS_HUMAN:   ${{ needs.check-files.outputs.is_human }}
         with:
           script: |
-            const name = process.env.IS_HUMAN === 'true' ? '@' + process.env.REQUESTER : process.env.REQUESTER;
+            const initial_spinner = '<img src="https://lh5.googleusercontent.com/proxy/OUqG0HgVNVMNorlPCmI4VgJa-3h7uHLkkMy9vdJ0eRsQlvJBytFUS-HvuW-O9EJd-c9xB7KAqlwby4Fzp59g1705FzBuP-F8dC1ZaBQtmLeCu5i6FfSd6Mmzh8mjOwgrEYZwy5UStg" width="20" height="20">';
+            const username = '${{ needs.check-files.outputs.username }}';
             await github.rest.issues.updateComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              comment_id: Number(process.env.COMMENT_ID),
-              body:
-                `## 🚀 ULTRA Visual Regression Tester — BUILD READY\n\n` +
-                `Requester: ${name}\n\n` +
-                `- 🏗️ Build: ✅ done\n` +
-                `- 🧪 Matrix: running across the multiverse\n` +
-                `- 🎨 Analysis: standing by\n\n` +
-                `_snapping screenshots like paparazzi_ 📸`
+              comment_id: ${{ steps.vrt_comment.outputs.comment_id }},
+              body: `${initial_spinner} **ULTRA Visual Regression Testing, requested by @${username}...**\n\n` +
+                    `🏗️ **Build Phase:** ✅ Complete\n\n` +
+                    `🧪 **Test Matrix:** Running (3 platforms × 3 browsers = 9 combinations)...\n\n` +
+                    `🎨 **Analysis:** Pending\n\n` +
+                    `_Hold tight!_ 🚀`
             });
 
-      - name: Update comment (build failed)
+      - name: Update comment - Build failed
         if: failure()
         uses: actions/github-script@v7
-        env:
-          COMMENT_ID: ${{ steps.open_comment.outputs.comment_id }}
-          REQUESTER:  ${{ needs.check-files.outputs.requester }}
-          IS_HUMAN:   ${{ needs.check-files.outputs.is_human }}
         with:
           script: |
-            const name = process.env.IS_HUMAN === 'true' ? '@' + process.env.REQUESTER : process.env.REQUESTER;
+            const username = '${{ needs.check-files.outputs.username }}';
             await github.rest.issues.updateComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              comment_id: Number(process.env.COMMENT_ID),
-              body:
-                `## ❌ VRT couldn’t launch — build tripped over itself\n\n` +
-                `Hey ${name}, the build phase failed so visual checks didn’t run.\n` +
-                `Peek the logs for the exact faceplant. We’ll fix fast and re‑run!`
+              comment_id: ${{ steps.vrt_comment.outputs.comment_id }},
+              body: `## ❌ ULTRA Visual Regression Testing - Build Failed\n\n` +
+                    `Hi @${username}! The build phase failed, so visual regression testing could not run.\n\n` +
+                    `**Build errors occurred for:**\n` +
+                    `- Base branch build and/or\n` +
+                    `- PR branch build\n\n` +
+                    `Please check the logs for details:\n` +
+                    `[View Workflow Run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})\n\n` +
+                    `_Common issues: webpack errors, dependency problems, or syntax errors in the code._`
             });
 
+  # ============================================================
+  # JOB 3: MATRIX TEST - 3 OS × 3 Browsers = 9 combinations
+  # ============================================================
   test-matrix:
     needs: [check-files, build]
     if: success()
@@ -311,6 +274,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         browser: [chromium, firefox, webkit]
+    
     steps:
       - name: Download base build
         uses: actions/download-artifact@v4
@@ -329,28 +293,24 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install Playwright and helpers
-        shell: bash
+      - name: Install Playwright and dependencies
         run: |
-          set -e
           npm init -y
           npm install --save-dev @playwright/test@latest gifenc pngjs pixelmatch
-          if [ "${RUNNER_OS}" = "Linux" ]; then
-            npx -y playwright@latest install --with-deps ${{ matrix.browser }}
-          else
-            npx -y playwright@latest install ${{ matrix.browser }}
-          fi
+          npx playwright install --with-deps ${{ matrix.browser }}
 
-      - name: Write Playwright config
+      - name: Create Playwright config
         shell: bash
         run: |
           cat > playwright.config.js << 'EOF'
           const { defineConfig, devices } = require('@playwright/test');
+          
           const browserDevices = {
             chromium: 'Desktop Chrome',
             firefox: 'Desktop Firefox',
-            webkit:  'Desktop Safari'
+            webkit: 'Desktop Safari'
           };
+          
           module.exports = defineConfig({
             testDir: '.',
             timeout: 60000,
@@ -363,7 +323,7 @@ jobs:
               trace: 'retain-on-failure',
               screenshot: 'only-on-failure',
               viewport: { width: 1366, height: 900 },
-              video: 'on'
+              video: { mode: 'on', size: { width: 1366, height: 900 } }
             },
             projects: [{
               name: process.env.BROWSER || 'chromium',
@@ -372,7 +332,7 @@ jobs:
           });
           EOF
 
-      - name: Write tests (original set + 2 new modals)
+      - name: Create enhanced test suite (10 tests!)
         shell: bash
         run: |
           cat > screenshot-test.spec.js << 'EOF'
@@ -385,65 +345,64 @@ jobs:
             await page.goto(`${BASE}/editor.html`);
             await page.waitForLoadState('networkidle');
             await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
-            await page.waitForTimeout(1200);
+            await page.waitForTimeout(1500);
           }
 
           async function clickTabByIndex(page, index) {
             const tabList = page.locator('[role="tablist"]').first();
             await expect(tabList).toBeVisible({ timeout: 10000 });
             const tab = tabList.locator('[role="tab"]').nth(index);
-            await expect(tab).toBeVisible({ timeout: 6000 });
+            await expect(tab).toBeVisible({ timeout: 5000 });
             await tab.scrollIntoViewIfNeeded();
             await tab.click();
-            await page.waitForTimeout(700);
+            await page.waitForTimeout(800);
           }
 
-          test.describe('Visual Regression (full + extras)', () => {
-            test('Editor - Initial', async ({ page }) => {
+          test.describe('Visual Regression Screenshots', () => {
+            test('Editor - Initial Load', async ({ page }) => {
               await waitEditor(page);
               await page.screenshot({ path: 'screenshots/editor-initial.png', fullPage: true });
             });
 
             test('Editor - Blocks Workspace', async ({ page }) => {
               await waitEditor(page);
-              const el = page.locator('[class*="editor-wrapper"]').first();
-              if (await el.count()) {
-                await el.screenshot({ path: 'screenshots/blocks-workspace.png' });
+              const editorWrapper = page.locator('[class*="editor-wrapper"]').first();
+              if (await editorWrapper.count()) {
+                await editorWrapper.screenshot({ path: 'screenshots/blocks-workspace.png' });
               } else {
-                await page.screenshot({ path: 'screenshots/blocks-workspace.png' });
+                await page.screenshot({ path: 'screenshots/blocks-workspace.png', fullPage: false });
               }
             });
 
             test('Editor - Stage and Sprites', async ({ page }) => {
               await waitEditor(page);
-              const el = page.locator('[class*="stage-and-target"], [class*="stage-and-target-wrapper"]').first();
-              if (await el.count()) {
-                await el.screenshot({ path: 'screenshots/stage-sprites.png' });
+              const stageWrapper = page.locator('[class*="stage-and-target-wrapper"]').first();
+              if (await stageWrapper.count()) {
+                await stageWrapper.screenshot({ path: 'screenshots/stage-sprites.png' });
               } else {
-                await page.screenshot({ path: 'screenshots/stage-sprites.png' });
+                await page.screenshot({ path: 'screenshots/stage-sprites.png', clip: { x: 0, y: 0, width: 600, height: 800 } });
               }
             });
 
-            // Tabs by index: Code=0, Costumes=1, Sounds=2, Songs=3
-            test('Tab - Code', async ({ page }) => {
+            test('Editor - Code Tab', async ({ page }) => {
               await waitEditor(page);
               await clickTabByIndex(page, 0);
               await page.screenshot({ path: 'screenshots/code-tab.png', fullPage: true });
             });
 
-            test('Tab - Costumes', async ({ page }) => {
+            test('Editor - Costumes Tab', async ({ page }) => {
               await waitEditor(page);
               await clickTabByIndex(page, 1);
               await page.screenshot({ path: 'screenshots/costumes-tab.png', fullPage: true });
             });
 
-            test('Tab - Sounds', async ({ page }) => {
+            test('Editor - Sounds Tab', async ({ page }) => {
               await waitEditor(page);
               await clickTabByIndex(page, 2);
               await page.screenshot({ path: 'screenshots/sounds-tab.png', fullPage: true });
             });
 
-            test('Tab - Songs', async ({ page }) => {
+            test('Editor - Songs Tab', async ({ page }) => {
               await waitEditor(page);
               await clickTabByIndex(page, 3);
               await page.screenshot({ path: 'screenshots/songs-tab.png', fullPage: true });
@@ -452,38 +411,44 @@ jobs:
             test('Player View', async ({ page }) => {
               await page.goto(`${BASE}/`);
               await page.waitForLoadState('networkidle');
-              await page.waitForTimeout(900);
+              await page.waitForTimeout(1000);
               await page.screenshot({ path: 'screenshots/player-view.png', fullPage: true });
             });
 
-            // NEW 1: Extension Library Modal
-            test('Extension Library Modal', async ({ page }) => {
+            test('Editor - Extension Library Modal', async ({ page }) => {
               await waitEditor(page);
-              const extBtn = page.locator(
-                '[aria-label="Add Extension"], [aria-label*="extension" i], button:has-text("Add Extension"), [data-testid*="extension"], [class*="extension-button"]'
-              ).first();
-              if (await extBtn.count()) {
-                await extBtn.click();
-                await page.waitForTimeout(900);
+              
+              const extensionButton = page.locator('[class*="extension-button"]').first()
+                .or(page.locator('button:has-text("Add Extension")'))
+                .or(page.locator('[aria-label*="extension" i]').first());
+              
+              if (await extensionButton.count() > 0) {
+                await extensionButton.click();
+                await page.waitForTimeout(1000);
+                await page.screenshot({ path: 'screenshots/extension-library.png', fullPage: true });
+              } else {
+                console.log('Extension button not found, taking fallback screenshot');
+                await page.screenshot({ path: 'screenshots/extension-library.png', fullPage: true });
               }
-              await page.screenshot({ path: 'screenshots/extension-library.png', fullPage: true });
             });
 
-            // NEW 2: Advanced Settings Modal
-            test('Advanced Settings Modal', async ({ page }) => {
+            test('Editor - Advanced Settings Modal', async ({ page }) => {
               await waitEditor(page);
-              const candidates = [
-                '[aria-label*="advanced" i]',
-                '[aria-label*="settings" i]',
-                'button:has-text("Advanced")',
-                'button:has-text("Settings")'
-              ];
-              for (const sel of candidates) {
-                const h = page.locator(sel).first();
-                if (await h.count()) { await h.click(); break; }
+              
+              const settingsButton = page.locator('[class*="menu-bar"]')
+                .locator('[class*="settings"], [aria-label*="settings" i], [aria-label*="advanced" i]')
+                .first()
+                .or(page.locator('button:has-text("Settings")'))
+                .or(page.locator('button:has-text("Advanced")'));
+              
+              if (await settingsButton.count() > 0) {
+                await settingsButton.click();
+                await page.waitForTimeout(1000);
+                await page.screenshot({ path: 'screenshots/advanced-settings.png', fullPage: true });
+              } else {
+                console.log('Advanced settings button not found, taking fallback screenshot');
+                await page.screenshot({ path: 'screenshots/advanced-settings.png', fullPage: true });
               }
-              await page.waitForTimeout(900);
-              await page.screenshot({ path: 'screenshots/advanced-settings.png', fullPage: true });
             });
           });
           EOF
@@ -491,75 +456,114 @@ jobs:
       - name: Start base server
         shell: bash
         run: |
-          npx -y http-server@14 base-build -p 8080 >/dev/null 2>&1 &
-          echo $! > base-server.pid
+          npx http-server base-build -p 8080 &
+          SERVER_PID=$!
+          echo $SERVER_PID > base-server.pid
+          
+          # Wait for server
           for i in {1..30}; do
-            if curl -fsS http://localhost:8080/ >/dev/null 2>&1; then
-              echo "Base server ready"
+            if curl -fsS http://localhost:8080/ > /dev/null 2>&1; then
+              echo "Base server ready!"
               break
             fi
-            [ $i -eq 30 ] && { echo "Base server failed"; exit 1; }
+            if [ $i -eq 30 ]; then
+              echo "Base server failed to start"
+              exit 1
+            fi
             sleep 1
           done
 
       - name: Capture base screenshots
+        shell: bash
         env:
           BROWSER: ${{ matrix.browser }}
-        shell: bash
         run: |
-          set -e
           mkdir -p screenshots-base videos-base
-          rm -rf screenshots test-results || true
+          rm -rf screenshots test-results
           npx playwright test screenshot-test.spec.js
-          [ -d screenshots ] && cp -r screenshots/* screenshots-base/ || true
+          
+          if [ -d screenshots ]; then
+            cp -r screenshots/* screenshots-base/ || true
+          fi
+          rm -rf screenshots
+          
           find test-results -name "*.webm" -exec cp {} videos-base/ \; 2>/dev/null || true
-          rm -rf screenshots test-results || true
 
       - name: Stop base server
         if: always()
         shell: bash
         run: |
-          [ -f base-server.pid ] && kill "$(cat base-server.pid)" 2>/dev/null || true
-          rm -f base-server.pid
+          if [ -f base-server.pid ]; then
+            kill $(cat base-server.pid) || true
+            rm base-server.pid
+          fi
 
       - name: Start PR server
         shell: bash
         run: |
-          npx -y http-server@14 pr-build -p 8081 >/dev/null 2>&1 &
-          echo $! > pr-server.pid
+          npx http-server pr-build -p 8081 &
+          SERVER_PID=$!
+          echo $SERVER_PID > pr-server.pid
+          
+          # Wait for server
           for i in {1..30}; do
-            if curl -fsS http://localhost:8081/ >/dev/null 2>&1; then
-              echo "PR server ready"
+            if curl -fsS http://localhost:8081/ > /dev/null 2>&1; then
+              echo "PR server ready!"
               break
             fi
-            [ $i -eq 30 ] && { echo "PR server failed"; exit 1; }
+            if [ $i -eq 30 ]; then
+              echo "PR server failed to start"
+              exit 1
+            fi
             sleep 1
           done
 
       - name: Capture PR screenshots
+        shell: bash
         env:
           PORT: '8081'
           BROWSER: ${{ matrix.browser }}
-        shell: bash
         run: |
-          set -e
           mkdir -p screenshots-pr videos-pr
-          rm -rf screenshots test-results || true
+          rm -rf screenshots test-results
           npx playwright test screenshot-test.spec.js
-          [ -d screenshots ] && cp -r screenshots/* screenshots-pr/ || true
+          
+          if [ -d screenshots ]; then
+            cp -r screenshots/* screenshots-pr/ || true
+          fi
+          rm -rf screenshots
+          
           find test-results -name "*.webm" -exec cp {} videos-pr/ \; 2>/dev/null || true
-          rm -rf screenshots test-results || true
 
-      - name: Compare and create diffs (all 10 shots)
+      - name: Stop PR server
+        if: always()
         shell: bash
         run: |
-          cat > compare.js << 'EOF'
+          if [ -f pr-server.pid ]; then
+            kill $(cat pr-server.pid) || true
+            rm pr-server.pid
+          fi
+
+      - name: Compare screenshots and generate GIFs
+        shell: bash
+        run: |
+          cat > compare-and-gif.js << 'EOF'
           const fs = require('fs');
           const { PNG } = require('pngjs');
-          const pixelmatch = require('pixelmatch');
-          const { GIFEncoder, quantize, applyPalette } = require('gifenc');
 
-          const shots = [
+          const pmMod = require('pixelmatch');
+          const pixelmatch = pmMod && (pmMod.default || pmMod);
+
+          const geMod = require('gifenc');
+          const GIFEncoder = (geMod && (geMod.GIFEncoder || geMod.default?.GIFEncoder)) || null;
+          const quantize   = (geMod && (geMod.quantize   || geMod.default?.quantize))   || null;
+          const applyPalette = (geMod && (geMod.applyPalette || geMod.default?.applyPalette)) || null;
+
+          if (typeof pixelmatch !== 'function') {
+            throw new TypeError('pixelmatch import failed');
+          }
+
+          const screenshots = [
             'editor-initial.png',
             'blocks-workspace.png',
             'stage-sprites.png',
@@ -572,54 +576,79 @@ jobs:
             'advanced-settings.png'
           ];
 
-          fs.mkdirSync('screenshots-diff', { recursive: true });
-          fs.mkdirSync('screenshots-gifs', { recursive: true });
-
           let changesDetected = false;
           const results = [];
 
-          for (const s of shots) {
-            const base = `screenshots-base/${s}`;
-            const pr   = `screenshots-pr/${s}`;
-            if (!fs.existsSync(base) || !fs.existsSync(pr)) {
-              results.push({ name: s, skipped: true });
+          fs.mkdirSync('screenshots-diff', { recursive: true });
+          fs.mkdirSync('screenshots-gifs', { recursive: true });
+
+          for (const screenshot of screenshots) {
+            const basePath = `screenshots-base/${screenshot}`;
+            const prPath   = `screenshots-pr/${screenshot}`;
+
+            if (!fs.existsSync(basePath) || !fs.existsSync(prPath)) {
+              console.log(`Skipping ${screenshot} - file not found`);
+              results.push({ name: screenshot, skipped: true });
               continue;
             }
 
-            const b = PNG.sync.read(fs.readFileSync(base));
-            const p = PNG.sync.read(fs.readFileSync(pr));
+            const base = PNG.sync.read(fs.readFileSync(basePath));
+            const pr   = PNG.sync.read(fs.readFileSync(prPath));
 
-            const w = Math.min(b.width, p.width);
-            const h = Math.min(b.height, p.height);
-            const diff = new PNG({ width: w, height: h });
+            const { width, height } = base;
+            if (width !== pr.width || height !== pr.height) {
+              console.warn(`Dimension mismatch for ${screenshot}`);
+            }
 
-            const n = pixelmatch(b.data, p.data, diff.data, w, h, { threshold: 0.1 });
-            const pct = ((n / (w * h)) * 100).toFixed(2);
+            const diff = new PNG({ width, height });
 
-            if (n > 0) {
+            const numDiffPixels = pixelmatch(
+              base.data,
+              pr.data,
+              diff.data,
+              Math.min(width, pr.width),
+              Math.min(height, pr.height),
+              { threshold: 0.1 }
+            );
+
+            const diffPercentage = ((numDiffPixels / (width * height)) * 100).toFixed(2);
+
+            if (numDiffPixels > 0) {
               changesDetected = true;
-              fs.writeFileSync(`screenshots-diff/${s}`, PNG.sync.write(diff));
-              try {
-                const enc = GIFEncoder();
-                for (const frame of [b, p, diff]) {
-                  const pal = quantize(frame.data, 256, { format: 'rgba444' });
-                  const idx = applyPalette(frame.data, pal, 'rgba444');
-                  enc.writeFrame(idx, frame.width, frame.height, { palette: pal, delay: 900 });
+              fs.writeFileSync(`screenshots-diff/${screenshot}`, PNG.sync.write(diff));
+
+              if (GIFEncoder && quantize && applyPalette) {
+                try {
+                  const enc = GIFEncoder();
+                  const frames = [base, pr, diff];
+                  const format = 'rgba444';
+
+                  for (const frame of frames) {
+                    const palette = quantize(frame.data, 256, { format });
+                    const index = applyPalette(frame.data, palette, format);
+                    enc.writeFrame(index, frame.width, frame.height, { palette, delay: 900 });
+                  }
+
+                  enc.finish();
+                  const gifBuffer = Buffer.from(enc.bytes());
+                  fs.writeFileSync(`screenshots-gifs/${screenshot.replace('.png', '.gif')}`, gifBuffer);
+                } catch (e) {
+                  console.log(`Could not create GIF for ${screenshot}: ${e.message}`);
                 }
-                enc.finish();
-                fs.writeFileSync(`screenshots-gifs/${s.replace('.png', '.gif')}`, Buffer.from(enc.bytes()));
-              } catch {}
-              results.push({ name: s, diffPixels: n, diffPercentage: pct, hasDiff: true, skipped: false });
+              }
+
+              results.push({ name: screenshot, diffPixels: numDiffPixels, diffPercentage, hasDiff: true, skipped: false });
             } else {
-              results.push({ name: s, diffPixels: 0, diffPercentage: '0.00', hasDiff: false, skipped: false });
+              results.push({ name: screenshot, diffPixels: 0, diffPercentage: '0.00', hasDiff: false, skipped: false });
             }
           }
 
           fs.writeFileSync('comparison-results.json', JSON.stringify({ changesDetected, results }, null, 2));
           EOF
-          node compare.js
 
-      - name: Upload results (per combo)
+          node compare-and-gif.js
+
+      - name: Upload matrix results
         uses: actions/upload-artifact@v4
         with:
           name: vrt-results-${{ matrix.os }}-${{ matrix.browser }}
@@ -631,8 +660,11 @@ jobs:
             screenshots-gifs/
             videos-base/
             videos-pr/
-          retention-days: 2
+          retention-days: 1
 
+  # ============================================================
+  # JOB 4: MERGE - Collect all results and post single comment
+  # ============================================================
   merge-and-report:
     needs: [check-files, build, test-matrix]
     if: |
@@ -641,17 +673,20 @@ jobs:
       needs.build.result == 'success' &&
       (needs.test-matrix.result == 'success' || needs.test-matrix.result == 'failure')
     runs-on: ubuntu-latest
+    
     steps:
-      - name: Download comment id
+      - name: Download comment ID
         uses: actions/download-artifact@v4
         with:
           name: vrt-comment-id
 
-      - name: Read comment id
-        id: cid
-        run: echo "comment_id=$(cat comment_id.txt)" >> "$GITHUB_OUTPUT"
+      - name: Load comment ID
+        id: load_comment
+        run: |
+          COMMENT_ID=$(cat comment_id.txt)
+          echo "comment_id=$COMMENT_ID" >> $GITHUB_OUTPUT
 
-      - name: Download all results
+      - name: Download all matrix results
         uses: actions/download-artifact@v4
         with:
           path: all-results/
@@ -662,216 +697,281 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Analyze results
+      - name: Analyze and merge results
         id: analyze
-        shell: bash
         run: |
-          cat > analyze.js << 'EOF'
+          cat > analyze-results.js << 'EOF'
           const fs = require('fs');
           const path = require('path');
 
+          const resultsDir = 'all-results';
+          
+          if (!fs.existsSync(resultsDir)) {
+            console.log('No results directory found!');
+            fs.writeFileSync('merged-analysis.json', JSON.stringify({
+              anyChanges: false,
+              totalCombinations: 9,
+              completedCombinations: 0,
+              allResults: {},
+              failed: true
+            }, null, 2));
+            process.exit(0);
+          }
+
           const platforms = ['ubuntu-latest', 'windows-latest', 'macos-latest'];
-          const browsers  = ['chromium', 'firefox', 'webkit'];
+          const browsers = ['chromium', 'firefox', 'webkit'];
 
-          const all = {};
-          let completed = 0;
-          let changes = false;
+          const allResults = {};
+          let anyChanges = false;
+          let totalCombinations = 0;
+          let completedCombinations = 0;
 
-          for (const os of platforms) {
-            for (const br of browsers) {
-              const dir  = path.join('all-results', `vrt-results-${os}-${br}`);
-              const file = path.join(dir, 'comparison-results.json');
-              if (fs.existsSync(file)) {
-                const data = JSON.parse(fs.readFileSync(file, 'utf8'));
-                all[`${os}-${br}`] = data;
-                completed++;
-                if (data.changesDetected) changes = true;
+          for (const platform of platforms) {
+            for (const browser of browsers) {
+              const key = `${platform}-${browser}`;
+              const resultPath = path.join(resultsDir, `vrt-results-${key}`, 'comparison-results.json');
+              
+              if (fs.existsSync(resultPath)) {
+                const result = JSON.parse(fs.readFileSync(resultPath, 'utf8'));
+                allResults[key] = result;
+                completedCombinations++;
+                if (result.changesDetected) {
+                  anyChanges = true;
+                }
               }
+              totalCombinations++;
             }
           }
 
           const summary = {
-            anyChanges: changes,
-            totalCombinations: platforms.length * browsers.length,
-            completedCombinations: completed,
-            allResults: all
+            anyChanges,
+            totalCombinations,
+            completedCombinations,
+            allResults,
+            failed: completedCombinations === 0
           };
+
           fs.writeFileSync('merged-analysis.json', JSON.stringify(summary, null, 2));
           EOF
-          node analyze.js
-          echo "completed=$(node -p \"require('./merged-analysis.json').completedCombinations\")" >> "$GITHUB_OUTPUT"
-          echo "any_changes=$(node -p \"require('./merged-analysis.json').anyChanges\")" >> "$GITHUB_OUTPUT"
 
-      - name: Push baselines (ubuntu+chromium only)
-        if: steps.analyze.outputs.completed != '0'
-        shell: bash
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          node analyze-results.js
+          
+          ANY_CHANGES=$(node -e "console.log(require('./merged-analysis.json').anyChanges)")
+          FAILED=$(node -e "console.log(require('./merged-analysis.json').failed)")
+          COMPLETED=$(node -e "console.log(require('./merged-analysis.json').completedCombinations)")
+          
+          echo "any_changes=$ANY_CHANGES" >> $GITHUB_OUTPUT
+          echo "failed=$FAILED" >> $GITHUB_OUTPUT
+          echo "completed=$COMPLETED" >> $GITHUB_OUTPUT
+
+      - name: Upload to vrt-baselines branch
+        if: steps.analyze.outputs.failed == 'false' && steps.analyze.outputs.completed > 0
         run: |
-          set -e
-          git config --global user.name  "github-actions[bot]"
+          git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-
-          git clone --depth 1 "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" vrt-baselines-repo
-          cd vrt-baselines-repo
-          if ! git show-ref --quiet refs/heads/vrt-baselines; then
+          
+          if git ls-remote --heads https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git vrt-baselines | grep -q vrt-baselines; then
+            git clone --single-branch --branch vrt-baselines --depth 1 https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git vrt-baselines-repo
+            cd vrt-baselines-repo
+          else
+            git clone --depth 1 https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git vrt-baselines-repo
+            cd vrt-baselines-repo
             git checkout --orphan vrt-baselines
-            git rm -rf . >/dev/null 2>&1 || true
-          else
-            git checkout vrt-baselines
+            git rm -rf . 2>/dev/null || true
           fi
-
+          
           rm -rf .github
-          mkdir -p "pr-${{ needs.check-files.outputs.pr_number }}"
-          SRC="../all-results/vrt-results-ubuntu-latest-chromium"
-          [ -d "$SRC" ] && cp -r "$SRC"/* "pr-${{ needs.check-files.outputs.pr_number }}/" || true
-
-          cat > "pr-${{ needs.check-files.outputs.pr_number }}/README.md" <<MD
+          
+          mkdir -p pr-${{ needs.check-files.outputs.pr_number }}
+          if [ -d ../all-results/vrt-results-ubuntu-latest-chromium ]; then
+            cp -r ../all-results/vrt-results-ubuntu-latest-chromium/* pr-${{ needs.check-files.outputs.pr_number }}/ 2>/dev/null || true
+          fi
+          
+          cat > pr-${{ needs.check-files.outputs.pr_number }}/README.md << 'READMEEOF'
           # Visual Regression Baseline (Enhanced)
-          - Base SHA: \`${{ needs.check-files.outputs.base_sha }}\`
-          - PR  SHA: \`${{ needs.check-files.outputs.head_sha }}\`
-          - Run: #${{ github.run_number }}
-          - Platforms: ubuntu, windows, macos
-          - Browsers:  chromium, firefox, webkit
-          MD
-
+          - Base SHA: `${{ needs.check-files.outputs.base_sha }}`
+          - PR SHA: `${{ needs.check-files.outputs.pr_sha }}`
+          - Run: [#${{ github.run_number }}](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          - Date: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          - Platforms tested: ubuntu, windows, macos
+          - Browsers tested: chromium, firefox, webkit
+          READMEEOF
+          
           git add .
-          git commit -m "Add VRT baselines for PR #${{ needs.check-files.outputs.pr_number }}" || true
-          git push -u origin vrt-baselines
+          git commit -m "Add enhanced VRT baselines for PR #${{ needs.check-files.outputs.pr_number }}" || echo "No changes"
+          git push origin vrt-baselines || git push -u origin vrt-baselines
 
-      - name: Push images for all combos
-        id: upload_images
-        if: steps.analyze.outputs.completed != '0'
-        shell: bash
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload to vrt-images branch
+        id: upload_assets
+        if: steps.analyze.outputs.failed == 'false' && steps.analyze.outputs.completed > 0
         run: |
-          set -e
-          git config --global user.name  "github-actions[bot]"
+          git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-          git clone --depth 1 "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" vrt-images-repo
-          cd vrt-images-repo
-          if ! git show-ref --quiet refs/heads/vrt-images; then
-            git checkout --orphan vrt-images
-            git rm -rf . >/dev/null 2>&1 || true
+          if git ls-remote --heads https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git vrt-images | grep -q vrt-images; then
+            git clone --single-branch --branch vrt-images --depth 1 https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git vrt-images-repo
+            cd vrt-images-repo
           else
-            git checkout vrt-images
+            git clone --depth 1 https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git vrt-images-repo
+            cd vrt-images-repo
+            git checkout --orphan vrt-images
+            git rm -rf . 2>/dev/null || true
           fi
 
           rm -rf .github
-          RUN_DIR="pr-${{ needs.check-files.outputs.pr_number }}/run-${{ github.run_number }}"
-          mkdir -p "$RUN_DIR"
 
-          for os in ubuntu-latest windows-latest macos-latest; do
-            for br in chromium firefox webkit; do
-              SRC="../all-results/vrt-results-${os}-${br}"
+          RUN_DIR="pr-${{ needs.check-files.outputs.pr_number }}/run-${{ github.run_number }}"
+          
+          for platform in ubuntu-latest windows-latest macos-latest; do
+            for browser in chromium firefox webkit; do
+              COMBO="${platform}-${browser}"
+              SRC="../all-results/vrt-results-${COMBO}"
               if [ -d "$SRC" ]; then
-                mkdir -p "$RUN_DIR/${os}-${br}"
-                cp -r "$SRC/comparison-results.json" "$RUN_DIR/${os}-${br}/" || true
-                cp -r "$SRC/screenshots-base" "$RUN_DIR/${os}-${br}/" || true
-                cp -r "$SRC/screenshots-pr"   "$RUN_DIR/${os}-${br}/" || true
-                cp -r "$SRC/screenshots-diff" "$RUN_DIR/${os}-${br}/" || true
-                cp -r "$SRC/screenshots-gifs" "$RUN_DIR/${os}-${br}/" || true
+                mkdir -p "$RUN_DIR/$COMBO"
+                cp -r "$SRC"/* "$RUN_DIR/$COMBO/" 2>/dev/null || true
               fi
             done
           done
 
           git add .
-          git commit -m "VRT images for PR #${{ needs.check-files.outputs.pr_number }} run #${{ github.run_number }}" || true
-          git push -u origin vrt-images
+          git commit -m "VRT assets for PR #${{ needs.check-files.outputs.pr_number }} run #${{ github.run_number }} (enhanced)" || echo "No changes"
+          git push origin vrt-images || git push -u origin vrt-images
 
-          echo "base_url=https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/vrt-images/${RUN_DIR}" >> "$GITHUB_OUTPUT"
+          echo "base_url=https://raw.githubusercontent.com/${{ github.repository }}/vrt-images/$RUN_DIR" >> $GITHUB_OUTPUT
 
-      - name: Update comment (results)
-        if: steps.analyze.outputs.completed != '0'
+      - name: Post comprehensive results (success)
+        if: steps.analyze.outputs.failed == 'false' && steps.analyze.outputs.completed > 0
         uses: actions/github-script@v7
-        env:
-          COMMENT_ID: ${{ steps.cid.outputs.comment_id }}
-          REQUESTER:  ${{ needs.check-files.outputs.requester }}
-          IS_HUMAN:   ${{ needs.check-files.outputs.is_human }}
-          BASE_URL:   ${{ steps.upload_images.outputs.base_url }}
         with:
           script: |
             const fs = require('fs');
-            const analysis = JSON.parse(fs.readFileSync('merged-analysis.json','utf8'));
-            const name = process.env.IS_HUMAN === 'true' ? '@' + process.env.REQUESTER : process.env.REQUESTER;
+            const path = require('path');
+            
+            const analysis = JSON.parse(fs.readFileSync('merged-analysis.json', 'utf8'));
+            const username = '${{ needs.check-files.outputs.username }}';
+            const prNumber = ${{ needs.check-files.outputs.pr_number }};
+            const runId = context.runId;
+            const runNumber = ${{ github.run_number }};
+            const baseURL = '${{ steps.upload_assets.outputs.base_url }}';
 
-            const platforms = {
+            const platformNames = {
               'ubuntu-latest': '<img width="12" height="12" alt="Ubuntu Logo" src="https://github.com/user-attachments/assets/f61ac63e-1fc8-4577-9fb1-736d921b81a2" /> Ubuntu',
               'windows-latest': '<img width="12" height="12" alt="Windows Logo" src="https://github.com/user-attachments/assets/4da4c060-732a-4aaf-b080-6b8de0600c71" /> Windows',
-              'macos-latest': '<img width="12" height="12" alt="Apple Logo" src="https://github.com/user-attachments/assets/636ee068-b7a7-489d-a545-a616534900ed" /> Apple'
+              'macos-latest': '<img width="12" height="12" alt="Apple Logo" src="https://github.com/user-attachments/assets/636ee068-b7a7-489d-a545-a616534900ed"/> Apple'
             };
-            const browsers = { chromium:'Chrome', firefox:'Firefox', webkit:'WebKit' };
 
-            let body = '';
-            body += `## 🎬 ULTRA Visual Regression — FINAL CUT\n\n`;
-            body += `Requester: ${name}\n\n`;
-            body += `Combos finished: **${analysis.completedCombinations}/${analysis.totalCombinations}**\n\n`;
-            body += analysis.anyChanges ? '⚠️ Visual changes detected — see highlights below.\n\n' : '✅ No visual diffs found — ship it! 🛳️\n\n';
+            const browserNames = {
+              'chromium': 'Chrome',
+              'firefox': 'Firefox',
+              'webkit': 'WebKit'
+            };
 
-            body += '### 📊 Matrix Summary\n\n';
-            body += '| Platform | Browser | Changes | Details |\n|---|---|---|---|\n';
-            for (const [key, r] of Object.entries(analysis.allResults)) {
-              const parts = key.split('-'); const br = parts.pop(); const os = parts.join('-');
-              const status = r.changesDetected ? '⚠️ Changes' : '✅ No changes';
-              const link = `[View](#${key.replace(/[^a-z0-9]/gi,'')})`;
-              body += `| ${platforms[os]||os} | ${browsers[br]||br} | ${status} | ${link} |\n`;
+            let body = `## 🎬 ULTRA Visual Regression Test Results\n\n`;
+            body += `Hi @${username}! Tested across **9 combinations** (3 platforms × 3 browsers). `;
+            body += `**${analysis.completedCombinations}/${analysis.totalCombinations}** completed.\n\n`;
+
+            if (analysis.anyChanges) {
+              body += `⚠️ **Visual changes detected!** Expand sections below for details.\n\n`;
+            } else {
+              body += `✅ **No visual differences detected across all combinations!**\n\n`;
             }
-            body += '\n---\n\n';
 
-            for (const [key, r] of Object.entries(analysis.allResults)) {
-              const parts = key.split('-'); const br = parts.pop(); const os = parts.join('-');
-              const open = r.changesDetected ? ' open' : '';
-              body += `<details id="${key.replace(/[^a-z0-9]/gi,'')}"${open}>\n`;
-              body += `<summary><strong>${platforms[os]||os} + ${browsers[br]||br}</strong></summary>\n\n`;
-              if (!r.results?.length) { body += `_No results._\n\n</details>\n\n`; continue; }
-              for (const item of r.results) {
-                if (item.skipped) continue;
-                const nice = item.name.replace('.png','').replace(/-/g,' ').replace(/\b\w/g, m => m.toUpperCase());
-                body += `#### ${nice}\n\n`;
-                if (item.hasDiff) {
-                  body += `<table><tr><th>Base</th><th>PR</th><th>Diff</th></tr><tr>`;
-                  body += `<td><img src="${process.env.BASE_URL}/${key}/screenshots-base/${item.name}" width="280"/></td>`;
-                  body += `<td><img src="${process.env.BASE_URL}/${key}/screenshots-pr/${item.name}" width="280"/></td>`;
-                  body += `<td><img src="${process.env.BASE_URL}/${key}/screenshots-diff/${item.name}" width="280"/></td>`;
-                  body += `</tr></table>\n\n`;
-                  const gif = item.name.replace('.png','.gif');
-                  body += `<img src="${process.env.BASE_URL}/${key}/screenshots-gifs/${gif}" width="840"/>\n\n`;
-                  body += `Diff: ${item.diffPercentage}% (${item.diffPixels} px)\n\n`;
-                } else {
-                  body += `✅ Pixel-perfect match.\n\n`;
+            body += `### 📊 Test Matrix Summary\n\n`;
+            body += `| Platform | Browser | Changes | Details |\n`;
+            body += `|----------|---------|---------|----------|\n`;
+            
+            for (const [key, result] of Object.entries(analysis.allResults)) {
+              const parts = key.split('-');
+              const browser = parts[parts.length - 1];
+              const platform = parts.slice(0, -1).join('-');
+              const platformIcon = platformNames[platform] || platform;
+              const browserName = browserNames[browser] || browser;
+              const status = result.changesDetected ? '⚠️ Changes' : '✅ No changes';
+              const link = `[View](#${key.replace(/\./g, '').replace(/-/g, '')})`;
+              body += `| ${platformIcon} | ${browserName} | ${status} | ${link} |\n`;
+            }
+
+            body += `\n---\n\n`;
+
+            for (const [key, result] of Object.entries(analysis.allResults)) {
+              const parts = key.split('-');
+              const browser = parts[parts.length - 1];
+              const platform = parts.slice(0, -1).join('-');
+              const platformIcon = platformNames[platform] || platform;
+              const browserName = browserNames[browser] || browser;
+              
+              const isOpen = result.changesDetected ? ' open' : '';
+              body += `<details${isOpen} id="${key.replace(/\./g, '').replace(/-/g, '')}">\n`;
+              body += `<summary><strong>${platformIcon} + ${browserName}</strong></summary>\n\n`;
+
+              if (!result.results || result.results.length === 0) {
+                body += `_No results available._\n\n`;
+              } else {
+                for (const r of result.results) {
+                  if (r.skipped) continue;
+                  
+                  const display = r.name.replace('.png','').replace(/-/g,' ').replace(/\b\w/g, l => l.toUpperCase());
+                  body += `#### ${display}\n\n`;
+                  
+                  if (r.hasDiff) {
+                    body += `<table><tr><th>Base</th><th>PR</th><th>Diff</th></tr><tr>`;
+                    body += `<td><img src="${baseURL}/${key}/screenshots-base/${r.name}" width="280"/></td>`;
+                    body += `<td><img src="${baseURL}/${key}/screenshots-pr/${r.name}" width="280"/></td>`;
+                    body += `<td><img src="${baseURL}/${key}/screenshots-diff/${r.name}" width="280"/></td>`;
+                    body += `</tr></table>\n\n`;
+                    
+                    body += `**Diff:** ${r.diffPercentage}% (${r.diffPixels} pixels)\n\n`;
+                    
+                    const gifName = r.name.replace('.png', '.gif');
+                    body += `<img src="${baseURL}/${key}/screenshots-gifs/${gifName}" width="840"/>\n\n`;
+                  } else {
+                    body += `✅ _No pixel difference detected._\n\n`;
+                  }
                 }
               }
+              
               body += `</details>\n\n`;
             }
 
+            body += `---\n\n`;
+            body += `### 📦 Resources\n\n`;
+            body += `- [Workflow Run](https://github.com/${{ github.repository }}/actions/runs/${runId})\n`;
+            body += `- [Download Artifacts](https://github.com/${{ github.repository }}/actions/runs/${runId}#artifacts)\n`;
+            body += `- [Baselines (vrt-baselines branch)](https://github.com/${{ github.repository }}/tree/vrt-baselines/pr-${prNumber})\n`;
+            body += `- [Images (vrt-images branch)](https://github.com/${{ github.repository }}/tree/vrt-images/pr-${prNumber}/run-${runNumber})\n`;
+
             await github.rest.issues.updateComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              comment_id: Number(process.env.COMMENT_ID),
+              comment_id: ${{ steps.load_comment.outputs.comment_id }},
               body
             });
 
-      - name: Update comment (matrix produced no results)
-        if: steps.analyze.outputs.completed == '0'
+      - name: Post failure message (no results)
+        if: steps.analyze.outputs.failed == 'true' || steps.analyze.outputs.completed == 0
         uses: actions/github-script@v7
-        env:
-          COMMENT_ID: ${{ steps.cid.outputs.comment_id }}
-          REQUESTER:  ${{ needs.check-files.outputs.requester }}
-          IS_HUMAN:   ${{ needs.check-files.outputs.is_human }}
         with:
           script: |
-            const name = process.env.IS_HUMAN === 'true' ? '@' + process.env.REQUESTER : process.env.REQUESTER;
+            const username = '${{ needs.check-files.outputs.username }}';
             await github.rest.issues.updateComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              comment_id: Number(process.env.COMMENT_ID),
-              body:
-                `## ❌ VRT matrix fizzled (0/9 produced results)\n\n` +
-                `Sorry ${name}! Likely a Playwright install or server boot hiccup. Re-run with \`/vrt\` or push again — I’m ready to zoom.`
+              comment_id: ${{ steps.load_comment.outputs.comment_id }},
+              body: `## ❌ ULTRA Visual Regression Testing - Tests Failed\n\n` +
+                    `Hi @${username}! The test matrix failed to produce any results.\n\n` +
+                    `**All 9 test combinations failed.** This could be due to:\n` +
+                    `- Playwright installation issues\n` +
+                    `- Server startup failures\n` +
+                    `- Screenshot capture errors\n` +
+                    `- Build artifacts not being properly created\n\n` +
+                    `Please check the logs for details:\n` +
+                    `[View Workflow Run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})\n\n` +
+                    `_The build phase completed successfully, but the test execution failed._`
             });
 
+  # ============================================================
+  # JOB 5: HANDLE BUILD FAILURE
+  # ============================================================
   handle-build-failure:
     needs: [check-files, build]
     if: |
@@ -879,29 +979,35 @@ jobs:
       needs.check-files.outputs.should_run == 'true' &&
       needs.build.result == 'failure'
     runs-on: ubuntu-latest
+    
     steps:
-      - name: Download comment id
+      - name: Download comment ID
         uses: actions/download-artifact@v4
         with:
           name: vrt-comment-id
         continue-on-error: true
 
-      - name: Post build failure comment
+      - name: Post build failure
         if: success()
         uses: actions/github-script@v7
         with:
           script: |
             try {
               const fs = require('fs');
-              const id = fs.readFileSync('comment_id.txt', 'utf8').trim();
+              const commentId = fs.readFileSync('comment_id.txt', 'utf8').trim();
+              const username = '${{ needs.check-files.outputs.username }}';
+              
               await github.rest.issues.updateComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                comment_id: Number(id),
-                body:
-                  `## ❌ ULTRA Visual Regression Testing — Build Failed\n\n` +
-                  `Build failed; VRT did not run. Please check the workflow logs.`
+                comment_id: commentId,
+                body: `## ❌ ULTRA Visual Regression Testing - Build Failed\n\n` +
+                      `Hi @${username}! The build phase failed, so visual regression testing could not run.\n\n` +
+                      `**Build errors occurred** - unable to create build artifacts for base and/or PR.\n\n` +
+                      `Please check the logs for details:\n` +
+                      `[View Workflow Run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})\n\n` +
+                      `_Common issues: webpack errors, dependency problems, or syntax errors in the code._`
               });
-            } catch (e) {
-              core.warning('Could not update comment: ' + e.message);
+            } catch (error) {
+              console.log('Could not update comment:', error.message);
             }

@@ -4,6 +4,17 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`ed1bde4`](https://github.com/OmniBlocks/scratch-gui/commit/ed1bde4a580c438c1e5f735f39a47d15c92cc82a) - 2025-11-28 20:08:58 -0500
+
+**feat: (ci) Add new stale pr checker**
+
+Uses github models api to generate personalized AI stale responses hehe
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`2b67192`](https://github.com/OmniBlocks/scratch-gui/commit/2b671928dbfeb74b1b6a44fcfd2de001078fd8d4) - 2025-11-28 09:21:47 -0500
 
 **fix: remove production from test builds**

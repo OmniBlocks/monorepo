@@ -903,7 +903,7 @@ jobs:
 
             // 🎯 SMART PRIORITIZATION LOGIC STARTS HERE 🎯
             const priorityCombos = ['windows-latest-chromium', 'ubuntu-latest-chromium'];
-            const priorityTests = ['editor-initial.png', 'gui-initial.png', 'blocks-tab-active.png'];
+            const priorityTests = ['editor-initial.png', 'blocks-workspace.png', 'player-view.png'];
 
             for (const [key, result] of Object.entries(analysis.allResults)) {
               const parts = key.split('-');

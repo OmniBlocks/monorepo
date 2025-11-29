@@ -1,29 +1,26 @@
-name: Summarize issues and comments (two-pass) + Duplicate Detection
+name: Issue Assistant (Summary + Categorizer) 🤖
 
-# --------------------------------------------------------------------------
-# Trigger on new issues OR new comments that mention the bot
-# --------------------------------------------------------------------------
+# Triggers: same as your summary, plus edited (from categorizer)
 on:
   issues:
-    types: [opened]
+    types: [opened, edited]
   issue_comment:
     types: [created]
 
-# --------------------------------------------------------------------------
-
+permissions:
+  issues: write
+  contents: read
+  pull-requests: read
+  repository-projects: read
+  models: read
 
 jobs:
-  summary:
-    # Run for new issues OR for comments that mention @github-actions
+  summary-and-categorize:
+    # Same guard as your summary job so we only respond to issues or @mentions
     if: >-
       ${{ github.event_name == 'issues' ||
          (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@github-actions')) }}
     runs-on: ubuntu-latest
-    permissions:
-      issues: write          # edit / comment / label
-      contents: read         # checkout repo
-      pull-requests: read    # list recent PRs (new)
-      repository-projects: read   # read the GitHub Project board (new)
 
     steps:
       # ------------------------------------------------------
@@ -127,7 +124,7 @@ jobs:
       # ------------------------------------------------------
       - name: Fetch all open issues for duplicate detection (full context)
         id: fetch-issues-full
-        if: ${{ github.event_name == 'issues' }}  # Only run on new issues
+        if: ${{ github.event_name == 'issues' }}  # Only run on issue events
         continue-on-error: true
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -154,7 +151,7 @@ jobs:
       # ------------------------------------------------------
       - name: Fetch open issue titles for duplicate detection (titles only)
         id: fetch-issues-titles
-        if: ${{ github.event_name == 'issues' }}  # Only run on new issues
+        if: ${{ github.event_name == 'issues' }}  # Only run on issue events
         continue-on-error: true
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -178,7 +175,6 @@ jobs:
 
       # ------------------------------------------------------
       # 🆕 DUPLICATE DETECTION - Exact match (100% confidence)
-      # This runs BEFORE AI detection and uses pure code comparison
       # ------------------------------------------------------
       - name: Check for exact duplicates (100% confidence)
         id: check-exact-duplicates
@@ -191,38 +187,26 @@ jobs:
           ISSUES_JSON: ${{ steps.fetch-issues-full.outputs.open_issues_full }}
         run: |
           set -e
-          
-          # Write JSON to temp file (handles special chars safely)
           printf '%s' "$ISSUES_JSON" | jq -c '.' > /tmp/issues.jsonl
-          
-          # Default to no match
           FOUND_MATCH=false
           MATCH_NUM=""
-          
-          # Read from file and compare each issue
           while IFS= read -r issue; do
             ISSUE_NUM=$(jq -r '.number' <<< "$issue")
             ISSUE_TITLE=$(jq -r '.title' <<< "$issue")
             ISSUE_BODY=$(jq -r '.body' <<< "$issue")
-            
-            # Exact string comparison (title AND body must match)
             if [ "$ISSUE_TITLE" = "$NEW_TITLE" ] && [ "$ISSUE_BODY" = "$NEW_BODY" ]; then
               FOUND_MATCH=true
               MATCH_NUM=$ISSUE_NUM
               break
             fi
           done < /tmp/issues.jsonl
-          
-          # Set outputs
           if [ "$FOUND_MATCH" = "true" ]; then
             echo "exact_match=true" >> "$GITHUB_OUTPUT"
             echo "match_number=$MATCH_NUM" >> "$GITHUB_OUTPUT"
           else
             echo "exact_match=false" >> "$GITHUB_OUTPUT"
           fi
-      # ------------------------------------------------------
-      # 🆕 DUPLICATE DETECTION - Comment on exact duplicate (100% confidence)
-      # ------------------------------------------------------
+
       - name: Comment and close exact duplicate (100% confidence)
         if: ${{ github.event_name == 'issues' && steps.check-exact-duplicates.outputs.exact_match == 'true' }}
         env:
@@ -230,12 +214,9 @@ jobs:
           ISSUE_NUMBER: ${{ github.event.issue.number }}
           DUPLICATE_NUMBER: ${{ steps.check-exact-duplicates.outputs.match_number }}
         run: |
-          # Get info about the duplicate
           DUPLICATE_INFO=$(gh issue view "$DUPLICATE_NUMBER" --json title,url)
           DUPLICATE_TITLE=$(echo "$DUPLICATE_INFO" | jq -r '.title')
           DUPLICATE_URL=$(echo "$DUPLICATE_INFO" | jq -r '.url')
-          
-          # Post comment with 100% confidence
           COMMENT="👋 Hi, @${{ github.event.issue.user.login }}! 
 
           🤖 **Exact Duplicate Detected (100% Confidence)**
@@ -246,16 +227,12 @@ jobs:
           The title and description match exactly. Please continue the discussion in the existing issue instead.
 
           This issue will be closed automatically to avoid fragmentation. Thank you! 😁"
-          
           echo "$COMMENT" | gh issue comment "$ISSUE_NUMBER" --body-file -
-          
-          # Add label and close
           gh issue edit "$ISSUE_NUMBER" --add-label "duplicate"
           gh issue close "$ISSUE_NUMBER" --reason "not_planned"
 
       # ------------------------------------------------------
-      # 🆕 DUPLICATE DETECTION - AI-based semantic matching (Tier 1: Full context)
-      # Only runs if NO exact duplicate was found
+      # 🧠 AI duplicate detection (full + titles)
       # ------------------------------------------------------
       - name: Check for duplicate issues using AI (full context)
         id: check-duplicates-full
@@ -286,10 +263,6 @@ jobs:
             If NO duplicates are found, respond with EXACTLY: "NONE"
             Do not include any other text, explanations, or formatting.
 
-      # ------------------------------------------------------
-      # 🆕 DUPLICATE DETECTION - AI-based semantic matching (Tier 2: Titles only)
-      # Only runs if full context AI check didn't succeed
-      # ------------------------------------------------------
       - name: Check for duplicate issues using AI (titles only)
         id: check-duplicates-titles
         if: ${{ github.event_name == 'issues' && steps.check-exact-duplicates.outputs.exact_match != 'true' && steps.check-duplicates-full.outcome != 'success' && steps.fetch-issues-titles.outputs.success == 'true' }}
@@ -320,10 +293,6 @@ jobs:
             If NO duplicates are found, respond with EXACTLY: "NONE"
             Do not include any other text, explanations, or formatting.
 
-      # ------------------------------------------------------
-      # 🆕 DUPLICATE DETECTION - Comment if duplicates found (High confidence)
-      # Now validates response isn't empty or "NONE"
-      # ------------------------------------------------------
       - name: Comment on potential duplicates (high confidence)
         if: ${{ github.event_name == 'issues' && steps.check-exact-duplicates.outputs.exact_match != 'true' && steps.check-duplicates-full.outcome == 'success' && steps.check-duplicates-full.outputs.response != '' && steps.check-duplicates-full.outputs.response != 'NONE' }}
         env:
@@ -331,37 +300,21 @@ jobs:
           ISSUE_NUMBER: ${{ github.event.issue.number }}
         run: |
           DUPLICATES="${{ steps.check-duplicates-full.outputs.response }}"
-          
-          # Additional validation - check if response is valid
           if [ -z "$DUPLICATES" ] || [ "$DUPLICATES" = "NONE" ]; then
-            echo "No duplicates found or invalid response"
             exit 0
           fi
-          
-          # Build the comment with links to potential duplicates
           COMMENT="👋 Hi @${{ github.event.issue.user.login }}! I've detected potential duplicate issues with **high confidence** (analyzed full issue content):\n\n"
-          
           IFS=',' read -ra ISSUE_NUMS <<< "$DUPLICATES"
           for NUM in "${ISSUE_NUMS[@]}"; do
-            # Trim whitespace
             NUM=$(echo "$NUM" | xargs)
             ISSUE_INFO=$(gh issue view "$NUM" --json title,url)
             TITLE=$(echo "$ISSUE_INFO" | jq -r '.title')
-            URL=$(echo "$ISSUE_INFO" | jq -r '.url')
             COMMENT="${COMMENT}- #${NUM}: ${TITLE}\n"
           done
-          
           COMMENT="${COMMENT}\nPlease check if any of these existing issues describe the same problem. If so, feel free to add your comments there instead! 🙂"
-          
           echo -e "$COMMENT" | gh issue comment "$ISSUE_NUMBER" --body-file -
-          
-          # Add a "possible-duplicate" label
           gh issue edit "$ISSUE_NUMBER" --add-label "possible-duplicate"
 
-      # ------------------------------------------------------
-      # 🆕 DUPLICATE DETECTION - Comment if duplicates found (Lower confidence)
-      # Now validates response isn't empty or "NONE"
-      # ------------------------------------------------------
       - name: Comment on potential duplicates (lower confidence)
         if: ${{ github.event_name == 'issues' && steps.check-exact-duplicates.outputs.exact_match != 'true' && steps.check-duplicates-full.outcome != 'success' && steps.check-duplicates-titles.outcome == 'success' && steps.check-duplicates-titles.outputs.response != '' && steps.check-duplicates-titles.outputs.response != 'NONE' }}
         env:
@@ -369,31 +322,19 @@ jobs:
           ISSUE_NUMBER: ${{ github.event.issue.number }}
         run: |
           DUPLICATES="${{ steps.check-duplicates-titles.outputs.response }}"
-          
-          # Additional validation - check if response is valid
           if [ -z "$DUPLICATES" ] || [ "$DUPLICATES" = "NONE" ]; then
-            echo "No duplicates found or invalid response"
             exit 0
           fi
-          
-          # Build the comment with links to potential duplicates
           COMMENT="👋 Hi @${{ github.event.issue.user.login }}! I've detected potential duplicate issues with **lower confidence** (analyzed titles only due to context limitations):\n\n"
-          
           IFS=',' read -ra ISSUE_NUMS <<< "$DUPLICATES"
           for NUM in "${ISSUE_NUMS[@]}"; do
-            # Trim whitespace
             NUM=$(echo "$NUM" | xargs)
             ISSUE_INFO=$(gh issue view "$NUM" --json title,url)
             TITLE=$(echo "$ISSUE_INFO" | jq -r '.title')
-            URL=$(echo "$ISSUE_INFO" | jq -r '.url')
             COMMENT="${COMMENT}- #${NUM}: ${TITLE}\n"
           done
-          
           COMMENT="${COMMENT}\nPlease check if any of these existing issues describe the same problem. Since this analysis was based on titles only, please review the full content of these issues to confirm if they're truly duplicates. If so, feel free to add your comments there instead! 🙂"
-          
           echo -e "$COMMENT" | gh issue comment "$ISSUE_NUMBER" --body-file -
-          
-          # Add a "possible-duplicate" label
           gh issue edit "$ISSUE_NUMBER" --add-label "possible-duplicate"
 
       # ------------------------------------------------------
@@ -477,16 +418,11 @@ jobs:
             printf "%s\n" "$FILES" |
             while IFS= read -r f && [ $COUNT -lt 6 ]; do
               COUNT=$((COUNT + 1))
-      
-              # ---- NEW: strip **all** whitespace (leading & trailing) ----
-              f_clean=$(echo "$f" | xargs)   # xargs removes leading/trailing blanks
-      
-              # ---- (optional) keep your existing security guard ----
+              f_clean=$(echo "$f" | xargs)
               if [[ "$f_clean" == *"../"* ]] || [[ "$f_clean" == /* ]]; then
                 echo "[SECURITY BLOCKED: Invalid path '$f_clean']" >> "$OUTFILE"
                 continue
               fi
-      
               ABS_PATH="$REPO_ROOT/$f_clean"
               echo "----- FILE: $f_clean -----" >> "$OUTFILE"
               if [ -f "$ABS_PATH" ]; then
@@ -594,7 +530,6 @@ jobs:
 
             Respond with either the single line "[SECURITY]" OR the full summary text. No extra metadata required.
 
-
       # ------------------------------------------------------
       # 🆕 Parse keywords and messages from AI response
       # ------------------------------------------------------
@@ -602,17 +537,11 @@ jobs:
         id: parse-response
         run: |
           set -euo pipefail
-          
-          # Read the response using a here-document to avoid quoting issues
           read -r -d '' RESPONSE << 'EOF' || true
           ${{ steps.final.outputs.response }}
           EOF
-          
-          # Initialize outputs
           KEYWORD=""
           MESSAGE=""
-          
-          # Check for each keyword and extract it
           if echo "$RESPONSE" | grep -q '\[SPAM\]'; then
             KEYWORD="SPAM"
             MESSAGE=$(echo "$RESPONSE" | sed 's/\[SPAM\]//g' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
@@ -626,11 +555,8 @@ jobs:
             KEYWORD="LOCK"
             MESSAGE=$(echo "$RESPONSE" | sed 's/\[LOCK\]//g' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
           else
-            # No keyword found, treat entire response as message
             MESSAGE="$RESPONSE"
           fi
-          
-          # Set outputs
           echo "keyword=$KEYWORD" >> "$GITHUB_OUTPUT"
           {
             echo "message<<EOF"
@@ -643,134 +569,126 @@ jobs:
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
 
-
       # ------------------------------------------------------
       # 9️⃣ If the AI flagged a security issue → hide, label, close, lock
+      # (original exact-equality handler kept)
       # ------------------------------------------------------
-      - name: Handle spam keyword
-        if: ${{ steps.parse-response.outputs.keyword == 'SPAM' }}
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ISSUE_NUMBER: ${{ github.event.issue.number }}
-        run: |
-          # Replace the public body with a safe placeholder
-          gh issue edit "$ISSUE_NUMBER" \
-            --title "SPAM" \
-            --body "🗯️ This issue appears to be spam. To prevent clutter, we have hidden its contents. Please don't spam, as it can result in a ban from GitHub."
-      
-          # Read AI message safely using heredoc
-          read -r -d '' AI_MESSAGE << 'EOF' || true
-          ${{ steps.parse-response.outputs.message }}
-          EOF
-      
-          # Post a comment with the reporting instructions and AI reasoning
-          COMMENT="Hi, ${{ github.event.issue.user.login }}! 💬
-      
-          Please refrain from spamming inside GitHub issues. GitHub issues are designed to help people, answer questions, gather input from the community, and improve everything for us as a whole. 
-          Spamming goes against that in many ways. If you keep spamming, it might even result in a ban from GitHub itself, locking access to your account in the entirety of GitHub.
-          
-          Please remember to be civil and don't spam!"
-          
-          # Add AI reasoning if provided
-          if [ -n "$AI_MESSAGE" ]; then
-            COMMENT="$COMMENT
-      
-          **AI Analysis:** $AI_MESSAGE"
-          fi
-          
-          echo "$COMMENT" | gh issue comment "$ISSUE_NUMBER" --body-file -
-      
-          # Close & lock the issue
-          gh issue close "$ISSUE_NUMBER"
-          gh issue lock "$ISSUE_NUMBER"
-      
-      - name: Handle security keyword
+      - name: Handle security keyword (exact equality)
         if: ${{ steps.final.outputs.response == '[SECURITY]' }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
         run: |
-          # Replace the public body with a safe placeholder
           gh issue edit "$ISSUE_NUMBER" \
             --title "Redacted Security Vulnerability" \
             --body "🔒 This issue appears to describe a security vulnerability. To protect our users, we've hidden the original content. Please submit security issues through our private reporting channel."
-      
-          # Post a comment with the reporting instructions
+
           gh issue comment "$ISSUE_NUMBER" --body "Thank you for your security report! 🔐
-      
+
           To protect our users, we handle security vulnerabilities through private reports. Please submit your findings [here](https://github.com/OmniBlocks/scratch-gui/security/advisories/new)
-      
+
           We'll investigate promptly and appreciate your responsible disclosure!
           
           ----
           
           
           🤖 **This issue has been closed as our systems detect it could be a security vulnerability. Do you think this is a mistake? One of the maintainers, such as @supervoidcoder or @ampelectrecuted will review this soon.**"
-          # Add a "security" label
           gh issue edit "$ISSUE_NUMBER" --add-label "security"
-      
-          # Close & lock the issue
           gh issue close "$ISSUE_NUMBER"
           gh issue lock "$ISSUE_NUMBER"
+
+      # Bonus add: also handle if [SECURITY] appears anywhere (no prompt changes, just extra guard)
+      - name: Handle security keyword (appears anywhere)
+        if: ${{ contains(steps.parse-response.outputs.full_response, '[SECURITY]') && steps.final.outputs.response != '[SECURITY]' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          gh issue edit "$ISSUE_NUMBER" \
+            --title "Redacted Security Vulnerability" \
+            --body "🔒 This issue appears to describe a security vulnerability. To protect our users, we've hidden the original content. Please submit security issues through our private reporting channel."
+          gh issue comment "$ISSUE_NUMBER" --body "Thank you for your security report! 🔐
+
+          To protect our users, we handle security vulnerabilities through private reports. Please submit your findings [here](https://github.com/OmniBlocks/scratch-gui/security/advisories/new)
+
+          We'll investigate promptly and appreciate your responsible disclosure!"
+          gh issue edit "$ISSUE_NUMBER" --add-label "security"
+          gh issue close "$ISSUE_NUMBER"
+          gh issue lock "$ISSUE_NUMBER"
+
+      - name: Handle spam keyword
+        if: ${{ steps.parse-response.outputs.keyword == 'SPAM' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          gh issue edit "$ISSUE_NUMBER" \
+            --title "SPAM" \
+            --body "🗯️ This issue appears to be spam. To prevent clutter, we have hidden its contents. Please don't spam, as it can result in a ban from GitHub."
+          read -r -d '' AI_MESSAGE << 'EOF' || true
+          ${{ steps.parse-response.outputs.message }}
+          EOF
+          COMMENT="Hi, ${{ github.event.issue.user.login }}! 💬
+
+          Please refrain from spamming inside GitHub issues. GitHub issues are designed to help people, answer questions, gather input from the community, and improve everything for us as a whole. 
+          Spamming goes against that in many ways. If you keep spamming, it might even result in a ban from GitHub itself, locking access to your account in the entirety of GitHub.
           
+          Please remember to be civil and don't spam!"
+          if [ -n "$AI_MESSAGE" ]; then
+            COMMENT="$COMMENT
+
+          **AI Analysis:** $AI_MESSAGE"
+          fi
+          echo "$COMMENT" | gh issue comment "$ISSUE_NUMBER" --body-file -
+          gh issue close "$ISSUE_NUMBER"
+          gh issue lock "$ISSUE_NUMBER"
+
       - name: Handle close keyword
         if: ${{ steps.parse-response.outputs.keyword == 'CLOSE' }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
         run: |
-          # Read AI message safely using heredoc
           read -r -d '' AI_MESSAGE << 'EOF' || true
           ${{ steps.parse-response.outputs.message }}
           EOF
-          
-          # Post a comment with AI reasoning if provided
           if [ -n "$AI_MESSAGE" ]; then
             echo "🤖 **Issue Closed**
-      
+
           $AI_MESSAGE" | gh issue comment "$ISSUE_NUMBER" --body-file -
           fi
-          
           gh issue close "$ISSUE_NUMBER"
-      
+
       - name: Handle lock keyword
         if: ${{ steps.parse-response.outputs.keyword == 'LOCK' }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
         run: |
-          # Read AI message safely using heredoc
           read -r -d '' AI_MESSAGE << 'EOF' || true
           ${{ steps.parse-response.outputs.message }}
           EOF
-          
-          # Post a comment with AI reasoning if provided
           if [ -n "$AI_MESSAGE" ]; then
             echo "🔒 **Issue Locked**
-      
+
           $AI_MESSAGE" | gh issue comment "$ISSUE_NUMBER" --body-file -
           fi
-          
           gh issue lock "$ISSUE_NUMBER"
-      
+
       - name: Handle lockdown keyword
         if: ${{ steps.parse-response.outputs.keyword == 'LOCKDOWN' }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
         run: |
-          # Read AI message safely using heredoc
           read -r -d '' AI_MESSAGE << 'EOF' || true
           ${{ steps.parse-response.outputs.message }}
           EOF
-          
-          # Post a comment with AI reasoning if provided
           if [ -n "$AI_MESSAGE" ]; then
             echo "🔒 **Issue Closed and Locked**
-      
+
           $AI_MESSAGE" | gh issue comment "$ISSUE_NUMBER" --body-file -
           fi
-          
           gh issue close "$ISSUE_NUMBER"
           gh issue lock "$ISSUE_NUMBER"
 
@@ -778,10 +696,74 @@ jobs:
       # 🔟 Normal path – post the AI‑generated summary as a comment
       # ------------------------------------------------------
       - name: Comment with AI summary
-        if: ${{ steps.parse-response.outputs.keyword == '' }}
+        if: ${{ steps.parse-response.outputs.keyword == '' && !contains(steps.parse-response.outputs.full_response, '[SECURITY]') }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
         run: |
           echo "${{ steps.parse-response.outputs.full_response }}" > response.txt
           gh issue comment "$ISSUE_NUMBER" --body-file response.txt
+
+      # =================================================================
+      # 🏷️ Added: Categorizer (kept EXACT prompt; just appended here)
+      # Runs only for issue events (opened/edited), not on comments
+      # =================================================================
+      - name: Analyze issue with AI (categorizer)
+        if: ${{ github.event_name == 'issues' }}
+        id: ai-categorize
+        uses: actions/ai-inference@v1
+        with:
+          prompt: |
+            Categorize this GitHub issue using one or more of these labels: 
+            bug, question, enhancement, documentation, dependencies, 
+            help-wanted, High-Priority, Medium-Priority, Low-Priority, 
+            invalid, javascript, wontfix.
+            Always add at least one priority one.
+            Respond ONLY with comma-separated label names. No explanations. No extra characters.
+            
+            Issue Title: ${{ github.event.issue.title }}
+            Issue Body: |
+              ${{ github.event.issue.body }}
+
+      - name: Clean AI output
+        if: ${{ github.event_name == 'issues' }}
+        id: clean-label
+        run: |
+          RAW_OUTPUT='${{ steps.ai-categorize.outputs.response }}'
+          CLEANED=$(echo "$RAW_OUTPUT" | \
+            tr '[:upper:]' '[:lower:]' | \
+            sed -e 's/["'\''$$$$]//g' -e 's/[, ]\+/, /g' -e 's/^[ ,]*//' -e 's/[ ,]*$//')
+          echo "raw_labels=$CLEANED" >> $GITHUB_OUTPUT
+
+      - name: Apply validated labels
+        if: ${{ github.event_name == 'issues' }}
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const validLabels = new Set([
+              'bug', 'question', 'enhancement', 'documentation', 
+              'dependencies', 'help-wanted', 'High-Priority', 
+              'Medium-Priority', 'Low-Priority', 'invalid', 
+              'javascript', 'wontfix'
+            ]);
+            const labelMap = new Map();
+            validLabels.forEach(label => labelMap.set(label.toLowerCase(), label));
+            const rawLabels = '${{ steps.clean-label.outputs.raw_labels }}';
+            const receivedLabels = new Set();
+            const finalLabels = new Set();
+            rawLabels.split(/\s*,\s*/).forEach(label => {
+              const normalized = label.trim().toLowerCase();
+              if (labelMap.has(normalized) && !receivedLabels.has(normalized)) {
+                finalLabels.add(labelMap.get(normalized));
+                receivedLabels.add(normalized);
+              }
+            });
+            if (finalLabels.size === 0) {
+              finalLabels.add('question');
+            }
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: ${{ github.event.issue.number }},
+              labels: Array.from(finalLabels)
+            });

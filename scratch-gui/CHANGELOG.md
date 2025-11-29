@@ -4,6 +4,17 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`aade3fe`](https://github.com/OmniBlocks/scratch-gui/commit/aade3feb7ad1065c67c1c14da8f01e655ae594f2) - 2025-11-28 20:38:01 -0500
+
+**Merge pull request #422 from OmniBlocks/issue-assistant**
+
+AI issue assistant
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`ed1bde4`](https://github.com/OmniBlocks/scratch-gui/commit/ed1bde4a580c438c1e5f735f39a47d15c92cc82a) - 2025-11-28 20:08:58 -0500
 
 **feat: (ci) Add new stale pr checker**

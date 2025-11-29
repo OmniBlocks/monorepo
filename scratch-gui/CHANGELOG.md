@@ -4,6 +4,17 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`bec9446`](https://github.com/OmniBlocks/scratch-gui/commit/bec94465ff501f2d52bd5e013150b68650620a94) - 2025-11-29 13:40:58 -0500
+
+**Merge pull request #426 from OmniBlocks/smart-vrt-prioritiziation**
+
+feat: (ci) add smart prioritization to visual regression
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`aade3fe`](https://github.com/OmniBlocks/scratch-gui/commit/aade3feb7ad1065c67c1c14da8f01e655ae594f2) - 2025-11-28 20:38:01 -0500
 
 **Merge pull request #422 from OmniBlocks/issue-assistant**

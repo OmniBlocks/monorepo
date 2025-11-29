@@ -901,6 +901,10 @@ jobs:
 
             body += `\n---\n\n`;
 
+            // 🎯 SMART PRIORITIZATION LOGIC STARTS HERE 🎯
+            const priorityCombos = ['windows-latest-chromium', 'ubuntu-latest-chromium'];
+            const priorityTests = ['editor-initial.png', 'gui-initial.png', 'blocks-tab-active.png'];
+
             for (const [key, result] of Object.entries(analysis.allResults)) {
               const parts = key.split('-');
               const browser = parts[parts.length - 1];
@@ -908,7 +912,15 @@ jobs:
               const platformIcon = platformNames[platform] || platform;
               const browserName = browserNames[browser] || browser;
               
-              const isOpen = result.changesDetected ? ' open' : '';
+              // Check if this combo is priority AND has priority test changes
+              const isPriorityCombination = priorityCombos.some(combo => key.includes(combo));
+              const hasPriorityChanges = result.results?.some(r => 
+                r.hasDiff && priorityTests.includes(r.name)
+              );
+              
+              // Only auto-expand if BOTH conditions are met
+              const isOpen = (isPriorityCombination && hasPriorityChanges) ? ' open' : '';
+              
               body += `<details${isOpen} id="${key.replace(/\./g, '').replace(/-/g, '')}">\n`;
               body += `<summary><strong>${platformIcon} + ${browserName}</strong></summary>\n\n`;
 

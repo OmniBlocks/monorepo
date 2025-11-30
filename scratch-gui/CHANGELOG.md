@@ -4,6 +4,15 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`b5ab6ec`](https://github.com/OmniBlocks/scratch-gui/commit/b5ab6ecfa011ab9f6984200d6af20963384d5f7b) - 2025-11-29 21:40:25 -0500
+
+**feat: (ci) update leaderboard so it doesn't show 0 file changes for some users**
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`3af7df6`](https://github.com/OmniBlocks/scratch-gui/commit/3af7df67b4e2e3c9e2f64d76dc7d2e6aa761f037) - 2025-11-29 21:39:42 -0500
 
 **feat: (github) Create .mailmap so Graison's commits are merged with his old username**

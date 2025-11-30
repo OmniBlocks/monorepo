@@ -4,6 +4,18 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`3af7df6`](https://github.com/OmniBlocks/scratch-gui/commit/3af7df67b4e2e3c9e2f64d76dc7d2e6aa761f037) - 2025-11-29 21:39:42 -0500
+
+**feat: (github) Create .mailmap so Graison's commits are merged with his old username**
+
+# Merge GvYoutube commits into Graison P
+Graison P <119984713+Graison-P@users.noreply.github.com> GvYoutube <119984713+Gvyt@users.noreply.github.com>
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`bec9446`](https://github.com/OmniBlocks/scratch-gui/commit/bec94465ff501f2d52bd5e013150b68650620a94) - 2025-11-29 13:40:58 -0500
 
 **Merge pull request #426 from OmniBlocks/smart-vrt-prioritiziation**

@@ -348,10 +348,14 @@ $fade-out-distance: 15px;
     bottom: 0;
     right: 0;
     margin: 20px;
-    margin-right: 40px;
-    transform: scale(1.2);
-    height: 2.5rem;
-    overflow: hidden;
+    margin-right: 32px;
     display: flex;
+}
+.nanoscript-container.not-nano {
     gap: $space;
+    margin-right: 30px;
+}
+.button-row {
+    background: $ui-white;
+    border-radius: $form-radius;
 }

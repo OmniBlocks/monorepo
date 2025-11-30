@@ -4,6 +4,15 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`9c83221`](https://github.com/OmniBlocks/scratch-gui/commit/9c832214596e1e2078c213b6cf52f9aa4bde2903) - 2025-11-29 22:23:36 -0500
+
+**Update leaderboard.yml**
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`b93ed1c`](https://github.com/OmniBlocks/scratch-gui/commit/b93ed1c556fcbcef5bb811a305afe5438b310100) - 2025-11-29 22:09:45 -0500
 
 **Update leaderboard.yml**

@@ -28,62 +28,57 @@ jobs:
           python3 << 'PYTHON_SCRIPT'
           import subprocess
           import re
+          from collections import defaultdict
           
           def get_stats(since_flag=""):
-              """Get contributor stats using shortstat (more reliable!)"""
-              cmd = ["git", "shortlog", "-sne", "--all"]
+              """Get stats by collecting all commits first, then filtering"""
+              
+              # Get ALL commits with author name and SHA
+              cmd = ["git", "log", "--format=%aN|%H", "--all"]
               if since_flag:
                   cmd.append(f"--since={since_flag}")
               
               result = subprocess.run(cmd, capture_output=True, text=True)
               
-              stats = []
+              # Group commits by author name
+              author_commits = defaultdict(list)
               for line in result.stdout.strip().split('\n'):
-                  if not line.strip():
+                  if not line.strip() or '|' not in line:
                       continue
-                  
-                  # Parse: "  123  Name <email>"
-                  match = re.match(r'\s*(\d+)\s+(.+?)\s+<(.+?)>', line)
-                  if not match:
-                      continue
-                  
-                  commits = int(match.group(1))
-                  name = match.group(2)
-                  email = match.group(3)
-                  
+                  name, sha = line.split('|', 1)
+                  author_commits[name].append(sha)
+              
+              # Calculate stats for each author
+              stats = []
+              for name, shas in sorted(author_commits.items(), key=lambda x: len(x[1]), reverse=True):
+                  commits = len(shas)
                   print(f"Processing {name} ({commits} commits)...")
-                  
-                  # Use shortstat instead of numstat - it's much more reliable!
-                  # Match by NAME not email to avoid regex escaping issues
-                  shortstat_cmd = ["git", "log", f"--author={name}", "--shortstat", "--pretty=format:"]
-                  if since_flag:
-                      shortstat_cmd.append(f"--since={since_flag}")
-                  
-                  shortstat_result = subprocess.run(shortstat_cmd, capture_output=True, text=True)
                   
                   additions = 0
                   deletions = 0
                   
-                  # Parse shortstat output like: " 1 file changed, 20 insertions(+), 10 deletions(-)"
-                  for stat_line in shortstat_result.stdout.strip().split('\n'):
-                      if 'insertion' in stat_line or 'deletion' in stat_line:
-                          # Extract numbers before "insertion" and "deletion"
-                          ins_match = re.search(r'(\d+) insertion', stat_line)
-                          del_match = re.search(r'(\d+) deletion', stat_line)
-                          
-                          if ins_match:
-                              additions += int(ins_match.group(1))
-                          if del_match:
-                              deletions += int(del_match.group(1))
+                  # Get stats for each commit SHA directly
+                  for sha in shas:
+                      numstat_cmd = ["git", "show", "--numstat", "--format=", sha]
+                      numstat = subprocess.run(numstat_cmd, capture_output=True, text=True)
+                      
+                      for stat_line in numstat.stdout.strip().split('\n'):
+                          if not stat_line.strip():
+                              continue
+                          parts = stat_line.split()
+                          if len(parts) >= 2:
+                              # Skip binary files (marked with -)
+                              if parts[0] == '-' or parts[1] == '-':
+                                  continue
+                              if parts[0].isdigit() and parts[1].isdigit():
+                                  additions += int(parts[0])
+                                  deletions += int(parts[1])
                   
                   total = additions + deletions
-                  
                   print(f"  → {name}: +{additions} -{deletions} (total: {total})")
                   
                   stats.append((commits, name, additions, deletions, total))
               
-              # Sort by commits
-              stats.sort(reverse=True, key=lambda x: x[0])
               return stats
           
           # Generate all time periods

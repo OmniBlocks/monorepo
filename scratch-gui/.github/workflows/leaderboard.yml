@@ -33,7 +33,12 @@ jobs:
           DATE_30_DAYS_AGO=$(date -d '30 days ago' +%Y-%m-%d 2>/dev/null || date -v-30d +%Y-%m-%d)
           DATE_1_YEAR_AGO=$(date -d '1 year ago' +%Y-%m-%d 2>/dev/null || date -v-1y +%Y-%m-%d)
           
-          # Function to calculate stats - simpler and more reliable approach
+          # Function to escape regex special characters in author names
+          escape_regex() {
+            echo "$1" | sed 's/[[\.*^$/]/\\&/g'
+          }
+          
+          # Function to calculate stats - properly handles bot names with brackets
           calculate_stats() {
             local time_filter="$1"
             local output_file="$2"
@@ -48,12 +53,15 @@ jobs:
               
               echo "  Processing $author..." >&2
               
-              # Count commits
-              commits=$(git log $time_filter --author="$author" --oneline | wc -l)
+              # Escape special regex characters for git log --author
+              escaped_author=$(escape_regex "$author")
               
-              # Get additions and deletions using shortstat (most reliable for all commit types)
-              stats=$(git log $time_filter --author="$author" --pretty=tformat: --numstat 2>/dev/null | \
-                gawk '
+              # Count commits - use ^$ anchors to match exact author name
+              commits=$(git log $time_filter --author="^${escaped_author}$" --oneline | wc -l)
+              
+              # Get additions and deletions using numstat
+              stats=$(git log $time_filter --author="^${escaped_author}$" --pretty=tformat: --numstat 2>/dev/null | \
+                awk '
                   BEGIN { add=0; del=0 }
                   # Skip binary files and submodule changes
                   $1 == "-" || $2 == "-" { next }
@@ -69,27 +77,6 @@ jobs:
               
               additions=$(echo "$stats" | awk '{print $1}')
               deletions=$(echo "$stats" | awk '{print $2}')
-              
-              # If numstat gave us zeros, try shortstat as fallback (catches merge commits better)
-              if [ "$additions" = "0" ] && [ "$deletions" = "0" ]; then
-                shortstat=$(git log $time_filter --author="$author" --shortstat 2>/dev/null | \
-                  gawk '
-                    BEGIN { add=0; del=0 }
-                    /insertion/ { 
-                      match($0, /([0-9]+) insertion/, arr)
-                      add += arr[1]
-                    }
-                    /deletion/ {
-                      match($0, /([0-9]+) deletion/, arr)  
-                      del += arr[1]
-                    }
-                    END {
-                      printf "%d %d", add, del
-                    }
-                  ')
-                additions=$(echo "$shortstat" | awk '{print $1}')
-                deletions=$(echo "$shortstat" | awk '{print $2}')
-              fi
               
               # Ensure we have valid numbers
               additions=${additions:-0}
@@ -223,7 +210,7 @@ jobs:
           total_contributors=$(git log --format='%aN' | sort -u | wc -l)
           
           # Calculate totals using the same reliable method
-          total_stats=$(git log --pretty=tformat: --numstat | gawk '
+          total_stats=$(git log --pretty=tformat: --numstat | awk '
             BEGIN { add=0; del=0 }
             $1 == "-" || $2 == "-" { next }
             $1 ~ /^[0-9]+$/ && $2 ~ /^[0-9]+$/ { 

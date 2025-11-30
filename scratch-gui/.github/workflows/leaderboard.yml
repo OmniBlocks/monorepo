@@ -29,13 +29,8 @@ jobs:
           import subprocess
           import re
           
-          def escape_for_git_regex(text):
-              """Escape special regex characters for git log --author"""
-              # Escape all regex special characters
-              return re.escape(text)
-          
           def get_stats(since_flag=""):
-              """Get contributor stats for a time period"""
+              """Get contributor stats using shortstat (more reliable!)"""
               cmd = ["git", "shortlog", "-sne", "--all"]
               if since_flag:
                   cmd.append(f"--since={since_flag}")
@@ -58,23 +53,28 @@ jobs:
                   
                   print(f"Processing {name} ({commits} commits)...")
                   
-                  # ESCAPE THE EMAIL for regex matching!
-                  escaped_email = escape_for_git_regex(email)
-                  
-                  # Get additions/deletions with properly escaped email
-                  numstat_cmd = ["git", "log", f"--author={escaped_email}", "--pretty=tformat:", "--numstat"]
+                  # Use shortstat instead of numstat - it's much more reliable!
+                  # Match by NAME not email to avoid regex escaping issues
+                  shortstat_cmd = ["git", "log", f"--author={name}", "--shortstat", "--pretty=format:"]
                   if since_flag:
-                      numstat_cmd.append(f"--since={since_flag}")
+                      shortstat_cmd.append(f"--since={since_flag}")
                   
-                  numstat = subprocess.run(numstat_cmd, capture_output=True, text=True)
+                  shortstat_result = subprocess.run(shortstat_cmd, capture_output=True, text=True)
                   
                   additions = 0
                   deletions = 0
-                  for stat_line in numstat.stdout.strip().split('\n'):
-                      parts = stat_line.split()
-                      if len(parts) >= 2 and parts[0].isdigit() and parts[1].isdigit():
-                          additions += int(parts[0])
-                          deletions += int(parts[1])
+                  
+                  # Parse shortstat output like: " 1 file changed, 20 insertions(+), 10 deletions(-)"
+                  for stat_line in shortstat_result.stdout.strip().split('\n'):
+                      if 'insertion' in stat_line or 'deletion' in stat_line:
+                          # Extract numbers before "insertion" and "deletion"
+                          ins_match = re.search(r'(\d+) insertion', stat_line)
+                          del_match = re.search(r'(\d+) deletion', stat_line)
+                          
+                          if ins_match:
+                              additions += int(ins_match.group(1))
+                          if del_match:
+                              deletions += int(del_match.group(1))
                   
                   total = additions + deletions
                   

@@ -22,114 +22,100 @@ jobs:
       - name: Generate Contributor Statistics
         id: stats
         run: |
-          echo "Generating contributor statistics..."
+          echo "🔥 Generating contributor statistics..."
           
           # Create temporary files for data
           ALL_TIME_STATS=$(mktemp)
           LAST_30_DAYS_STATS=$(mktemp)
           LAST_YEAR_STATS=$(mktemp)
-          AUTHOR_COMMITS_ALL=$(mktemp)
-          AUTHOR_COMMITS_30=$(mktemp)
-          AUTHOR_COMMITS_YEAR=$(mktemp)
           
           # Get date 30 days ago and 1 year ago
           DATE_30_DAYS_AGO=$(date -d '30 days ago' +%Y-%m-%d 2>/dev/null || date -v-30d +%Y-%m-%d)
           DATE_1_YEAR_AGO=$(date -d '1 year ago' +%Y-%m-%d 2>/dev/null || date -v-1y +%Y-%m-%d)
           
-          # Function to calculate stats using git diff for accurate counts
+          # Function to calculate stats - simpler and more reliable approach
           calculate_stats() {
-            local commits_file=$1
-            local output_file=$2
+            local time_filter="$1"
+            local output_file="$2"
             
-            # Get unique authors and their commit counts
-            cat "$commits_file" | awk -F'|' '{print $1}' | sort | uniq -c | sort -rn | while read count author; do
-              author=$(echo "$author" | xargs) # trim whitespace
+            echo "📊 Processing commits with filter: $time_filter" >&2
+            
+            # Get all unique authors
+            authors=$(git log $time_filter --format='%aN' | sort -u)
+            
+            while IFS= read -r author; do
               if [ -z "$author" ]; then continue; fi
               
-              echo "Processing $author..." >&2
+              echo "  Processing $author..." >&2
               
-              # Get all commit SHAs for this author from the commits file
-              shas=$(grep "^${author}|" "$commits_file" | awk -F'|' '{print $2}')
+              # Count commits
+              commits=$(git log $time_filter --author="$author" --oneline | wc -l)
               
-              additions=0
-              deletions=0
-              
-              # For each commit, use git show to get accurate diff stats
-              for sha in $shas; do
-                # Use git show with --numstat and handle binary files better
-                # First try with --numstat, then fallback to --shortstat for merge commits
-                stats=$(git show --numstat --format="" "$sha" 2>/dev/null | awk '
+              # Get additions and deletions using shortstat (most reliable for all commit types)
+              stats=$(git log $time_filter --author="$author" --pretty=tformat: --numstat 2>/dev/null | \
+                gawk '
                   BEGIN { add=0; del=0 }
-                  # Handle regular files (numeric values)
-                  $1 != "-" && $2 != "-" && $1 ~ /^[0-9]+$/ && $2 ~ /^[0-9]+$/ { add+=$1; del+=$2 }
-                  # Handle binary files (marked with -)
-                  $1 == "-" && $2 == "-" { add+=1; del+=1 }
-                  END { print add" "del }
+                  # Skip binary files and submodule changes
+                  $1 == "-" || $2 == "-" { next }
+                  # Sum up numeric values
+                  $1 ~ /^[0-9]+$/ && $2 ~ /^[0-9]+$/ { 
+                    add += $1
+                    del += $2
+                  }
+                  END { 
+                    printf "%d %d", add, del
+                  }
                 ')
-                
-                # If numstat didn't work (e.g., merge commit), try shortstat
-                if [ -z "$stats" ] || [ "$stats" = "0 0" ]; then
-                  shortstat=$(git show --shortstat --format="" "$sha" 2>/dev/null | grep -o '[0-9]\+ insertion\|[0-9]\+ deletion' | awk '
-                    /insertion/ { add+=$1 }
-                    /deletion/ { del+=$1 }
-                    END { print (add?add:0)" "(del?del:0) }
-                  ')
-                  if [ -n "$shortstat" ] && [ "$shortstat" != "0 0" ]; then
-                    stats="$shortstat"
-                  fi
-                fi
-                
-                # If still no stats, try diff-tree for merge commits
-                if [ -z "$stats" ] || [ "$stats" = "0 0" ]; then
-                  difftree=$(git diff-tree --numstat "$sha" 2>/dev/null | awk '
-                    BEGIN { add=0; del=0 }
-                    $1 != "-" && $2 != "-" && $1 ~ /^[0-9]+$/ && $2 ~ /^[0-9]+$/ { add+=$1; del+=$2 }
-                    $1 == "-" && $2 == "-" { add+=1; del+=1 }
-                    END { print add" "del }
-                  ')
-                  if [ -n "$difftree" ] && [ "$difftree" != "0 0" ]; then
-                    stats="$difftree"
-                  fi
-                fi
-                
-                if [ -n "$stats" ] && [ "$stats" != "0 0" ]; then
-                  add=$(echo "$stats" | awk '{print $1}')
-                  del=$(echo "$stats" | awk '{print $2}')
-                  additions=$((additions + add))
-                  deletions=$((deletions + del))
-                fi
-              done
               
+              additions=$(echo "$stats" | awk '{print $1}')
+              deletions=$(echo "$stats" | awk '{print $2}')
+              
+              # If numstat gave us zeros, try shortstat as fallback (catches merge commits better)
+              if [ "$additions" = "0" ] && [ "$deletions" = "0" ]; then
+                shortstat=$(git log $time_filter --author="$author" --shortstat 2>/dev/null | \
+                  gawk '
+                    BEGIN { add=0; del=0 }
+                    /insertion/ { 
+                      match($0, /([0-9]+) insertion/, arr)
+                      add += arr[1]
+                    }
+                    /deletion/ {
+                      match($0, /([0-9]+) deletion/, arr)  
+                      del += arr[1]
+                    }
+                    END {
+                      printf "%d %d", add, del
+                    }
+                  ')
+                additions=$(echo "$shortstat" | awk '{print $1}')
+                deletions=$(echo "$shortstat" | awk '{print $2}')
+              fi
+              
+              # Ensure we have valid numbers
+              additions=${additions:-0}
+              deletions=${deletions:-0}
               total_changes=$((additions + deletions))
-              echo "$count|$author|$additions|$deletions|$total_changes"
-            done > "$output_file"
+              
+              echo "$commits|$author|$additions|$deletions|$total_changes"
+            done <<< "$authors" | sort -t'|' -k5 -rn > "$output_file"
           }
           
-          # Get all commits with author and SHA (all time)
-          git log --format='%aN|%H' > "$AUTHOR_COMMITS_ALL"
-          
-          # Get commits from last 30 days
-          git log --since="$DATE_30_DAYS_AGO" --format='%aN|%H' > "$AUTHOR_COMMITS_30"
-          
-          # Get commits from last year
-          git log --since="$DATE_1_YEAR_AGO" --format='%aN|%H' > "$AUTHOR_COMMITS_YEAR"
-          
           # Calculate stats for each time period
-          echo "Calculating all-time statistics..." >&2
-          calculate_stats "$AUTHOR_COMMITS_ALL" "$ALL_TIME_STATS"
+          echo "🏆 Calculating all-time statistics..." >&2
+          calculate_stats "" "$ALL_TIME_STATS"
           
-          echo "Calculating last 30 days statistics..." >&2
-          calculate_stats "$AUTHOR_COMMITS_30" "$LAST_30_DAYS_STATS"
+          echo "📅 Calculating last year statistics..." >&2
+          calculate_stats "--since='$DATE_1_YEAR_AGO'" "$LAST_YEAR_STATS"
           
-          echo "Calculating last year statistics..." >&2
-          calculate_stats "$AUTHOR_COMMITS_YEAR" "$LAST_YEAR_STATS"
+          echo "🔥 Calculating last 30 days statistics..." >&2
+          calculate_stats "--since='$DATE_30_DAYS_AGO'" "$LAST_30_DAYS_STATS"
           
           # Store file paths
           echo "all_time_stats=$ALL_TIME_STATS" >> $GITHUB_OUTPUT
           echo "last_30_days_stats=$LAST_30_DAYS_STATS" >> $GITHUB_OUTPUT
           echo "last_year_stats=$LAST_YEAR_STATS" >> $GITHUB_OUTPUT
           
-          echo "Statistics generation complete!" >&2
+          echo "✨ Statistics generation complete!" >&2
       
       - name: Format Leaderboard
         id: format
@@ -232,18 +218,22 @@ jobs:
           
           EOF
           
-          # Add repository summary using git show for accurate counts
+          # Add repository summary
           total_commits=$(git rev-list --count HEAD)
           total_contributors=$(git log --format='%aN' | sort -u | wc -l)
           
-          # Calculate total additions/deletions accurately
-          echo "Calculating repository totals..."
-          total_stats=$(git log --format='%H' | while read sha; do
-            git show --numstat --format="" "$sha" 2>/dev/null | awk '
-              $1 != "-" && $2 != "-" { add+=$1; del+=$2 }
-              END { print add" "del }
-            '
-          done | awk '{add+=$1; del+=$2} END {print add" "del}')
+          # Calculate totals using the same reliable method
+          total_stats=$(git log --pretty=tformat: --numstat | gawk '
+            BEGIN { add=0; del=0 }
+            $1 == "-" || $2 == "-" { next }
+            $1 ~ /^[0-9]+$/ && $2 ~ /^[0-9]+$/ { 
+              add += $1
+              del += $2
+            }
+            END { 
+              printf "%d %d", add, del
+            }
+          ')
           
           total_additions=$(echo "$total_stats" | awk '{print $1}')
           total_deletions=$(echo "$total_stats" | awk '{print $2}')
@@ -278,12 +268,3 @@ jobs:
             --repo ${{ github.repository }}
           
           echo "✅ Leaderboard updated successfully!"
-      
-      - name: Comment on Success
-        if: success()
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          gh issue comment 275 \
-            --body "🤖 Leaderboard updated automatically on $(date -u +"%Y-%m-%d %H:%M:%S UTC")" \
-            --repo ${{ github.repository }}

@@ -435,23 +435,6 @@ const GUIComponent = props => {
                                             className={styles.buttonRow}
                                             buttons={[
                                                 {
-                                                    handleClick: () => {},
-                                                    icon: codeIcon,
-                                                    isSelected: true,
-                                                    title: 'Block-based'
-                                                },
-                                                {
-                                                    handleClick: () => {},
-                                                    icon: nanoscriptIcon,
-                                                    isSelected: false,
-                                                    title: 'Text-based'
-                                                }
-                                            ]}
-                                        />
-                                        <ToggleButtons
-                                            className={styles.buttonRow}
-                                            buttons={[
-                                                {
                                                     handleClick: () => {window.blocklyWorkspace.zoomCenter(1)},
                                                     isSelected: false,
                                                     children: '+'
@@ -465,6 +448,23 @@ const GUIComponent = props => {
                                                     handleClick: () => {window.blocklyWorkspace.setScale(0.675)},
                                                     isSelected: false,
                                                     children: '='
+                                                }
+                                            ]}
+                                        />
+                                        <ToggleButtons
+                                            className={styles.buttonRow}
+                                            buttons={[
+                                                {
+                                                    handleClick: () => {},
+                                                    icon: codeIcon,
+                                                    isSelected: true,
+                                                    title: 'Block-based'
+                                                },
+                                                {
+                                                    handleClick: () => {},
+                                                    icon: nanoscriptIcon,
+                                                    isSelected: false,
+                                                    title: 'Text-based'
                                                 }
                                             ]}
                                         />

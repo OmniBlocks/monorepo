@@ -28,12 +28,14 @@ jobs:
           python3 << 'PYTHON_SCRIPT'
           import subprocess
           import re
-          from collections import defaultdict
-          from datetime import datetime, timedelta
+          
+          def escape_for_git_regex(text):
+              """Escape special regex characters for git log --author"""
+              # Escape all regex special characters
+              return re.escape(text)
           
           def get_stats(since_flag=""):
               """Get contributor stats for a time period"""
-              # Use git shortlog which respects .mailmap
               cmd = ["git", "shortlog", "-sne", "--all"]
               if since_flag:
                   cmd.append(f"--since={since_flag}")
@@ -54,8 +56,13 @@ jobs:
                   name = match.group(2)
                   email = match.group(3)
                   
-                  # Get additions/deletions for this author (by email for accuracy)
-                  numstat_cmd = ["git", "log", "--author=" + email, "--pretty=tformat:", "--numstat"]
+                  print(f"Processing {name} ({commits} commits)...")
+                  
+                  # ESCAPE THE EMAIL for regex matching!
+                  escaped_email = escape_for_git_regex(email)
+                  
+                  # Get additions/deletions with properly escaped email
+                  numstat_cmd = ["git", "log", f"--author={escaped_email}", "--pretty=tformat:", "--numstat"]
                   if since_flag:
                       numstat_cmd.append(f"--since={since_flag}")
                   
@@ -70,20 +77,23 @@ jobs:
                           deletions += int(parts[1])
                   
                   total = additions + deletions
+                  
+                  print(f"  → {name}: +{additions} -{deletions} (total: {total})")
+                  
                   stats.append((commits, name, additions, deletions, total))
               
-              # Sort by commits (already sorted, but just in case)
+              # Sort by commits
               stats.sort(reverse=True, key=lambda x: x[0])
               return stats
           
           # Generate all time periods
-          print("Generating all-time stats...")
+          print("🏆 Generating all-time stats...")
           all_time = get_stats()
           
-          print("Generating last year stats...")
+          print("\n📅 Generating last year stats...")
           last_year = get_stats("1 year ago")
           
-          print("Generating last 30 days stats...")
+          print("\n🔥 Generating last 30 days stats...")
           last_30 = get_stats("30 days ago")
           
           # Save to files
@@ -96,7 +106,7 @@ jobs:
           write_stats(last_year, "/tmp/last_year.txt")
           write_stats(last_30, "/tmp/last_30.txt")
           
-          print("Stats generation complete!")
+          print("\n✨ Stats generation complete!")
           PYTHON_SCRIPT
       
       - name: Format Leaderboard

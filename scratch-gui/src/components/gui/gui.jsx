@@ -179,6 +179,8 @@ const GUIComponent = props => {
         tabSelected: classNames(tabStyles.reactTabsTabSelected, styles.isSelected)
     };
 
+    const [isNano, setNano] = React.useState(false);
+
     const unconstrainedWidth = (
         UNCONSTRAINED_NON_STAGE_WIDTH +
         FIXED_WIDTH +
@@ -402,36 +404,33 @@ const GUIComponent = props => {
                                     </Tab>
                                 </TabList>
                                 <TabPanel className={tabClassNames.tabPanel}>
-                                    <Box className={styles.blocksWrapper}>
-                                        <Blocks
-                                            key={`${blocksId}/${theme.id}`}
-                                            canUseCloud={canUseCloud}
-                                            grow={1}
-                                            isVisible={blocksTabVisible}
-                                            options={{
-                                                media: `${basePath}static/${theme.getBlocksMediaFolder()}/`
-                                            }}
-                                            stageSize={stageSize}
-                                            onOpenCustomExtensionModal={onOpenCustomExtensionModal}
-                                            theme={theme}
-                                            vm={vm}
-                                        />
-                                    </Box>
-                                    <Box className={styles.extensionButtonContainer}>
-                                        <button
-                                            className={styles.extensionButton}
-                                            title={intl.formatMessage(messages.addExtension)}
-                                            onClick={onExtensionButtonClick}
-                                        >
-                                            <img
-                                                className={styles.extensionButtonIcon}
-                                                draggable={false}
-                                                src={addExtensionIcon}
-                                            />
-                                        </button>
-                                    </Box>
-                                    <div className={styles.nanoscriptContainer}>
-                                        <ToggleButtons
+                                    {isNano ? 'inspired by nanoscratch by A-MARIO-PLAYER (he got banned from scratch RIP) now lets get to coding (nanoscript is not implemented yet)' : <><Box className={styles.blocksWrapper}>
+                                            <Blocks
+                                                key={`${blocksId}/${theme.id}`}
+                                                canUseCloud={canUseCloud}
+                                                grow={1}
+                                                isVisible={blocksTabVisible}
+                                                options={{
+                                                    media: `${basePath}static/${theme.getBlocksMediaFolder()}/`
+                                                }}
+                                                stageSize={stageSize}
+                                                onOpenCustomExtensionModal={onOpenCustomExtensionModal}
+                                                theme={theme}
+                                                vm={vm} />
+                                        </Box><Box className={styles.extensionButtonContainer}>
+                                                <button
+                                                    className={styles.extensionButton}
+                                                    title={intl.formatMessage(messages.addExtension)}
+                                                    onClick={onExtensionButtonClick}
+                                                >
+                                                    <img
+                                                        className={styles.extensionButtonIcon}
+                                                        draggable={false}
+                                                        src={addExtensionIcon} />
+                                                </button>
+                                            </Box></>}
+                                    <div className={classNames(styles.nanoscriptContainer, !isNano && styles.notNano)}>
+                                        {!isNano && <ToggleButtons
                                             className={styles.buttonRow}
                                             buttons={[
                                                 {
@@ -450,20 +449,20 @@ const GUIComponent = props => {
                                                     children: '='
                                                 }
                                             ]}
-                                        />
+                                        />}
                                         <ToggleButtons
                                             className={styles.buttonRow}
                                             buttons={[
                                                 {
-                                                    handleClick: () => {},
+                                                    handleClick: () => setNano(false),
                                                     icon: codeIcon,
-                                                    isSelected: true,
+                                                    isSelected: !isNano,
                                                     title: 'Block-based'
                                                 },
                                                 {
-                                                    handleClick: () => {},
+                                                    handleClick: () => setNano(true),
                                                     icon: nanoscriptIcon,
-                                                    isSelected: false,
+                                                    isSelected: isNano,
                                                     title: 'Text-based'
                                                 }
                                             ]}

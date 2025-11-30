@@ -38,6 +38,8 @@ import TWFontsModal from '../../containers/tw-fonts-modal.jsx';
 import TWUnknownPlatformModal from '../../containers/tw-unknown-platform-modal.jsx';
 import TWInvalidProjectModal from '../../containers/tw-invalid-project-modal.jsx';
 
+import ToggleButtons from '../toggle-buttons/toggle-buttons.jsx';
+
 import {STAGE_SIZE_MODES, FIXED_WIDTH, UNCONSTRAINED_NON_STAGE_WIDTH} from '../../lib/layout-constants';
 import {resolveStageSize} from '../../lib/screen-utils';
 import {Theme} from '../../lib/themes';
@@ -49,6 +51,7 @@ import addExtensionIcon from './icon--extensions.svg';
 import codeIcon from '!../../lib/tw-recolor/build!./icon--code.svg';
 import costumesIcon from '!../../lib/tw-recolor/build!./icon--costumes.svg';
 import soundsIcon from '!../../lib/tw-recolor/build!./icon--sounds.svg';
+import nanoscriptIcon from '!../../lib/tw-recolor/build!./nanoscriptIcon.svg';
 import songsIcon from '!../../lib/tw-recolor/build!./icon--songs.svg';
 const messages = defineMessages({
     addExtension: {
@@ -427,6 +430,45 @@ const GUIComponent = props => {
                                             />
                                         </button>
                                     </Box>
+                                    <div className={styles.nanoscriptContainer}>
+                                        <ToggleButtons
+                                            className={styles.buttonRow}
+                                            buttons={[
+                                                {
+                                                    handleClick: () => {},
+                                                    icon: codeIcon,
+                                                    isSelected: true,
+                                                    title: 'Block-based'
+                                                },
+                                                {
+                                                    handleClick: () => {},
+                                                    icon: nanoscriptIcon,
+                                                    isSelected: false,
+                                                    title: 'Text-based'
+                                                }
+                                            ]}
+                                        />
+                                        <ToggleButtons
+                                            className={styles.buttonRow}
+                                            buttons={[
+                                                {
+                                                    handleClick: () => {window.blocklyWorkspace.zoomCenter(1)},
+                                                    isSelected: false,
+                                                    children: '+'
+                                                },
+                                                {
+                                                    handleClick: () => {window.blocklyWorkspace.zoomCenter(-1)},
+                                                    isSelected: false,
+                                                    children: '-'
+                                                },
+                                                {
+                                                    handleClick: () => {window.blocklyWorkspace.setScale(0.675)},
+                                                    isSelected: false,
+                                                    children: '='
+                                                }
+                                            ]}
+                                        />
+                                    </div>
                                     <Box className={styles.watermark}>
                                         <Watermark />
                                     </Box>

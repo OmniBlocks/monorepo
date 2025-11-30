@@ -25,12 +25,12 @@ const ToggleButtons = ({buttons, className, disabled}) => (
                 onClick={button.handleClick}
                 disabled={disabled}
             >
-                <TWRenderRecoloredImage
+                {button.children ?? <TWRenderRecoloredImage
                     src={button.icon}
                     aria-hidden="true"
                     className={button.iconClassName}
                     draggable={false}
-                />
+                /> }
             </button>
         ))}
     </div>

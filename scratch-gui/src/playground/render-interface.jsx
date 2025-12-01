@@ -49,7 +49,7 @@ import styles from './interface.css';
 
 if (process.env.NODE_ENV === 'production') {
 const isInvalidEmbed = window.parent !== window;
-    else {
+   } else {
 const isInvalidEmbed = false;
 }
 const handleClickAddonSettings = addonId => {

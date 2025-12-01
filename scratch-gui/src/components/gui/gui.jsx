@@ -38,8 +38,6 @@ import TWFontsModal from '../../containers/tw-fonts-modal.jsx';
 import TWUnknownPlatformModal from '../../containers/tw-unknown-platform-modal.jsx';
 import TWInvalidProjectModal from '../../containers/tw-invalid-project-modal.jsx';
 
-import ToggleButtons from '../toggle-buttons/toggle-buttons.jsx';
-
 import {STAGE_SIZE_MODES, FIXED_WIDTH, UNCONSTRAINED_NON_STAGE_WIDTH} from '../../lib/layout-constants';
 import {resolveStageSize} from '../../lib/screen-utils';
 import {Theme} from '../../lib/themes';
@@ -51,7 +49,6 @@ import addExtensionIcon from './icon--extensions.svg';
 import codeIcon from '!../../lib/tw-recolor/build!./icon--code.svg';
 import costumesIcon from '!../../lib/tw-recolor/build!./icon--costumes.svg';
 import soundsIcon from '!../../lib/tw-recolor/build!./icon--sounds.svg';
-import nanoscriptIcon from '!../../lib/tw-recolor/build!./nanoscriptIcon.svg';
 import songsIcon from '!../../lib/tw-recolor/build!./icon--songs.svg';
 const messages = defineMessages({
     addExtension: {
@@ -404,70 +401,34 @@ const GUIComponent = props => {
                                     </Tab>
                                 </TabList>
                                 <TabPanel className={tabClassNames.tabPanel}>
-                                    {isNano ? 'inspired by nanoscratch by A-MARIO-PLAYER (he got banned from scratch RIP) now lets get to coding (nanoscript is not implemented yet)' : <><Box className={styles.blocksWrapper}>
-                                            <Blocks
-                                                key={`${blocksId}/${theme.id}`}
-                                                canUseCloud={canUseCloud}
-                                                grow={1}
-                                                isVisible={blocksTabVisible}
-                                                options={{
-                                                    media: `${basePath}static/${theme.getBlocksMediaFolder()}/`
-                                                }}
-                                                stageSize={stageSize}
-                                                onOpenCustomExtensionModal={onOpenCustomExtensionModal}
-                                                theme={theme}
-                                                vm={vm} />
-                                        </Box><Box className={styles.extensionButtonContainer}>
-                                                <button
-                                                    className={styles.extensionButton}
-                                                    title={intl.formatMessage(messages.addExtension)}
-                                                    onClick={onExtensionButtonClick}
-                                                >
-                                                    <img
-                                                        className={styles.extensionButtonIcon}
-                                                        draggable={false}
-                                                        src={addExtensionIcon} />
-                                                </button>
-                                            </Box></>}
-                                    <div className={classNames(styles.nanoscriptContainer, !isNano && styles.notNano)}>
-                                        {!isNano && <ToggleButtons
-                                            className={styles.buttonRow}
-                                            buttons={[
-                                                {
-                                                    handleClick: () => {window.blocklyWorkspace.zoomCenter(1)},
-                                                    isSelected: false,
-                                                    children: '+'
-                                                },
-                                                {
-                                                    handleClick: () => {window.blocklyWorkspace.zoomCenter(-1)},
-                                                    isSelected: false,
-                                                    children: '-'
-                                                },
-                                                {
-                                                    handleClick: () => {window.blocklyWorkspace.setScale(0.675)},
-                                                    isSelected: false,
-                                                    children: '='
-                                                }
-                                            ]}
-                                        />}
-                                        <ToggleButtons
-                                            className={styles.buttonRow}
-                                            buttons={[
-                                                {
-                                                    handleClick: () => setNano(false),
-                                                    icon: codeIcon,
-                                                    isSelected: !isNano,
-                                                    title: 'Block-based'
-                                                },
-                                                {
-                                                    handleClick: () => setNano(true),
-                                                    icon: nanoscriptIcon,
-                                                    isSelected: isNano,
-                                                    title: 'Text-based'
-                                                }
-                                            ]}
+                                    <Box className={styles.blocksWrapper}>
+                                        <Blocks
+                                            key={`${blocksId}/${theme.id}`}
+                                            canUseCloud={canUseCloud}
+                                            grow={1}
+                                            isVisible={blocksTabVisible}
+                                            options={{
+                                                media: `${basePath}static/${theme.getBlocksMediaFolder()}/`
+                                            }}
+                                            stageSize={stageSize}
+                                            onOpenCustomExtensionModal={onOpenCustomExtensionModal}
+                                            theme={theme}
+                                            vm={vm}
                                         />
-                                    </div>
+                                    </Box>
+                                    <Box className={styles.extensionButtonContainer}>
+                                        <button
+                                            className={styles.extensionButton}
+                                            title={intl.formatMessage(messages.addExtension)}
+                                            onClick={onExtensionButtonClick}
+                                        >
+                                            <img
+                                                className={styles.extensionButtonIcon}
+                                                draggable={false}
+                                                src={addExtensionIcon}
+                                            />
+                                        </button>
+                                    </Box>
                                     <Box className={styles.watermark}>
                                         <Watermark />
                                     </Box>

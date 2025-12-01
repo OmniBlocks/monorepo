@@ -4,6 +4,42 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`8f0280f`](https://github.com/OmniBlocks/scratch-gui/commit/8f0280f1e23344e2cb9b076ca9acbbe07323d703) - 2025-12-01 05:05:12 +0000
+
+**revert a few amp commits they're not bad at all i just moved them to a new branch so we don't have very incomplete stuff on main**
+
+*Author: supervoidcoder*
+
+---
+
+
+### Commit [`1db765b`](https://github.com/OmniBlocks/scratch-gui/commit/1db765b47172f6aa0fe8d933c6a6e7b0792d697f) - 2025-11-30 23:15:46 -0500
+
+**Rename .amazonq/rules.md to .amazonq/rules/rules.md**
+
+*Author: supervoidcoder*
+
+---
+
+
+### Commit [`17e4d9e`](https://github.com/OmniBlocks/scratch-gui/commit/17e4d9e4a027464decfb36fa2edde7e36bb1bb12) - 2025-11-30 23:05:17 -0500
+
+**Update and rename rules to rules.md**
+
+*Author: supervoidcoder*
+
+---
+
+
+### Commit [`a60ec93`](https://github.com/OmniBlocks/scratch-gui/commit/a60ec93ab5bee9b798ecf45b9e86a1ce8f5d54ab) - 2025-11-30 23:13:19 +0000
+
+**Merge branch 'main' of https://github.com/OmniBlocks/scratch-gui**
+
+*Author: ampelectrecuted*
+
+---
+
+
 ### Commit [`1e60612`](https://github.com/OmniBlocks/scratch-gui/commit/1e60612e1c85b4118f13470c76658636cfedde6c) - 2025-11-30 23:06:32 +0000
 
 **Merge branch 'main' of https://github.com/OmniBlocks/scratch-gui**

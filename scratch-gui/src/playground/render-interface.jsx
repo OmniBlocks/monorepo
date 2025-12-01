@@ -47,9 +47,11 @@ import {setProjectTitle} from '../reducers/project-title';
 
 import styles from './interface.css';
 
-// const isInvalidEmbed = window.parent !== window;
+if (process.env.NODE_ENV === 'production') {
+const isInvalidEmbed = window.parent !== window;
+    else {
 const isInvalidEmbed = false;
-
+}
 const handleClickAddonSettings = addonId => {
     // addonId might be a string of the addon to focus on, undefined, or an event (treat like undefined)
     const path = process.env.ROUTING_STYLE === 'wildcard' ? 'addons' : 'addons.html';

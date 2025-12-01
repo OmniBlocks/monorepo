@@ -4,6 +4,15 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`17e4d9e`](https://github.com/OmniBlocks/scratch-gui/commit/17e4d9e4a027464decfb36fa2edde7e36bb1bb12) - 2025-11-30 23:05:17 -0500
+
+**Update and rename rules to rules.md**
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`a60ec93`](https://github.com/OmniBlocks/scratch-gui/commit/a60ec93ab5bee9b798ecf45b9e86a1ce8f5d54ab) - 2025-11-30 23:13:19 +0000
 
 **Merge branch 'main' of https://github.com/OmniBlocks/scratch-gui**

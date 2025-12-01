@@ -12,7 +12,7 @@ const newsAppliesToUser = () => /android/i.test(navigator.userAgent);
 const NewsBody = () => (
     <div className={styles.text}>
         {/* eslint-disable-next-line max-len */}
-        {`The ${APP_NAME} app in the Google Play Store is illegitimate and outdated. If you were misled into installing it, leave a 1 star review, uninstall it, and report it. An official one will exist eventually.`}
+        {`The Google Play Store app calling itself TurboWarp is illegitimate and outdated. If you were misled into installing it, leave a 1 star review, uninstall it, and report it. An official one will exist eventually.`}
     </div>
 );
 

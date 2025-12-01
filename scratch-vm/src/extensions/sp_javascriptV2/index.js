@@ -195,8 +195,8 @@ class SPjavascriptV2 {
           hideFromPalette: true,
           arguments: {
             CODE: {
-              type: ArgumentType.CUSTOM, id: "SPjavascriptV2-codeEditor",
-              defaultValue: "needsInit-1@#4%^7*(0"
+              type: ArgumentType.STRING,
+              defaultValue: "alert(FOO)"
             }
           },
         },

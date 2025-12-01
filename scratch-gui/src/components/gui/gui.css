@@ -342,20 +342,3 @@ $fade-out-distance: 15px;
     /* overridden by JS; this will be used if the browser can't understand that color */
     background-color: white;
 }
-
-.nanoscript-container {
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    margin: 20px;
-    margin-right: 32px;
-    display: flex;
-}
-.nanoscript-container.not-nano {
-    gap: $space;
-    margin-right: 30px;
-}
-.button-row {
-    background: $ui-white;
-    border-radius: $form-radius;
-}

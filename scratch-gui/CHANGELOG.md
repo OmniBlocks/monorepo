@@ -4,6 +4,15 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`1db765b`](https://github.com/OmniBlocks/scratch-gui/commit/1db765b47172f6aa0fe8d933c6a6e7b0792d697f) - 2025-11-30 23:15:46 -0500
+
+**Rename .amazonq/rules.md to .amazonq/rules/rules.md**
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`17e4d9e`](https://github.com/OmniBlocks/scratch-gui/commit/17e4d9e4a027464decfb36fa2edde7e36bb1bb12) - 2025-11-30 23:05:17 -0500
 
 **Update and rename rules to rules.md**

@@ -24,6 +24,7 @@ jobs:
 
     steps:
       - name: Add eyes reaction
+        if: github.event.comment != null  # Only run if comment exists
         run: |
           gh api \
             --method POST \

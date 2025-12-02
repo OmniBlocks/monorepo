@@ -4,6 +4,17 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`c576af334`](https://github.com/OmniBlocks/scratch-gui/commit/c576af33425a96afa16f2c7b1f8441f434dba3f7) - 2025-12-02 18:58:26 -0500
+
+**Delete .github/workflows/node.js.yml**
+
+this is redundant because of test.yml which is infinitely better anyways
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`ee2b08168`](https://github.com/OmniBlocks/scratch-gui/commit/ee2b081688da27fd76655b7c12695d5a80b924a5) - 2025-12-02 18:56:57 -0500
 
 **feat: (ci) main branch monitor**

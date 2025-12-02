@@ -4,6 +4,15 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`ae0fcf831`](https://github.com/OmniBlocks/scratch-gui/commit/ae0fcf831edaa05c5dcf711cd2b88dd967b1e398) - 2025-12-02 21:47:11 +0000
+
+**replaced with ulti**
+
+*Author: ampelectrecuted*
+
+---
+
+
 ### Commit [`1a4c6cfd6`](https://github.com/OmniBlocks/scratch-gui/commit/1a4c6cfd6d7f693e0d1a9675a17340e77d9e4b66) - 2025-12-02 21:46:02 +0000
 
 **make stale checker work**

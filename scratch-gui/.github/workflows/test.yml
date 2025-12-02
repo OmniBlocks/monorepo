@@ -185,7 +185,7 @@ jobs:
           EOF
 
       # ============================================================
-      # SCREENSHOT PHASE (Existing)
+      # SCREENSHOT PHASE
       # ============================================================
 
       - name: Create screenshot test
@@ -400,87 +400,118 @@ jobs:
           });
           EOF
 
-      - name: Create recorded actions test
+      - name: Discover and generate custom recorded tests
         if: steps.build.outputs.build_status == 'success'
         run: |
-          # Create a sample recorded actions file
-          cat > recorded-actions.json << 'EOF'
-          [
-            { "type": "goto", "url": "/editor.html" },
-            { "type": "wait", "duration": 3000 },
-            { "type": "click", "selector": "[class*='react-tabs_react-tabs__tab']", "index": 1 },
-            { "type": "wait", "duration": 2000 },
-            { "type": "click", "selector": "[class*='react-tabs_react-tabs__tab']", "index": 2 },
-            { "type": "wait", "duration": 2000 },
-            { "type": "click", "selector": "[class*='react-tabs_react-tabs__tab']", "index": 0 },
-            { "type": "wait", "duration": 2000 }
-          ]
-          EOF
+          mkdir -p .github/chaos-tests
           
-          cat > recorded-actions-test.spec.js << 'EOF'
+          # Create default sample if no custom tests exist
+          if [ ! "$(ls -A .github/chaos-tests/*.json 2>/dev/null)" ]; then
+            echo "No custom tests found, creating sample..."
+            cat > .github/chaos-tests/sample-tabs.json << 'EOF'
+          {
+            "name": "Sample Tab Navigation",
+            "description": "Navigate through all tabs",
+            "actions": [
+              { "type": "goto", "url": "/editor.html" },
+              { "type": "wait", "duration": 3000 },
+              { "type": "click", "selector": "[class*='react-tabs_react-tabs__tab']", "index": 1 },
+              { "type": "wait", "duration": 2000 },
+              { "type": "click", "selector": "[class*='react-tabs_react-tabs__tab']", "index": 2 },
+              { "type": "wait", "duration": 2000 },
+              { "type": "click", "selector": "[class*='react-tabs_react-tabs__tab']", "index": 0 },
+              { "type": "wait", "duration": 2000 }
+            ]
+          }
+          EOF
+          fi
+          
+          # Generate test file for each custom test
+          cat > generate-custom-tests.js << 'GENEOF'
+          const fs = require('fs');
+          const path = require('path');
+          
+          const testDir = '.github/chaos-tests';
+          const testFiles = fs.readdirSync(testDir).filter(f => f.endsWith('.json'));
+          
+          let allTests = '';
+          
+          testFiles.forEach(file => {
+            const testConfig = JSON.parse(fs.readFileSync(path.join(testDir, file), 'utf8'));
+            const testName = testConfig.name || file.replace('.json', '');
+            const testSlug = file.replace('.json', '');
+            
+            allTests += `
+              test('${testName}', async ({ page }) => {
+                const consoleErrors = [];
+                const eventLog = [];
+                
+                page.on('console', msg => {
+                  if (msg.type() === 'error') {
+                    consoleErrors.push({
+                      text: msg.text(),
+                      timestamp: Date.now(),
+                      location: msg.location()
+                    });
+                  }
+                });
+                
+                const actions = ${JSON.stringify(testConfig.actions)};
+                
+                for (const action of actions) {
+                  eventLog.push({ ...action, executedAt: Date.now() });
+                  
+                  switch(action.type) {
+                    case 'goto':
+                      await page.goto(action.url);
+                      await page.waitForLoadState('networkidle');
+                      break;
+                    case 'click':
+                      if (action.index !== undefined) {
+                        await page.locator(action.selector).nth(action.index).click();
+                      } else {
+                        await page.locator(action.selector).click();
+                      }
+                      break;
+                    case 'type':
+                      await page.locator(action.selector).fill(action.text);
+                      break;
+                    case 'wait':
+                      await page.waitForTimeout(action.duration);
+                      break;
+                  }
+                }
+                
+                const results = {
+                  testName: '${testName}',
+                  testFile: '${file}',
+                  actionsExecuted: actions.length,
+                  errors: consoleErrors,
+                  events: eventLog
+                };
+                
+                fs.writeFileSync('recorded-${testSlug}-results.json', JSON.stringify(results, null, 2));
+                
+                if (consoleErrors.length > 0) {
+                  throw new Error(\`Found \${consoleErrors.length} console errors during ${testName}\`);
+                }
+              });
+            `;
+          });
+          
+          const fullTestFile = `
           const { test } = require('@playwright/test');
           const fs = require('fs');
 
           test.describe('🎬 Recorded Actions Playback', () => {
-            test('Execute Recorded User Actions', async ({ page }) => {
-              const consoleErrors = [];
-              const eventLog = [];
-              
-              // Listen for console ERRORS only
-              page.on('console', msg => {
-                if (msg.type() === 'error') {
-                  consoleErrors.push({
-                    text: msg.text(),
-                    timestamp: Date.now(),
-                    location: msg.location()
-                  });
-                }
-              });
-              
-              // Load recorded actions
-              const actions = JSON.parse(fs.readFileSync('recorded-actions.json', 'utf8'));
-              
-              for (const action of actions) {
-                eventLog.push({ ...action, executedAt: Date.now() });
-                
-                switch(action.type) {
-                  case 'goto':
-                    await page.goto(action.url);
-                    await page.waitForLoadState('networkidle');
-                    break;
-                  case 'click':
-                    if (action.index !== undefined) {
-                      await page.locator(action.selector).nth(action.index).click();
-                    } else {
-                      await page.locator(action.selector).click();
-                    }
-                    break;
-                  case 'type':
-                    await page.locator(action.selector).fill(action.text);
-                    break;
-                  case 'wait':
-                    await page.waitForTimeout(action.duration);
-                    break;
-                }
-              }
-              
-              // Save results
-              const results = {
-                testName: 'Recorded Actions',
-                actionsExecuted: actions.length,
-                errors: consoleErrors,
-                events: eventLog
-              };
-              
-              fs.writeFileSync('recorded-actions-results.json', JSON.stringify(results, null, 2));
-              
-              // Fail test if errors were found
-              if (consoleErrors.length > 0) {
-                throw new Error(`Found ${consoleErrors.length} console errors during recorded actions`);
-              }
-            });
+            ${allTests}
           });
-          EOF
+          `;
+          
+          fs.writeFileSync('recorded-actions-test.spec.js', fullTestFile);
+          GENEOF
+          
+          node generate-custom-tests.js
 
       - name: Run chaos tests with video recording
         id: chaos_tests
@@ -503,6 +534,75 @@ jobs:
           else
             echo "chaos_status=failed" >> $GITHUB_OUTPUT
             echo "errors_found=true" >> $GITHUB_OUTPUT
+          fi
+
+      # ============================================================
+      # 📹 UPLOAD VIDEOS TO BRANCH 📹
+      # ============================================================
+
+      - name: Checkout chaos-videos branch
+        if: always() && steps.chaos_tests.outputs.errors_found == 'true'
+        id: checkout_videos
+        uses: actions/checkout@v4
+        with:
+          ref: chaos-videos
+          path: chaos-videos
+          token: ${{ secrets.GITHUB_TOKEN }}
+          persist-credentials: true
+        continue-on-error: true
+
+      - name: Create chaos-videos branch if not exists
+        if: always() && steps.chaos_tests.outputs.errors_found == 'true' && steps.checkout_videos.outcome == 'failure'
+        run: |
+          mkdir -p chaos-videos
+          cd chaos-videos
+          git init -b chaos-videos
+          git remote add origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+          echo "# Chaos Test Videos" > README.md
+          echo "This branch stores video recordings from chaos testing." >> README.md
+          git add README.md
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git commit -m "Initialize chaos-videos branch"
+          git push origin chaos-videos
+          
+          # Re-checkout the branch we just created
+          cd ..
+          rm -rf chaos-videos
+          git clone -b chaos-videos https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git chaos-videos
+
+      - name: Upload videos to chaos-videos branch
+        if: always() && steps.chaos_tests.outputs.errors_found == 'true'
+        id: upload_to_branch
+        run: |
+          TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+          RUN_ID="${{ github.run_id }}"
+          VIDEO_DIR="${TIMESTAMP}-${RUN_ID}"
+          
+          mkdir -p "chaos-videos/${VIDEO_DIR}"
+          
+          # Find and copy all video files
+          find test-results -name "*.webm" -exec cp {} "chaos-videos/${VIDEO_DIR}/" \;
+          
+          # List uploaded videos
+          echo "Videos found:"
+          ls -lah "chaos-videos/${VIDEO_DIR}/" || echo "No videos found!"
+          
+          # Save video URLs for later use
+          echo "video_timestamp=${TIMESTAMP}" >> $GITHUB_OUTPUT
+          echo "video_dir=${VIDEO_DIR}" >> $GITHUB_OUTPUT
+          
+          cd chaos-videos
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add .
+          
+          if [ -n "$(git status --porcelain)" ]; then
+            git commit -m "Add chaos test videos from run ${RUN_ID}"
+            git push origin chaos-videos
+            echo "✅ Videos pushed to chaos-videos branch!"
+          else
+            echo "⚠️ No changes to commit"
           fi
 
       # ============================================================
@@ -546,33 +646,43 @@ jobs:
             fi
           fi
           
-          if [ -f recorded-actions-results.json ]; then
-            ERROR_COUNT=$(jq '.errors | length' recorded-actions-results.json)
-            if [ "$ERROR_COUNT" -gt 0 ]; then
-              FOUND_ERRORS=true
-              echo "recorded_has_errors=true" >> $GITHUB_OUTPUT
-              
-              ERRORS=$(jq -r '.errors[] | "[\(.timestamp)] \(.text)"' recorded-actions-results.json | head -20)
-              EVENTS=$(jq -r '.events | .[] | "[\(.executedAt)] \(.type): \(.selector // .url // "")"' recorded-actions-results.json)
-              
-              COMBINED="${ERRORS}\n\nActions executed:\n${EVENTS}"
-              TOKEN_ESTIMATE=$((${#COMBINED} / 4))
-              
-              echo "recorded_token_estimate=$TOKEN_ESTIMATE" >> $GITHUB_OUTPUT
-              
-              {
-                echo "recorded_errors<<EOF"
-                echo "$ERRORS"
-                echo "EOF"
-              } >> $GITHUB_OUTPUT
-              
-              {
-                echo "recorded_events<<EOF"
-                echo "$EVENTS"
-                echo "EOF"
-              } >> $GITHUB_OUTPUT
+          # Check for recorded action errors
+          for result_file in recorded-*-results.json; do
+            if [ -f "$result_file" ]; then
+              ERROR_COUNT=$(jq '.errors | length' "$result_file")
+              if [ "$ERROR_COUNT" -gt 0 ]; then
+                FOUND_ERRORS=true
+                TEST_NAME=$(jq -r '.testName' "$result_file")
+                TEST_FILE=$(jq -r '.testFile' "$result_file")
+                
+                echo "recorded_has_errors=true" >> $GITHUB_OUTPUT
+                echo "recorded_test_name=$TEST_NAME" >> $GITHUB_OUTPUT
+                echo "recorded_test_file=$TEST_FILE" >> $GITHUB_OUTPUT
+                
+                ERRORS=$(jq -r '.errors[] | "[\(.timestamp)] \(.text)"' "$result_file" | head -20)
+                EVENTS=$(jq -r '.events | .[] | "[\(.executedAt)] \(.type): \(.selector // .url // "")"' "$result_file")
+                
+                COMBINED="${ERRORS}\n\nActions executed:\n${EVENTS}"
+                TOKEN_ESTIMATE=$((${#COMBINED} / 4))
+                
+                echo "recorded_token_estimate=$TOKEN_ESTIMATE" >> $GITHUB_OUTPUT
+                
+                {
+                  echo "recorded_errors<<EOF"
+                  echo "$ERRORS"
+                  echo "EOF"
+                } >> $GITHUB_OUTPUT
+                
+                {
+                  echo "recorded_events<<EOF"
+                  echo "$EVENTS"
+                  echo "EOF"
+                } >> $GITHUB_OUTPUT
+                
+                break  # Only process first error for now
+              fi
             fi
-          fi
+          done
           
           echo "found_errors=$FOUND_ERRORS" >> $GITHUB_OUTPUT
 
@@ -622,17 +732,6 @@ jobs:
             
             Be specific about the action sequence and timing.
 
-      - name: Find and upload video artifacts
-        id: upload_videos
-        if: always() && steps.analyze_chaos_errors.outputs.found_errors == 'true'
-        uses: actions/upload-artifact@v4
-        with:
-          name: chaos-test-videos
-          path: |
-            test-results/**/video.webm
-            test-results/**/trace.zip
-          retention-days: 30
-
       - name: Create issue for chaos test errors
         if: always() && steps.analyze_chaos_errors.outputs.chaos_has_errors == 'true'
         uses: actions/github-script@v7
@@ -642,12 +741,14 @@ jobs:
           EVENTS: ${{ steps.analyze_chaos_errors.outputs.chaos_events }}
           AI_ANALYSIS: ${{ steps.ai_chaos_analysis.outputs.response }}
           TOKEN_ESTIMATE: ${{ steps.analyze_chaos_errors.outputs.chaos_token_estimate }}
+          VIDEO_DIR: ${{ steps.upload_to_branch.outputs.video_dir }}
         with:
           script: |
             const errors = process.env.ERRORS;
             const events = process.env.EVENTS;
             const aiAnalysis = process.env.AI_ANALYSIS;
             const tokenEstimate = process.env.TOKEN_ESTIMATE;
+            const videoDir = process.env.VIDEO_DIR;
             const runId = context.runId;
             const sha = context.sha;
             
@@ -660,6 +761,19 @@ jobs:
             
             const videoUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${runId}`;
             
+            // Get list of video files from the branch
+            let videoSection = `### 📹 Video Recordings\n\n`;
+            if (videoDir && videoDir !== 'None') {
+              const videoBranchUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/raw/chaos-videos/${videoDir}`;
+              videoSection += `**Videos captured during this run:**\n\n`;
+              videoSection += `- [Download chaos test video](${videoBranchUrl}/chaos-test-chromium-video.webm)\n`;
+              videoSection += `- [Browse all files in chaos-videos branch](https://github.com/${context.repo.owner}/${context.repo.repo}/tree/chaos-videos/${videoDir})\n`;
+              videoSection += `- [View workflow run](${videoUrl})\n\n`;
+              videoSection += `> **Note:** Click the download link above to view the video of the test execution.\n\n`;
+            } else {
+              videoSection += `Video recordings are available in the [workflow artifacts](${videoUrl}).\n\n`;
+            }
+            
             const issueBody = `## 🐛 Console Errors Detected During Chaos Testing
             
             **Test Type:** Random Click Spam (30 seconds)
@@ -667,8 +781,7 @@ jobs:
             **Commit:** ${sha}
             **Workflow:** [View Run](${videoUrl})
             
-            ### 📹 Video Recording
-            Video recordings and trace files are available in the [workflow artifacts](${videoUrl}).
+            ${videoSection}
             
             ### 🚨 Console Errors
             \`\`\`
@@ -703,12 +816,18 @@ jobs:
           EVENTS: ${{ steps.analyze_chaos_errors.outputs.recorded_events }}
           AI_ANALYSIS: ${{ steps.ai_recorded_analysis.outputs.response }}
           TOKEN_ESTIMATE: ${{ steps.analyze_chaos_errors.outputs.recorded_token_estimate }}
+          TEST_NAME: ${{ steps.analyze_chaos_errors.outputs.recorded_test_name }}
+          TEST_FILE: ${{ steps.analyze_chaos_errors.outputs.recorded_test_file }}
+          VIDEO_DIR: ${{ steps.upload_to_branch.outputs.video_dir }}
         with:
           script: |
             const errors = process.env.ERRORS;
             const events = process.env.EVENTS;
             const aiAnalysis = process.env.AI_ANALYSIS;
             const tokenEstimate = process.env.TOKEN_ESTIMATE;
+            const testName = process.env.TEST_NAME;
+            const testFile = process.env.TEST_FILE;
+            const videoDir = process.env.VIDEO_DIR;
             const runId = context.runId;
             const sha = context.sha;
             
@@ -721,15 +840,27 @@ jobs:
             
             const videoUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${runId}`;
             
+            let videoSection = `### 📹 Video Recordings\n\n`;
+            if (videoDir && videoDir !== 'None') {
+              const videoBranchUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/raw/chaos-videos/${videoDir}`;
+              videoSection += `**Videos captured during this run:**\n\n`;
+              videoSection += `- [Download recorded actions video](${videoBranchUrl}/recorded-actions-test-chromium-video.webm)\n`;
+              videoSection += `- [Browse all files in chaos-videos branch](https://github.com/${context.repo.owner}/${context.repo.repo}/tree/chaos-videos/${videoDir})\n`;
+              videoSection += `- [View workflow run](${videoUrl})\n\n`;
+              videoSection += `> **Note:** Click the download link above to view the video of the test execution.\n\n`;
+            } else {
+              videoSection += `Video recordings are available in the [workflow artifacts](${videoUrl}).\n\n`;
+            }
+            
             const issueBody = `## 🐛 Console Errors Detected During Recorded Actions Test
             
-            **Test Type:** Recorded Action Playback
+            **Test Name:** ${testName}
+            **Test File:** \`.github/chaos-tests/${testFile}\`
             **Run ID:** ${runId}
             **Commit:** ${sha}
             **Workflow:** [View Run](${videoUrl})
             
-            ### 📹 Video Recording
-            Video recordings and trace files are available in the [workflow artifacts](${videoUrl}).
+            ${videoSection}
             
             ### 🚨 Console Errors
             \`\`\`
@@ -749,7 +880,7 @@ jobs:
             await github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              title: `🎬 Console Errors Found During Recorded Actions Test`,
+              title: `🎬 Console Errors in "${testName}" Test`,
               body: issueBody,
               labels: ['bug', 'automated-test', 'console-error', 'recorded-actions'],
               assignees: ['supervoidcoder']
@@ -818,7 +949,7 @@ jobs:
           
           # Run dashboard generation script
           python3 .github/scripts/generate-dashboard.py dashboard
-          
+
       # ============================================================
       # DEPLOY TO GH-PAGES
       # ============================================================

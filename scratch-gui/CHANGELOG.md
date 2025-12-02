@@ -4,6 +4,51 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`df2c5e030`](https://github.com/OmniBlocks/scratch-gui/commit/df2c5e030cb13a7bad0776c3f4cb7d65d10da856) - 2025-12-02 18:18:35 +0000
+
+**feat: (ci) add super cool test dashboard thing**
+
+*Author: supervoidcoder*
+
+---
+
+
+### Commit [`25c6fcb3b`](https://github.com/OmniBlocks/scratch-gui/commit/25c6fcb3b31d0cace3f5f6f55fa2b9be87e3fe27) - 2025-12-02 18:12:32 +0000
+
+**outdated**
+
+*Author: ampelectrecuted*
+
+---
+
+
+### Commit [`35aea7411`](https://github.com/OmniBlocks/scratch-gui/commit/35aea7411c35fd84fb12b02b4978264775171902) - 2025-12-02 11:56:35 -0500
+
+**Update test.yml**
+
+*Author: supervoidcoder*
+
+---
+
+
+### Commit [`23140ee89`](https://github.com/OmniBlocks/scratch-gui/commit/23140ee89d9f42b54de9c6a987ffe41a763872ac) - 2025-12-01 22:19:11 +0000
+
+**delete ai scripts**
+
+*Author: ampelectrecuted*
+
+---
+
+
+### Commit [`3f33ab8`](https://github.com/OmniBlocks/scratch-gui/commit/3f33ab89922b0ea4d8cf100a2cea0aedca1e0c77) - 2025-12-01 17:53:30 +0000
+
+**Merge branch 'main' of https://github.com/OmniBlocks/scratch-gui**
+
+*Author: ampelectrecuted*
+
+---
+
+
 ### Commit [`8f0280f`](https://github.com/OmniBlocks/scratch-gui/commit/8f0280f1e23344e2cb9b076ca9acbbe07323d703) - 2025-12-01 05:05:12 +0000
 
 **revert a few amp commits they're not bad at all i just moved them to a new branch so we don't have very incomplete stuff on main**

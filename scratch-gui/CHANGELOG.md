@@ -4,6 +4,15 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`e7c082dba`](https://github.com/OmniBlocks/scratch-gui/commit/e7c082dba79adf9462cddb3d3bf13a3b58e5e405) - 2025-12-02 22:34:54 +0000
+
+**Update AI mention from github-actions to OmniBlocks/ai**
+
+*Author: ampelectrecuted*
+
+---
+
+
 ### Commit [`597f3a16d`](https://github.com/OmniBlocks/scratch-gui/commit/597f3a16d3f2d10b3b7f05ef7107f2dca500ea08) - 2025-12-02 22:32:56 +0000
 
 **i hate clanker commit messages**

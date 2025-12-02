@@ -4,6 +4,15 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`01e1aa0e3`](https://github.com/OmniBlocks/scratch-gui/commit/01e1aa0e36f70fdbaf8cba5e4801ac7f00ac9de2) - 2025-12-02 18:40:11 +0000
+
+**Merge branch 'main' of https://github.com/OmniBlocks/scratch-gui**
+
+*Author: ampelectrecuted*
+
+---
+
+
 ### Commit [`df2c5e030`](https://github.com/OmniBlocks/scratch-gui/commit/df2c5e030cb13a7bad0776c3f4cb7d65d10da856) - 2025-12-02 18:18:35 +0000
 
 **feat: (ci) add super cool test dashboard thing**

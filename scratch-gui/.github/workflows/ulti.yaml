@@ -30,7 +30,7 @@ jobs:
             -H "Accept: application/vnd.github+json" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
             /repos/${{ github.repository }}/issues/comments/${{ github.event.comment.id }}/reactions \
-            -f content='👀'
+            -f content='eyes'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       # ------------------------------------------------------

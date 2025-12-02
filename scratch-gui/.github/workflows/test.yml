@@ -1,15 +1,16 @@
-name: Main Branch Test Monitor
+name: Main Branch Test Monitor + Chaos Testing 🌪️
 
 permissions:
   contents: write
   issues: write
+  models: read
 
 on:
   push:
     branches: [ main ]
 
 jobs:
-  main-branch-test:
+  main-branch-test-and-chaos:
     runs-on: ubuntu-latest
 
     steps:
@@ -127,7 +128,7 @@ jobs:
           echo "integration_skipped=${SKIPPED:-0}" >> $GITHUB_OUTPUT
 
       # ============================================================
-      # SCREENSHOT PHASE
+      # SERVER SETUP
       # ============================================================
 
       - name: Start HTTP server
@@ -162,15 +163,17 @@ jobs:
 
           module.exports = defineConfig({
             testDir: '.',
-            timeout: 60000,
+            timeout: 120000,
             fullyParallel: false,
             forbidOnly: !!process.env.CI,
-            retries: 2,
+            retries: 0,
             workers: 1,
-            reporter: 'list',
+            reporter: [['list'], ['json', { outputFile: 'test-results.json' }]],
             use: {
-              trace: 'retain-on-failure',
-              screenshot: 'only-on-failure',
+              trace: 'on',
+              screenshot: 'on',
+              video: 'on',
+              baseURL: 'http://localhost:8080',
             },
             projects: [
               {
@@ -181,6 +184,10 @@ jobs:
           });
           EOF
 
+      # ============================================================
+      # SCREENSHOT PHASE (Existing)
+      # ============================================================
+
       - name: Create screenshot test
         if: steps.build.outputs.build_status == 'success'
         run: |
@@ -189,7 +196,7 @@ jobs:
 
           test.describe('Main Branch Screenshots', () => {
             test('Stage and Sprites', async ({ page }) => {
-              await page.goto('http://localhost:8080/editor.html');
+              await page.goto('/editor.html');
               await page.waitForLoadState('networkidle');
               await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
               await page.waitForTimeout(5000);
@@ -203,7 +210,7 @@ jobs:
             });
 
             test('Blocks Workspace', async ({ page }) => {
-              await page.goto('http://localhost:8080/editor.html');
+              await page.goto('/editor.html');
               await page.waitForLoadState('networkidle');
               await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
               await page.waitForTimeout(5000);
@@ -217,14 +224,14 @@ jobs:
             });
 
             test('Player View', async ({ page }) => {
-              await page.goto('http://localhost:8080/');
+              await page.goto('/');
               await page.waitForLoadState('networkidle');
               await page.waitForTimeout(3000);
               await page.screenshot({ path: 'screenshots/player-view.png', fullPage: true });
             });
 
             test('Editor Initial (Code Tab)', async ({ page }) => {
-              await page.goto('http://localhost:8080/editor.html');
+              await page.goto('/editor.html');
               await page.waitForLoadState('networkidle');
               await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
               await page.waitForTimeout(4000);
@@ -232,12 +239,11 @@ jobs:
             });
 
             test('Code Tab', async ({ page }) => {
-              await page.goto('http://localhost:8080/editor.html');
+              await page.goto('/editor.html');
               await page.waitForLoadState('networkidle');
               await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
               await page.waitForTimeout(3000);
               
-              // Click the Code tab (index 0) - use nth-child(1) since CSS is 1-indexed
               const tabList = await page.locator('[class*="react-tabs_react-tabs__tab-list"]').first();
               const codeTab = await tabList.locator('[class*="react-tabs_react-tabs__tab"]').nth(0);
               await codeTab.click();
@@ -247,12 +253,11 @@ jobs:
             });
 
             test('Costumes Tab', async ({ page }) => {
-              await page.goto('http://localhost:8080/editor.html');
+              await page.goto('/editor.html');
               await page.waitForLoadState('networkidle');
               await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
               await page.waitForTimeout(3000);
               
-              // Click the Costumes tab (index 1)
               const tabList = await page.locator('[class*="react-tabs_react-tabs__tab-list"]').first();
               const costumesTab = await tabList.locator('[class*="react-tabs_react-tabs__tab"]').nth(1);
               await costumesTab.click();
@@ -262,12 +267,11 @@ jobs:
             });
 
             test('Sounds Tab', async ({ page }) => {
-              await page.goto('http://localhost:8080/editor.html');
+              await page.goto('/editor.html');
               await page.waitForLoadState('networkidle');
               await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
               await page.waitForTimeout(3000);
               
-              // Click the Sounds tab (index 2)
               const tabList = await page.locator('[class*="react-tabs_react-tabs__tab-list"]').first();
               const soundsTab = await tabList.locator('[class*="react-tabs_react-tabs__tab"]').nth(2);
               await soundsTab.click();
@@ -277,12 +281,11 @@ jobs:
             });
 
             test('Songs Tab', async ({ page }) => {
-              await page.goto('http://localhost:8080/editor.html');
+              await page.goto('/editor.html');
               await page.waitForLoadState('networkidle');
               await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
               await page.waitForTimeout(3000);
               
-              // Click the Songs tab (index 3)
               const tabList = await page.locator('[class*="react-tabs_react-tabs__tab-list"]').first();
               const songsTab = await tabList.locator('[class*="react-tabs_react-tabs__tab"]').nth(3);
               await songsTab.click();
@@ -305,6 +308,456 @@ jobs:
           else
             echo "screenshot_status=failed" >> $GITHUB_OUTPUT
           fi
+
+      # ============================================================
+      # 🌪️ CHAOS TESTING PHASE 🌪️
+      # ============================================================
+
+      - name: Create chaos test (random click spam)
+        if: steps.build.outputs.build_status == 'success'
+        run: |
+          cat > chaos-test.spec.js << 'EOF'
+          const { test } = require('@playwright/test');
+          const fs = require('fs');
+
+          test.describe('🌪️ Chaos Testing', () => {
+            test('Random Click Spam - 30 Seconds of Chaos', async ({ page }) => {
+              const consoleErrors = [];
+              const eventLog = [];
+              
+              // Listen for console ERRORS only (not warnings!)
+              page.on('console', msg => {
+                if (msg.type() === 'error') {
+                  consoleErrors.push({
+                    text: msg.text(),
+                    timestamp: Date.now(),
+                    location: msg.location()
+                  });
+                }
+              });
+              
+              await page.goto('/editor.html');
+              await page.waitForLoadState('networkidle');
+              await page.waitForSelector('[class*="menu-bar"]', { timeout: 20000 });
+              await page.waitForTimeout(3000);
+              
+              // CHAOS MODE: Random clicks for 30 seconds
+              const duration = 30000;
+              const startTime = Date.now();
+              let clickCount = 0;
+              
+              while (Date.now() - startTime < duration) {
+                const clickableSelectors = [
+                  'button',
+                  '[role="button"]',
+                  'a',
+                  '[class*="menu"]',
+                  '[class*="tab"]',
+                  '[class*="block"]',
+                  '[class*="sprite"]',
+                  '[class*="costume"]'
+                ];
+                
+                const randomSelector = clickableSelectors[Math.floor(Math.random() * clickableSelectors.length)];
+                const elements = await page.locator(randomSelector).all();
+                
+                if (elements.length > 0) {
+                  const randomElement = elements[Math.floor(Math.random() * elements.length)];
+                  try {
+                    const elementClass = await randomElement.getAttribute('class') || 'unknown';
+                    await randomElement.click({ timeout: 1000, force: true });
+                    clickCount++;
+                    eventLog.push({
+                      action: 'click',
+                      element: elementClass,
+                      time: Date.now() - startTime,
+                      clickNumber: clickCount
+                    });
+                  } catch (e) {
+                    // Element disappeared or not clickable, that's chaos baby!
+                  }
+                }
+                
+                // Random delay between clicks
+                await page.waitForTimeout(100 + Math.random() * 400);
+              }
+              
+              // Save results
+              const results = {
+                testName: 'Random Click Spam',
+                clickCount,
+                errors: consoleErrors,
+                events: eventLog
+              };
+              
+              fs.writeFileSync('chaos-results.json', JSON.stringify(results, null, 2));
+              
+              // Fail test if errors were found
+              if (consoleErrors.length > 0) {
+                throw new Error(`Found ${consoleErrors.length} console errors during chaos testing`);
+              }
+            });
+          });
+          EOF
+
+      - name: Create recorded actions test
+        if: steps.build.outputs.build_status == 'success'
+        run: |
+          # Create a sample recorded actions file
+          cat > recorded-actions.json << 'EOF'
+          [
+            { "type": "goto", "url": "/editor.html" },
+            { "type": "wait", "duration": 3000 },
+            { "type": "click", "selector": "[class*='react-tabs_react-tabs__tab']", "index": 1 },
+            { "type": "wait", "duration": 2000 },
+            { "type": "click", "selector": "[class*='react-tabs_react-tabs__tab']", "index": 2 },
+            { "type": "wait", "duration": 2000 },
+            { "type": "click", "selector": "[class*='react-tabs_react-tabs__tab']", "index": 0 },
+            { "type": "wait", "duration": 2000 }
+          ]
+          EOF
+          
+          cat > recorded-actions-test.spec.js << 'EOF'
+          const { test } = require('@playwright/test');
+          const fs = require('fs');
+
+          test.describe('🎬 Recorded Actions Playback', () => {
+            test('Execute Recorded User Actions', async ({ page }) => {
+              const consoleErrors = [];
+              const eventLog = [];
+              
+              // Listen for console ERRORS only
+              page.on('console', msg => {
+                if (msg.type() === 'error') {
+                  consoleErrors.push({
+                    text: msg.text(),
+                    timestamp: Date.now(),
+                    location: msg.location()
+                  });
+                }
+              });
+              
+              // Load recorded actions
+              const actions = JSON.parse(fs.readFileSync('recorded-actions.json', 'utf8'));
+              
+              for (const action of actions) {
+                eventLog.push({ ...action, executedAt: Date.now() });
+                
+                switch(action.type) {
+                  case 'goto':
+                    await page.goto(action.url);
+                    await page.waitForLoadState('networkidle');
+                    break;
+                  case 'click':
+                    if (action.index !== undefined) {
+                      await page.locator(action.selector).nth(action.index).click();
+                    } else {
+                      await page.locator(action.selector).click();
+                    }
+                    break;
+                  case 'type':
+                    await page.locator(action.selector).fill(action.text);
+                    break;
+                  case 'wait':
+                    await page.waitForTimeout(action.duration);
+                    break;
+                }
+              }
+              
+              // Save results
+              const results = {
+                testName: 'Recorded Actions',
+                actionsExecuted: actions.length,
+                errors: consoleErrors,
+                events: eventLog
+              };
+              
+              fs.writeFileSync('recorded-actions-results.json', JSON.stringify(results, null, 2));
+              
+              // Fail test if errors were found
+              if (consoleErrors.length > 0) {
+                throw new Error(`Found ${consoleErrors.length} console errors during recorded actions`);
+              }
+            });
+          });
+          EOF
+
+      - name: Run chaos tests with video recording
+        id: chaos_tests
+        if: steps.build.outputs.build_status == 'success'
+        continue-on-error: true
+        run: |
+          mkdir -p test-videos chaos-reports
+          
+          # Run chaos tests
+          npx playwright test chaos-test.spec.js --project=chromium --output=test-videos/ 2>&1 | tee chaos-test-output.txt
+          CHAOS_EXIT=$?
+          
+          # Run recorded actions tests
+          npx playwright test recorded-actions-test.spec.js --project=chromium --output=test-videos/ 2>&1 | tee recorded-actions-output.txt
+          RECORDED_EXIT=$?
+          
+          if [ $CHAOS_EXIT -eq 0 ] && [ $RECORDED_EXIT -eq 0 ]; then
+            echo "chaos_status=passed" >> $GITHUB_OUTPUT
+            echo "errors_found=false" >> $GITHUB_OUTPUT
+          else
+            echo "chaos_status=failed" >> $GITHUB_OUTPUT
+            echo "errors_found=true" >> $GITHUB_OUTPUT
+          fi
+
+      # ============================================================
+      # 🤖 AI ERROR ANALYSIS & ISSUE CREATION 🤖
+      # ============================================================
+
+      - name: Analyze chaos test errors with AI
+        id: analyze_chaos_errors
+        if: always() && steps.chaos_tests.outputs.errors_found == 'true'
+        continue-on-error: true
+        run: |
+          # Check if results files exist and contain errors
+          FOUND_ERRORS=false
+          
+          if [ -f chaos-results.json ]; then
+            ERROR_COUNT=$(jq '.errors | length' chaos-results.json)
+            if [ "$ERROR_COUNT" -gt 0 ]; then
+              FOUND_ERRORS=true
+              echo "chaos_has_errors=true" >> $GITHUB_OUTPUT
+              
+              # Prepare error summary
+              ERRORS=$(jq -r '.errors[] | "[\(.timestamp)] \(.text)"' chaos-results.json | head -20)
+              EVENTS=$(jq -r '.events[-10:] | .[] | "[\(.time)ms] Click #\(.clickNumber): \(.element)"' chaos-results.json)
+              
+              COMBINED="${ERRORS}\n\nLast 10 events:\n${EVENTS}"
+              TOKEN_ESTIMATE=$((${#COMBINED} / 4))
+              
+              echo "chaos_token_estimate=$TOKEN_ESTIMATE" >> $GITHUB_OUTPUT
+              
+              {
+                echo "chaos_errors<<EOF"
+                echo "$ERRORS"
+                echo "EOF"
+              } >> $GITHUB_OUTPUT
+              
+              {
+                echo "chaos_events<<EOF"
+                echo "$EVENTS"
+                echo "EOF"
+              } >> $GITHUB_OUTPUT
+            fi
+          fi
+          
+          if [ -f recorded-actions-results.json ]; then
+            ERROR_COUNT=$(jq '.errors | length' recorded-actions-results.json)
+            if [ "$ERROR_COUNT" -gt 0 ]; then
+              FOUND_ERRORS=true
+              echo "recorded_has_errors=true" >> $GITHUB_OUTPUT
+              
+              ERRORS=$(jq -r '.errors[] | "[\(.timestamp)] \(.text)"' recorded-actions-results.json | head -20)
+              EVENTS=$(jq -r '.events | .[] | "[\(.executedAt)] \(.type): \(.selector // .url // "")"' recorded-actions-results.json)
+              
+              COMBINED="${ERRORS}\n\nActions executed:\n${EVENTS}"
+              TOKEN_ESTIMATE=$((${#COMBINED} / 4))
+              
+              echo "recorded_token_estimate=$TOKEN_ESTIMATE" >> $GITHUB_OUTPUT
+              
+              {
+                echo "recorded_errors<<EOF"
+                echo "$ERRORS"
+                echo "EOF"
+              } >> $GITHUB_OUTPUT
+              
+              {
+                echo "recorded_events<<EOF"
+                echo "$EVENTS"
+                echo "EOF"
+              } >> $GITHUB_OUTPUT
+            fi
+          fi
+          
+          echo "found_errors=$FOUND_ERRORS" >> $GITHUB_OUTPUT
+
+      - name: AI analysis for chaos test errors
+        id: ai_chaos_analysis
+        if: always() && steps.analyze_chaos_errors.outputs.chaos_has_errors == 'true' && steps.analyze_chaos_errors.outputs.chaos_token_estimate < 8000
+        continue-on-error: true
+        uses: actions/ai-inference@v1
+        with:
+          prompt: |
+            You are analyzing console errors found during chaos testing (random click spam) of the OmniBlocks scratch-gui editor.
+            
+            **Console Errors Detected:**
+            ${{ steps.analyze_chaos_errors.outputs.chaos_errors }}
+            
+            **Events Leading to Errors (Last 10 clicks):**
+            ${{ steps.analyze_chaos_errors.outputs.chaos_events }}
+            
+            **Your Task:**
+            Provide a concise hypothesis (2-3 paragraphs) about:
+            1. What likely caused these errors
+            2. Which UI components or interactions are problematic
+            3. Suggested areas to investigate for fixes
+            
+            Be specific about element classes, timing issues, or race conditions if visible.
+
+      - name: AI analysis for recorded actions errors
+        id: ai_recorded_analysis
+        if: always() && steps.analyze_chaos_errors.outputs.recorded_has_errors == 'true' && steps.analyze_chaos_errors.outputs.recorded_token_estimate < 8000
+        continue-on-error: true
+        uses: actions/ai-inference@v1
+        with:
+          prompt: |
+            You are analyzing console errors found during recorded action playback testing of the OmniBlocks scratch-gui editor.
+            
+            **Console Errors Detected:**
+            ${{ steps.analyze_chaos_errors.outputs.recorded_errors }}
+            
+            **Actions Executed:**
+            ${{ steps.analyze_chaos_errors.outputs.recorded_events }}
+            
+            **Your Task:**
+            Provide a concise hypothesis (2-3 paragraphs) about:
+            1. What likely caused these errors
+            2. Which specific action or sequence triggered the problem
+            3. Suggested areas to investigate for fixes
+            
+            Be specific about the action sequence and timing.
+
+      - name: Find and upload video artifacts
+        id: upload_videos
+        if: always() && steps.analyze_chaos_errors.outputs.found_errors == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: chaos-test-videos
+          path: |
+            test-results/**/video.webm
+            test-results/**/trace.zip
+          retention-days: 30
+
+      - name: Create issue for chaos test errors
+        if: always() && steps.analyze_chaos_errors.outputs.chaos_has_errors == 'true'
+        uses: actions/github-script@v7
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ERRORS: ${{ steps.analyze_chaos_errors.outputs.chaos_errors }}
+          EVENTS: ${{ steps.analyze_chaos_errors.outputs.chaos_events }}
+          AI_ANALYSIS: ${{ steps.ai_chaos_analysis.outputs.response }}
+          TOKEN_ESTIMATE: ${{ steps.analyze_chaos_errors.outputs.chaos_token_estimate }}
+        with:
+          script: |
+            const errors = process.env.ERRORS;
+            const events = process.env.EVENTS;
+            const aiAnalysis = process.env.AI_ANALYSIS;
+            const tokenEstimate = process.env.TOKEN_ESTIMATE;
+            const runId = context.runId;
+            const sha = context.sha;
+            
+            let aiSection = '';
+            if (aiAnalysis && tokenEstimate < 8000) {
+              aiSection = `### 🤖 AI Analysis & Hypothesis\n\n${aiAnalysis}\n\n`;
+            } else if (tokenEstimate >= 8000) {
+              aiSection = `### ⚠️ AI Analysis Skipped\n\nError log too large for AI analysis (${tokenEstimate} estimated tokens, limit is 8000).\n\n`;
+            }
+            
+            const videoUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${runId}`;
+            
+            const issueBody = `## 🐛 Console Errors Detected During Chaos Testing
+            
+            **Test Type:** Random Click Spam (30 seconds)
+            **Run ID:** ${runId}
+            **Commit:** ${sha}
+            **Workflow:** [View Run](${videoUrl})
+            
+            ### 📹 Video Recording
+            Video recordings and trace files are available in the [workflow artifacts](${videoUrl}).
+            
+            ### 🚨 Console Errors
+            \`\`\`
+            ${errors}
+            \`\`\`
+            
+            ### 🎯 Events Leading to Errors (Last 10 Clicks)
+            \`\`\`
+            ${events}
+            \`\`\`
+            
+            ${aiSection}
+            ---
+            *🤖 Automatically generated by chaos testing workflow*
+            `;
+            
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `🌪️ Console Errors Found During Chaos Testing`,
+              body: issueBody,
+              labels: ['bug', 'automated-test', 'console-error', 'chaos-testing'],
+              assignees: ['supervoidcoder']
+            });
+
+      - name: Create issue for recorded actions errors
+        if: always() && steps.analyze_chaos_errors.outputs.recorded_has_errors == 'true'
+        uses: actions/github-script@v7
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ERRORS: ${{ steps.analyze_chaos_errors.outputs.recorded_errors }}
+          EVENTS: ${{ steps.analyze_chaos_errors.outputs.recorded_events }}
+          AI_ANALYSIS: ${{ steps.ai_recorded_analysis.outputs.response }}
+          TOKEN_ESTIMATE: ${{ steps.analyze_chaos_errors.outputs.recorded_token_estimate }}
+        with:
+          script: |
+            const errors = process.env.ERRORS;
+            const events = process.env.EVENTS;
+            const aiAnalysis = process.env.AI_ANALYSIS;
+            const tokenEstimate = process.env.TOKEN_ESTIMATE;
+            const runId = context.runId;
+            const sha = context.sha;
+            
+            let aiSection = '';
+            if (aiAnalysis && tokenEstimate < 8000) {
+              aiSection = `### 🤖 AI Analysis & Hypothesis\n\n${aiAnalysis}\n\n`;
+            } else if (tokenEstimate >= 8000) {
+              aiSection = `### ⚠️ AI Analysis Skipped\n\nError log too large for AI analysis (${tokenEstimate} estimated tokens, limit is 8000).\n\n`;
+            }
+            
+            const videoUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${runId}`;
+            
+            const issueBody = `## 🐛 Console Errors Detected During Recorded Actions Test
+            
+            **Test Type:** Recorded Action Playback
+            **Run ID:** ${runId}
+            **Commit:** ${sha}
+            **Workflow:** [View Run](${videoUrl})
+            
+            ### 📹 Video Recording
+            Video recordings and trace files are available in the [workflow artifacts](${videoUrl}).
+            
+            ### 🚨 Console Errors
+            \`\`\`
+            ${errors}
+            \`\`\`
+            
+            ### 🎬 Actions Executed
+            \`\`\`
+            ${events}
+            \`\`\`
+            
+            ${aiSection}
+            ---
+            *🤖 Automatically generated by chaos testing workflow*
+            `;
+            
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `🎬 Console Errors Found During Recorded Actions Test`,
+              body: issueBody,
+              labels: ['bug', 'automated-test', 'console-error', 'recorded-actions'],
+              assignees: ['supervoidcoder']
+            });
+
+      # ============================================================
+      # STOP SERVER
+      # ============================================================
 
       - name: Stop HTTP server
         if: always()
@@ -349,6 +802,8 @@ jobs:
           INTEGRATION_FAILED: ${{ steps.integration_tests.outputs.integration_failed }}
           INTEGRATION_SKIPPED: ${{ steps.integration_tests.outputs.integration_skipped }}
           SCREENSHOT_STATUS: ${{ steps.screenshots.outputs.screenshot_status }}
+          CHAOS_STATUS: ${{ steps.chaos_tests.outputs.chaos_status }}
+          CHAOS_ERRORS_FOUND: ${{ steps.chaos_tests.outputs.errors_found }}
           DURATION: ${{ steps.duration.outputs.duration }}
           REPO: ${{ github.repository }}
           RUN_ID: ${{ github.run_id }}
@@ -390,27 +845,23 @@ jobs:
       - name: Sync dashboard to gh-pages/tests
         if: always()
         run: |
-          # Create tests directory structure with timestamp
           TIMESTAMP=$(date +%Y%m%d-%H%M%S)
           TEST_DIR="gh-pages/tests/$TIMESTAMP"
           mkdir -p "$TEST_DIR"
           
-          # Copy dashboard files
           cp -r dashboard/* "$TEST_DIR/"
           
-          # Create/update latest symlink
           cd gh-pages/tests
           rm -f latest
           ln -s "$TIMESTAMP" latest
           
-          # Create index page for tests directory
           cat > index.html << 'INDEXEOF'
           <!DOCTYPE html>
           <html lang="en">
           <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Test Results - OmniBlocks</title>
+            <title>Test Results - OmniBlocks 🌪️</title>
             <style>
               body {
                 font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -453,15 +904,20 @@ jobs:
                 margin-top: 30px;
                 opacity: 0.8;
               }
+              .chaos {
+                font-size: 2em;
+                margin: 20px 0;
+              }
             </style>
           </head>
           <body>
             <div class="container">
               <h1>🚀 OmniBlocks</h1>
               <h2>Main Branch Test Results</h2>
-              <p>View the latest test results and screenshots</p>
+              <div class="chaos">🌪️ NOW WITH CHAOS TESTING! 🌪️</div>
+              <p>View the latest test results, screenshots, and chaos test videos</p>
               <a href="latest/index.html" class="button">📊 View Latest Dashboard</a>
-              <p class="note">This page shows the most recent test results from the main branch</p>
+              <p class="note">Includes automated chaos testing with AI-powered error analysis!</p>
             </div>
           </body>
           </html>
@@ -474,11 +930,10 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
           
-          # Only add the tests directory, not workflow files
           git add tests/
           
           if [ -n "$(git status --porcelain)" ]; then
-            git commit -m "Update main branch test results - $(date -u +"%Y-%m-%d %H:%M:%S UTC")"
+            git commit -m "Update test results with chaos testing 🌪️ - $(date -u +"%Y-%m-%d %H:%M:%S UTC")"
             git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
             git push origin gh-pages
           else
@@ -486,7 +941,7 @@ jobs:
           fi
           
       # ============================================================
-      # CREATE ISSUE ON FAILURE
+      # CREATE ISSUE ON BUILD/INSTALL FAILURE
       # ============================================================
 
       - name: Create issue on failure

@@ -804,6 +804,7 @@ jobs:
           SCREENSHOT_STATUS: ${{ steps.screenshots.outputs.screenshot_status }}
           CHAOS_STATUS: ${{ steps.chaos_tests.outputs.chaos_status }}
           CHAOS_ERRORS_FOUND: ${{ steps.chaos_tests.outputs.errors_found }}
+          VIDEO_DIR: ${{ steps.upload_to_branch.outputs.video_dir }}
           DURATION: ${{ steps.duration.outputs.duration }}
           REPO: ${{ github.repository }}
           RUN_ID: ${{ github.run_id }}
@@ -817,7 +818,7 @@ jobs:
           
           # Run dashboard generation script
           python3 .github/scripts/generate-dashboard.py dashboard
-
+          
       # ============================================================
       # DEPLOY TO GH-PAGES
       # ============================================================

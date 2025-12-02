@@ -40,6 +40,39 @@ def generate_screenshot_html(screenshots_dir):
     
     return ''.join(screenshots_html) if screenshots_html else '<p>No screenshots available</p>'
 
+def generate_chaos_videos_html(video_dir, repo):
+    """Generate HTML for chaos test videos."""
+    if not video_dir or video_dir == 'None':
+        return '<p>No chaos testing videos available for this run.</p>'
+    
+    # List of potential video files from chaos tests
+    video_files = [
+        ('chaos-test-chromium-video.webm', '🌪️ Random Click Spam', 'chaos-test'),
+        ('recorded-actions-test-chromium-video.webm', '🎬 Recorded Actions Playback', 'recorded-actions')
+    ]
+    
+    videos_html = []
+    for filename, title, test_id in video_files:
+        video_url = f'https://github.com/{repo}/raw/chaos-videos/{video_dir}/{filename}'
+        download_url = f'https://github.com/{repo}/blob/chaos-videos/{video_dir}/{filename}?raw=true'
+        
+        videos_html.append(f'''
+                <div class="video-card">
+                  <h3>{title}</h3>
+                  <div class="video-wrapper">
+                    <video controls preload="metadata">
+                      <source src="{video_url}" type="video/webm">
+                      Your browser doesn't support video playback.
+                    </video>
+                  </div>
+                  <div class="video-actions">
+                    <a href="{download_url}" class="download-btn" download>⬇️ Download Video</a>
+                    <a href="https://github.com/{repo}/tree/chaos-videos/{video_dir}" class="browse-btn" target="_blank">📁 Browse All Files</a>
+                  </div>
+                </div>''')
+    
+    return ''.join(videos_html)
+
 def generate_dashboard(output_dir):
     """Generate the HTML dashboard."""
     # Get commit SHA
@@ -103,6 +136,22 @@ def generate_dashboard(output_dir):
         screenshot_status_class = "warning"
         screenshot_icon = "⚠️"
     
+    # Chaos testing status
+    chaos_status_raw = os.environ.get('CHAOS_STATUS', '')
+    chaos_errors = os.environ.get('CHAOS_ERRORS_FOUND', 'false')
+    if chaos_status_raw == "passed":
+        chaos_status = "✅ Clean"
+        chaos_status_class = "success"
+        chaos_icon = "🌪️"
+    elif chaos_errors == "true":
+        chaos_status = "❌ Errors"
+        chaos_status_class = "error"
+        chaos_icon = "🐛"
+    else:
+        chaos_status = "⚠️ N/A"
+        chaos_status_class = "warning"
+        chaos_icon = "⚠️"
+    
     # Read log files
     install_log = read_file_safe('install-output.txt')
     build_log = read_file_safe('build-output.txt')
@@ -110,9 +159,39 @@ def generate_dashboard(output_dir):
     unit_log = read_file_safe('unit-test-output.txt')
     integration_log = read_file_safe('integration-test-output.txt')
     screenshot_log = read_file_safe('screenshot-output.txt')
+    chaos_log = read_file_safe('chaos-test-output.txt')
+    recorded_log = read_file_safe('recorded-actions-output.txt')
     
     # Generate screenshot HTML
     screenshots_html = generate_screenshot_html('screenshots')
+    
+    # Generate chaos videos HTML
+    repo = os.environ.get('REPO', 'Unknown')
+    video_dir = os.environ.get('VIDEO_DIR', None)
+    chaos_videos_html = generate_chaos_videos_html(video_dir, repo)
+    
+    # Chaos section visibility
+    chaos_section = ''
+    if video_dir and video_dir != 'None':
+        chaos_section = f'''
+      <section>
+        <h2>🌪️ Chaos Testing Videos</h2>
+        <p style="margin-bottom: 20px; color: #666;">
+          Watch recordings of chaos tests that detected console errors. These videos show the exact sequence of events that led to each error.
+        </p>
+        <div class="videos-grid">{chaos_videos_html}</div>
+      </section>'''
+    
+    # Chaos logs tab
+    chaos_logs_tabs = ''
+    chaos_logs_content = ''
+    if chaos_status_raw:
+        chaos_logs_tabs = '''
+          <button class="tab" onclick="showTab('chaos')">Chaos Test</button>
+          <button class="tab" onclick="showTab('recorded')">Recorded Actions</button>'''
+        chaos_logs_content = f'''
+        <div id="chaos-tab" class="tab-content"><div class="log-viewer"><pre>{html.escape(chaos_log)}</pre></div></div>
+        <div id="recorded-tab" class="tab-content"><div class="log-viewer"><pre>{html.escape(recorded_log)}</pre></div></div>'''
     
     # HTML template - NOTE: CSS/JS curly braces are escaped with {{ and }}
     html_template = '''<!DOCTYPE html>
@@ -153,9 +232,20 @@ def generate_dashboard(output_dir):
     .screenshot-card img {{ width: 100%; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.15); cursor: pointer; transition: transform 0.3s ease; }}
     .screenshot-card img:hover {{ transform: scale(1.02); }}
     .screenshot-card .note {{ margin-top: 10px; padding: 10px; background: #e7f3ff; border-left: 4px solid #2196F3; border-radius: 5px; font-size: 0.9em; color: #1565C0; }}
+    .videos-grid {{ display: grid; grid-template-columns: repeat(auto-fill, minmax(500px, 1fr)); gap: 30px; }}
+    .video-card {{ background: #f8f9fa; border-radius: 10px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }}
+    .video-card h3 {{ margin-bottom: 15px; color: #555; font-size: 1.3em; }}
+    .video-wrapper {{ position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; background: #000; border-radius: 8px; margin-bottom: 15px; }}
+    .video-wrapper video {{ position: absolute; top: 0; left: 0; width: 100%; height: 100%; }}
+    .video-actions {{ display: flex; gap: 10px; }}
+    .download-btn, .browse-btn {{ flex: 1; padding: 12px; text-align: center; border-radius: 8px; text-decoration: none; font-weight: bold; transition: all 0.3s ease; }}
+    .download-btn {{ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }}
+    .download-btn:hover {{ transform: translateY(-2px); box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4); }}
+    .browse-btn {{ background: #f0f0f0; color: #333; }}
+    .browse-btn:hover {{ background: #e0e0e0; }}
     .log-viewer {{ background: #1e1e1e; color: #d4d4d4; border-radius: 10px; padding: 20px; font-family: 'Monaco', 'Courier New', monospace; font-size: 0.9em; max-height: 500px; overflow-y: auto; line-height: 1.5; }}
     .log-viewer pre {{ white-space: pre-wrap; word-wrap: break-word; }}
-    .tabs {{ display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #e0e0e0; }}
+    .tabs {{ display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #e0e0e0; flex-wrap: wrap; }}
     .tab {{ padding: 12px 24px; cursor: pointer; border: none; background: none; font-size: 1em; color: #666; border-bottom: 3px solid transparent; transition: all 0.3s ease; }}
     .tab:hover {{ color: #667eea; }}
     .tab.active {{ color: #667eea; border-bottom-color: #667eea; font-weight: bold; }}
@@ -205,6 +295,11 @@ def generate_dashboard(output_dir):
           <div class="title">Screenshots</div>
           <div class="value">{screenshot_status}</div>
         </div>
+        <div class="status-card {chaos_status_class}">
+          <div class="icon">{chaos_icon}</div>
+          <div class="title">Chaos Tests</div>
+          <div class="value">{chaos_status}</div>
+        </div>
       </div>
       <section>
         <h2>📊 Test Results</h2>
@@ -240,7 +335,7 @@ def generate_dashboard(output_dir):
       <section>
         <h2>📸 Screenshots</h2>
         <div class="screenshots-grid">{screenshots_html}</div>
-      </section>
+      </section>{chaos_section}
       <section>
         <h2>📝 Logs</h2>
         <div class="tabs">
@@ -249,14 +344,14 @@ def generate_dashboard(output_dir):
           <button class="tab" onclick="showTab('lint')">Lint</button>
           <button class="tab" onclick="showTab('unit')">Unit Tests</button>
           <button class="tab" onclick="showTab('integration')">Integration Tests</button>
-          <button class="tab" onclick="showTab('screenshots')">Screenshots</button>
+          <button class="tab" onclick="showTab('screenshots')">Screenshots</button>{chaos_logs_tabs}
         </div>
         <div id="install-tab" class="tab-content active"><div class="log-viewer"><pre>{install_log}</pre></div></div>
         <div id="build-tab" class="tab-content"><div class="log-viewer"><pre>{build_log}</pre></div></div>
         <div id="lint-tab" class="tab-content"><div class="log-viewer"><pre>{lint_log}</pre></div></div>
         <div id="unit-tab" class="tab-content"><div class="log-viewer"><pre>{unit_log}</pre></div></div>
         <div id="integration-tab" class="tab-content"><div class="log-viewer"><pre>{integration_log}</pre></div></div>
-        <div id="screenshots-tab" class="tab-content"><div class="log-viewer"><pre>{screenshot_log}</pre></div></div>
+        <div id="screenshots-tab" class="tab-content"><div class="log-viewer"><pre>{screenshot_log}</pre></div></div>{chaos_logs_content}
       </section>
     </div>
     <footer>
@@ -317,7 +412,13 @@ def generate_dashboard(output_dir):
         screenshot_status_class=screenshot_status_class,
         screenshot_icon=screenshot_icon,
         screenshot_status=screenshot_status,
+        chaos_status_class=chaos_status_class,
+        chaos_icon=chaos_icon,
+        chaos_status=chaos_status,
         screenshots_html=screenshots_html,
+        chaos_section=chaos_section,
+        chaos_logs_tabs=chaos_logs_tabs,
+        chaos_logs_content=chaos_logs_content,
         install_log=html.escape(install_log),
         build_log=html.escape(build_log),
         lint_log=html.escape(lint_log),

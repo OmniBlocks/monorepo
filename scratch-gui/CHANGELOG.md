@@ -4,6 +4,23 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`ee2b08168`](https://github.com/OmniBlocks/scratch-gui/commit/ee2b081688da27fd76655b7c12695d5a80b924a5) - 2025-12-02 18:56:57 -0500
+
+**feat: (ci) main branch monitor**
+
+✅ Actually detect test failures
+✅ Find and upload videos 
+✅ Create chaos-videos branch automatically
+✅ Push videos + screenshots + traces to the branch
+✅ Create issues with video links when errors are found
+✅ Run AI analysis on the errors
+✅ Deploy dashboard with embedded videos
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`48158dd49`](https://github.com/OmniBlocks/scratch-gui/commit/48158dd49f15178bd4515fcbaf58fe53a02b7452) - 2025-12-02 18:31:24 -0500
 
 **Update test.yml**

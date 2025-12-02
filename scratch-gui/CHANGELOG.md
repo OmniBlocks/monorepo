@@ -4,6 +4,15 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`ad779c3ce`](https://github.com/OmniBlocks/scratch-gui/commit/ad779c3ce6fe7946d5ea9547fa3243c8bf8ae8be) - 2025-12-02 22:23:16 +0000
+
+**mistral ai for issue assistant**
+
+*Author: ampelectrecuted*
+
+---
+
+
 ### Commit [`997dd692e`](https://github.com/OmniBlocks/scratch-gui/commit/997dd692ec5bb1ae6c6dd0a9293dd279e8ff2c21) - 2025-12-02 22:00:59 +0000
 
 **thing**

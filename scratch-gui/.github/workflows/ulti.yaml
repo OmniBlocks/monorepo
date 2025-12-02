@@ -778,15 +778,14 @@ jobs:
         id: ai-issue-type
         uses: actions/ai-inference@v1
         with:
-          model: 'gpt-4o-mini'
+          model: 'gpt-5'
           prompt: |
-            Classify this GitHub issue into **EXACTLY ONE** of these types: `bug`, `feature`, `task`.
+            Classify this GitHub issue into **EXACTLY ONE** of these types based off its content: `bug` (for bugs with the app), `feature` (for ideas for new features), `task` (for miscellanious).
             
             Respond with **ONLY** the type word (bug, feature, or task). No explanations.
             
             Title: ${{ github.event.issue.title }}
             Body: ${{ github.event.issue.body }}
-          temperature: 0.1
         continue-on-error: true
 
       - name: Clean Issue Type

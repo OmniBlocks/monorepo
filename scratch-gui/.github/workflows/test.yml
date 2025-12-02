@@ -518,15 +518,16 @@ jobs:
         if: steps.build.outputs.build_status == 'success'
         continue-on-error: true
         run: |
+          set -o pipefail
           mkdir -p test-videos chaos-reports
           
           # Run chaos tests
           npx playwright test chaos-test.spec.js --project=chromium --output=test-videos/ 2>&1 | tee chaos-test-output.txt
-          CHAOS_EXIT=$?
+          CHAOS_EXIT=${PIPESTATUS[0]}
           
           # Run recorded actions tests
           npx playwright test recorded-actions-test.spec.js --project=chromium --output=test-videos/ 2>&1 | tee recorded-actions-output.txt
-          RECORDED_EXIT=$?
+          RECORDED_EXIT=${PIPESTATUS[0]}
           
           if [ $CHAOS_EXIT -eq 0 ] && [ $RECORDED_EXIT -eq 0 ]; then
             echo "chaos_status=passed" >> $GITHUB_OUTPUT
@@ -581,12 +582,14 @@ jobs:
           
           mkdir -p "chaos-videos/${VIDEO_DIR}"
           
-          # Find and copy all video files
-          find test-results -name "*.webm" -exec cp {} "chaos-videos/${VIDEO_DIR}/" \;
+          # Copy all videos, screenshots from failures, and traces
+          find test-videos -type f -name "*.webm" -exec cp {} "chaos-videos/${VIDEO_DIR}/" \;
+          find test-videos -type f -name "test-failed-*.png" -exec cp {} "chaos-videos/${VIDEO_DIR}/" \;
+          find test-videos -type f -name "trace.zip" -exec cp {} "chaos-videos/${VIDEO_DIR}/" \;
           
-          # List uploaded videos
-          echo "Videos found:"
-          ls -lah "chaos-videos/${VIDEO_DIR}/" || echo "No videos found!"
+          # List uploaded files
+          echo "Videos and artifacts found:"
+          ls -lah "chaos-videos/${VIDEO_DIR}/" || echo "No files found!"
           
           # Save video URLs for later use
           echo "video_timestamp=${TIMESTAMP}" >> $GITHUB_OUTPUT
@@ -604,6 +607,17 @@ jobs:
           else
             echo "⚠️ No changes to commit"
           fi
+
+      - name: Upload video artifacts (fallback)
+        if: always() && steps.chaos_tests.outputs.errors_found == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: chaos-test-videos
+          path: |
+            test-videos/**/video.webm
+            test-videos/**/test-failed-*.png
+            test-videos/**/trace.zip
+          retention-days: 30
 
       # ============================================================
       # 🤖 AI ERROR ANALYSIS & ISSUE CREATION 🤖
@@ -766,7 +780,7 @@ jobs:
             if (videoDir && videoDir !== 'None') {
               const videoBranchUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/raw/chaos-videos/${videoDir}`;
               videoSection += `**Videos captured during this run:**\n\n`;
-              videoSection += `- [Download chaos test video](${videoBranchUrl}/chaos-test-chromium-video.webm)\n`;
+              videoSection += `- [Download chaos test video](${videoBranchUrl}/video.webm)\n`;
               videoSection += `- [Browse all files in chaos-videos branch](https://github.com/${context.repo.owner}/${context.repo.repo}/tree/chaos-videos/${videoDir})\n`;
               videoSection += `- [View workflow run](${videoUrl})\n\n`;
               videoSection += `> **Note:** Click the download link above to view the video of the test execution.\n\n`;
@@ -844,7 +858,7 @@ jobs:
             if (videoDir && videoDir !== 'None') {
               const videoBranchUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/raw/chaos-videos/${videoDir}`;
               videoSection += `**Videos captured during this run:**\n\n`;
-              videoSection += `- [Download recorded actions video](${videoBranchUrl}/recorded-actions-test-chromium-video.webm)\n`;
+              videoSection += `- [Download recorded actions video](${videoBranchUrl}/video.webm)\n`;
               videoSection += `- [Browse all files in chaos-videos branch](https://github.com/${context.repo.owner}/${context.repo.repo}/tree/chaos-videos/${videoDir})\n`;
               videoSection += `- [View workflow run](${videoUrl})\n\n`;
               videoSection += `> **Note:** Click the download link above to view the video of the test execution.\n\n`;

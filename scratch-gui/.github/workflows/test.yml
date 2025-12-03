@@ -761,6 +761,12 @@ jobs:
             const videoDir = process.env.VIDEO_DIR;
             const runId = context.runId;
             const sha = context.sha;
+            const commitAuthor = context.payload.head_commit.author.username;
+            
+            let assignees = ['supervoidcoder'];
+            if (commitAuthor) {
+              assignees.push(commitAuthor);
+            }
             
             let aiSection = '';
             if (aiAnalysis && tokenEstimate < 8000) {
@@ -774,8 +780,12 @@ jobs:
             let videoSection = `### 📹 Video\n\n`;
             if (videoDir) {
               const videoBranchUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/raw/chaos-videos/${videoDir}`;
-              videoSection += `- [Download video](${videoBranchUrl}/chaos-test-chromium-video.webm)\n`;
+              const rawVideoUrl = `${videoBranchUrl}/chaos-test-chromium-video.webm`;
+              videoSection += `- [Download video](${rawVideoUrl})\n`;
               videoSection += `- [Browse files](https://github.com/${context.repo.owner}/${context.repo.repo}/tree/chaos-videos/${videoDir})\n\n`;
+              
+              // Add raw video URL with newlines
+              videoSection += `\n\n${rawVideoUrl}\n\n`;
             } else {
               videoSection += `[Workflow artifacts](${videoUrl})\n\n`;
             }
@@ -784,9 +794,10 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               title: `🌪️ Console Errors During Chaos Testing`,
-              body: `## 🐛 Chaos Test Errors\n\n**Run:** ${runId}\n**Commit:** ${sha}\n\n${videoSection}\n### 🚨 Errors\n\`\`\`\n${errors}\n\`\`\`\n\n### 🎯 Last 10 Clicks\n\`\`\`\n${events}\n\`\`\`\n\n${aiSection}---\n*🤖 Auto-generated*`,
+              body: `## 🐛 Chaos Test Errors\n\n**Run:** ${runId}\n**Commit:** ${sha}\n**Author:** ${commitAuthor || 'unknown'}\n\n${videoSection}\n### 🚨 Errors\n\`\`\`\n${errors}\n\`\`\`\n\n### 🎯 Last 10 Clicks\n\`\`\`\n${events}\n\`\`\`\n\n${aiSection}---\n*🤖 Auto-generated*`,
               labels: ['bug', 'automated-test', 'console-error', 'chaos-testing'],
-              assignees: ['supervoidcoder']
+              assignees: assignees,
+              type: 'Bug'
             });
 
       - name: Create issue for recorded actions errors
@@ -811,6 +822,12 @@ jobs:
             const videoDir = process.env.VIDEO_DIR;
             const runId = context.runId;
             const sha = context.sha;
+            const commitAuthor = context.payload.head_commit.author.username;
+            
+            let assignees = ['supervoidcoder'];
+            if (commitAuthor) {
+              assignees.push(commitAuthor);
+            }
             
             let aiSection = '';
             if (aiAnalysis && tokenEstimate < 8000) {
@@ -824,8 +841,12 @@ jobs:
             let videoSection = `### 📹 Video\n\n`;
             if (videoDir) {
               const videoBranchUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/raw/chaos-videos/${videoDir}`;
-              videoSection += `- [Download video](${videoBranchUrl}/recorded-actions-chromium-video.webm)\n`;
+              const rawVideoUrl = `${videoBranchUrl}/recorded-actions-chromium-video.webm`;
+              videoSection += `- [Download video](${rawVideoUrl})\n`;
               videoSection += `- [Browse files](https://github.com/${context.repo.owner}/${context.repo.repo}/tree/chaos-videos/${videoDir})\n\n`;
+              
+              // Add raw video URL with newlines
+              videoSection += `\n\n${rawVideoUrl}\n\n`;
             } else {
               videoSection += `[Workflow artifacts](${videoUrl})\n\n`;
             }
@@ -834,9 +855,10 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               title: `🎬 Errors in "${testName}" Test`,
-              body: `## 🐛 Recorded Actions Errors\n\n**Test:** ${testName}\n**File:** \`.github/chaos-tests/${testFile}\`\n**Run:** ${runId}\n**Commit:** ${sha}\n\n${videoSection}\n### 🚨 Errors\n\`\`\`\n${errors}\n\`\`\`\n\n### 🎬 Actions\n\`\`\`\n${events}\n\`\`\`\n\n${aiSection}---\n*🤖 Auto-generated*`,
+              body: `## 🐛 Recorded Actions Errors\n\n**Test:** ${testName}\n**File:** \`.github/chaos-tests/${testFile}\`\n**Run:** ${runId}\n**Commit:** ${sha}\n**Author:** ${commitAuthor || 'unknown'}\n\n${videoSection}\n### 🚨 Errors\n\`\`\`\n${errors}\n\`\`\`\n\n### 🎬 Actions\n\`\`\`\n${events}\n\`\`\`\n\n${aiSection}---\n*🤖 Auto-generated*`,
               labels: ['bug', 'automated-test', 'console-error', 'recorded-actions'],
-              assignees: ['supervoidcoder']
+              assignees: assignees,
+              type: 'Bug'
             });
 
       # ============================================================

@@ -12,7 +12,6 @@ on:
 jobs:
   main-branch-test-and-chaos:
     runs-on: ubuntu-latest
-    # ⚡ FIX #1: ADD MISSING OUTPUTS SECTION - This is the critical fix!
     outputs:
       start_timestamp: ${{ steps.start_time.outputs.timestamp }}
       build_status: ${{ steps.build.outputs.build_status }}
@@ -195,7 +194,6 @@ jobs:
           npm init -y
           npm install --save-dev @playwright/test@latest
 
-      # ⚡ FIX #2: Platform-specific Playwright browser installation
       - name: Install Playwright browsers (Linux)
         if: runner.os == 'Linux'
         run: npx playwright install --with-deps ${{ matrix.browser }}
@@ -703,10 +701,13 @@ jobs:
           path: windows-results/
         continue-on-error: true
 
-      - name: Download all matrix results for dashboard
+      # 🎯 FIX #1: Download ALL matrix results (not just Windows) for dashboard
+      - name: Download all matrix results
         uses: actions/download-artifact@v4
         with:
+          pattern: chaos-results-*
           path: all-matrix-results/
+          merge-multiple: false
         continue-on-error: true
 
       - name: Analyze Windows chaos test errors (for issues)
@@ -784,6 +785,13 @@ jobs:
           
           echo "found_errors=$FOUND_ERRORS" >> $GITHUB_OUTPUT
 
+      # 🎯 FIX #2: Install FFmpeg for video-to-GIF conversion
+      - name: Install FFmpeg
+        if: steps.analyze_chaos_errors.outputs.found_errors == 'true'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+
       - name: Upload videos to chaos-videos branch
         if: steps.analyze_chaos_errors.outputs.found_errors == 'true'
         id: upload_to_branch
@@ -811,7 +819,7 @@ jobs:
           
           mkdir -p "$VIDEO_DIR"
           
-          # ⚡ FIX #3: Replace while read loop with for loop to fix race condition
+          # Copy videos with ASCII-safe names
           counter=1
           for video in ../windows-results/test-videos/*.webm; do
             if [ -f "$video" ]; then
@@ -820,9 +828,20 @@ jobs:
             fi
           done
           
-          # Also copy with test-specific names
+          # Copy test-specific videos
           find ../windows-results/test-videos -path "*chaos-test*" -name "video.webm" -exec cp {} "$VIDEO_DIR/chaos-test-chromium-video.webm" \; 2>/dev/null || true
           find ../windows-results/test-videos -path "*recorded-actions*" -name "video.webm" -exec cp {} "$VIDEO_DIR/recorded-actions-chromium-video.webm" \; 2>/dev/null || true
+          
+          # 🎯 FIX #3: Convert videos to GIF for inline display
+          echo "Converting videos to GIF for inline display..."
+          for webm in "$VIDEO_DIR"/*.webm; do
+            if [ -f "$webm" ]; then
+              gif="${webm%.webm}.gif"
+              echo "Converting $webm to $gif..."
+              # High-quality GIF conversion with reasonable file size
+              ffmpeg -i "$webm" -vf "fps=10,scale=800:-1:flags=lanczos,split[s0][s1];[s0]palettegen=max_colors=256[p];[s1][p]paletteuse=dither=bayer:bayer_scale=5" -loop 0 "$gif" -y 2>&1 | tail -5
+            fi
+          done
           
           echo "video_timestamp=$TIMESTAMP" >> $GITHUB_OUTPUT
           echo "video_dir=$VIDEO_DIR" >> $GITHUB_OUTPUT
@@ -903,7 +922,6 @@ jobs:
             const sha = context.sha;
             const commitAuthor = context.payload.head_commit?.author?.username || 'unknown';
             
-            // ⚡ FIX #4: Deduplicate assignees properly
             const assignees = ['supervoidcoder'];
             if (commitAuthor && commitAuthor !== 'unknown' && commitAuthor !== 'supervoidcoder') {
               assignees.push(commitAuthor);
@@ -916,13 +934,16 @@ jobs:
               aiSection = `### ⚠️ AI Analysis Skipped\n\nLog too large (${tokenEstimate} tokens).\n\n`;
             }
             
+            // 🎯 FIX #4: Use GIF for inline display + webm for download
             let videoSection = `### 📹 Video\n\n`;
             if (videoDir) {
               const videoBranchUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/raw/chaos-videos/${videoDir}`;
-              const rawVideoUrl = `${videoBranchUrl}/chaos-test-chromium-video.webm`;
-              videoSection += `- [Download video](${rawVideoUrl})\n`;
-              videoSection += `- [Browse files](https://github.com/${context.repo.owner}/${context.repo.repo}/tree/chaos-videos/${videoDir})\n\n`;
-              videoSection += `\n\n${rawVideoUrl}\n\n`;
+              const webmUrl = `${videoBranchUrl}/chaos-test-chromium-video.webm`;
+              const gifUrl = `${videoBranchUrl}/chaos-test-chromium-video.gif`;
+              
+              videoSection += `![Chaos Test Recording](${gifUrl})\n\n`;
+              videoSection += `📥 [Download original video (WebM)](${webmUrl})\n`;
+              videoSection += `🗂️ [Browse all files](https://github.com/${context.repo.owner}/${context.repo.repo}/tree/chaos-videos/${videoDir})\n\n`;
             } else {
               videoSection += `[Workflow artifacts](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${runId})\n\n`;
             }
@@ -960,7 +981,6 @@ jobs:
             const sha = context.sha;
             const commitAuthor = context.payload.head_commit?.author?.username || 'unknown';
             
-            // ⚡ FIX #4: Deduplicate assignees properly
             const assignees = ['supervoidcoder'];
             if (commitAuthor && commitAuthor !== 'unknown' && commitAuthor !== 'supervoidcoder') {
               assignees.push(commitAuthor);
@@ -973,13 +993,16 @@ jobs:
               aiSection = `### ⚠️ AI Analysis Skipped\n\nLog too large (${tokenEstimate} tokens).\n\n`;
             }
             
+            // 🎯 FIX #4: Use GIF for inline display + webm for download
             let videoSection = `### 📹 Video\n\n`;
             if (videoDir) {
               const videoBranchUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/raw/chaos-videos/${videoDir}`;
-              const rawVideoUrl = `${videoBranchUrl}/recorded-actions-chromium-video.webm`;
-              videoSection += `- [Download video](${rawVideoUrl})\n`;
-              videoSection += `- [Browse files](https://github.com/${context.repo.owner}/${context.repo.repo}/tree/chaos-videos/${videoDir})\n\n`;
-              videoSection += `\n\n${rawVideoUrl}\n\n`;
+              const webmUrl = `${videoBranchUrl}/recorded-actions-chromium-video.webm`;
+              const gifUrl = `${videoBranchUrl}/recorded-actions-chromium-video.gif`;
+              
+              videoSection += `![Recorded Actions Test](${gifUrl})\n\n`;
+              videoSection += `📥 [Download original video (WebM)](${webmUrl})\n`;
+              videoSection += `🗂️ [Browse all files](https://github.com/${context.repo.owner}/${context.repo.repo}/tree/chaos-videos/${videoDir})\n\n`;
             } else {
               videoSection += `[Workflow artifacts](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${runId})\n\n`;
             }
@@ -1027,14 +1050,28 @@ jobs:
         run: |
           mkdir -p dashboard
           
-          # Copy all screenshots from all platforms
+          # 🎯 FIX #5: Copy screenshots from ALL platforms for dashboard
+          echo "📸 Copying screenshots from all platforms..."
           for platform_dir in all-matrix-results/chaos-results-*/; do
-            if [ -d "$platform_dir/screenshots" ]; then
+            if [ -d "$platform_dir" ]; then
               platform_name=$(basename "$platform_dir" | sed 's/chaos-results-//')
-              mkdir -p "dashboard/screenshots-${platform_name}"
-              cp -r "$platform_dir/screenshots"/* "dashboard/screenshots-${platform_name}/" 2>/dev/null || true
+              echo "  - Found platform: $platform_name"
+              
+              if [ -d "$platform_dir/screenshots" ]; then
+                mkdir -p "dashboard/screenshots-${platform_name}"
+                screenshot_count=$(find "$platform_dir/screenshots" -name "*.png" | wc -l)
+                echo "    - Copying $screenshot_count screenshots..."
+                cp -r "$platform_dir/screenshots"/* "dashboard/screenshots-${platform_name}/" 2>/dev/null || true
+              else
+                echo "    - No screenshots directory found"
+              fi
             fi
           done
+          
+          # Verify screenshots were copied
+          echo ""
+          echo "📊 Dashboard screenshot summary:"
+          find dashboard -name "*.png" | wc -l | xargs echo "  Total screenshots:"
           
           python3 .github/scripts/generate-dashboard.py dashboard
 
@@ -1062,7 +1099,6 @@ jobs:
           rm -f latest
           ln -s "$TIMESTAMP" latest
           
-          # ⚡ FIX #5: Expanded CSS for better maintainability
           cat > index.html << 'INDEXEOF'
           <!DOCTYPE html>
           <html lang="en">

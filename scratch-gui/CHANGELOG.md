@@ -4,6 +4,15 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`d3d797df6`](https://github.com/OmniBlocks/scratch-gui/commit/d3d797df67114e989a436544b8698e8819148e5b) - 2025-12-03 08:52:34 -0500
+
+**fix: (ci) made AI know that it's github-actions**
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`3c0066cbf`](https://github.com/OmniBlocks/scratch-gui/commit/3c0066cbfaaaf7190784afe518cacc039e4b51ab) - 2025-12-02 21:46:22 -0500
 
 **feat: Add matrix-driven chaos testing workflow with multi-platform support and automated reporting**

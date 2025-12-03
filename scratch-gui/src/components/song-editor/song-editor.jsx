@@ -83,7 +83,7 @@ const SongEditor = () => {
                     id="beepboxEditorIframe"
                     src="songeditor.html"
                     className={styles.iframe}
-                    sandbox="allow-scripts allow-same-origin allow-downloads"
+                    sandbox="allow-scripts allow-same-origin allow-downloads allow-midi allow-modals allow-forms"
                     allow="fullscreen"
                 />
             </div>

@@ -12,6 +12,23 @@ on:
 jobs:
   main-branch-test-and-chaos:
     runs-on: ubuntu-latest
+    # ⚡ FIX #1: ADD MISSING OUTPUTS SECTION - This is the critical fix!
+    outputs:
+      start_timestamp: ${{ steps.start_time.outputs.timestamp }}
+      build_status: ${{ steps.build.outputs.build_status }}
+      lint_status: ${{ steps.lint.outputs.lint_status }}
+      lint_errors: ${{ steps.lint.outputs.lint_errors }}
+      lint_warnings: ${{ steps.lint.outputs.lint_warnings }}
+      unit_status: ${{ steps.unit_tests.outputs.unit_status }}
+      unit_total: ${{ steps.unit_tests.outputs.unit_total }}
+      unit_passed: ${{ steps.unit_tests.outputs.unit_passed }}
+      unit_failed: ${{ steps.unit_tests.outputs.unit_failed }}
+      unit_skipped: ${{ steps.unit_tests.outputs.unit_skipped }}
+      integration_status: ${{ steps.integration_tests.outputs.integration_status }}
+      integration_total: ${{ steps.integration_tests.outputs.integration_total }}
+      integration_passed: ${{ steps.integration_tests.outputs.integration_passed }}
+      integration_failed: ${{ steps.integration_tests.outputs.integration_failed }}
+      integration_skipped: ${{ steps.integration_tests.outputs.integration_skipped }}
 
     steps:
       - name: Record start time
@@ -177,7 +194,15 @@ jobs:
         run: |
           npm init -y
           npm install --save-dev @playwright/test@latest
-          npx playwright install --with-deps ${{ matrix.browser }}
+
+      # ⚡ FIX #2: Platform-specific Playwright browser installation
+      - name: Install Playwright browsers (Linux)
+        if: runner.os == 'Linux'
+        run: npx playwright install --with-deps ${{ matrix.browser }}
+
+      - name: Install Playwright browsers (macOS/Windows)
+        if: runner.os != 'Linux'
+        run: npx playwright install ${{ matrix.browser }}
 
       - name: Create Playwright config
         shell: bash
@@ -786,12 +811,14 @@ jobs:
           
           mkdir -p "$VIDEO_DIR"
           
-          # Copy and rename videos with ASCII-safe names
+          # ⚡ FIX #3: Replace while read loop with for loop to fix race condition
           counter=1
-          find ../windows-results/test-videos -type f -name "*.webm" 2>/dev/null | while read video; do
-            cp "$video" "$VIDEO_DIR/video-$(printf '%03d' $counter).webm"
-            counter=$((counter + 1))
-          done || true
+          for video in ../windows-results/test-videos/*.webm; do
+            if [ -f "$video" ]; then
+              cp "$video" "$VIDEO_DIR/video-$(printf '%03d' $counter).webm"
+              counter=$((counter + 1))
+            fi
+          done
           
           # Also copy with test-specific names
           find ../windows-results/test-videos -path "*chaos-test*" -name "video.webm" -exec cp {} "$VIDEO_DIR/chaos-test-chromium-video.webm" \; 2>/dev/null || true
@@ -876,9 +903,9 @@ jobs:
             const sha = context.sha;
             const commitAuthor = context.payload.head_commit?.author?.username || 'unknown';
             
-            // FIX: Deduplicate assignees
-            let assignees = ['supervoidcoder'];
-            if (commitAuthor && commitAuthor !== 'supervoidcoder') {
+            // ⚡ FIX #4: Deduplicate assignees properly
+            const assignees = ['supervoidcoder'];
+            if (commitAuthor && commitAuthor !== 'unknown' && commitAuthor !== 'supervoidcoder') {
               assignees.push(commitAuthor);
             }
             
@@ -933,9 +960,9 @@ jobs:
             const sha = context.sha;
             const commitAuthor = context.payload.head_commit?.author?.username || 'unknown';
             
-            // FIX: Deduplicate assignees
-            let assignees = ['supervoidcoder'];
-            if (commitAuthor && commitAuthor !== 'supervoidcoder') {
+            // ⚡ FIX #4: Deduplicate assignees properly
+            const assignees = ['supervoidcoder'];
+            if (commitAuthor && commitAuthor !== 'unknown' && commitAuthor !== 'supervoidcoder') {
               assignees.push(commitAuthor);
             }
             
@@ -1035,6 +1062,7 @@ jobs:
           rm -f latest
           ln -s "$TIMESTAMP" latest
           
+          # ⚡ FIX #5: Expanded CSS for better maintainability
           cat > index.html << 'INDEXEOF'
           <!DOCTYPE html>
           <html lang="en">
@@ -1042,6 +1070,7 @@ jobs:
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>Test Results - OmniBlocks 🌪️</title>
+            <style>
               body {
                 font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
                 background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -1049,19 +1078,22 @@ jobs:
                 padding: 40px;
                 text-align: center;
               }
+              
               .container {
                 max-width: 800px;
                 margin: 0 auto;
-                background: rgba(255,255,255,0.1);
+                background: rgba(255, 255, 255, 0.1);
                 backdrop-filter: blur(10px);
                 border-radius: 20px;
                 padding: 40px;
-                box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
               }
+              
               h1 {
                 font-size: 3em;
                 margin-bottom: 20px;
               }
+              
               .button {
                 display: inline-block;
                 padding: 15px 40px;
@@ -1073,21 +1105,23 @@ jobs:
                 font-weight: bold;
                 font-size: 1.1em;
                 transition: transform 0.3s ease, box-shadow 0.3s ease;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
               }
+              
               .button:hover {
                 transform: translateY(-3px);
-                box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
               }
+              
               .note {
                 margin-top: 30px;
                 opacity: 0.8;
               }
+              
               .chaos {
                 font-size: 2em;
                 margin: 20px 0;
               }
-              .chaos { font-size: 2em; margin: 20px 0; }
             </style>
           </head>
           <body>

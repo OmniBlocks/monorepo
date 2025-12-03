@@ -4,6 +4,15 @@ This file is automatically updated by the Changelog Updater bot.
 
 <!-- UNRELEASED_COMMITS_START -->
 
+### Commit [`da27c905d`](https://github.com/OmniBlocks/scratch-gui/commit/da27c905d50d22a2e296c14d472808a3c32942eb) - 2025-12-03 15:49:23 +0000
+
+**fix: songedito iframe... hopefully**
+
+*Author: supervoidcoder*
+
+---
+
+
 ### Commit [`1911e214b`](https://github.com/OmniBlocks/scratch-gui/commit/1911e214b607ec30664f56803d5927c504ad73aa) - 2025-12-03 14:00:56 +0000
 
 **update github actions**

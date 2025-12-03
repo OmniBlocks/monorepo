@@ -1084,20 +1084,3 @@ jobs:
           script: |
             const script = require('./.github/scripts/create-failure-issue.js');
             await script({github, context, core});
-
-    outputs:
-      start_timestamp: ${{ needs.main-branch-test-and-chaos.outputs.start_timestamp }}
-      build_status: ${{ needs.main-branch-test-and-chaos.outputs.build_status }}
-      lint_status: ${{ needs.main-branch-test-and-chaos.outputs.lint_status }}
-      lint_errors: ${{ needs.main-branch-test-and-chaos.outputs.lint_errors }}
-      lint_warnings: ${{ needs.main-branch-test-and-chaos.outputs.lint_warnings }}
-      unit_status: ${{ needs.main-branch-test-and-chaos.outputs.unit_status }}
-      unit_total: ${{ needs.main-branch-test-and-chaos.outputs.unit_total }}
-      unit_passed: ${{ needs.main-branch-test-and-chaos.outputs.unit_passed }}
-      unit_failed: ${{ needs.main-branch-test-and-chaos.outputs.unit_failed }}
-      unit_skipped: ${{ needs.main-branch-test-and-chaos.outputs.unit_skipped }}
-      integration_status: ${{ needs.main-branch-test-and-chaos.outputs.integration_status }}
-      integration_total: ${{ needs.main-branch-test-and-chaos.outputs.integration_total }}
-      integration_passed: ${{ needs.main-branch-test-and-chaos.outputs.integration_passed }}
-      integration_failed: ${{ needs.main-branch-test-and-chaos.outputs.integration_failed }}
-      integration_skipped: ${{ needs.main-branch-test-and-chaos.outputs.integration_skipped }}
